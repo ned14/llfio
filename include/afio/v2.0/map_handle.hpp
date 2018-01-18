@@ -82,7 +82,7 @@ public:
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~section_handle() override;
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
   //! Default constructor
-  constexpr section_handle() = default;
+  section_handle() = default;
   //! Construct a section handle using the given native handle type for the section and the given i/o handle for the backing storage
   explicit section_handle(native_handle_type sectionh, file_handle *backing, file_handle anonymous, flag __flag)
       : handle(sectionh, handle::caching::all)
@@ -270,9 +270,7 @@ protected:
 
 public:
   //! Default constructor
-  constexpr map_handle()
-  {
-  }
+  constexpr map_handle() {}
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~map_handle() override;
   //! Implicit move construction of map_handle permitted
   constexpr map_handle(map_handle &&o) noexcept : io_handle(std::move(o)), _section(o._section), _addr(o._addr), _offset(o._offset), _length(o._length), _flag(o._flag)

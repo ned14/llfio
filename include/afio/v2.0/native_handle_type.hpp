@@ -64,7 +64,7 @@ struct native_handle_type
   disposition behaviour;  //! The behaviour of the handle
   union {
     intptr_t _init{-1};
-    int fd;       //!< A POSIX file descriptor
+    int fd;         //!< A POSIX file descriptor
     int pid;        //!< A POSIX process identifier
     win::handle h;  //!< A Windows HANDLE
   };
@@ -76,7 +76,7 @@ struct native_handle_type
   constexpr native_handle_type(disposition _behaviour, win::handle _h) noexcept : behaviour(_behaviour), h(_h) {}
 
   //! Copy construct
-  constexpr native_handle_type(const native_handle_type &) = default;
+  native_handle_type(const native_handle_type &) = default;
   //! Move construct
   constexpr native_handle_type(native_handle_type &&o) noexcept : behaviour(o.behaviour), _init(o._init)
   {
@@ -84,7 +84,7 @@ struct native_handle_type
     o._init = -1;
   }
   //! Copy assign
-  constexpr native_handle_type &operator=(const native_handle_type &) = default;
+  native_handle_type &operator=(const native_handle_type &) = default;
   //! Move assign
   constexpr native_handle_type &operator=(native_handle_type &&o) noexcept
   {

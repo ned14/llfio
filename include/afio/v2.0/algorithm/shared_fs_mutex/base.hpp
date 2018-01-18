@@ -95,7 +95,7 @@ namespace algorithm
       using entities_type = span<entity_type>;
 
     protected:
-      constexpr shared_fs_mutex() = default;
+      shared_fs_mutex() = default;
 
     public:
       AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~shared_fs_mutex() = default;

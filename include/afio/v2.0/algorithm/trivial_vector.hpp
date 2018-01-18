@@ -198,7 +198,7 @@ namespace algorithm
 
     public:
       //! Default constructor
-      constexpr trivial_vector_impl() = default;
+      trivial_vector_impl() = default;
       //! Filling constructor of `value_type`
       trivial_vector_impl(size_type count, const value_type &v) { insert(begin(), count, v); }
       //! Range constructor
@@ -535,7 +535,7 @@ namespace algorithm
       using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
     public:
-      constexpr trivial_vector_impl() = default;
+      trivial_vector_impl() = default;
       using trivial_vector_impl<false, T>::trivial_vector_impl;
       //! Filling constructor of default constructed `value_type`
       explicit trivial_vector_impl(size_type count)
@@ -581,7 +581,7 @@ best suited to arrays of unknown in advance, but likely large, sizes.
     static_assert(std::is_trivially_copyable<T>::value, "trivial_vector: Type T is not trivially copyable!");
 
   public:
-    constexpr trivial_vector() = default;
+    trivial_vector() = default;
     using detail::trivial_vector_impl<std::is_default_constructible<T>::value, T>::trivial_vector_impl;
   };
 

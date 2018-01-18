@@ -120,7 +120,7 @@ public:
 
 public:
   //! Default constructor
-  constexpr directory_handle() = default;
+  directory_handle() = default;
   //! Construct a directory_handle from a supplied native path_handle
   explicit constexpr directory_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching = caching::all, flag flags = flag::none)
       : path_handle(std::move(h), caching, flags)
