@@ -18,7 +18,7 @@ var classafio__v2__xxx_1_1directory__handle =
       [ "none", "classafio__v2__xxx_1_1directory__handle.html#a47ed88b4de271daa08862b273c2f609ea334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
       [ "fastdeleted", "classafio__v2__xxx_1_1directory__handle.html#a47ed88b4de271daa08862b273c2f609ea14847befc159c1492671b53718fc46f8", null ]
     ] ],
-    [ "directory_handle", "classafio__v2__xxx_1_1directory__handle.html#a4c7c7f08f05d5e330ee2c24d652c1afa", null ],
+    [ "directory_handle", "classafio__v2__xxx_1_1directory__handle.html#aac1a405d6799c9bb469bc3ad3936a88e", null ],
     [ "directory_handle", "classafio__v2__xxx_1_1directory__handle.html#a352e948332a37127e4c47541f41b346e", null ],
     [ "directory_handle", "classafio__v2__xxx_1_1directory__handle.html#a7661e46005a377ca3f6e23064710dd9f", null ],
     [ "directory_handle", "classafio__v2__xxx_1_1directory__handle.html#af7cff32d671ae0b2b1e4b702c7389f3f", null ],
