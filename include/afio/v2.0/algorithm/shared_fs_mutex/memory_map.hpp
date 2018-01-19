@@ -123,10 +123,12 @@ namespace algorithm
       {
         _hlockinuse.set_handle(&_h);
       }
-      memory_map(const memory_map &) = delete;
-      memory_map &operator=(const memory_map &) = delete;
 
     public:
+      //! No copy construction
+      memory_map(const memory_map &) = delete;
+      //! No copy assignment
+      memory_map &operator=(const memory_map &) = delete;
       //! Move constructor
       memory_map(memory_map &&o) noexcept : _h(std::move(o._h)), _temph(std::move(o._temph)), _hlockinuse(std::move(o._hlockinuse)), _hmap(std::move(o._hmap)), _temphmap(std::move(o._temphmap)) { _hlockinuse.set_handle(&_h); }
       //! Move assign

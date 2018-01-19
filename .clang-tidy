@@ -1,5 +1,5 @@
 ---
-Checks:          '*,-llvm-header-guard,-google-build-using-namespace,-google-runtime-int,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-modernize-unary-static-assert,-fuchsia-*,-llvm-namespace-comment'
+Checks:          '*,-llvm-header-guard,-google-build-using-namespace,-google-runtime-int,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-modernize-unary-static-assert,-fuchsia-*,-llvm-namespace-comment,-hicpp-no-array-decay,-cppcoreguidelines-pro-type-union-access,-hicpp-use-override,-modernize-use-override,-google-default-arguments,-google-runtime-references,-cppcoreguidelines-pro-type-reinterpret-cast,-hicpp-vararg,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-vararg,-cppcoreguidelines-pro-bounds-constant-array-index'
 WarningsAsErrors: ''
 HeaderFilterRegex: '.*'
 AnalyzeTemporaryDtors: true

@@ -78,7 +78,7 @@ namespace algorithm
 #pragma warning(pop)
 #endif
         //! Default constructor
-        constexpr entity_type() noexcept : _init(0) {}
+        constexpr entity_type() noexcept : _init(0) {}  // NOLINT
 //! Constructor
 #if !defined(__GNUC__) || defined(__clang__) || __GNUC__ >= 7
         constexpr
@@ -96,6 +96,10 @@ namespace algorithm
 
     protected:
       shared_fs_mutex() = default;
+      shared_fs_mutex(const shared_fs_mutex &) = default;
+      shared_fs_mutex(shared_fs_mutex &&) = default;
+      shared_fs_mutex &operator=(const shared_fs_mutex &) = default;
+      shared_fs_mutex &operator=(shared_fs_mutex &&) = default;
 
     public:
       AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~shared_fs_mutex() = default;

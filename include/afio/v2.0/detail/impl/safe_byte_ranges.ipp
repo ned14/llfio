@@ -87,7 +87,7 @@ namespace algorithm
         // _m mutex must be held on entry!
         void _unlock(unsigned mythreadid, entity_type entity)
         {
-          auto it = _thread_locks.find(entity.value);
+          auto it = _thread_locks.find(entity.value);  // NOLINT
           assert(it != _thread_locks.end());
           assert(it->second.writer_tid == mythreadid || it->second.writer_tid == 0);
           if(it->second.writer_tid == mythreadid)
@@ -385,7 +385,7 @@ namespace algorithm
           };
           if(-1 == ::fstatat(base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, &s, AT_SYMLINK_NOFOLLOW))
           {
-            return { errno, std::system_category() };
+            return {errno, std::system_category()};
           }
           threaded_byte_ranges_list::key_type key;
           key.as_longlongs[0] = s.st_ino;

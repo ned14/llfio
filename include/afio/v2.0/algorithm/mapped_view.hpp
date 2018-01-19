@@ -76,7 +76,7 @@ namespace algorithm
         : _mapping(map_handle::map(length * sizeof(T), _flag).value())
     {
       char *addr = _mapping.address();
-      static_cast<span<T> &>(*this) = span<T>(reinterpret_cast<T *>(addr), length);
+      static_cast<span<T> &>(*this) = span<T>(reinterpret_cast<T *>(addr), length);  // NOLINT
     }
     /*! Construct a mapped view of the given section handle.
 

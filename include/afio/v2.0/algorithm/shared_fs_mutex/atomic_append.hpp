@@ -67,6 +67,11 @@ namespace algorithm
         uint64 us_count : 56;                       // Microseconds since the lock file created
         uint64 items : 8;                           // The number of entities below which are valid
         shared_fs_mutex::entity_type entities[12];  // Entities to exclusive or share lock
+        constexpr lock_request()
+            : us_count{}
+            , items{}
+        {
+        }
       };
       static_assert(sizeof(lock_request) == 128, "lock_request structure is not 128 bytes long!");
 #pragma pack(pop)
@@ -123,12 +128,10 @@ namespace algorithm
       {
         // guard now points at a non-existing handle
         _guard.set_handle(&_h);
-        utils::random_fill(reinterpret_cast<char *>(&_unique_id), sizeof(_unique_id));  // crypto strong random
+        utils::random_fill(reinterpret_cast<char *>(&_unique_id), sizeof(_unique_id));  // NOLINT crypto strong random
         memset(&_header, 0, sizeof(_header));
         (void) _read_header();
       }
-      atomic_append(const atomic_append &) = delete;
-      atomic_append &operator=(const atomic_append &) = delete;
 
       result<void> _read_header()
       {
@@ -163,6 +166,11 @@ namespace algorithm
       //! The type of a sequence of entities
       using entities_type = shared_fs_mutex::entities_type;
 
+      //! No copy construction
+      atomic_append(const atomic_append &) = delete;
+      //! No copy assignment
+      atomic_append &operator=(const atomic_append &) = delete;
+      ~atomic_append() = default;
       //! Move constructor
       atomic_append(atomic_append &&o) noexcept : _h(std::move(o._h)), _guard(std::move(o._guard)), _nfs_compatibility(o._nfs_compatibility), _skip_hashing(o._skip_hashing), _unique_id(o._unique_id), _header(o._header) { _guard.set_handle(&_h); }
       //! Move assign
@@ -275,7 +283,7 @@ namespace algorithm
           {
             auto lastbyte = static_cast<file_handle::extent_type>(-1);
             // Lock up to the beginning of the shadow lock space
-            lastbyte &= ~(1ULL << 63);
+            lastbyte &= ~(1ULL << 63U);
             OUTCOME_TRY(append_guard_, _h.lock(my_lock_request_offset, lastbyte, true));
             append_guard = std::move(append_guard_);
           }
@@ -426,7 +434,7 @@ namespace algorithm
             }
             auto lock_offset = record_offset;
             // Set the top bit to use the shadow lock space on Windows
-            lock_offset |= (1ULL << 63);
+            lock_offset |= (1ULL << 63U);
             OUTCOME_TRYV(_h.lock(lock_offset, sizeof(record), false, nd));
           }
           // Make sure we haven't timed out during this wait
@@ -483,7 +491,7 @@ namespace algorithm
         }
 
         // Every 32 records or so, bump _header.first_known_good
-        if((my_lock_request_offset & 4095) == 0u)
+        if((my_lock_request_offset & 4095U) == 0U)
         {
           //_read_header();
 
@@ -521,9 +529,9 @@ namespace algorithm
             }
           }
           // Hole punch if >= 1Mb of zeros exists
-          if(_header.first_known_good - _header.first_after_hole_punch >= 1024 * 1024)
+          if(_header.first_known_good - _header.first_after_hole_punch >= 1024U * 1024U)
           {
-            handle::extent_type holepunchend = _header.first_known_good & ~(1024 * 1024 - 1);
+            handle::extent_type holepunchend = _header.first_known_good & ~(1024U * 1024U - 1);
 #ifdef _DEBUG
             fprintf(stderr, "hole_punch(%llx, %llx)\n", _header.first_after_hole_punch, holepunchend - _header.first_after_hole_punch);
 #endif

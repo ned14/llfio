@@ -127,8 +127,6 @@ namespace algorithm
           : _p(std::move(p))
       {
       }
-      safe_byte_ranges(const safe_byte_ranges &) = delete;
-      safe_byte_ranges &operator=(const safe_byte_ranges &) = delete;
 
     public:
       //! The type of an entity id
@@ -136,6 +134,11 @@ namespace algorithm
       //! The type of a sequence of entities
       using entities_type = shared_fs_mutex::entities_type;
 
+      //! No copy construction
+      safe_byte_ranges(const safe_byte_ranges &) = delete;
+      //! No copy assignment
+      safe_byte_ranges &operator=(const safe_byte_ranges &) = delete;
+      ~safe_byte_ranges() = default;
       //! Move constructor
       safe_byte_ranges(safe_byte_ranges &&o) noexcept : _p(std::move(o._p)) {}
       //! Move assign
