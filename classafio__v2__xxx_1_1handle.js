@@ -30,7 +30,7 @@ var classafio__v2__xxx_1_1handle =
       [ "write", "classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee", null ],
       [ "append", "classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18a9516dfb15f51c7ee19a4d46b8c0dbe1d", null ]
     ] ],
-    [ "handle", "classafio__v2__xxx_1_1handle.html#af1135a1a8f9e422a317b328ea44146eb", null ],
+    [ "handle", "classafio__v2__xxx_1_1handle.html#ac0d2b45a418794d8388f68d1cc2b2573", null ],
     [ "handle", "classafio__v2__xxx_1_1handle.html#a8f029c40e700b01622f9b0c4126204a8", null ],
     [ "~handle", "classafio__v2__xxx_1_1handle.html#a24bada6bc30151aa8e9d8fc2bfdab2b3", null ],
     [ "handle", "classafio__v2__xxx_1_1handle.html#a593405e371cb4012c780907bd2e1fc55", null ],

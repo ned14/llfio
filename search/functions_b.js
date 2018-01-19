@@ -12,6 +12,6 @@ var searchData=
   ['max_5fbuffers',['max_buffers',['../classafio__v2__xxx_1_1io__handle.html#a4d9cbbb7aae98704c6ad97de080c4210',1,'afio_v2_xxx::io_handle']]],
   ['max_5fsize',['max_size',['../structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#ab6b3c4513e47e2905c8e6fe1c831d742',1,'afio_v2_xxx::storage_profile::storage_profile::max_size()'],['../structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a659754b0f9d7e2f3fa26921ebe48e7c0',1,'afio_v2_xxx::algorithm::impl::trivial_vector_impl::max_size()']]],
   ['memory_5fbacked_5ftemporary_5ffiles_5fdirectory',['memory_backed_temporary_files_directory',['../namespaceafio__v2__xxx_1_1path__discovery.html#ae34df4ad4e4f2c977ef99575713fd9bf',1,'afio_v2_xxx::path_discovery']]],
-  ['memory_5fmap',['memory_map',['../classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#af066bb4d3f9f7020b60733ff0bcc99df',1,'afio_v2_xxx::algorithm::shared_fs_mutex::memory_map']]],
+  ['memory_5fmap',['memory_map',['../classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#ad8731e82e929f26c38a34450fc87d7bb',1,'afio_v2_xxx::algorithm::shared_fs_mutex::memory_map::memory_map(const memory_map &amp;)=delete'],['../classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#af066bb4d3f9f7020b60733ff0bcc99df',1,'afio_v2_xxx::algorithm::shared_fs_mutex::memory_map::memory_map(memory_map &amp;&amp;o) noexcept']]],
   ['message',['message',['../structafio__v2__xxx_1_1error__info.html#ae710a4b60f3da9ab91e32374f9a766d5',1,'afio_v2_xxx::error_info']]]
 ];
