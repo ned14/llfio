@@ -327,7 +327,7 @@ namespace algorithm
         {
           auto lock_offset = my_lock_request_offset;
           // Set the top bit to use the shadow lock space on Windows
-          lock_offset |= (1ULL << 63);
+          lock_offset |= (1ULL << 63U);
           OUTCOME_TRY(my_request_guard_, _h.lock(lock_offset, sizeof(lock_request), true));
           my_request_guard = std::move(my_request_guard_);
         }

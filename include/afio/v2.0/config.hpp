@@ -460,6 +460,11 @@ class log_level_guard
   log_level _v;
 
 public:
+  log_level_guard() = delete;
+  log_level_guard(const log_level_guard &) = delete;
+  log_level_guard(log_level_guard &&) = delete;
+  log_level_guard &operator=(const log_level_guard &) = delete;
+  log_level_guard &operator=(log_level_guard &&) = delete;
   explicit log_level_guard(log_level n)
       : _v(log().log_level())
   {
@@ -514,13 +519,18 @@ namespace detail
   {
     handle *old{nullptr};
     bool enabled{false};
+    tls_current_handle_holder() = delete;
+    tls_current_handle_holder(const tls_current_handle_holder &) = delete;
+    tls_current_handle_holder(tls_current_handle_holder &&) = delete;
+    tls_current_handle_holder &operator=(const tls_current_handle_holder &) = delete;
+    tls_current_handle_holder &operator=(tls_current_handle_holder &&) = delete;
     explicit tls_current_handle_holder(const handle *h)
     {
       if(h != nullptr && log().log_level() >= log_level::error)
       {
         auto &tls = tls_errored_results();
         old = tls.current_handle;
-        tls.current_handle = const_cast<handle *>(h);
+        tls.current_handle = const_cast<handle *>(h);  // NOLINT
         enabled = true;
       }
     }
@@ -535,6 +545,11 @@ namespace detail
   };
   template <> struct tls_current_handle_holder<false>
   {
+    tls_current_handle_holder() = delete;
+    tls_current_handle_holder(const tls_current_handle_holder &) = delete;
+    tls_current_handle_holder(tls_current_handle_holder &&) = delete;
+    tls_current_handle_holder &operator=(const tls_current_handle_holder &) = delete;
+    tls_current_handle_holder &operator=(tls_current_handle_holder &&) = delete;
     template <class T> explicit tls_current_handle_holder(T && /*unused*/) {}
   };
 #define AFIO_LOG_INST_TO_TLS(inst) AFIO_V2_NAMESPACE::detail::tls_current_handle_holder<std::is_base_of<AFIO_V2_NAMESPACE::handle, std::decay_t<std::remove_pointer_t<decltype(inst)>>>::value> AFIO_UNIQUE_NAME(inst)
@@ -747,6 +762,11 @@ namespace detail
   {
     struct function_ptr_storage
     {
+      function_ptr_storage() = default;
+      function_ptr_storage(const function_ptr_storage &) = delete;
+      function_ptr_storage(function_ptr_storage &&) = delete;
+      function_ptr_storage &operator=(const function_ptr_storage &) = delete;
+      function_ptr_storage &operator=(function_ptr_storage &&) = delete;
       virtual ~function_ptr_storage() = default;
       virtual R operator()(Args &&... args) = 0;
     };
@@ -781,7 +801,7 @@ namespace detail
     constexpr function_ptr() noexcept : ptr(nullptr) {}
     constexpr explicit function_ptr(function_ptr_storage *p) noexcept : ptr(p) {}
     constexpr function_ptr(function_ptr &&o) noexcept : ptr(o.ptr) { o.ptr = nullptr; }
-    function_ptr &operator=(function_ptr &&o)
+    function_ptr &operator=(function_ptr &&o) noexcept
     {
       delete ptr;
       ptr = o.ptr;

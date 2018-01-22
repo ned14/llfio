@@ -56,12 +56,17 @@ struct AFIO_DEADLINE_NAME
     unsigned long long nsecs;  // NOLINT
   };
 #ifdef __cplusplus
-  deadline() noexcept { memset(this, 0, sizeof(*this)); }
+  constexpr deadline()
+      : steady(false)
+      , utc{0, 0}
+  {
+  }
   //! True if deadline is valid
-  explicit operator bool() const noexcept { return steady || utc.tv_sec != 0; }
+  constexpr explicit operator bool() const noexcept { return steady || utc.tv_sec != 0; }
   //! Implicitly construct a deadline from a system clock time point
   deadline(std::chrono::system_clock::time_point tp)  // NOLINT
-  : steady(false)
+  : steady(false),
+    utc{0, 0}
   {
     std::chrono::seconds secs(std::chrono::system_clock::to_time_t(tp));
     utc.tv_sec = secs.count();
@@ -70,8 +75,9 @@ struct AFIO_DEADLINE_NAME
   }
   //! Implicitly construct a deadline from a duration from now
   template <class Rep, class Period>
-  deadline(std::chrono::duration<Rep, Period> d)  // NOLINT
-  : steady(true)
+  constexpr deadline(std::chrono::duration<Rep, Period> d)  // NOLINT
+  : steady(true),
+    nsecs(0)
   {
     std::chrono::nanoseconds _nsecs = std::chrono::duration_cast<std::chrono::nanoseconds>(d);
     // Negative durations are zero duration
