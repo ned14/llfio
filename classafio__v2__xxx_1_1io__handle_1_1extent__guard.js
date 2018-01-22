@@ -1,6 +1,6 @@
 var classafio__v2__xxx_1_1io__handle_1_1extent__guard =
 [
-    [ "extent_guard", "classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#ad39d0d65e7497b15e5565ca5c40309bb", null ],
+    [ "extent_guard", "classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#a258e99aa881970a903c9dd745ef84350", null ],
     [ "extent_guard", "classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#a654755e3c10998191fe5a923df02c4e3", null ],
     [ "~extent_guard", "classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#aed3a270ce019773feab6f93818c443a8", null ],
     [ "extent", "classafio__v2__xxx_1_1io__handle_1_1extent__guard.html#a15ded83348af6cd802e49b261b7734ea", null ],

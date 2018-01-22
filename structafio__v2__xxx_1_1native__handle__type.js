@@ -2,7 +2,7 @@ var structafio__v2__xxx_1_1native__handle__type =
 [
     [ "disposition_base", "structafio__v2__xxx_1_1native__handle__type_1_1disposition__base.html", "structafio__v2__xxx_1_1native__handle__type_1_1disposition__base" ],
     [ "disposition", "structafio__v2__xxx_1_1native__handle__type.html#a3aab386f73623173d5275c1ce0c01877", null ],
-    [ "native_handle_type", "structafio__v2__xxx_1_1native__handle__type.html#a532813f19240bfa611cabf815f6adefc", null ],
+    [ "native_handle_type", "structafio__v2__xxx_1_1native__handle__type.html#ae887bbcc3aef6c72912fabff0cdfcb73", null ],
     [ "native_handle_type", "structafio__v2__xxx_1_1native__handle__type.html#a4bf882806140928beefb19ea186c0f20", null ],
     [ "native_handle_type", "structafio__v2__xxx_1_1native__handle__type.html#afbacfb60e744076535baf62eff599f90", null ],
     [ "native_handle_type", "structafio__v2__xxx_1_1native__handle__type.html#aac4e4df65cc5b3c31f3b67635aa5fe98", null ],

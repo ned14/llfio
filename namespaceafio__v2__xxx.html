@@ -1817,7 +1817,7 @@ For portability, you can only assume that barriers write order for a single hand
   </dd>
 </dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>Except on platforms with race free syscalls for renaming open handles (Windows), calls <code>current_path()</code> and thus is both expensive and calls malloc many times. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;{</div><div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.relink(std::forward&lt;decltype(base)&gt;(base), std::forward&lt;decltype(newpath)&gt;(newpath), std::forward&lt;decltype(atomic_replace)&gt;(atomic_replace), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;{</div><div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.relink(std::forward&lt;decltype(base)&gt;(base), std::forward&lt;decltype(newpath)&gt;(newpath), std::forward&lt;decltype(atomic_replace)&gt;(atomic_replace), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="ac095df054e29fb086f9e7b96274c3c67"></a>
@@ -2113,7 +2113,7 @@ For portability, you can only assume that barriers write order for a single hand
   </dd>
 </dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>Except on platforms with race free syscalls for unlinking open handles (Windows), calls <code>current_path()</code> and thus is both expensive and calls malloc many times. On Windows, also calls <code>current_path()</code> if <code>flag::disable_safety_unlinks</code> is not set. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;{</div><div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.unlink(std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;{</div><div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.unlink(std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a2d15768d28ea660ebe44901508ed3372"></a>

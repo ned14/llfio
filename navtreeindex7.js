@@ -1,5 +1,10 @@
 var NAVTREEINDEX7 =
 {
+"structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#a14559edf894cb85d3afcdce3af0f0d3f":[3,0,0,33,0,5],
+"structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#a2dcc8c52ed1147d36a480af7e43a263e":[3,0,0,33,0,3],
+"structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#a66db065b8f21b1895e1f021465cfe9e3":[3,0,0,33,0,4],
+"structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#aa60cb5337a8754332284d5fa19a311d7":[3,0,0,33,0,6],
+"structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#aad31bddf29d0736339709e78ca93062a":[3,0,0,33,0,2],
 "structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#aca3e492928914b0fb46e98289f32d0cd":[3,0,0,33,0,7],
 "structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#ad90201c2e2a8446c45feb244a9927778":[3,0,0,33,0,0],
 "structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#ada0e4acd2108972f836b87781b3bf19a":[3,0,0,33,0,1],
@@ -87,6 +92,7 @@ var NAVTREEINDEX7 =
 "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a5607dc3a379a1fa3db1d65930d6d60aa":[3,0,0,2,3,28],
 "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a572adadc5fcad439170c965ec4839d75":[3,0,0,2,3,27],
 "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a591a394d1916f06fe6045ba6b1c891ba":[3,0,0,2,3,1],
+"structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a59bcc78d328258d12493c80b676d4de3":[3,0,0,2,3,7],
 "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a5b1f170aeccbd787f8251e2b1eaecd32":[3,0,0,2,3,42],
 "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a60b600fac1a3c92295cd8989e474e21c":[3,0,0,2,3,77],
 "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a6463c774a453de667724a83d45c77596":[3,0,0,2,3,70],
@@ -103,7 +109,6 @@ var NAVTREEINDEX7 =
 "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a930c7dfcee658f51d52a52a67e11e20e":[3,0,0,2,3,11],
 "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a94d7b81b3132864094c55d7d810b3e28":[3,0,0,2,3,71],
 "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a961d153d6c9aa3431f1688ca2c932821":[3,0,0,2,3,37],
-"structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a97b67ae6de6e2c3994870d707473ea9d":[3,0,0,2,3,7],
 "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a9811705f9110d7dae69e621a67a39ec8":[3,0,0,2,3,16],
 "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a9cabe840a151594695d42962315c8a22":[3,0,0,2,3,10],
 "structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a9cd6a175bc3143172c1244e9ad5564f9":[3,0,0,2,3,88],
