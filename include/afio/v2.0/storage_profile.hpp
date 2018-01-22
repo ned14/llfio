@@ -238,9 +238,7 @@ namespace storage_profile
     size_type _size{0};
 
   public:
-    storage_profile()
-    {
-    }
+    storage_profile() = default;
 
     //! Value type
     using value_type = item_erased &;

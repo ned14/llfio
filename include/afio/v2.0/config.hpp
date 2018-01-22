@@ -784,13 +784,13 @@ namespace detail
     template <class U> struct emplace_t
     {
     };
-    template <class U, class V> friend inline function_ptr<U> make_function_ptr(V &&f);
+    template <class U, class V> friend inline function_ptr<U> make_function_ptr(V &&f);  // NOLINT
     template <class U>
     explicit function_ptr(std::nullptr_t, U &&f)
         : ptr(new function_ptr_storage_impl<typename std::decay<U>::type>(std::forward<U>(f)))
     {
     }
-    template <class R_, class U, class... Args2> friend inline function_ptr<R_> emplace_function_ptr(Args2 &&... args);
+    template <class R_, class U, class... Args2> friend inline function_ptr<R_> emplace_function_ptr(Args2 &&... args);  // NOLINT
     template <class U, class... Args2>
     explicit function_ptr(emplace_t<U> /*unused*/, Args2 &&... args)
         : ptr(new function_ptr_storage_impl<U>(std::forward<Args2>(args)...))

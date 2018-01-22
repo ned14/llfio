@@ -270,7 +270,7 @@ protected:
 
 public:
   //! Default constructor
-  constexpr map_handle() {}
+  map_handle() = default;
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~map_handle() override;
   //! Implicit move construction of map_handle permitted
   constexpr map_handle(map_handle &&o) noexcept : io_handle(std::move(o)), _section(o._section), _addr(o._addr), _offset(o._offset), _length(o._length), _flag(o._flag)

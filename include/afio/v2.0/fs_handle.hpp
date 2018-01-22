@@ -65,9 +65,7 @@ protected:
 
 protected:
   //! Default constructor
-  constexpr fs_handle()
-  {
-  }
+  fs_handle() = default;
   //! Construct a handle
   constexpr fs_handle(dev_t devid, ino_t inode)
       : _devid(devid)

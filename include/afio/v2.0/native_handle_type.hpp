@@ -69,7 +69,7 @@ struct native_handle_type
     win::handle h;  //!< A Windows HANDLE
   };
   //! Constructs a default instance
-  constexpr native_handle_type() noexcept {}
+  native_handle_type() = default;
   //! Construct from a POSIX file descriptor
   constexpr native_handle_type(disposition _behaviour, int _fd) noexcept : behaviour(_behaviour), fd(_fd) {}
   //! Construct from a Windows HANDLE

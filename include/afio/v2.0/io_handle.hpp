@@ -92,7 +92,7 @@ public:
   {
     T buffers{};
     extent_type offset{0};
-    constexpr io_request() {}
+    io_request() = default;
     constexpr io_request(T _buffers, extent_type _offset)
         : buffers(std::move(_buffers))
         , offset(_offset)
@@ -309,7 +309,7 @@ public:
 
   public:
     //! Default constructor
-    constexpr extent_guard() {}
+    extent_guard() = default;
     //! Move constructor
     extent_guard(extent_guard &&o) noexcept : _h(o._h), _offset(o._offset), _length(o._length), _exclusive(o._exclusive) { o.release(); }
     //! Move assign

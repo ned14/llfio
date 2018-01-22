@@ -54,4 +54,4 @@ namespace directory_handle_create_close
     b.close().value();
     return h;
   }
-}
+}  // namespace directory_handle_create_close

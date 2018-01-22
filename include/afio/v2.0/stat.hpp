@@ -107,27 +107,27 @@ struct stat_t
   //! Constructs a UNINITIALIZED instance i.e. full of random garbage
   stat_t() = default;
   //! Constructs a zeroed instance
-  constexpr explicit stat_t(std::nullptr_t) noexcept : st_dev(0),
-                                                       st_ino(0),
-                                                       st_type(filesystem::file_type::unknown),
+  constexpr explicit stat_t(std::nullptr_t) noexcept : st_dev(0),  // NOLINT
+                                                       st_ino(0),  // NOLINT
+                                                       st_type(filesystem::file_type::unknown),  // NOLINT
 #ifndef _WIN32
-                                                       st_perms(0),
+                                                       st_perms(0),  // NOLINT
 #endif
-                                                       st_nlink(0),
+                                                       st_nlink(0),  // NOLINT
 #ifndef _WIN32
-                                                       st_uid(0),
-                                                       st_gid(0),
-                                                       st_rdev(0),
+                                                       st_uid(0),  // NOLINT
+                                                       st_gid(0),  // NOLINT
+                                                       st_rdev(0),  // NOLINT
 #endif
-                                                       st_size(0),
-                                                       st_allocated(0),
-                                                       st_blocks(0),
-                                                       st_blksize(0),
-                                                       st_flags(0),
-                                                       st_gen(0),
-                                                       st_sparse(0),
-                                                       st_compressed(0),
-                                                       st_reparse_point(0)
+                                                       st_size(0),  // NOLINT
+                                                       st_allocated(0),  // NOLINT
+                                                       st_blocks(0),  // NOLINT
+                                                       st_blksize(0),  // NOLINT
+                                                       st_flags(0),  // NOLINT
+                                                       st_gen(0),  // NOLINT
+                                                       st_sparse(0),  // NOLINT
+                                                       st_compressed(0),  // NOLINT
+                                                       st_reparse_point(0)  // NOLINT
   {
   }
 #ifdef __cpp_exceptions

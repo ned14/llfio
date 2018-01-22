@@ -233,10 +233,10 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
     {
       return std::errc::timed_out;
     }
-    else
-    {
+    
+    
       return {errno, std::system_category()};
-    }
+    
   }
   return extent_guard(this, offset, bytes, exclusive);
 }

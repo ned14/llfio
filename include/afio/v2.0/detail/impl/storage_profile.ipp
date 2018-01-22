@@ -505,7 +505,7 @@ namespace storage_profile
           {
             std::this_thread::sleep_for(std::chrono::seconds(1));
           }
-          done = true;
+          done = 1u;
           for(auto &writer : writers)
           {
             writer.first->join();
@@ -651,7 +651,7 @@ namespace storage_profile
             {
               std::this_thread::sleep_for(std::chrono::seconds(1));
             }
-            done = true;
+            done = 1u;
             for(auto &writer : writers)
             {
               writer.first->join();
@@ -810,7 +810,7 @@ namespace storage_profile
               {
                 std::this_thread::sleep_for(std::chrono::seconds(1));
               }
-              done = true;
+              done = 1u;
               for(auto &writer : writers)
               {
                 writer.first->join();
@@ -978,7 +978,7 @@ namespace storage_profile
         {
           std::this_thread::sleep_for(std::chrono::seconds(1));
         }
-        done = true;
+        done = 1u;
         for(auto &writer : writers)
         {
           writer.first->join();

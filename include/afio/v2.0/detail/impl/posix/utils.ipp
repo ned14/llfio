@@ -214,6 +214,6 @@ namespace utils
       }
     }
   }  // namespace detail
-}  // namespace detail
+}  // namespace utils
 
 AFIO_V2_NAMESPACE_END

@@ -185,7 +185,7 @@ private:
   {
     string_view _utf8;
 
-    constexpr state() {}
+    state() = default;
     constexpr explicit state(string_view v)
         : _utf8(v)
     {
@@ -198,7 +198,7 @@ private:
 #endif
 public:
   //! Constructs an empty path view
-  constexpr path_view() noexcept {}
+  path_view() = default;
   //! Implicitly constructs a path view from a path. The input path MUST continue to exist for this view to be valid.
   path_view(const filesystem::path &v) noexcept : _state(v.native()) {}  // NOLINT
   //! Implicitly constructs a UTF-8 path view from a string. The input string MUST continue to exist for this view to be valid.

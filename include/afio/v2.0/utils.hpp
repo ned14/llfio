@@ -160,9 +160,7 @@ namespace utils
       void *p{nullptr};
       size_t page_size_used{0};
       size_t actual_size{0};
-      large_page_allocation()
-      {
-      }
+      large_page_allocation() = default;
       large_page_allocation(void *_p, size_t pagesize, size_t actual)
           : p(_p)
           , page_size_used(pagesize)
