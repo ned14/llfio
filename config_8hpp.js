@@ -50,5 +50,7 @@ var config_8hpp =
     [ "operator!=", "config_8hpp.html#a32361fd287b7160ae34aada17191e41e", null ],
     [ "operator<<", "config_8hpp.html#ac0d5364044c4627667e827f5aaaa183f", null ],
     [ "operator==", "config_8hpp.html#a14e8f43a04092eb024ced8b5909cfd88", null ],
+    [ "OUTCOME_TEMPLATE", "config_8hpp.html#a02415bd7a9e444399d9575e7627709f2", null ],
+    [ "OUTCOME_TEMPLATE", "config_8hpp.html#a01f7cebaa9daf8a041e3d362a85a7d18", null ],
     [ "throw_as_system_error_with_payload", "config_8hpp.html#ae44838fe79524e9d9eb432eb072395cb", null ]
 ];

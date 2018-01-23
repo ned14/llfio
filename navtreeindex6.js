@@ -1,5 +1,7 @@
 var NAVTREEINDEX6 =
 {
+"structafio__v2__xxx_1_1construct_3_01directory__handle_01_4.html":[3,0,0,8],
+"structafio__v2__xxx_1_1construct_3_01directory__handle_01_4.html#a3252246a5e1ced8b2464fc91f848ef43":[3,0,0,8,2],
 "structafio__v2__xxx_1_1construct_3_01directory__handle_01_4.html#a3309209710a951e1657471a6f5bbb5d4":[3,0,0,8,6],
 "structafio__v2__xxx_1_1construct_3_01directory__handle_01_4.html#a4d2e4e394b603391b393862d8eb2b33e":[3,0,0,8,5],
 "structafio__v2__xxx_1_1construct_3_01directory__handle_01_4.html#a85c4267b66cdf4d07c721185cab21d86":[3,0,0,8,0],
@@ -85,9 +87,9 @@ var NAVTREEINDEX6 =
 "structafio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#adc7fb3275838792208c936669926cfe9":[3,0,0,22,1,0],
 "structafio__v2__xxx_1_1io__handle_1_1io__request.html":[3,0,0,22,3],
 "structafio__v2__xxx_1_1io__handle_1_1io__request.html#a2e286d1fc85eb7d0e6a7c184a71ef63d":[3,0,0,22,3,2],
+"structafio__v2__xxx_1_1io__handle_1_1io__request.html#a331a35aab824809266890ff7abe81558":[3,0,0,22,3,0],
 "structafio__v2__xxx_1_1io__handle_1_1io__request.html#a438fe959c459d36360cce560d58c68dc":[3,0,0,22,3,3],
 "structafio__v2__xxx_1_1io__handle_1_1io__request.html#a7e1dc3fc06d2721304ac4945ecf0b96a":[3,0,0,22,3,1],
-"structafio__v2__xxx_1_1io__handle_1_1io__request.html#a9df30035763723fcdd1b2ab93012a8cd":[3,0,0,22,3,0],
 "structafio__v2__xxx_1_1io__handle_1_1io__result.html":[3,0,0,22,4],
 "structafio__v2__xxx_1_1io__handle_1_1io__result.html#a06f4e6691683b36ad2a4786dbf5ac0de":[3,0,0,22,4,6],
 "structafio__v2__xxx_1_1io__handle_1_1io__result.html#a26abbc9936d6412d2f073069f383d5e6":[3,0,0,22,4,4],
@@ -247,7 +249,5 @@ var NAVTREEINDEX6 =
 "structafio__v2__xxx_1_1statfs__t.html#a836b825613ae069efbbd676c505cef96":[3,0,0,33,2],
 "structafio__v2__xxx_1_1statfs__t.html#a8ba4ab8892187dff6ab92b3f0ca25c64":[3,0,0,33,14],
 "structafio__v2__xxx_1_1statfs__t.html#ab9d13f831de61aafbfcdcb8bac53e521":[3,0,0,33,3],
-"structafio__v2__xxx_1_1statfs__t.html#afd7deb0987a569515b00c412fe2c8f6d":[3,0,0,33,7],
-"structafio__v2__xxx_1_1statfs__t.html#aff9b6558a9deb9dcb2fb981881a14ba2":[3,0,0,33,5],
-"structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html":[3,0,0,33,0]
+"structafio__v2__xxx_1_1statfs__t.html#afd7deb0987a569515b00c412fe2c8f6d":[3,0,0,33,7]
 };

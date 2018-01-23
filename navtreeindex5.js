@@ -1,5 +1,7 @@
 var NAVTREEINDEX5 =
 {
+"mapped__file__handle_8hpp.html#abe51642ffc028c8f8b030944263b4a85":[4,0,0,0,0,12,3],
+"mapped__file__handle_8hpp.html#ac021261f7a8696b0f4cbdcfacef1e88a":[4,0,0,0,0,12,7],
 "mapped__file__handle_8hpp.html#ac9be648f691d72c9cac6295ea7b3f9c8":[4,0,0,0,0,12,5],
 "mapped__view_8hpp.html":[4,0,0,0,0,0,2],
 "memory__map_8hpp.html":[4,0,0,0,0,0,0,4],
@@ -8,8 +10,8 @@ var NAVTREEINDEX5 =
 "namespaceafio__v2__xxx.html":[2,0,0],
 "namespaceafio__v2__xxx_1_1algorithm.html":[3,0,0,0],
 "namespaceafio__v2__xxx_1_1algorithm.html":[2,0,0,0],
-"namespaceafio__v2__xxx_1_1algorithm_1_1impl.html":[3,0,0,0,0],
 "namespaceafio__v2__xxx_1_1algorithm_1_1impl.html":[2,0,0,0,0],
+"namespaceafio__v2__xxx_1_1algorithm_1_1impl.html":[3,0,0,0,0],
 "namespaceafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex.html":[3,0,0,0,1],
 "namespaceafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex.html":[2,0,0,0,1],
 "namespaceafio__v2__xxx_1_1path__discovery.html":[2,0,0,1],
@@ -247,7 +249,5 @@ var NAVTREEINDEX5 =
 "structafio__v2__xxx_1_1construct_3_01async__file__handle_01_4.html#ab1b4a4a68c6853aed4453ec8db6eceaf":[3,0,0,7,6],
 "structafio__v2__xxx_1_1construct_3_01async__file__handle_01_4.html#ac3b0c8caaff22d73ed751df6a0d2f280":[3,0,0,7,7],
 "structafio__v2__xxx_1_1construct_3_01async__file__handle_01_4.html#ac6e96ad5321692fc0a5d6e64e00cb5bd":[3,0,0,7,5],
-"structafio__v2__xxx_1_1construct_3_01async__file__handle_01_4.html#ad4547b4d236cd079473f0a3d0e37e7f1":[3,0,0,7,3],
-"structafio__v2__xxx_1_1construct_3_01directory__handle_01_4.html":[3,0,0,8],
-"structafio__v2__xxx_1_1construct_3_01directory__handle_01_4.html#a3252246a5e1ced8b2464fc91f848ef43":[3,0,0,8,2]
+"structafio__v2__xxx_1_1construct_3_01async__file__handle_01_4.html#ad4547b4d236cd079473f0a3d0e37e7f1":[3,0,0,7,3]
 };
