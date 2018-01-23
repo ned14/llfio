@@ -113,7 +113,7 @@ public:
 
   /*! Create a file handle opening access to a file on path
   \param base Handle to a base location on the filing system. Pass `{}` to indicate that path will be absolute.
-  \param _path The path relative to base to open.
+  \param path The path relative to base to open.
   \param _mode How to open the file.
   \param _creation How to create the file.
   \param _caching How to ask the kernel to cache the file.

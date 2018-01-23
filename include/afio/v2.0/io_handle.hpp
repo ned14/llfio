@@ -92,7 +92,7 @@ public:
   {
     T buffers{};
     extent_type offset{0};
-    io_request() = default;
+    constexpr io_request() {}  // NOLINT (defaulting this breaks clang and GCC, so don't do it!)
     constexpr io_request(T _buffers, extent_type _offset)
         : buffers(std::move(_buffers))
         , offset(_offset)

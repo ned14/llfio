@@ -309,7 +309,24 @@ using namespace QUICKCPPLIB_NAMESPACE::string_view;
 AFIO_V2_NAMESPACE_END
 // Bring in a result implementation
 #include "outcome/include/outcome.hpp"
+
+
 AFIO_V2_NAMESPACE_BEGIN
+
+namespace detail
+{
+  // Used to cast an unknown input to some unsigned integer
+  OUTCOME_TEMPLATE(class T, class U)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_unsigned<T>::value && !std::is_same<std::decay_t<U>, std::nullptr_t>::value))
+  inline T unsigned_integer_cast(U &&v) { return static_cast<T>(v); }
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_unsigned<T>::value))
+  inline T unsigned_integer_cast(std::nullptr_t /* unused */) { return static_cast<T>(0); }
+  OUTCOME_TEMPLATE(class T, class U)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_unsigned<T>::value))
+  inline T unsigned_integer_cast(U *v) { return static_cast<T>(reinterpret_cast<uintptr_t>(v)); }
+}  // namespace detail
+
 /*! \struct error_info
 \brief The cause of the failure of an operation in AFIO.
 */
@@ -630,24 +647,27 @@ AFIO_V2_NAMESPACE_END
 #if AFIO_LOGGING_LEVEL >= 1
 #define AFIO_LOG_FATAL(inst, message)                                                                                                                                                                                                                                                                                          \
   {                                                                                                                                                                                                                                                                                                                            \
-    AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::fatal, (message), (unsigned) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1U << 1U)) ? nullptr : __func__, __LINE__);                                                      \
+    AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::fatal, (message), AFIO_V2_NAMESPACE::detail::unsigned_integer_cast<unsigned>(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1U << 1U)) ? nullptr : __func__, __LINE__);                  \
     AFIO_LOG_FATAL_TO_CERR(message);                                                                                                                                                                                                                                                                                           \
   }
 #else
 #define AFIO_LOG_FATAL(inst, message) AFIO_LOG_FATAL_TO_CERR(message)
 #endif
 #if AFIO_LOGGING_LEVEL >= 2
-#define AFIO_LOG_ERROR(inst, message) AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::error, (message), (unsigned) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1U << 2U)) ? nullptr : __func__, __LINE__)
+#define AFIO_LOG_ERROR(inst, message)                                                                                                                                                                                                                                                                                          \
+  AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::error, (message), AFIO_V2_NAMESPACE::detail::unsigned_integer_cast<unsigned>(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1U << 2U)) ? nullptr : __func__, __LINE__)
 #else
 #define AFIO_LOG_ERROR(inst, message)
 #endif
 #if AFIO_LOGGING_LEVEL >= 3
-#define AFIO_LOG_WARN(inst, message) AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::warn, (message), (unsigned) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1U << 3U)) ? nullptr : __func__, __LINE__)
+#define AFIO_LOG_WARN(inst, message)                                                                                                                                                                                                                                                                                           \
+  AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::warn, (message), AFIO_V2_NAMESPACE::detail::unsigned_integer_cast<unsigned>(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1U << 3U)) ? nullptr : __func__, __LINE__)
 #else
 #define AFIO_LOG_WARN(inst, message)
 #endif
 #if AFIO_LOGGING_LEVEL >= 4
-#define AFIO_LOG_INFO(inst, message) AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::info, (message), (unsigned) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1U << 4U)) ? nullptr : __func__, __LINE__)
+#define AFIO_LOG_INFO(inst, message)                                                                                                                                                                                                                                                                                           \
+  AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::info, (message), AFIO_V2_NAMESPACE::detail::unsigned_integer_cast<unsigned>(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1U << 4U)) ? nullptr : __func__, __LINE__)
 
 // Need to expand out our namespace into a string
 #define AFIO_LOG_STRINGIFY9(s) #s "::"
@@ -740,12 +760,14 @@ AFIO_V2_NAMESPACE_END
 #define AFIO_LOG_FUNCTION_CALL(inst) AFIO_LOG_INST_TO_TLS(inst)
 #endif
 #if AFIO_LOGGING_LEVEL >= 5
-#define AFIO_LOG_DEBUG(inst, message) AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::debug, (message), (unsigned) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1U << 5U)) ? nullptr : __func__, __LINE__)
+#define AFIO_LOG_DEBUG(inst, message)                                                                                                                                                                                                                                                                                          \
+  AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::debug, AFIO_V2_NAMESPACE::detail::unsigned_integer_cast<unsigned>(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1U << 5U)) ? nullptr : __func__, __LINE__)
 #else
 #define AFIO_LOG_DEBUG(inst, message)
 #endif
 #if AFIO_LOGGING_LEVEL >= 6
-#define AFIO_LOG_ALL(inst, message) AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::all, (message), (unsigned) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1U << 6U)) ? nullptr : __func__, __LINE__)
+#define AFIO_LOG_ALL(inst, message)                                                                                                                                                                                                                                                                                            \
+  AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::all, (message), AFIO_V2_NAMESPACE::detail::unsigned_integer_cast<unsigned>(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1U << 6U)) ? nullptr : __func__, __LINE__)
 #else
 #define AFIO_LOG_ALL(inst, message)
 #endif

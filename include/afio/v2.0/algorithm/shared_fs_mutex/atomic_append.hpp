@@ -138,7 +138,7 @@ namespace algorithm
         bool first = true;
         do
         {
-          OUTCOME_TRY(_, _h.read(0, (char *) &_header, 48));
+          OUTCOME_TRY(_, _h.read(0, reinterpret_cast<char *>(&_header), 48));
           if(_.data != reinterpret_cast<char *>(&_header))
           {
             memcpy(&_header, _.data, _.len);
@@ -220,7 +220,7 @@ namespace algorithm
           {
             header.hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash((reinterpret_cast<char *>(&header)) + 16, sizeof(header) - 16);
           }
-          OUTCOME_TRYV(ret.write(0, (char *) &header, sizeof(header)));
+          OUTCOME_TRYV(ret.write(0, reinterpret_cast<char *>(&header), sizeof(header)));
         }
         // Open a shared lock on last byte in header to prevent other users zomping the file
         OUTCOME_TRY(guard, ret.lock(sizeof(header) - 1, 1, false));
@@ -287,7 +287,7 @@ namespace algorithm
             OUTCOME_TRY(append_guard_, _h.lock(my_lock_request_offset, lastbyte, true));
             append_guard = std::move(append_guard_);
           }
-          OUTCOME_TRYV(_h.write(0, (char *) &lock_request, sizeof(lock_request)));
+          OUTCOME_TRYV(_h.write(0, reinterpret_cast<char *>(&lock_request), sizeof(lock_request)));
         }
 
         // Find the record I just wrote
@@ -376,7 +376,7 @@ namespace algorithm
             // If record hash doesn't match contents it's a torn read, reload
             if(!_skip_hashing)
             {
-              if(record->hash != QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash(((char *) record) + 16, sizeof(atomic_append_detail::lock_request) - 16))
+              if(record->hash != QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash((reinterpret_cast<const char *>(record)) + 16, sizeof(atomic_append_detail::lock_request) - 16))
               {
                 goto reload;
               }
