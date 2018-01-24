@@ -127,6 +127,14 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a274f5d82e11f92ed62e05919076508b8"><td class="memItemLeft" align="right" valign="top"><a id="a274f5d82e11f92ed62e05919076508b8"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#a274f5d82e11f92ed62e05919076508b8">fs_handle</a> (const <a class="el" href="classafio__v2__xxx_1_1fs__handle.html">fs_handle</a> &amp;)=delete</td></tr>
+<tr class="memdesc:a274f5d82e11f92ed62e05919076508b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">No copy construction (use <code>clone()</code>) <br /></td></tr>
+<tr class="separator:a274f5d82e11f92ed62e05919076508b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a334ed7c11091e8f3f83686b8aeaa1c5b"><td class="memItemLeft" align="right" valign="top"><a id="a334ed7c11091e8f3f83686b8aeaa1c5b"></a>
+<a class="el" href="classafio__v2__xxx_1_1fs__handle.html">fs_handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#a334ed7c11091e8f3f83686b8aeaa1c5b">operator=</a> (const <a class="el" href="classafio__v2__xxx_1_1fs__handle.html">fs_handle</a> &amp;o)=delete</td></tr>
+<tr class="memdesc:a334ed7c11091e8f3f83686b8aeaa1c5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">No copy assignment. <br /></td></tr>
+<tr class="separator:a334ed7c11091e8f3f83686b8aeaa1c5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abf1012040064a3d429adfae8e6f443f0"><td class="memItemLeft" align="right" valign="top"><a id="abf1012040064a3d429adfae8e6f443f0"></a>
 dev_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#abf1012040064a3d429adfae8e6f443f0">st_dev</a> () const noexcept</td></tr>
 <tr class="memdesc:abf1012040064a3d429adfae8e6f443f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unless <code>flag::disable_safety_unlinks</code> is set, the device id of the file when opened. <br /></td></tr>
@@ -163,14 +171,6 @@ virtual const <a class="el" href="classafio__v2__xxx_1_1handle.html">handle</a> 
 constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#a45eb2220cdefa846fdb103d12a5ce485">fs_handle</a> (dev_t devid, ino_t inode)</td></tr>
 <tr class="memdesc:a45eb2220cdefa846fdb103d12a5ce485"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a handle. <br /></td></tr>
 <tr class="separator:a45eb2220cdefa846fdb103d12a5ce485"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a274f5d82e11f92ed62e05919076508b8"><td class="memItemLeft" align="right" valign="top"><a id="a274f5d82e11f92ed62e05919076508b8"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#a274f5d82e11f92ed62e05919076508b8">fs_handle</a> (const <a class="el" href="classafio__v2__xxx_1_1fs__handle.html">fs_handle</a> &amp;)=delete</td></tr>
-<tr class="memdesc:a274f5d82e11f92ed62e05919076508b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">No copy construction (use clone()) <br /></td></tr>
-<tr class="separator:a274f5d82e11f92ed62e05919076508b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a334ed7c11091e8f3f83686b8aeaa1c5b"><td class="memItemLeft" align="right" valign="top"><a id="a334ed7c11091e8f3f83686b8aeaa1c5b"></a>
-<a class="el" href="classafio__v2__xxx_1_1fs__handle.html">fs_handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#a334ed7c11091e8f3f83686b8aeaa1c5b">operator=</a> (const <a class="el" href="classafio__v2__xxx_1_1fs__handle.html">fs_handle</a> &amp;o)=delete</td></tr>
-<tr class="memdesc:a334ed7c11091e8f3f83686b8aeaa1c5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">No copy assignment. <br /></td></tr>
-<tr class="separator:a334ed7c11091e8f3f83686b8aeaa1c5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a10d68d2506b9d587e7cad8485fef9637"><td class="memItemLeft" align="right" valign="top"><a id="a10d68d2506b9d587e7cad8485fef9637"></a>
 constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#a10d68d2506b9d587e7cad8485fef9637">fs_handle</a> (<a class="el" href="classafio__v2__xxx_1_1fs__handle.html">fs_handle</a> &amp;&amp;o) noexcept</td></tr>
 <tr class="memdesc:a10d68d2506b9d587e7cad8485fef9637"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implicit move construction of fs_handle permitted. <br /></td></tr>

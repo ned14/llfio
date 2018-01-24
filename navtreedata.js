@@ -40,12 +40,12 @@ var NAVTREEINDEX =
 [
 "afio_8hpp.html",
 "classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html#a9cb175f8b03635cc4fc3ccf220adbe61",
-"classafio__v2__xxx_1_1file__handle.html#ad8fbc587a7d7dafd23b3d6c5ffc01eb8",
-"classafio__v2__xxx_1_1map__handle.html#ab790af4654f5455d8c5e1f1d397543ca",
-"classafio__v2__xxx_1_1section__handle.html#a6f7e37c73271968271c2342023f58c9eadec4ecca8ae1593f84eea4656599a693",
-"mapped__file__handle_8hpp.html#abe51642ffc028c8f8b030944263b4a85",
-"structafio__v2__xxx_1_1construct_3_01directory__handle_01_4.html",
-"structafio__v2__xxx_1_1statfs__t.html#aff9b6558a9deb9dcb2fb981881a14ba2"
+"classafio__v2__xxx_1_1file__handle.html#ac5b2859fabe04dbfc37020daed618257",
+"classafio__v2__xxx_1_1map__handle.html#a97ffbbf53f51549549efef0b49e125dc",
+"classafio__v2__xxx_1_1section__handle.html#a526c300d421155ccc071b04db4bca65d",
+"map__handle_8hpp.html#a2bea94a20aae6fb34ebe1ffd03e50891",
+"structafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entity__type.html#aaf26009d3ea5a35b9f96d9d468466dcf",
+"structafio__v2__xxx_1_1stat__t_1_1want__base.html#a5c889dae7c6113ee9da35a669447145ead3010a2a1a4b87d445c0d0755031c5eb"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
