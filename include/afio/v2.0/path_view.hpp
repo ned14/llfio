@@ -199,6 +199,7 @@ private:
 public:
   //! Constructs an empty path view
   path_view() = default;
+  ~path_view() = default;
   //! Implicitly constructs a path view from a path. The input path MUST continue to exist for this view to be valid.
   path_view(const filesystem::path &v) noexcept : _state(v.native()) {}  // NOLINT
   //! Implicitly constructs a UTF-8 path view from a string. The input string MUST continue to exist for this view to be valid.
@@ -489,6 +490,7 @@ public:
       _buffer[0] = 0;
       buffer = _buffer;
     }
+    ~c_str() = default;
     c_str(const c_str &) = delete;
     c_str(c_str &&) = delete;
     c_str &operator=(const c_str &) = delete;

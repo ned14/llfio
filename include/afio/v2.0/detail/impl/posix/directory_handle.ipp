@@ -196,6 +196,19 @@ result<directory_handle> directory_handle::clone(mode mode_, caching caching_, d
   }
 }
 
+AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> directory_handle::clone_to_path_handle() const noexcept
+{
+  AFIO_LOG_FUNCTION_CALL(this);
+  result<path_handle> ret(path_handle(native_handle_type(), _caching, _flags));
+  ret.value()._v.behaviour = _v.behaviour;
+  ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC);
+  if(-1 == ret.value()._v.fd)
+  {
+    return {errno, std::system_category()};
+  }
+  return ret;
+}
+
 result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_type &&tofill, path_view_type glob, filter /*unused*/, span<char> kernelbuffer) const noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);

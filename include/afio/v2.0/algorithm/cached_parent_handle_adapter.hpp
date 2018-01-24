@@ -129,8 +129,8 @@ namespace algorithm
     AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_handle> parent_path_handle(deadline /* unused */ = std::chrono::seconds(30)) const noexcept override
     {
       AFIO_LOG_FUNCTION_CALL(this);
-      OUTCOME_TRY(ret, _sph->h.clone());
-      return path_handle(std::move(ret));
+      OUTCOME_TRY(ret, _sph->h.clone_to_path_handle());
+      return {std::move(ret)};
     }
     AFIO_HEADERS_ONLY_VIRTUAL_SPEC
     result<void> relink(const path_handle &base, path_view_type newpath, bool atomic_replace = true, deadline d = std::chrono::seconds(30)) noexcept override

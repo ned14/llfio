@@ -37,6 +37,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
+class directory_handle;
+
 /*! \class path_handle
 \brief A handle to somewhere originally identified by a path on the filing system. Typically used
 as the lightest weight handle to some location on the filing system which may
@@ -46,6 +48,8 @@ of the path leading to that island.
 */
 class AFIO_DECL path_handle : public handle
 {
+  friend class directory_handle;
+
 public:
   using path_type = handle::path_type;
   using extent_type = handle::extent_type;

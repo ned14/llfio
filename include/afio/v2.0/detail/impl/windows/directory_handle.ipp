@@ -185,6 +185,16 @@ result<directory_handle> directory_handle::clone(mode mode_, caching caching_, d
   return ret;
 }
 
+AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> directory_handle::clone_to_path_handle() const noexcept
+{
+  AFIO_LOG_FUNCTION_CALL(this);
+  result<path_handle> ret(path_handle(native_handle_type(), _caching, _flags));
+  ret.value()._v.behaviour = _v.behaviour;
+  if(!DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, false, DUPLICATE_SAME_ACCESS))
+    return {GetLastError(), std::system_category()};
+  return ret;
+}
+
 namespace detail
 {
   inline result<file_handle> duplicate_handle_with_delete_privs(directory_handle *o) noexcept

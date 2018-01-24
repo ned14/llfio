@@ -122,7 +122,7 @@ namespace storage_profile
                 {
                   ;
                 }
-                int s = atoi(siblings), c = atoi(cpucores);
+                int s = atoi(siblings), c = atoi(cpucores);  // NOLINT
                 if((s != 0) && (c != 0))
                 {
                   sp.cpu_physical_cores.value = sysconf(_SC_NPROCESSORS_ONLN) * c / s;
@@ -179,7 +179,7 @@ namespace storage_profile
             }
             else
             {
-              strcpy(&buffer[14], "unbranded");
+              memcpy(&buffer[14], "unbranded", 10);
             }
 
             // Trim string

@@ -57,7 +57,7 @@ int io_service::set_interruption_signal(int signo)
   {
     if(sigaction(interrupt_signal, &interrupt_signal_handler_old_action, nullptr) < 0)
     {
-      throw std::system_error(errno, std::system_category());
+      throw std::system_error(errno, std::system_category());  // NOLINT
     }
     interrupt_signal = 0;
   }
@@ -92,7 +92,7 @@ int io_service::set_interruption_signal(int signo)
     sigemptyset(&sigact.sa_mask);
     if(sigaction(signo, &sigact, &interrupt_signal_handler_old_action) < 0)
     {
-      throw std::system_error(errno, std::system_category());
+      throw std::system_error(errno, std::system_category());  // NOLINT
     }
     interrupt_signal = signo;
   }
@@ -106,7 +106,7 @@ void io_service::_block_interruption() noexcept
     return;
   }
   assert(!_blocked_interrupt_signal);
-  sigset_t set;
+  sigset_t set{};
   sigemptyset(&set);
   sigaddset(&set, interrupt_signal);
   pthread_sigmask(SIG_BLOCK, &set, nullptr);
@@ -123,7 +123,7 @@ void io_service::_unblock_interruption() noexcept
   assert(_blocked_interrupt_signal);
   if(_blocked_interrupt_signal != 0)
   {
-    sigset_t set;
+    sigset_t set{};
     sigemptyset(&set);
     sigaddset(&set, _blocked_interrupt_signal);
     pthread_sigmask(SIG_UNBLOCK, &set, nullptr);
@@ -184,11 +184,11 @@ void io_service::disable_kqueues()
   {
     if(_work_queued != 0u)
     {
-      throw std::runtime_error("Cannot disable kqueues if work is pending");
+      throw std::runtime_error("Cannot disable kqueues if work is pending");  // NOLINT
     }
     if(pthread_self() != _threadh)
     {
-      throw std::runtime_error("Cannot disable kqueues except from owning thread");
+      throw std::runtime_error("Cannot disable kqueues except from owning thread");  // NOLINT
     }
     // Is the global signal handler set yet?
     if(interrupt_signal == 0)
@@ -238,7 +238,7 @@ result<bool> io_service::run_until(deadline d) noexcept
   {
     if(d)
     {
-      std::chrono::nanoseconds ns;
+      std::chrono::nanoseconds ns{};
       if(d.steady)
       {
         ns = std::chrono::duration_cast<std::chrono::nanoseconds>((began_steady + std::chrono::nanoseconds(d.nsecs)) - std::chrono::steady_clock::now());
@@ -327,7 +327,7 @@ result<bool> io_service::run_until(deadline d) noexcept
           int ioret = aio_return(aiocb);
           if(ioret < 0)
           {
-            return { errno, std::system_category() };
+            return {errno, std::system_category()};
           }
           // std::cout << "aiocb " << aiocb << " sees succesful return " << ioret << std::endl;
           // The aiocb aio_sigevent.sigev_value.sival_ptr field will point to a file_handle::_io_state_type

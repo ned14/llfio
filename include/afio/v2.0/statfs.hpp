@@ -46,43 +46,40 @@ class handle;
 */
 struct AFIO_DECL statfs_t
 {
+  static constexpr uint32_t _allbits1_32 = ~0U;
+  static constexpr uint64_t _allbits1_64 = ~0ULL;
   struct f_flags_t
   {
-    uint32_t rdonly : 1;           //!< Filing system is read only                                      (Windows, POSIX)
-    uint32_t noexec : 1;           //!< Filing system cannot execute programs                           (POSIX)
-    uint32_t nosuid : 1;           //!< Filing system cannot superuser                                  (POSIX)
-    uint32_t acls : 1;             //!< Filing system provides ACLs                                     (Windows, POSIX)
-    uint32_t xattr : 1;            //!< Filing system provides extended attributes                      (Windows, POSIX)
-    uint32_t compression : 1;      //!< Filing system provides whole volume compression                 (Windows, POSIX)
-    uint32_t extents : 1;          //!< Filing system provides extent based file storage (sparse files) (Windows, POSIX)
-    uint32_t filecompression : 1;  //!< Filing system provides per-file selectable compression          (Windows)
-  } f_flags{};                     /*!< copy of mount exported flags       (Windows, POSIX) */
-  uint64_t f_bsize{};              /*!< fundamental filesystem block size  (Windows, POSIX) */
-  uint64_t f_iosize{};             /*!< optimal transfer block size        (Windows, POSIX) */
-  uint64_t f_blocks{};             /*!< total data blocks in filesystem    (Windows, POSIX) */
-  uint64_t f_bfree{};              /*!< free blocks in filesystem          (Windows, POSIX) */
-  uint64_t f_bavail{};             /*!< free blocks avail to non-superuser (Windows, POSIX) */
-  uint64_t f_files{};              /*!< total file nodes in filesystem     (POSIX) */
-  uint64_t f_ffree{};              /*!< free nodes avail to non-superuser  (POSIX) */
-  uint32_t f_namemax{};            /*!< maximum filename length            (Windows, POSIX) */
+    uint32_t rdonly : 1;             //!< Filing system is read only                                      (Windows, POSIX)
+    uint32_t noexec : 1;             //!< Filing system cannot execute programs                           (POSIX)
+    uint32_t nosuid : 1;             //!< Filing system cannot superuser                                  (POSIX)
+    uint32_t acls : 1;               //!< Filing system provides ACLs                                     (Windows, POSIX)
+    uint32_t xattr : 1;              //!< Filing system provides extended attributes                      (Windows, POSIX)
+    uint32_t compression : 1;        //!< Filing system provides whole volume compression                 (Windows, POSIX)
+    uint32_t extents : 1;            //!< Filing system provides extent based file storage (sparse files) (Windows, POSIX)
+    uint32_t filecompression : 1;    //!< Filing system provides per-file selectable compression          (Windows)
+  } f_flags{0, 0, 0, 0, 0, 0, 0, 0}; /*!< copy of mount exported flags       (Windows, POSIX) */
+  uint64_t f_bsize{_allbits1_64};    /*!< fundamental filesystem block size  (Windows, POSIX) */
+  uint64_t f_iosize{_allbits1_64};   /*!< optimal transfer block size        (Windows, POSIX) */
+  uint64_t f_blocks{_allbits1_64};   /*!< total data blocks in filesystem    (Windows, POSIX) */
+  uint64_t f_bfree{_allbits1_64};    /*!< free blocks in filesystem          (Windows, POSIX) */
+  uint64_t f_bavail{_allbits1_64};   /*!< free blocks avail to non-superuser (Windows, POSIX) */
+  uint64_t f_files{_allbits1_64};    /*!< total file nodes in filesystem     (POSIX) */
+  uint64_t f_ffree{_allbits1_64};    /*!< free nodes avail to non-superuser  (POSIX) */
+  uint32_t f_namemax{_allbits1_32};  /*!< maximum filename length            (Windows, POSIX) */
 #ifndef _WIN32
-  int16_t f_owner{}; /*!< user that mounted the filesystem   (BSD, OS X) */
+  int16_t f_owner{-1}; /*!< user that mounted the filesystem   (BSD, OS X) */
 #endif
-  uint64_t f_fsid[2]{};         /*!< filesystem id                      (Windows, POSIX) */
-  std::string f_fstypename;     /*!< filesystem type name               (Windows, POSIX) */
-  std::string f_mntfromname;    /*!< mounted filesystem                 (Windows, POSIX) */
-  filesystem::path f_mntonname; /*!< directory on which mounted         (Windows, POSIX) */
+  uint64_t f_fsid[2]{_allbits1_64, _allbits1_64}; /*!< filesystem id                      (Windows, POSIX) */
+  std::string f_fstypename;                       /*!< filesystem type name               (Windows, POSIX) */
+  std::string f_mntfromname;                      /*!< mounted filesystem                 (Windows, POSIX) */
+  filesystem::path f_mntonname;                   /*!< directory on which mounted         (Windows, POSIX) */
 
   //! Used to indicate what metadata should be filled in
   QUICKCPPLIB_BITFIELD_BEGIN(want) { flags = 1 << 0, bsize = 1 << 1, iosize = 1 << 2, blocks = 1 << 3, bfree = 1 << 4, bavail = 1 << 5, files = 1 << 6, ffree = 1 << 7, namemax = 1 << 8, owner = 1 << 9, fsid = 1 << 10, fstypename = 1 << 11, mntfromname = 1 << 12, mntonname = 1 << 13, all = static_cast<unsigned>(-1) }
   QUICKCPPLIB_BITFIELD_END(want)
   //! Constructs a default initialised instance (all bits set)
-  statfs_t()
-  {
-    size_t frontbytes = (reinterpret_cast<char *>(&f_fstypename)) - (reinterpret_cast<char *>(this));
-    memset(this, 0xff, frontbytes);
-    memset(this, 0, sizeof(f_flags));
-  }
+  statfs_t() = default;
 #ifdef __cpp_exceptions
   //! Constructs a filled instance, throwing as an exception any error which might occur
   explicit statfs_t(const handle &h, want wanted = want::all)

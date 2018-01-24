@@ -38,7 +38,7 @@ AFIO_V2_NAMESPACE_EXPORT_BEGIN
 \brief A native handle type used for wrapping file descriptors, process ids or HANDLEs.
 Unmanaged, wrap in a handle object to manage.
 */
-struct native_handle_type
+struct native_handle_type  // NOLINT
 {
   //! The type of handle.
   QUICKCPPLIB_BITFIELD_BEGIN(disposition)
@@ -64,21 +64,25 @@ struct native_handle_type
   disposition behaviour;  //! The behaviour of the handle
   union {
     intptr_t _init{-1};
-    int fd;         //!< A POSIX file descriptor
-    int pid;        //!< A POSIX process identifier
-    win::handle h;  //!< A Windows HANDLE
+    //! A POSIX file descriptor
+    int fd;  // NOLINT
+    //! A POSIX process identifier
+    int pid;  // NOLINT
+    //! A Windows HANDLE
+    win::handle h;  // NOLINT
   };
   //! Constructs a default instance
-  native_handle_type() = default;
+  native_handle_type() = default;  // NOLINT
+  ~native_handle_type() = default;
   //! Construct from a POSIX file descriptor
-  constexpr native_handle_type(disposition _behaviour, int _fd) noexcept : behaviour(_behaviour), fd(_fd) {}
+  constexpr native_handle_type(disposition _behaviour, int _fd) noexcept : behaviour(_behaviour), fd(_fd) {}  // NOLINT
   //! Construct from a Windows HANDLE
-  constexpr native_handle_type(disposition _behaviour, win::handle _h) noexcept : behaviour(_behaviour), h(_h) {}
+  constexpr native_handle_type(disposition _behaviour, win::handle _h) noexcept : behaviour(_behaviour), h(_h) {}  // NOLINT
 
   //! Copy construct
   native_handle_type(const native_handle_type &) = default;
   //! Move construct
-  constexpr native_handle_type(native_handle_type &&o) noexcept : behaviour(o.behaviour), _init(o._init)
+  constexpr native_handle_type(native_handle_type &&o) noexcept : behaviour(o.behaviour), _init(o._init)  // NOLINT
   {
     o.behaviour = disposition();
     o._init = -1;

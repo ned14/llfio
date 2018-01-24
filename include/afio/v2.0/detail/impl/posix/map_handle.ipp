@@ -198,7 +198,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
     reqs.offset += _offset;
     return _section->backing()->barrier(reqs, wait_for_device, and_metadata, d);
   }
-  return io_handle::io_result<const_buffers_type>(reqs.buffers);
+  return {reqs.buffers};
 }
 
 
@@ -255,7 +255,7 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
   // printf("mmap(%p, %u, %d, %d, %d, %u)\n", ataddr, (unsigned) bytes, prot, flags, have_backing ? section->native_handle().fd : -1, (unsigned) offset);
   addr = ::mmap(ataddr, bytes, prot, flags, have_backing ? section->native_handle().fd : -1, offset);
   // printf("%d mmap %p-%p\n", getpid(), addr, (char *) addr+bytes);
-  if(MAP_FAILED == addr)
+  if(MAP_FAILED == addr)  // NOLINT
   {
     return {errno, std::system_category()};
   }
@@ -353,7 +353,7 @@ result<void> map_handle::zero_memory(buffer_type region) noexcept
     return std::errc::invalid_argument;
   }
 #ifdef MADV_REMOVE
-  buffer_type page_region{(char *) utils::round_up_to_page_size((uintptr_t) region.data), utils::round_down_to_page_size(region.len)};
+  buffer_type page_region{utils::round_up_to_page_size(region.data), utils::round_down_to_page_size(region.len)};
   // Zero contents and punch a hole in any backing storage
   if((page_region.len != 0u) && -1 != ::madvise(page_region.data, page_region.len, MADV_REMOVE))
   {

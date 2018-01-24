@@ -420,7 +420,7 @@ namespace storage_profile
               auto _h(srch.clone());
               if(!_h)
               {
-                throw std::runtime_error("concurrency::atomic_rewrite_quantum: "
+                throw std::runtime_error("concurrency::atomic_rewrite_quantum: "  // NOLINT
                                          "Could not open work file due to " +
                                          _h.error().message());
               }
@@ -459,7 +459,7 @@ namespace storage_profile
               auto _h(srch.clone());
               if(!_h)
               {
-                throw std::runtime_error("concurrency::atomic_rewrite_quantum: "
+                throw std::runtime_error("concurrency::atomic_rewrite_quantum: "  // NOLINT
                                          "Could not open work file due to " +
                                          _h.error().message());
               }
@@ -564,7 +564,7 @@ namespace storage_profile
                 auto _h(srch.clone());
                 if(!_h)
                 {
-                  throw std::runtime_error("concurrency::atomic_rewrite_"
+                  throw std::runtime_error("concurrency::atomic_rewrite_"  // NOLINT
                                            "quantum: Could not open work file "
                                            "due to " +
                                            _h.error().message());
@@ -604,7 +604,7 @@ namespace storage_profile
                 auto _h(srch.clone());
                 if(!_h)
                 {
-                  throw std::runtime_error("concurrency::atomic_rewrite_"
+                  throw std::runtime_error("concurrency::atomic_rewrite_"  // NOLINT
                                            "quantum: Could not open work file "
                                            "due to " +
                                            _h.error().message());
@@ -723,7 +723,7 @@ namespace storage_profile
                   auto _h(srch.clone());
                   if(!_h)
                   {
-                    throw std::runtime_error("concurrency::atomic_rewrite_"
+                    throw std::runtime_error("concurrency::atomic_rewrite_"  // NOLINT
                                              "offset_boundary: Could not open "
                                              "work file due to " +
                                              _h.error().message());
@@ -763,7 +763,7 @@ namespace storage_profile
                   auto _h(srch.clone());
                   if(!_h)
                   {
-                    throw std::runtime_error("concurrency::atomic_rewrite_"
+                    throw std::runtime_error("concurrency::atomic_rewrite_"  // NOLINT
                                              "offset_boundary: Could not open "
                                              "work file due to " +
                                              _h.error().message());

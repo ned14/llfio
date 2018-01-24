@@ -244,6 +244,14 @@ public:
   */
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<directory_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
 
+  /*! Return a copy of this directory handle, but as a path handle.
+
+  \errors Any of the values POSIX dup() or DuplicateHandle() can return.
+  \mallocs On POSIX, we must loop calling `current_path()` and
+  trying to open the path returned. Thus many allocations may occur.
+  */
+  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> clone_to_path_handle() const noexcept;
+
 #ifdef _WIN32
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC
   result<void> relink(const path_handle &base, path_view_type newpath, bool atomic_replace = true, deadline d = std::chrono::seconds(30)) noexcept override;

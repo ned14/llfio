@@ -62,34 +62,34 @@ if and only if st_allocated < st_size which can include compressed files if that
 with compression enabled (e.g. ZFS with ZLE compression which elides runs of zeros).
 - The st_reparse_point is a Windows only flag and is never set on POSIX, even on a NTFS volume.
 */
-struct stat_t
+struct stat_t  // NOLINT
 {
-  uint64_t st_dev{};             /*!< inode of device containing file (POSIX only) */
-  uint64_t st_ino{};             /*!< inode of file                   (Windows, POSIX) */
+  uint64_t st_dev;               /*!< inode of device containing file (POSIX only) */
+  uint64_t st_ino;               /*!< inode of file                   (Windows, POSIX) */
   filesystem::file_type st_type; /*!< type of file                    (Windows, POSIX) */
 #ifndef _WIN32
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  uint16_t st_perms{};
+  uint16_t st_perms;
 #else
   stil1z::filesystem::perms st_perms; /*!< uint16_t bitfield perms of file (POSIX only) */
 #endif
 #endif
-  int16_t st_nlink{}; /*!< number of hard links            (Windows, POSIX) */
+  int16_t st_nlink; /*!< number of hard links            (Windows, POSIX) */
 #ifndef _WIN32
-  int16_t st_uid{}; /*!< user ID of the file             (POSIX only) */
-  int16_t st_gid{}; /*!< group ID of the file            (POSIX only) */
-  dev_t st_rdev{};  /*!< id of file if special           (POSIX only) */
+  int16_t st_uid; /*!< user ID of the file             (POSIX only) */
+  int16_t st_gid; /*!< group ID of the file            (POSIX only) */
+  dev_t st_rdev;  /*!< id of file if special           (POSIX only) */
 #endif
   std::chrono::system_clock::time_point st_atim;     /*!< time of last access             (Windows, POSIX) */
   std::chrono::system_clock::time_point st_mtim;     /*!< time of last data modification  (Windows, POSIX) */
   std::chrono::system_clock::time_point st_ctim;     /*!< time of last status change      (Windows, POSIX) */
-  handle::extent_type st_size{};                     /*!< file size, in bytes             (Windows, POSIX) */
-  handle::extent_type st_allocated{};                /*!< bytes allocated for file        (Windows, POSIX) */
-  handle::extent_type st_blocks{};                   /*!< number of blocks allocated      (Windows, POSIX) */
-  uint16_t st_blksize{};                             /*!< block size used by this device  (Windows, POSIX) */
-  uint32_t st_flags{};                               /*!< user defined flags for file     (FreeBSD, OS X, zero
+  handle::extent_type st_size;                       /*!< file size, in bytes             (Windows, POSIX) */
+  handle::extent_type st_allocated;                  /*!< bytes allocated for file        (Windows, POSIX) */
+  handle::extent_type st_blocks;                     /*!< number of blocks allocated      (Windows, POSIX) */
+  uint16_t st_blksize;                               /*!< block size used by this device  (Windows, POSIX) */
+  uint32_t st_flags;                                 /*!< user defined flags for file     (FreeBSD, OS X, zero
                         otherwise) */
-  uint32_t st_gen{};                                 /*!< file generation number          (FreeBSD, OS X, zero
+  uint32_t st_gen;                                   /*!< file generation number          (FreeBSD, OS X, zero
                         otherwise)*/
   std::chrono::system_clock::time_point st_birthtim; /*!< time of file creation           (Windows, FreeBSD, OS X, zero otherwise) */
 
@@ -105,34 +105,35 @@ struct stat_t
   }
   QUICKCPPLIB_BITFIELD_END(want)
   //! Constructs a UNINITIALIZED instance i.e. full of random garbage
-  stat_t() = default;
+  stat_t() = default;  // NOLINT
   //! Constructs a zeroed instance
-  constexpr explicit stat_t(std::nullptr_t) noexcept : st_dev(0),  // NOLINT
-                                                       st_ino(0),  // NOLINT
+  constexpr explicit stat_t(std::nullptr_t) noexcept : st_dev(0),                                // NOLINT
+                                                       st_ino(0),                                // NOLINT
                                                        st_type(filesystem::file_type::unknown),  // NOLINT
 #ifndef _WIN32
                                                        st_perms(0),  // NOLINT
 #endif
                                                        st_nlink(0),  // NOLINT
 #ifndef _WIN32
-                                                       st_uid(0),  // NOLINT
-                                                       st_gid(0),  // NOLINT
+                                                       st_uid(0),   // NOLINT
+                                                       st_gid(0),   // NOLINT
                                                        st_rdev(0),  // NOLINT
 #endif
-                                                       st_size(0),  // NOLINT
-                                                       st_allocated(0),  // NOLINT
-                                                       st_blocks(0),  // NOLINT
-                                                       st_blksize(0),  // NOLINT
-                                                       st_flags(0),  // NOLINT
-                                                       st_gen(0),  // NOLINT
-                                                       st_sparse(0),  // NOLINT
-                                                       st_compressed(0),  // NOLINT
+                                                       st_size(0),          // NOLINT
+                                                       st_allocated(0),     // NOLINT
+                                                       st_blocks(0),        // NOLINT
+                                                       st_blksize(0),       // NOLINT
+                                                       st_flags(0),         // NOLINT
+                                                       st_gen(0),           // NOLINT
+                                                       st_sparse(0),        // NOLINT
+                                                       st_compressed(0),    // NOLINT
                                                        st_reparse_point(0)  // NOLINT
   {
   }
 #ifdef __cpp_exceptions
   //! Constructs a filled instance, throwing as an exception any error which might occur
   explicit stat_t(const handle &h, want wanted = want::all)
+      : stat_t(nullptr)
   {
     auto v(fill(h, wanted));
     if(v.has_error())

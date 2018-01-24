@@ -31,7 +31,7 @@ Distributed under the Boost Software License, Version 1.0.
 #else
 // We are standalone
 #include "../include/afio/afio.hpp"
-#define AFIO_TEST_KERNEL_DECL extern QUICKCPPLIB_SYMBOL_EXPORT
+#define AFIO_TEST_KERNEL_DECL extern inline QUICKCPPLIB_SYMBOL_EXPORT
 #endif
 
 #include "kerneltest/include/kerneltest.hpp"

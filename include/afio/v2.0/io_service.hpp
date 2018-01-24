@@ -230,7 +230,9 @@ public:
   */
   AFIO_HEADERS_ONLY_MEMFUNC_SPEC io_service();
   io_service(io_service &&) = delete;
+  io_service(const io_service &) = delete;
   io_service &operator=(io_service &&) = delete;
+  io_service &operator=(const io_service &) = delete;
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~io_service();
 
 #ifdef AFIO_IO_POST_SIGNAL
