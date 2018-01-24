@@ -69,8 +69,12 @@ public:
   explicit constexpr path_handle(handle &&o) noexcept : handle(std::move(o)) {}
   //! Move construction permitted
   path_handle(path_handle &&) = default;
+  //! No copy construction (use `clone()`)
+  path_handle(const path_handle &) = delete;
   //! Move assignment permitted
   path_handle &operator=(path_handle &&) = default;
+  //! No copy assignment
+  path_handle &operator=(const path_handle &) = delete;
 
   /*! Create a path handle opening access to some location on the filing system.
   Some operating systems provide a particularly lightweight method of doing this

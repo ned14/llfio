@@ -56,9 +56,9 @@ struct AFIO_DEADLINE_NAME
     unsigned long long nsecs;  // NOLINT
   };
 #ifdef __cplusplus
-  constexpr deadline()
-      : steady(false)
-      , utc{0, 0}
+  constexpr deadline()  // NOLINT
+  : steady(false),
+    utc{0, 0}
   {
   }
   //! True if deadline is valid
@@ -95,7 +95,7 @@ struct AFIO_DEADLINE_NAME
   {
     if(steady)
     {
-      throw std::invalid_argument("Not a UTC deadline!");
+      throw std::invalid_argument("Not a UTC deadline!");  // NOLINT
     }
     std::chrono::system_clock::time_point tp(std::chrono::system_clock::from_time_t(utc.tv_sec));
     tp += std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::nanoseconds(utc.tv_nsec));

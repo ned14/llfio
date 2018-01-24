@@ -130,10 +130,11 @@ public:
     using Base::Base;
     io_result() = default;
 #endif
+    ~io_result() = default;
     io_result(const io_result &) = default;
-    io_result(io_result &&) = default;
+    io_result(io_result &&) = default;  // NOLINT
     io_result &operator=(const io_result &) = default;
-    io_result &operator=(io_result &&) = default;
+    io_result &operator=(io_result &&) = default;  // NOLINT
     //! Returns bytes transferred
     size_type bytes_transferred() noexcept
     {
@@ -304,10 +305,11 @@ public:
         , _exclusive(exclusive)
     {
     }
+
+  public:
     extent_guard(const extent_guard &) = delete;
     extent_guard &operator=(const extent_guard &) = delete;
 
-  public:
     //! Default constructor
     extent_guard() = default;
     //! Move constructor

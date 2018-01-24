@@ -88,6 +88,7 @@ protected:
 public:
   //! Default constructor
   async_file_handle() = default;
+  ~async_file_handle() = default;
 
   //! Construct a handle from a supplied native handle
   constexpr async_file_handle(io_service *service, native_handle_type h, dev_t devid, ino_t inode, caching caching = caching::none, flag flags = flag::none)
@@ -97,6 +98,8 @@ public:
   }
   //! Implicit move construction of async_file_handle permitted
   async_file_handle(async_file_handle &&o) noexcept = default;
+  //! No copy construction (use `clone()`)
+  async_file_handle(const async_file_handle &) = delete;
   //! Explicit conversion from file_handle permitted
   explicit constexpr async_file_handle(file_handle &&o) noexcept : file_handle(std::move(o)) {}
   //! Explicit conversion from handle and io_handle permitted
@@ -108,6 +111,8 @@ public:
     new(this) async_file_handle(std::move(o));
     return *this;
   }
+  //! No copy assignment
+  async_file_handle &operator=(const async_file_handle &) = delete;
   //! Swap with another instance
   AFIO_MAKE_FREE_FUNCTION
   void swap(async_file_handle &o) noexcept
@@ -295,6 +300,12 @@ protected:
       - internal_state: address of pointer to struct aiocb in io_service's _aiocbsv
     */
     virtual void _system_io_completion(long errcode, long bytes_transferred, void *internal_state) noexcept = 0;
+
+  protected:
+    _erased_io_state_type(_erased_io_state_type &&) = default;
+    _erased_io_state_type(const _erased_io_state_type &) = default;
+    _erased_io_state_type &operator=(_erased_io_state_type &&) = default;
+    _erased_io_state_type &operator=(const _erased_io_state_type &) = default;
   };
   struct _io_state_deleter
   {
@@ -304,8 +315,8 @@ protected:
       _ptr->~U();
       if(must_deallocate_self)
       {
-        auto *ptr = (char *) _ptr;
-        ::free(ptr);
+        auto *ptr = reinterpret_cast<char *>(_ptr);
+        ::free(ptr);  // NOLINT
       }
     }
   };
@@ -333,6 +344,13 @@ protected:
     virtual void operator()(_erased_io_state_type *state) = 0;
     // Returns a pointer to the completion handler
     virtual void *address() noexcept = 0;
+
+  protected:
+    _erased_completion_handler() = default;
+    _erased_completion_handler(_erased_completion_handler &&) = default;
+    _erased_completion_handler(const _erased_completion_handler &) = default;
+    _erased_completion_handler &operator=(_erased_completion_handler &&) = default;
+    _erased_completion_handler &operator=(const _erased_completion_handler &) = default;
   };
   template <class BuffersType, class IORoutine> result<io_state_ptr> AFIO_HEADERS_ONLY_MEMFUNC_SPEC _begin_io(span<char> mem, operation_t operation, io_request<BuffersType> reqs, _erased_completion_handler &&completion, IORoutine &&ioroutine) noexcept;
   AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<io_state_ptr> _begin_io(span<char> mem, operation_t operation, io_request<const_buffers_type> reqs, _erased_completion_handler &&completion) noexcept;
@@ -373,7 +391,7 @@ public:
       size_t bytes() const noexcept final { return sizeof(*this); }
       void move(_erased_completion_handler *_dest) final
       {
-        auto *dest = (void *) _dest;
+        auto *dest = reinterpret_cast<void *>(_dest);
         new(dest) completion_handler(std::move(*this));
       }
       void operator()(_erased_io_state_type *state) final { completion(state->parent, state->result.write); }
@@ -422,7 +440,7 @@ public:
       size_t bytes() const noexcept final { return sizeof(*this); }
       void move(_erased_completion_handler *_dest) final
       {
-        auto *dest = (void *) _dest;
+        auto *dest = reinterpret_cast<void *>(_dest);
         new(dest) completion_handler(std::move(*this));
       }
       void operator()(_erased_io_state_type *state) final { completion(state->parent, state->result.read); }
@@ -458,7 +476,7 @@ public:
       size_t bytes() const noexcept final { return sizeof(*this); }
       void move(_erased_completion_handler *_dest) final
       {
-        auto *dest = (void *) _dest;
+        auto *dest = reinterpret_cast<void *>(_dest);
         new(dest) completion_handler(std::move(*this));
       }
       void operator()(_erased_io_state_type *state) final { completion(state->parent, state->result.write); }

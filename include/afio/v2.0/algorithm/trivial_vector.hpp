@@ -244,7 +244,7 @@ namespace algorithm
       {
         if(i >= size())
         {
-          throw std::out_of_range("bounds exceeded");
+          throw std::out_of_range("bounds exceeded");  // NOLINT
         }
         return _begin[i];
       }
@@ -253,7 +253,7 @@ namespace algorithm
       {
         if(i >= size())
         {
-          throw std::out_of_range("bounds exceeded");
+          throw std::out_of_range("bounds exceeded");  // NOLINT
         }
         return _begin[i];
       }
@@ -310,7 +310,7 @@ namespace algorithm
       {
         if(n > max_size())
         {
-          throw std::length_error("Max size exceeded");
+          throw std::length_error("Max size exceeded");  // NOLINT
         }
         size_type current_size = size();
         size_type bytes = n * sizeof(value_type);

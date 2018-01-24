@@ -74,7 +74,7 @@ namespace algorithm
   */
   template <class T> AFIO_REQUIRES(sizeof(construct<T>) > 0) class AFIO_DECL cached_parent_handle_adapter : public T
   {
-    static_assert(sizeof(construct<T>) > 0, "Type T must be registered with the construct<T> framework so cached_parent_handle_adapter<T> knows how to construct it");
+    static_assert(sizeof(construct<T>) > 0, "Type T must be registered with the construct<T> framework so cached_parent_handle_adapter<T> knows how to construct it");  // NOLINT
 
   public:
     //! The handle type being adapted
@@ -89,9 +89,9 @@ namespace algorithm
   public:
     cached_parent_handle_adapter() = default;
     cached_parent_handle_adapter(const cached_parent_handle_adapter &) = default;
-    cached_parent_handle_adapter(cached_parent_handle_adapter &&) = default;
+    cached_parent_handle_adapter(cached_parent_handle_adapter &&) = default;  // NOLINT
     cached_parent_handle_adapter &operator=(const cached_parent_handle_adapter &) = default;
-    cached_parent_handle_adapter &operator=(cached_parent_handle_adapter &&) = default;
+    cached_parent_handle_adapter &operator=(cached_parent_handle_adapter &&) = default;  // NOLINT
     cached_parent_handle_adapter(adapted_handle_type &&o, const path_handle &base, path_view path)
         : adapted_handle_type(std::move(o))
     {

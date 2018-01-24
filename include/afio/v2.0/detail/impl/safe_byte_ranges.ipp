@@ -69,9 +69,9 @@ namespace algorithm
         std::condition_variable _changed;
         struct _entity_info
         {
-          std::vector<unsigned> reader_tids;  // thread ids of all shared lock holders
-          unsigned writer_tid;                // thread id of exclusive lock holder
-          io_handle::extent_guard filelock;   // exclusive if writer_tid, else shared
+          std::vector<unsigned> reader_tids{};  // thread ids of all shared lock holders
+          unsigned writer_tid;                  // thread id of exclusive lock holder
+          io_handle::extent_guard filelock;     // exclusive if writer_tid, else shared
           _entity_info(bool exclusive, unsigned tid, io_handle::extent_guard _filelock)
               : writer_tid(exclusive ? tid : 0)
               , filelock(std::move(_filelock))
@@ -83,7 +83,7 @@ namespace algorithm
             }
           }
         };
-        std::unordered_map<entity_type::value_type, _entity_info> _thread_locks;  // entity to thread lock
+        std::unordered_map<entity_type::value_type, _entity_info> _thread_locks{};  // entity to thread lock
         // _m mutex must be held on entry!
         void _unlock(unsigned mythreadid, entity_type entity)
         {

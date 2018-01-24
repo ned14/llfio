@@ -139,6 +139,8 @@ public:
     _sh.set_backing(this);
     _mh.set_section(&_sh);
   }
+  //! No copy construction (use `clone()`)
+  mapped_file_handle(const mapped_file_handle &) = delete;
   //! Explicit conversion from file_handle permitted
   explicit constexpr mapped_file_handle(file_handle &&o) noexcept : file_handle(std::move(o)) {}
   //! Explicit conversion from file_handle permitted, this overload also attempts to map the file
@@ -158,6 +160,8 @@ public:
     new(this) mapped_file_handle(std::move(o));
     return *this;
   }
+  //! No copy assignment
+  mapped_file_handle &operator=(const mapped_file_handle &) = delete;
   //! Swap with another instance
   AFIO_MAKE_FREE_FUNCTION
   void swap(mapped_file_handle &o) noexcept

@@ -88,21 +88,29 @@ public:
   struct buffers_type : public span<buffer_type>
   {
     using span<buffer_type>::span;
+    //! Implicit construction from a span
     buffers_type(span<buffer_type> v)  // NOLINT
     : span<buffer_type>(v)
     {
     }
+    ~buffers_type() = default;
+    //! Move constructor
     buffers_type(buffers_type &&o) noexcept : span<buffer_type>(std::move(o)), _kernel_buffer(std::move(o._kernel_buffer)), _kernel_buffer_size(o._kernel_buffer_size)
     {
       static_cast<span<buffer_type> &>(o) = {};
       o._kernel_buffer_size = 0;
     }
+    //! No copy construction
+    buffers_type(const buffers_type &) = delete;
+    //! Move assignment
     buffers_type &operator=(buffers_type &&o) noexcept
     {
       this->~buffers_type();
       new(this) buffers_type(std::move(o));
       return *this;
     }
+    //! No copy assignment
+    buffers_type &operator=(const buffers_type &) = delete;
 
   private:
     friend class directory_handle;
@@ -129,6 +137,8 @@ public:
   }
   //! Implicit move construction of directory_handle permitted
   constexpr directory_handle(directory_handle &&o) noexcept : path_handle(std::move(o)), fs_handle(std::move(o)) {}
+  //! No copy construction (use `clone()`)
+  directory_handle(const directory_handle &) = delete;
   //! Explicit conversion from handle permitted
   explicit constexpr directory_handle(handle &&o, dev_t devid, ino_t inode) noexcept : path_handle(std::move(o)), fs_handle(devid, inode) {}
   //! Move assignment of directory_handle permitted
@@ -138,6 +148,8 @@ public:
     new(this) directory_handle(std::move(o));
     return *this;
   }
+  //! No copy assignment
+  directory_handle &operator=(const directory_handle &) = delete;
   //! Swap with another instance
   AFIO_MAKE_FREE_FUNCTION
   void swap(directory_handle &o) noexcept

@@ -567,6 +567,7 @@ namespace detail
     tls_current_handle_holder(tls_current_handle_holder &&) = delete;
     tls_current_handle_holder &operator=(const tls_current_handle_holder &) = delete;
     tls_current_handle_holder &operator=(tls_current_handle_holder &&) = delete;
+    ~tls_current_handle_holder() = default;
     template <class T> explicit tls_current_handle_holder(T && /*unused*/) {}
   };
 #define AFIO_LOG_INST_TO_TLS(inst) AFIO_V2_NAMESPACE::detail::tls_current_handle_holder<std::is_base_of<AFIO_V2_NAMESPACE::handle, std::decay_t<std::remove_pointer_t<decltype(inst)>>>::value> AFIO_UNIQUE_NAME(inst)

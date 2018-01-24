@@ -55,18 +55,18 @@ public:
   using size_type = handle::size_type;
 
   //! The behaviour of the memory section
-  QUICKCPPLIB_BITFIELD_BEGIN(flag){none = 0,          //!< No flags
-                                   read = 1 << 0,     //!< Memory views can be read
-                                   write = 1 << 1,    //!< Memory views can be written
-                                   cow = 1 << 2,      //!< Memory views can be copy on written
-                                   execute = 1 << 3,  //!< Memory views can execute code
+  QUICKCPPLIB_BITFIELD_BEGIN(flag){none = 0U,           //!< No flags
+                                   read = 1U << 0U,     //!< Memory views can be read
+                                   write = 1U << 1U,    //!< Memory views can be written
+                                   cow = 1U << 2U,      //!< Memory views can be copy on written
+                                   execute = 1U << 3U,  //!< Memory views can execute code
 
-                                   nocommit = 1 << 8,     //!< Don't allocate space for this memory in the system immediately
-                                   prefault = 1 << 9,     //!< Prefault, as if by reading every page, any views of memory upon creation.
-                                   executable = 1 << 10,  //!< The backing storage is in fact an executable program binary.
-                                   singleton = 1 << 11,   //!< A single instance of this section is to be shared by all processes using the same backing file.
+                                   nocommit = 1U << 8U,     //!< Don't allocate space for this memory in the system immediately
+                                   prefault = 1U << 9U,     //!< Prefault, as if by reading every page, any views of memory upon creation.
+                                   executable = 1U << 10U,  //!< The backing storage is in fact an executable program binary.
+                                   singleton = 1U << 11U,   //!< A single instance of this section is to be shared by all processes using the same backing file.
 
-                                   barrier_on_close = 1 << 16,  //!< Maps of this section, if writable, issue a `barrier()` when destructed blocking until data (not metadata) reaches physical storage.
+                                   barrier_on_close = 1U << 16U,  //!< Maps of this section, if writable, issue a `barrier()` when destructed blocking until data (not metadata) reaches physical storage.
 
                                    // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
 
@@ -97,6 +97,8 @@ public:
     o._backing = nullptr;
     o._flag = flag::none;
   }
+  //! No copy construction (use `clone()`)
+  section_handle(const section_handle &) = delete;
   //! Move assignment of section_handle permitted
   section_handle &operator=(section_handle &&o) noexcept
   {
@@ -104,6 +106,8 @@ public:
     new(this) section_handle(std::move(o));
     return *this;
   }
+  //! No copy assignment
+  section_handle &operator=(const section_handle &) = delete;
   //! Swap with another instance
   AFIO_MAKE_FREE_FUNCTION
   void swap(section_handle &o) noexcept
@@ -281,6 +285,8 @@ public:
     o._length = 0;
     o._flag = section_handle::flag::none;
   }
+  //! No copy construction (use `clone()`)
+  map_handle(const map_handle &) = delete;
   //! Move assignment of map_handle permitted
   map_handle &operator=(map_handle &&o) noexcept
   {
@@ -288,6 +294,8 @@ public:
     new(this) map_handle(std::move(o));
     return *this;
   }
+  //! No copy assignment
+  map_handle &operator=(const map_handle &) = delete;
   //! Swap with another instance
   AFIO_MAKE_FREE_FUNCTION
   void swap(map_handle &o) noexcept
