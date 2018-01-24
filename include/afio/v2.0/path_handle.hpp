@@ -60,6 +60,7 @@ public:
 
   //! Default constructor
   path_handle() = default;
+  ~path_handle() = default;
   //! Construct a handle from a supplied native handle
   explicit constexpr path_handle(native_handle_type h, caching caching = caching::all, flag flags = flag::none)
       : handle(h, caching, flags)

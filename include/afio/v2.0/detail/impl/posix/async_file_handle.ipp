@@ -70,6 +70,11 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
 #error todo
 #endif
     _erased_completion_handler *completion;
+    state_type() = delete;
+    state_type(state_type &&) = delete;
+    state_type(const state_type &) = delete;
+    state_type &operator=(state_type &&) = delete;
+    state_type &operator=(const state_type &) = delete;
     state_type(async_file_handle *_parent, operation_t _operation, bool must_deallocate_self, size_t _items)
         : _erased_io_state_type(_parent, _operation, must_deallocate_self, _items)
         , completion(nullptr)
@@ -180,7 +185,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
   bool must_deallocate_self = false;
   if(mem.empty())
   {
-    void *_mem = ::calloc(1, statelen);
+    void *_mem = ::calloc(1, statelen);  // NOLINT
     if(!_mem)
     {
       return std::errc::not_enough_memory;
@@ -188,9 +193,9 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
     mem = {static_cast<char *>(_mem), statelen};
     must_deallocate_self = true;
   }
-  io_state_ptr _state((state_type *) mem.data());
-  new((state = (state_type *) mem.data())) state_type(this, operation, must_deallocate_self, items);
-  state->completion = (_erased_completion_handler *) ((uintptr_t) state + sizeof(state_type) + (reqs.buffers.size() - 1) * sizeof(struct aiocb));
+  io_state_ptr _state(reinterpret_cast<state_type *>(mem.data()));
+  new((state = reinterpret_cast<state_type *>(mem.data()))) state_type(this, operation, must_deallocate_self, items);
+  state->completion = reinterpret_cast<_erased_completion_handler *>(reinterpret_cast<uintptr_t>(state) + sizeof(state_type) + (reqs.buffers.size() - 1) * sizeof(struct aiocb));
   completion.move(state->completion);
 
   // Noexcept move the buffers from req into result
@@ -210,10 +215,10 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
     struct aiocb *aiocb = state->aiocbs + n;
     aiocb->aio_fildes = _v.fd;
     aiocb->aio_offset = offset;
-    aiocb->aio_buf = (void *) out[n].data;
+    aiocb->aio_buf = reinterpret_cast<void *>(const_cast<char *>(out[n].data));
     aiocb->aio_nbytes = out[n].len;
     aiocb->aio_sigevent.sigev_notify = SIGEV_NONE;
-    aiocb->aio_sigevent.sigev_value.sival_ptr = (void *) state;
+    aiocb->aio_sigevent.sigev_value.sival_ptr = reinterpret_cast<void *>(state);
     switch(operation)
     {
     case operation_t::read:

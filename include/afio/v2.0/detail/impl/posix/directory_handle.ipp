@@ -271,17 +271,16 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
 #ifdef __linux__
   // Unlike FreeBSD, Linux doesn't define a getdents() function, so we'll do that here.
   using getdents64_t = int (*)(int, char *, unsigned int);
-  static auto getdents = (getdents64_t)[](int fd, char *buf, unsigned count)->int { return syscall(SYS_getdents64, fd, buf, count); };
+  static auto getdents = static_cast<getdents64_t>([](int fd, char *buf, unsigned count) -> int { return syscall(SYS_getdents64, fd, buf, count); });
   using dirent = dirent64;
 #endif
 #ifdef __APPLE__
   // OS X defines a getdirentries64() kernel syscall which can emulate getdents
   typedef int (*getdents_emulation_t)(int, char *, unsigned);
-  static getdents_emulation_t getdents = (getdents_emulation_t)[](int fd, char *buf, unsigned count)->int
-  {
+  static getdents_emulation_t getdents = static_cast<getdents_emulation_t>([](int fd, char *buf, unsigned count) -> int {
     off_t foo;
     return syscall(SYS_getdirentries64, fd, buf, count, &foo);
-  };
+  });
 #endif
   if(!tofill._kernel_buffer && kernelbuffer.empty())
   {
@@ -341,9 +340,9 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     tofill._resize(0);
     return enumerate_info{std::move(tofill), default_stat_contents, true};
   }
-  AFIO_VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(buffer, bytes);
+  AFIO_VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(buffer, bytes);  // NOLINT
   size_t n = 0;
-  for(dirent *dent = buffer;; dent = (dirent *) ((uintptr_t) dent + dent->d_reclen))
+  for(dirent *dent = buffer;; dent = reinterpret_cast<dirent *>(reinterpret_cast<uintptr_t>(dent) + dent->d_reclen))
   {
     if(dent->d_ino != 0u)
     {

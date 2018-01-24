@@ -166,6 +166,7 @@ public:
 public:
   //! Default constructor
   io_handle() = default;
+  ~io_handle() = default;
   //! Construct a handle from a supplied native handle
   constexpr explicit io_handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none)
       : handle(h, caching, flags)
@@ -175,8 +176,12 @@ public:
   explicit constexpr io_handle(handle &&o) noexcept : handle(std::move(o)) {}
   //! Move construction permitted
   io_handle(io_handle &&) = default;
+  //! No copy construction (use `clone()`)
+  io_handle(const io_handle &) = delete;
   //! Move assignment permitted
   io_handle &operator=(io_handle &&) = default;
+  //! No copy assignment
+  io_handle &operator=(const io_handle &) = delete;
 
   /*! \brief The *maximum* number of buffers which a single read or write syscall can process at a time
   for this specific open handle. On POSIX, this is known as `IOV_MAX`.
