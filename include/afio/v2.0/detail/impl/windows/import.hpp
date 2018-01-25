@@ -803,10 +803,10 @@ namespace windows_nt_kernel
     {
       return filesystem::file_type::directory;
     }
-    else
-    {
+    
+    
       return filesystem::file_type::regular;
-    }
+    
 #endif
   }
 

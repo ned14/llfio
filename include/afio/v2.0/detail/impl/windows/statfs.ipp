@@ -52,12 +52,12 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
     }
     if(wanted & want::flags)
     {
-      f_flags.rdonly = static_cast<uint32_t>(!((ffai->FileSystemAttributes & FILE_READ_ONLY_VOLUME)) == 0u);
-      f_flags.acls = static_cast<uint32_t>(!((ffai->FileSystemAttributes & FILE_PERSISTENT_ACLS)) == 0u);
-      f_flags.xattr = static_cast<uint32_t>(!((ffai->FileSystemAttributes & FILE_NAMED_STREAMS)) == 0u);
-      f_flags.compression = static_cast<uint32_t>(!((ffai->FileSystemAttributes & FILE_VOLUME_IS_COMPRESSED)) == 0u);
-      f_flags.extents = static_cast<uint32_t>(!((ffai->FileSystemAttributes & FILE_SUPPORTS_SPARSE_FILES)) == 0u);
-      f_flags.filecompression = static_cast<uint32_t>(!((ffai->FileSystemAttributes & FILE_FILE_COMPRESSION)) == 0u);
+      f_flags.rdonly = static_cast<uint32_t>((ffai->FileSystemAttributes & FILE_READ_ONLY_VOLUME) != 0u);
+      f_flags.acls = static_cast<uint32_t>((ffai->FileSystemAttributes & FILE_PERSISTENT_ACLS) != 0u);
+      f_flags.xattr = static_cast<uint32_t>((ffai->FileSystemAttributes & FILE_NAMED_STREAMS) != 0u);
+      f_flags.compression = static_cast<uint32_t>((ffai->FileSystemAttributes & FILE_VOLUME_IS_COMPRESSED) != 0u);
+      f_flags.extents = static_cast<uint32_t>((ffai->FileSystemAttributes & FILE_SUPPORTS_SPARSE_FILES) != 0u);
+      f_flags.filecompression = static_cast<uint32_t>((ffai->FileSystemAttributes & FILE_FILE_COMPRESSION) != 0u);
       ++ret;
     }
     if(wanted & want::namemax)
@@ -161,13 +161,13 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
           return {GetLastError(), std::system_category()};
         }
         buffer[len] = 0;
-        if(memcmp(buffer2, buffer + len - pathlen, pathlen) != 0 != 0)
+        if(memcmp(buffer2, buffer + len - pathlen, pathlen) != 0)
         {
           continue;  // path changed
         }
         len -= pathlen;
         // buffer should look like \Device\HarddiskVolumeX
-        if(memcmp(buffer, L"\\Device\\HarddiskVolume", 44) != 0 != 0)
+        if(memcmp(buffer, L"\\Device\\HarddiskVolume", 44) != 0)
         {
           return std::errc::illegal_byte_sequence;
         }
@@ -188,7 +188,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
           return {GetLastError(), std::system_category()};
         }
         buffer[len] = 0;
-        if(memcmp(buffer2, buffer + len - pathlen, pathlen) != 0 != 0)
+        if(memcmp(buffer2, buffer + len - pathlen, pathlen) != 0)
         {
           continue;  // path changed
         }

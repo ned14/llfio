@@ -149,10 +149,7 @@ private:
     string_view _utf8;
     wstring_view _utf16;
 
-    constexpr state()
-         
-    {
-    }
+    state() = default;
     constexpr explicit state(string_view v)
         : _utf8(v)
          

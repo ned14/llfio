@@ -354,9 +354,9 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     item.stat.st_size = ffdi->EndOfFile.QuadPart;
     item.stat.st_allocated = ffdi->AllocationSize.QuadPart;
     item.stat.st_birthtim = to_timepoint(ffdi->CreationTime);
-    item.stat.st_sparse = static_cast<unsigned int>(!((ffdi->FileAttributes & FILE_ATTRIBUTE_SPARSE_FILE)) == 0u);
-    item.stat.st_compressed = static_cast<unsigned int>(!((ffdi->FileAttributes & FILE_ATTRIBUTE_COMPRESSED)) == 0u);
-    item.stat.st_reparse_point = static_cast<unsigned int>(!((ffdi->FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)) == 0u);
+    item.stat.st_sparse = static_cast<unsigned int>((ffdi->FileAttributes & FILE_ATTRIBUTE_SPARSE_FILE) != 0u);
+    item.stat.st_compressed = static_cast<unsigned int>((ffdi->FileAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0u);
+    item.stat.st_reparse_point = static_cast<unsigned int>((ffdi->FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0u);
     n++;
     if(ffdi->NextEntryOffset == 0u)
     {

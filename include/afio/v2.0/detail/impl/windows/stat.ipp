@@ -126,7 +126,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
       return {GetLastError(), std::system_category()};
     }
     buffer_[len] = 0;
-    if(memcmp(buffer_, L"\\Device\\HarddiskVolume", 44) != 0 != 0)
+    if(memcmp(buffer_, L"\\Device\\HarddiskVolume", 44) != 0)
     {
       return std::errc::illegal_byte_sequence;
     }
@@ -205,17 +205,17 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
   }
   if(wanted & want::sparse)
   {
-    st_sparse = static_cast<unsigned int>(!((fai.BasicInformation.FileAttributes & FILE_ATTRIBUTE_SPARSE_FILE)) == 0u);
+    st_sparse = static_cast<unsigned int>((fai.BasicInformation.FileAttributes & FILE_ATTRIBUTE_SPARSE_FILE) != 0u);
     ++ret;
   }
   if(wanted & want::compressed)
   {
-    st_compressed = static_cast<unsigned int>(!((fai.BasicInformation.FileAttributes & FILE_ATTRIBUTE_COMPRESSED)) == 0u);
+    st_compressed = static_cast<unsigned int>((fai.BasicInformation.FileAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0u);
     ++ret;
   }
   if(wanted & want::reparse_point)
   {
-    st_reparse_point = static_cast<unsigned int>(!((fai.BasicInformation.FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)) == 0u);
+    st_reparse_point = static_cast<unsigned int>((fai.BasicInformation.FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0u);
     ++ret;
   }
   return ret;
