@@ -63,9 +63,9 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
     IO_STATUS_BLOCK isb = make_iostatus();
 
     path_view::c_str zpath(path, true);
-    UNICODE_STRING _path;
+    UNICODE_STRING _path{};
     _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
-    _path.MaximumLength = (_path.Length = (USHORT)(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
+    _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
     if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
     {
       _path.Buffer += 3;
@@ -73,7 +73,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
       _path.MaximumLength -= 3 * sizeof(wchar_t);
     }
 
-    OBJECT_ATTRIBUTES oa;
+    OBJECT_ATTRIBUTES oa{};
     memset(&oa, 0, sizeof(oa));
     oa.Length = sizeof(OBJECT_ATTRIBUTES);
     oa.ObjectName = &_path;
@@ -82,14 +82,16 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
     // if(!!(flags & file_flags::int_opening_link))
     //  oa.Attributes|=0x100/*OBJ_OPENLINK*/;
 
-    LARGE_INTEGER AllocationSize;
+    LARGE_INTEGER AllocationSize{};
     memset(&AllocationSize, 0, sizeof(AllocationSize));
-    NTSTATUS ntstat = NtCreateFile(&nativeh.h, access, &oa, &isb, &AllocationSize, attribs, fileshare, creatdisp, ntflags, NULL, 0);
+    NTSTATUS ntstat = NtCreateFile(&nativeh.h, access, &oa, &isb, &AllocationSize, attribs, fileshare, creatdisp, ntflags, nullptr, 0);
     if(STATUS_PENDING == ntstat)
+    {
       ntstat = ntwait(nativeh.h, isb, deadline());
+    }
     if(ntstat < 0)
     {
-      return {(int) ntstat, ntkernel_category()};
+      return {static_cast<int>(ntstat), ntkernel_category()};
     }
     switch(_creation)
     {
@@ -125,11 +127,11 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
       break;
     }
     path_view::c_str zpath(path, false);
-    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.buffer, access, fileshare, NULL, creation, attribs, NULL)))
+    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.buffer, access, fileshare, nullptr, creation, attribs, nullptr)))
     {
       DWORD errcode = GetLastError();
       // assert(false);
-      return {(int) errcode, std::system_category()};
+      return {static_cast<int>(errcode), std::system_category()};
     }
     switch(_creation)
     {
@@ -158,8 +160,8 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   if(need_to_set_sparse && !(flags & flag::win_disable_sparse_file_creation))
   {
     DWORD bytesout = 0;
-    FILE_SET_SPARSE_BUFFER fssb = {true};
-    if(!DeviceIoControl(nativeh.h, FSCTL_SET_SPARSE, &fssb, sizeof(fssb), nullptr, 0, &bytesout, nullptr))
+    FILE_SET_SPARSE_BUFFER fssb = {1u};
+    if(DeviceIoControl(nativeh.h, FSCTL_SET_SPARSE, &fssb, sizeof(fssb), nullptr, 0, &bytesout, nullptr) == 0)
     {
 #if AFIO_LOGGING_LEVEL >= 3
       DWORD errcode = GetLastError();
@@ -173,15 +175,19 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   {
     // Hide this item
     IO_STATUS_BLOCK isb = make_iostatus();
-    FILE_BASIC_INFORMATION fbi;
+    FILE_BASIC_INFORMATION fbi{};
     memset(&fbi, 0, sizeof(fbi));
     fbi.FileAttributes = FILE_ATTRIBUTE_HIDDEN;
     NtSetInformationFile(nativeh.h, &isb, &fbi, sizeof(fbi), FileBasicInformation);
     if(flags & flag::overlapped)
+    {
       ntwait(nativeh.h, isb, deadline());
+    }
   }
   if(_creation == creation::truncate && ret.value().are_safety_fsyncs_issued())
+  {
     FlushFileBuffers(nativeh.h);
+  }
   return ret;
 }
 
@@ -204,16 +210,16 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   attribs &= 0x00ffffff;  // the real attributes only, not the win32 flags
   OUTCOME_TRY(ntflags, ntflags_from_handle_caching_and_flags(nativeh, _caching, flags));
   ntflags |= 0x040 /*FILE_NON_DIRECTORY_FILE*/;  // do not open a directory
-  UNICODE_STRING _path;
-  _path.MaximumLength = (_path.Length = (USHORT)(68 * sizeof(wchar_t))) + sizeof(wchar_t);
+  UNICODE_STRING _path{};
+  _path.MaximumLength = (_path.Length = static_cast<USHORT>(68 * sizeof(wchar_t))) + sizeof(wchar_t);
 
-  OBJECT_ATTRIBUTES oa;
+  OBJECT_ATTRIBUTES oa{};
   memset(&oa, 0, sizeof(oa));
   oa.Length = sizeof(OBJECT_ATTRIBUTES);
   oa.ObjectName = &_path;
   oa.RootDirectory = dirh.native_handle().h;
 
-  LARGE_INTEGER AllocationSize;
+  LARGE_INTEGER AllocationSize{};
   memset(&AllocationSize, 0, sizeof(AllocationSize));
   std::string _random;
   std::wstring random(68, 0);
@@ -223,7 +229,9 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
     {
       _random = utils::random_string(32) + ".tmp";
       for(size_t n = 0; n < _random.size(); n++)
+      {
         random[n] = _random[n];
+      }
     }
     catch(...)
     {
@@ -232,21 +240,23 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
     _path.Buffer = const_cast<wchar_t *>(random.c_str());
     {
       IO_STATUS_BLOCK isb = make_iostatus();
-      NTSTATUS ntstat = NtCreateFile(&nativeh.h, access, &oa, &isb, &AllocationSize, attribs, fileshare, creatdisp, ntflags, NULL, 0);
+      NTSTATUS ntstat = NtCreateFile(&nativeh.h, access, &oa, &isb, &AllocationSize, attribs, fileshare, creatdisp, ntflags, nullptr, 0);
       if(STATUS_PENDING == ntstat)
-        ntstat = ntwait(nativeh.h, isb, deadline());
-      if(ntstat < 0 && ntstat != (NTSTATUS) 0xC0000035L /*STATUS_OBJECT_NAME_COLLISION*/)
       {
-        return {(int) ntstat, ntkernel_category()};
+        ntstat = ntwait(nativeh.h, isb, deadline());
+      }
+      if(ntstat < 0 && ntstat != static_cast<NTSTATUS>(0xC0000035L) /*STATUS_OBJECT_NAME_COLLISION*/)
+      {
+        return {static_cast<int>(ntstat), ntkernel_category()};
       }
     }
     // std::cerr << random << std::endl;
     OUTCOME_TRYV(ret.value()._fetch_inode());  // It can be useful to know the inode of temporary inodes
-    if(nativeh.h)
+    if(nativeh.h != nullptr)
     {
       // Hide this item
       IO_STATUS_BLOCK isb = make_iostatus();
-      FILE_BASIC_INFORMATION fbi;
+      FILE_BASIC_INFORMATION fbi{};
       memset(&fbi, 0, sizeof(fbi));
       fbi.FileAttributes = FILE_ATTRIBUTE_HIDDEN;
       NtSetInformationFile(nativeh.h, &isb, &fbi, sizeof(fbi), FileBasicInformation);
@@ -261,17 +271,23 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
   using namespace windows_nt_kernel;
   AFIO_LOG_FUNCTION_CALL(this);
   if(d && !_v.is_overlapped())
+  {
     return std::errc::not_supported;
+  }
   AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
-  OVERLAPPED ol;
+  OVERLAPPED ol{};
   memset(&ol, 0, sizeof(ol));
-  IO_STATUS_BLOCK *isb = (IO_STATUS_BLOCK *) &ol;
+  auto *isb = reinterpret_cast<IO_STATUS_BLOCK *>(&ol);
   *isb = make_iostatus();
   ULONG flags = 0;
   if(!wait_for_device)
+  {
     flags |= 2 /*FLUSH_FLAGS_NO_SYNC*/;
+  }
   if(!and_metadata)
+  {
     flags |= 1 /*FLUSH_FLAGS_FILE_DATA_ONLY*/;
+  }
   NTSTATUS ntstat = NtFlushBuffersFileEx(_v.h, flags, isb);
   if(STATUS_PENDING == ntstat)
   {
@@ -284,9 +300,9 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
   }
   if(ntstat < 0)
   {
-    return {(int) ntstat, ntkernel_category()};
+    return {static_cast<int>(ntstat), ntkernel_category()};
   }
-  return io_handle::io_result<const_buffers_type>(std::move(reqs.buffers));
+  return io_handle::io_result<const_buffers_type>(reqs.buffers);
 }
 
 result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline /*unused*/) const noexcept
@@ -298,8 +314,10 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline /*
     result<file_handle> ret(file_handle(native_handle_type(), _devid, _inode, caching_, _flags));
     ret.value()._service = _service;
     ret.value()._v.behaviour = _v.behaviour;
-    if(!DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, false, DUPLICATE_SAME_ACCESS))
+    if(DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, 0, DUPLICATE_SAME_ACCESS) == 0)
+    {
       return {GetLastError(), std::system_category()};
+    }
     return ret;
   }
   // Slow path
@@ -313,21 +331,23 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline /*
   OUTCOME_TRYV(attributes_from_handle_caching_and_flags(nativeh, caching_, _flags));
   OUTCOME_TRY(ntflags, ntflags_from_handle_caching_and_flags(nativeh, caching_, _flags));
   ntflags |= 0x040 /*FILE_NON_DIRECTORY_FILE*/;  // do not open a directory
-  OBJECT_ATTRIBUTES oa;
+  OBJECT_ATTRIBUTES oa{};
   memset(&oa, 0, sizeof(oa));
   oa.Length = sizeof(OBJECT_ATTRIBUTES);
   // It is entirely undocumented that this is how you clone a file handle with new privs
-  UNICODE_STRING _path;
+  UNICODE_STRING _path{};
   memset(&_path, 0, sizeof(_path));
   oa.ObjectName = &_path;
   oa.RootDirectory = _v.h;
   IO_STATUS_BLOCK isb = make_iostatus();
   NTSTATUS ntstat = NtOpenFile(&nativeh.h, access, &oa, &isb, fileshare, ntflags);
   if(STATUS_PENDING == ntstat)
+  {
     ntstat = ntwait(nativeh.h, isb, deadline());
+  }
   if(ntstat < 0)
   {
-    return {(int) ntstat, ntkernel_category()};
+    return {static_cast<int>(ntstat), ntkernel_category()};
   }
   return ret;
 }
@@ -343,19 +363,23 @@ result<file_handle::extent_type> file_handle::length() const noexcept
   ol.OffsetHigh = ol.Offset = 0xffffffff;
   WriteFile(_v.h, buffer, 0, &read, &ol);
 #endif
-  FILE_STANDARD_INFO fsi;
-  if(!GetFileInformationByHandleEx(_v.h, FileStandardInfo, &fsi, sizeof(fsi)))
+  FILE_STANDARD_INFO fsi{};
+  if(GetFileInformationByHandleEx(_v.h, FileStandardInfo, &fsi, sizeof(fsi)) == 0)
+  {
     return {GetLastError(), std::system_category()};
+  }
   return fsi.EndOfFile.QuadPart;
 }
 
 result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type newsize) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  FILE_END_OF_FILE_INFO feofi;
+  FILE_END_OF_FILE_INFO feofi{};
   feofi.EndOfFile.QuadPart = newsize;
-  if(!SetFileInformationByHandle(_v.h, FileEndOfFileInfo, &feofi, sizeof(feofi)))
+  if(SetFileInformationByHandle(_v.h, FileEndOfFileInfo, &feofi, sizeof(feofi)) == 0)
+  {
     return {GetLastError(), std::system_category()};
+  }
   if(are_safety_fsyncs_issued())
   {
     FlushFileBuffers(_v.h);
@@ -377,14 +401,14 @@ result<std::vector<std::pair<file_handle::extent_type, file_handle::extent_type>
 #else
     ret.resize(1);
 #endif
-    FILE_ALLOCATED_RANGE_BUFFER farb;
+    FILE_ALLOCATED_RANGE_BUFFER farb{};
     farb.FileOffset.QuadPart = 0;
-    farb.Length.QuadPart = ((extent_type) 1 << 63) - 1;  // Microsoft claims this is 1<<64-1024 for NTFS, but I get bad parameter error with anything higher than 1<<63-1.
+    farb.Length.QuadPart = (static_cast<extent_type>(1) << 63) - 1;  // Microsoft claims this is 1<<64-1024 for NTFS, but I get bad parameter error with anything higher than 1<<63-1.
     DWORD bytesout = 0;
-    OVERLAPPED ol;
+    OVERLAPPED ol{};
     memset(&ol, 0, sizeof(ol));
-    ol.Internal = (ULONG_PTR) -1;
-    while(!DeviceIoControl(_v.h, FSCTL_QUERY_ALLOCATED_RANGES, &farb, sizeof(farb), ret.data(), (DWORD)(ret.size() * sizeof(FILE_ALLOCATED_RANGE_BUFFER)), &bytesout, &ol))
+    ol.Internal = static_cast<ULONG_PTR>(-1);
+    while(DeviceIoControl(_v.h, FSCTL_QUERY_ALLOCATED_RANGES, &farb, sizeof(farb), ret.data(), static_cast<DWORD>(ret.size() * sizeof(FILE_ALLOCATED_RANGE_BUFFER)), &bytesout, &ol) == 0)
     {
       if(ERROR_INSUFFICIENT_BUFFER == GetLastError() || ERROR_MORE_DATA == GetLastError())
       {
@@ -392,7 +416,9 @@ result<std::vector<std::pair<file_handle::extent_type, file_handle::extent_type>
         continue;
       }
       if(ERROR_SUCCESS != GetLastError())
+      {
         return {GetLastError(), std::system_category()};
+      }
     }
     return ret;
   }
@@ -408,24 +434,30 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_type offs
   using namespace windows_nt_kernel;
   AFIO_LOG_FUNCTION_CALL(this);
   if(offset + bytes < offset)
+  {
     return std::errc::value_too_large;
-  FILE_ZERO_DATA_INFORMATION fzdi;
+  }
+  FILE_ZERO_DATA_INFORMATION fzdi{};
   fzdi.FileOffset.QuadPart = offset;
   fzdi.BeyondFinalZero.QuadPart = offset + bytes;
   DWORD bytesout = 0;
-  OVERLAPPED ol;
+  OVERLAPPED ol{};
   memset(&ol, 0, sizeof(ol));
-  ol.Internal = (ULONG_PTR) -1;
-  if(!DeviceIoControl(_v.h, FSCTL_SET_ZERO_DATA, &fzdi, sizeof(fzdi), nullptr, 0, &bytesout, &ol))
+  ol.Internal = static_cast<ULONG_PTR>(-1);
+  if(DeviceIoControl(_v.h, FSCTL_SET_ZERO_DATA, &fzdi, sizeof(fzdi), nullptr, 0, &bytesout, &ol) == 0)
   {
     if(ERROR_IO_PENDING == GetLastError())
     {
       NTSTATUS ntstat = ntwait(_v.h, ol, deadline());
-      if(ntstat)
+      if(ntstat != 0)
+      {
         return {ntstat, ntkernel_category()};
+      }
     }
     if(ERROR_SUCCESS != GetLastError())
+    {
       return {GetLastError(), std::system_category()};
+    }
   }
   return success();
 }

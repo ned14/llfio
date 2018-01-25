@@ -32,7 +32,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC void path_view::c_str::_from_utf8(const path_view
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   ULONG written = 0;
-  std::error_code ec((int) RtlUTF8ToUnicodeN(_buffer, (ULONG)(sizeof(_buffer) - sizeof(wchar_t)), &written, view._state._utf8.data(), (ULONG)(view._state._utf8.size())), ntkernel_category());
+  std::error_code ec(static_cast<int>(RtlUTF8ToUnicodeN(_buffer, static_cast<ULONG>(sizeof(_buffer) - sizeof(wchar_t)), &written, view._state._utf8.data(), static_cast<ULONG>(view._state._utf8.size()))), ntkernel_category());
   if(ec && ec.value() < 0)
   {
     AFIO_LOG_FATAL(ec.value(), ec.message().c_str());
@@ -44,11 +44,11 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC void path_view::c_str::_from_utf8(const path_view
   do
   {
     p = wcschr(p, '/');
-    if(p)
+    if(p != nullptr)
     {
       *p = '\\';
     }
-  } while(p);
+  } while(p != nullptr);
   buffer = _buffer;
 }
 

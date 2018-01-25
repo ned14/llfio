@@ -39,9 +39,9 @@ namespace utils
   size_t page_size() noexcept
   {
     static size_t ret;
-    if(!ret)
+    if(ret == 0u)
     {
-      SYSTEM_INFO si;
+      SYSTEM_INFO si{};
       memset(&si, 0, sizeof(si));
       GetSystemInfo(&si);
       ret = si.dwPageSize;
@@ -59,31 +59,33 @@ namespace utils
     std::lock_guard<decltype(lock)> g(lock);
     if(pagesizes.empty())
     {
-      typedef size_t(WINAPI * GetLargePageMinimum_t)(void);
-      SYSTEM_INFO si;
+      using GetLargePageMinimum_t = size_t(WINAPI *)(void);
+      SYSTEM_INFO si{};
       memset(&si, 0, sizeof(si));
       GetSystemInfo(&si);
       pagesizes.push_back(si.dwPageSize);
       pagesizes_available.push_back(si.dwPageSize);
-      GetLargePageMinimum_t GetLargePageMinimum_ = (GetLargePageMinimum_t) GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "GetLargePageMinimum");
-      if(GetLargePageMinimum_)
+      auto GetLargePageMinimum_ = reinterpret_cast<GetLargePageMinimum_t>(GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "GetLargePageMinimum"));
+      if(GetLargePageMinimum_ != nullptr)
       {
         windows_nt_kernel::init();
         using namespace windows_nt_kernel;
         pagesizes.push_back(GetLargePageMinimum_());
         /* Attempt to enable SeLockMemoryPrivilege */
         HANDLE token;
-        if(OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &token))
+        if(OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &token) != 0)
         {
           auto untoken = undoer([&token] { CloseHandle(token); });
-          TOKEN_PRIVILEGES privs;
+          TOKEN_PRIVILEGES privs{};
           memset(&privs, 0, sizeof(privs));
           privs.PrivilegeCount = 1;
-          if(LookupPrivilegeValue(NULL, SE_LOCK_MEMORY_NAME, &privs.Privileges[0].Luid))
+          if(LookupPrivilegeValue(nullptr, SE_LOCK_MEMORY_NAME, &privs.Privileges[0].Luid))
           {
             privs.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-            if(AdjustTokenPrivileges(token, FALSE, &privs, 0, NULL, NULL) && GetLastError() == S_OK)
+            if((AdjustTokenPrivileges(token, FALSE, &privs, 0, nullptr, nullptr) != 0) && GetLastError() == S_OK)
+            {
               pagesizes_available.push_back(GetLargePageMinimum_());
+            }
           }
         }
       }
@@ -98,7 +100,7 @@ namespace utils
   {
     windows_nt_kernel::init();
     using namespace windows_nt_kernel;
-    if(!RtlGenRandom(buffer, (ULONG) bytes))
+    if(RtlGenRandom(buffer, static_cast<ULONG>(bytes)) == 0u)
     {
       AFIO_LOG_FATAL(0, "afio: Kernel crypto function failed");
       std::terminate();
@@ -119,16 +121,16 @@ namespace utils
       }
       auto unprocessToken = undoer([&processToken] { CloseHandle(processToken); });
       {
-        LUID luid;
-        if(!LookupPrivilegeValue(NULL, L"SeProfileSingleProcessPrivilege", &luid))
+        LUID luid{};
+        if(!LookupPrivilegeValue(nullptr, L"SeProfileSingleProcessPrivilege", &luid))
         {
           return {GetLastError(), std::system_category()};
         }
-        TOKEN_PRIVILEGES tp;
+        TOKEN_PRIVILEGES tp{};
         tp.PrivilegeCount = 1;
         tp.Privileges[0].Luid = luid;
         tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-        if(!AdjustTokenPrivileges(processToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), (PTOKEN_PRIVILEGES) NULL, (PDWORD) NULL))
+        if(AdjustTokenPrivileges(processToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), (PTOKEN_PRIVILEGES) nullptr, (PDWORD) nullptr) == 0)
         {
           return {GetLastError(), std::system_category()};
         }
@@ -146,7 +148,7 @@ namespace utils
     NTSTATUS ntstat = NtSetSystemInformation(80 /*SystemMemoryListInformation*/, &command, sizeof(SYSTEM_MEMORY_LIST_COMMAND));
     if(ntstat != STATUS_SUCCESS)
     {
-      return {(int) ntstat, ntkernel_category()};
+      return {static_cast<int>(ntstat), ntkernel_category()};
     }
     return success();
   }
@@ -165,16 +167,16 @@ namespace utils
       }
       auto unprocessToken = undoer([&processToken] { CloseHandle(processToken); });
       {
-        LUID luid;
-        if(!LookupPrivilegeValue(NULL, L"SeIncreaseQuotaPrivilege", &luid))
+        LUID luid{};
+        if(!LookupPrivilegeValue(nullptr, L"SeIncreaseQuotaPrivilege", &luid))
         {
           return {GetLastError(), std::system_category()};
         }
-        TOKEN_PRIVILEGES tp;
+        TOKEN_PRIVILEGES tp{};
         tp.PrivilegeCount = 1;
         tp.Privileges[0].Luid = luid;
         tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-        if(!AdjustTokenPrivileges(processToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), (PTOKEN_PRIVILEGES) NULL, (PDWORD) NULL))
+        if(AdjustTokenPrivileges(processToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), (PTOKEN_PRIVILEGES) nullptr, (PDWORD) nullptr) == 0)
         {
           return {GetLastError(), std::system_category()};
         }
@@ -188,7 +190,7 @@ namespace utils
     // Flush modified data so dropping the cache drops everything
     OUTCOME_TRYV(flush_modified_data());
     // Drop filesystem cache
-    if(!SetSystemFileCacheSize((SIZE_T) -1, (SIZE_T) -1, 0))
+    if(SetSystemFileCacheSize(static_cast<SIZE_T>(-1), static_cast<SIZE_T>(-1), 0) == 0)
     {
       return {GetLastError(), std::system_category()};
     }
@@ -202,29 +204,35 @@ namespace utils
       large_page_allocation ret(calculate_large_page_allocation(bytes));
       DWORD type = MEM_COMMIT | MEM_RESERVE;
       if(ret.page_size_used > 65536)
+      {
         type |= MEM_LARGE_PAGES;
+      }
       ret.p = VirtualAlloc(nullptr, ret.actual_size, type, PAGE_READWRITE);
-      if(!ret.p)
+      if(ret.p == nullptr)
       {
         if(ERROR_NOT_ENOUGH_MEMORY == GetLastError())
+        {
           ret.p = VirtualAlloc(nullptr, ret.actual_size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+        }
       }
 #ifndef NDEBUG
       else if(ret.page_size_used > 65536)
+      {
         printf("afio: Large page allocation successful\n");
+      }
 #endif
       return ret;
     }
     void deallocate_large_pages(void *p, size_t bytes)
     {
       (void) bytes;
-      if(!VirtualFree(p, 0, MEM_RELEASE))
+      if(VirtualFree(p, 0, MEM_RELEASE) == 0)
       {
         AFIO_LOG_FATAL(p, "afio: Freeing large pages failed");
         std::terminate();
       }
     }
-  }
-}
+  }  // namespace detail
+}  // namespace utils
 
 AFIO_V2_NAMESPACE_END

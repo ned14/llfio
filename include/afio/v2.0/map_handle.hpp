@@ -119,13 +119,13 @@ public:
 
   /*! \brief Create a memory section backed by a file.
   \param backing The handle to use as backing storage.
-  \param bytes The initial size of this section, which cannot be larger than any backing file. Zero means to use `backing.length()`.
+  \param maximum_size The initial size of this section, which cannot be larger than any backing file. Zero means to use `backing.length()`.
   \param _flag How to create the section.
 
   \errors Any of the values POSIX dup(), open() or NtCreateSection() can return.
   */
   AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<section_handle> section(file_handle &backing, extent_type bytes, flag _flag) noexcept;
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<section_handle> section(file_handle &backing, extent_type maximum_size, flag _flag) noexcept;
   /*! \brief Create a memory section backed by a file.
   \param backing The handle to use as backing storage.
   \param bytes The initial size of this section, which cannot be larger than any backing file. Zero means to use `backing.length()`.
@@ -355,7 +355,7 @@ public:
   size_type length() const noexcept { return _length; }
 
   //! Ask the system to commit the system resources to make the memory represented by the buffer available with the given permissions. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually committed.
-  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> commit(buffer_type region, section_handle::flag _flag = section_handle::flag::readwrite) noexcept;
+  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> commit(buffer_type region, section_handle::flag flag = section_handle::flag::readwrite) noexcept;
 
   //! Ask the system to make the memory represented by the buffer unavailable and to decommit the system resources representing them. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually decommitted.
   AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> decommit(buffer_type region) noexcept;

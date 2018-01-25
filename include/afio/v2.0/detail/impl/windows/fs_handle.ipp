@@ -53,7 +53,9 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
       OUTCOME_TRY(currentpath, h.current_path());
       // If current path is empty, it's been deleted
       if(currentpath.empty())
+      {
         return std::errc::no_such_file_or_directory;
+      }
       // Split the path into root and leafname
       filesystem::path filename = currentpath.filename();
       currentpath.remove_filename();
@@ -63,45 +65,53 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
       const_cast<filesystem::path::string_type &>(currentpath.native()).push_back('\\');
       auto currentdirh_ = path_handle::path(currentpath);
       if(!currentdirh_)
+      {
         continue;
+      }
       path_handle currentdirh = std::move(currentdirh_.value());
       if(h.flags() & handle::flag::disable_safety_unlinks)
+      {
         return success(std::move(currentdirh));
+      }
 
       DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
       IO_STATUS_BLOCK isb = make_iostatus();
       path_view::c_str zpath(filename, true);
-      UNICODE_STRING _path;
+      UNICODE_STRING _path{};
       _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
-      _path.MaximumLength = (_path.Length = (USHORT)(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
-      OBJECT_ATTRIBUTES oa;
+      _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
+      OBJECT_ATTRIBUTES oa{};
       memset(&oa, 0, sizeof(oa));
       oa.Length = sizeof(OBJECT_ATTRIBUTES);
       oa.ObjectName = &_path;
       oa.RootDirectory = currentdirh.native_handle().h;
-      LARGE_INTEGER AllocationSize;
+      LARGE_INTEGER AllocationSize{};
       memset(&AllocationSize, 0, sizeof(AllocationSize));
       HANDLE nh = nullptr;
-      NTSTATUS ntstat = NtCreateFile(&nh, SYNCHRONIZE, &oa, &isb, &AllocationSize, 0, fileshare, 0x00000001 /*FILE_OPEN*/, 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/, NULL, 0);
+      NTSTATUS ntstat = NtCreateFile(&nh, SYNCHRONIZE, &oa, &isb, &AllocationSize, 0, fileshare, 0x00000001 /*FILE_OPEN*/, 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/, nullptr, 0);
       if(STATUS_SUCCESS != ntstat)
       {
-        if((NTSTATUS) 0xC000000F /*STATUS_NO_SUCH_FILE*/ == ntstat || (NTSTATUS) 0xC0000034 /*STATUS_OBJECT_NAME_NOT_FOUND*/ == ntstat)
+        if(static_cast<NTSTATUS>(0xC000000F) /*STATUS_NO_SUCH_FILE*/ == ntstat || static_cast<NTSTATUS>(0xC0000034) /*STATUS_OBJECT_NAME_NOT_FOUND*/ == ntstat)
         {
           continue;
         }
-        return {(int) ntstat, ntkernel_category()};
+        return {static_cast<int>(ntstat), ntkernel_category()};
       }
       auto unnh = undoer([nh] { CloseHandle(nh); });
       (void) unnh;
       isb.Status = -1;
-      FILE_INTERNAL_INFORMATION fii;
+      FILE_INTERNAL_INFORMATION fii{};
       ntstat = NtQueryInformationFile(nh, &isb, &fii, sizeof(fii), FileInternalInformation);
       if(STATUS_SUCCESS != ntstat)
+      {
         continue;
+      }
       // If the same, we know for a fact that this is the correct containing dir for now at least
       // FIXME: We are not comparing device number, that's faked as the volume number in stat_t
-      if((ino_t) fii.IndexNumber.QuadPart == _inode)
+      if(static_cast<ino_t>(fii.IndexNumber.QuadPart) == _inode)
+      {
         return success(std::move(currentdirh));
+      }
       AFIO_WIN_DEADLINE_TO_TIMEOUT(d);
     }
   }
@@ -122,13 +132,13 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
   if(!base.is_valid() && !path.is_ntpath())
   {
     path_view::c_str zpath(path, false);
-    UNICODE_STRING NtPath;
-    if(!RtlDosPathNameToNtPathName_U(zpath.buffer, &NtPath, NULL, NULL))
+    UNICODE_STRING NtPath{};
+    if(RtlDosPathNameToNtPathName_U(zpath.buffer, &NtPath, nullptr, nullptr) == 0u)
     {
       return {ERROR_FILE_NOT_FOUND, std::system_category()};
     }
     auto unntpath = undoer([&NtPath] {
-      if(!HeapFree(GetProcessHeap(), 0, NtPath.Buffer))
+      if(HeapFree(GetProcessHeap(), 0, NtPath.Buffer) == 0)
       {
         abort();
       }
@@ -138,9 +148,9 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
   }
 
   path_view::c_str zpath(path, true);
-  UNICODE_STRING _path;
+  UNICODE_STRING _path{};
   _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
-  _path.MaximumLength = (_path.Length = (USHORT)(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
+  _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
   if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
   {
     _path.Buffer += 3;
@@ -149,17 +159,19 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
   }
   IO_STATUS_BLOCK isb = make_iostatus();
   alignas(8) char buffer[sizeof(FILE_RENAME_INFORMATION) + 65536];
-  FILE_RENAME_INFORMATION *fni = (FILE_RENAME_INFORMATION *) buffer;
-  fni->ReplaceIfExists = atomic_replace;
+  auto *fni = reinterpret_cast<FILE_RENAME_INFORMATION *>(buffer);
+  fni->ReplaceIfExists = static_cast<BOOLEAN>(atomic_replace);
   fni->RootDirectory = base.is_valid() ? base.native_handle().h : nullptr;
   fni->FileNameLength = _path.Length;
   memcpy(fni->FileName, _path.Buffer, fni->FileNameLength);
   NTSTATUS ntstat = NtSetInformationFile(h.native_handle().h, &isb, fni, sizeof(FILE_RENAME_INFORMATION) + fni->FileNameLength, FileRenameInformation);
   if(STATUS_PENDING == ntstat)
+  {
     ntstat = ntwait(h.native_handle().h, isb, d);
+  }
   if(ntstat < 0)
   {
-    return {(int) ntstat, ntkernel_category()};
+    return {static_cast<int>(ntstat), ntkernel_category()};
   }
   return success();
 }
@@ -190,7 +202,7 @@ result<void> fs_handle::unlink(deadline d) noexcept
     {
       // If something else is using it, we may not be able to rename
       // This error also annoyingly appears if the file has delete on close set on it already
-      if(out.error().ec.value() == (int) 0xC0000043 /*STATUS_SHARING_VIOLATION*/)
+      if(out.error().ec.value() == static_cast<int>(0xC0000043) /*STATUS_SHARING_VIOLATION*/)
       {
         AFIO_LOG_WARN(this, "Failed to rename entry to random name to simulate immediate unlinking due to STATUS_SHARING_VIOLATION, skipping");
       }
@@ -206,25 +218,29 @@ result<void> fs_handle::unlink(deadline d) noexcept
     // Hide the item in Explorer and the command line
     {
       IO_STATUS_BLOCK isb = make_iostatus();
-      FILE_BASIC_INFORMATION fbi;
+      FILE_BASIC_INFORMATION fbi{};
       memset(&fbi, 0, sizeof(fbi));
       fbi.FileAttributes = FILE_ATTRIBUTE_HIDDEN;
       NTSTATUS ntstat = NtSetInformationFile(h.native_handle().h, &isb, &fbi, sizeof(fbi), FileBasicInformation);
       if(STATUS_PENDING == ntstat)
+      {
         ntstat = ntwait(h.native_handle().h, isb, d);
+      }
       (void) ntstat;
     }
     // Mark the item as delete on close
     IO_STATUS_BLOCK isb = make_iostatus();
-    FILE_DISPOSITION_INFORMATION fdi;
+    FILE_DISPOSITION_INFORMATION fdi{};
     memset(&fdi, 0, sizeof(fdi));
-    fdi._DeleteFile = true;
+    fdi._DeleteFile = 1u;
     NTSTATUS ntstat = NtSetInformationFile(h.native_handle().h, &isb, &fdi, sizeof(fdi), FileDispositionInformation);
     if(STATUS_PENDING == ntstat)
+    {
       ntstat = ntwait(h.native_handle().h, isb, d);
+    }
     if(ntstat < 0)
     {
-      return {(int) ntstat, ntkernel_category()};
+      return {static_cast<int>(ntstat), ntkernel_category()};
     }
   }
   return success();

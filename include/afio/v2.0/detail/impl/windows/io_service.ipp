@@ -31,19 +31,23 @@ io_service::io_service()
     : _work_queued(0)
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  if(!DuplicateHandle(GetCurrentProcess(), GetCurrentThread(), GetCurrentProcess(), &_threadh, 0, false, DUPLICATE_SAME_ACCESS))
+  if(DuplicateHandle(GetCurrentProcess(), GetCurrentThread(), GetCurrentProcess(), &_threadh, 0, 0, DUPLICATE_SAME_ACCESS) == 0)
+  {
     throw std::runtime_error("Failed to create creating thread handle");
+  }
   _threadid = GetCurrentThreadId();
 }
 
 io_service::~io_service()
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  if(_work_queued)
+  if(_work_queued != 0u)
   {
     fprintf(stderr, "WARNING: ~io_service() sees work still queued, blocking until no work queued\n");
-    while(_work_queued)
+    while(_work_queued != 0u)
+    {
       std::this_thread::yield();
+    }
   }
   CloseHandle(_threadh);
 }
@@ -51,10 +55,14 @@ io_service::~io_service()
 result<bool> io_service::run_until(deadline d) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  if(!_work_queued)
+  if(_work_queued == 0u)
+  {
     return false;
+  }
   if(GetCurrentThreadId() != _threadid)
+  {
     return std::errc::operation_not_supported;
+  }
   ntsleep(d, true);
   return _work_queued != 0;
 }
@@ -74,17 +82,19 @@ void io_service::_post(detail::function_ptr<void(io_service *)> &&f)
   {
     static void __stdcall _(ULONG_PTR data)
     {
-      post_info *pi = (post_info *) data;
+      auto *pi = (post_info *) data;
       pi->f(pi->service);
       pi->service->_post_done(pi);
     }
   };
   PAPCFUNC apcf = lambda::_;
-  if(QueueUserAPC(apcf, _threadh, (ULONG_PTR) data))
+  if(QueueUserAPC(apcf, _threadh, (ULONG_PTR) data) != 0u)
+  {
     _work_enqueued();
+  }
   else
   {
-    post_info *pi = (post_info *) data;
+    auto *pi = static_cast<post_info *>(data);
     pi->service->_post_done(pi);
   }
 }

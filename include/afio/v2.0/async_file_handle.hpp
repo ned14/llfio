@@ -518,9 +518,9 @@ public:
     io_state_ptr _state;
     awaitable_state<BuffersType> *_astate;
 
-    awaitable(io_state_ptr state)
+    explicit awaitable(io_state_ptr state)
         : _state(std::move(state))
-        , _astate((awaitable_state<BuffersType> *) _state->erased_completion_handler()->address())
+        , _astate(reinterpret_cast<awaitable_state<BuffersType> *>(_state->erased_completion_handler()->address()))
     {
     }
 

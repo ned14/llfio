@@ -45,20 +45,20 @@ namespace path_discovery
       // We don't use it as it's nearly useless, but GetTempPath() returns one of (in order):
       // %TMP%, %TEMP%, %USERPROFILE%, GetWindowsDirectory()\Temp
       static const wchar_t *variables[] = {L"TMP", L"TEMP", L"LOCALAPPDATA", L"USERPROFILE"};
-      for(size_t n = 0; n < sizeof(variables) / sizeof(variables[0]); n++)
+      for(auto &variable : variables)
       {
         buffer.resize(32768);
-        DWORD len = GetEnvironmentVariable(variables[n], (LPWSTR) buffer.data(), (DWORD) buffer.size());
-        if(len && len < buffer.size())
+        DWORD len = GetEnvironmentVariable(variable, const_cast<LPWSTR>(buffer.data()), static_cast<DWORD>(buffer.size()));
+        if((len != 0u) && len < buffer.size())
         {
           buffer.resize(len);
-          if(variables[n][0] == 'L')
+          if(variable[0] == 'L')
           {
             buffer.append(L"\\Temp");
             ret.emplace_back(discovered_path::source_type::environment, buffer);
             buffer.resize(len);
           }
-          else if(variables[n][0] == 'U')
+          else if(variable[0] == 'U')
           {
             buffer.append(L"\\AppData\\Local\\Temp");
             ret.emplace_back(discovered_path::source_type::environment, buffer);
@@ -78,14 +78,14 @@ namespace path_discovery
     // Ask the shell
     {
       PWSTR out;
-      if(S_OK == SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &out))
+      if(S_OK == SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, nullptr, &out))
       {
         buffer = out;
         CoTaskMemFree(out);
         buffer.append(L"\\Temp");
         ret.emplace_back(discovered_path::source_type::system, buffer);
       }
-      if(S_OK == SHGetKnownFolderPath(FOLDERID_Profile, 0, NULL, &out))
+      if(S_OK == SHGetKnownFolderPath(FOLDERID_Profile, 0, nullptr, &out))
       {
         buffer = out;
         CoTaskMemFree(out);
@@ -102,8 +102,8 @@ namespace path_discovery
     // fall back to Win3.1 era "the Windows directory" which definitely won't be
     // C:\Windows nowadays
     buffer.resize(32768);
-    DWORD len = GetWindowsDirectory((LPWSTR) buffer.data(), (UINT) buffer.size());
-    if(len && len < buffer.size())
+    DWORD len = GetWindowsDirectory(const_cast<LPWSTR>(buffer.data()), static_cast<UINT>(buffer.size()));
+    if((len != 0u) && len < buffer.size())
     {
       buffer.resize(len);
       buffer.append(L"\\Temp");
@@ -111,16 +111,16 @@ namespace path_discovery
     }
     // And if even that fails, try good old %SYSTEMDRIVE%\Temp
     buffer.resize(32768);
-    len = GetSystemWindowsDirectory((LPWSTR) buffer.data(), (UINT) buffer.size());
-    if(len && len < buffer.size())
+    len = GetSystemWindowsDirectory(const_cast<LPWSTR>(buffer.data()), static_cast<UINT>(buffer.size()));
+    if((len != 0u) && len < buffer.size())
     {
       buffer.resize(len);
-      buffer.resize(buffer.find_last_of(L"\\"));
+      buffer.resize(buffer.find_last_of(L'\\'));
       buffer.append(L"\\Temp");
       ret.emplace_back(discovered_path::source_type::hardcoded, buffer);
     }
     return ret;
   }
-}
+}  // namespace path_discovery
 
 AFIO_V2_NAMESPACE_END

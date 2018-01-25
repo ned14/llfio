@@ -40,8 +40,8 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
   NTSTATUS ntstat;
   size_t ret = 0;
 
-  FILE_ALL_INFORMATION &fai = *(FILE_ALL_INFORMATION *) buffer;
-  FILE_FS_SECTOR_SIZE_INFORMATION ffssi;
+  FILE_ALL_INFORMATION &fai = *reinterpret_cast<FILE_ALL_INFORMATION *>(buffer);
+  FILE_FS_SECTOR_SIZE_INFORMATION ffssi{};
   memset(&ffssi, 0, sizeof(ffssi));
   bool needInternal = !!(wanted & want::ino);
   bool needBasic = (!!(wanted & want::type) || !!(wanted & want::atim) || !!(wanted & want::mtim) || !!(wanted & want::ctim) || !!(wanted & want::birthtim) || !!(wanted & want::sparse) || !!(wanted & want::compressed) || !!(wanted & want::reparse_point));
@@ -49,13 +49,17 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
   // It's not widely known that the NT kernel supplies a stat() equivalent i.e. get me everything in a single syscall
   // However fetching FileAlignmentInformation which comes with FILE_ALL_INFORMATION is slow as it touches the device driver,
   // so only use if we need more than one item
-  if(((int) needInternal + (int) needBasic + (int) needStandard) >= 2)
+  if((static_cast<int>(needInternal) + static_cast<int>(needBasic) + static_cast<int>(needStandard)) >= 2)
   {
     ntstat = NtQueryInformationFile(h.native_handle().h, &isb, &fai, sizeof(buffer), FileAllInformation);
     if(STATUS_PENDING == ntstat)
+    {
       ntstat = ntwait(h.native_handle().h, isb, deadline());
+    }
     if(ntstat < 0)
-      return {(int) ntstat, ntkernel_category()};
+    {
+      return {static_cast<int>(ntstat), ntkernel_category()};
+    }
   }
   else
   {
@@ -63,27 +67,39 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
     {
       ntstat = NtQueryInformationFile(h.native_handle().h, &isb, &fai.InternalInformation, sizeof(fai.InternalInformation), FileInternalInformation);
       if(STATUS_PENDING == ntstat)
+      {
         ntstat = ntwait(h.native_handle().h, isb, deadline());
+      }
       if(ntstat < 0)
-        return {(int) ntstat, ntkernel_category()};
+      {
+        return {static_cast<int>(ntstat), ntkernel_category()};
+      }
     }
     if(needBasic)
     {
       isb.Status = -1;
       ntstat = NtQueryInformationFile(h.native_handle().h, &isb, &fai.BasicInformation, sizeof(fai.BasicInformation), FileBasicInformation);
       if(STATUS_PENDING == ntstat)
+      {
         ntstat = ntwait(h.native_handle().h, isb, deadline());
+      }
       if(ntstat < 0)
-        return {(int) ntstat, ntkernel_category()};
+      {
+        return {static_cast<int>(ntstat), ntkernel_category()};
+      }
     }
     if(needStandard)
     {
       isb.Status = -1;
       ntstat = NtQueryInformationFile(h.native_handle().h, &isb, &fai.StandardInformation, sizeof(fai.StandardInformation), FileStandardInformation);
       if(STATUS_PENDING == ntstat)
+      {
         ntstat = ntwait(h.native_handle().h, isb, deadline());
+      }
       if(ntstat < 0)
-        return {(int) ntstat, ntkernel_category()};
+      {
+        return {static_cast<int>(ntstat), ntkernel_category()};
+      }
     }
   }
   if((wanted & want::blocks) || (wanted & want::blksize))
@@ -91,9 +107,13 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
     isb.Status = -1;
     ntstat = NtQueryVolumeInformationFile(h.native_handle().h, &isb, &ffssi, sizeof(ffssi), FileFsSectorSizeInformation);
     if(STATUS_PENDING == ntstat)
+    {
       ntstat = ntwait(h.native_handle().h, isb, deadline());
+    }
     if(ntstat < 0)
-      return {(int) ntstat, ntkernel_category()};
+    {
+      return {static_cast<int>(ntstat), ntkernel_category()};
+    }
   }
 
   if(wanted & want::dev)
@@ -101,11 +121,15 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
     // This is a bit hacky, but we just need a unique device number
     alignas(8) wchar_t buffer_[32769];
     DWORD len = GetFinalPathNameByHandle(h.native_handle().h, buffer_, sizeof(buffer_) / sizeof(*buffer_), VOLUME_NAME_NT);
-    if(!len || len >= sizeof(buffer_) / sizeof(*buffer_))
+    if((len == 0u) || len >= sizeof(buffer_) / sizeof(*buffer_))
+    {
       return {GetLastError(), std::system_category()};
+    }
     buffer_[len] = 0;
-    if(memcmp(buffer_, L"\\Device\\HarddiskVolume", 44))
+    if(memcmp(buffer_, L"\\Device\\HarddiskVolume", 44) != 0 != 0)
+    {
       return std::errc::illegal_byte_sequence;
+    }
     // buffer_ should look like \Device\HarddiskVolumeX, so our number is from +22 onwards
     st_dev = _wtoi(buffer_ + 22);
     ++ret;
@@ -119,14 +143,16 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
   {
     ULONG ReparsePointTag = fai.EaInformation.ReparsePointTag;
     // We need to get its reparse tag to see if it's a symlink
-    if(fai.BasicInformation.FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT && !ReparsePointTag)
+    if(((fai.BasicInformation.FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0u) && (ReparsePointTag == 0u))
     {
       alignas(8) char buffer_[sizeof(REPARSE_DATA_BUFFER) + 32769];
       DWORD written = 0;
-      REPARSE_DATA_BUFFER *rpd = (REPARSE_DATA_BUFFER *) buffer_;
+      auto *rpd = reinterpret_cast<REPARSE_DATA_BUFFER *>(buffer_);
       memset(rpd, 0, sizeof(*rpd));
-      if(!DeviceIoControl(h.native_handle().h, FSCTL_GET_REPARSE_POINT, NULL, 0, rpd, sizeof(buffer_), &written, NULL))
+      if(DeviceIoControl(h.native_handle().h, FSCTL_GET_REPARSE_POINT, nullptr, 0, rpd, sizeof(buffer_), &written, nullptr) == 0)
+      {
         return {GetLastError(), std::system_category()};
+      }
       ReparsePointTag = rpd->ReparseTag;
     }
     st_type = windows_nt_kernel::to_st_type(fai.BasicInformation.FileAttributes, ReparsePointTag);
@@ -134,7 +160,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
   }
   if(wanted & want::nlink)
   {
-    st_nlink = (int16_t) fai.StandardInformation.NumberOfLinks;
+    st_nlink = static_cast<int16_t>(fai.StandardInformation.NumberOfLinks);
     ++ret;
   }
   if(wanted & want::atim)
@@ -169,7 +195,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
   }
   if(wanted & want::blksize)
   {
-    st_blksize = (uint16_t) ffssi.PhysicalBytesPerSectorForPerformance;
+    st_blksize = static_cast<uint16_t>(ffssi.PhysicalBytesPerSectorForPerformance);
     ++ret;
   }
   if(wanted & want::birthtim)
@@ -179,17 +205,17 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
   }
   if(wanted & want::sparse)
   {
-    st_sparse = !!(fai.BasicInformation.FileAttributes & FILE_ATTRIBUTE_SPARSE_FILE);
+    st_sparse = static_cast<unsigned int>(!((fai.BasicInformation.FileAttributes & FILE_ATTRIBUTE_SPARSE_FILE)) == 0u);
     ++ret;
   }
   if(wanted & want::compressed)
   {
-    st_compressed = !!(fai.BasicInformation.FileAttributes & FILE_ATTRIBUTE_COMPRESSED);
+    st_compressed = static_cast<unsigned int>(!((fai.BasicInformation.FileAttributes & FILE_ATTRIBUTE_COMPRESSED)) == 0u);
     ++ret;
   }
   if(wanted & want::reparse_point)
   {
-    st_reparse_point = !!(fai.BasicInformation.FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT);
+    st_reparse_point = static_cast<unsigned int>(!((fai.BasicInformation.FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)) == 0u);
     ++ret;
   }
   return ret;

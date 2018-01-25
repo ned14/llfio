@@ -690,8 +690,9 @@ namespace storage_profile
         return success();
       }
 #ifdef _WIN32  // The 4Kb min i/o makes this test take too long
-      if(srch.requires_aligned_io())
+      if(srch.requires_aligned_io()) {
         return success();
+}
 #endif
       try
       {

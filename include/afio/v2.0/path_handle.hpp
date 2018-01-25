@@ -89,7 +89,7 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> path(const path_handle &base, path_view_type _path) noexcept;
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> path(const path_handle &base, path_view_type path) noexcept;
   //! \overload
   AFIO_MAKE_FREE_FUNCTION
   static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> path(path_view_type _path) noexcept { return path(path_handle(), _path); }

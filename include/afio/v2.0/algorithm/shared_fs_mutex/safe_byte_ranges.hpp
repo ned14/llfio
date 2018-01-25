@@ -37,7 +37,7 @@ namespace algorithm
     {
     public:
       using byte_ranges::byte_ranges;
-      safe_byte_ranges(byte_ranges &&o)
+      explicit safe_byte_ranges(byte_ranges &&o)
           : byte_ranges(std::move(o))
       {
       }
