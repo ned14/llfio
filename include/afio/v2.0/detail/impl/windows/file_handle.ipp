@@ -127,7 +127,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
       break;
     }
     path_view::c_str zpath(path, false);
-    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.buffer, access, fileshare, nullptr, creation, attribs, nullptr)))
+    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.buffer, access, fileshare, nullptr, creation, attribs, nullptr)))  // NOLINT
     {
       DWORD errcode = GetLastError();
       // assert(false);
@@ -302,7 +302,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
   {
     return {static_cast<int>(ntstat), ntkernel_category()};
   }
-  return io_handle::io_result<const_buffers_type>(reqs.buffers);
+  return {reqs.buffers};
 }
 
 result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline /*unused*/) const noexcept

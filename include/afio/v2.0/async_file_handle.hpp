@@ -87,7 +87,7 @@ protected:
 
 public:
   //! Default constructor
-  async_file_handle() = default;
+  constexpr async_file_handle() {}  // NOLINT
   ~async_file_handle() = default;
 
   //! Construct a handle from a supplied native handle

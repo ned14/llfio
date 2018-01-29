@@ -66,7 +66,7 @@ namespace algorithm
 
   public:
     //! Default constructor
-    mapped_view() = default;
+    constexpr mapped_view() {}  // NOLINT
     /*! Create a view of new memory.
 
     \param length The number of items to map.

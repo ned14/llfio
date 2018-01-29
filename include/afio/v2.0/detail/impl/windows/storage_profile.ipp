@@ -219,13 +219,13 @@ namespace storage_profile
     namespace windows
     {
       // Controller type, max transfer, max buffers. Device name, size
-      outcome<void> _device(storage_profile &sp, file_handle & /*unused*/, const std::string &mntfromname, const std::string & /*fstypename*/) noexcept
+      outcome<void> _device(storage_profile &sp, file_handle & /*unused*/, const std::string &_mntfromname, const std::string & /*fstypename*/) noexcept
       {
         try
         {
           alignas(8) wchar_t buffer[32769];
           // Firstly open a handle to the volume
-          OUTCOME_TRY(volumeh, file_handle::file({}, mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
+          OUTCOME_TRY(volumeh, file_handle::file({}, _mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
           STORAGE_PROPERTY_QUERY spq{};
           memset(&spq, 0, sizeof(spq));
           spq.PropertyId = StorageAdapterProperty;

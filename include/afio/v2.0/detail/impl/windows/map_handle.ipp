@@ -352,7 +352,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
     reqs.offset += _offset;
     return _section->backing()->barrier(reqs, wait_for_device, and_metadata, d);
   }
-  return io_handle::io_result<const_buffers_type>(reqs.buffers);
+  return {reqs.buffers};
 }
 
 

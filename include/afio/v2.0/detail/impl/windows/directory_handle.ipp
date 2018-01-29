@@ -125,7 +125,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     }
     attribs |= FILE_FLAG_BACKUP_SEMANTICS;  // required to open a directory
     path_view::c_str zpath(path, false);
-    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.buffer, access, fileshare, nullptr, creation, attribs, nullptr, true)))
+    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.buffer, access, fileshare, nullptr, creation, attribs, nullptr, true)))  // NOLINT
     {
       DWORD errcode = GetLastError();
       // assert(false);
@@ -324,7 +324,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     }
   } while(!done);
   size_t n = 0;
-  for(FILE_ID_FULL_DIR_INFORMATION *ffdi = buffer;; ffdi = (FILE_ID_FULL_DIR_INFORMATION *) ((uintptr_t) ffdi + ffdi->NextEntryOffset))
+  for(FILE_ID_FULL_DIR_INFORMATION *ffdi = buffer;; ffdi = reinterpret_cast<FILE_ID_FULL_DIR_INFORMATION *>(reinterpret_cast<uintptr_t>(ffdi) + ffdi->NextEntryOffset))
   {
     size_t length = ffdi->FileNameLength / sizeof(wchar_t);
     if(length <= 2 && '.' == ffdi->FileName[0])
@@ -335,7 +335,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
       }
     }
     // Try to zero terminate leafnames where possible for later efficiency
-    if((uintptr_t)(ffdi->FileName + length) + sizeof(wchar_t) <= (uintptr_t) ffdi + ffdi->NextEntryOffset)
+    if(reinterpret_cast<uintptr_t>(ffdi->FileName + length) + sizeof(wchar_t) <= reinterpret_cast<uintptr_t>(ffdi) + ffdi->NextEntryOffset)
     {
       ffdi->FileName[length] = 0;
     }

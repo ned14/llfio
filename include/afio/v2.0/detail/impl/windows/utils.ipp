@@ -130,7 +130,7 @@ namespace utils
         tp.PrivilegeCount = 1;
         tp.Privileges[0].Luid = luid;
         tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-        if(AdjustTokenPrivileges(processToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), (PTOKEN_PRIVILEGES) nullptr, (PDWORD) nullptr) == 0)
+        if(AdjustTokenPrivileges(processToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), static_cast<PTOKEN_PRIVILEGES>(nullptr), static_cast<PDWORD>(nullptr)) == 0)
         {
           return {GetLastError(), std::system_category()};
         }
@@ -141,7 +141,7 @@ namespace utils
       }
       prived = true;
     }
-    typedef enum _SYSTEM_MEMORY_LIST_COMMAND { MemoryCaptureAccessedBits, MemoryCaptureAndResetAccessedBits, MemoryEmptyWorkingSets, MemoryFlushModifiedList, MemoryPurgeStandbyList, MemoryPurgeLowPriorityStandbyList, MemoryCommandMax } SYSTEM_MEMORY_LIST_COMMAND;
+    typedef enum _SYSTEM_MEMORY_LIST_COMMAND { MemoryCaptureAccessedBits, MemoryCaptureAndResetAccessedBits, MemoryEmptyWorkingSets, MemoryFlushModifiedList, MemoryPurgeStandbyList, MemoryPurgeLowPriorityStandbyList, MemoryCommandMax } SYSTEM_MEMORY_LIST_COMMAND;  // NOLINT
 
     // Write all modified pages to storage
     SYSTEM_MEMORY_LIST_COMMAND command = MemoryPurgeStandbyList;
@@ -176,7 +176,7 @@ namespace utils
         tp.PrivilegeCount = 1;
         tp.Privileges[0].Luid = luid;
         tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-        if(AdjustTokenPrivileges(processToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), (PTOKEN_PRIVILEGES) nullptr, (PDWORD) nullptr) == 0)
+        if(AdjustTokenPrivileges(processToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), static_cast<PTOKEN_PRIVILEGES>(nullptr), static_cast<PDWORD>(nullptr)) == 0)
         {
           return {GetLastError(), std::system_category()};
         }

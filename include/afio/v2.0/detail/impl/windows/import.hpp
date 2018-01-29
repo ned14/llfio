@@ -76,7 +76,7 @@ namespace windows_nt_kernel
 #endif
 
   // From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/FILE_INFORMATION_CLASS.html
-  typedef enum _FILE_INFORMATION_CLASS {
+  typedef enum _FILE_INFORMATION_CLASS {  // NOLINT
     FileDirectoryInformation = 1,
     FileFullDirectoryInformation,
     FileBothDirectoryInformation,
@@ -136,7 +136,7 @@ namespace windows_nt_kernel
   } FILE_INFORMATION_CLASS,
   *PFILE_INFORMATION_CLASS;
 
-  typedef enum {
+  typedef enum {  // NOLINT
     FileFsVolumeInformation = 1,
     FileFsLabelInformation = 2,
     FileFsSizeInformation = 3,
@@ -150,7 +150,7 @@ namespace windows_nt_kernel
     FileFsSectorSizeInformation = 11
   } FS_INFORMATION_CLASS;
 
-  typedef enum { ObjectBasicInformation = 0, ObjectNameInformation = 1, ObjectTypeInformation = 2 } OBJECT_INFORMATION_CLASS;
+  typedef enum { ObjectBasicInformation = 0, ObjectNameInformation = 1, ObjectTypeInformation = 2 } OBJECT_INFORMATION_CLASS;  // NOLINT
 
 #ifndef NTSTATUS
 #define NTSTATUS LONG
@@ -166,7 +166,7 @@ namespace windows_nt_kernel
 #endif
 
   // From http://msdn.microsoft.com/en-us/library/windows/hardware/ff550671(v=vs.85).aspx
-  typedef struct _IO_STATUS_BLOCK
+  typedef struct _IO_STATUS_BLOCK  // NOLINT
   {
     union {
       NTSTATUS Status;
@@ -176,7 +176,7 @@ namespace windows_nt_kernel
   } IO_STATUS_BLOCK, *PIO_STATUS_BLOCK;
 
   // From http://msdn.microsoft.com/en-us/library/windows/desktop/aa380518(v=vs.85).aspx
-  typedef struct _LSA_UNICODE_STRING
+  typedef struct _LSA_UNICODE_STRING  // NOLINT
   {
     USHORT Length;
     USHORT MaximumLength;
@@ -184,7 +184,7 @@ namespace windows_nt_kernel
   } LSA_UNICODE_STRING, *PLSA_UNICODE_STRING, UNICODE_STRING, *PUNICODE_STRING;
 
   // From http://msdn.microsoft.com/en-us/library/windows/hardware/ff557749(v=vs.85).aspx
-  typedef struct _OBJECT_ATTRIBUTES
+  typedef struct _OBJECT_ATTRIBUTES  // NOLINT
   {
     ULONG Length;
     HANDLE RootDirectory;
@@ -196,7 +196,7 @@ namespace windows_nt_kernel
 
   using PIO_APC_ROUTINE = void(NTAPI *)(IN PVOID ApcContext, IN PIO_STATUS_BLOCK IoStatusBlock, IN ULONG Reserved);
 
-  typedef struct _IMAGEHLP_LINE64
+  typedef struct _IMAGEHLP_LINE64  // NOLINT
   {
     DWORD SizeOfStruct;
     PVOID Key;
@@ -205,17 +205,17 @@ namespace windows_nt_kernel
     DWORD64 Address;
   } IMAGEHLP_LINE64, *PIMAGEHLP_LINE64;
 
-  typedef enum _SECTION_INHERIT { ViewShare = 1, ViewUnmap = 2 } SECTION_INHERIT, *PSECTION_INHERIT;
+  typedef enum _SECTION_INHERIT { ViewShare = 1, ViewUnmap = 2 } SECTION_INHERIT, *PSECTION_INHERIT;  // NOLINT
 
-  typedef struct _WIN32_MEMORY_RANGE_ENTRY
+  typedef struct _WIN32_MEMORY_RANGE_ENTRY  // NOLINT
   {
     PVOID VirtualAddress;
     SIZE_T NumberOfBytes;
   } WIN32_MEMORY_RANGE_ENTRY, *PWIN32_MEMORY_RANGE_ENTRY;
 
-  typedef enum _SECTION_INFORMATION_CLASS { SectionBasicInformation, SectionImageInformation } SECTION_INFORMATION_CLASS, *PSECTION_INFORMATION_CLASS;
+  typedef enum _SECTION_INFORMATION_CLASS { SectionBasicInformation, SectionImageInformation } SECTION_INFORMATION_CLASS, *PSECTION_INFORMATION_CLASS;  // NOLINT
 
-  typedef struct _SECTION_BASIC_INFORMATION
+  typedef struct _SECTION_BASIC_INFORMATION  // NOLINT
   {
     PVOID BaseAddress;
     ULONG AllocationAttributes;
@@ -259,7 +259,7 @@ namespace windows_nt_kernel
   // From http://msdn.microsoft.com/en-us/library/ms648412(v=vs.85).aspx
   using NtWaitForSingleObject_t = LONG(NTAPI *)(_In_ HANDLE Handle, _In_ BOOLEAN Alertable, _In_opt_ PLARGE_INTEGER Timeout);
 
-  typedef enum _OBJECT_WAIT_TYPE { WaitAllObject, WaitAnyObject } OBJECT_WAIT_TYPE, *POBJECT_WAIT_TYPE;
+  typedef enum _OBJECT_WAIT_TYPE { WaitAllObject, WaitAnyObject } OBJECT_WAIT_TYPE, *POBJECT_WAIT_TYPE;  // NOLINT
 
   using NtWaitForMultipleObjects_t = LONG(NTAPI *)(_In_ ULONG Count, _In_ HANDLE Object[], _In_ OBJECT_WAIT_TYPE WaitType, _In_ BOOLEAN Alertable, _In_opt_ PLARGE_INTEGER Time);
 
@@ -308,7 +308,7 @@ namespace windows_nt_kernel
 
   using RtlUTF8ToUnicodeN_t = LONG(NTAPI *)(_Out_opt_ PWSTR UnicodeStringDestination, _In_ ULONG UnicodeStringMaxByteCount, _Out_ PULONG UnicodeStringActualByteCount, _In_ PCCH UTF8StringSource, _In_ ULONG UTF8StringByteCount);
 
-  typedef struct _FILE_BASIC_INFORMATION
+  typedef struct _FILE_BASIC_INFORMATION  // NOLINT
   {
     LARGE_INTEGER CreationTime;
     LARGE_INTEGER LastAccessTime;
@@ -317,7 +317,7 @@ namespace windows_nt_kernel
     ULONG FileAttributes;
   } FILE_BASIC_INFORMATION, *PFILE_BASIC_INFORMATION;
 
-  typedef struct _FILE_STANDARD_INFORMATION
+  typedef struct _FILE_STANDARD_INFORMATION  // NOLINT
   {
     LARGE_INTEGER AllocationSize;
     LARGE_INTEGER EndOfFile;
@@ -326,12 +326,12 @@ namespace windows_nt_kernel
     BOOLEAN Directory;
   } FILE_STANDARD_INFORMATION, *PFILE_STANDARD_INFORMATION;
 
-  typedef struct _FILE_INTERNAL_INFORMATION
+  typedef struct _FILE_INTERNAL_INFORMATION  // NOLINT
   {
     LARGE_INTEGER IndexNumber;
   } FILE_INTERNAL_INFORMATION, *PFILE_INTERNAL_INFORMATION;
 
-  typedef struct _FILE_EA_INFORMATION
+  typedef struct _FILE_EA_INFORMATION  // NOLINT
   {
     union {
       ULONG EaSize;
@@ -339,33 +339,33 @@ namespace windows_nt_kernel
     };
   } FILE_EA_INFORMATION, *PFILE_EA_INFORMATION;
 
-  typedef struct _FILE_ACCESS_INFORMATION
+  typedef struct _FILE_ACCESS_INFORMATION  // NOLINT
   {
     ACCESS_MASK AccessFlags;
   } FILE_ACCESS_INFORMATION, *PFILE_ACCESS_INFORMATION;
 
-  typedef struct _FILE_POSITION_INFORMATION
+  typedef struct _FILE_POSITION_INFORMATION  // NOLINT
   {
     LARGE_INTEGER CurrentByteOffset;
   } FILE_POSITION_INFORMATION, *PFILE_POSITION_INFORMATION;
 
-  typedef struct _FILE_MODE_INFORMATION
+  typedef struct _FILE_MODE_INFORMATION  // NOLINT
   {
     ULONG Mode;
   } FILE_MODE_INFORMATION, *PFILE_MODE_INFORMATION;
 
-  typedef struct _FILE_ALIGNMENT_INFORMATION
+  typedef struct _FILE_ALIGNMENT_INFORMATION  // NOLINT
   {
     ULONG AlignmentRequirement;
   } FILE_ALIGNMENT_INFORMATION, *PFILE_ALIGNMENT_INFORMATION;
 
-  typedef struct _FILE_NAME_INFORMATION
+  typedef struct _FILE_NAME_INFORMATION  // NOLINT
   {
     ULONG FileNameLength;
     WCHAR FileName[1];
   } FILE_NAME_INFORMATION, *PFILE_NAME_INFORMATION;
 
-  typedef struct _FILE_RENAME_INFORMATION
+  typedef struct _FILE_RENAME_INFORMATION  // NOLINT
   {
     BOOLEAN ReplaceIfExists;
     HANDLE RootDirectory;
@@ -373,7 +373,7 @@ namespace windows_nt_kernel
     WCHAR FileName[1];
   } FILE_RENAME_INFORMATION, *PFILE_RENAME_INFORMATION;
 
-  typedef struct _FILE_LINK_INFORMATION
+  typedef struct _FILE_LINK_INFORMATION  // NOLINT
   {
     BOOLEAN ReplaceIfExists;
     HANDLE RootDirectory;
@@ -381,12 +381,12 @@ namespace windows_nt_kernel
     WCHAR FileName[1];
   } FILE_LINK_INFORMATION, *PFILE_LINK_INFORMATION;
 
-  typedef struct _FILE_DISPOSITION_INFORMATION
+  typedef struct _FILE_DISPOSITION_INFORMATION  // NOLINT
   {
     BOOLEAN _DeleteFile;
   } FILE_DISPOSITION_INFORMATION, *PFILE_DISPOSITION_INFORMATION;
 
-  typedef struct _FILE_ALL_INFORMATION
+  typedef struct _FILE_ALL_INFORMATION  // NOLINT
   {
     FILE_BASIC_INFORMATION BasicInformation;
     FILE_STANDARD_INFORMATION StandardInformation;
@@ -399,7 +399,7 @@ namespace windows_nt_kernel
     FILE_NAME_INFORMATION NameInformation;
   } FILE_ALL_INFORMATION, *PFILE_ALL_INFORMATION;
 
-  typedef struct _FILE_FS_ATTRIBUTE_INFORMATION
+  typedef struct _FILE_FS_ATTRIBUTE_INFORMATION  // NOLINT
   {
     ULONG FileSystemAttributes;
     LONG MaximumComponentNameLength;
@@ -407,7 +407,7 @@ namespace windows_nt_kernel
     WCHAR FileSystemName[1];
   } FILE_FS_ATTRIBUTE_INFORMATION, *PFILE_FS_ATTRIBUTE_INFORMATION;
 
-  typedef struct _FILE_FS_FULL_SIZE_INFORMATION
+  typedef struct _FILE_FS_FULL_SIZE_INFORMATION  // NOLINT
   {
     LARGE_INTEGER TotalAllocationUnits;
     LARGE_INTEGER CallerAvailableAllocationUnits;
@@ -416,13 +416,13 @@ namespace windows_nt_kernel
     ULONG BytesPerSector;
   } FILE_FS_FULL_SIZE_INFORMATION, *PFILE_FS_FULL_SIZE_INFORMATION;
 
-  typedef struct _FILE_FS_OBJECTID_INFORMATION
+  typedef struct _FILE_FS_OBJECTID_INFORMATION  // NOLINT
   {
     UCHAR ObjectId[16];
     UCHAR ExtendedInfo[48];
   } FILE_FS_OBJECTID_INFORMATION, *PFILE_FS_OBJECTID_INFORMATION;
 
-  typedef struct _FILE_FS_SECTOR_SIZE_INFORMATION
+  typedef struct _FILE_FS_SECTOR_SIZE_INFORMATION  // NOLINT
   {
     ULONG LogicalBytesPerSector;
     ULONG PhysicalBytesPerSectorForAtomicity;
@@ -434,7 +434,7 @@ namespace windows_nt_kernel
   } FILE_FS_SECTOR_SIZE_INFORMATION, *PFILE_FS_SECTOR_SIZE_INFORMATION;
 
   // From http://msdn.microsoft.com/en-us/library/windows/hardware/ff540310(v=vs.85).aspx
-  typedef struct _FILE_ID_FULL_DIR_INFORMATION
+  typedef struct _FILE_ID_FULL_DIR_INFORMATION  // NOLINT
   {
     ULONG NextEntryOffset;
     ULONG FileIndex;
@@ -455,14 +455,14 @@ namespace windows_nt_kernel
   } FILE_ID_FULL_DIR_INFORMATION, *PFILE_ID_FULL_DIR_INFORMATION;
 
   // From https://msdn.microsoft.com/en-us/library/windows/hardware/ff540354(v=vs.85).aspx
-  typedef struct _FILE_REPARSE_POINT_INFORMATION
+  typedef struct _FILE_REPARSE_POINT_INFORMATION  // NOLINT
   {
     LARGE_INTEGER FileReference;
     ULONG Tag;
   } FILE_REPARSE_POINT_INFORMATION, *PFILE_REPARSE_POINT_INFORMATION;
 
   // From http://msdn.microsoft.com/en-us/library/windows/hardware/ff552012(v=vs.85).aspx
-  typedef struct _REPARSE_DATA_BUFFER
+  typedef struct _REPARSE_DATA_BUFFER  // NOLINT
   {
     ULONG ReparseTag;
     USHORT ReparseDataLength;
@@ -803,10 +803,10 @@ namespace windows_nt_kernel
     {
       return filesystem::file_type::directory;
     }
-    
-    
-      return filesystem::file_type::regular;
-    
+
+
+    return filesystem::file_type::regular;
+
 #endif
   }
 
@@ -987,7 +987,7 @@ if(d)                                                                           
   \
 std::chrono::system_clock::time_point end_utc;                                                                                                                                                                                                                                                                                 \
   \
-alignas(8) LARGE_INTEGER _timeout;                                                                                                                                                                                                                                                                                             \
+alignas(8) LARGE_INTEGER _timeout{};                                                                                                                                                                                                                                                                                           \
   \
 memset(&_timeout, 0, sizeof(_timeout));                                                                                                                                                                                                                                                                                        \
   \
@@ -1010,8 +1010,7 @@ if(d)                                                                           
 #define AFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d)                                                                                                                                                                                                                                                                                     \
   if((d) && (d).steady)                                                                                                                                                                                                                                                                                                        \
   {                                                                                                                                                                                                                                                                                                                            \
-    std::chrono::nanoseconds ns;                                                                                                                                                                                                                                                                                               \
-    ns = std::chrono::duration_cast<std::chrono::nanoseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());                                                                                                                                                                        \
+    std::chrono::nanoseconds ns = std::chrono::duration_cast<std::chrono::nanoseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());                                                                                                                                               \
     if(ns.count() < 0)                                                                                                                                                                                                                                                                                                         \
       _timeout.QuadPart = 0;                                                                                                                                                                                                                                                                                                   \
     else                                                                                                                                                                                                                                                                                                                       \
@@ -1272,12 +1271,12 @@ inline HANDLE CreateFileW_(_In_ LPCTSTR lpFileName, _In_ DWORD dwDesiredAccess, 
   if((lpFileName == nullptr) || (lpFileName[0] == 0u))
   {
     SetLastError(ERROR_PATH_NOT_FOUND);
-    return INVALID_HANDLE_VALUE;
+    return INVALID_HANDLE_VALUE;  // NOLINT
   }
   if((hTemplateFile != nullptr) || (lstrcmpW(lpFileName, L"CONIN$") == 0) || (lstrcmpW(lpFileName, L"CONOUT$") == 0))
   {
     SetLastError(ERROR_NOT_SUPPORTED);
-    return INVALID_HANDLE_VALUE;
+    return INVALID_HANDLE_VALUE;  // NOLINT
   }
   switch(dwCreationDisposition)
   {
@@ -1298,7 +1297,7 @@ inline HANDLE CreateFileW_(_In_ LPCTSTR lpFileName, _In_ DWORD dwDesiredAccess, 
     break;
   default:
     SetLastError(ERROR_INVALID_PARAMETER);
-    return INVALID_HANDLE_VALUE;
+    return INVALID_HANDLE_VALUE;  // NOLINT
   }
   ULONG flags = 0;
   if((dwFlagsAndAttributes & FILE_FLAG_OVERLAPPED) == 0u)
@@ -1365,7 +1364,7 @@ inline HANDLE CreateFileW_(_In_ LPCTSTR lpFileName, _In_ DWORD dwDesiredAccess, 
   if(RtlDosPathNameToNtPathName_U(lpFileName, &NtPath, nullptr, nullptr) == 0u)
   {
     SetLastError(ERROR_FILE_NOT_FOUND);
-    return INVALID_HANDLE_VALUE;
+    return INVALID_HANDLE_VALUE;  // NOLINT
   }
   auto unntpath = undoer([&NtPath] {
     if(HeapFree(GetProcessHeap(), 0, NtPath.Buffer) == 0)
@@ -1389,7 +1388,7 @@ inline HANDLE CreateFileW_(_In_ LPCTSTR lpFileName, _In_ DWORD dwDesiredAccess, 
     ObjectAttributes.Attributes |= OBJ_CASE_INSENSITIVE;
   }
 
-  HANDLE ret = INVALID_HANDLE_VALUE;
+  HANDLE ret = INVALID_HANDLE_VALUE;  // NOLINT
   IO_STATUS_BLOCK isb = make_iostatus();
   dwFlagsAndAttributes &= ~0xfff80000;
   NTSTATUS ntstat = NtCreateFile(&ret, dwDesiredAccess, &ObjectAttributes, &isb, nullptr, dwFlagsAndAttributes, dwShareMode, dwCreationDisposition, flags, nullptr, 0);
@@ -1403,7 +1402,7 @@ inline HANDLE CreateFileW_(_In_ LPCTSTR lpFileName, _In_ DWORD dwDesiredAccess, 
   {
     SetLastError(ERROR_DELETE_PENDING);
   }
-  return INVALID_HANDLE_VALUE;
+  return INVALID_HANDLE_VALUE;  // NOLINT
 }
 
 // Detect if we are running under SUID or SGID

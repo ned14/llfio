@@ -160,8 +160,8 @@ namespace utils
       void *p{nullptr};
       size_t page_size_used{0};
       size_t actual_size{0};
-      large_page_allocation() = default;
-      large_page_allocation(void *_p, size_t pagesize, size_t actual)
+      constexpr large_page_allocation() {}  // NOLINT
+      constexpr large_page_allocation(void *_p, size_t pagesize, size_t actual)
           : p(_p)
           , page_size_used(pagesize)
           , actual_size(actual)
@@ -224,9 +224,9 @@ namespace utils
       using other = page_allocator<U>;
     };
 
-    page_allocator() noexcept = default;
+    constexpr page_allocator() noexcept {}  // NOLINT
 
-    template <class U> explicit page_allocator(const page_allocator<U> & /*unused*/) noexcept {}
+    template <class U> page_allocator(const page_allocator<U> & /*unused*/) noexcept {}  // NOLINT
 
     size_type max_size() const noexcept { return size_type(~0U) / sizeof(T); }
 

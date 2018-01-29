@@ -72,7 +72,7 @@ struct native_handle_type  // NOLINT
     win::handle h;  // NOLINT
   };
   //! Constructs a default instance
-  native_handle_type() = default;  // NOLINT
+  constexpr native_handle_type() {}  // NOLINT
   ~native_handle_type() = default;
   //! Construct from a POSIX file descriptor
   constexpr native_handle_type(disposition _behaviour, int _fd) noexcept : behaviour(_behaviour), fd(_fd) {}  // NOLINT

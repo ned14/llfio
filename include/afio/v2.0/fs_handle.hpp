@@ -65,7 +65,7 @@ protected:
 
 protected:
   //! Default constructor
-  fs_handle() = default;
+  constexpr fs_handle() {}  // NOLINT
   ~fs_handle() = default;
   //! Construct a handle
   constexpr fs_handle(dev_t devid, ino_t inode)

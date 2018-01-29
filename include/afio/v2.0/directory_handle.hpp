@@ -89,13 +89,13 @@ public:
   {
     using span<buffer_type>::span;
     //! Implicit construction from a span
-    buffers_type(span<buffer_type> v)  // NOLINT
+    /* constexpr */ buffers_type(span<buffer_type> v)  // NOLINT TODO FIXME Make this constexpr when span becomes constexpr. SAME for move constructor below
     : span<buffer_type>(v)
     {
     }
     ~buffers_type() = default;
     //! Move constructor
-    buffers_type(buffers_type &&o) noexcept : span<buffer_type>(std::move(o)), _kernel_buffer(std::move(o._kernel_buffer)), _kernel_buffer_size(o._kernel_buffer_size)
+    /* constexpr */ buffers_type(buffers_type &&o) noexcept : span<buffer_type>(std::move(o)), _kernel_buffer(std::move(o._kernel_buffer)), _kernel_buffer_size(o._kernel_buffer_size)
     {
       static_cast<span<buffer_type> &>(o) = {};
       o._kernel_buffer_size = 0;
@@ -128,7 +128,7 @@ public:
 
 public:
   //! Default constructor
-  directory_handle() = default;
+  constexpr directory_handle() {}  // NOLINT
   //! Construct a directory_handle from a supplied native path_handle
   explicit constexpr directory_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching = caching::all, flag flags = flag::none)
       : path_handle(std::move(h), caching, flags)

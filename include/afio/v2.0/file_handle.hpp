@@ -79,7 +79,7 @@ protected:
 
 public:
   //! Default constructor
-  file_handle() = default;
+  constexpr file_handle() {}  // NOLINT
   //! Construct a handle from a supplied native handle
   constexpr file_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching = caching::none, flag flags = flag::none)
       : io_handle(std::move(h), caching, flags)

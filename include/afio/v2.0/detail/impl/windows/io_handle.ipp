@@ -88,7 +88,7 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
       assert((req.len & 511) == 0);
     }
 #endif
-    if(!syscall(nativeh.h, req.data, (DWORD) req.len, &transferred, &ol) && ERROR_IO_PENDING != GetLastError())
+    if(!syscall(nativeh.h, req.data, static_cast<DWORD>(req.len), &transferred, &ol) && ERROR_IO_PENDING != GetLastError())
     {
       return {GetLastError(), std::system_category()};
     }

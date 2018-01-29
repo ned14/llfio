@@ -64,6 +64,11 @@ with compression enabled (e.g. ZFS with ZLE compression which elides runs of zer
 */
 struct stat_t  // NOLINT
 {
+  /* NOTE TO THOSE WHO WOULD MODIFY THIS:
+
+  These members need to be non-initialised. Do NOT initialise them. We WANT uninitialised data here
+  by default!
+  */
   uint64_t st_dev;               /*!< inode of device containing file (POSIX only) */
   uint64_t st_ino;               /*!< inode of file                   (Windows, POSIX) */
   filesystem::file_type st_type; /*!< type of file                    (Windows, POSIX) */
@@ -105,7 +110,7 @@ struct stat_t  // NOLINT
   }
   QUICKCPPLIB_BITFIELD_END(want)
   //! Constructs a UNINITIALIZED instance i.e. full of random garbage
-  stat_t() = default;  // NOLINT
+  stat_t() {}  // NOLINT   CANNOT be constexpr because we are INTENTIONALLY not initialising the storage
   //! Constructs a zeroed instance
   constexpr explicit stat_t(std::nullptr_t) noexcept : st_dev(0),                                // NOLINT
                                                        st_ino(0),                                // NOLINT

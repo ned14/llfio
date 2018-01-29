@@ -305,7 +305,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   return ret;
 }
 
-result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_handle::flag _flag) noexcept
+result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_handle::flag flag) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
   if(region.data == nullptr)
@@ -316,7 +316,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
   region = utils::round_to_page_size(region);
   extent_type offset = _offset + (region.data - _addr);
   size_type bytes = region.len;
-  OUTCOME_TRYV(do_mmap(_v, region.data, _section, bytes, offset, _flag));
+  OUTCOME_TRYV(do_mmap(_v, region.data, _section, bytes, offset, flag));
   // Tell the kernel we will be using these pages soon
   if(-1 == ::madvise(region.data, region.len, MADV_WILLNEED))
   {

@@ -165,7 +165,7 @@ public:
 
 public:
   //! Default constructor
-  io_handle() = default;
+  constexpr io_handle() {}  // NOLINT
   ~io_handle() = default;
   //! Construct a handle from a supplied native handle
   constexpr explicit io_handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none)
@@ -316,7 +316,7 @@ public:
     extent_guard &operator=(const extent_guard &) = delete;
 
     //! Default constructor
-    extent_guard() = default;
+    constexpr extent_guard() {}  // NOLINT
     //! Move constructor
     extent_guard(extent_guard &&o) noexcept : _h(o._h), _offset(o._offset), _length(o._length), _exclusive(o._exclusive) { o.release(); }
     //! Move assign

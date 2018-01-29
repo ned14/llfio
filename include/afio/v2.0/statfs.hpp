@@ -79,7 +79,7 @@ struct AFIO_DECL statfs_t
   QUICKCPPLIB_BITFIELD_BEGIN(want) { flags = 1 << 0, bsize = 1 << 1, iosize = 1 << 2, blocks = 1 << 3, bfree = 1 << 4, bavail = 1 << 5, files = 1 << 6, ffree = 1 << 7, namemax = 1 << 8, owner = 1 << 9, fsid = 1 << 10, fstypename = 1 << 11, mntfromname = 1 << 12, mntonname = 1 << 13, all = static_cast<unsigned>(-1) }
   QUICKCPPLIB_BITFIELD_END(want)
   //! Constructs a default initialised instance (all bits set)
-  statfs_t() = default;
+  statfs_t() {}  // NOLINT  Cannot be constexpr due to lack of constexpe string default constructor :(
 #ifdef __cpp_exceptions
   //! Constructs a filled instance, throwing as an exception any error which might occur
   explicit statfs_t(const handle &h, want wanted = want::all)

@@ -95,7 +95,7 @@ namespace algorithm
       using entities_type = span<entity_type>;
 
     protected:
-      shared_fs_mutex() = default;
+      constexpr shared_fs_mutex() {}  // NOLINT
       shared_fs_mutex(const shared_fs_mutex &) = default;
       shared_fs_mutex(shared_fs_mutex &&) = default;
       shared_fs_mutex &operator=(const shared_fs_mutex &) = default;

@@ -88,7 +88,7 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
     DWORD creation = OPEN_EXISTING;
     attribs |= FILE_FLAG_BACKUP_SEMANTICS;  // required to open a directory
     path_view::c_str zpath(path, false);
-    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.buffer, access, fileshare, nullptr, creation, attribs, nullptr)))
+    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.buffer, access, fileshare, nullptr, creation, attribs, nullptr)))  // NOLINT
     {
       DWORD errcode = GetLastError();
       // assert(false);

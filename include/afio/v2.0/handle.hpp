@@ -176,7 +176,7 @@ protected:
 
 public:
   //! Default constructor
-  handle() = default;
+  constexpr handle() {}  // NOLINT
   //! Construct a handle from a supplied native handle
   explicit constexpr handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none) noexcept : _caching(caching), _flags(flags), _v(std::move(h)) {}
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~handle();

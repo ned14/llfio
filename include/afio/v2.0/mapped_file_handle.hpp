@@ -131,7 +131,7 @@ protected:
 
 public:
   //! Default constructor
-  mapped_file_handle() = default;
+  constexpr mapped_file_handle() {}  // NOLINT
 
   //! Implicit move construction of mapped_file_handle permitted
   mapped_file_handle(mapped_file_handle &&o) noexcept : file_handle(std::move(o)), _reservation(o._reservation), _sh(std::move(o._sh)), _mh(std::move(o._mh))

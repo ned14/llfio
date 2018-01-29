@@ -193,7 +193,7 @@ namespace storage_profile
     namespace posix
     {
 #endif
-      AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> _device(storage_profile &sp, file_handle &h, const std::string& mntfromname, const std::string& fstypename) noexcept;
+      AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> _device(storage_profile &sp, file_handle &h, const std::string &_mntfromname, const std::string &fstypename) noexcept;
     }
   }  // namespace storage
   namespace concurrency

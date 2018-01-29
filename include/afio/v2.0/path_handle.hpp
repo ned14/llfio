@@ -63,7 +63,7 @@ public:
   using path_view_type = path_view;
 
   //! Default constructor
-  path_handle() = default;
+  constexpr path_handle() {}  // NOLINT
   ~path_handle() = default;
   //! Construct a handle from a supplied native handle
   explicit constexpr path_handle(native_handle_type h, caching caching = caching::all, flag flags = flag::none)
