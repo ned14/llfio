@@ -18,7 +18,7 @@ var classafio__v2__xxx_1_1directory__handle =
       [ "none", "classafio__v2__xxx_1_1directory__handle.html#a47ed88b4de271daa08862b273c2f609ea334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
       [ "fastdeleted", "classafio__v2__xxx_1_1directory__handle.html#a47ed88b4de271daa08862b273c2f609ea14847befc159c1492671b53718fc46f8", null ]
     ] ],
-    [ "directory_handle", "classafio__v2__xxx_1_1directory__handle.html#aac1a405d6799c9bb469bc3ad3936a88e", null ],
+    [ "directory_handle", "classafio__v2__xxx_1_1directory__handle.html#a13fab93f0536c914bee9c00f9d910075", null ],
     [ "directory_handle", "classafio__v2__xxx_1_1directory__handle.html#a352e948332a37127e4c47541f41b346e", null ],
     [ "directory_handle", "classafio__v2__xxx_1_1directory__handle.html#a7661e46005a377ca3f6e23064710dd9f", null ],
     [ "directory_handle", "classafio__v2__xxx_1_1directory__handle.html#a4eee464e2a8426dd2a272900fbd55a6d", null ],
@@ -30,6 +30,7 @@ var classafio__v2__xxx_1_1directory__handle =
     [ "are_writes_durable", "classafio__v2__xxx_1_1directory__handle.html#a97ffbbf53f51549549efef0b49e125dc", null ],
     [ "clone", "classafio__v2__xxx_1_1directory__handle.html#a6604d66ebd96f9ed038213b8c22afede", null ],
     [ "clone", "classafio__v2__xxx_1_1directory__handle.html#a54790e954f57372b87b095451cc79c38", null ],
+    [ "clone_to_path_handle", "classafio__v2__xxx_1_1directory__handle.html#a204b11e546071246a52684bd6c28b469", null ],
     [ "close", "classafio__v2__xxx_1_1directory__handle.html#a195e944c47ae9a10214b15030e241e51", null ],
     [ "current_path", "classafio__v2__xxx_1_1directory__handle.html#a616a67222676af5ec5b3aa94d7c02428", null ],
     [ "enumerate", "classafio__v2__xxx_1_1directory__handle.html#ac4b90958be1b1b620a6768de52407935", null ],

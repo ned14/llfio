@@ -135,10 +135,10 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a8961900b6758578c74c18c7df6cde6b7"><td class="memItemLeft" align="right" valign="top"><a id="a8961900b6758578c74c18c7df6cde6b7"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1path__view.html#a8961900b6758578c74c18c7df6cde6b7">path_view</a> ()=default</td></tr>
-<tr class="memdesc:a8961900b6758578c74c18c7df6cde6b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs an empty path view. <br /></td></tr>
-<tr class="separator:a8961900b6758578c74c18c7df6cde6b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2adb3dc0a02c12293e01baa0319ecd8f"><td class="memItemLeft" align="right" valign="top"><a id="a2adb3dc0a02c12293e01baa0319ecd8f"></a>
+constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1path__view.html#a2adb3dc0a02c12293e01baa0319ecd8f">path_view</a> ()</td></tr>
+<tr class="memdesc:a2adb3dc0a02c12293e01baa0319ecd8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs an empty path view. <br /></td></tr>
+<tr class="separator:a2adb3dc0a02c12293e01baa0319ecd8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a683015f920be7c7562cd65c9040e79ac"><td class="memItemLeft" align="right" valign="top"><a id="a683015f920be7c7562cd65c9040e79ac"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1path__view.html#a683015f920be7c7562cd65c9040e79ac">path_view</a> (const filesystem::path &amp;v) noexcept</td></tr>
 <tr class="memdesc:a683015f920be7c7562cd65c9040e79ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implicitly constructs a path view from a path. The input path MUST continue to exist for this view to be valid. <br /></td></tr>
@@ -323,7 +323,7 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>c_str</b></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Implicitly constructs a UTF-8 path view from a string view. </p><dl class="section warning"><dt>Warning</dt><dd>The byte after the end of the view must be legal to read. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;: _state(v) {}  <span class="comment">// NOLINT</span></div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;: _state(v) {}  <span class="comment">// NOLINT</span></div></div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -351,7 +351,7 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>c_str</b></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Compares the two string views via the view's <code>compare()</code> which in turn calls <code>traits::compare()</code>. Be aware that on Windows a conversion from UTF-8 to UTF-16 is performed if needed. </p>
-<div class="fragment"><div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;  {</div><div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;    <span class="keywordflow">return</span> _invoke([&amp;p](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v) { <span class="keywordflow">return</span> -p.compare(v); });</div><div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;  }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;  {</div><div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;    <span class="keywordflow">return</span> _invoke([&amp;p](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v) { <span class="keywordflow">return</span> -p.compare(v); });</div><div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;  }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="ac24b83766cf682a8aaf5da927c227f37"></a>
@@ -378,7 +378,7 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>c_str</b></td></tr>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;  {</div><div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1path__view.html#ab0d2c07fd17c32d8fadd424353c7fcf2">compare</a>(string_view(s));</div><div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;  }</div><div class="ttc" id="classafio__v2__xxx_1_1path__view_html_ab0d2c07fd17c32d8fadd424353c7fcf2"><div class="ttname"><a href="classafio__v2__xxx_1_1path__view.html#ab0d2c07fd17c32d8fadd424353c7fcf2">afio_v2_xxx::path_view::compare</a></div><div class="ttdeci">constexpr int compare(const path_view &amp;p) const noexcept</div><div class="ttdef"><b>Definition:</b> path_view.hpp:370</div></div>
+<div class="fragment"><div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;  {</div><div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1path__view.html#ab0d2c07fd17c32d8fadd424353c7fcf2">compare</a>(string_view(s));</div><div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;  }</div><div class="ttc" id="classafio__v2__xxx_1_1path__view_html_ab0d2c07fd17c32d8fadd424353c7fcf2"><div class="ttname"><a href="classafio__v2__xxx_1_1path__view.html#ab0d2c07fd17c32d8fadd424353c7fcf2">afio_v2_xxx::path_view::compare</a></div><div class="ttdeci">constexpr int compare(const path_view &amp;p) const noexcept</div><div class="ttdef"><b>Definition:</b> path_view.hpp:382</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -406,7 +406,7 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>c_str</b></td></tr>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;  {</div><div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;<span class="preprocessor">#ifdef _WIN32</span></div><div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;    <span class="keywordflow">if</span>(!_state._utf16.empty())</div><div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;    {</div><div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;      c_str z(<a class="code" href="classafio__v2__xxx_1_1path__view.html#a8961900b6758578c74c18c7df6cde6b7">path_view</a>(str), <span class="keyword">false</span>);</div><div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;      <span class="keywordflow">return</span> _state._utf16.compare(wstring_view(z.buffer, z.length));</div><div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;    }</div><div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;<span class="preprocessor">#endif</span></div><div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;    <span class="keywordflow">return</span> _state._utf8.compare(str);</div><div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;  }</div><div class="ttc" id="classafio__v2__xxx_1_1path__view_html_a8961900b6758578c74c18c7df6cde6b7"><div class="ttname"><a href="classafio__v2__xxx_1_1path__view.html#a8961900b6758578c74c18c7df6cde6b7">afio_v2_xxx::path_view::path_view</a></div><div class="ttdeci">path_view()=default</div><div class="ttdoc">Constructs an empty path view. </div></div>
+<div class="fragment"><div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;  {</div><div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;<span class="preprocessor">#ifdef _WIN32</span></div><div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;    <span class="keywordflow">if</span>(!_state._utf16.empty())</div><div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;    {</div><div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;      c_str z(<a class="code" href="classafio__v2__xxx_1_1path__view.html#a2adb3dc0a02c12293e01baa0319ecd8f">path_view</a>(str), <span class="keyword">false</span>);</div><div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;      <span class="keywordflow">return</span> _state._utf16.compare(wstring_view(z.buffer, z.length));</div><div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;    }</div><div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;<span class="preprocessor">#endif</span></div><div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;    <span class="keywordflow">return</span> _state._utf8.compare(str);</div><div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;  }</div><div class="ttc" id="classafio__v2__xxx_1_1path__view_html_a2adb3dc0a02c12293e01baa0319ecd8f"><div class="ttname"><a href="classafio__v2__xxx_1_1path__view.html#a2adb3dc0a02c12293e01baa0319ecd8f">afio_v2_xxx::path_view::path_view</a></div><div class="ttdeci">constexpr path_view()</div><div class="ttdoc">Constructs an empty path view. </div><div class="ttdef"><b>Definition:</b> path_view.hpp:198</div></div>
 </div><!-- fragment -->
 </div>
 </div>

@@ -12,7 +12,7 @@ var storage__profile_8hpp =
       [ "float_", "storage__profile_8hpp.html#a28463e9febc38f42595612b02c04b031aefe6d5085c67bc38cd3746f2dc8013e1", null ],
       [ "string", "storage__profile_8hpp.html#a28463e9febc38f42595612b02c04b031ab45cffe084dd3d20d928bee85e7b0f21", null ]
     ] ],
-    [ "_device", "storage__profile_8hpp.html#a97dce12101d54fb6082e260b725c11df", null ],
+    [ "_device", "storage__profile_8hpp.html#a6b51efd88bac8f1249d994ecc04d8764", null ],
     [ "_mem", "storage__profile_8hpp.html#a1a45f916a2d712222c364d0d0b583045", null ],
     [ "atomic_rewrite_offset_boundary", "storage__profile_8hpp.html#a4ba1781ab81abab32ab55d5282cd753c", null ],
     [ "atomic_rewrite_quantum", "storage__profile_8hpp.html#a3436db1f7d7acbbc931c14ddd3f45507", null ],

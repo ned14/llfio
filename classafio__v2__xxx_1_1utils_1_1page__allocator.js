@@ -10,7 +10,7 @@ var classafio__v2__xxx_1_1utils_1_1page__allocator =
     [ "reference", "classafio__v2__xxx_1_1utils_1_1page__allocator.html#ad41902faf16f647b73c7c4a00653638b", null ],
     [ "size_type", "classafio__v2__xxx_1_1utils_1_1page__allocator.html#a2922e6f29ef1998099a8a2688276e360", null ],
     [ "value_type", "classafio__v2__xxx_1_1utils_1_1page__allocator.html#a32bb813c5c692ef0fe48f62e91163cbc", null ],
-    [ "page_allocator", "classafio__v2__xxx_1_1utils_1_1page__allocator.html#ac7734e29a0822ecbf98e918f618f2309", null ],
+    [ "page_allocator", "classafio__v2__xxx_1_1utils_1_1page__allocator.html#a7963eac90bd577eb1847ce7fa8e74a31", null ],
     [ "page_allocator", "classafio__v2__xxx_1_1utils_1_1page__allocator.html#a88c4d8249f4ec57c59ea8a0648b40fc0", null ],
     [ "address", "classafio__v2__xxx_1_1utils_1_1page__allocator.html#a898fa5a15a2a20c7536bcada47e2184a", null ],
     [ "address", "classafio__v2__xxx_1_1utils_1_1page__allocator.html#ac1f96b15690ad0ef4f0d6d13cf9c500f", null ],

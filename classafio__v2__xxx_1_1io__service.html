@@ -158,9 +158,15 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>_work_done</b> ()</td
 <tr class="memitem:a0d4b2214a82771a947b97387a5da0716"><td class="memItemLeft" align="right" valign="top"><a id="a0d4b2214a82771a947b97387a5da0716"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>io_service</b> (<a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> &amp;&amp;)=delete</td></tr>
 <tr class="separator:a0d4b2214a82771a947b97387a5da0716"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9cc2c9834e3a5c3ce6b596286851d48c"><td class="memItemLeft" align="right" valign="top"><a id="a9cc2c9834e3a5c3ce6b596286851d48c"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>io_service</b> (const <a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> &amp;)=delete</td></tr>
+<tr class="separator:a9cc2c9834e3a5c3ce6b596286851d48c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1761cc16a1cc9362d4200df37a978d93"><td class="memItemLeft" align="right" valign="top"><a id="a1761cc16a1cc9362d4200df37a978d93"></a>
 <a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> &amp;&amp;)=delete</td></tr>
 <tr class="separator:a1761cc16a1cc9362d4200df37a978d93"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa853570d89428c82db0bb9fb83af2e5f"><td class="memItemLeft" align="right" valign="top"><a id="aa853570d89428c82db0bb9fb83af2e5f"></a>
+<a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> &amp;)=delete</td></tr>
+<tr class="separator:aa853570d89428c82db0bb9fb83af2e5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a692d937b87fa783803c5342f993fede1"><td class="memItemLeft" align="right" valign="top"><a id="a692d937b87fa783803c5342f993fede1"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__service.html#a692d937b87fa783803c5342f993fede1">using_kqueues</a> () const noexcept</td></tr>
 <tr class="memdesc:a692d937b87fa783803c5342f993fede1"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if this i/o service is using BSD kqueues. <br /></td></tr>
@@ -276,7 +282,7 @@ template&lt;class U &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>Schedule the callable to be invoked by the thread owning this object and executing <code>run()</code> at its next available opportunity. Unlike any other function in this API layer, this function is thread safe. </p>
-<div class="fragment"><div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;{ _post(detail::make_function_ptr&lt;<span class="keywordtype">void</span>(<a class="code" href="classafio__v2__xxx_1_1io__service.html#a444d27f19c042b91f1751621135f65e9">io_service</a> *)&gt;(std::forward&lt;U&gt;(f))); }</div><div class="ttc" id="classafio__v2__xxx_1_1io__service_html_a444d27f19c042b91f1751621135f65e9"><div class="ttname"><a href="classafio__v2__xxx_1_1io__service.html#a444d27f19c042b91f1751621135f65e9">afio_v2_xxx::io_service::io_service</a></div><div class="ttdeci">io_service()</div></div>
+<div class="fragment"><div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;{ _post(detail::make_function_ptr&lt;<span class="keywordtype">void</span>(<a class="code" href="classafio__v2__xxx_1_1io__service.html#a444d27f19c042b91f1751621135f65e9">io_service</a> *)&gt;(std::forward&lt;U&gt;(f))); }</div><div class="ttc" id="classafio__v2__xxx_1_1io__service_html_a444d27f19c042b91f1751621135f65e9"><div class="ttname"><a href="classafio__v2__xxx_1_1io__service.html#a444d27f19c042b91f1751621135f65e9">afio_v2_xxx::io_service::io_service</a></div><div class="ttdeci">io_service()</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -303,7 +309,7 @@ template&lt;class U &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__service.html#a72e68348a3f92ee2a91599960132f404">run_until</a>(deadline()); }</div><div class="ttc" id="classafio__v2__xxx_1_1io__service_html_a72e68348a3f92ee2a91599960132f404"><div class="ttname"><a href="classafio__v2__xxx_1_1io__service.html#a72e68348a3f92ee2a91599960132f404">afio_v2_xxx::io_service::run_until</a></div><div class="ttdeci">virtual result&lt; bool &gt; run_until(deadline d) noexcept</div></div>
+<div class="fragment"><div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1io__service.html#a72e68348a3f92ee2a91599960132f404">run_until</a>(deadline()); }</div><div class="ttc" id="classafio__v2__xxx_1_1io__service_html_a72e68348a3f92ee2a91599960132f404"><div class="ttname"><a href="classafio__v2__xxx_1_1io__service.html#a72e68348a3f92ee2a91599960132f404">afio_v2_xxx::io_service::run_until</a></div><div class="ttdeci">virtual result&lt; bool &gt; run_until(deadline d) noexcept</div></div>
 </div><!-- fragment -->
 </div>
 </div>

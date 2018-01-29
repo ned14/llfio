@@ -31,7 +31,7 @@ var classafio__v2__xxx_1_1section__handle =
       [ "append", "classafio__v2__xxx_1_1section__handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18a9516dfb15f51c7ee19a4d46b8c0dbe1d", null ]
     ] ],
     [ "~section_handle", "classafio__v2__xxx_1_1section__handle.html#aa75ec36a7f88640bb8822976125d3ad5", null ],
-    [ "section_handle", "classafio__v2__xxx_1_1section__handle.html#a1f0b32d1b4e789204e78d6558b530888", null ],
+    [ "section_handle", "classafio__v2__xxx_1_1section__handle.html#a2824f51d5726bb8015d89ac1ea7abe5f", null ],
     [ "section_handle", "classafio__v2__xxx_1_1section__handle.html#a74e73651ebfc233e31fff3d39b3a8e1a", null ],
     [ "section_handle", "classafio__v2__xxx_1_1section__handle.html#a84ec7259dfb8bab518d3def875bdc6f2", null ],
     [ "section_handle", "classafio__v2__xxx_1_1section__handle.html#a8f20e4f7aec4eb5545b9b223471ae1fc", null ],

@@ -165,10 +165,10 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aac1a405d6799c9bb469bc3ad3936a88e"><td class="memItemLeft" align="right" valign="top"><a id="aac1a405d6799c9bb469bc3ad3936a88e"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1directory__handle.html#aac1a405d6799c9bb469bc3ad3936a88e">directory_handle</a> ()=default</td></tr>
-<tr class="memdesc:aac1a405d6799c9bb469bc3ad3936a88e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
-<tr class="separator:aac1a405d6799c9bb469bc3ad3936a88e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13fab93f0536c914bee9c00f9d910075"><td class="memItemLeft" align="right" valign="top"><a id="a13fab93f0536c914bee9c00f9d910075"></a>
+constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1directory__handle.html#a13fab93f0536c914bee9c00f9d910075">directory_handle</a> ()</td></tr>
+<tr class="memdesc:a13fab93f0536c914bee9c00f9d910075"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
+<tr class="separator:a13fab93f0536c914bee9c00f9d910075"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a352e948332a37127e4c47541f41b346e"><td class="memItemLeft" align="right" valign="top"><a id="a352e948332a37127e4c47541f41b346e"></a>
 constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1directory__handle.html#a352e948332a37127e4c47541f41b346e">directory_handle</a> (<a class="el" href="structafio__v2__xxx_1_1native__handle__type.html">native_handle_type</a> h, dev_t devid, ino_t inode, <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a> <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a>=<a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9eaa181a603769c1f98ad927e7367c7aa51">caching::all</a>, flag <a class="el" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>=flag::none)</td></tr>
 <tr class="memdesc:a352e948332a37127e4c47541f41b346e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a directory_handle from a supplied native path_handle. <br /></td></tr>
@@ -203,6 +203,8 @@ virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom">
 <tr class="separator:a195e944c47ae9a10214b15030e241e51"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6604d66ebd96f9ed038213b8c22afede"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classafio__v2__xxx_1_1directory__handle.html">directory_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1directory__handle.html#a6604d66ebd96f9ed038213b8c22afede">clone</a> (<a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a> mode_=mode::unchanged, <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a> caching_=caching::unchanged, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) const noexcept</td></tr>
 <tr class="separator:a6604d66ebd96f9ed038213b8c22afede"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a204b11e546071246a52684bd6c28b469"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1directory__handle.html#a204b11e546071246a52684bd6c28b469">clone_to_path_handle</a> () const noexcept</td></tr>
+<tr class="separator:a204b11e546071246a52684bd6c28b469"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac4b90958be1b1b620a6768de52407935"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="structafio__v2__xxx_1_1directory__handle_1_1enumerate__info.html">enumerate_info</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1directory__handle.html#ac4b90958be1b1b620a6768de52407935">enumerate</a> (<a class="el" href="structafio__v2__xxx_1_1directory__handle_1_1buffers__type.html">buffers_type</a> &amp;&amp;tofill, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a> glob=<a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a>(), <a class="el" href="classafio__v2__xxx_1_1directory__handle.html#a47ed88b4de271daa08862b273c2f609e">filter</a> filtering=<a class="el" href="classafio__v2__xxx_1_1directory__handle.html#a47ed88b4de271daa08862b273c2f609ea14847befc159c1492671b53718fc46f8">filter::fastdeleted</a>, span&lt; char &gt; kernelbuffer=span&lt; char &gt;()) const noexcept</td></tr>
 <tr class="separator:ac4b90958be1b1b620a6768de52407935"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a657c12a309cf02bf2351bfcc7f41463b"><td class="memItemLeft" align="right" valign="top"><a id="a657c12a309cf02bf2351bfcc7f41463b"></a>
@@ -309,21 +311,21 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 <tr class="separator:a5a5244ab1a15053aefe93f2c253db5b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaacc27a62ce0859506d7443f0d0e7adf"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#aaacc27a62ce0859506d7443f0d0e7adf">parent_path_handle</a> (<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) const noexcept</td></tr>
 <tr class="separator:aaacc27a62ce0859506d7443f0d0e7adf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a747962d0776c0fa9e79c9aa9b86da1c0"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#a747962d0776c0fa9e79c9aa9b86da1c0">relink</a> (const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a> <a class="el" href="classafio__v2__xxx_1_1path__handle.html#a5cbd1d67ffe72d6cce0d093f861a4af7">path</a>, bool atomic_replace=true, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
+<tr class="memitem:a747962d0776c0fa9e79c9aa9b86da1c0"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#a747962d0776c0fa9e79c9aa9b86da1c0">relink</a> (const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a> <a class="el" href="classafio__v2__xxx_1_1path__handle.html#af6e7168b01cf2e1eefdc190ec4a52c8f">path</a>, bool atomic_replace=true, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
 <tr class="separator:a747962d0776c0fa9e79c9aa9b86da1c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6860b9626adc4d8e6db3ebb92974c054"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1fs__handle.html#a6860b9626adc4d8e6db3ebb92974c054">unlink</a> (<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
 <tr class="separator:a6860b9626adc4d8e6db3ebb92974c054"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:ac90b57c2bce3e0a42aef8fdf21f3c557"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classafio__v2__xxx_1_1directory__handle.html">directory_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1directory__handle.html#ac90b57c2bce3e0a42aef8fdf21f3c557">directory</a> (const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a> <a class="el" href="classafio__v2__xxx_1_1path__handle.html#a5cbd1d67ffe72d6cce0d093f861a4af7">path</a>, <a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a> _mode=<a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aecae13117d6f0584c25a9da6c8f8415e">mode::read</a>, <a class="el" href="classafio__v2__xxx_1_1handle.html#a45ff5c1c5662623d99156870dfeee0a7">creation</a> _creation=creation::open_existing, <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a> _caching=<a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9eaa181a603769c1f98ad927e7367c7aa51">caching::all</a>, flag <a class="el" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>=flag::none) noexcept</td></tr>
+<tr class="memitem:ac90b57c2bce3e0a42aef8fdf21f3c557"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classafio__v2__xxx_1_1directory__handle.html">directory_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1directory__handle.html#ac90b57c2bce3e0a42aef8fdf21f3c557">directory</a> (const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a> <a class="el" href="classafio__v2__xxx_1_1path__handle.html#af6e7168b01cf2e1eefdc190ec4a52c8f">path</a>, <a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a> _mode=<a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aecae13117d6f0584c25a9da6c8f8415e">mode::read</a>, <a class="el" href="classafio__v2__xxx_1_1handle.html#a45ff5c1c5662623d99156870dfeee0a7">creation</a> _creation=creation::open_existing, <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a> _caching=<a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9eaa181a603769c1f98ad927e7367c7aa51">caching::all</a>, flag <a class="el" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>=flag::none) noexcept</td></tr>
 <tr class="separator:ac90b57c2bce3e0a42aef8fdf21f3c557"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a28fdac2d7adadbdddd036efd802ad726"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classafio__v2__xxx_1_1directory__handle.html">directory_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1directory__handle.html#a28fdac2d7adadbdddd036efd802ad726">random_directory</a> (const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;dirpath, <a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a> _mode=<a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">mode::write</a>, <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a> _caching=<a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9ead5197d93c063a2b1e22d1630a39b7aef">caching::temporary</a>, flag <a class="el" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>=flag::none) noexcept</td></tr>
 <tr class="separator:a28fdac2d7adadbdddd036efd802ad726"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a87b6b5fd0537c0915f2f9a669bccfcfb"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classafio__v2__xxx_1_1directory__handle.html">directory_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1directory__handle.html#a87b6b5fd0537c0915f2f9a669bccfcfb">temp_directory</a> (<a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a> name=<a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a>(), <a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a> _mode=<a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">mode::write</a>, <a class="el" href="classafio__v2__xxx_1_1handle.html#a45ff5c1c5662623d99156870dfeee0a7">creation</a> _creation=creation::if_needed, <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a> _caching=<a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9eaa181a603769c1f98ad927e7367c7aa51">caching::all</a>, flag <a class="el" href="classafio__v2__xxx_1_1handle.html#ab3d876f5996605158fd6a0582adadad6">flags</a>=flag::none) noexcept</td></tr>
 <tr class="separator:a87b6b5fd0537c0915f2f9a669bccfcfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5cbd1d67ffe72d6cce0d093f861a4af7"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1path__handle.html#a5cbd1d67ffe72d6cce0d093f861a4af7">path</a> (const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a> _path) noexcept</td></tr>
-<tr class="separator:a5cbd1d67ffe72d6cce0d093f861a4af7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af6e7168b01cf2e1eefdc190ec4a52c8f"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1path__handle.html#af6e7168b01cf2e1eefdc190ec4a52c8f">path</a> (const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a> path) noexcept</td></tr>
+<tr class="separator:af6e7168b01cf2e1eefdc190ec4a52c8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a55d9de8f40e86dc1b657f3905d9a1e61"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1path__handle.html#a55d9de8f40e86dc1b657f3905d9a1e61">path</a> (<a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view_type</a> _path) noexcept</td></tr>
 <tr class="separator:a55d9de8f40e86dc1b657f3905d9a1e61"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -456,6 +458,34 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
 </div><div class="memdoc">
 <p>Clone this handle (copy constructor is disabled to avoid accidental copying)</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or DuplicateHandle() can return. </dd></dl>
+
+</div>
+</div>
+<a id="a204b11e546071246a52684bd6c28b469"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a204b11e546071246a52684bd6c28b469">&#9670;&nbsp;</a></span>clone_to_path_handle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;<a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a>&gt; afio_v2_xxx::directory_handle::clone_to_path_handle </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Return a copy of this directory handle, but as a path handle.</p>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or DuplicateHandle() can return. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>On POSIX, we must loop calling <code>current_path()</code> and trying to open the path returned. Thus many allocations may occur. </dd></dl>
 
 </div>
 </div>
@@ -643,8 +673,8 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
 
 </div>
 </div>
-<a id="a5cbd1d67ffe72d6cce0d093f861a4af7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5cbd1d67ffe72d6cce0d093f861a4af7">&#9670;&nbsp;</a></span>path() <span class="overload">[1/2]</span></h2>
+<a id="af6e7168b01cf2e1eefdc190ec4a52c8f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af6e7168b01cf2e1eefdc190ec4a52c8f">&#9670;&nbsp;</a></span>path() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -662,7 +692,7 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="classafio__v2__xxx_1_1path__handle.html#abe4d76fd0308667d7b5727c69cfe943f">path_view_type</a>&#160;</td>
-          <td class="paramname"><em>_path</em>&#160;</td>
+          <td class="paramname"><em>path</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -705,8 +735,8 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1path__handle.html#a5cbd1d67ffe72d6cce0d093f861a4af7">path</a>(<a class="code" href="classafio__v2__xxx_1_1path__handle.html#a61039e1770420c4e72814a942a188220">path_handle</a>(), _path); }</div><div class="ttc" id="classafio__v2__xxx_1_1path__handle_html_a61039e1770420c4e72814a942a188220"><div class="ttname"><a href="classafio__v2__xxx_1_1path__handle.html#a61039e1770420c4e72814a942a188220">afio_v2_xxx::path_handle::path_handle</a></div><div class="ttdeci">path_handle()=default</div><div class="ttdoc">Default constructor. </div></div>
-<div class="ttc" id="classafio__v2__xxx_1_1path__handle_html_a5cbd1d67ffe72d6cce0d093f861a4af7"><div class="ttname"><a href="classafio__v2__xxx_1_1path__handle.html#a5cbd1d67ffe72d6cce0d093f861a4af7">afio_v2_xxx::path_handle::path</a></div><div class="ttdeci">static result&lt; path_handle &gt; path(const path_handle &amp;base, path_view_type _path) noexcept</div></div>
+<div class="fragment"><div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classafio__v2__xxx_1_1path__handle.html#af6e7168b01cf2e1eefdc190ec4a52c8f">path</a>(<a class="code" href="classafio__v2__xxx_1_1path__handle.html#a3719b4f0ed795cba40d6d35eee62e8ff">path_handle</a>(), _path); }</div><div class="ttc" id="classafio__v2__xxx_1_1path__handle_html_af6e7168b01cf2e1eefdc190ec4a52c8f"><div class="ttname"><a href="classafio__v2__xxx_1_1path__handle.html#af6e7168b01cf2e1eefdc190ec4a52c8f">afio_v2_xxx::path_handle::path</a></div><div class="ttdeci">static result&lt; path_handle &gt; path(const path_handle &amp;base, path_view_type path) noexcept</div></div>
+<div class="ttc" id="classafio__v2__xxx_1_1path__handle_html_a3719b4f0ed795cba40d6d35eee62e8ff"><div class="ttname"><a href="classafio__v2__xxx_1_1path__handle.html#a3719b4f0ed795cba40d6d35eee62e8ff">afio_v2_xxx::path_handle::path_handle</a></div><div class="ttdeci">constexpr path_handle()</div><div class="ttdoc">Default constructor. </div><div class="ttdef"><b>Definition:</b> path_handle.hpp:66</div></div>
 </div><!-- fragment -->
 </div>
 </div>
