@@ -58,11 +58,19 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   }
   if((flags & flag::disable_prefetching) || (flags & flag::maximum_prefetching))
   {
+#ifdef POSIX_FADV_SEQUENTIAL
     int advice = (flags & flag::disable_prefetching) ? POSIX_FADV_RANDOM : (POSIX_FADV_SEQUENTIAL | POSIX_FADV_WILLNEED);
     if(-1 == ::posix_fadvise(nativeh.fd, 0, 0, advice))
     {
       return {errno, std::system_category()};
     }
+#elif __APPLE__
+    int advice = (flags & flag::disable_prefetching) ? 0 : 1;
+    if(-1 == ::fcntl(nativeh.fd, F_RDAHEAD, advice))
+    {
+      return {errno, std::system_category()};
+    }
+#endif
   }
   if(_creation == creation::truncate && ret.value().are_safety_fsyncs_issued())
   {
@@ -206,7 +214,10 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
     int attribs = fcntl(ret.value()._v.fd, F_GETFL);
     if(-1 != attribs)
     {
-      attribs &= ~(O_SYNC | O_DIRECT
+      attribs &= ~(O_SYNC
+#ifdef O_DIRECT
+                   | O_DIRECT
+#endif
 #ifdef O_DSYNC
                    | O_DSYNC
 #endif
@@ -216,7 +227,11 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
       case caching::unchanged:
         break;
       case caching::none:
-        attribs |= O_SYNC | O_DIRECT;
+        attribs |= O_SYNC
+#ifdef O_DIRECT
+          | O_DIRECT
+#endif
+          ;
         if(-1 == fcntl(ret.value()._v.fd, F_SETFL, attribs))
         {
           return {errno, std::system_category()};
@@ -224,7 +239,9 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
         ret.value()._v.behaviour |= native_handle_type::disposition::aligned_io;
         break;
       case caching::only_metadata:
+#ifdef O_DIRECT
         attribs |= O_DIRECT;
+#endif
         if(-1 == fcntl(ret.value()._v.fd, F_SETFL, attribs))
         {
           return {errno, std::system_category()};

@@ -32,6 +32,10 @@ Distributed under the Boost Software License, Version 1.0.
 #include <sys/user.h>    // for struct kinfo_file
 #endif
 
+#if defined(__APPLE__)
+#include <sys/stat.h>  // for struct stat
+#endif
+
 AFIO_V2_NAMESPACE_BEGIN
 
 handle::~handle()

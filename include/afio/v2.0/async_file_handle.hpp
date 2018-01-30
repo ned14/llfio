@@ -34,7 +34,7 @@ AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
-#if __cplusplus > 201700
+#if __cplusplus > 201700 && (!defined(_LIBCPP_VERSION) || _LIBCPP_VERSION > 7000 /* approx end of 2017 */)
   template <class R, class Fn, class... Args> using is_invocable_r = std::is_invocable_r<R, Fn, Args...>;
 #else
   template <class R, class Fn, class... Args> using is_invocable_r = std::true_type;

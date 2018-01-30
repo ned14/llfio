@@ -86,7 +86,17 @@ io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_requ
     }
   }
 #endif
-  ssize_t bytesread = ::preadv(_v.fd, iov, reqs.buffers.size(), reqs.offset);
+  ssize_t bytesread = 0;
+#if AFIO_MISSING_PIOV
+  off_t offset = reqs.offset;
+  for(size_t n = 0; n < reqs.buffers.size(); n++)
+  {
+    bytesread += ::pread(_v.fd, iov[n].iov_base, iov[n].iov_len, offset);
+    offset += iov[n].iov_len;
+  }
+#else
+  bytesread = ::preadv(_v.fd, iov, reqs.buffers.size(), reqs.offset);
+#endif
   if(bytesread < 0)
   {
     return {errno, std::system_category()};
@@ -143,7 +153,17 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::
     }
   }
 #endif
-  ssize_t byteswritten = ::pwritev(_v.fd, iov, reqs.buffers.size(), reqs.offset);
+  ssize_t byteswritten = 0;
+#if AFIO_MISSING_PIOV
+  off_t offset = reqs.offset;
+  for(size_t n = 0; n < reqs.buffers.size(); n++)
+  {
+    byteswritten += ::pwrite(_v.fd, iov[n].iov_base, iov[n].iov_len, offset);
+    offset += iov[n].iov_len;
+  }
+#else
+  byteswritten = ::pwritev(_v.fd, iov, reqs.buffers.size(), reqs.offset);
+#endif
   if(byteswritten < 0)
   {
     return {errno, std::system_category()};

@@ -6,6 +6,8 @@ compiler:
 sudo: false
 os:
  - linux
+ - osx
+osx_image: xcode9.2
 branches:
   only:
     - develop
@@ -38,15 +40,13 @@ env:
  
 matrix:
   exclude:
-#  - os: osx
-#    compiler: g++-7
+  - os: osx
+    compiler: g++-7
   - os: linux
     compiler: clang-4.0
     env: __="Documentation" NAME=TravisDocumentation
-#  - os: osx
-#    env: __="Documentation" NAME=TravisDocumentation
-#  - os: osx
-#    env: __="cmake tests" NAME=TravisLinuxWorker
+  - os: osx
+    env: __="Documentation" NAME=TravisDocumentation
 
 cache:
   apt: true
@@ -64,6 +64,14 @@ before_install:
       fi;
       export PATH="$PWD/doxygen-$DOXYGEN_VERSION/bin:$PATH";
     fi
+ -
+   if [ "${TRAVIS_OS_NAME}" = "osx" ]; then
+     brew install llvm;
+     export NAME=TravisOSXWorker;
+     export CXX=/usr/local/opt/llvm/bin/clang++;
+     export LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib";
+     export CPPFLAGS=-I/usr/local/opt/llvm/include;
+   fi
  - git checkout develop
  - git submodule update --init --recursive
  - mount
@@ -104,8 +112,15 @@ script:
 after_success:
 # - bash -x ./update_coveralls.sh `pwd`
 #  - NEWNAME=afio-v2.0-binaries-linux64-$(date +%Y%m%d%H%M%S).tgz
-  - NEWNAME=afio-v2.0-binaries-linux64-$TRAVIS_COMMIT.tgz
-  - mv afio-v2.0-binaries-linux64.tgz $NEWNAME
-  - if [ "$CXX" = "g++-7" ]; then curl -T $NEWNAME -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD https://dedi4.nedprod.com/static/files/upload/; fi;
+  - if [ "${TRAVIS_OS_NAME}" = "linux" && "$CXX" = "g++-7" ]; then   
+      NEWNAME=afio-v2.0-binaries-linux64-$TRAVIS_COMMIT.tgz;
+      mv afio-v2.0-binaries-linux64.tgz $NEWNAME;
+      curl -T $NEWNAME -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD https://dedi4.nedprod.com/static/files/upload/; fi;
+    fi
+  - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then   
+      NEWNAME=afio-v2.0-binaries-Darwin-$TRAVIS_COMMIT.tgz;
+      mv afio-v2.0-binaries-Darwin.tgz $NEWNAME;
+      curl -T $NEWNAME -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD https://dedi4.nedprod.com/static/files/upload/; fi;
+    fi
 
 after_failure:

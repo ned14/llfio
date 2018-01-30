@@ -59,6 +59,19 @@ else()
     )
     get_filename_component(toupload afio-v2.0-binaries-linux64.tgz ABSOLUTE)
   endif()
+  if(EXISTS "prebuilt/lib/libafio_dl-2.0-Darwin-x86_64-Release.so")
+    checked_execute_process("Tarring up binaries"
+      COMMAND mkdir afio
+      COMMAND cp -a doc afio/
+      COMMAND cp -a include afio/
+      COMMAND cp -a Readme.md afio/
+      COMMAND cp -a release_notes.md afio/
+      COMMAND cp -a --parents prebuilt/lib/libafio_sl-2.0-Darwin-x86_64-Release.a afio/
+      COMMAND cp -a --parents prebuilt/lib/libafio_dl-2.0-Darwin-x86_64-Release.so afio/
+      COMMAND "${CMAKE_COMMAND}" -E tar cfz afio-v2.0-binaries-Darwin.tgz afio
+    )
+    get_filename_component(toupload afio-v2.0-binaries-Darwin.tgz ABSOLUTE)
+  endif()
 endif()
 set(retval2 0)
 set(retval3 0)

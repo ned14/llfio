@@ -93,6 +93,10 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #endif
 
+#ifdef __APPLE__
+#define AFIO_MISSING_PIOV 1
+#endif
+
 // Pull in detection of __MINGW64_VERSION_MAJOR
 #ifdef __MINGW32__
 #include <_mingw.h>
