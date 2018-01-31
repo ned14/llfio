@@ -1,8 +1,8 @@
 dist: trusty
 language: cpp
 compiler:
- - g++-7
- - clang-4.0
+ - g++
+ - clang++
 sudo: false
 os:
  - linux
@@ -35,18 +35,23 @@ env:
     - secure: "A3TeWTlJdjUaQ31NF60kMOik8mzaJkdKA55jZXjN83BJ2ZjMDmWfq1XmZ7iDIxmn7HC2BVpjhdkj9jpRtPztb08L5VSlJIiVbXlBWNwgzmYANujpR9rA+bhZJwlKDaYQHUZUd4+iGHCHb0dLt2HG0eHF5azaifd0YqCfz5GcWl8="
   matrix:
     - __="cmake tests" NAME=TravisLinuxWorker
+    - __="cmake tests" NAME=TravisOSXWorker
     - __="Documentation" NAME=TravisDocumentation
     - __="Programs"
  
 matrix:
   exclude:
   - os: osx
-    compiler: g++-7
-  - os: linux
-    compiler: clang-4.0
-    env: __="Documentation" NAME=TravisDocumentation
+    compiler: g++
   - os: osx
     env: __="Documentation" NAME=TravisDocumentation
+  - os: osx
+    env: __="cmake tests" NAME=TravisLinuxWorker
+  - os: linux
+    compiler: clang++
+    env: __="Documentation" NAME=TravisDocumentation
+  - os: linux
+    env: __="cmake tests" NAME=TravisOSXWorker
 
 cache:
   apt: true
@@ -67,11 +72,13 @@ before_install:
  -
    if [ "${TRAVIS_OS_NAME}" = "osx" ]; then
      brew install llvm;
-     export NAME=TravisOSXWorker;
      export CXX=/usr/local/opt/llvm/bin/clang++;
      export LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib";
      export CPPFLAGS=-I/usr/local/opt/llvm/include;
+     export CMAKE_FLAGS=-DCMAKE_LIBRARY_PATH=/usr/local/opt/llvm/lib;
    fi
+ - if [ "$CXX" = "g++" ]; then export CXX=g++-7; export NAME=TravisLinuxWorkerGCC; fi;
+ - if [ "$CXX" = "clang++" ]; then export CXX=clang++-4.0; export NAME=TravisLinuxWorkerClang; fi;
  - git checkout develop
  - git submodule update --init --recursive
  - mount
@@ -79,9 +86,7 @@ before_install:
 script:
  -
    if [ "$__" = "cmake tests" ]; then
-     if [ "$CXX" = "g++" ]; then export CXX=g++-7; export NAME=TravisLinuxWorkerGCC; fi;
-     if [ "$CXX" = "clang++" ]; then export CXX=clang++-4.0; export NAME=TravisLinuxWorkerClang; fi;
-     ctest -S .ci.cmake -V --timeout 300;
+     ctest -S .ci.cmake -V --timeout 300 ${CMAKE_FLAGS};
    fi
  -
    if [ "$__" = "Documentation" ]; then
@@ -100,12 +105,10 @@ script:
    fi
  -
    if [ "$__" = "Programs" ]; then
-     if [ "$CXX" = "g++" ]; then export CXX=g++-7; export NAME=TravisLinuxWorkerGCC; fi;
-     if [ "$CXX" = "clang++" ]; then export CXX=clang++-4.0; export NAME=TravisLinuxWorkerClang; fi;
      cd programs;
      mkdir build;
      cd build;
-     cmake ..;
+     cmake ..  ${CMAKE_FLAGS};
      cmake --build .;
    fi
  
