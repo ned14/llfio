@@ -1,7 +1,7 @@
 dist: trusty
 language: cpp
 compiler:
- - g++
+# - g++
  - clang++
 sudo: false
 os:
@@ -23,7 +23,7 @@ addons:
     - george-edison55-precise-backports
     - llvm-toolchain-trusty-4.0
     packages:
-    - g++-7
+    - g++-6
     - clang-4.0
     - python3
     - cmake
@@ -41,8 +41,8 @@ env:
  
 matrix:
   exclude:
-  - os: osx
-    compiler: g++
+#  - os: osx
+#    compiler: g++
   - os: osx
     env: __="Documentation" NAME=TravisDocumentation
   - os: osx
@@ -77,7 +77,7 @@ before_install:
      export CPPFLAGS=-I/usr/local/opt/llvm/include;
      export CMAKE_FLAGS=-DCMAKE_LIBRARY_PATH=/usr/local/opt/llvm/lib;
    fi
- - if [ "$CXX" = "g++" ]; then export CXX=g++-7; export NAME=TravisLinuxWorkerGCC; fi;
+ - if [ "$CXX" = "g++" ]; then export CXX=g++-6; export NAME=TravisLinuxWorkerGCC; fi;
  - if [ "$CXX" = "clang++" ]; then export CXX=clang++-4.0; export NAME=TravisLinuxWorkerClang; fi;
  - git checkout develop
  - git submodule update --init --recursive
@@ -86,7 +86,7 @@ before_install:
 script:
  -
    if [ "$__" = "cmake tests" ]; then
-     ctest -S .ci.cmake -V --timeout 300 ${CMAKE_FLAGS};
+     ctest -S .ci.cmake -V --timeout 300 $CMAKE_FLAGS ;
    fi
  -
    if [ "$__" = "Documentation" ]; then
@@ -96,7 +96,7 @@ script:
      cd doc/html;
      git checkout gh-pages;
      cd ../..;
-     CXX=g++-7 ctest -S .docs.cmake -V;
+     ctest -S .docs.cmake -V;
      cd doc/html;
      git add . || true;
      git commit -a -m "Travis CI updates documentation" || true;
@@ -108,14 +108,14 @@ script:
      cd programs;
      mkdir build;
      cd build;
-     cmake ..  ${CMAKE_FLAGS};
+     cmake ..  $CMAKE_FLAGS ;
      cmake --build .;
    fi
  
 after_success:
 # - bash -x ./update_coveralls.sh `pwd`
 #  - NEWNAME=afio-v2.0-binaries-linux64-$(date +%Y%m%d%H%M%S).tgz
-  - if [ "${TRAVIS_OS_NAME}" = "linux" && "$CXX" = "g++-7" ]; then   
+  - if [ "${TRAVIS_OS_NAME}" = "linux" && "$CXX" = "g++-6" ]; then   
       NEWNAME=afio-v2.0-binaries-linux64-$TRAVIS_COMMIT.tgz;
       mv afio-v2.0-binaries-linux64.tgz $NEWNAME;
       curl -T $NEWNAME -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD https://dedi4.nedprod.com/static/files/upload/; fi;
