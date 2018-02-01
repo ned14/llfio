@@ -75,7 +75,7 @@ before_install:
      export CXX=/usr/local/opt/llvm/bin/clang++;
      export LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib";
      export CPPFLAGS=-I/usr/local/opt/llvm/include;
-     export CMAKE_FLAGS=-DCMAKE_LIBRARY_PATH=/usr/local/opt/llvm/lib;
+     export CMAKE_CONFIGURE_OPTIONS=-DCMAKE_LIBRARY_PATH=/usr/local/opt/llvm/lib;
    fi
  - if [ "$CXX" = "g++" ]; then export CXX=g++-6; export NAME=TravisLinuxWorkerGCC; fi;
  - if [ "$CXX" = "clang++" ]; then export CXX=clang++-4.0; export NAME=TravisLinuxWorkerClang; fi;
@@ -86,7 +86,7 @@ before_install:
 script:
  -
    if [ "$__" = "cmake tests" ]; then
-     ctest -S .ci.cmake -V --timeout 300 $CMAKE_FLAGS ;
+     ctest -S .ci.cmake -V --timeout 300 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS ;
    fi
  -
    if [ "$__" = "Documentation" ]; then
@@ -108,7 +108,7 @@ script:
      cd programs;
      mkdir build;
      cd build;
-     cmake ..  $CMAKE_FLAGS ;
+     cmake ..  $CMAKE_CONFIGURE_OPTIONS ;
      cmake --build .;
    fi
  

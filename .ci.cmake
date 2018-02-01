@@ -12,7 +12,7 @@ set(CTEST_GIT_COMMAND "${GIT_EXECUTABLE}")
 
 ctest_start("Experimental")
 ctest_update()
-ctest_configure()
+ctest_configure(OPTIONS ${CTEST_CONFIGURE_OPTIONS})
 ctest_build(TARGET _dl)
 ctest_build(TARGET _sl)
 ctest_test(RETURN_VALUE retval EXCLUDE "afio_hl|shared_fs_mutex")
