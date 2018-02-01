@@ -363,7 +363,7 @@ public:
   /* NOTE TO SELF: The error_info constructor implementation is in handle.hpp as we need that
   defined before we can do useful logging.
   */
-  //! Construct from an error condition enum
+  //! Implicit construct from an error condition enum
   OUTCOME_TEMPLATE(class ErrorCondEnum)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_condition_enum<ErrorCondEnum>::value))
   error_info(ErrorCondEnum &&v)  // NOLINT
@@ -390,6 +390,30 @@ inline bool operator==(const error_info &a, const error_info &b)
 inline bool operator!=(const error_info &a, const error_info &b)
 {
   return a.ec != b.ec;
+}
+OUTCOME_TEMPLATE(class ErrorCondEnum)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_condition_enum<ErrorCondEnum>::value))
+inline bool operator==(const error_info &a, const ErrorCondEnum &b)
+{
+  return a.ec == std::error_condition(b);
+}
+OUTCOME_TEMPLATE(class ErrorCondEnum)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_condition_enum<ErrorCondEnum>::value))
+inline bool operator==(const ErrorCondEnum &a, const error_info &b)
+{
+  return std::error_condition(a) == b.ec;
+}
+OUTCOME_TEMPLATE(class ErrorCondEnum)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_condition_enum<ErrorCondEnum>::value))
+inline bool operator!=(const error_info &a, const ErrorCondEnum &b)
+{
+  return a.ec != std::error_condition(b);
+}
+OUTCOME_TEMPLATE(class ErrorCondEnum)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_condition_enum<ErrorCondEnum>::value))
+inline bool operator!=(const ErrorCondEnum &a, const error_info &b)
+{
+  return std::error_condition(a) != b.ec;
 }
 #ifndef NDEBUG
 // Is trivial in all ways, except default constructibility

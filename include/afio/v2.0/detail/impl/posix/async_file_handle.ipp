@@ -179,8 +179,28 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
   }
   size_t items(reqs.buffers.size());
 #if AFIO_USE_POSIX_AIO && defined(AIO_LISTIO_MAX)
+  // If this i/o could never be done atomically, reject
   if(items > AIO_LISTIO_MAX)
     return std::errc::invalid_argument;
+#if defined(__FreeBSD__) || defined(__APPLE__)
+  if(!service()->using_kqueues())
+  {
+    // BSD and Apple put a tight limit on how many entries
+    // aio_suspend() will take in order to have reasonable
+    // performance. But their documentation lies, if you
+    // feed more than AIO_LISTIO_MAX items to aio_suspend
+    // it does NOT return EINVAL as specified, but rather
+    // simply marks all items past AIO_LISTIO_MAX as failed
+    // with EAGAIN. That punishes performance for AFIO
+    // because we loop setting up and tearing down
+    // the handlers, so if we would overload afio_suspend,
+    // better to error out now rather that later in io_service.
+    if(service()->_aiocbsv.size() + items > AIO_LISTIO_MAX)
+    {
+      return std::errc::resource_unavailable_try_again;
+    }
+  }
+#endif
 #endif
   bool must_deallocate_self = false;
   if(mem.empty())

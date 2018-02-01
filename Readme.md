@@ -1,10 +1,11 @@
 This is the post-peer-review AFIO v2 rewrite. You can view its documentation at https://ned14.github.io/afio/
 
-<b>master branch test status</b> Linux: [![Build Status](https://travis-ci.org/ned14/afio.svg?branch=master)](https://travis-ci.org/ned14/afio) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/ox59o2r276xbmef7/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/afio/branch/master) <b>CMake dashboard</b>: http://my.cdash.org/index.php?project=Boost.AFIO
+<b>master branch test status</b> Linux & OS X: [![Build Status](https://travis-ci.org/ned14/afio.svg?branch=master)](https://travis-ci.org/ned14/afio) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/ox59o2r276xbmef7/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/afio/branch/master) <b>CMake dashboard</b>: http://my.cdash.org/index.php?project=Boost.AFIO
 
-Tarballs of source and prebuilt binaries for Linux x64 and Windows x64:
+Tarballs of source and prebuilt binaries for Linux x64, MacOS x64 and Windows x64:
 - https://dedi4.nedprod.com/static/files/afio-v2.0-source-latest.tar.xz
 - https://dedi4.nedprod.com/static/files/afio-v2.0-binaries-linux64-latest.tgz
+- https://dedi4.nedprod.com/static/files/afio-v2.0-binaries-darwin64-latest.tgz
 - https://dedi4.nedprod.com/static/files/afio-v2.0-binaries-win64-latest.zip
 
 

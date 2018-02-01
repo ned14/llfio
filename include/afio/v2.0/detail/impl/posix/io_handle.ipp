@@ -39,6 +39,9 @@ size_t io_handle::max_buffers() const noexcept
   static size_t v;
   if(v == 0u)
   {
+#ifdef __APPLE__
+    v = 1;
+#else
     long r = sysconf(_SC_IOV_MAX);
     if(r == -1)
     {
@@ -49,6 +52,7 @@ size_t io_handle::max_buffers() const noexcept
 #endif
     }
     v = r;
+#endif
   }
   return v;
 }

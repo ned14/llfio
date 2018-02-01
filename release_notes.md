@@ -1,4 +1,4 @@
-﻿<center><table border="0" cellpadding="4">
+<center><table border="0" cellpadding="4">
 <tr>
 <td align="center"> <a href="https://github.com/ned14/afio">AFIO</a><br><a href="https://github.com/ned14/afio">on GitHub</a> </td>
 <td align="center"> <a href="http://my.cdash.org/index.php?project=Boost.AFIO">CTest summary</a><br><a href="http://my.cdash.org/index.php?project=Boost.AFIO">dashboard</a> </td>
@@ -6,6 +6,7 @@
 <td align="center"> <a href="https://ci.appveyor.com/project/ned14/afio/branch/master">Windows CI:</a><img src="https://ci.appveyor.com/api/projects/status/680b1pt9srnoprs3/branch/master?svg=true"/> </td>
 <td align="center"> <a href="https://dedi4.nedprod.com/static/files/afio-v2.0-source-latest.tar.xz">Latest stable</a><br><a href="https://dedi4.nedprod.com/static/files/afio-v2.0-source-latest.tar.xz">sources</a> </td>
 <td align="center"> <a href="https://dedi4.nedprod.com/static/files/afio-v2.0-binaries-linux64-latest.tgz">Latest stable</a><br><a href="https://dedi4.nedprod.com/static/files/afio-v2.0-binaries-linux64-latest.tgz">Linux x64 prebuilt</a> </td>
+<td align="center"> <a href="https://dedi4.nedprod.com/static/files/afio-v2.0-binaries-darwin-latest.tgz">Latest stable</a><br><a href="https://dedi4.nedprod.com/static/files/afio-v2.0-binaries-darwin64-latest.tgz">OS X x64 prebuilt</a> </td>
 <td align="center"> <a href="https://dedi4.nedprod.com/static/files/afio-v2.0-binaries-win64-latest.zip">Latest stable</a><br/><a href="https://dedi4.nedprod.com/static/files/afio-v2.0-binaries-win64-latest.zip">VS2017 x64 prebuilt</a> </td>
 </tr>
 </table></center>
@@ -82,6 +83,7 @@ co_await co_write(fh, {{{buffer, sizeof(buffer)}}, 0}).value();
 These compilers and OS are regularly tested:
 - GCC 7.0 (Linux 4,x x64)
 - clang 4.0 (Linux 4.x x64)
+- clang 5.0 (OS X 10.12 x64)
 - Visual Studio 2017 (Windows 10 x64)
 
 Other compilers, architectures and OSs may work, but are not tested regularly. You will need a Filesystem TS
@@ -188,10 +190,10 @@ Todo thereafter in order of priority:
 
 | NEW in v2 | Windows | POSIX |     |
 | --------- | --------| ----- | --- |
-| ✔ |   |   | Linux KAIO support for native non-blocking `O_DIRECT` i/o
 | ✔ |   |   | Reliable directory hierarchy deletion algorithm.
 | ✔ |   |   | Reliable directory hierarchy copy algorithm.
 | ✔ |   |   | Reliable directory hierarchy update (two and three way) algorithm.
+| ✔ |   |   | Linux KAIO support for native non-blocking `O_DIRECT` i/o
 | ✔ |   |   | `std::pmr::memory_resource` adapting a file backing if on C++ 17.
 | ✔ |   |   | Extended attributes support.
 | ✔ |   |   | Algorithm to replace all duplicate content with hard links.

@@ -414,6 +414,12 @@ public:
   }
 
   /*! \brief Schedule a read to occur asynchronously.
+   
+  Note that some OS kernels can only process a limited number async i/o
+  operations at a time. You should therefore check for the error `std::errc::resource_unavailable_try_again`
+  and gracefully reschedule the i/o for a later time. This temporary
+  failure may be returned immediately, or to the completion handler
+  and hence you ought to handle both situations.
 
   \return Either an io_state_ptr to the i/o in progress, or an error code.
   \param reqs A scatter-gather and offset request.
@@ -451,6 +457,13 @@ public:
 
   /*! \brief Schedule a write to occur asynchronously.
 
+  Note that some OS kernels can only process a limited number async i/o
+  operations at a time. You should therefore check for the error `std::errc::resource_unavailable_try_again`
+  and gracefully reschedule the i/o for a later time. This temporary
+  failure may be returned immediately, or to the completion handler
+  and hence you ought to handle both situations.
+
+   
   \return Either an io_state_ptr to the i/o in progress, or an error code.
   \param reqs A scatter-gather and offset request.
   \param completion A callable to call upon i/o completion. Spec is `void(async_file_handle *, io_result<const_buffers_type> &)`.

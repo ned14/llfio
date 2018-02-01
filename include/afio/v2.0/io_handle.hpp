@@ -194,7 +194,7 @@ public:
   but other OSs do not. Some OSs guarantee that each i/o syscall has effects atomically visible or not
   to other i/o, other OSs do not.
 
-  Microsoft Windows does not implement scatter-gather file i/o syscalls except for unbuffered i/o.
+  Microsoft Windows and OS X does not implement scatter-gather file i/o syscalls.
   Thus this function will always return `1` in that situation.
   */
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t max_buffers() const noexcept;
