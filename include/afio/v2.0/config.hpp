@@ -358,8 +358,8 @@ public:
       : error_info(std::error_code(code, cat))
   {
   }
-  // Implicit construction from an error code
-  inline error_info(std::error_code _ec);  // NOLINT
+  // Explicit construction from an error code
+  explicit inline error_info(std::error_code _ec);  // NOLINT
   /* NOTE TO SELF: The error_info constructor implementation is in handle.hpp as we need that
   defined before we can do useful logging.
   */
@@ -472,7 +472,10 @@ template <class T> using result = OUTCOME_V2_NAMESPACE::result<T, error_info>;
 template <class T> using outcome = OUTCOME_V2_NAMESPACE::outcome<T, error_info>;
 using OUTCOME_V2_NAMESPACE::success;
 using OUTCOME_V2_NAMESPACE::failure;
-using OUTCOME_V2_NAMESPACE::error_from_exception;
+inline error_info error_from_exception(std::exception_ptr &&ep = std::current_exception(), std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept
+{
+  return error_info(OUTCOME_V2_NAMESPACE::error_from_exception(std::move(ep), not_matched));
+}
 using OUTCOME_V2_NAMESPACE::in_place_type;
 
 static_assert(OUTCOME_V2_NAMESPACE::trait::has_error_code_v<error_info>, "error_info is not detected to be an error code");

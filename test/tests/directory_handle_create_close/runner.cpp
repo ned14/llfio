@@ -37,7 +37,7 @@ template <class U> inline void directory_handle_create_close_creation(U &&f)
   // clang-format off
   static typename directory_handle::buffer_type _entries[5];
   static typename directory_handle::buffers_type entries(_entries);
-  static result<typename directory_handle::enumerate_info> info(std::error_code{});
+  static result<typename directory_handle::enumerate_info> info(AFIO_V2_NAMESPACE::error_info{});
   static const auto permuter(mt_permute_parameters< 
     result<void>,                              
     parameters<                                
@@ -87,7 +87,7 @@ template <class U> inline void directory_handle_create_close_creation(U &&f)
           i = typename directory_handle::buffer_type();
         }
         entries = typename directory_handle::buffers_type(_entries);
-        info = std::error_code();
+        info = AFIO_V2_NAMESPACE::error_info();
         return std::make_tuple(std::ref(permuter), std::ref(testreturn), idx, std::ref(enumeration_should_be));
       },
       [&](auto /*tuplestate*/) {
