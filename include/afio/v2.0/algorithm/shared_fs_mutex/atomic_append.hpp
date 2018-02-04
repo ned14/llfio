@@ -435,7 +435,7 @@ namespace algorithm
             auto lock_offset = record_offset;
             // Set the top bit to use the shadow lock space on Windows
             lock_offset |= (1ULL << 63U);
-            OUTCOME_TRYV(_h.lock(lock_offset, sizeof(record), false, nd));
+            OUTCOME_TRYV(_h.lock(lock_offset, sizeof(*record), false, nd));
           }
           // Make sure we haven't timed out during this wait
           if(d)
