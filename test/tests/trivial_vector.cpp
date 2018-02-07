@@ -24,13 +24,13 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../test_kernel_decl.hpp"
 
-static size_t trivial_vector_udts_constructed;
+static uint64_t trivial_vector_udts_constructed = 78;
 static inline void TestTrivialVector()
 {
   // Test udt without default constructor, complex constructor and trivial everything else
   struct udt
   {
-    size_t v;
+    uint64_t v;
     udt() = delete;
     explicit udt(int /*unused*/) { v = trivial_vector_udts_constructed++; };
   };
@@ -39,35 +39,49 @@ static inline void TestTrivialVector()
   udt_vector v;
   BOOST_CHECK(v.empty());
   BOOST_CHECK(v.size() == 0);  // NOLINT
-  v.push_back(udt(5));
+  std::cout << "Resizing to 4Kb ..." << std::endl;
+  v.push_back(udt(5));         // first allocation of 4Kb
   BOOST_CHECK(v.size() == 1);
   BOOST_CHECK(v.capacity() == AFIO_V2_NAMESPACE::utils::page_size() / sizeof(udt));
-  v.resize(512, udt(6));
+  BOOST_REQUIRE(v[0].v == 78);
+  std::cout << "Resizing to capacity ..." << std::endl;
+  v.resize(512, udt(6));       // ought to be precisely 4Kb
   BOOST_CHECK(v.size() == 512);
   BOOST_CHECK(v.capacity() == AFIO_V2_NAMESPACE::utils::round_up_to_page_size(512 * sizeof(udt)) / sizeof(udt));
-  v.resize(2048, udt(7));
+  BOOST_REQUIRE(v[0].v == 78);
+  BOOST_REQUIRE(v[1].v == 79);
+  std::cout << "Resizing to 16Kb ..." << std::endl;
+  v.resize(2048, udt(7));     // 16Kb
   BOOST_CHECK(v.size() == 2048);
   BOOST_CHECK(v.capacity() == AFIO_V2_NAMESPACE::utils::round_up_to_page_size(2048 * sizeof(udt)) / sizeof(udt));
-  v.resize(8192, udt(8));
+  BOOST_REQUIRE(v[0].v == 78);
+  BOOST_REQUIRE(v[1].v == 79);
+  BOOST_REQUIRE(v[512].v == 80);
+  std::cout << "Resizing to 64Kb ..." << std::endl;
+  v.resize(8192, udt(8));     // 64Kb
   BOOST_CHECK(v.size() == 8192);
   BOOST_CHECK(v.capacity() == AFIO_V2_NAMESPACE::utils::round_up_to_page_size(8192 * sizeof(udt)) / sizeof(udt));
+  BOOST_REQUIRE(v[0].v == 78);
+  BOOST_REQUIRE(v[1].v == 79);
+  BOOST_REQUIRE(v[512].v == 80);
+  BOOST_REQUIRE(v[2048].v == 81);
   for(size_t n = 0; n < 8192; n++)
   {
     if(0 == n)
     {
-      BOOST_CHECK(v[n].v == 0);
+      BOOST_CHECK(v[n].v == 78);
     }
     else if(n < 512)
     {
-      BOOST_CHECK(v[n].v == 1);
+      BOOST_CHECK(v[n].v == 79);
     }
     else if(n < 2048)
     {
-      BOOST_CHECK(v[n].v == 2);
+      BOOST_CHECK(v[n].v == 80);
     }
     else if(n < 8192)
     {
-      BOOST_CHECK(v[n].v == 3);
+      BOOST_CHECK(v[n].v == 81);
     }
   }
   auto it = v.begin();
@@ -75,19 +89,19 @@ static inline void TestTrivialVector()
   {
     if(0 == n)
     {
-      BOOST_CHECK(it->v == 0);
+      BOOST_CHECK(it->v == 78);
     }
     else if(n < 512)
     {
-      BOOST_CHECK(it->v == 1);
+      BOOST_CHECK(it->v == 79);
     }
     else if(n < 2048)
     {
-      BOOST_CHECK(it->v == 2);
+      BOOST_CHECK(it->v == 80);
     }
     else if(n < 8192)
     {
-      BOOST_CHECK(it->v == 3);
+      BOOST_CHECK(it->v == 81);
     }
   }
   BOOST_CHECK(it == v.end());

@@ -193,6 +193,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
   {
     return {errno, std::system_category()};
   }
+  // Don't fsync temporary inodes
   if((_section->backing() != nullptr) && (wait_for_device || and_metadata))
   {
     reqs.offset += _offset;
@@ -204,7 +205,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
 
 static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, section_handle *section, map_handle::size_type &bytes, map_handle::extent_type offset, section_handle::flag _flag) noexcept
 {
-  bool have_backing = section != nullptr ? (section->backing() != nullptr) : false;
+  bool have_backing = (section != nullptr);
   int prot = 0, flags = have_backing ? MAP_SHARED : (MAP_PRIVATE | MAP_ANONYMOUS);
   void *addr = nullptr;
   if(_flag == section_handle::flag::none)
@@ -249,7 +250,7 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
     flags |= MAP_PREFAULT_READ;
 #endif
 #ifdef MAP_NOSYNC
-  if(have_backing && (section->backing()->kernel_caching() == handle::caching::temporary))
+  if(have_backing && section->backing() != nullptr && (section->backing()->kernel_caching() == handle::caching::temporary))
     flags |= MAP_NOSYNC;
 #endif
   // printf("mmap(%p, %u, %d, %d, %d, %u)\n", ataddr, (unsigned) bytes, prot, flags, have_backing ? section->native_handle().fd : -1, (unsigned) offset);

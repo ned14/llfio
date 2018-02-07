@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 //#include <iostream>
 //#define AFIO_LOG_TO_OSTREAM std::cerr
-//#define AFIO_LOGGING_LEVEL 3
+//#define AFIO_LOGGING_LEVEL 6
 
 //! \file config.hpp Configures a compiler environment for AFIO header and source code
 
