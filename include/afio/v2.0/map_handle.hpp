@@ -354,6 +354,23 @@ public:
   AFIO_MAKE_FREE_FUNCTION
   size_type length() const noexcept { return _length; }
 
+  /*! Resize the memory map by attempting to shrink, or expand, or map in new data immediately after the current
+  map. On platforms without a map expanding syscall (i.e. anything not Linux), if
+  anything else is mapped in after the current map, the function fails.
+
+  \note On all supported platforms apart from OS X, proprietary flags exist to avoid
+  performing a map if a map extension cannot be immediately placed after the current map. On OS X,
+  we hint where we'd like the new map to go, but if something is already there OS X will
+  place the map elsewhere. In this situation, we delete the new map and return failure,
+  which is inefficient but there is nothing else we can do.
+
+  \return The bytes actually truncated to.
+  \param newsize The bytes to truncate the map to.
+  \errors Any of the values POSIX `mremap()`, `mmap(addr)` or `VirtualAlloc(addr)` can return.
+  */
+  AFIO_MAKE_FREE_FUNCTION
+  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_type> truncate(size_type newsize) noexcept;
+
   //! Ask the system to commit the system resources to make the memory represented by the buffer available with the given permissions. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually committed.
   AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> commit(buffer_type region, section_handle::flag flag = section_handle::flag::readwrite) noexcept;
 

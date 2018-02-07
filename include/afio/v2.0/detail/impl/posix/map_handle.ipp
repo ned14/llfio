@@ -203,7 +203,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
 }
 
 
-static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, section_handle *section, map_handle::size_type &bytes, map_handle::extent_type offset, section_handle::flag _flag) noexcept
+static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, int extra_flags, section_handle *section, map_handle::size_type &bytes, map_handle::extent_type offset, section_handle::flag _flag) noexcept
 {
   bool have_backing = (section != nullptr);
   int prot = 0, flags = have_backing ? MAP_SHARED : (MAP_PRIVATE | MAP_ANONYMOUS);
@@ -253,6 +253,7 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
   if(have_backing && section->backing() != nullptr && (section->backing()->kernel_caching() == handle::caching::temporary))
     flags |= MAP_NOSYNC;
 #endif
+  flags |= extra_flags;
   // printf("mmap(%p, %u, %d, %d, %d, %u)\n", ataddr, (unsigned) bytes, prot, flags, have_backing ? section->native_handle().fd : -1, (unsigned) offset);
   addr = ::mmap(ataddr, bytes, prot, flags, have_backing ? section->native_handle().fd : -1, offset);
   // printf("%d mmap %p-%p\n", getpid(), addr, (char *) addr+bytes);
@@ -280,7 +281,7 @@ result<map_handle> map_handle::map(size_type bytes, section_handle::flag _flag) 
   bytes = utils::round_up_to_page_size(bytes);
   result<map_handle> ret(map_handle(nullptr));
   native_handle_type &nativeh = ret.value()._v;
-  OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, nullptr, bytes, 0, _flag));
+  OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, 0, nullptr, bytes, 0, _flag));
   ret.value()._addr = static_cast<char *>(addr);
   ret.value()._length = bytes;
   AFIO_LOG_FUNCTION_CALL(&ret);
@@ -296,7 +297,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   }
   result<map_handle> ret{map_handle(&section)};
   native_handle_type &nativeh = ret.value()._v;
-  OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, &section, bytes, offset, _flag));
+  OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, 0, &section, bytes, offset, _flag));
   ret.value()._addr = static_cast<char *>(addr);
   ret.value()._offset = offset;
   ret.value()._length = length - offset;  // length of backing, not reservation
@@ -304,6 +305,54 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   ret.value()._v.fd = section.native_handle().fd;
   AFIO_LOG_FUNCTION_CALL(&ret);
   return ret;
+}
+
+result<map_handle::size_type> map_handle::truncate(size_type newsize) noexcept
+{
+  AFIO_LOG_FUNCTION_CALL(this);
+  newsize = utils::round_up_to_page_size(newsize);
+#ifdef __linux__
+  // Dead easy on Linux
+  void *newaddr = ::mremap(_addr, _length, newsize, MREMAP_MAYMOVE);
+  if(MAP_FAILED == newaddr)
+  {
+    return {errno, std::system_category()};
+  }
+  _addr = static_cast<char *>(newaddr);
+  _length = newsize;
+  return newsize;
+#else
+  if(newsize > _length)
+  {
+#if defined(MAP_EXCL)  // BSD type systems
+    char *addrafter = _addr + _length;
+    size_type bytes = newsize - _length;
+    extent_type offset = _offset + _length;
+    OUTCOME_TRY(addr, do_mmap(_v, addrafter, MAP_FIXED | MAP_EXCL, _section, bytes, offset, _flag));
+    _length = newsize;
+    return newsize;
+#else  // generic POSIX, inefficient
+    char *addrafter = _addr + _length;
+    size_type bytes = newsize - _length;
+    extent_type offset = _offset + _length;
+    OUTCOME_TRY(addr, do_mmap(_v, addrafter, 0, _section, bytes, offset, _flag));
+    if(addr != addrafter)
+    {
+      ::munmap(addr, bytes);
+      return std::errc::not_enough_memory;
+    }
+    _length = newsize;
+    return newsize;
+#endif
+  }
+  // Shrink the map
+  if(-1 == ::munmap(_addr + newsize, _length - newsize))
+  {
+    return {errno, std::system_category()};    
+  }
+  _length = newsize;
+  return newsize;
+#endif
 }
 
 result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_handle::flag flag) noexcept
@@ -317,7 +366,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
   region = utils::round_to_page_size(region);
   extent_type offset = _offset + (region.data - _addr);
   size_type bytes = region.len;
-  OUTCOME_TRYV(do_mmap(_v, region.data, _section, bytes, offset, flag));
+  OUTCOME_TRYV(do_mmap(_v, region.data, MAP_FIXED, _section, bytes, offset, flag));
   // Tell the kernel we will be using these pages soon
   if(-1 == ::madvise(region.data, region.len, MADV_WILLNEED))
   {
@@ -342,7 +391,7 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
   // Set permissions on the pages to no access
   extent_type offset = _offset + (region.data - _addr);
   size_type bytes = region.len;
-  OUTCOME_TRYV(do_mmap(_v, region.data, _section, bytes, offset, section_handle::flag::none));
+  OUTCOME_TRYV(do_mmap(_v, region.data, MAP_FIXED, _section, bytes, offset, section_handle::flag::none));
   return region;
 }
 
