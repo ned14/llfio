@@ -283,6 +283,7 @@ result<map_handle> map_handle::map(size_type bytes, section_handle::flag _flag) 
   native_handle_type &nativeh = ret.value()._v;
   OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, 0, nullptr, bytes, 0, _flag));
   ret.value()._addr = static_cast<char *>(addr);
+  ret.value()._reservation = bytes;
   ret.value()._length = bytes;
   AFIO_LOG_FUNCTION_CALL(&ret);
   return ret;
@@ -300,7 +301,8 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, 0, &section, bytes, offset, _flag));
   ret.value()._addr = static_cast<char *>(addr);
   ret.value()._offset = offset;
-  ret.value()._length = length - offset;  // length of backing, not reservation
+  ret.value()._reservation = bytes;
+  ret.value()._length = (length - offset < bytes) ? (length - offset) : bytes;  // length of backing, not reservation
   // Make my handle borrow the native handle of my backing storage
   ret.value()._v.fd = section.native_handle().fd;
   AFIO_LOG_FUNCTION_CALL(&ret);
@@ -310,47 +312,80 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
 result<map_handle::size_type> map_handle::truncate(size_type newsize) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
+  extent_type length = _length;
+  if(_section != nullptr)
+  {
+    OUTCOME_TRY(length_, _section->length());  // length of the backing file
+    length = length_;
+  }
   newsize = utils::round_up_to_page_size(newsize);
+  if(newsize == _reservation)
+  {
+    return success();
+  }
+  if(newsize == 0)
+  {
+    if(-1 == ::munmap(_addr, _length))
+    {
+      return {errno, std::system_category()};
+    }
+    _addr = nullptr;
+    _reservation = 0;
+    _length = 0;
+    return 0;
+  }
+  if(_addr == nullptr)
+  {
+    OUTCOME_TRY(addr, do_mmap(_v, nullptr, 0, _section, newsize, _offset, _flag));
+    _addr = static_cast<char *>(addr);
+    _reservation = newsize;
+    _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
+    return newsize;
+  }
 #ifdef __linux__
   // Dead easy on Linux
-  void *newaddr = ::mremap(_addr, _length, newsize, MREMAP_MAYMOVE);
+  void *newaddr = ::mremap(_addr, _reservation, newsize, 0);
   if(MAP_FAILED == newaddr)
   {
     return {errno, std::system_category()};
   }
   _addr = static_cast<char *>(newaddr);
-  _length = newsize;
+  _reservation = newsize;
+  _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
   return newsize;
 #else
   if(newsize > _length)
   {
 #if defined(MAP_EXCL)  // BSD type systems
-    char *addrafter = _addr + _length;
-    size_type bytes = newsize - _length;
-    extent_type offset = _offset + _length;
+    char *addrafter = _addr + _reservation;
+    size_type bytes = newsize - _reservation;
+    extent_type offset = _offset + _reservation;
     OUTCOME_TRY(addr, do_mmap(_v, addrafter, MAP_FIXED | MAP_EXCL, _section, bytes, offset, _flag));
-    _length = newsize;
+    _reservation = newsize;
+    _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
     return newsize;
-#else  // generic POSIX, inefficient
-    char *addrafter = _addr + _length;
-    size_type bytes = newsize - _length;
-    extent_type offset = _offset + _length;
+#else                  // generic POSIX, inefficient
+    char *addrafter = _addr + _reservation;
+    size_type bytes = newsize - _reservation;
+    extent_type offset = _offset + _reservation;
     OUTCOME_TRY(addr, do_mmap(_v, addrafter, 0, _section, bytes, offset, _flag));
     if(addr != addrafter)
     {
       ::munmap(addr, bytes);
       return std::errc::not_enough_memory;
     }
-    _length = newsize;
+    _reservation = newsize;
+    _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
     return newsize;
 #endif
   }
   // Shrink the map
   if(-1 == ::munmap(_addr + newsize, _length - newsize))
   {
-    return {errno, std::system_category()};    
+    return {errno, std::system_category()};
   }
-  _length = newsize;
+  _reservation = newsize;
+  _length = (length - _offset < newsize) ? (length - _offset) : newsize;
   return newsize;
 #endif
 }

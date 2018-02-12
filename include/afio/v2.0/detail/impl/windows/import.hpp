@@ -66,13 +66,13 @@ namespace windows_nt_kernel
 {
 // Weirdly these appear to be undefined sometimes?
 #ifndef STATUS_SUCCESS
-#define STATUS_SUCCESS ((LONG) 0x00000000L)
+#define STATUS_SUCCESS ((NTSTATUS) 0x00000000L)
 #endif
 #ifndef STATUS_ALERTED
-#define STATUS_ALERTED ((LONG) 0x00000101L)
+#define STATUS_ALERTED ((NTSTATUS) 0x00000101L)
 #endif
 #ifndef STATUS_DELETE_PENDING
-#define STATUS_DELETE_PENDING ((LONG) 0xC0000056)
+#define STATUS_DELETE_PENDING ((NTSTATUS) 0xC0000056)
 #endif
 
   // From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/FILE_INFORMATION_CLASS.html
@@ -223,68 +223,74 @@ namespace windows_nt_kernel
   } SECTION_BASIC_INFORMATION, *PSECTION_BASIC_INFORMATION;
 
   // From https://msdn.microsoft.com/en-us/library/bb432383%28v=vs.85%29.aspx
-  using NtQueryObject_t = LONG(NTAPI *)(_In_opt_ HANDLE Handle, _In_ OBJECT_INFORMATION_CLASS ObjectInformationClass, _Out_opt_ PVOID ObjectInformation, _In_ ULONG ObjectInformationLength, _Out_opt_ PULONG ReturnLength);
+  using NtQueryObject_t = NTSTATUS(NTAPI *)(_In_opt_ HANDLE Handle, _In_ OBJECT_INFORMATION_CLASS ObjectInformationClass, _Out_opt_ PVOID ObjectInformation, _In_ ULONG ObjectInformationLength, _Out_opt_ PULONG ReturnLength);
 
   // From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/NtQueryInformationFile.html
   // and http://msdn.microsoft.com/en-us/library/windows/hardware/ff567052(v=vs.85).aspx
-  using NtQueryInformationFile_t = LONG(NTAPI *)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _Out_ PVOID FileInformation, _In_ ULONG Length, _In_ FILE_INFORMATION_CLASS FileInformationClass);
+  using NtQueryInformationFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _Out_ PVOID FileInformation, _In_ ULONG Length, _In_ FILE_INFORMATION_CLASS FileInformationClass);
 
   // From http://msdn.microsoft.com/en-us/library/windows/hardware/ff567070(v=vs.85).aspx
-  using NtQueryVolumeInformationFile_t = LONG(NTAPI *)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _Out_ PVOID FsInformation, _In_ ULONG Length, _In_ FS_INFORMATION_CLASS FsInformationClass);
+  using NtQueryVolumeInformationFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _Out_ PVOID FsInformation, _In_ ULONG Length, _In_ FS_INFORMATION_CLASS FsInformationClass);
 
   // From http://msdn.microsoft.com/en-us/library/windows/hardware/ff566492(v=vs.85).aspx
-  using NtOpenDirectoryObject_t = LONG(NTAPI *)(_Out_ PHANDLE DirectoryHandle, _In_ ACCESS_MASK DesiredAccess, _In_ POBJECT_ATTRIBUTES ObjectAttributes);
+  using NtOpenDirectoryObject_t = NTSTATUS(NTAPI *)(_Out_ PHANDLE DirectoryHandle, _In_ ACCESS_MASK DesiredAccess, _In_ POBJECT_ATTRIBUTES ObjectAttributes);
 
 
   // From http://msdn.microsoft.com/en-us/library/windows/hardware/ff567011(v=vs.85).aspx
-  using NtOpenFile_t = LONG(NTAPI *)(_Out_ PHANDLE FileHandle, _In_ ACCESS_MASK DesiredAccess, _In_ POBJECT_ATTRIBUTES ObjectAttributes, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ ULONG ShareAccess, _In_ ULONG OpenOptions);
+  using NtOpenFile_t = NTSTATUS(NTAPI *)(_Out_ PHANDLE FileHandle, _In_ ACCESS_MASK DesiredAccess, _In_ POBJECT_ATTRIBUTES ObjectAttributes, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ ULONG ShareAccess, _In_ ULONG OpenOptions);
 
   // From http://msdn.microsoft.com/en-us/library/windows/hardware/ff566424(v=vs.85).aspx
-  using NtCreateFile_t = LONG(NTAPI *)(_Out_ PHANDLE FileHandle, _In_ ACCESS_MASK DesiredAccess, _In_ POBJECT_ATTRIBUTES ObjectAttributes, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_opt_ PLARGE_INTEGER AllocationSize, _In_ ULONG FileAttributes, _In_ ULONG ShareAccess, _In_ ULONG CreateDisposition,
-                                       _In_ ULONG CreateOptions, _In_opt_ PVOID EaBuffer, _In_ ULONG EaLength);
+  using NtCreateFile_t = NTSTATUS(NTAPI *)(_Out_ PHANDLE FileHandle, _In_ ACCESS_MASK DesiredAccess, _In_ POBJECT_ATTRIBUTES ObjectAttributes, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_opt_ PLARGE_INTEGER AllocationSize, _In_ ULONG FileAttributes, _In_ ULONG ShareAccess, _In_ ULONG CreateDisposition,
+                                           _In_ ULONG CreateOptions, _In_opt_ PVOID EaBuffer, _In_ ULONG EaLength);
 
-  using NtDeleteFile_t = LONG(NTAPI *)(_In_ POBJECT_ATTRIBUTES ObjectAttributes);
+  using NtDeleteFile_t = NTSTATUS(NTAPI *)(_In_ POBJECT_ATTRIBUTES ObjectAttributes);
 
-  using NtClose_t = LONG(NTAPI *)(_Out_ HANDLE FileHandle);
+  using NtClose_t = NTSTATUS(NTAPI *)(_Out_ HANDLE FileHandle);
 
   // From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/NtQueryDirectoryFile.html
   // and http://msdn.microsoft.com/en-us/library/windows/hardware/ff567047(v=vs.85).aspx
-  using NtQueryDirectoryFile_t = LONG(NTAPI *)(_In_ HANDLE FileHandle, _In_opt_ HANDLE Event, _In_opt_ PIO_APC_ROUTINE ApcRoutine, _In_opt_ PVOID ApcContext, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _Out_ PVOID FileInformation, _In_ ULONG Length, _In_ FILE_INFORMATION_CLASS FileInformationClass,
-                                               _In_ BOOLEAN ReturnSingleEntry, _In_opt_ PUNICODE_STRING FileName, _In_ BOOLEAN RestartScan);
+  using NtQueryDirectoryFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _In_opt_ HANDLE Event, _In_opt_ PIO_APC_ROUTINE ApcRoutine, _In_opt_ PVOID ApcContext, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _Out_ PVOID FileInformation, _In_ ULONG Length, _In_ FILE_INFORMATION_CLASS FileInformationClass,
+                                                   _In_ BOOLEAN ReturnSingleEntry, _In_opt_ PUNICODE_STRING FileName, _In_ BOOLEAN RestartScan);
 
   // From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/NtSetInformationFile.html
   // and http://msdn.microsoft.com/en-us/library/windows/hardware/ff567096(v=vs.85).aspx
-  using NtSetInformationFile_t = LONG(NTAPI *)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ PVOID FileInformation, _In_ ULONG Length, _In_ FILE_INFORMATION_CLASS FileInformationClass);
+  using NtSetInformationFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ PVOID FileInformation, _In_ ULONG Length, _In_ FILE_INFORMATION_CLASS FileInformationClass);
 
   // From http://msdn.microsoft.com/en-us/library/ms648412(v=vs.85).aspx
-  using NtWaitForSingleObject_t = LONG(NTAPI *)(_In_ HANDLE Handle, _In_ BOOLEAN Alertable, _In_opt_ PLARGE_INTEGER Timeout);
+  using NtWaitForSingleObject_t = NTSTATUS(NTAPI *)(_In_ HANDLE Handle, _In_ BOOLEAN Alertable, _In_opt_ PLARGE_INTEGER Timeout);
 
   typedef enum _OBJECT_WAIT_TYPE { WaitAllObject, WaitAnyObject } OBJECT_WAIT_TYPE, *POBJECT_WAIT_TYPE;  // NOLINT
 
-  using NtWaitForMultipleObjects_t = LONG(NTAPI *)(_In_ ULONG Count, _In_ HANDLE Object[], _In_ OBJECT_WAIT_TYPE WaitType, _In_ BOOLEAN Alertable, _In_opt_ PLARGE_INTEGER Time);
+  using NtWaitForMultipleObjects_t = NTSTATUS(NTAPI *)(_In_ ULONG Count, _In_ HANDLE Object[], _In_ OBJECT_WAIT_TYPE WaitType, _In_ BOOLEAN Alertable, _In_opt_ PLARGE_INTEGER Time);
 
-  using NtDelayExecution_t = LONG(NTAPI *)(_In_ BOOLEAN Alertable, _In_opt_ LARGE_INTEGER *Interval);
+  using NtDelayExecution_t = NTSTATUS(NTAPI *)(_In_ BOOLEAN Alertable, _In_opt_ LARGE_INTEGER *Interval);
 
   // From https://msdn.microsoft.com/en-us/library/windows/hardware/ff566474(v=vs.85).aspx
-  using NtLockFile_t = LONG(NTAPI *)(_In_ HANDLE FileHandle, _In_opt_ HANDLE Event, _In_opt_ PIO_APC_ROUTINE ApcRoutine, _In_opt_ PVOID ApcContext, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ PLARGE_INTEGER ByteOffset, _In_ PLARGE_INTEGER Length, _In_ ULONG Key, _In_ BOOLEAN FailImmediately, _In_ BOOLEAN ExclusiveLock);
+  using NtLockFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _In_opt_ HANDLE Event, _In_opt_ PIO_APC_ROUTINE ApcRoutine, _In_opt_ PVOID ApcContext, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ PLARGE_INTEGER ByteOffset, _In_ PLARGE_INTEGER Length, _In_ ULONG Key, _In_ BOOLEAN FailImmediately,
+                                         _In_ BOOLEAN ExclusiveLock);
 
   // From https://msdn.microsoft.com/en-us/library/windows/hardware/ff567118(v=vs.85).aspx
-  using NtUnlockFile_t = LONG(NTAPI *)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ PLARGE_INTEGER ByteOffset, _In_ PLARGE_INTEGER Length, _In_ ULONG Key);
+  using NtUnlockFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ PLARGE_INTEGER ByteOffset, _In_ PLARGE_INTEGER Length, _In_ ULONG Key);
 
-  using NtCreateSection_t = LONG(NTAPI *)(_Out_ PHANDLE SectionHandle, _In_ ACCESS_MASK DesiredAccess, _In_opt_ POBJECT_ATTRIBUTES ObjectAttributes, _In_opt_ PLARGE_INTEGER MaximumSize, _In_ ULONG SectionPageProtection, _In_ ULONG AllocationAttributes, _In_opt_ HANDLE FileHandle);
+  using NtCreateSection_t = NTSTATUS(NTAPI *)(_Out_ PHANDLE SectionHandle, _In_ ACCESS_MASK DesiredAccess, _In_opt_ POBJECT_ATTRIBUTES ObjectAttributes, _In_opt_ PLARGE_INTEGER MaximumSize, _In_ ULONG SectionPageProtection, _In_ ULONG AllocationAttributes, _In_opt_ HANDLE FileHandle);
 
-  using NtQuerySection_t = LONG(NTAPI *)(_In_ HANDLE SectionHandle, _In_ SECTION_INFORMATION_CLASS InformationClass, _Out_ PVOID InformationBuffer, _In_ ULONG InformationBufferSize, _Out_opt_ PULONG ResultLength);
+  using NtQuerySection_t = NTSTATUS(NTAPI *)(_In_ HANDLE SectionHandle, _In_ SECTION_INFORMATION_CLASS InformationClass, _Out_ PVOID InformationBuffer, _In_ ULONG InformationBufferSize, _Out_opt_ PULONG ResultLength);
 
-  using NtExtendSection_t = LONG(NTAPI *)(_In_ HANDLE SectionHandle, _In_opt_ PLARGE_INTEGER MaximumSize);
+  using NtExtendSection_t = NTSTATUS(NTAPI *)(_In_ HANDLE SectionHandle, _In_opt_ PLARGE_INTEGER MaximumSize);
 
-  using NtMapViewOfSection_t = LONG(NTAPI *)(_In_ HANDLE SectionHandle, _In_ HANDLE ProcessHandle, _Inout_ PVOID *BaseAddress, _In_ ULONG_PTR ZeroBits, _In_ SIZE_T CommitSize, _Inout_opt_ PLARGE_INTEGER SectionOffset, _Inout_ PSIZE_T ViewSize, _In_ SECTION_INHERIT InheritDisposition, _In_ ULONG AllocationType,
-                                             _In_ ULONG Win32Protect);
+  using NtMapViewOfSection_t = NTSTATUS(NTAPI *)(_In_ HANDLE SectionHandle, _In_ HANDLE ProcessHandle, _Inout_ PVOID *BaseAddress, _In_ ULONG_PTR ZeroBits, _In_ SIZE_T CommitSize, _Inout_opt_ PLARGE_INTEGER SectionOffset, _Inout_ PSIZE_T ViewSize, _In_ SECTION_INHERIT InheritDisposition, _In_ ULONG AllocationType,
+                                                 _In_ ULONG Win32Protect);
 
-  using NtUnmapViewOfSection_t = LONG(NTAPI *)(_In_ HANDLE ProcessHandle, _In_opt_ PVOID BaseAddress);
+  using NtUnmapViewOfSection_t = NTSTATUS(NTAPI *)(_In_ HANDLE ProcessHandle, _In_opt_ PVOID BaseAddress);
 
-  using NtFlushBuffersFileEx_t = LONG(NTAPI *)(_In_ HANDLE FileHandle, _In_ ULONG Flags, _Out_ PIO_STATUS_BLOCK IoStatusBlock);
+  using NtFlushBuffersFileEx_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _In_ ULONG Flags, _Out_ PIO_STATUS_BLOCK IoStatusBlock);
 
-  using NtSetSystemInformation_t = LONG(NTAPI *)(_In_ INT SystemInformationClass, _In_ PVOID SystemInformation, _In_ ULONG SystemInformationLength);
+  using NtSetSystemInformation_t = NTSTATUS(NTAPI *)(_In_ INT SystemInformationClass, _In_ PVOID SystemInformation, _In_ ULONG SystemInformationLength);
+
+  using NtAllocateVirtualMemory_t = NTSTATUS(NTAPI *)(_In_ HANDLE ProcessHandle, _Inout_ PVOID *BaseAddress, _In_ ULONG_PTR ZeroBits, _Inout_ PSIZE_T RegionSize, _In_ ULONG AllocationType, _In_ ULONG Protect);
+
+  using NtFreeVirtualMemory_t = NTSTATUS(NTAPI *)(_In_ HANDLE ProcessHandle, _Inout_ PVOID *BaseAddress, _Inout_ PSIZE_T RegionSize, _In_ ULONG FreeType);
+
 
   using RtlGenRandom_t = BOOLEAN(NTAPI *)(_Out_ PVOID RandomBuffer, _In_ ULONG RandomBufferLength);
 
@@ -306,7 +312,7 @@ namespace windows_nt_kernel
 
   using RtlDosPathNameToNtPathName_U_t = BOOLEAN(NTAPI *)(__in PCWSTR DosFileName, __out PUNICODE_STRING NtFileName, __out_opt PWSTR *FilePart, __out_opt PVOID RelativeName);
 
-  using RtlUTF8ToUnicodeN_t = LONG(NTAPI *)(_Out_opt_ PWSTR UnicodeStringDestination, _In_ ULONG UnicodeStringMaxByteCount, _Out_ PULONG UnicodeStringActualByteCount, _In_ PCCH UTF8StringSource, _In_ ULONG UTF8StringByteCount);
+  using RtlUTF8ToUnicodeN_t = NTSTATUS(NTAPI *)(_Out_opt_ PWSTR UnicodeStringDestination, _In_ ULONG UnicodeStringMaxByteCount, _Out_ PULONG UnicodeStringActualByteCount, _In_ PCCH UTF8StringSource, _In_ ULONG UTF8StringByteCount);
 
   typedef struct _FILE_BASIC_INFORMATION  // NOLINT
   {
@@ -514,6 +520,8 @@ namespace windows_nt_kernel
   static NtUnmapViewOfSection_t NtUnmapViewOfSection;
   static NtFlushBuffersFileEx_t NtFlushBuffersFileEx;
   static NtSetSystemInformation_t NtSetSystemInformation;
+  static NtAllocateVirtualMemory_t NtAllocateVirtualMemory;
+  static NtFreeVirtualMemory_t NtFreeVirtualMemory;
   static RtlGenRandom_t RtlGenRandom;
   static OpenProcessToken_t OpenProcessToken;
   static LookupPrivilegeValue_t LookupPrivilegeValue;
@@ -695,6 +703,21 @@ namespace windows_nt_kernel
         abort();
       }
     }
+    if(NtAllocateVirtualMemory == nullptr)
+    {
+      if((NtAllocateVirtualMemory = reinterpret_cast<NtAllocateVirtualMemory_t>(GetProcAddress(ntdllh, "NtAllocateVirtualMemory"))) == nullptr)
+      {
+        abort();
+      }
+    }
+    if(NtFreeVirtualMemory == nullptr)
+    {
+      if((NtFreeVirtualMemory = reinterpret_cast<NtFreeVirtualMemory_t>(GetProcAddress(ntdllh, "NtFreeVirtualMemory"))) == nullptr)
+      {
+        abort();
+      }
+    }
+
     HMODULE advapi32 = LoadLibraryA("ADVAPI32.DLL");
     if(RtlGenRandom == nullptr)
     {

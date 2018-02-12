@@ -270,6 +270,99 @@ result<section_handle::extent_type> section_handle::truncate(extent_type newsize
 
 /******************************************* map_handle *********************************************/
 
+template <class T> static inline T win32_round_up_to_allocation_size(T i) noexcept
+{
+  // Should we fetch the allocation granularity from Windows? I very much doubt it'll ever change from 64Kb
+  i = (T)((AFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i) + 65535) & ~(65535));  // NOLINT
+  return i;
+}
+static inline void win32_map_flags(native_handle_type &nativeh, DWORD &allocation, DWORD &prot, size_t &commitsize, bool enable_reservation, section_handle::flag _flag)
+{
+  prot = PAGE_NOACCESS;
+  if(enable_reservation && ((_flag & section_handle::flag::nocommit) || (_flag == section_handle::flag::none)))
+  {
+    allocation = MEM_RESERVE;
+    prot = PAGE_NOACCESS;
+    commitsize = 0;
+  }
+  if(_flag & section_handle::flag::cow)
+  {
+    prot = PAGE_WRITECOPY;
+    nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
+  }
+  else if(_flag & section_handle::flag::write)
+  {
+    prot = PAGE_READWRITE;
+    nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
+  }
+  else if(_flag & section_handle::flag::read)
+  {
+    prot = PAGE_READONLY;
+    nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable;
+  }
+  if(!!(_flag & section_handle::flag::cow) && !!(_flag & section_handle::flag::execute))
+  {
+    prot = PAGE_EXECUTE_WRITECOPY;
+  }
+  else if(_flag & section_handle::flag::execute)
+  {
+    prot = PAGE_EXECUTE;
+  }
+}
+// Used to apply an operation to all maps within a region
+template <class F> static inline result<void> win32_maps_apply(char *addr, size_t bytes, F &&f)
+{
+  while(bytes > 0)
+  {
+    MEMORY_BASIC_INFORMATION mbi;
+    char *thisregion = addr;
+    // Need to iterate until AllocationBase changes
+    for(;;)
+    {
+      if(!VirtualQuery(addr, &mbi, sizeof(mbi)) || mbi.AllocationBase != thisregion)
+      {
+        break;
+      }
+      addr += mbi.RegionSize;
+      if(mbi.RegionSize < bytes)
+      {
+        bytes -= mbi.RegionSize;
+      }
+      else
+      {
+        bytes = 0;
+      }
+    }
+    // Address passed in originally must match an allocation
+    if(addr == thisregion)
+    {
+      return std::errc::invalid_argument;
+    }
+    OUTCOME_TRYV(f(thisregion, addr - thisregion));
+  }
+  return success();
+}
+// Only for memory allocated with VirtualAlloc. We can special case decommitting or releasing
+// memory because NtFreeVirtualMemory() tells us how much it freed.
+static inline result<void> win32_release_allocations(char *addr, size_t bytes, ULONG op)
+{
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  while(bytes > 0)
+  {
+    VOID *regionbase = addr;
+    SIZE_T regionsize = (op == MEM_RELEASE) ? 0 : bytes;
+    NTSTATUS ntstat = NtFreeVirtualMemory(GetCurrentProcess(), &regionbase, &regionsize, op);
+    if(ntstat < 0)
+    {
+      return {ntstat, ntkernel_category()};
+    }
+    addr += regionsize;
+    assert(regionsize <= bytes);
+    bytes -= regionsize;
+  }
+  return success();
+}
 
 map_handle::~map_handle()
 {
@@ -298,18 +391,18 @@ result<void> map_handle::close() noexcept
       {
         OUTCOME_TRYV(barrier({}, true, false));
       }
-      NTSTATUS ntstat = NtUnmapViewOfSection(GetCurrentProcess(), _addr);
-      if(STATUS_SUCCESS != ntstat)
-      {
-        return {ntstat, ntkernel_category()};
-      }
+      OUTCOME_TRYV(win32_maps_apply(_addr, _reservation, [](char *addr, size_t /* unused */) -> result<void> {
+        NTSTATUS ntstat = NtUnmapViewOfSection(GetCurrentProcess(), addr);
+        if(ntstat < 0)
+        {
+          return {ntstat, ntkernel_category()};
+        }
+        return success();
+      }));
     }
     else
     {
-      if(VirtualFree(_addr, 0, MEM_RELEASE) == 0)
-      {
-        return {GetLastError(), std::system_category()};
-      }
+      OUTCOME_TRYV(win32_release_allocations(_addr, _reservation, MEM_RELEASE));
     }
   }
   // We don't want ~handle() to close our borrowed handle
@@ -343,10 +436,17 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
     bytes += req.len;
   }
   // bytes = 0 means flush entire mapping
-  if(FlushViewOfFile(addr, static_cast<SIZE_T>(bytes)) == 0)
+  if(bytes == 0)
   {
-    return {GetLastError(), std::system_category()};
+    bytes = _reservation - reqs.offset;
   }
+  OUTCOME_TRYV(win32_maps_apply(addr, bytes, [](char *addr, size_t bytes) -> result<void> {
+    if(FlushViewOfFile(addr, static_cast<SIZE_T>(bytes)) == 0)
+    {
+      return {GetLastError(), std::system_category()};
+    }
+    return success();
+  }));
   if((_section != nullptr) && (_section->backing() != nullptr) && (wait_for_device || and_metadata))
   {
     reqs.offset += _offset;
@@ -358,38 +458,14 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
 
 result<map_handle> map_handle::map(size_type bytes, section_handle::flag _flag) noexcept
 {
-  bytes = utils::round_up_to_page_size(bytes);
+  bytes = win32_round_up_to_allocation_size(bytes);
   result<map_handle> ret(map_handle(nullptr));
   native_handle_type &nativeh = ret.value()._v;
-  DWORD allocation = MEM_RESERVE | MEM_COMMIT, prot = 0;
+  DWORD allocation = MEM_RESERVE | MEM_COMMIT, prot;
   PVOID addr = nullptr;
-  if((_flag & section_handle::flag::nocommit) || (_flag == section_handle::flag::none))
   {
-    allocation = MEM_RESERVE;
-    prot = PAGE_NOACCESS;
-  }
-  else if(_flag & section_handle::flag::cow)
-  {
-    prot = PAGE_WRITECOPY;
-    nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
-  }
-  else if(_flag & section_handle::flag::write)
-  {
-    prot = PAGE_READWRITE;
-    nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
-  }
-  else if(_flag & section_handle::flag::read)
-  {
-    prot = PAGE_READONLY;
-    nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable;
-  }
-  if(!!(_flag & section_handle::flag::cow) && !!(_flag & section_handle::flag::execute))
-  {
-    prot = PAGE_EXECUTE_WRITECOPY;
-  }
-  else if(_flag & section_handle::flag::execute)
-  {
-    prot = PAGE_EXECUTE;
+    size_t commitsize;
+    win32_map_flags(nativeh, allocation, prot, commitsize, true, _flag);
   }
   AFIO_LOG_FUNCTION_CALL(&ret);
   addr = VirtualAlloc(nullptr, bytes, allocation, prot);
@@ -398,6 +474,7 @@ result<map_handle> map_handle::map(size_type bytes, section_handle::flag _flag) 
     return {GetLastError(), std::system_category()};
   }
   ret.value()._addr = static_cast<char *>(addr);
+  ret.value()._reservation = bytes;
   ret.value()._length = bytes;
 
   // Windows has no way of getting the kernel to prefault maps on creation, so ...
@@ -427,54 +504,23 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   using namespace windows_nt_kernel;
   result<map_handle> ret{map_handle(&section)};
   native_handle_type &nativeh = ret.value()._v;
-  ULONG allocation = 0, prot = PAGE_NOACCESS;
+  ULONG allocation = MEM_RESERVE, prot;
   PVOID addr = nullptr;
   size_t commitsize = bytes;
   LARGE_INTEGER _offset{};
   _offset.QuadPart = offset;
-  SIZE_T _bytes = bytes;
-  if((section.backing() != nullptr) && ((_flag & section_handle::flag::nocommit) || (_flag == section_handle::flag::none)))
-  {
-    allocation = MEM_RESERVE;
-    commitsize = 0;
-  }
-  if(_flag & section_handle::flag::cow)
-  {
-    prot = PAGE_WRITECOPY;
-    nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
-  }
-  else if(_flag & section_handle::flag::write)
-  {
-    prot = PAGE_READWRITE;
-    nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
-  }
-  else if(_flag & section_handle::flag::read)
-  {
-    prot = PAGE_READONLY;
-    nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable;
-  }
-  if(!!(_flag & section_handle::flag::cow) && !!(_flag & section_handle::flag::execute))
-  {
-    prot = PAGE_EXECUTE_WRITECOPY;
-  }
-  else if(_flag & section_handle::flag::execute)
-  {
-    prot = PAGE_EXECUTE;
-  }
+  SIZE_T _bytes = win32_round_up_to_allocation_size(bytes);  // reserve to next 64Kb boundary
+  win32_map_flags(nativeh, allocation, prot, commitsize, section.backing() != nullptr, _flag);
   AFIO_LOG_FUNCTION_CALL(&ret);
   NTSTATUS ntstat = NtMapViewOfSection(section.native_handle().h, GetCurrentProcess(), &addr, 0, commitsize, &_offset, &_bytes, ViewUnmap, allocation, prot);
-  if(STATUS_SUCCESS != ntstat)
+  if(ntstat < 0)
   {
     return {static_cast<int>(ntstat), ntkernel_category()};
   }
   ret.value()._addr = static_cast<char *>(addr);
   ret.value()._offset = offset;
-#if 0
-  ret.value()._length = _bytes;
-#else
-  // Need exact size here, not rounded up value
+  ret.value()._reservation = _bytes;
   ret.value()._length = section.length().value() - offset;
-#endif
   // Make my handle borrow the native handle of my backing storage
   ret.value()._v.h = section.backing_native_handle().h;
 
@@ -498,6 +544,84 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   return ret;
 }
 
+result<map_handle::size_type> map_handle::truncate(size_type newsize) noexcept
+{
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  AFIO_LOG_FUNCTION_CALL(this);
+  newsize = win32_round_up_to_allocation_size(newsize);
+  if(newsize == _reservation)
+  {
+    return success();
+  }
+  // Is this VirtualAlloc() allocated memory?
+  if(_section == nullptr)
+  {
+    if(newsize == 0)
+    {
+      OUTCOME_TRYV(win32_release_allocations(_addr, _reservation, MEM_RELEASE));
+      _addr = nullptr;
+      _reservation = 0;
+      _length = 0;
+      return success();
+    }
+    if(newsize < _reservation)
+    {
+      // VirtualAlloc doesn't let us shrink regions, only free the whole thing. So if he tries
+      // to free any part of a region, it'll fail.
+      OUTCOME_TRYV(win32_release_allocations(_addr + newsize, _reservation - newsize, MEM_RELEASE));
+      _reservation = _length = newsize;
+      return _reservation;
+    }
+    // Try to allocate another region directly after this one
+    native_handle_type nativeh;
+    DWORD allocation = MEM_RESERVE | MEM_COMMIT, prot;
+    size_t commitsize;
+    win32_map_flags(nativeh, allocation, prot, commitsize, true, _flag);
+    if(!VirtualAlloc(_addr + _reservation, newsize - _reservation, allocation, prot))
+    {
+      return {GetLastError(), std::system_category()};
+    }
+    _reservation = _length = newsize;
+    return _reservation;
+  }
+
+  // So this must be file backed memory. Totally different APIs for that :)
+  OUTCOME_TRY(length, _section->length());  // length of the backing file
+  if(newsize < _reservation)
+  {
+    // If newsize isn't exactly a previous extension, this will fail, same as for the VirtualAlloc case
+    OUTCOME_TRYV(win32_maps_apply(_addr + newsize, _reservation - newsize, [](char *addr, size_t /* unused */) -> result<void> {
+      NTSTATUS ntstat = NtUnmapViewOfSection(GetCurrentProcess(), addr);
+      if(ntstat < 0)
+      {
+        return {ntstat, ntkernel_category()};
+      }
+      return success();
+    }));
+    _reservation = newsize;
+    _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
+    return _reservation;
+  }
+  // Try to map an additional part of the section directly after this map
+  ULONG allocation = MEM_RESERVE, prot;
+  PVOID addr = _addr + _reservation;
+  size_t commitsize = newsize - _reservation;
+  LARGE_INTEGER offset{};
+  offset.QuadPart = _offset + _reservation;
+  SIZE_T _bytes = newsize - _reservation;
+  native_handle_type nativeh;
+  win32_map_flags(nativeh, allocation, prot, commitsize, _section->backing() != nullptr, _flag);
+  NTSTATUS ntstat = NtMapViewOfSection(_section->native_handle().h, GetCurrentProcess(), &addr, 0, commitsize, &offset, &_bytes, ViewUnmap, allocation, prot);
+  if(ntstat < 0)
+  {
+    return {static_cast<int>(ntstat), ntkernel_category()};
+  }
+  _reservation += _bytes;
+  _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
+  return _reservation;
+}
+
 result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_handle::flag flag) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
@@ -508,37 +632,40 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
   DWORD prot = 0;
   if(flag == section_handle::flag::none)
   {
-    DWORD _ = 0;
-    if(VirtualProtect(region.data, region.len, PAGE_NOACCESS, &_) == 0)
-    {
-      return {GetLastError(), std::system_category()};
-    }
+    OUTCOME_TRYV(win32_maps_apply(region.data, region.len, [](char *addr, size_t bytes) -> result<void> {
+      DWORD _ = 0;
+      if(VirtualProtect(addr, bytes, PAGE_NOACCESS, &_) == 0)
+      {
+        return {GetLastError(), std::system_category()};
+      }
+      return success();
+    }));
     return region;
   }
   if(flag & section_handle::flag::cow)
   {
     prot = PAGE_WRITECOPY;
-    _v.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
   }
   else if(flag & section_handle::flag::write)
   {
     prot = PAGE_READWRITE;
-    _v.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
   }
   else if(flag & section_handle::flag::read)
   {
     prot = PAGE_READONLY;
-    _v.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable;
   }
   if(flag & section_handle::flag::execute)
   {
     prot = PAGE_EXECUTE;
   }
   region = utils::round_to_page_size(region);
-  if(VirtualAlloc(region.data, region.len, MEM_COMMIT, prot) == nullptr)
-  {
-    return {GetLastError(), std::system_category()};
-  }
+  OUTCOME_TRYV(win32_maps_apply(region.data, region.len, [prot](char *addr, size_t bytes) -> result<void> {
+    if(VirtualAlloc(addr, bytes, MEM_COMMIT, prot) == nullptr)
+    {
+      return {GetLastError(), std::system_category()};
+    }
+    return success();
+  }));
   return region;
 }
 
@@ -550,10 +677,13 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
     return std::errc::invalid_argument;
   }
   region = utils::round_to_page_size(region);
-  if(VirtualFree(region.data, region.len, MEM_DECOMMIT) == 0)
-  {
-    return {GetLastError(), std::system_category()};
-  }
+  OUTCOME_TRYV(win32_maps_apply(region.data, region.len, [](char *addr, size_t bytes) -> result<void> {
+    if(VirtualFree(addr, bytes, MEM_DECOMMIT) == 0)
+    {
+      return {GetLastError(), std::system_category()};
+    }
+    return success();
+  }));
   return region;
 }
 
@@ -573,10 +703,13 @@ result<void> map_handle::zero_memory(buffer_type region) noexcept
     region = utils::round_to_page_size(region);
     if(region.len > 0)
     {
-      if(DiscardVirtualMemory_(region.data, region.len) == 0)
-      {
-        return {GetLastError(), std::system_category()};
-      }
+      OUTCOME_TRYV(win32_maps_apply(region.data, region.len, [](char *addr, size_t bytes) -> result<void> {
+        if(DiscardVirtualMemory_(addr, bytes) == 0)
+        {
+          return {GetLastError(), std::system_category()};
+        }
+        return success();
+      }));
     }
   }
   return success();
@@ -615,17 +748,23 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
     // Win8's DiscardVirtualMemory is much faster if it's available
     if(DiscardVirtualMemory_ != nullptr)
     {
-      if(DiscardVirtualMemory_(region.data, region.len) == 0)
-      {
-        return {GetLastError(), std::system_category()};
-      }
+      OUTCOME_TRYV(win32_maps_apply(region.data, region.len, [](char *addr, size_t bytes) -> result<void> {
+        if(DiscardVirtualMemory_(addr, bytes) == 0)
+        {
+          return {GetLastError(), std::system_category()};
+        }
+        return success();
+      }));
       return region;
     }
     // Else MEM_RESET will do
-    if(VirtualAlloc(region.data, region.len, MEM_RESET, 0) == nullptr)
-    {
-      return {GetLastError(), std::system_category()};
-    }
+    OUTCOME_TRYV(win32_maps_apply(region.data, region.len, [](char *addr, size_t bytes) -> result<void> {
+      if(VirtualAlloc(addr, bytes, MEM_RESET, 0) == nullptr)
+      {
+        return {GetLastError(), std::system_category()};
+      }
+      return success();
+    }));
     return region;
   }
   // We did nothing

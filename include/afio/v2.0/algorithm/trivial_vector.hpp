@@ -585,9 +585,10 @@ namespace algorithm
 trivially copyable.
 
 As a hand waving estimate for whether this vector implementation may be useful to you,
-it roughly breaks even with `std::vector` on recent Intel CPUs at around the L2 cache
-level. So if your vector fits into the L2 cache, this implementation will be no
-better, and likely slower.
+it usually roughly breaks even with `std::vector` on recent Intel CPUs at around the L2 cache
+boundary. So if your vector fits into the L2 cache, this implementation will be no
+better, but no worse. If your vector fits into the L1 cache, this implementation will be
+worse, often considerably so.
 
 Note that no STL allocator support is provided as `T` must be trivially copyable
 (for which most STL's simply use `memcpy()` anyway instead of the allocator's
@@ -597,9 +598,10 @@ to implement the constant time capacity resizing.
 We also disable the copy constructor, as copying an entire backing file is expensive.
 Use the iterator based copy constructor if you really want to copy one of these.
 
-The very first item stored reserves a capacity of `utils::page_size()/sizeof(T)`.
+The very first item stored reserves a capacity of `utils::page_size()/sizeof(T)`
+on POSIX and `65536/sizeof(T)` on Windows.
 Capacity is doubled in byte terms thereafter (i.e. 8Kb, 16Kb and so on).
-Also be aware that the capacity of the vector needs to become reasonably large
+As mentioned earlier, the capacity of the vector needs to become reasonably large
 before going to the kernel to resize the `section_handle` and remapping memory
 becomes faster than `memcpy`. For these reasons, this vector implementation is
 best suited to arrays of unknown in advance, but likely large, sizes.
@@ -638,7 +640,44 @@ L3 4Mb:
     16777216,17096,8713
     33554432,36890,18421
     67108864,73593,40702
-*/
+- Windows 10 with VS2017.5:
+  - push_back():
+    8192,18,122
+    16384,23,149
+    32768,55,217
+    65536,104,292
+    131072,257,551
+    262144,450,330
+    524288,818,530
+    1048576,1205,850
+    2097152,2825,1507
+    4194304,6380,2756
+    8388608,10087,5219
+    16777216,23986,10337
+    33554432,54799,19660
+    67108864,88451,39100
+    134217728,195703,104047
+    268435456,428225,167032
+    536870912,926119,382816
+  - resize():
+    8192,9,82
+    16384,12,78
+    32768,28,97
+    65536,45,127
+    131072,114,178
+    262144,154,306
+    524288,450,570
+    1048576,895,1014
+    2097152,1716,1996
+    4194304,3332,3840
+    8388608,9766,7693
+    16777216,23859,15330
+    33554432,30330,34775
+    67108864,86717,48182
+    134217728,140302,71438
+    268435456,209555,143757
+    536870912,450855,290169
+  */
 #ifndef DOXYGEN_IS_IN_THE_HOUSE
   template <class T> AFIO_REQUIRES(std::is_trivially_copyable<T>::value) class trivial_vector : public detail::trivial_vector_impl<std::is_default_constructible<T>::value, T>
 #else
