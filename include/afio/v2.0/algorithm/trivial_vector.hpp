@@ -325,9 +325,9 @@ namespace algorithm
           // We can always grow a section even with maps open on it
           _sh.truncate(bytes).value();
           // Attempt to resize the map in place
-          if(!_mh.truncate(bytes))
+          if(!_mh.truncate(bytes, true))
           {
-            std::cerr << "truncate fail" << std::endl;
+            // std::cerr << "truncate fail" << std::endl;
             // If can't resize, close the map and reopen it into a new address
             _mh.close().value();
             _mh = map_handle::map(_sh, bytes).value();

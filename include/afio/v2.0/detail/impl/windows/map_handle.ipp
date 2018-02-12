@@ -544,7 +544,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   return ret;
 }
 
-result<map_handle::size_type> map_handle::truncate(size_type newsize) noexcept
+result<map_handle::size_type> map_handle::truncate(size_type newsize, bool /* unused */) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;

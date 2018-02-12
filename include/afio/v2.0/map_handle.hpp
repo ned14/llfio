@@ -331,7 +331,7 @@ public:
 
 
   /*! Create new memory and map it into view.
-  \param bytes How many bytes to create and map. Typically will be rounded to a multiple of the page size (see utils::page_sizes()).
+  \param bytes How many bytes to create and map. Typically will be rounded up to a multiple of the page size (see `utils::page_sizes()`) on POSIX, 64Kb on Windows.
   \param _flag The permissions with which to map the view. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
 
   \note On Microsoft Windows this constructor uses the faster VirtualAlloc() which creates less versatile page backed memory. If you want anonymous memory
@@ -346,7 +346,7 @@ public:
 
   /*! Create a memory mapped view of a backing storage, optionally reserving additional address space for later growth.
   \param section A memory section handle specifying the backing storage to use.
-  \param bytes How many bytes to reserve (0 = the size of the section).
+  \param bytes How many bytes to reserve (0 = the size of the section). Rounded up to nearest 64Kb on Windows.
   \param offset The offset into the backing storage to map from. Typically needs to be at least a multiple of the page size (see utils::page_sizes()), on Windows it needs to be a multiple of the kernel memory allocation granularity (typically 64Kb).
   \param _flag The permissions with which to map the view which are constrained by the permissions of the memory section. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
 
@@ -410,11 +410,13 @@ public:
   which is inefficient, but there is nothing else we can do.
 
   \return The bytes actually reserved.
-  \param newsize The bytes to truncate the map reservation to.
+  \param newsize The bytes to truncate the map reservation to. Rounded up to the nearest page size (POSIX) or 64Kb on Windows.
+  \param permit_relocation Permit the address to change (some OSs provide a syscall for resizing
+  a memory map).
   \errors Any of the values POSIX `mremap()`, `mmap(addr)` or `VirtualAlloc(addr)` can return.
   */
   AFIO_MAKE_FREE_FUNCTION
-  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_type> truncate(size_type newsize) noexcept;
+  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_type> truncate(size_type newsize, bool permit_relocation = false) noexcept;
 
   //! Ask the system to commit the system resources to make the memory represented by the buffer available with the given permissions. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually committed.
   AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> commit(buffer_type region, section_handle::flag flag = section_handle::flag::readwrite) noexcept;

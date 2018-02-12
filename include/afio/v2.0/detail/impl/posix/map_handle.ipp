@@ -309,7 +309,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   return ret;
 }
 
-result<map_handle::size_type> map_handle::truncate(size_type newsize) noexcept
+result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permit_relocation) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
   extent_type length = _length;
@@ -344,7 +344,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize) noexcept
   }
 #ifdef __linux__
   // Dead easy on Linux
-  void *newaddr = ::mremap(_addr, _reservation, newsize, 0);
+  void *newaddr = ::mremap(_addr, _reservation, newsize, permit_relocation ? MREMAP_MAYMOVE : 0);
   if(MAP_FAILED == newaddr)
   {
     return {errno, std::system_category()};
