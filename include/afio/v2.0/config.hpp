@@ -496,7 +496,10 @@ inline AFIO_DECL QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log<AF
 {
   static QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log<AFIO_LOGGING_MEMORY> _log(static_cast<QUICKCPPLIB_NAMESPACE::ringbuffer_log::level>(AFIO_LOGGING_LEVEL));
 #ifdef AFIO_LOG_TO_OSTREAM
-  _log.immediate(&AFIO_LOG_TO_OSTREAM);
+  if(_log.immediate() != &AFIO_LOG_TO_OSTREAM)
+  {
+    _log.immediate(&AFIO_LOG_TO_OSTREAM);
+  }
 #endif
   return _log;
 }

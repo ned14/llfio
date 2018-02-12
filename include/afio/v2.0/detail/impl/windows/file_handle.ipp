@@ -260,6 +260,18 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
       memset(&fbi, 0, sizeof(fbi));
       fbi.FileAttributes = FILE_ATTRIBUTE_HIDDEN;
       NtSetInformationFile(nativeh.h, &isb, &fbi, sizeof(fbi), FileBasicInformation);
+
+      // Mark the item as delete on close
+      isb = make_iostatus();
+      FILE_DISPOSITION_INFORMATION fdi{};
+      memset(&fdi, 0, sizeof(fdi));
+      fdi._DeleteFile = 1u;
+      NTSTATUS ntstat = NtSetInformationFile(nativeh.h, &isb, &fdi, sizeof(fdi), FileDispositionInformation);
+      if(ntstat >= 0)
+      {
+        // No need to delete it again on close
+        ret.value()._flags &= ~flag::unlink_on_close;
+      }
     }
     return ret;
   }

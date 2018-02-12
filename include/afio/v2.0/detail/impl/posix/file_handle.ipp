@@ -82,7 +82,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
 result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode, flag flags) noexcept
 {
   caching _caching = caching::temporary;
-  // No need to rename to random on unlink or check inode before unlink
+  // No need to check inode before unlink
   flags |= flag::unlink_on_close | flag::disable_safety_unlinks;
   result<file_handle> ret(file_handle(native_handle_type(), 0, 0, _caching, flags));
   native_handle_type &nativeh = ret.value()._v;
@@ -98,7 +98,8 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   if(-1 != nativeh.fd)
   {
     ret.value()._flags |= flag::anonymous_inode;
-    OUTCOME_TRYV(ret.value()._fetch_inode());  // It can be useful to know the inode of temporary inodes
+    OUTCOME_TRYV(ret.value()._fetch_inode());      // It can be useful to know the inode of temporary inodes
+    ret.value()._flags &= ~flag::unlink_on_close;  // It's already unlinked
     return ret;
   }
   // If it failed, assume this kernel or FS doesn't support O_TMPFILE
@@ -132,6 +133,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
       return {errno, std::system_category()};
     }
     OUTCOME_TRYV(ret.value()._fetch_inode());  // It can be useful to know the inode of temporary inodes
+    ret.value()._flags &= ~flag::unlink_on_close;
     return ret;
   }
 }
@@ -229,9 +231,9 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
       case caching::none:
         attribs |= O_SYNC
 #ifdef O_DIRECT
-          | O_DIRECT
+                   | O_DIRECT
 #endif
-          ;
+        ;
         if(-1 == fcntl(ret.value()._v.fd, F_SETFL, attribs))
         {
           return {errno, std::system_category()};
