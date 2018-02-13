@@ -149,19 +149,14 @@ private:
     string_view _utf8;
     wstring_view _utf16;
 
-    constexpr state()
-        : _utf8()
-        , _utf16()
-    {
-    }
-    constexpr state(string_view v)
+    constexpr state() {}  // NOLINT
+    constexpr explicit state(string_view v)
         : _utf8(v)
-        , _utf16()
+
     {
     }
-    constexpr state(wstring_view v)
-        : _utf8()
-        , _utf16(v)
+    constexpr explicit state(wstring_view v)
+        : _utf16(v)
     {
     }
     constexpr void swap(state &o) noexcept
@@ -176,7 +171,9 @@ private:
   {
     // wchar paths must use backslashes
     if(!_state._utf16.empty())
+    {
       return _state._utf16.rfind('\\');
+    }
     // char paths can use either
     return _state._utf8.find_last_of("/\\");
   }
@@ -185,7 +182,7 @@ private:
   {
     string_view _utf8;
 
-    constexpr state() {}
+    constexpr state() {}  // NOLINT
     constexpr explicit state(string_view v)
         : _utf8(v)
     {
@@ -198,7 +195,8 @@ private:
 #endif
 public:
   //! Constructs an empty path view
-  constexpr path_view() noexcept: {}
+  constexpr path_view() {}  // NOLINT
+  ~path_view() = default;
   //! Implicitly constructs a path view from a path. The input path MUST continue to exist for this view to be valid.
   path_view(const filesystem::path &v) noexcept : _state(v.native()) {}  // NOLINT
   //! Implicitly constructs a UTF-8 path view from a string. The input string MUST continue to exist for this view to be valid.
@@ -220,13 +218,13 @@ public:
   constexpr path_view(string_view v) noexcept : _state(v) {}  // NOLINT
 #ifdef _WIN32
   //! Implicitly constructs a UTF-16 path view from a string. The input string MUST continue to exist for this view to be valid.
-  path_view(const std::wstring &v) noexcept : _state(v) {}
+  path_view(const std::wstring &v) noexcept : _state(v) {}  // NOLINT
   //! Implicitly constructs a UTF-16 path view from a zero terminated `const wchar_t *`. The input string MUST continue to exist for this view to be valid.
-  constexpr path_view(const wchar_t *v) noexcept :
+  constexpr path_view(const wchar_t *v) noexcept :  // NOLINT
 #if !_HAS_CXX17 && __cplusplus < 201700
-  _state(wstring_view(v, detail::constexpr_strlen(v)))
+                                                    _state(wstring_view(v, detail::constexpr_strlen(v)))
 #else
-  _state(wstring_view(v))
+                                                    _state(wstring_view(v))
 #endif
   {
   }
@@ -235,7 +233,7 @@ public:
   /*! Implicitly constructs a UTF-16 path view from a wide string view.
   \warning The character after the end of the view must be legal to read.
   */
-  constexpr path_view(wstring_view v) noexcept : _state(v) {}
+  constexpr path_view(wstring_view v) noexcept : _state(v) {}  // NOLINT
 #endif
   //! Default copy constructor
   path_view(const path_view &) = default;
@@ -269,9 +267,13 @@ public:
   {
 #ifdef _WIN32
     if(!_state._utf16.empty())
+    {
       return wstring_view::npos != _state._utf16.find_first_of(L"*?");
+    }
     if(!_state._utf8.empty())
+    {
       return wstring_view::npos != _state._utf8.find_first_of("*?");
+    }
     return false;
 #else
     return string_view::npos != _state._utf8.find_first_of("*?[]");
@@ -283,12 +285,18 @@ public:
   {
     return _invoke([](const auto &v) {
       if(v.size() < 4)
+      {
         return false;
+      }
       const auto *d = v.data();
       if(d[0] == '\\' && d[1] == '!' && d[2] == '!' && d[3] == '\\')
+      {
         return true;
+      }
       if(d[0] == '\\' && d[1] == '?' && d[2] == '?' && d[3] == '\\')
+      {
         return true;
+      }
       return false;
     });
   }
@@ -303,7 +311,9 @@ public:
         {
           auto c = v[n];
           if(!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')))
+          {
             return false;
+          }
         }
         return v[64] == '.' && v[65] == 'd' && v[66] == 'e' && v[67] == 'l' && v[68] == 'e' && v[69] == 't' && v[70] == 'e' && v[71] == 'd';
       }
@@ -355,7 +365,9 @@ public:
   {
 #ifdef _WIN32
     if(!_state._utf16.empty())
+    {
       return filesystem::path(std::wstring(_state._utf16.data(), _state._utf16.size()));
+    }
 #endif
     if(!_state._utf8.empty())
     {
@@ -489,6 +501,7 @@ public:
       _buffer[0] = 0;
       buffer = _buffer;
     }
+    ~c_str() = default;
     c_str(const c_str &) = delete;
     c_str(c_str &&) = delete;
     c_str &operator=(const c_str &) = delete;
@@ -538,6 +551,10 @@ inline std::ostream &operator<<(std::ostream &s, const path_view &v)
 {
   return s << v.path();
 }
+
+#ifndef NDEBUG
+static_assert(std::is_trivially_copyable<path_view>::value, "path_view is not a trivially copyable!");
+#endif
 
 AFIO_V2_NAMESPACE_END
 

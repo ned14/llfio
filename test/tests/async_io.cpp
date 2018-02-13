@@ -39,11 +39,16 @@ static inline void TestAsyncFileHandle()
   afio::async_file_handle::const_buffer_type bt{buffer, sizeof(buffer)};  // NOLINT
   for(size_t n = 0; n < 1024; n++)
   {
+  retry:
     std::promise<afio::async_file_handle::const_buffers_type> p;
     auto f(p.get_future());
-    auto g(h
+    auto schedule_io = [&]{ return h
            .async_write({bt, n * 4096}, [ p = std::move(p), n ](afio::async_file_handle *, afio::async_file_handle::io_result<afio::async_file_handle::const_buffers_type> & result) mutable {
              (void) n;
+             if(!result && result.error() == std::errc::resource_unavailable_try_again)
+             {
+               std::cout << "*** Completion handler saw error " << result.error() << std::endl;
+             }
              try
              {
                p.set_value(result.value());
@@ -54,9 +59,16 @@ static inline void TestAsyncFileHandle()
                p.set_exception(std::current_exception());
                // std::cout << "Written block " << n << " unsuccessfully" << std::endl;
              }
-           })
-           .value());
-    futures.emplace_back(std::move(f), std::move(g));
+           }); };
+    auto g(schedule_io());
+    if(!g && g.error() == std::errc::resource_unavailable_try_again)
+    {
+      // Sleep until at least i/o is processed
+      service.run().value();
+      goto retry;
+    }
+    auto i(std::move(g).value());
+    futures.emplace_back(std::move(f), std::move(i));
   }
   // Pump the i/o until no more work remains.
   while(service.run().value())

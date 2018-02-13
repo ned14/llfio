@@ -1,11 +1,13 @@
 dist: trusty
 language: cpp
 compiler:
- - g++-7
- - clang-4.0
+# - g++
+ - clang++
 sudo: false
 os:
  - linux
+ - osx
+osx_image: xcode9.2
 branches:
   only:
     - develop
@@ -21,7 +23,7 @@ addons:
     - george-edison55-precise-backports
     - llvm-toolchain-trusty-4.0
     packages:
-    - g++-7
+    - g++-6
     - clang-4.0
     - python3
     - cmake
@@ -33,20 +35,23 @@ env:
     - secure: "A3TeWTlJdjUaQ31NF60kMOik8mzaJkdKA55jZXjN83BJ2ZjMDmWfq1XmZ7iDIxmn7HC2BVpjhdkj9jpRtPztb08L5VSlJIiVbXlBWNwgzmYANujpR9rA+bhZJwlKDaYQHUZUd4+iGHCHb0dLt2HG0eHF5azaifd0YqCfz5GcWl8="
   matrix:
     - __="cmake tests" NAME=TravisLinuxWorker
+    - __="cmake tests" NAME=TravisOSXWorker
     - __="Documentation" NAME=TravisDocumentation
     - __="Programs"
  
 matrix:
   exclude:
 #  - os: osx
-#    compiler: g++-7
-  - os: linux
-    compiler: clang-4.0
+#    compiler: g++
+  - os: osx
     env: __="Documentation" NAME=TravisDocumentation
-#  - os: osx
-#    env: __="Documentation" NAME=TravisDocumentation
-#  - os: osx
-#    env: __="cmake tests" NAME=TravisLinuxWorker
+  - os: osx
+    env: __="cmake tests" NAME=TravisLinuxWorker
+  - os: linux
+    compiler: clang++
+    env: __="Documentation" NAME=TravisDocumentation
+  - os: linux
+    env: __="cmake tests" NAME=TravisOSXWorker
 
 cache:
   apt: true
@@ -64,6 +69,16 @@ before_install:
       fi;
       export PATH="$PWD/doxygen-$DOXYGEN_VERSION/bin:$PATH";
     fi
+ -
+   if [ "${TRAVIS_OS_NAME}" = "osx" ]; then
+     brew install llvm;
+     export CXX=/usr/local/opt/llvm/bin/clang++;
+     export LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib";
+     export CPPFLAGS=-I/usr/local/opt/llvm/include;
+     export CMAKE_CONFIGURE_OPTIONS=-DCMAKE_LIBRARY_PATH=/usr/local/opt/llvm/lib;
+   fi
+ - if [ "$CXX" = "g++" ]; then export CXX=g++-6; export NAME=TravisLinuxWorkerGCC; fi;
+ - if [ "$CXX" = "clang++" ]; then export CXX=clang++-4.0; export NAME=TravisLinuxWorkerClang; fi;
  - git checkout develop
  - git submodule update --init --recursive
  - mount
@@ -71,9 +86,7 @@ before_install:
 script:
  -
    if [ "$__" = "cmake tests" ]; then
-     if [ "$CXX" = "g++" ]; then export CXX=g++-7; export NAME=TravisLinuxWorkerGCC; fi;
-     if [ "$CXX" = "clang++" ]; then export CXX=clang++-4.0; export NAME=TravisLinuxWorkerClang; fi;
-     ctest -S .ci.cmake -V --timeout 300;
+     ctest -S .ci.cmake -V --timeout 300 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS ;
    fi
  -
    if [ "$__" = "Documentation" ]; then
@@ -83,7 +96,7 @@ script:
      cd doc/html;
      git checkout gh-pages;
      cd ../..;
-     CXX=g++-7 ctest -S .docs.cmake -V;
+     ctest -S .docs.cmake -V;
      cd doc/html;
      git add . || true;
      git commit -a -m "Travis CI updates documentation" || true;
@@ -92,20 +105,25 @@ script:
    fi
  -
    if [ "$__" = "Programs" ]; then
-     if [ "$CXX" = "g++" ]; then export CXX=g++-7; export NAME=TravisLinuxWorkerGCC; fi;
-     if [ "$CXX" = "clang++" ]; then export CXX=clang++-4.0; export NAME=TravisLinuxWorkerClang; fi;
      cd programs;
      mkdir build;
      cd build;
-     cmake ..;
+     cmake ..  $CMAKE_CONFIGURE_OPTIONS ;
      cmake --build .;
    fi
  
 after_success:
 # - bash -x ./update_coveralls.sh `pwd`
 #  - NEWNAME=afio-v2.0-binaries-linux64-$(date +%Y%m%d%H%M%S).tgz
-  - NEWNAME=afio-v2.0-binaries-linux64-$TRAVIS_COMMIT.tgz
-  - mv afio-v2.0-binaries-linux64.tgz $NEWNAME
-  - if [ "$CXX" = "g++-7" ]; then curl -T $NEWNAME -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD https://dedi4.nedprod.com/static/files/upload/; fi;
+  - if [ "${TRAVIS_OS_NAME}" = "linux" && "$CXX" = "g++-6" ]; then   
+      NEWNAME=afio-v2.0-binaries-linux64-$TRAVIS_COMMIT.tgz;
+      mv afio-v2.0-binaries-linux64.tgz $NEWNAME;
+      curl -T $NEWNAME -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD https://dedi4.nedprod.com/static/files/upload/; fi;
+    fi
+  - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then   
+      NEWNAME=afio-v2.0-binaries-darwin64-$TRAVIS_COMMIT.tgz;
+      mv afio-v2.0-binaries-darwin64.tgz $NEWNAME;
+      curl -T $NEWNAME -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD https://dedi4.nedprod.com/static/files/upload/; fi;
+    fi
 
 after_failure:

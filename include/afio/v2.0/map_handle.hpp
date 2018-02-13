@@ -40,7 +40,7 @@ AFIO_V2_NAMESPACE_EXPORT_BEGIN
 \brief A handle to a source of mapped memory.
 
 There are two configurations of section handle, one where the user supplies the file backing for the
-section and the other where an internal file descriptor to an unnamed inode in a tmpfs or ramfs based
+section, and the other where an internal file descriptor to an unnamed inode in a tmpfs or ramfs based
 temporary directory is kept and managed. The latter is merely a convenience for creating an anonymous
 source of memory which can be resized whilst preserving contents: see `algorithm::trivial_vector<T>`.
 
@@ -55,18 +55,18 @@ public:
   using size_type = handle::size_type;
 
   //! The behaviour of the memory section
-  QUICKCPPLIB_BITFIELD_BEGIN(flag){none = 0,          //!< No flags
-                                   read = 1 << 0,     //!< Memory views can be read
-                                   write = 1 << 1,    //!< Memory views can be written
-                                   cow = 1 << 2,      //!< Memory views can be copy on written
-                                   execute = 1 << 3,  //!< Memory views can execute code
+  QUICKCPPLIB_BITFIELD_BEGIN(flag){none = 0U,           //!< No flags
+                                   read = 1U << 0U,     //!< Memory views can be read
+                                   write = 1U << 1U,    //!< Memory views can be written
+                                   cow = 1U << 2U,      //!< Memory views can be copy on written
+                                   execute = 1U << 3U,  //!< Memory views can execute code
 
-                                   nocommit = 1 << 8,     //!< Don't allocate space for this memory in the system immediately
-                                   prefault = 1 << 9,     //!< Prefault, as if by reading every page, any views of memory upon creation.
-                                   executable = 1 << 10,  //!< The backing storage is in fact an executable program binary.
-                                   singleton = 1 << 11,   //!< A single instance of this section is to be shared by all processes using the same backing file.
+                                   nocommit = 1U << 8U,     //!< Don't allocate space for this memory in the system immediately
+                                   prefault = 1U << 9U,     //!< Prefault, as if by reading every page, any views of memory upon creation.
+                                   executable = 1U << 10U,  //!< The backing storage is in fact an executable program binary.
+                                   singleton = 1U << 11U,   //!< A single instance of this section is to be shared by all processes using the same backing file.
 
-                                   barrier_on_close = 1 << 16,  //!< Maps of this section, if writable, issue a `barrier()` when destructed blocking until data (not metadata) reaches physical storage.
+                                   barrier_on_close = 1U << 16U,  //!< Maps of this section, if writable, issue a `barrier()` when destructed blocking until data (not metadata) reaches physical storage.
 
                                    // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
 
@@ -82,7 +82,7 @@ public:
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~section_handle() override;
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
   //! Default constructor
-  constexpr section_handle() = default;
+  constexpr section_handle() {}  // NOLINT
   //! Construct a section handle using the given native handle type for the section and the given i/o handle for the backing storage
   explicit section_handle(native_handle_type sectionh, file_handle *backing, file_handle anonymous, flag __flag)
       : handle(sectionh, handle::caching::all)
@@ -97,6 +97,8 @@ public:
     o._backing = nullptr;
     o._flag = flag::none;
   }
+  //! No copy construction (use `clone()`)
+  section_handle(const section_handle &) = delete;
   //! Move assignment of section_handle permitted
   section_handle &operator=(section_handle &&o) noexcept
   {
@@ -104,6 +106,8 @@ public:
     new(this) section_handle(std::move(o));
     return *this;
   }
+  //! No copy assignment
+  section_handle &operator=(const section_handle &) = delete;
   //! Swap with another instance
   AFIO_MAKE_FREE_FUNCTION
   void swap(section_handle &o) noexcept
@@ -115,13 +119,13 @@ public:
 
   /*! \brief Create a memory section backed by a file.
   \param backing The handle to use as backing storage.
-  \param bytes The initial size of this section, which cannot be larger than any backing file. Zero means to use `backing.length()`.
+  \param maximum_size The initial size of this section, which cannot be larger than any backing file. Zero means to use `backing.length()`.
   \param _flag How to create the section.
 
   \errors Any of the values POSIX dup(), open() or NtCreateSection() can return.
   */
   AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<section_handle> section(file_handle &backing, extent_type bytes, flag _flag) noexcept;
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<section_handle> section(file_handle &backing, extent_type maximum_size, flag _flag) noexcept;
   /*! \brief Create a memory section backed by a file.
   \param backing The handle to use as backing storage.
   \param bytes The initial size of this section, which cannot be larger than any backing file. Zero means to use `backing.length()`.
@@ -229,11 +233,26 @@ template <> struct construct<section_handle>
 class mapped_file_handle;
 
 /*! \class map_handle
-\brief A handle to a memory mapped region of memory.
+\brief A handle to a memory mapped region of memory, either backed by the system page file or by a section.
 
-\note The native handle returned by this map handle is always that of the backing storage, but closing this handle
+An important concept to realise with mapped regions is that they can far exceed the size of their backing
+storage. This allows one to reserve address space for a file which may grow in the future. This is how
+`mapped_file_handle` is implemented to provide very fast memory mapped file i/o of a potentially growing
+file.
+
+The size you specify when creating the map handle is the address space reservation. The map's `length()`
+will return the last known **valid** length of the mapped data i.e. the backing storage's length at the
+time of construction. This length is used by `read()` and `write()` to prevent reading and writing off
+the end of the mapped region. You can update this length to the backing storage's length using `update_map()`
+up to the reservation limit.
+
+You can attempt to modify the address space reservation after creation using `truncate()`. If successful,
+this will be more efficient than tearing down the map and creating a new larger map.
+
+The native handle returned by this map handle is always that of the backing storage, but closing this handle
 does not close that of the backing storage, nor does releasing this handle release that of the backing storage.
-Locking byte ranges of this handle is therefore equal to locking byte ranges in the original backing storage.
+Locking byte ranges of this handle is therefore equal to locking byte ranges in the original backing storage,
+which can be very useful.
 
 \sa `mapped_file_handle`, `algorithm::mapped_view`
 */
@@ -259,7 +278,7 @@ protected:
   section_handle *_section{nullptr};
   char *_addr{nullptr};
   extent_type _offset{0};
-  size_type _length{0};
+  size_type _reservation{0}, _length{0};
   section_handle::flag _flag{section_handle::flag::none};
 
   explicit map_handle(section_handle *section)
@@ -270,19 +289,20 @@ protected:
 
 public:
   //! Default constructor
-  constexpr map_handle()
-  {
-  }
+  constexpr map_handle() {}  // NOLINT
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~map_handle() override;
   //! Implicit move construction of map_handle permitted
-  constexpr map_handle(map_handle &&o) noexcept : io_handle(std::move(o)), _section(o._section), _addr(o._addr), _offset(o._offset), _length(o._length), _flag(o._flag)
+  constexpr map_handle(map_handle &&o) noexcept : io_handle(std::move(o)), _section(o._section), _addr(o._addr), _offset(o._offset), _reservation(o._reservation), _length(o._length), _flag(o._flag)
   {
     o._section = nullptr;
     o._addr = nullptr;
     o._offset = 0;
+    o._reservation = 0;
     o._length = 0;
     o._flag = section_handle::flag::none;
   }
+  //! No copy construction (use `clone()`)
+  map_handle(const map_handle &) = delete;
   //! Move assignment of map_handle permitted
   map_handle &operator=(map_handle &&o) noexcept
   {
@@ -290,6 +310,8 @@ public:
     new(this) map_handle(std::move(o));
     return *this;
   }
+  //! No copy assignment
+  map_handle &operator=(const map_handle &) = delete;
   //! Swap with another instance
   AFIO_MAKE_FREE_FUNCTION
   void swap(map_handle &o) noexcept
@@ -309,8 +331,8 @@ public:
 
 
   /*! Create new memory and map it into view.
-  \param bytes How many bytes to create and map. Typically will be rounded to a multiple of the page size (see utils::page_sizes()).
-  \param _flag The permissions with which to map the view which are constrained by the permissions of the memory section. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
+  \param bytes How many bytes to create and map. Typically will be rounded up to a multiple of the page size (see `utils::page_sizes()`) on POSIX, 64Kb on Windows.
+  \param _flag The permissions with which to map the view. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
 
   \note On Microsoft Windows this constructor uses the faster VirtualAlloc() which creates less versatile page backed memory. If you want anonymous memory
   allocated from a paging file backed section instead, create a page file backed section and then a mapped view from that using
@@ -322,9 +344,9 @@ public:
   AFIO_MAKE_FREE_FUNCTION
   static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(size_type bytes, section_handle::flag _flag = section_handle::flag::readwrite) noexcept;
 
-  /*! Create a memory mapped view of a backing storage.
+  /*! Create a memory mapped view of a backing storage, optionally reserving additional address space for later growth.
   \param section A memory section handle specifying the backing storage to use.
-  \param bytes How many bytes to map (0 = the size of the memory section).
+  \param bytes How many bytes to reserve (0 = the size of the section). Rounded up to nearest 64Kb on Windows.
   \param offset The offset into the backing storage to map from. Typically needs to be at least a multiple of the page size (see utils::page_sizes()), on Windows it needs to be a multiple of the kernel memory allocation granularity (typically 64Kb).
   \param _flag The permissions with which to map the view which are constrained by the permissions of the memory section. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
 
@@ -344,12 +366,60 @@ public:
   //! The offset of the memory map.
   extent_type offset() const noexcept { return _offset; }
 
-  //! The size of the memory map.
+  //! The reservation size of the memory map.
+  size_type capacity() const noexcept { return _reservation; }
+
+  //! The size of the memory map. This is the accessible size, NOT the reservation size.
   AFIO_MAKE_FREE_FUNCTION
   size_type length() const noexcept { return _length; }
 
+  //! Update the size of the memory map to that of any backing section, up to the reservation limit.
+  result<size_type> update_map() noexcept
+  {
+    if(_section == nullptr)
+    {
+      return _reservation;
+    }
+    OUTCOME_TRY(length, _section->length());  // length of the backing file
+    length -= _offset;
+    if(length > _reservation)
+    {
+      length = _reservation;
+    }
+    _length = static_cast<size_type>(length);
+    return _length;
+  }
+
+  /*! Resize the reservation of the memory map without changing the address (unless the map
+  was zero sized, in which case a new address will be chosen).
+
+  If shrinking, address space is released on POSIX, and on Windows if the new size is zero.
+  If the new size is zero, the address is set to null to prevent surprises.
+  Windows does not support modifying existing mapped regions, so if the new size is not
+  zero, the call will probably fail. Windows should let you truncate a previous extension
+  however, if it is exact.
+
+  If expanding, an attempt is made to map in new reservation immediately after the current address
+  reservation, thus extending the reservation. If anything else is mapped in after
+  the current reservation, the function fails.
+
+  \note On all supported platforms apart from OS X, proprietary flags exist to avoid
+  performing a map if a map extension cannot be immediately placed after the current map. On OS X,
+  we hint where we'd like the new map to go, but if something is already there OS X will
+  place the map elsewhere. In this situation, we delete the new map and return failure,
+  which is inefficient, but there is nothing else we can do.
+
+  \return The bytes actually reserved.
+  \param newsize The bytes to truncate the map reservation to. Rounded up to the nearest page size (POSIX) or 64Kb on Windows.
+  \param permit_relocation Permit the address to change (some OSs provide a syscall for resizing
+  a memory map).
+  \errors Any of the values POSIX `mremap()`, `mmap(addr)` or `VirtualAlloc(addr)` can return.
+  */
+  AFIO_MAKE_FREE_FUNCTION
+  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_type> truncate(size_type newsize, bool permit_relocation = false) noexcept;
+
   //! Ask the system to commit the system resources to make the memory represented by the buffer available with the given permissions. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually committed.
-  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> commit(buffer_type region, section_handle::flag _flag = section_handle::flag::readwrite) noexcept;
+  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> commit(buffer_type region, section_handle::flag flag = section_handle::flag::readwrite) noexcept;
 
   //! Ask the system to make the memory represented by the buffer unavailable and to decommit the system resources representing them. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually decommitted.
   AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> decommit(buffer_type region) noexcept;

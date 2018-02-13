@@ -92,9 +92,7 @@ public:
   {
     T buffers{};
     extent_type offset{0};
-    constexpr io_request()
-    {
-    }
+    constexpr io_request() {}  // NOLINT (defaulting this breaks clang and GCC, so don't do it!)
     constexpr io_request(T _buffers, extent_type _offset)
         : buffers(std::move(_buffers))
         , offset(_offset)
@@ -132,10 +130,11 @@ public:
     using Base::Base;
     io_result() = default;
 #endif
+    ~io_result() = default;
     io_result(const io_result &) = default;
-    io_result(io_result &&) = default;
+    io_result(io_result &&) = default;  // NOLINT
     io_result &operator=(const io_result &) = default;
-    io_result &operator=(io_result &&) = default;
+    io_result &operator=(io_result &&) = default;  // NOLINT
     //! Returns bytes transferred
     size_type bytes_transferred() noexcept
     {
@@ -166,7 +165,8 @@ public:
 
 public:
   //! Default constructor
-  constexpr io_handle() = default;
+  constexpr io_handle() {}  // NOLINT
+  ~io_handle() = default;
   //! Construct a handle from a supplied native handle
   constexpr explicit io_handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none)
       : handle(h, caching, flags)
@@ -176,8 +176,12 @@ public:
   explicit constexpr io_handle(handle &&o) noexcept : handle(std::move(o)) {}
   //! Move construction permitted
   io_handle(io_handle &&) = default;
+  //! No copy construction (use `clone()`)
+  io_handle(const io_handle &) = delete;
   //! Move assignment permitted
   io_handle &operator=(io_handle &&) = default;
+  //! No copy assignment
+  io_handle &operator=(const io_handle &) = delete;
 
   /*! \brief The *maximum* number of buffers which a single read or write syscall can process at a time
   for this specific open handle. On POSIX, this is known as `IOV_MAX`.
@@ -190,7 +194,7 @@ public:
   but other OSs do not. Some OSs guarantee that each i/o syscall has effects atomically visible or not
   to other i/o, other OSs do not.
 
-  Microsoft Windows does not implement scatter-gather file i/o syscalls except for unbuffered i/o.
+  Microsoft Windows and OS X does not implement scatter-gather file i/o syscalls.
   Thus this function will always return `1` in that situation.
   */
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t max_buffers() const noexcept;
@@ -306,14 +310,13 @@ public:
         , _exclusive(exclusive)
     {
     }
+
+  public:
     extent_guard(const extent_guard &) = delete;
     extent_guard &operator=(const extent_guard &) = delete;
 
-  public:
     //! Default constructor
-    constexpr extent_guard()
-    {
-    }
+    constexpr extent_guard() {}  // NOLINT
     //! Move constructor
     extent_guard(extent_guard &&o) noexcept : _h(o._h), _offset(o._offset), _length(o._length), _exclusive(o._exclusive) { o.release(); }
     //! Move assign

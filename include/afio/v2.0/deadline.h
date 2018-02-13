@@ -56,22 +56,28 @@ struct AFIO_DEADLINE_NAME
     unsigned long long nsecs;  // NOLINT
   };
 #ifdef __cplusplus
-  deadline() noexcept { memset(this, 0, sizeof(*this)); }
+  constexpr deadline()  // NOLINT
+  : steady(false),
+    utc{0, 0}
+  {
+  }
   //! True if deadline is valid
-  explicit operator bool() const noexcept { return steady || utc.tv_sec != 0; }
-  //! Construct a deadline from a system clock time point
-  explicit deadline(std::chrono::system_clock::time_point tp)
-      : steady(false)
+  constexpr explicit operator bool() const noexcept { return steady || utc.tv_sec != 0; }
+  //! Implicitly construct a deadline from a system clock time point
+  deadline(std::chrono::system_clock::time_point tp)  // NOLINT
+  : steady(false),
+    utc{0, 0}
   {
     std::chrono::seconds secs(std::chrono::system_clock::to_time_t(tp));
     utc.tv_sec = secs.count();
     std::chrono::system_clock::time_point _tp(std::chrono::system_clock::from_time_t(utc.tv_sec));
     utc.tv_nsec = static_cast<long>(std::chrono::duration_cast<std::chrono::nanoseconds>(tp - _tp).count());
   }
-  //! Construct a deadline from a duration from now
+  //! Implicitly construct a deadline from a duration from now
   template <class Rep, class Period>
-  explicit deadline(std::chrono::duration<Rep, Period> d)
-      : steady(true)
+  constexpr deadline(std::chrono::duration<Rep, Period> d)  // NOLINT
+  : steady(true),
+    nsecs(0)
   {
     std::chrono::nanoseconds _nsecs = std::chrono::duration_cast<std::chrono::nanoseconds>(d);
     // Negative durations are zero duration
@@ -89,7 +95,7 @@ struct AFIO_DEADLINE_NAME
   {
     if(steady)
     {
-      throw std::invalid_argument("Not a UTC deadline!");
+      throw std::invalid_argument("Not a UTC deadline!");  // NOLINT
     }
     std::chrono::system_clock::time_point tp(std::chrono::system_clock::from_time_t(utc.tv_sec));
     tp += std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::nanoseconds(utc.tv_nsec));

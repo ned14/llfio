@@ -49,7 +49,7 @@ result<handle::path_type> handle::current_path() const noexcept
     // Most efficient, least memory copying method is direct fill of a wstring which is moved into filesystem::path
     filesystem::path::string_type buffer;
     buffer.resize(32769);
-    wchar_t *_buffer = const_cast<wchar_t *>(buffer.data());
+    auto *_buffer = const_cast<wchar_t *>(buffer.data());
     memcpy(_buffer, L"\\!!", 6);
     DWORD len = GetFinalPathNameByHandle(_v.h, _buffer + 3, (DWORD)(buffer.size() - 4 * sizeof(wchar_t)), VOLUME_NAME_NT);  // NOLINT
     if(len == 0)
@@ -57,7 +57,7 @@ result<handle::path_type> handle::current_path() const noexcept
       return {GetLastError(), std::system_category()};
     }
     buffer.resize(3 + len);
-    return path_type(std::move(buffer));
+    return path_type(buffer);
   }
   catch(...)
   {
@@ -72,11 +72,15 @@ result<void> handle::close() noexcept
   {
     if(are_safety_fsyncs_issued() && is_writable())
     {
-      if(!FlushFileBuffers(_v.h))
+      if(FlushFileBuffers(_v.h) == 0)
+      {
         return {GetLastError(), std::system_category()};
+      }
     }
-    if(!CloseHandle(_v.h))
+    if(CloseHandle(_v.h) == 0)
+    {
       return {GetLastError(), std::system_category()};
+    }
     _v = native_handle_type();
   }
   return success();
@@ -87,8 +91,10 @@ result<handle> handle::clone() const noexcept
   AFIO_LOG_FUNCTION_CALL(this);
   result<handle> ret(handle(native_handle_type(), _caching, _flags));
   ret.value()._v.behaviour = _v.behaviour;
-  if(!DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, false, DUPLICATE_SAME_ACCESS))
+  if(DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, 0, DUPLICATE_SAME_ACCESS) == 0)
+  {
     return {GetLastError(), std::system_category()};
+  }
   return ret;
 }
 

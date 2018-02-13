@@ -39,6 +39,9 @@ size_t io_handle::max_buffers() const noexcept
   static size_t v;
   if(v == 0u)
   {
+#ifdef __APPLE__
+    v = 1;
+#else
     long r = sysconf(_SC_IOV_MAX);
     if(r == -1)
     {
@@ -49,6 +52,7 @@ size_t io_handle::max_buffers() const noexcept
 #endif
     }
     v = r;
+#endif
   }
   return v;
 }
@@ -81,15 +85,25 @@ io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_requ
     assert((reqs.offset & 511) == 0);
     for(size_t n = 0; n < reqs.buffers.size(); n++)
     {
-      assert(((uintptr_t) iov[n].iov_base & 511) == 0);
+      assert((reinterpret_cast<uintptr_t>(iov[n].iov_base) & 511) == 0);
       assert((iov[n].iov_len & 511) == 0);
     }
   }
 #endif
-  ssize_t bytesread = ::preadv(_v.fd, iov, reqs.buffers.size(), reqs.offset);
+  ssize_t bytesread = 0;
+#if AFIO_MISSING_PIOV
+  off_t offset = reqs.offset;
+  for(size_t n = 0; n < reqs.buffers.size(); n++)
+  {
+    bytesread += ::pread(_v.fd, iov[n].iov_base, iov[n].iov_len, offset);
+    offset += iov[n].iov_len;
+  }
+#else
+  bytesread = ::preadv(_v.fd, iov, reqs.buffers.size(), reqs.offset);
+#endif
   if(bytesread < 0)
   {
-    return { errno, std::system_category() };
+    return {errno, std::system_category()};
   }
   for(auto &buffer : reqs.buffers)
   {
@@ -107,7 +121,7 @@ io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_requ
       buffer.len = 0;
     }
   }
-  return io_handle::io_result<io_handle::buffers_type>(reqs.buffers);
+  return {reqs.buffers};
 }
 
 io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::io_request<io_handle::const_buffers_type> reqs, deadline d) noexcept
@@ -138,15 +152,25 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::
     assert((reqs.offset & 511) == 0);
     for(size_t n = 0; n < reqs.buffers.size(); n++)
     {
-      assert(((uintptr_t) iov[n].iov_base & 511) == 0);
+      assert((reinterpret_cast<uintptr_t>(iov[n].iov_base) & 511) == 0);
       assert((iov[n].iov_len & 511) == 0);
     }
   }
 #endif
-  ssize_t byteswritten = ::pwritev(_v.fd, iov, reqs.buffers.size(), reqs.offset);
+  ssize_t byteswritten = 0;
+#if AFIO_MISSING_PIOV
+  off_t offset = reqs.offset;
+  for(size_t n = 0; n < reqs.buffers.size(); n++)
+  {
+    byteswritten += ::pwrite(_v.fd, iov[n].iov_base, iov[n].iov_len, offset);
+    offset += iov[n].iov_len;
+  }
+#else
+  byteswritten = ::pwritev(_v.fd, iov, reqs.buffers.size(), reqs.offset);
+#endif
   if(byteswritten < 0)
   {
-    return { errno, std::system_category() };
+    return {errno, std::system_category()};
   }
   for(auto &buffer : reqs.buffers)
   {
@@ -164,7 +188,7 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::
       buffer.len = 0;
     }
   }
-  return io_handle::io_result<io_handle::const_buffers_type>(reqs.buffers);
+  return {reqs.buffers};
 }
 
 result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, io_handle::extent_type bytes, bool exclusive, deadline d) noexcept
@@ -233,10 +257,9 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
     {
       return std::errc::timed_out;
     }
-    else
-    {
-      return {errno, std::system_category()};
-    }
+
+
+    return {errno, std::system_category()};
   }
   return extent_guard(this, offset, bytes, exclusive);
 }

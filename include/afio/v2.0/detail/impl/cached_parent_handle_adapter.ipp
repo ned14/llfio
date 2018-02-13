@@ -121,8 +121,8 @@ namespace algorithm
         cached_path_handle_ptr ret = it->second.lock();
         if(ret)
         {
-          return { ret, leaf.path() }
-        };
+          return {ret, leaf.path()};
+        }
       }
       cached_path_handle_ptr ret = std::make_shared<cached_path_handle>(directory_handle::directory(base, path).value());
       auto _currentpath = ret->h.current_path();

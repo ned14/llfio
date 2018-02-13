@@ -42,11 +42,12 @@ namespace path_discovery
     //! Source of the discovered path.
     enum class source_type
     {
+      unknown,      //!< This path comes from an unknown source.
       local,        //!< This path was added locally.
       environment,  //!< This path came from an environment variable (an override?).
       system,       //!< This path came from querying the system.
       hardcoded     //!< This path came from an internal hardcoded list of paths likely for this system.
-    } source;
+    } source{source_type::unknown};
 
     /*! If this path was successfully probed for criteria verification, this was its stat after any symlink
     derefencing at that time. Secure applications ought to verify that any handles opened to the path have

@@ -198,7 +198,7 @@ namespace algorithm
 
     public:
       //! Default constructor
-      constexpr trivial_vector_impl() = default;
+      constexpr trivial_vector_impl() {}  // NOLINT
       //! Filling constructor of `value_type`
       trivial_vector_impl(size_type count, const value_type &v) { insert(begin(), count, v); }
       //! Range constructor
@@ -244,7 +244,7 @@ namespace algorithm
       {
         if(i >= size())
         {
-          throw std::out_of_range("bounds exceeded");
+          throw std::out_of_range("bounds exceeded");  // NOLINT
         }
         return _begin[i];
       }
@@ -253,7 +253,7 @@ namespace algorithm
       {
         if(i >= size())
         {
-          throw std::out_of_range("bounds exceeded");
+          throw std::out_of_range("bounds exceeded");  // NOLINT
         }
         return _begin[i];
       }
@@ -310,7 +310,7 @@ namespace algorithm
       {
         if(n > max_size())
         {
-          throw std::length_error("Max size exceeded");
+          throw std::length_error("Max size exceeded");  // NOLINT
         }
         size_type current_size = size();
         size_type bytes = n * sizeof(value_type);
@@ -318,17 +318,25 @@ namespace algorithm
         if(!_sh.is_valid())
         {
           _sh = section_handle::section(bytes).value();
+          _mh = map_handle::map(_sh, bytes).value();
         }
         else if(n > capacity())
         {
-          _mh.close().value();
+          // We can always grow a section even with maps open on it
           _sh.truncate(bytes).value();
+          // Attempt to resize the map in place
+          if(!_mh.truncate(bytes, true))
+          {
+            // std::cerr << "truncate fail" << std::endl;
+            // If can't resize, close the map and reopen it into a new address
+            _mh.close().value();
+            _mh = map_handle::map(_sh, bytes).value();
+          }
         }
         else
         {
           return;
         }
-        _mh = map_handle::map(_sh, bytes).value();
         _begin = reinterpret_cast<pointer>(_mh.address());
         _capacity = reinterpret_cast<pointer>(_mh.address() + bytes);
         _end = _begin + current_size;
@@ -381,19 +389,11 @@ namespace algorithm
           }
           reserve(cap);
         }
-        memmove(pos._v + count, pos._v, _end - pos._v);
-        size_type n = 0;
-        try
+        // Trivially copyable, so memmove and we know copy construction can't fail
+        memmove(pos._v + count, pos._v, (_end - pos._v) * sizeof(value_type));
+        for(size_type n = 0; n < count; n++)
         {
-          for(; n < count; n++)
-          {
-            new(pos._v + n) value_type(v);
-          }
-        }
-        catch(...)
-        {
-          memmove(pos._v, pos._v + count, _end - pos._v);
-          throw;
+          new(pos._v + n) value_type(v);
         }
         _end += count;
         return iterator(pos._v);
@@ -410,19 +410,11 @@ namespace algorithm
           }
           reserve(cap);
         }
-        memmove(pos._v + count, pos._v, _end - pos._v);
-        size_type n = 0;
-        try
+        // Trivially copyable, so memmove and we know copy construction can't fail
+        memmove(pos._v + count, pos._v, (_end - pos._v) * sizeof(value_type));
+        for(size_type n = 0; n < count; n++)
         {
-          for(; n < count; n++)
-          {
-            new(pos._v + n) value_type(*first++);
-          }
-        }
-        catch(...)
-        {
-          memmove(pos._v, pos._v + count, _end - pos._v);
-          throw;
+          new(pos._v + n) value_type(*first++);
         }
         _end += count;
         return iterator(pos._v);
@@ -436,14 +428,16 @@ namespace algorithm
         {
           reserve(_scale_capacity(capacity()));
         }
-        memmove(pos._v + 1, pos._v, _end - pos._v);
+        // Trivially copyable, so memmove
+        memmove(pos._v + 1, pos._v, (_end - pos._v) * sizeof(value_type));
+        // BUT complex constructors may throw!
         try
         {
           new(pos._v) value_type(std::forward<Args>(args)...);
         }
         catch(...)
         {
-          memmove(pos._v, pos._v + 1, _end - pos._v);
+          memmove(pos._v, pos._v + 1, (_end - pos._v) * sizeof(value_type));
           throw;
         }
         ++_end;
@@ -451,17 +445,36 @@ namespace algorithm
       }
 
       //! Erases item
-      iterator erase(const_iterator pos);
+      iterator erase(const_iterator pos)
+      {
+        // Trivially copyable
+        memmove(pos._v, pos._v + 1, ((_end - 1) - pos._v) * sizeof(value_type));
+        --_end;
+        return iterator(pos._v);
+      }
       //! Erases items
-      iterator erase(const_iterator first, const_iterator last);
+      iterator erase(const_iterator first, const_iterator last)
+      {
+        // Trivially copyable
+        memmove(first._v, last._v, (_end - last._v) * sizeof(value_type));
+        _end -= last._v - first._v;
+        return iterator(first._v);
+      }
       //! Appends item
-      void push_back(const value_type &v) { emplace_back(v); }
+      void push_back(const value_type &v)
+      {
+        if(_end == _capacity)
+        {
+          reserve(_scale_capacity(capacity()));
+        }
+        new(_end++) value_type(v);
+      }
       //! Appends item
-      void push_back(value_type &&v) { emplace_back(std::move(v)); }
+      void push_back(value_type &&v) { push_back(v); }
       //! Appends item
       template <class... Args> reference emplace_back(Args &&... args)
       {
-        if(size() == capacity())
+        if(_end == _capacity)
         {
           reserve(_scale_capacity(capacity()));
         }
@@ -492,9 +505,28 @@ namespace algorithm
           reserve(count);
         }
         // TODO(ned): Kinda assuming the compiler will do the right thing below, should really check that
+        while(count - size() >= 16)
+        {
+          new(_end++) value_type(v);
+          new(_end++) value_type(v);
+          new(_end++) value_type(v);
+          new(_end++) value_type(v);
+          new(_end++) value_type(v);
+          new(_end++) value_type(v);
+          new(_end++) value_type(v);
+          new(_end++) value_type(v);
+          new(_end++) value_type(v);
+          new(_end++) value_type(v);
+          new(_end++) value_type(v);
+          new(_end++) value_type(v);
+          new(_end++) value_type(v);
+          new(_end++) value_type(v);
+          new(_end++) value_type(v);
+          new(_end++) value_type(v);
+        }
         while(count > size())
         {
-          emplace_back(v);
+          new(_end++) value_type(v);
         }
       }
       //! Swaps
@@ -535,7 +567,7 @@ namespace algorithm
       using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
     public:
-      constexpr trivial_vector_impl() = default;
+      constexpr trivial_vector_impl() {}  // NOLINT
       using trivial_vector_impl<false, T>::trivial_vector_impl;
       //! Filling constructor of default constructed `value_type`
       explicit trivial_vector_impl(size_type count)
@@ -553,9 +585,10 @@ namespace algorithm
 trivially copyable.
 
 As a hand waving estimate for whether this vector implementation may be useful to you,
-it roughly breaks even with `std::vector` on recent Intel CPUs at around the L2 cache
-level. So if your vector fits into the L2 cache, this implementation will be no
-better, and likely slower.
+it usually roughly breaks even with `std::vector` on recent Intel CPUs at around the L2 cache
+boundary. So if your vector fits into the L2 cache, this implementation will be no
+better, but no worse. If your vector fits into the L1 cache, this implementation will be
+worse, often considerably so.
 
 Note that no STL allocator support is provided as `T` must be trivially copyable
 (for which most STL's simply use `memcpy()` anyway instead of the allocator's
@@ -565,13 +598,86 @@ to implement the constant time capacity resizing.
 We also disable the copy constructor, as copying an entire backing file is expensive.
 Use the iterator based copy constructor if you really want to copy one of these.
 
-The very first item stored reserves a capacity of `utils::page_size()/sizeof(T)`.
+The very first item stored reserves a capacity of `utils::page_size()/sizeof(T)`
+on POSIX and `65536/sizeof(T)` on Windows.
 Capacity is doubled in byte terms thereafter (i.e. 8Kb, 16Kb and so on).
-Also be aware that the capacity of the vector needs to become reasonably large
+As mentioned earlier, the capacity of the vector needs to become reasonably large
 before going to the kernel to resize the `section_handle` and remapping memory
 becomes faster than `memcpy`. For these reasons, this vector implementation is
 best suited to arrays of unknown in advance, but likely large, sizes.
-*/
+
+Benchmarking notes for Skylake 3.1Ghz Intel Core i5 with 2133Mhz DDR3 RAM, L2 256Kb,
+L3 4Mb:
+- OS X with clang 5.0 and libc++
+  - push_back():
+    32768,40,59
+    65536,36,76
+    131072,78,159
+    262144,166,198
+    524288,284,299
+    1048576,558,572
+    2097152,1074,1175
+    4194304,2201,2394
+    8388608,4520,5503
+    16777216,9339,9327
+    33554432,24853,17754
+    67108864,55876,40973
+    134217728,122577,86331
+    268435456,269004,178751
+    536870912,586466,330716
+  - resize():
+    8192,9,18
+    16384,14,20
+    32768,27,32
+    65536,66,43
+    131072,107,59
+    262144,222,131
+    524288,445,322
+    1048576,885,500
+    2097152,1785,1007
+    4194304,3623,2133
+    8388608,7334,4082
+    16777216,17096,8713
+    33554432,36890,18421
+    67108864,73593,40702
+- Windows 10 with VS2017.5:
+  - push_back():
+    8192,17,70
+    16384,22,108
+    32768,36,117
+    65536,51,152
+    131072,174,209
+    262144,336,309
+    524288,661,471
+    1048576,1027,787
+    2097152,2513,1361
+    4194304,5948,2595
+    8388608,9919,4820
+    16777216,23789,9716
+    33554432,52997,19558
+    67108864,86468,39240
+    134217728,193013,76298
+    268435456,450059,149644
+    536870912,983442,318078
+  - resize():
+    8192,9,48
+    16384,17,44
+    32768,35,48
+    65536,62,72
+    131072,134,114
+    262144,132,168
+    524288,505,330
+    1048576,988,582
+    2097152,1501,1152
+    4194304,2972,2231
+    8388608,6122,4436
+    16777216,12483,8906
+    33554432,25203,17847
+    67108864,52005,53646
+    134217728,102942,86502
+    268435456,246367,177999
+    536870912,405524,294685
+  */
 #ifndef DOXYGEN_IS_IN_THE_HOUSE
   template <class T> AFIO_REQUIRES(std::is_trivially_copyable<T>::value) class trivial_vector : public detail::trivial_vector_impl<std::is_default_constructible<T>::value, T>
 #else
@@ -581,7 +687,7 @@ best suited to arrays of unknown in advance, but likely large, sizes.
     static_assert(std::is_trivially_copyable<T>::value, "trivial_vector: Type T is not trivially copyable!");
 
   public:
-    constexpr trivial_vector() = default;
+    constexpr trivial_vector() {}  // NOLINT
     using detail::trivial_vector_impl<std::is_default_constructible<T>::value, T>::trivial_vector_impl;
   };
 

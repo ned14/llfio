@@ -85,32 +85,35 @@ namespace path_discovery
         # Comments and blank lines also possible
 
         */
-        const char *linestart = passwd.data(), *lineend, *end = passwd.data() + passwd.size();
+        string_view passwdfile(passwd.data(), passwd.size());
+        size_t linestart = 0;
         do
         {
-          lineend = static_cast<const char *>(memchr(linestart, 10, end - linestart));
-          if(lineend == nullptr)
+          string_view line(passwdfile.substr(linestart));
+          if(auto lineend = line.find(10))
           {
-            lineend = end;
+            line = line.substr(0, lineend);
           }
+          linestart += line.size() + 1;
           // uid is two colons in
-          const auto *colon = static_cast<const char *>(memchr(linestart, ':', lineend - linestart));
-          if(colon != nullptr)
+          size_t colon = line.find(':');
+          if(colon != string_view::npos)
           {
-            colon = static_cast<const char *>(memchr(colon + 1, ':', lineend - colon - 1));
-            if(colon != nullptr)
+            colon = line.find(':', colon + 1);
+            if(colon != string_view::npos)
             {
-              long uid = strtol(colon + 1, nullptr, 10);
+              long uid = strtol(line.data() + 1, nullptr, 10);
               if(uid == geteuid())
               {
                 // home directory is two colons from end
-                const auto *homeend = static_cast<const char *>(memrchr(colon + 1, ':', lineend - colon - 1));
-                if(homeend != nullptr)
+                size_t homeend = line.rfind(':');
+                if(homeend != string_view::npos)
                 {
-                  colon = static_cast<const char *>(memrchr(colon + 1, ':', homeend - colon - 1));
-                  if(colon != nullptr)
+                  colon = line.rfind(':', homeend - 1);
+                  if(colon != string_view::npos)
                   {
-                    buffer.assign(colon + 1, homeend - colon - 1);
+                    auto homedir = line.substr(colon + 1, homeend - colon - 1);
+                    buffer.assign(homedir.data(), homedir.size());
                     buffer.append("/.cache");
                     ret.emplace_back(discovered_path::source_type::system, buffer);
                     if(-1 == ::access(buffer.c_str(), F_OK))
@@ -123,7 +126,7 @@ namespace path_discovery
               }
             }
           }
-        } while(linestart = lineend + 1, linestart < end);
+        } while(linestart < passwd.size());
       }
     }
 

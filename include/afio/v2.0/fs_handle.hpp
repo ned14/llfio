@@ -65,19 +65,14 @@ protected:
 
 protected:
   //! Default constructor
-  constexpr fs_handle()
-  {
-  }
+  constexpr fs_handle() {}  // NOLINT
+  ~fs_handle() = default;
   //! Construct a handle
   constexpr fs_handle(dev_t devid, ino_t inode)
       : _devid(devid)
       , _inode(inode)
   {
   }
-  //! No copy construction (use clone())
-  fs_handle(const fs_handle &) = delete;
-  //! No copy assignment
-  fs_handle &operator=(const fs_handle &o) = delete;
   //! Implicit move construction of fs_handle permitted
   constexpr fs_handle(fs_handle &&o) noexcept : _devid(o._devid), _inode(o._inode)
   {
@@ -95,6 +90,11 @@ protected:
   }
 
 public:
+  //! No copy construction (use `clone()`)
+  fs_handle(const fs_handle &) = delete;
+  //! No copy assignment
+  fs_handle &operator=(const fs_handle &o) = delete;
+
   //! Unless `flag::disable_safety_unlinks` is set, the device id of the file when opened
   dev_t st_dev() const noexcept { return _devid; }
   //! Unless `flag::disable_safety_unlinks` is set, the inode of the file when opened. When combined with st_dev(), forms a unique identifer on this system

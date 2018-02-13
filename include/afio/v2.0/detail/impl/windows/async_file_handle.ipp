@@ -30,7 +30,7 @@ AFIO_V2_NAMESPACE_BEGIN
 async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_handle::barrier(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
 {
   // Pass through the file_handle's implementation, it understands overlapped handles
-  return file_handle::barrier(std::move(reqs), wait_for_device, and_metadata, std::move(d));
+  return file_handle::barrier(reqs, wait_for_device, and_metadata, d);
 }
 
 template <class BuffersType, class IORoutine> result<async_file_handle::io_state_ptr> async_file_handle::_begin_io(span<char> mem, async_file_handle::operation_t operation, async_file_handle::io_request<BuffersType> reqs, async_file_handle::_erased_completion_handler &&completion, IORoutine &&ioroutine) noexcept
@@ -40,21 +40,27 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
   {
     OVERLAPPED ols[1];
     _erased_completion_handler *completion;
-    state_type(async_file_handle *_parent, operation_t _operation, bool must_deallocate_self, size_t _items)
-        : _erased_io_state_type(_parent, _operation, must_deallocate_self, _items)
-        , completion(nullptr)
+    state_type(async_file_handle *_parent, operation_t _operation, bool must_deallocate_self, size_t _items)  // NOLINT
+    : _erased_io_state_type(_parent, _operation, must_deallocate_self, _items),
+      completion(nullptr)
     {
     }
+    state_type(state_type &&) = delete;
+    state_type(const state_type &) = delete;
+    state_type &operator=(state_type &&) = delete;
+    state_type &operator=(const state_type &) = delete;
     AFIO_HEADERS_ONLY_VIRTUAL_SPEC _erased_completion_handler *erased_completion_handler() noexcept override final { return completion; }
     AFIO_HEADERS_ONLY_VIRTUAL_SPEC void _system_io_completion(long errcode, long bytes_transferred, void *internal_state) noexcept override final
     {
-      LPOVERLAPPED ol = (LPOVERLAPPED) internal_state;
+      auto ol = static_cast<LPOVERLAPPED>(internal_state);
       ol->hEvent = nullptr;
       auto &result = this->result.write;
       if(result)
       {
         if(errcode)
+        {
           result = error_info{errcode, std::system_category()};
+        }
         else
         {
           // Figure out which i/o I am and update the buffer in question
@@ -70,7 +76,9 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
       this->parent->service()->_work_done();
       // Are we done?
       if(!--this->items_to_go)
+      {
         (*completion)(this);
+      }
     }
     AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~state_type() override final
     {
@@ -81,7 +89,9 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
         {
           // If this is non-zero, probably this i/o still in flight
           if(ols[n].hEvent)
+          {
             CancelIoEx(this->parent->native_handle().h, ols + n);
+          }
         }
         // Pump the i/o service until all pending i/o is completed
         while(this->items_to_go)
@@ -114,20 +124,24 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
   size_t items(reqs.buffers.size());
   // On Windows i/o must be scheduled on the same thread pumping completion
   if(GetCurrentThreadId() != service()->_threadid)
+  {
     return std::errc::operation_not_supported;
+  }
 
   bool must_deallocate_self = false;
   if(mem.empty())
   {
-    void *_mem = ::calloc(1, statelen);
+    void *_mem = ::calloc(1, statelen);  // NOLINT
     if(!_mem)
+    {
       return std::errc::not_enough_memory;
-    mem = {(char *) _mem, statelen};
+    }
+    mem = {static_cast<char *>(_mem), statelen};
     must_deallocate_self = true;
   }
-  io_state_ptr _state((state_type *) mem.data());
-  new((state = (state_type *) mem.data())) state_type(this, operation, must_deallocate_self, items);
-  state->completion = (_erased_completion_handler *) ((uintptr_t) state + sizeof(state_type) + (reqs.buffers.size() - 1) * sizeof(OVERLAPPED));
+  io_state_ptr _state(reinterpret_cast<state_type *>(mem.data()));
+  new((state = reinterpret_cast<state_type *>(mem.data()))) state_type(this, operation, must_deallocate_self, items);
+  state->completion = reinterpret_cast<_erased_completion_handler *>(reinterpret_cast<uintptr_t>(state) + sizeof(state_type) + (reqs.buffers.size() - 1) * sizeof(OVERLAPPED));
   completion.move(state->completion);
 
   // To be called once each buffer is read
@@ -135,7 +149,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
   {
     static VOID CALLBACK Do(DWORD errcode, DWORD bytes_transferred, LPOVERLAPPED ol)
     {
-      state_type *state = (state_type *) ol->hEvent;
+      auto *state = reinterpret_cast<state_type *>(ol->hEvent);
       state->_system_io_completion(errcode, bytes_transferred, ol);
     }
   };
@@ -145,9 +159,11 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
   for(size_t n = 0; n < items; n++)
   {
     LPOVERLAPPED ol = state->ols + n;
-    ol->Internal = (ULONG_PTR) -1;
+    ol->Internal = static_cast<ULONG_PTR>(-1);
     if(_v.is_append_only())
+    {
       ol->OffsetHigh = ol->Offset = 0xffffffff;
+    }
     else
     {
 #ifndef NDEBUG
@@ -160,23 +176,25 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
       ol->OffsetHigh = (offset >> 32) & 0xffffffff;
     }
     // Use the unused hEvent member to pass through the state
-    ol->hEvent = (HANDLE) state;
+    ol->hEvent = reinterpret_cast<HANDLE>(state);
     offset += out[n].len;
     ++state->items_to_go;
 #ifndef NDEBUG
     if(_v.requires_aligned_io())
     {
-      assert(((uintptr_t) out[n].data & 511) == 0);
+      assert((reinterpret_cast<uintptr_t>(out[n].data) & 511) == 0);
       assert((out[n].len & 511) == 0);
     }
 #endif
-    if(!ioroutine(_v.h, (char *) out[n].data, (DWORD) out[n].len, ol, handle_completion::Do))
+    if(!ioroutine(_v.h, const_cast<char *>(out[n].data), static_cast<DWORD>(out[n].len), ol, handle_completion::Do))
     {
       --state->items_to_go;
       state->result.write = {GetLastError(), std::system_category()};
       // Fire completion now if we didn't schedule anything
       if(!n)
+      {
         (*state->completion)(state);
+      }
       return _state;
     }
     service()->_work_enqueued();
@@ -205,7 +223,7 @@ async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle:
 {
   AFIO_LOG_FUNCTION_CALL(this);
   optional<io_result<buffers_type>> ret;
-  OUTCOME_TRY(io_state, async_read(reqs, [&ret](async_file_handle *, io_result<buffers_type> &result) { ret = std::move(result); }));
+  OUTCOME_TRY(io_state, async_read(reqs, [&ret](async_file_handle *, io_result<buffers_type> &result) { ret = result; }));
   (void) io_state;  // holds i/o open until it completes
 
   // While i/o is not done pump i/o completion
@@ -214,7 +232,9 @@ async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle:
     auto t(_service->run_until(d));
     // If i/o service pump failed or timed out, cancel outstanding i/o and return
     if(!t)
+    {
       return t.error();
+    }
 #ifndef NDEBUG
     if(!ret && t && !t.value())
     {
@@ -230,7 +250,7 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
 {
   AFIO_LOG_FUNCTION_CALL(this);
   optional<io_result<const_buffers_type>> ret;
-  OUTCOME_TRY(io_state, async_write(reqs, [&ret](async_file_handle *, io_result<const_buffers_type> &result) { ret = std::move(result); }));
+  OUTCOME_TRY(io_state, async_write(reqs, [&ret](async_file_handle *, io_result<const_buffers_type> &result) { ret = result; }));
   (void) io_state;  // holds i/o open until it completes
 
   // While i/o is not done pump i/o completion
@@ -239,7 +259,9 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
     auto t(_service->run_until(d));
     // If i/o service pump failed or timed out, cancel outstanding i/o and return
     if(!t)
+    {
       return t.error();
+    }
 #ifndef NDEBUG
     if(!ret && t && !t.value())
     {

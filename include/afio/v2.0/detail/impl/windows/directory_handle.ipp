@@ -42,7 +42,9 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
   DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
   // Trying to truncate a directory returns EISDIR rather than some internal Win32 error code uncomparable to std::errc
   if(_creation == creation::truncate)
+  {
     return std::errc::is_a_directory;
+  }
   OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode, flags));
   OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
   /* It is super important that we remove the DELETE permission for directories as otherwise relative renames
@@ -73,9 +75,9 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     IO_STATUS_BLOCK isb = make_iostatus();
 
     path_view::c_str zpath(path, true);
-    UNICODE_STRING _path;
+    UNICODE_STRING _path{};
     _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
-    _path.MaximumLength = (_path.Length = (USHORT)(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
+    _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
     if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
     {
       _path.Buffer += 3;
@@ -83,7 +85,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
       _path.MaximumLength -= 3 * sizeof(wchar_t);
     }
 
-    OBJECT_ATTRIBUTES oa;
+    OBJECT_ATTRIBUTES oa{};
     memset(&oa, 0, sizeof(oa));
     oa.Length = sizeof(OBJECT_ATTRIBUTES);
     oa.ObjectName = &_path;
@@ -92,14 +94,16 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     // if(!!(flags & file_flags::int_opening_link))
     //  oa.Attributes|=0x100/*OBJ_OPENLINK*/;
 
-    LARGE_INTEGER AllocationSize;
+    LARGE_INTEGER AllocationSize{};
     memset(&AllocationSize, 0, sizeof(AllocationSize));
-    NTSTATUS ntstat = NtCreateFile(&nativeh.h, access, &oa, &isb, &AllocationSize, attribs, fileshare, creatdisp, ntflags, NULL, 0);
+    NTSTATUS ntstat = NtCreateFile(&nativeh.h, access, &oa, &isb, &AllocationSize, attribs, fileshare, creatdisp, ntflags, nullptr, 0);
     if(STATUS_PENDING == ntstat)
+    {
       ntstat = ntwait(nativeh.h, isb, deadline());
+    }
     if(ntstat < 0)
     {
-      return {(int) ntstat, ntkernel_category()};
+      return {static_cast<int>(ntstat), ntkernel_category()};
     }
   }
   else
@@ -121,11 +125,11 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     }
     attribs |= FILE_FLAG_BACKUP_SEMANTICS;  // required to open a directory
     path_view::c_str zpath(path, false);
-    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.buffer, access, fileshare, NULL, creation, attribs, NULL, true)))
+    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.buffer, access, fileshare, nullptr, creation, attribs, nullptr, true)))  // NOLINT
     {
       DWORD errcode = GetLastError();
       // assert(false);
-      return {(int) errcode, std::system_category()};
+      return {static_cast<int>(errcode), std::system_category()};
     }
   }
   if(!(flags & flag::disable_safety_unlinks))
@@ -147,8 +151,10 @@ result<directory_handle> directory_handle::clone(mode mode_, caching caching_, d
   {
     result<directory_handle> ret(directory_handle(native_handle_type(), _devid, _inode, _caching, _flags));
     ret.value()._v.behaviour = _v.behaviour;
-    if(!DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, false, DUPLICATE_SAME_ACCESS))
+    if(DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, 0, DUPLICATE_SAME_ACCESS) == 0)
+    {
       return {GetLastError(), std::system_category()};
+    }
     return ret;
   }
   // Slow path
@@ -166,21 +172,35 @@ result<directory_handle> directory_handle::clone(mode mode_, caching caching_, d
   access &= ~DELETE;
   OUTCOME_TRY(ntflags, ntflags_from_handle_caching_and_flags(nativeh, caching_, _flags));
   ntflags |= 0x01 /*FILE_DIRECTORY_FILE*/;  // required to open a directory
-  OBJECT_ATTRIBUTES oa;
+  OBJECT_ATTRIBUTES oa{};
   memset(&oa, 0, sizeof(oa));
   oa.Length = sizeof(OBJECT_ATTRIBUTES);
   // It is entirely undocumented that this is how you clone a file handle with new privs
-  UNICODE_STRING _path;
+  UNICODE_STRING _path{};
   memset(&_path, 0, sizeof(_path));
   oa.ObjectName = &_path;
   oa.RootDirectory = _v.h;
   IO_STATUS_BLOCK isb = make_iostatus();
   NTSTATUS ntstat = NtOpenFile(&nativeh.h, access, &oa, &isb, fileshare, ntflags);
   if(STATUS_PENDING == ntstat)
+  {
     ntstat = ntwait(nativeh.h, isb, deadline());
+  }
   if(ntstat < 0)
   {
-    return {(int) ntstat, ntkernel_category()};
+    return {static_cast<int>(ntstat), ntkernel_category()};
+  }
+  return ret;
+}
+
+AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> directory_handle::clone_to_path_handle() const noexcept
+{
+  AFIO_LOG_FUNCTION_CALL(this);
+  result<path_handle> ret(path_handle(native_handle_type(), _caching, _flags));
+  ret.value()._v.behaviour = _v.behaviour;
+  if(DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, 0, DUPLICATE_SAME_ACCESS) == 0)
+  {
+    return {GetLastError(), std::system_category()};
   }
   return ret;
 }
@@ -193,26 +213,28 @@ namespace detail
     using namespace windows_nt_kernel;
     native_handle_type nativeh = o->native_handle();
     DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
-    OBJECT_ATTRIBUTES oa;
+    OBJECT_ATTRIBUTES oa{};
     memset(&oa, 0, sizeof(oa));
     oa.Length = sizeof(OBJECT_ATTRIBUTES);
     // It is entirely undocumented that this is how you clone a file handle with new privs
-    UNICODE_STRING _path;
+    UNICODE_STRING _path{};
     memset(&_path, 0, sizeof(_path));
     oa.ObjectName = &_path;
     oa.RootDirectory = o->native_handle().h;
     IO_STATUS_BLOCK isb = make_iostatus();
     NTSTATUS ntstat = NtOpenFile(&nativeh.h, GENERIC_READ | SYNCHRONIZE | DELETE, &oa, &isb, fileshare, 0x01 /*FILE_DIRECTORY_FILE*/ | 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/);
     if(STATUS_PENDING == ntstat)
+    {
       ntstat = ntwait(nativeh.h, isb, deadline());
+    }
     if(ntstat < 0)
     {
-      return {(int) ntstat, ntkernel_category()};
+      return {static_cast<int>(ntstat), ntkernel_category()};
     }
     // Return as a file handle so the direct relink and unlink are used
     return file_handle(nativeh, 0, 0, file_handle::caching::all);
   }
-}
+}  // namespace detail
 
 result<void> directory_handle::relink(const path_handle &base, directory_handle::path_view_type newpath, bool atomic_replace, deadline d) noexcept
 {
@@ -243,8 +265,10 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
   using namespace windows_nt_kernel;
   AFIO_LOG_FUNCTION_CALL(this);
   if(tofill.empty())
+  {
     return enumerate_info{std::move(tofill), stat_t::want::none, false};
-  UNICODE_STRING _glob;
+  }
+  UNICODE_STRING _glob{};
   memset(&_glob, 0, sizeof(_glob));
   path_view_type::c_str zglob(glob, true);
   if(!glob.empty())
@@ -257,8 +281,8 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
   {
     // Let's assume the average leafname will be 64 characters long.
     size_t toallocate = (sizeof(FILE_ID_FULL_DIR_INFORMATION) + 64 * sizeof(wchar_t)) * tofill.size();
-    char *mem = new(std::nothrow) char[toallocate];
-    if(!mem)
+    auto *mem = new(std::nothrow) char[toallocate];
+    if(mem == nullptr)
     {
       return std::errc::not_enough_memory;
     }
@@ -270,18 +294,20 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
   bool done = false;
   do
   {
-    buffer = kernelbuffer.empty() ? (FILE_ID_FULL_DIR_INFORMATION *) tofill._kernel_buffer.get() : (FILE_ID_FULL_DIR_INFORMATION *) kernelbuffer.data();
-    bytes = kernelbuffer.empty() ? (ULONG)(tofill._kernel_buffer_size) : (ULONG) kernelbuffer.size();
+    buffer = kernelbuffer.empty() ? reinterpret_cast<FILE_ID_FULL_DIR_INFORMATION *>(tofill._kernel_buffer.get()) : reinterpret_cast<FILE_ID_FULL_DIR_INFORMATION *>(kernelbuffer.data());
+    bytes = kernelbuffer.empty() ? static_cast<ULONG>(tofill._kernel_buffer_size) : static_cast<ULONG>(kernelbuffer.size());
     IO_STATUS_BLOCK isb = make_iostatus();
-    NTSTATUS ntstat = NtQueryDirectoryFile(_v.h, NULL, NULL, NULL, &isb, buffer, bytes, FileIdFullDirectoryInformation, FALSE, glob.empty() ? NULL : &_glob, TRUE);
+    NTSTATUS ntstat = NtQueryDirectoryFile(_v.h, nullptr, nullptr, nullptr, &isb, buffer, bytes, FileIdFullDirectoryInformation, FALSE, glob.empty() ? nullptr : &_glob, TRUE);
     if(STATUS_PENDING == ntstat)
+    {
       ntstat = ntwait(_v.h, isb, deadline());
+    }
     if(kernelbuffer.empty() && STATUS_BUFFER_OVERFLOW == ntstat)
     {
       tofill._kernel_buffer.reset();
       size_t toallocate = tofill._kernel_buffer_size * 2;
-      char *mem = new(std::nothrow) char[toallocate];
-      if(!mem)
+      auto *mem = new(std::nothrow) char[toallocate];
+      if(mem == nullptr)
       {
         return std::errc::not_enough_memory;
       }
@@ -292,29 +318,33 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     {
       if(ntstat < 0)
       {
-        return {(int) ntstat, ntkernel_category()};
+        return {static_cast<int>(ntstat), ntkernel_category()};
       }
       done = true;
     }
   } while(!done);
   size_t n = 0;
-  for(FILE_ID_FULL_DIR_INFORMATION *ffdi = buffer;; ffdi = (FILE_ID_FULL_DIR_INFORMATION *) ((uintptr_t) ffdi + ffdi->NextEntryOffset))
+  for(FILE_ID_FULL_DIR_INFORMATION *ffdi = buffer;; ffdi = reinterpret_cast<FILE_ID_FULL_DIR_INFORMATION *>(reinterpret_cast<uintptr_t>(ffdi) + ffdi->NextEntryOffset))
   {
     size_t length = ffdi->FileNameLength / sizeof(wchar_t);
     if(length <= 2 && '.' == ffdi->FileName[0])
     {
       if(1 == length || '.' == ffdi->FileName[1])
+      {
         continue;
+      }
     }
     // Try to zero terminate leafnames where possible for later efficiency
-    if((uintptr_t)(ffdi->FileName + length) + sizeof(wchar_t) <= (uintptr_t) ffdi + ffdi->NextEntryOffset)
+    if(reinterpret_cast<uintptr_t>(ffdi->FileName + length) + sizeof(wchar_t) <= reinterpret_cast<uintptr_t>(ffdi) + ffdi->NextEntryOffset)
     {
       ffdi->FileName[length] = 0;
     }
     directory_entry &item = tofill[n];
     item.leafname = path_view(wstring_view(ffdi->FileName, length));
     if(filtering == filter::fastdeleted && item.leafname.is_afio_deleted())
+    {
       continue;
+    }
     item.stat = stat_t(nullptr);
     item.stat.st_ino = ffdi->FileId.QuadPart;
     item.stat.st_type = to_st_type(ffdi->FileAttributes, ffdi->ReparsePointTag);
@@ -324,11 +354,11 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     item.stat.st_size = ffdi->EndOfFile.QuadPart;
     item.stat.st_allocated = ffdi->AllocationSize.QuadPart;
     item.stat.st_birthtim = to_timepoint(ffdi->CreationTime);
-    item.stat.st_sparse = !!(ffdi->FileAttributes & FILE_ATTRIBUTE_SPARSE_FILE);
-    item.stat.st_compressed = !!(ffdi->FileAttributes & FILE_ATTRIBUTE_COMPRESSED);
-    item.stat.st_reparse_point = !!(ffdi->FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT);
+    item.stat.st_sparse = static_cast<unsigned int>((ffdi->FileAttributes & FILE_ATTRIBUTE_SPARSE_FILE) != 0u);
+    item.stat.st_compressed = static_cast<unsigned int>((ffdi->FileAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0u);
+    item.stat.st_reparse_point = static_cast<unsigned int>((ffdi->FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0u);
     n++;
-    if(!ffdi->NextEntryOffset)
+    if(ffdi->NextEntryOffset == 0u)
     {
       // Fill is complete
       tofill._resize(n);

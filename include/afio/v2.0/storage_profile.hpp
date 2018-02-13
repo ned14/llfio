@@ -136,19 +136,19 @@ namespace storage_profile
       switch(type)
       {
       case storage_types::extent_type:
-        return f(*static_cast<const item<io_service::extent_type> *>(static_cast<const item_base *>(this)));
+        return f(*reinterpret_cast<const item<io_service::extent_type> *>(static_cast<const item_base *>(this)));
       case storage_types::unsigned_int:
-        return f(*static_cast<const item<unsigned int> *>(static_cast<const item_base *>(this)));
+        return f(*reinterpret_cast<const item<unsigned int> *>(static_cast<const item_base *>(this)));
       case storage_types::unsigned_long_long:
-        return f(*static_cast<const item<unsigned long long> *>(static_cast<const item_base *>(this)));
+        return f(*reinterpret_cast<const item<unsigned long long> *>(static_cast<const item_base *>(this)));
       case storage_types::float_:
-        return f(*static_cast<const item<float> *>(static_cast<const item_base *>(this)));
+        return f(*reinterpret_cast<const item<float> *>(static_cast<const item_base *>(this)));
       case storage_types::string:
-        return f(*static_cast<const item<std::string> *>(static_cast<const item_base *>(this)));
+        return f(*reinterpret_cast<const item<std::string> *>(static_cast<const item_base *>(this)));
       case storage_types::unknown:
         break;
       }
-      throw std::invalid_argument("No type set in item");
+      throw std::invalid_argument("No type set in item");  // NOLINT
     }
     //! Set this item if its value is default
     outcome<void> operator()(storage_profile &sp, handle_type &h) const
@@ -193,7 +193,7 @@ namespace storage_profile
     namespace posix
     {
 #endif
-      AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> _device(storage_profile &sp, file_handle &h, std::string mntfromname, std::string fstypename) noexcept;
+      AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> _device(storage_profile &sp, file_handle &h, const std::string &_mntfromname, const std::string &fstypename) noexcept;
     }
   }  // namespace storage
   namespace concurrency
@@ -238,9 +238,7 @@ namespace storage_profile
     size_type _size{0};
 
   public:
-    storage_profile()
-    {
-    }
+    storage_profile() = default;
 
     //! Value type
     using value_type = item_erased &;
@@ -262,11 +260,11 @@ namespace storage_profile
     //! Potential items in this storage profile
     size_type max_size() const noexcept { return (sizeof(*this) - sizeof(_size)) / item_base::item_size; }
     //! Returns an iterator to the first item
-    iterator begin() noexcept { return static_cast<item_erased *>(static_cast<item_base *>(&os_name)); }
+    iterator begin() noexcept { return reinterpret_cast<item_erased *>(static_cast<item_base *>(&os_name)); }
     //! Returns an iterator to the last item
     iterator end() noexcept { return begin() + max_size(); }
     //! Returns an iterator to the first item
-    const_iterator begin() const noexcept { return static_cast<const item_erased *>(static_cast<const item_base *>(&os_name)); }
+    const_iterator begin() const noexcept { return reinterpret_cast<const item_erased *>(static_cast<const item_base *>(&os_name)); }
     //! Returns an iterator to the last item
     const_iterator end() const noexcept { return begin() + max_size(); }
 

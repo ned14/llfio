@@ -12,7 +12,7 @@ set(CTEST_GIT_COMMAND "${GIT_EXECUTABLE}")
 
 ctest_start("Experimental")
 ctest_update()
-ctest_configure()
+ctest_configure(OPTIONS ${CTEST_CONFIGURE_OPTIONS})
 ctest_build(TARGET _dl)
 ctest_build(TARGET _sl)
 ctest_test(RETURN_VALUE retval EXCLUDE "afio_hl|shared_fs_mutex")
@@ -58,6 +58,19 @@ else()
       COMMAND "${CMAKE_COMMAND}" -E tar cfz afio-v2.0-binaries-linux64.tgz afio
     )
     get_filename_component(toupload afio-v2.0-binaries-linux64.tgz ABSOLUTE)
+  endif()
+  if(EXISTS "prebuilt/lib/libafio_dl-2.0-Darwin-x86_64-Release.so")
+    checked_execute_process("Tarring up binaries"
+      COMMAND mkdir afio
+      COMMAND cp -a doc afio/
+      COMMAND cp -a include afio/
+      COMMAND cp -a Readme.md afio/
+      COMMAND cp -a release_notes.md afio/
+      COMMAND cp -a --parents prebuilt/lib/libafio_sl-2.0-Darwin-x86_64-Release.a afio/
+      COMMAND cp -a --parents prebuilt/lib/libafio_dl-2.0-Darwin-x86_64-Release.so afio/
+      COMMAND "${CMAKE_COMMAND}" -E tar cfz afio-v2.0-binaries-darwin64.tgz afio
+    )
+    get_filename_component(toupload afio-v2.0-binaries-darwin64.tgz ABSOLUTE)
   endif()
 endif()
 set(retval2 0)

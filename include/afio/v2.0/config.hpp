@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 //#include <iostream>
 //#define AFIO_LOG_TO_OSTREAM std::cerr
-//#define AFIO_LOGGING_LEVEL 3
+//#define AFIO_LOGGING_LEVEL 6
 
 //! \file config.hpp Configures a compiler environment for AFIO header and source code
 
@@ -63,9 +63,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #if !defined(AFIO_LOG_BACKTRACE_LEVELS)
 //! \brief Bit mask of which log levels should be stack backtraced
-//! which will slow those logs thirty fold or so. Defaults to (1<<1)|(1<<2)|(1<<3) i.e. stack backtrace
+//! which will slow those logs thirty fold or so. Defaults to (1U<<1U)|(1U<<2U)|(1U<<3U) i.e. stack backtrace
 //! on fatal, error and warn logs. \ingroup config
-#define AFIO_LOG_BACKTRACE_LEVELS ((1 << 1) | (1 << 2) | (1 << 3))
+#define AFIO_LOG_BACKTRACE_LEVELS ((1U << 1U) | (1U << 2U) | (1U << 3U))
 #endif
 
 #if !defined(AFIO_LOGGING_MEMORY)
@@ -91,6 +91,10 @@ Distributed under the Boost Software License, Version 1.0.
 #if defined(NTDDI_VERSION) && NTDDI_VERSION < 0x06000000
 #error NTDDI_VERSION must at least be set to Windows Vista for AFIO to work
 #endif
+#endif
+
+#ifdef __APPLE__
+#define AFIO_MISSING_PIOV 1
 #endif
 
 // Pull in detection of __MINGW64_VERSION_MAJOR
@@ -309,7 +313,24 @@ using namespace QUICKCPPLIB_NAMESPACE::string_view;
 AFIO_V2_NAMESPACE_END
 // Bring in a result implementation
 #include "outcome/include/outcome.hpp"
+
+
 AFIO_V2_NAMESPACE_BEGIN
+
+namespace detail
+{
+  // Used to cast an unknown input to some unsigned integer
+  OUTCOME_TEMPLATE(class T, class U)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_unsigned<T>::value && !std::is_same<std::decay_t<U>, std::nullptr_t>::value))
+  inline T unsigned_integer_cast(U &&v) { return static_cast<T>(v); }
+  OUTCOME_TEMPLATE(class T)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_unsigned<T>::value))
+  inline T unsigned_integer_cast(std::nullptr_t /* unused */) { return static_cast<T>(0); }
+  OUTCOME_TEMPLATE(class T, class U)
+  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_unsigned<T>::value))
+  inline T unsigned_integer_cast(U *v) { return static_cast<T>(reinterpret_cast<uintptr_t>(v)); }
+}  // namespace detail
+
 /*! \struct error_info
 \brief The cause of the failure of an operation in AFIO.
 */
@@ -337,16 +358,16 @@ public:
       : error_info(std::error_code(code, cat))
   {
   }
-  // Construct from an error code
-  inline explicit error_info(std::error_code _ec);
+  // Explicit construction from an error code
+  explicit inline error_info(std::error_code _ec);  // NOLINT
   /* NOTE TO SELF: The error_info constructor implementation is in handle.hpp as we need that
   defined before we can do useful logging.
   */
-  //! Construct from an error condition enum
+  //! Implicit construct from an error condition enum
   OUTCOME_TEMPLATE(class ErrorCondEnum)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_condition_enum<ErrorCondEnum>::value))
   error_info(ErrorCondEnum &&v)  // NOLINT
-      : error_info(make_error_code(std::forward<ErrorCondEnum>(v)))
+  : error_info(make_error_code(std::forward<ErrorCondEnum>(v)))
   {
   }
 
@@ -369,6 +390,30 @@ inline bool operator==(const error_info &a, const error_info &b)
 inline bool operator!=(const error_info &a, const error_info &b)
 {
   return a.ec != b.ec;
+}
+OUTCOME_TEMPLATE(class ErrorCondEnum)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_condition_enum<ErrorCondEnum>::value))
+inline bool operator==(const error_info &a, const ErrorCondEnum &b)
+{
+  return a.ec == std::error_condition(b);
+}
+OUTCOME_TEMPLATE(class ErrorCondEnum)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_condition_enum<ErrorCondEnum>::value))
+inline bool operator==(const ErrorCondEnum &a, const error_info &b)
+{
+  return std::error_condition(a) == b.ec;
+}
+OUTCOME_TEMPLATE(class ErrorCondEnum)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_condition_enum<ErrorCondEnum>::value))
+inline bool operator!=(const error_info &a, const ErrorCondEnum &b)
+{
+  return a.ec != std::error_condition(b);
+}
+OUTCOME_TEMPLATE(class ErrorCondEnum)
+OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_condition_enum<ErrorCondEnum>::value))
+inline bool operator!=(const ErrorCondEnum &a, const error_info &b)
+{
+  return std::error_condition(a) != b.ec;
 }
 #ifndef NDEBUG
 // Is trivial in all ways, except default constructibility
@@ -427,7 +472,10 @@ template <class T> using result = OUTCOME_V2_NAMESPACE::result<T, error_info>;
 template <class T> using outcome = OUTCOME_V2_NAMESPACE::outcome<T, error_info>;
 using OUTCOME_V2_NAMESPACE::success;
 using OUTCOME_V2_NAMESPACE::failure;
-using OUTCOME_V2_NAMESPACE::error_from_exception;
+inline error_info error_from_exception(std::exception_ptr &&ep = std::current_exception(), std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept
+{
+  return error_info(OUTCOME_V2_NAMESPACE::error_from_exception(std::move(ep), not_matched));
+}
 using OUTCOME_V2_NAMESPACE::in_place_type;
 
 static_assert(OUTCOME_V2_NAMESPACE::trait::has_error_code_v<error_info>, "error_info is not detected to be an error code");
@@ -448,7 +496,10 @@ inline AFIO_DECL QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log<AF
 {
   static QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log<AFIO_LOGGING_MEMORY> _log(static_cast<QUICKCPPLIB_NAMESPACE::ringbuffer_log::level>(AFIO_LOGGING_LEVEL));
 #ifdef AFIO_LOG_TO_OSTREAM
-  _log.immediate(&AFIO_LOG_TO_OSTREAM);
+  if(_log.immediate() != &AFIO_LOG_TO_OSTREAM)
+  {
+    _log.immediate(&AFIO_LOG_TO_OSTREAM);
+  }
 #endif
   return _log;
 }
@@ -460,6 +511,11 @@ class log_level_guard
   log_level _v;
 
 public:
+  log_level_guard() = delete;
+  log_level_guard(const log_level_guard &) = delete;
+  log_level_guard(log_level_guard &&) = delete;
+  log_level_guard &operator=(const log_level_guard &) = delete;
+  log_level_guard &operator=(log_level_guard &&) = delete;
   explicit log_level_guard(log_level n)
       : _v(log().log_level())
   {
@@ -514,13 +570,18 @@ namespace detail
   {
     handle *old{nullptr};
     bool enabled{false};
+    tls_current_handle_holder() = delete;
+    tls_current_handle_holder(const tls_current_handle_holder &) = delete;
+    tls_current_handle_holder(tls_current_handle_holder &&) = delete;
+    tls_current_handle_holder &operator=(const tls_current_handle_holder &) = delete;
+    tls_current_handle_holder &operator=(tls_current_handle_holder &&) = delete;
     explicit tls_current_handle_holder(const handle *h)
     {
       if(h != nullptr && log().log_level() >= log_level::error)
       {
         auto &tls = tls_errored_results();
         old = tls.current_handle;
-        tls.current_handle = const_cast<handle *>(h);
+        tls.current_handle = const_cast<handle *>(h);  // NOLINT
         enabled = true;
       }
     }
@@ -535,6 +596,12 @@ namespace detail
   };
   template <> struct tls_current_handle_holder<false>
   {
+    tls_current_handle_holder() = delete;
+    tls_current_handle_holder(const tls_current_handle_holder &) = delete;
+    tls_current_handle_holder(tls_current_handle_holder &&) = delete;
+    tls_current_handle_holder &operator=(const tls_current_handle_holder &) = delete;
+    tls_current_handle_holder &operator=(tls_current_handle_holder &&) = delete;
+    ~tls_current_handle_holder() = default;
     template <class T> explicit tls_current_handle_holder(T && /*unused*/) {}
   };
 #define AFIO_LOG_INST_TO_TLS(inst) AFIO_V2_NAMESPACE::detail::tls_current_handle_holder<std::is_base_of<AFIO_V2_NAMESPACE::handle, std::decay_t<std::remove_pointer_t<decltype(inst)>>>::value> AFIO_UNIQUE_NAME(inst)
@@ -615,24 +682,27 @@ AFIO_V2_NAMESPACE_END
 #if AFIO_LOGGING_LEVEL >= 1
 #define AFIO_LOG_FATAL(inst, message)                                                                                                                                                                                                                                                                                          \
   {                                                                                                                                                                                                                                                                                                                            \
-    AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::fatal, (message), (unsigned) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1 << 1)) ? nullptr : __func__, __LINE__);                                                        \
+    AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::fatal, (message), AFIO_V2_NAMESPACE::detail::unsigned_integer_cast<unsigned>(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1U << 1U)) ? nullptr : __func__, __LINE__);                  \
     AFIO_LOG_FATAL_TO_CERR(message);                                                                                                                                                                                                                                                                                           \
   }
 #else
 #define AFIO_LOG_FATAL(inst, message) AFIO_LOG_FATAL_TO_CERR(message)
 #endif
 #if AFIO_LOGGING_LEVEL >= 2
-#define AFIO_LOG_ERROR(inst, message) AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::error, (message), (unsigned) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1 << 2)) ? nullptr : __func__, __LINE__)
+#define AFIO_LOG_ERROR(inst, message)                                                                                                                                                                                                                                                                                          \
+  AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::error, (message), AFIO_V2_NAMESPACE::detail::unsigned_integer_cast<unsigned>(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1U << 2U)) ? nullptr : __func__, __LINE__)
 #else
 #define AFIO_LOG_ERROR(inst, message)
 #endif
 #if AFIO_LOGGING_LEVEL >= 3
-#define AFIO_LOG_WARN(inst, message) AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::warn, (message), (unsigned) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1 << 3)) ? nullptr : __func__, __LINE__)
+#define AFIO_LOG_WARN(inst, message)                                                                                                                                                                                                                                                                                           \
+  AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::warn, (message), AFIO_V2_NAMESPACE::detail::unsigned_integer_cast<unsigned>(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1U << 3U)) ? nullptr : __func__, __LINE__)
 #else
 #define AFIO_LOG_WARN(inst, message)
 #endif
 #if AFIO_LOGGING_LEVEL >= 4
-#define AFIO_LOG_INFO(inst, message) AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::info, (message), (unsigned) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1 << 4)) ? nullptr : __func__, __LINE__)
+#define AFIO_LOG_INFO(inst, message)                                                                                                                                                                                                                                                                                           \
+  AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::info, (message), AFIO_V2_NAMESPACE::detail::unsigned_integer_cast<unsigned>(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1U << 4U)) ? nullptr : __func__, __LINE__)
 
 // Need to expand out our namespace into a string
 #define AFIO_LOG_STRINGIFY9(s) #s "::"
@@ -725,12 +795,14 @@ AFIO_V2_NAMESPACE_END
 #define AFIO_LOG_FUNCTION_CALL(inst) AFIO_LOG_INST_TO_TLS(inst)
 #endif
 #if AFIO_LOGGING_LEVEL >= 5
-#define AFIO_LOG_DEBUG(inst, message) AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::debug, (message), (unsigned) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1 << 5)) ? nullptr : __func__, __LINE__)
+#define AFIO_LOG_DEBUG(inst, message)                                                                                                                                                                                                                                                                                          \
+  AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::debug, AFIO_V2_NAMESPACE::detail::unsigned_integer_cast<unsigned>(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1U << 5U)) ? nullptr : __func__, __LINE__)
 #else
 #define AFIO_LOG_DEBUG(inst, message)
 #endif
 #if AFIO_LOGGING_LEVEL >= 6
-#define AFIO_LOG_ALL(inst, message) AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::all, (message), (unsigned) (uintptr_t)(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1 << 6)) ? nullptr : __func__, __LINE__)
+#define AFIO_LOG_ALL(inst, message)                                                                                                                                                                                                                                                                                            \
+  AFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::all, (message), AFIO_V2_NAMESPACE::detail::unsigned_integer_cast<unsigned>(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (AFIO_LOG_BACKTRACE_LEVELS & (1U << 6U)) ? nullptr : __func__, __LINE__)
 #else
 #define AFIO_LOG_ALL(inst, message)
 #endif
@@ -747,6 +819,11 @@ namespace detail
   {
     struct function_ptr_storage
     {
+      function_ptr_storage() = default;
+      function_ptr_storage(const function_ptr_storage &) = delete;
+      function_ptr_storage(function_ptr_storage &&) = delete;
+      function_ptr_storage &operator=(const function_ptr_storage &) = delete;
+      function_ptr_storage &operator=(function_ptr_storage &&) = delete;
       virtual ~function_ptr_storage() = default;
       virtual R operator()(Args &&... args) = 0;
     };
@@ -764,13 +841,13 @@ namespace detail
     template <class U> struct emplace_t
     {
     };
-    template <class U, class V> friend inline function_ptr<U> make_function_ptr(V &&f);
+    template <class U, class V> friend inline function_ptr<U> make_function_ptr(V &&f);  // NOLINT
     template <class U>
     explicit function_ptr(std::nullptr_t, U &&f)
         : ptr(new function_ptr_storage_impl<typename std::decay<U>::type>(std::forward<U>(f)))
     {
     }
-    template <class R_, class U, class... Args2> friend inline function_ptr<R_> emplace_function_ptr(Args2 &&... args);
+    template <class R_, class U, class... Args2> friend inline function_ptr<R_> emplace_function_ptr(Args2 &&... args);  // NOLINT
     template <class U, class... Args2>
     explicit function_ptr(emplace_t<U> /*unused*/, Args2 &&... args)
         : ptr(new function_ptr_storage_impl<U>(std::forward<Args2>(args)...))
@@ -781,7 +858,7 @@ namespace detail
     constexpr function_ptr() noexcept : ptr(nullptr) {}
     constexpr explicit function_ptr(function_ptr_storage *p) noexcept : ptr(p) {}
     constexpr function_ptr(function_ptr &&o) noexcept : ptr(o.ptr) { o.ptr = nullptr; }
-    function_ptr &operator=(function_ptr &&o)
+    function_ptr &operator=(function_ptr &&o) noexcept
     {
       delete ptr;
       ptr = o.ptr;

@@ -107,7 +107,7 @@ inline result<path_handle> containing_directory(optional<std::reference_wrapper<
         continue;
       }
       // If the same, we know for a fact that this is the correct containing dir for now at least
-      if(s.st_dev == fsh.st_dev() && s.st_ino == fsh.st_ino())
+      if(static_cast<fs_handle::dev_t>(s.st_dev) == fsh.st_dev() && s.st_ino == fsh.st_ino())
       {
         if(out_filename)
         {

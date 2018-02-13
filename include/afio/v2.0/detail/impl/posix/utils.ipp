@@ -102,8 +102,8 @@ namespace utils
           {
             ;
           }
-          sscanf(hugepagesize, "%u", &_hugepagesize);
-          sscanf(hugepages, "%u", &_hugepages);
+          sscanf(hugepagesize, "%u", &_hugepagesize);  // NOLINT
+          sscanf(hugepages, "%u", &_hugepages);        // NOLINT
           if(_hugepagesize != 0u)
           {
             pagesizes.push_back((static_cast<size_t>(_hugepagesize)) * 1024);
@@ -214,6 +214,6 @@ namespace utils
       }
     }
   }  // namespace detail
-}  // namespace detail
+}  // namespace utils
 
 AFIO_V2_NAMESPACE_END

@@ -46,7 +46,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   }
   if(-1 == nativeh.fd)
   {
-    return { errno, std::system_category() };
+    return {errno, std::system_category()};
   }
   if(!(flags & flag::disable_safety_unlinks))
   {
@@ -58,11 +58,19 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   }
   if((flags & flag::disable_prefetching) || (flags & flag::maximum_prefetching))
   {
+#ifdef POSIX_FADV_SEQUENTIAL
     int advice = (flags & flag::disable_prefetching) ? POSIX_FADV_RANDOM : (POSIX_FADV_SEQUENTIAL | POSIX_FADV_WILLNEED);
     if(-1 == ::posix_fadvise(nativeh.fd, 0, 0, advice))
     {
-      return { errno, std::system_category() };
+      return {errno, std::system_category()};
     }
+#elif __APPLE__
+    int advice = (flags & flag::disable_prefetching) ? 0 : 1;
+    if(-1 == ::fcntl(nativeh.fd, F_RDAHEAD, advice))
+    {
+      return {errno, std::system_category()};
+    }
+#endif
   }
   if(_creation == creation::truncate && ret.value().are_safety_fsyncs_issued())
   {
@@ -74,7 +82,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
 result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode, flag flags) noexcept
 {
   caching _caching = caching::temporary;
-  // No need to rename to random on unlink or check inode before unlink
+  // No need to check inode before unlink
   flags |= flag::unlink_on_close | flag::disable_safety_unlinks;
   result<file_handle> ret(file_handle(native_handle_type(), 0, 0, _caching, flags));
   native_handle_type &nativeh = ret.value()._v;
@@ -90,7 +98,8 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   if(-1 != nativeh.fd)
   {
     ret.value()._flags |= flag::anonymous_inode;
-    OUTCOME_TRYV(ret.value()._fetch_inode());  // It can be useful to know the inode of temporary inodes
+    OUTCOME_TRYV(ret.value()._fetch_inode());      // It can be useful to know the inode of temporary inodes
+    ret.value()._flags &= ~flag::unlink_on_close;  // It's already unlinked
     return ret;
   }
   // If it failed, assume this kernel or FS doesn't support O_TMPFILE
@@ -121,9 +130,10 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
     // Immediately unlink after creation
     if(-1 == ::unlinkat(dirh.native_handle().fd, random.c_str(), 0))
     {
-      return { errno, std::system_category() };
+      return {errno, std::system_category()};
     }
     OUTCOME_TRYV(ret.value()._fetch_inode());  // It can be useful to know the inode of temporary inodes
+    ret.value()._flags &= ~flag::unlink_on_close;
     return ret;
   }
 }
@@ -150,7 +160,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
     unsigned flags = SYNC_FILE_RANGE_WAIT_BEFORE | SYNC_FILE_RANGE_WRITE;  // start writing all dirty pages in range now
     if(-1 != ::sync_file_range(_v.fd, offset, bytes, flags))
     {
-      return io_handle::io_result<const_buffers_type>(reqs.buffers);
+      return {reqs.buffers};
     }
   }
 #endif
@@ -159,9 +169,9 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
   {
     if(-1 == ::fdatasync(_v.fd))
     {
-      return { errno, std::system_category() };
+      return {errno, std::system_category()};
     }
-    return io_handle::io_result<const_buffers_type>(reqs.buffers);
+    return {reqs.buffers};
   }
 #endif
 #ifdef __APPLE__
@@ -170,7 +180,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
     // OS X fsync doesn't wait for the device to flush its buffers
     if(-1 == ::fsync(_v.fd))
       return {errno, std::system_category()};
-    return io_handle::io_result<const_buffers_type>(std::move(reqs.buffers));
+    return {std::move(reqs.buffers)};
   }
   // This is the fsync as on every other OS
   if(-1 == ::fcntl(_v.fd, F_FULLFSYNC))
@@ -178,10 +188,10 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
 #else
   if(-1 == ::fsync(_v.fd))
   {
-    return { errno, std::system_category() };
+    return {errno, std::system_category()};
   }
 #endif
-  return io_handle::io_result<const_buffers_type>(reqs.buffers);
+  return {reqs.buffers};
 }
 
 result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d) const noexcept
@@ -196,7 +206,7 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
     ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC);
     if(-1 == ret.value()._v.fd)
     {
-      return { errno, std::system_category() };
+      return {errno, std::system_category()};
     }
     if(caching_ == caching::unchanged)
     {
@@ -206,7 +216,10 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
     int attribs = fcntl(ret.value()._v.fd, F_GETFL);
     if(-1 != attribs)
     {
-      attribs &= ~(O_SYNC | O_DIRECT
+      attribs &= ~(O_SYNC
+#ifdef O_DIRECT
+                   | O_DIRECT
+#endif
 #ifdef O_DSYNC
                    | O_DSYNC
 #endif
@@ -216,18 +229,24 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
       case caching::unchanged:
         break;
       case caching::none:
-        attribs |= O_SYNC | O_DIRECT;
+        attribs |= O_SYNC
+#ifdef O_DIRECT
+                   | O_DIRECT
+#endif
+        ;
         if(-1 == fcntl(ret.value()._v.fd, F_SETFL, attribs))
         {
-          return { errno, std::system_category() };
+          return {errno, std::system_category()};
         }
         ret.value()._v.behaviour |= native_handle_type::disposition::aligned_io;
         break;
       case caching::only_metadata:
+#ifdef O_DIRECT
         attribs |= O_DIRECT;
+#endif
         if(-1 == fcntl(ret.value()._v.fd, F_SETFL, attribs))
         {
-          return { errno, std::system_category() };
+          return {errno, std::system_category()};
         }
         ret.value()._v.behaviour |= native_handle_type::disposition::aligned_io;
         break;
@@ -235,7 +254,7 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
         attribs |= O_SYNC;
         if(-1 == fcntl(ret.value()._v.fd, F_SETFL, attribs))
         {
-          return { errno, std::system_category() };
+          return {errno, std::system_category()};
         }
         ret.value()._v.behaviour &= ~native_handle_type::disposition::aligned_io;
         break;
@@ -247,7 +266,7 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
 #endif
         if(-1 == fcntl(ret.value()._v.fd, F_SETFL, attribs))
         {
-          return { errno, std::system_category() };
+          return {errno, std::system_category()};
         }
         ret.value()._v.behaviour &= ~native_handle_type::disposition::aligned_io;
         break;
@@ -256,7 +275,7 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
       case caching::temporary:
         if(-1 == fcntl(ret.value()._v.fd, F_SETFL, attribs))
         {
-          return { errno, std::system_category() };
+          return {errno, std::system_category()};
         }
         ret.value()._v.behaviour &= ~native_handle_type::disposition::aligned_io;
         break;
@@ -328,7 +347,7 @@ result<file_handle::extent_type> file_handle::length() const noexcept
   memset(&s, 0, sizeof(s));
   if(-1 == ::fstat(_v.fd, &s))
   {
-    return { errno, std::system_category() };
+    return {errno, std::system_category()};
   }
   return s.st_size;
 }
@@ -338,7 +357,7 @@ result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type 
   AFIO_LOG_FUNCTION_CALL(this);
   if(ftruncate(_v.fd, newsize) < 0)
   {
-    return { errno, std::system_category() };
+    return {errno, std::system_category()};
   }
   if(are_safety_fsyncs_issued())
   {
@@ -402,7 +421,7 @@ result<std::vector<std::pair<file_handle::extent_type, file_handle::extent_type>
       }
       else
       {
-        return { errno, std::system_category() };
+        return {errno, std::system_category()};
       }
     }
 #if 0
@@ -436,7 +455,7 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_type offs
     // The filing system may not support trim
     if(EOPNOTSUPP != errno)
     {
-      return { errno, std::system_category() };
+      return {errno, std::system_category()};
     }
   }
 #endif

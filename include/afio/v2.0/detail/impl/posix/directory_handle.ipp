@@ -137,7 +137,7 @@ result<directory_handle> directory_handle::clone(mode mode_, caching caching_, d
     ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC);
     if(-1 == ret.value()._v.fd)
     {
-      return { errno, std::system_category() };
+      return {errno, std::system_category()};
     }
     return ret;
   }
@@ -196,12 +196,25 @@ result<directory_handle> directory_handle::clone(mode mode_, caching caching_, d
   }
 }
 
+AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> directory_handle::clone_to_path_handle() const noexcept
+{
+  AFIO_LOG_FUNCTION_CALL(this);
+  result<path_handle> ret(path_handle(native_handle_type(), _caching, _flags));
+  ret.value()._v.behaviour = _v.behaviour;
+  ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC);
+  if(-1 == ret.value()._v.fd)
+  {
+    return {errno, std::system_category()};
+  }
+  return ret;
+}
+
 result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_type &&tofill, path_view_type glob, filter /*unused*/, span<char> kernelbuffer) const noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
   if(tofill.empty())
   {
-    return enumerate_info { std::move(tofill), stat_t::want::none, false };
+    return enumerate_info{std::move(tofill), stat_t::want::none, false};
   }
   // Is glob a single entry match? If so, this is really a stat call
   path_view_type::c_str zglob(glob);
@@ -212,7 +225,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     };
     if(-1 == ::fstatat(_v.fd, zglob.buffer, &s, AT_SYMLINK_NOFOLLOW))
     {
-      return { errno, std::system_category() };
+      return {errno, std::system_category()};
     }
     tofill[0].stat.st_dev = s.st_dev;
     tofill[0].stat.st_ino = s.st_ino;
@@ -252,7 +265,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     tofill[0].stat.st_birthtim = to_timepoint(s.st_birthtim);
 #endif
 #endif
-    tofill[0].stat.st_sparse = static_cast<unsigned int>((static_cast<handle::extent_type>(s.st_blocks) * 512) < static_cast<handle::extent_type>(s.st_size);
+    tofill[0].stat.st_sparse = static_cast<unsigned int>((static_cast<handle::extent_type>(s.st_blocks) * 512) < static_cast<handle::extent_type>(s.st_size));
     tofill._resize(1);
     static constexpr stat_t::want default_stat_contents = stat_t::want::dev | stat_t::want::ino | stat_t::want::type | stat_t::want::perms | stat_t::want::nlink | stat_t::want::uid | stat_t::want::gid | stat_t::want::rdev | stat_t::want::atim | stat_t::want::mtim | stat_t::want::ctim | stat_t::want::size |
                                                           stat_t::want::allocated | stat_t::want::blocks | stat_t::want::blksize
@@ -271,17 +284,16 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
 #ifdef __linux__
   // Unlike FreeBSD, Linux doesn't define a getdents() function, so we'll do that here.
   using getdents64_t = int (*)(int, char *, unsigned int);
-  static auto getdents = (getdents64_t)[](int fd, char *buf, unsigned count)->int { return syscall(SYS_getdents64, fd, buf, count); };
+  static auto getdents = static_cast<getdents64_t>([](int fd, char *buf, unsigned count) -> int { return syscall(SYS_getdents64, fd, buf, count); });
   using dirent = dirent64;
 #endif
 #ifdef __APPLE__
   // OS X defines a getdirentries64() kernel syscall which can emulate getdents
   typedef int (*getdents_emulation_t)(int, char *, unsigned);
-  static getdents_emulation_t getdents = (getdents_emulation_t)[](int fd, char *buf, unsigned count)->int
-  {
+  static getdents_emulation_t getdents = static_cast<getdents_emulation_t>([](int fd, char *buf, unsigned count) -> int {
     off_t foo;
     return syscall(SYS_getdirentries64, fd, buf, count, &foo);
-  };
+  });
 #endif
   if(!tofill._kernel_buffer && kernelbuffer.empty())
   {
@@ -308,7 +320,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
 #ifdef __linux__
     if(-1 == ::lseek64(_v.fd, 0, SEEK_SET))
     {
-      return { errno, std::system_category() };
+      return {errno, std::system_category()};
     }
 #else
     if(-1 == ::lseek(_v.fd, 0, SEEK_SET))
@@ -341,9 +353,9 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     tofill._resize(0);
     return enumerate_info{std::move(tofill), default_stat_contents, true};
   }
-  AFIO_VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(buffer, bytes);
+  AFIO_VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(buffer, bytes);  // NOLINT
   size_t n = 0;
-  for(dirent *dent = buffer;; dent = (dirent *) ((uintptr_t) dent + dent->d_reclen))
+  for(dirent *dent = buffer;; dent = reinterpret_cast<dirent *>(reinterpret_cast<uintptr_t>(dent) + dent->d_reclen))
   {
     if(dent->d_ino != 0u)
     {

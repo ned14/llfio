@@ -37,6 +37,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 AFIO_V2_NAMESPACE_EXPORT_BEGIN
 
+class directory_handle;
+
 /*! \class path_handle
 \brief A handle to somewhere originally identified by a path on the filing system. Typically used
 as the lightest weight handle to some location on the filing system which may
@@ -46,6 +48,8 @@ of the path leading to that island.
 */
 class AFIO_DECL path_handle : public handle
 {
+  friend class directory_handle;
+
 public:
   using path_type = handle::path_type;
   using extent_type = handle::extent_type;
@@ -59,7 +63,8 @@ public:
   using path_view_type = path_view;
 
   //! Default constructor
-  path_handle() = default;
+  constexpr path_handle() {}  // NOLINT
+  ~path_handle() = default;
   //! Construct a handle from a supplied native handle
   explicit constexpr path_handle(native_handle_type h, caching caching = caching::all, flag flags = flag::none)
       : handle(h, caching, flags)
@@ -69,8 +74,12 @@ public:
   explicit constexpr path_handle(handle &&o) noexcept : handle(std::move(o)) {}
   //! Move construction permitted
   path_handle(path_handle &&) = default;
+  //! No copy construction (use `clone()`)
+  path_handle(const path_handle &) = delete;
   //! Move assignment permitted
   path_handle &operator=(path_handle &&) = default;
+  //! No copy assignment
+  path_handle &operator=(const path_handle &) = delete;
 
   /*! Create a path handle opening access to some location on the filing system.
   Some operating systems provide a particularly lightweight method of doing this
@@ -80,7 +89,7 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> path(const path_handle &base, path_view_type _path) noexcept;
+  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> path(const path_handle &base, path_view_type path) noexcept;
   //! \overload
   AFIO_MAKE_FREE_FUNCTION
   static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> path(path_view_type _path) noexcept { return path(path_handle(), _path); }

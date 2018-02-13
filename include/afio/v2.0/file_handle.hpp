@@ -79,9 +79,7 @@ protected:
 
 public:
   //! Default constructor
-  constexpr file_handle()
-  {
-  }
+  constexpr file_handle() {}  // NOLINT
   //! Construct a handle from a supplied native handle
   constexpr file_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching = caching::none, flag flags = flag::none)
       : io_handle(std::move(h), caching, flags)
@@ -89,6 +87,10 @@ public:
       , _service(nullptr)
   {
   }
+  //! No copy construction (use clone())
+  file_handle(const file_handle &) = delete;
+  //! No copy assignment
+  file_handle &operator=(const file_handle &) = delete;
   //! Implicit move construction of file_handle permitted
   constexpr file_handle(file_handle &&o) noexcept : io_handle(std::move(o)), fs_handle(std::move(o)), _service(o._service) { o._service = nullptr; }
   //! Explicit conversion from handle and io_handle permitted
@@ -111,7 +113,7 @@ public:
 
   /*! Create a file handle opening access to a file on path
   \param base Handle to a base location on the filing system. Pass `{}` to indicate that path will be absolute.
-  \param _path The path relative to base to open.
+  \param path The path relative to base to open.
   \param _mode How to open the file.
   \param _creation How to create the file.
   \param _caching How to ask the kernel to cache the file.

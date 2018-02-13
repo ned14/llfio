@@ -142,13 +142,17 @@ namespace path_discovery
       // Firstly go try to open and stat all items
       for(size_t n = 0; n < ps.all.size(); n++)
       {
-        auto _h = directory_handle::directory({}, ps.all[n].path);
-        if(!_h)
         {
-          // Error during opening
-          continue;
+          log_level_guard logg(log_level::fatal);  // suppress log printing of failure
+          (void) logg;
+          auto _h = directory_handle::directory({}, ps.all[n].path);
+          if(!_h)
+          {
+            // Error during opening
+            continue;
+          }
+          ps._all[n].h = std::move(_h).value();
         }
-        ps._all[n].h = std::move(_h).value();
         // Try to create a small file in that directory
         auto _fh = file_handle::random_file(ps._all[n].h, file_handle::mode::write, file_handle::caching::temporary, file_handle::flag::unlink_on_close);
         if(!_fh)

@@ -52,9 +52,9 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
     IO_STATUS_BLOCK isb = make_iostatus();
 
     path_view::c_str zpath(path, true);
-    UNICODE_STRING _path;
+    UNICODE_STRING _path{};
     _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
-    _path.MaximumLength = (_path.Length = (USHORT)(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
+    _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
     if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
     {
       _path.Buffer += 3;
@@ -62,7 +62,7 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
       _path.MaximumLength -= 3 * sizeof(wchar_t);
     }
 
-    OBJECT_ATTRIBUTES oa;
+    OBJECT_ATTRIBUTES oa{};
     memset(&oa, 0, sizeof(oa));
     oa.Length = sizeof(OBJECT_ATTRIBUTES);
     oa.ObjectName = &_path;
@@ -71,14 +71,16 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
     // if(!!(flags & file_flags::int_opening_link))
     //  oa.Attributes|=0x100/*OBJ_OPENLINK*/;
 
-    LARGE_INTEGER AllocationSize;
+    LARGE_INTEGER AllocationSize{};
     memset(&AllocationSize, 0, sizeof(AllocationSize));
-    NTSTATUS ntstat = NtCreateFile(&nativeh.h, access, &oa, &isb, &AllocationSize, attribs, fileshare, creatdisp, ntflags, NULL, 0);
+    NTSTATUS ntstat = NtCreateFile(&nativeh.h, access, &oa, &isb, &AllocationSize, attribs, fileshare, creatdisp, ntflags, nullptr, 0);
     if(STATUS_PENDING == ntstat)
+    {
       ntstat = ntwait(nativeh.h, isb, deadline());
+    }
     if(ntstat < 0)
     {
-      return {(int) ntstat, ntkernel_category()};
+      return {static_cast<int>(ntstat), ntkernel_category()};
     }
   }
   else
@@ -86,11 +88,11 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
     DWORD creation = OPEN_EXISTING;
     attribs |= FILE_FLAG_BACKUP_SEMANTICS;  // required to open a directory
     path_view::c_str zpath(path, false);
-    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.buffer, access, fileshare, NULL, creation, attribs, NULL)))
+    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.buffer, access, fileshare, nullptr, creation, attribs, nullptr)))  // NOLINT
     {
       DWORD errcode = GetLastError();
       // assert(false);
-      return {(int) errcode, std::system_category()};
+      return {static_cast<int>(errcode), std::system_category()};
     }
   }
   return ret;

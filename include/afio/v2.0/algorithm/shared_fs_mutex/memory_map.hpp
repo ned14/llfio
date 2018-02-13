@@ -110,7 +110,7 @@ namespace algorithm
 
       _hash_index_type &_index() const
       {
-        auto *ret = (_hash_index_type *) _temphmap.address();
+        auto *ret = reinterpret_cast<_hash_index_type *>(_temphmap.address());
         return *ret;
       }
 
@@ -123,10 +123,12 @@ namespace algorithm
       {
         _hlockinuse.set_handle(&_h);
       }
-      memory_map(const memory_map &) = delete;
-      memory_map &operator=(const memory_map &) = delete;
 
     public:
+      //! No copy construction
+      memory_map(const memory_map &) = delete;
+      //! No copy assignment
+      memory_map &operator=(const memory_map &) = delete;
       //! Move constructor
       memory_map(memory_map &&o) noexcept : _h(std::move(o._h)), _temph(std::move(o._temph)), _hlockinuse(std::move(o._hlockinuse)), _hmap(std::move(o._hmap)), _temphmap(std::move(o._temphmap)) { _hlockinuse.set_handle(&_h); }
       //! Move assign
@@ -209,7 +211,7 @@ namespace algorithm
             char buffer[65536];
             memset(buffer, 0, sizeof(buffer));
             OUTCOME_TRYV(ret.read(0, buffer, 65535));
-            path_view temphpath((filesystem::path::value_type *) buffer);
+            path_view temphpath(reinterpret_cast<filesystem::path::value_type *>(buffer));
             result<file_handle> _temph(in_place_type<file_handle>);
             _temph = file_handle::file({}, temphpath, file_handle::mode::write, file_handle::creation::open_existing, file_handle::caching::temporary);
             // If temp file doesn't exist, I am on a different machine
@@ -242,7 +244,7 @@ namespace algorithm
           char buffer[4096];
           memset(buffer, 0, sizeof(buffer));
           size_t bytes = temppath.native().size() * sizeof(*temppath.c_str());
-          file_handle::const_buffer_type buffers[] = {{static_cast<const char *>(temppath.c_str()), bytes}, {(const char *) buffer, 4096 - (bytes % 4096)}};
+          file_handle::const_buffer_type buffers[] = {{reinterpret_cast<const char *>(temppath.c_str()), bytes}, {static_cast<const char *>(buffer), 4096 - (bytes % 4096)}};
           OUTCOME_TRYV(ret.truncate(65536));
           OUTCOME_TRYV(ret.write({buffers, 0}));
           // Map for read the maximum possible path file size, again to avoid race problems
@@ -315,7 +317,7 @@ namespace algorithm
           }
         }
         // alloca() always returns 16 byte aligned addresses
-        span<_entity_idx> entity_to_idx(_hash_entities((_entity_idx *) alloca(sizeof(_entity_idx) * out.entities.size()), out.entities));
+        span<_entity_idx> entity_to_idx(_hash_entities(reinterpret_cast<_entity_idx *>(alloca(sizeof(_entity_idx) * out.entities.size())), out.entities));
         _hash_index_type &index = _index();
         // Fire this if an error occurs
         auto disableunlock = undoer([&] { out.release(); });
@@ -385,7 +387,7 @@ namespace algorithm
       AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long /*unused*/) noexcept final
       {
         AFIO_LOG_FUNCTION_CALL(this);
-        span<_entity_idx> entity_to_idx(_hash_entities((_entity_idx *) alloca(sizeof(_entity_idx) * entities.size()), entities));
+        span<_entity_idx> entity_to_idx(_hash_entities(reinterpret_cast<_entity_idx *>(alloca(sizeof(_entity_idx) * entities.size())), entities));
         _hash_index_type &index = _index();
         for(const auto &i : entity_to_idx)
         {

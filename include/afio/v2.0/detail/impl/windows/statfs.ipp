@@ -39,21 +39,25 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
   size_t ret = 0;
   if((wanted & want::flags) || (wanted & want::namemax) || (wanted & want::fstypename))
   {
-    FILE_FS_ATTRIBUTE_INFORMATION *ffai = (FILE_FS_ATTRIBUTE_INFORMATION *) buffer;
+    auto *ffai = reinterpret_cast<FILE_FS_ATTRIBUTE_INFORMATION *>(buffer);
     isb.Status = -1;
     ntstat = NtQueryVolumeInformationFile(h.native_handle().h, &isb, ffai, sizeof(buffer), FileFsAttributeInformation);
     if(STATUS_PENDING == ntstat)
+    {
       ntstat = ntwait(h.native_handle().h, isb, deadline());
-    if(ntstat)
-      return {(int) ntstat, ntkernel_category()};
+    }
+    if(ntstat != 0)
+    {
+      return {static_cast<int>(ntstat), ntkernel_category()};
+    }
     if(wanted & want::flags)
     {
-      f_flags.rdonly = !!(ffai->FileSystemAttributes & FILE_READ_ONLY_VOLUME);
-      f_flags.acls = !!(ffai->FileSystemAttributes & FILE_PERSISTENT_ACLS);
-      f_flags.xattr = !!(ffai->FileSystemAttributes & FILE_NAMED_STREAMS);
-      f_flags.compression = !!(ffai->FileSystemAttributes & FILE_VOLUME_IS_COMPRESSED);
-      f_flags.extents = !!(ffai->FileSystemAttributes & FILE_SUPPORTS_SPARSE_FILES);
-      f_flags.filecompression = !!(ffai->FileSystemAttributes & FILE_FILE_COMPRESSION);
+      f_flags.rdonly = static_cast<uint32_t>((ffai->FileSystemAttributes & FILE_READ_ONLY_VOLUME) != 0u);
+      f_flags.acls = static_cast<uint32_t>((ffai->FileSystemAttributes & FILE_PERSISTENT_ACLS) != 0u);
+      f_flags.xattr = static_cast<uint32_t>((ffai->FileSystemAttributes & FILE_NAMED_STREAMS) != 0u);
+      f_flags.compression = static_cast<uint32_t>((ffai->FileSystemAttributes & FILE_VOLUME_IS_COMPRESSED) != 0u);
+      f_flags.extents = static_cast<uint32_t>((ffai->FileSystemAttributes & FILE_SUPPORTS_SPARSE_FILES) != 0u);
+      f_flags.filecompression = static_cast<uint32_t>((ffai->FileSystemAttributes & FILE_FILE_COMPRESSION) != 0u);
       ++ret;
     }
     if(wanted & want::namemax)
@@ -65,19 +69,25 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
     {
       f_fstypename.resize(ffai->FileSystemNameLength / sizeof(wchar_t));
       for(size_t n = 0; n < ffai->FileSystemNameLength / sizeof(wchar_t); n++)
-        f_fstypename[n] = (char) ffai->FileSystemName[n];
+      {
+        f_fstypename[n] = static_cast<char>(ffai->FileSystemName[n]);
+      }
       ++ret;
     }
   }
   if((wanted & want::bsize) || (wanted & want::blocks) || (wanted & want::bfree) || (wanted & want::bavail))
   {
-    FILE_FS_FULL_SIZE_INFORMATION *fffsi = (FILE_FS_FULL_SIZE_INFORMATION *) buffer;
+    auto *fffsi = reinterpret_cast<FILE_FS_FULL_SIZE_INFORMATION *>(buffer);
     isb.Status = -1;
     ntstat = NtQueryVolumeInformationFile(h.native_handle().h, &isb, fffsi, sizeof(buffer), FileFsFullSizeInformation);
     if(STATUS_PENDING == ntstat)
+    {
       ntstat = ntwait(h.native_handle().h, isb, deadline());
-    if(ntstat)
-      return {(int) ntstat, ntkernel_category()};
+    }
+    if(ntstat != 0)
+    {
+      return {static_cast<int>(ntstat), ntkernel_category()};
+    }
     if(wanted & want::bsize)
     {
       f_bsize = fffsi->BytesPerSector * fffsi->SectorsPerAllocationUnit;
@@ -101,11 +111,13 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
   }
   if(wanted & want::fsid)
   {
-    FILE_FS_OBJECTID_INFORMATION *ffoi = (FILE_FS_OBJECTID_INFORMATION *) buffer;
+    auto *ffoi = reinterpret_cast<FILE_FS_OBJECTID_INFORMATION *>(buffer);
     isb.Status = -1;
     ntstat = NtQueryVolumeInformationFile(h.native_handle().h, &isb, ffoi, sizeof(buffer), FileFsObjectIdInformation);
     if(STATUS_PENDING == ntstat)
+    {
       ntstat = ntwait(h.native_handle().h, isb, deadline());
+    }
     if(0 /*STATUS_SUCCESS*/ == ntstat)
     {
       // FAT32 doesn't support filing system id, so sink error
@@ -115,13 +127,17 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
   }
   if(wanted & want::iosize)
   {
-    FILE_FS_SECTOR_SIZE_INFORMATION *ffssi = (FILE_FS_SECTOR_SIZE_INFORMATION *) buffer;
+    auto *ffssi = reinterpret_cast<FILE_FS_SECTOR_SIZE_INFORMATION *>(buffer);
     isb.Status = -1;
     ntstat = NtQueryVolumeInformationFile(h.native_handle().h, &isb, ffssi, sizeof(buffer), FileFsSectorSizeInformation);
     if(STATUS_PENDING == ntstat)
+    {
       ntstat = ntwait(h.native_handle().h, isb, deadline());
-    if(ntstat)
+    }
+    if(ntstat != 0)
+    {
       return {ntstat, ntkernel_category()};
+    }
     f_iosize = ffssi->PhysicalBytesPerSectorForPerformance;
     ++ret;
   }
@@ -132,36 +148,50 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
     for(;;)
     {
       DWORD pathlen = GetFinalPathNameByHandle(h.native_handle().h, buffer2, sizeof(buffer2) / sizeof(*buffer2), FILE_NAME_OPENED | VOLUME_NAME_NONE);
-      if(!pathlen || pathlen >= sizeof(buffer2) / sizeof(*buffer2))
+      if((pathlen == 0u) || pathlen >= sizeof(buffer2) / sizeof(*buffer2))
+      {
         return {GetLastError(), std::system_category()};
+      }
       buffer2[pathlen] = 0;
       if(wanted & want::mntfromname)
       {
         DWORD len = GetFinalPathNameByHandle(h.native_handle().h, buffer, sizeof(buffer) / sizeof(*buffer), FILE_NAME_OPENED | VOLUME_NAME_NT);
-        if(!len || len >= sizeof(buffer) / sizeof(*buffer))
+        if((len == 0u) || len >= sizeof(buffer) / sizeof(*buffer))
+        {
           return {GetLastError(), std::system_category()};
+        }
         buffer[len] = 0;
-        if(memcmp(buffer2, buffer + len - pathlen, pathlen))
+        if(memcmp(buffer2, buffer + len - pathlen, pathlen) != 0)
+        {
           continue;  // path changed
+        }
         len -= pathlen;
         // buffer should look like \Device\HarddiskVolumeX
-        if(memcmp(buffer, L"\\Device\\HarddiskVolume", 44))
+        if(memcmp(buffer, L"\\Device\\HarddiskVolume", 44) != 0)
+        {
           return std::errc::illegal_byte_sequence;
+        }
         f_mntfromname.reserve(len + 3);
         f_mntfromname.assign("\\!!");  // escape prefix for NT kernel path
         for(size_t n = 0; n < len; n++)
-          f_mntfromname.push_back((char) buffer[n]);
+        {
+          f_mntfromname.push_back(static_cast<char>(buffer[n]));
+        }
         ++ret;
         wanted &= ~want::mntfromname;
       }
       if(wanted & want::mntonname)
       {
         DWORD len = GetFinalPathNameByHandle(h.native_handle().h, buffer, sizeof(buffer) / sizeof(*buffer), FILE_NAME_OPENED | VOLUME_NAME_DOS);
-        if(!len || len >= sizeof(buffer) / sizeof(*buffer))
+        if((len == 0u) || len >= sizeof(buffer) / sizeof(*buffer))
+        {
           return {GetLastError(), std::system_category()};
+        }
         buffer[len] = 0;
-        if(memcmp(buffer2, buffer + len - pathlen, pathlen))
+        if(memcmp(buffer2, buffer + len - pathlen, pathlen) != 0)
+        {
           continue;  // path changed
+        }
         len -= pathlen;
         f_mntonname = decltype(f_mntonname)::string_type(buffer, len);
         ++ret;

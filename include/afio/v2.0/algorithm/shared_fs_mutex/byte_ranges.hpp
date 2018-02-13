@@ -78,8 +78,6 @@ namespace algorithm
           : _h(std::move(h))
       {
       }
-      byte_ranges(const byte_ranges &) = delete;
-      byte_ranges &operator=(const byte_ranges &) = delete;
 
     public:
       //! The type of an entity id
@@ -87,6 +85,11 @@ namespace algorithm
       //! The type of a sequence of entities
       using entities_type = shared_fs_mutex::entities_type;
 
+      //! No copy construction
+      byte_ranges(const byte_ranges &) = delete;
+      //! No copy assignment
+      byte_ranges &operator=(const byte_ranges &) = delete;
+      ~byte_ranges() = default;
       //! Move constructor
       byte_ranges(byte_ranges &&o) noexcept : _h(std::move(o._h)) {}
       //! Move assign

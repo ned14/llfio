@@ -122,7 +122,7 @@ namespace storage_profile
                 {
                   ;
                 }
-                int s = atoi(siblings), c = atoi(cpucores);
+                int s = atoi(siblings), c = atoi(cpucores);  // NOLINT
                 if((s != 0) && (c != 0))
                 {
                   sp.cpu_physical_cores.value = sysconf(_SC_NPROCESSORS_ONLN) * c / s;
@@ -179,7 +179,7 @@ namespace storage_profile
             }
             else
             {
-              strcpy(&buffer[14], "unbranded");
+              memcpy(&buffer[14], "unbranded", 10);
             }
 
             // Trim string
@@ -238,11 +238,12 @@ namespace storage_profile
     namespace posix
     {
       // Controller type, max transfer, max buffers. Device name, size
-      outcome<void> _device(storage_profile &sp, file_handle & /*unused*/, std::string mntfromname, std::string fstypename) noexcept
+      outcome<void> _device(storage_profile &sp, file_handle & /*unused*/, const std::string &_mntfromname, const std::string &fstypename) noexcept
       {
         (void) fstypename;
         try
         {
+          std::string mntfromname(_mntfromname);
           // Firstly open a handle to the device
           if(strncmp(mntfromname.data(), "/dev", 4) == 0)
           {
@@ -319,6 +320,6 @@ namespace storage_profile
       }
     }  // namespace posix
   }    // namespace storage
-}  // namespace system
+}  // namespace storage_profile
 
 AFIO_V2_NAMESPACE_END

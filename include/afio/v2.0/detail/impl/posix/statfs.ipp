@@ -43,7 +43,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
   memset(&s, 0, sizeof(s));
   if(-1 == fstatfs64(h.native_handle().fd, &s))
   {
-    return { errno, std::system_category() };
+    return {errno, std::system_category()};
   }
   if(!!(wanted & want::bsize))
   {
@@ -117,7 +117,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
         }
         if(mtab == nullptr)
         {
-          return { errno, std::system_category() };
+          return {errno, std::system_category()};
         }
         auto unmtab = undoer([mtab] { endmntent(mtab); });
         struct mntent m
@@ -170,9 +170,9 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
 #endif
       if(!!(wanted & want::flags))
       {
-        f_flags.rdonly = static_cast<uint32_t>(!((s.f_flags & MS_RDONLY)) == 0);
-        f_flags.noexec = static_cast<uint32_t>(!((s.f_flags & MS_NOEXEC)) == 0);
-        f_flags.nosuid = static_cast<uint32_t>(!((s.f_flags & MS_NOSUID)) == 0);
+        f_flags.rdonly = static_cast<uint32_t>((s.f_flags & MS_RDONLY) != 0);
+        f_flags.noexec = static_cast<uint32_t>((s.f_flags & MS_NOEXEC) != 0);
+        f_flags.nosuid = static_cast<uint32_t>((s.f_flags & MS_NOSUID) != 0);
         f_flags.acls = static_cast<uint32_t>(std::string::npos != mountentries.front().first.mnt_opts.find("acl") && std::string::npos == mountentries.front().first.mnt_opts.find("noacl"));
         f_flags.xattr = static_cast<uint32_t>(std::string::npos != mountentries.front().first.mnt_opts.find("xattr") && std::string::npos == mountentries.front().first.mnt_opts.find("nouser_xattr"));
         //                out.f_flags.compression=0;

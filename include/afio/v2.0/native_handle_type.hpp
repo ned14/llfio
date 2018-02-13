@@ -38,53 +38,57 @@ AFIO_V2_NAMESPACE_EXPORT_BEGIN
 \brief A native handle type used for wrapping file descriptors, process ids or HANDLEs.
 Unmanaged, wrap in a handle object to manage.
 */
-struct native_handle_type
+struct native_handle_type  // NOLINT
 {
   //! The type of handle.
   QUICKCPPLIB_BITFIELD_BEGIN(disposition)
   {
-    invalid = 0,  //!< Invalid handle
+    invalid = 0U,  //!< Invalid handle
 
-    readable = 1 << 0,     //!< Is readable
-    writable = 1 << 1,     //!< Is writable
-    append_only = 1 << 2,  //!< Is append only
+    readable = 1U << 0U,     //!< Is readable
+    writable = 1U << 1U,     //!< Is writable
+    append_only = 1U << 2U,  //!< Is append only
 
-    overlapped = 1 << 4,  //!< Requires additional synchronisation
-    seekable = 1 << 5,    //!< Is seekable
-    aligned_io = 1 << 6,  //!< Requires sector aligned i/o (typically 512 or 4096)
+    overlapped = 1U << 4U,  //!< Requires additional synchronisation
+    seekable = 1U << 5U,    //!< Is seekable
+    aligned_io = 1U << 6U,  //!< Requires sector aligned i/o (typically 512 or 4096)
 
-    file = 1 << 8,          //!< Is a regular file
-    directory = 1 << 9,     //!< Is a directory
-    symlink = 1 << 10,      //!< Is a symlink
-    multiplexer = 1 << 11,  //!< Is a kqueue/epoll/iocp
-    process = 1 << 12,      //!< Is a child process
-    section = 1 << 13       //!< Is a memory section
+    file = 1U << 8U,          //!< Is a regular file
+    directory = 1U << 9U,     //!< Is a directory
+    symlink = 1U << 10U,      //!< Is a symlink
+    multiplexer = 1U << 11U,  //!< Is a kqueue/epoll/iocp
+    process = 1U << 12U,      //!< Is a child process
+    section = 1U << 13U       //!< Is a memory section
   }
   QUICKCPPLIB_BITFIELD_END(disposition)
   disposition behaviour;  //! The behaviour of the handle
   union {
     intptr_t _init{-1};
-    int fd;       //!< A POSIX file descriptor
-    int pid;        //!< A POSIX process identifier
-    win::handle h;  //!< A Windows HANDLE
+    //! A POSIX file descriptor
+    int fd;  // NOLINT
+    //! A POSIX process identifier
+    int pid;  // NOLINT
+    //! A Windows HANDLE
+    win::handle h;  // NOLINT
   };
   //! Constructs a default instance
-  constexpr native_handle_type() noexcept {}
+  constexpr native_handle_type() {}  // NOLINT
+  ~native_handle_type() = default;
   //! Construct from a POSIX file descriptor
-  constexpr native_handle_type(disposition _behaviour, int _fd) noexcept : behaviour(_behaviour), fd(_fd) {}
+  constexpr native_handle_type(disposition _behaviour, int _fd) noexcept : behaviour(_behaviour), fd(_fd) {}  // NOLINT
   //! Construct from a Windows HANDLE
-  constexpr native_handle_type(disposition _behaviour, win::handle _h) noexcept : behaviour(_behaviour), h(_h) {}
+  constexpr native_handle_type(disposition _behaviour, win::handle _h) noexcept : behaviour(_behaviour), h(_h) {}  // NOLINT
 
   //! Copy construct
-  constexpr native_handle_type(const native_handle_type &) = default;
+  native_handle_type(const native_handle_type &) = default;
   //! Move construct
-  constexpr native_handle_type(native_handle_type &&o) noexcept : behaviour(o.behaviour), _init(o._init)
+  constexpr native_handle_type(native_handle_type &&o) noexcept : behaviour(o.behaviour), _init(o._init)  // NOLINT
   {
     o.behaviour = disposition();
     o._init = -1;
   }
   //! Copy assign
-  constexpr native_handle_type &operator=(const native_handle_type &) = default;
+  native_handle_type &operator=(const native_handle_type &) = default;
   //! Move assign
   constexpr native_handle_type &operator=(native_handle_type &&o) noexcept
   {

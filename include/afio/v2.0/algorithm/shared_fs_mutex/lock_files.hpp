@@ -79,8 +79,6 @@ namespace algorithm
           : _path(o)
       {
       }
-      lock_files(const lock_files &) = delete;
-      lock_files &operator=(const lock_files &) = delete;
 
     public:
       //! The type of an entity id
@@ -88,6 +86,11 @@ namespace algorithm
       //! The type of a sequence of entities
       using entities_type = shared_fs_mutex::entities_type;
 
+      //! No copy construction
+      lock_files(const lock_files &) = delete;
+      //! No copy assignment
+      lock_files &operator=(const lock_files &) = delete;
+      ~lock_files() = default;
       //! Move constructor
       lock_files(lock_files &&o) noexcept : _path(o._path), _hs(std::move(o._hs)) {}
       //! Move assign

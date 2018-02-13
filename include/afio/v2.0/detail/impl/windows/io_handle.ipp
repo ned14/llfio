@@ -35,12 +35,16 @@ size_t io_handle::max_buffers() const noexcept
 template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersType> do_read_write(const native_handle_type &nativeh, Syscall &&syscall, io_handle::io_request<BuffersType> reqs, deadline d) noexcept
 {
   if(d && !nativeh.is_overlapped())
+  {
     return std::errc::not_supported;
+  }
   if(reqs.buffers.size() > 64)
+  {
     return std::errc::argument_list_too_long;
+  }
 
   AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
-  std::array<OVERLAPPED, 64> _ols;
+  std::array<OVERLAPPED, 64> _ols{};
   memset(_ols.data(), 0, reqs.buffers.size() * sizeof(OVERLAPPED));
   span<OVERLAPPED> ols(_ols.data(), reqs.buffers.size());
   auto ol_it = ols.begin();
@@ -61,9 +65,11 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
   for(auto &req : reqs.buffers)
   {
     OVERLAPPED &ol = *ol_it++;
-    ol.Internal = (ULONG_PTR) -1;
+    ol.Internal = static_cast<ULONG_PTR>(-1);
     if(nativeh.is_append_only())
+    {
       ol.OffsetHigh = ol.Offset = 0xffffffff;
+    }
     else
     {
 #ifndef NDEBUG
@@ -82,8 +88,10 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
       assert((req.len & 511) == 0);
     }
 #endif
-    if(!syscall(nativeh.h, req.data, (DWORD) req.len, &transferred, &ol) && ERROR_IO_PENDING != GetLastError())
+    if(!syscall(nativeh.h, req.data, static_cast<DWORD>(req.len), &transferred, &ol) && ERROR_IO_PENDING != GetLastError())
+    {
       return {GetLastError(), std::system_category()};
+    }
     reqs.offset += req.len;
   }
   // If handle is overlapped, wait for completion of each i/o.
@@ -106,7 +114,7 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
     ols[n].Internal = ols[n].Internal & 0xffffffff;
     if(ols[n].Internal != 0)
     {
-      return {(int) ols[n].Internal, ntkernel_category()};
+      return {static_cast<int>(ols[n].Internal), ntkernel_category()};
     }
     reqs.buffers[n].len = ols[n].InternalHigh;
   }
@@ -116,37 +124,45 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
 io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_request<io_handle::buffers_type> reqs, deadline d) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  return do_read_write(_v, &ReadFile, std::move(reqs), std::move(d));
+  return do_read_write(_v, &ReadFile, reqs, d);
 }
 
 io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::io_request<io_handle::const_buffers_type> reqs, deadline d) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  return do_read_write(_v, &WriteFile, std::move(reqs), std::move(d));
+  return do_read_write(_v, &WriteFile, reqs, d);
 }
 
 result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, io_handle::extent_type bytes, bool exclusive, deadline d) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(_v.h);
   if(d && d.nsecs > 0 && !_v.is_overlapped())
+  {
     return std::errc::not_supported;
+  }
   DWORD flags = exclusive ? LOCKFILE_EXCLUSIVE_LOCK : 0;
-  if(d && !d.nsecs)
+  if(d && (d.nsecs == 0u))
+  {
     flags |= LOCKFILE_FAIL_IMMEDIATELY;
+  }
   AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
-  OVERLAPPED ol;
+  OVERLAPPED ol{};
   memset(&ol, 0, sizeof(ol));
-  ol.Internal = (ULONG_PTR) -1;
+  ol.Internal = static_cast<ULONG_PTR>(-1);
   ol.OffsetHigh = (offset >> 32) & 0xffffffff;
   ol.Offset = offset & 0xffffffff;
-  DWORD bytes_high = !bytes ? MAXDWORD : (DWORD)((bytes >> 32) & 0xffffffff);
-  DWORD bytes_low = !bytes ? MAXDWORD : (DWORD)(bytes & 0xffffffff);
-  if(!LockFileEx(_v.h, flags, 0, bytes_low, bytes_high, &ol))
+  DWORD bytes_high = bytes == 0u ? MAXDWORD : static_cast<DWORD>((bytes >> 32) & 0xffffffff);
+  DWORD bytes_low = bytes == 0u ? MAXDWORD : static_cast<DWORD>(bytes & 0xffffffff);
+  if(LockFileEx(_v.h, flags, 0, bytes_low, bytes_high, &ol) == 0)
   {
-    if(ERROR_LOCK_VIOLATION == GetLastError() && d && !d.nsecs)
+    if(ERROR_LOCK_VIOLATION == GetLastError() && d && (d.nsecs == 0u))
+    {
       return std::errc::timed_out;
+    }
     if(ERROR_IO_PENDING != GetLastError())
+    {
       return {GetLastError(), std::system_category()};
+    }
   }
   // If handle is overlapped, wait for completion of each i/o.
   if(_v.is_overlapped())
@@ -158,7 +174,9 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
     // It seems the NT kernel is guilty of casting bugs sometimes
     ol.Internal = ol.Internal & 0xffffffff;
     if(ol.Internal != 0)
-      return {(int) ol.Internal, ntkernel_category()};
+    {
+      return {static_cast<int>(ol.Internal), ntkernel_category()};
+    }
   }
   return extent_guard(this, offset, bytes, exclusive);
 }
@@ -166,18 +184,18 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
 void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type bytes) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  OVERLAPPED ol;
+  OVERLAPPED ol{};
   memset(&ol, 0, sizeof(ol));
-  ol.Internal = (ULONG_PTR) -1;
+  ol.Internal = static_cast<ULONG_PTR>(-1);
   ol.OffsetHigh = (offset >> 32) & 0xffffffff;
   ol.Offset = offset & 0xffffffff;
-  DWORD bytes_high = !bytes ? MAXDWORD : (DWORD)((bytes >> 32) & 0xffffffff);
-  DWORD bytes_low = !bytes ? MAXDWORD : (DWORD)(bytes & 0xffffffff);
-  if(!UnlockFileEx(_v.h, 0, bytes_low, bytes_high, &ol))
+  DWORD bytes_high = bytes == 0u ? MAXDWORD : static_cast<DWORD>((bytes >> 32) & 0xffffffff);
+  DWORD bytes_low = bytes == 0u ? MAXDWORD : static_cast<DWORD>(bytes & 0xffffffff);
+  if(UnlockFileEx(_v.h, 0, bytes_low, bytes_high, &ol) == 0)
   {
     if(ERROR_IO_PENDING != GetLastError())
     {
-      auto ret = std::error_code{(int) GetLastError(), std::system_category()};
+      auto ret = std::error_code{static_cast<int>(GetLastError()), std::system_category()};
       (void) ret;
       AFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
       std::terminate();
@@ -191,7 +209,7 @@ void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type byt
     {
       // It seems the NT kernel is guilty of casting bugs sometimes
       ol.Internal = ol.Internal & 0xffffffff;
-      auto ret = std::error_code((int) ol.Internal, ntkernel_category());
+      auto ret = std::error_code(static_cast<int>(ol.Internal), ntkernel_category());
       (void) ret;
       AFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
       std::terminate();

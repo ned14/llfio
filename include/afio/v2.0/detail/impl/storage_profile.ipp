@@ -420,7 +420,7 @@ namespace storage_profile
               auto _h(srch.clone());
               if(!_h)
               {
-                throw std::runtime_error("concurrency::atomic_rewrite_quantum: "
+                throw std::runtime_error("concurrency::atomic_rewrite_quantum: "  // NOLINT
                                          "Could not open work file due to " +
                                          _h.error().message());
               }
@@ -459,7 +459,7 @@ namespace storage_profile
               auto _h(srch.clone());
               if(!_h)
               {
-                throw std::runtime_error("concurrency::atomic_rewrite_quantum: "
+                throw std::runtime_error("concurrency::atomic_rewrite_quantum: "  // NOLINT
                                          "Could not open work file due to " +
                                          _h.error().message());
               }
@@ -505,7 +505,7 @@ namespace storage_profile
           {
             std::this_thread::sleep_for(std::chrono::seconds(1));
           }
-          done = true;
+          done = 1u;
           for(auto &writer : writers)
           {
             writer.first->join();
@@ -564,7 +564,7 @@ namespace storage_profile
                 auto _h(srch.clone());
                 if(!_h)
                 {
-                  throw std::runtime_error("concurrency::atomic_rewrite_"
+                  throw std::runtime_error("concurrency::atomic_rewrite_"  // NOLINT
                                            "quantum: Could not open work file "
                                            "due to " +
                                            _h.error().message());
@@ -604,7 +604,7 @@ namespace storage_profile
                 auto _h(srch.clone());
                 if(!_h)
                 {
-                  throw std::runtime_error("concurrency::atomic_rewrite_"
+                  throw std::runtime_error("concurrency::atomic_rewrite_"  // NOLINT
                                            "quantum: Could not open work file "
                                            "due to " +
                                            _h.error().message());
@@ -651,7 +651,7 @@ namespace storage_profile
             {
               std::this_thread::sleep_for(std::chrono::seconds(1));
             }
-            done = true;
+            done = 1u;
             for(auto &writer : writers)
             {
               writer.first->join();
@@ -690,8 +690,9 @@ namespace storage_profile
         return success();
       }
 #ifdef _WIN32  // The 4Kb min i/o makes this test take too long
-      if(srch.requires_aligned_io())
+      if(srch.requires_aligned_io()) {
         return success();
+}
 #endif
       try
       {
@@ -723,7 +724,7 @@ namespace storage_profile
                   auto _h(srch.clone());
                   if(!_h)
                   {
-                    throw std::runtime_error("concurrency::atomic_rewrite_"
+                    throw std::runtime_error("concurrency::atomic_rewrite_"  // NOLINT
                                              "offset_boundary: Could not open "
                                              "work file due to " +
                                              _h.error().message());
@@ -763,7 +764,7 @@ namespace storage_profile
                   auto _h(srch.clone());
                   if(!_h)
                   {
-                    throw std::runtime_error("concurrency::atomic_rewrite_"
+                    throw std::runtime_error("concurrency::atomic_rewrite_"  // NOLINT
                                              "offset_boundary: Could not open "
                                              "work file due to " +
                                              _h.error().message());
@@ -810,7 +811,7 @@ namespace storage_profile
               {
                 std::this_thread::sleep_for(std::chrono::seconds(1));
               }
-              done = true;
+              done = 1u;
               for(auto &writer : writers)
               {
                 writer.first->join();
@@ -978,7 +979,7 @@ namespace storage_profile
         {
           std::this_thread::sleep_for(std::chrono::seconds(1));
         }
-        done = true;
+        done = 1u;
         for(auto &writer : writers)
         {
           writer.first->join();

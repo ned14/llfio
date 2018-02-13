@@ -165,7 +165,7 @@ public:
 
 private:
 #ifdef _WIN32
-  win::handle _threadh;
+  win::handle _threadh{};
   win::dword _threadid;
 #else
   pthread_t _threadh;
@@ -230,7 +230,9 @@ public:
   */
   AFIO_HEADERS_ONLY_MEMFUNC_SPEC io_service();
   io_service(io_service &&) = delete;
+  io_service(const io_service &) = delete;
   io_service &operator=(io_service &&) = delete;
+  io_service &operator=(const io_service &) = delete;
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~io_service();
 
 #ifdef AFIO_IO_POST_SIGNAL
@@ -293,7 +295,7 @@ public:
     io_service *service;
 
     //! Constructor, takes the i/o service whose kernel thread we are to reschedule onto
-    awaitable_post_to_self(io_service &_service)
+    explicit awaitable_post_to_self(io_service &_service)
         : service(&_service)
     {
     }
@@ -301,7 +303,7 @@ public:
     bool await_ready() { return false; }
     void await_suspend(coroutine_handle<> co)
     {
-      service->post([co = std::move(co)](io_service * /*unused*/) { co.resume(); });
+      service->post([co = co](io_service * /*unused*/) { co.resume(); });
     }
     void await_resume() {}
   };

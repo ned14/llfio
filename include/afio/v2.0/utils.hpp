@@ -51,7 +51,7 @@ namespace utils
   template <class T> inline T round_down_to_page_size(T i) noexcept
   {
     const size_t pagesize = page_size();
-    i = (T)((uintptr_t) i & ~(pagesize - 1));
+    i = (T)(AFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i) & ~(pagesize - 1));  // NOLINT
     return i;
   }
   /*! \brief Round a value to its next highest page size multiple
@@ -59,7 +59,7 @@ namespace utils
   template <class T> inline T round_up_to_page_size(T i) noexcept
   {
     const size_t pagesize = page_size();
-    i = (T)(((uintptr_t) i + pagesize - 1) & ~(pagesize - 1));
+    i = (T)((AFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i) + pagesize - 1) & ~(pagesize - 1));  // NOLINT
     return i;
   }
   /*! \brief Round a pair of a pointer and a size_t to their nearest page size multiples. The pointer will be rounded
@@ -68,7 +68,7 @@ namespace utils
   template <class T> inline T round_to_page_size(T i) noexcept
   {
     const size_t pagesize = page_size();
-    i.data = (char *) (((uintptr_t) i.data) & ~(pagesize - 1));
+    i.data = reinterpret_cast<char *>((AFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i.data)) & ~(pagesize - 1));
     i.len = (i.len + pagesize - 1) & ~(pagesize - 1);
     return i;
   }
@@ -160,10 +160,8 @@ namespace utils
       void *p{nullptr};
       size_t page_size_used{0};
       size_t actual_size{0};
-      large_page_allocation()
-      {
-      }
-      large_page_allocation(void *_p, size_t pagesize, size_t actual)
+      constexpr large_page_allocation() {}  // NOLINT
+      constexpr large_page_allocation(void *_p, size_t pagesize, size_t actual)
           : p(_p)
           , page_size_used(pagesize)
           , actual_size(actual)
@@ -226,11 +224,11 @@ namespace utils
       using other = page_allocator<U>;
     };
 
-    page_allocator() noexcept = default;
+    constexpr page_allocator() noexcept {}  // NOLINT
 
-    template <class U> explicit page_allocator(const page_allocator<U> & /*unused*/) noexcept {}
+    template <class U> page_allocator(const page_allocator<U> & /*unused*/) noexcept {}  // NOLINT
 
-    size_type max_size() const noexcept { return size_type(~0) / sizeof(T); }
+    size_type max_size() const noexcept { return size_type(~0U) / sizeof(T); }
 
     pointer address(reference x) const noexcept { return std::addressof(x); }
 

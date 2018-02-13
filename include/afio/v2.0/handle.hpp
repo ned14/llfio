@@ -105,7 +105,7 @@ public:
     somewhat emulated by AFIO on Windows by renaming the file to a random name on `close()`
     causing it to appear to have been unlinked immediately.
     */
-    unlink_on_close = 1 << 0,
+    unlink_on_close = 1U << 0U,
 
     /*! Some kernel caching modes have unhelpfully inconsistent behaviours
     in getting your data onto storage, so by default unless this flag is
@@ -124,7 +124,7 @@ public:
     * caching::reads_and_metadata
     * caching::safety_fsyncs
     */
-    disable_safety_fsyncs = 1 << 2,
+    disable_safety_fsyncs = 1U << 2U,
     /*! `file_handle::unlink()` could accidentally delete the wrong file if someone has
     renamed the open file handle since the time it was opened. To prevent this occuring,
     where the OS doesn't provide race free unlink-by-open-handle we compare the inode of
@@ -133,17 +133,17 @@ public:
     and executing the unlink a third party changes the item about to be unlinked. Only
     operating systems with a true race-free unlink syscall are race free.
     */
-    disable_safety_unlinks = 1 << 3,
+    disable_safety_unlinks = 1U << 3U,
     /*! Ask the OS to disable prefetching of data. This can improve random
     i/o performance.
     */
-    disable_prefetching = 1 << 4,
+    disable_prefetching = 1U << 4U,
     /*! Ask the OS to maximise prefetching of data, possibly prefetching the entire file
     into kernel cache. This can improve sequential i/o performance.
     */
-    maximum_prefetching = 1 << 5,
+    maximum_prefetching = 1U << 5U,
 
-    win_disable_unlink_emulation = 1 << 24,  //!< See the documentation for `unlink_on_close`
+    win_disable_unlink_emulation = 1U << 24U,  //!< See the documentation for `unlink_on_close`
     /*! Microsoft Windows NTFS, having been created in the late 1980s, did not originally
     implement extents-based storage and thus could only represent sparse files via
     efficient compression of intermediate zeros. With NTFS v3.0 (Microsoft Windows 2000),
@@ -159,13 +159,13 @@ public:
     extents-based storage for any empty file it creates. If you don't want this, you
     can specify this flag to prevent that happening.
     */
-    win_disable_sparse_file_creation = 1 << 25,
+    win_disable_sparse_file_creation = 1U << 25U,
 
     // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
 
-    overlapped = 1 << 28,          //!< On Windows, create any new handles with OVERLAPPED semantics
-    byte_lock_insanity = 1 << 29,  //!< Using insane POSIX byte range locks
-    anonymous_inode = 1 << 30      //!< This is an inode created with no representation on the filing system
+    overlapped = 1U << 28U,          //!< On Windows, create any new handles with OVERLAPPED semantics
+    byte_lock_insanity = 1U << 29U,  //!< Using insane POSIX byte range locks
+    anonymous_inode = 1U << 30U      //!< This is an inode created with no representation on the filing system
   }
   QUICKCPPLIB_BITFIELD_END(flag);
 
@@ -176,7 +176,7 @@ protected:
 
 public:
   //! Default constructor
-  constexpr handle() {}
+  constexpr handle() {}  // NOLINT
   //! Construct a handle from a supplied native handle
   explicit constexpr handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none) noexcept : _caching(caching), _flags(flags), _v(std::move(h)) {}
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~handle();
@@ -308,7 +308,7 @@ public:
   //! True if writes are safely on storage on completion
   bool are_writes_durable() const noexcept { return _caching == caching::none || _caching == caching::reads || _caching == caching::reads_and_metadata; }
   //! True if issuing safety fsyncs is on
-  bool are_safety_fsyncs_issued() const noexcept { return !(_flags & flag::disable_safety_fsyncs) && !((static_cast<int>(_caching) & 1) == 0); }
+  bool are_safety_fsyncs_issued() const noexcept { return !(_flags & flag::disable_safety_fsyncs) && !((static_cast<unsigned>(_caching) & 1U) == 0U); }
 
   //! The flags this handle was opened with
   flag flags() const noexcept { return _flags; }
@@ -328,29 +328,29 @@ inline std::ostream &operator<<(std::ostream &s, const handle &v)
 inline std::ostream &operator<<(std::ostream &s, const handle::mode &v)
 {
   static constexpr const char *values[] = {"unchanged", nullptr, "none", nullptr, "attr_read", "attr_write", "read", "write", nullptr, "append"};
-  if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || (values[static_cast<size_t>(v)] == nullptr))
+  if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || (values[static_cast<size_t>(v)] == nullptr))  // NOLINT
   {
     return s << "afio::handle::mode::<unknown>";
   }
-  return s << "afio::handle::mode::" << values[static_cast<size_t>(v)];
+  return s << "afio::handle::mode::" << values[static_cast<size_t>(v)];  // NOLINT
 }
 inline std::ostream &operator<<(std::ostream &s, const handle::creation &v)
 {
   static constexpr const char *values[] = {"open_existing", "only_if_not_exist", "if_needed", "truncate"};
-  if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || (values[static_cast<size_t>(v)] == nullptr))
+  if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || (values[static_cast<size_t>(v)] == nullptr))  // NOLINT
   {
     return s << "afio::handle::creation::<unknown>";
   }
-  return s << "afio::handle::creation::" << values[static_cast<size_t>(v)];
+  return s << "afio::handle::creation::" << values[static_cast<size_t>(v)];  // NOLINT
 }
 inline std::ostream &operator<<(std::ostream &s, const handle::caching &v)
 {
   static constexpr const char *values[] = {"unchanged", "none", "only_metadata", "reads", "all", "reads_and_metadata", "temporary", "safety_fsyncs"};
-  if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || (values[static_cast<size_t>(v)] == nullptr))
+  if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || (values[static_cast<size_t>(v)] == nullptr))  // NOLINT
   {
     return s << "afio::handle::caching::<unknown>";
   }
-  return s << "afio::handle::caching::" << values[static_cast<size_t>(v)];
+  return s << "afio::handle::caching::" << values[static_cast<size_t>(v)];  // NOLINT
 }
 inline std::ostream &operator<<(std::ostream &s, const handle::flag &v)
 {

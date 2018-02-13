@@ -24,81 +24,111 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../test_kernel_decl.hpp"
 
-static size_t trivial_vector_udts_constructed;
+static uint64_t trivial_vector_udts_constructed = 78;
 static inline void TestTrivialVector()
 {
   // Test udt without default constructor, complex constructor and trivial everything else
   struct udt
   {
-    size_t v;
+    uint64_t v, _space[7];  // 64 bytes total
     udt() = delete;
-    explicit udt(int /*unused*/) { v = trivial_vector_udts_constructed++; };
+    explicit udt(int /*unused*/) : v(trivial_vector_udts_constructed++)
+    , _space{ 1, 2, 3, 4, 5, 6, 7 }
+    {
+    }
   };
   using udt_vector = AFIO_V2_NAMESPACE::algorithm::trivial_vector<udt>;
 
+  constexpr size_t _4kb = 4096 / sizeof(udt), _16kb = 16384 / sizeof(udt), _64kb = 65536 / sizeof(udt);
   udt_vector v;
   BOOST_CHECK(v.empty());
   BOOST_CHECK(v.size() == 0);  // NOLINT
-  v.push_back(udt(5));
+  std::cout << "Resizing to 4Kb ..." << std::endl;
+  v.push_back(udt(5));         // first allocation of 4Kb
   BOOST_CHECK(v.size() == 1);
   BOOST_CHECK(v.capacity() == AFIO_V2_NAMESPACE::utils::page_size() / sizeof(udt));
-  v.resize(512, udt(6));
-  BOOST_CHECK(v.size() == 512);
-  BOOST_CHECK(v.capacity() == AFIO_V2_NAMESPACE::utils::round_up_to_page_size(512 * sizeof(udt)) / sizeof(udt));
-  v.resize(2048, udt(7));
-  BOOST_CHECK(v.size() == 2048);
-  BOOST_CHECK(v.capacity() == AFIO_V2_NAMESPACE::utils::round_up_to_page_size(2048 * sizeof(udt)) / sizeof(udt));
-  v.resize(8192, udt(8));
-  BOOST_CHECK(v.size() == 8192);
-  BOOST_CHECK(v.capacity() == AFIO_V2_NAMESPACE::utils::round_up_to_page_size(8192 * sizeof(udt)) / sizeof(udt));
-  for(size_t n = 0; n < 8192; n++)
+  BOOST_REQUIRE(v[0].v == 78);
+  std::cout << "Resizing to capacity ..." << std::endl;
+  v.resize(_4kb, udt(6));       // ought to be precisely 4Kb
+  BOOST_CHECK(v.size() == _4kb);
+  BOOST_CHECK(v.capacity() == AFIO_V2_NAMESPACE::utils::round_up_to_page_size(4096) / sizeof(udt));
+  BOOST_REQUIRE(v[0].v == 78);
+  BOOST_REQUIRE(v[1].v == 79);
+  std::cout << "Resizing to 16Kb ..." << std::endl;
+  v.resize(_16kb, udt(7));     // 16Kb
+  BOOST_CHECK(v.size() == _16kb);
+  BOOST_CHECK(v.capacity() == AFIO_V2_NAMESPACE::utils::round_up_to_page_size(16384) / sizeof(udt));
+  BOOST_REQUIRE(v[0].v == 78);
+  BOOST_REQUIRE(v[1].v == 79);
+  BOOST_REQUIRE(v[_4kb].v == 80);
+  std::cout << "Resizing to 64Kb ..." << std::endl;
+  v.resize(_64kb, udt(8));     // 64Kb
+  BOOST_CHECK(v.size() == _64kb);
+  BOOST_CHECK(v.capacity() == AFIO_V2_NAMESPACE::utils::round_up_to_page_size(65536) / sizeof(udt));
+  BOOST_REQUIRE(v[0].v == 78);
+  BOOST_REQUIRE(v[1].v == 79);
+  BOOST_REQUIRE(v[_4kb].v == 80);
+  BOOST_REQUIRE(v[_16kb].v == 81);
+  for(size_t n = 0; n < _64kb; n++)
   {
     if(0 == n)
     {
-      BOOST_CHECK(v[n].v == 0);
+      BOOST_CHECK(v[n].v == 78);
     }
-    else if(n < 512)
+    else if(n < _4kb)
     {
-      BOOST_CHECK(v[n].v == 1);
+      BOOST_CHECK(v[n].v == 79);
     }
-    else if(n < 2048)
+    else if(n < _16kb)
     {
-      BOOST_CHECK(v[n].v == 2);
+      BOOST_CHECK(v[n].v == 80);
     }
-    else if(n < 8192)
+    else if(n < _64kb)
     {
-      BOOST_CHECK(v[n].v == 3);
+      BOOST_CHECK(v[n].v == 81);
     }
   }
   auto it = v.begin();
-  for(size_t n = 0; n < 8192; n++, ++it)
+  for(size_t n = 0; n < _64kb; n++, ++it)
   {
     if(0 == n)
     {
-      BOOST_CHECK(it->v == 0);
+      BOOST_CHECK(it->v == 78);
     }
-    else if(n < 512)
+    else if(n < _4kb)
     {
-      BOOST_CHECK(it->v == 1);
+      BOOST_CHECK(it->v == 79);
     }
-    else if(n < 2048)
+    else if(n < _16kb)
     {
-      BOOST_CHECK(it->v == 2);
+      BOOST_CHECK(it->v == 80);
     }
-    else if(n < 8192)
+    else if(n < _64kb)
     {
-      BOOST_CHECK(it->v == 3);
+      BOOST_CHECK(it->v == 81);
     }
   }
   BOOST_CHECK(it == v.end());
 }
 
+inline std::string printKb(size_t bytes)
+{
+  if(bytes >= 1024 * 1024 * 1024)
+    return std::to_string(bytes / 1024 / 1024 / 1024) + " Gb";
+  if(bytes >= 1024 * 1024)
+    return std::to_string(bytes / 1024 / 1024) + " Mb";
+  if(bytes >= 1024 * 1024 * 1024)
+    return std::to_string(bytes / 1024) + " Kb";
+  return std::to_string(bytes) + " bytes";
+}
+
 template <class T> unsigned long long BenchmarkVector(T &v, size_t no)
 {
+  typename T::value_type i;
   auto begin = std::chrono::high_resolution_clock::now();
   for(size_t n = 0; n < no; n++)
   {
-    v.push_back(5);
+    v.push_back(i);
   }
   auto end = std::chrono::high_resolution_clock::now();
   return std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
@@ -106,55 +136,113 @@ template <class T> unsigned long long BenchmarkVector(T &v, size_t no)
 
 static inline void BenchmarkTrivialVector1()
 {
-  for(size_t items = 512; items < 16 * 1024 * 1024; items *= 2)
+  struct udt
   {
-    auto begin = std::chrono::high_resolution_clock::now();
-    while(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < 1)
+    uint64_t v[8];  // 64 bytes total
+    constexpr udt()  // NOLINT
+    : v{ 1, 2, 3, 4, 5, 6, 7, 8 }
     {
     }
-    std::vector<int> v1;
+  };
+  std::ofstream csv("trivial_vector2.csv");
+  unsigned long long times[32][3];
+  {
+    auto begin = std::chrono::high_resolution_clock::now();
+    while(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < 3)
+    {
+    }
+  }
+  size_t idx = 0;
+  for(size_t items = 128; items < 16 * 1024 * 1024; items *= 2)
+  {
+    times[idx][0] = items * sizeof(udt);
+    std::vector<udt> v1;
     v1.reserve(1);
-    auto std_time = BenchmarkVector(v1, items);
-    AFIO_V2_NAMESPACE::algorithm::trivial_vector<int> v2;
-    v2.reserve(2);
-    auto afio_time = BenchmarkVector(v2, items);
-    std::cout << "                    std::vector<int> inserts " << items << " items in " << std_time << " microseconds" << std::endl;
-    std::cout << "afio::algorithm::trivial_vector<int> inserts " << items << " items in " << afio_time << " microseconds" << std::endl;
+    times[idx][1] = BenchmarkVector(v1, items);
+    ++idx;
+  }
+  {
+    auto begin = std::chrono::high_resolution_clock::now();
+    while(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < 3)
+    {
+    }
+  }
+  idx = 0;
+  for(size_t items = 128; items < 16 * 1024 * 1024; items *= 2)
+  {
+    AFIO_V2_NAMESPACE::algorithm::trivial_vector<udt> v2;
+    v2.reserve(1);
+    times[idx][2] = BenchmarkVector(v2, items);
+    ++idx;
+  }
+  for(size_t n = 0; n < idx; n++)
+  {
+    csv << times[n][0] << "," << times[n][1] << "," << times[n][2] << std::endl;
+    std::cout << "                    std::vector<udt> inserts " << printKb(times[n][0]) << " in " << times[n][1] << " microseconds" << std::endl;
+    std::cout << "afio::algorithm::trivial_vector<udt> inserts " << printKb(times[n][0]) << " in " << times[n][2] << " microseconds" << std::endl;
   }
 }
 
 static inline void BenchmarkTrivialVector2()
 {
-  for(size_t items = 1024; items < 16 * 1024 * 1024; items *= 2)
+  struct udt
   {
-    std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now(), end;
+    uint64_t v[8];  // 64 bytes total
+    constexpr udt(int /*unused*/)  // NOLINT
+    : v{ 1, 2, 3, 4, 5, 6, 7, 8 }
     {
-      std::vector<int> v1;
+    }
+  };
+  std::ofstream csv("trivial_vector3.csv");
+  unsigned long long times[32][3];
+  std::chrono::high_resolution_clock::time_point begin, end;
+  {
+    begin = std::chrono::high_resolution_clock::now();
+    while(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < 3)
+    {
+    }
+  }
+  size_t idx = 0;
+  for(size_t items = 128; items < 16 * 1024 * 1024; items *= 2)
+  {
+    times[idx][0] = items * sizeof(udt);
+    {
+      std::vector<udt> v1;
       v1.resize(items, 5);
-      while(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < 1)
-      {
-      }
       begin = std::chrono::high_resolution_clock::now();
       v1.resize(items * 2, 6);
       end = std::chrono::high_resolution_clock::now();
     }
-    auto std_time = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+    times[idx][1] = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+    ++idx;
+  }
+  {
+    begin = std::chrono::high_resolution_clock::now();
+    while(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < 3)
     {
-      AFIO_V2_NAMESPACE::algorithm::trivial_vector<int> v1;
+    }
+  }
+  idx = 0;
+  for(size_t items = 128; items < 16 * 1024 * 1024; items *= 2)
+  {
+    {
+      AFIO_V2_NAMESPACE::algorithm::trivial_vector<udt> v1;
       v1.resize(items, 5);
-      while(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < 1)
-      {
-      }
       begin = std::chrono::high_resolution_clock::now();
       v1.resize(items * 2, 6);
       end = std::chrono::high_resolution_clock::now();
     }
-    auto afio_time = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
-    std::cout << "                    std::vector<int> resizes " << items << " items to " << (items * 2) << " items in " << std_time << " microseconds" << std::endl;
-    std::cout << "afio::algorithm::trivial_vector<int> resizes " << items << " items to " << (items * 2) << " items in " << afio_time << " microseconds" << std::endl;
+    times[idx][2] = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+    ++idx;
+  }
+  for(size_t n = 0; n < idx; n++)
+  {
+    csv << times[n][0] << "," << times[n][1] << "," << times[n][2] << std::endl;
+    std::cout << "                    std::vector<udt> resizes " << printKb(times[n][0]) << " in " << times[n][1] << " microseconds" << std::endl;
+    std::cout << "afio::algorithm::trivial_vector<udt> resizes " << printKb(times[n][0]) << " in " << times[n][2] << " microseconds" << std::endl;
   }
 }
 
 KERNELTEST_TEST_KERNEL(integration, afio, algorithm, trivial_vector, "Tests that afio::algorithm::trivial_vector works as expected", TestTrivialVector())
-KERNELTEST_TEST_KERNEL(integration, afio, algorithm, trivial_vector2, "Benchmarks afio::algorithm::trivial_vector against std::vector 1", BenchmarkTrivialVector1())
-KERNELTEST_TEST_KERNEL(integration, afio, algorithm, trivial_vector3, "Benchmarks afio::algorithm::trivial_vector against std::vector 2", BenchmarkTrivialVector2())
+KERNELTEST_TEST_KERNEL(integration, afio, algorithm, trivial_vector2, "Benchmarks afio::algorithm::trivial_vector against std::vector with push_back()", BenchmarkTrivialVector1())
+KERNELTEST_TEST_KERNEL(integration, afio, algorithm, trivial_vector3, "Benchmarks afio::algorithm::trivial_vector against std::vector with resize()", BenchmarkTrivialVector2())
