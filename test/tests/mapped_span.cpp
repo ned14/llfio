@@ -31,9 +31,9 @@ static inline void TestMappedView1()
   file_handle fh = file_handle::file({}, "testfile", file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::all, file_handle::flag::unlink_on_close).value();
   fh.truncate(10000 * sizeof(int)).value();
   section_handle sh(section_handle::section(fh).value());
-  algorithm::mapped_view<int> v1(sh, 5);
-  algorithm::mapped_view<int> v2(sh);
-  algorithm::mapped_view<int> v3(50);
+  algorithm::mapped_span<int> v1(sh, 5);
+  algorithm::mapped_span<int> v2(sh);
+  algorithm::mapped_span<int> v3(50);
   BOOST_CHECK(v1.size() == 5);
   BOOST_CHECK(v2.size() == 10000);
   BOOST_CHECK(v3.size() == 50);
@@ -46,7 +46,7 @@ static inline void TestMappedView1()
   try
   {
     // Overly large views must not extend the file until written to
-    algorithm::mapped_view<int> v4(sh, 20000);
+    algorithm::mapped_span<int> v4(sh, 20000);
     BOOST_CHECK(fh.length().value() == 10000 * sizeof(int));
   }
   catch(...)
@@ -74,7 +74,7 @@ static inline void TestMappedView2()
   char *addr = mfh.address();
   BOOST_CHECK(addr != nullptr);
 
-  algorithm::mapped_view<int> v1(mfh);
+  algorithm::mapped_span<int> v1(mfh);
   BOOST_CHECK(v1.size() == 10000);
   v1[0] = 78;
   v1[9999] = 79;
@@ -82,38 +82,38 @@ static inline void TestMappedView2()
   BOOST_CHECK(addr == mfh.address());
   BOOST_CHECK(mfh.length().value() == 20000 * sizeof(int));
   BOOST_CHECK(mfh.underlying_file_length().value() == 20000 * sizeof(int));
-  v1 = algorithm::mapped_view<int>(mfh);
+  v1 = algorithm::mapped_span<int>(mfh);
   BOOST_CHECK(v1.size() == 20000);
   BOOST_CHECK(v1[0] == 78);
   BOOST_CHECK(v1[9999] == 79);
   mfh.truncate(2 * 1024 * 1024).value();  // exceed reservation, cause hidden reserve
   BOOST_CHECK(addr != nullptr);
-  v1 = algorithm::mapped_view<int>(mfh);
+  v1 = algorithm::mapped_span<int>(mfh);
   BOOST_CHECK(v1.size() == 2 * 1024 * 1024 / sizeof(int));
   BOOST_CHECK(v1[0] == 78);
   BOOST_CHECK(v1[9999] == 79);
   mfh.reserve(2 * 1024 * 1024).value();
   BOOST_CHECK(mfh.address() != nullptr);
-  v1 = algorithm::mapped_view<int>(mfh);
+  v1 = algorithm::mapped_span<int>(mfh);
   BOOST_CHECK(v1.size() == 2 * 1024 * 1024 / sizeof(int));
   BOOST_CHECK(v1[0] == 78);
   BOOST_CHECK(v1[9999] == 79);
   mfh.truncate(1 * sizeof(int)).value();
   BOOST_CHECK(mfh.address() != nullptr);
-  v1 = algorithm::mapped_view<int>(mfh);
+  v1 = algorithm::mapped_span<int>(mfh);
   BOOST_CHECK(v1.size() == 1);
   BOOST_CHECK(v1[0] == 78);
 
   // Use a different handle to extend the file
   mapped_file_handle mfh2 = mapped_file_handle::mapped_file(1024 * 1024, {}, "testfile", file_handle::mode::write, file_handle::creation::open_existing, file_handle::caching::all, file_handle::flag::unlink_on_close).value();
   mfh2.truncate(10000 * sizeof(int)).value();
-  v1 = algorithm::mapped_view<int>(mfh2);
+  v1 = algorithm::mapped_span<int>(mfh2);
   BOOST_CHECK(v1.size() == 10000);
   v1[0] = 78;
   v1[9999] = 79;
   // On Windows this will have updated the mapping, on POSIX it will not, so prod POSIX
   mfh.update_map().value();
-  v1 = algorithm::mapped_view<int>(mfh);
+  v1 = algorithm::mapped_span<int>(mfh);
   BOOST_CHECK(v1.size() == 10000);
   BOOST_CHECK(v1[0] == 78);
   BOOST_CHECK(v1[9999] == 79);
@@ -126,7 +126,7 @@ static inline void TestMappedView2()
   fh.truncate(10000 * sizeof(int)).value();
   // On POSIX this will have updated the mapping, on Windows it will not, so prod Windows
   mfh.update_map().value();
-  v1 = algorithm::mapped_view<int>(mfh);
+  v1 = algorithm::mapped_span<int>(mfh);
   BOOST_REQUIRE(v1.size() == 10000);
   BOOST_CHECK(v1[0] == 78);
   BOOST_CHECK(v1[9999] == 0);
@@ -135,5 +135,5 @@ static inline void TestMappedView2()
   BOOST_CHECK(mfh.address() == nullptr);
 }
 
-KERNELTEST_TEST_KERNEL(integration, afio, algorithm, mapped_view1, "Tests that afio::algorithm::mapped_view works as expected", TestMappedView1())
-KERNELTEST_TEST_KERNEL(integration, afio, algorithm, mapped_view2, "Tests that afio::algorithm::mapped_view works as expected", TestMappedView2())
+KERNELTEST_TEST_KERNEL(integration, afio, algorithm, mapped_span1, "Tests that afio::algorithm::mapped_span works as expected", TestMappedView1())
+KERNELTEST_TEST_KERNEL(integration, afio, algorithm, mapped_span2, "Tests that afio::algorithm::mapped_span works as expected", TestMappedView2())

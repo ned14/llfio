@@ -15,7 +15,7 @@ set(afio_TESTS
   "test/tests/file_handle_create_close/runner.cpp"
   "test/tests/file_handle_lock_unlock.cpp"
   "test/tests/map_handle_create_close/runner.cpp"
-  "test/tests/mapped_view.cpp"
+  "test/tests/mapped_span.cpp"
   "test/tests/path_discovery.cpp"
   "test/tests/path_view.cpp"
   "test/tests/section_handle_create_close/runner.cpp"

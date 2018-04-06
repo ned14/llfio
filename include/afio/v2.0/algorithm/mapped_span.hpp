@@ -28,7 +28,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../mapped_file_handle.hpp"
 #include "../utils.hpp"
 
-//! \file mapped_view.hpp Provides typed view of mapped section.
+//! \file mapped_span.hpp Provides typed view of mapped section.
 
 AFIO_V2_NAMESPACE_BEGIN
 
@@ -41,7 +41,7 @@ namespace algorithm
   `section_handle::flag::barrier_on_close`, thus forcing any changes to data referred to by the view
   to storage before the destructor returns.
   */
-  template <class T> class mapped_view : public span<T>
+  template <class T> class mapped_span : public span<T>
   {
   public:
     //! The extent type.
@@ -51,7 +51,7 @@ namespace algorithm
 
   private:
     map_handle _mapping;
-    mapped_view(extent_type page_offset, extent_type offset, section_handle &sh, size_type bytes, section_handle::flag _flag)  // NOLINT
+    mapped_span(extent_type page_offset, extent_type offset, section_handle &sh, size_type bytes, section_handle::flag _flag)  // NOLINT
     : _mapping(map_handle::map(sh, (bytes == 0) ? 0 : bytes + (offset - page_offset), page_offset, _flag).value())
     {
       offset -= page_offset;
@@ -66,13 +66,13 @@ namespace algorithm
 
   public:
     //! Default constructor
-    constexpr mapped_view() {}  // NOLINT
+    constexpr mapped_span() {}  // NOLINT
     /*! Create a view of new memory.
 
     \param length The number of items to map.
     \param _flag The flags to pass to `map_handle::map()`.
     */
-    explicit mapped_view(size_type length, section_handle::flag _flag = section_handle::flag::readwrite)
+    explicit mapped_span(size_type length, section_handle::flag _flag = section_handle::flag::readwrite)
         : _mapping(map_handle::map(length * sizeof(T), _flag).value())
     {
       char *addr = _mapping.address();
@@ -85,8 +85,8 @@ namespace algorithm
     \param byteoffset The byte offset into the section handle, this does not need to be a multiple of the page size.
     \param _flag The flags to pass to `map_handle::map()`.
     */
-    explicit mapped_view(section_handle &sh, size_type length = (size_type) -1, extent_type byteoffset = 0, section_handle::flag _flag = section_handle::flag::readwrite)  // NOLINT
-    : mapped_view((length == 0) ? mapped_view() : mapped_view(
+    explicit mapped_span(section_handle &sh, size_type length = (size_type) -1, extent_type byteoffset = 0, section_handle::flag _flag = section_handle::flag::readwrite)  // NOLINT
+    : mapped_span((length == 0) ? mapped_span() : mapped_span(
 #ifdef _WIN32
                                                   byteoffset & ~65535,
 #else
@@ -101,7 +101,7 @@ namespace algorithm
     \param length The number of items to map, use -1 to mean the length of the section handle divided by `sizeof(T)`.
     \param byteoffset The byte offset into the mapped file handle, this does not need to be a multiple of the page size.
     */
-    explicit mapped_view(mapped_file_handle &mfh, size_type length = (size_type) -1, extent_type byteoffset = 0)                            // NOLINT
+    explicit mapped_span(mapped_file_handle &mfh, size_type length = (size_type) -1, extent_type byteoffset = 0)                            // NOLINT
     : span<T>(reinterpret_cast<T *>(mfh.address() + byteoffset), (length == (size_type) -1) ? (mfh.length().value() / sizeof(T)) : length)  // NOLINT
     {
     }

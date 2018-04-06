@@ -1,5 +1,5 @@
 /* A handle to a source of mapped memory
-(C) 2016-2017 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
+(C) 2016-2018 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
 File Created: August 2016
 
 
@@ -67,6 +67,7 @@ public:
                                    singleton = 1U << 11U,   //!< A single instance of this section is to be shared by all processes using the same backing file.
 
                                    barrier_on_close = 1U << 16U,  //!< Maps of this section, if writable, issue a `barrier()` when destructed blocking until data (not metadata) reaches physical storage.
+                                   nvram = 1U << 17U,             //!< This section is of non-volatile RAM
 
                                    // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
 
@@ -148,6 +149,8 @@ public:
 
   //! Returns the memory section's flags
   flag section_flags() const noexcept { return _flag; }
+  //! True if the section reflects non-volatile RAM
+  bool is_nvram() const noexcept { return !!(_flag & flag::nvram); }
   //! Returns the borrowed handle backing this section, if any
   file_handle *backing() const noexcept { return _backing; }
   //! Sets the borrowed handle backing this section, if any
@@ -206,6 +209,10 @@ inline std::ostream &operator<<(std::ostream &s, const section_handle::flag &v)
   {
     temp.append("barrier_on_close|");
   }
+  if(!!(v & section_handle::flag::nvram))
+  {
+    temp.append("nvram|");
+  }
   if(!temp.empty())
   {
     temp.resize(temp.size() - 1);
@@ -254,7 +261,21 @@ does not close that of the backing storage, nor does releasing this handle relea
 Locking byte ranges of this handle is therefore equal to locking byte ranges in the original backing storage,
 which can be very useful.
 
-\sa `mapped_file_handle`, `algorithm::mapped_view`
+## Barriers:
+
+`map_handle`, because it implements `io_handle`, implements `barrier()` in a very conservative way
+to account for OS differences i.e. it calls `msync()`, and then the `barrier()` implementation for the backing file
+(probably `fsync()` or equivalent on most platforms, which synchronises the entire file).
+
+This is vast overkill if you are using non-volatile RAM, so a special *inlined* `barrier()` implementation
+taking a single buffer and no other arguments is also provided. This calls the appropriate architecture-specific
+instructions to cause the CPU to write all preceding writes out of the write buffers and CPU caches to main
+memory, so for Intel CPUs this would be `CLWB <each cache line>; SFENCE;`. As this is inlined, it ought to
+produce optimal code. If your CPU does not support the requisite instructions (or AFIO has not added support),
+and empty buffer will be returned to indicate that nothing was barriered, same as the normal `barrier()`
+function.
+
+\sa `mapped_file_handle`, `algorithm::mapped_span`
 */
 class AFIO_DECL map_handle : public io_handle
 {
@@ -328,7 +349,33 @@ public:
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override;
   AFIO_MAKE_FREE_FUNCTION
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
+  /*! Lightweight inlined barrier which causes the CPU to write out all buffered writes and dirty cache lines
+  in the request to main memory.
+  \return The cache lines actually barriered. This may be empty. This function does not return an error.
+  \param req The range of cache lines to write barrier.
+  \param evict Whether to also evict the cache lines from CPU caches, useful if they will not be used again.
 
+  Upon return, one knows that memory in the returned buffer has been barriered
+  (it may be empty if there is no support for this operation in AFIO, or if the current CPU does not
+  support this operation). You may find the `is_nvram()` observer of particular use here.
+  */
+  AFIO_MAKE_FREE_FUNCTION
+  const_buffer_type barrier(const_buffer_type req, bool evict = false) noexcept
+  {
+    const_buffer_type ret{(const char *) (((uintptr_t) req.data) & 31), 0};
+    ret.len = req.data + req.len - ret.data;
+    for(const char *addr = ret.data; addr < ret.data + ret.len; addr += 32)
+    {
+      // Slightly UB ...
+      auto *p = reinterpret_cast<const persistent<char> *>(addr);
+      if(memory_flush_none == p->flush(evict ? memory_flush_evict : memory_flush_retain))
+      {
+        req.len = 0;
+        break;
+      }
+    }
+    return ret;
+  }
 
   /*! Create new memory and map it into view.
   \param bytes How many bytes to create and map. Typically will be rounded up to a multiple of the page size (see `utils::page_sizes()`) on POSIX, 64Kb on Windows.
@@ -372,6 +419,9 @@ public:
   //! The size of the memory map. This is the accessible size, NOT the reservation size.
   AFIO_MAKE_FREE_FUNCTION
   size_type length() const noexcept { return _length; }
+
+  //! True if the map is of non-volatile RAM
+  bool is_nvram() const noexcept { return !!(_flag & section_handle::flag::nvram); }
 
   //! Update the size of the memory map to that of any backing section, up to the reservation limit.
   result<size_type> update_map() noexcept

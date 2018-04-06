@@ -30,7 +30,7 @@ source code repository lives at https://github.com/ned14/boost.afio.
 - Original error code is always preserved, even down to the original NT kernel error code if a NT kernel API was used.
 - Race free filesystem design used throughout (i.e. no TOCTOU).
 - Zero malloc, zero exception throw and zero whole system memory copy design used throughout, even down to paths (which can hit 64Kb!).
-- Works very well with the C++ standard library, and is intended to be proposed for standardisation into C++ in 2020 or thereabouts.
+- Works very well with the C++ standard library, and is intended to be proposed for standardisation into C++ in Summer 2018.
 
 \note Note that this code is of late alpha quality. It's quite reliable on Windows and Linux, but be careful when using it!
 
@@ -190,9 +190,13 @@ Todo thereafter in order of priority:
 
 | NEW in v2 | Windows | POSIX |     |
 | --------- | --------| ----- | --- |
-| ✔ |   |   | Reliable directory hierarchy deletion algorithm.
-| ✔ |   |   | Reliable directory hierarchy copy algorithm.
-| ✔ |   |   | Reliable directory hierarchy update (two and three way) algorithm.
+| ✔ |   |   | Page allocator based on an index of linked list of free pages. See notes.
+| ✔ |   |   | Optionally concurrent B+ tree index based on page allocator for key-value store.
+| ✔ |   |   | Attributes extending `span<buffers_type>` with DMA colouring.
+| ✔ |   |   | Coroutine generator for iterating a file's contents in DMA friendly way.
+| ✔ |   |   | Ranges & Concurrency based reliable directory hierarchy deletion algorithm.
+| ✔ |   |   | Ranges & Concurrency based reliable directory hierarchy copy algorithm.
+| ✔ |   |   | Ranges & Concurrency based reliable directory hierarchy update (two and three way) algorithm.
 | ✔ |   |   | Linux KAIO support for native non-blocking `O_DIRECT` i/o
 | ✔ |   |   | `std::pmr::memory_resource` adapting a file backing if on C++ 17.
 | ✔ |   |   | Extended attributes support.

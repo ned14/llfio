@@ -176,6 +176,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
   AFIO_LOG_FUNCTION_CALL(this);
   char *addr = _addr + reqs.offset;
   extent_type bytes = 0;
+  // Check for overflow
   for(const auto &req : reqs.buffers)
   {
     if(bytes + req.len < bytes)
@@ -184,9 +185,19 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
     }
     bytes += req.len;
   }
+  // If empty, do the whole file
   if(reqs.buffers.empty())
   {
     bytes = _length;
+  }
+  // If nvram and not syncing metadata, use lightweight barrier
+  if(!and_metadata && is_nvram())
+  {
+    auto synced = barrier({addr, bytes});
+    if(synced.len >= bytes)
+    {
+      return {reqs.buffers};
+    }
   }
   int flags = (wait_for_device || and_metadata) ? MS_SYNC : MS_ASYNC;
   if(-1 == ::msync(addr, bytes, flags))

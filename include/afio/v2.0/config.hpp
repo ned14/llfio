@@ -311,6 +311,11 @@ AFIO_V2_NAMESPACE_END
 AFIO_V2_NAMESPACE_BEGIN
 using namespace QUICKCPPLIB_NAMESPACE::string_view;
 AFIO_V2_NAMESPACE_END
+// Bring in a persistent implementation
+#include "quickcpplib/include/persistent.hpp"
+AFIO_V2_NAMESPACE_BEGIN
+using namespace QUICKCPPLIB_NAMESPACE::persistence;
+AFIO_V2_NAMESPACE_END
 // Bring in a result implementation
 #include "outcome/include/outcome.hpp"
 
@@ -433,7 +438,7 @@ inline std::error_code make_error_code(error_info ei)
   return ei.ec;
 }
 // Tell Outcome to call error_info::throw_as_exception() on no-value observation
-inline void throw_as_system_error_with_payload(const error_info &ei)
+inline void outcome_throw_as_system_error_with_payload(const error_info &ei)
 {
   ei.throw_as_exception();
 }

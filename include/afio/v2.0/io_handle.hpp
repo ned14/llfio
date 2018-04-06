@@ -285,7 +285,8 @@ public:
   \param wait_for_device True if you want the call to wait until data reaches storage and that storage
   has acknowledged the data is physically written. Slow.
   \param and_metadata True if you want the call to sync the metadata for retrieving the writes before the
-  barrier after a sudden power loss event. Slow.
+  barrier after a sudden power loss event. Slow. Setting this to false enables much faster performance,
+  especially on non-volatile memory.
   \param d An optional deadline by which the i/o must complete, else it is cancelled.
   Note function may return significantly after this deadline if the i/o takes long to cancel.
   \errors Any of the values POSIX fdatasync() or Windows NtFlushBuffersFileEx() can return.

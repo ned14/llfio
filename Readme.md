@@ -11,10 +11,24 @@ Tarballs of source and prebuilt binaries for Linux x64, MacOS x64 and Windows x6
 
 ### Immediate todos in order of priority:
 - [x] Implement new custom C++ exception synthesis support from Outcome.
-- [ ] Finish trivial vector, which is unfinished and currently segfaults.
-- [ ] Run clang-tidy fix pass, it's got a bit untidy recently.
+- [x] Finish trivial vector, which is unfinished and currently segfaults.
+- [x] Run clang-tidy fix pass, it's got a bit untidy recently.
+- [ ] Add OS X support to `storage_profile`, this should complete the Mac OS port.
+- [x] Fix all known bugs in Outcome, plus reorg source code in prep for `status_code`.
+- [ ] Implement SG14 `status_code` as a standalone library and test in AFIO.
+- [ ] Single include generation now we're on `status_code` and it's safe.
 - [ ] `atomic_append` isn't actually being tested in shared_fs_mutex
 - [ ] Implement a non-toy ACID key-value BLOB store and send it to Boost for peer review.
+  - [ ] For this need to implement a file-based B+ tree. And for that, need to
+  implement a page allocator out of a single file. Some notes:
+  
+  B+ trees would be based on the 4Kb page for memory mapping, and thus allocate and release whole 4Kb pages.
+
+  A simple page allocator from a file might simply keep some magic at the top, and then a list of offsets to free pages for the remainder of the page. That might be (4096 – 12) / 4 = 1021 slots (remember these are 42 bit offsets, so simply limit to 32 bit offsets << 12).
+  
+  Each free page links to its next free page. Freeing a page means modulus its address >> 12 with 1021, and CASing it into its “slot” as its linked list.
+
+  Allocating pages involves iterating a round robin index, pulling free pages off the top. Only if no free pages remain do we atomic append 1021 * 4096 = 4,182,016 bytes and refill the free page index.
 - [ ] All time based kernel tests need to use soak test based API and auto adjust to
 valgrind.
 - [ ] In DEBUG builds, have io_handle always not fill buffers passed to remind
@@ -22,7 +36,6 @@ people to use pointers returned!
 - KernelTest needs to be generating each test kernel as a standalone DLL so it can be
 fuzzed, coverage calculated, bloat calculated, ABI dumped etc
   - Easy coverage is the usual gcov route => coveralls.io or gcovr http://gcovr.com/guide.html
-- [ ] Single include generation
 
 
 ### clang AST parser based todos which await me getting back into the clang AST parser:
