@@ -70,7 +70,7 @@ template <class U> inline void section_handle_create_close_(U &&f)
         if (use_file_backing)
         {
           temph = file_handle::file({}, "tempfile", file_handle::mode::write, file_handle::creation::if_needed).value();
-          temph.write(0, "niall is not here", 17).value();
+          temph.write(0, { {"niall is not here", 17} }).value();
         }
         else
         {

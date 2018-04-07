@@ -414,7 +414,7 @@ public:
   }
 
   /*! \brief Schedule a read to occur asynchronously.
-   
+
   Note that some OS kernels can only process a limited number async i/o
   operations at a time. You should therefore check for the error `std::errc::resource_unavailable_try_again`
   and gracefully reschedule the i/o for a later time. This temporary
@@ -463,7 +463,7 @@ public:
   failure may be returned immediately, or to the completion handler
   and hence you ought to handle both situations.
 
-   
+
   \return Either an io_state_ptr to the i/o in progress, or an error code.
   \param reqs A scatter-gather and offset request.
   \param completion A callable to call upon i/o completion. Spec is `void(async_file_handle *, io_result<const_buffers_type> &)`.
@@ -564,6 +564,15 @@ public:
     OUTCOME_TRY(r, async_read(reqs, awaitable_state<buffers_type>()));
     return awaitable<buffers_type>(std::move(r));
   }
+  //! \overload
+  AFIO_MAKE_FREE_FUNCTION
+  result<awaitable<buffers_type>> co_read(extent_type offset, std::initializer_list<buffer_type> lst) noexcept
+  {
+    buffer_type *_reqs = reinterpret_cast<buffer_type *>(alloca(sizeof(buffer_type) * lst.size()));
+    memcpy(_reqs, lst.begin(), sizeof(buffer_type) * lst.size());
+    io_request<buffers_type> reqs(buffers_type(_reqs, lst.size()), offset);
+    return co_read(reqs);
+  }
 
   /*! \brief Schedule a write to occur asynchronously
 
@@ -580,6 +589,15 @@ public:
   {
     OUTCOME_TRY(r, async_write(reqs, awaitable_state<const_buffers_type>()));
     return awaitable<const_buffers_type>(std::move(r));
+  }
+  //! \overload
+  AFIO_MAKE_FREE_FUNCTION
+  result<awaitable<const_buffers_type>> co_write(extent_type offset, std::initializer_list<const_buffer_type> lst) noexcept
+  {
+    const_buffer_type *_reqs = reinterpret_cast<const_buffer_type *>(alloca(sizeof(const_buffer_type) * lst.size()));
+    memcpy(_reqs, lst.begin(), sizeof(const_buffer_type) * lst.size());
+    io_request<const_buffers_type> reqs(const_buffers_type(_reqs, lst.size()), offset);
+    return co_write(reqs);
   }
 #endif
 };

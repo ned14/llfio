@@ -38,44 +38,10 @@ Examples of use:
 <table width="100%" border="0" cellpadding="4">
 <tr>
 <td width="50%" valign="top">
-\code
-namespace afio = AFIO_V2_NAMESPACE;
-
-// Make me a 1 trillion element sparsely allocated integer array!
-afio::mapped_file_handle mfh = afio::mapped_temp_inode().value();
-
-// On an extents based filing system, doesn't actually allocate any physical
-// storage but does map approximately 4Tb of all bits zero data into memory
-mfh.truncate(1000000000000ULL*sizeof(int));
-
-// Create a typed view of the one trillion integers
-afio::algorithm::mapped_view<int> one_trillion_int_array(mfh);
-
-// Write and read as you see fit, if you exceed physical RAM it'll be paged out
-one_trillion_int_array[0] = 5;
-one_trillion_int_array[999999999999ULL] = 6;
-\endcode
+\snippet sparse_array
 </td>
 <td width="50%" valign="top">
-\code
-namespace afio = AFIO_V2_NAMESPACE;
-
-// Create an asynchronous file handle
-afio::io_service service;
-afio::async_file_handle fh =
-  afio::async_file(service, {}, "testfile.txt",
-                   afio::async_file_handle::mode::write,
-                   afio::async_file_handle::creation::if_needed).value();
-
-// Resize it to 1024 bytes
-truncate(fh, 1024).value();
-
-// Begin to asynchronously write "hello world" into the file at offset 0,
-// suspending execution of this coroutine until completion and then resuming
-// execution. Requires the Coroutines TS.
-alignas(4096) char buffer[] = "hello world";
-co_await co_write(fh, {{{buffer, sizeof(buffer)}}, 0}).value();
-\endcode
+\snippet coroutine_write
 </td>
 </tr>
 </table>

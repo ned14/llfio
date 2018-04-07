@@ -221,12 +221,13 @@ public:
   AFIO_MAKE_FREE_FUNCTION
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept;
   //! \overload
-  io_result<buffer_type> read(extent_type offset, char *data, size_type bytes, deadline d = deadline()) noexcept
+  AFIO_MAKE_FREE_FUNCTION
+  io_result<buffers_type> read(extent_type offset, std::initializer_list<buffer_type> lst, deadline d = deadline()) noexcept
   {
-    buffer_type _reqs[1] = {{data, bytes}};
-    io_request<buffers_type> reqs(buffers_type(_reqs), offset);
-    OUTCOME_TRY(v, read(reqs, d));
-    return *v.data();
+    buffer_type *_reqs = reinterpret_cast<buffer_type *>(alloca(sizeof(buffer_type) * lst.size()));
+    memcpy(_reqs, lst.begin(), sizeof(buffer_type) * lst.size());
+    io_request<buffers_type> reqs(buffers_type(_reqs, lst.size()), offset);
+    return read(reqs, d);
   }
 
   /*! \brief Write data to the open handle.
@@ -253,12 +254,13 @@ public:
   AFIO_MAKE_FREE_FUNCTION
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept;
   //! \overload
-  io_result<const_buffer_type> write(extent_type offset, const char *data, size_type bytes, deadline d = deadline()) noexcept
+  AFIO_MAKE_FREE_FUNCTION
+  io_result<const_buffers_type> write(extent_type offset, std::initializer_list<const_buffer_type> lst, deadline d = deadline()) noexcept
   {
-    const_buffer_type _reqs[1] = {{data, bytes}};
-    io_request<const_buffers_type> reqs(const_buffers_type(_reqs), offset);
-    OUTCOME_TRY(v, write(reqs, d));
-    return *v.data();
+    const_buffer_type *_reqs = reinterpret_cast<const_buffer_type *>(alloca(sizeof(const_buffer_type) * lst.size()));
+    memcpy(_reqs, lst.begin(), sizeof(const_buffer_type) * lst.size());
+    io_request<const_buffers_type> reqs(const_buffers_type(_reqs, lst.size()), offset);
+    return write(reqs, d);
   }
 
   /*! \brief Issue a write reordering barrier such that writes preceding the barrier will reach storage
