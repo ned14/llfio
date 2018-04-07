@@ -474,6 +474,11 @@ inline io_handle::io_result<io_handle::buffers_type> read(io_handle &self, io_ha
 {
   return self.read(std::forward<decltype(reqs)>(reqs), std::forward<decltype(d)>(d));
 }
+//! \overload
+inline io_handle::io_result<io_handle::buffers_type> read(io_handle &self, io_handle::extent_type offset, std::initializer_list<io_handle::buffer_type> lst, deadline d = deadline()) noexcept
+{
+  return self.read(std::forward<decltype(offset)>(offset), std::forward<decltype(lst)>(lst), std::forward<decltype(d)>(d));
+}
 /*! \brief Write data to the open handle.
 
 \warning Depending on the implementation backend, not all of the buffers input may be written and
@@ -500,6 +505,11 @@ inline io_handle::io_result<io_handle::const_buffers_type> write(io_handle &self
 {
   return self.write(std::forward<decltype(reqs)>(reqs), std::forward<decltype(d)>(d));
 }
+//! \overload
+inline io_handle::io_result<io_handle::const_buffers_type> write(io_handle &self, io_handle::extent_type offset, std::initializer_list<io_handle::const_buffer_type> lst, deadline d = deadline()) noexcept
+{
+  return self.write(std::forward<decltype(offset)>(offset), std::forward<decltype(lst)>(lst), std::forward<decltype(d)>(d));
+}
 /*! \brief Issue a write reordering barrier such that writes preceding the barrier will reach storage
 before writes after this barrier.
 
@@ -525,7 +535,8 @@ which always write barrier the entire file. Supplying a default initialised reqs
 \param wait_for_device True if you want the call to wait until data reaches storage and that storage
 has acknowledged the data is physically written. Slow.
 \param and_metadata True if you want the call to sync the metadata for retrieving the writes before the
-barrier after a sudden power loss event. Slow.
+barrier after a sudden power loss event. Slow. Setting this to false enables much faster performance,
+especially on non-volatile memory.
 \param d An optional deadline by which the i/o must complete, else it is cancelled.
 Note function may return significantly after this deadline if the i/o takes long to cancel.
 \errors Any of the values POSIX fdatasync() or Windows NtFlushBuffersFileEx() can return.

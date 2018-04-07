@@ -73,3 +73,8 @@ std::future<void> coroutine_write()
   //! [coroutine_write]
 }
 #endif
+
+int main()
+{
+  return 0;
+}

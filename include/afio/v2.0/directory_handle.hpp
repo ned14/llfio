@@ -322,10 +322,9 @@ inline void swap(directory_handle &self, directory_handle &o) noexcept
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<directory_handle> directory(const path_handle &base, directory_handle::path_view_type _path, directory_handle::mode _mode = directory_handle::mode::read, directory_handle::creation _creation = directory_handle::creation::open_existing, directory_handle::caching _caching = directory_handle::caching::all,
-                                          directory_handle::flag flags = directory_handle::flag::none) noexcept
+inline result<directory_handle> directory(const path_handle &base, directory_handle::path_view_type path, directory_handle::mode _mode = directory_handle::mode::read, directory_handle::creation _creation = directory_handle::creation::open_existing, directory_handle::caching _caching = directory_handle::caching::all, directory_handle::flag flags = directory_handle::flag::none) noexcept
 {
-  return directory_handle::directory(std::forward<decltype(base)>(base), std::forward<decltype(_path)>(_path), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
+  return directory_handle::directory(std::forward<decltype(base)>(base), std::forward<decltype(path)>(path), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }
 /*! Create a directory handle creating a randomly named file on a path.
 The file is opened exclusively with `creation::only_if_not_exist` so it
@@ -345,8 +344,7 @@ parameter is ignored.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<directory_handle> temp_directory(directory_handle::path_view_type name = directory_handle::path_view_type(), directory_handle::mode _mode = directory_handle::mode::write, directory_handle::creation _creation = directory_handle::creation::if_needed,
-                                               directory_handle::caching _caching = directory_handle::caching::all, directory_handle::flag flags = directory_handle::flag::none) noexcept
+inline result<directory_handle> temp_directory(directory_handle::path_view_type name = directory_handle::path_view_type(), directory_handle::mode _mode = directory_handle::mode::write, directory_handle::creation _creation = directory_handle::creation::if_needed, directory_handle::caching _caching = directory_handle::caching::all, directory_handle::flag flags = directory_handle::flag::none) noexcept
 {
   return directory_handle::temp_directory(std::forward<decltype(name)>(name), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }
@@ -365,8 +363,7 @@ is no longer using any items within (leafnames are views onto the original kerne
 \mallocs If the `kernelbuffer` parameter is set on entry, no memory allocations.
 If unset, at least one memory allocation, possibly more is performed.
 */
-inline result<directory_handle::enumerate_info> enumerate(const directory_handle &self, directory_handle::buffers_type &&tofill, directory_handle::path_view_type glob = directory_handle::path_view_type(), directory_handle::filter filtering = directory_handle::filter::fastdeleted,
-                                                          span<char> kernelbuffer = span<char>()) noexcept
+inline result<directory_handle::enumerate_info> enumerate(const directory_handle &self, directory_handle::buffers_type &&tofill, directory_handle::path_view_type glob = directory_handle::path_view_type(), directory_handle::filter filtering = directory_handle::filter::fastdeleted, span<char> kernelbuffer = span<char>()) noexcept
 {
   return self.enumerate(std::forward<decltype(tofill)>(tofill), std::forward<decltype(glob)>(glob), std::forward<decltype(filtering)>(filtering), std::forward<decltype(kernelbuffer)>(kernelbuffer));
 }

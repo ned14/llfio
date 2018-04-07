@@ -689,6 +689,75 @@ inline async_file_handle::io_result<async_file_handle::const_buffers_type> barri
 {
   return self.barrier(std::forward<decltype(reqs)>(reqs), std::forward<decltype(wait_for_device)>(wait_for_device), std::forward<decltype(and_metadata)>(and_metadata), std::forward<decltype(d)>(d));
 }
+/*! \brief Schedule a barrier to occur asynchronously.
+
+\note All the caveats and exclusions which apply to `barrier()` also apply here. Note that Microsoft Windows
+does not support asynchronously executed barriers, and this call will fail on that operating system.
+
+\return Either an io_state_ptr to the i/o in progress, or an error code.
+\param self The object whose member function to call.
+\param reqs A scatter-gather and offset request for what range to barrier. May be ignored on some platforms
+which always write barrier the entire file. Supplying a default initialised reqs write barriers the entire file.
+\param completion A callable to call upon i/o completion. Spec is `void(async_file_handle *, io_result<const_buffers_type> &)`.
+Note that buffers returned may not be buffers input, see documentation for `barrier()`.
+\param wait_for_device True if you want the call to wait until data reaches storage and that storage
+has acknowledged the data is physically written. Slow.
+\param and_metadata True if you want the call to sync the metadata for retrieving the writes before the
+barrier after a sudden power loss event. Slow.
+\param mem Optional span of memory to use to avoid using `calloc()`. Note span MUST be all bits zero on entry.
+\errors As for `barrier()`, plus `ENOMEM`.
+\mallocs If mem is not set, one calloc, one free. The allocation is unavoidable due to the need to store a type
+erased completion handler of unknown type and state per buffers input.
+*/
+template <class CompletionRoutine> inline result<async_file_handle::io_state_ptr> async_barrier(async_file_handle &self, async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, CompletionRoutine &&completion, bool wait_for_device = false, bool and_metadata = false, span<char> mem = {}) noexcept
+{
+  return self.async_barrier(std::forward<decltype(reqs)>(reqs), std::forward<decltype(completion)>(completion), std::forward<decltype(wait_for_device)>(wait_for_device), std::forward<decltype(and_metadata)>(and_metadata), std::forward<decltype(mem)>(mem));
+}
+/*! \brief Schedule a read to occur asynchronously.
+
+Note that some OS kernels can only process a limited number async i/o
+operations at a time. You should therefore check for the error `std::errc::resource_unavailable_try_again`
+and gracefully reschedule the i/o for a later time. This temporary
+failure may be returned immediately, or to the completion handler
+and hence you ought to handle both situations.
+
+\return Either an io_state_ptr to the i/o in progress, or an error code.
+\param self The object whose member function to call.
+\param reqs A scatter-gather and offset request.
+\param completion A callable to call upon i/o completion. Spec is `void(async_file_handle *, io_result<buffers_type> &)`.
+Note that buffers returned may not be buffers input, see documentation for `read()`.
+\param mem Optional span of memory to use to avoid using `calloc()`. Note span MUST be all bits zero on entry.
+\errors As for `read()`, plus `ENOMEM`.
+\mallocs If mem is not set, one calloc, one free. The allocation is unavoidable due to the need to store a type
+erased completion handler of unknown type and state per buffers input.
+*/
+template <class CompletionRoutine> inline result<async_file_handle::io_state_ptr> async_read(async_file_handle &self, async_file_handle::io_request<async_file_handle::buffers_type> reqs, CompletionRoutine &&completion, span<char> mem = {}) noexcept
+{
+  return self.async_read(std::forward<decltype(reqs)>(reqs), std::forward<decltype(completion)>(completion), std::forward<decltype(mem)>(mem));
+}
+/*! \brief Schedule a write to occur asynchronously.
+
+Note that some OS kernels can only process a limited number async i/o
+operations at a time. You should therefore check for the error `std::errc::resource_unavailable_try_again`
+and gracefully reschedule the i/o for a later time. This temporary
+failure may be returned immediately, or to the completion handler
+and hence you ought to handle both situations.
+
+
+\return Either an io_state_ptr to the i/o in progress, or an error code.
+\param self The object whose member function to call.
+\param reqs A scatter-gather and offset request.
+\param completion A callable to call upon i/o completion. Spec is `void(async_file_handle *, io_result<const_buffers_type> &)`.
+Note that buffers returned may not be buffers input, see documentation for `write()`.
+\param mem Optional span of memory to use to avoid using `calloc()`. Note span MUST be all bits zero on entry.
+\errors As for `write()`, plus `ENOMEM`.
+\mallocs If mem in not set, one calloc, one free. The allocation is unavoidable due to the need to store a type
+erased completion handler of unknown type and state per buffers input.
+*/
+template <class CompletionRoutine> inline result<async_file_handle::io_state_ptr> async_write(async_file_handle &self, async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, CompletionRoutine &&completion, span<char> mem = {}) noexcept
+{
+  return self.async_write(std::forward<decltype(reqs)>(reqs), std::forward<decltype(completion)>(completion), std::forward<decltype(mem)>(mem));
+}
 #if defined(__cpp_coroutines) || defined(DOXYGEN_IS_IN_THE_HOUSE)
 /*! \brief Schedule a read to occur asynchronously.
 
@@ -706,6 +775,11 @@ inline result<async_file_handle::awaitable<async_file_handle::buffers_type>> co_
 {
   return self.co_read(std::forward<decltype(reqs)>(reqs));
 }
+//! \overload
+inline result<async_file_handle::awaitable<async_file_handle::buffers_type>> co_read(async_file_handle &self, async_file_handle::extent_type offset, std::initializer_list<async_file_handle::buffer_type> lst) noexcept
+{
+  return self.co_read(std::forward<decltype(offset)>(offset), std::forward<decltype(lst)>(lst));
+}
 /*! \brief Schedule a write to occur asynchronously
 
 \return An awaitable, which when `co_await`ed upon, suspends execution of the coroutine
@@ -720,6 +794,11 @@ the number of bytes of that buffer transferred.
 inline result<async_file_handle::awaitable<async_file_handle::const_buffers_type>> co_write(async_file_handle &self, async_file_handle::io_request<async_file_handle::const_buffers_type> reqs) noexcept
 {
   return self.co_write(std::forward<decltype(reqs)>(reqs));
+}
+//! \overload
+inline result<async_file_handle::awaitable<async_file_handle::const_buffers_type>> co_write(async_file_handle &self, async_file_handle::extent_type offset, std::initializer_list<async_file_handle::const_buffer_type> lst) noexcept
+{
+  return self.co_write(std::forward<decltype(offset)>(offset), std::forward<decltype(lst)>(lst));
 }
 #endif
 // END make_free_functions.py

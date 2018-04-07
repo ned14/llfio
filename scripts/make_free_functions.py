@@ -19,12 +19,17 @@ for header in glob.glob("../include/afio/*/*.hpp"):
         if 'AFIO_MAKE_FREE_FUNCTION' in lines[lineidx] and re.match('\s*AFIO_MAKE_FREE_FUNCTION', lines[lineidx]):
             function = ''
             for n in range(1, 100):
+               if 'AFIO_REQUIRES' in lines[lineidx+n]:
+                   continue
                function += lines[lineidx+n]
                if lineidx+n+1 >= len(lines):
                    print(lines[lineidx:])
                    raise Exception()
                if '{' in lines[lineidx+n+1] or ';' in lines[lineidx+n]:
                    break
+            function = function.replace('//\n', '')
+            function = function.replace('\n', '')
+            function = function.replace(';', '')
             docs = ''
             if '*/' in lines[lineidx-1] or '//!' in lines[lineidx-1]:
                 for n in range(1, 100):
@@ -50,7 +55,7 @@ for header in glob.glob("../include/afio/*/*.hpp"):
             lines.insert(functions_to_be_freed_begin, '// BEGIN make_free_functions.py\n')
         idx = functions_to_be_freed_begin + 1
         for classname, function, docs in functions_to_be_freed:
-            #print((classname, function))
+            print((classname, function))
             function = function.replace('virtual ', '')
             function = function.replace('override', '')
             function = function.replace('AFIO_HEADERS_ONLY_MEMFUNC_SPEC ', '')
@@ -74,9 +79,12 @@ for header in glob.glob("../include/afio/*/*.hpp"):
             function = replace(function, 'path_view_type')
             function = replace(function, 'extent_type')
             function = replace(function, 'size_type')
+            function = replace(function, 'buffer_type')
+            function = replace(function, 'const_buffer_type')
+            function = replace(function, 'enumerate_info')
             function = replace(function, 'buffers_type')
             function = replace(function, 'const_buffers_type')
-            function = replace(function, 'enumerate_info')
+            function = replace(function, 'io_state_ptr')
             function = function.replace('path_view_type()', classname+'::path_view_type()')
             function = function.replace(' io_result<', ' '+classname+'::io_result<')
             function = function.replace(' io_request<', ' '+classname+'::io_request<')
