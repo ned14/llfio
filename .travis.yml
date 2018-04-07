@@ -48,7 +48,7 @@ matrix:
   - os: osx
     env: __="cmake tests" NAME=TravisLinuxWorker
   - os: linux
-    compiler: clang++
+    compiler: g++
     env: __="Documentation" NAME=TravisDocumentation
   - os: linux
     env: __="cmake tests" NAME=TravisOSXWorker
