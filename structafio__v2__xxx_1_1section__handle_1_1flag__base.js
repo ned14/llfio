@@ -11,6 +11,7 @@ var structafio__v2__xxx_1_1section__handle_1_1flag__base =
       [ "executable", "structafio__v2__xxx_1_1section__handle_1_1flag__base.html#a5b790e66402ef3a07ce9464f3e1dc9d8ac4d63015efddf12ccdb30242e135f35c", null ],
       [ "singleton", "structafio__v2__xxx_1_1section__handle_1_1flag__base.html#a5b790e66402ef3a07ce9464f3e1dc9d8a091dabebebe6745fe9c1ed2901c125f2", null ],
       [ "barrier_on_close", "structafio__v2__xxx_1_1section__handle_1_1flag__base.html#a5b790e66402ef3a07ce9464f3e1dc9d8a13b22e159d85ac0067a3aac0f7255acd", null ],
+      [ "nvram", "structafio__v2__xxx_1_1section__handle_1_1flag__base.html#a5b790e66402ef3a07ce9464f3e1dc9d8a1e60c3188179bfa97299536cd051fcb9", null ],
       [ "readwrite", "structafio__v2__xxx_1_1section__handle_1_1flag__base.html#a5b790e66402ef3a07ce9464f3e1dc9d8a804eada7d6163846f9e8a240d734a761", null ]
     ] ]
 ];

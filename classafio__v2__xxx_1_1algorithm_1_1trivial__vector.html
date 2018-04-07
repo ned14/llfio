@@ -347,10 +347,22 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
 class afio_v2_xxx::algorithm::trivial_vector&lt; T &gt;</h3>
 
 <p>Provides a constant time capacity expanding move-only STL vector. Requires <code>T</code> to be trivially copyable. </p>
-<p>As a hand waving estimate for whether this vector implementation may be useful to you, it roughly breaks even with <code>std::vector</code> on recent Intel CPUs at around the L2 cache level. So if your vector fits into the L2 cache, this implementation will be no better, and likely slower.</p>
+<p>As a hand waving estimate for whether this vector implementation may be useful to you, it usually roughly breaks even with <code>std::vector</code> on recent Intel CPUs at around the L2 cache boundary. So if your vector fits into the L2 cache, this implementation will be no better, but no worse. If your vector fits into the L1 cache, this implementation will be worse, often considerably so.</p>
 <p>Note that no STL allocator support is provided as <code>T</code> must be trivially copyable (for which most STL's simply use <code>memcpy()</code> anyway instead of the allocator's <code>construct</code>), and an internal <code>section_handle</code> is used for the storage in order to implement the constant time capacity resizing.</p>
 <p>We also disable the copy constructor, as copying an entire backing file is expensive. Use the iterator based copy constructor if you really want to copy one of these.</p>
-<p>The very first item stored reserves a capacity of <code>utils::page_size()/sizeof(T)</code>. Capacity is doubled in byte terms thereafter (i.e. 8Kb, 16Kb and so on). Also be aware that the capacity of the vector needs to become reasonably large before going to the kernel to resize the <code>section_handle</code> and remapping memory becomes faster than <code>memcpy</code>. For these reasons, this vector implementation is best suited to arrays of unknown in advance, but likely large, sizes. </p>
+<p>The very first item stored reserves a capacity of <code>utils::page_size()/sizeof(T)</code> on POSIX and <code>65536/sizeof(T)</code> on Windows. Capacity is doubled in byte terms thereafter (i.e. 8Kb, 16Kb and so on). As mentioned earlier, the capacity of the vector needs to become reasonably large before going to the kernel to resize the <code>section_handle</code> and remapping memory becomes faster than <code>memcpy</code>. For these reasons, this vector implementation is best suited to arrays of unknown in advance, but likely large, sizes.</p>
+<p>Benchmarking notes for Skylake 3.1Ghz Intel Core i5 with 2133Mhz DDR3 RAM, L2 256Kb, L3 4Mb:</p><ul>
+<li>OS X with clang 5.0 and libc++<ul>
+<li>push_back(): 32768,40,59 65536,36,76 131072,78,159 262144,166,198 524288,284,299 1048576,558,572 2097152,1074,1175 4194304,2201,2394 8388608,4520,5503 16777216,9339,9327 33554432,24853,17754 67108864,55876,40973 134217728,122577,86331 268435456,269004,178751 536870912,586466,330716</li>
+<li>resize(): 8192,9,18 16384,14,20 32768,27,32 65536,66,43 131072,107,59 262144,222,131 524288,445,322 1048576,885,500 2097152,1785,1007 4194304,3623,2133 8388608,7334,4082 16777216,17096,8713 33554432,36890,18421 67108864,73593,40702</li>
+</ul>
+</li>
+<li>Windows 10 with VS2017.5:<ul>
+<li>push_back(): 8192,17,70 16384,22,108 32768,36,117 65536,51,152 131072,174,209 262144,336,309 524288,661,471 1048576,1027,787 2097152,2513,1361 4194304,5948,2595 8388608,9919,4820 16777216,23789,9716 33554432,52997,19558 67108864,86468,39240 134217728,193013,76298 268435456,450059,149644 536870912,983442,318078</li>
+<li>resize(): 8192,9,48 16384,17,44 32768,35,48 65536,62,72 131072,134,114 262144,132,168 524288,505,330 1048576,988,582 2097152,1501,1152 4194304,2972,2231 8388608,6122,4436 16777216,12483,8906 33554432,25203,17847 67108864,52005,53646 134217728,102942,86502 268435456,246367,177999 536870912,405524,294685 </li>
+</ul>
+</li>
+</ul>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>include/afio/v2.0/algorithm/<a class="el" href="trivial__vector_8hpp.html">trivial_vector.hpp</a></li>
 </ul>

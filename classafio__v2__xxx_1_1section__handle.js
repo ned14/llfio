@@ -47,6 +47,7 @@ var classafio__v2__xxx_1_1section__handle =
     [ "is_append_only", "classafio__v2__xxx_1_1section__handle.html#ae33d4d0faa1377cd371bd6a0ae0769ae", null ],
     [ "is_directory", "classafio__v2__xxx_1_1section__handle.html#aa53d88105df8c6be01be649829a65b14", null ],
     [ "is_multiplexer", "classafio__v2__xxx_1_1section__handle.html#ab790af4654f5455d8c5e1f1d397543ca", null ],
+    [ "is_nvram", "classafio__v2__xxx_1_1section__handle.html#a111bb9698b6180e9f211e27816f8a4da", null ],
     [ "is_overlapped", "classafio__v2__xxx_1_1section__handle.html#af42904dd49b5517a303e7cb256eae939", null ],
     [ "is_process", "classafio__v2__xxx_1_1section__handle.html#ad02958278a0d92e4ec4fb864ba1eb35b", null ],
     [ "is_readable", "classafio__v2__xxx_1_1section__handle.html#a349e001cbe359d4e7a8f066c69e9361e", null ],

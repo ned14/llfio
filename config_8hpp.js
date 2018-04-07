@@ -44,6 +44,7 @@ var config_8hpp =
     [ "outcome", "config_8hpp.html#abacadff1ffbf16bfba8ef9a3d6fb20d8", null ],
     [ "result", "config_8hpp.html#a7ca979e5ecde58384b6a964b8db006cc", null ],
     [ "emplace_function_ptr", "config_8hpp.html#a0223ac96deaa57f1c6124e8ea00f987e", null ],
+    [ "error_from_exception", "config_8hpp.html#a9c3fa6c24a7218493a02150e363c5e6a", null ],
     [ "log", "config_8hpp.html#a08363b8572e6a8971a6d236d54fb8287", null ],
     [ "make_error_code", "config_8hpp.html#aa5f11cc32803b0966fe64dfdc325a18b", null ],
     [ "make_function_ptr", "config_8hpp.html#ae11f63b07f766758e45df316122b3598", null ],
@@ -52,5 +53,6 @@ var config_8hpp =
     [ "operator==", "config_8hpp.html#a14e8f43a04092eb024ced8b5909cfd88", null ],
     [ "OUTCOME_TEMPLATE", "config_8hpp.html#a02415bd7a9e444399d9575e7627709f2", null ],
     [ "OUTCOME_TEMPLATE", "config_8hpp.html#a01f7cebaa9daf8a041e3d362a85a7d18", null ],
-    [ "throw_as_system_error_with_payload", "config_8hpp.html#ae44838fe79524e9d9eb432eb072395cb", null ]
+    [ "OUTCOME_TEMPLATE", "config_8hpp.html#a2428d00bd15bd397f8eed6f8a13c3468", null ],
+    [ "outcome_throw_as_system_error_with_payload", "config_8hpp.html#a8ef55b4834fe3a95bfa1c18c9defd261", null ]
 ];

@@ -64,8 +64,8 @@ var hierarchy =
     [ "afio_v2_xxx::utils::page_allocator< void >", "classafio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4.html", null ],
     [ "afio_v2_xxx::path_hasher", "structafio__v2__xxx_1_1path__hasher.html", null ],
     [ "afio_v2_xxx::path_view", "classafio__v2__xxx_1_1path__view.html", null ],
-    [ "afio_v2_xxx::utils::page_allocator< void >::rebind< U >", "structafio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
     [ "afio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structafio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
+    [ "afio_v2_xxx::utils::page_allocator< void >::rebind< U >", "structafio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
     [ "result", null, [
       [ "afio_v2_xxx::io_handle::io_result< T >", "structafio__v2__xxx_1_1io__handle_1_1io__result.html", null ],
       [ "afio_v2_xxx::io_handle::io_result< buffers_type >", "structafio__v2__xxx_1_1io__handle_1_1io__result.html", null ],
@@ -80,7 +80,7 @@ var hierarchy =
       [ "afio_v2_xxx::algorithm::shared_fs_mutex::safe_byte_ranges", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html", null ]
     ] ],
     [ "span", null, [
-      [ "afio_v2_xxx::algorithm::mapped_view< T >", "classafio__v2__xxx_1_1algorithm_1_1mapped__view.html", null ],
+      [ "afio_v2_xxx::algorithm::mapped_span< T >", "classafio__v2__xxx_1_1algorithm_1_1mapped__span.html", null ],
       [ "afio_v2_xxx::directory_handle::buffers_type", "structafio__v2__xxx_1_1directory__handle_1_1buffers__type.html", null ]
     ] ],
     [ "afio_v2_xxx::stat_t", "structafio__v2__xxx_1_1stat__t.html", null ],

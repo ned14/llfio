@@ -96,7 +96,8 @@ $(document).ready(function(){initNavTree('index.html','');});
 </div>
   </td><td align="center"><a href="https://dedi4.nedprod.com/static/files/afio-v2.0-source-latest.tar.xz">Latest stable</a><br />
 <a href="https://dedi4.nedprod.com/static/files/afio-v2.0-source-latest.tar.xz">sources</a>  </td><td align="center"><a href="https://dedi4.nedprod.com/static/files/afio-v2.0-binaries-linux64-latest.tgz">Latest stable</a><br />
-<a href="https://dedi4.nedprod.com/static/files/afio-v2.0-binaries-linux64-latest.tgz">Linux x64 prebuilt</a>  </td><td align="center"><a href="https://dedi4.nedprod.com/static/files/afio-v2.0-binaries-win64-latest.zip">Latest stable</a><br />
+<a href="https://dedi4.nedprod.com/static/files/afio-v2.0-binaries-linux64-latest.tgz">Linux x64 prebuilt</a>  </td><td align="center"><a href="https://dedi4.nedprod.com/static/files/afio-v2.0-binaries-darwin-latest.tgz">Latest stable</a><br />
+<a href="https://dedi4.nedprod.com/static/files/afio-v2.0-binaries-darwin64-latest.tgz">OS X x64 prebuilt</a>  </td><td align="center"><a href="https://dedi4.nedprod.com/static/files/afio-v2.0-binaries-win64-latest.zip">Latest stable</a><br />
 <a href="https://dedi4.nedprod.com/static/files/afio-v2.0-binaries-win64-latest.zip">VS2017 x64 prebuilt</a>   </td></tr>
 </table>
 </center><p>Herein lies my proposed zero whole machine memory copy async file i/o and filesystem library for Boost and the C++ standard, intended for storage devices with ~1 microsecond 4Kb transfer latencies and those supporting Storage Class Memory (SCM)/Direct Access Storage (DAX). Its i/o overhead, including syscall overhead, has been benchmarked to 100 nanoseconds on Linux which corresponds to a theoretical maximum of 10M IOPS @ QD1, approx 40Gb/sec per thread. It has particularly strong support for writing portable filesystem algorithms which work well with directly mapped non-volatile storage such as Intel Optane.</p>
@@ -109,16 +110,17 @@ $(document).ready(function(){initNavTree('index.html','');});
 <li>Original error code is always preserved, even down to the original NT kernel error code if a NT kernel API was used.</li>
 <li>Race free filesystem design used throughout (i.e. no TOCTOU).</li>
 <li>Zero malloc, zero exception throw and zero whole system memory copy design used throughout, even down to paths (which can hit 64Kb!).</li>
-<li>Works very well with the C++ standard library, and is intended to be proposed for standardisation into C++ in 2020 or thereabouts.</li>
+<li>Works very well with the C++ standard library, and is intended to be proposed for standardisation into C++ in Summer 2018.</li>
 </ul>
 <dl class="section note"><dt>Note</dt><dd>Note that this code is of late alpha quality. It's quite reliable on Windows and Linux, but be careful when using it!</dd></dl>
 <p>Examples of use: </p><table width="100%" border="0" cellpadding="4">
 <tr>
-<td width="50%" valign="top"><div class="fragment"><div class="line">namespace afio = AFIO_V2_NAMESPACE;</div><div class="line"></div><div class="line">// Make me a 1 trillion element sparsely allocated integer array!</div><div class="line">afio::mapped_file_handle mfh = afio::mapped_temp_inode().value();</div><div class="line"></div><div class="line">// On an extents based filing system, doesn&#39;t actually allocate any physical</div><div class="line">// storage but does map approximately 4Tb of all bits zero data into memory</div><div class="line">mfh.truncate(1000000000000ULL*sizeof(int));</div><div class="line"></div><div class="line">// Create a typed view of the one trillion integers</div><div class="line">afio::algorithm::mapped_view&lt;int&gt; one_trillion_int_array(mfh);</div><div class="line"></div><div class="line">// Write and read as you see fit, if you exceed physical RAM it&#39;ll be paged out</div><div class="line">one_trillion_int_array[0] = 5;</div><div class="line">one_trillion_int_array[999999999999ULL] = 6;</div></div><!-- fragment -->  </td><td width="50%" valign="top"><div class="fragment"><div class="line">namespace afio = AFIO_V2_NAMESPACE;</div><div class="line"></div><div class="line">// Create an asynchronous file handle</div><div class="line">afio::io_service service;</div><div class="line">afio::async_file_handle fh =</div><div class="line">  afio::async_file(service, {}, &quot;testfile.txt&quot;,</div><div class="line">                   afio::async_file_handle::mode::write,</div><div class="line">                   afio::async_file_handle::creation::if_needed).value();</div><div class="line"></div><div class="line">// Resize it to 1024 bytes</div><div class="line">truncate(fh, 1024).value();</div><div class="line"></div><div class="line">// Begin to asynchronously write &quot;hello world&quot; into the file at offset 0,</div><div class="line">// suspending execution of this coroutine until completion and then resuming</div><div class="line">// execution. Requires the Coroutines TS.</div><div class="line">alignas(4096) char buffer[] = &quot;hello world&quot;;</div><div class="line">co_await co_write(fh, {{{buffer, sizeof(buffer)}}, 0}).value();</div></div><!-- fragment -->   </td></tr>
+<td width="50%" valign="top"><div class="fragment"></div><!-- fragment --> </td><td width="50%" valign="top"><div class="fragment"></div><!-- fragment -->  </td></tr>
 </table>
 <p>These compilers and OS are regularly tested:</p><ul>
 <li>GCC 7.0 (Linux 4,x x64)</li>
 <li>clang 4.0 (Linux 4.x x64)</li>
+<li>clang 5.0 (OS X 10.12 x64)</li>
 <li>Visual Studio 2017 (Windows 10 x64)</li>
 </ul>
 <p>Other compilers, architectures and OSs may work, but are not tested regularly. You will need a Filesystem TS implementation in your STL and C++ 14. See <a href="https://github.com/ned14/afio/blob/master/programs/fs-probe/fs_probe_results.yaml">https://github.com/ned14/afio/blob/master/programs/fs-probe/fs_probe_results.yaml</a> for a database of latencies for various previously tested OS, filing systems and storage devices.</p>
@@ -272,13 +274,21 @@ mapped_file_handle - adds low latency memory mapped scatter-gather i/o</li>
 <tr>
 <th>NEW in v2 </th><th>Windows </th><th>POSIX </th><th></th></tr>
 <tr>
+<td>✔ </td><td></td><td></td><td>Page allocator based on an index of linked list of free pages. See notes. </td></tr>
+<tr>
+<td>✔ </td><td></td><td></td><td>Optionally concurrent B+ tree index based on page allocator for key-value store. </td></tr>
+<tr>
+<td>✔ </td><td></td><td></td><td>Attributes extending <code>span&lt;buffers_type&gt;</code> with DMA colouring. </td></tr>
+<tr>
+<td>✔ </td><td></td><td></td><td>Coroutine generator for iterating a file's contents in DMA friendly way. </td></tr>
+<tr>
+<td>✔ </td><td></td><td></td><td>Ranges &amp; Concurrency based reliable directory hierarchy deletion algorithm. </td></tr>
+<tr>
+<td>✔ </td><td></td><td></td><td>Ranges &amp; Concurrency based reliable directory hierarchy copy algorithm. </td></tr>
+<tr>
+<td>✔ </td><td></td><td></td><td>Ranges &amp; Concurrency based reliable directory hierarchy update (two and three way) algorithm. </td></tr>
+<tr>
 <td>✔ </td><td></td><td></td><td>Linux KAIO support for native non-blocking <code>O_DIRECT</code> i/o </td></tr>
-<tr>
-<td>✔ </td><td></td><td></td><td>Reliable directory hierarchy deletion algorithm. </td></tr>
-<tr>
-<td>✔ </td><td></td><td></td><td>Reliable directory hierarchy copy algorithm. </td></tr>
-<tr>
-<td>✔ </td><td></td><td></td><td>Reliable directory hierarchy update (two and three way) algorithm. </td></tr>
 <tr>
 <td>✔ </td><td></td><td></td><td><code>std::pmr::memory_resource</code> adapting a file backing if on C++ 17. </td></tr>
 <tr>

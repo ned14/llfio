@@ -49,7 +49,7 @@ var classafio__v2__xxx_1_1io__handle =
     [ "operator=", "classafio__v2__xxx_1_1io__handle.html#aca75b76bf7cbb9add3fd9a36bcd6d42a", null ],
     [ "operator=", "classafio__v2__xxx_1_1io__handle.html#a949ba240535516e0041ed46594ad54fa", null ],
     [ "read", "classafio__v2__xxx_1_1io__handle.html#a71d7636f40607829cacc2c974c4a2a28", null ],
-    [ "read", "classafio__v2__xxx_1_1io__handle.html#a8af6c6dc1502d40f6aaccc83e49d5342", null ],
+    [ "read", "classafio__v2__xxx_1_1io__handle.html#a928a8ab64d5b7d68dc7e2b3e5849df24", null ],
     [ "release", "classafio__v2__xxx_1_1io__handle.html#a73d5f2070bce0c3d7fa536d3cbed7b52", null ],
     [ "requires_aligned_io", "classafio__v2__xxx_1_1io__handle.html#affb10caeeca67b804695b7378be29e23", null ],
     [ "set_append_only", "classafio__v2__xxx_1_1io__handle.html#af1610ec7fb0a41f039e3e17e0dc467ab", null ],
@@ -57,7 +57,7 @@ var classafio__v2__xxx_1_1io__handle =
     [ "try_lock", "classafio__v2__xxx_1_1io__handle.html#a0a1c4773b9fa7bbd04fee0756075d319", null ],
     [ "unlock", "classafio__v2__xxx_1_1io__handle.html#a96b9da71ee7791fbaaa2470c936ec763", null ],
     [ "write", "classafio__v2__xxx_1_1io__handle.html#aefac4710e5617264347f437b04732c01", null ],
-    [ "write", "classafio__v2__xxx_1_1io__handle.html#ab26a3c5a18cdcc67a506533dbe55e2b3", null ],
+    [ "write", "classafio__v2__xxx_1_1io__handle.html#add161546c0769941fce4fd9f06934e03", null ],
     [ "_caching", "classafio__v2__xxx_1_1io__handle.html#af024e3d92d9a01ac367734e9cdc517fb", null ],
     [ "_flags", "classafio__v2__xxx_1_1io__handle.html#ac46e0a296c31fcd0a996a79d78647fb6", null ],
     [ "_v", "classafio__v2__xxx_1_1io__handle.html#a771ef2bf39ad784eb6265dde077792ad", null ]
