@@ -30,7 +30,7 @@ source code repository lives at https://github.com/ned14/boost.afio.
 - Original error code is always preserved, even down to the original NT kernel error code if a NT kernel API was used.
 - Race free filesystem design used throughout (i.e. no TOCTOU).
 - Zero malloc, zero exception throw and zero whole system memory copy design used throughout, even down to paths (which can hit 64Kb!).
-- Works very well with the C++ standard library, and is intended to be proposed for standardisation into C++ in 2020 or thereabouts.
+- Works very well with the C++ standard library, and is intended to be proposed for standardisation into C++ in Summer 2018.
 
 \note Note that this code is of late alpha quality. It's quite reliable on Windows and Linux, but be careful when using it!
 
@@ -38,44 +38,10 @@ Examples of use:
 <table width="100%" border="0" cellpadding="4">
 <tr>
 <td width="50%" valign="top">
-\code
-namespace afio = AFIO_V2_NAMESPACE;
-
-// Make me a 1 trillion element sparsely allocated integer array!
-afio::mapped_file_handle mfh = afio::mapped_temp_inode().value();
-
-// On an extents based filing system, doesn't actually allocate any physical
-// storage but does map approximately 4Tb of all bits zero data into memory
-mfh.truncate(1000000000000ULL*sizeof(int));
-
-// Create a typed view of the one trillion integers
-afio::algorithm::mapped_view<int> one_trillion_int_array(mfh);
-
-// Write and read as you see fit, if you exceed physical RAM it'll be paged out
-one_trillion_int_array[0] = 5;
-one_trillion_int_array[999999999999ULL] = 6;
-\endcode
+\snippet sparse_array
 </td>
 <td width="50%" valign="top">
-\code
-namespace afio = AFIO_V2_NAMESPACE;
-
-// Create an asynchronous file handle
-afio::io_service service;
-afio::async_file_handle fh =
-  afio::async_file(service, {}, "testfile.txt",
-                   afio::async_file_handle::mode::write,
-                   afio::async_file_handle::creation::if_needed).value();
-
-// Resize it to 1024 bytes
-truncate(fh, 1024).value();
-
-// Begin to asynchronously write "hello world" into the file at offset 0,
-// suspending execution of this coroutine until completion and then resuming
-// execution. Requires the Coroutines TS.
-alignas(4096) char buffer[] = "hello world";
-co_await co_write(fh, {{{buffer, sizeof(buffer)}}, 0}).value();
-\endcode
+\snippet coroutine_write
 </td>
 </tr>
 </table>
@@ -190,9 +156,13 @@ Todo thereafter in order of priority:
 
 | NEW in v2 | Windows | POSIX |     |
 | --------- | --------| ----- | --- |
-| ✔ |   |   | Reliable directory hierarchy deletion algorithm.
-| ✔ |   |   | Reliable directory hierarchy copy algorithm.
-| ✔ |   |   | Reliable directory hierarchy update (two and three way) algorithm.
+| ✔ |   |   | Page allocator based on an index of linked list of free pages. See notes.
+| ✔ |   |   | Optionally concurrent B+ tree index based on page allocator for key-value store.
+| ✔ |   |   | Attributes extending `span<buffers_type>` with DMA colouring.
+| ✔ |   |   | Coroutine generator for iterating a file's contents in DMA friendly way.
+| ✔ |   |   | Ranges & Concurrency based reliable directory hierarchy deletion algorithm.
+| ✔ |   |   | Ranges & Concurrency based reliable directory hierarchy copy algorithm.
+| ✔ |   |   | Ranges & Concurrency based reliable directory hierarchy update (two and three way) algorithm.
 | ✔ |   |   | Linux KAIO support for native non-blocking `O_DIRECT` i/o
 | ✔ |   |   | `std::pmr::memory_resource` adapting a file backing if on C++ 17.
 | ✔ |   |   | Extended attributes support.

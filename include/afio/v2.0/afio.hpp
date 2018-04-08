@@ -64,7 +64,7 @@ import AFIO_MODULE_NAME;
 #include "storage_profile.hpp"
 
 #include "algorithm/cached_parent_handle_adapter.hpp"
-#include "algorithm/mapped_view.hpp"
+#include "algorithm/mapped_span.hpp"
 #include "algorithm/shared_fs_mutex/atomic_append.hpp"
 #include "algorithm/shared_fs_mutex/byte_ranges.hpp"
 #include "algorithm/shared_fs_mutex/lock_files.hpp"

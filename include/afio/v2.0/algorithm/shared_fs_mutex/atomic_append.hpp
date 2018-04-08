@@ -138,10 +138,10 @@ namespace algorithm
         bool first = true;
         do
         {
-          OUTCOME_TRY(_, _h.read(0, reinterpret_cast<char *>(&_header), 48));
-          if(_.data != reinterpret_cast<char *>(&_header))
+          OUTCOME_TRY(_, _h.read(0, {{reinterpret_cast<char *>(&_header), 48}}));
+          if(_[0].data != reinterpret_cast<char *>(&_header))
           {
-            memcpy(&_header, _.data, _.len);
+            memcpy(&_header, _[0].data, _[0].len);
           }
           if(_skip_hashing)
           {
@@ -220,7 +220,7 @@ namespace algorithm
           {
             header.hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash((reinterpret_cast<char *>(&header)) + 16, sizeof(header) - 16);
           }
-          OUTCOME_TRYV(ret.write(0, reinterpret_cast<char *>(&header), sizeof(header)));
+          OUTCOME_TRYV(ret.write(0, {{reinterpret_cast<char *>(&header), sizeof(header)}}));
         }
         // Open a shared lock on last byte in header to prevent other users zomping the file
         OUTCOME_TRY(guard, ret.lock(sizeof(header) - 1, 1, false));
@@ -287,7 +287,7 @@ namespace algorithm
             OUTCOME_TRY(append_guard_, _h.lock(my_lock_request_offset, lastbyte, true));
             append_guard = std::move(append_guard_);
           }
-          OUTCOME_TRYV(_h.write(0, reinterpret_cast<char *>(&lock_request), sizeof(lock_request)));
+          OUTCOME_TRYV(_h.write(0, {{reinterpret_cast<char *>(&lock_request), sizeof(lock_request)}}));
         }
 
         // Find the record I just wrote
@@ -299,7 +299,7 @@ namespace algorithm
         //! to avoid a duplicate read later
         for(;;)
         {
-          file_handle::io_result<file_handle::buffer_type> readoutcome = _h.read(my_lock_request_offset, _buffer, sizeof(_buffer));
+          file_handle::io_result<file_handle::buffers_type> readoutcome = _h.read(my_lock_request_offset, {{_buffer, sizeof(_buffer)}});
           // Should never happen :)
           if(readoutcome.has_error())
           {
@@ -307,7 +307,7 @@ namespace algorithm
             std::terminate();
           }
           const atomic_append_detail::lock_request *record, *lastrecord;
-          for(record = reinterpret_cast<const atomic_append_detail::lock_request *>(readoutcome.value().data), lastrecord = reinterpret_cast<const atomic_append_detail::lock_request *>(readoutcome.value().data + readoutcome.value().len); record < lastrecord && record->hash != lock_request.hash; ++record)
+          for(record = reinterpret_cast<const atomic_append_detail::lock_request *>(readoutcome.value()[0].data), lastrecord = reinterpret_cast<const atomic_append_detail::lock_request *>(readoutcome.value()[0].data + readoutcome.value()[0].len); record < lastrecord && record->hash != lock_request.hash; ++record)
           {
             my_lock_request_offset += sizeof(atomic_append_detail::lock_request);
           }
@@ -360,10 +360,10 @@ namespace algorithm
           }
           assert(record_offset >= start_offset);
           assert(record_offset - start_offset <= sizeof(_buffer));
-          OUTCOME_TRY(batchread, _h.read(start_offset, _buffer, (size_t)(record_offset - start_offset) + sizeof(atomic_append_detail::lock_request)));
-          assert(batchread.len == record_offset - start_offset + sizeof(atomic_append_detail::lock_request));
-          const atomic_append_detail::lock_request *record = reinterpret_cast<atomic_append_detail::lock_request *>(batchread.data + batchread.len - sizeof(atomic_append_detail::lock_request));
-          const atomic_append_detail::lock_request *firstrecord = reinterpret_cast<atomic_append_detail::lock_request *>(batchread.data);
+          OUTCOME_TRY(batchread, _h.read(start_offset, {{_buffer, (size_t)(record_offset - start_offset) + sizeof(atomic_append_detail::lock_request)}}));
+          assert(batchread[0].len == record_offset - start_offset + sizeof(atomic_append_detail::lock_request));
+          const atomic_append_detail::lock_request *record = reinterpret_cast<atomic_append_detail::lock_request *>(batchread[0].data + batchread[0].len - sizeof(atomic_append_detail::lock_request));
+          const atomic_append_detail::lock_request *firstrecord = reinterpret_cast<atomic_append_detail::lock_request *>(batchread[0].data);
 
           // Skip all completed lock requests or not mentioning any of my entities
           for(; record >= firstrecord; record_offset -= sizeof(atomic_append_detail::lock_request), --record)
@@ -473,7 +473,7 @@ namespace algorithm
         {
           atomic_append_detail::lock_request record;
 #ifdef _DEBUG
-          (void) _h.read(my_lock_request_offset, (char *) &record, sizeof(record));
+          (void) _h.read(my_lock_request_offset, {{(char *) &record, sizeof(record)}});
           if(!record.unique_id)
           {
             AFIO_LOG_FATAL(this, "atomic_append::unlock() I have been previously unlocked!");
@@ -487,7 +487,7 @@ namespace algorithm
           }
 #endif
           memset(&record, 0, sizeof(record));
-          (void) _h.write(my_lock_request_offset, reinterpret_cast<char *>(&record), sizeof(record));
+          (void) _h.write(my_lock_request_offset, {{reinterpret_cast<char *>(&record), sizeof(record)}});
         }
 
         // Every 32 records or so, bump _header.first_known_good
@@ -501,7 +501,7 @@ namespace algorithm
           bool done = false;
           while(!done)
           {
-            auto bytesread_ = _h.read(_header.first_known_good, _buffer, sizeof(_buffer));
+            auto bytesread_ = _h.read(_header.first_known_good, {{_buffer, sizeof(_buffer)}});
             if(bytesread_.has_error())
             {
               // If distance between original first known good and end of file is exactly
@@ -510,12 +510,12 @@ namespace algorithm
             }
             const auto &bytesread = bytesread_.value();
             // If read was partial, we are done after this round
-            if(bytesread.len < sizeof(_buffer))
+            if(bytesread[0].len < sizeof(_buffer))
             {
               done = true;
             }
-            const auto *record = reinterpret_cast<const atomic_append_detail::lock_request *>(bytesread.data);
-            const auto *lastrecord = reinterpret_cast<const atomic_append_detail::lock_request *>(bytesread.data + bytesread.len);
+            const auto *record = reinterpret_cast<const atomic_append_detail::lock_request *>(bytesread[0].data);
+            const auto *lastrecord = reinterpret_cast<const atomic_append_detail::lock_request *>(bytesread[0].data + bytesread[0].len);
             for(; record < lastrecord; ++record)
             {
               if(!record->hash && (record->unique_id == 0u))
@@ -543,7 +543,7 @@ namespace algorithm
             _header.hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash((reinterpret_cast<char *>(&_header)) + 16, sizeof(_header) - 16);
           }
           // Rewrite the first part of the header only
-          (void) _h.write(0, reinterpret_cast<char *>(&_header), 48);
+          (void) _h.write(0, {{reinterpret_cast<char *>(&_header), 48}});
         }
       }
     };

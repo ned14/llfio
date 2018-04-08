@@ -72,7 +72,7 @@ template <class U> inline void map_handle_create_close_(U &&f)
         {
           // Create a temporary backing file
           temph = file_handle::file({}, "tempfile", file_handle::mode::write, file_handle::creation::if_needed).value();
-          temph.write(0, "I am some file data", 19).value();
+          temph.write(0, { {"I am some file data", 19} }).value();
         }
         else
         {
@@ -115,26 +115,26 @@ template <class U> inline void map_handle_create_close_(U &&f)
             // Make sure maph's read() does what it is supposed to
             if (use_file_backing)
             {
-              auto b = maph.read(0, nullptr, 20).value();
-              KERNELTEST_CHECK(testreturn, b.data == addr);
-              KERNELTEST_CHECK(testreturn, b.len == 19);  // reads do not read more than the backing length
+              auto b = maph.read(0, { {nullptr, 20} }).value();
+              KERNELTEST_CHECK(testreturn, b[0].data == addr);
+              KERNELTEST_CHECK(testreturn, b[0].len == 19);  // reads do not read more than the backing length
             }
             else
             {
-              auto b = maph.read(5, nullptr, 5000).value();
-              KERNELTEST_CHECK(testreturn, b.data == addr+5); // NOLINT
-              KERNELTEST_CHECK(testreturn, b.len == 4091);
+              auto b = maph.read(5, { {nullptr, 5000} }).value();
+              KERNELTEST_CHECK(testreturn, b[0].data == addr+5); // NOLINT
+              KERNELTEST_CHECK(testreturn, b[0].len == 4091);
             }
             // If we are writable, write straight into the map
             if (maph.is_writable() && addr)
             {
               memcpy(addr, "NIALL was here", 14);
               // Make sure maph's write() works
-              maph.write(1, "iall", 4);
+              maph.write(1, { {"iall", 4} });
               // Make sure data written to the map turns up in the file
               if (use_file_backing)
               {
-                temph.read(0, buffer, 64);  // NOLINT
+                temph.read(0, { {buffer, 64} });  // NOLINT
                 if (flags & section_handle::flag::cow)
                 {
                   KERNELTEST_CHECK(testreturn, !memcmp(buffer, "I am some file data", 19));  // NOLINT

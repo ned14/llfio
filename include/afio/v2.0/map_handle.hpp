@@ -1,5 +1,5 @@
 /* A handle to a source of mapped memory
-(C) 2016-2017 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
+(C) 2016-2018 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
 File Created: August 2016
 
 
@@ -67,6 +67,7 @@ public:
                                    singleton = 1U << 11U,   //!< A single instance of this section is to be shared by all processes using the same backing file.
 
                                    barrier_on_close = 1U << 16U,  //!< Maps of this section, if writable, issue a `barrier()` when destructed blocking until data (not metadata) reaches physical storage.
+                                   nvram = 1U << 17U,             //!< This section is of non-volatile RAM
 
                                    // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
 
@@ -148,6 +149,8 @@ public:
 
   //! Returns the memory section's flags
   flag section_flags() const noexcept { return _flag; }
+  //! True if the section reflects non-volatile RAM
+  bool is_nvram() const noexcept { return !!(_flag & flag::nvram); }
   //! Returns the borrowed handle backing this section, if any
   file_handle *backing() const noexcept { return _backing; }
   //! Sets the borrowed handle backing this section, if any
@@ -206,6 +209,10 @@ inline std::ostream &operator<<(std::ostream &s, const section_handle::flag &v)
   {
     temp.append("barrier_on_close|");
   }
+  if(!!(v & section_handle::flag::nvram))
+  {
+    temp.append("nvram|");
+  }
   if(!temp.empty())
   {
     temp.resize(temp.size() - 1);
@@ -254,7 +261,21 @@ does not close that of the backing storage, nor does releasing this handle relea
 Locking byte ranges of this handle is therefore equal to locking byte ranges in the original backing storage,
 which can be very useful.
 
-\sa `mapped_file_handle`, `algorithm::mapped_view`
+## Barriers:
+
+`map_handle`, because it implements `io_handle`, implements `barrier()` in a very conservative way
+to account for OS differences i.e. it calls `msync()`, and then the `barrier()` implementation for the backing file
+(probably `fsync()` or equivalent on most platforms, which synchronises the entire file).
+
+This is vast overkill if you are using non-volatile RAM, so a special *inlined* `barrier()` implementation
+taking a single buffer and no other arguments is also provided. This calls the appropriate architecture-specific
+instructions to cause the CPU to write all preceding writes out of the write buffers and CPU caches to main
+memory, so for Intel CPUs this would be `CLWB <each cache line>; SFENCE;`. As this is inlined, it ought to
+produce optimal code. If your CPU does not support the requisite instructions (or AFIO has not added support),
+and empty buffer will be returned to indicate that nothing was barriered, same as the normal `barrier()`
+function.
+
+\sa `mapped_file_handle`, `algorithm::mapped_span`
 */
 class AFIO_DECL map_handle : public io_handle
 {
@@ -328,7 +349,33 @@ public:
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override;
   AFIO_MAKE_FREE_FUNCTION
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
+  /*! Lightweight inlined barrier which causes the CPU to write out all buffered writes and dirty cache lines
+  in the request to main memory.
+  \return The cache lines actually barriered. This may be empty. This function does not return an error.
+  \param req The range of cache lines to write barrier.
+  \param evict Whether to also evict the cache lines from CPU caches, useful if they will not be used again.
 
+  Upon return, one knows that memory in the returned buffer has been barriered
+  (it may be empty if there is no support for this operation in AFIO, or if the current CPU does not
+  support this operation). You may find the `is_nvram()` observer of particular use here.
+  */
+  AFIO_MAKE_FREE_FUNCTION
+  const_buffer_type barrier(const_buffer_type req, bool evict = false) noexcept
+  {
+    const_buffer_type ret{(const char *) (((uintptr_t) req.data) & 31), 0};
+    ret.len = req.data + req.len - ret.data;
+    for(const char *addr = ret.data; addr < ret.data + ret.len; addr += 32)
+    {
+      // Slightly UB ...
+      auto *p = reinterpret_cast<const persistent<char> *>(addr);
+      if(memory_flush_none == p->flush(evict ? memory_flush_evict : memory_flush_retain))
+      {
+        req.len = 0;
+        break;
+      }
+    }
+    return ret;
+  }
 
   /*! Create new memory and map it into view.
   \param bytes How many bytes to create and map. Typically will be rounded up to a multiple of the page size (see `utils::page_sizes()`) on POSIX, 64Kb on Windows.
@@ -372,6 +419,9 @@ public:
   //! The size of the memory map. This is the accessible size, NOT the reservation size.
   AFIO_MAKE_FREE_FUNCTION
   size_type length() const noexcept { return _length; }
+
+  //! True if the map is of non-volatile RAM
+  bool is_nvram() const noexcept { return !!(_flag & section_handle::flag::nvram); }
 
   //! Update the size of the memory map to that of any backing section, up to the reservation limit.
   result<size_type> update_map() noexcept
@@ -497,7 +547,40 @@ inline void swap(section_handle &self, section_handle &o) noexcept
 {
   return self.swap(std::forward<decltype(o)>(o));
 }
+/*! \brief Create a memory section backed by a file.
+\param backing The handle to use as backing storage.
+\param maximum_size The initial size of this section, which cannot be larger than any backing file. Zero means to use `backing.length()`.
+\param _flag How to create the section.
 
+\errors Any of the values POSIX dup(), open() or NtCreateSection() can return.
+*/
+inline result<section_handle> section(file_handle &backing, section_handle::extent_type maximum_size, section_handle::flag _flag) noexcept
+{
+  return section_handle::section(std::forward<decltype(backing)>(backing), std::forward<decltype(maximum_size)>(maximum_size), std::forward<decltype(_flag)>(_flag));
+}
+/*! \brief Create a memory section backed by a file.
+\param backing The handle to use as backing storage.
+\param bytes The initial size of this section, which cannot be larger than any backing file. Zero means to use `backing.length()`.
+
+This convenience overload create a writable section if the backing file is writable, otherwise a read-only section.
+
+\errors Any of the values POSIX dup(), open() or NtCreateSection() can return.
+*/
+inline result<section_handle> section(file_handle &backing, section_handle::extent_type bytes = 0) noexcept
+{
+  return section_handle::section(std::forward<decltype(backing)>(backing), std::forward<decltype(bytes)>(bytes));
+}
+/*! \brief Create a memory section backed by an anonymous, managed file.
+\param bytes The initial size of this section. Cannot be zero.
+\param dirh Where to create the anonymous, managed file.
+\param _flag How to create the section.
+
+\errors Any of the values POSIX dup(), open() or NtCreateSection() can return.
+*/
+inline result<section_handle> section(section_handle::extent_type bytes, const path_handle &dirh = path_discovery::storage_backed_temporary_files_directory(), section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept
+{
+  return section_handle::section(std::forward<decltype(bytes)>(bytes), std::forward<decltype(dirh)>(dirh), std::forward<decltype(_flag)>(_flag));
+}
 //! Return the current maximum permitted extent of the memory section.
 inline result<section_handle::extent_type> length(const section_handle &self) noexcept
 {
@@ -505,10 +588,10 @@ inline result<section_handle::extent_type> length(const section_handle &self) no
 }
 /*! Resize the current maximum permitted extent of the memory section to the given extent.
 \param self The object whose member function to call.
-\param newsize The new size of the memory section. Specify zero to use `backing.length()`.
-This cannot exceed the size of any backing file used.
+\param newsize The new size of the memory section, which cannot be zero. Specify zero to use `backing.length()`.
+This cannot exceed the size of any backing file used if that file is not writable.
 
-\errors Any of the values NtExtendSection() can return. On POSIX this is a no op.
+\errors Any of the values `NtExtendSection()` or `ftruncate()` can return.
 */
 inline result<section_handle::extent_type> truncate(section_handle &self, section_handle::extent_type newsize = 0) noexcept
 {
@@ -528,9 +611,24 @@ inline map_handle::io_result<map_handle::const_buffers_type> barrier(map_handle 
 {
   return self.barrier(std::forward<decltype(reqs)>(reqs), std::forward<decltype(wait_for_device)>(wait_for_device), std::forward<decltype(and_metadata)>(and_metadata), std::forward<decltype(d)>(d));
 }
+/*! Lightweight inlined barrier which causes the CPU to write out all buffered writes and dirty cache lines
+in the request to main memory.
+\return The cache lines actually barriered. This may be empty. This function does not return an error.
+\param self The object whose member function to call.
+\param req The range of cache lines to write barrier.
+\param evict Whether to also evict the cache lines from CPU caches, useful if they will not be used again.
+
+Upon return, one knows that memory in the returned buffer has been barriered
+(it may be empty if there is no support for this operation in AFIO, or if the current CPU does not
+support this operation). You may find the `is_nvram()` observer of particular use here.
+*/
+inline map_handle::const_buffer_type barrier(map_handle &self, map_handle::const_buffer_type req, bool evict = false) noexcept
+{
+  return self.barrier(std::forward<decltype(req)>(req), std::forward<decltype(evict)>(evict));
+}
 /*! Create new memory and map it into view.
-\param bytes How many bytes to create and map. Typically will be rounded to a multiple of the page size (see utils::page_sizes()).
-\param _flag The permissions with which to map the view which are constrained by the permissions of the memory section. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
+\param bytes How many bytes to create and map. Typically will be rounded up to a multiple of the page size (see `utils::page_sizes()`) on POSIX, 64Kb on Windows.
+\param _flag The permissions with which to map the view. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
 
 \note On Microsoft Windows this constructor uses the faster VirtualAlloc() which creates less versatile page backed memory. If you want anonymous memory
 allocated from a paging file backed section instead, create a page file backed section and then a mapped view from that using
@@ -543,9 +641,9 @@ inline result<map_handle> map(map_handle::size_type bytes, section_handle::flag 
 {
   return map_handle::map(std::forward<decltype(bytes)>(bytes), std::forward<decltype(_flag)>(_flag));
 }
-/*! Create a memory mapped view of a backing storage.
+/*! Create a memory mapped view of a backing storage, optionally reserving additional address space for later growth.
 \param section A memory section handle specifying the backing storage to use.
-\param bytes How many bytes to map (0 = the size of the memory section). Typically will be rounded to a multiple of the page size (see utils::page_sizes()).
+\param bytes How many bytes to reserve (0 = the size of the section). Rounded up to nearest 64Kb on Windows.
 \param offset The offset into the backing storage to map from. Typically needs to be at least a multiple of the page size (see utils::page_sizes()), on Windows it needs to be a multiple of the kernel memory allocation granularity (typically 64Kb).
 \param _flag The permissions with which to map the view which are constrained by the permissions of the memory section. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
 
@@ -555,10 +653,40 @@ inline result<map_handle> map(section_handle &section, map_handle::size_type byt
 {
   return map_handle::map(std::forward<decltype(section)>(section), std::forward<decltype(bytes)>(bytes), std::forward<decltype(offset)>(offset), std::forward<decltype(_flag)>(_flag));
 }
-//! The size of the memory map.
+//! The size of the memory map. This is the accessible size, NOT the reservation size.
 inline map_handle::size_type length(const map_handle &self) noexcept
 {
   return self.length();
+}
+/*! Resize the reservation of the memory map without changing the address (unless the map
+was zero sized, in which case a new address will be chosen).
+
+If shrinking, address space is released on POSIX, and on Windows if the new size is zero.
+If the new size is zero, the address is set to null to prevent surprises.
+Windows does not support modifying existing mapped regions, so if the new size is not
+zero, the call will probably fail. Windows should let you truncate a previous extension
+however, if it is exact.
+
+If expanding, an attempt is made to map in new reservation immediately after the current address
+reservation, thus extending the reservation. If anything else is mapped in after
+the current reservation, the function fails.
+
+\note On all supported platforms apart from OS X, proprietary flags exist to avoid
+performing a map if a map extension cannot be immediately placed after the current map. On OS X,
+we hint where we'd like the new map to go, but if something is already there OS X will
+place the map elsewhere. In this situation, we delete the new map and return failure,
+which is inefficient, but there is nothing else we can do.
+
+\return The bytes actually reserved.
+\param self The object whose member function to call.
+\param newsize The bytes to truncate the map reservation to. Rounded up to the nearest page size (POSIX) or 64Kb on Windows.
+\param permit_relocation Permit the address to change (some OSs provide a syscall for resizing
+a memory map).
+\errors Any of the values POSIX `mremap()`, `mmap(addr)` or `VirtualAlloc(addr)` can return.
+*/
+inline result<map_handle::size_type> truncate(map_handle &self, map_handle::size_type newsize, bool permit_relocation = false) noexcept
+{
+  return self.truncate(std::forward<decltype(newsize)>(newsize), std::forward<decltype(permit_relocation)>(permit_relocation));
 }
 /*! \brief Read data from the mapped view.
 

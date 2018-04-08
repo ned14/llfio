@@ -111,9 +111,9 @@ a directory. For other systems, we open a directory with read only permissions.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<path_handle> path(const path_handle &base, path_handle::path_view_type _path) noexcept
+inline result<path_handle> path(const path_handle &base, path_handle::path_view_type path) noexcept
 {
-  return path_handle::path(std::forward<decltype(base)>(base), std::forward<decltype(_path)>(_path));
+  return path_handle::path(std::forward<decltype(base)>(base), std::forward<decltype(path)>(path));
 }
 //! \overload
 inline result<path_handle> path(path_handle::path_view_type _path) noexcept

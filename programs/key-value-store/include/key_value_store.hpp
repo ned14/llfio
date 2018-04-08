@@ -127,7 +127,7 @@ namespace key_value_store
        - uint128 key             16 bytes
        - value_history          104 bytes
     */
-    using open_hash_index = basic_open_hash_index<atomic_linear_memory_policy<key_type, value_history, 0>, AFIO_V2_NAMESPACE::algorithm::mapped_view>;
+    using open_hash_index = basic_open_hash_index<atomic_linear_memory_policy<key_type, value_history, 0>, AFIO_V2_NAMESPACE::algorithm::mapped_span>;
     static_assert(sizeof(open_hash_index::value_type) == 128, "open_hash_index::value_type is wrong size");
 
     struct index
@@ -290,7 +290,7 @@ namespace key_value_store
             i.magic = _goodmagic;
             i.all_writes_synced = _indexfile.are_writes_durable();
             i.contents_hashed = enable_integrity;
-            _indexfile.write(0, (char *) &i, sizeof(i)).value();
+            _indexfile.write(0, {{(char *) &i, sizeof(i)}}).value();
           }
           else
           {
@@ -306,11 +306,11 @@ namespace key_value_store
             }
             // Now we've finished the checks, reset writes_occurring and all_writes_synced
             index::index i;
-            _indexfile.read(0, (char *) &i, sizeof(i)).value();
+            _indexfile.read(0, {{(char *) &i, sizeof(i)}}).value();
             memset(i.writes_occurring, 0, sizeof(i.writes_occurring));
             i.all_writes_synced = _indexfile.are_writes_durable();
             memset(&i.hash, 0, sizeof(i.hash));
-            _indexfile.write(0, (char *) &i, sizeof(i)).value();
+            _indexfile.write(0, {{(char *) &i, sizeof(i)}}).value();
           }
         }
       }
@@ -318,7 +318,7 @@ namespace key_value_store
       _indexfileguard = _indexfile.lock(_indexinuseoffset, 1, false).value();
       {
         char buffer[8];
-        _indexfile.read(0, buffer, 8).value();
+        _indexfile.read(0, {{buffer, 8}}).value();
         auto goodmagic = _goodmagic;
         auto badmagic = _badmagic;
         if(!memcmp(buffer, &badmagic, 8))
@@ -465,7 +465,7 @@ namespace key_value_store
       }
       else
       {
-        // TODO Depending on length, make a mapped_view instead
+        // TODO Depending on length, make a mapped_span instead
         const auto &item = it->second.history[revision];
         if(item.transaction_counter == 0)
         {
@@ -502,7 +502,7 @@ namespace key_value_store
           {
             throw std::bad_alloc();
           }
-          _smallfiles.blocking[item.value_identifier].read(item.value_offset * 64 - smallfilelength, buffer, smallfilelength).value();
+          _smallfiles.blocking[item.value_identifier].read(item.value_offset * 64 - smallfilelength, {{buffer, smallfilelength}}).value();
         }
         index::value_tail *vt = reinterpret_cast<index::value_tail *>(buffer + smallfilelength - sizeof(index::value_tail));
         if(_indexheader->contents_hashed || _indexheader->key_is_hash_of_value)

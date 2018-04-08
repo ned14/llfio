@@ -221,12 +221,13 @@ public:
   AFIO_MAKE_FREE_FUNCTION
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept;
   //! \overload
-  io_result<buffer_type> read(extent_type offset, char *data, size_type bytes, deadline d = deadline()) noexcept
+  AFIO_MAKE_FREE_FUNCTION
+  io_result<buffers_type> read(extent_type offset, std::initializer_list<buffer_type> lst, deadline d = deadline()) noexcept
   {
-    buffer_type _reqs[1] = {{data, bytes}};
-    io_request<buffers_type> reqs(buffers_type(_reqs), offset);
-    OUTCOME_TRY(v, read(reqs, d));
-    return *v.data();
+    buffer_type *_reqs = reinterpret_cast<buffer_type *>(alloca(sizeof(buffer_type) * lst.size()));
+    memcpy(_reqs, lst.begin(), sizeof(buffer_type) * lst.size());
+    io_request<buffers_type> reqs(buffers_type(_reqs, lst.size()), offset);
+    return read(reqs, d);
   }
 
   /*! \brief Write data to the open handle.
@@ -253,12 +254,13 @@ public:
   AFIO_MAKE_FREE_FUNCTION
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept;
   //! \overload
-  io_result<const_buffer_type> write(extent_type offset, const char *data, size_type bytes, deadline d = deadline()) noexcept
+  AFIO_MAKE_FREE_FUNCTION
+  io_result<const_buffers_type> write(extent_type offset, std::initializer_list<const_buffer_type> lst, deadline d = deadline()) noexcept
   {
-    const_buffer_type _reqs[1] = {{data, bytes}};
-    io_request<const_buffers_type> reqs(const_buffers_type(_reqs), offset);
-    OUTCOME_TRY(v, write(reqs, d));
-    return *v.data();
+    const_buffer_type *_reqs = reinterpret_cast<const_buffer_type *>(alloca(sizeof(const_buffer_type) * lst.size()));
+    memcpy(_reqs, lst.begin(), sizeof(const_buffer_type) * lst.size());
+    io_request<const_buffers_type> reqs(const_buffers_type(_reqs, lst.size()), offset);
+    return write(reqs, d);
   }
 
   /*! \brief Issue a write reordering barrier such that writes preceding the barrier will reach storage
@@ -285,7 +287,8 @@ public:
   \param wait_for_device True if you want the call to wait until data reaches storage and that storage
   has acknowledged the data is physically written. Slow.
   \param and_metadata True if you want the call to sync the metadata for retrieving the writes before the
-  barrier after a sudden power loss event. Slow.
+  barrier after a sudden power loss event. Slow. Setting this to false enables much faster performance,
+  especially on non-volatile memory.
   \param d An optional deadline by which the i/o must complete, else it is cancelled.
   Note function may return significantly after this deadline if the i/o takes long to cancel.
   \errors Any of the values POSIX fdatasync() or Windows NtFlushBuffersFileEx() can return.
@@ -471,6 +474,11 @@ inline io_handle::io_result<io_handle::buffers_type> read(io_handle &self, io_ha
 {
   return self.read(std::forward<decltype(reqs)>(reqs), std::forward<decltype(d)>(d));
 }
+//! \overload
+inline io_handle::io_result<io_handle::buffers_type> read(io_handle &self, io_handle::extent_type offset, std::initializer_list<io_handle::buffer_type> lst, deadline d = deadline()) noexcept
+{
+  return self.read(std::forward<decltype(offset)>(offset), std::forward<decltype(lst)>(lst), std::forward<decltype(d)>(d));
+}
 /*! \brief Write data to the open handle.
 
 \warning Depending on the implementation backend, not all of the buffers input may be written and
@@ -497,6 +505,11 @@ inline io_handle::io_result<io_handle::const_buffers_type> write(io_handle &self
 {
   return self.write(std::forward<decltype(reqs)>(reqs), std::forward<decltype(d)>(d));
 }
+//! \overload
+inline io_handle::io_result<io_handle::const_buffers_type> write(io_handle &self, io_handle::extent_type offset, std::initializer_list<io_handle::const_buffer_type> lst, deadline d = deadline()) noexcept
+{
+  return self.write(std::forward<decltype(offset)>(offset), std::forward<decltype(lst)>(lst), std::forward<decltype(d)>(d));
+}
 /*! \brief Issue a write reordering barrier such that writes preceding the barrier will reach storage
 before writes after this barrier.
 
@@ -522,7 +535,8 @@ which always write barrier the entire file. Supplying a default initialised reqs
 \param wait_for_device True if you want the call to wait until data reaches storage and that storage
 has acknowledged the data is physically written. Slow.
 \param and_metadata True if you want the call to sync the metadata for retrieving the writes before the
-barrier after a sudden power loss event. Slow.
+barrier after a sudden power loss event. Slow. Setting this to false enables much faster performance,
+especially on non-volatile memory.
 \param d An optional deadline by which the i/o must complete, else it is cancelled.
 Note function may return significantly after this deadline if the i/o takes long to cancel.
 \errors Any of the values POSIX fdatasync() or Windows NtFlushBuffersFileEx() can return.

@@ -67,7 +67,7 @@ else()
       COMMAND cp -a Readme.md afio/
       COMMAND cp -a release_notes.md afio/
       COMMAND cp -a --parents prebuilt/lib/libafio_sl-2.0-Darwin-x86_64-Release.a afio/
-      COMMAND cp -a --parents prebuilt/lib/libafio_dl-2.0-Darwin-x86_64-Release.so afio/
+      COMMAND cp -a --parents prebuilt/lib/libafio_dl-2.0-Darwin-x86_64-Release.dylib afio/
       COMMAND "${CMAKE_COMMAND}" -E tar cfz afio-v2.0-binaries-darwin64.tgz afio
     )
     get_filename_component(toupload afio-v2.0-binaries-darwin64.tgz ABSOLUTE)

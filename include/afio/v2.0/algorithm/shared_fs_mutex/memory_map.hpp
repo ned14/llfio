@@ -210,7 +210,7 @@ namespace algorithm
             }
             char buffer[65536];
             memset(buffer, 0, sizeof(buffer));
-            OUTCOME_TRYV(ret.read(0, buffer, 65535));
+            OUTCOME_TRYV(ret.read(0, {{buffer, 65535}}));
             path_view temphpath(reinterpret_cast<filesystem::path::value_type *>(buffer));
             result<file_handle> _temph(in_place_type<file_handle>);
             _temph = file_handle::file({}, temphpath, file_handle::mode::write, file_handle::creation::open_existing, file_handle::caching::temporary);

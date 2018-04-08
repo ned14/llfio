@@ -78,7 +78,7 @@ static inline void TestAsyncFileHandleCoroutines()
     for(size_t m = 0; m < 8; m++)
     {
       memset(buffer2, (int) ('0' + m), 4096);
-      h.read(offset, buffer1, 4096).value();
+      h.read(offset, {{buffer1, 4096}}).value();
       BOOST_CHECK(!memcmp(buffer1, buffer2, 4096));
       offset += 4096;
     }

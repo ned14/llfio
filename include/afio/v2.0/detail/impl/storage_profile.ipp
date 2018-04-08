@@ -690,9 +690,10 @@ namespace storage_profile
         return success();
       }
 #ifdef _WIN32  // The 4Kb min i/o makes this test take too long
-      if(srch.requires_aligned_io()) {
+      if(srch.requires_aligned_io())
+      {
         return success();
-}
+      }
 #endif
       try
       {
@@ -873,7 +874,7 @@ namespace storage_profile
             if(!fh)
             {
               fh = file_handle::file(base, std::to_string(n), file_handle::mode::write, file_handle::creation::if_needed, srch.kernel_caching(), srch.flags() | file_handle::flag::unlink_on_close);
-              fh.value().write(0, buffer.data(), buffer.size()).value();
+              fh.value().write(0, {{buffer.data(), buffer.size()}}).value();
             }
             _workfiles.push_back(std::move(fh.value()));
             workfiles[n] = &_workfiles.back();
@@ -1138,7 +1139,7 @@ namespace storage_profile
       auto begin = std::chrono::high_resolution_clock::now();
       for(size_t n = 0; n < 1000000; n++)
       {
-        if(!srch.read(0, nullptr, 0))
+        if(!srch.read(0, {{nullptr, 0}}))
         {
           ++errors;
         }
@@ -1158,7 +1159,7 @@ namespace storage_profile
       auto begin = std::chrono::high_resolution_clock::now();
       for(size_t n = 0; n < 1000000; n++)
       {
-        if(!srch.write(0, nullptr, 0))
+        if(!srch.write(0, {{nullptr, 0}}))
         {
           ++errors;
         }
@@ -1210,7 +1211,7 @@ namespace storage_profile
           file_handle fileh(file_handle::file(dirh, filename, file_handle::mode::write, file_handle::creation::if_needed, srch.kernel_caching(), flags).value());
           if(bytes > 0)
           {
-            fileh.write(0, buffer, bytes).value();
+            fileh.write(0, {{buffer, bytes}}).value();
           }
         }
         if(srch.kernel_caching() == file_handle::caching::reads || srch.kernel_caching() == file_handle::caching::none)
