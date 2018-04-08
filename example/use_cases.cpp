@@ -25,8 +25,161 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../include/afio.hpp"
 
 #include <future>
+#include <vector>
 
 // clang-format off
+
+void read_entire_file1()
+{
+  //! [file_entire_file1]
+  namespace afio = AFIO_V2_NAMESPACE;
+
+  // Open the file for read
+  afio::file_handle fh = afio::file(  //
+    {},       // path_handle to base directory
+    "foo"     // path_view to path fragment relative to base directory
+              // default mode is read only
+              // default creation is open existing
+              // default caching is all
+              // default flags is none
+  ).value();  // If failed, throw a filesystem_error exception
+
+  // Make a vector sized the current length of the file
+  std::vector<char> buffer(fh.length().value());
+
+  // Synchronous scatter read from file
+  afio::file_handle::buffers_type filled = afio::read(
+    fh,                                 // handle to read from
+    0,                                  // offset
+    {{ buffer.data(), buffer.size() }}  // Single scatter buffer of the vector 
+                                        // default deadline is infinite
+  ).value();                            // If failed, throw a filesystem_error exception
+
+  // In case of racy truncation of file by third party to new length, adjust buffer to
+  // bytes actually read
+  buffer.resize(filled[0].len);
+  //! [file_entire_file1]
+}
+
+void scatter_write()
+{
+  //! [scatter_write]
+  namespace afio = AFIO_V2_NAMESPACE;
+
+  // Open the file for write, creating if needed, don't cache reads nor writes
+  afio::file_handle fh = afio::file(  //
+    {},                                         // path_handle to base directory
+    "hello",                                    // path_view to path fragment relative to base directory
+    afio::file_handle::mode::write,             // write access please
+    afio::file_handle::creation::if_needed,     // create new file if needed
+    afio::file_handle::caching::only_metadata   // cache neither reads nor writes of data on this handle
+                                                // default flags is none
+  ).value();                                    // If failed, throw a filesystem_error exception
+
+  // Empty file
+  fh.truncate(0).value();
+
+  // Perform gather write
+  const char a[] = "hel";
+  const char b[] = "l";
+  const char c[] = "lo w";
+  const char d[] = "orld";
+
+  fh.write(0,                // offset
+    {                        // gather list
+      { a, sizeof(a) - 1 },
+      { b, sizeof(b) - 1 },
+      { c, sizeof(c) - 1 },
+      { d, sizeof(d) - 1 },
+    }
+                            // default deadline is infinite
+  ).value();                // If failed, throw a filesystem_error exception
+
+  // Explicitly close the file rather than letting the destructor do it
+  fh.close().value();
+  //! [scatter_write]
+}
+
+void map_file()
+{
+  //! [map_file]
+  namespace afio = AFIO_V2_NAMESPACE;
+
+  // Open the file for read
+  afio::file_handle rfh = afio::file(  //
+    {},       // path_handle to base directory
+    "foo"     // path_view to path fragment relative to base directory
+              // default mode is read only
+              // default creation is open existing
+              // default caching is all
+              // default flags is none
+  ).value();  // If failed, throw a filesystem_error exception
+
+  // Open the same file for atomic append
+  afio::file_handle afh = afio::file(  //
+    {},                               // path_handle to base directory
+    "foo",                            // path_view to path fragment relative to base directory
+    afio::file_handle::mode::append   // open for atomic append
+                                      // default creation is open existing
+                                      // default caching is all
+                                      // default flags is none
+  ).value();                          // If failed, throw a filesystem_error exception
+
+  // Create a section for the file of exactly the current length of the file
+  afio::section_handle sh = afio::section(rfh).value();
+
+  // Map the end of the file into memory with a 1Mb address reservation
+  afio::map_handle mh = afio::map(sh, 1024 * 1024, sh.length().value() & ~4095).value();
+
+  // Append stuff to append only handle
+  afio::write(afh,
+    0,             // offset is ignored for atomic append only handles
+    {{ "hello" }}  // single gather buffer
+                   // default deadline is infinite
+  ).value();
+
+  // Poke map to update itself into its reservation if necessary to match its backing
+  // file, bringing the just appended text into the map. A no-op on many platforms.
+  size_t length = mh.update_map().value();
+
+  // Find my appended text
+  for (char *p = mh.address(); (p = (char *) memchr(p, 'h', mh.address() + length - p)); p++)
+  {
+    if (strcmp(p, "hello"))
+    {
+      std::cout << "Happy days!" << std::endl;
+    }
+  }
+  //! [map_file]
+}
+
+void mapped_file()
+{
+  //! [mapped_file]
+  namespace afio = AFIO_V2_NAMESPACE;
+
+  // Open the mapped file for read
+  afio::mapped_file_handle mh = afio::mapped_file(  //
+    {},       // path_handle to base directory
+    "foo"     // path_view to path fragment relative to base directory
+              // default mode is read only
+              // default creation is open existing
+              // default caching is all
+              // default flags is none
+  ).value();  // If failed, throw a filesystem_error exception
+
+  auto length = mh.length().value();
+
+  // Find my text
+  for (char *p = mh.address(); (p = (char *)memchr(p, 'h', mh.address() + length - p)); p++)
+  {
+    if (strcmp(p, "hello"))
+    {
+      std::cout << "Happy days!" << std::endl;
+    }
+  }
+  //! [mapped_file]
+}
 
 void sparse_array()
 {
