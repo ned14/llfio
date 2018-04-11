@@ -235,7 +235,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
     struct aiocb *aiocb = state->aiocbs + n;
     aiocb->aio_fildes = _v.fd;
     aiocb->aio_offset = offset;
-    aiocb->aio_buf = reinterpret_cast<void *>(const_cast<char *>(out[n].data));
+    aiocb->aio_buf = reinterpret_cast<void *>(const_cast<byte *>(out[n].data));
     aiocb->aio_nbytes = out[n].len;
     aiocb->aio_sigevent.sigev_notify = SIGEV_NONE;
     aiocb->aio_sigevent.sigev_value.sival_ptr = reinterpret_cast<void *>(state);

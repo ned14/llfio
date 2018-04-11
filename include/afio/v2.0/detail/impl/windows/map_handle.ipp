@@ -310,12 +310,12 @@ static inline void win32_map_flags(native_handle_type &nativeh, DWORD &allocatio
   }
 }
 // Used to apply an operation to all maps within a region
-template <class F> static inline result<void> win32_maps_apply(char *addr, size_t bytes, F &&f)
+template <class F> static inline result<void> win32_maps_apply(byte *addr, size_t bytes, F &&f)
 {
   while(bytes > 0)
   {
     MEMORY_BASIC_INFORMATION mbi;
-    char *thisregion = addr;
+    byte *thisregion = addr;
     // Need to iterate until AllocationBase changes
     for(;;)
     {
@@ -344,7 +344,7 @@ template <class F> static inline result<void> win32_maps_apply(char *addr, size_
 }
 // Only for memory allocated with VirtualAlloc. We can special case decommitting or releasing
 // memory because NtFreeVirtualMemory() tells us how much it freed.
-static inline result<void> win32_release_allocations(char *addr, size_t bytes, ULONG op)
+static inline result<void> win32_release_allocations(byte *addr, size_t bytes, ULONG op)
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -391,7 +391,7 @@ result<void> map_handle::close() noexcept
       {
         OUTCOME_TRYV(barrier({}, true, false));
       }
-      OUTCOME_TRYV(win32_maps_apply(_addr, _reservation, [](char *addr, size_t /* unused */) -> result<void> {
+      OUTCOME_TRYV(win32_maps_apply(_addr, _reservation, [](byte *addr, size_t /* unused */) -> result<void> {
         NTSTATUS ntstat = NtUnmapViewOfSection(GetCurrentProcess(), addr);
         if(ntstat < 0)
         {
@@ -425,7 +425,7 @@ native_handle_type map_handle::release() noexcept
 map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_handle::io_request<map_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  char *addr = _addr + reqs.offset;
+  byte *addr = _addr + reqs.offset;
   extent_type bytes = 0;
   // Check for overflow
   for(const auto &req : reqs.buffers)
@@ -450,7 +450,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
       return {reqs.buffers};
     }
   }
-  OUTCOME_TRYV(win32_maps_apply(addr, bytes, [](char *addr, size_t bytes) -> result<void> {
+  OUTCOME_TRYV(win32_maps_apply(addr, bytes, [](byte *addr, size_t bytes) -> result<void> {
     if(FlushViewOfFile(addr, static_cast<SIZE_T>(bytes)) == 0)
     {
       return {GetLastError(), std::system_category()};
@@ -483,7 +483,7 @@ result<map_handle> map_handle::map(size_type bytes, section_handle::flag _flag) 
   {
     return {GetLastError(), std::system_category()};
   }
-  ret.value()._addr = static_cast<char *>(addr);
+  ret.value()._addr = static_cast<byte *>(addr);
   ret.value()._reservation = bytes;
   ret.value()._length = bytes;
 
@@ -492,7 +492,7 @@ result<map_handle> map_handle::map(size_type bytes, section_handle::flag _flag) 
   {
     using namespace windows_nt_kernel;
     // Start an asynchronous prefetch
-    buffer_type b{static_cast<char *>(addr), bytes};
+    buffer_type b{static_cast<byte *>(addr), bytes};
     (void) prefetch(span<buffer_type>(&b, 1));
     // If this kernel doesn't support that API, manually poke every page in the new map
     if(PrefetchVirtualMemory_ == nullptr)
@@ -527,7 +527,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   {
     return {static_cast<int>(ntstat), ntkernel_category()};
   }
-  ret.value()._addr = static_cast<char *>(addr);
+  ret.value()._addr = static_cast<byte *>(addr);
   ret.value()._offset = offset;
   ret.value()._reservation = _bytes;
   ret.value()._length = section.length().value() - offset;
@@ -538,7 +538,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   if(_flag & section_handle::flag::prefault)
   {
     // Start an asynchronous prefetch
-    buffer_type b{static_cast<char *>(addr), _bytes};
+    buffer_type b{static_cast<byte *>(addr), _bytes};
     (void) prefetch(span<buffer_type>(&b, 1));
     // If this kernel doesn't support that API, manually poke every page in the new map
     if(PrefetchVirtualMemory_ == nullptr)
@@ -601,7 +601,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool /* un
   if(newsize < _reservation)
   {
     // If newsize isn't exactly a previous extension, this will fail, same as for the VirtualAlloc case
-    OUTCOME_TRYV(win32_maps_apply(_addr + newsize, _reservation - newsize, [](char *addr, size_t /* unused */) -> result<void> {
+    OUTCOME_TRYV(win32_maps_apply(_addr + newsize, _reservation - newsize, [](byte *addr, size_t /* unused */) -> result<void> {
       NTSTATUS ntstat = NtUnmapViewOfSection(GetCurrentProcess(), addr);
       if(ntstat < 0)
       {
@@ -642,7 +642,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
   DWORD prot = 0;
   if(flag == section_handle::flag::none)
   {
-    OUTCOME_TRYV(win32_maps_apply(region.data, region.len, [](char *addr, size_t bytes) -> result<void> {
+    OUTCOME_TRYV(win32_maps_apply(region.data, region.len, [](byte *addr, size_t bytes) -> result<void> {
       DWORD _ = 0;
       if(VirtualProtect(addr, bytes, PAGE_NOACCESS, &_) == 0)
       {
@@ -669,7 +669,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
     prot = PAGE_EXECUTE;
   }
   region = utils::round_to_page_size(region);
-  OUTCOME_TRYV(win32_maps_apply(region.data, region.len, [prot](char *addr, size_t bytes) -> result<void> {
+  OUTCOME_TRYV(win32_maps_apply(region.data, region.len, [prot](byte *addr, size_t bytes) -> result<void> {
     if(VirtualAlloc(addr, bytes, MEM_COMMIT, prot) == nullptr)
     {
       return {GetLastError(), std::system_category()};
@@ -687,7 +687,7 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
     return std::errc::invalid_argument;
   }
   region = utils::round_to_page_size(region);
-  OUTCOME_TRYV(win32_maps_apply(region.data, region.len, [](char *addr, size_t bytes) -> result<void> {
+  OUTCOME_TRYV(win32_maps_apply(region.data, region.len, [](byte *addr, size_t bytes) -> result<void> {
     if(VirtualFree(addr, bytes, MEM_DECOMMIT) == 0)
     {
       return {GetLastError(), std::system_category()};
@@ -713,7 +713,7 @@ result<void> map_handle::zero_memory(buffer_type region) noexcept
     region = utils::round_to_page_size(region);
     if(region.len > 0)
     {
-      OUTCOME_TRYV(win32_maps_apply(region.data, region.len, [](char *addr, size_t bytes) -> result<void> {
+      OUTCOME_TRYV(win32_maps_apply(region.data, region.len, [](byte *addr, size_t bytes) -> result<void> {
         if(DiscardVirtualMemory_(addr, bytes) == 0)
         {
           return {GetLastError(), std::system_category()};
@@ -758,7 +758,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
     // Win8's DiscardVirtualMemory is much faster if it's available
     if(DiscardVirtualMemory_ != nullptr)
     {
-      OUTCOME_TRYV(win32_maps_apply(region.data, region.len, [](char *addr, size_t bytes) -> result<void> {
+      OUTCOME_TRYV(win32_maps_apply(region.data, region.len, [](byte *addr, size_t bytes) -> result<void> {
         if(DiscardVirtualMemory_(addr, bytes) == 0)
         {
           return {GetLastError(), std::system_category()};
@@ -768,7 +768,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
       return region;
     }
     // Else MEM_RESET will do
-    OUTCOME_TRYV(win32_maps_apply(region.data, region.len, [](char *addr, size_t bytes) -> result<void> {
+    OUTCOME_TRYV(win32_maps_apply(region.data, region.len, [](byte *addr, size_t bytes) -> result<void> {
       if(VirtualAlloc(addr, bytes, MEM_RESET, 0) == nullptr)
       {
         return {GetLastError(), std::system_category()};
@@ -785,7 +785,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
 map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buffers_type> reqs, deadline /*d*/) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  char *addr = _addr + reqs.offset;
+  byte *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
   for(buffer_type &req : reqs.buffers)
   {
@@ -810,7 +810,7 @@ map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buff
 map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_request<const_buffers_type> reqs, deadline /*d*/) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  char *addr = _addr + reqs.offset;
+  byte *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
   for(const_buffer_type &req : reqs.buffers)
   {

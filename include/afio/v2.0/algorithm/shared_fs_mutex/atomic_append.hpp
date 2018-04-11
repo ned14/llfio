@@ -138,8 +138,8 @@ namespace algorithm
         bool first = true;
         do
         {
-          OUTCOME_TRY(_, _h.read(0, {{reinterpret_cast<char *>(&_header), 48}}));
-          if(_[0].data != reinterpret_cast<char *>(&_header))
+          OUTCOME_TRY(_, _h.read(0, {{reinterpret_cast<byte *>(&_header), 48}}));
+          if(_[0].data != reinterpret_cast<byte *>(&_header))
           {
             memcpy(&_header, _[0].data, _[0].len);
           }
@@ -220,7 +220,7 @@ namespace algorithm
           {
             header.hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash((reinterpret_cast<char *>(&header)) + 16, sizeof(header) - 16);
           }
-          OUTCOME_TRYV(ret.write(0, {{reinterpret_cast<char *>(&header), sizeof(header)}}));
+          OUTCOME_TRYV(ret.write(0, {{reinterpret_cast<byte *>(&header), sizeof(header)}}));
         }
         // Open a shared lock on last byte in header to prevent other users zomping the file
         OUTCOME_TRY(guard, ret.lock(sizeof(header) - 1, 1, false));
@@ -287,11 +287,11 @@ namespace algorithm
             OUTCOME_TRY(append_guard_, _h.lock(my_lock_request_offset, lastbyte, true));
             append_guard = std::move(append_guard_);
           }
-          OUTCOME_TRYV(_h.write(0, {{reinterpret_cast<char *>(&lock_request), sizeof(lock_request)}}));
+          OUTCOME_TRYV(_h.write(0, {{reinterpret_cast<byte *>(&lock_request), sizeof(lock_request)}}));
         }
 
         // Find the record I just wrote
-        alignas(64) char _buffer[4096 + 2048];  // 6Kb cache line aligned buffer
+        alignas(64) byte _buffer[4096 + 2048];  // 6Kb cache line aligned buffer
         // Read onwards from length as reported before I wrote my lock request
         // until I find my lock request. This loop should never actually iterate
         // except under extreme load conditions.
@@ -473,7 +473,7 @@ namespace algorithm
         {
           atomic_append_detail::lock_request record;
 #ifdef _DEBUG
-          (void) _h.read(my_lock_request_offset, {{(char *) &record, sizeof(record)}});
+          (void) _h.read(my_lock_request_offset, {{(byte *) &record, sizeof(record)}});
           if(!record.unique_id)
           {
             AFIO_LOG_FATAL(this, "atomic_append::unlock() I have been previously unlocked!");
@@ -487,7 +487,7 @@ namespace algorithm
           }
 #endif
           memset(&record, 0, sizeof(record));
-          (void) _h.write(my_lock_request_offset, {{reinterpret_cast<char *>(&record), sizeof(record)}});
+          (void) _h.write(my_lock_request_offset, {{reinterpret_cast<byte *>(&record), sizeof(record)}});
         }
 
         // Every 32 records or so, bump _header.first_known_good
@@ -497,7 +497,7 @@ namespace algorithm
 
           // Forward scan records until first non-zero record is found
           // and update header with new info
-          alignas(64) char _buffer[4096 + 2048];
+          alignas(64) byte _buffer[4096 + 2048];
           bool done = false;
           while(!done)
           {
@@ -543,7 +543,7 @@ namespace algorithm
             _header.hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash((reinterpret_cast<char *>(&_header)) + 16, sizeof(_header) - 16);
           }
           // Rewrite the first part of the header only
-          (void) _h.write(0, {{reinterpret_cast<char *>(&_header), 48}});
+          (void) _h.write(0, {{reinterpret_cast<byte *>(&_header), 48}});
         }
       }
     };

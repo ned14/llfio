@@ -186,7 +186,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
       assert((out[n].len & 511) == 0);
     }
 #endif
-    if(!ioroutine(_v.h, const_cast<char *>(out[n].data), static_cast<DWORD>(out[n].len), ol, handle_completion::Do))
+    if(!ioroutine(_v.h, const_cast<byte *>(out[n].data), static_cast<DWORD>(out[n].len), ol, handle_completion::Do))
     {
       --state->items_to_go;
       state->result.write = {GetLastError(), std::system_category()};

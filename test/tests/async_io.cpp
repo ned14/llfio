@@ -34,7 +34,7 @@ static inline void TestAsyncFileHandle()
   std::vector<std::pair<std::future<afio::async_file_handle::const_buffers_type>, afio::async_file_handle::io_state_ptr>> futures;
   futures.reserve(1024);
   h.truncate(1024 * 4096).value();
-  alignas(4096) char buffer[4096];
+  alignas(4096) afio::byte buffer[4096];
   memset(buffer, 78, 4096);                                               // NOLINT
   afio::async_file_handle::const_buffer_type bt{buffer, sizeof(buffer)};  // NOLINT
   for(size_t n = 0; n < 1024; n++)
@@ -42,24 +42,25 @@ static inline void TestAsyncFileHandle()
   retry:
     std::promise<afio::async_file_handle::const_buffers_type> p;
     auto f(p.get_future());
-    auto schedule_io = [&]{ return h
-           .async_write({bt, n * 4096}, [ p = std::move(p), n ](afio::async_file_handle *, afio::async_file_handle::io_result<afio::async_file_handle::const_buffers_type> & result) mutable {
-             (void) n;
-             if(!result && result.error() == std::errc::resource_unavailable_try_again)
-             {
-               std::cout << "*** Completion handler saw error " << result.error() << std::endl;
-             }
-             try
-             {
-               p.set_value(result.value());
-               // std::cout << "Written block " << n << " successfully" << std::endl;
-             }
-             catch(...)
-             {
-               p.set_exception(std::current_exception());
-               // std::cout << "Written block " << n << " unsuccessfully" << std::endl;
-             }
-           }); };
+    auto schedule_io = [&] {
+      return h.async_write({bt, n * 4096}, [ p = std::move(p), n ](afio::async_file_handle *, afio::async_file_handle::io_result<afio::async_file_handle::const_buffers_type> & result) mutable {
+        (void) n;
+        if(!result && result.error() == std::errc::resource_unavailable_try_again)
+        {
+          std::cout << "*** Completion handler saw error " << result.error() << std::endl;
+        }
+        try
+        {
+          p.set_value(result.value());
+          // std::cout << "Written block " << n << " successfully" << std::endl;
+        }
+        catch(...)
+        {
+          p.set_exception(std::current_exception());
+          // std::cout << "Written block " << n << " unsuccessfully" << std::endl;
+        }
+      });
+    };
     auto g(schedule_io());
     if(!g && g.error() == std::errc::resource_unavailable_try_again)
     {

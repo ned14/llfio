@@ -72,7 +72,7 @@ template <class U> inline void map_handle_create_close_(U &&f)
         {
           // Create a temporary backing file
           temph = file_handle::file({}, "tempfile", file_handle::mode::write, file_handle::creation::if_needed).value();
-          temph.write(0, { {"I am some file data", 19} }).value();
+          temph.write(0, { {reinterpret_cast<const AFIO_V2_NAMESPACE::byte *>("I am some file data"), 19} }).value();
         }
         else
         {
@@ -100,13 +100,13 @@ template <class U> inline void map_handle_create_close_(U &&f)
 //#define KERNELTEST_CHECK(a, ...) BOOST_CHECK(__VA_ARGS__)
         if (testreturn)
         {
-          char *addr = maph.address();
+          AFIO_V2_NAMESPACE::byte *addr = maph.address();
           section_handle::flag flags = std::get<1>(std::get<1>(permuter[idx]));
           KERNELTEST_CHECK(testreturn, maph.length() > 0);
           KERNELTEST_CHECK(testreturn, addr != nullptr);
           if (!(flags & section_handle::flag::nocommit) && addr != nullptr)
           {
-            char buffer[64];
+            AFIO_V2_NAMESPACE::byte buffer[64];
             // Make sure the backing file is appearing in the map
             if (use_file_backing && maph.is_readable())
             {
@@ -130,7 +130,7 @@ template <class U> inline void map_handle_create_close_(U &&f)
             {
               memcpy(addr, "NIALL was here", 14);
               // Make sure maph's write() works
-              maph.write(1, { {"iall", 4} });
+              maph.write(1, { {reinterpret_cast<const AFIO_V2_NAMESPACE::byte *>("iall"), 4} });
               // Make sure data written to the map turns up in the file
               if (use_file_backing)
               {

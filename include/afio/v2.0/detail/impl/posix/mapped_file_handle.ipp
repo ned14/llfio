@@ -116,8 +116,8 @@ result<mapped_file_handle::extent_type> mapped_file_handle::truncate(extent_type
     // otherwise some kernels keep them around until last fd close, effectively leaking them
     if(newsize < size)
     {
-      char *start = utils::round_up_to_page_size(_mh.address() + newsize);
-      char *end = utils::round_up_to_page_size(_mh.address() + size);
+      byte *start = utils::round_up_to_page_size(_mh.address() + newsize);
+      byte *end = utils::round_up_to_page_size(_mh.address() + size);
       (void) _mh.do_not_store({start, static_cast<size_t>(end - start)});
     }
     // Resize the file, on unified page cache kernels it'll map any new pages into the reserved map
