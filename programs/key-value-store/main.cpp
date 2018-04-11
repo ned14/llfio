@@ -36,6 +36,7 @@ namespace stackoverflow
   {
     using namespace AFIO_V2_NAMESPACE;
     using AFIO_V2_NAMESPACE::file_handle;
+    using AFIO_V2_NAMESPACE::byte;
     // The result<T> is from WG21 P0762, it looks quite like an `expected<T, std::error_code>` object
     // See Outcome v2 at https://ned14.github.io/outcome/ and https://lists.boost.org/boost-announce/2017/06/0510.php
 
@@ -62,7 +63,7 @@ namespace stackoverflow
     // Otherwise unpack the value containing the valid file_handle
     file_handle fh(std::move(_fh.value()));
     // Configure the scatter buffers for the read, ideally aligned to a page boundary for DMA
-    alignas(4096) char buffer[4096];
+    alignas(4096) byte buffer[4096];
     // There is actually a faster to type shortcut for this, but I thought best to spell it out
     file_handle::buffer_type reqs[] = {{buffer, sizeof(buffer)}};
     // Do a blocking read from offset 0 possibly filling the scatter buffers passed in
@@ -78,7 +79,7 @@ namespace stackoverflow
     // This lets us skip unnecessary memory copying
 
     // Make a string view of the first buffer returned
-    string_view v(buffers_read[0].data, buffers_read[0].len);
+    string_view v((const char *) buffers_read[0].data, buffers_read[0].len);
     // Sub view that view with the first line
     string_view line(v.substr(0, v.find_first_of('\n')));
     // Return a string copying the first line from the file, or all 4096 bytes read if no newline found.
