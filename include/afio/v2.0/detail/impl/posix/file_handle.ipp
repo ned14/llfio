@@ -462,7 +462,7 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_type offs
   // Fall back onto a write of zeros
   if(bytes < utils::page_size())
   {
-    auto *buffer = static_cast<char *>(alloca(bytes));
+    auto *buffer = static_cast<byte *>(alloca(bytes));
     memset(buffer, 0, bytes);
     OUTCOME_TRY(written, write(offset, {{buffer, bytes}}, d));
     return written[0].len;
@@ -471,8 +471,8 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_type offs
   {
     extent_type ret = 0;
     auto blocksize = utils::file_buffer_default_size();
-    char *buffer = utils::page_allocator<char>().allocate(blocksize);
-    auto unbufferh = undoer([buffer, blocksize] { utils::page_allocator<char>().deallocate(buffer, blocksize); });
+    byte *buffer = utils::page_allocator<byte>().allocate(blocksize);
+    auto unbufferh = undoer([buffer, blocksize] { utils::page_allocator<byte>().deallocate(buffer, blocksize); });
     (void) unbufferh;
     while(bytes > 0)
     {

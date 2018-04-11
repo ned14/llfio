@@ -55,7 +55,7 @@ namespace algorithm
     : _mapping(map_handle::map(sh, (bytes == 0) ? 0 : bytes + (offset - page_offset), page_offset, _flag).value())
     {
       offset -= page_offset;
-      char *addr = _mapping.address() + offset;
+      byte *addr = _mapping.address() + offset;
       size_t len = sh.length().value() - offset;  // use section length, not mapped length as mapped length is rounded up to page size
       if(bytes != 0 && bytes < len)
       {
@@ -67,15 +67,15 @@ namespace algorithm
   public:
     //! Default constructor
     constexpr mapped_span() {}  // NOLINT
-    /*! Create a view of new memory.
-
-    \param length The number of items to map.
-    \param _flag The flags to pass to `map_handle::map()`.
-    */
+                                /*! Create a view of new memory.
+                            
+                                \param length The number of items to map.
+                                \param _flag The flags to pass to `map_handle::map()`.
+                                */
     explicit mapped_span(size_type length, section_handle::flag _flag = section_handle::flag::readwrite)
         : _mapping(map_handle::map(length * sizeof(T), _flag).value())
     {
-      char *addr = _mapping.address();
+      byte *addr = _mapping.address();
       static_cast<span<T> &>(*this) = span<T>(reinterpret_cast<T *>(addr), length);  // NOLINT
     }
     /*! Construct a mapped view of the given section handle.

@@ -297,7 +297,7 @@ public:
 
 protected:
   section_handle *_section{nullptr};
-  char *_addr{nullptr};
+  byte *_addr{nullptr};
   extent_type _offset{0};
   size_type _reservation{0}, _length{0};
   section_handle::flag _flag{section_handle::flag::none};
@@ -360,14 +360,14 @@ public:
   support this operation). You may find the `is_nvram()` observer of particular use here.
   */
   AFIO_MAKE_FREE_FUNCTION
-  const_buffer_type barrier(const_buffer_type req, bool evict = false) noexcept
+  static const_buffer_type barrier(const_buffer_type req, bool evict = false) noexcept
   {
-    const_buffer_type ret{(const char *) (((uintptr_t) req.data) & 31), 0};
+    const_buffer_type ret{(const_buffer_type::pointer)(((uintptr_t) req.data) & 31), 0};
     ret.len = req.data + req.len - ret.data;
-    for(const char *addr = ret.data; addr < ret.data + ret.len; addr += 32)
+    for(const_buffer_type::pointer addr = ret.data; addr < ret.data + ret.len; addr += 32)
     {
       // Slightly UB ...
-      auto *p = reinterpret_cast<const persistent<char> *>(addr);
+      auto *p = reinterpret_cast<const persistent<byte> *>(addr);
       if(memory_flush_none == p->flush(evict ? memory_flush_evict : memory_flush_retain))
       {
         req.len = 0;
@@ -408,7 +408,7 @@ public:
   void set_section(section_handle *s) noexcept { _section = s; }
 
   //! The address in memory where this mapped view resides
-  char *address() const noexcept { return _addr; }
+  byte *address() const noexcept { return _addr; }
 
   //! The offset of the memory map.
   extent_type offset() const noexcept { return _offset; }

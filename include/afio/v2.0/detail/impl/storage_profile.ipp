@@ -425,7 +425,7 @@ namespace storage_profile
                                          _h.error().message());
               }
               file_handle h(std::move(_h.value()));
-              std::vector<char, utils::page_allocator<char>> buffer(size, no);
+              std::vector<byte, utils::page_allocator<byte>> buffer(size, to_byte(no));
               file_handle::const_buffer_type _reqs[1] = {{buffer.data(), size}};
               file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, 0);
               --done;
@@ -464,7 +464,7 @@ namespace storage_profile
                                          _h.error().message());
               }
               file_handle h(std::move(_h.value()));
-              std::vector<char, utils::page_allocator<char>> buffer(size, 0), tocmp(size, 0);
+              std::vector<byte, utils::page_allocator<byte>> buffer(size, to_byte(0)), tocmp(size, to_byte(0));
               file_handle::buffer_type _reqs[1] = {{buffer.data(), size}};
               file_handle::io_request<file_handle::buffers_type> reqs(_reqs, 0);
               while(done == 0u)
@@ -570,7 +570,7 @@ namespace storage_profile
                                            _h.error().message());
                 }
                 file_handle h(std::move(_h.value()));
-                std::vector<char, utils::page_allocator<char>> buffer(size, no);
+                std::vector<byte, utils::page_allocator<byte>> buffer(size, to_byte(no));
                 file_handle::const_buffer_type _reqs[1] = {{buffer.data(), size}};
                 file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, offset);
                 --done;
@@ -610,7 +610,7 @@ namespace storage_profile
                                            _h.error().message());
                 }
                 file_handle h(std::move(_h.value()));
-                std::vector<char, utils::page_allocator<char>> buffer(size, 0), tocmp(size, 0);
+                std::vector<byte, utils::page_allocator<byte>> buffer(size, to_byte(0)), tocmp(size, to_byte(0));
                 file_handle::buffer_type _reqs[1] = {{buffer.data(), size}};
                 file_handle::io_request<file_handle::buffers_type> reqs(_reqs, offset);
                 while(done == 0u)
@@ -731,7 +731,7 @@ namespace storage_profile
                                              _h.error().message());
                   }
                   file_handle h(std::move(_h.value()));
-                  std::vector<char, utils::page_allocator<char>> buffer(size, no);
+                  std::vector<byte, utils::page_allocator<byte>> buffer(size, to_byte(no));
                   file_handle::const_buffer_type _reqs[1] = {{buffer.data(), size}};
                   file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, offset);
                   --done;
@@ -771,7 +771,7 @@ namespace storage_profile
                                              _h.error().message());
                   }
                   file_handle h(std::move(_h.value()));
-                  std::vector<char, utils::page_allocator<char>> buffer(size, 0), tocmp(size, 0);
+                  std::vector<byte, utils::page_allocator<byte>> buffer(size, to_byte(0)), tocmp(size, to_byte(0));
                   file_handle::buffer_type _reqs[1] = {{buffer.data(), size}};
                   file_handle::io_request<file_handle::buffers_type> reqs(_reqs, offset);
                   while(done == 0u)
@@ -867,7 +867,7 @@ namespace storage_profile
         path_handle base = srch.parent_path_handle().value();
         if(ownfiles)
         {
-          std::vector<char, utils::page_allocator<char>> buffer(1024 * 1024 * 1024);
+          std::vector<byte, utils::page_allocator<byte>> buffer(1024 * 1024 * 1024);
           for(size_t n = 0; n < noreaders + nowriters; n++)
           {
             auto fh = file_handle::file(base, std::to_string(n), file_handle::mode::write, file_handle::creation::open_existing, srch.kernel_caching(), srch.flags());
@@ -899,7 +899,7 @@ namespace storage_profile
             SetThreadAffinityMask(GetCurrentThread(), 1ULL << (no * 2));
 #endif
             file_handle &h = *workfiles[no];
-            alignas(4096) char buffer[4096];
+            alignas(4096) byte buffer[4096];
             memset(buffer, static_cast<int>(no), 4096);
             file_handle::const_buffer_type _reqs[1] = {{buffer, 4096}};
             file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, 0);
@@ -938,7 +938,7 @@ namespace storage_profile
             SetThreadAffinityMask(GetCurrentThread(), 1ULL << (no * 2));
 #endif
             file_handle &h = *workfiles[no];
-            alignas(4096) char buffer[4096];
+            alignas(4096) byte buffer[4096];
             memset(buffer, static_cast<int>(no), 4096);
             file_handle::buffer_type _reqs[1] = {{buffer, 4096}};
             file_handle::io_request<file_handle::buffers_type> reqs(_reqs, 0);
@@ -1189,7 +1189,7 @@ namespace storage_profile
         std::string filename;
         filename.reserve(16);
         std::chrono::high_resolution_clock::time_point begin, end;
-        alignas(4096) char buffer[4096];
+        alignas(4096) byte buffer[4096];
         memset(buffer, 78, sizeof(buffer));
         if(!race_free)
         {

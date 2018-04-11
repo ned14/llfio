@@ -306,6 +306,12 @@ AFIO_V2_NAMESPACE_END
 AFIO_V2_NAMESPACE_BEGIN
 using namespace QUICKCPPLIB_NAMESPACE::optional;
 AFIO_V2_NAMESPACE_END
+// Bring in a byte implementation
+#include "quickcpplib/include/byte.hpp"
+AFIO_V2_NAMESPACE_BEGIN
+using QUICKCPPLIB_NAMESPACE::byte::byte;
+using QUICKCPPLIB_NAMESPACE::byte::to_byte;
+AFIO_V2_NAMESPACE_END
 // Bring in a string_view implementation
 #include "quickcpplib/include/string_view.hpp"
 AFIO_V2_NAMESPACE_BEGIN

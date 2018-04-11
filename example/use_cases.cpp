@@ -28,6 +28,9 @@ Distributed under the Boost Software License, Version 1.0.
 #include <vector>
 
 // clang-format off
+#ifdef _MSC_VER
+#pragma warning(disable: 4706)  // assignment within conditional
+#endif
 
 void read_entire_file1()
 {
@@ -45,7 +48,7 @@ void read_entire_file1()
   ).value();  // If failed, throw a filesystem_error exception
 
   // Make a vector sized the current length of the file
-  std::vector<char> buffer(fh.length().value());
+  std::vector<afio::byte> buffer(fh.length().value());
 
   // Synchronous scatter read from file
   afio::file_handle::buffers_type filled = afio::read(
@@ -86,11 +89,11 @@ void scatter_write()
   const char d[] = "orld";
 
   fh.write(0,                // offset
-    {                        // gather list
-      { a, sizeof(a) - 1 },
-      { b, sizeof(b) - 1 },
-      { c, sizeof(c) - 1 },
-      { d, sizeof(d) - 1 },
+    {                        // gather list, buffers use std::byte
+      { reinterpret_cast<const afio::byte *>(a), sizeof(a) - 1 },
+      { reinterpret_cast<const afio::byte *>(b), sizeof(b) - 1 },
+      { reinterpret_cast<const afio::byte *>(c), sizeof(c) - 1 },
+      { reinterpret_cast<const afio::byte *>(d), sizeof(d) - 1 },
     }
                             // default deadline is infinite
   ).value();                // If failed, throw a filesystem_error exception
@@ -133,9 +136,9 @@ void map_file()
 
   // Append stuff to append only handle
   afio::write(afh,
-    0,             // offset is ignored for atomic append only handles
-    {{ "hello" }}  // single gather buffer
-                   // default deadline is infinite
+    0,                                                      // offset is ignored for atomic append only handles
+    {{ reinterpret_cast<const afio::byte *>("hello"), 6 }}  // single gather buffer
+                                                            // default deadline is infinite
   ).value();
 
   // Poke map to update itself into its reservation if necessary to match its backing
@@ -143,7 +146,7 @@ void map_file()
   size_t length = mh.update_map().value();
 
   // Find my appended text
-  for (char *p = mh.address(); (p = (char *) memchr(p, 'h', mh.address() + length - p)); p++)
+  for (char *p = reinterpret_cast<char *>(mh.address()); (p = (char *) memchr(p, 'h', reinterpret_cast<char *>(mh.address()) + length - p)); p++)
   {
     if (strcmp(p, "hello"))
     {
@@ -171,7 +174,7 @@ void mapped_file()
   auto length = mh.length().value();
 
   // Find my text
-  for (char *p = mh.address(); (p = (char *)memchr(p, 'h', mh.address() + length - p)); p++)
+  for (char *p = reinterpret_cast<char *>(mh.address()); (p = (char *)memchr(p, 'h', reinterpret_cast<char *>(mh.address()) + length - p)); p++)
   {
     if (strcmp(p, "hello"))
     {
@@ -222,7 +225,7 @@ std::future<void> coroutine_write()
   // suspending execution of this coroutine until completion and then resuming
   // execution. Requires the Coroutines TS.
   alignas(4096) char buffer[] = "hello world";
-  co_await co_write(fh, 0, { { buffer, sizeof(buffer) } }).value();
+  co_await co_write(fh, 0, { { reinterpret_cast<afio::byte *>(buffer), sizeof(buffer) } }).value();
   //! [coroutine_write]
 }
 #endif

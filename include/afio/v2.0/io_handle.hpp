@@ -53,18 +53,28 @@ public:
   //! The scatter buffer type used by this handle. Guaranteed to be `TrivialType` and `StandardLayoutType`.
   struct buffer_type
   {
+    //! Type of the pointer to memory.
+    using pointer = byte *;
+    //! Type of the length of memory.
+    using size_type = size_t;
+
     //! Pointer to memory to be filled by a read. Try to make this 64 byte, or ideally, `page_size()` aligned where possible.
-    char *data;
+    pointer data;
     //! The number of bytes to fill into this address. Try to make this a 64 byte multiple, or ideally, a whole multiple of `page_size()`.
-    size_t len;
+    size_type len;
   };
   //! The gather buffer type used by this handle. Guaranteed to be `TrivialType` and `StandardLayoutType`.
   struct const_buffer_type
   {
+    //! Type of the pointer to memory.
+    using pointer = const byte *;
+    //! Type of the length of memory.
+    using size_type = size_t;
+
     //! Pointer to memory to be written. Try to make this 64 byte, or ideally, `page_size()` aligned where possible.
-    const char *data;
+    pointer data;
     //! The number of bytes to write from this address. Try to make this a 64 byte multiple, or ideally, a whole multiple of `page_size()`.
-    size_t len;
+    size_type len;
   };
 #ifndef NDEBUG
   static_assert(std::is_trivial<buffer_type>::value, "buffer_type is not a trivial type!");

@@ -64,6 +64,7 @@ static inline void TestMappedView2()
 {
   using namespace AFIO_V2_NAMESPACE;
   using AFIO_V2_NAMESPACE::file_handle;
+  using AFIO_V2_NAMESPACE::byte;
   {
     std::error_code ec;
     filesystem::remove("testfile", ec);
@@ -71,7 +72,7 @@ static inline void TestMappedView2()
   mapped_file_handle mfh = mapped_file_handle::mapped_file(1024 * 1024, {}, "testfile", file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::all, file_handle::flag::unlink_on_close).value();
   BOOST_CHECK(mfh.address() == nullptr);
   mfh.truncate(10000 * sizeof(int)).value();
-  char *addr = mfh.address();
+  byte *addr = mfh.address();
   BOOST_CHECK(addr != nullptr);
 
   algorithm::mapped_span<int> v1(mfh);

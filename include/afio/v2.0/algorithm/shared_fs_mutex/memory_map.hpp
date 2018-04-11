@@ -208,7 +208,7 @@ namespace algorithm
             {
               return lockinuse.error();
             }
-            char buffer[65536];
+            byte buffer[65536];
             memset(buffer, 0, sizeof(buffer));
             OUTCOME_TRYV(ret.read(0, {{buffer, 65535}}));
             path_view temphpath(reinterpret_cast<filesystem::path::value_type *>(buffer));
@@ -244,7 +244,7 @@ namespace algorithm
           char buffer[4096];
           memset(buffer, 0, sizeof(buffer));
           size_t bytes = temppath.native().size() * sizeof(*temppath.c_str());
-          file_handle::const_buffer_type buffers[] = {{reinterpret_cast<const char *>(temppath.c_str()), bytes}, {static_cast<const char *>(buffer), 4096 - (bytes % 4096)}};
+          file_handle::const_buffer_type buffers[] = {{reinterpret_cast<const byte *>(temppath.c_str()), bytes}, {reinterpret_cast<const byte *>(buffer), 4096 - (bytes % 4096)}};
           OUTCOME_TRYV(ret.truncate(65536));
           OUTCOME_TRYV(ret.write({buffers, 0}));
           // Map for read the maximum possible path file size, again to avoid race problems

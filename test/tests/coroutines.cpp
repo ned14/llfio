@@ -43,7 +43,7 @@ static inline void TestAsyncFileHandleCoroutines()
 
   // Launch 8 coroutines, each writing 4Kb of chars 0-8 to every 32Kb block
   auto coroutine = [&h](size_t no) -> std::future<void> {
-    std::vector<char, afio::utils::page_allocator<char>> buffer(4096);
+    std::vector<afio::byte, afio::utils::page_allocator<afio::byte>> buffer(4096);
     memset(buffer.data(), (int) ('0' + no), 4096);
     afio::async_file_handle::const_buffer_type bt{buffer.data(), buffer.size()};
     for(size_t n = 0; n < 128; n++)
@@ -71,7 +71,7 @@ static inline void TestAsyncFileHandleCoroutines()
   //! [coroutines_example]
 
   // Check that the file has the right contents
-  alignas(4096) char buffer1[4096], buffer2[4096];
+  alignas(4096) afio::byte buffer1[4096], buffer2[4096];
   afio::async_file_handle::extent_type offset = 0;
   for(size_t n = 0; n < 128; n++)
   {

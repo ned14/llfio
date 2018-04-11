@@ -174,7 +174,7 @@ native_handle_type map_handle::release() noexcept
 map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_handle::io_request<map_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  char *addr = _addr + reqs.offset;
+  byte *addr = _addr + reqs.offset;
   extent_type bytes = 0;
   // Check for overflow
   for(const auto &req : reqs.buffers)
@@ -293,7 +293,7 @@ result<map_handle> map_handle::map(size_type bytes, section_handle::flag _flag) 
   result<map_handle> ret(map_handle(nullptr));
   native_handle_type &nativeh = ret.value()._v;
   OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, 0, nullptr, bytes, 0, _flag));
-  ret.value()._addr = static_cast<char *>(addr);
+  ret.value()._addr = static_cast<byte *>(addr);
   ret.value()._reservation = bytes;
   ret.value()._length = bytes;
   AFIO_LOG_FUNCTION_CALL(&ret);
@@ -310,7 +310,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   result<map_handle> ret{map_handle(&section)};
   native_handle_type &nativeh = ret.value()._v;
   OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, 0, &section, bytes, offset, _flag));
-  ret.value()._addr = static_cast<char *>(addr);
+  ret.value()._addr = static_cast<byte *>(addr);
   ret.value()._offset = offset;
   ret.value()._reservation = bytes;
   ret.value()._length = (length - offset < bytes) ? (length - offset) : bytes;  // length of backing, not reservation
@@ -348,7 +348,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
   if(_addr == nullptr)
   {
     OUTCOME_TRY(addr, do_mmap(_v, nullptr, 0, _section, newsize, _offset, _flag));
-    _addr = static_cast<char *>(addr);
+    _addr = static_cast<byte *>(addr);
     _reservation = newsize;
     _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
     return newsize;
@@ -360,7 +360,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
   {
     return {errno, std::system_category()};
   }
-  _addr = static_cast<char *>(newaddr);
+  _addr = static_cast<byte *>(newaddr);
   _reservation = newsize;
   _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
   return newsize;
@@ -368,7 +368,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
   if(newsize > _length)
   {
 #if defined(MAP_EXCL)  // BSD type systems
-    char *addrafter = _addr + _reservation;
+    byte *addrafter = _addr + _reservation;
     size_type bytes = newsize - _reservation;
     extent_type offset = _offset + _reservation;
     OUTCOME_TRY(addr, do_mmap(_v, addrafter, MAP_FIXED | MAP_EXCL, _section, bytes, offset, _flag));
@@ -376,7 +376,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
     _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
     return newsize;
 #else                  // generic POSIX, inefficient
-    char *addrafter = _addr + _reservation;
+    byte *addrafter = _addr + _reservation;
     size_type bytes = newsize - _reservation;
     extent_type offset = _offset + _reservation;
     OUTCOME_TRY(addr, do_mmap(_v, addrafter, 0, _section, bytes, offset, _flag));
@@ -505,7 +505,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
 map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buffers_type> reqs, deadline /*d*/) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  char *addr = _addr + reqs.offset;
+  byte *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
   for(buffer_type &req : reqs.buffers)
   {
@@ -530,7 +530,7 @@ map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buff
 map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_request<const_buffers_type> reqs, deadline /*d*/) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  char *addr = _addr + reqs.offset;
+  byte *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
   for(const_buffer_type &req : reqs.buffers)
   {

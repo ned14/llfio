@@ -52,6 +52,7 @@ static AFIO_V2_NAMESPACE::storage_profile::storage_profile profile[permute_flags
 int main(int argc, char *argv[])
 {
   using namespace AFIO_V2_NAMESPACE;
+  using AFIO_V2_NAMESPACE::byte;
   std::regex torun(".*");
   bool regexvalid = false;
   unsigned torunflags = (1 << permute_flags_max) - 1;
@@ -84,7 +85,7 @@ int main(int argc, char *argv[])
       abort();
     }
     file_handle testfile(std::move(_testfile.value()));
-    std::vector<char> buffer(1024 * 1024 * 1024);
+    std::vector<byte> buffer(1024 * 1024 * 1024);
     RETCHECK(testfile.truncate(buffer.size()));
     file_handle::const_buffer_type _reqs[1] = {{buffer.data(), buffer.size()}};
     file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, 0);

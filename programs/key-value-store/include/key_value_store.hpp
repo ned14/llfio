@@ -290,7 +290,7 @@ namespace key_value_store
             i.magic = _goodmagic;
             i.all_writes_synced = _indexfile.are_writes_durable();
             i.contents_hashed = enable_integrity;
-            _indexfile.write(0, {{(char *) &i, sizeof(i)}}).value();
+            _indexfile.write(0, {{(afio::byte *) &i, sizeof(i)}}).value();
           }
           else
           {
@@ -306,18 +306,18 @@ namespace key_value_store
             }
             // Now we've finished the checks, reset writes_occurring and all_writes_synced
             index::index i;
-            _indexfile.read(0, {{(char *) &i, sizeof(i)}}).value();
+            _indexfile.read(0, {{(afio::byte *) &i, sizeof(i)}}).value();
             memset(i.writes_occurring, 0, sizeof(i.writes_occurring));
             i.all_writes_synced = _indexfile.are_writes_durable();
             memset(&i.hash, 0, sizeof(i.hash));
-            _indexfile.write(0, {{(char *) &i, sizeof(i)}}).value();
+            _indexfile.write(0, {{(afio::byte *) &i, sizeof(i)}}).value();
           }
         }
       }
       // Take a shared lock, blocking if someone is still setting things up
       _indexfileguard = _indexfile.lock(_indexinuseoffset, 1, false).value();
       {
-        char buffer[8];
+        afio::byte buffer[8];
         _indexfile.read(0, {{buffer, 8}}).value();
         auto goodmagic = _goodmagic;
         auto badmagic = _badmagic;
@@ -478,7 +478,7 @@ namespace key_value_store
           // TODO: Open newly created smallfiles
           abort();
         }
-        char *buffer;
+        afio::byte *buffer;
         bool free_on_destruct = _smallfiles.mapped.empty();
         if(!free_on_destruct)
         {
@@ -497,7 +497,7 @@ namespace key_value_store
         }
         else
         {
-          buffer = (char *) malloc(smallfilelength);
+          buffer = (afio::byte *) malloc(smallfilelength);
           if(!buffer)
           {
             throw std::bad_alloc();
@@ -510,7 +510,7 @@ namespace key_value_store
           QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash hasher;
           uint128 tocheck = vt->hash;
           memset(&vt->hash, 0, sizeof(vt->hash));
-          uint128 thishash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash(buffer, _indexheader->contents_hashed ? smallfilelength : length);
+          uint128 thishash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash((char *) buffer, _indexheader->contents_hashed ? smallfilelength : length);
           if(tocheck != thishash)
           {
             _indexheader->magic = _badmagic;
@@ -532,7 +532,7 @@ namespace key_value_store
           _indexheader->magic = _badmagic;
           throw corrupted_store();
         }
-        return keyvalue_info(key, span<char>(buffer, length), free_on_destruct, item.transaction_counter);
+        return keyvalue_info(key, span<char>((char *) buffer, length), free_on_destruct, item.transaction_counter);
       }
     }
   };
@@ -757,7 +757,7 @@ namespace key_value_store
             mfh.reserve(new_length + _parent->_mmap_over_extension).value();
           }
           mfh.truncate(new_length).value();
-          char *value = mfh.address() + original_length;
+          afio::byte *value = mfh.address() + original_length;
           afio::file_handle::extent_type value_offset = original_length;
           for(size_t n = 0; n < _items.size(); n++)
           {
@@ -792,7 +792,7 @@ namespace key_value_store
             }
             if(_parent->_indexheader->contents_hashed)
             {
-              vt->hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash(value, totalwrite);
+              vt->hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash((char *) value, totalwrite);
             }
             value += totalwrite;
             value_offset += totalwrite;
@@ -809,11 +809,11 @@ namespace key_value_store
         std::vector<afio::file_handle::const_buffer_type> reqs;
         reqs.reserve(16);
         // With tails, that's eight items per syscall
-        char tailbuffers[8][128];
+        afio::byte tailbuffers[8][128];
         memset(tailbuffers, 0, sizeof(tailbuffers));
         for(size_t n = 0; n < _items.size(); n++)
         {
-          char *tailbuffer = tailbuffers[n % 8];
+          afio::byte *tailbuffer = tailbuffers[n % 8];
           index::value_tail *vt = reinterpret_cast<index::value_tail *>(tailbuffer + 128 - sizeof(index::value_tail));
           toupdate_type &thisupdate = toupdate[n];
           const transaction::_item &item = _items[n];
@@ -829,7 +829,7 @@ namespace key_value_store
             {
               QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash hasher;
               memset(&vt->hash, 0, sizeof(vt->hash));
-              hasher.add(reqs.back().data, reqs.back().len);
+              hasher.add((const char *) reqs.back().data, reqs.back().len);
               vt->hash = hasher.finalise();
             }
             memset(&thisupdate.history_item, 0, sizeof(thisupdate.history_item));
@@ -840,7 +840,7 @@ namespace key_value_store
             totalwrite = _parent->_pad_length(item.towrite->size());
             size_t tailbytes = totalwrite - item.towrite->size();
             assert(tailbytes < 128);
-            reqs.push_back({item.towrite->data(), item.towrite->size()});
+            reqs.push_back({(afio::byte *) item.towrite->data(), item.towrite->size()});
             reqs.push_back({tailbuffer + 128 - tailbytes, tailbytes});
             if(_parent->_indexheader->contents_hashed)
             {
@@ -848,9 +848,9 @@ namespace key_value_store
               memset(&vt->hash, 0, sizeof(vt->hash));
               auto rit = reqs.end();
               rit -= 2;
-              hasher.add(rit->data, rit->len);
+              hasher.add((char *) rit->data, rit->len);
               ++rit;
-              hasher.add(rit->data, rit->len);
+              hasher.add((char *) rit->data, rit->len);
               vt->hash = hasher.finalise();
             }
             index::value_history::item &history_item = thisupdate.history_item;

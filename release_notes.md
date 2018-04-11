@@ -38,10 +38,10 @@ Examples of use:
 <table width="100%" border="0" cellpadding="4">
 <tr>
 <td width="50%" valign="top">
-\snippet sparse_array
+\snippet use_cases.cpp sparse_array
 </td>
 <td width="50%" valign="top">
-\snippet coroutine_write
+\snippet use_cases.cpp coroutine_write
 </td>
 </tr>
 </table>
