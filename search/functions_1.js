@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['address',['address',['../classafio__v2__xxx_1_1map__handle.html#a1e9273d0c6aca7da6480437f6cf6638a',1,'afio_v2_xxx::map_handle::address()'],['../classafio__v2__xxx_1_1mapped__file__handle.html#adca505e51ea006ffa59e3673ea0a9853',1,'afio_v2_xxx::mapped_file_handle::address()']]],
+  ['address',['address',['../classafio__v2__xxx_1_1map__handle.html#a6f203a9bb0bee94ac6b395ac5f3a2270',1,'afio_v2_xxx::map_handle::address()'],['../classafio__v2__xxx_1_1mapped__file__handle.html#ab1d9c370e86dc327e3efad1c71db3cb3',1,'afio_v2_xxx::mapped_file_handle::address()']]],
   ['all_5ftemporary_5fdirectories',['all_temporary_directories',['../namespaceafio__v2__xxx_1_1path__discovery.html#a6b96e1ce0cebf33600e3f619ef355c7c',1,'afio_v2_xxx::path_discovery']]],
   ['are_5freads_5ffrom_5fcache',['are_reads_from_cache',['../classafio__v2__xxx_1_1handle.html#a71137cb82edd9a1bcb24f64886b5826d',1,'afio_v2_xxx::handle']]],
   ['are_5fsafety_5ffsyncs_5fissued',['are_safety_fsyncs_issued',['../classafio__v2__xxx_1_1handle.html#a3fc7db93fac699f5ecad453642ed314e',1,'afio_v2_xxx::handle']]],

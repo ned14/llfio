@@ -1,5 +1,7 @@
 var structafio__v2__xxx_1_1io__handle_1_1const__buffer__type =
 [
-    [ "data", "structafio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#adc7fb3275838792208c936669926cfe9", null ],
-    [ "len", "structafio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a18ff05ed710d3b3f210bff2f0e195885", null ]
+    [ "pointer", "structafio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a1a57197235e88675736a032578a3fd0c", null ],
+    [ "size_type", "structafio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a80e8c0e9427d35c3cacc60715f64b765", null ],
+    [ "data", "structafio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a52a0e6d1b115430256e64db0c90d9186", null ],
+    [ "len", "structafio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#af355ceae82988f25cfa34d595550cbcf", null ]
 ];
