@@ -47,7 +47,7 @@ static inline void TestMappedView1()
   {
     // Overly large views must not extend the file until written to
     algorithm::mapped_span<int> v4(sh, 20000);
-    BOOST_CHECK(fh.length().value() == 10000 * sizeof(int));
+    BOOST_CHECK(fh.maximum_extent().value() == 10000 * sizeof(int));
   }
   catch(...)
   {
@@ -81,8 +81,8 @@ static inline void TestMappedView2()
   v1[9999] = 79;
   mfh.truncate(20000 * sizeof(int)).value();
   BOOST_CHECK(addr == mfh.address());
-  BOOST_CHECK(mfh.length().value() == 20000 * sizeof(int));
-  BOOST_CHECK(mfh.underlying_file_length().value() == 20000 * sizeof(int));
+  BOOST_CHECK(mfh.maximum_extent().value() == 20000 * sizeof(int));
+  BOOST_CHECK(mfh.underlying_file_maximum_extent().value() == 20000 * sizeof(int));
   v1 = algorithm::mapped_span<int>(mfh);
   BOOST_CHECK(v1.size() == 20000);
   BOOST_CHECK(v1[0] == 78);

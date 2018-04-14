@@ -249,7 +249,7 @@ result<section_handle::extent_type> section_handle::truncate(extent_type newsize
   {
     if(_backing != nullptr)
     {
-      OUTCOME_TRY(length, _backing->length());
+      OUTCOME_TRY(length, _backing->maximum_extent());
       newsize = length;
     }
     else

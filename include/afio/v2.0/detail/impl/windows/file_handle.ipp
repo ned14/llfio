@@ -364,7 +364,7 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline /*
   return ret;
 }
 
-result<file_handle::extent_type> file_handle::length() const noexcept
+result<file_handle::extent_type> file_handle::maximum_extent() const noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
 #if 0

@@ -32,7 +32,7 @@ result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type rese
   AFIO_LOG_FUNCTION_CALL(this);
   if(reservation == 0)
   {
-    OUTCOME_TRY(length, underlying_file_length());
+    OUTCOME_TRY(length, underlying_file_maximum_extent());
     reservation = length;
   }
   reservation = utils::round_up_to_page_size(reservation);
@@ -142,7 +142,7 @@ result<mapped_file_handle::extent_type> mapped_file_handle::truncate(extent_type
 
 result<mapped_file_handle::extent_type> mapped_file_handle::update_map() noexcept
 {
-  OUTCOME_TRY(length, underlying_file_length());
+  OUTCOME_TRY(length, underlying_file_maximum_extent());
   if(length > _reservation)
   {
     // This API never exceeds the reservation

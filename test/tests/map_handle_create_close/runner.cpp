@@ -148,7 +148,7 @@ template <class U> inline void map_handle_create_close_(U &&f)
             // The OS should not auto expand storage to 4Kb
             if (use_file_backing)
             {
-              KERNELTEST_CHECK(testreturn, temph.length().value() == 19);
+              KERNELTEST_CHECK(testreturn, temph.maximum_extent().value() == 19);
             }
           }
         }
