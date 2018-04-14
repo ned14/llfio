@@ -120,7 +120,7 @@ public:
 
   /*! \brief Create a memory section backed by a file.
   \param backing The handle to use as backing storage.
-  \param maximum_size The initial size of this section, which cannot be larger than any backing file. Zero means to use `backing.length()`.
+  \param maximum_size The initial size of this section, which cannot be larger than any backing file. Zero means to use `backing.maximum_extent()`.
   \param _flag How to create the section.
 
   \errors Any of the values POSIX dup(), open() or NtCreateSection() can return.
@@ -129,7 +129,7 @@ public:
   static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<section_handle> section(file_handle &backing, extent_type maximum_size, flag _flag) noexcept;
   /*! \brief Create a memory section backed by a file.
   \param backing The handle to use as backing storage.
-  \param bytes The initial size of this section, which cannot be larger than any backing file. Zero means to use `backing.length()`.
+  \param bytes The initial size of this section, which cannot be larger than any backing file. Zero means to use `backing.maximum_extent()`.
 
   This convenience overload create a writable section if the backing file is writable, otherwise a read-only section.
 
@@ -157,12 +157,12 @@ public:
   void set_backing(file_handle *fh) noexcept { _backing = fh; }
   //! Returns the borrowed native handle backing this section
   native_handle_type backing_native_handle() const noexcept { return _backing != nullptr ? _backing->native_handle() : native_handle_type(); }
-  //! Return the current maximum permitted extent of the memory section.
+  //! Return the current length of the memory section.
   AFIO_MAKE_FREE_FUNCTION
   AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<extent_type> length() const noexcept;
 
   /*! Resize the current maximum permitted extent of the memory section to the given extent.
-  \param newsize The new size of the memory section, which cannot be zero. Specify zero to use `backing.length()`.
+  \param newsize The new size of the memory section, which cannot be zero. Specify zero to use `backing.maximum_extent()`.
   This cannot exceed the size of any backing file used if that file is not writable.
 
   \errors Any of the values `NtExtendSection()` or `ftruncate()` can return.
@@ -549,7 +549,7 @@ inline void swap(section_handle &self, section_handle &o) noexcept
 }
 /*! \brief Create a memory section backed by a file.
 \param backing The handle to use as backing storage.
-\param maximum_size The initial size of this section, which cannot be larger than any backing file. Zero means to use `backing.length()`.
+\param maximum_size The initial size of this section, which cannot be larger than any backing file. Zero means to use `backing.maximum_extent()`.
 \param _flag How to create the section.
 
 \errors Any of the values POSIX dup(), open() or NtCreateSection() can return.
@@ -560,7 +560,7 @@ inline result<section_handle> section(file_handle &backing, section_handle::exte
 }
 /*! \brief Create a memory section backed by a file.
 \param backing The handle to use as backing storage.
-\param bytes The initial size of this section, which cannot be larger than any backing file. Zero means to use `backing.length()`.
+\param bytes The initial size of this section, which cannot be larger than any backing file. Zero means to use `backing.maximum_extent()`.
 
 This convenience overload create a writable section if the backing file is writable, otherwise a read-only section.
 
@@ -588,7 +588,7 @@ inline result<section_handle::extent_type> length(const section_handle &self) no
 }
 /*! Resize the current maximum permitted extent of the memory section to the given extent.
 \param self The object whose member function to call.
-\param newsize The new size of the memory section, which cannot be zero. Specify zero to use `backing.length()`.
+\param newsize The new size of the memory section, which cannot be zero. Specify zero to use `backing.maximum_extent()`.
 This cannot exceed the size of any backing file used if that file is not writable.
 
 \errors Any of the values `NtExtendSection()` or `ftruncate()` can return.

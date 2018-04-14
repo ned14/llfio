@@ -30,7 +30,7 @@ AFIO_V2_NAMESPACE_BEGIN
 result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type reservation) noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
-  OUTCOME_TRY(length, underlying_file_length());
+  OUTCOME_TRY(length, underlying_file_maximum_extent());
   if(length == 0)
   {
     // Not portable to map an empty file, so fail
@@ -137,7 +137,7 @@ result<mapped_file_handle::extent_type> mapped_file_handle::truncate(extent_type
 
 result<mapped_file_handle::extent_type> mapped_file_handle::update_map() noexcept
 {
-  OUTCOME_TRY(length, underlying_file_length());
+  OUTCOME_TRY(length, underlying_file_maximum_extent());
   if(length > _reservation)
   {
     // This API never exceeds the reservation

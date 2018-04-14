@@ -338,7 +338,7 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
   }
 }
 
-result<file_handle::extent_type> file_handle::length() const noexcept
+result<file_handle::extent_type> file_handle::maximum_extent() const noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
   struct stat s
@@ -414,7 +414,7 @@ result<std::vector<std::pair<file_handle::extent_type, file_handle::extent_type>
         // If it failed with no output, probably this filing system doesn't support extents
         if(out.empty())
         {
-          OUTCOME_TRY(size, file_handle::length());
+          OUTCOME_TRY(size, file_handle::maximum_extent());
           out.emplace_back(0, size);
           return out;
         }

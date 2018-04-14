@@ -274,7 +274,7 @@ namespace algorithm
           lock_request.hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash((reinterpret_cast<char *>(&lock_request)) + 16, sizeof(lock_request) - 16);
         }
         // My lock request will be the file's current length or higher
-        OUTCOME_TRY(my_lock_request_offset, _h.length());
+        OUTCOME_TRY(my_lock_request_offset, _h.maximum_extent());
         {
           OUTCOME_TRYV(_h.set_append_only(true));
           auto undo = undoer([this] { (void) _h.set_append_only(false); });

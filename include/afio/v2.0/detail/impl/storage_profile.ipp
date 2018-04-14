@@ -904,7 +904,7 @@ namespace storage_profile
             file_handle::const_buffer_type _reqs[1] = {{buffer, 4096}};
             file_handle::io_request<file_handle::const_buffers_type> reqs(_reqs, 0);
             QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng rand(static_cast<uint32_t>(no));
-            auto maxsize = h.length().value();
+            auto maxsize = h.maximum_extent().value();
             --done;
             while(done != 0u)
             {
@@ -943,7 +943,7 @@ namespace storage_profile
             file_handle::buffer_type _reqs[1] = {{buffer, 4096}};
             file_handle::io_request<file_handle::buffers_type> reqs(_reqs, 0);
             QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng rand(static_cast<uint32_t>(no));
-            auto maxsize = h.length().value();
+            auto maxsize = h.maximum_extent().value();
             --done;
             while(done != 0u)
             {

@@ -47,8 +47,8 @@ void read_entire_file1()
               // default flags is none
   ).value();  // If failed, throw a filesystem_error exception
 
-  // Make a vector sized the current length of the file
-  std::vector<afio::byte> buffer(fh.length().value());
+  // Make a vector sized the current maximum extent of the file
+  std::vector<afio::byte> buffer(fh.maximum_extent().value());
 
   // Synchronous scatter read from file
   afio::file_handle::buffers_type filled = afio::read(
@@ -62,6 +62,92 @@ void read_entire_file1()
   // bytes actually read
   buffer.resize(filled[0].len);
   //! [file_entire_file1]
+}
+
+void read_entire_file2()
+{
+  //! [file_entire_file2]
+  namespace afio = AFIO_V2_NAMESPACE;
+
+  // Create an i/o service to complete the async file i/o
+  afio::io_service service;
+
+  // Open the file for read
+  afio::async_file_handle fh = afio::async_file(  //
+    service,  // The i/o service to complete i/o to
+    {},       // path_handle to base directory
+    "foo"     // path_view to path fragment relative to base directory
+              // default mode is read only
+              // default creation is open existing
+              // default caching is all
+              // default flags is none
+  ).value();  // If failed, throw a filesystem_error exception
+
+  // Get the valid extents of the file.
+  const std::vector<
+    std::pair<afio::file_handle::extent_type, afio::file_handle::extent_type>
+  > valid_extents = fh.extents().value();
+
+  // Schedule asynchronous reads for every valid extent
+  std::vector<std::pair<std::vector<afio::byte>, afio::async_file_handle::io_state_ptr>> buffers(valid_extents.size());
+  for (size_t n = 0; n < valid_extents.size(); n++)
+  {
+    // Set up the scatter buffer
+    buffers[n].first.resize(valid_extents[n].second);
+    for(;;)
+    {
+      afio::async_file_handle::buffer_type scatter_req{ buffers[n].first.data(), buffers[n].first.size() };  // buffer to fill
+      auto ret = afio::async_read( //
+        fh,                                 // handle to read from
+        { { scatter_req } , 0 },            // The scatter request buffers
+        [](                                                                            // The completion handler
+          afio::async_file_handle *,                                                   // The parent handle
+          afio::async_file_handle::io_result<afio::async_file_handle::buffers_type> &  // Result of the i/o
+          ) { /* do nothing */ }
+        // default deadline is infinite
+      );
+      // Was the operation successful?
+      if (ret)
+      {
+        // Retain the handle to the outstanding i/o
+        buffers[n].second = std::move(ret).value();
+        break;
+      }
+      if (ret.error() == std::errc::resource_unavailable_try_again)
+      {
+        // Many async file i/o implementations have limited total system concurrency
+        std::this_thread::yield();
+        continue;
+      }
+      // Otherwise, throw a filesystem_error exception
+      ret.value();
+    }
+  }
+
+  // Pump i/o completion until no work remains
+  while (service.run().value())
+  {
+    // run() returns per completion handler dispatched if work remains
+    // It blocks until some i/o completes (there is a polling and deadline based overload)
+    // If no work remains, it returns false
+  }
+
+  // Gather the completions of all i/o scheduled for success and errors
+  for (auto &i : buffers)
+  {
+    // Did the read succeed?
+    if (i.second->result.read)
+    {
+      // Then adjust the buffer size to that actually read
+      i.first.resize(i.second->result.read.value().size());
+    }
+    else
+    {
+      // Throw the cause of failure as an exception
+      i.second->result.read.value();
+    }
+  }
+  //! [file_entire_file2]
 }
 
 void scatter_write()
@@ -171,7 +257,7 @@ void mapped_file()
               // default flags is none
   ).value();  // If failed, throw a filesystem_error exception
 
-  auto length = mh.length().value();
+  auto length = mh.maximum_extent().value();
 
   // Find my text
   for (char *p = reinterpret_cast<char *>(mh.address()); (p = (char *)memchr(p, 'h', reinterpret_cast<char *>(mh.address()) + length - p)); p++)

@@ -101,8 +101,8 @@ namespace algorithm
     \param length The number of items to map, use -1 to mean the length of the section handle divided by `sizeof(T)`.
     \param byteoffset The byte offset into the mapped file handle, this does not need to be a multiple of the page size.
     */
-    explicit mapped_span(mapped_file_handle &mfh, size_type length = (size_type) -1, extent_type byteoffset = 0)                            // NOLINT
-    : span<T>(reinterpret_cast<T *>(mfh.address() + byteoffset), (length == (size_type) -1) ? (mfh.length().value() / sizeof(T)) : length)  // NOLINT
+    explicit mapped_span(mapped_file_handle &mfh, size_type length = (size_type) -1, extent_type byteoffset = 0)                                    // NOLINT
+    : span<T>(reinterpret_cast<T *>(mfh.address() + byteoffset), (length == (size_type) -1) ? (mfh.maximum_extent().value() / sizeof(T)) : length)  // NOLINT
     {
     }
   };

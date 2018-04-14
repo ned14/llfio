@@ -84,8 +84,8 @@ or not yet. You are guaranteed that `address()` will not return a new
 value unless you truncate from a bigger length to a smaller length, or you call `reserve()`
 with a new reservation or `truncate()` with a value bigger than the reservation.
 
-`length()` reports the last truncated length of the mapped file (possibly by any process in
-the system) up to the reservation limit, NOT the length of the underlying file.
+`maximum_extent()` reports the last truncated length of the mapped file (possibly by any process in
+the system) up to the reservation limit, NOT the maximum extent of the underlying file.
 When you know that another process has extended the file and you wish to map the newly appended
 data, you can call `update_map()` which guarantees that the mapping your
 process sees is up to date, rather than relying on any kernel-specific automatic mapping.
@@ -296,8 +296,8 @@ public:
   //! The address in memory where this mapped file resides
   byte *address() const noexcept { return _mh.address(); }
 
-  //! The length of the underlying file
-  result<extent_type> underlying_file_length() const noexcept { return file_handle::length(); }
+  //! The maximum extent of the underlying file
+  result<extent_type> underlying_file_maximum_extent() const noexcept { return file_handle::maximum_extent(); }
 
   //! The address space (to be) reserved for future expansion of this file.
   size_type capacity() const noexcept { return _reservation; }
@@ -333,7 +333,7 @@ public:
     return mapped_file_handle(std::move(fh), reservation);
   }
   //! Return the current maximum permitted extent of the file.
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> length() const noexcept override { return _mh.length(); }
+  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> maximum_extent() const noexcept override { return _mh.length(); }
 
   /*! \brief Resize the current maximum permitted extent of the mapped file to the given extent, avoiding any
   new allocation of physical storage where supported, and mapping or unmapping any new pages
