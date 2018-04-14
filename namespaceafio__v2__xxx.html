@@ -308,8 +308,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="name
 <tr class="separator:aa14b24c8bc330dd8e472f42676ba03d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aca98b0cb43a2d925bb65e055b07b4a08"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classafio__v2__xxx_1_1file__handle.html">file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#aca98b0cb43a2d925bb65e055b07b4a08">temp_inode</a> (const <a class="el" href="classafio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;dirh=<a class="el" href="namespaceafio__v2__xxx_1_1path__discovery.html#af398b6c3762f60aa96cebd270879093e">path_discovery::storage_backed_temporary_files_directory</a>(), <a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">file_handle::mode</a> _mode=<a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aefb2a684e4afb7d55e6147fbe5a332ee">file_handle::mode::write</a>, file_handle::flag flags=file_handle::flag::none) noexcept</td></tr>
 <tr class="separator:aca98b0cb43a2d925bb65e055b07b4a08"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afe66c5875c48c8bd172901a1159ccbdc"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle::extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#afe66c5875c48c8bd172901a1159ccbdc">length</a> (const <a class="el" href="classafio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;self) noexcept</td></tr>
-<tr class="separator:afe66c5875c48c8bd172901a1159ccbdc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8fbd7f7cc6449428269e22f9765b1d8d"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle::extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a8fbd7f7cc6449428269e22f9765b1d8d">maximum_extent</a> (const <a class="el" href="classafio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;self) noexcept</td></tr>
+<tr class="separator:a8fbd7f7cc6449428269e22f9765b1d8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a84d22c966fcabe50de30ad8cf26c7241"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle::extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a84d22c966fcabe50de30ad8cf26c7241">truncate</a> (<a class="el" href="classafio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;self, file_handle::extent_type newsize) noexcept</td></tr>
 <tr class="separator:a84d22c966fcabe50de30ad8cf26c7241"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac3c009153d916556b991d4a79c664fe9"><td class="memItemLeft" align="right" valign="top"><a id="ac3c009153d916556b991d4a79c664fe9"></a>
@@ -1413,37 +1413,9 @@ For portability, you can only assume that barriers write order for a single hand
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;{</div><div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#ab92ca63383ef7fe58af4620570d12803">file_handle::file</a>(std::forward&lt;decltype(base)&gt;(base), std::forward&lt;decltype(<a class="code" href="namespaceafio__v2__xxx.html#a7a98882ead35ebd6bd0700fdf571c44a">path</a>)&gt;(<a class="code" href="namespaceafio__v2__xxx.html#a7a98882ead35ebd6bd0700fdf571c44a">path</a>), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;}</div><div class="ttc" id="namespaceafio__v2__xxx_html_a7a98882ead35ebd6bd0700fdf571c44a"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a7a98882ead35ebd6bd0700fdf571c44a">afio_v2_xxx::path</a></div><div class="ttdeci">result&lt; path_handle &gt; path(const path_handle &amp;base, path_handle::path_view_type path) noexcept</div><div class="ttdef"><b>Definition:</b> path_handle.hpp:114</div></div>
-<div class="ttc" id="namespaceafio__v2__xxx_html_ab92ca63383ef7fe58af4620570d12803"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ab92ca63383ef7fe58af4620570d12803">afio_v2_xxx::file</a></div><div class="ttdeci">result&lt; file_handle &gt; file(const path_handle &amp;base, file_handle::path_view_type path, file_handle::mode _mode=file_handle::mode::read, file_handle::creation _creation=file_handle::creation::open_existing, file_handle::caching _caching=file_handle::caching::all, file_handle::flag flags=file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:307</div></div>
+<div class="fragment"><div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;{</div><div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#ab92ca63383ef7fe58af4620570d12803">file_handle::file</a>(std::forward&lt;decltype(base)&gt;(base), std::forward&lt;decltype(<a class="code" href="namespaceafio__v2__xxx.html#a7a98882ead35ebd6bd0700fdf571c44a">path</a>)&gt;(<a class="code" href="namespaceafio__v2__xxx.html#a7a98882ead35ebd6bd0700fdf571c44a">path</a>), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;}</div><div class="ttc" id="namespaceafio__v2__xxx_html_a7a98882ead35ebd6bd0700fdf571c44a"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a7a98882ead35ebd6bd0700fdf571c44a">afio_v2_xxx::path</a></div><div class="ttdeci">result&lt; path_handle &gt; path(const path_handle &amp;base, path_handle::path_view_type path) noexcept</div><div class="ttdef"><b>Definition:</b> path_handle.hpp:114</div></div>
+<div class="ttc" id="namespaceafio__v2__xxx_html_ab92ca63383ef7fe58af4620570d12803"><div class="ttname"><a href="namespaceafio__v2__xxx.html#ab92ca63383ef7fe58af4620570d12803">afio_v2_xxx::file</a></div><div class="ttdeci">result&lt; file_handle &gt; file(const path_handle &amp;base, file_handle::path_view_type path, file_handle::mode _mode=file_handle::mode::read, file_handle::creation _creation=file_handle::creation::open_existing, file_handle::caching _caching=file_handle::caching::all, file_handle::flag flags=file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:310</div></div>
 </div><!-- fragment -->
-</div>
-</div>
-<a id="afe66c5875c48c8bd172901a1159ccbdc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afe66c5875c48c8bd172901a1159ccbdc">&#9670;&nbsp;</a></span>length()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">result&lt;file_handle::extent_type&gt; afio_v2_xxx::length </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classafio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;&#160;</td>
-          <td class="paramname"><em>self</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Return the current maximum permitted extent of the file.</p>
-<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX fstat() or GetFileInformationByHandleEx() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;{</div><div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.length();</div><div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a2bea94a20aae6fb34ebe1ffd03e50891"></a>
@@ -1861,6 +1833,34 @@ For portability, you can only assume that barriers write order for a single hand
 </div><!-- fragment -->
 </div>
 </div>
+<a id="a8fbd7f7cc6449428269e22f9765b1d8d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8fbd7f7cc6449428269e22f9765b1d8d">&#9670;&nbsp;</a></span>maximum_extent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;file_handle::extent_type&gt; afio_v2_xxx::maximum_extent </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classafio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>self</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Return the current maximum permitted extent of the file.</p>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX fstat() or GetFileInformationByHandleEx() can return. </dd></dl>
+<div class="fragment"><div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;{</div><div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.maximum_extent();</div><div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;}</div></div><!-- fragment -->
+</div>
+</div>
 <a id="a7a98882ead35ebd6bd0700fdf571c44a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7a98882ead35ebd6bd0700fdf571c44a">&#9670;&nbsp;</a></span>path() <span class="overload">[1/2]</span></h2>
 
@@ -2026,7 +2026,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 <p>Create a file handle creating a randomly named file on a path. The file is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing file. Note also that caching defaults to temporary which hints to the OS to only flush changes to physical storage as lately as possible.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;{</div><div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#aac0b7d76c4298e86cef49c832c93edec">file_handle::random_file</a>(std::forward&lt;decltype(dirpath)&gt;(dirpath), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;}</div><div class="ttc" id="namespaceafio__v2__xxx_html_aac0b7d76c4298e86cef49c832c93edec"><div class="ttname"><a href="namespaceafio__v2__xxx.html#aac0b7d76c4298e86cef49c832c93edec">afio_v2_xxx::random_file</a></div><div class="ttdeci">result&lt; file_handle &gt; random_file(const path_handle &amp;dirpath, file_handle::mode _mode=file_handle::mode::write, file_handle::caching _caching=file_handle::caching::temporary, file_handle::flag flags=file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:319</div></div>
+<div class="fragment"><div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;{</div><div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#aac0b7d76c4298e86cef49c832c93edec">file_handle::random_file</a>(std::forward&lt;decltype(dirpath)&gt;(dirpath), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;}</div><div class="ttc" id="namespaceafio__v2__xxx_html_aac0b7d76c4298e86cef49c832c93edec"><div class="ttname"><a href="namespaceafio__v2__xxx.html#aac0b7d76c4298e86cef49c832c93edec">afio_v2_xxx::random_file</a></div><div class="ttdeci">result&lt; file_handle &gt; random_file(const path_handle &amp;dirpath, file_handle::mode _mode=file_handle::mode::write, file_handle::caching _caching=file_handle::caching::temporary, file_handle::flag flags=file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:323</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2303,7 +2303,7 @@ For portability, you can only assume that barriers write order for a single hand
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">backing</td><td>The handle to use as backing storage. </td></tr>
-    <tr><td class="paramname">maximum_size</td><td>The initial size of this section, which cannot be larger than any backing file. Zero means to use <code>backing.length()</code>. </td></tr>
+    <tr><td class="paramname">maximum_size</td><td>The initial size of this section, which cannot be larger than any backing file. Zero means to use <code>backing.maximum_extent()</code>. </td></tr>
     <tr><td class="paramname">_flag</td><td>How to create the section.</td></tr>
   </table>
   </dd>
@@ -2351,7 +2351,7 @@ For portability, you can only assume that barriers write order for a single hand
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">backing</td><td>The handle to use as backing storage. </td></tr>
-    <tr><td class="paramname">bytes</td><td>The initial size of this section, which cannot be larger than any backing file. Zero means to use <code>backing.length()</code>.</td></tr>
+    <tr><td class="paramname">bytes</td><td>The initial size of this section, which cannot be larger than any backing file. Zero means to use <code>backing.maximum_extent()</code>.</td></tr>
   </table>
   </dd>
 </dl>
@@ -2526,7 +2526,7 @@ For portability, you can only assume that barriers write order for a single hand
 <p>Create a file handle creating the named file on some path which the OS declares to be suitable for temporary files. Most OSs are very lazy about flushing changes made to these temporary files. Note the default flags are to have the newly created file deleted on first handle close. Note also that an empty name is equivalent to calling <code>random_file(path_discovery::storage_backed_temporary_files_directory())</code> and the creation parameter is ignored.</p>
 <dl class="section note"><dt>Note</dt><dd>If the temporary file you are creating is not going to have its path sent to another process for usage, this is the WRONG function to use. Use <code>temp_inode()</code> instead, it is far more secure.</dd></dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;{</div><div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#aa14b24c8bc330dd8e472f42676ba03d6">file_handle::temp_file</a>(std::forward&lt;decltype(name)&gt;(name), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;}</div><div class="ttc" id="namespaceafio__v2__xxx_html_aa14b24c8bc330dd8e472f42676ba03d6"><div class="ttname"><a href="namespaceafio__v2__xxx.html#aa14b24c8bc330dd8e472f42676ba03d6">afio_v2_xxx::temp_file</a></div><div class="ttdeci">result&lt; file_handle &gt; temp_file(file_handle::path_view_type name=file_handle::path_view_type(), file_handle::mode _mode=file_handle::mode::write, file_handle::creation _creation=file_handle::creation::if_needed, file_handle::caching _caching=file_handle::caching::temporary, file_handle::flag flags=file_handle::flag::unlink_on_close) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:338</div></div>
+<div class="fragment"><div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;{</div><div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#aa14b24c8bc330dd8e472f42676ba03d6">file_handle::temp_file</a>(std::forward&lt;decltype(name)&gt;(name), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;}</div><div class="ttc" id="namespaceafio__v2__xxx_html_aa14b24c8bc330dd8e472f42676ba03d6"><div class="ttname"><a href="namespaceafio__v2__xxx.html#aa14b24c8bc330dd8e472f42676ba03d6">afio_v2_xxx::temp_file</a></div><div class="ttdeci">result&lt; file_handle &gt; temp_file(file_handle::path_view_type name=file_handle::path_view_type(), file_handle::mode _mode=file_handle::mode::write, file_handle::creation _creation=file_handle::creation::if_needed, file_handle::caching _caching=file_handle::caching::temporary, file_handle::flag flags=file_handle::flag::unlink_on_close) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:342</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2571,7 +2571,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 <p><em>Securely</em> create a file handle creating a temporary anonymous inode in the filesystem referred to by <em>dirpath</em>. The inode created has no name nor accessible path on the filing system and ceases to exist as soon as the last handle is closed, making it ideal for use as a temporary file where other processes do not need to have access to its contents via some path on the filing system (a classic use case is for backing shared memory maps).</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;{</div><div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#aca98b0cb43a2d925bb65e055b07b4a08">file_handle::temp_inode</a>(std::forward&lt;decltype(dirh)&gt;(dirh), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;}</div><div class="ttc" id="namespaceafio__v2__xxx_html_aca98b0cb43a2d925bb65e055b07b4a08"><div class="ttname"><a href="namespaceafio__v2__xxx.html#aca98b0cb43a2d925bb65e055b07b4a08">afio_v2_xxx::temp_inode</a></div><div class="ttdeci">result&lt; file_handle &gt; temp_inode(const path_handle &amp;dirh=path_discovery::storage_backed_temporary_files_directory(), file_handle::mode _mode=file_handle::mode::write, file_handle::flag flags=file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:352</div></div>
+<div class="fragment"><div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;{</div><div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespaceafio__v2__xxx.html#aca98b0cb43a2d925bb65e055b07b4a08">file_handle::temp_inode</a>(std::forward&lt;decltype(dirh)&gt;(dirh), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;}</div><div class="ttc" id="namespaceafio__v2__xxx_html_aca98b0cb43a2d925bb65e055b07b4a08"><div class="ttname"><a href="namespaceafio__v2__xxx.html#aca98b0cb43a2d925bb65e055b07b4a08">afio_v2_xxx::temp_inode</a></div><div class="ttdeci">result&lt; file_handle &gt; temp_inode(const path_handle &amp;dirh=path_discovery::storage_backed_temporary_files_directory(), file_handle::mode _mode=file_handle::mode::write, file_handle::flag flags=file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:357</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2618,7 +2618,7 @@ For portability, you can only assume that barriers write order for a single hand
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX ftruncate() or SetFileInformationByHandle() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;{</div><div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.truncate(std::forward&lt;decltype(newsize)&gt;(newsize));</div><div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;{</div><div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.truncate(std::forward&lt;decltype(newsize)&gt;(newsize));</div><div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a6164dd52993407a203124b0761cc3bbc"></a>
@@ -2657,7 +2657,7 @@ For portability, you can only assume that barriers write order for a single hand
 <p>Resize the current maximum permitted extent of the memory section to the given extent. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">self</td><td>The object whose member function to call. </td></tr>
-    <tr><td class="paramname">newsize</td><td>The new size of the memory section, which cannot be zero. Specify zero to use <code>backing.length()</code>. This cannot exceed the size of any backing file used if that file is not writable.</td></tr>
+    <tr><td class="paramname">newsize</td><td>The new size of the memory section, which cannot be zero. Specify zero to use <code>backing.maximum_extent()</code>. This cannot exceed the size of any backing file used if that file is not writable.</td></tr>
   </table>
   </dd>
 </dl>
@@ -2987,7 +2987,7 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX write() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle may perform one calloc and one free. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;{</div><div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.zero(std::forward&lt;decltype(offset)&gt;(offset), std::forward&lt;decltype(bytes)&gt;(bytes), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;{</div><div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.zero(std::forward&lt;decltype(offset)&gt;(offset), std::forward&lt;decltype(bytes)&gt;(bytes), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 </div><!-- contents -->

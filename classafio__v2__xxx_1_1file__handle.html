@@ -214,13 +214,12 @@ virtual <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html
 <a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html#a672324d44ea84ccfb71594c1036628ac">service</a> () const noexcept</td></tr>
 <tr class="memdesc:a672324d44ea84ccfb71594c1036628ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">The i/o service this handle is attached to, if any. <br /></td></tr>
 <tr class="separator:a672324d44ea84ccfb71594c1036628ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2083c37ffc746ec28f9e4d6b094d3ba5"><td class="memItemLeft" align="right" valign="top">virtual result&lt; extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html#a2083c37ffc746ec28f9e4d6b094d3ba5">length</a> () const noexcept</td></tr>
-<tr class="separator:a2083c37ffc746ec28f9e4d6b094d3ba5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0ada5a2b1d45c41a71bc5c66eb921c9f"><td class="memItemLeft" align="right" valign="top">virtual result&lt; extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html#a0ada5a2b1d45c41a71bc5c66eb921c9f">maximum_extent</a> () const noexcept</td></tr>
+<tr class="separator:a0ada5a2b1d45c41a71bc5c66eb921c9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a45873fd0b1ab27f936f046ed14124afd"><td class="memItemLeft" align="right" valign="top">virtual result&lt; extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html#a45873fd0b1ab27f936f046ed14124afd">truncate</a> (extent_type newsize) noexcept</td></tr>
 <tr class="separator:a45873fd0b1ab27f936f046ed14124afd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03d1774e3ad8678fb4aac4ced57beeef"><td class="memItemLeft" align="right" valign="top"><a id="a03d1774e3ad8678fb4aac4ced57beeef"></a>
-virtual result&lt; std::vector&lt; std::pair&lt; extent_type, extent_type &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html#a03d1774e3ad8678fb4aac4ced57beeef">extents</a> () const noexcept</td></tr>
-<tr class="memdesc:a03d1774e3ad8678fb4aac4ced57beeef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list of currently valid extents for this open file. WARNING: racy! <br /></td></tr>
+<tr class="memitem:a03d1774e3ad8678fb4aac4ced57beeef"><td class="memItemLeft" align="right" valign="top">virtual result&lt; std::vector&lt; std::pair&lt; extent_type, extent_type &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html#a03d1774e3ad8678fb4aac4ced57beeef">extents</a> () const noexcept</td></tr>
+<tr class="memdesc:a03d1774e3ad8678fb4aac4ced57beeef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list of currently valid extents for this open file. WARNING: racy!  <a href="#a03d1774e3ad8678fb4aac4ced57beeef">More...</a><br /></td></tr>
 <tr class="separator:a03d1774e3ad8678fb4aac4ced57beeef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a649aa39b0d4b60a05d4aab4be569dcb6"><td class="memItemLeft" align="right" valign="top">virtual result&lt; extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html#a649aa39b0d4b60a05d4aab4be569dcb6">zero</a> (extent_type offset, extent_type bytes, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="memdesc:a649aa39b0d4b60a05d4aab4be569dcb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Efficiently zero, and possibly deallocate, data on storage.  <a href="#a649aa39b0d4b60a05d4aab4be569dcb6">More...</a><br /></td></tr>
@@ -587,6 +586,34 @@ For portability, you can only assume that barriers write order for a single hand
 
 </div>
 </div>
+<a id="a03d1774e3ad8678fb4aac4ced57beeef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a03d1774e3ad8678fb4aac4ced57beeef">&#9670;&nbsp;</a></span>extents()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual result&lt;std::vector&lt;std::pair&lt;extent_type, extent_type&gt; &gt; &gt; afio_v2_xxx::file_handle::extents </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns a list of currently valid extents for this open file. WARNING: racy! </p>
+<dl class="section return"><dt>Returns</dt><dd>A vector of pairs of extent offset + extent length representing the valid extents in this file. Filing systems which do not support extents return a single extent matching the length of the file rather than returning an error. </dd></dl>
+
+</div>
+</div>
 <a id="accb36f2bfd98393dc868653798c02d34"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#accb36f2bfd98393dc868653798c02d34">&#9670;&nbsp;</a></span>file()</h2>
 
@@ -656,35 +683,6 @@ For portability, you can only assume that barriers write order for a single hand
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-
-</div>
-</div>
-<a id="a2083c37ffc746ec28f9e4d6b094d3ba5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2083c37ffc746ec28f9e4d6b094d3ba5">&#9670;&nbsp;</a></span>length()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual result&lt;extent_type&gt; afio_v2_xxx::file_handle::length </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Return the current maximum permitted extent of the file.</p>
-<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX fstat() or GetFileInformationByHandleEx() can return. </dd></dl>
-
-<p>Reimplemented in <a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#a6e92c497a0070314630c6dbf6f76b933">afio_v2_xxx::mapped_file_handle</a>.</p>
 
 </div>
 </div>
@@ -859,6 +857,35 @@ For portability, you can only assume that barriers write order for a single hand
 <p>Note that the actual number of buffers accepted for a read or a write may be significantly lower than this system-defined limit, depending on available resources. The <code>read()</code> or <code>write()</code> call will return the buffers accepted.</p>
 <p>Note also that some OSs will error out if you supply more than this limit to <code>read()</code> or <code>write()</code>, but other OSs do not. Some OSs guarantee that each i/o syscall has effects atomically visible or not to other i/o, other OSs do not.</p>
 <p>Microsoft Windows and OS X does not implement scatter-gather file i/o syscalls. Thus this function will always return <code>1</code> in that situation. </p>
+
+</div>
+</div>
+<a id="a0ada5a2b1d45c41a71bc5c66eb921c9f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ada5a2b1d45c41a71bc5c66eb921c9f">&#9670;&nbsp;</a></span>maximum_extent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual result&lt;extent_type&gt; afio_v2_xxx::file_handle::maximum_extent </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Return the current maximum permitted extent of the file.</p>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX fstat() or GetFileInformationByHandleEx() can return. </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#a96936484028ac57f6150560b55b26da7">afio_v2_xxx::mapped_file_handle</a>.</p>
 
 </div>
 </div>

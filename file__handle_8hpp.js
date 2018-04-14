@@ -4,7 +4,7 @@ var file__handle_8hpp =
     [ "construct< file_handle >", "structafio__v2__xxx_1_1construct_3_01file__handle_01_4.html", "structafio__v2__xxx_1_1construct_3_01file__handle_01_4" ],
     [ "extents", "file__handle_8hpp.html#ac3c009153d916556b991d4a79c664fe9", null ],
     [ "file", "file__handle_8hpp.html#ab92ca63383ef7fe58af4620570d12803", null ],
-    [ "length", "file__handle_8hpp.html#afe66c5875c48c8bd172901a1159ccbdc", null ],
+    [ "maximum_extent", "file__handle_8hpp.html#a8fbd7f7cc6449428269e22f9765b1d8d", null ],
     [ "random_file", "file__handle_8hpp.html#aac0b7d76c4298e86cef49c832c93edec", null ],
     [ "swap", "file__handle_8hpp.html#a579d619e4d73e584fdd41e34761afa67", null ],
     [ "temp_file", "file__handle_8hpp.html#aa14b24c8bc330dd8e472f42676ba03d6", null ],

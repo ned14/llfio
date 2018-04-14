@@ -218,7 +218,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="separator:a5464eac84bedf1ce13318451b3a95e93"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f0dec7d839f348c39e7a185777866ea"><td class="memItemLeft" align="right" valign="top"><a id="a9f0dec7d839f348c39e7a185777866ea"></a>
 result&lt; <a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1section__handle.html#a9f0dec7d839f348c39e7a185777866ea">length</a> () const noexcept</td></tr>
-<tr class="memdesc:a9f0dec7d839f348c39e7a185777866ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the current maximum permitted extent of the memory section. <br /></td></tr>
+<tr class="memdesc:a9f0dec7d839f348c39e7a185777866ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the current length of the memory section. <br /></td></tr>
 <tr class="separator:a9f0dec7d839f348c39e7a185777866ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a229f515ed3251071d374476204e23e30"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1section__handle.html#a229f515ed3251071d374476204e23e30">truncate</a> (<a class="el" href="classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9">extent_type</a> newsize=0) noexcept</td></tr>
 <tr class="separator:a229f515ed3251071d374476204e23e30"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -416,7 +416,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b> {flag::non
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a45ff5c1c5662623d99156870dfeee0a7a244f58cf07c35fd48d7524b289551e5c"></a>truncate&#160;</td><td class="fielddoc"><p>Atomically truncate on open, leaving creation date unmodified. </p>
 </td></tr>
 </table>
-<div class="fragment"><div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;                      : <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span></div><div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  {</div><div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    open_existing = 0,</div><div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    only_if_not_exist,</div><div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    if_needed,</div><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <a class="code" href="namespaceafio__v2__xxx.html#a84d22c966fcabe50de30ad8cf26c7241">truncate</a>  <span class="comment">//!&lt; Atomically truncate on open, leaving creation date unmodified.</span></div><div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="comment"></span>              <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div><div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  };</div><div class="ttc" id="namespaceafio__v2__xxx_html_a84d22c966fcabe50de30ad8cf26c7241"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a84d22c966fcabe50de30ad8cf26c7241">afio_v2_xxx::truncate</a></div><div class="ttdeci">result&lt; file_handle::extent_type &gt; truncate(file_handle &amp;self, file_handle::extent_type newsize) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:373</div></div>
+<div class="fragment"><div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;                      : <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span></div><div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  {</div><div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    open_existing = 0,</div><div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    only_if_not_exist,</div><div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    if_needed,</div><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <a class="code" href="namespaceafio__v2__xxx.html#a84d22c966fcabe50de30ad8cf26c7241">truncate</a>  <span class="comment">//!&lt; Atomically truncate on open, leaving creation date unmodified.</span></div><div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="comment"></span>              <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div><div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  };</div><div class="ttc" id="namespaceafio__v2__xxx_html_a84d22c966fcabe50de30ad8cf26c7241"><div class="ttname"><a href="namespaceafio__v2__xxx.html#a84d22c966fcabe50de30ad8cf26c7241">afio_v2_xxx::truncate</a></div><div class="ttdeci">result&lt; file_handle::extent_type &gt; truncate(file_handle &amp;self, file_handle::extent_type newsize) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:378</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -563,7 +563,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b> {flag::non
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">backing</td><td>The handle to use as backing storage. </td></tr>
-    <tr><td class="paramname">maximum_size</td><td>The initial size of this section, which cannot be larger than any backing file. Zero means to use <code>backing.length()</code>. </td></tr>
+    <tr><td class="paramname">maximum_size</td><td>The initial size of this section, which cannot be larger than any backing file. Zero means to use <code>backing.maximum_extent()</code>. </td></tr>
     <tr><td class="paramname">_flag</td><td>How to create the section.</td></tr>
   </table>
   </dd>
@@ -610,7 +610,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b> {flag::non
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">backing</td><td>The handle to use as backing storage. </td></tr>
-    <tr><td class="paramname">bytes</td><td>The initial size of this section, which cannot be larger than any backing file. Zero means to use <code>backing.length()</code>.</td></tr>
+    <tr><td class="paramname">bytes</td><td>The initial size of this section, which cannot be larger than any backing file. Zero means to use <code>backing.maximum_extent()</code>.</td></tr>
   </table>
   </dd>
 </dl>
@@ -731,7 +731,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b> {flag::non
 </div><div class="memdoc">
 <p>Resize the current maximum permitted extent of the memory section to the given extent. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">newsize</td><td>The new size of the memory section, which cannot be zero. Specify zero to use <code>backing.length()</code>. This cannot exceed the size of any backing file used if that file is not writable.</td></tr>
+    <tr><td class="paramname">newsize</td><td>The new size of the memory section, which cannot be zero. Specify zero to use <code>backing.maximum_extent()</code>. This cannot exceed the size of any backing file used if that file is not writable.</td></tr>
   </table>
   </dd>
 </dl>

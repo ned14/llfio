@@ -2,7 +2,7 @@ var searchData=
 [
   ['uint128',['uint128',['../namespaceafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex.html#a48547949428f2da935a05cad87f2a7ff',1,'afio_v2_xxx::algorithm::shared_fs_mutex']]],
   ['uint64',['uint64',['../namespaceafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex.html#af6e3781d4c08b2d3f74b32255f49479f',1,'afio_v2_xxx::algorithm::shared_fs_mutex']]],
-  ['underlying_5ffile_5flength',['underlying_file_length',['../classafio__v2__xxx_1_1mapped__file__handle.html#a1dc81182455d0cceb0eb8db1a19df464',1,'afio_v2_xxx::mapped_file_handle']]],
+  ['underlying_5ffile_5fmaximum_5fextent',['underlying_file_maximum_extent',['../classafio__v2__xxx_1_1mapped__file__handle.html#a18f9e44522bdab10577af1abd953ad95',1,'afio_v2_xxx::mapped_file_handle']]],
   ['unique_5fid',['unique_id',['../classafio__v2__xxx_1_1fs__handle.html#a5a5244ab1a15053aefe93f2c253db5b3',1,'afio_v2_xxx::fs_handle']]],
   ['unique_5fid_5ftype',['unique_id_type',['../classafio__v2__xxx_1_1fs__handle.html#a0344f48ef10fa2b94199d5566aedd879',1,'afio_v2_xxx::fs_handle']]],
   ['unknown',['unknown',['../structafio__v2__xxx_1_1path__discovery_1_1discovered__path.html#a1deccea0a3ad1c3a5a2688a1a3cc118caad921d60486366258809553a3db49a4a',1,'afio_v2_xxx::path_discovery::discovered_path']]],

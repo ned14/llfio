@@ -220,10 +220,10 @@ const <a class="el" href="classafio__v2__xxx_1_1map__handle.html">map_handle</a>
 byte *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#ab1d9c370e86dc327e3efad1c71db3cb3">address</a> () const noexcept</td></tr>
 <tr class="memdesc:ab1d9c370e86dc327e3efad1c71db3cb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">The address in memory where this mapped file resides. <br /></td></tr>
 <tr class="separator:ab1d9c370e86dc327e3efad1c71db3cb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1dc81182455d0cceb0eb8db1a19df464"><td class="memItemLeft" align="right" valign="top"><a id="a1dc81182455d0cceb0eb8db1a19df464"></a>
-result&lt; extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#a1dc81182455d0cceb0eb8db1a19df464">underlying_file_length</a> () const noexcept</td></tr>
-<tr class="memdesc:a1dc81182455d0cceb0eb8db1a19df464"><td class="mdescLeft">&#160;</td><td class="mdescRight">The length of the underlying file. <br /></td></tr>
-<tr class="separator:a1dc81182455d0cceb0eb8db1a19df464"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a18f9e44522bdab10577af1abd953ad95"><td class="memItemLeft" align="right" valign="top"><a id="a18f9e44522bdab10577af1abd953ad95"></a>
+result&lt; extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#a18f9e44522bdab10577af1abd953ad95">underlying_file_maximum_extent</a> () const noexcept</td></tr>
+<tr class="memdesc:a18f9e44522bdab10577af1abd953ad95"><td class="mdescLeft">&#160;</td><td class="mdescRight">The maximum extent of the underlying file. <br /></td></tr>
+<tr class="separator:a18f9e44522bdab10577af1abd953ad95"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae8e389b2dbdff1b1f155ea351f5ba9c5"><td class="memItemLeft" align="right" valign="top"><a id="ae8e389b2dbdff1b1f155ea351f5ba9c5"></a>
 size_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#ae8e389b2dbdff1b1f155ea351f5ba9c5">capacity</a> () const noexcept</td></tr>
 <tr class="memdesc:ae8e389b2dbdff1b1f155ea351f5ba9c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">The address space (to be) reserved for future expansion of this file. <br /></td></tr>
@@ -247,10 +247,10 @@ virtual <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html
 <tr class="memitem:ade79cbd3cd40e6d194492319c3367da6"><td class="memItemLeft" align="right" valign="top"><a id="ade79cbd3cd40e6d194492319c3367da6"></a>
 result&lt; <a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html">mapped_file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>clone</b> (size_type reservation, <a class="el" href="classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18">mode</a> mode_=mode::unchanged, <a class="el" href="classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e">caching</a> caching_=caching::unchanged, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) const noexcept</td></tr>
 <tr class="separator:ade79cbd3cd40e6d194492319c3367da6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e92c497a0070314630c6dbf6f76b933"><td class="memItemLeft" align="right" valign="top"><a id="a6e92c497a0070314630c6dbf6f76b933"></a>
-virtual result&lt; extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#a6e92c497a0070314630c6dbf6f76b933">length</a> () const noexcept override</td></tr>
-<tr class="memdesc:a6e92c497a0070314630c6dbf6f76b933"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the current maximum permitted extent of the file. <br /></td></tr>
-<tr class="separator:a6e92c497a0070314630c6dbf6f76b933"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96936484028ac57f6150560b55b26da7"><td class="memItemLeft" align="right" valign="top"><a id="a96936484028ac57f6150560b55b26da7"></a>
+virtual result&lt; extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#a96936484028ac57f6150560b55b26da7">maximum_extent</a> () const noexcept override</td></tr>
+<tr class="memdesc:a96936484028ac57f6150560b55b26da7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the current maximum permitted extent of the file. <br /></td></tr>
+<tr class="separator:a96936484028ac57f6150560b55b26da7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a64bf34a474aa4de495b38ce314fd377b"><td class="memItemLeft" align="right" valign="top">virtual result&lt; extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1mapped__file__handle.html#a64bf34a474aa4de495b38ce314fd377b">truncate</a> (extent_type newsize) noexcept override</td></tr>
 <tr class="memdesc:a64bf34a474aa4de495b38ce314fd377b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resize the current maximum permitted extent of the mapped file to the given extent, avoiding any new allocation of physical storage where supported, and mapping or unmapping any new pages up to the reservation to reflect the new maximum extent. If the new size exceeds the reservation, <code>reserve()</code> will be called to increase the reservation.  <a href="#a64bf34a474aa4de495b38ce314fd377b">More...</a><br /></td></tr>
 <tr class="separator:a64bf34a474aa4de495b38ce314fd377b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -283,9 +283,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <a class="el" href="classafio__v2__xxx_1_1io__service.html">io_service</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html#a672324d44ea84ccfb71594c1036628ac">service</a> () const noexcept</td></tr>
 <tr class="memdesc:a672324d44ea84ccfb71594c1036628ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">The i/o service this handle is attached to, if any. <br /></td></tr>
 <tr class="separator:a672324d44ea84ccfb71594c1036628ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03d1774e3ad8678fb4aac4ced57beeef"><td class="memItemLeft" align="right" valign="top"><a id="a03d1774e3ad8678fb4aac4ced57beeef"></a>
-virtual result&lt; std::vector&lt; std::pair&lt; extent_type, extent_type &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html#a03d1774e3ad8678fb4aac4ced57beeef">extents</a> () const noexcept</td></tr>
-<tr class="memdesc:a03d1774e3ad8678fb4aac4ced57beeef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list of currently valid extents for this open file. WARNING: racy! <br /></td></tr>
+<tr class="memitem:a03d1774e3ad8678fb4aac4ced57beeef"><td class="memItemLeft" align="right" valign="top">virtual result&lt; std::vector&lt; std::pair&lt; extent_type, extent_type &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html#a03d1774e3ad8678fb4aac4ced57beeef">extents</a> () const noexcept</td></tr>
+<tr class="memdesc:a03d1774e3ad8678fb4aac4ced57beeef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list of currently valid extents for this open file. WARNING: racy!  <a href="#a03d1774e3ad8678fb4aac4ced57beeef">More...</a><br /></td></tr>
 <tr class="separator:a03d1774e3ad8678fb4aac4ced57beeef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d9cbbb7aae98704c6ad97de080c4210"><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__handle.html#a4d9cbbb7aae98704c6ad97de080c4210">max_buffers</a> () const noexcept</td></tr>
 <tr class="memdesc:a4d9cbbb7aae98704c6ad97de080c4210"><td class="mdescLeft">&#160;</td><td class="mdescRight">The <em>maximum</em> number of buffers which a single read or write syscall can process at a time for this specific open handle. On POSIX, this is known as <code>IOV_MAX</code>.  <a href="#a4d9cbbb7aae98704c6ad97de080c4210">More...</a><br /></td></tr>
@@ -487,7 +486,7 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
 <p>Note that zero length files cannot be memory mapped, and writes past the maximum extent do NOT auto-extend the size of the file, rather the data written beyond the maximum valid extent has undefined kernel-specific behaviour, which includes segfaulting. You must therefore always <code>truncate(newsize)</code> to resize the file and its maps before you can read or write to it, and be VERY careful to not read or write beyond the maximum extent of the file.</p>
 <p>Therefore, when a file is created or is otherwise of zero length, <code>address()</code> will return a null pointer. Similarly, calling <code>truncate(0)</code> will close the map and section handles, they will be recreated on next truncation to a non-zero size.</p>
 <p>For better performance when handling files which are growing, there is a concept of "address space reservation" via <code>reserve()</code> and <code>capacity()</code>, which on some kernels is automatically and efficiently expanded into when the underlying file grows. The implementation asks the kernel to set out a contiguous region of pages matching that reservation, and to map the file into the beginning of the reservation. The remainder of the pages may be inaccessible and may generate a segfault, or they may automatically reflect any growth in the underlying file. This is why <code>read()</code> and <code>write()</code> only know about the reservation size, and will read and write memory up to that reservation size, without checking if the memory involved exists or not yet. You are guaranteed that <code>address()</code> will not return a new value unless you truncate from a bigger length to a smaller length, or you call <code>reserve()</code> with a new reservation or <code>truncate()</code> with a value bigger than the reservation.</p>
-<p><code>length()</code> reports the last truncated length of the mapped file (possibly by any process in the system) up to the reservation limit, NOT the length of the underlying file. When you know that another process has extended the file and you wish to map the newly appended data, you can call <code>update_map()</code> which guarantees that the mapping your process sees is up to date, rather than relying on any kernel-specific automatic mapping. Whether automatic or enforced by <code>update_map()</code>, the reservation limit will not be exceeded nor will <code>address()</code> suddenly return something different.</p>
+<p><code>maximum_extent()</code> reports the last truncated length of the mapped file (possibly by any process in the system) up to the reservation limit, NOT the maximum extent of the underlying file. When you know that another process has extended the file and you wish to map the newly appended data, you can call <code>update_map()</code> which guarantees that the mapping your process sees is up to date, rather than relying on any kernel-specific automatic mapping. Whether automatic or enforced by <code>update_map()</code>, the reservation limit will not be exceeded nor will <code>address()</code> suddenly return something different.</p>
 <p>It is thus up to you to detect that the reservation has been exhausted, and to reserve a new reservation which will change the value returned by <code>address()</code>. This entirely manual system is a bit tedious and cumbersome to use, but as mapping files is an expensive operation given TLB shootdown, we leave it up to the end user to decide when to expend the cost of mapping.</p>
 <dl class="section warning"><dt>Warning</dt><dd>You must be cautious when the file is being extended by third parties which are not using this <code>mapped_file_handle</code> to write the new data. With unified page cache kernels, mixing mapped and normal i/o is generally safe except at the end of a file where race conditions and outright kernel bugs tend to abound. To avoid these, solely and exclusively use a dedicated handle configured to atomic append only to do the appends. </dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
@@ -664,6 +663,34 @@ For portability, you can only assume that barriers write order for a single hand
 <dl class="section warning"><dt>Warning</dt><dd>This call is expensive, it always asks the kernel for the current path, and no checking is done to ensure what the kernel returns is accurate or even sensible. Be aware that despite these precautions, paths are unstable and <b>can change randomly at any moment</b>. Most code written to use absolute file systems paths is <b>racy</b>, so don't do it, use <code>path_handle</code> to fix a base location on the file system and work from that anchor instead!</dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>At least one malloc for the <code>path_type</code>, likely several more. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><code>algorithm::cached_parent_handle_adapter&lt;T&gt;</code> which overrides this with an implementation based on retrieving the current path of a cached handle to the parent directory. On platforms with instability or failure to retrieve the correct current path for regular files, the cached parent handle adapter works around the problem by taking advantage of directory inodes not having the same instability problems on any platform. </dd></dl>
+
+</div>
+</div>
+<a id="a03d1774e3ad8678fb4aac4ced57beeef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a03d1774e3ad8678fb4aac4ced57beeef">&#9670;&nbsp;</a></span>extents()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual result&lt;std::vector&lt;std::pair&lt;extent_type, extent_type&gt; &gt; &gt; afio_v2_xxx::file_handle::extents </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns a list of currently valid extents for this open file. WARNING: racy! </p>
+<dl class="section return"><dt>Returns</dt><dd>A vector of pairs of extent offset + extent length representing the valid extents in this file. Filing systems which do not support extents return a single extent matching the length of the file rather than returning an error. </dd></dl>
 
 </div>
 </div>
