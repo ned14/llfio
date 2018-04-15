@@ -9,7 +9,7 @@ var classafio__v2__xxx_1_1fs__handle =
     [ "fs_handle", "classafio__v2__xxx_1_1fs__handle.html#a45eb2220cdefa846fdb103d12a5ce485", null ],
     [ "fs_handle", "classafio__v2__xxx_1_1fs__handle.html#a10d68d2506b9d587e7cad8485fef9637", null ],
     [ "fs_handle", "classafio__v2__xxx_1_1fs__handle.html#a274f5d82e11f92ed62e05919076508b8", null ],
-    [ "_fetch_inode", "classafio__v2__xxx_1_1fs__handle.html#ae579de33d4d008c50b4da07b641b3ba5", null ],
+    [ "_fetch_inode", "classafio__v2__xxx_1_1fs__handle.html#af3d9e428b4455c34285de06387b8ee14", null ],
     [ "_get_handle", "classafio__v2__xxx_1_1fs__handle.html#af1c6b569d96ce4bd7e13ae451641e628", null ],
     [ "operator=", "classafio__v2__xxx_1_1fs__handle.html#a57612714e944a93f6e26ec66b91ffd6e", null ],
     [ "operator=", "classafio__v2__xxx_1_1fs__handle.html#a334ed7c11091e8f3f83686b8aeaa1c5b", null ],
