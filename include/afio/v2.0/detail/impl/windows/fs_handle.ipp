@@ -29,7 +29,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 AFIO_V2_NAMESPACE_BEGIN
 
-result<void> fs_handle::_fetch_inode() noexcept
+result<void> fs_handle::_fetch_inode() const noexcept
 {
   stat_t s;
   OUTCOME_TRYV(s.fill(_get_handle(), stat_t::want::dev | stat_t::want::ino));
@@ -45,6 +45,10 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
   AFIO_LOG_FUNCTION_CALL(this);
   auto &h = _get_handle();
   AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+  if(_devid == 0 && _inode == 0)
+  {
+    OUTCOME_TRY(_fetch_inode());
+  }
   try
   {
     for(;;)

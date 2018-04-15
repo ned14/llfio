@@ -149,14 +149,6 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
       break;
     }
   }
-  if(!(flags & flag::disable_safety_unlinks))
-  {
-    if(!ret.value()._fetch_inode())
-    {
-      // If fetching inode failed e.g. were opening device, disable safety unlinks
-      ret.value()._flags &= ~flag::disable_safety_unlinks;
-    }
-  }
   if(need_to_set_sparse && !(flags & flag::win_disable_sparse_file_creation))
   {
     DWORD bytesout = 0;
@@ -251,7 +243,6 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
       }
     }
     // std::cerr << random << std::endl;
-    OUTCOME_TRYV(ret.value()._fetch_inode());  // It can be useful to know the inode of temporary inodes
     if(nativeh.h != nullptr)
     {
       // Hide this item

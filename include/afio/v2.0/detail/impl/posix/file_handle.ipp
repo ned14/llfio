@@ -48,14 +48,6 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   {
     return {errno, std::system_category()};
   }
-  if(!(flags & flag::disable_safety_unlinks))
-  {
-    if(!ret.value()._fetch_inode())
-    {
-      // If fetching inode failed e.g. were opening device, disable safety unlinks
-      ret.value()._flags &= ~flag::disable_safety_unlinks;
-    }
-  }
   if((flags & flag::disable_prefetching) || (flags & flag::maximum_prefetching))
   {
 #ifdef POSIX_FADV_SEQUENTIAL
@@ -98,7 +90,6 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   if(-1 != nativeh.fd)
   {
     ret.value()._flags |= flag::anonymous_inode;
-    OUTCOME_TRYV(ret.value()._fetch_inode());      // It can be useful to know the inode of temporary inodes
     ret.value()._flags &= ~flag::unlink_on_close;  // It's already unlinked
     return ret;
   }
@@ -132,7 +123,6 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
     {
       return {errno, std::system_category()};
     }
-    OUTCOME_TRYV(ret.value()._fetch_inode());  // It can be useful to know the inode of temporary inodes
     ret.value()._flags &= ~flag::unlink_on_close;
     return ret;
   }

@@ -132,14 +132,6 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
       return {static_cast<int>(errcode), std::system_category()};
     }
   }
-  if(!(flags & flag::disable_safety_unlinks))
-  {
-    if(!ret.value()._fetch_inode())
-    {
-      // If fetching inode failed e.g. were opening device, disable safety unlinks
-      ret.value()._flags &= ~flag::disable_safety_unlinks;
-    }
-  }
   return ret;
 }
 
