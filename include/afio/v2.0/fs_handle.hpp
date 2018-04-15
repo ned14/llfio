@@ -55,11 +55,11 @@ public:
   using unique_id_type = QUICKCPPLIB_NAMESPACE::integers128::uint128;
 
 protected:
-  dev_t _devid{0};
-  ino_t _inode{0};
+  mutable dev_t _devid{0};
+  mutable ino_t _inode{0};
 
   //! Fill in _devid and _inode from the handle via fstat()
-  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> _fetch_inode() noexcept;
+  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> _fetch_inode() const noexcept;
 
   virtual const handle &_get_handle() const noexcept = 0;
 
@@ -96,12 +96,30 @@ public:
   fs_handle &operator=(const fs_handle &o) = delete;
 
   //! Unless `flag::disable_safety_unlinks` is set, the device id of the file when opened
-  dev_t st_dev() const noexcept { return _devid; }
+  dev_t st_dev() const noexcept
+  {
+    if(_devid == 0 && _inode == 0)
+    {
+      (void) _fetch_inode();
+    }
+    return _devid;
+  }
   //! Unless `flag::disable_safety_unlinks` is set, the inode of the file when opened. When combined with st_dev(), forms a unique identifer on this system
-  ino_t st_ino() const noexcept { return _inode; }
+  ino_t st_ino() const noexcept
+  {
+    if(_devid == 0 && _inode == 0)
+    {
+      (void) _fetch_inode();
+    }
+    return _inode;
+  }
   //! A unique identifier for this handle across the entire system. Can be used in hash tables etc.
   unique_id_type unique_id() const noexcept
   {
+    if(_devid == 0 && _inode == 0)
+    {
+      (void) _fetch_inode();
+    }
     unique_id_type ret;
     ret.as_longlongs[0] = _devid;
     ret.as_longlongs[1] = _inode;

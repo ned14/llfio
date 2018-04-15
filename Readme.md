@@ -16,6 +16,7 @@ Tarballs of source and prebuilt binaries for Linux x64, MacOS x64 and Windows x6
 - [ ] Add OS X support to `storage_profile`, this should complete the Mac OS port.
 - [x] Fix all known bugs in Outcome, plus reorg source code in prep for `status_code`.
 - [x] Scatter-gather buffers to use https://github.com/martinmoene/byte-lite
+- [x] Make lazy the stat fetch during file/dir open.
 - [ ] Implement SG14 `status_code` as a standalone library and test in AFIO.
 - [ ] Single include generation now we're on `status_code` and it's safe.
 - [ ] `atomic_append` isn't actually being tested in shared_fs_mutex

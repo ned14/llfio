@@ -31,7 +31,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 AFIO_V2_NAMESPACE_BEGIN
 
-result<void> fs_handle::_fetch_inode() noexcept
+result<void> fs_handle::_fetch_inode() const noexcept
 {
   stat_t s(nullptr);
   OUTCOME_TRYV(s.fill(_get_handle(), stat_t::want::dev | stat_t::want::ino));
@@ -145,6 +145,10 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
 {
   AFIO_LOG_FUNCTION_CALL(this);
   auto &h = _get_handle();
+  if(_devid == 0 && _inode == 0)
+  {
+    OUTCOME_TRY(_fetch_inode());
+  }
   return containing_directory({}, h, *this, d);
 }
 
@@ -165,7 +169,7 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
     snprintf(_path, PATH_MAX, "/proc/self/fd/%d", h.native_handle().fd);
     if(-1 == ::linkat(AT_FDCWD, _path, base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, AT_SYMLINK_FOLLOW))
     {
-      return { errno, std::system_category() };
+      return {errno, std::system_category()};
     }
     h._flags &= ~handle::flag::anonymous_inode;
     return success();
@@ -173,6 +177,10 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
 #endif
   // Open our containing directory
   filesystem::path filename;
+  if(_devid == 0 && _inode == 0)
+  {
+    OUTCOME_TRY(_fetch_inode());
+  }
   OUTCOME_TRY(dirh, containing_directory(std::ref(filename), h, *this, d));
   if(!atomic_replace)
   {
@@ -186,12 +194,12 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
     // Otherwise we need to use linkat followed by renameat (non-atomic)
     if(-1 == ::linkat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, 0))
     {
-      return { errno, std::system_category() };
+      return {errno, std::system_category()};
     }
   }
   if(-1 == ::renameat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer))
   {
-    return { errno, std::system_category() };
+    return {errno, std::system_category()};
   }
   return success();
 }
@@ -202,6 +210,10 @@ result<void> fs_handle::unlink(deadline d) noexcept
   auto &h = _get_handle();
   // Open our containing directory
   filesystem::path filename;
+  if(_devid == 0 && _inode == 0)
+  {
+    OUTCOME_TRY(_fetch_inode());
+  }
   OUTCOME_TRY(dirh, containing_directory(std::ref(filename), h, *this, d));
   if(-1 == ::unlinkat(dirh.native_handle().fd, filename.c_str(), h.is_directory() ? AT_REMOVEDIR : 0))
   {
