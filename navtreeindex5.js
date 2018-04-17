@@ -1,5 +1,6 @@
 var NAVTREEINDEX5 =
 {
+"group__config.html#gafab2566c573eef8945053c8d57976764":[1,0,13],
 "group__config.html#gafab2566c573eef8945053c8d57976764":[4,0,0,0,2,6],
 "handle_8hpp.html":[4,0,0,0,0,8],
 "handle_8hpp.html#a23c535a7d67a0bbd0cf3254325b6efc7":[4,0,0,0,0,8,5],
@@ -248,6 +249,5 @@ var NAVTREEINDEX5 =
 "structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a77ac1dfbe6f0df38bf9ecd3fbdf515fe":[3,0,0,0,0,1,19],
 "structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a782e7042f5ef8e5794566ad990418a8a":[3,0,0,0,0,1,36],
 "structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a829281d387d6fe30048d9bcc4a75580c":[3,0,0,0,0,1,37],
-"structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a83a15aa2a15fe2231ee7c5691f9cc6e7":[3,0,0,0,0,1,27],
-"structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a8daf059785543d0e281a4e3fe3903dcd":[3,0,0,0,0,1,43]
+"structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a83a15aa2a15fe2231ee7c5691f9cc6e7":[3,0,0,0,0,1,27]
 };

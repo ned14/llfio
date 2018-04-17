@@ -79,10 +79,11 @@ var NAVTREEINDEX0 =
 "classafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__iterator.html#ae9d9a3cd2084361dabf501eea2931638":[3,0,0,0,0,2,9],
 "classafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__iterator.html#afa29de316ab1b28efe099a7fe9f92af3":[3,0,0,0,0,2,17],
 "classafio__v2__xxx_1_1algorithm_1_1mapped__span.html":[3,0,0,0,3],
-"classafio__v2__xxx_1_1algorithm_1_1mapped__span.html#a236f0978be161027886300e85bf5ae8d":[3,0,0,0,3,5],
+"classafio__v2__xxx_1_1algorithm_1_1mapped__span.html#a236f0978be161027886300e85bf5ae8d":[3,0,0,0,3,6],
 "classafio__v2__xxx_1_1algorithm_1_1mapped__span.html#aa33d0ce0be15b0738c6b36341843ccb5":[3,0,0,0,3,1],
 "classafio__v2__xxx_1_1algorithm_1_1mapped__span.html#aa53a448cdf7c235bdba9252b52548b5b":[3,0,0,0,3,0],
 "classafio__v2__xxx_1_1algorithm_1_1mapped__span.html#aa5b20642220613876d8be474003785e9":[3,0,0,0,3,2],
+"classafio__v2__xxx_1_1algorithm_1_1mapped__span.html#aba42e9fbb4a9f17ca78317060293b619":[3,0,0,0,3,5],
 "classafio__v2__xxx_1_1algorithm_1_1mapped__span.html#aca48ca2f9558c5d6f57e398016311fe8":[3,0,0,0,3,4],
 "classafio__v2__xxx_1_1algorithm_1_1mapped__span.html#af6a43d3c0201079dac97d407ddb00aaa":[3,0,0,0,3,3],
 "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html":[3,0,0,0,1,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX0 =
 "classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html#a681c9115ce2a475daa5cb3d01bd5ab6a":[3,0,0,0,4,14],
 "classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html#a6fa51a8f33e271df5fa6e7c0689e652e":[3,0,0,0,4,46],
 "classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html#a77ac1dfbe6f0df38bf9ecd3fbdf515fe":[3,0,0,0,4,18],
-"classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html#a782e7042f5ef8e5794566ad990418a8a":[3,0,0,0,4,35],
-"classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html#a829281d387d6fe30048d9bcc4a75580c":[3,0,0,0,4,36]
+"classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html#a782e7042f5ef8e5794566ad990418a8a":[3,0,0,0,4,35]
 };
