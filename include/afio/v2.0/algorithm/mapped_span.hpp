@@ -67,11 +67,12 @@ namespace algorithm
   public:
     //! Default constructor
     constexpr mapped_span() {}  // NOLINT
-                                /*! Create a view of new memory.
-                            
-                                \param length The number of items to map.
-                                \param _flag The flags to pass to `map_handle::map()`.
-                                */
+
+    /*! Create a view of new memory.
+
+    \param length The number of items to map.
+    \param _flag The flags to pass to `map_handle::map()`.
+    */
     explicit mapped_span(size_type length, section_handle::flag _flag = section_handle::flag::readwrite)
         : _mapping(map_handle::map(length * sizeof(T), _flag).value())
     {
@@ -95,14 +96,24 @@ namespace algorithm
                                                   byteoffset, sh, (length == (size_type) -1) ? 0 : length * sizeof(T), _flag))  // NOLINT
     {
     }
+    /*! Construct a mapped view of the given map handle.
+
+    \param mh The map handle to use.
+    \param length The number of items to map, use -1 to mean the length of the map handle divided by `sizeof(T)`.
+    \param byteoffset The byte offset into the map handle, this does not need to be a multiple of the page size.
+    */
+    explicit mapped_span(map_handle &mh, size_type length = (size_type) -1, extent_type byteoffset = 0)                                          // NOLINT
+    : span<T>(reinterpret_cast<T *>(mh.address() + byteoffset), (length == (size_type) -1) ? ((mh.length() - byteoffset) / sizeof(T)) : length)  // NOLINT
+    {
+    }
     /*! Construct a mapped view of the given mapped file handle.
 
     \param mfh The mapped file handle to use as the data source for creating the map.
     \param length The number of items to map, use -1 to mean the length of the section handle divided by `sizeof(T)`.
     \param byteoffset The byte offset into the mapped file handle, this does not need to be a multiple of the page size.
     */
-    explicit mapped_span(mapped_file_handle &mfh, size_type length = (size_type) -1, extent_type byteoffset = 0)                                    // NOLINT
-    : span<T>(reinterpret_cast<T *>(mfh.address() + byteoffset), (length == (size_type) -1) ? (mfh.maximum_extent().value() / sizeof(T)) : length)  // NOLINT
+    explicit mapped_span(mapped_file_handle &mfh, size_type length = (size_type) -1, extent_type byteoffset = 0)                                                   // NOLINT
+    : span<T>(reinterpret_cast<T *>(mfh.address() + byteoffset), (length == (size_type) -1) ? ((mfh.maximum_extent().value() - byteoffset) / sizeof(T)) : length)  // NOLINT
     {
     }
   };

@@ -189,6 +189,95 @@ void scatter_write()
   //! [scatter_write]
 }
 
+void malloc1()
+{
+  //! [malloc1]
+  namespace afio = AFIO_V2_NAMESPACE;
+
+  // Call whatever the equivalent to mmap() is on this platform to fetch
+  // new private memory backed by the swap file. This will be the system
+  // all bits zero page mapped into each page of the allocation. Only on
+  // first write will a page fault allocate a real zeroed page for that
+  // page.
+  afio::map_handle mh = afio::map(4096).value();
+
+  // Fill the newly allocated memory with 'a' C style. For each first write
+  // to a page, it will be page faulted into a private page by the kernel.
+  afio::byte *p = mh.address();
+  size_t len = mh.length();
+  memset(p, 'a', len);
+
+  // Tell the kernel to throw away the contents of any whole pages
+  // by resetting them to the system all zeros page. These pages
+  // will be faulted into existence on first write.
+  mh.zero_memory({ mh.address(), mh.length() }).value();
+
+  // Do not write these pages to the swap file (flip dirty bit to false)
+  mh.do_not_store({mh.address(), mh.length()}).value();
+
+  // Fill the memory with 'b' C++ style, probably faulting new pages into existence
+  afio::algorithm::mapped_span<char> p2(mh);
+  std::fill(p2.begin(), p2.end(), 'b');
+
+  // Kick the contents of the memory out to the swap file so it is no longer cached in RAM
+  // This also remaps the memory to reserved address space.
+  mh.decommit({mh.address(), mh.length()}).value();
+
+  // Map the swap file stored edition back into memory, it will fault on
+  // first read to do the load back into the kernel page cache.
+  mh.commit({ mh.address(), mh.length() }).value();
+
+  // And rather than wait until first page fault read, tell the system we are going to
+  // use this region soon. Most systems will begin an asynchronous population of the
+  // kernel page cache immediately.
+  afio::map_handle::buffer_type pf[] = { { mh.address(), mh.length() } };
+  mh.prefetch(pf).value();
+
+
+  // You can actually save yourself some time and skip manually creating map handles.
+  // Just construct a mapped_span directly, this creates an internal map_handle instance,
+  // so memory is released when the span is destroyed
+  afio::algorithm::mapped_span<float> f(1000);  // 1000 floats, allocated used mmap()
+  std::fill(f.begin(), f.end(), 1.23f);
+  //! [malloc1]
+}
+
+void malloc2()
+{
+  //! [malloc2]
+  namespace afio = AFIO_V2_NAMESPACE;
+
+  // Create 4Kb of anonymous shared memory. This will persist
+  // until the last handle to it in the system is destructed.
+  // You can fetch a path to it to give to other processes using
+  // sh.current_path()
+  afio::section_handle sh = afio::section(4096).value();
+
+  {
+    // Map it into memory, and fill it with 'a'
+    afio::algorithm::mapped_span<char> ms1(sh);
+    std::fill(ms1.begin(), ms1.end(), 'a');
+
+    // Destructor unmaps it from memory
+  }
+
+  // Map it into memory again, verify it contains 'a'
+  afio::algorithm::mapped_span<char> ms1(sh);
+  assert(ms1[0] == 'a');
+
+  // Map a *second view* of the same memory
+  afio::algorithm::mapped_span<char> ms2(sh);
+  assert(ms2[0] == 'a');
+
+  // The addresses of the two maps are unique
+  assert(ms1.data() != ms2.data());
+
+  // Yet writes to one map appear in the other map
+  ms2[0] = 'b';
+  assert(ms1[0] == 'b');
+  //! [malloc2]
+}
+
 void map_file()
 {
   //! [map_file]
