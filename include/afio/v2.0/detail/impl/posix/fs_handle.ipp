@@ -95,7 +95,7 @@ inline result<path_handle> containing_directory(optional<std::reference_wrapper<
         {
           continue;
         }
-        return {errno, std::system_category()};
+        return posix_error();
       }
       auto unfd = undoer([fd] { ::close(fd); });
       (void) unfd;
@@ -169,7 +169,7 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
     snprintf(_path, PATH_MAX, "/proc/self/fd/%d", h.native_handle().fd);
     if(-1 == ::linkat(AT_FDCWD, _path, base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, AT_SYMLINK_FOLLOW))
     {
-      return {errno, std::system_category()};
+      return posix_error();
     }
     h._flags &= ~handle::flag::anonymous_inode;
     return success();
@@ -189,17 +189,17 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
     if(-1 != ::renameat2(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, RENAME_NOREPLACE))
       return success();
     if(EEXIST == errno)
-      return {errno, std::system_category()};
+      return posix_error();
 #endif
     // Otherwise we need to use linkat followed by renameat (non-atomic)
     if(-1 == ::linkat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, 0))
     {
-      return {errno, std::system_category()};
+      return posix_error();
     }
   }
   if(-1 == ::renameat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer))
   {
-    return {errno, std::system_category()};
+    return posix_error();
   }
   return success();
 }
@@ -217,7 +217,7 @@ result<void> fs_handle::unlink(deadline d) noexcept
   OUTCOME_TRY(dirh, containing_directory(std::ref(filename), h, *this, d));
   if(-1 == ::unlinkat(dirh.native_handle().fd, filename.c_str(), h.is_directory() ? AT_REMOVEDIR : 0))
   {
-    return {errno, std::system_category()};
+    return posix_error();
   }
   return success();
 }

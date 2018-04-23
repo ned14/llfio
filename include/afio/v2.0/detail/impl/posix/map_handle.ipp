@@ -103,7 +103,7 @@ result<section_handle::extent_type> section_handle::length() const noexcept
   memset(&s, 0, sizeof(s));
   if(-1 == ::fstat(_v.fd, &s))
   {
-    return {errno, std::system_category()};
+    return posix_error();
   }
   return s.st_size;
 }
@@ -115,7 +115,7 @@ result<section_handle::extent_type> section_handle::truncate(extent_type newsize
   {
     if(-1 == ::ftruncate(_anonymous.native_handle().fd, newsize))
     {
-      return {errno, std::system_category()};
+      return posix_error();
     }
   }
   return newsize;
@@ -151,7 +151,7 @@ result<void> map_handle::close() noexcept
     // printf("%d munmap %p-%p\n", getpid(), _addr, _addr+_length);
     if(-1 == ::munmap(_addr, _length))
     {
-      return {errno, std::system_category()};
+      return posix_error();
     }
   }
   // We don't want ~handle() to close our borrowed handle
@@ -202,7 +202,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
   int flags = (wait_for_device || and_metadata) ? MS_SYNC : MS_ASYNC;
   if(-1 == ::msync(addr, bytes, flags))
   {
-    return {errno, std::system_category()};
+    return posix_error();
   }
   // Don't fsync temporary inodes
   if((_section->backing() != nullptr) && (wait_for_device || and_metadata))
@@ -270,14 +270,14 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
   // printf("%d mmap %p-%p\n", getpid(), addr, (char *) addr+bytes);
   if(MAP_FAILED == addr)  // NOLINT
   {
-    return {errno, std::system_category()};
+    return posix_error();
   }
 #if 0  // not implemented yet, not seen any benefit over setting this at the fd level
   if(have_backing && ((flags & map_handle::flag::disable_prefetching) || (flags & map_handle::flag::maximum_prefetching)))
   {
     int advice = (flags & map_handle::flag::disable_prefetching) ? MADV_RANDOM : MADV_SEQUENTIAL;
     if(-1 == ::madvise(addr, bytes, advice))
-      return {errno, std::system_category()};
+      return posix_error();
   }
 #endif
   return addr;
@@ -338,7 +338,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
   {
     if(-1 == ::munmap(_addr, _length))
     {
-      return {errno, std::system_category()};
+      return posix_error();
     }
     _addr = nullptr;
     _reservation = 0;
@@ -358,7 +358,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
   void *newaddr = ::mremap(_addr, _reservation, newsize, permit_relocation ? MREMAP_MAYMOVE : 0);
   if(MAP_FAILED == newaddr)
   {
-    return {errno, std::system_category()};
+    return posix_error();
   }
   _addr = static_cast<byte *>(newaddr);
   _reservation = newsize;
@@ -393,7 +393,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
   // Shrink the map
   if(-1 == ::munmap(_addr + newsize, _length - newsize))
   {
-    return {errno, std::system_category()};
+    return posix_error();
   }
   _reservation = newsize;
   _length = (length - _offset < newsize) ? (length - _offset) : newsize;
@@ -416,7 +416,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
   // Tell the kernel we will be using these pages soon
   if(-1 == ::madvise(region.data, region.len, MADV_WILLNEED))
   {
-    return {errno, std::system_category()};
+    return posix_error();
   }
   return region;
 }
@@ -432,7 +432,7 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
   // Tell the kernel to kick these pages into storage
   if(-1 == ::madvise(region.data, region.len, MADV_DONTNEED))
   {
-    return {errno, std::system_category()};
+    return posix_error();
   }
   // Set permissions on the pages to no access
   extent_type offset = _offset + (region.data - _addr);
@@ -470,7 +470,7 @@ result<span<map_handle::buffer_type>> map_handle::prefetch(span<buffer_type> reg
   {
     if(-1 == ::madvise(region.data, region.len, MADV_WILLNEED))
     {
-      return {errno, std::system_category()};
+      return posix_error();
     }
   }
   return regions;

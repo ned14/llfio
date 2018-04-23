@@ -492,9 +492,6 @@ AFIO_V2_NAMESPACE_END
 
 AFIO_V2_NAMESPACE_BEGIN
 
-//! Choose an errc implementation
-using std::errc;
-
 /*! \struct error_info
 \brief The cause of the failure of an operation in AFIO.
 */
@@ -517,11 +514,6 @@ public:
 
   //! Default constructor
   error_info() = default;
-  //! Construct from a code and error category
-  error_info(int code, const std::error_category &cat)
-      : error_info(std::error_code(code, cat))
-  {
-  }
   // Explicit construction from an error code
   explicit inline error_info(std::error_code _ec);  // NOLINT
   /* NOTE TO SELF: The error_info constructor implementation is in handle.hpp as we need that
@@ -636,13 +628,29 @@ template <class T> using result = OUTCOME_V2_NAMESPACE::result<T, error_info>;
 template <class T> using outcome = OUTCOME_V2_NAMESPACE::outcome<T, error_info>;
 using OUTCOME_V2_NAMESPACE::success;
 using OUTCOME_V2_NAMESPACE::failure;
-inline error_info error_from_exception(std::exception_ptr &&ep = std::current_exception(), std::error_code not_matched = std::make_error_code(errc::resource_unavailable_try_again)) noexcept
+inline error_info error_from_exception(std::exception_ptr &&ep = std::current_exception(), std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept
 {
   return error_info(OUTCOME_V2_NAMESPACE::error_from_exception(std::move(ep), not_matched));
 }
 using OUTCOME_V2_NAMESPACE::in_place_type;
 
 static_assert(OUTCOME_V2_NAMESPACE::trait::has_error_code_v<error_info>, "error_info is not detected to be an error code");
+
+//! Choose an errc implementation
+using std::errc;
+
+//! Helper for constructing an error info from an errc
+inline error_info generic_error(errc c)
+{
+  return error_info(make_error_code(c));
+}
+#ifndef _WIN32
+//! Helper for constructing an error info from a POSIX errno
+inline error_info posix_error(int c = errno)
+{
+  return error_info(std::error_code(c, std::system_category()));
+}
+#endif
 
 AFIO_V2_NAMESPACE_END
 #endif

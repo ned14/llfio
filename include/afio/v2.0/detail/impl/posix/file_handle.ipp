@@ -46,7 +46,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   }
   if(-1 == nativeh.fd)
   {
-    return {errno, std::system_category()};
+    return posix_error();
   }
   if((flags & flag::disable_prefetching) || (flags & flag::maximum_prefetching))
   {
@@ -54,13 +54,13 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
     int advice = (flags & flag::disable_prefetching) ? POSIX_FADV_RANDOM : (POSIX_FADV_SEQUENTIAL | POSIX_FADV_WILLNEED);
     if(-1 == ::posix_fadvise(nativeh.fd, 0, 0, advice))
     {
-      return {errno, std::system_category()};
+      return posix_error();
     }
 #elif __APPLE__
     int advice = (flags & flag::disable_prefetching) ? 0 : 1;
     if(-1 == ::fcntl(nativeh.fd, F_RDAHEAD, advice))
     {
-      return {errno, std::system_category()};
+      return posix_error();
     }
 #endif
   }
@@ -116,12 +116,12 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
       {
         continue;
       }
-      return {errcode, std::system_category()};
+      return posix_error(errcode);
     }
     // Immediately unlink after creation
     if(-1 == ::unlinkat(dirh.native_handle().fd, random.c_str(), 0))
     {
-      return {errno, std::system_category()};
+      return posix_error();
     }
     ret.value()._flags &= ~flag::unlink_on_close;
     return ret;
@@ -159,7 +159,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
   {
     if(-1 == ::fdatasync(_v.fd))
     {
-      return {errno, std::system_category()};
+      return posix_error();
     }
     return {reqs.buffers};
   }
@@ -169,16 +169,16 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
   {
     // OS X fsync doesn't wait for the device to flush its buffers
     if(-1 == ::fsync(_v.fd))
-      return {errno, std::system_category()};
+      return posix_error();
     return {std::move(reqs.buffers)};
   }
   // This is the fsync as on every other OS
   if(-1 == ::fcntl(_v.fd, F_FULLFSYNC))
-    return {errno, std::system_category()};
+    return posix_error();
 #else
   if(-1 == ::fsync(_v.fd))
   {
-    return {errno, std::system_category()};
+    return posix_error();
   }
 #endif
   return {reqs.buffers};
@@ -196,7 +196,7 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
     ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC);
     if(-1 == ret.value()._v.fd)
     {
-      return {errno, std::system_category()};
+      return posix_error();
     }
     if(caching_ == caching::unchanged)
     {
@@ -226,7 +226,7 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
         ;
         if(-1 == fcntl(ret.value()._v.fd, F_SETFL, attribs))
         {
-          return {errno, std::system_category()};
+          return posix_error();
         }
         ret.value()._v.behaviour |= native_handle_type::disposition::aligned_io;
         break;
@@ -236,7 +236,7 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
 #endif
         if(-1 == fcntl(ret.value()._v.fd, F_SETFL, attribs))
         {
-          return {errno, std::system_category()};
+          return posix_error();
         }
         ret.value()._v.behaviour |= native_handle_type::disposition::aligned_io;
         break;
@@ -244,7 +244,7 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
         attribs |= O_SYNC;
         if(-1 == fcntl(ret.value()._v.fd, F_SETFL, attribs))
         {
-          return {errno, std::system_category()};
+          return posix_error();
         }
         ret.value()._v.behaviour &= ~native_handle_type::disposition::aligned_io;
         break;
@@ -256,7 +256,7 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
 #endif
         if(-1 == fcntl(ret.value()._v.fd, F_SETFL, attribs))
         {
-          return {errno, std::system_category()};
+          return posix_error();
         }
         ret.value()._v.behaviour &= ~native_handle_type::disposition::aligned_io;
         break;
@@ -265,7 +265,7 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
       case caching::temporary:
         if(-1 == fcntl(ret.value()._v.fd, F_SETFL, attribs))
         {
-          return {errno, std::system_category()};
+          return posix_error();
         }
         ret.value()._v.behaviour &= ~native_handle_type::disposition::aligned_io;
         break;
@@ -337,7 +337,7 @@ result<file_handle::extent_type> file_handle::maximum_extent() const noexcept
   memset(&s, 0, sizeof(s));
   if(-1 == ::fstat(_v.fd, &s))
   {
-    return {errno, std::system_category()};
+    return posix_error();
   }
   return s.st_size;
 }
@@ -347,7 +347,7 @@ result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type 
   AFIO_LOG_FUNCTION_CALL(this);
   if(ftruncate(_v.fd, newsize) < 0)
   {
-    return {errno, std::system_category()};
+    return posix_error();
   }
   if(are_safety_fsyncs_issued())
   {
@@ -411,7 +411,7 @@ result<std::vector<std::pair<file_handle::extent_type, file_handle::extent_type>
       }
       else
       {
-        return {errno, std::system_category()};
+        return posix_error();
       }
     }
 #if 0
@@ -445,7 +445,7 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_type offs
     // The filing system may not support trim
     if(EOPNOTSUPP != errno)
     {
-      return {errno, std::system_category()};
+      return posix_error();
     }
   }
 #endif

@@ -96,7 +96,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
       {
         if(errcode)
         {
-          result = error_info(static_cast<int>(errcode), std::system_category());
+          result = posix_error(static_cast<int>(errcode));
         }
         else
         {
@@ -311,7 +311,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
   {
     service()->_aiocbsv.resize(service()->_aiocbsv.size() - items);
     state->items_to_go = 0;
-    state->result.write = {errno, std::system_category()};
+    state->result.write = posix_error();
     (*state->completion)(state);
     return success(std::move(_state));
   }

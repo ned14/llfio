@@ -68,7 +68,7 @@ result<handle::path_type> handle::current_path() const noexcept
     ssize_t len;
     if((len = readlink(in, out, 32768)) == -1)
     {
-      return { errno, std::system_category() };
+      return posix_error();
     }
     ret.resize(len);
     // Linux prepends or appends a " (deleted)" when a fd is nameless
@@ -82,7 +82,7 @@ result<handle::path_type> handle::current_path() const noexcept
     char *out = const_cast<char *>(ret.data());
     // Yes, this API is instant memory corruption. Thank you Apple.
     if(-1 == fcntl(_v.fd, F_GETPATH, out))
-      return {errno, std::system_category()};
+      return posix_error();
     ret.resize(strchr(out, 0) - out);  // no choice :(
     // Apple returns the previous path when deleted, so lstat to be sure
     struct stat ls;
@@ -96,10 +96,10 @@ result<handle::path_type> handle::current_path() const noexcept
     size_t len;
     int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_FILEDESC, getpid()};
     if(-1 == sysctl(mib, 4, NULL, &len, NULL, 0))
-      return {errno, std::system_category()};
+      return posix_error();
     std::vector<char> buffer(len * 2);
     if(-1 == sysctl(mib, 4, buffer.data(), &len, NULL, 0))
-      return {errno, std::system_category()};
+      return posix_error();
 #if 0  // ndef NDEBUG
     for (char *p = buffer.data(); p<buffer.data() + len;)
     {
@@ -138,12 +138,12 @@ result<void> handle::close() noexcept
     {
       if(-1 == fsync(_v.fd))
       {
-        return { errno, std::system_category() };
+        return posix_error();
       }
     }
     if(-1 == ::close(_v.fd))
     {
-      return { errno, std::system_category() };
+      return posix_error();
     }
     _v = native_handle_type();
   }
@@ -158,7 +158,7 @@ result<handle> handle::clone() const noexcept
   ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC);
   if(-1 == ret.value()._v.fd)
   {
-    return { errno, std::system_category() };
+    return posix_error();
   }
   return ret;
 }
@@ -169,7 +169,7 @@ result<void> handle::set_append_only(bool enable) noexcept
   int attribs = ::fcntl(_v.fd, F_GETFL);
   if(-1 == attribs)
   {
-    return { errno, std::system_category() };
+    return posix_error();
   }
   if(enable)
   {
@@ -177,7 +177,7 @@ result<void> handle::set_append_only(bool enable) noexcept
     attribs |= O_APPEND;
     if(-1 == ::fcntl(_v.fd, F_SETFL, attribs))
     {
-      return { errno, std::system_category() };
+      return posix_error();
     }
     _v.behaviour |= native_handle_type::disposition::append_only;
   }
@@ -187,7 +187,7 @@ result<void> handle::set_append_only(bool enable) noexcept
     attribs &= ~O_APPEND;
     if(-1 == ::fcntl(_v.fd, F_SETFL, attribs))
     {
-      return { errno, std::system_category() };
+      return posix_error();
     }
     _v.behaviour &= ~native_handle_type::disposition::append_only;
   }

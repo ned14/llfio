@@ -385,7 +385,7 @@ namespace algorithm
           };
           if(-1 == ::fstatat(base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, &s, AT_SYMLINK_NOFOLLOW))
           {
-            return {errno, std::system_category()};
+            return posix_error();
           }
           threaded_byte_ranges_list::key_type key;
           key.as_longlongs[0] = s.st_ino;

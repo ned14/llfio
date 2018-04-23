@@ -43,7 +43,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
   memset(&s, 0, sizeof(s));
   if(-1 == fstatfs64(h.native_handle().fd, &s))
   {
-    return {errno, std::system_category()};
+    return posix_error();
   }
   if(!!(wanted & want::bsize))
   {
@@ -117,7 +117,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
         }
         if(mtab == nullptr)
         {
-          return {errno, std::system_category()};
+          return posix_error();
         }
         auto unmtab = undoer([mtab] { endmntent(mtab); });
         struct mntent m
@@ -204,7 +204,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
 #else
   struct statfs s;
   if(-1 == fstatfs(h.native_handle().fd, &s))
-    return {errno, std::system_category()};
+    return posix_error();
   if(!!(wanted & want::flags))
   {
     f_flags.rdonly = !!(s.f_flags & MNT_RDONLY);

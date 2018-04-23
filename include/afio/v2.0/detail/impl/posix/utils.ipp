@@ -156,13 +156,13 @@ namespace utils
     int h = ::open("/proc/sys/vm/drop_caches", O_WRONLY | O_CLOEXEC);
     if(h == -1)
     {
-      return {errno, std::system_category()};
+      return posix_error();
     }
     auto unh = undoer([&h] { ::close(h); });
     char v = '3';  // drop everything
     if(-1 == ::write(h, &v, 1))
     {
-      return {errno, std::system_category()};
+      return posix_error();
     }
     return success();
 #endif

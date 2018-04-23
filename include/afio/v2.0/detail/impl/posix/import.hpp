@@ -81,15 +81,15 @@ inline result<int> attribs_from_handle_mode_caching_and_flags(native_handle_type
   case handle::caching::none:
     attribs |= O_SYNC
 #ifdef O_DIRECT
-      | O_DIRECT;
+               | O_DIRECT;
 #else
-      ;
+    ;
 #endif
     nativeh.behaviour |= native_handle_type::disposition::aligned_io;
     break;
   case handle::caching::only_metadata:
 #ifdef O_DIRECT
-      attribs |= O_DIRECT;
+    attribs |= O_DIRECT;
 #endif
     nativeh.behaviour |= native_handle_type::disposition::aligned_io;
     break;
