@@ -99,7 +99,7 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
         {
           continue;
         }
-        return {static_cast<int>(ntstat), ntkernel_category()};
+        return ntkernel_error(ntstat);
       }
       auto unnh = undoer([nh] { CloseHandle(nh); });
       (void) unnh;
@@ -139,7 +139,7 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
     UNICODE_STRING NtPath{};
     if(RtlDosPathNameToNtPathName_U(zpath.buffer, &NtPath, nullptr, nullptr) == 0u)
     {
-      return {ERROR_FILE_NOT_FOUND, std::system_category()};
+      return win32_error(ERROR_FILE_NOT_FOUND);
     }
     auto unntpath = undoer([&NtPath] {
       if(HeapFree(GetProcessHeap(), 0, NtPath.Buffer) == 0)
@@ -175,7 +175,7 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
   }
   if(ntstat < 0)
   {
-    return {static_cast<int>(ntstat), ntkernel_category()};
+    return ntkernel_error(ntstat);
   }
   return success();
 }
@@ -244,7 +244,7 @@ result<void> fs_handle::unlink(deadline d) noexcept
     }
     if(ntstat < 0)
     {
-      return {static_cast<int>(ntstat), ntkernel_category()};
+      return ntkernel_error(ntstat);
     }
   }
   return success();

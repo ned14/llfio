@@ -90,7 +90,7 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
 #endif
     if(!syscall(nativeh.h, req.data, static_cast<DWORD>(req.len), &transferred, &ol) && ERROR_IO_PENDING != GetLastError())
     {
-      return {GetLastError(), std::system_category()};
+      return win32_error();
     }
     reqs.offset += req.len;
   }
@@ -114,7 +114,7 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
     ols[n].Internal = ols[n].Internal & 0xffffffff;
     if(ols[n].Internal != 0)
     {
-      return {static_cast<int>(ols[n].Internal), ntkernel_category()};
+      return ntkernel_error(static_cast<NTSTATUS>(ols[n].Internal));
     }
     reqs.buffers[n].len = ols[n].InternalHigh;
   }
@@ -161,7 +161,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
     }
     if(ERROR_IO_PENDING != GetLastError())
     {
-      return {GetLastError(), std::system_category()};
+      return win32_error();
     }
   }
   // If handle is overlapped, wait for completion of each i/o.
@@ -175,7 +175,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
     ol.Internal = ol.Internal & 0xffffffff;
     if(ol.Internal != 0)
     {
-      return {static_cast<int>(ol.Internal), ntkernel_category()};
+      return ntkernel_error(static_cast<NTSTATUS>(ol.Internal));
     }
   }
   return extent_guard(this, offset, bytes, exclusive);
@@ -195,7 +195,7 @@ void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type byt
   {
     if(ERROR_IO_PENDING != GetLastError())
     {
-      auto ret = std::error_code{static_cast<int>(GetLastError()), std::system_category()};
+      auto ret = win32_error();
       (void) ret;
       AFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
       std::terminate();
@@ -209,7 +209,7 @@ void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type byt
     {
       // It seems the NT kernel is guilty of casting bugs sometimes
       ol.Internal = ol.Internal & 0xffffffff;
-      auto ret = std::error_code(static_cast<int>(ol.Internal), ntkernel_category());
+      auto ret = ntkernel_error(static_cast<NTSTATUS>(ol.Internal));
       (void) ret;
       AFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
       std::terminate();

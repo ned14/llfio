@@ -58,7 +58,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
     }
     if(ntstat < 0)
     {
-      return {static_cast<int>(ntstat), ntkernel_category()};
+      return ntkernel_error(ntstat);
     }
   }
   else
@@ -72,7 +72,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
       }
       if(ntstat < 0)
       {
-        return {static_cast<int>(ntstat), ntkernel_category()};
+        return ntkernel_error(ntstat);
       }
     }
     if(needBasic)
@@ -85,7 +85,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
       }
       if(ntstat < 0)
       {
-        return {static_cast<int>(ntstat), ntkernel_category()};
+        return ntkernel_error(ntstat);
       }
     }
     if(needStandard)
@@ -98,7 +98,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
       }
       if(ntstat < 0)
       {
-        return {static_cast<int>(ntstat), ntkernel_category()};
+        return ntkernel_error(ntstat);
       }
     }
   }
@@ -112,7 +112,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
     }
     if(ntstat < 0)
     {
-      return {static_cast<int>(ntstat), ntkernel_category()};
+      return ntkernel_error(ntstat);
     }
   }
 
@@ -123,7 +123,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
     DWORD len = GetFinalPathNameByHandle(h.native_handle().h, buffer_, sizeof(buffer_) / sizeof(*buffer_), VOLUME_NAME_NT);
     if((len == 0u) || len >= sizeof(buffer_) / sizeof(*buffer_))
     {
-      return {GetLastError(), std::system_category()};
+      return win32_error();
     }
     buffer_[len] = 0;
     if(memcmp(buffer_, L"\\Device\\HarddiskVolume", 44) != 0)
@@ -151,7 +151,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
       memset(rpd, 0, sizeof(*rpd));
       if(DeviceIoControl(h.native_handle().h, FSCTL_GET_REPARSE_POINT, nullptr, 0, rpd, sizeof(buffer_), &written, nullptr) == 0)
       {
-        return {GetLastError(), std::system_category()};
+        return win32_error();
       }
       ReparsePointTag = rpd->ReparseTag;
     }

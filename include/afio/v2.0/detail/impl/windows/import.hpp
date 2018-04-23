@@ -60,7 +60,16 @@ Distributed under the Boost Software License, Version 1.0.
 
 AFIO_V2_NAMESPACE_BEGIN
 
-using ntkernel_error_category::ntkernel_category;
+//! Helper for constructing an error info from a DWORD
+inline error_info win32_error(DWORD c = GetLastError())
+{
+  return error_info(std::error_code(c, std::system_category()));
+}
+//! Helper for constructing an error info from a NTSTATUS
+inline error_info ntkernel_error(NTSTATUS c)
+{
+  return error_info(std::error_code(c, ntkernel_error_category::ntkernel_category()));
+}
 
 namespace windows_nt_kernel
 {
@@ -989,12 +998,12 @@ if(d)                                                                           
     if((d).steady)                                                                                                                                                                                                                                                                                                             \
     {                                                                                                                                                                                                                                                                                                                          \
       if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))                                                                                                                                                                                                                             \
-        return make_errored_result<type>(errc::timed_out);                                                                                                                                                                                                                                                                \
+        return make_errored_result<type>(errc::timed_out);                                                                                                                                                                                                                                                                     \
     }                                                                                                                                                                                                                                                                                                                          \
     else                                                                                                                                                                                                                                                                                                                       \
     {                                                                                                                                                                                                                                                                                                                          \
       if(std::chrono::system_clock::now() >= end_utc)                                                                                                                                                                                                                                                                          \
-        return make_errored_result<type>(errc::timed_out);                                                                                                                                                                                                                                                                \
+        return make_errored_result<type>(errc::timed_out);                                                                                                                                                                                                                                                                     \
     }                                                                                                                                                                                                                                                                                                                          \
   \
 }
@@ -1063,12 +1072,12 @@ if(d)                                                                           
     if((d).steady)                                                                                                                                                                                                                                                                                                             \
     {                                                                                                                                                                                                                                                                                                                          \
       if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))                                                                                                                                                                                                                             \
-        return errc::timed_out;                                                                                                                                                                                                                                                                                           \
+        return errc::timed_out;                                                                                                                                                                                                                                                                                                \
     }                                                                                                                                                                                                                                                                                                                          \
     else                                                                                                                                                                                                                                                                                                                       \
     {                                                                                                                                                                                                                                                                                                                          \
       if(std::chrono::system_clock::now() >= end_utc)                                                                                                                                                                                                                                                                          \
-        return errc::timed_out;                                                                                                                                                                                                                                                                                           \
+        return errc::timed_out;                                                                                                                                                                                                                                                                                                \
     }                                                                                                                                                                                                                                                                                                                          \
   \
 }

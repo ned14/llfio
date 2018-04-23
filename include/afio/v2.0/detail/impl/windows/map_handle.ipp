@@ -148,7 +148,7 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   NTSTATUS ntstat = NtCreateSection(&h, SECTION_ALL_ACCESS, poa, pmaximum_size, prot, attribs, backing.native_handle().h);
   if(ntstat < 0)
   {
-    return {static_cast<int>(ntstat), ntkernel_category()};
+    return ntkernel_error(ntstat);
   }
   nativeh.h = h;
   return ret;
@@ -220,7 +220,7 @@ result<section_handle> section_handle::section(extent_type bytes, const path_han
   NTSTATUS ntstat = NtCreateSection(&h, SECTION_ALL_ACCESS, nullptr, pmaximum_size, prot, attribs, anonh.native_handle().h);
   if(ntstat < 0)
   {
-    return {static_cast<int>(ntstat), ntkernel_category()};
+    return ntkernel_error(ntstat);
   }
   nativeh.h = h;
   return ret;
@@ -235,7 +235,7 @@ result<section_handle::extent_type> section_handle::length() const noexcept
   NTSTATUS ntstat = NtQuerySection(_v.h, SectionBasicInformation, &sbi, sizeof(sbi), nullptr);
   if(STATUS_SUCCESS != ntstat)
   {
-    return {static_cast<int>(ntstat), ntkernel_category()};
+    return ntkernel_error(ntstat);
   }
   return sbi.MaximumSize.QuadPart;
 }
@@ -262,7 +262,7 @@ result<section_handle::extent_type> section_handle::truncate(extent_type newsize
   NTSTATUS ntstat = NtExtendSection(_v.h, &_maximum_size);
   if(STATUS_SUCCESS != ntstat)
   {
-    return {static_cast<int>(ntstat), ntkernel_category()};
+    return ntkernel_error(ntstat);
   }
   return newsize;
 }
@@ -355,7 +355,7 @@ static inline result<void> win32_release_allocations(byte *addr, size_t bytes, U
     NTSTATUS ntstat = NtFreeVirtualMemory(GetCurrentProcess(), &regionbase, &regionsize, op);
     if(ntstat < 0)
     {
-      return {ntstat, ntkernel_category()};
+      return ntkernel_error(ntstat);
     }
     addr += regionsize;
     assert(regionsize <= bytes);
@@ -395,7 +395,7 @@ result<void> map_handle::close() noexcept
         NTSTATUS ntstat = NtUnmapViewOfSection(GetCurrentProcess(), addr);
         if(ntstat < 0)
         {
-          return {ntstat, ntkernel_category()};
+          return ntkernel_error(ntstat);
         }
         return success();
       }));
@@ -453,7 +453,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
   OUTCOME_TRYV(win32_maps_apply(addr, bytes, [](byte *addr, size_t bytes) -> result<void> {
     if(FlushViewOfFile(addr, static_cast<SIZE_T>(bytes)) == 0)
     {
-      return {GetLastError(), std::system_category()};
+      return win32_error();
     }
     return success();
   }));
@@ -481,7 +481,7 @@ result<map_handle> map_handle::map(size_type bytes, section_handle::flag _flag) 
   addr = VirtualAlloc(nullptr, bytes, allocation, prot);
   if(addr == nullptr)
   {
-    return {GetLastError(), std::system_category()};
+    return win32_error();
   }
   ret.value()._addr = static_cast<byte *>(addr);
   ret.value()._reservation = bytes;
@@ -525,7 +525,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   NTSTATUS ntstat = NtMapViewOfSection(section.native_handle().h, GetCurrentProcess(), &addr, 0, commitsize, &_offset, &_bytes, ViewUnmap, allocation, prot);
   if(ntstat < 0)
   {
-    return {static_cast<int>(ntstat), ntkernel_category()};
+    return ntkernel_error(ntstat);
   }
   ret.value()._addr = static_cast<byte *>(addr);
   ret.value()._offset = offset;
@@ -590,7 +590,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool /* un
     win32_map_flags(nativeh, allocation, prot, commitsize, true, _flag);
     if(!VirtualAlloc(_addr + _reservation, newsize - _reservation, allocation, prot))
     {
-      return {GetLastError(), std::system_category()};
+      return win32_error();
     }
     _reservation = _length = newsize;
     return _reservation;
@@ -605,7 +605,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool /* un
       NTSTATUS ntstat = NtUnmapViewOfSection(GetCurrentProcess(), addr);
       if(ntstat < 0)
       {
-        return {ntstat, ntkernel_category()};
+        return ntkernel_error(ntstat);
       }
       return success();
     }));
@@ -625,7 +625,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool /* un
   NTSTATUS ntstat = NtMapViewOfSection(_section->native_handle().h, GetCurrentProcess(), &addr, 0, commitsize, &offset, &_bytes, ViewUnmap, allocation, prot);
   if(ntstat < 0)
   {
-    return {static_cast<int>(ntstat), ntkernel_category()};
+    return ntkernel_error(ntstat);
   }
   _reservation += _bytes;
   _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
@@ -646,7 +646,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
       DWORD _ = 0;
       if(VirtualProtect(addr, bytes, PAGE_NOACCESS, &_) == 0)
       {
-        return {GetLastError(), std::system_category()};
+        return win32_error();
       }
       return success();
     }));
@@ -672,7 +672,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
   OUTCOME_TRYV(win32_maps_apply(region.data, region.len, [prot](byte *addr, size_t bytes) -> result<void> {
     if(VirtualAlloc(addr, bytes, MEM_COMMIT, prot) == nullptr)
     {
-      return {GetLastError(), std::system_category()};
+      return win32_error();
     }
     return success();
   }));
@@ -690,7 +690,7 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
   OUTCOME_TRYV(win32_maps_apply(region.data, region.len, [](byte *addr, size_t bytes) -> result<void> {
     if(VirtualFree(addr, bytes, MEM_DECOMMIT) == 0)
     {
-      return {GetLastError(), std::system_category()};
+      return win32_error();
     }
     return success();
   }));
@@ -716,7 +716,7 @@ result<void> map_handle::zero_memory(buffer_type region) noexcept
       OUTCOME_TRYV(win32_maps_apply(region.data, region.len, [](byte *addr, size_t bytes) -> result<void> {
         if(DiscardVirtualMemory_(addr, bytes) == 0)
         {
-          return {GetLastError(), std::system_category()};
+          return win32_error();
         }
         return success();
       }));
@@ -737,7 +737,7 @@ result<span<map_handle::buffer_type>> map_handle::prefetch(span<buffer_type> reg
   auto wmre = reinterpret_cast<PWIN32_MEMORY_RANGE_ENTRY>(regions.data());
   if(PrefetchVirtualMemory_(GetCurrentProcess(), regions.size(), wmre, 0) == 0)
   {
-    return {GetLastError(), std::system_category()};
+    return win32_error();
   }
   return regions;
 }
@@ -761,7 +761,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
       OUTCOME_TRYV(win32_maps_apply(region.data, region.len, [](byte *addr, size_t bytes) -> result<void> {
         if(DiscardVirtualMemory_(addr, bytes) == 0)
         {
-          return {GetLastError(), std::system_category()};
+          return win32_error();
         }
         return success();
       }));
@@ -771,7 +771,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
     OUTCOME_TRYV(win32_maps_apply(region.data, region.len, [](byte *addr, size_t bytes) -> result<void> {
       if(VirtualAlloc(addr, bytes, MEM_RESET, 0) == nullptr)
       {
-        return {GetLastError(), std::system_category()};
+        return win32_error();
       }
       return success();
     }));

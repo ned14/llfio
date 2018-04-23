@@ -67,7 +67,7 @@ namespace storage_profile
           }
           if(RtlGetVersion == nullptr)
           {
-            return {GetLastError(), std::system_category()};
+            return win32_error();
           }
           RtlGetVersion(&ovi);
           sp.os_name.value = "Microsoft Windows ";
@@ -128,13 +128,13 @@ namespace storage_profile
             GetLogicalProcessorInformation(nullptr, &size);
             if(ERROR_INSUFFICIENT_BUFFER != GetLastError())
             {
-              return {GetLastError(), std::system_category()};
+              return win32_error();
             }
 
             std::vector<SYSTEM_LOGICAL_PROCESSOR_INFORMATION> buffer(size);
             if(GetLogicalProcessorInformation(&buffer.front(), &size) == FALSE)
             {
-              return {GetLastError(), std::system_category()};
+              return win32_error();
             }
 
             const size_t Elements = size / sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION);
@@ -241,12 +241,12 @@ namespace storage_profile
               NTSTATUS ntstat = ntwait(volumeh.native_handle().h, ol, deadline());
               if(ntstat != 0)
               {
-                return {ntstat, ntkernel_category()};
+                return ntkernel_error(ntstat);
               }
             }
             if(ERROR_SUCCESS != GetLastError())
             {
-              return {GetLastError(), std::system_category()};
+              return win32_error();
             }
           }
           switch(sad->BusType)
@@ -322,12 +322,12 @@ namespace storage_profile
               NTSTATUS ntstat = ntwait(volumeh.native_handle().h, ol, deadline());
               if(ntstat != 0)
               {
-                return {ntstat, ntkernel_category()};
+                return ntkernel_error(ntstat);
               }
             }
             if(ERROR_SUCCESS != GetLastError())
             {
-              return {GetLastError(), std::system_category()};
+              return win32_error();
             }
           }
           DWORD disk_extents = vde->NumberOfDiskExtents;
@@ -363,12 +363,12 @@ namespace storage_profile
                 NTSTATUS ntstat = ntwait(volumeh.native_handle().h, ol, deadline());
                 if(ntstat != 0)
                 {
-                  return {ntstat, ntkernel_category()};
+                  return ntkernel_error(ntstat);
                 }
               }
               if(ERROR_SUCCESS != GetLastError())
               {
-                return {GetLastError(), std::system_category()};
+                return win32_error();
               }
             }
             if(sdd->VendorIdOffset > 0 && sdd->VendorIdOffset < sizeof(buffer))
@@ -416,12 +416,12 @@ namespace storage_profile
                 NTSTATUS ntstat = ntwait(volumeh.native_handle().h, ol, deadline());
                 if(ntstat != 0)
                 {
-                  return {ntstat, ntkernel_category()};
+                  return ntkernel_error(ntstat);
                 }
               }
               if(ERROR_SUCCESS != GetLastError())
               {
-                return {GetLastError(), std::system_category()};
+                return win32_error();
               }
             }
             sp.device_size.value = dg->DiskSize.QuadPart;

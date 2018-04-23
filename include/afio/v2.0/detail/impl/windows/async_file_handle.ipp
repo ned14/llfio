@@ -59,7 +59,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
       {
         if(errcode)
         {
-          result = error_info{errcode, std::system_category()};
+          result = win32_error(errcode);
         }
         else
         {
@@ -189,7 +189,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
     if(!ioroutine(_v.h, const_cast<byte *>(out[n].data), static_cast<DWORD>(out[n].len), ol, handle_completion::Do))
     {
       --state->items_to_go;
-      state->result.write = {GetLastError(), std::system_category()};
+      state->result.write = win32_error();
       // Fire completion now if we didn't schedule anything
       if(!n)
       {

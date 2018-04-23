@@ -54,7 +54,7 @@ result<handle::path_type> handle::current_path() const noexcept
     DWORD len = GetFinalPathNameByHandle(_v.h, _buffer + 3, (DWORD)(buffer.size() - 4 * sizeof(wchar_t)), VOLUME_NAME_NT);  // NOLINT
     if(len == 0)
     {
-      return {GetLastError(), std::system_category()};
+      return win32_error();
     }
     buffer.resize(3 + len);
     return path_type(buffer);
@@ -74,12 +74,12 @@ result<void> handle::close() noexcept
     {
       if(FlushFileBuffers(_v.h) == 0)
       {
-        return {GetLastError(), std::system_category()};
+        return win32_error();
       }
     }
     if(CloseHandle(_v.h) == 0)
     {
-      return {GetLastError(), std::system_category()};
+      return win32_error();
     }
     _v = native_handle_type();
   }
@@ -93,7 +93,7 @@ result<handle> handle::clone() const noexcept
   ret.value()._v.behaviour = _v.behaviour;
   if(DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, 0, DUPLICATE_SAME_ACCESS) == 0)
   {
-    return {GetLastError(), std::system_category()};
+    return win32_error();
   }
   return ret;
 }

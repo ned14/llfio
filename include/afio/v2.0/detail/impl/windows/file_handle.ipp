@@ -91,7 +91,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
     }
     if(ntstat < 0)
     {
-      return {static_cast<int>(ntstat), ntkernel_category()};
+      return ntkernel_error(ntstat);
     }
     switch(_creation)
     {
@@ -131,7 +131,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
     {
       DWORD errcode = GetLastError();
       // assert(false);
-      return {static_cast<int>(errcode), std::system_category()};
+      return win32_error(errcode);
     }
     switch(_creation)
     {
@@ -158,7 +158,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
 #if AFIO_LOGGING_LEVEL >= 3
       DWORD errcode = GetLastError();
       AFIO_LOG_WARN(&ret, "Failed to set file to sparse");
-      result<void> r{errcode, std::system_category()};
+      result<void> r = win32_error(errcode);
       (void) r;  // throw away
 #endif
     }
@@ -239,7 +239,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
       }
       if(ntstat < 0 && ntstat != static_cast<NTSTATUS>(0xC0000035L) /*STATUS_OBJECT_NAME_COLLISION*/)
       {
-        return {static_cast<int>(ntstat), ntkernel_category()};
+        return ntkernel_error(ntstat);
       }
     }
     // std::cerr << random << std::endl;
@@ -303,7 +303,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
   }
   if(ntstat < 0)
   {
-    return {static_cast<int>(ntstat), ntkernel_category()};
+    return ntkernel_error(ntstat);
   }
   return {reqs.buffers};
 }
@@ -319,7 +319,7 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline /*
     ret.value()._v.behaviour = _v.behaviour;
     if(DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, 0, DUPLICATE_SAME_ACCESS) == 0)
     {
-      return {GetLastError(), std::system_category()};
+      return win32_error();
     }
     return ret;
   }
@@ -350,7 +350,7 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline /*
   }
   if(ntstat < 0)
   {
-    return {static_cast<int>(ntstat), ntkernel_category()};
+    return ntkernel_error(ntstat);
   }
   return ret;
 }
@@ -369,7 +369,7 @@ result<file_handle::extent_type> file_handle::maximum_extent() const noexcept
   FILE_STANDARD_INFO fsi{};
   if(GetFileInformationByHandleEx(_v.h, FileStandardInfo, &fsi, sizeof(fsi)) == 0)
   {
-    return {GetLastError(), std::system_category()};
+    return win32_error();
   }
   return fsi.EndOfFile.QuadPart;
 }
@@ -381,7 +381,7 @@ result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type 
   feofi.EndOfFile.QuadPart = newsize;
   if(SetFileInformationByHandle(_v.h, FileEndOfFileInfo, &feofi, sizeof(feofi)) == 0)
   {
-    return {GetLastError(), std::system_category()};
+    return win32_error();
   }
   if(are_safety_fsyncs_issued())
   {
@@ -420,7 +420,7 @@ result<std::vector<std::pair<file_handle::extent_type, file_handle::extent_type>
       }
       if(ERROR_SUCCESS != GetLastError())
       {
-        return {GetLastError(), std::system_category()};
+        return win32_error();
       }
     }
     return ret;
@@ -454,12 +454,12 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_type offs
       NTSTATUS ntstat = ntwait(_v.h, ol, deadline());
       if(ntstat != 0)
       {
-        return {ntstat, ntkernel_category()};
+        return ntkernel_error(ntstat);
       }
     }
     if(ERROR_SUCCESS != GetLastError())
     {
-      return {GetLastError(), std::system_category()};
+      return win32_error();
     }
   }
   return success();

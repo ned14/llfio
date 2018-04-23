@@ -48,7 +48,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
     }
     if(ntstat != 0)
     {
-      return {static_cast<int>(ntstat), ntkernel_category()};
+      return ntkernel_error(ntstat);
     }
     if(wanted & want::flags)
     {
@@ -86,7 +86,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
     }
     if(ntstat != 0)
     {
-      return {static_cast<int>(ntstat), ntkernel_category()};
+      return ntkernel_error(ntstat);
     }
     if(wanted & want::bsize)
     {
@@ -136,7 +136,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
     }
     if(ntstat != 0)
     {
-      return {ntstat, ntkernel_category()};
+      return ntkernel_error(ntstat);
     }
     f_iosize = ffssi->PhysicalBytesPerSectorForPerformance;
     ++ret;
@@ -150,7 +150,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
       DWORD pathlen = GetFinalPathNameByHandle(h.native_handle().h, buffer2, sizeof(buffer2) / sizeof(*buffer2), FILE_NAME_OPENED | VOLUME_NAME_NONE);
       if((pathlen == 0u) || pathlen >= sizeof(buffer2) / sizeof(*buffer2))
       {
-        return {GetLastError(), std::system_category()};
+        return win32_error();
       }
       buffer2[pathlen] = 0;
       if(wanted & want::mntfromname)
@@ -158,7 +158,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
         DWORD len = GetFinalPathNameByHandle(h.native_handle().h, buffer, sizeof(buffer) / sizeof(*buffer), FILE_NAME_OPENED | VOLUME_NAME_NT);
         if((len == 0u) || len >= sizeof(buffer) / sizeof(*buffer))
         {
-          return {GetLastError(), std::system_category()};
+          return win32_error();
         }
         buffer[len] = 0;
         if(memcmp(buffer2, buffer + len - pathlen, pathlen) != 0)
@@ -185,7 +185,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
         DWORD len = GetFinalPathNameByHandle(h.native_handle().h, buffer, sizeof(buffer) / sizeof(*buffer), FILE_NAME_OPENED | VOLUME_NAME_DOS);
         if((len == 0u) || len >= sizeof(buffer) / sizeof(*buffer))
         {
-          return {GetLastError(), std::system_category()};
+          return win32_error();
         }
         buffer[len] = 0;
         if(memcmp(buffer2, buffer + len - pathlen, pathlen) != 0)

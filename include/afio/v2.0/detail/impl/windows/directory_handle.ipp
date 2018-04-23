@@ -103,7 +103,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     }
     if(ntstat < 0)
     {
-      return {static_cast<int>(ntstat), ntkernel_category()};
+      return ntkernel_error(ntstat);
     }
   }
   else
@@ -129,7 +129,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     {
       DWORD errcode = GetLastError();
       // assert(false);
-      return {static_cast<int>(errcode), std::system_category()};
+      return win32_error(errcode);
     }
   }
   return ret;
@@ -145,7 +145,7 @@ result<directory_handle> directory_handle::clone(mode mode_, caching caching_, d
     ret.value()._v.behaviour = _v.behaviour;
     if(DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, 0, DUPLICATE_SAME_ACCESS) == 0)
     {
-      return {GetLastError(), std::system_category()};
+      return win32_error();
     }
     return ret;
   }
@@ -180,7 +180,7 @@ result<directory_handle> directory_handle::clone(mode mode_, caching caching_, d
   }
   if(ntstat < 0)
   {
-    return {static_cast<int>(ntstat), ntkernel_category()};
+    return ntkernel_error(ntstat);
   }
   return ret;
 }
@@ -192,7 +192,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> directory_handle::clone_to_pa
   ret.value()._v.behaviour = _v.behaviour;
   if(DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, 0, DUPLICATE_SAME_ACCESS) == 0)
   {
-    return {GetLastError(), std::system_category()};
+    return win32_error();
   }
   return ret;
 }
@@ -221,7 +221,7 @@ namespace detail
     }
     if(ntstat < 0)
     {
-      return {static_cast<int>(ntstat), ntkernel_category()};
+      return ntkernel_error(ntstat);
     }
     // Return as a file handle so the direct relink and unlink are used
     return file_handle(nativeh, 0, 0, file_handle::caching::all);
@@ -310,7 +310,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     {
       if(ntstat < 0)
       {
-        return {static_cast<int>(ntstat), ntkernel_category()};
+        return ntkernel_error(ntstat);
       }
       done = true;
     }
