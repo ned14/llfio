@@ -1,5 +1,5 @@
 /* Configures AFIO
-(C) 2015-2017 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2015-2018 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: Dec 2015
 
 
@@ -76,6 +76,11 @@ Distributed under the Boost Software License, Version 1.0.
 //! Defaults to 4Kb if NDEBUG defined, else 1Mb. \ingroup config
 #define AFIO_LOGGING_MEMORY (1024 * 1024)
 #endif
+#endif
+
+#if !defined(AFIO_EXPERIMENTAL_STATUS_CODE)
+//! \brief Whether to use SG14 experimental `status_code` instead of `std::error_code`
+#define AFIO_EXPERIMENTAL_STATUS_CODE 0
 #endif
 
 
@@ -322,8 +327,6 @@ AFIO_V2_NAMESPACE_END
 AFIO_V2_NAMESPACE_BEGIN
 using namespace QUICKCPPLIB_NAMESPACE::persistence;
 AFIO_V2_NAMESPACE_END
-// Bring in a result implementation
-#include "outcome/include/outcome.hpp"
 
 
 AFIO_V2_NAMESPACE_BEGIN
@@ -331,16 +334,166 @@ AFIO_V2_NAMESPACE_BEGIN
 namespace detail
 {
   // Used to cast an unknown input to some unsigned integer
-  OUTCOME_TEMPLATE(class T, class U)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_unsigned<T>::value && !std::is_same<std::decay_t<U>, std::nullptr_t>::value))
+  AFIO_TEMPLATE(class T, class U)
+  AFIO_TREQUIRES(AFIO_TPRED(std::is_unsigned<T>::value && !std::is_same<std::decay_t<U>, std::nullptr_t>::value))
   inline T unsigned_integer_cast(U &&v) { return static_cast<T>(v); }
-  OUTCOME_TEMPLATE(class T)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_unsigned<T>::value))
+  AFIO_TEMPLATE(class T)
+  AFIO_TREQUIRES(AFIO_TPRED(std::is_unsigned<T>::value))
   inline T unsigned_integer_cast(std::nullptr_t /* unused */) { return static_cast<T>(0); }
-  OUTCOME_TEMPLATE(class T, class U)
-  OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_unsigned<T>::value))
+  AFIO_TEMPLATE(class T, class U)
+  AFIO_TREQUIRES(AFIO_TPRED(std::is_unsigned<T>::value))
   inline T unsigned_integer_cast(U *v) { return static_cast<T>(reinterpret_cast<uintptr_t>(v)); }
 }  // namespace detail
+
+AFIO_V2_NAMESPACE_END
+
+
+/* The SG14 status code implementation is quite profoundly different to the
+error code implementation. In the error code implementation, std::error_code
+is fixed by the standard library, so we wrap it with extra metadata into
+an error_info type. error_info then constructs off a code and a code domain
+tag.
+
+Status code, on the other hand, is templated and is designed for custom
+domains which can set arbitrary payloads. So we define custom domains and
+status codes for AFIO with these combinations:
+
+- win32_error{ DWORD }
+- ntkernel_error{ LONG }
+- posix_error{ int }
+- generic_error{ errc }
+
+Each of these is a separate AFIO custom status code domain. We also define
+an erased form of these custom domains, and that is typedefed to
+error_domain<intptr_t>::value_type.
+
+This design ensure that AFIO can be configured into either std-based error
+handling or SG14 experimental status code handling. It defaults to the latter
+as that (a) enables safe header only AFIO on Windows (b) produces better codegen
+(c) drags in far fewer STL headers.
+*/
+
+#if AFIO_EXPERIMENTAL_STATUS_CODE
+
+// Bring in a result implementation based on status_code
+#include "outcome/include/outcome/experimental/status_result.hpp"
+
+AFIO_V2_NAMESPACE_BEGIN
+
+/*! \class error_domain
+\brief The SG14 status code domain for errors in AFIO.
+*/
+#ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
+template <class BaseStatusCodeDomain> class error_domain : public BaseStatusCodeDomain
+{
+  using __base = SYSTEM_ERROR2_NAMESPACE::status_code_domain;
+  using _base = BaseStatusCodeDomain;
+
+public:
+  //! \brief The value type of errors in AFIO
+  struct value_type
+  {
+    //! \brief The type of code from `BaseStatusCodeDomain`
+    typename _base::value_type sc;
+
+    // The id of the thread where this failure occurred
+    uint32_t thread_id{0};
+    // The TLS path store entry
+    uint16_t tls_path_id1{static_cast<uint16_t>(-1)}, _tls_path_id2{static_cast<uint16_t>(-1)};
+    // The id of the relevant log entry in the AFIO log (if logging enabled)
+    size_t log_id{static_cast<size_t>(-1)};
+  };
+  //! Thread safe reference to a message string composed from `BaseStatusCodeDomain` with added metadata
+  class string_ref : public __base::string_ref
+  {
+  public:
+    explicit string_ref(const __base::string_ref &o)
+        : __base::string_ref(o)
+    {
+    }
+    explicit string_ref(__base::string_ref &&o)
+        : __base::string_ref(static_cast<__base::string_ref &&>(o))
+    {
+    }
+    constexpr string_ref()
+        : __base::string_ref(__base::string_ref::_refcounted_string_thunk)
+    {
+    }
+    SYSTEM_ERROR2_CONSTEXPR14 explicit string_ref(const char *str)
+        : __base::string_ref(str, __base::string_ref::_refcounted_string_thunk)
+    {
+    }
+    string_ref(const string_ref &) = default;
+    string_ref(string_ref &&) = default;
+    string_ref &operator=(const string_ref &) = default;
+    string_ref &operator=(string_ref &&) = default;
+    ~string_ref() = default;
+    //! Construct from an underlying error code
+    explicit string_ref(value_type c)
+        : __base::string_ref(__base::string_ref::_refcounted_string_thunk)
+    {
+      // Ask _base for its message
+      _base::string_ref basemsg(c.sc);
+      // Append any extra metadata
+
+      this->_begin = malloc(basemsg.size() + 1);
+      if(this->_begin == nullptr)
+      {
+        goto failure;
+      }
+      this->_end = this->_begin + basemsg.size();
+      _msg() = (_allocated_msg *) calloc(1, sizeof(_allocated_msg));  // NOLINT
+      if(_msg() == nullptr)
+      {
+        free((void *) this->_begin);  // NOLINT
+        goto failure;
+      }
+      ++_msg()->count;
+      return;
+    failure:
+      _msg() = nullptr;  // disabled
+      this->_begin = "failed to get message from system";
+      this->_end = strchr(this->_begin, 0);
+    }
+  };
+
+  error_domain() = default;
+  error_domain(const error_domain &) = default;
+  error_domain(error_domain &&) = default;
+  error_domain &operator=(const error_domain &) = default;
+  error_domain &operator=(error_domain &&) = default;
+  ~error_domain() = default;
+
+protected:
+  virtual _base::string_ref _message(const status_code<void> &code) const noexcept override final  // NOLINT
+  {
+    assert(code.domain() == *this);
+    const auto &c = static_cast<const error_domain &>(code);  // NOLINT
+    return string_ref(c.value());
+  }
+};
+#else
+template <class BaseStatusCodeDomain> using error_domain = BaseStatusCodeDomain;
+#endif
+
+using generic_failure = SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::generic_code::domain_type>>;
+using posix_failure = SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::posix_code::domain_type>>;
+#ifdef _WIN32
+using win32_failure = SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::win32_code::domain_type>>;
+using ntkernel_failure = SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::nt_code::domain_type>>;
+#endif
+
+AFIO_V2_NAMESPACE_END
+
+#else
+
+// Bring in a result implementation based on std::error_code
+#include "outcome/include/outcome.hpp"
+
+AFIO_V2_NAMESPACE_BEGIN
+
+//! Choose an errc implementation
+using std::errc;
 
 /*! \struct error_info
 \brief The cause of the failure of an operation in AFIO.
@@ -483,7 +636,7 @@ template <class T> using result = OUTCOME_V2_NAMESPACE::result<T, error_info>;
 template <class T> using outcome = OUTCOME_V2_NAMESPACE::outcome<T, error_info>;
 using OUTCOME_V2_NAMESPACE::success;
 using OUTCOME_V2_NAMESPACE::failure;
-inline error_info error_from_exception(std::exception_ptr &&ep = std::current_exception(), std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept
+inline error_info error_from_exception(std::exception_ptr &&ep = std::current_exception(), std::error_code not_matched = std::make_error_code(errc::resource_unavailable_try_again)) noexcept
 {
   return error_info(OUTCOME_V2_NAMESPACE::error_from_exception(std::move(ep), not_matched));
 }
@@ -492,6 +645,7 @@ using OUTCOME_V2_NAMESPACE::in_place_type;
 static_assert(OUTCOME_V2_NAMESPACE::trait::has_error_code_v<error_info>, "error_info is not detected to be an error code");
 
 AFIO_V2_NAMESPACE_END
+#endif
 
 
 #if AFIO_LOGGING_LEVEL

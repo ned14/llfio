@@ -40,7 +40,7 @@ static inline void TestFileHandleLockUnlock()
     }
     auto _2 = h2.lock(0, 0, true, std::chrono::seconds(0));
     BOOST_REQUIRE(_2.has_error());
-    BOOST_CHECK(_2.error() == std::errc::timed_out);
+    BOOST_CHECK(_2.error() == afio::errc::timed_out);
   }
   // Two non-exclusive locks okay
   {
@@ -55,7 +55,7 @@ static inline void TestFileHandleLockUnlock()
     BOOST_REQUIRE(!_1.has_error());
     auto _2 = h2.lock(0, 0, true, std::chrono::seconds(0));
     BOOST_REQUIRE(_2.has_error());
-    BOOST_CHECK(_2.error() == std::errc::timed_out);
+    BOOST_CHECK(_2.error() == afio::errc::timed_out);
   }
 }
 

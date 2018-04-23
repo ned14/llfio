@@ -275,7 +275,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
   AFIO_LOG_FUNCTION_CALL(this);
   if(d && !_v.is_overlapped())
   {
-    return std::errc::not_supported;
+    return errc::not_supported;
   }
   AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
   OVERLAPPED ol{};
@@ -438,7 +438,7 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_type offs
   AFIO_LOG_FUNCTION_CALL(this);
   if(offset + bytes < offset)
   {
-    return std::errc::value_too_large;
+    return errc::value_too_large;
   }
   FILE_ZERO_DATA_INFORMATION fzdi{};
   fzdi.FileOffset.QuadPart = offset;

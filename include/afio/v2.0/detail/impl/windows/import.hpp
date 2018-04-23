@@ -989,12 +989,12 @@ if(d)                                                                           
     if((d).steady)                                                                                                                                                                                                                                                                                                             \
     {                                                                                                                                                                                                                                                                                                                          \
       if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))                                                                                                                                                                                                                             \
-        return make_errored_result<type>(std::errc::timed_out);                                                                                                                                                                                                                                                                \
+        return make_errored_result<type>(errc::timed_out);                                                                                                                                                                                                                                                                \
     }                                                                                                                                                                                                                                                                                                                          \
     else                                                                                                                                                                                                                                                                                                                       \
     {                                                                                                                                                                                                                                                                                                                          \
       if(std::chrono::system_clock::now() >= end_utc)                                                                                                                                                                                                                                                                          \
-        return make_errored_result<type>(std::errc::timed_out);                                                                                                                                                                                                                                                                \
+        return make_errored_result<type>(errc::timed_out);                                                                                                                                                                                                                                                                \
     }                                                                                                                                                                                                                                                                                                                          \
   \
 }
@@ -1063,12 +1063,12 @@ if(d)                                                                           
     if((d).steady)                                                                                                                                                                                                                                                                                                             \
     {                                                                                                                                                                                                                                                                                                                          \
       if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))                                                                                                                                                                                                                             \
-        return std::errc::timed_out;                                                                                                                                                                                                                                                                                           \
+        return errc::timed_out;                                                                                                                                                                                                                                                                                           \
     }                                                                                                                                                                                                                                                                                                                          \
     else                                                                                                                                                                                                                                                                                                                       \
     {                                                                                                                                                                                                                                                                                                                          \
       if(std::chrono::system_clock::now() >= end_utc)                                                                                                                                                                                                                                                                          \
-        return std::errc::timed_out;                                                                                                                                                                                                                                                                                           \
+        return errc::timed_out;                                                                                                                                                                                                                                                                                           \
     }                                                                                                                                                                                                                                                                                                                          \
   \
 }
@@ -1153,7 +1153,7 @@ inline result<ACCESS_MASK> access_mask_from_handle_mode(native_handle_type &nati
   switch(_mode)
   {
   case handle::mode::unchanged:
-    return std::errc::invalid_argument;
+    return errc::invalid_argument;
   case handle::mode::none:
     break;
   case handle::mode::attr_read:
@@ -1193,7 +1193,7 @@ inline result<DWORD> attributes_from_handle_caching_and_flags(native_handle_type
   switch(_caching)
   {
   case handle::caching::unchanged:
-    return std::errc::invalid_argument;
+    return errc::invalid_argument;
   case handle::caching::none:
     attribs |= FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
     nativeh.behaviour |= native_handle_type::disposition::aligned_io;
@@ -1241,7 +1241,7 @@ inline result<DWORD> ntflags_from_handle_caching_and_flags(native_handle_type &n
   switch(_caching)
   {
   case handle::caching::unchanged:
-    return std::errc::invalid_argument;
+    return errc::invalid_argument;
   case handle::caching::none:
     ntflags |= 0x00000008 /*FILE_NO_INTERMEDIATE_BUFFERING*/ | 0x00000002 /*FILE_WRITE_THROUGH*/;
     nativeh.behaviour |= native_handle_type::disposition::aligned_io;

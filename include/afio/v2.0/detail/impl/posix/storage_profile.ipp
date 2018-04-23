@@ -280,16 +280,16 @@ namespace storage_profile
                     continue;
                   // Is there more than one physical disk device?
                   if(!mntfromname.empty())
-                    return std::errc::function_not_supported;
+                    return errc::function_not_supported;
                   mntfromname = "/dev/" + std::string(s, e - s);
                 }
               }
               else
-                return std::errc::function_not_supported;
+                return errc::function_not_supported;
             }
             else
 #endif
-              return std::errc::function_not_supported;
+              return errc::function_not_supported;
           }
           OUTCOME_TRY(deviceh, file_handle::file({}, mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
 

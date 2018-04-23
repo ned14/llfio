@@ -61,7 +61,7 @@ result<bool> io_service::run_until(deadline d) noexcept
   }
   if(GetCurrentThreadId() != _threadid)
   {
-    return std::errc::operation_not_supported;
+    return errc::operation_not_supported;
   }
   ntsleep(d, true);
   return _work_queued != 0;

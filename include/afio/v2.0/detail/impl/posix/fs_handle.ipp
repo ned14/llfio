@@ -64,7 +64,7 @@ inline result<path_handle> containing_directory(optional<std::reference_wrapper<
       // If current path is empty, it's been deleted
       if(_currentpath.empty())
       {
-        return std::errc::no_such_file_or_directory;
+        return errc::no_such_file_or_directory;
       }
       // Split the path into root and leafname
       path_view currentpath(_currentpath);
@@ -122,14 +122,14 @@ inline result<path_handle> containing_directory(optional<std::reference_wrapper<
         {
           if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds(d.nsecs)))
           {
-            return std::errc::timed_out;
+            return errc::timed_out;
           }
         }
         else
         {
           if(std::chrono::system_clock::now() >= end_utc)
           {
-            return std::errc::timed_out;
+            return errc::timed_out;
           }
         }
       }
@@ -163,7 +163,7 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
   {
     if(atomic_replace)
     {
-      return std::errc::function_not_supported;
+      return errc::function_not_supported;
     }
     char _path[PATH_MAX];
     snprintf(_path, PATH_MAX, "/proc/self/fd/%d", h.native_handle().fd);

@@ -128,7 +128,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
     buffer_[len] = 0;
     if(memcmp(buffer_, L"\\Device\\HarddiskVolume", 44) != 0)
     {
-      return std::errc::illegal_byte_sequence;
+      return errc::illegal_byte_sequence;
     }
     // buffer_ should look like \Device\HarddiskVolumeX, so our number is from +22 onwards
     st_dev = _wtoi(buffer_ + 22);

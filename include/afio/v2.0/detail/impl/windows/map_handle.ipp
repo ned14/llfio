@@ -254,7 +254,7 @@ result<section_handle::extent_type> section_handle::truncate(extent_type newsize
     }
     else
     {
-      return std::errc::invalid_argument;
+      return errc::invalid_argument;
     }
   }
   LARGE_INTEGER _maximum_size{};
@@ -336,7 +336,7 @@ template <class F> static inline result<void> win32_maps_apply(byte *addr, size_
     // Address passed in originally must match an allocation
     if(addr == thisregion)
     {
-      return std::errc::invalid_argument;
+      return errc::invalid_argument;
     }
     OUTCOME_TRYV(f(thisregion, addr - thisregion));
   }
@@ -432,7 +432,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
   {
     if(bytes + req.len < bytes)
     {
-      return std::errc::value_too_large;
+      return errc::value_too_large;
     }
     bytes += req.len;
   }
@@ -637,7 +637,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
   AFIO_LOG_FUNCTION_CALL(this);
   if(region.data == nullptr)
   {
-    return std::errc::invalid_argument;
+    return errc::invalid_argument;
   }
   DWORD prot = 0;
   if(flag == section_handle::flag::none)
@@ -684,7 +684,7 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
   AFIO_LOG_FUNCTION_CALL(this);
   if(region.data == nullptr)
   {
-    return std::errc::invalid_argument;
+    return errc::invalid_argument;
   }
   region = utils::round_to_page_size(region);
   OUTCOME_TRYV(win32_maps_apply(region.data, region.len, [](byte *addr, size_t bytes) -> result<void> {
@@ -704,7 +704,7 @@ result<void> map_handle::zero_memory(buffer_type region) noexcept
   AFIO_LOG_FUNCTION_CALL(this);
   if(region.data == nullptr)
   {
-    return std::errc::invalid_argument;
+    return errc::invalid_argument;
   }
   // Alas, zero() will not work on mapped views on Windows :(, so memset to zero and call discard if available
   memset(region.data, 0, region.len);
@@ -750,7 +750,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
   region = utils::round_to_page_size(region);
   if(region.data == nullptr)
   {
-    return std::errc::invalid_argument;
+    return errc::invalid_argument;
   }
   // Windows does not support throwing away dirty pages on file backed maps
   if((_section == nullptr) || (_section->backing() == nullptr))

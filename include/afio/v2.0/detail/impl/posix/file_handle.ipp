@@ -135,7 +135,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
   AFIO_LOG_FUNCTION_CALL(this);
   if(d)
   {
-    return std::errc::not_supported;
+    return errc::not_supported;
   }
 #ifdef __linux__
   if(!wait_for_device && !and_metadata)
@@ -302,7 +302,7 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
     }
     else
     {
-      if(fh.error() != std::errc::no_such_file_or_directory)
+      if(fh.error() != errc::no_such_file_or_directory)
       {
         return fh.error();
       }
@@ -314,14 +314,14 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
       {
         if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds(d.nsecs)))
         {
-          return std::errc::timed_out;
+          return errc::timed_out;
         }
       }
       else
       {
         if(std::chrono::system_clock::now() >= end_utc)
         {
-          return std::errc::timed_out;
+          return errc::timed_out;
         }
       }
     }

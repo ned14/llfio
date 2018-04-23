@@ -141,7 +141,7 @@ public:
         auto randomname = utils::random_string(32);
         randomname.append(".random");
         result<file_handle> ret = file(dirpath, randomname, _mode, creation::only_if_not_exist, _caching, flags);
-        if(ret || (!ret && ret.error() != std::errc::file_exists))
+        if(ret || (!ret && ret.error() != errc::file_exists))
         {
           return ret;
         }
@@ -202,7 +202,7 @@ public:
       if(!ret)
       {
         // File may have already been deleted, if so ignore
-        if(ret.error() != std::errc::no_such_file_or_directory)
+        if(ret.error() != errc::no_such_file_or_directory)
         {
           return ret.error();
         }

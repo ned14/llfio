@@ -1350,7 +1350,7 @@ namespace storage_profile
         return success();
       if(srch.kernel_caching() != file_handle::caching::all)
       {
-        return std::errc::invalid_argument;
+        return errc::invalid_argument;
       }
       OUTCOME_TRY(s, _traversal_N(srch, 1000000, 0, false, false, true));
       sp.create_1M_files.value = s.create;

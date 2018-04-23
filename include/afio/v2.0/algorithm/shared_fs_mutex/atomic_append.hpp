@@ -202,7 +202,7 @@ namespace algorithm
         //! \todo fs_mutex_append needs to check if file still exists after lock is granted, awaiting path fetching.
         if(lockresult.has_error())
         {
-          if(lockresult.error() != std::errc::timed_out)
+          if(lockresult.error() != errc::timed_out)
           {
             return lockresult.error();
           }
@@ -243,7 +243,7 @@ namespace algorithm
         atomic_append_detail::lock_request lock_request;
         if(out.entities.size() > sizeof(lock_request.entities) / sizeof(lock_request.entities[0]))
         {
-          return std::errc::argument_list_too_long;
+          return errc::argument_list_too_long;
         }
 
         std::chrono::steady_clock::time_point began_steady;
@@ -444,14 +444,14 @@ namespace algorithm
             {
               if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))
               {
-                return std::errc::timed_out;
+                return errc::timed_out;
               }
             }
             else
             {
               if(std::chrono::system_clock::now() >= end_utc)
               {
-                return std::errc::timed_out;
+                return errc::timed_out;
               }
             }
           }

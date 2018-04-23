@@ -161,7 +161,7 @@ namespace algorithm
               if(ret.has_error())
               {
                 const auto &ec = ret.error();
-                if(ec != std::errc::resource_unavailable_try_again && ec != std::errc::file_exists)
+                if(ec != errc::resource_unavailable_try_again && ec != errc::file_exists)
                 {
                   return ret.error();
                 }
@@ -184,14 +184,14 @@ namespace algorithm
               {
                 if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))
                 {
-                  return std::errc::timed_out;
+                  return errc::timed_out;
                 }
               }
               else
               {
                 if(std::chrono::system_clock::now() >= end_utc)
                 {
-                  return std::errc::timed_out;
+                  return errc::timed_out;
                 }
               }
             }

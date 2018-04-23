@@ -58,7 +58,7 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
       // If current path is empty, it's been deleted
       if(currentpath.empty())
       {
-        return std::errc::no_such_file_or_directory;
+        return errc::no_such_file_or_directory;
       }
       // Split the path into root and leafname
       filesystem::path filename = currentpath.filename();

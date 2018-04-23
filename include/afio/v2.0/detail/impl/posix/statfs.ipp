@@ -144,7 +144,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
 #ifndef AFIO_COMPILING_FOR_GCOV
       if(mountentries.empty())
       {
-        return std::errc::no_such_file_or_directory;
+        return errc::no_such_file_or_directory;
       }
       // Choose the mount entry with the most closely matching statfs. You can't choose
       // exclusively based on mount point because of bind mounts

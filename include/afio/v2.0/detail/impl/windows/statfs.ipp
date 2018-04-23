@@ -169,7 +169,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
         // buffer should look like \Device\HarddiskVolumeX
         if(memcmp(buffer, L"\\Device\\HarddiskVolume", 44) != 0)
         {
-          return std::errc::illegal_byte_sequence;
+          return errc::illegal_byte_sequence;
         }
         f_mntfromname.reserve(len + 3);
         f_mntfromname.assign("\\!!");  // escape prefix for NT kernel path

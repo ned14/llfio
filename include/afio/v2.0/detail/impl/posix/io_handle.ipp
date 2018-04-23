@@ -62,11 +62,11 @@ io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_requ
   AFIO_LOG_FUNCTION_CALL(this);
   if(d)
   {
-    return std::errc::not_supported;
+    return errc::not_supported;
   }
   if(reqs.buffers.size() > IOV_MAX)
   {
-    return std::errc::argument_list_too_long;
+    return errc::argument_list_too_long;
   }
 #if 0
   struct iovec *iov = (struct iovec *) alloca(reqs.buffers.size() * sizeof(struct iovec));
@@ -129,11 +129,11 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::
   AFIO_LOG_FUNCTION_CALL(this);
   if(d)
   {
-    return std::errc::not_supported;
+    return errc::not_supported;
   }
   if(reqs.buffers.size() > IOV_MAX)
   {
-    return std::errc::argument_list_too_long;
+    return errc::argument_list_too_long;
   }
 #if 0
   struct iovec *iov = (struct iovec *) alloca(reqs.buffers.size() * sizeof(struct iovec));
@@ -196,7 +196,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
   AFIO_LOG_FUNCTION_CALL(this);
   if(d && d.nsecs > 0)
   {
-    return std::errc::not_supported;
+    return errc::not_supported;
   }
   bool failed = false;
 #if !defined(__linux__) && !defined(F_OFD_SETLK)
@@ -255,7 +255,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
   {
     if(d && (d.nsecs == 0u) && (EACCES == errno || EAGAIN == errno || EWOULDBLOCK == errno))
     {
-      return std::errc::timed_out;
+      return errc::timed_out;
     }
 
 

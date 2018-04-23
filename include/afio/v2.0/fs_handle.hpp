@@ -160,7 +160,7 @@ public:
   not be an atomic operation on some platforms (i.e. both the old and new names may be linked to the
   same inode for a very short period of time). Windows and recent Linuxes are always atomic.
   \param d The deadline by which the matching of the containing directory to the open handle's inode
-  must succeed, else `std::errc::timed_out` will be returned.
+  must succeed, else `errc::timed_out` will be returned.
   \mallocs Except on platforms with race free syscalls for renaming open handles (Windows), calls
   `current_path()` via `parent_path_handle()` and thus is both expensive and calls malloc many times.
   */
@@ -185,7 +185,7 @@ public:
   deadline given. This should prevent most unmalicious accidental loss of data.
 
   \param d The deadline by which the matching of the containing directory to the open handle's inode
-  must succeed, else `std::errc::timed_out` will be returned.
+  must succeed, else `errc::timed_out` will be returned.
   \mallocs Except on platforms with race free syscalls for unlinking open handles (Windows), calls
   `current_path()` and thus is both expensive and calls malloc many times. On Windows, also calls
   `current_path()` if `flag::disable_safety_unlinks` is not set.
@@ -216,7 +216,7 @@ Choosing false for this will fail if a file entry is already present at the dest
 not be an atomic operation on some platforms (i.e. both the old and new names may be linked to the
 same inode for a very short period of time). Windows and recent Linuxes are always atomic.
 \param d The deadline by which the matching of the containing directory to the open handle's inode
-must succeed, else `std::errc::timed_out` will be returned.
+must succeed, else `errc::timed_out` will be returned.
 \mallocs Except on platforms with race free syscalls for renaming open handles (Windows), calls
 `current_path()` via `parent_path_handle()` and thus is both expensive and calls malloc many times.
 */
@@ -242,7 +242,7 @@ deadline given. This should prevent most unmalicious accidental loss of data.
 
 \param self The object whose member function to call.
 \param d The deadline by which the matching of the containing directory to the open handle's inode
-must succeed, else `std::errc::timed_out` will be returned.
+must succeed, else `errc::timed_out` will be returned.
 \mallocs Except on platforms with race free syscalls for unlinking open handles (Windows), calls
 `current_path()` and thus is both expensive and calls malloc many times. On Windows, also calls
 `current_path()` if `flag::disable_safety_unlinks` is not set.

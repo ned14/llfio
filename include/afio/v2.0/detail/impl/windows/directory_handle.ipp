@@ -33,17 +33,17 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
   using namespace windows_nt_kernel;
   if(flags & flag::unlink_on_close)
   {
-    return std::errc::invalid_argument;
+    return errc::invalid_argument;
   }
   result<directory_handle> ret(directory_handle(native_handle_type(), 0, 0, _caching, flags));
   native_handle_type &nativeh = ret.value()._v;
   AFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::directory;
   DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
-  // Trying to truncate a directory returns EISDIR rather than some internal Win32 error code uncomparable to std::errc
+  // Trying to truncate a directory returns EISDIR rather than some internal Win32 error code uncomparable to errc
   if(_creation == creation::truncate)
   {
-    return std::errc::is_a_directory;
+    return errc::is_a_directory;
   }
   OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode, flags));
   OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
@@ -276,7 +276,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     auto *mem = new(std::nothrow) char[toallocate];
     if(mem == nullptr)
     {
-      return std::errc::not_enough_memory;
+      return errc::not_enough_memory;
     }
     tofill._kernel_buffer = std::unique_ptr<char[]>(mem);
     tofill._kernel_buffer_size = toallocate;
@@ -301,7 +301,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
       auto *mem = new(std::nothrow) char[toallocate];
       if(mem == nullptr)
       {
-        return std::errc::not_enough_memory;
+        return errc::not_enough_memory;
       }
       tofill._kernel_buffer = std::unique_ptr<char[]>(mem);
       tofill._kernel_buffer_size = toallocate;

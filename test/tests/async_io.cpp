@@ -45,7 +45,7 @@ static inline void TestAsyncFileHandle()
     auto schedule_io = [&] {
       return h.async_write({bt, n * 4096}, [ p = std::move(p), n ](afio::async_file_handle *, afio::async_file_handle::io_result<afio::async_file_handle::const_buffers_type> & result) mutable {
         (void) n;
-        if(!result && result.error() == std::errc::resource_unavailable_try_again)
+        if(!result && result.error() == afio::errc::resource_unavailable_try_again)
         {
           std::cout << "*** Completion handler saw error " << result.error() << std::endl;
         }
@@ -62,7 +62,7 @@ static inline void TestAsyncFileHandle()
       });
     };
     auto g(schedule_io());
-    if(!g && g.error() == std::errc::resource_unavailable_try_again)
+    if(!g && g.error() == afio::errc::resource_unavailable_try_again)
     {
       // Sleep until at least i/o is processed
       service.run().value();

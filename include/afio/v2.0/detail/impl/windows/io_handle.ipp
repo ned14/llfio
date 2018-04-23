@@ -36,11 +36,11 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
 {
   if(d && !nativeh.is_overlapped())
   {
-    return std::errc::not_supported;
+    return errc::not_supported;
   }
   if(reqs.buffers.size() > 64)
   {
-    return std::errc::argument_list_too_long;
+    return errc::argument_list_too_long;
   }
 
   AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
@@ -138,7 +138,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
   AFIO_LOG_FUNCTION_CALL(_v.h);
   if(d && d.nsecs > 0 && !_v.is_overlapped())
   {
-    return std::errc::not_supported;
+    return errc::not_supported;
   }
   DWORD flags = exclusive ? LOCKFILE_EXCLUSIVE_LOCK : 0;
   if(d && (d.nsecs == 0u))
@@ -157,7 +157,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
   {
     if(ERROR_LOCK_VIOLATION == GetLastError() && d && (d.nsecs == 0u))
     {
-      return std::errc::timed_out;
+      return errc::timed_out;
     }
     if(ERROR_IO_PENDING != GetLastError())
     {

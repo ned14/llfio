@@ -237,7 +237,7 @@ namespace algorithm
                     // If I am relocking myself, return deadlock
                     if((out.entities[n].exclusive != 0u) || already_have_shared_lock)
                     {
-                      return std::errc::resource_deadlock_would_occur;
+                      return errc::resource_deadlock_would_occur;
                     }
                     // Otherwise just add myself to the reader list
                     it->second.reader_tids.push_back(mythreadid);
@@ -255,7 +255,7 @@ namespace algorithm
                   // If I am relocking myself, return deadlock
                   if(already_have_shared_lock)
                   {
-                    return std::errc::resource_deadlock_would_occur;
+                    return errc::resource_deadlock_would_occur;
                   }
                   // Otherwise just add myself to the reader list
                   it->second.reader_tids.push_back(mythreadid);
@@ -321,14 +321,14 @@ namespace algorithm
               {
                 if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))
                 {
-                  return std::errc::timed_out;
+                  return errc::timed_out;
                 }
               }
               else
               {
                 if(std::chrono::system_clock::now() >= end_utc)
                 {
-                  return std::errc::timed_out;
+                  return errc::timed_out;
                 }
               }
             }

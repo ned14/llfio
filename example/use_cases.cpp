@@ -113,7 +113,7 @@ void read_entire_file2()
         buffers[n].second = std::move(ret).value();
         break;
       }
-      if (ret.error() == std::errc::resource_unavailable_try_again)
+      if (ret.error() == afio::errc::resource_unavailable_try_again)
       {
         // Many async file i/o implementations have limited total system concurrency
         std::this_thread::yield();

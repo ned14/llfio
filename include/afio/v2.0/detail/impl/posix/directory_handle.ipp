@@ -43,7 +43,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
 {
   if(flags & flag::unlink_on_close)
   {
-    return std::errc::invalid_argument;
+    return errc::invalid_argument;
   }
   result<directory_handle> ret(directory_handle(native_handle_type(), 0, 0, _caching, flags));
   native_handle_type &nativeh = ret.value()._v;
@@ -61,7 +61,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
   // Also trying to truncate a directory returns EISDIR
   if(_creation == creation::truncate)
   {
-    return std::errc::is_a_directory;
+    return errc::is_a_directory;
   }
   OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, _caching, flags));
 #ifdef O_DIRECTORY
@@ -170,7 +170,7 @@ result<directory_handle> directory_handle::clone(mode mode_, caching caching_, d
     }
     else
     {
-      if(fh.error() != std::errc::no_such_file_or_directory)
+      if(fh.error() != errc::no_such_file_or_directory)
       {
         return fh.error();
       }
@@ -182,14 +182,14 @@ result<directory_handle> directory_handle::clone(mode mode_, caching caching_, d
       {
         if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds(d.nsecs)))
         {
-          return std::errc::timed_out;
+          return errc::timed_out;
         }
       }
       else
       {
         if(std::chrono::system_clock::now() >= end_utc)
         {
-          return std::errc::timed_out;
+          return errc::timed_out;
         }
       }
     }
@@ -302,7 +302,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     auto *mem = new(std::nothrow) char[toallocate];
     if(mem == nullptr)
     {
-      return std::errc::not_enough_memory;
+      return errc::not_enough_memory;
     }
     tofill._kernel_buffer = std::unique_ptr<char[]>(mem);
     tofill._kernel_buffer_size = toallocate;
@@ -334,7 +334,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
       auto *mem = new(std::nothrow) char[toallocate];
       if(mem == nullptr)
       {
-        return std::errc::not_enough_memory;
+        return errc::not_enough_memory;
       }
       tofill._kernel_buffer = std::unique_ptr<char[]>(mem);
       tofill._kernel_buffer_size = toallocate;

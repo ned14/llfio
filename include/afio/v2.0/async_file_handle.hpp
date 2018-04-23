@@ -160,7 +160,7 @@ public:
         auto randomname = utils::random_string(32);
         randomname.append(".random");
         result<async_file_handle> ret = async_file(service, dirpath, randomname, _mode, creation::only_if_not_exist, _caching, flags);
-        if(ret || (!ret && ret.error() != std::errc::file_exists))
+        if(ret || (!ret && ret.error() != errc::file_exists))
         {
           return ret;
         }
@@ -416,7 +416,7 @@ public:
   /*! \brief Schedule a read to occur asynchronously.
 
   Note that some OS kernels can only process a limited number async i/o
-  operations at a time. You should therefore check for the error `std::errc::resource_unavailable_try_again`
+  operations at a time. You should therefore check for the error `errc::resource_unavailable_try_again`
   and gracefully reschedule the i/o for a later time. This temporary
   failure may be returned immediately, or to the completion handler
   and hence you ought to handle both situations.
@@ -458,7 +458,7 @@ public:
   /*! \brief Schedule a write to occur asynchronously.
 
   Note that some OS kernels can only process a limited number async i/o
-  operations at a time. You should therefore check for the error `std::errc::resource_unavailable_try_again`
+  operations at a time. You should therefore check for the error `errc::resource_unavailable_try_again`
   and gracefully reschedule the i/o for a later time. This temporary
   failure may be returned immediately, or to the completion handler
   and hence you ought to handle both situations.
@@ -716,7 +716,7 @@ template <class CompletionRoutine> inline result<async_file_handle::io_state_ptr
 /*! \brief Schedule a read to occur asynchronously.
 
 Note that some OS kernels can only process a limited number async i/o
-operations at a time. You should therefore check for the error `std::errc::resource_unavailable_try_again`
+operations at a time. You should therefore check for the error `errc::resource_unavailable_try_again`
 and gracefully reschedule the i/o for a later time. This temporary
 failure may be returned immediately, or to the completion handler
 and hence you ought to handle both situations.
@@ -738,7 +738,7 @@ template <class CompletionRoutine> inline result<async_file_handle::io_state_ptr
 /*! \brief Schedule a write to occur asynchronously.
 
 Note that some OS kernels can only process a limited number async i/o
-operations at a time. You should therefore check for the error `std::errc::resource_unavailable_try_again`
+operations at a time. You should therefore check for the error `errc::resource_unavailable_try_again`
 and gracefully reschedule the i/o for a later time. This temporary
 failure may be returned immediately, or to the completion handler
 and hence you ought to handle both situations.

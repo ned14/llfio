@@ -190,7 +190,7 @@ public:
   {
     if(_mode == mode::append)
     {
-      return std::errc::invalid_argument;
+      return errc::invalid_argument;
     }
     OUTCOME_TRY(fh, file_handle::file(base, _path, _mode, _creation, _caching, flags));
     switch(_creation)
@@ -233,7 +233,7 @@ public:
         auto randomname = utils::random_string(32);
         randomname.append(".random");
         result<mapped_file_handle> ret = mapped_file(reservation, dirpath, randomname, _mode, creation::only_if_not_exist, _caching, flags);
-        if(ret || (!ret && ret.error() != std::errc::file_exists))
+        if(ret || (!ret && ret.error() != errc::file_exists))
         {
           return ret;
         }

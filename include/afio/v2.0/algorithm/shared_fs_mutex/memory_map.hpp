@@ -58,7 +58,7 @@ namespace algorithm
 
     As it uses shared memory, this implementation of `shared_fs_mutex` cannot work over a networked
     drive. If you attempt to open this lock on a network drive and the first user of the lock is not
-    on this local machine, `std::errc::no_lock_available` will be returned from the constructor.
+    on this local machine, `errc::no_lock_available` will be returned from the constructor.
 
     - Linear complexity to number of concurrent users up until hash table starts to get full or hashed
     entries collide.
@@ -149,7 +149,7 @@ namespace algorithm
           _hlockinuse.unlock();
           auto lockresult = _h.try_lock(_initialisingoffset, 2, true);
 #ifndef NDEBUG
-          if(!lockresult && lockresult.error() != std::errc::timed_out)
+          if(!lockresult && lockresult.error() != errc::timed_out)
           {
             AFIO_LOG_FATAL(0, "memory_map::~memory_map() try_lock failed");
             abort();
@@ -183,7 +183,7 @@ namespace algorithm
 
       /*! Initialises a shared filing system mutex using the file at \em lockfile.
       \errors Awaiting the clang result<> AST parser which auto generates all the error codes which could occur,
-      but a particularly important one is `std::errc::no_lock_available` which will be returned if the lock
+      but a particularly important one is `errc::no_lock_available` which will be returned if the lock
       is in use by another computer on a network.
       */
       AFIO_MAKE_FREE_FUNCTION
@@ -198,7 +198,7 @@ namespace algorithm
           auto lockinuse = ret.try_lock(_initialisingoffset, 2, true);
           if(lockinuse.has_error())
           {
-            if(lockinuse.error() != std::errc::timed_out)
+            if(lockinuse.error() != errc::timed_out)
             {
               return lockinuse.error();
             }
@@ -218,7 +218,7 @@ namespace algorithm
             if(!_temph)
             {
               // Release the exclusive lock and tell caller that this lock is not available
-              return std::errc::no_lock_available;
+              return errc::no_lock_available;
             }
             temph = std::move(_temph.value());
             // Map the hash index file into memory for read/write access
@@ -359,14 +359,14 @@ namespace algorithm
             {
               if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))
               {
-                return std::errc::timed_out;
+                return errc::timed_out;
               }
             }
             else
             {
               if(std::chrono::system_clock::now() >= end_utc)
               {
-                return std::errc::timed_out;
+                return errc::timed_out;
               }
             }
           }

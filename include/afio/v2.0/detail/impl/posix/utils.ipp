@@ -166,7 +166,7 @@ namespace utils
     }
     return success();
 #endif
-    return std::errc::not_supported;
+    return errc::not_supported;
   }
 
   namespace detail
