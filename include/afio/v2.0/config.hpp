@@ -476,11 +476,44 @@ protected:
 template <class BaseStatusCodeDomain> using error_domain = BaseStatusCodeDomain;
 #endif
 
-using generic_failure = SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::generic_code::domain_type>>;
-using posix_failure = SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::posix_code::domain_type>>;
-#ifdef _WIN32
-using win32_failure = SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::win32_code::domain_type>>;
-using ntkernel_failure = SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::nt_code::domain_type>>;
+//! An erased status code
+using error_code = SYSTEM_ERROR2_NAMESPACE::status_code<SYSTEM_ERROR2_NAMESPACE::erased<error_domain<SYSTEM_ERROR2_NAMESPACE::system_code::domain_type>::value_type>>;
+
+
+template <class T> using result = OUTCOME_V2_NAMESPACE::result<T, error_code>;
+template <class T> using outcome = OUTCOME_V2_NAMESPACE::outcome<T, error_code>;
+using OUTCOME_V2_NAMESPACE::success;
+using OUTCOME_V2_NAMESPACE::failure;
+using OUTCOME_V2_NAMESPACE::in_place_type;
+
+//! Choose an errc implementation
+using SYSTEM_ERROR2_NAMESPACE::errc;
+
+//! Helper for constructing an error code from an errc
+inline error_code generic_error(errc c)
+{
+  return SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::generic_code::domain_type>>(c);
+}
+#ifndef _WIN32
+//! Helper for constructing an error code from a POSIX errno
+inline error_code posix_error(int c = errno)
+{
+  return SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::posix_code::domain_type>>(c);
+}
+#else
+//! Helper for constructing an error code from a DWORD
+inline error_code win32_error(DWORD c = GetLastError())
+{
+  return SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::win32_code::domain_type>>(c);
+}
+//! Helper for constructing an error code from a NTSTATUS
+inline error_code ntkernel_error(NTSTATUS c)
+{
+  return SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::nt_code::domain_type>>(c);
+}
+#endif
+
+#ifndef _WIN32
 #endif
 
 AFIO_V2_NAMESPACE_END

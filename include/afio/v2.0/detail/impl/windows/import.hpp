@@ -51,15 +51,19 @@ Distributed under the Boost Software License, Version 1.0.
 #error todo
 #endif
 
+#if !AFIO_EXPERIMENTAL_STATUS_CODE
 // Bring in the custom NT kernel error code category
 #if AFIO_HEADERS_ONLY
 #define NTKERNEL_ERROR_CATEGORY_INLINE
 #define NTKERNEL_ERROR_CATEGORY_STATIC
 #endif
 #include "../../../../ntkernel-error-category/include/ntkernel_category.hpp"
+#endif
 
 AFIO_V2_NAMESPACE_BEGIN
 
+#if AFIO_EXPERIMENTAL_STATUS_CODE
+#else
 //! Helper for constructing an error info from a DWORD
 inline error_info win32_error(DWORD c = GetLastError())
 {
@@ -70,6 +74,7 @@ inline error_info ntkernel_error(NTSTATUS c)
 {
   return error_info(std::error_code(c, ntkernel_error_category::ntkernel_category()));
 }
+#endif
 
 namespace windows_nt_kernel
 {
