@@ -6,6 +6,7 @@ var searchData=
   ['afio_2ehpp',['afio.hpp',['../afio_8hpp.html',1,'(Global Namespace)'],['../v2_80_2afio_8hpp.html',1,'(Global Namespace)']]],
   ['afio_5fcompile_5fkqueues',['AFIO_COMPILE_KQUEUES',['../io__service_8hpp.html#ac31c5a745782f65978dc61e09f105040',1,'io_service.hpp']]],
   ['afio_5fdisable_5fpaths_5fin_5ffailure_5finfo',['AFIO_DISABLE_PATHS_IN_FAILURE_INFO',['../config_8hpp.html#a233035c2698f3cbf5910c8ecf5193135',1,'config.hpp']]],
+  ['afio_5fexperimental_5fstatus_5fcode',['AFIO_EXPERIMENTAL_STATUS_CODE',['../config_8hpp.html#a1173a6ba3cfdabdefae09db138e0d297',1,'config.hpp']]],
   ['afio_5fhave_5frealtime_5fsignals',['AFIO_HAVE_REALTIME_SIGNALS',['../io__service_8hpp.html#aae4ac211f96f58a96027e350d45b4652',1,'io_service.hpp']]],
   ['afio_5fheaders_5fonly',['AFIO_HEADERS_ONLY',['../group__config.html#gafa3b0c57823d6f9736497df6a1571a95',1,'config.hpp']]],
   ['afio_5fheaders_5fonly_5ffunc_5fspec',['AFIO_HEADERS_ONLY_FUNC_SPEC',['../group__config.html#ga5ad5fa96bde3c76256d5c16c08023a0b',1,'config.hpp']]],

@@ -2,6 +2,7 @@ var searchData=
 [
   ['afio_5fcompile_5fkqueues',['AFIO_COMPILE_KQUEUES',['../io__service_8hpp.html#ac31c5a745782f65978dc61e09f105040',1,'io_service.hpp']]],
   ['afio_5fdisable_5fpaths_5fin_5ffailure_5finfo',['AFIO_DISABLE_PATHS_IN_FAILURE_INFO',['../config_8hpp.html#a233035c2698f3cbf5910c8ecf5193135',1,'config.hpp']]],
+  ['afio_5fexperimental_5fstatus_5fcode',['AFIO_EXPERIMENTAL_STATUS_CODE',['../config_8hpp.html#a1173a6ba3cfdabdefae09db138e0d297',1,'config.hpp']]],
   ['afio_5fhave_5frealtime_5fsignals',['AFIO_HAVE_REALTIME_SIGNALS',['../io__service_8hpp.html#aae4ac211f96f58a96027e350d45b4652',1,'io_service.hpp']]],
   ['afio_5fheaders_5fpath',['AFIO_HEADERS_PATH',['../afio_8hpp.html#a10597c2cb4385fd6111df5f645b7c5f8',1,'afio.hpp']]],
   ['afio_5fio_5fpost_5fsignal',['AFIO_IO_POST_SIGNAL',['../io__service_8hpp.html#ad825811f728a93d01908dd72e484f7ad',1,'io_service.hpp']]],

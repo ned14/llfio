@@ -1,7 +1,6 @@
 var structafio__v2__xxx_1_1error__info =
 [
     [ "error_info", "structafio__v2__xxx_1_1error__info.html#a3839c2c2f0586b8d2251d176267526f4", null ],
-    [ "error_info", "structafio__v2__xxx_1_1error__info.html#a1b716746fcd8bd812cae2c9a6c7c794d", null ],
     [ "error_info", "structafio__v2__xxx_1_1error__info.html#ac1174c8b5aca65822fb690df1f108b2b", null ],
     [ "message", "structafio__v2__xxx_1_1error__info.html#ae710a4b60f3da9ab91e32374f9a766d5", null ],
     [ "OUTCOME_TEMPLATE", "structafio__v2__xxx_1_1error__info.html#a891cf9546a70373c8415de2e3b2355cd", null ],

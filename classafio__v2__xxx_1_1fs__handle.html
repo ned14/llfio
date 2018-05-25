@@ -275,7 +275,7 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
     <tr><td class="paramname">base</td><td>Base for any relative path. </td></tr>
     <tr><td class="paramname">path</td><td>The relative or absolute new path to relink to. </td></tr>
     <tr><td class="paramname">atomic_replace</td><td>Atomically replace the destination if a file entry already is present there. Choosing false for this will fail if a file entry is already present at the destination, and may not be an atomic operation on some platforms (i.e. both the old and new names may be linked to the same inode for a very short period of time). Windows and recent Linuxes are always atomic. </td></tr>
-    <tr><td class="paramname">d</td><td>The deadline by which the matching of the containing directory to the open handle's inode must succeed, else <code>std::errc::timed_out</code> will be returned. </td></tr>
+    <tr><td class="paramname">d</td><td>The deadline by which the matching of the containing directory to the open handle's inode must succeed, else <code>errc::timed_out</code> will be returned. </td></tr>
   </table>
   </dd>
 </dl>
@@ -310,7 +310,7 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
 <dl class="section warning"><dt>Warning</dt><dd>Some operating systems provide a race free syscall for unlinking an open handle (Windows). On all other operating systems this call is <b>racy</b> and can result in the wrong file entry being unlinked. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation opens a <code>path_handle</code> to the containing directory first, then checks that the item about to be unlinked has the same inode as the open file handle. It will retry this matching until success until the deadline given. This should prevent most unmalicious accidental loss of data.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">d</td><td>The deadline by which the matching of the containing directory to the open handle's inode must succeed, else <code>std::errc::timed_out</code> will be returned. </td></tr>
+    <tr><td class="paramname">d</td><td>The deadline by which the matching of the containing directory to the open handle's inode must succeed, else <code>errc::timed_out</code> will be returned. </td></tr>
   </table>
   </dd>
 </dl>
