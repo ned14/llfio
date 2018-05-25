@@ -38,8 +38,12 @@ result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type rese
   reservation = utils::round_up_to_page_size(reservation);
   if(!_sh.is_valid())
   {
-    // Section must have read/write, as otherwise map reservation doesn't work on Windows
-    section_handle::flag sectionflags = section_handle::flag::singleton | section_handle::flag::readwrite;
+    // Section must match read/write of file, as otherwise map reservation doesn't work on Windows
+    section_handle::flag sectionflags = section_handle::flag::singleton;
+    if(this->is_readable())
+      sectionflags |= section_handle::flag::read;
+    if(this->is_writable())
+      sectionflags |= section_handle::flag::write;
     OUTCOME_TRY(sh, section_handle::section(*this, 0, sectionflags));
     _sh = std::move(sh);
   }
@@ -47,11 +51,11 @@ result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type rese
   {
     return reservation;
   }
+  section_handle::flag mapflags = section_handle::flag::read;
   // Reserve the full reservation in address space
-  section_handle::flag mapflags = section_handle::flag::nocommit | section_handle::flag::read;
   if(this->is_writable())
   {
-    mapflags |= section_handle::flag::write;
+    mapflags |= section_handle::flag::nocommit | section_handle::flag::write;
   }
   OUTCOME_TRYV(_mh.close());
   OUTCOME_TRY(mh, map_handle::map(_sh, reservation, 0, mapflags));

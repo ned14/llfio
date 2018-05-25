@@ -373,6 +373,9 @@ public:
     return bytes;
   }
 
+  using file_handle::read;
+  using file_handle::write;
+
   /*! \brief Read data from the mapped file.
 
   \note Because this implementation never copies memory, you can pass in buffers with a null address.

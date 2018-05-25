@@ -37,6 +37,7 @@ function(make_program program)
   )
 endfunction()
 
+make_program(benchmark-iostreams afio::hl)
 make_program(benchmark-locking afio::hl)
 make_program(fs-probe afio::hl)
 make_program(key-value-store afio::hl)

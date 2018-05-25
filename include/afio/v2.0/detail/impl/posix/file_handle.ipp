@@ -138,7 +138,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
     return errc::not_supported;
   }
 #ifdef __linux__
-  if(!wait_for_device && !and_metadata)
+  if(!and_metadata)
   {
     // Linux has a lovely dedicated syscall giving us exactly what we need here
     extent_type offset = reqs.offset, bytes = 0;
@@ -147,7 +147,11 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
     {
       bytes += req.len;
     }
-    unsigned flags = SYNC_FILE_RANGE_WAIT_BEFORE | SYNC_FILE_RANGE_WRITE;  // start writing all dirty pages in range now
+    unsigned flags = SYNC_FILE_RANGE_WRITE;  // start writing all dirty pages in range now
+    if(wait_for_device)
+    {
+      flags |= SYNC_FILE_RANGE_WAIT_BEFORE | SYNC_FILE_RANGE_WAIT_AFTER;  // block until they're on storage
+    }
     if(-1 != ::sync_file_range(_v.fd, offset, bytes, flags))
     {
       return {reqs.buffers};

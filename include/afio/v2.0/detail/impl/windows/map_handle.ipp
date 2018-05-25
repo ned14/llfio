@@ -514,7 +514,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   using namespace windows_nt_kernel;
   result<map_handle> ret{map_handle(&section)};
   native_handle_type &nativeh = ret.value()._v;
-  ULONG allocation = MEM_RESERVE, prot;
+  ULONG allocation = 0, prot;
   PVOID addr = nullptr;
   size_t commitsize = bytes;
   LARGE_INTEGER _offset{};

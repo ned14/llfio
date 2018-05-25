@@ -1,6 +1,6 @@
-/* Test the performance of various file locking mechanisms
-(C) 2016-2017 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
-File Created: Mar 2016
+/* Test the latency of iostreams vs AFIO
+(C) 2018 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
+File Created: Apr 2018
 
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,400 +22,259 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-//! On exit dumps a CSV file of the AFIO log, one per child worker
-#define DEBUG_CSV 1
-
-//! Seconds to run the benchmark
-#define BENCHMARK_DURATION 10
-
-#define _CRT_SECURE_NO_WARNINGS 1
+#define MAXBLOCKSIZE (256 * 1024)
+#define REGIONSIZE (100 * 1024 * 1024)
 
 #include "../../include/afio/afio.hpp"
-#include "kerneltest/include/kerneltest/v1.0/child_process.hpp"
+#include "quickcpplib/include/algorithm/small_prng.hpp"
 
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
-#ifdef _WIN32
-#undef _CRT_NONSTDC_DEPRECATE
-#define _CRT_NONSTDC_DEPRECATE(a)
-#include <conio.h>  // for kbhit()
-#else
-#include <sys/ioctl.h>
-#include <termios.h>
-
-bool kbhit()
-{
-  termios term;
-  tcgetattr(0, &term);
-
-  termios term2 = term;
-  term2.c_lflag &= ~ICANON;
-  tcsetattr(0, TCSANOW, &term2);
-
-  int byteswaiting;
-  ioctl(0, FIONREAD, &byteswaiting);
-
-  tcsetattr(0, TCSANOW, &term);
-
-  return byteswaiting > 0;
-}
-#endif
-
 namespace afio = AFIO_V2_NAMESPACE;
-namespace child_process = KERNELTEST_V1_NAMESPACE::child_process;
+using QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng;
 
-static volatile size_t *shared_memory;
-static void initialise_shared_memory()
+uint64_t nanoclock()
 {
-  auto fh = afio::file_handle::file({}, "shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary).value();
-  auto sh = afio::section_handle::section(fh, 8, afio::section_handle::flag::write).value();
-  auto mp = afio::map_handle::map(sh).value();
-  shared_memory = (size_t *) mp.address();
-  if(!shared_memory)
-    abort();
-  *shared_memory = (size_t) -1;
-}
-static void child_locks(size_t id)
-{
-  size_t current = *shared_memory;
-  if(current != (size_t) -1)
-  {
-    std::cerr << "FATAL: Lock algorithm is broken! " << current << " still holds the lock!" << std::endl;
-    std::terminate();
-  }
-  *shared_memory = id;
-}
-static void child_unlocks(size_t id)
-{
-  size_t current = *shared_memory;
-  if(current != id)
-  {
-    std::cerr << "FATAL: Lock algorithm is broken! " << current << " has stolen the lock!" << std::endl;
-    std::terminate();
-  }
-  *shared_memory = (size_t) -1;
-}
-
-int main(int argc, char *argv[])
-{
-  if(argc < 4)
-  {
-    std::cerr << "Usage: " << argv[0] << " [!]<atomic_append|byte_ranges|lock_files|memory_map> <entities> <no of waiters>" << std::endl;
-    return 1;
-  }
-  initialise_shared_memory();
-
-
-  // ******** MASTER PROCESS BEGINS HERE ********
-  if(strcmp(argv[1], "spawned") && strcmp(argv[1], "!spawned"))
-  {
-    size_t waiters = atoi(argv[3]);
-    if(!waiters || !atoi(argv[2]))
-    {
-      std::cerr << "Usage: " << argv[0] << " [!]<atomic_append|byte_ranges|lock_files|memory_map> <entities> <no of waiters>" << std::endl;
-      return 1;
-    }
-
-    std::vector<child_process::child_process> children;
-    auto mypath = child_process::current_process_path();
-#ifdef UNICODE
-    std::vector<afio::filesystem::path::string_type> args = {L"spawned", L"", L"", L"", L"00"};
-    args[1].resize(strlen(argv[1]));
-    for(size_t n = 0; n < args[1].size(); n++)
-      args[1][n] = argv[1][n];
-    args[2].resize(strlen(argv[2]));
-    for(size_t n = 0; n < args[2].size(); n++)
-      args[2][n] = argv[2][n];
-    args[3].resize(strlen(argv[3]));
-    for(size_t n = 0; n < args[3].size(); n++)
-      args[3][n] = argv[3][n];
+#ifdef _MSC_VER
+  auto rdtscp = [] {
+    unsigned x;
+    return (uint64_t) __rdtscp(&x);
+  };
 #else
-    std::vector<afio::filesystem::path::string_type> args = {"spawned", argv[1], argv[2], argv[3], "00"};
+#ifdef __rdtscp
+  return (uint64_t) __rdtscp();
+#elif defined(__x86_64__)
+  auto rdtscp = [] {
+    unsigned lo, hi;
+    asm volatile("rdtscp" : "=a"(lo), "=d"(hi));
+    return (uint64_t) lo | ((uint64_t) hi << 32);
+  };
+#elif defined(__i386__)
+  auto rdtscp = [] {
+    unsigned count;
+    asm volatile("rdtscp" : "=a"(count));
+    return (uint64_t) count;
+  };
 #endif
-    auto env = child_process::current_process_env();
-    std::cout << "Launching " << waiters << " copies of myself as a child process ..." << std::endl;
-    for(size_t n = 0; n < waiters; n++)
-    {
-      if(n >= 10)
-      {
-        args[4][0] = (char) ('0' + (n / 10));
-        args[4][1] = (char) ('0' + (n % 10));
-      }
-      else
-      {
-        args[4][0] = (char) ('0' + n);
-        args[4][1] = 0;
-      }
-      auto child = child_process::child_process::launch(mypath, args, env, true);
-      if(child.has_error())
-      {
-        std::cerr << "FATAL: Child " << n << " could not be launched due to " << child.error().message() << std::endl;
-        return 1;
-      }
-      children.push_back(std::move(child.value()));
-    }
-    // Wait for all children to tell me they are ready
-    char buffer[1024];
-    std::cout << "Waiting for all children to become ready ..." << std::endl;
-    for(auto &child : children)
-    {
-      auto &i = child.cout();
-      if(!i.getline(buffer, sizeof(buffer)))
-      {
-        std::cerr << "ERROR: Child seems to have vanished!" << std::endl;
-        return 1;
-      }
-      if(0 != strncmp(buffer, "READY", 5))
-      {
-        std::cerr << "ERROR: Child wrote unexpected output '" << buffer << "'" << std::endl;
-        return 1;
-      }
-    }
-#if 0
-    std::cout << "Attach your debugger now and press Return" << std::endl;
-    getchar();
+#if __ARM_ARCH >= 6
+  auto rdtscp = [] {
+    unsigned count;
+    asm volatile("MRC p15, 0, %0, c9, c13, 0" : "=r"(count));
+    return (uint64_t) count * 64;
+  };
 #endif
-#if 0
-    auto begin = std::chrono::steady_clock::now();
-    while(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - begin).count() < 2)
-      ;
 #endif
-    std::cout << "Benchmarking for " << BENCHMARK_DURATION << " seconds ..." << std::endl;
-    // Issue go command to all children
-    for(auto &child : children)
-      child.cin() << "GO" << std::endl;
-    // Wait for benchmark to complete
-    std::this_thread::sleep_for(std::chrono::seconds(BENCHMARK_DURATION));
-    std::cout << "Stopping benchmark and telling children to report results ..." << std::endl;
-    // Tell children to quit
-    for(auto &child : children)
-      child.cin() << "STOP" << std::endl;
-    unsigned long long results = 0, result;
-    std::cout << std::endl;
-    std::ofstream oh("benchmark_locking.csv");
-    for(size_t n = 0; n < children.size(); n++)
-    {
-      auto &child = children[n];
-      if(!child.cout().getline(buffer, sizeof(buffer)))
-      {
-        std::cerr << "ERROR: Child seems to have vanished!" << std::endl;
-        return 1;
-      }
-      if(0 != strncmp(buffer, "RESULTS(", 8))
-      {
-        std::cerr << "ERROR: Child wrote unexpected output '" << buffer << "'." << std::endl;
-        return 1;
-      }
-      result = atol(&buffer[8]);
-      std::cout << "Child " << n << " reports result " << result << std::endl;
-      results += result;
-      if(n)
-        oh << ",";
-      oh << result;
-    }
-    results /= BENCHMARK_DURATION;
-    std::cout << "Total result: " << results << " ops/sec" << std::endl;
-    oh << "\n" << results << std::endl;
-    return 0;
-  }
 
-
-  // ******** CHILD PROCESS BEGINS HERE ********
-  if(argc < 6)
+  static uint16_t ticks_per_sec;
+  static uint64_t offset;
+  if(ticks_per_sec == 0)
   {
-    std::cerr << "ERROR: args too short" << std::endl;
-    return 1;
-  }
-  enum class lock_algorithm
-  {
-    unknown,
-    atomic_append,
-    byte_ranges,
-    lock_files,
-    memory_map
-  } test = lock_algorithm::unknown;
-  bool contended = true;
-  if(!strcmp(argv[2], "atomic_append"))
-    test = lock_algorithm::atomic_append;
-  else if(!strcmp(argv[2], "byte_ranges"))
-    test = lock_algorithm::byte_ranges;
-  else if(!strcmp(argv[2], "lock_files"))
-    test = lock_algorithm::lock_files;
-  else if(!strcmp(argv[2], "memory_map"))
-    test = lock_algorithm::memory_map;
-  else if(!strcmp(argv[2], "!atomic_append"))
-  {
-    test = lock_algorithm::atomic_append;
-    contended = false;
-  }
-  else if(!strcmp(argv[2], "!byte_ranges"))
-  {
-    test = lock_algorithm::byte_ranges;
-    contended = false;
-  }
-  else if(!strcmp(argv[2], "!lock_files"))
-  {
-    test = lock_algorithm::lock_files;
-    contended = false;
-  }
-  else if(!strcmp(argv[2], "!memory_map"))
-  {
-    test = lock_algorithm::memory_map;
-    contended = false;
-  }
-  if(test == lock_algorithm::unknown)
-  {
-    std::cerr << "ERROR: unknown test requested" << std::endl;
-    return 1;
-  }
-  size_t total_locks = atoi(argv[3]), waiters = atoi(argv[4]), this_child = atoi(argv[5]), count = 0;
-  (void) waiters;
-  if(!total_locks)
-  {
-    std::cerr << "ERROR: unknown total locks requested" << std::endl;
-    return 1;
-  }
-  // I am a spawned child. Tell parent I am ready.
-  std::cout << "READY(" << this_child << ")" << std::endl;
-  // Wait for parent to let me proceed
-  std::atomic<int> done(-1);
-  std::thread worker([test, contended, total_locks, this_child, &done, &count] {
-    std::unique_ptr<afio::algorithm::shared_fs_mutex::shared_fs_mutex> algorithm;
-    auto base = afio::path_handle::path(".").value();
-    switch(test)
+    auto end = std::chrono::high_resolution_clock::now(), begin = std::chrono::high_resolution_clock::now();
+    auto diff = std::chrono::duration_cast<std::chrono::seconds>(end - begin);
+    uint64_t _begin = rdtscp(), _end;
+    do
     {
-    case lock_algorithm::atomic_append:
-    {
-      auto v = afio::algorithm::shared_fs_mutex::atomic_append::fs_mutex_append({}, "lockfile");
-      if(v.has_error())
-      {
-        std::cerr << "ERROR: Creation of lock algorithm returns " << v.error().message() << std::endl;
-        return;
-      }
-      algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::atomic_append>(std::move(v.value()));
-      break;
-    }
-    case lock_algorithm::byte_ranges:
-    {
-      auto v = afio::algorithm::shared_fs_mutex::byte_ranges::fs_mutex_byte_ranges({}, "lockfile");
-      if(v.has_error())
-      {
-        std::cerr << "ERROR: Creation of lock algorithm returns " << v.error().message() << std::endl;
-        return;
-      }
-      algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::byte_ranges>(std::move(v.value()));
-      break;
-    }
-    case lock_algorithm::lock_files:
-    {
-      auto v = afio::algorithm::shared_fs_mutex::lock_files::fs_mutex_lock_files(base);
-      if(v.has_error())
-      {
-        std::cerr << "ERROR: Creation of lock algorithm returns " << v.error().message() << std::endl;
-        return;
-      }
-      algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::lock_files>(std::move(v.value()));
-      break;
-    }
-    case lock_algorithm::memory_map:
-    {
-      auto v = afio::algorithm::shared_fs_mutex::memory_map<QUICKCPPLIB_NAMESPACE::algorithm::hash::passthru_hash>::fs_mutex_map({}, "lockfile");
-      if(v.has_error())
-      {
-        std::cerr << "ERROR: Creation of lock algorithm returns " << v.error().message() << std::endl;
-        return;
-      }
-      algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::memory_map<QUICKCPPLIB_NAMESPACE::algorithm::hash::passthru_hash>>(std::move(v.value()));
-      break;
-    }
-    case lock_algorithm::unknown:
-      break;
-    }
-    // Create entities named 0 to total_locks
-    std::vector<afio::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type> entities(total_locks);
-    for(size_t n = 0; n < total_locks; n++)
-    {
-      if(contended)
-      {
-        entities[n].value = n;
-        entities[n].exclusive = true;
-      }
-      else
-      {
-        entities[n].value = (this_child << 4) + n;  // guaranteed unique
-        entities[n].exclusive = true;
-      }
-    }
-    while(done == -1)
-      std::this_thread::yield();
-    while(!done)
-    {
-      auto result = algorithm->lock(entities, afio::deadline(), false);
-      if(result.has_error())
-      {
-        std::cerr << "ERROR: Algorithm lock returns " << result.error().message() << std::endl;
-        return;
-      }
-      if(contended)
-        child_locks(this_child);
-      ++count;
-      auto guard = std::move(result.value());
-      if(contended)
-        child_unlocks(this_child);
-      guard.unlock();
-    }
-  });
-  if(!strcmp(argv[1], "!spawned"))
-  {
-    auto lastcount = count;
-    size_t secs = 0;
-    done = 0;
-    while(!kbhit())
-    {
-      std::this_thread::sleep_for(std::chrono::seconds(1));
-      ++secs;
-      std::cout << "\ncount=" << count << " (+" << (count - lastcount) << "), average=" << (count / secs) << std::endl;
-      lastcount = count;
+      end = std::chrono::high_resolution_clock::now();
+    } while(std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() < 1);
+    _end = rdtscp();
+    uint64_t x = _end - _begin;
+    x /= (1000000000 / 128);
+    ticks_per_sec = (uint16_t) x;
+    volatile uint64_t a = (uint64_t)((128 * rdtscp()) / ticks_per_sec);
+    volatile uint64_t b = (uint64_t)((128 * rdtscp()) / ticks_per_sec);
+    offset = b - a;
 #if 1
-      auto it = afio::log().cbegin();
-      for(size_t n = 0; n < 10; n++)
-      {
-        if(it == afio::log().cend())
-          break;
-        std::cout << "   " << *it;
-        ++it;
-      }
+    std::cout << "There are " << (ticks_per_sec / 128.0) << " TSCs in 1 nanosecond and it takes " << offset << " nanoseconds per nanoclock()." << std::endl;
 #endif
-    }
-    done = 1;
-    worker.join();
   }
-  else
-    for(;;)
+  return (uint64_t)((128 * rdtscp()) / ticks_per_sec) - offset;
+}
+
+template <class F> inline void run_test(const char *csv, off_t max_extent, F &&f)
+{
+  char buffer[MAXBLOCKSIZE];
+  std::vector<std::pair<unsigned, unsigned>> offsets(512 * 1024);
+  std::vector<std::vector<unsigned>> results;
+  for(size_t blocksize = 1; blocksize <= MAXBLOCKSIZE; blocksize <<= 1)
+  {
+    size_t scale = blocksize / 16;
+    if(scale < 1)
+      scale = 1;
+    small_prng rand;
+    for(auto &i : offsets)
     {
-      char buffer[1024];
-      // This blocks
-      if(!std::cin.getline(buffer, sizeof(buffer)))
+      i.first = rand() % (max_extent - MAXBLOCKSIZE);
+    }
+    memset(buffer, 0, sizeof(buffer));
+    for(size_t n = 0; n < offsets.size() / scale; n++)
+    {
+      auto begin = nanoclock();
+      f(offsets[n].first, buffer, blocksize);
+      auto end = nanoclock();
+      offsets[n].second = (unsigned int) (end - begin);
+    }
+    results.emplace_back();
+    for(size_t n = 0; n < offsets.size() / scale; n++)
+    {
+      results.back().push_back(offsets[n].second);
+    }
+  }
+  std::ofstream out(csv);
+  for(size_t blocksize = 1; blocksize <= MAXBLOCKSIZE; blocksize <<= 1)
+  {
+    out << "," << blocksize;
+  }
+  out << std::endl;
+  for(size_t n = 0; n < offsets.size(); n++)
+  {
+    auto it = results.cbegin();
+    for(size_t blocksize = 1; blocksize <= MAXBLOCKSIZE; blocksize <<= 1, ++it)
+    {
+      if(n < it->size())
+        out << "," << it->at(n);
+    }
+    out << std::endl;
+  }
+}
+
+int main()
+{
+  nanoclock();
+  {
+    std::ofstream testfile("testfile");
+    std::vector<char> buffer(REGIONSIZE, 'a');
+    testfile.write(buffer.data(), buffer.size());
+  }
+#if 0
+  {
+    std::cout << "Testing latency of afio::file_handle with random malloc/free ..." << std::endl;
+    auto th = afio::file({}, "testfile").value();
+    std::vector<void *> allocations(1024 * 1024);
+    small_prng rand;
+    for(auto &i : allocations)
+    {
+      i = malloc(rand() % 4096);
+    }
+    run_test("file_handle_malloc_free.csv", 1024 * 1024, [&](unsigned offset, char *buffer, size_t len) {
+      th.read(offset, {{(afio::byte *) buffer, len}}).value();
+      for(size_t n = 0; n < rand() % 64; n++)
       {
-        return 1;
+        size_t i = rand() % (1024 * 1024);
+        if(allocations[i] == nullptr)
+          allocations[i] = malloc(rand() % 4096);
+        else
+        {
+          free(allocations[i]);
+          allocations[i] = nullptr;
+        }
       }
-      if(0 == strcmp(buffer, "GO"))
-      {
-        // Launch worker thread
-        done = 0;
-      }
-      else if(0 == strcmp(buffer, "STOP"))
-      {
-        done = 1;
-        worker.join();
-        std::cout << "RESULTS(" << count << ")" << std::endl;
-#if DEBUG_CSV
-        std::ofstream s("benchmark_locking_afio_log" + std::to_string(this_child) + ".csv");
-        s << csv(afio::log());
+    });
+  }
 #endif
-        return 0;
+#if 1
+  {
+    std::cout << "Testing latency of iostreams ..." << std::endl;
+    std::ifstream testfile("testfile");
+    testfile.exceptions(std::ios::failbit | std::ios::badbit);
+    run_test("iostreams.csv", REGIONSIZE, [&](unsigned offset, char *buffer, size_t len) {
+      testfile.seekg(offset, std::ios::beg);
+      testfile.read(buffer, len);
+    });
+  }
+  {
+    std::cout << "Testing latency of afio::file_handle ..." << std::endl;
+    auto th = afio::file({}, "testfile").value();
+    run_test("file_handle.csv", REGIONSIZE, [&](unsigned offset, char *buffer, size_t len) { th.read(offset, {{(afio::byte *) buffer, len}}).value(); });
+  }
+  {
+    std::cout << "Testing latency of afio::mapped_file_handle ..." << std::endl;
+    auto th = afio::mapped_file({}, "testfile").value();
+    run_test("mapped_file_handle.csv", REGIONSIZE, [&](unsigned offset, char *buffer, size_t len) { th.read(offset, {{(afio::byte *) buffer, len}}).value(); });
+  }
+#endif
+#if 1
+  {
+    std::cout << "Testing latency of memcpy ..." << std::endl;
+    auto th = afio::map(REGIONSIZE).value();
+#if 1
+    {
+      // Prefault
+      volatile afio::byte *p = th.address();
+      for(size_t n = 0; n < REGIONSIZE; n += 64)
+      {
+        p[n];
       }
     }
+#endif
+    run_test("memcpy.csv", REGIONSIZE, [&](unsigned offset, char *buffer, size_t len) {
+#if 0
+      memcpy(buffer, th.address() + offset, len);
+#else
+      // Can't use memcpy, it gets elided
+      const afio::byte *__restrict s = th.address() + offset;
+#if defined(__SSE2__) || defined(_M_X64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
+      while(len >= 4 * sizeof(__m128i))
+      {
+        __m128i a = *(const __m128i *__restrict) s;
+        s += sizeof(__m128i);
+        __m128i b = *(const __m128i *__restrict) s;
+        s += sizeof(__m128i);
+        __m128i c = *(const __m128i *__restrict) s;
+        s += sizeof(__m128i);
+        __m128i d = *(const __m128i *__restrict) s;
+        s += sizeof(__m128i);
+        *(__m128i * __restrict) buffer = a;
+        buffer += sizeof(__m128i);
+        *(__m128i * __restrict) buffer = b;
+        buffer += sizeof(__m128i);
+        *(__m128i * __restrict) buffer = c;
+        buffer += sizeof(__m128i);
+        *(__m128i * __restrict) buffer = d;
+        buffer += sizeof(__m128i);
+        len -= 4 * sizeof(__m128i);
+      }
+      while(len >= sizeof(__m128i))
+      {
+        *(__m128i * __restrict) buffer = *(const __m128i *__restrict) s;
+        buffer += sizeof(__m128i);
+        s += sizeof(__m128i);
+        len -= sizeof(__m128i);
+      }
+#endif
+      while(len >= sizeof(uint64_t))
+      {
+        *(volatile uint64_t * __restrict) buffer = *(const uint64_t *__restrict) s;
+        buffer += sizeof(uint64_t);
+        s += sizeof(uint64_t);
+        len -= sizeof(uint64_t);
+      }
+      if(len >= sizeof(uint32_t))
+      {
+        *(volatile uint32_t * __restrict) buffer = *(const uint32_t *__restrict) s;
+        buffer += sizeof(uint32_t);
+        s += sizeof(uint32_t);
+        len -= sizeof(uint32_t);
+      }
+      if(len >= sizeof(uint16_t))
+      {
+        *(volatile uint16_t * __restrict) buffer = *(const uint16_t *__restrict) s;
+        buffer += sizeof(uint16_t);
+        s += sizeof(uint16_t);
+        len -= sizeof(uint16_t);
+      }
+      if(len >= sizeof(uint8_t))
+      {
+        *(volatile uint8_t * __restrict) buffer = *(const uint8_t *__restrict) s;
+        buffer += sizeof(uint8_t);
+        s += sizeof(uint8_t);
+        len -= sizeof(uint8_t);
+      }
+#endif
+    });
+  }
+#endif
+  afio::filesystem::remove("testfile");
 }
