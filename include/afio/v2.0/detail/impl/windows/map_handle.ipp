@@ -519,7 +519,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   size_t commitsize = bytes;
   LARGE_INTEGER _offset{};
   _offset.QuadPart = offset;
-  SIZE_T _bytes = win32_round_up_to_allocation_size(bytes);  // reserve to next 64Kb boundary
+  SIZE_T _bytes = utils::round_up_to_page_size(bytes);
   win32_map_flags(nativeh, allocation, prot, commitsize, section.backing() != nullptr, _flag);
   AFIO_LOG_FUNCTION_CALL(&ret);
   NTSTATUS ntstat = NtMapViewOfSection(section.native_handle().h, GetCurrentProcess(), &addr, 0, commitsize, &_offset, &_bytes, ViewUnmap, allocation, prot);

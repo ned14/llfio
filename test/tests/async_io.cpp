@@ -30,7 +30,7 @@ static inline void TestAsyncFileHandle()
 {
   namespace afio = AFIO_V2_NAMESPACE;
   afio::io_service service;
-  afio::async_file_handle h = afio::async_file_handle::async_file(service, {}, "temp", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::only_metadata, afio::file_handle::flag::unlink_on_close).value();
+  afio::async_file_handle h = afio::async_file_handle::async_file(service, {}, "temp", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::only_metadata, afio::file_handle::flag::unlink_on_first_close).value();
   std::vector<std::pair<std::future<afio::async_file_handle::const_buffers_type>, afio::async_file_handle::io_state_ptr>> futures;
   futures.reserve(1024);
   h.truncate(1024 * 4096).value();

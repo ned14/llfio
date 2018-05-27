@@ -75,7 +75,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
 {
   caching _caching = caching::temporary;
   // No need to check inode before unlink
-  flags |= flag::unlink_on_close | flag::disable_safety_unlinks;
+  flags |= flag::unlink_on_first_close | flag::disable_safety_unlinks;
   result<file_handle> ret(file_handle(native_handle_type(), 0, 0, _caching, flags));
   native_handle_type &nativeh = ret.value()._v;
   AFIO_LOG_FUNCTION_CALL(&ret);
@@ -90,7 +90,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   if(-1 != nativeh.fd)
   {
     ret.value()._flags |= flag::anonymous_inode;
-    ret.value()._flags &= ~flag::unlink_on_close;  // It's already unlinked
+    ret.value()._flags &= ~flag::unlink_on_first_close;  // It's already unlinked
     return ret;
   }
   // If it failed, assume this kernel or FS doesn't support O_TMPFILE
@@ -123,7 +123,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
     {
       return posix_error();
     }
-    ret.value()._flags &= ~flag::unlink_on_close;
+    ret.value()._flags &= ~flag::unlink_on_first_close;
     return ret;
   }
 }

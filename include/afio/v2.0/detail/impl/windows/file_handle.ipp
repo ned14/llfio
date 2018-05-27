@@ -163,7 +163,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
 #endif
     }
   }
-  if(flags & flag::unlink_on_close)
+  if(flags & flag::unlink_on_first_close)
   {
     // Hide this item
     IO_STATUS_BLOCK isb = make_iostatus();
@@ -189,7 +189,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   using namespace windows_nt_kernel;
   caching _caching = caching::temporary;
   // No need to rename to random on unlink or check inode before unlink
-  flags |= flag::unlink_on_close | flag::disable_safety_unlinks | flag::win_disable_unlink_emulation;
+  flags |= flag::unlink_on_first_close | flag::disable_safety_unlinks | flag::win_disable_unlink_emulation;
   result<file_handle> ret(file_handle(native_handle_type(), 0, 0, _caching, flags));
   native_handle_type &nativeh = ret.value()._v;
   AFIO_LOG_FUNCTION_CALL(&ret);
@@ -245,23 +245,52 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
     // std::cerr << random << std::endl;
     if(nativeh.h != nullptr)
     {
-      // Hide this item
-      IO_STATUS_BLOCK isb = make_iostatus();
-      FILE_BASIC_INFORMATION fbi{};
-      memset(&fbi, 0, sizeof(fbi));
-      fbi.FileAttributes = FILE_ATTRIBUTE_HIDDEN;
-      NtSetInformationFile(nativeh.h, &isb, &fbi, sizeof(fbi), FileBasicInformation);
-
-      // Mark the item as delete on close
-      isb = make_iostatus();
-      FILE_DISPOSITION_INFORMATION fdi{};
-      memset(&fdi, 0, sizeof(fdi));
-      fdi._DeleteFile = 1u;
-      NTSTATUS ntstat = NtSetInformationFile(nativeh.h, &isb, &fdi, sizeof(fdi), FileDispositionInformation);
-      if(ntstat >= 0)
+      bool failed = true;
+      // Immediately delete, try by POSIX delete first
       {
-        // No need to delete it again on close
-        ret.value()._flags &= ~flag::unlink_on_close;
+        HANDLE duph;
+        // It is entirely undocumented that this is how you clone a file handle with new privs
+        memset(&_path, 0, sizeof(_path));
+        oa.ObjectName = &_path;
+        oa.RootDirectory = nativeh.h;
+        IO_STATUS_BLOCK isb = make_iostatus();
+        NTSTATUS ntstat = NtOpenFile(&duph, SYNCHRONIZE | DELETE, &oa, &isb, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/);
+        if(ntstat < 0)
+        {
+          return ntkernel_error(ntstat);
+        }
+        auto unduph = undoer([&duph] { CloseHandle(duph); });
+        (void) unduph;
+        isb = make_iostatus();
+        FILE_DISPOSITION_INFORMATION_EX fdie{};
+        memset(&fdie, 0, sizeof(fdie));
+        fdie.Flags = 0x1 /*FILE_DISPOSITION_DELETE*/ | 0x2 /*FILE_DISPOSITION_POSIX_SEMANTICS*/;
+        ntstat = NtSetInformationFile(duph, &isb, &fdie, sizeof(fdie), FileDispositionInformationEx);
+        if(ntstat >= 0)
+        {
+          failed = false;
+        }
+      }
+      if(failed)
+      {
+        // Hide this item
+        IO_STATUS_BLOCK isb = make_iostatus();
+        FILE_BASIC_INFORMATION fbi{};
+        memset(&fbi, 0, sizeof(fbi));
+        fbi.FileAttributes = FILE_ATTRIBUTE_HIDDEN;
+        NtSetInformationFile(nativeh.h, &isb, &fbi, sizeof(fbi), FileBasicInformation);
+
+        // Mark the item as delete on close
+        isb = make_iostatus();
+        FILE_DISPOSITION_INFORMATION fdi{};
+        memset(&fdi, 0, sizeof(fdi));
+        fdi._DeleteFile = 1u;
+        NTSTATUS ntstat = NtSetInformationFile(nativeh.h, &isb, &fdi, sizeof(fdi), FileDispositionInformation);
+        if(ntstat >= 0)
+        {
+          // No need to delete it again on close
+          ret.value()._flags &= ~flag::unlink_on_first_close;
+        }
       }
     }
     return ret;

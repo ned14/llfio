@@ -157,7 +157,7 @@ namespace algorithm
             });
             for(n = 0; n < out.entities.size(); n++)
             {
-              auto ret = file_handle::file(_path, entity_paths[n], file_handle::mode::write, file_handle::creation::only_if_not_exist, file_handle::caching::temporary, file_handle::flag::unlink_on_close);
+              auto ret = file_handle::file(_path, entity_paths[n], file_handle::mode::write, file_handle::creation::only_if_not_exist, file_handle::caching::temporary, file_handle::flag::unlink_on_first_close);
               if(ret.has_error())
               {
                 const auto &ec = ret.error();

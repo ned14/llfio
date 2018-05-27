@@ -1,5 +1,5 @@
 /* Declarations for Microsoft Windows system APIs
-(C) 2015-2017 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
+(C) 2015-2018 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
 File Created: Dec 2015
 
 
@@ -146,7 +146,8 @@ namespace windows_nt_kernel
     FileNumaNodeInformation,
     FileStandardLinkInformation,
     FileRemoteProtocolInformation,
-    FileMaximumInformation
+    FileMaximumInformation,
+    FileDispositionInformationEx = 64
   } FILE_INFORMATION_CLASS,
   *PFILE_INFORMATION_CLASS;
 
@@ -387,7 +388,7 @@ namespace windows_nt_kernel
 
   typedef struct _FILE_RENAME_INFORMATION  // NOLINT
   {
-    BOOLEAN ReplaceIfExists;
+    ULONG Flags;
     HANDLE RootDirectory;
     ULONG FileNameLength;
     WCHAR FileName[1];
@@ -405,6 +406,11 @@ namespace windows_nt_kernel
   {
     BOOLEAN _DeleteFile;
   } FILE_DISPOSITION_INFORMATION, *PFILE_DISPOSITION_INFORMATION;
+
+  typedef struct _FILE_DISPOSITION_INFORMATION_EX  // NOLINT
+  {
+    ULONG Flags;
+  } FILE_DISPOSITION_INFORMATION_EX, *PFILE_DISPOSITION_INFORMATION_EX;
 
   typedef struct _FILE_ALL_INFORMATION  // NOLINT
   {
@@ -1190,7 +1196,7 @@ inline result<ACCESS_MASK> access_mask_from_handle_mode(native_handle_type &nati
     break;
   }
   // Should we allow unlink on close if opening read only? I guess if Windows allows it, so should we.
-  if(flags & handle::flag::unlink_on_close)
+  if(flags & handle::flag::unlink_on_first_close)
   {
     access |= DELETE;
   }
@@ -1227,7 +1233,7 @@ inline result<DWORD> attributes_from_handle_caching_and_flags(native_handle_type
     attribs |= FILE_ATTRIBUTE_TEMPORARY;
     break;
   }
-  if(flags & handle::flag::unlink_on_close)
+  if(flags & handle::flag::unlink_on_first_close)
   {
     attribs |= FILE_FLAG_DELETE_ON_CLOSE;
   }
@@ -1275,7 +1281,7 @@ inline result<DWORD> ntflags_from_handle_caching_and_flags(native_handle_type &n
     // should be handled by attributes_from_handle_caching_and_flags
     break;
   }
-  if(flags & handle::flag::unlink_on_close)
+  if(flags & handle::flag::unlink_on_first_close)
   {
     ntflags |= 0x00001000 /*FILE_DELETE_ON_CLOSE*/;
   }

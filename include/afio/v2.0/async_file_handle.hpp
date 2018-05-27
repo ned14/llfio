@@ -187,7 +187,7 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   AFIO_MAKE_FREE_FUNCTION
-  static inline result<async_file_handle> async_temp_file(io_service &service, path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::only_metadata, flag flags = flag::unlink_on_close) noexcept
+  static inline result<async_file_handle> async_temp_file(io_service &service, path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::only_metadata, flag flags = flag::unlink_on_first_close) noexcept
   {
     auto &tempdirh = path_discovery::storage_backed_temporary_files_directory();
     return name.empty() ? async_random_file(service, tempdirh, _mode, _caching, flags) : async_file(service, tempdirh, name, _mode, _creation, _caching, flags);
@@ -666,7 +666,7 @@ to use. Use `temp_inode()` instead, it is far more secure.
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
 inline result<async_file_handle> async_temp_file(io_service &service, async_file_handle::path_view_type name = async_file_handle::path_view_type(), async_file_handle::mode _mode = async_file_handle::mode::write, async_file_handle::creation _creation = async_file_handle::creation::if_needed,
-                                                 async_file_handle::caching _caching = async_file_handle::caching::only_metadata, async_file_handle::flag flags = async_file_handle::flag::unlink_on_close) noexcept
+                                                 async_file_handle::caching _caching = async_file_handle::caching::only_metadata, async_file_handle::flag flags = async_file_handle::flag::unlink_on_first_close) noexcept
 {
   return async_file_handle::async_temp_file(std::forward<decltype(service)>(service), std::forward<decltype(name)>(name), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }

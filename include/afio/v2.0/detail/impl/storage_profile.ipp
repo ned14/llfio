@@ -873,7 +873,7 @@ namespace storage_profile
             auto fh = file_handle::file(base, std::to_string(n), file_handle::mode::write, file_handle::creation::open_existing, srch.kernel_caching(), srch.flags());
             if(!fh)
             {
-              fh = file_handle::file(base, std::to_string(n), file_handle::mode::write, file_handle::creation::if_needed, srch.kernel_caching(), srch.flags() | file_handle::flag::unlink_on_close);
+              fh = file_handle::file(base, std::to_string(n), file_handle::mode::write, file_handle::creation::if_needed, srch.kernel_caching(), srch.flags() | file_handle::flag::unlink_on_first_close);
               fh.value().write(0, {{buffer.data(), buffer.size()}}).value();
             }
             _workfiles.push_back(std::move(fh.value()));

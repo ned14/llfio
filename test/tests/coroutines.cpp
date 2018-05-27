@@ -36,7 +36,7 @@ static inline void TestAsyncFileHandleCoroutines()
   afio::io_service service;
 
   // Create an async file i/o handle attached to the i/o service for this thread
-  afio::async_file_handle h = afio::async_file_handle::async_file(service, {}, "temp", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::only_metadata, afio::file_handle::flag::unlink_on_close).value();
+  afio::async_file_handle h = afio::async_file_handle::async_file(service, {}, "temp", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::only_metadata, afio::file_handle::flag::unlink_on_first_close).value();
 
   // Truncate to 1Mb
   h.truncate(1024 * 4096);

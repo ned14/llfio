@@ -216,7 +216,7 @@ public:
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override
   {
     AFIO_LOG_FUNCTION_CALL(this);
-    if(_flags & flag::unlink_on_close)
+    if(_flags & flag::unlink_on_first_close)
     {
       auto ret = unlink();
       if(!ret)

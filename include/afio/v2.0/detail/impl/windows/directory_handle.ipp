@@ -31,7 +31,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  if(flags & flag::unlink_on_close)
+  if(flags & flag::unlink_on_first_close)
   {
     return errc::invalid_argument;
   }

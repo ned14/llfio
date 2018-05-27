@@ -164,7 +164,8 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
   IO_STATUS_BLOCK isb = make_iostatus();
   alignas(8) char buffer[sizeof(FILE_RENAME_INFORMATION) + 65536];
   auto *fni = reinterpret_cast<FILE_RENAME_INFORMATION *>(buffer);
-  fni->ReplaceIfExists = static_cast<BOOLEAN>(atomic_replace);
+  fni->Flags = atomic_replace ? 0x1 /*FILE_RENAME_REPLACE_IF_EXISTS*/ : 0;
+  fni->Flags |= 0x2 /*FILE_RENAME_POSIX_SEMANTICS*/;
   fni->RootDirectory = base.is_valid() ? base.native_handle().h : nullptr;
   fni->FileNameLength = _path.Length;
   memcpy(fni->FileName, _path.Buffer, fni->FileNameLength);
@@ -187,64 +188,97 @@ result<void> fs_handle::unlink(deadline d) noexcept
   using namespace windows_nt_kernel;
   AFIO_LOG_FUNCTION_CALL(this);
   auto &h = _get_handle();
-  if((h.is_regular() || h.is_symlink()) && !(h.flags() & flag::win_disable_unlink_emulation))
+  bool failed = true;
+  // Try by POSIX delete first
   {
-    // Rename it to something random to emulate immediate unlinking
-    std::string randomname;
-    try
+    HANDLE duph;
+    OBJECT_ATTRIBUTES oa{};
+    memset(&oa, 0, sizeof(oa));
+    oa.Length = sizeof(OBJECT_ATTRIBUTES);
+    // It is entirely undocumented that this is how you clone a file handle with new privs
+    UNICODE_STRING _path{};
+    memset(&_path, 0, sizeof(_path));
+    oa.ObjectName = &_path;
+    oa.RootDirectory = h.native_handle().h;
+    IO_STATUS_BLOCK isb = make_iostatus();
+    NTSTATUS ntstat = NtOpenFile(&duph, SYNCHRONIZE | DELETE, &oa, &isb, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/);
+    if(ntstat < 0)
     {
-      randomname = utils::random_string(32);
-      randomname.append(".deleted");
+      return ntkernel_error(ntstat);
     }
-    catch(...)
+    auto unduph = undoer([&duph] { CloseHandle(duph); });
+    (void) unduph;
+    isb = make_iostatus();
+    FILE_DISPOSITION_INFORMATION_EX fdie{};
+    memset(&fdie, 0, sizeof(fdie));
+    fdie.Flags = 0x1 /*FILE_DISPOSITION_DELETE*/ | 0x2 /*FILE_DISPOSITION_POSIX_SEMANTICS*/;
+    ntstat = NtSetInformationFile(duph, &isb, &fdie, sizeof(fdie), FileDispositionInformationEx);
+    if(ntstat >= 0)
     {
-      return error_from_exception();
-    }
-    OUTCOME_TRY(dirh, parent_path_handle(d));
-    result<void> out = relink(dirh, randomname);
-    if(!out)
-    {
-      // If something else is using it, we may not be able to rename
-      // This error also annoyingly appears if the file has delete on close set on it already
-      if(out.error().ec.value() == static_cast<int>(0xC0000043) /*STATUS_SHARING_VIOLATION*/)
-      {
-        AFIO_LOG_WARN(this, "Failed to rename entry to random name to simulate immediate unlinking due to STATUS_SHARING_VIOLATION, skipping");
-      }
-      else
-      {
-        return out.error();
-      }
+      failed = false;
     }
   }
-  // No point marking it for deletion if it's already been so
-  if(!(h.flags() & flag::unlink_on_close))
+  if(failed)
   {
-    // Hide the item in Explorer and the command line
+    if((h.is_regular() || h.is_symlink()) && !(h.flags() & flag::win_disable_unlink_emulation))
     {
+      // Rename it to something random to emulate immediate unlinking
+      std::string randomname;
+      try
+      {
+        randomname = utils::random_string(32);
+        randomname.append(".deleted");
+      }
+      catch(...)
+      {
+        return error_from_exception();
+      }
+      OUTCOME_TRY(dirh, parent_path_handle(d));
+      result<void> out = relink(dirh, randomname);
+      if(!out)
+      {
+        // If something else is using it, we may not be able to rename
+        // This error also annoyingly appears if the file has delete on close set on it already
+        if(out.error().ec.value() == static_cast<int>(0xC0000043) /*STATUS_SHARING_VIOLATION*/)
+        {
+          AFIO_LOG_WARN(this, "Failed to rename entry to random name to simulate immediate unlinking due to STATUS_SHARING_VIOLATION, skipping");
+        }
+        else
+        {
+          return out.error();
+        }
+      }
+    }
+    // No point marking it for deletion if it's already been so
+    if(!(h.flags() & flag::unlink_on_first_close))
+    {
+      // Hide the item in Explorer and the command line
+      {
+        IO_STATUS_BLOCK isb = make_iostatus();
+        FILE_BASIC_INFORMATION fbi{};
+        memset(&fbi, 0, sizeof(fbi));
+        fbi.FileAttributes = FILE_ATTRIBUTE_HIDDEN;
+        NTSTATUS ntstat = NtSetInformationFile(h.native_handle().h, &isb, &fbi, sizeof(fbi), FileBasicInformation);
+        if(STATUS_PENDING == ntstat)
+        {
+          ntstat = ntwait(h.native_handle().h, isb, d);
+        }
+        (void) ntstat;
+      }
+      // Mark the item as delete on close
       IO_STATUS_BLOCK isb = make_iostatus();
-      FILE_BASIC_INFORMATION fbi{};
-      memset(&fbi, 0, sizeof(fbi));
-      fbi.FileAttributes = FILE_ATTRIBUTE_HIDDEN;
-      NTSTATUS ntstat = NtSetInformationFile(h.native_handle().h, &isb, &fbi, sizeof(fbi), FileBasicInformation);
+      FILE_DISPOSITION_INFORMATION fdi{};
+      memset(&fdi, 0, sizeof(fdi));
+      fdi._DeleteFile = 1u;
+      NTSTATUS ntstat = NtSetInformationFile(h.native_handle().h, &isb, &fdi, sizeof(fdi), FileDispositionInformation);
       if(STATUS_PENDING == ntstat)
       {
         ntstat = ntwait(h.native_handle().h, isb, d);
       }
-      (void) ntstat;
-    }
-    // Mark the item as delete on close
-    IO_STATUS_BLOCK isb = make_iostatus();
-    FILE_DISPOSITION_INFORMATION fdi{};
-    memset(&fdi, 0, sizeof(fdi));
-    fdi._DeleteFile = 1u;
-    NTSTATUS ntstat = NtSetInformationFile(h.native_handle().h, &isb, &fdi, sizeof(fdi), FileDispositionInformation);
-    if(STATUS_PENDING == ntstat)
-    {
-      ntstat = ntwait(h.native_handle().h, isb, d);
-    }
-    if(ntstat < 0)
-    {
-      return ntkernel_error(ntstat);
+      if(ntstat < 0)
+      {
+        return ntkernel_error(ntstat);
+      }
     }
   }
   return success();

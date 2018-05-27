@@ -41,7 +41,7 @@ AFIO_V2_NAMESPACE_BEGIN
 
 result<directory_handle> directory_handle::directory(const path_handle &base, path_view_type path, mode _mode, creation _creation, caching _caching, flag flags) noexcept
 {
-  if(flags & flag::unlink_on_close)
+  if(flags & flag::unlink_on_first_close)
   {
     return errc::invalid_argument;
   }
