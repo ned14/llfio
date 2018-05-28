@@ -189,7 +189,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   using namespace windows_nt_kernel;
   caching _caching = caching::temporary;
   // No need to rename to random on unlink or check inode before unlink
-  flags |= flag::unlink_on_first_close | flag::disable_safety_unlinks | flag::win_disable_unlink_emulation;
+  flags |= flag::disable_safety_unlinks | flag::win_disable_unlink_emulation;
   result<file_handle> ret(file_handle(native_handle_type(), 0, 0, _caching, flags));
   native_handle_type &nativeh = ret.value()._v;
   AFIO_LOG_FUNCTION_CALL(&ret);
