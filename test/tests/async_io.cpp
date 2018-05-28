@@ -30,7 +30,7 @@ static inline void TestAsyncFileHandle()
 {
   namespace afio = AFIO_V2_NAMESPACE;
   afio::io_service service;
-  afio::async_file_handle h = afio::async_file_handle::async_file(service, {}, "temp", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::only_metadata, afio::file_handle::flag::unlink_on_close).value();
+  afio::async_file_handle h = afio::async_file_handle::async_file(service, {}, "temp", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::only_metadata, afio::file_handle::flag::unlink_on_first_close).value();
   std::vector<std::pair<std::future<afio::async_file_handle::const_buffers_type>, afio::async_file_handle::io_state_ptr>> futures;
   futures.reserve(1024);
   h.truncate(1024 * 4096).value();
@@ -45,7 +45,7 @@ static inline void TestAsyncFileHandle()
     auto schedule_io = [&] {
       return h.async_write({bt, n * 4096}, [ p = std::move(p), n ](afio::async_file_handle *, afio::async_file_handle::io_result<afio::async_file_handle::const_buffers_type> & result) mutable {
         (void) n;
-        if(!result && result.error() == std::errc::resource_unavailable_try_again)
+        if(!result && result.error() == afio::errc::resource_unavailable_try_again)
         {
           std::cout << "*** Completion handler saw error " << result.error() << std::endl;
         }
@@ -62,7 +62,7 @@ static inline void TestAsyncFileHandle()
       });
     };
     auto g(schedule_io());
-    if(!g && g.error() == std::errc::resource_unavailable_try_again)
+    if(!g && g.error() == afio::errc::resource_unavailable_try_again)
     {
       // Sleep until at least i/o is processed
       service.run().value();

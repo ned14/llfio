@@ -216,7 +216,7 @@ result<bool> io_service::run_until(deadline d) noexcept
   }
   if(pthread_self() != _threadh)
   {
-    return std::errc::operation_not_supported;
+    return errc::operation_not_supported;
   }
   std::chrono::steady_clock::time_point began_steady;
   std::chrono::system_clock::time_point end_utc;
@@ -308,7 +308,7 @@ result<bool> io_service::run_until(deadline d) noexcept
         // Let him loop, recalculate any timeout and check for posts to be executed
         break;
       default:
-        return {errcode, std::system_category()};
+        return posix_error(errcode);
       }
     }
     else
@@ -327,7 +327,7 @@ result<bool> io_service::run_until(deadline d) noexcept
           int ioret = aio_return(aiocb);
           if(ioret < 0)
           {
-            return {errno, std::system_category()};
+            return posix_error();
           }
           // std::cout << "aiocb " << aiocb << " sees succesful return " << ioret << std::endl;
           // The aiocb aio_sigevent.sigev_value.sival_ptr field will point to a file_handle::_io_state_type
@@ -358,14 +358,14 @@ result<bool> io_service::run_until(deadline d) noexcept
       {
         if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds(d.nsecs)))
         {
-          return std::errc::timed_out;
+          return errc::timed_out;
         }
       }
       else
       {
         if(std::chrono::system_clock::now() >= end_utc)
         {
-          return std::errc::timed_out;
+          return errc::timed_out;
         }
       }
     }

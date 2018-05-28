@@ -420,7 +420,7 @@ else. Verify shared allows other shared.
 void TestSharedFSMutexCorrectness(shared_memory::mutex_kind_type mutex_kind, shared_memory::test_type testtype, bool threads_not_processes)
 {
   namespace afio = AFIO_V2_NAMESPACE;
-  auto shared_mem_file = afio::file_handle::file({}, "shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::unlink_on_close).value();
+  auto shared_mem_file = afio::file_handle::file({}, "shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::unlink_on_first_close).value();
   shared_mem_file.truncate(sizeof(shared_memory)).value();
   auto shared_mem_file_section = afio::section_handle::section(shared_mem_file, sizeof(shared_memory), afio::section_handle::flag::readwrite).value();
   auto shared_mem_file_map = afio::map_handle::map(shared_mem_file_section).value();
@@ -510,7 +510,7 @@ and destructing the lock. This should find interesting races in the more complex
 static void TestSharedFSMutexConstructDestruct(shared_memory::mutex_kind_type mutex_kind)
 {
   namespace afio = AFIO_V2_NAMESPACE;
-  auto shared_mem_file = afio::file_handle::file({}, "shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::unlink_on_close).value();
+  auto shared_mem_file = afio::file_handle::file({}, "shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::unlink_on_first_close).value();
   shared_mem_file.truncate(sizeof(shared_memory)).value();
   auto shared_mem_file_section = afio::section_handle::section(shared_mem_file, sizeof(shared_memory), afio::section_handle::flag::readwrite).value();
   auto shared_mem_file_map = afio::map_handle::map(shared_mem_file_section).value();

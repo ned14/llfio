@@ -60,7 +60,7 @@ namespace storage_profile
           memset(&name, 0, sizeof(name));
           if(uname(&name) < 0)
           {
-            return {errno, std::system_category()};
+            return posix_error();
           }
           sp.os_name.value = os_name = name.sysname;
           sp.os_ver.value = os_ver = name.release;
@@ -94,7 +94,7 @@ namespace storage_profile
           memset(&name, 0, sizeof(name));
           if(uname(&name) < 0)
           {
-            return {errno, std::system_category()};
+            return posix_error();
           }
           sp.cpu_name.value = sp.cpu_architecture.value = name.machine;
           sp.cpu_physical_cores.value = 0;
@@ -280,16 +280,16 @@ namespace storage_profile
                     continue;
                   // Is there more than one physical disk device?
                   if(!mntfromname.empty())
-                    return std::errc::function_not_supported;
+                    return errc::function_not_supported;
                   mntfromname = "/dev/" + std::string(s, e - s);
                 }
               }
               else
-                return std::errc::function_not_supported;
+                return errc::function_not_supported;
             }
             else
 #endif
-              return std::errc::function_not_supported;
+              return errc::function_not_supported;
           }
           OUTCOME_TRY(deviceh, file_handle::file({}, mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
 

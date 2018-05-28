@@ -34,7 +34,7 @@ result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type rese
   if(length == 0)
   {
     // Not portable to map an empty file, so fail
-    return std::errc::invalid_seek;
+    return errc::invalid_seek;
   }
   if(reservation == 0)
   {

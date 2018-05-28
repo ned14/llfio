@@ -52,7 +52,7 @@ namespace stackoverflow
       // be POSIX, or Win32 or NT kernel error code domains. However we can always compare,
       // via 100% C++ 11 STL, any error code to a generic error *condition* for equivalence
       // So this comparison will work as expected irrespective of original error code.
-      if(ec == std::errc::no_such_file_or_directory)
+      if(ec == errc::no_such_file_or_directory)
       {
         // Return empty optional
         return {};

@@ -117,14 +117,14 @@ namespace utils
       HANDLE processToken;
       if(OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &processToken) == FALSE)
       {
-        return {GetLastError(), std::system_category()};
+        return win32_error();
       }
       auto unprocessToken = undoer([&processToken] { CloseHandle(processToken); });
       {
         LUID luid{};
         if(!LookupPrivilegeValue(nullptr, L"SeProfileSingleProcessPrivilege", &luid))
         {
-          return {GetLastError(), std::system_category()};
+          return win32_error();
         }
         TOKEN_PRIVILEGES tp{};
         tp.PrivilegeCount = 1;
@@ -132,11 +132,11 @@ namespace utils
         tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
         if(AdjustTokenPrivileges(processToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), static_cast<PTOKEN_PRIVILEGES>(nullptr), static_cast<PDWORD>(nullptr)) == 0)
         {
-          return {GetLastError(), std::system_category()};
+          return win32_error();
         }
         if(GetLastError() == ERROR_NOT_ALL_ASSIGNED)
         {
-          return {GetLastError(), std::system_category()};
+          return win32_error();
         }
       }
       prived = true;
@@ -148,7 +148,7 @@ namespace utils
     NTSTATUS ntstat = NtSetSystemInformation(80 /*SystemMemoryListInformation*/, &command, sizeof(SYSTEM_MEMORY_LIST_COMMAND));
     if(ntstat != STATUS_SUCCESS)
     {
-      return {static_cast<int>(ntstat), ntkernel_category()};
+      return ntkernel_error(ntstat);
     }
     return success();
   }
@@ -163,14 +163,14 @@ namespace utils
       HANDLE processToken;
       if(OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &processToken) == FALSE)
       {
-        return {GetLastError(), std::system_category()};
+        return win32_error();
       }
       auto unprocessToken = undoer([&processToken] { CloseHandle(processToken); });
       {
         LUID luid{};
         if(!LookupPrivilegeValue(nullptr, L"SeIncreaseQuotaPrivilege", &luid))
         {
-          return {GetLastError(), std::system_category()};
+          return win32_error();
         }
         TOKEN_PRIVILEGES tp{};
         tp.PrivilegeCount = 1;
@@ -178,11 +178,11 @@ namespace utils
         tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
         if(AdjustTokenPrivileges(processToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), static_cast<PTOKEN_PRIVILEGES>(nullptr), static_cast<PDWORD>(nullptr)) == 0)
         {
-          return {GetLastError(), std::system_category()};
+          return win32_error();
         }
         if(GetLastError() == ERROR_NOT_ALL_ASSIGNED)
         {
-          return {GetLastError(), std::system_category()};
+          return win32_error();
         }
       }
       prived = true;
@@ -192,7 +192,7 @@ namespace utils
     // Drop filesystem cache
     if(SetSystemFileCacheSize(static_cast<SIZE_T>(-1), static_cast<SIZE_T>(-1), 0) == 0)
     {
-      return {GetLastError(), std::system_category()};
+      return win32_error();
     }
     return success();
   }

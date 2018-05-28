@@ -98,14 +98,14 @@ public:
     none = 0,  //!< No flags
     /*! Unlinks the file on handle close. On POSIX, this simply unlinks whatever is pointed
     to by `path()` upon the call of `close()` if and only if the inode matches. On Windows,
-    this opens the file handle with the `FILE_FLAG_DELETE_ON_CLOSE` modifier which substantially
-    affects caching policy and causes the \b first handle close to make the file unavailable for
+    if you are on Windows 10 1709 or later, exactly the same thing occurs. If on previous
+    editions of Windows, the file entry does not disappears but becomes unavailable for
     anyone else to open with an `errc::resource_unavailable_try_again` error return. Because this is confusing, unless the
     `win_disable_unlink_emulation` flag is also specified, this POSIX behaviour is
-    somewhat emulated by AFIO on Windows by renaming the file to a random name on `close()`
+    somewhat emulated by AFIO on older Windows by renaming the file to a random name on `close()`
     causing it to appear to have been unlinked immediately.
     */
-    unlink_on_close = 1U << 0U,
+    unlink_on_first_close = 1U << 0U,
 
     /*! Some kernel caching modes have unhelpfully inconsistent behaviours
     in getting your data onto storage, so by default unless this flag is
@@ -143,7 +143,7 @@ public:
     */
     maximum_prefetching = 1U << 5U,
 
-    win_disable_unlink_emulation = 1U << 24U,  //!< See the documentation for `unlink_on_close`
+    win_disable_unlink_emulation = 1U << 24U,  //!< See the documentation for `unlink_on_first_close`
     /*! Microsoft Windows NTFS, having been created in the late 1980s, did not originally
     implement extents-based storage and thus could only represent sparse files via
     efficient compression of intermediate zeros. With NTFS v3.0 (Microsoft Windows 2000),
@@ -355,9 +355,9 @@ inline std::ostream &operator<<(std::ostream &s, const handle::caching &v)
 inline std::ostream &operator<<(std::ostream &s, const handle::flag &v)
 {
   std::string temp;
-  if(!!(v & handle::flag::unlink_on_close))
+  if(!!(v & handle::flag::unlink_on_first_close))
   {
-    temp.append("unlink_on_close|");
+    temp.append("unlink_on_first_close|");
   }
   if(!!(v & handle::flag::disable_safety_fsyncs))
   {

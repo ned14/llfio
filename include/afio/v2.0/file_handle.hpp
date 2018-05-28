@@ -141,7 +141,7 @@ public:
         auto randomname = utils::random_string(32);
         randomname.append(".random");
         result<file_handle> ret = file(dirpath, randomname, _mode, creation::only_if_not_exist, _caching, flags);
-        if(ret || (!ret && ret.error() != std::errc::file_exists))
+        if(ret || (!ret && ret.error() != errc::file_exists))
         {
           return ret;
         }
@@ -168,7 +168,7 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   AFIO_MAKE_FREE_FUNCTION
-  static inline result<file_handle> temp_file(path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::temporary, flag flags = flag::unlink_on_close) noexcept
+  static inline result<file_handle> temp_file(path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::temporary, flag flags = flag::unlink_on_first_close) noexcept
   {
     auto &tempdirh = path_discovery::storage_backed_temporary_files_directory();
     return name.empty() ? random_file(tempdirh, _mode, _caching, flags) : file(tempdirh, name, _mode, _creation, _caching, flags);
@@ -196,13 +196,13 @@ public:
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override
   {
     AFIO_LOG_FUNCTION_CALL(this);
-    if(_flags & flag::unlink_on_close)
+    if(_flags & flag::unlink_on_first_close)
     {
       auto ret = unlink();
       if(!ret)
       {
         // File may have already been deleted, if so ignore
-        if(ret.error() != std::errc::no_such_file_or_directory)
+        if(ret.error() != errc::no_such_file_or_directory)
         {
           return ret.error();
         }
@@ -340,7 +340,7 @@ to use. Use `temp_inode()` instead, it is far more secure.
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
 inline result<file_handle> temp_file(file_handle::path_view_type name = file_handle::path_view_type(), file_handle::mode _mode = file_handle::mode::write, file_handle::creation _creation = file_handle::creation::if_needed, file_handle::caching _caching = file_handle::caching::temporary,
-                                     file_handle::flag flags = file_handle::flag::unlink_on_close) noexcept
+                                     file_handle::flag flags = file_handle::flag::unlink_on_first_close) noexcept
 {
   return file_handle::temp_file(std::forward<decltype(name)>(name), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }

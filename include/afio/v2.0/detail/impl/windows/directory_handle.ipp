@@ -31,19 +31,19 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  if(flags & flag::unlink_on_close)
+  if(flags & flag::unlink_on_first_close)
   {
-    return std::errc::invalid_argument;
+    return errc::invalid_argument;
   }
   result<directory_handle> ret(directory_handle(native_handle_type(), 0, 0, _caching, flags));
   native_handle_type &nativeh = ret.value()._v;
   AFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::directory;
   DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
-  // Trying to truncate a directory returns EISDIR rather than some internal Win32 error code uncomparable to std::errc
+  // Trying to truncate a directory returns EISDIR rather than some internal Win32 error code uncomparable to errc
   if(_creation == creation::truncate)
   {
-    return std::errc::is_a_directory;
+    return errc::is_a_directory;
   }
   OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode, flags));
   OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
@@ -103,7 +103,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     }
     if(ntstat < 0)
     {
-      return {static_cast<int>(ntstat), ntkernel_category()};
+      return ntkernel_error(ntstat);
     }
   }
   else
@@ -129,7 +129,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     {
       DWORD errcode = GetLastError();
       // assert(false);
-      return {static_cast<int>(errcode), std::system_category()};
+      return win32_error(errcode);
     }
   }
   return ret;
@@ -145,7 +145,7 @@ result<directory_handle> directory_handle::clone(mode mode_, caching caching_, d
     ret.value()._v.behaviour = _v.behaviour;
     if(DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, 0, DUPLICATE_SAME_ACCESS) == 0)
     {
-      return {GetLastError(), std::system_category()};
+      return win32_error();
     }
     return ret;
   }
@@ -180,7 +180,7 @@ result<directory_handle> directory_handle::clone(mode mode_, caching caching_, d
   }
   if(ntstat < 0)
   {
-    return {static_cast<int>(ntstat), ntkernel_category()};
+    return ntkernel_error(ntstat);
   }
   return ret;
 }
@@ -192,7 +192,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> directory_handle::clone_to_pa
   ret.value()._v.behaviour = _v.behaviour;
   if(DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, 0, DUPLICATE_SAME_ACCESS) == 0)
   {
-    return {GetLastError(), std::system_category()};
+    return win32_error();
   }
   return ret;
 }
@@ -221,7 +221,7 @@ namespace detail
     }
     if(ntstat < 0)
     {
-      return {static_cast<int>(ntstat), ntkernel_category()};
+      return ntkernel_error(ntstat);
     }
     // Return as a file handle so the direct relink and unlink are used
     return file_handle(nativeh, 0, 0, file_handle::caching::all);
@@ -276,7 +276,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     auto *mem = new(std::nothrow) char[toallocate];
     if(mem == nullptr)
     {
-      return std::errc::not_enough_memory;
+      return errc::not_enough_memory;
     }
     tofill._kernel_buffer = std::unique_ptr<char[]>(mem);
     tofill._kernel_buffer_size = toallocate;
@@ -301,7 +301,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
       auto *mem = new(std::nothrow) char[toallocate];
       if(mem == nullptr)
       {
-        return std::errc::not_enough_memory;
+        return errc::not_enough_memory;
       }
       tofill._kernel_buffer = std::unique_ptr<char[]>(mem);
       tofill._kernel_buffer_size = toallocate;
@@ -310,7 +310,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     {
       if(ntstat < 0)
       {
-        return {static_cast<int>(ntstat), ntkernel_category()};
+        return ntkernel_error(ntstat);
       }
       done = true;
     }

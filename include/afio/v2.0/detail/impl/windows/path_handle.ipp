@@ -80,7 +80,7 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
     }
     if(ntstat < 0)
     {
-      return {static_cast<int>(ntstat), ntkernel_category()};
+      return ntkernel_error(ntstat);
     }
   }
   else
@@ -92,7 +92,7 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
     {
       DWORD errcode = GetLastError();
       // assert(false);
-      return {static_cast<int>(errcode), std::system_category()};
+      return win32_error(errcode);
     }
   }
   return ret;

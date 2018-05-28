@@ -41,9 +41,9 @@ AFIO_V2_NAMESPACE_BEGIN
 
 result<directory_handle> directory_handle::directory(const path_handle &base, path_view_type path, mode _mode, creation _creation, caching _caching, flag flags) noexcept
 {
-  if(flags & flag::unlink_on_close)
+  if(flags & flag::unlink_on_first_close)
   {
-    return std::errc::invalid_argument;
+    return errc::invalid_argument;
   }
   result<directory_handle> ret(directory_handle(native_handle_type(), 0, 0, _caching, flags));
   native_handle_type &nativeh = ret.value()._v;
@@ -61,7 +61,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
   // Also trying to truncate a directory returns EISDIR
   if(_creation == creation::truncate)
   {
-    return std::errc::is_a_directory;
+    return errc::is_a_directory;
   }
   OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, _caching, flags));
 #ifdef O_DIRECTORY
@@ -85,7 +85,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
       {
         if(EEXIST != errno || _creation == creation::only_if_not_exist)
         {
-          return {errno, std::system_category()};
+          return posix_error();
         }
       }
       attribs &= ~(O_CREAT | O_EXCL);
@@ -100,7 +100,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
       {
         if(EEXIST != errno || _creation == creation::only_if_not_exist)
         {
-          return {errno, std::system_category()};
+          return posix_error();
         }
       }
       attribs &= ~(O_CREAT | O_EXCL);
@@ -109,7 +109,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
   }
   if(-1 == nativeh.fd)
   {
-    return {errno, std::system_category()};
+    return posix_error();
   }
   if(!(flags & flag::disable_safety_unlinks))
   {
@@ -137,7 +137,7 @@ result<directory_handle> directory_handle::clone(mode mode_, caching caching_, d
     ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC);
     if(-1 == ret.value()._v.fd)
     {
-      return {errno, std::system_category()};
+      return posix_error();
     }
     return ret;
   }
@@ -170,7 +170,7 @@ result<directory_handle> directory_handle::clone(mode mode_, caching caching_, d
     }
     else
     {
-      if(fh.error() != std::errc::no_such_file_or_directory)
+      if(fh.error() != errc::no_such_file_or_directory)
       {
         return fh.error();
       }
@@ -182,14 +182,14 @@ result<directory_handle> directory_handle::clone(mode mode_, caching caching_, d
       {
         if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds(d.nsecs)))
         {
-          return std::errc::timed_out;
+          return errc::timed_out;
         }
       }
       else
       {
         if(std::chrono::system_clock::now() >= end_utc)
         {
-          return std::errc::timed_out;
+          return errc::timed_out;
         }
       }
     }
@@ -204,7 +204,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> directory_handle::clone_to_pa
   ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC);
   if(-1 == ret.value()._v.fd)
   {
-    return {errno, std::system_category()};
+    return posix_error();
   }
   return ret;
 }
@@ -225,7 +225,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     };
     if(-1 == ::fstatat(_v.fd, zglob.buffer, &s, AT_SYMLINK_NOFOLLOW))
     {
-      return {errno, std::system_category()};
+      return posix_error();
     }
     tofill[0].stat.st_dev = s.st_dev;
     tofill[0].stat.st_ino = s.st_ino;
@@ -302,7 +302,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     auto *mem = new(std::nothrow) char[toallocate];
     if(mem == nullptr)
     {
-      return std::errc::not_enough_memory;
+      return errc::not_enough_memory;
     }
     tofill._kernel_buffer = std::unique_ptr<char[]>(mem);
     tofill._kernel_buffer_size = toallocate;
@@ -320,11 +320,11 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
 #ifdef __linux__
     if(-1 == ::lseek64(_v.fd, 0, SEEK_SET))
     {
-      return {errno, std::system_category()};
+      return posix_error();
     }
 #else
     if(-1 == ::lseek(_v.fd, 0, SEEK_SET))
-      return {errno, std::system_category()};
+      return posix_error();
 #endif
     bytes = getdents(_v.fd, reinterpret_cast<char *>(buffer), bytesavailable);
     if(kernelbuffer.empty() && bytes == -1 && EINVAL == errno)
@@ -334,7 +334,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
       auto *mem = new(std::nothrow) char[toallocate];
       if(mem == nullptr)
       {
-        return std::errc::not_enough_memory;
+        return errc::not_enough_memory;
       }
       tofill._kernel_buffer = std::unique_ptr<char[]>(mem);
       tofill._kernel_buffer_size = toallocate;
@@ -343,7 +343,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     {
       if(bytes == -1)
       {
-        return {errno, std::system_category()};
+        return posix_error();
       }
       done = true;
     }

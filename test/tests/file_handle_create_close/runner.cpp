@@ -30,8 +30,8 @@ template <class U> inline void file_handle_create_close_creation(U &&f)
   using namespace KERNELTEST_V1_NAMESPACE;
   using AFIO_V2_NAMESPACE::result;
   using file_handle = AFIO_V2_NAMESPACE::file_handle;
-  static const result<void> no_such_file_or_directory = std::errc::no_such_file_or_directory;
-  static const result<void> file_exists = std::errc::file_exists;
+  static const result<void> no_such_file_or_directory = AFIO_V2_NAMESPACE::errc::no_such_file_or_directory;
+  static const result<void> file_exists = AFIO_V2_NAMESPACE::errc::file_exists;
 
   /* Set up a permuter which for every one of these parameter values listed,
   tests with the value using the input workspace which should produce outcome
@@ -79,7 +79,7 @@ template <class U> inline void file_handle_create_close_creation(U &&f)
       {                 success(), { file_handle::mode::write, file_handle::creation::truncate         , file_handle::flag::none }, { "existing1"    }, { "existing0"    }},
 
       // Does the flag parameter have the expected side effects?
-      {                 success(), { file_handle::mode::write, file_handle::creation::open_existing, file_handle::flag::unlink_on_close }, { "existing1" }, { "non-existing" }}
+      {                 success(), { file_handle::mode::write, file_handle::creation::open_existing, file_handle::flag::unlink_on_first_close }, { "existing1" }, { "non-existing" }}
     },
     // Any parameters from now on are called before each permutation and the object returned is
     // destroyed after each permutation. The callspec is (parameter_permuter<...> *parent, outcome<T> &testret, size_t, pars)

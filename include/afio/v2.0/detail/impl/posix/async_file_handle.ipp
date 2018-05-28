@@ -96,7 +96,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
       {
         if(errcode)
         {
-          result = error_info(static_cast<int>(errcode), std::system_category());
+          result = posix_error(static_cast<int>(errcode));
         }
         else
         {
@@ -175,13 +175,13 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
   size_t statelen = sizeof(state_type) + (reqs.buffers.size() - 1) * sizeof(struct aiocb) + completion.bytes();
   if(!mem.empty() && statelen > mem.size())
   {
-    return std::errc::not_enough_memory;
+    return errc::not_enough_memory;
   }
   size_t items(reqs.buffers.size());
 #if AFIO_USE_POSIX_AIO && defined(AIO_LISTIO_MAX)
   // If this i/o could never be done atomically, reject
   if(items > AIO_LISTIO_MAX)
-    return std::errc::invalid_argument;
+    return errc::invalid_argument;
 #if defined(__FreeBSD__) || defined(__APPLE__)
   if(!service()->using_kqueues())
   {
@@ -197,7 +197,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
     // better to error out now rather that later in io_service.
     if(service()->_aiocbsv.size() + items > AIO_LISTIO_MAX)
     {
-      return std::errc::resource_unavailable_try_again;
+      return errc::resource_unavailable_try_again;
     }
   }
 #endif
@@ -208,7 +208,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
     void *_mem = ::calloc(1, statelen);  // NOLINT
     if(!_mem)
     {
-      return std::errc::not_enough_memory;
+      return errc::not_enough_memory;
     }
     mem = {static_cast<char *>(_mem), statelen};
     must_deallocate_self = true;
@@ -311,7 +311,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
   {
     service()->_aiocbsv.resize(service()->_aiocbsv.size() - items);
     state->items_to_go = 0;
-    state->result.write = {errno, std::system_category()};
+    state->result.write = posix_error();
     (*state->completion)(state);
     return success(std::move(_state));
   }

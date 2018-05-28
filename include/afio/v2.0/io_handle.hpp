@@ -427,7 +427,7 @@ public:
     {
       if(bytes + i.len < bytes)
       {
-        return std::errc::value_too_large;
+        return errc::value_too_large;
       }
       bytes += i.len;
     }
@@ -441,7 +441,7 @@ public:
     {
       if(bytes + i.len < bytes)
       {
-        return std::errc::value_too_large;
+        return errc::value_too_large;
       }
       bytes += i.len;
     }

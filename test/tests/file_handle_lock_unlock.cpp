@@ -27,8 +27,8 @@ Distributed under the Boost Software License, Version 1.0.
 static inline void TestFileHandleLockUnlock()
 {
   namespace afio = AFIO_V2_NAMESPACE;
-  afio::file_handle h1 = afio::file_handle::file({}, "temp", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::unlink_on_close).value();
-  afio::file_handle h2 = afio::file_handle::file({}, "temp", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::unlink_on_close).value();
+  afio::file_handle h1 = afio::file_handle::file({}, "temp", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::unlink_on_first_close).value();
+  afio::file_handle h2 = afio::file_handle::file({}, "temp", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::unlink_on_first_close).value();
   // Two exclusive locks not possible
   {
     auto _1 = h1.lock(0, 0, true, std::chrono::seconds(0));
@@ -40,7 +40,7 @@ static inline void TestFileHandleLockUnlock()
     }
     auto _2 = h2.lock(0, 0, true, std::chrono::seconds(0));
     BOOST_REQUIRE(_2.has_error());
-    BOOST_CHECK(_2.error() == std::errc::timed_out);
+    BOOST_CHECK(_2.error() == afio::errc::timed_out);
   }
   // Two non-exclusive locks okay
   {
@@ -55,7 +55,7 @@ static inline void TestFileHandleLockUnlock()
     BOOST_REQUIRE(!_1.has_error());
     auto _2 = h2.lock(0, 0, true, std::chrono::seconds(0));
     BOOST_REQUIRE(_2.has_error());
-    BOOST_CHECK(_2.error() == std::errc::timed_out);
+    BOOST_CHECK(_2.error() == afio::errc::timed_out);
   }
 }
 

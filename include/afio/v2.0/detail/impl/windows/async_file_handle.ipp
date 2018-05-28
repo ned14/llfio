@@ -59,7 +59,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
       {
         if(errcode)
         {
-          result = error_info{errcode, std::system_category()};
+          result = win32_error(errcode);
         }
         else
         {
@@ -119,13 +119,13 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
   size_t statelen = sizeof(state_type) + (reqs.buffers.size() - 1) * sizeof(OVERLAPPED) + completion.bytes();
   if(!mem.empty() && statelen > mem.size())
   {
-    return std::errc::not_enough_memory;
+    return errc::not_enough_memory;
   }
   size_t items(reqs.buffers.size());
   // On Windows i/o must be scheduled on the same thread pumping completion
   if(GetCurrentThreadId() != service()->_threadid)
   {
-    return std::errc::operation_not_supported;
+    return errc::operation_not_supported;
   }
 
   bool must_deallocate_self = false;
@@ -134,7 +134,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
     void *_mem = ::calloc(1, statelen);  // NOLINT
     if(!_mem)
     {
-      return std::errc::not_enough_memory;
+      return errc::not_enough_memory;
     }
     mem = {static_cast<char *>(_mem), statelen};
     must_deallocate_self = true;
@@ -189,7 +189,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
     if(!ioroutine(_v.h, const_cast<byte *>(out[n].data), static_cast<DWORD>(out[n].len), ol, handle_completion::Do))
     {
       --state->items_to_go;
-      state->result.write = {GetLastError(), std::system_category()};
+      state->result.write = win32_error();
       // Fire completion now if we didn't schedule anything
       if(!n)
       {
@@ -216,7 +216,7 @@ result<async_file_handle::io_state_ptr> async_file_handle::_begin_io(span<char> 
   case operation_t::dsync_sync:
     break;
   }
-  return std::errc::operation_not_supported;
+  return errc::operation_not_supported;
 }
 
 async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle::read(async_file_handle::io_request<async_file_handle::buffers_type> reqs, deadline d) noexcept

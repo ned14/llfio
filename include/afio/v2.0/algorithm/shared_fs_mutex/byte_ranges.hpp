@@ -199,14 +199,14 @@ namespace algorithm
             {
               if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))
               {
-                return std::errc::timed_out;
+                return errc::timed_out;
               }
             }
             else
             {
               if(std::chrono::system_clock::now() >= end_utc)
               {
-                return std::errc::timed_out;
+                return errc::timed_out;
               }
             }
           }

@@ -180,7 +180,7 @@ public:
       {
         auto randomname = utils::random_string(32);
         result<directory_handle> ret = directory(dirpath, randomname, _mode, creation::only_if_not_exist, _caching, flags);
-        if(ret || (!ret && ret.error() != std::errc::file_exists))
+        if(ret || (!ret && ret.error() != errc::file_exists))
         {
           return ret;
         }
@@ -216,13 +216,13 @@ public:
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override
   {
     AFIO_LOG_FUNCTION_CALL(this);
-    if(_flags & flag::unlink_on_close)
+    if(_flags & flag::unlink_on_first_close)
     {
       auto ret = unlink();
       if(!ret)
       {
         // File may have already been deleted, if so ignore
-        if(ret.error() != std::errc::no_such_file_or_directory)
+        if(ret.error() != errc::no_such_file_or_directory)
         {
           return ret.error();
         }

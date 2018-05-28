@@ -43,7 +43,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
   memset(&s, 0, sizeof(s));
   if(-1 == fstatfs64(h.native_handle().fd, &s))
   {
-    return {errno, std::system_category()};
+    return posix_error();
   }
   if(!!(wanted & want::bsize))
   {
@@ -117,7 +117,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
         }
         if(mtab == nullptr)
         {
-          return {errno, std::system_category()};
+          return posix_error();
         }
         auto unmtab = undoer([mtab] { endmntent(mtab); });
         struct mntent m
@@ -144,7 +144,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
 #ifndef AFIO_COMPILING_FOR_GCOV
       if(mountentries.empty())
       {
-        return std::errc::no_such_file_or_directory;
+        return errc::no_such_file_or_directory;
       }
       // Choose the mount entry with the most closely matching statfs. You can't choose
       // exclusively based on mount point because of bind mounts
@@ -204,7 +204,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
 #else
   struct statfs s;
   if(-1 == fstatfs(h.native_handle().fd, &s))
-    return {errno, std::system_category()};
+    return posix_error();
   if(!!(wanted & want::flags))
   {
     f_flags.rdonly = !!(s.f_flags & MNT_RDONLY);
