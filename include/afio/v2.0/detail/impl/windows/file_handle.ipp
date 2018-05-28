@@ -245,10 +245,8 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
     // std::cerr << random << std::endl;
     if(nativeh.h != nullptr)
     {
-      bool failed = true;
-      // Immediately delete, try by POSIX delete first
+      HANDLE duph;
       {
-        HANDLE duph;
         // It is entirely undocumented that this is how you clone a file handle with new privs
         memset(&_path, 0, sizeof(_path));
         oa.ObjectName = &_path;
@@ -259,13 +257,17 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
         {
           return ntkernel_error(ntstat);
         }
-        auto unduph = undoer([&duph] { CloseHandle(duph); });
-        (void) unduph;
-        isb = make_iostatus();
+      }
+      auto unduph = undoer([&duph] { CloseHandle(duph); });
+      (void) unduph;
+      bool failed = true;
+      // Immediately delete, try by POSIX delete first
+      {
+        IO_STATUS_BLOCK isb = make_iostatus();
         FILE_DISPOSITION_INFORMATION_EX fdie{};
         memset(&fdie, 0, sizeof(fdie));
         fdie.Flags = 0x1 /*FILE_DISPOSITION_DELETE*/ | 0x2 /*FILE_DISPOSITION_POSIX_SEMANTICS*/;
-        ntstat = NtSetInformationFile(duph, &isb, &fdie, sizeof(fdie), FileDispositionInformationEx);
+        NTSTATUS ntstat = NtSetInformationFile(duph, &isb, &fdie, sizeof(fdie), FileDispositionInformationEx);
         if(ntstat >= 0)
         {
           failed = false;
@@ -285,7 +287,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
         FILE_DISPOSITION_INFORMATION fdi{};
         memset(&fdi, 0, sizeof(fdi));
         fdi._DeleteFile = 1u;
-        NTSTATUS ntstat = NtSetInformationFile(nativeh.h, &isb, &fdi, sizeof(fdi), FileDispositionInformation);
+        NTSTATUS ntstat = NtSetInformationFile(duph, &isb, &fdi, sizeof(fdi), FileDispositionInformation);
         if(ntstat >= 0)
         {
           // No need to delete it again on close

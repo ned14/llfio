@@ -188,10 +188,9 @@ result<void> fs_handle::unlink(deadline d) noexcept
   using namespace windows_nt_kernel;
   AFIO_LOG_FUNCTION_CALL(this);
   auto &h = _get_handle();
-  bool failed = true;
+  HANDLE duph;
   // Try by POSIX delete first
   {
-    HANDLE duph;
     OBJECT_ATTRIBUTES oa{};
     memset(&oa, 0, sizeof(oa));
     oa.Length = sizeof(OBJECT_ATTRIBUTES);
@@ -206,13 +205,17 @@ result<void> fs_handle::unlink(deadline d) noexcept
     {
       return ntkernel_error(ntstat);
     }
-    auto unduph = undoer([&duph] { CloseHandle(duph); });
-    (void) unduph;
-    isb = make_iostatus();
+  }
+  auto unduph = undoer([&duph] { CloseHandle(duph); });
+  (void) unduph;
+  bool failed = true;
+  // Try POSIX delete first, this will fail on Windows 10 before 1709, or if not NTFS
+  {
+    IO_STATUS_BLOCK isb = make_iostatus();
     FILE_DISPOSITION_INFORMATION_EX fdie{};
     memset(&fdie, 0, sizeof(fdie));
     fdie.Flags = 0x1 /*FILE_DISPOSITION_DELETE*/ | 0x2 /*FILE_DISPOSITION_POSIX_SEMANTICS*/;
-    ntstat = NtSetInformationFile(duph, &isb, &fdie, sizeof(fdie), FileDispositionInformationEx);
+    NTSTATUS ntstat = NtSetInformationFile(duph, &isb, &fdie, sizeof(fdie), FileDispositionInformationEx);
     if(ntstat >= 0)
     {
       failed = false;
@@ -270,10 +273,10 @@ result<void> fs_handle::unlink(deadline d) noexcept
       FILE_DISPOSITION_INFORMATION fdi{};
       memset(&fdi, 0, sizeof(fdi));
       fdi._DeleteFile = 1u;
-      NTSTATUS ntstat = NtSetInformationFile(h.native_handle().h, &isb, &fdi, sizeof(fdi), FileDispositionInformation);
+      NTSTATUS ntstat = NtSetInformationFile(duph, &isb, &fdi, sizeof(fdi), FileDispositionInformation);
       if(STATUS_PENDING == ntstat)
       {
-        ntstat = ntwait(h.native_handle().h, isb, d);
+        ntstat = ntwait(duph, isb, d);
       }
       if(ntstat < 0)
       {

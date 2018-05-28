@@ -57,6 +57,11 @@ result<handle::path_type> handle::current_path() const noexcept
       return win32_error();
     }
     buffer.resize(3 + len);
+    // As of Windows 10 1709, there are such things as actually unlinked files, so detect those
+    if(filesystem::path::string_type::npos != buffer.find(L"\\$Extend\\$Deleted\\"))
+    {
+      return path_type();
+    }
     return path_type(buffer);
   }
   catch(...)
