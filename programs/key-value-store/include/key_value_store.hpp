@@ -280,7 +280,7 @@ namespace key_value_store
         if(indexinuse.has_value())
         {
           // I am the first entrant into this data store
-          if(_indexfile.length().value() == 0)
+          if(_indexfile.maximum_extent().value() == 0)
           {
             afio::file_handle::extent_type size = sizeof(index::index) + (hashtableentries) * sizeof(index::open_hash_index::value_type);
             size = afio::utils::round_up_to_page_size(size);
@@ -356,7 +356,7 @@ namespace key_value_store
         // I am the last user
         if(_indexheader->contents_hashed)
         {
-          _indexheader->hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash((char *) _indexheader, _indexfile.length().value());
+          _indexheader->hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash((char *) _indexheader, _indexfile.maximum_extent().value());
         }
       }
     }
@@ -375,7 +375,7 @@ namespace key_value_store
       _smallfiles.mapped.reserve(_smallfiles.blocking.size());
       for(size_t n = 0; n < _smallfiles.blocking.size(); n++)
       {
-        auto currentlength = _smallfiles.blocking[n].length().value();
+        auto currentlength = _smallfiles.blocking[n].maximum_extent().value();
         _smallfiles.mapped.push_back(afio::mapped_file_handle(std::move(_smallfiles.blocking[n]), currentlength + overextension));
       }
       _smallfileguard.set_handle(&_smallfiles.mapped[_mysmallfileidx]);
@@ -482,7 +482,7 @@ namespace key_value_store
         bool free_on_destruct = _smallfiles.mapped.empty();
         if(!free_on_destruct)
         {
-          auto mappedlength = _smallfiles.mapped[item.value_identifier].length().value();
+          auto mappedlength = _smallfiles.mapped[item.value_identifier].maximum_extent().value();
           if(item.value_offset * 64 > mappedlength)
           {
             // Update mapping to match the underlying file
@@ -739,7 +739,7 @@ namespace key_value_store
       bool items_written = false;
       if(!_parent->_smallfiles.mapped.empty())
       {
-        afio::file_handle::extent_type original_length = _parent->_mysmallfile.length().value();
+        afio::file_handle::extent_type original_length = _parent->_mysmallfile.maximum_extent().value();
         // How big does this map need to be?
         size_t totalcommitsize = 0;
         for(size_t n = 0; n < _items.size(); n++)
@@ -803,7 +803,7 @@ namespace key_value_store
       if(!items_written)
       {
         // Gather append write all my items to my smallfile
-        afio::file_handle::extent_type value_offset = _parent->_mysmallfile.length().value();
+        afio::file_handle::extent_type value_offset = _parent->_mysmallfile.maximum_extent().value();
         assert((value_offset % 64) == 0);
         // POSIX guarantees that at least 16 gather buffers can be written in a single shot
         std::vector<afio::file_handle::const_buffer_type> reqs;
