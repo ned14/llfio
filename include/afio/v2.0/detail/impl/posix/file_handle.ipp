@@ -371,6 +371,10 @@ result<std::vector<std::pair<file_handle::extent_type, file_handle::extent_type>
     for(;;)
     {
 #ifdef __linux__
+#ifndef SEEK_DATA
+      errno = EINVAL;
+      break;
+#else
       start = lseek64(_v.fd, end, SEEK_DATA);
       if(static_cast<extent_type>(-1) == start)
       {
@@ -381,6 +385,7 @@ result<std::vector<std::pair<file_handle::extent_type, file_handle::extent_type>
       {
         break;
       }
+#endif
 #elif defined(__APPLE__)
       // Can't find any support for extent enumeration in OS X
       errno = EINVAL;

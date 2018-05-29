@@ -26,7 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define REGIONSIZE (100 * 1024 * 1024)
 
 #include "../../include/afio/afio.hpp"
-#include "quickcpplib/include/algorithm/small_prng.hpp"
+#include "../../include/afio/v2.0/quickcpplib/include/algorithm/small_prng.hpp"
 
 #include <chrono>
 #include <fstream>
@@ -202,10 +202,10 @@ int main()
 #if 1
     {
       // Prefault
-      volatile afio::byte *p = th.address();
+      volatile char *p = (char *) th.address(), x;
       for(size_t n = 0; n < REGIONSIZE; n += 64)
       {
-        p[n];
+        x = p[n];
       }
     }
 #endif
