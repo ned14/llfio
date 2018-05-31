@@ -314,15 +314,15 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
   auto *isb = reinterpret_cast<IO_STATUS_BLOCK *>(&ol);
   *isb = make_iostatus();
   ULONG flags = 0;
-  if(!wait_for_device)
+  if(!wait_for_device && !and_metadata)
   {
-    flags |= 2 /*FLUSH_FLAGS_NO_SYNC*/;
+    flags = 1 /*FLUSH_FLAGS_FILE_DATA_ONLY*/;
   }
-  if(!and_metadata)
+  else if(!wait_for_device)
   {
-    flags |= 1 /*FLUSH_FLAGS_FILE_DATA_ONLY*/;
+    flags = 2 /*FLUSH_FLAGS_NO_SYNC*/;
   }
-  NTSTATUS ntstat = NtFlushBuffersFileEx(_v.h, flags, isb);
+  NTSTATUS ntstat = NtFlushBuffersFileEx(_v.h, flags, nullptr, 0, isb);
   if(STATUS_PENDING == ntstat)
   {
     ntstat = ntwait(_v.h, ol, d);
