@@ -26,7 +26,11 @@ Distributed under the Boost Software License, Version 1.0.
 #define REGIONSIZE (100 * 1024 * 1024)
 
 #include "../../include/afio/afio.hpp"
+#if __has_include("quickcpplib/include/algorithm/small_prng.hpp")
+#include "quickcpplib/include/algorithm/small_prng.hpp"
+#else
 #include "../../include/afio/v2.0/quickcpplib/include/algorithm/small_prng.hpp"
+#endif
 
 #include <chrono>
 #include <fstream>
@@ -142,11 +146,16 @@ template <class F> inline void run_test(const char *csv, off_t max_extent, F &&f
 
 int main()
 {
-  nanoclock();
   {
-    std::ofstream testfile("testfile");
+    auto th = afio::file({}, "testfile", afio::file_handle::mode::write, afio::file_handle::creation::if_needed).value();
     std::vector<char> buffer(REGIONSIZE, 'a');
-    testfile.write(buffer.data(), buffer.size());
+    th.write(0, {{(afio::byte *) buffer.data(), buffer.size()}}).value();
+    th.barrier({}, true, true).value();
+  }
+  {
+    auto begin = nanoclock();
+    while(nanoclock() - begin < 1000000000ULL)
+      ;
   }
 #if 0
   {
@@ -184,11 +193,13 @@ int main()
       testfile.read(buffer, len);
     });
   }
+#endif
   {
     std::cout << "Testing latency of afio::file_handle ..." << std::endl;
     auto th = afio::file({}, "testfile").value();
     run_test("file_handle.csv", REGIONSIZE, [&](unsigned offset, char *buffer, size_t len) { th.read(offset, {{(afio::byte *) buffer, len}}).value(); });
   }
+#if 1
   {
     std::cout << "Testing latency of afio::mapped_file_handle ..." << std::endl;
     auto th = afio::mapped_file({}, "testfile").value();
