@@ -265,8 +265,20 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
     flags |= MAP_NOSYNC;
 #endif
   flags |= extra_flags;
-  // printf("mmap(%p, %u, %d, %d, %d, %u)\n", ataddr, (unsigned) bytes, prot, flags, have_backing ? section->native_handle().fd : -1, (unsigned) offset);
-  addr = ::mmap(ataddr, bytes, prot, flags, have_backing ? section->native_handle().fd : -1, offset);
+// printf("mmap(%p, %u, %d, %d, %d, %u)\n", ataddr, (unsigned) bytes, prot, flags, have_backing ? section->native_handle().fd : -1, (unsigned) offset);
+#ifdef MAP_SYNC  // Linux kernel 4.15 or later only
+  // If backed by a file into persistent shared memory, ask the kernel to use persistent memory safe semantics
+  if(have_backing && section->is_nvram() && (flags & MAP_SHARED) != 0)
+  {
+    int flagscopy = flags & ~MAP_SHARED;
+    flagscopy |= MAP_SHARED_VALIDATE | MAP_SYNC;
+    addr = ::mmap(ataddr, bytes, prot, flagscopy, section->native_handle().fd, offset);
+  }
+#endif
+  if(addr == nullptr)
+  {
+    addr = ::mmap(ataddr, bytes, prot, flags, have_backing ? section->native_handle().fd : -1, offset);
+  }
   // printf("%d mmap %p-%p\n", getpid(), addr, (char *) addr+bytes);
   if(MAP_FAILED == addr)  // NOLINT
   {

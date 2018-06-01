@@ -320,7 +320,7 @@ inline std::ostream &operator<<(std::ostream &s, const handle &v)
   if(v.is_valid())
   {
     auto _currentpath = v.current_path();
-    std::string currentpath = !_currentpath ? std::string(_currentpath.error().message()) : _currentpath.value().u8string();
+    std::string currentpath = !_currentpath ? std::string(_currentpath.error().message().c_str()) : _currentpath.value().u8string();
     return s << "afio::handle(" << v._v._init << ", " << currentpath << ")";
   }
   return s << "afio::handle(closed)";
@@ -421,15 +421,11 @@ template <class T> struct construct
   result<T> operator()() const noexcept { static_assert(!std::is_same<T, T>::value, "construct<T>() was not specialised for the type T supplied"); }
 };
 
-// failure_info is defined in config.hpp, this is its constructor which needs
-// to be defined here so that we have handle's definition available
-inline error_info::error_info(std::error_code _ec)
-    : ec(_ec)
-{
-  // Here is a VERY useful place to breakpoint!
-  if(ec)
-  {
 #ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
+namespace detail
+{
+  template <class Src> inline void fill_failure_info(Src &src)
+  {
     auto &tls = detail::tls_errored_results();
     if(!tls.reentering_self)
     {
@@ -445,28 +441,63 @@ inline error_info::error_info(std::error_code _ec)
         if(currentpath_)
         {
           auto currentpath = currentpath_.value().u8string();
-          _thread_id = tls.this_thread_id;
+          src._thread_id = tls.this_thread_id;
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4996)  // the function may be unsafe
 #endif
-          strncpy(tls.next(_tls_path_id1), QUICKCPPLIB_NAMESPACE::ringbuffer_log::last190(currentpath), 190);
+          strncpy(tls.next(src._tls_path_id1), QUICKCPPLIB_NAMESPACE::ringbuffer_log::last190(currentpath), 190);
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-          _tls_path_id2 = _tls_path_id1 - 17;  // guaranteed invalid
+          src._tls_path_id2 = src._tls_path_id1 - 17;  // guaranteed invalid
         }
       }
-#endif
 #if AFIO_LOGGING_LEVEL >= 2
       if(log().log_level() >= log_level::error)
       {
-        _log_id = log().emplace_back(log_level::error, ec.message().c_str(), static_cast<uint32_t>(nativeh._init), tls.this_thread_id);
+        src._log_id = log().emplace_back(log_level::error, src.ec.message().c_str(), static_cast<uint32_t>(nativeh._init), tls.this_thread_id);
       }
 #endif
     }
   }
 }
+#endif
+
+#if AFIO_EXPERIMENTAL_STATUS_CODE
+
+#ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
+namespace detail
+{
+  template <class T>
+  inline error_domain_value_type<T>::error_domain_value_type(T _sc)  // NOLINT
+  : ec(_sc)
+  {
+    // Here is a VERY useful place to breakpoint!
+    if(ec.failure())
+    {
+      detail::fill_failure_info(*this);
+    }
+  }
+}
+#endif
+
+#else  // AFIO_EXPERIMENTAL_STATUS_CODE
+
+// failure_info is defined in config.hpp, this is its constructor which needs
+// to be defined here so that we have handle's definition available
+inline error_info::error_info(std::error_code _ec)
+    : ec(_ec)
+{
+// Here is a VERY useful place to breakpoint!
+#ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
+  if(ec)
+  {
+    detail::fill_failure_info(*this);
+  }
+#endif
+}
+#endif  // AFIO_EXPERIMENTAL_STATUS_CODE
 
 // Define how we log handles and subclasses thereof
 namespace detail
