@@ -1,5 +1,6 @@
 var NAVTREEINDEX6 =
 {
+"structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a77ac1dfbe6f0df38bf9ecd3fbdf515fe":[3,0,0,0,0,1,19],
 "structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a782e7042f5ef8e5794566ad990418a8a":[3,0,0,0,0,1,36],
 "structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a829281d387d6fe30048d9bcc4a75580c":[3,0,0,0,0,1,37],
 "structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a83a15aa2a15fe2231ee7c5691f9cc6e7":[3,0,0,0,0,1,27],
@@ -248,6 +249,5 @@ var NAVTREEINDEX6 =
 "structafio__v2__xxx_1_1stat__t.html#a0a07fcfc00ab2593a47400549eba8509":[3,0,0,32,3],
 "structafio__v2__xxx_1_1stat__t.html#a0ffd227226a02f4507fd69039e3b7aed":[3,0,0,32,7],
 "structafio__v2__xxx_1_1stat__t.html#a28c1c62cef680fcd70df29508d6587af":[3,0,0,32,16],
-"structafio__v2__xxx_1_1stat__t.html#a3095960c9c7bf14371869b6278ab3d8a":[3,0,0,32,19],
-"structafio__v2__xxx_1_1stat__t.html#a594e03167fe2b5315ef61edc532ab840":[3,0,0,32,4]
+"structafio__v2__xxx_1_1stat__t.html#a3095960c9c7bf14371869b6278ab3d8a":[3,0,0,32,19]
 };

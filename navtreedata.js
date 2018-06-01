@@ -29,7 +29,6 @@ var NAVTREE =
       [ "File List", "files.html", "files" ],
       [ "File Members", "globals.html", [
         [ "All", "globals.html", null ],
-        [ "Functions", "globals_func.html", null ],
         [ "Macros", "globals_defs.html", null ]
       ] ]
     ] ]
@@ -44,9 +43,9 @@ var NAVTREEINDEX =
 "classafio__v2__xxx_1_1map__handle.html#a5b7bae1f24ec1ae96822fb865bfd0ea5",
 "classafio__v2__xxx_1_1section__handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18a8d7b3d6b83c0a517eac07e1aac94b773",
 "group__config.html#gaf5f9b13a512047008c0caeb5fcd310e0",
-"structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a782e7042f5ef8e5794566ad990418a8a",
-"structafio__v2__xxx_1_1stat__t.html#a6461e6278085dea3b33b865867746f6d",
-"v2_80_2afio_8hpp.html#a2288a58c8561b4dd712a813c2dc87113"
+"structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a77ac1dfbe6f0df38bf9ecd3fbdf515fe",
+"structafio__v2__xxx_1_1stat__t.html#a594e03167fe2b5315ef61edc532ab840",
+"v2_80_2afio_8hpp.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
