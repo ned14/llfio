@@ -28,6 +28,7 @@ Distributed under the Boost Software License, Version 1.0.
 //#include <iostream>
 //#define AFIO_LOG_TO_OSTREAM std::cerr
 //#define AFIO_LOGGING_LEVEL 6
+//#define AFIO_DISABLE_PATHS_IN_FAILURE_INFO
 
 //! \file config.hpp Configures a compiler environment for AFIO header and source code
 
@@ -56,6 +57,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #ifndef AFIO_LOG_TO_OSTREAM
 #if !defined(NDEBUG) && !defined(AFIO_DISABLE_LOG_TO_OSTREAM)
+#include <iostream>  // for std::cerr
 //! \brief Any `ostream` to also log to. If `NDEBUG` is not defined, `std::cerr` is the default.
 #define AFIO_LOG_TO_OSTREAM std::cerr
 #endif
@@ -377,24 +379,18 @@ as that (a) enables safe header only AFIO on Windows (b) produces better codegen
 
 // Bring in a result implementation based on status_code
 #include "outcome/include/outcome/experimental/status_result.hpp"
+#include "outcome/include/outcome/try.hpp"
 
 AFIO_V2_NAMESPACE_BEGIN
 
-/*! \class error_domain
-\brief The SG14 status code domain for errors in AFIO.
-*/
 #ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
-template <class BaseStatusCodeDomain> class error_domain : public BaseStatusCodeDomain
-{
-  using __base = SYSTEM_ERROR2_NAMESPACE::status_code_domain;
-  using _base = BaseStatusCodeDomain;
 
-public:
-  //! \brief The value type of errors in AFIO
-  struct value_type
+namespace detail
+{
+  template <class T> struct error_domain_value_type
   {
-    //! \brief The type of code from `BaseStatusCodeDomain`
-    typename _base::value_type sc;
+    //! \brief The type of code
+    T ec;
 
     // The id of the thread where this failure occurred
     uint32_t thread_id{0};
@@ -402,60 +398,25 @@ public:
     uint16_t tls_path_id1{static_cast<uint16_t>(-1)}, _tls_path_id2{static_cast<uint16_t>(-1)};
     // The id of the relevant log entry in the AFIO log (if logging enabled)
     size_t log_id{static_cast<size_t>(-1)};
-  };
-  //! Thread safe reference to a message string composed from `BaseStatusCodeDomain` with added metadata
-  class string_ref : public __base::string_ref
-  {
-  public:
-    explicit string_ref(const __base::string_ref &o)
-        : __base::string_ref(o)
-    {
-    }
-    explicit string_ref(__base::string_ref &&o)
-        : __base::string_ref(static_cast<__base::string_ref &&>(o))
-    {
-    }
-    constexpr string_ref()
-        : __base::string_ref(__base::string_ref::_refcounted_string_thunk)
-    {
-    }
-    SYSTEM_ERROR2_CONSTEXPR14 explicit string_ref(const char *str)
-        : __base::string_ref(str, __base::string_ref::_refcounted_string_thunk)
-    {
-    }
-    string_ref(const string_ref &) = default;
-    string_ref(string_ref &&) = default;
-    string_ref &operator=(const string_ref &) = default;
-    string_ref &operator=(string_ref &&) = default;
-    ~string_ref() = default;
-    //! Construct from an underlying error code
-    explicit string_ref(value_type c)
-        : __base::string_ref(__base::string_ref::_refcounted_string_thunk)
-    {
-      // Ask _base for its message
-      _base::string_ref basemsg(c.sc);
-      // Append any extra metadata
 
-      this->_begin = malloc(basemsg.size() + 1);
-      if(this->_begin == nullptr)
-      {
-        goto failure;
-      }
-      this->_end = this->_begin + basemsg.size();
-      _msg() = (_allocated_msg *) calloc(1, sizeof(_allocated_msg));  // NOLINT
-      if(_msg() == nullptr)
-      {
-        free((void *) this->_begin);  // NOLINT
-        goto failure;
-      }
-      ++_msg()->count;
-      return;
-    failure:
-      _msg() = nullptr;  // disabled
-      this->_begin = "failed to get message from system";
-      this->_end = strchr(this->_begin, 0);
-    }
+    //! Implicitly constructs an instance. Defined in handle.hpp as we need to understand handle.
+    inline error_domain_value_type(T _sc);  // NOLINT
   };
+}
+
+/*! \class error_domain
+\brief The SG14 status code domain for errors in AFIO.
+*/
+template <class BaseStatusCodeDomain> class error_domain : public BaseStatusCodeDomain
+{
+  using _base = BaseStatusCodeDomain;
+
+public:
+  using string_ref = typename BaseStatusCodeDomain::string_ref;
+  using atomic_refcounted_string_ref = typename BaseStatusCodeDomain::atomic_refcounted_string_ref;
+
+  //! \brief The value type of errors in AFIO
+  using value_type = detail::error_domain_value_type<typename _base::value_type>;
 
   error_domain() = default;
   error_domain(const error_domain &) = default;
@@ -465,23 +426,22 @@ public:
   ~error_domain() = default;
 
 protected:
-  virtual _base::string_ref _message(const status_code<void> &code) const noexcept override final  // NOLINT
-  {
-    assert(code.domain() == *this);
-    const auto &c = static_cast<const error_domain &>(code);  // NOLINT
-    return string_ref(c.value());
-  }
+  virtual inline string_ref _message(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept override final;
 };
 #else
 template <class BaseStatusCodeDomain> using error_domain = BaseStatusCodeDomain;
 #endif
 
+namespace detail
+{
+  using error_domain_value_system_code = error_domain_value_type<SYSTEM_ERROR2_NAMESPACE::system_code::value_type>;
+}
+
 //! An erased status code
-using error_code = SYSTEM_ERROR2_NAMESPACE::status_code<SYSTEM_ERROR2_NAMESPACE::erased<error_domain<SYSTEM_ERROR2_NAMESPACE::system_code::domain_type>::value_type>>;
+using error_code = SYSTEM_ERROR2_NAMESPACE::status_code<SYSTEM_ERROR2_NAMESPACE::erased<detail::error_domain_value_system_code>>;
 
 
-template <class T> using result = OUTCOME_V2_NAMESPACE::result<T, error_code>;
-template <class T> using outcome = OUTCOME_V2_NAMESPACE::outcome<T, error_code>;
+template <class T> using result = OUTCOME_V2_NAMESPACE::experimental::erased_result<T, error_code>;
 using OUTCOME_V2_NAMESPACE::success;
 using OUTCOME_V2_NAMESPACE::failure;
 using OUTCOME_V2_NAMESPACE::in_place_type;
@@ -502,34 +462,42 @@ inline error_code posix_error(int c = errno)
 }
 #else
 //! Helper for constructing an error code from a DWORD
-inline error_code win32_error(DWORD c = GetLastError())
+inline error_code win32_error(SYSTEM_ERROR2_NAMESPACE::win32::DWORD c = SYSTEM_ERROR2_NAMESPACE::win32::GetLastError())
 {
   return SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::win32_code::domain_type>>(c);
 }
 //! Helper for constructing an error code from a NTSTATUS
-inline error_code ntkernel_error(NTSTATUS c)
+inline error_code ntkernel_error(SYSTEM_ERROR2_NAMESPACE::win32::NTSTATUS c)
 {
   return SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::nt_code::domain_type>>(c);
 }
 #endif
 
-#ifndef _WIN32
-#endif
-
 AFIO_V2_NAMESPACE_END
 
-#else
+
+#else  // AFIO_EXPERIMENTAL_STATUS_CODE
+
 
 // Bring in a result implementation based on std::error_code
 #include "outcome/include/outcome.hpp"
 
 AFIO_V2_NAMESPACE_BEGIN
 
+namespace detail
+{
+  template <class Src> inline void append_path_info(Src &src, std::string &ret);
+  template <class Src> inline void fill_failure_info(Src &src);
+}
+
 /*! \struct error_info
 \brief The cause of the failure of an operation in AFIO.
 */
 struct error_info
 {
+  template <class Src> friend inline void detail::append_path_info(Src &src, std::string &ret);
+  template <class Src> friend inline void detail::fill_failure_info(Src &src);
+
   //! The error code for the failure
   std::error_code ec;
 
@@ -686,7 +654,7 @@ inline error_info posix_error(int c = errno)
 #endif
 
 AFIO_V2_NAMESPACE_END
-#endif
+#endif  // AFIO_EXPERIMENTAL_STATUS_CODE
 
 
 #if AFIO_LOGGING_LEVEL
@@ -812,68 +780,9 @@ namespace detail
   };
 #define AFIO_LOG_INST_TO_TLS(inst) AFIO_V2_NAMESPACE::detail::tls_current_handle_holder<std::is_base_of<AFIO_V2_NAMESPACE::handle, std::decay_t<std::remove_pointer_t<decltype(inst)>>>::value> AFIO_UNIQUE_NAME(inst)
 }  // namespace detail
-#else
+#else  // AFIO_DISABLE_PATHS_IN_FAILURE_INFO
 #define AFIO_LOG_INST_TO_TLS(inst)
-#endif
-
-inline filesystem::path error_info::path1() const
-{
-  if(QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id() == _thread_id)
-  {
-    auto &tls = detail::tls_errored_results();
-    const char *path1 = tls.get(_tls_path_id1);
-    if(path1 != nullptr)
-    {
-      return filesystem::path(path1);
-    }
-  }
-  return {};
-}
-inline filesystem::path error_info::path2() const
-{
-  if(QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id() == _thread_id)
-  {
-    auto &tls = detail::tls_errored_results();
-    const char *path2 = tls.get(_tls_path_id2);
-    if(path2 != nullptr)
-    {
-      return filesystem::path(path2);
-    }
-  }
-  return {};
-}
-inline std::string error_info::message() const
-{
-  std::string ret(ec.message());
-  if(QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id() == _thread_id)
-  {
-    auto &tls = detail::tls_errored_results();
-    const char *path1 = tls.get(_tls_path_id1), *path2 = tls.get(_tls_path_id2);
-    if(path1 != nullptr)
-    {
-      ret.append(" [path1 = ");
-      ret.append(path1);
-      if(path2 != nullptr)
-      {
-        ret.append(", path2 = ");
-        ret.append(path2);
-      }
-      ret.append("]");
-    }
-  }
-#if AFIO_LOGGING_LEVEL >= 2
-  if(_log_id != static_cast<uint32_t>(-1))
-  {
-    if(log().valid(_log_id))
-    {
-      ret.append(" [location = ");
-      ret.append(location(log()[_log_id]));
-      ret.append("]");
-    }
-  }
-#endif
-  return ret;
-}
+#endif  // AFIO_DISABLE_PATHS_IN_FAILURE_INFO
 
 AFIO_V2_NAMESPACE_END
 
@@ -1012,6 +921,103 @@ AFIO_V2_NAMESPACE_END
 #else
 #define AFIO_LOG_ALL(inst, message)
 #endif
+
+AFIO_V2_NAMESPACE_BEGIN
+
+#ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
+namespace detail
+{
+  template <class Src> inline void append_path_info(Src &src, std::string &ret)
+  {
+    if(QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id() == src._thread_id)
+    {
+      auto &tls = detail::tls_errored_results();
+      const char *path1 = tls.get(src._tls_path_id1), *path2 = tls.get(src._tls_path_id2);
+      if(path1 != nullptr)
+      {
+        ret.append(" [path1 = ");
+        ret.append(path1);
+        if(path2 != nullptr)
+        {
+          ret.append(", path2 = ");
+          ret.append(path2);
+        }
+        ret.append("]");
+      }
+    }
+#if AFIO_LOGGING_LEVEL >= 2
+    if(src._log_id != static_cast<uint32_t>(-1))
+    {
+      if(log().valid(src._log_id))
+      {
+        ret.append(" [location = ");
+        ret.append(location(log()[src._log_id]));
+        ret.append("]");
+      }
+    }
+#endif
+  }
+}
+#endif
+
+#if AFIO_EXPERIMENTAL_STATUS_CODE
+#ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
+template <class BaseStatusCodeDomain> inline typename error_domain<BaseStatusCodeDomain>::string_ref error_domain<BaseStatusCodeDomain>::_message(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept  // NOLINT
+{
+  assert(code.domain() == *this);
+  const auto &c = static_cast<const SYSTEM_ERROR2_NAMESPACE::status_code<error_domain> &>(code);  // NOLINT
+  auto v = c.value();
+  std::string ret = v.sc.message();
+  detail::append_path_info(v, ret);
+  return atomic_refcounted_string_ref(ret.c_str(), ret.size());
+}
+#endif
+
+#else  // AFIO_EXPERIMENTAL_STATUS_CODE
+
+inline filesystem::path error_info::path1() const
+{
+#ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
+  if(QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id() == _thread_id)
+  {
+    auto &tls = detail::tls_errored_results();
+    const char *path1 = tls.get(_tls_path_id1);
+    if(path1 != nullptr)
+    {
+      return filesystem::path(path1);
+    }
+  }
+#endif
+  return {};
+}
+inline filesystem::path error_info::path2() const
+{
+#ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
+  if(QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id() == _thread_id)
+  {
+    auto &tls = detail::tls_errored_results();
+    const char *path2 = tls.get(_tls_path_id2);
+    if(path2 != nullptr)
+    {
+      return filesystem::path(path2);
+    }
+  }
+#endif
+  return {};
+}
+inline std::string error_info::message() const
+{
+  std::string ret(ec.message());
+#ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
+  detail::append_path_info(*this, ret);
+#endif
+  return ret;
+}
+
+#endif  // AFIO_EXPERIMENTAL_STATUS_CODE
+
+AFIO_V2_NAMESPACE_END
+
 
 #include <ctime>  // for struct timespec
 
