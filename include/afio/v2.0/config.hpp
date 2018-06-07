@@ -390,17 +390,26 @@ namespace detail
   template <class T> struct error_domain_value_type
   {
     //! \brief The type of code
-    T ec;
+    T sc{};
 
     // The id of the thread where this failure occurred
-    uint32_t thread_id{0};
+    uint32_t _thread_id{0};
     // The TLS path store entry
-    uint16_t tls_path_id1{static_cast<uint16_t>(-1)}, _tls_path_id2{static_cast<uint16_t>(-1)};
+    uint16_t _tls_path_id1{static_cast<uint16_t>(-1)}, _tls_path_id2{static_cast<uint16_t>(-1)};
     // The id of the relevant log entry in the AFIO log (if logging enabled)
-    size_t log_id{static_cast<size_t>(-1)};
+    size_t _log_id{static_cast<size_t>(-1)};
 
-    //! Implicitly constructs an instance. Defined in handle.hpp as we need to understand handle.
-    inline error_domain_value_type(T _sc);  // NOLINT
+    //! Default construction
+    error_domain_value_type() = default;
+
+    //! Implicitly constructs an instance
+    constexpr inline error_domain_value_type(T _sc)
+        : sc(_sc)
+    {
+    }  // NOLINT
+
+    //! Compares to a T
+    constexpr bool operator==(const T &b) const noexcept { return sc == b; }
   };
 }
 
@@ -409,6 +418,7 @@ namespace detail
 */
 template <class BaseStatusCodeDomain> class error_domain : public BaseStatusCodeDomain
 {
+  friend class SYSTEM_ERROR2_NAMESPACE::status_code<error_domain>;
   using _base = BaseStatusCodeDomain;
 
 public:
@@ -450,28 +460,90 @@ using OUTCOME_V2_NAMESPACE::in_place_type;
 using SYSTEM_ERROR2_NAMESPACE::errc;
 
 //! Helper for constructing an error code from an errc
-inline error_code generic_error(errc c)
-{
-  return SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::generic_code::domain_type>>(c);
-}
+inline error_code generic_error(errc c);
 #ifndef _WIN32
 //! Helper for constructing an error code from a POSIX errno
-inline error_code posix_error(int c = errno)
-{
-  return SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::posix_code::domain_type>>(c);
-}
+inline error_code posix_error(int c = errno);
 #else
 //! Helper for constructing an error code from a DWORD
-inline error_code win32_error(SYSTEM_ERROR2_NAMESPACE::win32::DWORD c = SYSTEM_ERROR2_NAMESPACE::win32::GetLastError())
-{
-  return SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::win32_code::domain_type>>(c);
-}
+inline error_code win32_error(SYSTEM_ERROR2_NAMESPACE::win32::DWORD c = SYSTEM_ERROR2_NAMESPACE::win32::GetLastError());
 //! Helper for constructing an error code from a NTSTATUS
-inline error_code ntkernel_error(SYSTEM_ERROR2_NAMESPACE::win32::NTSTATUS c)
-{
-  return SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::nt_code::domain_type>>(c);
-}
+inline error_code ntkernel_error(SYSTEM_ERROR2_NAMESPACE::win32::NTSTATUS c);
 #endif
+
+namespace detail
+{
+  inline std::ostream &operator<<(std::ostream &s, const error_code &v) { return s << "afio::error_code(" << v.message().c_str() << ")"; }
+}
+inline error_code error_from_exception(std::exception_ptr &&ep = std::current_exception(), error_code not_matched = generic_error(errc::resource_unavailable_try_again)) noexcept
+{
+  if(!ep)
+  {
+    return generic_error(errc::success);
+  }
+  try
+  {
+    std::rethrow_exception(ep);
+  }
+  catch(const std::invalid_argument & /*unused*/)
+  {
+    ep = std::exception_ptr();
+    return generic_error(errc::invalid_argument);
+  }
+  catch(const std::domain_error & /*unused*/)
+  {
+    ep = std::exception_ptr();
+    return generic_error(errc::argument_out_of_domain);
+  }
+  catch(const std::length_error & /*unused*/)
+  {
+    ep = std::exception_ptr();
+    return generic_error(errc::argument_list_too_long);
+  }
+  catch(const std::out_of_range & /*unused*/)
+  {
+    ep = std::exception_ptr();
+    return generic_error(errc::result_out_of_range);
+  }
+  catch(const std::logic_error & /*unused*/) /* base class for this group */
+  {
+    ep = std::exception_ptr();
+    return generic_error(errc::invalid_argument);
+  }
+  catch(const std::system_error &e) /* also catches ios::failure */
+  {
+    ep = std::exception_ptr();
+    if(e.code().category() == std::generic_category())
+    {
+      return generic_error(static_cast<errc>(static_cast<int>(e.code().value())));
+    }
+    // Don't know this error code category, so fall through
+  }
+  catch(const std::overflow_error & /*unused*/)
+  {
+    ep = std::exception_ptr();
+    return generic_error(errc::value_too_large);
+  }
+  catch(const std::range_error & /*unused*/)
+  {
+    ep = std::exception_ptr();
+    return generic_error(errc::result_out_of_range);
+  }
+  catch(const std::runtime_error & /*unused*/) /* base class for this group */
+  {
+    ep = std::exception_ptr();
+    return generic_error(errc::resource_unavailable_try_again);
+  }
+  catch(const std::bad_alloc & /*unused*/)
+  {
+    ep = std::exception_ptr();
+    return generic_error(errc::not_enough_memory);
+  }
+  catch(...)
+  {
+  }
+  return not_matched;
+}
 
 AFIO_V2_NAMESPACE_END
 
@@ -487,22 +559,26 @@ AFIO_V2_NAMESPACE_BEGIN
 namespace detail
 {
   template <class Src> inline void append_path_info(Src &src, std::string &ret);
-  template <class Src> inline void fill_failure_info(Src &src);
+  template <class Dest, class Src> inline void fill_failure_info(Dest &dest, const Src &src);
 }
+
+struct error_info;
+inline std::error_code make_error_code(error_info ei);
 
 /*! \struct error_info
 \brief The cause of the failure of an operation in AFIO.
 */
 struct error_info
 {
+  friend inline std::error_code make_error_code(error_info ei);
   template <class Src> friend inline void detail::append_path_info(Src &src, std::string &ret);
-  template <class Src> friend inline void detail::fill_failure_info(Src &src);
+  template <class Dest, class Src> friend inline void detail::fill_failure_info(Dest &dest, const Src &src);
 
-  //! The error code for the failure
+private:
+  // The error code for the failure
   std::error_code ec;
 
 #ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
-private:
   // The id of the thread where this failure occurred
   uint32_t _thread_id{0};
   // The TLS path store entry
@@ -528,6 +604,8 @@ public:
   {
   }
 
+  //! Retrieve the value of the error code
+  int value() const noexcept { return ec.value(); }
   //! Retrieve any first path associated with this failure. Note this only works if called from the same thread as where the failure occurred.
   inline filesystem::path path1() const;
   //! Retrieve any second path associated with this failure. Note this only works if called from the same thread as where the failure occurred.
@@ -538,39 +616,39 @@ public:
   C++ exception types e.g. `bad_alloc`, we throw those types using the string from `message()`
   where possible. We then will throw an `error` exception type.
   */
-  inline void throw_as_exception() const;
+  inline void throw_exception() const;
 };
 inline bool operator==(const error_info &a, const error_info &b)
 {
-  return a.ec == b.ec;
+  return make_error_code(a) == make_error_code(b);
 }
 inline bool operator!=(const error_info &a, const error_info &b)
 {
-  return a.ec != b.ec;
+  return make_error_code(a) != make_error_code(b);
 }
 OUTCOME_TEMPLATE(class ErrorCondEnum)
 OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_condition_enum<ErrorCondEnum>::value))
 inline bool operator==(const error_info &a, const ErrorCondEnum &b)
 {
-  return a.ec == std::error_condition(b);
+  return make_error_code(a) == std::error_condition(b);
 }
 OUTCOME_TEMPLATE(class ErrorCondEnum)
 OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_condition_enum<ErrorCondEnum>::value))
 inline bool operator==(const ErrorCondEnum &a, const error_info &b)
 {
-  return std::error_condition(a) == b.ec;
+  return std::error_condition(a) == make_error_code(b);
 }
 OUTCOME_TEMPLATE(class ErrorCondEnum)
 OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_condition_enum<ErrorCondEnum>::value))
 inline bool operator!=(const error_info &a, const ErrorCondEnum &b)
 {
-  return a.ec != std::error_condition(b);
+  return make_error_code(a) != std::error_condition(b);
 }
 OUTCOME_TEMPLATE(class ErrorCondEnum)
 OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_condition_enum<ErrorCondEnum>::value))
 inline bool operator!=(const ErrorCondEnum &a, const error_info &b)
 {
-  return std::error_condition(a) != b.ec;
+  return std::error_condition(a) != make_error_code(b);
 }
 #ifndef NDEBUG
 // Is trivial in all ways, except default constructibility
@@ -578,7 +656,7 @@ static_assert(std::is_trivially_copyable<error_info>::value, "error_info is not 
 #endif
 inline std::ostream &operator<<(std::ostream &s, const error_info &v)
 {
-  if(v.ec)
+  if(make_error_code(v))
   {
     return s << "afio::error_info(" << v.message() << ")";
   }
@@ -589,10 +667,10 @@ inline std::error_code make_error_code(error_info ei)
 {
   return ei.ec;
 }
-// Tell Outcome to call error_info::throw_as_exception() on no-value observation
+// Tell Outcome to call error_info::throw_exception() on no-value observation
 inline void outcome_throw_as_system_error_with_payload(const error_info &ei)
 {
-  ei.throw_as_exception();
+  ei.throw_exception();
 }
 
 /*! \class error
@@ -605,13 +683,13 @@ public:
 
   //! Constructs from an error_info
   explicit error(error_info _ei)
-      : filesystem::filesystem_error(_ei.message(), _ei.path1(), _ei.path2(), _ei.ec)
+      : filesystem::filesystem_error(_ei.message(), _ei.path1(), _ei.path2(), make_error_code(_ei))
       , ei(_ei)
   {
   }
 };
 
-inline void error_info::throw_as_exception() const
+inline void error_info::throw_exception() const
 {
   std::string msg;
   try
@@ -965,10 +1043,9 @@ namespace detail
 template <class BaseStatusCodeDomain> inline typename error_domain<BaseStatusCodeDomain>::string_ref error_domain<BaseStatusCodeDomain>::_message(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept  // NOLINT
 {
   assert(code.domain() == *this);
-  const auto &c = static_cast<const SYSTEM_ERROR2_NAMESPACE::status_code<error_domain> &>(code);  // NOLINT
-  auto v = c.value();
-  std::string ret = v.sc.message();
-  detail::append_path_info(v, ret);
+  const auto &v = static_cast<const SYSTEM_ERROR2_NAMESPACE::status_code<error_domain> &>(code);  // NOLINT
+  std::string ret = v.message().c_str();
+  detail::append_path_info(v.value(), ret);
   return atomic_refcounted_string_ref(ret.c_str(), ret.size());
 }
 #endif

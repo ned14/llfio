@@ -424,7 +424,7 @@ template <class T> struct construct
 #ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
 namespace detail
 {
-  template <class Src> inline void fill_failure_info(Src &src)
+  template <class Dest, class Src> inline void fill_failure_info(Dest &dest, const Src &src)
   {
     auto &tls = detail::tls_errored_results();
     if(!tls.reentering_self)
@@ -441,22 +441,22 @@ namespace detail
         if(currentpath_)
         {
           auto currentpath = currentpath_.value().u8string();
-          src._thread_id = tls.this_thread_id;
+          dest._thread_id = tls.this_thread_id;
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4996)  // the function may be unsafe
 #endif
-          strncpy(tls.next(src._tls_path_id1), QUICKCPPLIB_NAMESPACE::ringbuffer_log::last190(currentpath), 190);
+          strncpy(tls.next(dest._tls_path_id1), QUICKCPPLIB_NAMESPACE::ringbuffer_log::last190(currentpath), 190);
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-          src._tls_path_id2 = src._tls_path_id1 - 17;  // guaranteed invalid
+          dest._tls_path_id2 = dest._tls_path_id1 - 17;  // guaranteed invalid
         }
       }
 #if AFIO_LOGGING_LEVEL >= 2
       if(log().log_level() >= log_level::error)
       {
-        src._log_id = log().emplace_back(log_level::error, src.ec.message().c_str(), static_cast<uint32_t>(nativeh._init), tls.this_thread_id);
+        dest._log_id = log().emplace_back(log_level::error, src.message().c_str(), static_cast<uint32_t>(nativeh._init), tls.this_thread_id);
       }
 #endif
     }
@@ -467,19 +467,51 @@ namespace detail
 #if AFIO_EXPERIMENTAL_STATUS_CODE
 
 #ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
-namespace detail
+
+//! Helper for constructing an error code from an errc
+inline error_code generic_error(errc c)
 {
-  template <class T>
-  inline error_domain_value_type<T>::error_domain_value_type(T _sc)  // NOLINT
-  : ec(_sc)
+  SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::generic_code::domain_type>> sc(c);
+  if(sc.failure())
   {
-    // Here is a VERY useful place to breakpoint!
-    if(ec.failure())
-    {
-      detail::fill_failure_info(*this);
-    }
+    detail::fill_failure_info(sc.value(), sc);
   }
+  return sc;
 }
+#ifndef _WIN32
+//! Helper for constructing an error code from a POSIX errno
+inline error_code posix_error(int c)
+{
+  SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::posix_code::domain_type>> sc(c);
+  if(sc.failure())
+  {
+    detail::fill_failure_info(sc.value(), sc);
+  }
+  return sc;
+}
+#else
+//! Helper for constructing an error code from a DWORD
+inline error_code win32_error(SYSTEM_ERROR2_NAMESPACE::win32::DWORD c)
+{
+  SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::win32_code::domain_type>> sc(c);
+  if(sc.failure())
+  {
+    detail::fill_failure_info(sc.value(), sc);
+  }
+  return sc;
+}
+//! Helper for constructing an error code from a NTSTATUS
+inline error_code ntkernel_error(SYSTEM_ERROR2_NAMESPACE::win32::NTSTATUS c)
+{
+  SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::nt_code::domain_type>> sc(c);
+  if(sc.failure())
+  {
+    detail::fill_failure_info(sc.value(), sc);
+  }
+  return sc;
+}
+#endif
+
 #endif
 
 #else  // AFIO_EXPERIMENTAL_STATUS_CODE
@@ -493,7 +525,7 @@ inline error_info::error_info(std::error_code _ec)
 #ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
   if(ec)
   {
-    detail::fill_failure_info(*this);
+    detail::fill_failure_info(*this, this->ec);
   }
 #endif
 }

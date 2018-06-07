@@ -143,7 +143,7 @@ struct stat_t  // NOLINT
     auto v(fill(h, wanted));
     if(v.has_error())
     {
-      v.error().throw_as_exception();
+      v.error().throw_exception();
     }
   }
 #endif

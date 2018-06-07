@@ -306,7 +306,7 @@ void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type byt
   }
   if(failed)
   {
-    error_info ret(posix_error());
+    auto ret(posix_error());
     (void) ret;
     AFIO_LOG_FATAL(_v.fd, "io_handle::unlock() failed");
     std::terminate();
