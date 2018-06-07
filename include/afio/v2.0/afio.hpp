@@ -57,11 +57,17 @@ import AFIO_MODULE_NAME;
 
 #include "config.hpp"
 
+#ifndef AFIO_LEAN_AND_MEAN
 #include "async_file_handle.hpp"
+#else
+#include "file_handle.hpp"
+#endif
 #include "directory_handle.hpp"
 #include "map_handle.hpp"
 #include "statfs.hpp"
+#ifndef AFIO_LEAN_AND_MEAN
 #include "storage_profile.hpp"
+#endif
 
 #include "algorithm/cached_parent_handle_adapter.hpp"
 #include "algorithm/mapped_span.hpp"

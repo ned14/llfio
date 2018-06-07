@@ -34,6 +34,9 @@ Distributed under the Boost Software License, Version 1.0.
 #define AFIO_TEST_KERNEL_DECL extern inline QUICKCPPLIB_SYMBOL_EXPORT
 #endif
 
+#if AFIO_EXPERIMENTAL_STATUS_CODE
+#define KERNELTEST_EXPERIMENTAL_STATUS_CODE 1
+#endif
 #include "kerneltest/include/kerneltest.hpp"
 
 #if 0

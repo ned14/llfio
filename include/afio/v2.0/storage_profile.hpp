@@ -27,6 +27,13 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "io_service.hpp"
 
+#if AFIO_EXPERIMENTAL_STATUS_CODE
+#include "outcome/include/outcome/experimental/status_outcome.hpp"
+AFIO_V2_NAMESPACE_EXPORT_BEGIN
+template <class T> using outcome = OUTCOME_V2_NAMESPACE::experimental::erased_outcome<T, error_code>;
+AFIO_V2_NAMESPACE_END
+#endif
+
 #include <regex>
 #include <utility>
 //! \file storage_profile.hpp Provides storage_profile

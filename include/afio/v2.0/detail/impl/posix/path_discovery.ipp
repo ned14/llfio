@@ -72,7 +72,7 @@ namespace path_discovery
       if(!_passwdh)
       {
         std::string msg("path_discovery::all_temporary_directories() failed to open /etc/passwd due to ");
-        msg.append(_passwdh.error().message());
+        msg.append(_passwdh.error().message().c_str());
         AFIO_LOG_WARN(nullptr, msg.c_str());
       }
       else

@@ -88,7 +88,7 @@ struct AFIO_DECL statfs_t
     auto v(fill(h, wanted));
     if(v.has_error())
     {
-      v.error().throw_as_exception();
+      v.error().throw_exception();
     }
   }
 #endif

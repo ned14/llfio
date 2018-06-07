@@ -32,6 +32,54 @@ include(QuickCppLibMakeLibrary)
 # Make an interface only library so dependent CMakeLists can bring in this header-only library
 include(QuickCppLibMakeHeaderOnlyLibrary)
 
+# Make preprocessed edition of this library target
+if(NOT PROJECT_IS_DEPENDENCY)
+  if(NOT PYTHONINTERP_FOUND)
+    indented_message(WARNING "NOT rebuilding preprocessed edition of library due to python not being installed")
+  else()
+    # See if the ply package is installed so pcpp can run
+    execute_process(COMMAND python -c "import ply" RESULT_VARIABLE python_has_ply)
+    if(NOT python_has_ply EQUAL 0)
+      indented_message(WARNING "NOT rebuilding preprocessed edition of library due to installed python not having the ply package installed. "
+        "Do 'pip install ply' to fix. NOTE that doxygen docs will NOT build without the precompiled edition.")
+    else()
+      function(make_single_header target name)
+        add_partial_preprocess(${target}
+                              "${name}"
+                              ${ARGN}
+                              -I ..
+                              --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs
+                              --passthru-comments --line-directive # --debug
+                              -U QUICKCPPLIB_ENABLE_VALGRIND
+                              -U DOXYGEN_SHOULD_SKIP_THIS -U DOXYGEN_IS_IN_THE_HOUSE
+                              -U STANDARDESE_IS_IN_THE_HOUSE
+                              -U __has_include -U __has_feature -U __has_cpp_attribute
+                              -U __cpp_modules
+                              WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                              )
+        if(NOT CMAKE_VERSION VERSION_LESS 3.3)
+          add_dependencies(outcome_hl ${target})
+        endif()
+      endfunction()
+      make_single_header(afio_hl-pp-std
+                         "${CMAKE_CURRENT_SOURCE_DIR}/single-header/afio.hpp"
+                         "${CMAKE_CURRENT_SOURCE_DIR}/include/afio/v2.0/afio.hpp"
+                         #-D QUICKCPPLIB_USE_STD_BYTE -D QUICKCPPLIB_USE_STD_OPTIONAL -D QUICKCPPLIB_USE_STD_SPAN
+                         -D AFIO_LEAN_AND_MEAN
+                         -D AFIO_EXPERIMENTAL_STATUS_CODE=1)
+      make_single_header(afio_hl-pp-abi
+                         "${CMAKE_CURRENT_SOURCE_DIR}/single-header/abi.hpp"
+                         "${CMAKE_CURRENT_SOURCE_DIR}/include/afio/v2.0/afio.hpp"
+                         -D AFIO_EXPERIMENTAL_STATUS_CODE=1
+                         -D AFIO_DISABLE_ABI_PERMUTATION=1
+                         -D OUTCOME_DISABLE_ABI_PERMUTATION=1
+                         -D QUICKCPPLIB_DISABLE_ABI_PERMUTATION=1
+                         -U AFIO_UNSTABLE_VERSION
+                         -U OUTCOME_UNSTABLE_VERSION)
+    endif()
+  endif()
+endif()
+
 # Create a custom doxygen generation target
 include(QuickCppLibMakeDoxygen)
 # Set the standard definitions for these libraries and bring in the all_* helper functions

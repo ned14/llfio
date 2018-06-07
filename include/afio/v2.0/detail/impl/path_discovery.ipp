@@ -161,7 +161,7 @@ namespace path_discovery
           std::string msg("path_discovery::verified_temporary_directories() failed to create a file in ");
           msg.append(ps._all[n].path.u8string());
           msg.append(" due to ");
-          msg.append(_fh.error().message());
+          msg.append(_fh.error().message().c_str());
           AFIO_LOG_WARN(nullptr, msg.c_str());
 #endif
           ps._all[n].h = {};
@@ -187,7 +187,7 @@ namespace path_discovery
           std::string msg("path_discovery::verified_temporary_directories() failed to statfs the temp directory ");
           msg.append(ps._all[n].path.u8string());
           msg.append(" due to ");
-          msg.append(statfsres.error().message());
+          msg.append(statfsres.error().message().c_str());
           AFIO_LOG_WARN(nullptr, msg.c_str());
 #endif
           ps.all[n].stat = {};

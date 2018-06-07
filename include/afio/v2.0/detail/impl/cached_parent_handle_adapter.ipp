@@ -54,7 +54,7 @@ namespace algorithm
         if(!ret)
         {
           std::string msg("cached_path_handle::current_path() failed to retrieve current path of cached handle due to ");
-          msg.append(ret.error().message());
+          msg.append(ret.error().message().c_str());
           AFIO_LOG_WARN(nullptr, msg.c_str());
         }
         else if(!ret.value().empty() && ret.value() != _lastpath)

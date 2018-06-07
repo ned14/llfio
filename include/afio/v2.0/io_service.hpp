@@ -31,8 +31,9 @@ Distributed under the Boost Software License, Version 1.0.
 #include <deque>
 #include <mutex>
 
-#ifdef __cpp_coroutines
+#if defined(__cpp_coroutines)
 // clang-format off
+#if defined(__has_include)
 #if __has_include(<coroutine>)
 #include <coroutine>
 AFIO_V2_NAMESPACE_EXPORT_BEGIN
@@ -45,6 +46,7 @@ template<class T = void> using coroutine_handle = std::experimental::coroutine_h
 AFIO_V2_NAMESPACE_END
 #else
 #error Cannot use C++ Coroutines without the <coroutine> header!
+#endif
 #endif
 // clang-format on
 #endif

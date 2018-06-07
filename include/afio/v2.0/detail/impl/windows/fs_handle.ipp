@@ -242,7 +242,7 @@ result<void> fs_handle::unlink(deadline d) noexcept
       {
         // If something else is using it, we may not be able to rename
         // This error also annoyingly appears if the file has delete on close set on it already
-        if(out.error().ec.value() == static_cast<int>(0xC0000043) /*STATUS_SHARING_VIOLATION*/)
+        if(out.error().value() == static_cast<int>(0xC0000043) /*STATUS_SHARING_VIOLATION*/)
         {
           AFIO_LOG_WARN(this, "Failed to rename entry to random name to simulate immediate unlinking due to STATUS_SHARING_VIOLATION, skipping");
         }

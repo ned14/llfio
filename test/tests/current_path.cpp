@@ -50,7 +50,7 @@ template <class FileHandleType, class DirectoryHandleType> static inline void Te
     BOOST_CHECK(h1path);
     if(!h1path)
     {
-      std::cerr << "Getting the current path of a file FAILED due to " << h1path.error().message() << std::endl;
+      std::cerr << "Getting the current path of a file FAILED due to " << h1path.error().message().c_str() << std::endl;
     }
     else if(h1path.value().empty())
     {
@@ -66,7 +66,7 @@ template <class FileHandleType, class DirectoryHandleType> static inline void Te
     BOOST_CHECK(h2path);
     if(!h2path)
     {
-      std::cerr << "Getting the current path of a directory FAILED due to " << h2path.error().message() << std::endl;
+      std::cerr << "Getting the current path of a directory FAILED due to " << h2path.error().message().c_str() << std::endl;
     }
     else if(h2path.value().empty())
     {
@@ -87,7 +87,7 @@ template <class FileHandleType, class DirectoryHandleType> static inline void Te
     BOOST_CHECK(h1path);
     if(!h1path)
     {
-      std::cerr << "Getting the current path of a file FAILED due to " << h1path.error().message() << std::endl;
+      std::cerr << "Getting the current path of a file FAILED due to " << h1path.error().message().c_str() << std::endl;
     }
     else if(h1path.value().empty())
     {
@@ -108,7 +108,7 @@ template <class FileHandleType, class DirectoryHandleType> static inline void Te
     BOOST_CHECK(h2path);
     if(!h2path)
     {
-      std::cerr << "Getting the current path of a directory FAILED due to " << h2path.error().message() << std::endl;
+      std::cerr << "Getting the current path of a directory FAILED due to " << h2path.error().message().c_str() << std::endl;
     }
     else if(h2path.value().empty())
     {
@@ -133,7 +133,7 @@ template <class FileHandleType, class DirectoryHandleType> static inline void Te
     BOOST_CHECK(h1path);
     if(!h1path)
     {
-      std::cerr << "Getting the current path of a file FAILED due to " << h1path.error().message() << std::endl;
+      std::cerr << "Getting the current path of a file FAILED due to " << h1path.error().message().c_str() << std::endl;
     }
     else if(h1path.value().empty())
     {
