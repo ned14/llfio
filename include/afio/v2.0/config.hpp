@@ -82,7 +82,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #if !defined(AFIO_EXPERIMENTAL_STATUS_CODE)
 //! \brief Whether to use SG14 experimental `status_code` instead of `std::error_code`
-#define AFIO_EXPERIMENTAL_STATUS_CODE 0
+#define AFIO_EXPERIMENTAL_STATUS_CODE 1
 #endif
 
 
@@ -146,7 +146,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "quickcpplib/include/import.h"
 
-#ifdef AFIO_UNSTABLE_VERSION
+#if defined(AFIO_UNSTABLE_VERSION) && !defined(AFIO_DISABLE_ABI_PERMUTATION)
 #include "../revision.hpp"
 #define AFIO_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(afio_v2, AFIO_PREVIOUS_COMMIT_UNIQUE))
 #else

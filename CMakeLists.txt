@@ -53,6 +53,8 @@ if(NOT PROJECT_IS_DEPENDENCY)
                               -U QUICKCPPLIB_ENABLE_VALGRIND
                               -U DOXYGEN_SHOULD_SKIP_THIS -U DOXYGEN_IS_IN_THE_HOUSE
                               -U STANDARDESE_IS_IN_THE_HOUSE
+                              -U __has_include -U __has_feature -U __has_cpp_attribute
+                              -U __cpp_modules
                               WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                               )
         if(NOT CMAKE_VERSION VERSION_LESS 3.3)
@@ -61,10 +63,14 @@ if(NOT PROJECT_IS_DEPENDENCY)
       endfunction()
       make_single_header(afio_hl-pp-std
                          "${CMAKE_CURRENT_SOURCE_DIR}/single-header/afio.hpp"
-                         "${CMAKE_CURRENT_SOURCE_DIR}/include/afio/v2.0/afio.hpp")
+                         "${CMAKE_CURRENT_SOURCE_DIR}/include/afio/v2.0/afio.hpp"
+                         #-D QUICKCPPLIB_USE_STD_BYTE -D QUICKCPPLIB_USE_STD_OPTIONAL -D QUICKCPPLIB_USE_STD_SPAN
+                         -D AFIO_LEAN_AND_MEAN
+                         -D AFIO_EXPERIMENTAL_STATUS_CODE=1)
       make_single_header(afio_hl-pp-abi
                          "${CMAKE_CURRENT_SOURCE_DIR}/single-header/abi.hpp"
                          "${CMAKE_CURRENT_SOURCE_DIR}/include/afio/v2.0/afio.hpp"
+                         -D AFIO_EXPERIMENTAL_STATUS_CODE=1
                          -D AFIO_DISABLE_ABI_PERMUTATION=1
                          -D OUTCOME_DISABLE_ABI_PERMUTATION=1
                          -D QUICKCPPLIB_DISABLE_ABI_PERMUTATION=1

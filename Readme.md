@@ -17,8 +17,10 @@ Tarballs of source and prebuilt binaries for Linux x64, MacOS x64 and Windows x6
 - [x] Fix all known bugs in Outcome, plus reorg source code in prep for `status_code`.
 - [x] Scatter-gather buffers to use https://github.com/martinmoene/byte-lite
 - [x] Make lazy the stat fetch during file/dir open.
-- [ ] Implement SG14 `status_code` as a standalone library and test in AFIO.
-- [ ] Single include generation now we're on `status_code` and it's safe.
+- [x] Implement SG14 `status_code` as a standalone library and test in AFIO.
+- [x] Single include generation now we're on `status_code` and it's safe.
+- [ ] Implement `SIGBUS`/`EXCEPTION_IN_PAGE_ERROR` RAII catcher.
+  - Is `io_service` reference counting the signal handler install?
 - [ ] `atomic_append` isn't actually being tested in shared_fs_mutex
 - [ ] Implement a non-toy ACID key-value BLOB store and send it to Boost for peer review.
   - [ ] For this need to implement a file-based B+ tree. And for that, need to
