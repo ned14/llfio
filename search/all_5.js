@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['ec',['ec',['../structafio__v2__xxx_1_1error__info.html#a1e44563674108c5338d1ca1050c4d0eb',1,'afio_v2_xxx::error_info']]],
   ['emplace',['emplace',['../structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#ae8f83ec93a0afb94595a93a92e555c1b',1,'afio_v2_xxx::algorithm::impl::trivial_vector_impl']]],
   ['emplace_5fback',['emplace_back',['../structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a9a48b859de9e022f56e2178fc01303ec',1,'afio_v2_xxx::algorithm::impl::trivial_vector_impl']]],
   ['empty',['empty',['../classafio__v2__xxx_1_1path__view.html#af41ee3062ad6f84a0cbc156bb4b6001b',1,'afio_v2_xxx::path_view::empty()'],['../structafio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a9cabe840a151594695d42962315c8a22',1,'afio_v2_xxx::storage_profile::storage_profile::empty()'],['../structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a2445e00cfeaec57852f3e8fac8833669',1,'afio_v2_xxx::algorithm::impl::trivial_vector_impl::empty()']]],
@@ -16,7 +15,7 @@ var searchData=
   ['environment',['environment',['../structafio__v2__xxx_1_1path__discovery_1_1discovered__path.html#a1deccea0a3ad1c3a5a2688a1a3cc118cae900e40bc91d3f9f7f0a99fed68a2e96',1,'afio_v2_xxx::path_discovery::discovered_path']]],
   ['erase',['erase',['../structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a97d59a2919feeb1a4c2bb71dda63c2a3',1,'afio_v2_xxx::algorithm::impl::trivial_vector_impl::erase(const_iterator pos)'],['../structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a782e7042f5ef8e5794566ad990418a8a',1,'afio_v2_xxx::algorithm::impl::trivial_vector_impl::erase(const_iterator first, const_iterator last)']]],
   ['error',['error',['../classafio__v2__xxx_1_1error.html',1,'afio_v2_xxx::error'],['../classafio__v2__xxx_1_1error.html#abc4782d44d167e68c6c48f359e98772e',1,'afio_v2_xxx::error::error()']]],
-  ['error_5finfo',['error_info',['../structafio__v2__xxx_1_1error__info.html',1,'afio_v2_xxx::error_info'],['../structafio__v2__xxx_1_1error__info.html#a3839c2c2f0586b8d2251d176267526f4',1,'afio_v2_xxx::error_info::error_info()']]],
+  ['error_5finfo',['error_info',['../structafio__v2__xxx_1_1error__info.html',1,'afio_v2_xxx']]],
   ['exclusive',['exclusive',['../structafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entity__type.html#aebf91f90fd55b749c3739978dd3ae20c',1,'afio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type']]],
   ['executable',['executable',['../structafio__v2__xxx_1_1section__handle_1_1flag__base.html#a5b790e66402ef3a07ce9464f3e1dc9d8ac4d63015efddf12ccdb30242e135f35c',1,'afio_v2_xxx::section_handle::flag_base']]],
   ['execute',['execute',['../structafio__v2__xxx_1_1section__handle_1_1flag__base.html#a5b790e66402ef3a07ce9464f3e1dc9d8a52cf147e32054f836e9fe4915eef32d1',1,'afio_v2_xxx::section_handle::flag_base']]],
