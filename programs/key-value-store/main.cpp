@@ -46,7 +46,7 @@ namespace stackoverflow
     if(!_fh)
     {
       // Fetch the error code
-      std::error_code ec = _fh.error().ec;
+      std::error_code ec = make_error_code(_fh.error());
       // Did we fail due to file not found?
       // It is *very* important to note that ec contains the *original* error code which could
       // be POSIX, or Win32 or NT kernel error code domains. However we can always compare,
@@ -70,7 +70,7 @@ namespace stackoverflow
     file_handle::io_result<file_handle::buffers_type> _buffers_read = read(fh, {reqs, 0});
     if(!_buffers_read)
     {
-      std::error_code ec = _fh.error().ec;
+      std::error_code ec = make_error_code(_fh.error());
       std::cerr << "Reading the file " << path << " failed with " << ec.message() << std::endl;
     }
     // Same as before, either throw any error or unpack the value returned

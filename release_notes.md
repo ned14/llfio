@@ -28,6 +28,8 @@ source code repository lives at https://github.com/ned14/boost.afio.
 - `async_file_handle` supports `co_await` (Coroutines TS).
 - Provides view adapters into the Ranges TS, so ready for STL2.
 - Original error code is always preserved, even down to the original NT kernel error code if a NT kernel API was used.
+    - Optional configuration based on [P1028](https://wg21.link/P1028) *SG14 status_code and standard error object
+    for P0709 Zero-overhead deterministic exceptions*.
 - Race free filesystem design used throughout (i.e. no TOCTOU).
 - Zero malloc, zero exception throw and zero whole system memory copy design used throughout, even down to paths (which can hit 64Kb!).
 - Works very well with the C++ standard library, and is intended to be proposed for standardisation into C++ in Summer 2018.
