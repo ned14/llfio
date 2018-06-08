@@ -47,8 +47,8 @@ matrix:
   - os: osx
     env: __="Documentation" NAME=TravisDocumentation
   - os: osx
-    env: __="cmake tests (error_code)" NAME=TravisLinuxWorker
-    env: __="cmake tests (status_code)" NAME=TravisLinuxWorker
+    env: __="cmake tests (error_code)" NAME=TravisLinuxWorker CMAKE_CONFIGURE_OPTIONS=
+    env: __="cmake tests (status_code)" NAME=TravisLinuxWorker CMAKE_CONFIGURE_OPTIONS=-DAFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - os: linux
     compiler: g++
     env: __="Documentation" NAME=TravisDocumentation
