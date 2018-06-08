@@ -1,2 +1,2 @@
-Herein can lie a single header edition of AFIO. It currently exceeds 1.5Mb,
-and so to keep the git repo from expanding it is not committed here.
+Herein lie two single header editions of AFIO. To keep the size down, they are
+split into POSIX and Windows only editions.

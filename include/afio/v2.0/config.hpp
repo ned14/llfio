@@ -82,7 +82,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #if !defined(AFIO_EXPERIMENTAL_STATUS_CODE)
 //! \brief Whether to use SG14 experimental `status_code` instead of `std::error_code`
-#define AFIO_EXPERIMENTAL_STATUS_CODE 1
+#define AFIO_EXPERIMENTAL_STATUS_CODE 0
 #endif
 
 
@@ -229,6 +229,11 @@ AFIO_V2_NAMESPACE_BEGIN
 namespace filesystem = std::experimental::filesystem;
 AFIO_V2_NAMESPACE_END
 #endif
+#elif __PCPP_ALWAYS_TRUE__
+#include <filesystem>
+AFIO_V2_NAMESPACE_BEGIN
+namespace filesystem = std::filesystem;
+AFIO_V2_NAMESPACE_END
 // clang-format on
 #elif defined(_MSC_VER)
 #include <filesystem>
@@ -1044,9 +1049,15 @@ template <class BaseStatusCodeDomain> inline typename error_domain<BaseStatusCod
 {
   assert(code.domain() == *this);
   const auto &v = static_cast<const SYSTEM_ERROR2_NAMESPACE::status_code<error_domain> &>(code);  // NOLINT
-  std::string ret = v.message().c_str();
+  std::string ret = _base::_message(code).c_str();
   detail::append_path_info(v.value(), ret);
-  return atomic_refcounted_string_ref(ret.c_str(), ret.size());
+  char *p = (char *) malloc(ret.size() + 1);
+  if(p == nullptr)
+  {
+    return string_ref("Failed to allocate memory to store error string");
+  }
+  memcpy(p, ret.c_str(), ret.size() + 1);
+  return atomic_refcounted_string_ref(p, ret.size());
 }
 #endif
 

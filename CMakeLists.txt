@@ -4,6 +4,8 @@ include(QuickCppLibRequireOutOfSourceBuild)
 include(QuickCppLibUtils)
 include(QuickCppLibPolicies)
 
+option(AFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE "Whether to use SG14 status_code for failure handling" ON)
+
 # Parse the version we tell cmake directly from the version header file
 ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/afio/version.hpp" VERSIONSTRING)
 # Sets the usual PROJECT_NAME etc
@@ -49,23 +51,33 @@ if(NOT PROJECT_IS_DEPENDENCY)
                               ${ARGN}
                               -I ..
                               --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs
-                              --passthru-comments --line-directive # --debug
+                              --line-directive #--passthru-comments --debug
                               -U QUICKCPPLIB_ENABLE_VALGRIND
                               -U DOXYGEN_SHOULD_SKIP_THIS -U DOXYGEN_IS_IN_THE_HOUSE
                               -U STANDARDESE_IS_IN_THE_HOUSE
                               -U __has_include -U __has_feature -U __has_cpp_attribute
                               -U __cpp_modules
+                             -U gsl_FEATURE_WITH_CONTAINER_TO_STD -U gsl_FEATURE_MAKE_SPAN_TO_STD -U gsl_FEATURE_BYTE_SPAN_TO_STD
+                             -U gsl_FEATURE_HAVE_IMPLICIT_MACRO -U gsl_FEATURE_HAVE_OWNER_MACRO -U gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
                               WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                               )
         if(NOT CMAKE_VERSION VERSION_LESS 3.3)
           add_dependencies(outcome_hl ${target})
         endif()
       endfunction()
-      make_single_header(afio_hl-pp-std
-                         "${CMAKE_CURRENT_SOURCE_DIR}/single-header/afio.hpp"
+      make_single_header(afio_hl-pp-posix
+                         "${CMAKE_CURRENT_SOURCE_DIR}/single-header/afio-posix.hpp"
                          "${CMAKE_CURRENT_SOURCE_DIR}/include/afio/v2.0/afio.hpp"
                          #-D QUICKCPPLIB_USE_STD_BYTE -D QUICKCPPLIB_USE_STD_OPTIONAL -D QUICKCPPLIB_USE_STD_SPAN
-                         -D AFIO_LEAN_AND_MEAN
+                         -U gsl_COMPILER_MSVC_VERSION -U gsl_HAS_CPP0X -D gsl_CPLUSPLUS=201703 -D __cplusplus=201703
+                         -D AFIO_LEAN_AND_MEAN -U _WIN32
+                         -D AFIO_EXPERIMENTAL_STATUS_CODE=1)
+      make_single_header(afio_hl-pp-win
+                         "${CMAKE_CURRENT_SOURCE_DIR}/single-header/afio-win.hpp"
+                         "${CMAKE_CURRENT_SOURCE_DIR}/include/afio/v2.0/afio.hpp"
+                         #-D QUICKCPPLIB_USE_STD_BYTE -D QUICKCPPLIB_USE_STD_OPTIONAL -D QUICKCPPLIB_USE_STD_SPAN
+                         -D gsl_CPLUSPLUS=201703 -D __cplusplus=201703
+                         -D AFIO_LEAN_AND_MEAN -D _WIN32
                          -D AFIO_EXPERIMENTAL_STATUS_CODE=1)
       make_single_header(afio_hl-pp-abi
                          "${CMAKE_CURRENT_SOURCE_DIR}/single-header/abi.hpp"
@@ -141,6 +153,9 @@ if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD" OR APPLE)
   all_link_libraries(PUBLIC ${libcxx_cxxexperimental})
 endif()
 # Set any macros this library requires
+if(AFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE)
+  all_compile_definitions(PUBLIC AFIO_EXPERIMENTAL_STATUS_CODE=1)
+endif()
 if(WIN32)
   all_compile_definitions(PRIVATE _WIN32_WINNT=0x600)  ## Target WinVista
   target_link_libraries(afio_dl PUBLIC ntkernel-error-category::dl)
