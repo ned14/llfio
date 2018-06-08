@@ -48,6 +48,7 @@ matrix:
     env: __="Documentation" NAME=TravisDocumentation
   - os: osx
     env: __="cmake tests (error_code)" NAME=TravisLinuxWorker CMAKE_CONFIGURE_OPTIONS=
+  - os: osx
     env: __="cmake tests (status_code)" NAME=TravisLinuxWorker CMAKE_CONFIGURE_OPTIONS=-DAFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - os: linux
     compiler: g++
@@ -77,7 +78,7 @@ before_install:
      export CXX=/usr/local/opt/llvm/bin/clang++;
      export LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib";
      export CPPFLAGS=-I/usr/local/opt/llvm/include;
-     export CMAKE_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS -DCMAKE_LIBRARY_PATH=/usr/local/opt/llvm/lib;
+     export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DCMAKE_LIBRARY_PATH=/usr/local/opt/llvm/lib";
    fi
  - if [ "$CXX" = "g++" ]; then export CXX=g++-6; export NAME=TravisLinuxWorkerGCC; fi;
  - if [ "$CXX" = "clang++" ]; then export CXX=clang++-4.0; export NAME=TravisLinuxWorkerClang; fi;
