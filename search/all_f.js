@@ -19,8 +19,8 @@ var searchData=
   ['pop_5fback',['pop_back',['../structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a6fa51a8f33e271df5fa6e7c0689e652e',1,'afio_v2_xxx::algorithm::impl::trivial_vector_impl']]],
   ['posix_5ferror',['posix_error',['../namespaceafio__v2__xxx.html#a057b54bbb63e73f6572033f651dc3408',1,'afio_v2_xxx']]],
   ['post',['post',['../classafio__v2__xxx_1_1io__service.html#acaa55fe3a61484c646c479f256158c02',1,'afio_v2_xxx::io_service']]],
-  ['prefault',['prefault',['../structafio__v2__xxx_1_1section__handle_1_1flag__base.html#a5b790e66402ef3a07ce9464f3e1dc9d8a522b281f854fe92d7ea674d2d8cc4be2',1,'afio_v2_xxx::section_handle::flag_base']]],
+  ['prefault',['prefault',['../classafio__v2__xxx_1_1section__handle.html#a37a43f96250b5d490a6583b0153ac91ea663dd9c1d668cbbd6829e865b1d197cb',1,'afio_v2_xxx::section_handle']]],
   ['prefetch',['prefetch',['../classafio__v2__xxx_1_1map__handle.html#ae16cb0af9b96f90f87f42318f7d35e65',1,'afio_v2_xxx::map_handle::prefetch(span&lt; buffer_type &gt; regions) noexcept'],['../classafio__v2__xxx_1_1map__handle.html#ab569da5c3ffa64200f8b10dbe683bbc8',1,'afio_v2_xxx::map_handle::prefetch(buffer_type region) noexcept']]],
-  ['process',['process',['../structafio__v2__xxx_1_1native__handle__type_1_1disposition__base.html#a89e0e728fc7a7e4a008e57d572702de6a6d1480a03d1d0ac5fd0248686ebc00c4',1,'afio_v2_xxx::native_handle_type::disposition_base']]],
+  ['process',['process',['../structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea91574eb2d3fa2866959ea514ceb8a872',1,'afio_v2_xxx::native_handle_type']]],
   ['push_5fback',['push_back',['../structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a5024e5e15fba22e7860a00d4c2359674',1,'afio_v2_xxx::algorithm::impl::trivial_vector_impl::push_back(const value_type &amp;v)'],['../structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#abe9b56a8ec510f4a65da01a6a25c22f5',1,'afio_v2_xxx::algorithm::impl::trivial_vector_impl::push_back(value_type &amp;&amp;v)']]]
 ];

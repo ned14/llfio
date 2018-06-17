@@ -81,7 +81,6 @@ $(document).ready(function(){initNavTree('structafio__v2__xxx_1_1native__handle_
 
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
@@ -96,17 +95,29 @@ $(document).ready(function(){initNavTree('structafio__v2__xxx_1_1native__handle_
 
 <p><code>#include &quot;native_handle_type.hpp&quot;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structafio__v2__xxx_1_1native__handle__type_1_1disposition__base.html">disposition_base</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of handle.  <a href="structafio__v2__xxx_1_1native__handle__type_1_1disposition__base.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a3aab386f73623173d5275c1ce0c01877"><td class="memItemLeft" align="right" valign="top"><a id="a3aab386f73623173d5275c1ce0c01877"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>disposition</b> = quickcpplib::_xxx ::bitfield::bitfield&lt; <a class="el" href="structafio__v2__xxx_1_1native__handle__type_1_1disposition__base.html">disposition_base</a> &gt;</td></tr>
-<tr class="separator:a3aab386f73623173d5275c1ce0c01877"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a32db674a5ee094e3eeb0e57ec97f590e"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590e">bitfield__disposition</a> : unsigned { <br />
+&#160;&#160;<a class="el" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea34df1c7f5403a369ff654b0be6b03b93">invalid</a> = 0U, 
+<a class="el" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590eac3acb2504fd1baae7efcbf7eddd96e09">readable</a> = 1U &lt;&lt; 0U, 
+<a class="el" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ead7c57d10ce46460a4df4725ee87349e4">writable</a> = 1U &lt;&lt; 1U, 
+<a class="el" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea9ca5e8ecedf6768c0024dbb893d2da92">append_only</a> = 1U &lt;&lt; 2U, 
+<br />
+&#160;&#160;<a class="el" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea0fce68f8258db2e2cacdd5db400cf880">overlapped</a> = 1U &lt;&lt; 4U, 
+<a class="el" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590eadfd5939c62445d24da4dbc3b9a7b5896">seekable</a> = 1U &lt;&lt; 5U, 
+<a class="el" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590eaff464eb296af44b13a72a49db257c33e">aligned_io</a> = 1U &lt;&lt; 6U, 
+<a class="el" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea2007719529d71fb049bba7f5a756b321">file</a> = 1U &lt;&lt; 8U, 
+<br />
+&#160;&#160;<a class="el" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590eaa034ac586de3c8fe4f8e875591007e7a">directory</a> = 1U &lt;&lt; 9U, 
+<a class="el" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea598d2ffbf7a063080d39258eb50dd81b">symlink</a> = 1U &lt;&lt; 10U, 
+<a class="el" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea74591d6b83e478ee8c8ff9fa4bde2360">multiplexer</a> = 1U &lt;&lt; 11U, 
+<a class="el" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea91574eb2d3fa2866959ea514ceb8a872">process</a> = 1U &lt;&lt; 12U, 
+<br />
+&#160;&#160;<a class="el" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590eadaeed28660cd8c0b790a37ba4a069670">section</a> = 1U &lt;&lt; 13U
+<br />
+ }<tr class="memdesc:a32db674a5ee094e3eeb0e57ec97f590e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of handle.  <a href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590e">More...</a><br /></td></tr>
+</td></tr>
+<tr class="separator:a32db674a5ee094e3eeb0e57ec97f590e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -231,7 +242,65 @@ union {</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A native handle type used for wrapping file descriptors, process ids or HANDLEs. Unmanaged, wrap in a handle object to manage. </p>
-</div><hr/>The documentation for this struct was generated from the following file:<ul>
+</div><h2 class="groupheader">Member Enumeration Documentation</h2>
+<a id="a32db674a5ee094e3eeb0e57ec97f590e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a32db674a5ee094e3eeb0e57ec97f590e">&#9670;&nbsp;</a></span>bitfield__disposition</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590e">afio_v2_xxx::native_handle_type::bitfield__disposition</a> : unsigned</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The type of handle. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a32db674a5ee094e3eeb0e57ec97f590ea34df1c7f5403a369ff654b0be6b03b93"></a>invalid&#160;</td><td class="fielddoc"><p>Invalid handle. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a32db674a5ee094e3eeb0e57ec97f590eac3acb2504fd1baae7efcbf7eddd96e09"></a>readable&#160;</td><td class="fielddoc"><p>Is readable. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a32db674a5ee094e3eeb0e57ec97f590ead7c57d10ce46460a4df4725ee87349e4"></a>writable&#160;</td><td class="fielddoc"><p>Is writable. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a32db674a5ee094e3eeb0e57ec97f590ea9ca5e8ecedf6768c0024dbb893d2da92"></a>append_only&#160;</td><td class="fielddoc"><p>Is append only. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a32db674a5ee094e3eeb0e57ec97f590ea0fce68f8258db2e2cacdd5db400cf880"></a>overlapped&#160;</td><td class="fielddoc"><p>Requires additional synchronisation. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a32db674a5ee094e3eeb0e57ec97f590eadfd5939c62445d24da4dbc3b9a7b5896"></a>seekable&#160;</td><td class="fielddoc"><p>Is seekable. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a32db674a5ee094e3eeb0e57ec97f590eaff464eb296af44b13a72a49db257c33e"></a>aligned_io&#160;</td><td class="fielddoc"><p>Requires sector aligned i/o (typically 512 or 4096) </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a32db674a5ee094e3eeb0e57ec97f590ea2007719529d71fb049bba7f5a756b321"></a>file&#160;</td><td class="fielddoc"><p>Is a regular file. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a32db674a5ee094e3eeb0e57ec97f590eaa034ac586de3c8fe4f8e875591007e7a"></a>directory&#160;</td><td class="fielddoc"><p>Is a directory. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a32db674a5ee094e3eeb0e57ec97f590ea598d2ffbf7a063080d39258eb50dd81b"></a>symlink&#160;</td><td class="fielddoc"><p>Is a symlink. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a32db674a5ee094e3eeb0e57ec97f590ea74591d6b83e478ee8c8ff9fa4bde2360"></a>multiplexer&#160;</td><td class="fielddoc"><p>Is a kqueue/epoll/iocp. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a32db674a5ee094e3eeb0e57ec97f590ea91574eb2d3fa2866959ea514ceb8a872"></a>process&#160;</td><td class="fielddoc"><p>Is a child process. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a32db674a5ee094e3eeb0e57ec97f590eadaeed28660cd8c0b790a37ba4a069670"></a>section&#160;</td><td class="fielddoc"><p>Is a memory section. </p>
+</td></tr>
+</table>
+<div class="fragment"><div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  {</div><div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <a class="code" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea34df1c7f5403a369ff654b0be6b03b93">invalid</a> = 0U,  <span class="comment">//!&lt; Invalid handle</span></div><div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="comment"></span></div><div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <a class="code" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590eac3acb2504fd1baae7efcbf7eddd96e09">readable</a> = 1U &lt;&lt; 0U,     <span class="comment">//!&lt; Is readable</span></div><div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="comment"></span>    <a class="code" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ead7c57d10ce46460a4df4725ee87349e4">writable</a> = 1U &lt;&lt; 1U,     <span class="comment">//!&lt; Is writable</span></div><div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="comment"></span>    <a class="code" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea9ca5e8ecedf6768c0024dbb893d2da92">append_only</a> = 1U &lt;&lt; 2U,  <span class="comment">//!&lt; Is append only</span></div><div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="comment"></span></div><div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <a class="code" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea0fce68f8258db2e2cacdd5db400cf880">overlapped</a> = 1U &lt;&lt; 4U,  <span class="comment">//!&lt; Requires additional synchronisation</span></div><div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="comment"></span>    <a class="code" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590eadfd5939c62445d24da4dbc3b9a7b5896">seekable</a> = 1U &lt;&lt; 5U,    <span class="comment">//!&lt; Is seekable</span></div><div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="comment"></span>    <a class="code" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590eaff464eb296af44b13a72a49db257c33e">aligned_io</a> = 1U &lt;&lt; 6U,  <span class="comment">//!&lt; Requires sector aligned i/o (typically 512 or 4096)</span></div><div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="comment"></span></div><div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <a class="code" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea2007719529d71fb049bba7f5a756b321">file</a> = 1U &lt;&lt; 8U,          <span class="comment">//!&lt; Is a regular file</span></div><div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="comment"></span>    <a class="code" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590eaa034ac586de3c8fe4f8e875591007e7a">directory</a> = 1U &lt;&lt; 9U,     <span class="comment">//!&lt; Is a directory</span></div><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="comment"></span>    <a class="code" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea598d2ffbf7a063080d39258eb50dd81b">symlink</a> = 1U &lt;&lt; 10U,      <span class="comment">//!&lt; Is a symlink</span></div><div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="comment"></span>    <a class="code" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea74591d6b83e478ee8c8ff9fa4bde2360">multiplexer</a> = 1U &lt;&lt; 11U,  <span class="comment">//!&lt; Is a kqueue/epoll/iocp</span></div><div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="comment"></span>    <a class="code" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea91574eb2d3fa2866959ea514ceb8a872">process</a> = 1U &lt;&lt; 12U,      <span class="comment">//!&lt; Is a child process</span></div><div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="comment"></span>    <a class="code" href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590eadaeed28660cd8c0b790a37ba4a069670">section</a> = 1U &lt;&lt; 13U       <span class="comment">//!&lt; Is a memory section</span></div><div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="comment"></span>  }</div><div class="ttc" id="structafio__v2__xxx_1_1native__handle__type_html_a32db674a5ee094e3eeb0e57ec97f590ead7c57d10ce46460a4df4725ee87349e4"><div class="ttname"><a href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ead7c57d10ce46460a4df4725ee87349e4">afio_v2_xxx::native_handle_type::writable</a></div><div class="ttdoc">Is writable. </div><div class="ttdef"><b>Definition:</b> native_handle_type.hpp:49</div></div>
+<div class="ttc" id="structafio__v2__xxx_1_1native__handle__type_html_a32db674a5ee094e3eeb0e57ec97f590eadaeed28660cd8c0b790a37ba4a069670"><div class="ttname"><a href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590eadaeed28660cd8c0b790a37ba4a069670">afio_v2_xxx::native_handle_type::section</a></div><div class="ttdoc">Is a memory section. </div><div class="ttdef"><b>Definition:</b> native_handle_type.hpp:61</div></div>
+<div class="ttc" id="structafio__v2__xxx_1_1native__handle__type_html_a32db674a5ee094e3eeb0e57ec97f590ea598d2ffbf7a063080d39258eb50dd81b"><div class="ttname"><a href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea598d2ffbf7a063080d39258eb50dd81b">afio_v2_xxx::native_handle_type::symlink</a></div><div class="ttdoc">Is a symlink. </div><div class="ttdef"><b>Definition:</b> native_handle_type.hpp:58</div></div>
+<div class="ttc" id="structafio__v2__xxx_1_1native__handle__type_html_a32db674a5ee094e3eeb0e57ec97f590eadfd5939c62445d24da4dbc3b9a7b5896"><div class="ttname"><a href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590eadfd5939c62445d24da4dbc3b9a7b5896">afio_v2_xxx::native_handle_type::seekable</a></div><div class="ttdoc">Is seekable. </div><div class="ttdef"><b>Definition:</b> native_handle_type.hpp:53</div></div>
+<div class="ttc" id="structafio__v2__xxx_1_1native__handle__type_html_a32db674a5ee094e3eeb0e57ec97f590eac3acb2504fd1baae7efcbf7eddd96e09"><div class="ttname"><a href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590eac3acb2504fd1baae7efcbf7eddd96e09">afio_v2_xxx::native_handle_type::readable</a></div><div class="ttdoc">Is readable. </div><div class="ttdef"><b>Definition:</b> native_handle_type.hpp:48</div></div>
+<div class="ttc" id="structafio__v2__xxx_1_1native__handle__type_html_a32db674a5ee094e3eeb0e57ec97f590ea2007719529d71fb049bba7f5a756b321"><div class="ttname"><a href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea2007719529d71fb049bba7f5a756b321">afio_v2_xxx::native_handle_type::file</a></div><div class="ttdoc">Is a regular file. </div><div class="ttdef"><b>Definition:</b> native_handle_type.hpp:56</div></div>
+<div class="ttc" id="structafio__v2__xxx_1_1native__handle__type_html_a32db674a5ee094e3eeb0e57ec97f590ea74591d6b83e478ee8c8ff9fa4bde2360"><div class="ttname"><a href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea74591d6b83e478ee8c8ff9fa4bde2360">afio_v2_xxx::native_handle_type::multiplexer</a></div><div class="ttdoc">Is a kqueue/epoll/iocp. </div><div class="ttdef"><b>Definition:</b> native_handle_type.hpp:59</div></div>
+<div class="ttc" id="structafio__v2__xxx_1_1native__handle__type_html_a32db674a5ee094e3eeb0e57ec97f590ea91574eb2d3fa2866959ea514ceb8a872"><div class="ttname"><a href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea91574eb2d3fa2866959ea514ceb8a872">afio_v2_xxx::native_handle_type::process</a></div><div class="ttdoc">Is a child process. </div><div class="ttdef"><b>Definition:</b> native_handle_type.hpp:60</div></div>
+<div class="ttc" id="structafio__v2__xxx_1_1native__handle__type_html_a32db674a5ee094e3eeb0e57ec97f590ea0fce68f8258db2e2cacdd5db400cf880"><div class="ttname"><a href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea0fce68f8258db2e2cacdd5db400cf880">afio_v2_xxx::native_handle_type::overlapped</a></div><div class="ttdoc">Requires additional synchronisation. </div><div class="ttdef"><b>Definition:</b> native_handle_type.hpp:52</div></div>
+<div class="ttc" id="structafio__v2__xxx_1_1native__handle__type_html_a32db674a5ee094e3eeb0e57ec97f590ea9ca5e8ecedf6768c0024dbb893d2da92"><div class="ttname"><a href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea9ca5e8ecedf6768c0024dbb893d2da92">afio_v2_xxx::native_handle_type::append_only</a></div><div class="ttdoc">Is append only. </div><div class="ttdef"><b>Definition:</b> native_handle_type.hpp:50</div></div>
+<div class="ttc" id="structafio__v2__xxx_1_1native__handle__type_html_a32db674a5ee094e3eeb0e57ec97f590eaff464eb296af44b13a72a49db257c33e"><div class="ttname"><a href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590eaff464eb296af44b13a72a49db257c33e">afio_v2_xxx::native_handle_type::aligned_io</a></div><div class="ttdoc">Requires sector aligned i/o (typically 512 or 4096) </div><div class="ttdef"><b>Definition:</b> native_handle_type.hpp:54</div></div>
+<div class="ttc" id="structafio__v2__xxx_1_1native__handle__type_html_a32db674a5ee094e3eeb0e57ec97f590eaa034ac586de3c8fe4f8e875591007e7a"><div class="ttname"><a href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590eaa034ac586de3c8fe4f8e875591007e7a">afio_v2_xxx::native_handle_type::directory</a></div><div class="ttdoc">Is a directory. </div><div class="ttdef"><b>Definition:</b> native_handle_type.hpp:57</div></div>
+<div class="ttc" id="structafio__v2__xxx_1_1native__handle__type_html_a32db674a5ee094e3eeb0e57ec97f590ea34df1c7f5403a369ff654b0be6b03b93"><div class="ttname"><a href="structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea34df1c7f5403a369ff654b0be6b03b93">afio_v2_xxx::native_handle_type::invalid</a></div><div class="ttdoc">Invalid handle. </div><div class="ttdef"><b>Definition:</b> native_handle_type.hpp:46</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<hr/>The documentation for this struct was generated from the following file:<ul>
 <li>include/afio/v2.0/<a class="el" href="native__handle__type_8hpp.html">native_handle_type.hpp</a></li>
 </ul>
 </div><!-- contents -->

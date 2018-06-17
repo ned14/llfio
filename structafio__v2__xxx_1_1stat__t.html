@@ -81,7 +81,6 @@ $(document).ready(function(){initNavTree('structafio__v2__xxx_1_1stat__t.html','
 
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
@@ -96,17 +95,41 @@ $(document).ready(function(){initNavTree('structafio__v2__xxx_1_1stat__t.html','
 
 <p><code>#include &quot;stat.hpp&quot;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structafio__v2__xxx_1_1stat__t_1_1want__base.html">want_base</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used to indicate what metadata should be filled in.  <a href="structafio__v2__xxx_1_1stat__t_1_1want__base.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:ab281797a371fd64de0d5350fb6ebba98"><td class="memItemLeft" align="right" valign="top"><a id="ab281797a371fd64de0d5350fb6ebba98"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>want</b> = quickcpplib::_xxx ::bitfield::bitfield&lt; <a class="el" href="structafio__v2__xxx_1_1stat__t_1_1want__base.html">want_base</a> &gt;</td></tr>
-<tr class="separator:ab281797a371fd64de0d5350fb6ebba98"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33a6214361864270a2a6af9ea5c61896"><td class="memItemLeft" align="right" valign="top"><a id="a33a6214361864270a2a6af9ea5c61896"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structafio__v2__xxx_1_1stat__t.html#a33a6214361864270a2a6af9ea5c61896">bitfield__want</a> : unsigned { <br />
+&#160;&#160;<b>dev</b> = 1 &lt;&lt; 0, 
+<b>ino</b> = 1 &lt;&lt; 1, 
+<b>type</b> = 1 &lt;&lt; 2, 
+<b>perms</b> = 1 &lt;&lt; 3, 
+<br />
+&#160;&#160;<b>nlink</b> = 1 &lt;&lt; 4, 
+<b>uid</b> = 1 &lt;&lt; 5, 
+<b>gid</b> = 1 &lt;&lt; 6, 
+<b>rdev</b> = 1 &lt;&lt; 7, 
+<br />
+&#160;&#160;<b>atim</b> = 1 &lt;&lt; 8, 
+<b>mtim</b> = 1 &lt;&lt; 9, 
+<b>ctim</b> = 1 &lt;&lt; 10, 
+<b>size</b> = 1 &lt;&lt; 11, 
+<br />
+&#160;&#160;<b>allocated</b> = 1 &lt;&lt; 12, 
+<b>blocks</b> = 1 &lt;&lt; 13, 
+<b>blksize</b> = 1 &lt;&lt; 14, 
+<b>flags</b> = 1 &lt;&lt; 15, 
+<br />
+&#160;&#160;<b>gen</b> = 1 &lt;&lt; 16, 
+<b>birthtim</b> = 1 &lt;&lt; 17, 
+<b>sparse</b> = 1 &lt;&lt; 24, 
+<b>compressed</b> = 1 &lt;&lt; 25, 
+<br />
+&#160;&#160;<b>reparse_point</b> = 1 &lt;&lt; 26, 
+<b>all</b> = static_cast&lt;unsigned&gt;(-1), 
+<b>none</b> = 0
+<br />
+ }<tr class="memdesc:a33a6214361864270a2a6af9ea5c61896"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used to indicate what metadata should be filled in. <br /></td></tr>
+</td></tr>
+<tr class="separator:a33a6214361864270a2a6af9ea5c61896"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>

@@ -14,20 +14,17 @@ var dir_df838802a8d72797f186037846947269 =
     [ "map_handle.hpp", "map__handle_8hpp.html", "map__handle_8hpp" ],
     [ "mapped_file_handle.hpp", "mapped__file__handle_8hpp.html", "mapped__file__handle_8hpp" ],
     [ "native_handle_type.hpp", "native__handle__type_8hpp.html", [
-      [ "native_handle_type", "structafio__v2__xxx_1_1native__handle__type.html", "structafio__v2__xxx_1_1native__handle__type" ],
-      [ "disposition_base", "structafio__v2__xxx_1_1native__handle__type_1_1disposition__base.html", "structafio__v2__xxx_1_1native__handle__type_1_1disposition__base" ]
+      [ "native_handle_type", "structafio__v2__xxx_1_1native__handle__type.html", "structafio__v2__xxx_1_1native__handle__type" ]
     ] ],
     [ "path_discovery.hpp", "path__discovery_8hpp.html", "path__discovery_8hpp" ],
     [ "path_handle.hpp", "path__handle_8hpp.html", "path__handle_8hpp" ],
     [ "path_view.hpp", "path__view_8hpp.html", "path__view_8hpp" ],
     [ "stat.hpp", "stat_8hpp.html", [
-      [ "stat_t", "structafio__v2__xxx_1_1stat__t.html", "structafio__v2__xxx_1_1stat__t" ],
-      [ "want_base", "structafio__v2__xxx_1_1stat__t_1_1want__base.html", "structafio__v2__xxx_1_1stat__t_1_1want__base" ]
+      [ "stat_t", "structafio__v2__xxx_1_1stat__t.html", "structafio__v2__xxx_1_1stat__t" ]
     ] ],
     [ "statfs.hpp", "statfs_8hpp.html", [
       [ "statfs_t", "structafio__v2__xxx_1_1statfs__t.html", "structafio__v2__xxx_1_1statfs__t" ],
-      [ "f_flags_t", "structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html", "structafio__v2__xxx_1_1statfs__t_1_1f__flags__t" ],
-      [ "want_base", "structafio__v2__xxx_1_1statfs__t_1_1want__base.html", "structafio__v2__xxx_1_1statfs__t_1_1want__base" ]
+      [ "f_flags_t", "structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html", "structafio__v2__xxx_1_1statfs__t_1_1f__flags__t" ]
     ] ],
     [ "storage_profile.hpp", "storage__profile_8hpp.html", "storage__profile_8hpp" ],
     [ "utils.hpp", "utils_8hpp.html", "utils_8hpp" ]

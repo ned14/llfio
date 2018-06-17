@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['cow',['cow',['../structafio__v2__xxx_1_1section__handle_1_1flag__base.html#a5b790e66402ef3a07ce9464f3e1dc9d8aa7b8e12448e73233d3631a6f8c2bb475',1,'afio_v2_xxx::section_handle::flag_base']]]
+  ['cow',['cow',['../classafio__v2__xxx_1_1section__handle.html#a37a43f96250b5d490a6583b0153ac91ead6b7230335a396a3cbe26bddc51e7e85',1,'afio_v2_xxx::section_handle']]]
 ];

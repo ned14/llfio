@@ -1,7 +1,6 @@
 var map__handle_8hpp =
 [
     [ "section_handle", "classafio__v2__xxx_1_1section__handle.html", "classafio__v2__xxx_1_1section__handle" ],
-    [ "flag_base", "structafio__v2__xxx_1_1section__handle_1_1flag__base.html", "structafio__v2__xxx_1_1section__handle_1_1flag__base" ],
     [ "construct< section_handle >", "structafio__v2__xxx_1_1construct_3_01section__handle_01_4.html", "structafio__v2__xxx_1_1construct_3_01section__handle_01_4" ],
     [ "map_handle", "classafio__v2__xxx_1_1map__handle.html", "classafio__v2__xxx_1_1map__handle" ],
     [ "construct< map_handle >", "structafio__v2__xxx_1_1construct_3_01map__handle_01_4.html", "structafio__v2__xxx_1_1construct_3_01map__handle_01_4" ],
@@ -12,7 +11,7 @@ var map__handle_8hpp =
     [ "length", "map__handle_8hpp.html#abb42093725f3206e37e53ec44c39ad68", null ],
     [ "map", "map__handle_8hpp.html#a2bea94a20aae6fb34ebe1ffd03e50891", null ],
     [ "map", "map__handle_8hpp.html#accb0ec68871a9c3e3e7aeadc0f31e009", null ],
-    [ "operator<<", "map__handle_8hpp.html#a2e9ad4a02efc6016631baecfbc1d1d4d", null ],
+    [ "operator<<", "map__handle_8hpp.html#aadb5d931dbbaccf81d09f0a070036edf", null ],
     [ "read", "map__handle_8hpp.html#ac89289d85eff137c40d3d0084c410656", null ],
     [ "section", "map__handle_8hpp.html#a6282e66d9ade4fea8e0508cfb65ec9ec", null ],
     [ "section", "map__handle_8hpp.html#ae694d1c5ef24e2c6caa30b8d7ae6e12b", null ],

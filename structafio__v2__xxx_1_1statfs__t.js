@@ -1,8 +1,23 @@
 var structafio__v2__xxx_1_1statfs__t =
 [
     [ "f_flags_t", "structafio__v2__xxx_1_1statfs__t_1_1f__flags__t.html", "structafio__v2__xxx_1_1statfs__t_1_1f__flags__t" ],
-    [ "want_base", "structafio__v2__xxx_1_1statfs__t_1_1want__base.html", "structafio__v2__xxx_1_1statfs__t_1_1want__base" ],
-    [ "want", "structafio__v2__xxx_1_1statfs__t.html#a836b825613ae069efbbd676c505cef96", null ],
+    [ "bitfield__want", "structafio__v2__xxx_1_1statfs__t.html#ae1684edb1dfb4aeefea98ec2250f07c7", [
+      [ "flags", "structafio__v2__xxx_1_1statfs__t.html#ae1684edb1dfb4aeefea98ec2250f07c7a92ac6e60099e3684fea59ee66c23b2fe", null ],
+      [ "bsize", "structafio__v2__xxx_1_1statfs__t.html#ae1684edb1dfb4aeefea98ec2250f07c7a6fff01a5ffc2b8983756f523279bccca", null ],
+      [ "iosize", "structafio__v2__xxx_1_1statfs__t.html#ae1684edb1dfb4aeefea98ec2250f07c7a9372981586831dd542f41858a22c892c", null ],
+      [ "blocks", "structafio__v2__xxx_1_1statfs__t.html#ae1684edb1dfb4aeefea98ec2250f07c7af57edaa509f9261fbab02d2954f4af45", null ],
+      [ "bfree", "structafio__v2__xxx_1_1statfs__t.html#ae1684edb1dfb4aeefea98ec2250f07c7a6c6aeaf50a1392e78f4a1bcceb13f2c7", null ],
+      [ "bavail", "structafio__v2__xxx_1_1statfs__t.html#ae1684edb1dfb4aeefea98ec2250f07c7ad1d91d4f6dd4118440867153287cccdf", null ],
+      [ "files", "structafio__v2__xxx_1_1statfs__t.html#ae1684edb1dfb4aeefea98ec2250f07c7a49a985b96a76e6b4b72f34ff80cf3f96", null ],
+      [ "ffree", "structafio__v2__xxx_1_1statfs__t.html#ae1684edb1dfb4aeefea98ec2250f07c7a3d4dda5f12cf89b27357696d0265b67c", null ],
+      [ "namemax", "structafio__v2__xxx_1_1statfs__t.html#ae1684edb1dfb4aeefea98ec2250f07c7a4d063034677552990410c96dcbc8a6ee", null ],
+      [ "owner", "structafio__v2__xxx_1_1statfs__t.html#ae1684edb1dfb4aeefea98ec2250f07c7a20e484353fe6d7c85e9bcf419c866c01", null ],
+      [ "fsid", "structafio__v2__xxx_1_1statfs__t.html#ae1684edb1dfb4aeefea98ec2250f07c7aa8cba7eaf2474fcd608817765754b766", null ],
+      [ "fstypename", "structafio__v2__xxx_1_1statfs__t.html#ae1684edb1dfb4aeefea98ec2250f07c7a12845c099c812175a1e726621f13567c", null ],
+      [ "mntfromname", "structafio__v2__xxx_1_1statfs__t.html#ae1684edb1dfb4aeefea98ec2250f07c7add70f2a397e16114bb1960965eaa89b0", null ],
+      [ "mntonname", "structafio__v2__xxx_1_1statfs__t.html#ae1684edb1dfb4aeefea98ec2250f07c7af54f6ee3604da802c4cddba9243bd0c1", null ],
+      [ "all", "structafio__v2__xxx_1_1statfs__t.html#ae1684edb1dfb4aeefea98ec2250f07c7ab1e523898c3dfde61e484a487a1a44c2", null ]
+    ] ],
     [ "statfs_t", "structafio__v2__xxx_1_1statfs__t.html#ab9d13f831de61aafbfcdcb8bac53e521", null ],
     [ "fill", "structafio__v2__xxx_1_1statfs__t.html#a3b10af0dcae5b2f7c8d5d33a635fa31c", null ],
     [ "f_bavail", "structafio__v2__xxx_1_1statfs__t.html#aff9b6558a9deb9dcb2fb981881a14ba2", null ],

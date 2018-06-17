@@ -34,7 +34,7 @@ var searchData=
   ['construct_3c_20mapped_5ffile_5fhandle_20_3e',['construct&lt; mapped_file_handle &gt;',['../structafio__v2__xxx_1_1construct_3_01mapped__file__handle_01_4.html',1,'afio_v2_xxx']]],
   ['construct_3c_20path_5fhandle_20_3e',['construct&lt; path_handle &gt;',['../structafio__v2__xxx_1_1construct_3_01path__handle_01_4.html',1,'afio_v2_xxx']]],
   ['construct_3c_20section_5fhandle_20_3e',['construct&lt; section_handle &gt;',['../structafio__v2__xxx_1_1construct_3_01section__handle_01_4.html',1,'afio_v2_xxx']]],
-  ['cow',['cow',['../structafio__v2__xxx_1_1section__handle_1_1flag__base.html#a5b790e66402ef3a07ce9464f3e1dc9d8aa7b8e12448e73233d3631a6f8c2bb475',1,'afio_v2_xxx::section_handle::flag_base']]],
+  ['cow',['cow',['../classafio__v2__xxx_1_1section__handle.html#a37a43f96250b5d490a6583b0153ac91ead6b7230335a396a3cbe26bddc51e7e85',1,'afio_v2_xxx::section_handle']]],
   ['crbegin',['crbegin',['../structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#ae0c4aad06173bf46781ef4e65827976b',1,'afio_v2_xxx::algorithm::impl::trivial_vector_impl']]],
   ['creation',['creation',['../classafio__v2__xxx_1_1handle.html#a45ff5c1c5662623d99156870dfeee0a7',1,'afio_v2_xxx::handle']]],
   ['crend',['crend',['../structafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a83a15aa2a15fe2231ee7c5691f9cc6e7',1,'afio_v2_xxx::algorithm::impl::trivial_vector_impl']]],

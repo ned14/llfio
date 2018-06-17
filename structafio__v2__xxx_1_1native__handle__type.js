@@ -1,7 +1,20 @@
 var structafio__v2__xxx_1_1native__handle__type =
 [
-    [ "disposition_base", "structafio__v2__xxx_1_1native__handle__type_1_1disposition__base.html", "structafio__v2__xxx_1_1native__handle__type_1_1disposition__base" ],
-    [ "disposition", "structafio__v2__xxx_1_1native__handle__type.html#a3aab386f73623173d5275c1ce0c01877", null ],
+    [ "bitfield__disposition", "structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590e", [
+      [ "invalid", "structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea34df1c7f5403a369ff654b0be6b03b93", null ],
+      [ "readable", "structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590eac3acb2504fd1baae7efcbf7eddd96e09", null ],
+      [ "writable", "structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ead7c57d10ce46460a4df4725ee87349e4", null ],
+      [ "append_only", "structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea9ca5e8ecedf6768c0024dbb893d2da92", null ],
+      [ "overlapped", "structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea0fce68f8258db2e2cacdd5db400cf880", null ],
+      [ "seekable", "structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590eadfd5939c62445d24da4dbc3b9a7b5896", null ],
+      [ "aligned_io", "structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590eaff464eb296af44b13a72a49db257c33e", null ],
+      [ "file", "structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea2007719529d71fb049bba7f5a756b321", null ],
+      [ "directory", "structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590eaa034ac586de3c8fe4f8e875591007e7a", null ],
+      [ "symlink", "structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea598d2ffbf7a063080d39258eb50dd81b", null ],
+      [ "multiplexer", "structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea74591d6b83e478ee8c8ff9fa4bde2360", null ],
+      [ "process", "structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea91574eb2d3fa2866959ea514ceb8a872", null ],
+      [ "section", "structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590eadaeed28660cd8c0b790a37ba4a069670", null ]
+    ] ],
     [ "native_handle_type", "structafio__v2__xxx_1_1native__handle__type.html#ad7d52d5d3972b2d623e54193a3b8799f", null ],
     [ "~native_handle_type", "structafio__v2__xxx_1_1native__handle__type.html#a8e79558e3c87bbb9b43253fae7b1baf8", null ],
     [ "native_handle_type", "structafio__v2__xxx_1_1native__handle__type.html#a4bf882806140928beefb19ea186c0f20", null ],

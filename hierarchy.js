@@ -18,7 +18,6 @@ var hierarchy =
     [ "afio_v2_xxx::deadline", "structafio__v2__xxx_1_1deadline.html", null ],
     [ "afio_v2_xxx::directory_entry", "structafio__v2__xxx_1_1directory__entry.html", null ],
     [ "afio_v2_xxx::path_discovery::discovered_path", "structafio__v2__xxx_1_1path__discovery_1_1discovered__path.html", null ],
-    [ "afio_v2_xxx::native_handle_type::disposition_base", "structafio__v2__xxx_1_1native__handle__type_1_1disposition__base.html", null ],
     [ "afio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex::entities_guard", "classafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html", null ],
     [ "afio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type", "structafio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entity__type.html", null ],
     [ "afio_v2_xxx::directory_handle::enumerate_info", "structafio__v2__xxx_1_1directory__handle_1_1enumerate__info.html", null ],
@@ -28,8 +27,6 @@ var hierarchy =
     [ "filesystem_error", null, [
       [ "afio_v2_xxx::error", "classafio__v2__xxx_1_1error.html", null ]
     ] ],
-    [ "afio_v2_xxx::handle::flag_base", "structafio__v2__xxx_1_1handle_1_1flag__base.html", null ],
-    [ "afio_v2_xxx::section_handle::flag_base", "structafio__v2__xxx_1_1section__handle_1_1flag__base.html", null ],
     [ "afio_v2_xxx::fs_handle", "classafio__v2__xxx_1_1fs__handle.html", [
       [ "afio_v2_xxx::directory_handle", "classafio__v2__xxx_1_1directory__handle.html", null ],
       [ "afio_v2_xxx::file_handle", "classafio__v2__xxx_1_1file__handle.html", [
@@ -95,7 +92,5 @@ var hierarchy =
         [ "afio_v2_xxx::algorithm::trivial_vector< T >", "classafio__v2__xxx_1_1algorithm_1_1trivial__vector.html", null ]
       ] ]
     ] ],
-    [ "afio_v2_xxx::algorithm::impl::trivial_vector_iterator< T >", "classafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__iterator.html", null ],
-    [ "afio_v2_xxx::stat_t::want_base", "structafio__v2__xxx_1_1stat__t_1_1want__base.html", null ],
-    [ "afio_v2_xxx::statfs_t::want_base", "structafio__v2__xxx_1_1statfs__t_1_1want__base.html", null ]
+    [ "afio_v2_xxx::algorithm::impl::trivial_vector_iterator< T >", "classafio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__iterator.html", null ]
 ];

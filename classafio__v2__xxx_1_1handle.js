@@ -1,13 +1,26 @@
 var classafio__v2__xxx_1_1handle =
 [
-    [ "flag_base", "structafio__v2__xxx_1_1handle_1_1flag__base.html", "structafio__v2__xxx_1_1handle_1_1flag__base" ],
     [ "extent_type", "classafio__v2__xxx_1_1handle.html#a818fff07c92eaab72532092d1c2a14f9", null ],
-    [ "flag", "classafio__v2__xxx_1_1handle.html#a70137cea6eedc190392200f7ffe2c70c", null ],
     [ "path_type", "classafio__v2__xxx_1_1handle.html#a6c4df2242ece6f63ba7ef4e6baafaca6", null ],
     [ "size_type", "classafio__v2__xxx_1_1handle.html#a0adf7fa00e23ed561328f473986e9ccc", null ],
+    [ "bitfield__flag", "classafio__v2__xxx_1_1handle.html#a6322054d60d251248051cfc15398f608", [
+      [ "none", "classafio__v2__xxx_1_1handle.html#a6322054d60d251248051cfc15398f608aa8a55b902102065962a56dcc6e042329", null ],
+      [ "none", "classafio__v2__xxx_1_1handle.html#a6322054d60d251248051cfc15398f608a334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
+      [ "none", "classafio__v2__xxx_1_1handle.html#a6322054d60d251248051cfc15398f608a334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
+      [ "unlink_on_first_close", "classafio__v2__xxx_1_1handle.html#a6322054d60d251248051cfc15398f608acd80b55b5142d39b67a551e89571ad63", null ],
+      [ "disable_safety_fsyncs", "classafio__v2__xxx_1_1handle.html#a6322054d60d251248051cfc15398f608a4f263f2b60c1f50f9d400a5e716e1161", null ],
+      [ "disable_safety_unlinks", "classafio__v2__xxx_1_1handle.html#a6322054d60d251248051cfc15398f608a1e39145e0df75a9ce3aa55840f043313", null ],
+      [ "disable_prefetching", "classafio__v2__xxx_1_1handle.html#a6322054d60d251248051cfc15398f608a02c4e85b0c96477ae9b1dca791bbcaf6", null ],
+      [ "maximum_prefetching", "classafio__v2__xxx_1_1handle.html#a6322054d60d251248051cfc15398f608a001904a2d795ae3ed488dbc0d4e10674", null ],
+      [ "win_disable_unlink_emulation", "classafio__v2__xxx_1_1handle.html#a6322054d60d251248051cfc15398f608a36d38379d10e372acfdb98d5ce45cf3a", null ],
+      [ "win_disable_sparse_file_creation", "classafio__v2__xxx_1_1handle.html#a6322054d60d251248051cfc15398f608a0c0a94f37b843d143876a4ac9f9f92c0", null ],
+      [ "overlapped", "classafio__v2__xxx_1_1handle.html#a6322054d60d251248051cfc15398f608a15c37339d7317c534121a29b381aa86c", null ],
+      [ "byte_lock_insanity", "classafio__v2__xxx_1_1handle.html#a6322054d60d251248051cfc15398f608a94fdec6f1ea4975667ed313208a1d93e", null ],
+      [ "anonymous_inode", "classafio__v2__xxx_1_1handle.html#a6322054d60d251248051cfc15398f608a89d34054589f4846025be042a5e71e14", null ]
+    ] ],
     [ "caching", "classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9e", [
       [ "unchanged", "classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9ea8d7b3d6b83c0a517eac07e1aac94b773", null ],
-      [ "none", "classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9ea334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
+      [ "none", "classafio__v2__xxx_1_1handle.html#a6322054d60d251248051cfc15398f608a334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
       [ "only_metadata", "classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9eab8a61dd00ce6fc5888706bda8fab2e98", null ],
       [ "reads", "classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9ea0fb9cf5f04f61bb6f1151da57ceb1ca1", null ],
       [ "reads_and_metadata", "classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9eadec4ecca8ae1593f84eea4656599a693", null ],
@@ -23,7 +36,7 @@ var classafio__v2__xxx_1_1handle =
     ] ],
     [ "mode", "classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18", [
       [ "unchanged", "classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18a8d7b3d6b83c0a517eac07e1aac94b773", null ],
-      [ "none", "classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18a334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
+      [ "none", "classafio__v2__xxx_1_1handle.html#a6322054d60d251248051cfc15398f608a334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
       [ "attr_read", "classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aa4daf6d1e8da35af49c33bbe9ee91d79", null ],
       [ "attr_write", "classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18a9f56aff64cb748e078ab221474132d19", null ],
       [ "read", "classafio__v2__xxx_1_1handle.html#a0489b6c1e25cd2bad2ba1ec86e1aaf18aecae13117d6f0584c25a9da6c8f8415e", null ],
