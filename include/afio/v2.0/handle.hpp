@@ -426,6 +426,7 @@ namespace detail
 {
   template <class Dest, class Src> inline void fill_failure_info(Dest &dest, const Src &src)
   {
+    (void) src;
     auto &tls = detail::tls_errored_results();
     if(!tls.reentering_self)
     {
