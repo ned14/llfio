@@ -1042,7 +1042,9 @@ namespace storage_profile
           result.clear();
           result.shrink_to_fit();
         }
+#ifndef NDEBUG
         std::cout << "Total results = " << totalresults.size() << std::endl;
+#endif
         s.mean = static_cast<unsigned long long>(static_cast<double>(sum) / totalresults.size());
         // Latency distributions are definitely not normally distributed, but here we have the
         // advantage of tons of sample points. So simply sort into order, and pluck out the values

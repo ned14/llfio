@@ -25,6 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../include/afio.hpp"
 
 #include <future>
+#include <iostream>
 #include <vector>
 
 // clang-format off
