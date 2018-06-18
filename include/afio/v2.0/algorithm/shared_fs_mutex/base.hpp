@@ -28,7 +28,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../handle.hpp"
 
 #ifdef __has_include
-#if __has_include("../../../quickcpplib/include/algorithm/hash.hpp")
+#if __has_include("../../quickcpplib/include/algorithm/hash.hpp")
 #include "../../quickcpplib/include/algorithm/hash.hpp"
 #else
 #include "quickcpplib/include/algorithm/hash.hpp"
