@@ -179,7 +179,9 @@ namespace algorithm
             if(!o2)
             {
               AFIO_LOG_FATAL(0, "memory_map::~memory_map() truncate failed");
+#ifndef NDEBUG
               std::cerr << "~memory_map() truncate failed due to " << o2.error().message().c_str() << std::endl;
+#endif
               abort();
             }
             // Unlink the temp file. We don't trap any failure to unlink on FreeBSD it can forget current path.
@@ -187,10 +189,14 @@ namespace algorithm
             if(!o3)
             {
 #ifdef __FreeBSD__
+#ifndef NDEBUG
               std::cerr << "~memory_map() unlink failed due to " << o3.error().message().c_str() << std::endl;
+#endif
 #else
               AFIO_LOG_FATAL(0, "memory_map::~memory_map() unlink failed");
+#ifndef NDEBUG
               std::cerr << "~memory_map() unlink failed due to " << o3.error().message().c_str() << std::endl;
+#endif
               abort();
 #endif
             }
