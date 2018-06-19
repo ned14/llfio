@@ -25,6 +25,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../map_handle.hpp"
 #include "../../../utils.hpp"
 
+#include "../../../quickcpplib/include/signal_guard.hpp"
+
 #include <sys/mman.h>
 
 AFIO_V2_NAMESPACE_BEGIN
@@ -544,23 +546,67 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
   AFIO_LOG_FUNCTION_CALL(this);
   byte *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
-  for(const_buffer_type &req : reqs.buffers)
+  if(QUICKCPPLIB_NAMESPACE::signal_guard::signal_guard(QUICKCPPLIB_NAMESPACE::signal_guard::signalc::undefined_memory_access,
+                                                       [&] {
+                                                         for(const_buffer_type &req : reqs.buffers)
+                                                         {
+                                                           if(togo != 0u)
+                                                           {
+                                                             if(req.len > togo)
+                                                             {
+                                                               req.len = togo;
+                                                             }
+                                                             memcpy(addr, req.data, req.len);
+                                                             req.data = addr;
+                                                             addr += req.len;
+                                                             togo -= req.len;
+                                                           }
+                                                           else
+                                                           {
+                                                             req.len = 0;
+                                                           }
+                                                         }
+                                                         return false;
+                                                       },
+                                                       [&](QUICKCPPLIB_NAMESPACE::signal_guard::signalc /* unused */, const void *_info, const void *_context) {
+                                                         assert(signo == QUICKCPPLIB_NAMESPACE::signal_guard::signalc::undefined_memory_access);
+                                                         const auto *info = (const siginfo_t *) _info;
+                                                         assert(info->si_signo == SIGBUS);
+                                                         auto *causingaddr = (byte *) info->si_addr;
+                                                         if(causingaddr < _addr || causingaddr >= (_addr + _length))
+                                                         {
+                                                           // Not caused by this map
+                                                           struct sigaction sa;
+                                                           sigaction(SIGBUS, nullptr, &sa);
+                                                           if(sa.sa_flags & SA_SIGINFO)
+                                                           {
+                                                             sa.sa_sigaction(SIGBUS, (siginfo_t *) info, (void *) _context);
+                                                           }
+                                                           else if(sa.sa_handler != SIG_IGN)
+                                                           {
+                                                             if(sa.sa_handler != SIG_DFL)
+                                                             {
+                                                               sa.sa_handler(SIGBUS);
+                                                             }
+                                                             // Painful ...
+                                                             struct sigaction myformer, def;
+                                                             memset(&def, 0, sizeof(def));
+                                                             def.sa_handler = SIG_DFL;
+                                                             sigaction(SIGBUS, &def, &myformer);
+                                                             sigset_t myformer2;
+                                                             sigset_t def2;
+                                                             sigemptyset(&def2);
+                                                             sigaddset(&def2, SIGBUS);
+                                                             pthread_sigmask(SIG_UNBLOCK, &def2, &myformer2);
+                                                             pthread_kill(pthread_self(), SIGBUS);
+                                                             sigaction(SIGBUS, &myformer, nullptr);
+                                                           }
+                                                           abort();
+                                                         }
+                                                         return true;
+                                                       }))
   {
-    if(togo != 0u)
-    {
-      if(req.len > togo)
-      {
-        req.len = togo;
-      }
-      memcpy(addr, req.data, req.len);
-      req.data = addr;
-      addr += req.len;
-      togo -= req.len;
-    }
-    else
-    {
-      req.len = 0;
-    }
+    return errc::no_space_on_device;
   }
   return reqs.buffers;
 }

@@ -27,6 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "import.hpp"
 
 #include "../../../quickcpplib/include/algorithm/hash.hpp"
+#include "../../../quickcpplib/include/signal_guard.hpp"
 
 
 AFIO_V2_NAMESPACE_BEGIN
@@ -812,23 +813,45 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
   AFIO_LOG_FUNCTION_CALL(this);
   byte *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
-  for(const_buffer_type &req : reqs.buffers)
+  if(QUICKCPPLIB_NAMESPACE::signal_guard::signal_guard(QUICKCPPLIB_NAMESPACE::signal_guard::signalc::undefined_memory_access,
+                                                       [&] {
+                                                         for(const_buffer_type &req : reqs.buffers)
+                                                         {
+                                                           if(togo != 0u)
+                                                           {
+                                                             if(req.len > togo)
+                                                             {
+                                                               req.len = togo;
+                                                             }
+                                                             memcpy(addr, req.data, req.len);
+                                                             req.data = addr;
+                                                             addr += req.len;
+                                                             togo -= req.len;
+                                                           }
+                                                           else
+                                                           {
+                                                             req.len = 0;
+                                                           }
+                                                         }
+                                                         return false;
+                                                       },
+                                                       [&](QUICKCPPLIB_NAMESPACE::signal_guard::signalc signo, const void *_info, const void * /*unused*/) {
+                                                         assert(signo == QUICKCPPLIB_NAMESPACE::signal_guard::signalc::undefined_memory_access);
+                                                         const auto *info = (const _EXCEPTION_RECORD *) _info;
+                                                         assert(info->ExceptionCode == EXCEPTION_IN_PAGE_ERROR);
+                                                         // info->ExceptionInformation[0] = 0=read 1=write 8=DEP
+                                                         // info->ExceptionInformation[1] = causing address
+                                                         // info->ExceptionInformation[2] = NTSTATUS causing exception
+                                                         auto *causingaddr = (byte *) info->ExceptionInformation[1];
+                                                         if(causingaddr < _addr || causingaddr >= (_addr + _length))
+                                                         {
+                                                           // Not caused by this map
+                                                           RaiseException(info->ExceptionCode, info->ExceptionFlags, info->NumberParameters, info->ExceptionInformation);
+                                                         }
+                                                         return true;
+                                                       }))
   {
-    if(togo != 0u)
-    {
-      if(req.len > togo)
-      {
-        req.len = togo;
-      }
-      memcpy(addr, req.data, req.len);
-      req.data = addr;
-      addr += req.len;
-      togo -= req.len;
-    }
-    else
-    {
-      req.len = 0;
-    }
+    return errc::no_space_on_device;
   }
   return reqs.buffers;
 }

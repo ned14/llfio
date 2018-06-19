@@ -441,7 +441,7 @@ public:
   ~error_domain() = default;
 
 protected:
-  virtual inline string_ref _message(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept override final;
+  virtual inline string_ref _do_message(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept override final;
 };
 #else
 template <class BaseStatusCodeDomain> using error_domain = BaseStatusCodeDomain;
@@ -1045,11 +1045,11 @@ namespace detail
 
 #if AFIO_EXPERIMENTAL_STATUS_CODE
 #ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
-template <class BaseStatusCodeDomain> inline typename error_domain<BaseStatusCodeDomain>::string_ref error_domain<BaseStatusCodeDomain>::_message(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept  // NOLINT
+template <class BaseStatusCodeDomain> inline typename error_domain<BaseStatusCodeDomain>::string_ref error_domain<BaseStatusCodeDomain>::_do_message(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept  // NOLINT
 {
   assert(code.domain() == *this);
   const auto &v = static_cast<const SYSTEM_ERROR2_NAMESPACE::status_code<error_domain> &>(code);  // NOLINT
-  std::string ret = _base::_message(code).c_str();
+  std::string ret = _base::_do_message(code).c_str();
   detail::append_path_info(v.value(), ret);
   char *p = (char *) malloc(ret.size() + 1);
   if(p == nullptr)
