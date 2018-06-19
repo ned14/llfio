@@ -57,6 +57,11 @@ import AFIO_MODULE_NAME;
 
 #include "config.hpp"
 
+// Predeclare to keep the single header edition happy
+#include "handle.hpp"
+#include "stat.hpp"
+#include "utils.hpp"
+
 #ifndef AFIO_LEAN_AND_MEAN
 #include "async_file_handle.hpp"
 #else

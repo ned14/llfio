@@ -378,9 +378,11 @@ public:
 
   /*! \brief Read data from the mapped file.
 
-  \note Because this implementation never copies memory, you can pass in buffers with a null address.
+  \note Because this implementation never copies memory, you can pass in buffers with a null address. As this
+  function never reads any memory, no attempt to trap signal raises can be made, this falls onto the user of
+  this function. See `QUICKCPPLIB_NAMESPACE::signal_guard` for a helper function.
 
-  \return The buffers read, which will never be the buffers input because they will point into the mapped view.
+  \return The buffers read, which will never be the buffers input, because they will point into the mapped view.
   The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred.
   \param reqs A scatter-gather and offset request.
   \param d Ignored.
@@ -390,12 +392,19 @@ public:
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override { return _mh.read(reqs, d); }
   /*! \brief Write data to the mapped file.
 
+  \note This call traps signals and structured exception throws using `QUICKCPPLIB_NAMESPACE::signal_guard`.
+  Instantiating a `QUICKCPPLIB_NAMESPACE::signal_guard_install` somewhere much higher up in the call stack
+  will improve performance enormously. The signal guard may cost less than 100 CPU cycles depending on how
+  you configure it. If you don't want the guard, you can write memory directly using `address()`.
+
   \return The buffers written, which will never be the buffers input because they will point at where the data was copied into the mapped view.
   The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred.
   \param reqs A scatter-gather and offset request.
   \param d Ignored.
-  \errors None, though the various signals and structured exception throws common to using memory maps may occur.
-  \mallocs None.
+  \errors If during the attempt to write the buffers to the map a `SIGBUS` or `EXCEPTION_IN_PAGE_ERROR` is raised,
+  an error code comparing equal to `errc::no_space_on_device` will be returned. This may not always be the cause
+  of the raised signal, but it is by far the most likely.
+  \mallocs None if a `QUICKCPPLIB_NAMESPACE::signal_guard_install` is already instanced.
   */
   AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override { return _mh.write(reqs, d); }
 };
