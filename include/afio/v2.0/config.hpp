@@ -215,6 +215,10 @@ AFIO_V2_NAMESPACE_END
 
 // Bring in the Boost-lite macros
 #include "quickcpplib/include/config.hpp"
+#if AFIO_LOGGING_LEVEL
+#include "quickcpplib/include/ringbuffer_log.hpp"
+#include "quickcpplib/include/utils/thread.hpp"
+#endif
 // Bring in filesystem
 #if defined(__has_include)
 // clang-format off
@@ -230,9 +234,9 @@ namespace filesystem = std::experimental::filesystem;
 AFIO_V2_NAMESPACE_END
 #endif
 #elif __PCPP_ALWAYS_TRUE__
-#include <filesystem>
+#include <experimental/filesystem>
 AFIO_V2_NAMESPACE_BEGIN
-namespace filesystem = std::filesystem;
+namespace filesystem = std::experimental::filesystem;
 AFIO_V2_NAMESPACE_END
 // clang-format on
 #elif defined(_MSC_VER)
@@ -741,8 +745,6 @@ AFIO_V2_NAMESPACE_END
 
 
 #if AFIO_LOGGING_LEVEL
-#include "quickcpplib/include/ringbuffer_log.hpp"
-#include "quickcpplib/include/utils/thread.hpp"
 
 /*! \todo TODO FIXME Replace in-memory log with memory map file backed log.
 */

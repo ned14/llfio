@@ -25,7 +25,15 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../map_handle.hpp"
 #include "../../../utils.hpp"
 
+#ifdef __has_include
+#if __has_include("../../../quickcpplib/include/signal_guard.hpp")
 #include "../../../quickcpplib/include/signal_guard.hpp"
+#else
+#include "quickcpplib/include/signal_guard.hpp"
+#endif
+#else
+#include "quickcpplib/include/signal_guard.hpp"
+#endif
 
 #include <sys/mman.h>
 
@@ -568,7 +576,8 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
                                                          }
                                                          return false;
                                                        },
-                                                       [&](QUICKCPPLIB_NAMESPACE::signal_guard::signalc /* unused */, const void *_info, const void *_context) {
+                                                       [&](QUICKCPPLIB_NAMESPACE::signal_guard::signalc signo, const void *_info, const void *_context) {
+                                                         (void) signo;
                                                          assert(signo == QUICKCPPLIB_NAMESPACE::signal_guard::signalc::undefined_memory_access);
                                                          const auto *info = (const siginfo_t *) _info;
                                                          assert(info->si_signo == SIGBUS);

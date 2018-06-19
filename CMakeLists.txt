@@ -158,14 +158,18 @@ if(AFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE)
 endif()
 if(WIN32)
   all_compile_definitions(PRIVATE _WIN32_WINNT=0x600)  ## Target WinVista
-  target_link_libraries(afio_dl PUBLIC ntkernel-error-category::dl)
-  target_link_libraries(afio_sl PUBLIC ntkernel-error-category::sl)
+  if(NOT AFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE)
+    target_link_libraries(afio_dl PUBLIC ntkernel-error-category::dl)
+    target_link_libraries(afio_sl PUBLIC ntkernel-error-category::sl)
+  endif()
 endif()
 # Anyone using the static or dynamic libraries is not using the header only variant
 foreach(lib afio_sl afio_dl)
   target_compile_definitions(${lib} INTERFACE AFIO_HEADERS_ONLY=0) 
   target_compile_definitions(${lib} PRIVATE AFIO_SOURCE=1) 
 endforeach()
+# The single header test requires C++ 17
+target_compile_features(afio-example_single-header PRIVATE cxx_std_17)
 
 # For all possible configurations of this library, add each test
 include(QuickCppLibMakeStandardTests)

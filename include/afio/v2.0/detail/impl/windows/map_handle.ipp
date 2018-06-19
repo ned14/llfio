@@ -26,8 +26,18 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../utils.hpp"
 #include "import.hpp"
 
+#ifdef __has_include
+#if __has_include("../../../quickcpplib/include/signal_guard.hpp")
 #include "../../../quickcpplib/include/algorithm/hash.hpp"
 #include "../../../quickcpplib/include/signal_guard.hpp"
+#else
+#include "quickcpplib/include/algorithm/hash.hpp"
+#include "quickcpplib/include/signal_guard.hpp"
+#endif
+#else
+#include "quickcpplib/include/algorithm/hash.hpp"
+#include "quickcpplib/include/signal_guard.hpp"
+#endif
 
 
 AFIO_V2_NAMESPACE_BEGIN
@@ -836,6 +846,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
                                                          return false;
                                                        },
                                                        [&](QUICKCPPLIB_NAMESPACE::signal_guard::signalc signo, const void *_info, const void * /*unused*/) {
+                                                         (void)signo;
                                                          assert(signo == QUICKCPPLIB_NAMESPACE::signal_guard::signalc::undefined_memory_access);
                                                          const auto *info = (const _EXCEPTION_RECORD *) _info;
                                                          assert(info->ExceptionCode == EXCEPTION_IN_PAGE_ERROR);
