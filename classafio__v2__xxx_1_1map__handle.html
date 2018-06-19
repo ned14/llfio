@@ -1148,8 +1148,8 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>Read data from the mapped view. </p>
-<dl class="section note"><dt>Note</dt><dd>Because this implementation never copies memory, you can pass in buffers with a null address.</dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>The buffers read, which will never be the buffers input because they will point into the mapped view. The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Because this implementation never copies memory, you can pass in buffers with a null address. As this function never reads any memory, no attempt to trap signal raises can be made, this falls onto the user of this function. See <code>QUICKCPPLIB_NAMESPACE::signal_guard</code> for a helper function.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The buffers read, which will never be the buffers input, because they will point into the mapped view. The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">reqs</td><td>A scatter-gather and offset request. </td></tr>
@@ -1461,6 +1461,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>Write data to the mapped view. </p>
+<dl class="section note"><dt>Note</dt><dd>This call traps signals and structured exception throws using <code>QUICKCPPLIB_NAMESPACE::signal_guard</code>. Instantiating a <code>QUICKCPPLIB_NAMESPACE::signal_guard_install</code> somewhere much higher up in the call stack will improve performance enormously. The signal guard may cost less than 100 CPU cycles depending on how you configure it. If you don't want the guard, you can write memory directly using <code>address()</code>.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>The buffers written, which will never be the buffers input because they will point at where the data was copied into the mapped view. The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -1469,8 +1470,8 @@ For portability, you can only assume that barriers write order for a single hand
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable</dt><dd>None, though the various signals and structured exception throws common to using memory maps may occur. </dd></dl>
-<dl class="section user"><dt>Memory Allocations</dt><dd>None. </dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>If during the attempt to write the buffers to the map a <code>SIGBUS</code> or <code>EXCEPTION_IN_PAGE_ERROR</code> is raised, an error code comparing equal to <code>errc::no_space_on_device</code> will be returned. This may not always be the cause of the raised signal, but it is by far the most likely. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>None if a <code>QUICKCPPLIB_NAMESPACE::signal_guard_install</code> is already instanced. </dd></dl>
 
 </div>
 </div>
