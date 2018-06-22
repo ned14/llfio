@@ -5,7 +5,7 @@ This is the post-peer-review AFIO v2 rewrite. You can view its documentation at 
 Tarballs of source and prebuilt binaries for Linux x64, MacOS x64 and Windows x64:
 - https://dedi5.nedprod.com/static/files/afio-v2.0-source-latest.tar.xz
 - https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-linux64-latest.tgz
-- https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-darwin64-latest.tgz
+- https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-darwin64-latest.tgz (disabled pending XCode supporting Filesystem TS)
 - https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-win64-latest.zip
 
 

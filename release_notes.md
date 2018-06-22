@@ -6,7 +6,7 @@
 <td align="center"> <a href="https://ci.appveyor.com/project/ned14/afio/branch/master">Windows CI:</a><img src="https://ci.appveyor.com/api/projects/status/680b1pt9srnoprs3/branch/master?svg=true"/> </td>
 <td align="center"> <a href="https://dedi5.nedprod.com/static/files/afio-v2.0-source-latest.tar.xz">Latest stable</a><br><a href="https://dedi5.nedprod.com/static/files/afio-v2.0-source-latest.tar.xz">sources</a> </td>
 <td align="center"> <a href="https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-linux64-latest.tgz">Latest stable</a><br><a href="https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-linux64-latest.tgz">Linux x64 prebuilt</a> </td>
-<td align="center"> <a href="https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-darwin-latest.tgz">Latest stable</a><br><a href="https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-darwin64-latest.tgz">OS X x64 prebuilt</a> </td>
+<td align="center"> <!--<a href="https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-darwin-latest.tgz">Latest stable</a><br><a href="https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-darwin64-latest.tgz">OS X x64 prebuilt</a>--> </td>
 <td align="center"> <a href="https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-win64-latest.zip">Latest stable</a><br/><a href="https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-win64-latest.zip">VS2017 x64 prebuilt</a> </td>
 </tr>
 </table></center>

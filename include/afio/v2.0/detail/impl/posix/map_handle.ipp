@@ -576,40 +576,13 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
                                                          }
                                                          return false;
                                                        },
-                                                       [&](QUICKCPPLIB_NAMESPACE::signal_guard::signalc signo, const void *_info, const void *_context) {
-                                                         (void) signo;
-                                                         assert(signo == QUICKCPPLIB_NAMESPACE::signal_guard::signalc::undefined_memory_access);
-                                                         const auto *info = (const siginfo_t *) _info;
-                                                         assert(info->si_signo == SIGBUS);
-                                                         auto *causingaddr = (byte *) info->si_addr;
+                                                       [&](const QUICKCPPLIB_NAMESPACE::signal_guard::raised_signal_info &_info) {
+                                                         auto &info = const_cast<QUICKCPPLIB_NAMESPACE::signal_guard::raised_signal_info &>(_info);
+                                                         auto *causingaddr = (byte *) info.address();
                                                          if(causingaddr < _addr || causingaddr >= (_addr + _length))
                                                          {
                                                            // Not caused by this map
-                                                           struct sigaction sa;
-                                                           sigaction(SIGBUS, nullptr, &sa);
-                                                           if(sa.sa_flags & SA_SIGINFO)
-                                                           {
-                                                             sa.sa_sigaction(SIGBUS, (siginfo_t *) info, (void *) _context);
-                                                           }
-                                                           else if(sa.sa_handler != SIG_IGN)
-                                                           {
-                                                             if(sa.sa_handler != SIG_DFL)
-                                                             {
-                                                               sa.sa_handler(SIGBUS);
-                                                             }
-                                                             // Painful ...
-                                                             struct sigaction myformer, def;
-                                                             memset(&def, 0, sizeof(def));
-                                                             def.sa_handler = SIG_DFL;
-                                                             sigaction(SIGBUS, &def, &myformer);
-                                                             sigset_t myformer2;
-                                                             sigset_t def2;
-                                                             sigemptyset(&def2);
-                                                             sigaddset(&def2, SIGBUS);
-                                                             pthread_sigmask(SIG_UNBLOCK, &def2, &myformer2);
-                                                             pthread_kill(pthread_self(), SIGBUS);
-                                                             sigaction(SIGBUS, &myformer, nullptr);
-                                                           }
+                                                           QUICKCPPLIB_NAMESPACE::signal_guard::thread_local_raise_signal(info.signal(), info.raw_info(), info.raw_context());
                                                            abort();
                                                          }
                                                          return true;
