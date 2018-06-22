@@ -6,7 +6,7 @@ compiler:
 sudo: false
 os:
  - linux
- - osx
+# - osx
 osx_image: xcode9.2
 branches:
   only:
@@ -36,7 +36,7 @@ env:
   matrix:
     - __="cmake tests (error_code)" NAME=TravisLinuxWorkerEC CMAKE_CONFIGURE_OPTIONS=
     - __="cmake tests (status_code)" NAME=TravisLinuxWorkerSC CMAKE_CONFIGURE_OPTIONS=-DAFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
-    - __="cmake tests" NAME=TravisOSXWorker
+#    - __="cmake tests" NAME=TravisOSXWorker
     - __="Documentation" NAME=TravisDocumentation
     - __="Programs"
  
@@ -44,12 +44,12 @@ matrix:
   exclude:
 #  - os: osx
 #    compiler: g++
-  - os: osx
-    env: __="Documentation" NAME=TravisDocumentation
-  - os: osx
-    env: __="cmake tests (error_code)" NAME=TravisLinuxWorkerEC CMAKE_CONFIGURE_OPTIONS=
-  - os: osx
-    env: __="cmake tests (status_code)" NAME=TravisLinuxWorkerSC CMAKE_CONFIGURE_OPTIONS=-DAFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+#  - os: osx
+#    env: __="Documentation" NAME=TravisDocumentation
+#  - os: osx
+#    env: __="cmake tests (error_code)" NAME=TravisLinuxWorkerEC CMAKE_CONFIGURE_OPTIONS=
+#  - os: osx
+#    env: __="cmake tests (status_code)" NAME=TravisLinuxWorkerSC CMAKE_CONFIGURE_OPTIONS=-DAFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - os: linux
     compiler: g++
     env: __="Documentation" NAME=TravisDocumentation
