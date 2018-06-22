@@ -845,19 +845,13 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
                                                          }
                                                          return false;
                                                        },
-                                                       [&](QUICKCPPLIB_NAMESPACE::signal_guard::signalc signo, const void *_info, const void * /*unused*/) {
-                                                         (void)signo;
-                                                         assert(signo == QUICKCPPLIB_NAMESPACE::signal_guard::signalc::undefined_memory_access);
-                                                         const auto *info = (const _EXCEPTION_RECORD *) _info;
-                                                         assert(info->ExceptionCode == EXCEPTION_IN_PAGE_ERROR);
-                                                         // info->ExceptionInformation[0] = 0=read 1=write 8=DEP
-                                                         // info->ExceptionInformation[1] = causing address
-                                                         // info->ExceptionInformation[2] = NTSTATUS causing exception
-                                                         auto *causingaddr = (byte *) info->ExceptionInformation[1];
+                                                       [&](const QUICKCPPLIB_NAMESPACE::signal_guard::raised_signal_info &_info) {
+                                                         auto &info = const_cast<QUICKCPPLIB_NAMESPACE::signal_guard::raised_signal_info &>(_info);
+                                                         auto *causingaddr = (byte *) info.address();
                                                          if(causingaddr < _addr || causingaddr >= (_addr + _length))
                                                          {
                                                            // Not caused by this map
-                                                           RaiseException(info->ExceptionCode, info->ExceptionFlags, info->NumberParameters, info->ExceptionInformation);
+                                                           QUICKCPPLIB_NAMESPACE::signal_guard::thread_local_raise_signal(info.signal(), info.raw_info(), info.raw_context());
                                                          }
                                                          return true;
                                                        }))
