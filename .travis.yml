@@ -90,6 +90,7 @@ script:
  -
    if [ "$__" = "cmake tests" ] || [ "$__" = "cmake tests (error_code)" ] || [ "$__" = "cmake tests (status_code)" ]; then
      ctest -S .ci.cmake -V --timeout 300 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS ;
+     prebuilt/bin/afio_sl-asan-current_path;
    fi
  -
    if [ "$__" = "Documentation" ]; then
