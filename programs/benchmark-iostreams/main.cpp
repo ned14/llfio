@@ -40,7 +40,7 @@ Distributed under the Boost Software License, Version 1.0.
 namespace afio = AFIO_V2_NAMESPACE;
 using QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng;
 
-uint64_t nanoclock()
+inline uint64_t ticksclock()
 {
 #ifdef _MSC_VER
   auto rdtscp = [] {
@@ -48,19 +48,17 @@ uint64_t nanoclock()
     return (uint64_t) __rdtscp(&x);
   };
 #else
-#ifdef __rdtscp
-  return (uint64_t) __rdtscp();
-#elif defined(__x86_64__)
+#if defined(__x86_64__)
   auto rdtscp = [] {
-    unsigned lo, hi;
-    asm volatile("rdtscp" : "=a"(lo), "=d"(hi));
+    unsigned lo, hi, aux;
+    asm volatile("rdtscp" : "=a"(lo), "=d"(hi), "=c"(aux));
     return (uint64_t) lo | ((uint64_t) hi << 32);
   };
 #elif defined(__i386__)
   auto rdtscp = [] {
-    unsigned count;
-    asm volatile("rdtscp" : "=a"(count));
-    return (uint64_t) count;
+    unsigned lo, hi, aux;
+    asm volatile("rdtscp" : "=a"(lo), "=d"(hi), "=c"(aux));
+    return (uint64_t) lo | ((uint64_t) hi << 32);
   };
 #endif
 #if __ARM_ARCH >= 6
@@ -71,30 +69,32 @@ uint64_t nanoclock()
   };
 #endif
 #endif
+  return rdtscp();
+}
 
-  static uint16_t ticks_per_sec;
+inline uint64_t nanoclock()
+{
+  static double ticks_per_sec;
   static uint64_t offset;
   if(ticks_per_sec == 0)
   {
     auto end = std::chrono::high_resolution_clock::now(), begin = std::chrono::high_resolution_clock::now();
-    auto diff = std::chrono::duration_cast<std::chrono::seconds>(end - begin);
-    uint64_t _begin = rdtscp(), _end;
+    uint64_t _begin = ticksclock(), _end;
     do
     {
       end = std::chrono::high_resolution_clock::now();
     } while(std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() < 1);
-    _end = rdtscp();
-    uint64_t x = _end - _begin;
-    x /= (1000000000 / 128);
-    ticks_per_sec = (uint16_t) x;
-    volatile uint64_t a = (uint64_t)((128 * rdtscp()) / ticks_per_sec);
-    volatile uint64_t b = (uint64_t)((128 * rdtscp()) / ticks_per_sec);
+    _end = ticksclock();
+    double x = (double) (_end - _begin);
+    ticks_per_sec = x / 1000000000.0;
+    volatile uint64_t a = ticksclock();
+    volatile uint64_t b = ticksclock();
     offset = b - a;
 #if 1
-    std::cout << "There are " << (ticks_per_sec / 128.0) << " TSCs in 1 nanosecond and it takes " << offset << " nanoseconds per nanoclock()." << std::endl;
+    std::cout << "There are " << ticks_per_sec << " TSCs in 1 nanosecond and it takes " << offset << " ticks per nanoclock()." << std::endl;
 #endif
   }
-  return (uint64_t)((128 * rdtscp()) / ticks_per_sec) - offset;
+  return (uint64_t)((ticksclock() - offset) / ticks_per_sec);
 }
 
 template <class F> inline void run_test(const char *csv, off_t max_extent, F &&f)
@@ -110,7 +110,7 @@ template <class F> inline void run_test(const char *csv, off_t max_extent, F &&f
     small_prng rand;
     for(auto &i : offsets)
     {
-      i.first = rand() % (max_extent - MAXBLOCKSIZE);
+      i.first = (rand() % (max_extent - MAXBLOCKSIZE)) & ~15;
     }
     memset(buffer, 0, sizeof(buffer));
     for(size_t n = 0; n < offsets.size() / scale; n++)
