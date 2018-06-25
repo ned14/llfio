@@ -90,6 +90,64 @@ namespace detail
   };
 }
 
+template <class BaseStatusCodeDomain> class error_domain;
+
+AFIO_V2_NAMESPACE_END
+
+// Inject a mixin for our custom status codes
+SYSTEM_ERROR2_NAMESPACE_BEGIN
+namespace mixins
+{
+  template <class Base, class BaseStatusCodeDomain> struct mixin<Base, ::AFIO_V2_NAMESPACE::error_domain<BaseStatusCodeDomain>> : public Base
+  {
+    using Base::Base;
+
+    //! Retrieve the paths associated with this failure
+    std::pair<const char *, const char *> _paths() const noexcept
+    {
+      if(QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id() == this->value()._thread_id)
+      {
+        auto &tls = ::AFIO_V2_NAMESPACE::detail::tls_errored_results();
+        const char *path1 = tls.get(this->value()._tls_path_id1);
+        const char *path2 = tls.get(this->value()._tls_path_id2);
+        return {path1, path2};
+      }
+      return {};
+    }
+    //! Retrieve the first path associated with this failure
+    ::AFIO_V2_NAMESPACE::filesystem::path path1() const
+    {
+      if(QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id() == this->value()._thread_id)
+      {
+        auto &tls = ::AFIO_V2_NAMESPACE::detail::tls_errored_results();
+        const char *path1 = tls.get(this->value()._tls_path_id1);
+        if(path1 != nullptr)
+        {
+          return ::AFIO_V2_NAMESPACE::filesystem::path(path1);
+        }
+      }
+      return {};
+    }
+    //! Retrieve the second path associated with this failure
+    ::AFIO_V2_NAMESPACE::filesystem::path path2() const
+    {
+      if(QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id() == this->value()._thread_id)
+      {
+        auto &tls = ::AFIO_V2_NAMESPACE::detail::tls_errored_results();
+        const char *path2 = tls.get(this->value()._tls_path_id2);
+        if(path2 != nullptr)
+        {
+          return ::AFIO_V2_NAMESPACE::filesystem::path(path2);
+        }
+      }
+      return {};
+    }
+  };
+}
+SYSTEM_ERROR2_NAMESPACE_END
+
+AFIO_V2_NAMESPACE_BEGIN
+
 /*! \class error_domain
 \brief The SG14 status code domain for errors in AFIO.
 */
@@ -117,8 +175,45 @@ protected:
   {
     assert(code.domain() == *this);
     const auto &v = static_cast<const SYSTEM_ERROR2_NAMESPACE::status_code<error_domain> &>(code);  // NOLINT
-    std::string ret = _base::_do_message(code).c_str();
-    detail::append_path_info(v.value(), ret);
+    // Get the paths for this failure, if any, using the mixins from above
+    auto paths = v._paths();
+    // Get the base message for this failure
+    auto msg = _base::_do_message(code);
+    if(paths.first == nullptr && paths.second == nullptr)
+    {
+      return msg;
+    }
+    std::string ret;
+    try
+    {
+      ret = msg.c_str();
+      if(paths.first != nullptr)
+      {
+        ret.append(" [path1 = ");
+        ret.append(paths.first);
+        if(paths.second != nullptr)
+        {
+          ret.append(", path2 = ");
+          ret.append(paths.second);
+        }
+        ret.append("]");
+      }
+#if AFIO_LOGGING_LEVEL >= 2
+      if(v.value()._log_id != static_cast<uint32_t>(-1))
+      {
+        if(log().valid(v.value()._log_id))
+        {
+          ret.append(" [location = ");
+          ret.append(location(log()[v.value()._log_id]));
+          ret.append("]");
+        }
+      }
+#endif
+    }
+    catch(...)
+    {
+      return string_ref("Failed to retrieve message for status code");
+    }
     char *p = (char *) malloc(ret.size() + 1);
     if(p == nullptr)
     {
@@ -129,9 +224,9 @@ protected:
   }
 };
 
-#else
+#else   // AFIO_DISABLE_PATHS_IN_FAILURE_INFO
 template <class BaseStatusCodeDomain> using error_domain = BaseStatusCodeDomain;
-#endif
+#endif  // AFIO_DISABLE_PATHS_IN_FAILURE_INFO
 
 namespace detail
 {
@@ -139,7 +234,7 @@ namespace detail
 }
 
 //! An erased status code
-using error_code = SYSTEM_ERROR2_NAMESPACE::status_code<SYSTEM_ERROR2_NAMESPACE::erased<detail::error_domain_value_system_code>>;
+using error_code = SYSTEM_ERROR2_NAMESPACE::errored_status_code<SYSTEM_ERROR2_NAMESPACE::erased<detail::error_domain_value_system_code>>;
 
 
 template <class T> using result = OUTCOME_V2_NAMESPACE::experimental::erased_result<T, error_code>;

@@ -290,45 +290,4 @@ AFIO_V2_NAMESPACE_END
 #define AFIO_LOG_ALL(inst, message)
 #endif
 
-AFIO_V2_NAMESPACE_BEGIN
-
-#ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
-namespace detail
-{
-  template <class Src> inline void append_path_info(Src &src, std::string &ret)
-  {
-    if(QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id() == src._thread_id)
-    {
-      auto &tls = detail::tls_errored_results();
-      const char *path1 = tls.get(src._tls_path_id1), *path2 = tls.get(src._tls_path_id2);
-      if(path1 != nullptr)
-      {
-        ret.append(" [path1 = ");
-        ret.append(path1);
-        if(path2 != nullptr)
-        {
-          ret.append(", path2 = ");
-          ret.append(path2);
-        }
-        ret.append("]");
-      }
-    }
-#if AFIO_LOGGING_LEVEL >= 2
-    if(src._log_id != static_cast<uint32_t>(-1))
-    {
-      if(log().valid(src._log_id))
-      {
-        ret.append(" [location = ");
-        ret.append(location(log()[src._log_id]));
-        ret.append("]");
-      }
-    }
-#endif
-  }
-}
-#endif
-
-AFIO_V2_NAMESPACE_END
-
-
 #endif
