@@ -27,6 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "deadline.h"
 #include "native_handle_type.hpp"
+#include "status_code.hpp"
 
 #include <algorithm>  // for std::count
 #include <cassert>
