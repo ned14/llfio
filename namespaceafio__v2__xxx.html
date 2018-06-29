@@ -201,6 +201,10 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
+<tr class="memitem:aed225790bbca36d005efff21edbee937"><td class="memItemLeft" align="right" valign="top"><a id="aed225790bbca36d005efff21edbee937"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#aed225790bbca36d005efff21edbee937">log_level</a> = QUICKCPPLIB_NAMESPACE::ringbuffer_log::level</td></tr>
+<tr class="memdesc:aed225790bbca36d005efff21edbee937"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enum for the log level. <br /></td></tr>
+<tr class="separator:aed225790bbca36d005efff21edbee937"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7ca979e5ecde58384b6a964b8db006cc"><td class="memTemplParams" colspan="2"><a id="a7ca979e5ecde58384b6a964b8db006cc"></a>
 template&lt;class T &gt; </td></tr>
 <tr class="memitem:a7ca979e5ecde58384b6a964b8db006cc"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>result</b> = OUTCOME_V2_NAMESPACE::result&lt; T, <a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> &gt;</td></tr>
@@ -209,10 +213,6 @@ template&lt;class T &gt; </td></tr>
 template&lt;class T &gt; </td></tr>
 <tr class="memitem:abacadff1ffbf16bfba8ef9a3d6fb20d8"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>outcome</b> = OUTCOME_V2_NAMESPACE::outcome&lt; T, <a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> &gt;</td></tr>
 <tr class="separator:abacadff1ffbf16bfba8ef9a3d6fb20d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aed225790bbca36d005efff21edbee937"><td class="memItemLeft" align="right" valign="top"><a id="aed225790bbca36d005efff21edbee937"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#aed225790bbca36d005efff21edbee937">log_level</a> = QUICKCPPLIB_NAMESPACE::ringbuffer_log::level</td></tr>
-<tr class="memdesc:aed225790bbca36d005efff21edbee937"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enum for the log level. <br /></td></tr>
-<tr class="separator:aed225790bbca36d005efff21edbee937"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -253,39 +253,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="name
 <tr class="separator:acd740f5aef6ca339575e7497fa873d06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6e6ab37dfca4a975e6d04696948c0728"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classafio__v2__xxx_1_1async__file__handle_1_1awaitable.html">async_file_handle::awaitable</a>&lt; async_file_handle::const_buffers_type &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a6e6ab37dfca4a975e6d04696948c0728">co_write</a> (<a class="el" href="classafio__v2__xxx_1_1async__file__handle.html">async_file_handle</a> &amp;self, async_file_handle::extent_type offset, std::initializer_list&lt; <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1const__buffer__type.html">async_file_handle::const_buffer_type</a> &gt; lst) noexcept</td></tr>
 <tr class="separator:a6e6ab37dfca4a975e6d04696948c0728"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa5f11cc32803b0966fe64dfdc325a18b"><td class="memItemLeft" align="right" valign="top"><a id="aa5f11cc32803b0966fe64dfdc325a18b"></a>
-std::error_code&#160;</td><td class="memItemRight" valign="bottom"><b>make_error_code</b> (<a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> ei)</td></tr>
-<tr class="separator:aa5f11cc32803b0966fe64dfdc325a18b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a14e8f43a04092eb024ced8b5909cfd88"><td class="memItemLeft" align="right" valign="top"><a id="a14e8f43a04092eb024ced8b5909cfd88"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (const <a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> &amp;a, const <a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> &amp;b)</td></tr>
-<tr class="separator:a14e8f43a04092eb024ced8b5909cfd88"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a32361fd287b7160ae34aada17191e41e"><td class="memItemLeft" align="right" valign="top"><a id="a32361fd287b7160ae34aada17191e41e"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator!=</b> (const <a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> &amp;a, const <a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> &amp;b)</td></tr>
-<tr class="separator:a32361fd287b7160ae34aada17191e41e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2428d00bd15bd397f8eed6f8a13c3468"><td class="memItemLeft" align="right" valign="top"><a id="a2428d00bd15bd397f8eed6f8a13c3468"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>OUTCOME_TEMPLATE</b> (class ErrorCondEnum) OUTCOME_TREQUIRES(OUTCOME_TPRED(std</td></tr>
-<tr class="separator:a2428d00bd15bd397f8eed6f8a13c3468"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac0d5364044c4627667e827f5aaaa183f"><td class="memItemLeft" align="right" valign="top"><a id="ac0d5364044c4627667e827f5aaaa183f"></a>
-std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> &amp;v)</td></tr>
-<tr class="separator:ac0d5364044c4627667e827f5aaaa183f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8ef55b4834fe3a95bfa1c18c9defd261"><td class="memItemLeft" align="right" valign="top"><a id="a8ef55b4834fe3a95bfa1c18c9defd261"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_system_error_with_payload</b> (const <a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> &amp;ei)</td></tr>
-<tr class="separator:a8ef55b4834fe3a95bfa1c18c9defd261"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9c3fa6c24a7218493a02150e363c5e6a"><td class="memItemLeft" align="right" valign="top"><a id="a9c3fa6c24a7218493a02150e363c5e6a"></a>
-<a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a>&#160;</td><td class="memItemRight" valign="bottom"><b>error_from_exception</b> (std::exception_ptr &amp;&amp;ep=std::current_exception(), std::error_code not_matched=std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept</td></tr>
-<tr class="separator:a9c3fa6c24a7218493a02150e363c5e6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaac2c57629d58bc8d82bb8fddea87308"><td class="memItemLeft" align="right" valign="top"><a id="aaac2c57629d58bc8d82bb8fddea87308"></a>
-<a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#aaac2c57629d58bc8d82bb8fddea87308">generic_error</a> (errc c)</td></tr>
-<tr class="memdesc:aaac2c57629d58bc8d82bb8fddea87308"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper for constructing an error info from an errc. <br /></td></tr>
-<tr class="separator:aaac2c57629d58bc8d82bb8fddea87308"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a057b54bbb63e73f6572033f651dc3408"><td class="memItemLeft" align="right" valign="top"><a id="a057b54bbb63e73f6572033f651dc3408"></a>
-<a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a057b54bbb63e73f6572033f651dc3408">posix_error</a> (int c=errno)</td></tr>
-<tr class="memdesc:a057b54bbb63e73f6572033f651dc3408"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper for constructing an error info from a POSIX errno. <br /></td></tr>
-<tr class="separator:a057b54bbb63e73f6572033f651dc3408"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a08363b8572e6a8971a6d236d54fb8287"><td class="memItemLeft" align="right" valign="top"><a id="a08363b8572e6a8971a6d236d54fb8287"></a>
-QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log&lt; <a class="el" href="group__config.html#ga7c2409ed4b38a384c422012a43423a16">AFIO_LOGGING_MEMORY</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a08363b8572e6a8971a6d236d54fb8287">log</a> () noexcept</td></tr>
-<tr class="memdesc:a08363b8572e6a8971a6d236d54fb8287"><td class="mdescLeft">&#160;</td><td class="mdescRight">The log used by AFIO. <br /></td></tr>
-<tr class="separator:a08363b8572e6a8971a6d236d54fb8287"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2cbad389de45a9893ef02eeec86dcd21"><td class="memItemLeft" align="right" valign="top"><a id="a2cbad389de45a9893ef02eeec86dcd21"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="classafio__v2__xxx_1_1directory__handle.html#a47ed88b4de271daa08862b273c2f609e">directory_handle::filter</a> &amp;v)</td></tr>
 <tr class="separator:a2cbad389de45a9893ef02eeec86dcd21"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -367,6 +334,10 @@ result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class
 <tr class="memitem:abb60a5dc89b41b1db101dbed12cb065d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__result.html">io_handle::io_result</a>&lt; <a class="el" href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">io_handle::const_buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#abb60a5dc89b41b1db101dbed12cb065d">barrier</a> (<a class="el" href="classafio__v2__xxx_1_1io__handle.html">io_handle</a> &amp;self, <a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_handle::io_request</a>&lt; <a class="el" href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">io_handle::const_buffers_type</a> &gt; reqs=<a class="el" href="structafio__v2__xxx_1_1io__handle_1_1io__request.html">io_handle::io_request</a>&lt; <a class="el" href="classafio__v2__xxx_1_1io__handle.html#a639b8760b1b98df95e4956f6cc56f6b5">io_handle::const_buffers_type</a> &gt;(), bool wait_for_device=false, bool and_metadata=false, <a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structafio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="memdesc:abb60a5dc89b41b1db101dbed12cb065d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Issue a write reordering barrier such that writes preceding the barrier will reach storage before writes after this barrier.  <a href="#abb60a5dc89b41b1db101dbed12cb065d">More...</a><br /></td></tr>
 <tr class="separator:abb60a5dc89b41b1db101dbed12cb065d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08363b8572e6a8971a6d236d54fb8287"><td class="memItemLeft" align="right" valign="top"><a id="a08363b8572e6a8971a6d236d54fb8287"></a>
+QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log&lt; <a class="el" href="group__config.html#ga7c2409ed4b38a384c422012a43423a16">AFIO_LOGGING_MEMORY</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a08363b8572e6a8971a6d236d54fb8287">log</a> () noexcept</td></tr>
+<tr class="memdesc:a08363b8572e6a8971a6d236d54fb8287"><td class="mdescLeft">&#160;</td><td class="mdescRight">The log used by AFIO. <br /></td></tr>
+<tr class="separator:a08363b8572e6a8971a6d236d54fb8287"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aadb5d931dbbaccf81d09f0a070036edf"><td class="memItemLeft" align="right" valign="top"><a id="aadb5d931dbbaccf81d09f0a070036edf"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const section_handle::flag &amp;v)</td></tr>
 <tr class="separator:aadb5d931dbbaccf81d09f0a070036edf"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -457,10 +428,39 @@ constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator&gt
 <tr class="memitem:a10b83cf245b2a1779d2016cb3cd69bdb"><td class="memItemLeft" align="right" valign="top"><a id="a10b83cf245b2a1779d2016cb3cd69bdb"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="classafio__v2__xxx_1_1path__view.html">path_view</a> &amp;v)</td></tr>
 <tr class="separator:a10b83cf245b2a1779d2016cb3cd69bdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5f11cc32803b0966fe64dfdc325a18b"><td class="memItemLeft" align="right" valign="top"><a id="aa5f11cc32803b0966fe64dfdc325a18b"></a>
+std::error_code&#160;</td><td class="memItemRight" valign="bottom"><b>make_error_code</b> (<a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> ei)</td></tr>
+<tr class="separator:aa5f11cc32803b0966fe64dfdc325a18b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a14e8f43a04092eb024ced8b5909cfd88"><td class="memItemLeft" align="right" valign="top"><a id="a14e8f43a04092eb024ced8b5909cfd88"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (const <a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> &amp;a, const <a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> &amp;b)</td></tr>
+<tr class="separator:a14e8f43a04092eb024ced8b5909cfd88"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a32361fd287b7160ae34aada17191e41e"><td class="memItemLeft" align="right" valign="top"><a id="a32361fd287b7160ae34aada17191e41e"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator!=</b> (const <a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> &amp;a, const <a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> &amp;b)</td></tr>
+<tr class="separator:a32361fd287b7160ae34aada17191e41e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2428d00bd15bd397f8eed6f8a13c3468"><td class="memItemLeft" align="right" valign="top"><a id="a2428d00bd15bd397f8eed6f8a13c3468"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>OUTCOME_TEMPLATE</b> (class ErrorCondEnum) OUTCOME_TREQUIRES(OUTCOME_TPRED(std</td></tr>
+<tr class="separator:a2428d00bd15bd397f8eed6f8a13c3468"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac0d5364044c4627667e827f5aaaa183f"><td class="memItemLeft" align="right" valign="top"><a id="ac0d5364044c4627667e827f5aaaa183f"></a>
+std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> &amp;v)</td></tr>
+<tr class="separator:ac0d5364044c4627667e827f5aaaa183f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ef55b4834fe3a95bfa1c18c9defd261"><td class="memItemLeft" align="right" valign="top"><a id="a8ef55b4834fe3a95bfa1c18c9defd261"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_system_error_with_payload</b> (const <a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a> &amp;ei)</td></tr>
+<tr class="separator:a8ef55b4834fe3a95bfa1c18c9defd261"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c3fa6c24a7218493a02150e363c5e6a"><td class="memItemLeft" align="right" valign="top"><a id="a9c3fa6c24a7218493a02150e363c5e6a"></a>
+<a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a>&#160;</td><td class="memItemRight" valign="bottom"><b>error_from_exception</b> (std::exception_ptr &amp;&amp;ep=std::current_exception(), std::error_code not_matched=std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept</td></tr>
+<tr class="separator:a9c3fa6c24a7218493a02150e363c5e6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaac2c57629d58bc8d82bb8fddea87308"><td class="memItemLeft" align="right" valign="top"><a id="aaac2c57629d58bc8d82bb8fddea87308"></a>
+<a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#aaac2c57629d58bc8d82bb8fddea87308">generic_error</a> (errc c)</td></tr>
+<tr class="memdesc:aaac2c57629d58bc8d82bb8fddea87308"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper for constructing an error info from an errc. <br /></td></tr>
+<tr class="separator:aaac2c57629d58bc8d82bb8fddea87308"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a057b54bbb63e73f6572033f651dc3408"><td class="memItemLeft" align="right" valign="top"><a id="a057b54bbb63e73f6572033f651dc3408"></a>
+<a class="el" href="structafio__v2__xxx_1_1error__info.html">error_info</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a057b54bbb63e73f6572033f651dc3408">posix_error</a> (int c=errno)</td></tr>
+<tr class="memdesc:a057b54bbb63e73f6572033f651dc3408"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper for constructing an error info from a POSIX errno. <br /></td></tr>
+<tr class="separator:a057b54bbb63e73f6572033f651dc3408"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The AFIO namespace. </p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000001">Todo:</a></b></dt><dd>TODO FIXME Replace in-memory log with memory map file backed log. </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000002">Todo:</a></b></dt><dd>TODO FIXME Replace in-memory log with memory map file backed log. </dd></dl>
 </div><h2 class="groupheader">Function Documentation</h2>
 <a id="a4c35fd205301d7fdd3ebb503f2d154fc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4c35fd205301d7fdd3ebb503f2d154fc">&#9670;&nbsp;</a></span>async_barrier()</h2>
@@ -994,7 +994,7 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX fdatasync() or Windows NtFlushBuffersFileEx() can return. </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>None. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;{</div><div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.barrier(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(wait_for_device)&gt;(wait_for_device), std::forward&lt;decltype(and_metadata)&gt;(and_metadata), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;{</div><div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.barrier(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(wait_for_device)&gt;(wait_for_device), std::forward&lt;decltype(and_metadata)&gt;(and_metadata), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a1b5c40714a95d835e7926b9508469bf2"></a>
@@ -2102,7 +2102,7 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX read() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be returned if deadline i/o is not possible with this particular handle configuration (e.g. reading from regular files on POSIX or reading from a non-overlapped HANDLE on Windows). </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle performs one calloc and one free. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;{</div><div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;{</div><div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a45b09c42c9a14c6abb56888a2832ba69"></a>
@@ -2151,7 +2151,7 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;{</div><div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(offset)&gt;(offset), std::forward&lt;decltype(lst)&gt;(lst), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;{</div><div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(offset)&gt;(offset), std::forward&lt;decltype(lst)&gt;(lst), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="ac89289d85eff137c40d3d0084c410656"></a>
@@ -2839,7 +2839,7 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX write() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle performs one calloc and one free. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;{</div><div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;{</div><div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a53f3d40c5752d0dbeaa9b8233bff976f"></a>
@@ -2888,7 +2888,7 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;{</div><div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(offset)&gt;(offset), std::forward&lt;decltype(lst)&gt;(lst), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;{</div><div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(offset)&gt;(offset), std::forward&lt;decltype(lst)&gt;(lst), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a5bfae365a1845c1bde4739de38c3653f"></a>
