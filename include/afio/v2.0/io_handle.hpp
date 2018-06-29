@@ -55,6 +55,10 @@ public:
   {
     //! Type of the pointer to memory.
     using pointer = byte *;
+    //! Type of the iterator to memory.
+    using iterator = byte *;
+    //! Type of the iterator to memory.
+    using const_iterator = const byte *;
     //! Type of the length of memory.
     using size_type = size_t;
 
@@ -62,12 +66,29 @@ public:
     pointer data;
     //! The number of bytes to fill into this address. Try to make this a 64 byte multiple, or ideally, a whole multiple of `page_size()`.
     size_type len;
+
+    //! Returns an iterator to the beginning of the buffer
+    constexpr iterator begin() { return data; }
+    //! Returns an iterator to the beginning of the buffer
+    constexpr const_iterator begin() const { return data; }
+    //! Returns an iterator to the beginning of the buffer
+    constexpr const_iterator cbegin() const { return data; }
+    //! Returns an iterator to after the end of the buffer
+    constexpr iterator end() { return data + len; }
+    //! Returns an iterator to after the end of the buffer
+    constexpr const_iterator end() const { return data + len; }
+    //! Returns an iterator to after the end of the buffer
+    constexpr const_iterator cend() const { return data + len; }
   };
   //! The gather buffer type used by this handle. Guaranteed to be `TrivialType` and `StandardLayoutType`.
   struct const_buffer_type
   {
     //! Type of the pointer to memory.
     using pointer = const byte *;
+    //! Type of the iterator to memory.
+    using iterator = const byte *;
+    //! Type of the iterator to memory.
+    using const_iterator = const byte *;
     //! Type of the length of memory.
     using size_type = size_t;
 
@@ -75,6 +96,19 @@ public:
     pointer data;
     //! The number of bytes to write from this address. Try to make this a 64 byte multiple, or ideally, a whole multiple of `page_size()`.
     size_type len;
+
+    //! Returns an iterator to the beginning of the buffer
+    constexpr iterator begin() { return data; }
+    //! Returns an iterator to the beginning of the buffer
+    constexpr const_iterator begin() const { return data; }
+    //! Returns an iterator to the beginning of the buffer
+    constexpr const_iterator cbegin() const { return data; }
+    //! Returns an iterator to after the end of the buffer
+    constexpr iterator end() { return data + len; }
+    //! Returns an iterator to after the end of the buffer
+    constexpr const_iterator end() const { return data + len; }
+    //! Returns an iterator to after the end of the buffer
+    constexpr const_iterator cend() const { return data + len; }
   };
 #ifndef NDEBUG
   static_assert(std::is_trivial<buffer_type>::value, "buffer_type is not a trivial type!");

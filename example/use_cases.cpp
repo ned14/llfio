@@ -153,6 +153,12 @@ void read_entire_file2()
 
 void scatter_write()
 {
+  /* WARNING: This example cannot possibly work because files opened with caching::only_metadata
+  are required by the operating system to be supplied with buffers aligned to, and be a multiple of,
+  the device's native block size (often 4Kb). So the gather buffers below would need to be each 4Kb
+  long, and aligned to 4Kb boundaries. If you would like this example to work as-is, change the
+  caching::only_metadata to caching::all.
+  */
   //! [scatter_write]
   namespace afio = AFIO_V2_NAMESPACE;
 
