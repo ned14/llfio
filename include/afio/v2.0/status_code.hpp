@@ -345,6 +345,7 @@ AFIO_V2_NAMESPACE_BEGIN
 namespace detail
 {
   template <class Dest, class Src> inline void fill_failure_info(Dest &dest, const Src &src);
+  template <class Src> inline void append_path_info(Src &src, std::string &ret);
 }
 
 struct error_info;
