@@ -22,7 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#define MAXBLOCKSIZE (256 * 1024)
+#define MINBLOCKSIZE (4096)
+#define MAXBLOCKSIZE (4096)
 #define REGIONSIZE (100 * 1024 * 1024)
 
 #include "../../include/afio/afio.hpp"
@@ -102,9 +103,9 @@ template <class F> inline void run_test(const char *csv, off_t max_extent, F &&f
   char buffer[MAXBLOCKSIZE];
   std::vector<std::pair<unsigned, unsigned>> offsets(512 * 1024);
   std::vector<std::vector<unsigned>> results;
-  for(size_t blocksize = 1; blocksize <= MAXBLOCKSIZE; blocksize <<= 1)
+  for(size_t blocksize = MINBLOCKSIZE; blocksize <= MAXBLOCKSIZE; blocksize <<= 1)
   {
-    size_t scale = blocksize / 16;
+    size_t scale = (512 * 1024) / (REGIONSIZE / blocksize) / 10;  // On average tap each block ten times
     if(scale < 1)
       scale = 1;
     small_prng rand;
@@ -127,7 +128,7 @@ template <class F> inline void run_test(const char *csv, off_t max_extent, F &&f
     }
   }
   std::ofstream out(csv);
-  for(size_t blocksize = 1; blocksize <= MAXBLOCKSIZE; blocksize <<= 1)
+  for(size_t blocksize = MINBLOCKSIZE; blocksize <= MAXBLOCKSIZE; blocksize <<= 1)
   {
     out << "," << blocksize;
   }
@@ -135,7 +136,7 @@ template <class F> inline void run_test(const char *csv, off_t max_extent, F &&f
   for(size_t n = 0; n < offsets.size(); n++)
   {
     auto it = results.cbegin();
-    for(size_t blocksize = 1; blocksize <= MAXBLOCKSIZE; blocksize <<= 1, ++it)
+    for(size_t blocksize = MINBLOCKSIZE; blocksize <= MAXBLOCKSIZE; blocksize <<= 1, ++it)
     {
       if(n < it->size())
         out << "," << it->at(n);
