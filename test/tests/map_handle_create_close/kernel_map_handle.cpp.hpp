@@ -26,10 +26,10 @@ Distributed under the Boost Software License, Version 1.0.
 
 namespace map_handle_create_close
 {
-  AFIO_TEST_KERNEL_DECL AFIO_V2_NAMESPACE::result<AFIO_V2_NAMESPACE::map_handle> test_kernel_map_handle(AFIO_V2_NAMESPACE::file_handle &backing, AFIO_V2_NAMESPACE::map_handle::size_type bytes, AFIO_V2_NAMESPACE::section_handle::flag m)
+  LLFIO_TEST_KERNEL_DECL LLFIO_V2_NAMESPACE::result<LLFIO_V2_NAMESPACE::map_handle> test_kernel_map_handle(LLFIO_V2_NAMESPACE::file_handle &backing, LLFIO_V2_NAMESPACE::map_handle::size_type bytes, LLFIO_V2_NAMESPACE::section_handle::flag m)
   {
-    auto sectionh = backing.is_valid() ? AFIO_V2_NAMESPACE::section_handle::section(backing, bytes, AFIO_V2_NAMESPACE::section_handle::flag::readwrite) : AFIO_V2_NAMESPACE::section_handle::section(bytes);
-    auto h = AFIO_V2_NAMESPACE::map_handle::map(sectionh.value(), bytes, 0, m);
+    auto sectionh = backing.is_valid() ? LLFIO_V2_NAMESPACE::section_handle::section(backing, bytes, LLFIO_V2_NAMESPACE::section_handle::flag::readwrite) : LLFIO_V2_NAMESPACE::section_handle::section(bytes);
+    auto h = LLFIO_V2_NAMESPACE::map_handle::map(sectionh.value(), bytes, 0, m);
     return h;
   }
 }

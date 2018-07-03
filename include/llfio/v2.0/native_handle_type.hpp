@@ -22,17 +22,17 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_CONFIG_HPP
+#ifndef LLFIO_CONFIG_HPP
 #error You must include the master afio.hpp, not individual header files directly
 #endif
 #include "config.hpp"
 
 //! \file native_handle_type.hpp Provides native_handle_type
 
-#ifndef AFIO_NATIVE_HANDLE_TYPE_H
-#define AFIO_NATIVE_HANDLE_TYPE_H
+#ifndef LLFIO_NATIVE_HANDLE_TYPE_H
+#define LLFIO_NATIVE_HANDLE_TYPE_H
 
-AFIO_V2_NAMESPACE_EXPORT_BEGIN
+LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 /*! \struct native_handle_type
 \brief A native handle type used for wrapping file descriptors, process ids or HANDLEs.
@@ -141,7 +141,7 @@ struct native_handle_type  // NOLINT
   constexpr bool is_section() const noexcept { return (behaviour & disposition::section) ? true : false; }
 };
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
 
 #endif

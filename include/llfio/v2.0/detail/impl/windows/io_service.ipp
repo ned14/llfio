@@ -25,12 +25,12 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../io_service.hpp"
 #include "import.hpp"
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 io_service::io_service()
     : _work_queued(0)
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(DuplicateHandle(GetCurrentProcess(), GetCurrentThread(), GetCurrentProcess(), &_threadh, 0, 0, DUPLICATE_SAME_ACCESS) == 0)
   {
     throw std::runtime_error("Failed to create creating thread handle");
@@ -40,7 +40,7 @@ io_service::io_service()
 
 io_service::~io_service()
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(_work_queued != 0u)
   {
     fprintf(stderr, "WARNING: ~io_service() sees work still queued, blocking until no work queued\n");
@@ -54,7 +54,7 @@ io_service::~io_service()
 
 result<bool> io_service::run_until(deadline d) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(_work_queued == 0u)
   {
     return false;
@@ -69,7 +69,7 @@ result<bool> io_service::run_until(deadline d) noexcept
 
 void io_service::_post(detail::function_ptr<void(io_service *)> &&f)
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   void *data = nullptr;
   {
     post_info pi(this, std::move(f));
@@ -99,4 +99,4 @@ void io_service::_post(detail::function_ptr<void(io_service *)> &&f)
   }
 }
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

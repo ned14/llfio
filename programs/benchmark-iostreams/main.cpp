@@ -38,7 +38,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <iostream>
 #include <vector>
 
-namespace afio = AFIO_V2_NAMESPACE;
+namespace afio = LLFIO_V2_NAMESPACE;
 using QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng;
 
 inline uint64_t ticksclock()

@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../utils.hpp"
 #include "import.hpp"
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 result<void> fs_handle::_fetch_inode() const noexcept
 {
@@ -42,9 +42,9 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   auto &h = _get_handle();
-  AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+  LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
   if(_devid == 0 && _inode == 0)
   {
     OUTCOME_TRY(_fetch_inode());
@@ -116,7 +116,7 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
       {
         return success(std::move(currentdirh));
       }
-      AFIO_WIN_DEADLINE_TO_TIMEOUT(d);
+      LLFIO_WIN_DEADLINE_TO_TIMEOUT(d);
     }
   }
   catch(...)
@@ -129,7 +129,7 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   auto &h = _get_handle();
 
   // If the target is a win32 path, we need to convert to NT path and call ourselves
@@ -186,7 +186,7 @@ result<void> fs_handle::unlink(deadline d) noexcept
   using flag = handle::flag;
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   auto &h = _get_handle();
   HANDLE duph;
   // Try by POSIX delete first
@@ -244,7 +244,7 @@ result<void> fs_handle::unlink(deadline d) noexcept
         // This error also annoyingly appears if the file has delete on close set on it already
         if(out.error().value() == static_cast<int>(0xC0000043) /*STATUS_SHARING_VIOLATION*/)
         {
-          AFIO_LOG_WARN(this, "Failed to rename entry to random name to simulate immediate unlinking due to STATUS_SHARING_VIOLATION, skipping");
+          LLFIO_LOG_WARN(this, "Failed to rename entry to random name to simulate immediate unlinking due to STATUS_SHARING_VIOLATION, skipping");
         }
         else
         {
@@ -287,4 +287,4 @@ result<void> fs_handle::unlink(deadline d) noexcept
   return success();
 }
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

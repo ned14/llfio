@@ -31,7 +31,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 int main()
 {
-  AFIO_V2_NAMESPACE::mapped_file_handle v;
+  LLFIO_V2_NAMESPACE::mapped_file_handle v;
   (void) v;
   return 0;
 }

@@ -26,7 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 static inline void TestPathView()
 {
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace afio = LLFIO_V2_NAMESPACE;
   // path view has constexpr construction
   constexpr afio::path_view a, b("hello");
   BOOST_CHECK(a.empty());

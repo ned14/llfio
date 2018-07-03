@@ -63,7 +63,7 @@ bool kbhit()
 }
 #endif
 
-namespace afio = AFIO_V2_NAMESPACE;
+namespace afio = LLFIO_V2_NAMESPACE;
 namespace child_process = KERNELTEST_V1_NAMESPACE::child_process;
 
 static volatile size_t *shared_memory;

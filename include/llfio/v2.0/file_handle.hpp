@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_FILE_HANDLE_H
-#define AFIO_FILE_HANDLE_H
+#ifndef LLFIO_FILE_HANDLE_H
+#define LLFIO_FILE_HANDLE_H
 
 #include "io_handle.hpp"
 #include "path_discovery.hpp"
@@ -36,7 +36,7 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4251)  // dll interface
 #endif
 
-AFIO_V2_NAMESPACE_EXPORT_BEGIN
+LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 class io_service;
 
@@ -52,9 +52,9 @@ async_file_handle.
 </table>
 
 */
-class AFIO_DECL file_handle : public io_handle, public fs_handle
+class LLFIO_DECL file_handle : public io_handle, public fs_handle
 {
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept final { return *this; }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept final { return *this; }
 
 public:
   using path_type = io_handle::path_type;
@@ -103,7 +103,7 @@ public:
     return *this;
   }
   //! Swap with another instance
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   void swap(file_handle &o) noexcept
   {
     file_handle temp(std::move(*this));
@@ -121,8 +121,8 @@ public:
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> file(const path_handle &base, path_view_type path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept;
+  LLFIO_MAKE_FREE_FUNCTION
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> file(const path_handle &base, path_view_type path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept;
   /*! Create a file handle creating a randomly named file on a path.
   The file is opened exclusively with `creation::only_if_not_exist` so it
   will never collide with nor overwrite any existing file. Note also
@@ -131,7 +131,7 @@ public:
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   static inline result<file_handle> random_file(const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::temporary, flag flags = flag::none) noexcept
   {
     try
@@ -167,7 +167,7 @@ public:
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   static inline result<file_handle> temp_file(path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::temporary, flag flags = flag::unlink_on_first_close) noexcept
   {
     auto &tempdirh = path_discovery::storage_backed_temporary_files_directory();
@@ -183,19 +183,19 @@ public:
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> temp_inode(const path_handle &dirh = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept;
+  LLFIO_MAKE_FREE_FUNCTION
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> temp_inode(const path_handle &dirh = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept;
 
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~file_handle() override
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~file_handle() override
   {
     if(_v)
     {
       (void) file_handle::close();
     }
   }
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override
   {
-    AFIO_LOG_FUNCTION_CALL(this);
+    LLFIO_LOG_FUNCTION_CALL(this);
     if(_flags & flag::unlink_on_first_close)
     {
       auto ret = unlink();
@@ -211,7 +211,7 @@ public:
     return io_handle::close();
   }
 
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
 
   /*! Clone this handle (copy constructor is disabled to avoid accidental copying),
   optionally race free reopening the handle with different access or caching.
@@ -225,7 +225,7 @@ public:
   \mallocs On POSIX if changing the mode, we must loop calling `current_path()` and
   trying to open the path returned. Thus many allocations may occur.
   */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
 
   //! The i/o service this handle is attached to, if any
   io_service *service() const noexcept { return _service; }
@@ -234,8 +234,8 @@ public:
 
   \errors Any of the values POSIX fstat() or GetFileInformationByHandleEx() can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> maximum_extent() const noexcept;
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> maximum_extent() const noexcept;
 
   /*! Resize the current maximum permitted extent of the file to the given extent, avoiding any
   new allocation of physical storage where supported. Note that on extents based filing systems
@@ -245,16 +245,16 @@ public:
   \param newsize The bytes to truncate the file to.
   \errors Any of the values POSIX ftruncate() or SetFileInformationByHandle() can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> truncate(extent_type newsize) noexcept;
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> truncate(extent_type newsize) noexcept;
 
   /*! \brief Returns a list of currently valid extents for this open file. WARNING: racy!
   \return A vector of pairs of extent offset + extent length representing the valid extents
   in this file. Filing systems which do not support extents return a single extent matching
   the length of the file rather than returning an error.
   */
-  AFIO_MAKE_FREE_FUNCTION
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<std::vector<std::pair<extent_type, extent_type>>> extents() const noexcept;
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<std::vector<std::pair<extent_type, extent_type>>> extents() const noexcept;
 
   /*! \brief Efficiently zero, and possibly deallocate, data on storage.
 
@@ -275,8 +275,8 @@ public:
   \mallocs The default synchronous implementation in file_handle performs no memory allocation.
   The asynchronous implementation in async_file_handle may perform one calloc and one free.
   */
-  AFIO_MAKE_FREE_FUNCTION
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> zero(extent_type offset, extent_type bytes, deadline d = deadline()) noexcept;
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> zero(extent_type offset, extent_type bytes, deadline d = deadline()) noexcept;
 };
 
 //! \brief Constructor for `file_handle`
@@ -411,23 +411,23 @@ inline result<file_handle::extent_type> zero(file_handle &self, file_handle::ext
 }
 // END make_free_functions.py
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
-#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define AFIO_INCLUDED_BY_HEADER 1
+#if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define LLFIO_INCLUDED_BY_HEADER 1
 #ifdef _WIN32
 #include "detail/impl/windows/file_handle.ipp"
 #else
 #include "detail/impl/posix/file_handle.ipp"
 #endif
-#undef AFIO_INCLUDED_BY_HEADER
+#undef LLFIO_INCLUDED_BY_HEADER
 #endif
 
 // Needs to be here as path discovery uses file_handle
-#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define AFIO_INCLUDED_BY_HEADER 1
+#if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define LLFIO_INCLUDED_BY_HEADER 1
 #include "detail/impl/path_discovery.ipp"
-#undef AFIO_INCLUDED_BY_HEADER
+#undef LLFIO_INCLUDED_BY_HEADER
 #endif
 
 #ifdef _MSC_VER

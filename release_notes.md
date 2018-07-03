@@ -1,13 +1,13 @@
 <center><table border="0" cellpadding="4">
 <tr>
-<td align="center"> <a href="https://github.com/ned14/afio">AFIO</a><br><a href="https://github.com/ned14/afio">on GitHub</a> </td>
+<td align="center"> <a href="https://github.com/ned14/llfio">LLFIO</a><br><a href="https://github.com/ned14/llfio">on GitHub</a> </td>
 <td align="center"> <a href="http://my.cdash.org/index.php?project=Boost.AFIO">CTest summary</a><br><a href="http://my.cdash.org/index.php?project=Boost.AFIO">dashboard</a> </td>
-<td align="center"> <a href="https://travis-ci.org/ned14/afio">Linux and MacOS CI:</a><img src="https://travis-ci.org/ned14/afio.svg?branch=master"/> </td>
-<td align="center"> <a href="https://ci.appveyor.com/project/ned14/afio/branch/master">Windows CI:</a><img src="https://ci.appveyor.com/api/projects/status/680b1pt9srnoprs3/branch/master?svg=true"/> </td>
-<td align="center"> <a href="https://dedi5.nedprod.com/static/files/afio-v2.0-source-latest.tar.xz">Latest stable</a><br><a href="https://dedi5.nedprod.com/static/files/afio-v2.0-source-latest.tar.xz">sources</a> </td>
-<td align="center"> <a href="https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-linux64-latest.tgz">Latest stable</a><br><a href="https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-linux64-latest.tgz">Linux x64 prebuilt</a> </td>
-<td align="center"> <!--<a href="https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-darwin-latest.tgz">Latest stable</a><br><a href="https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-darwin64-latest.tgz">OS X x64 prebuilt</a>--> </td>
-<td align="center"> <a href="https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-win64-latest.zip">Latest stable</a><br/><a href="https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-win64-latest.zip">VS2017 x64 prebuilt</a> </td>
+<td align="center"> <a href="https://travis-ci.org/ned14/llfio">Linux and MacOS CI:</a><img src="https://travis-ci.org/ned14/llfio.svg?branch=master"/> </td>
+<td align="center"> <a href="https://ci.appveyor.com/project/ned14/llfio/branch/master">Windows CI:</a><img src="https://ci.appveyor.com/api/projects/status/680b1pt9srnoprs3/branch/master?svg=true"/> </td>
+<td align="center"> <a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-source-latest.tar.xz">Latest stable</a><br><a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-source-latest.tar.xz">sources</a> </td>
+<td align="center"> <a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-linux64-latest.tgz">Latest stable</a><br><a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-linux64-latest.tgz">Linux x64 prebuilt</a> </td>
+<td align="center"> <!--<a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-darwin-latest.tgz">Latest stable</a><br><a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-darwin64-latest.tgz">OS X x64 prebuilt</a>--> </td>
+<td align="center"> <a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-win64-latest.zip">Latest stable</a><br/><a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-win64-latest.zip">VS2017 x64 prebuilt</a> </td>
 </tr>
 </table></center>
 
@@ -21,7 +21,7 @@ filesystem algorithms which work well with directly mapped non-volatile storage 
 as Intel Optane.
 
 It is a complete rewrite after a Boost peer review in August 2015. Its github
-source code repository lives at https://github.com/ned14/boost.afio.
+source code repository lives at https://github.com/ned14/boost.llfio.
 
 - Portable to any conforming C++ 14 compiler with a working Filesystem TS in its STL.
 - Will make use of any Concepts TS if you have them.
@@ -55,10 +55,10 @@ These compilers and OS are regularly tested:
 - Visual Studio 2017 (Windows 10 x64)
 
 Other compilers, architectures and OSs may work, but are not tested regularly. You will need a Filesystem TS
-implementation in your STL and C++ 14. See https://github.com/ned14/afio/blob/master/programs/fs-probe/fs_probe_results.yaml
+implementation in your STL and C++ 14. See https://github.com/ned14/llfio/blob/master/programs/fs-probe/fs_probe_results.yaml
 for a database of latencies for various previously tested OS, filing systems and storage devices.
 
-Todo list for already implemented parts: https://ned14.github.io/afio/todo.html
+Todo list for already implemented parts: https://ned14.github.io/llfio/todo.html
 
 To build and test (make, ninja etc):
 
@@ -67,7 +67,7 @@ mkdir build
 cd build
 cmake ..
 cmake --build .
-ctest -R afio_sl
+ctest -R llfio_sl
 ~~~
 
 To build and test (Visual Studio, XCode etc):
@@ -77,7 +77,7 @@ mkdir build
 cd build
 cmake ..
 cmake --build . --config Release
-ctest -C Release -R afio_sl
+ctest -C Release -R llfio_sl
 ~~~
 
 ## v2 architecture and design implemented:
@@ -87,12 +87,12 @@ ctest -C Release -R afio_sl
 | ✔ | ✔ | Universal native handle/fd abstraction instead of `void *`.
 | ✔ | ✔ | Perfectly/Ideally low memory (de)allocation per op (usually none).
 | ✔ | ✔ | noexcept API throughout returning error_code for failure instead of throwing exceptions.
-| ✔ | ✔ | AFIO v1 handle type split into hierarchy of types:<ol><li>handle - provides open, close, get path, clone, set/unset append only, change caching, characteristics<li>fs_handle - handles with an inode number<li>path_handle - a race free anchor to a subset of the filesystem<li>directory_handle - enumerates the filesystem<li>io_handle - adds synchronous scatter-gather i/o, byte range locking<li>file_handle - adds open/create file, get and set maximum extent<li>async_file_handle - adds asynchronous scatter-gather i/o<li>mapped_file_handle - adds low latency memory mapped scatter-gather i/o</ol>
+| ✔ | ✔ | LLFIO v1 handle type split into hierarchy of types:<ol><li>handle - provides open, close, get path, clone, set/unset append only, change caching, characteristics<li>fs_handle - handles with an inode number<li>path_handle - a race free anchor to a subset of the filesystem<li>directory_handle - enumerates the filesystem<li>io_handle - adds synchronous scatter-gather i/o, byte range locking<li>file_handle - adds open/create file, get and set maximum extent<li>async_file_handle - adds asynchronous scatter-gather i/o<li>mapped_file_handle - adds low latency memory mapped scatter-gather i/o</ol>
 | ✔ | ✔ | Cancelable i/o (made possible thanks to dropping XP support).
 | ✔ | ✔ | All shared_ptr usage removed as all use of multiple threads removed.
 | ✔ | ✔ | Use of std::vector to transport scatter-gather sequences replaced with C++ 20 `span<>` borrowed views.
 | ✔ | ✔ | Completion callbacks are now some arbitrary type `U&&` instead of a future continuation. Type erasure for its storage is bound into the one single memory allocation for everything needed to execute the op, and so therefore overhead is optimal.
-| ✔ | ✔ | Filing system algorithms made generic and broken out into public `afio::algorithms` template library (the AFIO FTL).
+| ✔ | ✔ | Filing system algorithms made generic and broken out into public `llfio::algorithms` template library (the LLFIO FTL).
 | ✔ | ✔ | Abstraction of native handle management via bitfield specified "characteristics".
 | ✔ |   | Storage profiles, a YAML database of behaviours of hardware, OS and filing system combinations.
 | ✔ |   | Absolute and interval deadline timed i/o throughout (made possible thanks to dropping XP support).
@@ -131,8 +131,8 @@ Todo:
 | ✔ | ✔ | ✔ | i/o deadlines and cancellation.
 |   | ✔ | ✔ | Retrieving and setting the current maximum extent (size) of an open file.
 |   | ✔ | ✔ | Retrieving the current path of an open file irrespective of where it has been renamed to by third parties.
-|   | ✔ | ✔ | statfs_t ported over from AFIO v1.
-|   | ✔ | ✔ | utils namespace ported over from AFIO v1.
+|   | ✔ | ✔ | statfs_t ported over from LLFIO v1.
+|   | ✔ | ✔ | utils namespace ported over from LLFIO v1.
 | ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on lock files
 | ✔ | ✔ | ✔ | Byte range shared/exclusive locking.
 | ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on byte ranges
@@ -140,14 +140,14 @@ Todo:
 |   | ✔ | ✔ | Memory mapped files and virtual memory management (`section_handle`, `map_handle` and `mapped_file_handle`)
 | ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on memory maps
 | ✔ | ✔ | ✔ | Universal portable UTF-8 path views.
-|   | ✔ | ✔ | "Hole punching" and hole enumeration ported over from AFIO v1.
-|   | ✔ | ✔ | Directory handles and very fast directory enumeration ported over from AFIO v1.
+|   | ✔ | ✔ | "Hole punching" and hole enumeration ported over from LLFIO v1.
+|   | ✔ | ✔ | Directory handles and very fast directory enumeration ported over from LLFIO v1.
 | ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on safe byte ranges
 |   | ✔ | ✔ | Set random or sequential i/o (prefetch).
 | ✔ | ✔ | ✔ | i/o on `async_file_handle` is coroutines awaitable.
-| ✔ | ✔ |   | `afio::algorithm::trivial_vector<T>` with constant time reallocation if `T` is trivially copyable.
+| ✔ | ✔ |   | `llfio::algorithm::trivial_vector<T>` with constant time reallocation if `T` is trivially copyable.
 
-Todo to reach feature parity with AFIO v1:
+Todo to reach feature parity with LLFIO v1:
 
 | NEW in v2 | Windows | POSIX |     |
 | --------- | --------| ----- | --- |
@@ -179,7 +179,7 @@ Features possibly to be added after a Boost peer review:
 
 <table width="100%" border="0" cellpadding="4">
 <tr>
-<th colspan="3">Why you might need AFIO<hr></th>
+<th colspan="3">Why you might need LLFIO<hr></th>
 </tr>
 <tr>
 <td valign="top" width="33%">
@@ -193,13 +193,13 @@ Manufacturer claimed 4Kb transfer latencies for the physical hardware:
 - RTT PCIe latency: **0.5us**
 </td>
 <td valign="top" width="33%">
-100% read QD1 4Kb direct transfer latencies for the software with AFIO:
+100% read QD1 4Kb direct transfer latencies for the software with LLFIO:
 - &lt; 99% spinning rust hard drive latency: Windows **187,231us** FreeBSD **9,836us** Linux **26,468us**
 - &lt; 99% SATA flash drive latency: Windows **290us** Linux **158us**
 - &lt; 99% NVMe drive latency: Windows **37us** FreeBSD **70us** Linux **30us**
 </td>
 <td valign="top" width="33%">
-75% read 25% write QD4 4Kb direct transfer latencies for the software with AFIO:
+75% read 25% write QD4 4Kb direct transfer latencies for the software with LLFIO:
 - &lt; 99% spinning rust hard drive latency: Windows **48,185us** FreeBSD **61,834us** Linux **104,507us**
 - &lt; 99% SATA flash drive latency: Windows **1,812us** Linux **1,416us**
 - &lt; 99% NVMe drive latency: Windows **50us** FreeBSD **143us** Linux **40us**

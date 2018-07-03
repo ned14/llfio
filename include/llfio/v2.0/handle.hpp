@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_HANDLE_H
-#define AFIO_HANDLE_H
+#ifndef LLFIO_HANDLE_H
+#define LLFIO_HANDLE_H
 
 #include "deadline.h"
 #include "native_handle_type.hpp"
@@ -39,14 +39,14 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4251)  // dll interface
 #endif
 
-AFIO_V2_NAMESPACE_EXPORT_BEGIN
+LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 class fs_handle;
 
 /*! \class handle
 \brief A native_handle_type which is managed by the lifetime of this object instance.
 */
-class AFIO_DECL handle
+class LLFIO_DECL handle
 {
   friend class fs_handle;
   friend inline std::ostream &operator<<(std::ostream &s, const handle &v);
@@ -180,7 +180,7 @@ public:
   constexpr handle() {}  // NOLINT
   //! Construct a handle from a supplied native handle
   explicit constexpr handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none) noexcept : _caching(caching), _flags(flags), _v(std::move(h)) {}
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~handle();
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~handle();
   //! No copy construction (use clone())
   handle(const handle &) = delete;
   //! No copy assignment
@@ -200,7 +200,7 @@ public:
     return *this;
   }
   //! Swap with another instance
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   void swap(handle &o) noexcept
   {
     handle temp(std::move(*this));
@@ -245,17 +245,17 @@ public:
   taking advantage of directory inodes not having the same instability problems on any
   platform.
   */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_type> current_path() const noexcept;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_type> current_path() const noexcept;
   //! Immediately close the native handle type managed by this handle
-  AFIO_MAKE_FREE_FUNCTION
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept;
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept;
   /*! Clone this handle (copy constructor is disabled to avoid accidental copying)
 
   \errors Any of the values POSIX dup() or DuplicateHandle() can return.
   */
-  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<handle> clone() const noexcept;
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<handle> clone() const noexcept;
   //! Release the native handle type managed by this handle
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept
   {
     native_handle_type ret(std::move(_v));
     return ret;
@@ -280,7 +280,7 @@ public:
   \errors Whatever POSIX fcntl() returns. On Windows nothing is changed on the handle.
   \mallocs No memory allocation.
   */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> set_append_only(bool enable) noexcept;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> set_append_only(bool enable) noexcept;
 
   //! True if overlapped
   bool is_overlapped() const noexcept { return _v.is_overlapped(); }
@@ -422,7 +422,7 @@ template <class T> struct construct
   result<T> operator()() const noexcept { static_assert(!std::is_same<T, T>::value, "construct<T>() was not specialised for the type T supplied"); }
 };
 
-#ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
+#ifndef LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
 namespace detail
 {
   template <class Dest, class Src> inline void fill_failure_info(Dest &dest, const Src &src)
@@ -455,7 +455,7 @@ namespace detail
           dest._tls_path_id2 = dest._tls_path_id1 - 17;  // guaranteed invalid
         }
       }
-#if AFIO_LOGGING_LEVEL >= 2
+#if LLFIO_LOGGING_LEVEL >= 2
       if(log().log_level() >= log_level::error)
       {
         dest._log_id = log().emplace_back(log_level::error, src.message().c_str(), static_cast<uint32_t>(nativeh._init), tls.this_thread_id);
@@ -466,9 +466,9 @@ namespace detail
 }
 #endif
 
-#if AFIO_EXPERIMENTAL_STATUS_CODE
+#if LLFIO_EXPERIMENTAL_STATUS_CODE
 
-#ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
+#ifndef LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
 
 //! Helper for constructing an error code from an errc
 inline error_code generic_error(errc c)
@@ -516,7 +516,7 @@ inline error_code ntkernel_error(SYSTEM_ERROR2_NAMESPACE::win32::NTSTATUS c)
 
 #endif
 
-#else  // AFIO_EXPERIMENTAL_STATUS_CODE
+#else  // LLFIO_EXPERIMENTAL_STATUS_CODE
 
 // failure_info is defined in config.hpp, this is its constructor which needs
 // to be defined here so that we have handle's definition available
@@ -524,14 +524,14 @@ inline error_info::error_info(std::error_code _ec)
     : ec(_ec)
 {
 // Here is a VERY useful place to breakpoint!
-#ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
+#ifndef LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
   if(ec)
   {
     detail::fill_failure_info(*this, this->ec);
   }
 #endif
 }
-#endif  // AFIO_EXPERIMENTAL_STATUS_CODE
+#endif  // LLFIO_EXPERIMENTAL_STATUS_CODE
 
 // Define how we log handles and subclasses thereof
 namespace detail
@@ -540,7 +540,7 @@ namespace detail
   {
     (void) inst;
     (void) buffer;
-    AFIO_LOG_INFO(inst->native_handle()._init, buffer);
+    LLFIO_LOG_INFO(inst->native_handle()._init, buffer);
   }
 }
 
@@ -557,16 +557,16 @@ inline result<void> close(handle &self) noexcept
 }
 // END make_free_functions.py
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
-#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define AFIO_INCLUDED_BY_HEADER 1
+#if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define LLFIO_INCLUDED_BY_HEADER 1
 #ifdef _WIN32
 #include "detail/impl/windows/handle.ipp"
 #else
 #include "detail/impl/posix/handle.ipp"
 #endif
-#undef AFIO_INCLUDED_BY_HEADER
+#undef LLFIO_INCLUDED_BY_HEADER
 #endif
 
 #ifdef _MSC_VER

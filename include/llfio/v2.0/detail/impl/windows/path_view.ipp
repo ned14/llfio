@@ -25,9 +25,9 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../path_view.hpp"
 #include "import.hpp"
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
-AFIO_HEADERS_ONLY_MEMFUNC_SPEC void path_view::c_str::_from_utf8(const path_view &view) noexcept
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC void path_view::c_str::_from_utf8(const path_view &view) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -35,7 +35,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC void path_view::c_str::_from_utf8(const path_view
   NTSTATUS ntstat = RtlUTF8ToUnicodeN(_buffer, static_cast<ULONG>(sizeof(_buffer) - sizeof(wchar_t)), &written, view._state._utf8.data(), static_cast<ULONG>(view._state._utf8.size()));
   if(ntstat < 0)
   {
-    AFIO_LOG_FATAL(ntstat, ntkernel_error(ntstat).message().c_str());
+    LLFIO_LOG_FATAL(ntstat, ntkernel_error(ntstat).message().c_str());
     abort();
   }
   length = static_cast<uint16_t>(written / sizeof(wchar_t));
@@ -52,4 +52,4 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC void path_view::c_str::_from_utf8(const path_view
   buffer = _buffer;
 }
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

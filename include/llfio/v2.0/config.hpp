@@ -22,67 +22,67 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_CONFIG_HPP
-#define AFIO_CONFIG_HPP
+#ifndef LLFIO_CONFIG_HPP
+#define LLFIO_CONFIG_HPP
 
 //#include <iostream>
-//#define AFIO_LOG_TO_OSTREAM std::cerr
-//#define AFIO_LOGGING_LEVEL 6
-//#define AFIO_DISABLE_PATHS_IN_FAILURE_INFO
+//#define LLFIO_LOG_TO_OSTREAM std::cerr
+//#define LLFIO_LOGGING_LEVEL 6
+//#define LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
 
 //! \file config.hpp Configures a compiler environment for AFIO header and source code
 
 //! \defgroup config Configuration macros
 
-#if !defined(AFIO_HEADERS_ONLY) && !defined(BOOST_ALL_DYN_LINK)
+#if !defined(LLFIO_HEADERS_ONLY) && !defined(BOOST_ALL_DYN_LINK)
 //! \brief Whether AFIO is a headers only library. Defaults to 1 unless BOOST_ALL_DYN_LINK is defined. \ingroup config
-#define AFIO_HEADERS_ONLY 1
+#define LLFIO_HEADERS_ONLY 1
 #endif
 
-//! \def AFIO_DISABLE_PATHS_IN_FAILURE_INFO
+//! \def LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
 //! \brief Define to not record the current handle's path in any failure info.
 #if DOXYGEN_IS_IN_THE_HOUSE
-#define AFIO_DISABLE_PATHS_IN_FAILURE_INFO not defined
+#define LLFIO_DISABLE_PATHS_IN_FAILURE_INFO not defined
 #endif
 
-#if !defined(AFIO_LOGGING_LEVEL)
+#if !defined(LLFIO_LOGGING_LEVEL)
 //! \brief How much detail to log. 0=disabled, 1=fatal, 2=error, 3=warn, 4=info, 5=debug, 6=all.
 //! Defaults to error level. \ingroup config
 #ifdef NDEBUG
-#define AFIO_LOGGING_LEVEL 1  // fatal
+#define LLFIO_LOGGING_LEVEL 1  // fatal
 #else
-#define AFIO_LOGGING_LEVEL 3  // warn
+#define LLFIO_LOGGING_LEVEL 3  // warn
 #endif
 #endif
 
-#ifndef AFIO_LOG_TO_OSTREAM
-#if !defined(NDEBUG) && !defined(AFIO_DISABLE_LOG_TO_OSTREAM)
+#ifndef LLFIO_LOG_TO_OSTREAM
+#if !defined(NDEBUG) && !defined(LLFIO_DISABLE_LOG_TO_OSTREAM)
 #include <iostream>  // for std::cerr
 //! \brief Any `ostream` to also log to. If `NDEBUG` is not defined, `std::cerr` is the default.
-#define AFIO_LOG_TO_OSTREAM std::cerr
+#define LLFIO_LOG_TO_OSTREAM std::cerr
 #endif
 #endif
 
-#if !defined(AFIO_LOG_BACKTRACE_LEVELS)
+#if !defined(LLFIO_LOG_BACKTRACE_LEVELS)
 //! \brief Bit mask of which log levels should be stack backtraced
 //! which will slow those logs thirty fold or so. Defaults to (1U<<1U)|(1U<<2U)|(1U<<3U) i.e. stack backtrace
 //! on fatal, error and warn logs. \ingroup config
-#define AFIO_LOG_BACKTRACE_LEVELS ((1U << 1U) | (1U << 2U) | (1U << 3U))
+#define LLFIO_LOG_BACKTRACE_LEVELS ((1U << 1U) | (1U << 2U) | (1U << 3U))
 #endif
 
-#if !defined(AFIO_LOGGING_MEMORY)
+#if !defined(LLFIO_LOGGING_MEMORY)
 #ifdef NDEBUG
-#define AFIO_LOGGING_MEMORY 4096
+#define LLFIO_LOGGING_MEMORY 4096
 #else
 //! \brief How much memory to use for the log.
 //! Defaults to 4Kb if NDEBUG defined, else 1Mb. \ingroup config
-#define AFIO_LOGGING_MEMORY (1024 * 1024)
+#define LLFIO_LOGGING_MEMORY (1024 * 1024)
 #endif
 #endif
 
-#if !defined(AFIO_EXPERIMENTAL_STATUS_CODE)
+#if !defined(LLFIO_EXPERIMENTAL_STATUS_CODE)
 //! \brief Whether to use SG14 experimental `status_code` instead of `std::error_code`
-#define AFIO_EXPERIMENTAL_STATUS_CODE 0
+#define LLFIO_EXPERIMENTAL_STATUS_CODE 0
 #endif
 
 
@@ -101,7 +101,7 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 
 #ifdef __APPLE__
-#define AFIO_MISSING_PIOV 1
+#define LLFIO_MISSING_PIOV 1
 #endif
 
 // Pull in detection of __MINGW64_VERSION_MAJOR
@@ -146,13 +146,13 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "quickcpplib/include/import.h"
 
-#if defined(AFIO_UNSTABLE_VERSION) && !defined(AFIO_DISABLE_ABI_PERMUTATION)
+#if defined(LLFIO_UNSTABLE_VERSION) && !defined(LLFIO_DISABLE_ABI_PERMUTATION)
 #include "../revision.hpp"
-#define AFIO_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(afio_v2, AFIO_PREVIOUS_COMMIT_UNIQUE))
+#define LLFIO_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(afio_v2, LLFIO_PREVIOUS_COMMIT_UNIQUE))
 #else
-#define AFIO_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(afio_v2))
+#define LLFIO_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(afio_v2))
 #endif
-/*! \def AFIO_V2
+/*! \def LLFIO_V2
 \ingroup config
 \brief The namespace configuration of this AFIO v2. Consists of a sequence
 of bracketed tokens later fused by the preprocessor into namespace and C++ module names.
@@ -178,44 +178,44 @@ namespace afio_v2_xxx
 namespace starting with `v2_` inside the `boost::afio` namespace.
 \ingroup config
 */
-#define AFIO_V2_NAMESPACE afio_v2_xxx
+#define LLFIO_V2_NAMESPACE afio_v2_xxx
 /*! \brief Expands into the appropriate namespace markup to enter the AFIO v2 namespace.
 \ingroup config
 */
-#define AFIO_V2_NAMESPACE_BEGIN                                                                                                                                                                                                                                                                                                \
+#define LLFIO_V2_NAMESPACE_BEGIN                                                                                                                                                                                                                                                                                                \
   namespace afio_v2_xxx                                                                                                                                                                                                                                                                                                        \
   {
 /*! \brief Expands into the appropriate namespace markup to enter the C++ module
 exported AFIO v2 namespace.
 \ingroup config
 */
-#define AFIO_V2_NAMESPACE_EXPORT_BEGIN                                                                                                                                                                                                                                                                                         \
+#define LLFIO_V2_NAMESPACE_EXPORT_BEGIN                                                                                                                                                                                                                                                                                         \
   export namespace afio_v2_xxx                                                                                                                                                                                                                                                                                                 \
   {
 /*! \brief Expands into the appropriate namespace markup to exit the AFIO v2 namespace.
 \ingroup config
 */
-#define AFIO_V2_NAMESPACE_END }
-#elif defined(GENERATING_AFIO_MODULE_INTERFACE)
-#define AFIO_V2_NAMESPACE QUICKCPPLIB_BIND_NAMESPACE(AFIO_V2)
-#define AFIO_V2_NAMESPACE_BEGIN QUICKCPPLIB_BIND_NAMESPACE_BEGIN(AFIO_V2)
-#define AFIO_V2_NAMESPACE_EXPORT_BEGIN QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN(AFIO_V2)
-#define AFIO_V2_NAMESPACE_END QUICKCPPLIB_BIND_NAMESPACE_END(AFIO_V2)
+#define LLFIO_V2_NAMESPACE_END }
+#elif defined(GENERATING_LLFIO_MODULE_INTERFACE)
+#define LLFIO_V2_NAMESPACE QUICKCPPLIB_BIND_NAMESPACE(LLFIO_V2)
+#define LLFIO_V2_NAMESPACE_BEGIN QUICKCPPLIB_BIND_NAMESPACE_BEGIN(LLFIO_V2)
+#define LLFIO_V2_NAMESPACE_EXPORT_BEGIN QUICKCPPLIB_BIND_NAMESPACE_EXPORT_BEGIN(LLFIO_V2)
+#define LLFIO_V2_NAMESPACE_END QUICKCPPLIB_BIND_NAMESPACE_END(LLFIO_V2)
 #else
-#define AFIO_V2_NAMESPACE QUICKCPPLIB_BIND_NAMESPACE(AFIO_V2)
-#define AFIO_V2_NAMESPACE_BEGIN QUICKCPPLIB_BIND_NAMESPACE_BEGIN(AFIO_V2)
-#define AFIO_V2_NAMESPACE_EXPORT_BEGIN QUICKCPPLIB_BIND_NAMESPACE_BEGIN(AFIO_V2)
-#define AFIO_V2_NAMESPACE_END QUICKCPPLIB_BIND_NAMESPACE_END(AFIO_V2)
+#define LLFIO_V2_NAMESPACE QUICKCPPLIB_BIND_NAMESPACE(LLFIO_V2)
+#define LLFIO_V2_NAMESPACE_BEGIN QUICKCPPLIB_BIND_NAMESPACE_BEGIN(LLFIO_V2)
+#define LLFIO_V2_NAMESPACE_EXPORT_BEGIN QUICKCPPLIB_BIND_NAMESPACE_BEGIN(LLFIO_V2)
+#define LLFIO_V2_NAMESPACE_END QUICKCPPLIB_BIND_NAMESPACE_END(LLFIO_V2)
 #endif
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 class handle;
 class file_handle;
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
 // Bring in the Boost-lite macros
 #include "quickcpplib/include/config.hpp"
-#if AFIO_LOGGING_LEVEL
+#if LLFIO_LOGGING_LEVEL
 #include "quickcpplib/include/ringbuffer_log.hpp"
 #include "quickcpplib/include/utils/thread.hpp"
 #endif
@@ -224,85 +224,85 @@ AFIO_V2_NAMESPACE_END
 // clang-format off
 #if __has_include(<filesystem>) && __cplusplus >= 202000
 #include <filesystem>
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 namespace filesystem = std::filesystem;
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 #elif __has_include(<experimental/filesystem>)
 #include <experimental/filesystem>
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 namespace filesystem = std::experimental::filesystem;
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 #endif
 #elif __PCPP_ALWAYS_TRUE__
 #include <experimental/filesystem>
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 namespace filesystem = std::experimental::filesystem;
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 // clang-format on
 #elif defined(_MSC_VER)
 #include <filesystem>
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 namespace filesystem = std::experimental::filesystem;
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 #else
 #error No <filesystem> implementation found
 #endif
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 struct path_hasher
 {
   size_t operator()(const filesystem::path &p) const { return std::hash<filesystem::path::string_type>()(p.native()); }
 };
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 #include <ctime>  // for struct timespec
 
 
-// Configure AFIO_DECL
-#if(defined(AFIO_DYN_LINK) || defined(BOOST_ALL_DYN_LINK)) && !defined(AFIO_STATIC_LINK)
+// Configure LLFIO_DECL
+#if(defined(LLFIO_DYN_LINK) || defined(BOOST_ALL_DYN_LINK)) && !defined(LLFIO_STATIC_LINK)
 
-#if defined(AFIO_SOURCE)
-#define AFIO_DECL QUICKCPPLIB_SYMBOL_EXPORT
-#define AFIO_BUILD_DLL
+#if defined(LLFIO_SOURCE)
+#define LLFIO_DECL QUICKCPPLIB_SYMBOL_EXPORT
+#define LLFIO_BUILD_DLL
 #else
-#define AFIO_DECL QUICKCPPLIB_SYMBOL_IMPORT
+#define LLFIO_DECL QUICKCPPLIB_SYMBOL_IMPORT
 #endif
 #else
-#define AFIO_DECL
+#define LLFIO_DECL
 #endif  // building a shared library
 
-// Configure AFIO_THREAD_LOCAL
-#ifndef AFIO_THREAD_LOCAL_IS_CXX11
-#define AFIO_THREAD_LOCAL_IS_CXX11 QUICKCPPLIB_THREAD_LOCAL_IS_CXX11
+// Configure LLFIO_THREAD_LOCAL
+#ifndef LLFIO_THREAD_LOCAL_IS_CXX11
+#define LLFIO_THREAD_LOCAL_IS_CXX11 QUICKCPPLIB_THREAD_LOCAL_IS_CXX11
 #endif
-#ifndef AFIO_THREAD_LOCAL
-#define AFIO_THREAD_LOCAL QUICKCPPLIB_THREAD_LOCAL
+#ifndef LLFIO_THREAD_LOCAL
+#define LLFIO_THREAD_LOCAL QUICKCPPLIB_THREAD_LOCAL
 #endif
-#ifndef AFIO_TEMPLATE
-#define AFIO_TEMPLATE(...) QUICKCPPLIB_TEMPLATE(__VA_ARGS__)
+#ifndef LLFIO_TEMPLATE
+#define LLFIO_TEMPLATE(...) QUICKCPPLIB_TEMPLATE(__VA_ARGS__)
 #endif
-#ifndef AFIO_TREQUIRES
-#define AFIO_TREQUIRES(...) QUICKCPPLIB_TREQUIRES(__VA_ARGS__)
+#ifndef LLFIO_TREQUIRES
+#define LLFIO_TREQUIRES(...) QUICKCPPLIB_TREQUIRES(__VA_ARGS__)
 #endif
-#ifndef AFIO_TEXPR
-#define AFIO_TEXPR(...) QUICKCPPLIB_TEXPR(__VA_ARGS__)
+#ifndef LLFIO_TEXPR
+#define LLFIO_TEXPR(...) QUICKCPPLIB_TEXPR(__VA_ARGS__)
 #endif
-#ifndef AFIO_TPRED
-#define AFIO_TPRED(...) QUICKCPPLIB_TPRED(__VA_ARGS__)
+#ifndef LLFIO_TPRED
+#define LLFIO_TPRED(...) QUICKCPPLIB_TPRED(__VA_ARGS__)
 #endif
-#ifndef AFIO_REQUIRES
-#define AFIO_REQUIRES(...) QUICKCPPLIB_REQUIRES(__VA_ARGS__)
+#ifndef LLFIO_REQUIRES
+#define LLFIO_REQUIRES(...) QUICKCPPLIB_REQUIRES(__VA_ARGS__)
 #endif
 
 // A unique identifier generating macro
-#define AFIO_GLUE2(x, y) x##y
-#define AFIO_GLUE(x, y) AFIO_GLUE2(x, y)
-#define AFIO_UNIQUE_NAME AFIO_GLUE(__t, __COUNTER__)
+#define LLFIO_GLUE2(x, y) x##y
+#define LLFIO_GLUE(x, y) LLFIO_GLUE2(x, y)
+#define LLFIO_UNIQUE_NAME LLFIO_GLUE(__t, __COUNTER__)
 
 // Used to tag functions which need to be made free by the AST tool
-#ifndef AFIO_MAKE_FREE_FUNCTION
+#ifndef LLFIO_MAKE_FREE_FUNCTION
 #if 0  //__cplusplus >= 201700  // makes annoying warnings
-#define AFIO_MAKE_FREE_FUNCTION [[afio::make_free_function]]
+#define LLFIO_MAKE_FREE_FUNCTION [[afio::make_free_function]]
 #else
-#define AFIO_MAKE_FREE_FUNCTION
+#define LLFIO_MAKE_FREE_FUNCTION
 #endif
 #endif
 
@@ -310,57 +310,57 @@ AFIO_V2_NAMESPACE_END
 #include "quickcpplib/include/bitfield.hpp"
 // Bring in scoped undo
 #include "quickcpplib/include/scoped_undo.hpp"
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 using QUICKCPPLIB_NAMESPACE::scoped_undo::undoer;
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 // Bring in a span implementation
 #include "quickcpplib/include/span.hpp"
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 using namespace QUICKCPPLIB_NAMESPACE::span;
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 // Bring in an optional implementation
 #include "quickcpplib/include/optional.hpp"
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 using namespace QUICKCPPLIB_NAMESPACE::optional;
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 // Bring in a byte implementation
 #include "quickcpplib/include/byte.hpp"
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 using QUICKCPPLIB_NAMESPACE::byte::byte;
 using QUICKCPPLIB_NAMESPACE::byte::to_byte;
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 // Bring in a string_view implementation
 #include "quickcpplib/include/string_view.hpp"
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 using namespace QUICKCPPLIB_NAMESPACE::string_view;
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 // Bring in a persistent implementation
 #include "quickcpplib/include/persistent.hpp"
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 using namespace QUICKCPPLIB_NAMESPACE::persistence;
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 namespace detail
 {
   // Used to cast an unknown input to some unsigned integer
-  AFIO_TEMPLATE(class T, class U)
-  AFIO_TREQUIRES(AFIO_TPRED(std::is_unsigned<T>::value && !std::is_same<std::decay_t<U>, std::nullptr_t>::value))
+  LLFIO_TEMPLATE(class T, class U)
+  LLFIO_TREQUIRES(LLFIO_TPRED(std::is_unsigned<T>::value && !std::is_same<std::decay_t<U>, std::nullptr_t>::value))
   inline T unsigned_integer_cast(U &&v) { return static_cast<T>(v); }
-  AFIO_TEMPLATE(class T)
-  AFIO_TREQUIRES(AFIO_TPRED(std::is_unsigned<T>::value))
+  LLFIO_TEMPLATE(class T)
+  LLFIO_TREQUIRES(LLFIO_TPRED(std::is_unsigned<T>::value))
   inline T unsigned_integer_cast(std::nullptr_t /* unused */) { return static_cast<T>(0); }
-  AFIO_TEMPLATE(class T, class U)
-  AFIO_TREQUIRES(AFIO_TPRED(std::is_unsigned<T>::value))
+  LLFIO_TEMPLATE(class T, class U)
+  LLFIO_TREQUIRES(LLFIO_TPRED(std::is_unsigned<T>::value))
   inline T unsigned_integer_cast(U *v) { return static_cast<T>(reinterpret_cast<uintptr_t>(v)); }
 }  // namespace detail
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 namespace detail
 {
@@ -445,18 +445,18 @@ namespace win
   using dword = unsigned long;
 }
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
 
 #if 0
 ///////////////////////////////////////////////////////////////////////////////
 //  Auto library naming
-#if !defined(AFIO_SOURCE) && !defined(BOOST_ALL_NO_LIB) && !defined(AFIO_NO_LIB) && !AFIO_STANDALONE && !AFIO_HEADERS_ONLY
+#if !defined(LLFIO_SOURCE) && !defined(BOOST_ALL_NO_LIB) && !defined(LLFIO_NO_LIB) && !LLFIO_STANDALONE && !LLFIO_HEADERS_ONLY
 
 #define BOOST_LIB_NAME boost_afio
 
 // tell the auto-link code to select a dll when required:
-#if defined(BOOST_ALL_DYN_LINK) || defined(AFIO_DYN_LINK)
+#if defined(BOOST_ALL_DYN_LINK) || defined(LLFIO_DYN_LINK)
 #define BOOST_DYN_LINK
 #endif
 
@@ -469,26 +469,26 @@ AFIO_V2_NAMESPACE_END
 //#define BOOST_THREAD_PROVIDES_VARIADIC_THREAD
 //#define BOOST_THREAD_DONT_PROVIDE_FUTURE
 //#define BOOST_THREAD_PROVIDES_SIGNATURE_PACKAGED_TASK
-#if AFIO_HEADERS_ONLY == 1 && !defined(AFIO_SOURCE)
+#if LLFIO_HEADERS_ONLY == 1 && !defined(LLFIO_SOURCE)
 /*! \brief Expands into the appropriate markup to declare an `extern`
 function exported from the AFIO DLL if not building headers only.
 \ingroup config
 */
-#define AFIO_HEADERS_ONLY_FUNC_SPEC inline
+#define LLFIO_HEADERS_ONLY_FUNC_SPEC inline
 /*! \brief Expands into the appropriate markup to declare a class member
 function exported from the AFIO DLL if not building headers only.
 \ingroup config
 */
-#define AFIO_HEADERS_ONLY_MEMFUNC_SPEC inline
+#define LLFIO_HEADERS_ONLY_MEMFUNC_SPEC inline
 /*! \brief Expands into the appropriate markup to declare a virtual class member
 function exported from the AFIO DLL if not building headers only.
 \ingroup config
 */
-#define AFIO_HEADERS_ONLY_VIRTUAL_SPEC inline virtual
+#define LLFIO_HEADERS_ONLY_VIRTUAL_SPEC inline virtual
 #else
-#define AFIO_HEADERS_ONLY_FUNC_SPEC extern AFIO_DECL
-#define AFIO_HEADERS_ONLY_MEMFUNC_SPEC
-#define AFIO_HEADERS_ONLY_VIRTUAL_SPEC virtual
+#define LLFIO_HEADERS_ONLY_FUNC_SPEC extern LLFIO_DECL
+#define LLFIO_HEADERS_ONLY_MEMFUNC_SPEC
+#define LLFIO_HEADERS_ONLY_VIRTUAL_SPEC virtual
 #endif
 
 #endif

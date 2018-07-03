@@ -22,15 +22,15 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_MAPPED_VIEW_HPP
-#define AFIO_MAPPED_VIEW_HPP
+#ifndef LLFIO_MAPPED_VIEW_HPP
+#define LLFIO_MAPPED_VIEW_HPP
 
 #include "../mapped_file_handle.hpp"
 #include "../utils.hpp"
 
 //! \file mapped_span.hpp Provides typed view of mapped section.
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
@@ -119,6 +119,6 @@ namespace algorithm
   };
 }  // namespace algorithm
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
 #endif

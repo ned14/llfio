@@ -26,13 +26,13 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "import.hpp"
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 result<path_handle> path_handle::path(const path_handle &base, path_handle::path_view_type path) noexcept
 {
   result<path_handle> ret{path_handle(native_handle_type())};
   native_handle_type &nativeh = ret.value()._v;
-  AFIO_LOG_FUNCTION_CALL(&ret);
+  LLFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::directory;
   int attribs = O_CLOEXEC | O_RDONLY;
 #ifdef O_DIRECTORY
@@ -58,4 +58,4 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
   return ret;
 }
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

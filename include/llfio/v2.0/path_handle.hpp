@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_PATH_HANDLE_H
-#define AFIO_PATH_HANDLE_H
+#ifndef LLFIO_PATH_HANDLE_H
+#define LLFIO_PATH_HANDLE_H
 
 #include "handle.hpp"
 #include "path_view.hpp"
@@ -35,7 +35,7 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4251)  // dll interface
 #endif
 
-AFIO_V2_NAMESPACE_EXPORT_BEGIN
+LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 class directory_handle;
 
@@ -46,7 +46,7 @@ unpredictably relocate over time. This handle is thus an *anchor* to a subset is
 filing system, free of any race conditions introduced by third party changes to any part
 of the path leading to that island.
 */
-class AFIO_DECL path_handle : public handle
+class LLFIO_DECL path_handle : public handle
 {
   friend class directory_handle;
 
@@ -88,11 +88,11 @@ public:
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> path(const path_handle &base, path_view_type path) noexcept;
+  LLFIO_MAKE_FREE_FUNCTION
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> path(const path_handle &base, path_view_type path) noexcept;
   //! \overload
-  AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> path(path_view_type _path) noexcept { return path(path_handle(), _path); }
+  LLFIO_MAKE_FREE_FUNCTION
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> path(path_view_type _path) noexcept { return path(path_handle(), _path); }
 };
 
 //! \brief Constructor for `path_handle`
@@ -122,16 +122,16 @@ inline result<path_handle> path(path_handle::path_view_type _path) noexcept
 }
 // END make_free_functions.py
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
-#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define AFIO_INCLUDED_BY_HEADER 1
+#if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define LLFIO_INCLUDED_BY_HEADER 1
 #ifdef _WIN32
 #include "detail/impl/windows/path_handle.ipp"
 #else
 #include "detail/impl/posix/path_handle.ipp"
 #endif
-#undef AFIO_INCLUDED_BY_HEADER
+#undef LLFIO_INCLUDED_BY_HEADER
 #endif
 
 #ifdef _MSC_VER

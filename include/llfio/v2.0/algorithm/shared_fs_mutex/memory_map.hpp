@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_SHARED_FS_MUTEX_MEMORY_MAP_HPP
-#define AFIO_SHARED_FS_MUTEX_MEMORY_MAP_HPP
+#ifndef LLFIO_SHARED_FS_MUTEX_MEMORY_MAP_HPP
+#define LLFIO_SHARED_FS_MUTEX_MEMORY_MAP_HPP
 
 #include "../../map_handle.hpp"
 #include "base.hpp"
@@ -51,7 +51,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! \file memory_map.hpp Provides algorithm::shared_fs_mutex::memory_map
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
@@ -168,7 +168,7 @@ namespace algorithm
 #ifndef NDEBUG
           if(!lockresult && lockresult.error() != errc::timed_out)
           {
-            AFIO_LOG_FATAL(0, "memory_map::~memory_map() try_lock failed");
+            LLFIO_LOG_FATAL(0, "memory_map::~memory_map() try_lock failed");
             abort();
           }
 #endif
@@ -178,7 +178,7 @@ namespace algorithm
             auto o2 = _h.truncate(0);
             if(!o2)
             {
-              AFIO_LOG_FATAL(0, "memory_map::~memory_map() truncate failed");
+              LLFIO_LOG_FATAL(0, "memory_map::~memory_map() truncate failed");
 #ifndef NDEBUG
               std::cerr << "~memory_map() truncate failed due to " << o2.error().message().c_str() << std::endl;
 #endif
@@ -193,7 +193,7 @@ namespace algorithm
               std::cerr << "~memory_map() unlink failed due to " << o3.error().message().c_str() << std::endl;
 #endif
 #else
-              AFIO_LOG_FATAL(0, "memory_map::~memory_map() unlink failed");
+              LLFIO_LOG_FATAL(0, "memory_map::~memory_map() unlink failed");
 #ifndef NDEBUG
               std::cerr << "~memory_map() unlink failed due to " << o3.error().message().c_str() << std::endl;
 #endif
@@ -209,10 +209,10 @@ namespace algorithm
       but a particularly important one is `errc::no_lock_available` which will be returned if the lock
       is in use by another computer on a network.
       */
-      AFIO_MAKE_FREE_FUNCTION
+      LLFIO_MAKE_FREE_FUNCTION
       static result<memory_map> fs_mutex_map(const path_handle &base, path_view lockfile) noexcept
       {
-        AFIO_LOG_FUNCTION_CALL(0);
+        LLFIO_LOG_FUNCTION_CALL(0);
         try
         {
           OUTCOME_TRY(ret, file_handle::file(base, lockfile, file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::reads));
@@ -323,9 +323,9 @@ namespace algorithm
         }
         return span<_entity_idx>(entity_to_idx, ep - entity_to_idx);
       }
-      AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept final
+      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept final
       {
-        AFIO_LOG_FUNCTION_CALL(this);
+        LLFIO_LOG_FUNCTION_CALL(this);
         std::chrono::steady_clock::time_point began_steady;
         std::chrono::system_clock::time_point end_utc;
         if(d)
@@ -407,9 +407,9 @@ namespace algorithm
       }
 
     public:
-      AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long /*unused*/) noexcept final
+      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long /*unused*/) noexcept final
       {
-        AFIO_LOG_FUNCTION_CALL(this);
+        LLFIO_LOG_FUNCTION_CALL(this);
         span<_entity_idx> entity_to_idx(_hash_entities(reinterpret_cast<_entity_idx *>(alloca(sizeof(_entity_idx) * entities.size())), entities));
         _hash_index_type &index = _index();
         for(const auto &i : entity_to_idx)
@@ -422,7 +422,7 @@ namespace algorithm
   }  // namespace shared_fs_mutex
 }  // namespace algorithm
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
 
 #endif

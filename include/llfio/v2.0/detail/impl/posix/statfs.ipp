@@ -31,9 +31,9 @@ Distributed under the Boost Software License, Version 1.0.
 #include <sys/statfs.h>
 #endif
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
-AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, statfs_t::want wanted) noexcept
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, statfs_t::want wanted) noexcept
 {
   size_t ret = 0;
 #ifdef __linux__
@@ -141,7 +141,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
           }
         }
       }
-#ifndef AFIO_COMPILING_FOR_GCOV
+#ifndef LLFIO_COMPILING_FOR_GCOV
       if(mountentries.empty())
       {
         return errc::no_such_file_or_directory;
@@ -297,4 +297,4 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
   return ret;
 }
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

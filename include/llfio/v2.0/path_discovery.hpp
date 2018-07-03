@@ -22,15 +22,15 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_PATH_DISCOVERY_H
-#define AFIO_PATH_DISCOVERY_H
+#ifndef LLFIO_PATH_DISCOVERY_H
+#define LLFIO_PATH_DISCOVERY_H
 
 #include "fs_handle.hpp"
 #include "stat.hpp"
 
 //! \file path_discovery.hpp Provides `path_discovery`
 
-AFIO_V2_NAMESPACE_EXPORT_BEGIN
+LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 //! \brief Contains functions used to discover suitable paths for things
 namespace path_discovery
@@ -77,7 +77,7 @@ namespace path_discovery
   may allocate additional memory for paths returned.
   \errors This call never fails, except to return an empty span.
   */
-  AFIO_HEADERS_ONLY_FUNC_SPEC span<discovered_path> all_temporary_directories(bool refresh = false) noexcept;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC span<discovered_path> all_temporary_directories(bool refresh = false) noexcept;
 
   /*! \brief Returns a subset of `all_temporary_directories()` each of which has been tested to be writable
   by the current process. No testing is done of available writable space.
@@ -91,7 +91,7 @@ namespace path_discovery
   \errors This call never fails, though if it fails to find any writable temporary directory, it will
   terminate the process.
   */
-  AFIO_HEADERS_ONLY_FUNC_SPEC span<discovered_path> verified_temporary_directories() noexcept;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC span<discovered_path> verified_temporary_directories() noexcept;
 
   /*! \brief Returns a reference to an open handle to a verified temporary directory where files created are
   stored in a filesystem directory, usually under the current user's quota.
@@ -103,7 +103,7 @@ namespace path_discovery
 
   The handle is created during `verified_temporary_directories()` and is statically cached thereafter.
   */
-  AFIO_HEADERS_ONLY_FUNC_SPEC const path_handle &storage_backed_temporary_files_directory() noexcept;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC const path_handle &storage_backed_temporary_files_directory() noexcept;
 
   /*! \brief Returns a reference to an open handle to a verified temporary directory where files created are
   stored in memory/paging file, and thus access may be a lot quicker, but stronger limits on
@@ -120,10 +120,10 @@ namespace path_discovery
   the same extent into multiple addresses e.g. to implement a constant time zero copy `realloc()`,
   strongly consider using a non-file-backed `section_handle` as this is more portable.
   */
-  AFIO_HEADERS_ONLY_FUNC_SPEC const path_handle &memory_backed_temporary_files_directory() noexcept;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC const path_handle &memory_backed_temporary_files_directory() noexcept;
 }  // namespace path_discovery
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
 // .ipp is included by file_handle.hpp if in header only mode
 

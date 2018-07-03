@@ -27,20 +27,20 @@ Distributed under the Boost Software License, Version 1.0.
 template <class U> inline void directory_handle_enumerate_(U &&f)
 {
   using namespace KERNELTEST_V1_NAMESPACE;
-  using AFIO_V2_NAMESPACE::result;
-  using AFIO_V2_NAMESPACE::path_view;
-  using AFIO_V2_NAMESPACE::directory_entry;
-  using AFIO_V2_NAMESPACE::directory_handle;
-  using filter = AFIO_V2_NAMESPACE::directory_handle::filter;
+  using LLFIO_V2_NAMESPACE::result;
+  using LLFIO_V2_NAMESPACE::path_view;
+  using LLFIO_V2_NAMESPACE::directory_entry;
+  using LLFIO_V2_NAMESPACE::directory_handle;
+  using filter = LLFIO_V2_NAMESPACE::directory_handle::filter;
 
   static directory_entry _entries[5];
-  static AFIO_V2_NAMESPACE::span<directory_entry> entries(_entries);
+  static LLFIO_V2_NAMESPACE::span<directory_entry> entries(_entries);
 
   // clang-format off
   static const auto permuter(mt_permute_parameters<
     result<void>,
     parameters<                              
-      AFIO_V2_NAMESPACE::span<directory_entry> *,
+      LLFIO_V2_NAMESPACE::span<directory_entry> *,
       path_view,
       filter
     >,

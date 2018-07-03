@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_SHARED_FS_MUTEX_BASE_HPP
-#define AFIO_SHARED_FS_MUTEX_BASE_HPP
+#ifndef LLFIO_SHARED_FS_MUTEX_BASE_HPP
+#define LLFIO_SHARED_FS_MUTEX_BASE_HPP
 
 #include "../../handle.hpp"
 
@@ -42,7 +42,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! \file base.hpp Provides algorithm::shared_fs_mutex::shared_fs_mutex
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
@@ -113,7 +113,7 @@ namespace algorithm
       shared_fs_mutex &operator=(shared_fs_mutex &&) = default;
 
     public:
-      AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~shared_fs_mutex() = default;
+      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~shared_fs_mutex() = default;
 
       //! Generates an entity id from a sequence of bytes
       entity_type entity_from_buffer(const char *buffer, size_t bytes, bool exclusive = true) noexcept
@@ -238,7 +238,7 @@ namespace algorithm
   }  // namespace shared_fs_mutex
 }  // namespace algorithm
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
 
 #endif

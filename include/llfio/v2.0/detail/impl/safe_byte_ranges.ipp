@@ -51,7 +51,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <mutex>
 #include <unordered_map>
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
@@ -141,12 +141,12 @@ namespace algorithm
       public:
         threaded_byte_ranges(const path_handle &base, path_view lockfile)
         {
-          AFIO_LOG_FUNCTION_CALL(0);
+          LLFIO_LOG_FUNCTION_CALL(0);
           _h = file_handle::file(base, lockfile, file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary).value();
         }
-        AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept final
+        LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept final
         {
-          AFIO_LOG_FUNCTION_CALL(this);
+          LLFIO_LOG_FUNCTION_CALL(this);
           unsigned mythreadid = QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id();
           std::chrono::steady_clock::time_point began_steady;
           std::chrono::system_clock::time_point end_utc;
@@ -366,9 +366,9 @@ namespace algorithm
           }
           // return success();
         }
-        AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long /*unused*/) noexcept final
+        LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long /*unused*/) noexcept final
         {
-          AFIO_LOG_FUNCTION_CALL(this);
+          LLFIO_LOG_FUNCTION_CALL(this);
           unsigned mythreadid = QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id();
           std::unique_lock<decltype(_m)> guard(_m);
           for(auto &entity : entities)
@@ -388,7 +388,7 @@ namespace algorithm
         static threaded_byte_ranges_list v;
         return v;
       }
-      AFIO_HEADERS_ONLY_FUNC_SPEC result<std::shared_ptr<shared_fs_mutex>> inode_to_fs_mutex(const path_handle &base, path_view lockfile) noexcept
+      LLFIO_HEADERS_ONLY_FUNC_SPEC result<std::shared_ptr<shared_fs_mutex>> inode_to_fs_mutex(const path_handle &base, path_view lockfile) noexcept
       {
         try
         {
@@ -435,4 +435,4 @@ namespace algorithm
   }    // namespace shared_fs_mutex
 }  // namespace algorithm
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

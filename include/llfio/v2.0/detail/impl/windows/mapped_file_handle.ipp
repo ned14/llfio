@@ -25,11 +25,11 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../mapped_file_handle.hpp"
 #include "import.hpp"
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type reservation) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(reservation == 0)
   {
     OUTCOME_TRY(length, underlying_file_maximum_extent());
@@ -66,7 +66,7 @@ result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type rese
 
 result<void> mapped_file_handle::close() noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(_mh.is_valid())
   {
     OUTCOME_TRYV(_mh.close());
@@ -79,7 +79,7 @@ result<void> mapped_file_handle::close() noexcept
 }
 native_handle_type mapped_file_handle::release() noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(_mh.is_valid())
   {
     (void) _mh.close();
@@ -93,7 +93,7 @@ native_handle_type mapped_file_handle::release() noexcept
 
 result<mapped_file_handle::extent_type> mapped_file_handle::truncate(extent_type newsize) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   // Release all maps and sections and truncate the backing file to zero
   if(newsize == 0)
   {
@@ -178,4 +178,4 @@ result<mapped_file_handle::extent_type> mapped_file_handle::update_map() noexcep
   return length;
 }
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

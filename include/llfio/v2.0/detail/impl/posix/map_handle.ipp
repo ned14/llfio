@@ -37,7 +37,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <sys/mman.h>
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 section_handle::~section_handle()
 {
@@ -46,14 +46,14 @@ section_handle::~section_handle()
     auto ret = section_handle::close();
     if(ret.has_error())
     {
-      AFIO_LOG_FATAL(_v.h, "section_handle::~section_handle() close failed");
+      LLFIO_LOG_FATAL(_v.h, "section_handle::~section_handle() close failed");
       abort();
     }
   }
 }
 result<void> section_handle::close() noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(_v)
   {
     // We don't want ~handle() to close our handle borrowed from the backing file or _anonymous
@@ -79,7 +79,7 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
     nativeh.behaviour |= native_handle_type::disposition::writable;
   }
   nativeh.behaviour |= native_handle_type::disposition::section;
-  AFIO_LOG_FUNCTION_CALL(&ret);
+  LLFIO_LOG_FUNCTION_CALL(&ret);
   return ret;
 }
 
@@ -100,13 +100,13 @@ result<section_handle> section_handle::section(extent_type bytes, const path_han
     nativeh.behaviour |= native_handle_type::disposition::writable;
   }
   nativeh.behaviour |= native_handle_type::disposition::section;
-  AFIO_LOG_FUNCTION_CALL(&ret);
+  LLFIO_LOG_FUNCTION_CALL(&ret);
   return ret;
 }
 
 result<section_handle::extent_type> section_handle::length() const noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   struct stat s
   {
   };
@@ -120,7 +120,7 @@ result<section_handle::extent_type> section_handle::length() const noexcept
 
 result<section_handle::extent_type> section_handle::truncate(extent_type newsize) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if((_backing == nullptr) && newsize > 0)
   {
     if(-1 == ::ftruncate(_anonymous.native_handle().fd, newsize))
@@ -143,7 +143,7 @@ map_handle::~map_handle()
     auto ret = map_handle::close();
     if(ret.has_error())
     {
-      AFIO_LOG_FATAL(_v.fd, "map_handle::~map_handle() close failed");
+      LLFIO_LOG_FATAL(_v.fd, "map_handle::~map_handle() close failed");
       abort();
     }
   }
@@ -151,7 +151,7 @@ map_handle::~map_handle()
 
 result<void> map_handle::close() noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(_addr != nullptr)
   {
     if(is_writable() && (_flag & section_handle::flag::barrier_on_close))
@@ -173,7 +173,7 @@ result<void> map_handle::close() noexcept
 
 native_handle_type map_handle::release() noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   // We don't want ~handle() to close our borrowed handle
   _v = native_handle_type();
   _addr = nullptr;
@@ -183,7 +183,7 @@ native_handle_type map_handle::release() noexcept
 
 map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_handle::io_request<map_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   byte *addr = _addr + reqs.offset;
   extent_type bytes = 0;
   // Check for overflow
@@ -318,7 +318,7 @@ result<map_handle> map_handle::map(size_type bytes, section_handle::flag _flag) 
   ret.value()._addr = static_cast<byte *>(addr);
   ret.value()._reservation = bytes;
   ret.value()._length = bytes;
-  AFIO_LOG_FUNCTION_CALL(&ret);
+  LLFIO_LOG_FUNCTION_CALL(&ret);
   return ret;
 }
 
@@ -338,13 +338,13 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   ret.value()._length = (length - offset < bytes) ? (length - offset) : bytes;  // length of backing, not reservation
   // Make my handle borrow the native handle of my backing storage
   ret.value()._v.fd = section.native_handle().fd;
-  AFIO_LOG_FUNCTION_CALL(&ret);
+  LLFIO_LOG_FUNCTION_CALL(&ret);
   return ret;
 }
 
 result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permit_relocation) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   extent_type length = _length;
   if(_section != nullptr)
   {
@@ -425,7 +425,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
 
 result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_handle::flag flag) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(region.data == nullptr)
   {
     return errc::invalid_argument;
@@ -445,7 +445,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
 
 result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(region.data == nullptr)
   {
     return errc::invalid_argument;
@@ -465,7 +465,7 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
 
 result<void> map_handle::zero_memory(buffer_type region) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(region.data == nullptr)
   {
     return errc::invalid_argument;
@@ -487,7 +487,7 @@ result<void> map_handle::zero_memory(buffer_type region) noexcept
 
 result<span<map_handle::buffer_type>> map_handle::prefetch(span<buffer_type> regions) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(0);
+  LLFIO_LOG_FUNCTION_CALL(0);
   for(const auto &region : regions)
   {
     if(-1 == ::madvise(region.data, region.len, MADV_WILLNEED))
@@ -500,7 +500,7 @@ result<span<map_handle::buffer_type>> map_handle::prefetch(span<buffer_type> reg
 
 result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(0);
+  LLFIO_LOG_FUNCTION_CALL(0);
   region = utils::round_to_page_size(region);
   if(region.data == nullptr)
   {
@@ -526,7 +526,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
 
 map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buffers_type> reqs, deadline /*d*/) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   byte *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
   for(buffer_type &req : reqs.buffers)
@@ -551,7 +551,7 @@ map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buff
 
 map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_request<const_buffers_type> reqs, deadline /*d*/) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   byte *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
   if(QUICKCPPLIB_NAMESPACE::signal_guard::signal_guard(QUICKCPPLIB_NAMESPACE::signal_guard::signalc::undefined_memory_access,
@@ -593,4 +593,4 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
   return reqs.buffers;
 }
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

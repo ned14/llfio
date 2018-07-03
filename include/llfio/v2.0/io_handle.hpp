@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_IO_HANDLE_H
-#define AFIO_IO_HANDLE_H
+#ifndef LLFIO_IO_HANDLE_H
+#define LLFIO_IO_HANDLE_H
 
 #include "handle.hpp"
 
@@ -34,12 +34,12 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4251)  // dll interface
 #endif
 
-AFIO_V2_NAMESPACE_EXPORT_BEGIN
+LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 /*! \class io_handle
 \brief A handle to something capable of scatter-gather i/o.
 */
-class AFIO_DECL io_handle : public handle
+class LLFIO_DECL io_handle : public handle
 {
 public:
   using path_type = handle::path_type;
@@ -155,9 +155,9 @@ public:
   static_assert(std::is_standard_layout<io_request<buffers_type>>::value, "io_request<buffers_type> is not a standard layout type!");
 #endif
   //! The i/o result type used by this handle. Guaranteed to be `TrivialType` apart from construction..
-  template <class T> struct io_result : public AFIO_V2_NAMESPACE::result<T>
+  template <class T> struct io_result : public LLFIO_V2_NAMESPACE::result<T>
   {
-    using Base = AFIO_V2_NAMESPACE::result<T>;
+    using Base = LLFIO_V2_NAMESPACE::result<T>;
     size_type _bytes_transferred{static_cast<size_type>(-1)};
 
 #if defined(_MSC_VER) && !defined(__clang__)  // workaround MSVC parsing bug
@@ -241,7 +241,7 @@ public:
   Microsoft Windows and OS X does not implement scatter-gather file i/o syscalls.
   Thus this function will always return `1` in that situation.
   */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t max_buffers() const noexcept;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t max_buffers() const noexcept;
 
   /*! \brief Read data from the open handle.
 
@@ -262,10 +262,10 @@ public:
   \mallocs The default synchronous implementation in file_handle performs no memory allocation.
   The asynchronous implementation in async_file_handle performs one calloc and one free.
   */
-  AFIO_MAKE_FREE_FUNCTION
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept;
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept;
   //! \overload
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   io_result<buffers_type> read(extent_type offset, std::initializer_list<buffer_type> lst, deadline d = deadline()) noexcept
   {
     buffer_type *_reqs = reinterpret_cast<buffer_type *>(alloca(sizeof(buffer_type) * lst.size()));
@@ -295,10 +295,10 @@ public:
   \mallocs The default synchronous implementation in file_handle performs no memory allocation.
   The asynchronous implementation in async_file_handle performs one calloc and one free.
   */
-  AFIO_MAKE_FREE_FUNCTION
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept;
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept;
   //! \overload
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   io_result<const_buffers_type> write(extent_type offset, std::initializer_list<const_buffer_type> lst, deadline d = deadline()) noexcept
   {
     const_buffer_type *_reqs = reinterpret_cast<const_buffer_type *>(alloca(sizeof(const_buffer_type) * lst.size()));
@@ -338,7 +338,7 @@ public:
   \errors Any of the values POSIX fdatasync() or Windows NtFlushBuffersFileEx() can return.
   \mallocs None.
   */
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   virtual io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept = 0;
 
   /*! \class extent_guard
@@ -450,7 +450,7 @@ public:
   \mallocs The default synchronous implementation in file_handle performs no memory allocation.
   The asynchronous implementation in async_file_handle performs one calloc and one free.
   */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_guard> lock(extent_type offset, extent_type bytes, bool exclusive = true, deadline d = deadline()) noexcept;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_guard> lock(extent_type offset, extent_type bytes, bool exclusive = true, deadline d = deadline()) noexcept;
   //! \overload
   result<extent_guard> try_lock(extent_type offset, extent_type bytes, bool exclusive = true) noexcept { return lock(offset, bytes, exclusive, deadline(std::chrono::seconds(0))); }
   //! \overload Locks for shared access
@@ -489,7 +489,7 @@ public:
   \errors Any of the values POSIX fcntl() can return.
   \mallocs None.
   */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(extent_type offset, extent_type bytes) noexcept;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(extent_type offset, extent_type bytes) noexcept;
 };
 
 
@@ -592,16 +592,16 @@ inline io_handle::io_result<io_handle::const_buffers_type> barrier(io_handle &se
 }
 // END make_free_functions.py
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
-#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define AFIO_INCLUDED_BY_HEADER 1
+#if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define LLFIO_INCLUDED_BY_HEADER 1
 #ifdef _WIN32
 #include "detail/impl/windows/io_handle.ipp"
 #else
 #include "detail/impl/posix/io_handle.ipp"
 #endif
-#undef AFIO_INCLUDED_BY_HEADER
+#undef LLFIO_INCLUDED_BY_HEADER
 #endif
 
 #ifdef _MSC_VER

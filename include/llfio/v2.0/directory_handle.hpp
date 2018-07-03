@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_DIRECTORY_HANDLE_H
-#define AFIO_DIRECTORY_HANDLE_H
+#ifndef LLFIO_DIRECTORY_HANDLE_H
+#define LLFIO_DIRECTORY_HANDLE_H
 
 #include "path_discovery.hpp"
 #include "stat.hpp"
@@ -37,7 +37,7 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4251)  // dll interface
 #endif
 
-AFIO_V2_NAMESPACE_EXPORT_BEGIN
+LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 struct directory_entry
 {
@@ -61,9 +61,9 @@ static_assert(std::is_standard_layout<directory_entry>::value, "directory_entry 
 /*! \class directory_handle
 \brief A handle to a directory which can be enumerated.
 */
-class AFIO_DECL directory_handle : public path_handle, public fs_handle
+class LLFIO_DECL directory_handle : public path_handle, public fs_handle
 {
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept final { return *this; }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept final { return *this; }
 
 public:
   using path_type = path_handle::path_type;
@@ -151,7 +151,7 @@ public:
   //! No copy assignment
   directory_handle &operator=(const directory_handle &) = delete;
   //! Swap with another instance
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   void swap(directory_handle &o) noexcept
   {
     directory_handle temp(std::move(*this));
@@ -163,15 +163,15 @@ public:
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<directory_handle> directory(const path_handle &base, path_view_type path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept;
+  LLFIO_MAKE_FREE_FUNCTION
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<directory_handle> directory(const path_handle &base, path_view_type path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept;
   /*! Create a directory handle creating a randomly named file on a path.
   The file is opened exclusively with `creation::only_if_not_exist` so it
   will never collide with nor overwrite any existing entry.
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   static inline result<directory_handle> random_directory(const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::temporary, flag flags = flag::none) noexcept
   {
     try
@@ -199,23 +199,23 @@ public:
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   static inline result<directory_handle> temp_directory(path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::all, flag flags = flag::none) noexcept
   {
     auto &tempdirh = path_discovery::storage_backed_temporary_files_directory();
     return name.empty() ? random_directory(tempdirh, _mode, _caching, flags) : directory(tempdirh, name, _mode, _creation, _caching, flags);
   }
 
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~directory_handle() override
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~directory_handle() override
   {
     if(_v)
     {
       (void) directory_handle::close();
     }
   }
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override
   {
-    AFIO_LOG_FUNCTION_CALL(this);
+    LLFIO_LOG_FUNCTION_CALL(this);
     if(_flags & flag::unlink_on_first_close)
     {
       auto ret = unlink();
@@ -242,7 +242,7 @@ public:
   \mallocs On POSIX if changing the mode, we must loop calling `current_path()` and
   trying to open the path returned. Thus many allocations may occur.
   */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<directory_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<directory_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
 
   /*! Return a copy of this directory handle, but as a path handle.
 
@@ -250,12 +250,12 @@ public:
   \mallocs On POSIX, we must loop calling `current_path()` and
   trying to open the path returned. Thus many allocations may occur.
   */
-  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> clone_to_path_handle() const noexcept;
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> clone_to_path_handle() const noexcept;
 
 #ifdef _WIN32
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
   result<void> relink(const path_handle &base, path_view_type newpath, bool atomic_replace = true, deadline d = std::chrono::seconds(30)) noexcept override;
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
   result<void> unlink(deadline d = std::chrono::seconds(30)) noexcept override;
 #endif
 
@@ -283,8 +283,8 @@ public:
   \mallocs If the `kernelbuffer` parameter is set on entry, no memory allocations.
   If unset, at least one memory allocation, possibly more is performed.
   */
-  AFIO_MAKE_FREE_FUNCTION
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<enumerate_info> enumerate(buffers_type &&tofill, path_view_type glob = path_view_type(), filter filtering = filter::fastdeleted, span<char> kernelbuffer = span<char>()) const noexcept;
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<enumerate_info> enumerate(buffers_type &&tofill, path_view_type glob = path_view_type(), filter filtering = filter::fastdeleted, span<char> kernelbuffer = span<char>()) const noexcept;
 };
 inline std::ostream &operator<<(std::ostream &s, const directory_handle::filter &v)
 {
@@ -369,16 +369,16 @@ inline result<directory_handle::enumerate_info> enumerate(const directory_handle
 }
 // END make_free_functions.py
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
-#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define AFIO_INCLUDED_BY_HEADER 1
+#if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define LLFIO_INCLUDED_BY_HEADER 1
 #ifdef _WIN32
 #include "detail/impl/windows/directory_handle.ipp"
 #else
 #include "detail/impl/posix/directory_handle.ipp"
 #endif
-#undef AFIO_INCLUDED_BY_HEADER
+#undef LLFIO_INCLUDED_BY_HEADER
 #endif
 
 #ifdef _MSC_VER

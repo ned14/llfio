@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_STATUS_CODE_HPP
-#define AFIO_STATUS_CODE_HPP
+#ifndef LLFIO_STATUS_CODE_HPP
+#define LLFIO_STATUS_CODE_HPP
 
 #include "logging.hpp"
 
@@ -52,15 +52,15 @@ as that (a) enables safe header only AFIO on Windows (b) produces better codegen
 (c) drags in far fewer STL headers.
 */
 
-#if AFIO_EXPERIMENTAL_STATUS_CODE
+#if LLFIO_EXPERIMENTAL_STATUS_CODE
 
 // Bring in a result implementation based on status_code
 #include "outcome/include/outcome/experimental/status_result.hpp"
 #include "outcome/include/outcome/try.hpp"
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
-#ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
+#ifndef LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
 
 namespace detail
 {
@@ -92,13 +92,13 @@ namespace detail
 
 template <class BaseStatusCodeDomain> class error_domain;
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
 // Inject a mixin for our custom status codes
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 namespace mixins
 {
-  template <class Base, class BaseStatusCodeDomain> struct mixin<Base, ::AFIO_V2_NAMESPACE::error_domain<BaseStatusCodeDomain>> : public Base
+  template <class Base, class BaseStatusCodeDomain> struct mixin<Base, ::LLFIO_V2_NAMESPACE::error_domain<BaseStatusCodeDomain>> : public Base
   {
     using Base::Base;
 
@@ -107,7 +107,7 @@ namespace mixins
     {
       if(QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id() == this->value()._thread_id)
       {
-        auto &tls = ::AFIO_V2_NAMESPACE::detail::tls_errored_results();
+        auto &tls = ::LLFIO_V2_NAMESPACE::detail::tls_errored_results();
         const char *path1 = tls.get(this->value()._tls_path_id1);
         const char *path2 = tls.get(this->value()._tls_path_id2);
         return {path1, path2};
@@ -115,29 +115,29 @@ namespace mixins
       return {};
     }
     //! Retrieve the first path associated with this failure
-    ::AFIO_V2_NAMESPACE::filesystem::path path1() const
+    ::LLFIO_V2_NAMESPACE::filesystem::path path1() const
     {
       if(QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id() == this->value()._thread_id)
       {
-        auto &tls = ::AFIO_V2_NAMESPACE::detail::tls_errored_results();
+        auto &tls = ::LLFIO_V2_NAMESPACE::detail::tls_errored_results();
         const char *path1 = tls.get(this->value()._tls_path_id1);
         if(path1 != nullptr)
         {
-          return ::AFIO_V2_NAMESPACE::filesystem::path(path1);
+          return ::LLFIO_V2_NAMESPACE::filesystem::path(path1);
         }
       }
       return {};
     }
     //! Retrieve the second path associated with this failure
-    ::AFIO_V2_NAMESPACE::filesystem::path path2() const
+    ::LLFIO_V2_NAMESPACE::filesystem::path path2() const
     {
       if(QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id() == this->value()._thread_id)
       {
-        auto &tls = ::AFIO_V2_NAMESPACE::detail::tls_errored_results();
+        auto &tls = ::LLFIO_V2_NAMESPACE::detail::tls_errored_results();
         const char *path2 = tls.get(this->value()._tls_path_id2);
         if(path2 != nullptr)
         {
-          return ::AFIO_V2_NAMESPACE::filesystem::path(path2);
+          return ::LLFIO_V2_NAMESPACE::filesystem::path(path2);
         }
       }
       return {};
@@ -146,7 +146,7 @@ namespace mixins
 }
 SYSTEM_ERROR2_NAMESPACE_END
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 /*! \class error_domain
 \brief The SG14 status code domain for errors in AFIO.
@@ -198,7 +198,7 @@ protected:
         }
         ret.append("]");
       }
-#if AFIO_LOGGING_LEVEL >= 2
+#if LLFIO_LOGGING_LEVEL >= 2
       if(v.value()._log_id != static_cast<uint32_t>(-1))
       {
         if(log().valid(v.value()._log_id))
@@ -224,9 +224,9 @@ protected:
   }
 };
 
-#else   // AFIO_DISABLE_PATHS_IN_FAILURE_INFO
+#else   // LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
 template <class BaseStatusCodeDomain> using error_domain = BaseStatusCodeDomain;
-#endif  // AFIO_DISABLE_PATHS_IN_FAILURE_INFO
+#endif  // LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
 
 namespace detail
 {
@@ -331,16 +331,16 @@ inline error_code error_from_exception(std::exception_ptr &&ep = std::current_ex
   return not_matched;
 }
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
 
-#else  // AFIO_EXPERIMENTAL_STATUS_CODE
+#else  // LLFIO_EXPERIMENTAL_STATUS_CODE
 
 
 // Bring in a result implementation based on std::error_code
 #include "outcome/include/outcome.hpp"
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 namespace detail
 {
@@ -364,7 +364,7 @@ private:
   // The error code for the failure
   std::error_code ec;
 
-#ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
+#ifndef LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
   // The id of the thread where this failure occurred
   uint32_t _thread_id{0};
   // The TLS path store entry
@@ -395,7 +395,7 @@ public:
   //! Retrieve any first path associated with this failure. Note this only works if called from the same thread as where the failure occurred.
   inline filesystem::path path1() const
   {
-#ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
+#ifndef LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
     if(QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id() == _thread_id)
     {
       auto &tls = detail::tls_errored_results();
@@ -411,7 +411,7 @@ public:
   //! Retrieve any second path associated with this failure. Note this only works if called from the same thread as where the failure occurred.
   inline filesystem::path path2() const
   {
-#ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
+#ifndef LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
     if(QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id() == _thread_id)
     {
       auto &tls = detail::tls_errored_results();
@@ -428,7 +428,7 @@ public:
   inline std::string message() const
   {
     std::string ret(ec.message());
-#ifndef AFIO_DISABLE_PATHS_IN_FAILURE_INFO
+#ifndef LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
     detail::append_path_info(*this, ret);
 #endif
     return ret;
@@ -552,9 +552,9 @@ inline error_info posix_error(int c = errno)
 }
 #endif
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
-#endif  // AFIO_EXPERIMENTAL_STATUS_CODE
+#endif  // LLFIO_EXPERIMENTAL_STATUS_CODE
 
 
 #endif

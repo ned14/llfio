@@ -28,11 +28,11 @@ Distributed under the Boost Software License, Version 1.0.
 #include <fcntl.h>
 #include <sys/uio.h>  // for preadv etc
 #include <unistd.h>
-#if AFIO_USE_POSIX_AIO
+#if LLFIO_USE_POSIX_AIO
 #include <aio.h>
 #endif
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 size_t io_handle::max_buffers() const noexcept
 {
@@ -59,7 +59,7 @@ size_t io_handle::max_buffers() const noexcept
 
 io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_request<io_handle::buffers_type> reqs, deadline d) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(d)
   {
     return errc::not_supported;
@@ -91,7 +91,7 @@ io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_requ
   }
 #endif
   ssize_t bytesread = 0;
-#if AFIO_MISSING_PIOV
+#if LLFIO_MISSING_PIOV
   off_t offset = reqs.offset;
   for(size_t n = 0; n < reqs.buffers.size(); n++)
   {
@@ -126,7 +126,7 @@ io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_requ
 
 io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::io_request<io_handle::const_buffers_type> reqs, deadline d) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(d)
   {
     return errc::not_supported;
@@ -158,7 +158,7 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::
   }
 #endif
   ssize_t byteswritten = 0;
-#if AFIO_MISSING_PIOV
+#if LLFIO_MISSING_PIOV
   off_t offset = reqs.offset;
   for(size_t n = 0; n < reqs.buffers.size(); n++)
   {
@@ -193,7 +193,7 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::
 
 result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, io_handle::extent_type bytes, bool exclusive, deadline d) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(d && d.nsecs > 0)
   {
     return errc::not_supported;
@@ -218,11 +218,11 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
     constexpr extent_type extent_topbit = static_cast<extent_type>(1) << (8 * sizeof(extent_type) - 1);
     if((offset & extent_topbit) != 0u)
     {
-      AFIO_LOG_WARN(_v.fd, "io_handle::lock() called with offset with top bit set, masking out");
+      LLFIO_LOG_WARN(_v.fd, "io_handle::lock() called with offset with top bit set, masking out");
     }
     if((bytes & extent_topbit) != 0u)
     {
-      AFIO_LOG_WARN(_v.fd, "io_handle::lock() called with bytes with top bit set, masking out");
+      LLFIO_LOG_WARN(_v.fd, "io_handle::lock() called with bytes with top bit set, masking out");
     }
     fl.l_whence = SEEK_SET;
     fl.l_start = offset & ~extent_topbit;
@@ -266,7 +266,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
 
 void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type bytes) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   bool failed = false;
 #if !defined(__linux__) && !defined(F_OFD_SETLK)
   if(0 == bytes)
@@ -308,10 +308,10 @@ void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type byt
   {
     auto ret(posix_error());
     (void) ret;
-    AFIO_LOG_FATAL(_v.fd, "io_handle::unlock() failed");
+    LLFIO_LOG_FATAL(_v.fd, "io_handle::unlock() failed");
     std::terminate();
   }
 }
 
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

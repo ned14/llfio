@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../handle.hpp"
 #include "import.hpp"
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_handle::barrier(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
 {
@@ -49,8 +49,8 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
     state_type(const state_type &) = delete;
     state_type &operator=(state_type &&) = delete;
     state_type &operator=(const state_type &) = delete;
-    AFIO_HEADERS_ONLY_VIRTUAL_SPEC _erased_completion_handler *erased_completion_handler() noexcept override final { return completion; }
-    AFIO_HEADERS_ONLY_VIRTUAL_SPEC void _system_io_completion(long errcode, long bytes_transferred, void *internal_state) noexcept override final
+    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC _erased_completion_handler *erased_completion_handler() noexcept override final { return completion; }
+    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void _system_io_completion(long errcode, long bytes_transferred, void *internal_state) noexcept override final
     {
       auto ol = static_cast<LPOVERLAPPED>(internal_state);
       ol->hEvent = nullptr;
@@ -67,7 +67,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
           size_t idx = ol - ols;
           if(idx >= this->items)
           {
-            AFIO_LOG_FATAL(0, "async_file_handle::io_state::operator() called with invalid index");
+            LLFIO_LOG_FATAL(0, "async_file_handle::io_state::operator() called with invalid index");
             std::terminate();
           }
           result.value()[idx].len = bytes_transferred;
@@ -80,7 +80,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
         (*completion)(this);
       }
     }
-    AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~state_type() override final
+    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~state_type() override final
     {
       // Do we need to cancel pending i/o?
       if(this->items_to_go)
@@ -101,12 +101,12 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
 #ifndef NDEBUG
           if(res.has_error())
           {
-            AFIO_LOG_FATAL(0, "async_file_handle: io_service failed");
+            LLFIO_LOG_FATAL(0, "async_file_handle: io_service failed");
             std::terminate();
           }
           if(!res.value())
           {
-            AFIO_LOG_FATAL(0, "async_file_handle: io_service returns no work when i/o has not completed");
+            LLFIO_LOG_FATAL(0, "async_file_handle: io_service returns no work when i/o has not completed");
             std::terminate();
           }
 #endif
@@ -221,7 +221,7 @@ result<async_file_handle::io_state_ptr> async_file_handle::_begin_io(span<char> 
 
 async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle::read(async_file_handle::io_request<async_file_handle::buffers_type> reqs, deadline d) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   optional<io_result<buffers_type>> ret;
   OUTCOME_TRY(io_state, async_read(reqs, [&ret](async_file_handle *, io_result<buffers_type> &result) { ret = result; }));
   (void) io_state;  // holds i/o open until it completes
@@ -238,7 +238,7 @@ async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle:
 #ifndef NDEBUG
     if(!ret && t && !t.value())
     {
-      AFIO_LOG_FATAL(_v.h, "async_file_handle: io_service returns no work when i/o has not completed");
+      LLFIO_LOG_FATAL(_v.h, "async_file_handle: io_service returns no work when i/o has not completed");
       std::terminate();
     }
 #endif
@@ -248,7 +248,7 @@ async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle:
 
 async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_handle::write(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, deadline d) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   optional<io_result<const_buffers_type>> ret;
   OUTCOME_TRY(io_state, async_write(reqs, [&ret](async_file_handle *, io_result<const_buffers_type> &result) { ret = result; }));
   (void) io_state;  // holds i/o open until it completes
@@ -265,7 +265,7 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
 #ifndef NDEBUG
     if(!ret && t && !t.value())
     {
-      AFIO_LOG_FATAL(_v.h, "async_file_handle: io_service returns no work when i/o has not completed");
+      LLFIO_LOG_FATAL(_v.h, "async_file_handle: io_service returns no work when i/o has not completed");
       std::terminate();
     }
 #endif
@@ -274,4 +274,4 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
 }
 
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

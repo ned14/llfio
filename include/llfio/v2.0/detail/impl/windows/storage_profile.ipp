@@ -31,7 +31,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <intrin.h>  // for __cpuid
 #endif
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 namespace storage_profile
 {
@@ -437,4 +437,4 @@ namespace storage_profile
   }    // namespace storage
 }  // namespace storage_profile
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_WINDOWS_H
-#define AFIO_WINDOWS_H
+#ifndef LLFIO_WINDOWS_H
+#define LLFIO_WINDOWS_H
 
 #include "../../../handle.hpp"
 #include <memory>  // for unique_ptr
@@ -51,18 +51,18 @@ Distributed under the Boost Software License, Version 1.0.
 #error todo
 #endif
 
-#if !AFIO_EXPERIMENTAL_STATUS_CODE
+#if !LLFIO_EXPERIMENTAL_STATUS_CODE
 // Bring in the custom NT kernel error code category
-#if AFIO_HEADERS_ONLY
+#if LLFIO_HEADERS_ONLY
 #define NTKERNEL_ERROR_CATEGORY_INLINE
 #define NTKERNEL_ERROR_CATEGORY_STATIC
 #endif
 #include "../../../../ntkernel-error-category/include/ntkernel_category.hpp"
 #endif
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
-#if AFIO_EXPERIMENTAL_STATUS_CODE
+#if LLFIO_EXPERIMENTAL_STATUS_CODE
 #else
 //! Helper for constructing an error info from a DWORD
 inline error_info win32_error(DWORD c = GetLastError())
@@ -776,7 +776,7 @@ namespace windows_nt_kernel
     {
       DiscardVirtualMemory_ = reinterpret_cast<DiscardVirtualMemory_t>(GetProcAddress(kernel32, "DiscardVirtualMemory"));
     }
-#ifdef AFIO_OP_STACKBACKTRACEDEPTH
+#ifdef LLFIO_OP_STACKBACKTRACEDEPTH
     if(dbghelp)
     {
       HMODULE dbghelp = LoadLibraryA("DBGHELP.DLL");
@@ -828,7 +828,7 @@ namespace windows_nt_kernel
 
   inline filesystem::file_type to_st_type(ULONG FileAttributes, ULONG ReparsePointTag)
   {
-#ifdef AFIO_USE_LEGACY_FILESYSTEM_SEMANTICS
+#ifdef LLFIO_USE_LEGACY_FILESYSTEM_SEMANTICS
     if(FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT && (ReparsePointTag == IO_REPARSE_TAG_MOUNT_POINT || ReparsePointTag == IO_REPARSE_TAG_SYMLINK))
       return filesystem::file_type::symlink_file;
     // return filesystem::file_type::reparse_file;
@@ -910,7 +910,7 @@ namespace windows_nt_kernel
 }  // namespace windows_nt_kernel
 
 #if 0
-inline void fill_stat_t(stat_t &stat, AFIO_POSIX_STAT_STRUCT s, metadata_flags wanted)
+inline void fill_stat_t(stat_t &stat, LLFIO_POSIX_STAT_STRUCT s, metadata_flags wanted)
 {
 #ifndef _WIN32
   if (!!(wanted&metadata_flags::dev)) { stat.st_dev = s.st_dev; }
@@ -958,7 +958,7 @@ inline HANDLE get_thread_local_waitable_timer()
 - sleep_interval: Set to the number of steady milliseconds until the sleep must end
 - sleep_object: Set to a primed deadline timer HANDLE which will signal when the system clock reaches the deadline
 */
-#define AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d)                                                                                                                                                                                                                                                                                     \
+#define LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d)                                                                                                                                                                                                                                                                                     \
   std::chrono::steady_clock::time_point began_steady;                                                                                                                                                                                                                                                                          \
   \
 std::chrono::system_clock::time_point end_utc;                                                                                                                                                                                                                                                                                 \
@@ -977,7 +977,7 @@ DWORD sleep_interval = INFINITE;                                                
   \
 HANDLE sleep_object = nullptr;
 
-#define AFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d)                                                                                                                                                                                                                                                                                     \
+#define LLFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d)                                                                                                                                                                                                                                                                                     \
   \
 if(d)                                                                                                                                                                                                                                                                                                                          \
   \
@@ -1001,7 +1001,7 @@ if(d)                                                                           
   \
 }
 
-#define AFIO_WIN_DEADLINE_TO_TIMEOUT(type, d)                                                                                                                                                                                                                                                                                  \
+#define LLFIO_WIN_DEADLINE_TO_TIMEOUT(type, d)                                                                                                                                                                                                                                                                                  \
   \
 if(d)                                                                                                                                                                                                                                                                                                                          \
   \
@@ -1025,7 +1025,7 @@ if(d)                                                                           
 - sleep_interval: Set to the number of steady milliseconds until the sleep must end
 - sleep_object: Set to a primed deadline timer HANDLE which will signal when the system clock reaches the deadline
 */
-#define AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d)                                                                                                                                                                                                                                                                                     \
+#define LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d)                                                                                                                                                                                                                                                                                     \
   std::chrono::steady_clock::time_point began_steady;                                                                                                                                                                                                                                                                          \
   \
 std::chrono::system_clock::time_point end_utc;                                                                                                                                                                                                                                                                                 \
@@ -1050,7 +1050,7 @@ if(d)                                                                           
   \
 }
 
-#define AFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d)                                                                                                                                                                                                                                                                                     \
+#define LLFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d)                                                                                                                                                                                                                                                                                     \
   if((d) && (d).steady)                                                                                                                                                                                                                                                                                                        \
   {                                                                                                                                                                                                                                                                                                                            \
     std::chrono::nanoseconds ns = std::chrono::duration_cast<std::chrono::nanoseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());                                                                                                                                               \
@@ -1060,7 +1060,7 @@ if(d)                                                                           
       _timeout.QuadPart = ns.count() / -100;                                                                                                                                                                                                                                                                                   \
   }
 
-#define AFIO_WIN_DEADLINE_TO_PARTIAL_DEADLINE(nd, d)                                                                                                                                                                                                                                                                           \
+#define LLFIO_WIN_DEADLINE_TO_PARTIAL_DEADLINE(nd, d)                                                                                                                                                                                                                                                                           \
   if(d)                                                                                                                                                                                                                                                                                                                        \
   {                                                                                                                                                                                                                                                                                                                            \
     if((d).steady)                                                                                                                                                                                                                                                                                                             \
@@ -1075,7 +1075,7 @@ if(d)                                                                           
       (nd) = (d);                                                                                                                                                                                                                                                                                                              \
   }
 
-#define AFIO_WIN_DEADLINE_TO_TIMEOUT(d)                                                                                                                                                                                                                                                                                        \
+#define LLFIO_WIN_DEADLINE_TO_TIMEOUT(d)                                                                                                                                                                                                                                                                                        \
   \
 if(d)                                                                                                                                                                                                                                                                                                                          \
   \
@@ -1108,10 +1108,10 @@ inline NTSTATUS ntwait(HANDLE h, windows_nt_kernel::IO_STATUS_BLOCK &isb, const 
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+  LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
   do  // needs to be a do, not while in order to flip auto reset event objects etc.
   {
-    AFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d);
+    LLFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d);
     // Pump alerts and APCs
     NTSTATUS ntstat = NtWaitForSingleObject(h, 1u, timeout);
     if(STATUS_TIMEOUT == ntstat)
@@ -1135,12 +1135,12 @@ inline bool ntsleep(const deadline &d, bool return_on_alert = false) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+  LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
   alignas(8) LARGE_INTEGER infinity{};
   infinity.QuadPart = INT64_MIN;
   for(;;)
   {
-    AFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d);
+    LLFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d);
     // Pump alerts and APCs
     NTSTATUS ntstat = NtDelayExecution(1u, timeout != nullptr ? timeout : &infinity);
     (void) ntstat;
@@ -1473,6 +1473,6 @@ inline bool running_under_suid_gid()
   return EqualSid(tu->User.Sid, to->Owner) == 0;
 }
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
 #endif

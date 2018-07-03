@@ -26,7 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 static inline void TestPathDiscovery()
 {
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace afio = LLFIO_V2_NAMESPACE;
   auto raw_list = afio::path_discovery::all_temporary_directories();
   std::cout << "The raw list of temporary directory paths on this system are:" << std::endl;
   for(auto &i : raw_list)

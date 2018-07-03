@@ -27,14 +27,14 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../quickcpplib/include/spinlock.hpp"
 #include "import.hpp"
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 namespace utils
 {
   // Stupid MSVC ...
   namespace detail
   {
-    using namespace AFIO_V2_NAMESPACE::detail;
+    using namespace LLFIO_V2_NAMESPACE::detail;
   }
   size_t page_size() noexcept
   {
@@ -102,7 +102,7 @@ namespace utils
     using namespace windows_nt_kernel;
     if(RtlGenRandom(buffer, static_cast<ULONG>(bytes)) == 0u)
     {
-      AFIO_LOG_FATAL(0, "afio: Kernel crypto function failed");
+      LLFIO_LOG_FATAL(0, "afio: Kernel crypto function failed");
       std::terminate();
     }
   }
@@ -228,11 +228,11 @@ namespace utils
       (void) bytes;
       if(VirtualFree(p, 0, MEM_RELEASE) == 0)
       {
-        AFIO_LOG_FATAL(p, "afio: Freeing large pages failed");
+        LLFIO_LOG_FATAL(p, "afio: Freeing large pages failed");
         std::terminate();
       }
     }
   }  // namespace detail
 }  // namespace utils
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

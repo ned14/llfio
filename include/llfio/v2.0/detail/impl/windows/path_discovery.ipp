@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_PATH_DISCOVERY_INCLUDING
+#ifndef LLFIO_PATH_DISCOVERY_INCLUDING
 #error Must be included by ../path_discovery.ipp only
 #endif
 
@@ -30,7 +30,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <ShlObj.h>
 
-AFIO_V2_NAMESPACE_EXPORT_BEGIN
+LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace path_discovery
 {
@@ -123,4 +123,4 @@ namespace path_discovery
   }
 }  // namespace path_discovery
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

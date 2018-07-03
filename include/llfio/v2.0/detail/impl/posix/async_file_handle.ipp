@@ -26,15 +26,15 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <fcntl.h>
 #include <unistd.h>
-#if AFIO_USE_POSIX_AIO
+#if LLFIO_USE_POSIX_AIO
 #include <aio.h>
 #endif
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_handle::barrier(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   optional<io_result<const_buffers_type>> ret;
   OUTCOME_TRY(io_state, async_barrier(reqs, [&ret](async_file_handle *, io_result<const_buffers_type> &result) { ret = result; }, wait_for_device, and_metadata));
   (void) io_state;
@@ -51,7 +51,7 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
 #ifndef NDEBUG
     if(!ret && t && !t.value())
     {
-      AFIO_LOG_FATAL(_v.fd, "async_file_handle: io_service returns no work when i/o has not completed");
+      LLFIO_LOG_FATAL(_v.fd, "async_file_handle: io_service returns no work when i/o has not completed");
       std::terminate();
     }
 #endif
@@ -64,7 +64,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
   // Need to keep a set of aiocbs matching the scatter-gather buffers
   struct state_type : public _erased_io_state_type
   {
-#if AFIO_USE_POSIX_AIO
+#if LLFIO_USE_POSIX_AIO
     struct aiocb aiocbs[1]{};
 #else
 #error todo
@@ -80,10 +80,10 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
         , completion(nullptr)
     {
     }
-    AFIO_HEADERS_ONLY_VIRTUAL_SPEC _erased_completion_handler *erased_completion_handler() noexcept final { return completion; }
-    AFIO_HEADERS_ONLY_VIRTUAL_SPEC void _system_io_completion(long errcode, long bytes_transferred, void *internal_state) noexcept final
+    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC _erased_completion_handler *erased_completion_handler() noexcept final { return completion; }
+    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void _system_io_completion(long errcode, long bytes_transferred, void *internal_state) noexcept final
     {
-#if AFIO_USE_POSIX_AIO
+#if LLFIO_USE_POSIX_AIO
       auto **_paiocb = static_cast<struct aiocb **>(internal_state);
       struct aiocb *aiocb = *_paiocb;
       assert(aiocb >= aiocbs && aiocb < aiocbs + this->items);
@@ -101,14 +101,14 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
         else
         {
 // Figure out which i/o I am and update the buffer in question
-#if AFIO_USE_POSIX_AIO
+#if LLFIO_USE_POSIX_AIO
           size_t idx = aiocb - aiocbs;
 #else
 #error todo
 #endif
           if(idx >= this->items)
           {
-            AFIO_LOG_FATAL(0, "file_handle::io_state::operator() called with invalid index");
+            LLFIO_LOG_FATAL(0, "file_handle::io_state::operator() called with invalid index");
             std::terminate();
           }
           result.value()[idx].len = bytes_transferred;
@@ -121,14 +121,14 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
         (*completion)(this);
       }
     }
-    AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~state_type() final
+    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~state_type() final
     {
       // Do we need to cancel pending i/o?
       if(this->items_to_go)
       {
         for(size_t n = 0; n < this->items; n++)
         {
-#if AFIO_USE_POSIX_AIO
+#if LLFIO_USE_POSIX_AIO
           int ret = aio_cancel(this->parent->native_handle().fd, aiocbs + n);
           (void) ret;
 #if 0
@@ -157,12 +157,12 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
 #ifndef NDEBUG
           if(res.has_error())
           {
-            AFIO_LOG_FATAL(0, "file_handle: io_service failed");
+            LLFIO_LOG_FATAL(0, "file_handle: io_service failed");
             std::terminate();
           }
           if(!res.value())
           {
-            AFIO_LOG_FATAL(0, "file_handle: io_service returns no work when i/o has not completed");
+            LLFIO_LOG_FATAL(0, "file_handle: io_service returns no work when i/o has not completed");
             std::terminate();
           }
 #endif
@@ -178,7 +178,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
     return errc::not_enough_memory;
   }
   size_t items(reqs.buffers.size());
-#if AFIO_USE_POSIX_AIO && defined(AIO_LISTIO_MAX)
+#if LLFIO_USE_POSIX_AIO && defined(AIO_LISTIO_MAX)
   // If this i/o could never be done atomically, reject
   if(items > AIO_LISTIO_MAX)
     return errc::invalid_argument;
@@ -223,7 +223,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
   out = std::move(reqs.buffers);
   for(size_t n = 0; n < items; n++)
   {
-#if AFIO_USE_POSIX_AIO
+#if LLFIO_USE_POSIX_AIO
 #ifndef NDEBUG
     if(_v.requires_aligned_io())
     {
@@ -263,10 +263,10 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
     ++state->items_to_go;
   }
   int ret = 0;
-#if AFIO_USE_POSIX_AIO
+#if LLFIO_USE_POSIX_AIO
   if(service()->using_kqueues())
   {
-#if AFIO_COMPILE_KQUEUES
+#if LLFIO_COMPILE_KQUEUES
     // Only issue one kqueue event when entire scatter-gather has completed
     struct _sigev = {0};
 #error todo
@@ -326,7 +326,7 @@ result<async_file_handle::io_state_ptr> async_file_handle::_begin_io(span<char> 
 
 async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle::read(async_file_handle::io_request<async_file_handle::buffers_type> reqs, deadline d) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   optional<io_result<buffers_type>> ret;
   OUTCOME_TRY(io_state, async_read(reqs, [&ret](async_file_handle *, io_result<buffers_type> &result) { ret = result; }));
   (void) io_state;
@@ -343,7 +343,7 @@ async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle:
 #ifndef NDEBUG
     if(!ret && t && !t.value())
     {
-      AFIO_LOG_FATAL(_v.fd, "async_file_handle: io_service returns no work when i/o has not completed");
+      LLFIO_LOG_FATAL(_v.fd, "async_file_handle: io_service returns no work when i/o has not completed");
       std::terminate();
     }
 #endif
@@ -353,7 +353,7 @@ async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle:
 
 async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_handle::write(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, deadline d) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   optional<io_result<const_buffers_type>> ret;
   OUTCOME_TRY(io_state, async_write(reqs, [&ret](async_file_handle *, io_result<const_buffers_type> &result) { ret = result; }));
   (void) io_state;
@@ -370,7 +370,7 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
 #ifndef NDEBUG
     if(!ret && t && !t.value())
     {
-      AFIO_LOG_FATAL(_v.fd, "async_file_handle: io_service returns no work when i/o has not completed");
+      LLFIO_LOG_FATAL(_v.fd, "async_file_handle: io_service returns no work when i/o has not completed");
       std::terminate();
     }
 #endif
@@ -378,4 +378,4 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
   return *ret;
 }
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

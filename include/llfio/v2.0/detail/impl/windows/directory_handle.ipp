@@ -25,7 +25,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include "../../../directory_handle.hpp"
 #include "import.hpp"
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 result<directory_handle> directory_handle::directory(const path_handle &base, path_view_type path, mode _mode, creation _creation, caching _caching, flag flags) noexcept
 {
@@ -37,7 +37,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
   }
   result<directory_handle> ret(directory_handle(native_handle_type(), 0, 0, _caching, flags));
   native_handle_type &nativeh = ret.value()._v;
-  AFIO_LOG_FUNCTION_CALL(&ret);
+  LLFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::directory;
   DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
   // Trying to truncate a directory returns EISDIR rather than some internal Win32 error code uncomparable to errc
@@ -137,7 +137,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
 
 result<directory_handle> directory_handle::clone(mode mode_, caching caching_, deadline /* unused */) const noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   // Fast path
   if(mode_ == mode::unchanged && caching_ == caching::unchanged)
   {
@@ -185,9 +185,9 @@ result<directory_handle> directory_handle::clone(mode mode_, caching caching_, d
   return ret;
 }
 
-AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> directory_handle::clone_to_path_handle() const noexcept
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> directory_handle::clone_to_path_handle() const noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   result<path_handle> ret(path_handle(native_handle_type(), _caching, _flags));
   ret.value()._v.behaviour = _v.behaviour;
   if(DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, 0, DUPLICATE_SAME_ACCESS) == 0)
@@ -230,7 +230,7 @@ namespace detail
 
 result<void> directory_handle::relink(const path_handle &base, directory_handle::path_view_type newpath, bool atomic_replace, deadline d) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   /* We can never hold DELETE permission on an open handle to a directory as otherwise
   race free renames into that directory will fail, so we are forced to duplicate the
   handle with DELETE privs temporarily in order to issue the rename
@@ -241,7 +241,7 @@ result<void> directory_handle::relink(const path_handle &base, directory_handle:
 
 result<void> directory_handle::unlink(deadline d) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   /* We can never hold DELETE permission on an open handle to a directory as otherwise
   race free renames into that directory will fail, so we are forced to duplicate the
   handle with DELETE privs temporarily in order to issue the unlink
@@ -255,7 +255,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
   static constexpr stat_t::want default_stat_contents = stat_t::want::ino | stat_t::want::type | stat_t::want::atim | stat_t::want::mtim | stat_t::want::ctim | stat_t::want::size | stat_t::want::allocated | stat_t::want::birthtim | stat_t::want::sparse | stat_t::want::compressed | stat_t::want::reparse_point;
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(tofill.empty())
   {
     return enumerate_info{std::move(tofill), stat_t::want::none, false};
@@ -364,4 +364,4 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
   }
 }
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

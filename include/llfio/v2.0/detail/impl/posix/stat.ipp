@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <sys/stat.h>
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 static inline filesystem::file_type to_st_type(uint16_t mode)
 {
@@ -63,9 +63,9 @@ static inline std::chrono::system_clock::time_point to_timepoint(struct timespec
   return std::chrono::system_clock::time_point(duration);
 }
 
-AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat_t::want wanted) noexcept
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat_t::want wanted) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(&h);
+  LLFIO_LOG_FUNCTION_CALL(&h);
   struct stat s
   {
   };
@@ -222,4 +222,4 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat
   return ret;
 }
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

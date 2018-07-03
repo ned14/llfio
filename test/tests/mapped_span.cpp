@@ -26,8 +26,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 static inline void TestMappedView1()
 {
-  using namespace AFIO_V2_NAMESPACE;
-  using AFIO_V2_NAMESPACE::file_handle;
+  using namespace LLFIO_V2_NAMESPACE;
+  using LLFIO_V2_NAMESPACE::file_handle;
   file_handle fh = file_handle::file({}, "testfile", file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::all, file_handle::flag::unlink_on_first_close).value();
   fh.truncate(10000 * sizeof(int)).value();
   section_handle sh(section_handle::section(fh).value());
@@ -62,9 +62,9 @@ static inline void TestMappedView1()
 
 static inline void TestMappedView2()
 {
-  using namespace AFIO_V2_NAMESPACE;
-  using AFIO_V2_NAMESPACE::file_handle;
-  using AFIO_V2_NAMESPACE::byte;
+  using namespace LLFIO_V2_NAMESPACE;
+  using LLFIO_V2_NAMESPACE::file_handle;
+  using LLFIO_V2_NAMESPACE::byte;
   {
     std::error_code ec;
     filesystem::remove("testfile", ec);

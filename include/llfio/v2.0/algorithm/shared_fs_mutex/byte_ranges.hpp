@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_SHARED_FS_MUTEX_BYTE_RANGES_HPP
-#define AFIO_SHARED_FS_MUTEX_BYTE_RANGES_HPP
+#ifndef LLFIO_SHARED_FS_MUTEX_BYTE_RANGES_HPP
+#define LLFIO_SHARED_FS_MUTEX_BYTE_RANGES_HPP
 
 #include "../../file_handle.hpp"
 #include "base.hpp"
@@ -42,7 +42,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! \file byte_ranges.hpp Provides algorithm::shared_fs_mutex::byte_ranges
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
@@ -110,10 +110,10 @@ namespace algorithm
       }
 
       //! Initialises a shared filing system mutex using the file at \em lockfile
-      AFIO_MAKE_FREE_FUNCTION
+      LLFIO_MAKE_FREE_FUNCTION
       static result<byte_ranges> fs_mutex_byte_ranges(const path_handle &base, path_view lockfile) noexcept
       {
-        AFIO_LOG_FUNCTION_CALL(0);
+        LLFIO_LOG_FUNCTION_CALL(0);
         OUTCOME_TRY(ret, file_handle::file(base, lockfile, file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
         return byte_ranges(std::move(ret));
       }
@@ -122,9 +122,9 @@ namespace algorithm
       const file_handle &handle() const noexcept { return _h; }
 
     protected:
-      AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept final
+      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept final
       {
-        AFIO_LOG_FUNCTION_CALL(this);
+        LLFIO_LOG_FUNCTION_CALL(this);
         std::chrono::steady_clock::time_point began_steady;
         std::chrono::system_clock::time_point end_utc;
         if(d)
@@ -234,9 +234,9 @@ namespace algorithm
       }
 
     public:
-      AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long /*hint*/) noexcept final
+      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long /*hint*/) noexcept final
       {
-        AFIO_LOG_FUNCTION_CALL(this);
+        LLFIO_LOG_FUNCTION_CALL(this);
         for(const auto &i : entities)
         {
           _h.unlock(i.value, 1);
@@ -247,7 +247,7 @@ namespace algorithm
   }  // namespace shared_fs_mutex
 }  // namespace algorithm
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
 
 #endif

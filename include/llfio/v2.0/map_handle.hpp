@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_MAP_HANDLE_H
-#define AFIO_MAP_HANDLE_H
+#ifndef LLFIO_MAP_HANDLE_H
+#define LLFIO_MAP_HANDLE_H
 
 #include "file_handle.hpp"
 
@@ -34,7 +34,7 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4251)  // dll interface
 #endif
 
-AFIO_V2_NAMESPACE_EXPORT_BEGIN
+LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 /*! \class section_handle
 \brief A handle to a source of mapped memory.
@@ -48,7 +48,7 @@ On Windows the native handle of this handle is that of the NT kernel section obj
 a cloned file descriptor of the backing storage if there is backing storage, else it will be the
 aforementioned file descriptor to an unnamed inode.
 */
-class AFIO_DECL section_handle : public handle
+class LLFIO_DECL section_handle : public handle
 {
 public:
   using extent_type = handle::extent_type;
@@ -80,8 +80,8 @@ protected:
   flag _flag{flag::none};
 
 public:
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~section_handle() override;
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~section_handle() override;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
   //! Default constructor
   constexpr section_handle() {}  // NOLINT
   //! Construct a section handle using the given native handle type for the section and the given i/o handle for the backing storage
@@ -110,7 +110,7 @@ public:
   //! No copy assignment
   section_handle &operator=(const section_handle &) = delete;
   //! Swap with another instance
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   void swap(section_handle &o) noexcept
   {
     section_handle temp(std::move(*this));
@@ -125,8 +125,8 @@ public:
 
   \errors Any of the values POSIX dup(), open() or NtCreateSection() can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<section_handle> section(file_handle &backing, extent_type maximum_size, flag _flag) noexcept;
+  LLFIO_MAKE_FREE_FUNCTION
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<section_handle> section(file_handle &backing, extent_type maximum_size, flag _flag) noexcept;
   /*! \brief Create a memory section backed by a file.
   \param backing The handle to use as backing storage.
   \param bytes The initial size of this section, which cannot be larger than any backing file. Zero means to use `backing.maximum_extent()`.
@@ -135,7 +135,7 @@ public:
 
   \errors Any of the values POSIX dup(), open() or NtCreateSection() can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   static result<section_handle> section(file_handle &backing, extent_type bytes = 0) noexcept { return section(backing, bytes, backing.is_writable() ? (flag::readwrite) : (flag::read)); }
   /*! \brief Create a memory section backed by an anonymous, managed file.
   \param bytes The initial size of this section. Cannot be zero.
@@ -144,8 +144,8 @@ public:
 
   \errors Any of the values POSIX dup(), open() or NtCreateSection() can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<section_handle> section(extent_type bytes, const path_handle &dirh = path_discovery::storage_backed_temporary_files_directory(), flag _flag = flag::read | flag::write) noexcept;
+  LLFIO_MAKE_FREE_FUNCTION
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<section_handle> section(extent_type bytes, const path_handle &dirh = path_discovery::storage_backed_temporary_files_directory(), flag _flag = flag::read | flag::write) noexcept;
 
   //! Returns the memory section's flags
   flag section_flags() const noexcept { return _flag; }
@@ -158,8 +158,8 @@ public:
   //! Returns the borrowed native handle backing this section
   native_handle_type backing_native_handle() const noexcept { return _backing != nullptr ? _backing->native_handle() : native_handle_type(); }
   //! Return the current length of the memory section.
-  AFIO_MAKE_FREE_FUNCTION
-  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<extent_type> length() const noexcept;
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<extent_type> length() const noexcept;
 
   /*! Resize the current maximum permitted extent of the memory section to the given extent.
   \param newsize The new size of the memory section, which cannot be zero. Specify zero to use `backing.maximum_extent()`.
@@ -167,8 +167,8 @@ public:
 
   \errors Any of the values `NtExtendSection()` or `ftruncate()` can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
-  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<extent_type> truncate(extent_type newsize = 0) noexcept;
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<extent_type> truncate(extent_type newsize = 0) noexcept;
 };
 inline std::ostream &operator<<(std::ostream &s, const section_handle::flag &v)
 {
@@ -277,7 +277,7 @@ function.
 
 \sa `mapped_file_handle`, `algorithm::mapped_span`
 */
-class AFIO_DECL map_handle : public io_handle
+class LLFIO_DECL map_handle : public io_handle
 {
   friend class mapped_file_handle;
 
@@ -311,7 +311,7 @@ protected:
 public:
   //! Default constructor
   constexpr map_handle() {}  // NOLINT
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~map_handle() override;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~map_handle() override;
   //! Implicit move construction of map_handle permitted
   constexpr map_handle(map_handle &&o) noexcept : io_handle(std::move(o)), _section(o._section), _addr(o._addr), _offset(o._offset), _reservation(o._reservation), _length(o._length), _flag(o._flag)
   {
@@ -334,7 +334,7 @@ public:
   //! No copy assignment
   map_handle &operator=(const map_handle &) = delete;
   //! Swap with another instance
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   void swap(map_handle &o) noexcept
   {
     map_handle temp(std::move(*this));
@@ -343,12 +343,12 @@ public:
   }
 
   //! Unmap the mapped view.
-  AFIO_MAKE_FREE_FUNCTION
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
   //! Releases the mapped view, but does NOT release the native handle.
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override;
-  AFIO_MAKE_FREE_FUNCTION
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override;
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
   /*! Lightweight inlined barrier which causes the CPU to write out all buffered writes and dirty cache lines
   in the request to main memory.
   \return The cache lines actually barriered. This may be empty. This function does not return an error.
@@ -359,7 +359,7 @@ public:
   (it may be empty if there is no support for this operation in AFIO, or if the current CPU does not
   support this operation). You may find the `is_nvram()` observer of particular use here.
   */
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   static const_buffer_type barrier(const_buffer_type req, bool evict = false) noexcept
   {
     const_buffer_type ret{(const_buffer_type::pointer)(((uintptr_t) req.data) & 31), 0};
@@ -388,8 +388,8 @@ public:
 
   \errors Any of the values POSIX mmap() or VirtualAlloc() can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(size_type bytes, section_handle::flag _flag = section_handle::flag::readwrite) noexcept;
+  LLFIO_MAKE_FREE_FUNCTION
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(size_type bytes, section_handle::flag _flag = section_handle::flag::readwrite) noexcept;
 
   /*! Create a memory mapped view of a backing storage, optionally reserving additional address space for later growth.
   \param section A memory section handle specifying the backing storage to use.
@@ -399,8 +399,8 @@ public:
 
   \errors Any of the values POSIX mmap() or NtMapViewOfSection() can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(section_handle &section, size_type bytes = 0, extent_type offset = 0, section_handle::flag _flag = section_handle::flag::readwrite) noexcept;
+  LLFIO_MAKE_FREE_FUNCTION
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(section_handle &section, size_type bytes = 0, extent_type offset = 0, section_handle::flag _flag = section_handle::flag::readwrite) noexcept;
 
   //! The memory section this handle is using
   section_handle *section() const noexcept { return _section; }
@@ -417,7 +417,7 @@ public:
   size_type capacity() const noexcept { return _reservation; }
 
   //! The size of the memory map. This is the accessible size, NOT the reservation size.
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   size_type length() const noexcept { return _length; }
 
   //! True if the map is of non-volatile RAM
@@ -465,14 +465,14 @@ public:
   a memory map).
   \errors Any of the values POSIX `mremap()`, `mmap(addr)` or `VirtualAlloc(addr)` can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
-  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_type> truncate(size_type newsize, bool permit_relocation = false) noexcept;
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_type> truncate(size_type newsize, bool permit_relocation = false) noexcept;
 
   //! Ask the system to commit the system resources to make the memory represented by the buffer available with the given permissions. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually committed.
-  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> commit(buffer_type region, section_handle::flag flag = section_handle::flag::readwrite) noexcept;
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> commit(buffer_type region, section_handle::flag flag = section_handle::flag::readwrite) noexcept;
 
   //! Ask the system to make the memory represented by the buffer unavailable and to decommit the system resources representing them. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually decommitted.
-  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> decommit(buffer_type region) noexcept;
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> decommit(buffer_type region) noexcept;
 
   /*! Zero the memory represented by the buffer. Differs from zero() because it acts on mapped memory, but may call zero() internally.
 
@@ -481,7 +481,7 @@ public:
   freshly zeroed ones making this a very efficient way of zeroing large ranges of memory.
   \errors Any of the errors returnable by madvise() or DiscardVirtualMemory or the zero() function.
   */
-  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> zero_memory(buffer_type region) noexcept;
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> zero_memory(buffer_type region) noexcept;
 
   /*! Ask the system to unset the dirty flag for the memory represented by the buffer. This will prevent any changes not yet sent to the backing storage from being sent in the future, also if the system kicks out this page and reloads it you may see some edition of the underlying storage instead of what was here. addr
   and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually undirtied.
@@ -491,10 +491,10 @@ public:
 
   \note Microsoft Windows does not support unsetting the dirty flag on file backed maps, so on Windows this call does nothing.
   */
-  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> do_not_store(buffer_type region) noexcept;
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> do_not_store(buffer_type region) noexcept;
 
   //! Ask the system to begin to asynchronously prefetch the span of memory regions given, returning the regions actually prefetched. Note that on Windows 7 or earlier the system call to implement this was not available, and so you will see an empty span returned.
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<span<buffer_type>> prefetch(span<buffer_type> regions) noexcept;
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<span<buffer_type>> prefetch(span<buffer_type> regions) noexcept;
   //! \overload
   static result<buffer_type> prefetch(buffer_type region) noexcept
   {
@@ -515,8 +515,8 @@ public:
   \errors None, though the various signals and structured exception throws common to using memory maps may occur.
   \mallocs None.
   */
-  AFIO_MAKE_FREE_FUNCTION
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
   using io_handle::read;
 
   /*! \brief Write data to the mapped view.
@@ -535,8 +535,8 @@ public:
   of the raised signal, but it is by far the most likely.
   \mallocs None if a `QUICKCPPLIB_NAMESPACE::signal_guard_install` is already instanced.
   */
-  AFIO_MAKE_FREE_FUNCTION
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override;
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override;
   using io_handle::write;
 };
 
@@ -729,16 +729,16 @@ inline map_handle::io_result<map_handle::const_buffers_type> write(map_handle &s
 }
 // END make_free_functions.py
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
-#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define AFIO_INCLUDED_BY_HEADER 1
+#if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define LLFIO_INCLUDED_BY_HEADER 1
 #ifdef _WIN32
 #include "detail/impl/windows/map_handle.ipp"
 #else
 #include "detail/impl/posix/map_handle.ipp"
 #endif
-#undef AFIO_INCLUDED_BY_HEADER
+#undef LLFIO_INCLUDED_BY_HEADER
 #endif
 
 #ifdef _MSC_VER

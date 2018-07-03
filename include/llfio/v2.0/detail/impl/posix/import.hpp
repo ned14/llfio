@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_POSIX_HPP
-#define AFIO_POSIX_HPP
+#ifndef LLFIO_POSIX_HPP
+#define LLFIO_POSIX_HPP
 
 #include "../../../handle.hpp"
 
@@ -34,7 +34,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <fcntl.h>
 #include <unistd.h>
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 inline result<int> attribs_from_handle_mode_caching_and_flags(native_handle_type &nativeh, handle::mode _mode, handle::creation _creation, handle::caching _caching, handle::flag /*unused*/) noexcept
 {
@@ -111,6 +111,6 @@ inline result<int> attribs_from_handle_mode_caching_and_flags(native_handle_type
   return attribs;
 }
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
 #endif

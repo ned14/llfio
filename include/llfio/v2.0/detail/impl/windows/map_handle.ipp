@@ -40,7 +40,7 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 section_handle::~section_handle()
 {
@@ -49,14 +49,14 @@ section_handle::~section_handle()
     auto ret = section_handle::close();
     if(ret.has_error())
     {
-      AFIO_LOG_FATAL(_v.h, "section_handle::~section_handle() close failed");
+      LLFIO_LOG_FATAL(_v.h, "section_handle::~section_handle() close failed");
       abort();
     }
   }
 }
 result<void> section_handle::close() noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(_v)
   {
     OUTCOME_TRYV(handle::close());
@@ -154,7 +154,7 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   {
     pmaximum_size = nullptr;
   }
-  AFIO_LOG_FUNCTION_CALL(&ret);
+  LLFIO_LOG_FUNCTION_CALL(&ret);
   HANDLE h;
   NTSTATUS ntstat = NtCreateSection(&h, SECTION_ALL_ACCESS, poa, pmaximum_size, prot, attribs, backing.native_handle().h);
   if(ntstat < 0)
@@ -226,7 +226,7 @@ result<section_handle> section_handle::section(extent_type bytes, const path_han
   nativeh.behaviour |= native_handle_type::disposition::section;
   LARGE_INTEGER _maximum_size{}, *pmaximum_size = &_maximum_size;
   _maximum_size.QuadPart = bytes;
-  AFIO_LOG_FUNCTION_CALL(&ret);
+  LLFIO_LOG_FUNCTION_CALL(&ret);
   HANDLE h;
   NTSTATUS ntstat = NtCreateSection(&h, SECTION_ALL_ACCESS, nullptr, pmaximum_size, prot, attribs, anonh.native_handle().h);
   if(ntstat < 0)
@@ -241,7 +241,7 @@ result<section_handle::extent_type> section_handle::length() const noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   SECTION_BASIC_INFORMATION sbi{};
   NTSTATUS ntstat = NtQuerySection(_v.h, SectionBasicInformation, &sbi, sizeof(sbi), nullptr);
   if(STATUS_SUCCESS != ntstat)
@@ -255,7 +255,7 @@ result<section_handle::extent_type> section_handle::truncate(extent_type newsize
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(newsize == 0u)
   {
     if(_backing != nullptr)
@@ -284,7 +284,7 @@ result<section_handle::extent_type> section_handle::truncate(extent_type newsize
 template <class T> static inline T win32_round_up_to_allocation_size(T i) noexcept
 {
   // Should we fetch the allocation granularity from Windows? I very much doubt it'll ever change from 64Kb
-  i = (T)((AFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i) + 65535) & ~(65535));  // NOLINT
+  i = (T)((LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i) + 65535) & ~(65535));  // NOLINT
   return i;
 }
 static inline void win32_map_flags(native_handle_type &nativeh, DWORD &allocation, DWORD &prot, size_t &commitsize, bool enable_reservation, section_handle::flag _flag)
@@ -383,7 +383,7 @@ map_handle::~map_handle()
     auto ret = map_handle::close();
     if(ret.has_error())
     {
-      AFIO_LOG_FATAL(_v.h, "map_handle::~map_handle() close failed");
+      LLFIO_LOG_FATAL(_v.h, "map_handle::~map_handle() close failed");
       abort();
     }
   }
@@ -393,7 +393,7 @@ result<void> map_handle::close() noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(_addr != nullptr)
   {
     if(_section != nullptr)
@@ -425,7 +425,7 @@ result<void> map_handle::close() noexcept
 
 native_handle_type map_handle::release() noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   // We don't want ~handle() to close our borrowed handle
   _v = native_handle_type();
   _addr = nullptr;
@@ -435,7 +435,7 @@ native_handle_type map_handle::release() noexcept
 
 map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_handle::io_request<map_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   byte *addr = _addr + reqs.offset;
   extent_type bytes = 0;
   // Check for overflow
@@ -488,7 +488,7 @@ result<map_handle> map_handle::map(size_type bytes, section_handle::flag _flag) 
     size_t commitsize;
     win32_map_flags(nativeh, allocation, prot, commitsize, true, _flag);
   }
-  AFIO_LOG_FUNCTION_CALL(&ret);
+  LLFIO_LOG_FUNCTION_CALL(&ret);
   addr = VirtualAlloc(nullptr, bytes, allocation, prot);
   if(addr == nullptr)
   {
@@ -532,7 +532,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   _offset.QuadPart = offset;
   SIZE_T _bytes = utils::round_up_to_page_size(bytes);
   win32_map_flags(nativeh, allocation, prot, commitsize, section.backing() != nullptr, _flag);
-  AFIO_LOG_FUNCTION_CALL(&ret);
+  LLFIO_LOG_FUNCTION_CALL(&ret);
   NTSTATUS ntstat = NtMapViewOfSection(section.native_handle().h, GetCurrentProcess(), &addr, 0, commitsize, &_offset, &_bytes, ViewUnmap, allocation, prot);
   if(ntstat < 0)
   {
@@ -569,7 +569,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool /* un
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   newsize = win32_round_up_to_allocation_size(newsize);
   if(newsize == _reservation)
   {
@@ -645,7 +645,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool /* un
 
 result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_handle::flag flag) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(region.data == nullptr)
   {
     return errc::invalid_argument;
@@ -692,7 +692,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
 
 result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(region.data == nullptr)
   {
     return errc::invalid_argument;
@@ -712,7 +712,7 @@ result<void> map_handle::zero_memory(buffer_type region) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(region.data == nullptr)
   {
     return errc::invalid_argument;
@@ -740,7 +740,7 @@ result<span<map_handle::buffer_type>> map_handle::prefetch(span<buffer_type> reg
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  AFIO_LOG_FUNCTION_CALL(0);
+  LLFIO_LOG_FUNCTION_CALL(0);
   if(PrefetchVirtualMemory_ == nullptr)
   {
     return span<map_handle::buffer_type>();
@@ -757,7 +757,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  AFIO_LOG_FUNCTION_CALL(0);
+  LLFIO_LOG_FUNCTION_CALL(0);
   region = utils::round_to_page_size(region);
   if(region.data == nullptr)
   {
@@ -795,7 +795,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
 
 map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buffers_type> reqs, deadline /*d*/) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   byte *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
   for(buffer_type &req : reqs.buffers)
@@ -820,7 +820,7 @@ map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buff
 
 map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_request<const_buffers_type> reqs, deadline /*d*/) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   byte *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
   if(QUICKCPPLIB_NAMESPACE::signal_guard::signal_guard(QUICKCPPLIB_NAMESPACE::signal_guard::signalc::undefined_memory_access,
@@ -861,4 +861,4 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
   return reqs.buffers;
 }
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

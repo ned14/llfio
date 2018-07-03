@@ -31,13 +31,13 @@ Distributed under the Boost Software License, Version 1.0.
 #include <iostream>
 
 #ifdef __linux__
-#define file_handle AFIO_V2_NAMESPACE::file_handle
+#define file_handle LLFIO_V2_NAMESPACE::file_handle
 #endif
 
 constexpr unsigned permute_flags_max = 4;
 static const std::regex sp_preamble{"(system|storage).*"};
 
-static AFIO_V2_NAMESPACE::storage_profile::storage_profile profile[permute_flags_max];
+static LLFIO_V2_NAMESPACE::storage_profile::storage_profile profile[permute_flags_max];
 
 #define RETCHECK(expr)                                                                                                                                                                                                                                                                                                         \
   {                                                                                                                                                                                                                                                                                                                            \
@@ -51,8 +51,8 @@ static AFIO_V2_NAMESPACE::storage_profile::storage_profile profile[permute_flags
 
 int main(int argc, char *argv[])
 {
-  using namespace AFIO_V2_NAMESPACE;
-  using AFIO_V2_NAMESPACE::byte;
+  using namespace LLFIO_V2_NAMESPACE;
+  using LLFIO_V2_NAMESPACE::byte;
   std::regex torun(".*");
   bool regexvalid = false;
   unsigned torunflags = (1 << permute_flags_max) - 1;

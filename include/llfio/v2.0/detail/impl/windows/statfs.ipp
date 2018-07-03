@@ -26,11 +26,11 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../statfs.hpp"
 #include "import.hpp"
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
-AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, statfs_t::want wanted) noexcept
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, statfs_t::want wanted) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(&h);
+  LLFIO_LOG_FUNCTION_CALL(&h);
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   alignas(8) wchar_t buffer[32769];
@@ -202,4 +202,4 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, st
   return ret;
 }
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

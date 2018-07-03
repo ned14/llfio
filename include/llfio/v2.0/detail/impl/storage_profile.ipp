@@ -47,12 +47,12 @@ Distributed under the Boost Software License, Version 1.0.
 #include <iostream>
 #endif
 
-#define AFIO_STORAGE_PROFILE_TIME_DIVIDER 10
+#define LLFIO_STORAGE_PROFILE_TIME_DIVIDER 10
 
 // Work around buggy Windows scheduler
-//#define AFIO_STORAGE_PROFILE_PIN_THREADS
+//#define LLFIO_STORAGE_PROFILE_PIN_THREADS
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 namespace storage_profile
 {
@@ -88,7 +88,7 @@ namespace storage_profile
   */
   void storage_profile::write(std::ostream &out, const std::regex &which, size_t _indent, bool invert_match) const
   {
-    AFIO_LOG_FUNCTION_CALL(this);
+    LLFIO_LOG_FUNCTION_CALL(this);
     std::vector<std::string> lastsection;
     auto print = [_indent, &out, &lastsection](auto &i) {
       size_t indent = _indent;
@@ -194,14 +194,14 @@ namespace storage_profile
             chunksize = static_cast<size_t>(sp.mem_quantity.value / 4);
           }
           char *buffer = utils::page_allocator<char>().allocate(chunksize);
-          auto unbuffer = AFIO_V2_NAMESPACE::undoer([buffer, chunksize] { utils::page_allocator<char>().deallocate(buffer, chunksize); });
+          auto unbuffer = LLFIO_V2_NAMESPACE::undoer([buffer, chunksize] { utils::page_allocator<char>().deallocate(buffer, chunksize); });
           // Make sure all memory is really allocated first
           memset(buffer, 1, chunksize);
 
           // Max bandwidth is sequential writes of min(25% of system memory or 256Mb)
           auto begin = std::chrono::high_resolution_clock::now();
           unsigned long long count;
-          for(count = 0; std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < (10 / AFIO_STORAGE_PROFILE_TIME_DIVIDER); count++)
+          for(count = 0; std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < (10 / LLFIO_STORAGE_PROFILE_TIME_DIVIDER); count++)
           {
             memset(buffer, count & 0xff, chunksize);
           }
@@ -210,7 +210,7 @@ namespace storage_profile
           // Min bandwidth is randomised 4Kb copies of the same
           QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng ctx(78);
           begin = std::chrono::high_resolution_clock::now();
-          for(count = 0; std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < (10 / AFIO_STORAGE_PROFILE_TIME_DIVIDER); count++)
+          for(count = 0; std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < (10 / LLFIO_STORAGE_PROFILE_TIME_DIVIDER); count++)
           {
             for(size_t n = 0; n < chunksize; n += 4096)
             {
@@ -511,7 +511,7 @@ namespace storage_profile
           std::cout << "direct=" << !srch.are_reads_from_cache() << " sync=" << srch.are_writes_durable() << " testing atomicity of rewrites of " << size << " bytes ..." << std::endl;
 #endif
           auto begin = std::chrono::high_resolution_clock::now();
-          while(!failed && std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < (20 / AFIO_STORAGE_PROFILE_TIME_DIVIDER))
+          while(!failed && std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < (20 / LLFIO_STORAGE_PROFILE_TIME_DIVIDER))
           {
             std::this_thread::sleep_for(std::chrono::seconds(1));
           }
@@ -657,7 +657,7 @@ namespace storage_profile
             std::cout << "direct=" << !srch.are_reads_from_cache() << " sync=" << srch.are_writes_durable() << " testing atomicity of rewrites of " << size << " bytes to offset " << offset << " ..." << std::endl;
 #endif
             auto begin = std::chrono::high_resolution_clock::now();
-            while(!failed && std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < (20 / AFIO_STORAGE_PROFILE_TIME_DIVIDER))
+            while(!failed && std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < (20 / LLFIO_STORAGE_PROFILE_TIME_DIVIDER))
             {
               std::this_thread::sleep_for(std::chrono::seconds(1));
             }
@@ -818,7 +818,7 @@ namespace storage_profile
               std::cout << "direct=" << !srch.are_reads_from_cache() << " sync=" << srch.are_writes_durable() << " testing atomicity of rewrites of " << size << " bytes to offset " << offset << " ..." << std::endl;
 #endif
               auto begin = std::chrono::high_resolution_clock::now();
-              while(!failed && std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < (20 / AFIO_STORAGE_PROFILE_TIME_DIVIDER))
+              while(!failed && std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < (20 / LLFIO_STORAGE_PROFILE_TIME_DIVIDER))
               {
                 std::this_thread::sleep_for(std::chrono::seconds(1));
               }
@@ -905,7 +905,7 @@ namespace storage_profile
         for(size_t no = 0; no < nowriters; no++)
         {
           std::packaged_task<void()> task([no, &done, &workfiles, &results] {
-#ifdef AFIO_STORAGE_PROFILE_PIN_THREADS
+#ifdef LLFIO_STORAGE_PROFILE_PIN_THREADS
             SetThreadAffinityMask(GetCurrentThread(), 1ULL << (no * 2));
 #endif
             file_handle &h = *workfiles[no];
@@ -944,7 +944,7 @@ namespace storage_profile
         for(size_t no = nowriters; no < nowriters + noreaders; no++)
         {
           std::packaged_task<void()> task([no, &done, &workfiles, &results] {
-#ifdef AFIO_STORAGE_PROFILE_PIN_THREADS
+#ifdef LLFIO_STORAGE_PROFILE_PIN_THREADS
             SetThreadAffinityMask(GetCurrentThread(), 1ULL << (no * 2));
 #endif
             file_handle &h = *workfiles[no];
@@ -1191,7 +1191,7 @@ namespace storage_profile
     inline outcome<stats> _traversal_N(file_handle &srch, size_t no, size_t bytes, bool cold_cache, bool race_free, bool reduced) noexcept
     {
       stats s;
-#ifdef AFIO_STORAGE_PROFILE_PIN_THREADS
+#ifdef LLFIO_STORAGE_PROFILE_PIN_THREADS
       SetThreadAffinityMask(GetCurrentThread(), 1ULL << (no * 2));
 #endif
       try
@@ -1373,7 +1373,7 @@ namespace storage_profile
     */
   }  // namespace response_time
 }  // namespace storage_profile
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
 #ifdef WIN32
 #include "windows/storage_profile.ipp"

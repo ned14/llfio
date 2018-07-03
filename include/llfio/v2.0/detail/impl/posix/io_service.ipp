@@ -25,17 +25,17 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../async_file_handle.hpp"
 
 #include <pthread.h>
-#if AFIO_USE_POSIX_AIO
+#if LLFIO_USE_POSIX_AIO
 #include <aio.h>
 #include <sys/mman.h>
-#if AFIO_COMPILE_KQUEUES
+#if LLFIO_COMPILE_KQUEUES
 #include <sys/event.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #endif
 #endif
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 static int interrupt_signal;
 static struct sigaction interrupt_signal_handler_old_action;
@@ -63,7 +63,7 @@ int io_service::set_interruption_signal(int signo)
   }
   if(signo != 0)
   {
-#if AFIO_HAVE_REALTIME_SIGNALS
+#if LLFIO_HAVE_REALTIME_SIGNALS
     if(-1 == signo)
     {
       for(signo = SIGRTMIN; signo < SIGRTMAX; signo++)
@@ -136,10 +136,10 @@ io_service::io_service()
     : _work_queued(0)
 {
   _threadh = pthread_self();
-#if AFIO_USE_POSIX_AIO
+#if LLFIO_USE_POSIX_AIO
   _use_kqueues = true;
   _blocked_interrupt_signal = 0;
-#if AFIO_COMPILE_KQUEUES
+#if LLFIO_COMPILE_KQUEUES
   _kqueueh = 0;
 #error todo
 #else
@@ -162,8 +162,8 @@ io_service::~io_service()
       std::this_thread::yield();
     }
   }
-#if AFIO_USE_POSIX_AIO
-#if AFIO_COMPILE_KQUEUES
+#if LLFIO_USE_POSIX_AIO
+#if LLFIO_COMPILE_KQUEUES
   if(_kqueueh)
     ::close(_kqueueh);
 #endif
@@ -177,7 +177,7 @@ io_service::~io_service()
 #endif
 }
 
-#if AFIO_USE_POSIX_AIO
+#if LLFIO_USE_POSIX_AIO
 void io_service::disable_kqueues()
 {
   if(_use_kqueues)
@@ -277,11 +277,11 @@ result<bool> io_service::run_until(deadline d) noexcept
         return _work_queued != 0;
       }
     }
-#if AFIO_USE_POSIX_AIO
+#if LLFIO_USE_POSIX_AIO
     int errcode = 0;
     if(_use_kqueues)
     {
-#if AFIO_COMPILE_KQUEUES
+#if LLFIO_COMPILE_KQUEUES
 #error todo
 #endif
     }
@@ -381,10 +381,10 @@ void io_service::_post(detail::function_ptr<void(io_service *)> &&f)
     _posts.push_back(std::move(pi));
   }
   _work_enqueued();
-#if AFIO_USE_POSIX_AIO
+#if LLFIO_USE_POSIX_AIO
   if(_use_kqueues)
   {
-#if AFIO_COMPILE_KQUEUES
+#if LLFIO_COMPILE_KQUEUES
 #error todo
 #endif
   }
@@ -394,7 +394,7 @@ void io_service::_post(detail::function_ptr<void(io_service *)> &&f)
     // of the aio_suspend(), we need to pump this until run_until() notices
     while(_need_signal)
     {
-      //#  if AFIO_HAVE_REALTIME_SIGNALS
+      //#  if LLFIO_HAVE_REALTIME_SIGNALS
       //    sigval val = { 0 };
       //    pthread_sigqueue(_threadh, interrupt_signal, val);
       //#else
@@ -407,4 +407,4 @@ void io_service::_post(detail::function_ptr<void(io_service *)> &&f)
 #endif
 }
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

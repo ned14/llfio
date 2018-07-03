@@ -22,16 +22,16 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_STORAGE_PROFILE_H
-#define AFIO_STORAGE_PROFILE_H
+#ifndef LLFIO_STORAGE_PROFILE_H
+#define LLFIO_STORAGE_PROFILE_H
 
 #include "io_service.hpp"
 
-#if AFIO_EXPERIMENTAL_STATUS_CODE
+#if LLFIO_EXPERIMENTAL_STATUS_CODE
 #include "outcome/include/outcome/experimental/status_outcome.hpp"
-AFIO_V2_NAMESPACE_EXPORT_BEGIN
+LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 template <class T> using outcome = OUTCOME_V2_NAMESPACE::experimental::erased_outcome<T, error_code>;
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 #endif
 
 #include <regex>
@@ -43,7 +43,7 @@ AFIO_V2_NAMESPACE_END
 #pragma warning(disable : 4251)  // dll interface
 #endif
 
-AFIO_V2_NAMESPACE_EXPORT_BEGIN
+LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace storage_profile
 {
@@ -167,11 +167,11 @@ namespace storage_profile
   namespace system
   {
     // OS name, version
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> os(storage_profile &sp, file_handle &h) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> os(storage_profile &sp, file_handle &h) noexcept;
     // CPU name, architecture, physical cores
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> cpu(storage_profile &sp, file_handle &h) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> cpu(storage_profile &sp, file_handle &h) noexcept;
     // System memory quantity, in use, max and min bandwidth
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> mem(storage_profile &sp, file_handle &h) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> mem(storage_profile &sp, file_handle &h) noexcept;
 #ifdef _WIN32
     namespace windows
     {
@@ -179,20 +179,20 @@ namespace storage_profile
     namespace posix
     {
 #endif
-      AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> _mem(storage_profile &sp, file_handle &h) noexcept;
+      LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> _mem(storage_profile &sp, file_handle &h) noexcept;
     }
     // High resolution clock granularity
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> clock_granularity(storage_profile &sp, file_handle &h) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> yield_overhead(storage_profile &sp, file_handle &h) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> sleep_wake_overhead(storage_profile &sp, file_handle &h) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> drop_filesystem_cache_support(storage_profile &sp, file_handle & /*unused*/) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> clock_granularity(storage_profile &sp, file_handle &h) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> yield_overhead(storage_profile &sp, file_handle &h) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> sleep_wake_overhead(storage_profile &sp, file_handle &h) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> drop_filesystem_cache_support(storage_profile &sp, file_handle & /*unused*/) noexcept;
   }  // namespace system
   namespace storage
   {
     // Device name, size, min i/o size
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> device(storage_profile &sp, file_handle &h) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> device(storage_profile &sp, file_handle &h) noexcept;
     // FS name, config, size, in use
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> fs(storage_profile &sp, file_handle &h) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> fs(storage_profile &sp, file_handle &h) noexcept;
 #ifdef _WIN32
     namespace windows
     {
@@ -200,43 +200,43 @@ namespace storage_profile
     namespace posix
     {
 #endif
-      AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> _device(storage_profile &sp, file_handle &h, const std::string &_mntfromname, const std::string &fstypename) noexcept;
+      LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> _device(storage_profile &sp, file_handle &h, const std::string &_mntfromname, const std::string &fstypename) noexcept;
     }
   }  // namespace storage
   namespace concurrency
   {
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> atomic_rewrite_quantum(storage_profile &sp, file_handle &srch) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> atomic_rewrite_offset_boundary(storage_profile &sp, file_handle &srch) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> atomic_rewrite_quantum(storage_profile &sp, file_handle &srch) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> atomic_rewrite_offset_boundary(storage_profile &sp, file_handle &srch) noexcept;
   }
   namespace latency
   {
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> read_nothing(storage_profile &sp, file_handle &srch) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> write_nothing(storage_profile &sp, file_handle &srch) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> read_qd1(storage_profile &sp, file_handle &srch) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> write_qd1(storage_profile &sp, file_handle &srch) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> read_qd16(storage_profile &sp, file_handle &srch) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> write_qd16(storage_profile &sp, file_handle &srch) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> readwrite_qd4(storage_profile &sp, file_handle &srch) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> read_nothing(storage_profile &sp, file_handle &srch) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> write_nothing(storage_profile &sp, file_handle &srch) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> read_qd1(storage_profile &sp, file_handle &srch) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> write_qd1(storage_profile &sp, file_handle &srch) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> read_qd16(storage_profile &sp, file_handle &srch) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> write_qd16(storage_profile &sp, file_handle &srch) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> readwrite_qd4(storage_profile &sp, file_handle &srch) noexcept;
   }
   namespace response_time
   {
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_racefree_0b(storage_profile &sp, file_handle &srch) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_racefree_1b(storage_profile &sp, file_handle &h) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_racefree_4k(storage_profile &sp, file_handle &h) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_nonracefree_0b(storage_profile &sp, file_handle &srch) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_nonracefree_1b(storage_profile &sp, file_handle &h) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_nonracefree_4k(storage_profile &sp, file_handle &h) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_nonracefree_1M(storage_profile &sp, file_handle &h) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_racefree_0b(storage_profile &sp, file_handle &srch) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_racefree_1b(storage_profile &sp, file_handle &h) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_racefree_4k(storage_profile &sp, file_handle &h) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_nonracefree_0b(storage_profile &sp, file_handle &h) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_nonracefree_1b(storage_profile &sp, file_handle &h) noexcept;
-    AFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_nonracefree_4k(storage_profile &sp, file_handle &h) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_racefree_0b(storage_profile &sp, file_handle &srch) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_racefree_1b(storage_profile &sp, file_handle &h) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_racefree_4k(storage_profile &sp, file_handle &h) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_nonracefree_0b(storage_profile &sp, file_handle &srch) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_nonracefree_1b(storage_profile &sp, file_handle &h) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_nonracefree_4k(storage_profile &sp, file_handle &h) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_warm_nonracefree_1M(storage_profile &sp, file_handle &h) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_racefree_0b(storage_profile &sp, file_handle &srch) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_racefree_1b(storage_profile &sp, file_handle &h) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_racefree_4k(storage_profile &sp, file_handle &h) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_nonracefree_0b(storage_profile &sp, file_handle &h) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_nonracefree_1b(storage_profile &sp, file_handle &h) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC outcome<void> traversal_cold_nonracefree_4k(storage_profile &sp, file_handle &h) noexcept;
   }  // namespace response_time
 
   //! A (possibly incomplet) profile of storage
-  struct AFIO_DECL storage_profile
+  struct LLFIO_DECL storage_profile
   {
     //! The size type
     using size_type = size_t;
@@ -276,9 +276,9 @@ namespace storage_profile
     const_iterator end() const noexcept { return begin() + max_size(); }
 
     //! Read the matching items in the storage profile from in as YAML
-    AFIO_HEADERS_ONLY_MEMFUNC_SPEC void read(std::istream &in, std::regex which = std::regex(".*"));
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC void read(std::istream &in, std::regex which = std::regex(".*"));
     //! Write the matching items from storage profile as YAML to out with the given indentation
-    AFIO_HEADERS_ONLY_MEMFUNC_SPEC void write(std::ostream &out, const std::regex &which = std::regex(".*"), size_t _indent = 0, bool invert_match = false) const;
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC void write(std::ostream &out, const std::regex &which = std::regex(".*"), size_t _indent = 0, bool invert_match = false) const;
 
     // System characteristics
     item<std::string> os_name = {"system:os:name", &system::os};                     // e.g. Microsoft Windows NT
@@ -395,12 +395,12 @@ namespace storage_profile
   };
 }  // namespace storage_profile
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
-#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define AFIO_INCLUDED_BY_HEADER 1
+#if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define LLFIO_INCLUDED_BY_HEADER 1
 #include "detail/impl/storage_profile.ipp"
-#undef AFIO_INCLUDED_BY_HEADER
+#undef LLFIO_INCLUDED_BY_HEADER
 #endif
 
 #ifdef _MSC_VER

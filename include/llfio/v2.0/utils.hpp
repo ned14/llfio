@@ -22,10 +22,10 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_UTILS_H
-#define AFIO_UTILS_H
+#ifndef LLFIO_UTILS_H
+#define LLFIO_UTILS_H
 
-#ifndef AFIO_CONFIG_HPP
+#ifndef LLFIO_CONFIG_HPP
 #error You must include the master afio.hpp, not individual header files directly
 #endif
 #include "config.hpp"
@@ -34,7 +34,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! \file utils.hpp Provides namespace utils
 
-AFIO_V2_NAMESPACE_EXPORT_BEGIN
+LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace utils
 {
@@ -44,14 +44,14 @@ namespace utils
   \ingroup utils
   \complexity{Whatever the system API takes (one would hope constant time).}
   */
-  AFIO_HEADERS_ONLY_FUNC_SPEC size_t page_size() noexcept;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC size_t page_size() noexcept;
 
   /*! \brief Round a value to its next lowest page size multiple
   */
   template <class T> inline T round_down_to_page_size(T i) noexcept
   {
     const size_t pagesize = page_size();
-    i = (T)(AFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i) & ~(pagesize - 1));  // NOLINT
+    i = (T)(LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i) & ~(pagesize - 1));  // NOLINT
     return i;
   }
   /*! \brief Round a value to its next highest page size multiple
@@ -59,7 +59,7 @@ namespace utils
   template <class T> inline T round_up_to_page_size(T i) noexcept
   {
     const size_t pagesize = page_size();
-    i = (T)((AFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i) + pagesize - 1) & ~(pagesize - 1));  // NOLINT
+    i = (T)((LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i) + pagesize - 1) & ~(pagesize - 1));  // NOLINT
     return i;
   }
   /*! \brief Round a pair of a pointer and a size_t to their nearest page size multiples. The pointer will be rounded
@@ -68,7 +68,7 @@ namespace utils
   template <class T> inline T round_to_page_size(T i) noexcept
   {
     const size_t pagesize = page_size();
-    i.data = reinterpret_cast<byte *>((AFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i.data)) & ~(pagesize - 1));
+    i.data = reinterpret_cast<byte *>((LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i.data)) & ~(pagesize - 1));
     i.len = (i.len + pagesize - 1) & ~(pagesize - 1);
     return i;
   }
@@ -81,7 +81,7 @@ namespace utils
   \complexity{Whatever the system API takes (one would hope constant time).}
   \exceptionmodel{Any error from the operating system or std::bad_alloc.}
   */
-  AFIO_HEADERS_ONLY_FUNC_SPEC std::vector<size_t> page_sizes(bool only_actually_available = true);
+  LLFIO_HEADERS_ONLY_FUNC_SPEC std::vector<size_t> page_sizes(bool only_actually_available = true);
 
   /*! \brief Returns a reasonable default size for page_allocator, typically the closest page size from
   page_sizes() to 1Mb.
@@ -121,7 +121,7 @@ namespace utils
   \complexity{Whatever the system API takes.}
   \exceptionmodel{Any error from the operating system.}
   */
-  AFIO_HEADERS_ONLY_FUNC_SPEC void random_fill(char *buffer, size_t bytes) noexcept;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC void random_fill(char *buffer, size_t bytes) noexcept;
 
   /*! \brief Returns a cryptographically random string capable of being used as a filename. Essentially random_fill() + to_hex_string().
 
@@ -142,7 +142,7 @@ namespace utils
 
   /*! \brief Tries to flush all modified data to the physical device.
   */
-  AFIO_HEADERS_ONLY_FUNC_SPEC result<void> flush_modified_data() noexcept;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<void> flush_modified_data() noexcept;
 
   /*! \brief Tries to flush all modified data to the physical device, and then drop the OS filesystem cache,
   thus making all future reads come from the physical device. Currently only implemented for Microsoft Windows and Linux.
@@ -151,7 +151,7 @@ namespace utils
   For obvious reasons, calling this will have a severe negative impact on performance, but it's very useful for
   benchmarking cold cache vs warm cache performance.
   */
-  AFIO_HEADERS_ONLY_FUNC_SPEC result<void> drop_filesystem_cache() noexcept;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<void> drop_filesystem_cache() noexcept;
 
   namespace detail
   {
@@ -180,8 +180,8 @@ namespace utils
       ret.actual_size = (bytes + ret.page_size_used - 1) & ~(ret.page_size_used - 1);
       return ret;
     }
-    AFIO_HEADERS_ONLY_FUNC_SPEC large_page_allocation allocate_large_pages(size_t bytes);
-    AFIO_HEADERS_ONLY_FUNC_SPEC void deallocate_large_pages(void *p, size_t bytes);
+    LLFIO_HEADERS_ONLY_FUNC_SPEC large_page_allocation allocate_large_pages(size_t bytes);
+    LLFIO_HEADERS_ONLY_FUNC_SPEC void deallocate_large_pages(void *p, size_t bytes);
   }  // namespace detail
   /*! \class page_allocator
   \brief An STL allocator which allocates large TLB page memory.
@@ -278,16 +278,16 @@ namespace utils
   template <class T, class U> inline bool operator==(const page_allocator<T> & /*unused*/, const page_allocator<U> & /*unused*/) noexcept { return true; }
 }  // namespace utils
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
-#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define AFIO_INCLUDED_BY_HEADER 1
+#if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define LLFIO_INCLUDED_BY_HEADER 1
 #ifdef _WIN32
 #include "detail/impl/windows/utils.ipp"
 #else
 #include "detail/impl/posix/utils.ipp"
 #endif
-#undef AFIO_INCLUDED_BY_HEADER
+#undef LLFIO_INCLUDED_BY_HEADER
 #endif
 
 

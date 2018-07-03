@@ -26,7 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 template <class FileHandleType, class DirectoryHandleType> static inline void TestHandleCurrentPath()
 {
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace afio = LLFIO_V2_NAMESPACE;
   {
     std::error_code ec;
     afio::filesystem::remove_all("tempfile", ec);
@@ -156,6 +156,6 @@ template <class FileHandleType, class DirectoryHandleType> static inline void Te
   h2.unlink().value();
 }
 
-KERNELTEST_TEST_KERNEL(integration, afio, current_path, handle, "Tests that afio::handle::current_path() works as expected", TestHandleCurrentPath<AFIO_V2_NAMESPACE::file_handle, AFIO_V2_NAMESPACE::directory_handle>())
+KERNELTEST_TEST_KERNEL(integration, afio, current_path, handle, "Tests that afio::handle::current_path() works as expected", TestHandleCurrentPath<LLFIO_V2_NAMESPACE::file_handle, LLFIO_V2_NAMESPACE::directory_handle>())
 KERNELTEST_TEST_KERNEL(integration, afio, current_path, cached_parent_handle_adapter, "Tests that afio::cached_parent_handle_adapter::current_path() works as expected",
-                       TestHandleCurrentPath<AFIO_V2_NAMESPACE::algorithm::cached_parent_handle_adapter<AFIO_V2_NAMESPACE::file_handle>, AFIO_V2_NAMESPACE::algorithm::cached_parent_handle_adapter<AFIO_V2_NAMESPACE::directory_handle>>())
+                       TestHandleCurrentPath<LLFIO_V2_NAMESPACE::algorithm::cached_parent_handle_adapter<LLFIO_V2_NAMESPACE::file_handle>, LLFIO_V2_NAMESPACE::algorithm::cached_parent_handle_adapter<LLFIO_V2_NAMESPACE::directory_handle>>())

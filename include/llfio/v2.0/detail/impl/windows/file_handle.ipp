@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../file_handle.hpp"
 #include "import.hpp"
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 result<file_handle> file_handle::file(const path_handle &base, file_handle::path_view_type path, file_handle::mode _mode, file_handle::creation _creation, file_handle::caching _caching, file_handle::flag flags) noexcept
 {
@@ -33,7 +33,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   using namespace windows_nt_kernel;
   result<file_handle> ret(file_handle(native_handle_type(), 0, 0, _caching, flags));
   native_handle_type &nativeh = ret.value()._v;
-  AFIO_LOG_FUNCTION_CALL(&ret);
+  LLFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::file;
   DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
   OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode, flags));
@@ -155,9 +155,9 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
     FILE_SET_SPARSE_BUFFER fssb = {1u};
     if(DeviceIoControl(nativeh.h, FSCTL_SET_SPARSE, &fssb, sizeof(fssb), nullptr, 0, &bytesout, nullptr) == 0)
     {
-#if AFIO_LOGGING_LEVEL >= 3
+#if LLFIO_LOGGING_LEVEL >= 3
       DWORD errcode = GetLastError();
-      AFIO_LOG_WARN(&ret, "Failed to set file to sparse");
+      LLFIO_LOG_WARN(&ret, "Failed to set file to sparse");
       result<void> r = win32_error(errcode);
       (void) r;  // throw away
 #endif
@@ -192,7 +192,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   flags |= flag::disable_safety_unlinks | flag::win_disable_unlink_emulation;
   result<file_handle> ret(file_handle(native_handle_type(), 0, 0, _caching, flags));
   native_handle_type &nativeh = ret.value()._v;
-  AFIO_LOG_FUNCTION_CALL(&ret);
+  LLFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::file;
   DWORD fileshare = /* no read nor write access for others */ FILE_SHARE_DELETE;
   OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode, flags));
@@ -303,12 +303,12 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(d && !_v.is_overlapped())
   {
     return errc::not_supported;
   }
-  AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+  LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
   OVERLAPPED ol{};
   memset(&ol, 0, sizeof(ol));
   auto *isb = reinterpret_cast<IO_STATUS_BLOCK *>(&ol);
@@ -329,7 +329,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
     if(STATUS_TIMEOUT == ntstat)
     {
       CancelIoEx(_v.h, &ol);
-      AFIO_WIN_DEADLINE_TO_TIMEOUT(d);
+      LLFIO_WIN_DEADLINE_TO_TIMEOUT(d);
     }
   }
   if(ntstat < 0)
@@ -341,7 +341,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
 
 result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline /*unused*/) const noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   // Fast path
   if(mode_ == mode::unchanged && caching_ == caching::unchanged)
   {
@@ -388,7 +388,7 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline /*
 
 result<file_handle::extent_type> file_handle::maximum_extent() const noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
 #if 0
   char buffer[1];
   DWORD read = 0;
@@ -407,7 +407,7 @@ result<file_handle::extent_type> file_handle::maximum_extent() const noexcept
 
 result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type newsize) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   FILE_END_OF_FILE_INFO feofi{};
   feofi.EndOfFile.QuadPart = newsize;
   if(SetFileInformationByHandle(_v.h, FileEndOfFileInfo, &feofi, sizeof(feofi)) == 0)
@@ -425,7 +425,7 @@ result<std::vector<std::pair<file_handle::extent_type, file_handle::extent_type>
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   try
   {
     static_assert(sizeof(std::pair<file_handle::extent_type, file_handle::extent_type>) == sizeof(FILE_ALLOCATED_RANGE_BUFFER), "FILE_ALLOCATED_RANGE_BUFFER is not equivalent to pair<extent_type, extent_type>!");
@@ -466,7 +466,7 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_type offs
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(offset + bytes < offset)
   {
     return errc::value_too_large;
@@ -496,4 +496,4 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_type offs
   return success();
 }
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

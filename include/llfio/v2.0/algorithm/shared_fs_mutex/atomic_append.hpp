@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_SHARED_FS_MUTEX_ATOMIC_APPEND_HPP
-#define AFIO_SHARED_FS_MUTEX_ATOMIC_APPEND_HPP
+#ifndef LLFIO_SHARED_FS_MUTEX_ATOMIC_APPEND_HPP
+#define LLFIO_SHARED_FS_MUTEX_ATOMIC_APPEND_HPP
 
 #include "../../file_handle.hpp"
 #include "base.hpp"
@@ -33,7 +33,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! \file atomic_append.hpp Provides algorithm::shared_fs_mutex::atomic_append
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
@@ -191,10 +191,10 @@ namespace algorithm
       ZFS, btrfs) guarantee atomicity of updates and therefore torn writes are never
       observed by readers. For these, hashing can be safely disabled.
       */
-      AFIO_MAKE_FREE_FUNCTION
+      LLFIO_MAKE_FREE_FUNCTION
       static result<atomic_append> fs_mutex_append(const path_handle &base, path_view lockfile, bool nfs_compatibility = false, bool skip_hashing = false) noexcept
       {
-        AFIO_LOG_FUNCTION_CALL(0);
+        LLFIO_LOG_FUNCTION_CALL(0);
         OUTCOME_TRY(ret, file_handle::file(base, lockfile, file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
         atomic_append_detail::header header;
         // Lock the entire header for exclusive access
@@ -237,9 +237,9 @@ namespace algorithm
       const file_handle &handle() const noexcept { return _h; }
 
     protected:
-      AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept final
+      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept final
       {
-        AFIO_LOG_FUNCTION_CALL(this);
+        LLFIO_LOG_FUNCTION_CALL(this);
         atomic_append_detail::lock_request lock_request;
         if(out.entities.size() > sizeof(lock_request.entities) / sizeof(lock_request.entities[0]))
         {
@@ -303,7 +303,7 @@ namespace algorithm
           // Should never happen :)
           if(readoutcome.has_error())
           {
-            AFIO_LOG_FATAL(this, "atomic_append::lock() saw an error when searching for just written data");
+            LLFIO_LOG_FATAL(this, "atomic_append::lock() saw an error when searching for just written data");
             std::terminate();
           }
           const atomic_append_detail::lock_request *record, *lastrecord;
@@ -460,13 +460,13 @@ namespace algorithm
       }
 
     public:
-      AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long hint) noexcept final
+      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long hint) noexcept final
       {
         (void) entities;
-        AFIO_LOG_FUNCTION_CALL(this);
+        LLFIO_LOG_FUNCTION_CALL(this);
         if(hint == 0u)
         {
-          AFIO_LOG_WARN(this, "atomic_append::unlock() currently requires a hint to work, assuming this is a failed lock.");
+          LLFIO_LOG_WARN(this, "atomic_append::unlock() currently requires a hint to work, assuming this is a failed lock.");
           return;
         }
         auto my_lock_request_offset = static_cast<file_handle::extent_type>(hint);
@@ -476,13 +476,13 @@ namespace algorithm
           (void) _h.read(my_lock_request_offset, {{(byte *) &record, sizeof(record)}});
           if(!record.unique_id)
           {
-            AFIO_LOG_FATAL(this, "atomic_append::unlock() I have been previously unlocked!");
+            LLFIO_LOG_FATAL(this, "atomic_append::unlock() I have been previously unlocked!");
             std::terminate();
           }
           (void) _read_header();
           if(_header.first_known_good > my_lock_request_offset)
           {
-            AFIO_LOG_FATAL(this, "atomic_append::unlock() header exceeds the lock I am unlocking!");
+            LLFIO_LOG_FATAL(this, "atomic_append::unlock() header exceeds the lock I am unlocking!");
             std::terminate();
           }
 #endif
@@ -551,7 +551,7 @@ namespace algorithm
   }  // namespace shared_fs_mutex
 }  // namespace algorithm
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
 
 #endif

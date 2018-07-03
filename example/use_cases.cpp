@@ -36,7 +36,7 @@ Distributed under the Boost Software License, Version 1.0.
 void read_entire_file1()
 {
   //! [file_entire_file1]
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace afio = LLFIO_V2_NAMESPACE;
 
   // Open the file for read
   afio::file_handle fh = afio::file(  //
@@ -68,7 +68,7 @@ void read_entire_file1()
 void read_entire_file2()
 {
   //! [file_entire_file2]
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace afio = LLFIO_V2_NAMESPACE;
 
   // Create an i/o service to complete the async file i/o
   afio::io_service service;
@@ -161,7 +161,7 @@ void scatter_write()
   */
   return;
   //! [scatter_write]
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace afio = LLFIO_V2_NAMESPACE;
 
   // Open the file for write, creating if needed, don't cache reads nor writes
   afio::file_handle fh = afio::file(  //
@@ -200,7 +200,7 @@ void scatter_write()
 void malloc1()
 {
   //! [malloc1]
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace afio = LLFIO_V2_NAMESPACE;
 
   // Call whatever the equivalent to mmap() is on this platform to fetch
   // new private memory backed by the swap file. This will be the system
@@ -253,7 +253,7 @@ void malloc1()
 void malloc2()
 {
   //! [malloc2]
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace afio = LLFIO_V2_NAMESPACE;
 
   // Create 4Kb of anonymous shared memory. This will persist
   // until the last handle to it in the system is destructed.
@@ -289,7 +289,7 @@ void malloc2()
 void map_file()
 {
   //! [map_file]
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace afio = LLFIO_V2_NAMESPACE;
 
   // Open the file for read
   afio::file_handle rfh = afio::file(  //
@@ -342,7 +342,7 @@ void map_file()
 void mapped_file()
 {
   //! [mapped_file]
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace afio = LLFIO_V2_NAMESPACE;
 
   // Open the mapped file for read
   afio::mapped_file_handle mh = afio::mapped_file(  //
@@ -370,7 +370,7 @@ void mapped_file()
 void sparse_array()
 {
   //! [sparse_array]
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace afio = LLFIO_V2_NAMESPACE;
 
   // Make me a 1 trillion element sparsely allocated integer array!
   afio::mapped_file_handle mfh = afio::mapped_temp_inode().value();
@@ -392,7 +392,7 @@ void sparse_array()
 std::future<void> coroutine_write()
 {
   //! [coroutine_write]
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace afio = LLFIO_V2_NAMESPACE;
 
   // Create an asynchronous file handle
   afio::io_service service;

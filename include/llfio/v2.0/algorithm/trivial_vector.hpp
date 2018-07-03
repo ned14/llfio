@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_ALGORITHM_VECTOR_HPP
-#define AFIO_ALGORITHM_VECTOR_HPP
+#ifndef LLFIO_ALGORITHM_VECTOR_HPP
+#define LLFIO_ALGORITHM_VECTOR_HPP
 
 #include "../map_handle.hpp"
 #include "../utils.hpp"
@@ -31,7 +31,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! \file trivial_vector.hpp Provides constant time reallocating STL vector.
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
@@ -679,7 +679,7 @@ L3 4Mb:
     536870912,405524,294685
   */
 #ifndef DOXYGEN_IS_IN_THE_HOUSE
-  template <class T> AFIO_REQUIRES(std::is_trivially_copyable<T>::value) class trivial_vector : public detail::trivial_vector_impl<std::is_default_constructible<T>::value, T>
+  template <class T> LLFIO_REQUIRES(std::is_trivially_copyable<T>::value) class trivial_vector : public detail::trivial_vector_impl<std::is_default_constructible<T>::value, T>
 #else
   template <class T> class trivial_vector : public impl::trivial_vector_impl<true, T>
 #endif
@@ -708,6 +708,6 @@ L3 4Mb:
 
 }  // namespace algorithm
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
 #endif

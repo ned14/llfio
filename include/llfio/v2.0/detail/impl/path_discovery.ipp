@@ -31,7 +31,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <regex>
 #include <vector>
 
-AFIO_V2_NAMESPACE_EXPORT_BEGIN
+LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace path_discovery
 {
@@ -87,7 +87,7 @@ namespace path_discovery
       std::vector<std::pair<discovered_path::source_type, _store::_discovered_path>> raw = _all_temporary_directories();
       if(raw.empty())
       {
-        AFIO_LOG_FATAL(nullptr, "path_discovery::all_temporary_directories() sees no possible temporary directories, something has gone very wrong");
+        LLFIO_LOG_FATAL(nullptr, "path_discovery::all_temporary_directories() sees no possible temporary directories, something has gone very wrong");
         abort();
       }
       for(size_t n = 0; n < raw.size(); n++)
@@ -115,11 +115,11 @@ namespace path_discovery
     {
       std::string msg("path_discovery::all_temporary_directories() saw exception thrown: ");
       msg.append(e.what());
-      AFIO_LOG_WARN(nullptr, msg.c_str());
+      LLFIO_LOG_WARN(nullptr, msg.c_str());
     }
     catch(...)
     {
-      AFIO_LOG_WARN(nullptr, "path_discovery::all_temporary_directories() saw unknown exception throw");
+      LLFIO_LOG_WARN(nullptr, "path_discovery::all_temporary_directories() saw unknown exception throw");
     }
     return ps.all;
   }
@@ -157,12 +157,12 @@ namespace path_discovery
         auto _fh = file_handle::random_file(ps._all[n].h, file_handle::mode::write, file_handle::caching::temporary, file_handle::flag::unlink_on_first_close);
         if(!_fh)
         {
-#if AFIO_LOGGING_LEVEL >= 3
+#if LLFIO_LOGGING_LEVEL >= 3
           std::string msg("path_discovery::verified_temporary_directories() failed to create a file in ");
           msg.append(ps._all[n].path.u8string());
           msg.append(" due to ");
           msg.append(_fh.error().message().c_str());
-          AFIO_LOG_WARN(nullptr, msg.c_str());
+          LLFIO_LOG_WARN(nullptr, msg.c_str());
 #endif
           ps._all[n].h = {};
           continue;
@@ -170,7 +170,7 @@ namespace path_discovery
         ps.all[n].stat = stat_t(nullptr);
         if(!ps.all[n].stat->fill(ps._all[n].h))
         {
-          AFIO_LOG_WARN(nullptr, "path_discovery::verified_temporary_directories() failed to stat an open handle to a temp directory");
+          LLFIO_LOG_WARN(nullptr, "path_discovery::verified_temporary_directories() failed to stat an open handle to a temp directory");
           ps.all[n].stat = {};
           ps._all[n].h = {};
           continue;
@@ -183,12 +183,12 @@ namespace path_discovery
         }
         else
         {
-#if AFIO_LOGGING_LEVEL >= 3
+#if LLFIO_LOGGING_LEVEL >= 3
           std::string msg("path_discovery::verified_temporary_directories() failed to statfs the temp directory ");
           msg.append(ps._all[n].path.u8string());
           msg.append(" due to ");
           msg.append(statfsres.error().message().c_str());
-          AFIO_LOG_WARN(nullptr, msg.c_str());
+          LLFIO_LOG_WARN(nullptr, msg.c_str());
 #endif
           ps.all[n].stat = {};
           ps._all[n].h = {};
@@ -201,7 +201,7 @@ namespace path_discovery
       ps.verified = span<discovered_path>(ps.all.data(), it - ps.all.begin());
       if(ps.verified.empty())
       {
-        AFIO_LOG_FATAL(nullptr, "path_discovery::verified_temporary_directories() could not find at least one writable temporary directory");
+        LLFIO_LOG_FATAL(nullptr, "path_discovery::verified_temporary_directories() could not find at least one writable temporary directory");
         abort();
       }
 
@@ -226,12 +226,12 @@ namespace path_discovery
     {
       std::string msg("path_discovery::verified_temporary_directories() saw exception thrown: ");
       msg.append(e.what());
-      AFIO_LOG_FATAL(nullptr, msg.c_str());
+      LLFIO_LOG_FATAL(nullptr, msg.c_str());
       abort();
     }
     catch(...)
     {
-      AFIO_LOG_FATAL(nullptr, "path_discovery::verified_temporary_directories() saw unknown exception throw");
+      LLFIO_LOG_FATAL(nullptr, "path_discovery::verified_temporary_directories() saw unknown exception throw");
       abort();
     }
     return ps.verified;
@@ -251,12 +251,12 @@ namespace path_discovery
   }
 }  // namespace path_discovery
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
-#define AFIO_PATH_DISCOVERY_INCLUDING
+#define LLFIO_PATH_DISCOVERY_INCLUDING
 #ifdef _WIN32
 #include "windows/path_discovery.ipp"
 #else
 #include "posix/path_discovery.ipp"
 #endif
-#undef AFIO_PATH_DISCOVERY_INCLUDING
+#undef LLFIO_PATH_DISCOVERY_INCLUDING

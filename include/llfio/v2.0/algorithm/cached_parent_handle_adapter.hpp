@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_CACHED_PARENT_HANDLE_ADAPTER_HPP
-#define AFIO_CACHED_PARENT_HANDLE_ADAPTER_HPP
+#ifndef LLFIO_CACHED_PARENT_HANDLE_ADAPTER_HPP
+#define LLFIO_CACHED_PARENT_HANDLE_ADAPTER_HPP
 
 #include "../directory_handle.hpp"
 
@@ -33,13 +33,13 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 
 //! \file cached_parent_handle_adapter.hpp Adapts any `fs_handle` to cache its parent directory handle
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
   namespace detail
   {
-    struct AFIO_DECL cached_path_handle : public std::enable_shared_from_this<cached_path_handle>
+    struct LLFIO_DECL cached_path_handle : public std::enable_shared_from_this<cached_path_handle>
     {
       directory_handle h;
       filesystem::path _lastpath;
@@ -47,11 +47,11 @@ namespace algorithm
           : h(std::move(_h))
       {
       }
-      AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<filesystem::path> current_path(const filesystem::path &append) noexcept;
+      LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<filesystem::path> current_path(const filesystem::path &append) noexcept;
     };
     using cached_path_handle_ptr = std::shared_ptr<cached_path_handle>;
     // Passed the base and path of the adapted handle being created, returns a handle to the containing directory and the leafname
-    AFIO_HEADERS_ONLY_FUNC_SPEC std::pair<cached_path_handle_ptr, filesystem::path> get_cached_path_handle(const path_handle &base, path_view path);
+    LLFIO_HEADERS_ONLY_FUNC_SPEC std::pair<cached_path_handle_ptr, filesystem::path> get_cached_path_handle(const path_handle &base, path_view path);
   }  // namespace detail
 
   /*! \brief Adapts any `construct()`-able implementation to cache its parent directory handle in a process wide cache.
@@ -72,7 +72,7 @@ namespace algorithm
   result in the inability to do race free unlinking etc, but if no third party changes are encountered it ought
   to work well.
   */
-  template <class T> AFIO_REQUIRES(sizeof(construct<T>) > 0) class AFIO_DECL cached_parent_handle_adapter : public T
+  template <class T> LLFIO_REQUIRES(sizeof(construct<T>) > 0) class LLFIO_DECL cached_parent_handle_adapter : public T
   {
     static_assert(sizeof(construct<T>) > 0, "Type T must be registered with the construct<T> framework so cached_parent_handle_adapter<T> knows how to construct it");  // NOLINT
 
@@ -99,43 +99,43 @@ namespace algorithm
       _sph = std::move(r.first);
       _leafname = std::move(r.second);
     }
-    AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~cached_parent_handle_adapter() override
+    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~cached_parent_handle_adapter() override
     {
       if(this->_v)
       {
         (void) cached_parent_handle_adapter::close();
       }
     }
-    AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_type> current_path() const noexcept override
+    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_type> current_path() const noexcept override
     {
-      AFIO_LOG_FUNCTION_CALL(this);
+      LLFIO_LOG_FUNCTION_CALL(this);
       return (_sph != nullptr) ? _sph->current_path(_leafname) : path_type();
     }
-    AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override
+    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override
     {
-      AFIO_LOG_FUNCTION_CALL(this);
+      LLFIO_LOG_FUNCTION_CALL(this);
       OUTCOME_TRYV(adapted_handle_type::close());
       _sph.reset();
       _leafname.clear();
       return success();
     }
-    AFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override
+    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override
     {
-      AFIO_LOG_FUNCTION_CALL(this);
+      LLFIO_LOG_FUNCTION_CALL(this);
       _sph.reset();
       _leafname.clear();
       return adapted_handle_type::release();
     }
-    AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_handle> parent_path_handle(deadline /* unused */ = std::chrono::seconds(30)) const noexcept override
+    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_handle> parent_path_handle(deadline /* unused */ = std::chrono::seconds(30)) const noexcept override
     {
-      AFIO_LOG_FUNCTION_CALL(this);
+      LLFIO_LOG_FUNCTION_CALL(this);
       OUTCOME_TRY(ret, _sph->h.clone_to_path_handle());
       return {std::move(ret)};
     }
-    AFIO_HEADERS_ONLY_VIRTUAL_SPEC
+    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
     result<void> relink(const path_handle &base, path_view_type newpath, bool atomic_replace = true, deadline d = std::chrono::seconds(30)) noexcept override
     {
-      AFIO_LOG_FUNCTION_CALL(this);
+      LLFIO_LOG_FUNCTION_CALL(this);
       OUTCOME_TRYV(adapted_handle_type::relink(base, newpath, atomic_replace, d));
       _sph.reset();
       _leafname.clear();
@@ -151,10 +151,10 @@ namespace algorithm
         return error_from_exception();
       }
     }
-    AFIO_HEADERS_ONLY_VIRTUAL_SPEC
+    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
     result<void> unlink(deadline d = std::chrono::seconds(30)) noexcept override
     {
-      AFIO_LOG_FUNCTION_CALL(this);
+      LLFIO_LOG_FUNCTION_CALL(this);
       OUTCOME_TRYV(adapted_handle_type::unlink(d));
       _sph.reset();
       _leafname.clear();
@@ -200,12 +200,12 @@ template <class T> struct construct<algorithm::cached_parent_handle_adapter<T>>
   }
 };
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
-#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define AFIO_INCLUDED_BY_HEADER 1
+#if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define LLFIO_INCLUDED_BY_HEADER 1
 #include "../detail/impl/cached_parent_handle_adapter.ipp"
-#undef AFIO_INCLUDED_BY_HEADER
+#undef LLFIO_INCLUDED_BY_HEADER
 #endif
 
 #ifdef _MSC_VER

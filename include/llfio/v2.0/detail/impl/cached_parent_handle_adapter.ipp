@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <mutex>
 #include <unordered_map>
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
@@ -44,7 +44,7 @@ namespace algorithm
       static cached_path_handle_map_ map;
       return map;
     }
-    AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<filesystem::path> cached_path_handle::current_path(const filesystem::path &append) noexcept
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<filesystem::path> cached_path_handle::current_path(const filesystem::path &append) noexcept
     {
       try
       {
@@ -55,7 +55,7 @@ namespace algorithm
         {
           std::string msg("cached_path_handle::current_path() failed to retrieve current path of cached handle due to ");
           msg.append(ret.error().message().c_str());
-          AFIO_LOG_WARN(nullptr, msg.c_str());
+          LLFIO_LOG_WARN(nullptr, msg.c_str());
         }
         else if(!ret.value().empty() && ret.value() != _lastpath)
         {
@@ -70,7 +70,7 @@ namespace algorithm
         return error_from_exception();
       }
     }
-    AFIO_HEADERS_ONLY_FUNC_SPEC std::pair<cached_path_handle_ptr, filesystem::path> get_cached_path_handle(const path_handle &base, path_view path)
+    LLFIO_HEADERS_ONLY_FUNC_SPEC std::pair<cached_path_handle_ptr, filesystem::path> get_cached_path_handle(const path_handle &base, path_view path)
     {
       path_view leaf(path.filename());
       path.remove_filename();
@@ -148,4 +148,4 @@ namespace algorithm
   }  // namespace detail
 }  // namespace algorithm
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

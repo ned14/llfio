@@ -27,9 +27,9 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #ifdef QUICKCPPLIB_ENABLE_VALGRIND
 #include "../../../quickcpplib/valgrind/memcheck.h"
-#define AFIO_VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(a, b) VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE((a), (b))
+#define LLFIO_VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(a, b) VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE((a), (b))
 #else
-#define AFIO_VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(a, b)
+#define LLFIO_VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(a, b)
 #endif
 
 #include <dirent.h> /* Defines DT_* constants */
@@ -37,7 +37,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include <sys/stat.h>
 #include <sys/syscall.h>
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 result<directory_handle> directory_handle::directory(const path_handle &base, path_view_type path, mode _mode, creation _creation, caching _caching, flag flags) noexcept
 {
@@ -47,7 +47,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
   }
   result<directory_handle> ret(directory_handle(native_handle_type(), 0, 0, _caching, flags));
   native_handle_type &nativeh = ret.value()._v;
-  AFIO_LOG_FUNCTION_CALL(&ret);
+  LLFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::directory;
   // POSIX does not permit directory opens with O_RDWR like Windows, so silently convert to read
   if(_mode == mode::attr_write)
@@ -128,7 +128,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
 
 result<directory_handle> directory_handle::clone(mode mode_, caching caching_, deadline d) const noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   // Fast path
   if(mode_ == mode::unchanged && caching_ == caching::unchanged)
   {
@@ -196,9 +196,9 @@ result<directory_handle> directory_handle::clone(mode mode_, caching caching_, d
   }
 }
 
-AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> directory_handle::clone_to_path_handle() const noexcept
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> directory_handle::clone_to_path_handle() const noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   result<path_handle> ret(path_handle(native_handle_type(), _caching, _flags));
   ret.value()._v.behaviour = _v.behaviour;
   ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC);
@@ -211,7 +211,7 @@ AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> directory_handle::clone_to_pa
 
 result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_type &&tofill, path_view_type glob, filter /*unused*/, span<char> kernelbuffer) const noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(tofill.empty())
   {
     return enumerate_info{std::move(tofill), stat_t::want::none, false};
@@ -353,7 +353,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     tofill._resize(0);
     return enumerate_info{std::move(tofill), default_stat_contents, true};
   }
-  AFIO_VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(buffer, bytes);  // NOLINT
+  LLFIO_VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(buffer, bytes);  // NOLINT
   size_t n = 0;
   for(dirent *dent = buffer;; dent = reinterpret_cast<dirent *>(reinterpret_cast<uintptr_t>(dent) + dent->d_reclen))
   {
@@ -421,4 +421,4 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
   }
 }
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

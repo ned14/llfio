@@ -29,7 +29,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <climits>  // for PATH_MAX
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 result<void> fs_handle::_fetch_inode() const noexcept
 {
@@ -143,7 +143,7 @@ inline result<path_handle> containing_directory(optional<std::reference_wrapper<
 
 result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   auto &h = _get_handle();
   if(_devid == 0 && _inode == 0)
   {
@@ -154,7 +154,7 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
 
 result<void> fs_handle::relink(const path_handle &base, path_view_type path, bool atomic_replace, deadline d) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   auto &h = const_cast<handle &>(_get_handle());
   path_view::c_str zpath(path);
 #ifdef O_TMPFILE
@@ -206,7 +206,7 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
 
 result<void> fs_handle::unlink(deadline d) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   auto &h = _get_handle();
   // Open our containing directory
   filesystem::path filename;
@@ -222,4 +222,4 @@ result<void> fs_handle::unlink(deadline d) noexcept
   return success();
 }
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

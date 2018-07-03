@@ -40,7 +40,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <sys/mman.h>
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 namespace utils
 {
@@ -148,7 +148,7 @@ namespace utils
     }
     if(-1 == fd || ::read(fd, buffer, bytes) < static_cast<ssize_t>(bytes))
     {
-      AFIO_LOG_FATAL(0, "afio: Kernel crypto function failed");
+      LLFIO_LOG_FATAL(0, "afio: Kernel crypto function failed");
       std::terminate();
     }
   }
@@ -219,11 +219,11 @@ namespace utils
     {
       if(munmap(p, bytes) < 0)
       {
-        AFIO_LOG_FATAL(p, "afio: Freeing large pages failed");
+        LLFIO_LOG_FATAL(p, "afio: Freeing large pages failed");
         std::terminate();
       }
     }
   }  // namespace detail
 }  // namespace utils
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

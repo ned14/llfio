@@ -30,7 +30,7 @@ static inline void TestAsyncFileHandleCoroutines()
 {
 #ifdef __cpp_coroutines
   //! [coroutines_example]
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace afio = LLFIO_V2_NAMESPACE;
 
   // Create an i/o service for this thread
   afio::io_service service;
@@ -89,7 +89,7 @@ static inline void TestAsyncFileHandleCoroutines()
 static inline void TestPostSelfToRunCoroutines()
 {
 #ifdef __cpp_coroutines
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace afio = LLFIO_V2_NAMESPACE;
   afio::io_service service;
   std::atomic<bool> ready(false);
   auto runthreadid = QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id();

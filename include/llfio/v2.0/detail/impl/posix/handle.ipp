@@ -36,7 +36,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <sys/stat.h>  // for struct stat
 #endif
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 handle::~handle()
 {
@@ -46,7 +46,7 @@ handle::~handle()
     auto ret = handle::close();
     if(ret.has_error())
     {
-      AFIO_LOG_FATAL(_v.fd, "handle::~handle() close failed");
+      LLFIO_LOG_FATAL(_v.fd, "handle::~handle() close failed");
       abort();
     }
   }
@@ -54,7 +54,7 @@ handle::~handle()
 
 result<handle::path_type> handle::current_path() const noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   try
   {
     // Most efficient, least memory copying method is direct fill of a string which is moved into filesystem::path
@@ -131,7 +131,7 @@ result<handle::path_type> handle::current_path() const noexcept
 
 result<void> handle::close() noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(_v)
   {
     if(are_safety_fsyncs_issued() && is_writable())
@@ -152,7 +152,7 @@ result<void> handle::close() noexcept
 
 result<handle> handle::clone() const noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   result<handle> ret(handle(native_handle_type(), _caching, _flags));
   ret.value()._v.behaviour = _v.behaviour;
   ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC);
@@ -165,7 +165,7 @@ result<handle> handle::clone() const noexcept
 
 result<void> handle::set_append_only(bool enable) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   int attribs = ::fcntl(_v.fd, F_GETFL);
   if(-1 == attribs)
   {
@@ -194,4 +194,4 @@ result<void> handle::set_append_only(bool enable) noexcept
   return success();
 }
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

@@ -26,10 +26,10 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! \file mapped_file_handle.hpp Provides mapped_file_handle
 
-#ifndef AFIO_MAPPED_FILE_HANDLE_H
-#define AFIO_MAPPED_FILE_HANDLE_H
+#ifndef LLFIO_MAPPED_FILE_HANDLE_H
+#define LLFIO_MAPPED_FILE_HANDLE_H
 
-AFIO_V2_NAMESPACE_EXPORT_BEGIN
+LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 /*! \class mapped_file_handle
 \brief A memory mapped regular file or device
@@ -104,7 +104,7 @@ mixing mapped and normal i/o is generally safe except at the end of a file where
 conditions and outright kernel bugs tend to abound. To avoid these, solely and exclusively
 use a dedicated handle configured to atomic append only to do the appends.
 */
-class AFIO_DECL mapped_file_handle : public file_handle
+class LLFIO_DECL mapped_file_handle : public file_handle
 {
 public:
   using dev_t = file_handle::dev_t;
@@ -163,7 +163,7 @@ public:
   //! No copy assignment
   mapped_file_handle &operator=(const mapped_file_handle &) = delete;
   //! Swap with another instance
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   void swap(mapped_file_handle &o) noexcept
   {
     mapped_file_handle temp(std::move(*this));
@@ -185,7 +185,7 @@ public:
 
   \errors Any of the values which the constructors for `file_handle`, `section_handle` and `map_handle` can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   static inline result<mapped_file_handle> mapped_file(size_type reservation, const path_handle &base, path_view_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept
   {
     if(_mode == mode::append)
@@ -212,7 +212,7 @@ public:
     }
   }
   //! \overload
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   static inline result<mapped_file_handle> mapped_file(const path_handle &base, path_view_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept { return mapped_file(0, base, _path, _mode, _creation, _caching, flags); }
 
   /*! Create an mapped file handle creating a randomly named file on a path.
@@ -223,7 +223,7 @@ public:
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   static inline result<mapped_file_handle> mapped_random_file(size_type reservation, const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::temporary, flag flags = flag::none) noexcept
   {
     try
@@ -259,7 +259,7 @@ public:
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   static inline result<mapped_file_handle> mapped_temp_file(size_type reservation, path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::temporary, flag flags = flag::unlink_on_first_close) noexcept
   {
     auto &tempdirh = path_discovery::storage_backed_temporary_files_directory();
@@ -275,8 +275,8 @@ public:
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<mapped_file_handle> mapped_temp_inode(const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept
+  LLFIO_MAKE_FREE_FUNCTION
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<mapped_file_handle> mapped_temp_inode(const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept
   {
     OUTCOME_TRY(v, file_handle::temp_inode(dir, _mode, flags));
     mapped_file_handle ret(std::move(v));
@@ -309,19 +309,19 @@ public:
   Note that this is an expensive call, and `address()` may return a different value afterwards.
   This call will fail if the underlying file has zero length.
   */
-  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_type> reserve(size_type reservation = 0) noexcept;
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_type> reserve(size_type reservation = 0) noexcept;
 
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~mapped_file_handle() override
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~mapped_file_handle() override
   {
     if(_v)
     {
       (void) mapped_file_handle::close();
     }
   }
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override;
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override { return _mh.barrier(reqs, wait_for_device, and_metadata, d); }
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept override
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override { return _mh.barrier(reqs, wait_for_device, and_metadata, d); }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept override
   {
     OUTCOME_TRY(fh, file_handle::clone(mode_, caching_, d));
     mapped_file_handle ret(std::move(fh), _reservation);
@@ -333,7 +333,7 @@ public:
     return mapped_file_handle(std::move(fh), reservation);
   }
   //! Return the current maximum permitted extent of the file.
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> maximum_extent() const noexcept override { return _mh.length(); }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> maximum_extent() const noexcept override { return _mh.length(); }
 
   /*! \brief Resize the current maximum permitted extent of the mapped file to the given extent, avoiding any
   new allocation of physical storage where supported, and mapping or unmapping any new pages
@@ -356,7 +356,7 @@ public:
   \param newsize The bytes to truncate the file to. Zero causes the maps to be closed before
   truncation.
   */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> truncate(extent_type newsize) noexcept override;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> truncate(extent_type newsize) noexcept override;
 
   /*! \brief Efficiently update the mapping to match that of the underlying file,
   returning the size of the underlying file.
@@ -365,9 +365,9 @@ public:
 
   If the internal section and map handle are invalid, they are restored unless the underlying file is zero length.
   */
-  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<extent_type> update_map() noexcept;
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<extent_type> update_map() noexcept;
 
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> zero(extent_type offset, extent_type bytes, deadline /*unused*/ = deadline()) noexcept override
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> zero(extent_type offset, extent_type bytes, deadline /*unused*/ = deadline()) noexcept override
   {
     OUTCOME_TRYV(_mh.zero_memory({_mh.address() + offset, bytes}));
     return bytes;
@@ -389,7 +389,7 @@ public:
   \errors None, though the various signals and structured exception throws common to using memory maps may occur.
   \mallocs None.
   */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override { return _mh.read(reqs, d); }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override { return _mh.read(reqs, d); }
   /*! \brief Write data to the mapped file.
 
   \note This call traps signals and structured exception throws using `QUICKCPPLIB_NAMESPACE::signal_guard`.
@@ -406,7 +406,7 @@ public:
   of the raised signal, but it is by far the most likely.
   \mallocs None if a `QUICKCPPLIB_NAMESPACE::signal_guard_install` is already instanced.
   */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override { return _mh.write(reqs, d); }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override { return _mh.write(reqs, d); }
 };
 
 //! \brief Constructor for `mapped_file_handle`
@@ -504,16 +504,16 @@ inline result<mapped_file_handle> mapped_temp_inode(const path_handle &dir = pat
 }
 // END make_free_functions.py
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
-#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define AFIO_INCLUDED_BY_HEADER 1
+#if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define LLFIO_INCLUDED_BY_HEADER 1
 #ifdef _WIN32
 #include "detail/impl/windows/mapped_file_handle.ipp"
 #else
 #include "detail/impl/posix/mapped_file_handle.ipp"
 #endif
-#undef AFIO_INCLUDED_BY_HEADER
+#undef LLFIO_INCLUDED_BY_HEADER
 #endif
 
 #endif

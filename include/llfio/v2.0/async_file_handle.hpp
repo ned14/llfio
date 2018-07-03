@@ -27,10 +27,10 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! \file async_file_handle.hpp Provides async_file_handle
 
-#ifndef AFIO_ASYNC_FILE_HANDLE_H
-#define AFIO_ASYNC_FILE_HANDLE_H
+#ifndef LLFIO_ASYNC_FILE_HANDLE_H
+#define LLFIO_ASYNC_FILE_HANDLE_H
 
-AFIO_V2_NAMESPACE_EXPORT_BEGIN
+LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
@@ -60,7 +60,7 @@ runs the i/o service's `run()` function.
 
 \snippet coroutines.cpp coroutines_example
 */
-class AFIO_DECL async_file_handle : public file_handle
+class LLFIO_DECL async_file_handle : public file_handle
 {
   friend class io_service;
 
@@ -114,7 +114,7 @@ public:
   //! No copy assignment
   async_file_handle &operator=(const async_file_handle &) = delete;
   //! Swap with another instance
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   void swap(async_file_handle &o) noexcept
   {
     async_file_handle temp(std::move(*this));
@@ -134,8 +134,8 @@ public:
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_file(io_service &service, const path_handle &base, path_view_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::only_metadata, flag flags = flag::none) noexcept
+  LLFIO_MAKE_FREE_FUNCTION
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_file(io_service &service, const path_handle &base, path_view_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::only_metadata, flag flags = flag::none) noexcept
   {
     // Open it overlapped, otherwise no difference.
     OUTCOME_TRY(v, file_handle::file(std::move(base), _path, _mode, _creation, _caching, flags | flag::overlapped));
@@ -150,7 +150,7 @@ public:
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   static inline result<async_file_handle> async_random_file(io_service &service, const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::only_metadata, flag flags = flag::none) noexcept
   {
     try
@@ -186,7 +186,7 @@ public:
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   static inline result<async_file_handle> async_temp_file(io_service &service, path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::only_metadata, flag flags = flag::unlink_on_first_close) noexcept
   {
     auto &tempdirh = path_discovery::storage_backed_temporary_files_directory();
@@ -202,8 +202,8 @@ public:
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
-  AFIO_MAKE_FREE_FUNCTION
-  static AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_temp_inode(io_service &service, const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept
+  LLFIO_MAKE_FREE_FUNCTION
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_temp_inode(io_service &service, const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept
   {
     // Open it overlapped, otherwise no difference.
     OUTCOME_TRY(v, file_handle::temp_inode(dir, _mode, flags | flag::overlapped));
@@ -212,8 +212,8 @@ public:
     return std::move(ret);
   }
 
-  AFIO_MAKE_FREE_FUNCTION
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
   /*! Clone this handle to a different io_service (copy constructor is disabled to avoid accidental copying)
 
   \errors Any of the values POSIX dup() or DuplicateHandle() can return.
@@ -225,7 +225,7 @@ public:
     ret._service = &service;
     return std::move(ret);
   }
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept override
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept override
   {
     OUTCOME_TRY(v, file_handle::clone(mode_, caching_, d));
     async_file_handle ret(std::move(v));
@@ -274,13 +274,13 @@ protected:
         , items_to_go(0)
     {
     }
-    AFIO_HEADERS_ONLY_VIRTUAL_SPEC ~_erased_io_state_type()
+    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~_erased_io_state_type()
     {
       // i/o still pending is very bad, this should never happen
       assert(!items_to_go);
       if(items_to_go != 0u)
       {
-        AFIO_LOG_FATAL(parent->native_handle().h, "FATAL: io_state destructed while i/o still in flight, the derived class should never allow this.");
+        LLFIO_LOG_FATAL(parent->native_handle().h, "FATAL: io_state destructed while i/o still in flight, the derived class should never allow this.");
         abort();
       }
     }
@@ -352,8 +352,8 @@ protected:
     _erased_completion_handler &operator=(_erased_completion_handler &&) = default;
     _erased_completion_handler &operator=(const _erased_completion_handler &) = default;
   };
-  template <class BuffersType, class IORoutine> result<io_state_ptr> AFIO_HEADERS_ONLY_MEMFUNC_SPEC _begin_io(span<char> mem, operation_t operation, io_request<BuffersType> reqs, _erased_completion_handler &&completion, IORoutine &&ioroutine) noexcept;
-  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<io_state_ptr> _begin_io(span<char> mem, operation_t operation, io_request<const_buffers_type> reqs, _erased_completion_handler &&completion) noexcept;
+  template <class BuffersType, class IORoutine> result<io_state_ptr> LLFIO_HEADERS_ONLY_MEMFUNC_SPEC _begin_io(span<char> mem, operation_t operation, io_request<BuffersType> reqs, _erased_completion_handler &&completion, IORoutine &&ioroutine) noexcept;
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<io_state_ptr> _begin_io(span<char> mem, operation_t operation, io_request<const_buffers_type> reqs, _erased_completion_handler &&completion) noexcept;
 
 public:
   /*! \brief Schedule a barrier to occur asynchronously.
@@ -375,12 +375,12 @@ public:
   \mallocs If mem is not set, one calloc, one free. The allocation is unavoidable due to the need to store a type
   erased completion handler of unknown type and state per buffers input.
   */
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   template <class CompletionRoutine>                                                                                           //
-  AFIO_REQUIRES(detail::is_invocable_r<void, CompletionRoutine, async_file_handle *, io_result<const_buffers_type> &>::value)  //
+  LLFIO_REQUIRES(detail::is_invocable_r<void, CompletionRoutine, async_file_handle *, io_result<const_buffers_type> &>::value)  //
   result<io_state_ptr> async_barrier(io_request<const_buffers_type> reqs, CompletionRoutine &&completion, bool wait_for_device = false, bool and_metadata = false, span<char> mem = {}) noexcept
   {
-    AFIO_LOG_FUNCTION_CALL(this);
+    LLFIO_LOG_FUNCTION_CALL(this);
     struct completion_handler : _erased_completion_handler
     {
       CompletionRoutine completion;
@@ -430,12 +430,12 @@ public:
   \mallocs If mem is not set, one calloc, one free. The allocation is unavoidable due to the need to store a type
   erased completion handler of unknown type and state per buffers input.
   */
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   template <class CompletionRoutine>                                                                                     //
-  AFIO_REQUIRES(detail::is_invocable_r<void, CompletionRoutine, async_file_handle *, io_result<buffers_type> &>::value)  //
+  LLFIO_REQUIRES(detail::is_invocable_r<void, CompletionRoutine, async_file_handle *, io_result<buffers_type> &>::value)  //
   result<io_state_ptr> async_read(io_request<buffers_type> reqs, CompletionRoutine &&completion, span<char> mem = {}) noexcept
   {
-    AFIO_LOG_FUNCTION_CALL(this);
+    LLFIO_LOG_FUNCTION_CALL(this);
     struct completion_handler : _erased_completion_handler
     {
       CompletionRoutine completion;
@@ -473,12 +473,12 @@ public:
   \mallocs If mem in not set, one calloc, one free. The allocation is unavoidable due to the need to store a type
   erased completion handler of unknown type and state per buffers input.
   */
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   template <class CompletionRoutine>                                                                                           //
-  AFIO_REQUIRES(detail::is_invocable_r<void, CompletionRoutine, async_file_handle *, io_result<const_buffers_type> &>::value)  //
+  LLFIO_REQUIRES(detail::is_invocable_r<void, CompletionRoutine, async_file_handle *, io_result<const_buffers_type> &>::value)  //
   result<io_state_ptr> async_write(io_request<const_buffers_type> reqs, CompletionRoutine &&completion, span<char> mem = {}) noexcept
   {
-    AFIO_LOG_FUNCTION_CALL(this);
+    LLFIO_LOG_FUNCTION_CALL(this);
     struct completion_handler : _erased_completion_handler
     {
       CompletionRoutine completion;
@@ -499,9 +499,9 @@ public:
   }
 
   using file_handle::read;
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
   using file_handle::write;
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override;
 
 #if defined(__cpp_coroutines) || defined(DOXYGEN_IS_IN_THE_HOUSE)
 private:
@@ -558,14 +558,14 @@ public:
   \errors As for read(), plus ENOMEM.
   \mallocs One calloc, one free.
   */
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   result<awaitable<buffers_type>> co_read(io_request<buffers_type> reqs) noexcept
   {
     OUTCOME_TRY(r, async_read(reqs, awaitable_state<buffers_type>()));
     return awaitable<buffers_type>(std::move(r));
   }
   //! \overload
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   result<awaitable<buffers_type>> co_read(extent_type offset, std::initializer_list<buffer_type> lst) noexcept
   {
     buffer_type *_reqs = reinterpret_cast<buffer_type *>(alloca(sizeof(buffer_type) * lst.size()));
@@ -584,14 +584,14 @@ public:
   \errors As for write(), plus ENOMEM.
   \mallocs One calloc, one free.
   */
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   result<awaitable<const_buffers_type>> co_write(io_request<const_buffers_type> reqs) noexcept
   {
     OUTCOME_TRY(r, async_write(reqs, awaitable_state<const_buffers_type>()));
     return awaitable<const_buffers_type>(std::move(r));
   }
   //! \overload
-  AFIO_MAKE_FREE_FUNCTION
+  LLFIO_MAKE_FREE_FUNCTION
   result<awaitable<const_buffers_type>> co_write(extent_type offset, std::initializer_list<const_buffer_type> lst) noexcept
   {
     const_buffer_type *_reqs = reinterpret_cast<const_buffer_type *>(alloca(sizeof(const_buffer_type) * lst.size()));
@@ -803,16 +803,16 @@ inline result<async_file_handle::awaitable<async_file_handle::const_buffers_type
 #endif
 // END make_free_functions.py
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
-#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define AFIO_INCLUDED_BY_HEADER 1
+#if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define LLFIO_INCLUDED_BY_HEADER 1
 #ifdef _WIN32
 #include "detail/impl/windows/async_file_handle.ipp"
 #else
 #include "detail/impl/posix/async_file_handle.ipp"
 #endif
-#undef AFIO_INCLUDED_BY_HEADER
+#undef LLFIO_INCLUDED_BY_HEADER
 #endif
 
 #endif

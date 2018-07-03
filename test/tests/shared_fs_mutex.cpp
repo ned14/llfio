@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../test_kernel_decl.hpp"
 
 KERNELTEST_TEST_KERNEL(unit, afio, shared_fs_mutex, entity_endian, "Tests that afio::algorithm::shared_fs_mutex::entity_type has the right endian", [] {
-  AFIO_V2_NAMESPACE::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type v(0, true);
+  LLFIO_V2_NAMESPACE::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type v(0, true);
   BOOST_REQUIRE(v._init != 1UL);  // NOLINT
 }())
 
@@ -332,7 +332,7 @@ static inline void check_child_worker(const KERNELTEST_V1_NAMESPACE::child_worke
 
 static std::string _TestSharedFSMutexCorrectnessChildWorker(KERNELTEST_V1_NAMESPACE::waitable_done &waitable, size_t childidx, shared_memory *shmem)  // NOLINT
 {
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace afio = LLFIO_V2_NAMESPACE;
   ++shmem->current_exclusive;
   while(-1 != shmem->current_exclusive)
   {
@@ -403,7 +403,7 @@ static std::string _TestSharedFSMutexCorrectnessChildWorker(KERNELTEST_V1_NAMESP
   return "ok, max concurrent readers was " + std::to_string(maxreaders);
 }
 static auto TestSharedFSMutexCorrectnessChildWorker = KERNELTEST_V1_NAMESPACE::register_child_worker("TestSharedFSMutexCorrectness", [](KERNELTEST_V1_NAMESPACE::waitable_done &waitable, size_t childidx, const char * /*unused*/) -> std::string {  // NOLINT
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace afio = LLFIO_V2_NAMESPACE;
   auto shared_mem_file = afio::file_handle::file({}, "shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::open_existing, afio::file_handle::caching::temporary).value();
   auto shared_mem_file_section = afio::section_handle::section(shared_mem_file, sizeof(shared_memory), afio::section_handle::flag::readwrite).value();
   auto shared_mem_file_map = afio::map_handle::map(shared_mem_file_section).value();
@@ -419,7 +419,7 @@ else. Verify shared allows other shared.
 
 void TestSharedFSMutexCorrectness(shared_memory::mutex_kind_type mutex_kind, shared_memory::test_type testtype, bool threads_not_processes)
 {
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace afio = LLFIO_V2_NAMESPACE;
   auto shared_mem_file = afio::file_handle::file({}, "shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::unlink_on_first_close).value();
   shared_mem_file.truncate(sizeof(shared_memory)).value();
   auto shared_mem_file_section = afio::section_handle::section(shared_mem_file, sizeof(shared_memory), afio::section_handle::flag::readwrite).value();
@@ -509,7 +509,7 @@ and destructing the lock. This should find interesting races in the more complex
 */
 static void TestSharedFSMutexConstructDestruct(shared_memory::mutex_kind_type mutex_kind)
 {
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace afio = LLFIO_V2_NAMESPACE;
   auto shared_mem_file = afio::file_handle::file({}, "shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::unlink_on_first_close).value();
   shared_mem_file.truncate(sizeof(shared_memory)).value();
   auto shared_mem_file_section = afio::section_handle::section(shared_mem_file, sizeof(shared_memory), afio::section_handle::flag::readwrite).value();
@@ -548,7 +548,7 @@ static void TestSharedFSMutexConstructDestruct(shared_memory::mutex_kind_type mu
 }
 
 static auto TestSharedFSMutexConstructDestructChildWorker = KERNELTEST_V1_NAMESPACE::register_child_worker("TestSharedFSMutexConstructDestruct", [](KERNELTEST_V1_NAMESPACE::waitable_done & /*unused*/, size_t /*unused*/, const char *params) -> std::string {  // NOLINT
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace afio = LLFIO_V2_NAMESPACE;
   std::unique_ptr<afio::algorithm::shared_fs_mutex::shared_fs_mutex> lock;
   auto mutex_kind = static_cast<shared_memory::mutex_kind_type>(atoi(params));  // NOLINT
   switch(mutex_kind)
@@ -669,8 +669,8 @@ int main(int argc, char *argv[])
       }
     }
   }
-  AFIO_V2_NAMESPACE::filesystem::create_directory("shared_fs_mutex_testdir");
-  AFIO_V2_NAMESPACE::filesystem::current_path("shared_fs_mutex_testdir");
+  LLFIO_V2_NAMESPACE::filesystem::create_directory("shared_fs_mutex_testdir");
+  LLFIO_V2_NAMESPACE::filesystem::current_path("shared_fs_mutex_testdir");
   int result = QUICKCPPLIB_BOOST_UNIT_TEST_RUN_TESTS(argc, argv);
   return result;
 }

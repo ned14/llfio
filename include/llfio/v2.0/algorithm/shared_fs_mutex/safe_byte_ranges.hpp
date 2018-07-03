@@ -22,12 +22,12 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_SHARED_FS_MUTEX_SAFE_BYTE_RANGES_HPP
-#define AFIO_SHARED_FS_MUTEX_SAFE_BYTE_RANGES_HPP
+#ifndef LLFIO_SHARED_FS_MUTEX_SAFE_BYTE_RANGES_HPP
+#define LLFIO_SHARED_FS_MUTEX_SAFE_BYTE_RANGES_HPP
 
 #if defined(_WIN32)
 #include "byte_ranges.hpp"
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
@@ -42,7 +42,7 @@ namespace algorithm
       {
       }
       //! Initialises a shared filing system mutex using the file at \em lockfile
-      AFIO_MAKE_FREE_FUNCTION
+      LLFIO_MAKE_FREE_FUNCTION
       static result<safe_byte_ranges> fs_mutex_safe_byte_ranges(const path_handle &base, path_view lockfile) noexcept
       {
         OUTCOME_TRY(v, byte_ranges::fs_mutex_byte_ranges(base, lockfile));
@@ -52,7 +52,7 @@ namespace algorithm
   }  // namespace shared_fs_mutex
 }  // namespace algorithm
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
 #else
 
@@ -62,7 +62,7 @@ AFIO_V2_NAMESPACE_END
 
 //! \file safe_byte_ranges.hpp Provides algorithm::shared_fs_mutex::safe_byte_ranges
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
@@ -70,7 +70,7 @@ namespace algorithm
   {
     namespace detail
     {
-      AFIO_HEADERS_ONLY_FUNC_SPEC result<std::shared_ptr<shared_fs_mutex>> inode_to_fs_mutex(const path_handle &base, path_view lockfile) noexcept;
+      LLFIO_HEADERS_ONLY_FUNC_SPEC result<std::shared_ptr<shared_fs_mutex>> inode_to_fs_mutex(const path_handle &base, path_view lockfile) noexcept;
     }
 
     /*! \class safe_byte_ranges
@@ -149,7 +149,7 @@ namespace algorithm
       }
 
       //! Initialises a shared filing system mutex using the file at \em lockfile
-      AFIO_MAKE_FREE_FUNCTION
+      LLFIO_MAKE_FREE_FUNCTION
       static result<safe_byte_ranges> fs_mutex_safe_byte_ranges(const path_handle &base, path_view lockfile) noexcept
       {
         OUTCOME_TRY(ret, detail::inode_to_fs_mutex(base, lockfile));
@@ -157,21 +157,21 @@ namespace algorithm
       }
 
     protected:
-      AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept final { return _p->_lock(out, d, spin_not_sleep); }
+      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _lock(entities_guard &out, deadline d, bool spin_not_sleep) noexcept final { return _p->_lock(out, d, spin_not_sleep); }
 
     public:
-      AFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long hint) noexcept final { return _p->unlock(entities, hint); }
+      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(entities_type entities, unsigned long long hint) noexcept final { return _p->unlock(entities, hint); }
     };
 
   }  // namespace shared_fs_mutex
 }  // namespace algorithm
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
-#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define AFIO_INCLUDED_BY_HEADER 1
+#if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define LLFIO_INCLUDED_BY_HEADER 1
 #include "../../detail/impl/safe_byte_ranges.ipp"
-#undef AFIO_INCLUDED_BY_HEADER
+#undef LLFIO_INCLUDED_BY_HEADER
 #endif
 
 #endif

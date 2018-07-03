@@ -22,10 +22,10 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_STATFS_H
-#define AFIO_STATFS_H
+#ifndef LLFIO_STATFS_H
+#define LLFIO_STATFS_H
 
-#ifndef AFIO_CONFIG_HPP
+#ifndef LLFIO_CONFIG_HPP
 #error You must include the master afio.hpp, not individual header files directly
 #endif
 #include "config.hpp"
@@ -37,14 +37,14 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4251)  // dll interface
 #endif
 
-AFIO_V2_NAMESPACE_EXPORT_BEGIN
+LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 class handle;
 
 /*! \struct statfs_t
 \brief Metadata about a filing system. Unsupported entries are all bits set.
 */
-struct AFIO_DECL statfs_t
+struct LLFIO_DECL statfs_t
 {
   static constexpr uint32_t _allbits1_32 = ~0U;
   static constexpr uint64_t _allbits1_64 = ~0ULL;
@@ -93,19 +93,19 @@ struct AFIO_DECL statfs_t
   }
 #endif
   //! Fills in the structure with metadata, returning number of items filled in
-  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> fill(const handle &h, want wanted = want::all) noexcept;
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> fill(const handle &h, want wanted = want::all) noexcept;
 };
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
-#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define AFIO_INCLUDED_BY_HEADER 1
+#if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define LLFIO_INCLUDED_BY_HEADER 1
 #ifdef _WIN32
 #include "detail/impl/windows/statfs.ipp"
 #else
 #include "detail/impl/posix/statfs.ipp"
 #endif
-#undef AFIO_INCLUDED_BY_HEADER
+#undef LLFIO_INCLUDED_BY_HEADER
 #endif
 
 #ifdef _MSC_VER

@@ -26,13 +26,13 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "import.hpp"
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 result<file_handle> file_handle::file(const path_handle &base, file_handle::path_view_type path, file_handle::mode _mode, file_handle::creation _creation, file_handle::caching _caching, file_handle::flag flags) noexcept
 {
   result<file_handle> ret(file_handle(native_handle_type(), 0, 0, _caching, flags));
   native_handle_type &nativeh = ret.value()._v;
-  AFIO_LOG_FUNCTION_CALL(&ret);
+  LLFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::file;
   OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, _caching, flags));
   path_view::c_str zpath(path);
@@ -78,7 +78,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   flags |= flag::unlink_on_first_close | flag::disable_safety_unlinks;
   result<file_handle> ret(file_handle(native_handle_type(), 0, 0, _caching, flags));
   native_handle_type &nativeh = ret.value()._v;
-  AFIO_LOG_FUNCTION_CALL(&ret);
+  LLFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::file;
   // Open file exclusively to prevent collision
   OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, creation::only_if_not_exist, _caching, flags));
@@ -132,7 +132,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
 {
   (void) wait_for_device;
   (void) and_metadata;
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(d)
   {
     return errc::not_supported;
@@ -190,7 +190,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
 
 result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d) const noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   // Fast path
   if(mode_ == mode::unchanged)
   {
@@ -334,7 +334,7 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
 
 result<file_handle::extent_type> file_handle::maximum_extent() const noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   struct stat s
   {
   };
@@ -348,7 +348,7 @@ result<file_handle::extent_type> file_handle::maximum_extent() const noexcept
 
 result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type newsize) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   if(ftruncate(_v.fd, newsize) < 0)
   {
     return posix_error();
@@ -362,7 +362,7 @@ result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type 
 
 result<std::vector<std::pair<file_handle::extent_type, file_handle::extent_type>>> file_handle::extents() const noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   try
   {
     std::vector<std::pair<file_handle::extent_type, file_handle::extent_type>> out;
@@ -447,7 +447,7 @@ result<std::vector<std::pair<file_handle::extent_type, file_handle::extent_type>
 
 result<file_handle::extent_type> file_handle::zero(file_handle::extent_type offset, file_handle::extent_type bytes, deadline d) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
 #if defined(__linux__)
   if(-1 == fallocate(_v.fd, 0x02 /*FALLOC_FL_PUNCH_HOLE*/ | 0x01 /*FALLOC_FL_KEEP_SIZE*/, offset, bytes))
   {
@@ -489,4 +489,4 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_type offs
   }
 }
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END

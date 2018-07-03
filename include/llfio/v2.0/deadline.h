@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_DEADLINE_H
-#define AFIO_DEADLINE_H
+#ifndef LLFIO_DEADLINE_H
+#define LLFIO_DEADLINE_H
 
 #include <stdbool.h>  // NOLINT
 #include <time.h>     // NOLINT
@@ -31,21 +31,21 @@ Distributed under the Boost Software License, Version 1.0.
 //! \file deadline.h Provides struct deadline
 
 #if defined(__cplusplus) || DOXYGEN_IS_IN_THE_HOUSE
-#ifndef AFIO_CONFIG_HPP
+#ifndef LLFIO_CONFIG_HPP
 #error You must include the master afio.hpp, not individual header files directly
 #endif
 #include "config.hpp"
 #include <stdexcept>
-AFIO_V2_NAMESPACE_EXPORT_BEGIN
-#define AFIO_DEADLINE_NAME deadline
+LLFIO_V2_NAMESPACE_EXPORT_BEGIN
+#define LLFIO_DEADLINE_NAME deadline
 #else
-#define AFIO_DEADLINE_NAME boost_afio_deadline
+#define LLFIO_DEADLINE_NAME boost_afio_deadline
 #endif
 
 /*! \struct deadline
 \brief A time deadline in either relative-to-now or absolute (system clock) terms
 */
-struct AFIO_DEADLINE_NAME
+struct LLFIO_DEADLINE_NAME
 {
   //! True if deadline does not change with system clock changes
   bool steady;  // NOLINT
@@ -104,9 +104,9 @@ struct AFIO_DEADLINE_NAME
 #endif
 };
 
-#undef AFIO_DEADLINE_NAME
+#undef LLFIO_DEADLINE_NAME
 #if defined(__cplusplus) || DOXYGEN_IS_IN_THE_HOUSE
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 #endif
 
 #endif

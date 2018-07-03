@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_PATH_VIEW_H
-#define AFIO_PATH_VIEW_H
+#ifndef LLFIO_PATH_VIEW_H
+#define LLFIO_PATH_VIEW_H
 
 #include "config.hpp"
 
@@ -34,7 +34,7 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4251)  // dll interface
 #endif
 
-AFIO_V2_NAMESPACE_EXPORT_BEGIN
+LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
@@ -119,7 +119,7 @@ routine.
 If however you are taking input from some external piece of code, then for
 maximum compatibility you should still use the Win32 API.
 */
-class AFIO_DECL path_view
+class LLFIO_DECL path_view
 {
 public:
   //! Character type
@@ -423,7 +423,7 @@ public:
   // iterator end() const;
 
   //! Instantiate from a `path_view` to get a zero terminated path suitable for feeding to the kernel
-  struct AFIO_DECL c_str
+  struct LLFIO_DECL c_str
   {
     //! Number of characters, excluding zero terminating char, at buffer
     uint16_t length{0};
@@ -436,7 +436,7 @@ public:
       {
         if(view._state._utf16.size() > 32768)
         {
-          AFIO_LOG_FATAL(&view, "Attempt to send a path exceeding 64Kb to kernel");
+          LLFIO_LOG_FATAL(&view, "Attempt to send a path exceeding 64Kb to kernel");
           abort();
         }
         length = static_cast<uint16_t>(view._state._utf16.size());
@@ -455,7 +455,7 @@ public:
         // Otherwise use _buffer and zero terminate.
         if(length > sizeof(_buffer) - 1)
         {
-          AFIO_LOG_FATAL(&view, "Attempt to send a path exceeding 64Kb to kernel");
+          LLFIO_LOG_FATAL(&view, "Attempt to send a path exceeding 64Kb to kernel");
           abort();
         }
         memcpy(_buffer, view._state._utf16.data(), length);
@@ -475,7 +475,7 @@ public:
       {
         if(view._state._utf8.size() > 32768)
         {
-          AFIO_LOG_FATAL(&view, "Attempt to send a path exceeding 64Kb to kernel");
+          LLFIO_LOG_FATAL(&view, "Attempt to send a path exceeding 64Kb to kernel");
           abort();
         }
         length = static_cast<uint16_t>(view._state._utf8.size());
@@ -488,7 +488,7 @@ public:
         // Otherwise use _buffer and zero terminate.
         if(length > sizeof(_buffer) - 1)
         {
-          AFIO_LOG_FATAL(&view, "Attempt to send a path exceeding 32Kb to kernel");
+          LLFIO_LOG_FATAL(&view, "Attempt to send a path exceeding 32Kb to kernel");
           abort();
         }
         memcpy(_buffer, view._state._utf8.data(), length);
@@ -510,7 +510,7 @@ public:
   private:
     filesystem::path::value_type _buffer[32768]{};
 #ifdef _WIN32
-    AFIO_HEADERS_ONLY_MEMFUNC_SPEC void _from_utf8(const path_view &view) noexcept;
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC void _from_utf8(const path_view &view) noexcept;
 #endif
   };
   friend struct c_str;
@@ -556,14 +556,14 @@ inline std::ostream &operator<<(std::ostream &s, const path_view &v)
 static_assert(std::is_trivially_copyable<path_view>::value, "path_view is not a trivially copyable!");
 #endif
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
-#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define AFIO_INCLUDED_BY_HEADER 1
+#if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define LLFIO_INCLUDED_BY_HEADER 1
 #ifdef _WIN32
 #include "detail/impl/windows/path_view.ipp"
 #endif
-#undef AFIO_INCLUDED_BY_HEADER
+#undef LLFIO_INCLUDED_BY_HEADER
 #endif
 
 #ifdef _MSC_VER

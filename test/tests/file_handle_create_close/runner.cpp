@@ -28,10 +28,10 @@ Distributed under the Boost Software License, Version 1.0.
 template <class U> inline void file_handle_create_close_creation(U &&f)
 {
   using namespace KERNELTEST_V1_NAMESPACE;
-  using AFIO_V2_NAMESPACE::result;
-  using file_handle = AFIO_V2_NAMESPACE::file_handle;
-  static const result<void> no_such_file_or_directory = AFIO_V2_NAMESPACE::errc::no_such_file_or_directory;
-  static const result<void> file_exists = AFIO_V2_NAMESPACE::errc::file_exists;
+  using LLFIO_V2_NAMESPACE::result;
+  using file_handle = LLFIO_V2_NAMESPACE::file_handle;
+  static const result<void> no_such_file_or_directory = LLFIO_V2_NAMESPACE::errc::no_such_file_or_directory;
+  static const result<void> file_exists = LLFIO_V2_NAMESPACE::errc::file_exists;
 
   /* Set up a permuter which for every one of these parameter values listed,
   tests with the value using the input workspace which should produce outcome

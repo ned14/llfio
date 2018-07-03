@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_FS_HANDLE_H
-#define AFIO_FS_HANDLE_H
+#ifndef LLFIO_FS_HANDLE_H
+#define LLFIO_FS_HANDLE_H
 
 #include "path_handle.hpp"
 #include "path_view.hpp"
@@ -37,14 +37,14 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4251)  // dll interface
 #endif
 
-AFIO_V2_NAMESPACE_EXPORT_BEGIN
+LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 /*! \class fs_handle
 \brief A handle to something with a device and inode number.
 
 \sa `algorithm::cached_parent_handle_adapter<T>`
 */
-class AFIO_DECL fs_handle
+class LLFIO_DECL fs_handle
 {
 public:
   using dev_t = uint64_t;
@@ -59,7 +59,7 @@ protected:
   mutable ino_t _inode{0};
 
   //! Fill in _devid and _inode from the handle via fstat()
-  AFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> _fetch_inode() const noexcept;
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> _fetch_inode() const noexcept;
 
   virtual const handle &_get_handle() const noexcept = 0;
 
@@ -139,7 +139,7 @@ public:
   \sa `algorithm::cached_parent_handle_adapter<T>` which overrides this with a zero cost
   implementation, thus making unlinking and relinking very considerably quicker.
   */
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_handle> parent_path_handle(deadline d = std::chrono::seconds(30)) const noexcept;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_handle> parent_path_handle(deadline d = std::chrono::seconds(30)) const noexcept;
 
   /*! Relinks the current path of this open handle to the new path specified. If `atomic_replace` is
   true, the relink \b atomically and silently replaces any item at the new path specified. This operation
@@ -164,8 +164,8 @@ public:
   \mallocs Except on platforms with race free syscalls for renaming open handles (Windows), calls
   `current_path()` via `parent_path_handle()` and thus is both expensive and calls malloc many times.
   */
-  AFIO_MAKE_FREE_FUNCTION
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
   result<void> relink(const path_handle &base, path_view_type path, bool atomic_replace = true, deadline d = std::chrono::seconds(30)) noexcept;
 
   /*! Unlinks the current path of this open handle, causing its entry to immediately disappear from the filing system.
@@ -190,8 +190,8 @@ public:
   `current_path()` and thus is both expensive and calls malloc many times. On Windows, also calls
   `current_path()` if `flag::disable_safety_unlinks` is not set.
   */
-  AFIO_MAKE_FREE_FUNCTION
-  AFIO_HEADERS_ONLY_VIRTUAL_SPEC
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
   result<void> unlink(deadline d = std::chrono::seconds(30)) noexcept;
 };
 
@@ -253,16 +253,16 @@ inline result<void> unlink(fs_handle &self, deadline d = std::chrono::seconds(30
 }
 // END make_free_functions.py
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
 
-#if AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define AFIO_INCLUDED_BY_HEADER 1
+#if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define LLFIO_INCLUDED_BY_HEADER 1
 #ifdef _WIN32
 #include "detail/impl/windows/fs_handle.ipp"
 #else
 #include "detail/impl/posix/fs_handle.ipp"
 #endif
-#undef AFIO_INCLUDED_BY_HEADER
+#undef LLFIO_INCLUDED_BY_HEADER
 #endif
 
 #ifdef _MSC_VER

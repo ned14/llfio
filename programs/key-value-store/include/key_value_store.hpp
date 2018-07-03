@@ -36,7 +36,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 namespace key_value_store
 {
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace afio = LLFIO_V2_NAMESPACE;
   template <class T> using optional = afio::optional<T>;
   template <class T> using span = afio::span<T>;
   using afio::undoer;
@@ -127,7 +127,7 @@ namespace key_value_store
        - uint128 key             16 bytes
        - value_history          104 bytes
     */
-    using open_hash_index = basic_open_hash_index<atomic_linear_memory_policy<key_type, value_history, 0>, AFIO_V2_NAMESPACE::algorithm::mapped_span>;
+    using open_hash_index = basic_open_hash_index<atomic_linear_memory_policy<key_type, value_history, 0>, LLFIO_V2_NAMESPACE::algorithm::mapped_span>;
     static_assert(sizeof(open_hash_index::value_type) == 128, "open_hash_index::value_type is wrong size");
 
     struct index

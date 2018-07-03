@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../io_handle.hpp"
 #include "import.hpp"
 
-AFIO_V2_NAMESPACE_BEGIN
+LLFIO_V2_NAMESPACE_BEGIN
 
 size_t io_handle::max_buffers() const noexcept
 {
@@ -43,7 +43,7 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
     return errc::argument_list_too_long;
   }
 
-  AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+  LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
   std::array<OVERLAPPED, 64> _ols{};
   memset(_ols.data(), 0, reqs.buffers.size() * sizeof(OVERLAPPED));
   span<OVERLAPPED> ols(_ols.data(), reqs.buffers.size());
@@ -100,10 +100,10 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
     for(auto &ol : ols)
     {
       deadline nd = d;
-      AFIO_WIN_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+      LLFIO_WIN_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
       if(STATUS_TIMEOUT == ntwait(nativeh.h, ol, nd))
       {
-        AFIO_WIN_DEADLINE_TO_TIMEOUT(d);
+        LLFIO_WIN_DEADLINE_TO_TIMEOUT(d);
       }
     }
   }
@@ -123,19 +123,19 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
 
 io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_request<io_handle::buffers_type> reqs, deadline d) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   return do_read_write(_v, &ReadFile, reqs, d);
 }
 
 io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::io_request<io_handle::const_buffers_type> reqs, deadline d) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   return do_read_write(_v, &WriteFile, reqs, d);
 }
 
 result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, io_handle::extent_type bytes, bool exclusive, deadline d) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(_v.h);
+  LLFIO_LOG_FUNCTION_CALL(_v.h);
   if(d && d.nsecs > 0 && !_v.is_overlapped())
   {
     return errc::not_supported;
@@ -145,7 +145,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
   {
     flags |= LOCKFILE_FAIL_IMMEDIATELY;
   }
-  AFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+  LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
   OVERLAPPED ol{};
   memset(&ol, 0, sizeof(ol));
   ol.Internal = static_cast<ULONG_PTR>(-1);
@@ -169,7 +169,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
   {
     if(STATUS_TIMEOUT == ntwait(_v.h, ol, d))
     {
-      AFIO_WIN_DEADLINE_TO_TIMEOUT(d);
+      LLFIO_WIN_DEADLINE_TO_TIMEOUT(d);
     }
     // It seems the NT kernel is guilty of casting bugs sometimes
     ol.Internal = ol.Internal & 0xffffffff;
@@ -183,7 +183,7 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
 
 void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type bytes) noexcept
 {
-  AFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_LOG_FUNCTION_CALL(this);
   OVERLAPPED ol{};
   memset(&ol, 0, sizeof(ol));
   ol.Internal = static_cast<ULONG_PTR>(-1);
@@ -197,7 +197,7 @@ void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type byt
     {
       auto ret = win32_error();
       (void) ret;
-      AFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
+      LLFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
       std::terminate();
     }
   }
@@ -211,10 +211,10 @@ void io_handle::unlock(io_handle::extent_type offset, io_handle::extent_type byt
       ol.Internal = ol.Internal & 0xffffffff;
       auto ret = ntkernel_error(static_cast<NTSTATUS>(ol.Internal));
       (void) ret;
-      AFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
+      LLFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
       std::terminate();
     }
   }
 }
 
-AFIO_V2_NAMESPACE_END
+LLFIO_V2_NAMESPACE_END
