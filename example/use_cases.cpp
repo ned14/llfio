@@ -159,6 +159,7 @@ void scatter_write()
   long, and aligned to 4Kb boundaries. If you would like this example to work as-is, change the
   caching::only_metadata to caching::all.
   */
+  return;
   //! [scatter_write]
   namespace afio = AFIO_V2_NAMESPACE;
 
