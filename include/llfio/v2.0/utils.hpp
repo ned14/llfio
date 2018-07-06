@@ -26,7 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define LLFIO_UTILS_H
 
 #ifndef LLFIO_CONFIG_HPP
-#error You must include the master afio.hpp, not individual header files directly
+#error You must include the master llfio.hpp, not individual header files directly
 #endif
 #include "config.hpp"
 
@@ -197,7 +197,7 @@ namespace utils
   unmodified.
 
   A particularly useful combination with this allocator is with the
-  page_sizes() member function of __afio_dispatcher__. This will return which
+  page_sizes() member function of __llfio_dispatcher__. This will return which
   pages sizes are possible, and which page sizes are enabled for this user. If
   writing a file copy routine for example, using this allocator with the
   largest page size as the copy chunk makes a great deal of sense.

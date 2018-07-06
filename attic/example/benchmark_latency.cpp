@@ -1,4 +1,4 @@
-#include "afio_pch.hpp"
+#include "llfio_pch.hpp"
 #include <thread>
 
 #define ITERATIONS 10000
@@ -8,20 +8,20 @@
 //#define MULTIPLIER 1000000 // output number of microseconds instead of seconds
 #define MULTIPLIER 3900000000ULL // output number of CPU clocks instead of seconds
 
-typedef decltype(boost::afio::chrono::high_resolution_clock::now()) time_point;
+typedef decltype(boost::llfio::chrono::high_resolution_clock::now()) time_point;
 size_t id_offset;
 static time_point points[100000];
 static time_point::duration overhead, timesliceoverhead, sleepoverhead;
-static std::pair<bool, std::shared_ptr<boost::afio::handle>> _callback(size_t id, boost::afio::future<> op)
+static std::pair<bool, std::shared_ptr<boost::llfio::handle>> _callback(size_t id, boost::llfio::future<> op)
 {
-  using namespace boost::afio;
+  using namespace boost::llfio;
   points[id-id_offset]=chrono::high_resolution_clock::now();
   return std::make_pair(true, op.get_handle());
 };
 
 int main(void)
 {
-  using namespace boost::afio;
+  using namespace boost::llfio;
   auto dispatcher=make_dispatcher().get();
   typedef chrono::duration<double, ratio<1, 1>> secs_type;
   {
@@ -59,7 +59,7 @@ int main(void)
   }  
   
   std::pair<async_op_flags, dispatcher::completion_t *> callback(async_op_flags::none, _callback);
-  std::ofstream csv("afio_latencies.csv");
+  std::ofstream csv("llfio_latencies.csv");
   csv << "Timing overhead is calculated to be," << chrono::duration_cast<secs_type>(overhead).count()
 #ifdef MULTIPLIER
     * MULTIPLIER

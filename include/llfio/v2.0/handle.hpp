@@ -322,36 +322,36 @@ inline std::ostream &operator<<(std::ostream &s, const handle &v)
   {
     auto _currentpath = v.current_path();
     std::string currentpath = !_currentpath ? std::string(_currentpath.error().message().c_str()) : _currentpath.value().u8string();
-    return s << "afio::handle(" << v._v._init << ", " << currentpath << ")";
+    return s << "llfio::handle(" << v._v._init << ", " << currentpath << ")";
   }
-  return s << "afio::handle(closed)";
+  return s << "llfio::handle(closed)";
 }
 inline std::ostream &operator<<(std::ostream &s, const handle::mode &v)
 {
   static constexpr const char *values[] = {"unchanged", nullptr, "none", nullptr, "attr_read", "attr_write", "read", "write", nullptr, "append"};
   if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || (values[static_cast<size_t>(v)] == nullptr))  // NOLINT
   {
-    return s << "afio::handle::mode::<unknown>";
+    return s << "llfio::handle::mode::<unknown>";
   }
-  return s << "afio::handle::mode::" << values[static_cast<size_t>(v)];  // NOLINT
+  return s << "llfio::handle::mode::" << values[static_cast<size_t>(v)];  // NOLINT
 }
 inline std::ostream &operator<<(std::ostream &s, const handle::creation &v)
 {
   static constexpr const char *values[] = {"open_existing", "only_if_not_exist", "if_needed", "truncate"};
   if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || (values[static_cast<size_t>(v)] == nullptr))  // NOLINT
   {
-    return s << "afio::handle::creation::<unknown>";
+    return s << "llfio::handle::creation::<unknown>";
   }
-  return s << "afio::handle::creation::" << values[static_cast<size_t>(v)];  // NOLINT
+  return s << "llfio::handle::creation::" << values[static_cast<size_t>(v)];  // NOLINT
 }
 inline std::ostream &operator<<(std::ostream &s, const handle::caching &v)
 {
   static constexpr const char *values[] = {"unchanged", "none", "only_metadata", "reads", "all", "reads_and_metadata", "temporary", "safety_fsyncs"};
   if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || (values[static_cast<size_t>(v)] == nullptr))  // NOLINT
   {
-    return s << "afio::handle::caching::<unknown>";
+    return s << "llfio::handle::caching::<unknown>";
   }
-  return s << "afio::handle::caching::" << values[static_cast<size_t>(v)];  // NOLINT
+  return s << "llfio::handle::caching::" << values[static_cast<size_t>(v)];  // NOLINT
 }
 inline std::ostream &operator<<(std::ostream &s, const handle::flag &v)
 {
@@ -404,7 +404,7 @@ inline std::ostream &operator<<(std::ostream &s, const handle::flag &v)
   {
     temp = "none";
   }
-  return s << "afio::handle::flag::" << temp;
+  return s << "llfio::handle::flag::" << temp;
 }
 
 /*! \brief Metaprogramming shim for constructing any `handle` subclass.

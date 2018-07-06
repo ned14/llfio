@@ -1,4 +1,4 @@
-#include "afio_pch.hpp"
+#include "llfio_pch.hpp"
 
 #ifdef _DEBUG
 #define ITEMS 64
@@ -11,13 +11,13 @@ namespace iostreams {
 #include "workshop_naive.ipp"
 }
 namespace naive {
-#include "workshop_naive_afio.ipp"
+#include "workshop_naive_llfio.ipp"
 }
 namespace atomic_updates {
-#include "workshop_atomic_updates_afio.ipp"
+#include "workshop_atomic_updates_llfio.ipp"
 }
 namespace final {
-#include "workshop_final_afio.ipp"
+#include "workshop_final_llfio.ipp"
 #include "../detail/SpookyV2.cpp"
 }
 
@@ -144,8 +144,8 @@ int main(void)
   while(chrono::duration_cast<secs_type>(chrono::high_resolution_clock::now()-begin).count()<3);
   
   //benchmark<iostreams::data_store>("iostreams.csv", "STL iostreams", true);
-  //benchmark<naive::data_store>("afio_naive.csv", "AFIO naive", true);
-  //benchmark<atomic_updates::data_store>("afio_atomic.csv", "AFIO atomic update", true);
-  benchmark<final::data_store>("afio_final.csv", "AFIO single file", true);
+  //benchmark<naive::data_store>("llfio_naive.csv", "AFIO naive", true);
+  //benchmark<atomic_updates::data_store>("llfio_atomic.csv", "AFIO atomic update", true);
+  benchmark<final::data_store>("llfio_final.csv", "AFIO single file", true);
   return 0;
 }

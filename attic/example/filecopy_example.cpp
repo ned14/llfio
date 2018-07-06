@@ -1,4 +1,4 @@
-#include "afio_pch.hpp"
+#include "llfio_pch.hpp"
 
 static uint32_t crc32(const void* data, size_t length, uint32_t previousCrc32 = 0)
 {
@@ -16,8 +16,8 @@ static uint32_t crc32(const void* data, size_t length, uint32_t previousCrc32 = 
 
 //[filecopy_example
 namespace {
-    using namespace boost::afio;
-    using boost::afio::off_t;
+    using namespace boost::llfio;
+    using boost::llfio::off_t;
 
     // Keep memory buffers around
     // A special allocator of highly efficient file i/o memory
@@ -28,7 +28,7 @@ namespace {
     stl_future<std::vector<handle_ptr>> async_concatenate_files(
         atomic<off_t> &written, off_t &totalbytes,
         dispatcher_ptr dispatcher,
-        boost::afio::filesystem::path dest, std::vector<boost::afio::filesystem::path> sources,
+        boost::llfio::filesystem::path dest, std::vector<boost::llfio::filesystem::path> sources,
         size_t chunk_size=1024*1024 /* 1Mb */)
     {
         // Schedule the opening of the output file for writing
@@ -106,8 +106,8 @@ namespace {
 
 int main(int argc, const char *argv[])
 {
-    using namespace boost::afio;
-    using boost::afio::off_t;
+    using namespace boost::llfio;
+    using boost::llfio::off_t;
     typedef chrono::duration<double, ratio<1, 1>> secs_type;
     if(argc<3)
     {
@@ -119,13 +119,13 @@ int main(int argc, const char *argv[])
     {
         atomic<off_t> written(0);
         off_t totalbytes=0;
-        std::shared_ptr<boost::afio::dispatcher> dispatcher=
-            boost::afio::make_dispatcher().get();
+        std::shared_ptr<boost::llfio::dispatcher> dispatcher=
+            boost::llfio::make_dispatcher().get();
         // Set a dispatcher as current for this thread
-        boost::afio::current_dispatcher_guard guard(dispatcher);
+        boost::llfio::current_dispatcher_guard guard(dispatcher);
 
-        boost::afio::filesystem::path dest=argv[1];
-        std::vector<boost::afio::filesystem::path> sources;
+        boost::llfio::filesystem::path dest=argv[1];
+        std::vector<boost::llfio::filesystem::path> sources;
         std::cout << "Concatenating into " << dest << " the files ";
         for(int n=2; n<argc; ++n)
         {
@@ -138,7 +138,7 @@ int main(int argc, const char *argv[])
         auto begin=chrono::steady_clock::now();
         auto h=async_concatenate_files(written, totalbytes, dispatcher, dest, sources);
         // Print progress once a second until it's done
-        while(future_status::timeout==h.wait_for(boost::afio::chrono::seconds(1)))
+        while(future_status::timeout==h.wait_for(boost::llfio::chrono::seconds(1)))
         {
             std::cout << "\r" << (100*written)/totalbytes << "% complete (" << written
                 << " out of " << totalbytes << " @ " << (written/chrono::duration_cast<secs_type>(

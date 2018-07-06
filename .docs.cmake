@@ -4,7 +4,7 @@ include(cmake/QuickCppLibBootstrap.cmake)
 include(QuickCppLibUtils)
 
 
-CONFIGURE_CTEST_SCRIPT_FOR_CDASH("afio" "cmake_ci")
+CONFIGURE_CTEST_SCRIPT_FOR_CDASH("llfio" "cmake_ci")
 ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
 include(FindGit)
 set(CTEST_GIT_COMMAND "${GIT_EXECUTABLE}")
@@ -21,7 +21,7 @@ checked_execute_process("git reset"
   WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/doc/html"
 )
 ctest_configure()
-ctest_build(TARGET afio_docs)
+ctest_build(TARGET llfio_docs)
 #checked_execute_process("git commit"
 #  COMMAND "${GIT_EXECUTABLE}" commit -a -m "upd"
 #  COMMAND "${GIT_EXECUTABLE}" push -f origin gh-pages

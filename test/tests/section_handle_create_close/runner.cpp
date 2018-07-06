@@ -94,4 +94,4 @@ template <class U> inline void section_handle_create_close_(U &&f)
   check_results_with_boost_test(permuter, results);
 }
 
-KERNELTEST_TEST_KERNEL(unit, afio, section_handle_create_close, section_handle, "Tests that afio::section_handle's creation parameters work as expected", section_handle_create_close_(section_handle_create_close::test_kernel_section_handle))
+KERNELTEST_TEST_KERNEL(unit, llfio, section_handle_create_close, section_handle, "Tests that llfio::section_handle's creation parameters work as expected", section_handle_create_close_(section_handle_create_close::test_kernel_section_handle))

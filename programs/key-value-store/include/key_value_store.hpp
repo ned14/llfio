@@ -25,21 +25,21 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef KEY_VALUE_STORE_HPP
 #define KEY_VALUE_STORE_HPP
 
-#include "../../../include/afio/afio.hpp"
+#include "../../../include/llfio/llfio.hpp"
 #if __has_include("quickcpplib/include/algorithm/open_hash_index.hpp")
 #include "quickcpplib/include/algorithm/open_hash_index.hpp"
 #else
-#include "../../../include/afio/v2.0/quickcpplib/include/algorithm/open_hash_index.hpp"
+#include "../../../include/llfio/v2.0/quickcpplib/include/algorithm/open_hash_index.hpp"
 #endif
 
 #include <vector>
 
 namespace key_value_store
 {
-  namespace afio = LLFIO_V2_NAMESPACE;
-  template <class T> using optional = afio::optional<T>;
-  template <class T> using span = afio::span<T>;
-  using afio::undoer;
+  namespace llfio = LLFIO_V2_NAMESPACE;
+  template <class T> using optional = llfio::optional<T>;
+  template <class T> using span = llfio::span<T>;
+  using llfio::undoer;
   using uint128 = QUICKCPPLIB_NAMESPACE::integers128::uint128;
   using key_type = uint128;
 
@@ -159,21 +159,21 @@ namespace key_value_store
   class basic_key_value_store
   {
     friend class transaction;
-    afio::file_handle _indexfile;
-    afio::file_handle _mysmallfile;  // append only
-    afio::file_handle::extent_guard _indexfileguard, _smallfileguard;
+    llfio::file_handle _indexfile;
+    llfio::file_handle _mysmallfile;  // append only
+    llfio::file_handle::extent_guard _indexfileguard, _smallfileguard;
     size_t _mysmallfileidx{(size_t) -1};
     struct
     {
-      std::vector<afio::file_handle> blocking;
-      std::vector<afio::mapped_file_handle> mapped;
+      std::vector<llfio::file_handle> blocking;
+      std::vector<llfio::mapped_file_handle> mapped;
     } _smallfiles;
     optional<index::open_hash_index> _index;
     index::index *_indexheader{nullptr};
     std::mutex _commitlock;
     size_t _mmap_over_extension{0};
 
-    static constexpr afio::file_handle::extent_type _indexinuseoffset = INT64_MAX;
+    static constexpr llfio::file_handle::extent_type _indexinuseoffset = INT64_MAX;
     static constexpr uint64_t _goodmagic = 0x3130564b4f494641;  // "AFIOKV01"
     static constexpr uint64_t _badmagic = 0x3130564b44414544;   // "DEADKV01"
 
@@ -182,11 +182,11 @@ namespace key_value_store
       // We append a value_tail record and round up to 64 byte multiple
       return (length + sizeof(index::value_tail) + 63) & ~63;
     }
-    void _openfiles(const afio::path_handle &dir, afio::file_handle::mode mode, afio::file_handle::caching caching)
+    void _openfiles(const llfio::path_handle &dir, llfio::file_handle::mode mode, llfio::file_handle::caching caching)
     {
-      const afio::file_handle::mode smallfilemode =
+      const llfio::file_handle::mode smallfilemode =
 #ifdef _WIN32
-      afio::file_handle::mode::read
+      llfio::file_handle::mode::read
 #else
       // Linux won't allow taking an exclusive lock on a read only file
       mode
@@ -200,18 +200,18 @@ namespace key_value_store
         for(size_t n = 0; n < 48; n++)
         {
           name = std::to_string(n);
-          auto fh = afio::file_handle::file(dir, name, smallfilemode, afio::file_handle::creation::open_existing, afio::file_handle::caching::all, afio::file_handle::flag::disable_prefetching);
+          auto fh = llfio::file_handle::file(dir, name, smallfilemode, llfio::file_handle::creation::open_existing, llfio::file_handle::caching::all, llfio::file_handle::flag::disable_prefetching);
           if(fh)
           {
           retry:
             bool claimed = false;
-            if(mode == afio::file_handle::mode::write && !_mysmallfile.is_valid())
+            if(mode == llfio::file_handle::mode::write && !_mysmallfile.is_valid())
             {
               // Try to claim this small file
               auto smallfileclaimed = fh.value().try_lock(_indexinuseoffset, 1, true);
               if(smallfileclaimed)
               {
-                _mysmallfile = afio::file_handle::file(dir, name, afio::file_handle::mode::write, afio::file_handle::creation::open_existing, caching).value();
+                _mysmallfile = llfio::file_handle::file(dir, name, llfio::file_handle::mode::write, llfio::file_handle::creation::open_existing, caching).value();
                 _mysmallfile.set_append_only(true).value();
                 _smallfileguard = std::move(smallfileclaimed).value();
                 _mysmallfileidx = n;
@@ -224,16 +224,16 @@ namespace key_value_store
             {
 #ifndef _WIN32
               // We really need this to only have read only perms, otherwise any mmaps will extend the file ludicrously
-              fh = afio::file_handle::file(dir, name, afio::file_handle::mode::read, afio::file_handle::creation::open_existing, afio::file_handle::caching::all, afio::file_handle::flag::disable_prefetching);
+              fh = llfio::file_handle::file(dir, name, llfio::file_handle::mode::read, llfio::file_handle::creation::open_existing, llfio::file_handle::caching::all, llfio::file_handle::flag::disable_prefetching);
 #endif
               _smallfiles.blocking.push_back(std::move(fh).value());
             }
             continue;
           }
-          else if(mode == afio::file_handle::mode::write && !_mysmallfile.is_valid())
+          else if(mode == llfio::file_handle::mode::write && !_mysmallfile.is_valid())
           {
             // Going to need a new smallfile
-            fh = afio::file_handle::file(dir, name, afio::file_handle::mode::write, afio::file_handle::creation::only_if_not_exist, caching);
+            fh = llfio::file_handle::file(dir, name, llfio::file_handle::mode::write, llfio::file_handle::creation::only_if_not_exist, caching);
             if(fh)
             {
               fh.value().truncate(64).value();
@@ -243,14 +243,14 @@ namespace key_value_store
           }
           break;
         }
-        if(mode == afio::file_handle::mode::write && !_mysmallfile.is_valid())
+        if(mode == llfio::file_handle::mode::write && !_mysmallfile.is_valid())
         {
           throw maximum_writers_reached();
         }
         // Set up the index, either r/w or read only with copy on write
-        afio::section_handle::flag mapflags = (mode == afio::file_handle::mode::write) ? afio::section_handle::flag::readwrite : (afio::section_handle::flag::read | afio::section_handle::flag::cow);
-        afio::section_handle sh = afio::section_handle::section(_indexfile, 0, mapflags).value();
-        afio::file_handle::extent_type len = sh.length().value();
+        llfio::section_handle::flag mapflags = (mode == llfio::file_handle::mode::write) ? llfio::section_handle::flag::readwrite : (llfio::section_handle::flag::read | llfio::section_handle::flag::cow);
+        llfio::section_handle sh = llfio::section_handle::section(_indexfile, 0, mapflags).value();
+        llfio::file_handle::extent_type len = sh.length().value();
         len -= sizeof(index::index);
         len /= sizeof(index::open_hash_index::value_type);
         size_t offset = sizeof(index::index);
@@ -270,10 +270,10 @@ namespace key_value_store
     basic_key_value_store &operator=(const basic_key_value_store &) = delete;
     basic_key_value_store &operator=(basic_key_value_store &&) = delete;
 
-    basic_key_value_store(const afio::path_handle &dir, size_t hashtableentries, bool enable_integrity = false, afio::file_handle::mode mode = afio::file_handle::mode::write, afio::file_handle::caching caching = afio::file_handle::caching::all)
-        : _indexfile(afio::file_handle::file(dir, "index", mode, (mode == afio::file_handle::mode::write) ? afio::file_handle::creation::if_needed : afio::file_handle::creation::open_existing, caching, afio::file_handle::flag::disable_prefetching).value())
+    basic_key_value_store(const llfio::path_handle &dir, size_t hashtableentries, bool enable_integrity = false, llfio::file_handle::mode mode = llfio::file_handle::mode::write, llfio::file_handle::caching caching = llfio::file_handle::caching::all)
+        : _indexfile(llfio::file_handle::file(dir, "index", mode, (mode == llfio::file_handle::mode::write) ? llfio::file_handle::creation::if_needed : llfio::file_handle::creation::open_existing, caching, llfio::file_handle::flag::disable_prefetching).value())
     {
-      if(mode == afio::file_handle::mode::write)
+      if(mode == llfio::file_handle::mode::write)
       {
         // Try an exclusive lock on inuse byte of the index file
         auto indexinuse = _indexfile.try_lock(_indexinuseoffset, 1, true);
@@ -282,15 +282,15 @@ namespace key_value_store
           // I am the first entrant into this data store
           if(_indexfile.maximum_extent().value() == 0)
           {
-            afio::file_handle::extent_type size = sizeof(index::index) + (hashtableentries) * sizeof(index::open_hash_index::value_type);
-            size = afio::utils::round_up_to_page_size(size);
+            llfio::file_handle::extent_type size = sizeof(index::index) + (hashtableentries) * sizeof(index::open_hash_index::value_type);
+            size = llfio::utils::round_up_to_page_size(size);
             _indexfile.truncate(size).value();
             index::index i;
             memset(&i, 0, sizeof(i));
             i.magic = _goodmagic;
             i.all_writes_synced = _indexfile.are_writes_durable();
             i.contents_hashed = enable_integrity;
-            _indexfile.write(0, {{(afio::byte *) &i, sizeof(i)}}).value();
+            _indexfile.write(0, {{(llfio::byte *) &i, sizeof(i)}}).value();
           }
           else
           {
@@ -306,18 +306,18 @@ namespace key_value_store
             }
             // Now we've finished the checks, reset writes_occurring and all_writes_synced
             index::index i;
-            _indexfile.read(0, {{(afio::byte *) &i, sizeof(i)}}).value();
+            _indexfile.read(0, {{(llfio::byte *) &i, sizeof(i)}}).value();
             memset(i.writes_occurring, 0, sizeof(i.writes_occurring));
             i.all_writes_synced = _indexfile.are_writes_durable();
             memset(&i.hash, 0, sizeof(i.hash));
-            _indexfile.write(0, {{(afio::byte *) &i, sizeof(i)}}).value();
+            _indexfile.write(0, {{(llfio::byte *) &i, sizeof(i)}}).value();
           }
         }
       }
       // Take a shared lock, blocking if someone is still setting things up
       _indexfileguard = _indexfile.lock(_indexinuseoffset, 1, false).value();
       {
-        afio::byte buffer[8];
+        llfio::byte buffer[8];
         _indexfile.read(0, {{buffer, 8}}).value();
         auto goodmagic = _goodmagic;
         auto badmagic = _badmagic;
@@ -334,13 +334,13 @@ namespace key_value_store
       }
     }
     //! \overload
-    basic_key_value_store(const afio::path_view &dir, size_t hashtableentries, bool enable_integrity = false, afio::file_handle::mode mode = afio::file_handle::mode::write, afio::file_handle::caching caching = afio::file_handle::caching::all)
-        : basic_key_value_store(afio::directory_handle::directory({}, dir, afio::directory_handle::mode::write, afio::directory_handle::creation::if_needed).value(), hashtableentries, enable_integrity, mode, caching)
+    basic_key_value_store(const llfio::path_view &dir, size_t hashtableentries, bool enable_integrity = false, llfio::file_handle::mode mode = llfio::file_handle::mode::write, llfio::file_handle::caching caching = llfio::file_handle::caching::all)
+        : basic_key_value_store(llfio::directory_handle::directory({}, dir, llfio::directory_handle::mode::write, llfio::directory_handle::creation::if_needed).value(), hashtableentries, enable_integrity, mode, caching)
     {
     }
     //! Opens the store for read only access
-    basic_key_value_store(const afio::path_view &dir)
-        : basic_key_value_store(afio::path_handle::path(dir).value(), 0, false, afio::file_handle::mode::read)
+    basic_key_value_store(const llfio::path_view &dir)
+        : basic_key_value_store(llfio::path_handle::path(dir).value(), 0, false, llfio::file_handle::mode::read)
     {
     }
     ~basic_key_value_store()
@@ -376,7 +376,7 @@ namespace key_value_store
       for(size_t n = 0; n < _smallfiles.blocking.size(); n++)
       {
         auto currentlength = _smallfiles.blocking[n].maximum_extent().value();
-        _smallfiles.mapped.push_back(afio::mapped_file_handle(std::move(_smallfiles.blocking[n]), currentlength + overextension));
+        _smallfiles.mapped.push_back(llfio::mapped_file_handle(std::move(_smallfiles.blocking[n]), currentlength + overextension));
       }
       _smallfileguard.set_handle(&_smallfiles.mapped[_mysmallfileidx]);
       _smallfiles.blocking.clear();
@@ -478,7 +478,7 @@ namespace key_value_store
           // TODO: Open newly created smallfiles
           abort();
         }
-        afio::byte *buffer;
+        llfio::byte *buffer;
         bool free_on_destruct = _smallfiles.mapped.empty();
         if(!free_on_destruct)
         {
@@ -497,7 +497,7 @@ namespace key_value_store
         }
         else
         {
-          buffer = (afio::byte *) malloc(smallfilelength);
+          buffer = (llfio::byte *) malloc(smallfilelength);
           if(!buffer)
           {
             throw std::bad_alloc();
@@ -546,7 +546,7 @@ namespace key_value_store
     struct _item
     {
       basic_key_value_store::keyvalue_info kvi;  // the item's value when fetched
-      afio::optional<span<const char>> towrite;  // the value to be written on commit
+      llfio::optional<span<const char>> towrite;  // the value to be written on commit
       bool remove;                               // true if to remove
       _item(basic_key_value_store::keyvalue_info &&_kvi)
           : kvi(std::move(_kvi))
@@ -739,7 +739,7 @@ namespace key_value_store
       bool items_written = false;
       if(!_parent->_smallfiles.mapped.empty())
       {
-        afio::file_handle::extent_type original_length = _parent->_mysmallfile.maximum_extent().value();
+        llfio::file_handle::extent_type original_length = _parent->_mysmallfile.maximum_extent().value();
         // How big does this map need to be?
         size_t totalcommitsize = 0;
         for(size_t n = 0; n < _items.size(); n++)
@@ -751,14 +751,14 @@ namespace key_value_store
         if(totalcommitsize >= 4096)
         {
           auto &mfh = _parent->_smallfiles.mapped[_parent->_mysmallfileidx];
-          afio::file_handle::extent_type new_length = original_length + totalcommitsize;
+          llfio::file_handle::extent_type new_length = original_length + totalcommitsize;
           if(new_length > mfh.capacity())
           {
             mfh.reserve(new_length + _parent->_mmap_over_extension).value();
           }
           mfh.truncate(new_length).value();
-          afio::byte *value = mfh.address() + original_length;
-          afio::file_handle::extent_type value_offset = original_length;
+          llfio::byte *value = mfh.address() + original_length;
+          llfio::file_handle::extent_type value_offset = original_length;
           for(size_t n = 0; n < _items.size(); n++)
           {
             toupdate_type &thisupdate = toupdate[n];
@@ -803,17 +803,17 @@ namespace key_value_store
       if(!items_written)
       {
         // Gather append write all my items to my smallfile
-        afio::file_handle::extent_type value_offset = _parent->_mysmallfile.maximum_extent().value();
+        llfio::file_handle::extent_type value_offset = _parent->_mysmallfile.maximum_extent().value();
         assert((value_offset % 64) == 0);
         // POSIX guarantees that at least 16 gather buffers can be written in a single shot
-        std::vector<afio::file_handle::const_buffer_type> reqs;
+        std::vector<llfio::file_handle::const_buffer_type> reqs;
         reqs.reserve(16);
         // With tails, that's eight items per syscall
-        afio::byte tailbuffers[8][128];
+        llfio::byte tailbuffers[8][128];
         memset(tailbuffers, 0, sizeof(tailbuffers));
         for(size_t n = 0; n < _items.size(); n++)
         {
-          afio::byte *tailbuffer = tailbuffers[n % 8];
+          llfio::byte *tailbuffer = tailbuffers[n % 8];
           index::value_tail *vt = reinterpret_cast<index::value_tail *>(tailbuffer + 128 - sizeof(index::value_tail));
           toupdate_type &thisupdate = toupdate[n];
           const transaction::_item &item = _items[n];
@@ -840,7 +840,7 @@ namespace key_value_store
             totalwrite = _parent->_pad_length(item.towrite->size());
             size_t tailbytes = totalwrite - item.towrite->size();
             assert(tailbytes < 128);
-            reqs.push_back({(afio::byte *) item.towrite->data(), item.towrite->size()});
+            reqs.push_back({(llfio::byte *) item.towrite->data(), item.towrite->size()});
             reqs.push_back({tailbuffer + 128 - tailbytes, tailbytes});
             if(_parent->_indexheader->contents_hashed)
             {

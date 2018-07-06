@@ -124,4 +124,4 @@ template <class U> inline void directory_handle_enumerate_(U &&f)
   check_results_with_boost_test(permuter, results);
 }
 
-KERNELTEST_TEST_KERNEL(unit, afio, directory_handle_enumerate, directory_handle, "Tests that afio::directory_handle::enumerate's parameters work as expected", directory_handle_enumerate_(directory_handle_enumerate::test_kernel_directory_handle_enumerate))
+KERNELTEST_TEST_KERNEL(unit, llfio, directory_handle_enumerate, directory_handle, "Tests that llfio::directory_handle::enumerate's parameters work as expected", directory_handle_enumerate_(directory_handle_enumerate::test_kernel_directory_handle_enumerate))

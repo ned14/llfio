@@ -26,11 +26,11 @@ Distributed under the Boost Software License, Version 1.0.
 #define MAXBLOCKSIZE (4096)
 #define REGIONSIZE (100 * 1024 * 1024)
 
-#include "../../include/afio/afio.hpp"
+#include "../../include/llfio/llfio.hpp"
 #if __has_include("quickcpplib/include/algorithm/small_prng.hpp")
 #include "quickcpplib/include/algorithm/small_prng.hpp"
 #else
-#include "../../include/afio/v2.0/quickcpplib/include/algorithm/small_prng.hpp"
+#include "../../include/llfio/v2.0/quickcpplib/include/algorithm/small_prng.hpp"
 #endif
 
 #include <chrono>
@@ -38,7 +38,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <iostream>
 #include <vector>
 
-namespace afio = LLFIO_V2_NAMESPACE;
+namespace llfio = LLFIO_V2_NAMESPACE;
 using QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng;
 
 inline uint64_t ticksclock()
@@ -148,9 +148,9 @@ template <class F> inline void run_test(const char *csv, off_t max_extent, F &&f
 int main()
 {
   {
-    auto th = afio::file({}, "testfile", afio::file_handle::mode::write, afio::file_handle::creation::if_needed).value();
+    auto th = llfio::file({}, "testfile", llfio::file_handle::mode::write, llfio::file_handle::creation::if_needed).value();
     std::vector<char> buffer(REGIONSIZE, 'a');
-    th.write(0, {{(afio::byte *) buffer.data(), buffer.size()}}).value();
+    th.write(0, {{(llfio::byte *) buffer.data(), buffer.size()}}).value();
     th.barrier({}, true, true).value();
   }
   {
@@ -160,8 +160,8 @@ int main()
   }
 #if 0
   {
-    std::cout << "Testing latency of afio::file_handle with random malloc/free ..." << std::endl;
-    auto th = afio::file({}, "testfile").value();
+    std::cout << "Testing latency of llfio::file_handle with random malloc/free ..." << std::endl;
+    auto th = llfio::file({}, "testfile").value();
     std::vector<void *> allocations(1024 * 1024);
     small_prng rand;
     for(auto &i : allocations)
@@ -169,7 +169,7 @@ int main()
       i = malloc(rand() % 4096);
     }
     run_test("file_handle_malloc_free.csv", 1024 * 1024, [&](unsigned offset, char *buffer, size_t len) {
-      th.read(offset, {{(afio::byte *) buffer, len}}).value();
+      th.read(offset, {{(llfio::byte *) buffer, len}}).value();
       for(size_t n = 0; n < rand() % 64; n++)
       {
         size_t i = rand() % (1024 * 1024);
@@ -196,21 +196,21 @@ int main()
   }
 #endif
   {
-    std::cout << "Testing latency of afio::file_handle ..." << std::endl;
-    auto th = afio::file({}, "testfile").value();
-    run_test("file_handle.csv", REGIONSIZE, [&](unsigned offset, char *buffer, size_t len) { th.read(offset, {{(afio::byte *) buffer, len}}).value(); });
+    std::cout << "Testing latency of llfio::file_handle ..." << std::endl;
+    auto th = llfio::file({}, "testfile").value();
+    run_test("file_handle.csv", REGIONSIZE, [&](unsigned offset, char *buffer, size_t len) { th.read(offset, {{(llfio::byte *) buffer, len}}).value(); });
   }
 #if 1
   {
-    std::cout << "Testing latency of afio::mapped_file_handle ..." << std::endl;
-    auto th = afio::mapped_file({}, "testfile").value();
-    run_test("mapped_file_handle.csv", REGIONSIZE, [&](unsigned offset, char *buffer, size_t len) { th.read(offset, {{(afio::byte *) buffer, len}}).value(); });
+    std::cout << "Testing latency of llfio::mapped_file_handle ..." << std::endl;
+    auto th = llfio::mapped_file({}, "testfile").value();
+    run_test("mapped_file_handle.csv", REGIONSIZE, [&](unsigned offset, char *buffer, size_t len) { th.read(offset, {{(llfio::byte *) buffer, len}}).value(); });
   }
 #endif
 #if 1
   {
     std::cout << "Testing latency of memcpy ..." << std::endl;
-    auto th = afio::map(REGIONSIZE).value();
+    auto th = llfio::map(REGIONSIZE).value();
 #if 1
     {
       // Prefault
@@ -226,7 +226,7 @@ int main()
       memcpy(buffer, th.address() + offset, len);
 #else
       // Can't use memcpy, it gets elided
-      const afio::byte *__restrict s = th.address() + offset;
+      const llfio::byte *__restrict s = th.address() + offset;
 #if defined(__SSE2__) || defined(_M_X64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
       while(len >= 4 * sizeof(__m128i))
       {
@@ -288,5 +288,5 @@ int main()
     });
   }
 #endif
-  afio::filesystem::remove("testfile");
+  llfio::filesystem::remove("testfile");
 }

@@ -333,7 +333,7 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     }
     directory_entry &item = tofill[n];
     item.leafname = path_view(wstring_view(ffdi->FileName, length));
-    if(filtering == filter::fastdeleted && item.leafname.is_afio_deleted())
+    if(filtering == filter::fastdeleted && item.leafname.is_llfio_deleted())
     {
       continue;
     }

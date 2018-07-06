@@ -201,7 +201,7 @@ LLFIO_V2_NAMESPACE_BEGIN
 namespace detail
 {
   // Returns the AFIO namespace as a string
-  inline span<char> afio_namespace_string()
+  inline span<char> llfio_namespace_string()
   {
     static char buffer[64];
     static size_t length;
@@ -239,7 +239,7 @@ namespace detail
   // Strips a __PRETTY_FUNCTION__ of all instances of ::LLFIO_V2_NAMESPACE:: and ::LLFIO_V2_NAMESPACE::
   inline void strip_pretty_function(char *out, size_t bytes, const char *in)
   {
-    const span<char> remove1 = afio_namespace_string();
+    const span<char> remove1 = llfio_namespace_string();
     const span<char> remove2 = outcome_namespace_string();
     for(--bytes; bytes && *in; --bytes)
     {

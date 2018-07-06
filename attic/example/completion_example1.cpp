@@ -1,12 +1,12 @@
 //#define BOOST_RESULT_OF_USE_DECLTYPE 1
-#include "afio_pch.hpp"
+#include "llfio_pch.hpp"
 
 int main(void)
 {
     //[completion_example1
     // Create a dispatcher instance
-    std::shared_ptr<boost::afio::dispatcher> dispatcher=
-        boost::afio::make_dispatcher().get();
+    std::shared_ptr<boost::llfio::dispatcher> dispatcher=
+        boost::llfio::make_dispatcher().get();
     
     // Completion handlers are the lowest level completion routine available, and therefore the least
     // overhead but at the cost of considerable extra programmer effort. You almost certainly want
@@ -15,11 +15,11 @@ int main(void)
     // First create some callable entity ...
     auto completer=[](
         /* These are always the standard parameters */
-        size_t id, boost::afio::future<> precondition,
+        size_t id, boost::llfio::future<> precondition,
         /* From now on user defined parameters */
         std::string text)
       /* This is always the return type */
-      -> std::pair<bool, std::shared_ptr<boost::afio::handle>>
+      -> std::pair<bool, std::shared_ptr<boost::llfio::handle>>
     {
         /* id is the unique, non-zero integer id of this op.
            precondition is the op you supplied as precondition. As it will by definition
@@ -35,8 +35,8 @@ int main(void)
         return std::make_pair(true, precondition.get_handle());
     };
     
-    // Bind any user defined parameters to create a proper boost::afio::dispatcher::completion_t
-    std::function<boost::afio::dispatcher::completion_t> boundf=
+    // Bind any user defined parameters to create a proper boost::llfio::dispatcher::completion_t
+    std::function<boost::llfio::dispatcher::completion_t> boundf=
         std::bind(completer,
             /* The standard parameters */
             std::placeholders::_1, std::placeholders::_2,
@@ -44,13 +44,13 @@ int main(void)
             std::string("Hello world"));
     
     // Schedule an asynchronous call of the completion with some bound set of arguments
-    boost::afio::future<> helloworld=
-        dispatcher->completion(boost::afio::future<>() /* no precondition */,
-            std::make_pair(boost::afio::async_op_flags::none, boundf));
+    boost::llfio::future<> helloworld=
+        dispatcher->completion(boost::llfio::future<>() /* no precondition */,
+            std::make_pair(boost::llfio::async_op_flags::none, boundf));
         
     // Create a boost::stl_future<> representing the ops passed to when_all_p()
-    boost::afio::stl_future<std::vector<std::shared_ptr<boost::afio::handle>>> stl_future
-        =boost::afio::when_all_p(helloworld);
+    boost::llfio::stl_future<std::vector<std::shared_ptr<boost::llfio::handle>>> stl_future
+        =boost::llfio::when_all_p(helloworld);
     // ... and wait for it to complete
     stl_future.wait();
     //]

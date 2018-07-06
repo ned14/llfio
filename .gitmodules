@@ -5,7 +5,7 @@
 	fetchRecurseSubmodules = true
 	ignore = none
 #	shallow = true
-[submodule "include/afio/v2.0/outcome"]
+[submodule "include/llfio/v2.0/outcome"]
 	path = include/llfio/v2.0/outcome
 	url = https://github.com/ned14/outcome.git
 	branch = master
@@ -19,14 +19,14 @@
 	fetchRecurseSubmodules = true
 	ignore = untracked
 #	shallow = true
-[submodule "include/afio/v2.0/quickcpplib"]
+[submodule "include/llfio/v2.0/quickcpplib"]
 	path = include/llfio/v2.0/quickcpplib
 	url = https://github.com/ned14/quickcpplib
 	branch = master
 	fetchRecurseSubmodules = true
 	ignore = untracked
 #	shallow = true
-[submodule "include/afio/ntkernel-error-category"]
+[submodule "include/llfio/ntkernel-error-category"]
 	path = include/llfio/ntkernel-error-category
 	url = https://github.com/ned14/ntkernel-error-category.git
 	branch = master

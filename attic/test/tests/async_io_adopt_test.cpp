@@ -2,7 +2,7 @@
 
 using namespace BOOST_AFIO_V2_NAMESPACE;
 namespace asio = BOOST_AFIO_V2_NAMESPACE::asio;
-namespace afio = BOOST_AFIO_V2_NAMESPACE;
+namespace llfio = BOOST_AFIO_V2_NAMESPACE;
 
 struct test_handle : handle
 {
@@ -20,11 +20,11 @@ struct test_handle : handle
         return nullptr;
     }
     using handle::path;
-    virtual afio::path path(bool refresh=false) override final
+    virtual llfio::path path(bool refresh=false) override final
     {
       return "foo";
     }
-    virtual afio::path path() const override final
+    virtual llfio::path path() const override final
     {
       return "foo";
     }
@@ -32,9 +32,9 @@ struct test_handle : handle
     {
         return directory_entry();
     }
-    virtual afio::path target() override final
+    virtual llfio::path target() override final
     {
-        return afio::path();
+        return llfio::path();
     }
     virtual void link(const path_req &req) override final
     {

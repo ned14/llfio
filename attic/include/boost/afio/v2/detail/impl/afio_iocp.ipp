@@ -115,9 +115,9 @@ namespace detail {
     // Two modes of calling, either a handle or a leafname + dir handle
     static inline bool isDeletedFile(path::string_type leafname)
     {
-      if(leafname.size()==64+6 && !leafname.compare(0, 6, L".afiod"))
+      if(leafname.size()==64+6 && !leafname.compare(0, 6, L".llfiod"))
       {
-        // Could be one of our "deleted" files, is he ".afiod" + all hex?
+        // Could be one of our "deleted" files, is he ".llfiod" + all hex?
         for(size_t n=6; n<leafname.size(); n++)
         {
           auto c=leafname[n];
@@ -622,7 +622,7 @@ namespace detail
             BOOST_AFIO_TYPEALIGNMENT(8) path::value_type buffer[32769+sizeof(FILE_NAME_INFORMATION)/sizeof(path::value_type)];
             // This is done in two steps to stop annoying temporary failures
             // Firstly, get where I am within my volume, NtQueryObject returns too much so simply fetch my current name
-            // Then try to rename myself to the closest to the root as possible with a .afiodXXXXX crypto random name
+            // Then try to rename myself to the closest to the root as possible with a .llfiodXXXXX crypto random name
             // If I fail to rename myself there, try the next directory up, usually at some point I'll find some directory
             // I'm allowed write to
             FILE_NAME_INFORMATION *fni=(FILE_NAME_INFORMATION *) buffer;
@@ -630,7 +630,7 @@ namespace detail
             bool success=false;
             do
             {
-              auto _randomname(".afiod"+utils::random_string(32 /* 128 bits */));
+              auto _randomname(".llfiod"+utils::random_string(32 /* 128 bits */));
               filesystem::path::string_type randomname(_randomname.begin(), _randomname.end());
               mypath=path(true);
               BOOST_AFIO_ERRHNTFN(NtQueryInformationFile(myid, &isb, fni, sizeof(buffer), FileNameInformation), [this]{return path(); });
@@ -782,7 +782,7 @@ namespace detail
             FILE_RENAME_INFORMATION *fni=(FILE_RENAME_INFORMATION *) buffer;
             fni->ReplaceIfExists=false;
             fni->RootDirectory=nullptr;  // same directory
-            auto randompath(".afiod"+utils::random_string(32 /* 128 bits */));
+            auto randompath(".llfiod"+utils::random_string(32 /* 128 bits */));
             fni->FileNameLength=(ULONG)(randompath.size()*sizeof(path::value_type));
             for(size_t n=0; n<randompath.size(); n++)
               fni->FileName[n]=randompath[n];

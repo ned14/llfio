@@ -193,7 +193,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
     // simply marks all items past AIO_LISTIO_MAX as failed
     // with EAGAIN. That punishes performance for AFIO
     // because we loop setting up and tearing down
-    // the handlers, so if we would overload afio_suspend,
+    // the handlers, so if we would overload llfio_suspend,
     // better to error out now rather that later in io_service.
     if(service()->_aiocbsv.size() + items > AIO_LISTIO_MAX)
     {

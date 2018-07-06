@@ -225,7 +225,7 @@ inline std::ostream &operator<<(std::ostream &s, const section_handle::flag &v)
   {
     temp = "none";
   }
-  return s << "afio::section_handle::flag::" << temp;
+  return s << "llfio::section_handle::flag::" << temp;
 }
 
 //! \brief Constructor for `section_handle`

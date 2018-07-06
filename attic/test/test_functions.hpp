@@ -14,7 +14,7 @@ Created: Feb 2013
 
 #define _CRT_SECURE_NO_WARNINGS
 
-#include "boost/afio/afio.hpp"
+#include "boost/llfio/llfio.hpp"
 
 #ifdef __MINGW32__
 #include <stdlib.h> // To pull in __MINGW64_VERSION_MAJOR
@@ -37,7 +37,7 @@ extern "C" void tzset(void);
 #include <fstream>
 #include "../detail/SpookyV2.h"
 #include "Aligned_Allocator.hpp"
-#include "boost/afio/v2/detail/valgrind/valgrind.h"
+#include "boost/llfio/v2/detail/valgrind/valgrind.h"
 #include <time.h>
 
 #ifdef BOOST_AFIO_INCLUDE_SPOOKY_IMPL
@@ -85,7 +85,7 @@ try{\
 }catch(...){BOOST_FAIL("Exception was thrown");}
 
 #else
-# include "../include/boost/afio/bindlib/include/boost/test/unit_test.hpp"
+# include "../include/boost/llfio/bindlib/include/boost/test/unit_test.hpp"
 # define BOOST_AFIO_CHECK_THROWS(expr) BOOST_CHECK_THROWS(expr)
 # define BOOST_AFIO_CHECK_NO_THROW(expr) BOOST_CHECK_NO_THROW(expr)
 #endif
@@ -761,7 +761,7 @@ static std::ostream &operator<<(std::ostream &s, const chrono::system_clock::tim
 
 static stat_t print_stat(handle_ptr h)
 {
-    using namespace boost::afio;
+    using namespace boost::llfio;
     auto entry=h->lstat(metadata_flags::All);
     std::cout << "Entry " << h->path(true) << " is a ";
     switch(entry.st_type)
@@ -854,7 +854,7 @@ static stat_t print_stat(handle_ptr h)
 
 static void print_stat(handle_ptr dirh, directory_entry direntry)
 {
-    using namespace boost::afio;
+    using namespace boost::llfio;
     std::cout << "Entry " << direntry.name() << " is a ";
     auto entry=direntry.fetch_lstat(dirh);
     switch(entry.st_type)

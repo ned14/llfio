@@ -1,4 +1,4 @@
-#include "afio_pch.hpp"
+#include "llfio_pch.hpp"
 #include <iostream>
 #include <fstream>
 #include <regex>
@@ -31,7 +31,7 @@ The search took 741.131 seconds which was 52.4684 files per second or 7.94029 Mb
 int main(int argc, const char *argv[])
 {
     using namespace std;
-    namespace filesystem = boost::afio::filesystem;
+    namespace filesystem = boost::llfio::filesystem;
 #if BOOST_AFIO_USE_BOOST_FILESYSTEM
     using boost::filesystem::ifstream;
 #endif

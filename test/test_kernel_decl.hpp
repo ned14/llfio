@@ -30,7 +30,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define LLFIO_TEST_KERNEL_DECL inline
 #else
 // We are standalone
-#include "../include/afio/afio.hpp"
+#include "../include/llfio/llfio.hpp"
 #define LLFIO_TEST_KERNEL_DECL extern inline QUICKCPPLIB_SYMBOL_EXPORT
 #endif
 
@@ -44,7 +44,7 @@ Distributed under the Boost Software License, Version 1.0.
 OUTCOME_V2_NAMESPACE_BEGIN
 namespace convert
 {
-  // Provide custom ValueOrError conversion from afio::result<U> into kerneltest::result<T>
+  // Provide custom ValueOrError conversion from llfio::result<U> into kerneltest::result<T>
   template <class T, class U> struct value_or_error<KERNELTEST_V1_NAMESPACE::result<T>, LLFIO_V2_NAMESPACE::result<U>>
   {
     static constexpr bool enable_result_inputs = true;
@@ -63,7 +63,7 @@ namespace convert
              KERNELTEST_V1_NAMESPACE::result<T>{make_error_code(std::forward<X>(src).error())};
     }
   };
-  // Provide custom ValueOrError conversion from afio::result<U> into kerneltest::outcome<T>
+  // Provide custom ValueOrError conversion from llfio::result<U> into kerneltest::outcome<T>
   template <class T, class U> struct value_or_error<KERNELTEST_V1_NAMESPACE::outcome<T>, LLFIO_V2_NAMESPACE::result<U>>
   {
     static constexpr bool enable_result_inputs = true;
@@ -84,8 +84,8 @@ namespace convert
   };
 }
 OUTCOME_V2_NAMESPACE_END
-static_assert(std::is_constructible<KERNELTEST_V1_NAMESPACE::result<int>, LLFIO_V2_NAMESPACE::result<int>>::value, "kerneltest::result<int> is not constructible from afio::result<int>!");
-static_assert(std::is_constructible<KERNELTEST_V1_NAMESPACE::outcome<int>, LLFIO_V2_NAMESPACE::result<int>>::value, "kerneltest::outcome<int> is not constructible from afio::result<int>!");
+static_assert(std::is_constructible<KERNELTEST_V1_NAMESPACE::result<int>, LLFIO_V2_NAMESPACE::result<int>>::value, "kerneltest::result<int> is not constructible from llfio::result<int>!");
+static_assert(std::is_constructible<KERNELTEST_V1_NAMESPACE::outcome<int>, LLFIO_V2_NAMESPACE::result<int>>::value, "kerneltest::outcome<int> is not constructible from llfio::result<int>!");
 #endif
 
 #endif  // namespace

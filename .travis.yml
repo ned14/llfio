@@ -35,7 +35,7 @@ env:
     - secure: "A3TeWTlJdjUaQ31NF60kMOik8mzaJkdKA55jZXjN83BJ2ZjMDmWfq1XmZ7iDIxmn7HC2BVpjhdkj9jpRtPztb08L5VSlJIiVbXlBWNwgzmYANujpR9rA+bhZJwlKDaYQHUZUd4+iGHCHb0dLt2HG0eHF5azaifd0YqCfz5GcWl8="
   matrix:
     - __="cmake tests (error_code)" NAME=TravisLinuxWorkerEC CMAKE_CONFIGURE_OPTIONS=
-    - __="cmake tests (status_code)" NAME=TravisLinuxWorkerSC CMAKE_CONFIGURE_OPTIONS=-DAFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+    - __="cmake tests (status_code)" NAME=TravisLinuxWorkerSC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
 #    - __="cmake tests" NAME=TravisOSXWorker
     - __="Documentation" NAME=TravisDocumentation
     - __="Programs"
@@ -49,7 +49,7 @@ matrix:
 #  - os: osx
 #    env: __="cmake tests (error_code)" NAME=TravisLinuxWorkerEC CMAKE_CONFIGURE_OPTIONS=
 #  - os: osx
-#    env: __="cmake tests (status_code)" NAME=TravisLinuxWorkerSC CMAKE_CONFIGURE_OPTIONS=-DAFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+#    env: __="cmake tests (status_code)" NAME=TravisLinuxWorkerSC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - os: linux
     compiler: g++
     env: __="Documentation" NAME=TravisDocumentation
@@ -104,7 +104,7 @@ script:
      cd doc/html;
      git add . || true;
      git commit -a -m "Travis CI updates documentation" || true;
-     git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/ned14/boost.afio gh-pages;
+     git push -f https://jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD@github.com/ned14/llfio gh-pages;
      cd ../..;
    fi
  -
@@ -118,15 +118,15 @@ script:
  
 after_success:
 # - bash -x ./update_coveralls.sh `pwd`
-#  - NEWNAME=afio-v2.0-binaries-linux64-$(date +%Y%m%d%H%M%S).tgz
+#  - NEWNAME=llfio-v2.0-binaries-linux64-$(date +%Y%m%d%H%M%S).tgz
   - if [ "${TRAVIS_OS_NAME}" = "linux" ] && [ "$CXX" = "clang++-4.0" ] && [ "$__" = "cmake tests (error_code)" ]; then   
-      NEWNAME=afio-v2.0-binaries-linux64-$TRAVIS_COMMIT.tgz;
-      mv afio-v2.0-binaries-linux64.tgz $NEWNAME;
+      NEWNAME=llfio-v2.0-binaries-linux64-$TRAVIS_COMMIT.tgz;
+      mv llfio-v2.0-binaries-linux64.tgz $NEWNAME;
       curl -T $NEWNAME -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD https://dedi5.nedprod.com/static/files/upload/;
     fi
   - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then   
-      NEWNAME=afio-v2.0-binaries-darwin64-$TRAVIS_COMMIT.tgz;
-      mv afio-v2.0-binaries-darwin64.tgz $NEWNAME;
+      NEWNAME=llfio-v2.0-binaries-darwin64-$TRAVIS_COMMIT.tgz;
+      mv llfio-v2.0-binaries-darwin64.tgz $NEWNAME;
       curl -T $NEWNAME -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD https://dedi5.nedprod.com/static/files/upload/;
     fi
 

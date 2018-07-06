@@ -26,7 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define LLFIO_STAT_H
 
 #ifndef LLFIO_CONFIG_HPP
-#error You must include the master afio.hpp, not individual header files directly
+#error You must include the master llfio.hpp, not individual header files directly
 #endif
 #include "config.hpp"
 

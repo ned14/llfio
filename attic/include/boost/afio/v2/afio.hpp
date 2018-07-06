@@ -48,8 +48,8 @@ DEALINGS IN THE SOFTWARE.
 #undef BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC
 #undef BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC
 
-#define BOOST_AFIO_V2_NAMESPACE boost::afio
-#define BOOST_AFIO_V2_NAMESPACE_BEGIN namespace boost { namespace afio {
+#define BOOST_AFIO_V2_NAMESPACE boost::llfio
+#define BOOST_AFIO_V2_NAMESPACE_BEGIN namespace boost { namespace llfio {
 #define BOOST_AFIO_V2_NAMESPACE_END } }
 #define BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC
 #define BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC virtual
@@ -88,7 +88,7 @@ for dispatch. This, being very useful for debugging, defaults to 1 except when
 #pragma warning(disable: 4251) // type needs to have dll-interface to be used by clients of class
 #endif
 
-/*! \file afio.hpp
+/*! \file llfio.hpp
 \brief Provides a batch asynchronous file i/o implementation based on Boost.ASIO
 */
 /*! \def BOOST_AFIO_HEADERS_ONLY
@@ -296,7 +296,7 @@ class std_thread_pool : public thread_source {
         explicit worker(std_thread_pool *p) : pool(p) { }
         void operator()()
         {
-            detail::set_threadname("boost::afio::std_thread_pool worker");
+            detail::set_threadname("boost::llfio::std_thread_pool worker");
             try
             {
                 pool->service.run();
@@ -797,7 +797,7 @@ using handle_ptr = std::shared_ptr<handle>;
 \brief Bitflags for availability of metadata from `struct stat_t`
 \ingroup metadata_flags
 
-See __afio_stat_t__ for explanation of meaning.
+See __llfio_stat_t__ for explanation of meaning.
 */
 enum class metadata_flags : size_t
 {
@@ -977,7 +977,7 @@ struct statfs_t
 Note that `directory_entry_hash` will hash one of these for you, and a `std::hash<directory_entry>` specialisation
 is defined for you so you ought to be able to use directory_entry directly in an `unordered_map<>`.
 
-See `__afio_stat_t__` for explanations of the fields.
+See `__llfio_stat_t__` for explanations of the fields.
 
 \qbk{
 [include generated/struct_directory_entry_hash.qbk]
@@ -1210,7 +1210,7 @@ public:
     off_t write_count_since_fsync() const { return byteswritten-byteswrittenatlastfsync; }
     /*! \brief Returns a mostly filled directory_entry for the file or directory referenced by this handle. Use `metadata_flags::All` if you want it as complete as your platform allows, even at the cost of severe performance loss.
 
-    Related types: `__afio_directory_entry__`, `__afio_stat_t__`
+    Related types: `__llfio_directory_entry__`, `__llfio_stat_t__`
     \return A directory entry for this handle.
     \param wanted The metadata wanted.
     \ingroup async_io_handle__ops
@@ -1224,7 +1224,7 @@ public:
     BOOST_AFIO_HEADERS_ONLY_VIRTUAL_SPEC directory_entry direntry(metadata_flags wanted=directory_entry::metadata_fastpath()) BOOST_AFIO_HEADERS_ONLY_VIRTUAL_UNDEFINED_SPEC
     /*! \brief Returns a mostly filled stat_t structure for the file or directory referenced by this handle. Use `metadata_flags::All` if you want it as complete as your platform allows, even at the cost of severe performance loss. Calls direntry(), so same race guarantees as that call.
 
-    Related types: `__afio_directory_entry__`, `__afio_stat_t__`
+    Related types: `__llfio_directory_entry__`, `__llfio_stat_t__`
     */
     stat_t lstat(metadata_flags wanted=directory_entry::metadata_fastpath())
     {
@@ -1273,7 +1273,7 @@ public:
  
     \ntkernelnamespacenote
 
-    Related types: `__afio_path_req__`
+    Related types: `__llfio_path_req__`
 
     \param req The absolute or relative (in which case precondition specifies a directory) path to create a hard link at.
     \ingroup async_io_handle__ops
@@ -1289,7 +1289,7 @@ public:
     
     On Microsoft Windows, this routine unlinks items as follows:
     
-    1. It tries to atomically rename the item to the root of the mounted volume it lives in with a .afiodXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX where
+    1. It tries to atomically rename the item to the root of the mounted volume it lives in with a .llfiodXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX where
     the X's are a 128 bit crypto random hexadecimal. If that fails, it tries the next directory up, and
     the next after that until success if any. This rename may fail for any reason, including if it is a directory with
     open file handles somewhere within. If it fails, the rename is skipped.
@@ -1309,7 +1309,7 @@ public:
 
     \ntkernelnamespacenote
 
-    Related types: `__afio_path_req__`
+    Related types: `__llfio_path_req__`
 
     \ingroup async_io_handle__ops
     \raceguarantees{
@@ -1335,7 +1335,7 @@ public:
 
     \ntkernelnamespacenote
 
-    Related types: `__afio_path_req__`
+    Related types: `__llfio_path_req__`
 
     \param req The absolute or relative (in which case precondition specifies a directory) path to relink to.
     \ingroup async_io_handle__ops
@@ -1407,7 +1407,7 @@ public:
   void reset(dispatcher_ptr p) { _old=p; }
 };
 
-//! Trait for determining if a type is an afio::future<T>
+//! Trait for determining if a type is an llfio::future<T>
 template<class T> struct is_future : std::false_type { };
 template<class T> struct is_future<future<T>> : std::true_type {};
 
@@ -1419,7 +1419,7 @@ namespace detail
   template<bool rethrow, class Iterator> inline stl_future<handle_ptr> when_any_ops(Iterator first, Iterator last);
 
   // Shim code for lightweight future continuations
-  template<class R, bool return_is_lightweight_future=is_lightweight_future<R>::value, bool return_is_afio_future=is_future<R>::value> struct continuation_return_type { using future_type = future<R>; using promise_type = void; };
+  template<class R, bool return_is_lightweight_future=is_lightweight_future<R>::value, bool return_is_llfio_future=is_future<R>::value> struct continuation_return_type { using future_type = future<R>; using promise_type = void; };
   template<class R, bool _> struct continuation_return_type<R, true, _> { using future_type = R; using promise_type = typename future_type::promise_type; };
   template<class R, bool _> struct continuation_return_type<R, _, true> { using future_type = R; using promise_type = void; };
   template<class future_type, class promise_type> struct do_continuation;
@@ -1792,10 +1792,10 @@ namespace detail
 \brief Abstract base class for dispatching file i/o asynchronously
 
 This is a reference counted instance with platform-specific implementation in object code.
-Construct an instance using the `boost::afio::make_dispatcher()` function.
+Construct an instance using the `boost::llfio::make_dispatcher()` function.
 
 \qbk{
-[/ link afio.reference.functions.async_file_io_dispatcher `async_file_io_dispatcher()`]
+[/ link llfio.reference.functions.async_file_io_dispatcher `async_file_io_dispatcher()`]
 [/ include generated/group_dispatcher__filter.qbk]
 [/ include generated/group_dispatcher__completion.qbk]
 [/ include generated/group_dispatcher__call.qbk]
@@ -6219,7 +6219,7 @@ namespace utils
   contiguous in physical memory. Regions returned by this allocator \em may be allocated contiguously in physical
   memory and therefore the kernel can pass through your scatter gather buffers unmodified.
 
-  A particularly useful combination with this allocator is with the page_sizes() member function of __afio_dispatcher__.
+  A particularly useful combination with this allocator is with the page_sizes() member function of __llfio_dispatcher__.
   This will return which pages sizes are possible, and which page sizes are enabled for this user. If writing a
   file copy routine for example, using this allocator with the largest page size as the copy chunk makes a great
   deal of sense.
@@ -6342,7 +6342,7 @@ namespace std
 #if BOOST_AFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 #undef BOOST_AFIO_VALIDATE_INPUTS // Let BOOST_AFIO_NEVER_VALIDATE_INPUTS take over
 #define BOOST_AFIO_HEADER_INCLUDED 1
-#include "detail/impl/afio.ipp"
+#include "detail/impl/llfio.ipp"
 #undef BOOST_AFIO_HEADER_INCLUDED
 #endif
 

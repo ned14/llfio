@@ -1,7 +1,7 @@
 #include "../detail/SpookyV2.h"
 
 //[workshop_final_interface
-namespace afio = BOOST_AFIO_V2_NAMESPACE;
+namespace llfio = BOOST_AFIO_V2_NAMESPACE;
 namespace filesystem = BOOST_AFIO_V2_NAMESPACE::filesystem;
 using BOOST_OUTCOME_V1_NAMESPACE::outcome;
 using BOOST_OUTCOME_V1_NAMESPACE::lightweight_futures::shared_future;
@@ -10,13 +10,13 @@ class data_store
 {
   struct _ostream;
   friend struct _ostream;
-  afio::dispatcher_ptr _dispatcher;
+  llfio::dispatcher_ptr _dispatcher;
   // The small blob store keeps non-memory mappable blobs at 32 byte alignments
-  afio::handle_ptr _small_blob_store, _small_blob_store_append, _small_blob_store_ecc;
+  llfio::handle_ptr _small_blob_store, _small_blob_store_append, _small_blob_store_ecc;
   // The large blob store keeps memory mappable blobs at 4Kb alignments
-  afio::handle_ptr _large_blob_store, _large_blob_store_append, _large_blob_store_ecc;
+  llfio::handle_ptr _large_blob_store, _large_blob_store_append, _large_blob_store_ecc;
   // The index is where we keep the map of keys to blobs
-  afio::handle_ptr _index_store, _index_store_append, _index_store_ecc;
+  llfio::handle_ptr _index_store, _index_store_append, _index_store_ecc;
   struct index;
   std::unique_ptr<index> _index;
 public:
@@ -33,7 +33,7 @@ public:
   static constexpr size_t writeable = (1<<0);
 
   // Open a data store at path
-  data_store(size_t flags = 0, afio::path path = "store");
+  data_store(size_t flags = 0, llfio::path path = "store");
   
   // Look up item named name for reading, returning an istream for the item
   shared_future<istream> lookup(std::string name) noexcept;
@@ -49,7 +49,7 @@ using BOOST_AFIO_V2_NAMESPACE::generic_category;
 using BOOST_OUTCOME_V1_NAMESPACE::outcome;
 
 // A special allocator of highly efficient file i/o memory
-using file_buffer_type = std::vector<char, afio::utils::page_allocator<char>>;
+using file_buffer_type = std::vector<char, llfio::utils::page_allocator<char>>;
 
 // Serialisation helper types
 #pragma pack(push, 1)
@@ -57,18 +57,18 @@ struct ondisk_file_header  // 20 bytes
 {
   union
   {
-    afio::off_t length;            // Always 32 in byte order of whoever wrote this
+    llfio::off_t length;            // Always 32 in byte order of whoever wrote this
     char endian[8];
   };
-  afio::off_t index_offset_begin;  // Hint to the length of the store when the index was last written
+  llfio::off_t index_offset_begin;  // Hint to the length of the store when the index was last written
   unsigned int time_count;         // Racy monotonically increasing count
 };
 struct ondisk_record_header  // 28 bytes - ALWAYS ALIGNED TO 32 BYTE FILE OFFSET
 {
-  afio::off_t magic : 16;   // 0xad magic
-  afio::off_t kind : 2;     // 0 for zeroed space, 1,2 for blob, 3 for index
-  afio::off_t _spare : 6;
-  afio::off_t length : 40;  // Size of the object (including this preamble, regions, key values) (+8)
+  llfio::off_t magic : 16;   // 0xad magic
+  llfio::off_t kind : 2;     // 0 for zeroed space, 1,2 for blob, 3 for index
+  llfio::off_t _spare : 6;
+  llfio::off_t length : 40;  // Size of the object (including this preamble, regions, key values) (+8)
   unsigned int age;         // file header time_count when this was added (+12)
   uint64 hash[2];           // 128-bit SpookyHash of the object (from below onwards) (+28)
   // ondisk_index_regions
@@ -76,11 +76,11 @@ struct ondisk_record_header  // 28 bytes - ALWAYS ALIGNED TO 32 BYTE FILE OFFSET
 };
 struct ondisk_index_regions  // 12 + regions_size * 32
 {
-  afio::off_t thisoffset;     // this index only valid if equals this offset
+  llfio::off_t thisoffset;     // this index only valid if equals this offset
   unsigned int regions_size;  // count of regions with their status (+28)
   struct ondisk_index_region
   {
-    afio::off_t offset;       // offset to this region
+    llfio::off_t offset;       // offset to this region
     ondisk_record_header r;   // copy of the header at the offset to avoid a disk seek
   } regions[1];
 };
@@ -97,13 +97,13 @@ struct data_store::index
   struct region
   {
     enum kind_type { zeroed=0, small_blob=1, large_blob=2, index=3 } kind;
-    afio::off_t offset, length;
+    llfio::off_t offset, length;
     uint64 hash[2];
     region(ondisk_index_regions::ondisk_index_region *r) : kind(static_cast<kind_type>(r->r.kind)), offset(r->offset), length(r->r.length) { memcpy(hash, r->r.hash, sizeof(hash)); }
     bool operator<(const region &o) const noexcept { return offset<o.offset; }
     bool operator==(const region &o) const noexcept { return offset==o.offset && length==o.length; }
   };
-  afio::off_t offset_loaded_from;  // Offset this index was loaded from
+  llfio::off_t offset_loaded_from;  // Offset this index was loaded from
   unsigned int last_time_count;    // Header time count
   std::vector<region> regions;
   std::unordered_map<std::string, size_t> key_to_region;
@@ -112,13 +112,13 @@ struct data_store::index
 //[workshop_final2]
   struct last_good_ondisk_index_info
   {
-    afio::off_t offset;
+    llfio::off_t offset;
     std::unique_ptr<char[]> buffer;
     size_t size;
     last_good_ondisk_index_info() : offset(0), size(0) { }
   };
   // Finds the last good index in the store
-  outcome<last_good_ondisk_index_info> find_last_good_ondisk_index(afio::handle_ptr h) noexcept
+  outcome<last_good_ondisk_index_info> find_last_good_ondisk_index(llfio::handle_ptr h) noexcept
   {
     last_good_ondisk_index_info ret;
     error_code ec;
@@ -126,8 +126,8 @@ struct data_store::index
     {
       // Read the front of the store file to get the index offset hint
       ondisk_file_header header;
-      afio::read(h, header, 0);
-      afio::off_t offset=0;
+      llfio::read(h, header, 0);
+      llfio::off_t offset=0;
       if(header.length==32)
         offset=header.index_offset_begin;
       else if(header.endian[0]==32)  // wrong endian
@@ -136,15 +136,15 @@ struct data_store::index
         return error_code(ENOTSUP, generic_category());
       last_time_count=header.time_count;
       // Fetch the valid extents
-      auto valid_extents(afio::extents(h));
+      auto valid_extents(llfio::extents(h));
       auto valid_extents_it=valid_extents.begin();
       // Iterate the records starting from index offset hint, keeping track of last known good index
       bool done=true;
       do
       {
-        afio::off_t linear_scanning=0;
+        llfio::off_t linear_scanning=0;
         ondisk_record_header record;
-        afio::off_t file_length=h->lstat(afio::metadata_flags::size).st_size;
+        llfio::off_t file_length=h->lstat(llfio::metadata_flags::size).st_size;
         for(; offset<file_length;)
         {
           // Round to 32 byte boundary
@@ -154,14 +154,14 @@ struct data_store::index
           {
             if(valid_extents.end()==++valid_extents_it)
             {
-              valid_extents=afio::extents(h);
+              valid_extents=llfio::extents(h);
               valid_extents_it=valid_extents.begin();
             }
           }
           // Is this offset within a valid extent? If not, bump it.
           if(offset<valid_extents_it->first)
             offset=valid_extents_it->first;
-          afio::read(ec, h, record, offset);
+          llfio::read(ec, h, record, offset);
           if(ec) return ec;
           // If this does not contain a valid record, linear scan
           // until we find one
@@ -186,9 +186,9 @@ start_linear_scan:
             temp.magic=0xad;
             temp.length=offset-linear_scanning;
             temp.age=last_time_count;
-            afio::write(ec, h, temp, linear_scanning);
+            llfio::write(ec, h, temp, linear_scanning);
             // Deallocate the physical storage for the invalid section
-            afio::zero(ec, h, {{linear_scanning+12, offset-linear_scanning-12}});
+            llfio::zero(ec, h, {{linear_scanning+12, offset-linear_scanning-12}});
             linear_scanning=0;
           }
           // If not an index, skip entire record
@@ -218,7 +218,7 @@ start_linear_scan:
               offset+=record.length;
             continue;
           }
-          afio::read(ec, h, buffer.get(), (size_t) record.length-sizeof(header), offset+sizeof(header));
+          llfio::read(ec, h, buffer.get(), (size_t) record.length-sizeof(header), offset+sizeof(header));
           if(ec)
             return ec;
           uint64 hash[2]={0, 0};
@@ -262,7 +262,7 @@ start_linear_scan:
 //]
 //[workshop_final3]
   // Loads the index from the store
-  outcome<void> load(afio::handle_ptr h) noexcept
+  outcome<void> load(llfio::handle_ptr h) noexcept
   {
     // If find_last_good_ondisk_index() returns error or exception, return those, else
     // initialise ondisk_index_info to monad.get()
@@ -291,7 +291,7 @@ start_linear_scan:
 //]
 //[workshop_final4]
   // Writes the index to the store
-  outcome<void> store(afio::handle_ptr rwh, afio::handle_ptr appendh) noexcept
+  outcome<void> store(llfio::handle_ptr rwh, llfio::handle_ptr appendh) noexcept
   {
     error_code ec;
     std::vector<ondisk_index_regions::ondisk_index_region> ondisk_regions;
@@ -359,7 +359,7 @@ start_linear_scan:
         return error_code(EDEADLK, generic_category());
       }
       // Take the current length of the store file. Any index written will be at or after this.
-      h.header2.thisoffset=appendh->lstat(afio::metadata_flags::size).st_size;
+      h.header2.thisoffset=appendh->lstat(llfio::metadata_flags::size).st_size;
       memset(h.header.hash, 0, sizeof(h.header.hash));
       // Hash the end of the first gather buffer and all the remaining gather buffers
       SpookyHash::Hash128(asio::buffer_cast<const char *>(buffers[0])+24, asio::buffer_size(buffers[0])-24, h.header.hash, h.header.hash+1);
@@ -368,10 +368,10 @@ start_linear_scan:
       if(buffers.size()>3)
         SpookyHash::Hash128(asio::buffer_cast<const char *>(buffers[3]),    asio::buffer_size(buffers[3]),    h.header.hash, h.header.hash+1);
       // Atomic append the record
-      afio::write(ec, appendh, buffers, 0);
+      llfio::write(ec, appendh, buffers, 0);
       if(ec) return ec;
       // Reread the record
-      afio::read(ec, rwh, reread.data(), reread.size(), h.header2.thisoffset);
+      llfio::read(ec, rwh, reread.data(), reread.size(), h.header2.thisoffset);
       if(ec) return ec;
       // If the record doesn't match it could be due to a lag in st_size between open handles,
       // so retry until success or stale index
@@ -380,12 +380,12 @@ start_linear_scan:
     // New index has been successfully written. Update the hint at the front of the file.
     // This update is racy of course, but as it's merely a hint we don't care.
     ondisk_file_header file_header;
-    afio::read(ec, rwh, file_header, 0);
+    llfio::read(ec, rwh, file_header, 0);
     if(!ec && file_header.index_offset_begin<h.header2.thisoffset)
     {
       file_header.index_offset_begin=h.header2.thisoffset;
       file_header.time_count++;
-      afio::write(ec, rwh, file_header, 0);
+      llfio::write(ec, rwh, file_header, 0);
     }
     offset_loaded_from=h.header2.thisoffset;
     last_time_count=file_header.time_count;
@@ -394,17 +394,17 @@ start_linear_scan:
 //]
 //[workshop_final5]
   // Reloads the index if needed
-  outcome<void> refresh(afio::handle_ptr h) noexcept
+  outcome<void> refresh(llfio::handle_ptr h) noexcept
   {
-    static afio::off_t last_size;
+    static llfio::off_t last_size;
     error_code ec;
-    afio::off_t size=h->lstat(afio::metadata_flags::size).st_size;
+    llfio::off_t size=h->lstat(llfio::metadata_flags::size).st_size;
     // Has the size changed? If so, need to check the hint
     if(size>last_size)
     {
       last_size=size;
       ondisk_file_header header;
-      afio::read(ec, h, header, 0);
+      llfio::read(ec, h, header, 0);
       if(ec) return ec;
       // If the hint is moved, we are stale
       if(header.index_offset_begin>offset_loaded_from)
@@ -421,30 +421,30 @@ using BOOST_AFIO_V2_NAMESPACE::error_code;
 using BOOST_AFIO_V2_NAMESPACE::generic_category;
 
 // A special allocator of highly efficient file i/o memory
-using file_buffer_type = std::vector<char, afio::utils::page_allocator<char>>;
+using file_buffer_type = std::vector<char, llfio::utils::page_allocator<char>>;
 
 // An iostream which reads directly from a memory mapped AFIO file
 struct idirectstream : public std::istream
 {
   struct directstreambuf : public std::streambuf
   {
-    afio::handle_ptr h;  // Holds the file open
+    llfio::handle_ptr h;  // Holds the file open
     std::shared_ptr<file_buffer_type> buffer;
     // From a mmap
-    directstreambuf(afio::handle_ptr _h, char *addr, size_t length) : h(std::move(_h))
+    directstreambuf(llfio::handle_ptr _h, char *addr, size_t length) : h(std::move(_h))
     {
       // Set the get buffer this streambuf is to use
       setg(addr, addr, addr + length);
     }
     // From a malloc
-    directstreambuf(afio::handle_ptr _h, std::shared_ptr<file_buffer_type> _buffer, size_t length) : h(std::move(_h)), buffer(std::move(_buffer))
+    directstreambuf(llfio::handle_ptr _h, std::shared_ptr<file_buffer_type> _buffer, size_t length) : h(std::move(_h)), buffer(std::move(_buffer))
     {
       // Set the get buffer this streambuf is to use
       setg(buffer->data(), buffer->data(), buffer->data() + length);
     }
   };
   std::unique_ptr<directstreambuf> buf;
-  template<class U> idirectstream(afio::handle_ptr h, U &&buffer, size_t length) : std::istream(new directstreambuf(std::move(h), std::forward<U>(buffer), length)), buf(static_cast<directstreambuf *>(rdbuf()))
+  template<class U> idirectstream(llfio::handle_ptr h, U &&buffer, size_t length) : std::istream(new directstreambuf(std::move(h), std::forward<U>(buffer), length)), buf(static_cast<directstreambuf *>(rdbuf()))
   {
   }
   virtual ~idirectstream() override
@@ -465,7 +465,7 @@ struct data_store::_ostream : public std::ostream
     data_store *ds;
     std::string name;
     file_buffer_type buffer;
-    ostreambuf(data_store *_ds, std::string _name) : ds(_ds), name(std::move(_name)), buffer(afio::utils::page_sizes().front())
+    ostreambuf(data_store *_ds, std::string _name) : ds(_ds), name(std::move(_name)), buffer(llfio::utils::page_sizes().front())
     {
       // Set the put buffer this streambuf is to use
       setp(buffer.data(), buffer.data() + buffer.size());
@@ -488,8 +488,8 @@ struct data_store::_ostream : public std::ostream
         buffers[0]=asio::const_buffer((char *) &r.r, sizeof(r.r));
         buffers[1]=asio::const_buffer(buffer.data(), (size_t)(r.r.length-sizeof(r.r)));
         error_code ec;
-        auto offset=ds->_small_blob_store_append->lstat(afio::metadata_flags::size).st_size;
-        afio::write(ec, ds->_small_blob_store_append, buffers, 0);
+        auto offset=ds->_small_blob_store_append->lstat(llfio::metadata_flags::size).st_size;
+        llfio::write(ec, ds->_small_blob_store_append, buffers, 0);
         if(ec)
           abort();  // should really do something better here
 
@@ -497,7 +497,7 @@ struct data_store::_ostream : public std::ostream
         ondisk_record_header header;
         do
         {
-          afio::read(ec, ds->_small_blob_store_append, header, offset);
+          llfio::read(ec, ds->_small_blob_store_append, header, offset);
           if(ec) abort();
           if(header.kind==1 /*small blob*/ && !memcmp(header.hash, r.r.hash, sizeof(header.hash)))
           {
@@ -505,7 +505,7 @@ struct data_store::_ostream : public std::ostream
             break;
           }
           offset+=header.length;
-        } while(offset<ds->_small_blob_store_append->lstat(afio::metadata_flags::size).st_size);
+        } while(offset<ds->_small_blob_store_append->lstat(llfio::metadata_flags::size).st_size);
 
         for(;;)
         {
@@ -558,35 +558,35 @@ struct data_store::_ostream : public std::ostream
 //]
 
 //[workshop_final8]
-data_store::data_store(size_t flags, afio::path path)
+data_store::data_store(size_t flags, llfio::path path)
 {
   // Make a dispatcher for the local filesystem URI, masking out write flags on all operations if not writeable
-  _dispatcher=afio::make_dispatcher("file:///", afio::file_flags::none, !(flags & writeable) ? afio::file_flags::write : afio::file_flags::none).get();
+  _dispatcher=llfio::make_dispatcher("file:///", llfio::file_flags::none, !(flags & writeable) ? llfio::file_flags::write : llfio::file_flags::none).get();
   // Set the dispatcher for this thread, and create/open a handle to the store directory
-  afio::current_dispatcher_guard h(_dispatcher);
-  auto dirh(afio::dir(std::move(path), afio::file_flags::create));  // throws if there was an error
+  llfio::current_dispatcher_guard h(_dispatcher);
+  auto dirh(llfio::dir(std::move(path), llfio::file_flags::create));  // throws if there was an error
 
   // The small blob store keeps non-memory mappable blobs at 32 byte alignments
-  _small_blob_store_append=afio::file(dirh, "small_blob_store", afio::file_flags::create | afio::file_flags::append);  // throws if there was an error
-  _small_blob_store=afio::file(dirh, "small_blob_store", afio::file_flags::read_write);          // throws if there was an error
-  _small_blob_store_ecc=afio::file(dirh, "small_blob_store.ecc", afio::file_flags::create | afio::file_flags::read_write);  // throws if there was an error
+  _small_blob_store_append=llfio::file(dirh, "small_blob_store", llfio::file_flags::create | llfio::file_flags::append);  // throws if there was an error
+  _small_blob_store=llfio::file(dirh, "small_blob_store", llfio::file_flags::read_write);          // throws if there was an error
+  _small_blob_store_ecc=llfio::file(dirh, "small_blob_store.ecc", llfio::file_flags::create | llfio::file_flags::read_write);  // throws if there was an error
 
   // The large blob store keeps memory mappable blobs at 4Kb alignments
   // TODO
 
   // The index is where we keep the map of keys to blobs
-  _index_store_append=afio::file(dirh, "index", afio::file_flags::create | afio::file_flags::append);  // throws if there was an error
-  _index_store=afio::file(dirh, "index", afio::file_flags::read_write);          // throws if there was an error
-  _index_store_ecc=afio::file(dirh, "index.ecc", afio::file_flags::create | afio::file_flags::read_write);  // throws if there was an error
+  _index_store_append=llfio::file(dirh, "index", llfio::file_flags::create | llfio::file_flags::append);  // throws if there was an error
+  _index_store=llfio::file(dirh, "index", llfio::file_flags::read_write);          // throws if there was an error
+  _index_store_ecc=llfio::file(dirh, "index.ecc", llfio::file_flags::create | llfio::file_flags::read_write);  // throws if there was an error
   // Is this store just created?
-  if(!_index_store_append->lstat(afio::metadata_flags::size).st_size)
+  if(!_index_store_append->lstat(llfio::metadata_flags::size).st_size)
   {
     ondisk_file_header header;
     header.length=32;
     header.index_offset_begin=32;
     header.time_count=0;
     // This is racy, but the file format doesn't care
-    afio::write(_index_store_append, header, 0);
+    llfio::write(_index_store_append, header, 0);
   }
   _index.reset(new index);
 }
@@ -600,12 +600,12 @@ shared_future<data_store::istream> data_store::lookup(std::string name) noexcept
     if(_index->key_to_region.end()==it)
       return error_code(ENOENT, generic_category());  // not found
     auto &r=_index->regions[it->second];
-    afio::off_t offset=r.offset+24, length=r.length-24;
+    llfio::off_t offset=r.offset+24, length=r.length-24;
     // Schedule the reading of the file into a buffer
     auto buffer=std::make_shared<file_buffer_type>((size_t) length);
-    afio::future<> h(afio::async_read(_small_blob_store, buffer->data(), (size_t) length, offset));
+    llfio::future<> h(llfio::async_read(_small_blob_store, buffer->data(), (size_t) length, offset));
     // When the read completes call this continuation
-    return h.then([buffer, length](const afio::future<> &h) -> shared_future<data_store::istream> {
+    return h.then([buffer, length](const llfio::future<> &h) -> shared_future<data_store::istream> {
       // If read failed, return the error or exception immediately
       BOOST_OUTCOME_PROPAGATE(h);
       data_store::istream ret(std::make_shared<idirectstream>(h.get_handle(), buffer, (size_t) length));

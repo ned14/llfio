@@ -301,7 +301,7 @@ public:
     });
   }
   // True if the path view matches the format of an AFIO deleted file
-  constexpr bool is_afio_deleted() const noexcept
+  constexpr bool is_llfio_deleted() const noexcept
   {
     return filename()._invoke([](const auto &v) {
       if(v.size() == 64 + 8)

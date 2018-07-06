@@ -63,7 +63,7 @@ File Created: Mar 2013
 #define _GNU_SOURCE
 #endif
 
-#include "../../afio.hpp"
+#include "../../llfio.hpp"
 #ifndef BOOST_AFIO_DISABLE_VALGRIND
 # include "../valgrind/memcheck.h"
 #else
@@ -254,7 +254,7 @@ static inline chrono::system_clock::time_point to_timepoint(struct timespec ts)
 }
 static inline void fill_stat_t(stat_t &stat, BOOST_AFIO_POSIX_STAT_STRUCT s, metadata_flags wanted)
 {
-    using namespace boost::afio;
+    using namespace boost::llfio;
     if(!!(wanted&metadata_flags::dev)) { stat.st_dev=s.st_dev; }
     if(!!(wanted&metadata_flags::ino)) { stat.st_ino=s.st_ino; }
     if(!!(wanted&metadata_flags::type)) { stat.st_type=to_st_type(s.st_mode); }
@@ -439,15 +439,15 @@ BOOST_AFIO_V2_NAMESPACE_END
 #endif
 
 BOOST_AFIO_V2_NAMESPACE_BEGIN
-struct afio_exception_stack_entry
+struct llfio_exception_stack_entry
 {
   std::string name;
   stack_type stack;
 };
-typedef std::vector<afio_exception_stack_entry> afio_exception_stack_t;
-inline afio_exception_stack_t *&afio_exception_stack()
+typedef std::vector<llfio_exception_stack_entry> llfio_exception_stack_t;
+inline llfio_exception_stack_t *&llfio_exception_stack()
 {
-  static BOOST_AFIO_THREAD_LOCAL afio_exception_stack_t *s;
+  static BOOST_AFIO_THREAD_LOCAL llfio_exception_stack_t *s;
   return s;
 }
 BOOST_AFIO_V2_NAMESPACE_END
@@ -580,7 +580,7 @@ namespace detail {
   protected:
     actual_lock_file(BOOST_AFIO_V2_NAMESPACE::path p) : path(p), lockfilepath(p)
     {
-      lockfilepath+=".afiolockfile";
+      lockfilepath+=".llfiolockfile";
     }
   public:
     ~actual_lock_file()
@@ -1336,7 +1336,7 @@ update_path:
                 if(it->second.expired())
                 {
 #ifndef NDEBUG
-                  std::cout << "afio: directory cached handle pruned stale " << it->first << std::endl;
+                  std::cout << "llfio: directory cached handle pruned stale " << it->first << std::endl;
 #endif
                   it=dirhcache.erase(it);
                   continue;
@@ -1364,7 +1364,7 @@ update_path:
                     dirh=std::move(result.second);
 #ifndef NDEBUG
                     if(dirh)
-                      std::cout << "afio: directory cached handle created for " << req.path << " (" << dirh.get() << ")" << std::endl;
+                      std::cout << "llfio: directory cached handle created for " << req.path << " (" << dirh.get() << ")" << std::endl;
 #endif
                     if(dirh)
                     {
@@ -1751,7 +1751,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void dispatcher::int_directory_cached_handl
     }
   }
 #ifndef NDEBUG
-  std::cout << "afio: directory cached handle we relocate from " << oldpath << " to " << newpath << " (" << h.get() << ")" << std::endl;
+  std::cout << "llfio: directory cached handle we relocate from " << oldpath << " to " << newpath << " (" << h.get() << ")" << std::endl;
 #endif
   if(!newpath.empty())
     p->dirhcache.insert(std::make_pair(std::move(newpath), std::move(h)));
@@ -1908,10 +1908,10 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void dispatcher::complete_async_op(size_t i
     {
 #ifdef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
         auto unexception_stack=detail::Undoer([]{
-          delete afio_exception_stack();
-          afio_exception_stack()=nullptr;
+          delete llfio_exception_stack();
+          llfio_exception_stack()=nullptr;
         });
-        if(afio_exception_stack() && !(p->testing_flags & detail::unit_testing_flags::no_symbol_lookup))
+        if(llfio_exception_stack() && !(p->testing_flags & detail::unit_testing_flags::no_symbol_lookup))
         {
           std::string originalmsg;
           error_code ec;
@@ -1927,7 +1927,7 @@ BOOST_AFIO_HEADERS_ONLY_MEMFUNC_SPEC void dispatcher::complete_async_op(size_t i
             buffer << originalmsg << ". Op was scheduled at:\n";
             print_stack(buffer, thisop->stack);
             buffer << "Exceptions were thrown within the engine at:\n";
-            for(auto &i : *afio_exception_stack())
+            for(auto &i : *llfio_exception_stack())
             {
               //buffer << i.name << " Backtrace:\n";
               print_stack(buffer, i.stack);
@@ -3335,7 +3335,7 @@ namespace detail {
 BOOST_AFIO_V2_NAMESPACE_END
 
 #if defined(WIN32) && !defined(USE_POSIX_ON_WIN32)
-#include "afio_iocp.ipp"
+#include "llfio_iocp.ipp"
 #endif
 
 BOOST_AFIO_V2_NAMESPACE_BEGIN
@@ -3619,7 +3619,7 @@ namespace utils
       }
 #ifndef NDEBUG
       else if(ret.page_size_used>65536)
-        std::cout << "afio: Large page allocation successful" << std::endl;
+        std::cout << "llfio: Large page allocation successful" << std::endl;
 #endif
 #else
       int flags=MAP_SHARED|MAP_ANON;
@@ -3644,7 +3644,7 @@ namespace utils
       }
 #ifndef NDEBUG
       else if(ret.page_size_used>65536)
-        std::cout << "afio: Large page allocation successful" << std::endl;
+        std::cout << "llfio: Large page allocation successful" << std::endl;
 #endif
 #endif
       return ret;

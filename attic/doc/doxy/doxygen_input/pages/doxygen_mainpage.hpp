@@ -15,7 +15,7 @@
 \mainpage Boost.AFIO
 
 Welcome to the Boost.AFIO documentation. You may find the more formal documentation at
-http://boostgsoc13.github.io/boost.afio/ of use. It also includes a full reference manual.
+http://boostgsoc13.github.io/boost.llfio/ of use. It also includes a full reference manual.
 
 */
 

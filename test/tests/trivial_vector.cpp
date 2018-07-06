@@ -179,7 +179,7 @@ static inline void BenchmarkTrivialVector1()
   {
     csv << times[n][0] << "," << times[n][1] << "," << times[n][2] << std::endl;
     std::cout << "                    std::vector<udt> inserts " << printKb(times[n][0]) << " in " << times[n][1] << " microseconds" << std::endl;
-    std::cout << "afio::algorithm::trivial_vector<udt> inserts " << printKb(times[n][0]) << " in " << times[n][2] << " microseconds" << std::endl;
+    std::cout << "llfio::algorithm::trivial_vector<udt> inserts " << printKb(times[n][0]) << " in " << times[n][2] << " microseconds" << std::endl;
   }
 }
 
@@ -239,10 +239,10 @@ static inline void BenchmarkTrivialVector2()
   {
     csv << times[n][0] << "," << times[n][1] << "," << times[n][2] << std::endl;
     std::cout << "                    std::vector<udt> resizes " << printKb(times[n][0]) << " in " << times[n][1] << " microseconds" << std::endl;
-    std::cout << "afio::algorithm::trivial_vector<udt> resizes " << printKb(times[n][0]) << " in " << times[n][2] << " microseconds" << std::endl;
+    std::cout << "llfio::algorithm::trivial_vector<udt> resizes " << printKb(times[n][0]) << " in " << times[n][2] << " microseconds" << std::endl;
   }
 }
 
-KERNELTEST_TEST_KERNEL(integration, afio, algorithm, trivial_vector, "Tests that afio::algorithm::trivial_vector works as expected", TestTrivialVector())
-KERNELTEST_TEST_KERNEL(integration, afio, algorithm, trivial_vector2, "Benchmarks afio::algorithm::trivial_vector against std::vector with push_back()", BenchmarkTrivialVector1())
-KERNELTEST_TEST_KERNEL(integration, afio, algorithm, trivial_vector3, "Benchmarks afio::algorithm::trivial_vector against std::vector with resize()", BenchmarkTrivialVector2())
+KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, trivial_vector, "Tests that llfio::algorithm::trivial_vector works as expected", TestTrivialVector())
+KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, trivial_vector2, "Benchmarks llfio::algorithm::trivial_vector against std::vector with push_back()", BenchmarkTrivialVector1())
+KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, trivial_vector3, "Benchmarks llfio::algorithm::trivial_vector against std::vector with resize()", BenchmarkTrivialVector2())

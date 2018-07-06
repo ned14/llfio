@@ -111,20 +111,20 @@ BOOST_AFIO_V2_NAMESPACE_END
 #ifdef BOOST_AFIO_COMPILING_FOR_GCOV
 #define BOOST_AFIO_THROW_FATAL(x) std::terminate()
 #else
-namespace boost { namespace afio { namespace fatal_exception_throw {
+namespace boost { namespace llfio { namespace fatal_exception_throw {
             template<class T> inline void do_throw_fatal_exception(const T &v) noexcept
             {
                 BOOST_AFIO_V2_NAMESPACE::detail::print_fatal_exception_message_to_stderr(v.what());
                 throw v;
             }
-            extern "C" inline void boost_afio_do_throw_fatal_exception(std::function<void()> impl) noexcept{ impl(); }
+            extern "C" inline void boost_llfio_do_throw_fatal_exception(std::function<void()> impl) noexcept{ impl(); }
             template<class T> inline void throw_fatal_exception(const T &v) noexcept
             {
                 // In case the extern "C" fails to terminate, trap and terminate here
                 try
                 {
                     std::function<void()> doer=std::bind(&do_throw_fatal_exception<T>, std::ref(v));
-                    boost_afio_do_throw_fatal_exception(doer);
+                    boost_llfio_do_throw_fatal_exception(doer);
                 }
                 catch(...)
                 {
@@ -132,7 +132,7 @@ namespace boost { namespace afio { namespace fatal_exception_throw {
                 }
             }
 } } }
-#define BOOST_AFIO_THROW_FATAL(x) boost::afio::fatal_exception_throw::throw_fatal_exception(x)
+#define BOOST_AFIO_THROW_FATAL(x) boost::llfio::fatal_exception_throw::throw_fatal_exception(x)
 #endif
 #ifdef _MSC_VER
 #pragma warning(pop)

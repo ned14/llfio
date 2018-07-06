@@ -259,7 +259,7 @@ inline error_code ntkernel_error(SYSTEM_ERROR2_NAMESPACE::win32::NTSTATUS c);
 
 namespace detail
 {
-  inline std::ostream &operator<<(std::ostream &s, const error_code &v) { return s << "afio::error_code(" << v.message().c_str() << ")"; }
+  inline std::ostream &operator<<(std::ostream &s, const error_code &v) { return s << "llfio::error_code(" << v.message().c_str() << ")"; }
 }
 inline error_code error_from_exception(std::exception_ptr &&ep = std::current_exception(), error_code not_matched = generic_error(errc::resource_unavailable_try_again)) noexcept
 {
@@ -479,9 +479,9 @@ inline std::ostream &operator<<(std::ostream &s, const error_info &v)
 {
   if(make_error_code(v))
   {
-    return s << "afio::error_info(" << v.message() << ")";
+    return s << "llfio::error_info(" << v.message() << ")";
   }
-  return s << "afio::error_info(null)";
+  return s << "llfio::error_info(null)";
 }
 // Tell Outcome that error_info is to be treated as an error_code
 inline std::error_code make_error_code(error_info ei)
@@ -495,7 +495,7 @@ inline void outcome_throw_as_system_error_with_payload(const error_info &ei)
 }
 
 /*! \class error
-\brief The exception type synthesised and thrown when an `afio::result` or `afio::outcome` is no-value observed.
+\brief The exception type synthesised and thrown when an `llfio::result` or `llfio::outcome` is no-value observed.
 */
 class error : public filesystem::filesystem_error
 {

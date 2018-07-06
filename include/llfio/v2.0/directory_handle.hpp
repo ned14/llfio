@@ -291,13 +291,13 @@ inline std::ostream &operator<<(std::ostream &s, const directory_handle::filter 
   static constexpr const char *values[] = {"none", "fastdeleted"};
   if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || (values[static_cast<size_t>(v)] == nullptr))
   {
-    return s << "afio::directory_handle::filter::<unknown>";
+    return s << "llfio::directory_handle::filter::<unknown>";
   }
-  return s << "afio::directory_handle::filter::" << values[static_cast<size_t>(v)];
+  return s << "llfio::directory_handle::filter::" << values[static_cast<size_t>(v)];
 }
 inline std::ostream &operator<<(std::ostream &s, const directory_handle::enumerate_info & /*unused*/)
 {
-  return s << "afio::directory_handle::enumerate_info";
+  return s << "llfio::directory_handle::enumerate_info";
 }
 
 //! \brief Constructor for `directory_handle`

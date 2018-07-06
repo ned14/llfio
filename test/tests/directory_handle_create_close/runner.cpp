@@ -154,5 +154,5 @@ template <class U> inline void directory_handle_create_close_creation(U &&f)
   check_results_with_boost_test(permuter, results);
 }
 
-KERNELTEST_TEST_KERNEL(unit, afio, directory_handle_create_close, directory_handle, "Tests that afio::directory_handle::directory()'s parameters with absolute paths work as expected", directory_handle_create_close_creation(directory_handle_create_close::test_kernel_directory_handle_absolute))
-KERNELTEST_TEST_KERNEL(unit, afio, directory_handle_create_close, directory_handle, "Tests that afio::directory_handle::directory()'s parameters with relative paths work as expected", directory_handle_create_close_creation(directory_handle_create_close::test_kernel_directory_handle_relative))
+KERNELTEST_TEST_KERNEL(unit, llfio, directory_handle_create_close, directory_handle, "Tests that llfio::directory_handle::directory()'s parameters with absolute paths work as expected", directory_handle_create_close_creation(directory_handle_create_close::test_kernel_directory_handle_absolute))
+KERNELTEST_TEST_KERNEL(unit, llfio, directory_handle_create_close, directory_handle, "Tests that llfio::directory_handle::directory()'s parameters with relative paths work as expected", directory_handle_create_close_creation(directory_handle_create_close::test_kernel_directory_handle_relative))

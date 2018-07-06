@@ -32,14 +32,14 @@ Distributed under the Boost Software License, Version 1.0.
 
 #if defined(__cplusplus) || DOXYGEN_IS_IN_THE_HOUSE
 #ifndef LLFIO_CONFIG_HPP
-#error You must include the master afio.hpp, not individual header files directly
+#error You must include the master llfio.hpp, not individual header files directly
 #endif
 #include "config.hpp"
 #include <stdexcept>
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 #define LLFIO_DEADLINE_NAME deadline
 #else
-#define LLFIO_DEADLINE_NAME boost_afio_deadline
+#define LLFIO_DEADLINE_NAME boost_llfio_deadline
 #endif
 
 /*! \struct deadline

@@ -1,4 +1,4 @@
-#include "afio_pch.hpp"
+#include "llfio_pch.hpp"
 
 /*  My Intel Core i7 3770K running Windows 8 x64:  911963 closures/sec
     My Intel Core i7 3770K running     Linux x64: 1094780 closures/sec
@@ -14,7 +14,7 @@ static int callback()
 
 int main(void)
 {
-    using namespace boost::afio;
+    using namespace boost::llfio;
     auto dispatcher=make_dispatcher().get();
     typedef chrono::duration<double, ratio<1, 1>> secs_type;
     auto begin=chrono::high_resolution_clock::now();

@@ -60,9 +60,9 @@ namespace path_discovery
     static constexpr const char *values[] = {"local", "environment", "system", "hardcoded"};
     if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || (values[static_cast<size_t>(v)] == nullptr))
     {
-      return s << "afio::path_discovery::discovered_path::source_type::<unknown>";
+      return s << "llfio::path_discovery::discovered_path::source_type::<unknown>";
     }
-    return s << "afio::path_discovery::discovered_path::source_type::" << values[static_cast<size_t>(v)];
+    return s << "llfio::path_discovery::discovered_path::source_type::" << values[static_cast<size_t>(v)];
   }
 
   /*! \brief Returns a list of potential directories which might be usuable for temporary files.

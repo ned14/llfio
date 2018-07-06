@@ -148,9 +148,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #if defined(LLFIO_UNSTABLE_VERSION) && !defined(LLFIO_DISABLE_ABI_PERMUTATION)
 #include "../revision.hpp"
-#define LLFIO_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(afio_v2, LLFIO_PREVIOUS_COMMIT_UNIQUE))
+#define LLFIO_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(llfio_v2, LLFIO_PREVIOUS_COMMIT_UNIQUE))
 #else
-#define LLFIO_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(afio_v2))
+#define LLFIO_V2 (QUICKCPPLIB_BIND_NAMESPACE_VERSION(llfio_v2))
 #endif
 /*! \def LLFIO_V2
 \ingroup config
@@ -159,7 +159,7 @@ of bracketed tokens later fused by the preprocessor into namespace and C++ modul
 */
 #if DOXYGEN_IS_IN_THE_HOUSE
 //! The AFIO namespace
-namespace afio_v2_xxx
+namespace llfio_v2_xxx
 {
   //! Collection of file system based algorithms
   namespace algorithm
@@ -175,22 +175,22 @@ namespace afio_v2_xxx
   }
 }
 /*! \brief The namespace of this AFIO v2 which will be some unknown inline
-namespace starting with `v2_` inside the `boost::afio` namespace.
+namespace starting with `v2_` inside the `boost::llfio` namespace.
 \ingroup config
 */
-#define LLFIO_V2_NAMESPACE afio_v2_xxx
+#define LLFIO_V2_NAMESPACE llfio_v2_xxx
 /*! \brief Expands into the appropriate namespace markup to enter the AFIO v2 namespace.
 \ingroup config
 */
 #define LLFIO_V2_NAMESPACE_BEGIN                                                                                                                                                                                                                                                                                                \
-  namespace afio_v2_xxx                                                                                                                                                                                                                                                                                                        \
+  namespace llfio_v2_xxx                                                                                                                                                                                                                                                                                                        \
   {
 /*! \brief Expands into the appropriate namespace markup to enter the C++ module
 exported AFIO v2 namespace.
 \ingroup config
 */
 #define LLFIO_V2_NAMESPACE_EXPORT_BEGIN                                                                                                                                                                                                                                                                                         \
-  export namespace afio_v2_xxx                                                                                                                                                                                                                                                                                                 \
+  export namespace llfio_v2_xxx                                                                                                                                                                                                                                                                                                 \
   {
 /*! \brief Expands into the appropriate namespace markup to exit the AFIO v2 namespace.
 \ingroup config
@@ -300,7 +300,7 @@ LLFIO_V2_NAMESPACE_END
 // Used to tag functions which need to be made free by the AST tool
 #ifndef LLFIO_MAKE_FREE_FUNCTION
 #if 0  //__cplusplus >= 201700  // makes annoying warnings
-#define LLFIO_MAKE_FREE_FUNCTION [[afio::make_free_function]]
+#define LLFIO_MAKE_FREE_FUNCTION [[llfio::make_free_function]]
 #else
 #define LLFIO_MAKE_FREE_FUNCTION
 #endif
@@ -453,7 +453,7 @@ LLFIO_V2_NAMESPACE_END
 //  Auto library naming
 #if !defined(LLFIO_SOURCE) && !defined(BOOST_ALL_NO_LIB) && !defined(LLFIO_NO_LIB) && !LLFIO_STANDALONE && !LLFIO_HEADERS_ONLY
 
-#define BOOST_LIB_NAME boost_afio
+#define BOOST_LIB_NAME boost_llfio
 
 // tell the auto-link code to select a dll when required:
 #if defined(BOOST_ALL_DYN_LINK) || defined(LLFIO_DYN_LINK)

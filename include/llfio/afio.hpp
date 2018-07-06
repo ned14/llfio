@@ -1,4 +1,4 @@
-//! \file afio/afio.hpp The master *latest version* AFIO include file. All AFIO consuming libraries should include this header only.
+//! \file llfio/llfio.hpp The master *latest version* AFIO include file. All AFIO consuming libraries should include this header only.
 #include "version.hpp"
 
 #if defined(_MSC_VER) && !defined(__clang__)
@@ -8,7 +8,7 @@
 #endif
 
 #if 0 // cmake's Makefiles and Ninja generators won't pick up dependent headers without this
-#include "v2.0/afio.hpp"
+#include "v2.0/llfio.hpp"
 #endif
 
 #define LLFIO_HEADERS_PATH4(a) #a

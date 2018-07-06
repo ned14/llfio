@@ -1,10 +1,10 @@
-#include "afio_pch.hpp"
+#include "llfio_pch.hpp"
 
 /*  My Intel Core i7 3770K running Windows 8 x64: 726124 closures/sec
     My Intel Core i7 3770K running     Linux x64: 968005 closures/sec
 */
 
-static std::pair<bool, std::shared_ptr<boost::afio::handle>> _callback(size_t, boost::afio::future<> op)
+static std::pair<bool, std::shared_ptr<boost::llfio::handle>> _callback(size_t, boost::llfio::future<> op)
 {
 #if 0
     // Simulate an i/o op with a context switch
@@ -15,7 +15,7 @@ static std::pair<bool, std::shared_ptr<boost::afio::handle>> _callback(size_t, b
 
 int main(void)
 {
-    using namespace boost::afio;
+    using namespace boost::llfio;
     auto dispatcher=make_dispatcher().get();
     typedef chrono::duration<double, ratio<1, 1>> secs_type;
     auto begin=chrono::high_resolution_clock::now();
