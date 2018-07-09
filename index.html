@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>AFIO: Main Page</title>
+<title>LLFIO: Main Page</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -28,7 +28,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">AFIO
+   <div id="projectname">LLFIO
    &#160;<span id="projectnumber">v2.00 late alpha</span>
    </div>
   </td>
@@ -81,26 +81,26 @@ $(document).ready(function(){initNavTree('index.html','');});
 
 <div class="header">
   <div class="headertitle">
-<div class="title">AFIO Documentation</div>  </div>
+<div class="title">LLFIO Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><center><table border="0" cellpadding="4">
 <tr>
-<td align="center"><a href="https://github.com/ned14/afio">AFIO</a><br />
-<a href="https://github.com/ned14/afio">on GitHub</a>  </td><td align="center"><a href="http://my.cdash.org/index.php?project=Boost.AFIO">CTest summary</a><br />
-<a href="http://my.cdash.org/index.php?project=Boost.AFIO">dashboard</a>  </td><td align="center"><a href="https://travis-ci.org/ned14/afio">Linux and MacOS CI:</a><div class="image">
-<img src="https://travis-ci.org/ned14/afio.svg?branch=master"/>
+<td align="center"><a href="https://github.com/ned14/llfio">LLFIO</a><br />
+<a href="https://github.com/ned14/llfio">on GitHub</a>  </td><td align="center"><a href="http://my.cdash.org/index.php?project=Boost.AFIO">CTest summary</a><br />
+<a href="http://my.cdash.org/index.php?project=Boost.AFIO">dashboard</a>  </td><td align="center"><a href="https://travis-ci.org/ned14/llfio">Linux and MacOS CI:</a><div class="image">
+<img src="https://travis-ci.org/ned14/llfio.svg?branch=master"/>
 </div>
-  </td><td align="center"><a href="https://ci.appveyor.com/project/ned14/afio/branch/master">Windows CI:</a><div class="image">
+  </td><td align="center"><a href="https://ci.appveyor.com/project/ned14/llfio/branch/master">Windows CI:</a><div class="image">
 <img src="https://ci.appveyor.com/api/projects/status/680b1pt9srnoprs3/branch/master?svg=true"/>
 </div>
-  </td><td align="center"><a href="https://dedi5.nedprod.com/static/files/afio-v2.0-source-latest.tar.xz">Latest stable</a><br />
-<a href="https://dedi5.nedprod.com/static/files/afio-v2.0-source-latest.tar.xz">sources</a>  </td><td align="center"><a href="https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-linux64-latest.tgz">Latest stable</a><br />
-<a href="https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-linux64-latest.tgz">Linux x64 prebuilt</a>  </td><td align="center"></td><td align="center"><a href="https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-win64-latest.zip">Latest stable</a><br />
-<a href="https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-win64-latest.zip">VS2017 x64 prebuilt</a>   </td></tr>
+  </td><td align="center"><a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-source-latest.tar.xz">Latest stable</a><br />
+<a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-source-latest.tar.xz">sources</a>  </td><td align="center"><a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-linux64-latest.tgz">Latest stable</a><br />
+<a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-linux64-latest.tgz">Linux x64 prebuilt</a>  </td><td align="center"></td><td align="center"><a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-win64-latest.zip">Latest stable</a><br />
+<a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-win64-latest.zip">VS2017 x64 prebuilt</a>   </td></tr>
 </table>
 </center><p>Herein lies my proposed zero whole machine memory copy async file i/o and filesystem library for Boost and the C++ standard, intended for storage devices with ~1 microsecond 4Kb transfer latencies and those supporting Storage Class Memory (SCM)/Direct Access Storage (DAX). Its i/o overhead, including syscall overhead, has been benchmarked to 100 nanoseconds on Linux which corresponds to a theoretical maximum of 10M IOPS @ QD1, approx 40Gb/sec per thread. It has particularly strong support for writing portable filesystem algorithms which work well with directly mapped non-volatile storage such as Intel Optane.</p>
-<p>It is a complete rewrite after a Boost peer review in August 2015. Its github source code repository lives at <a href="https://github.com/ned14/boost.afio">https://github.com/ned14/boost.afio</a>.</p>
+<p>It is a complete rewrite after a Boost peer review in August 2015. Its github source code repository lives at <a href="https://github.com/ned14/boost.llfio">https://github.com/ned14/boost.llfio</a>.</p>
 <ul>
 <li>Portable to any conforming C++ 14 compiler with a working Filesystem TS in its STL.</li>
 <li>Will make use of any Concepts TS if you have them.</li>
@@ -117,7 +117,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <dl class="section note"><dt>Note</dt><dd>Note that this code is of late alpha quality. It's quite reliable on Windows and Linux, but be careful when using it!</dd></dl>
 <p>Examples of use: </p><table width="100%" border="0" cellpadding="4">
 <tr>
-<td width="50%" valign="top"><div class="fragment"><div class="line">  <span class="keyword">namespace </span>afio = <a class="code" href="group__config.html#gaa3ed9f085329a0b81feeac3397a83740">AFIO_V2_NAMESPACE</a>;</div><div class="line"></div><div class="line">  <span class="comment">// Make me a 1 trillion element sparsely allocated integer array!</span></div><div class="line">  afio::mapped_file_handle mfh = <a class="code" href="namespaceafio__v2__xxx.html#ac021261f7a8696b0f4cbdcfacef1e88a">afio::mapped_temp_inode</a>().value();</div><div class="line"></div><div class="line">  <span class="comment">// On an extents based filing system, doesn&#39;t actually allocate any physical</span></div><div class="line">  <span class="comment">// storage but does map approximately 4Tb of all bits zero data into memory</span></div><div class="line">  (void) mfh.truncate(1000000000000ULL * <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>));</div><div class="line"></div><div class="line">  <span class="comment">// Create a typed view of the one trillion integers</span></div><div class="line">  afio::algorithm::mapped_span&lt;int&gt; one_trillion_int_array(mfh);</div><div class="line"></div><div class="line">  <span class="comment">// Write and read as you see fit, if you exceed physical RAM it&#39;ll be paged out</span></div><div class="line">  one_trillion_int_array[0] = 5;</div><div class="line">  one_trillion_int_array[999999999999ULL] = 6;</div></div><!-- fragment --> </td><td width="50%" valign="top"><div class="fragment"><div class="line">  <span class="keyword">namespace </span>afio = <a class="code" href="group__config.html#gaa3ed9f085329a0b81feeac3397a83740">AFIO_V2_NAMESPACE</a>;</div><div class="line"></div><div class="line">  <span class="comment">// Create an asynchronous file handle</span></div><div class="line">  afio::io_service service;</div><div class="line">  afio::async_file_handle fh =</div><div class="line">    <a class="code" href="namespaceafio__v2__xxx.html#a5b0168993998aafc342233aa782040a6">afio::async_file</a>(service, {}, <span class="stringliteral">&quot;testfile.txt&quot;</span>,</div><div class="line">      <a class="code" href="namespaceafio__v2__xxx.html#a2d15768d28ea660ebe44901508ed3372">afio::async_file_handle::mode::write</a>,</div><div class="line">      afio::async_file_handle::creation::if_needed).value();</div><div class="line"></div><div class="line">  <span class="comment">// Resize it to 1024 bytes</span></div><div class="line">  <a class="code" href="namespaceafio__v2__xxx.html#a84d22c966fcabe50de30ad8cf26c7241">truncate</a>(fh, 1024).value();</div><div class="line"></div><div class="line">  <span class="comment">// Begin to asynchronously write &quot;hello world&quot; into the file at offset 0,</span></div><div class="line">  <span class="comment">// suspending execution of this coroutine until completion and then resuming</span></div><div class="line">  <span class="comment">// execution. Requires the Coroutines TS.</span></div><div class="line">  <span class="keyword">alignas</span>(4096) <span class="keywordtype">char</span> buffer[] = <span class="stringliteral">&quot;hello world&quot;</span>;</div><div class="line">  co_await <a class="code" href="namespaceafio__v2__xxx.html#acd740f5aef6ca339575e7497fa873d06">co_write</a>(fh, 0, { { <span class="keyword">reinterpret_cast&lt;</span>afio::byte *<span class="keyword">&gt;</span>(buffer), <span class="keyword">sizeof</span>(buffer) } }).value();</div></div><!-- fragment -->  </td></tr>
+<td width="50%" valign="top"><div class="fragment"><div class="line">  <span class="keyword">namespace </span>llfio = <a class="code" href="group__config.html#gac9f7f0153adb9034d26c4554728f817a">LLFIO_V2_NAMESPACE</a>;</div><div class="line"></div><div class="line">  <span class="comment">// Make me a 1 trillion element sparsely allocated integer array!</span></div><div class="line">  llfio::mapped_file_handle mfh = <a class="code" href="namespacellfio__v2__xxx.html#a88517fa902d830cf56c032fa5470c89b">llfio::mapped_temp_inode</a>().value();</div><div class="line"></div><div class="line">  <span class="comment">// On an extents based filing system, doesn&#39;t actually allocate any physical</span></div><div class="line">  <span class="comment">// storage but does map approximately 4Tb of all bits zero data into memory</span></div><div class="line">  (void) mfh.truncate(1000000000000ULL * <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>));</div><div class="line"></div><div class="line">  <span class="comment">// Create a typed view of the one trillion integers</span></div><div class="line">  llfio::algorithm::mapped_span&lt;int&gt; one_trillion_int_array(mfh);</div><div class="line"></div><div class="line">  <span class="comment">// Write and read as you see fit, if you exceed physical RAM it&#39;ll be paged out</span></div><div class="line">  one_trillion_int_array[0] = 5;</div><div class="line">  one_trillion_int_array[999999999999ULL] = 6;</div></div><!-- fragment --> </td><td width="50%" valign="top"><div class="fragment"><div class="line">  <span class="keyword">namespace </span>llfio = <a class="code" href="group__config.html#gac9f7f0153adb9034d26c4554728f817a">LLFIO_V2_NAMESPACE</a>;</div><div class="line"></div><div class="line">  <span class="comment">// Create an asynchronous file handle</span></div><div class="line">  llfio::io_service service;</div><div class="line">  llfio::async_file_handle fh =</div><div class="line">    <a class="code" href="async__file__handle_8hpp.html#a2f1958f5d16f237b02599b7222c6d1ba">llfio::async_file</a>(service, {}, <span class="stringliteral">&quot;testfile.txt&quot;</span>,</div><div class="line">      <a class="code" href="namespacellfio__v2__xxx.html#a5a8908704c9988bbecc69c2359e6fd4a">llfio::async_file_handle::mode::write</a>,</div><div class="line">      llfio::async_file_handle::creation::if_needed).value();</div><div class="line"></div><div class="line">  <span class="comment">// Resize it to 1024 bytes</span></div><div class="line">  <a class="code" href="namespacellfio__v2__xxx.html#a16ee1bea5a5791ecde266420e00fba81">truncate</a>(fh, 1024).value();</div><div class="line"></div><div class="line">  <span class="comment">// Begin to asynchronously write &quot;hello world&quot; into the file at offset 0,</span></div><div class="line">  <span class="comment">// suspending execution of this coroutine until completion and then resuming</span></div><div class="line">  <span class="comment">// execution. Requires the Coroutines TS.</span></div><div class="line">  <span class="keyword">alignas</span>(4096) <span class="keywordtype">char</span> buffer[] = <span class="stringliteral">&quot;hello world&quot;</span>;</div><div class="line">  co_await <a class="code" href="async__file__handle_8hpp.html#a5118170b546db016ecf8117f0d315923">co_write</a>(fh, 0, { { <span class="keyword">reinterpret_cast&lt;</span>llfio::byte *<span class="keyword">&gt;</span>(buffer), <span class="keyword">sizeof</span>(buffer) } }).value();</div></div><!-- fragment -->  </td></tr>
 </table>
 <p>These compilers and OS are regularly tested:</p><ul>
 <li>GCC 7.0 (Linux 4,x x64)</li>
@@ -125,11 +125,11 @@ $(document).ready(function(){initNavTree('index.html','');});
 <li>clang 5.0 (OS X 10.12 x64)</li>
 <li>Visual Studio 2017 (Windows 10 x64)</li>
 </ul>
-<p>Other compilers, architectures and OSs may work, but are not tested regularly. You will need a Filesystem TS implementation in your STL and C++ 14. See <a href="https://github.com/ned14/afio/blob/master/programs/fs-probe/fs_probe_results.yaml">https://github.com/ned14/afio/blob/master/programs/fs-probe/fs_probe_results.yaml</a> for a database of latencies for various previously tested OS, filing systems and storage devices.</p>
-<p>Todo list for already implemented parts: <a href="https://ned14.github.io/afio/todo.html">https://ned14.github.io/afio/todo.html</a></p>
+<p>Other compilers, architectures and OSs may work, but are not tested regularly. You will need a Filesystem TS implementation in your STL and C++ 14. See <a href="https://github.com/ned14/llfio/blob/master/programs/fs-probe/fs_probe_results.yaml">https://github.com/ned14/llfio/blob/master/programs/fs-probe/fs_probe_results.yaml</a> for a database of latencies for various previously tested OS, filing systems and storage devices.</p>
+<p>Todo list for already implemented parts: <a href="https://ned14.github.io/llfio/todo.html">https://ned14.github.io/llfio/todo.html</a></p>
 <p>To build and test (make, ninja etc):</p>
-<div class="fragment"><div class="line">mkdir build</div><div class="line">cd build</div><div class="line">cmake ..</div><div class="line">cmake --build .</div><div class="line">ctest -R afio_sl</div></div><!-- fragment --><p>To build and test (Visual Studio, XCode etc):</p>
-<div class="fragment"><div class="line">mkdir build</div><div class="line">cd build</div><div class="line">cmake ..</div><div class="line">cmake --build . --config Release</div><div class="line">ctest -C Release -R afio_sl</div></div><!-- fragment --><h2>v2 architecture and design implemented:</h2>
+<div class="fragment"><div class="line">mkdir build</div><div class="line">cd build</div><div class="line">cmake ..</div><div class="line">cmake --build .</div><div class="line">ctest -R llfio_sl</div></div><!-- fragment --><p>To build and test (Visual Studio, XCode etc):</p>
+<div class="fragment"><div class="line">mkdir build</div><div class="line">cd build</div><div class="line">cmake ..</div><div class="line">cmake --build . --config Release</div><div class="line">ctest -C Release -R llfio_sl</div></div><!-- fragment --><h2>v2 architecture and design implemented:</h2>
 <table class="doxtable">
 <tr>
 <th>NEW in v2 </th><th>Boost peer review feedback </th><th></th></tr>
@@ -140,7 +140,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <tr>
 <td>✔ </td><td>✔ </td><td>noexcept API throughout returning error_code for failure instead of throwing exceptions. </td></tr>
 <tr>
-<td>✔ </td><td>✔ </td><td>AFIO v1 handle type split into hierarchy of types:<ol>
+<td>✔ </td><td>✔ </td><td>LLFIO v1 handle type split into hierarchy of types:<ol>
 <li>
 handle - provides open, close, get path, clone, set/unset append only, change caching, characteristics</li>
 <li>
@@ -168,7 +168,7 @@ mapped_file_handle - adds low latency memory mapped scatter-gather i/o</li>
 <tr>
 <td>✔ </td><td>✔ </td><td>Completion callbacks are now some arbitrary type <code>U&amp;&amp;</code> instead of a future continuation. Type erasure for its storage is bound into the one single memory allocation for everything needed to execute the op, and so therefore overhead is optimal. </td></tr>
 <tr>
-<td>✔ </td><td>✔ </td><td>Filing system algorithms made generic and broken out into public <code>afio::algorithms</code> template library (the AFIO FTL). </td></tr>
+<td>✔ </td><td>✔ </td><td>Filing system algorithms made generic and broken out into public <code>llfio::algorithms</code> template library (the LLFIO FTL). </td></tr>
 <tr>
 <td>✔ </td><td>✔ </td><td>Abstraction of native handle management via bitfield specified "characteristics". </td></tr>
 <tr>
@@ -232,9 +232,9 @@ mapped_file_handle - adds low latency memory mapped scatter-gather i/o</li>
 <tr>
 <td></td><td>✔ </td><td>✔ </td><td>Retrieving the current path of an open file irrespective of where it has been renamed to by third parties. </td></tr>
 <tr>
-<td></td><td>✔ </td><td>✔ </td><td>statfs_t ported over from AFIO v1. </td></tr>
+<td></td><td>✔ </td><td>✔ </td><td>statfs_t ported over from LLFIO v1. </td></tr>
 <tr>
-<td></td><td>✔ </td><td>✔ </td><td>utils namespace ported over from AFIO v1. </td></tr>
+<td></td><td>✔ </td><td>✔ </td><td>utils namespace ported over from LLFIO v1. </td></tr>
 <tr>
 <td>✔ </td><td>✔ </td><td>✔ </td><td><code>shared_fs_mutex</code> shared/exclusive entities locking based on lock files </td></tr>
 <tr>
@@ -250,9 +250,9 @@ mapped_file_handle - adds low latency memory mapped scatter-gather i/o</li>
 <tr>
 <td>✔ </td><td>✔ </td><td>✔ </td><td>Universal portable UTF-8 path views. </td></tr>
 <tr>
-<td></td><td>✔ </td><td>✔ </td><td>"Hole punching" and hole enumeration ported over from AFIO v1. </td></tr>
+<td></td><td>✔ </td><td>✔ </td><td>"Hole punching" and hole enumeration ported over from LLFIO v1. </td></tr>
 <tr>
-<td></td><td>✔ </td><td>✔ </td><td>Directory handles and very fast directory enumeration ported over from AFIO v1. </td></tr>
+<td></td><td>✔ </td><td>✔ </td><td>Directory handles and very fast directory enumeration ported over from LLFIO v1. </td></tr>
 <tr>
 <td>✔ </td><td>✔ </td><td>✔ </td><td><code>shared_fs_mutex</code> shared/exclusive entities locking based on safe byte ranges </td></tr>
 <tr>
@@ -260,9 +260,9 @@ mapped_file_handle - adds low latency memory mapped scatter-gather i/o</li>
 <tr>
 <td>✔ </td><td>✔ </td><td>✔ </td><td>i/o on <code>async_file_handle</code> is coroutines awaitable. </td></tr>
 <tr>
-<td>✔ </td><td>✔ </td><td></td><td><code>afio::algorithm::trivial_vector&lt;T&gt;</code> with constant time reallocation if <code>T</code> is trivially copyable. </td></tr>
+<td>✔ </td><td>✔ </td><td></td><td><code>llfio::algorithm::trivial_vector&lt;T&gt;</code> with constant time reallocation if <code>T</code> is trivially copyable. </td></tr>
 </table>
-<p>Todo to reach feature parity with AFIO v1:</p>
+<p>Todo to reach feature parity with LLFIO v1:</p>
 <table class="doxtable">
 <tr>
 <th>NEW in v2 </th><th>Windows </th><th>POSIX </th><th></th></tr>
@@ -308,7 +308,7 @@ mapped_file_handle - adds low latency memory mapped scatter-gather i/o</li>
 </ul>
 <table width="100%" border="0" cellpadding="4">
 <tr>
-<th colspan="3">Why you might need AFIO<hr/>
+<th colspan="3">Why you might need LLFIO<hr/>
   </th></tr>
 <tr>
 <td valign="top" width="33%">Manufacturer claimed 4Kb transfer latencies for the physical hardware:<ul>
@@ -320,12 +320,12 @@ mapped_file_handle - adds low latency memory mapped scatter-gather i/o</li>
 <li><code>memcpy(4Kb)</code> latency: <b>5us</b> (main memory) to <b>1.3us</b> (L3 cache)</li>
 <li>RTT PCIe latency: <b>0.5us</b>  </li>
 </ul>
-</td><td valign="top" width="33%">100% read QD1 4Kb direct transfer latencies for the software with AFIO:<ul>
+</td><td valign="top" width="33%">100% read QD1 4Kb direct transfer latencies for the software with LLFIO:<ul>
 <li>&lt; 99% spinning rust hard drive latency: Windows <b>187,231us</b> FreeBSD <b>9,836us</b> Linux <b>26,468us</b></li>
 <li>&lt; 99% SATA flash drive latency: Windows <b>290us</b> Linux <b>158us</b></li>
 <li>&lt; 99% NVMe drive latency: Windows <b>37us</b> FreeBSD <b>70us</b> Linux <b>30us</b>  </li>
 </ul>
-</td><td valign="top" width="33%">75% read 25% write QD4 4Kb direct transfer latencies for the software with AFIO:<ul>
+</td><td valign="top" width="33%">75% read 25% write QD4 4Kb direct transfer latencies for the software with LLFIO:<ul>
 <li>&lt; 99% spinning rust hard drive latency: Windows <b>48,185us</b> FreeBSD <b>61,834us</b> Linux <b>104,507us</b></li>
 <li>&lt; 99% SATA flash drive latency: Windows <b>1,812us</b> Linux <b>1,416us</b></li>
 <li>&lt; 99% NVMe drive latency: Windows <b>50us</b> FreeBSD <b>143us</b> Linux <b>40us</b>   </li>

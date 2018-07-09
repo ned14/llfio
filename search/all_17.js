@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['zero',['zero',['../classafio__v2__xxx_1_1file__handle.html#a649aa39b0d4b60a05d4aab4be569dcb6',1,'afio_v2_xxx::file_handle::zero()'],['../classafio__v2__xxx_1_1mapped__file__handle.html#a4987fc0ceef3c36f60a8b097083c22f4',1,'afio_v2_xxx::mapped_file_handle::zero()'],['../namespaceafio__v2__xxx.html#ae412aa7c9e37601d1814e75d09795185',1,'afio_v2_xxx::zero()']]],
-  ['zero_5fmemory',['zero_memory',['../classafio__v2__xxx_1_1map__handle.html#ac35a85e8a6cca721640ddc6b5008e145',1,'afio_v2_xxx::map_handle']]]
+  ['zero',['zero',['../classllfio__v2__xxx_1_1file__handle.html#a50caa94c51aae1f23e7708d3c6a21364',1,'llfio_v2_xxx::file_handle::zero()'],['../classllfio__v2__xxx_1_1mapped__file__handle.html#aecc5c8f55550a0c83e63b73e50e5ed0b',1,'llfio_v2_xxx::mapped_file_handle::zero()'],['../namespacellfio__v2__xxx.html#ad0fb15649a46da0d75b5797bfda8dc2e',1,'llfio_v2_xxx::zero()']]],
+  ['zero_5fmemory',['zero_memory',['../classllfio__v2__xxx_1_1map__handle.html#a0b87515430eb0220950b4c17a3da745f',1,'llfio_v2_xxx::map_handle']]]
 ];

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>AFIO: include/afio/v2.0/io_service.hpp File Reference</title>
+<title>LLFIO: include/llfio/v2.0/io_service.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -28,7 +28,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">AFIO
+   <div id="projectname">LLFIO
    &#160;<span id="projectnumber">v2.00 late alpha</span>
    </div>
   </td>
@@ -99,47 +99,47 @@ $(document).ready(function(){initNavTree('io__service_8hpp.html','');});
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1io__service.html">afio_v2_xxx::io_service</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An asynchronous i/o multiplexer service.  <a href="classafio__v2__xxx_1_1io__service.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__service.html">llfio_v2_xxx::io_service</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An asynchronous i/o multiplexer service.  <a href="classllfio__v2__xxx_1_1io__service.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structafio__v2__xxx_1_1io__service_1_1awaitable__post__to__self.html">afio_v2_xxx::io_service::awaitable_post_to_self</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__service_1_1awaitable__post__to__self.html">llfio_v2_xxx::io_service::awaitable_post_to_self</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 Namespaces</h2></td></tr>
-<tr class="memitem:namespaceafio__v2__xxx"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html">afio_v2_xxx</a></td></tr>
-<tr class="memdesc:namespaceafio__v2__xxx"><td class="mdescLeft">&#160;</td><td class="mdescRight">The AFIO namespace. <br /></td></tr>
+<tr class="memitem:namespacellfio__v2__xxx"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html">llfio_v2_xxx</a></td></tr>
+<tr class="memdesc:namespacellfio__v2__xxx"><td class="mdescLeft">&#160;</td><td class="mdescRight">The AFIO namespace. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:ab119f34af5807190f629bace8bb9491a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="io__service_8hpp.html#ab119f34af5807190f629bace8bb9491a">AFIO_USE_POSIX_AIO</a>&#160;&#160;&#160;1</td></tr>
-<tr class="memdesc:ab119f34af5807190f629bace8bb9491a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Undefined to autodetect, 1 to use POSIX AIO, 0 to not use.  <a href="#ab119f34af5807190f629bace8bb9491a">More...</a><br /></td></tr>
-<tr class="separator:ab119f34af5807190f629bace8bb9491a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac31c5a745782f65978dc61e09f105040"><td class="memItemLeft" align="right" valign="top"><a id="ac31c5a745782f65978dc61e09f105040"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="io__service_8hpp.html#ac31c5a745782f65978dc61e09f105040">AFIO_COMPILE_KQUEUES</a>&#160;&#160;&#160;0</td></tr>
-<tr class="memdesc:ac31c5a745782f65978dc61e09f105040"><td class="mdescLeft">&#160;</td><td class="mdescRight">Undefined to autodetect, 1 to compile in BSD kqueue support, 0 to leave it out. <br /></td></tr>
-<tr class="separator:ac31c5a745782f65978dc61e09f105040"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad825811f728a93d01908dd72e484f7ad"><td class="memItemLeft" align="right" valign="top"><a id="ad825811f728a93d01908dd72e484f7ad"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="io__service_8hpp.html#ad825811f728a93d01908dd72e484f7ad">AFIO_IO_POST_SIGNAL</a>&#160;&#160;&#160;(SIGUSR1)</td></tr>
-<tr class="memdesc:ad825811f728a93d01908dd72e484f7ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Undefined to autoset to first free SIGRTMIN if realtime signals available, else SIGUSR1. Only used if AFIO_USE_KQUEUES=0. <br /></td></tr>
-<tr class="separator:ad825811f728a93d01908dd72e484f7ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aae4ac211f96f58a96027e350d45b4652"><td class="memItemLeft" align="right" valign="top"><a id="aae4ac211f96f58a96027e350d45b4652"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="io__service_8hpp.html#aae4ac211f96f58a96027e350d45b4652">AFIO_HAVE_REALTIME_SIGNALS</a>&#160;&#160;&#160;0</td></tr>
-<tr class="memdesc:aae4ac211f96f58a96027e350d45b4652"><td class="mdescLeft">&#160;</td><td class="mdescRight">Undefined to autodetect. 0 to use non-realtime signals. Note performance in this use case is abysmal. <br /></td></tr>
-<tr class="separator:aae4ac211f96f58a96027e350d45b4652"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab7ceb2549e8eeb033d1cdc8ea565a280"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="io__service_8hpp.html#ab7ceb2549e8eeb033d1cdc8ea565a280">LLFIO_USE_POSIX_AIO</a>&#160;&#160;&#160;1</td></tr>
+<tr class="memdesc:ab7ceb2549e8eeb033d1cdc8ea565a280"><td class="mdescLeft">&#160;</td><td class="mdescRight">Undefined to autodetect, 1 to use POSIX AIO, 0 to not use.  <a href="#ab7ceb2549e8eeb033d1cdc8ea565a280">More...</a><br /></td></tr>
+<tr class="separator:ab7ceb2549e8eeb033d1cdc8ea565a280"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a194acf5c39b199b59acafded3b2015b8"><td class="memItemLeft" align="right" valign="top"><a id="a194acf5c39b199b59acafded3b2015b8"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="io__service_8hpp.html#a194acf5c39b199b59acafded3b2015b8">LLFIO_COMPILE_KQUEUES</a>&#160;&#160;&#160;0</td></tr>
+<tr class="memdesc:a194acf5c39b199b59acafded3b2015b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Undefined to autodetect, 1 to compile in BSD kqueue support, 0 to leave it out. <br /></td></tr>
+<tr class="separator:a194acf5c39b199b59acafded3b2015b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5cfb661784f372559747708772b9106"><td class="memItemLeft" align="right" valign="top"><a id="af5cfb661784f372559747708772b9106"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="io__service_8hpp.html#af5cfb661784f372559747708772b9106">LLFIO_IO_POST_SIGNAL</a>&#160;&#160;&#160;(SIGUSR1)</td></tr>
+<tr class="memdesc:af5cfb661784f372559747708772b9106"><td class="mdescLeft">&#160;</td><td class="mdescRight">Undefined to autoset to first free SIGRTMIN if realtime signals available, else SIGUSR1. Only used if LLFIO_USE_KQUEUES=0. <br /></td></tr>
+<tr class="separator:af5cfb661784f372559747708772b9106"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2195d9a60e427e96cb90a7bb95f1b773"><td class="memItemLeft" align="right" valign="top"><a id="a2195d9a60e427e96cb90a7bb95f1b773"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="io__service_8hpp.html#a2195d9a60e427e96cb90a7bb95f1b773">LLFIO_HAVE_REALTIME_SIGNALS</a>&#160;&#160;&#160;0</td></tr>
+<tr class="memdesc:a2195d9a60e427e96cb90a7bb95f1b773"><td class="mdescLeft">&#160;</td><td class="mdescRight">Undefined to autodetect. 0 to use non-realtime signals. Note performance in this use case is abysmal. <br /></td></tr>
+<tr class="separator:a2195d9a60e427e96cb90a7bb95f1b773"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides io_service. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="ab119f34af5807190f629bace8bb9491a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab119f34af5807190f629bace8bb9491a">&#9670;&nbsp;</a></span>AFIO_USE_POSIX_AIO</h2>
+<a id="ab7ceb2549e8eeb033d1cdc8ea565a280"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab7ceb2549e8eeb033d1cdc8ea565a280">&#9670;&nbsp;</a></span>LLFIO_USE_POSIX_AIO</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define AFIO_USE_POSIX_AIO&#160;&#160;&#160;1</td>
+          <td class="memname">#define LLFIO_USE_POSIX_AIO&#160;&#160;&#160;1</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -154,7 +154,7 @@ Macros</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_4443eecac141a9c11b93921c40e6e530.html">afio</a></li><li class="navelem"><a class="el" href="dir_df838802a8d72797f186037846947269.html">v2.0</a></li><li class="navelem"><a class="el" href="io__service_8hpp.html">io_service.hpp</a></li>
+    <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_9ffbcff25eb6a2bb8ed044f6c5d983c9.html">llfio</a></li><li class="navelem"><a class="el" href="dir_ff8d8ad368a820031e12dd9b12d79036.html">v2.0</a></li><li class="navelem"><a class="el" href="io__service_8hpp.html">io_service.hpp</a></li>
     <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>

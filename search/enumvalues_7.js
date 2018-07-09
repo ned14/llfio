@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['invalid',['invalid',['../structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea34df1c7f5403a369ff654b0be6b03b93',1,'afio_v2_xxx::native_handle_type']]]
+  ['invalid',['invalid',['../structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7a03c22e007aed8c42eaee4dc2a6f639e3',1,'llfio_v2_xxx::native_handle_type']]]
 ];

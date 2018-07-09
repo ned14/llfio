@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['safety_5ffsyncs',['safety_fsyncs',['../classafio__v2__xxx_1_1handle.html#a6f7e37c73271968271c2342023f58c9eadfa4d35596e04e042a53c64b25c22db3',1,'afio_v2_xxx::handle']]],
-  ['section',['section',['../structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590eadaeed28660cd8c0b790a37ba4a069670',1,'afio_v2_xxx::native_handle_type']]],
-  ['seekable',['seekable',['../structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590eadfd5939c62445d24da4dbc3b9a7b5896',1,'afio_v2_xxx::native_handle_type']]],
-  ['singleton',['singleton',['../classafio__v2__xxx_1_1section__handle.html#a37a43f96250b5d490a6583b0153ac91eac9b98c27e672f535596c648bff7bf8e5',1,'afio_v2_xxx::section_handle']]],
-  ['symlink',['symlink',['../structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea598d2ffbf7a063080d39258eb50dd81b',1,'afio_v2_xxx::native_handle_type']]],
-  ['system',['system',['../structafio__v2__xxx_1_1path__discovery_1_1discovered__path.html#a1deccea0a3ad1c3a5a2688a1a3cc118ca54b53072540eeeb8f8e9343e71f28176',1,'afio_v2_xxx::path_discovery::discovered_path']]]
+  ['safety_5ffsyncs',['safety_fsyncs',['../classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852adfa4d35596e04e042a53c64b25c22db3',1,'llfio_v2_xxx::handle']]],
+  ['section',['section',['../structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7a5d4474f0197e13f3205443ad91de390e',1,'llfio_v2_xxx::native_handle_type']]],
+  ['seekable',['seekable',['../structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7aff1dd4bc49b07187a9b147a14f9102b6',1,'llfio_v2_xxx::native_handle_type']]],
+  ['singleton',['singleton',['../classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a41771be4e90788c06cc49f2d35538108',1,'llfio_v2_xxx::section_handle']]],
+  ['symlink',['symlink',['../structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7a4afae65da7b66f75e6e82b470d298fb5',1,'llfio_v2_xxx::native_handle_type']]],
+  ['system',['system',['../structllfio__v2__xxx_1_1path__discovery_1_1discovered__path.html#ae02f172851c050f6a7f5929410428c7da54b53072540eeeb8f8e9343e71f28176',1,'llfio_v2_xxx::path_discovery::discovered_path']]]
 ];

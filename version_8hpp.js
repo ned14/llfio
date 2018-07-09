@@ -1,13 +1,13 @@
 var version_8hpp =
 [
-    [ "AFIO_HEADERS_VERSION", "version_8hpp.html#ab033775f211bacf115ee33e020eca664", null ],
-    [ "AFIO_NAMESPACE_VERSION", "version_8hpp.html#ab767a104191b56793f1e63713f8aa696", null ],
-    [ "AFIO_NAMESPACE_VERSION", "version_8hpp.html#ab767a104191b56793f1e63713f8aa696", null ],
-    [ "AFIO_UNSTABLE_VERSION", "group__config.html#ga6a0165e41661247f1a10b44e3f38ba52", null ],
-    [ "AFIO_VERSION_GLUE", "version_8hpp.html#aa446d6d4b32123465e362629430ea1c2", null ],
-    [ "AFIO_VERSION_GLUE2", "version_8hpp.html#a5d898772f113c64c7fa9ecb267a85e79", null ],
-    [ "AFIO_VERSION_MAJOR", "group__config.html#gafab2566c573eef8945053c8d57976764", null ],
-    [ "AFIO_VERSION_MINOR", "group__config.html#ga5a7b3dbd25ff8837537f5847fbd4277c", null ],
-    [ "AFIO_VERSION_PATCH", "group__config.html#ga7172d84eb04f1b165ec13ca67ab672c5", null ],
-    [ "AFIO_VERSION_REVISION", "group__config.html#gacb966611a7fc2153e23e4b76849da786", null ]
+    [ "LLFIO_HEADERS_VERSION", "version_8hpp.html#ac7aedfe0660c15373b69a68f760c5799", null ],
+    [ "LLFIO_NAMESPACE_VERSION", "version_8hpp.html#a7b08237a3cfed4832068a4daa6d6e160", null ],
+    [ "LLFIO_NAMESPACE_VERSION", "version_8hpp.html#a7b08237a3cfed4832068a4daa6d6e160", null ],
+    [ "LLFIO_UNSTABLE_VERSION", "group__config.html#gaadd4f1f9d1a5c77c3b40d9e1b759b706", null ],
+    [ "LLFIO_VERSION_GLUE", "version_8hpp.html#a699beb5138cc8f2a2df12d833e4d96be", null ],
+    [ "LLFIO_VERSION_GLUE2", "version_8hpp.html#aadba5400c27b35d85067c431cfd9b0e6", null ],
+    [ "LLFIO_VERSION_MAJOR", "group__config.html#gacac3045524a50876c1bc6068bd6237f0", null ],
+    [ "LLFIO_VERSION_MINOR", "group__config.html#gab03294596f77a7717954929a887ca425", null ],
+    [ "LLFIO_VERSION_PATCH", "group__config.html#ga090b0d323b6d7d2496dba7aa42068013", null ],
+    [ "LLFIO_VERSION_REVISION", "group__config.html#ga18295c2601f9e6cb9e759d57fa0d8ab4", null ]
 ];

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>AFIO: include/afio/v2.0/utils.hpp File Reference</title>
+<title>LLFIO: include/llfio/v2.0/utils.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -28,7 +28,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">AFIO
+   <div id="projectname">LLFIO
    &#160;<span id="projectnumber">v2.00 late alpha</span>
    </div>
   </td>
@@ -96,77 +96,77 @@ $(document).ready(function(){initNavTree('utils_8hpp.html','');});
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1utils_1_1page__allocator.html">afio_v2_xxx::utils::page_allocator&lt; T &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An STL allocator which allocates large TLB page memory.If the operating system is configured to allow it, this type of memory is particularly efficient for doing large scale file i/o. This is because the kernel must normally convert the scatter gather buffers you pass into extended scatter gather buffers as the memory you see as contiguous may not, and probably isn't, actually be contiguous in physical memory. Regions returned by this allocator <em>may</em> be allocated contiguously in physical memory and therefore the kernel can pass through your scatter gather buffers unmodified.  <a href="classafio__v2__xxx_1_1utils_1_1page__allocator.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1utils_1_1page__allocator.html">llfio_v2_xxx::utils::page_allocator&lt; T &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An STL allocator which allocates large TLB page memory.If the operating system is configured to allow it, this type of memory is particularly efficient for doing large scale file i/o. This is because the kernel must normally convert the scatter gather buffers you pass into extended scatter gather buffers as the memory you see as contiguous may not, and probably isn't, actually be contiguous in physical memory. Regions returned by this allocator <em>may</em> be allocated contiguously in physical memory and therefore the kernel can pass through your scatter gather buffers unmodified.  <a href="classllfio__v2__xxx_1_1utils_1_1page__allocator.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structafio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html">afio_v2_xxx::utils::page_allocator&lt; T &gt;::rebind&lt; U &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html">llfio_v2_xxx::utils::page_allocator&lt; T &gt;::rebind&lt; U &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4.html">afio_v2_xxx::utils::page_allocator&lt; void &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4.html">llfio_v2_xxx::utils::page_allocator&lt; void &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structafio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html">afio_v2_xxx::utils::page_allocator&lt; void &gt;::rebind&lt; U &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html">llfio_v2_xxx::utils::page_allocator&lt; void &gt;::rebind&lt; U &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 Namespaces</h2></td></tr>
-<tr class="memitem:namespaceafio__v2__xxx"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html">afio_v2_xxx</a></td></tr>
-<tr class="memdesc:namespaceafio__v2__xxx"><td class="mdescLeft">&#160;</td><td class="mdescRight">The AFIO namespace. <br /></td></tr>
+<tr class="memitem:namespacellfio__v2__xxx"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html">llfio_v2_xxx</a></td></tr>
+<tr class="memdesc:namespacellfio__v2__xxx"><td class="mdescLeft">&#160;</td><td class="mdescRight">The AFIO namespace. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:namespaceafio__v2__xxx_1_1utils"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1utils.html">afio_v2_xxx::utils</a></td></tr>
-<tr class="memdesc:namespaceafio__v2__xxx_1_1utils"><td class="mdescLeft">&#160;</td><td class="mdescRight">Utility routines often useful when using AFIO. <br /></td></tr>
+<tr class="memitem:namespacellfio__v2__xxx_1_1utils"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1utils.html">llfio_v2_xxx::utils</a></td></tr>
+<tr class="memdesc:namespacellfio__v2__xxx_1_1utils"><td class="mdescLeft">&#160;</td><td class="mdescRight">Utility routines often useful when using AFIO. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a337c41ad9b9dcbc6dbd81f2e706b469d"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1utils.html#a337c41ad9b9dcbc6dbd81f2e706b469d">afio_v2_xxx::utils::page_size</a> () noexcept</td></tr>
-<tr class="memdesc:a337c41ad9b9dcbc6dbd81f2e706b469d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the smallest page size of this architecture which is useful for calculating direct i/o multiples.  <a href="namespaceafio__v2__xxx_1_1utils.html#a337c41ad9b9dcbc6dbd81f2e706b469d">More...</a><br /></td></tr>
-<tr class="separator:a337c41ad9b9dcbc6dbd81f2e706b469d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7e0604f2e7f98b94ddb09989184968f5"><td class="memTemplParams" colspan="2"><a id="a7e0604f2e7f98b94ddb09989184968f5"></a>
+<tr class="memitem:a42fc69cae3dbbf66498545cbe358e2ba"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1utils.html#a42fc69cae3dbbf66498545cbe358e2ba">llfio_v2_xxx::utils::page_size</a> () noexcept</td></tr>
+<tr class="memdesc:a42fc69cae3dbbf66498545cbe358e2ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the smallest page size of this architecture which is useful for calculating direct i/o multiples.  <a href="namespacellfio__v2__xxx_1_1utils.html#a42fc69cae3dbbf66498545cbe358e2ba">More...</a><br /></td></tr>
+<tr class="separator:a42fc69cae3dbbf66498545cbe358e2ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a450a06ed496999f8e7f4cb1f424cbccc"><td class="memTemplParams" colspan="2"><a id="a450a06ed496999f8e7f4cb1f424cbccc"></a>
 template&lt;class T &gt; </td></tr>
-<tr class="memitem:a7e0604f2e7f98b94ddb09989184968f5"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1utils.html#a7e0604f2e7f98b94ddb09989184968f5">afio_v2_xxx::utils::round_down_to_page_size</a> (T i) noexcept</td></tr>
-<tr class="memdesc:a7e0604f2e7f98b94ddb09989184968f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Round a value to its next lowest page size multiple. <br /></td></tr>
-<tr class="separator:a7e0604f2e7f98b94ddb09989184968f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a13555945f08a71adb2707e7be4e29207"><td class="memTemplParams" colspan="2"><a id="a13555945f08a71adb2707e7be4e29207"></a>
+<tr class="memitem:a450a06ed496999f8e7f4cb1f424cbccc"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1utils.html#a450a06ed496999f8e7f4cb1f424cbccc">llfio_v2_xxx::utils::round_down_to_page_size</a> (T i) noexcept</td></tr>
+<tr class="memdesc:a450a06ed496999f8e7f4cb1f424cbccc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Round a value to its next lowest page size multiple. <br /></td></tr>
+<tr class="separator:a450a06ed496999f8e7f4cb1f424cbccc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aadbbaffaa23ebec2ae0f3335ff48608e"><td class="memTemplParams" colspan="2"><a id="aadbbaffaa23ebec2ae0f3335ff48608e"></a>
 template&lt;class T &gt; </td></tr>
-<tr class="memitem:a13555945f08a71adb2707e7be4e29207"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1utils.html#a13555945f08a71adb2707e7be4e29207">afio_v2_xxx::utils::round_up_to_page_size</a> (T i) noexcept</td></tr>
-<tr class="memdesc:a13555945f08a71adb2707e7be4e29207"><td class="mdescLeft">&#160;</td><td class="mdescRight">Round a value to its next highest page size multiple. <br /></td></tr>
-<tr class="separator:a13555945f08a71adb2707e7be4e29207"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6a99cc31f1816073bd899bb82d018e55"><td class="memTemplParams" colspan="2"><a id="a6a99cc31f1816073bd899bb82d018e55"></a>
+<tr class="memitem:aadbbaffaa23ebec2ae0f3335ff48608e"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1utils.html#aadbbaffaa23ebec2ae0f3335ff48608e">llfio_v2_xxx::utils::round_up_to_page_size</a> (T i) noexcept</td></tr>
+<tr class="memdesc:aadbbaffaa23ebec2ae0f3335ff48608e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Round a value to its next highest page size multiple. <br /></td></tr>
+<tr class="separator:aadbbaffaa23ebec2ae0f3335ff48608e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1663c56755185b28805889c06cbfd6f6"><td class="memTemplParams" colspan="2"><a id="a1663c56755185b28805889c06cbfd6f6"></a>
 template&lt;class T &gt; </td></tr>
-<tr class="memitem:a6a99cc31f1816073bd899bb82d018e55"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1utils.html#a6a99cc31f1816073bd899bb82d018e55">afio_v2_xxx::utils::round_to_page_size</a> (T i) noexcept</td></tr>
-<tr class="memdesc:a6a99cc31f1816073bd899bb82d018e55"><td class="mdescLeft">&#160;</td><td class="mdescRight">Round a pair of a pointer and a size_t to their nearest page size multiples. The pointer will be rounded down, the size_t upwards. <br /></td></tr>
-<tr class="separator:a6a99cc31f1816073bd899bb82d018e55"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aadc7dd505730e2701313be55519c9958"><td class="memItemLeft" align="right" valign="top">std::vector&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1utils.html#aadc7dd505730e2701313be55519c9958">afio_v2_xxx::utils::page_sizes</a> (bool only_actually_available=true)</td></tr>
-<tr class="memdesc:aadc7dd505730e2701313be55519c9958"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the page sizes of this architecture which is useful for calculating direct i/o multiples.  <a href="namespaceafio__v2__xxx_1_1utils.html#aadc7dd505730e2701313be55519c9958">More...</a><br /></td></tr>
-<tr class="separator:aadc7dd505730e2701313be55519c9958"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace050f445d1d1fdd4b2a6f99d9be7f85"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1utils.html#ace050f445d1d1fdd4b2a6f99d9be7f85">afio_v2_xxx::utils::file_buffer_default_size</a> ()</td></tr>
-<tr class="memdesc:ace050f445d1d1fdd4b2a6f99d9be7f85"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reasonable default size for page_allocator, typically the closest page size from page_sizes() to 1Mb.  <a href="namespaceafio__v2__xxx_1_1utils.html#ace050f445d1d1fdd4b2a6f99d9be7f85">More...</a><br /></td></tr>
-<tr class="separator:ace050f445d1d1fdd4b2a6f99d9be7f85"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aed184bfbef52745f68812e68b317527f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1utils.html#aed184bfbef52745f68812e68b317527f">afio_v2_xxx::utils::random_fill</a> (char *buffer, size_t bytes) noexcept</td></tr>
-<tr class="memdesc:aed184bfbef52745f68812e68b317527f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fills the buffer supplied with cryptographically strong randomness. Uses the OS kernel API.  <a href="namespaceafio__v2__xxx_1_1utils.html#aed184bfbef52745f68812e68b317527f">More...</a><br /></td></tr>
-<tr class="separator:aed184bfbef52745f68812e68b317527f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a767b8434456319066194534a4c4edbf5"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1utils.html#a767b8434456319066194534a4c4edbf5">afio_v2_xxx::utils::random_string</a> (size_t randomlen)</td></tr>
-<tr class="memdesc:a767b8434456319066194534a4c4edbf5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a cryptographically random string capable of being used as a filename. Essentially random_fill() + to_hex_string().  <a href="namespaceafio__v2__xxx_1_1utils.html#a767b8434456319066194534a4c4edbf5">More...</a><br /></td></tr>
-<tr class="separator:a767b8434456319066194534a4c4edbf5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a17a232f68f865706495f9f6e3a85e5d5"><td class="memItemLeft" align="right" valign="top"><a id="a17a232f68f865706495f9f6e3a85e5d5"></a>
-result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1utils.html#a17a232f68f865706495f9f6e3a85e5d5">afio_v2_xxx::utils::flush_modified_data</a> () noexcept</td></tr>
-<tr class="memdesc:a17a232f68f865706495f9f6e3a85e5d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tries to flush all modified data to the physical device. <br /></td></tr>
-<tr class="separator:a17a232f68f865706495f9f6e3a85e5d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a34fff580f0b7e7bea5509e5294f5d71e"><td class="memItemLeft" align="right" valign="top">result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx_1_1utils.html#a34fff580f0b7e7bea5509e5294f5d71e">afio_v2_xxx::utils::drop_filesystem_cache</a> () noexcept</td></tr>
-<tr class="memdesc:a34fff580f0b7e7bea5509e5294f5d71e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tries to flush all modified data to the physical device, and then drop the OS filesystem cache, thus making all future reads come from the physical device. Currently only implemented for Microsoft Windows and Linux.  <a href="namespaceafio__v2__xxx_1_1utils.html#a34fff580f0b7e7bea5509e5294f5d71e">More...</a><br /></td></tr>
-<tr class="separator:a34fff580f0b7e7bea5509e5294f5d71e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af0bcb12f4895aad8ad302dd8e1fa2143"><td class="memItemLeft" align="right" valign="top"><a id="af0bcb12f4895aad8ad302dd8e1fa2143"></a>
-large_page_allocation&#160;</td><td class="memItemRight" valign="bottom"><b>afio_v2_xxx::utils::detail::calculate_large_page_allocation</b> (size_t bytes)</td></tr>
-<tr class="separator:af0bcb12f4895aad8ad302dd8e1fa2143"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab8faa3b32314a16a8c42d7b8bcef8962"><td class="memItemLeft" align="right" valign="top"><a id="ab8faa3b32314a16a8c42d7b8bcef8962"></a>
-large_page_allocation&#160;</td><td class="memItemRight" valign="bottom"><b>afio_v2_xxx::utils::detail::allocate_large_pages</b> (size_t bytes)</td></tr>
-<tr class="separator:ab8faa3b32314a16a8c42d7b8bcef8962"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a23dd1191399dd20f3e23c3ff4b3a0c2e"><td class="memItemLeft" align="right" valign="top"><a id="a23dd1191399dd20f3e23c3ff4b3a0c2e"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>afio_v2_xxx::utils::detail::deallocate_large_pages</b> (void *p, size_t bytes)</td></tr>
-<tr class="separator:a23dd1191399dd20f3e23c3ff4b3a0c2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d0c1e951ea0b9f45b3e6d331f194e68"><td class="memTemplParams" colspan="2"><a id="a2d0c1e951ea0b9f45b3e6d331f194e68"></a>
+<tr class="memitem:a1663c56755185b28805889c06cbfd6f6"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1utils.html#a1663c56755185b28805889c06cbfd6f6">llfio_v2_xxx::utils::round_to_page_size</a> (T i) noexcept</td></tr>
+<tr class="memdesc:a1663c56755185b28805889c06cbfd6f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Round a pair of a pointer and a size_t to their nearest page size multiples. The pointer will be rounded down, the size_t upwards. <br /></td></tr>
+<tr class="separator:a1663c56755185b28805889c06cbfd6f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a844e6fc5ee5a2a402311917c44e44645"><td class="memItemLeft" align="right" valign="top">std::vector&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1utils.html#a844e6fc5ee5a2a402311917c44e44645">llfio_v2_xxx::utils::page_sizes</a> (bool only_actually_available=true)</td></tr>
+<tr class="memdesc:a844e6fc5ee5a2a402311917c44e44645"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the page sizes of this architecture which is useful for calculating direct i/o multiples.  <a href="namespacellfio__v2__xxx_1_1utils.html#a844e6fc5ee5a2a402311917c44e44645">More...</a><br /></td></tr>
+<tr class="separator:a844e6fc5ee5a2a402311917c44e44645"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a90d8f94ddb6e026f931e86d0dc904778"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1utils.html#a90d8f94ddb6e026f931e86d0dc904778">llfio_v2_xxx::utils::file_buffer_default_size</a> ()</td></tr>
+<tr class="memdesc:a90d8f94ddb6e026f931e86d0dc904778"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reasonable default size for page_allocator, typically the closest page size from page_sizes() to 1Mb.  <a href="namespacellfio__v2__xxx_1_1utils.html#a90d8f94ddb6e026f931e86d0dc904778">More...</a><br /></td></tr>
+<tr class="separator:a90d8f94ddb6e026f931e86d0dc904778"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae61e2de30b06776a1c24643a1d1dc64e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1utils.html#ae61e2de30b06776a1c24643a1d1dc64e">llfio_v2_xxx::utils::random_fill</a> (char *buffer, size_t bytes) noexcept</td></tr>
+<tr class="memdesc:ae61e2de30b06776a1c24643a1d1dc64e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fills the buffer supplied with cryptographically strong randomness. Uses the OS kernel API.  <a href="namespacellfio__v2__xxx_1_1utils.html#ae61e2de30b06776a1c24643a1d1dc64e">More...</a><br /></td></tr>
+<tr class="separator:ae61e2de30b06776a1c24643a1d1dc64e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a29cf29a4b097411f6c1e5274bfb417"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">llfio_v2_xxx::utils::random_string</a> (size_t randomlen)</td></tr>
+<tr class="memdesc:a6a29cf29a4b097411f6c1e5274bfb417"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a cryptographically random string capable of being used as a filename. Essentially random_fill() + to_hex_string().  <a href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">More...</a><br /></td></tr>
+<tr class="separator:a6a29cf29a4b097411f6c1e5274bfb417"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1d9ee5d6d391f39f62dacbc8c957ae8"><td class="memItemLeft" align="right" valign="top"><a id="ae1d9ee5d6d391f39f62dacbc8c957ae8"></a>
+result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1utils.html#ae1d9ee5d6d391f39f62dacbc8c957ae8">llfio_v2_xxx::utils::flush_modified_data</a> () noexcept</td></tr>
+<tr class="memdesc:ae1d9ee5d6d391f39f62dacbc8c957ae8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tries to flush all modified data to the physical device. <br /></td></tr>
+<tr class="separator:ae1d9ee5d6d391f39f62dacbc8c957ae8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abacefaf60ae391226c4775cf8a61276a"><td class="memItemLeft" align="right" valign="top">result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1utils.html#abacefaf60ae391226c4775cf8a61276a">llfio_v2_xxx::utils::drop_filesystem_cache</a> () noexcept</td></tr>
+<tr class="memdesc:abacefaf60ae391226c4775cf8a61276a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tries to flush all modified data to the physical device, and then drop the OS filesystem cache, thus making all future reads come from the physical device. Currently only implemented for Microsoft Windows and Linux.  <a href="namespacellfio__v2__xxx_1_1utils.html#abacefaf60ae391226c4775cf8a61276a">More...</a><br /></td></tr>
+<tr class="separator:abacefaf60ae391226c4775cf8a61276a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf1b1646f257d85f7f2655df1042483f"><td class="memItemLeft" align="right" valign="top"><a id="acf1b1646f257d85f7f2655df1042483f"></a>
+large_page_allocation&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::utils::detail::calculate_large_page_allocation</b> (size_t bytes)</td></tr>
+<tr class="separator:acf1b1646f257d85f7f2655df1042483f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a85afc40cff0ecfd3a13520ea7e5176a1"><td class="memItemLeft" align="right" valign="top"><a id="a85afc40cff0ecfd3a13520ea7e5176a1"></a>
+large_page_allocation&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::utils::detail::allocate_large_pages</b> (size_t bytes)</td></tr>
+<tr class="separator:a85afc40cff0ecfd3a13520ea7e5176a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2305cf865b7952f58aba997c4ac95efb"><td class="memItemLeft" align="right" valign="top"><a id="a2305cf865b7952f58aba997c4ac95efb"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::utils::detail::deallocate_large_pages</b> (void *p, size_t bytes)</td></tr>
+<tr class="separator:a2305cf865b7952f58aba997c4ac95efb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae880ebd5681dcf6b700d67fb10b4547e"><td class="memTemplParams" colspan="2"><a id="ae880ebd5681dcf6b700d67fb10b4547e"></a>
 template&lt;class T , class U &gt; </td></tr>
-<tr class="memitem:a2d0c1e951ea0b9f45b3e6d331f194e68"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>afio_v2_xxx::utils::operator==</b> (const page_allocator&lt; T &gt; &amp;, const page_allocator&lt; U &gt; &amp;) noexcept</td></tr>
-<tr class="separator:a2d0c1e951ea0b9f45b3e6d331f194e68"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae880ebd5681dcf6b700d67fb10b4547e"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>llfio_v2_xxx::utils::operator==</b> (const page_allocator&lt; T &gt; &amp;, const page_allocator&lt; U &gt; &amp;) noexcept</td></tr>
+<tr class="separator:ae880ebd5681dcf6b700d67fb10b4547e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides namespace utils. </p>
@@ -175,7 +175,7 @@ template&lt;class T , class U &gt; </td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_4443eecac141a9c11b93921c40e6e530.html">afio</a></li><li class="navelem"><a class="el" href="dir_df838802a8d72797f186037846947269.html">v2.0</a></li><li class="navelem"><a class="el" href="utils_8hpp.html">utils.hpp</a></li>
+    <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_9ffbcff25eb6a2bb8ed044f6c5d983c9.html">llfio</a></li><li class="navelem"><a class="el" href="dir_ff8d8ad368a820031e12dd9b12d79036.html">v2.0</a></li><li class="navelem"><a class="el" href="utils_8hpp.html">utils.hpp</a></li>
     <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>

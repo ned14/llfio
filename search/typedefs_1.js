@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['buffer_5ftype',['buffer_type',['../classafio__v2__xxx_1_1directory__handle.html#ab8def17e3aca3866e7d3dbd899f23fe4',1,'afio_v2_xxx::directory_handle::buffer_type()'],['../classafio__v2__xxx_1_1io__service.html#a92977b609973629357b17d2589b1212a',1,'afio_v2_xxx::io_service::buffer_type()']]],
-  ['buffers_5ftype',['buffers_type',['../classafio__v2__xxx_1_1io__handle.html#a70a3c5e6f62efc95db81f831f3b90a2c',1,'afio_v2_xxx::io_handle::buffers_type()'],['../classafio__v2__xxx_1_1io__service.html#a806f0493759968705d435a3e9f879ea9',1,'afio_v2_xxx::io_service::buffers_type()']]]
+  ['buffer_5ftype',['buffer_type',['../classllfio__v2__xxx_1_1directory__handle.html#a388fc107831ed68dba60c6f4082be952',1,'llfio_v2_xxx::directory_handle::buffer_type()'],['../classllfio__v2__xxx_1_1io__service.html#a6f63a89a90f60ad8076dcaedb23c17d8',1,'llfio_v2_xxx::io_service::buffer_type()']]],
+  ['buffers_5ftype',['buffers_type',['../classllfio__v2__xxx_1_1io__handle.html#a8f525d9665b524442b46cd55678817ed',1,'llfio_v2_xxx::io_handle::buffers_type()'],['../classllfio__v2__xxx_1_1io__service.html#ac50a0165e9e9093d859a7a57422bc93a',1,'llfio_v2_xxx::io_service::buffers_type()']]]
 ];

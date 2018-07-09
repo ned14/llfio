@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['fastdeleted',['fastdeleted',['../classafio__v2__xxx_1_1directory__handle.html#a47ed88b4de271daa08862b273c2f609ea14847befc159c1492671b53718fc46f8',1,'afio_v2_xxx::directory_handle']]],
-  ['file',['file',['../structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590ea2007719529d71fb049bba7f5a756b321',1,'afio_v2_xxx::native_handle_type']]]
+  ['fastdeleted',['fastdeleted',['../classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207a14847befc159c1492671b53718fc46f8',1,'llfio_v2_xxx::directory_handle']]],
+  ['file',['file',['../structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7a3a4b67c0b2579480cb8d56466cd9bf88',1,'llfio_v2_xxx::native_handle_type']]]
 ];

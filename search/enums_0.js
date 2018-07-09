@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['bitfield_5f_5fdisposition',['bitfield__disposition',['../structafio__v2__xxx_1_1native__handle__type.html#a32db674a5ee094e3eeb0e57ec97f590e',1,'afio_v2_xxx::native_handle_type']]],
-  ['bitfield_5f_5fflag',['bitfield__flag',['../classafio__v2__xxx_1_1handle.html#a6322054d60d251248051cfc15398f608',1,'afio_v2_xxx::handle::bitfield__flag()'],['../classafio__v2__xxx_1_1section__handle.html#a37a43f96250b5d490a6583b0153ac91e',1,'afio_v2_xxx::section_handle::bitfield__flag()']]],
-  ['bitfield_5f_5fwant',['bitfield__want',['../structafio__v2__xxx_1_1stat__t.html#a33a6214361864270a2a6af9ea5c61896',1,'afio_v2_xxx::stat_t::bitfield__want()'],['../structafio__v2__xxx_1_1statfs__t.html#ae1684edb1dfb4aeefea98ec2250f07c7',1,'afio_v2_xxx::statfs_t::bitfield__want()']]]
+  ['bitfield_5f_5fdisposition',['bitfield__disposition',['../structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7',1,'llfio_v2_xxx::native_handle_type']]],
+  ['bitfield_5f_5fflag',['bitfield__flag',['../classllfio__v2__xxx_1_1handle.html#a5929f46f42112bd805ab5001bfbf9d2a',1,'llfio_v2_xxx::handle::bitfield__flag()'],['../classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549',1,'llfio_v2_xxx::section_handle::bitfield__flag()']]],
+  ['bitfield_5f_5fwant',['bitfield__want',['../structllfio__v2__xxx_1_1stat__t.html#acff996a1858563643390725d298a9279',1,'llfio_v2_xxx::stat_t::bitfield__want()'],['../structllfio__v2__xxx_1_1statfs__t.html#a0505ba8b6f220ef9256306404843f398',1,'llfio_v2_xxx::statfs_t::bitfield__want()']]]
 ];

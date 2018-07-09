@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>AFIO: include/afio/v2.0/file_handle.hpp File Reference</title>
+<title>LLFIO: include/llfio/v2.0/file_handle.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -28,7 +28,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">AFIO
+   <div id="projectname">LLFIO
    &#160;<span id="projectnumber">v2.00 late alpha</span>
    </div>
   </td>
@@ -97,44 +97,44 @@ $(document).ready(function(){initNavTree('file__handle_8hpp.html','');});
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classafio__v2__xxx_1_1file__handle.html">afio_v2_xxx::file_handle</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to a regular file or device, kept data layout compatible with async_file_handle.  <a href="classafio__v2__xxx_1_1file__handle.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html">llfio_v2_xxx::file_handle</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to a regular file or device, kept data layout compatible with async_file_handle.  <a href="classllfio__v2__xxx_1_1file__handle.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structafio__v2__xxx_1_1construct_3_01file__handle_01_4.html">afio_v2_xxx::construct&lt; file_handle &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for <code>file_handle</code>  <a href="structafio__v2__xxx_1_1construct_3_01file__handle_01_4.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1construct_3_01file__handle_01_4.html">llfio_v2_xxx::construct&lt; file_handle &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for <code>file_handle</code>  <a href="structllfio__v2__xxx_1_1construct_3_01file__handle_01_4.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 Namespaces</h2></td></tr>
-<tr class="memitem:namespaceafio__v2__xxx"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html">afio_v2_xxx</a></td></tr>
-<tr class="memdesc:namespaceafio__v2__xxx"><td class="mdescLeft">&#160;</td><td class="mdescRight">The AFIO namespace. <br /></td></tr>
+<tr class="memitem:namespacellfio__v2__xxx"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html">llfio_v2_xxx</a></td></tr>
+<tr class="memdesc:namespacellfio__v2__xxx"><td class="mdescLeft">&#160;</td><td class="mdescRight">The AFIO namespace. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a579d619e4d73e584fdd41e34761afa67"><td class="memItemLeft" align="right" valign="top"><a id="a579d619e4d73e584fdd41e34761afa67"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a579d619e4d73e584fdd41e34761afa67">afio_v2_xxx::swap</a> (file_handle &amp;self, file_handle &amp;o) noexcept</td></tr>
-<tr class="memdesc:a579d619e4d73e584fdd41e34761afa67"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br /></td></tr>
-<tr class="separator:a579d619e4d73e584fdd41e34761afa67"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab92ca63383ef7fe58af4620570d12803"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#ab92ca63383ef7fe58af4620570d12803">afio_v2_xxx::file</a> (const path_handle &amp;base, file_handle::path_view_type path, file_handle::mode _mode=file_handle::mode::read, file_handle::creation _creation=file_handle::creation::open_existing, file_handle::caching _caching=file_handle::caching::all, file_handle::flag flags=file_handle::flag::none) noexcept</td></tr>
-<tr class="separator:ab92ca63383ef7fe58af4620570d12803"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac0b7d76c4298e86cef49c832c93edec"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#aac0b7d76c4298e86cef49c832c93edec">afio_v2_xxx::random_file</a> (const path_handle &amp;dirpath, file_handle::mode _mode=file_handle::mode::write, file_handle::caching _caching=file_handle::caching::temporary, file_handle::flag flags=file_handle::flag::none) noexcept</td></tr>
-<tr class="separator:aac0b7d76c4298e86cef49c832c93edec"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0c9b8bf8b5ad7b60fefd904d76a60c5b"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a0c9b8bf8b5ad7b60fefd904d76a60c5b">afio_v2_xxx::temp_file</a> (file_handle::path_view_type name=file_handle::path_view_type(), file_handle::mode _mode=file_handle::mode::write, file_handle::creation _creation=file_handle::creation::if_needed, file_handle::caching _caching=file_handle::caching::temporary, file_handle::flag flags=file_handle::flag::unlink_on_first_close) noexcept</td></tr>
-<tr class="separator:a0c9b8bf8b5ad7b60fefd904d76a60c5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aca98b0cb43a2d925bb65e055b07b4a08"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#aca98b0cb43a2d925bb65e055b07b4a08">afio_v2_xxx::temp_inode</a> (const path_handle &amp;dirh=path_discovery::storage_backed_temporary_files_directory(), file_handle::mode _mode=file_handle::mode::write, file_handle::flag flags=file_handle::flag::none) noexcept</td></tr>
-<tr class="separator:aca98b0cb43a2d925bb65e055b07b4a08"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8fbd7f7cc6449428269e22f9765b1d8d"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle::extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a8fbd7f7cc6449428269e22f9765b1d8d">afio_v2_xxx::maximum_extent</a> (const file_handle &amp;self) noexcept</td></tr>
-<tr class="separator:a8fbd7f7cc6449428269e22f9765b1d8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a84d22c966fcabe50de30ad8cf26c7241"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle::extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#a84d22c966fcabe50de30ad8cf26c7241">afio_v2_xxx::truncate</a> (file_handle &amp;self, file_handle::extent_type newsize) noexcept</td></tr>
-<tr class="separator:a84d22c966fcabe50de30ad8cf26c7241"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3c009153d916556b991d4a79c664fe9"><td class="memItemLeft" align="right" valign="top"><a id="ac3c009153d916556b991d4a79c664fe9"></a>
-result&lt; std::vector&lt; std::pair&lt; file_handle::extent_type, file_handle::extent_type &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#ac3c009153d916556b991d4a79c664fe9">afio_v2_xxx::extents</a> (const file_handle &amp;self) noexcept</td></tr>
-<tr class="memdesc:ac3c009153d916556b991d4a79c664fe9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list of currently valid extents for this open file. WARNING: racy! <br /></td></tr>
-<tr class="separator:ac3c009153d916556b991d4a79c664fe9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae412aa7c9e37601d1814e75d09795185"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle::extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceafio__v2__xxx.html#ae412aa7c9e37601d1814e75d09795185">afio_v2_xxx::zero</a> (file_handle &amp;self, file_handle::extent_type offset, file_handle::extent_type bytes, deadline d=deadline()) noexcept</td></tr>
-<tr class="memdesc:ae412aa7c9e37601d1814e75d09795185"><td class="mdescLeft">&#160;</td><td class="mdescRight">Efficiently zero, and possibly deallocate, data on storage.  <a href="namespaceafio__v2__xxx.html#ae412aa7c9e37601d1814e75d09795185">More...</a><br /></td></tr>
-<tr class="separator:ae412aa7c9e37601d1814e75d09795185"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2542466a055a0c024dee2704e9e32519"><td class="memItemLeft" align="right" valign="top"><a id="a2542466a055a0c024dee2704e9e32519"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a2542466a055a0c024dee2704e9e32519">llfio_v2_xxx::swap</a> (file_handle &amp;self, file_handle &amp;o) noexcept</td></tr>
+<tr class="memdesc:a2542466a055a0c024dee2704e9e32519"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br /></td></tr>
+<tr class="separator:a2542466a055a0c024dee2704e9e32519"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af31a062639499a79ef5cc8aed16ba65d"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#af31a062639499a79ef5cc8aed16ba65d">llfio_v2_xxx::file</a> (const path_handle &amp;base, file_handle::path_view_type path, file_handle::mode _mode=file_handle::mode::read, file_handle::creation _creation=file_handle::creation::open_existing, file_handle::caching _caching=file_handle::caching::all, file_handle::flag flags=file_handle::flag::none) noexcept</td></tr>
+<tr class="separator:af31a062639499a79ef5cc8aed16ba65d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5bc9df0fdb554e757d14cf40af0bbb4e"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a5bc9df0fdb554e757d14cf40af0bbb4e">llfio_v2_xxx::random_file</a> (const path_handle &amp;dirpath, file_handle::mode _mode=file_handle::mode::write, file_handle::caching _caching=file_handle::caching::temporary, file_handle::flag flags=file_handle::flag::none) noexcept</td></tr>
+<tr class="separator:a5bc9df0fdb554e757d14cf40af0bbb4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70d9ef3b988a880d171015b754bb7b27"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a70d9ef3b988a880d171015b754bb7b27">llfio_v2_xxx::temp_file</a> (file_handle::path_view_type name=file_handle::path_view_type(), file_handle::mode _mode=file_handle::mode::write, file_handle::creation _creation=file_handle::creation::if_needed, file_handle::caching _caching=file_handle::caching::temporary, file_handle::flag flags=file_handle::flag::unlink_on_first_close) noexcept</td></tr>
+<tr class="separator:a70d9ef3b988a880d171015b754bb7b27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8d9dc908fe39f9c896e99f6b7a39d81"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#ac8d9dc908fe39f9c896e99f6b7a39d81">llfio_v2_xxx::temp_inode</a> (const path_handle &amp;dirh=path_discovery::storage_backed_temporary_files_directory(), file_handle::mode _mode=file_handle::mode::write, file_handle::flag flags=file_handle::flag::none) noexcept</td></tr>
+<tr class="separator:ac8d9dc908fe39f9c896e99f6b7a39d81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1759f4cee184d433f4446a39ff8bfa02"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle::extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a1759f4cee184d433f4446a39ff8bfa02">llfio_v2_xxx::maximum_extent</a> (const file_handle &amp;self) noexcept</td></tr>
+<tr class="separator:a1759f4cee184d433f4446a39ff8bfa02"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a16ee1bea5a5791ecde266420e00fba81"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle::extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a16ee1bea5a5791ecde266420e00fba81">llfio_v2_xxx::truncate</a> (file_handle &amp;self, file_handle::extent_type newsize) noexcept</td></tr>
+<tr class="separator:a16ee1bea5a5791ecde266420e00fba81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f9a72b547dc542401a2d17b1c1e2e15"><td class="memItemLeft" align="right" valign="top"><a id="a6f9a72b547dc542401a2d17b1c1e2e15"></a>
+result&lt; std::vector&lt; std::pair&lt; file_handle::extent_type, file_handle::extent_type &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a6f9a72b547dc542401a2d17b1c1e2e15">llfio_v2_xxx::extents</a> (const file_handle &amp;self) noexcept</td></tr>
+<tr class="memdesc:a6f9a72b547dc542401a2d17b1c1e2e15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list of currently valid extents for this open file. WARNING: racy! <br /></td></tr>
+<tr class="separator:a6f9a72b547dc542401a2d17b1c1e2e15"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0fb15649a46da0d75b5797bfda8dc2e"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle::extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#ad0fb15649a46da0d75b5797bfda8dc2e">llfio_v2_xxx::zero</a> (file_handle &amp;self, file_handle::extent_type offset, file_handle::extent_type bytes, deadline d=deadline()) noexcept</td></tr>
+<tr class="memdesc:ad0fb15649a46da0d75b5797bfda8dc2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Efficiently zero, and possibly deallocate, data on storage.  <a href="namespacellfio__v2__xxx.html#ad0fb15649a46da0d75b5797bfda8dc2e">More...</a><br /></td></tr>
+<tr class="separator:ad0fb15649a46da0d75b5797bfda8dc2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides file_handle. </p>
@@ -143,7 +143,7 @@ result&lt; std::vector&lt; std::pair&lt; file_handle::extent_type, file_handle::
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_4443eecac141a9c11b93921c40e6e530.html">afio</a></li><li class="navelem"><a class="el" href="dir_df838802a8d72797f186037846947269.html">v2.0</a></li><li class="navelem"><a class="el" href="file__handle_8hpp.html">file_handle.hpp</a></li>
+    <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_9ffbcff25eb6a2bb8ed044f6c5d983c9.html">llfio</a></li><li class="navelem"><a class="el" href="dir_ff8d8ad368a820031e12dd9b12d79036.html">v2.0</a></li><li class="navelem"><a class="el" href="file__handle_8hpp.html">file_handle.hpp</a></li>
     <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
