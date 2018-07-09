@@ -1,6 +1,6 @@
 [submodule "doc/html"]
 	path = doc/html
-	url = https://github.com/ned14/afio.git
+	url = https://github.com/ned14/llfio.git
 	branch = gh-pages
 	fetchRecurseSubmodules = true
 	ignore = none
