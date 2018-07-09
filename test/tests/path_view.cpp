@@ -35,11 +35,11 @@ static inline void TestPathView()
   // Globs
   BOOST_CHECK(llfio::path_view("niall*").contains_glob());
   // Splitting
-  constexpr const char p[] = "/mnt/c/Users/ned/Documents/boostish/llfio/programs/build_posix/testdir/0";
+  constexpr const char p[] = "/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir/0";
   llfio::path_view e(p);  // NOLINT
   llfio::path_view f(e.filename());
   e.remove_filename();
-  BOOST_CHECK(e == "/mnt/c/Users/ned/Documents/boostish/llfio/programs/build_posix/testdir");
+  BOOST_CHECK(e == "/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir");
   BOOST_CHECK(f == "0");
 #ifndef _WIN32
   // cstr
@@ -59,11 +59,11 @@ static inline void TestPathView()
   BOOST_CHECK(llfio::path_view(L"0123456789012345678901234567890123456789012345678901234567890123.deleted").is_llfio_deleted());
   BOOST_CHECK(!llfio::path_view("0123456789012345678901234567890123456789g12345678901234567890123.deleted").is_llfio_deleted());
   // Splitting
-  constexpr const wchar_t p2[] = L"\\mnt\\c\\Users\\ned\\Documents\\boostish\\llfio\\programs\\build_posix\\testdir\\0";
+  constexpr const wchar_t p2[] = L"\\mnt\\c\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir\\0";
   llfio::path_view g(p2);
   llfio::path_view h(g.filename());
   g.remove_filename();
-  BOOST_CHECK(g == "\\mnt\\c\\Users\\ned\\Documents\\boostish\\llfio\\programs\\build_posix\\testdir");
+  BOOST_CHECK(g == "\\mnt\\c\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir");
   BOOST_CHECK(h == "0");
   // cstr
   llfio::path_view::c_str i(g, false);
