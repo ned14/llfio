@@ -2,9 +2,9 @@
 #include "version.hpp"
 
 #if defined(_MSC_VER) && !defined(__clang__)
-#define LLFIO_HEADERS_PATH2 LLFIO_VERSION_GLUE(v, LLFIO_HEADERS_VERSION, / llfio.hpp)
+#define LLFIO_HEADERS_PATH2 LLFIO_VERSION_GLUE(v, LLFIO_HEADERS_VERSION, /llfio.hpp)
 #elif !__PCPP_ALWAYS_FALSE__
-#define LLFIO_HEADERS_PATH2 LLFIO_VERSION_GLUE(v, LLFIO_HEADERS_VERSION, ) / llfio.hpp
+#define LLFIO_HEADERS_PATH2 LLFIO_VERSION_GLUE(v, LLFIO_HEADERS_VERSION,)/llfio.hpp
 #endif
 
 #if 0  // cmake's Makefiles and Ninja generators won't pick up dependent headers without this
