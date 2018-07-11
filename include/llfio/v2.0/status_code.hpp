@@ -1,4 +1,4 @@
-/* Configures AFIO
+/* LLFIO error handling
 (C) 2018 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: June 2018
 
@@ -35,20 +35,20 @@ tag.
 
 Status code, on the other hand, is templated and is designed for custom
 domains which can set arbitrary payloads. So we define custom domains and
-status codes for AFIO with these combinations:
+status codes for LLFIO with these combinations:
 
 - win32_error{ DWORD }
 - ntkernel_error{ LONG }
 - posix_error{ int }
 - generic_error{ errc }
 
-Each of these is a separate AFIO custom status code domain. We also define
+Each of these is a separate LLFIO custom status code domain. We also define
 an erased form of these custom domains, and that is typedefed to
 error_domain<intptr_t>::value_type.
 
-This design ensure that AFIO can be configured into either std-based error
+This design ensure that LLFIO can be configured into either std-based error
 handling or SG14 experimental status code handling. It defaults to the latter
-as that (a) enables safe header only AFIO on Windows (b) produces better codegen
+as that (a) enables safe header only LLFIO on Windows (b) produces better codegen
 (c) drags in far fewer STL headers.
 */
 
@@ -73,7 +73,7 @@ namespace detail
     uint32_t _thread_id{0};
     // The TLS path store entry
     uint16_t _tls_path_id1{static_cast<uint16_t>(-1)}, _tls_path_id2{static_cast<uint16_t>(-1)};
-    // The id of the relevant log entry in the AFIO log (if logging enabled)
+    // The id of the relevant log entry in the LLFIO log (if logging enabled)
     size_t _log_id{static_cast<size_t>(-1)};
 
     //! Default construction
@@ -149,7 +149,7 @@ SYSTEM_ERROR2_NAMESPACE_END
 LLFIO_V2_NAMESPACE_BEGIN
 
 /*! \class error_domain
-\brief The SG14 status code domain for errors in AFIO.
+\brief The SG14 status code domain for errors in LLFIO.
 */
 template <class BaseStatusCodeDomain> class error_domain : public BaseStatusCodeDomain
 {
@@ -160,7 +160,7 @@ public:
   using string_ref = typename BaseStatusCodeDomain::string_ref;
   using atomic_refcounted_string_ref = typename BaseStatusCodeDomain::atomic_refcounted_string_ref;
 
-  //! \brief The value type of errors in AFIO
+  //! \brief The value type of errors in LLFIO
   using value_type = detail::error_domain_value_type<typename _base::value_type>;
 
   error_domain() = default;
@@ -352,7 +352,7 @@ struct error_info;
 inline std::error_code make_error_code(error_info ei);
 
 /*! \struct error_info
-\brief The cause of the failure of an operation in AFIO.
+\brief The cause of the failure of an operation in LLFIO.
 */
 struct error_info
 {
@@ -369,7 +369,7 @@ private:
   uint32_t _thread_id{0};
   // The TLS path store entry
   uint16_t _tls_path_id1{static_cast<uint16_t>(-1)}, _tls_path_id2{static_cast<uint16_t>(-1)};
-  // The id of the relevant log entry in the AFIO log (if logging enabled)
+  // The id of the relevant log entry in the LLFIO log (if logging enabled)
   size_t _log_id{static_cast<size_t>(-1)};
 
 public:

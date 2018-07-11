@@ -1,4 +1,4 @@
-//! \file v2.0/llfio.hpp The master *versioned* AFIO include file. All version specific AFIO consuming libraries should include this header only.
+//! \file v2.0/llfio.hpp The master *versioned* LLFIO include file. All version specific LLFIO consuming libraries should include this header only.
 
 #undef LLFIO_VERSION_MAJOR
 #undef LLFIO_VERSION_MINOR
@@ -24,10 +24,10 @@
 
 #if defined(__cpp_modules) || defined(DOXYGEN_SHOULD_SKIP_THIS)
 #if defined(_MSC_VER) && !defined(__clang__)
-//! \brief The AFIO C++ module name
+//! \brief The LLFIO C++ module name
 #define LLFIO_MODULE_NAME LLFIO_VERSION_GLUE(llfio_v, LLFIO_NAMESPACE_VERSION, )
 #else
-//! \brief The AFIO C++ module name
+//! \brief The LLFIO C++ module name
 #define LLFIO_MODULE_NAME LLFIO_VERSION_GLUE(llfio_v, LLFIO_NAMESPACE_VERSION, )
 #endif
 #endif

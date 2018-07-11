@@ -191,7 +191,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
     // feed more than AIO_LISTIO_MAX items to aio_suspend
     // it does NOT return EINVAL as specified, but rather
     // simply marks all items past AIO_LISTIO_MAX as failed
-    // with EAGAIN. That punishes performance for AFIO
+    // with EAGAIN. That punishes performance for LLFIO
     // because we loop setting up and tearing down
     // the handlers, so if we would overload llfio_suspend,
     // better to error out now rather that later in io_service.

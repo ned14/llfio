@@ -108,9 +108,9 @@ result<mapped_file_handle::extent_type> mapped_file_handle::truncate(extent_type
     OUTCOME_TRYV(reserve(_reservation));
     return ret;
   }
-  // Ask the section what size it is. If multiple AFIO processes are using the same file,
+  // Ask the section what size it is. If multiple LLFIO processes are using the same file,
   // because the section is a singleton based on the canonical path of the file, another
-  // AFIO in another process may have already resized the section for us in which case
+  // LLFIO in another process may have already resized the section for us in which case
   // we can skip doing work now.
   OUTCOME_TRY(size, _sh.length());
   if(size != newsize)

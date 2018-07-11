@@ -40,7 +40,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "kerneltest/include/kerneltest.hpp"
 
 #if 0
-// Tell KernelTest's outcome how to grok AFIO's result
+// Tell KernelTest's outcome how to grok LLFIO's result
 OUTCOME_V2_NAMESPACE_BEGIN
 namespace convert
 {

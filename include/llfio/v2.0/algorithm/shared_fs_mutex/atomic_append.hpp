@@ -105,7 +105,7 @@ namespace algorithm
     - If your OS doesn't have sane byte range locks (OS X, BSD, older Linuxes) and multiple
     objects in your process use the same lock file, misoperation will occur. Use lock_files instead.
 
-    \todo Implement hole punching once I port that code from AFIO v1.
+    \todo Implement hole punching once I port that code from LLFIO v1.
     \todo Decide on some resolution mechanism for sudden process exit.
     \todo There is a 1 out of 2^64-2 chance of unique id collision. It would be nice if we
     actually formally checked that our chosen unique id is actually unique.

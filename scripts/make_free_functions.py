@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# Look for all static member functions marked AFIO_MAKE_FREE_FUNCTION and make them free
+# Look for all static member functions marked LLFIO_MAKE_FREE_FUNCTION and make them free
 # (C) 2017 Niall Douglas
 
 from __future__ import print_function
@@ -15,11 +15,11 @@ for header in glob.glob("../include/afio/*/*.hpp"):
     for lineidx in range(0, len(lines)):
         if lines[lineidx].startswith('class'):
             current_class = lines[lineidx][6:lines[lineidx].find(':')]
-            current_class = current_class.replace('AFIO_DECL', '').lstrip().rstrip()
-        if 'AFIO_MAKE_FREE_FUNCTION' in lines[lineidx] and re.match('\s*AFIO_MAKE_FREE_FUNCTION', lines[lineidx]):
+            current_class = current_class.replace('LLFIO_DECL', '').lstrip().rstrip()
+        if 'LLFIO_MAKE_FREE_FUNCTION' in lines[lineidx] and re.match('\s*LLFIO_MAKE_FREE_FUNCTION', lines[lineidx]):
             function = ''
             for n in range(1, 100):
-               if 'AFIO_REQUIRES' in lines[lineidx+n]:
+               if 'LLFIO_REQUIRES' in lines[lineidx+n]:
                    continue
                function += lines[lineidx+n]
                if lineidx+n+1 >= len(lines):
@@ -47,9 +47,9 @@ for header in glob.glob("../include/afio/*/*.hpp"):
         if functions_to_be_freed_begin != -1:
             del lines[functions_to_be_freed_begin+1:functions_to_be_freed_end]
         else:
-            # Place just before the last AFIO_V2_NAMESPACE_END
+            # Place just before the last LLFIO_V2_NAMESPACE_END
             functions_to_be_freed_begin = len(lines)-1
-            while not lines[functions_to_be_freed_begin].startswith('AFIO_V2_NAMESPACE_END'):
+            while not lines[functions_to_be_freed_begin].startswith('LLFIO_V2_NAMESPACE_END'):
                 functions_to_be_freed_begin = functions_to_be_freed_begin - 1
             lines.insert(functions_to_be_freed_begin, '// END make_free_functions.py\n\n')
             lines.insert(functions_to_be_freed_begin, '// BEGIN make_free_functions.py\n')
@@ -58,8 +58,8 @@ for header in glob.glob("../include/afio/*/*.hpp"):
             print((classname, function))
             function = function.replace('virtual ', '')
             function = function.replace('override', '')
-            function = function.replace('AFIO_HEADERS_ONLY_MEMFUNC_SPEC ', '')
-            function = function.replace('AFIO_HEADERS_ONLY_VIRTUAL_SPEC ', '')
+            function = function.replace('LLFIO_HEADERS_ONLY_MEMFUNC_SPEC ', '')
+            function = function.replace('LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ', '')
             completion_template = 'template <class CompletionRoutine>' in function
             function = function.replace('template <class CompletionRoutine> ', '')
             is_static = 'static ' in function

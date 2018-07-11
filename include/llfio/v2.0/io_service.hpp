@@ -122,7 +122,7 @@ initating i/o and completing it onto a single kernel thread.
 Unlike the `io_service` in ASIO or the Networking TS, this `io_service`
 is much simpler, in particular it is single threaded per instance only
 i.e. you must run a separate `io_service` instance one per kernel thread
-if you wish to run i/o processing across multiple threads. AFIO does not
+if you wish to run i/o processing across multiple threads. LLFIO does not
 do this for you (and for good reason, unlike socket i/o, it is generally
 unwise to distribute file i/o across kernel threads due to the much
 more code executable between user space and physical storage i.e. keeping

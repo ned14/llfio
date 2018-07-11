@@ -1,4 +1,4 @@
-/* Test the latency of iostreams vs AFIO
+/* Test the latency of iostreams vs LLFIO
 (C) 2018 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
 File Created: Apr 2018
 

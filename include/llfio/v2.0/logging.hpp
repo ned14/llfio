@@ -1,4 +1,4 @@
-/* Configures AFIO
+/* LLFIO logging
 (C) 2015-2018 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: Dec 2015
 
@@ -33,7 +33,7 @@ Distributed under the Boost Software License, Version 1.0.
 */
 LLFIO_V2_NAMESPACE_BEGIN
 
-//! The log used by AFIO
+//! The log used by LLFIO
 inline LLFIO_DECL QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log<LLFIO_LOGGING_MEMORY> &log() noexcept
 {
   static QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log<LLFIO_LOGGING_MEMORY> _log(static_cast<QUICKCPPLIB_NAMESPACE::ringbuffer_log::level>(LLFIO_LOGGING_LEVEL));
@@ -156,35 +156,35 @@ LLFIO_V2_NAMESPACE_END
 
 #ifndef LLFIO_LOG_FATAL_TO_CERR
 #include <cstdio>
-#define LLFIO_LOG_FATAL_TO_CERR(expr)                                                                                                                                                                                                                                                                                           \
+#define LLFIO_LOG_FATAL_TO_CERR(expr)                                                                                                                                                                                                                                                                                          \
   fprintf(stderr, "%s\n", (expr));                                                                                                                                                                                                                                                                                             \
   fflush(stderr)
 #endif
 #endif  // LLFIO_LOGGING_LEVEL
 
 #if LLFIO_LOGGING_LEVEL >= 1
-#define LLFIO_LOG_FATAL(inst, message)                                                                                                                                                                                                                                                                                          \
+#define LLFIO_LOG_FATAL(inst, message)                                                                                                                                                                                                                                                                                         \
   {                                                                                                                                                                                                                                                                                                                            \
-    ::LLFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::fatal, (message), ::LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<unsigned>(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (LLFIO_LOG_BACKTRACE_LEVELS & (1U << 1U)) ? nullptr : __func__, __LINE__);              \
-    LLFIO_LOG_FATAL_TO_CERR(message);                                                                                                                                                                                                                                                                                           \
+    ::LLFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::fatal, (message), ::LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<unsigned>(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (LLFIO_LOG_BACKTRACE_LEVELS & (1U << 1U)) ? nullptr : __func__, __LINE__);           \
+    LLFIO_LOG_FATAL_TO_CERR(message);                                                                                                                                                                                                                                                                                          \
   }
 #else
 #define LLFIO_LOG_FATAL(inst, message) LLFIO_LOG_FATAL_TO_CERR(message)
 #endif
 #if LLFIO_LOGGING_LEVEL >= 2
-#define LLFIO_LOG_ERROR(inst, message)                                                                                                                                                                                                                                                                                          \
+#define LLFIO_LOG_ERROR(inst, message)                                                                                                                                                                                                                                                                                         \
   ::LLFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::error, (message), ::LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<unsigned>(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (LLFIO_LOG_BACKTRACE_LEVELS & (1U << 2U)) ? nullptr : __func__, __LINE__)
 #else
 #define LLFIO_LOG_ERROR(inst, message)
 #endif
 #if LLFIO_LOGGING_LEVEL >= 3
-#define LLFIO_LOG_WARN(inst, message)                                                                                                                                                                                                                                                                                           \
+#define LLFIO_LOG_WARN(inst, message)                                                                                                                                                                                                                                                                                          \
   ::LLFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::warn, (message), ::LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<unsigned>(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (LLFIO_LOG_BACKTRACE_LEVELS & (1U << 3U)) ? nullptr : __func__, __LINE__)
 #else
 #define LLFIO_LOG_WARN(inst, message)
 #endif
 #if LLFIO_LOGGING_LEVEL >= 4
-#define LLFIO_LOG_INFO(inst, message)                                                                                                                                                                                                                                                                                           \
+#define LLFIO_LOG_INFO(inst, message)                                                                                                                                                                                                                                                                                          \
   ::LLFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::info, (message), ::LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<unsigned>(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (LLFIO_LOG_BACKTRACE_LEVELS & (1U << 4U)) ? nullptr : __func__, __LINE__)
 
 // Need to expand out our namespace into a string
@@ -200,7 +200,7 @@ LLFIO_V2_NAMESPACE_END
 LLFIO_V2_NAMESPACE_BEGIN
 namespace detail
 {
-  // Returns the AFIO namespace as a string
+  // Returns the LLFIO namespace as a string
   inline span<char> llfio_namespace_string()
   {
     static char buffer[64];
@@ -255,21 +255,21 @@ namespace detail
 }
 LLFIO_V2_NAMESPACE_END
 #ifdef _MSC_VER
-#define LLFIO_LOG_FUNCTION_CALL(inst)                                                                                                                                                                                                                                                                                           \
+#define LLFIO_LOG_FUNCTION_CALL(inst)                                                                                                                                                                                                                                                                                          \
   if(log().log_level() >= log_level::info)                                                                                                                                                                                                                                                                                     \
   {                                                                                                                                                                                                                                                                                                                            \
     char buffer[256];                                                                                                                                                                                                                                                                                                          \
-    ::LLFIO_V2_NAMESPACE::detail::strip_pretty_function(buffer, sizeof(buffer), __FUNCSIG__);                                                                                                                                                                                                                                   \
-    ::LLFIO_V2_NAMESPACE::detail::log_inst_to_info(inst, buffer);                                                                                                                                                                                                                                                               \
+    ::LLFIO_V2_NAMESPACE::detail::strip_pretty_function(buffer, sizeof(buffer), __FUNCSIG__);                                                                                                                                                                                                                                  \
+    ::LLFIO_V2_NAMESPACE::detail::log_inst_to_info(inst, buffer);                                                                                                                                                                                                                                                              \
   }                                                                                                                                                                                                                                                                                                                            \
   LLFIO_LOG_INST_TO_TLS(inst)
 #else
-#define LLFIO_LOG_FUNCTION_CALL(inst)                                                                                                                                                                                                                                                                                           \
+#define LLFIO_LOG_FUNCTION_CALL(inst)                                                                                                                                                                                                                                                                                          \
   if(log().log_level() >= log_level::info)                                                                                                                                                                                                                                                                                     \
   {                                                                                                                                                                                                                                                                                                                            \
     char buffer[256];                                                                                                                                                                                                                                                                                                          \
-    ::LLFIO_V2_NAMESPACE::detail::strip_pretty_function(buffer, sizeof(buffer), __PRETTY_FUNCTION__);                                                                                                                                                                                                                           \
-    ::LLFIO_V2_NAMESPACE::detail::log_inst_to_info(inst, buffer);                                                                                                                                                                                                                                                               \
+    ::LLFIO_V2_NAMESPACE::detail::strip_pretty_function(buffer, sizeof(buffer), __PRETTY_FUNCTION__);                                                                                                                                                                                                                          \
+    ::LLFIO_V2_NAMESPACE::detail::log_inst_to_info(inst, buffer);                                                                                                                                                                                                                                                              \
   }                                                                                                                                                                                                                                                                                                                            \
   LLFIO_LOG_INST_TO_TLS(inst)
 #endif
@@ -278,13 +278,13 @@ LLFIO_V2_NAMESPACE_END
 #define LLFIO_LOG_FUNCTION_CALL(inst) LLFIO_LOG_INST_TO_TLS(inst)
 #endif
 #if LLFIO_LOGGING_LEVEL >= 5
-#define LLFIO_LOG_DEBUG(inst, message)                                                                                                                                                                                                                                                                                          \
+#define LLFIO_LOG_DEBUG(inst, message)                                                                                                                                                                                                                                                                                         \
   ::LLFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::debug, ::LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<unsigned>(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (LLFIO_LOG_BACKTRACE_LEVELS & (1U << 5U)) ? nullptr : __func__, __LINE__)
 #else
 #define LLFIO_LOG_DEBUG(inst, message)
 #endif
 #if LLFIO_LOGGING_LEVEL >= 6
-#define LLFIO_LOG_ALL(inst, message)                                                                                                                                                                                                                                                                                            \
+#define LLFIO_LOG_ALL(inst, message)                                                                                                                                                                                                                                                                                           \
   ::LLFIO_V2_NAMESPACE::log().emplace_back(QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::all, (message), ::LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<unsigned>(inst), QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (LLFIO_LOG_BACKTRACE_LEVELS & (1U << 6U)) ? nullptr : __func__, __LINE__)
 #else
 #define LLFIO_LOG_ALL(inst, message)

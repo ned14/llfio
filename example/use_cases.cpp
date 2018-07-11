@@ -1,4 +1,4 @@
-/* Examples of AFIO use
+/* Examples of LLFIO use
 (C) 2018 Niall Douglas <http://www.nedproductions.biz/> (2 commits)
 File Created: Aug 2018
 

@@ -1,6 +1,6 @@
 {
-  "key": "afio",
-  "name": "AFIO",
+  "key": "LLfio",
+  "name": "LLFIO",
   "authors": [ "Niall Douglas", "Paul Kirth" ],
   "maintainers": [ "Niall Douglas" ],
   "description": "A hard guarantee asynchronous file i/o and filesystem library.",

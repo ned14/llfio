@@ -103,14 +103,14 @@ public:
     editions of Windows, the file entry does not disappears but becomes unavailable for
     anyone else to open with an `errc::resource_unavailable_try_again` error return. Because this is confusing, unless the
     `win_disable_unlink_emulation` flag is also specified, this POSIX behaviour is
-    somewhat emulated by AFIO on older Windows by renaming the file to a random name on `close()`
+    somewhat emulated by LLFIO on older Windows by renaming the file to a random name on `close()`
     causing it to appear to have been unlinked immediately.
     */
     unlink_on_first_close = 1U << 0U,
 
     /*! Some kernel caching modes have unhelpfully inconsistent behaviours
     in getting your data onto storage, so by default unless this flag is
-    specified AFIO adds extra fsyncs to the following operations for the
+    specified LLFIO adds extra fsyncs to the following operations for the
     caching modes specified below:
     * truncation of file length either explicitly or during file open.
     * closing of the handle either explicitly or in the destructor.
@@ -156,7 +156,7 @@ public:
     created files on NTFS, unlike in almost every other major filing system. You have to
     explicitly "opt in" to extents-based storage.
 
-    As extents-based storage is nearly cost free on NTFS, AFIO by default opts in to
+    As extents-based storage is nearly cost free on NTFS, LLFIO by default opts in to
     extents-based storage for any empty file it creates. If you don't want this, you
     can specify this flag to prevent that happening.
     */
@@ -217,18 +217,18 @@ public:
   circumstances e.g. renaming may switch to a different hard link's path which is almost
   certainly a bug.
 
-  If AFIO was not able to determine the current path for this open handle e.g. the inode
+  If LLFIO was not able to determine the current path for this open handle e.g. the inode
   has been unlinked, it returns an empty path. Be aware that FreeBSD can return an empty
-  (deleted) path for file inodes no longer cached by the kernel path cache, AFIO cannot
+  (deleted) path for file inodes no longer cached by the kernel path cache, LLFIO cannot
   detect the difference. FreeBSD will also return any path leading to the inode if it is
   hard linked. FreeBSD does implement path retrieval for directory inodes
   correctly however, and see `algorithm::stablized_path<T>` for a handle adapter which
   makes use of that.
 
-  On Linux if `/proc` is not mounted, this call fails with an error. All APIs in AFIO
+  On Linux if `/proc` is not mounted, this call fails with an error. All APIs in LLFIO
   which require the use of `current_path()` can be told to not use it e.g. `flag::disable_safety_unlinks`.
   It is up to you to detect if `current_path()` is not working, and to change how you
-  call AFIO appropriately.
+  call LLFIO appropriately.
 
   \warning This call is expensive, it always asks the kernel for the current path, and no
   checking is done to ensure what the kernel returns is accurate or even sensible.

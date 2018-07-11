@@ -63,7 +63,7 @@ namespace algorithm
     \tparam HashIndexSize The size in bytes of the hash index to use (defaults to 4Kb)
     \tparam SpinlockType The type of spinlock to use (defaults to a `SharedMutex` concept spinlock)
 
-    This is the highest performing filing system mutex in AFIO, but it comes with a long list of potential
+    This is the highest performing filing system mutex in LLFIO, but it comes with a long list of potential
     gotchas. It works by creating a random temporary file somewhere on the system and placing its path
     in a file at the lock file location. The random temporary file is mapped into memory by all processes
     using the lock where an open addressed hash table is kept. Each entity is hashed into somewhere in the

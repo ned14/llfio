@@ -55,9 +55,9 @@ namespace detail
 \brief A borrowed view of a path. A lightweight trivial-type alternative to
 `std::filesystem::path`.
 
-AFIO is sufficiently fast that `std::filesystem::path` as a wrapper of an
+LLFIO is sufficiently fast that `std::filesystem::path` as a wrapper of an
 underlying `std::basic_string<>` can be problematically expensive for some
-filing system operations due to the potential memory allocation. AFIO
+filing system operations due to the potential memory allocation. LLFIO
 therefore works exclusively with borrowed views of other path storage.
 
 Some of the API for `std::filesystem::path` is replicated here, however any
@@ -70,7 +70,7 @@ possible with borrowed views.
 
 Be aware that on Microsoft Windows, the native path storage
 `std::filesystem::path::value_type` is a `wchar_t` referring to UTF-16.
-However much of AFIO path usage is a `path_handle` to somewhere on the filing
+However much of LLFIO path usage is a `path_handle` to somewhere on the filing
 system plus a relative `const char *` UTF-8 path fragment as the use of
 absolute paths is discouraged. Rather than complicate the ABI to handle
 templated path character types, on Microsoft Windows only we do the following:
@@ -85,12 +85,12 @@ buffer. We use the fast NT kernel UTF8 to UTF16 routine, not the slow Win32
 routine.
   3. Any forward slashes are converted to backwards slashes.
 
-AFIO calls the NT kernel API directly rather than the Win32 API for:
+LLFIO calls the NT kernel API directly rather than the Win32 API for:
 
 - For any paths relative to a `path_handle` (the Win32 API does not provide a
 race free file system API).
 - For any paths beginning with `\!!\`, we pass the path + 3 characters
-directly through. This prefix is a pure AFIO extension, and will not be
+directly through. This prefix is a pure LLFIO extension, and will not be
 recognised by other code.
 - For any paths beginning with `\??\`, we pass the path + 0 characters
 directly through. Note the NT kernel keeps a symlink at `\??\` which refers to
@@ -300,7 +300,7 @@ public:
       return false;
     });
   }
-  // True if the path view matches the format of an AFIO deleted file
+  // True if the path view matches the format of an LLFIO deleted file
   constexpr bool is_llfio_deleted() const noexcept
   {
     return filename()._invoke([](const auto &v) {

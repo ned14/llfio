@@ -75,7 +75,7 @@ namespace stackoverflow
     }
     // Same as before, either throw any error or unpack the value returned
     file_handle::buffers_type buffers_read(_buffers_read.value());
-    // Note that buffers returned by AFIO read() may be completely different to buffers submitted
+    // Note that buffers returned by LLFIO read() may be completely different to buffers submitted
     // This lets us skip unnecessary memory copying
 
     // Make a string view of the first buffer returned

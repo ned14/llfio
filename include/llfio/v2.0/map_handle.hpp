@@ -271,7 +271,7 @@ This is vast overkill if you are using non-volatile RAM, so a special *inlined* 
 taking a single buffer and no other arguments is also provided. This calls the appropriate architecture-specific
 instructions to cause the CPU to write all preceding writes out of the write buffers and CPU caches to main
 memory, so for Intel CPUs this would be `CLWB <each cache line>; SFENCE;`. As this is inlined, it ought to
-produce optimal code. If your CPU does not support the requisite instructions (or AFIO has not added support),
+produce optimal code. If your CPU does not support the requisite instructions (or LLFIO has not added support),
 and empty buffer will be returned to indicate that nothing was barriered, same as the normal `barrier()`
 function.
 
@@ -356,7 +356,7 @@ public:
   \param evict Whether to also evict the cache lines from CPU caches, useful if they will not be used again.
 
   Upon return, one knows that memory in the returned buffer has been barriered
-  (it may be empty if there is no support for this operation in AFIO, or if the current CPU does not
+  (it may be empty if there is no support for this operation in LLFIO, or if the current CPU does not
   support this operation). You may find the `is_nvram()` observer of particular use here.
   */
   LLFIO_MAKE_FREE_FUNCTION
@@ -628,7 +628,7 @@ in the request to main memory.
 \param evict Whether to also evict the cache lines from CPU caches, useful if they will not be used again.
 
 Upon return, one knows that memory in the returned buffer has been barriered
-(it may be empty if there is no support for this operation in AFIO, or if the current CPU does not
+(it may be empty if there is no support for this operation in LLFIO, or if the current CPU does not
 support this operation). You may find the `is_nvram()` observer of particular use here.
 */
 inline map_handle::const_buffer_type barrier(map_handle &self, map_handle::const_buffer_type req, bool evict = false) noexcept

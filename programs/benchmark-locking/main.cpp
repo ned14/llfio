@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-//! On exit dumps a CSV file of the AFIO log, one per child worker
+//! On exit dumps a CSV file of the LLFIO log, one per child worker
 #define DEBUG_CSV 1
 
 //! Seconds to run the benchmark

@@ -1,4 +1,4 @@
-/* Configures AFIO
+/* Configures LLFIO
 (C) 2015-2018 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: Dec 2015
 
@@ -30,12 +30,12 @@ Distributed under the Boost Software License, Version 1.0.
 //#define LLFIO_LOGGING_LEVEL 6
 //#define LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
 
-//! \file config.hpp Configures a compiler environment for AFIO header and source code
+//! \file config.hpp Configures a compiler environment for LLFIO header and source code
 
 //! \defgroup config Configuration macros
 
 #if !defined(LLFIO_HEADERS_ONLY) && !defined(BOOST_ALL_DYN_LINK)
-//! \brief Whether AFIO is a headers only library. Defaults to 1 unless BOOST_ALL_DYN_LINK is defined. \ingroup config
+//! \brief Whether LLFIO is a headers only library. Defaults to 1 unless BOOST_ALL_DYN_LINK is defined. \ingroup config
 #define LLFIO_HEADERS_ONLY 1
 #endif
 
@@ -88,15 +88,15 @@ Distributed under the Boost Software License, Version 1.0.
 
 #if defined(_WIN32)
 #if !defined(_UNICODE)
-#error AFIO cannot target the ANSI Windows API. Please define _UNICODE to target the Unicode Windows API.
+#error LLFIO cannot target the ANSI Windows API. Please define _UNICODE to target the Unicode Windows API.
 #endif
 #if !defined(_WIN32_WINNT)
 #define _WIN32_WINNT 0x0600
 #elif _WIN32_WINNT < 0x0600
-#error _WIN32_WINNT must at least be set to Windows Vista for AFIO to work
+#error _WIN32_WINNT must at least be set to Windows Vista for LLFIO to work
 #endif
 #if defined(NTDDI_VERSION) && NTDDI_VERSION < 0x06000000
-#error NTDDI_VERSION must at least be set to Windows Vista for AFIO to work
+#error NTDDI_VERSION must at least be set to Windows Vista for LLFIO to work
 #endif
 #endif
 
@@ -112,34 +112,34 @@ Distributed under the Boost Software License, Version 1.0.
 #include "quickcpplib/include/cpp_feature.h"
 
 #ifndef __cpp_exceptions
-#error AFIO needs C++ exceptions to be turned on
+#error LLFIO needs C++ exceptions to be turned on
 #endif
 #ifndef __cpp_alias_templates
-#error AFIO needs template alias support in the compiler
+#error LLFIO needs template alias support in the compiler
 #endif
 #ifndef __cpp_variadic_templates
-#error AFIO needs variadic template support in the compiler
+#error LLFIO needs variadic template support in the compiler
 #endif
 #if __cpp_constexpr < 201304L && !defined(_MSC_VER)
-#error AFIO needs relaxed constexpr (C++ 14) support in the compiler
+#error LLFIO needs relaxed constexpr (C++ 14) support in the compiler
 #endif
 #ifndef __cpp_init_captures
-#error AFIO needs lambda init captures support in the compiler (C++ 14)
+#error LLFIO needs lambda init captures support in the compiler (C++ 14)
 #endif
 #ifndef __cpp_attributes
-#error AFIO needs attributes support in the compiler
+#error LLFIO needs attributes support in the compiler
 #endif
 #ifndef __cpp_variable_templates
-#error AFIO needs variable template support in the compiler
+#error LLFIO needs variable template support in the compiler
 #endif
 #ifndef __cpp_generic_lambdas
-#error AFIO needs generic lambda support in the compiler
+#error LLFIO needs generic lambda support in the compiler
 #endif
 #ifdef __has_include
 // clang-format off
 #if !__has_include(<filesystem>) && !__has_include(<experimental/filesystem>)
 // clang-format on
-#error AFIO needs an implementation of the Filesystem TS in the standard library
+#error LLFIO needs an implementation of the Filesystem TS in the standard library
 #endif
 #endif
 
@@ -154,11 +154,11 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 /*! \def LLFIO_V2
 \ingroup config
-\brief The namespace configuration of this AFIO v2. Consists of a sequence
+\brief The namespace configuration of this LLFIO v2. Consists of a sequence
 of bracketed tokens later fused by the preprocessor into namespace and C++ module names.
 */
 #if DOXYGEN_IS_IN_THE_HOUSE
-//! The AFIO namespace
+//! The LLFIO namespace
 namespace llfio_v2_xxx
 {
   //! Collection of file system based algorithms
@@ -169,30 +169,30 @@ namespace llfio_v2_xxx
   namespace storage_profile
   {
   }
-  //! Utility routines often useful when using AFIO
+  //! Utility routines often useful when using LLFIO
   namespace utils
   {
   }
 }
-/*! \brief The namespace of this AFIO v2 which will be some unknown inline
+/*! \brief The namespace of this LLFIO v2 which will be some unknown inline
 namespace starting with `v2_` inside the `boost::llfio` namespace.
 \ingroup config
 */
 #define LLFIO_V2_NAMESPACE llfio_v2_xxx
-/*! \brief Expands into the appropriate namespace markup to enter the AFIO v2 namespace.
+/*! \brief Expands into the appropriate namespace markup to enter the LLFIO v2 namespace.
 \ingroup config
 */
-#define LLFIO_V2_NAMESPACE_BEGIN                                                                                                                                                                                                                                                                                                \
-  namespace llfio_v2_xxx                                                                                                                                                                                                                                                                                                        \
+#define LLFIO_V2_NAMESPACE_BEGIN                                                                                                                                                                                                                                                                                               \
+  namespace llfio_v2_xxx                                                                                                                                                                                                                                                                                                       \
   {
 /*! \brief Expands into the appropriate namespace markup to enter the C++ module
-exported AFIO v2 namespace.
+exported LLFIO v2 namespace.
 \ingroup config
 */
-#define LLFIO_V2_NAMESPACE_EXPORT_BEGIN                                                                                                                                                                                                                                                                                         \
-  export namespace llfio_v2_xxx                                                                                                                                                                                                                                                                                                 \
+#define LLFIO_V2_NAMESPACE_EXPORT_BEGIN                                                                                                                                                                                                                                                                                        \
+  export namespace llfio_v2_xxx                                                                                                                                                                                                                                                                                                \
   {
-/*! \brief Expands into the appropriate namespace markup to exit the AFIO v2 namespace.
+/*! \brief Expands into the appropriate namespace markup to exit the LLFIO v2 namespace.
 \ingroup config
 */
 #define LLFIO_V2_NAMESPACE_END }
@@ -471,17 +471,17 @@ LLFIO_V2_NAMESPACE_END
 //#define BOOST_THREAD_PROVIDES_SIGNATURE_PACKAGED_TASK
 #if LLFIO_HEADERS_ONLY == 1 && !defined(LLFIO_SOURCE)
 /*! \brief Expands into the appropriate markup to declare an `extern`
-function exported from the AFIO DLL if not building headers only.
+function exported from the LLFIO DLL if not building headers only.
 \ingroup config
 */
 #define LLFIO_HEADERS_ONLY_FUNC_SPEC inline
 /*! \brief Expands into the appropriate markup to declare a class member
-function exported from the AFIO DLL if not building headers only.
+function exported from the LLFIO DLL if not building headers only.
 \ingroup config
 */
 #define LLFIO_HEADERS_ONLY_MEMFUNC_SPEC inline
 /*! \brief Expands into the appropriate markup to declare a virtual class member
-function exported from the AFIO DLL if not building headers only.
+function exported from the LLFIO DLL if not building headers only.
 \ingroup config
 */
 #define LLFIO_HEADERS_ONLY_VIRTUAL_SPEC inline virtual
