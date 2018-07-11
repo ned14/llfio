@@ -266,11 +266,11 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>c_str</b></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A borrowed view of a path. A lightweight trivial-type alternative to <code>std::filesystem::path</code>. </p>
-<p>AFIO is sufficiently fast that <code>std::filesystem::path</code> as a wrapper of an underlying <code>std::basic_string&lt;&gt;</code> can be problematically expensive for some filing system operations due to the potential memory allocation. AFIO therefore works exclusively with borrowed views of other path storage.</p>
+<p>LLFIO is sufficiently fast that <code>std::filesystem::path</code> as a wrapper of an underlying <code>std::basic_string&lt;&gt;</code> can be problematically expensive for some filing system operations due to the potential memory allocation. LLFIO therefore works exclusively with borrowed views of other path storage.</p>
 <p>Some of the API for <code>std::filesystem::path</code> is replicated here, however any APIs which modify the path other than taking subsets are obviously not possible with borrowed views.</p>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000003">Todo:</a></b></dt><dd>Lots of member functions remain to be implemented.</dd></dl>
 <h1>Windows specific notes:</h1>
-<p>Be aware that on Microsoft Windows, the native path storage <code>std::filesystem::path::value_type</code> is a <code>wchar_t</code> referring to UTF-16. However much of AFIO path usage is a <code>path_handle</code> to somewhere on the filing system plus a relative <code>const char *</code> UTF-8 path fragment as the use of absolute paths is discouraged. Rather than complicate the ABI to handle templated path character types, on Microsoft Windows only we do the following:</p>
+<p>Be aware that on Microsoft Windows, the native path storage <code>std::filesystem::path::value_type</code> is a <code>wchar_t</code> referring to UTF-16. However much of LLFIO path usage is a <code>path_handle</code> to somewhere on the filing system plus a relative <code>const char *</code> UTF-8 path fragment as the use of absolute paths is discouraged. Rather than complicate the ABI to handle templated path character types, on Microsoft Windows only we do the following:</p>
 <ul>
 <li>If view input is <code>wchar_t</code>, the original source is passed through unmodified to the syscall without any memory allocation, copying nor slash conversion.</li>
 <li>If view input is <code>char</code>:<ol type="1">
@@ -280,10 +280,10 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>c_str</b></td></tr>
 </ol>
 </li>
 </ul>
-<p>AFIO calls the NT kernel API directly rather than the Win32 API for:</p>
+<p>LLFIO calls the NT kernel API directly rather than the Win32 API for:</p>
 <ul>
 <li>For any paths relative to a <code>path_handle</code> (the Win32 API does not provide a race free file system API).</li>
-<li>For any paths beginning with <code>\!!\</code>, we pass the path + 3 characters directly through. This prefix is a pure AFIO extension, and will not be recognised by other code.</li>
+<li>For any paths beginning with <code>\!!\</code>, we pass the path + 3 characters directly through. This prefix is a pure LLFIO extension, and will not be recognised by other code.</li>
 <li>For any paths beginning with <code>\??\</code>, we pass the path + 0 characters directly through. Note the NT kernel keeps a symlink at <code>\??\</code> which refers to the DosDevices namespace for the current login, so as an incorrect relation which you should <b>not</b> rely on, the Win32 path <code>C:\foo</code> probably will appear at <code>\??\C:\foo</code>.</li>
 </ul>
 <p>These prefixes are still passed to the Win32 API:</p>

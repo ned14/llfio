@@ -204,7 +204,7 @@ Protected Member Functions</h2></td></tr>
 <li>Similarly older operating systems (e.g. Linux &lt; 3.0) do not implement extent hole punching and therefore will also see excessive disk space consumption. Note at the time of writing OS X doesn't implement hole punching at all.</li>
 <li>If your OS doesn't have sane byte range locks (OS X, BSD, older Linuxes) and multiple objects in your process use the same lock file, misoperation will occur. Use lock_files instead.</li>
 </ul>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000004">Todo:</a></b></dt><dd><p class="startdd">Implement hole punching once I port that code from AFIO v1. </p>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000004">Todo:</a></b></dt><dd><p class="startdd">Implement hole punching once I port that code from LLFIO v1. </p>
 <p>Decide on some resolution mechanism for sudden process exit. </p>
 <p class="enddd">There is a 1 out of 2^64-2 chance of unique id collision. It would be nice if we actually formally checked that our chosen unique id is actually unique. </p>
 </dd></dl>
