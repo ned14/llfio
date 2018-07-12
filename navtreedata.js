@@ -39,14 +39,14 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html#adc6284803080e42505ba812d4711bb74",
-"classllfio__v2__xxx_1_1file__handle.html#adf4f016382816f3ad07838fece06bd25",
-"classllfio__v2__xxx_1_1map__handle.html#a4471012e7b85ac6dea1d0af43f1ee4e6",
-"classllfio__v2__xxx_1_1path__view.html#a0f19b4fa899ae090c7143946b4349dea",
-"functions_vars.html",
-"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a4307b0d40e25aeaab451539f75140f62",
-"structllfio__v2__xxx_1_1native__handle__type.html#ac0d26bcb12d0f9baa757ee44df1ffbf9",
-"structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html#ae8860b3934d76d9e0b1d6a3eadd9676b"
+"classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html#a573150086df5bb6db571443b98f08776",
+"classllfio__v2__xxx_1_1fs__handle.html",
+"classllfio__v2__xxx_1_1map__handle.html#a5929f46f42112bd805ab5001bfbf9d2aa334c4a4c42fdb79d7ebc3e73b517e6f8",
+"classllfio__v2__xxx_1_1path__handle.html#aec00c90b9b840886be11f846d161415b",
+"functions_o.html",
+"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a316f0f8773d00ba317e2ec83f767f48f",
+"structllfio__v2__xxx_1_1native__handle__type.html#a8a38d56b1a9a3ee70799df3dac04edfc",
+"structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html#acf09944b61a0e84f7d72dd4a87ffb76d"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

@@ -66,8 +66,8 @@ var hierarchy =
     [ "llfio_v2_xxx::utils::page_allocator< void >", "classllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4.html", null ],
     [ "llfio_v2_xxx::path_hasher", "structllfio__v2__xxx_1_1path__hasher.html", null ],
     [ "llfio_v2_xxx::path_view", "classllfio__v2__xxx_1_1path__view.html", null ],
-    [ "llfio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
     [ "llfio_v2_xxx::utils::page_allocator< void >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
+    [ "llfio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
     [ "result", null, [
       [ "llfio_v2_xxx::io_handle::io_result< T >", "structllfio__v2__xxx_1_1io__handle_1_1io__result.html", null ]
     ] ],
@@ -80,8 +80,9 @@ var hierarchy =
       [ "llfio_v2_xxx::algorithm::shared_fs_mutex::safe_byte_ranges", "classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html", null ]
     ] ],
     [ "span", null, [
-      [ "llfio_v2_xxx::algorithm::mapped_span< T >", "classllfio__v2__xxx_1_1algorithm_1_1mapped__span.html", null ],
-      [ "llfio_v2_xxx::directory_handle::buffers_type", "structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html", null ]
+      [ "llfio_v2_xxx::directory_handle::buffers_type", "structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html", null ],
+      [ "llfio_v2_xxx::map_view< T >", "classllfio__v2__xxx_1_1map__view.html", null ],
+      [ "llfio_v2_xxx::mapped< T >", "classllfio__v2__xxx_1_1mapped.html", null ]
     ] ],
     [ "llfio_v2_xxx::stat_t", "structllfio__v2__xxx_1_1stat__t.html", null ],
     [ "llfio_v2_xxx::statfs_t", "structllfio__v2__xxx_1_1statfs__t.html", null ],

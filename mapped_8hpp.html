@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>LLFIO: Class Members - Functions</title>
+<title>LLFIO: include/llfio/v2.0/mapped.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,7 +62,7 @@ $(function() {
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('functions_func_m.html','');});
+$(document).ready(function(){initNavTree('mapped_8hpp.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -79,59 +79,40 @@ $(document).ready(function(){initNavTree('functions_func_m.html','');});
 </iframe>
 </div>
 
+<div class="header">
+  <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
+<a href="#namespaces">Namespaces</a>  </div>
+  <div class="headertitle">
+<div class="title">mapped.hpp File Reference</div>  </div>
+</div><!--header-->
 <div class="contents">
-&#160;
 
-<h3><a id="index_m"></a>- m -</h3><ul>
-<li>map()
-: <a class="el" href="classllfio__v2__xxx_1_1map__handle.html#ab277e359769f7873b5ec6687e65b6ba9">llfio_v2_xxx::map_handle</a>
-, <a class="el" href="classllfio__v2__xxx_1_1mapped.html#a242f94515ea03ad443afe5ecefa297a0">llfio_v2_xxx::mapped&lt; T &gt;</a>
-, <a class="el" href="classllfio__v2__xxx_1_1mapped__file__handle.html#aa7d0b35d39cdb39053da2816d42117bf">llfio_v2_xxx::mapped_file_handle</a>
-</li>
-<li>map_handle()
-: <a class="el" href="classllfio__v2__xxx_1_1map__handle.html#aa3225a2ee86b12e6099d15a2a87b99b4">llfio_v2_xxx::map_handle</a>
-</li>
-<li>map_view()
-: <a class="el" href="classllfio__v2__xxx_1_1map__view.html#acc3a035ab192f6debac1cae05303f5b6">llfio_v2_xxx::map_view&lt; T &gt;</a>
-</li>
-<li>mapped()
-: <a class="el" href="classllfio__v2__xxx_1_1mapped.html#a0c0b040a5d05978636dd20289fe5d16a">llfio_v2_xxx::mapped&lt; T &gt;</a>
-</li>
-<li>mapped_file()
-: <a class="el" href="classllfio__v2__xxx_1_1mapped__file__handle.html#a281a4659f90aef5b74c460611b11455a">llfio_v2_xxx::mapped_file_handle</a>
-</li>
-<li>mapped_file_handle()
-: <a class="el" href="classllfio__v2__xxx_1_1mapped__file__handle.html#a4aa124e03ec6376c70d9e07c548d0d44">llfio_v2_xxx::mapped_file_handle</a>
-</li>
-<li>mapped_random_file()
-: <a class="el" href="classllfio__v2__xxx_1_1mapped__file__handle.html#aec48e49378e8b4ef60db282d2360b89f">llfio_v2_xxx::mapped_file_handle</a>
-</li>
-<li>mapped_temp_file()
-: <a class="el" href="classllfio__v2__xxx_1_1mapped__file__handle.html#a6e47ccbb537d1c97a533e08d708b1a38">llfio_v2_xxx::mapped_file_handle</a>
-</li>
-<li>mapped_temp_inode()
-: <a class="el" href="classllfio__v2__xxx_1_1mapped__file__handle.html#ae385ed0e4be736c60025786be9109b9b">llfio_v2_xxx::mapped_file_handle</a>
-</li>
-<li>max_buffers()
-: <a class="el" href="classllfio__v2__xxx_1_1io__handle.html#ade38a6d55a4eda3c6d5e196683b129a7">llfio_v2_xxx::io_handle</a>
-</li>
-<li>max_size()
-: <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a90fee73d85b733951eab9c2f505f030e">llfio_v2_xxx::algorithm::impl::trivial_vector_impl&lt; has_default_construction, T &gt;</a>
-, <a class="el" href="structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a4ceec137ccb252012d507cd9a962a490">llfio_v2_xxx::storage_profile::storage_profile</a>
-</li>
-<li>maximum_extent()
-: <a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a7991af58283025b80a7225866643f0b4">llfio_v2_xxx::file_handle</a>
-, <a class="el" href="classllfio__v2__xxx_1_1mapped__file__handle.html#a0723a6ba04a578754bb601541be832d0">llfio_v2_xxx::mapped_file_handle</a>
-</li>
-<li>memory_map()
-: <a class="el" href="classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a70d275a5256eec64030bfffa87acdb87">llfio_v2_xxx::algorithm::shared_fs_mutex::memory_map&lt; Hasher, HashIndexSize, SpinlockType &gt;</a>
-</li>
-</ul>
-</div><!-- contents -->
+<p>Provides typed view of mapped section.  
+<a href="#details">More...</a></p>
+<div class="textblock"><code>#include &quot;<a class="el" href="mapped__file__handle_8hpp.html">mapped_file_handle.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="utils_8hpp.html">utils.hpp</a>&quot;</code><br />
+</div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1mapped.html">llfio_v2_xxx::mapped&lt; T &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides an owning, typed view of memory mapped from a <code>section_handle</code> or a <code>file_handle</code> suitable for feeding to STL algorithms or the Ranges TS.  <a href="classllfio__v2__xxx_1_1mapped.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:namespacellfio__v2__xxx"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html">llfio_v2_xxx</a></td></tr>
+<tr class="memdesc:namespacellfio__v2__xxx"><td class="mdescLeft">&#160;</td><td class="mdescRight">The LLFIO namespace. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Provides typed view of mapped section. </p>
+</div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
+    <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_9ffbcff25eb6a2bb8ed044f6c5d983c9.html">llfio</a></li><li class="navelem"><a class="el" href="dir_ff8d8ad368a820031e12dd9b12d79036.html">v2.0</a></li><li class="navelem"><a class="el" href="mapped_8hpp.html">mapped.hpp</a></li>
     <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
