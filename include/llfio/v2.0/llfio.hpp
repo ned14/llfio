@@ -68,14 +68,13 @@ import LLFIO_MODULE_NAME;
 #include "file_handle.hpp"
 #endif
 #include "directory_handle.hpp"
-#include "map_handle.hpp"
+#include "map_view.hpp"
 #include "statfs.hpp"
 #ifndef LLFIO_LEAN_AND_MEAN
 #include "storage_profile.hpp"
 #endif
 
 #include "algorithm/cached_parent_handle_adapter.hpp"
-#include "algorithm/mapped_span.hpp"
 #include "algorithm/shared_fs_mutex/atomic_append.hpp"
 #include "algorithm/shared_fs_mutex/byte_ranges.hpp"
 #include "algorithm/shared_fs_mutex/lock_files.hpp"

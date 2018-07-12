@@ -224,7 +224,7 @@ void malloc1()
   mh.do_not_store({mh.address(), mh.length()}).value();
 
   // Fill the memory with 'b' C++ style, probably faulting new pages into existence
-  llfio::algorithm::mapped_span<char> p2(mh);
+  llfio::map_view<char> p2(mh);
   std::fill(p2.begin(), p2.end(), 'b');
 
   // Kick the contents of the memory out to the swap file so it is no longer cached in RAM
@@ -245,7 +245,7 @@ void malloc1()
   // You can actually save yourself some time and skip manually creating map handles.
   // Just construct a mapped_span directly, this creates an internal map_handle instance,
   // so memory is released when the span is destroyed
-  llfio::algorithm::mapped_span<float> f(1000);  // 1000 floats, allocated used mmap()
+  llfio::mapped<float> f(1000);  // 1000 floats, allocated used mmap()
   std::fill(f.begin(), f.end(), 1.23f);
   //! [malloc1]
 }
@@ -263,18 +263,18 @@ void malloc2()
 
   {
     // Map it into memory, and fill it with 'a'
-    llfio::algorithm::mapped_span<char> ms1(sh);
+    llfio::mapped<char> ms1(sh);
     std::fill(ms1.begin(), ms1.end(), 'a');
 
     // Destructor unmaps it from memory
   }
 
   // Map it into memory again, verify it contains 'a'
-  llfio::algorithm::mapped_span<char> ms1(sh);
+  llfio::mapped<char> ms1(sh);
   assert(ms1[0] == 'a');
 
   // Map a *second view* of the same memory
-  llfio::algorithm::mapped_span<char> ms2(sh);
+  llfio::mapped<char> ms2(sh);
   assert(ms2[0] == 'a');
 
   // The addresses of the two maps are unique
@@ -380,7 +380,7 @@ void sparse_array()
   (void) mfh.truncate(1000000000000ULL * sizeof(int));
 
   // Create a typed view of the one trillion integers
-  llfio::algorithm::mapped_span<int> one_trillion_int_array(mfh);
+  llfio::map_view<int> one_trillion_int_array(mfh);
 
   // Write and read as you see fit, if you exceed physical RAM it'll be paged out
   one_trillion_int_array[0] = 5;
