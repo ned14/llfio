@@ -26,7 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #error Must be included by ../path_discovery.ipp only
 #endif
 
-#include "../../../algorithm/mapped_span.hpp"
+#include "../../../mapped.hpp"
 
 #include <pwd.h>
 
@@ -77,7 +77,7 @@ namespace path_discovery
       }
       else
       {
-        algorithm::mapped_span<const char> passwd(_passwdh.value());
+        mapped<const char> passwd(_passwdh.value());
         /* This will consist of lines of the form:
 
         jsmith:x:1001:1000:Joe Smith,Room 1007,(234)555-8910,(234)555-0044,email:/home/jsmith:/bin/sh
