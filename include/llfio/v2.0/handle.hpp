@@ -471,9 +471,9 @@ namespace detail
 #ifndef LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
 
 //! Helper for constructing an error code from an errc
-inline error_code generic_error(errc c)
+inline file_io_error generic_error(errc c)
 {
-  SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::generic_code::domain_type>> sc(c);
+  SYSTEM_ERROR2_NAMESPACE::status_code<file_io_error_domain<SYSTEM_ERROR2_NAMESPACE::generic_code::domain_type>> sc(c);
   if(sc.failure())
   {
     detail::fill_failure_info(sc.value(), sc);
@@ -482,9 +482,9 @@ inline error_code generic_error(errc c)
 }
 #ifndef _WIN32
 //! Helper for constructing an error code from a POSIX errno
-inline error_code posix_error(int c)
+inline file_io_error posix_error(int c)
 {
-  SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::posix_code::domain_type>> sc(c);
+  SYSTEM_ERROR2_NAMESPACE::status_code<file_io_error_domain<SYSTEM_ERROR2_NAMESPACE::posix_code::domain_type>> sc(c);
   if(sc.failure())
   {
     detail::fill_failure_info(sc.value(), sc);
@@ -493,9 +493,9 @@ inline error_code posix_error(int c)
 }
 #else
 //! Helper for constructing an error code from a DWORD
-inline error_code win32_error(SYSTEM_ERROR2_NAMESPACE::win32::DWORD c)
+inline file_io_error win32_error(SYSTEM_ERROR2_NAMESPACE::win32::DWORD c)
 {
-  SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::win32_code::domain_type>> sc(c);
+  SYSTEM_ERROR2_NAMESPACE::status_code<file_io_error_domain<SYSTEM_ERROR2_NAMESPACE::win32_code::domain_type>> sc(c);
   if(sc.failure())
   {
     detail::fill_failure_info(sc.value(), sc);
@@ -503,9 +503,9 @@ inline error_code win32_error(SYSTEM_ERROR2_NAMESPACE::win32::DWORD c)
   return sc;
 }
 //! Helper for constructing an error code from a NTSTATUS
-inline error_code ntkernel_error(SYSTEM_ERROR2_NAMESPACE::win32::NTSTATUS c)
+inline file_io_error ntkernel_error(SYSTEM_ERROR2_NAMESPACE::win32::NTSTATUS c)
 {
-  SYSTEM_ERROR2_NAMESPACE::status_code<error_domain<SYSTEM_ERROR2_NAMESPACE::nt_code::domain_type>> sc(c);
+  SYSTEM_ERROR2_NAMESPACE::status_code<file_io_error_domain<SYSTEM_ERROR2_NAMESPACE::nt_code::domain_type>> sc(c);
   if(sc.failure())
   {
     detail::fill_failure_info(sc.value(), sc);

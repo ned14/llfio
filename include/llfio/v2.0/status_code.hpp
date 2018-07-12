@@ -44,7 +44,7 @@ status codes for LLFIO with these combinations:
 
 Each of these is a separate LLFIO custom status code domain. We also define
 an erased form of these custom domains, and that is typedefed to
-error_domain<intptr_t>::value_type.
+file_io_error_domain<intptr_t>::value_type.
 
 This design ensure that LLFIO can be configured into either std-based error
 handling or SG14 experimental status code handling. It defaults to the latter
@@ -64,7 +64,7 @@ LLFIO_V2_NAMESPACE_BEGIN
 
 namespace detail
 {
-  template <class T> struct error_domain_value_type
+  template <class T> struct file_io_error_value_type
   {
     //! \brief The type of code
     T sc{};
@@ -77,10 +77,10 @@ namespace detail
     size_t _log_id{static_cast<size_t>(-1)};
 
     //! Default construction
-    error_domain_value_type() = default;
+    file_io_error_value_type() = default;
 
     //! Implicitly constructs an instance
-    constexpr inline error_domain_value_type(T _sc)
+    constexpr inline file_io_error_value_type(T _sc)
         : sc(_sc)
     {
     }  // NOLINT
@@ -90,7 +90,7 @@ namespace detail
   };
 }
 
-template <class BaseStatusCodeDomain> class error_domain;
+template <class BaseStatusCodeDomain> class file_io_error_domain;
 
 LLFIO_V2_NAMESPACE_END
 
@@ -98,7 +98,7 @@ LLFIO_V2_NAMESPACE_END
 SYSTEM_ERROR2_NAMESPACE_BEGIN
 namespace mixins
 {
-  template <class Base, class BaseStatusCodeDomain> struct mixin<Base, ::LLFIO_V2_NAMESPACE::error_domain<BaseStatusCodeDomain>> : public Base
+  template <class Base, class BaseStatusCodeDomain> struct mixin<Base, ::LLFIO_V2_NAMESPACE::file_io_error_domain<BaseStatusCodeDomain>> : public Base
   {
     using Base::Base;
 
@@ -148,12 +148,12 @@ SYSTEM_ERROR2_NAMESPACE_END
 
 LLFIO_V2_NAMESPACE_BEGIN
 
-/*! \class error_domain
+/*! \class file_io_error_domain
 \brief The SG14 status code domain for errors in LLFIO.
 */
-template <class BaseStatusCodeDomain> class error_domain : public BaseStatusCodeDomain
+template <class BaseStatusCodeDomain> class file_io_error_domain : public BaseStatusCodeDomain
 {
-  friend class SYSTEM_ERROR2_NAMESPACE::status_code<error_domain>;
+  friend class SYSTEM_ERROR2_NAMESPACE::status_code<file_io_error_domain>;
   using _base = BaseStatusCodeDomain;
 
 public:
@@ -161,20 +161,20 @@ public:
   using atomic_refcounted_string_ref = typename BaseStatusCodeDomain::atomic_refcounted_string_ref;
 
   //! \brief The value type of errors in LLFIO
-  using value_type = detail::error_domain_value_type<typename _base::value_type>;
+  using value_type = detail::file_io_error_value_type<typename _base::value_type>;
 
-  error_domain() = default;
-  error_domain(const error_domain &) = default;
-  error_domain(error_domain &&) = default;
-  error_domain &operator=(const error_domain &) = default;
-  error_domain &operator=(error_domain &&) = default;
-  ~error_domain() = default;
+  file_io_error_domain() = default;
+  file_io_error_domain(const file_io_error_domain &) = default;
+  file_io_error_domain(file_io_error_domain &&) = default;
+  file_io_error_domain &operator=(const file_io_error_domain &) = default;
+  file_io_error_domain &operator=(file_io_error_domain &&) = default;
+  ~file_io_error_domain() = default;
 
 protected:
   virtual inline string_ref _do_message(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept override final
   {
     assert(code.domain() == *this);
-    const auto &v = static_cast<const SYSTEM_ERROR2_NAMESPACE::status_code<error_domain> &>(code);  // NOLINT
+    const auto &v = static_cast<const SYSTEM_ERROR2_NAMESPACE::status_code<file_io_error_domain> &>(code);  // NOLINT
     // Get the paths for this failure, if any, using the mixins from above
     auto paths = v._paths();
     // Get the base message for this failure
@@ -225,19 +225,19 @@ protected:
 };
 
 #else   // LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
-template <class BaseStatusCodeDomain> using error_domain = BaseStatusCodeDomain;
+template <class BaseStatusCodeDomain> using file_io_error_domain = BaseStatusCodeDomain;
 #endif  // LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
 
 namespace detail
 {
-  using error_domain_value_system_code = error_domain_value_type<SYSTEM_ERROR2_NAMESPACE::system_code::value_type>;
+  using file_io_error_domain_value_system_code = file_io_error_value_type<SYSTEM_ERROR2_NAMESPACE::system_code::value_type>;
 }
 
 //! An erased status code
-using error_code = SYSTEM_ERROR2_NAMESPACE::errored_status_code<SYSTEM_ERROR2_NAMESPACE::erased<detail::error_domain_value_system_code>>;
+using file_io_error = SYSTEM_ERROR2_NAMESPACE::errored_status_code<SYSTEM_ERROR2_NAMESPACE::erased<detail::file_io_error_domain_value_system_code>>;
 
 
-template <class T> using result = OUTCOME_V2_NAMESPACE::experimental::erased_result<T, error_code>;
+template <class T> using result = OUTCOME_V2_NAMESPACE::experimental::erased_result<T, file_io_error>;
 using OUTCOME_V2_NAMESPACE::success;
 using OUTCOME_V2_NAMESPACE::failure;
 using OUTCOME_V2_NAMESPACE::in_place_type;
@@ -246,22 +246,22 @@ using OUTCOME_V2_NAMESPACE::in_place_type;
 using SYSTEM_ERROR2_NAMESPACE::errc;
 
 //! Helper for constructing an error code from an errc
-inline error_code generic_error(errc c);
+inline file_io_error generic_error(errc c);
 #ifndef _WIN32
 //! Helper for constructing an error code from a POSIX errno
-inline error_code posix_error(int c = errno);
+inline file_io_error posix_error(int c = errno);
 #else
 //! Helper for constructing an error code from a DWORD
-inline error_code win32_error(SYSTEM_ERROR2_NAMESPACE::win32::DWORD c = SYSTEM_ERROR2_NAMESPACE::win32::GetLastError());
+inline file_io_error win32_error(SYSTEM_ERROR2_NAMESPACE::win32::DWORD c = SYSTEM_ERROR2_NAMESPACE::win32::GetLastError());
 //! Helper for constructing an error code from a NTSTATUS
-inline error_code ntkernel_error(SYSTEM_ERROR2_NAMESPACE::win32::NTSTATUS c);
+inline file_io_error ntkernel_error(SYSTEM_ERROR2_NAMESPACE::win32::NTSTATUS c);
 #endif
 
 namespace detail
 {
-  inline std::ostream &operator<<(std::ostream &s, const error_code &v) { return s << "llfio::error_code(" << v.message().c_str() << ")"; }
+  inline std::ostream &operator<<(std::ostream &s, const file_io_error &v) { return s << "llfio::file_io_error(" << v.message().c_str() << ")"; }
 }
-inline error_code error_from_exception(std::exception_ptr &&ep = std::current_exception(), error_code not_matched = generic_error(errc::resource_unavailable_try_again)) noexcept
+inline file_io_error error_from_exception(std::exception_ptr &&ep = std::current_exception(), file_io_error not_matched = generic_error(errc::resource_unavailable_try_again)) noexcept
 {
   if(!ep)
   {
