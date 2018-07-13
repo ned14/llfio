@@ -127,7 +127,7 @@ namespace key_value_store
        - uint128 key             16 bytes
        - value_history          104 bytes
     */
-    using open_hash_index = basic_open_hash_index<atomic_linear_memory_policy<key_type, value_history, 0>, LLFIO_V2_NAMESPACE::algorithm::mapped_span>;
+    using open_hash_index = basic_open_hash_index<atomic_linear_memory_policy<key_type, value_history, 0>, LLFIO_V2_NAMESPACE::mapped>;
     static_assert(sizeof(open_hash_index::value_type) == 128, "open_hash_index::value_type is wrong size");
 
     struct index
@@ -545,9 +545,9 @@ namespace key_value_store
     basic_key_value_store *_parent;
     struct _item
     {
-      basic_key_value_store::keyvalue_info kvi;  // the item's value when fetched
+      basic_key_value_store::keyvalue_info kvi;   // the item's value when fetched
       llfio::optional<span<const char>> towrite;  // the value to be written on commit
-      bool remove;                               // true if to remove
+      bool remove;                                // true if to remove
       _item(basic_key_value_store::keyvalue_info &&_kvi)
           : kvi(std::move(_kvi))
           , remove(false)
