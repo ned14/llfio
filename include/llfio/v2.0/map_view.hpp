@@ -54,7 +54,7 @@ public:
 
   \param map The mapped data to take a view upon.
   \param length The number of items to map, use -1 to mean the length of the input view.
-  \param byteoffset The item offset into the mapped file handle.
+  \param offset The item offset into the mapped file handle.
   */
   map_view(mapped<T> &map, size_type length = (size_type) -1, size_type offset = 0)             // NOLINT
   : span<T>(map.begin() + offset, (length == (size_type) -1) ? (map.size() - offset) : length)  // NOLINT

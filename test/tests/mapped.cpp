@@ -136,5 +136,5 @@ static inline void TestMappedView2()
   BOOST_CHECK(mfh.address() == nullptr);
 }
 
-KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, mapped_span1, "Tests that llfio::map_view works as expected", TestMappedView1())
+KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, mapped_span1, "Tests that llfio::mapped works as expected", TestMappedView1())
 KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, mapped_span2, "Tests that llfio::map_view works as expected", TestMappedView2())

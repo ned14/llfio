@@ -13,7 +13,7 @@ image: Visual Studio 2017
 init:
   - git config --global core.longpaths true
 
-clone_folder: c:\boost.afio
+clone_folder: c:\boost.llfio
 platform: x64 
 configuration: Release
 environment:
