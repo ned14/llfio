@@ -34,6 +34,13 @@ Distributed under the Boost Software License, Version 1.0.
 
 LLFIO_V2_NAMESPACE_BEGIN
 
+constexpr inline void _check_iovec_match()
+{
+  static_assert(sizeof(io_handle::buffer_type) == sizeof(iovec), "buffer_type and struct iovec do not match in size");
+  static_assert(offsetof(io_handle::buffer_type, _data) == offsetof(iovec, iov_base), "buffer_type and struct iovec do not have same offset of data member");
+  static_assert(offsetof(io_handle::buffer_type, _len) == offsetof(iovec, iov_len), "buffer_type and struct iovec do not have same offset of len member");
+}
+
 size_t io_handle::max_buffers() const noexcept
 {
   static size_t v;
@@ -76,7 +83,6 @@ io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_requ
     iov[n].iov_len = reqs.buffers[n].len;
   }
 #else
-  static_assert(sizeof(buffer_type) == sizeof(iovec), "buffer_type and struct iovec do not match");
   auto *iov = reinterpret_cast<struct iovec *>(reqs.buffers.data());
 #endif
 #ifndef NDEBUG
@@ -107,18 +113,18 @@ io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_requ
   }
   for(auto &buffer : reqs.buffers)
   {
-    if(buffer.len >= static_cast<size_t>(bytesread))
+    if(buffer.size() >= static_cast<size_t>(bytesread))
     {
-      bytesread -= buffer.len;
+      bytesread -= buffer.size();
     }
     else if(bytesread > 0)
     {
-      buffer.len = bytesread;
+      buffer = {buffer.data(), (size_type) bytesread};
       bytesread = 0;
     }
     else
     {
-      buffer.len = 0;
+      buffer = {buffer.data(), 0};
     }
   }
   return {reqs.buffers};
@@ -143,7 +149,6 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::
     iov[n].iov_len = reqs.buffers[n].len;
   }
 #else
-  static_assert(sizeof(buffer_type) == sizeof(iovec), "buffer_type and struct iovec do not match");
   auto *iov = reinterpret_cast<struct iovec *>(reqs.buffers.data());
 #endif
 #ifndef NDEBUG
@@ -174,18 +179,18 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::
   }
   for(auto &buffer : reqs.buffers)
   {
-    if(buffer.len >= static_cast<size_t>(byteswritten))
+    if(buffer.size() >= static_cast<size_t>(byteswritten))
     {
-      byteswritten -= buffer.len;
+      byteswritten -= buffer.size();
     }
     else if(byteswritten > 0)
     {
-      buffer.len = byteswritten;
+      buffer = {buffer.data(), (size_type) byteswritten};
       byteswritten = 0;
     }
     else
     {
-      buffer.len = 0;
+      buffer = {buffer.data(), 0};
     }
   }
   return {reqs.buffers};
@@ -257,8 +262,6 @@ result<io_handle::extent_guard> io_handle::lock(io_handle::extent_type offset, i
     {
       return errc::timed_out;
     }
-
-
     return posix_error();
   }
   return extent_guard(this, offset, bytes, exclusive);

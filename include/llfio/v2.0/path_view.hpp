@@ -122,16 +122,6 @@ maximum compatibility you should still use the Win32 API.
 class LLFIO_DECL path_view
 {
 public:
-  //! Character type
-  using value_type = char;
-  //! Pointer type
-  using pointer = char *;
-  //! Const pointer type
-  using const_pointer = const char *;
-  //! Reference type
-  using reference = char &;
-  //! Const reference type
-  using const_reference = const char &;
   // const_iterator
   // iterator
   // reverse_iterator
@@ -140,6 +130,9 @@ public:
   using size_type = std::size_t;
   //! Difference type
   using difference_type = std::ptrdiff_t;
+
+  //! The preferred separator type
+  static constexpr auto preferred_separator = filesystem::path::preferred_separator;
 
 private:
   static constexpr auto _npos = string_view::npos;
@@ -167,6 +160,16 @@ private:
   } _state;
   template <class U> constexpr auto _invoke(U &&f) noexcept { return !_state._utf16.empty() ? f(_state._utf16) : f(_state._utf8); }
   template <class U> constexpr auto _invoke(U &&f) const noexcept { return !_state._utf16.empty() ? f(_state._utf16) : f(_state._utf8); }
+  constexpr auto _find_first_sep(size_t startidx = 0) const noexcept
+  {
+    // wchar paths must use backslashes
+    if(!_state._utf16.empty())
+    {
+      return _state._utf16.find('\\', startidx);
+    }
+    // char paths can use either
+    return _state._utf8.find_first_of("/\\", startidx);
+  }
   constexpr auto _find_last_sep() const noexcept
   {
     // wchar paths must use backslashes
@@ -191,7 +194,8 @@ private:
   } _state;
   template <class U> constexpr auto _invoke(U &&f) noexcept { return f(_state._utf8); }
   template <class U> constexpr auto _invoke(U &&f) const noexcept { return f(_state._utf8); }
-  constexpr auto _find_last_sep() const noexcept { return _state._utf8.rfind(filesystem::path::preferred_separator); }
+  constexpr auto _find_first_sep(size_t startidx = 0) const noexcept { return _state._utf8.find(preferred_separator, startidx); }
+  constexpr auto _find_last_sep() const noexcept { return _state._utf8.rfind(preferred_separator); }
 #endif
 public:
   //! Constructs an empty path view
@@ -252,16 +256,38 @@ public:
   {
     return _invoke([](const auto &v) { return v.empty(); });
   }
-  constexpr bool has_root_path() const noexcept;
-  constexpr bool has_root_name() const noexcept;
-  constexpr bool has_root_directory() const noexcept;
-  constexpr bool has_relative_path() const noexcept;
-  constexpr bool has_parent_path() const noexcept;
-  constexpr bool has_filename() const noexcept;
-  constexpr bool has_stem() const noexcept;
-  constexpr bool has_extension() const noexcept;
-  constexpr bool is_absolute() const noexcept;
-  constexpr bool is_relative() const noexcept;
+  constexpr bool has_root_path() const noexcept { return !root_path().empty(); }
+  constexpr bool has_root_name() const noexcept { return !root_name().empty(); }
+  constexpr bool has_root_directory() const noexcept { return !root_directory().empty(); }
+  constexpr bool has_relative_path() const noexcept { return !relative_path().empty(); }
+  constexpr bool has_parent_path() const noexcept { return !parent_path().empty(); }
+  constexpr bool has_filename() const noexcept { return !filename().empty(); }
+  constexpr bool has_stem() const noexcept { return !stem().empty(); }
+  constexpr bool has_extension() const noexcept { return !extension().empty(); }
+  constexpr bool is_absolute() const noexcept
+  {
+    auto sep_idx = _find_first_sep();
+    if(_npos == sep_idx)
+    {
+      return false;
+    }
+#ifdef _WIN32
+    if(is_ntpath())
+      return true;
+    return _invoke([sep_idx](const auto &v) {
+      if(sep_idx == 0)
+      {
+        if(v[sep_idx + 1] == preferred_separator)  // double separator at front
+          return true;
+      }
+      auto colon_idx = v.find(':');
+      return colon_idx < sep_idx;  // colon before first separator
+    });
+#else
+    return sep_idx == 0;
+#endif
+  }
+  constexpr bool is_relative() const noexcept { return !is_absolute(); }
   // True if the path view contains any of the characters `*`, `?`, (POSIX only: `[` or `]`).
   constexpr bool contains_glob() const noexcept
   {
@@ -342,11 +368,109 @@ public:
   {
     return _invoke([](const auto &v) { return v.size(); });
   }
-  constexpr path_view root_name() const noexcept;
-  constexpr path_view root_directory() const noexcept;
-  constexpr path_view root_path() const noexcept;
-  constexpr path_view relative_path() const noexcept;
-  constexpr path_view parent_path() const noexcept;
+  //! Returns a view of the root name part of this view e.g. C:
+  constexpr path_view root_name() const noexcept
+  {
+    auto sep_idx = _find_first_sep();
+    if(_npos == sep_idx)
+    {
+      return path_view();
+    }
+    return _invoke([sep_idx](const auto &v) { return path_view(v.data(), sep_idx); });
+  }
+  //! Returns a view of the root directory, if there is one e.g. /
+  constexpr path_view root_directory() const noexcept
+  {
+    auto sep_idx = _find_first_sep();
+    if(_npos == sep_idx)
+    {
+      return path_view();
+    }
+    return _invoke([sep_idx](const auto &v) {
+#ifdef _WIN32
+      auto colon_idx = v.find(':');
+      if(colon_idx < sep_idx)
+      {
+        return path_view(v.data() + sep_idx, 1);
+      }
+#endif
+      if(sep_idx == 0)
+      {
+        return path_view(v.data(), 1);
+      }
+      return path_view();
+    });
+  }
+  //! Returns, if any, a view of the root path part of this view e.g. C:/
+  constexpr path_view root_path() const noexcept
+  {
+    auto sep_idx = _find_first_sep();
+    if(_npos == sep_idx)
+    {
+      return path_view();
+    }
+    return _invoke([this, sep_idx](const auto &v) {
+#ifdef _WIN32
+      if(is_ntpath())
+      {
+        return path_view(v.data() + 3, 1);
+      }
+      // Special case \\.\ and \\?\ to match filesystem::path
+      if(v.size() >= 4 && sep_idx == 0 && v[1] == '\\' && (v[2] == '.' || v[2] == '?') && v[3] == '\\')
+      {
+        return path_view(v.data() + 0, 4);
+      }
+      auto colon_idx = v.find(':');
+      if(colon_idx < sep_idx)
+      {
+        return path_view(v.data(), sep_idx + 1);
+      }
+#endif
+      if(sep_idx == 0)
+      {
+        return path_view(v.data(), 1);
+      }
+      return path_view();
+    });
+  }
+  //! Returns a view of everything after the root path
+  constexpr path_view relative_path() const noexcept
+  {
+    auto sep_idx = _find_first_sep();
+    if(_npos == sep_idx)
+    {
+      return *this;
+    }
+    return _invoke([this, sep_idx](const auto &v) {
+#ifdef _WIN32
+      // Special case \\.\ and \\?\ to match filesystem::path
+      if(v.size() >= 4 && sep_idx == 0 && v[1] == '\\' && (v[2] == '.' || v[2] == '?') && v[3] == '\\')
+      {
+        return path_view(v.data() + 4, v.size() - 4);
+      }
+      auto colon_idx = v.find(':');
+      if(colon_idx < sep_idx)
+      {
+        return path_view(v.data() + sep_idx + 1, v.size() - sep_idx - 1);
+      }
+#endif
+      if(sep_idx == 0)
+      {
+        return path_view(v.data() + 1, v.size() - 1);
+      }
+      return path_view(v.data(), v.size());
+    });
+  }
+  //! Returns a view of the everything apart from the filename part of this view
+  constexpr path_view parent_path() const noexcept
+  {
+    auto sep_idx = _find_last_sep();
+    if(_npos == sep_idx)
+    {
+      return path_view();
+    }
+    return _invoke([sep_idx](const auto &v) { return path_view(v.data(), sep_idx); });
+  }
   //! Returns a view of the filename part of this view.
   constexpr path_view filename() const noexcept
   {
@@ -357,8 +481,32 @@ public:
     }
     return _invoke([sep_idx](const auto &v) { return path_view(v.data() + sep_idx + 1, v.size() - sep_idx - 1); });
   }
-  constexpr path_view stem() const noexcept;
-  constexpr path_view extension() const noexcept;
+  //! Returns a view of the filename without any file extension
+  constexpr path_view stem() const noexcept
+  {
+    auto sep_idx = _find_last_sep();
+    return _invoke([sep_idx](const auto &v) {
+      auto dot_idx = v.rfind('.');
+      if(_npos == dot_idx || (_npos != sep_idx && dot_idx < sep_idx) || dot_idx == sep_idx + 1 || (dot_idx == sep_idx + 2 && v[dot_idx - 1] == '.'))
+      {
+        return path_view(v.data() + sep_idx + 1, v.size() - sep_idx - 1);
+      }
+      return path_view(v.data() + sep_idx + 1, dot_idx - sep_idx - 1);
+    });
+  }
+  //! Returns a view of the file extension part of this view
+  constexpr path_view extension() const noexcept
+  {
+    auto sep_idx = _find_last_sep();
+    return _invoke([sep_idx](const auto &v) {
+      auto dot_idx = v.rfind('.');
+      if(_npos == dot_idx || (_npos != sep_idx && dot_idx < sep_idx) || dot_idx == sep_idx + 1 || (dot_idx == sep_idx + 2 && v[dot_idx - 1] == '.'))
+      {
+        return path_view();
+      }
+      return path_view(v.data() + dot_idx, v.size() - dot_idx);
+    });
+  }
 
   //! Return the path view as a path.
   filesystem::path path() const

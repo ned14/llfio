@@ -189,11 +189,11 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
   // Check for overflow
   for(const auto &req : reqs.buffers)
   {
-    if(bytes + req.len < bytes)
+    if(bytes + req.size() < bytes)
     {
       return errc::value_too_large;
     }
-    bytes += req.len;
+    bytes += req.size();
   }
   // If empty, do the whole file
   if(reqs.buffers.empty())
@@ -204,7 +204,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
   if(!and_metadata && is_nvram())
   {
     auto synced = barrier({addr, bytes});
-    if(synced.len >= bytes)
+    if(synced.size() >= bytes)
     {
       return {reqs.buffers};
     }
@@ -426,17 +426,17 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
 result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_handle::flag flag) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  if(region.data == nullptr)
+  if(region.data() == nullptr)
   {
     return errc::invalid_argument;
   }
   // Set permissions on the pages
   region = utils::round_to_page_size(region);
-  extent_type offset = _offset + (region.data - _addr);
-  size_type bytes = region.len;
-  OUTCOME_TRYV(do_mmap(_v, region.data, MAP_FIXED, _section, bytes, offset, flag));
+  extent_type offset = _offset + (region.data() - _addr);
+  size_type bytes = region.size();
+  OUTCOME_TRYV(do_mmap(_v, region.data(), MAP_FIXED, _section, bytes, offset, flag));
   // Tell the kernel we will be using these pages soon
-  if(-1 == ::madvise(region.data, region.len, MADV_WILLNEED))
+  if(-1 == ::madvise(region.data(), region.size(), MADV_WILLNEED))
   {
     return posix_error();
   }
@@ -446,51 +446,51 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
 result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  if(region.data == nullptr)
+  if(region.data() == nullptr)
   {
     return errc::invalid_argument;
   }
   region = utils::round_to_page_size(region);
   // Tell the kernel to kick these pages into storage
-  if(-1 == ::madvise(region.data, region.len, MADV_DONTNEED))
+  if(-1 == ::madvise(region.data(), region.size(), MADV_DONTNEED))
   {
     return posix_error();
   }
   // Set permissions on the pages to no access
-  extent_type offset = _offset + (region.data - _addr);
-  size_type bytes = region.len;
-  OUTCOME_TRYV(do_mmap(_v, region.data, MAP_FIXED, _section, bytes, offset, section_handle::flag::none));
+  extent_type offset = _offset + (region.data() - _addr);
+  size_type bytes = region.size();
+  OUTCOME_TRYV(do_mmap(_v, region.data(), MAP_FIXED, _section, bytes, offset, section_handle::flag::none));
   return region;
 }
 
 result<void> map_handle::zero_memory(buffer_type region) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  if(region.data == nullptr)
+  if(region.data() == nullptr)
   {
     return errc::invalid_argument;
   }
 #ifdef MADV_REMOVE
-  buffer_type page_region{utils::round_up_to_page_size(region.data), utils::round_down_to_page_size(region.len)};
+  buffer_type page_region{utils::round_up_to_page_size(region.data()), utils::round_down_to_page_size(region.size())};
   // Zero contents and punch a hole in any backing storage
-  if((page_region.len != 0u) && -1 != ::madvise(page_region.data, page_region.len, MADV_REMOVE))
+  if((page_region.size() != 0u) && -1 != ::madvise(page_region.data(), page_region.size(), MADV_REMOVE))
   {
-    memset(region.data, 0, page_region.data - region.data);
-    memset(page_region.data + page_region.len, 0, (region.data + region.len) - (page_region.data + page_region.len));
+    memset(region.data(), 0, page_region.data() - region.data());
+    memset(page_region.data() + page_region.size(), 0, (region.data() + region.size()) - (page_region.data() + page_region.size()));
     return success();
   }
 #endif
   //! Only Linux implements syscall zero(), and it's covered by MADV_REMOVE already
-  memset(region.data, 0, region.len);
+  memset(region.data(), 0, region.size());
   return success();
 }
 
 result<span<map_handle::buffer_type>> map_handle::prefetch(span<buffer_type> regions) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(0);
-  for(const auto &region : regions)
+  for(auto &region : regions)
   {
-    if(-1 == ::madvise(region.data, region.len, MADV_WILLNEED))
+    if(-1 == ::madvise(region.data(), region.size(), MADV_WILLNEED))
     {
       return posix_error();
     }
@@ -502,25 +502,25 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
 {
   LLFIO_LOG_FUNCTION_CALL(0);
   region = utils::round_to_page_size(region);
-  if(region.data == nullptr)
+  if(region.data() == nullptr)
   {
     return errc::invalid_argument;
   }
 #ifdef MADV_FREE
   // Lightweight unset of dirty bit for these pages. Needs FreeBSD or very recent Linux.
-  if(-1 != ::madvise(region.data, region.len, MADV_FREE))
+  if(-1 != ::madvise(region.data(), region.size(), MADV_FREE))
     return region;
 #endif
 #ifdef MADV_REMOVE
   // This is rather heavy weight in that it also punches a hole in any backing storage
   // but it works on Linux for donkey's years
-  if(-1 != ::madvise(region.data, region.len, MADV_REMOVE))
+  if(-1 != ::madvise(region.data(), region.size(), MADV_REMOVE))
   {
     return region;
   }
 #endif
   // No support on this platform
-  region.len = 0;
+  region = {region.data(), 0};
   return region;
 }
 
@@ -533,17 +533,17 @@ map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buff
   {
     if(togo != 0u)
     {
-      req.data = addr;
-      if(req.len > togo)
+      req = {addr, req.size()};
+      if(req.size() > togo)
       {
-        req.len = togo;
+        req = {req.data(), togo};
       }
-      addr += req.len;
-      togo -= req.len;
+      addr += req.size();
+      togo -= req.size();
     }
     else
     {
-      req.len = 0;
+      req = {req.data(), 0};
     }
   }
   return reqs.buffers;
@@ -560,18 +560,18 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
                                                          {
                                                            if(togo != 0u)
                                                            {
-                                                             if(req.len > togo)
+                                                             if(req.size() > togo)
                                                              {
-                                                               req.len = togo;
+                                                               req = {req.data(), togo};
                                                              }
-                                                             memcpy(addr, req.data, req.len);
-                                                             req.data = addr;
-                                                             addr += req.len;
-                                                             togo -= req.len;
+                                                             memcpy(addr, req.data(), req.size());
+                                                             req = {addr, req.size()};
+                                                             addr += req.size();
+                                                             togo -= req.size();
                                                            }
                                                            else
                                                            {
-                                                             req.len = 0;
+                                                             req = {req.data(), 0};
                                                            }
                                                          }
                                                          return false;

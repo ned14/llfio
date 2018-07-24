@@ -68,8 +68,7 @@ namespace utils
   template <class T> inline T round_to_page_size(T i) noexcept
   {
     const size_t pagesize = page_size();
-    i.data = reinterpret_cast<byte *>((LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i.data)) & ~(pagesize - 1));
-    i.len = (i.len + pagesize - 1) & ~(pagesize - 1);
+    i = {reinterpret_cast<byte *>((LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i.data())) & ~(pagesize - 1)), (i.size() + pagesize - 1) & ~(pagesize - 1)};
     return i;
   }
 

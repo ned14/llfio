@@ -139,9 +139,9 @@ namespace algorithm
         do
         {
           OUTCOME_TRY(_, _h.read(0, {{reinterpret_cast<byte *>(&_header), 48}}));
-          if(_[0].data != reinterpret_cast<byte *>(&_header))
+          if(_[0].data() != reinterpret_cast<byte *>(&_header))
           {
-            memcpy(&_header, _[0].data, _[0].len);
+            memcpy(&_header, _[0].data(), _[0].size());
           }
           if(_skip_hashing)
           {
@@ -307,7 +307,8 @@ namespace algorithm
             std::terminate();
           }
           const atomic_append_detail::lock_request *record, *lastrecord;
-          for(record = reinterpret_cast<const atomic_append_detail::lock_request *>(readoutcome.value()[0].data), lastrecord = reinterpret_cast<const atomic_append_detail::lock_request *>(readoutcome.value()[0].data + readoutcome.value()[0].len); record < lastrecord && record->hash != lock_request.hash; ++record)
+          for(record = reinterpret_cast<const atomic_append_detail::lock_request *>(readoutcome.value()[0].data()), lastrecord = reinterpret_cast<const atomic_append_detail::lock_request *>(readoutcome.value()[0].data() + readoutcome.value()[0].size()); record < lastrecord && record->hash != lock_request.hash;
+              ++record)
           {
             my_lock_request_offset += sizeof(atomic_append_detail::lock_request);
           }
@@ -361,9 +362,9 @@ namespace algorithm
           assert(record_offset >= start_offset);
           assert(record_offset - start_offset <= sizeof(_buffer));
           OUTCOME_TRY(batchread, _h.read(start_offset, {{_buffer, (size_t)(record_offset - start_offset) + sizeof(atomic_append_detail::lock_request)}}));
-          assert(batchread[0].len == record_offset - start_offset + sizeof(atomic_append_detail::lock_request));
-          const atomic_append_detail::lock_request *record = reinterpret_cast<atomic_append_detail::lock_request *>(batchread[0].data + batchread[0].len - sizeof(atomic_append_detail::lock_request));
-          const atomic_append_detail::lock_request *firstrecord = reinterpret_cast<atomic_append_detail::lock_request *>(batchread[0].data);
+          assert(batchread[0].size() == record_offset - start_offset + sizeof(atomic_append_detail::lock_request));
+          const atomic_append_detail::lock_request *record = reinterpret_cast<atomic_append_detail::lock_request *>(batchread[0].data() + batchread[0].size() - sizeof(atomic_append_detail::lock_request));
+          const atomic_append_detail::lock_request *firstrecord = reinterpret_cast<atomic_append_detail::lock_request *>(batchread[0].data());
 
           // Skip all completed lock requests or not mentioning any of my entities
           for(; record >= firstrecord; record_offset -= sizeof(atomic_append_detail::lock_request), --record)
@@ -510,12 +511,12 @@ namespace algorithm
             }
             const auto &bytesread = bytesread_.value();
             // If read was partial, we are done after this round
-            if(bytesread[0].len < sizeof(_buffer))
+            if(bytesread[0].size() < sizeof(_buffer))
             {
               done = true;
             }
-            const auto *record = reinterpret_cast<const atomic_append_detail::lock_request *>(bytesread[0].data);
-            const auto *lastrecord = reinterpret_cast<const atomic_append_detail::lock_request *>(bytesread[0].data + bytesread[0].len);
+            const auto *record = reinterpret_cast<const atomic_append_detail::lock_request *>(bytesread[0].data());
+            const auto *lastrecord = reinterpret_cast<const atomic_append_detail::lock_request *>(bytesread[0].data() + bytesread[0].size());
             for(; record < lastrecord; ++record)
             {
               if(!record->hash && (record->unique_id == 0u))

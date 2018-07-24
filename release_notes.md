@@ -146,18 +146,13 @@ Todo:
 |   | ✔ | ✔ | Set random or sequential i/o (prefetch).
 | ✔ | ✔ | ✔ | i/o on `async_file_handle` is coroutines awaitable.
 | ✔ | ✔ |   | `llfio::algorithm::trivial_vector<T>` with constant time reallocation if `T` is trivially copyable.
-
-Todo to reach feature parity with LLFIO v1:
-
-| NEW in v2 | Windows | POSIX |     |
-| --------- | --------| ----- | --- |
-|   |   |   | `symlink_handle`.
-|   |   |   | BSD and OS X kqueues optimised `io_service`
+|   | ✔ | ✔ | `symlink_handle`.
 
 Todo thereafter in order of priority:
 
 | NEW in v2 | Windows | POSIX |     |
 | --------- | --------| ----- | --- |
+| ✔ |   |   | A mechanism for writing a `stat_t` onto an inode.
 | ✔ |   |   | Page allocator based on an index of linked list of free pages. See notes.
 | ✔ |   |   | Optionally concurrent B+ tree index based on page allocator for key-value store.
 | ✔ |   |   | Attributes extending `span<buffers_type>` with DMA colouring.

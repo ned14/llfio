@@ -958,7 +958,7 @@ inline HANDLE get_thread_local_waitable_timer()
 - sleep_interval: Set to the number of steady milliseconds until the sleep must end
 - sleep_object: Set to a primed deadline timer HANDLE which will signal when the system clock reaches the deadline
 */
-#define LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d)                                                                                                                                                                                                                                                                                     \
+#define LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d)                                                                                                                                                                                                                                                                                    \
   std::chrono::steady_clock::time_point began_steady;                                                                                                                                                                                                                                                                          \
   \
 std::chrono::system_clock::time_point end_utc;                                                                                                                                                                                                                                                                                 \
@@ -977,7 +977,7 @@ DWORD sleep_interval = INFINITE;                                                
   \
 HANDLE sleep_object = nullptr;
 
-#define LLFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d)                                                                                                                                                                                                                                                                                     \
+#define LLFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d)                                                                                                                                                                                                                                                                                    \
   \
 if(d)                                                                                                                                                                                                                                                                                                                          \
   \
@@ -1001,7 +1001,7 @@ if(d)                                                                           
   \
 }
 
-#define LLFIO_WIN_DEADLINE_TO_TIMEOUT(type, d)                                                                                                                                                                                                                                                                                  \
+#define LLFIO_WIN_DEADLINE_TO_TIMEOUT(type, d)                                                                                                                                                                                                                                                                                 \
   \
 if(d)                                                                                                                                                                                                                                                                                                                          \
   \
@@ -1025,7 +1025,7 @@ if(d)                                                                           
 - sleep_interval: Set to the number of steady milliseconds until the sleep must end
 - sleep_object: Set to a primed deadline timer HANDLE which will signal when the system clock reaches the deadline
 */
-#define LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d)                                                                                                                                                                                                                                                                                     \
+#define LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d)                                                                                                                                                                                                                                                                                    \
   std::chrono::steady_clock::time_point began_steady;                                                                                                                                                                                                                                                                          \
   \
 std::chrono::system_clock::time_point end_utc;                                                                                                                                                                                                                                                                                 \
@@ -1050,7 +1050,7 @@ if(d)                                                                           
   \
 }
 
-#define LLFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d)                                                                                                                                                                                                                                                                                     \
+#define LLFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d)                                                                                                                                                                                                                                                                                    \
   if((d) && (d).steady)                                                                                                                                                                                                                                                                                                        \
   {                                                                                                                                                                                                                                                                                                                            \
     std::chrono::nanoseconds ns = std::chrono::duration_cast<std::chrono::nanoseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());                                                                                                                                               \
@@ -1060,7 +1060,7 @@ if(d)                                                                           
       _timeout.QuadPart = ns.count() / -100;                                                                                                                                                                                                                                                                                   \
   }
 
-#define LLFIO_WIN_DEADLINE_TO_PARTIAL_DEADLINE(nd, d)                                                                                                                                                                                                                                                                           \
+#define LLFIO_WIN_DEADLINE_TO_PARTIAL_DEADLINE(nd, d)                                                                                                                                                                                                                                                                          \
   if(d)                                                                                                                                                                                                                                                                                                                        \
   {                                                                                                                                                                                                                                                                                                                            \
     if((d).steady)                                                                                                                                                                                                                                                                                                             \
@@ -1075,7 +1075,7 @@ if(d)                                                                           
       (nd) = (d);                                                                                                                                                                                                                                                                                                              \
   }
 
-#define LLFIO_WIN_DEADLINE_TO_TIMEOUT(d)                                                                                                                                                                                                                                                                                        \
+#define LLFIO_WIN_DEADLINE_TO_TIMEOUT(d)                                                                                                                                                                                                                                                                                       \
   \
 if(d)                                                                                                                                                                                                                                                                                                                          \
   \
@@ -1294,6 +1294,55 @@ inline result<DWORD> ntflags_from_handle_caching_and_flags(native_handle_type &n
     ntflags |= 0x00000004 /*FILE_SEQUENTIAL_ONLY*/;
   }
   return ntflags;
+}
+
+inline result<void> do_clone_handle(native_handle_type &dest, const native_handle_type &src, handle::mode mode_, handle::caching caching_, handle::flag _flags, bool isdir = false) noexcept
+{
+  // Fast path
+  if(mode_ == handle::mode::unchanged && caching_ == handle::caching::unchanged)
+  {
+    dest.behaviour = src.behaviour;
+    if(DuplicateHandle(GetCurrentProcess(), dest.h, GetCurrentProcess(), const_cast<HANDLE *>(&src.h), 0, 0, DUPLICATE_SAME_ACCESS) == 0)
+    {
+      return win32_error();
+    }
+    return success();
+  }
+  // Slow path
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  dest.behaviour |= src.behaviour & ~127U;  // propagate type of handle only
+  DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
+  OUTCOME_TRY(access, access_mask_from_handle_mode(dest, mode_, _flags));
+  OUTCOME_TRYV(attributes_from_handle_caching_and_flags(dest, caching_, _flags));
+  if(isdir)
+  {
+    /* It is super important that we remove the DELETE permission for directories as otherwise relative renames
+    will always fail due to an unfortunate design choice by Microsoft.
+    */
+    access &= ~DELETE;
+  }
+  OUTCOME_TRY(ntflags, ntflags_from_handle_caching_and_flags(dest, caching_, _flags));
+  ntflags |= 0x040 /*FILE_NON_DIRECTORY_FILE*/;  // do not open a directory
+  OBJECT_ATTRIBUTES oa{};
+  memset(&oa, 0, sizeof(oa));
+  oa.Length = sizeof(OBJECT_ATTRIBUTES);
+  // It is entirely undocumented that this is how you clone a file handle with new privs
+  UNICODE_STRING _path{};
+  memset(&_path, 0, sizeof(_path));
+  oa.ObjectName = &_path;
+  oa.RootDirectory = src.h;
+  IO_STATUS_BLOCK isb = make_iostatus();
+  NTSTATUS ntstat = NtOpenFile(&dest.h, access, &oa, &isb, fileshare, ntflags);
+  if(STATUS_PENDING == ntstat)
+  {
+    ntstat = ntwait(dest.h, isb, deadline());
+  }
+  if(ntstat < 0)
+  {
+    return ntkernel_error(ntstat);
+  }
+  return success();
 }
 
 /* Our own custom CreateFileW() implementation.

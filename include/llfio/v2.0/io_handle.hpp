@@ -51,10 +51,13 @@ public:
   using flag = handle::flag;
 
   //! The scatter buffer type used by this handle. Guaranteed to be `TrivialType` and `StandardLayoutType`.
+  //! Try to make address and length 64 byte, or ideally, `page_size()` aligned where possible.
   struct buffer_type
   {
     //! Type of the pointer to memory.
     using pointer = byte *;
+    //! Type of the pointer to memory.
+    using const_pointer = const byte *;
     //! Type of the iterator to memory.
     using iterator = byte *;
     //! Type of the iterator to memory.
@@ -62,29 +65,50 @@ public:
     //! Type of the length of memory.
     using size_type = size_t;
 
-    //! Pointer to memory to be filled by a read. Try to make this 64 byte, or ideally, `page_size()` aligned where possible.
-    pointer data;
-    //! The number of bytes to fill into this address. Try to make this a 64 byte multiple, or ideally, a whole multiple of `page_size()`.
-    size_type len;
+    //! Default constructor
+    buffer_type() = default;
+    //! Constructor
+    constexpr buffer_type(pointer data, size_type len) noexcept : _data(data), _len(len) {}
+    buffer_type(const buffer_type &) = default;
+    buffer_type(buffer_type &&) = default;
+    buffer_type &operator=(const buffer_type &) = default;
+    buffer_type &operator=(buffer_type &&) = default;
+    ~buffer_type() = default;
+
+    // Emulation of this being a span<byte> in the TS
+
+    //! Returns the address of the bytes for this buffer
+    constexpr pointer data() noexcept { return _data; }
+    //! Returns the address of the bytes for this buffer
+    constexpr const_pointer data() const noexcept { return _data; }
+    //! Returns the number of bytes in this buffer
+    constexpr size_type size() const noexcept { return _len; }
 
     //! Returns an iterator to the beginning of the buffer
-    constexpr iterator begin() { return data; }
+    constexpr iterator begin() noexcept { return _data; }
     //! Returns an iterator to the beginning of the buffer
-    constexpr const_iterator begin() const { return data; }
+    constexpr const_iterator begin() const noexcept { return _data; }
     //! Returns an iterator to the beginning of the buffer
-    constexpr const_iterator cbegin() const { return data; }
+    constexpr const_iterator cbegin() const noexcept { return _data; }
     //! Returns an iterator to after the end of the buffer
-    constexpr iterator end() { return data + len; }
+    constexpr iterator end() noexcept { return _data + _len; }
     //! Returns an iterator to after the end of the buffer
-    constexpr const_iterator end() const { return data + len; }
+    constexpr const_iterator end() const noexcept { return _data + _len; }
     //! Returns an iterator to after the end of the buffer
-    constexpr const_iterator cend() const { return data + len; }
+    constexpr const_iterator cend() const noexcept { return _data + _len; }
+  private:
+    friend constexpr inline void _check_iovec_match();
+    pointer _data;
+    size_type _len;
   };
   //! The gather buffer type used by this handle. Guaranteed to be `TrivialType` and `StandardLayoutType`.
+  //! Try to make address and length 64 byte, or ideally, `page_size()` aligned where possible.
   struct const_buffer_type
   {
     //! Type of the pointer to memory.
     using pointer = const byte *;
+    //! Type of the pointer to memory.
+    using const_pointer = const byte *;
     //! Type of the iterator to memory.
     using iterator = const byte *;
     //! Type of the iterator to memory.
@@ -92,23 +116,40 @@ public:
     //! Type of the length of memory.
     using size_type = size_t;
 
-    //! Pointer to memory to be written. Try to make this 64 byte, or ideally, `page_size()` aligned where possible.
-    pointer data;
-    //! The number of bytes to write from this address. Try to make this a 64 byte multiple, or ideally, a whole multiple of `page_size()`.
-    size_type len;
+    //! Default constructor
+    const_buffer_type() = default;
+    //! Constructor
+    constexpr const_buffer_type(pointer data, size_type len) noexcept : _data(data), _len(len) {}
+    const_buffer_type(const const_buffer_type &) = default;
+    const_buffer_type(const_buffer_type &&) = default;
+    const_buffer_type &operator=(const const_buffer_type &) = default;
+    const_buffer_type &operator=(const_buffer_type &&) = default;
+    ~const_buffer_type() = default;
+
+    // Emulation of this being a span<byte> in the TS
+
+    //! Returns the address of the bytes for this buffer
+    constexpr pointer data() noexcept { return _data; }
+    //! Returns the address of the bytes for this buffer
+    constexpr const_pointer data() const noexcept { return _data; }
+    //! Returns the number of bytes in this buffer
+    constexpr size_type size() const noexcept { return _len; }
 
     //! Returns an iterator to the beginning of the buffer
-    constexpr iterator begin() { return data; }
+    constexpr iterator begin() noexcept { return _data; }
     //! Returns an iterator to the beginning of the buffer
-    constexpr const_iterator begin() const { return data; }
+    constexpr const_iterator begin() const noexcept { return _data; }
     //! Returns an iterator to the beginning of the buffer
-    constexpr const_iterator cbegin() const { return data; }
+    constexpr const_iterator cbegin() const noexcept { return _data; }
     //! Returns an iterator to after the end of the buffer
-    constexpr iterator end() { return data + len; }
+    constexpr iterator end() noexcept { return _data + _len; }
     //! Returns an iterator to after the end of the buffer
-    constexpr const_iterator end() const { return data + len; }
+    constexpr const_iterator end() const noexcept { return _data + _len; }
     //! Returns an iterator to after the end of the buffer
-    constexpr const_iterator cend() const { return data + len; }
+    constexpr const_iterator cend() const noexcept { return _data + _len; }
+  private:
+    pointer _data;
+    size_type _len;
   };
 #ifndef NDEBUG
   static_assert(std::is_trivial<buffer_type>::value, "buffer_type is not a trivial type!");
@@ -459,11 +500,11 @@ public:
     size_t bytes = 0;
     for(auto &i : reqs.buffers)
     {
-      if(bytes + i.len < bytes)
+      if(bytes + i.size() < bytes)
       {
         return errc::value_too_large;
       }
-      bytes += i.len;
+      bytes += i.size();
     }
     return lock(reqs.offset, bytes, false, d);
   }
@@ -473,11 +514,11 @@ public:
     size_t bytes = 0;
     for(auto &i : reqs.buffers)
     {
-      if(bytes + i.len < bytes)
+      if(bytes + i.size() < bytes)
       {
         return errc::value_too_large;
       }
-      bytes += i.len;
+      bytes += i.size();
     }
     return lock(reqs.offset, bytes, true, d);
   }

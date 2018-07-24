@@ -38,6 +38,7 @@ set(llfio_HEADERS
   "include/llfio/v2.0/statfs.hpp"
   "include/llfio/v2.0/status_code.hpp"
   "include/llfio/v2.0/storage_profile.hpp"
+  "include/llfio/v2.0/symlink_handle.hpp"
   "include/llfio/v2.0/utils.hpp"
   "include/llfio/version.hpp"
   "include/llfio/ntkernel-error-category/include/detail/ntkernel-table.ipp"
@@ -58,6 +59,7 @@ set(llfio_HEADERS
   "include/llfio/v2.0/detail/impl/posix/stat.ipp"
   "include/llfio/v2.0/detail/impl/posix/statfs.ipp"
   "include/llfio/v2.0/detail/impl/posix/storage_profile.ipp"
+  "include/llfio/v2.0/detail/impl/posix/symlink_handle.ipp"
   "include/llfio/v2.0/detail/impl/posix/utils.ipp"
   "include/llfio/v2.0/detail/impl/safe_byte_ranges.ipp"
   "include/llfio/v2.0/detail/impl/storage_profile.ipp"
@@ -76,5 +78,6 @@ set(llfio_HEADERS
   "include/llfio/v2.0/detail/impl/windows/stat.ipp"
   "include/llfio/v2.0/detail/impl/windows/statfs.ipp"
   "include/llfio/v2.0/detail/impl/windows/storage_profile.ipp"
+  "include/llfio/v2.0/detail/impl/windows/symlink_handle.ipp"
   "include/llfio/v2.0/detail/impl/windows/utils.ipp"
 )

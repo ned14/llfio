@@ -362,15 +362,15 @@ public:
   LLFIO_MAKE_FREE_FUNCTION
   static const_buffer_type barrier(const_buffer_type req, bool evict = false) noexcept
   {
-    const_buffer_type ret{(const_buffer_type::pointer)(((uintptr_t) req.data) & 31), 0};
-    ret.len = req.data + req.len - ret.data;
-    for(const_buffer_type::pointer addr = ret.data; addr < ret.data + ret.len; addr += 32)
+    auto *tp = (const_buffer_type::pointer)(((uintptr_t) req.data()) & 31);
+    const_buffer_type ret{tp, (size_t)(req.data() + req.size() - tp)};
+    for(const_buffer_type::pointer addr = ret.data(); addr < ret.data() + ret.size(); addr += 32)
     {
       // Slightly UB ...
       auto *p = reinterpret_cast<const persistent<byte> *>(addr);
       if(memory_flush_none == p->flush(evict ? memory_flush_evict : memory_flush_retain))
       {
-        req.len = 0;
+        ret = {tp, 0};
         break;
       }
     }

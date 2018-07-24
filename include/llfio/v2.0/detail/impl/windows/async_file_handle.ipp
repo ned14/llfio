@@ -70,7 +70,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
             LLFIO_LOG_FATAL(0, "async_file_handle::io_state::operator() called with invalid index");
             std::terminate();
           }
-          result.value()[idx].len = bytes_transferred;
+          result.value()[idx] = {result.value()[idx].data(), (size_t) bytes_transferred};
         }
       }
       this->parent->service()->_work_done();
@@ -177,16 +177,16 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
     }
     // Use the unused hEvent member to pass through the state
     ol->hEvent = reinterpret_cast<HANDLE>(state);
-    offset += out[n].len;
+    offset += out[n].size();
     ++state->items_to_go;
 #ifndef NDEBUG
     if(_v.requires_aligned_io())
     {
-      assert((reinterpret_cast<uintptr_t>(out[n].data) & 511) == 0);
-      assert((out[n].len & 511) == 0);
+      assert((reinterpret_cast<uintptr_t>(out[n].data()) & 511) == 0);
+      assert((out[n].size() & 511) == 0);
     }
 #endif
-    if(!ioroutine(_v.h, const_cast<byte *>(out[n].data), static_cast<DWORD>(out[n].len), ol, handle_completion::Do))
+    if(!ioroutine(_v.h, const_cast<byte *>(out[n].data()), static_cast<DWORD>(out[n].size()), ol, handle_completion::Do))
     {
       --state->items_to_go;
       state->result.write = win32_error();

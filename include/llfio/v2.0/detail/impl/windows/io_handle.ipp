@@ -84,15 +84,15 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
 #ifndef NDEBUG
     if(nativeh.requires_aligned_io())
     {
-      assert(((uintptr_t) req.data & 511) == 0);
-      assert((req.len & 511) == 0);
+      assert(((uintptr_t) req.data() & 511) == 0);
+      assert((req.size() & 511) == 0);
     }
 #endif
-    if(!syscall(nativeh.h, req.data, static_cast<DWORD>(req.len), &transferred, &ol) && ERROR_IO_PENDING != GetLastError())
+    if(!syscall(nativeh.h, req.data(), static_cast<DWORD>(req.size()), &transferred, &ol) && ERROR_IO_PENDING != GetLastError())
     {
       return win32_error();
     }
-    reqs.offset += req.len;
+    reqs.offset += req.size();
   }
   // If handle is overlapped, wait for completion of each i/o.
   if(nativeh.is_overlapped())
@@ -116,7 +116,7 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
     {
       return ntkernel_error(static_cast<NTSTATUS>(ols[n].Internal));
     }
-    reqs.buffers[n].len = ols[n].InternalHigh;
+    reqs.buffers[n] = {reqs.buffers[n].data(), ols[n].InternalHigh};
   }
   return io_handle::io_result<BuffersType>(std::move(reqs.buffers));
 }

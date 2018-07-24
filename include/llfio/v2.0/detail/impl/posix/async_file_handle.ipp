@@ -111,7 +111,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
             LLFIO_LOG_FATAL(0, "file_handle::io_state::operator() called with invalid index");
             std::terminate();
           }
-          result.value()[idx].len = bytes_transferred;
+          result.value()[idx] = {result.value()[idx].data(), (size_type) bytes_transferred};
         }
       }
       this->parent->service()->_work_done();
@@ -228,15 +228,15 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
     if(_v.requires_aligned_io())
     {
       assert((offset & 511) == 0);
-      assert(((uintptr_t) out[n].data & 511) == 0);
-      assert((out[n].len & 511) == 0);
+      assert(((uintptr_t) out[n].data() & 511) == 0);
+      assert((out[n].size() & 511) == 0);
     }
 #endif
     struct aiocb *aiocb = state->aiocbs + n;
     aiocb->aio_fildes = _v.fd;
     aiocb->aio_offset = offset;
-    aiocb->aio_buf = reinterpret_cast<void *>(const_cast<byte *>(out[n].data));
-    aiocb->aio_nbytes = out[n].len;
+    aiocb->aio_buf = reinterpret_cast<void *>(const_cast<byte *>(out[n].data()));
+    aiocb->aio_nbytes = out[n].size();
     aiocb->aio_sigevent.sigev_notify = SIGEV_NONE;
     aiocb->aio_sigevent.sigev_value.sival_ptr = reinterpret_cast<void *>(state);
     switch(operation)
@@ -259,7 +259,7 @@ template <class BuffersType, class IORoutine> result<async_file_handle::io_state
 #else
 #error todo
 #endif
-    offset += out[n].len;
+    offset += out[n].size();
     ++state->items_to_go;
   }
   int ret = 0;

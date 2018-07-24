@@ -200,7 +200,10 @@ result<void> fs_handle::unlink(deadline d) noexcept
     oa.ObjectName = &_path;
     oa.RootDirectory = h.native_handle().h;
     IO_STATUS_BLOCK isb = make_iostatus();
-    NTSTATUS ntstat = NtOpenFile(&duph, SYNCHRONIZE | DELETE, &oa, &isb, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/);
+    DWORD ntflags = 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/;
+    if(h.is_symlink())
+      ntflags |= 0x00200000 /*FILE_OPEN_REPARSE_POINT*/;
+    NTSTATUS ntstat = NtOpenFile(&duph, SYNCHRONIZE | DELETE, &oa, &isb, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, ntflags);
     if(ntstat < 0)
     {
       return ntkernel_error(ntstat);

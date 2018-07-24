@@ -163,19 +163,6 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
 #endif
     }
   }
-  if(flags & flag::unlink_on_first_close)
-  {
-    // Hide this item
-    IO_STATUS_BLOCK isb = make_iostatus();
-    FILE_BASIC_INFORMATION fbi{};
-    memset(&fbi, 0, sizeof(fbi));
-    fbi.FileAttributes = FILE_ATTRIBUTE_HIDDEN;
-    NtSetInformationFile(nativeh.h, &isb, &fbi, sizeof(fbi), FileBasicInformation);
-    if(flags & flag::overlapped)
-    {
-      ntwait(nativeh.h, isb, deadline());
-    }
-  }
   if(_creation == creation::truncate && ret.value().are_safety_fsyncs_issued())
   {
     FlushFileBuffers(nativeh.h);
@@ -342,47 +329,9 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
 result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline /*unused*/) const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  // Fast path
-  if(mode_ == mode::unchanged && caching_ == caching::unchanged)
-  {
-    result<file_handle> ret(file_handle(native_handle_type(), _devid, _inode, caching_, _flags));
-    ret.value()._service = _service;
-    ret.value()._v.behaviour = _v.behaviour;
-    if(DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, 0, DUPLICATE_SAME_ACCESS) == 0)
-    {
-      return win32_error();
-    }
-    return ret;
-  }
-  // Slow path
-  windows_nt_kernel::init();
-  using namespace windows_nt_kernel;
   result<file_handle> ret(file_handle(native_handle_type(), _devid, _inode, caching_, _flags));
-  native_handle_type &nativeh = ret.value()._v;
-  nativeh.behaviour |= native_handle_type::disposition::file;
-  DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
-  OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, mode_, _flags));
-  OUTCOME_TRYV(attributes_from_handle_caching_and_flags(nativeh, caching_, _flags));
-  OUTCOME_TRY(ntflags, ntflags_from_handle_caching_and_flags(nativeh, caching_, _flags));
-  ntflags |= 0x040 /*FILE_NON_DIRECTORY_FILE*/;  // do not open a directory
-  OBJECT_ATTRIBUTES oa{};
-  memset(&oa, 0, sizeof(oa));
-  oa.Length = sizeof(OBJECT_ATTRIBUTES);
-  // It is entirely undocumented that this is how you clone a file handle with new privs
-  UNICODE_STRING _path{};
-  memset(&_path, 0, sizeof(_path));
-  oa.ObjectName = &_path;
-  oa.RootDirectory = _v.h;
-  IO_STATUS_BLOCK isb = make_iostatus();
-  NTSTATUS ntstat = NtOpenFile(&nativeh.h, access, &oa, &isb, fileshare, ntflags);
-  if(STATUS_PENDING == ntstat)
-  {
-    ntstat = ntwait(nativeh.h, isb, deadline());
-  }
-  if(ntstat < 0)
-  {
-    return ntkernel_error(ntstat);
-  }
+  ret.value()._service = _service;
+  OUTCOME_TRY(do_clone_handle(ret.value()._v, _v, mode_, caching_, _flags));
   return ret;
 }
 

@@ -73,6 +73,7 @@ import LLFIO_MODULE_NAME;
 #ifndef LLFIO_LEAN_AND_MEAN
 #include "storage_profile.hpp"
 #endif
+#include "symlink_handle.hpp"
 
 #include "algorithm/cached_parent_handle_adapter.hpp"
 #include "algorithm/shared_fs_mutex/atomic_append.hpp"

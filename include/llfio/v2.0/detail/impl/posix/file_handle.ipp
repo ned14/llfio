@@ -145,7 +145,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
     // empty buffers means bytes = 0 which means sync entire file
     for(const auto &req : reqs.buffers)
     {
-      bytes += req.len;
+      bytes += req.size();
     }
     unsigned flags = SYNC_FILE_RANGE_WRITE;  // start writing all dirty pages in range now
     if(wait_for_device)
@@ -464,7 +464,7 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_type offs
     auto *buffer = static_cast<byte *>(alloca(bytes));
     memset(buffer, 0, bytes);
     OUTCOME_TRY(written, write(offset, {{buffer, bytes}}, d));
-    return written[0].len;
+    return written[0].size();
   }
   try
   {
@@ -477,9 +477,9 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_type offs
     {
       auto towrite = (bytes < blocksize) ? bytes : blocksize;
       OUTCOME_TRY(written, write(offset, {{buffer, towrite}}, d));
-      offset += written[0].len;
-      bytes -= written[0].len;
-      ret += written[0].len;
+      offset += written[0].size();
+      bytes -= written[0].size();
+      ret += written[0].size();
     }
     return ret;
   }

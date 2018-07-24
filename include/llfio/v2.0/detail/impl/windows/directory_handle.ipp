@@ -138,50 +138,8 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
 result<directory_handle> directory_handle::clone(mode mode_, caching caching_, deadline /* unused */) const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  // Fast path
-  if(mode_ == mode::unchanged && caching_ == caching::unchanged)
-  {
-    result<directory_handle> ret(directory_handle(native_handle_type(), _devid, _inode, _caching, _flags));
-    ret.value()._v.behaviour = _v.behaviour;
-    if(DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, 0, DUPLICATE_SAME_ACCESS) == 0)
-    {
-      return win32_error();
-    }
-    return ret;
-  }
-  // Slow path
-  windows_nt_kernel::init();
-  using namespace windows_nt_kernel;
-  result<directory_handle> ret(directory_handle(native_handle_type(), _devid, _inode, caching_, _flags));
-  native_handle_type &nativeh = ret.value()._v;
-  nativeh.behaviour |= native_handle_type::disposition::directory;
-  DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
-  OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, mode_, _flags));
-  OUTCOME_TRYV(attributes_from_handle_caching_and_flags(nativeh, caching_, _flags));
-  /* It is super important that we remove the DELETE permission for directories as otherwise relative renames
-  will always fail due to an unfortunate design choice by Microsoft.
-  */
-  access &= ~DELETE;
-  OUTCOME_TRY(ntflags, ntflags_from_handle_caching_and_flags(nativeh, caching_, _flags));
-  ntflags |= 0x01 /*FILE_DIRECTORY_FILE*/;  // required to open a directory
-  OBJECT_ATTRIBUTES oa{};
-  memset(&oa, 0, sizeof(oa));
-  oa.Length = sizeof(OBJECT_ATTRIBUTES);
-  // It is entirely undocumented that this is how you clone a file handle with new privs
-  UNICODE_STRING _path{};
-  memset(&_path, 0, sizeof(_path));
-  oa.ObjectName = &_path;
-  oa.RootDirectory = _v.h;
-  IO_STATUS_BLOCK isb = make_iostatus();
-  NTSTATUS ntstat = NtOpenFile(&nativeh.h, access, &oa, &isb, fileshare, ntflags);
-  if(STATUS_PENDING == ntstat)
-  {
-    ntstat = ntwait(nativeh.h, isb, deadline());
-  }
-  if(ntstat < 0)
-  {
-    return ntkernel_error(ntstat);
-  }
+  result<directory_handle> ret(directory_handle(native_handle_type(), _devid, _inode, _caching, _flags));
+  OUTCOME_TRY(do_clone_handle(ret.value()._v, _v, mode_, caching_, _flags, true));
   return ret;
 }
 

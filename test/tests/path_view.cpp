@@ -24,6 +24,32 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../test_kernel_decl.hpp"
 
+template <class U> inline void CheckPathView(const LLFIO_V2_NAMESPACE::filesystem::path &p, const char *desc, U &&c)
+{
+  using LLFIO_V2_NAMESPACE::filesystem::path;
+  using LLFIO_V2_NAMESPACE::path_view;
+  auto r1 = c(p);
+  auto r2 = c(path_view(p));
+  BOOST_CHECK(r1 == r2);
+  if(r1 != r2)
+  {
+    std::cerr << "For " << desc << " with path " << p << "\n";
+    std::cerr << "   filesystem::path returned " << r1 << "\n";
+    std::cerr << "          path_view returned " << r2 << std::endl;
+  }
+}
+
+static inline void CheckPathView(const LLFIO_V2_NAMESPACE::filesystem::path &path)
+{
+  CheckPathView(path, "root_directory()", [](const auto &p) { return p.root_directory(); });
+  CheckPathView(path, "root_path()", [](const auto &p) { return p.root_path(); });
+  CheckPathView(path, "relative_path()", [](const auto &p) { return p.relative_path(); });
+  CheckPathView(path, "parent_path()", [](const auto &p) { return p.parent_path(); });
+  CheckPathView(path, "filename()", [](const auto &p) { return p.filename(); });
+  CheckPathView(path, "stem()", [](const auto &p) { return p.stem(); });
+  CheckPathView(path, "extension()", [](const auto &p) { return p.extension(); });
+}
+
 static inline void TestPathView()
 {
   namespace llfio = LLFIO_V2_NAMESPACE;
@@ -48,6 +74,33 @@ static inline void TestPathView()
   llfio::path_view::c_str h(f);
   BOOST_CHECK(h.buffer == p + 70);  // NOLINT
 #endif
+  CheckPathView("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir");
+#if 0
+  // I think we are standards conforming here, Dinkumware and libstdc++ are not
+  CheckPathView("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir/");
+#endif
+  CheckPathView("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir/0");
+  CheckPathView("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir/0.txt");
+  CheckPathView("boostish/afio/programs/build_posix/testdir");
+#if 0
+  // I think we are standards conforming here, Dinkumware and libstdc++ are not
+  CheckPathView("boostish/afio/programs/build_posix/testdir/");
+#endif
+  CheckPathView("boostish/afio/programs/build_posix/testdir/0");
+  CheckPathView("boostish/afio/programs/build_posix/testdir/0.txt");
+  CheckPathView("0");
+  CheckPathView("0.txt");
+  CheckPathView("0.foo.txt");
+  CheckPathView(".0.foo.txt");
+#if 0
+  // I think we are standards conforming here, Dinkumware and libstdc++ are not
+  CheckPathView(".txt");
+  CheckPathView("/");
+  CheckPathView("//");
+#endif
+  CheckPathView("");
+  CheckPathView(".");
+  CheckPathView("..");
 
 #ifdef _WIN32
   // On Windows, UTF-8 and UTF-16 paths are equivalent and backslash conversion happens
@@ -72,6 +125,26 @@ static inline void TestPathView()
   BOOST_CHECK(j.buffer == p2);
   llfio::path_view::c_str k(h, false);
   BOOST_CHECK(k.buffer == p2 + 70);
+
+  CheckPathView(L"\\mnt\\c\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir\\0");
+  CheckPathView(L"C:\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir\\0");
+  CheckPathView("C:/Users/ned/Documents/boostish/afio/programs/build_posix/testdir/0.txt");
+  // CheckPathView(L"\\\\niall\\douglas.txt");
+  CheckPathView(L"\\!!\\niall\\douglas.txt");
+  CheckPathView(L"\\??\\niall\\douglas.txt");
+  CheckPathView(L"\\\\?\\niall\\douglas.txt");
+  CheckPathView(L"\\\\.\\niall\\douglas.txt");
+
+  // Handle NT kernel paths correctly
+  BOOST_CHECK(llfio::path_view(L"\\\\niall").is_absolute());
+  BOOST_CHECK(llfio::path_view(L"\\!!\\niall").is_absolute());
+  BOOST_CHECK(llfio::path_view(L"\\??\\niall").is_absolute());
+  BOOST_CHECK(llfio::path_view(L"\\\\?\\niall").is_absolute());
+  BOOST_CHECK(llfio::path_view(L"\\\\.\\niall").is_absolute());
+  // On Windows this is relative, on POSIX it is absolute
+  BOOST_CHECK(llfio::path_view("/niall").is_relative());
+#else
+  BOOST_CHECK(llfio::path_view("/niall").is_absolute());
 #endif
 }
 
