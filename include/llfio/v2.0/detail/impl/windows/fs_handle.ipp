@@ -73,7 +73,7 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
         continue;
       }
       path_handle currentdirh = std::move(currentdirh_.value());
-      if(h.flags() & handle::flag::disable_safety_unlinks)
+      if((h.flags() & handle::flag::disable_safety_unlinks) != 0 || h.is_symlink())
       {
         return success(std::move(currentdirh));
       }

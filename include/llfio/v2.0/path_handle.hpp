@@ -93,6 +93,16 @@ public:
   //! \overload
   LLFIO_MAKE_FREE_FUNCTION
   static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> path(path_view_type _path) noexcept { return path(path_handle(), _path); }
+
+  /*! Clone this handle (copy constructor is disabled to avoid accidental copying).
+  */
+  result<path_handle> clone() const noexcept
+  {
+    auto *h = static_cast<const handle *>(this);
+    OUTCOME_TRY(ret, h->clone());
+    auto nativeh = ret.release();
+    return path_handle(nativeh);
+  }
 };
 
 //! \brief Constructor for `path_handle`

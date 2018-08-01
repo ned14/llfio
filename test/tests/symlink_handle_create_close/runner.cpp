@@ -34,6 +34,8 @@ template <class U> inline void symlink_handle_create_close_creation(U &&f)
   static const result<void> function_not_supported = LLFIO_V2_NAMESPACE::errc::function_not_supported;
   static const result<void> permission_denied = LLFIO_V2_NAMESPACE::errc::permission_denied;
 
+  assert(file_exists.error() == LLFIO_V2_NAMESPACE::errc::file_exists);
+
   // clang-format off
   static const auto permuter(mt_permute_parameters<
     result<void>,                                  
@@ -54,8 +56,6 @@ template <class U> inline void symlink_handle_create_close_creation(U &&f)
       {                 success(), { symlink_handle::mode::write,      symlink_handle::creation::if_needed,     symlink_handle::flag::none }, { "existing0" }, { "existing1" }},
       {                 success(), { symlink_handle::mode::write,      symlink_handle::creation::if_needed,     symlink_handle::flag::none }, { "existing1" }, { "existing1" }},
       {    function_not_supported, { symlink_handle::mode::append,     symlink_handle::creation::if_needed,     symlink_handle::flag::none }, { "existing1" }, { "existing1" }},
-      {                 success(), { symlink_handle::mode::none,       symlink_handle::creation::if_needed,     symlink_handle::flag::none }, { "existing0" }, { "existing1" }},
-      {                 success(), { symlink_handle::mode::attr_read,  symlink_handle::creation::if_needed,     symlink_handle::flag::none }, { "existing0" }, { "existing1" }},
       {                 success(), { symlink_handle::mode::attr_write, symlink_handle::creation::if_needed,     symlink_handle::flag::none }, { "existing0" }, { "existing1" }},
 
       // Does the creation parameter have the expected side effects?

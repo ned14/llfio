@@ -31,7 +31,7 @@ Distributed under the Boost Software License, Version 1.0.
 //! \file symlink_handle.hpp Provides a handle to a symbolic link.
 
 #ifndef LLFIO_SYMLINK_HANDLE_IS_FAKED
-#if defined(_WIN32) || defined(__Linux__)
+#if defined(_WIN32)  //|| defined(__linux__)
 #define LLFIO_SYMLINK_HANDLE_IS_FAKED 0
 #else
 #define LLFIO_SYMLINK_HANDLE_IS_FAKED 1
@@ -47,6 +47,11 @@ LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 class symlink_handle;
 
+namespace detail
+{
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<void> stat_from_symlink(struct stat &s, const handle &h) noexcept;
+}
+
 /*! \class symlink_handle
 \brief A handle to an inode which redirects to a different path.
 
@@ -58,16 +63,16 @@ macro `LLFIO_SYMLINK_HANDLE_IS_FAKED` will be non-zero.
 
 If `LLFIO_SYMLINK_HANDLE_IS_FAKED` is on, the handle is race free up to the containing directory
 only. If a third party relocates the symbolic link into a different directory, and race free
-checking is enabled, this class will simply refuse to work as it no longer has any way of finding
-the symbolic link. You should take care that this does not become a denial of service attack.
+checking is enabled, this class will simply refuse to work with `errc::no_such_file_or_directory`
+as it no longer has any way of finding the symbolic link. You should take care that this does not
+become a denial of service attack.
 
 On Microsoft Windows, there are many kinds of symbolic link: this implementation supports
-directory junctions, NTFS symbolic links and WSL symbolic links. Any others will return an error
+directory junctions, and NTFS symbolic links. Reads of any others will return an error
 code comparing equal to `errc::protocol_not_supported`. One should note that modifying symbolic
-links is not permitted by users with ordinary permissions on Microsoft Windows, however when
-Windows is in Developer Mode, they are. This can cause developer testing to be an inaccurate
-view of the user experience. Windows supports directory symbolic links (junctions), these work
-for all users in any configuration.
+links was not historically permitted by users with ordinary permissions on Microsoft Windows,
+however recent versions of Windows 10 do support symbolic links for ordinary users. All versions
+of Windows support directory symbolic links (junctions), these work for all users in any configuration.
 */
 class LLFIO_DECL symlink_handle : public handle, public fs_handle
 {
@@ -77,6 +82,11 @@ class LLFIO_DECL symlink_handle : public handle, public fs_handle
   handle::path_type _leafname;
 #endif
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept final { return *this; }
+
+#ifndef _WIN32
+  friend LLFIO_HEADERS_ONLY_FUNC_SPEC result<void> detail::stat_from_symlink(struct stat &s, const handle &h) noexcept;
+  result<void> _create_symlink(path_view target, deadline d, bool atomic_replace) noexcept;
+#endif
 
 public:
   using path_type = handle::path_type;
@@ -234,10 +244,10 @@ public:
     path_view _link;
     symlink_type _type{symlink_type::none};
   };
-  //! The i/o request type used by this handle. Guaranteed to be `TrivialType` apart from construction, and `StandardLayoutType`.
-  template <class T> struct io_request;
+  //! The i/o request type used by this handle.
+  template <class T, bool = true> struct io_request;
   //! Specialisation for reading symlinks
-  template <> struct io_request<buffers_type>
+  template <bool ____> struct io_request<buffers_type, ____>  // workaround lack of nested specialisation support on older compilers
   {
     span<char> kernelbuffer{};
 
@@ -253,12 +263,12 @@ public:
     constexpr io_request(Args &&... args) noexcept : io_request(span<char>(static_cast<Args &&>(args)...)) {}
   };
   //! Specialisation for writing symlinks
-  template <> struct io_request<const_buffers_type>
+  template <bool ____> struct io_request<const_buffers_type, ____>  // workaround lack of nested specialisation support on older compilers
   {
     const_buffers_type buffers;
     span<char> kernelbuffer;
     //! Construct a request to write a link with optionally specified kernel buffer
-    constexpr io_request(const_buffers_type _buffers, span<char> _kernelbuffer = span<char>())
+    io_request(const_buffers_type _buffers, span<char> _kernelbuffer = span<char>())
         : buffers(std::move(_buffers))
         , kernelbuffer(_kernelbuffer)
     {
@@ -327,7 +337,14 @@ public:
         }
       }
     }
+#if !LLFIO_SYMLINK_HANDLE_IS_FAKED
     return handle::close();
+#else
+    _dirh = {};
+    _leafname = path_type();
+    _v = {};
+    return success();
+#endif
   }
 
   /*! Clone this handle (copy constructor is disabled to avoid accidental copying),
@@ -344,18 +361,48 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<symlink_handle> clone(mode mode_ = mode::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
 
 #if LLFIO_SYMLINK_HANDLE_IS_FAKED
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
-  result<void> relink(const path_handle &base, path_view_type newpath, bool atomic_replace = true, deadline d = std::chrono::seconds(30)) noexcept override;
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
-  result<void> unlink(deadline d = std::chrono::seconds(30)) noexcept override;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_type> current_path() const noexcept override;
 #endif
 
   /*! Create a symlink handle opening access to a symbolic link.
 
   For obvious reasons, one cannot append to a symbolic link, nor create with truncate.
+  In this situation a failure comparing equal to `errc::function_not_supported` shall
+  be returned.
+
+  \errors Any of the values POSIX open() or CreateFile() can return.
+  \mallocs None, unless `LLFIO_SYMLINK_HANDLE_IS_FAKED` is on, in which case one.
   */
   LLFIO_MAKE_FREE_FUNCTION
   static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink(const path_handle &base, path_view_type path, mode _mode = mode::read, creation _creation = creation::open_existing, flag flags = flag::none) noexcept;
+  /*! Create a symlink handle creating a randomly named symlink on a path.
+  The symlink is opened exclusively with `creation::only_if_not_exist` so it
+  will never collide with nor overwrite any existing symlink.
+
+  \errors Any of the values POSIX open() or CreateFile() can return,
+  or failure to allocate memory.
+  */
+  LLFIO_MAKE_FREE_FUNCTION
+  static inline result<symlink_handle> random_symlink(const path_handle &dirpath, mode _mode = mode::write, flag flags = flag::none) noexcept
+  {
+    try
+    {
+      for(;;)
+      {
+        auto randomname = utils::random_string(32);
+        randomname.append(".random");
+        result<symlink_handle> ret = symlink(dirpath, randomname, _mode, creation::only_if_not_exist, flags);
+        if(ret || (!ret && ret.error() != errc::file_exists))
+        {
+          return ret;
+        }
+      }
+    }
+    catch(...)
+    {
+      return error_from_exception();
+    }
+  }
 
   /*! Read the contents of the symbolic link.
 
@@ -363,13 +410,14 @@ public:
   link may change at any time. You should therefore retry reading the symbolic link, expanding
   your `kernelbuffer` each time, until a successful read occurs.
 
-  \return Returns the buffers filled, with its size adjusted to the bytes filled.
-  \param tofill A buffer to fill with the contents of the symbolic link.
+  \return Returns the buffers filled, with its path adjusted to the bytes filled.
+  \param req A buffer to fill with the contents of the symbolic link.
   \param kernelbuffer A buffer to use for the kernel to fill. If left defaulted, a kernel buffer
-  is allocated internally and stored into `tofill` which needs to not be destructed until one
+  is allocated internally and stored into `req.buffers` which needs to not be destructed until one
   is no longer using any items within (the path returned is a view onto the original kernel data).
-  \errors Any of the errors which `readlink()` or `DeviceIoControl()` might return, or failure
-  to allocate memory if the user did not supply a kernel buffer to use.
+  \errors Any of the errors which `readlinkat()` or `DeviceIoControl()` might return, or failure
+  to allocate memory if the user did not supply a kernel buffer to use, or the user supplied buffer
+  was too small.
   \mallocs If the `kernelbuffer` parameter is set on entry, no memory allocations.
   If unset, then at least one memory allocation, possibly more is performed.
   */
@@ -379,12 +427,15 @@ public:
   /*! Write the contents of the symbolic link.
 
   \param req A buffer with which to replace the contents of the symbolic link.
-  \errors Any of the errors which `symlink()` or `DeviceIoControl()` might return.
-  \mallocs If the `kernelbuffer` parameter is set on entry, no memory allocations.
-  If unset, then at least one memory allocation, possibly more is performed.
+  \param d An optional deadline by which the i/o must complete, else it is cancelled. Ignored
+  on Windows.
+  \errors Any of the errors which `symlinkat()` or `DeviceIoControl()` might return.
+  \mallocs On Windows, if the `kernelbuffer` parameter is set on entry, no memory allocations.
+  If unset, then at least one memory allocation, possibly more is performed. On POSIX,
+  at least one memory allocation.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<const_buffers_type> write(io_request<const_buffers_type> req) noexcept;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<const_buffers_type> write(io_request<const_buffers_type> req, deadline d = deadline()) noexcept;
 };
 
 //! \brief Constructor for `symlink_handle`

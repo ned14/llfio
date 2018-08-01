@@ -40,104 +40,96 @@ result<void> fs_handle::_fetch_inode() const noexcept
   return success();
 }
 
-inline result<path_handle> containing_directory(optional<std::reference_wrapper<filesystem::path>> out_filename, const handle &h, const fs_handle &fsh, deadline d) noexcept
+namespace detail
 {
-  std::chrono::steady_clock::time_point began_steady;
-  std::chrono::system_clock::time_point end_utc;
-  if(d)
+  result<path_handle> containing_directory(optional<std::reference_wrapper<filesystem::path>> out_filename, const handle &h, const fs_handle &fsh, deadline d) noexcept
   {
-    if(d.steady)
+    std::chrono::steady_clock::time_point began_steady;
+    std::chrono::system_clock::time_point end_utc;
+    if(d)
     {
-      began_steady = std::chrono::steady_clock::now();
-    }
-    else
-    {
-      end_utc = d.to_time_point();
-    }
-  }
-  try
-  {
-    for(;;)
-    {
-      // Get current path for handle and open its containing dir
-      OUTCOME_TRY(_currentpath, h.current_path());
-      // If current path is empty, it's been deleted
-      if(_currentpath.empty())
+      if(d.steady)
       {
-        return errc::no_such_file_or_directory;
+        began_steady = std::chrono::steady_clock::now();
       }
-      // Split the path into root and leafname
-      path_view currentpath(_currentpath);
-      path_view filename = currentpath.filename();
-      currentpath.remove_filename();
-      // Zero terminate the root path so it doesn't get copied later
-      const_cast<filesystem::path::string_type &>(_currentpath.native())[currentpath.native_size()] = 0;
-      auto currentdirh_ = path_handle::path(currentpath);
-      if(!currentdirh_)
+      else
       {
-        continue;
+        end_utc = d.to_time_point();
       }
-      path_handle currentdirh = std::move(currentdirh_.value());
-      if(h.flags() & handle::flag::disable_safety_unlinks)
+    }
+    try
+    {
+      for(;;)
       {
-        if(out_filename)
+        // Get current path for handle and open its containing dir
+        OUTCOME_TRY(_currentpath, h.current_path());
+        // If current path is empty, it's been deleted
+        if(_currentpath.empty())
         {
-          out_filename->get() = filename.path();
+          return errc::no_such_file_or_directory;
         }
-        return success(std::move(currentdirh));
-      }
-      // Open the same file name, and compare dev and inode
-      path_view::c_str zpath(filename);
-      int fd = ::openat(currentdirh.native_handle().fd, zpath.buffer, O_CLOEXEC);
-      if(fd == -1)
-      {
-        if(ENOENT == errno)
+        // Split the path into root and leafname
+        path_view currentpath(_currentpath);
+        path_view filename = currentpath.filename();
+        currentpath.remove_filename();
+        // Zero terminate the root path so it doesn't get copied later
+        const_cast<filesystem::path::string_type &>(_currentpath.native())[currentpath.native_size()] = 0;
+        auto currentdirh_ = path_handle::path(currentpath);
+        if(!currentdirh_)
         {
           continue;
         }
-        return posix_error();
-      }
-      auto unfd = undoer([fd] { ::close(fd); });
-      (void) unfd;
-      struct stat s
-      {
-      };
-      if(-1 == ::fstat(fd, &s))
-      {
-        continue;
-      }
-      // If the same, we know for a fact that this is the correct containing dir for now at least
-      if(static_cast<fs_handle::dev_t>(s.st_dev) == fsh.st_dev() && s.st_ino == fsh.st_ino())
-      {
-        if(out_filename)
+        path_handle currentdirh = std::move(currentdirh_.value());
+        if((h.flags() & handle::flag::disable_safety_unlinks) != 0)
         {
-          out_filename->get() = filename.path();
-        }
-        return success(std::move(currentdirh));
-      }
-      // Check timeout
-      if(d)
-      {
-        if(d.steady)
-        {
-          if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds(d.nsecs)))
+          if(out_filename)
           {
-            return errc::timed_out;
+            out_filename->get() = filename.path();
           }
+          return success(std::move(currentdirh));
         }
-        else
+        // stat the same file name, and compare dev and inode
+        path_view::c_str zpath(filename);
+        struct stat s
         {
-          if(std::chrono::system_clock::now() >= end_utc)
+        };
+        if(-1 == ::fstatat(currentdirh.native_handle().fd, zpath.buffer, &s, AT_SYMLINK_NOFOLLOW))
+        {
+          continue;
+        }
+        // If the same, we know for a fact that this is the correct containing dir for now at least
+        if(static_cast<fs_handle::dev_t>(s.st_dev) == fsh.st_dev() && s.st_ino == fsh.st_ino())
+        {
+          if(out_filename)
           {
-            return errc::timed_out;
+            out_filename->get() = filename.path();
+          }
+          return success(std::move(currentdirh));
+        }
+        // Check timeout
+        if(d)
+        {
+          if(d.steady)
+          {
+            if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds(d.nsecs)))
+            {
+              return errc::timed_out;
+            }
+          }
+          else
+          {
+            if(std::chrono::system_clock::now() >= end_utc)
+            {
+              return errc::timed_out;
+            }
           }
         }
       }
     }
-  }
-  catch(...)
-  {
-    return error_from_exception();
+    catch(...)
+    {
+      return error_from_exception();
+    }
   }
 }
 
@@ -149,7 +141,7 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
   {
     OUTCOME_TRY(_fetch_inode());
   }
-  return containing_directory({}, h, *this, d);
+  return detail::containing_directory({}, h, *this, d);
 }
 
 result<void> fs_handle::relink(const path_handle &base, path_view_type path, bool atomic_replace, deadline d) noexcept
@@ -181,7 +173,7 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
   {
     OUTCOME_TRY(_fetch_inode());
   }
-  OUTCOME_TRY(dirh, containing_directory(std::ref(filename), h, *this, d));
+  OUTCOME_TRY(dirh, detail::containing_directory(std::ref(filename), h, *this, d));
   if(!atomic_replace)
   {
 // Some systems provide an extension for atomic non-replacing renames
@@ -214,7 +206,7 @@ result<void> fs_handle::unlink(deadline d) noexcept
   {
     OUTCOME_TRY(_fetch_inode());
   }
-  OUTCOME_TRY(dirh, containing_directory(std::ref(filename), h, *this, d));
+  OUTCOME_TRY(dirh, detail::containing_directory(std::ref(filename), h, *this, d));
   if(-1 == ::unlinkat(dirh.native_handle().fd, filename.c_str(), h.is_directory() ? AT_REMOVEDIR : 0))
   {
     return posix_error();

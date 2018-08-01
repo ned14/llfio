@@ -195,6 +195,11 @@ public:
   result<void> unlink(deadline d = std::chrono::seconds(30)) noexcept;
 };
 
+namespace detail
+{
+  extern LLFIO_DECL result<path_handle> containing_directory(optional<std::reference_wrapper<filesystem::path>> out_filename, const handle &h, const fs_handle &fsh, deadline d) noexcept;
+}
+
 // BEGIN make_free_functions.py
 /*! Relinks the current path of this open handle to the new path specified. If `atomic_replace` is
 true, the relink \b atomically and silently replaces any item at the new path specified. This operation

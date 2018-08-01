@@ -104,6 +104,23 @@ struct LLFIO_DEADLINE_NAME
 #endif
 };
 
+#define LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d)                                                                                                                                                                                                                                                                              \
+  if(d)                                                                                                                                                                                                                                                                                                                        \
+  {                                                                                                                                                                                                                                                                                                                            \
+    if((d).steady)                                                                                                                                                                                                                                                                                                             \
+    {                                                                                                                                                                                                                                                                                                                          \
+      (nd).steady = true;                                                                                                                                                                                                                                                                                                      \
+      std::chrono::nanoseconds ns = std::chrono::duration_cast<std::chrono::nanoseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());                                                                                                                                             \
+      if(ns.count() < 0)                                                                                                                                                                                                                                                                                                       \
+        (nd).nsecs = 0;                                                                                                                                                                                                                                                                                                        \
+      else                                                                                                                                                                                                                                                                                                                     \
+        (nd).nsecs = ns.count();                                                                                                                                                                                                                                                                                               \
+    }                                                                                                                                                                                                                                                                                                                          \
+    else                                                                                                                                                                                                                                                                                                                       \
+      (nd) = (d);                                                                                                                                                                                                                                                                                                              \
+  }
+
+
 #undef LLFIO_DEADLINE_NAME
 #if defined(__cplusplus) || DOXYGEN_IS_IN_THE_HOUSE
 LLFIO_V2_NAMESPACE_END

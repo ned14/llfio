@@ -1,0 +1,396 @@
+/* A handle to a symbolic link
+(C) 2018 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+File Created: Jul 2018
+
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License in the accompanying file
+Licence.txt or at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+Distributed under the Boost Software License, Version 1.0.
+    (See accompanying file Licence.txt or copy at
+          http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+#include "../../../symlink_handle.hpp"
+#include "import.hpp"
+
+LLFIO_V2_NAMESPACE_BEGIN
+
+namespace detail
+{
+  // Used by stat_t.cpp to work around a dependency problem
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<void> stat_from_symlink(struct stat &s, const handle &_h) noexcept
+  {
+#if !LLFIO_SYMLINK_HANDLE_IS_FAKED
+    return posix_error(EBADF);
+#else
+    const auto &h = static_cast<const symlink_handle &>(_h);
+    if(-1 == ::fstatat(h._dirh.native_handle().fd, h._leafname.c_str(), &s, AT_SYMLINK_NOFOLLOW))
+    {
+      return posix_error();
+    }
+    return success();
+#endif
+  }
+}
+
+result<void> symlink_handle::_create_symlink(path_view target, deadline d, bool atomic_replace) noexcept
+{
+  std::chrono::steady_clock::time_point began_steady;
+  std::chrono::system_clock::time_point end_utc;
+  if(d)
+  {
+    if(d.steady)
+    {
+      began_steady = std::chrono::steady_clock::now();
+    }
+    else
+    {
+      end_utc = d.to_time_point();
+    }
+  }
+  path_view::c_str zpath(target);
+  try
+  {
+#if !LLFIO_SYMLINK_HANDLE_IS_FAKED
+    if(_devid == 0 && _inode == 0)
+    {
+      OUTCOME_TRY(_fetch_inode());
+    }
+    path_type filename;
+    OUTCOME_TRY(dirh, detail::containing_directory(std::ref(filename), *this, *this, d));
+#else
+    const path_handle &dirh = _dirh;
+    const path_type &filename = _leafname;
+#endif
+    if(atomic_replace)
+    {
+      // symlinkat() won't replace an existing symlink, so we need to create it
+      // with a random name and atomically rename over the existing one.
+      for(;;)
+      {
+        auto randomname = utils::random_string(32);
+        randomname.append(".random");
+        if(-1 == ::symlinkat(zpath.buffer, dirh.native_handle().fd, randomname.c_str()))
+        {
+          if(EEXIST == errno)
+          {
+            // Check timeout
+            if(d)
+            {
+              if(d.steady)
+              {
+                if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds(d.nsecs)))
+                {
+                  return errc::timed_out;
+                }
+              }
+              else
+              {
+                if(std::chrono::system_clock::now() >= end_utc)
+                {
+                  return errc::timed_out;
+                }
+              }
+            }
+            continue;
+          }
+          return posix_error();
+        }
+        if(-1 == ::renameat(dirh.native_handle().fd, randomname.c_str(), dirh.native_handle().fd, filename.c_str()))
+        {
+          return posix_error();
+        }
+        return success();
+      }
+    }
+    else
+    {
+      if(-1 == ::symlinkat(zpath.buffer, dirh.native_handle().fd, filename.c_str()))
+      {
+        return posix_error();
+      }
+      return success();
+    }
+  }
+  catch(...)
+  {
+    return error_from_exception();
+  }
+}
+
+result<symlink_handle> symlink_handle::clone(mode mode_, deadline d) const noexcept
+{
+  LLFIO_LOG_FUNCTION_CALL(this);
+#if LLFIO_SYMLINK_HANDLE_IS_FAKED
+  result<symlink_handle> ret(symlink_handle(native_handle_type(), _devid, _inode, _flags));
+  ret.value()._v.behaviour = _v.behaviour;
+  OUTCOME_TRY(dirh, _dirh.clone());
+  ret.value()._dirh = std::move(dirh);
+  try
+  {
+    ret.value()._leafname = _leafname;
+  }
+  catch(...)
+  {
+    return error_from_exception();
+  }
+  return ret;
+#endif
+  // fast path
+  if(mode_ == mode::unchanged)
+  {
+    result<symlink_handle> ret(symlink_handle(native_handle_type(), _devid, _inode, _flags));
+    ret.value()._v.behaviour = _v.behaviour;
+    ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC);
+    if(-1 == ret.value()._v.fd)
+    {
+      return posix_error();
+    }
+    return ret;
+  }
+  // Slow path
+  std::chrono::steady_clock::time_point began_steady;
+  std::chrono::system_clock::time_point end_utc;
+  if(d)
+  {
+    if(d.steady)
+    {
+      began_steady = std::chrono::steady_clock::now();
+    }
+    else
+    {
+      end_utc = d.to_time_point();
+    }
+  }
+  for(;;)
+  {
+    // Get the current path of myself
+    OUTCOME_TRY(currentpath, current_path());
+    // Open myself
+    auto fh = symlink({}, currentpath, mode_, creation::open_existing, _flags);
+    if(fh)
+    {
+      if(fh.value().unique_id() == unique_id())
+      {
+        return fh;
+      }
+    }
+    else
+    {
+      if(fh.error() != errc::no_such_file_or_directory)
+      {
+        return fh.error();
+      }
+    }
+    // Check timeout
+    if(d)
+    {
+      if(d.steady)
+      {
+        if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds(d.nsecs)))
+        {
+          return errc::timed_out;
+        }
+      }
+      else
+      {
+        if(std::chrono::system_clock::now() >= end_utc)
+        {
+          return errc::timed_out;
+        }
+      }
+    }
+  }
+}
+
+#if LLFIO_SYMLINK_HANDLE_IS_FAKED
+result<symlink_handle::path_type> symlink_handle::current_path() const noexcept
+{
+  LLFIO_LOG_FUNCTION_CALL(this);
+  try
+  {
+    for(;;)
+    {
+      // Sanity check that we still exist
+      struct stat s1, s2;
+      if(-1 == ::fstatat(_dirh.native_handle().fd, _leafname.c_str(), &s1, AT_SYMLINK_NOFOLLOW))
+      {
+        return posix_error();
+      }
+      OUTCOME_TRY(dirpath, _dirh.current_path());
+      dirpath /= _leafname;
+      if(-1 == ::lstat(dirpath.c_str(), &s2) || s1.st_dev != s2.st_dev || s1.st_ino != s2.st_ino)
+      {
+        continue;
+      }
+      return dirpath;
+    }
+  }
+  catch(...)
+  {
+    return error_from_exception();
+  }
+}
+#endif
+
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(const path_handle &base, symlink_handle::path_view_type path, symlink_handle::mode _mode, symlink_handle::creation _creation, flag flags) noexcept
+{
+  result<symlink_handle> ret(symlink_handle(native_handle_type(), 0, 0, flags));
+  native_handle_type &nativeh = ret.value()._v;
+  LLFIO_LOG_FUNCTION_CALL(&ret);
+  nativeh.behaviour |= native_handle_type::disposition::symlink;
+  if(_mode == mode::append || _creation == creation::truncate)
+  {
+    return errc::function_not_supported;
+  }
+  OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, caching::all, flags));
+  nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
+#if !LLFIO_SYMLINK_HANDLE_IS_FAKED
+  // Linux can open symbolic links directly like this
+  attribs |= O_PATH | O_NOFOLLOW;
+  path_view::c_str zpath(path);
+  if(base.is_valid())
+  {
+    nativeh.fd = ::openat(base.native_handle().fd, zpath.buffer, attribs, 0x1b0 /*660*/);
+  }
+  else
+  {
+    nativeh.fd = ::open(zpath.buffer, attribs, 0x1b0 /*660*/);
+  }
+  if(-1 == nativeh.fd)
+  {
+    return posix_error();
+  }
+#else
+  (void) attribs;
+  try
+  {
+    // Take a path handle to the directory containing the symlink
+    auto path_parent = path.parent_path();
+    ret.value()._leafname = path.filename().path();
+    if(base.is_valid() && !path_parent.empty())
+    {
+      OUTCOME_TRY(dh, base.clone());
+      ret.value()._dirh = std::move(dh);
+    }
+    else
+    {
+      OUTCOME_TRY(dh, path_handle::path(base, path_parent.empty() ? "." : path_parent));
+      ret.value()._dirh = std::move(dh);
+    }
+  }
+  catch(...)
+  {
+    return error_from_exception();
+  }
+  switch(_creation)
+  {
+  case creation::open_existing:
+  {
+    // Complain if it doesn't exist
+    struct stat s;
+    if(-1 == ::fstatat(ret.value()._dirh.native_handle().fd, ret.value()._leafname.c_str(), &s, AT_SYMLINK_NOFOLLOW))
+    {
+      return posix_error();
+    }
+    break;
+  }
+  case creation::only_if_not_exist:
+  case creation::if_needed:
+  case creation::truncate:
+  {
+    // Create an empty symlink, ignoring any file exists errors, unless only_if_not_exist
+    auto r = ret.value()._create_symlink(
+#ifdef __linux__
+    ".",  // Linux is not POSIX conforming here, and refuses to create empty symlinks
+#else
+    "",
+#endif
+    std::chrono::seconds(10), false);
+    if(!r)
+    {
+      if(_creation == creation::only_if_not_exist || r.error() != errc::file_exists)
+        return r.error();
+    }
+    break;
+  }
+  }
+#endif
+  return ret;
+}
+
+result<symlink_handle::buffers_type> symlink_handle::read(symlink_handle::io_request<symlink_handle::buffers_type> req) noexcept
+{
+  LLFIO_LOG_FUNCTION_CALL(this);
+  symlink_handle::buffers_type tofill;
+  if(req.kernelbuffer.empty())
+  {
+    // Let's assume the average symbolic link will be 256 characters long.
+    size_t toallocate = 256;
+    auto *mem = new(std::nothrow) char[toallocate];
+    if(mem == nullptr)
+    {
+      return errc::not_enough_memory;
+    }
+    tofill._kernel_buffer = std::unique_ptr<char[]>(mem);
+    tofill._kernel_buffer_size = toallocate;
+  }
+  for(;;)
+  {
+    char *buffer = req.kernelbuffer.empty() ? tofill._kernel_buffer.get() : req.kernelbuffer.data();
+    size_t bytes = req.kernelbuffer.empty() ? tofill._kernel_buffer_size : req.kernelbuffer.size();
+#if !LLFIO_SYMLINK_HANDLE_IS_FAKED
+    // Linux has the ability to read the link from a fd
+    ssize_t read = ::readlinkat(_v.fd, "", buffer, bytes);
+#else
+    ssize_t read = ::readlinkat(_dirh.native_handle().fd, _leafname.c_str(), buffer, bytes);
+#endif
+    if(read == -1)
+    {
+      return posix_error();
+    }
+    if((size_t) read == bytes)
+    {
+      if(req.kernelbuffer.empty())
+      {
+        tofill._kernel_buffer.reset();
+        size_t toallocate = tofill._kernel_buffer_size * 2;
+        auto *mem = new(std::nothrow) char[toallocate];
+        if(mem == nullptr)
+        {
+          return errc::not_enough_memory;
+        }
+        tofill._kernel_buffer = std::unique_ptr<char[]>(mem);
+        tofill._kernel_buffer_size = toallocate;
+        continue;
+      }
+      return errc::not_enough_memory;
+    }
+    // We know we can null terminate as read < bytes
+    buffer[read] = 0;
+    tofill._link = path_view(buffer, read);
+    tofill._type = symlink_type::symbolic;
+    return std::move(tofill);
+  }
+}
+
+result<symlink_handle::const_buffers_type> symlink_handle::write(symlink_handle::io_request<symlink_handle::const_buffers_type> req, deadline d) noexcept
+{
+  LLFIO_LOG_FUNCTION_CALL(this);
+  OUTCOME_TRY(_create_symlink(req.buffers.path(), d, true));
+  return success(std::move(req.buffers));
+}
+
+LLFIO_V2_NAMESPACE_END

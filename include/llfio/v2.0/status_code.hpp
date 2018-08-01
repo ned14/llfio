@@ -451,25 +451,53 @@ OUTCOME_TEMPLATE(class ErrorCondEnum)
 OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_condition_enum<ErrorCondEnum>::value))
 inline bool operator==(const error_info &a, const ErrorCondEnum &b)
 {
-  return make_error_code(a) == std::error_condition(b);
+  auto _a = make_error_code(a);
+  auto _b = std::error_condition(b);
+#ifndef _WIN32
+  // Looks like libstdc++ doesn't map system category to generic category, which is a bug
+  if(_a.category() == std::system_category() && _b.category() == std::generic_category() && _a.value() == static_cast<int>(b))
+    return true;
+#endif
+  return _a == _b;
 }
 OUTCOME_TEMPLATE(class ErrorCondEnum)
 OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_condition_enum<ErrorCondEnum>::value))
 inline bool operator==(const ErrorCondEnum &a, const error_info &b)
 {
-  return std::error_condition(a) == make_error_code(b);
+  auto _a = std::error_condition(a);
+  auto _b = make_error_code(b);
+#ifndef _WIN32
+  // Looks like libstdc++ doesn't map system category to generic category, which is a bug
+  if(_a.category() == std::generic_category() && _b.category() == std::system_category() && _b.value() == static_cast<int>(a))
+    return true;
+#endif
+  return _a == _b;
 }
 OUTCOME_TEMPLATE(class ErrorCondEnum)
 OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_condition_enum<ErrorCondEnum>::value))
 inline bool operator!=(const error_info &a, const ErrorCondEnum &b)
 {
-  return make_error_code(a) != std::error_condition(b);
+  auto _a = make_error_code(a);
+  auto _b = std::error_condition(b);
+#ifndef _WIN32
+  // Looks like libstdc++ doesn't map system category to generic category, which is a bug
+  if(_a.category() == std::system_category() && _b.category() == std::generic_category() && _a.value() == static_cast<int>(b))
+    return false;
+#endif
+  return _a != _b;
 }
 OUTCOME_TEMPLATE(class ErrorCondEnum)
 OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_condition_enum<ErrorCondEnum>::value))
 inline bool operator!=(const ErrorCondEnum &a, const error_info &b)
 {
-  return std::error_condition(a) != make_error_code(b);
+  auto _a = std::error_condition(a);
+  auto _b = make_error_code(b);
+#ifndef _WIN32
+  // Looks like libstdc++ doesn't map system category to generic category, which is a bug
+  if(_a.category() == std::generic_category() && _b.category() == std::system_category() && _b.value() == static_cast<int>(a))
+    return false;
+#endif
+  return _a != _b;
 }
 #ifndef NDEBUG
 // Is trivial in all ways, except default constructibility

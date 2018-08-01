@@ -35,7 +35,7 @@ static inline void TestAsyncFileHandle()
   futures.reserve(1024);
   h.truncate(1024 * 4096).value();
   alignas(4096) llfio::byte buffer[4096];
-  memset(buffer, 78, 4096);                                               // NOLINT
+  memset(buffer, 78, 4096);                                                // NOLINT
   llfio::async_file_handle::const_buffer_type bt{buffer, sizeof(buffer)};  // NOLINT
   for(size_t n = 0; n < 1024; n++)
   {
@@ -80,7 +80,7 @@ static inline void TestAsyncFileHandle()
   {
     llfio::async_file_handle::const_buffers_type out = i.first.get();
     // std::cout << out.data()->len << std::endl;
-    BOOST_CHECK(out.data()->len == 4096);
+    BOOST_CHECK(out.data()->size() == 4096);
   }
 }
 

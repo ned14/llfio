@@ -99,8 +99,8 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
   {
     for(auto &ol : ols)
     {
-      deadline nd = d;
-      LLFIO_WIN_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+      deadline nd;
+      LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
       if(STATUS_TIMEOUT == ntwait(nativeh.h, ol, nd))
       {
         LLFIO_WIN_DEADLINE_TO_TIMEOUT(d);

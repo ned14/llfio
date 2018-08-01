@@ -196,7 +196,7 @@ result<symlink_handle::buffers_type> symlink_handle::read(symlink_handle::io_req
   }
 }
 
-result<symlink_handle::const_buffers_type> symlink_handle::write(symlink_handle::io_request<symlink_handle::const_buffers_type> req) noexcept
+result<symlink_handle::const_buffers_type> symlink_handle::write(symlink_handle::io_request<symlink_handle::const_buffers_type> req, deadline /*unused*/) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;

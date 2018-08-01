@@ -29,6 +29,11 @@ Distributed under the Boost Software License, Version 1.0.
 
 LLFIO_V2_NAMESPACE_BEGIN
 
+namespace detail
+{
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<void> stat_from_symlink(struct stat &s, const handle &h) noexcept;
+}
+
 static inline filesystem::file_type to_st_type(uint16_t mode)
 {
   switch(mode & S_IFMT)
@@ -74,7 +79,12 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, sta
 
   if(-1 == ::fstat(h.native_handle().fd, &s))
   {
-    return posix_error();
+    if(!h.is_symlink() || EBADF != errno)
+    {
+      return posix_error();
+    }
+    // This is a hack, but symlink_handle includes this first so there is a chicken and egg dependency problem
+    OUTCOME_TRY(detail::stat_from_symlink(s, h));
   }
   if(wanted & want::dev)
   {

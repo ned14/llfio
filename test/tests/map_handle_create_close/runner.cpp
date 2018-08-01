@@ -116,14 +116,14 @@ template <class U> inline void map_handle_create_close_(U &&f)
             if (use_file_backing)
             {
               auto b = maph.read(0, { {nullptr, 20} }).value();
-              KERNELTEST_CHECK(testreturn, b[0].data == addr);
-              KERNELTEST_CHECK(testreturn, b[0].len == 19);  // reads do not read more than the backing length
+              KERNELTEST_CHECK(testreturn, b[0].data() == addr);
+              KERNELTEST_CHECK(testreturn, b[0].size() == 19);  // reads do not read more than the backing length
             }
             else
             {
               auto b = maph.read(5, { {nullptr, 5000} }).value();
-              KERNELTEST_CHECK(testreturn, b[0].data == addr+5); // NOLINT
-              KERNELTEST_CHECK(testreturn, b[0].len == 4091);
+              KERNELTEST_CHECK(testreturn, b[0].data() == addr+5); // NOLINT
+              KERNELTEST_CHECK(testreturn, b[0].size() == 4091);
             }
             // If we are writable, write straight into the map
             if (maph.is_writable() && addr)
