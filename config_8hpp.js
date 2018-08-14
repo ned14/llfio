@@ -12,7 +12,7 @@ var config_8hpp =
     [ "LLFIO_HEADERS_ONLY_VIRTUAL_SPEC", "group__config.html#ga40c15a3fc44361077b478acbfaca18ee", null ],
     [ "LLFIO_LOG_BACKTRACE_LEVELS", "group__config.html#ga799d6ef19b741b67d019652e4acc271f", null ],
     [ "LLFIO_LOG_TO_OSTREAM", "config_8hpp.html#a796b217a9d73a890d3a05de85bb1120d", null ],
-    [ "LLFIO_LOGGING_LEVEL", "group__config.html#gaf958c6b17b345d3b84043bf7352451f2", null ],
+    [ "LLFIO_LOGGING_LEVEL", "config_8hpp.html#af958c6b17b345d3b84043bf7352451f2", null ],
     [ "LLFIO_LOGGING_MEMORY", "group__config.html#ga2e45ede29ed7b2aa06eb19aff2485541", null ],
     [ "LLFIO_MAKE_FREE_FUNCTION", "config_8hpp.html#aa96417d97962da23b27d237508a58646", null ],
     [ "LLFIO_TEMPLATE", "config_8hpp.html#a4de8a527746757126bdb1635b9a2a892", null ],

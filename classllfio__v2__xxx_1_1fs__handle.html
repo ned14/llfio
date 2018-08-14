@@ -103,6 +103,7 @@ Inheritance diagram for llfio_v2_xxx::fs_handle:</div>
   <map id="llfio_5Fv2_5Fxxx::fs_5Fhandle_map" name="llfio_5Fv2_5Fxxx::fs_5Fhandle_map">
 <area href="classllfio__v2__xxx_1_1directory__handle.html" title="A handle to a directory which can be enumerated. " alt="llfio_v2_xxx::directory_handle" shape="rect" coords="0,56,197,80"/>
 <area href="classllfio__v2__xxx_1_1file__handle.html" title="A handle to a regular file or device, kept data layout compatible with async_file_handle. " alt="llfio_v2_xxx::file_handle" shape="rect" coords="207,56,404,80"/>
+<area href="classllfio__v2__xxx_1_1symlink__handle.html" title="A handle to an inode which redirects to a different path. " alt="llfio_v2_xxx::symlink_handle" shape="rect" coords="414,56,611,80"/>
 <area href="classllfio__v2__xxx_1_1mapped__file__handle.html" title="A memory mapped regular file or device. " alt="llfio_v2_xxx::mapped_file_handle" shape="rect" coords="207,112,404,136"/>
 </map>
  </div></div>
@@ -280,6 +281,8 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
 </dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>Except on platforms with race free syscalls for renaming open handles (Windows), calls <code>current_path()</code> via <code>parent_path_handle()</code> and thus is both expensive and calls malloc many times. </dd></dl>
 
+<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#afea9ef2b36cac3f6dfcae7555ca3303c">llfio_v2_xxx::symlink_handle</a>.</p>
+
 </div>
 </div>
 <a id="a1dd7923bb65456af4da41ebe7cb84982"></a>
@@ -314,6 +317,8 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
   </dd>
 </dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>Except on platforms with race free syscalls for unlinking open handles (Windows), calls <code>current_path()</code> and thus is both expensive and calls malloc many times. On Windows, also calls <code>current_path()</code> if <code>flag::disable_safety_unlinks</code> is not set. </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#a002c9dab669604d58e08aa8f4dbc99c8">llfio_v2_xxx::symlink_handle</a>.</p>
 
 </div>
 </div>

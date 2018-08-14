@@ -13,7 +13,8 @@ var structllfio__v2__xxx_1_1native__handle__type =
       [ "symlink", "structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7a4afae65da7b66f75e6e82b470d298fb5", null ],
       [ "multiplexer", "structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7a3cea1a678741f4ce20e57164946b5fc1", null ],
       [ "process", "structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7a7f4cc916f7b5827f7528027964445d21", null ],
-      [ "section", "structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7a5d4474f0197e13f3205443ad91de390e", null ]
+      [ "section", "structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7a5d4474f0197e13f3205443ad91de390e", null ],
+      [ "_child_close_executed", "structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7a4caa9f58b8c6de7934f0fad06ca2e1a1", null ]
     ] ],
     [ "native_handle_type", "structllfio__v2__xxx_1_1native__handle__type.html#af9eb6d201364aae2e933da37caa4c1dd", null ],
     [ "~native_handle_type", "structllfio__v2__xxx_1_1native__handle__type.html#aa9e3ba4e787524be1a1715f75586d5fe", null ],

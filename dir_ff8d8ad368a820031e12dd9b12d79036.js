@@ -33,5 +33,6 @@ var dir_ff8d8ad368a820031e12dd9b12d79036 =
       [ "f_flags_t", "structllfio__v2__xxx_1_1statfs__t_1_1f__flags__t.html", "structllfio__v2__xxx_1_1statfs__t_1_1f__flags__t" ]
     ] ],
     [ "storage_profile.hpp", "storage__profile_8hpp.html", "storage__profile_8hpp" ],
+    [ "symlink_handle.hpp", "symlink__handle_8hpp.html", "symlink__handle_8hpp" ],
     [ "utils.hpp", "utils_8hpp.html", "utils_8hpp" ]
 ];

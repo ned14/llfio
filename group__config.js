@@ -5,7 +5,6 @@ var group__config =
     [ "LLFIO_HEADERS_ONLY_MEMFUNC_SPEC", "group__config.html#gad270840dbd547a75ad62d48e93412ca7", null ],
     [ "LLFIO_HEADERS_ONLY_VIRTUAL_SPEC", "group__config.html#ga40c15a3fc44361077b478acbfaca18ee", null ],
     [ "LLFIO_LOG_BACKTRACE_LEVELS", "group__config.html#ga799d6ef19b741b67d019652e4acc271f", null ],
-    [ "LLFIO_LOGGING_LEVEL", "group__config.html#gaf958c6b17b345d3b84043bf7352451f2", null ],
     [ "LLFIO_LOGGING_MEMORY", "group__config.html#ga2e45ede29ed7b2aa06eb19aff2485541", null ],
     [ "LLFIO_UNSTABLE_VERSION", "group__config.html#gaadd4f1f9d1a5c77c3b40d9e1b759b706", null ],
     [ "LLFIO_V2", "group__config.html#gabb964a24682a722a7eaad891ee497a61", null ],

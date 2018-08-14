@@ -7,8 +7,10 @@ var hierarchy =
     [ "async_file_handle::awaitable< BuffersType >", "classasync__file__handle_1_1awaitable.html", null ],
     [ "llfio_v2_xxx::io_service::awaitable_post_to_self", "structllfio__v2__xxx_1_1io__service_1_1awaitable__post__to__self.html", null ],
     [ "llfio_v2_xxx::io_handle::buffer_type", "structllfio__v2__xxx_1_1io__handle_1_1buffer__type.html", null ],
+    [ "llfio_v2_xxx::symlink_handle::buffers_type", "structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html", null ],
     [ "llfio_v2_xxx::path_view::c_str", "structllfio__v2__xxx_1_1path__view_1_1c__str.html", null ],
     [ "llfio_v2_xxx::io_handle::const_buffer_type", "structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html", null ],
+    [ "llfio_v2_xxx::symlink_handle::const_buffers_type", "structllfio__v2__xxx_1_1symlink__handle_1_1const__buffers__type.html", null ],
     [ "llfio_v2_xxx::construct< T >", "structllfio__v2__xxx_1_1construct.html", null ],
     [ "llfio_v2_xxx::construct< algorithm::cached_parent_handle_adapter< T > >", "structllfio__v2__xxx_1_1construct_3_01algorithm_1_1cached__parent__handle__adapter_3_01_t_01_4_01_4.html", null ],
     [ "construct< async_file_handle >", "structconstruct_3_01async__file__handle_01_4.html", null ],
@@ -18,6 +20,7 @@ var hierarchy =
     [ "llfio_v2_xxx::construct< mapped_file_handle >", "structllfio__v2__xxx_1_1construct_3_01mapped__file__handle_01_4.html", null ],
     [ "llfio_v2_xxx::construct< path_handle >", "structllfio__v2__xxx_1_1construct_3_01path__handle_01_4.html", null ],
     [ "llfio_v2_xxx::construct< section_handle >", "structllfio__v2__xxx_1_1construct_3_01section__handle_01_4.html", null ],
+    [ "llfio_v2_xxx::construct< symlink_handle >", "structllfio__v2__xxx_1_1construct_3_01symlink__handle_01_4.html", null ],
     [ "llfio_v2_xxx::deadline", "structllfio__v2__xxx_1_1deadline.html", null ],
     [ "llfio_v2_xxx::directory_entry", "structllfio__v2__xxx_1_1directory__entry.html", null ],
     [ "llfio_v2_xxx::path_discovery::discovered_path", "structllfio__v2__xxx_1_1path__discovery_1_1discovered__path.html", null ],
@@ -37,7 +40,8 @@ var hierarchy =
       [ "llfio_v2_xxx::directory_handle", "classllfio__v2__xxx_1_1directory__handle.html", null ],
       [ "llfio_v2_xxx::file_handle", "classllfio__v2__xxx_1_1file__handle.html", [
         [ "llfio_v2_xxx::mapped_file_handle", "classllfio__v2__xxx_1_1mapped__file__handle.html", null ]
-      ] ]
+      ] ],
+      [ "llfio_v2_xxx::symlink_handle", "classllfio__v2__xxx_1_1symlink__handle.html", null ]
     ] ],
     [ "llfio_v2_xxx::handle", "classllfio__v2__xxx_1_1handle.html", [
       [ "llfio_v2_xxx::io_handle", "classllfio__v2__xxx_1_1io__handle.html", [
@@ -47,9 +51,13 @@ var hierarchy =
       [ "llfio_v2_xxx::path_handle", "classllfio__v2__xxx_1_1path__handle.html", [
         [ "llfio_v2_xxx::directory_handle", "classllfio__v2__xxx_1_1directory__handle.html", null ]
       ] ],
-      [ "llfio_v2_xxx::section_handle", "classllfio__v2__xxx_1_1section__handle.html", null ]
+      [ "llfio_v2_xxx::section_handle", "classllfio__v2__xxx_1_1section__handle.html", null ],
+      [ "llfio_v2_xxx::symlink_handle", "classllfio__v2__xxx_1_1symlink__handle.html", null ]
     ] ],
     [ "llfio_v2_xxx::io_handle::io_request< T >", "structllfio__v2__xxx_1_1io__handle_1_1io__request.html", null ],
+    [ "llfio_v2_xxx::symlink_handle::io_request< T, bool >", "structllfio__v2__xxx_1_1symlink__handle_1_1io__request.html", null ],
+    [ "llfio_v2_xxx::symlink_handle::io_request< buffers_type, ____ >", "structllfio__v2__xxx_1_1symlink__handle_1_1io__request_3_01buffers__type_00_01_________01_4.html", null ],
+    [ "llfio_v2_xxx::symlink_handle::io_request< const_buffers_type, ____ >", "structllfio__v2__xxx_1_1symlink__handle_1_1io__request_3_01const__buffers__type_00_01_________01_4.html", null ],
     [ "llfio_v2_xxx::io_service", "classllfio__v2__xxx_1_1io__service.html", null ],
     [ "llfio_v2_xxx::storage_profile::item_base", "structllfio__v2__xxx_1_1storage__profile_1_1item__base.html", [
       [ "llfio_v2_xxx::storage_profile::item< float >", "structllfio__v2__xxx_1_1storage__profile_1_1item.html", null ],

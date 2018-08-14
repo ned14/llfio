@@ -1,13 +1,8 @@
 var classllfio__v2__xxx_1_1path__view =
 [
     [ "c_str", "structllfio__v2__xxx_1_1path__view_1_1c__str.html", "structllfio__v2__xxx_1_1path__view_1_1c__str" ],
-    [ "const_pointer", "classllfio__v2__xxx_1_1path__view.html#a2ece0bfa9db65937027d67132b2b9591", null ],
-    [ "const_reference", "classllfio__v2__xxx_1_1path__view.html#a18c56240913fe67b9640d2df44f1fec9", null ],
     [ "difference_type", "classllfio__v2__xxx_1_1path__view.html#ad4e14fc71abee0765b06af857bd6a025", null ],
-    [ "pointer", "classllfio__v2__xxx_1_1path__view.html#a7e20393c144e25cb3f7d5dc95a47b7f8", null ],
-    [ "reference", "classllfio__v2__xxx_1_1path__view.html#a0b40530b8b360fe06e09d8751a77778f", null ],
     [ "size_type", "classllfio__v2__xxx_1_1path__view.html#ac797abdc80bbd5f5b94ccb4e30117cbb", null ],
-    [ "value_type", "classllfio__v2__xxx_1_1path__view.html#a6d72c74cf1adf04d80877f156288531a", null ],
     [ "path_view", "classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339", null ],
     [ "~path_view", "classllfio__v2__xxx_1_1path__view.html#a1b128bc55c1c093b9b46de07b7c1ced7", null ],
     [ "path_view", "classllfio__v2__xxx_1_1path__view.html#ab423783d2a907166248f3074f3750045", null ],

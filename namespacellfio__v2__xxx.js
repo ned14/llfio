@@ -12,6 +12,7 @@ var namespacellfio__v2__xxx =
     [ "construct< mapped_file_handle >", "structllfio__v2__xxx_1_1construct_3_01mapped__file__handle_01_4.html", "structllfio__v2__xxx_1_1construct_3_01mapped__file__handle_01_4" ],
     [ "construct< path_handle >", "structllfio__v2__xxx_1_1construct_3_01path__handle_01_4.html", "structllfio__v2__xxx_1_1construct_3_01path__handle_01_4" ],
     [ "construct< section_handle >", "structllfio__v2__xxx_1_1construct_3_01section__handle_01_4.html", "structllfio__v2__xxx_1_1construct_3_01section__handle_01_4" ],
+    [ "construct< symlink_handle >", "structllfio__v2__xxx_1_1construct_3_01symlink__handle_01_4.html", "structllfio__v2__xxx_1_1construct_3_01symlink__handle_01_4" ],
     [ "deadline", "structllfio__v2__xxx_1_1deadline.html", "structllfio__v2__xxx_1_1deadline" ],
     [ "directory_entry", "structllfio__v2__xxx_1_1directory__entry.html", "structllfio__v2__xxx_1_1directory__entry" ],
     [ "directory_handle", "classllfio__v2__xxx_1_1directory__handle.html", "classllfio__v2__xxx_1_1directory__handle" ],
@@ -33,5 +34,6 @@ var namespacellfio__v2__xxx =
     [ "path_view", "classllfio__v2__xxx_1_1path__view.html", "classllfio__v2__xxx_1_1path__view" ],
     [ "section_handle", "classllfio__v2__xxx_1_1section__handle.html", "classllfio__v2__xxx_1_1section__handle" ],
     [ "stat_t", "structllfio__v2__xxx_1_1stat__t.html", "structllfio__v2__xxx_1_1stat__t" ],
-    [ "statfs_t", "structllfio__v2__xxx_1_1statfs__t.html", "structllfio__v2__xxx_1_1statfs__t" ]
+    [ "statfs_t", "structllfio__v2__xxx_1_1statfs__t.html", "structllfio__v2__xxx_1_1statfs__t" ],
+    [ "symlink_handle", "classllfio__v2__xxx_1_1symlink__handle.html", "classllfio__v2__xxx_1_1symlink__handle" ]
 ];

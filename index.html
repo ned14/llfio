@@ -261,20 +261,15 @@ mapped_file_handle - adds low latency memory mapped scatter-gather i/o</li>
 <td>✔ </td><td>✔ </td><td>✔ </td><td>i/o on <code>async_file_handle</code> is coroutines awaitable. </td></tr>
 <tr>
 <td>✔ </td><td>✔ </td><td></td><td><code>llfio::algorithm::trivial_vector&lt;T&gt;</code> with constant time reallocation if <code>T</code> is trivially copyable. </td></tr>
-</table>
-<p>Todo to reach feature parity with LLFIO v1:</p>
-<table class="doxtable">
 <tr>
-<th>NEW in v2 </th><th>Windows </th><th>POSIX </th><th></th></tr>
-<tr>
-<td></td><td></td><td></td><td><code>symlink_handle</code>. </td></tr>
-<tr>
-<td></td><td></td><td></td><td>BSD and OS X kqueues optimised <code>io_service</code> </td></tr>
+<td></td><td>✔ </td><td>✔ </td><td><code>symlink_handle</code>. </td></tr>
 </table>
 <p>Todo thereafter in order of priority:</p>
 <table class="doxtable">
 <tr>
 <th>NEW in v2 </th><th>Windows </th><th>POSIX </th><th></th></tr>
+<tr>
+<td>✔ </td><td></td><td></td><td>A mechanism for writing a <code>stat_t</code> onto an inode. </td></tr>
 <tr>
 <td>✔ </td><td></td><td></td><td>Page allocator based on an index of linked list of free pages. See notes. </td></tr>
 <tr>

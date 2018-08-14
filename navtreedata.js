@@ -40,13 +40,13 @@ var NAVTREEINDEX =
 [
 "annotated.html",
 "classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html#a573150086df5bb6db571443b98f08776",
-"classllfio__v2__xxx_1_1fs__handle.html",
-"classllfio__v2__xxx_1_1map__handle.html#a5929f46f42112bd805ab5001bfbf9d2aa334c4a4c42fdb79d7ebc3e73b517e6f8",
-"classllfio__v2__xxx_1_1path__handle.html#aec00c90b9b840886be11f846d161415b",
-"functions_o.html",
-"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a316f0f8773d00ba317e2ec83f767f48f",
-"structllfio__v2__xxx_1_1native__handle__type.html#a8a38d56b1a9a3ee70799df3dac04edfc",
-"structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html#acf09944b61a0e84f7d72dd4a87ffb76d"
+"classllfio__v2__xxx_1_1file__handle.html#affb091ded80ffde7c0c3854e2abc52fd",
+"classllfio__v2__xxx_1_1map__handle.html#a5929f46f42112bd805ab5001bfbf9d2aa07122ea63cdc5b2c07e764d95a816d3d",
+"classllfio__v2__xxx_1_1path__handle.html#ade0d0e05b844e77f425669da87bf48bb",
+"config_8hpp.html#a79085acc20a53afe38d31c1af948301d",
+"storage__profile_8hpp.html#a9aeced989ea59c10af9066e5f8a35dea",
+"structllfio__v2__xxx_1_1construct_3_01symlink__handle_01_4.html#a2b039a2ed54afb395147ef5e4fb1b073",
+"structllfio__v2__xxx_1_1storage__profile_1_1item.html#a2580620b39e8cce0db068444dd6c14bf"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

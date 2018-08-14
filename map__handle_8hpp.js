@@ -9,7 +9,7 @@ var map__handle_8hpp =
     [ "close", "map__handle_8hpp.html#a30183de3590a31b5ef3b2952f700b110", null ],
     [ "length", "map__handle_8hpp.html#aa3676f0dd69f4b54cf7e14e3f86d32b9", null ],
     [ "length", "map__handle_8hpp.html#a70e68bcf05636966ffefe001b903487e", null ],
-    [ "map", "map__handle_8hpp.html#a18b5c3c9667839e05dd44972264672f9", null ],
+    [ "map", "map__handle_8hpp.html#ab50d07405d17a8fff4e360fd2612bc6f", null ],
     [ "map", "map__handle_8hpp.html#ab9dbbe2fe79758ef87fe2dd1f61d824c", null ],
     [ "operator<<", "map__handle_8hpp.html#aaf60dc6739dc2bd7d890630b1a50d15a", null ],
     [ "read", "map__handle_8hpp.html#ab993693c98cdb52e2d611f8f9e24e4e2", null ],

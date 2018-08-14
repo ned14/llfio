@@ -83,15 +83,11 @@ $(document).ready(function(){initNavTree('structllfio__v2__xxx_1_1io__handle_1_1
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">llfio_v2_xxx::io_handle::const_buffer_type Struct Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
-<p>The gather buffer type used by this handle. Guaranteed to be <code>TrivialType</code> and <code>StandardLayoutType</code>.  
- <a href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#details">More...</a></p>
 
 <p><code>#include &quot;io_handle.hpp&quot;</code></p>
 <table class="memberdecls">
@@ -101,6 +97,10 @@ Public Types</h2></td></tr>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a56b1347a75286b1b21af8082faacabb7">pointer</a> = const byte *</td></tr>
 <tr class="memdesc:a56b1347a75286b1b21af8082faacabb7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of the pointer to memory. <br /></td></tr>
 <tr class="separator:a56b1347a75286b1b21af8082faacabb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e9b89ea04a36102d5b3ae809a96205e"><td class="memItemLeft" align="right" valign="top"><a id="a7e9b89ea04a36102d5b3ae809a96205e"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a7e9b89ea04a36102d5b3ae809a96205e">const_pointer</a> = const byte *</td></tr>
+<tr class="memdesc:a7e9b89ea04a36102d5b3ae809a96205e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of the pointer to memory. <br /></td></tr>
+<tr class="separator:a7e9b89ea04a36102d5b3ae809a96205e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa3317755ad6cdbefb40f4e99c9f872ce"><td class="memItemLeft" align="right" valign="top"><a id="aa3317755ad6cdbefb40f4e99c9f872ce"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#aa3317755ad6cdbefb40f4e99c9f872ce">iterator</a> = const byte *</td></tr>
 <tr class="memdesc:aa3317755ad6cdbefb40f4e99c9f872ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of the iterator to memory. <br /></td></tr>
@@ -116,44 +116,65 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="str
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a6e12e67d3869387f9ce1da5d0a8f9d30"><td class="memItemLeft" align="right" valign="top"><a id="a6e12e67d3869387f9ce1da5d0a8f9d30"></a>
-constexpr <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#aa3317755ad6cdbefb40f4e99c9f872ce">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a6e12e67d3869387f9ce1da5d0a8f9d30">begin</a> ()</td></tr>
-<tr class="memdesc:a6e12e67d3869387f9ce1da5d0a8f9d30"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the beginning of the buffer. <br /></td></tr>
-<tr class="separator:a6e12e67d3869387f9ce1da5d0a8f9d30"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae2f7c41c5008aa492e1d6c57c2ca80ae"><td class="memItemLeft" align="right" valign="top"><a id="ae2f7c41c5008aa492e1d6c57c2ca80ae"></a>
-constexpr <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a7011ff9e31ac4814e8ae45b7b999f249">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#ae2f7c41c5008aa492e1d6c57c2ca80ae">begin</a> () const</td></tr>
-<tr class="memdesc:ae2f7c41c5008aa492e1d6c57c2ca80ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the beginning of the buffer. <br /></td></tr>
-<tr class="separator:ae2f7c41c5008aa492e1d6c57c2ca80ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a527a8dd9b03caf5ffd4bd2a0e95dc825"><td class="memItemLeft" align="right" valign="top"><a id="a527a8dd9b03caf5ffd4bd2a0e95dc825"></a>
-constexpr <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a7011ff9e31ac4814e8ae45b7b999f249">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a527a8dd9b03caf5ffd4bd2a0e95dc825">cbegin</a> () const</td></tr>
-<tr class="memdesc:a527a8dd9b03caf5ffd4bd2a0e95dc825"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the beginning of the buffer. <br /></td></tr>
-<tr class="separator:a527a8dd9b03caf5ffd4bd2a0e95dc825"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae1b1014911e0b6c195cef3ed7184313e"><td class="memItemLeft" align="right" valign="top"><a id="ae1b1014911e0b6c195cef3ed7184313e"></a>
-constexpr <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#aa3317755ad6cdbefb40f4e99c9f872ce">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#ae1b1014911e0b6c195cef3ed7184313e">end</a> ()</td></tr>
-<tr class="memdesc:ae1b1014911e0b6c195cef3ed7184313e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to after the end of the buffer. <br /></td></tr>
-<tr class="separator:ae1b1014911e0b6c195cef3ed7184313e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aca0270a18a1b4c234f67c0a4b5c52a09"><td class="memItemLeft" align="right" valign="top"><a id="aca0270a18a1b4c234f67c0a4b5c52a09"></a>
-constexpr <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a7011ff9e31ac4814e8ae45b7b999f249">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#aca0270a18a1b4c234f67c0a4b5c52a09">end</a> () const</td></tr>
-<tr class="memdesc:aca0270a18a1b4c234f67c0a4b5c52a09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to after the end of the buffer. <br /></td></tr>
-<tr class="separator:aca0270a18a1b4c234f67c0a4b5c52a09"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aabc70cfe30ec9548ccacd7788f41d333"><td class="memItemLeft" align="right" valign="top"><a id="aabc70cfe30ec9548ccacd7788f41d333"></a>
-constexpr <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a7011ff9e31ac4814e8ae45b7b999f249">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#aabc70cfe30ec9548ccacd7788f41d333">cend</a> () const</td></tr>
-<tr class="memdesc:aabc70cfe30ec9548ccacd7788f41d333"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to after the end of the buffer. <br /></td></tr>
-<tr class="separator:aabc70cfe30ec9548ccacd7788f41d333"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
-Public Attributes</h2></td></tr>
-<tr class="memitem:a84a8ede9ae03156d4fe6f2f3006c135a"><td class="memItemLeft" align="right" valign="top"><a id="a84a8ede9ae03156d4fe6f2f3006c135a"></a>
-<a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a56b1347a75286b1b21af8082faacabb7">pointer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a84a8ede9ae03156d4fe6f2f3006c135a">data</a></td></tr>
-<tr class="memdesc:a84a8ede9ae03156d4fe6f2f3006c135a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to memory to be written. Try to make this 64 byte, or ideally, <code>page_size()</code> aligned where possible. <br /></td></tr>
-<tr class="separator:a84a8ede9ae03156d4fe6f2f3006c135a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a78be763b5fa330d6c43a9ebe39f83a3e"><td class="memItemLeft" align="right" valign="top"><a id="a78be763b5fa330d6c43a9ebe39f83a3e"></a>
-<a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#acb6c33db3aabfbf88d5e8f636c8b6dd0">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a78be763b5fa330d6c43a9ebe39f83a3e">len</a></td></tr>
-<tr class="memdesc:a78be763b5fa330d6c43a9ebe39f83a3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of bytes to write from this address. Try to make this a 64 byte multiple, or ideally, a whole multiple of <code>page_size()</code>. <br /></td></tr>
-<tr class="separator:a78be763b5fa330d6c43a9ebe39f83a3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb471cea17d5f27e64a9ff87a8f12806"><td class="memItemLeft" align="right" valign="top"><a id="adb471cea17d5f27e64a9ff87a8f12806"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#adb471cea17d5f27e64a9ff87a8f12806">const_buffer_type</a> ()=default</td></tr>
+<tr class="memdesc:adb471cea17d5f27e64a9ff87a8f12806"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
+<tr class="separator:adb471cea17d5f27e64a9ff87a8f12806"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd415552a68aa6df0ec7b3ec4f40f31e"><td class="memItemLeft" align="right" valign="top"><a id="abd415552a68aa6df0ec7b3ec4f40f31e"></a>
+constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#abd415552a68aa6df0ec7b3ec4f40f31e">const_buffer_type</a> (<a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a56b1347a75286b1b21af8082faacabb7">pointer</a> <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a543a7c6701f1b7f6751b7276a0464f7e">data</a>, <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#acb6c33db3aabfbf88d5e8f636c8b6dd0">size_type</a> len) noexcept</td></tr>
+<tr class="memdesc:abd415552a68aa6df0ec7b3ec4f40f31e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
+<tr class="separator:abd415552a68aa6df0ec7b3ec4f40f31e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a878148d3f298383fbff896590067a3cb"><td class="memItemLeft" align="right" valign="top"><a id="a878148d3f298383fbff896590067a3cb"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>const_buffer_type</b> (const <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html">const_buffer_type</a> &amp;)=default</td></tr>
+<tr class="separator:a878148d3f298383fbff896590067a3cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5af7ddbdfaf9eff2fc3d71c1cb5fb5ab"><td class="memItemLeft" align="right" valign="top"><a id="a5af7ddbdfaf9eff2fc3d71c1cb5fb5ab"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>const_buffer_type</b> (<a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html">const_buffer_type</a> &amp;&amp;)=default</td></tr>
+<tr class="separator:a5af7ddbdfaf9eff2fc3d71c1cb5fb5ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aedcce0152f572813a4045d8b18761364"><td class="memItemLeft" align="right" valign="top"><a id="aedcce0152f572813a4045d8b18761364"></a>
+<a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html">const_buffer_type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html">const_buffer_type</a> &amp;)=default</td></tr>
+<tr class="separator:aedcce0152f572813a4045d8b18761364"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac007a84fad051c1681ad9c5ab783cfa6"><td class="memItemLeft" align="right" valign="top"><a id="ac007a84fad051c1681ad9c5ab783cfa6"></a>
+<a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html">const_buffer_type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html">const_buffer_type</a> &amp;&amp;)=default</td></tr>
+<tr class="separator:ac007a84fad051c1681ad9c5ab783cfa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a543a7c6701f1b7f6751b7276a0464f7e"><td class="memItemLeft" align="right" valign="top"><a id="a543a7c6701f1b7f6751b7276a0464f7e"></a>
+constexpr <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a56b1347a75286b1b21af8082faacabb7">pointer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a543a7c6701f1b7f6751b7276a0464f7e">data</a> () noexcept</td></tr>
+<tr class="memdesc:a543a7c6701f1b7f6751b7276a0464f7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the address of the bytes for this buffer. <br /></td></tr>
+<tr class="separator:a543a7c6701f1b7f6751b7276a0464f7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae46a664aab2d198534c2f1df65b46a6b"><td class="memItemLeft" align="right" valign="top"><a id="ae46a664aab2d198534c2f1df65b46a6b"></a>
+constexpr <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a7e9b89ea04a36102d5b3ae809a96205e">const_pointer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#ae46a664aab2d198534c2f1df65b46a6b">data</a> () const noexcept</td></tr>
+<tr class="memdesc:ae46a664aab2d198534c2f1df65b46a6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the address of the bytes for this buffer. <br /></td></tr>
+<tr class="separator:ae46a664aab2d198534c2f1df65b46a6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3dadd6b826704451e89cabf1c1305b40"><td class="memItemLeft" align="right" valign="top"><a id="a3dadd6b826704451e89cabf1c1305b40"></a>
+constexpr <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#acb6c33db3aabfbf88d5e8f636c8b6dd0">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a3dadd6b826704451e89cabf1c1305b40">size</a> () const noexcept</td></tr>
+<tr class="memdesc:a3dadd6b826704451e89cabf1c1305b40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of bytes in this buffer. <br /></td></tr>
+<tr class="separator:a3dadd6b826704451e89cabf1c1305b40"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4364d23f0a87200460bf789a4a8580a1"><td class="memItemLeft" align="right" valign="top"><a id="a4364d23f0a87200460bf789a4a8580a1"></a>
+constexpr <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#aa3317755ad6cdbefb40f4e99c9f872ce">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a4364d23f0a87200460bf789a4a8580a1">begin</a> () noexcept</td></tr>
+<tr class="memdesc:a4364d23f0a87200460bf789a4a8580a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the beginning of the buffer. <br /></td></tr>
+<tr class="separator:a4364d23f0a87200460bf789a4a8580a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10e6e1e22e4d3996a0a4c39d7b451f62"><td class="memItemLeft" align="right" valign="top"><a id="a10e6e1e22e4d3996a0a4c39d7b451f62"></a>
+constexpr <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a7011ff9e31ac4814e8ae45b7b999f249">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a10e6e1e22e4d3996a0a4c39d7b451f62">begin</a> () const noexcept</td></tr>
+<tr class="memdesc:a10e6e1e22e4d3996a0a4c39d7b451f62"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the beginning of the buffer. <br /></td></tr>
+<tr class="separator:a10e6e1e22e4d3996a0a4c39d7b451f62"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9763b53c5a059851d0e2e4901cb44b2"><td class="memItemLeft" align="right" valign="top"><a id="ac9763b53c5a059851d0e2e4901cb44b2"></a>
+constexpr <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a7011ff9e31ac4814e8ae45b7b999f249">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#ac9763b53c5a059851d0e2e4901cb44b2">cbegin</a> () const noexcept</td></tr>
+<tr class="memdesc:ac9763b53c5a059851d0e2e4901cb44b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the beginning of the buffer. <br /></td></tr>
+<tr class="separator:ac9763b53c5a059851d0e2e4901cb44b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a969cebe27482fe7e8060efbc9af3ce77"><td class="memItemLeft" align="right" valign="top"><a id="a969cebe27482fe7e8060efbc9af3ce77"></a>
+constexpr <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#aa3317755ad6cdbefb40f4e99c9f872ce">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a969cebe27482fe7e8060efbc9af3ce77">end</a> () noexcept</td></tr>
+<tr class="memdesc:a969cebe27482fe7e8060efbc9af3ce77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to after the end of the buffer. <br /></td></tr>
+<tr class="separator:a969cebe27482fe7e8060efbc9af3ce77"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0be10ca27a09246c1e22f97fa67a7be5"><td class="memItemLeft" align="right" valign="top"><a id="a0be10ca27a09246c1e22f97fa67a7be5"></a>
+constexpr <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a7011ff9e31ac4814e8ae45b7b999f249">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a0be10ca27a09246c1e22f97fa67a7be5">end</a> () const noexcept</td></tr>
+<tr class="memdesc:a0be10ca27a09246c1e22f97fa67a7be5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to after the end of the buffer. <br /></td></tr>
+<tr class="separator:a0be10ca27a09246c1e22f97fa67a7be5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94bef1f3da434964f250f70721b96554"><td class="memItemLeft" align="right" valign="top"><a id="a94bef1f3da434964f250f70721b96554"></a>
+constexpr <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a7011ff9e31ac4814e8ae45b7b999f249">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a94bef1f3da434964f250f70721b96554">cend</a> () const noexcept</td></tr>
+<tr class="memdesc:a94bef1f3da434964f250f70721b96554"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to after the end of the buffer. <br /></td></tr>
+<tr class="separator:a94bef1f3da434964f250f70721b96554"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The gather buffer type used by this handle. Guaranteed to be <code>TrivialType</code> and <code>StandardLayoutType</code>. </p>
+<div class="textblock"><p>The gather buffer type used by this handle. Guaranteed to be <code>TrivialType</code> and <code>StandardLayoutType</code>. Try to make address and length 64 byte, or ideally, <code>page_size()</code> aligned where possible. </p>
 </div><hr/>The documentation for this struct was generated from the following file:<ul>
 <li>include/llfio/v2.0/<a class="el" href="io__handle_8hpp.html">io_handle.hpp</a></li>
 </ul>

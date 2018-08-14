@@ -84,6 +84,7 @@ $(document).ready(function(){initNavTree('classllfio__v2__xxx_1_1path__view.html
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-attribs">Static Public Attributes</a> &#124;
 <a href="#friends">Friends</a> &#124;
 <a href="classllfio__v2__xxx_1_1path__view-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -104,26 +105,6 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a6d72c74cf1adf04d80877f156288531a"><td class="memItemLeft" align="right" valign="top"><a id="a6d72c74cf1adf04d80877f156288531a"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a6d72c74cf1adf04d80877f156288531a">value_type</a> = char</td></tr>
-<tr class="memdesc:a6d72c74cf1adf04d80877f156288531a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Character type. <br /></td></tr>
-<tr class="separator:a6d72c74cf1adf04d80877f156288531a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7e20393c144e25cb3f7d5dc95a47b7f8"><td class="memItemLeft" align="right" valign="top"><a id="a7e20393c144e25cb3f7d5dc95a47b7f8"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a7e20393c144e25cb3f7d5dc95a47b7f8">pointer</a> = char *</td></tr>
-<tr class="memdesc:a7e20393c144e25cb3f7d5dc95a47b7f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer type. <br /></td></tr>
-<tr class="separator:a7e20393c144e25cb3f7d5dc95a47b7f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2ece0bfa9db65937027d67132b2b9591"><td class="memItemLeft" align="right" valign="top"><a id="a2ece0bfa9db65937027d67132b2b9591"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a2ece0bfa9db65937027d67132b2b9591">const_pointer</a> = const char *</td></tr>
-<tr class="memdesc:a2ece0bfa9db65937027d67132b2b9591"><td class="mdescLeft">&#160;</td><td class="mdescRight">Const pointer type. <br /></td></tr>
-<tr class="separator:a2ece0bfa9db65937027d67132b2b9591"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0b40530b8b360fe06e09d8751a77778f"><td class="memItemLeft" align="right" valign="top"><a id="a0b40530b8b360fe06e09d8751a77778f"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a0b40530b8b360fe06e09d8751a77778f">reference</a> = char &amp;</td></tr>
-<tr class="memdesc:a0b40530b8b360fe06e09d8751a77778f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reference type. <br /></td></tr>
-<tr class="separator:a0b40530b8b360fe06e09d8751a77778f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a18c56240913fe67b9640d2df44f1fec9"><td class="memItemLeft" align="right" valign="top"><a id="a18c56240913fe67b9640d2df44f1fec9"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a18c56240913fe67b9640d2df44f1fec9">const_reference</a> = const char &amp;</td></tr>
-<tr class="memdesc:a18c56240913fe67b9640d2df44f1fec9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Const reference type. <br /></td></tr>
-<tr class="separator:a18c56240913fe67b9640d2df44f1fec9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac797abdc80bbd5f5b94ccb4e30117cbb"><td class="memItemLeft" align="right" valign="top"><a id="ac797abdc80bbd5f5b94ccb4e30117cbb"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#ac797abdc80bbd5f5b94ccb4e30117cbb">size_type</a> = std::size_t</td></tr>
 <tr class="memdesc:ac797abdc80bbd5f5b94ccb4e30117cbb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size type. <br /></td></tr>
@@ -223,29 +204,36 @@ constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 <tr class="memdesc:a2265f98040ccff9b1707326d4984ba4e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the view in characters. <br /></td></tr>
 <tr class="separator:a2265f98040ccff9b1707326d4984ba4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5efe04f8c9f7a74559a10e81e775de2c"><td class="memItemLeft" align="right" valign="top"><a id="a5efe04f8c9f7a74559a10e81e775de2c"></a>
-constexpr <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td><td class="memItemRight" valign="bottom"><b>root_name</b> () const noexcept</td></tr>
+constexpr <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a5efe04f8c9f7a74559a10e81e775de2c">root_name</a> () const noexcept</td></tr>
+<tr class="memdesc:a5efe04f8c9f7a74559a10e81e775de2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a view of the root name part of this view e.g. C: <br /></td></tr>
 <tr class="separator:a5efe04f8c9f7a74559a10e81e775de2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af1ca707bbe218ba97647e6fc976ed0fc"><td class="memItemLeft" align="right" valign="top"><a id="af1ca707bbe218ba97647e6fc976ed0fc"></a>
-constexpr <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td><td class="memItemRight" valign="bottom"><b>root_directory</b> () const noexcept</td></tr>
+constexpr <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#af1ca707bbe218ba97647e6fc976ed0fc">root_directory</a> () const noexcept</td></tr>
+<tr class="memdesc:af1ca707bbe218ba97647e6fc976ed0fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a view of the root directory, if there is one e.g. /. <br /></td></tr>
 <tr class="separator:af1ca707bbe218ba97647e6fc976ed0fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ace2d2fec2c49aff2a2536465b93e6639"><td class="memItemLeft" align="right" valign="top"><a id="ace2d2fec2c49aff2a2536465b93e6639"></a>
-constexpr <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td><td class="memItemRight" valign="bottom"><b>root_path</b> () const noexcept</td></tr>
+constexpr <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#ace2d2fec2c49aff2a2536465b93e6639">root_path</a> () const noexcept</td></tr>
+<tr class="memdesc:ace2d2fec2c49aff2a2536465b93e6639"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns, if any, a view of the root path part of this view e.g. C:/. <br /></td></tr>
 <tr class="separator:ace2d2fec2c49aff2a2536465b93e6639"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2660a043095f236e04c64518befe3811"><td class="memItemLeft" align="right" valign="top"><a id="a2660a043095f236e04c64518befe3811"></a>
-constexpr <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td><td class="memItemRight" valign="bottom"><b>relative_path</b> () const noexcept</td></tr>
+constexpr <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a2660a043095f236e04c64518befe3811">relative_path</a> () const noexcept</td></tr>
+<tr class="memdesc:a2660a043095f236e04c64518befe3811"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a view of everything after the root path. <br /></td></tr>
 <tr class="separator:a2660a043095f236e04c64518befe3811"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a2538aaa8ee056c9e29eec1f4abc989"><td class="memItemLeft" align="right" valign="top"><a id="a0a2538aaa8ee056c9e29eec1f4abc989"></a>
-constexpr <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td><td class="memItemRight" valign="bottom"><b>parent_path</b> () const noexcept</td></tr>
+constexpr <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a0a2538aaa8ee056c9e29eec1f4abc989">parent_path</a> () const noexcept</td></tr>
+<tr class="memdesc:a0a2538aaa8ee056c9e29eec1f4abc989"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a view of the everything apart from the filename part of this view. <br /></td></tr>
 <tr class="separator:a0a2538aaa8ee056c9e29eec1f4abc989"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab9973b8929a55d92a74c8ef8a6f52f90"><td class="memItemLeft" align="right" valign="top"><a id="ab9973b8929a55d92a74c8ef8a6f52f90"></a>
 constexpr <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#ab9973b8929a55d92a74c8ef8a6f52f90">filename</a> () const noexcept</td></tr>
 <tr class="memdesc:ab9973b8929a55d92a74c8ef8a6f52f90"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a view of the filename part of this view. <br /></td></tr>
 <tr class="separator:ab9973b8929a55d92a74c8ef8a6f52f90"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4ea230ab9092e8accfcefbead546141"><td class="memItemLeft" align="right" valign="top"><a id="ad4ea230ab9092e8accfcefbead546141"></a>
-constexpr <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td><td class="memItemRight" valign="bottom"><b>stem</b> () const noexcept</td></tr>
+constexpr <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#ad4ea230ab9092e8accfcefbead546141">stem</a> () const noexcept</td></tr>
+<tr class="memdesc:ad4ea230ab9092e8accfcefbead546141"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a view of the filename without any file extension. <br /></td></tr>
 <tr class="separator:ad4ea230ab9092e8accfcefbead546141"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8412be7f77b65810fd8da50987cdaf5a"><td class="memItemLeft" align="right" valign="top"><a id="a8412be7f77b65810fd8da50987cdaf5a"></a>
-constexpr <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td><td class="memItemRight" valign="bottom"><b>extension</b> () const noexcept</td></tr>
+constexpr <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a8412be7f77b65810fd8da50987cdaf5a">extension</a> () const noexcept</td></tr>
+<tr class="memdesc:a8412be7f77b65810fd8da50987cdaf5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a view of the file extension part of this view. <br /></td></tr>
 <tr class="separator:a8412be7f77b65810fd8da50987cdaf5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab86fa3a4456b6d298ec78e18e76f999d"><td class="memItemLeft" align="right" valign="top"><a id="ab86fa3a4456b6d298ec78e18e76f999d"></a>
 filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#ab86fa3a4456b6d298ec78e18e76f999d">path</a> () const</td></tr>
@@ -257,6 +245,13 @@ filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 <tr class="separator:a1c284ac9b48c76ad15d5371d4c8313eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aad3b3e087045c66f5580be26dbaedc64"><td class="memItemLeft" align="right" valign="top">constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#aad3b3e087045c66f5580be26dbaedc64">compare</a> (string_view str) const noexcept</td></tr>
 <tr class="separator:aad3b3e087045c66f5580be26dbaedc64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
+Static Public Attributes</h2></td></tr>
+<tr class="memitem:a5d34d5bd6de76ad2d56817214a7b8aee"><td class="memItemLeft" align="right" valign="top"><a id="a5d34d5bd6de76ad2d56817214a7b8aee"></a>
+static constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a5d34d5bd6de76ad2d56817214a7b8aee">preferred_separator</a> = filesystem::path::preferred_separator</td></tr>
+<tr class="memdesc:a5d34d5bd6de76ad2d56817214a7b8aee"><td class="mdescLeft">&#160;</td><td class="mdescRight">The preferred separator type. <br /></td></tr>
+<tr class="separator:a5d34d5bd6de76ad2d56817214a7b8aee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -323,7 +318,7 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>c_str</b></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Implicitly constructs a UTF-8 path view from a string view. </p><dl class="section warning"><dt>Warning</dt><dd>The byte after the end of the view must be legal to read. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;: _state(v) {}  <span class="comment">// NOLINT</span></div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;: _state(v) {}  <span class="comment">// NOLINT</span></div></div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -351,7 +346,7 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>c_str</b></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Compares the two string views via the view's <code>compare()</code> which in turn calls <code>traits::compare()</code>. Be aware that on Windows a conversion from UTF-8 to UTF-16 is performed if needed. </p>
-<div class="fragment"><div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;  {</div><div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;    <span class="keywordflow">return</span> _invoke([&amp;p](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v) { <span class="keywordflow">return</span> -p.compare(v); });</div><div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;  }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;  {</div><div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;    <span class="keywordflow">return</span> _invoke([&amp;p](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v) { <span class="keywordflow">return</span> -p.compare(v); });</div><div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;  }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a1c284ac9b48c76ad15d5371d4c8313eb"></a>
@@ -378,7 +373,7 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>c_str</b></td></tr>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;  {</div><div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classllfio__v2__xxx_1_1path__view.html#a0f19b4fa899ae090c7143946b4349dea">compare</a>(string_view(s));</div><div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1path__view_html_a0f19b4fa899ae090c7143946b4349dea"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a0f19b4fa899ae090c7143946b4349dea">llfio_v2_xxx::path_view::compare</a></div><div class="ttdeci">constexpr int compare(const path_view &amp;p) const noexcept</div><div class="ttdef"><b>Definition:</b> path_view.hpp:382</div></div>
+<div class="fragment"><div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;  {</div><div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classllfio__v2__xxx_1_1path__view.html#a0f19b4fa899ae090c7143946b4349dea">compare</a>(string_view(s));</div><div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1path__view_html_a0f19b4fa899ae090c7143946b4349dea"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a0f19b4fa899ae090c7143946b4349dea">llfio_v2_xxx::path_view::compare</a></div><div class="ttdeci">constexpr int compare(const path_view &amp;p) const noexcept</div><div class="ttdef"><b>Definition:</b> path_view.hpp:530</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -406,7 +401,7 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>c_str</b></td></tr>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;  {</div><div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;<span class="preprocessor">#ifdef _WIN32</span></div><div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;    <span class="keywordflow">if</span>(!_state._utf16.empty())</div><div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;    {</div><div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;      c_str z(<a class="code" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(str), <span class="keyword">false</span>);</div><div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;      <span class="keywordflow">return</span> _state._utf16.compare(wstring_view(z.buffer, z.length));</div><div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;    }</div><div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;<span class="preprocessor">#endif</span></div><div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;    <span class="keywordflow">return</span> _state._utf8.compare(str);</div><div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1path__view_html_a91540ade852194b9507184cdcaed3339"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">llfio_v2_xxx::path_view::path_view</a></div><div class="ttdeci">constexpr path_view()</div><div class="ttdoc">Constructs an empty path view. </div><div class="ttdef"><b>Definition:</b> path_view.hpp:198</div></div>
+<div class="fragment"><div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;  {</div><div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;<span class="preprocessor">#ifdef _WIN32</span></div><div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;    <span class="keywordflow">if</span>(!_state._utf16.empty())</div><div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;    {</div><div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;      c_str z(<a class="code" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(str), <span class="keyword">false</span>);</div><div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;      <span class="keywordflow">return</span> _state._utf16.compare(wstring_view(z.buffer, z.length));</div><div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;    }</div><div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;<span class="preprocessor">#endif</span></div><div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;    <span class="keywordflow">return</span> _state._utf8.compare(str);</div><div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1path__view_html_a91540ade852194b9507184cdcaed3339"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">llfio_v2_xxx::path_view::path_view</a></div><div class="ttdeci">constexpr path_view()</div><div class="ttdoc">Constructs an empty path view. </div><div class="ttdef"><b>Definition:</b> path_view.hpp:202</div></div>
 </div><!-- fragment -->
 </div>
 </div>

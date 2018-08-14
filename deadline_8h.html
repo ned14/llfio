@@ -113,10 +113,41 @@ Macros</h2></td></tr>
 <tr class="memitem:a8248d979e402cb0538f7f6f2840b55c1"><td class="memItemLeft" align="right" valign="top"><a id="a8248d979e402cb0538f7f6f2840b55c1"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>LLFIO_DEADLINE_NAME</b>&#160;&#160;&#160;deadline</td></tr>
 <tr class="separator:a8248d979e402cb0538f7f6f2840b55c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ad4e75918453ebe2365378d3d04dce0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><b>LLFIO_DEADLINE_TO_PARTIAL_DEADLINE</b>(nd,  d)</td></tr>
+<tr class="separator:a9ad4e75918453ebe2365378d3d04dce0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides struct deadline. </p>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="a9ad4e75918453ebe2365378d3d04dce0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ad4e75918453ebe2365378d3d04dce0">&#9670;&nbsp;</a></span>LLFIO_DEADLINE_TO_PARTIAL_DEADLINE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define LLFIO_DEADLINE_TO_PARTIAL_DEADLINE</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">nd, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">d&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">if</span>(d)                                                                                                                                                                                                                                                                                                                        \</div><div class="line">  {                                                                                                                                                                                                                                                                                                                            \</div><div class="line">    if((d).steady)                                                                                                                                                                                                                                                                                                             \</div><div class="line">    {                                                                                                                                                                                                                                                                                                                          \</div><div class="line">      (nd).steady = <span class="keyword">true</span>;                                                                                                                                                                                                                                                                                                      \</div><div class="line">      std::chrono::nanoseconds ns = std::chrono::duration_cast&lt;std::chrono::nanoseconds&gt;((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());                                                                                                                                             \</div><div class="line">      if(ns.count() &lt; 0)                                                                                                                                                                                                                                                                                                       \</div><div class="line">        (nd).nsecs = 0;                                                                                                                                                                                                                                                                                                        \</div><div class="line">      else                                                                                                                                                                                                                                                                                                                     \</div><div class="line">        (nd).nsecs = ns.count();                                                                                                                                                                                                                                                                                               \</div><div class="line">    }                                                                                                                                                                                                                                                                                                                          \</div><div class="line">    else                                                                                                                                                                                                                                                                                                                       \</div><div class="line">      (nd) = (d);                                                                                                                                                                                                                                                                                                              \</div><div class="line">  }</div></div><!-- fragment -->
+</div>
+</div>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
