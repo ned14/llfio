@@ -305,8 +305,9 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
   return addr;
 }
 
-result<map_handle> map_handle::map(size_type bytes, section_handle::flag _flag) noexcept
+result<map_handle> map_handle::map(size_type bytes, bool /*unused*/, section_handle::flag _flag) noexcept
 {
+  // TODO: Keep a cache of MADV_FREE pages deallocated
   if(bytes == 0u)
   {
     return errc::argument_out_of_domain;

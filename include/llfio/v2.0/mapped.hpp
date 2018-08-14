@@ -81,13 +81,15 @@ public:
   //! Returns a reference to the internal map handle
   const map_handle &map() const noexcept { return _maph; }
 
-  /*! Create a view of new memory.
+  /*! Create a view of newly allocated unused memory, creating new memory if insufficient unused memory is available.
+  Note that the memory mapped by this call may contain non-zero bits (recycled memory) unless `zeroed` is true.
 
   \param length The number of items to map.
+  \param zeroed Whether to ensure that the viewed memory returned is all bits zero or not.
   \param _flag The flags to pass to `map_handle::map()`.
   */
-  explicit mapped(size_type length, section_handle::flag _flag = section_handle::flag::readwrite)
-      : _maph(map_handle::map(length * sizeof(T), _flag).value())
+  explicit mapped(size_type length, bool zeroed = false, section_handle::flag _flag = section_handle::flag::readwrite)
+      : _maph(map_handle::map(length * sizeof(T), zeroed, _flag).value())
   {
     byte *addr = _maph.address();
     static_cast<span<T> &>(*this) = span<T>(reinterpret_cast<T *>(addr), length);  // NOLINT

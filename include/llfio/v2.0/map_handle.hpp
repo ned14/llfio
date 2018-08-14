@@ -377,8 +377,9 @@ public:
     return ret;
   }
 
-  /*! Create new memory and map it into view.
-  \param bytes How many bytes to create and map. Typically will be rounded up to a multiple of the page size (see `utils::page_sizes()`) on POSIX, 64Kb on Windows.
+  /*! Map unused memory into view, creating new memory if insufficient unused memory is available. Note that the memory mapped by this call may contain non-zero bits (recycled memory) unless `zeroed` is true.
+  \param bytes How many bytes to map. Typically will be rounded up to a multiple of the page size (see `utils::page_sizes()`) on POSIX, 64Kb on Windows.
+  \param zeroed Set to true if only all bits zeroed memory is wanted.
   \param _flag The permissions with which to map the view. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
 
   \note On Microsoft Windows this constructor uses the faster VirtualAlloc() which creates less versatile page backed memory. If you want anonymous memory
@@ -389,7 +390,7 @@ public:
   \errors Any of the values POSIX mmap() or VirtualAlloc() can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(size_type bytes, section_handle::flag _flag = section_handle::flag::readwrite) noexcept;
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(size_type bytes, bool zeroed = false, section_handle::flag _flag = section_handle::flag::readwrite) noexcept;
 
   /*! Create a memory mapped view of a backing storage, optionally reserving additional address space for later growth.
   \param section A memory section handle specifying the backing storage to use.
@@ -646,9 +647,9 @@ VirtualAlloc() memory cannot do.
 
 \errors Any of the values POSIX mmap() or VirtualAlloc() can return.
 */
-inline result<map_handle> map(map_handle::size_type bytes, section_handle::flag _flag = section_handle::flag::readwrite) noexcept
+inline result<map_handle> map(map_handle::size_type bytes, bool zeroed = false, section_handle::flag _flag = section_handle::flag::readwrite) noexcept
 {
-  return map_handle::map(std::forward<decltype(bytes)>(bytes), std::forward<decltype(_flag)>(_flag));
+  return map_handle::map(std::forward<decltype(bytes)>(bytes), zeroed, std::forward<decltype(_flag)>(_flag));
 }
 /*! Create a memory mapped view of a backing storage, optionally reserving additional address space for later growth.
 \param section A memory section handle specifying the backing storage to use.

@@ -59,6 +59,10 @@ result<void> section_handle::close() noexcept
   LLFIO_LOG_FUNCTION_CALL(this);
   if(_v)
   {
+#ifndef NDEBUG
+    // Tell handle::close() that we have correctly executed
+    _v.behaviour |= native_handle_type::disposition::_child_close_executed;
+#endif
     OUTCOME_TRYV(handle::close());
     OUTCOME_TRYV(_anonymous.close());
     _flag = flag::none;
@@ -477,8 +481,9 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
 }
 
 
-result<map_handle> map_handle::map(size_type bytes, section_handle::flag _flag) noexcept
+result<map_handle> map_handle::map(size_type bytes, bool /*unused*/, section_handle::flag _flag) noexcept
 {
+  // TODO: Keep a cache of DiscardVirtualMemory()/MEM_RESET pages deallocated
   bytes = win32_round_up_to_allocation_size(bytes);
   result<map_handle> ret(map_handle(nullptr));
   native_handle_type &nativeh = ret.value()._v;

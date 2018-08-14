@@ -91,7 +91,12 @@ namespace algorithm
     cached_parent_handle_adapter(const cached_parent_handle_adapter &) = default;
     cached_parent_handle_adapter(cached_parent_handle_adapter &&) = default;  // NOLINT
     cached_parent_handle_adapter &operator=(const cached_parent_handle_adapter &) = default;
-    cached_parent_handle_adapter &operator=(cached_parent_handle_adapter &&) = default;  // NOLINT
+    cached_parent_handle_adapter &operator=(cached_parent_handle_adapter &&o) noexcept
+    {
+      this->~cached_parent_handle_adapter();
+      new(this) cached_parent_handle_adapter(std::move(o));
+      return *this;
+    }
     cached_parent_handle_adapter(adapted_handle_type &&o, const path_handle &base, path_view path)
         : adapted_handle_type(std::move(o))
     {

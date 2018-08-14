@@ -48,7 +48,6 @@ template <class U> inline void symlink_handle_create_close_creation(U &&f)
     postcondition::filesystem_comparison_structure_parameters
   >(
     { 
-
       // Does the mode parameter have the expected side effects?
       {                 success(), { symlink_handle::mode::none,       symlink_handle::creation::if_needed,     symlink_handle::flag::none }, { "existing1" }, { "existing1" }},
       {                 success(), { symlink_handle::mode::attr_read,  symlink_handle::creation::if_needed,     symlink_handle::flag::none }, { "existing1" }, { "existing1" }},

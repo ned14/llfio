@@ -134,6 +134,14 @@ result<void> handle::close() noexcept
   LLFIO_LOG_FUNCTION_CALL(this);
   if(_v)
   {
+#ifndef NDEBUG
+    // Trap when refined handle implementations don't set their vptr properly (this took a while to debug!)
+    if((static_cast<unsigned>(_v.behaviour) & 0xff00) != 0 && !(_v.behaviour & native_handle_type::disposition::_child_close_executed))
+    {
+      LLFIO_LOG_FATAL(this, "handle::close() called on a derived handle implementation, this suggests vptr is incorrect");
+      abort();
+    }
+#endif
     if(are_safety_fsyncs_issued() && is_writable())
     {
       if(-1 == fsync(_v.fd))
@@ -155,10 +163,31 @@ result<handle> handle::clone() const noexcept
   LLFIO_LOG_FUNCTION_CALL(this);
   result<handle> ret(handle(native_handle_type(), _caching, _flags));
   ret.value()._v.behaviour = _v.behaviour;
-  ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC);
+  ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC, 0);
   if(-1 == ret.value()._v.fd)
   {
-    return posix_error();
+    int e = errno;
+    if(e == EBADF)
+    {
+      // Fall back onto F_DUPFD
+      ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD, 0);
+      if(-1 != ret.value()._v.fd)
+      {
+        // Set close on exec
+        int attribs = ::fcntl(_v.fd, F_GETFL);
+        if(-1 == attribs)
+        {
+          return posix_error();
+        }
+        attribs |= FD_CLOEXEC;
+        if(-1 == ::fcntl(_v.fd, F_SETFL, attribs))
+        {
+          return posix_error();
+        }
+        return ret;
+      }
+    }
+    return posix_error(e);
   }
   return ret;
 }

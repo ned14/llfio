@@ -75,6 +75,14 @@ result<void> handle::close() noexcept
   LLFIO_LOG_FUNCTION_CALL(this);
   if(_v)
   {
+#ifndef NDEBUG
+    // Trap when refined handle implementations don't set their vptr properly (this took a while to debug!)
+    if((static_cast<unsigned>(_v.behaviour) & 0xff00) != 0 && !(_v.behaviour & native_handle_type::disposition::_child_close_executed))
+    {
+      LLFIO_LOG_FATAL(this, "handle::close() called on a derived handle implementation, this suggests vptr is incorrect");
+      abort();
+    }
+#endif
     if(are_safety_fsyncs_issued() && is_writable())
     {
       if(FlushFileBuffers(_v.h) == 0)

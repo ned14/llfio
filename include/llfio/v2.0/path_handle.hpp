@@ -64,7 +64,6 @@ public:
 
   //! Default constructor
   constexpr path_handle() {}  // NOLINT
-  ~path_handle() = default;
   //! Construct a handle from a supplied native handle
   explicit constexpr path_handle(native_handle_type h, caching caching = caching::all, flag flags = flag::none)
       : handle(h, caching, flags)
@@ -77,9 +76,22 @@ public:
   //! No copy construction (use `clone()`)
   path_handle(const path_handle &) = delete;
   //! Move assignment permitted
-  path_handle &operator=(path_handle &&) = default;
+  path_handle &operator=(path_handle &&o) noexcept
+  {
+    this->~path_handle();
+    new(this) path_handle(std::move(o));
+    return *this;
+  }
   //! No copy assignment
   path_handle &operator=(const path_handle &) = delete;
+  //! Swap with another instance
+  LLFIO_MAKE_FREE_FUNCTION
+  void swap(path_handle &o) noexcept
+  {
+    path_handle temp(std::move(*this));
+    *this = std::move(o);
+    o = std::move(temp);
+  }
 
   /*! Create a path handle opening access to some location on the filing system.
   Some operating systems provide a particularly lightweight method of doing this
@@ -94,6 +106,25 @@ public:
   LLFIO_MAKE_FREE_FUNCTION
   static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> path(path_view_type _path) noexcept { return path(path_handle(), _path); }
 
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~path_handle() override
+  {
+    if(_v)
+    {
+      (void) path_handle::close();
+    }
+  }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override
+  {
+    LLFIO_LOG_FUNCTION_CALL(this);
+#ifndef NDEBUG
+    if(_v)
+    {
+      // Tell handle::close() that we have correctly executed
+      _v.behaviour |= native_handle_type::disposition::_child_close_executed;
+    }
+#endif
+    return handle::close();
+  }
   /*! Clone this handle (copy constructor is disabled to avoid accidental copying).
   */
   result<path_handle> clone() const noexcept

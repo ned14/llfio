@@ -208,6 +208,13 @@ public:
         }
       }
     }
+#ifndef NDEBUG
+    if(_v)
+    {
+      // Tell handle::close() that we have correctly executed
+      _v.behaviour |= native_handle_type::disposition::_child_close_executed;
+    }
+#endif
     return io_handle::close();
   }
 

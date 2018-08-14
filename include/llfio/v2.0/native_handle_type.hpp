@@ -58,7 +58,9 @@ struct native_handle_type  // NOLINT
     symlink = 1U << 10U,      //!< Is a symlink
     multiplexer = 1U << 11U,  //!< Is a kqueue/epoll/iocp
     process = 1U << 12U,      //!< Is a child process
-    section = 1U << 13U       //!< Is a memory section
+    section = 1U << 13U,      //!< Is a memory section
+
+    _child_close_executed = 1U << 28U  // used to trap when vptr has become corrupted
   }
   QUICKCPPLIB_BITFIELD_END(disposition)
   disposition behaviour;  //! The behaviour of the handle

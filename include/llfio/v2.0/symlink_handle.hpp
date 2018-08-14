@@ -31,7 +31,7 @@ Distributed under the Boost Software License, Version 1.0.
 //! \file symlink_handle.hpp Provides a handle to a symbolic link.
 
 #ifndef LLFIO_SYMLINK_HANDLE_IS_FAKED
-#if defined(_WIN32)  //|| defined(__linux__)
+#if defined(_WIN32) || defined(__linux__)
 #define LLFIO_SYMLINK_HANDLE_IS_FAKED 0
 #else
 #define LLFIO_SYMLINK_HANDLE_IS_FAKED 1
@@ -84,8 +84,8 @@ class LLFIO_DECL symlink_handle : public handle, public fs_handle
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept final { return *this; }
 
 #ifndef _WIN32
-  friend LLFIO_HEADERS_ONLY_FUNC_SPEC result<void> detail::stat_from_symlink(struct stat &s, const handle &h) noexcept;
-  result<void> _create_symlink(path_view target, deadline d, bool atomic_replace) noexcept;
+  friend result<void> detail::stat_from_symlink(struct stat &s, const handle &h) noexcept;
+  result<void> _create_symlink(const path_handle &dirh, const handle::path_type &filename, path_view target, deadline d, bool atomic_replace) noexcept;
 #endif
 
 public:
@@ -311,9 +311,22 @@ public:
   //! No copy construction (use `clone()`)
   symlink_handle(const symlink_handle &) = delete;
   //! Move assignment permitted
-  symlink_handle &operator=(symlink_handle &&) = default;
+  symlink_handle &operator=(symlink_handle &&o) noexcept
+  {
+    this->~symlink_handle();
+    new(this) symlink_handle(std::move(o));
+    return *this;
+  }
   //! No copy assignment
   symlink_handle &operator=(const symlink_handle &) = delete;
+  //! Swap with another instance
+  LLFIO_MAKE_FREE_FUNCTION
+  void swap(symlink_handle &o) noexcept
+  {
+    symlink_handle temp(std::move(*this));
+    *this = std::move(o);
+    o = std::move(temp);
+  }
 
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~symlink_handle() override
   {
@@ -338,6 +351,13 @@ public:
       }
     }
 #if !LLFIO_SYMLINK_HANDLE_IS_FAKED
+#ifndef NDEBUG
+    if(_v)
+    {
+      // Tell handle::close() that we have correctly executed
+      _v.behaviour |= native_handle_type::disposition::_child_close_executed;
+    }
+#endif
     return handle::close();
 #else
     _dirh = {};
@@ -362,6 +382,12 @@ public:
 
 #if LLFIO_SYMLINK_HANDLE_IS_FAKED
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_type> current_path() const noexcept override;
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
+  result<void> relink(const path_handle &base, path_view_type path, bool atomic_replace = true, deadline d = std::chrono::seconds(30)) noexcept override;
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
+  result<void> unlink(deadline d = std::chrono::seconds(30)) noexcept override;
 #endif
 
   /*! Create a symlink handle opening access to a symbolic link.
