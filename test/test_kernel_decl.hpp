@@ -36,6 +36,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #if LLFIO_EXPERIMENTAL_STATUS_CODE
 #define KERNELTEST_EXPERIMENTAL_STATUS_CODE 1
+#include "outcome/include/outcome/experimental/status-code/include/iostream_support.hpp"
 #endif
 #include "kerneltest/include/kerneltest.hpp"
 

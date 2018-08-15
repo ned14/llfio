@@ -15,7 +15,12 @@ ctest_update()
 ctest_configure(OPTIONS ${CTEST_CONFIGURE_OPTIONS})
 ctest_build(TARGET _dl)
 ctest_build(TARGET _sl)
-ctest_test(RETURN_VALUE retval EXCLUDE "llfio_hl|shared_fs_mutex")
+if(WIN32)
+  # Appveyor's Windows version doesn't permit unprivileged creation of symbolic links
+  ctest_test(RETURN_VALUE retval EXCLUDE "llfio_hl|shared_fs_mutex|symlink")
+else()
+  ctest_test(RETURN_VALUE retval EXCLUDE "llfio_hl|shared_fs_mutex")
+endif()
 if(WIN32)
   if(EXISTS "prebuilt/bin/Release/llfio_dl-2.0-Windows-x64-Release.dll")
     checked_execute_process("Tarring up binaries 1"

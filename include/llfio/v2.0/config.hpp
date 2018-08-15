@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 //#include <iostream>
 //#define LLFIO_LOG_TO_OSTREAM std::cerr
-#define LLFIO_LOGGING_LEVEL 1
+//#define LLFIO_LOGGING_LEVEL 1
 //#define LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
 
 //! \file config.hpp Configures a compiler environment for LLFIO header and source code
