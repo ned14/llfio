@@ -829,7 +829,7 @@ namespace key_value_store
             {
               QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash hasher;
               memset(&vt->hash, 0, sizeof(vt->hash));
-              hasher.add((const char *) reqs.back().data, reqs.back().len);
+              hasher.add((const char *) reqs.back().data(), reqs.back().size());
               vt->hash = hasher.finalise();
             }
             memset(&thisupdate.history_item, 0, sizeof(thisupdate.history_item));
@@ -848,9 +848,9 @@ namespace key_value_store
               memset(&vt->hash, 0, sizeof(vt->hash));
               auto rit = reqs.end();
               rit -= 2;
-              hasher.add((char *) rit->data, rit->len);
+              hasher.add((char *) rit->data(), rit->size());
               ++rit;
-              hasher.add((char *) rit->data, rit->len);
+              hasher.add((char *) rit->data(), rit->size());
               vt->hash = hasher.finalise();
             }
             index::value_history::item &history_item = thisupdate.history_item;

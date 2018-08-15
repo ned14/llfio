@@ -79,7 +79,7 @@ namespace stackoverflow
     // This lets us skip unnecessary memory copying
 
     // Make a string view of the first buffer returned
-    string_view v((const char *) buffers_read[0].data, buffers_read[0].len);
+    string_view v((const char *) buffers_read[0].data(), buffers_read[0].size());
     // Sub view that view with the first line
     string_view line(v.substr(0, v.find_first_of('\n')));
     // Return a string copying the first line from the file, or all 4096 bytes read if no newline found.
