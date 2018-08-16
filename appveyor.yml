@@ -13,7 +13,7 @@ image: Visual Studio 2017
 init:
   - git config --global core.longpaths true
 
-clone_folder: c:\boost.afio
+clone_folder: c:\boost.llfio
 platform: x64 
 configuration: Release
 environment:
@@ -32,9 +32,9 @@ test_script:
 after_test:
 
 on_success:
-#  - set "NEWNAME=afio-v2.0-binaries-win64-%date:~10,4%%date:~4,2%%date:~7,2%%time:~0,2%%time:~3,2%.zip"
-  - set "NEWNAME=afio-v2.0-binaries-win64-%APPVEYOR_REPO_COMMIT%.zip"
-  - rename afio-v2.0-binaries-win64.zip %NEWNAME%
+#  - set "NEWNAME=llfio-v2.0-binaries-win64-%date:~10,4%%date:~4,2%%date:~7,2%%time:~0,2%%time:~3,2%.zip"
+  - set "NEWNAME=llfio-v2.0-binaries-win64-%APPVEYOR_REPO_COMMIT%.zip"
+  - rename llfio-v2.0-binaries-win64.zip %NEWNAME%
   - curl -T %NEWNAME% -u jenkins-nedprod:%JENKINS_NEDPROD_PASSWORD% https://dedi5.nedprod.com/static/files/upload/
 on_failure:
 on_finish:

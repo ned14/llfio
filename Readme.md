@@ -1,12 +1,12 @@
-This is the post-peer-review AFIO v2 rewrite. You can view its documentation at https://ned14.github.io/afio/
+This is the post-peer-review LLFIO v2 rewrite. You can view its documentation at https://ned14.github.io/llfio/
 
-<b>master branch test status</b> Linux & OS X: [![Build Status](https://travis-ci.org/ned14/afio.svg?branch=master)](https://travis-ci.org/ned14/afio) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/ox59o2r276xbmef7/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/afio/branch/master) <b>CMake dashboard</b>: http://my.cdash.org/index.php?project=Boost.AFIO
+<b>master branch test status</b> Linux & OS X: [![Build Status](https://travis-ci.org/ned14/llfio.svg?branch=master)](https://travis-ci.org/ned14/llfio) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/dfctqfap3kpx89om/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/llfio/branch/master) <b>CMake dashboard</b>: http://my.cdash.org/index.php?project=Boost.AFIO
 
 Tarballs of source and prebuilt binaries for Linux x64, MacOS x64 and Windows x64:
-- https://dedi5.nedprod.com/static/files/afio-v2.0-source-latest.tar.xz
-- https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-linux64-latest.tgz
-- https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-darwin64-latest.tgz (disabled pending XCode supporting Filesystem TS)
-- https://dedi5.nedprod.com/static/files/afio-v2.0-binaries-win64-latest.zip
+- https://dedi5.nedprod.com/static/files/llfio-v2.0-source-latest.tar.xz
+- https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-linux64-latest.tgz
+- https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-darwin64-latest.tgz (disabled pending XCode supporting Filesystem TS)
+- https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-win64-latest.zip
 
 
 ### Immediate todos in order of priority:
@@ -17,9 +17,10 @@ Tarballs of source and prebuilt binaries for Linux x64, MacOS x64 and Windows x6
 - [x] Fix all known bugs in Outcome, plus reorg source code in prep for `status_code`.
 - [x] Scatter-gather buffers to use https://github.com/martinmoene/byte-lite
 - [x] Make lazy the stat fetch during file/dir open.
-- [x] Implement SG14 `status_code` as a standalone library and test in AFIO.
+- [x] Implement SG14 `status_code` as a standalone library and test in LLFIO.
 - [x] Single include generation now we're on `status_code` and it's safe.
 - [x] Implement `SIGBUS`/`EXCEPTION_IN_PAGE_ERROR` RAII catcher.
+- [ ] Implement `symlink_handle` already!
 - [ ] `atomic_append` isn't actually being tested in shared_fs_mutex
 - [ ] Implement a non-toy ACID key-value BLOB store and send it to Boost for peer review.
   - [ ] For this need to implement a file-based B+ tree. And for that, need to
@@ -42,7 +43,7 @@ fuzzed, coverage calculated, bloat calculated, ABI dumped etc
 
 
 ### clang AST parser based todos which await me getting back into the clang AST parser:
-- [ ] C bindings for all AFIO v2 APIs. Write libclang parser which autogenerates
+- [ ] C bindings for all LLFIO v2 APIs. Write libclang parser which autogenerates
 SWIG interface files from the .hpp files using custom attributes to fill in the
 missing gaps.
 - Much better coverage is to permute the *valid* parameter inputs of the kernel
@@ -107,7 +108,7 @@ the results directory where flags and OS get its own directory and each YAML fil
 is named FS + device e.g.
 
 
-### Algorithms library `AFIO_V2_NAMESPACE::algorithm` todo:
+### Algorithms library `LLFIO_V2_NAMESPACE::algorithm` todo:
 - [ ] Add `vector<T>` which adapts a `mapped_view<T>`.
 - [ ] Add some primitive which intelligently copies/moves between views and vectors.
 Specifically, if resizing, if type is trivially copyable, skip memory copying during

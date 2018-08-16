@@ -24,55 +24,128 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../test_kernel_decl.hpp"
 
+template <class U> inline void CheckPathView(const LLFIO_V2_NAMESPACE::filesystem::path &p, const char *desc, U &&c)
+{
+  using LLFIO_V2_NAMESPACE::filesystem::path;
+  using LLFIO_V2_NAMESPACE::path_view;
+  auto r1 = c(p);
+  auto r2 = c(path_view(p));
+  BOOST_CHECK(r1 == r2);
+  if(r1 != r2)
+  {
+    std::cerr << "For " << desc << " with path " << p << "\n";
+    std::cerr << "   filesystem::path returned " << r1 << "\n";
+    std::cerr << "          path_view returned " << r2 << std::endl;
+  }
+}
+
+static inline void CheckPathView(const LLFIO_V2_NAMESPACE::filesystem::path &path)
+{
+  CheckPathView(path, "root_directory()", [](const auto &p) { return p.root_directory(); });
+  CheckPathView(path, "root_path()", [](const auto &p) { return p.root_path(); });
+  CheckPathView(path, "relative_path()", [](const auto &p) { return p.relative_path(); });
+  CheckPathView(path, "parent_path()", [](const auto &p) { return p.parent_path(); });
+  CheckPathView(path, "filename()", [](const auto &p) { return p.filename(); });
+  CheckPathView(path, "stem()", [](const auto &p) { return p.stem(); });
+  CheckPathView(path, "extension()", [](const auto &p) { return p.extension(); });
+}
+
 static inline void TestPathView()
 {
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace llfio = LLFIO_V2_NAMESPACE;
   // path view has constexpr construction
-  constexpr afio::path_view a, b("hello");
+  constexpr llfio::path_view a, b("hello");
   BOOST_CHECK(a.empty());
   BOOST_CHECK(!b.empty());
   BOOST_CHECK(b == "hello");
   // Globs
-  BOOST_CHECK(afio::path_view("niall*").contains_glob());
+  BOOST_CHECK(llfio::path_view("niall*").contains_glob());
   // Splitting
   constexpr const char p[] = "/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir/0";
-  afio::path_view e(p);  // NOLINT
-  afio::path_view f(e.filename());
+  llfio::path_view e(p);  // NOLINT
+  llfio::path_view f(e.filename());
   e.remove_filename();
   BOOST_CHECK(e == "/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir");
   BOOST_CHECK(f == "0");
 #ifndef _WIN32
   // cstr
-  afio::path_view::c_str g(e);
+  llfio::path_view::c_str g(e);
   BOOST_CHECK(g.buffer != p);  // NOLINT
-  afio::path_view::c_str h(f);
+  llfio::path_view::c_str h(f);
   BOOST_CHECK(h.buffer == p + 70);  // NOLINT
 #endif
+  CheckPathView("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir");
+#if 0
+  // I think we are standards conforming here, Dinkumware and libstdc++ are not
+  CheckPathView("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir/");
+#endif
+  CheckPathView("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir/0");
+  CheckPathView("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir/0.txt");
+  CheckPathView("boostish/afio/programs/build_posix/testdir");
+#if 0
+  // I think we are standards conforming here, Dinkumware and libstdc++ are not
+  CheckPathView("boostish/afio/programs/build_posix/testdir/");
+#endif
+  CheckPathView("boostish/afio/programs/build_posix/testdir/0");
+  CheckPathView("boostish/afio/programs/build_posix/testdir/0.txt");
+  CheckPathView("0");
+  CheckPathView("0.txt");
+  CheckPathView("0.foo.txt");
+  CheckPathView(".0.foo.txt");
+#if 0
+  // I think we are standards conforming here, Dinkumware and libstdc++ are not
+  CheckPathView(".txt");
+  CheckPathView("/");
+  CheckPathView("//");
+#endif
+  CheckPathView("");
+  CheckPathView(".");
+  CheckPathView("..");
 
 #ifdef _WIN32
   // On Windows, UTF-8 and UTF-16 paths are equivalent and backslash conversion happens
-  afio::path_view c("path/to"), d(L"path\\to");
+  llfio::path_view c("path/to"), d(L"path\\to");
   BOOST_CHECK(c == d);
   // Globs
-  BOOST_CHECK(afio::path_view(L"niall*").contains_glob());
-  BOOST_CHECK(afio::path_view("0123456789012345678901234567890123456789012345678901234567890123.deleted").is_afio_deleted());
-  BOOST_CHECK(afio::path_view(L"0123456789012345678901234567890123456789012345678901234567890123.deleted").is_afio_deleted());
-  BOOST_CHECK(!afio::path_view("0123456789012345678901234567890123456789g12345678901234567890123.deleted").is_afio_deleted());
+  BOOST_CHECK(llfio::path_view(L"niall*").contains_glob());
+  BOOST_CHECK(llfio::path_view("0123456789012345678901234567890123456789012345678901234567890123.deleted").is_llfio_deleted());
+  BOOST_CHECK(llfio::path_view(L"0123456789012345678901234567890123456789012345678901234567890123.deleted").is_llfio_deleted());
+  BOOST_CHECK(!llfio::path_view("0123456789012345678901234567890123456789g12345678901234567890123.deleted").is_llfio_deleted());
   // Splitting
   constexpr const wchar_t p2[] = L"\\mnt\\c\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir\\0";
-  afio::path_view g(p2);
-  afio::path_view h(g.filename());
+  llfio::path_view g(p2);
+  llfio::path_view h(g.filename());
   g.remove_filename();
   BOOST_CHECK(g == "\\mnt\\c\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir");
   BOOST_CHECK(h == "0");
   // cstr
-  afio::path_view::c_str i(g, false);
+  llfio::path_view::c_str i(g, false);
   BOOST_CHECK(i.buffer != p2);
-  afio::path_view::c_str j(g, true);
+  llfio::path_view::c_str j(g, true);
   BOOST_CHECK(j.buffer == p2);
-  afio::path_view::c_str k(h, false);
+  llfio::path_view::c_str k(h, false);
   BOOST_CHECK(k.buffer == p2 + 70);
+
+  CheckPathView(L"\\mnt\\c\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir\\0");
+  CheckPathView(L"C:\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir\\0");
+  CheckPathView("C:/Users/ned/Documents/boostish/afio/programs/build_posix/testdir/0.txt");
+  // CheckPathView(L"\\\\niall\\douglas.txt");
+  CheckPathView(L"\\!!\\niall\\douglas.txt");
+  CheckPathView(L"\\??\\niall\\douglas.txt");
+  CheckPathView(L"\\\\?\\niall\\douglas.txt");
+  CheckPathView(L"\\\\.\\niall\\douglas.txt");
+
+  // Handle NT kernel paths correctly
+  BOOST_CHECK(llfio::path_view(L"\\\\niall").is_absolute());
+  BOOST_CHECK(llfio::path_view(L"\\!!\\niall").is_absolute());
+  BOOST_CHECK(llfio::path_view(L"\\??\\niall").is_absolute());
+  BOOST_CHECK(llfio::path_view(L"\\\\?\\niall").is_absolute());
+  BOOST_CHECK(llfio::path_view(L"\\\\.\\niall").is_absolute());
+  // On Windows this is relative, on POSIX it is absolute
+  BOOST_CHECK(llfio::path_view("/niall").is_relative());
+#else
+  BOOST_CHECK(llfio::path_view("/niall").is_absolute());
 #endif
 }
 
-KERNELTEST_TEST_KERNEL(integration, afio, path_view, path_view, "Tests that afio::path_view() works as expected", TestPathView())
+KERNELTEST_TEST_KERNEL(integration, llfio, path_view, path_view, "Tests that llfio::path_view() works as expected", TestPathView())

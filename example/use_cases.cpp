@@ -1,4 +1,4 @@
-/* Examples of AFIO use
+/* Examples of LLFIO use
 (C) 2018 Niall Douglas <http://www.nedproductions.biz/> (2 commits)
 File Created: Aug 2018
 
@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../include/afio.hpp"
+#include "../include/llfio.hpp"
 
 #include <future>
 #include <iostream>
@@ -36,10 +36,10 @@ Distributed under the Boost Software License, Version 1.0.
 void read_entire_file1()
 {
   //! [file_entire_file1]
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace llfio = LLFIO_V2_NAMESPACE;
 
   // Open the file for read
-  afio::file_handle fh = afio::file(  //
+  llfio::file_handle fh = llfio::file(  //
     {},       // path_handle to base directory
     "foo"     // path_view to path fragment relative to base directory
               // default mode is read only
@@ -49,10 +49,10 @@ void read_entire_file1()
   ).value();  // If failed, throw a filesystem_error exception
 
   // Make a vector sized the current maximum extent of the file
-  std::vector<afio::byte> buffer(fh.maximum_extent().value());
+  std::vector<llfio::byte> buffer(fh.maximum_extent().value());
 
   // Synchronous scatter read from file
-  afio::file_handle::buffers_type filled = afio::read(
+  llfio::file_handle::buffers_type filled = llfio::read(
     fh,                                 // handle to read from
     0,                                  // offset
     {{ buffer.data(), buffer.size() }}  // Single scatter buffer of the vector 
@@ -61,20 +61,20 @@ void read_entire_file1()
 
   // In case of racy truncation of file by third party to new length, adjust buffer to
   // bytes actually read
-  buffer.resize(filled[0].len);
+  buffer.resize(filled[0].size());
   //! [file_entire_file1]
 }
 
 void read_entire_file2()
 {
   //! [file_entire_file2]
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace llfio = LLFIO_V2_NAMESPACE;
 
   // Create an i/o service to complete the async file i/o
-  afio::io_service service;
+  llfio::io_service service;
 
   // Open the file for read
-  afio::async_file_handle fh = afio::async_file(  //
+  llfio::async_file_handle fh = llfio::async_file(  //
     service,  // The i/o service to complete i/o to
     {},       // path_handle to base directory
     "foo"     // path_view to path fragment relative to base directory
@@ -86,24 +86,24 @@ void read_entire_file2()
 
   // Get the valid extents of the file.
   const std::vector<
-    std::pair<afio::file_handle::extent_type, afio::file_handle::extent_type>
+    std::pair<llfio::file_handle::extent_type, llfio::file_handle::extent_type>
   > valid_extents = fh.extents().value();
 
   // Schedule asynchronous reads for every valid extent
-  std::vector<std::pair<std::vector<afio::byte>, afio::async_file_handle::io_state_ptr>> buffers(valid_extents.size());
+  std::vector<std::pair<std::vector<llfio::byte>, llfio::async_file_handle::io_state_ptr>> buffers(valid_extents.size());
   for (size_t n = 0; n < valid_extents.size(); n++)
   {
     // Set up the scatter buffer
     buffers[n].first.resize(valid_extents[n].second);
     for(;;)
     {
-      afio::async_file_handle::buffer_type scatter_req{ buffers[n].first.data(), buffers[n].first.size() };  // buffer to fill
-      auto ret = afio::async_read( //
+      llfio::async_file_handle::buffer_type scatter_req{ buffers[n].first.data(), buffers[n].first.size() };  // buffer to fill
+      auto ret = llfio::async_read( //
         fh,                                           // handle to read from
         { { scatter_req }, valid_extents[n].first },  // The scatter request buffers + offset
         [](                                                                            // The completion handler
-          afio::async_file_handle *,                                                   // The parent handle
-          afio::async_file_handle::io_result<afio::async_file_handle::buffers_type> &  // Result of the i/o
+          llfio::async_file_handle *,                                                   // The parent handle
+          llfio::async_file_handle::io_result<llfio::async_file_handle::buffers_type> &  // Result of the i/o
           ) { /* do nothing */ }
         // default deadline is infinite
       );
@@ -114,7 +114,7 @@ void read_entire_file2()
         buffers[n].second = std::move(ret).value();
         break;
       }
-      if (ret.error() == afio::errc::resource_unavailable_try_again)
+      if (ret.error() == llfio::errc::resource_unavailable_try_again)
       {
         // Many async file i/o implementations have limited total system concurrency
         std::this_thread::yield();
@@ -161,15 +161,15 @@ void scatter_write()
   */
   return;
   //! [scatter_write]
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace llfio = LLFIO_V2_NAMESPACE;
 
   // Open the file for write, creating if needed, don't cache reads nor writes
-  afio::file_handle fh = afio::file(  //
+  llfio::file_handle fh = llfio::file(  //
     {},                                         // path_handle to base directory
     "hello",                                    // path_view to path fragment relative to base directory
-    afio::file_handle::mode::write,             // write access please
-    afio::file_handle::creation::if_needed,     // create new file if needed
-    afio::file_handle::caching::only_metadata   // cache neither reads nor writes of data on this handle
+    llfio::file_handle::mode::write,             // write access please
+    llfio::file_handle::creation::if_needed,     // create new file if needed
+    llfio::file_handle::caching::only_metadata   // cache neither reads nor writes of data on this handle
                                                 // default flags is none
   ).value();                                    // If failed, throw a filesystem_error exception
 
@@ -184,10 +184,10 @@ void scatter_write()
 
   fh.write(0,                // offset
     {                        // gather list, buffers use std::byte
-      { reinterpret_cast<const afio::byte *>(a), sizeof(a) - 1 },
-      { reinterpret_cast<const afio::byte *>(b), sizeof(b) - 1 },
-      { reinterpret_cast<const afio::byte *>(c), sizeof(c) - 1 },
-      { reinterpret_cast<const afio::byte *>(d), sizeof(d) - 1 },
+      { reinterpret_cast<const llfio::byte *>(a), sizeof(a) - 1 },
+      { reinterpret_cast<const llfio::byte *>(b), sizeof(b) - 1 },
+      { reinterpret_cast<const llfio::byte *>(c), sizeof(c) - 1 },
+      { reinterpret_cast<const llfio::byte *>(d), sizeof(d) - 1 },
     }
                             // default deadline is infinite
   ).value();                // If failed, throw a filesystem_error exception
@@ -200,18 +200,18 @@ void scatter_write()
 void malloc1()
 {
   //! [malloc1]
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace llfio = LLFIO_V2_NAMESPACE;
 
   // Call whatever the equivalent to mmap() is on this platform to fetch
   // new private memory backed by the swap file. This will be the system
   // all bits zero page mapped into each page of the allocation. Only on
   // first write will a page fault allocate a real zeroed page for that
   // page.
-  afio::map_handle mh = afio::map(4096).value();
+  llfio::map_handle mh = llfio::map(4096).value();
 
   // Fill the newly allocated memory with 'a' C style. For each first write
   // to a page, it will be page faulted into a private page by the kernel.
-  afio::byte *p = mh.address();
+  llfio::byte *p = mh.address();
   size_t len = mh.length();
   memset(p, 'a', len);
 
@@ -224,7 +224,7 @@ void malloc1()
   mh.do_not_store({mh.address(), mh.length()}).value();
 
   // Fill the memory with 'b' C++ style, probably faulting new pages into existence
-  afio::algorithm::mapped_span<char> p2(mh);
+  llfio::map_view<char> p2(mh);
   std::fill(p2.begin(), p2.end(), 'b');
 
   // Kick the contents of the memory out to the swap file so it is no longer cached in RAM
@@ -238,14 +238,14 @@ void malloc1()
   // And rather than wait until first page fault read, tell the system we are going to
   // use this region soon. Most systems will begin an asynchronous population of the
   // kernel page cache immediately.
-  afio::map_handle::buffer_type pf[] = { { mh.address(), mh.length() } };
+  llfio::map_handle::buffer_type pf[] = { { mh.address(), mh.length() } };
   mh.prefetch(pf).value();
 
 
   // You can actually save yourself some time and skip manually creating map handles.
   // Just construct a mapped_span directly, this creates an internal map_handle instance,
   // so memory is released when the span is destroyed
-  afio::algorithm::mapped_span<float> f(1000);  // 1000 floats, allocated used mmap()
+  llfio::mapped<float> f(1000);  // 1000 floats, allocated used mmap()
   std::fill(f.begin(), f.end(), 1.23f);
   //! [malloc1]
 }
@@ -253,28 +253,28 @@ void malloc1()
 void malloc2()
 {
   //! [malloc2]
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace llfio = LLFIO_V2_NAMESPACE;
 
   // Create 4Kb of anonymous shared memory. This will persist
   // until the last handle to it in the system is destructed.
   // You can fetch a path to it to give to other processes using
   // sh.current_path()
-  afio::section_handle sh = afio::section(4096).value();
+  llfio::section_handle sh = llfio::section(4096).value();
 
   {
     // Map it into memory, and fill it with 'a'
-    afio::algorithm::mapped_span<char> ms1(sh);
+    llfio::mapped<char> ms1(sh);
     std::fill(ms1.begin(), ms1.end(), 'a');
 
     // Destructor unmaps it from memory
   }
 
   // Map it into memory again, verify it contains 'a'
-  afio::algorithm::mapped_span<char> ms1(sh);
+  llfio::mapped<char> ms1(sh);
   assert(ms1[0] == 'a');
 
   // Map a *second view* of the same memory
-  afio::algorithm::mapped_span<char> ms2(sh);
+  llfio::mapped<char> ms2(sh);
   assert(ms2[0] == 'a');
 
   // The addresses of the two maps are unique
@@ -289,10 +289,10 @@ void malloc2()
 void map_file()
 {
   //! [map_file]
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace llfio = LLFIO_V2_NAMESPACE;
 
   // Open the file for read
-  afio::file_handle rfh = afio::file(  //
+  llfio::file_handle rfh = llfio::file(  //
     {},       // path_handle to base directory
     "foo"     // path_view to path fragment relative to base directory
               // default mode is read only
@@ -302,25 +302,25 @@ void map_file()
   ).value();  // If failed, throw a filesystem_error exception
 
   // Open the same file for atomic append
-  afio::file_handle afh = afio::file(  //
+  llfio::file_handle afh = llfio::file(  //
     {},                               // path_handle to base directory
     "foo",                            // path_view to path fragment relative to base directory
-    afio::file_handle::mode::append   // open for atomic append
+    llfio::file_handle::mode::append   // open for atomic append
                                       // default creation is open existing
                                       // default caching is all
                                       // default flags is none
   ).value();                          // If failed, throw a filesystem_error exception
 
   // Create a section for the file of exactly the current length of the file
-  afio::section_handle sh = afio::section(rfh).value();
+  llfio::section_handle sh = llfio::section(rfh).value();
 
   // Map the end of the file into memory with a 1Mb address reservation
-  afio::map_handle mh = afio::map(sh, 1024 * 1024, sh.length().value() & ~4095).value();
+  llfio::map_handle mh = llfio::map(sh, 1024 * 1024, sh.length().value() & ~4095).value();
 
   // Append stuff to append only handle
-  afio::write(afh,
+  llfio::write(afh,
     0,                                                      // offset is ignored for atomic append only handles
-    {{ reinterpret_cast<const afio::byte *>("hello"), 6 }}  // single gather buffer
+    {{ reinterpret_cast<const llfio::byte *>("hello"), 6 }}  // single gather buffer
                                                             // default deadline is infinite
   ).value();
 
@@ -342,10 +342,10 @@ void map_file()
 void mapped_file()
 {
   //! [mapped_file]
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace llfio = LLFIO_V2_NAMESPACE;
 
   // Open the mapped file for read
-  afio::mapped_file_handle mh = afio::mapped_file(  //
+  llfio::mapped_file_handle mh = llfio::mapped_file(  //
     {},       // path_handle to base directory
     "foo"     // path_view to path fragment relative to base directory
               // default mode is read only
@@ -370,17 +370,17 @@ void mapped_file()
 void sparse_array()
 {
   //! [sparse_array]
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace llfio = LLFIO_V2_NAMESPACE;
 
   // Make me a 1 trillion element sparsely allocated integer array!
-  afio::mapped_file_handle mfh = afio::mapped_temp_inode().value();
+  llfio::mapped_file_handle mfh = llfio::mapped_temp_inode().value();
 
   // On an extents based filing system, doesn't actually allocate any physical
   // storage but does map approximately 4Tb of all bits zero data into memory
   (void) mfh.truncate(1000000000000ULL * sizeof(int));
 
   // Create a typed view of the one trillion integers
-  afio::algorithm::mapped_span<int> one_trillion_int_array(mfh);
+  llfio::map_view<int> one_trillion_int_array(mfh);
 
   // Write and read as you see fit, if you exceed physical RAM it'll be paged out
   one_trillion_int_array[0] = 5;
@@ -392,14 +392,14 @@ void sparse_array()
 std::future<void> coroutine_write()
 {
   //! [coroutine_write]
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace llfio = LLFIO_V2_NAMESPACE;
 
   // Create an asynchronous file handle
-  afio::io_service service;
-  afio::async_file_handle fh =
-    afio::async_file(service, {}, "testfile.txt",
-      afio::async_file_handle::mode::write,
-      afio::async_file_handle::creation::if_needed).value();
+  llfio::io_service service;
+  llfio::async_file_handle fh =
+    llfio::async_file(service, {}, "testfile.txt",
+      llfio::async_file_handle::mode::write,
+      llfio::async_file_handle::creation::if_needed).value();
 
   // Resize it to 1024 bytes
   truncate(fh, 1024).value();
@@ -408,7 +408,7 @@ std::future<void> coroutine_write()
   // suspending execution of this coroutine until completion and then resuming
   // execution. Requires the Coroutines TS.
   alignas(4096) char buffer[] = "hello world";
-  co_await co_write(fh, 0, { { reinterpret_cast<afio::byte *>(buffer), sizeof(buffer) } }).value();
+  co_await co_write(fh, 0, { { reinterpret_cast<llfio::byte *>(buffer), sizeof(buffer) } }).value();
   //! [coroutine_write]
 }
 #endif

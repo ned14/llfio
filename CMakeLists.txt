@@ -4,26 +4,26 @@ include(QuickCppLibRequireOutOfSourceBuild)
 include(QuickCppLibUtils)
 include(QuickCppLibPolicies)
 
-option(AFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE "Whether to use SG14 status_code for failure handling" OFF)
+option(LLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE "Whether to use SG14 status_code for failure handling" OFF)
 
 # Parse the version we tell cmake directly from the version header file
-ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/afio/version.hpp" VERSIONSTRING)
+ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/llfio/version.hpp" VERSIONSTRING)
 # Sets the usual PROJECT_NAME etc
-project(afio VERSION ${VERSIONSTRING} LANGUAGES C CXX)
+project(llfio VERSION ${VERSIONSTRING} LANGUAGES C CXX)
 # Also set a *cmake* namespace for this project
 set(PROJECT_NAMESPACE)
 # Setup this cmake environment for this project
 include(QuickCppLibSetupProject)
 if(NOT PROJECT_IS_DEPENDENCY)
   # This file should be updated with the last git SHA next commit
-  UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/afio/revision.hpp")
+  UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/llfio/revision.hpp")
 endif()
 # Find my library dependencies
 find_quickcpplib_library(quickcpplib 1.0 REQUIRED)
 find_quickcpplib_library(outcome 2.0 REQUIRED)
 find_quickcpplib_library(kerneltest 1.0 REQUIRED)
 if(WIN32)
-  add_subdirectory("include/afio/ntkernel-error-category" EXCLUDE_FROM_ALL)
+  add_subdirectory("include/llfio/ntkernel-error-category" EXCLUDE_FROM_ALL)
 endif()
 
 # Make the standard static and shared libraries, and if supported by this compiler, C++ modules
@@ -65,28 +65,28 @@ if(NOT PROJECT_IS_DEPENDENCY)
           add_dependencies(outcome_hl ${target})
         endif()
       endfunction()
-      make_single_header(afio_hl-pp-posix
-                         "${CMAKE_CURRENT_SOURCE_DIR}/single-header/afio-posix.hpp"
-                         "${CMAKE_CURRENT_SOURCE_DIR}/include/afio/v2.0/afio.hpp"
+      make_single_header(llfio_hl-pp-posix
+                         "${CMAKE_CURRENT_SOURCE_DIR}/single-header/llfio-posix.hpp"
+                         "${CMAKE_CURRENT_SOURCE_DIR}/include/llfio/v2.0/llfio.hpp"
                          #-D QUICKCPPLIB_USE_STD_BYTE -D QUICKCPPLIB_USE_STD_OPTIONAL -D QUICKCPPLIB_USE_STD_SPAN
                          -U gsl_COMPILER_MSVC_VERSION -U gsl_HAS_CPP0X -D gsl_CPLUSPLUS=201703 -D __cplusplus=201703
-                         -D AFIO_LEAN_AND_MEAN -U _WIN32
-                         -D AFIO_EXPERIMENTAL_STATUS_CODE=1)
-      make_single_header(afio_hl-pp-win
-                         "${CMAKE_CURRENT_SOURCE_DIR}/single-header/afio-win.hpp"
-                         "${CMAKE_CURRENT_SOURCE_DIR}/include/afio/v2.0/afio.hpp"
+                         -D LLFIO_LEAN_AND_MEAN -U _WIN32
+                         -D LLFIO_EXPERIMENTAL_STATUS_CODE=1)
+      make_single_header(llfio_hl-pp-win
+                         "${CMAKE_CURRENT_SOURCE_DIR}/single-header/llfio-win.hpp"
+                         "${CMAKE_CURRENT_SOURCE_DIR}/include/llfio/v2.0/llfio.hpp"
                          #-D QUICKCPPLIB_USE_STD_BYTE -D QUICKCPPLIB_USE_STD_OPTIONAL -D QUICKCPPLIB_USE_STD_SPAN
                          -D gsl_CPLUSPLUS=201703 -D __cplusplus=201703
-                         -D AFIO_LEAN_AND_MEAN -D _WIN32
-                         -D AFIO_EXPERIMENTAL_STATUS_CODE=1)
-      make_single_header(afio_hl-pp-abi
+                         -D LLFIO_LEAN_AND_MEAN -D _WIN32
+                         -D LLFIO_EXPERIMENTAL_STATUS_CODE=1)
+      make_single_header(llfio_hl-pp-abi
                          "${CMAKE_CURRENT_SOURCE_DIR}/single-header/abi.hpp"
-                         "${CMAKE_CURRENT_SOURCE_DIR}/include/afio/v2.0/afio.hpp"
-                         -D AFIO_EXPERIMENTAL_STATUS_CODE=1
-                         -D AFIO_DISABLE_ABI_PERMUTATION=1
+                         "${CMAKE_CURRENT_SOURCE_DIR}/include/llfio/v2.0/llfio.hpp"
+                         -D LLFIO_EXPERIMENTAL_STATUS_CODE=1
+                         -D LLFIO_DISABLE_ABI_PERMUTATION=1
                          -D OUTCOME_DISABLE_ABI_PERMUTATION=1
                          -D QUICKCPPLIB_DISABLE_ABI_PERMUTATION=1
-                         -U AFIO_UNSTABLE_VERSION
+                         -U LLFIO_UNSTABLE_VERSION
                          -U OUTCOME_UNSTABLE_VERSION)
     endif()
   endif()
@@ -153,22 +153,22 @@ if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD" OR APPLE)
   all_link_libraries(PUBLIC ${libcxx_cxxexperimental})
 endif()
 # Set any macros this library requires
-if(AFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE)
-  all_compile_definitions(PUBLIC AFIO_EXPERIMENTAL_STATUS_CODE=1)
+if(LLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE)
+  all_compile_definitions(PUBLIC LLFIO_EXPERIMENTAL_STATUS_CODE=1)
 endif()
 if(WIN32)
   all_compile_definitions(PRIVATE _WIN32_WINNT=0x600)  ## Target WinVista
-  if(NOT AFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE)
-    target_link_libraries(afio_dl PUBLIC ntkernel-error-category::dl)
-    target_link_libraries(afio_sl PUBLIC ntkernel-error-category::sl)
+  if(NOT LLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE)
+    target_link_libraries(llfio_dl PUBLIC ntkernel-error-category::dl)
+    target_link_libraries(llfio_sl PUBLIC ntkernel-error-category::sl)
   endif()
 endif()
 # Anyone using the static or dynamic libraries is not using the header only variant
-foreach(lib afio_sl afio_dl)
-  target_compile_definitions(${lib} INTERFACE AFIO_HEADERS_ONLY=0) 
-  target_compile_definitions(${lib} PRIVATE AFIO_SOURCE=1) 
+foreach(lib llfio_sl llfio_dl)
+  target_compile_definitions(${lib} INTERFACE LLFIO_HEADERS_ONLY=0) 
+  target_compile_definitions(${lib} PRIVATE LLFIO_SOURCE=1) 
 endforeach()
-if(TARGET afio-example_single-header)
+if(TARGET llfio-example_single-header)
   set(compiler_has_cxx_17 0)
   foreach(feature ${CMAKE_CXX_COMPILE_FEATURES})
     if(feature STREQUAL "cxx_std_17")
@@ -177,20 +177,20 @@ if(TARGET afio-example_single-header)
   endforeach()
   # The single header test requires C++ 17
   if(compiler_has_cxx_17)
-    target_compile_features(afio-example_single-header PRIVATE cxx_std_17)
+    target_compile_features(llfio-example_single-header PRIVATE cxx_std_17)
   else()
-    set_target_properties(afio-example_single-header PROPERTIES EXCLUDE_FROM_ALL ON EXCLUDE_FROM_DEFAULT_BUILD ON)
+    set_target_properties(llfio-example_single-header PROPERTIES EXCLUDE_FROM_ALL ON EXCLUDE_FROM_DEFAULT_BUILD ON)
   endif()
 endif()
 
 # For all possible configurations of this library, add each test
 include(QuickCppLibMakeStandardTests)
 # For each test target, link to kerneltest
-foreach(test_target ${afio_TEST_TARGETS})
+foreach(test_target ${llfio_TEST_TARGETS})
   target_link_libraries(${test_target} PRIVATE kerneltest::hl)
 endforeach()
 if(MSVC)
-  foreach(test_target ${afio_TEST_TARGETS})
+  foreach(test_target ${llfio_TEST_TARGETS})
     target_compile_options(${test_target} PRIVATE /wd4503)  ## decorated name length exceeded
   endforeach()
 endif()

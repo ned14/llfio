@@ -27,9 +27,9 @@ Distributed under the Boost Software License, Version 1.0.
 template <class U> inline void section_handle_create_close_(U &&f)
 {
   using namespace KERNELTEST_V1_NAMESPACE;
-  using AFIO_V2_NAMESPACE::result;
-  using AFIO_V2_NAMESPACE::file_handle;
-  using AFIO_V2_NAMESPACE::section_handle;
+  using LLFIO_V2_NAMESPACE::result;
+  using LLFIO_V2_NAMESPACE::file_handle;
+  using LLFIO_V2_NAMESPACE::section_handle;
 
   // Create a temporary file and put some text into it
   file_handle temph;
@@ -70,7 +70,7 @@ template <class U> inline void section_handle_create_close_(U &&f)
         if (use_file_backing)
         {
           temph = file_handle::file({}, "tempfile", file_handle::mode::write, file_handle::creation::if_needed).value();
-          temph.write(0, { {reinterpret_cast<const AFIO_V2_NAMESPACE::byte *>("niall is not here"), 17} }).value();
+          temph.write(0, { {reinterpret_cast<const LLFIO_V2_NAMESPACE::byte *>("niall is not here"), 17} }).value();
         }
         else
         {
@@ -94,4 +94,4 @@ template <class U> inline void section_handle_create_close_(U &&f)
   check_results_with_boost_test(permuter, results);
 }
 
-KERNELTEST_TEST_KERNEL(unit, afio, section_handle_create_close, section_handle, "Tests that afio::section_handle's creation parameters work as expected", section_handle_create_close_(section_handle_create_close::test_kernel_section_handle))
+KERNELTEST_TEST_KERNEL(unit, llfio, section_handle_create_close, section_handle, "Tests that llfio::section_handle's creation parameters work as expected", section_handle_create_close_(section_handle_create_close::test_kernel_section_handle))

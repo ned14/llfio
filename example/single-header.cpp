@@ -22,16 +22,16 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#if __has_include("../single-header/afio-win.hpp") && (_HAS_CXX17 || __cplusplus >= 201700)
+#if __has_include("../single-header/llfio-win.hpp") && (_HAS_CXX17 || __cplusplus >= 201700)
 #ifdef _WIN32
-#include "../single-header/afio-win.hpp"
+#include "../single-header/llfio-win.hpp"
 #else
-#include "../single-header/afio-posix.hpp"
+#include "../single-header/llfio-posix.hpp"
 #endif
 
 int main()
 {
-  AFIO_V2_NAMESPACE::mapped_file_handle v;
+  LLFIO_V2_NAMESPACE::mapped_file_handle v;
   (void) v;
   return 0;
 }

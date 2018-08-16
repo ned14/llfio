@@ -26,8 +26,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../test_kernel_decl.hpp"
 
-KERNELTEST_TEST_KERNEL(unit, afio, shared_fs_mutex, entity_endian, "Tests that afio::algorithm::shared_fs_mutex::entity_type has the right endian", [] {
-  AFIO_V2_NAMESPACE::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type v(0, true);
+KERNELTEST_TEST_KERNEL(unit, llfio, shared_fs_mutex, entity_endian, "Tests that llfio::algorithm::shared_fs_mutex::entity_type has the right endian", [] {
+  LLFIO_V2_NAMESPACE::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type v(0, true);
   BOOST_REQUIRE(v._init != 1UL);  // NOLINT
 }())
 
@@ -332,29 +332,29 @@ static inline void check_child_worker(const KERNELTEST_V1_NAMESPACE::child_worke
 
 static std::string _TestSharedFSMutexCorrectnessChildWorker(KERNELTEST_V1_NAMESPACE::waitable_done &waitable, size_t childidx, shared_memory *shmem)  // NOLINT
 {
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace llfio = LLFIO_V2_NAMESPACE;
   ++shmem->current_exclusive;
   while(-1 != shmem->current_exclusive)
   {
     std::this_thread::yield();
   }
-  std::unique_ptr<afio::algorithm::shared_fs_mutex::shared_fs_mutex> lock;
+  std::unique_ptr<llfio::algorithm::shared_fs_mutex::shared_fs_mutex> lock;
   switch(shmem->mutex_kind)
   {
   case shared_memory::mutex_kind_type::atomic_append:
-    lock = std::make_unique<afio::algorithm::shared_fs_mutex::atomic_append>(afio::algorithm::shared_fs_mutex::atomic_append::fs_mutex_append({}, "lockfile").value());
+    lock = std::make_unique<llfio::algorithm::shared_fs_mutex::atomic_append>(llfio::algorithm::shared_fs_mutex::atomic_append::fs_mutex_append({}, "lockfile").value());
     break;
   case shared_memory::mutex_kind_type::byte_ranges:
-    lock = std::make_unique<afio::algorithm::shared_fs_mutex::byte_ranges>(afio::algorithm::shared_fs_mutex::byte_ranges::fs_mutex_byte_ranges({}, "lockfile").value());
+    lock = std::make_unique<llfio::algorithm::shared_fs_mutex::byte_ranges>(llfio::algorithm::shared_fs_mutex::byte_ranges::fs_mutex_byte_ranges({}, "lockfile").value());
     break;
   case shared_memory::mutex_kind_type::safe_byte_ranges:
-    lock = std::make_unique<afio::algorithm::shared_fs_mutex::safe_byte_ranges>(afio::algorithm::shared_fs_mutex::safe_byte_ranges::fs_mutex_safe_byte_ranges({}, "lockfile").value());
+    lock = std::make_unique<llfio::algorithm::shared_fs_mutex::safe_byte_ranges>(llfio::algorithm::shared_fs_mutex::safe_byte_ranges::fs_mutex_safe_byte_ranges({}, "lockfile").value());
     break;
   case shared_memory::mutex_kind_type::lock_files:
-    lock = std::make_unique<afio::algorithm::shared_fs_mutex::lock_files>(afio::algorithm::shared_fs_mutex::lock_files::fs_mutex_lock_files(afio::path_handle::path(".").value()).value());
+    lock = std::make_unique<llfio::algorithm::shared_fs_mutex::lock_files>(llfio::algorithm::shared_fs_mutex::lock_files::fs_mutex_lock_files(llfio::path_handle::path(".").value()).value());
     break;
   case shared_memory::mutex_kind_type::memory_map:
-    lock = std::make_unique<afio::algorithm::shared_fs_mutex::memory_map<>>(afio::algorithm::shared_fs_mutex::memory_map<>::fs_mutex_map({}, "lockfile").value());
+    lock = std::make_unique<llfio::algorithm::shared_fs_mutex::memory_map<>>(llfio::algorithm::shared_fs_mutex::memory_map<>::fs_mutex_map({}, "lockfile").value());
     break;
   }
   ++shmem->current_shared;
@@ -367,7 +367,7 @@ static std::string _TestSharedFSMutexCorrectnessChildWorker(KERNELTEST_V1_NAMESP
   {
     if(shmem->testtype == shared_memory::test_type::exclusive || (shmem->testtype == shared_memory::test_type::both && childidx < 2))
     {
-      auto h = lock->lock(afio::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type(0, true)).value();
+      auto h = lock->lock(llfio::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type(0, true)).value();
       long oldval = shmem->current_exclusive.exchange(static_cast<long>(childidx));
       if(oldval != -1)
       {
@@ -386,7 +386,7 @@ static std::string _TestSharedFSMutexCorrectnessChildWorker(KERNELTEST_V1_NAMESP
     }
     else if(shmem->testtype == shared_memory::test_type::shared || shmem->testtype == shared_memory::test_type::both)
     {
-      auto h = lock->lock(afio::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type(0, false)).value();
+      auto h = lock->lock(llfio::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type(0, false)).value();
       long oldval = ++shmem->current_shared;
       if(oldval > maxreaders)
       {
@@ -403,10 +403,10 @@ static std::string _TestSharedFSMutexCorrectnessChildWorker(KERNELTEST_V1_NAMESP
   return "ok, max concurrent readers was " + std::to_string(maxreaders);
 }
 static auto TestSharedFSMutexCorrectnessChildWorker = KERNELTEST_V1_NAMESPACE::register_child_worker("TestSharedFSMutexCorrectness", [](KERNELTEST_V1_NAMESPACE::waitable_done &waitable, size_t childidx, const char * /*unused*/) -> std::string {  // NOLINT
-  namespace afio = AFIO_V2_NAMESPACE;
-  auto shared_mem_file = afio::file_handle::file({}, "shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::open_existing, afio::file_handle::caching::temporary).value();
-  auto shared_mem_file_section = afio::section_handle::section(shared_mem_file, sizeof(shared_memory), afio::section_handle::flag::readwrite).value();
-  auto shared_mem_file_map = afio::map_handle::map(shared_mem_file_section).value();
+  namespace llfio = LLFIO_V2_NAMESPACE;
+  auto shared_mem_file = llfio::file_handle::file({}, "shared_memory", llfio::file_handle::mode::write, llfio::file_handle::creation::open_existing, llfio::file_handle::caching::temporary).value();
+  auto shared_mem_file_section = llfio::section_handle::section(shared_mem_file, sizeof(shared_memory), llfio::section_handle::flag::readwrite).value();
+  auto shared_mem_file_map = llfio::map_handle::map(shared_mem_file_section).value();
   auto *shmem = reinterpret_cast<shared_memory *>(shared_mem_file_map.address());  // NOLINT
   return _TestSharedFSMutexCorrectnessChildWorker(waitable, childidx, shmem);
 });
@@ -419,11 +419,11 @@ else. Verify shared allows other shared.
 
 void TestSharedFSMutexCorrectness(shared_memory::mutex_kind_type mutex_kind, shared_memory::test_type testtype, bool threads_not_processes)
 {
-  namespace afio = AFIO_V2_NAMESPACE;
-  auto shared_mem_file = afio::file_handle::file({}, "shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::unlink_on_first_close).value();
+  namespace llfio = LLFIO_V2_NAMESPACE;
+  auto shared_mem_file = llfio::file_handle::file({}, "shared_memory", llfio::file_handle::mode::write, llfio::file_handle::creation::if_needed, llfio::file_handle::caching::temporary, llfio::file_handle::flag::unlink_on_first_close).value();
   shared_mem_file.truncate(sizeof(shared_memory)).value();
-  auto shared_mem_file_section = afio::section_handle::section(shared_mem_file, sizeof(shared_memory), afio::section_handle::flag::readwrite).value();
-  auto shared_mem_file_map = afio::map_handle::map(shared_mem_file_section).value();
+  auto shared_mem_file_section = llfio::section_handle::section(shared_mem_file, sizeof(shared_memory), llfio::section_handle::flag::readwrite).value();
+  auto shared_mem_file_map = llfio::map_handle::map(shared_mem_file_section).value();
   auto *shmem = reinterpret_cast<shared_memory *>(shared_mem_file_map.address());  // NOLINT
   shmem->current_shared = -static_cast<long>(std::thread::hardware_concurrency());
   shmem->current_exclusive = -static_cast<long>(std::thread::hardware_concurrency()) - 1;
@@ -473,22 +473,22 @@ void TestSharedFSMutexCorrectness(shared_memory::mutex_kind_type mutex_kind, sha
   }
 }
 
-KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_byte_ranges, exclusives, "Tests that afio::algorithm::shared_fs_mutex::byte_ranges implementation implements exclusive locking", [] { TestSharedFSMutexCorrectness(shared_memory::byte_ranges, shared_memory::exclusive, false); }())
-KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_byte_ranges, shared, "Tests that afio::algorithm::shared_fs_mutex::byte_ranges implementation implements shared locking", [] { TestSharedFSMutexCorrectness(shared_memory::byte_ranges, shared_memory::shared, false); }())
-KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_byte_ranges, both, "Tests that afio::algorithm::shared_fs_mutex::byte_ranges implementation implements a mixture of exclusive and shared locking", [] { TestSharedFSMutexCorrectness(shared_memory::byte_ranges, shared_memory::both, false); }())
+KERNELTEST_TEST_KERNEL(integration, llfio, shared_fs_mutex_byte_ranges, exclusives, "Tests that llfio::algorithm::shared_fs_mutex::byte_ranges implementation implements exclusive locking", [] { TestSharedFSMutexCorrectness(shared_memory::byte_ranges, shared_memory::exclusive, false); }())
+KERNELTEST_TEST_KERNEL(integration, llfio, shared_fs_mutex_byte_ranges, shared, "Tests that llfio::algorithm::shared_fs_mutex::byte_ranges implementation implements shared locking", [] { TestSharedFSMutexCorrectness(shared_memory::byte_ranges, shared_memory::shared, false); }())
+KERNELTEST_TEST_KERNEL(integration, llfio, shared_fs_mutex_byte_ranges, both, "Tests that llfio::algorithm::shared_fs_mutex::byte_ranges implementation implements a mixture of exclusive and shared locking", [] { TestSharedFSMutexCorrectness(shared_memory::byte_ranges, shared_memory::both, false); }())
 
-KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_memory_map, exclusives, "Tests that afio::algorithm::shared_fs_mutex::memory_map implementation implements exclusive locking", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::exclusive, false); }())
-KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_memory_map, shared, "Tests that afio::algorithm::shared_fs_mutex::memory_map implementation implements shared locking", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::shared, false); }())
-KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_memory_map, both, "Tests that afio::algorithm::shared_fs_mutex::memory_map implementation implements a mixture of exclusive and shared locking", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::both, false); }())
+KERNELTEST_TEST_KERNEL(integration, llfio, shared_fs_mutex_memory_map, exclusives, "Tests that llfio::algorithm::shared_fs_mutex::memory_map implementation implements exclusive locking", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::exclusive, false); }())
+KERNELTEST_TEST_KERNEL(integration, llfio, shared_fs_mutex_memory_map, shared, "Tests that llfio::algorithm::shared_fs_mutex::memory_map implementation implements shared locking", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::shared, false); }())
+KERNELTEST_TEST_KERNEL(integration, llfio, shared_fs_mutex_memory_map, both, "Tests that llfio::algorithm::shared_fs_mutex::memory_map implementation implements a mixture of exclusive and shared locking", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::both, false); }())
 
-KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_safe_byte_ranges_process, exclusives, "Tests that afio::algorithm::shared_fs_mutex::safe_byte_ranges implementation implements exclusive locking with processes", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::exclusive, false); }())
-KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_safe_byte_ranges_process, shared, "Tests that afio::algorithm::shared_fs_mutex::safe_byte_ranges implementation implements shared locking with processes", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::shared, false); }())
-KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_safe_byte_ranges_process, both, "Tests that afio::algorithm::shared_fs_mutex::safe_byte_ranges implementation implements a mixture of exclusive and shared locking with processes",
+KERNELTEST_TEST_KERNEL(integration, llfio, shared_fs_mutex_safe_byte_ranges_process, exclusives, "Tests that llfio::algorithm::shared_fs_mutex::safe_byte_ranges implementation implements exclusive locking with processes", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::exclusive, false); }())
+KERNELTEST_TEST_KERNEL(integration, llfio, shared_fs_mutex_safe_byte_ranges_process, shared, "Tests that llfio::algorithm::shared_fs_mutex::safe_byte_ranges implementation implements shared locking with processes", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::shared, false); }())
+KERNELTEST_TEST_KERNEL(integration, llfio, shared_fs_mutex_safe_byte_ranges_process, both, "Tests that llfio::algorithm::shared_fs_mutex::safe_byte_ranges implementation implements a mixture of exclusive and shared locking with processes",
                        [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::both, false); }())
 
-KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_safe_byte_ranges_thread, exclusives, "Tests that afio::algorithm::shared_fs_mutex::safe_byte_ranges implementation implements exclusive locking with threads", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::exclusive, true); }())
-KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_safe_byte_ranges_thread, shared, "Tests that afio::algorithm::shared_fs_mutex::safe_byte_ranges implementation implements shared locking with threads", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::shared, true); }())
-KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_safe_byte_ranges_thread, both, "Tests that afio::algorithm::shared_fs_mutex::safe_byte_ranges implementation implements a mixture of exclusive and shared locking with threads",
+KERNELTEST_TEST_KERNEL(integration, llfio, shared_fs_mutex_safe_byte_ranges_thread, exclusives, "Tests that llfio::algorithm::shared_fs_mutex::safe_byte_ranges implementation implements exclusive locking with threads", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::exclusive, true); }())
+KERNELTEST_TEST_KERNEL(integration, llfio, shared_fs_mutex_safe_byte_ranges_thread, shared, "Tests that llfio::algorithm::shared_fs_mutex::safe_byte_ranges implementation implements shared locking with threads", [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::shared, true); }())
+KERNELTEST_TEST_KERNEL(integration, llfio, shared_fs_mutex_safe_byte_ranges_thread, both, "Tests that llfio::algorithm::shared_fs_mutex::safe_byte_ranges implementation implements a mixture of exclusive and shared locking with threads",
                        [] { TestSharedFSMutexCorrectness(shared_memory::memory_map, shared_memory::both, true); }())
 
 /*
@@ -509,11 +509,11 @@ and destructing the lock. This should find interesting races in the more complex
 */
 static void TestSharedFSMutexConstructDestruct(shared_memory::mutex_kind_type mutex_kind)
 {
-  namespace afio = AFIO_V2_NAMESPACE;
-  auto shared_mem_file = afio::file_handle::file({}, "shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::unlink_on_first_close).value();
+  namespace llfio = LLFIO_V2_NAMESPACE;
+  auto shared_mem_file = llfio::file_handle::file({}, "shared_memory", llfio::file_handle::mode::write, llfio::file_handle::creation::if_needed, llfio::file_handle::caching::temporary, llfio::file_handle::flag::unlink_on_first_close).value();
   shared_mem_file.truncate(sizeof(shared_memory)).value();
-  auto shared_mem_file_section = afio::section_handle::section(shared_mem_file, sizeof(shared_memory), afio::section_handle::flag::readwrite).value();
-  auto shared_mem_file_map = afio::map_handle::map(shared_mem_file_section).value();
+  auto shared_mem_file_section = llfio::section_handle::section(shared_mem_file, sizeof(shared_memory), llfio::section_handle::flag::readwrite).value();
+  auto shared_mem_file_map = llfio::map_handle::map(shared_mem_file_section).value();
   auto *shmem = reinterpret_cast<shared_memory *>(shared_mem_file_map.address());  // NOLINT
   shmem->current_shared = -2;
   shmem->current_exclusive = -3;
@@ -548,33 +548,33 @@ static void TestSharedFSMutexConstructDestruct(shared_memory::mutex_kind_type mu
 }
 
 static auto TestSharedFSMutexConstructDestructChildWorker = KERNELTEST_V1_NAMESPACE::register_child_worker("TestSharedFSMutexConstructDestruct", [](KERNELTEST_V1_NAMESPACE::waitable_done & /*unused*/, size_t /*unused*/, const char *params) -> std::string {  // NOLINT
-  namespace afio = AFIO_V2_NAMESPACE;
-  std::unique_ptr<afio::algorithm::shared_fs_mutex::shared_fs_mutex> lock;
+  namespace llfio = LLFIO_V2_NAMESPACE;
+  std::unique_ptr<llfio::algorithm::shared_fs_mutex::shared_fs_mutex> lock;
   auto mutex_kind = static_cast<shared_memory::mutex_kind_type>(atoi(params));  // NOLINT
   switch(mutex_kind)
   {
   case shared_memory::mutex_kind_type::atomic_append:
-    lock = std::make_unique<afio::algorithm::shared_fs_mutex::atomic_append>(afio::algorithm::shared_fs_mutex::atomic_append::fs_mutex_append({}, "lockfile").value());
+    lock = std::make_unique<llfio::algorithm::shared_fs_mutex::atomic_append>(llfio::algorithm::shared_fs_mutex::atomic_append::fs_mutex_append({}, "lockfile").value());
     break;
   case shared_memory::mutex_kind_type::byte_ranges:
-    lock = std::make_unique<afio::algorithm::shared_fs_mutex::byte_ranges>(afio::algorithm::shared_fs_mutex::byte_ranges::fs_mutex_byte_ranges({}, "lockfile").value());
+    lock = std::make_unique<llfio::algorithm::shared_fs_mutex::byte_ranges>(llfio::algorithm::shared_fs_mutex::byte_ranges::fs_mutex_byte_ranges({}, "lockfile").value());
     break;
   case shared_memory::mutex_kind_type::safe_byte_ranges:
-    lock = std::make_unique<afio::algorithm::shared_fs_mutex::safe_byte_ranges>(afio::algorithm::shared_fs_mutex::safe_byte_ranges::fs_mutex_safe_byte_ranges({}, "lockfile").value());
+    lock = std::make_unique<llfio::algorithm::shared_fs_mutex::safe_byte_ranges>(llfio::algorithm::shared_fs_mutex::safe_byte_ranges::fs_mutex_safe_byte_ranges({}, "lockfile").value());
     break;
   case shared_memory::mutex_kind_type::lock_files:
-    lock = std::make_unique<afio::algorithm::shared_fs_mutex::lock_files>(afio::algorithm::shared_fs_mutex::lock_files::fs_mutex_lock_files(afio::path_handle::path(".").value()).value());
+    lock = std::make_unique<llfio::algorithm::shared_fs_mutex::lock_files>(llfio::algorithm::shared_fs_mutex::lock_files::fs_mutex_lock_files(llfio::path_handle::path(".").value()).value());
     break;
   case shared_memory::mutex_kind_type::memory_map:
-    lock = std::make_unique<afio::algorithm::shared_fs_mutex::memory_map<>>(afio::algorithm::shared_fs_mutex::memory_map<>::fs_mutex_map({}, "lockfile").value());
+    lock = std::make_unique<llfio::algorithm::shared_fs_mutex::memory_map<>>(llfio::algorithm::shared_fs_mutex::memory_map<>::fs_mutex_map({}, "lockfile").value());
     break;
   }
   // Take a shared lock of a different entity
-  auto h = lock->lock(afio::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type(1, false)).value();
+  auto h = lock->lock(llfio::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type(1, false)).value();
   return "ok";
 });
 
-KERNELTEST_TEST_KERNEL(integration, afio, shared_fs_mutex_memory_map, construct_destruct, "Tests that afio::algorithm::shared_fs_mutex::memory_map constructor and destructor are race free", [] { TestSharedFSMutexConstructDestruct(shared_memory::memory_map); }())
+KERNELTEST_TEST_KERNEL(integration, llfio, shared_fs_mutex_memory_map, construct_destruct, "Tests that llfio::algorithm::shared_fs_mutex::memory_map constructor and destructor are race free", [] { TestSharedFSMutexConstructDestruct(shared_memory::memory_map); }())
 
 
 /*
@@ -669,8 +669,8 @@ int main(int argc, char *argv[])
       }
     }
   }
-  AFIO_V2_NAMESPACE::filesystem::create_directory("shared_fs_mutex_testdir");
-  AFIO_V2_NAMESPACE::filesystem::current_path("shared_fs_mutex_testdir");
+  LLFIO_V2_NAMESPACE::filesystem::create_directory("shared_fs_mutex_testdir");
+  LLFIO_V2_NAMESPACE::filesystem::current_path("shared_fs_mutex_testdir");
   int result = QUICKCPPLIB_BOOST_UNIT_TEST_RUN_TESTS(argc, argv);
   return result;
 }

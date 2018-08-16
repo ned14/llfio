@@ -26,17 +26,17 @@ Distributed under the Boost Software License, Version 1.0.
 
 namespace stackoverflow
 {
-  namespace filesystem = AFIO_V2_NAMESPACE::filesystem;
-  using string_view = AFIO_V2_NAMESPACE::string_view;
-  template <class T> using optional = AFIO_V2_NAMESPACE::optional<T>;
+  namespace filesystem = LLFIO_V2_NAMESPACE::filesystem;
+  using string_view = LLFIO_V2_NAMESPACE::string_view;
+  template <class T> using optional = LLFIO_V2_NAMESPACE::optional<T>;
 
   // Try to read first line from file at path, returning no string if file does not exist,
   // throwing exception for any other error
   optional<std::string> read_first_line(filesystem::path path)
   {
-    using namespace AFIO_V2_NAMESPACE;
-    using AFIO_V2_NAMESPACE::file_handle;
-    using AFIO_V2_NAMESPACE::byte;
+    using namespace LLFIO_V2_NAMESPACE;
+    using LLFIO_V2_NAMESPACE::file_handle;
+    using LLFIO_V2_NAMESPACE::byte;
     // The result<T> is from WG21 P0762, it looks quite like an `expected<T, std::error_code>` object
     // See Outcome v2 at https://ned14.github.io/outcome/ and https://lists.boost.org/boost-announce/2017/06/0510.php
 
@@ -75,11 +75,11 @@ namespace stackoverflow
     }
     // Same as before, either throw any error or unpack the value returned
     file_handle::buffers_type buffers_read(_buffers_read.value());
-    // Note that buffers returned by AFIO read() may be completely different to buffers submitted
+    // Note that buffers returned by LLFIO read() may be completely different to buffers submitted
     // This lets us skip unnecessary memory copying
 
     // Make a string view of the first buffer returned
-    string_view v((const char *) buffers_read[0].data, buffers_read[0].len);
+    string_view v((const char *) buffers_read[0].data(), buffers_read[0].size());
     // Sub view that view with the first line
     string_view line(v.substr(0, v.find_first_of('\n')));
     // Return a string copying the first line from the file, or all 4096 bytes read if no newline found.
@@ -97,7 +97,7 @@ void benchmark(key_value_store::basic_key_value_store &store, const char *desc)
     std::cout << "  Generating 1M key-value pairs ..." << std::endl;
     for(size_t n = 0; n < 1000000; n++)
     {
-      std::string randomvalue = AFIO_V2_NAMESPACE::utils::random_string(1024 / 2);
+      std::string randomvalue = LLFIO_V2_NAMESPACE::utils::random_string(1024 / 2);
       values.push_back({100 + n, randomvalue});
     }
   }
@@ -150,7 +150,7 @@ int main()
   {
     {
       std::error_code ec;
-      AFIO_V2_NAMESPACE::filesystem::remove_all("teststore", ec);
+      LLFIO_V2_NAMESPACE::filesystem::remove_all("teststore", ec);
     }
     {
       key_value_store::basic_key_value_store store("teststore", 10);
@@ -224,7 +224,7 @@ int main()
     }
     {
       std::error_code ec;
-      AFIO_V2_NAMESPACE::filesystem::remove_all("teststore", ec);
+      LLFIO_V2_NAMESPACE::filesystem::remove_all("teststore", ec);
     }
     {
       key_value_store::basic_key_value_store store("teststore", 2000000);
@@ -232,7 +232,7 @@ int main()
     }
     {
       std::error_code ec;
-      AFIO_V2_NAMESPACE::filesystem::remove_all("teststore", ec);
+      LLFIO_V2_NAMESPACE::filesystem::remove_all("teststore", ec);
     }
     {
       key_value_store::basic_key_value_store store("teststore", 2000000, true);
@@ -240,7 +240,7 @@ int main()
     }
     {
       std::error_code ec;
-      AFIO_V2_NAMESPACE::filesystem::remove_all("teststore", ec);
+      LLFIO_V2_NAMESPACE::filesystem::remove_all("teststore", ec);
     }
     {
       key_value_store::basic_key_value_store store("teststore", 2000000);
@@ -249,7 +249,7 @@ int main()
     }
     {
       std::error_code ec;
-      AFIO_V2_NAMESPACE::filesystem::remove_all("teststore", ec);
+      LLFIO_V2_NAMESPACE::filesystem::remove_all("teststore", ec);
     }
     {
       key_value_store::basic_key_value_store store("teststore", 2000000, true);
@@ -258,10 +258,10 @@ int main()
     }
     {
       std::error_code ec;
-      AFIO_V2_NAMESPACE::filesystem::remove_all("teststore", ec);
+      LLFIO_V2_NAMESPACE::filesystem::remove_all("teststore", ec);
     }
     {
-      key_value_store::basic_key_value_store store("teststore", 2000000, true, AFIO_V2_NAMESPACE::file_handle::mode::write, AFIO_V2_NAMESPACE::file_handle::caching::reads);
+      key_value_store::basic_key_value_store store("teststore", 2000000, true, LLFIO_V2_NAMESPACE::file_handle::mode::write, LLFIO_V2_NAMESPACE::file_handle::caching::reads);
       store.use_mmaps();
       benchmark(store, "integrity, durability, mmaps");
     }

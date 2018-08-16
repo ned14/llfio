@@ -26,21 +26,21 @@ Distributed under the Boost Software License, Version 1.0.
 
 static inline void TestFileHandleLockUnlock()
 {
-  namespace afio = AFIO_V2_NAMESPACE;
-  afio::file_handle h1 = afio::file_handle::file({}, "temp", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::unlink_on_first_close).value();
-  afio::file_handle h2 = afio::file_handle::file({}, "temp", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::unlink_on_first_close).value();
+  namespace llfio = LLFIO_V2_NAMESPACE;
+  llfio::file_handle h1 = llfio::file_handle::file({}, "temp", llfio::file_handle::mode::write, llfio::file_handle::creation::if_needed, llfio::file_handle::caching::temporary, llfio::file_handle::flag::unlink_on_first_close).value();
+  llfio::file_handle h2 = llfio::file_handle::file({}, "temp", llfio::file_handle::mode::write, llfio::file_handle::creation::if_needed, llfio::file_handle::caching::temporary, llfio::file_handle::flag::unlink_on_first_close).value();
   // Two exclusive locks not possible
   {
     auto _1 = h1.lock(0, 0, true, std::chrono::seconds(0));
     BOOST_REQUIRE(!_1.has_error());
-    if(h1.flags() & afio::file_handle::flag::byte_lock_insanity)
+    if(h1.flags() & llfio::file_handle::flag::byte_lock_insanity)
     {
       std::cout << "This platform has byte_lock_insanity so this test won't be useful, bailing out" << std::endl;
       return;
     }
     auto _2 = h2.lock(0, 0, true, std::chrono::seconds(0));
     BOOST_REQUIRE(_2.has_error());
-    BOOST_CHECK(_2.error() == afio::errc::timed_out);
+    BOOST_CHECK(_2.error() == llfio::errc::timed_out);
   }
   // Two non-exclusive locks okay
   {
@@ -55,8 +55,8 @@ static inline void TestFileHandleLockUnlock()
     BOOST_REQUIRE(!_1.has_error());
     auto _2 = h2.lock(0, 0, true, std::chrono::seconds(0));
     BOOST_REQUIRE(_2.has_error());
-    BOOST_CHECK(_2.error() == afio::errc::timed_out);
+    BOOST_CHECK(_2.error() == llfio::errc::timed_out);
   }
 }
 
-KERNELTEST_TEST_KERNEL(integration, afio, file_handle_lock_unlock, file_handle, "Tests that afio::file_handle's lock and unlock work as expected", TestFileHandleLockUnlock())
+KERNELTEST_TEST_KERNEL(integration, llfio, file_handle_lock_unlock, file_handle, "Tests that llfio::file_handle's lock and unlock work as expected", TestFileHandleLockUnlock())

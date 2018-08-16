@@ -26,17 +26,17 @@ Distributed under the Boost Software License, Version 1.0.
 
 namespace file_handle_create_close
 {
-  AFIO_TEST_KERNEL_DECL AFIO_V2_NAMESPACE::result<AFIO_V2_NAMESPACE::file_handle> test_kernel_file_handle_absolute(AFIO_V2_NAMESPACE::file_handle::mode m, AFIO_V2_NAMESPACE::file_handle::creation c, AFIO_V2_NAMESPACE::file_handle::flag f)
+  LLFIO_TEST_KERNEL_DECL LLFIO_V2_NAMESPACE::result<LLFIO_V2_NAMESPACE::file_handle> test_kernel_file_handle_absolute(LLFIO_V2_NAMESPACE::file_handle::mode m, LLFIO_V2_NAMESPACE::file_handle::creation c, LLFIO_V2_NAMESPACE::file_handle::flag f)
   {
-    auto h = AFIO_V2_NAMESPACE::file_handle::file({}, "testfile.txt", m, c, AFIO_V2_NAMESPACE::file_handle::caching::all, f);
+    auto h = LLFIO_V2_NAMESPACE::file_handle::file({}, "testfile.txt", m, c, LLFIO_V2_NAMESPACE::file_handle::caching::all, f);
     if(h) {
       h.value().close().value(); }
     return h;
   }
-  AFIO_TEST_KERNEL_DECL AFIO_V2_NAMESPACE::result<AFIO_V2_NAMESPACE::file_handle> test_kernel_file_handle_relative(AFIO_V2_NAMESPACE::file_handle::mode m, AFIO_V2_NAMESPACE::file_handle::creation c, AFIO_V2_NAMESPACE::file_handle::flag f)
+  LLFIO_TEST_KERNEL_DECL LLFIO_V2_NAMESPACE::result<LLFIO_V2_NAMESPACE::file_handle> test_kernel_file_handle_relative(LLFIO_V2_NAMESPACE::file_handle::mode m, LLFIO_V2_NAMESPACE::file_handle::creation c, LLFIO_V2_NAMESPACE::file_handle::flag f)
   {
-    OUTCOME_TRY(b, AFIO_V2_NAMESPACE::path_handle::path("."));
-    auto h = AFIO_V2_NAMESPACE::file_handle::file(b, "testfile.txt", m, c, AFIO_V2_NAMESPACE::file_handle::caching::all, f);
+    OUTCOME_TRY(b, LLFIO_V2_NAMESPACE::path_handle::path("."));
+    auto h = LLFIO_V2_NAMESPACE::file_handle::file(b, "testfile.txt", m, c, LLFIO_V2_NAMESPACE::file_handle::caching::all, f);
     if(h) {
       h.value().close().value(); }
     b.close().value();

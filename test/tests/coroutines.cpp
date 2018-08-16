@@ -30,22 +30,22 @@ static inline void TestAsyncFileHandleCoroutines()
 {
 #ifdef __cpp_coroutines
   //! [coroutines_example]
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace llfio = LLFIO_V2_NAMESPACE;
 
   // Create an i/o service for this thread
-  afio::io_service service;
+  llfio::io_service service;
 
   // Create an async file i/o handle attached to the i/o service for this thread
-  afio::async_file_handle h = afio::async_file_handle::async_file(service, {}, "temp", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::only_metadata, afio::file_handle::flag::unlink_on_first_close).value();
+  llfio::async_file_handle h = llfio::async_file_handle::async_file(service, {}, "temp", llfio::file_handle::mode::write, llfio::file_handle::creation::if_needed, llfio::file_handle::caching::only_metadata, llfio::file_handle::flag::unlink_on_first_close).value();
 
   // Truncate to 1Mb
   h.truncate(1024 * 4096);
 
   // Launch 8 coroutines, each writing 4Kb of chars 0-8 to every 32Kb block
   auto coroutine = [&h](size_t no) -> std::future<void> {
-    std::vector<afio::byte, afio::utils::page_allocator<afio::byte>> buffer(4096);
+    std::vector<llfio::byte, llfio::utils::page_allocator<llfio::byte>> buffer(4096);
     memset(buffer.data(), (int) ('0' + no), 4096);
-    afio::async_file_handle::const_buffer_type bt{buffer.data(), buffer.size()};
+    llfio::async_file_handle::const_buffer_type bt{buffer.data(), buffer.size()};
     for(size_t n = 0; n < 128; n++)
     {
       // This will initiate the i/o, and suspend the coroutine until completion.
@@ -71,8 +71,8 @@ static inline void TestAsyncFileHandleCoroutines()
   //! [coroutines_example]
 
   // Check that the file has the right contents
-  alignas(4096) afio::byte buffer1[4096], buffer2[4096];
-  afio::async_file_handle::extent_type offset = 0;
+  alignas(4096) llfio::byte buffer1[4096], buffer2[4096];
+  llfio::async_file_handle::extent_type offset = 0;
   for(size_t n = 0; n < 128; n++)
   {
     for(size_t m = 0; m < 8; m++)
@@ -89,8 +89,8 @@ static inline void TestAsyncFileHandleCoroutines()
 static inline void TestPostSelfToRunCoroutines()
 {
 #ifdef __cpp_coroutines
-  namespace afio = AFIO_V2_NAMESPACE;
-  afio::io_service service;
+  namespace llfio = LLFIO_V2_NAMESPACE;
+  llfio::io_service service;
   std::atomic<bool> ready(false);
   auto runthreadid = QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id();
   auto coroutinethread = [&]() -> void {
@@ -98,7 +98,7 @@ static inline void TestPostSelfToRunCoroutines()
       auto thisthreadid = QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id();
       BOOST_CHECK(thisthreadid != runthreadid);
       ready = true;
-      co_await afio::io_service::awaitable_post_to_self(service);
+      co_await llfio::io_service::awaitable_post_to_self(service);
       thisthreadid = QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id();
       BOOST_CHECK(thisthreadid == runthreadid);
       // std::cout << "Coroutine exiting" << std::endl;
@@ -121,5 +121,5 @@ static inline void TestPostSelfToRunCoroutines()
 #endif
 }
 
-KERNELTEST_TEST_KERNEL(integration, afio, coroutines, async_file_handle, "Tests that afio::async_file_handle works as expected with Coroutines", TestAsyncFileHandleCoroutines())
-KERNELTEST_TEST_KERNEL(integration, afio, coroutines, co_post_self_to_run, "Tests that afio::io_service::co_post_self_to_run() works as expected with Coroutines", TestPostSelfToRunCoroutines())
+KERNELTEST_TEST_KERNEL(integration, llfio, coroutines, async_file_handle, "Tests that llfio::async_file_handle works as expected with Coroutines", TestAsyncFileHandleCoroutines())
+KERNELTEST_TEST_KERNEL(integration, llfio, coroutines, co_post_self_to_run, "Tests that llfio::io_service::co_post_self_to_run() works as expected with Coroutines", TestPostSelfToRunCoroutines())

@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-//! On exit dumps a CSV file of the AFIO log, one per child worker
+//! On exit dumps a CSV file of the LLFIO log, one per child worker
 #define DEBUG_CSV 1
 
 //! Seconds to run the benchmark
@@ -30,7 +30,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #define _CRT_SECURE_NO_WARNINGS 1
 
-#include "../../include/afio/afio.hpp"
+#include "../../include/llfio/llfio.hpp"
 #include "kerneltest/include/kerneltest/v1.0/child_process.hpp"
 
 #include <fstream>
@@ -63,15 +63,15 @@ bool kbhit()
 }
 #endif
 
-namespace afio = AFIO_V2_NAMESPACE;
+namespace llfio = LLFIO_V2_NAMESPACE;
 namespace child_process = KERNELTEST_V1_NAMESPACE::child_process;
 
 static volatile size_t *shared_memory;
 static void initialise_shared_memory()
 {
-  auto fh = afio::file_handle::file({}, "shared_memory", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary).value();
-  auto sh = afio::section_handle::section(fh, 8, afio::section_handle::flag::write).value();
-  auto mp = afio::map_handle::map(sh).value();
+  auto fh = llfio::file_handle::file({}, "shared_memory", llfio::file_handle::mode::write, llfio::file_handle::creation::if_needed, llfio::file_handle::caching::temporary).value();
+  auto sh = llfio::section_handle::section(fh, 8, llfio::section_handle::flag::write).value();
+  auto mp = llfio::map_handle::map(sh).value();
   shared_memory = (size_t *) mp.address();
   if(!shared_memory)
     abort();
@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
     std::vector<child_process::child_process> children;
     auto mypath = child_process::current_process_path();
 #ifdef UNICODE
-    std::vector<afio::filesystem::path::string_type> args = {L"spawned", L"", L"", L"", L"00"};
+    std::vector<llfio::filesystem::path::string_type> args = {L"spawned", L"", L"", L"", L"00"};
     args[1].resize(strlen(argv[1]));
     for(size_t n = 0; n < args[1].size(); n++)
       args[1][n] = argv[1][n];
@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
     for(size_t n = 0; n < args[3].size(); n++)
       args[3][n] = argv[3][n];
 #else
-    std::vector<afio::filesystem::path::string_type> args = {"spawned", argv[1], argv[2], argv[3], "00"};
+    std::vector<llfio::filesystem::path::string_type> args = {"spawned", argv[1], argv[2], argv[3], "00"};
 #endif
     auto env = child_process::current_process_env();
     std::cout << "Launching " << waiters << " copies of myself as a child process ..." << std::endl;
@@ -282,59 +282,59 @@ int main(int argc, char *argv[])
   // Wait for parent to let me proceed
   std::atomic<int> done(-1);
   std::thread worker([test, contended, total_locks, this_child, &done, &count] {
-    std::unique_ptr<afio::algorithm::shared_fs_mutex::shared_fs_mutex> algorithm;
-    auto base = afio::path_handle::path(".").value();
+    std::unique_ptr<llfio::algorithm::shared_fs_mutex::shared_fs_mutex> algorithm;
+    auto base = llfio::path_handle::path(".").value();
     switch(test)
     {
     case lock_algorithm::atomic_append:
     {
-      auto v = afio::algorithm::shared_fs_mutex::atomic_append::fs_mutex_append({}, "lockfile");
+      auto v = llfio::algorithm::shared_fs_mutex::atomic_append::fs_mutex_append({}, "lockfile");
       if(v.has_error())
       {
         std::cerr << "ERROR: Creation of lock algorithm returns " << v.error().message() << std::endl;
         return;
       }
-      algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::atomic_append>(std::move(v.value()));
+      algorithm = std::make_unique<llfio::algorithm::shared_fs_mutex::atomic_append>(std::move(v.value()));
       break;
     }
     case lock_algorithm::byte_ranges:
     {
-      auto v = afio::algorithm::shared_fs_mutex::byte_ranges::fs_mutex_byte_ranges({}, "lockfile");
+      auto v = llfio::algorithm::shared_fs_mutex::byte_ranges::fs_mutex_byte_ranges({}, "lockfile");
       if(v.has_error())
       {
         std::cerr << "ERROR: Creation of lock algorithm returns " << v.error().message() << std::endl;
         return;
       }
-      algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::byte_ranges>(std::move(v.value()));
+      algorithm = std::make_unique<llfio::algorithm::shared_fs_mutex::byte_ranges>(std::move(v.value()));
       break;
     }
     case lock_algorithm::lock_files:
     {
-      auto v = afio::algorithm::shared_fs_mutex::lock_files::fs_mutex_lock_files(base);
+      auto v = llfio::algorithm::shared_fs_mutex::lock_files::fs_mutex_lock_files(base);
       if(v.has_error())
       {
         std::cerr << "ERROR: Creation of lock algorithm returns " << v.error().message() << std::endl;
         return;
       }
-      algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::lock_files>(std::move(v.value()));
+      algorithm = std::make_unique<llfio::algorithm::shared_fs_mutex::lock_files>(std::move(v.value()));
       break;
     }
     case lock_algorithm::memory_map:
     {
-      auto v = afio::algorithm::shared_fs_mutex::memory_map<QUICKCPPLIB_NAMESPACE::algorithm::hash::passthru_hash>::fs_mutex_map({}, "lockfile");
+      auto v = llfio::algorithm::shared_fs_mutex::memory_map<QUICKCPPLIB_NAMESPACE::algorithm::hash::passthru_hash>::fs_mutex_map({}, "lockfile");
       if(v.has_error())
       {
         std::cerr << "ERROR: Creation of lock algorithm returns " << v.error().message() << std::endl;
         return;
       }
-      algorithm = std::make_unique<afio::algorithm::shared_fs_mutex::memory_map<QUICKCPPLIB_NAMESPACE::algorithm::hash::passthru_hash>>(std::move(v.value()));
+      algorithm = std::make_unique<llfio::algorithm::shared_fs_mutex::memory_map<QUICKCPPLIB_NAMESPACE::algorithm::hash::passthru_hash>>(std::move(v.value()));
       break;
     }
     case lock_algorithm::unknown:
       break;
     }
     // Create entities named 0 to total_locks
-    std::vector<afio::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type> entities(total_locks);
+    std::vector<llfio::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type> entities(total_locks);
     for(size_t n = 0; n < total_locks; n++)
     {
       if(contended)
@@ -352,7 +352,7 @@ int main(int argc, char *argv[])
       std::this_thread::yield();
     while(!done)
     {
-      auto result = algorithm->lock(entities, afio::deadline(), false);
+      auto result = algorithm->lock(entities, llfio::deadline(), false);
       if(result.has_error())
       {
         std::cerr << "ERROR: Algorithm lock returns " << result.error().message() << std::endl;
@@ -379,10 +379,10 @@ int main(int argc, char *argv[])
       std::cout << "\ncount=" << count << " (+" << (count - lastcount) << "), average=" << (count / secs) << std::endl;
       lastcount = count;
 #if 1
-      auto it = afio::log().cbegin();
+      auto it = llfio::log().cbegin();
       for(size_t n = 0; n < 10; n++)
       {
-        if(it == afio::log().cend())
+        if(it == llfio::log().cend())
           break;
         std::cout << "   " << *it;
         ++it;
@@ -412,8 +412,8 @@ int main(int argc, char *argv[])
         worker.join();
         std::cout << "RESULTS(" << count << ")" << std::endl;
 #if DEBUG_CSV
-        std::ofstream s("benchmark_locking_afio_log" + std::to_string(this_child) + ".csv");
-        s << csv(afio::log());
+        std::ofstream s("benchmark_locking_llfio_log" + std::to_string(this_child) + ".csv");
+        s << csv(llfio::log());
 #endif
         return 0;
       }

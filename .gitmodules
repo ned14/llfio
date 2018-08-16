@@ -1,12 +1,12 @@
 [submodule "doc/html"]
 	path = doc/html
-	url = https://github.com/ned14/afio.git
+	url = https://github.com/ned14/llfio.git
 	branch = gh-pages
 	fetchRecurseSubmodules = true
 	ignore = none
 #	shallow = true
-[submodule "include/afio/v2.0/outcome"]
-	path = include/afio/v2.0/outcome
+[submodule "include/llfio/v2.0/outcome"]
+	path = include/llfio/v2.0/outcome
 	url = https://github.com/ned14/outcome.git
 	branch = master
 	fetchRecurseSubmodules = true
@@ -19,16 +19,10 @@
 	fetchRecurseSubmodules = true
 	ignore = untracked
 #	shallow = true
-[submodule "include/afio/v2.0/quickcpplib"]
-	path = include/afio/v2.0/quickcpplib
+[submodule "include/llfio/v2.0/quickcpplib"]
+	path = include/llfio/v2.0/quickcpplib
 	url = https://github.com/ned14/quickcpplib
 	branch = master
 	fetchRecurseSubmodules = true
 	ignore = untracked
 #	shallow = true
-[submodule "include/afio/ntkernel-error-category"]
-	path = include/afio/ntkernel-error-category
-	url = https://github.com/ned14/ntkernel-error-category.git
-	branch = master
-	fetchRecurseSubmodules = true
-	ignore = untracked

@@ -37,7 +37,7 @@ static inline void TestTrivialVector()
     {
     }
   };
-  using udt_vector = AFIO_V2_NAMESPACE::algorithm::trivial_vector<udt>;
+  using udt_vector = LLFIO_V2_NAMESPACE::algorithm::trivial_vector<udt>;
 
   constexpr size_t _4kb = 4096 / sizeof(udt), _16kb = 16384 / sizeof(udt), _64kb = 65536 / sizeof(udt);
   udt_vector v;
@@ -46,25 +46,25 @@ static inline void TestTrivialVector()
   std::cout << "Resizing to 4Kb ..." << std::endl;
   v.push_back(udt(5));         // first allocation of 4Kb
   BOOST_CHECK(v.size() == 1);
-  BOOST_CHECK(v.capacity() == AFIO_V2_NAMESPACE::utils::page_size() / sizeof(udt));
+  BOOST_CHECK(v.capacity() == LLFIO_V2_NAMESPACE::utils::page_size() / sizeof(udt));
   BOOST_REQUIRE(v[0].v == 78);
   std::cout << "Resizing to capacity ..." << std::endl;
   v.resize(_4kb, udt(6));       // ought to be precisely 4Kb
   BOOST_CHECK(v.size() == _4kb);
-  BOOST_CHECK(v.capacity() == AFIO_V2_NAMESPACE::utils::round_up_to_page_size(4096) / sizeof(udt));
+  BOOST_CHECK(v.capacity() == LLFIO_V2_NAMESPACE::utils::round_up_to_page_size(4096) / sizeof(udt));
   BOOST_REQUIRE(v[0].v == 78);
   BOOST_REQUIRE(v[1].v == 79);
   std::cout << "Resizing to 16Kb ..." << std::endl;
   v.resize(_16kb, udt(7));     // 16Kb
   BOOST_CHECK(v.size() == _16kb);
-  BOOST_CHECK(v.capacity() == AFIO_V2_NAMESPACE::utils::round_up_to_page_size(16384) / sizeof(udt));
+  BOOST_CHECK(v.capacity() == LLFIO_V2_NAMESPACE::utils::round_up_to_page_size(16384) / sizeof(udt));
   BOOST_REQUIRE(v[0].v == 78);
   BOOST_REQUIRE(v[1].v == 79);
   BOOST_REQUIRE(v[_4kb].v == 80);
   std::cout << "Resizing to 64Kb ..." << std::endl;
   v.resize(_64kb, udt(8));     // 64Kb
   BOOST_CHECK(v.size() == _64kb);
-  BOOST_CHECK(v.capacity() == AFIO_V2_NAMESPACE::utils::round_up_to_page_size(65536) / sizeof(udt));
+  BOOST_CHECK(v.capacity() == LLFIO_V2_NAMESPACE::utils::round_up_to_page_size(65536) / sizeof(udt));
   BOOST_REQUIRE(v[0].v == 78);
   BOOST_REQUIRE(v[1].v == 79);
   BOOST_REQUIRE(v[_4kb].v == 80);
@@ -170,7 +170,7 @@ static inline void BenchmarkTrivialVector1()
   idx = 0;
   for(size_t items = 128; items < 16 * 1024 * 1024; items *= 2)
   {
-    AFIO_V2_NAMESPACE::algorithm::trivial_vector<udt> v2;
+    LLFIO_V2_NAMESPACE::algorithm::trivial_vector<udt> v2;
     v2.reserve(1);
     times[idx][2] = BenchmarkVector(v2, items);
     ++idx;
@@ -179,7 +179,7 @@ static inline void BenchmarkTrivialVector1()
   {
     csv << times[n][0] << "," << times[n][1] << "," << times[n][2] << std::endl;
     std::cout << "                    std::vector<udt> inserts " << printKb(times[n][0]) << " in " << times[n][1] << " microseconds" << std::endl;
-    std::cout << "afio::algorithm::trivial_vector<udt> inserts " << printKb(times[n][0]) << " in " << times[n][2] << " microseconds" << std::endl;
+    std::cout << "llfio::algorithm::trivial_vector<udt> inserts " << printKb(times[n][0]) << " in " << times[n][2] << " microseconds" << std::endl;
   }
 }
 
@@ -226,7 +226,7 @@ static inline void BenchmarkTrivialVector2()
   for(size_t items = 128; items < 16 * 1024 * 1024; items *= 2)
   {
     {
-      AFIO_V2_NAMESPACE::algorithm::trivial_vector<udt> v1;
+      LLFIO_V2_NAMESPACE::algorithm::trivial_vector<udt> v1;
       v1.resize(items, 5);
       begin = std::chrono::high_resolution_clock::now();
       v1.resize(items * 2, 6);
@@ -239,10 +239,10 @@ static inline void BenchmarkTrivialVector2()
   {
     csv << times[n][0] << "," << times[n][1] << "," << times[n][2] << std::endl;
     std::cout << "                    std::vector<udt> resizes " << printKb(times[n][0]) << " in " << times[n][1] << " microseconds" << std::endl;
-    std::cout << "afio::algorithm::trivial_vector<udt> resizes " << printKb(times[n][0]) << " in " << times[n][2] << " microseconds" << std::endl;
+    std::cout << "llfio::algorithm::trivial_vector<udt> resizes " << printKb(times[n][0]) << " in " << times[n][2] << " microseconds" << std::endl;
   }
 }
 
-KERNELTEST_TEST_KERNEL(integration, afio, algorithm, trivial_vector, "Tests that afio::algorithm::trivial_vector works as expected", TestTrivialVector())
-KERNELTEST_TEST_KERNEL(integration, afio, algorithm, trivial_vector2, "Benchmarks afio::algorithm::trivial_vector against std::vector with push_back()", BenchmarkTrivialVector1())
-KERNELTEST_TEST_KERNEL(integration, afio, algorithm, trivial_vector3, "Benchmarks afio::algorithm::trivial_vector against std::vector with resize()", BenchmarkTrivialVector2())
+KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, trivial_vector, "Tests that llfio::algorithm::trivial_vector works as expected", TestTrivialVector())
+KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, trivial_vector2, "Benchmarks llfio::algorithm::trivial_vector against std::vector with push_back()", BenchmarkTrivialVector1())
+KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, trivial_vector3, "Benchmarks llfio::algorithm::trivial_vector against std::vector with resize()", BenchmarkTrivialVector2())

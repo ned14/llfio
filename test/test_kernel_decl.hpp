@@ -22,36 +22,37 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef AFIO_TEST_KERNEL_DECL_HPP
-#define AFIO_TEST_KERNEL_DECL_HPP
+#ifndef LLFIO_TEST_KERNEL_DECL_HPP
+#define LLFIO_TEST_KERNEL_DECL_HPP
 
 #ifdef BOOST_KERNELTEST_PLEASE_INLINE_TEST_KERNELS
 // We have been included as part of an inline test suite
-#define AFIO_TEST_KERNEL_DECL inline
+#define LLFIO_TEST_KERNEL_DECL inline
 #else
 // We are standalone
-#include "../include/afio/afio.hpp"
-#define AFIO_TEST_KERNEL_DECL extern inline QUICKCPPLIB_SYMBOL_EXPORT
+#include "../include/llfio/llfio.hpp"
+#define LLFIO_TEST_KERNEL_DECL extern inline QUICKCPPLIB_SYMBOL_EXPORT
 #endif
 
-#if AFIO_EXPERIMENTAL_STATUS_CODE
+#if LLFIO_EXPERIMENTAL_STATUS_CODE
 #define KERNELTEST_EXPERIMENTAL_STATUS_CODE 1
+#include "outcome/include/outcome/experimental/status-code/include/iostream_support.hpp"
 #endif
 #include "kerneltest/include/kerneltest.hpp"
 
 #if 0
-// Tell KernelTest's outcome how to grok AFIO's result
+// Tell KernelTest's outcome how to grok LLFIO's result
 OUTCOME_V2_NAMESPACE_BEGIN
 namespace convert
 {
-  // Provide custom ValueOrError conversion from afio::result<U> into kerneltest::result<T>
-  template <class T, class U> struct value_or_error<KERNELTEST_V1_NAMESPACE::result<T>, AFIO_V2_NAMESPACE::result<U>>
+  // Provide custom ValueOrError conversion from llfio::result<U> into kerneltest::result<T>
+  template <class T, class U> struct value_or_error<KERNELTEST_V1_NAMESPACE::result<T>, LLFIO_V2_NAMESPACE::result<U>>
   {
     static constexpr bool enable_result_inputs = true;
     static constexpr bool enable_outcome_inputs = true;
 
     template <class X,                                                                                        //
-              typename = std::enable_if_t<std::is_same<AFIO_V2_NAMESPACE::result<U>, std::decay_t<X>>::value  //
+              typename = std::enable_if_t<std::is_same<LLFIO_V2_NAMESPACE::result<U>, std::decay_t<X>>::value  //
                                           && std::is_constructible<T, U>::value>>                             //
     constexpr KERNELTEST_V1_NAMESPACE::result<T>
     operator()(X &&src)
@@ -63,14 +64,14 @@ namespace convert
              KERNELTEST_V1_NAMESPACE::result<T>{make_error_code(std::forward<X>(src).error())};
     }
   };
-  // Provide custom ValueOrError conversion from afio::result<U> into kerneltest::outcome<T>
-  template <class T, class U> struct value_or_error<KERNELTEST_V1_NAMESPACE::outcome<T>, AFIO_V2_NAMESPACE::result<U>>
+  // Provide custom ValueOrError conversion from llfio::result<U> into kerneltest::outcome<T>
+  template <class T, class U> struct value_or_error<KERNELTEST_V1_NAMESPACE::outcome<T>, LLFIO_V2_NAMESPACE::result<U>>
   {
     static constexpr bool enable_result_inputs = true;
     static constexpr bool enable_outcome_inputs = true;
 
     template <class X,                                                                                        //
-              typename = std::enable_if_t<std::is_same<AFIO_V2_NAMESPACE::result<U>, std::decay_t<X>>::value  //
+              typename = std::enable_if_t<std::is_same<LLFIO_V2_NAMESPACE::result<U>, std::decay_t<X>>::value  //
                                           && std::is_constructible<T, U>::value>>                             //
     constexpr KERNELTEST_V1_NAMESPACE::outcome<T>
     operator()(X &&src)
@@ -84,8 +85,8 @@ namespace convert
   };
 }
 OUTCOME_V2_NAMESPACE_END
-static_assert(std::is_constructible<KERNELTEST_V1_NAMESPACE::result<int>, AFIO_V2_NAMESPACE::result<int>>::value, "kerneltest::result<int> is not constructible from afio::result<int>!");
-static_assert(std::is_constructible<KERNELTEST_V1_NAMESPACE::outcome<int>, AFIO_V2_NAMESPACE::result<int>>::value, "kerneltest::outcome<int> is not constructible from afio::result<int>!");
+static_assert(std::is_constructible<KERNELTEST_V1_NAMESPACE::result<int>, LLFIO_V2_NAMESPACE::result<int>>::value, "kerneltest::result<int> is not constructible from llfio::result<int>!");
+static_assert(std::is_constructible<KERNELTEST_V1_NAMESPACE::outcome<int>, LLFIO_V2_NAMESPACE::result<int>>::value, "kerneltest::outcome<int> is not constructible from llfio::result<int>!");
 #endif
 
 #endif  // namespace

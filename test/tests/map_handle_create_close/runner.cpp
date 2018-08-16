@@ -27,10 +27,10 @@ Distributed under the Boost Software License, Version 1.0.
 template <class U> inline void map_handle_create_close_(U &&f)
 {
   using namespace KERNELTEST_V1_NAMESPACE;
-  using AFIO_V2_NAMESPACE::result;
-  using AFIO_V2_NAMESPACE::file_handle;
-  using AFIO_V2_NAMESPACE::section_handle;
-  using AFIO_V2_NAMESPACE::map_handle;
+  using LLFIO_V2_NAMESPACE::result;
+  using LLFIO_V2_NAMESPACE::file_handle;
+  using LLFIO_V2_NAMESPACE::section_handle;
+  using LLFIO_V2_NAMESPACE::map_handle;
 
   // Create a temporary file and put some text into it
   file_handle temph;
@@ -72,7 +72,7 @@ template <class U> inline void map_handle_create_close_(U &&f)
         {
           // Create a temporary backing file
           temph = file_handle::file({}, "tempfile", file_handle::mode::write, file_handle::creation::if_needed).value();
-          temph.write(0, { {reinterpret_cast<const AFIO_V2_NAMESPACE::byte *>("I am some file data"), 19} }).value();
+          temph.write(0, { {reinterpret_cast<const LLFIO_V2_NAMESPACE::byte *>("I am some file data"), 19} }).value();
         }
         else
         {
@@ -92,7 +92,7 @@ template <class U> inline void map_handle_create_close_(U &&f)
           maph = std::move(testreturn.value());
         }
         // Need to close the map and any backing file as otherwise filesystem_setup won't be able to clear up the working dir on Windows
-        auto onexit = AFIO_V2_NAMESPACE::undoer([&]{
+        auto onexit = LLFIO_V2_NAMESPACE::undoer([&]{
           (void) maph.close();
           (void) temph.close();
         });
@@ -100,13 +100,13 @@ template <class U> inline void map_handle_create_close_(U &&f)
 //#define KERNELTEST_CHECK(a, ...) BOOST_CHECK(__VA_ARGS__)
         if (testreturn)
         {
-          AFIO_V2_NAMESPACE::byte *addr = maph.address();
+          LLFIO_V2_NAMESPACE::byte *addr = maph.address();
           section_handle::flag flags = std::get<1>(std::get<1>(permuter[idx]));
           KERNELTEST_CHECK(testreturn, maph.length() > 0);
           KERNELTEST_CHECK(testreturn, addr != nullptr);
           if (!(flags & section_handle::flag::nocommit) && addr != nullptr)
           {
-            AFIO_V2_NAMESPACE::byte buffer[64];
+            LLFIO_V2_NAMESPACE::byte buffer[64];
             // Make sure the backing file is appearing in the map
             if (use_file_backing && maph.is_readable())
             {
@@ -116,21 +116,21 @@ template <class U> inline void map_handle_create_close_(U &&f)
             if (use_file_backing)
             {
               auto b = maph.read(0, { {nullptr, 20} }).value();
-              KERNELTEST_CHECK(testreturn, b[0].data == addr);
-              KERNELTEST_CHECK(testreturn, b[0].len == 19);  // reads do not read more than the backing length
+              KERNELTEST_CHECK(testreturn, b[0].data() == addr);
+              KERNELTEST_CHECK(testreturn, b[0].size() == 19);  // reads do not read more than the backing length
             }
             else
             {
               auto b = maph.read(5, { {nullptr, 5000} }).value();
-              KERNELTEST_CHECK(testreturn, b[0].data == addr+5); // NOLINT
-              KERNELTEST_CHECK(testreturn, b[0].len == 4091);
+              KERNELTEST_CHECK(testreturn, b[0].data() == addr+5); // NOLINT
+              KERNELTEST_CHECK(testreturn, b[0].size() == 4091);
             }
             // If we are writable, write straight into the map
             if (maph.is_writable() && addr)
             {
               memcpy(addr, "NIALL was here", 14);
               // Make sure maph's write() works
-              maph.write(1, { {reinterpret_cast<const AFIO_V2_NAMESPACE::byte *>("iall"), 4} });
+              maph.write(1, { {reinterpret_cast<const LLFIO_V2_NAMESPACE::byte *>("iall"), 4} });
               // Make sure data written to the map turns up in the file
               if (use_file_backing)
               {
@@ -161,4 +161,4 @@ template <class U> inline void map_handle_create_close_(U &&f)
   check_results_with_boost_test(permuter, results);
 }
 
-KERNELTEST_TEST_KERNEL(unit, afio, map_handle_create_close, map_handle, "Tests that afio::map_handle's creation parameters work as expected", map_handle_create_close_(map_handle_create_close::test_kernel_map_handle))
+KERNELTEST_TEST_KERNEL(unit, llfio, map_handle_create_close, map_handle, "Tests that llfio::map_handle's creation parameters work as expected", map_handle_create_close_(map_handle_create_close::test_kernel_map_handle))

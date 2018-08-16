@@ -28,10 +28,10 @@ Distributed under the Boost Software License, Version 1.0.
 template <class U> inline void file_handle_create_close_creation(U &&f)
 {
   using namespace KERNELTEST_V1_NAMESPACE;
-  using AFIO_V2_NAMESPACE::result;
-  using file_handle = AFIO_V2_NAMESPACE::file_handle;
-  static const result<void> no_such_file_or_directory = AFIO_V2_NAMESPACE::errc::no_such_file_or_directory;
-  static const result<void> file_exists = AFIO_V2_NAMESPACE::errc::file_exists;
+  using LLFIO_V2_NAMESPACE::result;
+  using file_handle = LLFIO_V2_NAMESPACE::file_handle;
+  static const result<void> no_such_file_or_directory = LLFIO_V2_NAMESPACE::errc::no_such_file_or_directory;
+  static const result<void> file_exists = LLFIO_V2_NAMESPACE::errc::file_exists;
 
   /* Set up a permuter which for every one of these parameter values listed,
   tests with the value using the input workspace which should produce outcome
@@ -94,7 +94,7 @@ template <class U> inline void file_handle_create_close_creation(U &&f)
   check_results_with_boost_test(permuter, results);
 }
 
-KERNELTEST_TEST_KERNEL(unit, afio, file_handle_create_close, file_handle, "Tests that afio::file_handle::file()'s parameters with absolute paths work as expected", file_handle_create_close_creation(file_handle_create_close::test_kernel_file_handle_absolute))
-KERNELTEST_TEST_KERNEL(unit, afio, file_handle_create_close, file_handle, "Tests that afio::file_handle::file()'s parameters with relative paths work as expected", file_handle_create_close_creation(file_handle_create_close::test_kernel_file_handle_relative))
-KERNELTEST_TEST_KERNEL(unit, afio, file_handle_create_close, async_file_handle, "Tests that afio::async_file_handle::async_file()'s parameters with absolute paths work as expected", file_handle_create_close_creation(file_handle_create_close::test_kernel_async_file_handle_absolute))
-KERNELTEST_TEST_KERNEL(unit, afio, file_handle_create_close, async_file_handle, "Tests that afio::async_file_handle::async_file()'s parameters with relative paths work as expected", file_handle_create_close_creation(file_handle_create_close::test_kernel_async_file_handle_relative))
+KERNELTEST_TEST_KERNEL(unit, llfio, file_handle_create_close, file_handle, "Tests that llfio::file_handle::file()'s parameters with absolute paths work as expected", file_handle_create_close_creation(file_handle_create_close::test_kernel_file_handle_absolute))
+KERNELTEST_TEST_KERNEL(unit, llfio, file_handle_create_close, file_handle, "Tests that llfio::file_handle::file()'s parameters with relative paths work as expected", file_handle_create_close_creation(file_handle_create_close::test_kernel_file_handle_relative))
+KERNELTEST_TEST_KERNEL(unit, llfio, file_handle_create_close, async_file_handle, "Tests that llfio::async_file_handle::async_file()'s parameters with absolute paths work as expected", file_handle_create_close_creation(file_handle_create_close::test_kernel_async_file_handle_absolute))
+KERNELTEST_TEST_KERNEL(unit, llfio, file_handle_create_close, async_file_handle, "Tests that llfio::async_file_handle::async_file()'s parameters with relative paths work as expected", file_handle_create_close_creation(file_handle_create_close::test_kernel_async_file_handle_relative))

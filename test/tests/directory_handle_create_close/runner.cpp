@@ -27,12 +27,12 @@ Distributed under the Boost Software License, Version 1.0.
 template <class U> inline void directory_handle_create_close_creation(U &&f)
 {
   using namespace KERNELTEST_V1_NAMESPACE;
-  using AFIO_V2_NAMESPACE::result;
-  using directory_handle = AFIO_V2_NAMESPACE::directory_handle;
-  static const result<void> no_such_file_or_directory = AFIO_V2_NAMESPACE::errc::no_such_file_or_directory;
-  static const result<void> file_exists = AFIO_V2_NAMESPACE::errc::file_exists;
-  static const result<void> is_a_directory = AFIO_V2_NAMESPACE::errc::is_a_directory;
-  static const result<void> permission_denied = AFIO_V2_NAMESPACE::errc::permission_denied;
+  using LLFIO_V2_NAMESPACE::result;
+  using directory_handle = LLFIO_V2_NAMESPACE::directory_handle;
+  static const result<void> no_such_file_or_directory = LLFIO_V2_NAMESPACE::errc::no_such_file_or_directory;
+  static const result<void> file_exists = LLFIO_V2_NAMESPACE::errc::file_exists;
+  static const result<void> is_a_directory = LLFIO_V2_NAMESPACE::errc::is_a_directory;
+  static const result<void> permission_denied = LLFIO_V2_NAMESPACE::errc::permission_denied;
 
   // clang-format off
   static typename directory_handle::buffer_type _entries[5];
@@ -154,5 +154,5 @@ template <class U> inline void directory_handle_create_close_creation(U &&f)
   check_results_with_boost_test(permuter, results);
 }
 
-KERNELTEST_TEST_KERNEL(unit, afio, directory_handle_create_close, directory_handle, "Tests that afio::directory_handle::directory()'s parameters with absolute paths work as expected", directory_handle_create_close_creation(directory_handle_create_close::test_kernel_directory_handle_absolute))
-KERNELTEST_TEST_KERNEL(unit, afio, directory_handle_create_close, directory_handle, "Tests that afio::directory_handle::directory()'s parameters with relative paths work as expected", directory_handle_create_close_creation(directory_handle_create_close::test_kernel_directory_handle_relative))
+KERNELTEST_TEST_KERNEL(unit, llfio, directory_handle_create_close, directory_handle, "Tests that llfio::directory_handle::directory()'s parameters with absolute paths work as expected", directory_handle_create_close_creation(directory_handle_create_close::test_kernel_directory_handle_absolute))
+KERNELTEST_TEST_KERNEL(unit, llfio, directory_handle_create_close, directory_handle, "Tests that llfio::directory_handle::directory()'s parameters with relative paths work as expected", directory_handle_create_close_creation(directory_handle_create_close::test_kernel_directory_handle_relative))

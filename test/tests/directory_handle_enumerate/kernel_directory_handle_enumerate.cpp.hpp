@@ -26,9 +26,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 namespace directory_handle_enumerate
 {
-  AFIO_TEST_KERNEL_DECL AFIO_V2_NAMESPACE::result<AFIO_V2_NAMESPACE::directory_handle::enumerate_info> test_kernel_directory_handle_enumerate(AFIO_V2_NAMESPACE::span<AFIO_V2_NAMESPACE::directory_entry> *buffers, AFIO_V2_NAMESPACE::path_view glob, AFIO_V2_NAMESPACE::directory_handle::filter filtering)
+  LLFIO_TEST_KERNEL_DECL LLFIO_V2_NAMESPACE::result<LLFIO_V2_NAMESPACE::directory_handle::enumerate_info> test_kernel_directory_handle_enumerate(LLFIO_V2_NAMESPACE::span<LLFIO_V2_NAMESPACE::directory_entry> *buffers, LLFIO_V2_NAMESPACE::path_view glob, LLFIO_V2_NAMESPACE::directory_handle::filter filtering)
   {
-    OUTCOME_TRY(h, AFIO_V2_NAMESPACE::directory_handle::directory({}, "."));
+    OUTCOME_TRY(h, LLFIO_V2_NAMESPACE::directory_handle::directory({}, "."));
     auto ret = h.enumerate(*buffers, glob, filtering);
     h.close().value();
     return ret;

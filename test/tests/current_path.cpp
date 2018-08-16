@@ -26,21 +26,21 @@ Distributed under the Boost Software License, Version 1.0.
 
 template <class FileHandleType, class DirectoryHandleType> static inline void TestHandleCurrentPath()
 {
-  namespace afio = AFIO_V2_NAMESPACE;
+  namespace llfio = LLFIO_V2_NAMESPACE;
   {
     std::error_code ec;
-    afio::filesystem::remove_all("tempfile", ec);
-    afio::filesystem::remove_all("tempfile2", ec);
-    afio::filesystem::remove_all("tempdir", ec);
-    afio::filesystem::remove_all("tempdir2", ec);
+    llfio::filesystem::remove_all("tempfile", ec);
+    llfio::filesystem::remove_all("tempfile2", ec);
+    llfio::filesystem::remove_all("tempdir", ec);
+    llfio::filesystem::remove_all("tempdir2", ec);
   }
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-braces"
 #endif
-  afio::path_handle null_path_handle;
-  FileHandleType h1 = afio::construct<FileHandleType>{null_path_handle, "tempfile", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::temporary, afio::file_handle::flag::none}().value();     // NOLINT
-  DirectoryHandleType h2 = afio::construct<DirectoryHandleType>{null_path_handle, "tempdir", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::all, afio::file_handle::flag::none}().value();  // NOLINT
+  llfio::path_handle null_path_handle;
+  FileHandleType h1 = llfio::construct<FileHandleType>{null_path_handle, "tempfile", llfio::file_handle::mode::write, llfio::file_handle::creation::if_needed, llfio::file_handle::caching::temporary, llfio::file_handle::flag::none}().value();     // NOLINT
+  DirectoryHandleType h2 = llfio::construct<DirectoryHandleType>{null_path_handle, "tempdir", llfio::file_handle::mode::write, llfio::file_handle::creation::if_needed, llfio::file_handle::caching::all, llfio::file_handle::flag::none}().value();  // NOLINT
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
@@ -156,6 +156,6 @@ template <class FileHandleType, class DirectoryHandleType> static inline void Te
   h2.unlink().value();
 }
 
-KERNELTEST_TEST_KERNEL(integration, afio, current_path, handle, "Tests that afio::handle::current_path() works as expected", TestHandleCurrentPath<AFIO_V2_NAMESPACE::file_handle, AFIO_V2_NAMESPACE::directory_handle>())
-KERNELTEST_TEST_KERNEL(integration, afio, current_path, cached_parent_handle_adapter, "Tests that afio::cached_parent_handle_adapter::current_path() works as expected",
-                       TestHandleCurrentPath<AFIO_V2_NAMESPACE::algorithm::cached_parent_handle_adapter<AFIO_V2_NAMESPACE::file_handle>, AFIO_V2_NAMESPACE::algorithm::cached_parent_handle_adapter<AFIO_V2_NAMESPACE::directory_handle>>())
+KERNELTEST_TEST_KERNEL(integration, llfio, current_path, handle, "Tests that llfio::handle::current_path() works as expected", TestHandleCurrentPath<LLFIO_V2_NAMESPACE::file_handle, LLFIO_V2_NAMESPACE::directory_handle>())
+KERNELTEST_TEST_KERNEL(integration, llfio, current_path, cached_parent_handle_adapter, "Tests that llfio::cached_parent_handle_adapter::current_path() works as expected",
+                       TestHandleCurrentPath<LLFIO_V2_NAMESPACE::algorithm::cached_parent_handle_adapter<LLFIO_V2_NAMESPACE::file_handle>, LLFIO_V2_NAMESPACE::algorithm::cached_parent_handle_adapter<LLFIO_V2_NAMESPACE::directory_handle>>())

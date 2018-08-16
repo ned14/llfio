@@ -26,22 +26,22 @@ Distributed under the Boost Software License, Version 1.0.
 
 static inline void TestPathDiscovery()
 {
-  namespace afio = AFIO_V2_NAMESPACE;
-  auto raw_list = afio::path_discovery::all_temporary_directories();
+  namespace llfio = LLFIO_V2_NAMESPACE;
+  auto raw_list = llfio::path_discovery::all_temporary_directories();
   std::cout << "The raw list of temporary directory paths on this system are:" << std::endl;
   for(auto &i : raw_list)
   {
     std::cout << "   " << i.path << " (" << i.source << ")" << std::endl;
   }
 
-  auto verified_list = afio::path_discovery::verified_temporary_directories();
+  auto verified_list = llfio::path_discovery::verified_temporary_directories();
   std::cout << "\nThe verified list of temporary directory paths on this system are:" << std::endl;
   for(auto &i : verified_list)
   {
     std::cout << "   " << i.path << " (" << i.source << ")" << std::endl;
   }
 
-  auto &storage_backed = afio::path_discovery::storage_backed_temporary_files_directory();
+  auto &storage_backed = llfio::path_discovery::storage_backed_temporary_files_directory();
   if(storage_backed.is_valid())
   {
     std::cout << "\nThe storage backed temporary files directory chosen is:\n   " << storage_backed.current_path().value() << std::endl;
@@ -51,7 +51,7 @@ static inline void TestPathDiscovery()
     std::cout << "\nNo storage backed temporary files directory found!" << std::endl;
   }
 
-  auto &memory_backed = afio::path_discovery::memory_backed_temporary_files_directory();
+  auto &memory_backed = llfio::path_discovery::memory_backed_temporary_files_directory();
   if(memory_backed.is_valid())
   {
     std::cout << "\nThe memory backed temporary files directory chosen is:\n   " << memory_backed.current_path().value() << std::endl;
@@ -62,4 +62,4 @@ static inline void TestPathDiscovery()
   }
 }
 
-KERNELTEST_TEST_KERNEL(integration, afio, path_discovery, temp_directories, "Tests that afio::path_discovery works as expected", TestPathDiscovery())
+KERNELTEST_TEST_KERNEL(integration, llfio, path_discovery, temp_directories, "Tests that llfio::path_discovery works as expected", TestPathDiscovery())

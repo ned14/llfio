@@ -28,24 +28,24 @@ Distributed under the Boost Software License, Version 1.0.
 
 static inline void TestAsyncFileHandle()
 {
-  namespace afio = AFIO_V2_NAMESPACE;
-  afio::io_service service;
-  afio::async_file_handle h = afio::async_file_handle::async_file(service, {}, "temp", afio::file_handle::mode::write, afio::file_handle::creation::if_needed, afio::file_handle::caching::only_metadata, afio::file_handle::flag::unlink_on_first_close).value();
-  std::vector<std::pair<std::future<afio::async_file_handle::const_buffers_type>, afio::async_file_handle::io_state_ptr>> futures;
+  namespace llfio = LLFIO_V2_NAMESPACE;
+  llfio::io_service service;
+  llfio::async_file_handle h = llfio::async_file_handle::async_file(service, {}, "temp", llfio::file_handle::mode::write, llfio::file_handle::creation::if_needed, llfio::file_handle::caching::only_metadata, llfio::file_handle::flag::unlink_on_first_close).value();
+  std::vector<std::pair<std::future<llfio::async_file_handle::const_buffers_type>, llfio::async_file_handle::io_state_ptr>> futures;
   futures.reserve(1024);
   h.truncate(1024 * 4096).value();
-  alignas(4096) afio::byte buffer[4096];
-  memset(buffer, 78, 4096);                                               // NOLINT
-  afio::async_file_handle::const_buffer_type bt{buffer, sizeof(buffer)};  // NOLINT
+  alignas(4096) llfio::byte buffer[4096];
+  memset(buffer, 78, 4096);                                                // NOLINT
+  llfio::async_file_handle::const_buffer_type bt{buffer, sizeof(buffer)};  // NOLINT
   for(size_t n = 0; n < 1024; n++)
   {
   retry:
-    std::promise<afio::async_file_handle::const_buffers_type> p;
+    std::promise<llfio::async_file_handle::const_buffers_type> p;
     auto f(p.get_future());
     auto schedule_io = [&] {
-      return h.async_write({bt, n * 4096}, [ p = std::move(p), n ](afio::async_file_handle *, afio::async_file_handle::io_result<afio::async_file_handle::const_buffers_type> & result) mutable {
+      return h.async_write({bt, n * 4096}, [ p = std::move(p), n ](llfio::async_file_handle *, llfio::async_file_handle::io_result<llfio::async_file_handle::const_buffers_type> & result) mutable {
         (void) n;
-        if(!result && result.error() == afio::errc::resource_unavailable_try_again)
+        if(!result && result.error() == llfio::errc::resource_unavailable_try_again)
         {
           std::cout << "*** Completion handler saw error " << result.error() << std::endl;
         }
@@ -62,7 +62,7 @@ static inline void TestAsyncFileHandle()
       });
     };
     auto g(schedule_io());
-    if(!g && g.error() == afio::errc::resource_unavailable_try_again)
+    if(!g && g.error() == llfio::errc::resource_unavailable_try_again)
     {
       // Sleep until at least i/o is processed
       service.run().value();
@@ -78,10 +78,10 @@ static inline void TestAsyncFileHandle()
   // Make sure nothing went wrong by fetching the futures.
   for(auto &i : futures)
   {
-    afio::async_file_handle::const_buffers_type out = i.first.get();
+    llfio::async_file_handle::const_buffers_type out = i.first.get();
     // std::cout << out.data()->len << std::endl;
-    BOOST_CHECK(out.data()->len == 4096);
+    BOOST_CHECK(out.data()->size() == 4096);
   }
 }
 
-KERNELTEST_TEST_KERNEL(integration, afio, works, async_file_handle, "Tests that afio::async_file_handle works as expected", TestAsyncFileHandle())
+KERNELTEST_TEST_KERNEL(integration, llfio, works, async_file_handle, "Tests that llfio::async_file_handle works as expected", TestAsyncFileHandle())

@@ -1,13 +1,13 @@
 Herein lies an exploratory toy ACID key-value store written using
-AFIO which lets you look up any BLOB value from some 128-bit key, and to
+LLFIO which lets you look up any BLOB value from some 128-bit key, and to
 update as an atomic transaction up to 65,535 key-values at once.
 
 It is purely to test the feasibility of one approach to implementing such
-a store, and to test AFIO's design. Nobody should use this store for
+a store, and to test LLFIO's design. Nobody should use this store for
 anything serious.
 
 ## Todo:
-- [x] Add sparse file creation on Windows to AFIO and see how the
+- [x] Add sparse file creation on Windows to LLFIO and see how the
 benchmarks fare.
 - [x] Add key-value deletion.
 - [x] Atomic append should issue gather buffers of `IOV_MAX`
