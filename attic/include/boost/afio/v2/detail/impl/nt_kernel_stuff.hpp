@@ -700,7 +700,7 @@ static inline int winftruncate(int fd, off_t _newsize)
 }
 static inline void fill_stat_t(stat_t &stat, BOOST_AFIO_POSIX_STAT_STRUCT s, metadata_flags wanted)
 {
-    using namespace boost::llfio;
+    using namespace boost::afio;
 #ifndef WIN32
     if(!!(wanted&metadata_flags::dev)) { stat.st_dev=s.st_dev; }
 #endif

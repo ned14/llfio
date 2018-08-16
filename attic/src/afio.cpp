@@ -19,9 +19,9 @@ File Created: Mar 2013
 #define BOOST_AFIO_VALIDATE_INPUTS 1
 #endif
 
-#include "boost/llfio/llfio.hpp"
+#include "boost/afio/afio.hpp"
 #if BOOST_AFIO_LATEST_VERSION != 2
-# error Mismatched llfio.cpp to latest version
+# error Mismatched afio.cpp to latest version
 #endif
-#include "boost/llfio/v2/detail/impl/llfio.ipp"
+#include "boost/afio/v2/detail/impl/afio.ipp"
 

@@ -1,6 +1,6 @@
-#include "llfio_pch.hpp"
+#include "afio_pch.hpp"
 
-//[closure_execution_llfio_example
+//[closure_execution_afio_example
 #include <vector>
 
 int main()
@@ -16,22 +16,22 @@ int main()
     out_file.close();
     
 
-    //set up the llfio dispatcher
-    auto dispatcher = boost::llfio::make_dispatcher().get();
+    //set up the afio dispatcher
+    auto dispatcher = boost::afio::make_dispatcher().get();
 
     //set up an array to hold our integers
     int ary[ary_size];
 
     //schedule the file open
-    auto opened_file = dispatcher->file(boost::llfio::path_req("somefile.dat", 
-        boost::llfio::file_flags::read));
+    auto opened_file = dispatcher->file(boost::afio::path_req("somefile.dat", 
+        boost::afio::file_flags::read));
 
     //set up vectors for the individual read operations, and the work on each integer
-    std::vector<boost::llfio::future<>> read_ops(ary_size);
+    std::vector<boost::afio::future<>> read_ops(ary_size);
     std::vector<std::function<void()>> vec_func(ary_size);
     for (int i = 0; i < ary_size; ++i)
     {
-         read_ops[i] = dispatcher->read(boost::llfio::io_req<int>(opened_file, 
+         read_ops[i] = dispatcher->read(boost::afio::io_req<int>(opened_file, 
             &ary[i], sizeof(int), i*sizeof(int)));
         
          vec_func[i] = std::bind([](int* a){ *a *= 2 ; }, &ary[i]);
@@ -44,7 +44,7 @@ int main()
     auto closed_file = dispatcher->close(dispatcher->barrier(read_ops).front());
     
     // make sure work has completed before trying to print data from the array
-    boost::llfio::when_all_p(work.begin(), work.end()).wait();
+    boost::afio::when_all_p(work.begin(), work.end()).wait();
     
     //verify the out put is as expected: "0, 2, 4, 6, 8, 10, 12, 14, 16, 18"
      for (int i = 0; i < ary_size; ++i)

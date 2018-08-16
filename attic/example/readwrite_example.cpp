@@ -1,19 +1,19 @@
-#include "llfio_pch.hpp"
+#include "afio_pch.hpp"
 
 int main(void)
 {        
     try
     {
         //[readwrite_example
-        namespace llfio = BOOST_AFIO_V2_NAMESPACE;
+        namespace afio = BOOST_AFIO_V2_NAMESPACE;
         namespace asio = BOOST_AFIO_V2_NAMESPACE::asio;
 
         // Set a dispatcher as current for this thread
-        llfio::current_dispatcher_guard h(llfio::make_dispatcher().get());
+        afio::current_dispatcher_guard h(afio::make_dispatcher().get());
 
         // Schedule an opening of a file called example_file.txt
-        llfio::future<> openfile = llfio::async_file("example_file.txt",
-          llfio::file_flags::create | llfio::file_flags::read_write);
+        afio::future<> openfile = afio::async_file("example_file.txt",
+          afio::file_flags::create | afio::file_flags::read_write);
         
         // Something a bit surprising for many people is that writing off
         // the end of a file in AFIO does NOT extend the file and writes
@@ -25,7 +25,7 @@ int main(void)
         // workaround: either open a file for append-only access, in which
         // case all writes extend the file for you, or else you explicitly
         // extend files before writing, like this:
-        llfio::future<> resizedfile = llfio::async_truncate(openfile, 12);
+        afio::future<> resizedfile = afio::async_truncate(openfile, 12);
     
         // Config a write gather. You could do this of course as a batch
         // of writes, but a write gather has optimised host OS support in most
@@ -38,29 +38,29 @@ int main(void)
         buffers.push_back(asio::const_buffer("rl", 2));
         buffers.push_back(asio::const_buffer("d\n", 2));
         // Schedule the write gather to offset zero after the resize file
-        llfio::future<> written(llfio::async_write(resizedfile, buffers, 0));
+        afio::future<> written(afio::async_write(resizedfile, buffers, 0));
         
         // Have the compiler config the exact same write gather as earlier for you
         // The compiler assembles an identical sequence of ASIO write gather
         // buffers for you
         std::vector<std::string> buffers2={ "He", "ll", "o ", "Wo", "rl", "d\n" };
         // Schedule this to occur after the previous write completes
-        llfio::future<> written2(llfio::async_write(written, buffers2, 0));
+        afio::future<> written2(afio::async_write(written, buffers2, 0));
         
         // Schedule making sure the previous batch has definitely reached physical storage
         // This won't complete until the write is on disc
-        llfio::future<> stored(llfio::async_sync(written2));
+        afio::future<> stored(afio::async_sync(written2));
                 
         // Schedule filling this array from the file. Note how convenient std::array
         // is and completely replaces C style char buffer[bytes]
         std::array<char, 12> buffer;
-        llfio::future<> read(llfio::async_read(stored, buffer, 0));
+        afio::future<> read(afio::async_read(stored, buffer, 0));
             
         // Schedule the closing and deleting of example_file.txt after the contents read
-        llfio::future<> deletedfile(llfio::async_rmfile(llfio::async_close(read)));
+        afio::future<> deletedfile(afio::async_rmfile(afio::async_close(read)));
         
         // Wait until the buffer has been filled, checking all steps for errors
-        llfio::when_all_p(openfile, resizedfile, written, written2, stored, read).get(); /*< waits for file open, resize, write, sync and read to complete, throwing any exceptions encountered >*/
+        afio::when_all_p(openfile, resizedfile, written, written2, stored, read).get(); /*< waits for file open, resize, write, sync and read to complete, throwing any exceptions encountered >*/
         
         // There is actually a io_req<std::string> specialisation you
         // can use to skip this bit by reading directly into a string ...

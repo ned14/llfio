@@ -1,11 +1,11 @@
-#include "llfio_pch.hpp"
+#include "afio_pch.hpp"
 
 //[adopt_example
-struct test_handle : boost::llfio::handle
+struct test_handle : boost::afio::handle
 {
-    test_handle(boost::llfio::dispatcher *parent) :
-        boost::llfio::handle(parent,
-        boost::llfio::file_flags::none) {}
+    test_handle(boost::afio::dispatcher *parent) :
+        boost::afio::handle(parent,
+        boost::afio::file_flags::none) {}
     virtual void close() override final
     {
         // Do nothing
@@ -18,30 +18,30 @@ struct test_handle : boost::llfio::handle
     {
         return nullptr;
     }
-    virtual boost::llfio::path path(bool refresh=false) override final
+    virtual boost::afio::path path(bool refresh=false) override final
     {
-        return boost::llfio::path();
+        return boost::afio::path();
     }
-    virtual boost::llfio::path path() const override final
+    virtual boost::afio::path path() const override final
     {
-        return boost::llfio::path();
+        return boost::afio::path();
     }
-    virtual boost::llfio::directory_entry direntry(boost::llfio::metadata_flags
-        wanted=boost::llfio::directory_entry::metadata_fastpath()) override final
+    virtual boost::afio::directory_entry direntry(boost::afio::metadata_flags
+        wanted=boost::afio::directory_entry::metadata_fastpath()) override final
     {
-        return boost::llfio::directory_entry();
+        return boost::afio::directory_entry();
     }
-    virtual boost::llfio::path target() override final
+    virtual boost::afio::path target() override final
     {
-        return boost::llfio::path();
+        return boost::afio::path();
     }
-    virtual void link(const boost::llfio::path_req &req) override final
+    virtual void link(const boost::afio::path_req &req) override final
     {
     }
     virtual void unlink() override final
     {
     }
-    virtual void atomic_relink(const boost::llfio::path_req &req) override final
+    virtual void atomic_relink(const boost::afio::path_req &req) override final
     {
     }
 };
@@ -49,7 +49,7 @@ struct test_handle : boost::llfio::handle
 int main(void)
 {
   using namespace BOOST_AFIO_V2_NAMESPACE;
-  auto dispatcher = boost::llfio::make_dispatcher().get();
+  auto dispatcher = boost::afio::make_dispatcher().get();
   current_dispatcher_guard h(dispatcher);
   auto foreignh=std::make_shared<test_handle>(dispatcher.get());
   return 0;

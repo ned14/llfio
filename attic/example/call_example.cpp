@@ -1,14 +1,14 @@
 //#define BOOST_RESULT_OF_USE_DECLTYPE 1
-#include "llfio_pch.hpp"
+#include "afio_pch.hpp"
 
 int main(void)
 {
     //[call_example
     // Create a dispatcher instance
-    auto dispatcher=boost::llfio::make_dispatcher().get();
+    auto dispatcher=boost::afio::make_dispatcher().get();
     
     // Schedule an asynchronous call of some function with some bound set of arguments
-    auto helloworld=dispatcher->call(boost::llfio::future<>() /* no precondition */, [](std::string text) -> int {
+    auto helloworld=dispatcher->call(boost::afio::future<>() /* no precondition */, [](std::string text) -> int {
         std::cout << text << std::endl;
         return 42;
     }, std::string("Hello world"));

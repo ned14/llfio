@@ -1,12 +1,12 @@
-//[workshop_atomic_updates_llfio_interface
-namespace llfio = BOOST_AFIO_V2_NAMESPACE;
+//[workshop_atomic_updates_afio_interface
+namespace afio = BOOST_AFIO_V2_NAMESPACE;
 namespace filesystem = BOOST_AFIO_V2_NAMESPACE::filesystem;
 using BOOST_OUTCOME_V1_NAMESPACE::lightweight_futures::shared_future;
 
 class data_store
 {
-  llfio::dispatcher_ptr _dispatcher;
-  llfio::handle_ptr _store;
+  afio::dispatcher_ptr _dispatcher;
+  afio::handle_ptr _store;
 public:
   // Type used for read streams
   using istream = std::shared_ptr<std::istream>;
@@ -21,7 +21,7 @@ public:
   static constexpr size_t writeable = (1<<0);
 
   // Open a data store at path
-  data_store(size_t flags = 0, llfio::path path = "store");
+  data_store(size_t flags = 0, afio::path path = "store");
   
   // Look up item named name for reading, returning an istream for the item
   shared_future<istream> lookup(std::string name) noexcept;
@@ -30,38 +30,38 @@ public:
 };
 //]
 
-//[workshop_atomic_updates_llfio3]
+//[workshop_atomic_updates_afio3]
 namespace asio = BOOST_AFIO_V2_NAMESPACE::asio;
 using BOOST_OUTCOME_V1_NAMESPACE::empty;
 using BOOST_AFIO_V2_NAMESPACE::error_code;
 using BOOST_AFIO_V2_NAMESPACE::generic_category;
 
 // A special allocator of highly efficient file i/o memory
-using file_buffer_type = std::vector<char, llfio::utils::page_allocator<char>>;
+using file_buffer_type = std::vector<char, afio::utils::page_allocator<char>>;
 
 // An iostream which reads directly from a memory mapped AFIO file
 struct idirectstream : public std::istream
 {
   struct directstreambuf : public std::streambuf
   {
-    llfio::handle_ptr h;  // Holds the file open
+    afio::handle_ptr h;  // Holds the file open
     std::shared_ptr<file_buffer_type> buffer;
-    llfio::handle::mapped_file_ptr mfp;
+    afio::handle::mapped_file_ptr mfp;
     // From a mmap
-    directstreambuf(llfio::handle_ptr _h, llfio::handle::mapped_file_ptr _mfp, size_t length) : h(std::move(_h)), mfp(std::move(_mfp))
+    directstreambuf(afio::handle_ptr _h, afio::handle::mapped_file_ptr _mfp, size_t length) : h(std::move(_h)), mfp(std::move(_mfp))
     {
       // Set the get buffer this streambuf is to use
       setg((char *) mfp->addr, (char *) mfp->addr, (char *) mfp->addr + length);
     }
     // From a malloc
-    directstreambuf(llfio::handle_ptr _h, std::shared_ptr<file_buffer_type> _buffer, size_t length) : h(std::move(_h)), buffer(std::move(_buffer))
+    directstreambuf(afio::handle_ptr _h, std::shared_ptr<file_buffer_type> _buffer, size_t length) : h(std::move(_h)), buffer(std::move(_buffer))
     {
       // Set the get buffer this streambuf is to use
       setg(buffer->data(), buffer->data(), buffer->data() + length);
     }
   };
   std::unique_ptr<directstreambuf> buf;
-  template<class U> idirectstream(llfio::handle_ptr h, U &&buffer, size_t length) : std::istream(new directstreambuf(std::move(h), std::forward<U>(buffer), length)), buf(static_cast<directstreambuf *>(rdbuf()))
+  template<class U> idirectstream(afio::handle_ptr h, U &&buffer, size_t length) : std::istream(new directstreambuf(std::move(h), std::forward<U>(buffer), length)), buf(static_cast<directstreambuf *>(rdbuf()))
   {
   }
   virtual ~idirectstream() override
@@ -78,11 +78,11 @@ struct odirectstream : public std::ostream
   {
     using int_type = std::streambuf::int_type;
     using traits_type = std::streambuf::traits_type;
-    llfio::future<> lastwrite; // the last async write performed
-    llfio::off_t offset;       // offset of next write
+    afio::future<> lastwrite; // the last async write performed
+    afio::off_t offset;       // offset of next write
     file_buffer_type buffer;  // a page size on this machine
     file_buffer_type lastbuffer;
-    directstreambuf(llfio::handle_ptr _h) : lastwrite(std::move(_h)), offset(0), buffer(llfio::utils::page_sizes().front())
+    directstreambuf(afio::handle_ptr _h) : lastwrite(std::move(_h)), offset(0), buffer(afio::utils::page_sizes().front())
     {
       // Set the put buffer this streambuf is to use
       setp(buffer.data(), buffer.data() + buffer.size());
@@ -95,18 +95,18 @@ struct odirectstream : public std::ostream
         // Schedule an asynchronous write of the buffer to storage
         size_t thisbuffer = pptr() - pbase();
         if(thisbuffer)
-          lastwrite = llfio::async_write(llfio::async_truncate(lastwrite, offset+thisbuffer), buffer.data(), thisbuffer, offset);
+          lastwrite = afio::async_write(afio::async_truncate(lastwrite, offset+thisbuffer), buffer.data(), thisbuffer, offset);
         lastwrite.get();
         // TODO: On Windows do I need to close and reopen the file to flush metadata before
         //       the rename or does the rename do it for me?
         // Get handle to the parent directory
         auto dirh(lastwrite->container());
         // Atomically rename "tmpXXXXXXXXXXXXXXXX" to "0"
-        lastwrite->atomic_relink(llfio::path_req::relative(dirh, "0"));
+        lastwrite->atomic_relink(afio::path_req::relative(dirh, "0"));
 #ifdef __linux__
-        // Journalled Linux filing systems don't need this, but if you enabled llfio::file_flags::always_sync
+        // Journalled Linux filing systems don't need this, but if you enabled afio::file_flags::always_sync
         // you might want to issue this too.
-        llfio::sync(dirh);
+        afio::sync(dirh);
 #endif
       }
       catch(...)
@@ -138,16 +138,16 @@ struct odirectstream : public std::ostream
         buffer.resize(lastbuffer.size());
         setp(buffer.data(), buffer.data() + buffer.size());
         // Schedule an extension of physical storage by an extra page
-        lastwrite = llfio::async_truncate(lastwrite, offset + thisbuffer);
+        lastwrite = afio::async_truncate(lastwrite, offset + thisbuffer);
         // Schedule an asynchronous write of the buffer to storage
-        lastwrite=llfio::async_write(lastwrite, lastbuffer.data(), thisbuffer, offset);
+        lastwrite=afio::async_write(lastwrite, lastbuffer.data(), thisbuffer, offset);
         offset+=thisbuffer;
       }
       return 0;
     }
   };
   std::unique_ptr<directstreambuf> buf;
-  odirectstream(llfio::handle_ptr h) : std::ostream(new directstreambuf(std::move(h))), buf(static_cast<directstreambuf *>(rdbuf()))
+  odirectstream(afio::handle_ptr h) : std::ostream(new directstreambuf(std::move(h))), buf(static_cast<directstreambuf *>(rdbuf()))
   {
   }
   virtual ~odirectstream() override
@@ -158,7 +158,7 @@ struct odirectstream : public std::ostream
 };
 //]
 
-//[workshop_atomic_updates_llfio1]
+//[workshop_atomic_updates_afio1]
 namespace asio = BOOST_AFIO_V2_NAMESPACE::asio;
 using BOOST_OUTCOME_V1_NAMESPACE::empty;
 using BOOST_AFIO_V2_NAMESPACE::error_code;
@@ -183,7 +183,7 @@ static std::string random_name()
     random_names_type(size_t count) : names(count), idx(0)
     {
       for(size_t n=0; n<count; n++)
-        names[n]=llfio::utils::random_string(16);  // 128 bits
+        names[n]=afio::utils::random_string(16);  // 128 bits
     }
     std::string get()
     {
@@ -195,13 +195,13 @@ static std::string random_name()
   return random_names.get();
 }
 
-data_store::data_store(size_t flags, llfio::path path)
+data_store::data_store(size_t flags, afio::path path)
 {
   // Make a dispatcher for the local filesystem URI, masking out write flags on all operations if not writeable
-  _dispatcher=llfio::make_dispatcher("file:///", llfio::file_flags::none, !(flags & writeable) ? llfio::file_flags::write : llfio::file_flags::none).get();
+  _dispatcher=afio::make_dispatcher("file:///", afio::file_flags::none, !(flags & writeable) ? afio::file_flags::write : afio::file_flags::none).get();
   // Set the dispatcher for this thread, and open a handle to the store directory
-  llfio::current_dispatcher_guard h(_dispatcher);
-  _store=llfio::dir(std::move(path), llfio::file_flags::create);  // throws if there was an error
+  afio::current_dispatcher_guard h(_dispatcher);
+  _store=afio::dir(std::move(path), afio::file_flags::create);  // throws if there was an error
   // Precalculate the cache of random names
   random_name();
 }
@@ -214,16 +214,16 @@ shared_future<data_store::istream> data_store::lookup(std::string name) noexcept
   {
     name.append("/0");
     // Schedule the opening of the file for reading
-    llfio::future<> h(llfio::async_file(_store, name, llfio::file_flags::read));
+    afio::future<> h(afio::async_file(_store, name, afio::file_flags::read));
     // When it completes, call this continuation
-    return h.then([](llfio::future<> &_h) -> shared_future<data_store::istream> {
+    return h.then([](afio::future<> &_h) -> shared_future<data_store::istream> {
       // If file didn't open, return the error or exception immediately
       BOOST_OUTCOME_PROPAGATE(_h);
-      size_t length=(size_t) _h->lstat(llfio::metadata_flags::size).st_size;
+      size_t length=(size_t) _h->lstat(afio::metadata_flags::size).st_size;
       // Is a memory map more appropriate?
       if(length>=128*1024)
       {
-        llfio::handle::mapped_file_ptr mfp;
+        afio::handle::mapped_file_ptr mfp;
         if((mfp=_h->map_file()))
         {
           data_store::istream ret(std::make_shared<idirectstream>(_h.get_handle(), std::move(mfp), length));
@@ -232,9 +232,9 @@ shared_future<data_store::istream> data_store::lookup(std::string name) noexcept
       }
       // Schedule the reading of the file into a buffer
       auto buffer=std::make_shared<file_buffer_type>(length);
-      llfio::future<> h(llfio::async_read(_h, buffer->data(), length, 0));
+      afio::future<> h(afio::async_read(_h, buffer->data(), length, 0));
       // When the read completes call this continuation
-      return h.then([buffer, length](const llfio::future<> &h) -> shared_future<data_store::istream> {
+      return h.then([buffer, length](const afio::future<> &h) -> shared_future<data_store::istream> {
         // If read failed, return the error or exception immediately
         BOOST_OUTCOME_PROPAGATE(h);
         data_store::istream ret(std::make_shared<idirectstream>(h.get_handle(), buffer, length));
@@ -249,7 +249,7 @@ shared_future<data_store::istream> data_store::lookup(std::string name) noexcept
 }
 //]
 
-//[workshop_atomic_updates_llfio2]
+//[workshop_atomic_updates_afio2]
 shared_future<data_store::ostream> data_store::write(std::string name) noexcept
 {
   if(!is_valid_name(name))
@@ -257,24 +257,24 @@ shared_future<data_store::ostream> data_store::write(std::string name) noexcept
   try
   {
     // Schedule the opening of the directory
-    llfio::future<> dirh(llfio::async_dir(_store, name, llfio::file_flags::create));
+    afio::future<> dirh(afio::async_dir(_store, name, afio::file_flags::create));
 #ifdef __linux__
     // Flush metadata on Linux only. This will be a noop unless we created a new directory
     // above, and if we don't flush the new key directory it and its contents may not appear
     // in the store directory after a suddenly power loss, even if it and its contents are
     // all on physical storage.
-    dirh.then([this](const llfio::future<> &h) { async_sync(_store); });
+    dirh.then([this](const afio::future<> &h) { async_sync(_store); });
 #endif
     // Make a crypto strong random file name
     std::string randomname("tmp");
     randomname.append(random_name());
     // Schedule the opening of the file for writing
-    llfio::future<> h(llfio::async_file(dirh, randomname, llfio::file_flags::create | llfio::file_flags::write
-      | llfio::file_flags::hold_parent_open    // handle should keep a handle_ptr to its parent dir
-      /*| llfio::file_flags::always_sync*/     // writes don't complete until upon physical storage
+    afio::future<> h(afio::async_file(dirh, randomname, afio::file_flags::create | afio::file_flags::write
+      | afio::file_flags::hold_parent_open    // handle should keep a handle_ptr to its parent dir
+      /*| afio::file_flags::always_sync*/     // writes don't complete until upon physical storage
       ));
     // When it completes, call this continuation
-    return h.then([](const llfio::future<> &h) -> shared_future<data_store::ostream> {
+    return h.then([](const afio::future<> &h) -> shared_future<data_store::ostream> {
       // If file didn't open, return the error or exception immediately
       BOOST_OUTCOME_PROPAGATE(h);
       // Create an ostream which directly uses the file.

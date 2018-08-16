@@ -1,9 +1,9 @@
-#include "llfio_pch.hpp"
+#include "afio_pch.hpp"
 
 int main(void)
 {
-  using namespace boost::llfio;
-  auto dispatcher=boost::llfio::make_dispatcher().get();
+  using namespace boost::afio;
+  auto dispatcher=boost::afio::make_dispatcher().get();
         
   auto mkdir(dispatcher->dir(path_req("testdir", file_flags::create)));
   try
@@ -14,7 +14,7 @@ int main(void)
       path p(cs);
       try
       {
-        auto mkfile(dispatcher->file(path_req::relative(mkdir, p, boost::llfio::file_flags::create)));
+        auto mkfile(dispatcher->file(path_req::relative(mkdir, p, boost::afio::file_flags::create)));
         mkfile.get();
         auto rmfile(dispatcher->close(dispatcher->rmfile(mkfile)));
         std::cout << "Character " << n << " (" << p << ") is permitted on this operating system." << std::endl;

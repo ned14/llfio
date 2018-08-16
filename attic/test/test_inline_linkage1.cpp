@@ -1,11 +1,11 @@
-#include "boost/llfio/llfio.hpp"
+#include "boost/afio/afio.hpp"
 
 void test_inline_linkage1()
 {
-    using namespace boost::llfio;
+    using namespace boost::afio;
     using namespace std;
     vector<char> buffer(64, 'n');
-    auto dispatcher = boost::llfio::make_dispatcher("file:///", boost::llfio::file_flags::always_sync).get();
+    auto dispatcher = boost::afio::make_dispatcher("file:///", boost::afio::file_flags::always_sync).get();
     std::cout << "\n\nTesting synchronous directory and file creation:\n";
     {
       auto mkdir(dispatcher->dir(path_req("testdir", file_flags::create)));

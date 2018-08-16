@@ -1,12 +1,12 @@
 //#define BOOST_RESULT_OF_USE_DECLTYPE 1
-#include "llfio_pch.hpp"
+#include "afio_pch.hpp"
 
 int main(void)
 {
     //[completion_example2
     // Create a dispatcher instance
-    std::shared_ptr<boost::llfio::dispatcher> dispatcher=
-        boost::llfio::make_dispatcher().get();
+    std::shared_ptr<boost::afio::dispatcher> dispatcher=
+        boost::afio::make_dispatcher().get();
     
     // One thing direct programming of completion handlers can do which call() cannot is immediate
     // completions. These run immediately after the precondition finishes by the thread worker
@@ -14,18 +14,18 @@ int main(void)
     // be useful for ensuring data is still cache-local for example.
     
     // Create the completion, using the standard form
-    auto completion=[](std::shared_ptr<boost::llfio::dispatcher> dispatcher,
+    auto completion=[](std::shared_ptr<boost::afio::dispatcher> dispatcher,
         /* These are always the standard parameters */
-        size_t id, boost::llfio::future<> precondition)
+        size_t id, boost::afio::future<> precondition)
       /* This is always the return type */
-      -> std::pair<bool, std::shared_ptr<boost::llfio::handle>>
+      -> std::pair<bool, std::shared_ptr<boost::afio::handle>>
     {
         std::cout << "I am completion" << std::endl;
       
         // Create some callable entity which will do the actual completion. It can be
         // anything you like, but you need a minimum of its integer id.
-        auto completer=[](std::shared_ptr<boost::llfio::dispatcher> dispatcher,
-                          size_t id, boost::llfio::future<> op) -> int
+        auto completer=[](std::shared_ptr<boost::afio::dispatcher> dispatcher,
+                          size_t id, boost::afio::future<> op) -> int
         {
             try
             {
@@ -39,7 +39,7 @@ int main(void)
             {
                 // In non-deferred completions AFIO traps exceptions for you. Here, you must
                 // do it by hand and tell AFIO about what exception state to return.
-                boost::llfio::exception_ptr e(boost::llfio::current_exception());
+                boost::afio::exception_ptr e(boost::afio::current_exception());
                 dispatcher->complete_async_op(id, e);
             }
             return 0;
@@ -51,25 +51,25 @@ int main(void)
         return std::make_pair(false, precondition.get_handle());
     };
        
-    // Bind any user defined parameters to create a proper boost::llfio::dispatcher::completion_t
-    std::function<boost::llfio::dispatcher::completion_t> boundf=
+    // Bind any user defined parameters to create a proper boost::afio::dispatcher::completion_t
+    std::function<boost::afio::dispatcher::completion_t> boundf=
         std::bind(completion, dispatcher,
             /* The standard parameters */
             std::placeholders::_1, std::placeholders::_2);
 
     // Schedule an asynchronous call of the completion
-    boost::llfio::future<> op=
-        dispatcher->completion(boost::llfio::future<>() /* no precondition */,
+    boost::afio::future<> op=
+        dispatcher->completion(boost::afio::future<>() /* no precondition */,
             std::make_pair(
                 /* Complete boundf immediately after its precondition (in this
                 case as there is no precondition that means right now before
                 completion() returns) */
-                boost::llfio::async_op_flags::immediate,
+                boost::afio::async_op_flags::immediate,
                 boundf));
         
     // Create a boost::stl_future<> representing the ops passed to when_all_p()
-    boost::llfio::stl_future<std::vector<std::shared_ptr<boost::llfio::handle>>> stl_future
-        =boost::llfio::when_all_p(op);
+    boost::afio::stl_future<std::vector<std::shared_ptr<boost::afio::handle>>> stl_future
+        =boost::afio::when_all_p(op);
     // ... and wait for it to complete
     stl_future.wait();
     //]

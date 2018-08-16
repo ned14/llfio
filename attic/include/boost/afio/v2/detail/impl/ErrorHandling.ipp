@@ -5,7 +5,7 @@ File Created: Nov 2012
 
 #define _CRT_SECURE_NO_WARNINGS
 
-#include "../../llfio.hpp"
+#include "../../afio.hpp"
 #include <locale>
 #include <cstring>
 
@@ -16,12 +16,12 @@ namespace detail {
 #ifdef BOOST_AFIO_OP_STACKBACKTRACEDEPTH
     try
     {
-      if(!llfio_exception_stack())
-        llfio_exception_stack()=new llfio_exception_stack_t;
-      llfio_exception_stack_entry se;
+      if(!afio_exception_stack())
+        afio_exception_stack()=new afio_exception_stack_t;
+      afio_exception_stack_entry se;
       se.name=std::move(name);
       collect_stack(se.stack);
-      llfio_exception_stack()->push_back(std::move(se));
+      afio_exception_stack()->push_back(std::move(se));
     } catch(...) { }
 #endif
   }
