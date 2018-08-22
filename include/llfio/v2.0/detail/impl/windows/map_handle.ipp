@@ -324,36 +324,57 @@ static inline void win32_map_flags(native_handle_type &nativeh, DWORD &allocatio
     prot = PAGE_EXECUTE;
   }
 }
-// Used to apply an operation to all maps within a region
-template <class F> static inline result<void> win32_maps_apply(byte *addr, size_t bytes, F &&f)
+
+QUICKCPPLIB_BITFIELD_BEGIN(win32_map_sought)
 {
+  committed = 1U << 0U, freed = 1U << 1U, reserved = 1U << 2U
+}
+QUICKCPPLIB_BITFIELD_END(win32_map_sought)
+// Used to apply an operation to all maps within a region
+template <class F> static inline result<void> win32_maps_apply(byte *addr, size_t bytes, win32_map_sought sought, F &&f)
+{
+  /* Ok, so we have to be super careful here, because calling VirtualQuery()
+  somewhere in the middle of a region causes a linear scan until the beginning
+  or end of the region is found. For a reservation of say 2^42, that takes a
+  LONG time.
+
+  What we do instead is to query the current block, perform F on it, then query
+  it again to get the next point of change, query that, perhaps perform F on it,
+  and so on.
+
+  This causes twice the number of VirtualQuery() calls as ought to be necessary,
+  but such is this API's design.
+  */
+  MEMORY_BASIC_INFORMATION mbi;
   while(bytes > 0)
   {
-    MEMORY_BASIC_INFORMATION mbi;
-    byte *thisregion = addr;
-    // Need to iterate until AllocationBase changes
-    for(;;)
+    if(!VirtualQuery(addr, &mbi, sizeof(mbi)))
     {
-      if(!VirtualQuery(addr, &mbi, sizeof(mbi)) || mbi.AllocationBase != thisregion)
-      {
-        break;
-      }
-      addr += mbi.RegionSize;
-      if(mbi.RegionSize < bytes)
-      {
-        bytes -= mbi.RegionSize;
-      }
-      else
-      {
-        bytes = 0;
-      }
+      LLFIO_LOG_FATAL(nullptr, "map_handle::win32_maps_apply VirtualQuery() 1 failed");
+      abort();
     }
-    // Address passed in originally must match an allocation
-    if(addr == thisregion)
+    bool doit = false;
+    doit = doit || ((MEM_COMMIT == mbi.State) && (sought & win32_map_sought::committed));
+    doit = doit || ((MEM_FREE == mbi.State) && (sought & win32_map_sought::freed));
+    doit = doit || ((MEM_RESERVE == mbi.State) && (sought & win32_map_sought::reserved));
+    if(doit)
     {
-      return errc::invalid_argument;
+      OUTCOME_TRYV(f(reinterpret_cast<byte *>(mbi.BaseAddress), mbi.RegionSize));
     }
-    OUTCOME_TRYV(f(thisregion, addr - thisregion));
+    if(!VirtualQuery(addr, &mbi, sizeof(mbi)))
+    {
+      LLFIO_LOG_FATAL(nullptr, "map_handle::win32_maps_apply VirtualQuery() 2 failed");
+      abort();
+    }
+    addr += mbi.RegionSize;
+    if(mbi.RegionSize < bytes)
+    {
+      bytes -= mbi.RegionSize;
+    }
+    else
+    {
+      bytes = 0;
+    }
   }
   return success();
 }
@@ -406,7 +427,7 @@ result<void> map_handle::close() noexcept
       {
         OUTCOME_TRYV(barrier({}, true, false));
       }
-      OUTCOME_TRYV(win32_maps_apply(_addr, _reservation, [](byte *addr, size_t /* unused */) -> result<void> {
+      OUTCOME_TRYV(win32_maps_apply(_addr, _reservation, win32_map_sought::committed, [](byte *addr, size_t /* unused */) -> result<void> {
         NTSTATUS ntstat = NtUnmapViewOfSection(GetCurrentProcess(), addr);
         if(ntstat < 0)
         {
@@ -465,7 +486,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
       return {reqs.buffers};
     }
   }
-  OUTCOME_TRYV(win32_maps_apply(addr, bytes, [](byte *addr, size_t bytes) -> result<void> {
+  OUTCOME_TRYV(win32_maps_apply(addr, bytes, win32_map_sought::committed, [](byte *addr, size_t bytes) -> result<void> {
     if(FlushViewOfFile(addr, static_cast<SIZE_T>(bytes)) == 0)
     {
       return win32_error();
@@ -617,7 +638,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool /* un
   if(newsize < _reservation)
   {
     // If newsize isn't exactly a previous extension, this will fail, same as for the VirtualAlloc case
-    OUTCOME_TRYV(win32_maps_apply(_addr + newsize, _reservation - newsize, [](byte *addr, size_t /* unused */) -> result<void> {
+    OUTCOME_TRYV(win32_maps_apply(_addr + newsize, _reservation - newsize, win32_map_sought::committed, [](byte *addr, size_t /* unused */) -> result<void> {
       NTSTATUS ntstat = NtUnmapViewOfSection(GetCurrentProcess(), addr);
       if(ntstat < 0)
       {
@@ -658,7 +679,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
   DWORD prot = 0;
   if(flag == section_handle::flag::none)
   {
-    OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), [](byte *addr, size_t bytes) -> result<void> {
+    OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed, [](byte *addr, size_t bytes) -> result<void> {
       DWORD _ = 0;
       if(VirtualProtect(addr, bytes, PAGE_NOACCESS, &_) == 0)
       {
@@ -685,7 +706,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
     prot = PAGE_EXECUTE;
   }
   region = utils::round_to_page_size(region);
-  OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), [prot](byte *addr, size_t bytes) -> result<void> {
+  OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed | win32_map_sought::freed | win32_map_sought::reserved, [prot](byte *addr, size_t bytes) -> result<void> {
     if(VirtualAlloc(addr, bytes, MEM_COMMIT, prot) == nullptr)
     {
       return win32_error();
@@ -703,7 +724,7 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
     return errc::invalid_argument;
   }
   region = utils::round_to_page_size(region);
-  OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), [](byte *addr, size_t bytes) -> result<void> {
+  OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed, [](byte *addr, size_t bytes) -> result<void> {
     if(VirtualFree(addr, bytes, MEM_DECOMMIT) == 0)
     {
       return win32_error();
@@ -729,7 +750,7 @@ result<void> map_handle::zero_memory(buffer_type region) noexcept
     region = utils::round_to_page_size(region);
     if(region.size() > 0)
     {
-      OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), [](byte *addr, size_t bytes) -> result<void> {
+      OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed, [](byte *addr, size_t bytes) -> result<void> {
         if(DiscardVirtualMemory_(addr, bytes) == 0)
         {
           return win32_error();
@@ -774,7 +795,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
     // Win8's DiscardVirtualMemory is much faster if it's available
     if(DiscardVirtualMemory_ != nullptr)
     {
-      OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), [](byte *addr, size_t bytes) -> result<void> {
+      OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed, [](byte *addr, size_t bytes) -> result<void> {
         if(DiscardVirtualMemory_(addr, bytes) == 0)
         {
           return win32_error();
@@ -784,7 +805,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
       return region;
     }
     // Else MEM_RESET will do
-    OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), [](byte *addr, size_t bytes) -> result<void> {
+    OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed, [](byte *addr, size_t bytes) -> result<void> {
       if(VirtualAlloc(addr, bytes, MEM_RESET, 0) == nullptr)
       {
         return win32_error();
