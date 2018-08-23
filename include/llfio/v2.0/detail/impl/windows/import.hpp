@@ -54,8 +54,11 @@ Distributed under the Boost Software License, Version 1.0.
 #if !LLFIO_EXPERIMENTAL_STATUS_CODE
 // Bring in the custom NT kernel error code category
 #if LLFIO_HEADERS_ONLY
-#define NTKERNEL_ERROR_CATEGORY_INLINE
-#define NTKERNEL_ERROR_CATEGORY_STATIC
+#if !defined(NTKERNEL_ERROR_CATEGORY_INLINE)
+#pragma message("WARNING: LLFIO_HEADERS_ONLY=1, LLFIO_EXPERIMENTAL_STATUS_CODE=0 and NTKERNEL_ERROR_CATEGORY_INLINE=1 on Windows, this can produce unreliable binaries where semantic comparisons of error codes randomly fail!")
+#define NTKERNEL_ERROR_CATEGORY_INLINE 1  // BOLD!
+#define NTKERNEL_ERROR_CATEGORY_STATIC 1
+#endif
 #endif
 #include "../../../../ntkernel-error-category/include/ntkernel_category.hpp"
 #endif
