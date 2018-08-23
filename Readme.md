@@ -8,6 +8,8 @@ Tarballs of source and prebuilt binaries for Linux x64, MacOS x64 and Windows x6
 - https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-darwin64-latest.tgz (disabled pending XCode supporting Filesystem TS)
 - https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-win64-latest.zip
 
+USAGE AND CONFIGURATION INSTRUCTIONS CAN BE FOUND AT https://ned14.github.io/llfio/
+
 
 ### Immediate todos in order of priority:
 - [x] Implement new custom C++ exception synthesis support from Outcome.
@@ -20,7 +22,7 @@ Tarballs of source and prebuilt binaries for Linux x64, MacOS x64 and Windows x6
 - [x] Implement SG14 `status_code` as a standalone library and test in LLFIO.
 - [x] Single include generation now we're on `status_code` and it's safe.
 - [x] Implement `SIGBUS`/`EXCEPTION_IN_PAGE_ERROR` RAII catcher.
-- [ ] Implement `symlink_handle` already!
+- [x] Implement `symlink_handle` already!
 - [ ] `atomic_append` isn't actually being tested in shared_fs_mutex
 - [ ] Implement a non-toy ACID key-value BLOB store and send it to Boost for peer review.
   - [ ] For this need to implement a file-based B+ tree. And for that, need to
