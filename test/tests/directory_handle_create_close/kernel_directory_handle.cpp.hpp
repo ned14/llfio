@@ -27,20 +27,20 @@ Distributed under the Boost Software License, Version 1.0.
 namespace directory_handle_create_close
 {
   LLFIO_TEST_KERNEL_DECL LLFIO_V2_NAMESPACE::result<LLFIO_V2_NAMESPACE::directory_handle> test_kernel_directory_handle_absolute(LLFIO_V2_NAMESPACE::directory_handle::mode m, LLFIO_V2_NAMESPACE::directory_handle::creation c, LLFIO_V2_NAMESPACE::directory_handle::flag f,
-                                                                                                                             LLFIO_V2_NAMESPACE::directory_handle::buffers_type *entries, LLFIO_V2_NAMESPACE::result<LLFIO_V2_NAMESPACE::directory_handle::enumerate_info> *info)
+                                                                                                                                LLFIO_V2_NAMESPACE::directory_handle::buffers_type *entries, LLFIO_V2_NAMESPACE::result<LLFIO_V2_NAMESPACE::directory_handle::buffers_type> *info)
   {
     auto h = LLFIO_V2_NAMESPACE::directory_handle::directory({}, "testdir", m, c, LLFIO_V2_NAMESPACE::directory_handle::caching::all, f);
     if(h)
     {
       // git needs a file in a directory to create it, so any directory created needs an empty file called pin.txt
       (void) LLFIO_V2_NAMESPACE::file_handle::file(h.value(), "pin.txt", LLFIO_V2_NAMESPACE::file_handle::mode::write, LLFIO_V2_NAMESPACE::file_handle::creation::if_needed);
-      *info = LLFIO_V2_NAMESPACE::result<LLFIO_V2_NAMESPACE::directory_handle::enumerate_info>(h.value().enumerate(std::move(*entries)));
+      *info = LLFIO_V2_NAMESPACE::result<LLFIO_V2_NAMESPACE::directory_handle::buffers_type>(h.value().read(std::move(*entries)));
       h.value().close().value();
     }
     return h;
   }
   LLFIO_TEST_KERNEL_DECL LLFIO_V2_NAMESPACE::result<LLFIO_V2_NAMESPACE::directory_handle> test_kernel_directory_handle_relative(LLFIO_V2_NAMESPACE::directory_handle::mode m, LLFIO_V2_NAMESPACE::directory_handle::creation c, LLFIO_V2_NAMESPACE::directory_handle::flag f,
-                                                                                                                             LLFIO_V2_NAMESPACE::directory_handle::buffers_type *entries, LLFIO_V2_NAMESPACE::result<LLFIO_V2_NAMESPACE::directory_handle::enumerate_info> *info)
+                                                                                                                                LLFIO_V2_NAMESPACE::directory_handle::buffers_type *entries, LLFIO_V2_NAMESPACE::result<LLFIO_V2_NAMESPACE::directory_handle::buffers_type> *info)
   {
     OUTCOME_TRY(b, LLFIO_V2_NAMESPACE::path_handle::path("."));
     auto h = LLFIO_V2_NAMESPACE::directory_handle::directory(b, "testdir", m, c, LLFIO_V2_NAMESPACE::directory_handle::caching::all, f);
@@ -48,7 +48,7 @@ namespace directory_handle_create_close
     {
       // git needs a file in a directory to create it, so any directory created needs an empty file called pin.txt
       (void) LLFIO_V2_NAMESPACE::file_handle::file(h.value(), "pin.txt", LLFIO_V2_NAMESPACE::file_handle::mode::write, LLFIO_V2_NAMESPACE::file_handle::creation::if_needed);
-      *info = LLFIO_V2_NAMESPACE::result<LLFIO_V2_NAMESPACE::directory_handle::enumerate_info>(h.value().enumerate(std::move(*entries)));
+      *info = LLFIO_V2_NAMESPACE::result<LLFIO_V2_NAMESPACE::directory_handle::buffers_type>(h.value().read(std::move(*entries)));
       h.value().close().value();
     }
     b.close().value();

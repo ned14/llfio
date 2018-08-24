@@ -37,7 +37,7 @@ template <class U> inline void directory_handle_create_close_creation(U &&f)
   // clang-format off
   static typename directory_handle::buffer_type _entries[5];
   static typename directory_handle::buffers_type entries(_entries);
-  static result<typename directory_handle::enumerate_info> info(typename result<typename directory_handle::enumerate_info>::error_type{});
+  static result<typename directory_handle::buffers_type> info(typename result<typename directory_handle::buffers_type>::error_type{});
   static const auto permuter(mt_permute_parameters< 
     result<void>,                              
     parameters<                                
@@ -45,7 +45,7 @@ template <class U> inline void directory_handle_create_close_creation(U &&f)
       typename directory_handle::creation,
       typename directory_handle::flag,
       typename directory_handle::buffers_type *,
-      result<typename directory_handle::enumerate_info> *
+      result<typename directory_handle::buffers_type> *
     >,
     precondition::filesystem_setup_parameters,
     postcondition::filesystem_comparison_structure_parameters,
@@ -87,7 +87,7 @@ template <class U> inline void directory_handle_create_close_creation(U &&f)
           i = typename directory_handle::buffer_type();
         }
         entries = typename directory_handle::buffers_type(_entries);
-        info = typename result<typename directory_handle::enumerate_info>::error_type();
+        info = typename result<typename directory_handle::buffers_type>::error_type();
         return std::make_tuple(std::ref(permuter), std::ref(testreturn), idx, std::ref(enumeration_should_be));
       },
       [&](auto /*tuplestate*/) {
