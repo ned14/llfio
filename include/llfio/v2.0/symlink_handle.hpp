@@ -112,6 +112,8 @@ public:
 
   //! The buffer type used by this handle, which is a `path_view`
   using buffer_type = path_view;
+  //! The const buffer type used by this handle, which is a `path_view`
+  using const_buffer_type = path_view;
   /*! The buffers type used by this handle for reads, which is a single item sequence of `path_view`.
 
   \warning Unless you supply your own kernel buffer, you need to keep this around as long as you

@@ -209,16 +209,16 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> directory_handle::clone_to_p
   return ret;
 }
 
-result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_type &&tofill, path_view_type glob, filter /*unused*/, span<char> kernelbuffer) const noexcept
+result<directory_handle::buffers_type> directory_handle::read(io_request<buffers_type> req) const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  if(tofill.empty())
+  if(req.buffers.empty())
   {
-    return enumerate_info{std::move(tofill), stat_t::want::none, false};
+    return std::move(req.buffers);
   }
   // Is glob a single entry match? If so, this is really a stat call
-  path_view_type::c_str zglob(glob);
-  if(!glob.empty() && !glob.contains_glob())
+  path_view_type::c_str zglob(req.glob);
+  if(!req.glob.empty() && !req.glob.contains_glob())
   {
     struct stat s
     {
@@ -227,46 +227,46 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     {
       return posix_error();
     }
-    tofill[0].stat.st_dev = s.st_dev;
-    tofill[0].stat.st_ino = s.st_ino;
-    tofill[0].stat.st_type = to_st_type(s.st_mode);
-    tofill[0].stat.st_perms = s.st_mode & 0xfff;
-    tofill[0].stat.st_nlink = s.st_nlink;
-    tofill[0].stat.st_uid = s.st_uid;
-    tofill[0].stat.st_gid = s.st_gid;
-    tofill[0].stat.st_rdev = s.st_rdev;
+    req.buffers[0].stat.st_dev = s.st_dev;
+    req.buffers[0].stat.st_ino = s.st_ino;
+    req.buffers[0].stat.st_type = to_st_type(s.st_mode);
+    req.buffers[0].stat.st_perms = s.st_mode & 0xfff;
+    req.buffers[0].stat.st_nlink = s.st_nlink;
+    req.buffers[0].stat.st_uid = s.st_uid;
+    req.buffers[0].stat.st_gid = s.st_gid;
+    req.buffers[0].stat.st_rdev = s.st_rdev;
 #ifdef __ANDROID__
-    tofill[0].stat.st_atim = to_timepoint(*((struct timespec *) &s.st_atime));
-    tofill[0].stat.st_mtim = to_timepoint(*((struct timespec *) &s.st_mtime));
-    tofill[0].stat.st_ctim = to_timepoint(*((struct timespec *) &s.st_ctime));
+    req.buffers[0].stat.st_atim = to_timepoint(*((struct timespec *) &s.st_atime));
+    req.buffers[0].stat.st_mtim = to_timepoint(*((struct timespec *) &s.st_mtime));
+    req.buffers[0].stat.st_ctim = to_timepoint(*((struct timespec *) &s.st_ctime));
 #elif defined(__APPLE__)
-    tofill[0].stat.st_atim = to_timepoint(s.st_atimespec);
-    tofill[0].stat.st_mtim = to_timepoint(s.st_mtimespec);
-    tofill[0].stat.st_ctim = to_timepoint(s.st_ctimespec);
+    req.buffers[0].stat.st_atim = to_timepoint(s.st_atimespec);
+    req.buffers[0].stat.st_mtim = to_timepoint(s.st_mtimespec);
+    req.buffers[0].stat.st_ctim = to_timepoint(s.st_ctimespec);
 #else  // Linux and BSD
-    tofill[0].stat.st_atim = to_timepoint(s.st_atim);
-    tofill[0].stat.st_mtim = to_timepoint(s.st_mtim);
-    tofill[0].stat.st_ctim = to_timepoint(s.st_ctim);
+    req.buffers[0].stat.st_atim = to_timepoint(s.st_atim);
+    req.buffers[0].stat.st_mtim = to_timepoint(s.st_mtim);
+    req.buffers[0].stat.st_ctim = to_timepoint(s.st_ctim);
 #endif
-    tofill[0].stat.st_size = s.st_size;
-    tofill[0].stat.st_allocated = static_cast<handle::extent_type>(s.st_blocks) * 512;
-    tofill[0].stat.st_blocks = s.st_blocks;
-    tofill[0].stat.st_blksize = s.st_blksize;
+    req.buffers[0].stat.st_size = s.st_size;
+    req.buffers[0].stat.st_allocated = static_cast<handle::extent_type>(s.st_blocks) * 512;
+    req.buffers[0].stat.st_blocks = s.st_blocks;
+    req.buffers[0].stat.st_blksize = s.st_blksize;
 #ifdef HAVE_STAT_FLAGS
-    tofill[0].stat.st_flags = s.st_flags;
+    req.buffers[0].stat.st_flags = s.st_flags;
 #endif
 #ifdef HAVE_STAT_GEN
-    tofill[0].stat.st_gen = s.st_gen;
+    req.buffers[0].stat.st_gen = s.st_gen;
 #endif
 #ifdef HAVE_BIRTHTIMESPEC
 #if defined(__APPLE__)
-    tofill[0].stat.st_birthtim = to_timepoint(s.st_birthtimespec);
+    req.buffers[0].stat.st_birthtim = to_timepoint(s.st_birthtimespec);
 #else
-    tofill[0].stat.st_birthtim = to_timepoint(s.st_birthtim);
+    req.buffers[0].stat.st_birthtim = to_timepoint(s.st_birthtim);
 #endif
 #endif
-    tofill[0].stat.st_sparse = static_cast<unsigned int>((static_cast<handle::extent_type>(s.st_blocks) * 512) < static_cast<handle::extent_type>(s.st_size));
-    tofill._resize(1);
+    req.buffers[0].stat.st_sparse = static_cast<unsigned int>((static_cast<handle::extent_type>(s.st_blocks) * 512) < static_cast<handle::extent_type>(s.st_size));
+    req.buffers._resize(1);
     static constexpr stat_t::want default_stat_contents = stat_t::want::dev | stat_t::want::ino | stat_t::want::type | stat_t::want::perms | stat_t::want::nlink | stat_t::want::uid | stat_t::want::gid | stat_t::want::rdev | stat_t::want::atim | stat_t::want::mtim | stat_t::want::ctim | stat_t::want::size |
                                                           stat_t::want::allocated | stat_t::want::blocks | stat_t::want::blksize
 #ifdef HAVE_STAT_FLAGS
@@ -279,7 +279,9 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
                                                           | stat_t::want::birthtim
 #endif
                                                           | stat_t::want::sparse;
-    return enumerate_info{std::move(tofill), default_stat_contents, true};
+    req.buffers._metadata = default_stat_contents;
+    req.buffers._done = true;
+    return std::move(req.buffers);
   }
 #ifdef __linux__
   // Unlike FreeBSD, Linux doesn't define a getdents() function, so we'll do that here.
@@ -295,17 +297,17 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     return syscall(SYS_getdirentries64, fd, buf, count, &foo);
   });
 #endif
-  if(!tofill._kernel_buffer && kernelbuffer.empty())
+  if(!req.buffers._kernel_buffer && req.kernelbuffer.empty())
   {
     // Let's assume the average leafname will be 64 characters long.
-    size_t toallocate = (sizeof(dirent) + 64) * tofill.size();
+    size_t toallocate = (sizeof(dirent) + 64) * req.buffers.size();
     auto *mem = new(std::nothrow) char[toallocate];
     if(mem == nullptr)
     {
       return errc::not_enough_memory;
     }
-    tofill._kernel_buffer = std::unique_ptr<char[]>(mem);
-    tofill._kernel_buffer_size = toallocate;
+    req.buffers._kernel_buffer = std::unique_ptr<char[]>(mem);
+    req.buffers._kernel_buffer_size = toallocate;
   }
   stat_t::want default_stat_contents = stat_t::want::ino | stat_t::want::type;
   dirent *buffer;
@@ -314,8 +316,8 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
   bool done = false;
   do
   {
-    buffer = kernelbuffer.empty() ? reinterpret_cast<dirent *>(tofill._kernel_buffer.get()) : reinterpret_cast<dirent *>(kernelbuffer.data());
-    bytesavailable = kernelbuffer.empty() ? tofill._kernel_buffer_size : kernelbuffer.size();
+    buffer = req.kernelbuffer.empty() ? reinterpret_cast<dirent *>(req.buffers._kernel_buffer.get()) : reinterpret_cast<dirent *>(req.kernelbuffer.data());
+    bytesavailable = req.kernelbuffer.empty() ? req.buffers._kernel_buffer_size : req.kernelbuffer.size();
 // Seek to start
 #ifdef __linux__
     if(-1 == ::lseek64(_v.fd, 0, SEEK_SET))
@@ -327,17 +329,17 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
       return posix_error();
 #endif
     bytes = getdents(_v.fd, reinterpret_cast<char *>(buffer), bytesavailable);
-    if(kernelbuffer.empty() && bytes == -1 && EINVAL == errno)
+    if(req.kernelbuffer.empty() && bytes == -1 && EINVAL == errno)
     {
-      tofill._kernel_buffer.reset();
-      size_t toallocate = tofill._kernel_buffer_size * 2;
+      req.buffers._kernel_buffer.reset();
+      size_t toallocate = req.buffers._kernel_buffer_size * 2;
       auto *mem = new(std::nothrow) char[toallocate];
       if(mem == nullptr)
       {
         return errc::not_enough_memory;
       }
-      tofill._kernel_buffer = std::unique_ptr<char[]>(mem);
-      tofill._kernel_buffer_size = toallocate;
+      req.buffers._kernel_buffer = std::unique_ptr<char[]>(mem);
+      req.buffers._kernel_buffer_size = toallocate;
     }
     else
     {
@@ -350,8 +352,10 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
   } while(!done);
   if(bytes == 0)
   {
-    tofill._resize(0);
-    return enumerate_info{std::move(tofill), default_stat_contents, true};
+    req.buffers._resize(0);
+    req.buffers._metadata = default_stat_contents;
+    req.buffers._done = true;
+    return std::move(req.buffers);
   }
   LLFIO_VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(buffer, bytes);  // NOLINT
   size_t n = 0;
@@ -367,11 +371,11 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
           goto cont;
         }
       }
-      if(!glob.empty() && fnmatch(zglob.buffer, dent->d_name, 0) != 0)
+      if(!req.glob.empty() && fnmatch(zglob.buffer, dent->d_name, 0) != 0)
       {
         goto cont;
       }
-      directory_entry &item = tofill[n];
+      directory_entry &item = req.buffers[n];
       item.leafname = path_view(dent->d_name, length);
       item.stat = stat_t(nullptr);
       item.stat.st_ino = dent->d_ino;
@@ -410,13 +414,17 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     if((bytes -= dent->d_reclen) <= 0)
     {
       // Fill is complete
-      tofill._resize(n);
-      return enumerate_info{std::move(tofill), default_stat_contents, true};
+      req.buffers._resize(n);
+      req.buffers._metadata = default_stat_contents;
+      req.buffers._done = true;
+      return std::move(req.buffers);
     }
-    if(n >= tofill.size())
+    if(n >= req.buffers.size())
     {
       // Fill is incomplete
-      return enumerate_info{std::move(tofill), default_stat_contents, false};
+      req.buffers._metadata = default_stat_contents;
+      req.buffers._done = false;
+      return std::move(req.buffers);
     }
   }
 }

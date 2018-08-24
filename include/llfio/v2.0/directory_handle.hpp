@@ -79,6 +79,8 @@ public:
 
   //! The buffer type used by this handle, which is a `directory_entry`
   using buffer_type = directory_entry;
+  //! The const buffer type used by this handle, which is a `directory_entry`
+  using const_buffer_type = directory_entry;
   /*! The buffers type used by this handle, which is a contiguous sequence of `directory_entry`.
 
   \warning Unless you supply your own kernel buffer, you need to keep this around as long as you
@@ -87,6 +89,14 @@ public:
   */
   struct buffers_type : public span<buffer_type>
   {
+    /*! The list of stat metadata retrieved. Sometimes, due to kernel API design,
+    enumerating a directory retrieves more than the metadata requested in the read
+    request. This indidicates what stat metadata is in the buffers filled.
+    */
+    stat_t::want metadata() const noexcept { return _metadata; }
+    //! Whether the directory was entirely read or not into any buffers supplied.
+    bool done() const noexcept { return _done; }
+
     using span<buffer_type>::span;
     //! Implicit construction from a span
     /* constexpr */ buffers_type(span<buffer_type> v)  // NOLINT TODO FIXME Make this constexpr when span becomes constexpr. SAME for move constructor below
@@ -95,7 +105,7 @@ public:
     }
     ~buffers_type() = default;
     //! Move constructor
-    /* constexpr */ buffers_type(buffers_type &&o) noexcept : span<buffer_type>(std::move(o)), _kernel_buffer(std::move(o._kernel_buffer)), _kernel_buffer_size(o._kernel_buffer_size)
+    /* constexpr */ buffers_type(buffers_type &&o) noexcept : span<buffer_type>(std::move(o)), _kernel_buffer(std::move(o._kernel_buffer)), _kernel_buffer_size(o._kernel_buffer_size), _metadata(o._metadata), _done(o._done)
     {
       static_cast<span<buffer_type> &>(o) = {};
       o._kernel_buffer_size = 0;
@@ -117,14 +127,41 @@ public:
     std::unique_ptr<char[]> _kernel_buffer;
     size_t _kernel_buffer_size{0};
     void _resize(size_t l) { *static_cast<span<buffer_type> *>(this) = this->subspan(0, l); }
+    stat_t::want _metadata{stat_t::want::none};
+    bool _done{false};
   };
-
   //! How to do deleted file elimination on Windows
   enum class filter
   {
     none,        //!< Do no filtering at all
-    fastdeleted  //!< Filter out LLFIO deleted files based on their filename (fast and fairly reliable)
+    fastdeleted  //!< For Windows without POSIX delete semantics, filter out LLFIO deleted files based on their filename (fast and fairly reliable)
   };
+  //! The i/o request type used by this handle.
+  template <class /* unused */> struct io_request
+  {
+    buffers_type buffers{};
+    path_view_type glob{};
+    filter filtering{filter::fastdeleted};
+    span<char> kernelbuffer{};
+
+    /*! Construct a request to enumerate a directory with optionally specified kernel buffer.
+
+    \param _buffers The buffers to fill with enumerated directory entries.
+    \param _glob An optional shell glob by which to filter the items filled. Done kernel side on Windows, user side on POSIX.
+    \param _filtering Whether to filter out fake-deleted files on Windows or not.
+    \param _kernelbuffer A buffer to use for the kernel to fill. If left defaulted, a kernel buffer
+    is allocated internally and returned in the buffers returned which needs to not be destructed until one
+    is no longer using any items within (leafnames are views onto the original kernel data).
+    */
+    constexpr io_request(buffers_type _buffers, path_view_type _glob = {}, filter _filtering = filter::fastdeleted, span<char> _kernelbuffer = {})
+        : buffers(std::move(_buffers))
+        , glob(_glob)
+        , filtering(_filtering)
+        , kernelbuffer(_kernelbuffer)
+    {
+    }
+  };
+
 
 public:
   //! Default constructor
@@ -259,32 +296,17 @@ public:
   result<void> unlink(deadline d = std::chrono::seconds(30)) noexcept override;
 #endif
 
-  //! Completion information for `enumerate()`
-  struct enumerate_info
-  {
-    //! The buffers filled.
-    buffers_type filled;
-    //! The list of stat metadata retrieved by `enumerate()` this call per `buffer_type`.
-    stat_t::want metadata;
-    //! Whether the directory was entirely read or not.
-    bool done;
-  };
-  /*! Fill the buffers type with as many directory entries as will fit.
+  /*! Fill the buffers type with as many directory entries as will fit into any optionally supplied buffer.
 
   \return Returns the buffers filled, what metadata was filled in and whether the entire directory
-  was read into `tofill`.
-  \param tofill The buffers to fill, returned to you on exit.
-  \param glob An optional shell glob by which to filter the items filled. Done kernel side on Windows, user side on POSIX.
-  \param filtering Whether to filter out fake-deleted files on Windows or not.
-  \param kernelbuffer A buffer to use for the kernel to fill. If left defaulted, a kernel buffer
-  is allocated internally and stored into `tofill` which needs to not be destructed until one
-  is no longer using any items within (leafnames are views onto the original kernel data).
+  was read or not.
+  \param req A buffer fill (directory enumeration) request.
   \errors todo
-  \mallocs If the `kernelbuffer` parameter is set on entry, no memory allocations.
+  \mallocs If the `kernelbuffer` parameter is set in the request, no memory allocations.
   If unset, at least one memory allocation, possibly more is performed.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<enumerate_info> enumerate(buffers_type &&tofill, path_view_type glob = path_view_type(), filter filtering = filter::fastdeleted, span<char> kernelbuffer = span<char>()) const noexcept;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<buffers_type> read(io_request<buffers_type> req) const noexcept;
 };
 inline std::ostream &operator<<(std::ostream &s, const directory_handle::filter &v)
 {
@@ -295,9 +317,9 @@ inline std::ostream &operator<<(std::ostream &s, const directory_handle::filter 
   }
   return s << "llfio::directory_handle::filter::" << values[static_cast<size_t>(v)];
 }
-inline std::ostream &operator<<(std::ostream &s, const directory_handle::enumerate_info & /*unused*/)
+inline std::ostream &operator<<(std::ostream &s, const directory_handle::buffers_type & /*unused*/)
 {
-  return s << "llfio::directory_handle::enumerate_info";
+  return s << "llfio::directory_handle::buffers_type";
 }
 
 //! \brief Constructor for `directory_handle`
@@ -349,26 +371,6 @@ inline result<directory_handle> temp_directory(directory_handle::path_view_type 
                                                directory_handle::caching _caching = directory_handle::caching::all, directory_handle::flag flags = directory_handle::flag::none) noexcept
 {
   return directory_handle::temp_directory(std::forward<decltype(name)>(name), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
-}
-/*! Fill the buffers type with as many directory entries as will fit.
-
-\return Returns the buffers filled, what metadata was filled in and whether the entire directory
-was read into `tofill`.
-\param self The object whose member function to call.
-\param tofill The buffers to fill, returned to you on exit.
-\param glob An optional shell glob by which to filter the items filled. Done kernel side on Windows, user side on POSIX.
-\param filtering Whether to filter out fake-deleted files on Windows or not.
-\param kernelbuffer A buffer to use for the kernel to fill. If left defaulted, a kernel buffer
-is allocated internally and stored into `tofill` which needs to not be destructed until one
-is no longer using any items within (leafnames are views onto the original kernel data).
-\errors todo
-\mallocs If the `kernelbuffer` parameter is set on entry, no memory allocations.
-If unset, at least one memory allocation, possibly more is performed.
-*/
-inline result<directory_handle::enumerate_info> enumerate(const directory_handle &self, directory_handle::buffers_type &&tofill, directory_handle::path_view_type glob = directory_handle::path_view_type(), directory_handle::filter filtering = directory_handle::filter::fastdeleted,
-                                                          span<char> kernelbuffer = span<char>()) noexcept
-{
-  return self.enumerate(std::forward<decltype(tofill)>(tofill), std::forward<decltype(glob)>(glob), std::forward<decltype(filtering)>(filtering), std::forward<decltype(kernelbuffer)>(kernelbuffer));
 }
 // END make_free_functions.py
 

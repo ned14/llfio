@@ -73,25 +73,25 @@ template <class U> inline void directory_handle_enumerate_(U &&f)
         {
           path_view glob = std::get<1>(std::get<1>(permuter[idx]));
           filter filtered = std::get<2>(std::get<1>(permuter[idx]));
-          directory_handle::enumerate_info info(std::move(testreturn.value()));
-          KERNELTEST_CHECK(testreturn, info.done == true);
+          directory_handle::buffers_type info(std::move(testreturn.value()));
+          KERNELTEST_CHECK(testreturn, info.done() == true);
           if (!glob.empty())
           {
-            KERNELTEST_CHECK(testreturn, info.filled.size() == 1);
+            KERNELTEST_CHECK(testreturn, info.size() == 1);
           }
           else if (filtered == filter::fastdeleted)
           {
-            KERNELTEST_CHECK(testreturn, info.filled.size() == 3);
+            KERNELTEST_CHECK(testreturn, info.size() == 3);
           }
           else
           {
-            KERNELTEST_CHECK(testreturn, info.filled.size() == 4);
+            KERNELTEST_CHECK(testreturn, info.size() == 4);
           }
           bool havedeleted1 = !glob.empty();
           bool havedeleted2 = (filtered == filter::fastdeleted);
           bool havefoo = false;
           bool havedir = !glob.empty();
-          for (directory_entry &i : info.filled)
+          for (directory_entry &i : info)
           {
             if (i.leafname == "012345678901234567890123456789012345678901234567890123456789012z.deleted")
             {
