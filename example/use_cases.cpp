@@ -52,7 +52,7 @@ void read_entire_file1()
   std::vector<llfio::byte> buffer(fh.maximum_extent().value());
 
   // Synchronous scatter read from file
-  llfio::file_handle::buffers_type filled = llfio::read(
+  llfio::file_handle::size_type bytesread = llfio::read(
     fh,                                 // handle to read from
     0,                                  // offset
     {{ buffer.data(), buffer.size() }}  // Single scatter buffer of the vector 
@@ -61,7 +61,7 @@ void read_entire_file1()
 
   // In case of racy truncation of file by third party to new length, adjust buffer to
   // bytes actually read
-  buffer.resize(filled[0].size());
+  buffer.resize(bytesread);
   //! [file_entire_file1]
 }
 

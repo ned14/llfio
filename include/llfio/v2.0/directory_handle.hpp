@@ -153,7 +153,7 @@ public:
     is allocated internally and returned in the buffers returned which needs to not be destructed until one
     is no longer using any items within (leafnames are views onto the original kernel data).
     */
-    constexpr io_request(buffers_type _buffers, path_view_type _glob = {}, filter _filtering = filter::fastdeleted, span<char> _kernelbuffer = {})
+    /*constexpr*/ io_request(buffers_type _buffers, path_view_type _glob = {}, filter _filtering = filter::fastdeleted, span<char> _kernelbuffer = {})
         : buffers(std::move(_buffers))
         , glob(_glob)
         , filtering(_filtering)

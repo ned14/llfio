@@ -464,7 +464,7 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_type offs
     auto *buffer = static_cast<byte *>(alloca(bytes));
     memset(buffer, 0, bytes);
     OUTCOME_TRY(written, write(offset, {{buffer, bytes}}, d));
-    return written[0].size();
+    return written;
   }
   try
   {
@@ -477,9 +477,9 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_type offs
     {
       auto towrite = (bytes < blocksize) ? bytes : blocksize;
       OUTCOME_TRY(written, write(offset, {{buffer, towrite}}, d));
-      offset += written[0].size();
-      bytes -= written[0].size();
-      ret += written[0].size();
+      offset += written;
+      bytes -= written;
+      ret += written;
     }
     return ret;
   }
