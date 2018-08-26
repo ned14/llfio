@@ -104,8 +104,8 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html">llfio_v2_xxx::directory_handle::buffers_type</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1enumerate__info.html">llfio_v2_xxx::directory_handle::enumerate_info</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Completion information for <code>enumerate()</code>  <a href="structllfio__v2__xxx_1_1directory__handle_1_1enumerate__info.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1io__request.html">llfio_v2_xxx::directory_handle::io_request&lt; class &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The i/o request type used by this handle.  <a href="structllfio__v2__xxx_1_1directory__handle_1_1io__request.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1construct_3_01directory__handle_01_4.html">llfio_v2_xxx::construct&lt; directory_handle &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for <code>directory_handle</code>  <a href="structllfio__v2__xxx_1_1construct_3_01directory__handle_01_4.html#details">More...</a><br /></td></tr>
@@ -122,9 +122,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a026590e0aff0af0331ec8f8308e56724"><td class="memItemLeft" align="right" valign="top"><a id="a026590e0aff0af0331ec8f8308e56724"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::operator&lt;&lt;</b> (std::ostream &amp;s, const directory_handle::filter &amp;v)</td></tr>
 <tr class="separator:a026590e0aff0af0331ec8f8308e56724"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4f1034c71b3fd9fdc2bb7eaa952d7d7f"><td class="memItemLeft" align="right" valign="top"><a id="a4f1034c71b3fd9fdc2bb7eaa952d7d7f"></a>
-std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::operator&lt;&lt;</b> (std::ostream &amp;s, const directory_handle::enumerate_info &amp;)</td></tr>
-<tr class="separator:a4f1034c71b3fd9fdc2bb7eaa952d7d7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae5dd820167e77b7caf7ec921f0c6e8c9"><td class="memItemLeft" align="right" valign="top"><a id="ae5dd820167e77b7caf7ec921f0c6e8c9"></a>
+std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::operator&lt;&lt;</b> (std::ostream &amp;s, const directory_handle::buffers_type &amp;)</td></tr>
+<tr class="separator:ae5dd820167e77b7caf7ec921f0c6e8c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2fd0d67b7d28699d16f6a3666a62a5bf"><td class="memItemLeft" align="right" valign="top"><a id="a2fd0d67b7d28699d16f6a3666a62a5bf"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a2fd0d67b7d28699d16f6a3666a62a5bf">llfio_v2_xxx::swap</a> (directory_handle &amp;self, directory_handle &amp;o) noexcept</td></tr>
 <tr class="memdesc:a2fd0d67b7d28699d16f6a3666a62a5bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br /></td></tr>
@@ -135,8 +135,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="name
 <tr class="separator:ad574b7ae82e4a082a7d5703097d65e92"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:addbdc12d4993a8ee40c105a02a105a61"><td class="memItemLeft" align="right" valign="top">result&lt; directory_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#addbdc12d4993a8ee40c105a02a105a61">llfio_v2_xxx::temp_directory</a> (directory_handle::path_view_type name=directory_handle::path_view_type(), directory_handle::mode _mode=directory_handle::mode::write, directory_handle::creation _creation=directory_handle::creation::if_needed, directory_handle::caching _caching=directory_handle::caching::all, directory_handle::flag flags=directory_handle::flag::none) noexcept</td></tr>
 <tr class="separator:addbdc12d4993a8ee40c105a02a105a61"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a40393ee057e506193aa237041411e932"><td class="memItemLeft" align="right" valign="top">result&lt; directory_handle::enumerate_info &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a40393ee057e506193aa237041411e932">llfio_v2_xxx::enumerate</a> (const directory_handle &amp;self, directory_handle::buffers_type &amp;&amp;tofill, directory_handle::path_view_type glob=directory_handle::path_view_type(), directory_handle::filter filtering=directory_handle::filter::fastdeleted, span&lt; char &gt; kernelbuffer=span&lt; char &gt;()) noexcept</td></tr>
-<tr class="separator:a40393ee057e506193aa237041411e932"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides a handle to a directory. </p>

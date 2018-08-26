@@ -113,8 +113,8 @@ Inheritance diagram for llfio_v2_xxx::directory_handle:</div>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html">buffers_type</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1enumerate__info.html">enumerate_info</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Completion information for <code>enumerate()</code>  <a href="structllfio__v2__xxx_1_1directory__handle_1_1enumerate__info.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1io__request.html">io_request</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The i/o request type used by this handle.  <a href="structllfio__v2__xxx_1_1directory__handle_1_1io__request.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
@@ -158,6 +158,10 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>path_view_type</b> =
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#a388fc107831ed68dba60c6f4082be952">buffer_type</a> = <a class="el" href="structllfio__v2__xxx_1_1directory__entry.html">directory_entry</a></td></tr>
 <tr class="memdesc:a388fc107831ed68dba60c6f4082be952"><td class="mdescLeft">&#160;</td><td class="mdescRight">The buffer type used by this handle, which is a <code>directory_entry</code> <br /></td></tr>
 <tr class="separator:a388fc107831ed68dba60c6f4082be952"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afdc2558d4793953d37e680ced76f143a"><td class="memItemLeft" align="right" valign="top"><a id="afdc2558d4793953d37e680ced76f143a"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#afdc2558d4793953d37e680ced76f143a">const_buffer_type</a> = <a class="el" href="structllfio__v2__xxx_1_1directory__entry.html">directory_entry</a></td></tr>
+<tr class="memdesc:afdc2558d4793953d37e680ced76f143a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The const buffer type used by this handle, which is a <code>directory_entry</code> <br /></td></tr>
+<tr class="separator:afdc2558d4793953d37e680ced76f143a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5929f46f42112bd805ab5001bfbf9d2a"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a5929f46f42112bd805ab5001bfbf9d2a">bitfield__flag</a> : unsigned { <br />
 &#160;&#160;<a class="el" href="classllfio__v2__xxx_1_1handle.html#a5929f46f42112bd805ab5001bfbf9d2aae6fb35b3d125d5d76bbef95b1d804298">none</a> = 0, 
 <a class="el" href="classllfio__v2__xxx_1_1handle.html#a5929f46f42112bd805ab5001bfbf9d2aa334c4a4c42fdb79d7ebc3e73b517e6f8">none</a> = 2, 
@@ -226,8 +230,8 @@ virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom">
 <tr class="separator:a7c4b83dfd27ddf3c0551fd795d4a5817"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa0b7dc541e6188fed2950444089fed6c"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#aa0b7dc541e6188fed2950444089fed6c">clone_to_path_handle</a> () const noexcept</td></tr>
 <tr class="separator:aa0b7dc541e6188fed2950444089fed6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af7f8ed6432546aa2a26bb98fc719d96a"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1enumerate__info.html">enumerate_info</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#af7f8ed6432546aa2a26bb98fc719d96a">enumerate</a> (<a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html">buffers_type</a> &amp;&amp;tofill, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view_type</a> glob=<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view_type</a>(), <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207">filter</a> filtering=<a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207a14847befc159c1492671b53718fc46f8">filter::fastdeleted</a>, span&lt; char &gt; kernelbuffer=span&lt; char &gt;()) const noexcept</td></tr>
-<tr class="separator:af7f8ed6432546aa2a26bb98fc719d96a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45c13e16ecc131cbe5107e6affe94f33"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html">buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#a45c13e16ecc131cbe5107e6affe94f33">read</a> (<a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html">buffers_type</a> &gt; req) const noexcept</td></tr>
+<tr class="separator:a45c13e16ecc131cbe5107e6affe94f33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8752c5e4f4189c7bdfcd6eccb637bef9"><td class="memItemLeft" align="right" valign="top"><a id="a8752c5e4f4189c7bdfcd6eccb637bef9"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__handle.html#a8752c5e4f4189c7bdfcd6eccb637bef9">swap</a> (<a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;o) noexcept</td></tr>
 <tr class="memdesc:a8752c5e4f4189c7bdfcd6eccb637bef9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br /></td></tr>
@@ -473,10 +477,10 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a54d63e0972dee77ef1f0ff14bd4f9207a334c4a4c42fdb79d7ebc3e73b517e6f8"></a>none&#160;</td><td class="fielddoc"><p>Do no filtering at all. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a54d63e0972dee77ef1f0ff14bd4f9207a14847befc159c1492671b53718fc46f8"></a>fastdeleted&#160;</td><td class="fielddoc"><p>Filter out LLFIO deleted files based on their filename (fast and fairly reliable) </p>
+<tr><td class="fieldname"><a id="a54d63e0972dee77ef1f0ff14bd4f9207a14847befc159c1492671b53718fc46f8"></a>fastdeleted&#160;</td><td class="fielddoc"><p>For Windows without POSIX delete semantics, filter out LLFIO deleted files based on their filename (fast and fairly reliable) </p>
 </td></tr>
 </table>
-<div class="fragment"><div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;  {</div><div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <a class="code" href="classllfio__v2__xxx_1_1handle.html#a5929f46f42112bd805ab5001bfbf9d2aae6fb35b3d125d5d76bbef95b1d804298">none</a>,        <span class="comment">//!&lt; Do no filtering at all</span></div><div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="comment"></span>    fastdeleted  <span class="comment">//!&lt; Filter out LLFIO deleted files based on their filename (fast and fairly reliable)</span></div><div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="comment"></span>  };</div><div class="ttc" id="classllfio__v2__xxx_1_1handle_html_a5929f46f42112bd805ab5001bfbf9d2aae6fb35b3d125d5d76bbef95b1d804298"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a5929f46f42112bd805ab5001bfbf9d2aae6fb35b3d125d5d76bbef95b1d804298">llfio_v2_xxx::handle::none</a></div><div class="ttdoc">No flags. </div><div class="ttdef"><b>Definition:</b> handle.hpp:99</div></div>
+<div class="fragment"><div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;  {</div><div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <a class="code" href="classllfio__v2__xxx_1_1handle.html#a5929f46f42112bd805ab5001bfbf9d2aae6fb35b3d125d5d76bbef95b1d804298">none</a>,        <span class="comment">//!&lt; Do no filtering at all</span></div><div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="comment"></span>    fastdeleted  <span class="comment">//!&lt; For Windows without POSIX delete semantics, filter out LLFIO deleted files based on their filename (fast and fairly reliable)</span></div><div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;<span class="comment"></span>  };</div><div class="ttc" id="classllfio__v2__xxx_1_1handle_html_a5929f46f42112bd805ab5001bfbf9d2aae6fb35b3d125d5d76bbef95b1d804298"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a5929f46f42112bd805ab5001bfbf9d2aae6fb35b3d125d5d76bbef95b1d804298">llfio_v2_xxx::handle::none</a></div><div class="ttdoc">No flags. </div><div class="ttdef"><b>Definition:</b> handle.hpp:99</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -678,67 +682,6 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
 
 </div>
 </div>
-<a id="af7f8ed6432546aa2a26bb98fc719d96a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af7f8ed6432546aa2a26bb98fc719d96a">&#9670;&nbsp;</a></span>enumerate()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual result&lt;<a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1enumerate__info.html">enumerate_info</a>&gt; llfio_v2_xxx::directory_handle::enumerate </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html">buffers_type</a> &amp;&amp;&#160;</td>
-          <td class="paramname"><em>tofill</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view_type</a>&#160;</td>
-          <td class="paramname"><em>glob</em> = <code><a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view_type</a>()</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207">filter</a>&#160;</td>
-          <td class="paramname"><em>filtering</em> = <code><a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207a14847befc159c1492671b53718fc46f8">filter::fastdeleted</a></code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">span&lt; char &gt;&#160;</td>
-          <td class="paramname"><em>kernelbuffer</em> = <code>span&lt;&#160;char&#160;&gt;()</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Fill the buffers type with as many directory entries as will fit.</p>
-<dl class="section return"><dt>Returns</dt><dd>Returns the buffers filled, what metadata was filled in and whether the entire directory was read into <code>tofill</code>. </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">tofill</td><td>The buffers to fill, returned to you on exit. </td></tr>
-    <tr><td class="paramname">glob</td><td>An optional shell glob by which to filter the items filled. Done kernel side on Windows, user side on POSIX. </td></tr>
-    <tr><td class="paramname">filtering</td><td>Whether to filter out fake-deleted files on Windows or not. </td></tr>
-    <tr><td class="paramname">kernelbuffer</td><td>A buffer to use for the kernel to fill. If left defaulted, a kernel buffer is allocated internally and stored into <code>tofill</code> which needs to not be destructed until one is no longer using any items within (leafnames are views onto the original kernel data). </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section user"><dt>Errors returnable</dt><dd>todo </dd></dl>
-<dl class="section user"><dt>Memory Allocations</dt><dd>If the <code>kernelbuffer</code> parameter is set on entry, no memory allocations. If unset, at least one memory allocation, possibly more is performed. </dd></dl>
-
-</div>
-</div>
 <a id="a865caad2f7f4bdf12fb74aabfe3c5ff5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a865caad2f7f4bdf12fb74aabfe3c5ff5">&#9670;&nbsp;</a></span>parent_path_handle()</h2>
 
@@ -883,10 +826,46 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
 </div><div class="memdoc">
 <p>Create a directory handle creating a randomly named file on a path. The file is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing entry.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;  {</div><div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <span class="keywordflow">try</span></div><div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    {</div><div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;      <span class="keywordflow">for</span>(;;)</div><div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;      {</div><div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">utils::random_string</a>(32);</div><div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;        result&lt;directory_handle&gt; ret = <a class="code" href="classllfio__v2__xxx_1_1directory__handle.html#a1acc9714116df8fbb0651d912a870495">directory</a>(dirpath, randomname, _mode, creation::only_if_not_exist, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>);</div><div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        <span class="keywordflow">if</span>(ret || (!ret &amp;&amp; ret.error() != errc::file_exists))</div><div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        {</div><div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;          <span class="keywordflow">return</span> ret;</div><div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;        }</div><div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;      }</div><div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    }</div><div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    <span class="keywordflow">catch</span>(...)</div><div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    {</div><div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div><div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    }</div><div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1handle_html_a013936bc1254b1a47567fe29698d1b1c"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">llfio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:315</div></div>
+<div class="fragment"><div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;  {</div><div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    <span class="keywordflow">try</span></div><div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    {</div><div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;      <span class="keywordflow">for</span>(;;)</div><div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;      {</div><div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">utils::random_string</a>(32);</div><div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        result&lt;directory_handle&gt; ret = <a class="code" href="classllfio__v2__xxx_1_1directory__handle.html#a1acc9714116df8fbb0651d912a870495">directory</a>(dirpath, randomname, _mode, creation::only_if_not_exist, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>);</div><div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;        <span class="keywordflow">if</span>(ret || (!ret &amp;&amp; ret.error() != errc::file_exists))</div><div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;        {</div><div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;          <span class="keywordflow">return</span> ret;</div><div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;        }</div><div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;      }</div><div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    }</div><div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="keywordflow">catch</span>(...)</div><div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    {</div><div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div><div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    }</div><div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1handle_html_a013936bc1254b1a47567fe29698d1b1c"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">llfio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:315</div></div>
 <div class="ttc" id="namespacellfio__v2__xxx_1_1utils_html_a6a29cf29a4b097411f6c1e5274bfb417"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">llfio_v2_xxx::utils::random_string</a></div><div class="ttdeci">std::string random_string(size_t randomlen)</div><div class="ttdoc">Returns a cryptographically random string capable of being used as a filename. Essentially random_fil...</div><div class="ttdef"><b>Definition:</b> utils.hpp:133</div></div>
 <div class="ttc" id="classllfio__v2__xxx_1_1directory__handle_html_a1acc9714116df8fbb0651d912a870495"><div class="ttname"><a href="classllfio__v2__xxx_1_1directory__handle.html#a1acc9714116df8fbb0651d912a870495">llfio_v2_xxx::directory_handle::directory</a></div><div class="ttdeci">static result&lt; directory_handle &gt; directory(const path_handle &amp;base, path_view_type path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div></div>
 </div><!-- fragment -->
+</div>
+</div>
+<a id="a45c13e16ecc131cbe5107e6affe94f33"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a45c13e16ecc131cbe5107e6affe94f33">&#9670;&nbsp;</a></span>read()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual result&lt;<a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html">buffers_type</a>&gt; llfio_v2_xxx::directory_handle::read </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html">buffers_type</a> &gt;&#160;</td>
+          <td class="paramname"><em>req</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Fill the buffers type with as many directory entries as will fit into any optionally supplied buffer.</p>
+<dl class="section return"><dt>Returns</dt><dd>Returns the buffers filled, what metadata was filled in and whether the entire directory was read or not. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">req</td><td>A buffer fill (directory enumeration) request. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>todo </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>If the <code>kernelbuffer</code> parameter is set in the request, no memory allocations. If unset, at least one memory allocation, possibly more is performed. </dd></dl>
+
 </div>
 </div>
 <a id="a8700edc9ecd4dd35d5aad7c65dd0eca2"></a>
@@ -1034,8 +1013,8 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
 </div><div class="memdoc">
 <p>Create a directory handle creating the named directory on some path which the OS declares to be suitable for temporary files. Note also that an empty name is equivalent to calling <code>random_file(path_discovery::storage_backed_temporary_files_directory())</code> and the creation parameter is ignored.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  {</div><div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <span class="keyword">auto</span> &amp;tempdirh = <a class="code" href="namespacellfio__v2__xxx_1_1path__discovery.html#a2dd74ea752f3f511d58ccccdcac7f4fd">path_discovery::storage_backed_temporary_files_directory</a>();</div><div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="keywordflow">return</span> name.empty() ? <a class="code" href="classllfio__v2__xxx_1_1directory__handle.html#ae4a5f33565a72009d2a9471f925b4aad">random_directory</a>(tempdirh, _mode, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>) : <a class="code" href="classllfio__v2__xxx_1_1directory__handle.html#a1acc9714116df8fbb0651d912a870495">directory</a>(tempdirh, name, _mode, _creation, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>);</div><div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1handle_html_a013936bc1254b1a47567fe29698d1b1c"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">llfio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:315</div></div>
-<div class="ttc" id="classllfio__v2__xxx_1_1directory__handle_html_ae4a5f33565a72009d2a9471f925b4aad"><div class="ttname"><a href="classllfio__v2__xxx_1_1directory__handle.html#ae4a5f33565a72009d2a9471f925b4aad">llfio_v2_xxx::directory_handle::random_directory</a></div><div class="ttdeci">static result&lt; directory_handle &gt; random_directory(const path_handle &amp;dirpath, mode _mode=mode::write, caching _caching=caching::temporary, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:175</div></div>
+<div class="fragment"><div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;  {</div><div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    <span class="keyword">auto</span> &amp;tempdirh = <a class="code" href="namespacellfio__v2__xxx_1_1path__discovery.html#a2dd74ea752f3f511d58ccccdcac7f4fd">path_discovery::storage_backed_temporary_files_directory</a>();</div><div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <span class="keywordflow">return</span> name.empty() ? <a class="code" href="classllfio__v2__xxx_1_1directory__handle.html#ae4a5f33565a72009d2a9471f925b4aad">random_directory</a>(tempdirh, _mode, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>) : <a class="code" href="classllfio__v2__xxx_1_1directory__handle.html#a1acc9714116df8fbb0651d912a870495">directory</a>(tempdirh, name, _mode, _creation, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>);</div><div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1handle_html_a013936bc1254b1a47567fe29698d1b1c"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">llfio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:315</div></div>
+<div class="ttc" id="classllfio__v2__xxx_1_1directory__handle_html_ae4a5f33565a72009d2a9471f925b4aad"><div class="ttname"><a href="classllfio__v2__xxx_1_1directory__handle.html#ae4a5f33565a72009d2a9471f925b4aad">llfio_v2_xxx::directory_handle::random_directory</a></div><div class="ttdeci">static result&lt; directory_handle &gt; random_directory(const path_handle &amp;dirpath, mode _mode=mode::write, caching _caching=caching::temporary, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:212</div></div>
 <div class="ttc" id="namespacellfio__v2__xxx_1_1path__discovery_html_a2dd74ea752f3f511d58ccccdcac7f4fd"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1path__discovery.html#a2dd74ea752f3f511d58ccccdcac7f4fd">llfio_v2_xxx::path_discovery::storage_backed_temporary_files_directory</a></div><div class="ttdeci">const path_handle &amp; storage_backed_temporary_files_directory() noexcept</div><div class="ttdoc">Returns a reference to an open handle to a verified temporary directory where files created are store...</div></div>
 <div class="ttc" id="classllfio__v2__xxx_1_1directory__handle_html_a1acc9714116df8fbb0651d912a870495"><div class="ttname"><a href="classllfio__v2__xxx_1_1directory__handle.html#a1acc9714116df8fbb0651d912a870495">llfio_v2_xxx::directory_handle::directory</a></div><div class="ttdeci">static result&lt; directory_handle &gt; directory(const path_handle &amp;base, path_view_type path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div></div>
 </div><!-- fragment -->

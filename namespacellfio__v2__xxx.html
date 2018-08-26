@@ -225,9 +225,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a026590e0aff0af0331ec8f8308e56724"><td class="memItemLeft" align="right" valign="top"><a id="a026590e0aff0af0331ec8f8308e56724"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207">directory_handle::filter</a> &amp;v)</td></tr>
 <tr class="separator:a026590e0aff0af0331ec8f8308e56724"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4f1034c71b3fd9fdc2bb7eaa952d7d7f"><td class="memItemLeft" align="right" valign="top"><a id="a4f1034c71b3fd9fdc2bb7eaa952d7d7f"></a>
-std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1enumerate__info.html">directory_handle::enumerate_info</a> &amp;)</td></tr>
-<tr class="separator:a4f1034c71b3fd9fdc2bb7eaa952d7d7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae5dd820167e77b7caf7ec921f0c6e8c9"><td class="memItemLeft" align="right" valign="top"><a id="ae5dd820167e77b7caf7ec921f0c6e8c9"></a>
+std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html">directory_handle::buffers_type</a> &amp;)</td></tr>
+<tr class="separator:ae5dd820167e77b7caf7ec921f0c6e8c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2fd0d67b7d28699d16f6a3666a62a5bf"><td class="memItemLeft" align="right" valign="top"><a id="a2fd0d67b7d28699d16f6a3666a62a5bf"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a2fd0d67b7d28699d16f6a3666a62a5bf">swap</a> (<a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;self, <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;o) noexcept</td></tr>
 <tr class="memdesc:a2fd0d67b7d28699d16f6a3666a62a5bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br /></td></tr>
@@ -238,8 +238,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="name
 <tr class="separator:ad574b7ae82e4a082a7d5703097d65e92"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:addbdc12d4993a8ee40c105a02a105a61"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#addbdc12d4993a8ee40c105a02a105a61">temp_directory</a> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">directory_handle::path_view_type</a> name=<a class="el" href="classllfio__v2__xxx_1_1path__view.html">directory_handle::path_view_type</a>(), <a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">directory_handle::mode</a> _mode=<a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaaefb2a684e4afb7d55e6147fbe5a332ee">directory_handle::mode::write</a>, <a class="el" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42">directory_handle::creation</a> _creation=directory_handle::creation::if_needed, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">directory_handle::caching</a> _caching=<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852aa181a603769c1f98ad927e7367c7aa51">directory_handle::caching::all</a>, directory_handle::flag flags=directory_handle::flag::none) noexcept</td></tr>
 <tr class="separator:addbdc12d4993a8ee40c105a02a105a61"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a40393ee057e506193aa237041411e932"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1enumerate__info.html">directory_handle::enumerate_info</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a40393ee057e506193aa237041411e932">enumerate</a> (const <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;self, <a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html">directory_handle::buffers_type</a> &amp;&amp;tofill, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">directory_handle::path_view_type</a> glob=<a class="el" href="classllfio__v2__xxx_1_1path__view.html">directory_handle::path_view_type</a>(), <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207">directory_handle::filter</a> filtering=<a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207a14847befc159c1492671b53718fc46f8">directory_handle::filter::fastdeleted</a>, span&lt; char &gt; kernelbuffer=span&lt; char &gt;()) noexcept</td></tr>
-<tr class="separator:a40393ee057e506193aa237041411e932"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2542466a055a0c024dee2704e9e32519"><td class="memItemLeft" align="right" valign="top"><a id="a2542466a055a0c024dee2704e9e32519"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a2542466a055a0c024dee2704e9e32519">swap</a> (<a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;self, <a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;o) noexcept</td></tr>
 <tr class="memdesc:a2542466a055a0c024dee2704e9e32519"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br /></td></tr>
@@ -293,13 +291,13 @@ result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class
 <tr class="memitem:a225e15680392dfa9e1dda42afcc09672"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1io__result.html">io_handle::io_result</a>&lt; <a class="el" href="classllfio__v2__xxx_1_1io__handle.html#a8f525d9665b524442b46cd55678817ed">io_handle::buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a225e15680392dfa9e1dda42afcc09672">read</a> (<a class="el" href="classllfio__v2__xxx_1_1io__handle.html">io_handle</a> &amp;self, <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1io__request.html">io_handle::io_request</a>&lt; <a class="el" href="classllfio__v2__xxx_1_1io__handle.html#a8f525d9665b524442b46cd55678817ed">io_handle::buffers_type</a> &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="memdesc:a225e15680392dfa9e1dda42afcc09672"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read data from the open handle.  <a href="#a225e15680392dfa9e1dda42afcc09672">More...</a><br /></td></tr>
 <tr class="separator:a225e15680392dfa9e1dda42afcc09672"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ade7f08f6a942f83ade408b2146a9ca11"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1io__result.html">io_handle::io_result</a>&lt; <a class="el" href="classllfio__v2__xxx_1_1io__handle.html#a8f525d9665b524442b46cd55678817ed">io_handle::buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#ade7f08f6a942f83ade408b2146a9ca11">read</a> (<a class="el" href="classllfio__v2__xxx_1_1io__handle.html">io_handle</a> &amp;self, io_handle::extent_type offset, std::initializer_list&lt; <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1buffer__type.html">io_handle::buffer_type</a> &gt; lst, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
-<tr class="separator:ade7f08f6a942f83ade408b2146a9ca11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c4b2c6794e73f6bd11c5d14fd16cea9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1io__result.html">io_handle::io_result</a>&lt; io_handle::size_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a7c4b2c6794e73f6bd11c5d14fd16cea9">read</a> (<a class="el" href="classllfio__v2__xxx_1_1io__handle.html">io_handle</a> &amp;self, io_handle::extent_type offset, std::initializer_list&lt; <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1buffer__type.html">io_handle::buffer_type</a> &gt; lst, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="separator:a7c4b2c6794e73f6bd11c5d14fd16cea9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5a8908704c9988bbecc69c2359e6fd4a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1io__result.html">io_handle::io_result</a>&lt; <a class="el" href="classllfio__v2__xxx_1_1io__handle.html#a693a8c64bb7de1a6835d6a151e37aa0e">io_handle::const_buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a5a8908704c9988bbecc69c2359e6fd4a">write</a> (<a class="el" href="classllfio__v2__xxx_1_1io__handle.html">io_handle</a> &amp;self, <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1io__request.html">io_handle::io_request</a>&lt; <a class="el" href="classllfio__v2__xxx_1_1io__handle.html#a693a8c64bb7de1a6835d6a151e37aa0e">io_handle::const_buffers_type</a> &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="memdesc:a5a8908704c9988bbecc69c2359e6fd4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write data to the open handle.  <a href="#a5a8908704c9988bbecc69c2359e6fd4a">More...</a><br /></td></tr>
 <tr class="separator:a5a8908704c9988bbecc69c2359e6fd4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7c37681ca52b8b871195b4ce7ab7e700"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1io__result.html">io_handle::io_result</a>&lt; <a class="el" href="classllfio__v2__xxx_1_1io__handle.html#a693a8c64bb7de1a6835d6a151e37aa0e">io_handle::const_buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a7c37681ca52b8b871195b4ce7ab7e700">write</a> (<a class="el" href="classllfio__v2__xxx_1_1io__handle.html">io_handle</a> &amp;self, io_handle::extent_type offset, std::initializer_list&lt; <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html">io_handle::const_buffer_type</a> &gt; lst, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
-<tr class="separator:a7c37681ca52b8b871195b4ce7ab7e700"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ea3d93e8b2c7f6e3fca7a9cde734312"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1io__result.html">io_handle::io_result</a>&lt; io_handle::size_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a5ea3d93e8b2c7f6e3fca7a9cde734312">write</a> (<a class="el" href="classllfio__v2__xxx_1_1io__handle.html">io_handle</a> &amp;self, io_handle::extent_type offset, std::initializer_list&lt; <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html">io_handle::const_buffer_type</a> &gt; lst, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="separator:a5ea3d93e8b2c7f6e3fca7a9cde734312"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4fad22759dab40321cabd37c755880fe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1io__result.html">io_handle::io_result</a>&lt; <a class="el" href="classllfio__v2__xxx_1_1io__handle.html#a693a8c64bb7de1a6835d6a151e37aa0e">io_handle::const_buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a4fad22759dab40321cabd37c755880fe">barrier</a> (<a class="el" href="classllfio__v2__xxx_1_1io__handle.html">io_handle</a> &amp;self, <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1io__request.html">io_handle::io_request</a>&lt; <a class="el" href="classllfio__v2__xxx_1_1io__handle.html#a693a8c64bb7de1a6835d6a151e37aa0e">io_handle::const_buffers_type</a> &gt; reqs=<a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1io__request.html">io_handle::io_request</a>&lt; <a class="el" href="classllfio__v2__xxx_1_1io__handle.html#a693a8c64bb7de1a6835d6a151e37aa0e">io_handle::const_buffers_type</a> &gt;(), bool wait_for_device=false, bool and_metadata=false, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="memdesc:a4fad22759dab40321cabd37c755880fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Issue a write reordering barrier such that writes preceding the barrier will reach storage before writes after this barrier.  <a href="#a4fad22759dab40321cabd37c755880fe">More...</a><br /></td></tr>
 <tr class="separator:a4fad22759dab40321cabd37c755880fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -431,8 +429,60 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 <div class="textblock"><p>The LLFIO namespace. </p>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000002">Todo:</a></b></dt><dd>TODO FIXME Replace in-memory log with memory map file backed log. </dd></dl>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="a3d02b45677b6189566e862d5bcd4d5c8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3d02b45677b6189566e862d5bcd4d5c8">&#9670;&nbsp;</a></span>barrier() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html">map_handle::const_buffer_type</a> llfio_v2_xxx::barrier </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html">map_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html">map_handle::const_buffer_type</a>&#160;</td>
+          <td class="paramname"><em>req</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>evict</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Lightweight inlined barrier which causes the CPU to write out all buffered writes and dirty cache lines in the request to main memory. </p><dl class="section return"><dt>Returns</dt><dd>The cache lines actually barriered. This may be empty. This function does not return an error. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">self</td><td>The object whose member function to call. </td></tr>
+    <tr><td class="paramname">req</td><td>The range of cache lines to write barrier. </td></tr>
+    <tr><td class="paramname">evict</td><td>Whether to also evict the cache lines from CPU caches, useful if they will not be used again.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Upon return, one knows that memory in the returned buffer has been barriered (it may be empty if there is no support for this operation in LLFIO, or if the current CPU does not support this operation). You may find the <code>is_nvram()</code> observer of particular use here. </p>
+<div class="fragment"><div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;{</div><div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.barrier(std::forward&lt;decltype(req)&gt;(req), std::forward&lt;decltype(evict)&gt;(evict));</div><div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;}</div></div><!-- fragment -->
+</div>
+</div>
 <a id="a4fad22759dab40321cabd37c755880fe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4fad22759dab40321cabd37c755880fe">&#9670;&nbsp;</a></span>barrier() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a4fad22759dab40321cabd37c755880fe">&#9670;&nbsp;</a></span>barrier() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -502,59 +552,7 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX fdatasync() or Windows NtFlushBuffersFileEx() can return. </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>None. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;{</div><div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.barrier(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(wait_for_device)&gt;(wait_for_device), std::forward&lt;decltype(and_metadata)&gt;(and_metadata), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;}</div></div><!-- fragment -->
-</div>
-</div>
-<a id="a3d02b45677b6189566e862d5bcd4d5c8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3d02b45677b6189566e862d5bcd4d5c8">&#9670;&nbsp;</a></span>barrier() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html">map_handle::const_buffer_type</a> llfio_v2_xxx::barrier </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html">map_handle</a> &amp;&#160;</td>
-          <td class="paramname"><em>self</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html">map_handle::const_buffer_type</a>&#160;</td>
-          <td class="paramname"><em>req</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>evict</em> = <code>false</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Lightweight inlined barrier which causes the CPU to write out all buffered writes and dirty cache lines in the request to main memory. </p><dl class="section return"><dt>Returns</dt><dd>The cache lines actually barriered. This may be empty. This function does not return an error. </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">self</td><td>The object whose member function to call. </td></tr>
-    <tr><td class="paramname">req</td><td>The range of cache lines to write barrier. </td></tr>
-    <tr><td class="paramname">evict</td><td>Whether to also evict the cache lines from CPU caches, useful if they will not be used again.</td></tr>
-  </table>
-  </dd>
-</dl>
-<p>Upon return, one knows that memory in the returned buffer has been barriered (it may be empty if there is no support for this operation in LLFIO, or if the current CPU does not support this operation). You may find the <code>is_nvram()</code> observer of particular use here. </p>
-<div class="fragment"><div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;{</div><div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.barrier(std::forward&lt;decltype(req)&gt;(req), std::forward&lt;decltype(evict)&gt;(evict));</div><div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;{</div><div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.barrier(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(wait_for_device)&gt;(wait_for_device), std::forward&lt;decltype(and_metadata)&gt;(and_metadata), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a3d112d170c1d485e1120de06eef02375"></a>
@@ -616,77 +614,9 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 <p>Create a handle opening access to a directory on path.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;{</div><div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a3d112d170c1d485e1120de06eef02375">directory_handle::directory</a>(std::forward&lt;decltype(base)&gt;(base), std::forward&lt;decltype(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>)&gt;(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;}</div><div class="ttc" id="namespacellfio__v2__xxx_html_a3d112d170c1d485e1120de06eef02375"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a3d112d170c1d485e1120de06eef02375">llfio_v2_xxx::directory</a></div><div class="ttdeci">result&lt; directory_handle &gt; directory(const path_handle &amp;base, directory_handle::path_view_type path, directory_handle::mode _mode=directory_handle::mode::read, directory_handle::creation _creation=directory_handle::creation::open_existing, directory_handle::caching _caching=directory_handle::caching::all, directory_handle::flag flags=directory_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:325</div></div>
+<div class="fragment"><div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;{</div><div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a3d112d170c1d485e1120de06eef02375">directory_handle::directory</a>(std::forward&lt;decltype(base)&gt;(base), std::forward&lt;decltype(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>)&gt;(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;}</div><div class="ttc" id="namespacellfio__v2__xxx_html_a3d112d170c1d485e1120de06eef02375"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a3d112d170c1d485e1120de06eef02375">llfio_v2_xxx::directory</a></div><div class="ttdeci">result&lt; directory_handle &gt; directory(const path_handle &amp;base, directory_handle::path_view_type path, directory_handle::mode _mode=directory_handle::mode::read, directory_handle::creation _creation=directory_handle::creation::open_existing, directory_handle::caching _caching=directory_handle::caching::all, directory_handle::flag flags=directory_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:347</div></div>
 <div class="ttc" id="namespacellfio__v2__xxx_html_a49f7bb77eb38fbe1280019225b66b78b"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">llfio_v2_xxx::path</a></div><div class="ttdeci">result&lt; path_handle &gt; path(const path_handle &amp;base, path_handle::path_view_type path) noexcept</div><div class="ttdef"><b>Definition:</b> path_handle.hpp:155</div></div>
 </div><!-- fragment -->
-</div>
-</div>
-<a id="a40393ee057e506193aa237041411e932"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a40393ee057e506193aa237041411e932">&#9670;&nbsp;</a></span>enumerate()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">result&lt;<a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1enumerate__info.html">directory_handle::enumerate_info</a>&gt; llfio_v2_xxx::enumerate </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;&#160;</td>
-          <td class="paramname"><em>self</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html">directory_handle::buffers_type</a> &amp;&amp;&#160;</td>
-          <td class="paramname"><em>tofill</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1path__view.html">directory_handle::path_view_type</a>&#160;</td>
-          <td class="paramname"><em>glob</em> = <code><a class="el" href="classllfio__v2__xxx_1_1path__view.html">directory_handle::path_view_type</a>()</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207">directory_handle::filter</a>&#160;</td>
-          <td class="paramname"><em>filtering</em> = <code><a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207a14847befc159c1492671b53718fc46f8">directory_handle::filter::fastdeleted</a></code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">span&lt; char &gt;&#160;</td>
-          <td class="paramname"><em>kernelbuffer</em> = <code>span&lt;char&gt;()</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Fill the buffers type with as many directory entries as will fit.</p>
-<dl class="section return"><dt>Returns</dt><dd>Returns the buffers filled, what metadata was filled in and whether the entire directory was read into <code>tofill</code>. </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">self</td><td>The object whose member function to call. </td></tr>
-    <tr><td class="paramname">tofill</td><td>The buffers to fill, returned to you on exit. </td></tr>
-    <tr><td class="paramname">glob</td><td>An optional shell glob by which to filter the items filled. Done kernel side on Windows, user side on POSIX. </td></tr>
-    <tr><td class="paramname">filtering</td><td>Whether to filter out fake-deleted files on Windows or not. </td></tr>
-    <tr><td class="paramname">kernelbuffer</td><td>A buffer to use for the kernel to fill. If left defaulted, a kernel buffer is allocated internally and stored into <code>tofill</code> which needs to not be destructed until one is no longer using any items within (leafnames are views onto the original kernel data). </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section user"><dt>Errors returnable</dt><dd>todo </dd></dl>
-<dl class="section user"><dt>Memory Allocations</dt><dd>If the <code>kernelbuffer</code> parameter is set on entry, no memory allocations. If unset, at least one memory allocation, possibly more is performed. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;{</div><div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.enumerate(std::forward&lt;decltype(tofill)&gt;(tofill), std::forward&lt;decltype(glob)&gt;(glob), std::forward&lt;decltype(filtering)&gt;(filtering), std::forward&lt;decltype(kernelbuffer)&gt;(kernelbuffer));</div><div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="af31a062639499a79ef5cc8aed16ba65d"></a>
@@ -1326,7 +1256,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 <p>Create a directory handle creating a randomly named file on a path. The file is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing entry.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;{</div><div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#ad574b7ae82e4a082a7d5703097d65e92">directory_handle::random_directory</a>(std::forward&lt;decltype(dirpath)&gt;(dirpath), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;}</div><div class="ttc" id="namespacellfio__v2__xxx_html_ad574b7ae82e4a082a7d5703097d65e92"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ad574b7ae82e4a082a7d5703097d65e92">llfio_v2_xxx::random_directory</a></div><div class="ttdeci">result&lt; directory_handle &gt; random_directory(const path_handle &amp;dirpath, directory_handle::mode _mode=directory_handle::mode::write, directory_handle::caching _caching=directory_handle::caching::temporary, directory_handle::flag flags=directory_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:336</div></div>
+<div class="fragment"><div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;{</div><div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#ad574b7ae82e4a082a7d5703097d65e92">directory_handle::random_directory</a>(std::forward&lt;decltype(dirpath)&gt;(dirpath), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;}</div><div class="ttc" id="namespacellfio__v2__xxx_html_ad574b7ae82e4a082a7d5703097d65e92"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ad574b7ae82e4a082a7d5703097d65e92">llfio_v2_xxx::random_directory</a></div><div class="ttdeci">result&lt; directory_handle &gt; random_directory(const path_handle &amp;dirpath, directory_handle::mode _mode=directory_handle::mode::write, directory_handle::caching _caching=directory_handle::caching::temporary, directory_handle::flag flags=directory_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:358</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1434,11 +1364,11 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX read() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be returned if deadline i/o is not possible with this particular handle configuration (e.g. reading from regular files on POSIX or reading from a non-overlapped HANDLE on Windows). </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle performs one calloc and one free. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;{</div><div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;{</div><div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
-<a id="ade7f08f6a942f83ade408b2146a9ca11"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ade7f08f6a942f83ade408b2146a9ca11">&#9670;&nbsp;</a></span>read() <span class="overload">[2/3]</span></h2>
+<a id="a7c4b2c6794e73f6bd11c5d14fd16cea9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c4b2c6794e73f6bd11c5d14fd16cea9">&#9670;&nbsp;</a></span>read() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1447,7 +1377,7 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1io__result.html">io_handle::io_result</a>&lt;<a class="el" href="classllfio__v2__xxx_1_1io__handle.html#a8f525d9665b524442b46cd55678817ed">io_handle::buffers_type</a>&gt; llfio_v2_xxx::read </td>
+          <td class="memname"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1io__result.html">io_handle::io_result</a>&lt;io_handle::size_type&gt; llfio_v2_xxx::read </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1io__handle.html">io_handle</a> &amp;&#160;</td>
           <td class="paramname"><em>self</em>, </td>
@@ -1483,7 +1413,7 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;{</div><div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(offset)&gt;(offset), std::forward&lt;decltype(lst)&gt;(lst), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;{</div><div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(offset)&gt;(offset), std::forward&lt;decltype(lst)&gt;(lst), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="ab993693c98cdb52e2d611f8f9e24e4e2"></a>
@@ -1819,7 +1749,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 <p>Create a directory handle creating the named directory on some path which the OS declares to be suitable for temporary files. Note also that an empty name is equivalent to calling <code>random_file(path_discovery::storage_backed_temporary_files_directory())</code> and the creation parameter is ignored.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;{</div><div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#addbdc12d4993a8ee40c105a02a105a61">directory_handle::temp_directory</a>(std::forward&lt;decltype(name)&gt;(name), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;}</div><div class="ttc" id="namespacellfio__v2__xxx_html_addbdc12d4993a8ee40c105a02a105a61"><div class="ttname"><a href="namespacellfio__v2__xxx.html#addbdc12d4993a8ee40c105a02a105a61">llfio_v2_xxx::temp_directory</a></div><div class="ttdeci">result&lt; directory_handle &gt; temp_directory(directory_handle::path_view_type name=directory_handle::path_view_type(), directory_handle::mode _mode=directory_handle::mode::write, directory_handle::creation _creation=directory_handle::creation::if_needed, directory_handle::caching _caching=directory_handle::caching::all, directory_handle::flag flags=directory_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:348</div></div>
+<div class="fragment"><div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;{</div><div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#addbdc12d4993a8ee40c105a02a105a61">directory_handle::temp_directory</a>(std::forward&lt;decltype(name)&gt;(name), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;}</div><div class="ttc" id="namespacellfio__v2__xxx_html_addbdc12d4993a8ee40c105a02a105a61"><div class="ttname"><a href="namespacellfio__v2__xxx.html#addbdc12d4993a8ee40c105a02a105a61">llfio_v2_xxx::temp_directory</a></div><div class="ttdeci">result&lt; directory_handle &gt; temp_directory(directory_handle::path_view_type name=directory_handle::path_view_type(), directory_handle::mode _mode=directory_handle::mode::write, directory_handle::creation _creation=directory_handle::creation::if_needed, directory_handle::caching _caching=directory_handle::caching::all, directory_handle::flag flags=directory_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:370</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2171,11 +2101,11 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX write() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle performs one calloc and one free. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;{</div><div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;{</div><div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
-<a id="a7c37681ca52b8b871195b4ce7ab7e700"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7c37681ca52b8b871195b4ce7ab7e700">&#9670;&nbsp;</a></span>write() <span class="overload">[2/3]</span></h2>
+<a id="a5ea3d93e8b2c7f6e3fca7a9cde734312"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5ea3d93e8b2c7f6e3fca7a9cde734312">&#9670;&nbsp;</a></span>write() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2184,7 +2114,7 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1io__result.html">io_handle::io_result</a>&lt;<a class="el" href="classllfio__v2__xxx_1_1io__handle.html#a693a8c64bb7de1a6835d6a151e37aa0e">io_handle::const_buffers_type</a>&gt; llfio_v2_xxx::write </td>
+          <td class="memname"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1io__result.html">io_handle::io_result</a>&lt;io_handle::size_type&gt; llfio_v2_xxx::write </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1io__handle.html">io_handle</a> &amp;&#160;</td>
           <td class="paramname"><em>self</em>, </td>
@@ -2220,7 +2150,7 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;{</div><div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(offset)&gt;(offset), std::forward&lt;decltype(lst)&gt;(lst), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;{</div><div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(offset)&gt;(offset), std::forward&lt;decltype(lst)&gt;(lst), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a681ed7e98ac17e6bb336b9287365141b"></a>

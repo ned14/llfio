@@ -101,6 +101,12 @@ Inheritance diagram for llfio_v2_xxx::directory_handle::buffers_type:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a14d4df3a12986e4938ec8a5f8427e4ca"><td class="memItemLeft" align="right" valign="top">stat_t::want&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a14d4df3a12986e4938ec8a5f8427e4ca">metadata</a> () const noexcept</td></tr>
+<tr class="separator:a14d4df3a12986e4938ec8a5f8427e4ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a642a415d3444c11886c3bace729b917b"><td class="memItemLeft" align="right" valign="top"><a id="a642a415d3444c11886c3bace729b917b"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a642a415d3444c11886c3bace729b917b">done</a> () const noexcept</td></tr>
+<tr class="memdesc:a642a415d3444c11886c3bace729b917b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the directory was entirely read or not into any buffers supplied. <br /></td></tr>
+<tr class="separator:a642a415d3444c11886c3bace729b917b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac99d361654291d463bfce813c0d15989"><td class="memItemLeft" align="right" valign="top"><a id="ac99d361654291d463bfce813c0d15989"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#ac99d361654291d463bfce813c0d15989">buffers_type</a> (span&lt; <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#a388fc107831ed68dba60c6f4082be952">buffer_type</a> &gt; v)</td></tr>
 <tr class="memdesc:ac99d361654291d463bfce813c0d15989"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implicit construction from a span. <br /></td></tr>
@@ -131,7 +137,34 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>directory_handle</b>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The buffers type used by this handle, which is a contiguous sequence of <code>directory_entry</code>.</p>
 <dl class="section warning"><dt>Warning</dt><dd>Unless you supply your own kernel buffer, you need to keep this around as long as you use any of the directory entries, as their leafnames are views of the original buffer filled by the kernel and the existence of this keeps that original buffer around. </dd></dl>
-</div><hr/>The documentation for this struct was generated from the following file:<ul>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a14d4df3a12986e4938ec8a5f8427e4ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a14d4df3a12986e4938ec8a5f8427e4ca">&#9670;&nbsp;</a></span>metadata()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">stat_t::want llfio_v2_xxx::directory_handle::buffers_type::metadata </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>The list of stat metadata retrieved. Sometimes, due to kernel API design, enumerating a directory retrieves more than the metadata requested in the read request. This indidicates what stat metadata is in the buffers filled. </p>
+<div class="fragment"><div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;{ <span class="keywordflow">return</span> _metadata; }</div></div><!-- fragment -->
+</div>
+</div>
+<hr/>The documentation for this struct was generated from the following file:<ul>
 <li>include/llfio/v2.0/<a class="el" href="directory__handle_8hpp.html">directory_handle.hpp</a></li>
 </ul>
 </div><!-- contents -->

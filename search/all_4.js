@@ -17,6 +17,6 @@ var searchData=
   ['disable_5fsafety_5funlinks',['disable_safety_unlinks',['../classllfio__v2__xxx_1_1handle.html#a5929f46f42112bd805ab5001bfbf9d2aa5832b1ccb7f83ea61bf9e7f237ea481b',1,'llfio_v2_xxx::handle']]],
   ['discovered_5fpath',['discovered_path',['../structllfio__v2__xxx_1_1path__discovery_1_1discovered__path.html',1,'llfio_v2_xxx::path_discovery']]],
   ['do_5fnot_5fstore',['do_not_store',['../classllfio__v2__xxx_1_1map__handle.html#a3efb39f1b54a7c156a3e0ee2a953712d',1,'llfio_v2_xxx::map_handle']]],
-  ['done',['done',['../structllfio__v2__xxx_1_1directory__handle_1_1enumerate__info.html#a7767a390e24f684ba13f575a7f8cebc8',1,'llfio_v2_xxx::directory_handle::enumerate_info']]],
+  ['done',['done',['../structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a642a415d3444c11886c3bace729b917b',1,'llfio_v2_xxx::directory_handle::buffers_type']]],
   ['drop_5ffilesystem_5fcache',['drop_filesystem_cache',['../namespacellfio__v2__xxx_1_1utils.html#abacefaf60ae391226c4775cf8a61276a',1,'llfio_v2_xxx::utils']]]
 ];

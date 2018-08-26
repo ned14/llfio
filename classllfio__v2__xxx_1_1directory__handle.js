@@ -1,9 +1,10 @@
 var classllfio__v2__xxx_1_1directory__handle =
 [
     [ "buffers_type", "structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html", "structllfio__v2__xxx_1_1directory__handle_1_1buffers__type" ],
-    [ "enumerate_info", "structllfio__v2__xxx_1_1directory__handle_1_1enumerate__info.html", "structllfio__v2__xxx_1_1directory__handle_1_1enumerate__info" ],
+    [ "io_request", "structllfio__v2__xxx_1_1directory__handle_1_1io__request.html", "structllfio__v2__xxx_1_1directory__handle_1_1io__request" ],
     [ "buffer_type", "classllfio__v2__xxx_1_1directory__handle.html#a388fc107831ed68dba60c6f4082be952", null ],
     [ "caching", "classllfio__v2__xxx_1_1directory__handle.html#adf3ed49b617b62ebe9d7514e0d198bb3", null ],
+    [ "const_buffer_type", "classllfio__v2__xxx_1_1directory__handle.html#afdc2558d4793953d37e680ced76f143a", null ],
     [ "creation", "classllfio__v2__xxx_1_1directory__handle.html#aee70ec4eedd840ef360470ac9905f78a", null ],
     [ "dev_t", "classllfio__v2__xxx_1_1directory__handle.html#a25dd21d41625bdacd384ace8afcd4f95", null ],
     [ "extent_type", "classllfio__v2__xxx_1_1directory__handle.html#a9a6682e415d0d82fee6d09bb0c774ef8", null ],
@@ -48,7 +49,6 @@ var classllfio__v2__xxx_1_1directory__handle =
     [ "clone_to_path_handle", "classllfio__v2__xxx_1_1directory__handle.html#aa0b7dc541e6188fed2950444089fed6c", null ],
     [ "close", "classllfio__v2__xxx_1_1directory__handle.html#a8eb4f8792e37c370d5f53c643699f8b7", null ],
     [ "current_path", "classllfio__v2__xxx_1_1directory__handle.html#a00a85eec5a41f7edb2c574d40cf04535", null ],
-    [ "enumerate", "classllfio__v2__xxx_1_1directory__handle.html#af7f8ed6432546aa2a26bb98fc719d96a", null ],
     [ "flags", "classllfio__v2__xxx_1_1directory__handle.html#a013936bc1254b1a47567fe29698d1b1c", null ],
     [ "is_append_only", "classllfio__v2__xxx_1_1directory__handle.html#ac3aa3dc009822c0e437f317864534feb", null ],
     [ "is_directory", "classllfio__v2__xxx_1_1directory__handle.html#a4ca48bdcd6d6bf8b41d0cebb304fe9ce", null ],
@@ -67,6 +67,7 @@ var classllfio__v2__xxx_1_1directory__handle =
     [ "operator=", "classllfio__v2__xxx_1_1directory__handle.html#a42cba9c448ac59e4f7057e01eb0ddf49", null ],
     [ "operator=", "classllfio__v2__xxx_1_1directory__handle.html#a9acfca399be5d868fe659fce5166d630", null ],
     [ "parent_path_handle", "classllfio__v2__xxx_1_1directory__handle.html#a865caad2f7f4bdf12fb74aabfe3c5ff5", null ],
+    [ "read", "classllfio__v2__xxx_1_1directory__handle.html#a45c13e16ecc131cbe5107e6affe94f33", null ],
     [ "release", "classllfio__v2__xxx_1_1directory__handle.html#a1d273e38c061eb11f5012f624e9a202e", null ],
     [ "relink", "classllfio__v2__xxx_1_1directory__handle.html#a8700edc9ecd4dd35d5aad7c65dd0eca2", null ],
     [ "requires_aligned_io", "classllfio__v2__xxx_1_1directory__handle.html#a751e912d8dab755ea969a418c1d544eb", null ],

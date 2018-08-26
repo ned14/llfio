@@ -7,6 +7,7 @@ var classllfio__v2__xxx_1_1symlink__handle =
     [ "io_request< const_buffers_type, ____ >", "structllfio__v2__xxx_1_1symlink__handle_1_1io__request_3_01const__buffers__type_00_01_________01_4.html", "structllfio__v2__xxx_1_1symlink__handle_1_1io__request_3_01const__buffers__type_00_01_________01_4" ],
     [ "buffer_type", "classllfio__v2__xxx_1_1symlink__handle.html#a5c072cf6866aff3220047aba4e4f58fd", null ],
     [ "caching", "classllfio__v2__xxx_1_1symlink__handle.html#aa843ccfa486fe6d7d2772988d08d5e72", null ],
+    [ "const_buffer_type", "classllfio__v2__xxx_1_1symlink__handle.html#a08242270932bae1df673574b8b9b43b2", null ],
     [ "creation", "classllfio__v2__xxx_1_1symlink__handle.html#a4970f4d5ce8405cce62715af55b0e9f0", null ],
     [ "dev_t", "classllfio__v2__xxx_1_1symlink__handle.html#a965c39e7c0278de63cb33b7e0b5d0bf5", null ],
     [ "extent_type", "classllfio__v2__xxx_1_1symlink__handle.html#afd78d540ca27fb62d96fb5444353ba42", null ],
