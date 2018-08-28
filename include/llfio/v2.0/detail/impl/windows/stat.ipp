@@ -221,4 +221,46 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, sta
   return ret;
 }
 
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<stat_t::want> stat_t::stamp(handle &h, stat_t::want wanted) noexcept
+{
+  LLFIO_LOG_FUNCTION_CALL(&h);
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  IO_STATUS_BLOCK isb = make_iostatus();
+  NTSTATUS ntstat;
+  // Filter out the flags we don't support
+  wanted &= (want::atim | want::mtim | want::birthtim);
+  if(!wanted)
+  {
+    return wanted;
+  }
+  FILE_BASIC_INFORMATION fbi;
+  isb.Status = -1;
+  ntstat = NtQueryInformationFile(h.native_handle().h, &isb, &fbi, sizeof(fbi), FileBasicInformation);
+  if(STATUS_PENDING == ntstat)
+  {
+    ntstat = ntwait(h.native_handle().h, isb, deadline());
+  }
+  if(ntstat < 0)
+  {
+    return ntkernel_error(ntstat);
+  }
+  // Set what we are changing, zeroing those elements we are not changing
+  fbi.ChangeTime.QuadPart = 0;  // will be reset when we write this anyway
+  fbi.LastAccessTime = (wanted & want::atim) ? from_timepoint(st_atim) : fbi.ChangeTime;
+  fbi.LastWriteTime = (wanted & want::mtim) ? from_timepoint(st_mtim) : fbi.ChangeTime;
+  fbi.CreationTime = (wanted & want::birthtim) ? from_timepoint(st_birthtim) : fbi.ChangeTime;
+  isb.Status = -1;
+  ntstat = NtSetInformationFile(h.native_handle().h, &isb, &fbi, sizeof(fbi), FileBasicInformation);
+  if(STATUS_PENDING == ntstat)
+  {
+    ntstat = ntwait(h.native_handle().h, isb, deadline());
+  }
+  if(ntstat < 0)
+  {
+    return ntkernel_error(ntstat);
+  }
+  return wanted;
+}
+
 LLFIO_V2_NAMESPACE_END

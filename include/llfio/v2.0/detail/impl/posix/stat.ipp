@@ -67,6 +67,16 @@ static inline std::chrono::system_clock::time_point to_timepoint(struct timespec
   std::chrono::system_clock::duration duration(ts.tv_sec * STL_TICKS_PER_SEC + ts.tv_nsec * multiplier / divider);
   return std::chrono::system_clock::time_point(duration);
 }
+inline struct timespec from_timepoint(std::chrono::system_clock::time_point time)
+{
+  // Need to have this self-adapt to the STL being used
+  static constexpr unsigned long long STL_TICKS_PER_SEC = static_cast<unsigned long long>(std::chrono::system_clock::period::den) / std::chrono::system_clock::period::num;
+  static constexpr unsigned long long multiplier = STL_TICKS_PER_SEC >= 1000000000ULL ? STL_TICKS_PER_SEC / 1000000000ULL : 1;
+  static constexpr unsigned long long divider = STL_TICKS_PER_SEC >= 1000000000ULL ? 1 : 1000000000ULL / STL_TICKS_PER_SEC;
+  // For speed we make the big assumption that the STL's system_clock is based on the time_t epoch 1st Jan 1970.
+  std::chrono::system_clock::duration duration(time.time_since_epoch());
+  return {static_cast<time_t>(duration.count() / STL_TICKS_PER_SEC), static_cast<long int>((duration.count() % STL_TICKS_PER_SEC) * divider / multiplier)};
+}
 
 LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, stat_t::want wanted) noexcept
 {
@@ -230,6 +240,77 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, sta
     ++ret;
   }
   return ret;
+}
+
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<stat_t::want> stat_t::stamp(handle &h, stat_t::want wanted) noexcept
+{
+  LLFIO_LOG_FUNCTION_CALL(&h);
+  // Filter out the flags we don't support
+  wanted &= (want::perms | want::uid | want::gid | want::atim | want::mtim
+#ifdef HAVE_BIRTHTIMESPEC
+             | want::birthtim
+#endif
+             );
+  if(!wanted)
+  {
+    return wanted;
+  }
+  if(wanted & want::perms)
+  {
+    if(-1 == ::fchmod(h.native_handle().fd, st_perms))
+    {
+      return posix_error();
+    }
+  }
+  if(wanted & (want::uid | want::gid))
+  {
+    if(-1 == ::fchown(h.native_handle().fd, (wanted & want::uid) ? st_uid : -1, (wanted & want::gid) ? st_gid : -1))
+    {
+      return posix_error();
+    }
+  }
+  struct timespec times[2] = {{0, UTIME_OMIT}, {0, UTIME_OMIT}};
+  if(wanted & want::atim)
+  {
+    times[0] = from_timepoint(st_atim);
+  }
+  if(wanted & want::mtim)
+  {
+    times[1] = from_timepoint(st_mtim);
+  }
+  if(wanted & want::birthtim)
+  {
+    if(!(wanted & want::mtim))
+    {
+      // Need to back up last modified time so it gets restored after
+      struct stat s;
+      if(-1 == ::fstat(h.native_handle().fd, &s))
+      {
+        return posix_error();
+      }
+#ifdef __ANDROID__
+      times[1] = *((struct timespec *) &s.st_mtime);
+#elif defined(__APPLE__)
+      times[1] = s.st_mtimespec;
+#else  // Linux and BSD
+      times[1] = s.st_mtim;
+#endif
+    }
+    // Set the modified date to the birth date, later we'll restore/set the modified date
+    struct timespec btimes[2] = {{0, UTIME_OMIT}, from_timepoint(st_birthtim)};
+    if(-1 == ::futimens(h.native_handle().fd, btimes))
+    {
+      return posix_error();
+    }
+  }
+  if(wanted & (want::atim | want::mtim | want::birthtim))
+  {
+    if(-1 == ::futimens(h.native_handle().fd, times))
+    {
+      return posix_error();
+    }
+  }
+  return wanted;
 }
 
 LLFIO_V2_NAMESPACE_END

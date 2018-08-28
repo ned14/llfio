@@ -1,5 +1,5 @@
 /* Information about a file
-(C) 2015-2017 Niall Douglas <http://www.nedproductions.biz/> (4 commits)
+(C) 2015-2018 Niall Douglas <http://www.nedproductions.biz/> (4 commits)
 File Created: Apr 2017
 
 
@@ -147,8 +147,46 @@ struct stat_t  // NOLINT
     }
   }
 #endif
-  //! Fills in the structure with metadata, returning number of items filled in
+  /*! Fills the structure with metadata.
+
+  \return The number of items filled in. You should use a nullptr constructed structure if you wish
+  to detect which items were filled in, and which not (those not may be all bits zero).
+  */
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> fill(const handle &h, want wanted = want::all) noexcept;
+  /*! Stamps the handle with the metadata in the structure, returning the metadata written.
+
+  The following want bits are always ignored, and are cleared in the want bits returned:
+  - `dev`
+  - `ino`
+  - `type`
+  - `nlink`
+  - `rdev`
+  - `ctim`
+  - `size` (use `truncate()` on the file instead)
+  - `allocated`
+  - `blocks`
+  - `blksize`
+  - `flags`
+  - `gen`
+  - `sparse`
+  - `compressed`
+  - `reparse_point`
+
+  The following want bits are supported by these platforms:
+  - `perms`, `uid`, `gid`  (POSIX only)
+  - `atim`                 (Windows, POSIX)
+  - `mtim`                 (Windows, POSIX)
+  - `birthtim`             (Windows, FreeBSD, OS X)
+
+  Note that on POSIX, setting birth time involves two syscalls, the first of which
+  temporarily sets the modified date to the birth time, which is racy. This is
+  unavoidable given the syscall's design.
+
+  Note also that on POSIX one can never make a birth time newer than the current
+  birth time, nor a modified time older than a birth time. You can do these on
+  Windows, however.
+  */
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<want> stamp(handle &h, want wanted = want::all) noexcept;
 };
 
 LLFIO_V2_NAMESPACE_END
