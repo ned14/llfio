@@ -28,6 +28,7 @@ var structllfio__v2__xxx_1_1stat__t =
     [ "stat_t", "structllfio__v2__xxx_1_1stat__t.html#a7370e218d82985d4476643672f37993b", null ],
     [ "stat_t", "structllfio__v2__xxx_1_1stat__t.html#aef93718067115fcb4c596f4c8fe4cc2f", null ],
     [ "fill", "structllfio__v2__xxx_1_1stat__t.html#aa08a4b9530403b4689498706b0738db4", null ],
+    [ "stamp", "structllfio__v2__xxx_1_1stat__t.html#a4ca693399bffd1b5004d31897e5b72e7", null ],
     [ "st_allocated", "structllfio__v2__xxx_1_1stat__t.html#a57ae0ee58e01481b7879596f319b9e1d", null ],
     [ "st_atim", "structllfio__v2__xxx_1_1stat__t.html#a3e33b115cae22ba75360660274f660b9", null ],
     [ "st_birthtim", "structllfio__v2__xxx_1_1stat__t.html#a7175e9ba3f0dae6ae87fb3001ca47e61", null ],

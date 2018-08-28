@@ -141,10 +141,10 @@ Public Member Functions</h2></td></tr>
 constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1stat__t.html#aef93718067115fcb4c596f4c8fe4cc2f">stat_t</a> (std::nullptr_t) noexcept</td></tr>
 <tr class="memdesc:aef93718067115fcb4c596f4c8fe4cc2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a zeroed instance. <br /></td></tr>
 <tr class="separator:aef93718067115fcb4c596f4c8fe4cc2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa08a4b9530403b4689498706b0738db4"><td class="memItemLeft" align="right" valign="top"><a id="aa08a4b9530403b4689498706b0738db4"></a>
-result&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1stat__t.html#aa08a4b9530403b4689498706b0738db4">fill</a> (const <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;h, want wanted=want::all) noexcept</td></tr>
-<tr class="memdesc:aa08a4b9530403b4689498706b0738db4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fills in the structure with metadata, returning number of items filled in. <br /></td></tr>
+<tr class="memitem:aa08a4b9530403b4689498706b0738db4"><td class="memItemLeft" align="right" valign="top">result&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1stat__t.html#aa08a4b9530403b4689498706b0738db4">fill</a> (const <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;h, want wanted=want::all) noexcept</td></tr>
 <tr class="separator:aa08a4b9530403b4689498706b0738db4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ca693399bffd1b5004d31897e5b72e7"><td class="memItemLeft" align="right" valign="top">result&lt; want &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1stat__t.html#a4ca693399bffd1b5004d31897e5b72e7">stamp</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;h, want wanted=want::all) noexcept</td></tr>
+<tr class="separator:a4ca693399bffd1b5004d31897e5b72e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -202,7 +202,108 @@ Public Attributes</h2></td></tr>
 <li>The st_sparse and st_compressed flags indicate if your file is sparse and/or compressed, or if the directory will compress newly created files by default. Note that on POSIX, a file is sparse if and only if st_allocated &lt; st_size which can include compressed files if that filing system is mounted with compression enabled (e.g. ZFS with ZLE compression which elides runs of zeros).</li>
 <li>The st_reparse_point is a Windows only flag and is never set on POSIX, even on a NTFS volume. </li>
 </ul>
-</div><h2 class="groupheader">Member Data Documentation</h2>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="aa08a4b9530403b4689498706b0738db4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa08a4b9530403b4689498706b0738db4">&#9670;&nbsp;</a></span>fill()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;size_t&gt; llfio_v2_xxx::stat_t::fill </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>h</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">want&#160;</td>
+          <td class="paramname"><em>wanted</em> = <code>want::all</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Fills the structure with metadata.</p>
+<dl class="section return"><dt>Returns</dt><dd>The number of items filled in. You should use a nullptr constructed structure if you wish to detect which items were filled in, and which not (those not may be all bits zero). </dd></dl>
+
+</div>
+</div>
+<a id="a4ca693399bffd1b5004d31897e5b72e7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ca693399bffd1b5004d31897e5b72e7">&#9670;&nbsp;</a></span>stamp()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;want&gt; llfio_v2_xxx::stat_t::stamp </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>h</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">want&#160;</td>
+          <td class="paramname"><em>wanted</em> = <code>want::all</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Stamps the handle with the metadata in the structure, returning the metadata written.</p>
+<p>The following want bits are always ignored, and are cleared in the want bits returned:</p><ul>
+<li><code>dev</code></li>
+<li><code>ino</code></li>
+<li><code>type</code></li>
+<li><code>nlink</code></li>
+<li><code>rdev</code></li>
+<li><code>ctim</code></li>
+<li><code>size</code> (use <code>truncate()</code> on the file instead)</li>
+<li><code>allocated</code></li>
+<li><code>blocks</code></li>
+<li><code>blksize</code></li>
+<li><code>flags</code></li>
+<li><code>gen</code></li>
+<li><code>sparse</code></li>
+<li><code>compressed</code></li>
+<li><code>reparse_point</code></li>
+</ul>
+<p>The following want bits are supported by these platforms:</p><ul>
+<li><code>perms</code>, <code>uid</code>, <code>gid</code> (POSIX only)</li>
+<li><code>atim</code> (Windows, POSIX)</li>
+<li><code>mtim</code> (Windows, POSIX)</li>
+<li><code>birthtim</code> (Windows, FreeBSD, OS X)</li>
+</ul>
+<p>Note that on POSIX, setting birth time involves two syscalls, the first of which temporarily sets the modified date to the birth time, which is racy. This is unavoidable given the syscall's design.</p>
+<p>Note also that on POSIX one can never make a birth time newer than the current birth time, nor a modified time older than a birth time. You can do these on Windows, however. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
 <a id="a57ae0ee58e01481b7879596f319b9e1d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a57ae0ee58e01481b7879596f319b9e1d">&#9670;&nbsp;</a></span>st_allocated</h2>
 
