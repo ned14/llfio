@@ -25,14 +25,15 @@ source code repository lives at https://github.com/ned14/llfio.
 
 - Portable to any conforming C++ 14 compiler with a working Filesystem TS in its STL.
 - Will make use of any Concepts TS if you have them.
-- `async_file_handle` supports `co_await` (Coroutines TS).
 - Provides view adapters into the Ranges TS, so ready for STL2.
 - Original error code is always preserved, even down to the original NT kernel error code if a NT kernel API was used.
     - Optional configuration based on [P1028](https://wg21.link/P1028) *SG14 status_code and standard error object
     for P0709 Zero-overhead deterministic exceptions*.
 - Race free filesystem design used throughout (i.e. no TOCTOU).
 - Zero malloc, zero exception throw and zero whole system memory copy design used throughout, even down to paths (which can hit 64Kb!).
-- Works very well with the C++ standard library, and is intended to be proposed for standardisation into C++ in Summer 2018.
+- Comprehensive support for virtual and mapped memory of both SCM/DAX and page cached storage, including large, huge and super pages.
+- Works very well with the C++ standard library, and is being proposed for standardisation into C++. See <a href="https://wg21.link/P1031">P1031 *Low level file i/o*</a>.
+- `async_file_handle` supports `co_await` (Coroutines TS).
 
 \note Note that this code is of late alpha quality. It's quite reliable on Windows and Linux, but be careful when using it!
 

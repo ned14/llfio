@@ -117,18 +117,21 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   {
     // Handled during view mapping below
   }
-  // Windows supports large pages, and no larger
-  if((_flag & section_handle::flag::page_sizes_3) == section_handle::flag::page_sizes_3)
+  if(!(_flag & section_handle::flag::nvram))
   {
-    return errc::invalid_argument;
-  }
-  else if((_flag & section_handle::flag::page_sizes_2) == section_handle::flag::page_sizes_2)
-  {
-    return errc::invalid_argument;
-  }
-  else if((_flag & section_handle::flag::page_sizes_1) == section_handle::flag::page_sizes_1)
-  {
-    attribs |= SEC_LARGE_PAGES;
+    // Windows supports large pages, and no larger
+    if((_flag & section_handle::flag::page_sizes_3) == section_handle::flag::page_sizes_3)
+    {
+      return errc::invalid_argument;
+    }
+    else if((_flag & section_handle::flag::page_sizes_2) == section_handle::flag::page_sizes_2)
+    {
+      return errc::invalid_argument;
+    }
+    else if((_flag & section_handle::flag::page_sizes_1) == section_handle::flag::page_sizes_1)
+    {
+      attribs |= SEC_LARGE_PAGES;
+    }
   }
   nativeh.behaviour |= native_handle_type::disposition::section;
   OBJECT_ATTRIBUTES oa{}, *poa = nullptr;
@@ -240,18 +243,21 @@ result<section_handle> section_handle::section(extent_type bytes, const path_han
   {
     // Handled during view mapping below
   }
-  // Windows supports large pages, and no larger
-  if((_flag & section_handle::flag::page_sizes_3) == section_handle::flag::page_sizes_3)
+  if(!(_flag & section_handle::flag::nvram))
   {
-    return errc::invalid_argument;
-  }
-  else if((_flag & section_handle::flag::page_sizes_2) == section_handle::flag::page_sizes_2)
-  {
-    return errc::invalid_argument;
-  }
-  else if((_flag & section_handle::flag::page_sizes_1) == section_handle::flag::page_sizes_1)
-  {
-    attribs |= SEC_LARGE_PAGES;
+    // Windows supports large pages, and no larger
+    if((_flag & section_handle::flag::page_sizes_3) == section_handle::flag::page_sizes_3)
+    {
+      return errc::invalid_argument;
+    }
+    else if((_flag & section_handle::flag::page_sizes_2) == section_handle::flag::page_sizes_2)
+    {
+      return errc::invalid_argument;
+    }
+    else if((_flag & section_handle::flag::page_sizes_1) == section_handle::flag::page_sizes_1)
+    {
+      attribs |= SEC_LARGE_PAGES;
+    }
   }
   nativeh.behaviour |= native_handle_type::disposition::section;
   LARGE_INTEGER _maximum_size{}, *pmaximum_size = &_maximum_size;
@@ -317,35 +323,6 @@ template <class T> static inline T win32_round_up_to_allocation_size(T i) noexce
   i = (T)((LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i) + 65535) & ~(65535));  // NOLINT
   return i;
 }
-static inline result<size_t> win32_pagesize_from_flags(section_handle::flag _flag) noexcept
-{
-  try
-  {
-    const auto &pagesizes = utils::page_sizes();
-    // Windows supports large pages, and no larger
-    if((_flag & section_handle::flag::page_sizes_3) == section_handle::flag::page_sizes_3)
-    {
-      return errc::invalid_argument;
-    }
-    else if((_flag & section_handle::flag::page_sizes_2) == section_handle::flag::page_sizes_2)
-    {
-      return errc::invalid_argument;
-    }
-    else if((_flag & section_handle::flag::page_sizes_1) == section_handle::flag::page_sizes_1)
-    {
-      if(pagesizes.size() < 2)
-      {
-        return errc::invalid_argument;
-      }
-      return pagesizes[1];
-    }
-    return pagesizes[0];
-  }
-  catch(...)
-  {
-    return error_from_exception();
-  }
-}
 static inline result<void> win32_map_flags(native_handle_type &nativeh, DWORD &allocation, DWORD &prot, size_t &commitsize, bool enable_reservation, section_handle::flag _flag)
 {
   prot = PAGE_NOACCESS;
@@ -378,24 +355,27 @@ static inline result<void> win32_map_flags(native_handle_type &nativeh, DWORD &a
   {
     prot = PAGE_EXECUTE;
   }
-  // Windows supports large pages, and no larger
-  if((_flag & section_handle::flag::page_sizes_3) == section_handle::flag::page_sizes_3)
+  if(!(_flag & section_handle::flag::nvram))
   {
-    return errc::invalid_argument;
-  }
-  else if((_flag & section_handle::flag::page_sizes_2) == section_handle::flag::page_sizes_2)
-  {
-    return errc::invalid_argument;
-  }
-  else if((_flag & section_handle::flag::page_sizes_1) == section_handle::flag::page_sizes_1)
-  {
-    // Windows does not permit address reservation with large pages
-    if(_flag & section_handle::flag::nocommit)
+    // Windows supports large pages, and no larger
+    if((_flag & section_handle::flag::page_sizes_3) == section_handle::flag::page_sizes_3)
     {
       return errc::invalid_argument;
     }
-    // Windows seems to require MEM_RESERVE with large pages
-    allocation |= MEM_RESERVE | MEM_LARGE_PAGES;
+    else if((_flag & section_handle::flag::page_sizes_2) == section_handle::flag::page_sizes_2)
+    {
+      return errc::invalid_argument;
+    }
+    else if((_flag & section_handle::flag::page_sizes_1) == section_handle::flag::page_sizes_1)
+    {
+      // Windows does not permit address reservation with large pages
+      if(_flag & section_handle::flag::nocommit)
+      {
+        return errc::invalid_argument;
+      }
+      // Windows seems to require MEM_RESERVE with large pages
+      allocation |= MEM_RESERVE | MEM_LARGE_PAGES;
+    }
   }
   return success();
 }
@@ -580,15 +560,15 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
 result<map_handle> map_handle::map(size_type bytes, bool /*unused*/, section_handle::flag _flag) noexcept
 {
   // TODO: Keep a cache of DiscardVirtualMemory()/MEM_RESET pages deallocated
-  OUTCOME_TRY(pagesize, win32_pagesize_from_flags(_flag));
-  bytes = utils::round_up_to_page_size(bytes, pagesize);
-  result<map_handle> ret(map_handle(nullptr));
+  result<map_handle> ret(map_handle(nullptr, _flag));
   native_handle_type &nativeh = ret.value()._v;
   DWORD allocation = MEM_RESERVE | MEM_COMMIT, prot;
   PVOID addr = nullptr;
+  OUTCOME_TRY(pagesize, detail::pagesize_from_flags(ret.value()._flag));
+  bytes = utils::round_up_to_page_size(bytes, pagesize);
   {
     size_t commitsize;
-    OUTCOME_TRY(win32_map_flags(nativeh, allocation, prot, commitsize, true, _flag));
+    OUTCOME_TRY(win32_map_flags(nativeh, allocation, prot, commitsize, true, ret.value()._flag));
   }
   LLFIO_LOG_FUNCTION_CALL(&ret);
   addr = VirtualAlloc(nullptr, bytes, allocation, prot);
@@ -625,16 +605,16 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  result<map_handle> ret{map_handle(&section)};
+  result<map_handle> ret{map_handle(&section, _flag)};
   native_handle_type &nativeh = ret.value()._v;
   ULONG allocation = 0, prot;
   PVOID addr = nullptr;
   size_t commitsize = bytes;
   LARGE_INTEGER _offset{};
   _offset.QuadPart = offset;
-  OUTCOME_TRY(pagesize, win32_pagesize_from_flags(_flag));
+  OUTCOME_TRY(pagesize, detail::pagesize_from_flags(ret.value()._flag));
   SIZE_T _bytes = utils::round_up_to_page_size(bytes, pagesize);
-  OUTCOME_TRY(win32_map_flags(nativeh, allocation, prot, commitsize, section.backing() != nullptr, _flag));
+  OUTCOME_TRY(win32_map_flags(nativeh, allocation, prot, commitsize, section.backing() != nullptr, ret.value()._flag));
   LLFIO_LOG_FUNCTION_CALL(&ret);
   NTSTATUS ntstat = NtMapViewOfSection(section.native_handle().h, GetCurrentProcess(), &addr, 0, commitsize, &_offset, &_bytes, ViewUnmap, allocation, prot);
   if(ntstat < 0)
@@ -650,7 +630,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   ret.value()._v.h = section.backing_native_handle().h;
 
   // Windows has no way of getting the kernel to prefault maps on creation, so ...
-  if(_flag & section_handle::flag::prefault)
+  if(ret.value()._flag & section_handle::flag::prefault)
   {
     // Start an asynchronous prefetch
     buffer_type b{static_cast<byte *>(addr), _bytes};

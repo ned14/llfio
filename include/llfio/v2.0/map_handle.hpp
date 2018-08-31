@@ -272,12 +272,6 @@ up to the reservation limit.
 You can attempt to modify the address space reservation after creation using `truncate()`. If successful,
 this will be more efficient than tearing down the map and creating a new larger map.
 
-\note On Microsoft Windows, it is not permitted to reserve address space using large pages. Any attempt to do
-so will fail. Note also that on that kernel, you must have granted the ability to lock memory to the user
-or users running the process for large page support to be made available to that process and user. Finally,
-as of Windows 10 1803, using large pages in file backed memory maps is not supported. If a future kernel
-changes this, the existing code should "just work".
-
 The native handle returned by this map handle is always that of the backing storage, but closing this handle
 does not close that of the backing storage, nor does releasing this handle release that of the backing storage.
 Locking byte ranges of this handle is therefore equal to locking byte ranges in the original backing storage,
@@ -296,6 +290,58 @@ memory, so for Intel CPUs this would be `CLWB <each cache line>; SFENCE;`. As th
 produce optimal code. If your CPU does not support the requisite instructions (or LLFIO has not added support),
 and empty buffer will be returned to indicate that nothing was barriered, same as the normal `barrier()`
 function.
+
+## Large page support:
+
+Large, huge, massive and super page support is available via the `section_handle::flag::page_sizes_N` flags.
+Use these in combination with `utils::page_size()` to request allocations or maps which use different page sizes.
+
+### Windows:
+
+Firstly, explicit large page support is only available to processes and logged in users who have been assigned the
+`SeLockMemoryPrivilege`. A default Windows installation assigns that privilege to nothing, so explicit
+action will need to be taken to assign that privilege per Windows installation.
+
+Secondly, as of Windows 10 1803, there is the large page size or the normal page size. There isn't (useful)
+support for pages of any other size, as there is on other systems.
+
+For allocating memory, large page allocation can randomly fail depending on what the system is feeling
+like, same as on all the other operating systems. It is not permitted to reserve address space using large pages.
+
+For mapping files, large page maps do not work as of Windows 10 1803 (curiously, ReactOS *does*
+implement this). There is a big exception to this, which is for DAX formatted NTFS volumes with a formatted
+cluster size of the large page size, where if
+you map in large page sized multiples, the Windows kernel uses large pages (and one need not hold
+`SeLockMemoryPrivilege` either). Therefore, if you specify `section_handle::flag::nvram` with a
+`section_handle::flag::page_sizes_N`, LLFIO does not ask for large pages which would fail, it merely
+rounds all requests up to the nearest large page multiple.
+
+### Linux:
+
+As usual on Linux, large page (often called huge page on Linux) support comes in many forms.
+
+Explicit support is via `MAP_HUGETLB` to `mmap()`, and whether an explicit request succeeds or not is up to how
+many huge pages were configured into the running system via boot-time kernel parameters, and how many
+huge pages are in use already. For most recent kernels on most distributions, explicit memory allocation
+requests using large pages generally works without issue. As of Linux kernel 4.18, mapping files using
+large pages only works on `tmpfs`, this corresponds to `path_discovery::memory_backed_temporary_files_directory()`
+sourced anonymous section handles. Work is proceeding well for the major Linux filing systems to become
+able to map files using large pages soon, and in theory LLFIO based should "just work" on such a newer kernel.
+
+Note that many distributions enable transparent huge pages, whereby if you request allocations of large page multiples
+at large page offsets, the kernel uses large pages, without you needing to specify any `section_handle::flag::page_sizes_N`.
+
+### FreeBSD:
+
+FreeBSD has no support for failing if large pages cannot be used for a specific `mmap()`. The best you can do is to ask for
+large pages, and you may or may not get them depending on available system resources, filing system in use,
+etc. LLFIO does not check returned maps to discover if large
+pages were actually used, that is on end user code to check if it really needs to know.
+
+### MacOS:
+
+MacOS only supports large pages for memory allocations, not for mapping files. It fails if large pages could
+not be used when a large page allocation was requested.
 
 \sa `mapped_file_handle`, `algorithm::mapped_span`
 */
@@ -324,10 +370,15 @@ protected:
   size_type _reservation{0}, _length{0}, _pagesize{0};
   section_handle::flag _flag{section_handle::flag::none};
 
-  explicit map_handle(section_handle *section)
+  explicit map_handle(section_handle *section, section_handle::flag flags)
       : _section(section)
-      , _flag(section != nullptr ? section->section_flags() : section_handle::flag::none)
+      , _flag(flags)
   {
+    if(section != nullptr)
+    {
+      // Apart from read/write/cow/execute, the section's flags override the map's flags
+      _flag |= (section->section_flags() & ~(section_handle::flag::read | section_handle::flag::write | section_handle::flag::cow | section_handle::flag::execute));
+    }
   }
 
 public:
@@ -419,7 +470,8 @@ public:
   \param section A memory section handle specifying the backing storage to use.
   \param bytes How many bytes to reserve (0 = the size of the section). Rounded up to nearest 64Kb on Windows.
   \param offset The offset into the backing storage to map from. Typically needs to be at least a multiple of the page size (see `page_size()`), on Windows it needs to be a multiple of the kernel memory allocation granularity (typically 64Kb).
-  \param _flag The permissions with which to map the view which are constrained by the permissions of the memory section. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
+  \param _flag The permissions with which to map the view which are constrained by the permissions of the memory section. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory. Note that apart from read/write/cow/execute,
+  the section's flags override the map's flags.
 
   \errors Any of the values POSIX mmap() or NtMapViewOfSection() can return.
   */
@@ -757,6 +809,46 @@ inline map_handle::io_result<map_handle::const_buffers_type> write(map_handle &s
   return self.write(std::forward<decltype(reqs)>(reqs), std::forward<decltype(d)>(d));
 }
 // END make_free_functions.py
+
+namespace detail
+{
+  inline result<size_t> pagesize_from_flags(section_handle::flag _flag) noexcept
+  {
+    try
+    {
+      const auto &pagesizes = utils::page_sizes();
+      if((_flag & section_handle::flag::page_sizes_3) == section_handle::flag::page_sizes_3)
+      {
+        if(pagesizes.size() < 4)
+        {
+          return errc::invalid_argument;
+        }
+        return pagesizes[3];
+      }
+      else if((_flag & section_handle::flag::page_sizes_2) == section_handle::flag::page_sizes_2)
+      {
+        if(pagesizes.size() < 3)
+        {
+          return errc::invalid_argument;
+        }
+        return pagesizes[2];
+      }
+      else if((_flag & section_handle::flag::page_sizes_1) == section_handle::flag::page_sizes_1)
+      {
+        if(pagesizes.size() < 2)
+        {
+          return errc::invalid_argument;
+        }
+        return pagesizes[1];
+      }
+      return pagesizes[0];
+    }
+    catch(...)
+    {
+      return error_from_exception();
+    }
+  }
+}  // namespace detail
 
 LLFIO_V2_NAMESPACE_END
 
