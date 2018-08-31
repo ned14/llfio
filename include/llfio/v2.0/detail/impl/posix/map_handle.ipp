@@ -312,7 +312,7 @@ result<map_handle> map_handle::map(size_type bytes, bool /*unused*/, section_han
   {
     return errc::argument_out_of_domain;
   }
-  bytes = utils::round_up_to_page_size(bytes);
+  bytes = utils::round_up_to_page_size(bytes, /*FIXME*/ utils::page_size());
   result<map_handle> ret(map_handle(nullptr));
   native_handle_type &nativeh = ret.value()._v;
   OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, 0, nullptr, bytes, 0, _flag));
@@ -352,7 +352,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
     OUTCOME_TRY(length_, _section->length());  // length of the backing file
     length = length_;
   }
-  newsize = utils::round_up_to_page_size(newsize);
+  newsize = utils::round_up_to_page_size(newsize, _pagesize);
   if(newsize == _reservation)
   {
     return success();
@@ -432,7 +432,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
     return errc::invalid_argument;
   }
   // Set permissions on the pages
-  region = utils::round_to_page_size(region);
+  region = utils::round_to_page_size(region, _pagesize);
   extent_type offset = _offset + (region.data() - _addr);
   size_type bytes = region.size();
   OUTCOME_TRYV(do_mmap(_v, region.data(), MAP_FIXED, _section, bytes, offset, flag));
@@ -451,7 +451,7 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
   {
     return errc::invalid_argument;
   }
-  region = utils::round_to_page_size(region);
+  region = utils::round_to_page_size(region, _pagesize);
   // Tell the kernel to kick these pages into storage
   if(-1 == ::madvise(region.data(), region.size(), MADV_DONTNEED))
   {
@@ -472,7 +472,7 @@ result<void> map_handle::zero_memory(buffer_type region) noexcept
     return errc::invalid_argument;
   }
 #ifdef MADV_REMOVE
-  buffer_type page_region{utils::round_up_to_page_size(region.data()), utils::round_down_to_page_size(region.size())};
+  buffer_type page_region{utils::round_up_to_page_size(region.data(), _pagesize), utils::round_down_to_page_size(region.size(), _pagesize)};
   // Zero contents and punch a hole in any backing storage
   if((page_region.size() != 0u) && -1 != ::madvise(page_region.data(), page_region.size(), MADV_REMOVE))
   {
@@ -502,7 +502,7 @@ result<span<map_handle::buffer_type>> map_handle::prefetch(span<buffer_type> reg
 result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(0);
-  region = utils::round_to_page_size(region);
+  region = utils::round_to_page_size(region, _pagesize);
   if(region.data() == nullptr)
   {
     return errc::invalid_argument;

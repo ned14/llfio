@@ -117,6 +117,19 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   {
     // Handled during view mapping below
   }
+  // Windows supports large pages, and no larger
+  if((_flag & section_handle::flag::page_sizes_3) == section_handle::flag::page_sizes_3)
+  {
+    return errc::invalid_argument;
+  }
+  else if((_flag & section_handle::flag::page_sizes_2) == section_handle::flag::page_sizes_2)
+  {
+    return errc::invalid_argument;
+  }
+  else if((_flag & section_handle::flag::page_sizes_1) == section_handle::flag::page_sizes_1)
+  {
+    attribs |= SEC_LARGE_PAGES;
+  }
   nativeh.behaviour |= native_handle_type::disposition::section;
   OBJECT_ATTRIBUTES oa{}, *poa = nullptr;
   UNICODE_STRING _path{};
@@ -227,6 +240,19 @@ result<section_handle> section_handle::section(extent_type bytes, const path_han
   {
     // Handled during view mapping below
   }
+  // Windows supports large pages, and no larger
+  if((_flag & section_handle::flag::page_sizes_3) == section_handle::flag::page_sizes_3)
+  {
+    return errc::invalid_argument;
+  }
+  else if((_flag & section_handle::flag::page_sizes_2) == section_handle::flag::page_sizes_2)
+  {
+    return errc::invalid_argument;
+  }
+  else if((_flag & section_handle::flag::page_sizes_1) == section_handle::flag::page_sizes_1)
+  {
+    attribs |= SEC_LARGE_PAGES;
+  }
   nativeh.behaviour |= native_handle_type::disposition::section;
   LARGE_INTEGER _maximum_size{}, *pmaximum_size = &_maximum_size;
   _maximum_size.QuadPart = bytes;
@@ -291,7 +317,36 @@ template <class T> static inline T win32_round_up_to_allocation_size(T i) noexce
   i = (T)((LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i) + 65535) & ~(65535));  // NOLINT
   return i;
 }
-static inline void win32_map_flags(native_handle_type &nativeh, DWORD &allocation, DWORD &prot, size_t &commitsize, bool enable_reservation, section_handle::flag _flag)
+static inline result<size_t> win32_pagesize_from_flags(section_handle::flag _flag) noexcept
+{
+  try
+  {
+    const auto &pagesizes = utils::page_sizes();
+    // Windows supports large pages, and no larger
+    if((_flag & section_handle::flag::page_sizes_3) == section_handle::flag::page_sizes_3)
+    {
+      return errc::invalid_argument;
+    }
+    else if((_flag & section_handle::flag::page_sizes_2) == section_handle::flag::page_sizes_2)
+    {
+      return errc::invalid_argument;
+    }
+    else if((_flag & section_handle::flag::page_sizes_1) == section_handle::flag::page_sizes_1)
+    {
+      if(pagesizes.size() < 2)
+      {
+        return errc::invalid_argument;
+      }
+      return pagesizes[1];
+    }
+    return pagesizes[0];
+  }
+  catch(...)
+  {
+    return error_from_exception();
+  }
+}
+static inline result<void> win32_map_flags(native_handle_type &nativeh, DWORD &allocation, DWORD &prot, size_t &commitsize, bool enable_reservation, section_handle::flag _flag)
 {
   prot = PAGE_NOACCESS;
   if(enable_reservation && ((_flag & section_handle::flag::nocommit) || (_flag == section_handle::flag::none)))
@@ -323,6 +378,26 @@ static inline void win32_map_flags(native_handle_type &nativeh, DWORD &allocatio
   {
     prot = PAGE_EXECUTE;
   }
+  // Windows supports large pages, and no larger
+  if((_flag & section_handle::flag::page_sizes_3) == section_handle::flag::page_sizes_3)
+  {
+    return errc::invalid_argument;
+  }
+  else if((_flag & section_handle::flag::page_sizes_2) == section_handle::flag::page_sizes_2)
+  {
+    return errc::invalid_argument;
+  }
+  else if((_flag & section_handle::flag::page_sizes_1) == section_handle::flag::page_sizes_1)
+  {
+    // Windows does not permit address reservation with large pages
+    if(_flag & section_handle::flag::nocommit)
+    {
+      return errc::invalid_argument;
+    }
+    // Windows seems to require MEM_RESERVE with large pages
+    allocation |= MEM_RESERVE | MEM_LARGE_PAGES;
+  }
+  return success();
 }
 
 QUICKCPPLIB_BITFIELD_BEGIN(win32_map_sought)
@@ -505,14 +580,15 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
 result<map_handle> map_handle::map(size_type bytes, bool /*unused*/, section_handle::flag _flag) noexcept
 {
   // TODO: Keep a cache of DiscardVirtualMemory()/MEM_RESET pages deallocated
-  bytes = win32_round_up_to_allocation_size(bytes);
+  OUTCOME_TRY(pagesize, win32_pagesize_from_flags(_flag));
+  bytes = utils::round_up_to_page_size(bytes, pagesize);
   result<map_handle> ret(map_handle(nullptr));
   native_handle_type &nativeh = ret.value()._v;
   DWORD allocation = MEM_RESERVE | MEM_COMMIT, prot;
   PVOID addr = nullptr;
   {
     size_t commitsize;
-    win32_map_flags(nativeh, allocation, prot, commitsize, true, _flag);
+    OUTCOME_TRY(win32_map_flags(nativeh, allocation, prot, commitsize, true, _flag));
   }
   LLFIO_LOG_FUNCTION_CALL(&ret);
   addr = VirtualAlloc(nullptr, bytes, allocation, prot);
@@ -523,6 +599,7 @@ result<map_handle> map_handle::map(size_type bytes, bool /*unused*/, section_han
   ret.value()._addr = static_cast<byte *>(addr);
   ret.value()._reservation = bytes;
   ret.value()._length = bytes;
+  ret.value()._pagesize = pagesize;
 
   // Windows has no way of getting the kernel to prefault maps on creation, so ...
   if(_flag & section_handle::flag::prefault)
@@ -534,7 +611,6 @@ result<map_handle> map_handle::map(size_type bytes, bool /*unused*/, section_han
     // If this kernel doesn't support that API, manually poke every page in the new map
     if(PrefetchVirtualMemory_ == nullptr)
     {
-      size_t pagesize = utils::page_size();
       volatile auto *a = static_cast<volatile char *>(addr);
       for(size_t n = 0; n < bytes; n += pagesize)
       {
@@ -556,8 +632,9 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   size_t commitsize = bytes;
   LARGE_INTEGER _offset{};
   _offset.QuadPart = offset;
-  SIZE_T _bytes = utils::round_up_to_page_size(bytes);
-  win32_map_flags(nativeh, allocation, prot, commitsize, section.backing() != nullptr, _flag);
+  OUTCOME_TRY(pagesize, win32_pagesize_from_flags(_flag));
+  SIZE_T _bytes = utils::round_up_to_page_size(bytes, pagesize);
+  OUTCOME_TRY(win32_map_flags(nativeh, allocation, prot, commitsize, section.backing() != nullptr, _flag));
   LLFIO_LOG_FUNCTION_CALL(&ret);
   NTSTATUS ntstat = NtMapViewOfSection(section.native_handle().h, GetCurrentProcess(), &addr, 0, commitsize, &_offset, &_bytes, ViewUnmap, allocation, prot);
   if(ntstat < 0)
@@ -568,6 +645,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   ret.value()._offset = offset;
   ret.value()._reservation = _bytes;
   ret.value()._length = section.length().value() - offset;
+  ret.value()._pagesize = pagesize;
   // Make my handle borrow the native handle of my backing storage
   ret.value()._v.h = section.backing_native_handle().h;
 
@@ -580,7 +658,6 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
     // If this kernel doesn't support that API, manually poke every page in the new map
     if(PrefetchVirtualMemory_ == nullptr)
     {
-      size_t pagesize = utils::page_size();
       volatile auto *a = static_cast<volatile char *>(addr);
       for(size_t n = 0; n < _bytes; n += pagesize)
       {
@@ -596,7 +673,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool /* un
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   LLFIO_LOG_FUNCTION_CALL(this);
-  newsize = win32_round_up_to_allocation_size(newsize);
+  newsize = utils::round_up_to_page_size(newsize, _pagesize);
   if(newsize == _reservation)
   {
     return success();
@@ -624,7 +701,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool /* un
     native_handle_type nativeh;
     DWORD allocation = MEM_RESERVE | MEM_COMMIT, prot;
     size_t commitsize;
-    win32_map_flags(nativeh, allocation, prot, commitsize, true, _flag);
+    OUTCOME_TRY(win32_map_flags(nativeh, allocation, prot, commitsize, true, _flag));
     if(!VirtualAlloc(_addr + _reservation, newsize - _reservation, allocation, prot))
     {
       return win32_error();
@@ -658,7 +735,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool /* un
   offset.QuadPart = _offset + _reservation;
   SIZE_T _bytes = newsize - _reservation;
   native_handle_type nativeh;
-  win32_map_flags(nativeh, allocation, prot, commitsize, _section->backing() != nullptr, _flag);
+  OUTCOME_TRY(win32_map_flags(nativeh, allocation, prot, commitsize, _section->backing() != nullptr, _flag));
   NTSTATUS ntstat = NtMapViewOfSection(_section->native_handle().h, GetCurrentProcess(), &addr, 0, commitsize, &offset, &_bytes, ViewUnmap, allocation, prot);
   if(ntstat < 0)
   {
@@ -705,7 +782,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
   {
     prot = PAGE_EXECUTE;
   }
-  region = utils::round_to_page_size(region);
+  region = utils::round_to_page_size(region, _pagesize);
   OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed | win32_map_sought::freed | win32_map_sought::reserved, [prot](byte *addr, size_t bytes) -> result<void> {
     if(VirtualAlloc(addr, bytes, MEM_COMMIT, prot) == nullptr)
     {
@@ -723,7 +800,7 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
   {
     return errc::invalid_argument;
   }
-  region = utils::round_to_page_size(region);
+  region = utils::round_to_page_size(region, _pagesize);
   OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed, [](byte *addr, size_t bytes) -> result<void> {
     if(VirtualFree(addr, bytes, MEM_DECOMMIT) == 0)
     {
@@ -747,7 +824,7 @@ result<void> map_handle::zero_memory(buffer_type region) noexcept
   memset(region.data(), 0, region.size());
   if((DiscardVirtualMemory_ != nullptr) && region.size() >= utils::page_size())
   {
-    region = utils::round_to_page_size(region);
+    region = utils::round_to_page_size(region, _pagesize);
     if(region.size() > 0)
     {
       OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed, [](byte *addr, size_t bytes) -> result<void> {
@@ -784,7 +861,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   LLFIO_LOG_FUNCTION_CALL(0);
-  region = utils::round_to_page_size(region);
+  region = utils::round_to_page_size(region, _pagesize);
   if(region.data() == nullptr)
   {
     return errc::invalid_argument;

@@ -106,7 +106,7 @@ public:
 #ifdef _WIN32
                                              byteoffset & ~65535,
 #else
-                                             utils::round_down_to_page_size(byteoffset),
+                                             utils::round_down_to_page_size(byteoffset, utils::page_size()),
 #endif
                                              byteoffset, &sh, (length == (size_type) -1) ? 0 : length * sizeof(T), _flag))  // NOLINT
   {
@@ -124,7 +124,7 @@ public:
 #ifdef _WIN32
                                              byteoffset & ~65535,
 #else
-                                             utils::round_down_to_page_size(byteoffset),
+                                             utils::round_down_to_page_size(byteoffset, utils::page_size()),
 #endif
                                              byteoffset, nullptr, (length == (size_type) -1) ? 0 : length * sizeof(T), _flag))  // NOLINT
   {

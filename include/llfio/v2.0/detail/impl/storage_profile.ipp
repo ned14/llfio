@@ -1209,7 +1209,7 @@ namespace storage_profile
         }
         if(srch.requires_aligned_io())
         {
-          bytes = utils::round_down_to_page_size(bytes);
+          bytes = utils::round_down_to_page_size(bytes, utils::page_size());
         }
 
         if(cold_cache)

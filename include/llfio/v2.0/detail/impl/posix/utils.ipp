@@ -53,11 +53,11 @@ namespace utils
     }
     return ret;
   }
-  std::vector<size_t> page_sizes(bool only_actually_available)
+  const std::vector<size_t> &page_sizes(bool only_actually_available)
   {
     static QUICKCPPLIB_NAMESPACE::configurable_spinlock::spinlock<bool> lock;
-    static std::vector<size_t> pagesizes, pagesizes_available;
     std::lock_guard<decltype(lock)> g(lock);
+    static std::vector<size_t> pagesizes, pagesizes_available;
     if(pagesizes.empty())
     {
 #if defined(__FreeBSD__)

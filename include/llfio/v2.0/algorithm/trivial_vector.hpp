@@ -314,7 +314,7 @@ namespace algorithm
         }
         size_type current_size = size();
         size_type bytes = n * sizeof(value_type);
-        bytes = utils::round_up_to_page_size(bytes);
+        bytes = utils::round_up_to_page_size(bytes, _mh.page_size());
         if(!_sh.is_valid())
         {
           _sh = section_handle::section(bytes).value();
@@ -348,7 +348,7 @@ namespace algorithm
       {
         size_type current_size = size();
         size_type bytes = current_size * sizeof(value_type);
-        bytes = utils::round_up_to_page_size(bytes);
+        bytes = utils::round_up_to_page_size(bytes, _mh.page_size());
         if(bytes / sizeof(value_type) == capacity())
         {
           return;

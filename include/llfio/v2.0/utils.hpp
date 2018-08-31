@@ -48,26 +48,23 @@ namespace utils
 
   /*! \brief Round a value to its next lowest page size multiple
   */
-  template <class T> inline T round_down_to_page_size(T i) noexcept
+  template <class T> inline T round_down_to_page_size(T i, size_t pagesize) noexcept
   {
-    const size_t pagesize = page_size();
     i = (T)(LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i) & ~(pagesize - 1));  // NOLINT
     return i;
   }
   /*! \brief Round a value to its next highest page size multiple
   */
-  template <class T> inline T round_up_to_page_size(T i) noexcept
+  template <class T> inline T round_up_to_page_size(T i, size_t pagesize) noexcept
   {
-    const size_t pagesize = page_size();
     i = (T)((LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i) + pagesize - 1) & ~(pagesize - 1));  // NOLINT
     return i;
   }
   /*! \brief Round a pair of a pointer and a size_t to their nearest page size multiples. The pointer will be rounded
   down, the size_t upwards.
   */
-  template <class T> inline T round_to_page_size(T i) noexcept
+  template <class T> inline T round_to_page_size(T i, size_t pagesize) noexcept
   {
-    const size_t pagesize = page_size();
     i = {reinterpret_cast<byte *>((LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i.data())) & ~(pagesize - 1)), (i.size() + pagesize - 1) & ~(pagesize - 1)};
     return i;
   }
@@ -77,10 +74,11 @@ namespace utils
   \param only_actually_available Only return page sizes actually available to the user running this process
   \return The page sizes of this architecture.
   \ingroup utils
-  \complexity{Whatever the system API takes (one would hope constant time).}
-  \exceptionmodel{Any error from the operating system or std::bad_alloc.}
+  \complexity{First call performs multiple memory allocations, mutex locks and system calls. Subsequent calls
+  lock mutexes.}
+  \exceptionmodel{Throws any error from the operating system or std::bad_alloc.}
   */
-  LLFIO_HEADERS_ONLY_FUNC_SPEC std::vector<size_t> page_sizes(bool only_actually_available = true);
+  LLFIO_HEADERS_ONLY_FUNC_SPEC const std::vector<size_t> &page_sizes(bool only_actually_available = true);
 
   /*! \brief Returns a reasonable default size for page_allocator, typically the closest page size from
   page_sizes() to 1Mb.
@@ -88,14 +86,14 @@ namespace utils
   \return A value of a TLB large page size close to 1Mb.
   \ingroup utils
   \complexity{Whatever the system API takes (one would hope constant time).}
-  \exceptionmodel{Any error from the operating system or std::bad_alloc.}
+  \exceptionmodel{Throws any error from the operating system or std::bad_alloc.}
   */
   inline size_t file_buffer_default_size()
   {
     static size_t size;
     if(size == 0u)
     {
-      std::vector<size_t> sizes(page_sizes(true));
+      const std::vector<size_t> &sizes = page_sizes(true);
       for(auto &i : sizes)
       {
         if(i >= 1024 * 1024)
@@ -196,7 +194,7 @@ namespace utils
   unmodified.
 
   A particularly useful combination with this allocator is with the
-  page_sizes() member function of __llfio_dispatcher__. This will return which
+  `page_sizes()` member function of __llfio_dispatcher__. This will return which
   pages sizes are possible, and which page sizes are enabled for this user. If
   writing a file copy routine for example, using this allocator with the
   largest page size as the copy chunk makes a great deal of sense.

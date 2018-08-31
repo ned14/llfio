@@ -149,7 +149,7 @@ public:
     auto out = reserve(reservation);
     if(!out)
     {
-      _reservation = utils::round_up_to_page_size(reservation);
+      _reservation = reservation;
       // sink the error
     }
   }
@@ -295,6 +295,12 @@ public:
 
   //! The address in memory where this mapped file resides
   byte *address() const noexcept { return _mh.address(); }
+
+  //! The page size used by the map, in bytes.
+  size_type page_size() const noexcept { return _mh.page_size(); }
+
+  //! True if the map is of non-volatile RAM
+  bool is_nvram() const noexcept { return _mh.is_nvram(); }
 
   //! The maximum extent of the underlying file
   result<extent_type> underlying_file_maximum_extent() const noexcept { return file_handle::maximum_extent(); }

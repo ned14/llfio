@@ -150,8 +150,9 @@ Todo:
 | ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on safe byte ranges
 |   | ✔ | ✔ | Set random or sequential i/o (prefetch).
 | ✔ | ✔ | ✔ | i/o on `async_file_handle` is coroutines awaitable.
-| ✔ | ✔ |   | `llfio::algorithm::trivial_vector<T>` with constant time reallocation if `T` is trivially copyable.
+| ✔ | ✔ | ✔ | `llfio::algorithm::trivial_vector<T>` with constant time reallocation if `T` is trivially copyable.
 |   | ✔ | ✔ | `symlink_handle`.
+| ✔ | ✔ | ✔ | Large, huge and massive page size support for memory allocation and (POSIX only) file maps.
 
 Todo thereafter in order of priority:
 
