@@ -15,6 +15,9 @@ var classllfio__v2__xxx_1_1section__handle =
       [ "singleton", "classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a41771be4e90788c06cc49f2d35538108", null ],
       [ "barrier_on_close", "classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a06b41188d84f0fee5cff37c71b3d5877", null ],
       [ "nvram", "classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a2087205d797bb4de249c85cc8b87afc5", null ],
+      [ "page_sizes_1", "classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a8d15253a30787fff812c9f254e26baf1", null ],
+      [ "page_sizes_2", "classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549aa3a2b1b4beaa0a8f0e2658cb321f7c46", null ],
+      [ "page_sizes_3", "classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a0a225b6b1594a5540799b4c58c937522", null ],
       [ "readwrite", "classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a88d13c7a84c4b579c0da45a290fd6b78", null ]
     ] ],
     [ "caching", "classllfio__v2__xxx_1_1section__handle.html#aecd3a7db6cee3aec07d32fe6f99e6852", [

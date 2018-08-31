@@ -12,10 +12,10 @@ var utils_8hpp =
     [ "flush_modified_data", "utils_8hpp.html#ae1d9ee5d6d391f39f62dacbc8c957ae8", null ],
     [ "operator==", "utils_8hpp.html#ae880ebd5681dcf6b700d67fb10b4547e", null ],
     [ "page_size", "utils_8hpp.html#a42fc69cae3dbbf66498545cbe358e2ba", null ],
-    [ "page_sizes", "utils_8hpp.html#a844e6fc5ee5a2a402311917c44e44645", null ],
+    [ "page_sizes", "utils_8hpp.html#a6c41e314d4d4b8362b96a3b4c1c363f5", null ],
     [ "random_fill", "utils_8hpp.html#ae61e2de30b06776a1c24643a1d1dc64e", null ],
     [ "random_string", "utils_8hpp.html#a6a29cf29a4b097411f6c1e5274bfb417", null ],
-    [ "round_down_to_page_size", "utils_8hpp.html#a450a06ed496999f8e7f4cb1f424cbccc", null ],
-    [ "round_to_page_size", "utils_8hpp.html#a1663c56755185b28805889c06cbfd6f6", null ],
-    [ "round_up_to_page_size", "utils_8hpp.html#aadbbaffaa23ebec2ae0f3335ff48608e", null ]
+    [ "round_down_to_page_size", "utils_8hpp.html#a5499feaf6b774e774a26e7decd11e3fa", null ],
+    [ "round_to_page_size", "utils_8hpp.html#afa36e8bc2a1f004696c09d104e23d685", null ],
+    [ "round_up_to_page_size", "utils_8hpp.html#a67f8f31f6b93293a22a4b30d686eb3af", null ]
 ];

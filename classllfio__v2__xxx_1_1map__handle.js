@@ -70,6 +70,7 @@ var classllfio__v2__xxx_1_1map__handle =
     [ "offset", "classllfio__v2__xxx_1_1map__handle.html#a9b65f62129418d02a925e6ef56220198", null ],
     [ "operator=", "classllfio__v2__xxx_1_1map__handle.html#a22cfe5a7c6868d0952fde18f62f71195", null ],
     [ "operator=", "classllfio__v2__xxx_1_1map__handle.html#a01dcb36c0a955692e016a90656a6ceb2", null ],
+    [ "page_size", "classllfio__v2__xxx_1_1map__handle.html#a7224b586e457183ebcb0a694e282d0fc", null ],
     [ "read", "classllfio__v2__xxx_1_1map__handle.html#a5f7485307a0704aa1680e5785be2035d", null ],
     [ "read", "classllfio__v2__xxx_1_1map__handle.html#aac0369e8025ae1320e7d607922f61b48", null ],
     [ "read", "classllfio__v2__xxx_1_1map__handle.html#a073cdca57e3e3718d2eb285be51d5c92", null ],
@@ -95,6 +96,7 @@ var classllfio__v2__xxx_1_1map__handle =
     [ "_flags", "classllfio__v2__xxx_1_1map__handle.html#ad758cf1eb2e0b4c63583eab05e7f6820", null ],
     [ "_length", "classllfio__v2__xxx_1_1map__handle.html#a67fb29deeca27a58ca3d78c792ca5435", null ],
     [ "_offset", "classllfio__v2__xxx_1_1map__handle.html#a9ff113f78e71337f78c9139ca202fe6a", null ],
+    [ "_pagesize", "classllfio__v2__xxx_1_1map__handle.html#ae44bc69b964c2140a3bab80dd8aed205", null ],
     [ "_reservation", "classllfio__v2__xxx_1_1map__handle.html#a0b6166d8c12c8b8430d6204dc701bf25", null ],
     [ "_section", "classllfio__v2__xxx_1_1map__handle.html#a486f8bbb3ea986b6f2e877d9ea5ba81d", null ],
     [ "_v", "classllfio__v2__xxx_1_1map__handle.html#a1d6911771ac743fd9d64063c12429deb", null ]
