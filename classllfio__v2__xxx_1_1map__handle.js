@@ -28,7 +28,7 @@ var classllfio__v2__xxx_1_1map__handle =
       [ "byte_lock_insanity", "classllfio__v2__xxx_1_1map__handle.html#a5929f46f42112bd805ab5001bfbf9d2aa6aa77c9bac6dd95b83f8d278f0e5fa59", null ],
       [ "anonymous_inode", "classllfio__v2__xxx_1_1map__handle.html#a5929f46f42112bd805ab5001bfbf9d2aa07122ea63cdc5b2c07e764d95a816d3d", null ]
     ] ],
-    [ "map_handle", "classllfio__v2__xxx_1_1map__handle.html#a41be918ad9a0c472b6522ce351aaa8c4", null ],
+    [ "map_handle", "classllfio__v2__xxx_1_1map__handle.html#aa954d9b40b2685bbc8a229e3907c297d", null ],
     [ "map_handle", "classllfio__v2__xxx_1_1map__handle.html#a9c69e0d3f3fa2c213bdd4deabc6c2279", null ],
     [ "~map_handle", "classllfio__v2__xxx_1_1map__handle.html#a433596cf8fbaf7fa81c6ff8807c18b4e", null ],
     [ "map_handle", "classllfio__v2__xxx_1_1map__handle.html#a85903a9f61228497b09bf5071ffc255b", null ],
@@ -37,8 +37,8 @@ var classllfio__v2__xxx_1_1map__handle =
     [ "are_reads_from_cache", "classllfio__v2__xxx_1_1map__handle.html#a7126a726b2a06e4c1eca1a94c41163ff", null ],
     [ "are_safety_fsyncs_issued", "classllfio__v2__xxx_1_1map__handle.html#a4471012e7b85ac6dea1d0af43f1ee4e6", null ],
     [ "are_writes_durable", "classllfio__v2__xxx_1_1map__handle.html#a8036792f332459064172d7b0cfaee3cf", null ],
-    [ "barrier", "classllfio__v2__xxx_1_1map__handle.html#ab9fb41b19bd14bba06e3df8f41e9087d", null ],
     [ "barrier", "classllfio__v2__xxx_1_1map__handle.html#aa3ec366f663f85fb4d679542b8c1b41a", null ],
+    [ "barrier", "classllfio__v2__xxx_1_1map__handle.html#ab9fb41b19bd14bba06e3df8f41e9087d", null ],
     [ "capacity", "classllfio__v2__xxx_1_1map__handle.html#ac7d048f830c0b2563fb4b50eb0597152", null ],
     [ "clone", "classllfio__v2__xxx_1_1map__handle.html#aeea4389189021b94dde6d8f2c3ccc5b3", null ],
     [ "close", "classllfio__v2__xxx_1_1map__handle.html#ab6704788ecc652589c3e155f47b40a5e", null ],

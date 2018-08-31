@@ -12,6 +12,7 @@ var map__handle_8hpp =
     [ "map", "map__handle_8hpp.html#ab50d07405d17a8fff4e360fd2612bc6f", null ],
     [ "map", "map__handle_8hpp.html#ab9dbbe2fe79758ef87fe2dd1f61d824c", null ],
     [ "operator<<", "map__handle_8hpp.html#aaf60dc6739dc2bd7d890630b1a50d15a", null ],
+    [ "pagesize_from_flags", "map__handle_8hpp.html#acaa74d6fc6b9aef877233654f514041d", null ],
     [ "read", "map__handle_8hpp.html#ab993693c98cdb52e2d611f8f9e24e4e2", null ],
     [ "section", "map__handle_8hpp.html#ac9be77116e7a2d8c029dd066dfa363fb", null ],
     [ "section", "map__handle_8hpp.html#a3d55c0a3b567c7ed05053a94750bb133", null ],

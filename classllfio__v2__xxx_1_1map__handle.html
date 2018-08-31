@@ -398,9 +398,9 @@ static result&lt; span&lt; <a class="el" href="structllfio__v2__xxx_1_1io__handl
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a41be918ad9a0c472b6522ce351aaa8c4"><td class="memItemLeft" align="right" valign="top"><a id="a41be918ad9a0c472b6522ce351aaa8c4"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>map_handle</b> (<a class="el" href="classllfio__v2__xxx_1_1section__handle.html">section_handle</a> *<a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a173539843aebd387bb8ca06246067ead">section</a>)</td></tr>
-<tr class="separator:a41be918ad9a0c472b6522ce351aaa8c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa954d9b40b2685bbc8a229e3907c297d"><td class="memItemLeft" align="right" valign="top"><a id="aa954d9b40b2685bbc8a229e3907c297d"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>map_handle</b> (<a class="el" href="classllfio__v2__xxx_1_1section__handle.html">section_handle</a> *<a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a173539843aebd387bb8ca06246067ead">section</a>, section_handle::flag <a class="el" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>)</td></tr>
+<tr class="separator:aa954d9b40b2685bbc8a229e3907c297d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -446,11 +446,25 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>mapped_file_handle</
 <p>An important concept to realise with mapped regions is that they can far exceed the size of their backing storage. This allows one to reserve address space for a file which may grow in the future. This is how <code>mapped_file_handle</code> is implemented to provide very fast memory mapped file i/o of a potentially growing file.</p>
 <p>The size you specify when creating the map handle is the address space reservation. The map's <code>length()</code> will return the last known <b>valid</b> length of the mapped data i.e. the backing storage's length at the time of construction. This length is used by <code>read()</code> and <code>write()</code> to prevent reading and writing off the end of the mapped region. You can update this length to the backing storage's length using <code>update_map()</code> up to the reservation limit.</p>
 <p>You can attempt to modify the address space reservation after creation using <code>truncate()</code>. If successful, this will be more efficient than tearing down the map and creating a new larger map.</p>
-<dl class="section note"><dt>Note</dt><dd>On Microsoft Windows, it is not permitted to reserve address space using large pages. Any attempt to do so will fail. Note also that on that kernel, you must have granted the ability to lock memory to the user or users running the process for large page support to be made available to that process and user. Finally, as of Windows 10 1803, using large pages in file backed memory maps is not supported. If a future kernel changes this, the existing code should "just work".</dd></dl>
 <p>The native handle returned by this map handle is always that of the backing storage, but closing this handle does not close that of the backing storage, nor does releasing this handle release that of the backing storage. Locking byte ranges of this handle is therefore equal to locking byte ranges in the original backing storage, which can be very useful.</p>
 <h2>Barriers:</h2>
 <p><code>map_handle</code>, because it implements <code>io_handle</code>, implements <code>barrier()</code> in a very conservative way to account for OS differences i.e. it calls <code>msync()</code>, and then the <code>barrier()</code> implementation for the backing file (probably <code>fsync()</code> or equivalent on most platforms, which synchronises the entire file).</p>
 <p>This is vast overkill if you are using non-volatile RAM, so a special <em>inlined</em> <code>barrier()</code> implementation taking a single buffer and no other arguments is also provided. This calls the appropriate architecture-specific instructions to cause the CPU to write all preceding writes out of the write buffers and CPU caches to main memory, so for Intel CPUs this would be <code>CLWB &lt;each cache line&gt;; SFENCE;</code>. As this is inlined, it ought to produce optimal code. If your CPU does not support the requisite instructions (or LLFIO has not added support), and empty buffer will be returned to indicate that nothing was barriered, same as the normal <code>barrier()</code> function.</p>
+<h2>Large page support:</h2>
+<p>Large, huge, massive and super page support is available via the <code>section_handle::flag::page_sizes_N</code> flags. Use these in combination with <code>utils::page_size()</code> to request allocations or maps which use different page sizes.</p>
+<h3>Windows:</h3>
+<p>Firstly, explicit large page support is only available to processes and logged in users who have been assigned the <code>SeLockMemoryPrivilege</code>. A default Windows installation assigns that privilege to nothing, so explicit action will need to be taken to assign that privilege per Windows installation.</p>
+<p>Secondly, as of Windows 10 1803, there is the large page size or the normal page size. There isn't (useful) support for pages of any other size, as there is on other systems.</p>
+<p>For allocating memory, large page allocation can randomly fail depending on what the system is feeling like, same as on all the other operating systems. It is not permitted to reserve address space using large pages.</p>
+<p>For mapping files, large page maps do not work as of Windows 10 1803 (curiously, ReactOS <em>does</em> implement this). There is a big exception to this, which is for DAX formatted NTFS volumes with a formatted cluster size of the large page size, where if you map in large page sized multiples, the Windows kernel uses large pages (and one need not hold <code>SeLockMemoryPrivilege</code> either). Therefore, if you specify <code>section_handle::flag::nvram</code> with a <code>section_handle::flag::page_sizes_N</code>, LLFIO does not ask for large pages which would fail, it merely rounds all requests up to the nearest large page multiple.</p>
+<h3>Linux:</h3>
+<p>As usual on Linux, large page (often called huge page on Linux) support comes in many forms.</p>
+<p>Explicit support is via <code>MAP_HUGETLB</code> to <code>mmap()</code>, and whether an explicit request succeeds or not is up to how many huge pages were configured into the running system via boot-time kernel parameters, and how many huge pages are in use already. For most recent kernels on most distributions, explicit memory allocation requests using large pages generally works without issue. As of Linux kernel 4.18, mapping files using large pages only works on <code>tmpfs</code>, this corresponds to <code>path_discovery::memory_backed_temporary_files_directory()</code> sourced anonymous section handles. Work is proceeding well for the major Linux filing systems to become able to map files using large pages soon, and in theory LLFIO based should "just work" on such a newer kernel.</p>
+<p>Note that many distributions enable transparent huge pages, whereby if you request allocations of large page multiples at large page offsets, the kernel uses large pages, without you needing to specify any <code>section_handle::flag::page_sizes_N</code>.</p>
+<h3>FreeBSD:</h3>
+<p>FreeBSD has no support for failing if large pages cannot be used for a specific <code>mmap()</code>. The best you can do is to ask for large pages, and you may or may not get them depending on available system resources, filing system in use, etc. LLFIO does not check returned maps to discover if large pages were actually used, that is on end user code to check if it really needs to know.</p>
+<h3>MacOS:</h3>
+<p>MacOS only supports large pages for memory allocations, not for mapping files. It fails if large pages could not be used when a large page allocation was requested.</p>
 <dl class="section see"><dt>See also</dt><dd><code>mapped_file_handle</code>, <code>algorithm::mapped_span</code> </dd></dl>
 </div><h2 class="groupheader">Member Enumeration Documentation</h2>
 <a id="a5929f46f42112bd805ab5001bfbf9d2a"></a>
@@ -521,54 +535,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>mapped_file_handle</
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a55ac4e0146703e646a34053cfb440d9b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a55ac4e0146703e646a34053cfb440d9b">&#9670;&nbsp;</a></span>barrier() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html">const_buffer_type</a> llfio_v2_xxx::map_handle::barrier </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html">const_buffer_type</a>&#160;</td>
-          <td class="paramname"><em>req</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>evict</em> = <code>false</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Lightweight inlined barrier which causes the CPU to write out all buffered writes and dirty cache lines in the request to main memory. </p><dl class="section return"><dt>Returns</dt><dd>The cache lines actually barriered. This may be empty. This function does not return an error. </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">req</td><td>The range of cache lines to write barrier. </td></tr>
-    <tr><td class="paramname">evict</td><td>Whether to also evict the cache lines from CPU caches, useful if they will not be used again.</td></tr>
-  </table>
-  </dd>
-</dl>
-<p>Upon return, one knows that memory in the returned buffer has been barriered (it may be empty if there is no support for this operation in LLFIO, or if the current CPU does not support this operation). You may find the <code>is_nvram()</code> observer of particular use here. </p>
-<div class="fragment"><div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;  {</div><div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;    <span class="keyword">auto</span> *tp = (<a class="code" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a56b1347a75286b1b21af8082faacabb7">const_buffer_type::pointer</a>)(((uintptr_t) req.data()) &amp; 31);</div><div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;    const_buffer_type ret{tp, (size_t)(req.data() + req.size() - tp)};</div><div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;    <span class="keywordflow">for</span>(<a class="code" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a56b1347a75286b1b21af8082faacabb7">const_buffer_type::pointer</a> addr = ret.data(); addr &lt; ret.data() + ret.size(); addr += 32)</div><div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;    {</div><div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;      <span class="comment">// Slightly UB ...</span></div><div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;      <span class="keyword">auto</span> *p = <span class="keyword">reinterpret_cast&lt;</span><span class="keyword">const </span>persistent&lt;byte&gt; *<span class="keyword">&gt;</span>(addr);</div><div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;      <span class="keywordflow">if</span>(memory_flush_none == p-&gt;flush(evict ? memory_flush_evict : memory_flush_retain))</div><div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;      {</div><div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;        ret = {tp, 0};</div><div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;        <span class="keywordflow">break</span>;</div><div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;      }</div><div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;    }</div><div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;    <span class="keywordflow">return</span> ret;</div><div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;  }</div><div class="ttc" id="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type_html_a56b1347a75286b1b21af8082faacabb7"><div class="ttname"><a href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a56b1347a75286b1b21af8082faacabb7">llfio_v2_xxx::io_handle::const_buffer_type::pointer</a></div><div class="ttdeci">const byte * pointer</div><div class="ttdoc">Type of the pointer to memory. </div><div class="ttdef"><b>Definition:</b> io_handle.hpp:109</div></div>
-</div><!-- fragment -->
-</div>
-</div>
 <a id="aa3ec366f663f85fb4d679542b8c1b41a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa3ec366f663f85fb4d679542b8c1b41a">&#9670;&nbsp;</a></span>barrier() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3ec366f663f85fb4d679542b8c1b41a">&#9670;&nbsp;</a></span>barrier() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -632,6 +600,52 @@ For portability, you can only assume that barriers write order for a single hand
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX fdatasync() or Windows NtFlushBuffersFileEx() can return. </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>None. </dd></dl>
 
+</div>
+</div>
+<a id="a55ac4e0146703e646a34053cfb440d9b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a55ac4e0146703e646a34053cfb440d9b">&#9670;&nbsp;</a></span>barrier() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html">const_buffer_type</a> llfio_v2_xxx::map_handle::barrier </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html">const_buffer_type</a>&#160;</td>
+          <td class="paramname"><em>req</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>evict</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Lightweight inlined barrier which causes the CPU to write out all buffered writes and dirty cache lines in the request to main memory. </p><dl class="section return"><dt>Returns</dt><dd>The cache lines actually barriered. This may be empty. This function does not return an error. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">req</td><td>The range of cache lines to write barrier. </td></tr>
+    <tr><td class="paramname">evict</td><td>Whether to also evict the cache lines from CPU caches, useful if they will not be used again.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Upon return, one knows that memory in the returned buffer has been barriered (it may be empty if there is no support for this operation in LLFIO, or if the current CPU does not support this operation). You may find the <code>is_nvram()</code> observer of particular use here. </p>
+<div class="fragment"><div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;  {</div><div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;    <span class="keyword">auto</span> *tp = (<a class="code" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a56b1347a75286b1b21af8082faacabb7">const_buffer_type::pointer</a>)(((uintptr_t) req.data()) &amp; 31);</div><div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;    const_buffer_type ret{tp, (size_t)(req.data() + req.size() - tp)};</div><div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;    <span class="keywordflow">for</span>(<a class="code" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a56b1347a75286b1b21af8082faacabb7">const_buffer_type::pointer</a> addr = ret.data(); addr &lt; ret.data() + ret.size(); addr += 32)</div><div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;    {</div><div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;      <span class="comment">// Slightly UB ...</span></div><div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;      <span class="keyword">auto</span> *p = <span class="keyword">reinterpret_cast&lt;</span><span class="keyword">const </span>persistent&lt;byte&gt; *<span class="keyword">&gt;</span>(addr);</div><div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;      <span class="keywordflow">if</span>(memory_flush_none == p-&gt;flush(evict ? memory_flush_evict : memory_flush_retain))</div><div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;      {</div><div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;        ret = {tp, 0};</div><div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;        <span class="keywordflow">break</span>;</div><div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;      }</div><div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;    }</div><div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;    <span class="keywordflow">return</span> ret;</div><div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;  }</div><div class="ttc" id="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type_html_a56b1347a75286b1b21af8082faacabb7"><div class="ttname"><a href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a56b1347a75286b1b21af8082faacabb7">llfio_v2_xxx::io_handle::const_buffer_type::pointer</a></div><div class="ttdeci">const byte * pointer</div><div class="ttdoc">Type of the pointer to memory. </div><div class="ttdef"><b>Definition:</b> io_handle.hpp:109</div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="aeea4389189021b94dde6d8f2c3ccc5b3"></a>
@@ -969,7 +983,7 @@ For portability, you can only assume that barriers write order for a single hand
     <tr><td class="paramname">section</td><td>A memory section handle specifying the backing storage to use. </td></tr>
     <tr><td class="paramname">bytes</td><td>How many bytes to reserve (0 = the size of the section). Rounded up to nearest 64Kb on Windows. </td></tr>
     <tr><td class="paramname">offset</td><td>The offset into the backing storage to map from. Typically needs to be at least a multiple of the page size (see <code>page_size()</code>), on Windows it needs to be a multiple of the kernel memory allocation granularity (typically 64Kb). </td></tr>
-    <tr><td class="paramname">_flag</td><td>The permissions with which to map the view which are constrained by the permissions of the memory section. <code>flag::none</code> can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.</td></tr>
+    <tr><td class="paramname">_flag</td><td>The permissions with which to map the view which are constrained by the permissions of the memory section. <code>flag::none</code> can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory. Note that apart from read/write/cow/execute, the section's flags override the map's flags.</td></tr>
   </table>
   </dd>
 </dl>
@@ -1031,7 +1045,7 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;  {</div><div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;    OUTCOME_TRY(ret, <a class="code" href="classllfio__v2__xxx_1_1map__handle.html#a25dcce3a7127c5552687c540c37b9f27">prefetch</a>(span&lt;buffer_type&gt;(&amp;region, 1)));</div><div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;    <span class="keywordflow">return</span> *ret.data();</div><div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1map__handle_html_a25dcce3a7127c5552687c540c37b9f27"><div class="ttname"><a href="classllfio__v2__xxx_1_1map__handle.html#a25dcce3a7127c5552687c540c37b9f27">llfio_v2_xxx::map_handle::prefetch</a></div><div class="ttdeci">static result&lt; span&lt; buffer_type &gt; &gt; prefetch(span&lt; buffer_type &gt; regions) noexcept</div><div class="ttdoc">Ask the system to begin to asynchronously prefetch the span of memory regions given, returning the regions actually prefetched. Note that on Windows 7 or earlier the system call to implement this was not available, and so you will see an empty span returned. </div></div>
+<div class="fragment"><div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;  {</div><div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;    OUTCOME_TRY(ret, <a class="code" href="classllfio__v2__xxx_1_1map__handle.html#a25dcce3a7127c5552687c540c37b9f27">prefetch</a>(span&lt;buffer_type&gt;(&amp;region, 1)));</div><div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;    <span class="keywordflow">return</span> *ret.data();</div><div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1map__handle_html_a25dcce3a7127c5552687c540c37b9f27"><div class="ttname"><a href="classllfio__v2__xxx_1_1map__handle.html#a25dcce3a7127c5552687c540c37b9f27">llfio_v2_xxx::map_handle::prefetch</a></div><div class="ttdeci">static result&lt; span&lt; buffer_type &gt; &gt; prefetch(span&lt; buffer_type &gt; regions) noexcept</div><div class="ttdoc">Ask the system to begin to asynchronously prefetch the span of memory regions given, returning the regions actually prefetched. Note that on Windows 7 or earlier the system call to implement this was not available, and so you will see an empty span returned. </div></div>
 </div><!-- fragment -->
 </div>
 </div>
