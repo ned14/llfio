@@ -50,6 +50,7 @@ namespace utils
   */
   template <class T> inline T round_down_to_page_size(T i, size_t pagesize) noexcept
   {
+    assert(pagesize > 0);
     i = (T)(LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i) & ~(pagesize - 1));  // NOLINT
     return i;
   }
@@ -57,6 +58,7 @@ namespace utils
   */
   template <class T> inline T round_up_to_page_size(T i, size_t pagesize) noexcept
   {
+    assert(pagesize > 0);
     i = (T)((LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i) + pagesize - 1) & ~(pagesize - 1));  // NOLINT
     return i;
   }
@@ -65,6 +67,7 @@ namespace utils
   */
   template <class T> inline T round_to_page_size(T i, size_t pagesize) noexcept
   {
+    assert(pagesize > 0);
     i = {reinterpret_cast<byte *>((LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i.data())) & ~(pagesize - 1)), (i.size() + pagesize - 1) & ~(pagesize - 1)};
     return i;
   }
