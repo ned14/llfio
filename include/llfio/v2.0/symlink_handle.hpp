@@ -85,7 +85,7 @@ class LLFIO_DECL symlink_handle : public handle, public fs_handle
 
 #ifndef _WIN32
   friend result<void> detail::stat_from_symlink(struct stat &s, const handle &h) noexcept;
-  result<void> _create_symlink(const path_handle &dirh, const handle::path_type &filename, path_view target, deadline d, bool atomic_replace) noexcept;
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> _create_symlink(const path_handle &dirh, const handle::path_type &filename, path_view target, deadline d, bool atomic_replace) noexcept;
 #endif
 
 public:

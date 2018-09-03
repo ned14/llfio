@@ -47,7 +47,7 @@ namespace detail
   }
 }
 
-result<void> symlink_handle::_create_symlink(const path_handle &dirh, const handle::path_type &filename, path_view target, deadline d, bool atomic_replace) noexcept
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> symlink_handle::_create_symlink(const path_handle &dirh, const handle::path_type &filename, path_view target, deadline d, bool atomic_replace) noexcept
 {
   std::chrono::steady_clock::time_point began_steady;
   std::chrono::system_clock::time_point end_utc;

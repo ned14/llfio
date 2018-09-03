@@ -41,3 +41,7 @@ make_program(benchmark-iostreams llfio::hl)
 make_program(benchmark-locking llfio::hl)
 make_program(fs-probe llfio::hl)
 make_program(key-value-store llfio::hl)
+
+if(NOT WIN32)
+  add_subdirectory(collision-check)
+endif()

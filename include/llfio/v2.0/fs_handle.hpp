@@ -197,7 +197,7 @@ public:
 
 namespace detail
 {
-  extern LLFIO_DECL result<path_handle> containing_directory(optional<std::reference_wrapper<filesystem::path>> out_filename, const handle &h, const fs_handle &fsh, deadline d) noexcept;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<path_handle> containing_directory(optional<std::reference_wrapper<filesystem::path>> out_filename, const handle &h, const fs_handle &fsh, deadline d) noexcept;
 }
 
 // BEGIN make_free_functions.py

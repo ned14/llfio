@@ -305,20 +305,6 @@ public:
   */
   LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept;
-  //! \overload
-  LLFIO_MAKE_FREE_FUNCTION
-  io_result<size_type> read(extent_type offset, std::initializer_list<buffer_type> lst, deadline d = deadline()) noexcept
-  {
-    buffer_type *_reqs = reinterpret_cast<buffer_type *>(alloca(sizeof(buffer_type) * lst.size()));
-    memcpy(_reqs, lst.begin(), sizeof(buffer_type) * lst.size());
-    io_request<buffers_type> reqs(buffers_type(_reqs, lst.size()), offset);
-    auto ret = read(reqs, d);
-    if(ret)
-    {
-      return ret.bytes_transferred();
-    }
-    return ret.error();
-  }
 
   /*! \brief Write data to the open handle.
 
@@ -568,11 +554,6 @@ The asynchronous implementation in async_file_handle performs one calloc and one
 inline io_handle::io_result<io_handle::buffers_type> read(io_handle &self, io_handle::io_request<io_handle::buffers_type> reqs, deadline d = deadline()) noexcept
 {
   return self.read(std::forward<decltype(reqs)>(reqs), std::forward<decltype(d)>(d));
-}
-//! \overload
-inline io_handle::io_result<io_handle::size_type> read(io_handle &self, io_handle::extent_type offset, std::initializer_list<io_handle::buffer_type> lst, deadline d = deadline()) noexcept
-{
-  return self.read(std::forward<decltype(offset)>(offset), std::forward<decltype(lst)>(lst), std::forward<decltype(d)>(d));
 }
 /*! \brief Write data to the open handle.
 
