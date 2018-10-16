@@ -153,6 +153,12 @@ namespace utils
   */
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<void> drop_filesystem_cache() noexcept;
 
+#ifndef _WIN32
+  /*! \brief Returns true if this POSIX is running under Microsoft's Subsystem for Linux.
+  */
+  LLFIO_HEADERS_ONLY_FUNC_SPEC bool running_under_wsl() noexcept;
+#endif
+
   namespace detail
   {
     struct large_page_allocation

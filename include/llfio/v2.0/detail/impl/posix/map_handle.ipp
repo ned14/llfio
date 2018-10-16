@@ -158,8 +158,8 @@ result<void> map_handle::close() noexcept
     {
       OUTCOME_TRYV(map_handle::barrier({}, true, false));
     }
-    // printf("%d munmap %p-%p\n", getpid(), _addr, _addr+_length);
-    if(-1 == ::munmap(_addr, _length))
+    // printf("%d munmap %p-%p\n", getpid(), _addr, _addr+_reservation);
+    if(-1 == ::munmap(_addr, _reservation))
     {
       return posix_error();
     }
@@ -376,6 +376,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   return ret;
 }
 
+// Change the address reservation for this map
 result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permit_relocation) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
@@ -390,9 +391,10 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
   {
     return success();
   }
+  // If wiping the map ...
   if(newsize == 0)
   {
-    if(-1 == ::munmap(_addr, _length))
+    if(-1 == ::munmap(_addr, _reservation))
     {
       return posix_error();
     }
@@ -401,6 +403,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
     _length = 0;
     return 0;
   }
+  // If not mapped yet ...
   if(_addr == nullptr)
   {
     OUTCOME_TRY(addr, do_mmap(_v, nullptr, 0, _section, _pagesize, newsize, _offset, _flag));
@@ -421,7 +424,8 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
   _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
   return newsize;
 #else
-  if(newsize > _length)
+  // Try to expand reservation in place
+  if(newsize > _reservation)
   {
 #if defined(MAP_EXCL)  // BSD type systems
     byte *addrafter = _addr + _reservation;
@@ -447,7 +451,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
 #endif
   }
   // Shrink the map
-  if(-1 == ::munmap(_addr + newsize, _length - newsize))
+  if(-1 == ::munmap(_addr + newsize, _reservation - newsize))
   {
     return posix_error();
   }
@@ -613,7 +617,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
                                                        [&](const QUICKCPPLIB_NAMESPACE::signal_guard::raised_signal_info &_info) {
                                                          auto &info = const_cast<QUICKCPPLIB_NAMESPACE::signal_guard::raised_signal_info &>(_info);
                                                          auto *causingaddr = (byte *) info.address();
-                                                         if(causingaddr < _addr || causingaddr >= (_addr + _length))
+                                                         if(causingaddr < _addr || causingaddr >= (_addr + _reservation))
                                                          {
                                                            // Not caused by this map
                                                            QUICKCPPLIB_NAMESPACE::signal_guard::thread_local_raise_signal(info.signal(), info.raw_info(), info.raw_context());

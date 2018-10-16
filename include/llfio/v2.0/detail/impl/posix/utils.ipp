@@ -179,6 +179,39 @@ namespace utils
     return errc::not_supported;
   }
 
+  bool running_under_wsl() noexcept
+  {
+#ifdef __linux__
+    static int cached;
+    if(cached != 0)
+    {
+      return cached == 2;
+    }
+    int h = ::open("/proc/version", O_RDONLY | O_CLOEXEC);
+    if(h == -1)
+    {
+      cached = 1;
+      return false;
+    }
+    auto unh = undoer([&h] { ::close(h); });
+    char buffer[257];
+    ssize_t bytes = ::read(h, buffer, 256);
+    if(bytes == -1)
+    {
+      cached = 1;
+      return false;
+    }
+    buffer[bytes] = 0;
+    if(strstr(buffer, "-Microsoft (Microsoft@Microsoft.com)") != nullptr)
+    {
+      cached = 2;
+      return true;
+    }
+    cached = 1;
+#endif
+    return false;
+  }
+
   namespace detail
   {
     large_page_allocation allocate_large_pages(size_t bytes)

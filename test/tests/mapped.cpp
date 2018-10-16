@@ -65,6 +65,9 @@ static inline void TestMappedView2()
   using namespace LLFIO_V2_NAMESPACE;
   using LLFIO_V2_NAMESPACE::file_handle;
   using LLFIO_V2_NAMESPACE::byte;
+#ifndef _WIN32
+  std::cout << "NOTE: utils::running_under_wsl() = " << utils::running_under_wsl() << std::endl;
+#endif
   {
     std::error_code ec;
     filesystem::remove("testfile", ec);
@@ -99,6 +102,11 @@ static inline void TestMappedView2()
   BOOST_CHECK(v1.size() == 2 * 1024 * 1024 / sizeof(int));
   BOOST_CHECK(v1[0] == 78);
   BOOST_CHECK(v1[9999] == 79);
+  // Microsoft WSL hasn't implemented the shrinking of open maps yet
+  if(utils::running_under_wsl())
+  {
+    return;
+  }
   mfh.truncate(1 * sizeof(int)).value();
   BOOST_CHECK(mfh.address() != nullptr);
   v1 = map_view<int>(mfh);
