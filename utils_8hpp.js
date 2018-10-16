@@ -17,5 +17,6 @@ var utils_8hpp =
     [ "random_string", "utils_8hpp.html#a6a29cf29a4b097411f6c1e5274bfb417", null ],
     [ "round_down_to_page_size", "utils_8hpp.html#a5499feaf6b774e774a26e7decd11e3fa", null ],
     [ "round_to_page_size", "utils_8hpp.html#afa36e8bc2a1f004696c09d104e23d685", null ],
-    [ "round_up_to_page_size", "utils_8hpp.html#a67f8f31f6b93293a22a4b30d686eb3af", null ]
+    [ "round_up_to_page_size", "utils_8hpp.html#a67f8f31f6b93293a22a4b30d686eb3af", null ],
+    [ "running_under_wsl", "utils_8hpp.html#a7aae80908cc5521ef67234152c5c5044", null ]
 ];
