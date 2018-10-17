@@ -205,7 +205,7 @@ namespace algorithm
         {
           if(lockresult.error() != errc::timed_out)
           {
-            return lockresult.error();
+            return std::move(lockresult).error();
           }
           // Somebody else is also using this file
         }

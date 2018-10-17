@@ -36,7 +36,7 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   optional<io_result<const_buffers_type>> ret;
-  OUTCOME_TRY(io_state, async_barrier(reqs, [&ret](async_file_handle *, io_result<const_buffers_type> &result) { ret = result; }, wait_for_device, and_metadata));
+  OUTCOME_TRY(io_state, async_barrier(reqs, [&ret](async_file_handle *, io_result<const_buffers_type> &&result) { ret = std::move(result); }, wait_for_device, and_metadata));
   (void) io_state;
 
   // While i/o is not done pump i/o completion
@@ -46,7 +46,7 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
     // If i/o service pump failed or timed out, cancel outstanding i/o and return
     if(!t)
     {
-      return t.error();
+      return std::move(t).error();
     }
 #ifndef NDEBUG
     if(!ret && t && !t.value())
@@ -56,7 +56,7 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
     }
 #endif
   }
-  return *ret;
+  return std::move(*ret);
 }
 
 template <class BuffersType, class IORoutine> result<async_file_handle::io_state_ptr> async_file_handle::_begin_io(span<char> mem, async_file_handle::operation_t operation, async_file_handle::io_request<BuffersType> reqs, async_file_handle::_erased_completion_handler &&completion, IORoutine && /*unused*/) noexcept
@@ -328,7 +328,7 @@ async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle:
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   optional<io_result<buffers_type>> ret;
-  OUTCOME_TRY(io_state, async_read(reqs, [&ret](async_file_handle *, io_result<buffers_type> &result) { ret = result; }));
+  OUTCOME_TRY(io_state, async_read(reqs, [&ret](async_file_handle *, io_result<buffers_type> &&result) { ret = std::move(result); }));
   (void) io_state;
 
   // While i/o is not done pump i/o completion
@@ -338,7 +338,7 @@ async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle:
     // If i/o service pump failed or timed out, cancel outstanding i/o and return
     if(!t)
     {
-      return t.error();
+      return std::move(t).error();
     }
 #ifndef NDEBUG
     if(!ret && t && !t.value())
@@ -348,14 +348,14 @@ async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle:
     }
 #endif
   }
-  return *ret;
+  return std::move(*ret);
 }
 
 async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_handle::write(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   optional<io_result<const_buffers_type>> ret;
-  OUTCOME_TRY(io_state, async_write(reqs, [&ret](async_file_handle *, io_result<const_buffers_type> &result) { ret = result; }));
+  OUTCOME_TRY(io_state, async_write(reqs, [&ret](async_file_handle *, io_result<const_buffers_type> &&result) { ret = std::move(result); }));
   (void) io_state;
 
   // While i/o is not done pump i/o completion
@@ -365,7 +365,7 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
     // If i/o service pump failed or timed out, cancel outstanding i/o and return
     if(!t)
     {
-      return t.error();
+      return std::move(t).error();
     }
 #ifndef NDEBUG
     if(!ret && t && !t.value())
@@ -375,7 +375,7 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
     }
 #endif
   }
-  return *ret;
+  return std::move(*ret);
 }
 
 LLFIO_V2_NAMESPACE_END

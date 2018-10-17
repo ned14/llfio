@@ -216,10 +216,15 @@ public:
     io_result() = default;
 #endif
     ~io_result() = default;
-    io_result(const io_result &) = default;
-    io_result(io_result &&) = default;  // NOLINT
-    io_result &operator=(const io_result &) = default;
     io_result &operator=(io_result &&) = default;  // NOLINT
+#if LLFIO_EXPERIMENTAL_STATUS_CODE
+    io_result(const io_result &) = delete;
+    io_result &operator=(const io_result &) = delete;
+#else
+    io_result(const io_result &) = default;
+    io_result &operator=(const io_result &) = default;
+#endif
+    io_result(io_result &&) = default;  // NOLINT
     //! Returns bytes transferred
     size_type bytes_transferred() noexcept
     {
@@ -234,7 +239,7 @@ public:
       return _bytes_transferred;
     }
   };
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !LLFIO_EXPERIMENTAL_STATUS_CODE
   // Is trivial in all ways, except default constructibility
   static_assert(std::is_trivially_copyable<io_result<buffers_type>>::value, "io_result<buffers_type> is not trivially copyable!");
 // static_assert(std::is_trivially_assignable<io_result<buffers_type>, io_result<buffers_type>>::value, "io_result<buffers_type> is not trivially assignable!");
@@ -341,7 +346,7 @@ public:
     {
       return ret.bytes_transferred();
     }
-    return ret.error();
+    return std::move(ret).error();
   }
 
   /*! \brief Issue a write reordering barrier such that writes preceding the barrier will reach storage

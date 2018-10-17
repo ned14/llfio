@@ -38,7 +38,7 @@ template <class U> inline void map_handle_create_close_(U &&f)
 
   // clang-format off
   static const auto permuter(st_permute_parameters<
-    result<void>,                               
+    il_result<void>,                               
     parameters<                              
       typename map_handle::size_type,
       typename section_handle::flag

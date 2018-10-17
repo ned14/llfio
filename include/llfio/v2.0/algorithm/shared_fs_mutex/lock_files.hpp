@@ -174,7 +174,7 @@ namespace algorithm
                 const auto &ec = ret.error();
                 if(ec != errc::resource_unavailable_try_again && ec != errc::file_exists)
                 {
-                  return ret.error();
+                  return std::move(ret).error();
                 }
                 // Collided with another locker
                 was_contended = n;

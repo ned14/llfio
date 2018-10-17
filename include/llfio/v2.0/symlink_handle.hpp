@@ -348,7 +348,7 @@ public:
         // File may have already been deleted, if so ignore
         if(ret.error() != errc::no_such_file_or_directory)
         {
-          return ret.error();
+          return std::move(ret).error();
         }
       }
     }

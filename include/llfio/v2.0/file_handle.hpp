@@ -204,7 +204,7 @@ public:
         // File may have already been deleted, if so ignore
         if(ret.error() != errc::no_such_file_or_directory)
         {
-          return ret.error();
+          return std::move(ret).error();
         }
       }
     }
@@ -232,7 +232,7 @@ public:
   \mallocs On POSIX if changing the mode, we must loop calling `current_path()` and
   trying to open the path returned. Thus many allocations may occur.
   */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
+  result<file_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
 
   //! The i/o service this handle is attached to, if any
   io_service *service() const noexcept { return _service; }
@@ -250,7 +250,7 @@ public:
     {
       return ret.bytes_transferred();
     }
-    return ret.error();
+    return std::move(ret).error();
   }
 
   /*! Return the current maximum permitted extent of the file.

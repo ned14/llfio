@@ -308,7 +308,7 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
     {
       if(fh.error() != errc::no_such_file_or_directory)
       {
-        return fh.error();
+        return std::move(fh).error();
       }
     }
     // Check timeout

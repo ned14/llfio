@@ -251,7 +251,7 @@ result<void> fs_handle::unlink(deadline d) noexcept
         }
         else
         {
-          return out.error();
+          return std::move(out).error();
         }
       }
     }

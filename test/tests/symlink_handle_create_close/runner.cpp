@@ -29,16 +29,16 @@ template <class U> inline void symlink_handle_create_close_creation(U &&f)
   using namespace KERNELTEST_V1_NAMESPACE;
   using LLFIO_V2_NAMESPACE::result;
   using symlink_handle = LLFIO_V2_NAMESPACE::symlink_handle;
-  static const result<void> no_such_file_or_directory = LLFIO_V2_NAMESPACE::errc::no_such_file_or_directory;
-  static const result<void> file_exists = LLFIO_V2_NAMESPACE::errc::file_exists;
-  static const result<void> function_not_supported = LLFIO_V2_NAMESPACE::errc::function_not_supported;
-  static const result<void> permission_denied = LLFIO_V2_NAMESPACE::errc::permission_denied;
+  static const il_result<void> no_such_file_or_directory = LLFIO_V2_NAMESPACE::errc::no_such_file_or_directory;
+  static const il_result<void> file_exists = LLFIO_V2_NAMESPACE::errc::file_exists;
+  static const il_result<void> function_not_supported = LLFIO_V2_NAMESPACE::errc::function_not_supported;
+  static const il_result<void> permission_denied = LLFIO_V2_NAMESPACE::errc::permission_denied;
 
   assert(file_exists.error() == LLFIO_V2_NAMESPACE::errc::file_exists);
 
   // clang-format off
   static const auto permuter(mt_permute_parameters<
-    result<void>,                                  
+    il_result<void>,                                  
     parameters<                                    
       typename symlink_handle::mode,
       typename symlink_handle::creation,

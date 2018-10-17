@@ -38,7 +38,7 @@ template <class U> inline void directory_handle_enumerate_(U &&f)
 
   // clang-format off
   static const auto permuter(mt_permute_parameters<
-    result<void>,
+    il_result<void>,
     parameters<                              
       LLFIO_V2_NAMESPACE::span<directory_entry> *,
       path_view,

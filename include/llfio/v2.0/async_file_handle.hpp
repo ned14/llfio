@@ -225,7 +225,7 @@ public:
     ret._service = &service;
     return std::move(ret);
   }
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept override
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept
   {
     OUTCOME_TRY(v, file_handle::clone(mode_, caching_, d));
     async_file_handle ret(std::move(v));
@@ -265,6 +265,7 @@ protected:
           : read(buffers_type())
       {
       }
+      ~result_storage() { /* needed as io_result is move-only when configured with status code */}
     } result;
     constexpr _erased_io_state_type(async_file_handle *_parent, operation_t _operation, bool _must_deallocate_self, size_t _items)
         : parent(_parent)
@@ -376,7 +377,7 @@ public:
   erased completion handler of unknown type and state per buffers input.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  template <class CompletionRoutine>                                                                                           //
+  template <class CompletionRoutine>                                                                                            //
   LLFIO_REQUIRES(detail::is_invocable_r<void, CompletionRoutine, async_file_handle *, io_result<const_buffers_type> &>::value)  //
   result<io_state_ptr> async_barrier(io_request<const_buffers_type> reqs, CompletionRoutine &&completion, bool wait_for_device = false, bool and_metadata = false, span<char> mem = {}) noexcept
   {
@@ -394,7 +395,7 @@ public:
         auto *dest = reinterpret_cast<void *>(_dest);
         new(dest) completion_handler(std::move(*this));
       }
-      void operator()(_erased_io_state_type *state) final { completion(state->parent, state->result.write); }
+      void operator()(_erased_io_state_type *state) final { completion(state->parent, std::move(state->result.write)); }
       void *address() noexcept final { return &completion; }
     } ch{std::forward<CompletionRoutine>(completion)};
     operation_t operation = operation_t::fsync_sync;
@@ -423,7 +424,7 @@ public:
 
   \return Either an io_state_ptr to the i/o in progress, or an error code.
   \param reqs A scatter-gather and offset request.
-  \param completion A callable to call upon i/o completion. Spec is `void(async_file_handle *, io_result<buffers_type> &)`.
+  \param completion A callable to call upon i/o completion. Spec is `void(async_file_handle *, io_result<buffers_type> &&)`.
   Note that buffers returned may not be buffers input, see documentation for `read()`.
   \param mem Optional span of memory to use to avoid using `calloc()`. Note span MUST be all bits zero on entry.
   \errors As for `read()`, plus `ENOMEM`.
@@ -431,7 +432,7 @@ public:
   erased completion handler of unknown type and state per buffers input.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  template <class CompletionRoutine>                                                                                     //
+  template <class CompletionRoutine>                                                                                      //
   LLFIO_REQUIRES(detail::is_invocable_r<void, CompletionRoutine, async_file_handle *, io_result<buffers_type> &>::value)  //
   result<io_state_ptr> async_read(io_request<buffers_type> reqs, CompletionRoutine &&completion, span<char> mem = {}) noexcept
   {
@@ -449,7 +450,7 @@ public:
         auto *dest = reinterpret_cast<void *>(_dest);
         new(dest) completion_handler(std::move(*this));
       }
-      void operator()(_erased_io_state_type *state) final { completion(state->parent, state->result.read); }
+      void operator()(_erased_io_state_type *state) final { completion(state->parent, std::move(state->result.read)); }
       void *address() noexcept final { return &completion; }
     } ch{std::forward<CompletionRoutine>(completion)};
     return _begin_io(mem, operation_t::read, io_request<const_buffers_type>({reinterpret_cast<const_buffer_type *>(reqs.buffers.data()), reqs.buffers.size()}, reqs.offset), std::move(ch));
@@ -466,7 +467,7 @@ public:
 
   \return Either an io_state_ptr to the i/o in progress, or an error code.
   \param reqs A scatter-gather and offset request.
-  \param completion A callable to call upon i/o completion. Spec is `void(async_file_handle *, io_result<const_buffers_type> &)`.
+  \param completion A callable to call upon i/o completion. Spec is `void(async_file_handle *, io_result<const_buffers_type> &&)`.
   Note that buffers returned may not be buffers input, see documentation for `write()`.
   \param mem Optional span of memory to use to avoid using `calloc()`. Note span MUST be all bits zero on entry.
   \errors As for `write()`, plus `ENOMEM`.
@@ -474,7 +475,7 @@ public:
   erased completion handler of unknown type and state per buffers input.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  template <class CompletionRoutine>                                                                                           //
+  template <class CompletionRoutine>                                                                                            //
   LLFIO_REQUIRES(detail::is_invocable_r<void, CompletionRoutine, async_file_handle *, io_result<const_buffers_type> &>::value)  //
   result<io_state_ptr> async_write(io_request<const_buffers_type> reqs, CompletionRoutine &&completion, span<char> mem = {}) noexcept
   {
@@ -492,7 +493,7 @@ public:
         auto *dest = reinterpret_cast<void *>(_dest);
         new(dest) completion_handler(std::move(*this));
       }
-      void operator()(_erased_io_state_type *state) final { completion(state->parent, state->result.write); }
+      void operator()(_erased_io_state_type *state) final { completion(state->parent, std::move(state->result.write)); }
       void *address() noexcept final { return &completion; }
     } ch{std::forward<CompletionRoutine>(completion)};
     return _begin_io(mem, operation_t::write, reqs, std::move(ch));
@@ -512,7 +513,7 @@ private:
     optional<io_result<BuffersType>> _result;
 
     // Called on completion of the i/o
-    void operator()(async_file_handle * /*unused*/, io_result<BuffersType> &result)
+    void operator()(async_file_handle * /*unused*/, io_result<BuffersType> &&result)
     {
       // store the result and resume the coroutine
       _result = std::move(result);

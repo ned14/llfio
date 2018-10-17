@@ -101,9 +101,9 @@ void read_entire_file2()
       auto ret = llfio::async_read( //
         fh,                                           // handle to read from
         { { scatter_req }, valid_extents[n].first },  // The scatter request buffers + offset
-        [](                                                                            // The completion handler
-          llfio::async_file_handle *,                                                   // The parent handle
-          llfio::async_file_handle::io_result<llfio::async_file_handle::buffers_type> &  // Result of the i/o
+        [](                                                                               // The completion handler
+          llfio::async_file_handle *,                                                     // The parent handle
+          llfio::async_file_handle::io_result<llfio::async_file_handle::buffers_type> &&  // Result of the i/o
           ) { /* do nothing */ }
         // default deadline is infinite
       );

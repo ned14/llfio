@@ -102,11 +102,13 @@ static inline void TestMappedView2()
   BOOST_CHECK(v1.size() == 2 * 1024 * 1024 / sizeof(int));
   BOOST_CHECK(v1[0] == 78);
   BOOST_CHECK(v1[9999] == 79);
+#ifndef _WIN32
   // Microsoft WSL hasn't implemented the shrinking of open maps yet
   if(utils::running_under_wsl())
   {
     return;
   }
+#endif
   mfh.truncate(1 * sizeof(int)).value();
   BOOST_CHECK(mfh.address() != nullptr);
   v1 = map_view<int>(mfh);

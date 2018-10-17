@@ -223,13 +223,13 @@ namespace algorithm
           {
             if(lockinuse.error() != errc::timed_out)
             {
-              return lockinuse.error();
+              return std::move(lockinuse).error();
             }
             // Somebody else is also using this file, so try to read the hash index file I ought to use
             lockinuse = ret.lock(_lockinuseoffset, 1, false);  // inuse shared access, blocking
             if(!lockinuse)
             {
-              return lockinuse.error();
+              return std::move(lockinuse).error();
             }
             byte buffer[65536];
             memset(buffer, 0, sizeof(buffer));
