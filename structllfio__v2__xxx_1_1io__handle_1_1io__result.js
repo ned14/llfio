@@ -6,7 +6,7 @@ var structllfio__v2__xxx_1_1io__handle_1_1io__result =
     [ "io_result", "structllfio__v2__xxx_1_1io__handle_1_1io__result.html#a90bee69c746e646458e0d255ce18668d", null ],
     [ "io_result", "structllfio__v2__xxx_1_1io__handle_1_1io__result.html#aea1d610bc13166971300720b194feb64", null ],
     [ "bytes_transferred", "structllfio__v2__xxx_1_1io__handle_1_1io__result.html#a58e05cc0f5fe29282c69d44e6797d41a", null ],
-    [ "operator=", "structllfio__v2__xxx_1_1io__handle_1_1io__result.html#a5a5c16b320edf9894dfc1f1f9f817d18", null ],
     [ "operator=", "structllfio__v2__xxx_1_1io__handle_1_1io__result.html#ab4cec8941a442e257aab1f0fd615a8a3", null ],
+    [ "operator=", "structllfio__v2__xxx_1_1io__handle_1_1io__result.html#a5a5c16b320edf9894dfc1f1f9f817d18", null ],
     [ "_bytes_transferred", "structllfio__v2__xxx_1_1io__handle_1_1io__result.html#a458ac6f7315d452180e7ed89f9ceba83", null ]
 ];

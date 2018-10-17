@@ -41,7 +41,7 @@ var classasync__file__handle =
     [ "_begin_io", "classasync__file__handle.html#aab74eeda06f83be56406879dda2352df", null ],
     [ "barrier", "classasync__file__handle.html#ab155660bb07642550206b9ccb4eda4e6", null ],
     [ "clone", "classasync__file__handle.html#a67326a2f1e482b6c66b0bb18b67a6826", null ],
-    [ "clone", "classasync__file__handle.html#aa388b106a798471c95a91daa40824033", null ],
+    [ "clone", "classasync__file__handle.html#a376d80d9b88014ec83c7f3377a6f7f55", null ],
     [ "co_read", "classasync__file__handle.html#a51e4032fd025d04213386ed2973fb8c7", null ],
     [ "co_read", "classasync__file__handle.html#a7d7c5be5a207988990c73e9a04dbcf45", null ],
     [ "co_write", "classasync__file__handle.html#a3189fb435df6f0beab09efbc71effc44", null ],
