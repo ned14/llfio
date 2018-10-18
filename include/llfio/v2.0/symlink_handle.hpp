@@ -134,7 +134,8 @@ public:
     //! Default constructor
     constexpr buffers_type() {}  // NOLINT
 
-    //! Constructor
+    /*! Constructor
+    */
     constexpr buffers_type(path_view link, symlink_type type = symlink_type::symbolic)
         : _link(link)
         , _type(type)
@@ -440,14 +441,11 @@ public:
 
   \return Returns the buffers filled, with its path adjusted to the bytes filled.
   \param req A buffer to fill with the contents of the symbolic link.
-  \param kernelbuffer A buffer to use for the kernel to fill. If left defaulted, a kernel buffer
-  is allocated internally and stored into `req.buffers` which needs to not be destructed until one
-  is no longer using any items within (the path returned is a view onto the original kernel data).
   \errors Any of the errors which `readlinkat()` or `DeviceIoControl()` might return, or failure
   to allocate memory if the user did not supply a kernel buffer to use, or the user supplied buffer
   was too small.
-  \mallocs If the `kernelbuffer` parameter is set on entry, no memory allocations.
-  If unset, then at least one memory allocation, possibly more is performed.
+  \mallocs If the `kernelbuffer` parameter is set in the request, no memory allocations.
+  If unset, at least one memory allocation, possibly more is performed.
   */
   LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<buffers_type> read(io_request<buffers_type> req = {}) noexcept;
