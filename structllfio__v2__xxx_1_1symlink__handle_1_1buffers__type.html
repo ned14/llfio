@@ -117,9 +117,7 @@ Public Member Functions</h2></td></tr>
 constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#a8e897069034acea0439397ea4aeb777a">buffers_type</a> ()</td></tr>
 <tr class="memdesc:a8e897069034acea0439397ea4aeb777a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
 <tr class="separator:a8e897069034acea0439397ea4aeb777a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa4d9b043e638ad6e1b592f2b93a5c9c2"><td class="memItemLeft" align="right" valign="top"><a id="aa4d9b043e638ad6e1b592f2b93a5c9c2"></a>
-constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#aa4d9b043e638ad6e1b592f2b93a5c9c2">buffers_type</a> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> link, <a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#a1908a242ca435cf1386fe96a86da4002">symlink_type</a> <a class="el" href="structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#ac44ca889e5423c1bdeb02e5bee5f645a">type</a>=<a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#a1908a242ca435cf1386fe96a86da4002a7bf46ad61adc2265f803fc3b798b3559">symlink_type::symbolic</a>)</td></tr>
-<tr class="memdesc:aa4d9b043e638ad6e1b592f2b93a5c9c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
+<tr class="memitem:aa4d9b043e638ad6e1b592f2b93a5c9c2"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#aa4d9b043e638ad6e1b592f2b93a5c9c2">buffers_type</a> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> link, <a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#a1908a242ca435cf1386fe96a86da4002">symlink_type</a> <a class="el" href="structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#ac44ca889e5423c1bdeb02e5bee5f645a">type</a>=<a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#a1908a242ca435cf1386fe96a86da4002a7bf46ad61adc2265f803fc3b798b3559">symlink_type::symbolic</a>)</td></tr>
 <tr class="separator:aa4d9b043e638ad6e1b592f2b93a5c9c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3880885ec5694a6ca77b4325a0684848"><td class="memItemLeft" align="right" valign="top"><a id="a3880885ec5694a6ca77b4325a0684848"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#a3880885ec5694a6ca77b4325a0684848">buffers_type</a> (<a class="el" href="structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html">buffers_type</a> &amp;&amp;o) noexcept</td></tr>
@@ -179,7 +177,46 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>symlink_handle</b></
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The buffers type used by this handle for reads, which is a single item sequence of <code>path_view</code>.</p>
 <dl class="section warning"><dt>Warning</dt><dd>Unless you supply your own kernel buffer, you need to keep this around as long as you use the path view, as the path is a view of the original buffer filled by the kernel and the existence of this keeps that original buffer around. </dd></dl>
-</div><hr/>The documentation for this struct was generated from the following file:<ul>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="aa4d9b043e638ad6e1b592f2b93a5c9c2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa4d9b043e638ad6e1b592f2b93a5c9c2">&#9670;&nbsp;</a></span>buffers_type()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr llfio_v2_xxx::symlink_handle::buffers_type::buffers_type </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td>
+          <td class="paramname"><em>link</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#a1908a242ca435cf1386fe96a86da4002">symlink_type</a>&#160;</td>
+          <td class="paramname"><em>type</em> = <code><a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#a1908a242ca435cf1386fe96a86da4002a7bf46ad61adc2265f803fc3b798b3559">symlink_type::symbolic</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Constructor </p>
+<div class="fragment"><div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;        : _link(link)</div><div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;        , _type(<a class="code" href="structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#ac44ca889e5423c1bdeb02e5bee5f645a">type</a>)</div><div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    {</div><div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    }</div><div class="ttc" id="structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type_html_ac44ca889e5423c1bdeb02e5bee5f645a"><div class="ttname"><a href="structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#ac44ca889e5423c1bdeb02e5bee5f645a">llfio_v2_xxx::symlink_handle::buffers_type::type</a></div><div class="ttdeci">symlink_type type() const noexcept</div><div class="ttdoc">The type of the symbolic link. </div><div class="ttdef"><b>Definition:</b> symlink_handle.hpp:180</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<hr/>The documentation for this struct was generated from the following file:<ul>
 <li>include/llfio/v2.0/<a class="el" href="symlink__handle_8hpp.html">symlink_handle.hpp</a></li>
 </ul>
 </div><!-- contents -->
