@@ -15,6 +15,7 @@ set(llfio_TESTS
   "test/tests/directory_handle_enumerate/runner.cpp"
   "test/tests/file_handle_create_close/runner.cpp"
   "test/tests/file_handle_lock_unlock.cpp"
+  "test/tests/large_pages.cpp"
   "test/tests/map_handle_create_close/runner.cpp"
   "test/tests/mapped.cpp"
   "test/tests/path_discovery.cpp"

@@ -29,27 +29,27 @@ template <class U> inline void directory_handle_create_close_creation(U &&f)
   using namespace KERNELTEST_V1_NAMESPACE;
   using LLFIO_V2_NAMESPACE::result;
   using directory_handle = LLFIO_V2_NAMESPACE::directory_handle;
-  static const result<void> no_such_file_or_directory = LLFIO_V2_NAMESPACE::errc::no_such_file_or_directory;
-  static const result<void> file_exists = LLFIO_V2_NAMESPACE::errc::file_exists;
-  static const result<void> is_a_directory = LLFIO_V2_NAMESPACE::errc::is_a_directory;
-  static const result<void> permission_denied = LLFIO_V2_NAMESPACE::errc::permission_denied;
+  static const il_result<void> no_such_file_or_directory = LLFIO_V2_NAMESPACE::errc::no_such_file_or_directory;
+  static const il_result<void> file_exists = LLFIO_V2_NAMESPACE::errc::file_exists;
+  static const il_result<void> is_a_directory = LLFIO_V2_NAMESPACE::errc::is_a_directory;
+  static const il_result<void> permission_denied = LLFIO_V2_NAMESPACE::errc::permission_denied;
 
   // clang-format off
   static typename directory_handle::buffer_type _entries[5];
   static typename directory_handle::buffers_type entries(_entries);
-  static result<typename directory_handle::enumerate_info> info(typename result<typename directory_handle::enumerate_info>::error_type{});
+  static result<typename directory_handle::buffers_type> info(typename result<typename directory_handle::buffers_type>::error_type{});
   static const auto permuter(mt_permute_parameters< 
-    result<void>,                              
+    il_result<void>,                              
     parameters<                                
       typename directory_handle::mode,
       typename directory_handle::creation,
       typename directory_handle::flag,
       typename directory_handle::buffers_type *,
-      result<typename directory_handle::enumerate_info> *
+      result<typename directory_handle::buffers_type> *
     >,
     precondition::filesystem_setup_parameters,
     postcondition::filesystem_comparison_structure_parameters,
-    postcondition::custom_parameters<result<void>>
+    postcondition::custom_parameters<il_result<void>>
   >(
     { 
 
@@ -87,7 +87,7 @@ template <class U> inline void directory_handle_create_close_creation(U &&f)
           i = typename directory_handle::buffer_type();
         }
         entries = typename directory_handle::buffers_type(_entries);
-        info = typename result<typename directory_handle::enumerate_info>::error_type();
+        info = typename result<typename directory_handle::buffers_type>::error_type();
         return std::make_tuple(std::ref(permuter), std::ref(testreturn), idx, std::ref(enumeration_should_be));
       },
       [&](auto /*tuplestate*/) {

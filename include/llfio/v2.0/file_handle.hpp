@@ -204,7 +204,7 @@ public:
         // File may have already been deleted, if so ignore
         if(ret.error() != errc::no_such_file_or_directory)
         {
-          return ret.error();
+          return std::move(ret).error();
         }
       }
     }
@@ -232,10 +232,26 @@ public:
   \mallocs On POSIX if changing the mode, we must loop calling `current_path()` and
   trying to open the path returned. Thus many allocations may occur.
   */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
+  result<file_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
 
   //! The i/o service this handle is attached to, if any
   io_service *service() const noexcept { return _service; }
+
+  using io_handle::read;
+  //! Convenience initialiser list based overload for `read()`
+  LLFIO_MAKE_FREE_FUNCTION
+  io_result<size_type> read(extent_type offset, std::initializer_list<buffer_type> lst, deadline d = deadline()) noexcept
+  {
+    buffer_type *_reqs = reinterpret_cast<buffer_type *>(alloca(sizeof(buffer_type) * lst.size()));
+    memcpy(_reqs, lst.begin(), sizeof(buffer_type) * lst.size());
+    io_request<buffers_type> reqs(buffers_type(_reqs, lst.size()), offset);
+    auto ret = read(reqs, d);
+    if(ret)
+    {
+      return ret.bytes_transferred();
+    }
+    return std::move(ret).error();
+  }
 
   /*! Return the current maximum permitted extent of the file.
 
@@ -364,6 +380,11 @@ is for backing shared memory maps).
 inline result<file_handle> temp_inode(const path_handle &dirh = path_discovery::storage_backed_temporary_files_directory(), file_handle::mode _mode = file_handle::mode::write, file_handle::flag flags = file_handle::flag::none) noexcept
 {
   return file_handle::temp_inode(std::forward<decltype(dirh)>(dirh), std::forward<decltype(_mode)>(_mode), std::forward<decltype(flags)>(flags));
+}
+//! \overload
+inline file_handle::io_result<file_handle::size_type> read(file_handle &self, file_handle::extent_type offset, std::initializer_list<file_handle::buffer_type> lst, deadline d = deadline()) noexcept
+{
+  return self.read(std::forward<decltype(offset)>(offset), std::forward<decltype(lst)>(lst), std::forward<decltype(d)>(d));
 }
 /*! Return the current maximum permitted extent of the file.
 

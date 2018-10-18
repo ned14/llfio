@@ -223,7 +223,7 @@ async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle:
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   optional<io_result<buffers_type>> ret;
-  OUTCOME_TRY(io_state, async_read(reqs, [&ret](async_file_handle *, io_result<buffers_type> &result) { ret = result; }));
+  OUTCOME_TRY(io_state, async_read(reqs, [&ret](async_file_handle *, io_result<buffers_type> &&result) { ret = std::move(result); }));
   (void) io_state;  // holds i/o open until it completes
 
   // While i/o is not done pump i/o completion
@@ -233,7 +233,7 @@ async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle:
     // If i/o service pump failed or timed out, cancel outstanding i/o and return
     if(!t)
     {
-      return t.error();
+      return std::move(t).error();
     }
 #ifndef NDEBUG
     if(!ret && t && !t.value())
@@ -243,14 +243,14 @@ async_file_handle::io_result<async_file_handle::buffers_type> async_file_handle:
     }
 #endif
   }
-  return *ret;
+  return std::move(*ret);
 }
 
 async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_handle::write(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   optional<io_result<const_buffers_type>> ret;
-  OUTCOME_TRY(io_state, async_write(reqs, [&ret](async_file_handle *, io_result<const_buffers_type> &result) { ret = result; }));
+  OUTCOME_TRY(io_state, async_write(reqs, [&ret](async_file_handle *, io_result<const_buffers_type> &&result) { ret = std::move(result); }));
   (void) io_state;  // holds i/o open until it completes
 
   // While i/o is not done pump i/o completion
@@ -260,7 +260,7 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
     // If i/o service pump failed or timed out, cancel outstanding i/o and return
     if(!t)
     {
-      return t.error();
+      return std::move(t).error();
     }
 #ifndef NDEBUG
     if(!ret && t && !t.value())
@@ -270,7 +270,7 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
     }
 #endif
   }
-  return *ret;
+  return std::move(*ret);
 }
 
 

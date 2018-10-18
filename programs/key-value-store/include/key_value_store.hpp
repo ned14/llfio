@@ -283,7 +283,7 @@ namespace key_value_store
           if(_indexfile.maximum_extent().value() == 0)
           {
             llfio::file_handle::extent_type size = sizeof(index::index) + (hashtableentries) * sizeof(index::open_hash_index::value_type);
-            size = llfio::utils::round_up_to_page_size(size);
+            size = llfio::utils::round_up_to_page_size(size, llfio::utils::page_size());
             _indexfile.truncate(size).value();
             index::index i;
             memset(&i, 0, sizeof(i));

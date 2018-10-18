@@ -30,8 +30,8 @@ template <class U> inline void file_handle_create_close_creation(U &&f)
   using namespace KERNELTEST_V1_NAMESPACE;
   using LLFIO_V2_NAMESPACE::result;
   using file_handle = LLFIO_V2_NAMESPACE::file_handle;
-  static const result<void> no_such_file_or_directory = LLFIO_V2_NAMESPACE::errc::no_such_file_or_directory;
-  static const result<void> file_exists = LLFIO_V2_NAMESPACE::errc::file_exists;
+  static const il_result<void> no_such_file_or_directory = LLFIO_V2_NAMESPACE::errc::no_such_file_or_directory;
+  static const il_result<void> file_exists = LLFIO_V2_NAMESPACE::errc::file_exists;
 
   /* Set up a permuter which for every one of these parameter values listed,
   tests with the value using the input workspace which should produce outcome
@@ -42,7 +42,7 @@ template <class U> inline void file_handle_create_close_creation(U &&f)
   */
   // clang-format off
   static const auto permuter(mt_permute_parameters<  // This is a multithreaded parameter permutation test
-    result<void>,                                    // The output outcome/result/option type. Type void means we don't care about the return type.
+    il_result<void>,                                  // The output outcome/result/option type. Type void means we don't care about the return type.
     parameters<                                      // The types of one or more input parameters to permute/fuzz the kernel with.
       typename file_handle::mode,
       typename file_handle::creation,

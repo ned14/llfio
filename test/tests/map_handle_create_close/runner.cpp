@@ -38,7 +38,7 @@ template <class U> inline void map_handle_create_close_(U &&f)
 
   // clang-format off
   static const auto permuter(st_permute_parameters<
-    result<void>,                               
+    il_result<void>,                               
     parameters<                              
       typename map_handle::size_type,
       typename section_handle::flag
@@ -115,13 +115,15 @@ template <class U> inline void map_handle_create_close_(U &&f)
             // Make sure maph's read() does what it is supposed to
             if (use_file_backing)
             {
-              auto b = maph.read(0, { {nullptr, 20} }).value();
+              map_handle::buffer_type req{ nullptr, 20 };
+              auto b = maph.read({ req, 0 }).value();
               KERNELTEST_CHECK(testreturn, b[0].data() == addr);
               KERNELTEST_CHECK(testreturn, b[0].size() == 19);  // reads do not read more than the backing length
             }
             else
             {
-              auto b = maph.read(5, { {nullptr, 5000} }).value();
+              map_handle::buffer_type req{ nullptr, 5000 };
+              auto b = maph.read({ req, 5 }).value();
               KERNELTEST_CHECK(testreturn, b[0].data() == addr+5); // NOLINT
               KERNELTEST_CHECK(testreturn, b[0].size() == 4091);
             }

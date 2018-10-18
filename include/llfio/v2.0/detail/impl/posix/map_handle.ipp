@@ -158,8 +158,8 @@ result<void> map_handle::close() noexcept
     {
       OUTCOME_TRYV(map_handle::barrier({}, true, false));
     }
-    // printf("%d munmap %p-%p\n", getpid(), _addr, _addr+_length);
-    if(-1 == ::munmap(_addr, _length))
+    // printf("%d munmap %p-%p\n", getpid(), _addr, _addr+_reservation);
+    if(-1 == ::munmap(_addr, _reservation))
     {
       return posix_error();
     }
@@ -224,7 +224,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
 }
 
 
-static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, int extra_flags, section_handle *section, map_handle::size_type &bytes, map_handle::extent_type offset, section_handle::flag _flag) noexcept
+static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, int extra_flags, section_handle *section, map_handle::size_type pagesize, map_handle::size_type &bytes, map_handle::extent_type offset, section_handle::flag _flag) noexcept
 {
   bool have_backing = (section != nullptr);
   int prot = 0, flags = have_backing ? MAP_SHARED : (MAP_PRIVATE | MAP_ANONYMOUS);
@@ -275,19 +275,48 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
     flags |= MAP_NOSYNC;
 #endif
   flags |= extra_flags;
+  int fd_to_use = have_backing ? section->native_handle().fd : -1;
+  if(pagesize != utils::page_size())
+  {
+    static const auto &pagesizes = utils::page_sizes();  // can't throw, as guaranteed called before now
+#ifdef __linux__
+    flags |= MAP_HUGETLB;  // gets me pagesizes[1]
+    if(pagesize > pagesizes[1])
+    {
+#ifdef MAP_HUGE_SHIFT
+      // Ask for page size requested
+      size_t topbitset = (__CHAR_BIT__ * sizeof(unsigned long)) - __builtin_clzl((unsigned long) pagesize);
+      flags |= topbitset << MAP_HUGE_SHIFT;
+#else
+      return errc::invalid_argument;
+#endif
+    }
+#elif defined(__FreeBSD__)
+    size_t topbitset = (__CHAR_BIT__ * sizeof(unsigned long)) - __builtin_clzl((unsigned long) pagesize);
+    flags |= MAP_ALIGNED(topbitset);
+#elif defined(__APPLE__)
+    if(have_backing)
+    {
+      return errc::invalid_argument;
+    }
+    fd_to_use = VM_FLAGS_SUPERPAGE_SIZE_ANY;
+#else
+#error Do not know how to specify large/huge/super pages on this platform
+#endif
+  }
 // printf("mmap(%p, %u, %d, %d, %d, %u)\n", ataddr, (unsigned) bytes, prot, flags, have_backing ? section->native_handle().fd : -1, (unsigned) offset);
 #ifdef MAP_SYNC  // Linux kernel 4.15 or later only
   // If backed by a file into persistent shared memory, ask the kernel to use persistent memory safe semantics
-  if(have_backing && section->is_nvram() && (flags & MAP_SHARED) != 0)
+  if(have_backing && (_flag & section_handle::flag::nvram) && (flags & MAP_SHARED) != 0)
   {
     int flagscopy = flags & ~MAP_SHARED;
     flagscopy |= MAP_SHARED_VALIDATE | MAP_SYNC;
-    addr = ::mmap(ataddr, bytes, prot, flagscopy, section->native_handle().fd, offset);
+    addr = ::mmap(ataddr, bytes, prot, flagscopy, fd_to_use, offset);
   }
 #endif
   if(addr == nullptr)
   {
-    addr = ::mmap(ataddr, bytes, prot, flags, have_backing ? section->native_handle().fd : -1, offset);
+    addr = ::mmap(ataddr, bytes, prot, flags, fd_to_use, offset);
   }
   // printf("%d mmap %p-%p\n", getpid(), addr, (char *) addr+bytes);
   if(MAP_FAILED == addr)  // NOLINT
@@ -312,13 +341,15 @@ result<map_handle> map_handle::map(size_type bytes, bool /*unused*/, section_han
   {
     return errc::argument_out_of_domain;
   }
-  bytes = utils::round_up_to_page_size(bytes);
-  result<map_handle> ret(map_handle(nullptr));
+  bytes = utils::round_up_to_page_size(bytes, /*FIXME*/ utils::page_size());
+  result<map_handle> ret(map_handle(nullptr, _flag));
   native_handle_type &nativeh = ret.value()._v;
-  OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, 0, nullptr, bytes, 0, _flag));
+  OUTCOME_TRY(pagesize, detail::pagesize_from_flags(ret.value()._flag));
+  OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, 0, nullptr, pagesize, bytes, 0, ret.value()._flag));
   ret.value()._addr = static_cast<byte *>(addr);
   ret.value()._reservation = bytes;
   ret.value()._length = bytes;
+  ret.value()._pagesize = pagesize;
   LLFIO_LOG_FUNCTION_CALL(&ret);
   return ret;
 }
@@ -330,19 +361,22 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   {
     bytes = length - offset;
   }
-  result<map_handle> ret{map_handle(&section)};
+  result<map_handle> ret{map_handle(&section, _flag)};
   native_handle_type &nativeh = ret.value()._v;
-  OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, 0, &section, bytes, offset, _flag));
+  OUTCOME_TRY(pagesize, detail::pagesize_from_flags(ret.value()._flag));
+  OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, 0, &section, pagesize, bytes, offset, ret.value()._flag));
   ret.value()._addr = static_cast<byte *>(addr);
   ret.value()._offset = offset;
   ret.value()._reservation = bytes;
   ret.value()._length = (length - offset < bytes) ? (length - offset) : bytes;  // length of backing, not reservation
+  ret.value()._pagesize = pagesize;
   // Make my handle borrow the native handle of my backing storage
   ret.value()._v.fd = section.native_handle().fd;
   LLFIO_LOG_FUNCTION_CALL(&ret);
   return ret;
 }
 
+// Change the address reservation for this map
 result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permit_relocation) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
@@ -352,14 +386,15 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
     OUTCOME_TRY(length_, _section->length());  // length of the backing file
     length = length_;
   }
-  newsize = utils::round_up_to_page_size(newsize);
+  newsize = utils::round_up_to_page_size(newsize, _pagesize);
   if(newsize == _reservation)
   {
     return success();
   }
+  // If wiping the map ...
   if(newsize == 0)
   {
-    if(-1 == ::munmap(_addr, _length))
+    if(-1 == ::munmap(_addr, _reservation))
     {
       return posix_error();
     }
@@ -368,9 +403,10 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
     _length = 0;
     return 0;
   }
+  // If not mapped yet ...
   if(_addr == nullptr)
   {
-    OUTCOME_TRY(addr, do_mmap(_v, nullptr, 0, _section, newsize, _offset, _flag));
+    OUTCOME_TRY(addr, do_mmap(_v, nullptr, 0, _section, _pagesize, newsize, _offset, _flag));
     _addr = static_cast<byte *>(addr);
     _reservation = newsize;
     _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
@@ -388,13 +424,14 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
   _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
   return newsize;
 #else
-  if(newsize > _length)
+  // Try to expand reservation in place
+  if(newsize > _reservation)
   {
 #if defined(MAP_EXCL)  // BSD type systems
     byte *addrafter = _addr + _reservation;
     size_type bytes = newsize - _reservation;
     extent_type offset = _offset + _reservation;
-    OUTCOME_TRY(addr, do_mmap(_v, addrafter, MAP_FIXED | MAP_EXCL, _section, bytes, offset, _flag));
+    OUTCOME_TRY(addr, do_mmap(_v, addrafter, MAP_FIXED | MAP_EXCL, _section, _pagesize, bytes, offset, _flag));
     _reservation = newsize;
     _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
     return newsize;
@@ -402,7 +439,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
     byte *addrafter = _addr + _reservation;
     size_type bytes = newsize - _reservation;
     extent_type offset = _offset + _reservation;
-    OUTCOME_TRY(addr, do_mmap(_v, addrafter, 0, _section, bytes, offset, _flag));
+    OUTCOME_TRY(addr, do_mmap(_v, addrafter, 0, _section, _pagesize, bytes, offset, _flag));
     if(addr != addrafter)
     {
       ::munmap(addr, bytes);
@@ -414,7 +451,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
 #endif
   }
   // Shrink the map
-  if(-1 == ::munmap(_addr + newsize, _length - newsize))
+  if(-1 == ::munmap(_addr + newsize, _reservation - newsize))
   {
     return posix_error();
   }
@@ -432,10 +469,10 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
     return errc::invalid_argument;
   }
   // Set permissions on the pages
-  region = utils::round_to_page_size(region);
+  region = utils::round_to_page_size(region, _pagesize);
   extent_type offset = _offset + (region.data() - _addr);
   size_type bytes = region.size();
-  OUTCOME_TRYV(do_mmap(_v, region.data(), MAP_FIXED, _section, bytes, offset, flag));
+  OUTCOME_TRYV(do_mmap(_v, region.data(), MAP_FIXED, _section, _pagesize, bytes, offset, flag));
   // Tell the kernel we will be using these pages soon
   if(-1 == ::madvise(region.data(), region.size(), MADV_WILLNEED))
   {
@@ -451,7 +488,7 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
   {
     return errc::invalid_argument;
   }
-  region = utils::round_to_page_size(region);
+  region = utils::round_to_page_size(region, _pagesize);
   // Tell the kernel to kick these pages into storage
   if(-1 == ::madvise(region.data(), region.size(), MADV_DONTNEED))
   {
@@ -460,7 +497,7 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
   // Set permissions on the pages to no access
   extent_type offset = _offset + (region.data() - _addr);
   size_type bytes = region.size();
-  OUTCOME_TRYV(do_mmap(_v, region.data(), MAP_FIXED, _section, bytes, offset, section_handle::flag::none));
+  OUTCOME_TRYV(do_mmap(_v, region.data(), MAP_FIXED, _section, _pagesize, bytes, offset, section_handle::flag::none));
   return region;
 }
 
@@ -472,7 +509,7 @@ result<void> map_handle::zero_memory(buffer_type region) noexcept
     return errc::invalid_argument;
   }
 #ifdef MADV_REMOVE
-  buffer_type page_region{utils::round_up_to_page_size(region.data()), utils::round_down_to_page_size(region.size())};
+  buffer_type page_region{utils::round_up_to_page_size(region.data(), _pagesize), utils::round_down_to_page_size(region.size(), _pagesize)};
   // Zero contents and punch a hole in any backing storage
   if((page_region.size() != 0u) && -1 != ::madvise(page_region.data(), page_region.size(), MADV_REMOVE))
   {
@@ -502,7 +539,7 @@ result<span<map_handle::buffer_type>> map_handle::prefetch(span<buffer_type> reg
 result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(0);
-  region = utils::round_to_page_size(region);
+  region = utils::round_to_page_size(region, _pagesize);
   if(region.data() == nullptr)
   {
     return errc::invalid_argument;
@@ -580,7 +617,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
                                                        [&](const QUICKCPPLIB_NAMESPACE::signal_guard::raised_signal_info &_info) {
                                                          auto &info = const_cast<QUICKCPPLIB_NAMESPACE::signal_guard::raised_signal_info &>(_info);
                                                          auto *causingaddr = (byte *) info.address();
-                                                         if(causingaddr < _addr || causingaddr >= (_addr + _length))
+                                                         if(causingaddr < _addr || causingaddr >= (_addr + _reservation))
                                                          {
                                                            // Not caused by this map
                                                            QUICKCPPLIB_NAMESPACE::signal_guard::thread_local_raise_signal(info.signal(), info.raw_info(), info.raw_context());

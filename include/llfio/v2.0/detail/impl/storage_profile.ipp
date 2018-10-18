@@ -1209,7 +1209,7 @@ namespace storage_profile
         }
         if(srch.requires_aligned_io())
         {
-          bytes = utils::round_down_to_page_size(bytes);
+          bytes = utils::round_down_to_page_size(bytes, utils::page_size());
         }
 
         if(cold_cache)
@@ -1239,9 +1239,9 @@ namespace storage_profile
 
         std::vector<directory_entry> entries(no);
         begin = std::chrono::high_resolution_clock::now();
-        directory_handle::enumerate_info ei(dirh.enumerate(entries).value());
-        assert(ei.done == true);
-        assert(ei.filled.size() == no);
+        directory_handle::buffers_type ei(dirh.read(directory_handle::buffers_type(entries)).value());
+        assert(ei.done() == true);
+        assert(ei.size() == no);
         end = std::chrono::high_resolution_clock::now();
         s.enumerate = static_cast<unsigned long long>(static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / no);
         if(cold_cache)

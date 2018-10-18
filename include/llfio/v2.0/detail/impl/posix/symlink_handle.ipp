@@ -47,7 +47,7 @@ namespace detail
   }
 }
 
-result<void> symlink_handle::_create_symlink(const path_handle &dirh, const handle::path_type &filename, path_view target, deadline d, bool atomic_replace) noexcept
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> symlink_handle::_create_symlink(const path_handle &dirh, const handle::path_type &filename, path_view target, deadline d, bool atomic_replace) noexcept
 {
   std::chrono::steady_clock::time_point began_steady;
   std::chrono::system_clock::time_point end_utc;
@@ -185,7 +185,7 @@ result<symlink_handle> symlink_handle::clone(mode mode_, deadline d) const noexc
     {
       if(fh.error() != errc::no_such_file_or_directory)
       {
-        return fh.error();
+        return std::move(fh).error();
       }
     }
     // Check timeout
@@ -357,7 +357,9 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
     if(!r)
     {
       if(_creation == creation::only_if_not_exist || r.error() != errc::file_exists)
-        return r.error();
+      {
+        return std::move(r).error();
+      }
     }
     break;
   }
@@ -456,7 +458,7 @@ result<symlink_handle::const_buffers_type> symlink_handle::write(symlink_handle:
     // If reopen failed, report that now
     if(!newthis)
     {
-      return newthis.error();
+      return std::move(newthis).error();
     }
     // Swap myself with the new this
     swap(newthis.value());

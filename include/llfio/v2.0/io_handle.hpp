@@ -216,10 +216,15 @@ public:
     io_result() = default;
 #endif
     ~io_result() = default;
-    io_result(const io_result &) = default;
-    io_result(io_result &&) = default;  // NOLINT
-    io_result &operator=(const io_result &) = default;
     io_result &operator=(io_result &&) = default;  // NOLINT
+#if LLFIO_EXPERIMENTAL_STATUS_CODE
+    io_result(const io_result &) = delete;
+    io_result &operator=(const io_result &) = delete;
+#else
+    io_result(const io_result &) = default;
+    io_result &operator=(const io_result &) = default;
+#endif
+    io_result(io_result &&) = default;  // NOLINT
     //! Returns bytes transferred
     size_type bytes_transferred() noexcept
     {
@@ -228,13 +233,13 @@ public:
         _bytes_transferred = 0;
         for(auto &i : this->value())
         {
-          _bytes_transferred += i.second;
+          _bytes_transferred += i.size();
         }
       }
       return _bytes_transferred;
     }
   };
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !LLFIO_EXPERIMENTAL_STATUS_CODE
   // Is trivial in all ways, except default constructibility
   static_assert(std::is_trivially_copyable<io_result<buffers_type>>::value, "io_result<buffers_type> is not trivially copyable!");
 // static_assert(std::is_trivially_assignable<io_result<buffers_type>, io_result<buffers_type>>::value, "io_result<buffers_type> is not trivially assignable!");
@@ -305,15 +310,6 @@ public:
   */
   LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept;
-  //! \overload
-  LLFIO_MAKE_FREE_FUNCTION
-  io_result<buffers_type> read(extent_type offset, std::initializer_list<buffer_type> lst, deadline d = deadline()) noexcept
-  {
-    buffer_type *_reqs = reinterpret_cast<buffer_type *>(alloca(sizeof(buffer_type) * lst.size()));
-    memcpy(_reqs, lst.begin(), sizeof(buffer_type) * lst.size());
-    io_request<buffers_type> reqs(buffers_type(_reqs, lst.size()), offset);
-    return read(reqs, d);
-  }
 
   /*! \brief Write data to the open handle.
 
@@ -340,12 +336,17 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept;
   //! \overload
   LLFIO_MAKE_FREE_FUNCTION
-  io_result<const_buffers_type> write(extent_type offset, std::initializer_list<const_buffer_type> lst, deadline d = deadline()) noexcept
+  io_result<size_type> write(extent_type offset, std::initializer_list<const_buffer_type> lst, deadline d = deadline()) noexcept
   {
     const_buffer_type *_reqs = reinterpret_cast<const_buffer_type *>(alloca(sizeof(const_buffer_type) * lst.size()));
     memcpy(_reqs, lst.begin(), sizeof(const_buffer_type) * lst.size());
     io_request<const_buffers_type> reqs(const_buffers_type(_reqs, lst.size()), offset);
-    return write(reqs, d);
+    auto ret = write(reqs, d);
+    if(ret)
+    {
+      return ret.bytes_transferred();
+    }
+    return std::move(ret).error();
   }
 
   /*! \brief Issue a write reordering barrier such that writes preceding the barrier will reach storage
@@ -559,11 +560,6 @@ inline io_handle::io_result<io_handle::buffers_type> read(io_handle &self, io_ha
 {
   return self.read(std::forward<decltype(reqs)>(reqs), std::forward<decltype(d)>(d));
 }
-//! \overload
-inline io_handle::io_result<io_handle::buffers_type> read(io_handle &self, io_handle::extent_type offset, std::initializer_list<io_handle::buffer_type> lst, deadline d = deadline()) noexcept
-{
-  return self.read(std::forward<decltype(offset)>(offset), std::forward<decltype(lst)>(lst), std::forward<decltype(d)>(d));
-}
 /*! \brief Write data to the open handle.
 
 \warning Depending on the implementation backend, not all of the buffers input may be written and
@@ -591,7 +587,7 @@ inline io_handle::io_result<io_handle::const_buffers_type> write(io_handle &self
   return self.write(std::forward<decltype(reqs)>(reqs), std::forward<decltype(d)>(d));
 }
 //! \overload
-inline io_handle::io_result<io_handle::const_buffers_type> write(io_handle &self, io_handle::extent_type offset, std::initializer_list<io_handle::const_buffer_type> lst, deadline d = deadline()) noexcept
+inline io_handle::io_result<io_handle::size_type> write(io_handle &self, io_handle::extent_type offset, std::initializer_list<io_handle::const_buffer_type> lst, deadline d = deadline()) noexcept
 {
   return self.write(std::forward<decltype(offset)>(offset), std::forward<decltype(lst)>(lst), std::forward<decltype(d)>(d));
 }

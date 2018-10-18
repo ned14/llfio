@@ -43,7 +43,7 @@ static inline void TestAsyncFileHandle()
     std::promise<llfio::async_file_handle::const_buffers_type> p;
     auto f(p.get_future());
     auto schedule_io = [&] {
-      return h.async_write({bt, n * 4096}, [ p = std::move(p), n ](llfio::async_file_handle *, llfio::async_file_handle::io_result<llfio::async_file_handle::const_buffers_type> & result) mutable {
+      return h.async_write({bt, n * 4096}, [ p = std::move(p), n ](llfio::async_file_handle *, llfio::async_file_handle::io_result<llfio::async_file_handle::const_buffers_type> && result) mutable {
         (void) n;
         if(!result && result.error() == llfio::errc::resource_unavailable_try_again)
         {

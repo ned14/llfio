@@ -53,11 +53,11 @@ namespace utils
     }
     return ret;
   }
-  std::vector<size_t> page_sizes(bool only_actually_available)
+  const std::vector<size_t> &page_sizes(bool only_actually_available)
   {
     static QUICKCPPLIB_NAMESPACE::configurable_spinlock::spinlock<bool> lock;
-    static std::vector<size_t> pagesizes, pagesizes_available;
     std::lock_guard<decltype(lock)> g(lock);
+    static std::vector<size_t> pagesizes, pagesizes_available;
     if(pagesizes.empty())
     {
 #if defined(__FreeBSD__)
@@ -177,6 +177,39 @@ namespace utils
     return success();
 #endif
     return errc::not_supported;
+  }
+
+  bool running_under_wsl() noexcept
+  {
+#ifdef __linux__
+    static int cached;
+    if(cached != 0)
+    {
+      return cached == 2;
+    }
+    int h = ::open("/proc/version", O_RDONLY | O_CLOEXEC);
+    if(h == -1)
+    {
+      cached = 1;
+      return false;
+    }
+    auto unh = undoer([&h] { ::close(h); });
+    char buffer[257];
+    ssize_t bytes = ::read(h, buffer, 256);
+    if(bytes == -1)
+    {
+      cached = 1;
+      return false;
+    }
+    buffer[bytes] = 0;
+    if(strstr(buffer, "-Microsoft (Microsoft@Microsoft.com)") != nullptr)
+    {
+      cached = 2;
+      return true;
+    }
+    cached = 1;
+#endif
+    return false;
   }
 
   namespace detail

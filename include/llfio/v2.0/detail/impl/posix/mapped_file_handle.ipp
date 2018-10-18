@@ -40,7 +40,6 @@ result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type rese
   {
     reservation = length;
   }
-  reservation = utils::round_up_to_page_size(reservation);
   if(!_sh.is_valid())
   {
     section_handle::flag sectionflags = section_handle::flag::readwrite;
@@ -60,8 +59,8 @@ result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type rese
   OUTCOME_TRYV(_mh.close());
   OUTCOME_TRY(mh, map_handle::map(_sh, reservation, 0, mapflags));
   _mh = std::move(mh);
-  _reservation = reservation;
-  return reservation;
+  _reservation = utils::round_up_to_page_size(reservation, page_size());
+  return _reservation;
 }
 
 result<void> mapped_file_handle::close() noexcept
@@ -116,8 +115,8 @@ result<mapped_file_handle::extent_type> mapped_file_handle::truncate(extent_type
     // otherwise some kernels keep them around until last fd close, effectively leaking them
     if(newsize < size)
     {
-      byte *start = utils::round_up_to_page_size(_mh.address() + newsize);
-      byte *end = utils::round_up_to_page_size(_mh.address() + size);
+      byte *start = utils::round_up_to_page_size(_mh.address() + newsize, page_size());
+      byte *end = utils::round_up_to_page_size(_mh.address() + size, page_size());
       (void) _mh.do_not_store({start, static_cast<size_t>(end - start)});
     }
     // Resize the file, on unified page cache kernels it'll map any new pages into the reserved map

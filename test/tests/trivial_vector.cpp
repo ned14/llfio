@@ -32,8 +32,9 @@ static inline void TestTrivialVector()
   {
     uint64_t v, _space[7];  // 64 bytes total
     udt() = delete;
-    explicit udt(int /*unused*/) : v(trivial_vector_udts_constructed++)
-    , _space{ 1, 2, 3, 4, 5, 6, 7 }
+    explicit udt(int /*unused*/)
+        : v(trivial_vector_udts_constructed++)
+        , _space{1, 2, 3, 4, 5, 6, 7}
     {
     }
   };
@@ -44,27 +45,27 @@ static inline void TestTrivialVector()
   BOOST_CHECK(v.empty());
   BOOST_CHECK(v.size() == 0);  // NOLINT
   std::cout << "Resizing to 4Kb ..." << std::endl;
-  v.push_back(udt(5));         // first allocation of 4Kb
+  v.push_back(udt(5));  // first allocation of 4Kb
   BOOST_CHECK(v.size() == 1);
   BOOST_CHECK(v.capacity() == LLFIO_V2_NAMESPACE::utils::page_size() / sizeof(udt));
   BOOST_REQUIRE(v[0].v == 78);
   std::cout << "Resizing to capacity ..." << std::endl;
-  v.resize(_4kb, udt(6));       // ought to be precisely 4Kb
+  v.resize(_4kb, udt(6));  // ought to be precisely 4Kb
   BOOST_CHECK(v.size() == _4kb);
-  BOOST_CHECK(v.capacity() == LLFIO_V2_NAMESPACE::utils::round_up_to_page_size(4096) / sizeof(udt));
+  BOOST_CHECK(v.capacity() == LLFIO_V2_NAMESPACE::utils::round_up_to_page_size(4096, LLFIO_V2_NAMESPACE::utils::page_size()) / sizeof(udt));
   BOOST_REQUIRE(v[0].v == 78);
   BOOST_REQUIRE(v[1].v == 79);
   std::cout << "Resizing to 16Kb ..." << std::endl;
-  v.resize(_16kb, udt(7));     // 16Kb
+  v.resize(_16kb, udt(7));  // 16Kb
   BOOST_CHECK(v.size() == _16kb);
-  BOOST_CHECK(v.capacity() == LLFIO_V2_NAMESPACE::utils::round_up_to_page_size(16384) / sizeof(udt));
+  BOOST_CHECK(v.capacity() == LLFIO_V2_NAMESPACE::utils::round_up_to_page_size(16384, LLFIO_V2_NAMESPACE::utils::page_size()) / sizeof(udt));
   BOOST_REQUIRE(v[0].v == 78);
   BOOST_REQUIRE(v[1].v == 79);
   BOOST_REQUIRE(v[_4kb].v == 80);
   std::cout << "Resizing to 64Kb ..." << std::endl;
-  v.resize(_64kb, udt(8));     // 64Kb
+  v.resize(_64kb, udt(8));  // 64Kb
   BOOST_CHECK(v.size() == _64kb);
-  BOOST_CHECK(v.capacity() == LLFIO_V2_NAMESPACE::utils::round_up_to_page_size(65536) / sizeof(udt));
+  BOOST_CHECK(v.capacity() == LLFIO_V2_NAMESPACE::utils::round_up_to_page_size(65536, LLFIO_V2_NAMESPACE::utils::page_size()) / sizeof(udt));
   BOOST_REQUIRE(v[0].v == 78);
   BOOST_REQUIRE(v[1].v == 79);
   BOOST_REQUIRE(v[_4kb].v == 80);
@@ -138,9 +139,9 @@ static inline void BenchmarkTrivialVector1()
 {
   struct udt
   {
-    uint64_t v[8];  // 64 bytes total
+    uint64_t v[8];   // 64 bytes total
     constexpr udt()  // NOLINT
-    : v{ 1, 2, 3, 4, 5, 6, 7, 8 }
+    : v{1, 2, 3, 4, 5, 6, 7, 8}
     {
     }
   };
@@ -187,9 +188,9 @@ static inline void BenchmarkTrivialVector2()
 {
   struct udt
   {
-    uint64_t v[8];  // 64 bytes total
+    uint64_t v[8];                 // 64 bytes total
     constexpr udt(int /*unused*/)  // NOLINT
-    : v{ 1, 2, 3, 4, 5, 6, 7, 8 }
+    : v{1, 2, 3, 4, 5, 6, 7, 8}
     {
     }
   };

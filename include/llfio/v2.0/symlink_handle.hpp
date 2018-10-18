@@ -85,7 +85,7 @@ class LLFIO_DECL symlink_handle : public handle, public fs_handle
 
 #ifndef _WIN32
   friend result<void> detail::stat_from_symlink(struct stat &s, const handle &h) noexcept;
-  result<void> _create_symlink(const path_handle &dirh, const handle::path_type &filename, path_view target, deadline d, bool atomic_replace) noexcept;
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> _create_symlink(const path_handle &dirh, const handle::path_type &filename, path_view target, deadline d, bool atomic_replace) noexcept;
 #endif
 
 public:
@@ -112,6 +112,8 @@ public:
 
   //! The buffer type used by this handle, which is a `path_view`
   using buffer_type = path_view;
+  //! The const buffer type used by this handle, which is a `path_view`
+  using const_buffer_type = path_view;
   /*! The buffers type used by this handle for reads, which is a single item sequence of `path_view`.
 
   \warning Unless you supply your own kernel buffer, you need to keep this around as long as you
@@ -132,7 +134,8 @@ public:
     //! Default constructor
     constexpr buffers_type() {}  // NOLINT
 
-    //! Constructor
+    /*! Constructor
+    */
     constexpr buffers_type(path_view link, symlink_type type = symlink_type::symbolic)
         : _link(link)
         , _type(type)
@@ -346,7 +349,7 @@ public:
         // File may have already been deleted, if so ignore
         if(ret.error() != errc::no_such_file_or_directory)
         {
-          return ret.error();
+          return std::move(ret).error();
         }
       }
     }
@@ -438,14 +441,11 @@ public:
 
   \return Returns the buffers filled, with its path adjusted to the bytes filled.
   \param req A buffer to fill with the contents of the symbolic link.
-  \param kernelbuffer A buffer to use for the kernel to fill. If left defaulted, a kernel buffer
-  is allocated internally and stored into `req.buffers` which needs to not be destructed until one
-  is no longer using any items within (the path returned is a view onto the original kernel data).
   \errors Any of the errors which `readlinkat()` or `DeviceIoControl()` might return, or failure
   to allocate memory if the user did not supply a kernel buffer to use, or the user supplied buffer
   was too small.
-  \mallocs If the `kernelbuffer` parameter is set on entry, no memory allocations.
-  If unset, then at least one memory allocation, possibly more is performed.
+  \mallocs If the `kernelbuffer` parameter is set in the request, no memory allocations.
+  If unset, at least one memory allocation, possibly more is performed.
   */
   LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<buffers_type> read(io_request<buffers_type> req = {}) noexcept;

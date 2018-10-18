@@ -1,6 +1,6 @@
-/* Test kernel for map_handle create and close
-(C) 2016-2017 Niall Douglas <http://www.nedproductions.biz/> (2 commits)
-File Created: August 2016
+/* Test whether LLFIO collides with itself
+(C) 2018 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
+File Created: Sept 2018
 
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,15 +22,12 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../test_kernel_decl.hpp"
+#include "../../include/llfio/llfio.hpp"
 
-namespace directory_handle_enumerate
+#define ID2(a, b) a ## b
+#define ID(a, b) ID2(a, b)
+
+extern QUICKCPPLIB_SYMBOL_EXPORT LLFIO_V2_NAMESPACE::file_handle ID(make_file, LIBNO)()
 {
-  LLFIO_TEST_KERNEL_DECL LLFIO_V2_NAMESPACE::result<LLFIO_V2_NAMESPACE::directory_handle::buffers_type> test_kernel_directory_handle_enumerate(LLFIO_V2_NAMESPACE::span<LLFIO_V2_NAMESPACE::directory_entry> *buffers, LLFIO_V2_NAMESPACE::path_view glob, LLFIO_V2_NAMESPACE::directory_handle::filter filtering)
-  {
-    OUTCOME_TRY(h, LLFIO_V2_NAMESPACE::directory_handle::directory({}, "."));
-    auto ret = h.read({*buffers, glob, filtering});
-    h.close().value();
-    return ret;
-  }
+  return {};
 }

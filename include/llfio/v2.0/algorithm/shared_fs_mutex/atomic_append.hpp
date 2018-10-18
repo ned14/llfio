@@ -138,7 +138,8 @@ namespace algorithm
         bool first = true;
         do
         {
-          OUTCOME_TRY(_, _h.read(0, {{reinterpret_cast<byte *>(&_header), 48}}));
+          file_handle::buffer_type req{reinterpret_cast<byte *>(&_header), 48};
+          OUTCOME_TRY(_, _h.read({req, 0}));
           if(_[0].data() != reinterpret_cast<byte *>(&_header))
           {
             memcpy(&_header, _[0].data(), _[0].size());
@@ -204,7 +205,7 @@ namespace algorithm
         {
           if(lockresult.error() != errc::timed_out)
           {
-            return lockresult.error();
+            return std::move(lockresult).error();
           }
           // Somebody else is also using this file
         }
@@ -299,7 +300,8 @@ namespace algorithm
         //! to avoid a duplicate read later
         for(;;)
         {
-          file_handle::io_result<file_handle::buffers_type> readoutcome = _h.read(my_lock_request_offset, {{_buffer, sizeof(_buffer)}});
+          file_handle::buffer_type req{_buffer, sizeof(_buffer)};
+          file_handle::io_result<file_handle::buffers_type> readoutcome = _h.read({req, my_lock_request_offset});
           // Should never happen :)
           if(readoutcome.has_error())
           {
@@ -361,7 +363,8 @@ namespace algorithm
           }
           assert(record_offset >= start_offset);
           assert(record_offset - start_offset <= sizeof(_buffer));
-          OUTCOME_TRY(batchread, _h.read(start_offset, {{_buffer, (size_t)(record_offset - start_offset) + sizeof(atomic_append_detail::lock_request)}}));
+          file_handle::buffer_type req{_buffer, (size_t)(record_offset - start_offset) + sizeof(atomic_append_detail::lock_request)};
+          OUTCOME_TRY(batchread, _h.read({req, start_offset}));
           assert(batchread[0].size() == record_offset - start_offset + sizeof(atomic_append_detail::lock_request));
           const atomic_append_detail::lock_request *record = reinterpret_cast<atomic_append_detail::lock_request *>(batchread[0].data() + batchread[0].size() - sizeof(atomic_append_detail::lock_request));
           const atomic_append_detail::lock_request *firstrecord = reinterpret_cast<atomic_append_detail::lock_request *>(batchread[0].data());
@@ -502,7 +505,8 @@ namespace algorithm
           bool done = false;
           while(!done)
           {
-            auto bytesread_ = _h.read(_header.first_known_good, {{_buffer, sizeof(_buffer)}});
+            file_handle::buffer_type req{_buffer, sizeof(_buffer)};
+            auto bytesread_ = _h.read({req, _header.first_known_good});
             if(bytesread_.has_error())
             {
               // If distance between original first known good and end of file is exactly

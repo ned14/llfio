@@ -69,6 +69,10 @@ public:
                                    barrier_on_close = 1U << 16U,  //!< Maps of this section, if writable, issue a `barrier()` when destructed blocking until data (not metadata) reaches physical storage.
                                    nvram = 1U << 17U,             //!< This section is of non-volatile RAM
 
+                                   page_sizes_1 = 1U << 24U,  //!< Use `utils::page_sizes()[1]` sized pages, or fail.
+                                   page_sizes_2 = 2U << 24U,  //!< Use `utils::page_sizes()[2]` sized pages, or fail.
+                                   page_sizes_3 = 3U << 24U,  //!< Use `utils::page_sizes()[3]` sized pages, or fail.
+
                                    // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
 
                                    readwrite = (read | write)};
@@ -213,6 +217,18 @@ inline std::ostream &operator<<(std::ostream &s, const section_handle::flag &v)
   {
     temp.append("nvram|");
   }
+  if((v & section_handle::flag::page_sizes_3) == section_handle::flag::page_sizes_3)
+  {
+    temp.append("page_sizes_3|");
+  }
+  else if((v & section_handle::flag::page_sizes_2) == section_handle::flag::page_sizes_2)
+  {
+    temp.append("page_sizes_2|");
+  }
+  else if((v & section_handle::flag::page_sizes_1) == section_handle::flag::page_sizes_1)
+  {
+    temp.append("page_sizes_1|");
+  }
   if(!temp.empty())
   {
     temp.resize(temp.size() - 1);
@@ -275,6 +291,58 @@ produce optimal code. If your CPU does not support the requisite instructions (o
 and empty buffer will be returned to indicate that nothing was barriered, same as the normal `barrier()`
 function.
 
+## Large page support:
+
+Large, huge, massive and super page support is available via the `section_handle::flag::page_sizes_N` flags.
+Use these in combination with `utils::page_size()` to request allocations or maps which use different page sizes.
+
+### Windows:
+
+Firstly, explicit large page support is only available to processes and logged in users who have been assigned the
+`SeLockMemoryPrivilege`. A default Windows installation assigns that privilege to nothing, so explicit
+action will need to be taken to assign that privilege per Windows installation.
+
+Secondly, as of Windows 10 1803, there is the large page size or the normal page size. There isn't (useful)
+support for pages of any other size, as there is on other systems.
+
+For allocating memory, large page allocation can randomly fail depending on what the system is feeling
+like, same as on all the other operating systems. It is not permitted to reserve address space using large pages.
+
+For mapping files, large page maps do not work as of Windows 10 1803 (curiously, ReactOS *does*
+implement this). There is a big exception to this, which is for DAX formatted NTFS volumes with a formatted
+cluster size of the large page size, where if
+you map in large page sized multiples, the Windows kernel uses large pages (and one need not hold
+`SeLockMemoryPrivilege` either). Therefore, if you specify `section_handle::flag::nvram` with a
+`section_handle::flag::page_sizes_N`, LLFIO does not ask for large pages which would fail, it merely
+rounds all requests up to the nearest large page multiple.
+
+### Linux:
+
+As usual on Linux, large page (often called huge page on Linux) support comes in many forms.
+
+Explicit support is via `MAP_HUGETLB` to `mmap()`, and whether an explicit request succeeds or not is up to how
+many huge pages were configured into the running system via boot-time kernel parameters, and how many
+huge pages are in use already. For most recent kernels on most distributions, explicit memory allocation
+requests using large pages generally works without issue. As of Linux kernel 4.18, mapping files using
+large pages only works on `tmpfs`, this corresponds to `path_discovery::memory_backed_temporary_files_directory()`
+sourced anonymous section handles. Work is proceeding well for the major Linux filing systems to become
+able to map files using large pages soon, and in theory LLFIO based should "just work" on such a newer kernel.
+
+Note that many distributions enable transparent huge pages, whereby if you request allocations of large page multiples
+at large page offsets, the kernel uses large pages, without you needing to specify any `section_handle::flag::page_sizes_N`.
+
+### FreeBSD:
+
+FreeBSD has no support for failing if large pages cannot be used for a specific `mmap()`. The best you can do is to ask for
+large pages, and you may or may not get them depending on available system resources, filing system in use,
+etc. LLFIO does not check returned maps to discover if large
+pages were actually used, that is on end user code to check if it really needs to know.
+
+### MacOS:
+
+MacOS only supports large pages for memory allocations, not for mapping files. It fails if large pages could
+not be used when a large page allocation was requested.
+
 \sa `mapped_file_handle`, `algorithm::mapped_span`
 */
 class LLFIO_DECL map_handle : public io_handle
@@ -299,13 +367,18 @@ protected:
   section_handle *_section{nullptr};
   byte *_addr{nullptr};
   extent_type _offset{0};
-  size_type _reservation{0}, _length{0};
+  size_type _reservation{0}, _length{0}, _pagesize{0};
   section_handle::flag _flag{section_handle::flag::none};
 
-  explicit map_handle(section_handle *section)
+  explicit map_handle(section_handle *section, section_handle::flag flags)
       : _section(section)
-      , _flag(section != nullptr ? section->section_flags() : section_handle::flag::none)
+      , _flag(flags)
   {
+    if(section != nullptr)
+    {
+      // Apart from read/write/cow/execute, the section's flags override the map's flags
+      _flag |= (section->section_flags() & ~(section_handle::flag::read | section_handle::flag::write | section_handle::flag::cow | section_handle::flag::execute));
+    }
   }
 
 public:
@@ -313,13 +386,14 @@ public:
   constexpr map_handle() {}  // NOLINT
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~map_handle() override;
   //! Implicit move construction of map_handle permitted
-  constexpr map_handle(map_handle &&o) noexcept : io_handle(std::move(o)), _section(o._section), _addr(o._addr), _offset(o._offset), _reservation(o._reservation), _length(o._length), _flag(o._flag)
+  constexpr map_handle(map_handle &&o) noexcept : io_handle(std::move(o)), _section(o._section), _addr(o._addr), _offset(o._offset), _reservation(o._reservation), _length(o._length), _pagesize(o._pagesize), _flag(o._flag)
   {
     o._section = nullptr;
     o._addr = nullptr;
     o._offset = 0;
     o._reservation = 0;
     o._length = 0;
+    o._pagesize = 0;
     o._flag = section_handle::flag::none;
   }
   //! No copy construction (use `clone()`)
@@ -378,7 +452,7 @@ public:
   }
 
   /*! Map unused memory into view, creating new memory if insufficient unused memory is available. Note that the memory mapped by this call may contain non-zero bits (recycled memory) unless `zeroed` is true.
-  \param bytes How many bytes to map. Typically will be rounded up to a multiple of the page size (see `utils::page_sizes()`) on POSIX, 64Kb on Windows.
+  \param bytes How many bytes to map. Typically will be rounded up to a multiple of the page size (see `page_size()`).
   \param zeroed Set to true if only all bits zeroed memory is wanted.
   \param _flag The permissions with which to map the view. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
 
@@ -395,8 +469,9 @@ public:
   /*! Create a memory mapped view of a backing storage, optionally reserving additional address space for later growth.
   \param section A memory section handle specifying the backing storage to use.
   \param bytes How many bytes to reserve (0 = the size of the section). Rounded up to nearest 64Kb on Windows.
-  \param offset The offset into the backing storage to map from. Typically needs to be at least a multiple of the page size (see utils::page_sizes()), on Windows it needs to be a multiple of the kernel memory allocation granularity (typically 64Kb).
-  \param _flag The permissions with which to map the view which are constrained by the permissions of the memory section. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
+  \param offset The offset into the backing storage to map from. Typically needs to be at least a multiple of the page size (see `page_size()`), on Windows it needs to be a multiple of the kernel memory allocation granularity (typically 64Kb).
+  \param _flag The permissions with which to map the view which are constrained by the permissions of the memory section. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory. Note that apart from read/write/cow/execute,
+  the section's flags override the map's flags.
 
   \errors Any of the values POSIX mmap() or NtMapViewOfSection() can return.
   */
@@ -420,6 +495,9 @@ public:
   //! The size of the memory map. This is the accessible size, NOT the reservation size.
   LLFIO_MAKE_FREE_FUNCTION
   size_type length() const noexcept { return _length; }
+
+  //! The page size used by the map, in bytes.
+  size_type page_size() const noexcept { return _pagesize; }
 
   //! True if the map is of non-volatile RAM
   bool is_nvram() const noexcept { return !!(_flag & section_handle::flag::nvram); }
@@ -469,23 +547,28 @@ public:
   LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_type> truncate(size_type newsize, bool permit_relocation = false) noexcept;
 
-  //! Ask the system to commit the system resources to make the memory represented by the buffer available with the given permissions. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually committed.
+  //! Ask the system to commit the system resources to make the memory represented by the buffer available with the given permissions. addr and length should be page aligned (see `page_size()`), if not the returned buffer is the region actually committed.
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> commit(buffer_type region, section_handle::flag flag = section_handle::flag::readwrite) noexcept;
 
-  //! Ask the system to make the memory represented by the buffer unavailable and to decommit the system resources representing them. addr and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually decommitted.
+  //! Ask the system to make the memory represented by the buffer unavailable and to decommit the system resources representing them. addr and length should be page aligned (see `page_size()`), if not the returned buffer is the region actually decommitted.
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> decommit(buffer_type region) noexcept;
 
-  /*! Zero the memory represented by the buffer. Differs from zero() because it acts on mapped memory, but may call zero() internally.
+  /*! Zero the memory represented by the buffer. Differs from zero() because it acts on mapped memory, not on allocated file extents.
 
-  On Linux, Windows and FreeBSD any full 4Kb pages will be deallocated from the
+  On Linux, Mac OS and FreeBSD any full 4Kb pages will be deallocated from the
   system entirely, including the extents for them in any backing storage. On newer Linux kernels the kernel can additionally swap whole 4Kb pages for
   freshly zeroed ones making this a very efficient way of zeroing large ranges of memory.
+
+  On Windows, this call currently only works for non-backed memory due to lacking kernel support.
+
   \errors Any of the errors returnable by madvise() or DiscardVirtualMemory or the zero() function.
   */
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> zero_memory(buffer_type region) noexcept;
 
-  /*! Ask the system to unset the dirty flag for the memory represented by the buffer. This will prevent any changes not yet sent to the backing storage from being sent in the future, also if the system kicks out this page and reloads it you may see some edition of the underlying storage instead of what was here. addr
-  and length should be page aligned (see utils::page_sizes()), if not the returned buffer is the region actually undirtied.
+  /*! Ask the system to unset the dirty flag for the memory represented by the buffer. This will prevent any changes not yet sent to
+  the backing storage from being sent in the future, also if the system kicks out this page and reloads it you may see some edition of
+  the underlying storage instead of what was here. `addr` and `length` should be page aligned (see`page_size()`), if not the returned
+  buffer is the region actually undirtied.
 
   \warning This function destroys the contents of unwritten pages in the region in a totally unpredictable fashion. Only use it if you don't care how much of
   the region reaches physical storage or not. Note that the region is not necessarily zeroed, and may be randomly zeroed.
@@ -637,7 +720,7 @@ inline map_handle::const_buffer_type barrier(map_handle &self, map_handle::const
   return self.barrier(std::forward<decltype(req)>(req), std::forward<decltype(evict)>(evict));
 }
 /*! Create new memory and map it into view.
-\param bytes How many bytes to create and map. Typically will be rounded up to a multiple of the page size (see `utils::page_sizes()`) on POSIX, 64Kb on Windows.
+\param bytes How many bytes to create and map. Typically will be rounded up to a multiple of the page size (see `page_size()`) on POSIX, 64Kb on Windows.
 \param _flag The permissions with which to map the view. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
 
 \note On Microsoft Windows this constructor uses the faster VirtualAlloc() which creates less versatile page backed memory. If you want anonymous memory
@@ -654,7 +737,7 @@ inline result<map_handle> map(map_handle::size_type bytes, bool zeroed = false, 
 /*! Create a memory mapped view of a backing storage, optionally reserving additional address space for later growth.
 \param section A memory section handle specifying the backing storage to use.
 \param bytes How many bytes to reserve (0 = the size of the section). Rounded up to nearest 64Kb on Windows.
-\param offset The offset into the backing storage to map from. Typically needs to be at least a multiple of the page size (see utils::page_sizes()), on Windows it needs to be a multiple of the kernel memory allocation granularity (typically 64Kb).
+\param offset The offset into the backing storage to map from. Typically needs to be at least a multiple of the page size (see `page_size()`), on Windows it needs to be a multiple of the kernel memory allocation granularity (typically 64Kb).
 \param _flag The permissions with which to map the view which are constrained by the permissions of the memory section. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
 
 \errors Any of the values POSIX mmap() or NtMapViewOfSection() can return.
@@ -729,6 +812,46 @@ inline map_handle::io_result<map_handle::const_buffers_type> write(map_handle &s
   return self.write(std::forward<decltype(reqs)>(reqs), std::forward<decltype(d)>(d));
 }
 // END make_free_functions.py
+
+namespace detail
+{
+  inline result<size_t> pagesize_from_flags(section_handle::flag _flag) noexcept
+  {
+    try
+    {
+      const auto &pagesizes = utils::page_sizes();
+      if((_flag & section_handle::flag::page_sizes_3) == section_handle::flag::page_sizes_3)
+      {
+        if(pagesizes.size() < 4)
+        {
+          return errc::invalid_argument;
+        }
+        return pagesizes[3];
+      }
+      else if((_flag & section_handle::flag::page_sizes_2) == section_handle::flag::page_sizes_2)
+      {
+        if(pagesizes.size() < 3)
+        {
+          return errc::invalid_argument;
+        }
+        return pagesizes[2];
+      }
+      else if((_flag & section_handle::flag::page_sizes_1) == section_handle::flag::page_sizes_1)
+      {
+        if(pagesizes.size() < 2)
+        {
+          return errc::invalid_argument;
+        }
+        return pagesizes[1];
+      }
+      return pagesizes[0];
+    }
+    catch(...)
+    {
+      return error_from_exception();
+    }
+  }
+}  // namespace detail
 
 LLFIO_V2_NAMESPACE_END
 

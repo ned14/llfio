@@ -21,18 +21,19 @@ filesystem algorithms which work well with directly mapped non-volatile storage 
 as Intel Optane.
 
 It is a complete rewrite after a Boost peer review in August 2015. Its github
-source code repository lives at https://github.com/ned14/boost.llfio.
+source code repository lives at https://github.com/ned14/llfio.
 
 - Portable to any conforming C++ 14 compiler with a working Filesystem TS in its STL.
 - Will make use of any Concepts TS if you have them.
-- `async_file_handle` supports `co_await` (Coroutines TS).
 - Provides view adapters into the Ranges TS, so ready for STL2.
 - Original error code is always preserved, even down to the original NT kernel error code if a NT kernel API was used.
     - Optional configuration based on [P1028](https://wg21.link/P1028) *SG14 status_code and standard error object
     for P0709 Zero-overhead deterministic exceptions*.
 - Race free filesystem design used throughout (i.e. no TOCTOU).
 - Zero malloc, zero exception throw and zero whole system memory copy design used throughout, even down to paths (which can hit 64Kb!).
-- Works very well with the C++ standard library, and is intended to be proposed for standardisation into C++ in Summer 2018.
+- Comprehensive support for virtual and mapped memory of both SCM/DAX and page cached storage, including large, huge and super pages.
+- Works very well with the C++ standard library, and is being proposed for standardisation into C++. See <a href="https://wg21.link/P1031">P1031 *Low level file i/o*</a>.
+- `async_file_handle` supports `co_await` (Coroutines TS).
 
 \note Note that this code is of late alpha quality. It's quite reliable on Windows and Linux, but be careful when using it!
 
@@ -59,6 +60,11 @@ implementation in your STL and C++ 14. See https://github.com/ned14/llfio/blob/m
 for a database of latencies for various previously tested OS, filing systems and storage devices.
 
 Todo list for already implemented parts: https://ned14.github.io/llfio/todo.html
+
+LLFIO defaults to header only library configuration, so you don't actually need any of the prebuilt
+binaries above. It is however faster to build if you do. In this situation, define `LLFIO_HEADERS_ONLY=0`,
+and choose one of `LLFIO_DYN_LINK` or `LLFIO_STATIC_LINK` depending on whether you are using the
+prebuilt shared or static libraries respectively.
 
 To build and test (make, ninja etc):
 
@@ -145,8 +151,9 @@ Todo:
 | ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on safe byte ranges
 |   | ✔ | ✔ | Set random or sequential i/o (prefetch).
 | ✔ | ✔ | ✔ | i/o on `async_file_handle` is coroutines awaitable.
-| ✔ | ✔ |   | `llfio::algorithm::trivial_vector<T>` with constant time reallocation if `T` is trivially copyable.
+| ✔ | ✔ | ✔ | `llfio::algorithm::trivial_vector<T>` with constant time reallocation if `T` is trivially copyable.
 |   | ✔ | ✔ | `symlink_handle`.
+| ✔ | ✔ | ✔ | Large, huge and massive page size support for memory allocation and (POSIX only) file maps.
 
 Todo thereafter in order of priority:
 

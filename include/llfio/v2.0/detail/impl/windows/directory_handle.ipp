@@ -208,61 +208,61 @@ result<void> directory_handle::unlink(deadline d) noexcept
   return h.unlink(d);
 }
 
-result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_type &&tofill, path_view_type glob, filter filtering, span<char> kernelbuffer) const noexcept
+result<directory_handle::buffers_type> directory_handle::read(io_request<buffers_type> req) const noexcept
 {
   static constexpr stat_t::want default_stat_contents = stat_t::want::ino | stat_t::want::type | stat_t::want::atim | stat_t::want::mtim | stat_t::want::ctim | stat_t::want::size | stat_t::want::allocated | stat_t::want::birthtim | stat_t::want::sparse | stat_t::want::compressed | stat_t::want::reparse_point;
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   LLFIO_LOG_FUNCTION_CALL(this);
-  if(tofill.empty())
+  if(req.buffers.empty())
   {
-    return enumerate_info{std::move(tofill), stat_t::want::none, false};
+    return std::move(req.buffers);
   }
   UNICODE_STRING _glob{};
   memset(&_glob, 0, sizeof(_glob));
-  path_view_type::c_str zglob(glob, true);
-  if(!glob.empty())
+  path_view_type::c_str zglob(req.glob, true);
+  if(!req.glob.empty())
   {
     _glob.Buffer = const_cast<wchar_t *>(zglob.buffer);
     _glob.Length = zglob.length * sizeof(wchar_t);
     _glob.MaximumLength = _glob.Length + sizeof(wchar_t);
   }
-  if(!tofill._kernel_buffer && kernelbuffer.empty())
+  if(!req.buffers._kernel_buffer && req.kernelbuffer.empty())
   {
     // Let's assume the average leafname will be 64 characters long.
-    size_t toallocate = (sizeof(FILE_ID_FULL_DIR_INFORMATION) + 64 * sizeof(wchar_t)) * tofill.size();
+    size_t toallocate = (sizeof(FILE_ID_FULL_DIR_INFORMATION) + 64 * sizeof(wchar_t)) * req.buffers.size();
     auto *mem = new(std::nothrow) char[toallocate];
     if(mem == nullptr)
     {
       return errc::not_enough_memory;
     }
-    tofill._kernel_buffer = std::unique_ptr<char[]>(mem);
-    tofill._kernel_buffer_size = toallocate;
+    req.buffers._kernel_buffer = std::unique_ptr<char[]>(mem);
+    req.buffers._kernel_buffer_size = toallocate;
   }
   FILE_ID_FULL_DIR_INFORMATION *buffer;
   ULONG bytes;
   bool done = false;
   do
   {
-    buffer = kernelbuffer.empty() ? reinterpret_cast<FILE_ID_FULL_DIR_INFORMATION *>(tofill._kernel_buffer.get()) : reinterpret_cast<FILE_ID_FULL_DIR_INFORMATION *>(kernelbuffer.data());
-    bytes = kernelbuffer.empty() ? static_cast<ULONG>(tofill._kernel_buffer_size) : static_cast<ULONG>(kernelbuffer.size());
+    buffer = req.kernelbuffer.empty() ? reinterpret_cast<FILE_ID_FULL_DIR_INFORMATION *>(req.buffers._kernel_buffer.get()) : reinterpret_cast<FILE_ID_FULL_DIR_INFORMATION *>(req.kernelbuffer.data());
+    bytes = req.kernelbuffer.empty() ? static_cast<ULONG>(req.buffers._kernel_buffer_size) : static_cast<ULONG>(req.kernelbuffer.size());
     IO_STATUS_BLOCK isb = make_iostatus();
-    NTSTATUS ntstat = NtQueryDirectoryFile(_v.h, nullptr, nullptr, nullptr, &isb, buffer, bytes, FileIdFullDirectoryInformation, FALSE, glob.empty() ? nullptr : &_glob, TRUE);
+    NTSTATUS ntstat = NtQueryDirectoryFile(_v.h, nullptr, nullptr, nullptr, &isb, buffer, bytes, FileIdFullDirectoryInformation, FALSE, req.glob.empty() ? nullptr : &_glob, TRUE);
     if(STATUS_PENDING == ntstat)
     {
       ntstat = ntwait(_v.h, isb, deadline());
     }
-    if(kernelbuffer.empty() && STATUS_BUFFER_OVERFLOW == ntstat)
+    if(req.kernelbuffer.empty() && STATUS_BUFFER_OVERFLOW == ntstat)
     {
-      tofill._kernel_buffer.reset();
-      size_t toallocate = tofill._kernel_buffer_size * 2;
+      req.buffers._kernel_buffer.reset();
+      size_t toallocate = req.buffers._kernel_buffer_size * 2;
       auto *mem = new(std::nothrow) char[toallocate];
       if(mem == nullptr)
       {
         return errc::not_enough_memory;
       }
-      tofill._kernel_buffer = std::unique_ptr<char[]>(mem);
-      tofill._kernel_buffer_size = toallocate;
+      req.buffers._kernel_buffer = std::unique_ptr<char[]>(mem);
+      req.buffers._kernel_buffer_size = toallocate;
     }
     else
     {
@@ -289,9 +289,9 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     {
       ffdi->FileName[length] = 0;
     }
-    directory_entry &item = tofill[n];
+    directory_entry &item = req.buffers[n];
     item.leafname = path_view(wstring_view(ffdi->FileName, length));
-    if(filtering == filter::fastdeleted && item.leafname.is_llfio_deleted())
+    if(req.filtering == filter::fastdeleted && item.leafname.is_llfio_deleted())
     {
       continue;
     }
@@ -311,13 +311,17 @@ result<directory_handle::enumerate_info> directory_handle::enumerate(buffers_typ
     if(ffdi->NextEntryOffset == 0u)
     {
       // Fill is complete
-      tofill._resize(n);
-      return enumerate_info{std::move(tofill), default_stat_contents, true};
+      req.buffers._resize(n);
+      req.buffers._metadata = default_stat_contents;
+      req.buffers._done = true;
+      return std::move(req.buffers);
     }
-    if(n >= tofill.size())
+    if(n >= req.buffers.size())
     {
       // Fill is incomplete
-      return enumerate_info{std::move(tofill), default_stat_contents, false};
+      req.buffers._metadata = default_stat_contents;
+      req.buffers._done = false;
+      return std::move(req.buffers);
     }
   }
 }
