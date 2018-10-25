@@ -74,10 +74,43 @@ static inline void TestFastRandomFileHandlePerformance()
   memset(store.begin(), 1, store.size());
   fast_random_file_handle h = fast_random_file_handle::fast_random_file(testbytes).value();
   auto begin = std::chrono::high_resolution_clock::now();
-  h.read(0, {{store.begin(), store.size()}}).value();
+  while(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < 1)
+    ;
+  QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng prng;
+  begin = std::chrono::high_resolution_clock::now();
+  for(size_t n = 0; n < 10; n++)
+  {
+    for(size_t i = 0; i < store.size(); i += 64)
+    {
+      *(uint32_t *) (&store[i + 0]) = prng();
+      *(uint32_t *) (&store[i + 4]) = prng();
+      *(uint32_t *) (&store[i + 8]) = prng();
+      *(uint32_t *) (&store[i + 12]) = prng();
+      *(uint32_t *) (&store[i + 16]) = prng();
+      *(uint32_t *) (&store[i + 20]) = prng();
+      *(uint32_t *) (&store[i + 24]) = prng();
+      *(uint32_t *) (&store[i + 28]) = prng();
+      *(uint32_t *) (&store[i + 32]) = prng();
+      *(uint32_t *) (&store[i + 36]) = prng();
+      *(uint32_t *) (&store[i + 40]) = prng();
+      *(uint32_t *) (&store[i + 44]) = prng();
+      *(uint32_t *) (&store[i + 48]) = prng();
+      *(uint32_t *) (&store[i + 52]) = prng();
+      *(uint32_t *) (&store[i + 56]) = prng();
+      *(uint32_t *) (&store[i + 60]) = prng();
+    }
+  }
   auto end = std::chrono::high_resolution_clock::now();
-  auto diff = std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
-  std::cout << "fast_random_file_handle produces randomness at " << ((testbytes / 1024.0 / 1024.0) / (diff.count() / 1000000.0)) << " Mb/sec" << std::endl;
+  auto diff1 = std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
+  begin = std::chrono::high_resolution_clock::now();
+  for(size_t n = 0; n < 10; n++)
+  {
+    h.read(0, {{store.begin(), store.size()}}).value();
+  }
+  end = std::chrono::high_resolution_clock::now();
+  auto diff2 = std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
+  std::cout << "small_prng produces randomness at " << ((testbytes / 1024.0 / 1024.0) / (diff1.count() / 10000000.0)) << " Mb/sec" << std::endl;
+  std::cout << "fast_random_file_handle produces randomness at " << ((testbytes / 1024.0 / 1024.0) / (diff2.count() / 10000000.0)) << " Mb/sec" << std::endl;
 }
 
 KERNELTEST_TEST_KERNEL(integration, llfio, fast_random_file_handle, works, "Tests that fast random file handle works as expected", TestFastRandomFileHandleWorks())

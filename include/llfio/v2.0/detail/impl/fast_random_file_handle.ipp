@@ -24,19 +24,6 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../../fast_random_file_handle.hpp"
 
-#ifdef __has_include
-#if __has_include("../../quickcpplib/include/algorithm/hash.hpp")
-#include "../../quickcpplib/include/algorithm/hash.hpp"
-#else
-#include "quickcpplib/include/algorithm/hash.hpp"
-#endif
-#elif __PCPP_ALWAYS_TRUE__
-#include "quickcpplib/include/algorithm/hash.hpp"
-#else
-#include "../../quickcpplib/include/algorithm/hash.hpp"
-#endif
-
-
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 fast_random_file_handle::io_result<fast_random_file_handle::buffers_type> fast_random_file_handle::read(io_request<buffers_type> reqs, deadline /* unused */) noexcept
@@ -50,7 +37,7 @@ fast_random_file_handle::io_result<fast_random_file_handle::buffers_type> fast_r
     }
     return std::move(reqs.buffers);
   }
-  extent_type hashoffset, togo = _length - reqs.offset;
+  extent_type togo = _length - reqs.offset;
   // Fill the scatter buffers
   for(auto &buffer : reqs.buffers)
   {
@@ -62,10 +49,10 @@ fast_random_file_handle::io_result<fast_random_file_handle::buffers_type> fast_r
     {
       for(extent_type i = 0; i < buffer.size();)
       {
-        hashoffset = reqs.offset >> 4;  // add this offset to the state
-        _iv[0] = hashoffset;
-        auto hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash((const char *) _iv, 16);
-        extent_type thisblockoffset = reqs.offset - (hashoffset << 4), thisblocklen = 16 - thisblockoffset;
+        // How much can we do at once?
+        auto hashoffset = reqs.offset >> 2;                      // place this offset into the state
+        auto thisblockoffset = reqs.offset - (hashoffset << 2);  // offset into our buffer due to request offset misalignment
+        extent_type thisblocklen = 64;                           // maximum possible block this iteration
         if(thisblocklen > buffer.size() - i)
         {
           thisblocklen = buffer.size() - i;
@@ -74,7 +61,70 @@ fast_random_file_handle::io_result<fast_random_file_handle::buffers_type> fast_r
         {
           thisblocklen = togo;
         }
-        memcpy(buffer.data() + i, hash.as_bytes + thisblockoffset, thisblocklen);
+
+        struct _p
+        {
+          uint32_t hash[16];
+        } blk, *p = &blk;
+        // If not copying partial buffers
+        if(thisblockoffset == 0)
+        {
+          // If destination is on 4 byte multiple, we can write direct
+          if((((uintptr_t) buffer.data() + i) & 3) == 0)
+            p = (_p *) (buffer.data() + i);
+        }
+        if(thisblocklen == 64)
+        {
+          auto &hash = p->hash;
+          prng __prngs[16] = {_prng, _prng, _prng, _prng, _prng, _prng, _prng, _prng, _prng, _prng, _prng, _prng, _prng, _prng, _prng, _prng};
+          hash[0] = __prngs[0](hashoffset + 0);
+          hash[1] = __prngs[1](hashoffset + 1);
+          hash[2] = __prngs[2](hashoffset + 2);
+          hash[3] = __prngs[3](hashoffset + 3);
+          hash[4] = __prngs[4](hashoffset + 4);
+          hash[5] = __prngs[5](hashoffset + 5);
+          hash[6] = __prngs[6](hashoffset + 6);
+          hash[7] = __prngs[7](hashoffset + 7);
+          hash[8] = __prngs[8](hashoffset + 8);
+          hash[9] = __prngs[9](hashoffset + 9);
+          hash[10] = __prngs[10](hashoffset + 10);
+          hash[11] = __prngs[11](hashoffset + 11);
+          hash[12] = __prngs[12](hashoffset + 12);
+          hash[13] = __prngs[13](hashoffset + 13);
+          hash[14] = __prngs[14](hashoffset + 14);
+          hash[15] = __prngs[15](hashoffset + 15);
+          if(thisblocklen > 64 - thisblockoffset)
+          {
+            thisblocklen = 64 - thisblockoffset;
+          }
+        }
+        else if(thisblocklen == 16)
+        {
+          auto &hash = p->hash;
+          prng __prngs[4] = {_prng, _prng, _prng, _prng};
+          hash[0] = __prngs[0](hashoffset + 0);
+          hash[1] = __prngs[1](hashoffset + 1);
+          hash[2] = __prngs[2](hashoffset + 2);
+          hash[3] = __prngs[3](hashoffset + 3);
+          if(thisblocklen > 16 - thisblockoffset)
+          {
+            thisblocklen = 16 - thisblockoffset;
+          }
+        }
+        else
+        {
+          auto &hash = p->hash;
+          auto __prng(_prng);
+          hash[0] = __prng(hashoffset);
+          if(thisblocklen > 4 - thisblockoffset)
+          {
+            thisblocklen = 4 - thisblockoffset;
+          }
+        }
+        if(p == &blk)
+        {
+          memcpy(buffer.data() + i, ((const char *) p) + thisblockoffset, thisblocklen);
+        }
         reqs.offset += thisblocklen;
         i += thisblocklen;
         togo -= thisblocklen;

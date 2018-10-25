@@ -27,6 +27,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "file_handle.hpp"
 
+#include "quickcpplib/include/algorithm/small_prng.hpp"
+
 //! \file fast_random_file_handle.hpp Provides `fast_random_file_handle`.
 
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
@@ -35,18 +37,18 @@ LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 \brief A handle to synthesised, non-cryptographic, pseudo-random data.
 
 This implementation of file handle provides read-only file data of random bits
-based on Bob Jenkin's 128-bit SpookyHash (http://burtleburtle.net/bob/hash/spooky.html).
-It works by initialising the hash state from the 128-bit seed you provide at construction,
-and then for each 16 byte block it copies the 304 bytes of hash state, adds the scatter buffer
-offset divided by 16 to the hash, generating a unique 128-bit hash for that seed and
-file offset. SpookyHash is not a cryptographically secure hash, so do not use this
-class for anything secure. However it certainly ought to produce very random data
-indeed, as SpookyHash is an excellent quality fast hash.
+based on Bob Jenkins' 32-bit JSF PRNG (http://burtleburtle.net/bob/rand/smallprng.html).
+It works by initialising the prng state from the seed you provide at construction,
+and then for each 4 byte block it copies the 16 bytes of prng state, overwrites the
+first eight bytes with the offset divided by 4, and performs a PRNG round to generate
+a fairly unique number. As there are eight bytes of randomness being mixed with eight
+bytes of counter, this will not be a particularly random stream, but it's probably not
+awful either.
 
 Note that writes to this handle are permitted if it was opened with write permission,
 but writes have no effect.
 
-The use for a file handle full of very random data may not be obvious. The first is
+The use for a file handle full of random data may not be obvious. The first is
 to obfuscate another file's data using `algorithm::xor_file_handle`. The second is
 for mock ups in testing, where this file handle stands in for some other (large) file,
 and you are testing throughput or latency in processing code.
@@ -55,9 +57,22 @@ The third is for unit testing randomly corrupted file data. `algorithm::mix_file
 can randomly mix scatter gather buffers from this file handle into another file handle
 in order to test how well handling code copes with random data corruption.
 
-VS2017:
-- 416Mb/sec static function
-- 539Mb/sec preinit, add, finalise
+## Benchmarks:
+
+On a 3.1Ghz Intel Skylake CPU where `memcpy()` can do ~12Gb/sec:
+
+- GCC7: 4659 Mb/sec
+- VS2017: 3653 Mb/sec
+
+The current implementation spots when it can do 16x simultaneous PRNG rounds, and thus
+can fill a cache line at a time. The Skylake CPU used to benchmark the code dispatches
+around four times the throughput with this, however there is likely still performance
+left on the table.
+
+If someone were bothered to rewrite the JSF PRNG into SIMD, it is possible one could
+approach `memcpy()` in performance. One would probably need to use AVX-512 however,
+as the JSF PRNG makes heavy use of bit rotation, which is slow before AVX-512 as it
+must be emulated with copious bit shifting and masking.
 */
 class fast_random_file_handle : public file_handle
 {
@@ -80,7 +95,27 @@ public:
   template <class T> using io_result = io_handle::io_result<T>;
 
 protected:
-  uint64_t _iv[12]{};  // sc_blockSize from SpookyHash
+  struct prng : public QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng
+  {
+    using _base = QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng;
+    prng() = default;
+    // Construct an instance with `seed`
+    explicit prng(span<const byte> seed) noexcept
+    {
+      a = 0xf1ea5eed;
+      b = c = d = 0xdeadbeef;
+      memcpy(&a, seed.data(), std::min(seed.size(), sizeof(*this)));
+      for(size_t i = 0; i < 20; ++i)
+        _base::operator()();
+    }
+    // Return randomness for a given extent
+    _base::value_type operator()(extent_type offset) noexcept
+    {
+      a = offset & 0xffffffff;
+      b = (offset >> 32) & 0xffffffff;
+      return _base::operator()();
+    }
+  } _prng;
   extent_type _length{0};
 
   result<void> _perms_check() const noexcept
@@ -94,16 +129,16 @@ protected:
 
 public:
   //! Default constructor
-  constexpr fast_random_file_handle() {}  // NOLINT
-                                          //! Constructor. Seed can be of up to 88 bytes.
+  fast_random_file_handle() = default;
+  //! Constructor. Seed is not much use past sixteen bytes.
   fast_random_file_handle(extent_type length, span<const byte> seed)
-      : _length(length)
+      : _prng(seed)
+      , _length(length)
   {
-    memcpy(&_iv[1], seed.begin(), (seed.size() < (sizeof(_iv) - sizeof(_iv[0]))) ? seed.size() : (sizeof(_iv) - sizeof(_iv[0])));
   }
 
   //! Implicit move construction of fast_random_file_handle permitted
-  fast_random_file_handle(fast_random_file_handle &&o) noexcept : _length(o._length) { memcpy(_iv, o._iv, sizeof(_iv)); }
+  fast_random_file_handle(fast_random_file_handle &&o) noexcept : _prng(o._prng), _length(o._length) {}
   //! No copy construction (use `clone()`)
   fast_random_file_handle(const fast_random_file_handle &) = delete;
   //! Move assignment of fast_random_file_handle permitted
@@ -136,7 +171,7 @@ public:
     {
       return errc::invalid_argument;
     }
-    byte _seed[88];
+    byte _seed[16];
     if(seed.empty())
     {
       utils::random_fill((char *) _seed, sizeof(_seed));
