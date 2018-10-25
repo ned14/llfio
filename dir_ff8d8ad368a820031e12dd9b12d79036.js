@@ -5,6 +5,11 @@ var dir_ff8d8ad368a820031e12dd9b12d79036 =
     [ "config.hpp", "config_8hpp.html", "config_8hpp" ],
     [ "deadline.h", "deadline_8h.html", "deadline_8h" ],
     [ "directory_handle.hpp", "directory__handle_8hpp.html", "directory__handle_8hpp" ],
+    [ "fast_random_file_handle.hpp", "fast__random__file__handle_8hpp.html", [
+      [ "fast_random_file_handle", "classllfio__v2__xxx_1_1fast__random__file__handle.html", "classllfio__v2__xxx_1_1fast__random__file__handle" ],
+      [ "prng", "structllfio__v2__xxx_1_1fast__random__file__handle_1_1prng.html", "structllfio__v2__xxx_1_1fast__random__file__handle_1_1prng" ],
+      [ "construct< fast_random_file_handle >", "structllfio__v2__xxx_1_1construct_3_01fast__random__file__handle_01_4.html", "structllfio__v2__xxx_1_1construct_3_01fast__random__file__handle_01_4" ]
+    ] ],
     [ "file_handle.hpp", "file__handle_8hpp.html", "file__handle_8hpp" ],
     [ "fs_handle.hpp", "fs__handle_8hpp.html", "fs__handle_8hpp" ],
     [ "handle.hpp", "handle_8hpp.html", "handle_8hpp" ],
