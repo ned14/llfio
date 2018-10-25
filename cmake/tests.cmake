@@ -13,6 +13,7 @@ set(llfio_TESTS
   "test/tests/current_path.cpp"
   "test/tests/directory_handle_create_close/runner.cpp"
   "test/tests/directory_handle_enumerate/runner.cpp"
+  "test/tests/fast_random_file_handle.cpp"
   "test/tests/file_handle_create_close/runner.cpp"
   "test/tests/file_handle_lock_unlock.cpp"
   "test/tests/large_pages.cpp"
