@@ -1,6 +1,7 @@
 var NAVTREE =
 [
   [ "LLFIO", "index.html", [
+    [ "Build instructions", "md__build.html", null ],
     [ "Todo List", "todo.html", null ],
     [ "Modules", "modules.html", "modules" ],
     [ "Namespaces", null, [
@@ -45,9 +46,9 @@ var NAVTREEINDEX =
 "classllfio__v2__xxx_1_1mapped__file__handle.html#a7126a726b2a06e4c1eca1a94c41163ff",
 "classllfio__v2__xxx_1_1symlink__handle.html#a1908a242ca435cf1386fe96a86da4002",
 "index.html",
-"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a0cb7623d9b4cc4c3acdad0ab030fb9c5",
-"structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7a4afae65da7b66f75e6e82b470d298fb5",
-"structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html#af8906857ccc0bc91120d1d05f632b91d"
+"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a0be07d789edddbe8e88938cdd81c8420",
+"structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7a3cea1a678741f4ce20e57164946b5fc1",
+"structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html#af7beaacfc3e7e47ef2392dfeac421b5d"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

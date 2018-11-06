@@ -15,5 +15,6 @@ var searchData=
   ['byte_5flock_5finsanity',['byte_lock_insanity',['../classllfio__v2__xxx_1_1handle.html#a5929f46f42112bd805ab5001bfbf9d2aa6aa77c9bac6dd95b83f8d278f0e5fa59',1,'llfio_v2_xxx::handle']]],
   ['byte_5franges',['byte_ranges',['../classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html',1,'llfio_v2_xxx::algorithm::shared_fs_mutex::byte_ranges'],['../classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html#ae6ccd949eefecbcf8208420ad9c27cf3',1,'llfio_v2_xxx::algorithm::shared_fs_mutex::byte_ranges::byte_ranges(const byte_ranges &amp;)=delete'],['../classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html#a9223706814fe3ddc1c6260408f643b4a',1,'llfio_v2_xxx::algorithm::shared_fs_mutex::byte_ranges::byte_ranges(byte_ranges &amp;&amp;o) noexcept']]],
   ['byte_5franges_2ehpp',['byte_ranges.hpp',['../byte__ranges_8hpp.html',1,'']]],
-  ['bytes_5ftransferred',['bytes_transferred',['../structllfio__v2__xxx_1_1io__handle_1_1io__result.html#a58e05cc0f5fe29282c69d44e6797d41a',1,'llfio_v2_xxx::io_handle::io_result']]]
+  ['bytes_5ftransferred',['bytes_transferred',['../structllfio__v2__xxx_1_1io__handle_1_1io__result.html#a58e05cc0f5fe29282c69d44e6797d41a',1,'llfio_v2_xxx::io_handle::io_result']]],
+  ['build_20instructions',['Build instructions',['../md__build.html',1,'']]]
 ];
