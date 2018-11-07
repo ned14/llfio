@@ -49,42 +49,14 @@ Examples of use:
 </tr>
 </table>
 
-These compilers and OS are regularly tested:
-- GCC 7.0 (Linux 4,x x64)
-- clang 4.0 (Linux 4.x x64)
-- clang 5.0 (OS X 10.12 x64)
-- Visual Studio 2017 (Windows 10 x64)
-
-Other compilers, architectures and OSs may work, but are not tested regularly. You will need a Filesystem TS
-implementation in your STL and C++ 14. See https://github.com/ned14/llfio/blob/master/programs/fs-probe/fs_probe_results.yaml
+See https://github.com/ned14/llfio/blob/master/programs/fs-probe/fs_probe_results.yaml
 for a database of latencies for various previously tested OS, filing systems and storage devices.
 
 Todo list for already implemented parts: https://ned14.github.io/llfio/todo.html
 
-LLFIO defaults to header only library configuration, so you don't actually need any of the prebuilt
-binaries above. It is however faster to build if you do. In this situation, define `LLFIO_HEADERS_ONLY=0`,
-and choose one of `LLFIO_DYN_LINK` or `LLFIO_STATIC_LINK` depending on whether you are using the
-prebuilt shared or static libraries respectively.
-
-To build and test (make, ninja etc):
-
-~~~
-mkdir build
-cd build
-cmake ..
-cmake --build .
-ctest -R llfio_sl
-~~~
-
-To build and test (Visual Studio, XCode etc):
-
-~~~
-mkdir build
-cd build
-cmake ..
-cmake --build . --config Release
-ctest -C Release -R llfio_sl
-~~~
+<p>&nbsp;</p>
+<center><span style="font-size: large; text-decoration: underline;">[Build instructions can found here](Build.md)</span></center>
+<p>&nbsp;</p>
 
 ## v2 architecture and design implemented:
 
