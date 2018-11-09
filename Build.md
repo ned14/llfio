@@ -7,11 +7,14 @@ These compilers and OSs are regularly tested:
 - Clang 5.0 (macOS 10.12 x64)
 - Visual Studio 2017 (Windows 10 x64)
 
-Other compilers, architectures and OSs may work, but are not tested regularly. You will need a working [Filesystem TS](https://en.cppreference.com/w/cpp/experimental/fs) implementation in your STL, and C++ 14. 
+Other compilers, architectures and OSs may work, but are not tested regularly.
+You will need a working [Filesystem TS](https://en.cppreference.com/w/cpp/experimental/fs)
+implementation in your STL, and C++ 14. 
 
 ## Get a copy of the source
 
-Download [this archive](https://dedi5.nedprod.com/static/files/llfio-v2.0-source-latest.tar.xz) or clone from the GitHub repository:
+Download [this archive](https://dedi5.nedprod.com/static/files/llfio-v2.0-source-latest.tar.xz)
+or clone from the GitHub repository:
 
 ~~~
 git config --system core.longpaths true
@@ -19,11 +22,14 @@ git clone --recursive https://github.com/ned14/llfio.git
 cd llfio
 ~~~
 
-The first command is relevant so deeply nested paths on Windows will work when cloning the repository and submodules. It may require elevated privileges, but you can also use `git config --global core.longpaths true` instead.
+The first command is relevant so deeply nested paths on Windows will work when
+cloning the repository and submodules. It may require elevated privileges, but
+you can also use `git config --global core.longpaths true` instead.
 
 ### If you already cloned before reading this
 
-If you had already cloned _this_ repository, but didn't use the `--recursive` switch, you can simply run the following command from inside the work tree:
+If you had already cloned _this_ repository, but didn't use the `--recursive`
+switch, you can simply run the following command from inside the work tree:
 
 ~~~
 git submodule update --init --recursive
@@ -31,11 +37,35 @@ git submodule update --init --recursive
 
 ## Header only usage
 
-LLFIO defaults to header only library configuration, so you don't actually need any of the prebuilt binaries below, or to build anything. Simply:
+LLFIO defaults to header only library configuration, so you don't actually need
+any of the prebuilt binaries below, or to build anything. Simply:
 
 ~~~cpp
 #include "llfio/include/llfio.hpp"
 ~~~
+
+Note that on Microsoft Windows, the default header only configuration is unsafe
+to use outside of toy projects. You will get warnings of the form:
+
+~~~
+warning : LLFIO_HEADERS_ONLY=1, LLFIO_EXPERIMENTAL_STATUS_CODE=0 and NTKERNEL_ERROR_CATEGORY_INLINE=1 on Windows, this can produce unreliable binaries where semantic comparisons of error codes randomly fail!
+~~~
+
+... and ...
+
+~~~
+Defining custom error code category ntkernel_category() via header only form is unreliable! Semantic comparisons will break! Define NTKERNEL_ERROR_CATEGORY_INLINE to 0 and only ever link in ntkernel_category() from a prebuilt shared library to avoid this problem.
+~~~
+
+The cause is that `<system_error>` has a design flaw not rectified until
+([probably](https://wg21.link/P1196)) C++ 20 where custom error code categories
+are unsafe when shared libraries are in use.
+
+You have one of three choices here: (i) Use [experimental SG14 `status_code`](https://wg21.link/P1028)
+which doesn't have this problem (define `LLFIO_EXPERIMENTAL_STATUS_CODE=1`)
+(ii) Use the NT kernel error category as a shared library ([see its
+documentation](https://github.com/ned14/ntkernel-error-category)) (iii)
+Don't use header only LLFIO on Windows (see below).
 
 ## Prebuilt binaries
 
