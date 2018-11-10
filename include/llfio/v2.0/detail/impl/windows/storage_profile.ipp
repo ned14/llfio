@@ -302,7 +302,7 @@ namespace storage_profile
           case BusTypeNvme:
             sp.controller_type.value = "NVMe";
             break;
-          case BusTypeSCM:
+          case BusTypeSCM:  // NOTE: If this is not found, update your Windows SDK to something recent!!!
             sp.controller_type.value = "Storage Class Memory";
             break;
           default:
