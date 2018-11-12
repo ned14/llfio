@@ -88,9 +88,9 @@ public:
     only_metadata = 2,       //!< Cache reads and writes of metadata but avoid caching data (<tt>O_DIRECT</tt>), thus i/o here does not affect other cached data for other handles. Align all i/o to 4Kb boundaries for this to work.
     reads = 3,               //!< Cache reads only. Writes of data and metadata do not complete until reaching storage (<tt>O_SYNC</tt>). <tt>flag_disable_safety_fsyncs</tt> can be used here.
     reads_and_metadata = 5,  //!< Cache reads and writes of metadata, but writes of data do not complete until reaching storage (<tt>O_DSYNC</tt>). <tt>flag_disable_safety_fsyncs</tt> can be used here.
-    all = 4,                 //!< Cache reads and writes of data and metadata so they complete immediately, sending writes to storage at some point when the kernel decides (this is the default file system caching on a system).
+    all = 6,                 //!< Cache reads and writes of data and metadata so they complete immediately, sending writes to storage at some point when the kernel decides (this is the default file system caching on a system).
     safety_fsyncs = 7,       //!< Cache reads and writes of data and metadata so they complete immediately, but issue safety fsyncs at certain points. See documentation for <tt>flag_disable_safety_fsyncs</tt>.
-    temporary = 6            //!< Cache reads and writes of data and metadata so they complete immediately, only sending any updates to storage on last handle close in the system or if memory becomes tight as this file is expected to be temporary (Windows and FreeBSD only).
+    temporary = 8            //!< Cache reads and writes of data and metadata so they complete immediately, only sending any updates to storage on last handle close in the system or if memory becomes tight as this file is expected to be temporary (Windows and FreeBSD only).
                              // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
   };
   //! Bitwise flags which can be specified
@@ -161,6 +161,13 @@ public:
     can specify this flag to prevent that happening.
     */
     win_disable_sparse_file_creation = 1U << 25U,
+    /*! Filesystems tend to be embarrassingly parallel for operations performed to different
+    inodes. Where LLFIO performs i/o to multiple inodes at a time, it will use OpenMP or
+    the Parallelism or Concurrency standard library extensions to usually complete the
+    operation in constant rather than linear time. If you don't want this default, you can
+    disable default using this flag.
+    */
+    disable_parallelism = 1U << 26U,
 
     // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
 
@@ -379,6 +386,10 @@ inline std::ostream &operator<<(std::ostream &s, const handle::flag &v)
   if(!!(v & handle::flag::win_disable_sparse_file_creation))
   {
     temp.append("win_disable_sparse_file_creation|");
+  }
+  if(!!(v & handle::flag::disable_parallelism))
+  {
+    temp.append("disable_parallelism|");
   }
   if(!!(v & handle::flag::overlapped))
   {

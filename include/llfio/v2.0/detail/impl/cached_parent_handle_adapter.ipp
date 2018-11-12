@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../algorithm/cached_parent_handle_adapter.hpp"
+#include "../../algorithm/handle_adapter/cached_parent.hpp"
 
 #include <mutex>
 #include <unordered_map>

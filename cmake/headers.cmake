@@ -6,7 +6,7 @@ set(llfio_HEADERS
   "include/llfio/ntkernel-error-category/include/config.hpp"
   "include/llfio/ntkernel-error-category/include/ntkernel_category.hpp"
   "include/llfio/revision.hpp"
-  "include/llfio/v2.0/algorithm/cached_parent_handle_adapter.hpp"
+  "include/llfio/v2.0/algorithm/handle_adapter/cached_parent.hpp"
   "include/llfio/v2.0/algorithm/shared_fs_mutex/atomic_append.hpp"
   "include/llfio/v2.0/algorithm/shared_fs_mutex/base.hpp"
   "include/llfio/v2.0/algorithm/shared_fs_mutex/byte_ranges.hpp"

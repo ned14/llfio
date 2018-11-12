@@ -49,11 +49,11 @@ Note that writes to this handle are permitted if it was opened with write permis
 but writes have no effect.
 
 The use for a file handle full of random data may not be obvious. The first is
-to obfuscate another file's data using `algorithm::xor_file_handle`. The second is
+to obfuscate another file's data using `algorithm::xor_handle_adapter`. The second is
 for mock ups in testing, where this file handle stands in for some other (large) file,
 and you are testing throughput or latency in processing code.
 
-The third is for unit testing randomly corrupted file data. `algorithm::mix_file_handle`
+The third is for unit testing randomly corrupted file data. `algorithm::mix_handle_adapter`
 can randomly mix scatter gather buffers from this file handle into another file handle
 in order to test how well handling code copes with random data corruption.
 
@@ -74,7 +74,7 @@ approach `memcpy()` in performance. One would probably need to use AVX-512 howev
 as the JSF PRNG makes heavy use of bit rotation, which is slow before AVX-512 as it
 must be emulated with copious bit shifting and masking.
 */
-class fast_random_file_handle : public file_handle
+class LLFIO_DECL fast_random_file_handle : public file_handle
 {
 public:
   using dev_t = file_handle::dev_t;
@@ -203,6 +203,7 @@ public:
 
   /*! \brief Resize the current maximum permitted extent of the random file to the given extent.
   */
+  LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> truncate(extent_type newsize) noexcept override
   {
     OUTCOME_TRY(_perms_check());
@@ -211,11 +212,16 @@ public:
   }
 
   //! \brief Zero a portion of the random file (does nothing).
+  LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> zero(extent_type /*unused*/, extent_type bytes, deadline /*unused*/ = deadline()) noexcept override
   {
     OUTCOME_TRY(_perms_check());
     return bytes;
   }
+
+  //! \brief Return a single extent of the maximum extent
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<std::vector<std::pair<extent_type, extent_type>>> extents() const noexcept override { return std::vector<std::pair<extent_type, extent_type>>{{0, _length}}; }
+
 
   using file_handle::read;
   using file_handle::write;
@@ -232,6 +238,7 @@ public:
   \errors None possible.
   \mallocs None possible.
   */
+  LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline /* unused */ = deadline()) noexcept override;
 
   /*! \brief Fails to write to the random file.
@@ -245,6 +252,7 @@ public:
   \errors None possible if handle was opened with write permissions.
   \mallocs None possible.
   */
+  LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline /* unused */ = deadline()) noexcept override
   {
     OUTCOME_TRY(_perms_check());
@@ -254,6 +262,37 @@ public:
       buffer = {buffer.data(), 0};
     }
     return std::move(reqs.buffers);
+  }
+
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool /* unused */ = false, bool /* unused */ = false, deadline /* unused */ = deadline()) noexcept override
+  {
+    OUTCOME_TRY(_perms_check());
+    // Return null written
+    for(auto &buffer : reqs.buffers)
+    {
+      buffer = {buffer.data(), 0};
+    }
+    return std::move(reqs.buffers);
+  }
+
+private:
+  struct _extent_guard : public extent_guard
+  {
+    friend class fast_random_file_handle;
+    using extent_guard::extent_guard;
+  };
+
+public:
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_guard> lock(extent_type offset, extent_type bytes, bool exclusive = true, deadline /* unused */ = deadline()) noexcept override
+  {
+    // Lock nothing
+    return _extent_guard(this, offset, bytes, exclusive);
+  }
+
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(extent_type /*unused*/, extent_type /*unused*/) noexcept override
+  {
+    // Unlock nothing
   }
 };
 
