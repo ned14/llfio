@@ -29,6 +29,7 @@ var classllfio__v2__xxx_1_1symlink__handle =
       [ "maximum_prefetching", "classllfio__v2__xxx_1_1symlink__handle.html#a5929f46f42112bd805ab5001bfbf9d2aaf131856fed08b53ec642fbdc6d063de0", null ],
       [ "win_disable_unlink_emulation", "classllfio__v2__xxx_1_1symlink__handle.html#a5929f46f42112bd805ab5001bfbf9d2aacf17c790c4b3af070b11bc5b75911f9c", null ],
       [ "win_disable_sparse_file_creation", "classllfio__v2__xxx_1_1symlink__handle.html#a5929f46f42112bd805ab5001bfbf9d2aaafd26e37b4a783bd9814549fb4ff6cd0", null ],
+      [ "disable_parallelism", "classllfio__v2__xxx_1_1symlink__handle.html#a5929f46f42112bd805ab5001bfbf9d2aa49d1f07791f8f6d711df222027abe322", null ],
       [ "overlapped", "classllfio__v2__xxx_1_1symlink__handle.html#a5929f46f42112bd805ab5001bfbf9d2aab099987c48559cca2de094c74ffc702a", null ],
       [ "byte_lock_insanity", "classllfio__v2__xxx_1_1symlink__handle.html#a5929f46f42112bd805ab5001bfbf9d2aa6aa77c9bac6dd95b83f8d278f0e5fa59", null ],
       [ "anonymous_inode", "classllfio__v2__xxx_1_1symlink__handle.html#a5929f46f42112bd805ab5001bfbf9d2aa07122ea63cdc5b2c07e764d95a816d3d", null ]

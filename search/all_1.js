@@ -1,7 +1,6 @@
 var searchData=
 [
   ['acls',['acls',['../structllfio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#a17f61dd9f0f5aae7c34c55ba46358ddf',1,'llfio_v2_xxx::statfs_t::f_flags_t']]],
-  ['adapted_5fhandle_5ftype',['adapted_handle_type',['../classllfio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter.html#af52438883443a2aadd8f1253187d902b',1,'llfio_v2_xxx::algorithm::cached_parent_handle_adapter']]],
   ['address',['address',['../classllfio__v2__xxx_1_1map__handle.html#a7456b95e191ec373af61af6541dd4737',1,'llfio_v2_xxx::map_handle::address()'],['../classllfio__v2__xxx_1_1mapped__file__handle.html#af781e99c23d0a8158c249066214ac49c',1,'llfio_v2_xxx::mapped_file_handle::address()']]],
   ['aligned_5fio',['aligned_io',['../structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7aa965d460f7cbe6c30dfce6432bb1c41d',1,'llfio_v2_xxx::native_handle_type']]],
   ['all',['all',['../classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852aa181a603769c1f98ad927e7367c7aa51',1,'llfio_v2_xxx::handle']]],

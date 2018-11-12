@@ -13,5 +13,5 @@ var searchData=
   ['extension',['extension',['../classllfio__v2__xxx_1_1path__view.html#a8412be7f77b65810fd8da50987cdaf5a',1,'llfio_v2_xxx::path_view']]],
   ['extent',['extent',['../classllfio__v2__xxx_1_1io__handle_1_1extent__guard.html#a228c6d81a4f3734a01d896e47fc0f4d7',1,'llfio_v2_xxx::io_handle::extent_guard']]],
   ['extent_5fguard',['extent_guard',['../classllfio__v2__xxx_1_1io__handle_1_1extent__guard.html#afa82a05e49b0641c95f710b670903035',1,'llfio_v2_xxx::io_handle::extent_guard::extent_guard()'],['../classllfio__v2__xxx_1_1io__handle_1_1extent__guard.html#a854dea02310487970fd5b4c8600322ea',1,'llfio_v2_xxx::io_handle::extent_guard::extent_guard(extent_guard &amp;&amp;o) noexcept']]],
-  ['extents',['extents',['../classllfio__v2__xxx_1_1file__handle.html#a1c2c1c27b1be6414415b3fc3fcda88b2',1,'llfio_v2_xxx::file_handle::extents()'],['../namespacellfio__v2__xxx.html#a6f9a72b547dc542401a2d17b1c1e2e15',1,'llfio_v2_xxx::extents()']]]
+  ['extents',['extents',['../classllfio__v2__xxx_1_1fast__random__file__handle.html#a9bc75ea73ffb575d36e9800b8e1e5af0',1,'llfio_v2_xxx::fast_random_file_handle::extents()'],['../classllfio__v2__xxx_1_1file__handle.html#a1c2c1c27b1be6414415b3fc3fcda88b2',1,'llfio_v2_xxx::file_handle::extents()'],['../namespacellfio__v2__xxx.html#a6f9a72b547dc542401a2d17b1c1e2e15',1,'llfio_v2_xxx::extents()']]]
 ];

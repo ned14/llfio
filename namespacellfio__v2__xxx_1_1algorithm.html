@@ -103,19 +103,12 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter.html">cached_parent_handle_adapter</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adapts any <code>construct()</code>-able implementation to cache its parent directory handle in a process wide cache.  <a href="classllfio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides a constant time capacity expanding move-only STL vector. Requires <code>T</code> to be trivially copyable.  <a href="classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a0e474a5af3258fc971c71d057c8fb0bb"><td class="memTemplParams" colspan="2">template&lt;class T , class... Args&gt; </td></tr>
-<tr class="memitem:a0e474a5af3258fc971c71d057c8fb0bb"><td class="memTemplItemLeft" align="right" valign="top">result&lt; <a class="el" href="classllfio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter.html">cached_parent_handle_adapter</a>&lt; T &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a0e474a5af3258fc971c71d057c8fb0bb">cache_parent</a> (Args &amp;&amp;... args) noexcept</td></tr>
-<tr class="memdesc:a0e474a5af3258fc971c71d057c8fb0bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a <code>T</code> adapted into a parent handle caching implementation.  <a href="#a0e474a5af3258fc971c71d057c8fb0bb">More...</a><br /></td></tr>
-<tr class="separator:a0e474a5af3258fc971c71d057c8fb0bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6e8566ac7a5eeb0c14cf2387dfb8c1a1"><td class="memTemplParams" colspan="2"><a id="a6e8566ac7a5eeb0c14cf2387dfb8c1a1"></a>
 template&lt;class T &gt; </td></tr>
 <tr class="memitem:a6e8566ac7a5eeb0c14cf2387dfb8c1a1"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a6e8566ac7a5eeb0c14cf2387dfb8c1a1">operator==</a> (const <a class="el" href="classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a>&lt; T &gt; &amp;a, const <a class="el" href="classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a>&lt; T &gt; &amp;b)</td></tr>
@@ -154,39 +147,7 @@ template&lt;class T &gt; </td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Collection of file system based algorithms. </p>
-</div><h2 class="groupheader">Function Documentation</h2>
-<a id="a0e474a5af3258fc971c71d057c8fb0bb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0e474a5af3258fc971c71d057c8fb0bb">&#9670;&nbsp;</a></span>cache_parent()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class T , class... Args&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">result&lt;<a class="el" href="classllfio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter.html">cached_parent_handle_adapter</a>&lt;T&gt; &gt; llfio_v2_xxx::algorithm::cache_parent </td>
-          <td>(</td>
-          <td class="paramtype">Args &amp;&amp;...&#160;</td>
-          <td class="paramname"><em>args</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Constructs a <code>T</code> adapted into a parent handle caching implementation. </p>
-<p>This function works via the <code>construct&lt;T&gt;()</code> free function framework for which your <code>handle</code> implementation must have registered its construction details. </p>
-<div class="fragment"><div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;  {</div><div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    construct&lt;T&gt; constructor{std::forward&lt;Args&gt;(args)...};</div><div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    OUTCOME_TRY(h, constructor());</div><div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="keywordflow">try</span></div><div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    {</div><div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;      <span class="keywordflow">return</span> cached_parent_handle_adapter&lt;T&gt;(std::move(h), constructor.base, constructor._path);</div><div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    }</div><div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    <span class="keywordflow">catch</span>(...)</div><div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    {</div><div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div><div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    }</div><div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;  }</div></div><!-- fragment -->
-</div>
-</div>
-</div><!-- contents -->
+</div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

@@ -12,7 +12,6 @@ var hierarchy =
     [ "llfio_v2_xxx::io_handle::const_buffer_type", "structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html", null ],
     [ "llfio_v2_xxx::symlink_handle::const_buffers_type", "structllfio__v2__xxx_1_1symlink__handle_1_1const__buffers__type.html", null ],
     [ "llfio_v2_xxx::construct< T >", "structllfio__v2__xxx_1_1construct.html", null ],
-    [ "llfio_v2_xxx::construct< algorithm::cached_parent_handle_adapter< T > >", "structllfio__v2__xxx_1_1construct_3_01algorithm_1_1cached__parent__handle__adapter_3_01_t_01_4_01_4.html", null ],
     [ "construct< async_file_handle >", "structconstruct_3_01async__file__handle_01_4.html", null ],
     [ "llfio_v2_xxx::construct< directory_handle >", "structllfio__v2__xxx_1_1construct_3_01directory__handle_01_4.html", null ],
     [ "llfio_v2_xxx::construct< fast_random_file_handle >", "structllfio__v2__xxx_1_1construct_3_01fast__random__file__handle_01_4.html", null ],
@@ -76,8 +75,8 @@ var hierarchy =
     [ "llfio_v2_xxx::utils::page_allocator< void >", "classllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4.html", null ],
     [ "llfio_v2_xxx::path_hasher", "structllfio__v2__xxx_1_1path__hasher.html", null ],
     [ "llfio_v2_xxx::path_view", "classllfio__v2__xxx_1_1path__view.html", null ],
-    [ "llfio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
     [ "llfio_v2_xxx::utils::page_allocator< void >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
+    [ "llfio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
     [ "result", null, [
       [ "llfio_v2_xxx::io_handle::io_result< T >", "structllfio__v2__xxx_1_1io__handle_1_1io__result.html", null ]
     ] ],
@@ -100,9 +99,6 @@ var hierarchy =
     [ "llfio_v2_xxx::stat_t", "structllfio__v2__xxx_1_1stat__t.html", null ],
     [ "llfio_v2_xxx::statfs_t", "structllfio__v2__xxx_1_1statfs__t.html", null ],
     [ "llfio_v2_xxx::storage_profile::storage_profile", "structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html", null ],
-    [ "T", null, [
-      [ "llfio_v2_xxx::algorithm::cached_parent_handle_adapter< T >", "classllfio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter.html", null ]
-    ] ],
     [ "llfio_v2_xxx::algorithm::impl::trivial_vector_impl< has_default_construction, T >", "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html", null ],
     [ "llfio_v2_xxx::algorithm::impl::trivial_vector_impl< false, T >", "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html", [
       [ "llfio_v2_xxx::algorithm::impl::trivial_vector_impl< true, T >", "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html", [

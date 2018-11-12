@@ -5,7 +5,6 @@ var namespacellfio__v2__xxx =
     [ "storage_profile", "namespacellfio__v2__xxx_1_1storage__profile.html", "namespacellfio__v2__xxx_1_1storage__profile" ],
     [ "utils", "namespacellfio__v2__xxx_1_1utils.html", "namespacellfio__v2__xxx_1_1utils" ],
     [ "construct", "structllfio__v2__xxx_1_1construct.html", "structllfio__v2__xxx_1_1construct" ],
-    [ "construct< algorithm::cached_parent_handle_adapter< T > >", "structllfio__v2__xxx_1_1construct_3_01algorithm_1_1cached__parent__handle__adapter_3_01_t_01_4_01_4.html", "structllfio__v2__xxx_1_1construct_3_01algorithm_1_1cached__parent__handle__adapter_3_01_t_01_4_01_4" ],
     [ "construct< directory_handle >", "structllfio__v2__xxx_1_1construct_3_01directory__handle_01_4.html", "structllfio__v2__xxx_1_1construct_3_01directory__handle_01_4" ],
     [ "construct< fast_random_file_handle >", "structllfio__v2__xxx_1_1construct_3_01fast__random__file__handle_01_4.html", "structllfio__v2__xxx_1_1construct_3_01fast__random__file__handle_01_4" ],
     [ "construct< file_handle >", "structllfio__v2__xxx_1_1construct_3_01file__handle_01_4.html", "structllfio__v2__xxx_1_1construct_3_01file__handle_01_4" ],
