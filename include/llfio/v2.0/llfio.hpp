@@ -76,7 +76,7 @@ import LLFIO_MODULE_NAME;
 #include "fast_random_file_handle.hpp"
 #include "symlink_handle.hpp"
 
-#include "algorithm/cached_parent_handle_adapter.hpp"
+#include "algorithm/handle_adapter/cached_parent.hpp"
 #include "algorithm/shared_fs_mutex/atomic_append.hpp"
 #include "algorithm/shared_fs_mutex/byte_ranges.hpp"
 #include "algorithm/shared_fs_mutex/lock_files.hpp"

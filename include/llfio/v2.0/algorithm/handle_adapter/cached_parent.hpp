@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef LLFIO_CACHED_PARENT_HANDLE_ADAPTER_HPP
 #define LLFIO_CACHED_PARENT_HANDLE_ADAPTER_HPP
 
-#include "../directory_handle.hpp"
+#include "../../directory_handle.hpp"
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -209,7 +209,7 @@ LLFIO_V2_NAMESPACE_END
 
 #if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 #define LLFIO_INCLUDED_BY_HEADER 1
-#include "../detail/impl/cached_parent_handle_adapter.ipp"
+#include "../../detail/impl/cached_parent_handle_adapter.ipp"
 #undef LLFIO_INCLUDED_BY_HEADER
 #endif
 

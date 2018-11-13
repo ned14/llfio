@@ -392,6 +392,8 @@ public:
     io_handle *_h{nullptr};
     extent_type _offset{0}, _length{0};
     bool _exclusive{false};
+
+  protected:
     constexpr extent_guard(io_handle *h, extent_type offset, extent_type length, bool exclusive)
         : _h(h)
         , _offset(offset)
