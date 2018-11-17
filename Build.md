@@ -5,7 +5,8 @@ These compilers and OSs are regularly tested:
 - [GCC](https://gcc.gnu.org/) 7.0 (Linux 4.x x64)
 - [Clang](https://clang.llvm.org/) 4.0 (Linux 4.x x64)
 - Clang 5.0 (macOS 10.12 x64)
-- Visual Studio 2017 (Windows 10 x64)
+- Visual Studio 2017 (Windows 10 x64). Note that LLFIO does not currently
+compile with `/permissive-` due a bug in MSVC.
 
 Other compilers, architectures and OSs may work, but are not tested regularly.
 You will need a working [Filesystem TS](https://en.cppreference.com/w/cpp/experimental/fs)

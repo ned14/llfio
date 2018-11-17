@@ -16,6 +16,7 @@ set(llfio_TESTS
   "test/tests/fast_random_file_handle.cpp"
   "test/tests/file_handle_create_close/runner.cpp"
   "test/tests/file_handle_lock_unlock.cpp"
+  "test/tests/handle_adapter_xor.cpp"
   "test/tests/large_pages.cpp"
   "test/tests/map_handle_create_close/runner.cpp"
   "test/tests/mapped.cpp"

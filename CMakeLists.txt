@@ -38,7 +38,7 @@ include(QuickCppLibMakeHeaderOnlyLibrary)
 if(NOT PROJECT_IS_DEPENDENCY)
   if(NOT PYTHONINTERP_FOUND)
     indented_message(WARNING "NOT rebuilding preprocessed edition of library due to python not being installed")
-  else()
+  elseif(FALSE)
     # See if the ply package is installed so pcpp can run
     execute_process(COMMAND python -c "import ply" RESULT_VARIABLE python_has_ply)
     if(NOT python_has_ply EQUAL 0)
@@ -191,7 +191,8 @@ foreach(test_target ${llfio_TEST_TARGETS})
 endforeach()
 if(MSVC)
   foreach(test_target ${llfio_TEST_TARGETS})
-    target_compile_options(${test_target} PRIVATE /wd4503)  ## decorated name length exceeded
+    target_compile_options(${test_target} PRIVATE /wd4503)       ## decorated name length exceeded
+    #target_compile_options(${test_target} PRIVATE /permissive-)  ## future parsing
   endforeach()
 endif()
 
