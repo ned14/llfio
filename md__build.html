@@ -89,7 +89,7 @@ $(document).ready(function(){initNavTree('md__build.html','');});
 <li><a href="https://gcc.gnu.org/">GCC</a> 7.0 (Linux 4.x x64)</li>
 <li><a href="https://clang.llvm.org/">Clang</a> 4.0 (Linux 4.x x64)</li>
 <li>Clang 5.0 (macOS 10.12 x64)</li>
-<li>Visual Studio 2017 (Windows 10 x64)</li>
+<li>Visual Studio 2017 (Windows 10 x64). Note that LLFIO does not currently compile with <code>/permissive-</code> due a bug in MSVC.</li>
 </ul>
 <p>Other compilers, architectures and OSs may work, but are not tested regularly. You will need a working <a href="https://en.cppreference.com/w/cpp/experimental/fs">Filesystem TS</a> implementation in your STL, and C++ 14.</p>
 <h2>Get a copy of the source</h2>

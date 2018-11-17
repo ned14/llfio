@@ -7,6 +7,7 @@ var structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type =
     [ "size_type", "structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#acb6c33db3aabfbf88d5e8f636c8b6dd0", null ],
     [ "const_buffer_type", "structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#adb471cea17d5f27e64a9ff87a8f12806", null ],
     [ "const_buffer_type", "structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#abd415552a68aa6df0ec7b3ec4f40f31e", null ],
+    [ "const_buffer_type", "structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a6110864546f1e887761092fbaf87f4ce", null ],
     [ "const_buffer_type", "structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a878148d3f298383fbff896590067a3cb", null ],
     [ "const_buffer_type", "structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#a5af7ddbdfaf9eff2fc3d71c1cb5fb5ab", null ],
     [ "~const_buffer_type", "structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#aa9f33c81f645130d3aa3b66dded241b1", null ],
