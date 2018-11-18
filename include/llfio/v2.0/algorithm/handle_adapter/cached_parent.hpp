@@ -71,6 +71,9 @@ namespace algorithm
   handle at the time of creation. Third party changes to the part of the filesystem you are working upon will
   result in the inability to do race free unlinking etc, but if no third party changes are encountered it ought
   to work well.
+
+  \todo I have been lazy and used public inheritance from that base i/o handle.
+  I should use protected inheritance to prevent slicing, and expose all the public functions by hand.
   */
   template <class T> LLFIO_REQUIRES(sizeof(construct<T>) > 0) class LLFIO_DECL cached_parent_handle_adapter : public T
   {

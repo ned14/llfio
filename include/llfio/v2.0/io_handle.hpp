@@ -120,6 +120,8 @@ public:
     const_buffer_type() = default;
     //! Constructor
     constexpr const_buffer_type(pointer data, size_type len) noexcept : _data(data), _len(len) {}
+    //! Converting constructor from non-const buffer type
+    constexpr const_buffer_type(buffer_type b) noexcept : _data(b.data()), _len(b.size()) {}
     const_buffer_type(const const_buffer_type &) = default;
     const_buffer_type(const_buffer_type &&) = default;
     const_buffer_type &operator=(const const_buffer_type &) = default;

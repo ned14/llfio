@@ -33,6 +33,11 @@ Distributed under the Boost Software License, Version 1.0.
 
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4251)  // subclass needs to have dll interface
+#endif
+
 /*! \class fast_random_file_handle
 \brief A handle to synthesised, non-cryptographic, pseudo-random data.
 
@@ -165,7 +170,7 @@ public:
   \param seed Up to 88 bytes with which to seed the randomness. The default means use `utils::random_fill()`.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<fast_random_file_handle> fast_random_file(extent_type bytes, mode _mode = mode::read, span<const byte> seed = {}) noexcept
+  static inline result<fast_random_file_handle> fast_random_file(extent_type bytes = (extent_type) -1, mode _mode = mode::read, span<const byte> seed = {}) noexcept
   {
     if(_mode == mode::append)
     {
@@ -239,7 +244,7 @@ public:
   \mallocs None possible.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline /* unused */ = deadline()) noexcept override;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
 
   /*! \brief Fails to write to the random file.
 
@@ -253,8 +258,9 @@ public:
   \mallocs None possible.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline /* unused */ = deadline()) noexcept override
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override
   {
+    (void) d;
     OUTCOME_TRY(_perms_check());
     // Return null written
     for(auto &buffer : reqs.buffers)
@@ -299,11 +305,15 @@ public:
 //! \brief Constructor for `fast_random_file_handle`
 template <> struct construct<fast_random_file_handle>
 {
-  fast_random_file_handle::extent_type bytes{0};
+  fast_random_file_handle::extent_type bytes{(fast_random_file_handle::extent_type) -1};
   fast_random_file_handle::mode _mode{fast_random_file_handle::mode::read};
   span<const byte> seed{};
   result<fast_random_file_handle> operator()() const noexcept { return fast_random_file_handle::fast_random_file(bytes, _mode, seed); }
 };
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 // BEGIN make_free_functions.py
 

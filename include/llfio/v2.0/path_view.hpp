@@ -409,8 +409,8 @@ public:
     {
       return path_view();
     }
-    return _invoke([this, sep_idx](const auto &v) {
 #ifdef _WIN32
+    return _invoke([this, sep_idx](const auto &v) {
       if(is_ntpath())
       {
         return path_view(v.data() + 3, 1);
@@ -425,6 +425,8 @@ public:
       {
         return path_view(v.data(), sep_idx + 1);
       }
+#else
+    return _invoke([sep_idx](const auto &v) {
 #endif
       if(sep_idx == 0)
       {
@@ -441,8 +443,8 @@ public:
     {
       return *this;
     }
-    return _invoke([this, sep_idx](const auto &v) {
 #ifdef _WIN32
+    return _invoke([this, sep_idx](const auto &v) {
       // Special case \\.\ and \\?\ to match filesystem::path
       if(v.size() >= 4 && sep_idx == 0 && v[1] == '\\' && (v[2] == '.' || v[2] == '?') && v[3] == '\\')
       {
@@ -453,6 +455,8 @@ public:
       {
         return path_view(v.data() + sep_idx + 1, v.size() - sep_idx - 1);
       }
+#else
+    return _invoke([sep_idx](const auto &v) {
 #endif
       if(sep_idx == 0)
       {
