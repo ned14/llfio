@@ -769,8 +769,10 @@ WARN_LOGFILE           = doxygen_warnings.log
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = include/llfio \
+                         include/kvstore \
                          include/llfio/v2.0 \
                          include/llfio/v2.0/algorithm \
+                         include/llfio/v2.0/algorithm/handle_adapter \
                          include/llfio/v2.0/algorithm/shared_fs_mutex \
                          release_notes.md Build.md
 

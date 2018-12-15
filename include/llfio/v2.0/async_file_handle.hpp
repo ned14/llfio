@@ -22,13 +22,13 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
+#ifndef LLFIO_ASYNC_FILE_HANDLE_H
+#define LLFIO_ASYNC_FILE_HANDLE_H
+
 #include "file_handle.hpp"
 #include "io_service.hpp"
 
 //! \file async_file_handle.hpp Provides async_file_handle
-
-#ifndef LLFIO_ASYNC_FILE_HANDLE_H
-#define LLFIO_ASYNC_FILE_HANDLE_H
 
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 

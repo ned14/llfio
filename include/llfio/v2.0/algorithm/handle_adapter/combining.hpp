@@ -174,17 +174,23 @@ namespace algorithm
           bytes += b.size();
         }
         // If less than page size, use stack, else use free pages
-        buffer_type buffers[2] = {{(byte *) ((bytes <= utils::page_size()) ? alloca(bytes) : nullptr), bytes}, {(byte *) ((_have_source && bytes <= utils::page_size()) ? alloca(bytes) : nullptr), bytes}};
+        buffer_type buffers[2] = {{(byte *) ((bytes <= utils::page_size()) ? alloca(bytes + 64) : nullptr), bytes}, {(byte *) ((_have_source && bytes <= utils::page_size()) ? alloca(bytes + 64) : nullptr), bytes}};
         map_handle buffersh;
-        if(buffers[0].data() == nullptr)
+        if(buffers[0].data() != nullptr)
         {
-          bytes = (bytes + alignof(std::max_align_t) - 1) & ~(alignof(std::max_align_t) - 1);
-          OUTCOME_TRY(_, map_handle::map(bytes * (1 + _have_source)));
+          // Adjust to 64 byte multiple
+          buffers[0] = buffer_type((byte *) (((uintptr_t) buffers[0].data() + 63) & ~63), bytes);
+          buffers[1] = buffer_type((byte *) (((uintptr_t) buffers[1].data() + 63) & ~63), bytes);
+        }
+        else
+        {
+          auto _bytes = (bytes + 63) & ~63;
+          OUTCOME_TRY(_, map_handle::map(_bytes * (1 + _have_source)));
           buffersh = std::move(_);
           buffers[0] = buffer_type{buffersh.address(), bytes};
           if(_have_source)
           {
-            buffers[1] = buffer_type{buffersh.address() + bytes, bytes};
+            buffers[1] = buffer_type{buffersh.address() + _bytes, bytes};
           }
         }
 
@@ -245,17 +251,23 @@ namespace algorithm
           bytes += b.size();
         }
         // If less than page size, use stack, else use free pages
-        buffer_type buffers[2] = {{(byte *) ((bytes <= utils::page_size()) ? alloca(bytes) : nullptr), bytes}, {(byte *) ((_have_source && bytes <= utils::page_size()) ? alloca(bytes) : nullptr), bytes}};
+        buffer_type buffers[2] = {{(byte *) ((bytes <= utils::page_size()) ? alloca(bytes + 64) : nullptr), bytes}, {(byte *) ((_have_source && bytes <= utils::page_size()) ? alloca(bytes + 64) : nullptr), bytes}};
         map_handle buffersh;
-        if(buffers[0].data() == nullptr)
+        if(buffers[0].data() != nullptr)
         {
-          bytes = (bytes + alignof(std::max_align_t) - 1) & ~(alignof(std::max_align_t) - 1);
-          OUTCOME_TRY(_, map_handle::map(bytes * (1 + _have_source)));
+          // Adjust to 64 byte multiple
+          buffers[0] = buffer_type((byte *) (((uintptr_t) buffers[0].data() + 63) & ~63), bytes);
+          buffers[1] = buffer_type((byte *) (((uintptr_t) buffers[1].data() + 63) & ~63), bytes);
+        }
+        else
+        {
+          auto _bytes = (bytes + 63) & ~63;
+          OUTCOME_TRY(_, map_handle::map(_bytes * (1 + _have_source)));
           buffersh = std::move(_);
           buffers[0] = buffer_type{buffers[0].data(), bytes};
           if(_have_source)
           {
-            buffers[1] = buffer_type{buffers[1].data() + bytes, bytes};
+            buffers[1] = buffer_type{buffers[1].data() + _bytes, bytes};
           }
         }
         buffer_type tempbuffers[2] = {buffers[0], buffers[1]};
