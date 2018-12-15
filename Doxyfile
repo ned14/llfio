@@ -2042,6 +2042,8 @@ EXPAND_AS_DEFINED      = LLFIO_DECL LLFIO_DEADLINE_NAME LLFIO_MAKE_FREE_FUNCTION
     LLFIO_VERSION_MAJOR LLFIO_VERSION_MINOR \
     LLFIO_REQUIRES
 
+EXPAND_AS_DEFINED     += KVSTORE_V1_NAMESPACE KVSTORE_V1_NAMESPACE_BEGIN KVSTORE_V1_NAMESPACE_EXPORT_BEGIN KVSTORE_V1_NAMESPACE_END
+
 # If the SKIP_FUNCTION_MACROS tag is set to YES then doxygen's preprocessor will
 # remove all references to function-like macros that are alone on a line, have
 # an all uppercase name, and do not end with a semicolon. Such function macros
