@@ -32,7 +32,7 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4251)  // dll interface
 #endif
 
-//! \file cached_parent_handle_adapter.hpp Adapts any `fs_handle` to cache its parent directory handle
+//! \file handle_adapter/cached_parent.hpp Adapts any `fs_handle` to cache its parent directory handle
 LLFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm

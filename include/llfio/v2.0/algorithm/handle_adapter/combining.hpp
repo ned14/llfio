@@ -214,12 +214,12 @@ namespace algorithm
         // Handle any errors
         buffer_type filleds[2];
         {
-          OUTCOME_TRY(_filled, *_filleds[0]);
+          OUTCOME_TRY(_filled, std::move(*_filleds[0]));
           filleds[0] = std::move(_filled[0]);
         }
         if(_have_source)
         {
-          OUTCOME_TRY(_filled, *_filleds[1]);
+          OUTCOME_TRY(_filled, std::move(*_filleds[1]));
           filleds[1] = std::move(_filled[0]);
         }
 
@@ -340,12 +340,12 @@ namespace algorithm
         }
         // Handle any errors
         {
-          OUTCOME_TRY(_, *_locks[0]);
+          OUTCOME_TRY(_, std::move(*_locks[0]));
           _.release();
         }
         if(_have_source)
         {
-          OUTCOME_TRY(_, *_locks[1]);
+          OUTCOME_TRY(_, std::move(*_locks[1]));
           _.release();
         }
         return _extent_guard(this, offset, bytes, exclusive);
@@ -421,13 +421,13 @@ namespace algorithm
         extent_type ret = (extent_type) -1;
         // Handle any errors
         {
-          OUTCOME_TRY(_, *r[0]);
+          OUTCOME_TRY(_, std::move(*r[0]));
           if(_ < ret)
             ret = _;
         }
         if(_have_source)
         {
-          OUTCOME_TRY(_, *r[1]);
+          OUTCOME_TRY(_, std::move(*r[1]));
           if(_ < ret)
             ret = _;
         }
@@ -456,13 +456,13 @@ namespace algorithm
         extent_type ret = (extent_type) -1;
         // Handle any errors
         {
-          OUTCOME_TRY(_, *r[0]);
+          OUTCOME_TRY(_, std::move(*r[0]));
           if(_ < ret)
             ret = _;
         }
         if(_have_source)
         {
-          OUTCOME_TRY(_, *r[1]);
+          OUTCOME_TRY(_, std::move(*r[1]));
           if(_ < ret)
             ret = _;
         }
