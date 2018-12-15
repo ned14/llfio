@@ -809,8 +809,12 @@ LLFIO_V2_NAMESPACE_END
 #if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 #define LLFIO_INCLUDED_BY_HEADER 1
 #ifdef _WIN32
+#include "detail/impl/windows/io_service.ipp"
+
 #include "detail/impl/windows/async_file_handle.ipp"
 #else
+#include "detail/impl/posix/io_service.ipp"
+
 #include "detail/impl/posix/async_file_handle.ipp"
 #endif
 #undef LLFIO_INCLUDED_BY_HEADER
