@@ -1,0 +1,25 @@
+var classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter =
+[
+    [ "buffer_type", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html#a4227056a72bf24e7343ea1a98f4729cf", null ],
+    [ "buffers_type", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html#a9cda6dec04c4a26cb7c0b7be967f5ba7", null ],
+    [ "caching", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html#a9bf783aed0ee8ee06b2005d1615beb3e", null ],
+    [ "const_buffer_type", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html#a673cbeb0cd107cff01f86dbf64222d18", null ],
+    [ "const_buffers_type", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html#ae6a5bf508fcf2bfefb1cd179d7c4b48f", null ],
+    [ "creation", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html#a5626652ef800d549dbf83607f09ed9a9", null ],
+    [ "extent_type", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html#acb6eafba06e83383c985019dce2b1d61", null ],
+    [ "flag", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html#a5f04ab5c665244d2bd8f371f10fd330a", null ],
+    [ "io_request", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html#a062212d815f834770edb424487bec4c4", null ],
+    [ "io_result", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html#a6dbc56b017dfde90bc9df067838bc6b6", null ],
+    [ "mode", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html#a47df31310a28561efbfe65b678a699d4", null ],
+    [ "path_type", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html#a06f517c08339014bfbf70f6da07be847", null ],
+    [ "size_type", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html#a88b45d183e9756a86b32386b9a6f109e", null ],
+    [ "source_handle_type", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html#ad9c333e01114cddbed807c7bda522860", null ],
+    [ "target_handle_type", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html#ab0b7b07cb1282c369b1b663d21c1df3c", null ],
+    [ "combining_handle_adapter", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html#aa69b0a7e5b852b6e1b065469c96634b1", null ],
+    [ "combining_handle_adapter", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html#ad1709516df5d85349325940187f57712", null ],
+    [ "combining_handle_adapter", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html#ae54760bdd0fa784866e9f0e355c62077", null ],
+    [ "combining_handle_adapter", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html#a29adaaf07569fbc92039fb3f2d17e479", null ],
+    [ "operator=", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html#a9e767cbccf4130478b49012693168f5c", null ],
+    [ "operator=", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html#a6fad139bec35264b356c2e057318db3e", null ],
+    [ "swap", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html#aefc25feff3ba060a3b3092a69cf4d5cc", null ]
+];

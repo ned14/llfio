@@ -1,5 +1,10 @@
 var group__config =
 [
+    [ "KVSTORE_V1", "group__config.html#ga33014e3ba68fc774bc1ebc1d88b1dae3", null ],
+    [ "KVSTORE_V1_NAMESPACE", "group__config.html#ga8a15603141e848a1816c1758b9436287", null ],
+    [ "KVSTORE_V1_NAMESPACE_BEGIN", "group__config.html#ga86edeb2887d8f97f8b93005f08e46c80", null ],
+    [ "KVSTORE_V1_NAMESPACE_END", "group__config.html#ga797a3aa85bda51271100fe47cecf2058", null ],
+    [ "KVSTORE_V1_NAMESPACE_EXPORT_BEGIN", "group__config.html#ga1d39516e3f1380b0d2906629a8add07c", null ],
     [ "LLFIO_HEADERS_ONLY", "group__config.html#ga5365e6c96107a8e7edf6030462562cae", null ],
     [ "LLFIO_HEADERS_ONLY_FUNC_SPEC", "group__config.html#ga48fcb899a9d482d406f8fdbebc791ba0", null ],
     [ "LLFIO_HEADERS_ONLY_MEMFUNC_SPEC", "group__config.html#gad270840dbd547a75ad62d48e93412ca7", null ],

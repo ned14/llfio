@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['safe_5fbyte_5franges_2ehpp',['safe_byte_ranges.hpp',['../safe__byte__ranges_8hpp.html',1,'']]],
-  ['stat_2ehpp',['stat.hpp',['../stat_8hpp.html',1,'']]],
-  ['statfs_2ehpp',['statfs.hpp',['../statfs_8hpp.html',1,'']]],
-  ['storage_5fprofile_2ehpp',['storage_profile.hpp',['../storage__profile_8hpp.html',1,'']]],
-  ['symlink_5fhandle_2ehpp',['symlink_handle.hpp',['../symlink__handle_8hpp.html',1,'']]]
+  ['path_5fdiscovery_2ehpp',['path_discovery.hpp',['../path__discovery_8hpp.html',1,'']]],
+  ['path_5fhandle_2ehpp',['path_handle.hpp',['../path__handle_8hpp.html',1,'']]],
+  ['path_5fview_2ehpp',['path_view.hpp',['../path__view_8hpp.html',1,'']]]
 ];

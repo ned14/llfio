@@ -22,15 +22,13 @@ var NAVTREE =
         [ "Functions", "functions_func.html", "functions_func" ],
         [ "Variables", "functions_vars.html", null ],
         [ "Typedefs", "functions_type.html", null ],
-        [ "Enumerations", "functions_enum.html", null ],
-        [ "Enumerator", "functions_eval.html", null ]
+        [ "Enumerations", "functions_enum.html", null ]
       ] ]
     ] ],
     [ "Files", null, [
       [ "File List", "files.html", "files" ],
       [ "File Members", "globals.html", [
         [ "All", "globals.html", null ],
-        [ "Functions", "globals_func.html", null ],
         [ "Macros", "globals_defs.html", null ]
       ] ]
     ] ]
@@ -40,15 +38,15 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html#a2d09a83a6f59afb7d1f0f06ebc79e7bf",
-"classllfio__v2__xxx_1_1file__handle.html#a1e478777fb31b49b95bcddbee612a13b",
-"classllfio__v2__xxx_1_1io__handle.html#ae91c8db1fca923c7743b257c125c77f7",
-"classllfio__v2__xxx_1_1mapped__file__handle.html#a97e0884c27147b4929be98961b8e9254",
-"classllfio__v2__xxx_1_1symlink__handle.html#a4970f4d5ce8405cce62715af55b0e9f0",
-"llfio_8hpp.html#ad2355e889e3d2e599f26847898c3981b",
-"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a3e63c1cb08d63bb46ea73cbbae5adb07",
-"structllfio__v2__xxx_1_1path__discovery_1_1discovered__path.html#a69d065f1a50d5a043fe034d28326b25f",
-"structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#a8b5db964ac65a2d3f916798cd79ebcaa"
+"classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1lock__files.html#a5a7f463e9235bb95ddd84b69e2642613",
+"classllfio__v2__xxx_1_1directory__handle.html#a00a85eec5a41f7edb2c574d40cf04535",
+"classllfio__v2__xxx_1_1fs__handle.html#a1dd7923bb65456af4da41ebe7cb84982",
+"classllfio__v2__xxx_1_1map__handle.html#aa7e9bedf8c7a4c4a79a644a6e1857ee4",
+"classllfio__v2__xxx_1_1section__handle.html#a34f702e58a35c1eee31f5a5d3e5ec73d",
+"functions_m.html",
+"structkvstore__v1__xxx_1_1basic__key__value__store__info.html#aa89f3aa72d3cfd207242e7ef4ad853ed",
+"structllfio__v2__xxx_1_1io__handle_1_1buffer__type.html#a56e6ad95e6034b0ab36fbe838a1b4999",
+"structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html#aa7f50aa7235858cde986ea9a26381f3b"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

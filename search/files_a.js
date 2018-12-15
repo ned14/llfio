@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['path_5fdiscovery_2ehpp',['path_discovery.hpp',['../path__discovery_8hpp.html',1,'']]],
-  ['path_5fhandle_2ehpp',['path_handle.hpp',['../path__handle_8hpp.html',1,'']]],
-  ['path_5fview_2ehpp',['path_view.hpp',['../path__view_8hpp.html',1,'']]]
+  ['native_5fhandle_5ftype_2ehpp',['native_handle_type.hpp',['../native__handle__type_8hpp.html',1,'']]]
 ];

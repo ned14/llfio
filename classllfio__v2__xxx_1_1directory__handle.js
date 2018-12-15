@@ -15,22 +15,6 @@ var classllfio__v2__xxx_1_1directory__handle =
     [ "path_view_type", "classllfio__v2__xxx_1_1directory__handle.html#af39b5b7a73266dc1dd435f4fb1dfb463", null ],
     [ "size_type", "classllfio__v2__xxx_1_1directory__handle.html#aafd3eb03845b55c19154cab76956efad", null ],
     [ "unique_id_type", "classllfio__v2__xxx_1_1directory__handle.html#a1a65884346740af7fb4648c79d44a750", null ],
-    [ "bitfield__flag", "classllfio__v2__xxx_1_1directory__handle.html#a5929f46f42112bd805ab5001bfbf9d2a", [
-      [ "none", "classllfio__v2__xxx_1_1directory__handle.html#a5929f46f42112bd805ab5001bfbf9d2aae6fb35b3d125d5d76bbef95b1d804298", null ],
-      [ "none", "classllfio__v2__xxx_1_1directory__handle.html#a5929f46f42112bd805ab5001bfbf9d2aa334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
-      [ "none", "classllfio__v2__xxx_1_1directory__handle.html#a5929f46f42112bd805ab5001bfbf9d2aa334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
-      [ "unlink_on_first_close", "classllfio__v2__xxx_1_1directory__handle.html#a5929f46f42112bd805ab5001bfbf9d2aa72328d49ab1e37950ff31891b47a6962", null ],
-      [ "disable_safety_fsyncs", "classllfio__v2__xxx_1_1directory__handle.html#a5929f46f42112bd805ab5001bfbf9d2aaadb5cad9e6637b574e46bc43a82a44b9", null ],
-      [ "disable_safety_unlinks", "classllfio__v2__xxx_1_1directory__handle.html#a5929f46f42112bd805ab5001bfbf9d2aa5832b1ccb7f83ea61bf9e7f237ea481b", null ],
-      [ "disable_prefetching", "classllfio__v2__xxx_1_1directory__handle.html#a5929f46f42112bd805ab5001bfbf9d2aa4557d4caa81561875089ae5f819fb2c3", null ],
-      [ "maximum_prefetching", "classllfio__v2__xxx_1_1directory__handle.html#a5929f46f42112bd805ab5001bfbf9d2aaf131856fed08b53ec642fbdc6d063de0", null ],
-      [ "win_disable_unlink_emulation", "classllfio__v2__xxx_1_1directory__handle.html#a5929f46f42112bd805ab5001bfbf9d2aacf17c790c4b3af070b11bc5b75911f9c", null ],
-      [ "win_disable_sparse_file_creation", "classllfio__v2__xxx_1_1directory__handle.html#a5929f46f42112bd805ab5001bfbf9d2aaafd26e37b4a783bd9814549fb4ff6cd0", null ],
-      [ "disable_parallelism", "classllfio__v2__xxx_1_1directory__handle.html#a5929f46f42112bd805ab5001bfbf9d2aa49d1f07791f8f6d711df222027abe322", null ],
-      [ "overlapped", "classllfio__v2__xxx_1_1directory__handle.html#a5929f46f42112bd805ab5001bfbf9d2aab099987c48559cca2de094c74ffc702a", null ],
-      [ "byte_lock_insanity", "classllfio__v2__xxx_1_1directory__handle.html#a5929f46f42112bd805ab5001bfbf9d2aa6aa77c9bac6dd95b83f8d278f0e5fa59", null ],
-      [ "anonymous_inode", "classllfio__v2__xxx_1_1directory__handle.html#a5929f46f42112bd805ab5001bfbf9d2aa07122ea63cdc5b2c07e764d95a816d3d", null ]
-    ] ],
     [ "filter", "classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207", [
       [ "none", "classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207a334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
       [ "fastdeleted", "classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207a14847befc159c1492671b53718fc46f8", null ]
@@ -68,6 +52,8 @@ var classllfio__v2__xxx_1_1directory__handle =
     [ "operator=", "classllfio__v2__xxx_1_1directory__handle.html#a42cba9c448ac59e4f7057e01eb0ddf49", null ],
     [ "operator=", "classllfio__v2__xxx_1_1directory__handle.html#a9acfca399be5d868fe659fce5166d630", null ],
     [ "parent_path_handle", "classllfio__v2__xxx_1_1directory__handle.html#a865caad2f7f4bdf12fb74aabfe3c5ff5", null ],
+    [ "QUICKCPPLIB_BITFIELD_BEGIN", "classllfio__v2__xxx_1_1directory__handle.html#ac5222904f116c9beb0515a4a5aa850bf", null ],
+    [ "QUICKCPPLIB_BITFIELD_END", "classllfio__v2__xxx_1_1directory__handle.html#aa7e9bedf8c7a4c4a79a644a6e1857ee4", null ],
     [ "read", "classllfio__v2__xxx_1_1directory__handle.html#a45c13e16ecc131cbe5107e6affe94f33", null ],
     [ "release", "classllfio__v2__xxx_1_1directory__handle.html#a1d273e38c061eb11f5012f624e9a202e", null ],
     [ "relink", "classllfio__v2__xxx_1_1directory__handle.html#a8700edc9ecd4dd35d5aad7c65dd0eca2", null ],
