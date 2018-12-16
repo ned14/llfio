@@ -721,6 +721,7 @@ inline map_handle::const_buffer_type barrier(map_handle &self, map_handle::const
 }
 /*! Create new memory and map it into view.
 \param bytes How many bytes to create and map. Typically will be rounded up to a multiple of the page size (see `page_size()`) on POSIX, 64Kb on Windows.
+\param zeroed Set to true if only all bits zeroed memory is wanted.
 \param _flag The permissions with which to map the view. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
 
 \note On Microsoft Windows this constructor uses the faster VirtualAlloc() which creates less versatile page backed memory. If you want anonymous memory

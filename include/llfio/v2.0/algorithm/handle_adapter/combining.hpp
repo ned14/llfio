@@ -174,17 +174,23 @@ namespace algorithm
           bytes += b.size();
         }
         // If less than page size, use stack, else use free pages
-        buffer_type buffers[2] = {{(byte *) ((bytes <= utils::page_size()) ? alloca(bytes) : nullptr), bytes}, {(byte *) ((_have_source && bytes <= utils::page_size()) ? alloca(bytes) : nullptr), bytes}};
+        buffer_type buffers[2] = {{(byte *) ((bytes <= utils::page_size()) ? alloca(bytes + 64) : nullptr), bytes}, {(byte *) ((_have_source && bytes <= utils::page_size()) ? alloca(bytes + 64) : nullptr), bytes}};
         map_handle buffersh;
-        if(buffers[0].data() == nullptr)
+        if(buffers[0].data() != nullptr)
         {
-          bytes = (bytes + alignof(std::max_align_t) - 1) & ~(alignof(std::max_align_t) - 1);
-          OUTCOME_TRY(_, map_handle::map(bytes * (1 + _have_source)));
+          // Adjust to 64 byte multiple
+          buffers[0] = buffer_type((byte *) (((uintptr_t) buffers[0].data() + 63) & ~63), bytes);
+          buffers[1] = buffer_type((byte *) (((uintptr_t) buffers[1].data() + 63) & ~63), bytes);
+        }
+        else
+        {
+          auto _bytes = (bytes + 63) & ~63;
+          OUTCOME_TRY(_, map_handle::map(_bytes * (1 + _have_source)));
           buffersh = std::move(_);
           buffers[0] = buffer_type{buffersh.address(), bytes};
           if(_have_source)
           {
-            buffers[1] = buffer_type{buffersh.address() + bytes, bytes};
+            buffers[1] = buffer_type{buffersh.address() + _bytes, bytes};
           }
         }
 
@@ -208,12 +214,12 @@ namespace algorithm
         // Handle any errors
         buffer_type filleds[2];
         {
-          OUTCOME_TRY(_filled, *_filleds[0]);
+          OUTCOME_TRY(_filled, std::move(*_filleds[0]));
           filleds[0] = std::move(_filled[0]);
         }
         if(_have_source)
         {
-          OUTCOME_TRY(_filled, *_filleds[1]);
+          OUTCOME_TRY(_filled, std::move(*_filleds[1]));
           filleds[1] = std::move(_filled[0]);
         }
 
@@ -245,17 +251,23 @@ namespace algorithm
           bytes += b.size();
         }
         // If less than page size, use stack, else use free pages
-        buffer_type buffers[2] = {{(byte *) ((bytes <= utils::page_size()) ? alloca(bytes) : nullptr), bytes}, {(byte *) ((_have_source && bytes <= utils::page_size()) ? alloca(bytes) : nullptr), bytes}};
+        buffer_type buffers[2] = {{(byte *) ((bytes <= utils::page_size()) ? alloca(bytes + 64) : nullptr), bytes}, {(byte *) ((_have_source && bytes <= utils::page_size()) ? alloca(bytes + 64) : nullptr), bytes}};
         map_handle buffersh;
-        if(buffers[0].data() == nullptr)
+        if(buffers[0].data() != nullptr)
         {
-          bytes = (bytes + alignof(std::max_align_t) - 1) & ~(alignof(std::max_align_t) - 1);
-          OUTCOME_TRY(_, map_handle::map(bytes * (1 + _have_source)));
+          // Adjust to 64 byte multiple
+          buffers[0] = buffer_type((byte *) (((uintptr_t) buffers[0].data() + 63) & ~63), bytes);
+          buffers[1] = buffer_type((byte *) (((uintptr_t) buffers[1].data() + 63) & ~63), bytes);
+        }
+        else
+        {
+          auto _bytes = (bytes + 63) & ~63;
+          OUTCOME_TRY(_, map_handle::map(_bytes * (1 + _have_source)));
           buffersh = std::move(_);
           buffers[0] = buffer_type{buffers[0].data(), bytes};
           if(_have_source)
           {
-            buffers[1] = buffer_type{buffers[1].data() + bytes, bytes};
+            buffers[1] = buffer_type{buffers[1].data() + _bytes, bytes};
           }
         }
         buffer_type tempbuffers[2] = {buffers[0], buffers[1]};
@@ -328,12 +340,12 @@ namespace algorithm
         }
         // Handle any errors
         {
-          OUTCOME_TRY(_, *_locks[0]);
+          OUTCOME_TRY(_, std::move(*_locks[0]));
           _.release();
         }
         if(_have_source)
         {
-          OUTCOME_TRY(_, *_locks[1]);
+          OUTCOME_TRY(_, std::move(*_locks[1]));
           _.release();
         }
         return _extent_guard(this, offset, bytes, exclusive);
@@ -409,13 +421,13 @@ namespace algorithm
         extent_type ret = (extent_type) -1;
         // Handle any errors
         {
-          OUTCOME_TRY(_, *r[0]);
+          OUTCOME_TRY(_, std::move(*r[0]));
           if(_ < ret)
             ret = _;
         }
         if(_have_source)
         {
-          OUTCOME_TRY(_, *r[1]);
+          OUTCOME_TRY(_, std::move(*r[1]));
           if(_ < ret)
             ret = _;
         }
@@ -444,13 +456,13 @@ namespace algorithm
         extent_type ret = (extent_type) -1;
         // Handle any errors
         {
-          OUTCOME_TRY(_, *r[0]);
+          OUTCOME_TRY(_, std::move(*r[0]));
           if(_ < ret)
             ret = _;
         }
         if(_have_source)
         {
-          OUTCOME_TRY(_, *r[1]);
+          OUTCOME_TRY(_, std::move(*r[1]));
           if(_ < ret)
             ret = _;
         }

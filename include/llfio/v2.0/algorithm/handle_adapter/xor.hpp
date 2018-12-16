@@ -46,40 +46,60 @@ namespace algorithm
 
       static result<buffer_type> do_read(buffer_type out, buffer_type t, buffer_type s) noexcept
       {
-        // out is the constraint here
+        // Clamp out to smallest of inputs
+        if(t.size() < out.size())
+        {
+          out = buffer_type(out.data(), t.size());
+        }
+        if(s.size() < out.size())
+        {
+          out = buffer_type(out.data(), s.size());
+        }
         for(size_t idx = 0; idx < out.size();)
         {
-          // If addresses happen to align, we can do this fast
-          uintptr_t remain1 = ((uintptr_t) out.data() + idx) & 63;
-          uintptr_t remain2 = ((uintptr_t) t.data() + idx) & 63;
-          uintptr_t remain3 = ((uintptr_t) s.data() + idx) & 63;
-          if(remain1 == remain2 && remain2 == remain3)
           {
-            while(out.size() - idx >= 64 && remain1 == 0)
+            // If addresses happen to align to SIMD, hint very strongly to use SIMD
+            uintptr_t remain1 = ((uintptr_t) out.data() + idx) & 63;
+            uintptr_t remain2 = ((uintptr_t) t.data() + idx) & 63;
+            uintptr_t remain3 = ((uintptr_t) s.data() + idx) & 63;
+            if(remain1 == 0 && remain2 == 0 && remain3 == 0)
             {
-              uint64_t *a = (uint64_t *) (out.data() + idx);
-              const uint64_t *b = (const uint64_t *) (t.data() + idx);
-              const uint64_t *c = (const uint64_t *) (s.data() + idx);
-              a[0] = b[0] ^ c[0];
-              a[1] = b[1] ^ c[1];
-              a[2] = b[2] ^ c[2];
-              a[3] = b[3] ^ c[3];
-              a[4] = b[4] ^ c[4];
-              a[5] = b[5] ^ c[5];
-              a[6] = b[6] ^ c[6];
-              a[7] = b[7] ^ c[7];
-              idx += 64;
-            }
-            while(out.size() - idx >= 8 && (remain1 & 7) == 0)
-            {
-              uint64_t *a = (uint64_t *) (out.data() + idx);
-              const uint64_t *b = (const uint64_t *) (t.data() + idx);
-              const uint64_t *c = (const uint64_t *) (s.data() + idx);
-              a[0] = b[0] ^ c[0];
-              idx += 8;
+              while(out.size() - idx >= 64)
+              {
+                uint64_t *a = (uint64_t *) (out.data() + idx);
+                const uint64_t *b = (const uint64_t *) (t.data() + idx);
+                const uint64_t *c = (const uint64_t *) (s.data() + idx);
+                a[0] = b[0] ^ c[0];
+                a[1] = b[1] ^ c[1];
+                a[2] = b[2] ^ c[2];
+                a[3] = b[3] ^ c[3];
+                a[4] = b[4] ^ c[4];
+                a[5] = b[5] ^ c[5];
+                a[6] = b[6] ^ c[6];
+                a[7] = b[7] ^ c[7];
+                idx += 64;
+              }
             }
           }
-          if(out.size() - idx > 0)
+          {
+            // If addresses happen to align to registers, use that
+            uintptr_t remain1 = ((uintptr_t) out.data() + idx) & (sizeof(uintptr_t) - 1);
+            uintptr_t remain2 = ((uintptr_t) t.data() + idx) & (sizeof(uintptr_t) - 1);
+            uintptr_t remain3 = ((uintptr_t) s.data() + idx) & (sizeof(uintptr_t) - 1);
+            if(remain1 == 0 && remain2 == 0 && remain3 == 0)
+            {
+              while(out.size() - idx >= sizeof(uintptr_t))
+              {
+                uintptr_t *a = (uintptr_t *) (out.data() + idx);
+                const uintptr_t *b = (const uintptr_t *) (t.data() + idx);
+                const uintptr_t *c = (const uintptr_t *) (s.data() + idx);
+                a[0] = b[0] ^ c[0];
+                idx += sizeof(uintptr_t);
+              }
+            }
+          }
+          // Otherwise byte work
+          while(out.size() - idx > 0)
           {
             uint8_t *a = (uint8_t *) (out.data() + idx);
             const uint8_t *b = (const uint8_t *) (t.data() + idx);
@@ -96,37 +116,49 @@ namespace algorithm
         // in is the constraint here
         for(size_t idx = 0; idx < in.size();)
         {
-          // If addresses happen to align, we can do this fast
-          uintptr_t remain1 = ((uintptr_t) t.data() + idx) & 63;
-          uintptr_t remain2 = ((uintptr_t) s.data() + idx) & 63;
-          uintptr_t remain3 = ((uintptr_t) in.data() + idx) & 63;
-          if(remain1 == remain2 && remain2 == remain3)
           {
-            while(in.size() - idx >= 64 && remain1 == 0)
+            // If addresses happen to align to SIMD, hint very strongly to use SIMD
+            uintptr_t remain1 = ((uintptr_t) t.data() + idx) & 63;
+            uintptr_t remain2 = ((uintptr_t) s.data() + idx) & 63;
+            uintptr_t remain3 = ((uintptr_t) in.data() + idx) & 63;
+            if(remain1 == 0 && remain2 == 0 && remain3 == 0)
             {
-              uint64_t *a = (uint64_t *) (t.data() + idx);
-              const uint64_t *b = (const uint64_t *) (s.data() + idx);
-              const uint64_t *c = (const uint64_t *) (in.data() + idx);
-              a[0] = b[0] ^ c[0];
-              a[1] = b[1] ^ c[1];
-              a[2] = b[2] ^ c[2];
-              a[3] = b[3] ^ c[3];
-              a[4] = b[4] ^ c[4];
-              a[5] = b[5] ^ c[5];
-              a[6] = b[6] ^ c[6];
-              a[7] = b[7] ^ c[7];
-              idx += 64;
-            }
-            while(in.size() - idx >= 8 && (remain1 & 7) == 0)
-            {
-              uint64_t *a = (uint64_t *) (t.data() + idx);
-              const uint64_t *b = (const uint64_t *) (s.data() + idx);
-              const uint64_t *c = (const uint64_t *) (in.data() + idx);
-              a[0] = b[0] ^ c[0];
-              idx += 8;
+              while(in.size() - idx >= 64)
+              {
+                uint64_t *a = (uint64_t *) (t.data() + idx);
+                const uint64_t *b = (const uint64_t *) (s.data() + idx);
+                const uint64_t *c = (const uint64_t *) (in.data() + idx);
+                a[0] = b[0] ^ c[0];
+                a[1] = b[1] ^ c[1];
+                a[2] = b[2] ^ c[2];
+                a[3] = b[3] ^ c[3];
+                a[4] = b[4] ^ c[4];
+                a[5] = b[5] ^ c[5];
+                a[6] = b[6] ^ c[6];
+                a[7] = b[7] ^ c[7];
+                idx += 64;
+              }
             }
           }
-          if(in.size() - idx > 0)
+          {
+            // If addresses happen to align to registers, use that
+            uintptr_t remain1 = ((uintptr_t) t.data() + idx) & (sizeof(uintptr_t) - 1);
+            uintptr_t remain2 = ((uintptr_t) s.data() + idx) & (sizeof(uintptr_t) - 1);
+            uintptr_t remain3 = ((uintptr_t) in.data() + idx) & (sizeof(uintptr_t) - 1);
+            if(remain1 == 0 && remain2 == 0 && remain3 == 0)
+            {
+              while(in.size() - idx >= sizeof(uintptr_t))
+              {
+                uintptr_t *a = (uintptr_t *) (t.data() + idx);
+                const uintptr_t *b = (const uintptr_t *) (s.data() + idx);
+                const uintptr_t *c = (const uintptr_t *) (in.data() + idx);
+                a[0] = b[0] ^ c[0];
+                idx += sizeof(uintptr_t);
+              }
+            }
+          }
+          // Otherwise byte work
+          while(in.size() - idx > 0)
           {
             uint8_t *a = (uint8_t *) (t.data() + idx);
             const uint8_t *b = (const uint8_t *) (s.data() + idx);

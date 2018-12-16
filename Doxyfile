@@ -769,8 +769,10 @@ WARN_LOGFILE           = doxygen_warnings.log
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = include/llfio \
+                         include/kvstore \
                          include/llfio/v2.0 \
                          include/llfio/v2.0/algorithm \
+                         include/llfio/v2.0/algorithm/handle_adapter \
                          include/llfio/v2.0/algorithm/shared_fs_mutex \
                          release_notes.md Build.md
 
@@ -2039,6 +2041,8 @@ EXPAND_AS_DEFINED      = LLFIO_DECL LLFIO_DEADLINE_NAME LLFIO_MAKE_FREE_FUNCTION
     LLFIO_HEADERS_PATH LLFIO_MODULE_NAME \
     LLFIO_VERSION_MAJOR LLFIO_VERSION_MINOR \
     LLFIO_REQUIRES
+
+EXPAND_AS_DEFINED     += KVSTORE_V1_NAMESPACE KVSTORE_V1_NAMESPACE_BEGIN KVSTORE_V1_NAMESPACE_EXPORT_BEGIN KVSTORE_V1_NAMESPACE_END
 
 # If the SKIP_FUNCTION_MACROS tag is set to YES then doxygen's preprocessor will
 # remove all references to function-like macros that are alone on a line, have

@@ -46,13 +46,13 @@ static inline void TestXorHandleAdapterWorks()
   // Make temp inode have same contents as random file
   h2.truncate(testbytes).value();
   h1.read(0, {{h2.address(), testbytes}}).value();
-  
+
   // Configure the XOR handle adapter for the two handles
   algorithm::xor_handle_adapter<mapped_file_handle, fast_random_file_handle> h(&h2, &h1);
   BOOST_CHECK(h.is_readable());
   BOOST_CHECK(h.is_writable());
   BOOST_CHECK(h.maximum_extent().value() == testbytes);
-  
+
   // Read the whole of the XOR handle adapter, it should return all bits zero
   mapped<byte> tempbuffer(testbytes);
   BOOST_CHECK(h.read(0, {{tempbuffer.data(), tempbuffer.size()}}).value() == testbytes);
@@ -61,14 +61,15 @@ static inline void TestXorHandleAdapterWorks()
     uint64_t *p = (uint64_t *) tempbuffer.data();
     BOOST_CHECK(p[n] == 0);
   }
+  memset(tempbuffer.data(), 0, tempbuffer.size());
 
-#if 0
-  // Now make sure that random read offsets and lengths match exactly
+  // Now make sure that random read offsets and lengths are also all bits zero
   small_prng rand;
-  for(size_t n = 0; n < 10000; n++)
+  for(size_t i = 0; i < 10000; i++)
   {
-    byte buffer[512];
-    size_t offset = rand() % testbytes, length = rand() % 512;
+    byte buffer[8192];
+    size_t offset = rand() % testbytes, length = rand() % 8192;
+    memset(buffer, 1, 8192);
     auto bytesread = h.read(offset, {{buffer, length}}).value();
     if(offset + length > testbytes)
     {
@@ -78,9 +79,20 @@ static inline void TestXorHandleAdapterWorks()
     {
       BOOST_CHECK(bytesread == length);
     }
-    BOOST_CHECK(!memcmp(buffer, store.begin() + offset, bytesread));
+    size_t n = 0;
+    uint8_t *p = (uint8_t *) tempbuffer.data();
+    for(; n < bytesread; n += 8)
+    {
+      uint64_t *_p = (uint64_t *) (&p[n]);
+      BOOST_CHECK(_p[0] == 0);
+    }
+    for(; n < bytesread; n++)
+    {
+      BOOST_CHECK(p[n] == 0);
+    }
   }
-#endif
+
+  // TODO Test writing works
 }
 
 #if 0
@@ -134,4 +146,4 @@ static inline void TestFastRandomFileHandlePerformance()
 #endif
 
 KERNELTEST_TEST_KERNEL(integration, llfio, xor_handle_adapter, works, "Tests that the xor handle adapter works as expected", TestXorHandleAdapterWorks())
-//KERNELTEST_TEST_KERNEL(integration, llfio, fast_random_file_handle, performance, "Tests the performance of the fast random file handle", TestFastRandomFileHandlePerformance())
+// KERNELTEST_TEST_KERNEL(integration, llfio, fast_random_file_handle, performance, "Tests the performance of the fast random file handle", TestFastRandomFileHandlePerformance())

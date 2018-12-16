@@ -22,13 +22,13 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
+#ifndef LLFIO_ASYNC_FILE_HANDLE_H
+#define LLFIO_ASYNC_FILE_HANDLE_H
+
 #include "file_handle.hpp"
 #include "io_service.hpp"
 
 //! \file async_file_handle.hpp Provides async_file_handle
-
-#ifndef LLFIO_ASYNC_FILE_HANDLE_H
-#define LLFIO_ASYNC_FILE_HANDLE_H
 
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
@@ -809,8 +809,12 @@ LLFIO_V2_NAMESPACE_END
 #if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 #define LLFIO_INCLUDED_BY_HEADER 1
 #ifdef _WIN32
+#include "detail/impl/windows/io_service.ipp"
+
 #include "detail/impl/windows/async_file_handle.ipp"
 #else
+#include "detail/impl/posix/io_service.ipp"
+
 #include "detail/impl/posix/async_file_handle.ipp"
 #endif
 #undef LLFIO_INCLUDED_BY_HEADER

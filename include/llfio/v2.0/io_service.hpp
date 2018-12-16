@@ -314,16 +314,6 @@ public:
 
 LLFIO_V2_NAMESPACE_END
 
-#if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define LLFIO_INCLUDED_BY_HEADER 1
-#ifdef _WIN32
-#include "detail/impl/windows/io_service.ipp"
-#else
-#include "detail/impl/posix/io_service.ipp"
-#endif
-#undef LLFIO_INCLUDED_BY_HEADER
-#endif
-
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
