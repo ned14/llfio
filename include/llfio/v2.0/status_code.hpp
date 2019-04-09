@@ -237,7 +237,7 @@ namespace detail
 using file_io_error = SYSTEM_ERROR2_NAMESPACE::errored_status_code<SYSTEM_ERROR2_NAMESPACE::erased<detail::file_io_error_domain_value_system_code>>;
 
 
-template <class T> using result = OUTCOME_V2_NAMESPACE::experimental::erased_result<T, file_io_error>;
+template <class T> using result = OUTCOME_V2_NAMESPACE::experimental::status_result<T, file_io_error>;
 using OUTCOME_V2_NAMESPACE::success;
 using OUTCOME_V2_NAMESPACE::failure;
 using OUTCOME_V2_NAMESPACE::in_place_type;
@@ -562,7 +562,7 @@ inline error_info error_from_exception(std::exception_ptr &&ep = std::current_ex
 }
 using OUTCOME_V2_NAMESPACE::in_place_type;
 
-static_assert(OUTCOME_V2_NAMESPACE::trait::has_error_code_v<error_info>, "error_info is not detected to be an error code");
+static_assert(OUTCOME_V2_NAMESPACE::trait::is_error_code_available_v<error_info>, "error_info is not detected to be an error code");
 
 //! Choose an errc implementation
 using std::errc;
