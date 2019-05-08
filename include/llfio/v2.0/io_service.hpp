@@ -31,7 +31,11 @@ Distributed under the Boost Software License, Version 1.0.
 #include <deque>
 #include <mutex>
 
-#if defined(__cpp_coroutines)
+#if defined(__cpp_coroutines) && !defined(LLFIO_HAVE_COROUTINES)
+#define LLFIO_HAVE_COROUTINES 1
+#endif
+
+#if defined(LLFIO_HAVE_COROUTINES)
 // clang-format off
 #if defined(__has_include)
 #if __has_include(<coroutine>)
@@ -287,7 +291,7 @@ public:
   */
   template <class U> void post(U &&f) { _post(detail::make_function_ptr<void(io_service *)>(std::forward<U>(f))); }
 
-#if defined(__cpp_coroutines) || defined(DOXYGEN_IS_IN_THE_HOUSE)
+#if LLFIO_HAVE_COROUTINES || defined(DOXYGEN_IS_IN_THE_HOUSE)
   /*! An awaitable suspending execution of this coroutine on the current kernel thread,
   and resuming execution on the kernel thread running this i/o service. This is a
   convenience wrapper for `post()`.

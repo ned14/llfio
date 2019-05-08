@@ -28,7 +28,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 static inline void TestAsyncFileHandleCoroutines()
 {
-#ifdef __cpp_coroutines
+#if LLFIO_HAVE_COROUTINES
   //! [coroutines_example]
   namespace llfio = LLFIO_V2_NAMESPACE;
 
@@ -88,7 +88,7 @@ static inline void TestAsyncFileHandleCoroutines()
 
 static inline void TestPostSelfToRunCoroutines()
 {
-#ifdef __cpp_coroutines
+#if LLFIO_HAVE_COROUTINES
   namespace llfio = LLFIO_V2_NAMESPACE;
   llfio::io_service service;
   std::atomic<bool> ready(false);

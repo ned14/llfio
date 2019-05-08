@@ -388,7 +388,7 @@ void sparse_array()
   //! [sparse_array]
 }
 
-#ifdef __cpp_coroutines
+#if LLFIO_HAVE_COROUTINES
 std::future<void> coroutine_write()
 {
   //! [coroutine_write]
