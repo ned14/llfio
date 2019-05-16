@@ -97,7 +97,11 @@ public:
   {
   }
   //! Implicit move construction of section_handle permitted
-  constexpr section_handle(section_handle &&o) noexcept : handle(std::move(o)), _backing(o._backing), _anonymous(std::move(o._anonymous)), _flag(o._flag)
+  constexpr section_handle(section_handle &&o) noexcept
+      : handle(std::move(o))
+      , _backing(o._backing)
+      , _anonymous(std::move(o._anonymous))
+      , _flag(o._flag)
   {
     o._backing = nullptr;
     o._flag = flag::none;
@@ -386,7 +390,15 @@ public:
   constexpr map_handle() {}  // NOLINT
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~map_handle() override;
   //! Implicit move construction of map_handle permitted
-  constexpr map_handle(map_handle &&o) noexcept : io_handle(std::move(o)), _section(o._section), _addr(o._addr), _offset(o._offset), _reservation(o._reservation), _length(o._length), _pagesize(o._pagesize), _flag(o._flag)
+  constexpr map_handle(map_handle &&o) noexcept
+      : io_handle(std::move(o))
+      , _section(o._section)
+      , _addr(o._addr)
+      , _offset(o._offset)
+      , _reservation(o._reservation)
+      , _length(o._length)
+      , _pagesize(o._pagesize)
+      , _flag(o._flag)
   {
     o._section = nullptr;
     o._addr = nullptr;
@@ -436,17 +448,11 @@ public:
   LLFIO_MAKE_FREE_FUNCTION
   static const_buffer_type barrier(const_buffer_type req, bool evict = false) noexcept
   {
-    auto *tp = (const_buffer_type::pointer)(((uintptr_t) req.data()) & 31);
+    auto *tp = (const_buffer_type::pointer)(((uintptr_t) req.data()) & 63);
     const_buffer_type ret{tp, (size_t)(req.data() + req.size() - tp)};
-    for(const_buffer_type::pointer addr = ret.data(); addr < ret.data() + ret.size(); addr += 32)
+    if(memory_flush_none == ensure_stores(ret.data(), ret.size(), evict ? memory_flush_evict : memory_flush_retain).first)
     {
-      // Slightly UB ...
-      auto *p = reinterpret_cast<const persistent<byte> *>(addr);
-      if(memory_flush_none == p->flush(evict ? memory_flush_evict : memory_flush_retain))
-      {
-        ret = {tp, 0};
-        break;
-      }
+      ret = {tp, 0};
     }
     return ret;
   }

@@ -23,7 +23,7 @@ find_quickcpplib_library(quickcpplib 1.0 REQUIRED)
 find_quickcpplib_library(outcome 2.0 REQUIRED)
 find_quickcpplib_library(kerneltest 1.0 REQUIRED)
 if(WIN32)
-  add_subdirectory("include/llfio/ntkernel-error-category" )
+  add_subdirectory("include/llfio/ntkernel-error-category" EXCLUDE_FROM_ALL)
 endif()
 
 # Make the standard static and shared libraries, and if supported by this compiler, C++ modules

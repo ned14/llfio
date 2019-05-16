@@ -334,10 +334,10 @@ LLFIO_V2_NAMESPACE_END
 LLFIO_V2_NAMESPACE_BEGIN
 using namespace QUICKCPPLIB_NAMESPACE::string_view;
 LLFIO_V2_NAMESPACE_END
-// Bring in a persistent implementation
-#include "quickcpplib/include/persistent.hpp"
+// Bring in an ensure_stores implementation
+#include "quickcpplib/include/ensure_stores.hpp"
 LLFIO_V2_NAMESPACE_BEGIN
-using namespace QUICKCPPLIB_NAMESPACE::persistence;
+using namespace QUICKCPPLIB_NAMESPACE::ensure_stores;
 LLFIO_V2_NAMESPACE_END
 
 
