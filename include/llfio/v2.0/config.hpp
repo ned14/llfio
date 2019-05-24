@@ -173,7 +173,7 @@ namespace llfio_v2_xxx
   namespace utils
   {
   }
-}
+}  // namespace llfio_v2_xxx
 /*! \brief The namespace of this LLFIO v2 which will be some unknown inline
 namespace starting with `v2_` inside the `boost::llfio` namespace.
 \ingroup config
@@ -339,6 +339,18 @@ LLFIO_V2_NAMESPACE_END
 LLFIO_V2_NAMESPACE_BEGIN
 using namespace QUICKCPPLIB_NAMESPACE::ensure_stores;
 LLFIO_V2_NAMESPACE_END
+// Bring in a detach_cast implementation
+#include "quickcpplib/include/detach_cast.hpp"
+LLFIO_V2_NAMESPACE_BEGIN
+using namespace QUICKCPPLIB_NAMESPACE::detach_cast;
+LLFIO_V2_NAMESPACE_END
+// Bring in an in_place_detach implementation
+#include "quickcpplib/include/in_place_detach_attach.hpp"
+LLFIO_V2_NAMESPACE_BEGIN
+using namespace QUICKCPPLIB_NAMESPACE::in_place_attach_detach;
+using QUICKCPPLIB_NAMESPACE::in_place_attach_detach::in_place_attach;
+using QUICKCPPLIB_NAMESPACE::in_place_attach_detach::in_place_detach;
+LLFIO_V2_NAMESPACE_END
 
 
 LLFIO_V2_NAMESPACE_BEGIN
@@ -356,6 +368,12 @@ namespace detail
   LLFIO_TREQUIRES(LLFIO_TPRED(std::is_unsigned<T>::value))
   inline T unsigned_integer_cast(U *v) { return static_cast<T>(reinterpret_cast<uintptr_t>(v)); }
 }  // namespace detail
+
+// Define a https://wg21.link/P0593 bless implementation
+inline void bless(void *start, size_t length) noexcept
+{
+  memmove(start, start, length);
+}
 
 LLFIO_V2_NAMESPACE_END
 
@@ -406,9 +424,19 @@ namespace detail
     }
 
   public:
-    constexpr function_ptr() noexcept : ptr(nullptr) {}
-    constexpr explicit function_ptr(function_ptr_storage *p) noexcept : ptr(p) {}
-    constexpr function_ptr(function_ptr &&o) noexcept : ptr(o.ptr) { o.ptr = nullptr; }
+    constexpr function_ptr() noexcept
+        : ptr(nullptr)
+    {
+    }
+    constexpr explicit function_ptr(function_ptr_storage *p) noexcept
+        : ptr(p)
+    {
+    }
+    constexpr function_ptr(function_ptr &&o) noexcept
+        : ptr(o.ptr)
+    {
+      o.ptr = nullptr;
+    }
     function_ptr &operator=(function_ptr &&o) noexcept
     {
       delete ptr;
@@ -443,7 +471,7 @@ namespace win
 {
   using handle = void *;
   using dword = unsigned long;
-}
+}  // namespace win
 
 LLFIO_V2_NAMESPACE_END
 

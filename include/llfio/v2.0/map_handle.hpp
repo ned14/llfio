@@ -640,6 +640,11 @@ template <> struct construct<map_handle>
   result<map_handle> operator()() const noexcept { return map_handle::map(section, bytes, offset, _flag); }
 };
 
+//! \brief Declare `map_handle` as a suitable source for P1631 `attached<T>`.
+template <class T> constexpr inline span<T> in_place_attach(map_handle& mh) noexcept {
+  return in_place_attach<T>(span<byte>{mh.address(), mh.length()});
+}
+
 // BEGIN make_free_functions.py
 //! Swap with another instance
 inline void swap(section_handle &self, section_handle &o) noexcept
