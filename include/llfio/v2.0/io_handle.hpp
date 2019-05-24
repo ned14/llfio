@@ -298,8 +298,8 @@ public:
   memory and that each buffer's size will have changed.
 
   \return The buffers read, which may not be the buffers input. The size of each scatter-gather
-  buffer is updated with the number of bytes of that buffer transferred, and the pointer to
-  the data may be \em completely different to what was submitted (e.g. it may point into a
+  buffer returned is updated with the number of bytes of that buffer transferred, and the pointer
+  to the data may be \em completely different to what was submitted (e.g. it may point into a
   memory map).
   \param reqs A scatter-gather and offset request.
   \param d An optional deadline by which the i/o must complete, else it is cancelled.
@@ -315,8 +315,7 @@ public:
 
   /*! \brief Write data to the open handle.
 
-  \warning Depending on the implementation backend, not all of the buffers input may be written and
-  the some buffers at the end of the returned buffers may return with zero bytes written.
+  \warning Depending on the implementation backend, not all of the buffers input may be written.
   For example, with a zeroed deadline, some backends may only consume as many buffers as the system has available write slots
   for, thus for those backends this call is "non-blocking" in the sense that it will return immediately even if it
   could not schedule a single buffer write. Another example is that some implementations will not
@@ -324,7 +323,7 @@ public:
   a `truncate(newsize)` first.
 
   \return The buffers written, which may not be the buffers input. The size of each scatter-gather
-  buffer is updated with the number of bytes of that buffer transferred.
+  buffer returned is updated with the number of bytes of that buffer transferred.
   \param reqs A scatter-gather and offset request.
   \param d An optional deadline by which the i/o must complete, else it is cancelled.
   Note function may return significantly after this deadline if the i/o takes long to cancel.

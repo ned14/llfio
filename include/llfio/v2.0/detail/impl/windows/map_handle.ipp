@@ -896,22 +896,18 @@ map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buff
   LLFIO_LOG_FUNCTION_CALL(this);
   byte *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
-  for(buffer_type &req : reqs.buffers)
+  for(size_t i = 0; i < reqs.buffers.size(); i++)
   {
-    if(togo != 0u)
+    buffer_type &req = reqs.buffers[i];
+    req = {addr, req.size()};
+    if(req.size() > togo)
     {
-      req = {addr, req.size()};
-      if(req.size() > togo)
-      {
-        req = {req.data(), togo};
-      }
-      addr += req.size();
-      togo -= req.size();
+      req = {req.data(), togo};
+      reqs.buffers = {reqs.buffers.data(), i + 1};
+      break;
     }
-    else
-    {
-      req = {req.data(), 0};
-    }
+    addr += req.size();
+    togo -= req.size();
   }
   return reqs.buffers;
 }
@@ -923,22 +919,22 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
   if(QUICKCPPLIB_NAMESPACE::signal_guard::signal_guard(QUICKCPPLIB_NAMESPACE::signal_guard::signalc::undefined_memory_access,
                                                        [&] {
-                                                         for(const_buffer_type &req : reqs.buffers)
+                                                         for(size_t i = 0; i < reqs.buffers.size(); i++)
                                                          {
-                                                           if(togo != 0u)
+                                                           const_buffer_type &req = reqs.buffers[i];
+                                                           if(req.size() > togo)
                                                            {
-                                                             if(req.size() > togo)
-                                                             {
-                                                               req = {req.data(), togo};
-                                                             }
+                                                             memcpy(addr, req.data(), togo);
+                                                             req = {addr, togo};
+                                                             reqs.buffers = {reqs.buffers.data(), i + 1};
+                                                             return false;
+                                                           }
+                                                           else
+                                                           {
                                                              memcpy(addr, req.data(), req.size());
                                                              req = {addr, req.size()};
                                                              addr += req.size();
                                                              togo -= req.size();
-                                                           }
-                                                           else
-                                                           {
-                                                             req = {req.data(), 0};
                                                            }
                                                          }
                                                          return false;

@@ -1,5 +1,5 @@
 /* A handle to something
-(C) 2015-2017 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
+(C) 2015-2019 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
 File Created: Dec 2015
 
 

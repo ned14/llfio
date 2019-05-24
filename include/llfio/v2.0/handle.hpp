@@ -1,5 +1,5 @@
 /* A handle to something
-(C) 2015-2017 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2015-2019 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: Dec 2015
 
 
@@ -74,11 +74,11 @@ public:
   //! On opening, do we also create a new file or truncate an existing one?
   enum class creation : unsigned char
   {
-    open_existing = 0,
-    only_if_not_exist,
-    if_needed,
-    truncate  //!< Atomically truncate on open, leaving creation date unmodified.
-              // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
+    open_existing = 0,  //!< Filesystem entry must already exist
+    only_if_not_exist,  //!< Filesystem entry must NOT exist, and is atomically created by the success of this operation
+    if_needed,          //!< If filesystem entry exists that is used, else one is created
+    truncate            //!< Filesystem entry must already exist. It is atomically truncated on open, leaving creation date and unique identifier unmodified.
+                        // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
   };
   //! What i/o on the handle will complete immediately due to kernel caching
   enum class caching : unsigned char  // bit 0 set means safety fsyncs enabled
