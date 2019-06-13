@@ -227,7 +227,7 @@ void malloc1()
   mh.do_not_store({mh.address(), mh.length()}).value();
 
   // Fill the memory with 'b' C++ style, probably faulting new pages into existence
-  llfio::map_view<char> p2(mh);
+  llfio::attached<char> p2(mh);
   std::fill(p2.begin(), p2.end(), 'b');
 
   // Kick the contents of the memory out to the swap file so it is no longer cached in RAM
@@ -383,7 +383,7 @@ void sparse_array()
   (void) mfh.truncate(1000000000000ULL * sizeof(int));
 
   // Create a typed view of the one trillion integers
-  llfio::map_view<int> one_trillion_int_array(mfh);
+  llfio::attached<int> one_trillion_int_array(mfh);
 
   // Write and read as you see fit, if you exceed physical RAM it'll be paged out
   one_trillion_int_array[0] = 5;

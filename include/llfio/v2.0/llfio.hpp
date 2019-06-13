@@ -68,7 +68,7 @@ import LLFIO_MODULE_NAME;
 #include "file_handle.hpp"
 #endif
 #include "directory_handle.hpp"
-#include "map_view.hpp"
+#include "mapped.hpp"
 #include "statfs.hpp"
 #ifndef LLFIO_LEAN_AND_MEAN
 #include "storage_profile.hpp"

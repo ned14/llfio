@@ -78,7 +78,7 @@ static inline void TestMappedView2()
   byte *addr = mfh.address();
   BOOST_CHECK(addr != nullptr);
 
-  map_view<int> v1(mfh);
+  attached<int> v1(mfh);
   BOOST_CHECK(v1.size() == 10000);
   v1[0] = 78;
   v1[9999] = 79;
@@ -86,19 +86,19 @@ static inline void TestMappedView2()
   BOOST_CHECK(addr == mfh.address());
   BOOST_CHECK(mfh.maximum_extent().value() == 20000 * sizeof(int));
   BOOST_CHECK(mfh.underlying_file_maximum_extent().value() == 20000 * sizeof(int));
-  v1 = map_view<int>(mfh);
+  v1 = attached<int>(mfh);
   BOOST_CHECK(v1.size() == 20000);
   BOOST_CHECK(v1[0] == 78);
   BOOST_CHECK(v1[9999] == 79);
   mfh.truncate(2 * 1024 * 1024).value();  // exceed reservation, cause hidden reserve
   BOOST_CHECK(addr != nullptr);
-  v1 = map_view<int>(mfh);
+  v1 = attached<int>(mfh);
   BOOST_CHECK(v1.size() == 2 * 1024 * 1024 / sizeof(int));
   BOOST_CHECK(v1[0] == 78);
   BOOST_CHECK(v1[9999] == 79);
   mfh.reserve(2 * 1024 * 1024).value();
   BOOST_CHECK(mfh.address() != nullptr);
-  v1 = map_view<int>(mfh);
+  v1 = attached<int>(mfh);
   BOOST_CHECK(v1.size() == 2 * 1024 * 1024 / sizeof(int));
   BOOST_CHECK(v1[0] == 78);
   BOOST_CHECK(v1[9999] == 79);
@@ -111,20 +111,20 @@ static inline void TestMappedView2()
 #endif
   mfh.truncate(1 * sizeof(int)).value();
   BOOST_CHECK(mfh.address() != nullptr);
-  v1 = map_view<int>(mfh);
+  v1 = attached<int>(mfh);
   BOOST_CHECK(v1.size() == 1);
   BOOST_CHECK(v1[0] == 78);
 
   // Use a different handle to extend the file
   mapped_file_handle mfh2 = mapped_file_handle::mapped_file(1024 * 1024, {}, "testfile", file_handle::mode::write, file_handle::creation::open_existing, file_handle::caching::all, file_handle::flag::unlink_on_first_close).value();
   mfh2.truncate(10000 * sizeof(int)).value();
-  v1 = map_view<int>(mfh2);
+  v1 = attached<int>(mfh2);
   BOOST_CHECK(v1.size() == 10000);
   v1[0] = 78;
   v1[9999] = 79;
   // On Windows this will have updated the mapping, on POSIX it will not, so prod POSIX
   mfh.update_map().value();
-  v1 = map_view<int>(mfh);
+  v1 = attached<int>(mfh);
   BOOST_CHECK(v1.size() == 10000);
   BOOST_CHECK(v1[0] == 78);
   BOOST_CHECK(v1[9999] == 79);
@@ -137,7 +137,7 @@ static inline void TestMappedView2()
   fh.truncate(10000 * sizeof(int)).value();
   // On POSIX this will have updated the mapping, on Windows it will not, so prod Windows
   mfh.update_map().value();
-  v1 = map_view<int>(mfh);
+  v1 = attached<int>(mfh);
   BOOST_REQUIRE(v1.size() == 10000);
   BOOST_CHECK(v1[0] == 78);
   BOOST_CHECK(v1[9999] == 0);
@@ -147,4 +147,4 @@ static inline void TestMappedView2()
 }
 
 KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, mapped_span1, "Tests that llfio::mapped works as expected", TestMappedView1())
-KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, mapped_span2, "Tests that llfio::map_view works as expected", TestMappedView2())
+KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, mapped_span2, "Tests that llfio::attached works as expected", TestMappedView2())

@@ -31,7 +31,6 @@ set(llfio_HEADERS
   "include/llfio/v2.0/llfio.hpp"
   "include/llfio/v2.0/logging.hpp"
   "include/llfio/v2.0/map_handle.hpp"
-  "include/llfio/v2.0/map_view.hpp"
   "include/llfio/v2.0/mapped.hpp"
   "include/llfio/v2.0/mapped_file_handle.hpp"
   "include/llfio/v2.0/native_handle_type.hpp"

@@ -599,7 +599,7 @@ public:
   this function. See `QUICKCPPLIB_NAMESPACE::signal_guard` for a helper function.
 
   \return The buffers read, which will never be the buffers input, because they will point into the mapped view.
-  The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred.
+  The size of each scatter-gather buffer returned is updated with the number of bytes of that buffer transferred.
   \param reqs A scatter-gather and offset request.
   \param d Ignored.
   \errors None, though the various signals and structured exception throws common to using memory maps may occur.
@@ -617,7 +617,7 @@ public:
   you configure it. If you don't want the guard, you can write memory directly using `address()`.
 
   \return The buffers written, which will never be the buffers input because they will point at where the data was copied into the mapped view.
-  The size of each scatter-gather buffer is updated with the number of bytes of that buffer transferred.
+  The size of each scatter-gather buffer returned is updated with the number of bytes of that buffer transferred.
   \param reqs A scatter-gather and offset request.
   \param d Ignored.
   \errors If during the attempt to write the buffers to the map a `SIGBUS` or `EXCEPTION_IN_PAGE_ERROR` is raised,
