@@ -89,7 +89,7 @@ public:
     reads = 3,               //!< Cache reads only. Writes of data and metadata do not complete until reaching storage (<tt>O_SYNC</tt>). <tt>flag_disable_safety_fsyncs</tt> can be used here.
     reads_and_metadata = 5,  //!< Cache reads and writes of metadata, but writes of data do not complete until reaching storage (<tt>O_DSYNC</tt>). <tt>flag_disable_safety_fsyncs</tt> can be used here.
     all = 6,                 //!< Cache reads and writes of data and metadata so they complete immediately, sending writes to storage at some point when the kernel decides (this is the default file system caching on a system).
-    safety_fsyncs = 7,       //!< Cache reads and writes of data and metadata so they complete immediately, but issue safety fsyncs at certain points. See documentation for <tt>flag_disable_safety_fsyncs</tt>.
+    safety_barriers = 7,       //!< Cache reads and writes of data and metadata so they complete immediately, but issue safety barriers at certain points. See documentation for <tt>flag_disable_safety_barriers</tt>.
     temporary = 8            //!< Cache reads and writes of data and metadata so they complete immediately, only sending any updates to storage on last handle close in the system or if memory becomes tight as this file is expected to be temporary (Windows and FreeBSD only).
                              // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
   };
@@ -123,9 +123,9 @@ public:
     * caching::none
     * caching::reads
     * caching::reads_and_metadata
-    * caching::safety_fsyncs
+    * caching::safety_barriers
     */
-    disable_safety_fsyncs = 1U << 2U,
+    disable_safety_barriers = 1U << 2U,
     /*! `file_handle::unlink()` could accidentally delete the wrong file if someone has
     renamed the open file handle since the time it was opened. To prevent this occuring,
     where the OS doesn't provide race free unlink-by-open-handle we compare the inode of
@@ -316,7 +316,7 @@ public:
   //! True if writes are safely on storage on completion
   bool are_writes_durable() const noexcept { return _caching == caching::none || _caching == caching::reads || _caching == caching::reads_and_metadata; }
   //! True if issuing safety fsyncs is on
-  bool are_safety_fsyncs_issued() const noexcept { return !(_flags & flag::disable_safety_fsyncs) && !((static_cast<unsigned>(_caching) & 1U) == 0U); }
+  bool are_safety_barriers_issued() const noexcept { return !(_flags & flag::disable_safety_barriers) && !((static_cast<unsigned>(_caching) & 1U) == 0U); }
 
   //! The flags this handle was opened with
   flag flags() const noexcept { return _flags; }
@@ -367,9 +367,9 @@ inline std::ostream &operator<<(std::ostream &s, const handle::flag &v)
   {
     temp.append("unlink_on_first_close|");
   }
-  if(!!(v & handle::flag::disable_safety_fsyncs))
+  if(!!(v & handle::flag::disable_safety_barriers))
   {
-    temp.append("disable_safety_fsyncs|");
+    temp.append("disable_safety_barriers|");
   }
   if(!!(v & handle::flag::disable_prefetching))
   {

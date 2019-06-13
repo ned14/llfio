@@ -83,7 +83,7 @@ result<void> handle::close() noexcept
       abort();
     }
 #endif
-    if(are_safety_fsyncs_issued() && is_writable())
+    if(are_safety_barriers_issued() && is_writable())
     {
       if(FlushFileBuffers(_v.h) == 0)
       {

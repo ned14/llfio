@@ -213,6 +213,9 @@ void malloc1()
   // to a page, it will be page faulted into a private page by the kernel.
   llfio::byte *p = mh.address();
   size_t len = mh.length();
+  // map_handle::address() returns indeterminate bytes, so you need to bless
+  // them into existence before use
+  llfio::bless(p, len);
   memset(p, 'a', len);
 
   // Tell the kernel to throw away the contents of any whole pages
