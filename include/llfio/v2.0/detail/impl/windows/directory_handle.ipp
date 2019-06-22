@@ -274,9 +274,11 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
     }
   } while(!done);
   size_t n = 0;
-  for(FILE_ID_FULL_DIR_INFORMATION *ffdi = buffer;; ffdi = reinterpret_cast<FILE_ID_FULL_DIR_INFORMATION *>(reinterpret_cast<uintptr_t>(ffdi) + ffdi->NextEntryOffset))
+  done = false;
+  for(FILE_ID_FULL_DIR_INFORMATION *ffdi = buffer; !done && n < req.buffers.size(); ffdi = reinterpret_cast<FILE_ID_FULL_DIR_INFORMATION *>(reinterpret_cast<uintptr_t>(ffdi) + ffdi->NextEntryOffset))
   {
-    size_t length = ffdi->FileNameLength / sizeof(wchar_t);
+    done = ffdi->NextEntryOffset == 0u;
+    const size_t length = ffdi->FileNameLength / sizeof(wchar_t);
     if(length <= 2 && '.' == ffdi->FileName[0])
     {
       if(1 == length || '.' == ffdi->FileName[1])
@@ -308,22 +310,12 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
     item.stat.st_compressed = static_cast<unsigned int>((ffdi->FileAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0u);
     item.stat.st_reparse_point = static_cast<unsigned int>((ffdi->FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0u);
     n++;
-    if(ffdi->NextEntryOffset == 0u)
-    {
-      // Fill is complete
-      req.buffers._resize(n);
-      req.buffers._metadata = default_stat_contents;
-      req.buffers._done = true;
-      return std::move(req.buffers);
-    }
-    if(n >= req.buffers.size())
-    {
-      // Fill is incomplete
-      req.buffers._metadata = default_stat_contents;
-      req.buffers._done = false;
-      return std::move(req.buffers);
-    }
   }
+
+  req.buffers._done = done;
+  req.buffers._resize(n);
+  req.buffers._metadata = default_stat_contents;
+  return std::move(req.buffers);
 }
 
 LLFIO_V2_NAMESPACE_END
