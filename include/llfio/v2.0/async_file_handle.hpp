@@ -385,7 +385,7 @@ public:
     struct completion_handler : _erased_completion_handler
     {
       CompletionRoutine completion;
-      explicit completion_handler(CompletionRoutine c)
+      completion_handler(CompletionRoutine c)
           : completion(std::move(c))
       {
       }
@@ -440,7 +440,7 @@ public:
     struct completion_handler : _erased_completion_handler
     {
       CompletionRoutine completion;
-      explicit completion_handler(CompletionRoutine c)
+      completion_handler(CompletionRoutine c)
           : completion(std::move(c))
       {
       }
@@ -483,7 +483,7 @@ public:
     struct completion_handler : _erased_completion_handler
     {
       CompletionRoutine completion;
-      explicit completion_handler(CompletionRoutine c)
+      completion_handler(CompletionRoutine c)
           : completion(std::move(c))
       {
       }
