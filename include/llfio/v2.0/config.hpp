@@ -109,6 +109,12 @@ Distributed under the Boost Software License, Version 1.0.
 #include <_mingw.h>
 #endif
 
+
+#if __cplusplus > 201703L
+#include <version>
+#endif
+
+
 #include "quickcpplib/include/cpp_feature.h"
 
 #ifndef __cpp_exceptions
@@ -222,7 +228,8 @@ LLFIO_V2_NAMESPACE_END
 // Bring in filesystem
 #if defined(__has_include)
 // clang-format off
-#if __has_include(<filesystem>) && __cplusplus >= 202000
+#if (__cplusplus > 201703L && __cpp_lib_filesystem >= 201703L) || \
+      __has_include(<filesystem>) && (__cplusplus == 201703L || _MSVC_LANG == 201703L)
 #include <filesystem>
 LLFIO_V2_NAMESPACE_BEGIN
 namespace filesystem = std::filesystem;
