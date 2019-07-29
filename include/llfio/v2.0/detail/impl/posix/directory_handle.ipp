@@ -119,7 +119,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
       ret.value()._flags &= ~flag::disable_safety_unlinks;
     }
   }
-  if(ret.value().are_safety_fsyncs_issued())
+  if(ret.value().are_safety_barriers_issued())
   {
     fsync(nativeh.fd);
   }

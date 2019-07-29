@@ -104,7 +104,7 @@ inline result<int> attribs_from_handle_mode_caching_and_flags(native_handle_type
 #endif
     break;
   case handle::caching::all:
-  case handle::caching::safety_fsyncs:
+  case handle::caching::safety_barriers:
   case handle::caching::temporary:
     break;
   }

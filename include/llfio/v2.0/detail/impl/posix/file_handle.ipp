@@ -64,7 +64,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
     }
 #endif
   }
-  if(_creation == creation::truncate && ret.value().are_safety_fsyncs_issued())
+  if(_creation == creation::truncate && ret.value().are_safety_barriers_issued())
   {
     fsync(nativeh.fd);
   }
@@ -265,7 +265,7 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
         ret.value()._v.behaviour &= ~native_handle_type::disposition::aligned_io;
         break;
       case caching::all:
-      case caching::safety_fsyncs:
+      case caching::safety_barriers:
       case caching::temporary:
         if(-1 == fcntl(ret.value()._v.fd, F_SETFL, attribs))
         {
@@ -353,7 +353,7 @@ result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type 
   {
     return posix_error();
   }
-  if(are_safety_fsyncs_issued())
+  if(are_safety_barriers_issued())
   {
     fsync(_v.fd);
   }

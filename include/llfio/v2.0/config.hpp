@@ -334,10 +334,10 @@ LLFIO_V2_NAMESPACE_END
 LLFIO_V2_NAMESPACE_BEGIN
 using namespace QUICKCPPLIB_NAMESPACE::string_view;
 LLFIO_V2_NAMESPACE_END
-// Bring in an ensure_stores implementation
-#include "quickcpplib/include/ensure_stores.hpp"
+// Bring in an ensure_flushes implementation
+#include "quickcpplib/include/mem_flush_loads_stores.hpp"
 LLFIO_V2_NAMESPACE_BEGIN
-using namespace QUICKCPPLIB_NAMESPACE::ensure_stores;
+using namespace QUICKCPPLIB_NAMESPACE::mem_flush_loads_stores;
 LLFIO_V2_NAMESPACE_END
 // Bring in a detach_cast implementation
 #include "quickcpplib/include/detach_cast.hpp"

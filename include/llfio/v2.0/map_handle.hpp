@@ -450,7 +450,7 @@ public:
   {
     auto *tp = (const_buffer_type::pointer)(((uintptr_t) req.data()) & 63);
     const_buffer_type ret{tp, (size_t)(req.data() + req.size() - tp)};
-    if(memory_flush_none == ensure_stores(ret.data(), ret.size(), evict ? memory_flush_evict : memory_flush_retain).first)
+    if(memory_flush_none == mem_flush_stores(ret.data(), ret.size(), evict ? memory_flush_evict : memory_flush_retain))
     {
       ret = {tp, 0};
     }
