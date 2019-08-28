@@ -213,6 +213,9 @@ void malloc1()
   // to a page, it will be page faulted into a private page by the kernel.
   llfio::byte *p = mh.address();
   size_t len = mh.length();
+  // map_handle::address() returns indeterminate bytes, so you need to bless
+  // them into existence before use
+  llfio::bless(p, len);
   memset(p, 'a', len);
 
   // Tell the kernel to throw away the contents of any whole pages
@@ -224,7 +227,7 @@ void malloc1()
   mh.do_not_store({mh.address(), mh.length()}).value();
 
   // Fill the memory with 'b' C++ style, probably faulting new pages into existence
-  llfio::map_view<char> p2(mh);
+  llfio::attached<char> p2(mh);
   std::fill(p2.begin(), p2.end(), 'b');
 
   // Kick the contents of the memory out to the swap file so it is no longer cached in RAM
@@ -380,7 +383,7 @@ void sparse_array()
   (void) mfh.truncate(1000000000000ULL * sizeof(int));
 
   // Create a typed view of the one trillion integers
-  llfio::map_view<int> one_trillion_int_array(mfh);
+  llfio::attached<int> one_trillion_int_array(mfh);
 
   // Write and read as you see fit, if you exceed physical RAM it'll be paged out
   one_trillion_int_array[0] = 5;
@@ -388,7 +391,7 @@ void sparse_array()
   //! [sparse_array]
 }
 
-#ifdef __cpp_coroutines
+#if LLFIO_HAVE_COROUTINES
 std::future<void> coroutine_write()
 {
   //! [coroutine_write]

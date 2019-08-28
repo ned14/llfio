@@ -1215,7 +1215,7 @@ inline result<DWORD> attributes_from_handle_caching_and_flags(native_handle_type
     attribs |= FILE_FLAG_WRITE_THROUGH;
     break;
   case handle::caching::all:
-  case handle::caching::safety_fsyncs:
+  case handle::caching::safety_barriers:
     break;
   case handle::caching::temporary:
     attribs |= FILE_ATTRIBUTE_TEMPORARY;
@@ -1263,7 +1263,7 @@ inline result<DWORD> ntflags_from_handle_caching_and_flags(native_handle_type &n
     ntflags |= 0x00000002 /*FILE_WRITE_THROUGH*/;
     break;
   case handle::caching::all:
-  case handle::caching::safety_fsyncs:
+  case handle::caching::safety_barriers:
     break;
   case handle::caching::temporary:
     // should be handled by attributes_from_handle_caching_and_flags

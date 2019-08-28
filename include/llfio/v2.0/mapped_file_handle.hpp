@@ -422,6 +422,11 @@ template <> struct construct<mapped_file_handle>
   result<mapped_file_handle> operator()() const noexcept { return mapped_file_handle::mapped_file(reservation, base, _path, _mode, _creation, _caching, flags); }
 };
 
+//! \brief Declare `mapped_file_handle` as a suitable source for P1631 `attached<T>`.
+template <class T> constexpr inline span<T> in_place_attach(mapped_file_handle &mfh) noexcept
+{
+  return in_place_attach<T>(span<byte>{mfh.address(), mfh.map().length()});
+}
 
 // BEGIN make_free_functions.py
 //! Swap with another instance

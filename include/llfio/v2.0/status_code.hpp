@@ -88,7 +88,7 @@ namespace detail
     //! Compares to a T
     constexpr bool operator==(const T &b) const noexcept { return sc == b; }
   };
-}
+}  // namespace detail
 
 template <class BaseStatusCodeDomain> class file_io_error_domain;
 
@@ -143,7 +143,7 @@ namespace mixins
       return {};
     }
   };
-}
+}  // namespace mixins
 SYSTEM_ERROR2_NAMESPACE_END
 
 LLFIO_V2_NAMESPACE_BEGIN
@@ -237,10 +237,10 @@ namespace detail
 using file_io_error = SYSTEM_ERROR2_NAMESPACE::errored_status_code<SYSTEM_ERROR2_NAMESPACE::erased<detail::file_io_error_domain_value_system_code>>;
 
 
-template <class T> using result = OUTCOME_V2_NAMESPACE::experimental::erased_result<T, file_io_error>;
-using OUTCOME_V2_NAMESPACE::success;
+template <class T> using result = OUTCOME_V2_NAMESPACE::experimental::status_result<T, file_io_error>;
 using OUTCOME_V2_NAMESPACE::failure;
 using OUTCOME_V2_NAMESPACE::in_place_type;
+using OUTCOME_V2_NAMESPACE::success;
 
 //! Choose an errc implementation
 using SYSTEM_ERROR2_NAMESPACE::errc;
@@ -260,7 +260,7 @@ inline file_io_error ntkernel_error(SYSTEM_ERROR2_NAMESPACE::win32::NTSTATUS c);
 namespace detail
 {
   inline std::ostream &operator<<(std::ostream &s, const file_io_error &v) { return s << "llfio::file_io_error(" << v.message().c_str() << ")"; }
-}
+}  // namespace detail
 inline file_io_error error_from_exception(std::exception_ptr &&ep = std::current_exception(), file_io_error not_matched = generic_error(errc::resource_unavailable_try_again)) noexcept
 {
   if(!ep)
@@ -346,7 +346,7 @@ namespace detail
 {
   template <class Dest, class Src> inline void fill_failure_info(Dest &dest, const Src &src);
   template <class Src> inline void append_path_info(Src &src, std::string &ret);
-}
+}  // namespace detail
 
 struct error_info;
 inline std::error_code make_error_code(error_info ei);
@@ -386,7 +386,7 @@ public:
   OUTCOME_TEMPLATE(class ErrorCondEnum)
   OUTCOME_TREQUIRES(OUTCOME_TPRED(std::is_error_condition_enum<ErrorCondEnum>::value))
   error_info(ErrorCondEnum &&v)  // NOLINT
-  : error_info(make_error_code(std::forward<ErrorCondEnum>(v)))
+      : error_info(make_error_code(std::forward<ErrorCondEnum>(v)))
   {
   }
 
@@ -554,15 +554,15 @@ inline void error_info::throw_exception() const
 
 template <class T> using result = OUTCOME_V2_NAMESPACE::result<T, error_info>;
 template <class T> using outcome = OUTCOME_V2_NAMESPACE::outcome<T, error_info>;
-using OUTCOME_V2_NAMESPACE::success;
 using OUTCOME_V2_NAMESPACE::failure;
+using OUTCOME_V2_NAMESPACE::success;
 inline error_info error_from_exception(std::exception_ptr &&ep = std::current_exception(), std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept
 {
   return error_info(OUTCOME_V2_NAMESPACE::error_from_exception(std::move(ep), not_matched));
 }
 using OUTCOME_V2_NAMESPACE::in_place_type;
 
-static_assert(OUTCOME_V2_NAMESPACE::trait::has_error_code_v<error_info>, "error_info is not detected to be an error code");
+static_assert(OUTCOME_V2_NAMESPACE::trait::is_error_code_available_v<error_info>, "error_info is not detected to be an error code");
 
 //! Choose an errc implementation
 using std::errc;

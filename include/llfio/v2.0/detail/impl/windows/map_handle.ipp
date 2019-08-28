@@ -380,13 +380,10 @@ static inline result<void> win32_map_flags(native_handle_type &nativeh, DWORD &a
   return success();
 }
 
-QUICKCPPLIB_BITFIELD_BEGIN(win32_map_sought)
-{
-  committed = 1U << 0U, freed = 1U << 1U, reserved = 1U << 2U
-}
-QUICKCPPLIB_BITFIELD_END(win32_map_sought)
+QUICKCPPLIB_BITFIELD_BEGIN(win32_map_sought){committed = 1U << 0U, freed = 1U << 1U, reserved = 1U << 2U} QUICKCPPLIB_BITFIELD_END(win32_map_sought)
 // Used to apply an operation to all maps within a region
-template <class F> static inline result<void> win32_maps_apply(byte *addr, size_t bytes, win32_map_sought sought, F &&f)
+template <class F>
+static inline result<void> win32_maps_apply(byte *addr, size_t bytes, win32_map_sought sought, F &&f)
 {
   /* Ok, so we have to be super careful here, because calling VirtualQuery()
   somewhere in the middle of a region causes a linear scan until the beginning
@@ -802,15 +799,29 @@ result<void> map_handle::zero_memory(buffer_type region) noexcept
   }
   // Alas, zero() will not work on mapped views on Windows :(, so memset to zero and call discard if available
   memset(region.data(), 0, region.size());
-  if((DiscardVirtualMemory_ != nullptr) && region.size() >= utils::page_size())
+  if(region.size() >= utils::page_size())
   {
     region = utils::round_to_page_size(region, _pagesize);
     if(region.size() > 0)
     {
       OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed, [](byte *addr, size_t bytes) -> result<void> {
-        if(DiscardVirtualMemory_(addr, bytes) == 0)
+        if(DiscardVirtualMemory_ != nullptr)
         {
-          return win32_error();
+          if(DiscardVirtualMemory_(addr, bytes) == 0)
+          {
+            return win32_error();
+          }
+        }
+        else
+        {
+          // This will always fail, but has the side effect of discarding the pages anyway.
+          if(VirtualUnlock(addr, bytes) == 0)
+          {
+            if(ERROR_NOT_LOCKED != GetLastError())
+            {
+              return win32_error();
+            }
+          }
         }
         return success();
       }));
@@ -861,11 +872,15 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
       }));
       return region;
     }
-    // Else MEM_RESET will do
+    // Else VirtualUnlock will do
     OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed, [](byte *addr, size_t bytes) -> result<void> {
-      if(VirtualAlloc(addr, bytes, MEM_RESET, 0) == nullptr)
+      // This will always fail, but has the side effect of discarding the pages anyway.
+      if(VirtualUnlock(addr, bytes) == 0)
       {
-        return win32_error();
+        if(ERROR_NOT_LOCKED != GetLastError())
+        {
+          return win32_error();
+        }
       }
       return success();
     }));
@@ -881,22 +896,18 @@ map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buff
   LLFIO_LOG_FUNCTION_CALL(this);
   byte *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
-  for(buffer_type &req : reqs.buffers)
+  for(size_t i = 0; i < reqs.buffers.size(); i++)
   {
-    if(togo != 0u)
+    buffer_type &req = reqs.buffers[i];
+    req = {addr, req.size()};
+    if(req.size() > togo)
     {
-      req = {addr, req.size()};
-      if(req.size() > togo)
-      {
-        req = {req.data(), togo};
-      }
-      addr += req.size();
-      togo -= req.size();
+      req = {req.data(), togo};
+      reqs.buffers = {reqs.buffers.data(), i + 1};
+      break;
     }
-    else
-    {
-      req = {req.data(), 0};
-    }
+    addr += req.size();
+    togo -= req.size();
   }
   return reqs.buffers;
 }
@@ -908,22 +919,22 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
   if(QUICKCPPLIB_NAMESPACE::signal_guard::signal_guard(QUICKCPPLIB_NAMESPACE::signal_guard::signalc::undefined_memory_access,
                                                        [&] {
-                                                         for(const_buffer_type &req : reqs.buffers)
+                                                         for(size_t i = 0; i < reqs.buffers.size(); i++)
                                                          {
-                                                           if(togo != 0u)
+                                                           const_buffer_type &req = reqs.buffers[i];
+                                                           if(req.size() > togo)
                                                            {
-                                                             if(req.size() > togo)
-                                                             {
-                                                               req = {req.data(), togo};
-                                                             }
+                                                             memcpy(addr, req.data(), togo);
+                                                             req = {addr, togo};
+                                                             reqs.buffers = {reqs.buffers.data(), i + 1};
+                                                             return false;
+                                                           }
+                                                           else
+                                                           {
                                                              memcpy(addr, req.data(), req.size());
                                                              req = {addr, req.size()};
                                                              addr += req.size();
                                                              togo -= req.size();
-                                                           }
-                                                           else
-                                                           {
-                                                             req = {req.data(), 0};
                                                            }
                                                          }
                                                          return false;

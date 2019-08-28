@@ -163,7 +163,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
 #endif
     }
   }
-  if(_creation == creation::truncate && ret.value().are_safety_fsyncs_issued())
+  if(_creation == creation::truncate && ret.value().are_safety_barriers_issued())
   {
     FlushFileBuffers(nativeh.h);
   }
@@ -363,7 +363,7 @@ result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type 
   {
     return win32_error();
   }
-  if(are_safety_fsyncs_issued())
+  if(are_safety_barriers_issued())
   {
     FlushFileBuffers(_v.h);
   }

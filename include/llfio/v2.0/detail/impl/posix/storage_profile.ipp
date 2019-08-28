@@ -159,23 +159,23 @@ namespace storage_profile
 #if defined(__i386__) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_X64)
           // We can do a much better CPU name on x86/x64
           sp.cpu_name.value.clear();
-          auto __cpuid = [](int *cpuInfo, int func) { __asm__ __volatile__("cpuid\n\t" : "=a"(cpuInfo[0]), "=b"(cpuInfo[1]), "=c"(cpuInfo[2]), "=d"(cpuInfo[3]) : "0"(func)); };  // NOLINT
+          auto x86cpuid = [](int *cpuInfo, int func) { __asm__ __volatile__("cpuid\n\t" : "=a"(cpuInfo[0]), "=b"(cpuInfo[1]), "=c"(cpuInfo[2]), "=d"(cpuInfo[3]) : "0"(func)); };  // NOLINT
           {
             char buffer[62];
             memset(buffer, 32, 62);
             int nBuff[4];
-            __cpuid(nBuff, 0);
+            x86cpuid(nBuff, 0);
             memcpy(buffer + 0, nBuff + 1, 4);
             *reinterpret_cast<int *>(buffer + 4) = nBuff[3];
             *reinterpret_cast<int *>(buffer + 8) = nBuff[2];
 
             // Do we have a brand string?
-            __cpuid(nBuff, 0x80000000);
+            x86cpuid(nBuff, 0x80000000);
             if(static_cast<unsigned>(nBuff[0]) >= 0x80000004)
             {
-              __cpuid(reinterpret_cast<int *>(&buffer[14]), 0x80000002);
-              __cpuid(reinterpret_cast<int *>(&buffer[30]), 0x80000003);
-              __cpuid(reinterpret_cast<int *>(&buffer[46]), 0x80000004);
+              x86cpuid(reinterpret_cast<int *>(&buffer[14]), 0x80000002);
+              x86cpuid(reinterpret_cast<int *>(&buffer[30]), 0x80000003);
+              x86cpuid(reinterpret_cast<int *>(&buffer[46]), 0x80000004);
             }
             else
             {

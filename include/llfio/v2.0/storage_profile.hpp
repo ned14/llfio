@@ -30,7 +30,7 @@ Distributed under the Boost Software License, Version 1.0.
 #if LLFIO_EXPERIMENTAL_STATUS_CODE
 #include "outcome/include/outcome/experimental/status_outcome.hpp"
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
-template <class T> using outcome = OUTCOME_V2_NAMESPACE::experimental::erased_outcome<T, file_io_error>;
+template <class T> using outcome = OUTCOME_V2_NAMESPACE::experimental::status_outcome<T, file_io_error>;
 LLFIO_V2_NAMESPACE_END
 #endif
 

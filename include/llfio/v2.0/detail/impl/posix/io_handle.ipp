@@ -1,5 +1,5 @@
 /* A handle to something
-(C) 2015-2017 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
+(C) 2015-2019 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
 File Created: Dec 2015
 
 
@@ -111,20 +111,18 @@ io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_requ
   {
     return posix_error();
   }
-  for(auto &buffer : reqs.buffers)
+  for(size_t i = 0; i < reqs.buffers.size(); i++)
   {
+    auto &buffer = reqs.buffers[i];
     if(buffer.size() >= static_cast<size_t>(bytesread))
     {
       bytesread -= buffer.size();
     }
-    else if(bytesread > 0)
-    {
-      buffer = {buffer.data(), (size_type) bytesread};
-      bytesread = 0;
-    }
     else
     {
-      buffer = {buffer.data(), 0};
+      buffer = {buffer.data(), (size_type) bytesread};
+      reqs.buffers = {reqs.buffers.data(), i + 1};
+      break;
     }
   }
   return {reqs.buffers};
@@ -177,20 +175,18 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::
   {
     return posix_error();
   }
-  for(auto &buffer : reqs.buffers)
+  for(size_t i = 0; i < reqs.buffers.size(); i++)
   {
+    auto &buffer = reqs.buffers[i];
     if(buffer.size() >= static_cast<size_t>(byteswritten))
     {
       byteswritten -= buffer.size();
     }
-    else if(byteswritten > 0)
-    {
-      buffer = {buffer.data(), (size_type) byteswritten};
-      byteswritten = 0;
-    }
     else
     {
-      buffer = {buffer.data(), 0};
+      buffer = {buffer.data(), (size_type) byteswritten};
+      reqs.buffers = {reqs.buffers.data(), i + 1};
+      break;
     }
   }
   return {reqs.buffers};
