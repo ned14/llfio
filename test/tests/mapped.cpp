@@ -142,6 +142,7 @@ static inline void TestMappedView2()
   BOOST_CHECK(v1[0] == 78);
   BOOST_CHECK(v1[9999] == 0);
 
+  v1 = {};
   mfh.truncate(0).value();
   BOOST_CHECK(mfh.address() == nullptr);
 }
