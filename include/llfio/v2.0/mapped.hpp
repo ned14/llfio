@@ -144,7 +144,10 @@ private:
     {
       len = bytes;
     }
-    static_cast<span<T> &>(*this) = detail::attach_or_reinterpret<T>::attach({addr, len});
+    if(_maph.is_writable())
+    {
+      static_cast<span<T> &>(*this) = detail::attach_or_reinterpret<T>::attach({addr, len});
+    }
   }
 
 public:
@@ -170,7 +173,7 @@ public:
   //! Detaches the array of `T`, before tearing down the map
   ~mapped()
   {
-    if(!this->empty())
+    if(!this->empty() && _maph.is_writable())
     {
       detail::attach_or_reinterpret<T>::detach(*this);
     }

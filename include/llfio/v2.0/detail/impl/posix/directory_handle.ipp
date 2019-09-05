@@ -26,7 +26,15 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include "import.hpp"
 
 #ifdef QUICKCPPLIB_ENABLE_VALGRIND
+#ifdef __has_include
+#if __has_include("../../../quickcpplib/valgrind/memcheck.h")
 #include "../../../quickcpplib/valgrind/memcheck.h"
+#else
+#include "quickcpplib/valgrind/memcheck.h"
+#endif
+#else
+#include "quickcpplib/valgrind/memcheck.h"
+#endif
 #define LLFIO_VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(a, b) VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE((a), (b))
 #else
 #define LLFIO_VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(a, b)
