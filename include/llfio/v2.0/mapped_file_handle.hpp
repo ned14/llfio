@@ -422,10 +422,28 @@ template <> struct construct<mapped_file_handle>
   result<mapped_file_handle> operator()() const noexcept { return mapped_file_handle::mapped_file(reservation, base, _path, _mode, _creation, _caching, flags); }
 };
 
+LLFIO_V2_NAMESPACE_END
+
+// Do not actually attach/detach, as it causes a page fault storm in the current emulation
+QUICKCPPLIB_NAMESPACE_BEGIN
+
+namespace in_place_attach_detach
+{
+  namespace traits
+  {
+    template <> struct disable_attached_for<LLFIO_V2_NAMESPACE::mapped_file_handle> : public std::true_type
+    {
+    };
+  }
+}
+QUICKCPPLIB_NAMESPACE_END
+
+LLFIO_V2_NAMESPACE_EXPORT_BEGIN
+
 //! \brief Declare `mapped_file_handle` as a suitable source for P1631 `attached<T>`.
 template <class T> constexpr inline span<T> in_place_attach(mapped_file_handle &mfh) noexcept
 {
-  return in_place_attach<T>(span<byte>{mfh.address(), mfh.map().length()});
+  return span<T>{reinterpret_cast<T *>(mfh.address()), mfh.map().length()/sizeof(T)};
 }
 
 // BEGIN make_free_functions.py

@@ -26,7 +26,15 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include "import.hpp"
 
 #ifdef QUICKCPPLIB_ENABLE_VALGRIND
+#ifdef __has_include
+#if __has_include("../../../quickcpplib/valgrind/memcheck.h")
 #include "../../../quickcpplib/valgrind/memcheck.h"
+#else
+#include "quickcpplib/valgrind/memcheck.h"
+#endif
+#else
+#include "quickcpplib/valgrind/memcheck.h"
+#endif
 #define LLFIO_VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(a, b) VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE((a), (b))
 #else
 #define LLFIO_VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(a, b)
@@ -119,7 +127,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
       ret.value()._flags &= ~flag::disable_safety_unlinks;
     }
   }
-  if(ret.value().are_safety_fsyncs_issued())
+  if(ret.value().are_safety_barriers_issued())
   {
     fsync(nativeh.fd);
   }

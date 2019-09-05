@@ -450,7 +450,7 @@ public:
   {
     auto *tp = (const_buffer_type::pointer)(((uintptr_t) req.data()) & 63);
     const_buffer_type ret{tp, (size_t)(req.data() + req.size() - tp)};
-    if(memory_flush_none == ensure_stores(ret.data(), ret.size(), evict ? memory_flush_evict : memory_flush_retain).first)
+    if(memory_flush_none == mem_flush_stores(ret.data(), ret.size(), evict ? memory_flush_evict : memory_flush_retain))
     {
       ret = {tp, 0};
     }
@@ -640,9 +640,27 @@ template <> struct construct<map_handle>
   result<map_handle> operator()() const noexcept { return map_handle::map(section, bytes, offset, _flag); }
 };
 
+LLFIO_V2_NAMESPACE_END
+
+// Do not actually attach/detach, as it causes a page fault storm in the current emulation
+QUICKCPPLIB_NAMESPACE_BEGIN
+
+namespace in_place_attach_detach
+{
+  namespace traits
+  {
+    template <> struct disable_attached_for<LLFIO_V2_NAMESPACE::map_handle> : public std::true_type
+    {
+    };
+  }
+}
+QUICKCPPLIB_NAMESPACE_END
+
+LLFIO_V2_NAMESPACE_EXPORT_BEGIN
+
 //! \brief Declare `map_handle` as a suitable source for P1631 `attached<T>`.
 template <class T> constexpr inline span<T> in_place_attach(map_handle& mh) noexcept {
-  return in_place_attach<T>(span<byte>{mh.address(), mh.length()});
+  return span<T>{reinterpret_cast<T *>(mh.address()), mh.length()/sizeof(T)};
 }
 
 // BEGIN make_free_functions.py

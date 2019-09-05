@@ -588,7 +588,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
   LLFIO_LOG_FUNCTION_CALL(this);
   byte *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
-  if(QUICKCPPLIB_NAMESPACE::signal_guard::signal_guard(QUICKCPPLIB_NAMESPACE::signal_guard::signalc::undefined_memory_access,
+  if(QUICKCPPLIB_NAMESPACE::signal_guard::signal_guard(QUICKCPPLIB_NAMESPACE::signal_guard::signalc_set::undefined_memory_access,
                                                        [&] {
                                                          for(size_t i = 0; i < reqs.buffers.size(); i++)
                                                          {
@@ -610,13 +610,12 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
                                                          }
                                                          return false;
                                                        },
-                                                       [&](const QUICKCPPLIB_NAMESPACE::signal_guard::raised_signal_info &_info) {
-                                                         auto &info = const_cast<QUICKCPPLIB_NAMESPACE::signal_guard::raised_signal_info &>(_info);
-                                                         auto *causingaddr = (byte *) info.address();
+                                                       [&](const QUICKCPPLIB_NAMESPACE::signal_guard::raised_signal_info *info) {
+                                                         auto *causingaddr = (byte *) info->addr;
                                                          if(causingaddr < _addr || causingaddr >= (_addr + _reservation))
                                                          {
                                                            // Not caused by this map
-                                                           QUICKCPPLIB_NAMESPACE::signal_guard::thread_local_raise_signal(info.signal(), info.raw_info(), info.raw_context());
+                                                           thrd_raise_signal(info->signo, info->raw_info, info->raw_context);
                                                            abort();
                                                          }
                                                          return true;
