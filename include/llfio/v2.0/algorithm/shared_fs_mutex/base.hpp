@@ -218,14 +218,14 @@ namespace algorithm
       {
         entities_guard ret(this, entities);
         OUTCOME_TRYV(_lock(ret, d, spin_not_sleep));
-        return std::move(ret);
+        return {std::move(ret)};
       }
       //! Lock a single entity for exclusive or shared access
       result<entities_guard> lock(entity_type entity, deadline d = deadline(), bool spin_not_sleep = false) noexcept
       {
         entities_guard ret(this, entity);
         OUTCOME_TRYV(_lock(ret, d, spin_not_sleep));
-        return std::move(ret);
+        return {std::move(ret)};
       }
       //! Try to lock all of a sequence of entities for exclusive or shared access
       result<entities_guard> try_lock(entities_type entities) noexcept { return lock(entities, deadline(std::chrono::seconds(0))); }

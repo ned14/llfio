@@ -34,6 +34,13 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4251)  // dll interface
 #endif
 
+// Stupid GCC 8 suddenly started erroring on use of lambdas in constexpr in C++ 14 :(
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ > 7 && __cplusplus < 201700
+#define LLFIO_PATH_VIEW_GCC_CONSTEXPR
+#else
+#define LLFIO_PATH_VIEW_GCC_CONSTEXPR constexpr
+#endif
+
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
@@ -252,18 +259,18 @@ public:
   constexpr void swap(path_view &o) noexcept { _state.swap(o._state); }
 
   //! True if empty
-  constexpr bool empty() const noexcept
+  LLFIO_PATH_VIEW_GCC_CONSTEXPR bool empty() const noexcept
   {
     return _invoke([](const auto &v) { return v.empty(); });
   }
-  constexpr bool has_root_path() const noexcept { return !root_path().empty(); }
-  constexpr bool has_root_name() const noexcept { return !root_name().empty(); }
-  constexpr bool has_root_directory() const noexcept { return !root_directory().empty(); }
-  constexpr bool has_relative_path() const noexcept { return !relative_path().empty(); }
-  constexpr bool has_parent_path() const noexcept { return !parent_path().empty(); }
-  constexpr bool has_filename() const noexcept { return !filename().empty(); }
-  constexpr bool has_stem() const noexcept { return !stem().empty(); }
-  constexpr bool has_extension() const noexcept { return !extension().empty(); }
+  LLFIO_PATH_VIEW_GCC_CONSTEXPR bool has_root_path() const noexcept { return !root_path().empty(); }
+  LLFIO_PATH_VIEW_GCC_CONSTEXPR bool has_root_name() const noexcept { return !root_name().empty(); }
+  LLFIO_PATH_VIEW_GCC_CONSTEXPR bool has_root_directory() const noexcept { return !root_directory().empty(); }
+  LLFIO_PATH_VIEW_GCC_CONSTEXPR bool has_relative_path() const noexcept { return !relative_path().empty(); }
+  LLFIO_PATH_VIEW_GCC_CONSTEXPR bool has_parent_path() const noexcept { return !parent_path().empty(); }
+  LLFIO_PATH_VIEW_GCC_CONSTEXPR bool has_filename() const noexcept { return !filename().empty(); }
+  LLFIO_PATH_VIEW_GCC_CONSTEXPR bool has_stem() const noexcept { return !stem().empty(); }
+  LLFIO_PATH_VIEW_GCC_CONSTEXPR bool has_extension() const noexcept { return !extension().empty(); }
   constexpr bool is_absolute() const noexcept
   {
     auto sep_idx = _find_first_sep();
@@ -349,7 +356,7 @@ public:
 #endif
 
   //! Adjusts the end of this view to match the final separator.
-  constexpr void remove_filename() noexcept
+  LLFIO_PATH_VIEW_GCC_CONSTEXPR void remove_filename() noexcept
   {
     auto sep_idx = _find_last_sep();
     _invoke([sep_idx](auto &v) {
@@ -364,12 +371,12 @@ public:
     });
   }
   //! Returns the size of the view in characters.
-  constexpr size_t native_size() const noexcept
+  LLFIO_PATH_VIEW_GCC_CONSTEXPR size_t native_size() const noexcept
   {
     return _invoke([](const auto &v) { return v.size(); });
   }
   //! Returns a view of the root name part of this view e.g. C:
-  constexpr path_view root_name() const noexcept
+  LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view root_name() const noexcept
   {
     auto sep_idx = _find_first_sep();
     if(_npos == sep_idx)
@@ -379,7 +386,7 @@ public:
     return _invoke([sep_idx](const auto &v) { return path_view(v.data(), sep_idx); });
   }
   //! Returns a view of the root directory, if there is one e.g. /
-  constexpr path_view root_directory() const noexcept
+  LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view root_directory() const noexcept
   {
     auto sep_idx = _find_first_sep();
     if(_npos == sep_idx)
@@ -402,7 +409,7 @@ public:
     });
   }
   //! Returns, if any, a view of the root path part of this view e.g. C:/
-  constexpr path_view root_path() const noexcept
+  LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view root_path() const noexcept
   {
     auto sep_idx = _find_first_sep();
     if(_npos == sep_idx)
@@ -436,7 +443,7 @@ public:
     });
   }
   //! Returns a view of everything after the root path
-  constexpr path_view relative_path() const noexcept
+  LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view relative_path() const noexcept
   {
     auto sep_idx = _find_first_sep();
     if(_npos == sep_idx)
@@ -466,7 +473,7 @@ public:
     });
   }
   //! Returns a view of the everything apart from the filename part of this view
-  constexpr path_view parent_path() const noexcept
+  LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view parent_path() const noexcept
   {
     auto sep_idx = _find_last_sep();
     if(_npos == sep_idx)
@@ -476,7 +483,7 @@ public:
     return _invoke([sep_idx](const auto &v) { return path_view(v.data(), sep_idx); });
   }
   //! Returns a view of the filename part of this view.
-  constexpr path_view filename() const noexcept
+  LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view filename() const noexcept
   {
     auto sep_idx = _find_last_sep();
     if(_npos == sep_idx)
@@ -486,7 +493,7 @@ public:
     return _invoke([sep_idx](const auto &v) { return path_view(v.data() + sep_idx + 1, v.size() - sep_idx - 1); });
   }
   //! Returns a view of the filename without any file extension
-  constexpr path_view stem() const noexcept
+  LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view stem() const noexcept
   {
     auto sep_idx = _find_last_sep();
     return _invoke([sep_idx](const auto &v) {
@@ -499,7 +506,7 @@ public:
     });
   }
   //! Returns a view of the file extension part of this view
-  constexpr path_view extension() const noexcept
+  LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view extension() const noexcept
   {
     auto sep_idx = _find_last_sep();
     return _invoke([sep_idx](const auto &v) {
@@ -531,7 +538,7 @@ public:
   /*! Compares the two string views via the view's `compare()` which in turn calls `traits::compare()`.
   Be aware that on Windows a conversion from UTF-8 to UTF-16 is performed if needed.
   */
-  constexpr int compare(const path_view &p) const noexcept
+  LLFIO_PATH_VIEW_GCC_CONSTEXPR int compare(const path_view &p) const noexcept
   {
     return _invoke([&p](const auto &v) { return -p.compare(v); });
   }
@@ -667,7 +674,7 @@ public:
   };
   friend struct c_str;
 };
-inline constexpr bool operator==(path_view x, path_view y) noexcept
+inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(path_view x, path_view y) noexcept
 {
   if(x.native_size() != y.native_size())
   {
@@ -675,7 +682,7 @@ inline constexpr bool operator==(path_view x, path_view y) noexcept
   }
   return x.compare(y) == 0;
 }
-inline constexpr bool operator!=(path_view x, path_view y) noexcept
+inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(path_view x, path_view y) noexcept
 {
   if(x.native_size() != y.native_size())
   {
@@ -683,19 +690,19 @@ inline constexpr bool operator!=(path_view x, path_view y) noexcept
   }
   return x.compare(y) != 0;
 }
-inline constexpr bool operator<(path_view x, path_view y) noexcept
+inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator<(path_view x, path_view y) noexcept
 {
   return x.compare(y) < 0;
 }
-inline constexpr bool operator>(path_view x, path_view y) noexcept
+inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator>(path_view x, path_view y) noexcept
 {
   return x.compare(y) > 0;
 }
-inline constexpr bool operator<=(path_view x, path_view y) noexcept
+inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator<=(path_view x, path_view y) noexcept
 {
   return x.compare(y) <= 0;
 }
-inline constexpr bool operator>=(path_view x, path_view y) noexcept
+inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator>=(path_view x, path_view y) noexcept
 {
   return x.compare(y) >= 0;
 }

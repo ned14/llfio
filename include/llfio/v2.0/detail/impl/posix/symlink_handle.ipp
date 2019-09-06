@@ -427,7 +427,7 @@ result<symlink_handle::buffers_type> symlink_handle::read(symlink_handle::io_req
     buffer[read] = 0;
     tofill._link = path_view(buffer, read);
     tofill._type = symlink_type::symbolic;
-    return std::move(tofill);
+    return {std::move(tofill)};
   }
 }
 

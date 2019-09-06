@@ -280,7 +280,7 @@ public:
   {
     OUTCOME_TRY(v, file_handle::temp_inode(dir, _mode, flags));
     mapped_file_handle ret(std::move(v));
-    return std::move(ret);
+    return {std::move(ret)};
   }
 
   //! The memory section this handle is using
