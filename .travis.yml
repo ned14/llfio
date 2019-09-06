@@ -28,6 +28,7 @@ addons:
     - python3
     - cmake
     - cmake-data
+    - doxygen
 
 
 env:
