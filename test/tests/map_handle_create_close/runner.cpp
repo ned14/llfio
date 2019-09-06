@@ -83,7 +83,7 @@ template <class U> inline void map_handle_create_close_(U &&f)
       },
       [&](auto tuplestate) {
         auto &permuter = std::get<0>(tuplestate);
-        auto &testreturn = *std::get<1>(tuplestate);
+        auto &testreturn = std::get<1>(tuplestate).value();
         size_t idx = std::get<2>(tuplestate);
         int use_file_backing = std::get<3>(tuplestate);
         map_handle maph;

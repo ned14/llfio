@@ -57,8 +57,8 @@ namespace path_discovery
   };
   inline std::ostream &operator<<(std::ostream &s, const discovered_path::source_type &v)
   {
-    static constexpr const char *values[] = {"local", "environment", "system", "hardcoded"};
-    if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || (values[static_cast<size_t>(v)] == nullptr))
+    static constexpr const char *values[] = {"unknown", "local", "environment", "system", "hardcoded"};
+    if(static_cast<size_t>(v) > sizeof(values) / sizeof(values[0]) || (values[static_cast<size_t>(v)] == nullptr))
     {
       return s << "llfio::path_discovery::discovered_path::source_type::<unknown>";
     }

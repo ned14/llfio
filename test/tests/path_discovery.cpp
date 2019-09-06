@@ -49,6 +49,7 @@ static inline void TestPathDiscovery()
   else
   {
     std::cout << "\nNo storage backed temporary files directory found!" << std::endl;
+    BOOST_CHECK(false);  // this is extremely unlikely to occur, so fail the test
   }
 
   auto &memory_backed = llfio::path_discovery::memory_backed_temporary_files_directory();

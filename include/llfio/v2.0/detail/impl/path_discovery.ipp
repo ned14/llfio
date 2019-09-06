@@ -206,7 +206,7 @@ namespace path_discovery
       }
 
       // Finally, need to choose storage and memory backed directories
-      std::regex storage_backed_regex("btrfs|cifs|exfat|ext?|f2fs|hfs|jfs|lxfs|nfs|nilf2|ufs|vfat|xfs|zfs|msdosfs|newnfs|ntfs|smbfs|unionfs|fat|fat32", std::regex::icase);
+      std::regex storage_backed_regex("btrfs|cifs|exfat|ext[2-4]|f2fs|hfs|jfs|lxfs|nfs|nilf2|ufs|vfat|xfs|zfs|msdosfs|newnfs|ntfs|smbfs|unionfs|fat|fat32", std::regex::icase);
       std::regex memory_backed_regex("tmpfs|ramfs", std::regex::icase);
       for(size_t n = 0; n < ps.verified.size(); n++)
       {
