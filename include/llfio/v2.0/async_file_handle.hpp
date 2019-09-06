@@ -141,7 +141,7 @@ public:
     OUTCOME_TRY(v, file_handle::file(std::move(base), _path, _mode, _creation, _caching, flags | flag::overlapped));
     async_file_handle ret(std::move(v));
     ret._service = &service;
-    return std::move(ret);
+    return {std::move(ret)};
   }
 
   /*! Create an async file handle creating a randomly named file on a path.
@@ -209,7 +209,7 @@ public:
     OUTCOME_TRY(v, file_handle::temp_inode(dir, _mode, flags | flag::overlapped));
     async_file_handle ret(std::move(v));
     ret._service = &service;
-    return std::move(ret);
+    return {std::move(ret)};
   }
 
   LLFIO_MAKE_FREE_FUNCTION
@@ -223,14 +223,14 @@ public:
     OUTCOME_TRY(v, file_handle::clone(mode_, caching_, d));
     async_file_handle ret(std::move(v));
     ret._service = &service;
-    return std::move(ret);
+    return {std::move(ret)};
   }
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept
   {
     OUTCOME_TRY(v, file_handle::clone(mode_, caching_, d));
     async_file_handle ret(std::move(v));
     ret._service = _service;
-    return static_cast<file_handle &&>(ret);
+    return {static_cast<file_handle &&>(ret)};
   }
 
 #if DOXYGEN_SHOULD_SKIP_THIS

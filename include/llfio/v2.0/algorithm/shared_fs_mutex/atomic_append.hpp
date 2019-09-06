@@ -33,6 +33,11 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! \file atomic_append.hpp Provides algorithm::shared_fs_mutex::atomic_append
 
+#if __GNUC__ >= 8
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
+
 LLFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
@@ -59,6 +64,7 @@ namespace algorithm
         // Last byte is used to detect first user of the file
       };
       static_assert(sizeof(header) == 128, "header structure is not 128 bytes long!");
+      static_assert(std::is_trivially_copyable<header>::value, "header structure is not trivially copyable");
 
       struct alignas(16) lock_request
       {
@@ -74,6 +80,7 @@ namespace algorithm
         }
       };
       static_assert(sizeof(lock_request) == 128, "lock_request structure is not 128 bytes long!");
+      static_assert(std::is_trivially_copyable<lock_request>::value, "header structure is not trivially copyable");
 #pragma pack(pop)
     }  // namespace atomic_append_detail
 #endif
@@ -557,6 +564,10 @@ namespace algorithm
 }  // namespace algorithm
 
 LLFIO_V2_NAMESPACE_END
+
+#if __GNUC__ >= 8
+#pragma GCC diagnostic pop
+#endif
 
 
 #endif
