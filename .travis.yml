@@ -63,7 +63,7 @@ cache:
     
 before_install:
  -
-    DOXYGEN_VERSION=1.8.13;
+    DOXYGEN_VERSION=1.8.16;
     if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
       if [ -z "$(ls -A doxygen-$DOXYGEN_VERSION)" ]; then
         wget -O doxygen-$DOXYGEN_VERSION.tar.gz http://doxygen.nl/files/doxygen-$DOXYGEN_VERSION.linux.bin.tar.gz;
