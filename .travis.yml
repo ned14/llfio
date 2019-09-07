@@ -28,7 +28,7 @@ addons:
     - python3
     - cmake
     - cmake-data
-
+    - doxygen
 
 env:
   global:
@@ -58,20 +58,20 @@ matrix:
 
 cache:
   apt: true
-  directories:
-    - doxygen-1.8.13
+#  directories:
+#    - doxygen-1.8.16
     
 before_install:
- -
-    DOXYGEN_VERSION=1.8.13;
-    if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
-      if [ -z "$(ls -A doxygen-$DOXYGEN_VERSION)" ]; then
-        wget -O doxygen-$DOXYGEN_VERSION.tar.gz http://ftp.stack.nl/pub/users/dimitri/doxygen-$DOXYGEN_VERSION.linux.bin.tar.gz;
-        mkdir -p doxygen-$DOXYGEN_VERSION;
-        tar -xvf doxygen-$DOXYGEN_VERSION.tar.gz --strip 1 -C doxygen-$DOXYGEN_VERSION;
-      fi;
-      export PATH="$PWD/doxygen-$DOXYGEN_VERSION/bin:$PATH";
-    fi
+# -
+#    DOXYGEN_VERSION=1.8.16;
+#    if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
+#      if [ -z "$(ls -A doxygen-$DOXYGEN_VERSION)" ]; then
+#        wget -O doxygen-$DOXYGEN_VERSION.tar.gz http://doxygen.nl/files/doxygen-$DOXYGEN_VERSION.linux.bin.tar.gz;
+#        mkdir -p doxygen-$DOXYGEN_VERSION;
+#        tar -xvf doxygen-$DOXYGEN_VERSION.tar.gz --strip 1 -C doxygen-$DOXYGEN_VERSION;
+#      fi;
+#      export PATH="$PWD/doxygen-$DOXYGEN_VERSION/bin:$PATH";
+#    fi
  -
    if [ "${TRAVIS_OS_NAME}" = "osx" ]; then
      brew install llvm;
