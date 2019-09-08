@@ -67,7 +67,7 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
     oa.Length = sizeof(OBJECT_ATTRIBUTES);
     oa.ObjectName = &_path;
     oa.RootDirectory = base.is_valid() ? base.native_handle().h : nullptr;
-    oa.Attributes = 0x40 /*OBJ_CASE_INSENSITIVE*/;
+    oa.Attributes = 0;  // 0x40 /*OBJ_CASE_INSENSITIVE*/;
     // if(!!(flags & file_flags::int_opening_link))
     //  oa.Attributes|=0x100/*OBJ_OPENLINK*/;
 

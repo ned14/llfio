@@ -51,6 +51,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
   will always fail due to an unfortunate design choice by Microsoft.
   */
   access &= ~DELETE;
+  bool need_to_set_case_sensitive = false;
   if(base.is_valid() || path.is_ntpath())
   {
     DWORD creatdisp = 0x00000001 /*FILE_OPEN*/;
@@ -90,7 +91,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     oa.Length = sizeof(OBJECT_ATTRIBUTES);
     oa.ObjectName = &_path;
     oa.RootDirectory = base.is_valid() ? base.native_handle().h : nullptr;
-    oa.Attributes = 0x40 /*OBJ_CASE_INSENSITIVE*/;
+    oa.Attributes = 0;  // 0x40 /*OBJ_CASE_INSENSITIVE*/;
     // if(!!(flags & file_flags::int_opening_link))
     //  oa.Attributes|=0x100/*OBJ_OPENLINK*/;
 
@@ -104,6 +105,21 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     if(ntstat < 0)
     {
       return ntkernel_error(ntstat);
+    }
+    switch(_creation)
+    {
+    case creation::open_existing:
+      need_to_set_case_sensitive = false;
+      break;
+    case creation::only_if_not_exist:
+      need_to_set_case_sensitive = true;
+      break;
+    case creation::if_needed:
+      need_to_set_case_sensitive = (isb.Information == 2 /*FILE_CREATED*/);
+      break;
+    case creation::truncate:
+      need_to_set_case_sensitive = true;
+      break;
     }
   }
   else
@@ -130,6 +146,34 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
       DWORD errcode = GetLastError();
       // assert(false);
       return win32_error(errcode);
+    }
+    switch(_creation)
+    {
+    case creation::open_existing:
+      need_to_set_case_sensitive = false;
+      break;
+    case creation::only_if_not_exist:
+      need_to_set_case_sensitive = true;
+      break;
+    case creation::if_needed:
+      need_to_set_case_sensitive = (GetLastError() != ERROR_ALREADY_EXISTS);  // FIXME: doesn't appear to detect when new directory not created
+      break;
+    case creation::truncate:
+      need_to_set_case_sensitive = true;
+      break;
+    }
+  }
+  if(_mode == mode::write && need_to_set_case_sensitive && (flags & flag::win_create_case_sensitive_directory))
+  {
+    IO_STATUS_BLOCK isb = make_iostatus();
+    FILE_CASE_SENSITIVE_INFORMATION fcsi;
+    fcsi.Flags = 1 /*FILE_CS_FLAG_CASE_SENSITIVE_DIR*/;
+    NTSTATUS ntstat = NtSetInformationFile(nativeh.h, &isb, &fcsi, sizeof(fcsi), FileCaseSensitiveInformation);
+    if(ntstat < 0)
+    {
+      auto r = ntkernel_error(ntstat);
+      LLFIO_LOG_WARN(&ret, "Failed to set directory to case sensitive");
+      (void) r;  // throw away
     }
   }
   return ret;

@@ -78,7 +78,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
     oa.Length = sizeof(OBJECT_ATTRIBUTES);
     oa.ObjectName = &_path;
     oa.RootDirectory = base.is_valid() ? base.native_handle().h : nullptr;
-    oa.Attributes = 0x40 /*OBJ_CASE_INSENSITIVE*/;
+    oa.Attributes = 0;  // 0x40 /*OBJ_CASE_INSENSITIVE*/;
     // if(!!(flags & file_flags::int_opening_link))
     //  oa.Attributes|=0x100/*OBJ_OPENLINK*/;
 
@@ -142,7 +142,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
       need_to_set_sparse = true;
       break;
     case creation::if_needed:
-      need_to_set_sparse = (GetLastError() == ERROR_ALREADY_EXISTS);
+      need_to_set_sparse = (GetLastError() != ERROR_ALREADY_EXISTS);  // new inode created
       break;
     case creation::truncate:
       need_to_set_sparse = true;
