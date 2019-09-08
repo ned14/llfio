@@ -145,12 +145,31 @@ namespace windows_nt_kernel
     FileNetworkPhysicalNameInformation,
     FileIdGlobalTxDirectoryInformation,
     FileIsRemoteDeviceInformation,
-    FileAttributeCacheInformation,
+    FileUnusedInformation,
     FileNumaNodeInformation,
     FileStandardLinkInformation,
     FileRemoteProtocolInformation,
-    FileMaximumInformation,
-    FileDispositionInformationEx = 64
+    FileRenameInformationBypassAccessCheck,
+    FileLinkInformationBypassAccessCheck,
+    FileVolumeNameInformation,
+    FileIdInformation,
+    FileIdExtdDirectoryInformation,
+    FileReplaceCompletionInformation,
+    FileHardLinkFullIdInformation,
+    FileIdExtdBothDirectoryInformation,
+    FileDispositionInformationEx,
+    FileRenameInformationEx,
+    FileRenameInformationExBypassAccessCheck,
+    FileDesiredStorageClassInformation,
+    FileStatInformation,
+    FileMemoryPartitionInformation,
+    FileStatLxInformation,
+    FileCaseSensitiveInformation,
+    FileLinkInformationEx,
+    FileLinkInformationExBypassAccessCheck,
+    FileStorageReserveIdInformation,
+    FileCaseSensitiveInformationForceAccessCheck,
+    FileMaximumInformation
   } FILE_INFORMATION_CLASS,
   *PFILE_INFORMATION_CLASS;
 
@@ -520,6 +539,11 @@ namespace windows_nt_kernel
       } GenericReparseBuffer;
     };
   } REPARSE_DATA_BUFFER, *PREPARSE_DATA_BUFFER;
+
+  typedef struct _FILE_CASE_SENSITIVE_INFORMATION
+  {
+    ULONG Flags;
+  } FILE_CASE_SENSITIVE_INFORMATION, *PFILE_CASE_SENSITIVE_INFORMATION;
 
   static NtQueryObject_t NtQueryObject;
   static NtQueryInformationFile_t NtQueryInformationFile;

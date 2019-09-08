@@ -168,6 +168,12 @@ public:
     disable default using this flag.
     */
     disable_parallelism = 1U << 26U,
+    /*! Microsoft Windows NTFS has the option, when creating a directory, to set whether
+    leafname lookup will be case sensitive. This is the only way of getting exact POSIX
+    semantics on Windows without resorting to editing the system registry, however it also
+    affects all code doing lookups within that directory, so we must default it to off.
+    */
+    win_create_case_sensitive_directory = 1U << 27U,
 
     // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
 
@@ -390,6 +396,10 @@ inline std::ostream &operator<<(std::ostream &s, const handle::flag &v)
   if(!!(v & handle::flag::disable_parallelism))
   {
     temp.append("disable_parallelism|");
+  }
+  if(!!(v & handle::flag::win_create_case_sensitive_directory))
+  {
+    temp.append("win_create_case_sensitive_directory|");
   }
   if(!!(v & handle::flag::overlapped))
   {

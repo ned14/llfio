@@ -113,8 +113,12 @@ than a DOS path.
 
 If the NT kernel API is used directly then:
 
-- Paths are matched case sensitively as raw bytes via `memcmp()`, not case
+- If the calling thread has the `ThreadExplicitCaseSensitivity` privilege,
+or the system registry has enabled case sensitive lookup for NTFS,
+paths are matched case sensitively as raw bytes via `memcmp()`, not case
 insensitively (requires slow locale conversion).
+- If the NTFS directory has its case sensitive lookup bit set (see
+`handle::flag`
 - The path limit is 32,767 characters.
 
 If you really care about performance, you are very strongly recommended to use
@@ -580,6 +584,10 @@ public:
 
   // iterator begin() const;
   // iterator end() const;
+
+  const char *_raw_data() const noexcept {
+    return _invoke([](const auto &v) { return (const char *) v.data(); });
+  }
 
   //! Instantiate from a `path_view` to get a zero terminated path suitable for feeding to the kernel
   struct LLFIO_DECL c_str

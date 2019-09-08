@@ -43,6 +43,10 @@ make_program(fs-probe llfio::hl)
 make_program(illegal-codepoints llfio::hl)
 make_program(key-value-store llfio::hl)
 
+if(MSVC)
+  target_compile_options(illegal-codepoints PUBLIC /utf-8)
+endif()
+
 if(NOT WIN32)
   add_subdirectory(collision-check)
 endif()
