@@ -99,7 +99,6 @@ var hierarchy =
     ] ],
     [ "span", null, [
       [ "llfio_v2_xxx::directory_handle::buffers_type", "structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html", null ],
-      [ "llfio_v2_xxx::map_view< T >", "classllfio__v2__xxx_1_1map__view.html", null ],
       [ "llfio_v2_xxx::mapped< T >", "classllfio__v2__xxx_1_1mapped.html", null ]
     ] ],
     [ "llfio_v2_xxx::stat_t", "structllfio__v2__xxx_1_1stat__t.html", null ],
@@ -117,5 +116,9 @@ var hierarchy =
         [ "llfio_v2_xxx::algorithm::trivial_vector< T >", "classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html", null ]
       ] ]
     ] ],
-    [ "llfio_v2_xxx::algorithm::impl::trivial_vector_iterator< T >", "classllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__iterator.html", null ]
+    [ "llfio_v2_xxx::algorithm::impl::trivial_vector_iterator< T >", "classllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__iterator.html", null ],
+    [ "true_type", null, [
+      [ "in_place_attach_detach::traits::disable_attached_for< llfio_v2_xxx::map_handle >", "structin__place__attach__detach_1_1traits_1_1disable__attached__for_3_01llfio__v2__xxx_1_1map__handle_01_4.html", null ],
+      [ "in_place_attach_detach::traits::disable_attached_for< llfio_v2_xxx::mapped_file_handle >", "structin__place__attach__detach_1_1traits_1_1disable__attached__for_3_01llfio__v2__xxx_1_1mapped__file__handle_01_4.html", null ]
+    ] ]
 ];

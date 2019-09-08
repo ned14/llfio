@@ -29,7 +29,6 @@ var namespacellfio__v2__xxx =
     [ "io_service", "classllfio__v2__xxx_1_1io__service.html", "classllfio__v2__xxx_1_1io__service" ],
     [ "log_level_guard", "classllfio__v2__xxx_1_1log__level__guard.html", "classllfio__v2__xxx_1_1log__level__guard" ],
     [ "map_handle", "classllfio__v2__xxx_1_1map__handle.html", "classllfio__v2__xxx_1_1map__handle" ],
-    [ "map_view", "classllfio__v2__xxx_1_1map__view.html", "classllfio__v2__xxx_1_1map__view" ],
     [ "mapped", "classllfio__v2__xxx_1_1mapped.html", "classllfio__v2__xxx_1_1mapped" ],
     [ "mapped_file_handle", "classllfio__v2__xxx_1_1mapped__file__handle.html", "classllfio__v2__xxx_1_1mapped__file__handle" ],
     [ "native_handle_type", "structllfio__v2__xxx_1_1native__handle__type.html", "structllfio__v2__xxx_1_1native__handle__type" ],

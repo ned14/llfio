@@ -20,7 +20,7 @@ var classllfio__v2__xxx_1_1map__handle =
     [ "map_handle", "classllfio__v2__xxx_1_1map__handle.html#aa3225a2ee86b12e6099d15a2a87b99b4", null ],
     [ "address", "classllfio__v2__xxx_1_1map__handle.html#a7456b95e191ec373af61af6541dd4737", null ],
     [ "are_reads_from_cache", "classllfio__v2__xxx_1_1map__handle.html#a7126a726b2a06e4c1eca1a94c41163ff", null ],
-    [ "are_safety_fsyncs_issued", "classllfio__v2__xxx_1_1map__handle.html#a4471012e7b85ac6dea1d0af43f1ee4e6", null ],
+    [ "are_safety_barriers_issued", "classllfio__v2__xxx_1_1map__handle.html#a0a2a5896f5e373fa032cdae1c1fff2c1", null ],
     [ "are_writes_durable", "classllfio__v2__xxx_1_1map__handle.html#a8036792f332459064172d7b0cfaee3cf", null ],
     [ "barrier", "classllfio__v2__xxx_1_1map__handle.html#aa3ec366f663f85fb4d679542b8c1b41a", null ],
     [ "barrier", "classllfio__v2__xxx_1_1map__handle.html#ab9fb41b19bd14bba06e3df8f41e9087d", null ],

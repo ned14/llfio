@@ -1,8 +1,10 @@
 var searchData=
 [
   ['offset',['offset',['../classllfio__v2__xxx_1_1map__handle.html#a9b65f62129418d02a925e6ef56220198',1,'llfio_v2_xxx::map_handle']]],
+  ['only_5fif_5fnot_5fexist',['only_if_not_exist',['../classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255',1,'llfio_v2_xxx::handle']]],
   ['only_5fmetadata',['only_metadata',['../classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852ab8a61dd00ce6fc5888706bda8fab2e98',1,'llfio_v2_xxx::handle']]],
   ['open',['open',['../classkvstore__v1__xxx_1_1basic__key__value__store.html#a6f45998a528be5d9ee623327e2817a46',1,'kvstore_v1_xxx::basic_key_value_store']]],
+  ['open_5fexisting',['open_existing',['../classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42aa200dcd6176417e93be2405188ae7cc9',1,'llfio_v2_xxx::handle']]],
   ['open_5fkvstore',['open_kvstore',['../namespacekvstore__v1__xxx.html#ab623a6b882a8f334d0ac43dfbfb72408',1,'kvstore_v1_xxx']]],
   ['operator_20bool',['operator bool',['../classllfio__v2__xxx_1_1io__handle_1_1extent__guard.html#a8972e60c3f969955c3b529609f10d7cd',1,'llfio_v2_xxx::io_handle::extent_guard::operator bool()'],['../structllfio__v2__xxx_1_1native__handle__type.html#ab66e790c05ddebea23b80c86dae4fbe3',1,'llfio_v2_xxx::native_handle_type::operator bool()'],['../classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html#a208c64d5760fca4f9049de58e1395f4b',1,'llfio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex::entities_guard::operator bool()']]],
   ['operator_21',['operator!',['../classllfio__v2__xxx_1_1io__handle_1_1extent__guard.html#a1f1bf0b1f64fe65785a5e4cacebc7b5f',1,'llfio_v2_xxx::io_handle::extent_guard::operator!()'],['../structllfio__v2__xxx_1_1native__handle__type.html#af51f8cd2e901aa8fc6862eb85e66b20c',1,'llfio_v2_xxx::native_handle_type::operator!()'],['../classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html#a5091edbf46f38cd8e4281cc51daa9b4c',1,'llfio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex::entities_guard::operator!()']]],

@@ -32,7 +32,7 @@ var classllfio__v2__xxx_1_1symlink__handle =
     [ "~symlink_handle", "classllfio__v2__xxx_1_1symlink__handle.html#acebc87ad5ec328f4d2395d5b8905ee0a", null ],
     [ "_fetch_inode", "classllfio__v2__xxx_1_1symlink__handle.html#adc2b24484565bcb0cf654adf2f732f7e", null ],
     [ "are_reads_from_cache", "classllfio__v2__xxx_1_1symlink__handle.html#a7126a726b2a06e4c1eca1a94c41163ff", null ],
-    [ "are_safety_fsyncs_issued", "classllfio__v2__xxx_1_1symlink__handle.html#a4471012e7b85ac6dea1d0af43f1ee4e6", null ],
+    [ "are_safety_barriers_issued", "classllfio__v2__xxx_1_1symlink__handle.html#a0a2a5896f5e373fa032cdae1c1fff2c1", null ],
     [ "are_writes_durable", "classllfio__v2__xxx_1_1symlink__handle.html#a8036792f332459064172d7b0cfaee3cf", null ],
     [ "clone", "classllfio__v2__xxx_1_1symlink__handle.html#aeea4389189021b94dde6d8f2c3ccc5b3", null ],
     [ "clone", "classllfio__v2__xxx_1_1symlink__handle.html#aae07dfa26b75c9b973909c7da4580cf5", null ],

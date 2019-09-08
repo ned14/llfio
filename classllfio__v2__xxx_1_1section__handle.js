@@ -10,7 +10,7 @@ var classllfio__v2__xxx_1_1section__handle =
       [ "reads", "classllfio__v2__xxx_1_1section__handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a0fb9cf5f04f61bb6f1151da57ceb1ca1", null ],
       [ "reads_and_metadata", "classllfio__v2__xxx_1_1section__handle.html#aecd3a7db6cee3aec07d32fe6f99e6852adec4ecca8ae1593f84eea4656599a693", null ],
       [ "all", "classllfio__v2__xxx_1_1section__handle.html#aecd3a7db6cee3aec07d32fe6f99e6852aa181a603769c1f98ad927e7367c7aa51", null ],
-      [ "safety_fsyncs", "classllfio__v2__xxx_1_1section__handle.html#aecd3a7db6cee3aec07d32fe6f99e6852adfa4d35596e04e042a53c64b25c22db3", null ],
+      [ "safety_barriers", "classllfio__v2__xxx_1_1section__handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a9cd65f46f55fb6a4b198fcee6f0a63c1", null ],
       [ "temporary", "classllfio__v2__xxx_1_1section__handle.html#aecd3a7db6cee3aec07d32fe6f99e6852ad5197d93c063a2b1e22d1630a39b7aef", null ]
     ] ],
     [ "creation", "classllfio__v2__xxx_1_1section__handle.html#af0b352d0f273ba6fa70c178b2c2fee42", [
@@ -34,7 +34,7 @@ var classllfio__v2__xxx_1_1section__handle =
     [ "section_handle", "classllfio__v2__xxx_1_1section__handle.html#a28bc1b458a57c697b94804fd6c87dcd9", null ],
     [ "section_handle", "classllfio__v2__xxx_1_1section__handle.html#ab3cb03378bf927a2fb6636beb6ca2f20", null ],
     [ "are_reads_from_cache", "classllfio__v2__xxx_1_1section__handle.html#a7126a726b2a06e4c1eca1a94c41163ff", null ],
-    [ "are_safety_fsyncs_issued", "classllfio__v2__xxx_1_1section__handle.html#a4471012e7b85ac6dea1d0af43f1ee4e6", null ],
+    [ "are_safety_barriers_issued", "classllfio__v2__xxx_1_1section__handle.html#a0a2a5896f5e373fa032cdae1c1fff2c1", null ],
     [ "are_writes_durable", "classllfio__v2__xxx_1_1section__handle.html#a8036792f332459064172d7b0cfaee3cf", null ],
     [ "backing", "classllfio__v2__xxx_1_1section__handle.html#a680320bd539378d99870d9b2cdedb9c8", null ],
     [ "backing_native_handle", "classllfio__v2__xxx_1_1section__handle.html#aea14a4f834500e412db39efd998f438a", null ],

@@ -17,9 +17,6 @@ var dir_ff8d8ad368a820031e12dd9b12d79036 =
     [ "io_service.hpp", "io__service_8hpp.html", "io__service_8hpp" ],
     [ "llfio.hpp", "v2_80_2llfio_8hpp.html", "v2_80_2llfio_8hpp" ],
     [ "map_handle.hpp", "map__handle_8hpp.html", "map__handle_8hpp" ],
-    [ "map_view.hpp", "map__view_8hpp.html", [
-      [ "map_view", "classllfio__v2__xxx_1_1map__view.html", "classllfio__v2__xxx_1_1map__view" ]
-    ] ],
     [ "mapped.hpp", "mapped_8hpp.html", [
       [ "mapped", "classllfio__v2__xxx_1_1mapped.html", "classllfio__v2__xxx_1_1mapped" ]
     ] ],

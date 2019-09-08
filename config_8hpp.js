@@ -29,6 +29,7 @@ var config_8hpp =
     [ "LLFIO_V2_NAMESPACE_EXPORT_BEGIN", "group__config.html#gab2f82803f0ce479a2993d3b7696db8d3", null ],
     [ "dword", "config_8hpp.html#a79085acc20a53afe38d31c1af948301d", null ],
     [ "handle", "config_8hpp.html#af65fb3311b32b8757c3b7ebdd045afe9", null ],
+    [ "bless", "config_8hpp.html#a925ad90dc78642b82b3e91e677a263cd", null ],
     [ "emplace_function_ptr", "config_8hpp.html#ace72a598b9cabfc3d6f6760895e893fd", null ],
     [ "LLFIO_TEMPLATE", "config_8hpp.html#a02c02d05e24d34c25324c192df11c0b4", null ],
     [ "LLFIO_TEMPLATE", "config_8hpp.html#a77c52ccdc38be135a374dbb4a7d1d466", null ],
