@@ -532,7 +532,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
   // If nvram and not syncing metadata, use lightweight barrier
   if(!and_metadata && is_nvram())
   {
-    auto synced = barrier({addr, bytes});
+    auto synced = nvram_barrier({addr, bytes});
     if(synced.size() >= bytes)
     {
       return {reqs.buffers};
