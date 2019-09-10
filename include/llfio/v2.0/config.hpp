@@ -222,7 +222,7 @@ LLFIO_V2_NAMESPACE_END
 // Bring in filesystem
 #if defined(__has_include)
 // clang-format off
-#if __has_include(<filesystem>) && __cplusplus >= 202000
+#if __has_include(<filesystem>) && __cplusplus >= 201700
 #include <filesystem>
 LLFIO_V2_NAMESPACE_BEGIN
 namespace filesystem = std::filesystem;

@@ -385,6 +385,7 @@ public:
     struct completion_handler : _erased_completion_handler
     {
       CompletionRoutine completion;
+
       explicit completion_handler(CompletionRoutine c)
           : completion(std::move(c))
       {
@@ -393,7 +394,8 @@ public:
       void move(_erased_completion_handler *_dest) final
       {
         auto *dest = reinterpret_cast<void *>(_dest);
-        new(dest) completion_handler(std::move(*this));
+        using msvc_workaround = std::decay_t<decltype(*this)>;
+        new(dest) msvc_workaround(std::move(*this));
       }
       void operator()(_erased_io_state_type *state) final { completion(state->parent, std::move(state->result.write)); }
       void *address() noexcept final { return &completion; }
@@ -448,7 +450,8 @@ public:
       void move(_erased_completion_handler *_dest) final
       {
         auto *dest = reinterpret_cast<void *>(_dest);
-        new(dest) completion_handler(std::move(*this));
+        using msvc_workaround = std::decay_t<decltype(*this)>;
+        new(dest) msvc_workaround(std::move(*this));
       }
       void operator()(_erased_io_state_type *state) final { completion(state->parent, std::move(state->result.read)); }
       void *address() noexcept final { return &completion; }
@@ -491,7 +494,8 @@ public:
       void move(_erased_completion_handler *_dest) final
       {
         auto *dest = reinterpret_cast<void *>(_dest);
-        new(dest) completion_handler(std::move(*this));
+        using msvc_workaround = std::decay_t<decltype(*this)>;
+        new(dest) msvc_workaround(std::move(*this));
       }
       void operator()(_erased_io_state_type *state) final { completion(state->parent, std::move(state->result.write)); }
       void *address() noexcept final { return &completion; }
