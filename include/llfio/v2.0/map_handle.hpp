@@ -259,6 +259,28 @@ template <> struct construct<section_handle>
 
 class mapped_file_handle;
 
+/*! Lightweight inlined barrier which causes the CPU to write out all buffered writes and dirty cache lines
+in the request to main memory.
+\return The cache lines actually barriered. This may be empty. This function does not return an error.
+\param req The range of cache lines to write barrier.
+\param evict Whether to also evict the cache lines from CPU caches, useful if they will not be used again.
+
+Upon return, one knows that memory in the returned buffer has been barriered
+(it may be empty if there is no support for this operation in LLFIO, or if the current CPU does not
+support this operation). You may find the `is_nvram()` observer of particular use here.
+*/
+inline io_handle::const_buffer_type nvram_barrier(io_handle::const_buffer_type req, bool evict = false) noexcept
+{
+  auto *tp = (io_handle::const_buffer_type::pointer)(((uintptr_t) req.data()) & ~63);
+  io_handle::const_buffer_type ret{tp, (size_t)(req.data() + 63 + req.size() - tp) & ~63};
+  if(memory_flush_none == mem_flush_stores(ret.data(), ret.size(), evict ? memory_flush_evict : memory_flush_retain))
+  {
+    ret = {tp, 0};
+  }
+  return ret;
+}
+
+
 /*! \class map_handle
 \brief A handle to a memory mapped region of memory, either backed by the system page file or by a section.
 
@@ -287,8 +309,8 @@ which can be very useful.
 to account for OS differences i.e. it calls `msync()`, and then the `barrier()` implementation for the backing file
 (probably `fsync()` or equivalent on most platforms, which synchronises the entire file).
 
-This is vast overkill if you are using non-volatile RAM, so a special *inlined* `barrier()` implementation
-taking a single buffer and no other arguments is also provided. This calls the appropriate architecture-specific
+This is vast overkill if you are using non-volatile RAM, so a special *inlined* `nvram_barrier()` implementation
+taking a single buffer and no other arguments is also provided as a free function. This calls the appropriate architecture-specific
 instructions to cause the CPU to write all preceding writes out of the write buffers and CPU caches to main
 memory, so for Intel CPUs this would be `CLWB <each cache line>; SFENCE;`. As this is inlined, it ought to
 produce optimal code. If your CPU does not support the requisite instructions (or LLFIO has not added support),
@@ -435,27 +457,6 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override;
   LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
-  /*! Lightweight inlined barrier which causes the CPU to write out all buffered writes and dirty cache lines
-  in the request to main memory.
-  \return The cache lines actually barriered. This may be empty. This function does not return an error.
-  \param req The range of cache lines to write barrier.
-  \param evict Whether to also evict the cache lines from CPU caches, useful if they will not be used again.
-
-  Upon return, one knows that memory in the returned buffer has been barriered
-  (it may be empty if there is no support for this operation in LLFIO, or if the current CPU does not
-  support this operation). You may find the `is_nvram()` observer of particular use here.
-  */
-  LLFIO_MAKE_FREE_FUNCTION
-  static const_buffer_type barrier(const_buffer_type req, bool evict = false) noexcept
-  {
-    auto *tp = (const_buffer_type::pointer)(((uintptr_t) req.data()) & 63);
-    const_buffer_type ret{tp, (size_t)(req.data() + req.size() - tp)};
-    if(memory_flush_none == mem_flush_stores(ret.data(), ret.size(), evict ? memory_flush_evict : memory_flush_retain))
-    {
-      ret = {tp, 0};
-    }
-    return ret;
-  }
 
   /*! Map unused memory into view, creating new memory if insufficient unused memory is available. Note that the memory mapped by this call may contain non-zero bits (recycled memory) unless `zeroed` is true.
   \param bytes How many bytes to map. Typically will be rounded up to a multiple of the page size (see `page_size()`).
@@ -732,21 +733,6 @@ inline result<void> close(map_handle &self) noexcept
 inline map_handle::io_result<map_handle::const_buffers_type> barrier(map_handle &self, map_handle::io_request<map_handle::const_buffers_type> reqs = map_handle::io_request<map_handle::const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept
 {
   return self.barrier(std::forward<decltype(reqs)>(reqs), std::forward<decltype(wait_for_device)>(wait_for_device), std::forward<decltype(and_metadata)>(and_metadata), std::forward<decltype(d)>(d));
-}
-/*! Lightweight inlined barrier which causes the CPU to write out all buffered writes and dirty cache lines
-in the request to main memory.
-\return The cache lines actually barriered. This may be empty. This function does not return an error.
-\param self The object whose member function to call.
-\param req The range of cache lines to write barrier.
-\param evict Whether to also evict the cache lines from CPU caches, useful if they will not be used again.
-
-Upon return, one knows that memory in the returned buffer has been barriered
-(it may be empty if there is no support for this operation in LLFIO, or if the current CPU does not
-support this operation). You may find the `is_nvram()` observer of particular use here.
-*/
-inline map_handle::const_buffer_type barrier(map_handle &self, map_handle::const_buffer_type req, bool evict = false) noexcept
-{
-  return self.barrier(std::forward<decltype(req)>(req), std::forward<decltype(evict)>(evict));
 }
 /*! Create new memory and map it into view.
 \param bytes How many bytes to create and map. Typically will be rounded up to a multiple of the page size (see `page_size()`) on POSIX, 64Kb on Windows.
