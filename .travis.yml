@@ -100,7 +100,12 @@ script:
      cd doc/html;
      git checkout gh-pages;
      cd ../..;
-     ctest -S .docs.cmake -V;
+#     ctest -S .docs.cmake -V;
+     mkdir build;
+     cd build;
+     cmake ..  $CMAKE_CONFIGURE_OPTIONS ;
+     make llfio_docs;
+     cd ..;
      cd doc/html;
      git add . || true;
      git commit -a -m "Travis CI updates documentation" || true;
