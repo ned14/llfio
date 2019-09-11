@@ -23,6 +23,7 @@ addons:
     - george-edison55-precise-backports
     - llvm-toolchain-trusty-4.0
     packages:
+    - g++-5
     - g++-6
     - clang-4.0
     - python3
