@@ -80,16 +80,16 @@ public:
     truncate            //!< Filesystem entry must already exist. It is atomically truncated on open, leaving creation date and unique identifier unmodified.
                         // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
   };
-  //! What i/o on the handle will complete immediately due to kernel caching
-  enum class caching : unsigned char  // bit 0 set means safety fsyncs enabled
+  //! What i/o on the handle may complete immediately due to kernel caching
+  enum class caching : unsigned char  // bit 0 set means safety barriers enabled
   {
     unchanged = 0,
-    none = 1,                //!< No caching whatsoever, all reads and writes come from storage (i.e. <tt>O_DIRECT|O_SYNC</tt>). Align all i/o to 4Kb boundaries for this to work. <tt>flag_disable_safety_fsyncs</tt> can be used here.
+    none = 1,                //!< No caching whatsoever, all reads and writes come from storage (i.e. <tt>O_DIRECT|O_SYNC</tt>). Align all i/o to 4Kb boundaries for this to work. <tt>disable_safety_barriers</tt> can be used here.
     only_metadata = 2,       //!< Cache reads and writes of metadata but avoid caching data (<tt>O_DIRECT</tt>), thus i/o here does not affect other cached data for other handles. Align all i/o to 4Kb boundaries for this to work.
-    reads = 3,               //!< Cache reads only. Writes of data and metadata do not complete until reaching storage (<tt>O_SYNC</tt>). <tt>flag_disable_safety_fsyncs</tt> can be used here.
-    reads_and_metadata = 5,  //!< Cache reads and writes of metadata, but writes of data do not complete until reaching storage (<tt>O_DSYNC</tt>). <tt>flag_disable_safety_fsyncs</tt> can be used here.
+    reads = 3,               //!< Cache reads only. Writes of data and metadata do not complete until reaching storage (<tt>O_SYNC</tt>). <tt>disable_safety_barriers</tt> can be used here.
+    reads_and_metadata = 5,  //!< Cache reads and writes of metadata, but writes of data do not complete until reaching storage (<tt>O_DSYNC</tt>). <tt>disable_safety_barriers</tt> can be used here.
     all = 6,                 //!< Cache reads and writes of data and metadata so they complete immediately, sending writes to storage at some point when the kernel decides (this is the default file system caching on a system).
-    safety_barriers = 7,       //!< Cache reads and writes of data and metadata so they complete immediately, but issue safety barriers at certain points. See documentation for <tt>flag_disable_safety_barriers</tt>.
+    safety_barriers = 7,     //!< Cache reads and writes of data and metadata so they complete immediately, but issue safety barriers at certain points. See documentation for <tt>disable_safety_barriers</tt>.
     temporary = 8            //!< Cache reads and writes of data and metadata so they complete immediately, only sending any updates to storage on last handle close in the system or if memory becomes tight as this file is expected to be temporary (Windows and FreeBSD only).
                              // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
   };

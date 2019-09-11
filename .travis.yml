@@ -1,7 +1,7 @@
-dist: trusty
+dist: bionic
 language: cpp
 compiler:
-# - g++
+ - g++
  - clang++
 sudo: false
 os:
@@ -18,13 +18,10 @@ notifications:
 
 addons:
   apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    - george-edison55-precise-backports
-    - llvm-toolchain-trusty-4.0
     packages:
-    - g++-6
-    - clang-4.0
+    - g++
+    - clang
+    - g++-arm-linux-gnueabihf
     - python3
     - cmake
     - cmake-data
@@ -34,10 +31,12 @@ env:
   global:
     - secure: "A3TeWTlJdjUaQ31NF60kMOik8mzaJkdKA55jZXjN83BJ2ZjMDmWfq1XmZ7iDIxmn7HC2BVpjhdkj9jpRtPztb08L5VSlJIiVbXlBWNwgzmYANujpR9rA+bhZJwlKDaYQHUZUd4+iGHCHb0dLt2HG0eHF5azaifd0YqCfz5GcWl8="
   matrix:
-    - __="cmake tests (error_code)" NAME=TravisLinuxWorkerEC CMAKE_CONFIGURE_OPTIONS=
-    - __="cmake tests (status_code)" NAME=TravisLinuxWorkerSC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+    - __="x64 cmake tests (error_code)" NAME=Linux_x64_EC CMAKE_CONFIGURE_OPTIONS=
+    - __="x64 cmake tests (status_code)" NAME=Linux_x64_SC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+    - __="ARM32 cmake tests (error_code)" NAME=Linux_ARM32_EC CMAKE_CONFIGURE_OPTIONS=
+    - __="ARM32 cmake tests (status_code)" NAME=Linux_ARM32_SC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
 #    - __="cmake tests" NAME=TravisOSXWorker
-    - __="Documentation" NAME=TravisDocumentation
+    - __="Documentation" NAME=Documentation
     - __="Programs"
  
 matrix:
@@ -51,27 +50,21 @@ matrix:
 #  - os: osx
 #    env: __="cmake tests (status_code)" NAME=TravisLinuxWorkerSC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - os: linux
-    compiler: g++
-    env: __="Documentation" NAME=TravisDocumentation
+    compiler: clang++
+    env: __="ARM32 cmake tests (error_code)" NAME=Linux_ARM32_EC CMAKE_CONFIGURE_OPTIONS=
   - os: linux
-    env: __="cmake tests" NAME=TravisOSXWorker
+    compiler: clang++
+    env: __="ARM32 cmake tests (status_code)" NAME=Linux_ARM32_SC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+  - os: linux
+    compiler: g++
+    env: __="Documentation" NAME=Documentation
+#  - os: linux
+#    env: __="cmake tests" NAME=TravisOSXWorker
 
 cache:
   apt: true
-#  directories:
-#    - doxygen-1.8.16
     
 before_install:
-# -
-#    DOXYGEN_VERSION=1.8.16;
-#    if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
-#      if [ -z "$(ls -A doxygen-$DOXYGEN_VERSION)" ]; then
-#        wget -O doxygen-$DOXYGEN_VERSION.tar.gz http://doxygen.nl/files/doxygen-$DOXYGEN_VERSION.linux.bin.tar.gz;
-#        mkdir -p doxygen-$DOXYGEN_VERSION;
-#        tar -xvf doxygen-$DOXYGEN_VERSION.tar.gz --strip 1 -C doxygen-$DOXYGEN_VERSION;
-#      fi;
-#      export PATH="$PWD/doxygen-$DOXYGEN_VERSION/bin:$PATH";
-#    fi
  -
    if [ "${TRAVIS_OS_NAME}" = "osx" ]; then
      brew install llvm;
@@ -80,17 +73,23 @@ before_install:
      export CPPFLAGS=-I/usr/local/opt/llvm/include;
      export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DCMAKE_LIBRARY_PATH=/usr/local/opt/llvm/lib";
    fi
- - if [ "$CXX" = "g++" ]; then export CXX=g++-6; export NAME=TravisLinuxWorkerGCC; fi;
- - if [ "$CXX" = "clang++" ]; then export CXX=clang++-4.0; fi;
+ - if [ "$CXX" = "g++" ]; then export NAME=GCC$NAME; fi;
+ - if [ "$CXX" = "clang++" ]; then export NAME=Clang$NAME; fi;
  - git checkout develop
  - git submodule update --init --recursive
  - mount
 
 script:
  -
-   if [ "$__" = "cmake tests" ] || [ "$__" = "cmake tests (error_code)" ] || [ "$__" = "cmake tests (status_code)" ]; then
+   if [ "$__" = "cmake tests" ] || [ "$__" = "x64 cmake tests (error_code)" ] || [ "$__" = "x64 cmake tests (status_code)" ]; then
      export ASAN_OPTIONS=detect_leaks=0;
      ctest -S .ci.cmake -V --timeout 300 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS ;
+   fi
+ -
+   if [ "$__" = "ARM32 cmake tests (error_code)" ] || [ "$__" = "ARM32 cmake tests (status_code)" ]; then
+     export CXX=arm-linux-gnueabihf-g++;
+     export $CMAKE_CONFIGURE_OPTIONS=$$CMAKE_CONFIGURE_OPTIONS -DCMAKE_SYSTEM_PROCESSOR=armhf;
+     ctest -S .ci.cmake -V --timeout 300 -DCTEST_DISABLE_TESTING=1 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS ;
    fi
  -
    if [ "$__" = "Documentation" ]; then
@@ -100,12 +99,7 @@ script:
      cd doc/html;
      git checkout gh-pages;
      cd ../..;
-#     ctest -S .docs.cmake -V;
-     mkdir build;
-     cd build;
-     cmake ..  $CMAKE_CONFIGURE_OPTIONS ;
-     make llfio_docs;
-     cd ..;
+     ctest -S .docs.cmake -V;
      cd doc/html;
      git add . || true;
      git commit -a -m "Travis CI updates documentation" || true;
@@ -124,14 +118,14 @@ script:
 after_success:
 # - bash -x ./update_coveralls.sh `pwd`
 #  - NEWNAME=llfio-v2.0-binaries-linux64-$(date +%Y%m%d%H%M%S).tgz
-  - if [ "${TRAVIS_OS_NAME}" = "linux" ] && [ "$CXX" = "clang++-4.0" ] && [ "$__" = "cmake tests (error_code)" ]; then   
+  - if [ "${TRAVIS_OS_NAME}" = "linux" ] && [ "$CXX" = "g++" ] && [ "$__" = "x64 cmake tests (error_code)" ]; then   
       NEWNAME=llfio-v2.0-binaries-linux64-$TRAVIS_COMMIT.tgz;
-      mv llfio-v2.0-binaries-linux64.tgz $NEWNAME;
+      mv llfio-v2.0-binaries-linux-x64.tgz $NEWNAME;
       curl -T $NEWNAME -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD https://dedi5.nedprod.com/static/files/upload/;
     fi
   - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then   
       NEWNAME=llfio-v2.0-binaries-darwin64-$TRAVIS_COMMIT.tgz;
-      mv llfio-v2.0-binaries-darwin64.tgz $NEWNAME;
+      mv llfio-v2.0-binaries-darwin-x64.tgz $NEWNAME;
       curl -T $NEWNAME -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD https://dedi5.nedprod.com/static/files/upload/;
     fi
 

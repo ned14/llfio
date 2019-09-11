@@ -15,11 +15,13 @@ ctest_update()
 ctest_configure(OPTIONS ${CTEST_CONFIGURE_OPTIONS})
 ctest_build(TARGET _dl)
 ctest_build(TARGET _sl)
-if(WIN32)
-  # Appveyor's Windows version doesn't permit unprivileged creation of symbolic links
-  ctest_test(RETURN_VALUE retval EXCLUDE "llfio_hl|shared_fs_mutex|symlink")
-else()
-  ctest_test(RETURN_VALUE retval EXCLUDE "llfio_hl|shared_fs_mutex")
+if(NOT CTEST_DISABLE_TESTING)
+  if(WIN32)
+    # Appveyor's Windows version doesn't permit unprivileged creation of symbolic links
+    ctest_test(RETURN_VALUE retval EXCLUDE "llfio_hl|shared_fs_mutex|symlink")
+  else()
+    ctest_test(RETURN_VALUE retval EXCLUDE "llfio_hl|shared_fs_mutex")
+  endif()
 endif()
 if(WIN32)
   if(EXISTS "prebuilt/bin/Release/llfio_dl-2.0-Windows-x64-Release.dll")
@@ -60,9 +62,22 @@ else()
       COMMAND cp -a release_notes.md llfio/
       COMMAND cp -a --parents prebuilt/lib/libllfio_sl-2.0-Linux-x86_64-Release.a llfio/
       COMMAND cp -a --parents prebuilt/lib/libllfio_dl-2.0-Linux-x86_64-Release.so llfio/
-      COMMAND "${CMAKE_COMMAND}" -E tar cfz llfio-v2.0-binaries-linux64.tgz llfio
+      COMMAND "${CMAKE_COMMAND}" -E tar cfz llfio-v2.0-binaries-linux-x64.tgz llfio
     )
-    get_filename_component(toupload llfio-v2.0-binaries-linux64.tgz ABSOLUTE)
+    get_filename_component(toupload llfio-v2.0-binaries-linux-x64.tgz ABSOLUTE)
+  endif()
+  if(EXISTS "prebuilt/lib/libllfio_dl-2.0-Linux-armhf-Release.so")
+    checked_execute_process("Tarring up binaries"
+      COMMAND mkdir llfio
+      COMMAND cp -a doc llfio/
+      COMMAND cp -a include llfio/
+      COMMAND cp -a Readme.md llfio/
+      COMMAND cp -a release_notes.md llfio/
+      COMMAND cp -a --parents prebuilt/lib/libllfio_sl-2.0-Linux-armhf-Release.a llfio/
+      COMMAND cp -a --parents prebuilt/lib/libllfio_dl-2.0-Linux-armhf-Release.so llfio/
+      COMMAND "${CMAKE_COMMAND}" -E tar cfz llfio-v2.0-binaries-linux-armhf.tgz llfio
+    )
+    get_filename_component(toupload llfio-v2.0-binaries-linux-armhf.tgz ABSOLUTE)
   endif()
   if(EXISTS "prebuilt/lib/libllfio_dl-2.0-Darwin-x86_64-Release.so")
     checked_execute_process("Tarring up binaries"
@@ -73,9 +88,9 @@ else()
       COMMAND cp -a release_notes.md llfio/
       COMMAND cp -a --parents prebuilt/lib/libllfio_sl-2.0-Darwin-x86_64-Release.a llfio/
       COMMAND cp -a --parents prebuilt/lib/libllfio_dl-2.0-Darwin-x86_64-Release.dylib llfio/
-      COMMAND "${CMAKE_COMMAND}" -E tar cfz llfio-v2.0-binaries-darwin64.tgz llfio
+      COMMAND "${CMAKE_COMMAND}" -E tar cfz llfio-v2.0-binaries-darwin-x64.tgz llfio
     )
-    get_filename_component(toupload llfio-v2.0-binaries-darwin64.tgz ABSOLUTE)
+    get_filename_component(toupload llfio-v2.0-binaries-darwin-x64.tgz ABSOLUTE)
   endif()
 endif()
 set(retval2 0)
