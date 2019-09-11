@@ -100,7 +100,6 @@ script:
      cd doc/html;
      git checkout gh-pages;
      cd ../..;
-#     ctest -S .docs.cmake -V;
      mkdir build;
      cd build;
      cmake ..  $CMAKE_CONFIGURE_OPTIONS ;
