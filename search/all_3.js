@@ -39,6 +39,7 @@ var searchData=
   ['construct_3c_20path_5fhandle_20_3e',['construct&lt; path_handle &gt;',['../structllfio__v2__xxx_1_1construct_3_01path__handle_01_4.html',1,'llfio_v2_xxx']]],
   ['construct_3c_20section_5fhandle_20_3e',['construct&lt; section_handle &gt;',['../structllfio__v2__xxx_1_1construct_3_01section__handle_01_4.html',1,'llfio_v2_xxx']]],
   ['construct_3c_20symlink_5fhandle_20_3e',['construct&lt; symlink_handle &gt;',['../structllfio__v2__xxx_1_1construct_3_01symlink__handle_01_4.html',1,'llfio_v2_xxx']]],
+  ['cow',['cow',['../classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549ac57346933aada59cff3ee2296cc70332',1,'llfio_v2_xxx::section_handle']]],
   ['crbegin',['crbegin',['../structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a3feb4c15c7805fd403138d677953b285',1,'llfio_v2_xxx::algorithm::impl::trivial_vector_impl']]],
   ['create',['create',['../structkvstore__v1__xxx_1_1basic__key__value__store__info.html#aa52a30f6b8dafd8720fb6b19d7df3847',1,'kvstore_v1_xxx::basic_key_value_store_info']]],
   ['create_5fkvstore',['create_kvstore',['../namespacekvstore__v1__xxx.html#a6e486d7b17da9677f0218b106b1f3817',1,'kvstore_v1_xxx']]],

@@ -2,5 +2,6 @@ var searchData=
 [
   ['native_5fhandle',['native_handle',['../classllfio__v2__xxx_1_1handle.html#a942b0d276c9f20fe41baab679b88fe72',1,'llfio_v2_xxx::handle']]],
   ['native_5fhandle_5ftype',['native_handle_type',['../structllfio__v2__xxx_1_1native__handle__type.html#af9eb6d201364aae2e933da37caa4c1dd',1,'llfio_v2_xxx::native_handle_type::native_handle_type()'],['../structllfio__v2__xxx_1_1native__handle__type.html#aa014dc4620266c5e79ff574eab95559c',1,'llfio_v2_xxx::native_handle_type::native_handle_type(disposition _behaviour, int _fd) noexcept'],['../structllfio__v2__xxx_1_1native__handle__type.html#a3c7ef470ac1baa0af9100aae36b87524',1,'llfio_v2_xxx::native_handle_type::native_handle_type(disposition _behaviour, win::handle _h) noexcept'],['../structllfio__v2__xxx_1_1native__handle__type.html#ac0d26bcb12d0f9baa757ee44df1ffbf9',1,'llfio_v2_xxx::native_handle_type::native_handle_type(const native_handle_type &amp;)=default'],['../structllfio__v2__xxx_1_1native__handle__type.html#ae3f07d9d74e09d71d31abdc91e18e64d',1,'llfio_v2_xxx::native_handle_type::native_handle_type(native_handle_type &amp;&amp;o) noexcept']]],
-  ['native_5fsize',['native_size',['../classllfio__v2__xxx_1_1path__view.html#a5c5aa6069f667fe8043a89ca87495fcb',1,'llfio_v2_xxx::path_view']]]
+  ['native_5fsize',['native_size',['../classllfio__v2__xxx_1_1path__view.html#a5c5aa6069f667fe8043a89ca87495fcb',1,'llfio_v2_xxx::path_view']]],
+  ['nvram_5fbarrier',['nvram_barrier',['../namespacellfio__v2__xxx.html#a86f75b69db68e6c0593919f0a878f838',1,'llfio_v2_xxx']]]
 ];

@@ -81,6 +81,7 @@ $(document).ready(function(){initNavTree('structllfio__v2__xxx_1_1stat__t.html',
 
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="structllfio__v2__xxx_1_1stat__t-members.html">List of all members</a>  </div>
@@ -94,16 +95,48 @@ $(document).ready(function(){initNavTree('structllfio__v2__xxx_1_1stat__t.html',
 
 <p><code>#include &quot;stat.hpp&quot;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:acff996a1858563643390725d298a9279"><td class="memItemLeft" align="right" valign="top"><a id="acff996a1858563643390725d298a9279"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1stat__t.html#acff996a1858563643390725d298a9279">bitfield__want</a> : unsigned { <br />
+&#160;&#160;<b>dev</b> = 1 &lt;&lt; 0, 
+<b>ino</b> = 1 &lt;&lt; 1, 
+<b>type</b> = 1 &lt;&lt; 2, 
+<b>perms</b> = 1 &lt;&lt; 3, 
+<br />
+&#160;&#160;<b>nlink</b> = 1 &lt;&lt; 4, 
+<b>uid</b> = 1 &lt;&lt; 5, 
+<b>gid</b> = 1 &lt;&lt; 6, 
+<b>rdev</b> = 1 &lt;&lt; 7, 
+<br />
+&#160;&#160;<b>atim</b> = 1 &lt;&lt; 8, 
+<b>mtim</b> = 1 &lt;&lt; 9, 
+<b>ctim</b> = 1 &lt;&lt; 10, 
+<b>size</b> = 1 &lt;&lt; 11, 
+<br />
+&#160;&#160;<b>allocated</b> = 1 &lt;&lt; 12, 
+<b>blocks</b> = 1 &lt;&lt; 13, 
+<b>blksize</b> = 1 &lt;&lt; 14, 
+<b>flags</b> = 1 &lt;&lt; 15, 
+<br />
+&#160;&#160;<b>gen</b> = 1 &lt;&lt; 16, 
+<b>birthtim</b> = 1 &lt;&lt; 17, 
+<b>sparse</b> = 1 &lt;&lt; 24, 
+<b>compressed</b> = 1 &lt;&lt; 25, 
+<br />
+&#160;&#160;<b>reparse_point</b> = 1 &lt;&lt; 26, 
+<b>all</b> = static_cast&lt;unsigned&gt;(-1), 
+<b>none</b> = 0
+<br />
+ }<tr class="memdesc:acff996a1858563643390725d298a9279"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used to indicate what metadata should be filled in. <br /></td></tr>
+</td></tr>
+<tr class="separator:acff996a1858563643390725d298a9279"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a7c281295d6ae22631336206446f37581"><td class="memItemLeft" align="right" valign="top"><a id="a7c281295d6ae22631336206446f37581"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1stat__t.html#a7c281295d6ae22631336206446f37581">QUICKCPPLIB_BITFIELD_BEGIN</a> (want)</td></tr>
-<tr class="memdesc:a7c281295d6ae22631336206446f37581"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used to indicate what metadata should be filled in. <br /></td></tr>
-<tr class="separator:a7c281295d6ae22631336206446f37581"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8fc0ebfd31e3e3c5fe561f61fb86a6b7"><td class="memItemLeft" align="right" valign="top"><a id="a8fc0ebfd31e3e3c5fe561f61fb86a6b7"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1stat__t.html#a8fc0ebfd31e3e3c5fe561f61fb86a6b7">QUICKCPPLIB_BITFIELD_END</a> (want) <a class="el" href="structllfio__v2__xxx_1_1stat__t.html">stat_t</a>()</td></tr>
-<tr class="memdesc:a8fc0ebfd31e3e3c5fe561f61fb86a6b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a UNINITIALIZED instance i.e. full of random garbage. <br /></td></tr>
-<tr class="separator:a8fc0ebfd31e3e3c5fe561f61fb86a6b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7370e218d82985d4476643672f37993b"><td class="memItemLeft" align="right" valign="top"><a id="a7370e218d82985d4476643672f37993b"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1stat__t.html#a7370e218d82985d4476643672f37993b">stat_t</a> ()</td></tr>
+<tr class="memdesc:a7370e218d82985d4476643672f37993b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a UNINITIALIZED instance i.e. full of random garbage. <br /></td></tr>
+<tr class="separator:a7370e218d82985d4476643672f37993b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef93718067115fcb4c596f4c8fe4cc2f"><td class="memItemLeft" align="right" valign="top"><a id="aef93718067115fcb4c596f4c8fe4cc2f"></a>
 constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1stat__t.html#aef93718067115fcb4c596f4c8fe4cc2f">stat_t</a> (std::nullptr_t) noexcept</td></tr>
 <tr class="memdesc:aef93718067115fcb4c596f4c8fe4cc2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a zeroed instance. <br /></td></tr>

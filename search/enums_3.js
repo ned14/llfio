@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['mode',['mode',['../classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca',1,'llfio_v2_xxx::handle']]]
+  ['kvstore_5ferrc',['kvstore_errc',['../namespacekvstore__v1__xxx.html#a7bc2f2673bddc429b098b16e413deb5f',1,'kvstore_v1_xxx']]]
 ];

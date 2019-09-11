@@ -12,6 +12,7 @@ var classllfio__v2__xxx_1_1path__view =
     [ "path_view", "classllfio__v2__xxx_1_1path__view.html#a82487e2de3c0b23cb237de064b71f072", null ],
     [ "path_view", "classllfio__v2__xxx_1_1path__view.html#a83b86163124a03eadb509e3bb4bcce3e", null ],
     [ "path_view", "classllfio__v2__xxx_1_1path__view.html#a4fb290145d390bd9e8cf3b5e2553c266", null ],
+    [ "_raw_data", "classllfio__v2__xxx_1_1path__view.html#ae47996cda2382aecfddcbf20c62bfc98", null ],
     [ "compare", "classllfio__v2__xxx_1_1path__view.html#a4f70a36ca7261e649c7382637bb933c6", null ],
     [ "compare", "classllfio__v2__xxx_1_1path__view.html#a1c284ac9b48c76ad15d5371d4c8313eb", null ],
     [ "compare", "classllfio__v2__xxx_1_1path__view.html#aad3b3e087045c66f5580be26dbaedc64", null ],

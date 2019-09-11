@@ -22,7 +22,8 @@ var NAVTREE =
         [ "Functions", "functions_func.html", "functions_func" ],
         [ "Variables", "functions_vars.html", null ],
         [ "Typedefs", "functions_type.html", null ],
-        [ "Enumerations", "functions_enum.html", null ]
+        [ "Enumerations", "functions_enum.html", null ],
+        [ "Enumerator", "functions_eval.html", null ]
       ] ]
     ] ],
     [ "Files", null, [
@@ -39,14 +40,15 @@ var NAVTREEINDEX =
 [
 ".html",
 "classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1lock__files.html#a3d30413d592be2c4802f50b9cf891681",
-"classllfio__v2__xxx_1_1async__file__handle_1_1awaitable.html#ae39e3934b1eb85ac91f1993c8886d888",
-"classllfio__v2__xxx_1_1fs__handle.html#a1a65884346740af7fb4648c79d44a750",
-"classllfio__v2__xxx_1_1map__handle.html#aa3225a2ee86b12e6099d15a2a87b99b4",
-"classllfio__v2__xxx_1_1section__handle.html",
-"functions_func_m.html",
-"storage__profile_8hpp.html#aeba16d86e9c035cdd006caa6be1ab66c",
-"structllfio__v2__xxx_1_1directory__handle_1_1io__request.html#acef80df57e56c2e18a1987985a7d7590",
-"structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a70f32c33de7d02ed2c39ff98b1027ce1"
+"classllfio__v2__xxx_1_1async__file__handle.html#ae0d5de068f71628e9491c5669f89dca0",
+"classllfio__v2__xxx_1_1file__handle.html#a5c7f6a0a8ffdea22763c75a9319ba0c2",
+"classllfio__v2__xxx_1_1io__service.html#a46ae106f20af58f24d11cbfc099b874a",
+"classllfio__v2__xxx_1_1mapped__file__handle.html#ac3f6788f559c6e4f0f577eeebf120efe",
+"classllfio__v2__xxx_1_1symlink__handle.html#a5929f46f42112bd805ab5001bfbf9d2aa6aa77c9bac6dd95b83f8d278f0e5fa59",
+"io__service_8hpp.html#a2195d9a60e427e96cb90a7bb95f1b773",
+"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#aea98df8215a197c3356e5ff9098ae238",
+"structllfio__v2__xxx_1_1native__handle__type.html#a8a38d56b1a9a3ee70799df3dac04edfc",
+"structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html#accda92d5c8ff679c32218792b9933aeb"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

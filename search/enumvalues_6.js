@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['none',['none',['../classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207a334c4a4c42fdb79d7ebc3e73b517e6f8',1,'llfio_v2_xxx::directory_handle::none()'],['../classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaa334c4a4c42fdb79d7ebc3e73b517e6f8',1,'llfio_v2_xxx::handle::none()'],['../classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a334c4a4c42fdb79d7ebc3e73b517e6f8',1,'llfio_v2_xxx::handle::none()'],['../classllfio__v2__xxx_1_1symlink__handle.html#a1908a242ca435cf1386fe96a86da4002a334c4a4c42fdb79d7ebc3e73b517e6f8',1,'llfio_v2_xxx::symlink_handle::none()']]]
+  ['hardcoded',['hardcoded',['../structllfio__v2__xxx_1_1path__discovery_1_1discovered__path.html#ae02f172851c050f6a7f5929410428c7daeca7a05085eba86cbab65a157f848354',1,'llfio_v2_xxx::path_discovery::discovered_path']]],
+  ['history',['history',['../structkvstore__v1__xxx_1_1basic__key__value__store__info.html#af30d19036dae0956d02af0c1e867c54aa498d5b94bbf58b2f19323f5357bbb6d9',1,'kvstore_v1_xxx::basic_key_value_store_info']]]
 ];

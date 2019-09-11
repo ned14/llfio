@@ -1,5 +1,21 @@
 var structllfio__v2__xxx_1_1native__handle__type =
 [
+    [ "bitfield__disposition", "structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7", [
+      [ "invalid", "structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7a03c22e007aed8c42eaee4dc2a6f639e3", null ],
+      [ "readable", "structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7a2bf351d9ef739909485db2d6e0d55a00", null ],
+      [ "writable", "structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7ab0fb91cab5d26713f14fe767166e6ec6", null ],
+      [ "append_only", "structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7a9256691cdd6fc5afaa7cd96091781ced", null ],
+      [ "overlapped", "structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7a8ce64daff425ed6534f1683b1d0dc066", null ],
+      [ "seekable", "structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7aff1dd4bc49b07187a9b147a14f9102b6", null ],
+      [ "aligned_io", "structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7aa965d460f7cbe6c30dfce6432bb1c41d", null ],
+      [ "file", "structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7a3a4b67c0b2579480cb8d56466cd9bf88", null ],
+      [ "directory", "structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7a8d7b31aed417b5d7274a817b8d7d0fab", null ],
+      [ "symlink", "structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7a4afae65da7b66f75e6e82b470d298fb5", null ],
+      [ "multiplexer", "structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7a3cea1a678741f4ce20e57164946b5fc1", null ],
+      [ "process", "structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7a7f4cc916f7b5827f7528027964445d21", null ],
+      [ "section", "structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7a5d4474f0197e13f3205443ad91de390e", null ],
+      [ "_child_close_executed", "structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7a4caa9f58b8c6de7934f0fad06ca2e1a1", null ]
+    ] ],
     [ "native_handle_type", "structllfio__v2__xxx_1_1native__handle__type.html#af9eb6d201364aae2e933da37caa4c1dd", null ],
     [ "~native_handle_type", "structllfio__v2__xxx_1_1native__handle__type.html#aa9e3ba4e787524be1a1715f75586d5fe", null ],
     [ "native_handle_type", "structllfio__v2__xxx_1_1native__handle__type.html#aa014dc4620266c5e79ff574eab95559c", null ],
@@ -22,11 +38,10 @@ var structllfio__v2__xxx_1_1native__handle__type =
     [ "operator!", "structllfio__v2__xxx_1_1native__handle__type.html#af51f8cd2e901aa8fc6862eb85e66b20c", null ],
     [ "operator=", "structllfio__v2__xxx_1_1native__handle__type.html#a0c8c18825ea9b3c448a4f4c708047b29", null ],
     [ "operator=", "structllfio__v2__xxx_1_1native__handle__type.html#ac0c95863560b730e724ca0f158564415", null ],
-    [ "QUICKCPPLIB_BITFIELD_BEGIN", "structllfio__v2__xxx_1_1native__handle__type.html#aab66573d64b32857ecc113b87dd56489", null ],
-    [ "QUICKCPPLIB_BITFIELD_END", "structllfio__v2__xxx_1_1native__handle__type.html#a2329417e016cd5ccd01794937c4eec3b", null ],
     [ "requires_aligned_io", "structllfio__v2__xxx_1_1native__handle__type.html#a45431e8a673c8a7d204136cd2ae612ed", null ],
     [ "swap", "structllfio__v2__xxx_1_1native__handle__type.html#abc96c9f96b0bf877af2cd9092bd3255e", null ],
     [ "_init", "structllfio__v2__xxx_1_1native__handle__type.html#a4b4b6662c7efc8b95937a60cf6285d3a", null ],
+    [ "behaviour", "structllfio__v2__xxx_1_1native__handle__type.html#a967ace482f3fe7fd3c6e24bffee25888", null ],
     [ "fd", "structllfio__v2__xxx_1_1native__handle__type.html#a6d63f413705982a84f4140640e4340af", null ],
     [ "h", "structllfio__v2__xxx_1_1native__handle__type.html#afbc6866f3f80808fbe3ca903d15b5481", null ],
     [ "pid", "structllfio__v2__xxx_1_1native__handle__type.html#a8a38d56b1a9a3ee70799df3dac04edfc", null ]
