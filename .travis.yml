@@ -1,7 +1,7 @@
-dist: trusty
+dist: bionic
 language: cpp
 compiler:
-# - g++
+ - g++
  - clang++
 sudo: false
 os:
@@ -18,13 +18,13 @@ notifications:
 
 addons:
   apt:
-    sources:
-    - llvm-toolchain-trusty-4.0
     packages:
-    - clang-4.0
+    - g++
+    - clang
     - python3
     - cmake
     - cmake-data
+    - doxygen
 
 env:
   global:
@@ -54,20 +54,8 @@ matrix:
 
 cache:
   apt: true
-  directories:
-    - doxygen-1.8.16
     
 before_install:
- -
-    DOXYGEN_VERSION=1.8.16;
-    if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
-      if [ -z "$(ls -A doxygen-$DOXYGEN_VERSION)" ]; then
-        wget -O doxygen-$DOXYGEN_VERSION.tar.gz http://doxygen.nl/files/doxygen-$DOXYGEN_VERSION.linux.bin.tar.gz;
-        mkdir -p doxygen-$DOXYGEN_VERSION;
-        tar -xvf doxygen-$DOXYGEN_VERSION.tar.gz --strip 1 -C doxygen-$DOXYGEN_VERSION;
-      fi;
-      export PATH="$PWD/doxygen-$DOXYGEN_VERSION/bin:$PATH";
-    fi
  -
    if [ "${TRAVIS_OS_NAME}" = "osx" ]; then
      brew install llvm;
@@ -76,8 +64,8 @@ before_install:
      export CPPFLAGS=-I/usr/local/opt/llvm/include;
      export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DCMAKE_LIBRARY_PATH=/usr/local/opt/llvm/lib";
    fi
- - if [ "$CXX" = "g++" ]; then export CXX=g++-6; export NAME=TravisLinuxWorkerGCC; fi;
- - if [ "$CXX" = "clang++" ]; then export CXX=clang++-4.0; fi;
+# - if [ "$CXX" = "g++" ]; then export CXX=g++-6; export NAME=TravisLinuxWorkerGCC; fi;
+# - if [ "$CXX" = "clang++" ]; then export CXX=clang++-4.0; fi;
  - git checkout develop
  - git submodule update --init --recursive
  - mount
@@ -96,11 +84,7 @@ script:
      cd doc/html;
      git checkout gh-pages;
      cd ../..;
-     mkdir build;
-     cd build;
-     cmake ..  $CMAKE_CONFIGURE_OPTIONS ;
-     make llfio_docs;
-     cd ..;
+     ctest -S .docs.cmake -V;
      cd doc/html;
      git add . || true;
      git commit -a -m "Travis CI updates documentation" || true;
@@ -119,7 +103,7 @@ script:
 after_success:
 # - bash -x ./update_coveralls.sh `pwd`
 #  - NEWNAME=llfio-v2.0-binaries-linux64-$(date +%Y%m%d%H%M%S).tgz
-  - if [ "${TRAVIS_OS_NAME}" = "linux" ] && [ "$CXX" = "clang++-4.0" ] && [ "$__" = "cmake tests (error_code)" ]; then   
+  - if [ "${TRAVIS_OS_NAME}" = "linux" ] && [ "$CXX" = "g++" ] && [ "$__" = "cmake tests (error_code)" ]; then   
       NEWNAME=llfio-v2.0-binaries-linux64-$TRAVIS_COMMIT.tgz;
       mv llfio-v2.0-binaries-linux64.tgz $NEWNAME;
       curl -T $NEWNAME -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD https://dedi5.nedprod.com/static/files/upload/;
