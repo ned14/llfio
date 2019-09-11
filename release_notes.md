@@ -5,7 +5,7 @@
 <td align="center"> <a href="https://travis-ci.org/ned14/llfio">Linux and MacOS CI:</a><img src="https://travis-ci.org/ned14/llfio.svg?branch=master"/> </td>
 <td align="center"> <a href="https://ci.appveyor.com/project/ned14/llfio/branch/master">Windows CI:</a><img src="https://ci.appveyor.com/api/projects/status/dfctqfap3kpx89om/branch/master?svg=true"/> </td>
 <td align="center"> <a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-source-latest.tar.xz">Latest stable</a><br><a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-source-latest.tar.xz">sources</a> </td>
-<td align="center"> <a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-linux64-latest.tgz">Latest stable</a><br><a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-linux64-latest.tgz">Linux x64 prebuilt</a> </td>
+<td align="center"> <a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-linux64-latest.tgz">Latest stable</a><br><a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-linux64-latest.tgz">Ubuntu 18.04 x64 prebuilt</a> </td>
 <td align="center"> <!--<a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-darwin-latest.tgz">Latest stable</a><br><a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-darwin64-latest.tgz">OS X x64 prebuilt</a>--> </td>
 <td align="center"> <a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-win64-latest.zip">Latest stable</a><br/><a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-win64-latest.zip">VS2017 x64 prebuilt</a> </td>
 </tr>
