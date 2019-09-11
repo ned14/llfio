@@ -19,12 +19,9 @@ notifications:
 addons:
   apt:
     sources:
-    - ubuntu-toolchain-r-test
-    - george-edison55-precise-backports
     - llvm-toolchain-trusty-4.0
     packages:
     - g++-6
-    - g++-7
     - clang-4.0
     - python3
     - cmake
@@ -58,8 +55,8 @@ matrix:
 
 cache:
   apt: true
-#  directories:
-#    - doxygen-1.8.16
+  directories:
+    - doxygen-1.8.16
     
 before_install:
  -
