@@ -21,7 +21,6 @@ addons:
     sources:
     - llvm-toolchain-trusty-4.0
     packages:
-    - g++-6
     - clang-4.0
     - python3
     - cmake
