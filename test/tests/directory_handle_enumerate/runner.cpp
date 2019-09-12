@@ -24,17 +24,27 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "kernel_directory_handle_enumerate.cpp.hpp"
 
+inline LLFIO_V2_NAMESPACE::span<LLFIO_V2_NAMESPACE::directory_entry> static_directory_entries()
+{
+  using LLFIO_V2_NAMESPACE::directory_entry;
+  static directory_entry _entries[5];
+  for(auto &i : _entries)
+  {
+    i = directory_entry();
+  }
+  return {_entries};
+}
+
 template <class U> inline void directory_handle_enumerate_(U &&f)
 {
   using namespace KERNELTEST_V1_NAMESPACE;
-  using LLFIO_V2_NAMESPACE::result;
-  using LLFIO_V2_NAMESPACE::path_view;
   using LLFIO_V2_NAMESPACE::directory_entry;
   using LLFIO_V2_NAMESPACE::directory_handle;
+  using LLFIO_V2_NAMESPACE::path_view;
+  using LLFIO_V2_NAMESPACE::result;
   using filter = LLFIO_V2_NAMESPACE::directory_handle::filter;
 
-  static directory_entry _entries[5];
-  static LLFIO_V2_NAMESPACE::span<directory_entry> entries(_entries);
+  auto entries = static_directory_entries();
 
   // clang-format off
   static const auto permuter(mt_permute_parameters<
@@ -57,11 +67,8 @@ template <class U> inline void directory_handle_enumerate_(U &&f)
     precondition::filesystem_setup(),
     postcondition::custom(
       [&](auto &permuter, auto &testreturn, size_t idx) {
-        for(auto &i : _entries)
-        {
-          i = directory_entry();
-        }
-        entries = _entries;
+        // reset
+        static_directory_entries();
         return std::make_tuple(std::ref(permuter), std::ref(testreturn), idx);
       },
       [&](auto tuplestate) {

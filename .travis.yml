@@ -88,7 +88,7 @@ script:
  -
    if [ "$__" = "ARM32 cmake tests (error_code)" ] || [ "$__" = "ARM32 cmake tests (status_code)" ]; then
      export CXX=arm-linux-gnueabihf-g++;
-     export $CMAKE_CONFIGURE_OPTIONS=$$CMAKE_CONFIGURE_OPTIONS -DCMAKE_SYSTEM_PROCESSOR=armhf;
+     export CMAKE_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS -DCMAKE_SYSTEM_PROCESSOR=armhf -DCMAKE_CXX_FLAGS="-Wno-attributes -Wno-psabi";
      ctest -S .ci.cmake -V --timeout 300 -DCTEST_DISABLE_TESTING=1 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS ;
    fi
  -

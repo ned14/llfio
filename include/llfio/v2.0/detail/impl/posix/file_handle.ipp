@@ -461,9 +461,9 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_type offs
   // Fall back onto a write of zeros
   if(bytes < utils::page_size())
   {
-    auto *buffer = static_cast<byte *>(alloca(bytes));
-    memset(buffer, 0, bytes);
-    OUTCOME_TRY(written, write(offset, {{buffer, bytes}}, d));
+    auto *buffer = static_cast<byte *>(alloca((size_type) bytes));
+    memset(buffer, 0, (size_type) bytes);
+    OUTCOME_TRY(written, write(offset, {{buffer, (size_type) bytes}}, d));
     return written;
   }
   try
@@ -475,7 +475,7 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_type offs
     (void) unbufferh;
     while(bytes > 0)
     {
-      auto towrite = (bytes < blocksize) ? bytes : blocksize;
+      auto towrite = (bytes < blocksize) ? (size_t) bytes : blocksize;
       OUTCOME_TRY(written, write(offset, {{buffer, towrite}}, d));
       offset += written;
       bytes -= written;

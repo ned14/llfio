@@ -103,7 +103,7 @@ namespace path_discovery
             if(colon != string_view::npos)
             {
               long uid = strtol(line.data() + 1, nullptr, 10);
-              if(uid == geteuid())
+              if(uid == (long) geteuid())
               {
                 // home directory is two colons from end
                 size_t homeend = line.rfind(':');
