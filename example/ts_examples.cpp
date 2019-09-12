@@ -39,7 +39,7 @@ inline io_handle::buffers_type read_all(io_handle &h, io_handle::io_request<io_h
 
   // Take copy of input buffers onto stack, and set output buffers to buffers supplied
   auto *input_buffers_mem = reinterpret_cast<io_handle::buffer_type *>(alloca(reqs.buffers.size() * sizeof(io_handle::buffer_type)));
-  auto *input_buffers_sizes = reinterpret_cast<io_handle::extent_type *>(alloca(reqs.buffers.size() * sizeof(io_handle::extent_type)));
+  auto *input_buffers_sizes = reinterpret_cast<io_handle::size_type *>(alloca(reqs.buffers.size() * sizeof(io_handle::size_type)));
   io_handle::buffers_type output_buffers(reqs.buffers);
   io_handle::io_request<io_handle::buffers_type> creq({input_buffers_mem, reqs.buffers.size()}, 0);
   for(size_t n = 0; n < reqs.buffers.size(); n++)

@@ -370,6 +370,7 @@ void mapped_file()
   //! [mapped_file]
 }
 
+#if !defined(__SIZE_MAX__) || __SIZE_MAX__ > 999999999999UL
 void sparse_array()
 {
   //! [sparse_array]
@@ -390,6 +391,7 @@ void sparse_array()
   one_trillion_int_array[999999999999ULL] = 6;
   //! [sparse_array]
 }
+#endif
 
 #if LLFIO_HAVE_COROUTINES
 std::future<void> coroutine_write()

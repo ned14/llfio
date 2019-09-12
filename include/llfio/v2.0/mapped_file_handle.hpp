@@ -369,7 +369,7 @@ public:
 
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> zero(extent_type offset, extent_type bytes, deadline /*unused*/ = deadline()) noexcept override
   {
-    OUTCOME_TRYV(_mh.zero_memory({_mh.address() + offset, bytes}));
+    OUTCOME_TRYV(_mh.zero_memory({_mh.address() + offset, (size_type) bytes}));
     return bytes;
   }
 

@@ -24,6 +24,28 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "kernel_directory_handle.cpp.hpp"
 
+inline LLFIO_V2_NAMESPACE::directory_handle::buffers_type static_buffers()
+{
+  using directory_handle = LLFIO_V2_NAMESPACE::directory_handle;
+  static typename directory_handle::buffer_type _entries[5];
+  // Reset enumeration entries
+  for(auto &i : _entries)
+  {
+    i = typename directory_handle::buffer_type();
+  }
+  return {_entries};
+}
+
+inline LLFIO_V2_NAMESPACE::result<typename LLFIO_V2_NAMESPACE::directory_handle::buffers_type> &static_info()
+{
+  using LLFIO_V2_NAMESPACE::result;
+  using directory_handle = LLFIO_V2_NAMESPACE::directory_handle;
+  static result<typename directory_handle::buffers_type> info(typename result<typename directory_handle::buffers_type>::error_type{});
+  info = {typename result<typename directory_handle::buffers_type>::error_type{}};
+  return info;
+}
+
+
 template <class U> inline void directory_handle_create_close_creation(U &&f)
 {
   using namespace KERNELTEST_V1_NAMESPACE;
@@ -35,9 +57,8 @@ template <class U> inline void directory_handle_create_close_creation(U &&f)
   static const il_result<void> permission_denied = LLFIO_V2_NAMESPACE::errc::permission_denied;
 
   // clang-format off
-  static typename directory_handle::buffer_type _entries[5];
-  static typename directory_handle::buffers_type entries(_entries);
-  static result<typename directory_handle::buffers_type> info(typename result<typename directory_handle::buffers_type>::error_type{});
+  auto entries = static_buffers();
+  auto &info = static_info();
   static const auto permuter(mt_permute_parameters< 
     il_result<void>,                              
     parameters<                                
@@ -81,13 +102,9 @@ template <class U> inline void directory_handle_create_close_creation(U &&f)
     postcondition::filesystem_comparison_structure(),
     postcondition::custom(
       [&](auto &permuter, auto &testreturn, size_t idx, auto &enumeration_should_be) {
-        // Reset enumeration entries
-        for (auto &i : _entries)
-        {
-          i = typename directory_handle::buffer_type();
-        }
-        entries = typename directory_handle::buffers_type(_entries);
-        info = typename result<typename directory_handle::buffers_type>::error_type();
+        // reset
+        static_buffers();
+        static_info();
         return std::make_tuple(std::ref(permuter), std::ref(testreturn), idx, std::ref(enumeration_should_be));
       },
       [&](auto /*tuplestate*/) {

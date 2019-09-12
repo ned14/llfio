@@ -47,7 +47,7 @@ fast_random_file_handle::io_result<fast_random_file_handle::buffers_type> fast_r
     }
     else
     {
-      for(extent_type i = 0; i < buffer.size();)
+      for(size_type i = 0; i < buffer.size();)
       {
         // How much can we do at once?
         auto hashoffset = reqs.offset >> 2;                      // place this offset into the state

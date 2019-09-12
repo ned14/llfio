@@ -185,7 +185,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   byte *addr = _addr + reqs.offset;
-  extent_type bytes = 0;
+  size_type bytes = 0;
   // Check for overflow
   for(const auto &req : reqs.buffers)
   {
