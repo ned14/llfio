@@ -15,6 +15,7 @@ ctest_update()
 ctest_configure(OPTIONS ${CTEST_CONFIGURE_OPTIONS})
 ctest_build(TARGET _dl)
 ctest_build(TARGET _sl)
+set(retval 0)
 if(NOT CTEST_DISABLE_TESTING)
   if(WIN32)
     # Appveyor's Windows version doesn't permit unprivileged creation of symbolic links

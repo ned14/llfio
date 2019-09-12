@@ -6119,7 +6119,8 @@ int main()
       static std::wstring_convert<std::codecvt_utf8_utf16<char16_t>,char16_t> convert;
       ret.append(convert.to_bytes((char16_t) v));
 #else
-      ret.append((char) v);
+      char _v = (char) v;
+      ret.append(&_v, 1);
 #endif
       ret.append("'");
       return ret;
