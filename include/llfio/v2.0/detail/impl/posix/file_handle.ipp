@@ -70,7 +70,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
       }
       // If failed to rename, remove
       (void) rfh.unlink();
-      return r.error();
+      return std::move(r).error();
     }
     return posix_error();
   }

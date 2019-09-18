@@ -108,7 +108,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     }
     // If failed to rename, remove
     (void) rfh.unlink();
-    return r.error();
+    return std::move(r).error();
   };
   if(base.is_valid())
   {
@@ -125,7 +125,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
           auto r = rename_random_dir_over_existing_dir(base, path);
           if(!r)
           {
-            return r.error();
+            return std::move(r).error();
           }
           ret = std::move(r).value();
           goto opened;
@@ -150,7 +150,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
           auto r = rename_random_dir_over_existing_dir(base, path);
           if(!r)
           {
-            return r.error();
+            return std::move(r).error();
           }
           ret = std::move(r).value();
           goto opened;
