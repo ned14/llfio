@@ -35,6 +35,19 @@ template <class U> inline void symlink_handle_create_close_creation(U &&f)
 
   assert(file_exists.error() == LLFIO_V2_NAMESPACE::errc::file_exists);
 
+#ifdef _WIN32
+  // Try to construct a symlink on Windows to force token grab,
+  // if it fails, don't bother running these tests
+  {
+    auto r = symlink_handle::symlink({}, "testlink", symlink_handle::mode::write, symlink_handle::creation::if_needed, symlink_handle::flag::unlink_on_first_close);
+    if(!r && r.error() == LLFIO_V2_NAMESPACE::errc::function_not_supported)
+    {
+      std::cerr << "WARNING: Failed to create a test symlink, assuming lack of\nSeCreateSymbolicLinkPrivilege on this system, skipping test" << std::endl;
+      return;
+    }
+  }
+#endif
+
   // clang-format off
   static const auto permuter(mt_permute_parameters<
     il_result<void>,                                  

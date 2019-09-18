@@ -171,7 +171,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
 #endif
     }
   }
-  if(_creation == creation::truncate && ret.value().are_safety_barriers_issued())
+  if(_creation == creation::truncate_existing && ret.value().are_safety_barriers_issued())
   {
     FlushFileBuffers(nativeh.h);
   }
