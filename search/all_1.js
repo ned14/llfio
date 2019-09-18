@@ -8,6 +8,7 @@ var searchData=
   ['all_5ftemporary_5fdirectories',['all_temporary_directories',['../namespacellfio__v2__xxx_1_1path__discovery.html#ada0466e529e851d2d58ce87e0e28f4f2',1,'llfio_v2_xxx::path_discovery']]],
   ['allocator',['allocator',['../classkvstore__v1__xxx_1_1basic__key__value__store.html#a5d1b9afb5721b17ee1b24c53e0d7bbef',1,'kvstore_v1_xxx::basic_key_value_store::allocator() noexcept'],['../classkvstore__v1__xxx_1_1basic__key__value__store.html#a763d805ef9ca3c5862632d69d285e065',1,'kvstore_v1_xxx::basic_key_value_store::allocator() const noexcept']]],
   ['allocator_5ftype',['allocator_type',['../classkvstore__v1__xxx_1_1basic__key__value__store.html#a1f0f1d6b86075230abeeb582f23ec4c5',1,'kvstore_v1_xxx::basic_key_value_store']]],
+  ['always_5fnew',['always_new',['../classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42af7cf95e0f43dc8f79e39ae628c85a11d',1,'llfio_v2_xxx::handle']]],
   ['anonymous_5finode',['anonymous_inode',['../classllfio__v2__xxx_1_1handle.html#a5929f46f42112bd805ab5001bfbf9d2aa07122ea63cdc5b2c07e764d95a816d3d',1,'llfio_v2_xxx::handle']]],
   ['append',['append',['../classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaa9516dfb15f51c7ee19a4d46b8c0dbe1d',1,'llfio_v2_xxx::handle']]],
   ['append_5fonly',['append_only',['../structllfio__v2__xxx_1_1native__handle__type.html#af9532a4123ade5a0c4ff8df3de2170f7a9256691cdd6fc5afaa7cd96091781ced',1,'llfio_v2_xxx::native_handle_type']]],
