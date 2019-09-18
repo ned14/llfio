@@ -64,8 +64,11 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
     case creation::if_needed:
       creatdisp = 0x00000003 /*FILE_OPEN_IF*/;
       break;
-    case creation::truncate:
+    case creation::truncate_existing:
       creatdisp = 0x00000004 /*FILE_OVERWRITE*/;
+      break;
+    case creation::always_new:
+      creatdisp = 0x00000000 /*FILE_SUPERSEDE*/;
       break;
     }
 
@@ -120,8 +123,11 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
     case creation::if_needed:
       creation = OPEN_ALWAYS;
       break;
-    case creation::truncate:
+    case creation::truncate_existing:
       creation = TRUNCATE_EXISTING;
+      break;
+    case creation::always_new:
+      creation = CREATE_ALWAYS;
       break;
     }
     // required to open a symlink

@@ -1365,6 +1365,9 @@ which means our file open routines return EACCES, which is useless to us for det
 when we are trying to open files being deleted. We therefore reimplement CreateFileW()
 with a non-broken version.
 
+Another bug fix is that CREATE_ALWAYS is mapped to FILE_OPEN_IF on Win32, which does
+not replace the inode if it already exists. We map it correctly to FILE_SUPERSEDE.
+
 This edition does pretty much the same as the Win32 edition, minus support for file
 templates and lpFileName being anything but a file path.
 */
@@ -1388,7 +1391,7 @@ inline HANDLE CreateFileW_(_In_ LPCTSTR lpFileName, _In_ DWORD dwDesiredAccess, 
     dwCreationDisposition = FILE_CREATE;
     break;
   case CREATE_ALWAYS:
-    dwCreationDisposition = FILE_OVERWRITE_IF;
+    dwCreationDisposition = FILE_SUPERSEDE;  // WARNING: Win32 uses FILE_OVERWRITE_IF;
     break;
   case OPEN_EXISTING:
     dwCreationDisposition = FILE_OPEN;

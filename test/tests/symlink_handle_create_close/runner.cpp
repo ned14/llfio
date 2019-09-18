@@ -63,7 +63,9 @@ template <class U> inline void symlink_handle_create_close_creation(U &&f)
       {               file_exists, { symlink_handle::mode::write, symlink_handle::creation::only_if_not_exist, symlink_handle::flag::none }, { "existing1" }, { "existing1" }},
       {                 success(), { symlink_handle::mode::write, symlink_handle::creation::if_needed        , symlink_handle::flag::none }, { "existing0" }, { "existing1" }},
       {                 success(), { symlink_handle::mode::write, symlink_handle::creation::if_needed        , symlink_handle::flag::none }, { "existing1" }, { "existing1" }},
-      {    function_not_supported, { symlink_handle::mode::write, symlink_handle::creation::truncate         , symlink_handle::flag::none }, { "existing1" }, { "existing1" }},
+      {    function_not_supported, { symlink_handle::mode::write, symlink_handle::creation::truncate_existing, symlink_handle::flag::none }, { "existing1" }, { "existing1" }},
+      {                 success(), { symlink_handle::mode::write, symlink_handle::creation::always_new       , symlink_handle::flag::none }, { "existing0" }, { "existing1" }},
+      {                 success(), { symlink_handle::mode::write, symlink_handle::creation::always_new       , symlink_handle::flag::none }, { "existing1" }, { "existing1" }},
 
       // Does the flag parameter have the expected side effects?
       {                 success(), { symlink_handle::mode::write, symlink_handle::creation::open_existing, symlink_handle::flag::unlink_on_first_close }, { "existing1" }, { "existing0" }}

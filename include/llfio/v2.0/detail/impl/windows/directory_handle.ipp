@@ -65,8 +65,11 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     case creation::if_needed:
       creatdisp = 0x00000003 /*FILE_OPEN_IF*/;
       break;
-    case creation::truncate:
+    case creation::truncate_existing:
       creatdisp = 0x00000004 /*FILE_OVERWRITE*/;
+      break;
+    case creation::always_new:
+      creatdisp = 0x00000000 /*FILE_SUPERSEDE*/;
       break;
     }
 
@@ -117,7 +120,8 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     case creation::if_needed:
       need_to_set_case_sensitive = (isb.Information == 2 /*FILE_CREATED*/);
       break;
-    case creation::truncate:
+    case creation::truncate_existing:
+    case creation::always_new:
       need_to_set_case_sensitive = true;
       break;
     }
@@ -135,8 +139,11 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     case creation::if_needed:
       creation = OPEN_ALWAYS;
       break;
-    case creation::truncate:
+    case creation::truncate_existing:
       creation = TRUNCATE_EXISTING;
+      break;
+    case creation::always_new:
+      creation = CREATE_ALWAYS;
       break;
     }
     attribs |= FILE_FLAG_BACKUP_SEMANTICS;  // required to open a directory
@@ -158,7 +165,8 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     case creation::if_needed:
       need_to_set_case_sensitive = (GetLastError() != ERROR_ALREADY_EXISTS);  // FIXME: doesn't appear to detect when new directory not created
       break;
-    case creation::truncate:
+    case creation::truncate_existing:
+    case creation::always_new:
       need_to_set_case_sensitive = true;
       break;
     }

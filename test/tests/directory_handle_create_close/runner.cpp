@@ -54,6 +54,7 @@ template <class U> inline void directory_handle_create_close_creation(U &&f)
   static const il_result<void> no_such_file_or_directory = LLFIO_V2_NAMESPACE::errc::no_such_file_or_directory;
   static const il_result<void> file_exists = LLFIO_V2_NAMESPACE::errc::file_exists;
   static const il_result<void> is_a_directory = LLFIO_V2_NAMESPACE::errc::is_a_directory;
+  static const il_result<void> directory_not_empty = LLFIO_V2_NAMESPACE::errc::directory_not_empty;
   static const il_result<void> permission_denied = LLFIO_V2_NAMESPACE::errc::permission_denied;
 
   // clang-format off
@@ -94,9 +95,11 @@ template <class U> inline void directory_handle_create_close_creation(U &&f)
       {               file_exists, { directory_handle::mode::write, directory_handle::creation::only_if_not_exist, directory_handle::flag::none, &entries, &info }, { "existing0"    }, { "existing0"    },{ success() } },
       {                 success(), { directory_handle::mode::write, directory_handle::creation::if_needed        , directory_handle::flag::none, &entries, &info }, { "non-existing" }, { "existing0"    },{ success() } },
       {                 success(), { directory_handle::mode::write, directory_handle::creation::if_needed        , directory_handle::flag::none, &entries, &info }, { "existing1"    }, { "existing1"    },{ success() } },
-      {            is_a_directory, { directory_handle::mode::write, directory_handle::creation::truncate         , directory_handle::flag::none, &entries, &info }, { "non-existing" }, { "non-existing" },{ success() } },
-      {            is_a_directory, { directory_handle::mode::write, directory_handle::creation::truncate         , directory_handle::flag::none, &entries, &info }, { "existing0"    }, { "existing0"    },{ success() } },
-      {            is_a_directory, { directory_handle::mode::write, directory_handle::creation::truncate         , directory_handle::flag::none, &entries, &info }, { "existing1"    }, { "existing1"    },{ success() } }
+      {            is_a_directory, { directory_handle::mode::write, directory_handle::creation::truncate_existing, directory_handle::flag::none, &entries, &info }, { "non-existing" }, { "non-existing" },{ success() } },
+      {            is_a_directory, { directory_handle::mode::write, directory_handle::creation::truncate_existing, directory_handle::flag::none, &entries, &info }, { "existing0"    }, { "existing0"    },{ success() } },
+      {            is_a_directory, { directory_handle::mode::write, directory_handle::creation::truncate_existing, directory_handle::flag::none, &entries, &info }, { "existing1"    }, { "existing1"    },{ success() } },
+      {                 success(), { directory_handle::mode::write, directory_handle::creation::always_new       , directory_handle::flag::none, &entries, &info }, { "non-existing" }, { "existing0"    },{ success() } },
+      {       directory_not_empty, { directory_handle::mode::write, directory_handle::creation::always_new       , directory_handle::flag::none, &entries, &info }, { "existing1"    }, { "existing1"    },{ success() } }
     },
     precondition::filesystem_setup(),                
     postcondition::filesystem_comparison_structure(),

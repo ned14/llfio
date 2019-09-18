@@ -202,7 +202,8 @@ public:
       return {std::move(mfh)};
     }
     case creation::only_if_not_exist:
-    case creation::truncate:
+    case creation::truncate_existing:
+    case creation::always_new:
     {
       // Don't attempt mapping now as file will be empty
       mapped_file_handle mfh(std::move(fh));

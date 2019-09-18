@@ -46,6 +46,32 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   }
   if(-1 == nativeh.fd)
   {
+    if((mode::write == _mode || mode::append == _mode) && creation::always_new == _creation && EEXIST == errno)
+    {
+      // Take a path handle to the directory containing the file
+      auto path_parent = path.parent_path();
+      path_handle dirh;
+      if(base.is_valid() && path_parent.empty())
+      {
+        OUTCOME_TRY(dh, base.clone());
+        dirh = std::move(dh);
+      }
+      else if(!path_parent.empty())
+      {
+        OUTCOME_TRY(dh, path_handle::path(base, path_parent));
+        dirh = std::move(dh);
+      }
+      // Create a randomly named file, and rename it over
+      OUTCOME_TRY(rfh, random_file(dirh, _mode, _caching, flags));
+      auto r = rfh.relink(dirh, path.filename());
+      if(r)
+      {
+        return std::move(rfh);
+      }
+      // If failed to rename, remove
+      (void) rfh.unlink();
+      return r.error();
+    }
     return posix_error();
   }
   if((flags & flag::disable_prefetching) || (flags & flag::maximum_prefetching))
@@ -64,7 +90,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
     }
 #endif
   }
-  if(_creation == creation::truncate && ret.value().are_safety_barriers_issued())
+  if(_creation == creation::truncate_existing && ret.value().are_safety_barriers_issued())
   {
     fsync(nativeh.fd);
   }
@@ -217,7 +243,7 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
 #ifdef O_DSYNC
                    | O_DSYNC
 #endif
-                   );
+      );
       switch(caching_)
       {
       case caching::unchanged:
