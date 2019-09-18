@@ -70,8 +70,11 @@ inline result<int> attribs_from_handle_mode_caching_and_flags(native_handle_type
   case handle::creation::if_needed:
     attribs |= O_CREAT;
     break;
-  case handle::creation::truncate:
+  case handle::creation::truncate_existing:
     attribs |= O_TRUNC;
+    break;
+  case handle::creation::always_new:
+    attribs |= O_CREAT | O_EXCL;
     break;
   }
   switch(_caching)

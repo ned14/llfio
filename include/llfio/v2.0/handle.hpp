@@ -77,7 +77,8 @@ public:
     open_existing = 0,  //!< Filesystem entry must already exist
     only_if_not_exist,  //!< Filesystem entry must NOT exist, and is atomically created by the success of this operation
     if_needed,          //!< If filesystem entry exists that is used, else one is created
-    truncate            //!< Filesystem entry must already exist. It is atomically truncated on open, leaving creation date and unique identifier unmodified.
+    truncate_existing,  //!< Filesystem entry must already exist. It is atomically truncated on open, leaving creation date and unique identifier unmodified.
+    always_new          //!< If filesystem entry exists, it is atomically replaced with a new inode, else a new entry is created.
                         // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
   };
   //! What i/o on the handle may complete immediately due to kernel caching
@@ -94,94 +95,92 @@ public:
                              // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
   };
   //! Bitwise flags which can be specified
-  QUICKCPPLIB_BITFIELD_BEGIN(flag)
-  {
-    none = 0,  //!< No flags
-    /*! Unlinks the file on handle close. On POSIX, this simply unlinks whatever is pointed
-    to by `path()` upon the call of `close()` if and only if the inode matches. On Windows,
-    if you are on Windows 10 1709 or later, exactly the same thing occurs. If on previous
-    editions of Windows, the file entry does not disappears but becomes unavailable for
-    anyone else to open with an `errc::resource_unavailable_try_again` error return. Because this is confusing, unless the
-    `win_disable_unlink_emulation` flag is also specified, this POSIX behaviour is
-    somewhat emulated by LLFIO on older Windows by renaming the file to a random name on `close()`
-    causing it to appear to have been unlinked immediately.
-    */
-    unlink_on_first_close = 1U << 0U,
+  QUICKCPPLIB_BITFIELD_BEGIN(flag){
+  none = 0,  //!< No flags
+  /*! Unlinks the file on handle close. On POSIX, this simply unlinks whatever is pointed
+  to by `path()` upon the call of `close()` if and only if the inode matches. On Windows,
+  if you are on Windows 10 1709 or later, exactly the same thing occurs. If on previous
+  editions of Windows, the file entry does not disappears but becomes unavailable for
+  anyone else to open with an `errc::resource_unavailable_try_again` error return. Because this is confusing, unless the
+  `win_disable_unlink_emulation` flag is also specified, this POSIX behaviour is
+  somewhat emulated by LLFIO on older Windows by renaming the file to a random name on `close()`
+  causing it to appear to have been unlinked immediately.
+  */
+  unlink_on_first_close = 1U << 0U,
 
-    /*! Some kernel caching modes have unhelpfully inconsistent behaviours
-    in getting your data onto storage, so by default unless this flag is
-    specified LLFIO adds extra fsyncs to the following operations for the
-    caching modes specified below:
-    * truncation of file length either explicitly or during file open.
-    * closing of the handle either explicitly or in the destructor.
+  /*! Some kernel caching modes have unhelpfully inconsistent behaviours
+  in getting your data onto storage, so by default unless this flag is
+  specified LLFIO adds extra fsyncs to the following operations for the
+  caching modes specified below:
+  * truncation of file length either explicitly or during file open.
+  * closing of the handle either explicitly or in the destructor.
 
-    Additionally on Linux only to prevent loss of file metadata:
-    * On the parent directory whenever a file might have been created.
-    * On the parent directory on file close.
+  Additionally on Linux only to prevent loss of file metadata:
+  * On the parent directory whenever a file might have been created.
+  * On the parent directory on file close.
 
-    This only occurs for these kernel caching modes:
-    * caching::none
-    * caching::reads
-    * caching::reads_and_metadata
-    * caching::safety_barriers
-    */
-    disable_safety_barriers = 1U << 2U,
-    /*! `file_handle::unlink()` could accidentally delete the wrong file if someone has
-    renamed the open file handle since the time it was opened. To prevent this occuring,
-    where the OS doesn't provide race free unlink-by-open-handle we compare the inode of
-    the path we are about to unlink with that of the open handle before unlinking.
-    \warning This does not prevent races where in between the time of checking the inode
-    and executing the unlink a third party changes the item about to be unlinked. Only
-    operating systems with a true race-free unlink syscall are race free.
-    */
-    disable_safety_unlinks = 1U << 3U,
-    /*! Ask the OS to disable prefetching of data. This can improve random
-    i/o performance.
-    */
-    disable_prefetching = 1U << 4U,
-    /*! Ask the OS to maximise prefetching of data, possibly prefetching the entire file
-    into kernel cache. This can improve sequential i/o performance.
-    */
-    maximum_prefetching = 1U << 5U,
+  This only occurs for these kernel caching modes:
+  * caching::none
+  * caching::reads
+  * caching::reads_and_metadata
+  * caching::safety_barriers
+  */
+  disable_safety_barriers = 1U << 2U,
+  /*! `file_handle::unlink()` could accidentally delete the wrong file if someone has
+  renamed the open file handle since the time it was opened. To prevent this occuring,
+  where the OS doesn't provide race free unlink-by-open-handle we compare the inode of
+  the path we are about to unlink with that of the open handle before unlinking.
+  \warning This does not prevent races where in between the time of checking the inode
+  and executing the unlink a third party changes the item about to be unlinked. Only
+  operating systems with a true race-free unlink syscall are race free.
+  */
+  disable_safety_unlinks = 1U << 3U,
+  /*! Ask the OS to disable prefetching of data. This can improve random
+  i/o performance.
+  */
+  disable_prefetching = 1U << 4U,
+  /*! Ask the OS to maximise prefetching of data, possibly prefetching the entire file
+  into kernel cache. This can improve sequential i/o performance.
+  */
+  maximum_prefetching = 1U << 5U,
 
-    win_disable_unlink_emulation = 1U << 24U,  //!< See the documentation for `unlink_on_first_close`
-    /*! Microsoft Windows NTFS, having been created in the late 1980s, did not originally
-    implement extents-based storage and thus could only represent sparse files via
-    efficient compression of intermediate zeros. With NTFS v3.0 (Microsoft Windows 2000),
-    a proper extents-based on-storage representation was added, thus allowing only 64Kb
-    extent chunks written to be stored irrespective of whatever the maximum file extent
-    was set to.
+  win_disable_unlink_emulation = 1U << 24U,  //!< See the documentation for `unlink_on_first_close`
+  /*! Microsoft Windows NTFS, having been created in the late 1980s, did not originally
+  implement extents-based storage and thus could only represent sparse files via
+  efficient compression of intermediate zeros. With NTFS v3.0 (Microsoft Windows 2000),
+  a proper extents-based on-storage representation was added, thus allowing only 64Kb
+  extent chunks written to be stored irrespective of whatever the maximum file extent
+  was set to.
 
-    For various historical reasons, extents-based storage is disabled by default in newly
-    created files on NTFS, unlike in almost every other major filing system. You have to
-    explicitly "opt in" to extents-based storage.
+  For various historical reasons, extents-based storage is disabled by default in newly
+  created files on NTFS, unlike in almost every other major filing system. You have to
+  explicitly "opt in" to extents-based storage.
 
-    As extents-based storage is nearly cost free on NTFS, LLFIO by default opts in to
-    extents-based storage for any empty file it creates. If you don't want this, you
-    can specify this flag to prevent that happening.
-    */
-    win_disable_sparse_file_creation = 1U << 25U,
-    /*! Filesystems tend to be embarrassingly parallel for operations performed to different
-    inodes. Where LLFIO performs i/o to multiple inodes at a time, it will use OpenMP or
-    the Parallelism or Concurrency standard library extensions to usually complete the
-    operation in constant rather than linear time. If you don't want this default, you can
-    disable default using this flag.
-    */
-    disable_parallelism = 1U << 26U,
-    /*! Microsoft Windows NTFS has the option, when creating a directory, to set whether
-    leafname lookup will be case sensitive. This is the only way of getting exact POSIX
-    semantics on Windows without resorting to editing the system registry, however it also
-    affects all code doing lookups within that directory, so we must default it to off.
-    */
-    win_create_case_sensitive_directory = 1U << 27U,
+  As extents-based storage is nearly cost free on NTFS, LLFIO by default opts in to
+  extents-based storage for any empty file it creates. If you don't want this, you
+  can specify this flag to prevent that happening.
+  */
+  win_disable_sparse_file_creation = 1U << 25U,
+  /*! Filesystems tend to be embarrassingly parallel for operations performed to different
+  inodes. Where LLFIO performs i/o to multiple inodes at a time, it will use OpenMP or
+  the Parallelism or Concurrency standard library extensions to usually complete the
+  operation in constant rather than linear time. If you don't want this default, you can
+  disable default using this flag.
+  */
+  disable_parallelism = 1U << 26U,
+  /*! Microsoft Windows NTFS has the option, when creating a directory, to set whether
+  leafname lookup will be case sensitive. This is the only way of getting exact POSIX
+  semantics on Windows without resorting to editing the system registry, however it also
+  affects all code doing lookups within that directory, so we must default it to off.
+  */
+  win_create_case_sensitive_directory = 1U << 27U,
 
-    // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
+  // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
 
-    overlapped = 1U << 28U,          //!< On Windows, create any new handles with OVERLAPPED semantics
-    byte_lock_insanity = 1U << 29U,  //!< Using insane POSIX byte range locks
-    anonymous_inode = 1U << 30U      //!< This is an inode created with no representation on the filing system
-  }
-  QUICKCPPLIB_BITFIELD_END(flag);
+  overlapped = 1U << 28U,          //!< On Windows, create any new handles with OVERLAPPED semantics
+  byte_lock_insanity = 1U << 29U,  //!< Using insane POSIX byte range locks
+  anonymous_inode = 1U << 30U      //!< This is an inode created with no representation on the filing system
+  } QUICKCPPLIB_BITFIELD_END(flag);
 
 protected:
   caching _caching{caching::none};
@@ -192,14 +191,22 @@ public:
   //! Default constructor
   constexpr handle() {}  // NOLINT
   //! Construct a handle from a supplied native handle
-  explicit constexpr handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none) noexcept : _caching(caching), _flags(flags), _v(std::move(h)) {}
+  explicit constexpr handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none) noexcept
+      : _caching(caching)
+      , _flags(flags)
+      , _v(std::move(h))
+  {
+  }
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~handle();
   //! No copy construction (use clone())
   handle(const handle &) = delete;
   //! No copy assignment
   handle &operator=(const handle &o) = delete;
   //! Move the handle.
-  constexpr handle(handle &&o) noexcept : _caching(o._caching), _flags(o._flags), _v(std::move(o._v))
+  constexpr handle(handle &&o) noexcept
+      : _caching(o._caching)
+      , _flags(o._flags)
+      , _v(std::move(o._v))
   {
     o._caching = caching::none;
     o._flags = flag::none;
@@ -350,7 +357,7 @@ inline std::ostream &operator<<(std::ostream &s, const handle::mode &v)
 }
 inline std::ostream &operator<<(std::ostream &s, const handle::creation &v)
 {
-  static constexpr const char *values[] = {"open_existing", "only_if_not_exist", "if_needed", "truncate"};
+  static constexpr const char *values[] = {"open_existing", "only_if_not_exist", "if_needed", "truncate_existing", "always_new"};
   if(static_cast<size_t>(v) >= sizeof(values) / sizeof(values[0]) || (values[static_cast<size_t>(v)] == nullptr))  // NOLINT
   {
     return s << "llfio::handle::creation::<unknown>";
@@ -484,7 +491,7 @@ namespace detail
 #endif
     }
   }
-}
+}  // namespace detail
 #endif
 
 #if LLFIO_EXPERIMENTAL_STATUS_CODE
@@ -563,7 +570,7 @@ namespace detail
     (void) buffer;
     LLFIO_LOG_INFO(inst->native_handle()._init, buffer);
   }
-}
+}  // namespace detail
 
 // BEGIN make_free_functions.py
 //! Swap with another instance

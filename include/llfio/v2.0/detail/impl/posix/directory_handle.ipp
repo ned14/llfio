@@ -67,7 +67,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     _mode = mode::read;
   }
   // Also trying to truncate a directory returns EISDIR
-  if(_creation == creation::truncate)
+  if(_creation == creation::truncate_existing)
   {
     return errc::is_a_directory;
   }
@@ -85,15 +85,50 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     path = ".";
   }
   path_view::c_str zpath(path);
+  auto rename_random_dir_over_existing_dir = [_mode, _caching, flags](const path_handle &base, path_view_type path) -> result<directory_handle> {
+    // Take a path handle to the directory containing the file
+    auto path_parent = path.parent_path();
+    path_handle dirh;
+    if(base.is_valid() && path_parent.empty())
+    {
+      OUTCOME_TRY(dh, base.clone());
+      dirh = std::move(dh);
+    }
+    else if(!path_parent.empty())
+    {
+      OUTCOME_TRY(dh, path_handle::path(base, path_parent));
+      dirh = std::move(dh);
+    }
+    // Create a randomly named directory, and rename it over
+    OUTCOME_TRY(rfh, random_directory(dirh, _mode, _caching, flags));
+    auto r = rfh.relink(dirh, path.filename());
+    if(r)
+    {
+      return std::move(rfh);
+    }
+    // If failed to rename, remove
+    (void) rfh.unlink();
+    return std::move(r).error();
+  };
   if(base.is_valid())
   {
-    if(_creation == creation::if_needed || _creation == creation::only_if_not_exist)
+    if(_creation == creation::if_needed || _creation == creation::only_if_not_exist || _creation == creation::always_new)
     {
       if(-1 == ::mkdirat(base.native_handle().fd, zpath.buffer, 0x1f8 /*770*/))
       {
         if(EEXIST != errno || _creation == creation::only_if_not_exist)
         {
           return posix_error();
+        }
+        if(_creation == creation::always_new)
+        {
+          auto r = rename_random_dir_over_existing_dir(base, path);
+          if(!r)
+          {
+            return std::move(r).error();
+          }
+          ret = std::move(r).value();
+          goto opened;
         }
       }
       attribs &= ~(O_CREAT | O_EXCL);
@@ -102,13 +137,23 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
   }
   else
   {
-    if(_creation == creation::if_needed || _creation == creation::only_if_not_exist)
+    if(_creation == creation::if_needed || _creation == creation::only_if_not_exist || _creation == creation::always_new)
     {
       if(-1 == ::mkdir(zpath.buffer, 0x1f8 /*770*/))
       {
         if(EEXIST != errno || _creation == creation::only_if_not_exist)
         {
           return posix_error();
+        }
+        if(_creation == creation::always_new)
+        {
+          auto r = rename_random_dir_over_existing_dir(base, path);
+          if(!r)
+          {
+            return std::move(r).error();
+          }
+          ret = std::move(r).value();
+          goto opened;
         }
       }
       attribs &= ~(O_CREAT | O_EXCL);
@@ -119,6 +164,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
   {
     return posix_error();
   }
+opened:
   if(!(flags & flag::disable_safety_unlinks))
   {
     if(!ret.value()._fetch_inode())

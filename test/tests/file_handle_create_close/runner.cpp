@@ -74,9 +74,11 @@ template <class U> inline void file_handle_create_close_creation(U &&f)
       {               file_exists, { file_handle::mode::write, file_handle::creation::only_if_not_exist, file_handle::flag::none }, { "existing0"    }, { "existing0"    }},
       {                 success(), { file_handle::mode::write, file_handle::creation::if_needed        , file_handle::flag::none }, { "non-existing" }, { "existing0"    }},
       {                 success(), { file_handle::mode::write, file_handle::creation::if_needed        , file_handle::flag::none }, { "existing1"    }, { "existing1"    }},
-      { no_such_file_or_directory, { file_handle::mode::write, file_handle::creation::truncate         , file_handle::flag::none }, { "non-existing" }, { "non-existing" }},
-      {                 success(), { file_handle::mode::write, file_handle::creation::truncate         , file_handle::flag::none }, { "existing0"    }, { "existing0"    }},
-      {                 success(), { file_handle::mode::write, file_handle::creation::truncate         , file_handle::flag::none }, { "existing1"    }, { "existing0"    }},
+      { no_such_file_or_directory, { file_handle::mode::write, file_handle::creation::truncate_existing, file_handle::flag::none }, { "non-existing" }, { "non-existing" }},
+      {                 success(), { file_handle::mode::write, file_handle::creation::truncate_existing, file_handle::flag::none }, { "existing0"    }, { "existing0"    }},
+      {                 success(), { file_handle::mode::write, file_handle::creation::truncate_existing, file_handle::flag::none }, { "existing1"    }, { "existing0"    }},
+      {                 success(), { file_handle::mode::write, file_handle::creation::always_new       , file_handle::flag::none }, { "non-existing" }, { "existing0"    }},
+      {                 success(), { file_handle::mode::write, file_handle::creation::always_new       , file_handle::flag::none }, { "existing1"    }, { "existing0"    }},
 
       // Does the flag parameter have the expected side effects?
       {                 success(), { file_handle::mode::write, file_handle::creation::open_existing, file_handle::flag::unlink_on_first_close }, { "existing1" }, { "non-existing" }}

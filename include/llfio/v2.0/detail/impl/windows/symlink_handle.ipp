@@ -44,9 +44,36 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
   LLFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::symlink;
   DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
-  if(_mode == mode::append || _creation == creation::truncate)
+  if(_mode == mode::append || _creation == creation::truncate_existing)
   {
     return errc::function_not_supported;
+  }
+  static int obtained_privilege;
+  if(_creation != creation::open_existing)
+  {
+    if(0 == obtained_privilege)
+    {
+      // Attempt to enable SeCreateSymbolicLinkPrivilege
+      obtained_privilege = 2;
+      HANDLE token;
+      if(OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &token))
+      {
+        TOKEN_PRIVILEGES privs = {1};
+        if(LookupPrivilegeValue(NULL, SE_CREATE_SYMBOLIC_LINK_NAME, &privs.Privileges[0].Luid))
+        {
+          privs.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+          if(AdjustTokenPrivileges(token, FALSE, &privs, 0, NULL, NULL) && GetLastError() == S_OK)
+          {
+            obtained_privilege = 1;
+          }
+        }
+        CloseHandle(token);
+      }
+    }
+    if(1 != obtained_privilege)
+    {
+      return errc::function_not_supported;
+    }
   }
   OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode, flags));
   OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, caching::all, flags));
@@ -64,8 +91,11 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
     case creation::if_needed:
       creatdisp = 0x00000003 /*FILE_OPEN_IF*/;
       break;
-    case creation::truncate:
+    case creation::truncate_existing:
       creatdisp = 0x00000004 /*FILE_OVERWRITE*/;
+      break;
+    case creation::always_new:
+      creatdisp = 0x00000000 /*FILE_SUPERSEDE*/;
       break;
     }
 
@@ -120,8 +150,11 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
     case creation::if_needed:
       creation = OPEN_ALWAYS;
       break;
-    case creation::truncate:
+    case creation::truncate_existing:
       creation = TRUNCATE_EXISTING;
+      break;
+    case creation::always_new:
+      creation = CREATE_ALWAYS;
       break;
     }
     // required to open a symlink

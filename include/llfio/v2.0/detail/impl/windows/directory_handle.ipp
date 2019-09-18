@@ -41,14 +41,17 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
   nativeh.behaviour |= native_handle_type::disposition::directory;
   DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
   // Trying to truncate a directory returns EISDIR rather than some internal Win32 error code uncomparable to errc
-  if(_creation == creation::truncate)
+  if(_creation == creation::truncate_existing)
   {
     return errc::is_a_directory;
   }
   OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode, flags));
   OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
   /* It is super important that we remove the DELETE permission for directories as otherwise relative renames
-  will always fail due to an unfortunate design choice by Microsoft.
+  will always fail due to an unfortunate design choice by Microsoft. This breaks renaming by open handle,
+  see relink() for the hack workaround. It also breaks creation::always_new, which ought to be implemented
+  by opening the handle with DELETE, then reopening the file without DELETE, which I haven't bothered
+  doing below (pull requests are welcome!).
   */
   access &= ~DELETE;
   bool need_to_set_case_sensitive = false;
@@ -65,8 +68,13 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     case creation::if_needed:
       creatdisp = 0x00000003 /*FILE_OPEN_IF*/;
       break;
-    case creation::truncate:
+    case creation::truncate_existing:
       creatdisp = 0x00000004 /*FILE_OVERWRITE*/;
+      break;
+    case creation::always_new:
+      // creatdisp = 0x00000000 /*FILE_SUPERSEDE*/;
+      // Superseding won't work without DELETE permission, so ...
+      creatdisp = 0x00000002 /*FILE_CREATE*/;
       break;
     }
 
@@ -104,6 +112,10 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     }
     if(ntstat < 0)
     {
+      if(creation::always_new == _creation && 0xc0000035 /*STATUS_OBJECT_NAME_COLLISION*/ == ntstat)
+      {
+        return errc::directory_not_empty;
+      }
       return ntkernel_error(ntstat);
     }
     switch(_creation)
@@ -117,7 +129,8 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     case creation::if_needed:
       need_to_set_case_sensitive = (isb.Information == 2 /*FILE_CREATED*/);
       break;
-    case creation::truncate:
+    case creation::truncate_existing:
+    case creation::always_new:
       need_to_set_case_sensitive = true;
       break;
     }
@@ -135,8 +148,13 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     case creation::if_needed:
       creation = OPEN_ALWAYS;
       break;
-    case creation::truncate:
+    case creation::truncate_existing:
       creation = TRUNCATE_EXISTING;
+      break;
+    case creation::always_new:
+      // creation = CREATE_ALWAYS;
+      // Superseding won't work without DELETE permission, so ...
+      creation = CREATE_NEW;
       break;
     }
     attribs |= FILE_FLAG_BACKUP_SEMANTICS;  // required to open a directory
@@ -144,6 +162,10 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.buffer, access, fileshare, nullptr, creation, attribs, nullptr, true)))  // NOLINT
     {
       DWORD errcode = GetLastError();
+      if(creation::always_new == _creation && 0xb7 /*ERROR_ALREADY_EXISTS*/ == errcode)
+      {
+        return errc::directory_not_empty;
+      }
       // assert(false);
       return win32_error(errcode);
     }
@@ -158,7 +180,8 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     case creation::if_needed:
       need_to_set_case_sensitive = (GetLastError() != ERROR_ALREADY_EXISTS);  // FIXME: doesn't appear to detect when new directory not created
       break;
-    case creation::truncate:
+    case creation::truncate_existing:
+    case creation::always_new:
       need_to_set_case_sensitive = true;
       break;
     }

@@ -286,7 +286,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::symlink;
-  if(_mode == mode::append || _creation == creation::truncate)
+  if(_mode == mode::append || _creation == creation::truncate_existing)
   {
     return errc::function_not_supported;
   }
@@ -344,7 +344,8 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
   }
   case creation::only_if_not_exist:
   case creation::if_needed:
-  case creation::truncate:
+  case creation::truncate_existing:
+  case creation::always_new:
   {
     // Create an empty symlink, ignoring any file exists errors, unless only_if_not_exist
     auto r = ret.value()._create_symlink(dirh, leafname,
@@ -353,7 +354,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
 #else
                                          "",
 #endif
-                                         std::chrono::seconds(10), false);
+                                         std::chrono::seconds(10), creation::always_new == _creation);
     if(!r)
     {
       if(_creation == creation::only_if_not_exist || r.error() != errc::file_exists)
