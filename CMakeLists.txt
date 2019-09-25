@@ -119,30 +119,65 @@ endif()
 include(QuickCppLibMakeDoxygen)
 # Set the standard definitions for these libraries and bring in the all_* helper functions
 include(QuickCppLibApplyDefaultDefinitions)
+
 # Do we have the Coroutines TS?
-function(CheckCXXHasCoroutines iter flags)
-  set(CMAKE_REQUIRED_FLAGS "${flags}")
+function(CheckCXXHasCoroutines iter)
+  set(CMAKE_REQUIRED_FLAGS ${ARGN})
   check_cxx_source_compiles("
-#include <future>
-std::future<int> g() { co_return 0; }
+#if __has_include(<coroutine>)
+#include <coroutine>
+using std::suspend_never;
+#elif __has_include(<experimental/coroutine>)
+#include <experimental/coroutine>
+using std::experimental::suspend_never;
+#endif
+class resumable{
+public:
+  struct promise_type
+  {
+    resumable get_return_object() { return {}; }
+    auto initial_suspend() { return suspend_never(); }
+    auto final_suspend() { return suspend_never(); }
+    int return_value(int x) { return x; }
+    void unhandled_exception();
+  };
+  bool resume() { return true; }
+  int get() { return 0; }
+};
+resumable g() { co_return 0; }
 int main() { return g().get(); }
 " CXX_HAS_COROUTINES${iter})
   set(CXX_HAS_COROUTINES${iter} ${CXX_HAS_COROUTINES${iter}} PARENT_SCOPE)
 endfunction()
 include(CheckCXXSourceCompiles)
-if(MSVC)
-  CheckCXXHasCoroutines(_MSVC "/await")
-  if(CXX_HAS_COROUTINES_MSVC)
-    all_compile_options(PUBLIC "/await")
-    all_compile_definitions(PUBLIC "LLFIO_HAVE_COROUTINES=1")
+set(HAVE_COROUTINES 0)
+CheckCXXHasCoroutines(_BY_DEFAULT)
+if(CXX_HAS_COROUTINES_BY_DEFAULT)
+  set(HAVE_COROUTINES 1)
+endif()
+if(NOT HAVE_COROUTINES)
+  if(MSVC)
+    CheckCXXHasCoroutines(_MSVC "/await")
+    if(CXX_HAS_COROUTINES_MSVC)
+      add_compile_options("/await")
+      set(HAVE_COROUTINES 1)
+    endif()
+  endif()
+  if(CLANG OR GCC)
+    CheckCXXHasCoroutines(_CLANG_GCC "-fcoroutines-ts")
+    if(CXX_HAS_COROUTINES_CLANG_GCC)
+      add_compile_options("-fcoroutines-ts")
+      set(HAVE_COROUTINES 1)
+    endif()
+    CheckCXXHasCoroutines(_CLANG_GCC_LIBCXX "-stdlib=libc++ -fcoroutines-ts")
+    if(CXX_HAS_COROUTINES_CLANG_GCC_LIBCXX)
+      add_compile_options("-stdlib=libc++ -fcoroutines-ts")
+      set(HAVE_COROUTINES 1)
+    endif()
   endif()
 endif()
-if(CLANG OR GCC)
-  CheckCXXHasCoroutines(_CLANG_GCC "-fcoroutines-ts")
-  if(CXX_HAS_COROUTINES_CLANG_GCC)
-    all_compile_options(PUBLIC "-fcoroutines-ts")
-    all_compile_definitions(PUBLIC "LLFIO_HAVE_COROUTINES=1")
-  endif()
+if(HAVE_COROUTINES)
+  all_compile_definitions(PUBLIC "LLFIO_HAVE_COROUTINES=1")
 endif()
 
 # Set the C++ features this library requires
