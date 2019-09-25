@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "file_handle.hpp"
 
-#include "quickcpplib/include/algorithm/small_prng.hpp"
+#include "quickcpplib/algorithm/small_prng.hpp"
 
 //! \file fast_random_file_handle.hpp Provides `fast_random_file_handle`.
 
@@ -271,7 +271,7 @@ public:
   }
 
   LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool /* unused */ = false, bool /* unused */ = false, deadline /* unused */ = deadline()) noexcept override
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), barrier_kind /*unused*/ = barrier_kind::nowait_data_only, deadline /* unused */ = deadline()) noexcept override
   {
     OUTCOME_TRY(_perms_check());
     // Return null written

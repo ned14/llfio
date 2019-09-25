@@ -24,7 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../../../utils.hpp"
 
-#include "../../../quickcpplib/include/spinlock.hpp"
+#include "quickcpplib/spinlock.hpp"
 #include "import.hpp"
 
 LLFIO_V2_NAMESPACE_BEGIN

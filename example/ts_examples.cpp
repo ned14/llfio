@@ -72,6 +72,7 @@ inline io_handle::buffers_type read_all(io_handle &h, io_handle::io_request<io_h
     }
     // Partial fill buffers with current request
     io_handle::buffers_type filled = h.read(creq, nd) VALUE;
+    (void) filled;
 
     // Adjust output buffers by what was filled, and prepare input
     // buffers for next round of partial fill

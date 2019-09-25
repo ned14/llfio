@@ -327,7 +327,7 @@ public:
   }
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override;
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override { return _mh.barrier(reqs, wait_for_device, and_metadata, d); }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), barrier_kind kind = barrier_kind::nowait_data_only, deadline d = deadline()) noexcept override { return _mh.barrier(reqs, kind, d); }
   result<mapped_file_handle> clone(size_type reservation, mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept
   {
     OUTCOME_TRY(fh, file_handle::clone(mode_, caching_, d));

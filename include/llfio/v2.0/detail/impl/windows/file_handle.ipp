@@ -294,7 +294,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   }
 }
 
-file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(file_handle::io_request<file_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
+file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(file_handle::io_request<file_handle::const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -309,11 +309,11 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
   auto *isb = reinterpret_cast<IO_STATUS_BLOCK *>(&ol);
   *isb = make_iostatus();
   ULONG flags = 0;
-  if(!wait_for_device && !and_metadata)
+  if(kind == barrier_kind::nowait_data_only)
   {
-    flags = 1 /*FLUSH_FLAGS_FILE_DATA_ONLY*/;
+    flags = 1 /*FLUSH_FLAGS_FILE_DATA_ONLY*/;  // note this doesn't block
   }
-  else if(!wait_for_device)
+  else if(kind == barrier_kind::nowait_all)
   {
     flags = 2 /*FLUSH_FLAGS_NO_SYNC*/;
   }

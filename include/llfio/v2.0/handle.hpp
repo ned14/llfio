@@ -242,8 +242,8 @@ public:
   (deleted) path for file inodes no longer cached by the kernel path cache, LLFIO cannot
   detect the difference. FreeBSD will also return any path leading to the inode if it is
   hard linked. FreeBSD does implement path retrieval for directory inodes
-  correctly however, and see `algorithm::stablized_path<T>` for a handle adapter which
-  makes use of that.
+  correctly however, and see `algorithm::cached_parent_handle_adapter<T>` for a handle
+  adapter which makes use of that.
 
   On Linux if `/proc` is not mounted, this call fails with an error. All APIs in LLFIO
   which require the use of `current_path()` can be told to not use it e.g. `flag::disable_safety_unlinks`.

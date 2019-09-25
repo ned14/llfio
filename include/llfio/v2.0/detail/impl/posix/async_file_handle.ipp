@@ -32,11 +32,11 @@ Distributed under the Boost Software License, Version 1.0.
 
 LLFIO_V2_NAMESPACE_BEGIN
 
-async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_handle::barrier(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
+async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_handle::barrier(async_file_handle::io_request<async_file_handle::const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   optional<io_result<const_buffers_type>> ret;
-  OUTCOME_TRY(io_state, async_barrier(reqs, [&ret](async_file_handle *, io_result<const_buffers_type> &&result) { ret = std::move(result); }, wait_for_device, and_metadata));
+  OUTCOME_TRY(io_state, async_barrier(reqs, [&ret](async_file_handle *, io_result<const_buffers_type> &&result) { ret = std::move(result); }, kind));
   (void) io_state;
 
   // While i/o is not done pump i/o completion

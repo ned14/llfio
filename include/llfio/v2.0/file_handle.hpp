@@ -219,7 +219,7 @@ public:
   }
 
   LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), barrier_kind kind = barrier_kind::nowait_data_only, deadline d = deadline()) noexcept override;
 
   /*! Clone this handle (copy constructor is disabled to avoid accidental copying),
   optionally race free reopening the handle with different access or caching.
@@ -293,9 +293,10 @@ public:
   \param bytes The number of bytes to zero.
   \param d An optional deadline by which the i/o must complete, else it is cancelled.
   Note function may return significantly after this deadline if the i/o takes long to cancel.
-  \errors Any of the values POSIX write() can return, `errc::timed_out`, `errc::operation_canceled`. `errc::not_supported` may be
-  returned if deadline i/o is not possible with this particular handle configuration (e.g.
-  writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows).
+  \errors Any of the values POSIX write() can return, `errc::timed_out`, `errc::operation_canceled`.
+  `errc::not_supported` may be returned if deadline i/o is not possible with this particular
+  handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped
+  HANDLE on Windows).
   \mallocs The default synchronous implementation in file_handle performs no memory allocation.
   The asynchronous implementation in async_file_handle may perform one calloc and one free.
   */

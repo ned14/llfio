@@ -30,7 +30,7 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #include "config.hpp"
 
-#include "quickcpplib/include/algorithm/string.hpp"
+#include "quickcpplib/algorithm/string.hpp"
 
 //! \file utils.hpp Provides namespace utils
 

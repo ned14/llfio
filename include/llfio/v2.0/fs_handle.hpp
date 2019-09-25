@@ -28,7 +28,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "path_handle.hpp"
 #include "path_view.hpp"
 
-#include "quickcpplib/include/uint128.hpp"
+#include "quickcpplib/uint128.hpp"
 
 //! \file fs_handle.hpp Provides fs_handle
 
@@ -74,7 +74,9 @@ protected:
   {
   }
   //! Implicit move construction of fs_handle permitted
-  constexpr fs_handle(fs_handle &&o) noexcept : _devid(o._devid), _inode(o._inode)
+  constexpr fs_handle(fs_handle &&o) noexcept
+      : _devid(o._devid)
+      , _inode(o._inode)
   {
     o._devid = 0;
     o._inode = 0;
@@ -142,8 +144,8 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_handle> parent_path_handle(deadline d = std::chrono::seconds(30)) const noexcept;
 
   /*! Relinks the current path of this open handle to the new path specified. If `atomic_replace` is
-  true, the relink \b atomically and silently replaces any item at the new path specified. This operation
-  is both atomic and silent matching POSIX behaviour even on Microsoft Windows where
+  true, the relink \b atomically and silently replaces any item at the new path specified. This
+  operation is both atomic and silent matching POSIX behaviour even on Microsoft Windows where
   no Win32 API can match POSIX semantics.
 
   \warning Some operating systems provide a race free syscall for renaming an open handle (Windows).
@@ -168,11 +170,55 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
   result<void> relink(const path_handle &base, path_view_type path, bool atomic_replace = true, deadline d = std::chrono::seconds(30)) noexcept;
 
-  /*! Unlinks the current path of this open handle, causing its entry to immediately disappear from the filing system.
-  On Windows before Windows 10 1709 unless `flag::win_disable_unlink_emulation` is set, this behaviour is
-  simulated by renaming the file to something random and setting its delete-on-last-close flag.
-  Note that Windows may prevent the renaming of a file in use by another process, if so it will
-  NOT be renamed.
+#if 0  // Not implemented yet for absolutely no good reason
+  /*! Links the inode referred to by this open handle to the path specified. The current path
+  of this open handle is not changed, unless it has no current path due to being unlinked.
+
+  \warning Some operating systems provide a race free syscall for linking an open handle to a new
+  location (Linux, Windows).
+  On all other operating systems this call is \b racy and can result in the wrong inode being
+  linked. Note that unless `flag::disable_safety_unlinks` is set, this implementation opens a
+  `path_handle` to the source containing directory first, then checks before linking that the item
+  about to be hard linked has the same inode as the open file handle. It will retry this matching
+  until success until the deadline given. This should prevent most unmalicious accidental loss of
+  data.
+
+  \param base Base for any relative path.
+  \param path The relative or absolute new path to hard link to.
+  \param d The deadline by which the matching of the containing directory to the open handle's inode
+  must succeed, else `errc::timed_out` will be returned.
+  \mallocs Except on platforms with race free syscalls for renaming open handles (Windows), calls
+  `current_path()` via `parent_path_handle()` and thus is both expensive and calls malloc many times.
+  */
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
+  result<void> link(const path_handle &base, path_view_type path, deadline d = std::chrono::seconds(30)) noexcept;
+
+  /*! Clones the inode referenced by the open handle into a new inode referencing the same extents
+  for the file content, with a copy of the same metadata, apart from ownership which is for the
+  current user. Changes to either inode are guaranteed to not be seen by the other inode i.e. they
+  become completely independent, even though they initially reference the same file content extents.
+  If your filing system supports this call (at the time of writing - Linux: XFS, btrfs, ocfs2, smbfs;
+  Mac OS: APFS; Windows: ReFS, CIFS), this is a very cheap way of copying even very large files.
+  Be aware that on Samba/CIFS, rather than erroring out if the storage filesystem doesn't implement
+  support, this call is implemented by having the remove machine perform the file
+  copy, which is usually much faster than doing the copy over the network.
+
+  \return A file handle instance referring to the cloned inode.
+  \param base Base for any relative path.
+  \param path The relative or absolute new path to clone the inode to.
+  */
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
+  result<file_handle> clone_inode(const path_handle &base,
+                          path_view_type path) noexcept;
+#endif
+
+  /*! Unlinks the current path of this open handle, causing its entry to immediately disappear
+  from the filing system. On Windows before Windows 10 1709 unless
+  `flag::win_disable_unlink_emulation` is set, this behaviour is simulated by renaming the file
+  to something random and setting its delete-on-last-close flag. Note that Windows may prevent
+  the renaming of a file in use by another process, if so it will NOT be renamed.
   After the next handle to that file closes, it will become permanently unopenable by anyone
   else until the last handle is closed, whereupon the entry will be eventually removed by the
   operating system.

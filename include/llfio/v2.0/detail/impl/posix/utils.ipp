@@ -24,17 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../../../utils.hpp"
 
-#ifdef __has_include
-#if __has_include("../../../quickcpplib/include/spinlock.hpp")
-#include "../../../quickcpplib/include/spinlock.hpp"
-#else
-#include "quickcpplib/include/spinlock.hpp"
-#endif
-#elif __PCPP_ALWAYS_TRUE__
-#include "quickcpplib/include/spinlock.hpp"
-#else
-#include "../../../quickcpplib/include/spinlock.hpp"
-#endif
+#include "quickcpplib/spinlock.hpp"
 
 #include <mutex>  // for lock_guard
 
