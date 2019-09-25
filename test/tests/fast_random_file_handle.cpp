@@ -24,15 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../test_kernel_decl.hpp"
 
-#ifdef __has_include
-#if __has_include("../../../include/llfio/v2.0/quickcpplib/include/algorithm/small_prng.hpp")
-#include "../../../include/llfio/v2.0/quickcpplib/include/algorithm/small_prng.hpp"
-#else
-#include "quickcpplib/include/algorithm/small_prng.hpp"
-#endif
-#else
-#include "../../../include/llfio/v2.0/quickcpplib/include/algorithm/small_prng.hpp"
-#endif
+#include "quickcpplib/algorithm/small_prng.hpp"
 
 
 static inline void TestFastRandomFileHandleWorks()

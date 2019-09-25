@@ -24,6 +24,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "include/key_value_store.hpp"
 
+#include <iostream>
+
 namespace stackoverflow
 {
   namespace filesystem = LLFIO_V2_NAMESPACE::filesystem;

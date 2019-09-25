@@ -456,7 +456,7 @@ public:
   //! Releases the mapped view, but does NOT release the native handle.
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override;
   LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept override;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), barrier_kind kind = barrier_kind::nowait_data_only, deadline d = deadline()) noexcept override;
 
   /*! Map unused memory into view, creating new memory if insufficient unused memory is available. Note that the memory mapped by this call may contain non-zero bits (recycled memory) unless `zeroed` is true.
   \param bytes How many bytes to map. Typically will be rounded up to a multiple of the page size (see `page_size()`).
@@ -729,10 +729,6 @@ inline void swap(map_handle &self, map_handle &o) noexcept
 inline result<void> close(map_handle &self) noexcept
 {
   return self.close();
-}
-inline map_handle::io_result<map_handle::const_buffers_type> barrier(map_handle &self, map_handle::io_request<map_handle::const_buffers_type> reqs = map_handle::io_request<map_handle::const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept
-{
-  return self.barrier(std::forward<decltype(reqs)>(reqs), std::forward<decltype(wait_for_device)>(wait_for_device), std::forward<decltype(and_metadata)>(and_metadata), std::forward<decltype(d)>(d));
 }
 /*! Create new memory and map it into view.
 \param bytes How many bytes to create and map. Typically will be rounded up to a multiple of the page size (see `page_size()`) on POSIX, 64Kb on Windows.

@@ -154,17 +154,16 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   }
 }
 
-file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(file_handle::io_request<file_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
+file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(file_handle::io_request<file_handle::const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
 {
-  (void) wait_for_device;
-  (void) and_metadata;
+  (void) kind;
   LLFIO_LOG_FUNCTION_CALL(this);
   if(d)
   {
     return errc::not_supported;
   }
 #ifdef __linux__
-  if(!and_metadata)
+  if(kind == barrier_kind::nowait_data_only || kind == barrier_kind::wait_data_only)
   {
     // Linux has a lovely dedicated syscall giving us exactly what we need here
     extent_type offset = reqs.offset, bytes = 0;
@@ -174,7 +173,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
       bytes += req.size();
     }
     unsigned flags = SYNC_FILE_RANGE_WRITE;  // start writing all dirty pages in range now
-    if(wait_for_device)
+    if(kind == barrier_kind::wait_data_only)
     {
       flags |= SYNC_FILE_RANGE_WAIT_BEFORE | SYNC_FILE_RANGE_WAIT_AFTER;  // block until they're on storage
     }
@@ -185,7 +184,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
   }
 #endif
 #if !defined(__FreeBSD__) && !defined(__APPLE__)  // neither of these have fdatasync()
-  if(!and_metadata)
+  if(kind == barrier_kind::nowait_data_only || kind == barrier_kind::wait_data_only)
   {
     if(-1 == ::fdatasync(_v.fd))
     {
@@ -195,7 +194,7 @@ file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(fil
   }
 #endif
 #ifdef __APPLE__
-  if(!wait_for_device)
+  if(kind == barrier_kind::nowait_data_only || kind == barrier_kind::nowait_all)
   {
     // OS X fsync doesn't wait for the device to flush its buffers
     if(-1 == ::fsync(_v.fd))

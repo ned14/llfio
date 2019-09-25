@@ -26,19 +26,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../utils.hpp"
 #include "import.hpp"
 
-#ifdef __has_include
-#if __has_include("../../../quickcpplib/include/signal_guard.hpp")
-#include "../../../quickcpplib/include/algorithm/hash.hpp"
-#include "../../../quickcpplib/include/signal_guard.hpp"
-#else
-#include "quickcpplib/include/algorithm/hash.hpp"
-#include "quickcpplib/include/signal_guard.hpp"
-#endif
-#else
-#include "quickcpplib/include/algorithm/hash.hpp"
-#include "quickcpplib/include/signal_guard.hpp"
-#endif
-
+#include "quickcpplib/algorithm/hash.hpp"
+#include "quickcpplib/signal_guard.hpp"
 
 LLFIO_V2_NAMESPACE_BEGIN
 
@@ -477,7 +466,7 @@ result<void> map_handle::close() noexcept
     {
       if(is_writable() && (_flag & section_handle::flag::barrier_on_close))
       {
-        OUTCOME_TRYV(barrier({}, true, false));
+        OUTCOME_TRYV(barrier({}, barrier_kind::wait_all));
       }
       OUTCOME_TRYV(win32_maps_apply(_addr, _reservation, win32_map_sought::committed, [](byte *addr, size_t /* unused */) -> result<void> {
         NTSTATUS ntstat = NtUnmapViewOfSection(GetCurrentProcess(), addr);
@@ -510,7 +499,7 @@ native_handle_type map_handle::release() noexcept
   return {};
 }
 
-map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_handle::io_request<map_handle::const_buffers_type> reqs, bool wait_for_device, bool and_metadata, deadline d) noexcept
+map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_handle::io_request<map_handle::const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   byte *addr = _addr + reqs.offset;
@@ -530,7 +519,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
     bytes = _reservation - reqs.offset;
   }
   // If nvram and not syncing metadata, use lightweight barrier
-  if(!and_metadata && is_nvram())
+  if((kind == barrier_kind::nowait_data_only || kind == barrier_kind::wait_data_only) && is_nvram())
   {
     auto synced = nvram_barrier({addr, bytes});
     if(synced.size() >= bytes)
@@ -545,10 +534,10 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_ha
     }
     return success();
   }));
-  if((_section != nullptr) && (_section->backing() != nullptr) && (wait_for_device || and_metadata))
+  if((_section != nullptr) && (_section->backing() != nullptr) && kind != barrier_kind::nowait_data_only)
   {
     reqs.offset += _offset;
-    return _section->backing()->barrier(reqs, wait_for_device, and_metadata, d);
+    return _section->backing()->barrier(reqs, kind, d);
   }
   return {reqs.buffers};
 }

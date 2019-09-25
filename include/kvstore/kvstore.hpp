@@ -27,17 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../llfio/v2.0/file_handle.hpp"
 
-#ifdef __has_include
-#if __has_include("../llfio/v2.0/quickcpplib/include/memory_resource.hpp")
-#include "../llfio/v2.0/quickcpplib/include/memory_resource.hpp"
-#else
-#include "quickcpplib/include/memory_resource.hpp"
-#endif
-#elif __PCPP_ALWAYS_TRUE__
-#include "quickcpplib/include/memory_resource.hpp"
-#else
-#include "../llfio/v2.0/quickcpplib/include/memory_resource.hpp"
-#endif
+#include "quickcpplib/memory_resource.hpp"
 
 //! \file kvstore.hpp Provides the abstract interface for a key-value store.
 

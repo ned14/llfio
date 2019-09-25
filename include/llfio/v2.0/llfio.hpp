@@ -62,27 +62,30 @@ import LLFIO_MODULE_NAME;
 #include "stat.hpp"
 #include "utils.hpp"
 
-#ifndef LLFIO_LEAN_AND_MEAN
+#ifdef LLFIO_INCLUDE_ASYNC_FILE_HANDLE
 #include "async_file_handle.hpp"
 #else
 #include "file_handle.hpp"
 #endif
 #include "directory_handle.hpp"
-#include "mapped.hpp"
 #include "statfs.hpp"
-#ifndef LLFIO_LEAN_AND_MEAN
+#ifdef LLFIO_INCLUDE_STORAGE_PROFILE
 #include "storage_profile.hpp"
 #endif
 #include "fast_random_file_handle.hpp"
 #include "symlink_handle.hpp"
 
 #include "algorithm/handle_adapter/cached_parent.hpp"
-#include "algorithm/handle_adapter/xor.hpp"
 #include "algorithm/shared_fs_mutex/atomic_append.hpp"
 #include "algorithm/shared_fs_mutex/byte_ranges.hpp"
 #include "algorithm/shared_fs_mutex/lock_files.hpp"
-#include "algorithm/shared_fs_mutex/memory_map.hpp"
 #include "algorithm/shared_fs_mutex/safe_byte_ranges.hpp"
+
+#ifndef LLFIO_EXCLUDE_MAPPED_FILE_HANDLE
+#include "mapped.hpp"
+#include "algorithm/handle_adapter/xor.hpp"
+#include "algorithm/shared_fs_mutex/memory_map.hpp"
 #include "algorithm/trivial_vector.hpp"
+#endif
 
 #endif

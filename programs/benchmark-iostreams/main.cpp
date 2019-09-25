@@ -27,11 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define REGIONSIZE (100 * 1024 * 1024)
 
 #include "../../include/llfio/llfio.hpp"
-#if __has_include("quickcpplib/include/algorithm/small_prng.hpp")
-#include "quickcpplib/include/algorithm/small_prng.hpp"
-#else
-#include "../../include/llfio/v2.0/quickcpplib/include/algorithm/small_prng.hpp"
-#endif
+#include "quickcpplib/algorithm/small_prng.hpp"
 
 #include <chrono>
 #include <fstream>
@@ -151,7 +147,7 @@ int main()
     auto th = llfio::file({}, "testfile", llfio::file_handle::mode::write, llfio::file_handle::creation::if_needed).value();
     std::vector<char> buffer(REGIONSIZE, 'a');
     th.write(0, {{(llfio::byte *) buffer.data(), buffer.size()}}).value();
-    th.barrier({}, true, true).value();
+    th.barrier({}, llfio::file_handle::barrier_kind::wait_all).value();
   }
   {
     auto begin = nanoclock();

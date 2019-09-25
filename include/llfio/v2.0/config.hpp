@@ -109,7 +109,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <_mingw.h>
 #endif
 
-#include "quickcpplib/include/cpp_feature.h"
+#include "quickcpplib/cpp_feature.h"
 
 #ifndef __cpp_exceptions
 #error LLFIO needs C++ exceptions to be turned on
@@ -144,7 +144,7 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 
 
-#include "quickcpplib/include/import.h"
+#include "quickcpplib/import.h"
 
 #if defined(LLFIO_UNSTABLE_VERSION) && !defined(LLFIO_DISABLE_ABI_PERMUTATION)
 #include "../revision.hpp"
@@ -214,10 +214,10 @@ class file_handle;
 LLFIO_V2_NAMESPACE_END
 
 // Bring in the Boost-lite macros
-#include "quickcpplib/include/config.hpp"
+#include "quickcpplib/config.hpp"
 #if LLFIO_LOGGING_LEVEL
-#include "quickcpplib/include/ringbuffer_log.hpp"
-#include "quickcpplib/include/utils/thread.hpp"
+#include "quickcpplib/ringbuffer_log.hpp"
+#include "quickcpplib/utils/thread.hpp"
 #endif
 // Bring in filesystem
 #if defined(__has_include)
@@ -307,45 +307,45 @@ LLFIO_V2_NAMESPACE_END
 #endif
 
 // Bring in bitfields
-#include "quickcpplib/include/bitfield.hpp"
+#include "quickcpplib/bitfield.hpp"
 // Bring in scoped undo
-#include "quickcpplib/include/scoped_undo.hpp"
+#include "quickcpplib/scoped_undo.hpp"
 LLFIO_V2_NAMESPACE_BEGIN
 using QUICKCPPLIB_NAMESPACE::scoped_undo::undoer;
 LLFIO_V2_NAMESPACE_END
 // Bring in a span implementation
-#include "quickcpplib/include/span.hpp"
+#include "quickcpplib/span.hpp"
 LLFIO_V2_NAMESPACE_BEGIN
 using namespace QUICKCPPLIB_NAMESPACE::span;
 LLFIO_V2_NAMESPACE_END
 // Bring in an optional implementation
-#include "quickcpplib/include/optional.hpp"
+#include "quickcpplib/optional.hpp"
 LLFIO_V2_NAMESPACE_BEGIN
 using namespace QUICKCPPLIB_NAMESPACE::optional;
 LLFIO_V2_NAMESPACE_END
 // Bring in a byte implementation
-#include "quickcpplib/include/byte.hpp"
+#include "quickcpplib/byte.hpp"
 LLFIO_V2_NAMESPACE_BEGIN
 using QUICKCPPLIB_NAMESPACE::byte::byte;
 using QUICKCPPLIB_NAMESPACE::byte::to_byte;
 LLFIO_V2_NAMESPACE_END
 // Bring in a string_view implementation
-#include "quickcpplib/include/string_view.hpp"
+#include "quickcpplib/string_view.hpp"
 LLFIO_V2_NAMESPACE_BEGIN
 using namespace QUICKCPPLIB_NAMESPACE::string_view;
 LLFIO_V2_NAMESPACE_END
 // Bring in an ensure_flushes implementation
-#include "quickcpplib/include/mem_flush_loads_stores.hpp"
+#include "quickcpplib/mem_flush_loads_stores.hpp"
 LLFIO_V2_NAMESPACE_BEGIN
 using namespace QUICKCPPLIB_NAMESPACE::mem_flush_loads_stores;
 LLFIO_V2_NAMESPACE_END
 // Bring in a detach_cast implementation
-#include "quickcpplib/include/detach_cast.hpp"
+#include "quickcpplib/detach_cast.hpp"
 LLFIO_V2_NAMESPACE_BEGIN
 using namespace QUICKCPPLIB_NAMESPACE::detach_cast;
 LLFIO_V2_NAMESPACE_END
 // Bring in an in_place_detach implementation
-#include "quickcpplib/include/in_place_detach_attach.hpp"
+#include "quickcpplib/in_place_detach_attach.hpp"
 LLFIO_V2_NAMESPACE_BEGIN
 using namespace QUICKCPPLIB_NAMESPACE::in_place_attach_detach;
 using QUICKCPPLIB_NAMESPACE::in_place_attach_detach::in_place_attach;

@@ -55,8 +55,8 @@ as that (a) enables safe header only LLFIO on Windows (b) produces better codege
 #if LLFIO_EXPERIMENTAL_STATUS_CODE
 
 // Bring in a result implementation based on status_code
-#include "outcome/include/outcome/experimental/status_result.hpp"
-#include "outcome/include/outcome/try.hpp"
+#include "outcome/experimental/status_result.hpp"
+#include "outcome/try.hpp"
 
 LLFIO_V2_NAMESPACE_BEGIN
 
@@ -338,7 +338,9 @@ LLFIO_V2_NAMESPACE_END
 
 
 // Bring in a result implementation based on std::error_code
-#include "outcome/include/outcome.hpp"
+#include "outcome/result.hpp"
+#include "outcome/try.hpp"
+#include "outcome/utils.hpp"
 
 LLFIO_V2_NAMESPACE_BEGIN
 
@@ -553,7 +555,6 @@ inline void error_info::throw_exception() const
 }
 
 template <class T> using result = OUTCOME_V2_NAMESPACE::result<T, error_info>;
-template <class T> using outcome = OUTCOME_V2_NAMESPACE::outcome<T, error_info>;
 using OUTCOME_V2_NAMESPACE::failure;
 using OUTCOME_V2_NAMESPACE::success;
 inline error_info error_from_exception(std::exception_ptr &&ep = std::current_exception(), std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept

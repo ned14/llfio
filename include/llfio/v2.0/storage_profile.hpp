@@ -28,9 +28,14 @@ Distributed under the Boost Software License, Version 1.0.
 #include "io_service.hpp"
 
 #if LLFIO_EXPERIMENTAL_STATUS_CODE
-#include "outcome/include/outcome/experimental/status_outcome.hpp"
+#include "outcome/experimental/status_outcome.hpp"
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 template <class T> using outcome = OUTCOME_V2_NAMESPACE::experimental::status_outcome<T, file_io_error>;
+LLFIO_V2_NAMESPACE_END
+#else
+#include "outcome/outcome.hpp"
+LLFIO_V2_NAMESPACE_EXPORT_BEGIN
+template <class T> using outcome = OUTCOME_V2_NAMESPACE::outcome<T, error_info>;
 LLFIO_V2_NAMESPACE_END
 #endif
 

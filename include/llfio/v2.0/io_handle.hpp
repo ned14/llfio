@@ -50,6 +50,15 @@ public:
   using caching = handle::caching;
   using flag = handle::flag;
 
+  //! The kinds of write reordering barrier which can be performed.
+  enum class barrier_kind
+  {
+    nowait_data_only,  //!< Barrier data only, non-blocking. This is highly optimised on NV-DIMM storage, but consider using `nvram_barrier()` for even better performance.
+    wait_data_only,    //!< Barrier data only, block until it is done. This is highly optimised on NV-DIMM storage, but consider using `nvram_barrier()` for even better performance.
+    nowait_all,        //!< Barrier data and the metadata to retrieve it, non-blocking.
+    wait_all           //!< Barrier data and the metadata to retrieve it, block until it is done.
+  };
+
   //! The scatter buffer type used by this handle. Guaranteed to be `TrivialType` and `StandardLayoutType`.
   //! Try to make address and length 64 byte, or ideally, `page_size()` aligned where possible.
   struct buffer_type
@@ -68,7 +77,11 @@ public:
     //! Default constructor
     buffer_type() = default;
     //! Constructor
-    constexpr buffer_type(pointer data, size_type len) noexcept : _data(data), _len(len) {}
+    constexpr buffer_type(pointer data, size_type len) noexcept
+        : _data(data)
+        , _len(len)
+    {
+    }
     buffer_type(const buffer_type &) = default;
     buffer_type(buffer_type &&) = default;
     buffer_type &operator=(const buffer_type &) = default;
@@ -96,6 +109,7 @@ public:
     constexpr const_iterator end() const noexcept { return _data + _len; }
     //! Returns an iterator to after the end of the buffer
     constexpr const_iterator cend() const noexcept { return _data + _len; }
+
   private:
     friend constexpr inline void _check_iovec_match();
     pointer _data;
@@ -119,9 +133,17 @@ public:
     //! Default constructor
     const_buffer_type() = default;
     //! Constructor
-    constexpr const_buffer_type(pointer data, size_type len) noexcept : _data(data), _len(len) {}
+    constexpr const_buffer_type(pointer data, size_type len) noexcept
+        : _data(data)
+        , _len(len)
+    {
+    }
     //! Converting constructor from non-const buffer type
-    constexpr const_buffer_type(buffer_type b) noexcept : _data(b.data()), _len(b.size()) {}
+    constexpr const_buffer_type(buffer_type b) noexcept
+        : _data(b.data())
+        , _len(b.size())
+    {
+    }
     const_buffer_type(const const_buffer_type &) = default;
     const_buffer_type(const_buffer_type &&) = default;
     const_buffer_type &operator=(const const_buffer_type &) = default;
@@ -149,6 +171,7 @@ public:
     constexpr const_iterator end() const noexcept { return _data + _len; }
     //! Returns an iterator to after the end of the buffer
     constexpr const_iterator cend() const noexcept { return _data + _len; }
+
   private:
     pointer _data;
     size_type _len;
@@ -197,7 +220,7 @@ public:
   // static_assert(std::is_trivially_move_assignable<io_request<buffers_type>>::value, "io_request<buffers_type> is not trivially move assignable!");
   static_assert(std::is_standard_layout<io_request<buffers_type>>::value, "io_request<buffers_type> is not a standard layout type!");
 #endif
-  //! The i/o result type used by this handle. Guaranteed to be `TrivialType` apart from construction..
+  //! The i/o result type used by this handle. Guaranteed to be `TrivialType` apart from construction.
   template <class T> struct io_result : public LLFIO_V2_NAMESPACE::result<T>
   {
     using Base = LLFIO_V2_NAMESPACE::result<T>;
@@ -265,7 +288,10 @@ public:
   {
   }
   //! Explicit conversion from handle permitted
-  explicit constexpr io_handle(handle &&o) noexcept : handle(std::move(o)) {}
+  explicit constexpr io_handle(handle &&o) noexcept
+      : handle(std::move(o))
+  {
+  }
   //! Move construction permitted
   io_handle(io_handle &&) = default;
   //! No copy construction (use `clone()`)
@@ -275,8 +301,8 @@ public:
   //! No copy assignment
   io_handle &operator=(const io_handle &) = delete;
 
-  /*! \brief The *maximum* number of buffers which a single read or write syscall can process at a time
-  for this specific open handle. On POSIX, this is known as `IOV_MAX`.
+  /*! \brief The *maximum* number of buffers which a single read or write syscall can process at a
+  time for this specific open handle. On POSIX, this is known as `IOV_MAX`.
 
   Note that the actual number of buffers accepted for a read or a write may be significantly
   lower than this system-defined limit, depending on available resources. The `read()` or `write()`
@@ -286,8 +312,11 @@ public:
   but other OSs do not. Some OSs guarantee that each i/o syscall has effects atomically visible or not
   to other i/o, other OSs do not.
 
-  Microsoft Windows and OS X does not implement scatter-gather file i/o syscalls.
+  OS X does not implement scatter-gather file i/o syscalls.
   Thus this function will always return `1` in that situation.
+
+  Microsoft Windows *may* implement scatter-gather file i/o under very limited circumstances.
+  Most of the time this function will return `1`.
   */
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t max_buffers() const noexcept;
 
@@ -350,39 +379,36 @@ public:
     return std::move(ret).error();
   }
 
-  /*! \brief Issue a write reordering barrier such that writes preceding the barrier will reach storage
-  before writes after this barrier.
+  /*! \brief Issue a write reordering barrier such that writes preceding the barrier will reach
+  storage before writes after this barrier.
 
-  \warning **Assume that this call is a no-op**. It is not reliably implemented in many common use cases,
-  for example if your code is running inside a LXC container, or if the user has mounted the filing
-  system with non-default options. Instead open the handle with `caching::reads` which means that all
-  writes form a strict sequential order not completing until acknowledged by the storage device.
-  Filing system can and do use different algorithms to give much better performance with `caching::reads`,
-  some (e.g. ZFS) spectacularly better.
+  \warning **Assume that this call is a no-op**. It is not reliably implemented in many common
+  use cases, for example if your code is running inside a LXC container, or if the user has mounted
+  the filing system with non-default options. Instead open the handle with `caching::reads` which
+  means that all writes form a strict sequential order not completing until acknowledged by the
+  storage device. Filing system can and do use different algorithms to give much better performance
+  with `caching::reads`, some (e.g. ZFS) spectacularly better.
 
-  \warning Let me repeat again: consider this call to be a **hint** to poke the kernel with a stick to
-  go start to do some work sooner rather than later. **It may be ignored entirely**.
+  \warning Let me repeat again: consider this call to be a **hint** to poke the kernel with a stick
+  to go start to do some work sooner rather than later. **It may be ignored entirely**.
 
   \warning For portability, you can only assume that barriers write order for a single handle
-  instance. You cannot assume that barriers write order across multiple handles to the same inode, or
-  across processes.
+  instance. You cannot assume that barriers write order across multiple handles to the same inode,
+  or across processes.
 
   \return The buffers barriered, which may not be the buffers input. The size of each scatter-gather
   buffer is updated with the number of bytes of that buffer barriered.
-  \param reqs A scatter-gather and offset request for what range to barrier. May be ignored on some platforms
-  which always write barrier the entire file. Supplying a default initialised reqs write barriers the entire file.
-  \param wait_for_device True if you want the call to wait until data reaches storage and that storage
-  has acknowledged the data is physically written. Slow.
-  \param and_metadata True if you want the call to sync the metadata for retrieving the writes before the
-  barrier after a sudden power loss event. Slow. Setting this to false enables much faster performance,
-  especially on non-volatile memory.
+  \param reqs A scatter-gather and offset request for what range to barrier. May be ignored on
+  some platforms which always write barrier the entire file. Supplying a default initialised reqs
+  write barriers the entire file.
+  \param kind Which kind of write reordering barrier to perform.
   \param d An optional deadline by which the i/o must complete, else it is cancelled.
   Note function may return significantly after this deadline if the i/o takes long to cancel.
   \errors Any of the values POSIX fdatasync() or Windows NtFlushBuffersFileEx() can return.
   \mallocs None.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  virtual io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept = 0;
+  virtual io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), barrier_kind kind = barrier_kind::nowait_data_only, deadline d = deadline()) noexcept = 0;
 
   /*! \class extent_guard
   \brief RAII holder a locked extent of bytes in a file.
@@ -410,7 +436,14 @@ public:
     //! Default constructor
     constexpr extent_guard() {}  // NOLINT
     //! Move constructor
-    extent_guard(extent_guard &&o) noexcept : _h(o._h), _offset(o._offset), _length(o._length), _exclusive(o._exclusive) { o.release(); }
+    extent_guard(extent_guard &&o) noexcept
+        : _h(o._h)
+        , _offset(o._offset)
+        , _length(o._length)
+        , _exclusive(o._exclusive)
+    {
+      o.release();
+    }
     //! Move assign
     extent_guard &operator=(extent_guard &&o) noexcept
     {
@@ -461,23 +494,25 @@ public:
     }
   };
 
-  /*! \brief Tries to lock the range of bytes specified for shared or exclusive access. Be aware this passes through
-  the same semantics as the underlying OS call, including any POSIX insanity present on your platform:
+  /*! \brief Tries to lock the range of bytes specified for shared or exclusive access. Be aware
+  this passes through the same semantics as the underlying OS call, including any POSIX insanity
+  present on your platform:
 
   - Any fd closed on an inode must release all byte range locks on that inode for all
-  other fds. If your OS isn't new enough to support the non-insane lock API, `flag::byte_lock_insanity` will be set
-  in flags() after the first call to this function.
+  other fds. If your OS isn't new enough to support the non-insane lock API,
+  `flag::byte_lock_insanity` will be set in flags() after the first call to this function.
   - Threads replace each other's locks, indeed locks replace each other's locks.
 
   You almost cetainly should use your choice of an `algorithm::shared_fs_mutex::*` instead of this
   as those are more portable and performant.
 
-  \warning This is a low-level API which you should not use directly in portable code. Another issue is that
-  atomic lock upgrade/downgrade, if your platform implements that (you should assume it does not in
-  portable code), means that on POSIX you need to *release* the old `extent_guard` after creating a new one over the
-  same byte range, otherwise the old `extent_guard`'s destructor will simply unlock the range entirely. On
-  Windows however upgrade/downgrade locks overlay, so on that platform you must *not* release the old
-  `extent_guard`. Look into `algorithm::shared_fs_mutex::safe_byte_ranges` for a portable solution.
+  \warning This is a low-level API which you should not use directly in portable code. Another
+  issue is that atomic lock upgrade/downgrade, if your platform implements that (you should assume
+  it does not in portable code), means that on POSIX you need to *release* the old `extent_guard`
+  after creating a new one over the same byte range, otherwise the old `extent_guard`'s destructor
+  will simply unlock the range entirely. On Windows however upgrade/downgrade locks overlay, so on
+  that platform you must *not* release the old `extent_guard`. Look into
+  `algorithm::shared_fs_mutex::safe_byte_ranges` for a portable solution.
 
   \return An extent guard, the destruction of which will call unlock().
   \param offset The offset to lock. Note that on POSIX the top bit is always cleared before use
@@ -593,42 +628,6 @@ inline io_handle::io_result<io_handle::const_buffers_type> write(io_handle &self
 inline io_handle::io_result<io_handle::size_type> write(io_handle &self, io_handle::extent_type offset, std::initializer_list<io_handle::const_buffer_type> lst, deadline d = deadline()) noexcept
 {
   return self.write(std::forward<decltype(offset)>(offset), std::forward<decltype(lst)>(lst), std::forward<decltype(d)>(d));
-}
-/*! \brief Issue a write reordering barrier such that writes preceding the barrier will reach storage
-before writes after this barrier.
-
-\warning **Assume that this call is a no-op**. It is not reliably implemented in many common use cases,
-for example if your code is running inside a LXC container, or if the user has mounted the filing
-system with non-default options. Instead open the handle with `caching::reads` which means that all
-writes form a strict sequential order not completing until acknowledged by the storage device.
-Filing system can and do use different algorithms to give much better performance with `caching::reads`,
-some (e.g. ZFS) spectacularly better.
-
-\warning Let me repeat again: consider this call to be a **hint** to poke the kernel with a stick to
-go start to do some work sooner rather than later. **It may be ignored entirely**.
-
-\warning For portability, you can only assume that barriers write order for a single handle
-instance. You cannot assume that barriers write order across multiple handles to the same inode, or
-across processes.
-
-\return The buffers barriered, which may not be the buffers input. The size of each scatter-gather
-buffer is updated with the number of bytes of that buffer barriered.
-\param self The object whose member function to call.
-\param reqs A scatter-gather and offset request for what range to barrier. May be ignored on some platforms
-which always write barrier the entire file. Supplying a default initialised reqs write barriers the entire file.
-\param wait_for_device True if you want the call to wait until data reaches storage and that storage
-has acknowledged the data is physically written. Slow.
-\param and_metadata True if you want the call to sync the metadata for retrieving the writes before the
-barrier after a sudden power loss event. Slow. Setting this to false enables much faster performance,
-especially on non-volatile memory.
-\param d An optional deadline by which the i/o must complete, else it is cancelled.
-Note function may return significantly after this deadline if the i/o takes long to cancel.
-\errors Any of the values POSIX fdatasync() or Windows NtFlushBuffersFileEx() can return.
-\mallocs None.
-*/
-inline io_handle::io_result<io_handle::const_buffers_type> barrier(io_handle &self, io_handle::io_request<io_handle::const_buffers_type> reqs = io_handle::io_request<io_handle::const_buffers_type>(), bool wait_for_device = false, bool and_metadata = false, deadline d = deadline()) noexcept
-{
-  return self.barrier(std::forward<decltype(reqs)>(reqs), std::forward<decltype(wait_for_device)>(wait_for_device), std::forward<decltype(and_metadata)>(and_metadata), std::forward<decltype(d)>(d));
 }
 // END make_free_functions.py
 

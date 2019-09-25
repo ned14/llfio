@@ -23,8 +23,10 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 #define _CRT_SECURE_NO_WARNINGS 1
+#define LLFIO_INCLUDE_STORAGE_PROFILE 1
 
 #include "../../include/llfio/llfio.hpp"
+#include "outcome/iostream_support.hpp"
 
 #include <fstream>
 #include <iomanip>

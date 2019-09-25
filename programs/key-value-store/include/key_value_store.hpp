@@ -26,11 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define KEY_VALUE_STORE_HPP
 
 #include "../../../include/llfio/llfio.hpp"
-#if __has_include("quickcpplib/include/algorithm/open_hash_index.hpp")
-#include "quickcpplib/include/algorithm/open_hash_index.hpp"
-#else
-#include "../../../include/llfio/v2.0/quickcpplib/include/algorithm/open_hash_index.hpp"
-#endif
+#include "quickcpplib/algorithm/open_hash_index.hpp"
 
 #include <vector>
 
