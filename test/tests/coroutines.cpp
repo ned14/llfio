@@ -28,7 +28,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 static inline void TestAsyncFileHandleCoroutines()
 {
-#if LLFIO_HAVE_COROUTINES
+#if defined(LLFIO_ENABLE_COROUTINES)
   //! [coroutines_example]
   namespace llfio = LLFIO_V2_NAMESPACE;
 
@@ -39,10 +39,10 @@ static inline void TestAsyncFileHandleCoroutines()
   llfio::async_file_handle h = llfio::async_file_handle::async_file(service, {}, "temp", llfio::file_handle::mode::write, llfio::file_handle::creation::if_needed, llfio::file_handle::caching::only_metadata, llfio::file_handle::flag::unlink_on_first_close).value();
 
   // Truncate to 1Mb
-  h.truncate(1024 * 4096);
+  (void) h.truncate(1024 * 4096);
 
   // Launch 8 coroutines, each writing 4Kb of chars 0-8 to every 32Kb block
-  auto coroutine = [&h](size_t no) -> std::future<void> {
+  auto coroutine = [&h](size_t no) -> llfio::eager<void> {
     std::vector<llfio::byte, llfio::utils::page_allocator<llfio::byte>> buffer(4096);
     memset(buffer.data(), (int) ('0' + no), 4096);
     llfio::async_file_handle::const_buffer_type bt{buffer.data(), buffer.size()};
@@ -54,7 +54,7 @@ static inline void TestAsyncFileHandleCoroutines()
       written.value();
     }
   };
-  std::vector<std::future<void>> coroutines;
+  std::vector<llfio::eager<void>> coroutines;
   for(size_t n = 0; n < 8; n++)
   {
     // Construct each coroutine, initiating the i/o, then suspending.
@@ -63,11 +63,6 @@ static inline void TestAsyncFileHandleCoroutines()
   // Pump the i/o, multiplexing the coroutines, until no more work remains.
   while(service.run().value())
     ;
-  // Make sure nothing went wrong by fetching the futures.
-  for(auto &i : coroutines)
-  {
-    i.get();
-  }
   //! [coroutines_example]
 
   // Check that the file has the right contents
@@ -88,24 +83,26 @@ static inline void TestAsyncFileHandleCoroutines()
 
 static inline void TestPostSelfToRunCoroutines()
 {
-#if LLFIO_HAVE_COROUTINES
+#if defined(LLFIO_ENABLE_COROUTINES)
   namespace llfio = LLFIO_V2_NAMESPACE;
   llfio::io_service service;
   std::atomic<bool> ready(false);
   auto runthreadid = QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id();
+  // Start a coroutine which immediately suspends
+  auto coroutine = [&]() -> llfio::lazy<void> {
+    auto thisthreadid = QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id();
+    BOOST_CHECK(thisthreadid != runthreadid);
+    ready = true;
+    co_await llfio::io_service::awaitable_post_to_self(service);
+    thisthreadid = QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id();
+    BOOST_CHECK(thisthreadid == runthreadid);
+    // std::cout << "Coroutine exiting" << std::endl;
+    ready = false;
+  }();
+  // Run the coroutine's body in another thread
   auto coroutinethread = [&]() -> void {
-    auto coroutine = [&]() -> std::future<void> {
-      auto thisthreadid = QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id();
-      BOOST_CHECK(thisthreadid != runthreadid);
-      ready = true;
-      co_await llfio::io_service::awaitable_post_to_self(service);
-      thisthreadid = QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id();
-      BOOST_CHECK(thisthreadid == runthreadid);
-      // std::cout << "Coroutine exiting" << std::endl;
-      ready = false;
-    };
     // std::cout << "Thread waiting on coroutine" << std::endl;
-    coroutine().get();
+    coroutine.await_suspend({});
     // std::cout << "Thread exiting" << std::endl;
   };
   auto asynch = std::async(std::launch::async, coroutinethread);

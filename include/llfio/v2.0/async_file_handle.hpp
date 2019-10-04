@@ -505,7 +505,7 @@ public:
   using file_handle::write;
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override;
 
-#if LLFIO_HAVE_COROUTINES || defined(DOXYGEN_IS_IN_THE_HOUSE)
+#if defined(LLFIO_ENABLE_COROUTINES) || defined(DOXYGEN_IS_IN_THE_HOUSE)
 private:
   template <class BuffersType> class awaitable_state
   {
@@ -731,7 +731,7 @@ template <class CompletionRoutine> inline result<async_file_handle::io_state_ptr
 {
   return self.async_write(std::forward<decltype(reqs)>(reqs), std::forward<decltype(completion)>(completion), std::forward<decltype(mem)>(mem));
 }
-#if LLFIO_HAVE_COROUTINES || defined(DOXYGEN_IS_IN_THE_HOUSE)
+#if defined(LLFIO_ENABLE_COROUTINES) || defined(DOXYGEN_IS_IN_THE_HOUSE)
 /*! \brief Schedule a read to occur asynchronously.
 
 \return An awaitable, which when `co_await`ed upon, suspends execution of the coroutine
