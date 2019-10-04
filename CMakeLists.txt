@@ -42,12 +42,16 @@ if(NOT PROJECT_IS_DEPENDENCY)
   UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/llfio/revision.hpp")
 endif()
 # Find my library dependencies
-find_quickcpplib_library(quickcpplib 1.0 REQUIRED)
-find_quickcpplib_library(outcome 2.0 REQUIRED)
-find_quickcpplib_library(kerneltest 1.0 REQUIRED)
+find_quickcpplib_library(outcome
+  GIT_REPOSITORY "https://github.com/ned14/outcome.git"
+  GIT_TAG "develop"
+  REQUIRED
+)
 if(WIN32)
   add_subdirectory("include/llfio/ntkernel-error-category" EXCLUDE_FROM_ALL)
 endif()
+
+set(UNIT_TESTS_CXX_VERSION "latest" CACHE STRING "The version of C++ to use in the header-only unit tests")
 
 # Make the standard static and shared libraries, and if supported by this compiler, C++ modules
 # for both static and shared libraries as well. For the non-C++ module variants, makes the
@@ -56,6 +60,13 @@ endif()
 include(QuickCppLibMakeLibrary)
 # Make an interface only library so dependent CMakeLists can bring in this header-only library
 include(QuickCppLibMakeHeaderOnlyLibrary)
+
+# If we have concepts, enable those for both myself and all inclusions
+apply_cxx_concepts_to(INTERFACE llfio_hl)
+apply_cxx_concepts_to(PUBLIC llfio_sl llfio_dl)
+
+# If we have coroutines, enable those for the shared library build only
+apply_cxx_coroutines_to(PRIVATE llfio_dl)
 
 # Make preprocessed edition of this library target
 if(NOT PROJECT_IS_DEPENDENCY)
@@ -85,7 +96,7 @@ if(NOT PROJECT_IS_DEPENDENCY)
                               WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                               )
         if(NOT CMAKE_VERSION VERSION_LESS 3.3)
-          add_dependencies(outcome_hl ${target})
+          add_dependencies(llfio_hl ${target})
         endif()
       endfunction()
       make_single_header(llfio_hl-pp-posix
@@ -120,66 +131,6 @@ include(QuickCppLibMakeDoxygen)
 # Set the standard definitions for these libraries and bring in the all_* helper functions
 include(QuickCppLibApplyDefaultDefinitions)
 
-# Do we have the Coroutines TS?
-function(CheckCXXHasCoroutines iter)
-  set(CMAKE_REQUIRED_FLAGS ${ARGN})
-  check_cxx_source_compiles("
-#if __has_include(<coroutine>)
-#include <coroutine>
-using std::suspend_never;
-#elif __has_include(<experimental/coroutine>)
-#include <experimental/coroutine>
-using std::experimental::suspend_never;
-#endif
-class resumable{
-public:
-  struct promise_type
-  {
-    resumable get_return_object() { return {}; }
-    auto initial_suspend() { return suspend_never(); }
-    auto final_suspend() { return suspend_never(); }
-    int return_value(int x) { return x; }
-    void unhandled_exception();
-  };
-  bool resume() { return true; }
-  int get() { return 0; }
-};
-resumable g() { co_return 0; }
-int main() { return g().get(); }
-" CXX_HAS_COROUTINES${iter})
-  set(CXX_HAS_COROUTINES${iter} ${CXX_HAS_COROUTINES${iter}} PARENT_SCOPE)
-endfunction()
-include(CheckCXXSourceCompiles)
-set(HAVE_COROUTINES 0)
-CheckCXXHasCoroutines(_BY_DEFAULT)
-if(CXX_HAS_COROUTINES_BY_DEFAULT)
-  set(HAVE_COROUTINES 1)
-endif()
-if(NOT HAVE_COROUTINES)
-  if(MSVC)
-    CheckCXXHasCoroutines(_MSVC "/await")
-    if(CXX_HAS_COROUTINES_MSVC)
-      add_compile_options("/await")
-      set(HAVE_COROUTINES 1)
-    endif()
-  endif()
-  if(CLANG OR GCC)
-    CheckCXXHasCoroutines(_CLANG_GCC "-fcoroutines-ts")
-    if(CXX_HAS_COROUTINES_CLANG_GCC)
-      add_compile_options("-fcoroutines-ts")
-      set(HAVE_COROUTINES 1)
-    endif()
-    CheckCXXHasCoroutines(_CLANG_GCC_LIBCXX "-stdlib=libc++ -fcoroutines-ts")
-    if(CXX_HAS_COROUTINES_CLANG_GCC_LIBCXX)
-      add_compile_options("-stdlib=libc++ -fcoroutines-ts")
-      set(HAVE_COROUTINES 1)
-    endif()
-  endif()
-endif()
-if(HAVE_COROUTINES)
-  all_compile_definitions(PUBLIC "LLFIO_HAVE_COROUTINES=1")
-endif()
-
 # Set the C++ features this library requires
 all_compile_features(PUBLIC
   # cxx_exceptions                        ## Annoyingly not supported by cmake 3.6
@@ -199,12 +150,32 @@ endif()
 # Set the library dependencies this library has
 all_link_libraries(PUBLIC quickcpplib::hl outcome::hl Threads::Threads)
 # Set the system dependencies this library has
+set(USING_LIBCXX_ON_LINUX 0)
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
   find_library(libstdcxx_stdcxxfs stdc++fs)
   if(libstdcxx_stdcxxfs MATCHES "NOTFOUND")
     set(libstdcxx_stdcxxfs -lstdc++fs)
   endif()
-  all_link_libraries(PUBLIC ${libstdcxx_stdcxxfs} rt)
+  get_target_property(val llfio_dl USING_LIBCXX_ON_LINUX)
+  if(val MATCHES "NOTFOUND")
+    all_link_libraries(PUBLIC ${libstdcxx_stdcxxfs} rt)
+  else()
+    set(USING_LIBCXX_ON_LINUX 1)
+    # We had to use libc++ to get coroutines on Linux, so don't link the filesystem TS
+    target_link_libraries(${PROJECT_NAME}_hl INTERFACE ${libstdcxx_stdcxxfs} rt)
+    target_link_libraries(${PROJECT_NAME}_sl PUBLIC ${libstdcxx_stdcxxfs} rt)
+    foreach(special ${SPECIAL_BUILDS})
+      target_link_libraries(${PROJECT_NAME}_sl-${special} PUBLIC ${libstdcxx_stdcxxfs} rt)
+    endforeach()
+    # Do make libc++ a requirement
+    target_compile_definitions(${PROJECT_NAME}_dl PUBLIC _LIBCPP_NO_EXPERIMENTAL_DEPRECATION_WARNING_FILESYSTEM=1)
+    target_compile_options(${PROJECT_NAME}_dl PUBLIC -stdlib=libc++)
+    target_link_libraries(${PROJECT_NAME}_dl PUBLIC -stdlib=libc++ -lc++abi)
+    foreach(special ${SPECIAL_BUILDS})
+      target_compile_options(${PROJECT_NAME}_dl-${special} PUBLIC -stdlib=libc++)
+      target_link_libraries(${PROJECT_NAME}_dl-${special} PUBLIC -stdlib=libc++ -lc++abi)
+    endforeach()
+  endif()
 endif()
 if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD" OR APPLE)
   find_library(libcxx_cxxexperimental c++experimental)
@@ -245,22 +216,74 @@ if(TARGET llfio-example_single-header)
   endif()
 endif()
 
-# For all possible configurations of this library, add each test
-include(QuickCppLibMakeStandardTests)
-# For each test target, set definitions and linkage
-foreach(target ${llfio_COMPILE_TEST_TARGETS} ${llfio_TEST_TARGETS})
-  target_compile_definitions(${target} PRIVATE LLFIO_INCLUDE_ASYNC_FILE_HANDLE=1 LLFIO_INCLUDE_STORAGE_PROFILE=1)
-endforeach()
-foreach(test_target ${llfio_TEST_TARGETS})
-  target_link_libraries(${test_target} PRIVATE kerneltest::hl)
-endforeach()
-if(MSVC)
-  foreach(test_target ${llfio_TEST_TARGETS})
-    target_compile_options(${test_target} PRIVATE /wd4503)       ## decorated name length exceeded
-	if(NOT CLANG)
-      target_compile_options(${test_target} PRIVATE /permissive-)  ## future parsing
-	endif()
+if(NOT PROJECT_IS_DEPENDENCY)
+  # For all possible configurations of this library, add each test
+  include(QuickCppLibMakeStandardTests)
+  # For each test target, set definitions and linkage
+  foreach(target ${llfio_COMPILE_TEST_TARGETS} ${llfio_TEST_TARGETS})
+    target_compile_definitions(${target} PRIVATE LLFIO_INCLUDE_ASYNC_FILE_HANDLE=1 LLFIO_INCLUDE_STORAGE_PROFILE=1)
   endforeach()
+  find_quickcpplib_library(kerneltest
+    GIT_REPOSITORY "https://github.com/ned14/kerneltest.git"
+    REQUIRED
+  )
+  foreach(test_target ${llfio_TEST_TARGETS})
+    target_link_libraries(${test_target} PRIVATE kerneltest::hl)
+    if(test_target MATCHES coroutines)
+      if(USING_LIBCXX_ON_LINUX)
+        if(NOT test_target MATCHES _sl)
+          apply_cxx_coroutines_to(PRIVATE ${test_target})
+        endif()
+      else()
+        apply_cxx_coroutines_to(PRIVATE ${test_target})
+      endif()
+    endif()
+  endforeach()
+  if(MSVC)
+    foreach(test_target ${llfio_TEST_TARGETS})
+      target_compile_options(${test_target} PRIVATE /wd4503)         ## decorated name length exceeded
+      if(NOT CLANG)
+        target_compile_options(${test_target} PRIVATE /permissive-)  ## future parsing
+      endif()
+    endforeach()
+  endif()
+
+  # Turn on latest C++ where possible for the test suite
+  if(UNIT_TESTS_CXX_VERSION STREQUAL "latest")
+    set(LATEST_CXX_FEATURE)
+    foreach(feature ${CMAKE_CXX_COMPILE_FEATURES})
+      if(feature STREQUAL "cxx_std_23")
+        set(LATEST_CXX_FEATURE "cxx_std_23")
+        indented_message(STATUS "NOTE: This compiler claims to support C++ 23, enabling for header-only unit test suite")
+      endif()
+    endforeach()
+    if(NOT LATEST_CXX_FEATURE)
+      foreach(feature ${CMAKE_CXX_COMPILE_FEATURES})
+        if(feature STREQUAL "cxx_std_20")
+          set(LATEST_CXX_FEATURE "cxx_std_20")
+          indented_message(STATUS "NOTE: This compiler claims to support C++ 20, enabling for header-only unit test suite")
+        endif()
+      endforeach()
+    endif()
+    if(NOT LATEST_CXX_FEATURE)
+      foreach(feature ${CMAKE_CXX_COMPILE_FEATURES})
+        if(feature STREQUAL "cxx_std_17")
+          set(LATEST_CXX_FEATURE "cxx_std_17")
+          indented_message(STATUS "NOTE: This compiler claims to support C++ 17, enabling for header-only unit test suite")
+        endif()
+      endforeach()
+    endif()
+  elseif(UNIT_TESTS_CXX_VERSION)
+    set(LATEST_CXX_FEATURE "cxx_std_${UNIT_TESTS_CXX_VERSION}")
+  endif()
+  if(LATEST_CXX_FEATURE)
+    # Turn on latest C++ where possible for the header only test suite
+    foreach(test_target ${llfio_TEST_TARGETS} ${llfio_EXAMPLE_TARGETS})
+      if(test_target MATCHES _hl)
+        target_compile_features(${test_target} PUBLIC ${LATEST_CXX_FEATURE})
+      endif()
+    endforeach()
+  endif()
 endif()
 
 # Cache this library's auto scanned sources for later reuse

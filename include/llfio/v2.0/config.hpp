@@ -232,6 +232,11 @@ LLFIO_V2_NAMESPACE_END
 LLFIO_V2_NAMESPACE_BEGIN
 namespace filesystem = std::experimental::filesystem;
 LLFIO_V2_NAMESPACE_END
+#elif __has_include(<filesystem>)
+#include <filesystem>
+LLFIO_V2_NAMESPACE_BEGIN
+namespace filesystem = std::filesystem;
+LLFIO_V2_NAMESPACE_END
 #endif
 #elif __PCPP_ALWAYS_TRUE__
 #include <experimental/filesystem>

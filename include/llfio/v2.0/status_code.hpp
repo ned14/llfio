@@ -57,6 +57,12 @@ as that (a) enables safe header only LLFIO on Windows (b) produces better codege
 // Bring in a result implementation based on status_code
 #include "outcome/experimental/status_result.hpp"
 #include "outcome/try.hpp"
+#if __cpp_coroutines
+#include "outcome/experimental/coroutine_support.hpp"
+#ifdef OUTCOME_FOUND_COROUTINE_HEADER
+#define LLFIO_ENABLE_COROUTINES 1
+#endif
+#endif
 
 LLFIO_V2_NAMESPACE_BEGIN
 
@@ -241,6 +247,13 @@ template <class T> using result = OUTCOME_V2_NAMESPACE::experimental::status_res
 using OUTCOME_V2_NAMESPACE::failure;
 using OUTCOME_V2_NAMESPACE::in_place_type;
 using OUTCOME_V2_NAMESPACE::success;
+#if defined(LLFIO_ENABLE_COROUTINES)
+template <class T> using atomic_eager = OUTCOME_V2_NAMESPACE::experimental::awaitables::atomic_eager<T>;
+template <class T> using atomic_lazy = OUTCOME_V2_NAMESPACE::experimental::awaitables::atomic_lazy<T>;
+template <class T> using eager = OUTCOME_V2_NAMESPACE::experimental::awaitables::eager<T>;
+template <class T> using lazy = OUTCOME_V2_NAMESPACE::experimental::awaitables::lazy<T>;
+template <class T = void> using coroutine_handle = OUTCOME_V2_NAMESPACE::experimental::awaitables::coroutine_handle<T>;
+#endif
 
 //! Choose an errc implementation
 using SYSTEM_ERROR2_NAMESPACE::errc;
@@ -341,6 +354,12 @@ LLFIO_V2_NAMESPACE_END
 #include "outcome/result.hpp"
 #include "outcome/try.hpp"
 #include "outcome/utils.hpp"
+#if __cpp_coroutines
+#include "outcome/coroutine_support.hpp"
+#ifdef OUTCOME_FOUND_COROUTINE_HEADER
+#define LLFIO_ENABLE_COROUTINES 1
+#endif
+#endif
 
 LLFIO_V2_NAMESPACE_BEGIN
 
@@ -562,6 +581,13 @@ inline error_info error_from_exception(std::exception_ptr &&ep = std::current_ex
   return error_info(OUTCOME_V2_NAMESPACE::error_from_exception(std::move(ep), not_matched));
 }
 using OUTCOME_V2_NAMESPACE::in_place_type;
+#if defined(LLFIO_ENABLE_COROUTINES)
+template <class T> using atomic_eager = OUTCOME_V2_NAMESPACE::awaitables::atomic_eager<T>;
+template <class T> using atomic_lazy = OUTCOME_V2_NAMESPACE::awaitables::atomic_lazy<T>;
+template <class T> using eager = OUTCOME_V2_NAMESPACE::awaitables::eager<T>;
+template <class T> using lazy = OUTCOME_V2_NAMESPACE::awaitables::lazy<T>;
+template <class T = void> using coroutine_handle = OUTCOME_V2_NAMESPACE::awaitables::coroutine_handle<T>;
+#endif
 
 static_assert(OUTCOME_V2_NAMESPACE::trait::is_error_code_available_v<error_info>, "error_info is not detected to be an error code");
 

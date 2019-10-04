@@ -60,7 +60,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define NTKERNEL_ERROR_CATEGORY_STATIC 1
 #endif
 #endif
-#include "../../../../ntkernel-error-category/include/ntkernel_category.hpp"
+#include "ntkernel-error-category/ntkernel_category.hpp"
 #endif
 
 LLFIO_V2_NAMESPACE_BEGIN
