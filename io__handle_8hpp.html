@@ -106,7 +106,7 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The i/o request type used by this handle. Guaranteed to be <code>TrivialType</code> apart from construction, and <code>StandardLayoutType</code>.  <a href="structllfio__v2__xxx_1_1io__handle_1_1io__request.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1io__result.html">llfio_v2_xxx::io_handle::io_result&lt; T &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The i/o result type used by this handle. Guaranteed to be <code>TrivialType</code> apart from construction..  <a href="structllfio__v2__xxx_1_1io__handle_1_1io__result.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The i/o result type used by this handle. Guaranteed to be <code>TrivialType</code> apart from construction.  <a href="structllfio__v2__xxx_1_1io__handle_1_1io__result.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__handle_1_1extent__guard.html">llfio_v2_xxx::io_handle::extent_guard</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">RAII holder a locked extent of bytes in a file.  <a href="classllfio__v2__xxx_1_1io__handle_1_1extent__guard.html#details">More...</a><br /></td></tr>
@@ -128,9 +128,6 @@ Functions</h2></td></tr>
 <tr class="separator:a5a8908704c9988bbecc69c2359e6fd4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5ea3d93e8b2c7f6e3fca7a9cde734312"><td class="memItemLeft" align="right" valign="top">io_handle::io_result&lt; io_handle::size_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a5ea3d93e8b2c7f6e3fca7a9cde734312">llfio_v2_xxx::write</a> (io_handle &amp;self, io_handle::extent_type offset, std::initializer_list&lt; io_handle::const_buffer_type &gt; lst, deadline d=deadline()) noexcept</td></tr>
 <tr class="separator:a5ea3d93e8b2c7f6e3fca7a9cde734312"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4fad22759dab40321cabd37c755880fe"><td class="memItemLeft" align="right" valign="top">io_handle::io_result&lt; io_handle::const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a4fad22759dab40321cabd37c755880fe">llfio_v2_xxx::barrier</a> (io_handle &amp;self, io_handle::io_request&lt; io_handle::const_buffers_type &gt; reqs=io_handle::io_request&lt; io_handle::const_buffers_type &gt;(), bool wait_for_device=false, bool and_metadata=false, deadline d=deadline()) noexcept</td></tr>
-<tr class="memdesc:a4fad22759dab40321cabd37c755880fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Issue a write reordering barrier such that writes preceding the barrier will reach storage before writes after this barrier.  <a href="namespacellfio__v2__xxx.html#a4fad22759dab40321cabd37c755880fe">More...</a><br /></td></tr>
-<tr class="separator:a4fad22759dab40321cabd37c755880fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides i/o handle. </p>

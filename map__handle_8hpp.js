@@ -5,7 +5,6 @@ var map__handle_8hpp =
     [ "map_handle", "classllfio__v2__xxx_1_1map__handle.html", "classllfio__v2__xxx_1_1map__handle" ],
     [ "construct< map_handle >", "structllfio__v2__xxx_1_1construct_3_01map__handle_01_4.html", "structllfio__v2__xxx_1_1construct_3_01map__handle_01_4" ],
     [ "disable_attached_for< llfio_v2_xxx::map_handle >", "structin__place__attach__detach_1_1traits_1_1disable__attached__for_3_01llfio__v2__xxx_1_1map__handle_01_4.html", null ],
-    [ "barrier", "map__handle_8hpp.html#ab26180c1aada3315a46564d6477bea72", null ],
     [ "close", "map__handle_8hpp.html#a30183de3590a31b5ef3b2952f700b110", null ],
     [ "in_place_attach", "map__handle_8hpp.html#a96135062edc7cb1fa33460ff521498f5", null ],
     [ "length", "map__handle_8hpp.html#aa3676f0dd69f4b54cf7e14e3f86d32b9", null ],

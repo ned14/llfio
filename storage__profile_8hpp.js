@@ -4,6 +4,7 @@ var storage__profile_8hpp =
     [ "item", "structllfio__v2__xxx_1_1storage__profile_1_1item.html", "structllfio__v2__xxx_1_1storage__profile_1_1item" ],
     [ "item_erased", "structllfio__v2__xxx_1_1storage__profile_1_1item__erased.html", "structllfio__v2__xxx_1_1storage__profile_1_1item__erased" ],
     [ "storage_profile", "structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html", "structllfio__v2__xxx_1_1storage__profile_1_1storage__profile" ],
+    [ "outcome", "storage__profile_8hpp.html#a6ddb7c2bee277fc16207b7e8cb05693f", null ],
     [ "storage_types", "storage__profile_8hpp.html#ac4910e412ff87c1c9e33615d81b2d238", [
       [ "unknown", "storage__profile_8hpp.html#ac4910e412ff87c1c9e33615d81b2d238aad921d60486366258809553a3db49a4a", null ],
       [ "extent_type", "storage__profile_8hpp.html#ac4910e412ff87c1c9e33615d81b2d238a59b1fa3a479308121c258d4f85c97f85", null ],

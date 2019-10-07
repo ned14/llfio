@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['barrier_5fon_5fclose',['barrier_on_close',['../classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a06b41188d84f0fee5cff37c71b3d5877',1,'llfio_v2_xxx::section_handle']]],
-  ['byte_5flock_5finsanity',['byte_lock_insanity',['../classllfio__v2__xxx_1_1handle.html#a5929f46f42112bd805ab5001bfbf9d2aa6aa77c9bac6dd95b83f8d278f0e5fa59',1,'llfio_v2_xxx::handle']]]
+  ['environment',['environment',['../structllfio__v2__xxx_1_1path__discovery_1_1discovered__path.html#ae02f172851c050f6a7f5929410428c7dae900e40bc91d3f9f7f0a99fed68a2e96',1,'llfio_v2_xxx::path_discovery::discovered_path']]]
 ];
