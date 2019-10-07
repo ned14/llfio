@@ -281,6 +281,9 @@ LLFIO_V2_NAMESPACE_END
 #ifndef LLFIO_THREAD_LOCAL
 #define LLFIO_THREAD_LOCAL QUICKCPPLIB_THREAD_LOCAL
 #endif
+#ifndef LLFIO_NODISCARD
+#define LLFIO_NODISCARD QUICKCPPLIB_NODISCARD
+#endif
 #ifndef LLFIO_TEMPLATE
 #define LLFIO_TEMPLATE(...) QUICKCPPLIB_TEMPLATE(__VA_ARGS__)
 #endif
@@ -315,8 +318,7 @@ LLFIO_V2_NAMESPACE_END
 #include "quickcpplib/bitfield.hpp"
 // Bring in scoped undo
 #include "quickcpplib/scoped_undo.hpp"
-LLFIO_V2_NAMESPACE_BEGIN
-using QUICKCPPLIB_NAMESPACE::scoped_undo::undoer;
+LLFIO_V2_NAMESPACE_BEGIN using QUICKCPPLIB_NAMESPACE::scoped_undo::undoer;
 LLFIO_V2_NAMESPACE_END
 // Bring in a span implementation
 #include "quickcpplib/span.hpp"

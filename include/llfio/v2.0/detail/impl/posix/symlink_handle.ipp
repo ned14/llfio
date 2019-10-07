@@ -62,7 +62,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> symlink_handle::_create_symlink(con
       end_utc = d.to_time_point();
     }
   }
-  path_view::c_str zpath(target);
+  path_view::c_str<> zpath(target);
   try
   {
     if(atomic_replace)
@@ -426,7 +426,7 @@ result<symlink_handle::buffers_type> symlink_handle::read(symlink_handle::io_req
     }
     // We know we can null terminate as read < bytes
     buffer[read] = 0;
-    tofill._link = path_view(buffer, read);
+    tofill._link = path_view(buffer, read, true);
     tofill._type = symlink_type::symbolic;
     return {std::move(tofill)};
   }

@@ -89,7 +89,7 @@ namespace detail
           return success(std::move(currentdirh));
         }
         // stat the same file name, and compare dev and inode
-        path_view::c_str zpath(filename);
+        path_view::c_str<> zpath(filename);
         struct stat s
         {
         };
@@ -148,7 +148,7 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   auto &h = const_cast<handle &>(_get_handle());
-  path_view::c_str zpath(path);
+  path_view::c_str<> zpath(path);
 #ifdef O_TMPFILE
   // If the handle was created with O_TMPFILE, we need a different approach
   if(h.flags() & handle::flag::anonymous_inode)

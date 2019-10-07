@@ -42,7 +42,7 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
   // Linux provides this extension opening a super light weight fd to just an anchor on the filing system
   attribs |= O_PATH;
 #endif
-  path_view::c_str zpath(path);
+  path_view::c_str<> zpath(path);
   if(base.is_valid())
   {
     nativeh.fd = ::openat(base.native_handle().fd, zpath.buffer, attribs);

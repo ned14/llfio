@@ -27,6 +27,10 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "config.hpp"
 
+#include <iterator>
+#include <locale>
+#include <memory>  // for unique_ptr
+
 //! \file path_view.hpp Provides view of a path
 
 #ifdef _MSC_VER
@@ -45,18 +49,697 @@ LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
 {
-#if(!_HAS_CXX17 && __cplusplus < 201700) || (defined(__GLIBCXX__) && __GLIBCXX__ <= 20170818)  // libstdc++'s char_traits is missing constexpr
-  template <class T> constexpr size_t constexpr_strlen(const T *s) noexcept
+  template <class T> constexpr inline size_t constexpr_strlen(const T *s) noexcept
   {
     const T *e = s;
     for(; *e; e++)
     {
-      ;
     }
     return e - s;
   }
+
+#if !defined(__CHAR8_TYPE__) && __cplusplus < 20200000
+  struct char8_t
+  {
+    char v;
+    char8_t() = default;
+    constexpr char8_t(char _v) noexcept
+        : v(_v)
+    {
+    }
+    constexpr bool operator!() const noexcept { return !v; }
+    constexpr explicit operator bool() const noexcept { return !!v; }
+  };
+  constexpr inline bool operator<(char8_t a, char8_t b) noexcept { return a.v < b.v; }
+  constexpr inline bool operator>(char8_t a, char8_t b) noexcept { return a.v > b.v; }
+  constexpr inline bool operator<=(char8_t a, char8_t b) noexcept { return a.v <= b.v; }
+  constexpr inline bool operator>=(char8_t a, char8_t b) noexcept { return a.v >= b.v; }
+  constexpr inline bool operator==(char8_t a, char8_t b) noexcept { return a.v == b.v; }
+  constexpr inline bool operator!=(char8_t a, char8_t b) noexcept { return a.v != b.v; }
 #endif
+#if !defined(__CHAR16_TYPE__) && !defined(_MSC_VER)  // VS2015 onwards has built in char16_t
+  enum class char16_t : unsigned short
+  {
+  };
+#endif
+
+  template <class T> struct is_path_view_component_source_type : std::false_type
+  {
+  };
+  template <> struct is_path_view_component_source_type<LLFIO_V2_NAMESPACE::byte> : std::true_type
+  {
+  };
+  template <> struct is_path_view_component_source_type<char> : std::true_type
+  {
+  };
+  template <> struct is_path_view_component_source_type<wchar_t> : std::true_type
+  {
+  };
+  template <> struct is_path_view_component_source_type<char8_t> : std::true_type
+  {
+  };
+  template <> struct is_path_view_component_source_type<char16_t> : std::true_type
+  {
+  };
+
+  template <class T> inline T *cast_char8_t_ptr(T *v) { return v; }
+  template <class InternT, class ExternT> struct _codecvt : std::codecvt<InternT, ExternT, std::mbstate_t>
+  {
+    template <class... Args>
+    _codecvt(Args &&... args)
+        : std::codecvt<InternT, ExternT, std::mbstate_t>(std::forward<Args>(args)...)
+    {
+    }
+    ~_codecvt() {}
+  };
+#if !defined(__CHAR8_TYPE__) && __cplusplus < 20200000
+  inline const char *cast_char8_t_ptr(const char8_t *v) { return (const char *) v; }
+  inline char *cast_char8_t_ptr(char8_t *v) { return (char *) v; }
+  template <> struct _codecvt<char8_t, char> : std::codecvt<char, char, std::mbstate_t>
+  {
+    template <class... Args>
+    _codecvt(Args &&... args)
+        : std::codecvt<char, char, std::mbstate_t>(std::forward<Args>(args)...)
+    {
+    }
+    ~_codecvt() {}
+  };
+#endif
+
+  class path_view_iterator;
 }  // namespace detail
+
+class path_view;
+
+/*! \class path_view_component
+\brief An iterated part of a `path_view`.
+*/
+class LLFIO_DECL path_view_component
+{
+  friend class path_view;
+  friend class detail::path_view_iterator;
+
+public:
+  //! The preferred separator type
+  static constexpr auto preferred_separator = filesystem::path::preferred_separator;
+
+  //! Character type for passthrough input
+  using byte = LLFIO_V2_NAMESPACE::byte;
+#if !defined(__CHAR8_TYPE__) && __cplusplus < 20200000
+  using char8_t = detail::char8_t;
+#endif
+#if !defined(__CHAR16_TYPE__) && !defined(_MSC_VER)  // VS2015 onwards has built in char16_t
+  using char16_t = detail::char16_t;
+#endif
+
+private:
+  template <class Char> static constexpr bool _is_constructible = detail::is_path_view_component_source_type<std::decay_t<Char>>::value;
+  static constexpr auto _npos = string_view::npos;
+  union {
+    const byte *_bytestr{nullptr};
+    const char *_charstr;
+    const wchar_t *_wcharstr;
+    const char8_t *_char8str;
+    const char16_t *_char16str;
+  };
+  size_t _length{0};  // in characters, excluding any zero terminator
+  unsigned _zero_terminated : 1;
+  unsigned _passthrough : 1;
+  unsigned _char : 1;
+  unsigned _wchar : 1;
+  unsigned _utf8 : 1;
+  unsigned _utf16 : 1;
+
+  constexpr path_view_component()
+      : _zero_terminated(false)
+      , _passthrough(false)
+      , _char(false)
+      , _wchar(false)
+      , _utf8(false)
+      , _utf16(false)
+  {
+  }  // NOLINT
+  constexpr path_view_component(const byte *b, size_t l, bool zt)
+      : _bytestr(b)
+      , _length(l)
+      , _zero_terminated(zt)
+      , _passthrough(true)
+      , _char(false)
+      , _wchar(false)
+      , _utf8(false)
+      , _utf16(false)
+  {
+  }
+  constexpr path_view_component(const char *b, size_t l, bool zt)
+      : _charstr(b)
+      , _length(l)
+      , _zero_terminated(zt)
+      , _passthrough(false)
+      , _char(true)
+      , _wchar(false)
+      , _utf8(false)
+      , _utf16(false)
+  {
+  }
+  constexpr path_view_component(const wchar_t *b, size_t l, bool zt)
+      : _wcharstr(b)
+      , _length(l)
+      , _zero_terminated(zt)
+      , _passthrough(false)
+      , _char(false)
+      , _wchar(true)
+      , _utf8(false)
+      , _utf16(false)
+  {
+  }
+  constexpr path_view_component(const char8_t *b, size_t l, bool zt)
+      : _char8str(b)
+      , _length(l)
+      , _zero_terminated(zt)
+      , _passthrough(false)
+      , _char(false)
+      , _wchar(false)
+      , _utf8(true)
+      , _utf16(false)
+  {
+  }
+  constexpr path_view_component(const char16_t *b, size_t l, bool zt)
+      : _char16str(b)
+      , _length(l)
+      , _zero_terminated(zt)
+      , _passthrough(false)
+      , _char(false)
+      , _wchar(false)
+      , _utf8(false)
+      , _utf16(true)
+  {
+  }
+  template <class U> constexpr auto _invoke(U &&f) const noexcept
+  {
+    return _utf8 ? f(basic_string_view<char8_t>(_char8str, _length))  //
+                   :
+                   (_utf16 ? f(basic_string_view<char16_t>(_char16str, _length))  //
+                             :
+                             (_wchar ? f(basic_string_view<wchar_t>(_wcharstr, _length))  //
+                                       :
+                                       f(basic_string_view<char>((const char *) _bytestr, _length))));
+  }
+  constexpr auto _find_first_sep(size_t startidx = 0) const noexcept
+  {
+#ifdef _WIN32
+    return _utf8 ? basic_string_view<char8_t>(_char8str, _length).find_first_of((const char8_t *) "/\\", startidx)  //
+                   :
+                   (_utf16 ? basic_string_view<char16_t>(_char16str, _length).find_first_of((const char16_t *) L"/\\", startidx)  //
+                             :
+                             (_wchar ? basic_string_view<wchar_t>(_wcharstr, _length).find_first_of(L"/\\", startidx)  //
+                                       :
+                                       basic_string_view<char>((const char *) _bytestr, _length).find_first_of((const char *) "/\\", startidx)));
+#else
+    return _utf8 ? basic_string_view<char8_t>(_char8str, _length).find(preferred_separator, startidx)  //
+                   :
+                   (_utf16 ? basic_string_view<char16_t>(_char16str, _length).find(preferred_separator, startidx)  //
+                             :
+                             (_wchar ? basic_string_view<wchar_t>(_wcharstr, _length).find(preferred_separator, startidx)  //
+                                       :
+                                       basic_string_view<char>((const char *) _bytestr, _length).find(preferred_separator, startidx)));
+#endif
+  }
+  constexpr auto _find_last_sep(size_t endidx = _npos) const noexcept
+  {
+#ifdef _WIN32
+    return _utf8 ? basic_string_view<char8_t>(_char8str, _length).find_last_of((const char8_t *) "/\\", endidx)  //
+                   :
+                   (_utf16 ? basic_string_view<char16_t>(_char16str, _length).find_last_of((const char16_t *) L"/\\", endidx)  //
+                             :
+                             (_wchar ? basic_string_view<wchar_t>(_wcharstr, _length).find_last_of(L"/\\", endidx)  //
+                                       :
+                                       basic_string_view<char>((const char *) _bytestr, _length).find_last_of("/\\", endidx)));
+#else
+    return _utf8 ? basic_string_view<char8_t>(_char8str, _length).rfind(preferred_separator, endidx)  //
+                   :
+                   (_utf16 ? basic_string_view<char16_t>(_char16str, _length).rfind(preferred_separator, endidx)  //
+                             :
+                             (_wchar ? basic_string_view<wchar_t>(_wcharstr, _length).rfind(preferred_separator, endidx)  //
+                                       :
+                                       basic_string_view<char>((const char *) _bytestr, _length).rfind(preferred_separator, endidx)));
+#endif
+  }
+
+public:
+  path_view_component(const path_view_component &) = default;
+  path_view_component(path_view_component &&) = default;
+  path_view_component &operator=(const path_view_component &) = default;
+  path_view_component &operator=(path_view_component &&) = default;
+  ~path_view_component() = default;
+
+  //! True if empty
+  constexpr bool empty() const noexcept { return _length == 0; }
+
+  //! Returns the size of the view in characters.
+  constexpr size_t native_size() const noexcept
+  {
+    return _invoke([](const auto &v) { return v.size(); });
+  }
+
+  //! Swap the view with another
+  constexpr void swap(path_view_component &o) noexcept
+  {
+    path_view_component x = *this;
+    *this = o;
+    o = x;
+  }
+
+  // True if the view contains any of the characters `*`, `?`, (POSIX only: `[` or `]`).
+  constexpr bool contains_glob() const noexcept
+  {
+    return _invoke([](const auto &v) {
+      using value_type = typename std::remove_reference<decltype(*v.data())>::type;
+#ifdef _WIN32
+      const value_type *tofind = sizeof(value_type) > 1 ? (const value_type *) L"*?" : (const value_type *) "*?";
+#else
+      const value_type *tofind = sizeof(value_type) > 1 ? (const value_type *) L"*?[]" : (const value_type *) "*?[]";
+#endif
+      return string_view::npos != v.find_first_of(tofind);
+    });
+  }
+
+  //! Returns a view of the filename without any file extension
+  constexpr path_view_component stem() const noexcept
+  {
+    auto sep_idx = _find_last_sep();
+    return _invoke([sep_idx, this](const auto &v) {
+      auto dot_idx = v.rfind('.');
+      if(_npos == dot_idx || (_npos != sep_idx && dot_idx < sep_idx) || dot_idx == sep_idx + 1 || (dot_idx == sep_idx + 2 && v[dot_idx - 1] == '.'))
+      {
+        return path_view_component(v.data() + sep_idx + 1, v.size() - sep_idx - 1, false);
+      }
+      return path_view_component(v.data() + sep_idx + 1, dot_idx - sep_idx - 1, _zero_terminated);
+    });
+  }
+  //! Returns a view of the file extension part of this view
+  constexpr path_view_component extension() const noexcept
+  {
+    auto sep_idx = _find_last_sep();
+    return _invoke([sep_idx, this](const auto &v) {
+      auto dot_idx = v.rfind('.');
+      if(_npos == dot_idx || (_npos != sep_idx && dot_idx < sep_idx) || dot_idx == sep_idx + 1 || (dot_idx == sep_idx + 2 && v[dot_idx - 1] == '.'))
+      {
+        return path_view_component();
+      }
+      return path_view_component(v.data() + dot_idx, v.size() - dot_idx, _zero_terminated);
+    });
+  }
+
+private:
+  template <class CharT> static filesystem::path _path_from_char_array(basic_string_view<CharT> v) { return {v.data(), v.data() + v.size()}; }
+  static filesystem::path _path_from_char_array(basic_string_view<char8_t> v) { return filesystem::u8path((const char *) v.data(), (const char *) v.data() + v.size()); }
+
+  template <class InT, class OutT> static detail::_codecvt<InT, OutT> &_get_codecvt() noexcept
+  {
+    static detail::_codecvt<InT, OutT> ret;
+    return ret;
+  }
+  template <class CharT> static int _compare(basic_string_view<CharT> a, basic_string_view<CharT> b) noexcept { return a.compare(b); }
+#ifdef _WIN32
+  // On Windows only, char is the native narrow encoding, which is locale dependent
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC std::unique_ptr<char8_t[]> _ansi_path_to_utf8(basic_string_view<char8_t> &out, basic_string_view<char> in) noexcept;
+  static int _compare(basic_string_view<char> a, basic_string_view<char> b) noexcept { return a.compare(b); }
+  template <class CharT> static int _compare(basic_string_view<CharT> a, basic_string_view<char> b) noexcept { return -_compare(b, a); }
+  template <class CharT> static int _compare(basic_string_view<char> a, basic_string_view<CharT> b) noexcept
+  {
+    // Convert a from native narrow encoding to utf8
+    basic_string_view<char8_t> a_utf8;
+    auto h = _ansi_path_to_utf8(a_utf8, a);
+    if(!h)
+    {
+      // Failure to allocate memory, or convert
+      assert(h);
+      return -99;
+    }
+    return _compare(a_utf8, b);
+  }
+#endif
+  template <class Char1T, class Char2T> static int _compare(basic_string_view<Char1T> a, basic_string_view<Char2T> b) noexcept
+  {
+    static constexpr size_t codepoints_at_a_time = 8 * 4;
+    // Convert both to utf8, then to utf32, and compare
+#if !defined(__CHAR8_TYPE__) && __cplusplus < 20200000
+    using utf8_type = char;
+#else
+    using utf8_type = char8_t;
+#endif
+    auto &convert_a = _get_codecvt<Char1T, utf8_type>();
+    auto &convert_b = _get_codecvt<Char2T, utf8_type>();
+    std::mbstate_t a_state{}, b_state{};
+    auto *a_ptr = detail::cast_char8_t_ptr(a.data());
+    auto *b_ptr = detail::cast_char8_t_ptr(b.data());
+    const auto *a_back = detail::cast_char8_t_ptr(&a.back());
+    const auto *b_back = detail::cast_char8_t_ptr(&b.back());
+    while(a_ptr <= a_back && b_ptr <= b_back)
+    {
+      // Try to convert 5 to 32 chars at a time
+      utf8_type a_out[codepoints_at_a_time + 1], b_out[codepoints_at_a_time + 1], *a_out_end = a_out, *b_out_end = b_out;
+      auto a_result = convert_a.out(a_state, a_ptr, a_back + 1, a_ptr, a_out, a_out + codepoints_at_a_time, a_out_end);
+      auto b_result = convert_b.out(b_state, b_ptr, b_back + 1, b_ptr, b_out, b_out + codepoints_at_a_time, b_out_end);
+      assert(std::codecvt_base::noconv != a_result);
+      if(std::codecvt_base::noconv == a_result)
+      {
+        size_t tocopy = std::min(codepoints_at_a_time, (size_t)(a_back + 1 - a_ptr));
+        memcpy(a_out, a_ptr, tocopy);
+        a_out_end = a_out + tocopy;
+        a_ptr += tocopy;
+      }
+      if(std::codecvt_base::partial == a_result && a_out_end == a_out + codepoints_at_a_time)
+      {
+        // Needs one more character from input
+        a_result = convert_a.out(a_state, a_ptr, a_ptr + 1, a_ptr, a_out + codepoints_at_a_time, a_out + codepoints_at_a_time + 1, a_out_end);
+        assert(std::codecvt_base::partial != a_result);
+      }
+      if(std::codecvt_base::error == a_result)
+      {
+        assert(false);
+        return -99;
+      }
+      assert(std::codecvt_base::noconv != b_result);
+      if(std::codecvt_base::noconv == b_result)
+      {
+        size_t tocopy = std::min(codepoints_at_a_time, (size_t)(b_back + 1 - b_ptr));
+        memcpy(b_out, b_ptr, tocopy);
+        b_out_end = b_out + tocopy;
+        b_ptr += tocopy;
+      }
+      if(std::codecvt_base::partial == b_result && b_out_end == b_out + codepoints_at_a_time)
+      {
+        // Needs one more character from input
+        b_result = convert_b.out(b_state, b_ptr, b_ptr + 1, b_ptr, b_out + codepoints_at_a_time, b_out + codepoints_at_a_time + 1, b_out_end);
+        assert(std::codecvt_base::partial != b_result);
+      }
+      if(std::codecvt_base::error == b_result)
+      {
+        assert(false);
+        return 99;
+      }
+      if((a_out_end - a_out) < (b_out_end - b_out))
+      {
+        return -2;
+      }
+      if((a_out_end - a_out) > (b_out_end - b_out))
+      {
+        return 2;
+      }
+#if !defined(__CHAR8_TYPE__) && __cplusplus < 20200000
+      // Before C++ 20, no facility to char_traits::compare utf8, so convert to utf32
+      const utf8_type *a_out_end_ = a_out_end, *b_out_end_ = b_out_end;
+      char32_t a32[codepoints_at_a_time + 1], b32[codepoints_at_a_time + 1], *a32_end = a32, *b32_end = b32;
+      std::mbstate_t a32_state{}, b32_state{};
+      auto &convert32 = _get_codecvt<char32_t, char>();
+      convert32.in(a32_state, a_out, a_out_end, a_out_end_, a32, a32 + codepoints_at_a_time + 1, a32_end);
+      convert32.in(b32_state, b_out, b_out_end, b_out_end_, b32, b32 + codepoints_at_a_time + 1, b32_end);
+      if((a32_end - a32) < (b32_end - b32))
+      {
+        return -2;
+      }
+      if((a32_end - a32) > (b32_end - b32))
+      {
+        return 2;
+      }
+      int ret = std::char_traits<char32_t>::compare(a32, b32, a32_end - a32);
+#else
+      int ret = std::char_traits<char8_t>::compare(a_out, b_out, a_out_end - a_out);
+#endif
+      if(ret != 0)
+      {
+        return ret;
+      }
+    }
+    if(a_ptr >= a_back)
+    {
+      return -2;
+    }
+    if(b_ptr >= b_back)
+    {
+      return 2;
+    }
+    return 0;  // equal
+  }
+
+public:
+  //! Return the path view as a path. Allocates and copies memory!
+  filesystem::path path() const
+  {
+    return _invoke([](const auto &v) { return _path_from_char_array(v); });
+  }
+
+  /*! Compares the two path views for equivalence or ordering.
+  Be aware that comparing path views of differing source encodings will be expensive
+  as a conversion to utf8 is performed. Be further aware that on
+  Windows, `char` source must undergo a narrow native encoding to utf8 conversion via
+  the Windows conversion APIs, which is extremely expensive, if not comparing `char`-`char`
+  views.
+  */
+  constexpr int compare(const path_view_component &p) const noexcept
+  {
+    return _invoke([&p](const auto &self) { return p._invoke([&self](const auto &other) { return _compare(self, other); }); });
+  }
+  //! \overload
+  LLFIO_TEMPLATE(class Char)
+  LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::_is_constructible<Char>))
+  constexpr int compare(const Char *s) const noexcept { return compare(path_view_component(s)); }
+  //! \overload
+  LLFIO_TEMPLATE(class Char)
+  LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::_is_constructible<Char>))
+  constexpr int compare(const basic_string_view<Char> s) const noexcept { return compare(path_view_component(s)); }
+
+  /*! Instantiate from a `path_view_component` to get a path suitable for feeding to other code.
+  \tparam T The destination encoding required.
+  \tparam Deleter A custom deleter for any temporary buffer.
+  \tparam disable_internal_buffer Set to true to disable the internal temporary buffer, thus
+  reducing stack space consumption (most compilers optimise away the internal temporary buffer
+  if it can be proved it will never be used).
+
+  This makes the input to the path view component into a destination format suitable for
+  consumption by other code. If the source has the same format as the destination, and
+  the zero termination requirements are the same, the source is used directly without
+  memory copying nor reencoding.
+
+  If the format is compatible, but the destination requires zero termination,
+  and the source is not zero terminated, a straight memory copy is performed
+  into the temporary buffer.
+
+  `c_str` contains a 4Kb internal temporary buffer. Output below that amount involves
+  no dynamic memory allocation. Output above that amount calls `operator new[]`. You
+  can use an externally supplied larger temporary buffer to avoid dynamic memory
+  allocation in all situations.
+  */
+  template <class T = typename filesystem::path::value_type, class Deleter = std::default_delete<T[]>, bool disable_internal_buffer = false> struct c_str
+  {
+    static_assert(_is_constructible<T>, "path_view_component::c_str<T> does not have a T which is one of byte, char, wchar_t, char8_t nor char16_t");
+    //! Type of the value type
+    using value_type = T;
+    //! Type of the deleter
+    using deleter_type = Deleter;
+
+    //! Number of characters, excluding zero terminating char, at buffer
+    size_t length{0};
+    //! Pointer to the possibly-converted path
+    const value_type *buffer{nullptr};
+
+  private:
+    template <class U, class source_type> void _make_passthrough(const path_view_component & /*unused*/, bool /*unused*/, U & /*unused*/, source_type * /*unused*/) {}
+    template <class U> void _make_passthrough(const path_view_component &view, bool no_zero_terminate, U &allocate, value_type *source)
+    {
+      length = view._length;
+      if(no_zero_terminate || view._zero_terminated)
+      {
+        buffer = source;
+      }
+      else
+      {
+        const size_t required_length = view._length + (!no_zero_terminate - view._zero_terminated);
+        const size_t required_bytes = required_length * sizeof(value_type);
+        const size_t _buffer_bytes = sizeof(_buffer);
+#ifdef _WIN32
+        if(required_bytes > 65535)
+        {
+          LLFIO_LOG_FATAL(nullptr, "Paths exceeding 64Kb are impossible on Microsoft Windows");
+          abort();
+        }
+#endif
+        if(required_bytes <= _buffer_bytes)
+        {
+          buffer = _buffer;
+          memcpy(buffer, source, required_bytes);
+        }
+        else
+        {
+          buffer = allocate(required_length);
+          if(nullptr == buffer)
+          {
+            length = 0;
+          }
+          else
+          {
+            _call_deleter = true;
+          }
+        }
+      }
+    }
+
+  public:
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4127)  // conditional expression is constant
+#endif
+    /*! Construct, performing any reencoding or memory copying required.
+    \param view The path component view to use as source.
+    \param no_zero_terminate Set to true if zero termination is not required.
+    \param allocate A callable with prototype `value_type *(size_t length)` which
+    is defaulted to `return new value_type[length];`. You can return `nullptr` if
+    you wish, the consumer of `c_str` will see a `buffer` set to `nullptr`.
+
+    If an error occurs during any conversion from UTF-8 or UTF-16, an exception of
+    `system_error(errc::illegal_byte_sequence)` is thrown.
+    This is because if you tell `path_view` that its source is UTF-8 or UTF-16, then that
+    must be **valid** UTF. If you wish to supply UTF-invalid paths (which are legal
+    on most filesystems), use native narrow or wide encoded source, or binary.
+    */
+    template <class U> c_str(const path_view_component &view, bool no_zero_terminate, U &&allocate)
+    {
+      if(std::is_same<T, byte>::value || view._passthrough)
+      {
+        length = view._length;
+        buffer = (const value_type *) view._bytestr;
+        return;
+      }
+      if(std::is_same<T, char>::value && view._char)
+      {
+        _make_passthrough(view, no_zero_terminate, allocate, view._charstr);
+        return;
+      }
+      if(std::is_same<T, wchar_t>::value && view._wchar)
+      {
+        _make_passthrough(view, no_zero_terminate, allocate, view._wcharstr);
+        return;
+      }
+      if(std::is_same<T, char8_t>::value && view._utf8)
+      {
+        _make_passthrough(view, no_zero_terminate, allocate, view._char8str);
+        return;
+      }
+      if(std::is_same<T, char16_t>::value && view._utf16)
+      {
+        _make_passthrough(view, no_zero_terminate, allocate, view._char16str);
+        return;
+      }
+#ifdef _WIN32
+      // On Windows, consider char16_t input equivalent to wchar_t
+      if(std::is_same<T, wchar_t>::value && view._utf16)
+      {
+        _make_passthrough(view, no_zero_terminate, allocate, view._wcharstr);
+        return;
+      }
+#else
+      // On POSIX, consider char8_t input equivalent to char
+      if(std::is_same<T, char>::value && view._utf8)
+      {
+        _make_passthrough(view, no_zero_terminate, allocate, view._charstr);
+        return;
+      }
+#endif
+      // A reencoding is required
+      view._invoke([&](auto src) {
+        using src_value_type = typename decltype(src)::value_type;
+        auto &convert = view._get_codecvt<src_value_type, value_type>();
+        std::mbstate_t cstate{};
+        auto *src_ptr = src.data();
+        auto *dest_ptr = _buffer;
+        if(!disable_internal_buffer)
+        {
+          // First try the internal buffer, if we overflow, fall back to the allocator
+          auto result = convert.out(cstate, src_ptr, &src.back() + 1, src_ptr, dest_ptr, _buffer + sizeof(_buffer) / sizeof(value_type) - 1, dest_ptr);
+          assert(std::codecvt_base::noconv != result);
+          if(std::codecvt_base::noconv == result)
+          {
+            LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str should never do identity reencoding");
+            abort();
+          }
+          if(std::codecvt_base::error == result)
+          {
+            throw std::system_error(make_error_code(std::errc::illegal_byte_sequence));
+          }
+          if(std::codecvt_base::ok == result)
+          {
+            *dest_ptr = 0;
+            length = dest_ptr - _buffer;
+            buffer = _buffer;
+            return;
+          }
+        }
+        // This is a bit crap, but codecvt is hardly the epitome of good design :(
+        const size_t required_length = convert.max_length() * (1 + view.native_size());
+#ifdef _WIN32
+        const size_t required_bytes = required_length * sizeof(value_type);
+        if(required_bytes > 65535)
+        {
+          LLFIO_LOG_FATAL(nullptr, "Paths exceeding 64Kb are impossible on Microsoft Windows");
+          abort();
+        }
+#endif
+        auto *out = allocate(required_length);
+        buffer = out;
+        if(nullptr == out)
+        {
+          length = 0;
+          return;
+        }
+        _call_deleter = true;
+        memcpy(out, _buffer, dest_ptr - _buffer);
+        dest_ptr = out + (dest_ptr - _buffer);
+        auto result = convert.out(cstate, src_ptr, &src.back() + 1, src_ptr, dest_ptr, out + required_length - 1, dest_ptr);
+        assert(std::codecvt_base::noconv != result);
+        if(std::codecvt_base::noconv == result)
+        {
+          LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str should never do identity reencoding");
+          abort();
+        }
+        if(std::codecvt_base::error == result)
+        {
+          throw std::system_error(std::make_error_code(std::errc::illegal_byte_sequence));
+        }
+        assert(std::codecvt_base::ok == result);
+        if(std::codecvt_base::ok != result)
+        {
+          LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str should never experience partial conversion");
+          abort();
+        }
+        *dest_ptr = 0;
+        length = dest_ptr - out;
+      });
+    }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+    //! \overload
+    c_str(const path_view_component &view, bool no_zero_terminate = false)
+        : c_str(view, no_zero_terminate, [](size_t length) { return new value_type[length]; })
+    {
+    }
+    ~c_str() = default;
+    c_str(const c_str &) = delete;
+    c_str(c_str &&) = delete;
+    c_str &operator=(const c_str &) = delete;
+    c_str &operator=(c_str &&) = delete;
+
+  private:
+    bool _call_deleter{false};
+    Deleter _deleter;
+    // MAKE SURE this is the final item in storage, the compiler will elide the storage
+    // under optimisation if it can prove it is never used.
+    value_type _buffer[disable_internal_buffer ? 1 : (4096 / sizeof(value_type))]{};
+  };
+  template <class, class, bool> friend struct c_str;
+};
+
 
 /*! \class path_view
 \brief A borrowed view of a path. A lightweight trivial-type alternative to
@@ -71,28 +754,44 @@ Some of the API for `std::filesystem::path` is replicated here, however any
 APIs which modify the path other than taking subsets are obviously not
 possible with borrowed views.
 
-\todo Lots of member functions remain to be implemented.
+\todo Lots of member functions remain to be implemented. `char8_t` and `char16_t`
+support is not implemented yet.
+
+Each consumer of `path_view` defines what the "native platform transport" and
+"native platform encoding" is. For LLFIO, the native platform transport is
+defined to be `std::filesystem::path::value_type`, which is as follows:
+
+- POSIX: The native platform transport is `char`.
+- Microsoft Windows: The native platform transport is `wchar_t`.
+
+**If** the input to `path_view` equals the native platform transport, the bits
+supplied will be passed through to the operating system without translation (see below).
+*If* the consuming API expects null termination, and the input to `path_view` is null
+terminated, then you are *guaranteed* that the originally supplied buffer is passed
+through. If the input is not null terminated, a bitwise identical copy is made into
+temporary storage (which will be the stack for smaller strings), which is then null
+terminated before passing to the consuming API.
+
+If the input to `path_view` does NOT equal the native platform transport, then
+a translation of the input bits will be performed into temporary storage just before
+calling the consuming API. The rules are as follows:
+
+- POSIX: The native platform encoding is assumed to be UTF-8. If the input is `char8_t`
+or `char`, it is not translated. If the input is `char16_t`, a UTF-16 to UTF-8 translation
+is performed.
+
+- Microsoft Windows: The native platform encoding is assumed to be UTF-16. If the input
+is `char16_t` or `wchar_t`, it is not translated. If the input is `char8_t`, a UTF-8 to UTF-16
+translation is performed. If the input is `char`, the Microsoft Windows API for ANSI to
+UTF-16 translation is invoked in order to match how Windows ANSI APIs are mapped onto the
+Windows Unicode APIs (be aware this is very slow).
 
 # Windows specific notes:
 
-Be aware that on Microsoft Windows, the native path storage
-`std::filesystem::path::value_type` is a `wchar_t` referring to UTF-16.
-However much of LLFIO path usage is a `path_handle` to somewhere on the filing
-system plus a relative `const char *` UTF-8 path fragment as the use of
-absolute paths is discouraged. Rather than complicate the ABI to handle
-templated path character types, on Microsoft Windows only we do the following:
-
-- If view input is `wchar_t`, the original source is passed through unmodified
-to the syscall without any memory allocation, copying nor slash conversion.
-- If view input is `char`:
-  1. The original source **is assumed to be in UTF-8**, not ASCII like most
-`char` paths on Microsoft Windows.
-  2. Use with any kernel function converts to a temporary UTF-16 internal
-buffer. We use the fast NT kernel UTF8 to UTF16 routine, not the slow Win32
-routine.
-  3. Any forward slashes are converted to backwards slashes.
-
-LLFIO calls the NT kernel API directly rather than the Win32 API for:
+On Microsoft Windows, filesystem paths may require to be zero terminated,
+or they may not. Which is the case depends on whether LLFIO calls the NT kernel
+API directly rather than the Win32 API. As a general rule as to when which
+is used, the NT kernel API is called instead of the Win32 API when:
 
 - For any paths relative to a `path_handle` (the Win32 API does not provide a
 race free file system API).
@@ -130,13 +829,18 @@ routine.
 If however you are taking input from some external piece of code, then for
 maximum compatibility you should still use the Win32 API.
 */
-class LLFIO_DECL path_view
+class path_view
 {
 public:
-  // const_iterator
-  // iterator
-  // reverse_iterator
-  // const_reverse_iterator
+  friend class detail::path_view_iterator;
+  //! Const iterator type
+  using const_iterator = detail::path_view_iterator;
+  //! iterator type
+  using iterator = const_iterator;
+  //! Reverse iterator
+  using reverse_iterator = std::reverse_iterator<iterator>;
+  //! Const reverse iterator
+  using const_reverse_iterator = std::reverse_iterator<const_iterator>;
   //! Size type
   using size_type = std::size_t;
   //! Difference type
@@ -145,111 +849,88 @@ public:
   //! The preferred separator type
   static constexpr auto preferred_separator = filesystem::path::preferred_separator;
 
+  //! Character type for passthrough input
+  using byte = LLFIO_V2_NAMESPACE::byte;
+#if !defined(__CHAR8_TYPE__) && __cplusplus < 20200000
+  using char8_t = detail::char8_t;
+#endif
+#if !defined(__CHAR16_TYPE__) && !defined(_MSC_VER)  // VS2015 onwards has built in char16_t
+  enum class char16_t : unsigned short
+  {
+  };
+#endif
+
 private:
   static constexpr auto _npos = string_view::npos;
-#ifdef _WIN32
-  struct state
-  {
-    string_view _utf8;
-    wstring_view _utf16;
 
-    constexpr state() {}  // NOLINT
-    constexpr explicit state(string_view v)
-        : _utf8(v)
+  path_view_component _state;
 
-    {
-    }
-    constexpr explicit state(wstring_view v)
-        : _utf16(v)
-    {
-    }
-    constexpr void swap(state &o) noexcept
-    {
-      _utf8.swap(o._utf8);
-      _utf16.swap(o._utf16);
-    }
-  } _state;
-  template <class U> constexpr auto _invoke(U &&f) noexcept { return !_state._utf16.empty() ? f(_state._utf16) : f(_state._utf8); }
-  template <class U> constexpr auto _invoke(U &&f) const noexcept { return !_state._utf16.empty() ? f(_state._utf16) : f(_state._utf8); }
-  constexpr auto _find_first_sep(size_t startidx = 0) const noexcept
-  {
-    // wchar paths must use backslashes
-    if(!_state._utf16.empty())
-    {
-      return _state._utf16.find('\\', startidx);
-    }
-    // char paths can use either
-    return _state._utf8.find_first_of("/\\", startidx);
-  }
-  constexpr auto _find_last_sep() const noexcept
-  {
-    // wchar paths must use backslashes
-    if(!_state._utf16.empty())
-    {
-      return _state._utf16.rfind('\\');
-    }
-    // char paths can use either
-    return _state._utf8.find_last_of("/\\");
-  }
-#else
-  struct state
-  {
-    string_view _utf8;
-
-    constexpr state() {}  // NOLINT
-    constexpr explicit state(string_view v)
-        : _utf8(v)
-    {
-    }
-    constexpr void swap(state &o) noexcept { _utf8.swap(o._utf8); }
-  } _state;
-  template <class U> constexpr auto _invoke(U &&f) noexcept { return f(_state._utf8); }
-  template <class U> constexpr auto _invoke(U &&f) const noexcept { return f(_state._utf8); }
-  constexpr auto _find_first_sep(size_t startidx = 0) const noexcept { return _state._utf8.find(preferred_separator, startidx); }
-  constexpr auto _find_last_sep() const noexcept { return _state._utf8.rfind(preferred_separator); }
-#endif
 public:
   //! Constructs an empty path view
   constexpr path_view() {}  // NOLINT
   ~path_view() = default;
+
   //! Implicitly constructs a path view from a path. The input path MUST continue to exist for this view to be valid.
-  path_view(const filesystem::path &v) noexcept : _state(v.native()) {}  // NOLINT
-  //! Implicitly constructs a UTF-8 path view from a string. The input string MUST continue to exist for this view to be valid.
-  path_view(const std::string &v) noexcept : _state(v) {}  // NOLINT
-  //! Implicitly constructs a UTF-8 path view from a zero terminated `const char *`. The input string MUST continue to exist for this view to be valid.
-  constexpr path_view(const char *v) noexcept :                                                // NOLINT
-#if(!_HAS_CXX17 && __cplusplus < 201700) || (defined(__GLIBCXX__) && __GLIBCXX__ <= 20170818)  // libstdc++'s char_traits is missing constexpr
-                                                 _state(string_view(v, detail::constexpr_strlen(v)))
-#else
-                                                 _state(string_view(v))
-#endif
+  path_view(const filesystem::path &v) noexcept  // NOLINT
+      : _state(v.native().c_str(), v.native().size(), true)
   {
   }
-  //! Constructs a UTF-8 path view from a lengthed `const char *`. The input string MUST continue to exist for this view to be valid.
-  constexpr path_view(const char *v, size_t len) noexcept : _state(string_view(v, len)) {}
-  /*! Implicitly constructs a UTF-8 path view from a string view.
-  \warning The byte after the end of the view must be legal to read.
-  */
-  constexpr path_view(string_view v) noexcept : _state(v) {}  // NOLINT
-#ifdef _WIN32
-  //! Implicitly constructs a UTF-16 path view from a string. The input string MUST continue to exist for this view to be valid.
-  path_view(const std::wstring &v) noexcept : _state(v) {}  // NOLINT
-  //! Implicitly constructs a UTF-16 path view from a zero terminated `const wchar_t *`. The input string MUST continue to exist for this view to be valid.
-  constexpr path_view(const wchar_t *v) noexcept :  // NOLINT
-#if !_HAS_CXX17 && __cplusplus < 201700
-                                                    _state(wstring_view(v, detail::constexpr_strlen(v)))
-#else
-                                                    _state(wstring_view(v))
-#endif
+  //! Implicitly constructs a path view from a path view component. The input path MUST continue to exist for this view to be valid.
+  path_view(path_view_component v) noexcept  // NOLINT
+      : _state(v)
   {
   }
-  //! Constructs a UTF-16 path view from a lengthed `const wchar_t *`. The input string MUST continue to exist for this view to be valid.
-  constexpr path_view(const wchar_t *v, size_t len) noexcept : _state(wstring_view(v, len)) {}
-  /*! Implicitly constructs a UTF-16 path view from a wide string view.
-  \warning The character after the end of the view must be legal to read.
+
+  //! Implicitly constructs a path view from a zero terminated `const char *`. Convenience wrapper for the `byte` constructor. The input string MUST continue to exist for this view to be valid.
+  constexpr path_view(const char *v) noexcept  // NOLINT
+      : _state(v, detail::constexpr_strlen(v), true)
+  {
+  }
+  //! Implicitly constructs a path view from a zero terminated `const wchar_t *`. Convenience wrapper for the `byte` constructor. The input string MUST continue to exist for this view to be valid.
+  constexpr path_view(const wchar_t *v) noexcept  // NOLINT
+      : _state(v, detail::constexpr_strlen(v), true)
+  {
+  }
+  //! Implicitly constructs a path view from a zero terminated `const char8_t *`. Performs a UTF-8 to native encoding if necessary. The input string MUST continue to exist for this view to be valid.
+  constexpr path_view(const char8_t *v) noexcept  // NOLINT
+      : _state(v, detail::constexpr_strlen(v), true)
+  {
+  }
+  //! Implicitly constructs a path view from a zero terminated `const char16_t *`. Performs a UTF-16 to native encoding if necessary. The input string MUST continue to exist for this view to be valid.
+  constexpr path_view(const char16_t *v) noexcept  // NOLINT
+      : _state(v, detail::constexpr_strlen(v), true)
+  {
+  }
+
+  /*! Constructs a path view from a lengthed array of one of
+  `byte`, `char`, `wchar_t`, `char8_t` or `char16_t`. The input
+  string MUST continue to exist for this view to be valid.
   */
-  constexpr path_view(wstring_view v) noexcept : _state(v) {}  // NOLINT
-#endif
+  LLFIO_TEMPLATE(class Char)
+  LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::_is_constructible<Char>))
+  constexpr path_view(const Char *v, size_t len, bool is_zero_terminated) noexcept
+      : _state(v, len, is_zero_terminated)
+  {
+  }
+  /*! Constructs from a basic string if the character type is one of
+  `char`, `wchar_t`, `char8_t` or `char16_t`.
+  */
+  LLFIO_TEMPLATE(class Char)
+  LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::_is_constructible<Char>))
+  constexpr path_view(const std::basic_string<Char> &v) noexcept  // NOLINT
+      : path_view(v.data(), v.size(), true)
+  {
+  }
+  /*! Constructs from a basic string view if the character type is one of
+  `char`, `wchar_t`, `char8_t` or `char16_t`.
+  */
+  LLFIO_TEMPLATE(class Char)
+  LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::_is_constructible<Char>))
+  constexpr path_view(basic_string_view<Char> v, bool is_zero_terminated) noexcept  // NOLINT
+      : path_view(v.data(), v.size(), is_zero_terminated)
+  {
+  }
+
   //! Default copy constructor
   path_view(const path_view &) = default;
   //! Default move constructor
@@ -263,9 +944,9 @@ public:
   constexpr void swap(path_view &o) noexcept { _state.swap(o._state); }
 
   //! True if empty
-  LLFIO_PATH_VIEW_GCC_CONSTEXPR bool empty() const noexcept
+  LLFIO_PATH_VIEW_GCC_CONSTEXPR LLFIO_NODISCARD bool empty() const noexcept
   {
-    return _invoke([](const auto &v) { return v.empty(); });
+    return _state.empty();
   }
   LLFIO_PATH_VIEW_GCC_CONSTEXPR bool has_root_path() const noexcept { return !root_path().empty(); }
   LLFIO_PATH_VIEW_GCC_CONSTEXPR bool has_root_name() const noexcept { return !root_name().empty(); }
@@ -277,7 +958,7 @@ public:
   LLFIO_PATH_VIEW_GCC_CONSTEXPR bool has_extension() const noexcept { return !extension().empty(); }
   constexpr bool is_absolute() const noexcept
   {
-    auto sep_idx = _find_first_sep();
+    auto sep_idx = _state._find_first_sep();
     if(_npos == sep_idx)
     {
       return false;
@@ -285,7 +966,7 @@ public:
 #ifdef _WIN32
     if(is_ntpath())
       return true;
-    return _invoke([sep_idx](const auto &v) {
+    return _state._invoke([sep_idx](const auto &v) {
       if(sep_idx == 0)
       {
         if(v[sep_idx + 1] == preferred_separator)  // double separator at front
@@ -300,27 +981,12 @@ public:
   }
   constexpr bool is_relative() const noexcept { return !is_absolute(); }
   // True if the path view contains any of the characters `*`, `?`, (POSIX only: `[` or `]`).
-  constexpr bool contains_glob() const noexcept
-  {
-#ifdef _WIN32
-    if(!_state._utf16.empty())
-    {
-      return wstring_view::npos != _state._utf16.find_first_of(L"*?");
-    }
-    if(!_state._utf8.empty())
-    {
-      return wstring_view::npos != _state._utf8.find_first_of("*?");
-    }
-    return false;
-#else
-    return string_view::npos != _state._utf8.find_first_of("*?[]");
-#endif
-  }
+  constexpr bool contains_glob() const noexcept { return _state.contains_glob(); }
 #ifdef _WIN32
   // True if the path view is a NT kernel path starting with `\!!\` or `\??\`
   constexpr bool is_ntpath() const noexcept
   {
-    return _invoke([](const auto &v) {
+    return _state._invoke([](const auto &v) {
       if(v.size() < 4)
       {
         return false;
@@ -340,7 +1006,7 @@ public:
   // True if the path view matches the format of an LLFIO deleted file
   constexpr bool is_llfio_deleted() const noexcept
   {
-    return filename()._invoke([](const auto &v) {
+    return filename()._state._invoke([](const auto &v) {
       if(v.size() == 64 + 8)
       {
         // Could be one of our "deleted" files, is he all hex + ".deleted"?
@@ -359,55 +1025,60 @@ public:
   }
 #endif
 
-  //! Adjusts the end of this view to match the final separator.
-  LLFIO_PATH_VIEW_GCC_CONSTEXPR void remove_filename() noexcept
+  //! Returns an iterator to the first path component
+  constexpr inline const_iterator cbegin() const noexcept;
+  //! Returns an iterator to the first path component
+  constexpr inline const_iterator begin() const noexcept;
+  //! Returns an iterator to the first path component
+  constexpr inline iterator begin() noexcept;
+  //! Returns an iterator to after the last path component
+  constexpr inline const_iterator cend() const noexcept;
+  //! Returns an iterator to after the last path component
+  constexpr inline const_iterator end() const noexcept;
+  //! Returns an iterator to after the last path component
+  constexpr inline iterator end() noexcept;
+
+  //! Returns a copy of this view with the end adjusted to match the final separator.
+  constexpr path_view remove_filename() const noexcept
   {
-    auto sep_idx = _find_last_sep();
-    _invoke([sep_idx](auto &v) {
-      if(_npos == sep_idx)
-      {
-        v = {};
-      }
-      else
-      {
-        v.remove_suffix(v.size() - sep_idx);
-      }
-    });
+    auto sep_idx = _state._find_last_sep();
+    if(_npos == sep_idx)
+    {
+      return *this;
+    }
+    return _state._invoke([sep_idx](auto v) { return path_view(v.data(), sep_idx, false); });
   }
   //! Returns the size of the view in characters.
-  LLFIO_PATH_VIEW_GCC_CONSTEXPR size_t native_size() const noexcept
-  {
-    return _invoke([](const auto &v) { return v.size(); });
-  }
+  constexpr size_t native_size() const noexcept { return _state.native_size(); }
   //! Returns a view of the root name part of this view e.g. C:
   LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view root_name() const noexcept
   {
-    auto sep_idx = _find_first_sep();
+    auto sep_idx = _state._find_first_sep();
     if(_npos == sep_idx)
     {
       return path_view();
     }
-    return _invoke([sep_idx](const auto &v) { return path_view(v.data(), sep_idx); });
+    return _state._invoke([sep_idx](const auto &v) { return path_view(v.data(), sep_idx, false); });
   }
   //! Returns a view of the root directory, if there is one e.g. /
   LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view root_directory() const noexcept
   {
-    auto sep_idx = _find_first_sep();
+    auto sep_idx = _state._find_first_sep();
     if(_npos == sep_idx)
     {
       return path_view();
     }
-    return _invoke([sep_idx](const auto &v) {
+    return _state._invoke([sep_idx](const auto &v) {
 #ifdef _WIN32
       auto colon_idx = v.find(':');
       if(colon_idx < sep_idx)
       {
-        return path_view(v.data() + sep_idx, 1);
+        return path_view(v.data() + sep_idx, 1, false);
       }
 #endif
       if(sep_idx == 0)
       {
-        return path_view(v.data(), 1);
+        return path_view(v.data(), 1, false);
       }
       return path_view();
     });
@@ -415,33 +1086,33 @@ public:
   //! Returns, if any, a view of the root path part of this view e.g. C:/
   LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view root_path() const noexcept
   {
-    auto sep_idx = _find_first_sep();
+    auto sep_idx = _state._find_first_sep();
     if(_npos == sep_idx)
     {
       return path_view();
     }
 #ifdef _WIN32
-    return _invoke([this, sep_idx](const auto &v) {
+    return _state._invoke([this, sep_idx](const auto &v) {
       if(is_ntpath())
       {
-        return path_view(v.data() + 3, 1);
+        return path_view(v.data() + 3, 1, false);
       }
       // Special case \\.\ and \\?\ to match filesystem::path
       if(v.size() >= 4 && sep_idx == 0 && v[1] == '\\' && (v[2] == '.' || v[2] == '?') && v[3] == '\\')
       {
-        return path_view(v.data() + 0, 4);
+        return path_view(v.data() + 0, 4, false);
       }
       auto colon_idx = v.find(':');
       if(colon_idx < sep_idx)
       {
-        return path_view(v.data(), sep_idx + 1);
+        return path_view(v.data(), sep_idx + 1, false);
       }
 #else
-    return _invoke([sep_idx](const auto &v) {
+    return _state._invoke([sep_idx](const auto &v) {
 #endif
       if(sep_idx == 0)
       {
-        return path_view(v.data(), 1);
+        return path_view(v.data(), 1, false);
       }
       return path_view();
     });
@@ -449,238 +1120,97 @@ public:
   //! Returns a view of everything after the root path
   LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view relative_path() const noexcept
   {
-    auto sep_idx = _find_first_sep();
+    auto sep_idx = _state._find_first_sep();
     if(_npos == sep_idx)
     {
       return *this;
     }
 #ifdef _WIN32
-    return _invoke([this, sep_idx](const auto &v) {
+    return _state._invoke([this, sep_idx](const auto &v) {
       // Special case \\.\ and \\?\ to match filesystem::path
       if(v.size() >= 4 && sep_idx == 0 && v[1] == '\\' && (v[2] == '.' || v[2] == '?') && v[3] == '\\')
       {
-        return path_view(v.data() + 4, v.size() - 4);
+        return path_view(v.data() + 4, v.size() - 4, _state._zero_terminated);
       }
       auto colon_idx = v.find(':');
       if(colon_idx < sep_idx)
       {
-        return path_view(v.data() + sep_idx + 1, v.size() - sep_idx - 1);
+        return path_view(v.data() + sep_idx + 1, v.size() - sep_idx - 1, _state._zero_terminated);
       }
 #else
-    return _invoke([sep_idx](const auto &v) {
+    return _state._invoke([this, sep_idx](const auto &v) {
 #endif
       if(sep_idx == 0)
       {
-        return path_view(v.data() + 1, v.size() - 1);
+        return path_view(v.data() + 1, v.size() - 1, _state._zero_terminated);
       }
-      return path_view(v.data(), v.size());
+      return *this;
     });
   }
   //! Returns a view of the everything apart from the filename part of this view
   LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view parent_path() const noexcept
   {
-    auto sep_idx = _find_last_sep();
+    auto sep_idx = _state._find_last_sep();
     if(_npos == sep_idx)
     {
       return path_view();
     }
-    return _invoke([sep_idx](const auto &v) { return path_view(v.data(), sep_idx); });
+    return _state._invoke([sep_idx](const auto &v) { return path_view(v.data(), sep_idx, false); });
   }
   //! Returns a view of the filename part of this view.
   LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view filename() const noexcept
   {
-    auto sep_idx = _find_last_sep();
+    auto sep_idx = _state._find_last_sep();
     if(_npos == sep_idx)
     {
-      return *this;
+      return _state;
     }
-    return _invoke([sep_idx](const auto &v) { return path_view(v.data() + sep_idx + 1, v.size() - sep_idx - 1); });
+    return _state._invoke([sep_idx, this](const auto &v) { return path_view_component(v.data() + sep_idx + 1, v.size() - sep_idx - 1, _state._zero_terminated); });
   }
   //! Returns a view of the filename without any file extension
-  LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view stem() const noexcept
-  {
-    auto sep_idx = _find_last_sep();
-    return _invoke([sep_idx](const auto &v) {
-      auto dot_idx = v.rfind('.');
-      if(_npos == dot_idx || (_npos != sep_idx && dot_idx < sep_idx) || dot_idx == sep_idx + 1 || (dot_idx == sep_idx + 2 && v[dot_idx - 1] == '.'))
-      {
-        return path_view(v.data() + sep_idx + 1, v.size() - sep_idx - 1);
-      }
-      return path_view(v.data() + sep_idx + 1, dot_idx - sep_idx - 1);
-    });
-  }
+  constexpr path_view_component stem() const noexcept { return _state.stem(); }
   //! Returns a view of the file extension part of this view
-  LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view extension() const noexcept
-  {
-    auto sep_idx = _find_last_sep();
-    return _invoke([sep_idx](const auto &v) {
-      auto dot_idx = v.rfind('.');
-      if(_npos == dot_idx || (_npos != sep_idx && dot_idx < sep_idx) || dot_idx == sep_idx + 1 || (dot_idx == sep_idx + 2 && v[dot_idx - 1] == '.'))
-      {
-        return path_view();
-      }
-      return path_view(v.data() + dot_idx, v.size() - dot_idx);
-    });
-  }
+  constexpr path_view_component extension() const noexcept { return _state.extension(); }
 
-  //! Return the path view as a path.
-  filesystem::path path() const
-  {
-#ifdef _WIN32
-    if(!_state._utf16.empty())
-    {
-      return filesystem::path(std::wstring(_state._utf16.data(), _state._utf16.size()));
-    }
-#endif
-    if(!_state._utf8.empty())
-    {
-      return filesystem::path(std::string(_state._utf8.data(), _state._utf8.size()));
-    }
-    return {};
-  }
+  //! Return the path view as a path. Allocates and copies memory!
+  filesystem::path path() const { return _state.path(); }
 
-  /*! Compares the two string views via the view's `compare()` which in turn calls `traits::compare()`.
-  Be aware that on Windows a conversion from UTF-8 to UTF-16 is performed if needed.
+  /*! Compares the two path views for equivalence or ordering.
+  Be aware that comparing path views of differing source encodings will be expensive
+  as a conversion to utf8 is performed for each path component. Be further aware that on
+  Windows, `char` source must undergo a narrow native encoding to utf8 conversion via
+  the Windows conversion APIs, which is extremely expensive, if not comparing `char`-`char`
+  views.
   */
-  LLFIO_PATH_VIEW_GCC_CONSTEXPR int compare(const path_view &p) const noexcept
-  {
-    return _invoke([&p](const auto &v) { return -p.compare(v); });
-  }
-//! \overload
-#ifndef _WIN32
-  constexpr
-#endif
-  int compare(const char *s) const noexcept
-  {
-    return compare(string_view(s));
-  }
-//! \overload
-#ifndef _WIN32
-  constexpr
-#endif
-  int compare(string_view str) const noexcept
-  {
-#ifdef _WIN32
-    if(!_state._utf16.empty())
-    {
-      c_str z(path_view(str), false);
-      return _state._utf16.compare(wstring_view(z.buffer, z.length));
-    }
-#endif
-    return _state._utf8.compare(str);
-  }
-#ifdef _WIN32
-  int compare(const wchar_t *s) const noexcept { return compare(wstring_view(s)); }
-  int compare(wstring_view str) const noexcept
-  {
-    if(!_state._utf16.empty())
-    {
-      return _state._utf16.compare(str);
-    }
-    c_str z(path_view(*this), false);
-    return -str.compare(wstring_view(z.buffer, z.length));
-  }
-#endif
+  constexpr inline int compare(const path_view &o) const noexcept;
+  //! \overload
+  LLFIO_TEMPLATE(class Char)
+  LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::_is_constructible<Char>))
+  constexpr int compare(const Char *s) const noexcept { return _state.compare(s); }
+  //! \overload
+  LLFIO_TEMPLATE(class Char)
+  LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::_is_constructible<Char>))
+  constexpr int compare(const basic_string_view<Char> s) const noexcept { return _state.compare(s); }
 
-  // iterator begin() const;
-  // iterator end() const;
-
-  const char *_raw_data() const noexcept {
-    return _invoke([](const auto &v) { return (const char *) v.data(); });
-  }
-
-  //! Instantiate from a `path_view` to get a zero terminated path suitable for feeding to the kernel
-  struct LLFIO_DECL c_str
+  //! Instantiate from a `path_view` to get a path suitable for feeding to other code. See `path_view_component::c_str`.
+  template <class T = typename filesystem::path::value_type, class Deleter = std::default_delete<T[]>, bool disable_internal_buffer = false> struct c_str : path_view_component::c_str<T, Deleter, disable_internal_buffer>
   {
     //! Number of characters, excluding zero terminating char, at buffer
-    uint16_t length{0};
-    const filesystem::path::value_type *buffer{nullptr};
-
-#ifdef _WIN32
-    c_str(const path_view &view, bool ntkernelapi) noexcept
+    using _base = path_view_component::c_str<T, Deleter, disable_internal_buffer>;
+    /*! See constructor for `path_view_component::c_str`.
+     */
+    template <class U>
+    c_str(const path_view &view, bool no_zero_terminate, U &&allocate)
+        : _base(view._state, no_zero_terminate, static_cast<U &&>(allocate))
     {
-      if(!view._state._utf16.empty())
-      {
-        if(view._state._utf16.size() > 32768)
-        {
-          LLFIO_LOG_FATAL(&view, "Attempt to send a path exceeding 64Kb to kernel");
-          abort();
-        }
-        length = static_cast<uint16_t>(view._state._utf16.size());
-        // Is this going straight to a NT kernel API? If so, use directly
-        if(ntkernelapi)
-        {
-          buffer = view._state._utf16.data();
-          return;
-        }
-        // Is the byte just after the view a zero? If so, use directly
-        if(0 == view._state._utf16.data()[length])
-        {
-          buffer = view._state._utf16.data();
-          return;
-        }
-        // Otherwise use _buffer and zero terminate.
-        if(length > sizeof(_buffer) - 1)
-        {
-          LLFIO_LOG_FATAL(&view, "Attempt to send a path exceeding 64Kb to kernel");
-          abort();
-        }
-        memcpy(_buffer, view._state._utf16.data(), length);
-        _buffer[length] = 0;
-        buffer = _buffer;
-        return;
-      }
-      if(!view._state._utf8.empty())
-      {
-        _from_utf8(view);
-        return;
-      }
-#else
-    c_str(const path_view &view) noexcept  // NOLINT
-    {
-      if(!view._state._utf8.empty())
-      {
-        if(view._state._utf8.size() > 32768)
-        {
-          LLFIO_LOG_FATAL(&view, "Attempt to send a path exceeding 64Kb to kernel");
-          abort();
-        }
-        length = static_cast<uint16_t>(view._state._utf8.size());
-        // Is the byte just after the view a zero? If so, use directly
-        if(0 == view._state._utf8.data()[length])
-        {
-          buffer = view._state._utf8.data();
-          return;
-        }
-        // Otherwise use _buffer and zero terminate.
-        if(length > sizeof(_buffer) - 1)
-        {
-          LLFIO_LOG_FATAL(&view, "Attempt to send a path exceeding 32Kb to kernel");
-          abort();
-        }
-        memcpy(_buffer, view._state._utf8.data(), length);
-        _buffer[length] = 0;
-        buffer = _buffer;
-        return;
-      }
-#endif
-      length = 0;
-      _buffer[0] = 0;
-      buffer = _buffer;
     }
-    ~c_str() = default;
-    c_str(const c_str &) = delete;
-    c_str(c_str &&) = delete;
-    c_str &operator=(const c_str &) = delete;
-    c_str &operator=(c_str &&) = delete;
-
-  private:
-    filesystem::path::value_type _buffer[32768]{};
-#ifdef _WIN32
-    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC void _from_utf8(const path_view &view) noexcept;
-#endif
+    //! \overload
+    c_str(const path_view &view, bool no_zero_terminate = false)
+        : _base(view._state, no_zero_terminate)
+    {
+    }
   };
-  friend struct c_str;
+  template <class, class, bool> friend struct c_str;
 };
 inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(path_view x, path_view y) noexcept
 {
@@ -698,26 +1228,190 @@ inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(path_view x, path_view y) n
   }
   return x.compare(y) != 0;
 }
-inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator<(path_view x, path_view y) noexcept
-{
-  return x.compare(y) < 0;
-}
-inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator>(path_view x, path_view y) noexcept
-{
-  return x.compare(y) > 0;
-}
-inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator<=(path_view x, path_view y) noexcept
-{
-  return x.compare(y) <= 0;
-}
-inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator>=(path_view x, path_view y) noexcept
-{
-  return x.compare(y) >= 0;
-}
 inline std::ostream &operator<<(std::ostream &s, const path_view &v)
 {
   return s << v.path();
 }
+
+namespace detail
+{
+  template <class T> class value_pointer_fascade
+  {
+    T _v;
+
+  public:
+    constexpr value_pointer_fascade(T o)
+        : _v(o)
+    {
+    }
+    constexpr const T &operator*() const noexcept { return _v; }
+    constexpr T &operator*() noexcept { return _v; }
+    constexpr const T *operator->() const noexcept { return &_v; }
+    constexpr T *operator->() noexcept { return &_v; }
+  };
+  class path_view_iterator
+  {
+    friend class LLFIO_V2_NAMESPACE::path_view;
+
+  public:
+    //! Value type
+    using value_type = path_view_component;
+    //! Reference type
+    using reference = value_type;
+    //! Const reference type
+    using const_reference = const value_type;
+    //! Pointer type
+    using pointer = value_pointer_fascade<value_type>;
+    //! Const pointer type
+    using const_pointer = value_pointer_fascade<const value_type>;
+    //! Size type
+    using size_type = size_t;
+
+  private:
+    const path_view *_parent{nullptr};
+    size_type _begin{0}, _end{0};
+
+    static constexpr auto _npos = string_view::npos;
+    constexpr bool _is_end() const noexcept { return (nullptr == _parent) || _parent->native_size() == _begin; }
+    constexpr value_type _get() const noexcept
+    {
+      assert(_parent != nullptr);
+      return _parent->_state._invoke([this](const auto &v) {
+        assert(_begin + _end <= v.size());
+        return path_view_component(v.data() + _begin, _end, (_begin + _end == v.size()) ? _parent->_state._zero_terminated : false);
+      });
+    }
+    constexpr void _inc() noexcept
+    {
+      _begin = _end;
+      _end = _parent->_state._find_first_sep(_begin + 1);
+      if(_npos == _end)
+      {
+        _parent->_state._invoke([this](const auto &v) { _end = v.size(); });
+      }
+    }
+    constexpr void _dec() noexcept
+    {
+      _end = _begin;
+      _begin = _parent->_state._find_last_sep(_end - 1);
+      if(_npos == _begin)
+      {
+        _begin = 0;
+      }
+    }
+
+    constexpr path_view_iterator(const path_view *p, bool end)
+        : _parent(p)
+        , _begin(end ? p->native_size() : 0)
+        , _end(end ? p->native_size() : 0)
+    {
+      if(!end)
+      {
+        _inc();
+      }
+    }
+
+  public:
+    path_view_iterator() = default;
+    path_view_iterator(const path_view_iterator &) = default;
+    path_view_iterator(path_view_iterator &&) = default;
+    path_view_iterator &operator=(const path_view_iterator &) = default;
+    path_view_iterator &operator=(path_view_iterator &&) = default;
+    ~path_view_iterator() = default;
+
+    constexpr const_reference operator*() const noexcept { return _get(); }
+    constexpr reference operator*() noexcept { return _get(); }
+    constexpr const_pointer operator->() const noexcept { return _get(); }
+    constexpr pointer operator->() noexcept { return _get(); }
+
+    constexpr bool operator!=(path_view_iterator o) const noexcept
+    {
+      if(_is_end() && o._is_end())
+      {
+        return false;
+      }
+      return _parent != o._parent || _begin != o._begin || _end != o._end;
+    }
+    constexpr bool operator==(path_view_iterator o) const noexcept
+    {
+      if(_is_end() && o._is_end())
+      {
+        return true;
+      }
+      return _parent == o._parent && _begin == o._begin && _end == o._end;
+    }
+
+    constexpr path_view_iterator &operator--() noexcept
+    {
+      _dec();
+      return *this;
+    }
+    constexpr path_view_iterator operator--(int) noexcept
+    {
+      auto self(*this);
+      _dec();
+      return self;
+    }
+    constexpr path_view_iterator &operator++() noexcept
+    {
+      _inc();
+      return *this;
+    }
+    constexpr path_view_iterator operator++(int) noexcept
+    {
+      auto self(*this);
+      _inc();
+      return self;
+    }
+  };
+}  // namespace detail
+
+constexpr inline path_view::const_iterator path_view::cbegin() const noexcept
+{
+  return const_iterator(this, false);
+}
+constexpr inline path_view::const_iterator path_view::cend() const noexcept
+{
+  return const_iterator(this, true);
+}
+constexpr inline path_view::const_iterator path_view::begin() const noexcept
+{
+  return cbegin();
+}
+constexpr inline path_view::iterator path_view::begin() noexcept
+{
+  return cbegin();
+}
+constexpr inline path_view::const_iterator path_view::end() const noexcept
+{
+  return cend();
+}
+constexpr inline path_view::iterator path_view::end() noexcept
+{
+  return cend();
+}
+constexpr inline int path_view::compare(const path_view &o) const noexcept
+{
+  auto it1 = begin(), it2 = o.begin();
+  for(; it1 != end() && it2 != o.end(); ++it1, ++it2)
+  {
+    int res = it1->compare(*it2);
+    if(res != 0)
+    {
+      return res;
+    }
+  }
+  if(it1 == end() && it2 != o.end())
+  {
+    return -1;
+  }
+  if(it1 != end() && it2 == o.end())
+  {
+    return 1;
+  }
+  return 0;  // identical
+}
+
 
 #ifndef NDEBUG
 static_assert(std::is_trivially_copyable<path_view>::value, "path_view is not a trivially copyable!");
