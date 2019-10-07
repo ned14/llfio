@@ -42,10 +42,16 @@ if(NOT PROJECT_IS_DEPENDENCY)
   UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/llfio/revision.hpp")
 endif()
 # Find my library dependencies
+find_quickcpplib_library(quickcpplib
+  GIT_REPOSITORY "https://github.com/ned14/quickcpplib.git"
+  REQUIRED
+  IS_HEADER_ONLY
+)
 find_quickcpplib_library(outcome
   GIT_REPOSITORY "https://github.com/ned14/outcome.git"
   GIT_TAG "develop"
   REQUIRED
+  IS_HEADER_ONLY
 )
 if(WIN32)
   add_subdirectory("include/llfio/ntkernel-error-category" EXCLUDE_FROM_ALL)
@@ -226,6 +232,7 @@ if(NOT PROJECT_IS_DEPENDENCY)
   find_quickcpplib_library(kerneltest
     GIT_REPOSITORY "https://github.com/ned14/kerneltest.git"
     REQUIRED
+    IS_HEADER_ONLY
   )
   foreach(test_target ${llfio_TEST_TARGETS})
     target_link_libraries(${test_target} PRIVATE kerneltest::hl)
