@@ -57,6 +57,8 @@ as that (a) enables safe header only LLFIO on Windows (b) produces better codege
 // Bring in a result implementation based on status_code
 #include "outcome/experimental/status_result.hpp"
 #include "outcome/try.hpp"
+// Bring in status code utility
+#include "outcome/experimental/status-code/include/system_code_from_exception.hpp"
 #if __cpp_coroutines
 #include "outcome/experimental/coroutine_support.hpp"
 #ifdef OUTCOME_FOUND_COROUTINE_HEADER
@@ -252,7 +254,7 @@ template <class T> using atomic_eager = OUTCOME_V2_NAMESPACE::experimental::awai
 template <class T> using atomic_lazy = OUTCOME_V2_NAMESPACE::experimental::awaitables::atomic_lazy<T>;
 template <class T> using eager = OUTCOME_V2_NAMESPACE::experimental::awaitables::eager<T>;
 template <class T> using lazy = OUTCOME_V2_NAMESPACE::experimental::awaitables::lazy<T>;
-template <class T = void> using coroutine_handle = OUTCOME_V2_NAMESPACE::experimental::awaitables::coroutine_handle<T>;
+template <class T = void> using coroutine_handle = OUTCOME_V2_NAMESPACE::awaitables::coroutine_handle<T>;
 #endif
 
 //! Choose an errc implementation
@@ -274,74 +276,9 @@ namespace detail
 {
   inline std::ostream &operator<<(std::ostream &s, const file_io_error &v) { return s << "llfio::file_io_error(" << v.message().c_str() << ")"; }
 }  // namespace detail
-inline file_io_error error_from_exception(std::exception_ptr &&ep = std::current_exception(), file_io_error not_matched = generic_error(errc::resource_unavailable_try_again)) noexcept
+inline file_io_error error_from_exception(std::exception_ptr &&ep = std::current_exception(), SYSTEM_ERROR2_NAMESPACE::system_code not_matched = errc::resource_unavailable_try_again) noexcept
 {
-  if(!ep)
-  {
-    return generic_error(errc::success);
-  }
-  try
-  {
-    std::rethrow_exception(ep);
-  }
-  catch(const std::invalid_argument & /*unused*/)
-  {
-    ep = std::exception_ptr();
-    return generic_error(errc::invalid_argument);
-  }
-  catch(const std::domain_error & /*unused*/)
-  {
-    ep = std::exception_ptr();
-    return generic_error(errc::argument_out_of_domain);
-  }
-  catch(const std::length_error & /*unused*/)
-  {
-    ep = std::exception_ptr();
-    return generic_error(errc::argument_list_too_long);
-  }
-  catch(const std::out_of_range & /*unused*/)
-  {
-    ep = std::exception_ptr();
-    return generic_error(errc::result_out_of_range);
-  }
-  catch(const std::logic_error & /*unused*/) /* base class for this group */
-  {
-    ep = std::exception_ptr();
-    return generic_error(errc::invalid_argument);
-  }
-  catch(const std::system_error &e) /* also catches ios::failure */
-  {
-    ep = std::exception_ptr();
-    if(e.code().category() == std::generic_category())
-    {
-      return generic_error(static_cast<errc>(static_cast<int>(e.code().value())));
-    }
-    // Don't know this error code category, so fall through
-  }
-  catch(const std::overflow_error & /*unused*/)
-  {
-    ep = std::exception_ptr();
-    return generic_error(errc::value_too_large);
-  }
-  catch(const std::range_error & /*unused*/)
-  {
-    ep = std::exception_ptr();
-    return generic_error(errc::result_out_of_range);
-  }
-  catch(const std::runtime_error & /*unused*/) /* base class for this group */
-  {
-    ep = std::exception_ptr();
-    return generic_error(errc::resource_unavailable_try_again);
-  }
-  catch(const std::bad_alloc & /*unused*/)
-  {
-    ep = std::exception_ptr();
-    return generic_error(errc::not_enough_memory);
-  }
-  catch(...)
-  {
-  }
-  return not_matched;
+  return SYSTEM_ERROR2_NAMESPACE::system_code_from_exception(static_cast<std::exception_ptr &&>(ep), static_cast<SYSTEM_ERROR2_NAMESPACE::system_code &&>(not_matched));
 }
 
 LLFIO_V2_NAMESPACE_END

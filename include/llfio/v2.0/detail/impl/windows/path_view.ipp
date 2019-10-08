@@ -27,6 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 LLFIO_V2_NAMESPACE_BEGIN
 
+#if 0
 LLFIO_HEADERS_ONLY_MEMFUNC_SPEC std::unique_ptr<path_view_component::char8_t[]> path_view_component::_ansi_path_to_utf8(basic_string_view<char8_t> &out, basic_string_view<char> in) noexcept
 {
   windows_nt_kernel::init();
@@ -69,7 +70,6 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC std::unique_ptr<path_view_component::char8_t[]> 
   return ret;
 }
 
-#if 0
 LLFIO_HEADERS_ONLY_MEMFUNC_SPEC void path_view::c_str::_from_utf8(const path_view &view) noexcept
 {
   windows_nt_kernel::init();

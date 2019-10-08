@@ -83,22 +83,26 @@ namespace detail
   };
 #endif
 
-  template <class T> struct is_path_view_component_source_type : std::false_type
+  template <class T> struct is_source_chartype_acceptable : std::false_type
   {
   };
-  template <> struct is_path_view_component_source_type<LLFIO_V2_NAMESPACE::byte> : std::true_type
+  template <> struct is_source_chartype_acceptable<char> : std::true_type
   {
   };
-  template <> struct is_path_view_component_source_type<char> : std::true_type
+  template <> struct is_source_chartype_acceptable<wchar_t> : std::true_type
   {
   };
-  template <> struct is_path_view_component_source_type<wchar_t> : std::true_type
+  template <> struct is_source_chartype_acceptable<char8_t> : std::true_type
   {
   };
-  template <> struct is_path_view_component_source_type<char8_t> : std::true_type
+  template <> struct is_source_chartype_acceptable<char16_t> : std::true_type
   {
   };
-  template <> struct is_path_view_component_source_type<char16_t> : std::true_type
+
+  template <class T> struct is_source_acceptable : is_source_chartype_acceptable<T>
+  {
+  };
+  template <> struct is_source_acceptable<LLFIO_V2_NAMESPACE::byte> : std::true_type
   {
   };
 
@@ -130,6 +134,13 @@ namespace detail
 }  // namespace detail
 
 class path_view;
+class path_view_component;
+inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(path_view_component x, path_view_component y) noexcept;
+inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(path_view_component x, path_view_component y) noexcept;
+inline std::ostream &operator<<(std::ostream &s, const path_view_component &v);
+inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(path_view x, path_view y) noexcept;
+inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(path_view x, path_view y) noexcept;
+inline std::ostream &operator<<(std::ostream &s, const path_view &v);
 
 /*! \class path_view_component
 \brief An iterated part of a `path_view`.
@@ -138,6 +149,9 @@ class LLFIO_DECL path_view_component
 {
   friend class path_view;
   friend class detail::path_view_iterator;
+  friend inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(path_view_component x, path_view_component y) noexcept;
+  friend inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(path_view_component x, path_view_component y) noexcept;
+  friend inline std::ostream &operator<<(std::ostream &s, const path_view_component &v);
 
 public:
   //! The preferred separator type
@@ -152,8 +166,18 @@ public:
   using char16_t = detail::char16_t;
 #endif
 
+  //! True if path views can be constructed from this character type.
+  //! i.e. is one of `char`, `wchar_t`, `char8_t`, `char16_t`
+  template <class Char> static constexpr bool is_source_chartype_acceptable = detail::is_source_chartype_acceptable<Char>::value;
+
+  //! True if path views can be constructed from this source.
+  //! i.e. `is_source_chartype_acceptable`, or is `byte`
+  template <class Char> static constexpr bool is_source_acceptable = detail::is_source_acceptable<Char>::value;
+
+  //! The default internal buffer size used by `c_str`.
+  static constexpr size_t default_internal_buffer_size = 1024;  // 2Kb for wchar_t, 1Kb for char
+
 private:
-  template <class Char> static constexpr bool _is_constructible = detail::is_path_view_component_source_type<std::decay_t<Char>>::value;
   static constexpr auto _npos = string_view::npos;
   union {
     const byte *_bytestr{nullptr};
@@ -293,7 +317,7 @@ public:
   ~path_view_component() = default;
 
   //! True if empty
-  constexpr bool empty() const noexcept { return _length == 0; }
+  LLFIO_NODISCARD constexpr bool empty() const noexcept { return _length == 0; }
 
   //! Returns the size of the view in characters.
   constexpr size_t native_size() const noexcept
@@ -359,128 +383,22 @@ private:
     static detail::_codecvt<InT, OutT> ret;
     return ret;
   }
-  template <class CharT> static int _compare(basic_string_view<CharT> a, basic_string_view<CharT> b) noexcept { return a.compare(b); }
-#ifdef _WIN32
-  // On Windows only, char is the native narrow encoding, which is locale dependent
-  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC std::unique_ptr<char8_t[]> _ansi_path_to_utf8(basic_string_view<char8_t> &out, basic_string_view<char> in) noexcept;
-  static int _compare(basic_string_view<char> a, basic_string_view<char> b) noexcept { return a.compare(b); }
-  template <class CharT> static int _compare(basic_string_view<CharT> a, basic_string_view<char> b) noexcept { return -_compare(b, a); }
-  template <class CharT> static int _compare(basic_string_view<char> a, basic_string_view<CharT> b) noexcept
+  // Identical source encodings compare lexiographically
+  template <class DestT, class Deleter, size_t _internal_buffer_size, class CharT> static int _compare(basic_string_view<CharT> a, basic_string_view<CharT> b) noexcept { return a.compare(b); }
+  // Disparate source encodings compare via c_str
+  template <class DestT, class Deleter, size_t _internal_buffer_size, class Char1T, class Char2T> static int _compare(basic_string_view<Char1T> a, basic_string_view<Char2T> b) noexcept
   {
-    // Convert a from native narrow encoding to utf8
-    basic_string_view<char8_t> a_utf8;
-    auto h = _ansi_path_to_utf8(a_utf8, a);
-    if(!h)
+    c_str<DestT, Deleter, _internal_buffer_size> _a(a, true);
+    c_str<DestT, Deleter, _internal_buffer_size> _b(b, true);
+    if(_a.length < _b.length)
     {
-      // Failure to allocate memory, or convert
-      assert(h);
-      return -99;
+      return -1;
     }
-    return _compare(a_utf8, b);
-  }
-#endif
-  template <class Char1T, class Char2T> static int _compare(basic_string_view<Char1T> a, basic_string_view<Char2T> b) noexcept
-  {
-    static constexpr size_t codepoints_at_a_time = 8 * 4;
-    // Convert both to utf8, then to utf32, and compare
-#if !defined(__CHAR8_TYPE__) && __cplusplus < 20200000
-    using utf8_type = char;
-#else
-    using utf8_type = char8_t;
-#endif
-    auto &convert_a = _get_codecvt<Char1T, utf8_type>();
-    auto &convert_b = _get_codecvt<Char2T, utf8_type>();
-    std::mbstate_t a_state{}, b_state{};
-    auto *a_ptr = detail::cast_char8_t_ptr(a.data());
-    auto *b_ptr = detail::cast_char8_t_ptr(b.data());
-    const auto *a_back = detail::cast_char8_t_ptr(&a.back());
-    const auto *b_back = detail::cast_char8_t_ptr(&b.back());
-    while(a_ptr <= a_back && b_ptr <= b_back)
+    if(_a.length > _b.length)
     {
-      // Try to convert 5 to 32 chars at a time
-      utf8_type a_out[codepoints_at_a_time + 1], b_out[codepoints_at_a_time + 1], *a_out_end = a_out, *b_out_end = b_out;
-      auto a_result = convert_a.out(a_state, a_ptr, a_back + 1, a_ptr, a_out, a_out + codepoints_at_a_time, a_out_end);
-      auto b_result = convert_b.out(b_state, b_ptr, b_back + 1, b_ptr, b_out, b_out + codepoints_at_a_time, b_out_end);
-      assert(std::codecvt_base::noconv != a_result);
-      if(std::codecvt_base::noconv == a_result)
-      {
-        size_t tocopy = std::min(codepoints_at_a_time, (size_t)(a_back + 1 - a_ptr));
-        memcpy(a_out, a_ptr, tocopy);
-        a_out_end = a_out + tocopy;
-        a_ptr += tocopy;
-      }
-      if(std::codecvt_base::partial == a_result && a_out_end == a_out + codepoints_at_a_time)
-      {
-        // Needs one more character from input
-        a_result = convert_a.out(a_state, a_ptr, a_ptr + 1, a_ptr, a_out + codepoints_at_a_time, a_out + codepoints_at_a_time + 1, a_out_end);
-        assert(std::codecvt_base::partial != a_result);
-      }
-      if(std::codecvt_base::error == a_result)
-      {
-        assert(false);
-        return -99;
-      }
-      assert(std::codecvt_base::noconv != b_result);
-      if(std::codecvt_base::noconv == b_result)
-      {
-        size_t tocopy = std::min(codepoints_at_a_time, (size_t)(b_back + 1 - b_ptr));
-        memcpy(b_out, b_ptr, tocopy);
-        b_out_end = b_out + tocopy;
-        b_ptr += tocopy;
-      }
-      if(std::codecvt_base::partial == b_result && b_out_end == b_out + codepoints_at_a_time)
-      {
-        // Needs one more character from input
-        b_result = convert_b.out(b_state, b_ptr, b_ptr + 1, b_ptr, b_out + codepoints_at_a_time, b_out + codepoints_at_a_time + 1, b_out_end);
-        assert(std::codecvt_base::partial != b_result);
-      }
-      if(std::codecvt_base::error == b_result)
-      {
-        assert(false);
-        return 99;
-      }
-      if((a_out_end - a_out) < (b_out_end - b_out))
-      {
-        return -2;
-      }
-      if((a_out_end - a_out) > (b_out_end - b_out))
-      {
-        return 2;
-      }
-#if !defined(__CHAR8_TYPE__) && __cplusplus < 20200000
-      // Before C++ 20, no facility to char_traits::compare utf8, so convert to utf32
-      const utf8_type *a_out_end_ = a_out_end, *b_out_end_ = b_out_end;
-      char32_t a32[codepoints_at_a_time + 1], b32[codepoints_at_a_time + 1], *a32_end = a32, *b32_end = b32;
-      std::mbstate_t a32_state{}, b32_state{};
-      auto &convert32 = _get_codecvt<char32_t, char>();
-      convert32.in(a32_state, a_out, a_out_end, a_out_end_, a32, a32 + codepoints_at_a_time + 1, a32_end);
-      convert32.in(b32_state, b_out, b_out_end, b_out_end_, b32, b32 + codepoints_at_a_time + 1, b32_end);
-      if((a32_end - a32) < (b32_end - b32))
-      {
-        return -2;
-      }
-      if((a32_end - a32) > (b32_end - b32))
-      {
-        return 2;
-      }
-      int ret = std::char_traits<char32_t>::compare(a32, b32, a32_end - a32);
-#else
-      int ret = std::char_traits<char8_t>::compare(a_out, b_out, a_out_end - a_out);
-#endif
-      if(ret != 0)
-      {
-        return ret;
-      }
+      return 1;
     }
-    if(a_ptr >= a_back)
-    {
-      return -2;
-    }
-    if(b_ptr >= b_back)
-    {
-      return 2;
-    }
-    return 0;  // equal
+    return memcmp(_a.buffer, _b.buffer, _a.length);
   }
 
 public:
@@ -490,32 +408,43 @@ public:
     return _invoke([](const auto &v) { return _path_from_char_array(v); });
   }
 
-  /*! Compares the two path views for equivalence or ordering.
-  Be aware that comparing path views of differing source encodings will be expensive
-  as a conversion to utf8 is performed. Be further aware that on
-  Windows, `char` source must undergo a narrow native encoding to utf8 conversion via
-  the Windows conversion APIs, which is extremely expensive, if not comparing `char`-`char`
-  views.
+  /*! Compares the two path views for equivalence or ordering using `T`
+  as the destination encoding, if necessary.
+
+  If the source encodings of the two path views are compatible, a
+  lexicographical comparison is performed. If they are incompatible,
+  either or both views are converted to the destination encoding
+  using `c_str<T, Delete, _internal_buffer_size>`, and then a
+  lexicographical comparison is performed.
+
+  This can, for obvious reasons, be expensive. It can also throw
+  exceptions, as `c_str` does.
+
+  If the destination encoding is `byte`, `memcmp()` is used,
+  and `c_str` is never invoked as the two sources are byte
+  compared directly.
   */
-  constexpr int compare(const path_view_component &p) const noexcept
+  LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = std::default_delete<T[]>, size_t _internal_buffer_size = default_internal_buffer_size)
+  LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>))
+  constexpr int compare(const path_view_component &p) const
   {
-    return _invoke([&p](const auto &self) { return p._invoke([&self](const auto &other) { return _compare(self, other); }); });
+    return _invoke([&p](const auto &self) { return p._invoke([&self](const auto &other) { return _compare<T>(self, other); }); });
   }
   //! \overload
-  LLFIO_TEMPLATE(class Char)
-  LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::_is_constructible<Char>))
-  constexpr int compare(const Char *s) const noexcept { return compare(path_view_component(s)); }
+  LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = std::default_delete<T[]>, size_t _internal_buffer_size = default_internal_buffer_size, class Char)
+  LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T> &&is_source_acceptable<Char>))
+  constexpr int compare(const Char *s) const noexcept { return compare<T>(path_view_component(s)); }
   //! \overload
-  LLFIO_TEMPLATE(class Char)
-  LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::_is_constructible<Char>))
-  constexpr int compare(const basic_string_view<Char> s) const noexcept { return compare(path_view_component(s)); }
+  LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = std::default_delete<T[]>, size_t _internal_buffer_size = default_internal_buffer_size, class Char)
+  LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T> &&is_source_chartype_acceptable<Char>))
+  constexpr int compare(const basic_string_view<Char> s) const noexcept { return compare<T>(path_view_component(s)); }
 
   /*! Instantiate from a `path_view_component` to get a path suitable for feeding to other code.
   \tparam T The destination encoding required.
   \tparam Deleter A custom deleter for any temporary buffer.
-  \tparam disable_internal_buffer Set to true to disable the internal temporary buffer, thus
+  \tparam _internal_buffer_size Override the size of the internal temporary buffer, thus
   reducing stack space consumption (most compilers optimise away the internal temporary buffer
-  if it can be proved it will never be used).
+  if it can be proved it will never be used). The default is 1024 values of `T`.
 
   This makes the input to the path view component into a destination format suitable for
   consumption by other code. If the source has the same format as the destination, and
@@ -526,18 +455,22 @@ public:
   and the source is not zero terminated, a straight memory copy is performed
   into the temporary buffer.
 
-  `c_str` contains a 4Kb internal temporary buffer. Output below that amount involves
-  no dynamic memory allocation. Output above that amount calls `operator new[]`. You
-  can use an externally supplied larger temporary buffer to avoid dynamic memory
-  allocation in all situations.
+  `c_str` contains a temporary buffer sized according to the template parameter. Output
+  below that amount involves no dynamic memory allocation. Output above that amount calls
+  `operator new[]`. You can use an externally supplied larger temporary buffer to avoid
+  dynamic memory allocation in all situations.
   */
-  template <class T = typename filesystem::path::value_type, class Deleter = std::default_delete<T[]>, bool disable_internal_buffer = false> struct c_str
+  LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = std::default_delete<T[]>, size_t _internal_buffer_size = default_internal_buffer_size)
+  LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>))
+  struct c_str
   {
-    static_assert(_is_constructible<T>, "path_view_component::c_str<T> does not have a T which is one of byte, char, wchar_t, char8_t nor char16_t");
+    static_assert(is_source_acceptable<T>, "path_view_component::c_str<T> does not have a T which is one of byte, char, wchar_t, char8_t nor char16_t");
     //! Type of the value type
     using value_type = T;
     //! Type of the deleter
     using deleter_type = Deleter;
+    //! The size of the internal temporary buffer
+    static constexpr size_t internal_buffer_size = (_internal_buffer_size == 0) ? 1 : _internal_buffer_size;
 
     //! Number of characters, excluding zero terminating char, at buffer
     size_t length{0};
@@ -653,7 +586,7 @@ public:
         std::mbstate_t cstate{};
         auto *src_ptr = src.data();
         auto *dest_ptr = _buffer;
-        if(!disable_internal_buffer)
+        if(_internal_buffer_size != 0)
         {
           // First try the internal buffer, if we overflow, fall back to the allocator
           auto result = convert.out(cstate, src_ptr, &src.back() + 1, src_ptr, dest_ptr, _buffer + sizeof(_buffer) / sizeof(value_type) - 1, dest_ptr);
@@ -665,7 +598,14 @@ public:
           }
           if(std::codecvt_base::error == result)
           {
-            throw std::system_error(make_error_code(std::errc::illegal_byte_sequence));
+            // If input is supposed to be valid UTF, barf
+            if(view._utf8 || view._utf16)
+            {
+              throw std::system_error(make_error_code(std::errc::illegal_byte_sequence));
+            }
+            // Otherwise proceed anyway :)
+            LLFIO_LOG_WARN(nullptr, "path_view_component::c_str saw failure to completely convert input encoding");
+            result = std::codecvt_base::ok;
           }
           if(std::codecvt_base::ok == result)
           {
@@ -704,7 +644,14 @@ public:
         }
         if(std::codecvt_base::error == result)
         {
-          throw std::system_error(std::make_error_code(std::errc::illegal_byte_sequence));
+          // If input is supposed to be valid UTF, barf
+          if(view._utf8 || view._utf16)
+          {
+            throw std::system_error(std::make_error_code(std::errc::illegal_byte_sequence));
+          }
+          // Otherwise proceed anyway :)
+          LLFIO_LOG_WARN(nullptr, "path_view_component::c_str saw failure to completely convert input encoding");
+          result = std::codecvt_base::ok;
         }
         assert(std::codecvt_base::ok == result);
         if(std::codecvt_base::ok != result)
@@ -735,10 +682,102 @@ public:
     Deleter _deleter;
     // MAKE SURE this is the final item in storage, the compiler will elide the storage
     // under optimisation if it can prove it is never used.
-    value_type _buffer[disable_internal_buffer ? 1 : (4096 / sizeof(value_type))]{};
+    value_type _buffer[internal_buffer_size]{};
   };
-  template <class, class, bool> friend struct c_str;
+  LLFIO_TEMPLATE(class T, class Deleter, size_t _internal_buffer_size)
+  LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>))
+  friend struct c_str;
 };
+inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(path_view_component x, path_view_component y) noexcept
+{
+  if(x.native_size() != y.native_size())
+  {
+    return false;
+  }
+  if(x._passthrough != y._passthrough)
+  {
+    return false;
+  }
+  if(x._char != y._char)
+  {
+    return false;
+  }
+  if(x._wchar != y._wchar)
+  {
+    return false;
+  }
+  if(x._utf8 != y._utf8)
+  {
+    return false;
+  }
+  if(x._utf16 != y._utf16)
+  {
+    return false;
+  }
+  return 0 == memcmp(x._bytestr, y._bytestr, x._length);
+}
+inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(path_view_component x, path_view_component y) noexcept
+{
+  if(x.native_size() != y.native_size())
+  {
+    return true;
+  }
+  if(x._passthrough != y._passthrough)
+  {
+    return true;
+  }
+  if(x._char != y._char)
+  {
+    return true;
+  }
+  if(x._wchar != y._wchar)
+  {
+    return true;
+  }
+  if(x._utf8 != y._utf8)
+  {
+    return true;
+  }
+  if(x._utf16 != y._utf16)
+  {
+    return true;
+  }
+  return 0 != memcmp(x._bytestr, y._bytestr, x._length);
+}
+namespace detail
+{
+  struct string_view_printer
+  {
+    std::ostream &s;
+    template <class CharT> void operator()(basic_string_view<CharT> v) { s << v; }
+    void operator()(basic_string_view<char16_t> _v)
+    {
+      // Cheat by going via filesystem::path
+      s << filesystem::path(_v.begin(), _v.end());
+    }
+    void operator()(basic_string_view<wchar_t> _v)
+    {
+      // Cheat by going via filesystem::path
+      s << filesystem::path(_v.begin(), _v.end());
+    }
+#if !defined(__CHAR8_TYPE__) && __cplusplus < 20200000
+    void operator()(basic_string_view<char8_t> _v)
+    {
+      basic_string_view<char> v((char *) _v.data(), _v.size());
+      s << v;
+    }
+#endif
+  };
+}  // namespace detail
+inline std::ostream &operator<<(std::ostream &s, const path_view_component &v)
+{
+  if(v._passthrough)
+  {
+    return s << QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string({v._charstr, v._length});
+  }
+  v._invoke(detail::string_view_printer{s});
+  return s;
+}
 
 
 /*! \class path_view
@@ -831,8 +870,12 @@ maximum compatibility you should still use the Win32 API.
 */
 class path_view
 {
-public:
   friend class detail::path_view_iterator;
+  friend inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(path_view x, path_view y) noexcept;
+  friend inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(path_view x, path_view y) noexcept;
+  friend inline std::ostream &operator<<(std::ostream &s, const path_view &v);
+
+public:
   //! Const iterator type
   using const_iterator = detail::path_view_iterator;
   //! iterator type
@@ -859,6 +902,17 @@ public:
   {
   };
 #endif
+
+  //! True if path views can be constructed from this character type.
+  //! i.e. is one of `char`, `wchar_t`, `char8_t`, `char16_t`
+  template <class Char> static constexpr bool is_source_chartype_acceptable = path_view_component::is_source_chartype_acceptable<Char>;
+
+  //! True if path views can be constructed from this source.
+  //! i.e. `is_source_chartype_acceptable`, or is `byte`
+  template <class Char> static constexpr bool is_source_acceptable = path_view_component::is_source_acceptable<Char>;
+
+  //! The default internal buffer size used by `c_str`.
+  static constexpr size_t default_internal_buffer_size = path_view_component::default_internal_buffer_size;  // 2Kb for wchar_t, 1Kb for char
 
 private:
   static constexpr auto _npos = string_view::npos;
@@ -907,7 +961,7 @@ public:
   string MUST continue to exist for this view to be valid.
   */
   LLFIO_TEMPLATE(class Char)
-  LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::_is_constructible<Char>))
+  LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_acceptable<Char>))
   constexpr path_view(const Char *v, size_t len, bool is_zero_terminated) noexcept
       : _state(v, len, is_zero_terminated)
   {
@@ -916,7 +970,7 @@ public:
   `char`, `wchar_t`, `char8_t` or `char16_t`.
   */
   LLFIO_TEMPLATE(class Char)
-  LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::_is_constructible<Char>))
+  LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_chartype_acceptable<Char>))
   constexpr path_view(const std::basic_string<Char> &v) noexcept  // NOLINT
       : path_view(v.data(), v.size(), true)
   {
@@ -925,7 +979,7 @@ public:
   `char`, `wchar_t`, `char8_t` or `char16_t`.
   */
   LLFIO_TEMPLATE(class Char)
-  LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::_is_constructible<Char>))
+  LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_chartype_acceptable<Char>))
   constexpr path_view(basic_string_view<Char> v, bool is_zero_terminated) noexcept  // NOLINT
       : path_view(v.data(), v.size(), is_zero_terminated)
   {
@@ -944,10 +998,7 @@ public:
   constexpr void swap(path_view &o) noexcept { _state.swap(o._state); }
 
   //! True if empty
-  LLFIO_PATH_VIEW_GCC_CONSTEXPR LLFIO_NODISCARD bool empty() const noexcept
-  {
-    return _state.empty();
-  }
+  LLFIO_NODISCARD LLFIO_PATH_VIEW_GCC_CONSTEXPR bool empty() const noexcept { return _state.empty(); }
   LLFIO_PATH_VIEW_GCC_CONSTEXPR bool has_root_path() const noexcept { return !root_path().empty(); }
   LLFIO_PATH_VIEW_GCC_CONSTEXPR bool has_root_name() const noexcept { return !root_name().empty(); }
   LLFIO_PATH_VIEW_GCC_CONSTEXPR bool has_root_directory() const noexcept { return !root_directory().empty(); }
@@ -1175,28 +1226,42 @@ public:
   //! Return the path view as a path. Allocates and copies memory!
   filesystem::path path() const { return _state.path(); }
 
-  /*! Compares the two path views for equivalence or ordering.
-  Be aware that comparing path views of differing source encodings will be expensive
-  as a conversion to utf8 is performed for each path component. Be further aware that on
-  Windows, `char` source must undergo a narrow native encoding to utf8 conversion via
-  the Windows conversion APIs, which is extremely expensive, if not comparing `char`-`char`
-  views.
+  /*! Compares the two path views for equivalence or ordering using `T`
+  as the destination encoding, if necessary.
+
+  If the source encodings of the two path views are compatible, a
+  lexicographical comparison is performed. If they are incompatible,
+  either or both views are converted to the destination encoding
+  using `c_str<T, Delete, _internal_buffer_size>`, and then a
+  lexicographical comparison is performed.
+
+  This can, for obvious reasons, be expensive. It can also throw
+  exceptions, as `c_str` does.
+
+  If the destination encoding is `byte`, `memcmp()` is used,
+  and `c_str` is never invoked as the two sources are byte
+  compared directly.
   */
-  constexpr inline int compare(const path_view &o) const noexcept;
+  LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = std::default_delete<T[]>, size_t _internal_buffer_size = default_internal_buffer_size)
+  LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>))
+  constexpr int compare(const path_view &p) const;
   //! \overload
-  LLFIO_TEMPLATE(class Char)
-  LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::_is_constructible<Char>))
-  constexpr int compare(const Char *s) const noexcept { return _state.compare(s); }
+  LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = std::default_delete<T[]>, size_t _internal_buffer_size = default_internal_buffer_size, class Char)
+  LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T> &&is_source_acceptable<Char>))
+  constexpr int compare(const Char *s) const noexcept { return compare<T, Deleter, _internal_buffer_size>(path_view_component(s)); }
   //! \overload
-  LLFIO_TEMPLATE(class Char)
-  LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::_is_constructible<Char>))
-  constexpr int compare(const basic_string_view<Char> s) const noexcept { return _state.compare(s); }
+  LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = std::default_delete<T[]>, size_t _internal_buffer_size = default_internal_buffer_size, class Char)
+  LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T> &&is_source_chartype_acceptable<Char>))
+  constexpr int compare(const basic_string_view<Char> s) const noexcept { return compare<T, Deleter, _internal_buffer_size>(path_view_component(s)); }
+
 
   //! Instantiate from a `path_view` to get a path suitable for feeding to other code. See `path_view_component::c_str`.
-  template <class T = typename filesystem::path::value_type, class Deleter = std::default_delete<T[]>, bool disable_internal_buffer = false> struct c_str : path_view_component::c_str<T, Deleter, disable_internal_buffer>
+  LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = std::default_delete<T[]>, size_t _internal_buffer_size = default_internal_buffer_size)
+  LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>))
+  struct c_str
   {
     //! Number of characters, excluding zero terminating char, at buffer
-    using _base = path_view_component::c_str<T, Deleter, disable_internal_buffer>;
+    using _base = path_view_component::c_str<T, Deleter, _internal_buffer_size>;
     /*! See constructor for `path_view_component::c_str`.
      */
     template <class U>
@@ -1210,27 +1275,21 @@ public:
     {
     }
   };
-  template <class, class, bool> friend struct c_str;
+  LLFIO_TEMPLATE(class T, class Deleter, size_t _internal_buffer_size)
+  LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>))
+  friend struct c_str;
 };
 inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(path_view x, path_view y) noexcept
 {
-  if(x.native_size() != y.native_size())
-  {
-    return false;
-  }
-  return x.compare(y) == 0;
+  return x._state == y._state;
 }
 inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(path_view x, path_view y) noexcept
 {
-  if(x.native_size() != y.native_size())
-  {
-    return true;
-  }
-  return x.compare(y) != 0;
+  return x._state != y._state;
 }
 inline std::ostream &operator<<(std::ostream &s, const path_view &v)
 {
-  return s << v.path();
+  return s << v._state;
 }
 
 namespace detail
@@ -1390,12 +1449,13 @@ constexpr inline path_view::iterator path_view::end() noexcept
 {
   return cend();
 }
-constexpr inline int path_view::compare(const path_view &o) const noexcept
+template<class T, class Deleter, size_t _internal_buffer_size, class>
+constexpr inline int path_view::compare(const path_view &o) const
 {
   auto it1 = begin(), it2 = o.begin();
   for(; it1 != end() && it2 != o.end(); ++it1, ++it2)
   {
-    int res = it1->compare(*it2);
+    int res = it1->compare<T, Deleter, _internal_buffer_size>(*it2);
     if(res != 0)
     {
       return res;
