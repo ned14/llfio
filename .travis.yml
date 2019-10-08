@@ -111,7 +111,7 @@ script:
      cd programs;
      mkdir build;
      cd build;
-     cmake ..  $CMAKE_CONFIGURE_OPTIONS ;
+     cmake ..  $CMAKE_CONFIGURE_OPTIONS -DCMAKE_BUILD_TYPE=Release;
      cmake --build .;
    fi
  
