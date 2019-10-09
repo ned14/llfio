@@ -28,7 +28,6 @@ Distributed under the Boost Software License, Version 1.0.
 #include "config.hpp"
 
 #include <iterator>
-#include <locale>
 #include <memory>  // for unique_ptr
 
 //! \file path_view.hpp Provides view of a path
@@ -106,30 +105,17 @@ namespace detail
   {
   };
 
-  template <class T> inline T *cast_char8_t_ptr(T *v) { return v; }
-  template <class InternT, class ExternT> struct _codecvt : std::codecvt<InternT, ExternT, std::mbstate_t>
-  {
-    template <class... Args>
-    _codecvt(Args &&... args)
-        : std::codecvt<InternT, ExternT, std::mbstate_t>(std::forward<Args>(args)...)
-    {
-    }
-    ~_codecvt() {}
-  };
-#if !defined(__CHAR8_TYPE__) && __cplusplus < 20200000
-  inline const char *cast_char8_t_ptr(const char8_t *v) { return (const char *) v; }
-  inline char *cast_char8_t_ptr(char8_t *v) { return (char *) v; }
-  template <> struct _codecvt<char8_t, char> : std::codecvt<char, char, std::mbstate_t>
-  {
-    template <class... Args>
-    _codecvt(Args &&... args)
-        : std::codecvt<char, char, std::mbstate_t>(std::forward<Args>(args)...)
-    {
-    }
-    ~_codecvt() {}
-  };
-#endif
+  LLFIO_HEADERS_ONLY_FUNC_SPEC char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const LLFIO_V2_NAMESPACE::byte *src_buffer, size_t src_buffer_length, bool src_is_zero_terminated);
+  LLFIO_HEADERS_ONLY_FUNC_SPEC char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const char *src_buffer, size_t src_buffer_length, bool src_is_zero_terminated);
+  LLFIO_HEADERS_ONLY_FUNC_SPEC char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const wchar_t *src_buffer, size_t src_buffer_length, bool src_is_zero_terminated);
+  LLFIO_HEADERS_ONLY_FUNC_SPEC char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const char8_t *src_buffer, size_t src_buffer_length, bool src_is_zero_terminated);
+  LLFIO_HEADERS_ONLY_FUNC_SPEC char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const char16_t *src_buffer, size_t src_buffer_length, bool src_is_zero_terminated);
 
+  LLFIO_HEADERS_ONLY_FUNC_SPEC wchar_t *reencode_path_to(size_t &toallocate, wchar_t *dest_buffer, size_t dest_buffer_length, const LLFIO_V2_NAMESPACE::byte *src_buffer, size_t src_buffer_length, bool src_is_zero_terminated);
+  LLFIO_HEADERS_ONLY_FUNC_SPEC wchar_t *reencode_path_to(size_t &toallocate, wchar_t *dest_buffer, size_t dest_buffer_length, const char *src_buffer, size_t src_buffer_length, bool src_is_zero_terminated);
+  LLFIO_HEADERS_ONLY_FUNC_SPEC wchar_t *reencode_path_to(size_t &toallocate, wchar_t *dest_buffer, size_t dest_buffer_length, const wchar_t *src_buffer, size_t src_buffer_length, bool src_is_zero_terminated);
+  LLFIO_HEADERS_ONLY_FUNC_SPEC wchar_t *reencode_path_to(size_t &toallocate, wchar_t *dest_buffer, size_t dest_buffer_length, const char8_t *src_buffer, size_t src_buffer_length, bool src_is_zero_terminated);
+  LLFIO_HEADERS_ONLY_FUNC_SPEC wchar_t *reencode_path_to(size_t &toallocate, wchar_t *dest_buffer, size_t dest_buffer_length, const char16_t *src_buffer, size_t src_buffer_length, bool src_is_zero_terminated);
   class path_view_iterator;
 }  // namespace detail
 
@@ -378,10 +364,18 @@ private:
   template <class CharT> static filesystem::path _path_from_char_array(basic_string_view<CharT> v) { return {v.data(), v.data() + v.size()}; }
   static filesystem::path _path_from_char_array(basic_string_view<char8_t> v) { return filesystem::u8path((const char *) v.data(), (const char *) v.data() + v.size()); }
 
-  template <class InT, class OutT> static detail::_codecvt<InT, OutT> &_get_codecvt() noexcept
+  template <class CharT> int _do_compare(const CharT *a, const CharT *b, size_t length) noexcept { return memcmp(a, b, length * sizeof(CharT)); }
+  int _do_compare(const char8_t *_a, const char8_t *_b, size_t length) noexcept
   {
-    static detail::_codecvt<InT, OutT> ret;
-    return ret;
+    basic_string_view<char> a((const char *) _a, length);
+    basic_string_view<char> b((const char *) _b, length);
+    return a.compare(b);
+  }
+  int _do_compare(const char16_t *_a, const char16_t *_b, size_t length) noexcept
+  {
+    basic_string_view<char16_t> a(_a, length);
+    basic_string_view<char16_t> b(_b, length);
+    return a.compare(b);
   }
   // Identical source encodings compare lexiographically
   template <class DestT, class Deleter, size_t _internal_buffer_size, class CharT> static int _compare(basic_string_view<CharT> a, basic_string_view<CharT> b) noexcept { return a.compare(b); }
@@ -398,7 +392,7 @@ private:
     {
       return 1;
     }
-    return memcmp(_a.buffer, _b.buffer, _a.length);
+    return _do_compare(_a.buffer, _b.buffer, _a.length);
   }
 
 public:
@@ -426,7 +420,7 @@ public:
   */
   LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = std::default_delete<T[]>, size_t _internal_buffer_size = default_internal_buffer_size)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>))
-  constexpr int compare(const path_view_component &p) const
+  constexpr int compare(path_view_component p) const
   {
     return _invoke([&p](const auto &self) { return p._invoke([&self](const auto &other) { return _compare<T>(self, other); }); });
   }
@@ -465,6 +459,7 @@ public:
   struct c_str
   {
     static_assert(is_source_acceptable<T>, "path_view_component::c_str<T> does not have a T which is one of byte, char, wchar_t, char8_t nor char16_t");
+
     //! Type of the value type
     using value_type = T;
     //! Type of the deleter
@@ -579,89 +574,80 @@ public:
         return;
       }
 #endif
-      // A reencoding is required
-      view._invoke([&](auto src) {
-        using src_value_type = typename decltype(src)::value_type;
-        auto &convert = view._get_codecvt<src_value_type, value_type>();
-        std::mbstate_t cstate{};
-        auto *src_ptr = src.data();
-        auto *dest_ptr = _buffer;
-        if(_internal_buffer_size != 0)
-        {
-          // First try the internal buffer, if we overflow, fall back to the allocator
-          auto result = convert.out(cstate, src_ptr, &src.back() + 1, src_ptr, dest_ptr, _buffer + sizeof(_buffer) / sizeof(value_type) - 1, dest_ptr);
-          assert(std::codecvt_base::noconv != result);
-          if(std::codecvt_base::noconv == result)
-          {
-            LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str should never do identity reencoding");
-            abort();
-          }
-          if(std::codecvt_base::error == result)
-          {
-            // If input is supposed to be valid UTF, barf
-            if(view._utf8 || view._utf16)
-            {
-              throw std::system_error(make_error_code(std::errc::illegal_byte_sequence));
-            }
-            // Otherwise proceed anyway :)
-            LLFIO_LOG_WARN(nullptr, "path_view_component::c_str saw failure to completely convert input encoding");
-            result = std::codecvt_base::ok;
-          }
-          if(std::codecvt_base::ok == result)
-          {
-            *dest_ptr = 0;
-            length = dest_ptr - _buffer;
-            buffer = _buffer;
-            return;
-          }
-        }
-        // This is a bit crap, but codecvt is hardly the epitome of good design :(
-        const size_t required_length = convert.max_length() * (1 + view.native_size());
-#ifdef _WIN32
-        const size_t required_bytes = required_length * sizeof(value_type);
-        if(required_bytes > 65535)
-        {
-          LLFIO_LOG_FATAL(nullptr, "Paths exceeding 64Kb are impossible on Microsoft Windows");
-          abort();
-        }
-#endif
-        auto *out = allocate(required_length);
-        buffer = out;
-        if(nullptr == out)
-        {
-          length = 0;
-          return;
-        }
-        _call_deleter = true;
-        memcpy(out, _buffer, dest_ptr - _buffer);
-        dest_ptr = out + (dest_ptr - _buffer);
-        auto result = convert.out(cstate, src_ptr, &src.back() + 1, src_ptr, dest_ptr, out + required_length - 1, dest_ptr);
-        assert(std::codecvt_base::noconv != result);
-        if(std::codecvt_base::noconv == result)
-        {
-          LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str should never do identity reencoding");
-          abort();
-        }
-        if(std::codecvt_base::error == result)
-        {
-          // If input is supposed to be valid UTF, barf
-          if(view._utf8 || view._utf16)
-          {
-            throw std::system_error(std::make_error_code(std::errc::illegal_byte_sequence));
-          }
-          // Otherwise proceed anyway :)
-          LLFIO_LOG_WARN(nullptr, "path_view_component::c_str saw failure to completely convert input encoding");
-          result = std::codecvt_base::ok;
-        }
-        assert(std::codecvt_base::ok == result);
-        if(std::codecvt_base::ok != result)
-        {
-          LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str should never experience partial conversion");
-          abort();
-        }
-        *dest_ptr = 0;
-        length = dest_ptr - out;
-      });
+      // A reencode is required. We keep this out of header because reencoding
+      // requires dragging in lots of system header files.
+      size_t required_length = 0;
+      value_type *end = nullptr;
+      if(view._passthrough)
+      {
+        end = detail::reencode_path_to(required_length, _buffer, _internal_buffer_size, view._bytestr, view._length, view._zero_terminated);
+      }
+      else if(view._char)
+      {
+        end = detail::reencode_path_to(required_length, _buffer, _internal_buffer_size, view._charstr, view._length, view._zero_terminated);
+      }
+      else if(view._wchar)
+      {
+        end = detail::reencode_path_to(required_length, _buffer, _internal_buffer_size, view._wcharstr, view._length, view._zero_terminated);
+      }
+      else if(view._utf8)
+      {
+        end = detail::reencode_path_to(required_length, _buffer, _internal_buffer_size, view._char8str, view._length, view._zero_terminated);
+      }
+      else if(view._utf16)
+      {
+        end = detail::reencode_path_to(required_length, _buffer, _internal_buffer_size, view._char16str, view._length, view._zero_terminated);
+      }
+      else
+      {
+        LLFIO_LOG_FATAL(nullptr, "path_view_component::cstr somehow sees no state!");
+        abort();
+      }
+      if(0 == required_length)
+      {
+        // The internal buffer was sufficient.
+        buffer = _buffer;
+        length = end - _buffer;
+        return;
+      }
+      // The internal buffer is too small. Fall back to dynamic allocation. This may throw.
+      auto *allocated_buffer = allocate(required_length);
+      if(nullptr == allocated_buffer)
+      {
+        length = 0;
+        return;
+      }
+      _call_deleter = true;
+      memcpy(allocated_buffer, _buffer, end - _buffer);
+      required_length -= (end - _buffer);
+      end = allocated_buffer + (end - _buffer);
+      if(view._passthrough)
+      {
+        end = detail::reencode_path_to(length, end, required_length, view._bytestr, view._length, view._zero_terminated);
+      }
+      else if(view._char)
+      {
+        end = detail::reencode_path_to(length, end, required_length, view._charstr, view._length, view._zero_terminated);
+      }
+      else if(view._wchar)
+      {
+        end = detail::reencode_path_to(length, end, required_length, view._wcharstr, view._length, view._zero_terminated);
+      }
+      else if(view._utf8)
+      {
+        end = detail::reencode_path_to(length, end, required_length, view._char8str, view._length, view._zero_terminated);
+      }
+      else if(view._utf16)
+      {
+        end = detail::reencode_path_to(length, end, required_length, view._char16str, view._length, view._zero_terminated);
+      }
+      else
+      {
+        LLFIO_LOG_FATAL(nullptr, "path_view_component::cstr somehow sees no state!");
+        abort();
+      }
+      buffer = allocated_buffer;
+      length = end - buffer;
     }
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -930,7 +916,7 @@ public:
   {
   }
   //! Implicitly constructs a path view from a path view component. The input path MUST continue to exist for this view to be valid.
-  path_view(path_view_component v) noexcept  // NOLINT
+  constexpr path_view(path_view_component v) noexcept  // NOLINT
       : _state(v)
   {
   }
@@ -1244,7 +1230,7 @@ public:
   */
   LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = std::default_delete<T[]>, size_t _internal_buffer_size = default_internal_buffer_size)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>))
-  constexpr int compare(const path_view &p) const;
+  constexpr inline int compare(path_view p) const;
   //! \overload
   LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = std::default_delete<T[]>, size_t _internal_buffer_size = default_internal_buffer_size, class Char)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T> &&is_source_acceptable<Char>))
@@ -1258,7 +1244,7 @@ public:
   //! Instantiate from a `path_view` to get a path suitable for feeding to other code. See `path_view_component::c_str`.
   LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = std::default_delete<T[]>, size_t _internal_buffer_size = default_internal_buffer_size)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>))
-  struct c_str
+  struct c_str : public path_view_component::c_str<T, Deleter, _internal_buffer_size>
   {
     //! Number of characters, excluding zero terminating char, at buffer
     using _base = path_view_component::c_str<T, Deleter, _internal_buffer_size>;
@@ -1449,8 +1435,13 @@ constexpr inline path_view::iterator path_view::end() noexcept
 {
   return cend();
 }
-template<class T, class Deleter, size_t _internal_buffer_size, class>
-constexpr inline int path_view::compare(const path_view &o) const
+#ifdef __cpp_concepts
+template <class T, class Deleter, size_t _internal_buffer_size>
+requires path_view::is_source_acceptable<T>
+#else
+template <class T, class Deleter, size_t _internal_buffer_size, class>
+#endif
+constexpr inline int path_view::compare(path_view o) const
 {
   auto it1 = begin(), it2 = o.begin();
   for(; it1 != end() && it2 != o.end(); ++it1, ++it2)
@@ -1481,9 +1472,7 @@ LLFIO_V2_NAMESPACE_END
 
 #if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 #define LLFIO_INCLUDED_BY_HEADER 1
-#ifdef _WIN32
-#include "detail/impl/windows/path_view.ipp"
-#endif
+#include "detail/impl/path_view.ipp"
 #undef LLFIO_INCLUDED_BY_HEADER
 #endif
 
