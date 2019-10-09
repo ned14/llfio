@@ -249,6 +249,10 @@ protected:
     dsync_async
   };
   struct _erased_completion_handler;
+#if defined(__clang__) && __clang_major__ >= 8
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdefaulted-function-deleted"
+#endif
   // Holds state for an i/o in progress. Will be subclassed with platform specific state and how to implement completion.
   struct _erased_io_state_type
   {
@@ -308,6 +312,9 @@ protected:
     _erased_io_state_type &operator=(_erased_io_state_type &&) = default;
     _erased_io_state_type &operator=(const _erased_io_state_type &) = default;
   };
+#if defined(__clang__) && __clang_major__ >= 8
+#pragma clang diagnostic pop
+#endif
   struct _io_state_deleter
   {
     template <class U> void operator()(U *_ptr) const
