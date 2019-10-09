@@ -3,16 +3,18 @@
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 include(cmake/QuickCppLibBootstrap.cmake)
 include(QuickCppLibUtils)
-
+message("*** CTEST_CONFIGURE_OPTIONS = ${CTEST_CONFIGURE_OPTIONS}")
 
 CONFIGURE_CTEST_SCRIPT_FOR_CDASH("llfio" "prebuilt")
+list(APPEND CTEST_CONFIGURE_OPTIONS -DCMAKE_BUILD_TYPE=${CTEST_CONFIGURATION_TYPE})
+message("*** CTEST_CONFIGURE_OPTIONS = ${CTEST_CONFIGURE_OPTIONS}")
 ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
 include(FindGit)
 set(CTEST_GIT_COMMAND "${GIT_EXECUTABLE}")
 
 ctest_start("Experimental")
 ctest_update()
-ctest_configure(OPTIONS -DCMAKE_BUILD_TYPE=${CTEST_CONFIGURATION_TYPE};${CTEST_CONFIGURE_OPTIONS})
+ctest_configure(OPTIONS ${CTEST_CONFIGURE_OPTIONS})
 ctest_build(TARGET _dl)
 ctest_build(TARGET _sl)
 set(retval 0)
