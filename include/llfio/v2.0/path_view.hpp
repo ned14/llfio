@@ -105,17 +105,17 @@ namespace detail
   {
   };
 
-  LLFIO_HEADERS_ONLY_FUNC_SPEC char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const LLFIO_V2_NAMESPACE::byte *src_buffer, size_t src_buffer_length, bool src_is_zero_terminated);
-  LLFIO_HEADERS_ONLY_FUNC_SPEC char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const char *src_buffer, size_t src_buffer_length, bool src_is_zero_terminated);
-  LLFIO_HEADERS_ONLY_FUNC_SPEC char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const wchar_t *src_buffer, size_t src_buffer_length, bool src_is_zero_terminated);
-  LLFIO_HEADERS_ONLY_FUNC_SPEC char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const char8_t *src_buffer, size_t src_buffer_length, bool src_is_zero_terminated);
-  LLFIO_HEADERS_ONLY_FUNC_SPEC char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const char16_t *src_buffer, size_t src_buffer_length, bool src_is_zero_terminated);
+  LLFIO_HEADERS_ONLY_FUNC_SPEC char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const LLFIO_V2_NAMESPACE::byte *src_buffer, size_t src_buffer_length);
+  LLFIO_HEADERS_ONLY_FUNC_SPEC char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const char *src_buffer, size_t src_buffer_length);
+  LLFIO_HEADERS_ONLY_FUNC_SPEC char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const wchar_t *src_buffer, size_t src_buffer_length);
+  LLFIO_HEADERS_ONLY_FUNC_SPEC char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const char8_t *src_buffer, size_t src_buffer_length);
+  LLFIO_HEADERS_ONLY_FUNC_SPEC char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const char16_t *src_buffer, size_t src_buffer_length);
 
-  LLFIO_HEADERS_ONLY_FUNC_SPEC wchar_t *reencode_path_to(size_t &toallocate, wchar_t *dest_buffer, size_t dest_buffer_length, const LLFIO_V2_NAMESPACE::byte *src_buffer, size_t src_buffer_length, bool src_is_zero_terminated);
-  LLFIO_HEADERS_ONLY_FUNC_SPEC wchar_t *reencode_path_to(size_t &toallocate, wchar_t *dest_buffer, size_t dest_buffer_length, const char *src_buffer, size_t src_buffer_length, bool src_is_zero_terminated);
-  LLFIO_HEADERS_ONLY_FUNC_SPEC wchar_t *reencode_path_to(size_t &toallocate, wchar_t *dest_buffer, size_t dest_buffer_length, const wchar_t *src_buffer, size_t src_buffer_length, bool src_is_zero_terminated);
-  LLFIO_HEADERS_ONLY_FUNC_SPEC wchar_t *reencode_path_to(size_t &toallocate, wchar_t *dest_buffer, size_t dest_buffer_length, const char8_t *src_buffer, size_t src_buffer_length, bool src_is_zero_terminated);
-  LLFIO_HEADERS_ONLY_FUNC_SPEC wchar_t *reencode_path_to(size_t &toallocate, wchar_t *dest_buffer, size_t dest_buffer_length, const char16_t *src_buffer, size_t src_buffer_length, bool src_is_zero_terminated);
+  LLFIO_HEADERS_ONLY_FUNC_SPEC wchar_t *reencode_path_to(size_t &toallocate, wchar_t *dest_buffer, size_t dest_buffer_length, const LLFIO_V2_NAMESPACE::byte *src_buffer, size_t src_buffer_length);
+  LLFIO_HEADERS_ONLY_FUNC_SPEC wchar_t *reencode_path_to(size_t &toallocate, wchar_t *dest_buffer, size_t dest_buffer_length, const char *src_buffer, size_t src_buffer_length);
+  LLFIO_HEADERS_ONLY_FUNC_SPEC wchar_t *reencode_path_to(size_t &toallocate, wchar_t *dest_buffer, size_t dest_buffer_length, const wchar_t *src_buffer, size_t src_buffer_length);
+  LLFIO_HEADERS_ONLY_FUNC_SPEC wchar_t *reencode_path_to(size_t &toallocate, wchar_t *dest_buffer, size_t dest_buffer_length, const char8_t *src_buffer, size_t src_buffer_length);
+  LLFIO_HEADERS_ONLY_FUNC_SPEC wchar_t *reencode_path_to(size_t &toallocate, wchar_t *dest_buffer, size_t dest_buffer_length, const char16_t *src_buffer, size_t src_buffer_length);
   class path_view_iterator;
 }  // namespace detail
 
@@ -364,14 +364,19 @@ private:
   template <class CharT> static filesystem::path _path_from_char_array(basic_string_view<CharT> v) { return {v.data(), v.data() + v.size()}; }
   static filesystem::path _path_from_char_array(basic_string_view<char8_t> v) { return filesystem::u8path((const char *) v.data(), (const char *) v.data() + v.size()); }
 
-  template <class CharT> int _do_compare(const CharT *a, const CharT *b, size_t length) noexcept { return memcmp(a, b, length * sizeof(CharT)); }
-  int _do_compare(const char8_t *_a, const char8_t *_b, size_t length) noexcept
+  template <class CharT> static int _do_compare(const CharT *a, const CharT *b, size_t length) noexcept { return memcmp(a, b, length * sizeof(CharT)); }
+  static int _do_compare(const char8_t *_a, const char8_t *_b, size_t length) noexcept
   {
+#if !defined(__CHAR8_TYPE__) && __cplusplus < 20200000
     basic_string_view<char> a((const char *) _a, length);
     basic_string_view<char> b((const char *) _b, length);
+#else
+    basic_string_view<char8_t> a(_a, length);
+    basic_string_view<char8_t> b(_b, length);
+#endif
     return a.compare(b);
   }
-  int _do_compare(const char16_t *_a, const char16_t *_b, size_t length) noexcept
+  static int _do_compare(const char16_t *_a, const char16_t *_b, size_t length) noexcept
   {
     basic_string_view<char16_t> a(_a, length);
     basic_string_view<char16_t> b(_b, length);
@@ -580,23 +585,23 @@ public:
       value_type *end = nullptr;
       if(view._passthrough)
       {
-        end = detail::reencode_path_to(required_length, _buffer, _internal_buffer_size, view._bytestr, view._length, view._zero_terminated);
+        end = detail::reencode_path_to(required_length, _buffer, _internal_buffer_size, view._bytestr, view._length);
       }
       else if(view._char)
       {
-        end = detail::reencode_path_to(required_length, _buffer, _internal_buffer_size, view._charstr, view._length, view._zero_terminated);
+        end = detail::reencode_path_to(required_length, _buffer, _internal_buffer_size, view._charstr, view._length);
       }
       else if(view._wchar)
       {
-        end = detail::reencode_path_to(required_length, _buffer, _internal_buffer_size, view._wcharstr, view._length, view._zero_terminated);
+        end = detail::reencode_path_to(required_length, _buffer, _internal_buffer_size, view._wcharstr, view._length);
       }
       else if(view._utf8)
       {
-        end = detail::reencode_path_to(required_length, _buffer, _internal_buffer_size, view._char8str, view._length, view._zero_terminated);
+        end = detail::reencode_path_to(required_length, _buffer, _internal_buffer_size, view._char8str, view._length);
       }
       else if(view._utf16)
       {
-        end = detail::reencode_path_to(required_length, _buffer, _internal_buffer_size, view._char16str, view._length, view._zero_terminated);
+        end = detail::reencode_path_to(required_length, _buffer, _internal_buffer_size, view._char16str, view._length);
       }
       else
       {
@@ -623,23 +628,23 @@ public:
       end = allocated_buffer + (end - _buffer);
       if(view._passthrough)
       {
-        end = detail::reencode_path_to(length, end, required_length, view._bytestr, view._length, view._zero_terminated);
+        end = detail::reencode_path_to(length, end, required_length, view._bytestr, view._length);
       }
       else if(view._char)
       {
-        end = detail::reencode_path_to(length, end, required_length, view._charstr, view._length, view._zero_terminated);
+        end = detail::reencode_path_to(length, end, required_length, view._charstr, view._length);
       }
       else if(view._wchar)
       {
-        end = detail::reencode_path_to(length, end, required_length, view._wcharstr, view._length, view._zero_terminated);
+        end = detail::reencode_path_to(length, end, required_length, view._wcharstr, view._length);
       }
       else if(view._utf8)
       {
-        end = detail::reencode_path_to(length, end, required_length, view._char8str, view._length, view._zero_terminated);
+        end = detail::reencode_path_to(length, end, required_length, view._char8str, view._length);
       }
       else if(view._utf16)
       {
-        end = detail::reencode_path_to(length, end, required_length, view._char16str, view._length, view._zero_terminated);
+        end = detail::reencode_path_to(length, end, required_length, view._char16str, view._length);
       }
       else
       {
@@ -670,8 +675,14 @@ public:
     // under optimisation if it can prove it is never used.
     value_type _buffer[internal_buffer_size]{};
   };
-  LLFIO_TEMPLATE(class T, class Deleter, size_t _internal_buffer_size)
-  LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>))
+#ifdef __cpp_concepts
+  template <class T, class Deleter, size_t _internal_buffer_size>
+  requires is_source_acceptable<T>
+#elif defined(_MSC_VER)
+  template <class T, class Deleter, size_t _internal_buffer_size, class>
+#else
+  template <class T, class Deleter, size_t _internal_buffer_size, typename std::enable_if<(is_source_acceptable<T>), bool>::type>
+#endif
   friend struct c_str;
 };
 inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(path_view_component x, path_view_component y) noexcept
@@ -1229,7 +1240,7 @@ public:
   compared directly.
   */
   LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = std::default_delete<T[]>, size_t _internal_buffer_size = default_internal_buffer_size)
-  LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>))
+  LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<T>))
   constexpr inline int compare(path_view p) const;
   //! \overload
   LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = std::default_delete<T[]>, size_t _internal_buffer_size = default_internal_buffer_size, class Char)
@@ -1261,8 +1272,14 @@ public:
     {
     }
   };
-  LLFIO_TEMPLATE(class T, class Deleter, size_t _internal_buffer_size)
-  LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>))
+#ifdef __cpp_concepts
+  template <class T, class Deleter, size_t _internal_buffer_size>
+  requires is_source_acceptable<T>
+#elif defined(_MSC_VER)
+  template <class T, class Deleter, size_t _internal_buffer_size, class>
+#else
+  template <class T, class Deleter, size_t _internal_buffer_size, typename std::enable_if<(is_source_acceptable<T>), bool>::type>
+#endif
   friend struct c_str;
 };
 inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(path_view x, path_view y) noexcept
@@ -1438,8 +1455,10 @@ constexpr inline path_view::iterator path_view::end() noexcept
 #ifdef __cpp_concepts
 template <class T, class Deleter, size_t _internal_buffer_size>
 requires path_view::is_source_acceptable<T>
-#else
+#elif defined(_MSC_VER)
 template <class T, class Deleter, size_t _internal_buffer_size, class>
+#else
+template <class T, class Deleter, size_t _internal_buffer_size, typename std::enable_if<(path_view::is_source_acceptable<T>), bool>::type>
 #endif
 constexpr inline int path_view::compare(path_view o) const
 {

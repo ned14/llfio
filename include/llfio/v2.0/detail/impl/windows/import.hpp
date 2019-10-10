@@ -355,7 +355,13 @@ namespace windows_nt_kernel
 
   using RtlAnsiStringToUnicodeString_t = NTSTATUS(NTAPI *)(PUNICODE_STRING DestinationString, PCANSI_STRING SourceString, BOOLEAN AllocateDestinationString);
 
+  using RtlUnicodeStringToAnsiString_t = NTSTATUS(NTAPI *)(PANSI_STRING DestinationString, PCUNICODE_STRING SourceString, BOOLEAN AllocateDestinationString);
+
   using RtlOemStringToUnicodeString_t = NTSTATUS(NTAPI *)(PUNICODE_STRING DestinationString, PCOEM_STRING SourceString, BOOLEAN AllocateDestinationString);
+
+  using RtlUnicodeStringToOemString_t = NTSTATUS(NTAPI *)(POEM_STRING DestinationString, PCUNICODE_STRING SourceString, BOOLEAN AllocateDestinationString);
+
+  using RtlFreeAnsiString_t = NTSTATUS(NTAPI *)(PANSI_STRING String);
 
   using RtlFreeUnicodeString_t = NTSTATUS(NTAPI *)(PUNICODE_STRING String);
 
@@ -590,8 +596,11 @@ namespace windows_nt_kernel
   static RtlUTF8ToUnicodeN_t RtlUTF8ToUnicodeN;
   static RtlUnicodeToUTF8N_t RtlUnicodeToUTF8N;
   static RtlAnsiStringToUnicodeString_t RtlAnsiStringToUnicodeString;
+  static RtlUnicodeStringToAnsiString_t RtlUnicodeStringToAnsiString;
   static RtlOemStringToUnicodeString_t RtlOemStringToUnicodeString;
+  static RtlUnicodeStringToOemString_t RtlUnicodeStringToOemString;
   static RtlFreeUnicodeString_t RtlFreeUnicodeString;
+  static RtlFreeAnsiString_t RtlFreeAnsiString;
 
   
 #ifdef _MSC_VER
@@ -601,7 +610,7 @@ namespace windows_nt_kernel
 #endif
   inline void doinit()
   {
-    if(RtlFreeUnicodeString != nullptr)
+    if(RtlFreeAnsiString != nullptr)
     {
       return;
     }
@@ -864,6 +873,13 @@ namespace windows_nt_kernel
         abort();
       }
     }
+    if(RtlUnicodeStringToAnsiString == nullptr)
+    {
+      if((RtlUnicodeStringToAnsiString = reinterpret_cast<RtlUnicodeStringToAnsiString_t>(GetProcAddress(ntdllh, "RtlUnicodeStringToAnsiString"))) == nullptr)
+      {
+        abort();
+      }
+    }
     if(RtlOemStringToUnicodeString == nullptr)
     {
       if((RtlOemStringToUnicodeString = reinterpret_cast<RtlOemStringToUnicodeString_t>(GetProcAddress(ntdllh, "RtlOemStringToUnicodeString"))) == nullptr)
@@ -871,9 +887,23 @@ namespace windows_nt_kernel
         abort();
       }
     }
+    if(RtlUnicodeStringToOemString == nullptr)
+    {
+      if((RtlUnicodeStringToOemString = reinterpret_cast<RtlUnicodeStringToOemString_t>(GetProcAddress(ntdllh, "RtlUnicodeStringToOemString"))) == nullptr)
+      {
+        abort();
+      }
+    }
     if(RtlFreeUnicodeString == nullptr)
     {
       if((RtlFreeUnicodeString = reinterpret_cast<RtlFreeUnicodeString_t>(GetProcAddress(ntdllh, "RtlFreeUnicodeString"))) == nullptr)
+      {
+        abort();
+      }
+    }
+    if(RtlFreeAnsiString == nullptr)
+    {
+      if((RtlFreeAnsiString = reinterpret_cast<RtlFreeAnsiString_t>(GetProcAddress(ntdllh, "RtlFreeAnsiString"))) == nullptr)
       {
         abort();
       }
