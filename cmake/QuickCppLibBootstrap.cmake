@@ -37,6 +37,8 @@ if(NOT quickcpplib_done)
   if(EXISTS "${CMAKE_SOURCE_DIR}/../.quickcpplib_use_siblings" AND NOT QUICKCPPLIB_DISABLE_SIBLINGS)
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../quickcpplib/cmakelib")
     set(CTEST_QUICKCPPLIB_SCRIPTS "${CMAKE_SOURCE_DIR}/../quickcpplib/scripts")
+    # Copy latest version of myself into end user
+    file(COPY "${CTEST_QUICKCPPLIB_SCRIPTS}/../cmake/QuickCppLibBootstrap.cmake" DESTINATION "${CMAKE_SOURCE_DIR}/cmake/")
   elseif(CMAKE_BINARY_DIR)
     # Place into root binary directory, same place as where find_quickcpplib_library() puts dependencies.
     set(CTEST_QUICKCPPLIB_CLONE_DIR "${CMAKE_BINARY_DIR}/quickcpplib")
@@ -63,7 +65,4 @@ if(NOT quickcpplib_done)
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CTEST_QUICKCPPLIB_CLONE_DIR}/repo/cmakelib")
     set(CTEST_QUICKCPPLIB_SCRIPTS "${CTEST_QUICKCPPLIB_CLONE_DIR}/repo/scripts")
   endif()
-
-  # Copy latest version of myself into end user
-  file(COPY "${CTEST_QUICKCPPLIB_SCRIPTS}/../cmake/QuickCppLibBootstrap.cmake" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 endif()

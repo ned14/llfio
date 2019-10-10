@@ -159,7 +159,7 @@ namespace path_discovery
         {
 #if LLFIO_LOGGING_LEVEL >= 3
           std::string msg("path_discovery::verified_temporary_directories() failed to create a file in ");
-          msg.append(ps._all[n].path.u8string());
+          msg.append(ps._all[n].path.string());
           msg.append(" due to ");
           msg.append(_fh.error().message().c_str());
           LLFIO_LOG_WARN(nullptr, msg.c_str());
@@ -185,7 +185,7 @@ namespace path_discovery
         {
 #if LLFIO_LOGGING_LEVEL >= 3
           std::string msg("path_discovery::verified_temporary_directories() failed to statfs the temp directory ");
-          msg.append(ps._all[n].path.u8string());
+          msg.append(ps._all[n].path.string());
           msg.append(" due to ");
           msg.append(statfsres.error().message().c_str());
           LLFIO_LOG_WARN(nullptr, msg.c_str());

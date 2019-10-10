@@ -341,7 +341,7 @@ inline std::ostream &operator<<(std::ostream &s, const handle &v)
   if(v.is_valid())
   {
     auto _currentpath = v.current_path();
-    std::string currentpath = !_currentpath ? std::string(_currentpath.error().message().c_str()) : _currentpath.value().u8string();
+    std::string currentpath = !_currentpath ? std::string(_currentpath.error().message().c_str()) : _currentpath.value().string();
     return s << "llfio::handle(" << v._v._init << ", " << currentpath << ")";
   }
   return s << "llfio::handle(closed)";
@@ -470,7 +470,7 @@ namespace detail
         tls.reentering_self = false;
         if(currentpath_)
         {
-          auto currentpath = currentpath_.value().u8string();
+          auto currentpath = currentpath_.value().string();
           dest._thread_id = tls.this_thread_id;
 #ifdef _MSC_VER
 #pragma warning(push)
