@@ -310,7 +310,7 @@ namespace detail
     // Successful
     toallocate = 0;
     state.buffer.Buffer[(state.buffer.Length / sizeof(wchar_t))] = 0;
-    return state.buffer.Buffer + (state.buffer.Length / sizeof(wchar_t)) + 1;
+    return state.buffer.Buffer + (state.buffer.Length / sizeof(wchar_t));
 #elif defined(_LIBCPP_VERSION)
     (void) toallocate;
     (void) dest_buffer;

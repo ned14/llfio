@@ -73,7 +73,7 @@ namespace algorithm
     LLFIO_HEADERS_ONLY_FUNC_SPEC std::pair<cached_path_handle_ptr, filesystem::path> get_cached_path_handle(const path_handle &base, path_view path)
     {
       path_view leaf(path.filename());
-      path.remove_filename();
+      path = path.remove_filename();
       filesystem::path dirpath;
       if(base.is_valid())
       {

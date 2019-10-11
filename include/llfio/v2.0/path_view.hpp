@@ -198,10 +198,10 @@ private:
   {
   }  // NOLINT
   constexpr path_view_component(const byte *b, size_t l, bool zt)
-      : _bytestr(b)
-      , _length(l)
-      , _zero_terminated(zt)
-      , _passthrough(true)
+      : _bytestr((l == 0) ? nullptr : b)
+      , _length((l == 0) ? 0 : l)
+      , _zero_terminated((l == 0) ? false : zt)
+      , _passthrough((l == 0) ? false : true)
       , _char(false)
       , _wchar(false)
       , _utf8(false)
@@ -209,47 +209,47 @@ private:
   {
   }
   constexpr path_view_component(const char *b, size_t l, bool zt)
-      : _charstr(b)
-      , _length(l)
-      , _zero_terminated(zt)
+      : _charstr((l == 0) ? nullptr : b)
+      , _length((l == 0) ? 0 : l)
+      , _zero_terminated((l == 0) ? false : zt)
       , _passthrough(false)
-      , _char(true)
+      , _char((l == 0) ? false : true)
       , _wchar(false)
       , _utf8(false)
       , _utf16(false)
   {
   }
   constexpr path_view_component(const wchar_t *b, size_t l, bool zt)
-      : _wcharstr(b)
-      , _length(l)
-      , _zero_terminated(zt)
+      : _wcharstr((l == 0) ? nullptr : b)
+      , _length((l == 0) ? 0 : l)
+      , _zero_terminated((l == 0) ? false : zt)
       , _passthrough(false)
       , _char(false)
-      , _wchar(true)
+      , _wchar((l == 0) ? false : true)
       , _utf8(false)
       , _utf16(false)
   {
   }
   constexpr path_view_component(const char8_t *b, size_t l, bool zt)
-      : _char8str(b)
-      , _length(l)
-      , _zero_terminated(zt)
+      : _char8str((l == 0) ? nullptr : b)
+      , _length((l == 0) ? 0 : l)
+      , _zero_terminated((l == 0) ? false : zt)
       , _passthrough(false)
       , _char(false)
       , _wchar(false)
-      , _utf8(true)
+      , _utf8((l == 0) ? false : true)
       , _utf16(false)
   {
   }
   constexpr path_view_component(const char16_t *b, size_t l, bool zt)
-      : _char16str(b)
-      , _length(l)
-      , _zero_terminated(zt)
+      : _char16str((l == 0) ? nullptr : b)
+      , _length((l == 0) ? 0 : l)
+      , _zero_terminated((l == 0) ? false : zt)
       , _passthrough(false)
       , _char(false)
       , _wchar(false)
       , _utf8(false)
-      , _utf16(true)
+      , _utf16((l == 0) ? false : true)
   {
   }
   template <class U> constexpr auto _invoke(U &&f) const noexcept
@@ -395,8 +395,8 @@ private:
   // Disparate source encodings compare via c_str
   template <class DestT, class Deleter, size_t _internal_buffer_size, class Char1T, class Char2T> static int _compare(basic_string_view<Char1T> a, basic_string_view<Char2T> b) noexcept
   {
-    c_str<DestT, Deleter, _internal_buffer_size> _a(a, true);
-    c_str<DestT, Deleter, _internal_buffer_size> _b(b, true);
+    c_str<DestT, Deleter, _internal_buffer_size> _a({a.data(), a.size(), false}, true);
+    c_str<DestT, Deleter, _internal_buffer_size> _b({b.data(), b.size(), false}, true);
     if(_a.length < _b.length)
     {
       return -1;
@@ -435,16 +435,16 @@ public:
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>))
   constexpr int compare(path_view_component p) const
   {
-    return _invoke([&p](const auto &self) { return p._invoke([&self](const auto &other) { return _compare<T>(self, other); }); });
+    return _invoke([&p](const auto &self) { return p._invoke([&self](const auto &other) { return _compare<T, Deleter, _internal_buffer_size>(self, other); }); });
   }
   //! \overload
   LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = std::default_delete<T[]>, size_t _internal_buffer_size = default_internal_buffer_size, class Char)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T> &&is_source_acceptable<Char>))
-  constexpr int compare(const Char *s) const noexcept { return compare<T>(path_view_component(s)); }
+  constexpr int compare(const Char *s) const noexcept { return compare<T, Deleter, _internal_buffer_size>(path_view_component(s, detail::constexpr_strlen(s), true)); }
   //! \overload
   LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = std::default_delete<T[]>, size_t _internal_buffer_size = default_internal_buffer_size, class Char)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T> &&is_source_chartype_acceptable<Char>))
-  constexpr int compare(const basic_string_view<Char> s) const noexcept { return compare<T>(path_view_component(s)); }
+  constexpr int compare(const basic_string_view<Char> s) const noexcept { return compare<T, Deleter, _internal_buffer_size>(path_view_component(s)); }
 
   /*! Instantiate from a `path_view_component` to get a path suitable for feeding to other code.
   \tparam T The destination encoding required.
@@ -486,8 +486,8 @@ public:
     const value_type *buffer{nullptr};
 
   private:
-    template <class U, class source_type> void _make_passthrough(const path_view_component & /*unused*/, bool /*unused*/, U & /*unused*/, source_type * /*unused*/) {}
-    template <class U> void _make_passthrough(const path_view_component &view, bool no_zero_terminate, U &allocate, value_type *source)
+    template <class U, class source_type> void _make_passthrough(path_view_component /*unused*/, bool /*unused*/, U & /*unused*/, const source_type * /*unused*/) {}
+    template <class U> void _make_passthrough(path_view_component view, bool no_zero_terminate, U &allocate, const value_type *source)
     {
       length = view._length;
       if(no_zero_terminate || view._zero_terminated)
@@ -496,7 +496,8 @@ public:
       }
       else
       {
-        const size_t required_length = view._length + (!no_zero_terminate - view._zero_terminated);
+        // Source must be not zero terminated, and zero terminated is required
+        const size_t required_length = view._length + view._zero_terminated;
         const size_t required_bytes = required_length * sizeof(value_type);
         const size_t _buffer_bytes = sizeof(_buffer);
 #ifdef _WIN32
@@ -508,19 +509,24 @@ public:
 #endif
         if(required_bytes <= _buffer_bytes)
         {
+          // Use the internal buffer
+          memcpy(_buffer, source, required_bytes);
+          _buffer[required_length] = 0;
           buffer = _buffer;
-          memcpy(buffer, source, required_bytes);
         }
         else
         {
-          buffer = allocate(required_length);
-          if(nullptr == buffer)
+          auto *buffer_ = allocate(required_length);
+          if(nullptr == buffer_)
           {
             length = 0;
           }
           else
           {
             _call_deleter = true;
+            memcpy(buffer_, source, required_bytes);
+            buffer_[required_length] = 0;
+            buffer = buffer_;
           }
         }
       }
@@ -544,7 +550,7 @@ public:
     must be **valid** UTF. If you wish to supply UTF-invalid paths (which are legal
     on most filesystems), use native narrow or wide encoded source, or binary.
     */
-    template <class U> c_str(const path_view_component &view, bool no_zero_terminate, U &&allocate)
+    template <class U> c_str(path_view_component view, bool no_zero_terminate, U &&allocate)
     {
       if(std::is_same<T, byte>::value || view._passthrough)
       {
@@ -666,7 +672,7 @@ public:
 #pragma warning(pop)
 #endif
     //! \overload
-    c_str(const path_view_component &view, bool no_zero_terminate = false)
+    c_str(path_view_component view, bool no_zero_terminate = false)
         : c_str(view, no_zero_terminate, [](size_t length) { return new value_type[length]; })
     {
     }
@@ -765,7 +771,7 @@ namespace detail
       // Cheat by going via filesystem::path
       s << filesystem::path(_v.begin(), _v.end());
     }
-#if LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED || 1 // std::filesystem::path support for char8_t input is currently lacking :(
+#if LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED || 1  // std::filesystem::path support for char8_t input is currently lacking :(
     void operator()(basic_string_view<char8_t> _v)
     {
       basic_string_view<char> v((char *) _v.data(), _v.size());
@@ -1259,7 +1265,7 @@ public:
   //! \overload
   LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = std::default_delete<T[]>, size_t _internal_buffer_size = default_internal_buffer_size, class Char)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T> &&is_source_acceptable<Char>))
-  constexpr int compare(const Char *s) const noexcept { return compare<T, Deleter, _internal_buffer_size>(path_view_component(s)); }
+  constexpr int compare(const Char *s) const noexcept { return compare<T, Deleter, _internal_buffer_size>(path_view_component(s, detail::constexpr_strlen(s), true)); }
   //! \overload
   LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = std::default_delete<T[]>, size_t _internal_buffer_size = default_internal_buffer_size, class Char)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T> &&is_source_chartype_acceptable<Char>))
@@ -1276,12 +1282,12 @@ public:
     /*! See constructor for `path_view_component::c_str`.
      */
     template <class U>
-    c_str(const path_view &view, bool no_zero_terminate, U &&allocate)
+    c_str(path_view view, bool no_zero_terminate, U &&allocate)
         : _base(view._state, no_zero_terminate, static_cast<U &&>(allocate))
     {
     }
     //! \overload
-    c_str(const path_view &view, bool no_zero_terminate = false)
+    c_str(path_view view, bool no_zero_terminate = false)
         : _base(view._state, no_zero_terminate)
     {
     }
@@ -1353,8 +1359,9 @@ namespace detail
     {
       assert(_parent != nullptr);
       return _parent->_state._invoke([this](const auto &v) {
-        assert(_begin + _end <= v.size());
-        return path_view_component(v.data() + _begin, _end, (_begin + _end == v.size()) ? _parent->_state._zero_terminated : false);
+        assert(_end <= v.size());
+        assert(_begin <= _end);
+        return path_view_component(v.data() + _begin, _end - _begin, (_end == v.size()) ? _parent->_state._zero_terminated : false);
       });
     }
     constexpr void _inc() noexcept

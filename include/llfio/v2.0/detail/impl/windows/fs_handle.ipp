@@ -62,7 +62,7 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
       }
       // Split the path into root and leafname
       filesystem::path filename = currentpath.filename();
-      currentpath.remove_filename();
+      currentpath = currentpath.remove_filename();
       /* We have to be super careful here because \Device\HarddiskVolume4 != \Device\HarddiskVolume4\!
       The former opens the device, the latter the root directory of the device.
       */

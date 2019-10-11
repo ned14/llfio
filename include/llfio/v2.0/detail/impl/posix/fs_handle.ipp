@@ -71,7 +71,7 @@ namespace detail
         // Split the path into root and leafname
         path_view currentpath(_currentpath);
         path_view filename = currentpath.filename();
-        currentpath.remove_filename();
+        currentpath = currentpath.remove_filename();
         // Zero terminate the root path so it doesn't get copied later
         const_cast<filesystem::path::string_type &>(_currentpath.native())[currentpath.native_size()] = 0;
         auto currentdirh_ = path_handle::path(currentpath);
