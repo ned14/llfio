@@ -44,6 +44,14 @@ Distributed under the Boost Software License, Version 1.0.
 #define LLFIO_PATH_VIEW_GCC_CONSTEXPR constexpr
 #endif
 
+#ifndef LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED
+#if !defined(__CHAR8_TYPE__) && (__cplusplus <= 201703L && !_HAS_CXX20)
+#define LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED 1
+#else
+#define LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED 0
+#endif
+#endif
+
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace detail
@@ -57,7 +65,7 @@ namespace detail
     return e - s;
   }
 
-#if !defined(__CHAR8_TYPE__) && __cplusplus < 20200000
+#if LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED
   struct char8_t
   {
     char v;
@@ -145,7 +153,7 @@ public:
 
   //! Character type for passthrough input
   using byte = LLFIO_V2_NAMESPACE::byte;
-#if !defined(__CHAR8_TYPE__) && __cplusplus < 20200000
+#if LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED
   using char8_t = detail::char8_t;
 #endif
 #if !defined(__CHAR16_TYPE__) && !defined(_MSC_VER)  // VS2015 onwards has built in char16_t
@@ -367,7 +375,7 @@ private:
   template <class CharT> static int _do_compare(const CharT *a, const CharT *b, size_t length) noexcept { return memcmp(a, b, length * sizeof(CharT)); }
   static int _do_compare(const char8_t *_a, const char8_t *_b, size_t length) noexcept
   {
-#if !defined(__CHAR8_TYPE__) && __cplusplus < 20200000
+#if LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED
     basic_string_view<char> a((const char *) _a, length);
     basic_string_view<char> b((const char *) _b, length);
 #else
@@ -757,11 +765,17 @@ namespace detail
       // Cheat by going via filesystem::path
       s << filesystem::path(_v.begin(), _v.end());
     }
-#if !defined(__CHAR8_TYPE__) && __cplusplus < 20200000
+#if LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED || 1 // std::filesystem::path support for char8_t input is currently lacking :(
     void operator()(basic_string_view<char8_t> _v)
     {
       basic_string_view<char> v((char *) _v.data(), _v.size());
       s << v;
+    }
+#else
+    void operator()(basic_string_view<char8_t> _v)
+    {
+      // Cheat by going via filesystem::path
+      s << filesystem::path(_v.begin(), _v.end());
     }
 #endif
   };
@@ -891,7 +905,7 @@ public:
 
   //! Character type for passthrough input
   using byte = LLFIO_V2_NAMESPACE::byte;
-#if !defined(__CHAR8_TYPE__) && __cplusplus < 20200000
+#if LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED
   using char8_t = detail::char8_t;
 #endif
 #if !defined(__CHAR16_TYPE__) && !defined(_MSC_VER)  // VS2015 onwards has built in char16_t
@@ -1278,7 +1292,7 @@ public:
 #elif defined(_MSC_VER)
   template <class T, class Deleter, size_t _internal_buffer_size, class>
 #else
-  template <class T, class Deleter, size_t _internal_buffer_size, typename std::enable_if<(is_source_acceptable<T>), bool>::type>
+template <class T, class Deleter, size_t _internal_buffer_size, typename std::enable_if<(is_source_acceptable<T>), bool>::type>
 #endif
   friend struct c_str;
 };

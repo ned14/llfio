@@ -44,7 +44,7 @@ namespace detail
     }
     ~_codecvt() {}
   };
-#if !defined(__CHAR8_TYPE__) && __cplusplus < 20200000
+#if LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED
   inline const char *cast_char8_t_ptr(const char8_t *v) { return (const char *) v; }
   inline char *cast_char8_t_ptr(char8_t *v) { return (char *) v; }
   template <> struct _codecvt<char8_t, char> : std::codecvt<char, char, std::mbstate_t>
@@ -311,6 +311,22 @@ namespace detail
     toallocate = 0;
     state.buffer.Buffer[(state.buffer.Length / sizeof(wchar_t))] = 0;
     return state.buffer.Buffer + (state.buffer.Length / sizeof(wchar_t)) + 1;
+#elif defined(_LIBCPP_VERSION)
+    (void) toallocate;
+    (void) dest_buffer;
+    (void) dest_buffer_length;
+    (void) src_buffer;
+    (void) src_buffer_length;
+    LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str reencoding function does not support char to wchar_t conversion on libc++.");
+    abort();
+#elif defined(__GLIBCXX__)
+    (void) toallocate;
+    (void) dest_buffer;
+    (void) dest_buffer_length;
+    (void) src_buffer;
+    (void) src_buffer_length;
+    LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str reencoding function does not support char to wchar_t conversion on libstdc++.");
+    abort();
 #else
     return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, src_buffer, src_buffer_length);
 #endif
@@ -322,8 +338,26 @@ namespace detail
   }
   wchar_t *reencode_path_to(size_t &toallocate, wchar_t *dest_buffer, size_t dest_buffer_length, const char8_t *src_buffer, size_t src_buffer_length)
   {
-#if !defined(__CHAR8_TYPE__) && __cplusplus < 20200000
+#if LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED
+#if defined(_LIBCPP_VERSION)
+    (void) toallocate;
+    (void) dest_buffer;
+    (void) dest_buffer_length;
+    (void) src_buffer;
+    (void) src_buffer_length;
+    LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str reencoding function does not support char8_t to wchar_t conversion on libc++.");
+    abort();
+#elif defined(__GLIBCXX__)
+    (void) toallocate;
+    (void) dest_buffer;
+    (void) dest_buffer_length;
+    (void) src_buffer;
+    (void) src_buffer_length;
+    LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str reencoding function does not support char8_t to wchar_t conversion on libstdc++.");
+    abort();
+#else
     return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, (const char *) src_buffer, src_buffer_length);
+#endif
 #else
     return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, src_buffer, src_buffer_length);
 #endif
@@ -337,6 +371,22 @@ namespace detail
     (void) src_buffer;
     (void) src_buffer_length;
     LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str reencoding function should never see identity.");
+    abort();
+#elif defined(_LIBCPP_VERSION)
+    (void) toallocate;
+    (void) dest_buffer;
+    (void) dest_buffer_length;
+    (void) src_buffer;
+    (void) src_buffer_length;
+    LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str reencoding function does not support char16_t to wchar_t conversion on libc++.");
+    abort();
+#elif defined(__GLIBCXX__)
+    (void) toallocate;
+    (void) dest_buffer;
+    (void) dest_buffer_length;
+    (void) src_buffer;
+    (void) src_buffer_length;
+    LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str reencoding function does not support char16_t to wchar_t conversion on libstdc++.");
     abort();
 #else
     return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, src_buffer, src_buffer_length);
