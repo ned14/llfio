@@ -2,7 +2,7 @@ dist: bionic
 language: cpp
 compiler:
  - g++
- - clang++
+ - clang++-8
 sudo: false
 os:
  - linux
@@ -20,7 +20,9 @@ addons:
   apt:
     packages:
     - g++
-    - clang
+    - clang-8
+    - libc++-8-dev
+    - libc++abi-8-dev
     - g++-arm-linux-gnueabihf
     - python3
     - cmake
@@ -50,10 +52,10 @@ matrix:
 #  - os: osx
 #    env: __="cmake tests (status_code)" NAME=TravisLinuxWorkerSC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - os: linux
-    compiler: clang++
+    compiler: clang++-8
     env: __="ARM32 cmake tests (error_code)" NAME=Linux_ARM32_EC CMAKE_CONFIGURE_OPTIONS=
   - os: linux
-    compiler: clang++
+    compiler: clang++-8
     env: __="ARM32 cmake tests (status_code)" NAME=Linux_ARM32_SC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - os: linux
     compiler: g++
@@ -74,7 +76,7 @@ before_install:
      export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DCMAKE_LIBRARY_PATH=/usr/local/opt/llvm/lib";
    fi
  - if [ "$CXX" = "g++" ]; then export NAME=GCC$NAME; fi;
- - if [ "$CXX" = "clang++" ]; then export NAME=Clang$NAME; fi;
+ - if [ "$CXX" = "clang++-8" ]; then export NAME=Clang$NAME; fi;
  - git checkout develop
  - git submodule update --init --recursive
  - mount
