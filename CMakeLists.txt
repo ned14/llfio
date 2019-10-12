@@ -168,18 +168,19 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
   else()
     set(USING_LIBCXX_ON_LINUX 1)
     # We had to use libc++ to get coroutines on Linux, so don't link the filesystem TS
+    # into the _dl edition, which is the coroutines-enabled edition
     target_link_libraries(${PROJECT_NAME}_hl INTERFACE ${libstdcxx_stdcxxfs} rt)
     target_link_libraries(${PROJECT_NAME}_sl PUBLIC ${libstdcxx_stdcxxfs} rt)
     foreach(special ${SPECIAL_BUILDS})
       target_link_libraries(${PROJECT_NAME}_sl-${special} PUBLIC ${libstdcxx_stdcxxfs} rt)
     endforeach()
-    # Do make libc++ a requirement
+    # Do make libc++ a requirement for the _dl edition
     target_compile_definitions(${PROJECT_NAME}_dl PUBLIC _LIBCPP_NO_EXPERIMENTAL_DEPRECATION_WARNING_FILESYSTEM=1)
     target_compile_options(${PROJECT_NAME}_dl PUBLIC -stdlib=libc++)
-    target_link_libraries(${PROJECT_NAME}_dl PUBLIC -stdlib=libc++ -lc++abi)
+    target_link_libraries(${PROJECT_NAME}_dl PUBLIC -stdlib=libc++ -lc++abi -lc++experimental)
     foreach(special ${SPECIAL_BUILDS})
       target_compile_options(${PROJECT_NAME}_dl-${special} PUBLIC -stdlib=libc++)
-      target_link_libraries(${PROJECT_NAME}_dl-${special} PUBLIC -stdlib=libc++ -lc++abi)
+      target_link_libraries(${PROJECT_NAME}_dl-${special} PUBLIC -stdlib=libc++ -lc++abi -lc++experimental)
     endforeach()
   endif()
 endif()
