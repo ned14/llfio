@@ -318,6 +318,8 @@ public:
   path_view_component &operator=(const path_view_component &) = default;
   path_view_component &operator=(path_view_component &&) = default;
   ~path_view_component() = default;
+  
+  const byte *_raw_data() const noexcept { return _bytestr; }
 
   //! True if empty
   LLFIO_NODISCARD constexpr bool empty() const noexcept { return _length == 0; }
@@ -866,9 +868,6 @@ Some of the API for `std::filesystem::path` is replicated here, however any
 APIs which modify the path other than taking subsets are obviously not
 possible with borrowed views.
 
-\todo Lots of member functions remain to be implemented. `char8_t` and `char16_t`
-support is not implemented yet.
-
 Each consumer of `path_view` defines what the "native platform transport" and
 "native platform encoding" is. For LLFIO, the native platform transport is
 defined to be `std::filesystem::path::value_type`, which is as follows:
@@ -1069,6 +1068,8 @@ public:
 
   //! Swap the view with another
   constexpr void swap(path_view &o) noexcept { _state.swap(o._state); }
+
+  const byte *_raw_data() const noexcept { return _state._bytestr; }
 
   //! True if empty
   LLFIO_NODISCARD LLFIO_PATH_VIEW_CONSTEXPR bool empty() const noexcept { return _state.empty(); }
