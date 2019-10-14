@@ -35,6 +35,7 @@ var namespacellfio__v2__xxx =
     [ "path_handle", "classllfio__v2__xxx_1_1path__handle.html", "classllfio__v2__xxx_1_1path__handle" ],
     [ "path_hasher", "structllfio__v2__xxx_1_1path__hasher.html", "structllfio__v2__xxx_1_1path__hasher" ],
     [ "path_view", "classllfio__v2__xxx_1_1path__view.html", "classllfio__v2__xxx_1_1path__view" ],
+    [ "path_view_component", "classllfio__v2__xxx_1_1path__view__component.html", "classllfio__v2__xxx_1_1path__view__component" ],
     [ "section_handle", "classllfio__v2__xxx_1_1section__handle.html", "classllfio__v2__xxx_1_1section__handle" ],
     [ "stat_t", "structllfio__v2__xxx_1_1stat__t.html", "structllfio__v2__xxx_1_1stat__t" ],
     [ "statfs_t", "structllfio__v2__xxx_1_1statfs__t.html", "structllfio__v2__xxx_1_1statfs__t" ],

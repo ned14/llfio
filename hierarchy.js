@@ -9,7 +9,6 @@ var hierarchy =
     [ "kvstore_v1_xxx::basic_key_value_store_info", "structkvstore__v1__xxx_1_1basic__key__value__store__info.html", null ],
     [ "llfio_v2_xxx::io_handle::buffer_type", "structllfio__v2__xxx_1_1io__handle_1_1buffer__type.html", null ],
     [ "llfio_v2_xxx::symlink_handle::buffers_type", "structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html", null ],
-    [ "llfio_v2_xxx::path_view::c_str", "structllfio__v2__xxx_1_1path__view_1_1c__str.html", null ],
     [ "llfio_v2_xxx::io_handle::const_buffer_type", "structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html", null ],
     [ "llfio_v2_xxx::symlink_handle::const_buffers_type", "structllfio__v2__xxx_1_1symlink__handle_1_1const__buffers__type.html", null ],
     [ "llfio_v2_xxx::construct< T >", "structllfio__v2__xxx_1_1construct.html", null ],
@@ -79,8 +78,9 @@ var hierarchy =
     [ "llfio_v2_xxx::utils::page_allocator< void >", "classllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4.html", null ],
     [ "llfio_v2_xxx::path_hasher", "structllfio__v2__xxx_1_1path__hasher.html", null ],
     [ "llfio_v2_xxx::path_view", "classllfio__v2__xxx_1_1path__view.html", null ],
-    [ "llfio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
+    [ "llfio_v2_xxx::path_view_component", "classllfio__v2__xxx_1_1path__view__component.html", null ],
     [ "llfio_v2_xxx::utils::page_allocator< void >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
+    [ "llfio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
     [ "result", null, [
       [ "llfio_v2_xxx::io_handle::io_result< buffers_type >", "structllfio__v2__xxx_1_1io__handle_1_1io__result.html", null ],
       [ "llfio_v2_xxx::io_handle::io_result< const_buffers_type >", "structllfio__v2__xxx_1_1io__handle_1_1io__result.html", null ],

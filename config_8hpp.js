@@ -15,6 +15,7 @@ var config_8hpp =
     [ "LLFIO_LOGGING_LEVEL", "group__config.html#gaf958c6b17b345d3b84043bf7352451f2", null ],
     [ "LLFIO_LOGGING_MEMORY", "group__config.html#ga2e45ede29ed7b2aa06eb19aff2485541", null ],
     [ "LLFIO_MAKE_FREE_FUNCTION", "config_8hpp.html#aa96417d97962da23b27d237508a58646", null ],
+    [ "LLFIO_NODISCARD", "config_8hpp.html#adb72eb2d002d482f9c9be5505a7ab2ae", null ],
     [ "LLFIO_TEMPLATE", "config_8hpp.html#a4de8a527746757126bdb1635b9a2a892", null ],
     [ "LLFIO_TEXPR", "config_8hpp.html#ae0ffcd967fa2fb3f8acaf39cf7b75d8d", null ],
     [ "LLFIO_THREAD_LOCAL", "config_8hpp.html#a1e5f2d817ba0955e319af287e5dd924b", null ],

@@ -4,6 +4,7 @@ var searchData=
   ['deadline',['deadline',['../structllfio__v2__xxx_1_1deadline.html',1,'llfio_v2_xxx']]],
   ['deadline_2eh',['deadline.h',['../deadline_8h.html',1,'']]],
   ['decommit',['decommit',['../classllfio__v2__xxx_1_1map__handle.html#a518ff43602ac8e32ae48a198d0de1d75',1,'llfio_v2_xxx::map_handle']]],
+  ['default_5finternal_5fbuffer_5fsize',['default_internal_buffer_size',['../classllfio__v2__xxx_1_1path__view__component.html#a7b52fa10c4359dcc25aed43be0be8a91',1,'llfio_v2_xxx::path_view_component::default_internal_buffer_size()'],['../classllfio__v2__xxx_1_1path__view.html#a2a8bf49225c71090012ed30260f117bf',1,'llfio_v2_xxx::path_view::default_internal_buffer_size()']]],
   ['default_5fvalue',['default_value',['../namespacellfio__v2__xxx_1_1storage__profile.html#aac385da4b780e8a6a87444fe3579578c',1,'llfio_v2_xxx::storage_profile']]],
   ['dependencies',['dependencies',['../classkvstore__v1__xxx_1_1basic__key__value__store_1_1transaction.html#a844ec2c3ede9688a0ae1be106ef92df8',1,'kvstore_v1_xxx::basic_key_value_store::transaction']]],
   ['description',['description',['../structllfio__v2__xxx_1_1storage__profile_1_1item__base.html#a8f9536ff1752dee8f073e3dafac18fe0',1,'llfio_v2_xxx::storage_profile::item_base']]],

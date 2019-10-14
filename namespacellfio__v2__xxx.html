@@ -201,6 +201,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A borrowed view of a path. A lightweight trivial-type alternative to <code>std::filesystem::path</code>.  <a href="classllfio__v2__xxx_1_1path__view.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An iterated part of a <code>path_view</code>.  <a href="classllfio__v2__xxx_1_1path__view__component.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1section__handle.html">section_handle</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to a source of mapped memory.  <a href="classllfio__v2__xxx_1_1section__handle.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -420,27 +423,27 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="name
 <tr class="separator:a49f7bb77eb38fbe1280019225b66b78b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad8b12afdd4c80d69d2530bd40f92427c"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#ad8b12afdd4c80d69d2530bd40f92427c">path</a> (<a class="el" href="classllfio__v2__xxx_1_1path__handle.html#a6f2c51636f17ae97255106d37ef4187c">path_handle::path_view_type</a> _path) noexcept</td></tr>
 <tr class="separator:ad8b12afdd4c80d69d2530bd40f92427c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac9e1bf32080cf8be3406ad96e9516e61"><td class="memItemLeft" align="right" valign="top"><a id="ac9e1bf32080cf8be3406ad96e9516e61"></a>
-LLFIO_PATH_VIEW_GCC_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> x, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> y) noexcept</td></tr>
-<tr class="separator:ac9e1bf32080cf8be3406ad96e9516e61"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6a0ac4fab49a443e85a51abe2f2e5156"><td class="memItemLeft" align="right" valign="top"><a id="a6a0ac4fab49a443e85a51abe2f2e5156"></a>
-LLFIO_PATH_VIEW_GCC_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator!=</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> x, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> y) noexcept</td></tr>
-<tr class="separator:a6a0ac4fab49a443e85a51abe2f2e5156"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a87ccbad410cda08b1b14566aad2332"><td class="memItemLeft" align="right" valign="top"><a id="a1a87ccbad410cda08b1b14566aad2332"></a>
-LLFIO_PATH_VIEW_GCC_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> x, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> y) noexcept</td></tr>
-<tr class="separator:a1a87ccbad410cda08b1b14566aad2332"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa42db078a374a94dabbda3a2ba3ba39f"><td class="memItemLeft" align="right" valign="top"><a id="aa42db078a374a94dabbda3a2ba3ba39f"></a>
-LLFIO_PATH_VIEW_GCC_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator&gt;</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> x, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> y) noexcept</td></tr>
-<tr class="separator:aa42db078a374a94dabbda3a2ba3ba39f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5c60a01d705fafd6036d346c883c96a0"><td class="memItemLeft" align="right" valign="top"><a id="a5c60a01d705fafd6036d346c883c96a0"></a>
-LLFIO_PATH_VIEW_GCC_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;=</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> x, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> y) noexcept</td></tr>
-<tr class="separator:a5c60a01d705fafd6036d346c883c96a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3ff493fb21f2aafa6092cf641f26ca60"><td class="memItemLeft" align="right" valign="top"><a id="a3ff493fb21f2aafa6092cf641f26ca60"></a>
-LLFIO_PATH_VIEW_GCC_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator&gt;=</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> x, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> y) noexcept</td></tr>
-<tr class="separator:a3ff493fb21f2aafa6092cf641f26ca60"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b272f994e955b1219e61920df8ec136"><td class="memItemLeft" align="right" valign="top"><a id="a8b272f994e955b1219e61920df8ec136"></a>
+constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> x, <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> y) noexcept</td></tr>
+<tr class="separator:a8b272f994e955b1219e61920df8ec136"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a84c787ed5c98dc08c46bf520746bdbea"><td class="memItemLeft" align="right" valign="top"><a id="a84c787ed5c98dc08c46bf520746bdbea"></a>
+constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator!=</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> x, <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> y) noexcept</td></tr>
+<tr class="separator:a84c787ed5c98dc08c46bf520746bdbea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20dbb9e8deed80ea3d0b65d52fd34771"><td class="memItemLeft" align="right" valign="top"><a id="a20dbb9e8deed80ea3d0b65d52fd34771"></a>
+std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> &amp;v)</td></tr>
+<tr class="separator:a20dbb9e8deed80ea3d0b65d52fd34771"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96d00f83eb1996bcbbb9d3aa62424a51"><td class="memItemLeft" align="right" valign="top"><a id="a96d00f83eb1996bcbbb9d3aa62424a51"></a>
+constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> x, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> y) noexcept</td></tr>
+<tr class="separator:a96d00f83eb1996bcbbb9d3aa62424a51"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af909fbaabae06c5831b45bc7f506d2dd"><td class="memItemLeft" align="right" valign="top"><a id="af909fbaabae06c5831b45bc7f506d2dd"></a>
+constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator!=</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> x, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> y) noexcept</td></tr>
+<tr class="separator:af909fbaabae06c5831b45bc7f506d2dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0247c61a58f54b12119505f6b12aef2b"><td class="memItemLeft" align="right" valign="top"><a id="a0247c61a58f54b12119505f6b12aef2b"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> &amp;v)</td></tr>
 <tr class="separator:a0247c61a58f54b12119505f6b12aef2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e68b8ef674b43bc67a04576a5d9a99e"><td class="memItemLeft" align="right" valign="top"><a id="a3e68b8ef674b43bc67a04576a5d9a99e"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>LLFIO_TEMPLATE</b> (class CharT) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a></td></tr>
+<tr class="separator:a3e68b8ef674b43bc67a04576a5d9a99e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a209f670f6c6b08da7864aa85401ee124"><td class="memItemLeft" align="right" valign="top"><a id="a209f670f6c6b08da7864aa85401ee124"></a>
 std::error_code&#160;</td><td class="memItemRight" valign="bottom"><b>make_error_code</b> (<a class="el" href="structllfio__v2__xxx_1_1error__info.html">error_info</a> ei)</td></tr>
 <tr class="separator:a209f670f6c6b08da7864aa85401ee124"><td class="memSeparator" colspan="2">&#160;</td></tr>
