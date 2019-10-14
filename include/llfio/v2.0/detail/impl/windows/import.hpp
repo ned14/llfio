@@ -351,6 +351,20 @@ namespace windows_nt_kernel
 
   using RtlUTF8ToUnicodeN_t = NTSTATUS(NTAPI *)(_Out_opt_ PWSTR UnicodeStringDestination, _In_ ULONG UnicodeStringMaxByteCount, _Out_ PULONG UnicodeStringActualByteCount, _In_ PCCH UTF8StringSource, _In_ ULONG UTF8StringByteCount);
 
+  using RtlUnicodeToUTF8N_t = NTSTATUS(NTAPI *)(_Out_opt_ PCHAR  UTF8StringDestination, _In_ ULONG  UTF8StringMaxByteCount, _Out_ PULONG UTF8StringActualByteCount, _In_ PCWCH  UnicodeStringSource, _In_ ULONG  UnicodeStringByteCount);
+
+  using RtlAnsiStringToUnicodeString_t = NTSTATUS(NTAPI *)(PUNICODE_STRING DestinationString, PCANSI_STRING SourceString, BOOLEAN AllocateDestinationString);
+
+  using RtlUnicodeStringToAnsiString_t = NTSTATUS(NTAPI *)(PANSI_STRING DestinationString, PCUNICODE_STRING SourceString, BOOLEAN AllocateDestinationString);
+
+  using RtlOemStringToUnicodeString_t = NTSTATUS(NTAPI *)(PUNICODE_STRING DestinationString, PCOEM_STRING SourceString, BOOLEAN AllocateDestinationString);
+
+  using RtlUnicodeStringToOemString_t = NTSTATUS(NTAPI *)(POEM_STRING DestinationString, PCUNICODE_STRING SourceString, BOOLEAN AllocateDestinationString);
+
+  using RtlFreeAnsiString_t = NTSTATUS(NTAPI *)(PANSI_STRING String);
+
+  using RtlFreeUnicodeString_t = NTSTATUS(NTAPI *)(PUNICODE_STRING String);
+
   typedef struct _FILE_BASIC_INFORMATION  // NOLINT
   {
     LARGE_INTEGER CreationTime;
@@ -580,7 +594,15 @@ namespace windows_nt_kernel
   static RtlCaptureStackBackTrace_t RtlCaptureStackBackTrace;
   static RtlDosPathNameToNtPathName_U_t RtlDosPathNameToNtPathName_U;
   static RtlUTF8ToUnicodeN_t RtlUTF8ToUnicodeN;
+  static RtlUnicodeToUTF8N_t RtlUnicodeToUTF8N;
+  static RtlAnsiStringToUnicodeString_t RtlAnsiStringToUnicodeString;
+  static RtlUnicodeStringToAnsiString_t RtlUnicodeStringToAnsiString;
+  static RtlOemStringToUnicodeString_t RtlOemStringToUnicodeString;
+  static RtlUnicodeStringToOemString_t RtlUnicodeStringToOemString;
+  static RtlFreeUnicodeString_t RtlFreeUnicodeString;
+  static RtlFreeAnsiString_t RtlFreeAnsiString;
 
+  
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4706)  // assignment within conditional
@@ -588,7 +610,7 @@ namespace windows_nt_kernel
 #endif
   inline void doinit()
   {
-    if(RtlUTF8ToUnicodeN != nullptr)
+    if(RtlFreeAnsiString != nullptr)
     {
       return;
     }
@@ -837,7 +859,56 @@ namespace windows_nt_kernel
         abort();
       }
     }
-
+    if(RtlUnicodeToUTF8N == nullptr)
+    {
+      if((RtlUnicodeToUTF8N = reinterpret_cast<RtlUnicodeToUTF8N_t>(GetProcAddress(ntdllh, "RtlUnicodeToUTF8N"))) == nullptr)
+      {
+        abort();
+      }
+    }
+    if(RtlAnsiStringToUnicodeString == nullptr)
+    {
+      if((RtlAnsiStringToUnicodeString = reinterpret_cast<RtlAnsiStringToUnicodeString_t>(GetProcAddress(ntdllh, "RtlAnsiStringToUnicodeString"))) == nullptr)
+      {
+        abort();
+      }
+    }
+    if(RtlUnicodeStringToAnsiString == nullptr)
+    {
+      if((RtlUnicodeStringToAnsiString = reinterpret_cast<RtlUnicodeStringToAnsiString_t>(GetProcAddress(ntdllh, "RtlUnicodeStringToAnsiString"))) == nullptr)
+      {
+        abort();
+      }
+    }
+    if(RtlOemStringToUnicodeString == nullptr)
+    {
+      if((RtlOemStringToUnicodeString = reinterpret_cast<RtlOemStringToUnicodeString_t>(GetProcAddress(ntdllh, "RtlOemStringToUnicodeString"))) == nullptr)
+      {
+        abort();
+      }
+    }
+    if(RtlUnicodeStringToOemString == nullptr)
+    {
+      if((RtlUnicodeStringToOemString = reinterpret_cast<RtlUnicodeStringToOemString_t>(GetProcAddress(ntdllh, "RtlUnicodeStringToOemString"))) == nullptr)
+      {
+        abort();
+      }
+    }
+    if(RtlFreeUnicodeString == nullptr)
+    {
+      if((RtlFreeUnicodeString = reinterpret_cast<RtlFreeUnicodeString_t>(GetProcAddress(ntdllh, "RtlFreeUnicodeString"))) == nullptr)
+      {
+        abort();
+      }
+    }
+    if(RtlFreeAnsiString == nullptr)
+    {
+      if((RtlFreeAnsiString = reinterpret_cast<RtlFreeAnsiString_t>(GetProcAddress(ntdllh, "RtlFreeAnsiString"))) == nullptr)
+      {
+        abort();
+      }
+    }
+    
     // MAKE SURE you update the early exit check at the top to whatever the last of these is!
   }
 #ifdef _MSC_VER

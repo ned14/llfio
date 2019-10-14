@@ -35,7 +35,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   LLFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::file;
   OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, _caching, flags));
-  path_view::c_str zpath(path);
+  path_view::c_str<> zpath(path);
   if(base.is_valid())
   {
     nativeh.fd = ::openat(base.native_handle().fd, zpath.buffer, attribs, 0x1b0 /*660*/);

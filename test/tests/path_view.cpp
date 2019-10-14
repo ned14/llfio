@@ -57,21 +57,21 @@ static inline void TestPathView()
   constexpr llfio::path_view a, b("hello");
   BOOST_CHECK(a.empty());
   BOOST_CHECK(!b.empty());
-  BOOST_CHECK(b == "hello");
+  BOOST_CHECK(0 == b.compare<>("hello"));
   // Globs
   BOOST_CHECK(llfio::path_view("niall*").contains_glob());
   // Splitting
   constexpr const char p[] = "/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir/0";
   llfio::path_view e(p);  // NOLINT
   llfio::path_view f(e.filename());
-  e.remove_filename();
-  BOOST_CHECK(e == "/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir");
-  BOOST_CHECK(f == "0");
+  e = e.remove_filename();
+  BOOST_CHECK(0 == e.compare<>("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir"));
+  BOOST_CHECK(0 == f.compare<>("0"));
 #ifndef _WIN32
   // cstr
-  llfio::path_view::c_str g(e);
+  llfio::path_view::c_str<> g(e);
   BOOST_CHECK(g.buffer != p);  // NOLINT
-  llfio::path_view::c_str h(f);
+  llfio::path_view::c_str<> h(f);
   BOOST_CHECK(h.buffer == p + 70);  // NOLINT
 #endif
   CheckPathView("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir");
@@ -105,7 +105,7 @@ static inline void TestPathView()
 #ifdef _WIN32
   // On Windows, UTF-8 and UTF-16 paths are equivalent and backslash conversion happens
   llfio::path_view c("path/to"), d(L"path\\to");
-  BOOST_CHECK(c == d);
+  BOOST_CHECK(0 == c.compare<>(d));
   // Globs
   BOOST_CHECK(llfio::path_view(L"niall*").contains_glob());
   BOOST_CHECK(llfio::path_view("0123456789012345678901234567890123456789012345678901234567890123.deleted").is_llfio_deleted());
@@ -115,15 +115,15 @@ static inline void TestPathView()
   constexpr const wchar_t p2[] = L"\\mnt\\c\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir\\0";
   llfio::path_view g(p2);
   llfio::path_view h(g.filename());
-  g.remove_filename();
-  BOOST_CHECK(g == "\\mnt\\c\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir");
-  BOOST_CHECK(h == "0");
+  g = g.remove_filename();
+  BOOST_CHECK(0 == g.compare<>("\\mnt\\c\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir"));
+  BOOST_CHECK(0 == h.compare<>("0"));
   // cstr
-  llfio::path_view::c_str i(g, false);
+  llfio::path_view::c_str<> i(g, false);
   BOOST_CHECK(i.buffer != p2);
-  llfio::path_view::c_str j(g, true);
+  llfio::path_view::c_str<> j(g, true);
   BOOST_CHECK(j.buffer == p2);
-  llfio::path_view::c_str k(h, false);
+  llfio::path_view::c_str<> k(h, false);
   BOOST_CHECK(k.buffer == p2 + 70);
 
   CheckPathView(L"\\mnt\\c\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir\\0");

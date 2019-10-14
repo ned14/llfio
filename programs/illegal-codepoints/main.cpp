@@ -6142,7 +6142,7 @@ int main()
     buffer[1] = (llfio::filesystem::path::value_type) n;
     buffer[2] = 'z';
     buffer[3] = 0;
-    llfio::path_view leaf(buffer, 3);
+    llfio::path_view leaf(buffer, 3, true);
     auto h = llfio::file(testdir, leaf, llfio::file_handle::mode::write, llfio::file_handle::creation::if_needed);
     if(h)
     {
@@ -6166,7 +6166,7 @@ int main()
       auto &entry = entries[n];
       if(entry.second == status::created)
       {
-        if(item.leafname == llfio::path_view(entry.first.data(), 3))
+        if(item.leafname == llfio::path_view(entry.first.data(), 3, true))
         {
           entry.second = status::found;
           break;
