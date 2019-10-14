@@ -2,7 +2,6 @@ var classllfio__v2__xxx_1_1path__view__component =
 [
     [ "byte", "classllfio__v2__xxx_1_1path__view__component.html#a7663cb908516be3f8bf17b6826da186a", null ],
     [ "char16_t", "classllfio__v2__xxx_1_1path__view__component.html#a38ff18893dfc84c562fb36c299702bf5", null ],
-    [ "char8_t", "classllfio__v2__xxx_1_1path__view__component.html#a5eeba6a43ae783d5865f860eb0a1e2fa", null ],
     [ "path_view_component", "classllfio__v2__xxx_1_1path__view__component.html#a72f7bc6b8dd06f719f83732bc91f36e0", null ],
     [ "path_view_component", "classllfio__v2__xxx_1_1path__view__component.html#a7dfa033bda230ae9a1fdd60a17fb7880", null ],
     [ "~path_view_component", "classllfio__v2__xxx_1_1path__view__component.html#a93aef9d3a7c37537ec71bd788d0f7272", null ],

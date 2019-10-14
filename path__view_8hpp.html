@@ -118,7 +118,7 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>LLFIO_PATH_VIEW_CONSTEXPR</b>&#160;&#160;&#160;constexpr</td></tr>
 <tr class="separator:ad116a2c98d1b1326ca6bb64d3868dbbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae52923980b09f106b87cde636b286c61"><td class="memItemLeft" align="right" valign="top"><a id="ae52923980b09f106b87cde636b286c61"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED</b>&#160;&#160;&#160;1</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED</b>&#160;&#160;&#160;0</td></tr>
 <tr class="separator:ae52923980b09f106b87cde636b286c61"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
@@ -132,24 +132,6 @@ Functions</h2></td></tr>
 template&lt;class T &gt; </td></tr>
 <tr class="memitem:a24c9ba461630fe02b8c818df8b4f0402"><td class="memTemplItemLeft" align="right" valign="top">constexpr size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><b>llfio_v2_xxx::detail::constexpr_strlen</b> (const T *s) noexcept</td></tr>
 <tr class="separator:a24c9ba461630fe02b8c818df8b4f0402"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a70e89d0ff7938359dcd3f446988cd311"><td class="memItemLeft" align="right" valign="top"><a id="a70e89d0ff7938359dcd3f446988cd311"></a>
-constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::detail::operator&lt;</b> (char8_t a, char8_t b) noexcept</td></tr>
-<tr class="separator:a70e89d0ff7938359dcd3f446988cd311"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a75ed5667013f252bc225a8d576011637"><td class="memItemLeft" align="right" valign="top"><a id="a75ed5667013f252bc225a8d576011637"></a>
-constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::detail::operator&gt;</b> (char8_t a, char8_t b) noexcept</td></tr>
-<tr class="separator:a75ed5667013f252bc225a8d576011637"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adf710823c05ef51747069e4d3ad1d4e4"><td class="memItemLeft" align="right" valign="top"><a id="adf710823c05ef51747069e4d3ad1d4e4"></a>
-constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::detail::operator&lt;=</b> (char8_t a, char8_t b) noexcept</td></tr>
-<tr class="separator:adf710823c05ef51747069e4d3ad1d4e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a021daddff848226cb05d4fe060ddcb7a"><td class="memItemLeft" align="right" valign="top"><a id="a021daddff848226cb05d4fe060ddcb7a"></a>
-constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::detail::operator&gt;=</b> (char8_t a, char8_t b) noexcept</td></tr>
-<tr class="separator:a021daddff848226cb05d4fe060ddcb7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afa14e4c4f238805993e5ec25082f95b6"><td class="memItemLeft" align="right" valign="top"><a id="afa14e4c4f238805993e5ec25082f95b6"></a>
-constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::detail::operator==</b> (char8_t a, char8_t b) noexcept</td></tr>
-<tr class="separator:afa14e4c4f238805993e5ec25082f95b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa9dfbe4bbf4ec63df4b6f248344bffeb"><td class="memItemLeft" align="right" valign="top"><a id="aa9dfbe4bbf4ec63df4b6f248344bffeb"></a>
-constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::detail::operator!=</b> (char8_t a, char8_t b) noexcept</td></tr>
-<tr class="separator:aa9dfbe4bbf4ec63df4b6f248344bffeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a13faa6de476f799028a4bf143facd46c"><td class="memItemLeft" align="right" valign="top"><a id="a13faa6de476f799028a4bf143facd46c"></a>
 char *&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::detail::reencode_path_to</b> (size_t &amp;toallocate, char *dest_buffer, size_t dest_buffer_length, const llfio_v2_xxx::byte *src_buffer, size_t src_buffer_length)</td></tr>
 <tr class="separator:a13faa6de476f799028a4bf143facd46c"><td class="memSeparator" colspan="2">&#160;</td></tr>

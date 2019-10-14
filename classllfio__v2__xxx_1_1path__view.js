@@ -1,7 +1,6 @@
 var classllfio__v2__xxx_1_1path__view =
 [
     [ "byte", "classllfio__v2__xxx_1_1path__view.html#a1aaf2407fed87b3b4c077e71495039ca", null ],
-    [ "char8_t", "classllfio__v2__xxx_1_1path__view.html#a82a326735c2f11f1cd47283b8ddcbfb6", null ],
     [ "const_iterator", "classllfio__v2__xxx_1_1path__view.html#ae064112c51630be49c33bd51e4380cbd", null ],
     [ "const_reverse_iterator", "classllfio__v2__xxx_1_1path__view.html#af613a5a2995dd0fca21d914b59e4aff8", null ],
     [ "difference_type", "classllfio__v2__xxx_1_1path__view.html#ad4e14fc71abee0765b06af857bd6a025", null ],
