@@ -37,11 +37,11 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4251)  // dll interface
 #endif
 
-// Stupid GCC 8 suddenly started erroring on use of lambdas in constexpr in C++ 14 :(
-#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ > 7 && __cplusplus < 201700
-#define LLFIO_PATH_VIEW_GCC_CONSTEXPR
+// Can't use lambdas in constexpr in C++ 14 :(
+#if __cplusplus < 201700 && defined(__GNUC__)
+#define LLFIO_PATH_VIEW_CONSTEXPR
 #else
-#define LLFIO_PATH_VIEW_GCC_CONSTEXPR constexpr
+#define LLFIO_PATH_VIEW_CONSTEXPR constexpr
 #endif
 
 #ifndef LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED
@@ -129,11 +129,11 @@ namespace detail
 
 class path_view;
 class path_view_component;
-inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(path_view_component x, path_view_component y) noexcept;
-inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(path_view_component x, path_view_component y) noexcept;
+inline constexpr bool operator==(path_view_component x, path_view_component y) noexcept;
+inline constexpr bool operator!=(path_view_component x, path_view_component y) noexcept;
 inline std::ostream &operator<<(std::ostream &s, const path_view_component &v);
-inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(path_view x, path_view y) noexcept;
-inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(path_view x, path_view y) noexcept;
+inline constexpr bool operator==(path_view x, path_view y) noexcept;
+inline constexpr bool operator!=(path_view x, path_view y) noexcept;
 inline std::ostream &operator<<(std::ostream &s, const path_view &v);
 
 /*! \class path_view_component
@@ -143,8 +143,8 @@ class LLFIO_DECL path_view_component
 {
   friend class path_view;
   friend class detail::path_view_iterator;
-  friend inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(path_view_component x, path_view_component y) noexcept;
-  friend inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(path_view_component x, path_view_component y) noexcept;
+  friend inline constexpr bool operator==(path_view_component x, path_view_component y) noexcept;
+  friend inline constexpr bool operator!=(path_view_component x, path_view_component y) noexcept;
   friend inline std::ostream &operator<<(std::ostream &s, const path_view_component &v);
 
 public:
@@ -302,7 +302,7 @@ private:
                                        basic_string_view<char>((const char *) _bytestr, _length).rfind(preferred_separator, endidx)));
 #endif
   }
-  LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view_component _filename() const noexcept
+  LLFIO_PATH_VIEW_CONSTEXPR path_view_component _filename() const noexcept
   {
     auto sep_idx = _find_last_sep();
     if(_npos == sep_idx)
@@ -351,7 +351,7 @@ public:
   }
 
   //! Returns a view of the filename without any file extension
-  constexpr path_view_component stem() const noexcept
+  LLFIO_PATH_VIEW_CONSTEXPR path_view_component stem() const noexcept
   {
     auto self = _filename();
     return self._invoke([self](const auto &v) {
@@ -364,7 +364,7 @@ public:
     });
   }
   //! Returns a view of the file extension part of this view
-  constexpr path_view_component extension() const noexcept
+  LLFIO_PATH_VIEW_CONSTEXPR path_view_component extension() const noexcept
   {
     auto self = _filename();
     return self._invoke([this](const auto &v) {
@@ -715,7 +715,7 @@ public:
 #endif
   friend struct c_str;
 };
-inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(path_view_component x, path_view_component y) noexcept
+inline constexpr bool operator==(path_view_component x, path_view_component y) noexcept
 {
   if(x.native_size() != y.native_size())
   {
@@ -749,7 +749,7 @@ inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(path_view_component x, path
   assert(y._bytestr != nullptr);
   return 0 == memcmp(x._bytestr, y._bytestr, x._length);
 }
-inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(path_view_component x, path_view_component y) noexcept
+inline constexpr bool operator!=(path_view_component x, path_view_component y) noexcept
 {
   if(x.native_size() != y.native_size())
   {
@@ -785,27 +785,27 @@ inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(path_view_component x, path
 }
 LLFIO_TEMPLATE(class CharT)
 LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_acceptable<CharT>))
-inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(path_view_component /*unused*/, const CharT * /*unused*/) noexcept {
+inline constexpr bool operator==(path_view_component /*unused*/, const CharT * /*unused*/) noexcept {
   static_assert(!path_view_component::is_source_acceptable<CharT>, "Do not use operator== with path_view_component and a string literal, use .compare<>()");
   return false;
 }
 LLFIO_TEMPLATE(class CharT)
 LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_acceptable<CharT>))
-inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(const CharT * /*unused*/, path_view_component /*unused*/) noexcept
+inline constexpr bool operator==(const CharT * /*unused*/, path_view_component /*unused*/) noexcept
 {
   static_assert(!path_view_component::is_source_acceptable<CharT>, "Do not use operator== with path_view_component and a string literal, use .compare<>()");
   return false;
 }
 LLFIO_TEMPLATE(class CharT)
 LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_acceptable<CharT>))
-inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(path_view_component /*unused*/, const CharT * /*unused*/) noexcept
+inline constexpr bool operator!=(path_view_component /*unused*/, const CharT * /*unused*/) noexcept
 {
   static_assert(!path_view_component::is_source_acceptable<CharT>, "Do not use operator!= with path_view_component and a string literal, use .compare<>()");
   return false;
 }
 LLFIO_TEMPLATE(class CharT)
 LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_acceptable<CharT>))
-inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(const CharT * /*unused*/, path_view_component /*unused*/) noexcept
+inline constexpr bool operator!=(const CharT * /*unused*/, path_view_component /*unused*/) noexcept
 {
   static_assert(!path_view_component::is_source_acceptable<CharT>, "Do not use operator!= with path_view_component and a string literal, use .compare<>()");
   return false;
@@ -944,8 +944,8 @@ maximum compatibility you should still use the Win32 API.
 class path_view
 {
   friend class detail::path_view_iterator;
-  friend inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(path_view x, path_view y) noexcept;
-  friend inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(path_view x, path_view y) noexcept;
+  friend inline constexpr bool operator==(path_view x, path_view y) noexcept;
+  friend inline constexpr bool operator!=(path_view x, path_view y) noexcept;
   friend inline std::ostream &operator<<(std::ostream &s, const path_view &v);
 
 public:
@@ -1071,15 +1071,15 @@ public:
   constexpr void swap(path_view &o) noexcept { _state.swap(o._state); }
 
   //! True if empty
-  LLFIO_NODISCARD LLFIO_PATH_VIEW_GCC_CONSTEXPR bool empty() const noexcept { return _state.empty(); }
-  LLFIO_PATH_VIEW_GCC_CONSTEXPR bool has_root_path() const noexcept { return !root_path().empty(); }
-  LLFIO_PATH_VIEW_GCC_CONSTEXPR bool has_root_name() const noexcept { return !root_name().empty(); }
-  LLFIO_PATH_VIEW_GCC_CONSTEXPR bool has_root_directory() const noexcept { return !root_directory().empty(); }
-  LLFIO_PATH_VIEW_GCC_CONSTEXPR bool has_relative_path() const noexcept { return !relative_path().empty(); }
-  LLFIO_PATH_VIEW_GCC_CONSTEXPR bool has_parent_path() const noexcept { return !parent_path().empty(); }
-  LLFIO_PATH_VIEW_GCC_CONSTEXPR bool has_filename() const noexcept { return !filename().empty(); }
-  LLFIO_PATH_VIEW_GCC_CONSTEXPR bool has_stem() const noexcept { return !stem().empty(); }
-  LLFIO_PATH_VIEW_GCC_CONSTEXPR bool has_extension() const noexcept { return !extension().empty(); }
+  LLFIO_NODISCARD LLFIO_PATH_VIEW_CONSTEXPR bool empty() const noexcept { return _state.empty(); }
+  LLFIO_PATH_VIEW_CONSTEXPR bool has_root_path() const noexcept { return !root_path().empty(); }
+  LLFIO_PATH_VIEW_CONSTEXPR bool has_root_name() const noexcept { return !root_name().empty(); }
+  LLFIO_PATH_VIEW_CONSTEXPR bool has_root_directory() const noexcept { return !root_directory().empty(); }
+  LLFIO_PATH_VIEW_CONSTEXPR bool has_relative_path() const noexcept { return !relative_path().empty(); }
+  LLFIO_PATH_VIEW_CONSTEXPR bool has_parent_path() const noexcept { return !parent_path().empty(); }
+  LLFIO_PATH_VIEW_CONSTEXPR bool has_filename() const noexcept { return !filename().empty(); }
+  LLFIO_PATH_VIEW_CONSTEXPR bool has_stem() const noexcept { return !stem().empty(); }
+  LLFIO_PATH_VIEW_CONSTEXPR bool has_extension() const noexcept { return !extension().empty(); }
   constexpr bool is_absolute() const noexcept
   {
     auto sep_idx = _state._find_first_sep();
@@ -1163,7 +1163,7 @@ public:
   constexpr inline iterator end() noexcept;
 
   //! Returns a copy of this view with the end adjusted to match the final separator.
-  constexpr path_view remove_filename() const noexcept
+  LLFIO_PATH_VIEW_CONSTEXPR path_view remove_filename() const noexcept
   {
     auto sep_idx = _state._find_last_sep();
     if(_npos == sep_idx)
@@ -1175,7 +1175,7 @@ public:
   //! Returns the size of the view in characters.
   constexpr size_t native_size() const noexcept { return _state.native_size(); }
   //! Returns a view of the root name part of this view e.g. C:
-  LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view root_name() const noexcept
+  LLFIO_PATH_VIEW_CONSTEXPR path_view root_name() const noexcept
   {
     auto sep_idx = _state._find_first_sep();
     if(_npos == sep_idx)
@@ -1185,7 +1185,7 @@ public:
     return _state._invoke([sep_idx](const auto &v) { return path_view(v.data(), sep_idx, false); });
   }
   //! Returns a view of the root directory, if there is one e.g. /
-  LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view root_directory() const noexcept
+  LLFIO_PATH_VIEW_CONSTEXPR path_view root_directory() const noexcept
   {
     auto sep_idx = _state._find_first_sep();
     if(_npos == sep_idx)
@@ -1208,7 +1208,7 @@ public:
     });
   }
   //! Returns, if any, a view of the root path part of this view e.g. C:/
-  LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view root_path() const noexcept
+  LLFIO_PATH_VIEW_CONSTEXPR path_view root_path() const noexcept
   {
     auto sep_idx = _state._find_first_sep();
     if(_npos == sep_idx)
@@ -1242,7 +1242,7 @@ public:
     });
   }
   //! Returns a view of everything after the root path
-  LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view relative_path() const noexcept
+  LLFIO_PATH_VIEW_CONSTEXPR path_view relative_path() const noexcept
   {
     auto sep_idx = _state._find_first_sep();
     if(_npos == sep_idx)
@@ -1272,7 +1272,7 @@ public:
     });
   }
   //! Returns a view of the everything apart from the filename part of this view
-  LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view parent_path() const noexcept
+  LLFIO_PATH_VIEW_CONSTEXPR path_view parent_path() const noexcept
   {
     auto sep_idx = _state._find_last_sep();
     if(_npos == sep_idx)
@@ -1282,11 +1282,11 @@ public:
     return _state._invoke([sep_idx](const auto &v) { return path_view(v.data(), sep_idx, false); });
   }
   //! Returns a view of the filename part of this view.
-  LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view filename() const noexcept { return _state._filename(); }
+  LLFIO_PATH_VIEW_CONSTEXPR path_view filename() const noexcept { return _state._filename(); }
   //! Returns a view of the filename without any file extension
-  constexpr path_view_component stem() const noexcept { return _state.stem(); }
+  LLFIO_PATH_VIEW_CONSTEXPR path_view_component stem() const noexcept { return _state.stem(); }
   //! Returns a view of the file extension part of this view
-  constexpr path_view_component extension() const noexcept { return _state.extension(); }
+  LLFIO_PATH_VIEW_CONSTEXPR path_view_component extension() const noexcept { return _state.extension(); }
 
   //! Return the path view as a path. Allocates and copies memory!
   filesystem::path path() const { return _state.path(); }
@@ -1350,38 +1350,38 @@ template <class T, class Deleter, size_t _internal_buffer_size, typename std::en
 #endif
   friend struct c_str;
 };
-inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(path_view x, path_view y) noexcept
+inline constexpr bool operator==(path_view x, path_view y) noexcept
 {
   return x._state == y._state;
 }
-inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(path_view x, path_view y) noexcept
+inline constexpr bool operator!=(path_view x, path_view y) noexcept
 {
   return x._state != y._state;
 }
 LLFIO_TEMPLATE(class CharT)
 LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<CharT>))
-inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(path_view /*unused*/, const CharT * /*unused*/) noexcept
+inline constexpr bool operator==(path_view /*unused*/, const CharT * /*unused*/) noexcept
 {
   static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator== with path_view and a string literal, use .compare<>()");
   return false;
 }
 LLFIO_TEMPLATE(class CharT)
 LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<CharT>))
-inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(const CharT * /*unused*/, path_view /*unused*/) noexcept
+inline constexpr bool operator==(const CharT * /*unused*/, path_view /*unused*/) noexcept
 {
   static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator== with path_view and a string literal, use .compare<>()");
   return false;
 }
 LLFIO_TEMPLATE(class CharT)
 LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<CharT>))
-inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(path_view /*unused*/, const CharT * /*unused*/) noexcept
+inline constexpr bool operator!=(path_view /*unused*/, const CharT * /*unused*/) noexcept
 {
   static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator!= with path_view and a string literal, use .compare<>()");
   return false;
 }
 LLFIO_TEMPLATE(class CharT)
 LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<CharT>))
-inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(const CharT * /*unused*/, path_view /*unused*/) noexcept
+inline constexpr bool operator!=(const CharT * /*unused*/, path_view /*unused*/) noexcept
 {
   static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator!= with path_view and a string literal, use .compare<>()");
   return false;
