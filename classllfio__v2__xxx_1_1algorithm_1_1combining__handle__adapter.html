@@ -206,7 +206,7 @@ class llfio_v2_xxx::algorithm::combining_handle_adapter&lt; Op, Target, Source &
 <p>If just one handle type is supplied (the additional source type is <code>void</code>), then instead of combining, this handle adapter is transforming. <code>Op::do_read()</code> and <code>Op::do_write()</code> will be called with the second of the input buffers empty.</p>
 <p>The defaults for the virtual functions may not suit your use case, in which case you can override them in the <code>Op::override</code> class.</p>
 <p>Destroying the adapter does not destroy the attached handles. Closing the adapter does close the attached handles.</p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000005">Todo:</a></b></dt><dd>I have been lazy and used public inheritance from <code>io_handle</code> and <code>file_handle</code>. I should use protected inheritance to prevent slicing, and expose all the public functions by hand. </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000004">Todo:</a></b></dt><dd>I have been lazy and used public inheritance from <code>io_handle</code> and <code>file_handle</code>. I should use protected inheritance to prevent slicing, and expose all the public functions by hand. </dd></dl>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>include/llfio/v2.0/algorithm/handle_adapter/<a class="el" href="combining_8hpp.html">combining.hpp</a></li>
 </ul>

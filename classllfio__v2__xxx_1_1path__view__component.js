@@ -5,6 +5,7 @@ var classllfio__v2__xxx_1_1path__view__component =
     [ "path_view_component", "classllfio__v2__xxx_1_1path__view__component.html#a72f7bc6b8dd06f719f83732bc91f36e0", null ],
     [ "path_view_component", "classllfio__v2__xxx_1_1path__view__component.html#a7dfa033bda230ae9a1fdd60a17fb7880", null ],
     [ "~path_view_component", "classllfio__v2__xxx_1_1path__view__component.html#a93aef9d3a7c37537ec71bd788d0f7272", null ],
+    [ "_raw_data", "classllfio__v2__xxx_1_1path__view__component.html#a026f3fd0f948212028182d1b501dffbb", null ],
     [ "contains_glob", "classllfio__v2__xxx_1_1path__view__component.html#aea489beba43bb7bb9fa31b5bfd23b0cb", null ],
     [ "empty", "classllfio__v2__xxx_1_1path__view__component.html#a467256884725db92974c8a5a2c786bc2", null ],
     [ "extension", "classllfio__v2__xxx_1_1path__view__component.html#a2d62abddb51d080a8c2e42998bc6fb58", null ],
