@@ -91,7 +91,7 @@ script:
  -
    if [ "$__" = "cmake tests" ] || [ "$__" = "x64 cmake tests (error_code)" ] || [ "$__" = "x64 cmake tests (status_code)" ]; then
      export ASAN_OPTIONS=detect_leaks=0;
-     ctest -S .ci.cmake -V --timeout 300 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS ;
+     ctest -S .ci.cmake -VV --timeout 300 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS ;
    fi
  -
    if [ "$__" = "ARM32 cmake tests (error_code)" ] || [ "$__" = "ARM32 cmake tests (status_code)" ]; then
