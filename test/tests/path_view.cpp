@@ -57,7 +57,7 @@ static inline void TestPathView()
   constexpr llfio::path_view a, b("hello");
   BOOST_CHECK(a.empty());
   BOOST_CHECK(!b.empty());
-  BOOST_CHECK(b == "hello");
+  BOOST_CHECK(0 == b.compare<>("hello"));
   // Globs
   BOOST_CHECK(llfio::path_view("niall*").contains_glob());
   // Splitting
@@ -65,8 +65,8 @@ static inline void TestPathView()
   llfio::path_view e(p);  // NOLINT
   llfio::path_view f(e.filename());
   e = e.remove_filename();
-  BOOST_CHECK(e == "/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir");
-  BOOST_CHECK(f == "0");
+  BOOST_CHECK(0 == e.compare<>("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir"));
+  BOOST_CHECK(0 == f.compare<>("0"));
 #ifndef _WIN32
   // cstr
   llfio::path_view::c_str<> g(e);

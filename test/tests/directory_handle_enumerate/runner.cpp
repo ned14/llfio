@@ -100,19 +100,19 @@ template <class U> inline void directory_handle_enumerate_(U &&f)
           bool havedir = !glob.empty();
           for (directory_entry &i : info)
           {
-            if (i.leafname == "012345678901234567890123456789012345678901234567890123456789012z.deleted")
+            if (0 == i.leafname.compare<>("012345678901234567890123456789012345678901234567890123456789012z.deleted"))
             {
               havedeleted1 = true;
             }
-            if (i.leafname == "0123456789012345678901234567890123456789012345678901234567890123.deleted")
+            if (0 == i.leafname.compare<>("0123456789012345678901234567890123456789012345678901234567890123.deleted"))
             {
               havedeleted2 = true;
             }
-            if (i.leafname == "foo.txt")
+            if (0 == i.leafname.compare<>("foo.txt"))
             {
               havefoo = true;
             }
-            if (i.leafname == "dir")
+            if (0 == i.leafname.compare<>("dir"))
             {
               havedir = true;
             }

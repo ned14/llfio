@@ -302,6 +302,15 @@ private:
                                        basic_string_view<char>((const char *) _bytestr, _length).rfind(preferred_separator, endidx)));
 #endif
   }
+  LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view_component _filename() const noexcept
+  {
+    auto sep_idx = _find_last_sep();
+    if(_npos == sep_idx)
+    {
+      return *this;
+    }
+    return _invoke([sep_idx, this](const auto &v) { return path_view_component(v.data() + sep_idx + 1, v.size() - sep_idx - 1, _zero_terminated); });
+  }
 
 public:
   path_view_component(const path_view_component &) = default;
@@ -344,23 +353,23 @@ public:
   //! Returns a view of the filename without any file extension
   constexpr path_view_component stem() const noexcept
   {
-    auto sep_idx = _find_last_sep();
-    return _invoke([sep_idx, this](const auto &v) {
+    auto self = _filename();
+    return self._invoke([self](const auto &v) {
       auto dot_idx = v.rfind('.');
-      if(_npos == dot_idx || (_npos != sep_idx && dot_idx < sep_idx) || dot_idx == sep_idx + 1 || (dot_idx == sep_idx + 2 && v[dot_idx - 1] == '.'))
+      if(_npos == dot_idx || dot_idx == 0 || (dot_idx == 1 && v[dot_idx - 1] == '.'))
       {
-        return path_view_component(v.data() + sep_idx + 1, v.size() - sep_idx - 1, false);
+        return self;
       }
-      return path_view_component(v.data() + sep_idx + 1, dot_idx - sep_idx - 1, _zero_terminated);
+      return path_view_component(v.data(), dot_idx, false);
     });
   }
   //! Returns a view of the file extension part of this view
   constexpr path_view_component extension() const noexcept
   {
-    auto sep_idx = _find_last_sep();
-    return _invoke([sep_idx, this](const auto &v) {
+    auto self = _filename();
+    return self._invoke([this](const auto &v) {
       auto dot_idx = v.rfind('.');
-      if(_npos == dot_idx || (_npos != sep_idx && dot_idx < sep_idx) || dot_idx == sep_idx + 1 || (dot_idx == sep_idx + 2 && v[dot_idx - 1] == '.'))
+      if(_npos == dot_idx || dot_idx == 0 || (dot_idx == 1 && v[dot_idx - 1] == '.'))
       {
         return path_view_component();
       }
@@ -552,6 +561,13 @@ public:
     */
     template <class U> c_str(path_view_component view, bool no_zero_terminate, U &&allocate)
     {
+      if(0 == view._length)
+      {
+        _buffer[0] = 0;
+        buffer = _buffer;
+        length = 0;
+        return;
+      }
       if(std::is_same<T, byte>::value || view._passthrough)
       {
         length = view._length;
@@ -725,6 +741,12 @@ inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(path_view_component x, path
   {
     return false;
   }
+  if(0 == x._length && 0 == y._length)
+  {
+    return true;
+  }
+  assert(x._bytestr != nullptr);
+  assert(y._bytestr != nullptr);
   return 0 == memcmp(x._bytestr, y._bytestr, x._length);
 }
 inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(path_view_component x, path_view_component y) noexcept
@@ -753,8 +775,42 @@ inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(path_view_component x, path
   {
     return true;
   }
+  if(0 == x._length && 0 == y._length)
+  {
+    return false;
+  }
+  assert(x._bytestr != nullptr);
+  assert(y._bytestr != nullptr);
   return 0 != memcmp(x._bytestr, y._bytestr, x._length);
 }
+LLFIO_TEMPLATE(class CharT)
+LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_acceptable<CharT>))
+inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(path_view_component /*unused*/, const CharT * /*unused*/) noexcept {
+  static_assert(!path_view_component::is_source_acceptable<CharT>, "Do not use operator== with path_view_component and a string literal, use .compare<>()");
+  return false;
+}
+LLFIO_TEMPLATE(class CharT)
+LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_acceptable<CharT>))
+inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(const CharT * /*unused*/, path_view_component /*unused*/) noexcept
+{
+  static_assert(!path_view_component::is_source_acceptable<CharT>, "Do not use operator== with path_view_component and a string literal, use .compare<>()");
+  return false;
+}
+LLFIO_TEMPLATE(class CharT)
+LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_acceptable<CharT>))
+inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(path_view_component /*unused*/, const CharT * /*unused*/) noexcept
+{
+  static_assert(!path_view_component::is_source_acceptable<CharT>, "Do not use operator!= with path_view_component and a string literal, use .compare<>()");
+  return false;
+}
+LLFIO_TEMPLATE(class CharT)
+LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_acceptable<CharT>))
+inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(const CharT * /*unused*/, path_view_component /*unused*/) noexcept
+{
+  static_assert(!path_view_component::is_source_acceptable<CharT>, "Do not use operator!= with path_view_component and a string literal, use .compare<>()");
+  return false;
+}
+
 namespace detail
 {
   struct string_view_printer
@@ -1112,7 +1168,7 @@ public:
     auto sep_idx = _state._find_last_sep();
     if(_npos == sep_idx)
     {
-      return *this;
+      return path_view();
     }
     return _state._invoke([sep_idx](auto v) { return path_view(v.data(), sep_idx, false); });
   }
@@ -1226,15 +1282,7 @@ public:
     return _state._invoke([sep_idx](const auto &v) { return path_view(v.data(), sep_idx, false); });
   }
   //! Returns a view of the filename part of this view.
-  LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view filename() const noexcept
-  {
-    auto sep_idx = _state._find_last_sep();
-    if(_npos == sep_idx)
-    {
-      return _state;
-    }
-    return _state._invoke([sep_idx, this](const auto &v) { return path_view_component(v.data() + sep_idx + 1, v.size() - sep_idx - 1, _state._zero_terminated); });
-  }
+  LLFIO_PATH_VIEW_GCC_CONSTEXPR path_view filename() const noexcept { return _state._filename(); }
   //! Returns a view of the filename without any file extension
   constexpr path_view_component stem() const noexcept { return _state.stem(); }
   //! Returns a view of the file extension part of this view
@@ -1310,6 +1358,34 @@ inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(path_view x, path_view y) n
 {
   return x._state != y._state;
 }
+LLFIO_TEMPLATE(class CharT)
+LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<CharT>))
+inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(path_view /*unused*/, const CharT * /*unused*/) noexcept
+{
+  static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator== with path_view and a string literal, use .compare<>()");
+  return false;
+}
+LLFIO_TEMPLATE(class CharT)
+LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<CharT>))
+inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator==(const CharT * /*unused*/, path_view /*unused*/) noexcept
+{
+  static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator== with path_view and a string literal, use .compare<>()");
+  return false;
+}
+LLFIO_TEMPLATE(class CharT)
+LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<CharT>))
+inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(path_view /*unused*/, const CharT * /*unused*/) noexcept
+{
+  static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator!= with path_view and a string literal, use .compare<>()");
+  return false;
+}
+LLFIO_TEMPLATE(class CharT)
+LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<CharT>))
+inline LLFIO_PATH_VIEW_GCC_CONSTEXPR bool operator!=(const CharT * /*unused*/, path_view /*unused*/) noexcept
+{
+  static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator!= with path_view and a string literal, use .compare<>()");
+  return false;
+}
 inline std::ostream &operator<<(std::ostream &s, const path_view &v)
 {
   return s << v._state;
@@ -1372,6 +1448,10 @@ namespace detail
       {
         _parent->_state._invoke([this](const auto &v) { _end = v.size(); });
       }
+      if(_end > _begin)
+      {
+        ++_begin;
+      }
     }
     constexpr void _dec() noexcept
     {
@@ -1380,6 +1460,10 @@ namespace detail
       if(_npos == _begin)
       {
         _begin = 0;
+      }
+      if(_begin < _end)
+      {
+        --_end;
       }
     }
 

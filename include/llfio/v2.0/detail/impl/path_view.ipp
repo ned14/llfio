@@ -287,30 +287,31 @@ namespace detail
     state.str.Length = state.str.MaximumLength = (USHORT) src_buffer_length;
     // Try using the internal buffer
     NTSTATUS ntstat = AreFileApisANSI() ? RtlAnsiStringToUnicodeString(&state.buffer, &state.str, false) : RtlOemStringToUnicodeString(&state.buffer, &state.str, false);
+    if(ntstat >= 0)
+    {
+      // Successful
+      toallocate = 0;
+      state.buffer.Buffer[(state.buffer.Length / sizeof(wchar_t))] = 0;
+      state.buffer.Buffer = nullptr;
+      return dest_buffer + (state.buffer.Length / sizeof(wchar_t));
+    }
+    if(ntstat != STATUS_BUFFER_OVERFLOW)
+    {
+      LLFIO_LOG_FATAL(ntstat, ntkernel_error(ntstat).message().c_str());
+      abort();
+    }
+    // Dynamically allocate
+    ntstat = AreFileApisANSI() ? RtlAnsiStringToUnicodeString(&state.buffer, &state.str, true) : RtlOemStringToUnicodeString(&state.buffer, &state.str, true);
     if(ntstat < 0)
     {
-      if(ntstat != STATUS_BUFFER_OVERFLOW)
-      {
-        LLFIO_LOG_FATAL(ntstat, ntkernel_error(ntstat).message().c_str());
-        abort();
-      }
-      // Dynamically allocate
-      ntstat = AreFileApisANSI() ? RtlAnsiStringToUnicodeString(&state.buffer, &state.str, true) : RtlOemStringToUnicodeString(&state.buffer, &state.str, true);
-      if(ntstat < 0)
-      {
-        LLFIO_LOG_FATAL(ntstat, ntkernel_error(ntstat).message().c_str());
-        abort();
-      }
-      // The thread local state will cache this for later
-      state.buffer.MaximumLength = state.buffer.Length + sizeof(wchar_t);
-      // Retry me with this dynamic allocation
-      toallocate = state.buffer.MaximumLength / sizeof(wchar_t);
-      return dest_buffer;
+      LLFIO_LOG_FATAL(ntstat, ntkernel_error(ntstat).message().c_str());
+      abort();
     }
-    // Successful
-    toallocate = 0;
-    state.buffer.Buffer[(state.buffer.Length / sizeof(wchar_t))] = 0;
-    return state.buffer.Buffer + (state.buffer.Length / sizeof(wchar_t));
+    // The thread local state will cache this for later
+    state.buffer.MaximumLength = state.buffer.Length + sizeof(wchar_t);
+    // Retry me with this dynamic allocation
+    toallocate = state.buffer.MaximumLength / sizeof(wchar_t);
+    return dest_buffer;
 #elif defined(_LIBCPP_VERSION)
     (void) toallocate;
     (void) dest_buffer;
