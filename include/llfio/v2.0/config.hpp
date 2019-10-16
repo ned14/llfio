@@ -346,6 +346,11 @@ LLFIO_V2_NAMESPACE_END
 LLFIO_V2_NAMESPACE_BEGIN
 using namespace QUICKCPPLIB_NAMESPACE::mem_flush_loads_stores;
 LLFIO_V2_NAMESPACE_END
+// Bring in a start_lifetime_as and launder implementation
+#include "quickcpplib/start_lifetime_as.hpp"
+LLFIO_V2_NAMESPACE_BEGIN
+using namespace QUICKCPPLIB_NAMESPACE::start_lifetime_as;
+LLFIO_V2_NAMESPACE_END
 // Bring in a detach_cast implementation
 #include "quickcpplib/detach_cast.hpp"
 LLFIO_V2_NAMESPACE_BEGIN
@@ -375,12 +380,6 @@ namespace detail
   LLFIO_TREQUIRES(LLFIO_TPRED(std::is_unsigned<T>::value))
   inline T unsigned_integer_cast(U *v) { return static_cast<T>(reinterpret_cast<uintptr_t>(v)); }
 }  // namespace detail
-
-// Define a https://wg21.link/P0593 bless implementation
-inline void bless(void *start, size_t length) noexcept
-{
-  memmove(start, start, length);
-}
 
 LLFIO_V2_NAMESPACE_END
 

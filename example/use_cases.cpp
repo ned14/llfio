@@ -215,7 +215,7 @@ void malloc1()
   size_t len = mh.length();
   // map_handle::address() returns indeterminate bytes, so you need to bless
   // them into existence before use
-  llfio::bless(p, len);
+  new(p) llfio::byte[len];
   memset(p, 'a', len);
 
   // Tell the kernel to throw away the contents of any whole pages
