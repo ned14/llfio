@@ -859,7 +859,10 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
       OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed, [](byte *addr, size_t bytes) -> result<void> {
         if(DiscardVirtualMemory_(addr, bytes) == 0)
         {
-          return win32_error();
+          if(ERROR_NOT_LOCKED != GetLastError())
+          {
+            return win32_error();
+          }
         }
         return success();
       }));
