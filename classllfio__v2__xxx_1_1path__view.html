@@ -222,9 +222,9 @@ constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>is_absolute
 <tr class="memitem:ae9532a152294cc91153584a909210b30"><td class="memItemLeft" align="right" valign="top"><a id="ae9532a152294cc91153584a909210b30"></a>
 constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>is_relative</b> () const noexcept</td></tr>
 <tr class="separator:ae9532a152294cc91153584a909210b30"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9fca33ec3b70cbe44bc3c6968fdc6376"><td class="memItemLeft" align="right" valign="top"><a id="a9fca33ec3b70cbe44bc3c6968fdc6376"></a>
-constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>contains_glob</b> () const noexcept</td></tr>
-<tr class="separator:a9fca33ec3b70cbe44bc3c6968fdc6376"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ac23fffe202146b4aecfb82a99c9a77"><td class="memItemLeft" align="right" valign="top"><a id="a1ac23fffe202146b4aecfb82a99c9a77"></a>
+LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>contains_glob</b> () const noexcept</td></tr>
+<tr class="separator:a1ac23fffe202146b4aecfb82a99c9a77"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8efb8be3b3f3b224680e9f10149bb2da"><td class="memItemLeft" align="right" valign="top"><a id="a8efb8be3b3f3b224680e9f10149bb2da"></a>
 constexpr <a class="el" href="classllfio__v2__xxx_1_1path__view.html#ae064112c51630be49c33bd51e4380cbd">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a8efb8be3b3f3b224680e9f10149bb2da">cbegin</a> () const noexcept</td></tr>
 <tr class="memdesc:a8efb8be3b3f3b224680e9f10149bb2da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the first path component. <br /></td></tr>
@@ -253,10 +253,10 @@ constexpr <a class="el" href="classllfio__v2__xxx_1_1path__view.html#a7bfb0a7905
 LLFIO_PATH_VIEW_CONSTEXPR <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#ac33ed45573976ace5610de51d40de0ee">remove_filename</a> () const noexcept</td></tr>
 <tr class="memdesc:ac33ed45573976ace5610de51d40de0ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a copy of this view with the end adjusted to match the final separator. <br /></td></tr>
 <tr class="separator:ac33ed45573976ace5610de51d40de0ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2265f98040ccff9b1707326d4984ba4e"><td class="memItemLeft" align="right" valign="top"><a id="a2265f98040ccff9b1707326d4984ba4e"></a>
-constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a2265f98040ccff9b1707326d4984ba4e">native_size</a> () const noexcept</td></tr>
-<tr class="memdesc:a2265f98040ccff9b1707326d4984ba4e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the view in characters. <br /></td></tr>
-<tr class="separator:a2265f98040ccff9b1707326d4984ba4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a711aaeec6fcc29431b6996ef25c6043f"><td class="memItemLeft" align="right" valign="top"><a id="a711aaeec6fcc29431b6996ef25c6043f"></a>
+LLFIO_PATH_VIEW_CONSTEXPR size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a711aaeec6fcc29431b6996ef25c6043f">native_size</a> () const noexcept</td></tr>
+<tr class="memdesc:a711aaeec6fcc29431b6996ef25c6043f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the view in characters. <br /></td></tr>
+<tr class="separator:a711aaeec6fcc29431b6996ef25c6043f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a57047ecaa75f039c61b6bbeb5b5c33af"><td class="memItemLeft" align="right" valign="top"><a id="a57047ecaa75f039c61b6bbeb5b5c33af"></a>
 LLFIO_PATH_VIEW_CONSTEXPR <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a57047ecaa75f039c61b6bbeb5b5c33af">root_name</a> () const noexcept</td></tr>
 <tr class="memdesc:a57047ecaa75f039c61b6bbeb5b5c33af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a view of the root name part of this view e.g. C: <br /></td></tr>
@@ -322,12 +322,12 @@ Friends</h2></td></tr>
 template&lt;class T , class Deleter , size_t _internal_buffer_size, typename std::enable_if&lt;(is_source_acceptable&lt; T &gt;), bool &gt;::type &gt; </td></tr>
 <tr class="memitem:a9c02c1b6cc56f8221abea75a1e92a776"><td class="memTemplItemLeft" align="right" valign="top">struct&#160;</td><td class="memTemplItemRight" valign="bottom"><b>c_str</b></td></tr>
 <tr class="separator:a9c02c1b6cc56f8221abea75a1e92a776"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a049a6d80a473b5808706863dfd23888d"><td class="memItemLeft" align="right" valign="top"><a id="a049a6d80a473b5808706863dfd23888d"></a>
-constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> x, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> y) noexcept</td></tr>
-<tr class="separator:a049a6d80a473b5808706863dfd23888d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af155697bac67542927db4af277b4e01d"><td class="memItemLeft" align="right" valign="top"><a id="af155697bac67542927db4af277b4e01d"></a>
-constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator!=</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> x, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> y) noexcept</td></tr>
-<tr class="separator:af155697bac67542927db4af277b4e01d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a867468c27c376aa62c4ecc5413367bba"><td class="memItemLeft" align="right" valign="top"><a id="a867468c27c376aa62c4ecc5413367bba"></a>
+LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> x, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> y) noexcept</td></tr>
+<tr class="separator:a867468c27c376aa62c4ecc5413367bba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ec27b9ac42042eb58d44837bdc1773c"><td class="memItemLeft" align="right" valign="top"><a id="a9ec27b9ac42042eb58d44837bdc1773c"></a>
+LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator!=</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> x, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> y) noexcept</td></tr>
+<tr class="separator:a9ec27b9ac42042eb58d44837bdc1773c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a565624fc24e6a6d57d38d0471e91cd84"><td class="memItemLeft" align="right" valign="top"><a id="a565624fc24e6a6d57d38d0471e91cd84"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> &amp;v)</td></tr>
 <tr class="separator:a565624fc24e6a6d57d38d0471e91cd84"><td class="memSeparator" colspan="2">&#160;</td></tr>
