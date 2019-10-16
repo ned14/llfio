@@ -798,7 +798,11 @@ result<void> map_handle::zero_memory(buffer_type region) noexcept
         {
           if(DiscardVirtualMemory_(addr, bytes) == 0)
           {
-            return win32_error();
+            // It seems DiscardVirtualMemory() behaves like VirtualUnlock() sometimes.
+            if(ERROR_NOT_LOCKED != GetLastError())
+            {
+              return win32_error();
+            }
           }
         }
         else

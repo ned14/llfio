@@ -277,10 +277,11 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<mapped_file_handle> mapped_temp_inode(const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<mapped_file_handle> mapped_temp_inode(size_type reservation = 0, const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept
   {
     OUTCOME_TRY(v, file_handle::temp_inode(dir, _mode, flags));
     mapped_file_handle ret(std::move(v));
+    ret._reservation = reservation;
     return {std::move(ret)};
   }
 
@@ -522,9 +523,9 @@ is for backing shared memory maps).
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<mapped_file_handle> mapped_temp_inode(const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mapped_file_handle::mode _mode = mapped_file_handle::mode::write, mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
+inline result<mapped_file_handle> mapped_temp_inode(mapped_file_handle::size_type reservation = 0, const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mapped_file_handle::mode _mode = mapped_file_handle::mode::write, mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
 {
-  return mapped_file_handle::mapped_temp_inode(std::forward<decltype(dir)>(dir), std::forward<decltype(_mode)>(_mode), std::forward<decltype(flags)>(flags));
+  return mapped_file_handle::mapped_temp_inode(std::forward<decltype(reservation)>(reservation), std::forward<decltype(dir)>(dir), std::forward<decltype(_mode)>(_mode), std::forward<decltype(flags)>(flags));
 }
 // END make_free_functions.py
 
