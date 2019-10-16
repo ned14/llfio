@@ -131,11 +131,11 @@ namespace detail
 
 class path_view;
 class path_view_component;
-inline constexpr bool operator==(path_view_component x, path_view_component y) noexcept;
-inline constexpr bool operator!=(path_view_component x, path_view_component y) noexcept;
+inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view_component x, path_view_component y) noexcept;
+inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view_component x, path_view_component y) noexcept;
 inline std::ostream &operator<<(std::ostream &s, const path_view_component &v);
-inline constexpr bool operator==(path_view x, path_view y) noexcept;
-inline constexpr bool operator!=(path_view x, path_view y) noexcept;
+inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view x, path_view y) noexcept;
+inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view x, path_view y) noexcept;
 inline std::ostream &operator<<(std::ostream &s, const path_view &v);
 
 /*! \class path_view_component
@@ -145,8 +145,8 @@ class LLFIO_DECL path_view_component
 {
   friend class path_view;
   friend class detail::path_view_iterator;
-  friend inline constexpr bool operator==(path_view_component x, path_view_component y) noexcept;
-  friend inline constexpr bool operator!=(path_view_component x, path_view_component y) noexcept;
+  friend inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view_component x, path_view_component y) noexcept;
+  friend inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view_component x, path_view_component y) noexcept;
   friend inline std::ostream &operator<<(std::ostream &s, const path_view_component &v);
 
 public:
@@ -327,7 +327,7 @@ public:
   LLFIO_NODISCARD constexpr bool empty() const noexcept { return _length == 0; }
 
   //! Returns the size of the view in characters.
-  constexpr size_t native_size() const noexcept
+  LLFIO_PATH_VIEW_CONSTEXPR size_t native_size() const noexcept
   {
     return _invoke([](const auto &v) { return v.size(); });
   }
@@ -341,7 +341,7 @@ public:
   }
 
   // True if the view contains any of the characters `*`, `?`, (POSIX only: `[` or `]`).
-  constexpr bool contains_glob() const noexcept
+  LLFIO_PATH_VIEW_CONSTEXPR bool contains_glob() const noexcept
   {
     return _invoke([](const auto &v) {
       using value_type = typename std::remove_reference<decltype(*v.data())>::type;
@@ -719,7 +719,7 @@ public:
 #endif
   friend struct c_str;
 };
-inline constexpr bool operator==(path_view_component x, path_view_component y) noexcept
+inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view_component x, path_view_component y) noexcept
 {
   if(x.native_size() != y.native_size())
   {
@@ -753,7 +753,7 @@ inline constexpr bool operator==(path_view_component x, path_view_component y) n
   assert(y._bytestr != nullptr);
   return 0 == memcmp(x._bytestr, y._bytestr, x._length);
 }
-inline constexpr bool operator!=(path_view_component x, path_view_component y) noexcept
+inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view_component x, path_view_component y) noexcept
 {
   if(x.native_size() != y.native_size())
   {
@@ -945,8 +945,8 @@ maximum compatibility you should still use the Win32 API.
 class path_view
 {
   friend class detail::path_view_iterator;
-  friend inline constexpr bool operator==(path_view x, path_view y) noexcept;
-  friend inline constexpr bool operator!=(path_view x, path_view y) noexcept;
+  friend inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view x, path_view y) noexcept;
+  friend inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view x, path_view y) noexcept;
   friend inline std::ostream &operator<<(std::ostream &s, const path_view &v);
 
 public:
@@ -1108,7 +1108,7 @@ public:
   }
   constexpr bool is_relative() const noexcept { return !is_absolute(); }
   // True if the path view contains any of the characters `*`, `?`, (POSIX only: `[` or `]`).
-  constexpr bool contains_glob() const noexcept { return _state.contains_glob(); }
+  LLFIO_PATH_VIEW_CONSTEXPR bool contains_glob() const noexcept { return _state.contains_glob(); }
 #ifdef _WIN32
   // True if the path view is a NT kernel path starting with `\!!\` or `\??\`
   constexpr bool is_ntpath() const noexcept
@@ -1176,7 +1176,7 @@ public:
     return _state._invoke([sep_idx](auto v) { return path_view(v.data(), sep_idx, false); });
   }
   //! Returns the size of the view in characters.
-  constexpr size_t native_size() const noexcept { return _state.native_size(); }
+  LLFIO_PATH_VIEW_CONSTEXPR size_t native_size() const noexcept { return _state.native_size(); }
   //! Returns a view of the root name part of this view e.g. C:
   LLFIO_PATH_VIEW_CONSTEXPR path_view root_name() const noexcept
   {
@@ -1353,11 +1353,11 @@ template <class T, class Deleter, size_t _internal_buffer_size, typename std::en
 #endif
   friend struct c_str;
 };
-inline constexpr bool operator==(path_view x, path_view y) noexcept
+inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view x, path_view y) noexcept
 {
   return x._state == y._state;
 }
-inline constexpr bool operator!=(path_view x, path_view y) noexcept
+inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view x, path_view y) noexcept
 {
   return x._state != y._state;
 }
@@ -1434,7 +1434,7 @@ namespace detail
 
     static constexpr auto _npos = string_view::npos;
     constexpr bool _is_end() const noexcept { return (nullptr == _parent) || _parent->native_size() == _begin; }
-    constexpr value_type _get() const noexcept
+    LLFIO_PATH_VIEW_CONSTEXPR value_type _get() const noexcept
     {
       assert(_parent != nullptr);
       return _parent->_state._invoke([this](const auto &v) {
@@ -1443,7 +1443,7 @@ namespace detail
         return path_view_component(v.data() + _begin, _end - _begin, (_end == v.size()) ? _parent->_state._zero_terminated : false);
       });
     }
-    constexpr void _inc() noexcept
+    LLFIO_PATH_VIEW_CONSTEXPR void _inc() noexcept
     {
       _begin = _end;
       _end = _parent->_state._find_first_sep(_begin + 1);
@@ -1489,10 +1489,10 @@ namespace detail
     path_view_iterator &operator=(path_view_iterator &&) = default;
     ~path_view_iterator() = default;
 
-    constexpr const_reference operator*() const noexcept { return _get(); }
-    constexpr reference operator*() noexcept { return _get(); }
-    constexpr const_pointer operator->() const noexcept { return _get(); }
-    constexpr pointer operator->() noexcept { return _get(); }
+    LLFIO_PATH_VIEW_CONSTEXPR const_reference operator*() const noexcept { return _get(); }
+    LLFIO_PATH_VIEW_CONSTEXPR reference operator*() noexcept { return _get(); }
+    LLFIO_PATH_VIEW_CONSTEXPR const_pointer operator->() const noexcept { return _get(); }
+    LLFIO_PATH_VIEW_CONSTEXPR pointer operator->() noexcept { return _get(); }
 
     constexpr bool operator!=(path_view_iterator o) const noexcept
     {
@@ -1522,12 +1522,12 @@ namespace detail
       _dec();
       return self;
     }
-    constexpr path_view_iterator &operator++() noexcept
+    LLFIO_PATH_VIEW_CONSTEXPR path_view_iterator &operator++() noexcept
     {
       _inc();
       return *this;
     }
-    constexpr path_view_iterator operator++(int) noexcept
+    LLFIO_PATH_VIEW_CONSTEXPR path_view_iterator operator++(int) noexcept
     {
       auto self(*this);
       _inc();
