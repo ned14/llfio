@@ -597,7 +597,7 @@ template&lt;class CompletionRoutine &gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">reqs</td><td>A scatter-gather and offset request for what range to barrier. May be ignored on some platforms which always write barrier the entire file. Supplying a default initialised reqs write barriers the entire file. </td></tr>
-    <tr><td class="paramname">completion</td><td>A callable to call upon i/o completion. Spec is <code>void(async_file_handle *, io_result&lt;const_buffers_type&gt; &amp;)</code>. Note that buffers returned may not be buffers input, see documentation for <code>barrier()</code>. </td></tr>
+    <tr><td class="paramname">completion</td><td>A callable to call upon i/o completion. Spec is <code>void(async_file_handle *, io_result&lt;const_buffers_type&gt; &amp;&amp;)</code>. Note that buffers returned may not be buffers input, see documentation for <code>barrier()</code>. </td></tr>
     <tr><td class="paramname">kind</td><td>Which kind of write reordering barrier to perform. </td></tr>
     <tr><td class="paramname">mem</td><td>Optional span of memory to use to avoid using <code>calloc()</code>. Note span MUST be all bits zero on entry. </td></tr>
   </table>

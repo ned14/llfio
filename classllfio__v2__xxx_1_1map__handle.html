@@ -220,6 +220,12 @@ byte *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 <a class="el" href="classllfio__v2__xxx_1_1handle.html#aed9587571c3fb932adadddc1beeeed58">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#ad2fce2bd5cd3798196c0dcf87f569ef7">length</a> () const noexcept</td></tr>
 <tr class="memdesc:ad2fce2bd5cd3798196c0dcf87f569ef7"><td class="mdescLeft">&#160;</td><td class="mdescRight">The size of the memory map. This is the accessible size, NOT the reservation size. <br /></td></tr>
 <tr class="separator:ad2fce2bd5cd3798196c0dcf87f569ef7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace85e1ed0933fe9f3f5e2b460d9fca65"><td class="memItemLeft" align="right" valign="top"><a id="ace85e1ed0933fe9f3f5e2b460d9fca65"></a>
+span&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#ace85e1ed0933fe9f3f5e2b460d9fca65">as_span</a> () noexcept</td></tr>
+<tr class="memdesc:ace85e1ed0933fe9f3f5e2b460d9fca65"><td class="mdescLeft">&#160;</td><td class="mdescRight">The memory map as a span of bytes. <br /></td></tr>
+<tr class="separator:ace85e1ed0933fe9f3f5e2b460d9fca65"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acdb624159d265151a82c0831899bb13a"><td class="memItemLeft" align="right" valign="top">span&lt; const byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#acdb624159d265151a82c0831899bb13a">as_span</a> () const noexcept</td></tr>
+<tr class="separator:acdb624159d265151a82c0831899bb13a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7224b586e457183ebcb0a694e282d0fc"><td class="memItemLeft" align="right" valign="top"><a id="a7224b586e457183ebcb0a694e282d0fc"></a>
 <a class="el" href="classllfio__v2__xxx_1_1handle.html#aed9587571c3fb932adadddc1beeeed58">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a7224b586e457183ebcb0a694e282d0fc">page_size</a> () const noexcept</td></tr>
 <tr class="memdesc:a7224b586e457183ebcb0a694e282d0fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">The page size used by the map, in bytes. <br /></td></tr>
@@ -490,6 +496,32 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>mapped_file_handle</
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="acdb624159d265151a82c0831899bb13a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acdb624159d265151a82c0831899bb13a">&#9670;&nbsp;</a></span>as_span()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">span&lt;const byte&gt; llfio_v2_xxx::map_handle::as_span </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
+<div class="fragment"><div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;{ <span class="keywordflow">return</span> {_addr, _length}; }</div></div><!-- fragment -->
+</div>
+</div>
 <a id="a823391cea8818da742c0d4c573f7300f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a823391cea8818da742c0d4c573f7300f">&#9670;&nbsp;</a></span>barrier()</h2>
 
@@ -950,7 +982,7 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;  {</div><div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;    OUTCOME_TRY(ret, <a class="code" href="classllfio__v2__xxx_1_1map__handle.html#a25dcce3a7127c5552687c540c37b9f27">prefetch</a>(span&lt;buffer_type&gt;(&amp;region, 1)));</div><div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;    <span class="keywordflow">return</span> *ret.data();</div><div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1map__handle_html_a25dcce3a7127c5552687c540c37b9f27"><div class="ttname"><a href="classllfio__v2__xxx_1_1map__handle.html#a25dcce3a7127c5552687c540c37b9f27">llfio_v2_xxx::map_handle::prefetch</a></div><div class="ttdeci">static result&lt; span&lt; buffer_type &gt; &gt; prefetch(span&lt; buffer_type &gt; regions) noexcept</div><div class="ttdoc">Ask the system to begin to asynchronously prefetch the span of memory regions given, returning the regions actually prefetched. Note that on Windows 7 or earlier the system call to implement this was not available, and so you will see an empty span returned. </div></div>
+<div class="fragment"><div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;  {</div><div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;    OUTCOME_TRY(ret, <a class="code" href="classllfio__v2__xxx_1_1map__handle.html#a25dcce3a7127c5552687c540c37b9f27">prefetch</a>(span&lt;buffer_type&gt;(&amp;region, 1)));</div><div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;    <span class="keywordflow">return</span> *ret.data();</div><div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1map__handle_html_a25dcce3a7127c5552687c540c37b9f27"><div class="ttname"><a href="classllfio__v2__xxx_1_1map__handle.html#a25dcce3a7127c5552687c540c37b9f27">llfio_v2_xxx::map_handle::prefetch</a></div><div class="ttdeci">static result&lt; span&lt; buffer_type &gt; &gt; prefetch(span&lt; buffer_type &gt; regions) noexcept</div><div class="ttdoc">Ask the system to begin to asynchronously prefetch the span of memory regions given, returning the regions actually prefetched. Note that on Windows 7 or earlier the system call to implement this was not available, and so you will see an empty span returned. </div></div>
 </div><!-- fragment -->
 </div>
 </div>

@@ -28,6 +28,8 @@ var classllfio__v2__xxx_1_1map__handle =
     [ "are_reads_from_cache", "classllfio__v2__xxx_1_1map__handle.html#a7126a726b2a06e4c1eca1a94c41163ff", null ],
     [ "are_safety_barriers_issued", "classllfio__v2__xxx_1_1map__handle.html#a0a2a5896f5e373fa032cdae1c1fff2c1", null ],
     [ "are_writes_durable", "classllfio__v2__xxx_1_1map__handle.html#a8036792f332459064172d7b0cfaee3cf", null ],
+    [ "as_span", "classllfio__v2__xxx_1_1map__handle.html#ace85e1ed0933fe9f3f5e2b460d9fca65", null ],
+    [ "as_span", "classllfio__v2__xxx_1_1map__handle.html#acdb624159d265151a82c0831899bb13a", null ],
     [ "barrier", "classllfio__v2__xxx_1_1map__handle.html#a823391cea8818da742c0d4c573f7300f", null ],
     [ "barrier", "classllfio__v2__xxx_1_1map__handle.html#ab0aa8cab289373bace4c576465fe7e3d", null ],
     [ "capacity", "classllfio__v2__xxx_1_1map__handle.html#ac7d048f830c0b2563fb4b50eb0597152", null ],
