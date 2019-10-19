@@ -481,12 +481,12 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
     return errc::invalid_argument;
   }
   region = utils::round_to_page_size(region, _pagesize);
-  // Tell the kernel to kick these pages into storage
-  if(-1 == ::madvise(region.data(), region.size(), MADV_DONTNEED))
+  // If decommitting a mapped file, tell the kernel to kick these pages back to storage
+  if(_section != nullptr && -1 == ::madvise(region.data(), region.size(), MADV_DONTNEED))
   {
     return posix_error();
   }
-  // Set permissions on the pages to no access
+  // Remap these pages with ones having no access
   extent_type offset = _offset + (region.data() - _addr);
   size_type bytes = region.size();
   OUTCOME_TRYV(do_mmap(_v, region.data(), MAP_FIXED, _section, _pagesize, bytes, offset, section_handle::flag::none));
@@ -580,38 +580,39 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
   LLFIO_LOG_FUNCTION_CALL(this);
   byte *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
-  if(QUICKCPPLIB_NAMESPACE::signal_guard::signal_guard(QUICKCPPLIB_NAMESPACE::signal_guard::signalc_set::undefined_memory_access,
-                                                       [&] {
-                                                         for(size_t i = 0; i < reqs.buffers.size(); i++)
-                                                         {
-                                                           const_buffer_type &req = reqs.buffers[i];
-                                                           if(req.size() > togo)
-                                                           {
-                                                             memcpy(addr, req.data(), togo);
-                                                             req = {addr, togo};
-                                                             reqs.buffers = {reqs.buffers.data(), i + 1};
-                                                             return false;
-                                                           }
-                                                           else
-                                                           {
-                                                             memcpy(addr, req.data(), req.size());
-                                                             req = {addr, req.size()};
-                                                             addr += req.size();
-                                                             togo -= req.size();
-                                                           }
-                                                         }
-                                                         return false;
-                                                       },
-                                                       [&](const QUICKCPPLIB_NAMESPACE::signal_guard::raised_signal_info *info) {
-                                                         auto *causingaddr = (byte *) info->addr;
-                                                         if(causingaddr < _addr || causingaddr >= (_addr + _reservation))
-                                                         {
-                                                           // Not caused by this map
-                                                           thrd_raise_signal(info->signo, info->raw_info, info->raw_context);
-                                                           abort();
-                                                         }
-                                                         return true;
-                                                       }))
+  if(QUICKCPPLIB_NAMESPACE::signal_guard::signal_guard(
+     QUICKCPPLIB_NAMESPACE::signal_guard::signalc_set::undefined_memory_access,
+     [&] {
+       for(size_t i = 0; i < reqs.buffers.size(); i++)
+       {
+         const_buffer_type &req = reqs.buffers[i];
+         if(req.size() > togo)
+         {
+           memcpy(addr, req.data(), togo);
+           req = {addr, togo};
+           reqs.buffers = {reqs.buffers.data(), i + 1};
+           return false;
+         }
+         else
+         {
+           memcpy(addr, req.data(), req.size());
+           req = {addr, req.size()};
+           addr += req.size();
+           togo -= req.size();
+         }
+       }
+       return false;
+     },
+     [&](const QUICKCPPLIB_NAMESPACE::signal_guard::raised_signal_info *info) {
+       auto *causingaddr = (byte *) info->addr;
+       if(causingaddr < _addr || causingaddr >= (_addr + _reservation))
+       {
+         // Not caused by this map
+         thrd_raise_signal(info->signo, info->raw_info, info->raw_context);
+         abort();
+       }
+       return true;
+     }))
   {
     return errc::no_space_on_device;
   }

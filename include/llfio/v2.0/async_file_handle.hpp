@@ -372,7 +372,7 @@ public:
   \return Either an io_state_ptr to the i/o in progress, or an error code.
   \param reqs A scatter-gather and offset request for what range to barrier. May be ignored on some platforms
   which always write barrier the entire file. Supplying a default initialised reqs write barriers the entire file.
-  \param completion A callable to call upon i/o completion. Spec is `void(async_file_handle *, io_result<const_buffers_type> &)`.
+  \param completion A callable to call upon i/o completion. Spec is `void(async_file_handle *, io_result<const_buffers_type> &&)`.
   Note that buffers returned may not be buffers input, see documentation for `barrier()`.
   \param kind Which kind of write reordering barrier to perform.
   \param mem Optional span of memory to use to avoid using `calloc()`. Note span MUST be all bits zero on entry.
@@ -382,7 +382,7 @@ public:
   */
   LLFIO_MAKE_FREE_FUNCTION
   template <class CompletionRoutine>                                                                                            //
-  LLFIO_REQUIRES(detail::is_invocable_r<void, CompletionRoutine, async_file_handle *, io_result<const_buffers_type> &>::value)  //
+  LLFIO_REQUIRES(detail::is_invocable_r<void, CompletionRoutine, async_file_handle *, io_result<const_buffers_type> &&>::value)  //
   result<io_state_ptr> async_barrier(io_request<const_buffers_type> reqs, CompletionRoutine &&completion, barrier_kind kind = barrier_kind::nowait_data_only, span<char> mem = {}) noexcept
   {
     LLFIO_LOG_FUNCTION_CALL(this);
@@ -439,7 +439,7 @@ public:
   */
   LLFIO_MAKE_FREE_FUNCTION
   template <class CompletionRoutine>                                                                                      //
-  LLFIO_REQUIRES(detail::is_invocable_r<void, CompletionRoutine, async_file_handle *, io_result<buffers_type> &>::value)  //
+  LLFIO_REQUIRES(detail::is_invocable_r<void, CompletionRoutine, async_file_handle *, io_result<buffers_type> &&>::value)  //
   result<io_state_ptr> async_read(io_request<buffers_type> reqs, CompletionRoutine &&completion, span<char> mem = {}) noexcept
   {
     LLFIO_LOG_FUNCTION_CALL(this);
@@ -483,7 +483,7 @@ public:
   */
   LLFIO_MAKE_FREE_FUNCTION
   template <class CompletionRoutine>                                                                                            //
-  LLFIO_REQUIRES(detail::is_invocable_r<void, CompletionRoutine, async_file_handle *, io_result<const_buffers_type> &>::value)  //
+  LLFIO_REQUIRES(detail::is_invocable_r<void, CompletionRoutine, async_file_handle *, io_result<const_buffers_type> &&>::value)  //
   result<io_state_ptr> async_write(io_request<const_buffers_type> reqs, CompletionRoutine &&completion, span<char> mem = {}) noexcept
   {
     LLFIO_LOG_FUNCTION_CALL(this);
