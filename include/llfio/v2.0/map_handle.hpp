@@ -503,6 +503,11 @@ public:
   LLFIO_MAKE_FREE_FUNCTION
   size_type length() const noexcept { return _length; }
 
+  //! The memory map as a span of bytes.
+  span<byte> as_span() noexcept { return {_addr, _length}; }
+  //! \overload
+  span<const byte> as_span() const noexcept { return {_addr, _length}; }
+
   //! The page size used by the map, in bytes.
   size_type page_size() const noexcept { return _pagesize; }
 
@@ -653,15 +658,16 @@ namespace in_place_attach_detach
     template <> struct disable_attached_for<LLFIO_V2_NAMESPACE::map_handle> : public std::true_type
     {
     };
-  }
-}
+  }  // namespace traits
+}  // namespace in_place_attach_detach
 QUICKCPPLIB_NAMESPACE_END
 
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 //! \brief Declare `map_handle` as a suitable source for P1631 `attached<T>`.
-template <class T> constexpr inline span<T> in_place_attach(map_handle& mh) noexcept {
-  return span<T>{reinterpret_cast<T *>(mh.address()), mh.length()/sizeof(T)};
+template <class T> constexpr inline span<T> in_place_attach(map_handle &mh) noexcept
+{
+  return span<T>{reinterpret_cast<T *>(mh.address()), mh.length() / sizeof(T)};
 }
 
 // BEGIN make_free_functions.py
