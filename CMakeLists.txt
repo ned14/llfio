@@ -153,6 +153,12 @@ if(NOT MSVC OR CMAKE_VERSION VERSION_GREATER 3.59)
     cxx_variable_templates
   )
 endif()
+# If on VS2019 16.3 or later, we require C++ 17
+if(MSVC AND MSVC_VERSION VERSION_GREATER_EQUAL 1923)
+  all_compile_features(PUBLIC
+    cxx_std_17
+  )
+endif()
 # Set the library dependencies this library has
 all_link_libraries(PUBLIC quickcpplib::hl outcome::hl Threads::Threads)
 # Set the system dependencies this library has
