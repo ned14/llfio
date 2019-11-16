@@ -45,9 +45,7 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 
 #ifndef LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED
-#if(defined(_MSC_VER) && !defined(__clang__) && !_HAS_CXX20) \
-  || (defined(__GNUC__) && !defined(__clang__) && !defined(__CHAR8_TYPE__)) \
-  || (defined(__clang__) && !defined(__CHAR8_TYPE__) && (__cplusplus < 201703L || __clang_major__ < 9))
+#if(defined(_MSC_VER) && !defined(__clang__) && !_HAS_CXX20) || (defined(__GNUC__) && !defined(__clang__) && !defined(__CHAR8_TYPE__)) || (defined(__clang__) && !defined(__CHAR8_TYPE__) && (__cplusplus < 201703L || __clang_major__ < 9))
 #define LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED 1
 #else
 #define LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED 0
@@ -68,6 +66,9 @@ namespace detail
   }
 
 #if LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED
+#ifdef _MSC_VER  // MSVC's standard library refuses any basic_string_view<T> where T is not an unsigned type
+  using char8_t = unsigned char;
+#else
   struct char8_t
   {
     char v;
@@ -85,6 +86,7 @@ namespace detail
   constexpr inline bool operator>=(char8_t a, char8_t b) noexcept { return a.v >= b.v; }
   constexpr inline bool operator==(char8_t a, char8_t b) noexcept { return a.v == b.v; }
   constexpr inline bool operator!=(char8_t a, char8_t b) noexcept { return a.v != b.v; }
+#endif
 #endif
 #if !defined(__CHAR16_TYPE__) && !defined(_MSC_VER)  // VS2015 onwards has built in char16_t
   enum class char16_t : unsigned short
@@ -320,7 +322,7 @@ public:
   path_view_component &operator=(const path_view_component &) = default;
   path_view_component &operator=(path_view_component &&) = default;
   ~path_view_component() = default;
-  
+
   const byte *_raw_data() const noexcept { return _bytestr; }
 
   //! True if empty
@@ -789,7 +791,8 @@ inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view_component x, path_vie
 }
 LLFIO_TEMPLATE(class CharT)
 LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_acceptable<CharT>))
-inline constexpr bool operator==(path_view_component /*unused*/, const CharT * /*unused*/) noexcept {
+inline constexpr bool operator==(path_view_component /*unused*/, const CharT * /*unused*/) noexcept
+{
   static_assert(!path_view_component::is_source_acceptable<CharT>, "Do not use operator== with path_view_component and a string literal, use .compare<>()");
   return false;
 }
