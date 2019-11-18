@@ -290,7 +290,7 @@ public:
   bool is_writable() const noexcept { return _v.is_writable(); }
   //! True if the handle is append only
   bool is_append_only() const noexcept { return _v.is_append_only(); }
-  /*! Changes whether this handle is append only or not.
+  /*! \brief EXTENSION: Changes whether this handle is append only or not.
 
   \warning On Windows this is implemented as a bit of a hack to make it fast like on POSIX,
   so make sure you open the handle for read/write originally. Note unlike on POSIX the

@@ -148,7 +148,7 @@ namespace algorithm
           _temphmap = {};
           // Release my shared locks and try locking inuse exclusively
           _hlockinuse.unlock();
-          auto lockresult = _h.try_lock(_initialisingoffset, 2, true);
+          auto lockresult = _h.try_lock_range(_initialisingoffset, 2, file_handle::lock_kind::exclusive);
 #ifndef NDEBUG
           if(!lockresult && lockresult.error() != errc::timed_out)
           {
@@ -202,7 +202,7 @@ namespace algorithm
           OUTCOME_TRY(ret, file_handle::file(base, lockfile, file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::reads));
           file_handle temph;
           // Am I the first person to this file? Lock everything exclusively
-          auto lockinuse = ret.try_lock(_initialisingoffset, 2, true);
+          auto lockinuse = ret.try_lock_range(_initialisingoffset, 2, file_handle::lock_kind::exclusive);
           if(lockinuse.has_error())
           {
             if(lockinuse.error() != errc::timed_out)
@@ -210,7 +210,7 @@ namespace algorithm
               return std::move(lockinuse).error();
             }
             // Somebody else is also using this file, so try to read the hash index file I ought to use
-            lockinuse = ret.lock(_lockinuseoffset, 1, false);  // inuse shared access, blocking
+            lockinuse = ret.lock_range(_lockinuseoffset, 1, file_handle::lock_kind::shared);  // inuse shared access, blocking
             if(!lockinuse)
             {
               return std::move(lockinuse).error();
@@ -261,7 +261,7 @@ namespace algorithm
           atomic downgrade of exclusive range to shared range, we're fully prepared for other users
           now. The _initialisingoffset remains exclusive to prevent double entry into this init routine.
           */
-          OUTCOME_TRY(lockinuse2, ret.lock(_lockinuseoffset, 1, false));
+          OUTCOME_TRY(lockinuse2, ret.lock_range(_lockinuseoffset, 1, file_handle::lock_kind::shared));
           lockinuse = std::move(lockinuse2);  // releases exclusive lock on all three offsets
           return memory_map(std::move(ret), std::move(temph), std::move(lockinuse.value()), std::move(hmap), std::move(temphmap));
         }

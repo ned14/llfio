@@ -305,60 +305,6 @@ namespace algorithm
         }
         return std::move(reqs.buffers);
       }
-
-      using extent_guard = typename Base::extent_guard;
-
-    private:
-      struct _extent_guard : public extent_guard
-      {
-        friend class combining_handle_adapter;
-        _extent_guard() = default;
-        constexpr _extent_guard(io_handle *h, extent_type offset, extent_type length, bool exclusive)
-            : extent_guard(h, offset, length, exclusive)
-        {
-        }
-      };
-
-    public:
-      //! \brief Lock the given extent in one or both of the attached handles. Any second handle is always locked for shared.
-      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_guard> lock(extent_type offset, extent_type bytes, bool exclusive = true, deadline d = deadline()) noexcept override
-      {
-        optional<result<extent_guard>> _locks[2];
-#if !defined(LLFIO_DISABLE_OPENMP) && defined(_OPENMP)
-#pragma omp parallel for if(_have_source && (_flags &flag::disable_parallelism) == 0)
-#endif
-        for(size_t n = 0; n < 2; n++)
-        {
-          if(n == 0)
-          {
-            _locks[n] = _target->lock(offset, bytes, exclusive, d);
-          }
-          else if(_have_source)
-          {
-            _locks[n] = _source->lock(offset, bytes, false, d);
-          }
-        }
-        // Handle any errors
-        {
-          OUTCOME_TRY(_, std::move(*_locks[0]));
-          _.release();
-        }
-        if(_have_source)
-        {
-          OUTCOME_TRY(_, std::move(*_locks[1]));
-          _.release();
-        }
-        return _extent_guard(this, offset, bytes, exclusive);
-      }
-      //! \brief Unlock the given extent in one or both of the attached handles.
-      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(extent_type offset, extent_type bytes) noexcept override
-      {
-        _target->unlock(offset, bytes);
-        if(_have_source)
-        {
-          _source->unlock(offset, bytes);
-        }
-      }
     };
     template <template <class, class> class Op, class Target, class Source> class combining_handle_adapter_base<Op, Target, Source, file_handle_wrapper, true> : public combining_handle_adapter_base<Op, Target, Source, file_handle_wrapper, false>
     {
@@ -384,6 +330,61 @@ namespace algorithm
 
       combining_handle_adapter_base() = default;
       using _base::_base;
+
+      using lock_kind = typename _base::lock_kind;
+      using extent_guard = typename _base::extent_guard;
+
+    private:
+      struct _extent_guard : public extent_guard
+      {
+        friend class combining_handle_adapter;
+        _extent_guard() = default;
+        constexpr _extent_guard(file_handle *h, extent_type offset, extent_type length, lock_kind kind)
+            : extent_guard(h, offset, length, kind)
+        {
+        }
+      };
+
+    public:
+      //! \brief Lock the given extent in one or both of the attached handles. Any second handle is always locked for shared.
+      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_guard> lock_range(extent_type offset, extent_type bytes, lock_kind kind, deadline d = deadline()) noexcept override
+      {
+        optional<result<extent_guard>> _locks[2];
+#if !defined(LLFIO_DISABLE_OPENMP) && defined(_OPENMP)
+#pragma omp parallel for if(_have_source && (_flags & flag::disable_parallelism) == 0)
+#endif
+        for(size_t n = 0; n < 2; n++)
+        {
+          if(n == 0)
+          {
+            _locks[n] = this->_target->lock_range(offset, bytes, kind, d);
+          }
+          else if(_have_source)
+          {
+            _locks[n] = this->_source->lock_range(offset, bytes, lock_kind::shared, d);
+          }
+        }
+        // Handle any errors
+        {
+          OUTCOME_TRY(_, std::move(*_locks[0]));
+          _.release();
+        }
+        if(_have_source)
+        {
+          OUTCOME_TRY(_, std::move(*_locks[1]));
+          _.release();
+        }
+        return _extent_guard(this, offset, bytes, kind);
+      }
+      //! \brief Unlock the given extent in one or both of the attached handles.
+      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock_range(extent_type offset, extent_type bytes) noexcept override
+      {
+        this->_target->unlock_range(offset, bytes);
+        if(_have_source)
+        {
+          this->_source->unlock_range(offset, bytes);
+        }
+      }
 
       //! \brief Return the lesser of one or both of the attached handles
       LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> maximum_extent() const noexcept override
