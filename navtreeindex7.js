@@ -1,5 +1,10 @@
 var NAVTREEINDEX7 =
 {
+"namespacellfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex.html":[4,0,2,0,1],
+"namespacellfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex.html":[3,0,1,0,1],
+"namespacellfio__v2__xxx_1_1path__discovery.html":[4,0,2,1],
+"namespacellfio__v2__xxx_1_1path__discovery.html":[3,0,1,1],
+"namespacellfio__v2__xxx_1_1storage__profile.html":[3,0,1,2],
 "namespacellfio__v2__xxx_1_1storage__profile.html":[4,0,2,2],
 "namespacellfio__v2__xxx_1_1utils.html":[3,0,1,3],
 "namespacellfio__v2__xxx_1_1utils.html":[4,0,2,3],
@@ -244,10 +249,5 @@ var NAVTREEINDEX7 =
 "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#ae79263dcf9faf5d3f2973ba688201f7e":[4,0,2,0,0,1,50],
 "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#aea98df8215a197c3356e5ff9098ae238":[4,0,2,0,0,1,13],
 "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#af7813ac4dde322154b5ca70e06494905":[4,0,2,0,0,1,42],
-"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#afd59aa55d1e9bc3a9942f13b964badae":[4,0,2,0,0,1,37],
-"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#afff8e1a93ad371a5844543a3e782f471":[4,0,2,0,0,1,51],
-"structllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map_1_1__entity__idx.html":[4,0,2,0,1,3,0],
-"structllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map_1_1__entity__idx.html#a3e4939b7eed7dee1ae7b938ed21f0bc2":[4,0,2,0,1,3,0,0],
-"structllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map_1_1__entity__idx.html#ae31e6520a32c4f07c753ceeeeffbc047":[4,0,2,0,1,3,0,1],
-"structllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entity__type.html":[4,0,2,0,1,5,1]
+"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#afd59aa55d1e9bc3a9942f13b964badae":[4,0,2,0,0,1,37]
 };

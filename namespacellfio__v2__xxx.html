@@ -1172,7 +1172,7 @@ template&lt;class CompletionRoutine &gt; </div>
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;{</div><div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#af31a062639499a79ef5cc8aed16ba65d">file_handle::file</a>(std::forward&lt;decltype(base)&gt;(base), std::forward&lt;decltype(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>)&gt;(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;}</div><div class="ttc" id="namespacellfio__v2__xxx_html_af31a062639499a79ef5cc8aed16ba65d"><div class="ttname"><a href="namespacellfio__v2__xxx.html#af31a062639499a79ef5cc8aed16ba65d">llfio_v2_xxx::file</a></div><div class="ttdeci">result&lt; file_handle &gt; file(const path_handle &amp;base, file_handle::path_view_type path, file_handle::mode _mode=file_handle::mode::read, file_handle::creation _creation=file_handle::creation::open_existing, file_handle::caching _caching=file_handle::caching::all, file_handle::flag flags=file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:335</div></div>
+<div class="fragment"><div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;{</div><div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#af31a062639499a79ef5cc8aed16ba65d">file_handle::file</a>(std::forward&lt;decltype(base)&gt;(base), std::forward&lt;decltype(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>)&gt;(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;}</div><div class="ttc" id="namespacellfio__v2__xxx_html_af31a062639499a79ef5cc8aed16ba65d"><div class="ttname"><a href="namespacellfio__v2__xxx.html#af31a062639499a79ef5cc8aed16ba65d">llfio_v2_xxx::file</a></div><div class="ttdeci">result&lt; file_handle &gt; file(const path_handle &amp;base, file_handle::path_view_type path, file_handle::mode _mode=file_handle::mode::read, file_handle::creation _creation=file_handle::creation::open_existing, file_handle::caching _caching=file_handle::caching::all, file_handle::flag flags=file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:501</div></div>
 <div class="ttc" id="namespacellfio__v2__xxx_html_a49f7bb77eb38fbe1280019225b66b78b"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">llfio_v2_xxx::path</a></div><div class="ttdeci">result&lt; path_handle &gt; path(const path_handle &amp;base, path_handle::path_view_type path) noexcept</div><div class="ttdef"><b>Definition:</b> path_handle.hpp:155</div></div>
 </div><!-- fragment -->
 </div>
@@ -1630,7 +1630,7 @@ template&lt;class CompletionRoutine &gt; </div>
 </div><div class="memdoc">
 <p>Return the current maximum permitted extent of the file.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX fstat() or GetFileInformationByHandleEx() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;{</div><div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.maximum_extent();</div><div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;{</div><div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.maximum_extent();</div><div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a86f75b69db68e6c0593919f0a878f838"></a>
@@ -1843,61 +1843,12 @@ template&lt;class CompletionRoutine &gt; </div>
 </div><div class="memdoc">
 <p>Create a file handle creating a randomly named file on a path. The file is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing file. Note also that caching defaults to temporary which hints to the OS to only flush changes to physical storage as lately as possible.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;{</div><div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a5bc9df0fdb554e757d14cf40af0bbb4e">file_handle::random_file</a>(std::forward&lt;decltype(dirpath)&gt;(dirpath), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;}</div><div class="ttc" id="namespacellfio__v2__xxx_html_a5bc9df0fdb554e757d14cf40af0bbb4e"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a5bc9df0fdb554e757d14cf40af0bbb4e">llfio_v2_xxx::random_file</a></div><div class="ttdeci">result&lt; file_handle &gt; random_file(const path_handle &amp;dirpath, file_handle::mode _mode=file_handle::mode::write, file_handle::caching _caching=file_handle::caching::temporary, file_handle::flag flags=file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:348</div></div>
+<div class="fragment"><div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;{</div><div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a5bc9df0fdb554e757d14cf40af0bbb4e">file_handle::random_file</a>(std::forward&lt;decltype(dirpath)&gt;(dirpath), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;}</div><div class="ttc" id="namespacellfio__v2__xxx_html_a5bc9df0fdb554e757d14cf40af0bbb4e"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a5bc9df0fdb554e757d14cf40af0bbb4e">llfio_v2_xxx::random_file</a></div><div class="ttdeci">result&lt; file_handle &gt; random_file(const path_handle &amp;dirpath, file_handle::mode _mode=file_handle::mode::write, file_handle::caching _caching=file_handle::caching::temporary, file_handle::flag flags=file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:514</div></div>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="af678f58d20e1f0962ff0744150342683"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af678f58d20e1f0962ff0744150342683">&#9670;&nbsp;</a></span>read() <span class="overload">[1/3]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1io__result.html">file_handle::io_result</a>&lt;file_handle::size_type&gt; llfio_v2_xxx::read </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;&#160;</td>
-          <td class="paramname"><em>self</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">file_handle::extent_type&#160;</td>
-          <td class="paramname"><em>offset</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::initializer_list&lt; <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1buffer__type.html">file_handle::buffer_type</a> &gt;&#160;</td>
-          <td class="paramname"><em>lst</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
-          <td class="paramname"><em>d</em> = <code><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;{</div><div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(offset)&gt;(offset), std::forward&lt;decltype(lst)&gt;(lst), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;}</div></div><!-- fragment -->
-</div>
-</div>
 <a id="a225e15680392dfa9e1dda42afcc09672"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a225e15680392dfa9e1dda42afcc09672">&#9670;&nbsp;</a></span>read() <span class="overload">[2/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a225e15680392dfa9e1dda42afcc09672">&#9670;&nbsp;</a></span>read() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1949,7 +1900,56 @@ template&lt;class CompletionRoutine &gt; </div>
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX read() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be returned if deadline i/o is not possible with this particular handle configuration (e.g. reading from regular files on POSIX or reading from a non-overlapped HANDLE on Windows). </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle performs one calloc and one free. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;{</div><div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;{</div><div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;}</div></div><!-- fragment -->
+</div>
+</div>
+<a id="af678f58d20e1f0962ff0744150342683"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af678f58d20e1f0962ff0744150342683">&#9670;&nbsp;</a></span>read() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1io__result.html">file_handle::io_result</a>&lt;file_handle::size_type&gt; llfio_v2_xxx::read </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">file_handle::extent_type&#160;</td>
+          <td class="paramname"><em>offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::initializer_list&lt; <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1buffer__type.html">file_handle::buffer_type</a> &gt;&#160;</td>
+          <td class="paramname"><em>lst</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
+<div class="fragment"><div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;{</div><div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(offset)&gt;(offset), std::forward&lt;decltype(lst)&gt;(lst), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="ab993693c98cdb52e2d611f8f9e24e4e2"></a>
@@ -2343,7 +2343,7 @@ template&lt;class CompletionRoutine &gt; </div>
 <p>Create a file handle creating the named file on some path which the OS declares to be suitable for temporary files. Most OSs are very lazy about flushing changes made to these temporary files. Note the default flags are to have the newly created file deleted on first handle close. Note also that an empty name is equivalent to calling <code>random_file(path_discovery::storage_backed_temporary_files_directory())</code> and the creation parameter is ignored.</p>
 <dl class="section note"><dt>Note</dt><dd>If the temporary file you are creating is not going to have its path sent to another process for usage, this is the WRONG function to use. Use <code>temp_inode()</code> instead, it is far more secure.</dd></dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;{</div><div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a70d9ef3b988a880d171015b754bb7b27">file_handle::temp_file</a>(std::forward&lt;decltype(name)&gt;(name), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;}</div><div class="ttc" id="namespacellfio__v2__xxx_html_a70d9ef3b988a880d171015b754bb7b27"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a70d9ef3b988a880d171015b754bb7b27">llfio_v2_xxx::temp_file</a></div><div class="ttdeci">result&lt; file_handle &gt; temp_file(file_handle::path_view_type name=file_handle::path_view_type(), file_handle::mode _mode=file_handle::mode::write, file_handle::creation _creation=file_handle::creation::if_needed, file_handle::caching _caching=file_handle::caching::temporary, file_handle::flag flags=file_handle::flag::unlink_on_first_close) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:367</div></div>
+<div class="fragment"><div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;{</div><div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a70d9ef3b988a880d171015b754bb7b27">file_handle::temp_file</a>(std::forward&lt;decltype(name)&gt;(name), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;}</div><div class="ttc" id="namespacellfio__v2__xxx_html_a70d9ef3b988a880d171015b754bb7b27"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a70d9ef3b988a880d171015b754bb7b27">llfio_v2_xxx::temp_file</a></div><div class="ttdeci">result&lt; file_handle &gt; temp_file(file_handle::path_view_type name=file_handle::path_view_type(), file_handle::mode _mode=file_handle::mode::write, file_handle::creation _creation=file_handle::creation::if_needed, file_handle::caching _caching=file_handle::caching::temporary, file_handle::flag flags=file_handle::flag::unlink_on_first_close) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:533</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2388,7 +2388,7 @@ template&lt;class CompletionRoutine &gt; </div>
 </div><div class="memdoc">
 <p><em>Securely</em> create a file handle creating a temporary anonymous inode in the filesystem referred to by <em>dirpath</em>. The inode created has no name nor accessible path on the filing system and ceases to exist as soon as the last handle is closed, making it ideal for use as a temporary file where other processes do not need to have access to its contents via some path on the filing system (a classic use case is for backing shared memory maps).</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;{</div><div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#ac8d9dc908fe39f9c896e99f6b7a39d81">file_handle::temp_inode</a>(std::forward&lt;decltype(dirh)&gt;(dirh), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;}</div><div class="ttc" id="namespacellfio__v2__xxx_html_ac8d9dc908fe39f9c896e99f6b7a39d81"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ac8d9dc908fe39f9c896e99f6b7a39d81">llfio_v2_xxx::temp_inode</a></div><div class="ttdeci">result&lt; file_handle &gt; temp_inode(const path_handle &amp;dirh=path_discovery::storage_backed_temporary_files_directory(), file_handle::mode _mode=file_handle::mode::write, file_handle::flag flags=file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:382</div></div>
+<div class="fragment"><div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;{</div><div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#ac8d9dc908fe39f9c896e99f6b7a39d81">file_handle::temp_inode</a>(std::forward&lt;decltype(dirh)&gt;(dirh), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;}</div><div class="ttc" id="namespacellfio__v2__xxx_html_ac8d9dc908fe39f9c896e99f6b7a39d81"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ac8d9dc908fe39f9c896e99f6b7a39d81">llfio_v2_xxx::temp_inode</a></div><div class="ttdeci">result&lt; file_handle &gt; temp_inode(const path_handle &amp;dirh=path_discovery::storage_backed_temporary_files_directory(), file_handle::mode _mode=file_handle::mode::write, file_handle::flag flags=file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:548</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2435,7 +2435,7 @@ template&lt;class CompletionRoutine &gt; </div>
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX ftruncate() or SetFileInformationByHandle() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;{</div><div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.truncate(std::forward&lt;decltype(newsize)&gt;(newsize));</div><div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;{</div><div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.truncate(std::forward&lt;decltype(newsize)&gt;(newsize));</div><div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="aa6b0c71dfe04ceae64818d4c91d05537"></a>
@@ -2637,7 +2637,7 @@ template&lt;class CompletionRoutine &gt; </div>
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX write() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle performs one calloc and one free. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;{</div><div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;{</div><div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a5ea3d93e8b2c7f6e3fca7a9cde734312"></a>
@@ -2686,7 +2686,7 @@ template&lt;class CompletionRoutine &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;{</div><div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(offset)&gt;(offset), std::forward&lt;decltype(lst)&gt;(lst), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;{</div><div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(offset)&gt;(offset), std::forward&lt;decltype(lst)&gt;(lst), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a681ed7e98ac17e6bb336b9287365141b"></a>
@@ -2804,7 +2804,7 @@ template&lt;class CompletionRoutine &gt; </div>
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX write() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle may perform one calloc and one free. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;{</div><div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.zero(std::forward&lt;decltype(offset)&gt;(offset), std::forward&lt;decltype(bytes)&gt;(bytes), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;{</div><div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.zero(std::forward&lt;decltype(offset)&gt;(offset), std::forward&lt;decltype(bytes)&gt;(bytes), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 </div><!-- contents -->

@@ -7,7 +7,7 @@ var searchData=
   ['service',['service',['../classllfio__v2__xxx_1_1file__handle.html#ae7735588338065ede0ab9b7f979bc65a',1,'llfio_v2_xxx::file_handle']]],
   ['set_5fappend_5fonly',['set_append_only',['../classllfio__v2__xxx_1_1handle.html#a101620e9fff0c0e8c346af0e9de58b6a',1,'llfio_v2_xxx::handle']]],
   ['set_5fbacking',['set_backing',['../classllfio__v2__xxx_1_1section__handle.html#a85635c700f2778280481598393c24c00',1,'llfio_v2_xxx::section_handle']]],
-  ['set_5fhandle',['set_handle',['../classllfio__v2__xxx_1_1io__handle_1_1extent__guard.html#aaebef63395732f47b469310dc2a4165d',1,'llfio_v2_xxx::io_handle::extent_guard']]],
+  ['set_5fhandle',['set_handle',['../classllfio__v2__xxx_1_1file__handle_1_1extent__guard.html#a911d0cf556b0d234a33235f84c85dfc2',1,'llfio_v2_xxx::file_handle::extent_guard']]],
   ['set_5finterruption_5fsignal',['set_interruption_signal',['../classllfio__v2__xxx_1_1io__service.html#aeacd8d21f956903c204ee49c0d3ab195',1,'llfio_v2_xxx::io_service']]],
   ['set_5fsection',['set_section',['../classllfio__v2__xxx_1_1map__handle.html#a7a27e949d3333a75e96f5d979e2d6bbf',1,'llfio_v2_xxx::map_handle']]],
   ['shrink_5fto_5ffit',['shrink_to_fit',['../structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a19aa2b2535f9880a41f64fb43162ec9e',1,'llfio_v2_xxx::algorithm::impl::trivial_vector_impl']]],

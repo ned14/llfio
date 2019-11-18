@@ -250,6 +250,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memdesc:ac3aa3dc009822c0e437f317864534feb"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if the handle is append only. <br /></td></tr>
 <tr class="separator:ac3aa3dc009822c0e437f317864534feb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a101620e9fff0c0e8c346af0e9de58b6a"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a101620e9fff0c0e8c346af0e9de58b6a">set_append_only</a> (bool enable) noexcept</td></tr>
+<tr class="memdesc:a101620e9fff0c0e8c346af0e9de58b6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">EXTENSION: Changes whether this handle is append only or not.  <a href="#a101620e9fff0c0e8c346af0e9de58b6a">More...</a><br /></td></tr>
 <tr class="separator:a101620e9fff0c0e8c346af0e9de58b6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8085cb3b40982c6dbd874547c183fd5e"><td class="memItemLeft" align="right" valign="top"><a id="a8085cb3b40982c6dbd874547c183fd5e"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a8085cb3b40982c6dbd874547c183fd5e">is_overlapped</a> () const noexcept</td></tr>
@@ -916,7 +917,8 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Changes whether this handle is append only or not.</p>
+
+<p>EXTENSION: Changes whether this handle is append only or not. </p>
 <dl class="section warning"><dt>Warning</dt><dd>On Windows this is implemented as a bit of a hack to make it fast like on POSIX, so make sure you open the handle for read/write originally. Note unlike on POSIX the append_only disposition will be the only one toggled, seekable and readable will remain turned on.</dd></dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Whatever POSIX fcntl() returns. On Windows nothing is changed on the handle. </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>No memory allocation. </dd></dl>

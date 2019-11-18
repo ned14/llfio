@@ -1,5 +1,6 @@
 var classllfio__v2__xxx_1_1file__handle =
 [
+    [ "extent_guard", "classllfio__v2__xxx_1_1file__handle_1_1extent__guard.html", "classllfio__v2__xxx_1_1file__handle_1_1extent__guard" ],
     [ "buffer_type", "classllfio__v2__xxx_1_1file__handle.html#a1e478777fb31b49b95bcddbee612a13b", null ],
     [ "buffers_type", "classllfio__v2__xxx_1_1file__handle.html#a4a50713d6a6aec1ecacc0cdf12d61298", null ],
     [ "caching", "classllfio__v2__xxx_1_1file__handle.html#a7afcacdae9224a8587b8163eb3f5db8b", null ],
@@ -22,6 +23,11 @@ var classllfio__v2__xxx_1_1file__handle =
       [ "wait_data_only", "classllfio__v2__xxx_1_1file__handle.html#a7816bb7ae5156fa2997b68e6300ae565af1d3baf03681db9a9986e0a76d6107ce", null ],
       [ "nowait_all", "classllfio__v2__xxx_1_1file__handle.html#a7816bb7ae5156fa2997b68e6300ae565ab7a52d26120f585b21e8960812db5bf1", null ],
       [ "wait_all", "classllfio__v2__xxx_1_1file__handle.html#a7816bb7ae5156fa2997b68e6300ae565a4e1789381cf8c976ec7a7118b3529345", null ]
+    ] ],
+    [ "lock_kind", "classllfio__v2__xxx_1_1file__handle.html#aa25e3ab298152166fc387d8fcfb19a63", [
+      [ "unknown", "classllfio__v2__xxx_1_1file__handle.html#aa25e3ab298152166fc387d8fcfb19a63aad921d60486366258809553a3db49a4a", null ],
+      [ "shared", "classllfio__v2__xxx_1_1file__handle.html#aa25e3ab298152166fc387d8fcfb19a63a9e81e7b963c71363e2fb3eefcfecfc0e", null ],
+      [ "exclusive", "classllfio__v2__xxx_1_1file__handle.html#aa25e3ab298152166fc387d8fcfb19a63aa4293995cfbfa9ce60ce71ade2ff75f7", null ]
     ] ],
     [ "file_handle", "classllfio__v2__xxx_1_1file__handle.html#a8f754fdbf69fbb9b989c5aab409f2cb2", null ],
     [ "file_handle", "classllfio__v2__xxx_1_1file__handle.html#a664770d5a3dc9db34d177622cb494779", null ],
@@ -54,9 +60,9 @@ var classllfio__v2__xxx_1_1file__handle =
     [ "is_valid", "classllfio__v2__xxx_1_1file__handle.html#a5c7f6a0a8ffdea22763c75a9319ba0c2", null ],
     [ "is_writable", "classllfio__v2__xxx_1_1file__handle.html#a211fee447a47bdeb5424a2a5ae1de852", null ],
     [ "kernel_caching", "classllfio__v2__xxx_1_1file__handle.html#a90bf8668df002dac5a7d9397486b2946", null ],
-    [ "lock", "classllfio__v2__xxx_1_1file__handle.html#a29cc9f2525f78dd73f8402cb59d97212", null ],
-    [ "lock", "classllfio__v2__xxx_1_1file__handle.html#a369f8ec6a682030f8e7f5749eb7bc77e", null ],
-    [ "lock", "classllfio__v2__xxx_1_1file__handle.html#a198e1c294966a28919d2f0698e3608b8", null ],
+    [ "lock_range", "classllfio__v2__xxx_1_1file__handle.html#a5a9910116cc5751398e6b55f06a9a793", null ],
+    [ "lock_range", "classllfio__v2__xxx_1_1file__handle.html#a3c5c229b11f488d0e9bff74c65737db2", null ],
+    [ "lock_range", "classllfio__v2__xxx_1_1file__handle.html#a4055bb02680af02dcc189f0461bad503", null ],
     [ "max_buffers", "classllfio__v2__xxx_1_1file__handle.html#ade38a6d55a4eda3c6d5e196683b129a7", null ],
     [ "maximum_extent", "classllfio__v2__xxx_1_1file__handle.html#a7991af58283025b80a7225866643f0b4", null ],
     [ "native_handle", "classllfio__v2__xxx_1_1file__handle.html#a942b0d276c9f20fe41baab679b88fe72", null ],
@@ -77,10 +83,10 @@ var classllfio__v2__xxx_1_1file__handle =
     [ "swap", "classllfio__v2__xxx_1_1file__handle.html#ad0cfbde678b809518ca005251ec64808", null ],
     [ "swap", "classllfio__v2__xxx_1_1file__handle.html#a4716696b8700953889006251e0678aa4", null ],
     [ "truncate", "classllfio__v2__xxx_1_1file__handle.html#a2be41c54aff8578e2d0afbf4ae73049f", null ],
-    [ "try_lock", "classllfio__v2__xxx_1_1file__handle.html#ae1abb705dbe9890e103365bf7c61521e", null ],
+    [ "try_lock_range", "classllfio__v2__xxx_1_1file__handle.html#a2919da8c2520240c4e65f18f68872fd0", null ],
     [ "unique_id", "classllfio__v2__xxx_1_1file__handle.html#a9793fe40564fda2437783488bd51b9f1", null ],
     [ "unlink", "classllfio__v2__xxx_1_1file__handle.html#a1dd7923bb65456af4da41ebe7cb84982", null ],
-    [ "unlock", "classllfio__v2__xxx_1_1file__handle.html#ad720c4c7f350fe06291534d1cbf2feb5", null ],
+    [ "unlock_range", "classllfio__v2__xxx_1_1file__handle.html#a0cd024de36cc7cb63d9189f45a9944e9", null ],
     [ "write", "classllfio__v2__xxx_1_1file__handle.html#a83884eca7b4cd09125a5cf8a155e6052", null ],
     [ "write", "classllfio__v2__xxx_1_1file__handle.html#ab500784aa806dc7c2d90028d2f72de57", null ],
     [ "zero", "classllfio__v2__xxx_1_1file__handle.html#a50caa94c51aae1f23e7708d3c6a21364", null ],

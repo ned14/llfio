@@ -28,7 +28,7 @@ var hierarchy =
     [ "llfio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex::entities_guard", "classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html", null ],
     [ "llfio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type", "structllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entity__type.html", null ],
     [ "llfio_v2_xxx::error_info", "structllfio__v2__xxx_1_1error__info.html", null ],
-    [ "llfio_v2_xxx::io_handle::extent_guard", "classllfio__v2__xxx_1_1io__handle_1_1extent__guard.html", null ],
+    [ "llfio_v2_xxx::file_handle::extent_guard", "classllfio__v2__xxx_1_1file__handle_1_1extent__guard.html", null ],
     [ "llfio_v2_xxx::statfs_t::f_flags_t", "structllfio__v2__xxx_1_1statfs__t_1_1f__flags__t.html", null ],
     [ "filesystem_error", null, [
       [ "llfio_v2_xxx::error", "classllfio__v2__xxx_1_1error.html", null ]
