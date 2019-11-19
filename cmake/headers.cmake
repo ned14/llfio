@@ -69,6 +69,7 @@ set(llfio_HEADERS
   "include/llfio/v2.0/io_handle.hpp"
   "include/llfio/v2.0/io_service.hpp"
   "include/llfio/v2.0/llfio.hpp"
+  "include/llfio/v2.0/lockable_io_handle.hpp"
   "include/llfio/v2.0/logging.hpp"
   "include/llfio/v2.0/map_handle.hpp"
   "include/llfio/v2.0/mapped.hpp"

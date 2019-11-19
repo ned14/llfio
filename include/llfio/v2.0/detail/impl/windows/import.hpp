@@ -1428,6 +1428,88 @@ inline result<void> do_clone_handle(native_handle_type &dest, const native_handl
   return success();
 }
 
+inline result<void> do_lock_range(native_handle_type &_v, handle::extent_type offset, handle::extent_type bytes, bool exclusive, deadline d) noexcept
+{
+  if(d && d.nsecs > 0 && !_v.is_overlapped())
+  {
+    return errc::not_supported;
+  }
+  DWORD flags = exclusive ? LOCKFILE_EXCLUSIVE_LOCK : 0;
+  if(d && (d.nsecs == 0u))
+  {
+    flags |= LOCKFILE_FAIL_IMMEDIATELY;
+  }
+  LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+  OVERLAPPED ol{};
+  memset(&ol, 0, sizeof(ol));
+  ol.Internal = static_cast<ULONG_PTR>(-1);
+  ol.OffsetHigh = (offset >> 32) & 0xffffffff;
+  ol.Offset = offset & 0xffffffff;
+  DWORD bytes_high = bytes == 0u ? MAXDWORD : static_cast<DWORD>((bytes >> 32) & 0xffffffff);
+  DWORD bytes_low = bytes == 0u ? MAXDWORD : static_cast<DWORD>(bytes & 0xffffffff);
+  if(LockFileEx(_v.h, flags, 0, bytes_low, bytes_high, &ol) == 0)
+  {
+    if(ERROR_LOCK_VIOLATION == GetLastError() && d && (d.nsecs == 0u))
+    {
+      return errc::timed_out;
+    }
+    if(ERROR_IO_PENDING != GetLastError())
+    {
+      return win32_error();
+    }
+  }
+  // If handle is overlapped, wait for completion of each i/o.
+  if(_v.is_overlapped())
+  {
+    if(STATUS_TIMEOUT == ntwait(_v.h, ol, d))
+    {
+      LLFIO_WIN_DEADLINE_TO_TIMEOUT(d);
+    }
+    // It seems the NT kernel is guilty of casting bugs sometimes
+    ol.Internal = ol.Internal & 0xffffffff;
+    if(ol.Internal != 0)
+    {
+      return ntkernel_error(static_cast<NTSTATUS>(ol.Internal));
+    }
+  }
+  return success();
+}
+
+inline void do_unlock_range(native_handle_type &_v, handle::extent_type offset, handle::extent_type bytes) noexcept
+{
+  OVERLAPPED ol{};
+  memset(&ol, 0, sizeof(ol));
+  ol.Internal = static_cast<ULONG_PTR>(-1);
+  ol.OffsetHigh = (offset >> 32) & 0xffffffff;
+  ol.Offset = offset & 0xffffffff;
+  DWORD bytes_high = bytes == 0u ? MAXDWORD : static_cast<DWORD>((bytes >> 32) & 0xffffffff);
+  DWORD bytes_low = bytes == 0u ? MAXDWORD : static_cast<DWORD>(bytes & 0xffffffff);
+  if(UnlockFileEx(_v.h, 0, bytes_low, bytes_high, &ol) == 0)
+  {
+    if(ERROR_IO_PENDING != GetLastError())
+    {
+      auto ret = win32_error();
+      (void) ret;
+      LLFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
+      std::terminate();
+    }
+  }
+  // If handle is overlapped, wait for completion of each i/o.
+  if(_v.is_overlapped())
+  {
+    ntwait(_v.h, ol, deadline());
+    if(ol.Internal != 0)
+    {
+      // It seems the NT kernel is guilty of casting bugs sometimes
+      ol.Internal = ol.Internal & 0xffffffff;
+      auto ret = ntkernel_error(static_cast<NTSTATUS>(ol.Internal));
+      (void) ret;
+      LLFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
+      std::terminate();
+    }
+  }
+}
+
 /* Our own custom CreateFileW() implementation.
 
 The Win32 CreateFileW() implementation is unfortunately slow. It also, very annoyingly,
