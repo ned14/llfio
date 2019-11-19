@@ -71,8 +71,8 @@ namespace algorithm
         {
           std::vector<unsigned> reader_tids;  // thread ids of all shared lock holders
           unsigned writer_tid;                // thread id of exclusive lock holder
-          io_handle::extent_guard filelock;   // exclusive if writer_tid, else shared
-          _entity_info(bool exclusive, unsigned tid, io_handle::extent_guard _filelock)
+          file_handle::extent_guard filelock;   // exclusive if writer_tid, else shared
+          _entity_info(bool exclusive, unsigned tid, file_handle::extent_guard _filelock)
               : writer_tid(exclusive ? tid : 0)
               , filelock(std::move(_filelock))
           {
@@ -95,7 +95,7 @@ namespace algorithm
             if(!it->second.reader_tids.empty())
             {
               // Downgrade the lock from exclusive to shared
-              auto l = _h.lock(entity.value, 1, false).value();
+              auto l = _h.lock_range(entity.value, 1, file_handle::lock_kind::shared).value();
 #ifndef _WIN32
               // On POSIX byte range locks replace
               it->second.filelock.release();
@@ -120,7 +120,7 @@ namespace algorithm
           if(it->second.reader_tids.empty())
           {
             // Release the lock and delete this entity from the map
-            _h.unlock(entity.value, 1);
+            _h.unlock_range(entity.value, 1);
             _thread_locks.erase(it);
           }
         }
@@ -207,7 +207,7 @@ namespace algorithm
                   }
                   // Allow other threads to use this threaded_byte_ranges
                   guard.unlock();
-                  auto outcome = _h.lock(out.entities[n].value, 1, out.entities[n].exclusive != 0u, nd);
+                  auto outcome = _h.lock_range(out.entities[n].value, 1, (out.entities[n].exclusive != 0u) ? file_handle::lock_kind::exclusive : file_handle::lock_kind::shared, nd);
                   guard.lock();
                   if(!outcome)
                   {
@@ -294,7 +294,7 @@ namespace algorithm
                 }
                 // Allow other threads to use this threaded_byte_ranges
                 guard.unlock();
-                auto outcome = _h.lock(out.entities[n].value, 1, true, nd);
+                auto outcome = _h.lock_range(out.entities[n].value, 1, file_handle::lock_kind::exclusive, nd);
                 guard.lock();
                 if(!outcome)
                 {

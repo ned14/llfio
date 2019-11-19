@@ -357,6 +357,130 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
   }
 }
 
+#if 0
+#if !defined(__linux__) && !defined(F_OFD_SETLK)
+  if(0 == bytes)
+  {
+    // Non-Linux has a sane locking system in flock() if you are willing to lock the entire file
+    int operation = ((d && !d.nsecs) ? LOCK_NB : 0) | ((kind != file_handle::lock_kind::shared) ? LOCK_EX : LOCK_SH);
+    if(-1 == flock(_v.fd, operation))
+      failed = true;
+  }
+  else
+#endif
+
+#if !defined(__linux__) && !defined(F_OFD_SETLK)
+  if(0 == bytes)
+  {
+    if(-1 == flock(_v.fd, LOCK_UN))
+      failed = true;
+  }
+  else
+#endif
+#endif
+
+result<file_handle::extent_guard> file_handle::lock_range(io_handle::extent_type offset, io_handle::extent_type bytes, file_handle::lock_kind kind, deadline d) noexcept
+{
+  LLFIO_LOG_FUNCTION_CALL(this);
+  if(d && d.nsecs > 0)
+  {
+    return errc::not_supported;
+  }
+  bool failed = false;
+  {
+    struct flock fl
+    {
+    };
+    memset(&fl, 0, sizeof(fl));
+    fl.l_type = (kind != file_handle::lock_kind::shared) ? F_WRLCK : F_RDLCK;
+    constexpr extent_type extent_topbit = static_cast<extent_type>(1) << (8 * sizeof(extent_type) - 1);
+    if((offset & extent_topbit) != 0u)
+    {
+      LLFIO_LOG_WARN(_v.fd, "file_handle::lock() called with offset with top bit set, masking out");
+    }
+    if((bytes & extent_topbit) != 0u)
+    {
+      LLFIO_LOG_WARN(_v.fd, "file_handle::lock() called with bytes with top bit set, masking out");
+    }
+    fl.l_whence = SEEK_SET;
+    fl.l_start = offset & ~extent_topbit;
+    fl.l_len = bytes & ~extent_topbit;
+#ifdef F_OFD_SETLK
+    if(-1 == fcntl(_v.fd, (d && !d.nsecs) ? F_OFD_SETLK : F_OFD_SETLKW, &fl))
+    {
+      if(EINVAL == errno)  // OFD locks not supported on this kernel
+      {
+        if(-1 == fcntl(_v.fd, (d && !d.nsecs) ? F_SETLK : F_SETLKW, &fl))
+          failed = true;
+        else
+          _flags |= flag::byte_lock_insanity;
+      }
+      else
+        failed = true;
+    }
+#else
+    if(-1 == fcntl(_v.fd, (d && (d.nsecs == 0u)) ? F_SETLK : F_SETLKW, &fl))
+    {
+      failed = true;
+    }
+    else
+    {
+      _flags |= flag::byte_lock_insanity;
+    }
+#endif
+  }
+  if(failed)
+  {
+    if(d && (d.nsecs == 0u) && (EACCES == errno || EAGAIN == errno || EWOULDBLOCK == errno))
+    {
+      return errc::timed_out;
+    }
+    return posix_error();
+  }
+  return extent_guard(this, offset, bytes, kind);
+}
+
+void file_handle::unlock_range(io_handle::extent_type offset, io_handle::extent_type bytes) noexcept
+{
+  LLFIO_LOG_FUNCTION_CALL(this);
+  bool failed = false;
+  {
+    struct flock fl
+    {
+    };
+    memset(&fl, 0, sizeof(fl));
+    fl.l_type = F_UNLCK;
+    constexpr extent_type extent_topbit = static_cast<extent_type>(1) << (8 * sizeof(extent_type) - 1);
+    fl.l_whence = SEEK_SET;
+    fl.l_start = offset & ~extent_topbit;
+    fl.l_len = bytes & ~extent_topbit;
+#ifdef F_OFD_SETLK
+    if(-1 == fcntl(_v.fd, F_OFD_SETLK, &fl))
+    {
+      if(EINVAL == errno)  // OFD locks not supported on this kernel
+      {
+        if(-1 == fcntl(_v.fd, F_SETLK, &fl))
+          failed = true;
+      }
+      else
+        failed = true;
+    }
+#else
+    if(-1 == fcntl(_v.fd, F_SETLK, &fl))
+    {
+      failed = true;
+    }
+#endif
+  }
+  if(failed)
+  {
+    auto ret(posix_error());
+    (void) ret;
+    LLFIO_LOG_FATAL(_v.fd, "io_handle::unlock() failed");
+    std::terminate();
+  }
+}
+
 result<file_handle::extent_type> file_handle::maximum_extent() const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);

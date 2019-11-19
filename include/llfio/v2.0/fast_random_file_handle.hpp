@@ -290,13 +290,13 @@ private:
   };
 
 public:
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_guard> lock(extent_type offset, extent_type bytes, bool exclusive = true, deadline /* unused */ = deadline()) noexcept override
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_guard> lock_range(extent_type offset, extent_type bytes, lock_kind kind, deadline /* unused */ = deadline()) noexcept override
   {
     // Lock nothing
-    return _extent_guard(this, offset, bytes, exclusive);
+    return _extent_guard(this, offset, bytes, kind);
   }
 
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock(extent_type /*unused*/, extent_type /*unused*/) noexcept override
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock_range(extent_type /*unused*/, extent_type /*unused*/) noexcept override
   {
     // Unlock nothing
   }
