@@ -1,7 +1,6 @@
 var file__handle_8hpp =
 [
     [ "file_handle", "classllfio__v2__xxx_1_1file__handle.html", "classllfio__v2__xxx_1_1file__handle" ],
-    [ "extent_guard", "classllfio__v2__xxx_1_1file__handle_1_1extent__guard.html", "classllfio__v2__xxx_1_1file__handle_1_1extent__guard" ],
     [ "construct< file_handle >", "structllfio__v2__xxx_1_1construct_3_01file__handle_01_4.html", "structllfio__v2__xxx_1_1construct_3_01file__handle_01_4" ],
     [ "extents", "file__handle_8hpp.html#a6f9a72b547dc542401a2d17b1c1e2e15", null ],
     [ "file", "file__handle_8hpp.html#af31a062639499a79ef5cc8aed16ba65d", null ],

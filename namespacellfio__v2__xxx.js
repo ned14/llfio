@@ -27,6 +27,7 @@ var namespacellfio__v2__xxx =
     [ "handle", "classllfio__v2__xxx_1_1handle.html", "classllfio__v2__xxx_1_1handle" ],
     [ "io_handle", "classllfio__v2__xxx_1_1io__handle.html", "classllfio__v2__xxx_1_1io__handle" ],
     [ "io_service", "classllfio__v2__xxx_1_1io__service.html", "classllfio__v2__xxx_1_1io__service" ],
+    [ "lockable_io_handle", "classllfio__v2__xxx_1_1lockable__io__handle.html", "classllfio__v2__xxx_1_1lockable__io__handle" ],
     [ "log_level_guard", "classllfio__v2__xxx_1_1log__level__guard.html", "classllfio__v2__xxx_1_1log__level__guard" ],
     [ "map_handle", "classllfio__v2__xxx_1_1map__handle.html", "classllfio__v2__xxx_1_1map__handle" ],
     [ "mapped", "classllfio__v2__xxx_1_1mapped.html", "classllfio__v2__xxx_1_1mapped" ],
@@ -39,5 +40,6 @@ var namespacellfio__v2__xxx =
     [ "section_handle", "classllfio__v2__xxx_1_1section__handle.html", "classllfio__v2__xxx_1_1section__handle" ],
     [ "stat_t", "structllfio__v2__xxx_1_1stat__t.html", "structllfio__v2__xxx_1_1stat__t" ],
     [ "statfs_t", "structllfio__v2__xxx_1_1statfs__t.html", "structllfio__v2__xxx_1_1statfs__t" ],
-    [ "symlink_handle", "classllfio__v2__xxx_1_1symlink__handle.html", "classllfio__v2__xxx_1_1symlink__handle" ]
+    [ "symlink_handle", "classllfio__v2__xxx_1_1symlink__handle.html", "classllfio__v2__xxx_1_1symlink__handle" ],
+    [ "unique_file_lock", "classllfio__v2__xxx_1_1unique__file__lock.html", "classllfio__v2__xxx_1_1unique__file__lock" ]
 ];
