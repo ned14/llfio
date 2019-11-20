@@ -27,6 +27,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "io_handle.hpp"
 
+#include <cassert>
+
 //! \file lockable_io_handle.hpp Provides a lockable i/o handle
 
 #ifdef _MSC_VER
@@ -59,12 +61,12 @@ public:
   using buffers_type = io_handle::buffers_type;
   using const_buffers_type = io_handle::const_buffers_type;
   template <class T> using io_request = io_handle::io_request<T>;
-  template<class T> using io_result = io_handle::io_result<T>;
+  template <class T> using io_result = io_handle::io_result<T>;
 
   //! The kinds of concurrent user exclusion which can be performed.
   enum class lock_kind
   {
-    unknown,
+    unlocked,  //!< Exclude none.
     shared,    //!< Exclude only those requesting an exclusive lock on the same inode.
     exclusive  //!< Exclude those requesting any kind of lock on the same inode.
   };
@@ -93,74 +95,52 @@ public:
   lockable_io_handle &operator=(const lockable_io_handle &) = delete;
 
   /*! \brief Locks the inode referred to by the open handle for exclusive access.
+
+  Note that this may, or may not, interact with the byte range lock extensions. See `unique_file_lock`
+  for a RAII locker.
   \errors Any of the values POSIX `flock()` can return.
   \mallocs The default synchronous implementation in `file_handle` performs no memory allocation.
   The asynchronous implementation in `async_file_handle` performs one calloc and one free.
   */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> do_lock() noexcept;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> lock_file() noexcept;
   /*! \brief Tries to lock the inode referred to by the open handle for exclusive access,
   returning `false` if lock is currently unavailable.
+
+  Note that this may, or may not, interact with the byte range lock extensions. See `unique_file_lock`
+  for a RAII locker.
   \errors Any of the values POSIX `flock()` can return.
   \mallocs The default synchronous implementation in `file_handle` performs no memory allocation.
   The asynchronous implementation in `async_file_handle` performs one calloc and one free.
   */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<bool> do_try_lock() noexcept;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC bool try_lock_file() noexcept;
   /*! \brief Unlocks a previously acquired exclusive lock.
-  */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void do_unlock() noexcept;
-
-  /*! \brief Locks the inode referred to by the open handle for shared access.
-  */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> do_lock_shared() noexcept;
-  /*! \brief Tries to lock the inode referred to by the open handle for shared access,
-  returning `false` if lock is currently unavailable.
-  */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<bool> do_try_lock_shared() noexcept;
-  /*! \brief Unlocks a previously acquired shared lock.
-  */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void do_unlock_shared() noexcept;
-
-  /*! \brief Locks the inode referred to by the open handle for exclusive access.
-
-  As is required by `SharedMutex`, this function must throw an exception upon failure.
-  Use `do_lock()` if you want a `noexcept` equivalent.
-  */
-  void lock() { do_lock().value(); }
-  /*! \brief Tries to lock the inode referred to by the open handle for exclusive access,
-  returning `false` if lock is currently unavailable.
-
-  As is required by `SharedMutex`, this function must throw an exception upon failure.
-  Use `do_try_lock()` if you want a `noexcept` equivalent.
-  */
-  bool try_lock() { return do_try_lock().value(); }
-  /*! \brief Unlocks a previously acquired exclusive lock.
-
-  As is required by `SharedMutex`, this function must throw an exception upon failure.
-  Use `do_unlock()` if you want a `noexcept` equivalent.
-  */
-  void unlock() { do_unlock(); }
+   */
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock_file() noexcept;
 
   /*! \brief Locks the inode referred to by the open handle for shared access.
 
-  As is required by `SharedMutex`, this function must throw an exception upon failure.
-  Use `do_lock_shared()` if you want a `noexcept` equivalent.
+  Note that this may, or may not, interact with the byte range lock extensions. See `unique_file_lock`
+  for a RAII locker.
+  \errors Any of the values POSIX `flock()` can return.
+  \mallocs The default synchronous implementation in `file_handle` performs no memory allocation.
+  The asynchronous implementation in `async_file_handle` performs one calloc and one free.
   */
-  void lock_shared() { do_lock_shared().value(); }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> lock_file_shared() noexcept;
   /*! \brief Tries to lock the inode referred to by the open handle for shared access,
   returning `false` if lock is currently unavailable.
 
-  As is required by `SharedMutex`, this function must throw an exception upon failure.
-  Use `do_try_lock_shared()` if you want a `noexcept` equivalent.
+  Note that this may, or may not, interact with the byte range lock extensions. See `unique_file_lock`
+  for a RAII locker.
+  \errors Any of the values POSIX `flock()` can return.
+  \mallocs The default synchronous implementation in `file_handle` performs no memory allocation.
+  The asynchronous implementation in `async_file_handle` performs one calloc and one free.
   */
-  bool try_lock_shared() { return do_try_lock_shared().value(); }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC bool try_lock_file_shared() noexcept;
   /*! \brief Unlocks a previously acquired shared lock.
+   */
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock_file_shared() noexcept;
 
-  As is required by `SharedMutex`, this function must throw an exception upon failure.
-  Use `do_unlock_shared()` if you want a `noexcept` equivalent.
-  */
-  void unlock_shared() { do_unlock_shared(); }
-
-  public:
+public:
   /*! \class extent_guard
   \brief EXTENSION: RAII holder a locked extent of bytes in a file.
   */
@@ -169,7 +149,7 @@ public:
     friend class lockable_io_handle;
     lockable_io_handle *_h{nullptr};
     extent_type _offset{0}, _length{0};
-    lock_kind _kind{lock_kind::unknown};
+    lock_kind _kind{lock_kind::unlocked};
 
   protected:
     constexpr extent_guard(lockable_io_handle *h, extent_type offset, extent_type length, lock_kind kind)
@@ -228,7 +208,7 @@ public:
     {
       if(_h != nullptr)
       {
-        _h->unlock_range(_offset, _length);
+        _h->unlock_file_range(_offset, _length);
         release();
       }
     }
@@ -239,7 +219,7 @@ public:
       _h = nullptr;
       _offset = 0;
       _length = 0;
-      _kind = lock_kind::unknown;
+      _kind = lock_kind::unlocked;
     }
   };
 
@@ -281,11 +261,11 @@ public:
   \mallocs The default synchronous implementation in file_handle performs no memory allocation.
   The asynchronous implementation in async_file_handle performs one calloc and one free.
   */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_guard> lock_range(extent_type offset, extent_type bytes, lock_kind kind, deadline d = deadline()) noexcept;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_guard> lock_file_range(extent_type offset, extent_type bytes, lock_kind kind, deadline d = deadline()) noexcept;
   //! \overload
-  result<extent_guard> try_lock_range(extent_type offset, extent_type bytes, lock_kind kind) noexcept { return lock_range(offset, bytes, kind, deadline(std::chrono::seconds(0))); }
+  result<extent_guard> try_lock_file_range(extent_type offset, extent_type bytes, lock_kind kind) noexcept { return lock_file_range(offset, bytes, kind, deadline(std::chrono::seconds(0))); }
   //! \overload EXTENSION: Locks for shared access
-  result<extent_guard> lock_range(io_request<buffers_type> reqs, deadline d = deadline()) noexcept
+  result<extent_guard> lock_file_range(io_request<buffers_type> reqs, deadline d = deadline()) noexcept
   {
     size_t bytes = 0;
     for(auto &i : reqs.buffers)
@@ -296,10 +276,10 @@ public:
       }
       bytes += i.size();
     }
-    return lock_range(reqs.offset, bytes, lock_kind::shared, d);
+    return lock_file_range(reqs.offset, bytes, lock_kind::shared, d);
   }
   //! \overload EXTENSION: Locks for exclusive access
-  result<extent_guard> lock_range(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept
+  result<extent_guard> lock_file_range(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept
   {
     size_t bytes = 0;
     for(auto &i : reqs.buffers)
@@ -310,7 +290,7 @@ public:
       }
       bytes += i.size();
     }
-    return lock_range(reqs.offset, bytes, lock_kind::exclusive, d);
+    return lock_file_range(reqs.offset, bytes, lock_kind::exclusive, d);
   }
 
   /*! \brief EXTENSION: Unlocks a byte range previously locked.
@@ -320,7 +300,166 @@ public:
   \errors Any of the values POSIX fcntl() can return.
   \mallocs None.
   */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock_range(extent_type offset, extent_type bytes) noexcept;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock_file_range(extent_type offset, extent_type bytes) noexcept;
+};
+
+/*! \brief RAII locker matching `std::unique_lock` for `lockable_io_handle`, but untemplated.
+ */
+class unique_file_lock
+{
+  lockable_io_handle *_h{nullptr};
+  lockable_io_handle::lock_kind _lock_state{lockable_io_handle::lock_kind::unlocked};
+
+public:
+  unique_file_lock() = default;
+  explicit unique_file_lock(lockable_io_handle &h, lockable_io_handle::lock_kind kind)
+      : _h(&h)
+  {
+    if(kind == lockable_io_handle::lock_kind::exclusive)
+    {
+      lock().value();
+    }
+    else if(kind == lockable_io_handle::lock_kind::shared)
+    {
+      lock_shared().value();
+    }
+  }
+  unique_file_lock(unique_file_lock &&o) noexcept
+      : _h(o._h)
+  {
+    o._h = nullptr;
+    o._lock_state = lockable_io_handle::lock_kind::unlocked;
+  }
+  unique_file_lock(const unique_file_lock &) = delete;
+  unique_file_lock &operator=(unique_file_lock &&o) noexcept
+  {
+    this->~unique_file_lock();
+    new(this) unique_file_lock(std::move(o));
+    return *this;
+  }
+  unique_file_lock &operator=(const unique_file_lock &) = delete;
+  ~unique_file_lock()
+  {
+    if(_h != nullptr)
+    {
+      if(_lock_state == lockable_io_handle::lock_kind::exclusive)
+      {
+        _h->unlock_file();
+      }
+      else if(_lock_state == lockable_io_handle::lock_kind::shared)
+      {
+        _h->unlock_file_shared();
+      }
+      _h = nullptr;
+    }
+  }
+
+  //! Returns the associated mutex
+  lockable_io_handle *mutex() const noexcept { return _h; }
+  //! True if the associated mutex is owned by this lock
+  bool owns_lock() const noexcept { return (_h != nullptr) && _lock_state != lockable_io_handle::lock_kind::unlocked; }
+  //! True if the associated mutex is owned by this lock
+  explicit operator bool() const noexcept { return owns_lock(); }
+
+  //! Releases the mutex from management
+  lockable_io_handle *release() noexcept
+  {
+    lockable_io_handle *ret = _h;
+    _h = nullptr;
+    return ret;
+  }
+
+  //! Lock the mutex for exclusive access
+  result<void> lock() noexcept
+  {
+    if(_h == nullptr)
+    {
+      return errc::operation_not_permitted;
+    }
+    if(_lock_state != lockable_io_handle::lock_kind::unlocked)
+    {
+      return errc::resource_deadlock_would_occur;
+    }
+    OUTCOME_TRY(_h->lock_file());
+    _lock_state = lockable_io_handle::lock_kind::exclusive;
+    return success();
+  }
+  //! Try to lock the mutex for exclusive access
+  bool try_lock() noexcept
+  {
+    if(_h == nullptr)
+    {
+      return false;
+    }
+    if(_lock_state != lockable_io_handle::lock_kind::unlocked)
+    {
+      return false;
+    }
+    if(_h->try_lock_file())
+    {
+      _lock_state = lockable_io_handle::lock_kind::exclusive;
+      return true;
+    }
+    return false;
+  }
+  //! Unlock the mutex from exclusive access
+  void unlock() noexcept
+  {
+    assert(_h != nullptr);
+    assert(_lock_state == lockable_io_handle::lock_kind::exclusive);
+    if(_h == nullptr || _lock_state != lockable_io_handle::lock_kind::exclusive)
+    {
+      return;
+    }
+    _h->unlock_file();
+    _lock_state = lockable_io_handle::lock_kind::unlocked;
+  }
+
+  //! Lock the mutex for shared access
+  result<void> lock_shared() noexcept
+  {
+    if(_h == nullptr)
+    {
+      return errc::operation_not_permitted;
+    }
+    if(_lock_state != lockable_io_handle::lock_kind::unlocked)
+    {
+      return errc::resource_deadlock_would_occur;
+    }
+    OUTCOME_TRY(_h->lock_file_shared());
+    _lock_state = lockable_io_handle::lock_kind::shared;
+    return success();
+  }
+  //! Try to lock the mutex for shared access
+  bool try_lock_shared() noexcept
+  {
+    if(_h == nullptr)
+    {
+      return false;
+    }
+    if(_lock_state != lockable_io_handle::lock_kind::unlocked)
+    {
+      return false;
+    }
+    if(_h->try_lock_file_shared())
+    {
+      _lock_state = lockable_io_handle::lock_kind::shared;
+      return true;
+    }
+    return false;
+  }
+  //! Unlock the mutex from shared access
+  void unlock_shared() noexcept
+  {
+    assert(_h != nullptr);
+    assert(_lock_state == lockable_io_handle::lock_kind::shared);
+    if(_h == nullptr || _lock_state != lockable_io_handle::lock_kind::shared)
+    {
+      return;
+    }
+    _h->unlock_file_shared();
+    _lock_state = lockable_io_handle::lock_kind::unlocked;
+  }
 };
 
 

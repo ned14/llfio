@@ -31,29 +31,29 @@ static inline void TestFileHandleLockUnlock()
   llfio::file_handle h2 = llfio::file_handle::file({}, "temp", llfio::file_handle::mode::write, llfio::file_handle::creation::if_needed, llfio::file_handle::caching::temporary, llfio::file_handle::flag::unlink_on_first_close).value();
   // Two exclusive locks not possible
   {
-    auto _1 = h1.lock_range(0, 0, llfio::file_handle::lock_kind::exclusive, std::chrono::seconds(0));
+    auto _1 = h1.lock_file_range(0, 0, llfio::file_handle::lock_kind::exclusive, std::chrono::seconds(0));
     BOOST_REQUIRE(!_1.has_error());
     if(h1.flags() & llfio::file_handle::flag::byte_lock_insanity)
     {
       std::cout << "This platform has byte_lock_insanity so this test won't be useful, bailing out" << std::endl;
       return;
     }
-    auto _2 = h2.lock_range(0, 0, llfio::file_handle::lock_kind::exclusive, std::chrono::seconds(0));
+    auto _2 = h2.lock_file_range(0, 0, llfio::file_handle::lock_kind::exclusive, std::chrono::seconds(0));
     BOOST_REQUIRE(_2.has_error());
     BOOST_CHECK(_2.error() == llfio::errc::timed_out);
   }
   // Two non-exclusive locks okay
   {
-    auto _1 = h1.lock_range(0, 0, llfio::file_handle::lock_kind::shared, std::chrono::seconds(0));
+    auto _1 = h1.lock_file_range(0, 0, llfio::file_handle::lock_kind::shared, std::chrono::seconds(0));
     BOOST_REQUIRE(!_1.has_error());
-    auto _2 = h2.lock_range(0, 0, llfio::file_handle::lock_kind::shared, std::chrono::seconds(0));
+    auto _2 = h2.lock_file_range(0, 0, llfio::file_handle::lock_kind::shared, std::chrono::seconds(0));
     BOOST_REQUIRE(!_2.has_error());
   }
   // Non-exclusive excludes exclusive
   {
-    auto _1 = h1.lock_range(0, 0, llfio::file_handle::lock_kind::shared, std::chrono::seconds(0));
+    auto _1 = h1.lock_file_range(0, 0, llfio::file_handle::lock_kind::shared, std::chrono::seconds(0));
     BOOST_REQUIRE(!_1.has_error());
-    auto _2 = h2.lock_range(0, 0, llfio::file_handle::lock_kind::exclusive, std::chrono::seconds(0));
+    auto _2 = h2.lock_file_range(0, 0, llfio::file_handle::lock_kind::exclusive, std::chrono::seconds(0));
     BOOST_REQUIRE(_2.has_error());
     BOOST_CHECK(_2.error() == llfio::errc::timed_out);
   }

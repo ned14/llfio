@@ -1428,7 +1428,7 @@ inline result<void> do_clone_handle(native_handle_type &dest, const native_handl
   return success();
 }
 
-inline result<void> do_lock_range(native_handle_type &_v, handle::extent_type offset, handle::extent_type bytes, bool exclusive, deadline d) noexcept
+inline result<void> do_lock_file_range(native_handle_type &_v, handle::extent_type offset, handle::extent_type bytes, bool exclusive, deadline d) noexcept
 {
   if(d && d.nsecs > 0 && !_v.is_overlapped())
   {
@@ -1475,7 +1475,7 @@ inline result<void> do_lock_range(native_handle_type &_v, handle::extent_type of
   return success();
 }
 
-inline void do_unlock_range(native_handle_type &_v, handle::extent_type offset, handle::extent_type bytes) noexcept
+inline void do_unlock_file_range(native_handle_type &_v, handle::extent_type offset, handle::extent_type bytes) noexcept
 {
   OVERLAPPED ol{};
   memset(&ol, 0, sizeof(ol));

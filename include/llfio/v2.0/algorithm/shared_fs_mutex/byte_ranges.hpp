@@ -143,9 +143,9 @@ namespace algorithm
                 // Now 0 to n needs to be closed
                 for(; n > 0; n--)
                 {
-                  _h.unlock_range(out.entities[n].value, 1);
+                  _h.unlock_file_range(out.entities[n].value, 1);
                 }
-                _h.unlock_range(out.entities[0].value, 1);
+                _h.unlock_file_range(out.entities[0].value, 1);
               }
             });
             for(n = 0; n < out.entities.size(); n++)
@@ -179,7 +179,7 @@ namespace algorithm
                   }
                 }
               }
-              auto outcome = _h.lock_range(out.entities[n].value, 1, (out.entities[n].exclusive != 0u) ? file_handle::lock_kind::exclusive : file_handle::lock_kind::shared, nd);
+              auto outcome = _h.lock_file_range(out.entities[n].value, 1, (out.entities[n].exclusive != 0u) ? file_handle::lock_kind::exclusive : file_handle::lock_kind::shared, nd);
               if(!outcome)
               {
                 was_contended = n;
@@ -229,7 +229,7 @@ namespace algorithm
         LLFIO_LOG_FUNCTION_CALL(this);
         for(const auto &i : entities)
         {
-          _h.unlock_range(i.value, 1);
+          _h.unlock_file_range(i.value, 1);
         }
       }
     };

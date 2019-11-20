@@ -27,70 +27,54 @@ Distributed under the Boost Software License, Version 1.0.
 
 LLFIO_V2_NAMESPACE_BEGIN
 
-result<void> lockable_io_handle::do_lock() noexcept
+result<void> lockable_io_handle::lock_file() noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  OUTCOME_TRY(do_lock_range(_v, 0xffffffffffffffffULL, 1, true, {}));
+  OUTCOME_TRY(do_lock_file_range(_v, 0xffffffffffffffffULL, 1, true, {}));
   return success();
 }
-result<bool> lockable_io_handle::do_try_lock() noexcept
+bool lockable_io_handle::try_lock_file() noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  auto r = do_lock_range(_v, 0xffffffffffffffffULL, 1, true, std::chrono::seconds(0));
-  if(r)
-  {
-    return true;
-  }
-  if(r.error() == errc::timed_out)
-  {
-    return false;
-  }
-  return r.error();
+  auto r = do_lock_file_range(_v, 0xffffffffffffffffULL, 1, true, std::chrono::seconds(0));
+  return !!r;
 }
-void lockable_io_handle::do_unlock() noexcept
+void lockable_io_handle::unlock_file() noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  do_unlock_range(_v, 0xffffffffffffffffULL, 1);
+  do_unlock_file_range(_v, 0xffffffffffffffffULL, 1);
 }
 
-result<void> lockable_io_handle::do_lock_shared() noexcept
+result<void> lockable_io_handle::lock_file_shared() noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  OUTCOME_TRY(do_lock_range(_v, 0xffffffffffffffffULL, 1, false, {}));
+  OUTCOME_TRY(do_lock_file_range(_v, 0xffffffffffffffffULL, 1, false, {}));
   return success();
 }
-result<bool> lockable_io_handle::do_try_lock_shared() noexcept
+bool lockable_io_handle::try_lock_file_shared() noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  auto r = do_lock_range(_v, 0xffffffffffffffffULL, 1, false, std::chrono::seconds(0));
-  if(r)
-  {
-    return true;
-  }
-  if(r.error() == errc::timed_out)
-  {
-    return false;
-  }
-  return r.error();
+  auto r = do_lock_file_range(_v, 0xffffffffffffffffULL, 1, false, std::chrono::seconds(0));
+  return !!r;
 }
-void lockable_io_handle::do_unlock_shared() noexcept
+void lockable_io_handle::unlock_file_shared() noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  do_unlock_range(_v, 0xffffffffffffffffULL, 1);
+  do_unlock_file_range(_v, 0xffffffffffffffffULL, 1);
 }
 
 
-result<lockable_io_handle::extent_guard> lockable_io_handle::lock_range(io_handle::extent_type offset, io_handle::extent_type bytes, lock_kind kind, deadline d) noexcept
+result<lockable_io_handle::extent_guard> lockable_io_handle::lock_file_range(io_handle::extent_type offset, io_handle::extent_type bytes, lock_kind kind, deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  OUTCOME_TRY(do_lock_range(_v, offset, bytes, kind != lock_kind::shared, d));
+  OUTCOME_TRY(do_lock_file_range(_v, offset, bytes, kind != lock_kind::shared, d));
   return extent_guard(this, offset, bytes, kind);
 }
 
-void lockable_io_handle::unlock_range(io_handle::extent_type offset, io_handle::extent_type bytes) noexcept
+void lockable_io_handle::unlock_file_range(io_handle::extent_type offset, io_handle::extent_type bytes) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  do_unlock_range(_v, offset, bytes);
+  do_unlock_file_range(_v, offset, bytes);
 }
 
 

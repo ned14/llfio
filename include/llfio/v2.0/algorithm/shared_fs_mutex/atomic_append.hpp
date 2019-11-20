@@ -206,7 +206,7 @@ namespace algorithm
         OUTCOME_TRY(ret, file_handle::file(base, lockfile, file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
         atomic_append_detail::header header;
         // Lock the entire header for exclusive access
-        auto lockresult = ret.try_lock_range(0, sizeof(header), file_handle::lock_kind::exclusive);
+        auto lockresult = ret.try_lock_file_range(0, sizeof(header), file_handle::lock_kind::exclusive);
         //! \todo fs_mutex_append needs to check if file still exists after lock is granted, awaiting path fetching.
         if(lockresult.has_error())
         {
@@ -231,7 +231,7 @@ namespace algorithm
           OUTCOME_TRYV(ret.write(0, {{reinterpret_cast<byte *>(&header), sizeof(header)}}));
         }
         // Open a shared lock on last byte in header to prevent other users zomping the file
-        OUTCOME_TRY(guard, ret.lock_range(sizeof(header) - 1, 1, file_handle::lock_kind::shared));
+        OUTCOME_TRY(guard, ret.lock_file_range(sizeof(header) - 1, 1, file_handle::lock_kind::shared));
         // Unlock any exclusive lock I gained earlier now
         if(lockresult)
         {
@@ -292,7 +292,7 @@ namespace algorithm
             auto lastbyte = static_cast<file_handle::extent_type>(-1);
             // Lock up to the beginning of the shadow lock space
             lastbyte &= ~(1ULL << 63U);
-            OUTCOME_TRY(append_guard_, _h.lock_range(my_lock_request_offset, lastbyte, file_handle::lock_kind::exclusive));
+            OUTCOME_TRY(append_guard_, _h.lock_file_range(my_lock_request_offset, lastbyte, file_handle::lock_kind::exclusive));
             append_guard = std::move(append_guard_);
           }
           OUTCOME_TRYV(_h.write(0, {{reinterpret_cast<byte *>(&lock_request), sizeof(lock_request)}}));
@@ -338,7 +338,7 @@ namespace algorithm
           auto lock_offset = my_lock_request_offset;
           // Set the top bit to use the shadow lock space on Windows
           lock_offset |= (1ULL << 63U);
-          OUTCOME_TRY(my_request_guard_, _h.lock_range(lock_offset, sizeof(lock_request), file_handle::lock_kind::exclusive));
+          OUTCOME_TRY(my_request_guard_, _h.lock_file_range(lock_offset, sizeof(lock_request), file_handle::lock_kind::exclusive));
           my_request_guard = std::move(my_request_guard_);
         }
 
@@ -446,7 +446,7 @@ namespace algorithm
             auto lock_offset = record_offset;
             // Set the top bit to use the shadow lock space on Windows
             lock_offset |= (1ULL << 63U);
-            OUTCOME_TRYV(_h.lock_range(lock_offset, sizeof(*record), file_handle::lock_kind::shared, nd));
+            OUTCOME_TRYV(_h.lock_file_range(lock_offset, sizeof(*record), file_handle::lock_kind::shared, nd));
           }
           // Make sure we haven't timed out during this wait
           if(d)
