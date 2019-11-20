@@ -262,8 +262,6 @@ public:
   The asynchronous implementation in async_file_handle performs one calloc and one free.
   */
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_guard> lock_file_range(extent_type offset, extent_type bytes, lock_kind kind, deadline d = deadline()) noexcept;
-  //! \overload
-  result<extent_guard> try_lock_file_range(extent_type offset, extent_type bytes, lock_kind kind) noexcept { return lock_file_range(offset, bytes, kind, deadline(std::chrono::seconds(0))); }
   //! \overload EXTENSION: Locks for shared access
   result<extent_guard> lock_file_range(io_request<buffers_type> reqs, deadline d = deadline()) noexcept
   {
@@ -292,6 +290,8 @@ public:
     }
     return lock_file_range(reqs.offset, bytes, lock_kind::exclusive, d);
   }
+
+  LLFIO_DEADLINE_TRY_FOR_UNTIL(lock_file_range)
 
   /*! \brief EXTENSION: Unlocks a byte range previously locked.
 

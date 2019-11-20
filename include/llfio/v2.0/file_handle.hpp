@@ -246,6 +246,8 @@ public:
   */
   result<file_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
 
+  LLFIO_DEADLINE_TRY_FOR_UNTIL(clone)
+
   //! The i/o service this handle is attached to, if any
   io_service *service() const noexcept { return _service; }
 
@@ -264,6 +266,8 @@ public:
     }
     return std::move(ret).error();
   }
+
+  LLFIO_DEADLINE_TRY_FOR_UNTIL(read)
 
   /*! Return the current maximum permitted extent of the file.
 
@@ -313,6 +317,8 @@ public:
   */
   LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> zero(extent_type offset, extent_type bytes, deadline d = deadline()) noexcept;
+
+  LLFIO_DEADLINE_TRY_FOR_UNTIL(zero)
 };
 
 //! \brief Constructor for `file_handle`

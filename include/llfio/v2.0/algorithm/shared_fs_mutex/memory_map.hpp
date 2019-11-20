@@ -148,7 +148,7 @@ namespace algorithm
           _temphmap = {};
           // Release my shared locks and try locking inuse exclusively
           _hlockinuse.unlock();
-          auto lockresult = _h.try_lock_file_range(_initialisingoffset, 2, file_handle::lock_kind::exclusive);
+          auto lockresult = _h.lock_file_range(_initialisingoffset, 2, file_handle::lock_kind::exclusive, std::chrono::seconds(0));
 #ifndef NDEBUG
           if(!lockresult && lockresult.error() != errc::timed_out)
           {
@@ -202,7 +202,7 @@ namespace algorithm
           OUTCOME_TRY(ret, file_handle::file(base, lockfile, file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::reads));
           file_handle temph;
           // Am I the first person to this file? Lock everything exclusively
-          auto lockinuse = ret.try_lock_file_range(_initialisingoffset, 2, file_handle::lock_kind::exclusive);
+          auto lockinuse = ret.lock_file_range(_initialisingoffset, 2, file_handle::lock_kind::exclusive, std::chrono::seconds(0));
           if(lockinuse.has_error())
           {
             if(lockinuse.error() != errc::timed_out)

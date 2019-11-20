@@ -342,6 +342,8 @@ public:
   LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept;
 
+  LLFIO_DEADLINE_TRY_FOR_UNTIL(read)
+
   /*! \brief Write data to the open handle.
 
   \warning Depending on the implementation backend, not all of the buffers input may be written.
@@ -379,6 +381,8 @@ public:
     return std::move(ret).error();
   }
 
+  LLFIO_DEADLINE_TRY_FOR_UNTIL(write)
+
   /*! \brief Issue a write reordering barrier such that writes preceding the barrier will reach
   storage before writes after this barrier.
 
@@ -409,6 +413,8 @@ public:
   */
   LLFIO_MAKE_FREE_FUNCTION
   virtual io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), barrier_kind kind = barrier_kind::nowait_data_only, deadline d = deadline()) noexcept = 0;
+
+  LLFIO_DEADLINE_TRY_FOR_UNTIL(barrier)
 };
 
 
