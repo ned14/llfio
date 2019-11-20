@@ -45,9 +45,9 @@ var hierarchy =
     [ "llfio_v2_xxx::handle", "classllfio__v2__xxx_1_1handle.html", [
       [ "llfio_v2_xxx::io_handle", "classllfio__v2__xxx_1_1io__handle.html", [
         [ "llfio_v2_xxx::lockable_io_handle", "classllfio__v2__xxx_1_1lockable__io__handle.html", [
-          [ "llfio_v2_xxx::file_handle", "classllfio__v2__xxx_1_1file__handle.html", null ]
-        ] ],
-        [ "llfio_v2_xxx::map_handle", "classllfio__v2__xxx_1_1map__handle.html", null ]
+          [ "llfio_v2_xxx::file_handle", "classllfio__v2__xxx_1_1file__handle.html", null ],
+          [ "llfio_v2_xxx::map_handle", "classllfio__v2__xxx_1_1map__handle.html", null ]
+        ] ]
       ] ],
       [ "llfio_v2_xxx::path_handle", "classllfio__v2__xxx_1_1path__handle.html", [
         [ "llfio_v2_xxx::directory_handle", "classllfio__v2__xxx_1_1directory__handle.html", null ]
