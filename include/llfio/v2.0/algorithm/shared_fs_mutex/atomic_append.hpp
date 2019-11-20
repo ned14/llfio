@@ -206,7 +206,7 @@ namespace algorithm
         OUTCOME_TRY(ret, file_handle::file(base, lockfile, file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
         atomic_append_detail::header header;
         // Lock the entire header for exclusive access
-        auto lockresult = ret.try_lock_file_range(0, sizeof(header), file_handle::lock_kind::exclusive);
+        auto lockresult = ret.lock_file_range(0, sizeof(header), file_handle::lock_kind::exclusive, std::chrono::seconds(0));
         //! \todo fs_mutex_append needs to check if file still exists after lock is granted, awaiting path fetching.
         if(lockresult.has_error())
         {
