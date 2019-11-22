@@ -20,11 +20,6 @@ var classllfio__v2__xxx_1_1lockable__io__handle =
       [ "nowait_all", "classllfio__v2__xxx_1_1lockable__io__handle.html#a7816bb7ae5156fa2997b68e6300ae565ab7a52d26120f585b21e8960812db5bf1", null ],
       [ "wait_all", "classllfio__v2__xxx_1_1lockable__io__handle.html#a7816bb7ae5156fa2997b68e6300ae565a4e1789381cf8c976ec7a7118b3529345", null ]
     ] ],
-    [ "lock_kind", "classllfio__v2__xxx_1_1lockable__io__handle.html#a340e3aa1ceddfc6ba451b2878cd79a7d", [
-      [ "unlocked", "classllfio__v2__xxx_1_1lockable__io__handle.html#a340e3aa1ceddfc6ba451b2878cd79a7dad821dbe5ef2db3d805cd0f7eea0ec33f", null ],
-      [ "shared", "classllfio__v2__xxx_1_1lockable__io__handle.html#a340e3aa1ceddfc6ba451b2878cd79a7da9e81e7b963c71363e2fb3eefcfecfc0e", null ],
-      [ "exclusive", "classllfio__v2__xxx_1_1lockable__io__handle.html#a340e3aa1ceddfc6ba451b2878cd79a7daa4293995cfbfa9ce60ce71ade2ff75f7", null ]
-    ] ],
     [ "lockable_io_handle", "classllfio__v2__xxx_1_1lockable__io__handle.html#a4b3e88620e2a244900daf0918bcb8e5b", null ],
     [ "~lockable_io_handle", "classllfio__v2__xxx_1_1lockable__io__handle.html#ae1cdbb1cceb45b7a948b1a4bbe6942d4", null ],
     [ "lockable_io_handle", "classllfio__v2__xxx_1_1lockable__io__handle.html#a6bb5cbffe2bbdea3803667c3680f12c2", null ],

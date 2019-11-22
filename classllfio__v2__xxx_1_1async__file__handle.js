@@ -25,11 +25,6 @@ var classllfio__v2__xxx_1_1async__file__handle =
       [ "nowait_all", "classllfio__v2__xxx_1_1async__file__handle.html#a7816bb7ae5156fa2997b68e6300ae565ab7a52d26120f585b21e8960812db5bf1", null ],
       [ "wait_all", "classllfio__v2__xxx_1_1async__file__handle.html#a7816bb7ae5156fa2997b68e6300ae565a4e1789381cf8c976ec7a7118b3529345", null ]
     ] ],
-    [ "lock_kind", "classllfio__v2__xxx_1_1async__file__handle.html#a340e3aa1ceddfc6ba451b2878cd79a7d", [
-      [ "unlocked", "classllfio__v2__xxx_1_1async__file__handle.html#a340e3aa1ceddfc6ba451b2878cd79a7dad821dbe5ef2db3d805cd0f7eea0ec33f", null ],
-      [ "shared", "classllfio__v2__xxx_1_1async__file__handle.html#a340e3aa1ceddfc6ba451b2878cd79a7da9e81e7b963c71363e2fb3eefcfecfc0e", null ],
-      [ "exclusive", "classllfio__v2__xxx_1_1async__file__handle.html#a340e3aa1ceddfc6ba451b2878cd79a7daa4293995cfbfa9ce60ce71ade2ff75f7", null ]
-    ] ],
     [ "async_file_handle", "classllfio__v2__xxx_1_1async__file__handle.html#a8b72655442a5c5a17e609a6df96106e0", null ],
     [ "~async_file_handle", "classllfio__v2__xxx_1_1async__file__handle.html#a3674e63b664f6e3926991dc00c1312d2", null ],
     [ "async_file_handle", "classllfio__v2__xxx_1_1async__file__handle.html#a4e0afe8f9559163a716b722e280e4e13", null ],

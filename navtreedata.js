@@ -39,16 +39,16 @@ var NAVTREEINDEX =
 [
 ".html",
 "classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1lock__files.html#a5a7f463e9235bb95ddd84b69e2642613",
-"classllfio__v2__xxx_1_1async__file__handle.html#ab124dfae890ce2c1cad1840230e23073",
-"classllfio__v2__xxx_1_1fast__random__file__handle.html#afc5ba16c0377a56b7e1a66a9c6d0a703",
-"classllfio__v2__xxx_1_1io__handle.html#a7117e0e4327c09103c1f27a9363c8b24",
-"classllfio__v2__xxx_1_1map__handle.html#a97e0884c27147b4929be98961b8e9254",
-"classllfio__v2__xxx_1_1path__handle.html#acab4abf41e3a54d6f55ca28da526fc8a",
-"classllfio__v2__xxx_1_1symlink__handle.html#aea44ed050acfd8e4f9dec59ff194c746",
-"llfio_8hpp.html",
-"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a231c46161cc7164fa0c610c2f61a931c",
-"structllfio__v2__xxx_1_1native__handle__type.html#af9eb6d201364aae2e933da37caa4c1dd",
-"structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html"
+"classllfio__v2__xxx_1_1async__file__handle.html#ac1a82f9f61d49d8f6836c823950483ac",
+"classllfio__v2__xxx_1_1file__handle.html#a0ece4f0a48e1e67debc438a9742a1f4c",
+"classllfio__v2__xxx_1_1io__handle.html#a8085cb3b40982c6dbd874547c183fd5e",
+"classllfio__v2__xxx_1_1map__handle.html#ac5222904f116c9beb0515a4a5aa850bf",
+"classllfio__v2__xxx_1_1path__view.html#a2711832d81f40800e9d3915b9c37ff4e",
+"classllfio__v2__xxx_1_1unique__file__lock.html#ae8af367ca1475f4a3c415fd7fff18694",
+"map__handle_8hpp.html#ab50d07405d17a8fff4e360fd2612bc6f",
+"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a7e43886636755ba657a9fb5fce4d1c2f",
+"structllfio__v2__xxx_1_1stat__t.html#a40efc73a0eee503c070ae843754504d2",
+"utils_8hpp.html#a2305cf865b7952f58aba997c4ac95efb"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

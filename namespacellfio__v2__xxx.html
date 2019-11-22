@@ -84,6 +84,7 @@ $(document).ready(function(){initNavTree('namespacellfio__v2__xxx.html','');});
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">llfio_v2_xxx Namespace Reference</div>  </div>
@@ -237,6 +238,15 @@ template&lt;class T &gt; </td></tr>
 template&lt;class T &gt; </td></tr>
 <tr class="memitem:a6ddb7c2bee277fc16207b7e8cb05693f"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>outcome</b> = OUTCOME_V2_NAMESPACE::outcome&lt; T, <a class="el" href="structllfio__v2__xxx_1_1error__info.html">error_info</a> &gt;</td></tr>
 <tr class="separator:a6ddb7c2bee277fc16207b7e8cb05693f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:ae79486289ff1386b26d1ce60bb797d33"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33">lock_kind</a> { <a class="el" href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33ad821dbe5ef2db3d805cd0f7eea0ec33f">lock_kind::unlocked</a>, 
+<a class="el" href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33a9e81e7b963c71363e2fb3eefcfecfc0e">lock_kind::shared</a>, 
+<a class="el" href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33aa4293995cfbfa9ce60ce71ade2ff75f7">lock_kind::exclusive</a>
+ }<tr class="memdesc:ae79486289ff1386b26d1ce60bb797d33"><td class="mdescLeft">&#160;</td><td class="mdescRight">The kinds of concurrent user exclusion which can be performed.  <a href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33">More...</a><br /></td></tr>
+</td></tr>
+<tr class="separator:ae79486289ff1386b26d1ce60bb797d33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -480,7 +490,43 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The LLFIO namespace. </p>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000002">Todo:</a></b></dt><dd>TODO FIXME Replace in-memory log with memory map file backed log. </dd></dl>
-</div><h2 class="groupheader">Function Documentation</h2>
+</div><h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="ae79486289ff1386b26d1ce60bb797d33"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae79486289ff1386b26d1ce60bb797d33">&#9670;&nbsp;</a></span>lock_kind</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33">llfio_v2_xxx::lock_kind</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The kinds of concurrent user exclusion which can be performed. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ae79486289ff1386b26d1ce60bb797d33ad821dbe5ef2db3d805cd0f7eea0ec33f"></a>unlocked&#160;</td><td class="fielddoc"><p>Exclude none. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ae79486289ff1386b26d1ce60bb797d33a9e81e7b963c71363e2fb3eefcfecfc0e"></a>shared&#160;</td><td class="fielddoc"><p>Exclude only those requesting an exclusive lock on the same inode. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ae79486289ff1386b26d1ce60bb797d33aa4293995cfbfa9ce60ce71ade2ff75f7"></a>exclusive&#160;</td><td class="fielddoc"><p>Exclude those requesting any kind of lock on the same inode. </p>
+</td></tr>
+</table>
+<div class="fragment"><div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;{</div><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <a class="code" href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33ad821dbe5ef2db3d805cd0f7eea0ec33f">unlocked</a>,  <span class="comment">//!&lt; Exclude none.</span></div><div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="comment"></span>  <a class="code" href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33a9e81e7b963c71363e2fb3eefcfecfc0e">shared</a>,    <span class="comment">//!&lt; Exclude only those requesting an exclusive lock on the same inode.</span></div><div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="comment"></span>  <a class="code" href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33aa4293995cfbfa9ce60ce71ade2ff75f7">exclusive</a>  <span class="comment">//!&lt; Exclude those requesting any kind of lock on the same inode.</span></div><div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="comment"></span>};</div><div class="ttc" id="namespacellfio__v2__xxx_html_ae79486289ff1386b26d1ce60bb797d33aa4293995cfbfa9ce60ce71ade2ff75f7"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33aa4293995cfbfa9ce60ce71ade2ff75f7">llfio_v2_xxx::lock_kind::exclusive</a></div><div class="ttdoc">Exclude those requesting any kind of lock on the same inode. </div></div>
+<div class="ttc" id="namespacellfio__v2__xxx_html_ae79486289ff1386b26d1ce60bb797d33ad821dbe5ef2db3d805cd0f7eea0ec33f"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33ad821dbe5ef2db3d805cd0f7eea0ec33f">llfio_v2_xxx::lock_kind::unlocked</a></div><div class="ttdoc">Exclude none. </div></div>
+<div class="ttc" id="namespacellfio__v2__xxx_html_ae79486289ff1386b26d1ce60bb797d33a9e81e7b963c71363e2fb3eefcfecfc0e"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33a9e81e7b963c71363e2fb3eefcfecfc0e">llfio_v2_xxx::lock_kind::shared</a></div><div class="ttdoc">Exclude only those requesting an exclusive lock on the same inode. </div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
 <a id="ab8bf2fda0abbb11fdeb77d25f8288149"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab8bf2fda0abbb11fdeb77d25f8288149">&#9670;&nbsp;</a></span>async_file()</h2>
 

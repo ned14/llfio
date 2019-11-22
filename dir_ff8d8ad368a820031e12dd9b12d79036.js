@@ -16,11 +16,7 @@ var dir_ff8d8ad368a820031e12dd9b12d79036 =
     [ "io_handle.hpp", "io__handle_8hpp.html", "io__handle_8hpp" ],
     [ "io_service.hpp", "io__service_8hpp.html", "io__service_8hpp" ],
     [ "llfio.hpp", "v2_80_2llfio_8hpp.html", "v2_80_2llfio_8hpp" ],
-    [ "lockable_io_handle.hpp", "lockable__io__handle_8hpp.html", [
-      [ "lockable_io_handle", "classllfio__v2__xxx_1_1lockable__io__handle.html", "classllfio__v2__xxx_1_1lockable__io__handle" ],
-      [ "extent_guard", "classllfio__v2__xxx_1_1lockable__io__handle_1_1extent__guard.html", "classllfio__v2__xxx_1_1lockable__io__handle_1_1extent__guard" ],
-      [ "unique_file_lock", "classllfio__v2__xxx_1_1unique__file__lock.html", "classllfio__v2__xxx_1_1unique__file__lock" ]
-    ] ],
+    [ "lockable_io_handle.hpp", "lockable__io__handle_8hpp.html", "lockable__io__handle_8hpp" ],
     [ "map_handle.hpp", "map__handle_8hpp.html", "map__handle_8hpp" ],
     [ "mapped.hpp", "mapped_8hpp.html", [
       [ "mapped", "classllfio__v2__xxx_1_1mapped.html", "classllfio__v2__xxx_1_1mapped" ]
