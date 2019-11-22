@@ -34,7 +34,7 @@ LLFIO_V2_NAMESPACE_BEGIN
   if(0 == bytes)
   {
     // Non-Linux has a sane locking system in flock() if you are willing to lock the entire file
-    int operation = ((d && !d.nsecs) ? LOCK_NB : 0) | ((kind != file_handle::lock_kind::shared) ? LOCK_EX : LOCK_SH);
+    int operation = ((d && !d.nsecs) ? LOCK_NB : 0) | ((kind != lock_kind::shared) ? LOCK_EX : LOCK_SH);
     if(-1 == flock(_v.fd, operation))
       failed = true;
   }
@@ -101,7 +101,7 @@ void lockable_io_handle::unlock_file_shared() noexcept
 }
 
 
-result<lockable_io_handle::extent_guard> lockable_io_handle::lock_file_range(io_handle::extent_type offset, io_handle::extent_type bytes, lockable_io_handle::lock_kind kind, deadline d) noexcept
+result<lockable_io_handle::extent_guard> lockable_io_handle::lock_file_range(io_handle::extent_type offset, io_handle::extent_type bytes, lock_kind kind, deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   if(d && d.nsecs > 0)
@@ -114,7 +114,7 @@ result<lockable_io_handle::extent_guard> lockable_io_handle::lock_file_range(io_
     {
     };
     memset(&fl, 0, sizeof(fl));
-    fl.l_type = (kind != lockable_io_handle::lock_kind::shared) ? F_WRLCK : F_RDLCK;
+    fl.l_type = (kind != lock_kind::shared) ? F_WRLCK : F_RDLCK;
     constexpr extent_type extent_topbit = static_cast<extent_type>(1) << (8 * sizeof(extent_type) - 1);
     if((offset & extent_topbit) != 0u)
     {

@@ -95,7 +95,7 @@ namespace algorithm
             if(!it->second.reader_tids.empty())
             {
               // Downgrade the lock from exclusive to shared
-              auto l = _h.lock_file_range(entity.value, 1, file_handle::lock_kind::shared).value();
+              auto l = _h.lock_file_range(entity.value, 1, lock_kind::shared).value();
 #ifndef _WIN32
               // On POSIX byte range locks replace
               it->second.filelock.release();
@@ -207,7 +207,7 @@ namespace algorithm
                   }
                   // Allow other threads to use this threaded_byte_ranges
                   guard.unlock();
-                  auto outcome = _h.lock_file_range(out.entities[n].value, 1, (out.entities[n].exclusive != 0u) ? file_handle::lock_kind::exclusive : file_handle::lock_kind::shared, nd);
+                  auto outcome = _h.lock_file_range(out.entities[n].value, 1, (out.entities[n].exclusive != 0u) ? lock_kind::exclusive : lock_kind::shared, nd);
                   guard.lock();
                   if(!outcome)
                   {
@@ -294,7 +294,7 @@ namespace algorithm
                 }
                 // Allow other threads to use this threaded_byte_ranges
                 guard.unlock();
-                auto outcome = _h.lock_file_range(out.entities[n].value, 1, file_handle::lock_kind::exclusive, nd);
+                auto outcome = _h.lock_file_range(out.entities[n].value, 1, lock_kind::exclusive, nd);
                 guard.lock();
                 if(!outcome)
                 {

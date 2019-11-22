@@ -204,7 +204,7 @@ namespace key_value_store
             if(mode == llfio::file_handle::mode::write && !_mysmallfile.is_valid())
             {
               // Try to claim this small file
-              auto smallfileclaimed = fh.value().lock_file_range(_indexinuseoffset, 1, llfio::file_handle::lock_kind::exclusive, std::chrono::seconds(0));
+              auto smallfileclaimed = fh.value().lock_file_range(_indexinuseoffset, 1, llfio::lock_kind::exclusive, std::chrono::seconds(0));
               if(smallfileclaimed)
               {
                 _mysmallfile = llfio::file_handle::file(dir, name, llfio::file_handle::mode::write, llfio::file_handle::creation::open_existing, caching).value();
@@ -272,7 +272,7 @@ namespace key_value_store
       if(mode == llfio::file_handle::mode::write)
       {
         // Try an exclusive lock on inuse byte of the index file
-        auto indexinuse = _indexfile.lock_file_range(_indexinuseoffset, 1, llfio::file_handle::lock_kind::exclusive, std::chrono::seconds(0));
+        auto indexinuse = _indexfile.lock_file_range(_indexinuseoffset, 1, llfio::lock_kind::exclusive, std::chrono::seconds(0));
         if(indexinuse.has_value())
         {
           // I am the first entrant into this data store
@@ -311,7 +311,7 @@ namespace key_value_store
         }
       }
       // Take a shared lock, blocking if someone is still setting things up
-      _indexfileguard = _indexfile.lock_file_range(_indexinuseoffset, 1, llfio::file_handle::lock_kind::shared).value();
+      _indexfileguard = _indexfile.lock_file_range(_indexinuseoffset, 1, llfio::lock_kind::shared).value();
       {
         llfio::byte buffer[8];
         _indexfile.read(0, {{buffer, 8}}).value();
@@ -346,7 +346,7 @@ namespace key_value_store
       _mysmallfile.close().value();
       // Try to lock the index exclusively
       _indexfileguard.unlock();
-      auto indexfileguard = _indexfile.lock_file_range(_indexinuseoffset, 1, llfio::file_handle::lock_kind::exclusive, std::chrono::seconds(0));
+      auto indexfileguard = _indexfile.lock_file_range(_indexinuseoffset, 1, llfio::lock_kind::exclusive, std::chrono::seconds(0));
       if(indexfileguard)
       {
         // I am the last user
