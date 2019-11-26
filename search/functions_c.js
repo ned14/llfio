@@ -18,5 +18,6 @@ var searchData=
   ['memory_5fbacked_5ftemporary_5ffiles_5fdirectory',['memory_backed_temporary_files_directory',['../namespacellfio__v2__xxx_1_1path__discovery.html#ade18f14d3ef37488e8967c87faa04d29',1,'llfio_v2_xxx::path_discovery']]],
   ['memory_5fmap',['memory_map',['../classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a60b0c32576780e9588b6b58770bc849d',1,'llfio_v2_xxx::algorithm::shared_fs_mutex::memory_map::memory_map(const memory_map &amp;)=delete'],['../classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#a70d275a5256eec64030bfffa87acdb87',1,'llfio_v2_xxx::algorithm::shared_fs_mutex::memory_map::memory_map(memory_map &amp;&amp;o) noexcept']]],
   ['metadata',['metadata',['../structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a14d4df3a12986e4938ec8a5f8427e4ca',1,'llfio_v2_xxx::directory_handle::buffers_type']]],
+  ['multiplexer',['multiplexer',['../classllfio__v2__xxx_1_1handle.html#a02769f641a80a18ef52431df9c530d9b',1,'llfio_v2_xxx::handle']]],
   ['mutex',['mutex',['../classllfio__v2__xxx_1_1unique__file__lock.html#ac66e90389ea1568453ca7df71db96f16',1,'llfio_v2_xxx::unique_file_lock']]]
 ];

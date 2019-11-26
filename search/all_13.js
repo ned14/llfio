@@ -3,6 +3,7 @@ var searchData=
   ['temp_5fdirectory',['temp_directory',['../classllfio__v2__xxx_1_1directory__handle.html#a3513e9a84f1bc13bb4500dbab84207c4',1,'llfio_v2_xxx::directory_handle::temp_directory()'],['../namespacellfio__v2__xxx.html#addbdc12d4993a8ee40c105a02a105a61',1,'llfio_v2_xxx::temp_directory()']]],
   ['temp_5ffile',['temp_file',['../classllfio__v2__xxx_1_1file__handle.html#a428114e3c8628c0621b1aa156051651c',1,'llfio_v2_xxx::file_handle::temp_file()'],['../namespacellfio__v2__xxx.html#a70d9ef3b988a880d171015b754bb7b27',1,'llfio_v2_xxx::temp_file()']]],
   ['temp_5finode',['temp_inode',['../classllfio__v2__xxx_1_1file__handle.html#a1eff21e1833be0c21f72477c593fadc5',1,'llfio_v2_xxx::file_handle::temp_inode()'],['../namespacellfio__v2__xxx.html#ac8d9dc908fe39f9c896e99f6b7a39d81',1,'llfio_v2_xxx::temp_inode()']]],
+  ['temp_5fpipe',['temp_pipe',['../classllfio__v2__xxx_1_1pipe__handle.html#a695115a7dc168a8647fb80b0d859ed9b',1,'llfio_v2_xxx::pipe_handle']]],
   ['temporary',['temporary',['../classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852ad5197d93c063a2b1e22d1630a39b7aef',1,'llfio_v2_xxx::handle']]],
   ['todo_20list',['Todo List',['../todo.html',1,'']]],
   ['transaction',['transaction',['../classkvstore__v1__xxx_1_1basic__key__value__store_1_1transaction.html',1,'kvstore_v1_xxx::basic_key_value_store']]],

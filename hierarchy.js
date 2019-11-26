@@ -20,6 +20,7 @@ var hierarchy =
     [ "llfio_v2_xxx::construct< map_handle >", "structllfio__v2__xxx_1_1construct_3_01map__handle_01_4.html", null ],
     [ "llfio_v2_xxx::construct< mapped_file_handle >", "structllfio__v2__xxx_1_1construct_3_01mapped__file__handle_01_4.html", null ],
     [ "llfio_v2_xxx::construct< path_handle >", "structllfio__v2__xxx_1_1construct_3_01path__handle_01_4.html", null ],
+    [ "llfio_v2_xxx::construct< pipe_handle >", "structllfio__v2__xxx_1_1construct_3_01pipe__handle_01_4.html", null ],
     [ "llfio_v2_xxx::construct< section_handle >", "structllfio__v2__xxx_1_1construct_3_01section__handle_01_4.html", null ],
     [ "llfio_v2_xxx::construct< symlink_handle >", "structllfio__v2__xxx_1_1construct_3_01symlink__handle_01_4.html", null ],
     [ "llfio_v2_xxx::deadline", "structllfio__v2__xxx_1_1deadline.html", null ],
@@ -40,6 +41,7 @@ var hierarchy =
         [ "llfio_v2_xxx::fast_random_file_handle", "classllfio__v2__xxx_1_1fast__random__file__handle.html", null ],
         [ "llfio_v2_xxx::mapped_file_handle", "classllfio__v2__xxx_1_1mapped__file__handle.html", null ]
       ] ],
+      [ "llfio_v2_xxx::pipe_handle", "classllfio__v2__xxx_1_1pipe__handle.html", null ],
       [ "llfio_v2_xxx::symlink_handle", "classllfio__v2__xxx_1_1symlink__handle.html", null ]
     ] ],
     [ "llfio_v2_xxx::handle", "classllfio__v2__xxx_1_1handle.html", [
@@ -47,7 +49,8 @@ var hierarchy =
         [ "llfio_v2_xxx::lockable_io_handle", "classllfio__v2__xxx_1_1lockable__io__handle.html", [
           [ "llfio_v2_xxx::file_handle", "classllfio__v2__xxx_1_1file__handle.html", null ],
           [ "llfio_v2_xxx::map_handle", "classllfio__v2__xxx_1_1map__handle.html", null ]
-        ] ]
+        ] ],
+        [ "llfio_v2_xxx::pipe_handle", "classllfio__v2__xxx_1_1pipe__handle.html", null ]
       ] ],
       [ "llfio_v2_xxx::path_handle", "classllfio__v2__xxx_1_1path__handle.html", [
         [ "llfio_v2_xxx::directory_handle", "classllfio__v2__xxx_1_1directory__handle.html", null ]

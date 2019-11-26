@@ -3,7 +3,7 @@ var searchData=
   ['back',['back',['../structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a8b3f69d7e670bf45727baa9e9ed30141',1,'llfio_v2_xxx::algorithm::impl::trivial_vector_impl::back()'],['../structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#aba4b731aa0cd0d654976d34d5c10388f',1,'llfio_v2_xxx::algorithm::impl::trivial_vector_impl::back() const']]],
   ['backing',['backing',['../classllfio__v2__xxx_1_1section__handle.html#a680320bd539378d99870d9b2cdedb9c8',1,'llfio_v2_xxx::section_handle']]],
   ['backing_5fnative_5fhandle',['backing_native_handle',['../classllfio__v2__xxx_1_1section__handle.html#aea14a4f834500e412db39efd998f438a',1,'llfio_v2_xxx::section_handle']]],
-  ['barrier',['barrier',['../classllfio__v2__xxx_1_1io__handle.html#a823391cea8818da742c0d4c573f7300f',1,'llfio_v2_xxx::io_handle']]],
+  ['barrier',['barrier',['../classllfio__v2__xxx_1_1io__handle.html#a6a1044eeb6ab16939e4669bbeb071b32',1,'llfio_v2_xxx::io_handle']]],
   ['barrier_5fkind',['barrier_kind',['../classllfio__v2__xxx_1_1io__handle.html#a7816bb7ae5156fa2997b68e6300ae565',1,'llfio_v2_xxx::io_handle']]],
   ['base_2ehpp',['base.hpp',['../base_8hpp.html',1,'']]],
   ['basic_5fkey_5fvalue_5fstore',['basic_key_value_store',['../classkvstore__v1__xxx_1_1basic__key__value__store.html',1,'kvstore_v1_xxx::basic_key_value_store'],['../classkvstore__v1__xxx_1_1basic__key__value__store.html#a626aa5e393870b8ad926c3efdbeb364e',1,'kvstore_v1_xxx::basic_key_value_store::basic_key_value_store()']]],

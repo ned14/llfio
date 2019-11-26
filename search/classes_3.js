@@ -13,6 +13,7 @@ var searchData=
   ['construct_3c_20map_5fhandle_20_3e',['construct&lt; map_handle &gt;',['../structllfio__v2__xxx_1_1construct_3_01map__handle_01_4.html',1,'llfio_v2_xxx']]],
   ['construct_3c_20mapped_5ffile_5fhandle_20_3e',['construct&lt; mapped_file_handle &gt;',['../structllfio__v2__xxx_1_1construct_3_01mapped__file__handle_01_4.html',1,'llfio_v2_xxx']]],
   ['construct_3c_20path_5fhandle_20_3e',['construct&lt; path_handle &gt;',['../structllfio__v2__xxx_1_1construct_3_01path__handle_01_4.html',1,'llfio_v2_xxx']]],
+  ['construct_3c_20pipe_5fhandle_20_3e',['construct&lt; pipe_handle &gt;',['../structllfio__v2__xxx_1_1construct_3_01pipe__handle_01_4.html',1,'llfio_v2_xxx']]],
   ['construct_3c_20section_5fhandle_20_3e',['construct&lt; section_handle &gt;',['../structllfio__v2__xxx_1_1construct_3_01section__handle_01_4.html',1,'llfio_v2_xxx']]],
   ['construct_3c_20symlink_5fhandle_20_3e',['construct&lt; symlink_handle &gt;',['../structllfio__v2__xxx_1_1construct_3_01symlink__handle_01_4.html',1,'llfio_v2_xxx']]]
 ];

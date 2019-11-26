@@ -28,6 +28,10 @@ var dir_ff8d8ad368a820031e12dd9b12d79036 =
     [ "path_discovery.hpp", "path__discovery_8hpp.html", "path__discovery_8hpp" ],
     [ "path_handle.hpp", "path__handle_8hpp.html", "path__handle_8hpp" ],
     [ "path_view.hpp", "path__view_8hpp.html", "path__view_8hpp" ],
+    [ "pipe_handle.hpp", "pipe__handle_8hpp.html", [
+      [ "pipe_handle", "classllfio__v2__xxx_1_1pipe__handle.html", "classllfio__v2__xxx_1_1pipe__handle" ],
+      [ "construct< pipe_handle >", "structllfio__v2__xxx_1_1construct_3_01pipe__handle_01_4.html", "structllfio__v2__xxx_1_1construct_3_01pipe__handle_01_4" ]
+    ] ],
     [ "stat.hpp", "stat_8hpp.html", [
       [ "stat_t", "structllfio__v2__xxx_1_1stat__t.html", "structllfio__v2__xxx_1_1stat__t" ]
     ] ],

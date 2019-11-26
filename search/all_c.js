@@ -26,5 +26,6 @@ var searchData=
   ['min_5fkey_5fsize',['min_key_size',['../structkvstore__v1__xxx_1_1basic__key__value__store__info.html#a3a48e754b1f0ccb700a1d17663f0bbb4',1,'kvstore_v1_xxx::basic_key_value_store_info']]],
   ['min_5fvalue_5fsize',['min_value_size',['../structkvstore__v1__xxx_1_1basic__key__value__store__info.html#a413b348bd19556537cd4ff287b937b0a',1,'kvstore_v1_xxx::basic_key_value_store_info']]],
   ['mode',['mode',['../classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca',1,'llfio_v2_xxx::handle::mode()'],['../structkvstore__v1__xxx_1_1basic__key__value__store__info.html#a2c1743edd93e794407f21911c9f72483',1,'kvstore_v1_xxx::basic_key_value_store_info::mode()'],['../classkvstore__v1__xxx_1_1basic__key__value__store.html#ad7d315f979abada8f65bb8ccfa19efe6',1,'kvstore_v1_xxx::basic_key_value_store::mode()']]],
+  ['multiplexer',['multiplexer',['../classllfio__v2__xxx_1_1handle.html#a02769f641a80a18ef52431df9c530d9b',1,'llfio_v2_xxx::handle']]],
   ['mutex',['mutex',['../classllfio__v2__xxx_1_1unique__file__lock.html#ac66e90389ea1568453ca7df71db96f16',1,'llfio_v2_xxx::unique_file_lock']]]
 ];
