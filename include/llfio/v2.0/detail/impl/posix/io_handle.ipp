@@ -24,8 +24,11 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../../../io_handle.hpp"
 
+#include "import.hpp"
+
 #include <climits>  // for IOV_MAX
 #include <fcntl.h>
+#include <poll.h>
 #include <sys/uio.h>  // for preadv etc
 #include <unistd.h>
 #if LLFIO_USE_POSIX_AIO
@@ -67,7 +70,7 @@ size_t io_handle::max_buffers() const noexcept
 io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_request<io_handle::buffers_type> reqs, deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  if(d)
+  if(d && !_v.is_nonblocking())
   {
     return errc::not_supported;
   }
@@ -75,6 +78,7 @@ io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_requ
   {
     return errc::argument_list_too_long;
   }
+  LLFIO_POSIX_DEADLINE_TO_SLEEP_INIT(d);
 #if 0
   struct iovec *iov = (struct iovec *) alloca(reqs.buffers.size() * sizeof(struct iovec));
   for(size_t n = 0; n < reqs.buffers.size(); n++)
@@ -97,19 +101,47 @@ io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_requ
   }
 #endif
   ssize_t bytesread = 0;
+  if(is_seekable())
+  {
 #if LLFIO_MISSING_PIOV
-  off_t offset = reqs.offset;
-  for(size_t n = 0; n < reqs.buffers.size(); n++)
-  {
-    bytesread += ::pread(_v.fd, iov[n].iov_base, iov[n].iov_len, offset);
-    offset += iov[n].iov_len;
-  }
+    off_t offset = reqs.offset;
+    for(size_t n = 0; n < reqs.buffers.size(); n++)
+    {
+      bytesread += ::pread(_v.fd, iov[n].iov_base, iov[n].iov_len, offset);
+      offset += iov[n].iov_len;
+    }
 #else
-  bytesread = ::preadv(_v.fd, iov, reqs.buffers.size(), reqs.offset);
+    bytesread = ::preadv(_v.fd, iov, reqs.buffers.size(), reqs.offset);
 #endif
-  if(bytesread < 0)
+    if(bytesread < 0)
+    {
+      return posix_error();
+    }
+  }
+  else
   {
-    return posix_error();
+    do
+    {
+      bytesread = ::readv(_v.fd, iov, reqs.buffers.size());
+      if(bytesread < 0)
+      {
+        if(EWOULDBLOCK != errno && EAGAIN != errno)
+        {
+          return posix_error();
+        }
+        LLFIO_POSIX_DEADLINE_TO_SLEEP_LOOP(d);
+        int mstimeout = (timeout == nullptr) ? -1 : (timeout->tv_sec * 1000 + timeout->tv_nsec / 1000000LL);
+        pollfd p;
+        memset(&p, 0, sizeof(p));
+        p.fd = _v.fd;
+        p.events = POLLIN | POLLERR;
+        if(-1 == ::poll(&p, 1, mstimeout))
+        {
+          return posix_error();
+        }
+        LLFIO_POSIX_DEADLINE_TO_TIMEOUT_LOOP(d)
+      }
+    } while(bytesread <= 0);
   }
   for(size_t i = 0; i < reqs.buffers.size(); i++)
   {
@@ -131,7 +163,7 @@ io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_requ
 io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::io_request<io_handle::const_buffers_type> reqs, deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  if(d)
+  if(d && !_v.is_nonblocking())
   {
     return errc::not_supported;
   }
@@ -139,6 +171,7 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::
   {
     return errc::argument_list_too_long;
   }
+  LLFIO_POSIX_DEADLINE_TO_SLEEP_INIT(d);
 #if 0
   struct iovec *iov = (struct iovec *) alloca(reqs.buffers.size() * sizeof(struct iovec));
   for(size_t n = 0; n < reqs.buffers.size(); n++)
@@ -161,19 +194,47 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::
   }
 #endif
   ssize_t byteswritten = 0;
+  if(is_seekable())
+  {
 #if LLFIO_MISSING_PIOV
-  off_t offset = reqs.offset;
-  for(size_t n = 0; n < reqs.buffers.size(); n++)
-  {
-    byteswritten += ::pwrite(_v.fd, iov[n].iov_base, iov[n].iov_len, offset);
-    offset += iov[n].iov_len;
-  }
+    off_t offset = reqs.offset;
+    for(size_t n = 0; n < reqs.buffers.size(); n++)
+    {
+      byteswritten += ::pwrite(_v.fd, iov[n].iov_base, iov[n].iov_len, offset);
+      offset += iov[n].iov_len;
+    }
 #else
-  byteswritten = ::pwritev(_v.fd, iov, reqs.buffers.size(), reqs.offset);
+    byteswritten = ::pwritev(_v.fd, iov, reqs.buffers.size(), reqs.offset);
 #endif
-  if(byteswritten < 0)
+    if(byteswritten < 0)
+    {
+      return posix_error();
+    }
+  }
+  else
   {
-    return posix_error();
+    do
+    {
+      byteswritten = ::writev(_v.fd, iov, reqs.buffers.size());
+      if(byteswritten < 0)
+      {
+        if(EWOULDBLOCK != errno && EAGAIN != errno)
+        {
+          return posix_error();
+        }
+        LLFIO_POSIX_DEADLINE_TO_SLEEP_LOOP(d);
+        int mstimeout = (timeout == nullptr) ? -1 : (timeout->tv_sec * 1000 + timeout->tv_nsec / 1000000LL);
+        pollfd p;
+        memset(&p, 0, sizeof(p));
+        p.fd = _v.fd;
+        p.events = POLLOUT | POLLERR;
+        if(-1 == ::poll(&p, 1, mstimeout))
+        {
+          return posix_error();
+        }
+        LLFIO_POSIX_DEADLINE_TO_TIMEOUT_LOOP(d)
+      }
+    } while(byteswritten <= 0);
   }
   for(size_t i = 0; i < reqs.buffers.size(); i++)
   {
@@ -189,6 +250,65 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::
       break;
     }
   }
+  return {reqs.buffers};
+}
+
+io_handle::io_result<io_handle::const_buffers_type> io_handle::barrier(io_handle::io_request<io_handle::const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
+{
+  (void) kind;
+  LLFIO_LOG_FUNCTION_CALL(this);
+  if(d)
+  {
+    return errc::not_supported;
+  }
+#ifdef __linux__
+  if(kind == barrier_kind::nowait_data_only || kind == barrier_kind::wait_data_only)
+  {
+    // Linux has a lovely dedicated syscall giving us exactly what we need here
+    extent_type offset = reqs.offset, bytes = 0;
+    // empty buffers means bytes = 0 which means sync entire file
+    for(const auto &req : reqs.buffers)
+    {
+      bytes += req.size();
+    }
+    unsigned flags = SYNC_FILE_RANGE_WRITE;  // start writing all dirty pages in range now
+    if(kind == barrier_kind::wait_data_only)
+    {
+      flags |= SYNC_FILE_RANGE_WAIT_BEFORE | SYNC_FILE_RANGE_WAIT_AFTER;  // block until they're on storage
+    }
+    if(-1 != ::sync_file_range(_v.fd, offset, bytes, flags))
+    {
+      return {reqs.buffers};
+    }
+  }
+#endif
+#if !defined(__FreeBSD__) && !defined(__APPLE__)  // neither of these have fdatasync()
+  if(kind == barrier_kind::nowait_data_only || kind == barrier_kind::wait_data_only)
+  {
+    if(-1 == ::fdatasync(_v.fd))
+    {
+      return posix_error();
+    }
+    return {reqs.buffers};
+  }
+#endif
+#ifdef __APPLE__
+  if(kind == barrier_kind::nowait_data_only || kind == barrier_kind::nowait_all)
+  {
+    // OS X fsync doesn't wait for the device to flush its buffers
+    if(-1 == ::fsync(_v.fd))
+      return posix_error();
+    return {std::move(reqs.buffers)};
+  }
+  // This is the fsync as on every other OS
+  if(-1 == ::fcntl(_v.fd, F_FULLFSYNC))
+    return posix_error();
+#else
+  if(-1 == ::fsync(_v.fd))
+  {
+    return posix_error();
+  }
+#endif
   return {reqs.buffers};
 }
 

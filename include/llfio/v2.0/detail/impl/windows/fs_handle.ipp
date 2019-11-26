@@ -116,7 +116,7 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
       {
         return success(std::move(currentdirh));
       }
-      LLFIO_WIN_DEADLINE_TO_TIMEOUT(d);
+      LLFIO_WIN_DEADLINE_TO_TIMEOUT_LOOP(d);
     }
   }
   catch(...)

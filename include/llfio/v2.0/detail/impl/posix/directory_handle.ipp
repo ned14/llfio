@@ -64,6 +64,9 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     return errc::is_a_directory;
   }
   OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, _caching, flags));
+  attribs &= ~O_NONBLOCK;
+  nativeh.behaviour &= ~native_handle_type::disposition::nonblocking;
+  nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
 #ifdef O_DIRECTORY
   attribs |= O_DIRECTORY;
 #endif

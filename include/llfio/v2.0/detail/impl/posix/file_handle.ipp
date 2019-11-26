@@ -35,6 +35,8 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   LLFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::file;
   OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, _caching, flags));
+  attribs &= ~O_NONBLOCK;
+  nativeh.behaviour &= ~native_handle_type::disposition::nonblocking;
   path_view::c_str<> zpath(path);
   if(base.is_valid())
   {
@@ -108,6 +110,8 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   nativeh.behaviour |= native_handle_type::disposition::file;
   // Open file exclusively to prevent collision
   OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, creation::only_if_not_exist, _caching, flags));
+  attribs &= ~O_NONBLOCK;
+  nativeh.behaviour &= ~native_handle_type::disposition::nonblocking;
 #ifdef O_TMPFILE
   // Linux has a special flag just for this use case
   attribs |= O_TMPFILE;
@@ -152,65 +156,6 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
     ret.value()._flags &= ~flag::unlink_on_first_close;
     return ret;
   }
-}
-
-file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(file_handle::io_request<file_handle::const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
-{
-  (void) kind;
-  LLFIO_LOG_FUNCTION_CALL(this);
-  if(d)
-  {
-    return errc::not_supported;
-  }
-#ifdef __linux__
-  if(kind == barrier_kind::nowait_data_only || kind == barrier_kind::wait_data_only)
-  {
-    // Linux has a lovely dedicated syscall giving us exactly what we need here
-    extent_type offset = reqs.offset, bytes = 0;
-    // empty buffers means bytes = 0 which means sync entire file
-    for(const auto &req : reqs.buffers)
-    {
-      bytes += req.size();
-    }
-    unsigned flags = SYNC_FILE_RANGE_WRITE;  // start writing all dirty pages in range now
-    if(kind == barrier_kind::wait_data_only)
-    {
-      flags |= SYNC_FILE_RANGE_WAIT_BEFORE | SYNC_FILE_RANGE_WAIT_AFTER;  // block until they're on storage
-    }
-    if(-1 != ::sync_file_range(_v.fd, offset, bytes, flags))
-    {
-      return {reqs.buffers};
-    }
-  }
-#endif
-#if !defined(__FreeBSD__) && !defined(__APPLE__)  // neither of these have fdatasync()
-  if(kind == barrier_kind::nowait_data_only || kind == barrier_kind::wait_data_only)
-  {
-    if(-1 == ::fdatasync(_v.fd))
-    {
-      return posix_error();
-    }
-    return {reqs.buffers};
-  }
-#endif
-#ifdef __APPLE__
-  if(kind == barrier_kind::nowait_data_only || kind == barrier_kind::nowait_all)
-  {
-    // OS X fsync doesn't wait for the device to flush its buffers
-    if(-1 == ::fsync(_v.fd))
-      return posix_error();
-    return {std::move(reqs.buffers)};
-  }
-  // This is the fsync as on every other OS
-  if(-1 == ::fcntl(_v.fd, F_FULLFSYNC))
-    return posix_error();
-#else
-  if(-1 == ::fsync(_v.fd))
-  {
-    return posix_error();
-  }
-#endif
-  return {reqs.buffers};
 }
 
 result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d) const noexcept

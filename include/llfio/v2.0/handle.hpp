@@ -42,6 +42,9 @@ Distributed under the Boost Software License, Version 1.0.
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 class fs_handle;
+class io_context;
+
+#pragma pack(push, 4)
 
 /*! \class handle
 \brief A native_handle_type which is managed by the lifetime of this object instance.
@@ -175,26 +178,42 @@ public:
   */
   win_create_case_sensitive_directory = 1U << 27U,
 
+  /*! Create the handle in a way where i/o upon it can be multiplexed with other i/o
+  on the same initiating thread of execution i.e. you can perform more than one read
+  concurrently, without using threads. The blocking operations `.read()` and `.write()`
+  may have to use a less efficient, but cancellable, blocking implementation for handles created
+  in this way. On Microsoft Windows, this creates handles with `OVERLAPPED` semantics.
+  On POSIX, this creates handles with nonblocking semantics for non-file handles such
+  as pipes and sockets, however for file, directory and symlink handles it does not set
+  nonblocking, as it is non-portable.
+  */
+  multiplexable = 1U << 28U,
+
   // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
 
-  overlapped = 1U << 28U,          //!< On Windows, create any new handles with OVERLAPPED semantics
   byte_lock_insanity = 1U << 29U,  //!< Using insane POSIX byte range locks
   anonymous_inode = 1U << 30U      //!< This is an inode created with no representation on the filing system
   } QUICKCPPLIB_BITFIELD_END(flag);
 
 protected:
+  // vptr takes 4 or 8 bytes
+  io_context *_ctx{nullptr};  // 8 or 16 bytes
+  native_handle_type _v;      // 16 or 28 bytes
   caching _caching{caching::none};
-  flag _flags{flag::none};
-  native_handle_type _v;
+  char _spare1{0};  // used by pipe_handle
+  char _spare2{0};
+  char _spare3{0};          // 20 or 32 bytes
+  flag _flags{flag::none};  // 24 or 36 bytes
 
 public:
   //! Default constructor
   constexpr handle() {}  // NOLINT
   //! Construct a handle from a supplied native handle
-  explicit constexpr handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none) noexcept
-      : _caching(caching)
-      , _flags(flags)
+  explicit constexpr handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none, io_context *ctx = nullptr) noexcept
+      : _ctx(ctx)
       , _v(std::move(h))
+      , _caching(caching)
+      , _flags(flags)
   {
   }
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~handle();
@@ -204,13 +223,18 @@ public:
   handle &operator=(const handle &o) = delete;
   //! Move the handle.
   constexpr handle(handle &&o) noexcept
-      : _caching(o._caching)
-      , _flags(o._flags)
+      : _ctx(o._ctx)
       , _v(std::move(o._v))
+      , _caching(o._caching)
+      , _spare1(o._spare1)
+      , _spare2(o._spare2)
+      , _spare3(o._spare3)
+      , _flags(o._flags)
   {
+    o._ctx = nullptr;
+    o._v = native_handle_type();
     o._caching = caching::none;
     o._flags = flag::none;
-    o._v = native_handle_type();
   }
   //! Move assignment of handle
   handle &operator=(handle &&o) noexcept
@@ -227,6 +251,9 @@ public:
     *this = std::move(o);
     o = std::move(temp);
   }
+
+  //! The i/o context this handle will use to multiplex i/o, if any
+  io_context *multiplexer() const noexcept { return _ctx; }
 
   /*! Returns the current path of the open handle as said by the operating system. Note
   that you are NOT guaranteed that any path refreshed bears any resemblance to the original,
@@ -302,8 +329,10 @@ public:
   */
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> set_append_only(bool enable) noexcept;
 
-  //! True if overlapped
-  bool is_overlapped() const noexcept { return _v.is_overlapped(); }
+  //! True if multiplexable
+  bool is_multiplexable() const noexcept { return !!(_flags & flag::multiplexable); }
+  //! True if nonblocking
+  bool is_nonblocking() const noexcept { return _v.is_nonblocking(); }
   //! True if seekable
   bool is_seekable() const noexcept { return _v.is_seekable(); }
   //! True if requires aligned i/o
@@ -315,6 +344,10 @@ public:
   bool is_directory() const noexcept { return _v.is_directory(); }
   //! True if a symlink
   bool is_symlink() const noexcept { return _v.is_symlink(); }
+  //! True if a pipe
+  bool is_pipe() const noexcept { return _v.is_pipe(); }
+  //! True if a socket
+  bool is_socket() const noexcept { return _v.is_socket(); }
   //! True if a multiplexer like BSD kqueues, Linux epoll or Windows IOCP
   bool is_multiplexer() const noexcept { return _v.is_multiplexer(); }
   //! True if a process
@@ -336,6 +369,10 @@ public:
   //! The native handle used by this handle
   native_handle_type native_handle() const noexcept { return _v; }
 };
+static_assert((sizeof(void *) == 4 && sizeof(handle) == 24) || (sizeof(void *) == 8 && sizeof(handle) == 36), "handle is not 24 or 36 bytes in size!");
+
+#pragma pack(pop)
+
 inline std::ostream &operator<<(std::ostream &s, const handle &v)
 {
   if(v.is_valid())
@@ -408,9 +445,9 @@ inline std::ostream &operator<<(std::ostream &s, const handle::flag &v)
   {
     temp.append("win_create_case_sensitive_directory|");
   }
-  if(!!(v & handle::flag::overlapped))
+  if(!!(v & handle::flag::multiplexable))
   {
-    temp.append("overlapped|");
+    temp.append("multiplexable|");
   }
   if(!!(v & handle::flag::byte_lock_insanity))
   {

@@ -34,6 +34,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
+#pragma pack(push, 4)
 /*! \struct native_handle_type
 \brief A native handle type used for wrapping file descriptors, process ids or HANDLEs.
 Unmanaged, wrap in a handle object to manage.
@@ -41,29 +42,29 @@ Unmanaged, wrap in a handle object to manage.
 struct native_handle_type  // NOLINT
 {
   //! The type of handle.
-  QUICKCPPLIB_BITFIELD_BEGIN(disposition)
-  {
-    invalid = 0U,  //!< Invalid handle
+  QUICKCPPLIB_BITFIELD_BEGIN(disposition){
+  invalid = 0U,  //!< Invalid handle
 
-    readable = 1U << 0U,     //!< Is readable
-    writable = 1U << 1U,     //!< Is writable
-    append_only = 1U << 2U,  //!< Is append only
+  readable = 1U << 0U,     //!< Is readable
+  writable = 1U << 1U,     //!< Is writable
+  append_only = 1U << 2U,  //!< Is append only
 
-    overlapped = 1U << 4U,  //!< Requires additional synchronisation
-    seekable = 1U << 5U,    //!< Is seekable
-    aligned_io = 1U << 6U,  //!< Requires sector aligned i/o (typically 512 or 4096)
+  nonblocking = 1U << 4U,  //!< Requires additional synchronisation (Windows: `OVERLAPPED`; POSIX: `O_NONBLOCK`)
+  seekable = 1U << 5U,     //!< Is seekable
+  aligned_io = 1U << 6U,   //!< Requires sector aligned i/o (typically 512 or 4096)
 
-    file = 1U << 8U,          //!< Is a regular file
-    directory = 1U << 9U,     //!< Is a directory
-    symlink = 1U << 10U,      //!< Is a symlink
-    multiplexer = 1U << 11U,  //!< Is a kqueue/epoll/iocp
-    process = 1U << 12U,      //!< Is a child process
-    section = 1U << 13U,      //!< Is a memory section
+  file = 1U << 8U,          //!< Is a regular file
+  directory = 1U << 9U,     //!< Is a directory
+  symlink = 1U << 10U,      //!< Is a symlink
+  pipe = 1U << 11U,         //!< Is a pipe
+  socket = 1U << 12U,       //!< Is a socket
+  multiplexer = 1U << 13U,  //!< Is a kqueue/epoll/iocp
+  process = 1U << 14U,      //!< Is a child process
+  section = 1U << 15U,      //!< Is a memory section
 
-    _child_close_executed = 1U << 28U  // used to trap when vptr has become corrupted
-  }
-  QUICKCPPLIB_BITFIELD_END(disposition)
-  disposition behaviour;  //! The behaviour of the handle
+  _child_close_executed = 1U << 28U  // used to trap when vptr has become corrupted
+  } QUICKCPPLIB_BITFIELD_END(disposition)
+
   union {
     intptr_t _init{-1};
     //! A POSIX file descriptor
@@ -73,18 +74,32 @@ struct native_handle_type  // NOLINT
     //! A Windows HANDLE
     win::handle h;  // NOLINT
   };
+  disposition behaviour;  //! The behaviour of the handle
   //! Constructs a default instance
   constexpr native_handle_type() {}  // NOLINT
   ~native_handle_type() = default;
   //! Construct from a POSIX file descriptor
-  constexpr native_handle_type(disposition _behaviour, int _fd) noexcept : behaviour(_behaviour), fd(_fd) {}  // NOLINT
+  constexpr native_handle_type(disposition _behaviour, int _fd) noexcept
+      : 
+       fd(_fd)
+      , behaviour(_behaviour)
+  {
+  }  // NOLINT
   //! Construct from a Windows HANDLE
-  constexpr native_handle_type(disposition _behaviour, win::handle _h) noexcept : behaviour(_behaviour), h(_h) {}  // NOLINT
+  constexpr native_handle_type(disposition _behaviour, win::handle _h) noexcept
+      : 
+       h(_h)
+      , behaviour(_behaviour)
+  {
+  }  // NOLINT
 
   //! Copy construct
   native_handle_type(const native_handle_type &) = default;
   //! Move construct
-  constexpr native_handle_type(native_handle_type &&o) noexcept : behaviour(o.behaviour), _init(o._init)  // NOLINT
+  constexpr native_handle_type(native_handle_type &&o) noexcept  // NOLINT
+      : 
+      _init(o._init)
+      , behaviour(o.behaviour)
   {
     o.behaviour = disposition();
     o._init = -1;
@@ -94,8 +109,8 @@ struct native_handle_type  // NOLINT
   //! Move assign
   constexpr native_handle_type &operator=(native_handle_type &&o) noexcept
   {
-    behaviour = o.behaviour;
     _init = o._init;
+    behaviour = o.behaviour;
     o.behaviour = disposition();
     o._init = -1;
     return *this;
@@ -103,8 +118,8 @@ struct native_handle_type  // NOLINT
   //! Swaps with another instance
   void swap(native_handle_type &o) noexcept
   {
-    std::swap(behaviour, o.behaviour);
     std::swap(_init, o._init);
+    std::swap(behaviour, o.behaviour);
   }
 
   //! True if valid
@@ -122,8 +137,8 @@ struct native_handle_type  // NOLINT
   //! True if the handle is append only
   constexpr bool is_append_only() const noexcept { return (behaviour & disposition::append_only) ? true : false; }
 
-  //! True if overlapped
-  constexpr bool is_overlapped() const noexcept { return (behaviour & disposition::overlapped) ? true : false; }
+  //! True if nonblocking
+  constexpr bool is_nonblocking() const noexcept { return (behaviour & disposition::nonblocking) ? true : false; }
   //! True if seekable
   constexpr bool is_seekable() const noexcept { return (behaviour & disposition::seekable) ? true : false; }
   //! True if requires aligned i/o
@@ -135,6 +150,10 @@ struct native_handle_type  // NOLINT
   constexpr bool is_directory() const noexcept { return (behaviour & disposition::directory) ? true : false; }
   //! True if a symlink
   constexpr bool is_symlink() const noexcept { return (behaviour & disposition::symlink) ? true : false; }
+  //! True if a pipe
+  constexpr bool is_pipe() const noexcept { return (behaviour & disposition::pipe) ? true : false; }
+  //! True if a socket
+  constexpr bool is_socket() const noexcept { return (behaviour & disposition::socket) ? true : false; }
   //! True if a multiplexer like BSD kqueues, Linux epoll or Windows IOCP
   constexpr bool is_multiplexer() const noexcept { return (behaviour & disposition::multiplexer) ? true : false; }
   //! True if a process
@@ -142,6 +161,13 @@ struct native_handle_type  // NOLINT
   //! True if a memory section
   constexpr bool is_section() const noexcept { return (behaviour & disposition::section) ? true : false; }
 };
+static_assert((sizeof(void *) == 4 && sizeof(native_handle_type) == 8) || (sizeof(void *) == 8 && sizeof(native_handle_type) == 12), "native_handle_type is not 8 or 12 bytes in size!");
+// Not trivially copyable, as has non-trivial move.
+static_assert(std::is_trivially_destructible<native_handle_type>::value, "native_handle_type is not trivially destructible!");
+static_assert(std::is_trivially_copy_constructible<native_handle_type>::value, "native_handle_type is not trivially copy constructible!");
+static_assert(std::is_trivially_copy_assignable<native_handle_type>::value, "native_handle_type is not trivially copy assignable!");
+
+#pragma pack(pop)
 
 LLFIO_V2_NAMESPACE_END
 

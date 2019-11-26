@@ -34,7 +34,7 @@ size_t io_handle::max_buffers() const noexcept
 
 template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersType> do_read_write(const native_handle_type &nativeh, Syscall &&syscall, io_handle::io_request<BuffersType> reqs, deadline d) noexcept
 {
-  if(d && !nativeh.is_overlapped())
+  if(d && !nativeh.is_nonblocking())
   {
     return errc::not_supported;
   }
@@ -50,7 +50,7 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
   auto ol_it = ols.begin();
   DWORD transferred = 0;
   auto cancel_io = undoer([&] {
-    if(nativeh.is_overlapped())
+    if(nativeh.is_nonblocking())
     {
       for(auto &ol : ols)
       {
@@ -95,7 +95,7 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
     reqs.offset += req.size();
   }
   // If handle is overlapped, wait for completion of each i/o.
-  if(nativeh.is_overlapped())
+  if(nativeh.is_nonblocking())
   {
     for(auto &ol : ols)
     {
@@ -103,7 +103,7 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
       LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
       if(STATUS_TIMEOUT == ntwait(nativeh.h, ol, nd))
       {
-        LLFIO_WIN_DEADLINE_TO_TIMEOUT(d);
+        LLFIO_WIN_DEADLINE_TO_TIMEOUT_LOOP(d);
       }
     }
   }
@@ -131,6 +131,46 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   return do_read_write(_v, &WriteFile, reqs, d);
+}
+
+io_handle::io_result<io_handle::const_buffers_type> io_handle::barrier(io_handle::io_request<io_handle::const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
+{
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  LLFIO_LOG_FUNCTION_CALL(this);
+  if(d && !_v.is_nonblocking())
+  {
+    return errc::not_supported;
+  }
+  LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+  OVERLAPPED ol{};
+  memset(&ol, 0, sizeof(ol));
+  auto *isb = reinterpret_cast<IO_STATUS_BLOCK *>(&ol);
+  *isb = make_iostatus();
+  ULONG flags = 0;
+  if(kind == barrier_kind::nowait_data_only)
+  {
+    flags = 1 /*FLUSH_FLAGS_FILE_DATA_ONLY*/;  // note this doesn't block
+  }
+  else if(kind == barrier_kind::nowait_all)
+  {
+    flags = 2 /*FLUSH_FLAGS_NO_SYNC*/;
+  }
+  NTSTATUS ntstat = NtFlushBuffersFileEx(_v.h, flags, nullptr, 0, isb);
+  if(STATUS_PENDING == ntstat)
+  {
+    ntstat = ntwait(_v.h, ol, d);
+    if(STATUS_TIMEOUT == ntstat)
+    {
+      CancelIoEx(_v.h, &ol);
+      return errc::timed_out;
+    }
+  }
+  if(ntstat < 0)
+  {
+    return ntkernel_error(ntstat);
+  }
+  return {reqs.buffers};
 }
 
 LLFIO_V2_NAMESPACE_END

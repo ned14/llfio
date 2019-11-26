@@ -229,9 +229,6 @@ public:
     return io_handle::close();
   }
 
-  LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), barrier_kind kind = barrier_kind::nowait_data_only, deadline d = deadline()) noexcept override;
-
   /*! Clone this handle (copy constructor is disabled to avoid accidental copying),
   optionally race free reopening the handle with different access or caching.
 

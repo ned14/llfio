@@ -294,46 +294,6 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   }
 }
 
-file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(file_handle::io_request<file_handle::const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
-{
-  windows_nt_kernel::init();
-  using namespace windows_nt_kernel;
-  LLFIO_LOG_FUNCTION_CALL(this);
-  if(d && !_v.is_overlapped())
-  {
-    return errc::not_supported;
-  }
-  LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
-  OVERLAPPED ol{};
-  memset(&ol, 0, sizeof(ol));
-  auto *isb = reinterpret_cast<IO_STATUS_BLOCK *>(&ol);
-  *isb = make_iostatus();
-  ULONG flags = 0;
-  if(kind == barrier_kind::nowait_data_only)
-  {
-    flags = 1 /*FLUSH_FLAGS_FILE_DATA_ONLY*/;  // note this doesn't block
-  }
-  else if(kind == barrier_kind::nowait_all)
-  {
-    flags = 2 /*FLUSH_FLAGS_NO_SYNC*/;
-  }
-  NTSTATUS ntstat = NtFlushBuffersFileEx(_v.h, flags, nullptr, 0, isb);
-  if(STATUS_PENDING == ntstat)
-  {
-    ntstat = ntwait(_v.h, ol, d);
-    if(STATUS_TIMEOUT == ntstat)
-    {
-      CancelIoEx(_v.h, &ol);
-      LLFIO_WIN_DEADLINE_TO_TIMEOUT(d);
-    }
-  }
-  if(ntstat < 0)
-  {
-    return ntkernel_error(ntstat);
-  }
-  return {reqs.buffers};
-}
-
 result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline /*unused*/) const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);

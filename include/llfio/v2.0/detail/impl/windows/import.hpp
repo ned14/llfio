@@ -1099,7 +1099,7 @@ if(d)                                                                           
   \
 }
 
-#define LLFIO_WIN_DEADLINE_TO_TIMEOUT(type, d)                                                                                                                                                                                                                                                                                 \
+#define LLFIO_WIN_DEADLINE_TO_TIMEOUT_LOOP(type, d)                                                                                                                                                                                                                                                                                 \
   \
 if(d)                                                                                                                                                                                                                                                                                                                          \
   \
@@ -1158,7 +1158,7 @@ if(d)                                                                           
       _timeout.QuadPart = ns.count() / -100;                                                                                                                                                                                                                                                                                   \
   }
 
-#define LLFIO_WIN_DEADLINE_TO_TIMEOUT(d)                                                                                                                                                                                                                                                                                       \
+#define LLFIO_WIN_DEADLINE_TO_TIMEOUT_LOOP(d)                                                                                                                                                                                                                                                                                       \
   \
 if(d)                                                                                                                                                                                                                                                                                                                          \
   \
@@ -1288,10 +1288,10 @@ inline result<ACCESS_MASK> access_mask_from_handle_mode(native_handle_type &nati
 inline result<DWORD> attributes_from_handle_caching_and_flags(native_handle_type &nativeh, handle::caching _caching, handle::flag flags)
 {
   DWORD attribs = 0;
-  if(flags & handle::flag::overlapped)
+  if(flags & handle::flag::multiplexable)
   {
     attribs |= FILE_FLAG_OVERLAPPED;
-    nativeh.behaviour |= native_handle_type::disposition::overlapped;
+    nativeh.behaviour |= native_handle_type::disposition::nonblocking;
   }
   switch(_caching)
   {
@@ -1333,9 +1333,9 @@ inline result<DWORD> attributes_from_handle_caching_and_flags(native_handle_type
 inline result<DWORD> ntflags_from_handle_caching_and_flags(native_handle_type &nativeh, handle::caching _caching, handle::flag flags)
 {
   DWORD ntflags = 0;
-  if(flags & handle::flag::overlapped)
+  if(flags & handle::flag::multiplexable)
   {
-    nativeh.behaviour |= native_handle_type::disposition::overlapped;
+    nativeh.behaviour |= native_handle_type::disposition::nonblocking;
   }
   else
   {
@@ -1430,7 +1430,7 @@ inline result<void> do_clone_handle(native_handle_type &dest, const native_handl
 
 inline result<void> do_lock_file_range(native_handle_type &_v, handle::extent_type offset, handle::extent_type bytes, bool exclusive, deadline d) noexcept
 {
-  if(d && d.nsecs > 0 && !_v.is_overlapped())
+  if(d && d.nsecs > 0 && !_v.is_nonblocking())
   {
     return errc::not_supported;
   }
@@ -1459,11 +1459,11 @@ inline result<void> do_lock_file_range(native_handle_type &_v, handle::extent_ty
     }
   }
   // If handle is overlapped, wait for completion of each i/o.
-  if(_v.is_overlapped())
+  if(_v.is_nonblocking())
   {
     if(STATUS_TIMEOUT == ntwait(_v.h, ol, d))
     {
-      LLFIO_WIN_DEADLINE_TO_TIMEOUT(d);
+      return errc::timed_out;
     }
     // It seems the NT kernel is guilty of casting bugs sometimes
     ol.Internal = ol.Internal & 0xffffffff;
@@ -1495,7 +1495,7 @@ inline void do_unlock_file_range(native_handle_type &_v, handle::extent_type off
     }
   }
   // If handle is overlapped, wait for completion of each i/o.
-  if(_v.is_overlapped())
+  if(_v.is_nonblocking())
   {
     ntwait(_v.h, ol, deadline());
     if(ol.Internal != 0)

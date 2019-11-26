@@ -283,8 +283,8 @@ public:
   constexpr io_handle() {}  // NOLINT
   ~io_handle() = default;
   //! Construct a handle from a supplied native handle
-  constexpr explicit io_handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none)
-      : handle(h, caching, flags)
+  constexpr explicit io_handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none, io_context *ctx = nullptr)
+      : handle(h, caching, flags, ctx)
   {
   }
   //! Explicit conversion from handle permitted
@@ -412,7 +412,7 @@ public:
   \mallocs None.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  virtual io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), barrier_kind kind = barrier_kind::nowait_data_only, deadline d = deadline()) noexcept = 0;
+  virtual io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), barrier_kind kind = barrier_kind::nowait_data_only, deadline d = deadline()) noexcept;
 
   LLFIO_DEADLINE_TRY_FOR_UNTIL(barrier)
 };

@@ -39,6 +39,7 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
   // Open directory with no access requested, this is much faster than asking for access
   OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, mode::none, flag::none));
   OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, caching::all, flag::none));
+  nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
   /* It is super important that we remove the DELETE permission for directories as otherwise relative renames
   will always fail due to an unfortunate design choice by Microsoft.
   */
