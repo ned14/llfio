@@ -331,7 +331,6 @@ namespace algorithm
       combining_handle_adapter_base() = default;
       using _base::_base;
 
-      using lock_kind = typename _base::lock_kind;
       using extent_guard = typename _base::extent_guard;
 
     private:

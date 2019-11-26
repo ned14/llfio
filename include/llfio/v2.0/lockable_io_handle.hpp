@@ -38,6 +38,14 @@ Distributed under the Boost Software License, Version 1.0.
 
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
+//! The kinds of concurrent user exclusion which can be performed.
+enum class lock_kind
+{
+  unlocked,  //!< Exclude none.
+  shared,    //!< Exclude only those requesting an exclusive lock on the same inode.
+  exclusive  //!< Exclude those requesting any kind of lock on the same inode.
+};
+
 /*! \class lockable_io_handle
 \brief A handle to something capable of scatter-gather i/o and which can exclude other concurrent users.
 Models `SharedMutex`, though note that the locks are per-handle, not per-thread.
@@ -62,14 +70,6 @@ public:
   using const_buffers_type = io_handle::const_buffers_type;
   template <class T> using io_request = io_handle::io_request<T>;
   template <class T> using io_result = io_handle::io_result<T>;
-
-  //! The kinds of concurrent user exclusion which can be performed.
-  enum class lock_kind
-  {
-    unlocked,  //!< Exclude none.
-    shared,    //!< Exclude only those requesting an exclusive lock on the same inode.
-    exclusive  //!< Exclude those requesting any kind of lock on the same inode.
-  };
 
 public:
   //! Default constructor
@@ -308,27 +308,28 @@ public:
 class unique_file_lock
 {
   lockable_io_handle *_h{nullptr};
-  lockable_io_handle::lock_kind _lock_state{lockable_io_handle::lock_kind::unlocked};
+  lock_kind _lock_state{lock_kind::unlocked};
 
 public:
   unique_file_lock() = default;
-  explicit unique_file_lock(lockable_io_handle &h, lockable_io_handle::lock_kind kind)
+  explicit unique_file_lock(lockable_io_handle &h, lock_kind kind)
       : _h(&h)
   {
-    if(kind == lockable_io_handle::lock_kind::exclusive)
+    if(kind == lock_kind::exclusive)
     {
       lock().value();
     }
-    else if(kind == lockable_io_handle::lock_kind::shared)
+    else if(kind == lock_kind::shared)
     {
       lock_shared().value();
     }
   }
   unique_file_lock(unique_file_lock &&o) noexcept
       : _h(o._h)
+      , _lock_state(o._lock_state)
   {
     o._h = nullptr;
-    o._lock_state = lockable_io_handle::lock_kind::unlocked;
+    o._lock_state = lock_kind::unlocked;
   }
   unique_file_lock(const unique_file_lock &) = delete;
   unique_file_lock &operator=(unique_file_lock &&o) noexcept
@@ -342,11 +343,11 @@ public:
   {
     if(_h != nullptr)
     {
-      if(_lock_state == lockable_io_handle::lock_kind::exclusive)
+      if(_lock_state == lock_kind::exclusive)
       {
         _h->unlock_file();
       }
-      else if(_lock_state == lockable_io_handle::lock_kind::shared)
+      else if(_lock_state == lock_kind::shared)
       {
         _h->unlock_file_shared();
       }
@@ -357,7 +358,7 @@ public:
   //! Returns the associated mutex
   lockable_io_handle *mutex() const noexcept { return _h; }
   //! True if the associated mutex is owned by this lock
-  bool owns_lock() const noexcept { return (_h != nullptr) && _lock_state != lockable_io_handle::lock_kind::unlocked; }
+  bool owns_lock() const noexcept { return (_h != nullptr) && _lock_state != lock_kind::unlocked; }
   //! True if the associated mutex is owned by this lock
   explicit operator bool() const noexcept { return owns_lock(); }
 
@@ -376,12 +377,12 @@ public:
     {
       return errc::operation_not_permitted;
     }
-    if(_lock_state != lockable_io_handle::lock_kind::unlocked)
+    if(_lock_state != lock_kind::unlocked)
     {
       return errc::resource_deadlock_would_occur;
     }
     OUTCOME_TRY(_h->lock_file());
-    _lock_state = lockable_io_handle::lock_kind::exclusive;
+    _lock_state = lock_kind::exclusive;
     return success();
   }
   //! Try to lock the mutex for exclusive access
@@ -391,13 +392,13 @@ public:
     {
       return false;
     }
-    if(_lock_state != lockable_io_handle::lock_kind::unlocked)
+    if(_lock_state != lock_kind::unlocked)
     {
       return false;
     }
     if(_h->try_lock_file())
     {
-      _lock_state = lockable_io_handle::lock_kind::exclusive;
+      _lock_state = lock_kind::exclusive;
       return true;
     }
     return false;
@@ -406,13 +407,13 @@ public:
   void unlock() noexcept
   {
     assert(_h != nullptr);
-    assert(_lock_state == lockable_io_handle::lock_kind::exclusive);
-    if(_h == nullptr || _lock_state != lockable_io_handle::lock_kind::exclusive)
+    assert(_lock_state == lock_kind::exclusive);
+    if(_h == nullptr || _lock_state != lock_kind::exclusive)
     {
       return;
     }
     _h->unlock_file();
-    _lock_state = lockable_io_handle::lock_kind::unlocked;
+    _lock_state = lock_kind::unlocked;
   }
 
   //! Lock the mutex for shared access
@@ -422,12 +423,12 @@ public:
     {
       return errc::operation_not_permitted;
     }
-    if(_lock_state != lockable_io_handle::lock_kind::unlocked)
+    if(_lock_state != lock_kind::unlocked)
     {
       return errc::resource_deadlock_would_occur;
     }
     OUTCOME_TRY(_h->lock_file_shared());
-    _lock_state = lockable_io_handle::lock_kind::shared;
+    _lock_state = lock_kind::shared;
     return success();
   }
   //! Try to lock the mutex for shared access
@@ -437,13 +438,13 @@ public:
     {
       return false;
     }
-    if(_lock_state != lockable_io_handle::lock_kind::unlocked)
+    if(_lock_state != lock_kind::unlocked)
     {
       return false;
     }
     if(_h->try_lock_file_shared())
     {
-      _lock_state = lockable_io_handle::lock_kind::shared;
+      _lock_state = lock_kind::shared;
       return true;
     }
     return false;
@@ -452,13 +453,13 @@ public:
   void unlock_shared() noexcept
   {
     assert(_h != nullptr);
-    assert(_lock_state == lockable_io_handle::lock_kind::shared);
-    if(_h == nullptr || _lock_state != lockable_io_handle::lock_kind::shared)
+    assert(_lock_state == lock_kind::shared);
+    if(_h == nullptr || _lock_state != lock_kind::shared)
     {
       return;
     }
     _h->unlock_file_shared();
-    _lock_state = lockable_io_handle::lock_kind::unlocked;
+    _lock_state = lock_kind::unlocked;
   }
 };
 

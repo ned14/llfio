@@ -179,7 +179,7 @@ namespace algorithm
                   }
                 }
               }
-              auto outcome = _h.lock_file_range(out.entities[n].value, 1, (out.entities[n].exclusive != 0u) ? file_handle::lock_kind::exclusive : file_handle::lock_kind::shared, nd);
+              auto outcome = _h.lock_file_range(out.entities[n].value, 1, (out.entities[n].exclusive != 0u) ? lock_kind::exclusive : lock_kind::shared, nd);
               if(!outcome)
               {
                 was_contended = n;
