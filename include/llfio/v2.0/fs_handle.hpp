@@ -150,6 +150,11 @@ public:
   operation is both atomic and silent matching POSIX behaviour even on Microsoft Windows where
   no Win32 API can match POSIX semantics.
 
+  If the handle refers to a pipe, on Microsoft Windows the base path handle is ignored as there is
+  a single global named pipe namespace. Unless the path fragment begins with `\`, the string `\??\`
+  is prefixed to the name before passing it to the NT kernel API which performs the rename. This
+  is because `\\.\` in Win32 maps onto `\??\` in the NT kernel.
+
   \warning Some operating systems provide a race free syscall for renaming an open handle (Windows).
   On all other operating systems this call is \b racy and can result in the wrong file entry being
   relinked. Note that unless `flag::disable_safety_unlinks` is set, this implementation opens a

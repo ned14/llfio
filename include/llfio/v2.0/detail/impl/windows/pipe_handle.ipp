@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 LLFIO_V2_NAMESPACE_BEGIN
 
-result<pipe_handle> pipe_handle::pipe(const path_handle & /*unused*/, pipe_handle::path_view_type path, pipe_handle::mode _mode, pipe_handle::creation _creation, pipe_handle::caching _caching, pipe_handle::flag flags) noexcept
+result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_handle::mode _mode, pipe_handle::creation _creation, pipe_handle::caching _caching, pipe_handle::flag flags, const path_handle & /*unused*/) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -40,18 +40,22 @@ result<pipe_handle> pipe_handle::pipe(const path_handle & /*unused*/, pipe_handl
   OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
   nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
   ret.value()._flags |= flag::unlink_on_first_close;
-  if(creation::truncate_existing == _creation || creation::always_new == _creation)
+  if(creation::truncate_existing == _creation || creation::always_new == _creation || path.is_ntpath())
   {
     return errc::operation_not_supported;
   }
   path_view::c_str<> zpath(path, false);
-  if(zpath.length + 9 >= zpath.internal_buffer_size)
+
+  if(zpath.buffer[0] != '\\')
   {
-    return errc::argument_out_of_domain;  // I should try harder here
+    if(zpath.length + 9 >= zpath.internal_buffer_size)
+    {
+      return errc::argument_out_of_domain;  // I should try harder here
+    }
+    wchar_t *_zpathbuffer = const_cast<wchar_t *>(zpath.buffer);
+    memmove(_zpathbuffer + 9, _zpathbuffer, (zpath.length + 1) * sizeof(wchar_t));
+    memcpy(_zpathbuffer, L"\\\\.\\pipe\\", 9 * sizeof(wchar_t));
   }
-  wchar_t *_zpathbuffer = const_cast<wchar_t *>(zpath.buffer);
-  memmove(_zpathbuffer + 9, _zpathbuffer, (zpath.length + 1) * sizeof(wchar_t));
-  memcpy(_zpathbuffer, L"\\\\.\\pipe\\", 9 * sizeof(wchar_t));
   if(creation::open_existing == _creation)
   {
     // Open existing pipe
@@ -72,6 +76,10 @@ result<pipe_handle> pipe_handle::pipe(const path_handle & /*unused*/, pipe_handl
     case creation::always_new:
       creation = CREATE_ALWAYS;
       break;
+    }
+    if(mode::append == _mode)
+    {
+      access = SYNCHRONIZE | DELETE | GENERIC_WRITE;
     }
     if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.buffer, access, fileshare, nullptr, creation, attribs, nullptr)))  // NOLINT
     {

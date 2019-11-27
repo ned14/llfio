@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 LLFIO_V2_NAMESPACE_BEGIN
 
-result<pipe_handle> pipe_handle::pipe(const path_handle &base, pipe_handle::path_view_type path, pipe_handle::mode _mode, pipe_handle::creation _creation, pipe_handle::caching _caching, pipe_handle::flag flags) noexcept
+result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_handle::mode _mode, pipe_handle::creation _creation, pipe_handle::caching _caching, pipe_handle::flag flags, const path_handle &base) noexcept
 {
   flags |= flag::unlink_on_first_close;
   result<pipe_handle> ret(pipe_handle(native_handle_type(), 0, 0, _caching, flags));

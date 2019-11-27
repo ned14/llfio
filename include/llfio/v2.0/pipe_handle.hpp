@@ -40,12 +40,7 @@ on some platforms (e.g. Windows), named pipes always get deleted when
 the last handle to them is closed in the system, so the closest
 matching semantic is to unlink them on first close on all platforms.
 If you don't want this, release the native handle before closing the
-handle instance, and close it manually.
-
-For similar portability reasons, we do not expose the ability to rename
-or unlink named pipes, as these operations are not possible on some
-platforms (Windows). Similarly, portably determining a unique id for
-the pipe which does not clash with file unique id's is problematic.
+handle instance, and take over its management.
 
 Be aware that `mode::write` opens a pipe in full duplex mode -- generally,
 you don't want full duplex pipes (and indeed some systems don't support
@@ -55,18 +50,44 @@ specify `mode::append` instead.
 Unless `flag::multiplexable` is specified which causes the handle to
 be created as `native_handle_type::disposition::nonblocking`,
 creating or opening a pipe handle with only read privileges blocks until
-the other end is opened with write privileges. Similarly, creating or
-opening a pipe handle with only write privileges fails unless
-the other end is opened with read privileges. This means that there is
+the other end is opened with write privileges. Be aware that creating or
+opening a pipe handle with only write privileges has implementation defined
+behaviour if the other end is not opened for read. This means that there is
 a potential race between initiating whomever will do a write to a pipe,
 and you opening the pipe for reads -- you may wish to thus loop opening
 a pipe for writing, checking for an error code comparing equal to
-`errc::no_such_device_or_address`. Note that creating or opening a
-pipe handle with both read and write privileges has implementation defined
-semantics, as POSIX does not define what happens.
+`errc::no_such_device_or_address`, but also being careful that on some
+platforms opening an unconnected pipe for write may just hang forever.
+Note that creating or opening a pipe handle with both read and write
+privileges has implementation defined semantics, as POSIX does not define
+what happens.
 
 \warning On POSIX neither `creation::only_if_not_exist` nor
 `creation::always_new` is atomic due to lack of kernel API support.
+
+# Windows only
+
+On Microsoft Windows, anonymous pipes are really named pipes with a unique
+name (the name is chosen by the system, not LLFIO). They are created within
+the `\Device\NamedPipe\` region within the NT kernel namespace, which is the
+ONLY place where pipes can exist on Windows (i.e. you cannot place them in
+the filing system like on POSIX).
+
+Because pipes can only exist in a single, global namespace shared amongst
+all applications, and this is the same whether for Win32 or the NT kernel,
+`pipe_handle` does not bother implementing the `\!!\` extension which forces
+use of the NT kernel API. Instead, the Win32 API is always used.
+
+For the Win32 API, you are supposed to always prefix pipe names with `\\.\`. 
+This is not portable, so we default the base path handle to
+`path_discovery::storage_backed_temporary_files_directory()` on all platforms.
+The base path handle is ignored on Windows, and if the path supplied does not
+begin with `\`, `\\.\` is prepended on your behalf.
+
+This allows you to write portable code which simply has some name without
+qualifying path for the named pipe. On POSIX, this prefixes some temporary
+directory for the current user as determined by path discovery, and on Windows,
+you end up in the global path namespace.
 */
 class LLFIO_DECL pipe_handle : public io_handle, public fs_handle
 {
@@ -135,19 +156,33 @@ public:
   }
 
   /*! Create a pipe handle opening access to a named pipe
-  \param base Handle to a base location on the filing system.
-  Pass `{}` to indicate that path will be absolute. Will be ignored on
-  some platforms (Windows).
   \param path The path relative to base to open.
   \param _mode How to open the pipe.
   \param _creation How to create the pipe.
   \param _caching How to ask the kernel to cache the pipe.
   \param flags Any additional custom behaviours.
+  \param base Handle to a base location on the filing system.
+  Defaults to `path_discovery::storage_backed_temporary_files_directory()`.
+  IGNORED ON WINDOWS.
 
   \errors Any of the values POSIX open(), mkfifo(), CreateFile() or CreateNamedPipe() can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<pipe_handle> pipe(const path_handle &base, path_view_type path, mode _mode = mode::write, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept;
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<pipe_handle> pipe(path_view_type path, mode _mode, creation _creation, caching _caching = caching::all, flag flags = flag::none, const path_handle &base = path_discovery::storage_backed_temporary_files_directory()) noexcept;
+  /*! Convenience overload for `pipe()` creating a new named pipe if
+  needed, and with read-only privileges. Unless `flag::multiplexable`
+  is specified, this will block until the other end connects.
+  */
+  LLFIO_MAKE_FREE_FUNCTION
+  static inline result<pipe_handle> pipe_create(path_view_type path, caching _caching = caching::all, flag flags = flag::none, const path_handle &base = path_discovery::storage_backed_temporary_files_directory()) noexcept { return pipe(path, mode::read, creation::if_needed, _caching, flags, base); }
+  /*! Convenience overload for `pipe()` opening an existing named pipe
+  with write-only privileges. Unless `flag::multiplexable`
+  is specified, this will have implementation defined behaviour
+  if no reader is waiting on the other end of the pipe.
+  */
+  LLFIO_MAKE_FREE_FUNCTION
+  static inline result<pipe_handle> pipe_open(path_view_type path, caching _caching = caching::all, flag flags = flag::none, const path_handle &base = path_discovery::storage_backed_temporary_files_directory()) noexcept { return pipe(path, mode::append, creation::open_existing, _caching, flags, base); }
+
   /*! Create a pipe handle creating a randomly named pipe on a path.
   The pipe is opened exclusively with `creation::only_if_not_exist` so it
   will never collide with nor overwrite any existing pipe.
@@ -155,7 +190,7 @@ public:
   \errors Any of the values POSIX open(), mkfifo(), CreateFile() or CreateNamedPipe() can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<pipe_handle> random_pipe(const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::all, flag flags = flag::none) noexcept
+  static inline result<pipe_handle> random_pipe(mode _mode = mode::read, caching _caching = caching::all, flag flags = flag::none, const path_handle &dirpath = path_discovery::storage_backed_temporary_files_directory()) noexcept
   {
     try
     {
@@ -163,7 +198,7 @@ public:
       {
         auto randomname = utils::random_string(32);
         randomname.append(".random");
-        result<pipe_handle> ret = pipe(dirpath, randomname, _mode, creation::only_if_not_exist, _caching, flags);
+        result<pipe_handle> ret = pipe(randomname, _mode, creation::only_if_not_exist, _caching, flags, dirpath);
         if(ret || (!ret && ret.error() != errc::file_exists))
         {
           return ret;
@@ -174,24 +209,6 @@ public:
     {
       return error_from_exception();
     }
-  }
-  /*! Create a pipe handle creating the named pipe on some path which
-  the OS declares to be suitable for temporary files.
-  Note also that an empty name is equivalent to calling
-  `random_pipe(path_discovery::storage_backed_temporary_files_directory())` and the creation
-  parameter is ignored.
-
-  \note If the temporary pipe you are creating is not going to have its
-  path sent to another process for usage, this is the WRONG function
-  to use. Use `anonymous_pipe()` instead, it is far more secure.
-
-  \errors Any of the values POSIX open() or CreateFile() can return.
-  */
-  LLFIO_MAKE_FREE_FUNCTION
-  static inline result<pipe_handle> temp_pipe(path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::all, flag flags = flag::none) noexcept
-  {
-    auto &tempdirh = path_discovery::storage_backed_temporary_files_directory();
-    return name.empty() ? random_pipe(tempdirh, _mode, _caching, flags) : pipe(tempdirh, name, _mode, _creation, _caching, flags);
   }
   /*! \em Securely create two ends of an anonymous pipe handle. The first
   handle returned is the read end; the second is the write end.
@@ -262,13 +279,13 @@ public:
 //! \brief Constructor for `pipe_handle`
 template <> struct construct<pipe_handle>
 {
-  const path_handle &base;
   pipe_handle::path_view_type _path;
   pipe_handle::mode _mode = pipe_handle::mode::read;
-  pipe_handle::creation _creation = pipe_handle::creation::open_existing;
+  pipe_handle::creation _creation = pipe_handle::creation::if_needed;
   pipe_handle::caching _caching = pipe_handle::caching::all;
   pipe_handle::flag flags = pipe_handle::flag::none;
-  result<pipe_handle> operator()() const noexcept { return pipe_handle::pipe(base, _path, _mode, _creation, _caching, flags); }
+  const path_handle &base = path_discovery::storage_backed_temporary_files_directory();
+  result<pipe_handle> operator()() const noexcept { return pipe_handle::pipe(_path, _mode, _creation, _caching, flags, base); }
 };
 
 // BEGIN make_free_functions.py
