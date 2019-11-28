@@ -140,6 +140,8 @@ namespace path_discovery
     ret.emplace_back(discovered_path::source_type::hardcoded, "/run/shm");
     return ret;
   }
+
+  const path_handle &temporary_named_pipes_directory() noexcept { return storage_backed_temporary_files_directory(); }
 }  // namespace path_discovery
 
 LLFIO_V2_NAMESPACE_END

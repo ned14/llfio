@@ -121,6 +121,16 @@ namespace path_discovery
   strongly consider using a non-file-backed `section_handle` as this is more portable.
   */
   LLFIO_HEADERS_ONLY_FUNC_SPEC const path_handle &memory_backed_temporary_files_directory() noexcept;
+
+  /*! \brief Returns a reference to an open handle to a verified temporary directory where named
+  pipes may be created and found.
+
+  On Microsoft Windows, this is `\Device\NamedPipe` within the NT kernel namespace.
+
+  On POSIX, this is `storage_backed_temporary_files_directory()`.
+  */
+  LLFIO_HEADERS_ONLY_FUNC_SPEC const path_handle &temporary_named_pipes_directory() noexcept;
+
 }  // namespace path_discovery
 
 LLFIO_V2_NAMESPACE_END

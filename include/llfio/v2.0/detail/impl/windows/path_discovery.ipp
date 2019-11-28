@@ -121,6 +121,24 @@ namespace path_discovery
     }
     return ret;
   }
+
+  const path_handle &temporary_named_pipes_directory() noexcept
+  {
+    static path_handle pipesdir;
+    if(pipesdir.is_valid())
+    {
+      return pipesdir;
+    }
+    auto &ps = path_store();
+    std::lock_guard<std::mutex> g(ps.lock);
+    auto r = path_handle::path(L"\\!!\\Device\\NamedPipe\\");
+    if(!r)
+    {
+      LLFIO_LOG_FATAL(nullptr, "path_discovery::temporary_named_pipes_directory() failed to open \\Device\\NamedPipe\\, something has gone very wrong");
+    }
+    pipesdir = std::move(r).value();
+    return pipesdir;
+  }
 }  // namespace path_discovery
 
 LLFIO_V2_NAMESPACE_END

@@ -34,41 +34,38 @@ LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 /*! \class pipe_handle
 \brief A handle to a named or anonymous pipe.
 
-Note that `flag::unlink_on_first_close` is always on for
-handles created by this class. This is due to portability reasons -
+The only fully portable use of this class is to *create* a named pipe with
+read-only privileges, and then to *open* an existing named pipe with
+append-only privileges. This ordering is important - on POSIX opening
+pipes for reads blocks until a writer connects to the other side, and
+opening pipes for writes fails if no reader on the other side is present.
+The Windows implementation of this class matches these POSIX semantics.
+
+This class doesn't prevent you opening fully duplex pipes
+(i.e. `mode::write`) if your system supports them, but semantics in this
+situation are implementation defined. Linux and Windows support fully
+duplex pipes, and the Windows implementation matches the Linux bespoke
+semantics.
+
+When you create a named pipe, `flag::unlink_on_first_close` is
+always forced on. This is due to portability reasons -
 on some platforms (e.g. Windows), named pipes always get deleted when
 the last handle to them is closed in the system, so the closest
-matching semantic is to unlink them on first close on all platforms.
-If you don't want this, release the native handle before closing the
-handle instance, and take over its management.
+matching semantic is for the creating handle to unlink its creation on
+first close on all platforms. If you don't want this, release the native
+handle before closing the handle instance, and take over its management.
 
-Be aware that `mode::write` opens a pipe in full duplex mode -- generally,
-you don't want full duplex pipes (and indeed some systems don't support
-them or have weird semantics with them), so if you want a write-only pipe,
-specify `mode::append` instead.
-
-Unless `flag::multiplexable` is specified which causes the handle to
-be created as `native_handle_type::disposition::nonblocking`,
-creating or opening a pipe handle with only read privileges blocks until
-the other end is opened with write privileges. Be aware that creating or
-opening a pipe handle with only write privileges has implementation defined
-behaviour if the other end is not opened for read. This means that there is
-a potential race between initiating whomever will do a write to a pipe,
-and you opening the pipe for reads -- you may wish to thus loop opening
-a pipe for writing, checking for an error code comparing equal to
-`errc::no_such_device_or_address`, but also being careful that on some
-platforms opening an unconnected pipe for write may just hang forever.
-Note that creating or opening a pipe handle with both read and write
-privileges has implementation defined semantics, as POSIX does not define
-what happens.
+If `flag::multiplexable` is specified which causes the handle to
+be created as `native_handle_type::disposition::nonblocking`, opening
+pipes for reads no longer blocks in the constructor. However it will then
+block in `read()`, unless its deadline is zero.
 
 \warning On POSIX neither `creation::only_if_not_exist` nor
 `creation::always_new` is atomic due to lack of kernel API support.
 
 # Windows only
 
-On Microsoft Windows, anonymous pipes are really named pipes with a unique
-name (the name is chosen by the system, not LLFIO). They are created within
+On Microsoft Windows, all pipes (including anonymous) are created within
 the `\Device\NamedPipe\` region within the NT kernel namespace, which is the
 ONLY place where pipes can exist on Windows (i.e. you cannot place them in
 the filing system like on POSIX).
@@ -76,18 +73,13 @@ the filing system like on POSIX).
 Because pipes can only exist in a single, global namespace shared amongst
 all applications, and this is the same whether for Win32 or the NT kernel,
 `pipe_handle` does not bother implementing the `\!!\` extension which forces
-use of the NT kernel API. Instead, the Win32 API is always used.
+use of the NT kernel API. All named pipes always operate out of the NT kernel
+namespace. `.parent_path_handle()` always returns
+`path_discovery::temporary_named_pipes_directory()` on Windows.
 
-For the Win32 API, you are supposed to always prefix pipe names with `\\.\`. 
-This is not portable, so we default the base path handle to
-`path_discovery::storage_backed_temporary_files_directory()` on all platforms.
-The base path handle is ignored on Windows, and if the path supplied does not
-begin with `\`, `\\.\` is prepended on your behalf.
-
-This allows you to write portable code which simply has some name without
-qualifying path for the named pipe. On POSIX, this prefixes some temporary
-directory for the current user as determined by path discovery, and on Windows,
-you end up in the global path namespace.
+So long as you use `path_discovery::temporary_named_pipes_directory()`
+as your base directory, you can write quite portable code between POSIX
+and Windows.
 */
 class LLFIO_DECL pipe_handle : public io_handle, public fs_handle
 {
@@ -162,35 +154,33 @@ public:
   \param _caching How to ask the kernel to cache the pipe.
   \param flags Any additional custom behaviours.
   \param base Handle to a base location on the filing system.
-  Defaults to `path_discovery::storage_backed_temporary_files_directory()`.
-  IGNORED ON WINDOWS.
+  Defaults to `path_discovery::temporary_named_pipes_directory()`.
 
-  \errors Any of the values POSIX open(), mkfifo(), CreateFile() or CreateNamedPipe() can return.
+  \errors Any of the values POSIX `open()`, `mkfifo()`, `NtCreateFile()` or `NtCreateNamedPipeFile()` can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<pipe_handle> pipe(path_view_type path, mode _mode, creation _creation, caching _caching = caching::all, flag flags = flag::none, const path_handle &base = path_discovery::storage_backed_temporary_files_directory()) noexcept;
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<pipe_handle> pipe(path_view_type path, mode _mode, creation _creation, caching _caching = caching::all, flag flags = flag::none, const path_handle &base = path_discovery::temporary_named_pipes_directory()) noexcept;
   /*! Convenience overload for `pipe()` creating a new named pipe if
   needed, and with read-only privileges. Unless `flag::multiplexable`
   is specified, this will block until the other end connects.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<pipe_handle> pipe_create(path_view_type path, caching _caching = caching::all, flag flags = flag::none, const path_handle &base = path_discovery::storage_backed_temporary_files_directory()) noexcept { return pipe(path, mode::read, creation::if_needed, _caching, flags, base); }
+  static inline result<pipe_handle> pipe_create(path_view_type path, caching _caching = caching::all, flag flags = flag::none, const path_handle &base = path_discovery::temporary_named_pipes_directory()) noexcept { return pipe(path, mode::read, creation::if_needed, _caching, flags, base); }
   /*! Convenience overload for `pipe()` opening an existing named pipe
-  with write-only privileges. Unless `flag::multiplexable`
-  is specified, this will have implementation defined behaviour
-  if no reader is waiting on the other end of the pipe.
+  with write-only privileges. This will fail if no reader is waiting
+  on the other end of the pipe.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<pipe_handle> pipe_open(path_view_type path, caching _caching = caching::all, flag flags = flag::none, const path_handle &base = path_discovery::storage_backed_temporary_files_directory()) noexcept { return pipe(path, mode::append, creation::open_existing, _caching, flags, base); }
+  static inline result<pipe_handle> pipe_open(path_view_type path, caching _caching = caching::all, flag flags = flag::none, const path_handle &base = path_discovery::temporary_named_pipes_directory()) noexcept { return pipe(path, mode::append, creation::open_existing, _caching, flags, base); }
 
   /*! Create a pipe handle creating a randomly named pipe on a path.
   The pipe is opened exclusively with `creation::only_if_not_exist` so it
   will never collide with nor overwrite any existing pipe.
 
-  \errors Any of the values POSIX open(), mkfifo(), CreateFile() or CreateNamedPipe() can return.
+  \errors Any of the values POSIX `open()`, `mkfifo()`, `NtCreateFile()` or `NtCreateNamedPipeFile()` can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<pipe_handle> random_pipe(mode _mode = mode::read, caching _caching = caching::all, flag flags = flag::none, const path_handle &dirpath = path_discovery::storage_backed_temporary_files_directory()) noexcept
+  static inline result<pipe_handle> random_pipe(mode _mode = mode::read, caching _caching = caching::all, flag flags = flag::none, const path_handle &dirpath = path_discovery::temporary_named_pipes_directory()) noexcept
   {
     try
     {
@@ -213,7 +203,10 @@ public:
   /*! \em Securely create two ends of an anonymous pipe handle. The first
   handle returned is the read end; the second is the write end.
 
-  \errors Any of the values POSIX pipe() or CreatePipe() can return.
+  Unlike Windows' `CreatePipe()`, this function can create non-blocking
+  anonymous pipes. These are truly anonymous, not just randomly named.
+
+  \errors Any of the values POSIX `pipe()` or `NtCreateNamedPipeFile()` can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
   static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<pipe_handle, pipe_handle>> anonymous_pipe(caching _caching = caching::all, flag flags = flag::none) noexcept;
@@ -253,6 +246,11 @@ public:
   using io_handle::read;
   using io_handle::write;
 #ifdef _WIN32
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_handle> parent_path_handle(deadline /*unused*/ = std::chrono::seconds(30)) const noexcept override
+  {
+    // Pipes parent handle is always the NT kernel namespace for pipes
+    return path_discovery::temporary_named_pipes_directory().clone();
+  }
   LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
   LLFIO_MAKE_FREE_FUNCTION
@@ -284,7 +282,7 @@ template <> struct construct<pipe_handle>
   pipe_handle::creation _creation = pipe_handle::creation::if_needed;
   pipe_handle::caching _caching = pipe_handle::caching::all;
   pipe_handle::flag flags = pipe_handle::flag::none;
-  const path_handle &base = path_discovery::storage_backed_temporary_files_directory();
+  const path_handle &base = path_discovery::temporary_named_pipes_directory();
   result<pipe_handle> operator()() const noexcept { return pipe_handle::pipe(_path, _mode, _creation, _caching, flags, base); }
 };
 

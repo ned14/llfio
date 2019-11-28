@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 LLFIO_V2_NAMESPACE_BEGIN
 
-result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_handle::mode _mode, pipe_handle::creation _creation, pipe_handle::caching _caching, pipe_handle::flag flags, const path_handle & /*unused*/) noexcept
+result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_handle::mode _mode, pipe_handle::creation _creation, pipe_handle::caching _caching, pipe_handle::flag flags, const path_handle &base) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -39,102 +39,124 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
   OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode, flags));
   OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
   nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
-  ret.value()._flags |= flag::unlink_on_first_close;
-  if(creation::truncate_existing == _creation || creation::always_new == _creation || path.is_ntpath())
+  if(creation::truncate_existing == _creation || creation::always_new == _creation || !base.is_valid())
   {
     return errc::operation_not_supported;
   }
-  path_view::c_str<> zpath(path, false);
-
-  if(zpath.buffer[0] != '\\')
+  DWORD creatdisp = 0x00000001 /*FILE_OPEN*/;
+  switch(_creation)
   {
-    if(zpath.length + 9 >= zpath.internal_buffer_size)
-    {
-      return errc::argument_out_of_domain;  // I should try harder here
-    }
-    wchar_t *_zpathbuffer = const_cast<wchar_t *>(zpath.buffer);
-    memmove(_zpathbuffer + 9, _zpathbuffer, (zpath.length + 1) * sizeof(wchar_t));
-    memcpy(_zpathbuffer, L"\\\\.\\pipe\\", 9 * sizeof(wchar_t));
+  case creation::open_existing:
+    break;
+  case creation::only_if_not_exist:
+    creatdisp = 0x00000002 /*FILE_CREATE*/;
+    break;
+  case creation::if_needed:
+    creatdisp = 0x00000003 /*FILE_OPEN_IF*/;
+    break;
+  case creation::truncate_existing:
+    creatdisp = 0x00000004 /*FILE_OVERWRITE*/;
+    break;
+  case creation::always_new:
+    creatdisp = 0x00000000 /*FILE_SUPERSEDE*/;
+    break;
   }
+  if(mode::append == _mode)
+  {
+    access = SYNCHRONIZE | DELETE | GENERIC_WRITE;
+  }
+
+  attribs &= 0x00ffffff;  // the real attributes only, not the win32 flags
+  OUTCOME_TRY(ntflags, ntflags_from_handle_caching_and_flags(nativeh, _caching, flags));
+  IO_STATUS_BLOCK isb = make_iostatus();
+
+  path_view::c_str<> zpath(path, true);
+  UNICODE_STRING _path{};
+  _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
+  _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
+  if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
+  {
+    _path.Buffer += 3;
+    _path.Length -= 3 * sizeof(wchar_t);
+    _path.MaximumLength -= 3 * sizeof(wchar_t);
+  }
+
+  OBJECT_ATTRIBUTES oa{};
+  memset(&oa, 0, sizeof(oa));
+  oa.Length = sizeof(OBJECT_ATTRIBUTES);
+  oa.ObjectName = &_path;
+  oa.RootDirectory = base.native_handle().h;
+  oa.Attributes = 0x40 /*OBJ_CASE_INSENSITIVE*/;
+  // if(!!(flags & file_flags::int_opening_link))
+  //  oa.Attributes|=0x100/*OBJ_OPENLINK*/;
+
   if(creation::open_existing == _creation)
   {
-    // Open existing pipe
-    DWORD creation = OPEN_EXISTING;
-    switch(_creation)
+    for(;;)
     {
-    case creation::open_existing:
-      break;
-    case creation::only_if_not_exist:
-      creation = CREATE_NEW;
-      break;
-    case creation::if_needed:
-      creation = OPEN_ALWAYS;
-      break;
-    case creation::truncate_existing:
-      creation = TRUNCATE_EXISTING;
-      break;
-    case creation::always_new:
-      creation = CREATE_ALWAYS;
-      break;
+      LARGE_INTEGER AllocationSize{};
+      memset(&AllocationSize, 0, sizeof(AllocationSize));
+      NTSTATUS ntstat = NtCreateFile(&nativeh.h, access, &oa, &isb, &AllocationSize, attribs, fileshare, creatdisp, ntflags, nullptr, 0);
+      if(STATUS_PENDING == ntstat)
+      {
+        ntstat = ntwait(nativeh.h, isb, deadline());
+      }
+      if(ntstat >= 0)
+      {
+        break;
+      }
+      // If writable and not readable, fail if other end is not connected
+      // This matches full duplex pipe behaviour on Linux
+      if(nativeh.is_readable() && nativeh.is_writable() && 0xC00000AE /*STATUS_PIPE_BUSY*/ == ntstat)
+      {
+        return errc::no_such_device_or_address;  // ENXIO, as per Linux
+      }
+      if(nativeh.is_readable())
+      {
+        // assert(false);
+        return ntkernel_error(ntstat);
+      }
+      // loop
     }
-    if(mode::append == _mode)
-    {
-      access = SYNCHRONIZE | DELETE | GENERIC_WRITE;
-    }
-    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.buffer, access, fileshare, nullptr, creation, attribs, nullptr)))  // NOLINT
-    {
-      DWORD errcode = GetLastError();
-      // assert(false);
-      return win32_error(errcode);
-    }
+    ret.value()._set_is_connected(true);
   }
   else
   {
-    switch(_mode)
+    fileshare &= ~FILE_SHARE_DELETE;            // ReactOS sources say this will be refused
+    access |= DELETE;                           // read only pipes need to be able to rename
+    access |= 4 /*FILE_CREATE_PIPE_INSTANCE*/;  // Allow creation of multiple instances
+
+    LARGE_INTEGER default_timeout{};
+    memset(&default_timeout, 0, sizeof(default_timeout));
+    default_timeout.QuadPart = -500000;
+    NTSTATUS ntstat = NtCreateNamedPipeFile(&nativeh.h, access, &oa, &isb, fileshare, creatdisp, ntflags, 0 /*FILE_PIPE_BYTE_STREAM_TYPE*/, 0 /*FILE_PIPE_BYTE_STREAM_MODE*/, 0 /*FILE_PIPE_QUEUE_OPERATION*/, (unsigned long) -1 /*FILE_PIPE_UNLIMITED_INSTANCES*/, 65536, 65536, &default_timeout);
+    if(STATUS_PENDING == ntstat)
     {
-    case handle::mode::unchanged:
-    case handle::mode::none:
-    case handle::mode::attr_read:
-    case handle::mode::attr_write:
-      break;
-    case handle::mode::read:
-      attribs |= PIPE_ACCESS_INBOUND;
-      break;
-    case handle::mode::write:
-      attribs |= PIPE_ACCESS_DUPLEX;
-      break;
-    case handle::mode::append:
-      attribs |= PIPE_ACCESS_OUTBOUND;
-      break;
+      ntstat = ntwait(nativeh.h, isb, deadline());
     }
-    if(creation::only_if_not_exist == _creation)
+    if(ntstat < 0)
     {
-      attribs |= FILE_FLAG_FIRST_PIPE_INSTANCE;
+      return ntkernel_error(ntstat);
     }
-    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateNamedPipe(zpath.buffer, attribs, PIPE_TYPE_BYTE, PIPE_UNLIMITED_INSTANCES, 65535, 65536, NMPWAIT_USE_DEFAULT_WAIT, nullptr)))  // NOLINT
-    {
-      DWORD errcode = GetLastError();
-      // assert(false);
-      return win32_error(errcode);
-    }
+    ret.value()._flags |= flag::unlink_on_first_close;
   }
-  if(!nativeh.is_nonblocking())
+  // If opening a pipe for reading and not writing, and this pipe is blocking,
+  // block until the other end opens for write
+  if(nativeh.is_readable() && !nativeh.is_writable() && !nativeh.is_nonblocking())
   {
-    if(nativeh.is_readable() && !nativeh.is_writable())
+    // Opening blocking pipes for reads must block until other end opens with write
+    if(!ConnectNamedPipe(nativeh.h, nullptr))
     {
-      // Opening blocking pipes for reads must block until other end opens with write
-      if(!ConnectNamedPipe(nativeh.h, nullptr))
-      {
-        return win32_error();
-      }
-      ret.value()._set_is_connected(true);
+      return win32_error();
     }
+    ret.value()._set_is_connected(true);
   }
   return ret;
 }
 
 result<std::pair<pipe_handle, pipe_handle>> pipe_handle::anonymous_pipe(caching _caching, flag flags) noexcept
 {
+  // TODO FIXME Use HANDLE cloning from https://stackoverflow.com/questions/40844884/windows-named-pipe-access-control
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   std::pair<pipe_handle, pipe_handle> ret(pipe_handle(native_handle_type(), 0, 0, _caching, flags), pipe_handle(native_handle_type(), 0, 0, _caching, flags));
@@ -155,47 +177,42 @@ result<std::pair<pipe_handle, pipe_handle>> pipe_handle::anonymous_pipe(caching 
   return ret;
 }
 
-static inline result<void> _do_connect(const native_handle_type &nativeh, deadline &d) noexcept
-{
-  LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
-  OVERLAPPED ol{};
-  memset(&ol, 0, sizeof(ol));
-  ol.Internal = static_cast<ULONG_PTR>(-1);
-  if(!ConnectNamedPipe(nativeh.h, &ol))
-  {
-    if(ERROR_IO_PENDING != GetLastError())
-    {
-      return win32_error();
-    }
-    if(STATUS_TIMEOUT == ntwait(nativeh.h, ol, d))
-    {
-      return errc::timed_out;
-    }
-    // It seems the NT kernel is guilty of casting bugs sometimes
-    ol.Internal = ol.Internal & 0xffffffff;
-    if(ol.Internal != 0)
-    {
-      return ntkernel_error(static_cast<NTSTATUS>(ol.Internal));
-    }
-    if(d.steady)
-    {
-      auto remaining = std::chrono::duration_cast<std::chrono::nanoseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());
-      if(remaining.count() < 0)
-      {
-        remaining = std::chrono::nanoseconds(0);
-      }
-      d = deadline(remaining);
-    }
-  }
-  return success();
-}
-
 pipe_handle::io_result<pipe_handle::buffers_type> pipe_handle::read(pipe_handle::io_request<pipe_handle::buffers_type> reqs, deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
+  // If not connected, it'll be non-blocking, so connect now.
   if(!_is_connected())
   {
-    OUTCOME_TRY(_do_connect(_v, d));
+    LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+    OVERLAPPED ol{};
+    memset(&ol, 0, sizeof(ol));
+    ol.Internal = static_cast<ULONG_PTR>(-1);
+    if(!ConnectNamedPipe(_v.h, &ol))
+    {
+      if(ERROR_IO_PENDING != GetLastError())
+      {
+        return win32_error();
+      }
+      if(STATUS_TIMEOUT == ntwait(_v.h, ol, d))
+      {
+        return errc::timed_out;
+      }
+      // It seems the NT kernel is guilty of casting bugs sometimes
+      ol.Internal = ol.Internal & 0xffffffff;
+      if(ol.Internal != 0)
+      {
+        return ntkernel_error(static_cast<NTSTATUS>(ol.Internal));
+      }
+      if(d.steady)
+      {
+        auto remaining = std::chrono::duration_cast<std::chrono::nanoseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());
+        if(remaining.count() < 0)
+        {
+          remaining = std::chrono::nanoseconds(0);
+        }
+        d = deadline(remaining);
+      }
+    }
     _set_is_connected(true);
   }
   return io_handle::read(reqs, d);
@@ -204,11 +221,6 @@ pipe_handle::io_result<pipe_handle::buffers_type> pipe_handle::read(pipe_handle:
 pipe_handle::io_result<pipe_handle::const_buffers_type> pipe_handle::write(pipe_handle::io_request<pipe_handle::const_buffers_type> reqs, deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  if(!_is_connected())
-  {
-    OUTCOME_TRY(_do_connect(_v, d));
-    _set_is_connected(true);
-  }
   return io_handle::write(reqs, d);
 }
 
