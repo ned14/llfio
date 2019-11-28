@@ -114,6 +114,9 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <tr class="memitem:ade18f14d3ef37488e8967c87faa04d29"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1path__discovery.html#ade18f14d3ef37488e8967c87faa04d29">memory_backed_temporary_files_directory</a> () noexcept</td></tr>
 <tr class="memdesc:ade18f14d3ef37488e8967c87faa04d29"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to an open handle to a verified temporary directory where files created are stored in memory/paging file, and thus access may be a lot quicker, but stronger limits on capacity may apply.  <a href="#ade18f14d3ef37488e8967c87faa04d29">More...</a><br /></td></tr>
 <tr class="separator:ade18f14d3ef37488e8967c87faa04d29"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d3e2ea602c3195433c7898c41744188"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1path__discovery.html#a2d3e2ea602c3195433c7898c41744188">temporary_named_pipes_directory</a> () noexcept</td></tr>
+<tr class="memdesc:a2d3e2ea602c3195433c7898c41744188"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to an open handle to a verified temporary directory where named pipes may be created and found.  <a href="#a2d3e2ea602c3195433c7898c41744188">More...</a><br /></td></tr>
+<tr class="separator:a2d3e2ea602c3195433c7898c41744188"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Contains functions used to discover suitable paths for things. </p>
@@ -207,6 +210,35 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <p>This is implemented by iterating all of the paths returned by <code>verified_temporary_directories()</code> and checking what file system is in use. The following regex is used:</p>
 <p><code>btrfs|cifs|exfat|ext(2|3|4)|f2fs|hfs|jfs|lxfs|nfs|nilf2|ufs|vfat|xfs|zfs|msdosfs|newnfs|ntfs|smbfs|unionfs|fat|fat32</code></p>
 <p>The handle is created during <code>verified_temporary_directories()</code> and is statically cached thereafter. </p>
+
+</div>
+</div>
+<a id="a2d3e2ea602c3195433c7898c41744188"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d3e2ea602c3195433c7898c41744188">&#9670;&nbsp;</a></span>temporary_named_pipes_directory()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a>&amp; llfio_v2_xxx::path_discovery::temporary_named_pipes_directory </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns a reference to an open handle to a verified temporary directory where named pipes may be created and found. </p>
+<p>On Microsoft Windows, this is <code>\Device\NamedPipe</code> within the NT kernel namespace.</p>
+<p>On POSIX, this is <code>storage_backed_temporary_files_directory()</code>. </p>
 
 </div>
 </div>
