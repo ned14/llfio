@@ -33,5 +33,6 @@ var searchData=
   ['await_5fresume',['await_resume',['../classllfio__v2__xxx_1_1async__file__handle_1_1awaitable.html#ae043d0256889c189f3b75a890e3550e2',1,'llfio_v2_xxx::async_file_handle::awaitable']]],
   ['await_5fsuspend',['await_suspend',['../classllfio__v2__xxx_1_1async__file__handle_1_1awaitable.html#a80a5e4c502524a55bb5e8adb52d5d06d',1,'llfio_v2_xxx::async_file_handle::awaitable']]],
   ['awaitable',['awaitable',['../classllfio__v2__xxx_1_1async__file__handle_1_1awaitable.html',1,'llfio_v2_xxx::async_file_handle']]],
+  ['awaitable_5fhandle',['awaitable_handle',['../classllfio__v2__xxx_1_1awaitable__handle.html',1,'llfio_v2_xxx']]],
   ['awaitable_5fpost_5fto_5fself',['awaitable_post_to_self',['../structllfio__v2__xxx_1_1io__service_1_1awaitable__post__to__self.html',1,'llfio_v2_xxx::io_service::awaitable_post_to_self'],['../structllfio__v2__xxx_1_1io__service_1_1awaitable__post__to__self.html#a1023716d724ddf252b772f9b83b1fe85',1,'llfio_v2_xxx::io_service::awaitable_post_to_self::awaitable_post_to_self()']]]
 ];

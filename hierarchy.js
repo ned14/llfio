@@ -29,6 +29,7 @@ var hierarchy =
     [ "llfio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex::entities_guard", "classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html", null ],
     [ "llfio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type", "structllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entity__type.html", null ],
     [ "llfio_v2_xxx::error_info", "structllfio__v2__xxx_1_1error__info.html", null ],
+    [ "llfio_v2_xxx::executor", "classllfio__v2__xxx_1_1executor.html", null ],
     [ "llfio_v2_xxx::lockable_io_handle::extent_guard", "classllfio__v2__xxx_1_1lockable__io__handle_1_1extent__guard.html", null ],
     [ "llfio_v2_xxx::statfs_t::f_flags_t", "structllfio__v2__xxx_1_1statfs__t_1_1f__flags__t.html", null ],
     [ "filesystem_error", null, [
@@ -45,6 +46,7 @@ var hierarchy =
       [ "llfio_v2_xxx::symlink_handle", "classllfio__v2__xxx_1_1symlink__handle.html", null ]
     ] ],
     [ "llfio_v2_xxx::handle", "classllfio__v2__xxx_1_1handle.html", [
+      [ "llfio_v2_xxx::awaitable_handle< IoHandleType >", "classllfio__v2__xxx_1_1awaitable__handle.html", null ],
       [ "llfio_v2_xxx::io_handle", "classllfio__v2__xxx_1_1io__handle.html", [
         [ "llfio_v2_xxx::lockable_io_handle", "classllfio__v2__xxx_1_1lockable__io__handle.html", [
           [ "llfio_v2_xxx::file_handle", "classllfio__v2__xxx_1_1file__handle.html", null ],
@@ -84,6 +86,7 @@ var hierarchy =
     [ "llfio_v2_xxx::path_hasher", "structllfio__v2__xxx_1_1path__hasher.html", null ],
     [ "llfio_v2_xxx::path_view", "classllfio__v2__xxx_1_1path__view.html", null ],
     [ "llfio_v2_xxx::path_view_component", "classllfio__v2__xxx_1_1path__view__component.html", null ],
+    [ "llfio_v2_xxx::read_receiver< IoHandleType >", "classllfio__v2__xxx_1_1read__receiver.html", null ],
     [ "llfio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
     [ "llfio_v2_xxx::utils::page_allocator< void >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
     [ "result", null, [
@@ -126,5 +129,6 @@ var hierarchy =
       [ "in_place_attach_detach::traits::disable_attached_for< llfio_v2_xxx::map_handle >", "structin__place__attach__detach_1_1traits_1_1disable__attached__for_3_01llfio__v2__xxx_1_1map__handle_01_4.html", null ],
       [ "in_place_attach_detach::traits::disable_attached_for< llfio_v2_xxx::mapped_file_handle >", "structin__place__attach__detach_1_1traits_1_1disable__attached__for_3_01llfio__v2__xxx_1_1mapped__file__handle_01_4.html", null ]
     ] ],
-    [ "llfio_v2_xxx::unique_file_lock", "classllfio__v2__xxx_1_1unique__file__lock.html", null ]
+    [ "llfio_v2_xxx::unique_file_lock", "classllfio__v2__xxx_1_1unique__file__lock.html", null ],
+    [ "llfio_v2_xxx::write_receiver< IoHandleType >", "classllfio__v2__xxx_1_1write__receiver.html", null ]
 ];

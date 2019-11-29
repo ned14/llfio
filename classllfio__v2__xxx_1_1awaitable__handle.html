@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>LLFIO: llfio_v2_xxx::handle Class Reference</title>
+<title>LLFIO: llfio_v2_xxx::awaitable_handle&lt; IoHandleType &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,7 +62,7 @@ $(function() {
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('classllfio__v2__xxx_1_1handle.html','');});
+$(document).ready(function(){initNavTree('classllfio__v2__xxx_1_1awaitable__handle.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -84,41 +84,32 @@ $(document).ready(function(){initNavTree('classllfio__v2__xxx_1_1handle.html',''
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
-<a href="#friends">Friends</a> &#124;
-<a href="classllfio__v2__xxx_1_1handle-members.html">List of all members</a>  </div>
+<a href="classllfio__v2__xxx_1_1awaitable__handle-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">llfio_v2_xxx::handle Class Reference</div>  </div>
+<div class="title">llfio_v2_xxx::awaitable_handle&lt; IoHandleType &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>A native_handle_type which is managed by the lifetime of this object instance.  
- <a href="classllfio__v2__xxx_1_1handle.html#details">More...</a></p>
+<p>An awaitable handle which attempts to execute the i/o immediately. If the i/o can complete immediately, no coroutine suspension occurs. Only if the i/o would take a while is coroutine suspension performed.  
+ <a href="classllfio__v2__xxx_1_1awaitable__handle.html#details">More...</a></p>
 
-<p><code>#include &quot;handle.hpp&quot;</code></p>
+<p><code>#include &quot;multiplex.hpp&quot;</code></p>
 <div class="dynheader">
-Inheritance diagram for llfio_v2_xxx::handle:</div>
+Inheritance diagram for llfio_v2_xxx::awaitable_handle&lt; IoHandleType &gt;:</div>
 <div class="dyncontent">
  <div class="center">
-  <img src="classllfio__v2__xxx_1_1handle.png" usemap="#llfio_5Fv2_5Fxxx::handle_map" alt=""/>
-  <map id="llfio_5Fv2_5Fxxx::handle_map" name="llfio_5Fv2_5Fxxx::handle_map">
-<area href="classllfio__v2__xxx_1_1awaitable__handle.html" title="An awaitable handle which attempts to execute the i/o immediately. If the i/o can complete immediatel..." alt="llfio_v2_xxx::awaitable_handle&lt; IoHandleType &gt;" shape="rect" coords="0,56,284,80"/>
-<area href="classllfio__v2__xxx_1_1io__handle.html" title="A handle to something capable of scatter-gather i/o. " alt="llfio_v2_xxx::io_handle" shape="rect" coords="588,56,872,80"/>
-<area href="classllfio__v2__xxx_1_1path__handle.html" title="A handle to somewhere originally identified by a path on the filing system. Typically used as the lig..." alt="llfio_v2_xxx::path_handle" shape="rect" coords="1029,56,1313,80"/>
-<area href="classllfio__v2__xxx_1_1section__handle.html" title="A handle to a source of mapped memory. " alt="llfio_v2_xxx::section_handle" shape="rect" coords="1323,56,1607,80"/>
-<area href="classllfio__v2__xxx_1_1symlink__handle.html" title="A handle to an inode which redirects to a different path. " alt="llfio_v2_xxx::symlink_handle" shape="rect" coords="1617,56,1901,80"/>
-<area href="classllfio__v2__xxx_1_1lockable__io__handle.html" title="A handle to something capable of scatter-gather i/o and which can exclude other concurrent users..." alt="llfio_v2_xxx::lockable_io_handle" shape="rect" coords="441,112,725,136"/>
-<area href="classllfio__v2__xxx_1_1pipe__handle.html" title="A handle to a named or anonymous pipe. " alt="llfio_v2_xxx::pipe_handle" shape="rect" coords="735,112,1019,136"/>
-<area href="classllfio__v2__xxx_1_1directory__handle.html" title="A handle to a directory which can be enumerated. " alt="llfio_v2_xxx::directory_handle" shape="rect" coords="1029,112,1313,136"/>
-<area href="classllfio__v2__xxx_1_1file__handle.html" title="A handle to a regular file or device, kept data layout compatible with async_file_handle. " alt="llfio_v2_xxx::file_handle" shape="rect" coords="294,168,578,192"/>
-<area href="classllfio__v2__xxx_1_1map__handle.html" title="A handle to a memory mapped region of memory, either backed by the system page file or by a section..." alt="llfio_v2_xxx::map_handle" shape="rect" coords="588,168,872,192"/>
-<area href="classllfio__v2__xxx_1_1async__file__handle.html" title="An asynchronous handle to an open something. " alt="llfio_v2_xxx::async_file_handle" shape="rect" coords="0,224,284,248"/>
-<area href="classllfio__v2__xxx_1_1fast__random__file__handle.html" title="A handle to synthesised, non-cryptographic, pseudo-random data. " alt="llfio_v2_xxx::fast_random_file_handle" shape="rect" coords="294,224,578,248"/>
-<area href="classllfio__v2__xxx_1_1mapped__file__handle.html" title="A memory mapped regular file or device. " alt="llfio_v2_xxx::mapped_file_handle" shape="rect" coords="588,224,872,248"/>
+  <img src="classllfio__v2__xxx_1_1awaitable__handle.png" usemap="#llfio_5Fv2_5Fxxx::awaitable_5Fhandle_3C_20IoHandleType_20_3E_map" alt=""/>
+  <map id="llfio_5Fv2_5Fxxx::awaitable_5Fhandle_3C_20IoHandleType_20_3E_map" name="llfio_5Fv2_5Fxxx::awaitable_5Fhandle_3C_20IoHandleType_20_3E_map">
+<area href="classllfio__v2__xxx_1_1handle.html" title="A native_handle_type which is managed by the lifetime of this object instance. " alt="llfio_v2_xxx::handle" shape="rect" coords="0,0,284,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
+<tr class="memitem:a1eb1b47189610a12b6a46ae581e55dc7"><td class="memTemplParams" colspan="2"><a id="a1eb1b47189610a12b6a46ae581e55dc7"></a>
+template&lt;class T &gt; </td></tr>
+<tr class="memitem:a1eb1b47189610a12b6a46ae581e55dc7"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>eager_awaitable</b> = OUTCOME_V2_NAMESPACE::awaitables::eager&lt; T &gt;</td></tr>
+<tr class="separator:a1eb1b47189610a12b6a46ae581e55dc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa3930273a2d4cabbac309e0b75701dca"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a> : unsigned char { <br />
 &#160;&#160;<b>unchanged</b> = 0, 
 <a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaa334c4a4c42fdb79d7ebc3e73b517e6f8">mode::none</a> = 2, 
@@ -172,36 +163,57 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a67c9dc3a201fc43d85ab582759fbd116"><td class="memItemLeft" align="right" valign="top"><a id="a67c9dc3a201fc43d85ab582759fbd116"></a>
+eager_awaitable&lt; io_result&lt; buffers_type &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>read</b> (io_request&lt; buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="separator:a67c9dc3a201fc43d85ab582759fbd116"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa3b130f12705b6f0a36f5f5dcb5a068"><td class="memTemplParams" colspan="2"><a id="afa3b130f12705b6f0a36f5f5dcb5a068"></a>
+template&lt;class... Args&gt; </td></tr>
+<tr class="memitem:afa3b130f12705b6f0a36f5f5dcb5a068"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_read</b> (Args &amp;&amp;... args) noexcept</td></tr>
+<tr class="separator:afa3b130f12705b6f0a36f5f5dcb5a068"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a80320c6c50c4bd1430c92d7c290abd17"><td class="memTemplParams" colspan="2"><a id="a80320c6c50c4bd1430c92d7c290abd17"></a>
+template&lt;class... Args, class Rep , class Period &gt; </td></tr>
+<tr class="memitem:a80320c6c50c4bd1430c92d7c290abd17"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_read_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
+<tr class="separator:a80320c6c50c4bd1430c92d7c290abd17"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9dcfa5dabb40bf2175c5628537b9cc4e"><td class="memTemplParams" colspan="2"><a id="a9dcfa5dabb40bf2175c5628537b9cc4e"></a>
+template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
+<tr class="memitem:a9dcfa5dabb40bf2175c5628537b9cc4e"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_read_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
+<tr class="separator:a9dcfa5dabb40bf2175c5628537b9cc4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb0e2865ca62ca0715e8e1dce502f878"><td class="memItemLeft" align="right" valign="top"><a id="abb0e2865ca62ca0715e8e1dce502f878"></a>
+eager_awaitable&lt; io_result&lt; const_buffers_type &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> (io_request&lt; const_buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="separator:abb0e2865ca62ca0715e8e1dce502f878"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1eed67fb752ce4cdbea73fc6d774abbd"><td class="memTemplParams" colspan="2"><a id="a1eed67fb752ce4cdbea73fc6d774abbd"></a>
+template&lt;class... Args&gt; </td></tr>
+<tr class="memitem:a1eed67fb752ce4cdbea73fc6d774abbd"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_write</b> (Args &amp;&amp;... args) noexcept</td></tr>
+<tr class="separator:a1eed67fb752ce4cdbea73fc6d774abbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3dad14fd2ff7107d066b1ac365d2e7d1"><td class="memTemplParams" colspan="2"><a id="a3dad14fd2ff7107d066b1ac365d2e7d1"></a>
+template&lt;class... Args, class Rep , class Period &gt; </td></tr>
+<tr class="memitem:a3dad14fd2ff7107d066b1ac365d2e7d1"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_write_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
+<tr class="separator:a3dad14fd2ff7107d066b1ac365d2e7d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c3e328220dc0ab9d68b09dab659b1fc"><td class="memTemplParams" colspan="2"><a id="a5c3e328220dc0ab9d68b09dab659b1fc"></a>
+template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
+<tr class="memitem:a5c3e328220dc0ab9d68b09dab659b1fc"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_write_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
+<tr class="separator:a5c3e328220dc0ab9d68b09dab659b1fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa662339395dd63073132ad083ffe4577"><td class="memItemLeft" align="right" valign="top"><a id="aa662339395dd63073132ad083ffe4577"></a>
+eager_awaitable&lt; io_result&lt; const_buffers_type &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>barrier</b> (io_request&lt; const_buffers_type &gt; reqs=io_request&lt; const_buffers_type &gt;(), barrier_kind kind=barrier_kind::nowait_data_only, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="separator:aa662339395dd63073132ad083ffe4577"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3674d0e972ffcecee2862d136b89100b"><td class="memTemplParams" colspan="2"><a id="a3674d0e972ffcecee2862d136b89100b"></a>
+template&lt;class... Args&gt; </td></tr>
+<tr class="memitem:a3674d0e972ffcecee2862d136b89100b"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_barrier</b> (Args &amp;&amp;... args) noexcept</td></tr>
+<tr class="separator:a3674d0e972ffcecee2862d136b89100b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb656a2f9720cf9d699b9afdaa3c1bf7"><td class="memTemplParams" colspan="2"><a id="afb656a2f9720cf9d699b9afdaa3c1bf7"></a>
+template&lt;class... Args, class Rep , class Period &gt; </td></tr>
+<tr class="memitem:afb656a2f9720cf9d699b9afdaa3c1bf7"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_barrier_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
+<tr class="separator:afb656a2f9720cf9d699b9afdaa3c1bf7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf5a5c6ed113a49c7e0fd8c6831b48e2"><td class="memTemplParams" colspan="2"><a id="acf5a5c6ed113a49c7e0fd8c6831b48e2"></a>
+template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
+<tr class="memitem:acf5a5c6ed113a49c7e0fd8c6831b48e2"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_barrier_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
+<tr class="separator:acf5a5c6ed113a49c7e0fd8c6831b48e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac5222904f116c9beb0515a4a5aa850bf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#ac5222904f116c9beb0515a4a5aa850bf">QUICKCPPLIB_BITFIELD_BEGIN</a> (flag)</td></tr>
 <tr class="memdesc:ac5222904f116c9beb0515a4a5aa850bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bitwise flags which can be specified.  <a href="#ac5222904f116c9beb0515a4a5aa850bf">More...</a><br /></td></tr>
 <tr class="separator:ac5222904f116c9beb0515a4a5aa850bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa7e9bedf8c7a4c4a79a644a6e1857ee4"><td class="memItemLeft" align="right" valign="top"><a id="aa7e9bedf8c7a4c4a79a644a6e1857ee4"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>QUICKCPPLIB_BITFIELD_END</b> (flag)</td></tr>
 <tr class="separator:aa7e9bedf8c7a4c4a79a644a6e1857ee4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aea43917ff5cc28f3da3c622c0b3382c4"><td class="memItemLeft" align="right" valign="top"><a id="aea43917ff5cc28f3da3c622c0b3382c4"></a>
-constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#aea43917ff5cc28f3da3c622c0b3382c4">handle</a> ()</td></tr>
-<tr class="memdesc:aea43917ff5cc28f3da3c622c0b3382c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
-<tr class="separator:aea43917ff5cc28f3da3c622c0b3382c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a38078be376d13bdf4af2e7867c09ea24"><td class="memItemLeft" align="right" valign="top"><a id="a38078be376d13bdf4af2e7867c09ea24"></a>
-constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a38078be376d13bdf4af2e7867c09ea24">handle</a> (<a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a> h, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a>=<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a334c4a4c42fdb79d7ebc3e73b517e6f8">caching::none</a>, flag <a class="el" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>=flag::none, io_context *ctx=nullptr) noexcept</td></tr>
-<tr class="memdesc:a38078be376d13bdf4af2e7867c09ea24"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a handle from a supplied native handle. <br /></td></tr>
-<tr class="separator:a38078be376d13bdf4af2e7867c09ea24"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a798fa51a935da9b16ed7bb565b3a4c11"><td class="memItemLeft" align="right" valign="top"><a id="a798fa51a935da9b16ed7bb565b3a4c11"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a798fa51a935da9b16ed7bb565b3a4c11">handle</a> (const <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;)=delete</td></tr>
-<tr class="memdesc:a798fa51a935da9b16ed7bb565b3a4c11"><td class="mdescLeft">&#160;</td><td class="mdescRight">No copy construction (use clone()) <br /></td></tr>
-<tr class="separator:a798fa51a935da9b16ed7bb565b3a4c11"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab7a7864db8369f8e62ae81586ef68ef0"><td class="memItemLeft" align="right" valign="top"><a id="ab7a7864db8369f8e62ae81586ef68ef0"></a>
-<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#ab7a7864db8369f8e62ae81586ef68ef0">operator=</a> (const <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;o)=delete</td></tr>
-<tr class="memdesc:ab7a7864db8369f8e62ae81586ef68ef0"><td class="mdescLeft">&#160;</td><td class="mdescRight">No copy assignment. <br /></td></tr>
-<tr class="separator:ab7a7864db8369f8e62ae81586ef68ef0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ce55ea40b3a0c313f3cb34bb59750f0"><td class="memItemLeft" align="right" valign="top"><a id="a6ce55ea40b3a0c313f3cb34bb59750f0"></a>
-constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a6ce55ea40b3a0c313f3cb34bb59750f0">handle</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;&amp;o) noexcept</td></tr>
-<tr class="memdesc:a6ce55ea40b3a0c313f3cb34bb59750f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move the handle. <br /></td></tr>
-<tr class="separator:a6ce55ea40b3a0c313f3cb34bb59750f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4acd6daf162e10373efedf7fd8528365"><td class="memItemLeft" align="right" valign="top"><a id="a4acd6daf162e10373efedf7fd8528365"></a>
-<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a4acd6daf162e10373efedf7fd8528365">operator=</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;&amp;o) noexcept</td></tr>
-<tr class="memdesc:a4acd6daf162e10373efedf7fd8528365"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move assignment of handle. <br /></td></tr>
-<tr class="separator:a4acd6daf162e10373efedf7fd8528365"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4716696b8700953889006251e0678aa4"><td class="memItemLeft" align="right" valign="top"><a id="a4716696b8700953889006251e0678aa4"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a4716696b8700953889006251e0678aa4">swap</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;o) noexcept</td></tr>
 <tr class="memdesc:a4716696b8700953889006251e0678aa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br /></td></tr>
@@ -337,18 +349,12 @@ char&#160;</td><td class="memItemRight" valign="bottom"><b>_spare3</b> {0}</td><
 <tr class="memitem:ad758cf1eb2e0b4c63583eab05e7f6820"><td class="memItemLeft" align="right" valign="top"><a id="ad758cf1eb2e0b4c63583eab05e7f6820"></a>
 flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b> {flag::none}</td></tr>
 <tr class="separator:ad758cf1eb2e0b4c63583eab05e7f6820"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
-Friends</h2></td></tr>
-<tr class="memitem:a026944e947f6830e5bc5fd31aae205be"><td class="memItemLeft" align="right" valign="top"><a id="a026944e947f6830e5bc5fd31aae205be"></a>
-class&#160;</td><td class="memItemRight" valign="bottom"><b>fs_handle</b></td></tr>
-<tr class="separator:a026944e947f6830e5bc5fd31aae205be"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5c7d33dcd1f366fa378607e1dd087744"><td class="memItemLeft" align="right" valign="top"><a id="a5c7d33dcd1f366fa378607e1dd087744"></a>
-std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;v)</td></tr>
-<tr class="separator:a5c7d33dcd1f366fa378607e1dd087744"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>A native_handle_type which is managed by the lifetime of this object instance. </p>
+<div class="textblock"><h3>template&lt;class IoHandleType&gt;<br />
+class llfio_v2_xxx::awaitable_handle&lt; IoHandleType &gt;</h3>
+
+<p>An awaitable handle which attempts to execute the i/o immediately. If the i/o can complete immediately, no coroutine suspension occurs. Only if the i/o would take a while is coroutine suspension performed. </p>
 </div><h2 class="groupheader">Member Enumeration Documentation</h2>
 <a id="aecd3a7db6cee3aec07d32fe6f99e6852"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aecd3a7db6cee3aec07d32fe6f99e6852">&#9670;&nbsp;</a></span>caching</h2>
@@ -365,7 +371,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+<span class="mlabels"><span class="mlabel">strong</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -405,7 +411,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+<span class="mlabels"><span class="mlabel">strong</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -441,7 +447,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+<span class="mlabels"><span class="mlabel">strong</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -485,7 +491,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -512,7 +518,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -546,7 +552,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -591,7 +597,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -604,14 +610,14 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>include/llfio/v2.0/<a class="el" href="handle_8hpp.html">handle.hpp</a></li>
+<li>include/llfio/v2.0/multiplex.hpp</li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespacellfio__v2__xxx.html">llfio_v2_xxx</a></li><li class="navelem"><a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a></li>
+    <li class="navelem"><a class="el" href="namespacellfio__v2__xxx.html">llfio_v2_xxx</a></li><li class="navelem"><a class="el" href="classllfio__v2__xxx_1_1awaitable__handle.html">awaitable_handle</a></li>
     <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>

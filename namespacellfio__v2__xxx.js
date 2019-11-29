@@ -5,6 +5,7 @@ var namespacellfio__v2__xxx =
     [ "storage_profile", "namespacellfio__v2__xxx_1_1storage__profile.html", "namespacellfio__v2__xxx_1_1storage__profile" ],
     [ "utils", "namespacellfio__v2__xxx_1_1utils.html", "namespacellfio__v2__xxx_1_1utils" ],
     [ "async_file_handle", "classllfio__v2__xxx_1_1async__file__handle.html", "classllfio__v2__xxx_1_1async__file__handle" ],
+    [ "awaitable_handle", "classllfio__v2__xxx_1_1awaitable__handle.html", "classllfio__v2__xxx_1_1awaitable__handle" ],
     [ "construct", "structllfio__v2__xxx_1_1construct.html", "structllfio__v2__xxx_1_1construct" ],
     [ "construct< algorithm::cached_parent_handle_adapter< T > >", "structllfio__v2__xxx_1_1construct_3_01algorithm_1_1cached__parent__handle__adapter_3_01_t_01_4_01_4.html", "structllfio__v2__xxx_1_1construct_3_01algorithm_1_1cached__parent__handle__adapter_3_01_t_01_4_01_4" ],
     [ "construct< async_file_handle >", "structllfio__v2__xxx_1_1construct_3_01async__file__handle_01_4.html", "structllfio__v2__xxx_1_1construct_3_01async__file__handle_01_4" ],
@@ -22,6 +23,7 @@ var namespacellfio__v2__xxx =
     [ "directory_handle", "classllfio__v2__xxx_1_1directory__handle.html", "classllfio__v2__xxx_1_1directory__handle" ],
     [ "error", "classllfio__v2__xxx_1_1error.html", "classllfio__v2__xxx_1_1error" ],
     [ "error_info", "structllfio__v2__xxx_1_1error__info.html", "structllfio__v2__xxx_1_1error__info" ],
+    [ "executor", "classllfio__v2__xxx_1_1executor.html", "classllfio__v2__xxx_1_1executor" ],
     [ "fast_random_file_handle", "classllfio__v2__xxx_1_1fast__random__file__handle.html", "classllfio__v2__xxx_1_1fast__random__file__handle" ],
     [ "file_handle", "classllfio__v2__xxx_1_1file__handle.html", "classllfio__v2__xxx_1_1file__handle" ],
     [ "fs_handle", "classllfio__v2__xxx_1_1fs__handle.html", "classllfio__v2__xxx_1_1fs__handle" ],
@@ -39,9 +41,11 @@ var namespacellfio__v2__xxx =
     [ "path_view", "classllfio__v2__xxx_1_1path__view.html", "classllfio__v2__xxx_1_1path__view" ],
     [ "path_view_component", "classllfio__v2__xxx_1_1path__view__component.html", "classllfio__v2__xxx_1_1path__view__component" ],
     [ "pipe_handle", "classllfio__v2__xxx_1_1pipe__handle.html", "classllfio__v2__xxx_1_1pipe__handle" ],
+    [ "read_receiver", "classllfio__v2__xxx_1_1read__receiver.html", "classllfio__v2__xxx_1_1read__receiver" ],
     [ "section_handle", "classllfio__v2__xxx_1_1section__handle.html", "classllfio__v2__xxx_1_1section__handle" ],
     [ "stat_t", "structllfio__v2__xxx_1_1stat__t.html", "structllfio__v2__xxx_1_1stat__t" ],
     [ "statfs_t", "structllfio__v2__xxx_1_1statfs__t.html", "structllfio__v2__xxx_1_1statfs__t" ],
     [ "symlink_handle", "classllfio__v2__xxx_1_1symlink__handle.html", "classllfio__v2__xxx_1_1symlink__handle" ],
-    [ "unique_file_lock", "classllfio__v2__xxx_1_1unique__file__lock.html", "classllfio__v2__xxx_1_1unique__file__lock" ]
+    [ "unique_file_lock", "classllfio__v2__xxx_1_1unique__file__lock.html", "classllfio__v2__xxx_1_1unique__file__lock" ],
+    [ "write_receiver", "classllfio__v2__xxx_1_1write__receiver.html", "classllfio__v2__xxx_1_1write__receiver" ]
 ];
