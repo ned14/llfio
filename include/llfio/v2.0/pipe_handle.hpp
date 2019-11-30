@@ -35,8 +35,8 @@ LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 \brief A handle to a named or anonymous pipe.
 
 The only fully portable use of this class is to *create* a named pipe with
-read-only privileges, and then to *open* an existing named pipe with
-append-only privileges. This ordering is important - on POSIX opening
+read-only privileges (`pipe_create()`), and then to *open* an existing named pipe with
+append-only privileges (`pipe_open()`). This ordering is important - on POSIX opening
 pipes for reads blocks until a writer connects to the other side, and
 opening pipes for writes fails if no reader on the other side is present.
 The Windows implementation of this class matches these POSIX semantics.

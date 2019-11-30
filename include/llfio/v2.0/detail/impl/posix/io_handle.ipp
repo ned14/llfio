@@ -146,7 +146,7 @@ io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_requ
   for(size_t i = 0; i < reqs.buffers.size(); i++)
   {
     auto &buffer = reqs.buffers[i];
-    if(buffer.size() >= static_cast<size_t>(bytesread))
+    if(buffer.size() <= static_cast<size_t>(bytesread))
     {
       bytesread -= buffer.size();
     }
@@ -239,7 +239,7 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::
   for(size_t i = 0; i < reqs.buffers.size(); i++)
   {
     auto &buffer = reqs.buffers[i];
-    if(buffer.size() >= static_cast<size_t>(byteswritten))
+    if(buffer.size() <= static_cast<size_t>(byteswritten))
     {
       byteswritten -= buffer.size();
     }
@@ -257,6 +257,10 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::barrier(io_handle
 {
   (void) kind;
   LLFIO_LOG_FUNCTION_CALL(this);
+  if(is_pipe() || is_socket())
+  {
+    return success();  // nothing was flushed
+  }
   if(d)
   {
     return errc::not_supported;

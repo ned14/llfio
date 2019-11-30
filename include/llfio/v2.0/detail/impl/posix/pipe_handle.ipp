@@ -29,7 +29,6 @@ LLFIO_V2_NAMESPACE_BEGIN
 
 result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_handle::mode _mode, pipe_handle::creation _creation, pipe_handle::caching _caching, pipe_handle::flag flags, const path_handle &base) noexcept
 {
-  flags |= flag::unlink_on_first_close;
   result<pipe_handle> ret(pipe_handle(native_handle_type(), 0, 0, _caching, flags));
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
@@ -37,7 +36,6 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
   OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, _caching, flags));
   attribs &= ~(O_CREAT | O_EXCL);                                   // needs to be emulated for fifos
   nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
-  ret.value()._flags |= flag::unlink_on_first_close;
   if(creation::truncate_existing == _creation)
   {
     return errc::operation_not_supported;
@@ -108,6 +106,7 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
     {
       return posix_error();
     }
+    ret.value()._flags |= flag::unlink_on_first_close;
   }
   nativeh.fd = ::openat(dirhfd, leafname.c_str(), attribs, 0x1b0 /*660*/);
   if(-1 == nativeh.fd)
@@ -119,8 +118,8 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
 
 result<std::pair<pipe_handle, pipe_handle>> pipe_handle::anonymous_pipe(caching _caching, flag flags) noexcept
 {
-  std::pair<pipe_handle, pipe_handle> ret(pipe_handle(native_handle_type(), 0, 0, _caching, flags), pipe_handle(native_handle_type(), 0, 0, _caching, flags));
-  native_handle_type &readnativeh = ret.first._v, &writenativeh = ret.second._v;
+  result<std::pair<pipe_handle, pipe_handle>> ret(pipe_handle(native_handle_type(), 0, 0, _caching, flags), pipe_handle(native_handle_type(), 0, 0, _caching, flags));
+  native_handle_type &readnativeh = ret.value().first._v, &writenativeh = ret.value().second._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
   OUTCOME_TRY(readattribs, attribs_from_handle_mode_caching_and_flags(readnativeh, mode::read, creation::open_existing, _caching, flags));
   OUTCOME_TRY(attribs_from_handle_mode_caching_and_flags(writenativeh, mode::append, creation::open_existing, _caching, flags));
@@ -158,6 +157,8 @@ result<std::pair<pipe_handle, pipe_handle>> pipe_handle::anonymous_pipe(caching 
     return posix_error();
   }
 #endif
+  readnativeh.fd = pipefds[0];
+  writenativeh.fd = pipefds[1];
   return ret;
 }
 
