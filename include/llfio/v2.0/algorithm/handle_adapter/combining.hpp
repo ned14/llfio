@@ -331,7 +331,6 @@ namespace algorithm
       combining_handle_adapter_base() = default;
       using _base::_base;
 
-      using lock_kind = typename _base::lock_kind;
       using extent_guard = typename _base::extent_guard;
 
     private:
@@ -347,7 +346,7 @@ namespace algorithm
 
     public:
       //! \brief Lock the given extent in one or both of the attached handles. Any second handle is always locked for shared.
-      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_guard> lock_range(extent_type offset, extent_type bytes, lock_kind kind, deadline d = deadline()) noexcept override
+      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_guard> lock_file_range(extent_type offset, extent_type bytes, lock_kind kind, deadline d = deadline()) noexcept override
       {
         optional<result<extent_guard>> _locks[2];
 #if !defined(LLFIO_DISABLE_OPENMP) && defined(_OPENMP)
@@ -357,11 +356,11 @@ namespace algorithm
         {
           if(n == 0)
           {
-            _locks[n] = this->_target->lock_range(offset, bytes, kind, d);
+            _locks[n] = this->_target->lock_file_range(offset, bytes, kind, d);
           }
           else if(_have_source)
           {
-            _locks[n] = this->_source->lock_range(offset, bytes, lock_kind::shared, d);
+            _locks[n] = this->_source->lock_file_range(offset, bytes, lock_kind::shared, d);
           }
         }
         // Handle any errors
@@ -377,12 +376,12 @@ namespace algorithm
         return _extent_guard(this, offset, bytes, kind);
       }
       //! \brief Unlock the given extent in one or both of the attached handles.
-      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock_range(extent_type offset, extent_type bytes) noexcept override
+      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock_file_range(extent_type offset, extent_type bytes) noexcept override
       {
-        this->_target->unlock_range(offset, bytes);
+        this->_target->unlock_file_range(offset, bytes);
         if(_have_source)
         {
-          this->_source->unlock_range(offset, bytes);
+          this->_source->unlock_file_range(offset, bytes);
         }
       }
 

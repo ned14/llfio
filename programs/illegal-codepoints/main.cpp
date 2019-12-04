@@ -6100,6 +6100,10 @@ a￼z   a�z   a￾z
 #include <iostream>
 #include <vector>
 
+#ifdef _WIN32
+#include <codecvt>
+#endif
+
 namespace llfio = LLFIO_V2_NAMESPACE;
 
 int main()

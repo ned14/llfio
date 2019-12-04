@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef LLFIO_FILE_HANDLE_H
 #define LLFIO_FILE_HANDLE_H
 
-#include "io_handle.hpp"
+#include "lockable_io_handle.hpp"
 #include "path_discovery.hpp"
 #include "utils.hpp"
 
@@ -52,7 +52,7 @@ async_file_handle.
 </table>
 
 */
-class LLFIO_DECL file_handle : public io_handle, public fs_handle
+class LLFIO_DECL file_handle : public lockable_io_handle, public fs_handle
 {
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept final { return *this; }
 
@@ -74,14 +74,6 @@ public:
   using ino_t = fs_handle::ino_t;
   using path_view_type = fs_handle::path_view_type;
 
-  //! The kinds of concurrent user exclusion which can be performed.
-  enum class lock_kind
-  {
-    unknown,
-    shared,    //!< Exclude only those requesting an exclusive lock on the same inode.
-    exclusive  //!< Exclude those requesting any kind of lock on the same inode.
-  };
-
 protected:
   io_service *_service{nullptr};
 
@@ -90,7 +82,7 @@ public:
   constexpr file_handle() {}  // NOLINT
   //! Construct a handle from a supplied native handle
   constexpr file_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching = caching::none, flag flags = flag::none)
-      : io_handle(std::move(h), caching, flags)
+      : lockable_io_handle(std::move(h), caching, flags)
       , fs_handle(devid, inode)
       , _service(nullptr)
   {
@@ -100,9 +92,20 @@ public:
   //! No copy assignment
   file_handle &operator=(const file_handle &) = delete;
   //! Implicit move construction of file_handle permitted
-  constexpr file_handle(file_handle &&o) noexcept : io_handle(std::move(o)), fs_handle(std::move(o)), _service(o._service) { o._service = nullptr; }
+  constexpr file_handle(file_handle &&o) noexcept
+      : lockable_io_handle(std::move(o))
+      , fs_handle(std::move(o))
+      , _service(o._service)
+  {
+    o._service = nullptr;
+  }
   //! Explicit conversion from handle and io_handle permitted
-  explicit constexpr file_handle(handle &&o, dev_t devid, ino_t inode) noexcept : io_handle(std::move(o)), fs_handle(devid, inode), _service(nullptr) {}
+  explicit constexpr file_handle(handle &&o, dev_t devid, ino_t inode) noexcept
+      : lockable_io_handle(std::move(o))
+      , fs_handle(devid, inode)
+      , _service(nullptr)
+  {
+  }
   //! Move assignment of file_handle permitted
   file_handle &operator=(file_handle &&o) noexcept
   {
@@ -226,9 +229,6 @@ public:
     return io_handle::close();
   }
 
-  LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), barrier_kind kind = barrier_kind::nowait_data_only, deadline d = deadline()) noexcept override;
-
   /*! Clone this handle (copy constructor is disabled to avoid accidental copying),
   optionally race free reopening the handle with different access or caching.
 
@@ -242,6 +242,8 @@ public:
   trying to open the path returned. Thus many allocations may occur.
   */
   result<file_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
+
+  LLFIO_DEADLINE_TRY_FOR_UNTIL(clone)
 
   //! The i/o service this handle is attached to, if any
   io_service *service() const noexcept { return _service; }
@@ -262,163 +264,7 @@ public:
     return std::move(ret).error();
   }
 
-  /*! \class extent_guard
-  \brief EXTENSION: RAII holder a locked extent of bytes in a file.
-  */
-  class extent_guard
-  {
-    friend class file_handle;
-    file_handle *_h{nullptr};
-    extent_type _offset{0}, _length{0};
-    lock_kind _kind{lock_kind::unknown};
-
-  protected:
-    constexpr extent_guard(file_handle *h, extent_type offset, extent_type length, lock_kind kind)
-        : _h(h)
-        , _offset(offset)
-        , _length(length)
-        , _kind(kind)
-    {
-    }
-
-  public:
-    extent_guard(const extent_guard &) = delete;
-    extent_guard &operator=(const extent_guard &) = delete;
-
-    //! Default constructor
-    constexpr extent_guard() {}  // NOLINT
-    //! Move constructor
-    extent_guard(extent_guard &&o) noexcept
-        : _h(o._h)
-        , _offset(o._offset)
-        , _length(o._length)
-        , _kind(o._kind)
-    {
-      o.release();
-    }
-    //! Move assign
-    extent_guard &operator=(extent_guard &&o) noexcept
-    {
-      unlock();
-      _h = o._h;
-      _offset = o._offset;
-      _length = o._length;
-      _kind = o._kind;
-      o.release();
-      return *this;
-    }
-    ~extent_guard()
-    {
-      if(_h != nullptr)
-      {
-        unlock();
-      }
-    }
-    //! True if extent guard is valid
-    explicit operator bool() const noexcept { return _h != nullptr; }
-
-    //! The `file_handle` to be unlocked
-    file_handle *handle() const noexcept { return _h; }
-    //! Sets the `file_handle` to be unlocked
-    void set_handle(file_handle *h) noexcept { _h = h; }
-    //! The extent to be unlocked
-    std::tuple<extent_type, extent_type, lock_kind> extent() const noexcept { return std::make_tuple(_offset, _length, _kind); }
-
-    //! Unlocks the locked extent immediately
-    void unlock() noexcept
-    {
-      if(_h != nullptr)
-      {
-        _h->unlock_range(_offset, _length);
-        release();
-      }
-    }
-
-    //! Detach this RAII unlocker from the locked state
-    void release() noexcept
-    {
-      _h = nullptr;
-      _offset = 0;
-      _length = 0;
-      _kind = lock_kind::unknown;
-    }
-  };
-
-  /*! \brief EXTENSION: Tries to lock the range of bytes specified for shared or exclusive access. Be aware
-  this passes through the same semantics as the underlying OS call, including any POSIX insanity
-  present on your platform:
-
-  - Any fd closed on an inode must release all byte range locks on that inode for all
-  other fds. If your OS isn't new enough to support the non-insane lock API,
-  `flag::byte_lock_insanity` will be set in flags() after the first call to this function.
-  - Threads replace each other's locks, indeed locks replace each other's locks.
-
-  You almost cetainly should use your choice of an `algorithm::shared_fs_mutex::*` instead of this
-  as those are more portable and performant, or use the `SharedMutex` modelling member functions
-  which lock the whole inode for exclusive or shared access.
-
-  \warning This is a low-level API which you should not use directly in portable code. Another
-  issue is that atomic lock upgrade/downgrade, if your platform implements that (you should assume
-  it does not in portable code), means that on POSIX you need to *release* the old `extent_guard`
-  after creating a new one over the same byte range, otherwise the old `extent_guard`'s destructor
-  will simply unlock the range entirely. On Windows however upgrade/downgrade locks overlay, so on
-  that platform you must *not* release the old `extent_guard`. Look into
-  `algorithm::shared_fs_mutex::safe_byte_ranges` for a portable solution.
-
-  \return An extent guard, the destruction of which will call unlock().
-  \param offset The offset to lock. Note that on POSIX the top bit is always cleared before use
-  as POSIX uses signed transport for offsets. If you want an advisory rather than mandatory lock
-  on Windows, one technique is to force top bit set so the region you lock is not the one you will
-  i/o - obviously this reduces maximum file size to (2^63)-1.
-  \param bytes The number of bytes to lock. 
-  \param kind Whether the lock is to be shared or exclusive.
-  \param d An optional deadline by which the lock must complete, else it is cancelled.
-  \errors Any of the values POSIX fcntl() can return, `errc::timed_out`, `errc::not_supported` may be
-  returned if deadline i/o is not possible with this particular handle configuration (e.g.
-  non-overlapped HANDLE on Windows).
-  \mallocs The default synchronous implementation in file_handle performs no memory allocation.
-  The asynchronous implementation in async_file_handle performs one calloc and one free.
-  */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_guard> lock_range(extent_type offset, extent_type bytes, lock_kind kind, deadline d = deadline()) noexcept;
-  //! \overload
-  result<extent_guard> try_lock_range(extent_type offset, extent_type bytes, lock_kind kind) noexcept { return lock_range(offset, bytes, kind, deadline(std::chrono::seconds(0))); }
-  //! \overload EXTENSION: Locks for shared access
-  result<extent_guard> lock_range(io_request<buffers_type> reqs, deadline d = deadline()) noexcept
-  {
-    size_t bytes = 0;
-    for(auto &i : reqs.buffers)
-    {
-      if(bytes + i.size() < bytes)
-      {
-        return errc::value_too_large;
-      }
-      bytes += i.size();
-    }
-    return lock_range(reqs.offset, bytes, lock_kind::shared, d);
-  }
-  //! \overload EXTENSION: Locks for exclusive access
-  result<extent_guard> lock_range(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept
-  {
-    size_t bytes = 0;
-    for(auto &i : reqs.buffers)
-    {
-      if(bytes + i.size() < bytes)
-      {
-        return errc::value_too_large;
-      }
-      bytes += i.size();
-    }
-    return lock_range(reqs.offset, bytes, lock_kind::exclusive, d);
-  }
-
-  /*! \brief EXTENSION: Unlocks a byte range previously locked.
-
-  \param offset The offset to unlock. This should be an offset previously locked.
-  \param bytes The number of bytes to unlock. This should be a byte extent previously locked.
-  \errors Any of the values POSIX fcntl() can return.
-  \mallocs None.
-  */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock_range(extent_type offset, extent_type bytes) noexcept;
+  LLFIO_DEADLINE_TRY_FOR_UNTIL(read)
 
   /*! Return the current maximum permitted extent of the file.
 
@@ -468,6 +314,8 @@ public:
   */
   LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> zero(extent_type offset, extent_type bytes, deadline d = deadline()) noexcept;
+
+  LLFIO_DEADLINE_TRY_FOR_UNTIL(zero)
 };
 
 //! \brief Constructor for `file_handle`

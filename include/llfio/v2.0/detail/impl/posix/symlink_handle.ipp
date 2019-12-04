@@ -291,6 +291,8 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
     return errc::function_not_supported;
   }
   OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, caching::all, flags));
+  attribs &= ~O_NONBLOCK;
+  nativeh.behaviour &= ~native_handle_type::disposition::nonblocking;
   nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
 #if !LLFIO_SYMLINK_HANDLE_IS_FAKED
   path_handle dirh;

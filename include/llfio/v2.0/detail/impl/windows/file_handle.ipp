@@ -294,46 +294,6 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   }
 }
 
-file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(file_handle::io_request<file_handle::const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
-{
-  windows_nt_kernel::init();
-  using namespace windows_nt_kernel;
-  LLFIO_LOG_FUNCTION_CALL(this);
-  if(d && !_v.is_overlapped())
-  {
-    return errc::not_supported;
-  }
-  LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
-  OVERLAPPED ol{};
-  memset(&ol, 0, sizeof(ol));
-  auto *isb = reinterpret_cast<IO_STATUS_BLOCK *>(&ol);
-  *isb = make_iostatus();
-  ULONG flags = 0;
-  if(kind == barrier_kind::nowait_data_only)
-  {
-    flags = 1 /*FLUSH_FLAGS_FILE_DATA_ONLY*/;  // note this doesn't block
-  }
-  else if(kind == barrier_kind::nowait_all)
-  {
-    flags = 2 /*FLUSH_FLAGS_NO_SYNC*/;
-  }
-  NTSTATUS ntstat = NtFlushBuffersFileEx(_v.h, flags, nullptr, 0, isb);
-  if(STATUS_PENDING == ntstat)
-  {
-    ntstat = ntwait(_v.h, ol, d);
-    if(STATUS_TIMEOUT == ntstat)
-    {
-      CancelIoEx(_v.h, &ol);
-      LLFIO_WIN_DEADLINE_TO_TIMEOUT(d);
-    }
-  }
-  if(ntstat < 0)
-  {
-    return ntkernel_error(ntstat);
-  }
-  return {reqs.buffers};
-}
-
 result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline /*unused*/) const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
@@ -341,90 +301,6 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline /*
   ret.value()._service = _service;
   OUTCOME_TRY(do_clone_handle(ret.value()._v, _v, mode_, caching_, _flags));
   return ret;
-}
-
-result<file_handle::extent_guard> file_handle::lock_range(io_handle::extent_type offset, io_handle::extent_type bytes, lock_kind kind, deadline d) noexcept
-{
-  LLFIO_LOG_FUNCTION_CALL(_v.h);
-  if(d && d.nsecs > 0 && !_v.is_overlapped())
-  {
-    return errc::not_supported;
-  }
-  DWORD flags = (lock_kind::shared != kind) ? LOCKFILE_EXCLUSIVE_LOCK : 0;
-  if(d && (d.nsecs == 0u))
-  {
-    flags |= LOCKFILE_FAIL_IMMEDIATELY;
-  }
-  LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
-  OVERLAPPED ol{};
-  memset(&ol, 0, sizeof(ol));
-  ol.Internal = static_cast<ULONG_PTR>(-1);
-  ol.OffsetHigh = (offset >> 32) & 0xffffffff;
-  ol.Offset = offset & 0xffffffff;
-  DWORD bytes_high = bytes == 0u ? MAXDWORD : static_cast<DWORD>((bytes >> 32) & 0xffffffff);
-  DWORD bytes_low = bytes == 0u ? MAXDWORD : static_cast<DWORD>(bytes & 0xffffffff);
-  if(LockFileEx(_v.h, flags, 0, bytes_low, bytes_high, &ol) == 0)
-  {
-    if(ERROR_LOCK_VIOLATION == GetLastError() && d && (d.nsecs == 0u))
-    {
-      return errc::timed_out;
-    }
-    if(ERROR_IO_PENDING != GetLastError())
-    {
-      return win32_error();
-    }
-  }
-  // If handle is overlapped, wait for completion of each i/o.
-  if(_v.is_overlapped())
-  {
-    if(STATUS_TIMEOUT == ntwait(_v.h, ol, d))
-    {
-      LLFIO_WIN_DEADLINE_TO_TIMEOUT(d);
-    }
-    // It seems the NT kernel is guilty of casting bugs sometimes
-    ol.Internal = ol.Internal & 0xffffffff;
-    if(ol.Internal != 0)
-    {
-      return ntkernel_error(static_cast<NTSTATUS>(ol.Internal));
-    }
-  }
-  return extent_guard(this, offset, bytes, kind);
-}
-
-void file_handle::unlock_range(io_handle::extent_type offset, io_handle::extent_type bytes) noexcept
-{
-  LLFIO_LOG_FUNCTION_CALL(this);
-  OVERLAPPED ol{};
-  memset(&ol, 0, sizeof(ol));
-  ol.Internal = static_cast<ULONG_PTR>(-1);
-  ol.OffsetHigh = (offset >> 32) & 0xffffffff;
-  ol.Offset = offset & 0xffffffff;
-  DWORD bytes_high = bytes == 0u ? MAXDWORD : static_cast<DWORD>((bytes >> 32) & 0xffffffff);
-  DWORD bytes_low = bytes == 0u ? MAXDWORD : static_cast<DWORD>(bytes & 0xffffffff);
-  if(UnlockFileEx(_v.h, 0, bytes_low, bytes_high, &ol) == 0)
-  {
-    if(ERROR_IO_PENDING != GetLastError())
-    {
-      auto ret = win32_error();
-      (void) ret;
-      LLFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
-      std::terminate();
-    }
-  }
-  // If handle is overlapped, wait for completion of each i/o.
-  if(_v.is_overlapped())
-  {
-    ntwait(_v.h, ol, deadline());
-    if(ol.Internal != 0)
-    {
-      // It seems the NT kernel is guilty of casting bugs sometimes
-      ol.Internal = ol.Internal & 0xffffffff;
-      auto ret = ntkernel_error(static_cast<NTSTATUS>(ol.Internal));
-      (void) ret;
-      LLFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
-      std::terminate();
-    }
-  }
 }
 
 result<file_handle::extent_type> file_handle::maximum_extent() const noexcept

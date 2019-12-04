@@ -93,7 +93,8 @@ namespace windows_nt_kernel
 #endif
 
   // From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/FILE_INFORMATION_CLASS.html
-  typedef enum _FILE_INFORMATION_CLASS {  // NOLINT
+  typedef enum _FILE_INFORMATION_CLASS
+  {  // NOLINT
     FileDirectoryInformation = 1,
     FileFullDirectoryInformation,
     FileBothDirectoryInformation,
@@ -173,7 +174,8 @@ namespace windows_nt_kernel
   } FILE_INFORMATION_CLASS,
   *PFILE_INFORMATION_CLASS;
 
-  typedef enum {  // NOLINT
+  typedef enum
+  {  // NOLINT
     FileFsVolumeInformation = 1,
     FileFsLabelInformation = 2,
     FileFsSizeInformation = 3,
@@ -187,7 +189,12 @@ namespace windows_nt_kernel
     FileFsSectorSizeInformation = 11
   } FS_INFORMATION_CLASS;
 
-  typedef enum { ObjectBasicInformation = 0, ObjectNameInformation = 1, ObjectTypeInformation = 2 } OBJECT_INFORMATION_CLASS;  // NOLINT
+  typedef enum
+  {
+    ObjectBasicInformation = 0,
+    ObjectNameInformation = 1,
+    ObjectTypeInformation = 2
+  } OBJECT_INFORMATION_CLASS;  // NOLINT
 
 #ifndef NTSTATUS
 #define NTSTATUS LONG
@@ -242,7 +249,12 @@ namespace windows_nt_kernel
     DWORD64 Address;
   } IMAGEHLP_LINE64, *PIMAGEHLP_LINE64;
 
-  typedef enum _SECTION_INHERIT { ViewShare = 1, ViewUnmap = 2 } SECTION_INHERIT, *PSECTION_INHERIT;  // NOLINT
+  typedef enum _SECTION_INHERIT
+  {
+    ViewShare = 1,
+    ViewUnmap = 2
+  } SECTION_INHERIT,
+  *PSECTION_INHERIT;  // NOLINT
 
   typedef struct _WIN32_MEMORY_RANGE_ENTRY  // NOLINT
   {
@@ -250,7 +262,12 @@ namespace windows_nt_kernel
     SIZE_T NumberOfBytes;
   } WIN32_MEMORY_RANGE_ENTRY, *PWIN32_MEMORY_RANGE_ENTRY;
 
-  typedef enum _SECTION_INFORMATION_CLASS { SectionBasicInformation, SectionImageInformation } SECTION_INFORMATION_CLASS, *PSECTION_INFORMATION_CLASS;  // NOLINT
+  typedef enum _SECTION_INFORMATION_CLASS
+  {
+    SectionBasicInformation,
+    SectionImageInformation
+  } SECTION_INFORMATION_CLASS,
+  *PSECTION_INFORMATION_CLASS;  // NOLINT
 
   typedef struct _SECTION_BASIC_INFORMATION  // NOLINT
   {
@@ -284,6 +301,10 @@ namespace windows_nt_kernel
 
   using NtClose_t = NTSTATUS(NTAPI *)(_Out_ HANDLE FileHandle);
 
+  // From https://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/NtCreateNamedPipeFile.html
+  using NtCreateNamedPipeFile_t = NTSTATUS(NTAPI *)(_Out_ PHANDLE NamedPipeFileHandle, _In_ ACCESS_MASK DesiredAccess, _In_ POBJECT_ATTRIBUTES ObjectAttributes, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ ULONG ShareAccess, _In_ ULONG CreateDisposition, _In_ ULONG CreateOptions, _In_ ULONG WriteModeMessage,
+                                                    _In_ ULONG ReadModeMessage, _In_ ULONG NonBlocking, _In_ ULONG MaxInstances, _In_ ULONG InBufferSize, _In_ ULONG OutBufferSize, _In_ PLARGE_INTEGER DefaultTimeOut);
+
   // From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/NtQueryDirectoryFile.html
   // and http://msdn.microsoft.com/en-us/library/windows/hardware/ff567047(v=vs.85).aspx
   using NtQueryDirectoryFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _In_opt_ HANDLE Event, _In_opt_ PIO_APC_ROUTINE ApcRoutine, _In_opt_ PVOID ApcContext, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _Out_ PVOID FileInformation, _In_ ULONG Length, _In_ FILE_INFORMATION_CLASS FileInformationClass,
@@ -296,7 +317,12 @@ namespace windows_nt_kernel
   // From http://msdn.microsoft.com/en-us/library/ms648412(v=vs.85).aspx
   using NtWaitForSingleObject_t = NTSTATUS(NTAPI *)(_In_ HANDLE Handle, _In_ BOOLEAN Alertable, _In_opt_ PLARGE_INTEGER Timeout);
 
-  typedef enum _OBJECT_WAIT_TYPE { WaitAllObject, WaitAnyObject } OBJECT_WAIT_TYPE, *POBJECT_WAIT_TYPE;  // NOLINT
+  typedef enum _OBJECT_WAIT_TYPE
+  {
+    WaitAllObject,
+    WaitAnyObject
+  } OBJECT_WAIT_TYPE,
+  *POBJECT_WAIT_TYPE;  // NOLINT
 
   using NtWaitForMultipleObjects_t = NTSTATUS(NTAPI *)(_In_ ULONG Count, _In_ HANDLE Object[], _In_ OBJECT_WAIT_TYPE WaitType, _In_ BOOLEAN Alertable, _In_opt_ PLARGE_INTEGER Time);
 
@@ -351,7 +377,7 @@ namespace windows_nt_kernel
 
   using RtlUTF8ToUnicodeN_t = NTSTATUS(NTAPI *)(_Out_opt_ PWSTR UnicodeStringDestination, _In_ ULONG UnicodeStringMaxByteCount, _Out_ PULONG UnicodeStringActualByteCount, _In_ PCCH UTF8StringSource, _In_ ULONG UTF8StringByteCount);
 
-  using RtlUnicodeToUTF8N_t = NTSTATUS(NTAPI *)(_Out_opt_ PCHAR  UTF8StringDestination, _In_ ULONG  UTF8StringMaxByteCount, _Out_ PULONG UTF8StringActualByteCount, _In_ PCWCH  UnicodeStringSource, _In_ ULONG  UnicodeStringByteCount);
+  using RtlUnicodeToUTF8N_t = NTSTATUS(NTAPI *)(_Out_opt_ PCHAR UTF8StringDestination, _In_ ULONG UTF8StringMaxByteCount, _Out_ PULONG UTF8StringActualByteCount, _In_ PCWCH UnicodeStringSource, _In_ ULONG UnicodeStringByteCount);
 
   using RtlAnsiStringToUnicodeString_t = NTSTATUS(NTAPI *)(PUNICODE_STRING DestinationString, PCANSI_STRING SourceString, BOOLEAN AllocateDestinationString);
 
@@ -567,6 +593,7 @@ namespace windows_nt_kernel
   static NtCreateFile_t NtCreateFile;
   static NtDeleteFile_t NtDeleteFile;
   static NtClose_t NtClose;
+  static NtCreateNamedPipeFile_t NtCreateNamedPipeFile;
   static NtQueryDirectoryFile_t NtQueryDirectoryFile;
   static NtSetInformationFile_t NtSetInformationFile;
   static NtWaitForSingleObject_t NtWaitForSingleObject;
@@ -602,7 +629,7 @@ namespace windows_nt_kernel
   static RtlFreeUnicodeString_t RtlFreeUnicodeString;
   static RtlFreeAnsiString_t RtlFreeAnsiString;
 
-  
+
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4706)  // assignment within conditional
@@ -670,6 +697,13 @@ namespace windows_nt_kernel
     if(NtClose == nullptr)
     {
       if((NtClose = reinterpret_cast<NtClose_t>(GetProcAddress(ntdllh, "NtClose"))) == nullptr)
+      {
+        abort();
+      }
+    }
+    if(NtCreateNamedPipeFile == nullptr)
+    {
+      if((NtCreateNamedPipeFile = reinterpret_cast<NtCreateNamedPipeFile_t>(GetProcAddress(ntdllh, "NtCreateNamedPipeFile"))) == nullptr)
       {
         abort();
       }
@@ -908,7 +942,7 @@ namespace windows_nt_kernel
         abort();
       }
     }
-    
+
     // MAKE SURE you update the early exit check at the top to whatever the last of these is!
   }
 #ifdef _MSC_VER
@@ -1058,28 +1092,27 @@ inline HANDLE get_thread_local_waitable_timer()
 */
 #define LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d)                                                                                                                                                                                                                                                                                    \
   std::chrono::steady_clock::time_point began_steady;                                                                                                                                                                                                                                                                          \
-  \
-std::chrono::system_clock::time_point end_utc;                                                                                                                                                                                                                                                                                 \
-  \
-if(d)                                                                                                                                                                                                                                                                                                                          \
-  \
-{                                                                                                                                                                                                                                                                                                                         \
+                                                                                                                                                                                                                                                                                                                               \
+  std::chrono::system_clock::time_point end_utc;                                                                                                                                                                                                                                                                               \
+                                                                                                                                                                                                                                                                                                                               \
+  if(d)                                                                                                                                                                                                                                                                                                                        \
+                                                                                                                                                                                                                                                                                                                               \
+  {                                                                                                                                                                                                                                                                                                                            \
     if((d).steady)                                                                                                                                                                                                                                                                                                             \
       began_steady = std::chrono::steady_clock::now();                                                                                                                                                                                                                                                                         \
     else                                                                                                                                                                                                                                                                                                                       \
       end_utc = (d).to_time_point();                                                                                                                                                                                                                                                                                           \
-  \
-}                                                                                                                                                                                                                                                                                                                         \
-  \
-DWORD sleep_interval = INFINITE;                                                                                                                                                                                                                                                                                               \
-  \
-HANDLE sleep_object = nullptr;
+  }                                                                                                                                                                                                                                                                                                                            \
+                                                                                                                                                                                                                                                                                                                               \
+  DWORD sleep_interval = INFINITE;                                                                                                                                                                                                                                                                                             \
+                                                                                                                                                                                                                                                                                                                               \
+  HANDLE sleep_object = nullptr;
 
 #define LLFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d)                                                                                                                                                                                                                                                                                    \
-  \
-if(d)                                                                                                                                                                                                                                                                                                                          \
-  \
-{                                                                                                                                                                                                                                                                                                                         \
+                                                                                                                                                                                                                                                                                                                               \
+  if(d)                                                                                                                                                                                                                                                                                                                        \
+                                                                                                                                                                                                                                                                                                                               \
+  {                                                                                                                                                                                                                                                                                                                            \
     if((d).steady)                                                                                                                                                                                                                                                                                                             \
     {                                                                                                                                                                                                                                                                                                                          \
       std::chrono::milliseconds ms;                                                                                                                                                                                                                                                                                            \
@@ -1096,14 +1129,13 @@ if(d)                                                                           
       if(!SetWaitableTimer(sleep_object, &due_time, 0, nullptr, nullptr, false))                                                                                                                                                                                                                                               \
         throw std::system_error(GetLastError(), std::system_category());                                                                                                                                                                                                                                                       \
     }                                                                                                                                                                                                                                                                                                                          \
-  \
-}
+  }
 
-#define LLFIO_WIN_DEADLINE_TO_TIMEOUT(type, d)                                                                                                                                                                                                                                                                                 \
-  \
-if(d)                                                                                                                                                                                                                                                                                                                          \
-  \
-{                                                                                                                                                                                                                                                                                                                         \
+#define LLFIO_WIN_DEADLINE_TO_TIMEOUT_LOOP(type, d)                                                                                                                                                                                                                                                                            \
+                                                                                                                                                                                                                                                                                                                               \
+  if(d)                                                                                                                                                                                                                                                                                                                        \
+                                                                                                                                                                                                                                                                                                                               \
+  {                                                                                                                                                                                                                                                                                                                            \
     if((d).steady)                                                                                                                                                                                                                                                                                                             \
     {                                                                                                                                                                                                                                                                                                                          \
       if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))                                                                                                                                                                                                                             \
@@ -1114,8 +1146,7 @@ if(d)                                                                           
       if(std::chrono::system_clock::now() >= end_utc)                                                                                                                                                                                                                                                                          \
         return make_errored_result<type>(errc::timed_out);                                                                                                                                                                                                                                                                     \
     }                                                                                                                                                                                                                                                                                                                          \
-  \
-}
+  }
 #else
 /*! Defines a number of variables into its scope:
 - began_steady: Set to the steady clock at the beginning of a sleep
@@ -1125,18 +1156,18 @@ if(d)                                                                           
 */
 #define LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d)                                                                                                                                                                                                                                                                                    \
   std::chrono::steady_clock::time_point began_steady;                                                                                                                                                                                                                                                                          \
-  \
-std::chrono::system_clock::time_point end_utc;                                                                                                                                                                                                                                                                                 \
-  \
-alignas(8) LARGE_INTEGER _timeout{};                                                                                                                                                                                                                                                                                           \
-  \
-memset(&_timeout, 0, sizeof(_timeout));                                                                                                                                                                                                                                                                                        \
-  \
-LARGE_INTEGER *timeout = nullptr;                                                                                                                                                                                                                                                                                              \
-  \
-if(d)                                                                                                                                                                                                                                                                                                                          \
-  \
-{                                                                                                                                                                                                                                                                                                                         \
+                                                                                                                                                                                                                                                                                                                               \
+  std::chrono::system_clock::time_point end_utc;                                                                                                                                                                                                                                                                               \
+                                                                                                                                                                                                                                                                                                                               \
+  alignas(8) LARGE_INTEGER _timeout{};                                                                                                                                                                                                                                                                                         \
+                                                                                                                                                                                                                                                                                                                               \
+  memset(&_timeout, 0, sizeof(_timeout));                                                                                                                                                                                                                                                                                      \
+                                                                                                                                                                                                                                                                                                                               \
+  LARGE_INTEGER *timeout = nullptr;                                                                                                                                                                                                                                                                                            \
+                                                                                                                                                                                                                                                                                                                               \
+  if(d)                                                                                                                                                                                                                                                                                                                        \
+                                                                                                                                                                                                                                                                                                                               \
+  {                                                                                                                                                                                                                                                                                                                            \
     if((d).steady)                                                                                                                                                                                                                                                                                                             \
       began_steady = std::chrono::steady_clock::now();                                                                                                                                                                                                                                                                         \
     else                                                                                                                                                                                                                                                                                                                       \
@@ -1145,8 +1176,7 @@ if(d)                                                                           
       _timeout = windows_nt_kernel::from_timepoint(end_utc);                                                                                                                                                                                                                                                                   \
     }                                                                                                                                                                                                                                                                                                                          \
     timeout = &_timeout;                                                                                                                                                                                                                                                                                                       \
-  \
-}
+  }
 
 #define LLFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d)                                                                                                                                                                                                                                                                                    \
   if((d) && (d).steady)                                                                                                                                                                                                                                                                                                        \
@@ -1158,11 +1188,11 @@ if(d)                                                                           
       _timeout.QuadPart = ns.count() / -100;                                                                                                                                                                                                                                                                                   \
   }
 
-#define LLFIO_WIN_DEADLINE_TO_TIMEOUT(d)                                                                                                                                                                                                                                                                                       \
-  \
-if(d)                                                                                                                                                                                                                                                                                                                          \
-  \
-{                                                                                                                                                                                                                                                                                                                         \
+#define LLFIO_WIN_DEADLINE_TO_TIMEOUT_LOOP(d)                                                                                                                                                                                                                                                                                  \
+                                                                                                                                                                                                                                                                                                                               \
+  if(d)                                                                                                                                                                                                                                                                                                                        \
+                                                                                                                                                                                                                                                                                                                               \
+  {                                                                                                                                                                                                                                                                                                                            \
     if((d).steady)                                                                                                                                                                                                                                                                                                             \
     {                                                                                                                                                                                                                                                                                                                          \
       if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))                                                                                                                                                                                                                             \
@@ -1173,8 +1203,7 @@ if(d)                                                                           
       if(std::chrono::system_clock::now() >= end_utc)                                                                                                                                                                                                                                                                          \
         return errc::timed_out;                                                                                                                                                                                                                                                                                                \
     }                                                                                                                                                                                                                                                                                                                          \
-  \
-}
+  }
 #endif
 
 // Initialise an IO_STATUS_BLOCK for later wait operations
@@ -1288,10 +1317,10 @@ inline result<ACCESS_MASK> access_mask_from_handle_mode(native_handle_type &nati
 inline result<DWORD> attributes_from_handle_caching_and_flags(native_handle_type &nativeh, handle::caching _caching, handle::flag flags)
 {
   DWORD attribs = 0;
-  if(flags & handle::flag::overlapped)
+  if(flags & handle::flag::multiplexable)
   {
     attribs |= FILE_FLAG_OVERLAPPED;
-    nativeh.behaviour |= native_handle_type::disposition::overlapped;
+    nativeh.behaviour |= native_handle_type::disposition::nonblocking;
   }
   switch(_caching)
   {
@@ -1333,9 +1362,9 @@ inline result<DWORD> attributes_from_handle_caching_and_flags(native_handle_type
 inline result<DWORD> ntflags_from_handle_caching_and_flags(native_handle_type &nativeh, handle::caching _caching, handle::flag flags)
 {
   DWORD ntflags = 0;
-  if(flags & handle::flag::overlapped)
+  if(flags & handle::flag::multiplexable)
   {
-    nativeh.behaviour |= native_handle_type::disposition::overlapped;
+    nativeh.behaviour |= native_handle_type::disposition::nonblocking;
   }
   else
   {
@@ -1426,6 +1455,88 @@ inline result<void> do_clone_handle(native_handle_type &dest, const native_handl
     return ntkernel_error(ntstat);
   }
   return success();
+}
+
+inline result<void> do_lock_file_range(native_handle_type &_v, handle::extent_type offset, handle::extent_type bytes, bool exclusive, deadline d) noexcept
+{
+  if(d && d.nsecs > 0 && !_v.is_nonblocking())
+  {
+    return errc::not_supported;
+  }
+  DWORD flags = exclusive ? LOCKFILE_EXCLUSIVE_LOCK : 0;
+  if(d && (d.nsecs == 0u))
+  {
+    flags |= LOCKFILE_FAIL_IMMEDIATELY;
+  }
+  LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+  OVERLAPPED ol{};
+  memset(&ol, 0, sizeof(ol));
+  ol.Internal = static_cast<ULONG_PTR>(-1);
+  ol.OffsetHigh = (offset >> 32) & 0xffffffff;
+  ol.Offset = offset & 0xffffffff;
+  DWORD bytes_high = bytes == 0u ? MAXDWORD : static_cast<DWORD>((bytes >> 32) & 0xffffffff);
+  DWORD bytes_low = bytes == 0u ? MAXDWORD : static_cast<DWORD>(bytes & 0xffffffff);
+  if(LockFileEx(_v.h, flags, 0, bytes_low, bytes_high, &ol) == 0)
+  {
+    if(ERROR_LOCK_VIOLATION == GetLastError() && d && (d.nsecs == 0u))
+    {
+      return errc::timed_out;
+    }
+    if(ERROR_IO_PENDING != GetLastError())
+    {
+      return win32_error();
+    }
+  }
+  // If handle is overlapped, wait for completion of each i/o.
+  if(_v.is_nonblocking())
+  {
+    if(STATUS_TIMEOUT == ntwait(_v.h, ol, d))
+    {
+      return errc::timed_out;
+    }
+    // It seems the NT kernel is guilty of casting bugs sometimes
+    ol.Internal = ol.Internal & 0xffffffff;
+    if(ol.Internal != 0)
+    {
+      return ntkernel_error(static_cast<NTSTATUS>(ol.Internal));
+    }
+  }
+  return success();
+}
+
+inline void do_unlock_file_range(native_handle_type &_v, handle::extent_type offset, handle::extent_type bytes) noexcept
+{
+  OVERLAPPED ol{};
+  memset(&ol, 0, sizeof(ol));
+  ol.Internal = static_cast<ULONG_PTR>(-1);
+  ol.OffsetHigh = (offset >> 32) & 0xffffffff;
+  ol.Offset = offset & 0xffffffff;
+  DWORD bytes_high = bytes == 0u ? MAXDWORD : static_cast<DWORD>((bytes >> 32) & 0xffffffff);
+  DWORD bytes_low = bytes == 0u ? MAXDWORD : static_cast<DWORD>(bytes & 0xffffffff);
+  if(UnlockFileEx(_v.h, 0, bytes_low, bytes_high, &ol) == 0)
+  {
+    if(ERROR_IO_PENDING != GetLastError())
+    {
+      auto ret = win32_error();
+      (void) ret;
+      LLFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
+      std::terminate();
+    }
+  }
+  // If handle is overlapped, wait for completion of each i/o.
+  if(_v.is_nonblocking())
+  {
+    ntwait(_v.h, ol, deadline());
+    if(ol.Internal != 0)
+    {
+      // It seems the NT kernel is guilty of casting bugs sometimes
+      ol.Internal = ol.Internal & 0xffffffff;
+      auto ret = ntkernel_error(static_cast<NTSTATUS>(ol.Internal));
+      (void) ret;
+      LLFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
+      std::terminate();
+    }
+  }
 }
 
 /* Our own custom CreateFileW() implementation.

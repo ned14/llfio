@@ -35,6 +35,8 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   LLFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::file;
   OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, _caching, flags));
+  attribs &= ~O_NONBLOCK;
+  nativeh.behaviour &= ~native_handle_type::disposition::nonblocking;
   path_view::c_str<> zpath(path);
   if(base.is_valid())
   {
@@ -108,6 +110,8 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   nativeh.behaviour |= native_handle_type::disposition::file;
   // Open file exclusively to prevent collision
   OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, creation::only_if_not_exist, _caching, flags));
+  attribs &= ~O_NONBLOCK;
+  nativeh.behaviour &= ~native_handle_type::disposition::nonblocking;
 #ifdef O_TMPFILE
   // Linux has a special flag just for this use case
   attribs |= O_TMPFILE;
@@ -152,65 +156,6 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
     ret.value()._flags &= ~flag::unlink_on_first_close;
     return ret;
   }
-}
-
-file_handle::io_result<file_handle::const_buffers_type> file_handle::barrier(file_handle::io_request<file_handle::const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
-{
-  (void) kind;
-  LLFIO_LOG_FUNCTION_CALL(this);
-  if(d)
-  {
-    return errc::not_supported;
-  }
-#ifdef __linux__
-  if(kind == barrier_kind::nowait_data_only || kind == barrier_kind::wait_data_only)
-  {
-    // Linux has a lovely dedicated syscall giving us exactly what we need here
-    extent_type offset = reqs.offset, bytes = 0;
-    // empty buffers means bytes = 0 which means sync entire file
-    for(const auto &req : reqs.buffers)
-    {
-      bytes += req.size();
-    }
-    unsigned flags = SYNC_FILE_RANGE_WRITE;  // start writing all dirty pages in range now
-    if(kind == barrier_kind::wait_data_only)
-    {
-      flags |= SYNC_FILE_RANGE_WAIT_BEFORE | SYNC_FILE_RANGE_WAIT_AFTER;  // block until they're on storage
-    }
-    if(-1 != ::sync_file_range(_v.fd, offset, bytes, flags))
-    {
-      return {reqs.buffers};
-    }
-  }
-#endif
-#if !defined(__FreeBSD__) && !defined(__APPLE__)  // neither of these have fdatasync()
-  if(kind == barrier_kind::nowait_data_only || kind == barrier_kind::wait_data_only)
-  {
-    if(-1 == ::fdatasync(_v.fd))
-    {
-      return posix_error();
-    }
-    return {reqs.buffers};
-  }
-#endif
-#ifdef __APPLE__
-  if(kind == barrier_kind::nowait_data_only || kind == barrier_kind::nowait_all)
-  {
-    // OS X fsync doesn't wait for the device to flush its buffers
-    if(-1 == ::fsync(_v.fd))
-      return posix_error();
-    return {std::move(reqs.buffers)};
-  }
-  // This is the fsync as on every other OS
-  if(-1 == ::fcntl(_v.fd, F_FULLFSYNC))
-    return posix_error();
-#else
-  if(-1 == ::fsync(_v.fd))
-  {
-    return posix_error();
-  }
-#endif
-  return {reqs.buffers};
 }
 
 result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d) const noexcept
@@ -354,130 +299,6 @@ result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d)
         }
       }
     }
-  }
-}
-
-#if 0
-#if !defined(__linux__) && !defined(F_OFD_SETLK)
-  if(0 == bytes)
-  {
-    // Non-Linux has a sane locking system in flock() if you are willing to lock the entire file
-    int operation = ((d && !d.nsecs) ? LOCK_NB : 0) | ((kind != file_handle::lock_kind::shared) ? LOCK_EX : LOCK_SH);
-    if(-1 == flock(_v.fd, operation))
-      failed = true;
-  }
-  else
-#endif
-
-#if !defined(__linux__) && !defined(F_OFD_SETLK)
-  if(0 == bytes)
-  {
-    if(-1 == flock(_v.fd, LOCK_UN))
-      failed = true;
-  }
-  else
-#endif
-#endif
-
-result<file_handle::extent_guard> file_handle::lock_range(io_handle::extent_type offset, io_handle::extent_type bytes, file_handle::lock_kind kind, deadline d) noexcept
-{
-  LLFIO_LOG_FUNCTION_CALL(this);
-  if(d && d.nsecs > 0)
-  {
-    return errc::not_supported;
-  }
-  bool failed = false;
-  {
-    struct flock fl
-    {
-    };
-    memset(&fl, 0, sizeof(fl));
-    fl.l_type = (kind != file_handle::lock_kind::shared) ? F_WRLCK : F_RDLCK;
-    constexpr extent_type extent_topbit = static_cast<extent_type>(1) << (8 * sizeof(extent_type) - 1);
-    if((offset & extent_topbit) != 0u)
-    {
-      LLFIO_LOG_WARN(_v.fd, "file_handle::lock() called with offset with top bit set, masking out");
-    }
-    if((bytes & extent_topbit) != 0u)
-    {
-      LLFIO_LOG_WARN(_v.fd, "file_handle::lock() called with bytes with top bit set, masking out");
-    }
-    fl.l_whence = SEEK_SET;
-    fl.l_start = offset & ~extent_topbit;
-    fl.l_len = bytes & ~extent_topbit;
-#ifdef F_OFD_SETLK
-    if(-1 == fcntl(_v.fd, (d && !d.nsecs) ? F_OFD_SETLK : F_OFD_SETLKW, &fl))
-    {
-      if(EINVAL == errno)  // OFD locks not supported on this kernel
-      {
-        if(-1 == fcntl(_v.fd, (d && !d.nsecs) ? F_SETLK : F_SETLKW, &fl))
-          failed = true;
-        else
-          _flags |= flag::byte_lock_insanity;
-      }
-      else
-        failed = true;
-    }
-#else
-    if(-1 == fcntl(_v.fd, (d && (d.nsecs == 0u)) ? F_SETLK : F_SETLKW, &fl))
-    {
-      failed = true;
-    }
-    else
-    {
-      _flags |= flag::byte_lock_insanity;
-    }
-#endif
-  }
-  if(failed)
-  {
-    if(d && (d.nsecs == 0u) && (EACCES == errno || EAGAIN == errno || EWOULDBLOCK == errno))
-    {
-      return errc::timed_out;
-    }
-    return posix_error();
-  }
-  return extent_guard(this, offset, bytes, kind);
-}
-
-void file_handle::unlock_range(io_handle::extent_type offset, io_handle::extent_type bytes) noexcept
-{
-  LLFIO_LOG_FUNCTION_CALL(this);
-  bool failed = false;
-  {
-    struct flock fl
-    {
-    };
-    memset(&fl, 0, sizeof(fl));
-    fl.l_type = F_UNLCK;
-    constexpr extent_type extent_topbit = static_cast<extent_type>(1) << (8 * sizeof(extent_type) - 1);
-    fl.l_whence = SEEK_SET;
-    fl.l_start = offset & ~extent_topbit;
-    fl.l_len = bytes & ~extent_topbit;
-#ifdef F_OFD_SETLK
-    if(-1 == fcntl(_v.fd, F_OFD_SETLK, &fl))
-    {
-      if(EINVAL == errno)  // OFD locks not supported on this kernel
-      {
-        if(-1 == fcntl(_v.fd, F_SETLK, &fl))
-          failed = true;
-      }
-      else
-        failed = true;
-    }
-#else
-    if(-1 == fcntl(_v.fd, F_SETLK, &fl))
-    {
-      failed = true;
-    }
-#endif
-  }
-  if(failed)
-  {
-    auto ret(posix_error());
-    (void) ret;
-    LLFIO_LOG_FATAL(_v.fd, "io_handle::unlock() failed");
-    std::terminate();
   }
 }
 

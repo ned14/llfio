@@ -47,6 +47,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
   }
   OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode, flags));
   OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
+  nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
   /* It is super important that we remove the DELETE permission for directories as otherwise relative renames
   will always fail due to an unfortunate design choice by Microsoft. This breaks renaming by open handle,
   see relink() for the hack workaround. It also breaks creation::always_new, which ought to be implemented

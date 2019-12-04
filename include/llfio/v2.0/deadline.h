@@ -57,16 +57,16 @@ struct LLFIO_DEADLINE_NAME
   };
 #ifdef __cplusplus
   constexpr deadline()  // NOLINT
-  : steady(false),
-    utc{0, 0}
+      : steady(false)
+      , utc{0, 0}
   {
   }
   //! True if deadline is valid
   constexpr explicit operator bool() const noexcept { return steady || utc.tv_sec != 0; }
   //! Implicitly construct a deadline from a system clock time point
   deadline(std::chrono::system_clock::time_point tp)  // NOLINT
-  : steady(false),
-    utc{0, 0}
+      : steady(false)
+      , utc{0, 0}
   {
     std::chrono::seconds secs(std::chrono::system_clock::to_time_t(tp));
     utc.tv_sec = secs.count();
@@ -76,8 +76,8 @@ struct LLFIO_DEADLINE_NAME
   //! Implicitly construct a deadline from a duration from now
   template <class Rep, class Period>
   constexpr deadline(std::chrono::duration<Rep, Period> d)  // NOLINT
-  : steady(true),
-    nsecs(0)
+      : steady(true)
+      , nsecs(0)
   {
     std::chrono::nanoseconds _nsecs = std::chrono::duration_cast<std::chrono::nanoseconds>(d);
     // Negative durations are zero duration
@@ -120,6 +120,22 @@ struct LLFIO_DEADLINE_NAME
       (nd) = (d);                                                                                                                                                                                                                                                                                                              \
   }
 
+#define LLFIO_DEADLINE_TRY_FOR_UNTIL(name)                                                                                                                                                                                                                                                                               \
+  template <class... Args> bool try_##name (Args && ... args) noexcept                                                                                                                                                                                                                                                           \
+  {                                                                                                                                                                                                                                                                                                                            \
+    auto r = name(std::forward<Args>(args)..., std::chrono::seconds(0));                                                                                                                                                                                                                                                       \
+    return !!r;                                                                                                                                                                                                                                                                                                                \
+  }                                                                                                                                                                                                                                                                                                                            \
+  template <class... Args, class Rep, class Period> bool try_##name##_for(Args &&... args, const std::chrono::duration<Rep, Period> &duration) noexcept                                                                                                                                                                          \
+  {                                                                                                                                                                                                                                                                                                                            \
+    auto r = name(std::forward<Args>(args)..., duration);                                                                                                                                                                                                                                                                      \
+    return !!r;                                                                                                                                                                                                                                                                                                                \
+  }                                                                                                                                                                                                                                                                                                                            \
+  template <class... Args, class Clock, class Duration> bool try_##name##_until(Args &&... args, const std::chrono::time_point<Clock, Duration> &timeout) noexcept                                                                                                                                                               \
+  {                                                                                                                                                                                                                                                                                                                            \
+    auto r = name(std::forward<Args>(args)..., timeout);                                                                                                                                                                                                                                                                       \
+    return !!r;                                                                                                                                                                                                                                                                                                                \
+  }
 
 #undef LLFIO_DEADLINE_NAME
 #if defined(__cplusplus) || DOXYGEN_IS_IN_THE_HOUSE

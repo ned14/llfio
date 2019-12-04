@@ -67,6 +67,7 @@ import LLFIO_MODULE_NAME;
 #else
 #include "file_handle.hpp"
 #endif
+#include "pipe_handle.hpp"
 #include "directory_handle.hpp"
 #include "statfs.hpp"
 #ifdef LLFIO_INCLUDE_STORAGE_PROFILE

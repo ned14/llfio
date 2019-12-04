@@ -138,7 +138,7 @@ public:
   static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_file(io_service &service, const path_handle &base, path_view_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::only_metadata, flag flags = flag::none) noexcept
   {
     // Open it overlapped, otherwise no difference.
-    OUTCOME_TRY(v, file_handle::file(std::move(base), _path, _mode, _creation, _caching, flags | flag::overlapped));
+    OUTCOME_TRY(v, file_handle::file(std::move(base), _path, _mode, _creation, _caching, flags | flag::multiplexable));
     async_file_handle ret(std::move(v));
     ret._service = &service;
     return {std::move(ret)};
@@ -206,7 +206,7 @@ public:
   static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<async_file_handle> async_temp_inode(io_service &service, const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept
   {
     // Open it overlapped, otherwise no difference.
-    OUTCOME_TRY(v, file_handle::temp_inode(dir, _mode, flags | flag::overlapped));
+    OUTCOME_TRY(v, file_handle::temp_inode(dir, _mode, flags | flag::multiplexable));
     async_file_handle ret(std::move(v));
     ret._service = &service;
     return {std::move(ret)};

@@ -21,6 +21,7 @@ set(llfio_TESTS
   "test/tests/mapped.cpp"
   "test/tests/path_discovery.cpp"
   "test/tests/path_view.cpp"
+  "test/tests/pipe_handle.cpp"
   "test/tests/section_handle_create_close/kernel_section_handle.cpp.hpp"
   "test/tests/section_handle_create_close/runner.cpp"
   "test/tests/shared_fs_mutex.cpp"

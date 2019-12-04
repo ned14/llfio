@@ -371,7 +371,7 @@ not be used when a large page allocation was requested.
 
 \sa `mapped_file_handle`, `algorithm::mapped_span`
 */
-class LLFIO_DECL map_handle : public io_handle
+class LLFIO_DECL map_handle : public lockable_io_handle
 {
   friend class mapped_file_handle;
 
@@ -413,7 +413,7 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~map_handle() override;
   //! Implicit move construction of map_handle permitted
   constexpr map_handle(map_handle &&o) noexcept
-      : io_handle(std::move(o))
+      : lockable_io_handle(std::move(o))
       , _section(o._section)
       , _addr(o._addr)
       , _offset(o._offset)

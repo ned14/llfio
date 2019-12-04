@@ -116,7 +116,7 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
       {
         return success(std::move(currentdirh));
       }
-      LLFIO_WIN_DEADLINE_TO_TIMEOUT(d);
+      LLFIO_WIN_DEADLINE_TO_TIMEOUT_LOOP(d);
     }
   }
   catch(...)
@@ -188,7 +188,7 @@ result<void> fs_handle::unlink(deadline d) noexcept
   using namespace windows_nt_kernel;
   LLFIO_LOG_FUNCTION_CALL(this);
   auto &h = _get_handle();
-  HANDLE duph;
+  HANDLE duph = INVALID_HANDLE_VALUE;
   // Try by POSIX delete first
   {
     OBJECT_ATTRIBUTES oa{};
@@ -204,13 +204,19 @@ result<void> fs_handle::unlink(deadline d) noexcept
     if(h.is_symlink())
       ntflags |= 0x00200000 /*FILE_OPEN_REPARSE_POINT*/;
     NTSTATUS ntstat = NtOpenFile(&duph, SYNCHRONIZE | DELETE, &oa, &isb, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, ntflags);
-    if(ntstat < 0)
+    // Can't duplicate the handle of a pipe not in the listening state
+    if(ntstat < 0 && !h.is_pipe())
     {
       return ntkernel_error(ntstat);
     }
   }
   auto unduph = undoer([&duph] { CloseHandle(duph); });
-  (void) unduph;
+  // If we failed to duplicate the handle, try using the original handle
+  if(duph == INVALID_HANDLE_VALUE)
+  {
+    unduph.dismiss();
+    duph = h.native_handle().h;
+  }
   bool failed = true;
   // Try POSIX delete first, this will fail on Windows 10 before 1709, or if not NTFS
   {
@@ -226,7 +232,7 @@ result<void> fs_handle::unlink(deadline d) noexcept
   }
   if(failed)
   {
-    if((h.is_regular() || h.is_symlink()) && !(h.flags() & flag::win_disable_unlink_emulation))
+    if((h.is_regular() || h.is_symlink() || h.is_pipe()) && !(h.flags() & flag::win_disable_unlink_emulation))
     {
       // Rename it to something random to emulate immediate unlinking
       std::string randomname;

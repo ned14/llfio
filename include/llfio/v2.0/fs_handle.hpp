@@ -143,10 +143,17 @@ public:
   */
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_handle> parent_path_handle(deadline d = std::chrono::seconds(30)) const noexcept;
 
+  LLFIO_DEADLINE_TRY_FOR_UNTIL(parent_path_handle)
+
   /*! Relinks the current path of this open handle to the new path specified. If `atomic_replace` is
   true, the relink \b atomically and silently replaces any item at the new path specified. This
   operation is both atomic and silent matching POSIX behaviour even on Microsoft Windows where
   no Win32 API can match POSIX semantics.
+
+  If the handle refers to a pipe, on Microsoft Windows the base path handle is ignored as there is
+  a single global named pipe namespace. Unless the path fragment begins with `\`, the string `\??\`
+  is prefixed to the name before passing it to the NT kernel API which performs the rename. This
+  is because `\\.\` in Win32 maps onto `\??\` in the NT kernel.
 
   \warning Some operating systems provide a race free syscall for renaming an open handle (Windows).
   On all other operating systems this call is \b racy and can result in the wrong file entry being
@@ -169,6 +176,8 @@ public:
   LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
   result<void> relink(const path_handle &base, path_view_type path, bool atomic_replace = true, deadline d = std::chrono::seconds(30)) noexcept;
+
+  LLFIO_DEADLINE_TRY_FOR_UNTIL(relink)
 
 #if 0  // Not implemented yet for absolutely no good reason
   /*! Links the inode referred to by this open handle to the path specified. The current path
@@ -194,6 +203,8 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
   result<void> link(const path_handle &base, path_view_type path, deadline d = std::chrono::seconds(30)) noexcept;
 
+  LLFIO_DEADLINE_TRY_FOR_UNTIL(link)
+
   /*! Clones the inode referenced by the open handle into a new inode referencing the same extents
   for the file content, with a copy of the same metadata, apart from ownership which is for the
   current user. Changes to either inode are guaranteed to not be seen by the other inode i.e. they
@@ -212,6 +223,8 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
   result<file_handle> clone_inode(const path_handle &base,
                           path_view_type path) noexcept;
+
+  LLFIO_DEADLINE_TRY_FOR_UNTIL(clone_inode)
 #endif
 
   /*! Unlinks the current path of this open handle, causing its entry to immediately disappear
@@ -239,6 +252,8 @@ public:
   LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
   result<void> unlink(deadline d = std::chrono::seconds(30)) noexcept;
+
+  LLFIO_DEADLINE_TRY_FOR_UNTIL(unlink)
 };
 
 namespace detail
