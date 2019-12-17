@@ -75,7 +75,7 @@ namespace algorithm
   \todo I have been lazy and used public inheritance from that base i/o handle.
   I should use protected inheritance to prevent slicing, and expose all the public functions by hand.
   */
-  template <class T> LLFIO_REQUIRES(sizeof(construct<T>) > 0) class LLFIO_DECL cached_parent_handle_adapter : public T
+  template <class T> LLFIO_REQUIRES((sizeof(construct<T>) > 0)) class LLFIO_DECL cached_parent_handle_adapter : public T
   {
     static_assert(sizeof(construct<T>) > 0, "Type T must be registered with the construct<T> framework so cached_parent_handle_adapter<T> knows how to construct it");  // NOLINT
 
