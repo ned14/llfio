@@ -63,7 +63,7 @@ namespace storage_profile
           static RtlGetVersion_t RtlGetVersion;
           if(RtlGetVersion == nullptr)
           {
-            RtlGetVersion = reinterpret_cast<RtlGetVersion_t>(GetProcAddress(GetModuleHandle(L"NTDLL.DLL"), "RtlGetVersion"));
+            RtlGetVersion = reinterpret_cast<RtlGetVersion_t>(GetProcAddress(GetModuleHandleW(L"NTDLL.DLL"), "RtlGetVersion"));
           }
           if(RtlGetVersion == nullptr)
           {

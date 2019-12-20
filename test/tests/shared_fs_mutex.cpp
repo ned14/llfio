@@ -146,16 +146,21 @@ struct child_workers
   };
   std::vector<result> results;
 
+  template <class CharType> struct string_converter
+  {
+    auto operator()(const std::string &v) const { return v; }
+  };
+
+  template <> struct string_converter<wchar_t>
+  {
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
+    std::wstring operator()(const std::string &v) { return conv.from_bytes(v); };
+  };
+
   template <class... Args> child_workers(std::string name, size_t workersno, Args &&... _args)
   {
-#ifdef _UNICODE
-    std::wstringstream ss1, ss2, ss3;
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> utf16conv;
-    auto convstr = [&](const std::string &v) { return utf16conv.from_bytes(v); };
-#else
-    std::stringstream ss1, ss2, ss3;
-    auto convstr = [](const std::string &v) { return v; };
-#endif
+    std::basic_stringstream<filesystem::path::value_type> ss1, ss2, ss3;
+    string_converter<filesystem::path::value_type> convstr;
     ss1 << "--kerneltestchild," << convstr(name) << ",";
     ss3 << ",";
     detail::print_args(ss3, std::forward<Args>(_args)...);
