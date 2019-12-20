@@ -1223,6 +1223,13 @@ public:
     }
 #ifdef _WIN32
     return _state._invoke([this, sep_idx](const auto &v) {
+#ifndef _EXPERIMENTAL_FILESYSTEM_
+      // Special case \\.\, \\?\ and \??\ to match filesystem::path
+      if(v.size() >= 4 && sep_idx == 0 && ((v[1] == '\\' && (v[2] == '.' || v[2] == '?')) || (v[1] == '?' && v[2] == '?')) && v[3] == '\\')
+      {
+        return path_view(v.data() + 0, 4, false);
+      }
+#else
       if(is_ntpath())
       {
         return path_view(v.data() + 3, 1, false);
@@ -1232,6 +1239,7 @@ public:
       {
         return path_view(v.data() + 0, 4, false);
       }
+#endif
       auto colon_idx = v.find(':');
       if(colon_idx < sep_idx)
       {
@@ -1257,11 +1265,19 @@ public:
     }
 #ifdef _WIN32
     return _state._invoke([this, sep_idx](const auto &v) {
+#ifndef _EXPERIMENTAL_FILESYSTEM_
+      // Special case \\.\, \\?\ and \??\ to match filesystem::path
+      if(v.size() >= 4 && sep_idx == 0 && ((v[1] == '\\' && (v[2] == '.' || v[2] == '?')) || (v[1] == '?' && v[2] == '?')) && v[3] == '\\')
+      {
+        return path_view(v.data() + 4, v.size() - 4, _state._zero_terminated);
+      }
+#else
       // Special case \\.\ and \\?\ to match filesystem::path
       if(v.size() >= 4 && sep_idx == 0 && v[1] == '\\' && (v[2] == '.' || v[2] == '?') && v[3] == '\\')
       {
         return path_view(v.data() + 4, v.size() - 4, _state._zero_terminated);
       }
+#endif
       auto colon_idx = v.find(':');
       if(colon_idx < sep_idx)
       {
