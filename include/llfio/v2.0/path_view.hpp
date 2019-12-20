@@ -713,7 +713,7 @@ public:
   };
 #ifdef __cpp_concepts
   template <class T, class Deleter, size_t _internal_buffer_size>
-  requires is_source_acceptable<T>
+  requires (is_source_acceptable<T>)
 #elif defined(_MSC_VER)
   template <class T, class Deleter, size_t _internal_buffer_size, class>
 #else
@@ -1348,7 +1348,7 @@ public:
   };
 #ifdef __cpp_concepts
   template <class T, class Deleter, size_t _internal_buffer_size>
-  requires is_source_acceptable<T>
+  requires (is_source_acceptable<T>)
 #elif defined(_MSC_VER)
   template <class T, class Deleter, size_t _internal_buffer_size, class>
 #else
@@ -1565,7 +1565,7 @@ constexpr inline path_view::iterator path_view::end() noexcept
 }
 #ifdef __cpp_concepts
 template <class T, class Deleter, size_t _internal_buffer_size>
-requires path_view::is_source_acceptable<T>
+requires (path_view::is_source_acceptable<T>)
 #elif defined(_MSC_VER)
 template <class T, class Deleter, size_t _internal_buffer_size, class>
 #else
