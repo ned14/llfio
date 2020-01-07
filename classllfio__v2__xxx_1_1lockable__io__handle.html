@@ -310,8 +310,8 @@ io_context *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a62a75b1a4a24fbc9ad2e98a641167db6">close</a> () noexcept</td></tr>
 <tr class="memdesc:a62a75b1a4a24fbc9ad2e98a641167db6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Immediately close the native handle type managed by this handle. <br /></td></tr>
 <tr class="separator:a62a75b1a4a24fbc9ad2e98a641167db6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeea4389189021b94dde6d8f2c3ccc5b3"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#aeea4389189021b94dde6d8f2c3ccc5b3">clone</a> () const noexcept</td></tr>
-<tr class="separator:aeea4389189021b94dde6d8f2c3ccc5b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46ee43d56e2665596b94721de986928b"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a46ee43d56e2665596b94721de986928b">clone</a> () const noexcept</td></tr>
+<tr class="separator:a46ee43d56e2665596b94721de986928b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d273e38c061eb11f5012f624e9a202e"><td class="memItemLeft" align="right" valign="top"><a id="a1d273e38c061eb11f5012f624e9a202e"></a>
 virtual <a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a1d273e38c061eb11f5012f624e9a202e">release</a> () noexcept</td></tr>
 <tr class="memdesc:a1d273e38c061eb11f5012f624e9a202e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release the native handle type managed by this handle. <br /></td></tr>
@@ -531,8 +531,8 @@ For portability, you can only assume that barriers write order for a single hand
 
 </div>
 </div>
-<a id="aeea4389189021b94dde6d8f2c3ccc5b3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeea4389189021b94dde6d8f2c3ccc5b3">&#9670;&nbsp;</a></span>clone()</h2>
+<a id="a46ee43d56e2665596b94721de986928b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a46ee43d56e2665596b94721de986928b">&#9670;&nbsp;</a></span>clone()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -541,7 +541,7 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">result&lt;<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a>&gt; llfio_v2_xxx::handle::clone </td>
+          <td class="memname">virtual result&lt;<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a>&gt; llfio_v2_xxx::handle::clone </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -549,12 +549,14 @@ For portability, you can only assume that barriers write order for a single hand
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 <p>Clone this handle (copy constructor is disabled to avoid accidental copying)</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or DuplicateHandle() can return. </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a97713c4f87b28e62f856665185ea6a18">llfio_v2_xxx::file_handle</a>.</p>
 
 </div>
 </div>

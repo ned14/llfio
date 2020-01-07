@@ -205,8 +205,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#a8eb4f8792e37c370d5f53c643699f8b7">close</a> () noexcept override</td></tr>
 <tr class="memdesc:a8eb4f8792e37c370d5f53c643699f8b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Immediately close the native handle type managed by this handle. <br /></td></tr>
 <tr class="separator:a8eb4f8792e37c370d5f53c643699f8b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7c4b83dfd27ddf3c0551fd795d4a5817"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#a7c4b83dfd27ddf3c0551fd795d4a5817">clone</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a> mode_=mode::unchanged, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> caching_=caching::unchanged, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) const noexcept</td></tr>
-<tr class="separator:a7c4b83dfd27ddf3c0551fd795d4a5817"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac65718d52cac467dcc1cb814bd91d537"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#ac65718d52cac467dcc1cb814bd91d537">reopen</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a> mode_=mode::unchanged, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> caching_=caching::unchanged, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) const noexcept</td></tr>
+<tr class="separator:ac65718d52cac467dcc1cb814bd91d537"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa0b7dc541e6188fed2950444089fed6c"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#aa0b7dc541e6188fed2950444089fed6c">clone_to_path_handle</a> () const noexcept</td></tr>
 <tr class="separator:aa0b7dc541e6188fed2950444089fed6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a45c13e16ecc131cbe5107e6affe94f33"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html">buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#a45c13e16ecc131cbe5107e6affe94f33">read</a> (<a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html">buffers_type</a> &gt; req) const noexcept</td></tr>
@@ -219,8 +219,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a4716696b8700953889006251e0678aa4">swap</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;o) noexcept</td></tr>
 <tr class="memdesc:a4716696b8700953889006251e0678aa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br /></td></tr>
 <tr class="separator:a4716696b8700953889006251e0678aa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae260bf811da1b17c142f51fbb53476bf"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__handle.html#ae260bf811da1b17c142f51fbb53476bf">clone</a> () const noexcept</td></tr>
-<tr class="separator:ae260bf811da1b17c142f51fbb53476bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac5222904f116c9beb0515a4a5aa850bf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#ac5222904f116c9beb0515a4a5aa850bf">QUICKCPPLIB_BITFIELD_BEGIN</a> (flag)</td></tr>
 <tr class="memdesc:ac5222904f116c9beb0515a4a5aa850bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bitwise flags which can be specified.  <a href="#ac5222904f116c9beb0515a4a5aa850bf">More...</a><br /></td></tr>
 <tr class="separator:ac5222904f116c9beb0515a4a5aa850bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -233,6 +231,8 @@ io_context *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="separator:a02769f641a80a18ef52431df9c530d9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a00a85eec5a41f7edb2c574d40cf04535"><td class="memItemLeft" align="right" valign="top">virtual result&lt; path_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a00a85eec5a41f7edb2c574d40cf04535">current_path</a> () const noexcept</td></tr>
 <tr class="separator:a00a85eec5a41f7edb2c574d40cf04535"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46ee43d56e2665596b94721de986928b"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a46ee43d56e2665596b94721de986928b">clone</a> () const noexcept</td></tr>
+<tr class="separator:a46ee43d56e2665596b94721de986928b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d273e38c061eb11f5012f624e9a202e"><td class="memItemLeft" align="right" valign="top"><a id="a1d273e38c061eb11f5012f624e9a202e"></a>
 virtual <a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a1d273e38c061eb11f5012f624e9a202e">release</a> () noexcept</td></tr>
 <tr class="memdesc:a1d273e38c061eb11f5012f624e9a202e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release the native handle type managed by this handle. <br /></td></tr>
@@ -467,8 +467,8 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="ae260bf811da1b17c142f51fbb53476bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae260bf811da1b17c142f51fbb53476bf">&#9670;&nbsp;</a></span>clone() <span class="overload">[1/2]</span></h2>
+<a id="a46ee43d56e2665596b94721de986928b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a46ee43d56e2665596b94721de986928b">&#9670;&nbsp;</a></span>clone()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -477,7 +477,7 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">result&lt;<a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a>&gt; llfio_v2_xxx::path_handle::clone </td>
+          <td class="memname">virtual result&lt;<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a>&gt; llfio_v2_xxx::handle::clone </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -485,59 +485,14 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Clone this handle (copy constructor is disabled to avoid accidental copying). </p>
-<div class="fragment"><div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  {</div><div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keyword">auto</span> *h = <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="classllfio__v2__xxx_1_1handle.html#aea43917ff5cc28f3da3c622c0b3382c4">handle</a> *<span class="keyword">&gt;</span>(<span class="keyword">this</span>);</div><div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    OUTCOME_TRY(ret, h-&gt;clone());</div><div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="keyword">auto</span> nativeh = ret.release();</div><div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classllfio__v2__xxx_1_1path__handle.html#a01603d237d7f48f649abebd25bb7daaf">path_handle</a>(nativeh);</div><div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1handle_html_aea43917ff5cc28f3da3c622c0b3382c4"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#aea43917ff5cc28f3da3c622c0b3382c4">llfio_v2_xxx::handle::handle</a></div><div class="ttdeci">constexpr handle()</div><div class="ttdoc">Default constructor. </div><div class="ttdef"><b>Definition:</b> handle.hpp:210</div></div>
-<div class="ttc" id="classllfio__v2__xxx_1_1path__handle_html_a01603d237d7f48f649abebd25bb7daaf"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__handle.html#a01603d237d7f48f649abebd25bb7daaf">llfio_v2_xxx::path_handle::path_handle</a></div><div class="ttdeci">constexpr path_handle()</div><div class="ttdoc">Default constructor. </div><div class="ttdef"><b>Definition:</b> path_handle.hpp:66</div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="a7c4b83dfd27ddf3c0551fd795d4a5817"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7c4b83dfd27ddf3c0551fd795d4a5817">&#9670;&nbsp;</a></span>clone() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual result&lt;<a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a>&gt; llfio_v2_xxx::directory_handle::clone </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a>&#160;</td>
-          <td class="paramname"><em>mode_</em> = <code>mode::unchanged</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a>&#160;</td>
-          <td class="paramname"><em>caching_</em> = <code>caching::unchanged</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
-          <td class="paramname"><em>d</em> = <code>std::chrono::seconds(30)</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Clone this handle (copy constructor is disabled to avoid accidental copying), optionally race free reopening the handle with different access or caching.</p>
-<p>Microsoft Windows provides a syscall for cloning an existing handle but with new access. On POSIX, we must loop calling <code>current_path()</code>, trying to open the path returned and making sure it is the same inode.</p>
+<p>Clone this handle (copy constructor is disabled to avoid accidental copying)</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or DuplicateHandle() can return. </dd></dl>
-<dl class="section user"><dt>Memory Allocations</dt><dd>On POSIX if changing the mode, we must loop calling <code>current_path()</code> and trying to open the path returned. Thus many allocations may occur. </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a97713c4f87b28e62f856665185ea6a18">llfio_v2_xxx::file_handle</a>.</p>
 
 </div>
 </div>
@@ -956,6 +911,52 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
 <dl class="section user"><dt>Memory Allocations</dt><dd>Except on platforms with race free syscalls for renaming open handles (Windows), calls <code>current_path()</code> via <code>parent_path_handle()</code> and thus is both expensive and calls malloc many times. </dd></dl>
 
 <p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#afea9ef2b36cac3f6dfcae7555ca3303c">llfio_v2_xxx::symlink_handle</a>.</p>
+
+</div>
+</div>
+<a id="ac65718d52cac467dcc1cb814bd91d537"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac65718d52cac467dcc1cb814bd91d537">&#9670;&nbsp;</a></span>reopen()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual result&lt;<a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a>&gt; llfio_v2_xxx::directory_handle::reopen </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a>&#160;</td>
+          <td class="paramname"><em>mode_</em> = <code>mode::unchanged</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a>&#160;</td>
+          <td class="paramname"><em>caching_</em> = <code>caching::unchanged</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code>std::chrono::seconds(30)</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Reopen this handle (copy constructor is disabled to avoid accidental copying), optionally race free reopening the handle with different access or caching.</p>
+<p>Microsoft Windows provides a syscall for cloning an existing handle but with new access. On POSIX, we must loop calling <code>current_path()</code>, trying to open the path returned and making sure it is the same inode.</p>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or DuplicateHandle() can return. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>On POSIX if changing the mode, we must loop calling <code>current_path()</code> and trying to open the path returned. Thus many allocations may occur. </dd></dl>
 
 </div>
 </div>

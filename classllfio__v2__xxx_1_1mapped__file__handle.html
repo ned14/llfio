@@ -258,9 +258,9 @@ virtual <a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">n
 <tr class="memitem:aa2850681ae5fe8f7c270cca3cba7c929"><td class="memItemLeft" align="right" valign="top"><a id="aa2850681ae5fe8f7c270cca3cba7c929"></a>
 virtual <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>barrier</b> (<a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs=<a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt;(), <a class="el" href="classllfio__v2__xxx_1_1io__handle.html#a7816bb7ae5156fa2997b68e6300ae565">barrier_kind</a> kind=<a class="el" href="classllfio__v2__xxx_1_1io__handle.html#a7816bb7ae5156fa2997b68e6300ae565a2f6648dac37731813bb84ae9b24bdfdb">barrier_kind::nowait_data_only</a>, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept override</td></tr>
 <tr class="separator:aa2850681ae5fe8f7c270cca3cba7c929"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc2e847ad7de6d05e9ed95bb1b3aac71"><td class="memItemLeft" align="right" valign="top"><a id="adc2e847ad7de6d05e9ed95bb1b3aac71"></a>
-result&lt; <a class="el" href="classllfio__v2__xxx_1_1mapped__file__handle.html">mapped_file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>clone</b> (size_type reservation, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a> mode_=mode::unchanged, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> caching_=caching::unchanged, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) const noexcept</td></tr>
-<tr class="separator:adc2e847ad7de6d05e9ed95bb1b3aac71"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaed2968352e0cb76177ac48866716b01"><td class="memItemLeft" align="right" valign="top"><a id="aaed2968352e0cb76177ac48866716b01"></a>
+result&lt; <a class="el" href="classllfio__v2__xxx_1_1mapped__file__handle.html">mapped_file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>reopen</b> (size_type reservation, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a> mode_=mode::unchanged, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> caching_=caching::unchanged, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) const noexcept</td></tr>
+<tr class="separator:aaed2968352e0cb76177ac48866716b01"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0723a6ba04a578754bb601541be832d0"><td class="memItemLeft" align="right" valign="top"><a id="a0723a6ba04a578754bb601541be832d0"></a>
 virtual result&lt; extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1mapped__file__handle.html#a0723a6ba04a578754bb601541be832d0">maximum_extent</a> () const noexcept override</td></tr>
 <tr class="memdesc:a0723a6ba04a578754bb601541be832d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the current maximum permitted extent of the file. <br /></td></tr>
@@ -288,22 +288,22 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a4716696b8700953889006251e0678aa4">swap</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;o) noexcept</td></tr>
 <tr class="memdesc:a4716696b8700953889006251e0678aa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br /></td></tr>
 <tr class="separator:a4716696b8700953889006251e0678aa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6b97756d8d46e80da7d0fa04158a71a8"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a6b97756d8d46e80da7d0fa04158a71a8">clone</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a> mode_=mode::unchanged, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> caching_=caching::unchanged, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) const noexcept</td></tr>
-<tr class="separator:a6b97756d8d46e80da7d0fa04158a71a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeea4389189021b94dde6d8f2c3ccc5b3"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#aeea4389189021b94dde6d8f2c3ccc5b3">clone</a> () const noexcept</td></tr>
-<tr class="separator:aeea4389189021b94dde6d8f2c3ccc5b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab124dfae890ce2c1cad1840230e23073"><td class="memTemplParams" colspan="2"><a id="ab124dfae890ce2c1cad1840230e23073"></a>
+<tr class="memitem:aa276caa8542cca700a2574459395ff60"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#aa276caa8542cca700a2574459395ff60">reopen</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a> mode_=mode::unchanged, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> caching_=caching::unchanged, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) const noexcept</td></tr>
+<tr class="separator:aa276caa8542cca700a2574459395ff60"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8040aa44a0482224dbf5e9fc3131b19"><td class="memTemplParams" colspan="2"><a id="aa8040aa44a0482224dbf5e9fc3131b19"></a>
 template&lt;class... Args&gt; </td></tr>
-<tr class="memitem:ab124dfae890ce2c1cad1840230e23073"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_clone</b> (Args &amp;&amp;... args) noexcept</td></tr>
-<tr class="separator:ab124dfae890ce2c1cad1840230e23073"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8fb21aa653c1ac2f8c2050de1c701bb6"><td class="memTemplParams" colspan="2"><a id="a8fb21aa653c1ac2f8c2050de1c701bb6"></a>
+<tr class="memitem:aa8040aa44a0482224dbf5e9fc3131b19"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_reopen</b> (Args &amp;&amp;... args) noexcept</td></tr>
+<tr class="separator:aa8040aa44a0482224dbf5e9fc3131b19"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d89a5de0941ba6d1193a5b87cde28af"><td class="memTemplParams" colspan="2"><a id="a5d89a5de0941ba6d1193a5b87cde28af"></a>
 template&lt;class... Args, class Rep , class Period &gt; </td></tr>
-<tr class="memitem:a8fb21aa653c1ac2f8c2050de1c701bb6"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_clone_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
-<tr class="separator:a8fb21aa653c1ac2f8c2050de1c701bb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5878e6a0a209ea7d11047c97c5c9fb71"><td class="memTemplParams" colspan="2"><a id="a5878e6a0a209ea7d11047c97c5c9fb71"></a>
+<tr class="memitem:a5d89a5de0941ba6d1193a5b87cde28af"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_reopen_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
+<tr class="separator:a5d89a5de0941ba6d1193a5b87cde28af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af620e483e3963be3b09794da4040db12"><td class="memTemplParams" colspan="2"><a id="af620e483e3963be3b09794da4040db12"></a>
 template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
-<tr class="memitem:a5878e6a0a209ea7d11047c97c5c9fb71"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_clone_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
-<tr class="separator:a5878e6a0a209ea7d11047c97c5c9fb71"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af620e483e3963be3b09794da4040db12"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_reopen_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
+<tr class="separator:af620e483e3963be3b09794da4040db12"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97713c4f87b28e62f856665185ea6a18"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a97713c4f87b28e62f856665185ea6a18">clone</a> () const noexcept override</td></tr>
+<tr class="separator:a97713c4f87b28e62f856665185ea6a18"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae7735588338065ede0ab9b7f979bc65a"><td class="memItemLeft" align="right" valign="top"><a id="ae7735588338065ede0ab9b7f979bc65a"></a>
 <a class="el" href="classllfio__v2__xxx_1_1io__service.html">io_service</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#ae7735588338065ede0ab9b7f979bc65a">service</a> () const noexcept</td></tr>
 <tr class="memdesc:ae7735588338065ede0ab9b7f979bc65a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The i/o service this handle is attached to, if any. <br /></td></tr>
@@ -764,8 +764,8 @@ For portability, you can only assume that barriers write order for a single hand
 
 </div>
 </div>
-<a id="a6b97756d8d46e80da7d0fa04158a71a8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6b97756d8d46e80da7d0fa04158a71a8">&#9670;&nbsp;</a></span>clone() <span class="overload">[1/2]</span></h2>
+<a id="a97713c4f87b28e62f856665185ea6a18"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a97713c4f87b28e62f856665185ea6a18">&#9670;&nbsp;</a></span>clone()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -774,53 +774,7 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">result&lt;<a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a>&gt; llfio_v2_xxx::file_handle::clone </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a>&#160;</td>
-          <td class="paramname"><em>mode_</em> = <code>mode::unchanged</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a>&#160;</td>
-          <td class="paramname"><em>caching_</em> = <code>caching::unchanged</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
-          <td class="paramname"><em>d</em> = <code>std::chrono::seconds(30)</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Clone this handle (copy constructor is disabled to avoid accidental copying), optionally race free reopening the handle with different access or caching.</p>
-<p>Microsoft Windows provides a syscall for cloning an existing handle but with new access. On POSIX, if not changing the mode, we change caching via <code>fcntl()</code>, if changing the mode we must loop calling <code>current_path()</code>, trying to open the path returned and making sure it is the same inode.</p>
-<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or DuplicateHandle() can return. </dd></dl>
-<dl class="section user"><dt>Memory Allocations</dt><dd>On POSIX if changing the mode, we must loop calling <code>current_path()</code> and trying to open the path returned. Thus many allocations may occur. </dd></dl>
-
-</div>
-</div>
-<a id="aeea4389189021b94dde6d8f2c3ccc5b3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeea4389189021b94dde6d8f2c3ccc5b3">&#9670;&nbsp;</a></span>clone() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">result&lt;<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a>&gt; llfio_v2_xxx::handle::clone </td>
+          <td class="memname">virtual result&lt;<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a>&gt; llfio_v2_xxx::file_handle::clone </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -828,13 +782,17 @@ For portability, you can only assume that barriers write order for a single hand
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 <p>Clone this handle (copy constructor is disabled to avoid accidental copying)</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or DuplicateHandle() can return. </dd></dl>
 
+<p>Reimplemented from <a class="el" href="classllfio__v2__xxx_1_1handle.html#a46ee43d56e2665596b94721de986928b">llfio_v2_xxx::handle</a>.</p>
+<div class="fragment"><div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;  {</div><div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <span class="comment">// For file handles, we need a deeper clone than duph()</span></div><div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    OUTCOME_TRY(ret, <a class="code" href="classllfio__v2__xxx_1_1file__handle.html#aa276caa8542cca700a2574459395ff60">reopen</a>());</div><div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classllfio__v2__xxx_1_1handle.html#aea43917ff5cc28f3da3c622c0b3382c4">handle</a>(ret.release());</div><div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1handle_html_aea43917ff5cc28f3da3c622c0b3382c4"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#aea43917ff5cc28f3da3c622c0b3382c4">llfio_v2_xxx::handle::handle</a></div><div class="ttdeci">constexpr handle()</div><div class="ttdoc">Default constructor. </div><div class="ttdef"><b>Definition:</b> handle.hpp:210</div></div>
+<div class="ttc" id="classllfio__v2__xxx_1_1file__handle_html_aa276caa8542cca700a2574459395ff60"><div class="ttname"><a href="classllfio__v2__xxx_1_1file__handle.html#aa276caa8542cca700a2574459395ff60">llfio_v2_xxx::file_handle::reopen</a></div><div class="ttdeci">result&lt; file_handle &gt; reopen(mode mode_=mode::unchanged, caching caching_=caching::unchanged, deadline d=std::chrono::seconds(30)) const noexcept</div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a00a85eec5a41f7edb2c574d40cf04535"></a>
@@ -1828,6 +1786,52 @@ For portability, you can only assume that barriers write order for a single hand
 <dl class="section user"><dt>Memory Allocations</dt><dd>Except on platforms with race free syscalls for renaming open handles (Windows), calls <code>current_path()</code> via <code>parent_path_handle()</code> and thus is both expensive and calls malloc many times. </dd></dl>
 
 <p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#afea9ef2b36cac3f6dfcae7555ca3303c">llfio_v2_xxx::symlink_handle</a>.</p>
+
+</div>
+</div>
+<a id="aa276caa8542cca700a2574459395ff60"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa276caa8542cca700a2574459395ff60">&#9670;&nbsp;</a></span>reopen()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;<a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a>&gt; llfio_v2_xxx::file_handle::reopen </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a>&#160;</td>
+          <td class="paramname"><em>mode_</em> = <code>mode::unchanged</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a>&#160;</td>
+          <td class="paramname"><em>caching_</em> = <code>caching::unchanged</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code>std::chrono::seconds(30)</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Reopen this handle (copy constructor is disabled to avoid accidental copying), optionally race free reopening the handle with different access or caching.</p>
+<p>Microsoft Windows provides a syscall for cloning an existing handle but with new access. On POSIX, if not changing the mode, we change caching via <code>fcntl()</code>, if changing the mode we must loop calling <code>current_path()</code>, trying to open the path returned and making sure it is the same inode.</p>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or DuplicateHandle() can return. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>On POSIX if changing the mode, we must loop calling <code>current_path()</code> and trying to open the path returned. Thus many allocations may occur. </dd></dl>
 
 </div>
 </div>

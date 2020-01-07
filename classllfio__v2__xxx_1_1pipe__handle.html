@@ -280,8 +280,8 @@ io_context *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="separator:a02769f641a80a18ef52431df9c530d9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a00a85eec5a41f7edb2c574d40cf04535"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html#a33481bae57d9ccd0c97946416f9682f3">path_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a00a85eec5a41f7edb2c574d40cf04535">current_path</a> () const noexcept</td></tr>
 <tr class="separator:a00a85eec5a41f7edb2c574d40cf04535"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeea4389189021b94dde6d8f2c3ccc5b3"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#aeea4389189021b94dde6d8f2c3ccc5b3">clone</a> () const noexcept</td></tr>
-<tr class="separator:aeea4389189021b94dde6d8f2c3ccc5b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46ee43d56e2665596b94721de986928b"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a46ee43d56e2665596b94721de986928b">clone</a> () const noexcept</td></tr>
+<tr class="separator:a46ee43d56e2665596b94721de986928b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d273e38c061eb11f5012f624e9a202e"><td class="memItemLeft" align="right" valign="top"><a id="a1d273e38c061eb11f5012f624e9a202e"></a>
 virtual <a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a1d273e38c061eb11f5012f624e9a202e">release</a> () noexcept</td></tr>
 <tr class="memdesc:a1d273e38c061eb11f5012f624e9a202e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release the native handle type managed by this handle. <br /></td></tr>
@@ -628,8 +628,8 @@ For portability, you can only assume that barriers write order for a single hand
 
 </div>
 </div>
-<a id="aeea4389189021b94dde6d8f2c3ccc5b3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeea4389189021b94dde6d8f2c3ccc5b3">&#9670;&nbsp;</a></span>clone()</h2>
+<a id="a46ee43d56e2665596b94721de986928b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a46ee43d56e2665596b94721de986928b">&#9670;&nbsp;</a></span>clone()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -638,7 +638,7 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">result&lt;<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a>&gt; llfio_v2_xxx::handle::clone </td>
+          <td class="memname">virtual result&lt;<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a>&gt; llfio_v2_xxx::handle::clone </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -646,12 +646,14 @@ For portability, you can only assume that barriers write order for a single hand
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 <p>Clone this handle (copy constructor is disabled to avoid accidental copying)</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or DuplicateHandle() can return. </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a97713c4f87b28e62f856665185ea6a18">llfio_v2_xxx::file_handle</a>.</p>
 
 </div>
 </div>
@@ -870,7 +872,7 @@ For portability, you can only assume that barriers write order for a single hand
 <div class="fragment"><div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classllfio__v2__xxx_1_1pipe__handle.html#ab2a30c788731707f70ff08c107ca1c97">pipe</a>(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>, <a class="code" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaaecae13117d6f0584c25a9da6c8f8415e">mode::read</a>, <a class="code" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42a8f0339e854eb5321306a443ce9199e1d">creation::if_needed</a>, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>, base); }</div><div class="ttc" id="classllfio__v2__xxx_1_1handle_html_aa3930273a2d4cabbac309e0b75701dcaaecae13117d6f0584c25a9da6c8f8415e"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaaecae13117d6f0584c25a9da6c8f8415e">llfio_v2_xxx::handle::mode::read</a></div><div class="ttdoc">Ability to read (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|SYNCHRONISE or O_RDONL...</div></div>
 <div class="ttc" id="classllfio__v2__xxx_1_1handle_html_a013936bc1254b1a47567fe29698d1b1c"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">llfio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:368</div></div>
 <div class="ttc" id="classllfio__v2__xxx_1_1pipe__handle_html_ab2a30c788731707f70ff08c107ca1c97"><div class="ttname"><a href="classllfio__v2__xxx_1_1pipe__handle.html#ab2a30c788731707f70ff08c107ca1c97">llfio_v2_xxx::pipe_handle::pipe</a></div><div class="ttdeci">static result&lt; pipe_handle &gt; pipe(path_view_type path, mode _mode, creation _creation, caching _caching=caching::all, flag flags=flag::none, const path_handle &amp;base=path_discovery::temporary_named_pipes_directory()) noexcept</div></div>
-<div class="ttc" id="namespacellfio__v2__xxx_html_a49f7bb77eb38fbe1280019225b66b78b"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">llfio_v2_xxx::path</a></div><div class="ttdeci">result&lt; path_handle &gt; path(const path_handle &amp;base, path_handle::path_view_type path) noexcept</div><div class="ttdef"><b>Definition:</b> path_handle.hpp:155</div></div>
+<div class="ttc" id="namespacellfio__v2__xxx_html_a49f7bb77eb38fbe1280019225b66b78b"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">llfio_v2_xxx::path</a></div><div class="ttdeci">result&lt; path_handle &gt; path(const path_handle &amp;base, path_handle::path_view_type path) noexcept</div><div class="ttdef"><b>Definition:</b> path_handle.hpp:146</div></div>
 <div class="ttc" id="classllfio__v2__xxx_1_1handle_html_af0b352d0f273ba6fa70c178b2c2fee42a8f0339e854eb5321306a443ce9199e1d"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42a8f0339e854eb5321306a443ce9199e1d">llfio_v2_xxx::handle::creation::if_needed</a></div><div class="ttdoc">If filesystem entry exists that is used, else one is created. </div></div>
 </div><!-- fragment -->
 </div>
@@ -923,7 +925,7 @@ For portability, you can only assume that barriers write order for a single hand
 <p>Convenience overload for <code>pipe()</code> opening an existing named pipe with write-only privileges. This will fail if no reader is waiting on the other end of the pipe. </p>
 <div class="fragment"><div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classllfio__v2__xxx_1_1pipe__handle.html#ab2a30c788731707f70ff08c107ca1c97">pipe</a>(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>, <a class="code" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaa9516dfb15f51c7ee19a4d46b8c0dbe1d">mode::append</a>, <a class="code" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42aa200dcd6176417e93be2405188ae7cc9">creation::open_existing</a>, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>, base); }</div><div class="ttc" id="classllfio__v2__xxx_1_1handle_html_a013936bc1254b1a47567fe29698d1b1c"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">llfio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:368</div></div>
 <div class="ttc" id="classllfio__v2__xxx_1_1pipe__handle_html_ab2a30c788731707f70ff08c107ca1c97"><div class="ttname"><a href="classllfio__v2__xxx_1_1pipe__handle.html#ab2a30c788731707f70ff08c107ca1c97">llfio_v2_xxx::pipe_handle::pipe</a></div><div class="ttdeci">static result&lt; pipe_handle &gt; pipe(path_view_type path, mode _mode, creation _creation, caching _caching=caching::all, flag flags=flag::none, const path_handle &amp;base=path_discovery::temporary_named_pipes_directory()) noexcept</div></div>
-<div class="ttc" id="namespacellfio__v2__xxx_html_a49f7bb77eb38fbe1280019225b66b78b"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">llfio_v2_xxx::path</a></div><div class="ttdeci">result&lt; path_handle &gt; path(const path_handle &amp;base, path_handle::path_view_type path) noexcept</div><div class="ttdef"><b>Definition:</b> path_handle.hpp:155</div></div>
+<div class="ttc" id="namespacellfio__v2__xxx_html_a49f7bb77eb38fbe1280019225b66b78b"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">llfio_v2_xxx::path</a></div><div class="ttdeci">result&lt; path_handle &gt; path(const path_handle &amp;base, path_handle::path_view_type path) noexcept</div><div class="ttdef"><b>Definition:</b> path_handle.hpp:146</div></div>
 <div class="ttc" id="classllfio__v2__xxx_1_1handle_html_aa3930273a2d4cabbac309e0b75701dcaa9516dfb15f51c7ee19a4d46b8c0dbe1d"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaa9516dfb15f51c7ee19a4d46b8c0dbe1d">llfio_v2_xxx::handle::mode::append</a></div><div class="ttdoc">All mainstream OSs and CIFS guarantee this is atomic with respect to all other appenders (FILE_APPEND...</div></div>
 <div class="ttc" id="classllfio__v2__xxx_1_1handle_html_af0b352d0f273ba6fa70c178b2c2fee42aa200dcd6176417e93be2405188ae7cc9"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42aa200dcd6176417e93be2405188ae7cc9">llfio_v2_xxx::handle::creation::open_existing</a></div><div class="ttdoc">Filesystem entry must already exist. </div></div>
 </div><!-- fragment -->

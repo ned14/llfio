@@ -214,8 +214,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#a2a22f51ca307aa30660ed91b26785ec3">close</a> () noexcept override</td></tr>
 <tr class="memdesc:a2a22f51ca307aa30660ed91b26785ec3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Immediately close the native handle type managed by this handle. <br /></td></tr>
 <tr class="separator:a2a22f51ca307aa30660ed91b26785ec3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aae07dfa26b75c9b973909c7da4580cf5"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html">symlink_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#aae07dfa26b75c9b973909c7da4580cf5">clone</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a> mode_=mode::unchanged, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) const noexcept</td></tr>
-<tr class="separator:aae07dfa26b75c9b973909c7da4580cf5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1eed91444d65330347cb89bbe206c13b"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html">symlink_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#a1eed91444d65330347cb89bbe206c13b">reopen</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a> mode_=mode::unchanged, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) const noexcept</td></tr>
+<tr class="separator:a1eed91444d65330347cb89bbe206c13b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aea44ed050acfd8e4f9dec59ff194c746"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html#a33481bae57d9ccd0c97946416f9682f3">path_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#aea44ed050acfd8e4f9dec59ff194c746">current_path</a> () const noexcept override</td></tr>
 <tr class="separator:aea44ed050acfd8e4f9dec59ff194c746"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afea9ef2b36cac3f6dfcae7555ca3303c"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#afea9ef2b36cac3f6dfcae7555ca3303c">relink</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#abcd8c8171f4e561620864295e8d5879b">path_view_type</a> <a class="el" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>, bool atomic_replace=true, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept override</td></tr>
@@ -240,8 +240,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 io_context *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a02769f641a80a18ef52431df9c530d9b">multiplexer</a> () const noexcept</td></tr>
 <tr class="memdesc:a02769f641a80a18ef52431df9c530d9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The i/o context this handle will use to multiplex i/o, if any. <br /></td></tr>
 <tr class="separator:a02769f641a80a18ef52431df9c530d9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeea4389189021b94dde6d8f2c3ccc5b3"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#aeea4389189021b94dde6d8f2c3ccc5b3">clone</a> () const noexcept</td></tr>
-<tr class="separator:aeea4389189021b94dde6d8f2c3ccc5b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46ee43d56e2665596b94721de986928b"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a46ee43d56e2665596b94721de986928b">clone</a> () const noexcept</td></tr>
+<tr class="separator:a46ee43d56e2665596b94721de986928b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d273e38c061eb11f5012f624e9a202e"><td class="memItemLeft" align="right" valign="top"><a id="a1d273e38c061eb11f5012f624e9a202e"></a>
 virtual <a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a1d273e38c061eb11f5012f624e9a202e">release</a> () noexcept</td></tr>
 <tr class="memdesc:a1d273e38c061eb11f5012f624e9a202e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release the native handle type managed by this handle. <br /></td></tr>
@@ -473,8 +473,8 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="aeea4389189021b94dde6d8f2c3ccc5b3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeea4389189021b94dde6d8f2c3ccc5b3">&#9670;&nbsp;</a></span>clone() <span class="overload">[1/2]</span></h2>
+<a id="a46ee43d56e2665596b94721de986928b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a46ee43d56e2665596b94721de986928b">&#9670;&nbsp;</a></span>clone()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -483,7 +483,7 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">result&lt;<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a>&gt; llfio_v2_xxx::handle::clone </td>
+          <td class="memname">virtual result&lt;<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a>&gt; llfio_v2_xxx::handle::clone </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -491,52 +491,14 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 <p>Clone this handle (copy constructor is disabled to avoid accidental copying)</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or DuplicateHandle() can return. </dd></dl>
 
-</div>
-</div>
-<a id="aae07dfa26b75c9b973909c7da4580cf5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aae07dfa26b75c9b973909c7da4580cf5">&#9670;&nbsp;</a></span>clone() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual result&lt;<a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html">symlink_handle</a>&gt; llfio_v2_xxx::symlink_handle::clone </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a>&#160;</td>
-          <td class="paramname"><em>mode_</em> = <code>mode::unchanged</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
-          <td class="paramname"><em>d</em> = <code>std::chrono::seconds(30)</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Clone this handle (copy constructor is disabled to avoid accidental copying), optionally race free reopening the handle with different access or caching.</p>
-<p>Microsoft Windows provides a syscall for cloning an existing handle but with new access. On POSIX, we must loop calling <code>current_path()</code>, trying to open the path returned and making sure it is the same inode.</p>
-<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or DuplicateHandle() can return. </dd></dl>
-<dl class="section user"><dt>Memory Allocations</dt><dd>On POSIX if changing the mode, we must loop calling <code>current_path()</code> and trying to open the path returned. Thus many allocations may occur. </dd></dl>
+<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a97713c4f87b28e62f856665185ea6a18">llfio_v2_xxx::file_handle</a>.</p>
 
 </div>
 </div>
@@ -793,6 +755,46 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
 <dl class="section user"><dt>Memory Allocations</dt><dd>Except on platforms with race free syscalls for renaming open handles (Windows), calls <code>current_path()</code> via <code>parent_path_handle()</code> and thus is both expensive and calls malloc many times. </dd></dl>
 
 <p>Reimplemented from <a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#a8700edc9ecd4dd35d5aad7c65dd0eca2">llfio_v2_xxx::fs_handle</a>.</p>
+
+</div>
+</div>
+<a id="a1eed91444d65330347cb89bbe206c13b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1eed91444d65330347cb89bbe206c13b">&#9670;&nbsp;</a></span>reopen()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual result&lt;<a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html">symlink_handle</a>&gt; llfio_v2_xxx::symlink_handle::reopen </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a>&#160;</td>
+          <td class="paramname"><em>mode_</em> = <code>mode::unchanged</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code>std::chrono::seconds(30)</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Reopen this handle (copy constructor is disabled to avoid accidental copying), optionally race free reopening the handle with different access or caching.</p>
+<p>Microsoft Windows provides a syscall for cloning an existing handle but with new access. On POSIX, we must loop calling <code>current_path()</code>, trying to open the path returned and making sure it is the same inode.</p>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or DuplicateHandle() can return. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>On POSIX if changing the mode, we must loop calling <code>current_path()</code> and trying to open the path returned. Thus many allocations may occur. </dd></dl>
 
 </div>
 </div>

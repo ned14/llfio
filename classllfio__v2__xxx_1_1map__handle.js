@@ -33,7 +33,7 @@ var classllfio__v2__xxx_1_1map__handle =
     [ "barrier", "classllfio__v2__xxx_1_1map__handle.html#a6a1044eeb6ab16939e4669bbeb071b32", null ],
     [ "barrier", "classllfio__v2__xxx_1_1map__handle.html#ab0aa8cab289373bace4c576465fe7e3d", null ],
     [ "capacity", "classllfio__v2__xxx_1_1map__handle.html#ac7d048f830c0b2563fb4b50eb0597152", null ],
-    [ "clone", "classllfio__v2__xxx_1_1map__handle.html#aeea4389189021b94dde6d8f2c3ccc5b3", null ],
+    [ "clone", "classllfio__v2__xxx_1_1map__handle.html#a46ee43d56e2665596b94721de986928b", null ],
     [ "close", "classllfio__v2__xxx_1_1map__handle.html#ab6704788ecc652589c3e155f47b40a5e", null ],
     [ "commit", "classllfio__v2__xxx_1_1map__handle.html#a9b3f12d17a9fc0cfbe15d389f896caa7", null ],
     [ "current_path", "classllfio__v2__xxx_1_1map__handle.html#a00a85eec5a41f7edb2c574d40cf04535", null ],

@@ -39,7 +39,7 @@ var classllfio__v2__xxx_1_1section__handle =
     [ "are_writes_durable", "classllfio__v2__xxx_1_1section__handle.html#a8036792f332459064172d7b0cfaee3cf", null ],
     [ "backing", "classllfio__v2__xxx_1_1section__handle.html#a680320bd539378d99870d9b2cdedb9c8", null ],
     [ "backing_native_handle", "classllfio__v2__xxx_1_1section__handle.html#aea14a4f834500e412db39efd998f438a", null ],
-    [ "clone", "classllfio__v2__xxx_1_1section__handle.html#aeea4389189021b94dde6d8f2c3ccc5b3", null ],
+    [ "clone", "classllfio__v2__xxx_1_1section__handle.html#a46ee43d56e2665596b94721de986928b", null ],
     [ "close", "classllfio__v2__xxx_1_1section__handle.html#a967031835185e5ba872a4e584d51c40d", null ],
     [ "current_path", "classllfio__v2__xxx_1_1section__handle.html#a00a85eec5a41f7edb2c574d40cf04535", null ],
     [ "flags", "classllfio__v2__xxx_1_1section__handle.html#a013936bc1254b1a47567fe29698d1b1c", null ],
