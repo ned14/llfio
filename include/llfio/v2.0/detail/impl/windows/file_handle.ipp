@@ -294,7 +294,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   }
 }
 
-result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline /*unused*/) const noexcept
+result<file_handle> file_handle::reopen(mode mode_, caching caching_, deadline /*unused*/) const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   result<file_handle> ret(file_handle(native_handle_type(), _devid, _inode, caching_, _flags));

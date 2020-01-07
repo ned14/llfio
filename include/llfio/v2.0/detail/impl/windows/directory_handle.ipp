@@ -203,7 +203,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
   return ret;
 }
 
-result<directory_handle> directory_handle::clone(mode mode_, caching caching_, deadline /* unused */) const noexcept
+result<directory_handle> directory_handle::reopen(mode mode_, caching caching_, deadline /* unused */) const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   result<directory_handle> ret(directory_handle(native_handle_type(), _devid, _inode, _caching, _flags));

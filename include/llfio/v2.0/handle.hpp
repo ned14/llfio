@@ -300,7 +300,7 @@ public:
 
   \errors Any of the values POSIX dup() or DuplicateHandle() can return.
   */
-  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<handle> clone() const noexcept;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<handle> clone() const noexcept;
   //! Release the native handle type managed by this handle
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept
   {

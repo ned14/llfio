@@ -214,20 +214,20 @@ public:
 
   LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), barrier_kind kind = barrier_kind::nowait_data_only, deadline d = deadline()) noexcept override;
-  /*! Clone this handle to a different io_service (copy constructor is disabled to avoid accidental copying)
+  /*! Reopen this handle to a different io_service (copy constructor is disabled to avoid accidental copying)
 
   \errors Any of the values POSIX dup() or DuplicateHandle() can return.
   */
-  result<async_file_handle> clone(io_service &service, mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept
+  result<async_file_handle> reopen(io_service &service, mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept
   {
-    OUTCOME_TRY(v, file_handle::clone(mode_, caching_, d));
+    OUTCOME_TRY(v, file_handle::reopen(mode_, caching_, d));
     async_file_handle ret(std::move(v));
     ret._service = &service;
     return {std::move(ret)};
   }
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<file_handle> reopen(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept
   {
-    OUTCOME_TRY(v, file_handle::clone(mode_, caching_, d));
+    OUTCOME_TRY(v, file_handle::reopen(mode_, caching_, d));
     async_file_handle ret(std::move(v));
     ret._service = _service;
     return {static_cast<file_handle &&>(ret)};

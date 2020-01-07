@@ -125,15 +125,6 @@ public:
 #endif
     return handle::close();
   }
-  /*! Clone this handle (copy constructor is disabled to avoid accidental copying).
-  */
-  result<path_handle> clone() const noexcept
-  {
-    auto *h = static_cast<const handle *>(this);
-    OUTCOME_TRY(ret, h->clone());
-    auto nativeh = ret.release();
-    return path_handle(nativeh);
-  }
 };
 
 //! \brief Constructor for `path_handle`

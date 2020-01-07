@@ -417,7 +417,7 @@ namespace storage_profile
           for(char no = '1'; no <= '2'; no++)
           {
             std::packaged_task<void()> task([size, &srch, no, &done] {
-              auto _h(srch.clone());
+              auto _h(srch.reopen());
               if(!_h)
               {
                 throw std::runtime_error(std::string("concurrency::atomic_rewrite_quantum: "  // NOLINT
@@ -456,7 +456,7 @@ namespace storage_profile
           for(unsigned no = 0; no < concurrency; no++)
           {
             std::packaged_task<void()> task([size, &srch, &done, &atomic_rewrite_quantum, &failed] {
-              auto _h(srch.clone());
+              auto _h(srch.reopen());
               if(!_h)
               {
                 throw std::runtime_error(std::string("concurrency::atomic_rewrite_quantum: "  // NOLINT
@@ -561,7 +561,7 @@ namespace storage_profile
             for(char no = '1'; no <= '2'; no++)
             {
               std::packaged_task<void()> task([size, offset, &srch, no, &done] {
-                auto _h(srch.clone());
+                auto _h(srch.reopen());
                 if(!_h)
                 {
                   throw std::runtime_error(std::string("concurrency::atomic_rewrite_"  // NOLINT
@@ -601,7 +601,7 @@ namespace storage_profile
             for(unsigned no = 0; no < concurrency; no++)
             {
               std::packaged_task<void()> task([size, offset, &srch, &done, &max_aligned_atomic_rewrite, &failed] {
-                auto _h(srch.clone());
+                auto _h(srch.reopen());
                 if(!_h)
                 {
                   throw std::runtime_error(std::string("concurrency::atomic_rewrite_"  // NOLINT
@@ -722,7 +722,7 @@ namespace storage_profile
               for(char no = '1'; no <= '2'; no++)
               {
                 std::packaged_task<void()> task([size, offset, &srch, no, &done] {
-                  auto _h(srch.clone());
+                  auto _h(srch.reopen());
                   if(!_h)
                   {
                     throw std::runtime_error(std::string("concurrency::atomic_rewrite_"  // NOLINT
@@ -762,7 +762,7 @@ namespace storage_profile
               for(unsigned no = 0; no < concurrency; no++)
               {
                 std::packaged_task<void()> task([size, offset, &srch, &done, &atomic_rewrite_offset_boundary, &failed] {
-                  auto _h(srch.clone());
+                  auto _h(srch.reopen());
                   if(!_h)
                   {
                     throw std::runtime_error(std::string("concurrency::atomic_rewrite_"  // NOLINT

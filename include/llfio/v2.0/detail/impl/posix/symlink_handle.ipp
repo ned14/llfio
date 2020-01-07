@@ -124,7 +124,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> symlink_handle::_create_symlink(con
   }
 }
 
-result<symlink_handle> symlink_handle::clone(mode mode_, deadline d) const noexcept
+result<symlink_handle> symlink_handle::reopen(mode mode_, deadline d) const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
 #if LLFIO_SYMLINK_HANDLE_IS_FAKED

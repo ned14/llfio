@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 LLFIO_V2_NAMESPACE_BEGIN
 
-result<symlink_handle> symlink_handle::clone(mode mode_, deadline /*unused*/) const noexcept
+result<symlink_handle> symlink_handle::reopen(mode mode_, deadline /*unused*/) const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   result<symlink_handle> ret(symlink_handle(native_handle_type(), _devid, _inode, _flags));

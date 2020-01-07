@@ -87,7 +87,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     if(base.is_valid() && path_parent.empty())
     {
       OUTCOME_TRY(dh, base.clone());
-      dirh = std::move(dh);
+      dirh = path_handle(std::move(dh));
     }
     else if(!path_parent.empty())
     {
@@ -175,7 +175,7 @@ opened:
   return ret;
 }
 
-result<directory_handle> directory_handle::clone(mode mode_, caching caching_, deadline d) const noexcept
+result<directory_handle> directory_handle::reopen(mode mode_, caching caching_, deadline d) const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   // Fast path

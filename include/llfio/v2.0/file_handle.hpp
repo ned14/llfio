@@ -229,7 +229,7 @@ public:
     return io_handle::close();
   }
 
-  /*! Clone this handle (copy constructor is disabled to avoid accidental copying),
+  /*! Reopen this handle (copy constructor is disabled to avoid accidental copying),
   optionally race free reopening the handle with different access or caching.
 
   Microsoft Windows provides a syscall for cloning an existing handle but with new
@@ -241,9 +241,16 @@ public:
   \mallocs On POSIX if changing the mode, we must loop calling `current_path()` and
   trying to open the path returned. Thus many allocations may occur.
   */
-  result<file_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
+  result<file_handle> reopen(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
 
-  LLFIO_DEADLINE_TRY_FOR_UNTIL(clone)
+  LLFIO_DEADLINE_TRY_FOR_UNTIL(reopen)
+
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<handle> clone() const noexcept override
+  {
+    // For file handles, we need a deeper clone than duph()
+    OUTCOME_TRY(ret, reopen());
+    return handle(ret.release());
+  }
 
   //! The i/o service this handle is attached to, if any
   io_service *service() const noexcept { return _service; }
@@ -424,7 +431,7 @@ inline result<file_handle::extent_type> truncate(file_handle &self, file_handle:
   return self.truncate(std::forward<decltype(newsize)>(newsize));
 }
 /*! \brief Returns a list of currently valid extents for this open file. WARNING: racy!
-*/
+ */
 inline result<std::vector<std::pair<file_handle::extent_type, file_handle::extent_type>>> extents(const file_handle &self) noexcept
 {
   return self.extents();
