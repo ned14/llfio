@@ -129,9 +129,11 @@ static inline void TestPathView()
   CheckPathView(L"\\mnt\\c\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir\\0");
   CheckPathView(L"C:\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir\\0");
   CheckPathView("C:/Users/ned/Documents/boostish/afio/programs/build_posix/testdir/0.txt");
-  // CheckPathView(L"\\\\niall\\douglas.txt");
-  CheckPathView(L"\\!!\\niall\\douglas.txt");
+  //CheckPathView(L"\\\\niall\\douglas.txt");
+  //CheckPathView(L"\\!!\\niall\\douglas.txt");
+#ifndef _EXPERIMENTAL_FILESYSTEM_
   CheckPathView(L"\\??\\niall\\douglas.txt");
+#endif
   CheckPathView(L"\\\\?\\niall\\douglas.txt");
   CheckPathView(L"\\\\.\\niall\\douglas.txt");
 

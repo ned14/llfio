@@ -1230,12 +1230,8 @@ public:
     }
 #ifdef _WIN32
     return _state._invoke([this, sep_idx](const auto &v) {
-      if(is_ntpath())
-      {
-        return path_view(v.data() + 3, 1, false);
-      }
       // Special case \\.\ and \\?\ to match filesystem::path
-      if(v.size() >= 4 && sep_idx == 0 && v[1] == '\\' && (v[2] == '.' || v[2] == '?') && v[3] == '\\')
+      if(is_ntpath() || (v.size() >= 4 && sep_idx == 0 && v[1] == '\\' && (v[2] == '.' || v[2] == '?') && v[3] == '\\'))
       {
         return path_view(v.data() + 0, 4, false);
       }
@@ -1265,7 +1261,7 @@ public:
 #ifdef _WIN32
     return _state._invoke([this, sep_idx](const auto &v) {
       // Special case \\.\ and \\?\ to match filesystem::path
-      if(v.size() >= 4 && sep_idx == 0 && v[1] == '\\' && (v[2] == '.' || v[2] == '?') && v[3] == '\\')
+      if(is_ntpath() || (v.size() >= 4 && sep_idx == 0 && v[1] == '\\' && (v[2] == '.' || v[2] == '?') && v[3] == '\\'))
       {
         return path_view(v.data() + 4, v.size() - 4, _state._zero_terminated);
       }
