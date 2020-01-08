@@ -335,8 +335,6 @@ public:
   */
   LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> zero(extent_type offset, extent_type bytes, deadline d = deadline()) noexcept;
-
-  LLFIO_DEADLINE_TRY_FOR_UNTIL(zero)
 };
 
 //! \brief Constructor for `file_handle`

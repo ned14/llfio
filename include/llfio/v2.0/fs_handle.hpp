@@ -143,8 +143,6 @@ public:
   */
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_handle> parent_path_handle(deadline d = std::chrono::seconds(30)) const noexcept;
 
-  LLFIO_DEADLINE_TRY_FOR_UNTIL(parent_path_handle)
-
   /*! Relinks the current path of this open handle to the new path specified. If `atomic_replace` is
   true, the relink \b atomically and silently replaces any item at the new path specified. This
   operation is both atomic and silent matching POSIX behaviour even on Microsoft Windows where
@@ -177,8 +175,6 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
   result<void> relink(const path_handle &base, path_view_type path, bool atomic_replace = true, deadline d = std::chrono::seconds(30)) noexcept;
 
-  LLFIO_DEADLINE_TRY_FOR_UNTIL(relink)
-
 #if 0  // Not implemented yet for absolutely no good reason
   /*! Links the inode referred to by this open handle to the path specified. The current path
   of this open handle is not changed, unless it has no current path due to being unlinked.
@@ -203,8 +199,6 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
   result<void> link(const path_handle &base, path_view_type path, deadline d = std::chrono::seconds(30)) noexcept;
 
-  LLFIO_DEADLINE_TRY_FOR_UNTIL(link)
-
   /*! Clones the inode referenced by the open handle into a new inode referencing the same extents
   for the file content, with a copy of the same metadata, apart from ownership which is for the
   current user. Changes to either inode are guaranteed to not be seen by the other inode i.e. they
@@ -223,8 +217,6 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
   result<file_handle> clone_inode(const path_handle &base,
                           path_view_type path) noexcept;
-
-  LLFIO_DEADLINE_TRY_FOR_UNTIL(clone_inode)
 #endif
 
   /*! Unlinks the current path of this open handle, causing its entry to immediately disappear
@@ -252,8 +244,6 @@ public:
   LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
   result<void> unlink(deadline d = std::chrono::seconds(30)) noexcept;
-
-  LLFIO_DEADLINE_TRY_FOR_UNTIL(unlink)
 };
 
 namespace detail

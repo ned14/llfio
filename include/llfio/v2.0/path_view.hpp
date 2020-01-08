@@ -830,7 +830,7 @@ namespace detail
   struct string_view_printer
   {
     std::ostream &s;
-    template <class CharT> void operator()(basic_string_view<CharT> v) { s << v; }
+    template <class CharT> void operator()(basic_string_view<CharT> v) { s << '"' << v << '"'; }
     void operator()(basic_string_view<char16_t> _v)
     {
       // Cheat by going via filesystem::path
@@ -845,7 +845,7 @@ namespace detail
     void operator()(basic_string_view<char8_t> _v)
     {
       basic_string_view<char> v((char *) _v.data(), _v.size());
-      s << v;
+      s << '"' << v << '"';
     }
 #else
     void operator()(basic_string_view<char8_t> _v)
@@ -860,7 +860,7 @@ inline std::ostream &operator<<(std::ostream &s, const path_view_component &v)
 {
   if(v._passthrough)
   {
-    return s << QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string({v._charstr, v._length});
+    return s << '"' << QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string({v._charstr, v._length}) << '"';
   }
   v._invoke(detail::string_view_printer{s});
   return s;
@@ -1140,6 +1140,22 @@ public:
       return false;
     });
   }
+  // True if the path view is a UNC path starting with `\\`
+  constexpr bool is_uncpath() const noexcept
+  {
+    return _state._invoke([](const auto &v) {
+      if(v.size() < 2)
+      {
+        return false;
+      }
+      const auto *d = v.data();
+      if(d[0] == '\\' && d[1] == '\\')
+      {
+        return true;
+      }
+      return false;
+    });
+  }
   // True if the path view matches the format of an LLFIO deleted file
   constexpr bool is_llfio_deleted() const noexcept
   {
@@ -1229,15 +1245,26 @@ public:
       return path_view();
     }
 #ifdef _WIN32
-    return _state._invoke([this, sep_idx](const auto &v) {
+    return _state._invoke([this, sep_idx](const auto &v) mutable {
       // Special case \\.\ and \\?\ to match filesystem::path
       if(is_ntpath() || (v.size() >= 4 && sep_idx == 0 && v[1] == '\\' && (v[2] == '.' || v[2] == '?') && v[3] == '\\'))
       {
         return path_view(v.data() + 0, 4, false);
       }
+      // Is there a drive letter before the first separator?
       auto colon_idx = v.find(':');
       if(colon_idx < sep_idx)
       {
+        return path_view(v.data(), sep_idx + 1, false);
+      }
+      // UNC paths return the server name as the root path
+      if(is_uncpath())
+      {
+        sep_idx = _state._find_first_sep(2);
+        if(_npos == sep_idx)
+        {
+          return *this;
+        }
         return path_view(v.data(), sep_idx + 1, false);
       }
 #else
@@ -1259,15 +1286,26 @@ public:
       return *this;
     }
 #ifdef _WIN32
-    return _state._invoke([this, sep_idx](const auto &v) {
+    return _state._invoke([this, sep_idx](const auto &v) mutable {
       // Special case \\.\ and \\?\ to match filesystem::path
       if(is_ntpath() || (v.size() >= 4 && sep_idx == 0 && v[1] == '\\' && (v[2] == '.' || v[2] == '?') && v[3] == '\\'))
       {
         return path_view(v.data() + 4, v.size() - 4, _state._zero_terminated);
       }
+      // Is there a drive letter before the first separator?
       auto colon_idx = v.find(':');
       if(colon_idx < sep_idx)
       {
+        return path_view(v.data() + sep_idx + 1, v.size() - sep_idx - 1, _state._zero_terminated);
+      }
+      // UNC paths return the server name as the root path
+      if(is_uncpath())
+      {
+        sep_idx = _state._find_first_sep(2);
+        if(_npos == sep_idx)
+        {
+          return path_view();
+        }
         return path_view(v.data() + sep_idx + 1, v.size() - sep_idx - 1, _state._zero_terminated);
       }
 #else
@@ -1288,7 +1326,22 @@ public:
     {
       return path_view();
     }
+#ifdef _WIN32
+    return _state._invoke([this, sep_idx](const auto &v) {
+      // UNC paths return a trailing slash if the parent path is the server name
+      if(is_uncpath())
+      {
+        auto sep_idx2 = _state._find_first_sep(2);
+        if(sep_idx2 == sep_idx)
+        {
+          return path_view(v.data(), sep_idx + 1, false);
+        }
+      }
+      return path_view(v.data(), sep_idx, false);
+    });
+#else
     return _state._invoke([sep_idx](const auto &v) { return path_view(v.data(), sep_idx, false); });
+#endif
   }
   //! Returns a view of the filename part of this view.
   LLFIO_PATH_VIEW_CONSTEXPR path_view filename() const noexcept { return _state._filename(); }

@@ -31,7 +31,7 @@ template <class U> inline void CheckPathView(const LLFIO_V2_NAMESPACE::filesyste
   auto r1 = c(p);
   auto r2 = c(path_view(p));
   BOOST_CHECK(r1 == r2);
-  if(r1 != r2)
+  //if(r1 != r2)
   {
     std::cerr << "For " << desc << " with path " << p << "\n";
     std::cerr << "   filesystem::path returned " << r1 << "\n";
@@ -129,7 +129,7 @@ static inline void TestPathView()
   CheckPathView(L"\\mnt\\c\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir\\0");
   CheckPathView(L"C:\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir\\0");
   CheckPathView("C:/Users/ned/Documents/boostish/afio/programs/build_posix/testdir/0.txt");
-  //CheckPathView(L"\\\\niall\\douglas.txt");
+  CheckPathView(L"\\\\niall\\douglas.txt");
   //CheckPathView(L"\\!!\\niall\\douglas.txt");
 #ifndef _EXPERIMENTAL_FILESYSTEM_
   CheckPathView(L"\\??\\niall\\douglas.txt");
