@@ -100,6 +100,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html">llfio_v2_xxx::file_handle</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to a regular file or device, kept data layout compatible with async_file_handle.  <a href="classllfio__v2__xxx_1_1file__handle.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html">llfio_v2_xxx::file_handle::extent_pair</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A pair of valid extents.  <a href="structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1construct_3_01file__handle_01_4.html">llfio_v2_xxx::construct&lt; file_handle &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for <code>file_handle</code>  <a href="structllfio__v2__xxx_1_1construct_3_01file__handle_01_4.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -130,10 +133,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="name
 <tr class="separator:a1759f4cee184d433f4446a39ff8bfa02"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a16ee1bea5a5791ecde266420e00fba81"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle::extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a16ee1bea5a5791ecde266420e00fba81">llfio_v2_xxx::truncate</a> (file_handle &amp;self, file_handle::extent_type newsize) noexcept</td></tr>
 <tr class="separator:a16ee1bea5a5791ecde266420e00fba81"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6f9a72b547dc542401a2d17b1c1e2e15"><td class="memItemLeft" align="right" valign="top"><a id="a6f9a72b547dc542401a2d17b1c1e2e15"></a>
-result&lt; std::vector&lt; std::pair&lt; file_handle::extent_type, file_handle::extent_type &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a6f9a72b547dc542401a2d17b1c1e2e15">llfio_v2_xxx::extents</a> (const file_handle &amp;self) noexcept</td></tr>
-<tr class="memdesc:a6f9a72b547dc542401a2d17b1c1e2e15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list of currently valid extents for this open file. WARNING: racy! <br /></td></tr>
-<tr class="separator:a6f9a72b547dc542401a2d17b1c1e2e15"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4f1cfcc3469ace25264a09770b0cdef"><td class="memItemLeft" align="right" valign="top"><a id="ad4f1cfcc3469ace25264a09770b0cdef"></a>
+result&lt; std::vector&lt; file_handle::extent_pair &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#ad4f1cfcc3469ace25264a09770b0cdef">llfio_v2_xxx::extents</a> (const file_handle &amp;self) noexcept</td></tr>
+<tr class="memdesc:ad4f1cfcc3469ace25264a09770b0cdef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list of currently valid extents for this open file. WARNING: racy! <br /></td></tr>
+<tr class="separator:ad4f1cfcc3469ace25264a09770b0cdef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad0fb15649a46da0d75b5797bfda8dc2e"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle::extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#ad0fb15649a46da0d75b5797bfda8dc2e">llfio_v2_xxx::zero</a> (file_handle &amp;self, file_handle::extent_type offset, file_handle::extent_type bytes, deadline d=deadline()) noexcept</td></tr>
 <tr class="memdesc:ad0fb15649a46da0d75b5797bfda8dc2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Efficiently zero, and possibly deallocate, data on storage.  <a href="namespacellfio__v2__xxx.html#ad0fb15649a46da0d75b5797bfda8dc2e">More...</a><br /></td></tr>
 <tr class="separator:ad0fb15649a46da0d75b5797bfda8dc2e"><td class="memSeparator" colspan="2">&#160;</td></tr>

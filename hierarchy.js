@@ -31,6 +31,7 @@ var hierarchy =
     [ "llfio_v2_xxx::error_info", "structllfio__v2__xxx_1_1error__info.html", null ],
     [ "llfio_v2_xxx::executor", "classllfio__v2__xxx_1_1executor.html", null ],
     [ "llfio_v2_xxx::lockable_io_handle::extent_guard", "classllfio__v2__xxx_1_1lockable__io__handle_1_1extent__guard.html", null ],
+    [ "llfio_v2_xxx::file_handle::extent_pair", "structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html", null ],
     [ "llfio_v2_xxx::statfs_t::f_flags_t", "structllfio__v2__xxx_1_1statfs__t_1_1f__flags__t.html", null ],
     [ "filesystem_error", null, [
       [ "llfio_v2_xxx::error", "classllfio__v2__xxx_1_1error.html", null ]
@@ -87,8 +88,8 @@ var hierarchy =
     [ "llfio_v2_xxx::path_view", "classllfio__v2__xxx_1_1path__view.html", null ],
     [ "llfio_v2_xxx::path_view_component", "classllfio__v2__xxx_1_1path__view__component.html", null ],
     [ "llfio_v2_xxx::read_receiver< IoHandleType >", "classllfio__v2__xxx_1_1read__receiver.html", null ],
-    [ "llfio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
     [ "llfio_v2_xxx::utils::page_allocator< void >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
+    [ "llfio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
     [ "result", null, [
       [ "llfio_v2_xxx::io_handle::io_result< buffers_type >", "structllfio__v2__xxx_1_1io__handle_1_1io__result.html", null ],
       [ "llfio_v2_xxx::io_handle::io_result< const_buffers_type >", "structllfio__v2__xxx_1_1io__handle_1_1io__result.html", null ],

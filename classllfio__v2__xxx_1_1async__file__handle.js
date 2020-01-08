@@ -48,7 +48,7 @@ var classllfio__v2__xxx_1_1async__file__handle =
     [ "co_write", "classllfio__v2__xxx_1_1async__file__handle.html#a3a7030863cef0cdc5646f18e76a43411", null ],
     [ "co_write", "classllfio__v2__xxx_1_1async__file__handle.html#a9b835259530bd30f8e49975003323e3f", null ],
     [ "current_path", "classllfio__v2__xxx_1_1async__file__handle.html#a00a85eec5a41f7edb2c574d40cf04535", null ],
-    [ "extents", "classllfio__v2__xxx_1_1async__file__handle.html#a1c2c1c27b1be6414415b3fc3fcda88b2", null ],
+    [ "extents", "classllfio__v2__xxx_1_1async__file__handle.html#a6e30345e9aa4fa263b009efe2c97466a", null ],
     [ "flags", "classllfio__v2__xxx_1_1async__file__handle.html#a013936bc1254b1a47567fe29698d1b1c", null ],
     [ "is_append_only", "classllfio__v2__xxx_1_1async__file__handle.html#ac3aa3dc009822c0e437f317864534feb", null ],
     [ "is_directory", "classllfio__v2__xxx_1_1async__file__handle.html#a4ca48bdcd6d6bf8b41d0cebb304fe9ce", null ],

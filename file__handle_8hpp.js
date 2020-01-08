@@ -1,8 +1,9 @@
 var file__handle_8hpp =
 [
     [ "file_handle", "classllfio__v2__xxx_1_1file__handle.html", "classllfio__v2__xxx_1_1file__handle" ],
+    [ "extent_pair", "structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html", "structllfio__v2__xxx_1_1file__handle_1_1extent__pair" ],
     [ "construct< file_handle >", "structllfio__v2__xxx_1_1construct_3_01file__handle_01_4.html", "structllfio__v2__xxx_1_1construct_3_01file__handle_01_4" ],
-    [ "extents", "file__handle_8hpp.html#a6f9a72b547dc542401a2d17b1c1e2e15", null ],
+    [ "extents", "file__handle_8hpp.html#ad4f1cfcc3469ace25264a09770b0cdef", null ],
     [ "file", "file__handle_8hpp.html#af31a062639499a79ef5cc8aed16ba65d", null ],
     [ "maximum_extent", "file__handle_8hpp.html#a1759f4cee184d433f4446a39ff8bfa02", null ],
     [ "random_file", "file__handle_8hpp.html#a5bc9df0fdb554e757d14cf40af0bbb4e", null ],

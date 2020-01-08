@@ -40,7 +40,7 @@ var classllfio__v2__xxx_1_1mapped__file__handle =
     [ "clone", "classllfio__v2__xxx_1_1mapped__file__handle.html#a97713c4f87b28e62f856665185ea6a18", null ],
     [ "close", "classllfio__v2__xxx_1_1mapped__file__handle.html#a325b7470c78ae88bab851ff054bdbc6c", null ],
     [ "current_path", "classllfio__v2__xxx_1_1mapped__file__handle.html#a00a85eec5a41f7edb2c574d40cf04535", null ],
-    [ "extents", "classllfio__v2__xxx_1_1mapped__file__handle.html#a1c2c1c27b1be6414415b3fc3fcda88b2", null ],
+    [ "extents", "classllfio__v2__xxx_1_1mapped__file__handle.html#a6e30345e9aa4fa263b009efe2c97466a", null ],
     [ "flags", "classllfio__v2__xxx_1_1mapped__file__handle.html#a013936bc1254b1a47567fe29698d1b1c", null ],
     [ "is_append_only", "classllfio__v2__xxx_1_1mapped__file__handle.html#ac3aa3dc009822c0e437f317864534feb", null ],
     [ "is_directory", "classllfio__v2__xxx_1_1mapped__file__handle.html#a4ca48bdcd6d6bf8b41d0cebb304fe9ce", null ],

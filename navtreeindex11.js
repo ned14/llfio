@@ -1,5 +1,10 @@
 var NAVTREEINDEX11 =
 {
+"structllfio__v2__xxx_1_1io__handle_1_1io__result.html#a90bee69c746e646458e0d255ce18668d":[4,0,2,28,3,3],
+"structllfio__v2__xxx_1_1io__handle_1_1io__result.html#ab4cec8941a442e257aab1f0fd615a8a3":[4,0,2,28,3,6],
+"structllfio__v2__xxx_1_1io__handle_1_1io__result.html#acc75d0f4c3003db5eed4d6ef1122e77a":[4,0,2,28,3,0],
+"structllfio__v2__xxx_1_1io__handle_1_1io__result.html#ae49f06f0a4b9f268b413181ccf75fd8f":[4,0,2,28,3,2],
+"structllfio__v2__xxx_1_1io__handle_1_1io__result.html#aea1d610bc13166971300720b194feb64":[4,0,2,28,3,4],
 "structllfio__v2__xxx_1_1io__service_1_1awaitable__post__to__self.html":[4,0,2,29,0],
 "structllfio__v2__xxx_1_1io__service_1_1awaitable__post__to__self.html#a00191d017cabcae0bd140d8027174ad7":[4,0,2,29,0,3],
 "structllfio__v2__xxx_1_1io__service_1_1awaitable__post__to__self.html#a1023716d724ddf252b772f9b83b1fe85":[4,0,2,29,0,0],
@@ -244,10 +249,5 @@ var NAVTREEINDEX11 =
 "structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#a8b5db964ac65a2d3f916798cd79ebcaa":[4,0,2,45,0,16],
 "structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#a8e897069034acea0439397ea4aeb777a":[4,0,2,45,0,4],
 "structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#a8ee21a380f56cd0e948cd84576a41636":[4,0,2,45,0,15],
-"structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#a912fbd8b1122c799cc732817a830c890":[4,0,2,45,0,8],
-"structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#aa4d9b043e638ad6e1b592f2b93a5c9c2":[4,0,2,45,0,5],
-"structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#aac4581300de0e933397e3bb17daac03d":[4,0,2,45,0,12],
-"structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#ac44ca889e5423c1bdeb02e5bee5f645a":[4,0,2,45,0,18],
-"structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#aca3d0c03e7256af2d2126d47bfc44cd0":[4,0,2,45,0,11],
-"structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#acc92d4b9ce54a7dbc52170aad7b1d623":[4,0,2,45,0,14]
+"structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#a912fbd8b1122c799cc732817a830c890":[4,0,2,45,0,8]
 };

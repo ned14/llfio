@@ -39,7 +39,7 @@ var classllfio__v2__xxx_1_1fast__random__file__handle =
     [ "clone", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a97713c4f87b28e62f856665185ea6a18", null ],
     [ "close", "classllfio__v2__xxx_1_1fast__random__file__handle.html#ad67d4e8da0a8fa8719f301d577418165", null ],
     [ "current_path", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a00a85eec5a41f7edb2c574d40cf04535", null ],
-    [ "extents", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a9bc75ea73ffb575d36e9800b8e1e5af0", null ],
+    [ "extents", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a8026691789a70593329230076357fc96", null ],
     [ "flags", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a013936bc1254b1a47567fe29698d1b1c", null ],
     [ "is_append_only", "classllfio__v2__xxx_1_1fast__random__file__handle.html#ac3aa3dc009822c0e437f317864534feb", null ],
     [ "is_directory", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a4ca48bdcd6d6bf8b41d0cebb304fe9ce", null ],

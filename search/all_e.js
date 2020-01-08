@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['offset',['offset',['../classllfio__v2__xxx_1_1map__handle.html#a9b65f62129418d02a925e6ef56220198',1,'llfio_v2_xxx::map_handle']]],
+  ['offset',['offset',['../structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html#a262bee34ba37e87b3a837ab45724693e',1,'llfio_v2_xxx::file_handle::extent_pair::offset()'],['../classllfio__v2__xxx_1_1map__handle.html#a9b65f62129418d02a925e6ef56220198',1,'llfio_v2_xxx::map_handle::offset()']]],
   ['only_5fif_5fnot_5fexist',['only_if_not_exist',['../classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255',1,'llfio_v2_xxx::handle']]],
   ['only_5fmetadata',['only_metadata',['../classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852ab8a61dd00ce6fc5888706bda8fab2e98',1,'llfio_v2_xxx::handle']]],
   ['open',['open',['../classkvstore__v1__xxx_1_1basic__key__value__store.html#a6f45998a528be5d9ee623327e2817a46',1,'kvstore_v1_xxx::basic_key_value_store']]],

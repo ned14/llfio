@@ -189,6 +189,11 @@ var NAVTREEINDEX10 =
 "structllfio__v2__xxx_1_1fast__random__file__handle_1_1prng.html#a853281a0dd1013e6e441fa419c2ad8f0":[4,0,2,24,0,1],
 "structllfio__v2__xxx_1_1fast__random__file__handle_1_1prng.html#a9d49b0269021bac52a119340604ac286":[4,0,2,24,0,2],
 "structllfio__v2__xxx_1_1fast__random__file__handle_1_1prng.html#af67370f7251dde83b2947bfb4d080044":[4,0,2,24,0,3],
+"structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html":[4,0,2,25,0],
+"structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html#a236b653b2364ca641921573eb2234161":[4,0,2,25,0,1],
+"structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html#a262bee34ba37e87b3a837ab45724693e":[4,0,2,25,0,3],
+"structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html#a2d24ecbcb59152be697bb4b59ac2cc7f":[4,0,2,25,0,0],
+"structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html#a694c74732e045b21ef066232cfe2827a":[4,0,2,25,0,2],
 "structllfio__v2__xxx_1_1io__handle_1_1buffer__type.html":[4,0,2,28,0],
 "structllfio__v2__xxx_1_1io__handle_1_1buffer__type.html#a008f53151591d2ff9c73e9189d032205":[4,0,2,28,0,12],
 "structllfio__v2__xxx_1_1io__handle_1_1buffer__type.html#a014d6325987a0ace31118793956b18c3":[4,0,2,28,0,1],
@@ -244,10 +249,5 @@ var NAVTREEINDEX10 =
 "structllfio__v2__xxx_1_1io__handle_1_1io__result.html#a458ac6f7315d452180e7ed89f9ceba83":[4,0,2,28,3,8],
 "structllfio__v2__xxx_1_1io__handle_1_1io__result.html#a58e05cc0f5fe29282c69d44e6797d41a":[4,0,2,28,3,5],
 "structllfio__v2__xxx_1_1io__handle_1_1io__result.html#a5a5c16b320edf9894dfc1f1f9f817d18":[4,0,2,28,3,7],
-"structllfio__v2__xxx_1_1io__handle_1_1io__result.html#a80942d3d1854695f772ec4b12962aa63":[4,0,2,28,3,1],
-"structllfio__v2__xxx_1_1io__handle_1_1io__result.html#a90bee69c746e646458e0d255ce18668d":[4,0,2,28,3,3],
-"structllfio__v2__xxx_1_1io__handle_1_1io__result.html#ab4cec8941a442e257aab1f0fd615a8a3":[4,0,2,28,3,6],
-"structllfio__v2__xxx_1_1io__handle_1_1io__result.html#acc75d0f4c3003db5eed4d6ef1122e77a":[4,0,2,28,3,0],
-"structllfio__v2__xxx_1_1io__handle_1_1io__result.html#ae49f06f0a4b9f268b413181ccf75fd8f":[4,0,2,28,3,2],
-"structllfio__v2__xxx_1_1io__handle_1_1io__result.html#aea1d610bc13166971300720b194feb64":[4,0,2,28,3,4]
+"structllfio__v2__xxx_1_1io__handle_1_1io__result.html#a80942d3d1854695f772ec4b12962aa63":[4,0,2,28,3,1]
 };

@@ -327,9 +327,9 @@ template&lt;class... Args, class Rep , class Period &gt; </td></tr>
 template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
 <tr class="memitem:a9ec4e9590e6e22ae5d4dc8a2565b2358"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_read_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
 <tr class="separator:a9ec4e9590e6e22ae5d4dc8a2565b2358"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c2c1c27b1be6414415b3fc3fcda88b2"><td class="memItemLeft" align="right" valign="top">virtual result&lt; std::vector&lt; std::pair&lt; extent_type, extent_type &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a1c2c1c27b1be6414415b3fc3fcda88b2">extents</a> () const noexcept</td></tr>
-<tr class="memdesc:a1c2c1c27b1be6414415b3fc3fcda88b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list of currently valid extents for this open file. WARNING: racy!  <a href="#a1c2c1c27b1be6414415b3fc3fcda88b2">More...</a><br /></td></tr>
-<tr class="separator:a1c2c1c27b1be6414415b3fc3fcda88b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e30345e9aa4fa263b009efe2c97466a"><td class="memItemLeft" align="right" valign="top">virtual result&lt; std::vector&lt; <a class="el" href="structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html">extent_pair</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a6e30345e9aa4fa263b009efe2c97466a">extents</a> () const noexcept</td></tr>
+<tr class="memdesc:a6e30345e9aa4fa263b009efe2c97466a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list of currently valid extents for this open file. WARNING: racy!  <a href="#a6e30345e9aa4fa263b009efe2c97466a">More...</a><br /></td></tr>
+<tr class="separator:a6e30345e9aa4fa263b009efe2c97466a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afab4b38fba3730a36ba0b2f849dc6777"><td class="memTemplParams" colspan="2"><a id="afab4b38fba3730a36ba0b2f849dc6777"></a>
 template&lt;class... Args&gt; </td></tr>
 <tr class="memitem:afab4b38fba3730a36ba0b2f849dc6777"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_zero</b> (Args &amp;&amp;... args) noexcept</td></tr>
@@ -828,8 +828,8 @@ For portability, you can only assume that barriers write order for a single hand
 
 </div>
 </div>
-<a id="a1c2c1c27b1be6414415b3fc3fcda88b2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1c2c1c27b1be6414415b3fc3fcda88b2">&#9670;&nbsp;</a></span>extents()</h2>
+<a id="a6e30345e9aa4fa263b009efe2c97466a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6e30345e9aa4fa263b009efe2c97466a">&#9670;&nbsp;</a></span>extents()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -838,7 +838,7 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual result&lt;std::vector&lt;std::pair&lt;extent_type, extent_type&gt; &gt; &gt; llfio_v2_xxx::file_handle::extents </td>
+          <td class="memname">virtual result&lt;std::vector&lt;<a class="el" href="structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html">extent_pair</a>&gt; &gt; llfio_v2_xxx::file_handle::extents </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -854,7 +854,7 @@ For portability, you can only assume that barriers write order for a single hand
 <p>Returns a list of currently valid extents for this open file. WARNING: racy! </p>
 <dl class="section return"><dt>Returns</dt><dd>A vector of pairs of extent offset + extent length representing the valid extents in this file. Filing systems which do not support extents return a single extent matching the length of the file rather than returning an error. </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1fast__random__file__handle.html#a9bc75ea73ffb575d36e9800b8e1e5af0">llfio_v2_xxx::fast_random_file_handle</a>.</p>
+<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1fast__random__file__handle.html#a8026691789a70593329230076357fc96">llfio_v2_xxx::fast_random_file_handle</a>.</p>
 
 </div>
 </div>

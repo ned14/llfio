@@ -1,5 +1,10 @@
 var NAVTREEINDEX12 =
 {
+"structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#aa4d9b043e638ad6e1b592f2b93a5c9c2":[4,0,2,45,0,5],
+"structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#aac4581300de0e933397e3bb17daac03d":[4,0,2,45,0,12],
+"structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#ac44ca889e5423c1bdeb02e5bee5f645a":[4,0,2,45,0,18],
+"structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#aca3d0c03e7256af2d2126d47bfc44cd0":[4,0,2,45,0,11],
+"structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#acc92d4b9ce54a7dbc52170aad7b1d623":[4,0,2,45,0,14],
 "structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#ad4138f1e3cfa2932aa898d0eb0a7bf6a":[4,0,2,45,0,2],
 "structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#ae1138a854773d736e5cc8f3c13b29ec1":[4,0,2,45,0,10],
 "structllfio__v2__xxx_1_1symlink__handle_1_1const__buffers__type.html":[4,0,2,45,1],
@@ -81,8 +86,8 @@ var NAVTREEINDEX12 =
 "v2_80_2llfio_8hpp.html#ae0f8dc3a9d303f90044533d23f6417a8":[5,0,0,1,0,11,0],
 "version_8hpp.html":[5,0,0,1,2],
 "version_8hpp.html#a699beb5138cc8f2a2df12d833e4d96be":[5,0,0,1,2,4],
-"version_8hpp.html#a7b08237a3cfed4832068a4daa6d6e160":[5,0,0,1,2,1],
 "version_8hpp.html#a7b08237a3cfed4832068a4daa6d6e160":[5,0,0,1,2,2],
+"version_8hpp.html#a7b08237a3cfed4832068a4daa6d6e160":[5,0,0,1,2,1],
 "version_8hpp.html#aadba5400c27b35d85067c431cfd9b0e6":[5,0,0,1,2,5],
 "version_8hpp.html#ac7aedfe0660c15373b69a68f760c5799":[5,0,0,1,2,0],
 "xor_8hpp.html":[5,0,0,1,0,0,0,2],
