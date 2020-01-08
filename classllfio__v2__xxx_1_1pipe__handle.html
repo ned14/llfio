@@ -391,46 +391,10 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 <tr class="separator:a9793fe40564fda2437783488bd51b9f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a865caad2f7f4bdf12fb74aabfe3c5ff5"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#a865caad2f7f4bdf12fb74aabfe3c5ff5">parent_path_handle</a> (<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) const noexcept</td></tr>
 <tr class="separator:a865caad2f7f4bdf12fb74aabfe3c5ff5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1eeaf9d77a1279b4f0d3062de509f77f"><td class="memTemplParams" colspan="2"><a id="a1eeaf9d77a1279b4f0d3062de509f77f"></a>
-template&lt;class... Args&gt; </td></tr>
-<tr class="memitem:a1eeaf9d77a1279b4f0d3062de509f77f"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_parent_path_handle</b> (Args &amp;&amp;... args) noexcept</td></tr>
-<tr class="separator:a1eeaf9d77a1279b4f0d3062de509f77f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a41ea4bd2d5a66fbde4cdbfe463166a4f"><td class="memTemplParams" colspan="2"><a id="a41ea4bd2d5a66fbde4cdbfe463166a4f"></a>
-template&lt;class... Args, class Rep , class Period &gt; </td></tr>
-<tr class="memitem:a41ea4bd2d5a66fbde4cdbfe463166a4f"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_parent_path_handle_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
-<tr class="separator:a41ea4bd2d5a66fbde4cdbfe463166a4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acbb1fe8c7901382307d84848fdc0afcb"><td class="memTemplParams" colspan="2"><a id="acbb1fe8c7901382307d84848fdc0afcb"></a>
-template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
-<tr class="memitem:acbb1fe8c7901382307d84848fdc0afcb"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_parent_path_handle_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
-<tr class="separator:acbb1fe8c7901382307d84848fdc0afcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8700edc9ecd4dd35d5aad7c65dd0eca2"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#a8700edc9ecd4dd35d5aad7c65dd0eca2">relink</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#abcd8c8171f4e561620864295e8d5879b">path_view_type</a> <a class="el" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>, bool atomic_replace=true, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
 <tr class="separator:a8700edc9ecd4dd35d5aad7c65dd0eca2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7f5f9892f6652359f2330bf6d9b89e17"><td class="memTemplParams" colspan="2"><a id="a7f5f9892f6652359f2330bf6d9b89e17"></a>
-template&lt;class... Args&gt; </td></tr>
-<tr class="memitem:a7f5f9892f6652359f2330bf6d9b89e17"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_relink</b> (Args &amp;&amp;... args) noexcept</td></tr>
-<tr class="separator:a7f5f9892f6652359f2330bf6d9b89e17"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af5565cd5f2fcbb9472b2a00795cc0bcc"><td class="memTemplParams" colspan="2"><a id="af5565cd5f2fcbb9472b2a00795cc0bcc"></a>
-template&lt;class... Args, class Rep , class Period &gt; </td></tr>
-<tr class="memitem:af5565cd5f2fcbb9472b2a00795cc0bcc"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_relink_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
-<tr class="separator:af5565cd5f2fcbb9472b2a00795cc0bcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1fc4e2ade67dfb9140007cc31f4b6b20"><td class="memTemplParams" colspan="2"><a id="a1fc4e2ade67dfb9140007cc31f4b6b20"></a>
-template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
-<tr class="memitem:a1fc4e2ade67dfb9140007cc31f4b6b20"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_relink_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
-<tr class="separator:a1fc4e2ade67dfb9140007cc31f4b6b20"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1dd7923bb65456af4da41ebe7cb84982"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#a1dd7923bb65456af4da41ebe7cb84982">unlink</a> (<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
 <tr class="separator:a1dd7923bb65456af4da41ebe7cb84982"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7f77a249baf4e0c5de2172669a7724d7"><td class="memTemplParams" colspan="2"><a id="a7f77a249baf4e0c5de2172669a7724d7"></a>
-template&lt;class... Args&gt; </td></tr>
-<tr class="memitem:a7f77a249baf4e0c5de2172669a7724d7"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_unlink</b> (Args &amp;&amp;... args) noexcept</td></tr>
-<tr class="separator:a7f77a249baf4e0c5de2172669a7724d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a209de025a2d3e202a61c50b52d43f2af"><td class="memTemplParams" colspan="2"><a id="a209de025a2d3e202a61c50b52d43f2af"></a>
-template&lt;class... Args, class Rep , class Period &gt; </td></tr>
-<tr class="memitem:a209de025a2d3e202a61c50b52d43f2af"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_unlink_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
-<tr class="separator:a209de025a2d3e202a61c50b52d43f2af"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae9c4133fef23811abcb01e1faf2b19d3"><td class="memTemplParams" colspan="2"><a id="ae9c4133fef23811abcb01e1faf2b19d3"></a>
-template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
-<tr class="memitem:ae9c4133fef23811abcb01e1faf2b19d3"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_unlink_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
-<tr class="separator:ae9c4133fef23811abcb01e1faf2b19d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
