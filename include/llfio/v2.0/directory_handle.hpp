@@ -268,7 +268,7 @@ public:
     return path_handle::close();
   }
 
-  /*! Clone this handle (copy constructor is disabled to avoid accidental copying),
+  /*! Reopen this handle (copy constructor is disabled to avoid accidental copying),
   optionally race free reopening the handle with different access or caching.
 
   Microsoft Windows provides a syscall for cloning an existing handle but with new
@@ -279,7 +279,7 @@ public:
   \mallocs On POSIX if changing the mode, we must loop calling `current_path()` and
   trying to open the path returned. Thus many allocations may occur.
   */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<directory_handle> clone(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<directory_handle> reopen(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
 
   /*! Return a copy of this directory handle, but as a path handle.
 

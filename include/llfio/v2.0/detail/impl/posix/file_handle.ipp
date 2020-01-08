@@ -56,7 +56,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
       if(base.is_valid() && path_parent.empty())
       {
         OUTCOME_TRY(dh, base.clone());
-        dirh = std::move(dh);
+        dirh = path_handle(std::move(dh));
       }
       else if(!path_parent.empty())
       {
@@ -158,7 +158,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   }
 }
 
-result<file_handle> file_handle::clone(mode mode_, caching caching_, deadline d) const noexcept
+result<file_handle> file_handle::reopen(mode mode_, caching caching_, deadline d) const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   // Fast path

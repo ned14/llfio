@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 LLFIO_V2_NAMESPACE_BEGIN
 
-result<symlink_handle> symlink_handle::clone(mode mode_, deadline /*unused*/) const noexcept
+result<symlink_handle> symlink_handle::reopen(mode mode_, deadline /*unused*/) const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   result<symlink_handle> ret(symlink_handle(native_handle_type(), _devid, _inode, _flags));
@@ -59,7 +59,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
       if(OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &token))
       {
         TOKEN_PRIVILEGES privs = {1};
-        if(LookupPrivilegeValue(NULL, SE_CREATE_SYMBOLIC_LINK_NAME, &privs.Privileges[0].Luid))
+        if(LookupPrivilegeValueW(NULL, L"SeCreateSymbolicLinkPrivilege", &privs.Privileges[0].Luid))
         {
           privs.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
           if(AdjustTokenPrivileges(token, FALSE, &privs, 0, NULL, NULL) && GetLastError() == S_OK)

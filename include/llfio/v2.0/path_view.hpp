@@ -385,7 +385,14 @@ public:
 
 private:
   template <class CharT> static filesystem::path _path_from_char_array(basic_string_view<CharT> v) { return {v.data(), v.data() + v.size()}; }
-  static filesystem::path _path_from_char_array(basic_string_view<char8_t> v) { return filesystem::u8path((const char *) v.data(), (const char *) v.data() + v.size()); }
+  static filesystem::path _path_from_char_array(basic_string_view<char8_t> v)
+  {
+#if __cplusplus >= 202000 || _HAS_CXX20
+    return filesystem::path(v);
+#else
+    return filesystem::u8path((const char *) v.data(), (const char *) v.data() + v.size());
+#endif
+  }
 
   template <class CharT> static int _do_compare(const CharT *a, const CharT *b, size_t length) noexcept { return memcmp(a, b, length * sizeof(CharT)); }
   static int _do_compare(const char8_t *_a, const char8_t *_b, size_t length) noexcept
@@ -713,7 +720,7 @@ public:
   };
 #ifdef __cpp_concepts
   template <class T, class Deleter, size_t _internal_buffer_size>
-  requires is_source_acceptable<T>
+  requires(is_source_acceptable<T>)
 #elif defined(_MSC_VER)
   template <class T, class Deleter, size_t _internal_buffer_size, class>
 #else
@@ -1223,12 +1230,8 @@ public:
     }
 #ifdef _WIN32
     return _state._invoke([this, sep_idx](const auto &v) {
-      if(is_ntpath())
-      {
-        return path_view(v.data() + 3, 1, false);
-      }
       // Special case \\.\ and \\?\ to match filesystem::path
-      if(v.size() >= 4 && sep_idx == 0 && v[1] == '\\' && (v[2] == '.' || v[2] == '?') && v[3] == '\\')
+      if(is_ntpath() || (v.size() >= 4 && sep_idx == 0 && v[1] == '\\' && (v[2] == '.' || v[2] == '?') && v[3] == '\\'))
       {
         return path_view(v.data() + 0, 4, false);
       }
@@ -1258,7 +1261,7 @@ public:
 #ifdef _WIN32
     return _state._invoke([this, sep_idx](const auto &v) {
       // Special case \\.\ and \\?\ to match filesystem::path
-      if(v.size() >= 4 && sep_idx == 0 && v[1] == '\\' && (v[2] == '.' || v[2] == '?') && v[3] == '\\')
+      if(is_ntpath() || (v.size() >= 4 && sep_idx == 0 && v[1] == '\\' && (v[2] == '.' || v[2] == '?') && v[3] == '\\'))
       {
         return path_view(v.data() + 4, v.size() - 4, _state._zero_terminated);
       }
@@ -1348,7 +1351,7 @@ public:
   };
 #ifdef __cpp_concepts
   template <class T, class Deleter, size_t _internal_buffer_size>
-  requires is_source_acceptable<T>
+  requires(is_source_acceptable<T>)
 #elif defined(_MSC_VER)
   template <class T, class Deleter, size_t _internal_buffer_size, class>
 #else
@@ -1565,7 +1568,7 @@ constexpr inline path_view::iterator path_view::end() noexcept
 }
 #ifdef __cpp_concepts
 template <class T, class Deleter, size_t _internal_buffer_size>
-requires path_view::is_source_acceptable<T>
+requires(path_view::is_source_acceptable<T>)
 #elif defined(_MSC_VER)
 template <class T, class Deleter, size_t _internal_buffer_size, class>
 #else
