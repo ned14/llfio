@@ -338,15 +338,15 @@ result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type 
   return newsize;
 }
 
-result<std::vector<std::pair<file_handle::extent_type, file_handle::extent_type>>> file_handle::extents() const noexcept
+result<std::vector<file_handle::extent_pair>> file_handle::extents() const noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   LLFIO_LOG_FUNCTION_CALL(this);
   try
   {
-    static_assert(sizeof(std::pair<file_handle::extent_type, file_handle::extent_type>) == sizeof(FILE_ALLOCATED_RANGE_BUFFER), "FILE_ALLOCATED_RANGE_BUFFER is not equivalent to pair<extent_type, extent_type>!");
-    std::vector<std::pair<file_handle::extent_type, file_handle::extent_type>> ret;
+    static_assert(sizeof(file_handle::extent_pair) == sizeof(FILE_ALLOCATED_RANGE_BUFFER), "FILE_ALLOCATED_RANGE_BUFFER is not equivalent to pair<extent_type, extent_type>!");
+    std::vector<file_handle::extent_pair> ret;
 #ifdef NDEBUG
     ret.resize(64);
 #else

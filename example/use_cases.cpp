@@ -86,7 +86,7 @@ void read_entire_file2()
 
   // Get the valid extents of the file.
   const std::vector<
-    std::pair<llfio::file_handle::extent_type, llfio::file_handle::extent_type>
+    llfio::file_handle::extent_pair
   > valid_extents = fh.extents().value();
 
   // Schedule asynchronous reads for every valid extent
@@ -94,13 +94,13 @@ void read_entire_file2()
   for (size_t n = 0; n < valid_extents.size(); n++)
   {
     // Set up the scatter buffer
-    buffers[n].first.resize(valid_extents[n].second);
+    buffers[n].first.resize(valid_extents[n].length);
     for(;;)
     {
       llfio::async_file_handle::buffer_type scatter_req{ buffers[n].first.data(), buffers[n].first.size() };  // buffer to fill
       auto ret = llfio::async_read( //
         fh,                                           // handle to read from
-        { { scatter_req }, valid_extents[n].first },  // The scatter request buffers + offset
+        { { scatter_req }, valid_extents[n].offset },  // The scatter request buffers + offset
         [](                                                                               // The completion handler
           llfio::async_file_handle *,                                                     // The parent handle
           llfio::async_file_handle::io_result<llfio::async_file_handle::buffers_type> &&  // Result of the i/o

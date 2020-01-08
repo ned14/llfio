@@ -291,13 +291,27 @@ public:
   LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> truncate(extent_type newsize) noexcept;
 
+  //! \brief A pair of valid extents
+  struct extent_pair
+  {
+    extent_type offset{(extent_type) -1};  //!< The offset of where the valid extent begins
+    extent_type length{(extent_type) -1};  //!< The number of valid bytes in the valid extent
+
+    constexpr extent_pair() {}
+    constexpr extent_pair(extent_type _offset, extent_type _length)
+        : offset(_offset)
+        , length(_length)
+    {
+    }
+  };
+
   /*! \brief Returns a list of currently valid extents for this open file. WARNING: racy!
   \return A vector of pairs of extent offset + extent length representing the valid extents
   in this file. Filing systems which do not support extents return a single extent matching
   the length of the file rather than returning an error.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<std::vector<std::pair<extent_type, extent_type>>> extents() const noexcept;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<std::vector<extent_pair>> extents() const noexcept;
 
   /*! \brief Efficiently zero, and possibly deallocate, data on storage.
 
@@ -432,7 +446,7 @@ inline result<file_handle::extent_type> truncate(file_handle &self, file_handle:
 }
 /*! \brief Returns a list of currently valid extents for this open file. WARNING: racy!
  */
-inline result<std::vector<std::pair<file_handle::extent_type, file_handle::extent_type>>> extents(const file_handle &self) noexcept
+inline result<std::vector<file_handle::extent_pair>> extents(const file_handle &self) noexcept
 {
   return self.extents();
 }
