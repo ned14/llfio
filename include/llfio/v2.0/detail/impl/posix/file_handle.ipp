@@ -330,12 +330,12 @@ result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type 
   return newsize;
 }
 
-result<std::vector<std::pair<file_handle::extent_type, file_handle::extent_type>>> file_handle::extents() const noexcept
+result<std::vector<file_handle::extent_pair>> file_handle::extents() const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   try
   {
-    std::vector<std::pair<file_handle::extent_type, file_handle::extent_type>> out;
+    std::vector<file_handle::extent_pair> out;
     out.reserve(64);
     extent_type start = 0, end = 0;
     for(;;)

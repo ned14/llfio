@@ -225,7 +225,7 @@ public:
   }
 
   //! \brief Return a single extent of the maximum extent
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<std::vector<std::pair<extent_type, extent_type>>> extents() const noexcept override { return std::vector<std::pair<extent_type, extent_type>>{{0, _length}}; }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<std::vector<file_handle::extent_pair>> extents() const noexcept override { return std::vector<file_handle::extent_pair>{{0, _length}}; }
 
 
   using file_handle::read;
