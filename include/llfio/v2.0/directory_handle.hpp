@@ -202,14 +202,14 @@ public:
   */
   LLFIO_MAKE_FREE_FUNCTION
   static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<directory_handle> directory(const path_handle &base, path_view_type path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept;
-  /*! Create a directory handle creating a randomly named file on a path.
+  /*! Create a directory handle creating a uniquely named file on a path.
   The file is opened exclusively with `creation::only_if_not_exist` so it
   will never collide with nor overwrite any existing entry.
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<directory_handle> random_directory(const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::temporary, flag flags = flag::none) noexcept
+  static inline result<directory_handle> uniquely_named_directory(const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::temporary, flag flags = flag::none) noexcept
   {
     try
     {
@@ -231,7 +231,7 @@ public:
   /*! Create a directory handle creating the named directory on some path which
   the OS declares to be suitable for temporary files.
   Note also that an empty name is equivalent to calling
-  `random_file(path_discovery::storage_backed_temporary_files_directory())` and the creation
+  `uniquely_named_file(path_discovery::storage_backed_temporary_files_directory())` and the creation
   parameter is ignored.
 
   \errors Any of the values POSIX open() or CreateFile() can return.
@@ -240,7 +240,7 @@ public:
   static inline result<directory_handle> temp_directory(path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::all, flag flags = flag::none) noexcept
   {
     auto &tempdirh = path_discovery::storage_backed_temporary_files_directory();
-    return name.empty() ? random_directory(tempdirh, _mode, _caching, flags) : directory(tempdirh, name, _mode, _creation, _caching, flags);
+    return name.empty() ? uniquely_named_directory(tempdirh, _mode, _caching, flags) : directory(tempdirh, name, _mode, _creation, _caching, flags);
   }
 
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~directory_handle() override
@@ -355,14 +355,14 @@ will never collide with nor overwrite any existing entry.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<directory_handle> random_directory(const path_handle &dirpath, directory_handle::mode _mode = directory_handle::mode::write, directory_handle::caching _caching = directory_handle::caching::temporary, directory_handle::flag flags = directory_handle::flag::none) noexcept
+inline result<directory_handle> uniquely_named_directory(const path_handle &dirpath, directory_handle::mode _mode = directory_handle::mode::write, directory_handle::caching _caching = directory_handle::caching::temporary, directory_handle::flag flags = directory_handle::flag::none) noexcept
 {
-  return directory_handle::random_directory(std::forward<decltype(dirpath)>(dirpath), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
+  return directory_handle::uniquely_named_directory(std::forward<decltype(dirpath)>(dirpath), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }
 /*! Create a directory handle creating the named directory on some path which
 the OS declares to be suitable for temporary files.
 Note also that an empty name is equivalent to calling
-`random_file(path_discovery::storage_backed_temporary_files_directory())` and the creation
+`uniquely_named_file(path_discovery::storage_backed_temporary_files_directory())` and the creation
 parameter is ignored.
 
 \errors Any of the values POSIX open() or CreateFile() can return.

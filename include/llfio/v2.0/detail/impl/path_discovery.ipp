@@ -154,7 +154,7 @@ namespace path_discovery
           ps._all[n].h = std::move(_h).value();
         }
         // Try to create a small file in that directory
-        auto _fh = file_handle::random_file(ps._all[n].h, file_handle::mode::write, file_handle::caching::temporary, file_handle::flag::unlink_on_first_close);
+        auto _fh = file_handle::uniquely_named_file(ps._all[n].h, file_handle::mode::write, file_handle::caching::temporary, file_handle::flag::unlink_on_first_close);
         if(!_fh)
         {
 #if LLFIO_LOGGING_LEVEL >= 3

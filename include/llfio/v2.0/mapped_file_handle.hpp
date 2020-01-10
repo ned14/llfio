@@ -216,7 +216,7 @@ public:
   LLFIO_MAKE_FREE_FUNCTION
   static inline result<mapped_file_handle> mapped_file(const path_handle &base, path_view_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept { return mapped_file(0, base, _path, _mode, _creation, _caching, flags); }
 
-  /*! Create an mapped file handle creating a randomly named file on a path.
+  /*! Create an mapped file handle creating a uniquely named file on a path.
   The file is opened exclusively with `creation::only_if_not_exist` so it
   will never collide with nor overwrite any existing file. Note also
   that caching defaults to temporary which hints to the OS to only
@@ -225,7 +225,7 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<mapped_file_handle> mapped_random_file(size_type reservation, const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::temporary, flag flags = flag::none) noexcept
+  static inline result<mapped_file_handle> mapped_uniquely_named_file(size_type reservation, const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::temporary, flag flags = flag::none) noexcept
   {
     try
     {
@@ -251,7 +251,7 @@ public:
   Note the default flags are to have the newly created file deleted
   on first handle close.
   Note also that an empty name is equivalent to calling
-  `mapped_random_file(path_discovery::storage_backed_temporary_files_directory())` and the creation
+  `mapped_uniquely_named_file(path_discovery::storage_backed_temporary_files_directory())` and the creation
   parameter is ignored.
 
   \note If the temporary file you are creating is not going to have its
@@ -264,7 +264,7 @@ public:
   static inline result<mapped_file_handle> mapped_temp_file(size_type reservation, path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::temporary, flag flags = flag::unlink_on_first_close) noexcept
   {
     auto &tempdirh = path_discovery::storage_backed_temporary_files_directory();
-    return name.empty() ? mapped_random_file(reservation, tempdirh, _mode, _caching, flags) : mapped_file(reservation, tempdirh, name, _mode, _creation, _caching, flags);
+    return name.empty() ? mapped_uniquely_named_file(reservation, tempdirh, _mode, _caching, flags) : mapped_file(reservation, tempdirh, name, _mode, _creation, _caching, flags);
   }
   /*! \em Securely create a mapped file handle creating a temporary anonymous inode in
   the filesystem referred to by \em dirpath. The inode created has
@@ -488,10 +488,10 @@ flush changes to physical storage as lately as possible.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<mapped_file_handle> mapped_random_file(mapped_file_handle::size_type reservation, const path_handle &dirpath, mapped_file_handle::mode _mode = mapped_file_handle::mode::write, mapped_file_handle::caching _caching = mapped_file_handle::caching::temporary,
+inline result<mapped_file_handle> mapped_uniquely_named_file(mapped_file_handle::size_type reservation, const path_handle &dirpath, mapped_file_handle::mode _mode = mapped_file_handle::mode::write, mapped_file_handle::caching _caching = mapped_file_handle::caching::temporary,
                                                      mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
 {
-  return mapped_file_handle::mapped_random_file(std::forward<decltype(reservation)>(reservation), std::forward<decltype(dirpath)>(dirpath), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
+  return mapped_file_handle::mapped_uniquely_named_file(std::forward<decltype(reservation)>(reservation), std::forward<decltype(dirpath)>(dirpath), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }
 /*! Create a mapped file handle creating the named file on some path which
 the OS declares to be suitable for temporary files. Most OSs are
@@ -499,7 +499,7 @@ very lazy about flushing changes made to these temporary files.
 Note the default flags are to have the newly created file deleted
 on first handle close.
 Note also that an empty name is equivalent to calling
-`mapped_random_file(path_discovery::storage_backed_temporary_files_directory())` and the creation
+`mapped_uniquely_named_file(path_discovery::storage_backed_temporary_files_directory())` and the creation
 parameter is ignored.
 
 \note If the temporary file you are creating is not going to have its

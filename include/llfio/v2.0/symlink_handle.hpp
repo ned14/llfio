@@ -404,7 +404,7 @@ public:
   */
   LLFIO_MAKE_FREE_FUNCTION
   static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink(const path_handle &base, path_view_type path, mode _mode = mode::read, creation _creation = creation::open_existing, flag flags = flag::none) noexcept;
-  /*! Create a symlink handle creating a randomly named symlink on a path.
+  /*! Create a symlink handle creating a uniquely named symlink on a path.
   The symlink is opened exclusively with `creation::only_if_not_exist` so it
   will never collide with nor overwrite any existing symlink.
 
@@ -412,7 +412,7 @@ public:
   or failure to allocate memory.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<symlink_handle> random_symlink(const path_handle &dirpath, mode _mode = mode::write, flag flags = flag::none) noexcept
+  static inline result<symlink_handle> uniquely_named_symlink(const path_handle &dirpath, mode _mode = mode::write, flag flags = flag::none) noexcept
   {
     try
     {

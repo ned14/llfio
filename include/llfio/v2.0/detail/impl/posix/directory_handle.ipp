@@ -95,7 +95,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
       dirh = std::move(dh);
     }
     // Create a randomly named directory, and rename it over
-    OUTCOME_TRY(rfh, random_directory(dirh, _mode, _caching, flags));
+    OUTCOME_TRY(rfh, uniquely_named_directory(dirh, _mode, _caching, flags));
     auto r = rfh.relink(dirh, path.filename());
     if(r)
     {

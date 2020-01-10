@@ -134,7 +134,7 @@ public:
   */
   LLFIO_MAKE_FREE_FUNCTION
   static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> file(const path_handle &base, path_view_type path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept;
-  /*! Create a file handle creating a randomly named file on a path.
+  /*! Create a file handle creating a uniquely named file on a path.
   The file is opened exclusively with `creation::only_if_not_exist` so it
   will never collide with nor overwrite any existing file. Note also
   that caching defaults to temporary which hints to the OS to only
@@ -143,7 +143,7 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<file_handle> random_file(const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::temporary, flag flags = flag::none) noexcept
+  static inline result<file_handle> uniquely_named_file(const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::temporary, flag flags = flag::none) noexcept
   {
     try
     {
@@ -169,7 +169,7 @@ public:
   Note the default flags are to have the newly created file deleted
   on first handle close.
   Note also that an empty name is equivalent to calling
-  `random_file(path_discovery::storage_backed_temporary_files_directory())` and the creation
+  `uniquely_named_file(path_discovery::storage_backed_temporary_files_directory())` and the creation
   parameter is ignored.
 
   \note If the temporary file you are creating is not going to have its
@@ -182,7 +182,7 @@ public:
   static inline result<file_handle> temp_file(path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::temporary, flag flags = flag::unlink_on_first_close) noexcept
   {
     auto &tempdirh = path_discovery::storage_backed_temporary_files_directory();
-    return name.empty() ? random_file(tempdirh, _mode, _caching, flags) : file(tempdirh, name, _mode, _creation, _caching, flags);
+    return name.empty() ? uniquely_named_file(tempdirh, _mode, _caching, flags) : file(tempdirh, name, _mode, _creation, _caching, flags);
   }
   /*! \em Securely create a file handle creating a temporary anonymous inode in
   the filesystem referred to by \em dirpath. The inode created has
@@ -378,9 +378,9 @@ flush changes to physical storage as lately as possible.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<file_handle> random_file(const path_handle &dirpath, file_handle::mode _mode = file_handle::mode::write, file_handle::caching _caching = file_handle::caching::temporary, file_handle::flag flags = file_handle::flag::none) noexcept
+inline result<file_handle> uniquely_named_file(const path_handle &dirpath, file_handle::mode _mode = file_handle::mode::write, file_handle::caching _caching = file_handle::caching::temporary, file_handle::flag flags = file_handle::flag::none) noexcept
 {
-  return file_handle::random_file(std::forward<decltype(dirpath)>(dirpath), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
+  return file_handle::uniquely_named_file(std::forward<decltype(dirpath)>(dirpath), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }
 /*! Create a file handle creating the named file on some path which
 the OS declares to be suitable for temporary files. Most OSs are
@@ -388,7 +388,7 @@ very lazy about flushing changes made to these temporary files.
 Note the default flags are to have the newly created file deleted
 on first handle close.
 Note also that an empty name is equivalent to calling
-`random_file(path_discovery::storage_backed_temporary_files_directory())` and the creation
+`uniquely_named_file(path_discovery::storage_backed_temporary_files_directory())` and the creation
 parameter is ignored.
 
 \note If the temporary file you are creating is not going to have its

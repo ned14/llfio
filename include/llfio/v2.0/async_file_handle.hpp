@@ -144,14 +144,14 @@ public:
     return {std::move(ret)};
   }
 
-  /*! Create an async file handle creating a randomly named file on a path.
+  /*! Create an async file handle creating a uniquely named file on a path.
   The file is opened exclusively with `creation::only_if_not_exist` so it
   will never collide with nor overwrite any existing file.
 
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<async_file_handle> async_random_file(io_service &service, const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::only_metadata, flag flags = flag::none) noexcept
+  static inline result<async_file_handle> async_uniquely_named_file(io_service &service, const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::only_metadata, flag flags = flag::none) noexcept
   {
     try
     {
@@ -177,7 +177,7 @@ public:
   Note the default flags are to have the newly created file deleted
   on first handle close.
   Note also that an empty name is equivalent to calling
-  `async_random_file(path_discovery::storage_backed_temporary_files_directory())` and the creation
+  `async_uniquely_named_file(path_discovery::storage_backed_temporary_files_directory())` and the creation
   parameter is ignored.
 
   \note If the temporary file you are creating is not going to have its
@@ -190,7 +190,7 @@ public:
   static inline result<async_file_handle> async_temp_file(io_service &service, path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::only_metadata, flag flags = flag::unlink_on_first_close) noexcept
   {
     auto &tempdirh = path_discovery::storage_backed_temporary_files_directory();
-    return name.empty() ? async_random_file(service, tempdirh, _mode, _caching, flags) : async_file(service, tempdirh, name, _mode, _creation, _caching, flags);
+    return name.empty() ? async_uniquely_named_file(service, tempdirh, _mode, _caching, flags) : async_file(service, tempdirh, name, _mode, _creation, _caching, flags);
   }
   /*! \em Securely create an async file handle creating a temporary anonymous inode in
   the filesystem referred to by \em dirpath. The inode created has
@@ -655,9 +655,9 @@ will never collide with nor overwrite any existing file.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<async_file_handle> async_random_file(io_service &service, const path_handle &dirpath, async_file_handle::mode _mode = async_file_handle::mode::write, async_file_handle::caching _caching = async_file_handle::caching::only_metadata, async_file_handle::flag flags = async_file_handle::flag::none) noexcept
+inline result<async_file_handle> async_uniquely_named_file(io_service &service, const path_handle &dirpath, async_file_handle::mode _mode = async_file_handle::mode::write, async_file_handle::caching _caching = async_file_handle::caching::only_metadata, async_file_handle::flag flags = async_file_handle::flag::none) noexcept
 {
-  return async_file_handle::async_random_file(std::forward<decltype(service)>(service), std::forward<decltype(dirpath)>(dirpath), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
+  return async_file_handle::async_uniquely_named_file(std::forward<decltype(service)>(service), std::forward<decltype(dirpath)>(dirpath), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }
 /*! Create an async file handle creating the named file on some path which
 the OS declares to be suitable for temporary files. Most OSs are
@@ -665,7 +665,7 @@ very lazy about flushing changes made to these temporary files.
 Note the default flags are to have the newly created file deleted
 on first handle close.
 Note also that an empty name is equivalent to calling
-`async_random_file(path_discovery::storage_backed_temporary_files_directory())` and the creation
+`async_uniquely_named_file(path_discovery::storage_backed_temporary_files_directory())` and the creation
 parameter is ignored.
 
 \note If the temporary file you are creating is not going to have its

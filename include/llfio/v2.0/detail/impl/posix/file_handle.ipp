@@ -64,7 +64,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
         dirh = std::move(dh);
       }
       // Create a randomly named file, and rename it over
-      OUTCOME_TRY(rfh, random_file(dirh, _mode, _caching, flags));
+      OUTCOME_TRY(rfh, uniquely_named_file(dirh, _mode, _caching, flags));
       auto r = rfh.relink(dirh, path.filename());
       if(r)
       {

@@ -239,7 +239,7 @@ namespace algorithm
 
           // I am the first person to be using this (stale?) file, so create a new hash index file in /tmp
           auto &tempdirh = path_discovery::memory_backed_temporary_files_directory().is_valid() ? path_discovery::memory_backed_temporary_files_directory() : path_discovery::storage_backed_temporary_files_directory();
-          OUTCOME_TRY(_temph, file_handle::random_file(tempdirh));
+          OUTCOME_TRY(_temph, file_handle::uniquely_named_file(tempdirh));
           temph = std::move(_temph);
           // Truncate it out to the hash index size, and map it into memory for read/write access
           OUTCOME_TRYV(temph.truncate(HashIndexSize));
