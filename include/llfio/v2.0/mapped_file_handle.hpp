@@ -134,7 +134,11 @@ public:
   constexpr mapped_file_handle() {}  // NOLINT
 
   //! Implicit move construction of mapped_file_handle permitted
-  mapped_file_handle(mapped_file_handle &&o) noexcept : file_handle(std::move(o)), _reservation(o._reservation), _sh(std::move(o._sh)), _mh(std::move(o._mh))
+  mapped_file_handle(mapped_file_handle &&o) noexcept
+      : file_handle(std::move(o))
+      , _reservation(o._reservation)
+      , _sh(std::move(o._sh))
+      , _mh(std::move(o._mh))
   {
     _sh.set_backing(this);
     _mh.set_section(&_sh);
@@ -142,9 +146,13 @@ public:
   //! No copy construction (use `clone()`)
   mapped_file_handle(const mapped_file_handle &) = delete;
   //! Explicit conversion from file_handle permitted
-  explicit constexpr mapped_file_handle(file_handle &&o) noexcept : file_handle(std::move(o)) {}
+  explicit constexpr mapped_file_handle(file_handle &&o) noexcept
+      : file_handle(std::move(o))
+  {
+  }
   //! Explicit conversion from file_handle permitted, this overload also attempts to map the file
-  explicit mapped_file_handle(file_handle &&o, size_type reservation) noexcept : file_handle(std::move(o))
+  explicit mapped_file_handle(file_handle &&o, size_type reservation) noexcept
+      : file_handle(std::move(o))
   {
     auto out = reserve(reservation);
     if(!out)
@@ -334,8 +342,17 @@ public:
     OUTCOME_TRY(fh, file_handle::reopen(mode_, caching_, d));
     return mapped_file_handle(std::move(fh), reservation);
   }
-  //! Return the current maximum permitted extent of the file.
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> maximum_extent() const noexcept override { return _mh.length(); }
+  /*! \brief Return the current maximum permitted extent of the file, after updating the map.
+
+  Firstly calls `update_map()` to efficiently update the map to match that of the underlying
+  file, then returns the number of bytes in the map which are valid to access. Because of
+  the call to `update_map()`, this call is not particularly efficient, and you ought to cache
+  its value where possible.
+  */
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> maximum_extent() const noexcept override
+  {
+    return const_cast<mapped_file_handle *>(this)->update_map();
+  }
 
   /*! \brief Resize the current maximum permitted extent of the mapped file to the given extent, avoiding any
   new allocation of physical storage where supported, and mapping or unmapping any new pages
@@ -361,11 +378,13 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> truncate(extent_type newsize) noexcept override;
 
   /*! \brief Efficiently update the mapping to match that of the underlying file,
-  returning the size of the underlying file.
+  returning the new current maximum permitted extent of the file.
 
   This call is often considerably less heavyweight than `truncate(newsize)`, and should be used where possible.
 
   If the internal section and map handle are invalid, they are restored unless the underlying file is zero length.
+
+  If the size of the underlying file has become zero length, the internal section and map handle are closed.
   */
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<extent_type> update_map() noexcept;
 
@@ -436,8 +455,8 @@ namespace in_place_attach_detach
     template <> struct disable_attached_for<LLFIO_V2_NAMESPACE::mapped_file_handle> : public std::true_type
     {
     };
-  }
-}
+  }  // namespace traits
+}  // namespace in_place_attach_detach
 QUICKCPPLIB_NAMESPACE_END
 
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
@@ -445,7 +464,7 @@ LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 //! \brief Declare `mapped_file_handle` as a suitable source for P1631 `attached<T>`.
 template <class T> constexpr inline span<T> in_place_attach(mapped_file_handle &mfh) noexcept
 {
-  return span<T>{reinterpret_cast<T *>(mfh.address()), mfh.map().length()/sizeof(T)};
+  return span<T>{reinterpret_cast<T *>(mfh.address()), mfh.map().length() / sizeof(T)};
 }
 
 // BEGIN make_free_functions.py
@@ -489,7 +508,7 @@ flush changes to physical storage as lately as possible.
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
 inline result<mapped_file_handle> mapped_uniquely_named_file(mapped_file_handle::size_type reservation, const path_handle &dirpath, mapped_file_handle::mode _mode = mapped_file_handle::mode::write, mapped_file_handle::caching _caching = mapped_file_handle::caching::temporary,
-                                                     mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
+                                                             mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
 {
   return mapped_file_handle::mapped_uniquely_named_file(std::forward<decltype(reservation)>(reservation), std::forward<decltype(dirpath)>(dirpath), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }
@@ -523,7 +542,8 @@ is for backing shared memory maps).
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<mapped_file_handle> mapped_temp_inode(mapped_file_handle::size_type reservation = 0, const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mapped_file_handle::mode _mode = mapped_file_handle::mode::write, mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
+inline result<mapped_file_handle> mapped_temp_inode(mapped_file_handle::size_type reservation = 0, const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mapped_file_handle::mode _mode = mapped_file_handle::mode::write,
+                                                    mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
 {
   return mapped_file_handle::mapped_temp_inode(std::forward<decltype(reservation)>(reservation), std::forward<decltype(dir)>(dir), std::forward<decltype(_mode)>(_mode), std::forward<decltype(flags)>(flags));
 }
