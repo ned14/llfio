@@ -80,19 +80,17 @@ file into the beginning of the reservation. The remainder of the pages may be in
 and may generate a segfault, or they may automatically reflect any growth in the underlying
 file. This is why `read()` and `write()` only know about the reservation size, and will read
 and write memory up to that reservation size, without checking if the memory involved exists
-or not yet. You are guaranteed that `address()` will not return a new
+or not yet. You are guaranteed on POSIX only that `address()` will not return a new
 value unless you truncate from a bigger length to a smaller length, or you call `reserve()`
 with a new reservation or `truncate()` with a value bigger than the reservation.
 
-`maximum_extent()` reports the last truncated length of the mapped file (possibly by any process in
-the system) up to the reservation limit, NOT the maximum extent of the underlying file.
-When you know that another process has extended the file and you wish to map the newly appended
-data, you can call `update_map()` which guarantees that the mapping your
-process sees is up to date, rather than relying on any kernel-specific automatic mapping.
-Whether automatic or enforced by `update_map()`, the reservation limit will not be exceeded
-nor will `address()` suddenly return something different.
+`maximum_extent()` in mapped file handle is an alias for `update_map()`. `update_map()`
+fetches the maximum extent of the underlying file, and if it has changed from the map's
+length, the map is updated to match the underlying file, up to the reservation limit.
+You can of course explicitly call `update_map()` whenever you need the map to reflect
+changes to the maximum extent of the underlying file.
 
-It is thus up to you to detect that the reservation has been exhausted, and to
+It is up to you to detect that the reservation has been exhausted, and to
 reserve a new reservation which will change the value returned by `address()`. This
 entirely manual system is a bit tedious and cumbersome to use, but as mapping files
 is an expensive operation given TLB shootdown, we leave it up to the end user to decide
@@ -103,6 +101,34 @@ not using this `mapped_file_handle` to write the new data. With unified page cac
 mixing mapped and normal i/o is generally safe except at the end of a file where race
 conditions and outright kernel bugs tend to abound. To avoid these, solely and exclusively
 use a dedicated handle configured to atomic append only to do the appends.
+
+## Microsoft Windows only
+
+Microsoft Windows can have quite different semantics to POSIX, which are important to be
+aware of.
+
+On Windows, the length of any section object for a file can never exceed the maximum
+extent of the file. Open section objects therefore clamp the valid maximum extent of
+a file to no lower than the largest of the section objects open upon the file. This
+is enforced by Windows, which will return an error if you try to truncate a file to
+smaller than any of its section objects on the system.
+
+Windows only implements address space reservation for sections opened with write
+permissions. LLFIO names the section object backing every mapped file uniquely to
+the file's inode, and all those section objects are shared between all LLFIO processes
+for the current Windows session. This means that if any one process updates a section
+object's length, the section's length gets updated for all processes, and all maps
+of that section in all processes get automatically updated.
+
+This works great if, and only if, the very first mapping of any file is with a writable
+file handle, as that permits the global section object to be writable, and all other
+LLFIO processes then discover that writable global section object. If however the
+very first mapping of any file is with a read-only file handle, that creates a
+read-only section object, and that in turn **disables all address space reservation
+permanently for all processes** using that file.
+
+So long as you ensure that any shared mapped file is always opened first with writable
+privileges, which is usually the case, all works like POSIX on Microsoft Windows.
 */
 class LLFIO_DECL mapped_file_handle : public file_handle
 {
