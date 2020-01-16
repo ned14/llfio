@@ -337,6 +337,8 @@ namespace windows_nt_kernel
 
   using NtCreateSection_t = NTSTATUS(NTAPI *)(_Out_ PHANDLE SectionHandle, _In_ ACCESS_MASK DesiredAccess, _In_opt_ POBJECT_ATTRIBUTES ObjectAttributes, _In_opt_ PLARGE_INTEGER MaximumSize, _In_ ULONG SectionPageProtection, _In_ ULONG AllocationAttributes, _In_opt_ HANDLE FileHandle);
 
+  using NtOpenSection_t = NTSTATUS(NTAPI *)(_Out_ PHANDLE SectionHandle, _In_ ACCESS_MASK DesiredAccess, _In_opt_ POBJECT_ATTRIBUTES ObjectAttributes);
+
   using NtQuerySection_t = NTSTATUS(NTAPI *)(_In_ HANDLE SectionHandle, _In_ SECTION_INFORMATION_CLASS InformationClass, _Out_ PVOID InformationBuffer, _In_ ULONG InformationBufferSize, _Out_opt_ PULONG ResultLength);
 
   using NtExtendSection_t = NTSTATUS(NTAPI *)(_In_ HANDLE SectionHandle, _In_opt_ PLARGE_INTEGER MaximumSize);
@@ -602,6 +604,7 @@ namespace windows_nt_kernel
   static NtLockFile_t NtLockFile;
   static NtUnlockFile_t NtUnlockFile;
   static NtCreateSection_t NtCreateSection;
+  static NtOpenSection_t NtOpenSection;
   static NtQuerySection_t NtQuerySection;
   static NtExtendSection_t NtExtendSection;
   static NtMapViewOfSection_t NtMapViewOfSection;
@@ -760,6 +763,13 @@ namespace windows_nt_kernel
     if(NtCreateSection == nullptr)
     {
       if((NtCreateSection = reinterpret_cast<NtCreateSection_t>(GetProcAddress(ntdllh, "NtCreateSection"))) == nullptr)
+      {
+        abort();
+      }
+    }
+    if(NtOpenSection == nullptr)
+    {
+      if((NtOpenSection = reinterpret_cast<NtOpenSection_t>(GetProcAddress(ntdllh, "NtOpenSection"))) == nullptr)
       {
         abort();
       }

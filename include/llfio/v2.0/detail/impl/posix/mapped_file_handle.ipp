@@ -33,8 +33,9 @@ result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type rese
   OUTCOME_TRY(length, underlying_file_maximum_extent());
   if(length == 0)
   {
-    // Not portable to map an empty file, so fail
-    return errc::invalid_seek;
+    // Not portable to map an empty file, so do nothing
+    _reservation = reservation;
+    return success();
   }
   if(reservation == 0)
   {
@@ -48,7 +49,8 @@ result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type rese
   }
   if(_mh.is_valid() && reservation == _mh.length())
   {
-    return reservation;
+    _reservation = reservation;
+    return _reservation;
   }
   // Reserve the full reservation in address space
   section_handle::flag mapflags = section_handle::flag::nocommit | section_handle::flag::read;
@@ -59,7 +61,7 @@ result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type rese
   OUTCOME_TRYV(_mh.close());
   OUTCOME_TRY(mh, map_handle::map(_sh, reservation, 0, mapflags));
   _mh = std::move(mh);
-  _reservation = utils::round_up_to_page_size(reservation, page_size());
+  _reservation = reservation;
   return _reservation;
 }
 
@@ -103,6 +105,10 @@ result<mapped_file_handle::extent_type> mapped_file_handle::truncate(extent_type
   if(!_sh.is_valid())
   {
     OUTCOME_TRY(ret, file_handle::truncate(newsize));
+    if(newsize > _reservation)
+    {
+      _reservation = newsize;
+    }
     // Reserve now we have resized, it'll create a new section for the new size
     OUTCOME_TRYV(reserve(_reservation));
     return ret;

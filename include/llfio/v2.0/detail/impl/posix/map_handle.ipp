@@ -359,7 +359,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, 0, &section, pagesize, bytes, offset, ret.value()._flag));
   ret.value()._addr = static_cast<byte *>(addr);
   ret.value()._offset = offset;
-  ret.value()._reservation = bytes;
+  ret.value()._reservation = utils::round_up_to_page_size(bytes, pagesize);
   ret.value()._length = (length - offset < bytes) ? (length - offset) : bytes;  // length of backing, not reservation
   ret.value()._pagesize = pagesize;
   // Make my handle borrow the native handle of my backing storage
@@ -378,8 +378,8 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
     OUTCOME_TRY(length_, _section->length());  // length of the backing file
     length = length_;
   }
-  newsize = utils::round_up_to_page_size(newsize, _pagesize);
-  if(newsize == _reservation)
+  auto _newsize = utils::round_up_to_page_size(newsize, _pagesize);
+  if(_newsize == _reservation)
   {
     return success();
   }
@@ -400,7 +400,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
   {
     OUTCOME_TRY(addr, do_mmap(_v, nullptr, 0, _section, _pagesize, newsize, _offset, _flag));
     _addr = static_cast<byte *>(addr);
-    _reservation = newsize;
+    _reservation = _newsize;
     _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
     return newsize;
   }
@@ -412,7 +412,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
     return posix_error();
   }
   _addr = static_cast<byte *>(newaddr);
-  _reservation = newsize;
+  _reservation = _newsize;
   _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
   return newsize;
 #else
@@ -424,7 +424,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
     size_type bytes = newsize - _reservation;
     extent_type offset = _offset + _reservation;
     OUTCOME_TRY(addr, do_mmap(_v, addrafter, MAP_FIXED | MAP_EXCL, _section, _pagesize, bytes, offset, _flag));
-    _reservation = newsize;
+    _reservation = _newsize;
     _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
     return newsize;
 #else                  // generic POSIX, inefficient
@@ -437,7 +437,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
       ::munmap(addr, bytes);
       return errc::not_enough_memory;
     }
-    _reservation = newsize;
+    _reservation = _newsize;
     _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
     return newsize;
 #endif

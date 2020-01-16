@@ -164,10 +164,15 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   }
   LLFIO_LOG_FUNCTION_CALL(&ret);
   HANDLE h;
-  NTSTATUS ntstat = NtCreateSection(&h, SECTION_ALL_ACCESS, poa, pmaximum_size, prot, attribs, backing.native_handle().h);
+  // Try to open any existing object first. With luck, it'll have write privs allowing address space reservation.
+  NTSTATUS ntstat = NtOpenSection(&h, SECTION_ALL_ACCESS, poa);
   if(ntstat < 0)
   {
-    return ntkernel_error(ntstat);
+    ntstat = NtCreateSection(&h, SECTION_ALL_ACCESS, poa, pmaximum_size, prot, attribs, backing.native_handle().h);
+    if(ntstat < 0)
+    {
+      return ntkernel_error(ntstat);
+    }
   }
   nativeh.h = h;
   return ret;
@@ -598,7 +603,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   LARGE_INTEGER _offset{};
   _offset.QuadPart = offset;
   OUTCOME_TRY(pagesize, detail::pagesize_from_flags(ret.value()._flag));
-  SIZE_T _bytes = utils::round_up_to_page_size(bytes, pagesize);
+  SIZE_T _bytes = bytes;
   OUTCOME_TRY(win32_map_flags(nativeh, allocation, prot, commitsize, section.backing() != nullptr, ret.value()._flag));
   LLFIO_LOG_FUNCTION_CALL(&ret);
   NTSTATUS ntstat = NtMapViewOfSection(section.native_handle().h, GetCurrentProcess(), &addr, 0, commitsize, &_offset, &_bytes, ViewUnmap, allocation, prot);
@@ -912,37 +917,38 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
   LLFIO_LOG_FUNCTION_CALL(this);
   byte *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
-  if(QUICKCPPLIB_NAMESPACE::signal_guard::signal_guard(QUICKCPPLIB_NAMESPACE::signal_guard::signalc_set::undefined_memory_access,
-                                                       [&] {
-                                                         for(size_t i = 0; i < reqs.buffers.size(); i++)
-                                                         {
-                                                           const_buffer_type &req = reqs.buffers[i];
-                                                           if(req.size() > togo)
-                                                           {
-                                                             memcpy(addr, req.data(), togo);
-                                                             req = {addr, togo};
-                                                             reqs.buffers = {reqs.buffers.data(), i + 1};
-                                                             return false;
-                                                           }
-                                                           else
-                                                           {
-                                                             memcpy(addr, req.data(), req.size());
-                                                             req = {addr, req.size()};
-                                                             addr += req.size();
-                                                             togo -= req.size();
-                                                           }
-                                                         }
-                                                         return false;
-                                                       },
-                                                       [&](const QUICKCPPLIB_NAMESPACE::signal_guard::raised_signal_info *info) {
-                                                         auto *causingaddr = (byte *) info->addr;
-                                                         if(causingaddr < _addr || causingaddr >= (_addr + _length))
-                                                         {
-                                                           // Not caused by this map
-                                                           thrd_raise_signal(info->signo, info->raw_info, info->raw_context);
-                                                         }
-                                                         return true;
-                                                       }))
+  if(QUICKCPPLIB_NAMESPACE::signal_guard::signal_guard(
+     QUICKCPPLIB_NAMESPACE::signal_guard::signalc_set::undefined_memory_access,
+     [&] {
+       for(size_t i = 0; i < reqs.buffers.size(); i++)
+       {
+         const_buffer_type &req = reqs.buffers[i];
+         if(req.size() > togo)
+         {
+           memcpy(addr, req.data(), togo);
+           req = {addr, togo};
+           reqs.buffers = {reqs.buffers.data(), i + 1};
+           return false;
+         }
+         else
+         {
+           memcpy(addr, req.data(), req.size());
+           req = {addr, req.size()};
+           addr += req.size();
+           togo -= req.size();
+         }
+       }
+       return false;
+     },
+     [&](const QUICKCPPLIB_NAMESPACE::signal_guard::raised_signal_info *info) {
+       auto *causingaddr = (byte *) info->addr;
+       if(causingaddr < _addr || causingaddr >= (_addr + _length))
+       {
+         // Not caused by this map
+         thrd_raise_signal(info->signo, info->raw_info, info->raw_context);
+       }
+       return true;
+     }))
   {
     return errc::no_space_on_device;
   }

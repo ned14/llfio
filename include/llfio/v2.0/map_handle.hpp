@@ -303,6 +303,9 @@ does not close that of the backing storage, nor does releasing this handle relea
 Locking byte ranges of this handle is therefore equal to locking byte ranges in the original backing storage,
 which can be very useful.
 
+On Microsoft Windows, when mapping file content, you should try to always create the first map of that
+file using a writable handle. See `mapped_file_handle` for more detail on this.
+
 ## Barriers:
 
 `map_handle`, because it implements `io_handle`, implements `barrier()` in a very conservative way
