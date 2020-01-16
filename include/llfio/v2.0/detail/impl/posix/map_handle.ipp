@@ -129,7 +129,7 @@ result<section_handle::extent_type> section_handle::truncate(extent_type newsize
 
 map_handle::~map_handle()
 {
-  if(_v)
+  if(_addr != nullptr)
   {
     // Unmap the view
     auto ret = map_handle::close();

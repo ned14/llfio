@@ -447,7 +447,7 @@ static inline result<void> win32_release_allocations(byte *addr, size_t bytes, U
 
 map_handle::~map_handle()
 {
-  if(_v)
+  if(_addr != nullptr)
   {
     // Unmap the view
     auto ret = map_handle::close();
@@ -575,17 +575,13 @@ result<map_handle> map_handle::map(size_type bytes, bool /*unused*/, section_han
   if(_flag & section_handle::flag::prefault)
   {
     using namespace windows_nt_kernel;
-    // Start an asynchronous prefetch
+    // Start an asynchronous prefetch, so it might fault the whole lot in at once
     buffer_type b{static_cast<byte *>(addr), bytes};
     (void) prefetch(span<buffer_type>(&b, 1));
-    // If this kernel doesn't support that API, manually poke every page in the new map
-    if(PrefetchVirtualMemory_ == nullptr)
+    volatile auto *a = static_cast<volatile char *>(addr);
+    for(size_t n = 0; n < bytes; n += pagesize)
     {
-      volatile auto *a = static_cast<volatile char *>(addr);
-      for(size_t n = 0; n < bytes; n += pagesize)
-      {
-        a[n];
-      }
+      a[n];
     }
   }
   return ret;
@@ -622,17 +618,13 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   // Windows has no way of getting the kernel to prefault maps on creation, so ...
   if(ret.value()._flag & section_handle::flag::prefault)
   {
-    // Start an asynchronous prefetch
+    // Start an asynchronous prefetch, so it might fault the whole lot in at once
     buffer_type b{static_cast<byte *>(addr), _bytes};
     (void) prefetch(span<buffer_type>(&b, 1));
-    // If this kernel doesn't support that API, manually poke every page in the new map
-    if(PrefetchVirtualMemory_ == nullptr)
+    volatile auto *a = static_cast<volatile char *>(addr);
+    for(size_t n = 0; n < _bytes; n += pagesize)
     {
-      volatile auto *a = static_cast<volatile char *>(addr);
-      for(size_t n = 0; n < _bytes; n += pagesize)
-      {
-        a[n];
-      }
+      a[n];
     }
   }
   return ret;
