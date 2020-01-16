@@ -6,6 +6,8 @@ var searchData=
   ['temporary',['temporary',['../classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852ad5197d93c063a2b1e22d1630a39b7aef',1,'llfio_v2_xxx::handle']]],
   ['temporary_5fnamed_5fpipes_5fdirectory',['temporary_named_pipes_directory',['../namespacellfio__v2__xxx_1_1path__discovery.html#a2d3e2ea602c3195433c7898c41744188',1,'llfio_v2_xxx::path_discovery']]],
   ['todo_20list',['Todo List',['../todo.html',1,'']]],
+  ['total_5faddress_5fspace_5fin_5fuse',['total_address_space_in_use',['../structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html#adf45c0d5909d6067817a07dc1a11676b',1,'llfio_v2_xxx::utils::process_memory_usage']]],
+  ['total_5faddress_5fspace_5fpaged_5fin',['total_address_space_paged_in',['../structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html#ad5b2ceeb0974a4a3115bdc74fc9d5b8f',1,'llfio_v2_xxx::utils::process_memory_usage']]],
   ['transaction',['transaction',['../classkvstore__v1__xxx_1_1basic__key__value__store_1_1transaction.html',1,'kvstore_v1_xxx::basic_key_value_store']]],
   ['transaction_5faborted_5fcollision',['transaction_aborted_collision',['../namespacekvstore__v1__xxx.html#a7bc2f2673bddc429b098b16e413deb5fa203fd50f72dbec98aa499192e1844fc8',1,'kvstore_v1_xxx']]],
   ['trivial_5fvector',['trivial_vector',['../classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html',1,'llfio_v2_xxx::algorithm']]],

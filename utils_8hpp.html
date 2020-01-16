@@ -96,6 +96,9 @@ $(document).ready(function(){initNavTree('utils_8hpp.html','');});
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html">llfio_v2_xxx::utils::process_memory_usage</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Memory usage statistics for a process.  <a href="structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1utils_1_1page__allocator.html">llfio_v2_xxx::utils::page_allocator&lt; T &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An STL allocator which allocates large TLB page memory.If the operating system is configured to allow it, this type of memory is particularly efficient for doing large scale file i/o. This is because the kernel must normally convert the scatter gather buffers you pass into extended scatter gather buffers as the memory you see as contiguous may not, and probably isn't, actually be contiguous in physical memory. Regions returned by this allocator <em>may</em> be allocated contiguously in physical memory and therefore the kernel can pass through your scatter gather buffers unmodified.  <a href="classllfio__v2__xxx_1_1utils_1_1page__allocator.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -158,6 +161,10 @@ result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1utils.html#a7aae80908cc5521ef67234152c5c5044">llfio_v2_xxx::utils::running_under_wsl</a> () noexcept</td></tr>
 <tr class="memdesc:a7aae80908cc5521ef67234152c5c5044"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if this POSIX is running under Microsoft's Subsystem for Linux. <br /></td></tr>
 <tr class="separator:a7aae80908cc5521ef67234152c5c5044"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a2d8f932686b4c35a67a6aa972b4e92"><td class="memItemLeft" align="right" valign="top"><a id="a5a2d8f932686b4c35a67a6aa972b4e92"></a>
+result&lt; process_memory_usage &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1utils.html#a5a2d8f932686b4c35a67a6aa972b4e92">llfio_v2_xxx::utils::current_process_memory_usage</a> () noexcept</td></tr>
+<tr class="memdesc:a5a2d8f932686b4c35a67a6aa972b4e92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the current memory usage statistics for this process. <br /></td></tr>
+<tr class="separator:a5a2d8f932686b4c35a67a6aa972b4e92"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acf1b1646f257d85f7f2655df1042483f"><td class="memItemLeft" align="right" valign="top"><a id="acf1b1646f257d85f7f2655df1042483f"></a>
 large_page_allocation&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::utils::detail::calculate_large_page_allocation</b> (size_t bytes)</td></tr>
 <tr class="separator:acf1b1646f257d85f7f2655df1042483f"><td class="memSeparator" colspan="2">&#160;</td></tr>

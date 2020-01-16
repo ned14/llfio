@@ -17,5 +17,6 @@ var searchData=
   ['crbegin',['crbegin',['../structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a3feb4c15c7805fd403138d677953b285',1,'llfio_v2_xxx::algorithm::impl::trivial_vector_impl']]],
   ['create_5fkvstore',['create_kvstore',['../namespacekvstore__v1__xxx.html#a6e486d7b17da9677f0218b106b1f3817',1,'kvstore_v1_xxx']]],
   ['crend',['crend',['../structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#aa98cbde51743fcb7d700a29cae27587b',1,'llfio_v2_xxx::algorithm::impl::trivial_vector_impl']]],
-  ['current_5fpath',['current_path',['../classllfio__v2__xxx_1_1handle.html#a00a85eec5a41f7edb2c574d40cf04535',1,'llfio_v2_xxx::handle::current_path()'],['../classllfio__v2__xxx_1_1symlink__handle.html#aea44ed050acfd8e4f9dec59ff194c746',1,'llfio_v2_xxx::symlink_handle::current_path()']]]
+  ['current_5fpath',['current_path',['../classllfio__v2__xxx_1_1handle.html#a00a85eec5a41f7edb2c574d40cf04535',1,'llfio_v2_xxx::handle::current_path()'],['../classllfio__v2__xxx_1_1symlink__handle.html#aea44ed050acfd8e4f9dec59ff194c746',1,'llfio_v2_xxx::symlink_handle::current_path()']]],
+  ['current_5fprocess_5fmemory_5fusage',['current_process_memory_usage',['../namespacellfio__v2__xxx_1_1utils.html#a5a2d8f932686b4c35a67a6aa972b4e92',1,'llfio_v2_xxx::utils']]]
 ];

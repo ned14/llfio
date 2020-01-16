@@ -1,11 +1,13 @@
 var utils_8hpp =
 [
+    [ "process_memory_usage", "structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html", "structllfio__v2__xxx_1_1utils_1_1process__memory__usage" ],
     [ "page_allocator", "classllfio__v2__xxx_1_1utils_1_1page__allocator.html", "classllfio__v2__xxx_1_1utils_1_1page__allocator" ],
     [ "rebind", "structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", "structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind" ],
     [ "page_allocator< void >", "classllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4.html", "classllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4" ],
     [ "rebind", "structllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", "structllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind" ],
     [ "allocate_large_pages", "utils_8hpp.html#a85afc40cff0ecfd3a13520ea7e5176a1", null ],
     [ "calculate_large_page_allocation", "utils_8hpp.html#acf1b1646f257d85f7f2655df1042483f", null ],
+    [ "current_process_memory_usage", "utils_8hpp.html#a5a2d8f932686b4c35a67a6aa972b4e92", null ],
     [ "deallocate_large_pages", "utils_8hpp.html#a2305cf865b7952f58aba997c4ac95efb", null ],
     [ "drop_filesystem_cache", "utils_8hpp.html#abacefaf60ae391226c4775cf8a61276a", null ],
     [ "file_buffer_default_size", "utils_8hpp.html#a90d8f94ddb6e026f931e86d0dc904778", null ],
