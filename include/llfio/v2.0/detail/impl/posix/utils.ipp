@@ -30,6 +30,10 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <sys/mman.h>
 
+#ifdef __linux__
+#include <unistd.h>  // for preadv
+#endif
+
 LLFIO_V2_NAMESPACE_BEGIN
 
 namespace utils
@@ -79,7 +83,7 @@ namespace utils
       if(-1 != ih)
       {
         char buffer[4096], *hugepagesize, *hugepages;
-        buffer[ ::read(ih, buffer, sizeof(buffer) - 1)] = 0;
+        buffer[::read(ih, buffer, sizeof(buffer) - 1)] = 0;
         ::close(ih);
         hugepagesize = strstr(buffer, "Hugepagesize:");
         hugepages = strstr(buffer, "HugePages_Total:");
@@ -200,6 +204,206 @@ namespace utils
     cached = 1;
 #endif
     return false;
+  }
+
+  result<process_memory_usage> current_process_memory_usage() noexcept
+  {
+#ifdef __linux__
+    try
+    {
+      /* /proc/[pid]/status:
+
+      total_address_space_in_use = VmSize
+      total_address_space_paged_in = VmRSS
+      private_committed = ???  MISSING
+      private_paged_in = RssAnon
+
+      /proc/[pid]/smaps:
+
+      total_address_space_in_use = Sum of Size
+      total_address_space_paged_in = Sum of Rss
+      private_committed = Sum of Size for all entries with VmFlags containing ac, and inode = 0?
+      private_paged_in = (Sum of Anonymous - Sum of LazyFree) for all entries with VmFlags containing ac, and inode = 0?
+      */
+      std::vector<char> buffer(65536);
+      for(;;)
+      {
+        int ih = ::open("/proc/self/smaps", O_RDONLY);
+        if(ih == -1)
+        {
+          return posix_error();
+        }
+        size_t totalbytesread = 0;
+        for(;;)
+        {
+          auto bytesread = ::read(ih, buffer.data() + totalbytesread, buffer.size() - totalbytesread);
+          if(bytesread < 0)
+          {
+            ::close(ih);
+            return posix_error();
+          }
+          if(bytesread == 0)
+          {
+            break;
+          }
+          totalbytesread += bytesread;
+        }
+        ::close(ih);
+        if(totalbytesread < buffer.size())
+        {
+          buffer.resize(totalbytesread);
+          break;
+        }
+        buffer.resize(buffer.size() * 2);
+      }
+      const string_view totalview(buffer.data(), buffer.size());
+      //std::cerr << totalview << std::endl;
+      std::vector<string_view> anon_entries, non_anon_entries;
+      anon_entries.reserve(32);
+      non_anon_entries.reserve(32);
+      auto sizeidx = totalview.find("\nSize:");
+      while(sizeidx < totalview.size())
+      {
+        auto itemtopidx = totalview.rfind("\n", sizeidx - 1);
+        if(string_view::npos == itemtopidx)
+        {
+          itemtopidx = 0;
+        }
+        // hexaddr-hexaddr flags offset dev:id inode [path]
+        size_t begin, end, offset, inode = 1;
+        char f1, f2, f3, f4, f5, f6, f7, f8;
+        sscanf(totalview.data() + itemtopidx, "%zx-%zx %c%c%c%c %zx %c%c:%c%c %zu", &begin, &end, &f1, &f2, &f3, &f4, &offset, &f5, &f6, &f7, &f8, &inode);
+        sizeidx = totalview.find("\nSize:", sizeidx + 1);
+        if(string_view::npos == sizeidx)
+        {
+          sizeidx = totalview.size();
+        }
+        auto itemendidx = totalview.rfind("\n", sizeidx - 1);
+        if(string_view::npos == itemendidx)
+        {
+          abort();
+        }
+        const string_view item(totalview.substr(itemtopidx + 1, itemendidx - itemtopidx - 1));
+        auto vmflagsidx = item.rfind("\n");
+        if(string_view::npos == itemendidx)
+        {
+          abort();
+        }
+        if(0 != memcmp(item.data() + vmflagsidx, "\nVmFlags:", 9))
+        {
+          return errc::illegal_byte_sequence;
+        }
+        // Is there " ac" after vmflagsidx?
+        if(string_view::npos != item.find(" ac", vmflagsidx) && inode == 0)
+        {
+          //std::cerr << "Adding anon entry at offset " << itemtopidx << std::endl;
+          anon_entries.push_back(item);
+        }
+        else
+        {
+          //std::cerr << "Adding non-anon entry at offset " << itemtopidx << std::endl;
+          non_anon_entries.push_back(item);
+        }
+      }
+      auto parse = [](string_view item, string_view what) ->result<uint64_t> { auto idx = item.find(what);
+        if(string_view::npos == idx)
+        {
+          return (uint64_t) -1;
+        }
+        idx += what.size();
+        for(; item[idx] == ' '; idx++)
+          ;
+        auto eidx = idx;
+        for(; item[eidx] != '\n'; eidx++)
+          ;
+        string_view unit(item.substr(eidx - 2, 2));
+        uint64_t value = atoll(item.data() + idx);
+        if(unit == "kB")
+        {
+          value *= 1024ULL;
+        }
+        else if(unit == "mB")
+        {
+          value *= 1024ULL * 1024;
+        }
+        else if(unit == "gB")
+        {
+          value *= 1024ULL * 1024 * 1024;
+        }
+        else if(unit == "tB")
+        {
+          value *= 1024ULL * 1024 * 1024 * 1024;
+        }
+        else if(unit == "pB")
+        {
+          value *= 1024ULL * 1024 * 1024 * 1024 * 1024;
+        }
+        else if(unit == "eB")
+        {
+          value *= 1024ULL * 1024 * 1024 * 1024 * 1024 * 1024;
+        }
+        else if(unit == "zB")
+        {
+          value *= 1024ULL * 1024 * 1024 * 1024 * 1024 * 1024 * 1024;
+        }
+        else if(unit == "yB")
+        {
+          value *= 1024ULL * 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024;
+        }
+        else
+        {
+          return errc::illegal_byte_sequence;
+        }
+        return value;
+      };
+      process_memory_usage ret;
+      //std::cerr << "Anon entries:";
+      for(auto &i : anon_entries)
+      {
+        OUTCOME_TRY(size, parse(i, "\nSize:"));
+        OUTCOME_TRY(rss, parse(i, "\nRss:"));
+        OUTCOME_TRY(anonymous, parse(i, "\nAnonymous:"));
+        OUTCOME_TRY(lazyfree, parse(i, "\nLazyFree:"));
+        if(size != (uint64_t) -1 && rss != (uint64_t) -1 && anonymous != (uint64_t) -1)
+        {
+          ret.total_address_space_in_use += size;
+          ret.total_address_space_paged_in += rss;
+          ret.private_committed += size;
+          ret.private_paged_in += anonymous;
+          if(lazyfree != (uint64_t) -1)
+          {
+            ret.total_address_space_paged_in -= lazyfree;
+            ret.private_paged_in -= lazyfree;
+          }
+        }
+        //std::cerr << i << "\nSize = " << size << " Rss = " << rss << std::endl;
+      }
+      //std::cerr << "\n\nNon-anon entries:";
+      for(auto &i : non_anon_entries)
+      {
+        OUTCOME_TRY(size, parse(i, "\nSize:"));
+        OUTCOME_TRY(rss, parse(i, "\nRss:"));
+        OUTCOME_TRY(lazyfree, parse(i, "\nLazyFree:"));
+        if(size != (uint64_t) -1 && rss != (uint64_t) -1)
+        {
+          ret.total_address_space_in_use += size;
+          ret.total_address_space_paged_in += rss;
+          if(lazyfree != (uint64_t) -1)
+          {
+            ret.total_address_space_paged_in -= lazyfree;
+          }
+        }
+        //std::cerr << i << "\nSize = " << size << " Rss = " << rss << std::endl;
+      }
+      return ret;
+    }
+    catch(...)
+    {
+      return error_from_exception();
+    }
+#else
+#error Unknown platform
+#endif
   }
 
   namespace detail

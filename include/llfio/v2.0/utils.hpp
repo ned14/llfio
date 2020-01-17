@@ -1,5 +1,5 @@
 /* Misc utilities
-(C) 2015-2017 Niall Douglas <http://www.nedproductions.biz/> (8 commits)
+(C) 2015-2020 Niall Douglas <http://www.nedproductions.biz/> (8 commits)
 File Created: Dec 2015
 
 
@@ -47,7 +47,7 @@ namespace utils
   LLFIO_HEADERS_ONLY_FUNC_SPEC size_t page_size() noexcept;
 
   /*! \brief Round a value to its next lowest page size multiple
-  */
+   */
   template <class T> inline T round_down_to_page_size(T i, size_t pagesize) noexcept
   {
     assert(pagesize > 0);
@@ -55,7 +55,7 @@ namespace utils
     return i;
   }
   /*! \brief Round a value to its next highest page size multiple
-  */
+   */
   template <class T> inline T round_up_to_page_size(T i, size_t pagesize) noexcept
   {
     assert(pagesize > 0);
@@ -141,7 +141,7 @@ namespace utils
   }
 
   /*! \brief Tries to flush all modified data to the physical device.
-  */
+   */
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<void> flush_modified_data() noexcept;
 
   /*! \brief Tries to flush all modified data to the physical device, and then drop the OS filesystem cache,
@@ -155,9 +155,27 @@ namespace utils
 
 #ifndef _WIN32
   /*! \brief Returns true if this POSIX is running under Microsoft's Subsystem for Linux.
-  */
+   */
   LLFIO_HEADERS_ONLY_FUNC_SPEC bool running_under_wsl() noexcept;
 #endif
+
+  /*! \brief Memory usage statistics for a process.
+  */
+  struct process_memory_usage
+  {
+    //! The total virtual address space in use.
+    size_t total_address_space_in_use{0};
+    //! The total memory currently paged into the process. Always `<= total_address_space_in_use`. Also known as "working set", or "resident set size including shared".
+    size_t total_address_space_paged_in{0};
+
+    //! The total anonymous memory committed. Also known as "commit charge".
+    size_t private_committed{0};
+    //! The total anonymous memory currently paged into the process. Always `<= private_committed`. Also known as "active anonymous pages".
+    size_t private_paged_in{0};
+  };
+  /*! \brief Retrieve the current memory usage statistics for this process.
+  */
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<process_memory_usage> current_process_memory_usage() noexcept;
 
   namespace detail
   {
@@ -189,6 +207,7 @@ namespace utils
     LLFIO_HEADERS_ONLY_FUNC_SPEC large_page_allocation allocate_large_pages(size_t bytes);
     LLFIO_HEADERS_ONLY_FUNC_SPEC void deallocate_large_pages(void *p, size_t bytes);
   }  // namespace detail
+
   /*! \class page_allocator
   \brief An STL allocator which allocates large TLB page memory.
   \ingroup utils

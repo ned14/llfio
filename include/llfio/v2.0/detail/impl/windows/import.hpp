@@ -356,6 +356,103 @@ namespace windows_nt_kernel
 
   using NtFreeVirtualMemory_t = NTSTATUS(NTAPI *)(_In_ HANDLE ProcessHandle, _Inout_ PVOID *BaseAddress, _Inout_ PSIZE_T RegionSize, _In_ ULONG FreeType);
 
+  typedef struct _VM_COUNTERS_EX2
+  {
+    SIZE_T PeakVirtualSize;
+    SIZE_T VirtualSize;
+    ULONG PageFaultCount;
+    SIZE_T PeakWorkingSetSize;
+    SIZE_T WorkingSetSize;
+    SIZE_T QuotaPeakPagedPoolUsage;
+    SIZE_T QuotaPagedPoolUsage;
+    SIZE_T QuotaPeakNonPagedPoolUsage;
+    SIZE_T QuotaNonPagedPoolUsage;
+    SIZE_T PagefileUsage;
+    SIZE_T PeakPagefileUsage;
+    SIZE_T PrivateUsage;
+    SIZE_T PrivateWorkingSetSize;
+    SIZE_T SharedCommitUsage;
+  } VM_COUNTERS_EX2, *PVM_COUNTERS_EX2;
+
+  typedef enum _PROCESSINFOCLASS
+  {
+    ProcessBasicInformation,
+    ProcessQuotaLimits,
+    ProcessIoCounters,
+    ProcessVmCounters,
+    ProcessTimes,
+    ProcessBasePriority,
+    ProcessRaisePriority,
+    ProcessDebugPort,
+    ProcessExceptionPort,
+    ProcessAccessToken,
+    ProcessLdtInformation,
+    ProcessLdtSize,
+    ProcessDefaultHardErrorMode,
+    ProcessIoPortHandlers,
+    ProcessPooledUsageAndLimits,
+    ProcessWorkingSetWatch,
+    ProcessUserModeIOPL,
+    ProcessEnableAlignmentFaultFixup,
+    ProcessPriorityClass,
+    ProcessWx86Information,
+    ProcessHandleCount,
+    ProcessAffinityMask,
+    ProcessPriorityBoost,
+    ProcessDeviceMap,
+    ProcessSessionInformation,
+    ProcessForegroundInformation,
+    ProcessWow64Information,
+    ProcessImageFileName,
+    ProcessLUIDDeviceMapsEnabled,
+    ProcessBreakOnTermination,
+    ProcessDebugObjectHandle,
+    ProcessDebugFlags,
+    ProcessHandleTracing,
+    ProcessIoPriority,
+    ProcessExecuteFlags,
+    ProcessResourceManagement,
+    ProcessCookie,
+    ProcessImageInformation,
+    ProcessCycleTime,
+    ProcessPagePriority,
+    ProcessInstrumentationCallback,
+    ProcessThreadStackAllocation,
+    ProcessWorkingSetWatchEx,
+    ProcessImageFileNameWin32,
+    ProcessImageFileMapping,
+    ProcessAffinityUpdateMode,
+    ProcessMemoryAllocationMode,
+    ProcessGroupInformation,
+    ProcessTokenVirtualizationEnabled,
+    ProcessConsoleHostProcess,
+    ProcessWindowInformation,
+    ProcessHandleInformation,
+    ProcessMitigationPolicy,
+    ProcessDynamicFunctionTableInformation,
+    ProcessHandleCheckingMode,
+    ProcessKeepAliveCount,
+    ProcessRevokeFileHandles,
+    ProcessWorkingSetControl,
+    ProcessHandleTable,
+    ProcessCheckStackExtentsMode,
+    ProcessCommandLineInformation,
+    ProcessProtectionInformation,
+    ProcessMemoryExhaustion,
+    ProcessFaultInformation,
+    ProcessTelemetryIdInformation,
+    ProcessCommitReleaseInformation,
+    ProcessDefaultCpuSetsInformation,
+    ProcessAllowedCpuSetsInformation,
+    ProcessReserved1Information,
+    ProcessReserved2Information,
+    ProcessSubsystemProcess,
+    ProcessJobMemoryInformation,
+    MaxProcessInfoClass
+  } PROCESSINFOCLASS;
+
+  using NtQueryInformationProcess_t = NTSTATUS(NTAPI *)(_In_ HANDLE ProcessHandle, _In_ PROCESSINFOCLASS ProcessInformationClass, _Out_ PVOID ProcessInformation, _In_ ULONG ProcessInformationLength, _Out_opt_ PULONG ReturnLength);
+
 
   using RtlGenRandom_t = BOOLEAN(NTAPI *)(_Out_ PVOID RandomBuffer, _In_ ULONG RandomBufferLength);
 
@@ -613,6 +710,7 @@ namespace windows_nt_kernel
   static NtSetSystemInformation_t NtSetSystemInformation;
   static NtAllocateVirtualMemory_t NtAllocateVirtualMemory;
   static NtFreeVirtualMemory_t NtFreeVirtualMemory;
+  static NtQueryInformationProcess_t NtQueryInformationProcess;
   static RtlGenRandom_t RtlGenRandom;
   static OpenProcessToken_t OpenProcessToken;
   static LookupPrivilegeValue_t LookupPrivilegeValue;
@@ -830,6 +928,14 @@ namespace windows_nt_kernel
         abort();
       }
     }
+    if(NtQueryInformationProcess == nullptr)
+    {
+      if((NtQueryInformationProcess = reinterpret_cast<NtQueryInformationProcess_t>(GetProcAddress(ntdllh, "NtQueryInformationProcess"))) == nullptr)
+      {
+        abort();
+      }
+    }
+
 
     HMODULE advapi32 = LoadLibraryA("ADVAPI32.DLL");
     if(RtlGenRandom == nullptr)

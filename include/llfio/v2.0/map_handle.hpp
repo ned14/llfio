@@ -574,7 +574,7 @@ public:
   system entirely, including the extents for them in any backing storage. On newer Linux kernels the kernel can additionally swap whole 4Kb pages for
   freshly zeroed ones making this a very efficient way of zeroing large ranges of memory.
 
-  On Windows, this call currently only works for non-backed memory due to lacking kernel support.
+  On Windows, this call currently only has an effect for non-backed memory due to lacking kernel support.
 
   \errors Any of the errors returnable by madvise() or DiscardVirtualMemory or the zero() function.
   */
