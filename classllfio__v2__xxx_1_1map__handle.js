@@ -40,6 +40,7 @@ var classllfio__v2__xxx_1_1map__handle =
     [ "decommit", "classllfio__v2__xxx_1_1map__handle.html#a518ff43602ac8e32ae48a198d0de1d75", null ],
     [ "do_not_store", "classllfio__v2__xxx_1_1map__handle.html#a3efb39f1b54a7c156a3e0ee2a953712d", null ],
     [ "flags", "classllfio__v2__xxx_1_1map__handle.html#a013936bc1254b1a47567fe29698d1b1c", null ],
+    [ "is_allocation", "classllfio__v2__xxx_1_1map__handle.html#a028fbead3b3c4d4eed2da7fa51c75036", null ],
     [ "is_append_only", "classllfio__v2__xxx_1_1map__handle.html#ac3aa3dc009822c0e437f317864534feb", null ],
     [ "is_directory", "classllfio__v2__xxx_1_1map__handle.html#a4ca48bdcd6d6bf8b41d0cebb304fe9ce", null ],
     [ "is_multiplexable", "classllfio__v2__xxx_1_1map__handle.html#ade2416b9154d1e56937c99cd514324f8", null ],

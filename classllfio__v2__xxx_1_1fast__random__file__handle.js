@@ -41,6 +41,7 @@ var classllfio__v2__xxx_1_1fast__random__file__handle =
     [ "current_path", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a00a85eec5a41f7edb2c574d40cf04535", null ],
     [ "extents", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a8026691789a70593329230076357fc96", null ],
     [ "flags", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a013936bc1254b1a47567fe29698d1b1c", null ],
+    [ "is_allocation", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a028fbead3b3c4d4eed2da7fa51c75036", null ],
     [ "is_append_only", "classllfio__v2__xxx_1_1fast__random__file__handle.html#ac3aa3dc009822c0e437f317864534feb", null ],
     [ "is_directory", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a4ca48bdcd6d6bf8b41d0cebb304fe9ce", null ],
     [ "is_multiplexable", "classllfio__v2__xxx_1_1fast__random__file__handle.html#ade2416b9154d1e56937c99cd514324f8", null ],

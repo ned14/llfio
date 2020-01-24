@@ -6,6 +6,7 @@ var structllfio__v2__xxx_1_1native__handle__type =
     [ "native_handle_type", "structllfio__v2__xxx_1_1native__handle__type.html#a3c7ef470ac1baa0af9100aae36b87524", null ],
     [ "native_handle_type", "structllfio__v2__xxx_1_1native__handle__type.html#ac0d26bcb12d0f9baa757ee44df1ffbf9", null ],
     [ "native_handle_type", "structllfio__v2__xxx_1_1native__handle__type.html#ae3f07d9d74e09d71d31abdc91e18e64d", null ],
+    [ "is_allocation", "structllfio__v2__xxx_1_1native__handle__type.html#a390f2bbc4b0485179fa56ef275f97763", null ],
     [ "is_append_only", "structllfio__v2__xxx_1_1native__handle__type.html#a38054fed025ad3deec2b5a5494e7e57d", null ],
     [ "is_directory", "structllfio__v2__xxx_1_1native__handle__type.html#af4d88dcf57bbfcc2f5c30210225c5fbd", null ],
     [ "is_multiplexer", "structllfio__v2__xxx_1_1native__handle__type.html#aa9773fae5d91f769e281cc05df1f0e6c", null ],

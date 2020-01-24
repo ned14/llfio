@@ -241,13 +241,9 @@ result&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html#aed9587571c3fb
 <tr class="separator:ac7aeb0aa6182a22d0242340eb6d341b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1fb1c874bdab5540c3310e468e41325a"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html#aed9587571c3fb932adadddc1beeeed58">size_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a1fb1c874bdab5540c3310e468e41325a">truncate</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html#aed9587571c3fb932adadddc1beeeed58">size_type</a> newsize, bool permit_relocation=false) noexcept</td></tr>
 <tr class="separator:a1fb1c874bdab5540c3310e468e41325a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9b3f12d17a9fc0cfbe15d389f896caa7"><td class="memItemLeft" align="right" valign="top"><a id="a9b3f12d17a9fc0cfbe15d389f896caa7"></a>
-result&lt; <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a9b3f12d17a9fc0cfbe15d389f896caa7">commit</a> (<a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a> region, section_handle::flag flag=section_handle::flag::readwrite) noexcept</td></tr>
-<tr class="memdesc:a9b3f12d17a9fc0cfbe15d389f896caa7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ask the system to commit the system resources to make the memory represented by the buffer available with the given permissions. addr and length should be page aligned (see <code>page_size()</code>), if not the returned buffer is the region actually committed. <br /></td></tr>
+<tr class="memitem:a9b3f12d17a9fc0cfbe15d389f896caa7"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a9b3f12d17a9fc0cfbe15d389f896caa7">commit</a> (<a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a> region, section_handle::flag flag=section_handle::flag::readwrite) noexcept</td></tr>
 <tr class="separator:a9b3f12d17a9fc0cfbe15d389f896caa7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a518ff43602ac8e32ae48a198d0de1d75"><td class="memItemLeft" align="right" valign="top"><a id="a518ff43602ac8e32ae48a198d0de1d75"></a>
-result&lt; <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a518ff43602ac8e32ae48a198d0de1d75">decommit</a> (<a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a> region) noexcept</td></tr>
-<tr class="memdesc:a518ff43602ac8e32ae48a198d0de1d75"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ask the system to make the memory represented by the buffer unavailable and to decommit the system resources representing them. addr and length should be page aligned (see <code>page_size()</code>), if not the returned buffer is the region actually decommitted. <br /></td></tr>
+<tr class="memitem:a518ff43602ac8e32ae48a198d0de1d75"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a518ff43602ac8e32ae48a198d0de1d75">decommit</a> (<a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a> region) noexcept</td></tr>
 <tr class="separator:a518ff43602ac8e32ae48a198d0de1d75"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0b87515430eb0220950b4c17a3da745f"><td class="memItemLeft" align="right" valign="top">result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a0b87515430eb0220950b4c17a3da745f">zero_memory</a> (<a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a> region) noexcept</td></tr>
 <tr class="separator:a0b87515430eb0220950b4c17a3da745f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -436,6 +432,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a354c9168af7759f7151a071c1e1b7b19">is_section</a> () const noexcept</td></tr>
 <tr class="memdesc:a354c9168af7759f7151a071c1e1b7b19"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if a memory section. <br /></td></tr>
 <tr class="separator:a354c9168af7759f7151a071c1e1b7b19"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a028fbead3b3c4d4eed2da7fa51c75036"><td class="memItemLeft" align="right" valign="top"><a id="a028fbead3b3c4d4eed2da7fa51c75036"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a028fbead3b3c4d4eed2da7fa51c75036">is_allocation</a> () const noexcept</td></tr>
+<tr class="memdesc:a028fbead3b3c4d4eed2da7fa51c75036"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if a memory allocation. <br /></td></tr>
+<tr class="separator:a028fbead3b3c4d4eed2da7fa51c75036"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a90bf8668df002dac5a7d9397486b2946"><td class="memItemLeft" align="right" valign="top"><a id="a90bf8668df002dac5a7d9397486b2946"></a>
 <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a90bf8668df002dac5a7d9397486b2946">kernel_caching</a> () const noexcept</td></tr>
 <tr class="memdesc:a90bf8668df002dac5a7d9397486b2946"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kernel cache strategy used by this handle. <br /></td></tr>
@@ -465,6 +465,8 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:adf0cad925c9d6accd5bd7fc3aa49884c"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classllfio__v2__xxx_1_1map__handle.html">map_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#adf0cad925c9d6accd5bd7fc3aa49884c">map</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html#aed9587571c3fb932adadddc1beeeed58">size_type</a> bytes, bool zeroed=false, section_handle::flag _flag=section_handle::flag::readwrite) noexcept</td></tr>
 <tr class="separator:adf0cad925c9d6accd5bd7fc3aa49884c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac0c02775e3288da59f5912f8110b45cc"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classllfio__v2__xxx_1_1map__handle.html">map_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#ac0c02775e3288da59f5912f8110b45cc">reserve</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html#aed9587571c3fb932adadddc1beeeed58">size_type</a> bytes) noexcept</td></tr>
+<tr class="separator:ac0c02775e3288da59f5912f8110b45cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e6163e135f2a0eebf62a127f0125533"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classllfio__v2__xxx_1_1map__handle.html">map_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a8e6163e135f2a0eebf62a127f0125533">map</a> (<a class="el" href="classllfio__v2__xxx_1_1section__handle.html">section_handle</a> &amp;<a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a173539843aebd387bb8ca06246067ead">section</a>, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aed9587571c3fb932adadddc1beeeed58">size_type</a> bytes=0, <a class="el" href="classllfio__v2__xxx_1_1handle.html#a4ee58f1b6a24af5e64d850d1e3eed07f">extent_type</a> <a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a9b65f62129418d02a925e6ef56220198">offset</a>=0, section_handle::flag _flag=section_handle::flag::readwrite) noexcept</td></tr>
 <tr class="separator:a8e6163e135f2a0eebf62a127f0125533"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a25dcce3a7127c5552687c540c37b9f27"><td class="memItemLeft" align="right" valign="top"><a id="a25dcce3a7127c5552687c540c37b9f27"></a>
@@ -538,6 +540,10 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>mapped_file_handle</
 <p>You can attempt to modify the address space reservation after creation using <code>truncate()</code>. If successful, this will be more efficient than tearing down the map and creating a new larger map.</p>
 <p>The native handle returned by this map handle is always that of the backing storage, but closing this handle does not close that of the backing storage, nor does releasing this handle release that of the backing storage. Locking byte ranges of this handle is therefore equal to locking byte ranges in the original backing storage, which can be very useful.</p>
 <p>On Microsoft Windows, when mapping file content, you should try to always create the first map of that file using a writable handle. See <code>mapped_file_handle</code> for more detail on this.</p>
+<h2>Commit charge:</h2>
+<p>All virtual memory systems account for memory allocated, even if never used. This is known as "commit charge". All virtual memory systems will not permit more pages to be committed than there is storage for them between RAM and the swap files (except for Linux, where most distributions configure "over commit" in the Linux kernel). This ensures that if the system gives you a committed memory page, you are hard guaranteed that writing into it will not fail. Note that memory mapped files have storage backed by their file contents, so except for pages written into and not yet flushed to storage, memory mapped files usually do not contribute more than a few pages each to commit charge.</p>
+<p>The system commit limit can be easily exceeded if programs commit a lot of memory that they never use. To avoid this, for large allocations you should <em>reserve</em> pages which you don't expect to use immediately, and <em>later</em> explicitly commit and decommit them. You can request pages not accounted against the system commit charge using <code>flag::nocommit</code>. For portability, you should <b>always</b> combine <code>flag::nocommit</code> with <code>flag::none</code>, indeed only Linux permits the allocation of usable pages which are not charged against commit. All other platforms enforce that reserved pages must be unusable, and only pages which are committed are usable.</p>
+<p>Separate to whether a page is committed or not is whether it actually consumes resources or not. Pages never written into are not stored by virtual memory systems, and much code when considering the memory consumption of a process only considers the portion of the total commit charge which contains modified pages. This makes sense, given the prevalence of code which commits memory it never uses, however it also leads to anti-social outcomes such as Linux distributions enabling pathological workarounds such as over commit and specialised OOM killers.</p>
 <h2>Barriers:</h2>
 <p><code>map_handle</code>, because it implements <code>io_handle</code>, implements <code>barrier()</code> in a very conservative way to account for OS differences i.e. it calls <code>msync()</code>, and then the <code>barrier()</code> implementation for the backing file (probably <code>fsync()</code> or equivalent on most platforms, which synchronises the entire file).</p>
 <p>This is vast overkill if you are using non-volatile RAM, so a special <em>inlined</em> <code>nvram_barrier()</code> implementation taking a single buffer and no other arguments is also provided as a free function. This calls the appropriate architecture-specific instructions to cause the CPU to write all preceding writes out of the write buffers and CPU caches to main memory, so for Intel CPUs this would be <code>CLWB &lt;each cache line&gt;; SFENCE;</code>. As this is inlined, it ought to produce optimal code. If your CPU does not support the requisite instructions (or LLFIO has not added support), and empty buffer will be returned to indicate that nothing was barriered, same as the normal <code>barrier()</code> function.</p>
@@ -616,7 +622,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>mapped_file_handle</
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;{ <span class="keywordflow">return</span> {_addr, _length}; }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;{ <span class="keywordflow">return</span> {_addr, _length}; }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a6a1044eeb6ab16939e4669bbeb071b32"></a>
@@ -708,6 +714,43 @@ For portability, you can only assume that barriers write order for a single hand
 
 </div>
 </div>
+<a id="a9b3f12d17a9fc0cfbe15d389f896caa7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b3f12d17a9fc0cfbe15d389f896caa7">&#9670;&nbsp;</a></span>commit()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;<a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a>&gt; llfio_v2_xxx::map_handle::commit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a>&#160;</td>
+          <td class="paramname"><em>region</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">section_handle::flag&#160;</td>
+          <td class="paramname"><em>flag</em> = <code>section_handle::flag::readwrite</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Ask the system to commit the system resources to make the memory represented by the buffer available with the given permissions. addr and length should be page aligned (see <code>page_size()</code>), if not the returned buffer is the region actually committed. </p>
+
+</div>
+</div>
 <a id="a00a85eec5a41f7edb2c574d40cf04535"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a00a85eec5a41f7edb2c574d40cf04535">&#9670;&nbsp;</a></span>current_path()</h2>
 
@@ -741,6 +784,33 @@ For portability, you can only assume that barriers write order for a single hand
 
 </div>
 </div>
+<a id="a518ff43602ac8e32ae48a198d0de1d75"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a518ff43602ac8e32ae48a198d0de1d75">&#9670;&nbsp;</a></span>decommit()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;<a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a>&gt; llfio_v2_xxx::map_handle::decommit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1buffer__type.html">buffer_type</a>&#160;</td>
+          <td class="paramname"><em>region</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Ask the system to make the memory represented by the buffer unavailable and to decommit the system resources representing them. addr and length should be page aligned (see <code>page_size()</code>), if not the returned buffer is the region actually decommitted. </p>
+
+</div>
+</div>
 <a id="a3efb39f1b54a7c156a3e0ee2a953712d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3efb39f1b54a7c156a3e0ee2a953712d">&#9670;&nbsp;</a></span>do_not_store()</h2>
 
@@ -765,6 +835,7 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>Ask the system to unset the dirty flag for the memory represented by the buffer. This will prevent any changes not yet sent to the backing storage from being sent in the future, also if the system kicks out this page and reloads it you may see some edition of the underlying storage instead of what was here. <code>addr</code> and <code>length</code> should be page aligned (see<code>page_size()</code>), if not the returned buffer is the region actually undirtied.</p>
+<p>Note that commit charge is not affected by this operation, as writes into the undirtied pages are guaranteed to succeed.</p>
 <dl class="section warning"><dt>Warning</dt><dd>This function destroys the contents of unwritten pages in the region in a totally unpredictable fashion. Only use it if you don't care how much of the region reaches physical storage or not. Note that the region is not necessarily zeroed, and may be randomly zeroed.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>Microsoft Windows does not support unsetting the dirty flag on file backed maps, so on Windows this call does nothing. </dd></dl>
 
@@ -1016,16 +1087,17 @@ For portability, you can only assume that barriers write order for a single hand
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Map unused memory into view, creating new memory if insufficient unused memory is available. Note that the memory mapped by this call may contain non-zero bits (recycled memory) unless <code>zeroed</code> is true. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Map unused memory into view, creating new memory if insufficient unused memory is available (i.e. add the returned memory to the process' commit charge, unless <code>flag::nocommit</code> was specified). Note that the memory mapped by this call may contain non-zero bits (recycled memory) unless <code>zeroed</code> is true.</p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">bytes</td><td>How many bytes to map. Typically will be rounded up to a multiple of the page size (see <code>page_size()</code>). </td></tr>
     <tr><td class="paramname">zeroed</td><td>Set to true if only all bits zeroed memory is wanted. </td></tr>
-    <tr><td class="paramname">_flag</td><td>The permissions with which to map the view. <code>flag::none</code> can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.</td></tr>
+    <tr><td class="paramname">_flag</td><td>The permissions with which to map the view.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd>On Microsoft Windows this constructor uses the faster VirtualAlloc() which creates less versatile page backed memory. If you want anonymous memory allocated from a paging file backed section instead, create a page file backed section and then a mapped view from that using the other constructor. This makes available all those very useful VM tricks Windows can do with section mapped memory which VirtualAlloc() memory cannot do.</dd></dl>
-<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX mmap() or VirtualAlloc() can return. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>On Microsoft Windows this constructor uses the faster <code>VirtualAlloc()</code> which creates less versatile page backed memory. If you want anonymous memory allocated from a paging file backed section instead, create a page file backed section and then a mapped view from that using the other constructor. This makes available all those very useful VM tricks Windows can do with section mapped memory which <code>VirtualAlloc()</code> memory cannot do.</dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX <code>mmap()</code> or <code>VirtualAlloc()</code> can return. </dd></dl>
 
 </div>
 </div>
@@ -1074,16 +1146,17 @@ For portability, you can only assume that barriers write order for a single hand
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Create a memory mapped view of a backing storage, optionally reserving additional address space for later growth. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Create a memory mapped view of a backing storage, optionally reserving additional address space for later growth.</p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">section</td><td>A memory section handle specifying the backing storage to use. </td></tr>
     <tr><td class="paramname">bytes</td><td>How many bytes to reserve (0 = the size of the section). Rounded up to nearest 64Kb on Windows. </td></tr>
     <tr><td class="paramname">offset</td><td>The offset into the backing storage to map from. Typically needs to be at least a multiple of the page size (see <code>page_size()</code>), on Windows it needs to be a multiple of the kernel memory allocation granularity (typically 64Kb). </td></tr>
-    <tr><td class="paramname">_flag</td><td>The permissions with which to map the view which are constrained by the permissions of the memory section. <code>flag::none</code> can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory. Note that apart from read/write/cow/execute, the section's flags override the map's flags.</td></tr>
+    <tr><td class="paramname">_flag</td><td>The permissions with which to map the view which are constrained by the permissions of the memory section. <code>flag::none</code> can be useful for reserving virtual address space without committing system resources, use <code>commit()</code> to later change availability of memory. Note that apart from read/write/cow/execute, the section's flags override the map's flags.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX mmap() or NtMapViewOfSection() can return. </dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX <code>mmap()</code> or <code>NtMapViewOfSection()</code> can return. </dd></dl>
 
 </div>
 </div>
@@ -1142,7 +1215,7 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;  {</div><div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;    OUTCOME_TRY(ret, <a class="code" href="classllfio__v2__xxx_1_1map__handle.html#a25dcce3a7127c5552687c540c37b9f27">prefetch</a>(span&lt;buffer_type&gt;(&amp;region, 1)));</div><div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;    <span class="keywordflow">return</span> *ret.data();</div><div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1map__handle_html_a25dcce3a7127c5552687c540c37b9f27"><div class="ttname"><a href="classllfio__v2__xxx_1_1map__handle.html#a25dcce3a7127c5552687c540c37b9f27">llfio_v2_xxx::map_handle::prefetch</a></div><div class="ttdeci">static result&lt; span&lt; buffer_type &gt; &gt; prefetch(span&lt; buffer_type &gt; regions) noexcept</div><div class="ttdoc">Ask the system to begin to asynchronously prefetch the span of memory regions given, returning the regions actually prefetched. Note that on Windows 7 or earlier the system call to implement this was not available, and so you will see an empty span returned. </div></div>
+<div class="fragment"><div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;  {</div><div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;    OUTCOME_TRY(ret, <a class="code" href="classllfio__v2__xxx_1_1map__handle.html#a25dcce3a7127c5552687c540c37b9f27">prefetch</a>(span&lt;buffer_type&gt;(&amp;region, 1)));</div><div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;    <span class="keywordflow">return</span> *ret.data();</div><div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1map__handle_html_a25dcce3a7127c5552687c540c37b9f27"><div class="ttname"><a href="classllfio__v2__xxx_1_1map__handle.html#a25dcce3a7127c5552687c540c37b9f27">llfio_v2_xxx::map_handle::prefetch</a></div><div class="ttdeci">static result&lt; span&lt; buffer_type &gt; &gt; prefetch(span&lt; buffer_type &gt; regions) noexcept</div><div class="ttdoc">Ask the system to begin to asynchronously prefetch the span of memory regions given, returning the regions actually prefetched. Note that on Windows 7 or earlier the system call to implement this was not available, and so you will see an empty span returned. </div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1287,6 +1360,42 @@ For portability, you can only assume that barriers write order for a single hand
 <dl class="section user"><dt>Errors returnable</dt><dd>None, though the various signals and structured exception throws common to using memory maps may occur. </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>None. </dd></dl>
 
+</div>
+</div>
+<a id="ac0c02775e3288da59f5912f8110b45cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac0c02775e3288da59f5912f8110b45cc">&#9670;&nbsp;</a></span>reserve()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static result&lt;<a class="el" href="classllfio__v2__xxx_1_1map__handle.html">map_handle</a>&gt; llfio_v2_xxx::map_handle::reserve </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1handle.html#aed9587571c3fb932adadddc1beeeed58">size_type</a>&#160;</td>
+          <td class="paramname"><em>bytes</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Reserve address space within which individual pages can later be committed. Reserved address space is NOT added to the process' commit charge.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">bytes</td><td>How many bytes to reserve. Rounded up to nearest 64Kb on Windows.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>On Microsoft Windows this constructor uses the faster <code>VirtualAlloc()</code> which creates less versatile page backed memory. If you want anonymous memory allocated from a paging file backed section instead, create a page file backed section and then a mapped view from that using the other constructor. This makes available all those very useful VM tricks Windows can do with section mapped memory which <code>VirtualAlloc()</code> memory cannot do.</dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX <code>mmap()</code> or <code>VirtualAlloc()</code> can return. </dd></dl>
+<div class="fragment"><div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classllfio__v2__xxx_1_1map__handle.html#adf0cad925c9d6accd5bd7fc3aa49884c">map</a>(bytes, <span class="keyword">false</span>, section_handle::flag::none | section_handle::flag::nocommit); }</div><div class="ttc" id="classllfio__v2__xxx_1_1map__handle_html_adf0cad925c9d6accd5bd7fc3aa49884c"><div class="ttname"><a href="classllfio__v2__xxx_1_1map__handle.html#adf0cad925c9d6accd5bd7fc3aa49884c">llfio_v2_xxx::map_handle::map</a></div><div class="ttdeci">static result&lt; map_handle &gt; map(size_type bytes, bool zeroed=false, section_handle::flag _flag=section_handle::flag::readwrite) noexcept</div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a101620e9fff0c0e8c346af0e9de58b6a"></a>
@@ -1643,7 +1752,7 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>Zero the memory represented by the buffer. Differs from zero() because it acts on mapped memory, not on allocated file extents.</p>
-<p>On Linux, Mac OS and FreeBSD any full 4Kb pages will be deallocated from the system entirely, including the extents for them in any backing storage. On newer Linux kernels the kernel can additionally swap whole 4Kb pages for freshly zeroed ones making this a very efficient way of zeroing large ranges of memory.</p>
+<p>On Linux, Mac OS and FreeBSD any full 4Kb pages will be deallocated from the system entirely, including the extents for them in any backing storage. On newer Linux kernels the kernel can additionally swap whole 4Kb pages for freshly zeroed ones making this a very efficient way of zeroing large ranges of memory. Note that commit charge is not affected by this operation, as writes into the zeroed pages are guaranteed to succeed.</p>
 <p>On Windows, this call currently only has an effect for non-backed memory due to lacking kernel support.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the errors returnable by madvise() or DiscardVirtualMemory or the zero() function. </dd></dl>
 

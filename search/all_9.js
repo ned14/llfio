@@ -19,6 +19,7 @@ var searchData=
   ['io_5fservice',['io_service',['../classllfio__v2__xxx_1_1io__service.html',1,'llfio_v2_xxx::io_service'],['../classllfio__v2__xxx_1_1io__service.html#a6a00c11cd49640dffc2bae95f13b6835',1,'llfio_v2_xxx::io_service::io_service()']]],
   ['io_5fservice_2ehpp',['io_service.hpp',['../io__service_8hpp.html',1,'']]],
   ['io_5fstate_5fptr',['io_state_ptr',['../classllfio__v2__xxx_1_1async__file__handle.html#a8c38344215baf024148e144735f3cb67',1,'llfio_v2_xxx::async_file_handle']]],
+  ['is_5fallocation',['is_allocation',['../classllfio__v2__xxx_1_1handle.html#a028fbead3b3c4d4eed2da7fa51c75036',1,'llfio_v2_xxx::handle::is_allocation()'],['../structllfio__v2__xxx_1_1native__handle__type.html#a390f2bbc4b0485179fa56ef275f97763',1,'llfio_v2_xxx::native_handle_type::is_allocation()']]],
   ['is_5fappend_5fonly',['is_append_only',['../classllfio__v2__xxx_1_1handle.html#ac3aa3dc009822c0e437f317864534feb',1,'llfio_v2_xxx::handle::is_append_only()'],['../structllfio__v2__xxx_1_1native__handle__type.html#a38054fed025ad3deec2b5a5494e7e57d',1,'llfio_v2_xxx::native_handle_type::is_append_only()']]],
   ['is_5fattachable',['is_attachable',['../structkvstore__v1__xxx_1_1traits_1_1is__attachable.html',1,'kvstore_v1_xxx::traits']]],
   ['is_5fdetachable',['is_detachable',['../structkvstore__v1__xxx_1_1traits_1_1is__detachable.html',1,'kvstore_v1_xxx::traits']]],

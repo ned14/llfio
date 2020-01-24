@@ -38,6 +38,7 @@ var classllfio__v2__xxx_1_1symlink__handle =
     [ "close", "classllfio__v2__xxx_1_1symlink__handle.html#a2a22f51ca307aa30660ed91b26785ec3", null ],
     [ "current_path", "classllfio__v2__xxx_1_1symlink__handle.html#aea44ed050acfd8e4f9dec59ff194c746", null ],
     [ "flags", "classllfio__v2__xxx_1_1symlink__handle.html#a013936bc1254b1a47567fe29698d1b1c", null ],
+    [ "is_allocation", "classllfio__v2__xxx_1_1symlink__handle.html#a028fbead3b3c4d4eed2da7fa51c75036", null ],
     [ "is_append_only", "classllfio__v2__xxx_1_1symlink__handle.html#ac3aa3dc009822c0e437f317864534feb", null ],
     [ "is_directory", "classllfio__v2__xxx_1_1symlink__handle.html#a4ca48bdcd6d6bf8b41d0cebb304fe9ce", null ],
     [ "is_multiplexable", "classllfio__v2__xxx_1_1symlink__handle.html#ade2416b9154d1e56937c99cd514324f8", null ],
