@@ -1441,7 +1441,7 @@ inline result<DWORD> attributes_from_handle_caching_and_flags(native_handle_type
   switch(_caching)
   {
   case handle::caching::unchanged:
-    return errc::invalid_argument;
+    break;  // can be called by reopen()
   case handle::caching::none:
     attribs |= FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
     nativeh.behaviour |= native_handle_type::disposition::aligned_io;
@@ -1489,7 +1489,7 @@ inline result<DWORD> ntflags_from_handle_caching_and_flags(native_handle_type &n
   switch(_caching)
   {
   case handle::caching::unchanged:
-    return errc::invalid_argument;
+    break; // can be called by reopen()
   case handle::caching::none:
     ntflags |= 0x00000008 /*FILE_NO_INTERMEDIATE_BUFFERING*/ | 0x00000002 /*FILE_WRITE_THROUGH*/;
     nativeh.behaviour |= native_handle_type::disposition::aligned_io;

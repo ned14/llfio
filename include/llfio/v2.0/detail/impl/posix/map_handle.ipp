@@ -224,6 +224,12 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
   if(_flag == section_handle::flag::none)
   {
     prot |= PROT_NONE;
+#ifdef MAP_GUARD
+    if(_flag & section_handle::flag::nocommit)
+    {
+      flags |= MAP_GUARD;
+    }
+#endif
   }
   else if(_flag & section_handle::flag::cow)
   {
@@ -342,6 +348,8 @@ result<map_handle> map_handle::map(size_type bytes, bool /*unused*/, section_han
   ret.value()._reservation = bytes;
   ret.value()._length = bytes;
   ret.value()._pagesize = pagesize;
+  nativeh._init = -2;  // otherwise appears closed
+  nativeh.behaviour |= native_handle_type::disposition::allocation;
   LLFIO_LOG_FUNCTION_CALL(&ret);
   return ret;
 }
@@ -364,6 +372,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   ret.value()._pagesize = pagesize;
   // Make my handle borrow the native handle of my backing storage
   ret.value()._v.fd = section.native_handle().fd;
+  nativeh.behaviour |= native_handle_type::disposition::allocation;
   LLFIO_LOG_FUNCTION_CALL(&ret);
   return ret;
 }
@@ -486,10 +495,10 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
   {
     return posix_error();
   }
-  // Remap these pages with ones having no access
+  // Remap these pages with ones having no access, and remove from commit charge
   extent_type offset = _offset + (region.data() - _addr);
   size_type bytes = region.size();
-  OUTCOME_TRYV(do_mmap(_v, region.data(), MAP_FIXED, _section, _pagesize, bytes, offset, section_handle::flag::none));
+  OUTCOME_TRYV(do_mmap(_v, region.data(), MAP_FIXED, _section, _pagesize, bytes, offset, section_handle::flag::none | section_handle::flag::nocommit));
   return region;
 }
 

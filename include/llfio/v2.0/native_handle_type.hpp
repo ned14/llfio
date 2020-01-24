@@ -61,6 +61,7 @@ struct native_handle_type  // NOLINT
   multiplexer = 1U << 13U,  //!< Is a kqueue/epoll/iocp
   process = 1U << 14U,      //!< Is a child process
   section = 1U << 15U,      //!< Is a memory section
+  allocation = 1U << 16U,   //!< Is a memory allocation
 
   _child_close_executed = 1U << 28U  // used to trap when vptr has become corrupted
   } QUICKCPPLIB_BITFIELD_END(disposition)
@@ -80,15 +81,13 @@ struct native_handle_type  // NOLINT
   ~native_handle_type() = default;
   //! Construct from a POSIX file descriptor
   constexpr native_handle_type(disposition _behaviour, int _fd) noexcept
-      : 
-       fd(_fd)
+      : fd(_fd)
       , behaviour(_behaviour)
   {
   }  // NOLINT
   //! Construct from a Windows HANDLE
   constexpr native_handle_type(disposition _behaviour, win::handle _h) noexcept
-      : 
-       h(_h)
+      : h(_h)
       , behaviour(_behaviour)
   {
   }  // NOLINT
@@ -97,8 +96,7 @@ struct native_handle_type  // NOLINT
   native_handle_type(const native_handle_type &) = default;
   //! Move construct
   constexpr native_handle_type(native_handle_type &&o) noexcept  // NOLINT
-      : 
-      _init(o._init)
+      : _init(o._init)
       , behaviour(o.behaviour)
   {
     o.behaviour = disposition();
@@ -160,6 +158,8 @@ struct native_handle_type  // NOLINT
   constexpr bool is_process() const noexcept { return (behaviour & disposition::process) ? true : false; }
   //! True if a memory section
   constexpr bool is_section() const noexcept { return (behaviour & disposition::section) ? true : false; }
+  //! True if a memory allocation
+  constexpr bool is_allocation() const noexcept { return (behaviour & disposition::allocation) ? true : false; }
 };
 static_assert((sizeof(void *) == 4 && sizeof(native_handle_type) == 8) || (sizeof(void *) == 8 && sizeof(native_handle_type) == 12), "native_handle_type is not 8 or 12 bytes in size!");
 // Not trivially copyable, as has non-trivial move.

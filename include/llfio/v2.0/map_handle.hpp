@@ -306,6 +306,31 @@ which can be very useful.
 On Microsoft Windows, when mapping file content, you should try to always create the first map of that
 file using a writable handle. See `mapped_file_handle` for more detail on this.
 
+## Commit charge:
+
+All virtual memory systems account for memory allocated, even if never used. This is known as "commit charge".
+All virtual memory systems will not permit more pages to be committed than there is storage for them
+between RAM and the swap files (except for Linux, where most distributions configure "over commit" in
+the Linux kernel). This ensures that if the system gives you a committed memory page, you are hard
+guaranteed that writing into it will not fail. Note that memory mapped files have storage backed by
+their file contents, so except for pages written into and not yet flushed to storage, memory mapped files
+usually do not contribute more than a few pages each to commit charge.
+
+The system commit limit can be easily exceeded if programs commit a lot of memory that they never use.
+To avoid this, for large allocations you should *reserve* pages which you don't expect to use immediately,
+and *later* explicitly commit and decommit them. You can request pages not accounted against the system
+commit charge using `flag::nocommit`. For portability, you should **always** combine `flag::nocommit`
+with `flag::none`, indeed only Linux permits the allocation of usable pages which are not charged
+against commit. All other platforms enforce that reserved pages must be unusable, and only pages
+which are committed are usable.
+
+Separate to whether a page is committed or not is whether it actually consumes resources or not.
+Pages never written into are not stored by virtual memory systems, and much code when considering the
+memory consumption of a process only considers the portion of the total commit charge which contains
+modified pages. This makes sense, given the prevalence of code which commits memory it never uses,
+however it also leads to anti-social outcomes such as Linux distributions enabling pathological
+workarounds such as over commit and specialised OOM killers.
+
 ## Barriers:
 
 `map_handle`, because it implements `io_handle`, implements `barrier()` in a very conservative way
@@ -461,29 +486,58 @@ public:
   LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), barrier_kind kind = barrier_kind::nowait_data_only, deadline d = deadline()) noexcept override;
 
-  /*! Map unused memory into view, creating new memory if insufficient unused memory is available. Note that the memory mapped by this call may contain non-zero bits (recycled memory) unless `zeroed` is true.
-  \param bytes How many bytes to map. Typically will be rounded up to a multiple of the page size (see `page_size()`).
+  /*! Map unused memory into view, creating new memory if insufficient unused memory is available
+  (i.e. add the returned memory to the process' commit charge, unless `flag::nocommit`
+  was specified). Note that the memory mapped by this call may contain non-zero bits (recycled memory)
+  unless `zeroed` is true.
+
+  \param bytes How many bytes to map. Typically will be rounded up to a multiple of the page size
+  (see `page_size()`).
   \param zeroed Set to true if only all bits zeroed memory is wanted.
-  \param _flag The permissions with which to map the view. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
+  \param _flag The permissions with which to map the view. 
 
-  \note On Microsoft Windows this constructor uses the faster VirtualAlloc() which creates less versatile page backed memory. If you want anonymous memory
-  allocated from a paging file backed section instead, create a page file backed section and then a mapped view from that using
-  the other constructor. This makes available all those very useful VM tricks Windows can do with section mapped memory which
-  VirtualAlloc() memory cannot do.
+  \note On Microsoft Windows this constructor uses the faster `VirtualAlloc()` which creates less
+  versatile page backed memory. If you want anonymous memory allocated from a paging file backed
+  section instead, create a page file backed section and then a mapped view from that using
+  the other constructor. This makes available all those very useful VM tricks Windows can do with
+  section mapped memory which `VirtualAlloc()` memory cannot do.
 
-  \errors Any of the values POSIX mmap() or VirtualAlloc() can return.
+  \errors Any of the values POSIX `mmap()` or `VirtualAlloc()` can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
   static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(size_type bytes, bool zeroed = false, section_handle::flag _flag = section_handle::flag::readwrite) noexcept;
 
-  /*! Create a memory mapped view of a backing storage, optionally reserving additional address space for later growth.
-  \param section A memory section handle specifying the backing storage to use.
-  \param bytes How many bytes to reserve (0 = the size of the section). Rounded up to nearest 64Kb on Windows.
-  \param offset The offset into the backing storage to map from. Typically needs to be at least a multiple of the page size (see `page_size()`), on Windows it needs to be a multiple of the kernel memory allocation granularity (typically 64Kb).
-  \param _flag The permissions with which to map the view which are constrained by the permissions of the memory section. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory. Note that apart from read/write/cow/execute,
-  the section's flags override the map's flags.
+  /*! Reserve address space within which individual pages can later be committed. Reserved address
+  space is NOT added to the process' commit charge.
 
-  \errors Any of the values POSIX mmap() or NtMapViewOfSection() can return.
+  \param bytes How many bytes to reserve. Rounded up to nearest 64Kb on Windows.
+
+  \note On Microsoft Windows this constructor uses the faster `VirtualAlloc()` which creates less
+  versatile page backed memory. If you want anonymous memory allocated from a paging file backed
+  section instead, create a page file backed section and then a mapped view from that using
+  the other constructor. This makes available all those very useful VM tricks Windows can do with
+  section mapped memory which `VirtualAlloc()` memory cannot do.
+
+  \errors Any of the values POSIX `mmap()` or `VirtualAlloc()` can return.
+  */
+  LLFIO_MAKE_FREE_FUNCTION
+  static inline result<map_handle> reserve(size_type bytes) noexcept { return map(bytes, false, section_handle::flag::none | section_handle::flag::nocommit); }
+
+  /*! Create a memory mapped view of a backing storage, optionally reserving additional address
+  space for later growth.
+
+  \param section A memory section handle specifying the backing storage to use.
+  \param bytes How many bytes to reserve (0 = the size of the section). Rounded up to nearest
+  64Kb on Windows.
+  \param offset The offset into the backing storage to map from. Typically needs to be at least
+  a multiple of the page size (see `page_size()`), on Windows it needs to be a multiple of the
+  kernel memory allocation granularity (typically 64Kb).
+  \param _flag The permissions with which to map the view which are constrained by the
+  permissions of the memory section. `flag::none` can be useful for reserving virtual address
+  space without committing system resources, use `commit()` to later change availability of memory.
+  Note that apart from read/write/cow/execute, the section's flags override the map's flags.
+
+  \errors Any of the values POSIX `mmap()` or `NtMapViewOfSection()` can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
   static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(section_handle &section, size_type bytes = 0, extent_type offset = 0, section_handle::flag _flag = section_handle::flag::readwrite) noexcept;
@@ -562,17 +616,28 @@ public:
   LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_type> truncate(size_type newsize, bool permit_relocation = false) noexcept;
 
-  //! Ask the system to commit the system resources to make the memory represented by the buffer available with the given permissions. addr and length should be page aligned (see `page_size()`), if not the returned buffer is the region actually committed.
+  /*! Ask the system to commit the system resources to make the memory represented
+  by the buffer available with the given permissions. addr and length should be page
+  aligned (see `page_size()`), if not the returned buffer is the region actually committed.
+  */
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> commit(buffer_type region, section_handle::flag flag = section_handle::flag::readwrite) noexcept;
 
-  //! Ask the system to make the memory represented by the buffer unavailable and to decommit the system resources representing them. addr and length should be page aligned (see `page_size()`), if not the returned buffer is the region actually decommitted.
+  /*! Ask the system to make the memory represented by the buffer unavailable and
+  to decommit the system resources representing them. addr and length should be
+  page aligned (see `page_size()`), if not the returned buffer is the region actually
+  decommitted.
+  */
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> decommit(buffer_type region) noexcept;
 
-  /*! Zero the memory represented by the buffer. Differs from zero() because it acts on mapped memory, not on allocated file extents.
+  /*! Zero the memory represented by the buffer. Differs from zero() because it acts on
+  mapped memory, not on allocated file extents.
 
   On Linux, Mac OS and FreeBSD any full 4Kb pages will be deallocated from the
-  system entirely, including the extents for them in any backing storage. On newer Linux kernels the kernel can additionally swap whole 4Kb pages for
+  system entirely, including the extents for them in any backing storage. On
+  newer Linux kernels the kernel can additionally swap whole 4Kb pages for
   freshly zeroed ones making this a very efficient way of zeroing large ranges of memory.
+  Note that commit charge is not affected by this operation, as writes into
+  the zeroed pages are guaranteed to succeed.
 
   On Windows, this call currently only has an effect for non-backed memory due to lacking kernel support.
 
@@ -580,15 +645,23 @@ public:
   */
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> zero_memory(buffer_type region) noexcept;
 
-  /*! Ask the system to unset the dirty flag for the memory represented by the buffer. This will prevent any changes not yet sent to
-  the backing storage from being sent in the future, also if the system kicks out this page and reloads it you may see some edition of
-  the underlying storage instead of what was here. `addr` and `length` should be page aligned (see`page_size()`), if not the returned
+  /*! Ask the system to unset the dirty flag for the memory represented by the
+  buffer. This will prevent any changes not yet sent to the backing storage from
+  being sent in the future, also if the system kicks out this page and reloads it
+  you may see some edition of the underlying storage instead of what was here.
+  `addr` and `length` should be page aligned (see`page_size()`), if not the returned
   buffer is the region actually undirtied.
 
-  \warning This function destroys the contents of unwritten pages in the region in a totally unpredictable fashion. Only use it if you don't care how much of
-  the region reaches physical storage or not. Note that the region is not necessarily zeroed, and may be randomly zeroed.
+  Note that commit charge is not affected by this operation, as writes into
+  the undirtied pages are guaranteed to succeed.
 
-  \note Microsoft Windows does not support unsetting the dirty flag on file backed maps, so on Windows this call does nothing.
+  \warning This function destroys the contents of unwritten pages in the region
+  in a totally unpredictable fashion. Only use it if you don't care how much of
+  the region reaches physical storage or not. Note that the region is not necessarily
+  zeroed, and may be randomly zeroed.
+
+  \note Microsoft Windows does not support unsetting the dirty flag on file backed maps,
+  so on Windows this call does nothing.
   */
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> do_not_store(buffer_type region) noexcept;
 

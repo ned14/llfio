@@ -354,6 +354,8 @@ public:
   bool is_process() const noexcept { return _v.is_process(); }
   //! True if a memory section
   bool is_section() const noexcept { return _v.is_section(); }
+  //! True if a memory allocation
+  bool is_allocation() const noexcept { return _v.is_allocation(); }
 
   //! Kernel cache strategy used by this handle
   caching kernel_caching() const noexcept { return _caching; }

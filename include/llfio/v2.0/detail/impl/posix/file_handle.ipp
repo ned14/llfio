@@ -265,6 +265,11 @@ result<file_handle> file_handle::reopen(mode mode_, caching caching_, deadline d
   {
     // Get the current path of myself
     OUTCOME_TRY(currentpath, current_path());
+    if(currentpath.empty())
+    {
+      // Cannot reopen a file which has been unlinked
+      return errc::no_such_file_or_directory;
+    }
     // Open myself
     auto fh = file({}, currentpath, mode_, creation::open_existing, caching_, _flags);
     if(fh)
