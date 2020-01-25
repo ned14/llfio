@@ -404,7 +404,10 @@ static inline result<void> win32_maps_apply(byte *addr, size_t bytes, win32_map_
     doit = doit || ((MEM_RESERVE == mbi.State) && (sought & win32_map_sought::reserved));
     if(doit)
     {
-      OUTCOME_TRYV(f(reinterpret_cast<byte *>(mbi.BaseAddress), mbi.RegionSize));
+      /* mbi.RegionSize will be that from mbi.AllocationBase to end of a reserved region,
+      so clamp to region size originally requested.
+      */
+      OUTCOME_TRYV(f(reinterpret_cast<byte *>(mbi.BaseAddress), std::min(mbi.RegionSize, bytes)));
     }
     if(!VirtualQuery(addr, &mbi, sizeof(mbi)))
     {
@@ -570,6 +573,8 @@ result<map_handle> map_handle::map(size_type bytes, bool /*unused*/, section_han
   ret.value()._reservation = bytes;
   ret.value()._length = bytes;
   ret.value()._pagesize = pagesize;
+  nativeh._init = -2;  // otherwise appears closed
+  nativeh.behaviour |= native_handle_type::disposition::allocation;
 
   // Windows has no way of getting the kernel to prefault maps on creation, so ...
   if(_flag & section_handle::flag::prefault)
@@ -614,6 +619,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   ret.value()._pagesize = pagesize;
   // Make my handle borrow the native handle of my backing storage
   ret.value()._v.h = section.backing_native_handle().h;
+  nativeh.behaviour |= native_handle_type::disposition::allocation;
 
   // Windows has no way of getting the kernel to prefault maps on creation, so ...
   if(ret.value()._flag & section_handle::flag::prefault)
@@ -763,6 +769,9 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
     return errc::invalid_argument;
   }
   region = utils::round_to_page_size(region, _pagesize);
+#if 1
+  OUTCOME_TRYV(win32_release_allocations(region.data(), region.size(), MEM_DECOMMIT));
+#else
   OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed, [](byte *addr, size_t bytes) -> result<void> {
     if(VirtualFree(addr, bytes, MEM_DECOMMIT) == 0)
     {
@@ -770,6 +779,7 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
     }
     return success();
   }));
+#endif
   return region;
 }
 

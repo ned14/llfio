@@ -42,7 +42,7 @@ inline result<int> attribs_from_handle_mode_caching_and_flags(native_handle_type
   switch(_mode)
   {
   case handle::mode::unchanged:
-    return errc::invalid_argument;
+    break;  // can be called by reopen()
   case handle::mode::none:
     break;
   case handle::mode::attr_read:
@@ -80,7 +80,7 @@ inline result<int> attribs_from_handle_mode_caching_and_flags(native_handle_type
   switch(_caching)
   {
   case handle::caching::unchanged:
-    return errc::invalid_argument;
+    break;  // can be called by reopen()
   case handle::caching::none:
     attribs |= O_SYNC
 #ifdef O_DIRECT
