@@ -38,7 +38,7 @@ static struct llfio_linux_munmap_debug_t
   llfio_linux_munmap_debug_t()
   {
     smaps_fd = ::open("/proc/self/smaps", O_RDONLY);
-    dumpfile_fd = ::open("/tmp/llfio_unmap_debug_smaps.txt", O_WRONLY);
+    dumpfile_fd = ::open("/tmp/llfio_unmap_debug_smaps.txt", O_WRONLY | O_CREAT, 0x1b0 /*660*/);
     if(-1 == smaps_fd || -1 == dumpfile_fd)
     {
       puts("llfio_linux_munmap_debug: Failed to open one of the files\n");
