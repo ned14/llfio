@@ -29,6 +29,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <sys/mman.h>
 
+//#define LLFIO_DEBUG_LINUX_MUNMAP
+
 #ifdef LLFIO_DEBUG_LINUX_MUNMAP
 #include <unistd.h>
 static struct llfio_linux_munmap_debug_t
@@ -38,7 +40,7 @@ static struct llfio_linux_munmap_debug_t
   llfio_linux_munmap_debug_t()
   {
     smaps_fd = ::open("/proc/self/smaps", O_RDONLY);
-    dumpfile_fd = ::open("/tmp/llfio_unmap_debug_smaps.txt", O_WRONLY | O_CREAT, 0x1b0 /*660*/);
+    dumpfile_fd = ::open("/tmp/llfio_unmap_debug_smaps.txt", O_WRONLY | O_CREAT | O_APPEND, 0x1b0 /*660*/);
     if(-1 == smaps_fd || -1 == dumpfile_fd)
     {
       puts("llfio_linux_munmap_debug: Failed to open one of the files\n");
@@ -175,9 +177,11 @@ result<void> map_handle::close() noexcept
 #ifdef LLFIO_DEBUG_LINUX_MUNMAP
       int olderrno = errno;
       ssize_t bytesread;
+      // Refresh the /proc file
+      ::lseek(llfio_linux_munmap_debug.smaps_fd, 0, SEEK_END);
       ::lseek(llfio_linux_munmap_debug.smaps_fd, 0, SEEK_SET);
       char buffer[4096];
-      ::write(llfio_linux_munmap_debug.dumpfile_fd, buffer, sprintf(buffer, "\n---\nCause of munmap failure: %d (%s)\n\n", olderrno, strerror(olderrno)));
+      ::write(llfio_linux_munmap_debug.dumpfile_fd, buffer, sprintf(buffer, "\n---\nCause of munmap failure by process %d: %d (%s)\n\n", getpid(), olderrno, strerror(olderrno)));
       do
       {
         bytesread = ::read(llfio_linux_munmap_debug.smaps_fd, buffer, sizeof(buffer));
