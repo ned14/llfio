@@ -178,16 +178,16 @@ result<void> map_handle::close() noexcept
       int olderrno = errno;
       ssize_t bytesread;
       // Refresh the /proc file
-      ::lseek(llfio_linux_munmap_debug.smaps_fd, 0, SEEK_END);
-      ::lseek(llfio_linux_munmap_debug.smaps_fd, 0, SEEK_SET);
+      (void) ::lseek(llfio_linux_munmap_debug.smaps_fd, 0, SEEK_END);
+      (void) ::lseek(llfio_linux_munmap_debug.smaps_fd, 0, SEEK_SET);
       char buffer[4096];
-      ::write(llfio_linux_munmap_debug.dumpfile_fd, buffer, sprintf(buffer, "\n---\nCause of munmap failure by process %d: %d (%s)\n\n", getpid(), olderrno, strerror(olderrno)));
+      (void) ::write(llfio_linux_munmap_debug.dumpfile_fd, buffer, sprintf(buffer, "\n---\nCause of munmap failure by process %d: %d (%s)\n\n", getpid(), olderrno, strerror(olderrno)));
       do
       {
         bytesread = ::read(llfio_linux_munmap_debug.smaps_fd, buffer, sizeof(buffer));
         if(bytesread > 0)
         {
-          ::write(llfio_linux_munmap_debug.dumpfile_fd, buffer, bytesread);
+          (void) ::write(llfio_linux_munmap_debug.dumpfile_fd, buffer, bytesread);
         }
       } while(bytesread > 0);
       errno = olderrno;
