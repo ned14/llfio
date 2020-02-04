@@ -29,6 +29,25 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <sys/mman.h>
 
+#ifdef LLFIO_DEBUG_LINUX_MUNMAP
+#include <unistd.h>
+static struct llfio_linux_munmap_debug_t
+{
+  int smaps_fd, dumpfile_fd;
+
+  llfio_linux_munmap_debug_t()
+  {
+    smaps_fd = ::open("/proc/self/smaps", O_RDONLY);
+    dumpfile_fd = ::open("/tmp/llfio_unmap_debug_smaps.txt", O_WRONLY);
+    if(-1 == smaps_fd || -1 == dumpfile_fd)
+    {
+      puts("llfio_linux_munmap_debug: Failed to open one of the files\n");
+      abort();
+    }
+  }
+} llfio_linux_munmap_debug;
+#endif
+
 LLFIO_V2_NAMESPACE_BEGIN
 
 section_handle::~section_handle()
@@ -153,6 +172,22 @@ result<void> map_handle::close() noexcept
     // printf("%d munmap %p-%p\n", getpid(), _addr, _addr+_reservation);
     if(-1 == ::munmap(_addr, _reservation))
     {
+#ifdef LLFIO_DEBUG_LINUX_MUNMAP
+      int olderrno = errno;
+      ssize_t bytesread;
+      ::lseek(llfio_linux_munmap_debug.smaps_fd, 0, SEEK_SET);
+      char buffer[4096];
+      ::write(llfio_linux_munmap_debug.dumpfile_fd, buffer, sprintf(buffer, "\n---\nCause of munmap failure: %d (%s)\n\n", olderrno, strerror(olderrno)));
+      do
+      {
+        bytesread = ::read(llfio_linux_munmap_debug.smaps_fd, buffer, sizeof(buffer));
+        if(bytesread > 0)
+        {
+          ::write(llfio_linux_munmap_debug.dumpfile_fd, buffer, bytesread);
+        }
+      } while(bytesread > 0);
+      errno = olderrno;
+#endif
       return posix_error();
     }
   }
