@@ -439,6 +439,19 @@ public:
   //! Default constructor
   constexpr map_handle() {}  // NOLINT
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~map_handle() override;
+  //! Construct an instance managing pages at `addr`, `length`, `pagesize` and `flags`
+  explicit map_handle(byte *addr, size_type length, size_type pagesize, section_handle::flag flags, section_handle *section = nullptr, extent_type offset = 0) noexcept
+      : _section(section)
+      , _addr(addr)
+      , _offset(offset)
+      , _reservation(length)
+      , _length(length)
+      , _pagesize(pagesize)
+      , _flag(flags)
+  {
+    _v._init = -2;  // otherwise appears closed
+    _v.behaviour |= native_handle_type::disposition::allocation;
+  }
   //! Implicit move construction of map_handle permitted
   constexpr map_handle(map_handle &&o) noexcept
       : lockable_io_handle(std::move(o))
