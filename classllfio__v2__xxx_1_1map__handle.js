@@ -22,6 +22,7 @@ var classllfio__v2__xxx_1_1map__handle =
     [ "map_handle", "classllfio__v2__xxx_1_1map__handle.html#aa954d9b40b2685bbc8a229e3907c297d", null ],
     [ "map_handle", "classllfio__v2__xxx_1_1map__handle.html#a9c69e0d3f3fa2c213bdd4deabc6c2279", null ],
     [ "~map_handle", "classllfio__v2__xxx_1_1map__handle.html#a433596cf8fbaf7fa81c6ff8807c18b4e", null ],
+    [ "map_handle", "classllfio__v2__xxx_1_1map__handle.html#a8ef85c2e8a638614a39b85626467004c", null ],
     [ "map_handle", "classllfio__v2__xxx_1_1map__handle.html#a85903a9f61228497b09bf5071ffc255b", null ],
     [ "map_handle", "classllfio__v2__xxx_1_1map__handle.html#aa3225a2ee86b12e6099d15a2a87b99b4", null ],
     [ "address", "classllfio__v2__xxx_1_1map__handle.html#a7456b95e191ec373af61af6541dd4737", null ],
