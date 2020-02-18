@@ -333,38 +333,4 @@ LLFIO_V2_NAMESPACE_END
 #endif
 #endif
 
-#if !LLFIO_HEADERS_ONLY && !defined(LLFIO_DISABLE_SIZEOF_FILESYSTEM_PATH_CHECK)
-/* I've been burned by this enough times now that I'm adding a runtime check
-for differing filesystem::path implementations to ensure differing compiler
-settings don't balls up the ABI
-*/
-LLFIO_V2_NAMESPACE_BEGIN
-namespace detail
-{
-  LLFIO_HEADERS_ONLY_FUNC_SPEC size_t sizeof_filesystem_path() noexcept;
-  struct check_sizeof_filesystem_path_t
-  {
-    check_sizeof_filesystem_path_t()
-    {
-      if(sizeof(LLFIO_V2_NAMESPACE::filesystem::path) != sizeof_filesystem_path())
-      {
-#if LLFIO_LOGGING_LEVEL
-        LLFIO_LOG_FATAL(nullptr, "sizeof(filesystem::path) differs in this translation unit to sizeof(filesystem::path) for when LLFIO was built!");
-#else
-        abort();
-#endif
-      }
-    }
-  };
-  static check_sizeof_filesystem_path_t check_sizeof_filesystem_path;
-}  // namespace detail
-LLFIO_V2_NAMESPACE_END
-#endif
-
-#if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#define LLFIO_INCLUDED_BY_HEADER 1
-#include "detail/impl/logging.ipp"
-#undef LLFIO_INCLUDED_BY_HEADER
-#endif
-
 #endif

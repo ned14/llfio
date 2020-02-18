@@ -1,4 +1,4 @@
-/* LLFIO logging
+/* Configures LLFIO
 (C) 2015-2020 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: Dec 2015
 
@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../logging.hpp"
+#include "../../config.hpp"
 
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
