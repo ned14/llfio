@@ -1,5 +1,5 @@
 /* LLFIO logging
-(C) 2015-2018 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2015-2020 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: Dec 2015
 
 
@@ -30,7 +30,7 @@ Distributed under the Boost Software License, Version 1.0.
 #if LLFIO_LOGGING_LEVEL
 
 /*! \todo TODO FIXME Replace in-memory log with memory map file backed log.
-*/
+ */
 LLFIO_V2_NAMESPACE_BEGIN
 
 //! The log used by LLFIO
@@ -252,7 +252,7 @@ namespace detail
     *out = 0;
   }
   template <class T> void log_inst_to_info(T &&inst, const char *buffer) { LLFIO_LOG_INFO(inst, buffer); }
-}
+}  // namespace detail
 LLFIO_V2_NAMESPACE_END
 #ifdef _MSC_VER
 #define LLFIO_LOG_FUNCTION_CALL(inst)                                                                                                                                                                                                                                                                                          \
@@ -327,10 +327,44 @@ namespace detail
     }
 #endif
   }
-}
+}  // namespace detail
 
 LLFIO_V2_NAMESPACE_END
 #endif
+#endif
+
+#if !LLFIO_HEADERS_ONLY && !defined(LLFIO_DISABLE_SIZEOF_FILESYSTEM_PATH_CHECK)
+/* I've been burned by this enough times now that I'm adding a runtime check
+for differing filesystem::path implementations to ensure differing compiler
+settings don't balls up the ABI
+*/
+LLFIO_V2_NAMESPACE_BEGIN
+namespace detail
+{
+  LLFIO_HEADERS_ONLY_FUNC_SPEC size_t sizeof_filesystem_path() noexcept;
+  struct check_sizeof_filesystem_path_t
+  {
+    check_sizeof_filesystem_path_t()
+    {
+      if(sizeof(LLFIO_V2_NAMESPACE::filesystem::path) != sizeof_filesystem_path())
+      {
+#if LLFIO_LOGGING_LEVEL
+        LLFIO_LOG_FATAL(nullptr, "sizeof(filesystem::path) differs in this translation unit to sizeof(filesystem::path) for when LLFIO was built!");
+#else
+        abort();
+#endif
+      }
+    }
+  };
+  static check_sizeof_filesystem_path_t check_sizeof_filesystem_path;
+}  // namespace detail
+LLFIO_V2_NAMESPACE_END
+#endif
+
+#if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define LLFIO_INCLUDED_BY_HEADER 1
+#include "detail/impl/logging.ipp"
+#undef LLFIO_INCLUDED_BY_HEADER
 #endif
 
 #endif
