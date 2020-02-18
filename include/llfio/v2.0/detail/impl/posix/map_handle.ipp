@@ -156,7 +156,8 @@ map_handle::~map_handle()
     auto ret = map_handle::close();
     if(ret.has_error())
     {
-      LLFIO_LOG_FATAL(_v.fd, "map_handle::~map_handle() close failed");
+      LLFIO_LOG_FATAL(_v.fd, "map_handle::~map_handle() close failed. Cause is typically other code modifying mapped regions. If on Linux, you may have exceeded the 64k VMA process limit, set the LLFIO_DEBUG_LINUX_MUNMAP macro at the top of posix/map_handle.ipp to cause dumping of VMAs to "
+                             "/tmp/llfio_unmap_debug_smaps.txt, and combine with strace to figure it out.");
       abort();
     }
   }
