@@ -1,5 +1,5 @@
 /* LLFIO logging
-(C) 2015-2018 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2015-2020 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: Dec 2015
 
 
@@ -30,7 +30,7 @@ Distributed under the Boost Software License, Version 1.0.
 #if LLFIO_LOGGING_LEVEL
 
 /*! \todo TODO FIXME Replace in-memory log with memory map file backed log.
-*/
+ */
 LLFIO_V2_NAMESPACE_BEGIN
 
 //! The log used by LLFIO
@@ -252,7 +252,7 @@ namespace detail
     *out = 0;
   }
   template <class T> void log_inst_to_info(T &&inst, const char *buffer) { LLFIO_LOG_INFO(inst, buffer); }
-}
+}  // namespace detail
 LLFIO_V2_NAMESPACE_END
 #ifdef _MSC_VER
 #define LLFIO_LOG_FUNCTION_CALL(inst)                                                                                                                                                                                                                                                                                          \
@@ -327,7 +327,7 @@ namespace detail
     }
 #endif
   }
-}
+}  // namespace detail
 
 LLFIO_V2_NAMESPACE_END
 #endif

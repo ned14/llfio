@@ -167,7 +167,7 @@ result<file_handle> file_handle::reopen(mode mode_, caching caching_, deadline d
     result<file_handle> ret(file_handle(native_handle_type(), _devid, _inode, caching_, _flags));
     ret.value()._service = _service;
     ret.value()._v.behaviour = _v.behaviour;
-    ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC);
+    ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC, 0);
     if(-1 == ret.value()._v.fd)
     {
       return posix_error();

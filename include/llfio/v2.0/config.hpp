@@ -1,5 +1,5 @@
 /* Configures LLFIO
-(C) 2015-2018 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2015-2020 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: Dec 2015
 
 
@@ -523,6 +523,47 @@ function exported from the LLFIO DLL if not building headers only.
 #define LLFIO_HEADERS_ONLY_FUNC_SPEC extern LLFIO_DECL
 #define LLFIO_HEADERS_ONLY_MEMFUNC_SPEC
 #define LLFIO_HEADERS_ONLY_VIRTUAL_SPEC virtual
+#endif
+
+/* I've been burned by this enough times now that I'm adding a runtime check
+for differing filesystem::path implementations to ensure differing compiler
+settings don't balls up the ABI. NOTE that you CANNOT use anything but the
+C library here, as we run before the C++ runtime inits.
+*/
+#if !LLFIO_HEADERS_ONLY && !defined(LLFIO_DISABLE_SIZEOF_FILESYSTEM_PATH_CHECK)
+#include <cstdio>
+LLFIO_V2_NAMESPACE_BEGIN
+namespace detail
+{
+  LLFIO_HEADERS_ONLY_FUNC_SPEC size_t sizeof_filesystem_path() noexcept;
+  struct check_sizeof_filesystem_path_t
+  {
+    template <size_t N> check_sizeof_filesystem_path_t(const char (&filepath)[N])
+    {
+      if(sizeof(LLFIO_V2_NAMESPACE::filesystem::path) != sizeof_filesystem_path())
+      {
+        fprintf(stderr, "FATAL: sizeof(filesystem::path) = %u differs in the translation unit '%s' to the sizeof(filesystem::path) = %u as when LLFIO was built!\n", (unsigned) sizeof(LLFIO_V2_NAMESPACE::filesystem::path), filepath, (unsigned) sizeof_filesystem_path());
+        abort();
+      }
+    }
+  };
+}  // namespace detail
+LLFIO_V2_NAMESPACE_END
+
+#ifndef LLFIO_DISABLE_INLINE_SIZEOF_FILESYSTEM_PATH_CHECK
+// Ensure this TU performs the runtime ABI check
+#ifdef __BASE_FILE__
+static LLFIO_V2_NAMESPACE::detail::check_sizeof_filesystem_path_t llfio_check_sizeof_filesystem_path(__BASE_FILE__);
+#else
+static LLFIO_V2_NAMESPACE::detail::check_sizeof_filesystem_path_t llfio_check_sizeof_filesystem_path("?");
+#endif
+#endif
+#endif
+
+#if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
+#define LLFIO_INCLUDED_BY_HEADER 1
+#include "detail/impl/config.ipp"
+#undef LLFIO_INCLUDED_BY_HEADER
 #endif
 
 #endif

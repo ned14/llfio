@@ -183,7 +183,7 @@ result<directory_handle> directory_handle::reopen(mode mode_, caching caching_, 
   {
     result<directory_handle> ret(directory_handle(native_handle_type(), _devid, _inode, _caching, _flags));
     ret.value()._v.behaviour = _v.behaviour;
-    ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC);
+    ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC, 0);
     if(-1 == ret.value()._v.fd)
     {
       return posix_error();
@@ -250,7 +250,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> directory_handle::clone_to_p
   LLFIO_LOG_FUNCTION_CALL(this);
   result<path_handle> ret(path_handle(native_handle_type(), _caching, _flags));
   ret.value()._v.behaviour = _v.behaviour;
-  ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC);
+  ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC, 0);
   if(-1 == ret.value()._v.fd)
   {
     return posix_error();

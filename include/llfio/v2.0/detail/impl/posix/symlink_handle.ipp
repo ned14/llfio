@@ -147,7 +147,7 @@ result<symlink_handle> symlink_handle::reopen(mode mode_, deadline d) const noex
   {
     result<symlink_handle> ret(symlink_handle(native_handle_type(), _devid, _inode, _flags));
     ret.value()._v.behaviour = _v.behaviour;
-    ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC);
+    ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC, 0);
     if(-1 == ret.value()._v.fd)
     {
       return posix_error();
