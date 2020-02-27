@@ -29,6 +29,18 @@ include(QuickCppLibPolicies)
 
 option(LLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE "Whether to use SG14 status_code for failure handling" OFF)
 
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include/llfio/ntkernel-error-category/include")
+  include(FindGit)
+  message(STATUS "NOTE: Running ${GIT_EXECUTABLE} submodule update --init --recursive ...")
+  execute_process(COMMAND "${GIT_EXECUTABLE}" submodule update --init --recursive
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+    RESULT_VARIABLE retcode
+  )
+  if(retcode)
+    message(FATAL_ERROR "FATAL: git submodule update failed with code ${retcode}")
+  endif()
+endif()
+
 # Parse the version we tell cmake directly from the version header file
 ParseProjectVersionFromHpp("${CMAKE_CURRENT_SOURCE_DIR}/include/llfio/version.hpp" VERSIONSTRING)
 # Sets the usual PROJECT_NAME etc
