@@ -1,5 +1,5 @@
 # LLFIO cmake
-# (C) 2016-2019 Niall Douglas <http://www.nedproductions.biz/>
+# (C) 2016-2020 Niall Douglas <http://www.nedproductions.biz/>
 # File Created: June 2016
 # 
 # 
@@ -21,7 +21,7 @@
 #     (See accompanying file Licence.txt or copy at
 #           http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
 include(cmake/QuickCppLibBootstrap.cmake)
 include(QuickCppLibRequireOutOfSourceBuild)
 include(QuickCppLibUtils)
@@ -89,6 +89,7 @@ if(NOT PROJECT_IS_DEPENDENCY)
       function(make_single_header target name)
         add_partial_preprocess(${target}
                               "${name}"
+                              "${CMAKE_CURRENT_SOURCE_DIR}/include/llfio/revision.hpp"
                               ${ARGN}
                               -I ..
                               --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs
@@ -234,6 +235,11 @@ endif()
 
 if(NOT PROJECT_IS_DEPENDENCY)
   # For all possible configurations of this library, add each test
+  set(llfio_TESTS_DISABLE_PRECOMPILE_HEADERS
+    "llfio_hl--coroutines"
+    "llfio_sl--coroutines"
+    "llfio_dl--coroutines"
+  )
   include(QuickCppLibMakeStandardTests)
   # For each test target, set definitions and linkage
   foreach(target ${llfio_COMPILE_TEST_TARGETS} ${llfio_TEST_TARGETS})
