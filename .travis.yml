@@ -133,7 +133,7 @@ script:
      cd test_cpp-pm_install;
      mkdir build;
      cd build;
-     cmake .. $CMAKE_CONFIGURE_OPTIONS -DCMAKE_BUILD_TYPE=Release;
+     cmake .. -DCMAKE_BUILD_TYPE=Release;
      cmake --build .;
    fi
  
