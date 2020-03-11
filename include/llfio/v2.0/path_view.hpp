@@ -44,10 +44,14 @@ Distributed under the Boost Software License, Version 1.0.
 #define LLFIO_PATH_VIEW_CONSTEXPR constexpr
 #endif
 
+/* GCC defines __CHAR8_TYPE__ if there is a char8_t.
+clang defines __cpp_char8_t if there is a char8_t.
+MSVC seems to only implement char8_t if C++ 20 is enabled.
+*/
 #ifndef LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED
 #if (defined(_MSC_VER) && !defined(__clang__) && !_HAS_CXX20) \
      || (defined(__GNUC__) && !defined(__clang__) && !defined(__CHAR8_TYPE__)) \
-     || (defined(__clang__) && !defined(__CHAR8_TYPE__) && (__cplusplus < 202000L || __clang_major__ < 9))
+     || (defined(__clang__) && !defined(__cpp_char8_t))
 #define LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED 1
 #else
 #define LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED 0
