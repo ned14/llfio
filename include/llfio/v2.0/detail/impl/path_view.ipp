@@ -360,7 +360,12 @@ namespace detail
     return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, (const char *) src_buffer, src_buffer_length);
 #endif
 #else
+#if defined(_LIBCPP_VERSION)
+    // libc++ appears to be missing char8_t to wchar_t codecvt entirely
+    return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, (const char *) src_buffer, src_buffer_length);
+#else
     return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, src_buffer, src_buffer_length);
+#endif
 #endif
   }
   wchar_t *reencode_path_to(size_t &toallocate, wchar_t *dest_buffer, size_t dest_buffer_length, const char16_t *src_buffer, size_t src_buffer_length)
