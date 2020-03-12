@@ -20,7 +20,7 @@
 #     (See accompanying file Licence.txt or copy at
 #           http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 # If necessary bring in the quickcpplib cmake tooling
 set(quickcpplib_done OFF)
 foreach(item ${CMAKE_MODULE_PATH})
@@ -31,26 +31,30 @@ endforeach()
 if(NOT quickcpplib_done)
   # CMAKE_SOURCE_DIR is the very topmost parent cmake project
   # CMAKE_CURRENT_SOURCE_DIR is the current cmake subproject
-  set(CTEST_QUICKCPPLIB_CLONE_DIR)
-  
-  # If there is a magic .quickcpplib_use_siblings directory above the topmost project, use sibling edition
-  if(EXISTS "${CMAKE_SOURCE_DIR}/../.quickcpplib_use_siblings" AND NOT QUICKCPPLIB_DISABLE_SIBLINGS)
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../quickcpplib/cmakelib")
-    set(CTEST_QUICKCPPLIB_SCRIPTS "${CMAKE_SOURCE_DIR}/../quickcpplib/scripts")
-    # Copy latest version of myself into end user
-    file(COPY "${CTEST_QUICKCPPLIB_SCRIPTS}/../cmake/QuickCppLibBootstrap.cmake" DESTINATION "${CMAKE_SOURCE_DIR}/cmake/")
-  elseif(CMAKE_BINARY_DIR)
-    # Place into root binary directory, same place as where find_quickcpplib_library() puts dependencies.
-    set(CTEST_QUICKCPPLIB_CLONE_DIR "${CMAKE_BINARY_DIR}/quickcpplib")
-  else()
-    # We must be being called from a ctest script. No way of knowing what the build directory
-    # will be, so simply clone into the current directory
-    set(CTEST_QUICKCPPLIB_CLONE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/quickcpplib")
+  if(NOT DEFINED CTEST_QUICKCPPLIB_CLONE_DIR)
+    # If there is a magic .quickcpplib_use_siblings directory above the topmost project, use sibling edition
+    if(EXISTS "${CMAKE_SOURCE_DIR}/../.quickcpplib_use_siblings" AND NOT QUICKCPPLIB_DISABLE_SIBLINGS)
+      set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../quickcpplib/cmakelib")
+      set(CTEST_QUICKCPPLIB_SCRIPTS "${CMAKE_SOURCE_DIR}/../quickcpplib/scripts")
+      # Copy latest version of myself into end user
+      file(COPY "${CTEST_QUICKCPPLIB_SCRIPTS}/../cmake/QuickCppLibBootstrap.cmake" DESTINATION "${CMAKE_SOURCE_DIR}/cmake/")
+    elseif(CMAKE_BINARY_DIR)
+      # Place into root binary directory, same place as where find_quickcpplib_library() puts dependencies.
+      set(CTEST_QUICKCPPLIB_CLONE_DIR "${CMAKE_BINARY_DIR}/quickcpplib")
+    else()
+      # We must be being called from a ctest script. No way of knowing what the build directory
+      # will be, so simply clone into the current directory
+      set(CTEST_QUICKCPPLIB_CLONE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/quickcpplib")
+    endif()
   endif()
   if(CTEST_QUICKCPPLIB_CLONE_DIR)
-    file(MAKE_DIRECTORY "${CTEST_QUICKCPPLIB_CLONE_DIR}")
-    find_package(quickcpplib QUIET CONFIG NO_DEFAULT_PATH PATHS "${CTEST_QUICKCPPLIB_CLONE_DIR}/repo")
-    if(NOT quickcpplib_FOUND)
+    if(NOT EXISTS "${CTEST_QUICKCPPLIB_CLONE_DIR}/repo/cmakelib")
+      file(MAKE_DIRECTORY "${CTEST_QUICKCPPLIB_CLONE_DIR}")
+      find_package(quickcpplib QUIET CONFIG PATHS "${CTEST_QUICKCPPLIB_CLONE_DIR}/repo")
+      if(quickcpplib_FOUND)
+      endif()
+    endif()
+    if(NOT EXISTS "${CTEST_QUICKCPPLIB_CLONE_DIR}/repo/cmakelib")
       message(STATUS "quickcpplib not found, cloning git repository and installing into ${CTEST_QUICKCPPLIB_CLONE_DIR} ...")
       include(FindGit)
       execute_process(COMMAND "${GIT_EXECUTABLE}" clone "https://github.com/ned14/quickcpplib.git" repo
@@ -59,7 +63,7 @@ if(NOT quickcpplib_done)
         ERROR_VARIABLE errout
       )
       if(NOT EXISTS "${CTEST_QUICKCPPLIB_CLONE_DIR}/repo/cmakelib")
-        message(FATAL_ERROR "FATAL: Failed to git clone quickcpplib!\n\nstdout was: ${cloneout}\n\nstderr was: ${errout}")
+        message(FATAL_ERROR "FATAL: Failed to git clone quickcpplib!\n\nstdout was: ${cloneout}\n\nstderr was: ${errout}\n\nIf you are in a build environment which prevents use of the internet during superbuild, please place a clone of quickcpplib into '${CTEST_QUICKCPPLIB_CLONE_DIR}/repo' i.e. as if 'cd \"${CTEST_QUICKCPPLIB_CLONE_DIR}\" && git clone --recursive \"https://github.com/ned14/quickcpplib.git\" repo'. You can also predefine CTEST_QUICKCPPLIB_CLONE_DIR to point at a copy of quickcpplib during cmake configuration.")
       endif()
     endif()
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CTEST_QUICKCPPLIB_CLONE_DIR}/repo/cmakelib")

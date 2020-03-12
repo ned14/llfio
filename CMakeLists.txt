@@ -21,7 +21,7 @@
 #     (See accompanying file Licence.txt or copy at
 #           http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 include(cmake/QuickCppLibBootstrap.cmake)
 include(QuickCppLibRequireOutOfSourceBuild)
 include(QuickCppLibUtils)
