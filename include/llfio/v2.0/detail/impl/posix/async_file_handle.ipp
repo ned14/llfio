@@ -62,7 +62,7 @@ async_file_handle::io_result<async_file_handle::const_buffers_type> async_file_h
 template <class BuffersType, class IORoutine> result<async_file_handle::io_state_ptr> async_file_handle::_begin_io(span<char> mem, async_file_handle::operation_t operation, async_file_handle::io_request<BuffersType> reqs, async_file_handle::_erased_completion_handler &&completion, IORoutine && /*unused*/) noexcept
 {
   // Need to keep a set of aiocbs matching the scatter-gather buffers
-  struct state_type : public _erased_io_state_type
+  struct state_type final : public _erased_io_state_type
   {
 #if LLFIO_USE_POSIX_AIO
     struct aiocb aiocbs[1]{};

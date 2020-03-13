@@ -49,9 +49,7 @@ clang defines __cpp_char8_t if there is a char8_t.
 MSVC seems to only implement char8_t if C++ 20 is enabled.
 */
 #ifndef LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED
-#if (defined(_MSC_VER) && !defined(__clang__) && !_HAS_CXX20) \
-     || (defined(__GNUC__) && !defined(__clang__) && !defined(__CHAR8_TYPE__)) \
-     || (defined(__clang__) && !defined(__cpp_char8_t))
+#if(defined(_MSC_VER) && !defined(__clang__) && !_HAS_CXX20) || (defined(__GNUC__) && !defined(__clang__) && !defined(__CHAR8_TYPE__)) || (defined(__clang__) && !defined(__cpp_char8_t))
 #define LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED 1
 #else
 #define LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED 0
@@ -141,9 +139,11 @@ class path_view;
 class path_view_component;
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view_component x, path_view_component y) noexcept;
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view_component x, path_view_component y) noexcept;
+template <class F> inline LLFIO_PATH_VIEW_CONSTEXPR auto visit(path_view_component view, F &&f);
 inline std::ostream &operator<<(std::ostream &s, const path_view_component &v);
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view x, path_view y) noexcept;
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view x, path_view y) noexcept;
+template <class F> inline LLFIO_PATH_VIEW_CONSTEXPR auto visit(path_view view, F &&f);
 inline std::ostream &operator<<(std::ostream &s, const path_view &v);
 
 /*! \class path_view_component
@@ -153,9 +153,11 @@ class LLFIO_DECL path_view_component
 {
   friend class path_view;
   friend class detail::path_view_iterator;
-  friend inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view_component x, path_view_component y) noexcept;
-  friend inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view_component x, path_view_component y) noexcept;
-  friend inline std::ostream &operator<<(std::ostream &s, const path_view_component &v);
+  friend inline LLFIO_PATH_VIEW_CONSTEXPR bool LLFIO_V2_NAMESPACE::operator==(path_view_component x, path_view_component y) noexcept;
+  friend inline LLFIO_PATH_VIEW_CONSTEXPR bool LLFIO_V2_NAMESPACE::operator!=(path_view_component x, path_view_component y) noexcept;
+  template <class F> friend inline LLFIO_PATH_VIEW_CONSTEXPR auto LLFIO_V2_NAMESPACE::visit(path_view_component view, F &&f);
+  template <class F> friend inline LLFIO_PATH_VIEW_CONSTEXPR auto LLFIO_V2_NAMESPACE::visit(path_view view, F &&f);
+  friend inline std::ostream &LLFIO_V2_NAMESPACE::operator<<(std::ostream &s, const path_view_component &v);
 
 public:
   //! The preferred separator type
@@ -830,6 +832,11 @@ inline constexpr bool operator!=(const CharT * /*unused*/, path_view_component /
   static_assert(!path_view_component::is_source_acceptable<CharT>, "Do not use operator!= with path_view_component and a string literal, use .compare<>()");
   return false;
 }
+//! \brief Visit the underlying source for a `path_view_component`
+template <class F> inline LLFIO_PATH_VIEW_CONSTEXPR auto visit(path_view_component view, F &&f)
+{
+  return view._invoke(static_cast<F &&>(f));
+}
 
 namespace detail
 {
@@ -961,9 +968,10 @@ maximum compatibility you should still use the Win32 API.
 class path_view
 {
   friend class detail::path_view_iterator;
-  friend inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view x, path_view y) noexcept;
-  friend inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view x, path_view y) noexcept;
-  friend inline std::ostream &operator<<(std::ostream &s, const path_view &v);
+  friend inline LLFIO_PATH_VIEW_CONSTEXPR bool LLFIO_V2_NAMESPACE::operator==(path_view x, path_view y) noexcept;
+  friend inline LLFIO_PATH_VIEW_CONSTEXPR bool LLFIO_V2_NAMESPACE::operator!=(path_view x, path_view y) noexcept;
+  template <class F> friend inline LLFIO_PATH_VIEW_CONSTEXPR auto LLFIO_V2_NAMESPACE::visit(path_view view, F &&f);
+  friend inline std::ostream &LLFIO_V2_NAMESPACE::operator<<(std::ostream &s, const path_view &v);
 
 public:
   //! Const iterator type
@@ -1454,6 +1462,11 @@ inline constexpr bool operator!=(const CharT * /*unused*/, path_view /*unused*/)
   static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator!= with path_view and a string literal, use .compare<>()");
   return false;
 }
+//! \brief Visit the underlying source for a `path_view`
+template <class F> inline LLFIO_PATH_VIEW_CONSTEXPR auto visit(path_view view, F &&f)
+{
+  return view._state._invoke(static_cast<F &&>(f));
+}
 inline std::ostream &operator<<(std::ostream &s, const path_view &v)
 {
   return s << v._state;
@@ -1496,9 +1509,10 @@ namespace detail
   private:
     const path_view *_parent{nullptr};
     size_type _begin{0}, _end{0};
+    int _special{0};  // -1 if at preceding /, +1 if at trailing /
 
     static constexpr auto _npos = string_view::npos;
-    constexpr bool _is_end() const noexcept { return (nullptr == _parent) || _parent->native_size() == _begin; }
+    constexpr bool _is_end() const noexcept { return (nullptr == _parent) || (!_special && _parent->native_size() == _begin); }
     LLFIO_PATH_VIEW_CONSTEXPR value_type _get() const noexcept
     {
       assert(_parent != nullptr);
@@ -1510,29 +1524,53 @@ namespace detail
     }
     LLFIO_PATH_VIEW_CONSTEXPR void _inc() noexcept
     {
-      _begin = _end;
-      _end = _parent->_state._find_first_sep(_begin + 1);
+      _begin = (_end > 0 && !_special) ? (_end + 1) : _end;
+      _end = _parent->_state._find_first_sep(_begin);
+      if(0 == _end)
+      {
+        // Path has a beginning /
+        _special = -1;
+        _end = 1;
+        return;
+      }
       if(_npos == _end)
       {
-        _parent->_state._invoke([this](const auto &v) { _end = v.size(); });
+        _end = _parent->native_size();
+        if(_begin == _end && !_special)
+        {
+          // Path has a trailing /
+          _special = 1;
+          return;
+        }
+        if(_begin > _end)
+        {
+          _begin = _end;
+        }
       }
-      if(_end > _begin)
-      {
-        ++_begin;
-      }
+      _special = 0;
     }
     constexpr void _dec() noexcept
     {
-      _end = _begin;
-      _begin = _parent->_state._find_last_sep(_end - 1);
-      if(_npos == _begin)
+      auto is_end = _is_end();
+      _end = is_end ? _begin : (_begin - 1);
+      if(0 == _end)
       {
+        // Path has a beginning /
+        _special = -1;
         _begin = 0;
+        _end = 1;
+        return;
       }
-      if(_begin < _end)
+      _begin = _parent->_state._find_last_sep(_end - 1);
+      if(is_end && _begin == _end - 1)
       {
-        --_end;
+        // Path has a trailing /
+        _special = 1;
+        _begin = _end;
+        return;
       }
+      _begin = (_npos == _begin) ? 0 : (_begin + 1);
+      _special = 0;
     }
 
     constexpr path_view_iterator(const path_view *p, bool end)
@@ -1565,7 +1603,7 @@ namespace detail
       {
         return false;
       }
-      return _parent != o._parent || _begin != o._begin || _end != o._end;
+      return _parent != o._parent || _begin != o._begin || _end != o._end || _special != o._special;
     }
     constexpr bool operator==(path_view_iterator o) const noexcept
     {
@@ -1573,7 +1611,7 @@ namespace detail
       {
         return true;
       }
-      return _parent == o._parent && _begin == o._begin && _end == o._end;
+      return _parent == o._parent && _begin == o._begin && _end == o._end && _special == o._special;
     }
 
     constexpr path_view_iterator &operator--() noexcept
