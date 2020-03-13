@@ -24,6 +24,7 @@ It is a complete rewrite after a Boost peer review in August 2015. Its github
 source code repository lives at https://github.com/ned14/llfio.
 
 - Portable to any conforming C++ 14 compiler with a working Filesystem TS in its STL.
+    - Note that VS2019 16.3 and libc++ 11 dropped support for Filesystem in C++ 14.
 - Will make use of any Concepts TS if you have them.
 - Provides view adapters into the Ranges TS, so ready for STL2.
 - Original error code is always preserved, even down to the original NT kernel error code if a NT kernel API was used.
