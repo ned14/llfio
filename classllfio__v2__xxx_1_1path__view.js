@@ -57,7 +57,8 @@ var classllfio__v2__xxx_1_1path__view =
     [ "stem", "classllfio__v2__xxx_1_1path__view.html#a8e0dbd474d2c668a0c33a01e7a5aafe8", null ],
     [ "swap", "classllfio__v2__xxx_1_1path__view.html#ab7ae611a6aa7fed01b4447a3f5133c14", null ],
     [ "c_str", "classllfio__v2__xxx_1_1path__view.html#a9c02c1b6cc56f8221abea75a1e92a776", null ],
-    [ "operator!=", "classllfio__v2__xxx_1_1path__view.html#a9ec27b9ac42042eb58d44837bdc1773c", null ],
-    [ "operator<<", "classllfio__v2__xxx_1_1path__view.html#a565624fc24e6a6d57d38d0471e91cd84", null ],
-    [ "operator==", "classllfio__v2__xxx_1_1path__view.html#a867468c27c376aa62c4ecc5413367bba", null ]
+    [ "llfio_v2_xxx::operator!=", "classllfio__v2__xxx_1_1path__view.html#a2abd5b3147c3dadfd9f556dff8679c46", null ],
+    [ "llfio_v2_xxx::operator<<", "classllfio__v2__xxx_1_1path__view.html#af2f7621850a85841df4db5f456d63dc4", null ],
+    [ "llfio_v2_xxx::operator==", "classllfio__v2__xxx_1_1path__view.html#a04eaaa00f1a82c4160c60043df70c8f9", null ],
+    [ "llfio_v2_xxx::visit", "classllfio__v2__xxx_1_1path__view.html#a33c2b4df34059bab2ec3c9239f29b1a9", null ]
 ];

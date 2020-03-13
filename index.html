@@ -102,7 +102,10 @@ $(document).ready(function(){initNavTree('index.html','');});
 </center><p>Herein lies my proposed zero whole machine memory copy async file i/o and filesystem library for Boost and the C++ standard, intended for storage devices with ~1 microsecond 4Kb transfer latencies and those supporting Storage Class Memory (SCM)/Direct Access Storage (DAX). Its i/o overhead, including syscall overhead, has been benchmarked to 100 nanoseconds on Linux which corresponds to a theoretical maximum of 10M IOPS @ QD1, approx 40Gb/sec per thread. It has particularly strong support for writing portable filesystem algorithms which work well with directly mapped non-volatile storage such as Intel Optane.</p>
 <p>It is a complete rewrite after a Boost peer review in August 2015. Its github source code repository lives at <a href="https://github.com/ned14/llfio">https://github.com/ned14/llfio</a>.</p>
 <ul>
-<li>Portable to any conforming C++ 14 compiler with a working Filesystem TS in its STL.</li>
+<li>Portable to any conforming C++ 14 compiler with a working Filesystem TS in its STL.<ul>
+<li>Note that VS2019 16.3 and libc++ 11 dropped support for Filesystem in C++ 14.</li>
+</ul>
+</li>
 <li>Will make use of any Concepts TS if you have them.</li>
 <li>Provides view adapters into the Ranges TS, so ready for STL2.</li>
 <li>Original error code is always preserved, even down to the original NT kernel error code if a NT kernel API was used.<ul>

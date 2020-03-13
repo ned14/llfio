@@ -9,8 +9,8 @@ var path__view_8hpp =
     [ "LLFIO_TEMPLATE", "path__view_8hpp.html#a3e68b8ef674b43bc67a04576a5d9a99e", null ],
     [ "operator!=", "path__view_8hpp.html#a0846b040cbf733b34787c76a39e35b85", null ],
     [ "operator!=", "path__view_8hpp.html#ad34f076b77f1de6ae1660108254f2183", null ],
-    [ "operator<<", "path__view_8hpp.html#a20dbb9e8deed80ea3d0b65d52fd34771", null ],
-    [ "operator<<", "path__view_8hpp.html#a0247c61a58f54b12119505f6b12aef2b", null ],
+    [ "operator<<", "path__view_8hpp.html#ada4abf0a0e41c43e53dad057607cebbc", null ],
+    [ "operator<<", "path__view_8hpp.html#ae057a480e66afcac3fe44d6a62f07433", null ],
     [ "operator==", "path__view_8hpp.html#a6024cdc07fef0c772c14ec1f91defa75", null ],
     [ "operator==", "path__view_8hpp.html#aa93a5ee3bddc44cc342826ff9892a170", null ],
     [ "reencode_path_to", "path__view_8hpp.html#a13faa6de476f799028a4bf143facd46c", null ],
@@ -22,5 +22,7 @@ var path__view_8hpp =
     [ "reencode_path_to", "path__view_8hpp.html#ad5a486f4772daf5d5586d27591fc8f9b", null ],
     [ "reencode_path_to", "path__view_8hpp.html#a46e59fbd0b20657311cfa8015f9525a7", null ],
     [ "reencode_path_to", "path__view_8hpp.html#ab87d8f741a60f9b2c2646efd9d00d8df", null ],
-    [ "reencode_path_to", "path__view_8hpp.html#a242ba0cf05b33c8dabf070791e92c50e", null ]
+    [ "reencode_path_to", "path__view_8hpp.html#a242ba0cf05b33c8dabf070791e92c50e", null ],
+    [ "visit", "path__view_8hpp.html#a1374384491dae4c33de1ddd218336f98", null ],
+    [ "visit", "path__view_8hpp.html#afb0c1c2fcbfe481393f9122019d3f3e3", null ]
 ];
