@@ -26,12 +26,12 @@ Distributed under the Boost Software License, Version 1.0.
 
 template <class U> inline void CheckPathView(const LLFIO_V2_NAMESPACE::filesystem::path &p, const char *desc, U &&c)
 {
-  using LLFIO_V2_NAMESPACE::filesystem::path;
   using LLFIO_V2_NAMESPACE::path_view;
+  using LLFIO_V2_NAMESPACE::filesystem::path;
   auto r1 = c(p);
   auto r2 = c(path_view(p));
   BOOST_CHECK(r1 == r2);
-  //if(r1 != r2)
+  // if(r1 != r2)
   {
     std::cerr << "For " << desc << " with path " << p << "\n";
     std::cerr << "   filesystem::path returned " << r1 << "\n";
@@ -48,6 +48,31 @@ static inline void CheckPathView(const LLFIO_V2_NAMESPACE::filesystem::path &pat
   CheckPathView(path, "filename()", [](const auto &p) { return p.filename(); });
   CheckPathView(path, "stem()", [](const auto &p) { return p.stem(); });
   CheckPathView(path, "extension()", [](const auto &p) { return p.extension(); });
+}
+
+static inline void CheckPathIteration(const LLFIO_V2_NAMESPACE::filesystem::path &path)
+{
+  LLFIO_V2_NAMESPACE::filesystem::path test1(path);
+  LLFIO_V2_NAMESPACE::path_view test2(test1);
+  std::cout << "\n" << test1 << std::endl;
+  auto it1 = test1.begin();
+  auto it2 = test2.begin();
+  for(; it1 != test1.end() && it2 != test2.end(); ++it1, ++it2)
+  {
+    std::cout << "   " << *it1 << " == " << *it2 << "?" << std::endl;
+    BOOST_CHECK(*it1 == it2->path());
+  }
+  BOOST_CHECK(it1 == test1.end());
+  BOOST_CHECK(it2 == test2.end());
+  for(--it1, --it2; it1 != test1.begin() && it2 != test2.begin(); --it1, --it2)
+  {
+    std::cout << "   " << *it1 << " == " << *it2 << "?" << std::endl;
+    BOOST_CHECK(*it1 == it2->path());
+  }
+  BOOST_CHECK(it1 == test1.begin());
+  BOOST_CHECK(it2 == test2.begin());
+  std::cout << "   " << *it1 << " == " << *it2 << "?" << std::endl;
+  BOOST_CHECK(*it1 == it2->path());
 }
 
 static inline void TestPathView()
@@ -75,17 +100,11 @@ static inline void TestPathView()
   BOOST_CHECK(h.buffer == p + 70);  // NOLINT
 #endif
   CheckPathView("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir");
-#if 0
-  // I think we are standards conforming here, Dinkumware and libstdc++ are not
   CheckPathView("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir/");
-#endif
   CheckPathView("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir/0");
   CheckPathView("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir/0.txt");
   CheckPathView("boostish/afio/programs/build_posix/testdir");
-#if 0
-  // I think we are standards conforming here, Dinkumware and libstdc++ are not
   CheckPathView("boostish/afio/programs/build_posix/testdir/");
-#endif
   CheckPathView("boostish/afio/programs/build_posix/testdir/0");
   CheckPathView("boostish/afio/programs/build_posix/testdir/0.txt");
   CheckPathView("0");
@@ -130,7 +149,7 @@ static inline void TestPathView()
   CheckPathView(L"C:\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir\\0");
   CheckPathView("C:/Users/ned/Documents/boostish/afio/programs/build_posix/testdir/0.txt");
   CheckPathView(L"\\\\niall\\douglas.txt");
-  //CheckPathView(L"\\!!\\niall\\douglas.txt");
+  // CheckPathView(L"\\!!\\niall\\douglas.txt");
 #ifndef _EXPERIMENTAL_FILESYSTEM_
   CheckPathView(L"\\??\\niall\\douglas.txt");
 #endif
@@ -148,6 +167,20 @@ static inline void TestPathView()
 #else
   BOOST_CHECK(llfio::path_view("/niall").is_absolute());
 #endif
+
+  // Does iteration work right?
+  CheckPathIteration("/mnt/testdir");
+  CheckPathIteration("/mnt/testdir/");
+  CheckPathIteration("boostish/testdir");
+  CheckPathIteration("boostish/testdir/");
+  CheckPathIteration("/a/c");
+  CheckPathIteration("/a/c/");
+  CheckPathIteration("a/c");
+  CheckPathIteration("a/c/");
+
+  // Does visitation work right?
+  visit(llfio::path_view("hi"), [](auto sv) { BOOST_CHECK(0 == memcmp(sv.data(), "hi", 2)); });
+  visit(*llfio::path_view(L"hi").begin(), [](auto sv) { BOOST_CHECK(0 == memcmp(sv.data(), L"hi", 4)); });
 }
 
 KERNELTEST_TEST_KERNEL(integration, llfio, path_view, path_view, "Tests that llfio::path_view() works as expected", TestPathView())

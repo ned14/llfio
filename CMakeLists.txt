@@ -196,6 +196,14 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
   endif()
 endif()
 if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD" OR APPLE)
+  if(CLANG_VERSION_MAJOR GREATER_EQUAL 9)
+    # Do nothing, it's built in
+  elseif(CLANG_VERSION_MAJOR GREATER_EQUAL 7)
+    find_library(libcxx_cxxfs c++fs)
+    all_link_libraries(PUBLIC ${libcxx_cxxfs})
+  endif()
+  # Link in experimental always. If library is in C++ 14, or older LLVM, experimental filesystem will be used.
+  # If libc++fs or built-in filesystem is used, this link will be discarded.
   find_library(libcxx_cxxexperimental c++experimental)
   all_link_libraries(PUBLIC ${libcxx_cxxexperimental})
 endif()

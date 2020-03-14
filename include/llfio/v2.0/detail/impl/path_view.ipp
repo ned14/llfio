@@ -361,8 +361,14 @@ namespace detail
 #endif
 #else
 #if defined(_LIBCPP_VERSION)
-    // libc++ appears to be missing char8_t to wchar_t codecvt entirely
-    return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, (const char *) src_buffer, src_buffer_length);
+    // libc++ appears to be missing anything to wchar_t codecvt entirely
+    (void) toallocate;
+    (void) dest_buffer;
+    (void) dest_buffer_length;
+    (void) src_buffer;
+    (void) src_buffer_length;
+    LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str reencoding function does not support char8_t to wchar_t conversion on libc++.");
+    abort();
 #else
     return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, src_buffer, src_buffer_length);
 #endif
