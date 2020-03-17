@@ -43,6 +43,10 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4251)  // dll interface
 #endif
 
+extern "C" {
+  struct stat;
+} 
+
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 class symlink_handle;

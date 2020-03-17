@@ -131,7 +131,7 @@ result<symlink_handle> symlink_handle::reopen(mode mode_, deadline d) const noex
   result<symlink_handle> ret(symlink_handle(native_handle_type(), _devid, _inode, _flags));
   ret.value()._v.behaviour = _v.behaviour;
   OUTCOME_TRY(dirh, _dirh.clone());
-  ret.value()._dirh = std::move(dirh);
+  ret.value()._dirh = path_handle(std::move(dirh));
   try
   {
     ret.value()._leafname = _leafname;
@@ -234,7 +234,7 @@ result<symlink_handle::path_type> symlink_handle::current_path() const noexcept
       {
         continue;
       }
-      return dirpath;
+      return {std::move(dirpath)};
     }
   }
   catch(...)
@@ -255,7 +255,7 @@ result<void> symlink_handle::relink(const path_handle &base, path_view_type path
     if(base.is_valid() && path_parent.empty())
     {
       OUTCOME_TRY(dh, base.clone());
-      _dirh = std::move(dh);
+      _dirh = path_handle(std::move(dh));
     }
     else if(!path_parent.empty())
     {
@@ -314,7 +314,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
       dirhfd = base.native_handle().fd;
 #else
       OUTCOME_TRY(dh, base.clone());
-      dirh = std::move(dh);
+      dirh = path_handle(std::move(dh));
       dirhfd = dirh.native_handle().fd;
 #endif
     }
