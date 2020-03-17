@@ -195,7 +195,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
     endforeach()
   endif()
 endif()
-if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD" OR APPLE)
+if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
   if(CLANG_VERSION_MAJOR GREATER_EQUAL 9)
     # Do nothing, it's built in
   elseif(CLANG_VERSION_MAJOR GREATER_EQUAL 7)
