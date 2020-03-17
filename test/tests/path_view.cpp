@@ -30,7 +30,15 @@ template <class U> inline void CheckPathView(const LLFIO_V2_NAMESPACE::filesyste
   using LLFIO_V2_NAMESPACE::filesystem::path;
   auto r1 = c(p);
   auto r2 = c(path_view(p));
-  BOOST_CHECK(r1 == r2);
+  if(r2.empty() && r1.native().size() == 1 && r1.native()[0] == '.')
+  {
+    // libstdc++ returns "." as the tail component for /a/b/ type paths
+    BOOST_CHECK(true);
+  }
+  else
+  {
+    BOOST_CHECK(r1 == r2);
+  }
   // if(r1 != r2)
   {
     std::cerr << "For " << desc << " with path " << p << "\n";
@@ -60,14 +68,30 @@ static inline void CheckPathIteration(const LLFIO_V2_NAMESPACE::filesystem::path
   for(; it1 != test1.end() && it2 != test2.end(); ++it1, ++it2)
   {
     std::cout << "   " << *it1 << " == " << *it2 << "?" << std::endl;
-    BOOST_CHECK(*it1 == it2->path());
+    if(it2->empty() && it1->native().size() == 1 && it1->native()[0] == '.')
+    {
+      // libstdc++ returns "." as the tail component for /a/b/ type paths
+      BOOST_CHECK(true);
+    }
+    else
+    {
+      BOOST_CHECK(*it1 == it2->path());
+    }
   }
   BOOST_CHECK(it1 == test1.end());
   BOOST_CHECK(it2 == test2.end());
   for(--it1, --it2; it1 != test1.begin() && it2 != test2.begin(); --it1, --it2)
   {
     std::cout << "   " << *it1 << " == " << *it2 << "?" << std::endl;
-    BOOST_CHECK(*it1 == it2->path());
+    if(it2->empty() && it1->native().size() == 1 && it1->native()[0] == '.')
+    {
+      // libstdc++ returns "." as the tail component for /a/b/ type paths
+      BOOST_CHECK(true);
+    }
+    else
+    {
+      BOOST_CHECK(*it1 == it2->path());
+    }
   }
   BOOST_CHECK(it1 == test1.begin());
   BOOST_CHECK(it2 == test2.begin());
