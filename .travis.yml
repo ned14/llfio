@@ -6,8 +6,8 @@ compiler:
 sudo: false
 os:
  - linux
- - osx
-osx_image: xcode11.3
+# - osx  ## disabled until MacOS 10.15 deploys on Travis
+#osx_image: xcode11.4
 branches:
   only:
     - develop
@@ -43,14 +43,14 @@ env:
  
 matrix:
   exclude:
-  - os: osx
-    compiler: g++
-  - os: osx
-    env: __="Documentation" NAME=Documentation
-  - os: osx
-    env: __="ARM32 cmake tests (error_code)" NAME=ARM32_EC CMAKE_CONFIGURE_OPTIONS=
-  - os: osx
-    env: __="ARM32 cmake tests (status_code)" NAME=ARM32_SC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+#  - os: osx
+#    compiler: g++
+#  - os: osx
+#    env: __="Documentation" NAME=Documentation
+#  - os: osx
+#    env: __="ARM32 cmake tests (error_code)" NAME=ARM32_EC CMAKE_CONFIGURE_OPTIONS=
+#  - os: osx
+#    env: __="ARM32 cmake tests (status_code)" NAME=ARM32_SC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - os: linux
     compiler: clang++
     env: __="ARM32 cmake tests (error_code)" NAME=ARM32_EC CMAKE_CONFIGURE_OPTIONS=
