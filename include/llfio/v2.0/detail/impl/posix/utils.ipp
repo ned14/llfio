@@ -33,6 +33,10 @@ Distributed under the Boost Software License, Version 1.0.
 #ifdef __linux__
 #include <unistd.h>  // for preadv
 #endif
+#ifdef __APPLE__
+#include <mach/task.h>
+#include <mach/task_info.h>
+#endif
 
 LLFIO_V2_NAMESPACE_BEGIN
 
@@ -401,6 +405,22 @@ namespace utils
     {
       return error_from_exception();
     }
+#elif defined(__APPLE__)
+  kern_return_t error;
+  mach_msg_type_number_t outCount;
+  task_vm_info_data_t vmInfo;
+
+  outCount = TASK_VM_INFO_COUNT;
+  error = task_info(mach_task_self(), TASK_VM_INFO, (task_info_t)&vmInfo, &outCount);
+  if (error != KERN_SUCCESS) {
+    return errc::invalid_argument;
+  }
+  process_memory_usage ret;
+  ret.total_address_space_in_use = vmInfo.virtual_size;
+  ret.total_address_space_paged_in = vmInfo.resident_size;
+  ret.private_committed = vmInfo.internal + vmInfo.compressed;
+  ret.private_paged_in = vmInfo.phys_footprint;
+  return ret;
 #else
 #error Unknown platform
 #endif
