@@ -6,8 +6,8 @@ compiler:
 sudo: false
 os:
  - linux
-# - osx
-osx_image: xcode9.2
+# - osx  ## disabled until MacOS 10.15 deploys on Travis
+#osx_image: xcode11.4
 branches:
   only:
     - develop
@@ -33,11 +33,10 @@ env:
   global:
     - secure: "A3TeWTlJdjUaQ31NF60kMOik8mzaJkdKA55jZXjN83BJ2ZjMDmWfq1XmZ7iDIxmn7HC2BVpjhdkj9jpRtPztb08L5VSlJIiVbXlBWNwgzmYANujpR9rA+bhZJwlKDaYQHUZUd4+iGHCHb0dLt2HG0eHF5azaifd0YqCfz5GcWl8="
   matrix:
-    - __="x64 cmake tests (error_code)" NAME=Linux_x64_EC CMAKE_CONFIGURE_OPTIONS=
-    - __="x64 cmake tests (status_code)" NAME=Linux_x64_SC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
-    - __="ARM32 cmake tests (error_code)" NAME=Linux_ARM32_EC CMAKE_CONFIGURE_OPTIONS=
-    - __="ARM32 cmake tests (status_code)" NAME=Linux_ARM32_SC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
-#    - __="cmake tests" NAME=TravisOSXWorker
+    - __="x64 cmake tests (error_code)" NAME=x64_EC CMAKE_CONFIGURE_OPTIONS=
+    - __="x64 cmake tests (status_code)" NAME=x64_SC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+    - __="ARM32 cmake tests (error_code)" NAME=ARM32_EC CMAKE_CONFIGURE_OPTIONS=
+    - __="ARM32 cmake tests (status_code)" NAME=ARM32_SC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
     - __="Documentation" NAME=Documentation
     - __="Programs"
     - __="Installability"
@@ -47,22 +46,20 @@ matrix:
 #  - os: osx
 #    compiler: g++
 #  - os: osx
-#    env: __="Documentation" NAME=TravisDocumentation
+#    env: __="Documentation" NAME=Documentation
 #  - os: osx
-#    env: __="cmake tests (error_code)" NAME=TravisLinuxWorkerEC CMAKE_CONFIGURE_OPTIONS=
+#    env: __="ARM32 cmake tests (error_code)" NAME=ARM32_EC CMAKE_CONFIGURE_OPTIONS=
 #  - os: osx
-#    env: __="cmake tests (status_code)" NAME=TravisLinuxWorkerSC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+#    env: __="ARM32 cmake tests (status_code)" NAME=ARM32_SC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - os: linux
     compiler: clang++
-    env: __="ARM32 cmake tests (error_code)" NAME=Linux_ARM32_EC CMAKE_CONFIGURE_OPTIONS=
+    env: __="ARM32 cmake tests (error_code)" NAME=ARM32_EC CMAKE_CONFIGURE_OPTIONS=
   - os: linux
     compiler: clang++
-    env: __="ARM32 cmake tests (status_code)" NAME=Linux_ARM32_SC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+    env: __="ARM32 cmake tests (status_code)" NAME=ARM32_SC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - os: linux
     compiler: g++
     env: __="Documentation" NAME=Documentation
-#  - os: linux
-#    env: __="cmake tests" NAME=TravisOSXWorker
 
 cache:
   apt: true
@@ -70,14 +67,14 @@ cache:
 before_install:
  -
    if [ "${TRAVIS_OS_NAME}" = "osx" ]; then
-     brew install llvm;
-     export CXX=/usr/local/opt/llvm/bin/clang++;
-     export LDFLAGS="-L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib";
-     export CPPFLAGS=-I/usr/local/opt/llvm/include;
-     export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DCMAKE_LIBRARY_PATH=/usr/local/opt/llvm/lib";
+     if [ "$CXX" = "g++" ]; then export NAME=MacOSGCC$NAME; fi;
+     if [ "$CXX" = "clang++" ]; then export NAME=MacOSClang$NAME; fi;
    fi
- - if [ "$CXX" = "g++" ]; then export NAME=GCC$NAME; fi;
- - if [ "$CXX" = "clang++" ]; then export NAME=Clang$NAME; fi;
+ -
+   if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
+     if [ "$CXX" = "g++" ]; then export NAME=LinuxGCC$NAME; fi;
+     if [ "$CXX" = "clang++" ]; then export NAME=LinuxClang$NAME; fi;
+   fi
  - git checkout develop
  - git submodule update --init --recursive
  - mount

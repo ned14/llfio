@@ -335,6 +335,7 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
 #elif defined(__APPLE__)
     if(have_backing)
     {
+      (void) pagesizes;
       return errc::invalid_argument;
     }
     fd_to_use = VM_FLAGS_SUPERPAGE_SIZE_ANY;
@@ -465,6 +466,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
   _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
   return newsize;
 #else
+  (void) permit_relocation;
   // Try to expand reservation in place
   if(newsize > _reservation)
   {

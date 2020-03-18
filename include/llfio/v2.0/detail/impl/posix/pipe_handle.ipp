@@ -102,7 +102,18 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
   }
   if(need_to_create_fifo)
   {
+#ifdef __APPLE__
+    native_handle_type dirhfd_;
+    dirhfd_.fd = dirhfd;
+    path_handle dirhfdwrap(dirhfd_);
+    auto dirhpath = dirhfdwrap.current_path();
+    dirhfdwrap.release();
+    OUTCOME_TRY(dirhpath);
+    dirhpath.value() /= leafname;
+    if(-1 == ::mkfifo(dirhpath.value().c_str(), 0x1b0 /*660*/))
+#else
     if(-1 == ::mkfifoat(dirhfd, leafname.c_str(), 0x1b0 /*660*/))
+#endif
     {
       return posix_error();
     }
@@ -123,7 +134,11 @@ result<std::pair<pipe_handle, pipe_handle>> pipe_handle::anonymous_pipe(caching 
   LLFIO_LOG_FUNCTION_CALL(&ret);
   OUTCOME_TRY(readattribs, attribs_from_handle_mode_caching_and_flags(readnativeh, mode::read, creation::open_existing, _caching, flags));
   OUTCOME_TRY(attribs_from_handle_mode_caching_and_flags(writenativeh, mode::append, creation::open_existing, _caching, flags));
+#ifdef O_DIRECT
   readattribs &= O_DIRECT | O_NONBLOCK;
+#else
+  readattribs &= O_NONBLOCK;
+#endif
   readnativeh.behaviour |= native_handle_type::disposition::pipe;
   readnativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
   writenativeh.behaviour |= native_handle_type::disposition::pipe;
