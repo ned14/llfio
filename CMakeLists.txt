@@ -74,8 +74,9 @@ include(QuickCppLibMakeHeaderOnlyLibrary)
 apply_cxx_concepts_to(INTERFACE llfio_hl)
 apply_cxx_concepts_to(PUBLIC llfio_sl llfio_dl)
 
-# If we have coroutines, enable those for the shared library build only
-apply_cxx_coroutines_to(PRIVATE llfio_dl)
+# If we have coroutines, enable those for both myself and all inclusions
+apply_cxx_coroutines_to(INTERFACE llfio_hl)
+apply_cxx_coroutines_to(PUBLIC llfio_sl llfio_dl)
 
 # Make preprocessed edition of this library target
 if(NOT PROJECT_IS_DEPENDENCY)
@@ -165,48 +166,53 @@ if((MSVC AND MSVC_VERSION VERSION_GREATER_EQUAL 1923) OR APPLE)
   )
 endif()
 # Set the library dependencies this library has
-all_link_libraries(PUBLIC quickcpplib::hl outcome::hl Threads::Threads)
+all_link_libraries(PUBLIC quickcpplib::hl outcome::hl Threads::Threads $<$<PLATFORM_ID:Linux>:rt>)
+
 # Set the system dependencies this library has
-set(USING_LIBCXX_ON_LINUX 0)
-if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+include(CheckCXXSourceCompiles)
+# Are we on libstdc++ or libc++?
+check_cxx_source_compiles("
+#include <iostream>
+int main() {
+#ifdef __GLIBCXX__
+  return 0;
+#else
+  return i am not a number;
+#endif
+}
+" CXX_IS_USING_LIBSTDCXX)
+check_cxx_source_compiles("
+#include <iostream>
+int main() {
+#ifdef _LIBCPP_VERSION
+  return 0;
+#else
+  return i am not a number;
+#endif
+}
+" CXX_IS_USING_LIBCXX)
+# If on libstdc++, we need to link in stdc++fs for experimental filesystem
+if(CXX_IS_USING_LIBSTDCXX)
   find_library(libstdcxx_stdcxxfs stdc++fs)
   if(libstdcxx_stdcxxfs MATCHES "NOTFOUND")
     set(libstdcxx_stdcxxfs -lstdc++fs)
   endif()
-  get_target_property(val llfio_dl USING_LIBCXX_ON_LINUX)
-  if(val MATCHES "NOTFOUND")
-    all_link_libraries(PUBLIC ${libstdcxx_stdcxxfs} rt)
-  else()
-    set(USING_LIBCXX_ON_LINUX 1)
-    # We had to use libc++ to get coroutines on Linux, so don't link the filesystem TS
-    # into the _dl edition, which is the coroutines-enabled edition
-    target_link_libraries(${PROJECT_NAME}_hl INTERFACE ${libstdcxx_stdcxxfs} rt)
-    target_link_libraries(${PROJECT_NAME}_sl PUBLIC ${libstdcxx_stdcxxfs} rt)
-    foreach(special ${SPECIAL_BUILDS})
-      target_link_libraries(${PROJECT_NAME}_sl-${special} PUBLIC ${libstdcxx_stdcxxfs} rt)
-    endforeach()
-    # Do make libc++ a requirement for the _dl edition
-    target_compile_definitions(${PROJECT_NAME}_dl PUBLIC _LIBCPP_NO_EXPERIMENTAL_DEPRECATION_WARNING_FILESYSTEM=1)
-    target_compile_options(${PROJECT_NAME}_dl PUBLIC -stdlib=libc++)
-    target_link_libraries(${PROJECT_NAME}_dl PUBLIC -stdlib=libc++ -lc++abi)
-    foreach(special ${SPECIAL_BUILDS})
-      target_compile_options(${PROJECT_NAME}_dl-${special} PUBLIC -stdlib=libc++)
-      target_link_libraries(${PROJECT_NAME}_dl-${special} PUBLIC -stdlib=libc++ -lc++abi)
-    endforeach()
-  endif()
+  all_link_libraries(PUBLIC ${libstdcxx_stdcxxfs})
 endif()
-if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
-  if(CLANG_VERSION_MAJOR GREATER_EQUAL 9)
-    # Do nothing, it's built in
-  elseif(CLANG_VERSION_MAJOR GREATER_EQUAL 7)
-    find_library(libcxx_cxxfs c++fs)
+# If on libc++, we may need to link in c++fs or c++experimental for experimental filesystem
+if(CXX_IS_USING_LIBCXX)
+  find_library(libcxx_cxxfs c++fs)
+  find_library(libcxx_cxxexperimental c++experimental)
+  if(NOT libcxx_cxxfs MATCHES "NOTFOUND")
     all_link_libraries(PUBLIC ${libcxx_cxxfs})
   endif()
-  # Link in experimental always. If library is in C++ 14, or older LLVM, experimental filesystem will be used.
-  # If libc++fs or built-in filesystem is used, this link will be discarded.
-  find_library(libcxx_cxxexperimental c++experimental)
-  all_link_libraries(PUBLIC ${libcxx_cxxexperimental})
+  if(NOT libcxx_cxxexperimental MATCHES "NOTFOUND")
+    all_link_libraries(PUBLIC ${libcxx_cxxexperimental})
+  endif()
+  # Disable the irritating warnings
+  all_compile_definitions(PUBLIC _LIBCPP_NO_EXPERIMENTAL_DEPRECATION_WARNING_FILESYSTEM=1)
 endif()
+
 # Set any macros this library requires
 all_compile_definitions(PRIVATE LLFIO_INCLUDE_ASYNC_FILE_HANDLE=1 LLFIO_INCLUDE_STORAGE_PROFILE=1)
 foreach(target ${llfio_EXAMPLE_TARGETS})
@@ -263,13 +269,7 @@ if(NOT PROJECT_IS_DEPENDENCY)
   foreach(test_target ${llfio_TEST_TARGETS})
     target_link_libraries(${test_target} PRIVATE kerneltest::hl)
     if(test_target MATCHES coroutines)
-      if(USING_LIBCXX_ON_LINUX)
-        if(NOT test_target MATCHES _sl)
-          apply_cxx_coroutines_to(PRIVATE ${test_target})
-        endif()
-      else()
-        apply_cxx_coroutines_to(PRIVATE ${test_target})
-      endif()
+      apply_cxx_coroutines_to(PRIVATE ${test_target})
     endif()
   endforeach()
   if(MSVC)
