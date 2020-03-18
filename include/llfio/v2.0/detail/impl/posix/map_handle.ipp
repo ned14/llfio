@@ -333,12 +333,13 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
     size_t topbitset = (__CHAR_BIT__ * sizeof(unsigned long)) - __builtin_clzl((unsigned long) pagesize);
     flags |= MAP_ALIGNED(topbitset);
 #elif defined(__APPLE__)
-    if(have_backing)
+    size_t topbitset = (__CHAR_BIT__ * sizeof(unsigned long)) - __builtin_clzl((unsigned long) pagesize);
+    if(have_backing || topbitset < 21)
     {
       (void) pagesizes;
       return errc::invalid_argument;
     }
-    fd_to_use = VM_FLAGS_SUPERPAGE_SIZE_ANY;
+    fd_to_use = ((topbitset - 20) << VM_FLAGS_SUPERPAGE_SHIFT);
 #else
 #error Do not know how to specify large/huge/super pages on this platform
 #endif
@@ -362,6 +363,19 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
   {
     return posix_error();
   }
+#ifdef MADV_FREE_REUSABLE
+  if((prot & PROT_WRITE) != 0 && (_flag & section_handle::flag::nocommit))
+  {
+    // On Mac OS, you cannot ask for reserved memory, but you can ask
+    // for committed memory first and then decommit it. Which can potentially
+    // blow out the commit limit for really large reservations,
+    // but this is literally the only game in town on Mac OS.
+    if(-1 == ::madvise(addr, bytes, MADV_FREE_REUSABLE))
+    {
+      return posix_error();
+    }
+  }
+#endif
 #if 0  // not implemented yet, not seen any benefit over setting this at the fd level
   if(have_backing && ((flags & map_handle::flag::disable_prefetching) || (flags & map_handle::flag::maximum_prefetching)))
   {
@@ -551,6 +565,19 @@ result<void> map_handle::zero_memory(buffer_type region) noexcept
   {
     return errc::invalid_argument;
   }
+#ifdef MADV_FREE_REUSABLE
+  /* Mac OS will reduce both the commit charge and MADV_FREE the pages
+  if we use this flag.
+  */
+  memset(region.data(), 0, region.size());
+  buffer_type page_region{utils::round_up_to_page_size(region.data(), _pagesize), utils::round_down_to_page_size(region.size(), _pagesize)};
+  // Zero contents
+  if((page_region.size() != 0u) && _section == nullptr)
+  {
+    (void) ::madvise(page_region.data(), page_region.size(), MADV_FREE_REUSABLE);
+  }
+  return success();
+#endif
 #ifdef MADV_REMOVE
   buffer_type page_region{utils::round_up_to_page_size(region.data(), _pagesize), utils::round_down_to_page_size(region.size(), _pagesize)};
   // Zero contents and punch a hole in any backing storage

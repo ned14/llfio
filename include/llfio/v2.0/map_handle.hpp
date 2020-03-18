@@ -645,14 +645,14 @@ public:
   /*! Zero the memory represented by the buffer. Differs from zero() because it acts on
   mapped memory, not on allocated file extents.
 
-  On Linux, Mac OS and FreeBSD any full 4Kb pages will be deallocated from the
+  On Linux only, any full 4Kb pages will be deallocated from the
   system entirely, including the extents for them in any backing storage. On
   newer Linux kernels the kernel can additionally swap whole 4Kb pages for
   freshly zeroed ones making this a very efficient way of zeroing large ranges of memory.
   Note that commit charge is not affected by this operation, as writes into
   the zeroed pages are guaranteed to succeed.
 
-  On Windows, this call currently only has an effect for non-backed memory due to lacking kernel support.
+  On Windows and Mac OS, this call currently only has an effect for non-backed memory due to lacking kernel support.
 
   \errors Any of the errors returnable by madvise() or DiscardVirtualMemory or the zero() function.
   */

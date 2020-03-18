@@ -174,6 +174,8 @@ namespace utils
     size_t private_paged_in{0};
   };
   /*! \brief Retrieve the current memory usage statistics for this process.
+   
+   \note Mac OS provides no way of reading how much memory a process has committed. We therefore supply as `private_committed` the same value as `private_paged_in`.
   */
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<process_memory_usage> current_process_memory_usage() noexcept;
 
