@@ -34,7 +34,15 @@ static inline void TestLargeMemMappedPages()
     BOOST_TEST_MESSAGE("Large page support not available on this hardware, or to this privilege of user. So skipping this test.");
     return;
   }
-  map_handle mh(map_handle::map(1024 * 1024, false, section_handle::flag::readwrite | section_handle::flag::page_sizes_1).value());
+  auto _mh(map_handle::map(1024 * 1024, false, section_handle::flag::readwrite | section_handle::flag::page_sizes_1));
+#ifdef __APPLE__
+  if(!_mh)
+  {
+    BOOST_TEST_MESSAGE("Large page support not available on this hardware, or to this privilege of user. So skipping this test.");
+    return;
+  }
+#endif
+  map_handle mh(std::move(_mh).value());
   BOOST_CHECK(mh.address() != nullptr);
   BOOST_CHECK(mh.page_size() == pagesizes[1]);
   BOOST_CHECK(mh.length() == pagesizes[1]);
@@ -43,6 +51,7 @@ static inline void TestLargeMemMappedPages()
 
 static inline void TestLargeKernelMappedPages()
 {
+#ifndef __APPLE__  // Mac OS only implements super pages for anonymous memory
   using namespace LLFIO_V2_NAMESPACE;
   using LLFIO_V2_NAMESPACE::file_handle;
   using LLFIO_V2_NAMESPACE::byte;
@@ -67,10 +76,12 @@ static inline void TestLargeKernelMappedPages()
   BOOST_CHECK(mh.page_size() == pagesizes[1]);
   BOOST_CHECK(mh.length() == pagesizes[1]);
   mh.write(0, {{(const byte *) "hello world", 11}}).value();
+#endif
 }
 
 static inline void TestLargeFileMappedPages()
 {
+#ifndef __APPLE__  // Mac OS only implements super pages for anonymous memory
   using namespace LLFIO_V2_NAMESPACE;
   using LLFIO_V2_NAMESPACE::file_handle;
   using LLFIO_V2_NAMESPACE::byte;
@@ -98,6 +109,7 @@ static inline void TestLargeFileMappedPages()
   BOOST_CHECK(mh.page_size() == pagesizes[1]);
   BOOST_CHECK(mh.length() == pagesizes[1]);
   mh.write(0, {{(const byte *) "hello world", 11}}).value();
+#endif
 }
 
 KERNELTEST_TEST_KERNEL(integration, llfio, map_handle, large_mem_mapped_pages, "Tests that large page support for allocating memory works as expected", TestLargeMemMappedPages())

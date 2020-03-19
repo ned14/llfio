@@ -83,6 +83,8 @@ namespace detail
     }
     constexpr bool operator!() const noexcept { return !v; }
     constexpr explicit operator bool() const noexcept { return !!v; }
+    constexpr int operator-(int x) const noexcept { return v - x; }
+    constexpr int operator+(int x) const noexcept { return v + x; }
   };
   constexpr inline bool operator<(char8_t a, char8_t b) noexcept { return a.v < b.v; }
   constexpr inline bool operator>(char8_t a, char8_t b) noexcept { return a.v > b.v; }

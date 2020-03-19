@@ -409,12 +409,20 @@ namespace utils
   kern_return_t error;
   mach_msg_type_number_t outCount;
   task_vm_info_data_t vmInfo;
+  //task_kernelmemory_info_data_t kmInfo;
 
   outCount = TASK_VM_INFO_COUNT;
   error = task_info(mach_task_self(), TASK_VM_INFO, (task_info_t)&vmInfo, &outCount);
   if (error != KERN_SUCCESS) {
     return errc::invalid_argument;
   }
+  //outCount = TASK_KERNELMEMORY_INFO_COUNT;
+  //error = task_info(mach_task_self(), TASK_KERNELMEMORY_INFO, (task_info_t)&kmInfo, &outCount);
+  //if (error != KERN_SUCCESS) {
+  //  return errc::invalid_argument;
+  //}
+  //std::cout << vmInfo.virtual_size << "\n" << vmInfo.region_count << "\n" << vmInfo.resident_size << "\n" << vmInfo.device << "\n" << vmInfo.internal << "\n" << vmInfo.external << "\n" << vmInfo.reusable << "\n" << vmInfo.purgeable_volatile_pmap<< "\n" << vmInfo.purgeable_volatile_resident << "\n" << vmInfo.purgeable_volatile_virtual << "\n" << vmInfo.compressed << "\n" << vmInfo.phys_footprint << std::endl;
+  //std::cout << "\n" << kmInfo.total_palloc << "\n" << kmInfo.total_pfree << "\n" << kmInfo.total_salloc << "\n" << kmInfo.total_sfree << std::endl;
   process_memory_usage ret;
   ret.total_address_space_in_use = vmInfo.virtual_size;
   ret.total_address_space_paged_in = vmInfo.resident_size;

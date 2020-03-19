@@ -35,6 +35,19 @@ static inline void TestCurrentProcessMemoryUsage()
       return s << "      " << (last_pmu->total_address_space_in_use / 1024.0 / 1024.0) << "," << (last_pmu->total_address_space_paged_in / 1024.0 / 1024.0) << "," << (last_pmu->private_committed / 1024.0 / 1024.0) << "," << (last_pmu->private_paged_in / 1024.0 / 1024.0) << std::endl;
     };
   };
+  auto fakefault = [](llfio::map_handle &maph){
+#ifdef __APPLE__
+      // Mac OS doesn't implement map page table prefaulting at all,
+      // so fake it so the memory statistics work right
+      for(size_t n = 0; n < maph.length(); n += 4096)
+      {
+          auto *p = (volatile llfio::byte *) maph.address() + n;
+          *p;
+      }
+#else
+      (void) maph;
+#endif
+  };
   {
     llfio::utils::process_memory_usage pmu;
     std::cout << "   Really before anything:\n" << print(pmu) << std::endl;
@@ -61,23 +74,27 @@ static inline void TestCurrentProcessMemoryUsage()
     {
       // Should raise total_address_space_in_use, private_committed and private_paged_in by 1Gb
       auto maph = llfio::map_handle::map(1024 * 1024 * 1024, false, llfio::section_handle::flag::readwrite | llfio::section_handle::flag::prefault).value();
+      fakefault(maph);
       std::cout << "   After committing and faulting 1Gb:\n" << print(after_fault) << std::endl;
     }
     {
       // Should raise total_address_space_in_use by 1Gb
       auto maph = llfio::map_handle::map(1024 * 1024 * 1024, false, llfio::section_handle::flag::readwrite | llfio::section_handle::flag::prefault).value();
+      fakefault(maph);
       maph.decommit({maph.address(), maph.length()}).value();
       std::cout << "   After committing and faulting and decommitting 1Gb:\n" << print(after_decommit) << std::endl;
     }
     {
       // Should raise total_address_space_in_use, private_committed by 1Gb
       auto maph = llfio::map_handle::map(1024 * 1024 * 1024, false, llfio::section_handle::flag::readwrite | llfio::section_handle::flag::prefault).value();
+      fakefault(maph);
       maph.zero_memory({maph.address(), maph.length()}).value();
       std::cout << "   After committing and faulting and zeroing 1Gb:\n" << print(after_zero) << std::endl;
     }
     {
       // Should raise total_address_space_in_use, private_committed by 1Gb
       auto maph = llfio::map_handle::map(1024 * 1024 * 1024, false, llfio::section_handle::flag::readwrite | llfio::section_handle::flag::prefault).value();
+      fakefault(maph);
       maph.do_not_store({maph.address(), maph.length()}).value();
       std::cout << "   After committing and faulting and do not storing 1Gb:\n" << print(after_do_not_store) << std::endl;
     }
@@ -91,6 +108,15 @@ static inline void TestCurrentProcessMemoryUsage()
              && check(a.private_committed, b.private_committed, private_committed)                                   //
              && check(a.private_paged_in, b.private_paged_in, private_paged_in);
     };
+#ifdef __APPLE__
+    // Mac OS has no way of differentiating between committed and paged in pages :(
+    BOOST_CHECK(within(before_anything, after_reserve, 1024, 0, 0, 0));
+    BOOST_CHECK(within(before_anything, after_commit, 1024, 0, 0, 0));
+    BOOST_CHECK(within(before_anything, after_fault, 1024, 1024, 1024, 1024));
+    BOOST_CHECK(within(before_anything, after_decommit, 1024, 0, 0, 0));
+    BOOST_CHECK(within(before_anything, after_zero, 1024, 1024, 0, 0));
+    BOOST_CHECK(within(before_anything, after_do_not_store, 1024, 1024, 1024, 1024));  // do_not_store() doesn't decrease RSS
+#else
     BOOST_CHECK(within(before_anything, after_reserve, 1024, 0, 0, 0));
     BOOST_CHECK(within(before_anything, after_commit, 1024, 0, 1024, 0));
     BOOST_CHECK(within(before_anything, after_fault, 1024, 1024, 1024, 1024));
@@ -101,6 +127,7 @@ static inline void TestCurrentProcessMemoryUsage()
     (void) after_zero;
 #endif
     BOOST_CHECK(within(before_anything, after_do_not_store, 1024, 0, 1024, 0));
+#endif
   }
   std::cout << "\nFor file mapping:\n";
   {
@@ -122,24 +149,28 @@ static inline void TestCurrentProcessMemoryUsage()
     {
       // Should raise total_address_space_in_use and total_address_space_paged_in by 1Gb
       auto mapfileh = llfio::map_handle::map(sectionh, 1024 * 1024 * 1024, 0, llfio::section_handle::flag::readwrite | llfio::section_handle::flag::prefault).value();
+      fakefault(mapfileh);
       std::cout << "   After committing and faulting 1Gb:\n" << print(after_fault) << std::endl;
     }
 #ifndef _WIN32
     {
       // Should raise total_address_space_in_use by 1Gb, but not private_committed
       auto mapfileh = llfio::map_handle::map(sectionh, 1024 * 1024 * 1024, 0, llfio::section_handle::flag::readwrite | llfio::section_handle::flag::prefault).value();
+      fakefault(mapfileh);
       mapfileh.decommit({mapfileh.address(), mapfileh.length()}).value();
       std::cout << "   After committing and faulting and decommitting 1Gb:\n" << print(after_decommit) << std::endl;
     }
     {
       // Should raise total_address_space_in_use by 1Gb, but not private_committed
       auto mapfileh = llfio::map_handle::map(sectionh, 1024 * 1024 * 1024, 0, llfio::section_handle::flag::readwrite | llfio::section_handle::flag::prefault).value();
+      fakefault(mapfileh);
       mapfileh.zero_memory({mapfileh.address(), mapfileh.length()}).value();
       std::cout << "   After committing and faulting and zeroing 1Gb:\n" << print(after_zero) << std::endl;
     }
     {
       // Should raise total_address_space_in_use by 1Gb, but not private_committed
       auto mapfileh = llfio::map_handle::map(sectionh, 1024 * 1024 * 1024, 0, llfio::section_handle::flag::readwrite | llfio::section_handle::flag::prefault).value();
+      fakefault(mapfileh);
       mapfileh.do_not_store({mapfileh.address(), mapfileh.length()}).value();
       std::cout << "   After committing and faulting and do not storing 1Gb:\n" << print(after_do_not_store) << std::endl;
     }
@@ -154,6 +185,15 @@ static inline void TestCurrentProcessMemoryUsage()
              && check(a.private_committed, b.private_committed, private_committed)                                   //
              && check(a.private_paged_in, b.private_paged_in, private_paged_in);
     };
+#ifdef __APPLE__
+    // Mac OS has no way of differentiating between committed and paged in pages :(
+    BOOST_CHECK(within(before_anything, after_reserve, 1024, 0, 0, 0));
+    BOOST_CHECK(within(before_anything, after_commit, 1024, 0, 0, 0));
+    BOOST_CHECK(within(before_anything, after_fault, 1024, 1024, 0, 0));
+    BOOST_CHECK(within(before_anything, after_decommit, 1024, 0, 0, 0));
+    BOOST_CHECK(within(before_anything, after_zero, 1024, 1024, 0, 0));  // doesn't implement zero()
+    BOOST_CHECK(within(before_anything, after_do_not_store, 1024, 1024, 0, 0));  // do_not_store() doesn't decrease RSS
+#else
     BOOST_CHECK(within(before_anything, after_reserve, 1024, 0, 0, 0));
     BOOST_CHECK(within(before_anything, after_commit, 1024, 0, 0, 0));
     BOOST_CHECK(within(before_anything, after_fault, 1024, 1024, 0, 0));
@@ -165,6 +205,7 @@ static inline void TestCurrentProcessMemoryUsage()
     (void) after_decommit;
     (void) after_zero;
     (void) after_do_not_store;
+#endif
 #endif
   }
 }

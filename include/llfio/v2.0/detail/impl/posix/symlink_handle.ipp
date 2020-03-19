@@ -351,8 +351,8 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
   {
     // Create an empty symlink, ignoring any file exists errors, unless only_if_not_exist
     auto r = ret.value()._create_symlink(dirh, leafname,
-#ifdef __linux__
-                                         ".",  // Linux is not POSIX conforming here, and refuses to create empty symlinks
+#if defined(__linux__) || defined(__APPLE__)
+                                         ".",  // Linux and Mac OS is not POSIX conforming here, and refuses to create empty symlinks
 #else
                                          "",
 #endif
