@@ -145,9 +145,8 @@ result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1utils.html#a7aae80908cc5521ef67234152c5c5044">running_under_wsl</a> () noexcept</td></tr>
 <tr class="memdesc:a7aae80908cc5521ef67234152c5c5044"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if this POSIX is running under Microsoft's Subsystem for Linux. <br /></td></tr>
 <tr class="separator:a7aae80908cc5521ef67234152c5c5044"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a2d8f932686b4c35a67a6aa972b4e92"><td class="memItemLeft" align="right" valign="top"><a id="a5a2d8f932686b4c35a67a6aa972b4e92"></a>
-result&lt; <a class="el" href="structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html">process_memory_usage</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1utils.html#a5a2d8f932686b4c35a67a6aa972b4e92">current_process_memory_usage</a> () noexcept</td></tr>
-<tr class="memdesc:a5a2d8f932686b4c35a67a6aa972b4e92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the current memory usage statistics for this process. <br /></td></tr>
+<tr class="memitem:a5a2d8f932686b4c35a67a6aa972b4e92"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html">process_memory_usage</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1utils.html#a5a2d8f932686b4c35a67a6aa972b4e92">current_process_memory_usage</a> () noexcept</td></tr>
+<tr class="memdesc:a5a2d8f932686b4c35a67a6aa972b4e92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the current memory usage statistics for this process.  <a href="#a5a2d8f932686b4c35a67a6aa972b4e92">More...</a><br /></td></tr>
 <tr class="separator:a5a2d8f932686b4c35a67a6aa972b4e92"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae880ebd5681dcf6b700d67fb10b4547e"><td class="memTemplParams" colspan="2"><a id="ae880ebd5681dcf6b700d67fb10b4547e"></a>
 template&lt;class T , class U &gt; </td></tr>
@@ -157,6 +156,34 @@ template&lt;class T , class U &gt; </td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Utility routines often useful when using LLFIO. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="a5a2d8f932686b4c35a67a6aa972b4e92"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a2d8f932686b4c35a67a6aa972b4e92">&#9670;&nbsp;</a></span>current_process_memory_usage()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;<a class="el" href="structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html">process_memory_usage</a>&gt; llfio_v2_xxx::utils::current_process_memory_usage </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retrieve the current memory usage statistics for this process. </p>
+<dl class="section note"><dt>Note</dt><dd>Mac OS provides no way of reading how much memory a process has committed. We therefore supply as <code>private_committed</code> the same value as <code>private_paged_in</code>. </dd></dl>
+
+</div>
+</div>
 <a id="abacefaf60ae391226c4775cf8a61276a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abacefaf60ae391226c4775cf8a61276a">&#9670;&nbsp;</a></span>drop_filesystem_cache()</h2>
 
