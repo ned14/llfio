@@ -242,7 +242,7 @@ int main() {
   endif()
   function(check_stl_filesystem_link_flags)
     indented_message(STATUS "NOTE: Using STL link flags '${ARGN}'")
-    set(CMAKE_REQUIRED_LINK_OPTIONS ${ARGN})
+    set(CMAKE_REQUIRED_LIBRARIES ${ARGN})
     check_cxx_source_runs("
 #include <filesystem>
 int main() {
