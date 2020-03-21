@@ -37,6 +37,11 @@ env:
     - secure: "A3TeWTlJdjUaQ31NF60kMOik8mzaJkdKA55jZXjN83BJ2ZjMDmWfq1XmZ7iDIxmn7HC2BVpjhdkj9jpRtPztb08L5VSlJIiVbXlBWNwgzmYANujpR9rA+bhZJwlKDaYQHUZUd4+iGHCHb0dLt2HG0eHF5azaifd0YqCfz5GcWl8="
  
 matrix:
+  exclude:
+  - compiler:
+     - g++
+     - clang++
+     - clang++-10
   include:
   - name: "x64 cmake tests (error_code)"
     compiler:
@@ -99,6 +104,7 @@ before_install:
  - if [ "$TRAVIS_COMPILER" = "clang++-10" ]; then
      export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake";
      wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -;
+     sudo apt update;
      sudo apt install clang-10 libc++-10-dev libc++abi-10-dev libomp-10-dev;
    fi
  - mount
@@ -113,13 +119,13 @@ before_install:
 
 script:
  -
-   if [[ "$NAME" == "x64_*_tests" ]]; then
+   if [[ "$NAME" == "x64_"*"_tests" ]]; then
      export NAME=$TRAVIS_OSNAME_$TRAVIS_COMPILER_$NAME;
      export ASAN_OPTIONS=detect_leaks=0;
      ctest -S .ci.cmake -VV --timeout 300 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS ;
    fi
  -
-   if [[ "$NAME" == "ARM32_*_build" ]]; then
+   if [[ "$NAME" == "ARM32_"*"_build" ]]; then
      export NAME=$TRAVIS_OSNAME_$TRAVIS_COMPILER_$NAME;
      export CXX=arm-linux-gnueabihf-g++;
      export CMAKE_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS -DCMAKE_SYSTEM_PROCESSOR=armhf -DCMAKE_CXX_FLAGS="-Wno-attributes -Wno-psabi";
@@ -141,7 +147,7 @@ script:
      cd ../..;
    fi
  -
-   if [[ "$NAME" == "x64_*_programs" ]]; then
+   if [[ "$NAME" == "x64_"*"_programs" ]]; then
      cd programs;
      mkdir build;
      cd build;
@@ -149,7 +155,7 @@ script:
      cmake --build .;
    fi
  -
-   if [[ "$NAME" == "x64_*_install" ]]; then
+   if [[ "$NAME" == "x64_"*"_install" ]]; then
      git clone --depth 1 https://github.com/ned14/quickcpplib.git;
      pip3 install --user gitpython;
      python3 quickcpplib/scripts/test_cpp-pm_install.py test-packaging/example.cpp quickcpplib quickcpplib::hl https://github.com/ned14/quickcpplib outcome outcome::hl https://github.com/ned14/outcome llfio llfio::sl https://github.com/ned14/llfio;
@@ -168,7 +174,7 @@ after_success:
       mv llfio-v2.0-binaries-linux-x64.tgz $NEWNAME;
       curl -T $NEWNAME -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD https://dedi5.nedprod.com/static/files/upload/;
     fi
-  - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then   
+  - if [ "$NAME" = "osx_clang++_x64_EC_tests" ]; then   
       NEWNAME=llfio-v2.0-binaries-darwin64-$TRAVIS_COMMIT.tgz;
       mv llfio-v2.0-binaries-darwin-x64.tgz $NEWNAME;
       curl -T $NEWNAME -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD https://dedi5.nedprod.com/static/files/upload/;
