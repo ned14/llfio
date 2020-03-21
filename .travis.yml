@@ -4,7 +4,9 @@ compiler:
  - g++
  - clang++
  - clang++-10
-sudo: false
+sudo: true
+git:
+  submodules: false
 os:
  - linux
 # - osx  ## disabled until MacOS 10.15 deploys on Travis
@@ -19,14 +21,9 @@ notifications:
 
 addons:
   apt:
-    sources:
-    - llvm-toolchain-bionic-10
     packages:
     - g++
     - clang
-    - clang-10
-    - libc++-10-dev
-    - libc++abi-10-dev
     - g++-arm-linux-gnueabihf
     - python3
     - cmake
@@ -38,51 +35,72 @@ addons:
 env:
   global:
     - secure: "A3TeWTlJdjUaQ31NF60kMOik8mzaJkdKA55jZXjN83BJ2ZjMDmWfq1XmZ7iDIxmn7HC2BVpjhdkj9jpRtPztb08L5VSlJIiVbXlBWNwgzmYANujpR9rA+bhZJwlKDaYQHUZUd4+iGHCHb0dLt2HG0eHF5azaifd0YqCfz5GcWl8="
-  matrix:
-    - __="x64 cmake tests (error_code)" NAME=x64_EC CMAKE_CONFIGURE_OPTIONS=
-    - __="x64 cmake tests (status_code)" NAME=x64_SC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
-    - __="ARM32 cmake tests (error_code)" NAME=ARM32_EC CMAKE_CONFIGURE_OPTIONS=
-    - __="ARM32 cmake tests (status_code)" NAME=ARM32_SC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
-    - __="Documentation" NAME=Documentation
-    - __="Programs"
-    - __="Installability"
  
 matrix:
-  exclude:
-#  - os: osx
-#    compiler: g++
-#  - os: osx
-#    env: __="Documentation" NAME=Documentation
-#  - os: osx
-#    env: __="ARM32 cmake tests (error_code)" NAME=ARM32_EC CMAKE_CONFIGURE_OPTIONS=
-#  - os: osx
-#    env: __="ARM32 cmake tests (status_code)" NAME=ARM32_SC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
-  - os: linux
+  include:
+  - name: "x64 cmake tests (error_code)"
     compiler:
-    - clang++
-    - clang++-10
-    env: __="ARM32 cmake tests (error_code)" NAME=ARM32_EC CMAKE_CONFIGURE_OPTIONS=
-  - os: linux
+     - g++
+     - clang++
+     - clang++-10
+    env: NAME=x64_EC_tests
+  - name: "x64 cmake tests (status_code)"
     compiler:
-    - clang++
-    - clang++-10
-    env: __="ARM32 cmake tests (status_code)" NAME=ARM32_SC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
-  - os: linux
+     - g++
+     - clang++
+     - clang++-10
+    env:
+     - NAME=x64_SC_tests
+     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+  - name: "ARM32 cmake build (error_code)"
     compiler:
-    - g++
-    - clang++-10
-    env: __="Documentation" NAME=Documentation
-
-cache:
-  apt: true
+     - g++
+    env: NAME=ARM32_EC_build
+  - name: "ARM32 cmake build (error_code)"
+    compiler:
+     - g++
+    env:
+     - NAME=ARM32_SC_build
+     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+  - name: "Documentation"
+    compiler:
+     - clang++
+    env: NAME=Documentation
+  - name: "x64 Programs (error_code)"
+    compiler:
+     - g++
+     - clang++
+     - clang++-10
+    env: NAME=x64_EC_programs
+  - name: "x64 Programs (status_code)"
+    compiler:
+     - g++
+     - clang++
+     - clang++-10
+    env:
+     - NAME=x64_SC_programs
+     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+  - name: "Installability (error_code)"
+    compiler:
+     - g++
+     - clang++
+     - clang++-10
+    env: NAME=x64_EC_install
+  - name: "Installability (error_code)"
+    compiler:
+     - g++
+     - clang++
+     - clang++-10
+    env:
+     - NAME=x64_SC_install
+     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
     
 before_install:
- - export NAME=$TRAVIS_OSNAME_$TRAVIS_COMPILER_$NAME
  - if [ "$TRAVIS_COMPILER" = "clang++-10" ]; then
      export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake";
+     wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -;
+     sudo apt install clang-10 libc++-10-dev libc++abi-10-dev libomp-10-dev;
    fi
- - git checkout develop
- - git submodule update --init --recursive
  - mount
 
 #     mkdir build;
@@ -95,18 +113,20 @@ before_install:
 
 script:
  -
-   if [ "$__" = "cmake tests" ] || [ "$__" = "x64 cmake tests (error_code)" ] || [ "$__" = "x64 cmake tests (status_code)" ]; then
+   if [[ "$NAME" == "x64_*_tests" ]]; then
+     export NAME=$TRAVIS_OSNAME_$TRAVIS_COMPILER_$NAME;
      export ASAN_OPTIONS=detect_leaks=0;
      ctest -S .ci.cmake -VV --timeout 300 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS ;
    fi
  -
-   if [ "$__" = "ARM32 cmake tests (error_code)" ] || [ "$__" = "ARM32 cmake tests (status_code)" ]; then
+   if [[ "$NAME" == "ARM32_*_build" ]]; then
+     export NAME=$TRAVIS_OSNAME_$TRAVIS_COMPILER_$NAME;
      export CXX=arm-linux-gnueabihf-g++;
      export CMAKE_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS -DCMAKE_SYSTEM_PROCESSOR=armhf -DCMAKE_CXX_FLAGS="-Wno-attributes -Wno-psabi";
      ctest -S .ci.cmake -V --timeout 300 -DCTEST_DISABLE_TESTING=1 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS ;
    fi
  -
-   if [ "$__" = "Documentation" ]; then
+   if [ "$NAME" = "Documentation" ]; then
      git config --global push.default simple;
      git config --global user.name "Jenkins nedprod CI";
      git config --global user.email "foo@nowhere";
@@ -121,7 +141,7 @@ script:
      cd ../..;
    fi
  -
-   if [ "$__" = "Programs" ]; then
+   if [[ "$NAME" == "x64_*_programs" ]]; then
      cd programs;
      mkdir build;
      cd build;
@@ -129,7 +149,7 @@ script:
      cmake --build .;
    fi
  -
-   if [ "$__" = "Installability" ]; then
+   if [[ "$NAME" == "x64_*_install" ]]; then
      git clone --depth 1 https://github.com/ned14/quickcpplib.git;
      pip3 install --user gitpython;
      python3 quickcpplib/scripts/test_cpp-pm_install.py test-packaging/example.cpp quickcpplib quickcpplib::hl https://github.com/ned14/quickcpplib outcome outcome::hl https://github.com/ned14/outcome llfio llfio::sl https://github.com/ned14/llfio;
@@ -143,7 +163,7 @@ script:
 after_success:
 # - bash -x ./update_coveralls.sh `pwd`
 #  - NEWNAME=llfio-v2.0-binaries-linux64-$(date +%Y%m%d%H%M%S).tgz
-  - if [ "${TRAVIS_OS_NAME}" = "linux" ] && [ "$CXX" = "g++" ] && [ "$__" = "x64 cmake tests (error_code)" ]; then   
+  - if [ "$NAME" = "linux_g++_x64_EC_tests" ]; then   
       NEWNAME=llfio-v2.0-binaries-linux64-$TRAVIS_COMMIT.tgz;
       mv llfio-v2.0-binaries-linux-x64.tgz $NEWNAME;
       curl -T $NEWNAME -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD https://dedi5.nedprod.com/static/files/upload/;
