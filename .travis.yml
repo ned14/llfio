@@ -1,9 +1,5 @@
 dist: bionic
 language: cpp
-compiler:
- - g++
- - clang++
- - clang++-10
 sudo: true
 git:
   submodules: false
@@ -99,6 +95,7 @@ before_install:
  - if [ "$TRAVIS_COMPILER" = "clang++-10" ]; then
      export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake";
      wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -;
+     echo "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-10 main" >> /etc/apt/sources.list;
      sudo apt update;
      sudo apt install clang-10 libc++-10-dev libc++abi-10-dev libomp-10-dev;
    fi
