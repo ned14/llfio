@@ -1,5 +1,9 @@
 dist: bionic
 language: cpp
+compiler:
+ - g++
+ - clang++
+ - clang++-10
 sudo: true
 git:
   submodules: false
@@ -68,14 +72,14 @@ matrix:
      - clang++
      - clang++-10
     env: NAME=x64_EC_programs
-  - name: "x64 Programs (status_code)"
-    compiler:
-     - g++
-     - clang++
-     - clang++-10
-    env:
-     - NAME=x64_SC_programs
-     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+#  - name: "x64 Programs (status_code)"
+#    compiler:
+#     - g++
+#     - clang++
+#     - clang++-10
+#    env:
+#     - NAME=x64_SC_programs
+#     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - name: "Installability (error_code)"
     compiler:
      - g++
@@ -92,6 +96,7 @@ matrix:
      - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
     
 before_install:
+ - if [ -z "$NAME" ]; then exit 0; fi
  - if [ "$TRAVIS_COMPILER" = "clang++-10" ]; then
      export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake";
      wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -;
@@ -111,6 +116,7 @@ before_install:
 #     cd ..;
 
 script:
+ - if [ -z "$NAME" ]; then exit 0; fi
  -
    if [[ "$NAME" == "x64_"*"_tests" ]]; then
      export NAME=$TRAVIS_OSNAME_$TRAVIS_COMPILER_$NAME;
@@ -121,8 +127,7 @@ script:
    if [[ "$NAME" == "ARM32_"*"_build" ]]; then
      export NAME=$TRAVIS_OSNAME_$TRAVIS_COMPILER_$NAME;
      export CXX=arm-linux-gnueabihf-g++;
-     export CMAKE_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS -DCMAKE_SYSTEM_PROCESSOR=armhf -DCMAKE_CXX_FLAGS="-Wno-attributes -Wno-psabi";
-     ctest -S .ci.cmake -V --timeout 300 -DCTEST_DISABLE_TESTING=1 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS ;
+     ctest -S .ci.cmake -V --timeout 300 -DCTEST_DISABLE_TESTING=1 '-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS -DCMAKE_SYSTEM_PROCESSOR=armhf -DCMAKE_CXX_FLAGS="-Wno-attributes -Wno-psabi"';
    fi
  -
    if [ "$NAME" = "Documentation" ]; then
@@ -160,6 +165,7 @@ script:
    fi
  
 after_success:
+  - if [ -z "$NAME" ]; then exit 0; fi
 # - bash -x ./update_coveralls.sh `pwd`
 #  - NEWNAME=llfio-v2.0-binaries-linux64-$(date +%Y%m%d%H%M%S).tgz
   - if [ "$NAME" = "linux_g++_x64_EC_tests" ]; then   
