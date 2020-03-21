@@ -219,7 +219,7 @@ LLFIO_V2_NAMESPACE_END
 // Bring in filesystem
 #if defined(__has_include)
 // clang-format off
-#if __has_include(<filesystem>) && (__cplusplus >= 201700 || _HAS_CXX17)
+#if !LLFIO_FORCE_EXPERIMENTAL_FILESYSTEM && __has_include(<filesystem>) && (__cplusplus >= 201700 || _HAS_CXX17)
 #include <filesystem>
 LLFIO_V2_NAMESPACE_BEGIN
 namespace filesystem = std::filesystem;
@@ -231,7 +231,7 @@ LLFIO_V2_NAMESPACE_END
 LLFIO_V2_NAMESPACE_BEGIN
 namespace filesystem = std::experimental::filesystem;
 LLFIO_V2_NAMESPACE_END
-#elif __has_include(<filesystem>)
+#elif !LLFIO_FORCE_EXPERIMENTAL_FILESYSTEM && __has_include(<filesystem>)
 #if defined(_MSC_VER) && _MSC_VER >= 1923
 #error MSVC dropped support for C++ 14 <filesystem> from VS2019 16.3 onwards. Please enable C++ 17 or later.
 #endif

@@ -164,53 +164,105 @@ if((MSVC AND MSVC_VERSION VERSION_GREATER_EQUAL 1923) OR APPLE)
   all_compile_features(PUBLIC
     cxx_std_17
   )
+  if(NOT DEFINED CMAKE_CXX_STANDARD_REQUIRED)
+    # Also set globally so compiler probes work
+    set(CMAKE_CXX_STANDARD_REQUIRED 17)
+  endif()
 endif()
 # Set the library dependencies this library has
 all_link_libraries(PUBLIC quickcpplib::hl outcome::hl Threads::Threads $<$<PLATFORM_ID:Linux>:rt>)
 
 # Set the system dependencies this library has
 include(CheckCXXSourceCompiles)
-# Are we on libstdc++ or libc++?
-check_cxx_source_compiles("
+include(CheckCXXSourceRuns)
+# Do we have native <filesystem> that just works without any extra effort?
+# We have to check if it runs, as binaries may link, but fail to run due to missing symbols
+check_cxx_source_runs("
+#include <filesystem>
+int main() {
+  try { return std::filesystem::path(\"hi\").empty(); } catch(std::filesystem::filesystem_error) { return 1; }
+}
+" CXX_HAS_CXX17_FILESYSTEM)
+if(NOT CXX_HAS_CXX17_FILESYSTEM)
+  indented_message(STATUS "NOTE: Standard <filesystem> not found in the current compiler configuration (try forcing C++ 17 or later?), attempting to figure out what <experimental/filesystem> linker flags to use for this STL ...")
+  # Are we on libstdc++ or libc++?
+  check_cxx_source_compiles("
 #include <iostream>
 int main() {
 #ifdef __GLIBCXX__
+  std::cout << \"hi\";
   return 0;
 #else
   return i am not a number;
 #endif
 }
 " CXX_IS_USING_LIBSTDCXX)
-check_cxx_source_compiles("
+  check_cxx_source_compiles("
 #include <iostream>
 int main() {
 #ifdef _LIBCPP_VERSION
+  std::cout << \"hi\";
   return 0;
 #else
   return i am not a number;
 #endif
 }
 " CXX_IS_USING_LIBCXX)
-# If on libstdc++, we need to link in stdc++fs for experimental filesystem
-if(CXX_IS_USING_LIBSTDCXX)
-  find_library(libstdcxx_stdcxxfs stdc++fs)
-  if(libstdcxx_stdcxxfs MATCHES "NOTFOUND")
-    set(libstdcxx_stdcxxfs -lstdc++fs)
+  if(NOT CXX_IS_USING_LIBSTDCXX AND NOT CXX_IS_USING_LIBCXX)
+    indented_message(FATAL_ERROR "FATAL: <filesystem> is not available, and neither libstdc++ nor libc++ STLs will link a program")
   endif()
-  all_link_libraries(PUBLIC ${libstdcxx_stdcxxfs})
-endif()
-# If on libc++, we may need to link in c++fs or c++experimental for experimental filesystem
-if(CXX_IS_USING_LIBCXX)
-  find_library(libcxx_cxxfs c++fs)
-  find_library(libcxx_cxxexperimental c++experimental)
-  if(NOT libcxx_cxxfs MATCHES "NOTFOUND")
-    all_link_libraries(PUBLIC ${libcxx_cxxfs})
+  set(stl_filesystem_link_flags)
+  # If on libstdc++, we need to link in stdc++fs for experimental filesystem
+  if(CXX_IS_USING_LIBSTDCXX)
+    find_library(libstdcxx_stdcxxfs stdc++fs)
+    if(libstdcxx_stdcxxfs MATCHES "NOTFOUND")
+      set(libstdcxx_stdcxxfs -lstdc++fs)
+    endif()
+    all_link_libraries(PUBLIC ${libstdcxx_stdcxxfs})
+    list(APPEND stl_filesystem_link_flags ${libstdcxx_stdcxxfs})
   endif()
-  if(NOT libcxx_cxxexperimental MATCHES "NOTFOUND")
-    all_link_libraries(PUBLIC ${libcxx_cxxexperimental})
+  # If on libc++, we may need to link in c++fs or c++experimental for experimental filesystem
+  if(CXX_IS_USING_LIBCXX)
+    find_library(libcxx_cxxfs c++fs)
+    find_library(libcxx_cxxexperimental c++experimental)
+    if(NOT libcxx_cxxfs MATCHES "NOTFOUND" AND NOT libcxx_cxxexperimental MATCHES "NOTFOUND")
+      # I guess default to forcing libc++experimental?
+      set(libcxx_cxxexperimental -lc++experimental)
+    endif()
+    if(NOT libcxx_cxxfs MATCHES "NOTFOUND")
+      all_link_libraries(PUBLIC ${libcxx_cxxfs})
+      list(APPEND stl_filesystem_link_flags ${libcxx_cxxfs})
+    endif()
+    if(NOT libcxx_cxxexperimental MATCHES "NOTFOUND")
+      all_link_libraries(PUBLIC ${libcxx_cxxexperimental})
+      list(APPEND stl_filesystem_link_flags ${libcxx_cxxexperimental})
+    endif()
+    # Disable the irritating warnings
+    all_compile_definitions(PUBLIC _LIBCPP_NO_EXPERIMENTAL_DEPRECATION_WARNING_FILESYSTEM=1)
   endif()
-  # Disable the irritating warnings
-  all_compile_definitions(PUBLIC _LIBCPP_NO_EXPERIMENTAL_DEPRECATION_WARNING_FILESYSTEM=1)
+  function(check_stl_filesystem_link_flags)
+    indented_message(STATUS "NOTE: Using STL link flags '${ARGN}'")
+    set(CMAKE_REQUIRED_LIBRARIES ${ARGN})
+    check_cxx_source_runs("
+#include <filesystem>
+int main() {
+  try { return std::filesystem::path(\"hi\").empty(); } catch(std::filesystem::filesystem_error) { return 1; }
+}
+" CXX_HAS_CXX_FILESYSTEM_AFTER_FLAGS)
+    check_cxx_source_runs("
+#include <experimental/filesystem>
+int main() {
+  try { return std::experimental::filesystem::path(\"hi\").empty(); } catch(std::experimental::filesystem::filesystem_error) { return 1; }
+}
+" CXX_HAS_CXX_EXPERIMENTAL_FILESYSTEM_AFTER_FLAGS)
+  if(NOT CXX_HAS_CXX_FILESYSTEM_AFTER_FLAGS AND NOT CXX_HAS_CXX_EXPERIMENTAL_FILESYSTEM_AFTER_FLAGS)
+    indented_message(FATAL_ERROR "FATAL: After probing multiple configurations, still cannot compile and link a <filesystem> or <experimental/filesystem> based program! Please adjust the configuration and/or install missing dependencies.")
+  endif()
+  endfunction()
+  check_stl_filesystem_link_flags(${stl_filesystem_link_flags})
+  if(NOT CXX_HAS_CXX_FILESYSTEM_AFTER_FLAGS AND CXX_HAS_CXX_EXPERIMENTAL_FILESYSTEM_AFTER_FLAGS)
+    all_compile_definitions(PUBLIC LLFIO_FORCE_EXPERIMENTAL_FILESYSTEM=1 KERNELTEST_FORCE_EXPERIMENTAL_FILESYSTEM=1)
+  endif()
 endif()
 
 # Set any macros this library requires

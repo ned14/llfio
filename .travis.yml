@@ -3,6 +3,7 @@ language: cpp
 compiler:
  - g++
  - clang++
+ - clang++-10
 sudo: false
 os:
  - linux
@@ -18,9 +19,14 @@ notifications:
 
 addons:
   apt:
+    sources:
+    - llvm-toolchain-bionic-10
     packages:
     - g++
     - clang
+    - clang-10
+    - libc++-10-dev
+    - libc++abi-10-dev
     - g++-arm-linux-gnueabihf
     - python3
     - cmake
@@ -52,28 +58,28 @@ matrix:
 #  - os: osx
 #    env: __="ARM32 cmake tests (status_code)" NAME=ARM32_SC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - os: linux
-    compiler: clang++
+    compiler:
+    - clang++
+    - clang++-10
     env: __="ARM32 cmake tests (error_code)" NAME=ARM32_EC CMAKE_CONFIGURE_OPTIONS=
   - os: linux
-    compiler: clang++
+    compiler:
+    - clang++
+    - clang++-10
     env: __="ARM32 cmake tests (status_code)" NAME=ARM32_SC CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - os: linux
-    compiler: g++
+    compiler:
+    - g++
+    - clang++-10
     env: __="Documentation" NAME=Documentation
 
 cache:
   apt: true
     
 before_install:
- -
-   if [ "${TRAVIS_OS_NAME}" = "osx" ]; then
-     if [ "$CXX" = "g++" ]; then export NAME=MacOSGCC$NAME; fi;
-     if [ "$CXX" = "clang++" ]; then export NAME=MacOSClang$NAME; fi;
-   fi
- -
-   if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
-     if [ "$CXX" = "g++" ]; then export NAME=LinuxGCC$NAME; fi;
-     if [ "$CXX" = "clang++" ]; then export NAME=LinuxClang$NAME; fi;
+ - export NAME=$TRAVIS_OSNAME_$TRAVIS_COMPILER_$NAME
+ - if [ "$TRAVIS_COMPILER" = "clang++-10" ]; then
+     export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake";
    fi
  - git checkout develop
  - git submodule update --init --recursive
