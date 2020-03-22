@@ -1,9 +1,5 @@
 dist: bionic
 language: cpp
-compiler:
- - g++
- - clang++
- - clang++-10
 sudo: true
 git:
   submodules: false
@@ -39,38 +35,48 @@ env:
 matrix:
   include:
   - name: "x64 cmake tests (error_code)"
-    compiler:
-     - g++
-     - clang++
-     - clang++-10
+    compiler: g++
+    env: NAME=x64_EC_tests
+  - name: "x64 cmake tests (error_code)"
+    compiler: clang++
+    env: NAME=x64_EC_tests
+  - name: "x64 cmake tests (error_code)"
+    compiler: clang++-10
     env: NAME=x64_EC_tests
   - name: "x64 cmake tests (status_code)"
-    compiler:
-     - g++
-     - clang++
-     - clang++-10
+    compiler: g++
+    env:
+     - NAME=x64_SC_tests
+     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+  - name: "x64 cmake tests (status_code)"
+    compiler: clang++
+    env:
+     - NAME=x64_SC_tests
+     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+  - name: "x64 cmake tests (status_code)"
+    compiler: clang++-10
     env:
      - NAME=x64_SC_tests
      - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - name: "ARM32 cmake build (error_code)"
-    compiler:
-     - g++
+    compiler: g++
     env: NAME=ARM32_EC_build
   - name: "ARM32 cmake build (error_code)"
-    compiler:
-     - g++
+    compiler: g++
     env:
      - NAME=ARM32_SC_build
      - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - name: "Documentation"
-    compiler:
-     - clang++
+    compiler: clang++
     env: NAME=Documentation
   - name: "x64 Programs (error_code)"
-    compiler:
-     - g++
-     - clang++
-     - clang++-10
+    compiler: g++
+    env: NAME=x64_EC_programs
+  - name: "x64 Programs (error_code)"
+    compiler: clang++
+    env: NAME=x64_EC_programs
+  - name: "x64 Programs (error_code)"
+    compiler: clang++-10
     env: NAME=x64_EC_programs
 #  - name: "x64 Programs (status_code)"
 #    compiler:
@@ -81,16 +87,26 @@ matrix:
 #     - NAME=x64_SC_programs
 #     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - name: "Installability (error_code)"
-    compiler:
-     - g++
-     - clang++
-     - clang++-10
+    compiler: g++
     env: NAME=x64_EC_install
   - name: "Installability (error_code)"
-    compiler:
-     - g++
-     - clang++
-     - clang++-10
+    compiler: clang++
+    env: NAME=x64_EC_install
+  - name: "Installability (error_code)"
+    compiler: clang++-10
+    env: NAME=x64_EC_install
+  - name: "Installability (error_code)"
+    compiler: g++
+    env:
+     - NAME=x64_SC_install
+     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+  - name: "Installability (error_code)"
+    compiler: clang++
+    env:
+     - NAME=x64_SC_install
+     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+  - name: "Installability (error_code)"
+    compiler: clang++-10
     env:
      - NAME=x64_SC_install
      - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
@@ -126,8 +142,7 @@ script:
  -
    if [[ "$NAME" == "ARM32_"*"_build" ]]; then
      export NAME=$TRAVIS_OSNAME_$TRAVIS_COMPILER_$NAME;
-     export CXX=arm-linux-gnueabihf-g++;
-     ctest -S .ci.cmake -V --timeout 300 -DCTEST_DISABLE_TESTING=1 '-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS -DCMAKE_SYSTEM_PROCESSOR=armhf -DCMAKE_CXX_FLAGS="-Wno-attributes -Wno-psabi"';
+     ctest -S .ci.cmake -V --timeout 300 -DCTEST_DISABLE_TESTING=1 '-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-arm.cmake';
    fi
  -
    if [ "$NAME" = "Documentation" ]; then
