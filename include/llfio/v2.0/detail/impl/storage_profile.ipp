@@ -1143,7 +1143,7 @@ namespace storage_profile
       {
         if(!srch.read(0, {{nullptr, 0}}))
         {
-          ++errors;
+          errors = errors + 1;
         }
       }
       auto end = std::chrono::high_resolution_clock::now();
@@ -1163,7 +1163,7 @@ namespace storage_profile
       {
         if(!srch.write(0, {{nullptr, 0}}))
         {
-          ++errors;
+          errors = errors + 1;
         }
       }
       auto end = std::chrono::high_resolution_clock::now();

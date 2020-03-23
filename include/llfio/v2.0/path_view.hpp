@@ -397,7 +397,7 @@ private:
   template <class CharT> static filesystem::path _path_from_char_array(basic_string_view<CharT> v) { return {v.data(), v.data() + v.size()}; }
   static filesystem::path _path_from_char_array(basic_string_view<char8_t> v)
   {
-#if __cplusplus >= 202000 || _HAS_CXX20
+#if (__cplusplus >= 202000 || _HAS_CXX20) && (!defined(_LIBCPP_VERSION) || _LIBCPP_VERSION > 10000 /* approx start of 2020 */)
     return filesystem::path(v);
 #else
     return filesystem::u8path((const char *) v.data(), (const char *) v.data() + v.size());

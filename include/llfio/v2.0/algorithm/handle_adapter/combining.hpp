@@ -201,7 +201,7 @@ namespace algorithm
 #endif
         for(size_t n = 0; n < 2; n++)
         {
-          io_request<buffers_type> req(buffers[n], reqs.offset);
+          io_request<buffers_type> req({&buffers[n], 1}, reqs.offset);
           if(n == 0)
           {
             _filleds[n] = _target->read(req, d);
@@ -275,7 +275,7 @@ namespace algorithm
         // Read the source if we have one
         if(_have_source)
         {
-          io_request<buffers_type> req(buffers[1], reqs.offset);
+          io_request<buffers_type> req({&buffers[1], 1}, reqs.offset);
           OUTCOME_TRY(_, _source->read(req, d));
           tempbuffers[1] = buffer_type{_[0].data(), _[0].size()};
         }
@@ -299,7 +299,7 @@ namespace algorithm
         // Write the temporary buffer, and adjust the buffers written we return to match
         {
           const_buffer_type b(buffers[0]);
-          io_request<const_buffers_type> req({b}, reqs.offset);
+          io_request<const_buffers_type> req({&b, 1}, reqs.offset);
           OUTCOME_TRY(_, _target->write(req, d));
           OUTCOME_TRY((Op<target_handle_type, source_handle_type>::adjust_written_buffers(reqs.buffers, _[0], buffers[0])));
         }
