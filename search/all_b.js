@@ -6,6 +6,8 @@ var searchData=
   ['length',['length',['../structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html#a694c74732e045b21ef066232cfe2827a',1,'llfio_v2_xxx::file_handle::extent_pair::length()'],['../classllfio__v2__xxx_1_1section__handle.html#a137acb9e2bbec111072ef357236e9441',1,'llfio_v2_xxx::section_handle::length()'],['../classllfio__v2__xxx_1_1map__handle.html#ad2fce2bd5cd3798196c0dcf87f569ef7',1,'llfio_v2_xxx::map_handle::length()'],['../namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9',1,'llfio_v2_xxx::length(const section_handle &amp;self) noexcept'],['../namespacellfio__v2__xxx.html#a70e68bcf05636966ffefe001b903487e',1,'llfio_v2_xxx::length(const map_handle &amp;self) noexcept']]],
   ['llfio_2ehpp',['llfio.hpp',['../llfio_8hpp.html',1,'(Global Namespace)'],['../v2_80_2llfio_8hpp.html',1,'(Global Namespace)']]],
   ['llfio_5fcompile_5fkqueues',['LLFIO_COMPILE_KQUEUES',['../io__service_8hpp.html#a194acf5c39b199b59acafded3b2015b8',1,'io_service.hpp']]],
+  ['llfio_5fdeadline_5fto_5fpartial_5fdeadline',['LLFIO_DEADLINE_TO_PARTIAL_DEADLINE',['../deadline_8h.html#a9ad4e75918453ebe2365378d3d04dce0',1,'deadline.h']]],
+  ['llfio_5fdeadline_5fto_5fsleep_5finit',['LLFIO_DEADLINE_TO_SLEEP_INIT',['../deadline_8h.html#adf76463290984016fdbe2ac4c7c514e4',1,'deadline.h']]],
   ['llfio_5fdisable_5fpaths_5fin_5ffailure_5finfo',['LLFIO_DISABLE_PATHS_IN_FAILURE_INFO',['../config_8hpp.html#a65d3346e1345f27d02cfe4ef4d7c9c3a',1,'config.hpp']]],
   ['llfio_5fexperimental_5fstatus_5fcode',['LLFIO_EXPERIMENTAL_STATUS_CODE',['../config_8hpp.html#aebebb7d8d2589a39eba3e0e84cb26559',1,'config.hpp']]],
   ['llfio_5fhave_5frealtime_5fsignals',['LLFIO_HAVE_REALTIME_SIGNALS',['../io__service_8hpp.html#a2195d9a60e427e96cb90a7bb95f1b773',1,'io_service.hpp']]],
