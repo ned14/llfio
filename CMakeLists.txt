@@ -175,9 +175,16 @@ all_link_libraries(PUBLIC quickcpplib::hl outcome::hl Threads::Threads $<$<PLATF
 # Set the system dependencies this library has
 include(CheckCXXSourceCompiles)
 include(CheckCXXSourceRuns)
+macro(check_cxx_source_linkage prog var)
+  if(CMAKE_SYSTEM_PROCESSOR STREQUAL ${CMAKE_HOST_SYSTEM_PROCESSOR})
+    check_cxx_source_runs("${prog}" ${var})
+  else()
+    check_cxx_source_compiles("${prog}" ${var})
+  endif()
+endmacro()
 # Do we have native <filesystem> that just works without any extra effort?
 # We have to check if it runs, as binaries may link, but fail to run due to missing symbols
-check_cxx_source_runs("
+check_cxx_source_linkage("
 #include <filesystem>
 int main() {
   try { return std::filesystem::path(\"hi\").empty(); } catch(std::filesystem::filesystem_error) { return 1; }
@@ -243,13 +250,13 @@ int main() {
   function(check_stl_filesystem_link_flags)
     indented_message(STATUS "NOTE: Using STL link flags '${ARGN}'")
     set(CMAKE_REQUIRED_LIBRARIES ${ARGN})
-    check_cxx_source_runs("
+    check_cxx_source_linkage("
 #include <filesystem>
 int main() {
   try { return std::filesystem::path(\"hi\").empty(); } catch(std::filesystem::filesystem_error) { return 1; }
 }
 " CXX_HAS_CXX_FILESYSTEM_AFTER_FLAGS)
-    check_cxx_source_runs("
+    check_cxx_source_linkage("
 #include <experimental/filesystem>
 int main() {
   try { return std::experimental::filesystem::path(\"hi\").empty(); } catch(std::experimental::filesystem::filesystem_error) { return 1; }

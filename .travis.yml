@@ -1,9 +1,5 @@
 dist: bionic
 language: cpp
-compiler:
- - g++
- - clang++
- - clang++-10
 sudo: true
 git:
   submodules: false
@@ -38,40 +34,54 @@ env:
  
 matrix:
   include:
-  - name: "x64 cmake tests (error_code)"
-    compiler:
-     - g++
-     - clang++
-     - clang++-10
+  - name: "g++ 7.5 x64 cmake tests (error_code)"
+    compiler: g++
     env: NAME=x64_EC_tests
-  - name: "x64 cmake tests (status_code)"
-    compiler:
-     - g++
-     - clang++
-     - clang++-10
+  - name: "clang++ 7.0 x64 cmake tests (error_code)"
+    compiler: clang++
+    env: NAME=x64_EC_tests
+  - name: "libc++ x64 cmake tests (error_code)"
+    compiler: clang++-10
+    env:
+     - NAME=x64_EC_tests
+     - CMAKE_CONFIGURE_OPTIONS=-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake
+  - name: "g++ 7.5 x64 cmake tests (status_code)"
+    compiler: g++
     env:
      - NAME=x64_SC_tests
      - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
-  - name: "ARM32 cmake build (error_code)"
-    compiler:
-     - g++
+  - name: "clang++ 7.0 x64 cmake tests (status_code)"
+    compiler: clang++
+    env:
+     - NAME=x64_SC_tests
+     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+  - name: "libc++ x64 cmake tests (status_code)"
+    compiler: clang++-10
+    env:
+     - NAME=x64_SC_tests
+     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake
+  - name: "g++ ARM32 cmake build (error_code)"
+    compiler: g++
     env: NAME=ARM32_EC_build
-  - name: "ARM32 cmake build (error_code)"
-    compiler:
-     - g++
+  - name: "g++ ARM32 cmake build (status_code)"
+    compiler: g++
     env:
      - NAME=ARM32_SC_build
      - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - name: "Documentation"
-    compiler:
-     - clang++
+    compiler: clang++
     env: NAME=Documentation
-  - name: "x64 Programs (error_code)"
-    compiler:
-     - g++
-     - clang++
-     - clang++-10
+  - name: "g++ 7.5 x64 Programs (error_code)"
+    compiler: g++
     env: NAME=x64_EC_programs
+  - name: "clang++ 7.0 x64 Programs (error_code)"
+    compiler: clang++
+    env: NAME=x64_EC_programs
+  - name: "libc++ x64 Programs (error_code)"
+    compiler: clang++-10
+    env:
+     - NAME=x64_EC_programs
+     - CMAKE_CONFIGURE_OPTIONS=-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake
 #  - name: "x64 Programs (status_code)"
 #    compiler:
 #     - g++
@@ -80,32 +90,41 @@ matrix:
 #    env:
 #     - NAME=x64_SC_programs
 #     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
-  - name: "Installability (error_code)"
-    compiler:
-     - g++
-     - clang++
-     - clang++-10
+  - name: "g++ 7.5 Installability (error_code)"
+    compiler: g++
     env: NAME=x64_EC_install
-  - name: "Installability (error_code)"
-    compiler:
-     - g++
-     - clang++
-     - clang++-10
+  - name: "clang++ 7.0 Installability (error_code)"
+    compiler: clang++
+    env: NAME=x64_EC_install
+  - name: "libc++ Installability (error_code)"
+    compiler: clang++-10
+    env:
+     - NAME=x64_EC_install
+     - CMAKE_CONFIGURE_OPTIONS=-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake
+  - name: "g++ 7.5 Installability (status_code)"
+    compiler: g++
     env:
      - NAME=x64_SC_install
      - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+  - name: "clang++ 7.0 Installability (status_code)"
+    compiler: clang++
+    env:
+     - NAME=x64_SC_install
+     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+  - name: "libc++ Installability (status_code)"
+    compiler: clang++-10
+    env:
+     - NAME=x64_SC_install
+     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake
     
 before_install:
- - if [ -z "$NAME" ]; then exit 0; fi
  - if [ "$TRAVIS_COMPILER" = "clang++-10" ]; then
-     export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake";
      wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -;
      echo "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-10 main" >> /etc/apt/sources.list;
      sudo apt update;
      sudo apt install clang-10 libc++-10-dev libc++abi-10-dev libomp-10-dev;
    fi
  - mount
- - env
 
 #     mkdir build;
 #     cd build;
@@ -116,7 +135,6 @@ before_install:
 #     cd ..;
 
 script:
- - if [ -z "$NAME" ]; then exit 0; fi
  -
    if [[ "$NAME" == "x64_"*"_tests" ]]; then
      export NAME=$TRAVIS_OSNAME_$TRAVIS_COMPILER_$NAME;
@@ -126,14 +144,14 @@ script:
  -
    if [[ "$NAME" == "ARM32_"*"_build" ]]; then
      export NAME=$TRAVIS_OSNAME_$TRAVIS_COMPILER_$NAME;
-     export CXX=arm-linux-gnueabihf-g++;
-     ctest -S .ci.cmake -V --timeout 300 -DCTEST_DISABLE_TESTING=1 '-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS -DCMAKE_SYSTEM_PROCESSOR=armhf -DCMAKE_CXX_FLAGS="-Wno-attributes -Wno-psabi"';
+     ctest -S .ci.cmake -V --timeout 300 -DCTEST_DISABLE_TESTING=1 '-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-arm.cmake';
    fi
  -
    if [ "$NAME" = "Documentation" ]; then
      git config --global push.default simple;
      git config --global user.name "Jenkins nedprod CI";
      git config --global user.email "foo@nowhere";
+     git submodule update --init;
      cd doc/html;
      git checkout gh-pages;
      cd ../..;
@@ -165,7 +183,6 @@ script:
    fi
  
 after_success:
-  - if [ -z "$NAME" ]; then exit 0; fi
 # - bash -x ./update_coveralls.sh `pwd`
 #  - NEWNAME=llfio-v2.0-binaries-linux64-$(date +%Y%m%d%H%M%S).tgz
   - if [ "$NAME" = "linux_g++_x64_EC_tests" ]; then   
