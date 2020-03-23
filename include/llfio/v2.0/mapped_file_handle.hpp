@@ -480,13 +480,17 @@ public:
         if(written.empty())
         {
           reqs.buffers = reqs.buffers.subspan(0, n);
-          return reqs.buffers;
+          break;
         }
         for(auto &b : written)
         {
           thisreq.offset += b.size();
           n++;
         }
+      }
+      if(thisreq.offset > _mh.length())
+      {
+        OUTCOME_TRY(_mh.update_map());
       }
       return reqs.buffers;
     }

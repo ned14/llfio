@@ -919,7 +919,16 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_reque
   LLFIO_LOG_FUNCTION_CALL(this);
   if(!!(_flag & section_handle::flag::write_via_syscall) && _section != nullptr && _section->backing() != nullptr)
   {
-    return _section->backing()->write(reqs, d);
+    auto r = _section->backing()->write(reqs, d);
+    if(!r)
+    {
+      return std::move(r).error();
+    }
+    if(reqs.offset + r.bytes_transferred() > _length)
+    {
+      OUTCOME_TRY(update_map());
+    }
+    return std::move(r).value();
   }
   byte *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
