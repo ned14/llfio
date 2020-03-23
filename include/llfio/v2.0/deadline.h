@@ -104,6 +104,18 @@ struct LLFIO_DEADLINE_NAME
 #endif
 };
 
+/*! Defines a number of variables into its scope:
+- began_steady: Set to the steady clock at the beginning of a sleep
+*/
+#define LLFIO_DEADLINE_TO_SLEEP_INIT(d)                                                                                                                                                                                                                                                                                  \
+  std::chrono::steady_clock::time_point began_steady;                                                                                                                                                                                                                                                                          \
+  if(d)                                                                                                                                                                                                                                                                                                                        \
+  {                                                                                                                                                                                                                                                                                                                            \
+    if((d).steady)                                                                                                                                                                                                                                                                                                             \
+      began_steady = std::chrono::steady_clock::now();                                                                                                                                                                                                                                                                         \
+  }
+
+//! Run inside a series of steps to create a sub-deadline from a master deadline
 #define LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d)                                                                                                                                                                                                                                                                              \
   if(d)                                                                                                                                                                                                                                                                                                                        \
   {                                                                                                                                                                                                                                                                                                                            \
