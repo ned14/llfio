@@ -332,7 +332,7 @@ static inline result<void> win32_map_flags(native_handle_type &nativeh, DWORD &a
   }
   else if(_flag & section_handle::flag::write)
   {
-    prot = PAGE_READWRITE;
+    prot = (_flag & section_handle::flag::write_via_syscall) ? PAGE_READONLY : PAGE_READWRITE;
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
   }
   else if(_flag & section_handle::flag::read)

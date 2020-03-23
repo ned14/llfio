@@ -280,7 +280,7 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
   }
   else if(_flag & section_handle::flag::write)
   {
-    prot |= PROT_READ | PROT_WRITE;
+    prot = (_flag & section_handle::flag::write_via_syscall) ? PROT_READ : (PROT_READ | PROT_WRITE);
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
   }
   else if(_flag & section_handle::flag::read)

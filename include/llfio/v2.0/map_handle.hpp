@@ -68,7 +68,7 @@ public:
 
                                    barrier_on_close = 1U << 16U,   //!< Maps of this section, if writable, issue a `barrier()` when destructed blocking until data (not metadata) reaches physical storage.
                                    nvram = 1U << 17U,              //!< This section is of non-volatile RAM.
-                                   write_via_syscall = 1U << 18U,  //!< For file backed maps, `map_handle::write()` is implemented as a `write()` syscall to the file descriptor.
+                                   write_via_syscall = 1U << 18U,  //!< For file backed maps, `map_handle::write()` is implemented as a `write()` syscall to the file descriptor. This causes the map to be mapped read-only.
 
                                    page_sizes_1 = 1U << 24U,  //!< Use `utils::page_sizes()[1]` sized pages, or fail.
                                    page_sizes_2 = 2U << 24U,  //!< Use `utils::page_sizes()[2]` sized pages, or fail.
