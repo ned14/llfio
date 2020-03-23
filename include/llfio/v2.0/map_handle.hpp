@@ -66,8 +66,9 @@ public:
                                    executable = 1U << 10U,  //!< The backing storage is in fact an executable program binary.
                                    singleton = 1U << 11U,   //!< A single instance of this section is to be shared by all processes using the same backing file.
 
-                                   barrier_on_close = 1U << 16U,  //!< Maps of this section, if writable, issue a `barrier()` when destructed blocking until data (not metadata) reaches physical storage.
-                                   nvram = 1U << 17U,             //!< This section is of non-volatile RAM
+                                   barrier_on_close = 1U << 16U,   //!< Maps of this section, if writable, issue a `barrier()` when destructed blocking until data (not metadata) reaches physical storage.
+                                   nvram = 1U << 17U,              //!< This section is of non-volatile RAM.
+                                   write_via_syscall = 1U << 18U,  //!< For file backed maps, `map_handle::write()` is implemented as a `write()` syscall to the file descriptor.
 
                                    page_sizes_1 = 1U << 24U,  //!< Use `utils::page_sizes()[1]` sized pages, or fail.
                                    page_sizes_2 = 2U << 24U,  //!< Use `utils::page_sizes()[2]` sized pages, or fail.
@@ -88,6 +89,11 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
   //! Default constructor
   constexpr section_handle() {}  // NOLINT
+  //! Construct a section handle using the given flags
+  constexpr explicit section_handle(flag __flag)
+      : _flag(__flag)
+  {
+  }
   //! Construct a section handle using the given native handle type for the section and the given i/o handle for the backing storage
   explicit section_handle(native_handle_type sectionh, file_handle *backing, file_handle anonymous, flag __flag)
       : handle(sectionh, handle::caching::all)
@@ -220,6 +226,10 @@ inline std::ostream &operator<<(std::ostream &s, const section_handle::flag &v)
   if(!!(v & section_handle::flag::nvram))
   {
     temp.append("nvram|");
+  }
+  if(!!(v & section_handle::flag::write_via_syscall))
+  {
+    temp.append("write_via_syscall|");
   }
   if((v & section_handle::flag::page_sizes_3) == section_handle::flag::page_sizes_3)
   {
@@ -507,7 +517,7 @@ public:
   \param bytes How many bytes to map. Typically will be rounded up to a multiple of the page size
   (see `page_size()`).
   \param zeroed Set to true if only all bits zeroed memory is wanted.
-  \param _flag The permissions with which to map the view. 
+  \param _flag The permissions with which to map the view.
 
   \note On Microsoft Windows this constructor uses the faster `VirtualAlloc()` which creates less
   versatile page backed memory. If you want anonymous memory allocated from a paging file backed
@@ -706,7 +716,14 @@ public:
 
   /*! \brief Write data to the mapped view.
 
-  \note This call traps signals and structured exception throws using `QUICKCPPLIB_NAMESPACE::signal_guard`.
+  If this map is backed by a file, and `section_handle::flag::write_via_syscall` is set, this function is
+  actually implemented using the equivalent to the kernel's `write()` syscall. This will be very significantly
+  slower for small writes than writing into the map directly, and will corrupt file content on kernels without
+  a unified kernel page cache, so it should not be normally enabled. However, this technique is known to work
+  around various kernel bugs, quirks and race conditions found in modern OS kernels when memory mapped i/o
+  is performed at scale (files of many tens of Gb each).
+ 
+ \note This call traps signals and structured exception throws using `QUICKCPPLIB_NAMESPACE::signal_guard`.
   Instantiating a `QUICKCPPLIB_NAMESPACE::signal_guard_install` somewhere much higher up in the call stack
   will improve performance enormously. The signal guard may cost less than 100 CPU cycles depending on how
   you configure it. If you don't want the guard, you can write memory directly using `address()`.

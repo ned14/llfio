@@ -43,7 +43,7 @@ result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type rese
   }
   if(!_sh.is_valid())
   {
-    section_handle::flag sectionflags = section_handle::flag::readwrite;
+    section_handle::flag sectionflags = _sh.section_flags() | section_handle::flag::readwrite;
     OUTCOME_TRY(sh, section_handle::section(*this, length, sectionflags));
     _sh = std::move(sh);
   }

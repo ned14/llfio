@@ -44,7 +44,7 @@ result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type rese
   if(!_sh.is_valid())
   {
     // Section must match read/write of file, as otherwise map reservation doesn't work on Windows
-    section_handle::flag sectionflags = section_handle::flag::singleton;
+    section_handle::flag sectionflags = _sh.section_flags() | section_handle::flag::singleton;
     if(this->is_readable())
       sectionflags |= section_handle::flag::read;
     if(this->is_writable())

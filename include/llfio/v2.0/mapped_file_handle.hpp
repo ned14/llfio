@@ -172,13 +172,15 @@ public:
   //! No copy construction (use `clone()`)
   mapped_file_handle(const mapped_file_handle &) = delete;
   //! Explicit conversion from file_handle permitted
-  explicit constexpr mapped_file_handle(file_handle &&o) noexcept
+  explicit constexpr mapped_file_handle(file_handle &&o, section_handle::flag sflags) noexcept
       : file_handle(std::move(o))
+      , _sh(sflags)
   {
   }
   //! Explicit conversion from file_handle permitted, this overload also attempts to map the file
-  explicit mapped_file_handle(file_handle &&o, size_type reservation) noexcept
+  explicit mapped_file_handle(file_handle &&o, size_type reservation, section_handle::flag sflags) noexcept
       : file_handle(std::move(o))
+      , _sh(sflags)
   {
     auto out = reserve(reservation);
     if(!out)
@@ -213,6 +215,7 @@ public:
   \param _creation How to create the file.
   \param _caching How to ask the kernel to cache the file.
   \param flags Any additional custom behaviours.
+  \param sflags Any additional custom behaviours for the internal `section_handle`.
 
   Note that if the file is currently zero sized, no mapping occurs now, but
   later when `truncate()` or `update_map()` is called.
@@ -220,7 +223,7 @@ public:
   \errors Any of the values which the constructors for `file_handle`, `section_handle` and `map_handle` can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<mapped_file_handle> mapped_file(size_type reservation, const path_handle &base, path_view_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept
+  static inline result<mapped_file_handle> mapped_file(size_type reservation, const path_handle &base, path_view_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none, section_handle::flag sflags = section_handle::flag::none) noexcept
   {
     if(_mode == mode::append)
     {
@@ -232,7 +235,7 @@ public:
     default:
     {
       // Attempt mapping now (may silently fail if file is empty)
-      mapped_file_handle mfh(std::move(fh), reservation);
+      mapped_file_handle mfh(std::move(fh), reservation, sflags);
       return {std::move(mfh)};
     }
     case creation::only_if_not_exist:
@@ -240,7 +243,7 @@ public:
     case creation::always_new:
     {
       // Don't attempt mapping now as file will be empty
-      mapped_file_handle mfh(std::move(fh));
+      mapped_file_handle mfh(std::move(fh), sflags);
       mfh._reservation = reservation;
       return {std::move(mfh)};
     }
@@ -248,7 +251,10 @@ public:
   }
   //! \overload
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<mapped_file_handle> mapped_file(const path_handle &base, path_view_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept { return mapped_file(0, base, _path, _mode, _creation, _caching, flags); }
+  static inline result<mapped_file_handle> mapped_file(const path_handle &base, path_view_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none, section_handle::flag sflags = section_handle::flag::none) noexcept
+  {
+    return mapped_file(0, base, _path, _mode, _creation, _caching, flags, sflags);
+  }
 
   /*! Create an mapped file handle creating a uniquely named file on a path.
   The file is opened exclusively with `creation::only_if_not_exist` so it
@@ -259,7 +265,7 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<mapped_file_handle> mapped_uniquely_named_file(size_type reservation, const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::temporary, flag flags = flag::none) noexcept
+  static inline result<mapped_file_handle> mapped_uniquely_named_file(size_type reservation, const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::temporary, flag flags = flag::none, section_handle::flag sflags = section_handle::flag::none) noexcept
   {
     try
     {
@@ -267,7 +273,7 @@ public:
       {
         auto randomname = utils::random_string(32);
         randomname.append(".random");
-        result<mapped_file_handle> ret = mapped_file(reservation, dirpath, randomname, _mode, creation::only_if_not_exist, _caching, flags);
+        result<mapped_file_handle> ret = mapped_file(reservation, dirpath, randomname, _mode, creation::only_if_not_exist, _caching, flags, sflags);
         if(ret || (!ret && ret.error() != errc::file_exists))
         {
           return ret;
@@ -295,10 +301,11 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<mapped_file_handle> mapped_temp_file(size_type reservation, path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::temporary, flag flags = flag::unlink_on_first_close) noexcept
+  static inline result<mapped_file_handle> mapped_temp_file(size_type reservation, path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::temporary, flag flags = flag::unlink_on_first_close,
+                                                            section_handle::flag sflags = section_handle::flag::none) noexcept
   {
     auto &tempdirh = path_discovery::storage_backed_temporary_files_directory();
-    return name.empty() ? mapped_uniquely_named_file(reservation, tempdirh, _mode, _caching, flags) : mapped_file(reservation, tempdirh, name, _mode, _creation, _caching, flags);
+    return name.empty() ? mapped_uniquely_named_file(reservation, tempdirh, _mode, _caching, flags, sflags) : mapped_file(reservation, tempdirh, name, _mode, _creation, _caching, flags, sflags);
   }
   /*! \em Securely create a mapped file handle creating a temporary anonymous inode in
   the filesystem referred to by \em dirpath. The inode created has
@@ -311,10 +318,10 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<mapped_file_handle> mapped_temp_inode(size_type reservation = 0, const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<mapped_file_handle> mapped_temp_inode(size_type reservation = 0, const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none, section_handle::flag sflags = section_handle::flag::none) noexcept
   {
     OUTCOME_TRY(v, file_handle::temp_inode(dir, _mode, flags));
-    mapped_file_handle ret(std::move(v));
+    mapped_file_handle ret(std::move(v), sflags);
     ret._reservation = reservation;
     return {std::move(ret)};
   }
@@ -366,7 +373,7 @@ public:
   result<mapped_file_handle> reopen(size_type reservation, mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept
   {
     OUTCOME_TRY(fh, file_handle::reopen(mode_, caching_, d));
-    return mapped_file_handle(std::move(fh), reservation);
+    return mapped_file_handle(std::move(fh), reservation, _sh.section_flags());
   }
   /*! \brief Return the current maximum permitted extent of the file, after updating the map.
 
@@ -375,10 +382,7 @@ public:
   the call to `update_map()`, this call is not particularly efficient, and you ought to cache
   its value where possible.
   */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> maximum_extent() const noexcept override
-  {
-    return const_cast<mapped_file_handle *>(this)->update_map();
-  }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> maximum_extent() const noexcept override { return const_cast<mapped_file_handle *>(this)->update_map(); }
 
   /*! \brief Resize the current maximum permitted extent of the mapped file to the given extent, avoiding any
   new allocation of physical storage where supported, and mapping or unmapping any new pages
@@ -439,6 +443,13 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override { return _mh.read(reqs, d); }
   /*! \brief Write data to the mapped file.
 
+  If this mapped file handle was constructed with `section_handle::flag::write_via_syscall`, this function is
+  actually implemented using the equivalent to the kernel's `write()` syscall. This will be very significantly
+  slower for small writes than writing into the map directly, and will corrupt file content on kernels without
+  a unified kernel page cache, so it should not be normally enabled. However, this technique is known to work
+  around various kernel bugs, quirks and race conditions found in modern OS kernels when memory mapped i/o
+  is performed at scale (files of many tens of Gb each).
+
   \note This call traps signals and structured exception throws using `QUICKCPPLIB_NAMESPACE::signal_guard`.
   Instantiating a `QUICKCPPLIB_NAMESPACE::signal_guard_install` somewhere much higher up in the call stack
   will improve performance enormously. The signal guard may cost less than 100 CPU cycles depending on how
@@ -453,7 +464,34 @@ public:
   of the raised signal, but it is by far the most likely.
   \mallocs None if a `QUICKCPPLIB_NAMESPACE::signal_guard_install` is already instanced.
   */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override { return _mh.write(reqs, d); }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override
+  {
+    if(!!(_sh.section_flags() & section_handle::flag::write_via_syscall))
+    {
+      const auto batch = max_buffers();
+      io_request<const_buffers_type> thisreq(reqs);
+      LLFIO_DEADLINE_TO_SLEEP_INIT(d);
+      for(size_t n = 0; n < reqs.buffers.size();)
+      {
+        deadline nd;
+        LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+        thisreq.buffers = reqs.buffers.subspan(n, std::min(batch, reqs.buffers.size() - n));
+        OUTCOME_TRY(written, file_handle::write(thisreq, nd));
+        if(written.empty())
+        {
+          reqs.buffers = reqs.buffers.subspan(0, n);
+          return reqs.buffers;
+        }
+        for(auto &b : written)
+        {
+          thisreq.offset += b.size();
+          n++;
+        }
+      }
+      return reqs.buffers;
+    }
+    return _mh.write(reqs, d);
+  }
 };
 
 //! \brief Constructor for `mapped_file_handle`
