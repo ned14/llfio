@@ -100,7 +100,7 @@ void read_entire_file2()
       llfio::async_file_handle::buffer_type scatter_req{ buffers[n].first.data(), buffers[n].first.size() };  // buffer to fill
       auto ret = llfio::async_read( //
         fh,                                           // handle to read from
-        { { scatter_req }, valid_extents[n].offset },  // The scatter request buffers + offset
+        { { &scatter_req, 1 }, valid_extents[n].offset },  // The scatter request buffers + offset
         [](                                                                               // The completion handler
           llfio::async_file_handle *,                                                     // The parent handle
           llfio::async_file_handle::io_result<llfio::async_file_handle::buffers_type> &&  // Result of the i/o

@@ -116,14 +116,14 @@ template <class U> inline void map_handle_create_close_(U &&f)
             if (use_file_backing)
             {
               map_handle::buffer_type req{ nullptr, 20 };
-              auto b = maph.read({ req, 0 }).value();
+              auto b = maph.read({ {&req, 1}, 0 }).value();
               KERNELTEST_CHECK(testreturn, b[0].data() == addr);
               KERNELTEST_CHECK(testreturn, b[0].size() == 19);  // reads do not read more than the backing length
             }
             else
             {
               map_handle::buffer_type req{ nullptr, 5000 };
-              auto b = maph.read({ req, 5 }).value();
+              auto b = maph.read({ {&req, 1}, 5 }).value();
               KERNELTEST_CHECK(testreturn, b[0].data() == addr+5); // NOLINT
               KERNELTEST_CHECK(testreturn, b[0].size() == 4091);
             }
