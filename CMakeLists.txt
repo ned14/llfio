@@ -164,9 +164,10 @@ if((MSVC AND MSVC_VERSION VERSION_GREATER_EQUAL 1923) OR APPLE)
   all_compile_features(PUBLIC
     cxx_std_17
   )
-  if(NOT DEFINED CMAKE_CXX_STANDARD_REQUIRED)
-    # Also set globally so compiler probes work
-    set(CMAKE_CXX_STANDARD_REQUIRED 17)
+  if(MSVC)
+    set(check_cxx_source_linkage_flags /std:c++17)
+  else()
+    set(check_cxx_source_linkage_flags -std=c++17)
   endif()
 endif()
 # Set the library dependencies this library has
@@ -175,13 +176,15 @@ all_link_libraries(PUBLIC quickcpplib::hl outcome::hl Threads::Threads $<$<PLATF
 # Set the system dependencies this library has
 include(CheckCXXSourceCompiles)
 include(CheckCXXSourceRuns)
-macro(check_cxx_source_linkage prog var)
+function(check_cxx_source_linkage prog var)
+  set(CMAKE_REQUIRED_FLAGS ${check_cxx_source_linkage_flags})
   if(CMAKE_SYSTEM_PROCESSOR STREQUAL ${CMAKE_HOST_SYSTEM_PROCESSOR})
     check_cxx_source_runs("${prog}" ${var})
   else()
     check_cxx_source_compiles("${prog}" ${var})
   endif()
-endmacro()
+  set(${var} "${${var}}" PARENT_SCOPE)
+endfunction()
 # Do we have native <filesystem> that just works without any extra effort?
 # We have to check if it runs, as binaries may link, but fail to run due to missing symbols
 check_cxx_source_linkage("
