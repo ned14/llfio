@@ -7,7 +7,6 @@ var classllfio__v2__xxx_1_1mapped =
     [ "difference_type", "classllfio__v2__xxx_1_1mapped.html#a1e8b86dd97d7d2e01436407160495e11", null ],
     [ "element_type", "classllfio__v2__xxx_1_1mapped.html#ace37649b885ac91425a6cadf63ccadda", null ],
     [ "extent_type", "classllfio__v2__xxx_1_1mapped.html#acfd0ab21349fb0eb56172b81d6a7fa83", null ],
-    [ "index_type", "classllfio__v2__xxx_1_1mapped.html#a6bad7c10fb47406a8a21966733e639ad", null ],
     [ "iterator", "classllfio__v2__xxx_1_1mapped.html#a6645c7abab4aea56e09ba4241b106cc4", null ],
     [ "pointer", "classllfio__v2__xxx_1_1mapped.html#a4bdd43e622e1bc5f3a43fc508c3cb209", null ],
     [ "reference", "classllfio__v2__xxx_1_1mapped.html#ac72fe8e94cd14a91d4744a642e88d2df", null ],

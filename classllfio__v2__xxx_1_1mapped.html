@@ -112,13 +112,8 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1mapped.html#a25d56aca213617d530ab3c9cb6f43df5">size_type</a> = typename section_handle::size_type</td></tr>
 <tr class="memdesc:a25d56aca213617d530ab3c9cb6f43df5"><td class="mdescLeft">&#160;</td><td class="mdescRight">The size type. <br /></td></tr>
 <tr class="separator:a25d56aca213617d530ab3c9cb6f43df5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6bad7c10fb47406a8a21966733e639ad"><td class="memItemLeft" align="right" valign="top"><a id="a6bad7c10fb47406a8a21966733e639ad"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1mapped.html#a6bad7c10fb47406a8a21966733e639ad">index_type</a> = typename span&lt; T &gt;::<a class="el" href="classllfio__v2__xxx_1_1mapped.html#a6bad7c10fb47406a8a21966733e639ad">index_type</a></td></tr>
-<tr class="memdesc:a6bad7c10fb47406a8a21966733e639ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">The index type. <br /></td></tr>
-<tr class="separator:a6bad7c10fb47406a8a21966733e639ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace37649b885ac91425a6cadf63ccadda"><td class="memItemLeft" align="right" valign="top"><a id="ace37649b885ac91425a6cadf63ccadda"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1mapped.html#ace37649b885ac91425a6cadf63ccadda">element_type</a> = typename span&lt; T &gt;::<a class="el" href="classllfio__v2__xxx_1_1mapped.html#ace37649b885ac91425a6cadf63ccadda">element_type</a></td></tr>
-<tr class="memdesc:ace37649b885ac91425a6cadf63ccadda"><td class="mdescLeft">&#160;</td><td class="mdescRight">The element type. <br /></td></tr>
+<tr class="memitem:ace37649b885ac91425a6cadf63ccadda"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1mapped.html#ace37649b885ac91425a6cadf63ccadda">element_type</a> = typename span&lt; T &gt;::<a class="el" href="classllfio__v2__xxx_1_1mapped.html#ace37649b885ac91425a6cadf63ccadda">element_type</a></td></tr>
+<tr class="memdesc:ace37649b885ac91425a6cadf63ccadda"><td class="mdescLeft">&#160;</td><td class="mdescRight">The index type.  <a href="#ace37649b885ac91425a6cadf63ccadda">More...</a><br /></td></tr>
 <tr class="separator:ace37649b885ac91425a6cadf63ccadda"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a42e32d5e02addf6123422ebee02510e4"><td class="memItemLeft" align="right" valign="top"><a id="a42e32d5e02addf6123422ebee02510e4"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1mapped.html#a42e32d5e02addf6123422ebee02510e4">value_type</a> = typename span&lt; T &gt;::<a class="el" href="classllfio__v2__xxx_1_1mapped.html#a42e32d5e02addf6123422ebee02510e4">value_type</a></td></tr>
@@ -212,7 +207,27 @@ class llfio_v2_xxx::mapped&lt; T &gt;</h3>
 <p>These owning semantics are convenient, but may be too heavy for your use case. You can gain more fine grained control using <code>map_handle</code>/<code>mapped_file_handle</code> directly with P1631 <code>attached&lt;T&gt;</code>.</p>
 <dl class="section note"><dt>Note</dt><dd>Only on the clang compiler, does <code>mapped</code> actually use P1631 in_place_attach/in_place_detach, as currently GCC and MSVC do two memcpy's of the mapped region. Also, we restrict the use of in_place_attach/in_place_detach to regions less than 4Kb in size, as even clang falls down on large regions.</dd></dl>
 <p>Optionally can issue a blocking write barrier on destruction of the mapped view by setting the flag <code>section_handle::flag::barrier_on_close</code>, thus forcing any changes to data referred to by this to storage before the destructor returns. </p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a id="ace37649b885ac91425a6cadf63ccadda"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace37649b885ac91425a6cadf63ccadda">&#9670;&nbsp;</a></span>element_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="classllfio__v2__xxx_1_1mapped.html">llfio_v2_xxx::mapped</a>&lt; T &gt;::<a class="el" href="classllfio__v2__xxx_1_1mapped.html#ace37649b885ac91425a6cadf63ccadda">element_type</a> =  typename span&lt;T&gt;::<a class="el" href="classllfio__v2__xxx_1_1mapped.html#ace37649b885ac91425a6cadf63ccadda">element_type</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The index type. </p>
+<p>The element type </p>
+
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="afb5d860d3f7fc1d4bad147f0a121d144"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#afb5d860d3f7fc1d4bad147f0a121d144">&#9670;&nbsp;</a></span>mapped() <span class="overload">[1/3]</span></h2>
 

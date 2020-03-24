@@ -1,6 +1,5 @@
 var NAVTREEINDEX12 =
 {
-"trivial__vector_8hpp.html#ade7571062c3e19cb6622bd2e411130ab":[5,0,0,1,0,0,2,13],
 "trivial__vector_8hpp.html#ae0973243c4b58d53d6f11ce5a2535a8c":[5,0,0,1,0,0,2,14],
 "utils_8hpp.html":[5,0,0,1,0,25],
 "utils_8hpp.html#a2305cf865b7952f58aba997c4ac95efb":[5,0,0,1,0,25,8],
