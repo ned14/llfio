@@ -332,7 +332,7 @@ static inline result<void> win32_map_flags(native_handle_type &nativeh, DWORD &a
   }
   else if(_flag & section_handle::flag::write)
   {
-    prot = PAGE_READWRITE;
+    prot = (_flag & section_handle::flag::write_via_syscall) ? PAGE_READONLY : PAGE_READWRITE;
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
   }
   else if(_flag & section_handle::flag::read)
@@ -914,9 +914,22 @@ map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buff
   return reqs.buffers;
 }
 
-map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_request<const_buffers_type> reqs, deadline /*d*/) noexcept
+map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_request<const_buffers_type> reqs, deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
+  if(!!(_flag & section_handle::flag::write_via_syscall) && _section != nullptr && _section->backing() != nullptr)
+  {
+    auto r = _section->backing()->write(reqs, d);
+    if(!r)
+    {
+      return std::move(r).error();
+    }
+    if(reqs.offset + r.bytes_transferred() > _length)
+    {
+      OUTCOME_TRY(update_map());
+    }
+    return std::move(r).value();
+  }
   byte *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
   if(QUICKCPPLIB_NAMESPACE::signal_guard::signal_guard(

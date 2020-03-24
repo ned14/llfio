@@ -232,7 +232,7 @@ int main() {
   if(CXX_IS_USING_LIBCXX)
     find_library(libcxx_cxxfs c++fs)
     find_library(libcxx_cxxexperimental c++experimental)
-    if(NOT libcxx_cxxfs MATCHES "NOTFOUND" AND NOT libcxx_cxxexperimental MATCHES "NOTFOUND")
+    if(libcxx_cxxfs MATCHES "NOTFOUND" AND libcxx_cxxexperimental MATCHES "NOTFOUND")
       # I guess default to forcing libc++experimental?
       set(libcxx_cxxexperimental -lc++experimental)
     endif()
