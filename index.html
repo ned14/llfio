@@ -29,7 +29,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LLFIO
-   &#160;<span id="projectnumber">v2.00 late alpha</span>
+   &#160;<span id="projectnumber">v2.00 late beta</span>
    </div>
   </td>
  </tr>
@@ -102,14 +102,18 @@ $(document).ready(function(){initNavTree('index.html','');});
 </center><p>Herein lies my proposed zero whole machine memory copy async file i/o and filesystem library for Boost and the C++ standard, intended for storage devices with ~1 microsecond 4Kb transfer latencies and those supporting Storage Class Memory (SCM)/Direct Access Storage (DAX). Its i/o overhead, including syscall overhead, has been benchmarked to 100 nanoseconds on Linux which corresponds to a theoretical maximum of 10M IOPS @ QD1, approx 40Gb/sec per thread. It has particularly strong support for writing portable filesystem algorithms which work well with directly mapped non-volatile storage such as Intel Optane.</p>
 <p>It is a complete rewrite after a Boost peer review in August 2015. Its github source code repository lives at <a href="https://github.com/ned14/llfio">https://github.com/ned14/llfio</a>.</p>
 <ul>
-<li><code>llfio::path_view</code> is expected to enter the C++ 23 standard. <code>llfio::file_handle</code> and <code>llfio::mapped_file_handle</code> are on track for entering the C++ 23 standard.</li>
+<li>LLFIO is the reference implementation for these C++ standardisation:<ul>
+<li><code>llfio::path_view</code> is expected to enter the C++ 23 standard.</li>
+<li><code>llfio::file_handle</code> and <code>llfio::mapped_file_handle</code> are on track for entering the C++ 23 standard.</li>
+</ul>
+</li>
 <li>Portable to any conforming C++ 14 compiler with a working Filesystem TS in its STL.<ul>
 <li>Note that VS2019 16.3 and libc++ 11 dropped support for Filesystem in C++ 14, so for those LLFIO's cmake forces on C++ 17.</li>
 </ul>
 </li>
 <li>Fully clean with C++ 20.<ul>
 <li>Will make use of any Coroutines, Concepts, Span, Byte etc if you have them, otherwise swaps in C++ 14 compatible alternatives.</li>
-<li>NOTE that libstdc++ does not currently provide symbols for <code>&lt;codecvt&gt;</code> if you are building in C++ 20, so linking LLFIO programs on libstdc++ if in C++ 20 will fail. Either use a different STL, manually rebuild libstdc++, or use C++ 17.</li>
+<li>NOTE that Ubuntu 18.04's libstdc++ 9 does not currently provide symbols for <code>&lt;codecvt&gt;</code> if you are building in C++ 20, so linking LLFIO programs on libstdc++ on that Linux if in C++ 20 will fail. Either use a different STL, manually rebuild libstdc++, or use C++ 17.</li>
 </ul>
 </li>
 <li>Original error code is always preserved, even down to the original NT kernel error code if a NT kernel API was used.<ul>
@@ -119,7 +123,6 @@ $(document).ready(function(){initNavTree('index.html','');});
 <li>Race free filesystem design used throughout (i.e. no TOCTOU).</li>
 <li>Zero malloc, zero exception throw and zero whole system memory copy design used throughout, even down to paths (which can hit 64Kb!).</li>
 <li>Comprehensive support for virtual and mapped memory of both SCM/DAX and page cached storage, including large, huge and super pages.</li>
-<li>Works very well with the C++ standard library, and is being proposed for standardisation into C++. See <a href="https://wg21.link/P1031">P1031 <em>Low level file i/o</em></a>.</li>
 </ul>
 <dl class="section note"><dt>Note</dt><dd>This code is of late beta quality. It has been shipping in production with multiple vendors for some years now. It is quite reliable on Windows and Linux (less well tested on Mac OS), so be careful when using it!</dd></dl>
 <p>Examples of use: </p><table width="100%" border="0" cellpadding="4">
