@@ -101,7 +101,7 @@ public:
   //! The size type.
   using size_type = typename section_handle::size_type;
   //! The index type
-  using index_type = typename span<T>::index_type;
+  //using index_type = typename span<T>::index_type;
   //! The element type
   using element_type = typename span<T>::element_type;
   //! The value type
@@ -160,7 +160,7 @@ public:
       , _sectionh(std::move(o._sectionh))
       , _maph(std::move(o._maph))
   {
-    static_cast<span<T> &>(o) = {nullptr, 0};
+    static_cast<span<T> &>(o) = {};
   }
   mapped &operator=(const mapped &) = delete;
   mapped &operator=(mapped &&o) noexcept
@@ -190,12 +190,12 @@ public:
   using span<T>::last;
   using span<T>::subspan;
   using span<T>::size;
-  using span<T>::ssize;
+  //using span<T>::ssize;
   using span<T>::size_bytes;
   using span<T>::empty;
   using span<T>::operator[];
-  using span<T>::operator();
-  using span<T>::at;
+  //using span<T>::operator();
+  //using span<T>::at;
   using span<T>::data;
   using span<T>::begin;
   using span<T>::end;

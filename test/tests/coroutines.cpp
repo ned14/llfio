@@ -50,7 +50,7 @@ static inline void TestAsyncFileHandleCoroutines()
     {
       // This will initiate the i/o, and suspend the coroutine until completion.
       // The caller will thus resume execution with a valid unsignaled future.
-      auto written = co_await h.co_write({bt, n * 32768 + no * 4096}).value();
+      auto written = co_await h.co_write({{&bt, 1}, n * 32768 + no * 4096}).value();
       written.value();
     }
   };

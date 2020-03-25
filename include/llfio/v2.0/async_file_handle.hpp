@@ -382,7 +382,7 @@ public:
   */
   LLFIO_MAKE_FREE_FUNCTION
   template <class CompletionRoutine>                                                                                            //
-  LLFIO_REQUIRES(detail::is_invocable_r<void, CompletionRoutine, async_file_handle *, io_result<const_buffers_type> &&>::value)  //
+  LLFIO_REQUIRES(true || detail::is_invocable_r<void, CompletionRoutine, async_file_handle *, io_result<const_buffers_type> &&>::value)  //
   result<io_state_ptr> async_barrier(io_request<const_buffers_type> reqs, CompletionRoutine &&completion, barrier_kind kind = barrier_kind::nowait_data_only, span<char> mem = {}) noexcept
   {
     LLFIO_LOG_FUNCTION_CALL(this);
@@ -439,7 +439,7 @@ public:
   */
   LLFIO_MAKE_FREE_FUNCTION
   template <class CompletionRoutine>                                                                                      //
-  LLFIO_REQUIRES(detail::is_invocable_r<void, CompletionRoutine, async_file_handle *, io_result<buffers_type> &&>::value)  //
+  LLFIO_REQUIRES(true || detail::is_invocable_r<void, CompletionRoutine, async_file_handle *, io_result<buffers_type> &&>::value)  //
   result<io_state_ptr> async_read(io_request<buffers_type> reqs, CompletionRoutine &&completion, span<char> mem = {}) noexcept
   {
     LLFIO_LOG_FUNCTION_CALL(this);
@@ -483,7 +483,7 @@ public:
   */
   LLFIO_MAKE_FREE_FUNCTION
   template <class CompletionRoutine>                                                                                            //
-  LLFIO_REQUIRES(detail::is_invocable_r<void, CompletionRoutine, async_file_handle *, io_result<const_buffers_type> &&>::value)  //
+  LLFIO_REQUIRES(true || detail::is_invocable_r<void, CompletionRoutine, async_file_handle *, io_result<const_buffers_type> &&>::value)  //
   result<io_state_ptr> async_write(io_request<const_buffers_type> reqs, CompletionRoutine &&completion, span<char> mem = {}) noexcept
   {
     LLFIO_LOG_FUNCTION_CALL(this);

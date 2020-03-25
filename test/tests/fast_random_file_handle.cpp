@@ -26,7 +26,6 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "quickcpplib/algorithm/small_prng.hpp"
 
-
 static inline void TestFastRandomFileHandleWorks()
 {
   static constexpr size_t testbytes = 1024 * 1024UL;
@@ -36,7 +35,7 @@ static inline void TestFastRandomFileHandleWorks()
   mapped<byte> store(testbytes);
   fast_random_file_handle h = fast_random_file_handle::fast_random_file(testbytes).value();
   // Bulk read
-  BOOST_CHECK(h.read(0, {{store.begin(), store.size()}}).value() == store.size());
+  BOOST_CHECK(h.read(0, {{store.data(), store.size()}}).value() == store.size());
 
   // Now make sure that random read offsets and lengths match exactly
   small_prng rand;
@@ -53,7 +52,7 @@ static inline void TestFastRandomFileHandleWorks()
     {
       BOOST_CHECK(bytesread == length);
     }
-    BOOST_CHECK(!memcmp(buffer, store.begin() + offset, bytesread));
+    BOOST_CHECK(!memcmp(buffer, store.data() + offset, bytesread));
   }
 }
 
@@ -63,7 +62,7 @@ static inline void TestFastRandomFileHandlePerformance()
   using namespace LLFIO_V2_NAMESPACE;
   using LLFIO_V2_NAMESPACE::byte;
   mapped<byte> store(testbytes);
-  memset(store.begin(), 1, store.size());
+  memset(store.data(), 1, store.size());
   fast_random_file_handle h = fast_random_file_handle::fast_random_file(testbytes).value();
   auto begin = std::chrono::high_resolution_clock::now();
   while(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - begin).count() < 1)
@@ -97,7 +96,7 @@ static inline void TestFastRandomFileHandlePerformance()
   begin = std::chrono::high_resolution_clock::now();
   for(size_t n = 0; n < 10; n++)
   {
-    h.read(0, {{store.begin(), store.size()}}).value();
+    h.read(0, {{store.data(), store.size()}}).value();
   }
   end = std::chrono::high_resolution_clock::now();
   auto diff2 = std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
