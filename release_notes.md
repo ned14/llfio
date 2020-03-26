@@ -23,19 +23,20 @@ as Intel Optane.
 It is a complete rewrite after a Boost peer review in August 2015. Its github
 source code repository lives at https://github.com/ned14/llfio.
 
-- `llfio::path_view` is expected to enter the C++ 23 standard. `llfio::file_handle` and `llfio::mapped_file_handle` are on track for entering the C++ 23 standard.
+- LLFIO is the reference implementation for these C++ standardisation:
+    - `llfio::path_view` is expected to enter the C++ 23 standard.
+    - `llfio::file_handle` and `llfio::mapped_file_handle` are on track for entering the C++ 23 standard.
 - Portable to any conforming C++ 14 compiler with a working Filesystem TS in its STL.
     - Note that VS2019 16.3 and libc++ 11 dropped support for Filesystem in C++ 14, so for those LLFIO's cmake forces on C++ 17.
 - Fully clean with C++ 20.
     - Will make use of any Coroutines, Concepts, Span, Byte etc if you have them, otherwise swaps in C++ 14 compatible alternatives.
-    - NOTE that libstdc++ does not currently provide symbols for `<codecvt>` if you are building in C++ 20, so linking LLFIO programs on libstdc++ if in C++ 20 will fail. Either use a different STL, manually rebuild libstdc++, or use C++ 17.
+    - NOTE that Ubuntu 18.04's libstdc++ 9 does not currently provide symbols for `<codecvt>` if you are building in C++ 20, so linking LLFIO programs on libstdc++ on that Linux if in C++ 20 will fail. Either use a different STL, manually rebuild libstdc++, or use C++ 17.
 - Original error code is always preserved, even down to the original NT kernel error code if a NT kernel API was used.
     - Optional configuration based on [P1028](https://wg21.link/P1028) *SG14 status_code and standard error object
     for P0709 Zero-overhead deterministic exceptions*.
 - Race free filesystem design used throughout (i.e. no TOCTOU).
 - Zero malloc, zero exception throw and zero whole system memory copy design used throughout, even down to paths (which can hit 64Kb!).
 - Comprehensive support for virtual and mapped memory of both SCM/DAX and page cached storage, including large, huge and super pages.
-- Works very well with the C++ standard library, and is being proposed for standardisation into C++. See <a href="https://wg21.link/P1031">P1031 *Low level file i/o*</a>.
 
 \note This code is of late beta quality. It has been shipping in production with multiple vendors for some years now. It is quite reliable on Windows and Linux (less well tested on Mac OS), so be careful when using it!
 

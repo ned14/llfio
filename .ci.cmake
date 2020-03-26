@@ -21,6 +21,9 @@ if(NOT CTEST_DISABLE_TESTING)
   if(WIN32)
     # Appveyor's Windows version doesn't permit unprivileged creation of symbolic links
     ctest_test(RETURN_VALUE retval EXCLUDE "shared_fs_mutex|symlink")
+  elseif("$ENV{CXX}" MATCHES "clang")
+    # clang 10 with libc++ in C++ 20 currently segfaults
+    ctest_test(RETURN_VALUE retval EXCLUDE "shared_fs_mutex|llfio_hl--coroutines")
   else()
     ctest_test(RETURN_VALUE retval EXCLUDE "shared_fs_mutex")
   endif()
