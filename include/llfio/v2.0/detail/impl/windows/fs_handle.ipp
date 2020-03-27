@@ -66,7 +66,10 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
       /* We have to be super careful here because \Device\HarddiskVolume4 != \Device\HarddiskVolume4\!
       The former opens the device, the latter the root directory of the device.
       */
-      const_cast<filesystem::path::string_type &>(currentpath.native()).push_back('\\');
+      if(currentpath.native().back() !='\\')
+      {
+        const_cast<filesystem::path::string_type &>(currentpath.native()).push_back('\\');
+      }
       auto currentdirh_ = path_handle::path(currentpath);
       if(!currentdirh_)
       {

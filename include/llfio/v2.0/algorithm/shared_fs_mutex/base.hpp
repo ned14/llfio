@@ -79,18 +79,24 @@ namespace algorithm
 #pragma warning(pop)
 #endif
         //! Default constructor
-        constexpr entity_type() noexcept : _init(0) {}  // NOLINT
+        constexpr entity_type() noexcept
+            : _init(0)
+        {
+        }  // NOLINT
 //! Constructor
 #if !defined(__GNUC__) || defined(__clang__) || __GNUC__ >= 7
         constexpr
 #endif
-        entity_type(value_type _value, bool _exclusive) noexcept : _init(0)
+        entity_type(value_type _value, bool _exclusive) noexcept
+            : _init(0)
         {
           value = _value;
           exclusive = _exclusive;  // NOLINT
         }
       };
+#if __cplusplus < 201700 && !_HAS_CXX17
       static_assert(std::is_literal_type<entity_type>::value, "entity_type is not a literal type");
+#endif
       static_assert(sizeof(entity_type) == sizeof(entity_type::value_type), "entity_type is bit equal to its underlying type");
       //! The type of a sequence of entities
       using entities_type = span<entity_type>;
@@ -159,7 +165,11 @@ namespace algorithm
         }
         entities_guard(const entities_guard &) = delete;
         entities_guard &operator=(const entities_guard &) = delete;
-        entities_guard(entities_guard &&o) noexcept : _entity(o._entity), parent(o.parent), entities(o.entities), hint(o.hint)
+        entities_guard(entities_guard &&o) noexcept
+            : _entity(o._entity)
+            , parent(o.parent)
+            , entities(o.entities)
+            , hint(o.hint)
         {
           if(entities.data() == &o._entity)
           {
