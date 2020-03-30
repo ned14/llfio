@@ -84,6 +84,7 @@ $(document).ready(function(){initNavTree('namespacellfio__v2__xxx_1_1algorithm.h
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">llfio_v2_xxx::algorithm Namespace Reference</div>  </div>
@@ -110,6 +111,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html">combining_handle_adapter</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle combining the data from one or two other handles.  <a href="classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">union &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="unionllfio__v2__xxx_1_1algorithm_1_1remove__all__callback__arg.html">remove_all_callback_arg</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of an argument for a <code>remove_all()</code> callback.  <a href="unionllfio__v2__xxx_1_1algorithm_1_1remove__all__callback__arg.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides a constant time capacity expanding move-only STL vector. Requires <code>T</code> to be trivially copyable.  <a href="classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -121,8 +125,29 @@ Typedefs</h2></td></tr>
 <tr class="memdesc:a27450e894b5dab6c18a01350670fa0dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle combining the data from two other handles using XOR.  <a href="#a27450e894b5dab6c18a01350670fa0dc">More...</a><br /></td></tr>
 <tr class="separator:a27450e894b5dab6c18a01350670fa0dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:a89fb17908d9b35ffbc3628711b4fa7d6"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a89fb17908d9b35ffbc3628711b4fa7d6">remove_all_callback_reason</a> { <br />
+&#160;&#160;<a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a89fb17908d9b35ffbc3628711b4fa7d6a84fc595ee118bfa975a9b1eeaca88e58">remove_all_callback_reason::begin_enumeration</a>, 
+<a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a89fb17908d9b35ffbc3628711b4fa7d6a53fa4692881e0db0c8a4509c8ccdc382">remove_all_callback_reason::progress_enumeration</a>, 
+<a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a89fb17908d9b35ffbc3628711b4fa7d6a9002e959448e90e4eeb5fb43822dda71">remove_all_callback_reason::end_enumeration</a>, 
+<a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a89fb17908d9b35ffbc3628711b4fa7d6aa5d7ceb2c59b8cee46c2953fec9abc19">remove_all_callback_reason::finished</a>, 
+<br />
+&#160;&#160;<a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a89fb17908d9b35ffbc3628711b4fa7d6ab453c9e93bdb00ebf6eaa2aa170515b3">remove_all_callback_reason::unrenameable</a>, 
+<a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a89fb17908d9b35ffbc3628711b4fa7d6a8e3cfe4c80ab518b76fd7cc65d6554b7">remove_all_callback_reason::unremoveable</a>
+<br />
+ }<tr class="memdesc:a89fb17908d9b35ffbc3628711b4fa7d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">The event for which the <code>remove_all()</code> callback is being invoked.  <a href="namespacellfio__v2__xxx_1_1algorithm.html#a89fb17908d9b35ffbc3628711b4fa7d6">More...</a><br /></td></tr>
+</td></tr>
+<tr class="separator:a89fb17908d9b35ffbc3628711b4fa7d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a3009e68eae33fa0675e3eddc9a1d3043"><td class="memTemplParams" colspan="2">template&lt;class F &gt; </td></tr>
+<tr class="memitem:a3009e68eae33fa0675e3eddc9a1d3043"><td class="memTemplItemLeft" align="right" valign="top">result&lt; size_t &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a3009e68eae33fa0675e3eddc9a1d3043">remove_all</a> (<a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;&amp;dirh, F &amp;&amp;callback, size_t threads=0) noexcept</td></tr>
+<tr class="memdesc:a3009e68eae33fa0675e3eddc9a1d3043"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reliably removes from the filesystem <code>dirh</code> and everything under <code>dirh</code>.  <a href="#a3009e68eae33fa0675e3eddc9a1d3043">More...</a><br /></td></tr>
+<tr class="separator:a3009e68eae33fa0675e3eddc9a1d3043"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d527a8b5a5a829884151a40421fd457"><td class="memItemLeft" align="right" valign="top">result&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a8d527a8b5a5a829884151a40421fd457">remove_all</a> (<a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;&amp;dirh, size_t threads=0) noexcept</td></tr>
+<tr class="separator:a8d527a8b5a5a829884151a40421fd457"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6e8566ac7a5eeb0c14cf2387dfb8c1a1"><td class="memTemplParams" colspan="2"><a id="a6e8566ac7a5eeb0c14cf2387dfb8c1a1"></a>
 template&lt;class T &gt; </td></tr>
 <tr class="memitem:a6e8566ac7a5eeb0c14cf2387dfb8c1a1"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a6e8566ac7a5eeb0c14cf2387dfb8c1a1">operator==</a> (const <a class="el" href="classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a>&lt; T &gt; &amp;a, const <a class="el" href="classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a>&lt; T &gt; &amp;b)</td></tr>
@@ -192,6 +217,51 @@ template&lt;class Target , class Source &gt; </div>
 
 </div>
 </div>
+<h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="a89fb17908d9b35ffbc3628711b4fa7d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a89fb17908d9b35ffbc3628711b4fa7d6">&#9670;&nbsp;</a></span>remove_all_callback_reason</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a89fb17908d9b35ffbc3628711b4fa7d6">llfio_v2_xxx::algorithm::remove_all_callback_reason</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The event for which the <code>remove_all()</code> callback is being invoked. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a89fb17908d9b35ffbc3628711b4fa7d6a84fc595ee118bfa975a9b1eeaca88e58"></a>begin_enumeration&#160;</td><td class="fielddoc"><p>Called just before beginning enumeration. arg1 is non zero if the base directory rename was successful. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a89fb17908d9b35ffbc3628711b4fa7d6a53fa4692881e0db0c8a4509c8ccdc382"></a>progress_enumeration&#160;</td><td class="fielddoc"><p>Called after the items in a directory have all been unlinked. arg1 is the total number of items not removed for this kernel thread (which can include subdirectories). arg2 is the total number of items removed for this kernel thread. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a89fb17908d9b35ffbc3628711b4fa7d6a9002e959448e90e4eeb5fb43822dda71"></a>end_enumeration&#160;</td><td class="fielddoc"><p>Called just after ending enumeration. arg1 is the total number of items not removed. arg2 is the total number of items removed. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a89fb17908d9b35ffbc3628711b4fa7d6aa5d7ceb2c59b8cee46c2953fec9abc19"></a>finished&#160;</td><td class="fielddoc"><p>Called just before returning. arg1 is the total number of items not removed. arg2 is the total number of items removed. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a89fb17908d9b35ffbc3628711b4fa7d6ab453c9e93bdb00ebf6eaa2aa170515b3"></a>unrenameable&#160;</td><td class="fielddoc"><p>Called when it was not possible to rename a file entry. arg1 is a pointer to a <code>directory_handle</code> which is the directory containing the problem item. arg2 is a pointer to the <code>path_view</code> of the leafname. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a89fb17908d9b35ffbc3628711b4fa7d6a8e3cfe4c80ab518b76fd7cc65d6554b7"></a>unremoveable&#160;</td><td class="fielddoc"><p>Called when it was not possible to unlink a file entry. arg1 is a pointer to a <code>directory_handle</code> which is the directory containing the problem item. arg2 is a pointer to the <code>path_view</code> of the leafname. </p>
+</td></tr>
+</table>
+<div class="fragment"><div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  {</div><div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <a class="code" href="namespacellfio__v2__xxx_1_1algorithm.html#a89fb17908d9b35ffbc3628711b4fa7d6a84fc595ee118bfa975a9b1eeaca88e58">begin_enumeration</a>,     <span class="comment">//!&lt; Called just before beginning enumeration. arg1 is non zero if the base directory rename was successful.</span></div><div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="comment"></span>    <a class="code" href="namespacellfio__v2__xxx_1_1algorithm.html#a89fb17908d9b35ffbc3628711b4fa7d6a53fa4692881e0db0c8a4509c8ccdc382">progress_enumeration</a>,  <span class="comment">//!&lt; Called after the items in a directory have all been unlinked. arg1 is the total number of items not removed for this kernel thread (which can include subdirectories). arg2 is the total number of items removed for this kernel thread.</span></div><div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment"></span>    <a class="code" href="namespacellfio__v2__xxx_1_1algorithm.html#a89fb17908d9b35ffbc3628711b4fa7d6a9002e959448e90e4eeb5fb43822dda71">end_enumeration</a>,       <span class="comment">//!&lt; Called just after ending enumeration. arg1 is the total number of items not removed. arg2 is the total number of items removed.</span></div><div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="comment"></span>    <a class="code" href="namespacellfio__v2__xxx_1_1algorithm.html#a89fb17908d9b35ffbc3628711b4fa7d6aa5d7ceb2c59b8cee46c2953fec9abc19">finished</a>,              <span class="comment">//!&lt; Called just before returning. arg1 is the total number of items not removed. arg2 is the total number of items removed.</span></div><div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment"></span>    <a class="code" href="namespacellfio__v2__xxx_1_1algorithm.html#a89fb17908d9b35ffbc3628711b4fa7d6ab453c9e93bdb00ebf6eaa2aa170515b3">unrenameable</a>,          <span class="comment">//!&lt; Called when it was not possible to rename a file entry. arg1 is a pointer to a `directory_handle` which is the directory containing the problem item. arg2 is a pointer to the `path_view` of the leafname.</span></div><div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment"></span>    <a class="code" href="namespacellfio__v2__xxx_1_1algorithm.html#a89fb17908d9b35ffbc3628711b4fa7d6a8e3cfe4c80ab518b76fd7cc65d6554b7">unremoveable</a>           <span class="comment">//!&lt; Called when it was not possible to unlink a file entry. arg1 is a pointer to a `directory_handle` which is the directory containing the problem item. arg2 is a pointer to the `path_view` of the leafname.</span></div><div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment"></span>  };</div><div class="ttc" id="namespacellfio__v2__xxx_1_1algorithm_html_a89fb17908d9b35ffbc3628711b4fa7d6a53fa4692881e0db0c8a4509c8ccdc382"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1algorithm.html#a89fb17908d9b35ffbc3628711b4fa7d6a53fa4692881e0db0c8a4509c8ccdc382">llfio_v2_xxx::algorithm::remove_all_callback_reason::progress_enumeration</a></div><div class="ttdoc">Called after the items in a directory have all been unlinked. arg1 is the total number of items not r...</div></div>
+<div class="ttc" id="namespacellfio__v2__xxx_1_1algorithm_html_a89fb17908d9b35ffbc3628711b4fa7d6a9002e959448e90e4eeb5fb43822dda71"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1algorithm.html#a89fb17908d9b35ffbc3628711b4fa7d6a9002e959448e90e4eeb5fb43822dda71">llfio_v2_xxx::algorithm::remove_all_callback_reason::end_enumeration</a></div><div class="ttdoc">Called just after ending enumeration. arg1 is the total number of items not removed. arg2 is the total number of items removed. </div></div>
+<div class="ttc" id="namespacellfio__v2__xxx_1_1algorithm_html_a89fb17908d9b35ffbc3628711b4fa7d6a8e3cfe4c80ab518b76fd7cc65d6554b7"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1algorithm.html#a89fb17908d9b35ffbc3628711b4fa7d6a8e3cfe4c80ab518b76fd7cc65d6554b7">llfio_v2_xxx::algorithm::remove_all_callback_reason::unremoveable</a></div><div class="ttdoc">Called when it was not possible to unlink a file entry. arg1 is a pointer to a directory_handle which...</div></div>
+<div class="ttc" id="namespacellfio__v2__xxx_1_1algorithm_html_a89fb17908d9b35ffbc3628711b4fa7d6ab453c9e93bdb00ebf6eaa2aa170515b3"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1algorithm.html#a89fb17908d9b35ffbc3628711b4fa7d6ab453c9e93bdb00ebf6eaa2aa170515b3">llfio_v2_xxx::algorithm::remove_all_callback_reason::unrenameable</a></div><div class="ttdoc">Called when it was not possible to rename a file entry. arg1 is a pointer to a directory_handle which...</div></div>
+<div class="ttc" id="namespacellfio__v2__xxx_1_1algorithm_html_a89fb17908d9b35ffbc3628711b4fa7d6a84fc595ee118bfa975a9b1eeaca88e58"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1algorithm.html#a89fb17908d9b35ffbc3628711b4fa7d6a84fc595ee118bfa975a9b1eeaca88e58">llfio_v2_xxx::algorithm::remove_all_callback_reason::begin_enumeration</a></div><div class="ttdoc">Called just before beginning enumeration. arg1 is non zero if the base directory rename was successfu...</div></div>
+<div class="ttc" id="namespacellfio__v2__xxx_1_1algorithm_html_a89fb17908d9b35ffbc3628711b4fa7d6aa5d7ceb2c59b8cee46c2953fec9abc19"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1algorithm.html#a89fb17908d9b35ffbc3628711b4fa7d6aa5d7ceb2c59b8cee46c2953fec9abc19">llfio_v2_xxx::algorithm::remove_all_callback_reason::finished</a></div><div class="ttdoc">Called just before returning. arg1 is the total number of items not removed. arg2 is the total number...</div></div>
+</div><!-- fragment -->
+</div>
+</div>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a0e474a5af3258fc971c71d057c8fb0bb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0e474a5af3258fc971c71d057c8fb0bb">&#9670;&nbsp;</a></span>cache_parent()</h2>
@@ -222,6 +292,109 @@ template&lt;class T , class... Args&gt; </div>
 <p>Constructs a <code>T</code> adapted into a parent handle caching implementation. </p>
 <p>This function works via the <code>construct&lt;T&gt;()</code> free function framework for which your <code>handle</code> implementation must have registered its construction details. </p>
 <div class="fragment"><div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;  {</div><div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    construct&lt;T&gt; constructor{std::forward&lt;Args&gt;(args)...};</div><div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    OUTCOME_TRY(h, constructor());</div><div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    <span class="keywordflow">try</span></div><div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    {</div><div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;      <span class="keywordflow">return</span> cached_parent_handle_adapter&lt;T&gt;(std::move(h), constructor.base, constructor._path);</div><div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    }</div><div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="keywordflow">catch</span>(...)</div><div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    {</div><div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div><div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    }</div><div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;  }</div></div><!-- fragment -->
+</div>
+</div>
+<a id="a3009e68eae33fa0675e3eddc9a1d3043"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3009e68eae33fa0675e3eddc9a1d3043">&#9670;&nbsp;</a></span>remove_all() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class F &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;size_t&gt; llfio_v2_xxx::algorithm::remove_all </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;&amp;&#160;</td>
+          <td class="paramname"><em>dirh</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">F &amp;&amp;&#160;</td>
+          <td class="paramname"><em>callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>threads</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Reliably removes from the filesystem <code>dirh</code> and everything under <code>dirh</code>. </p>
+<p>You might be surprised to learn that most directory tree removal implementations are of poor quality, not leveraging the filesystem facilities that are available, not handling concurrent modification of the filesystem correctly, having poor performance, or failing to handle not uncommon corner cases. This implementation is considerably better quality, indeed it is to my knowledge the highest quality possible on at least Linux and Microsoft Windows.</p>
+<p>The algorithm is as follows:</p>
+<ol type="1">
+<li>Attempt to rename <code>dirh</code> to a uniquely named directory. If successful, this causes concurrent users to no longer see the directory tree. It also usefully detects if permissions problems would prevent whole directory tree removal. Note that on Windows, if any process has a handle open to anything inside the directory tree, it is usually the case that all renames will be prevented.</li>
+<li>The entire directory tree is enumerated using the requested number of kernel threads. All non-directory items are unlinked after each directory enumeration. This is done in-line by the kernel thread, as it prevents contention on the kernel mutex on each directory inode, and the just-enumerated contents of the directory are fresh in cache. If an item cannot be unlinked, it is renamed into a uniquely named file just inside <code>dirh</code>.</li>
+<li>We recurse into each subdirectory, always trying to prevent each kernel thread from touching any part of the filesystem which other kernel threads might be touching, in order to prevent contention on the kernel mutex on each directory inode.</li>
+<li>Except for unrenameable files, now the entire directory tree will have been removed. We now loop attempting to unlink the remaining file entries. The default callback implementation which if exceeded, an error code comparing equal to <code>errc::timed_out</code> is returned.</li>
+</ol>
+<p>Even on slow filesystems such as those on Windows, or networked filesystems, this algorithm performs very well. We do not currently inspect the filing system to see if bisect unlinking directories with millions of entries will perform well (some filing systems can store very large directories with multiple independent inode locks, thus using multiple kernel threads on the same directory sees a large performance increase for very large directories). We also remove items based on enumerated order, under the assumption that filesystems will have optimised for this specific use case.</p>
+<p>If the function succeeds, <code>dirh</code> is moved into the function, and the total number of filesystem entries removed is returned.</p>
+<p>If the function fails, <code>dirh</code> is NOT moved into the function, and continues to refer to the (likely renamed) directory you passed in. You might do something like try to rename it into <code>storage_backed_temporary_files_directory()</code>, or some other hail mary action.</p>
+<h2>The callback function</h2>
+<p>The optional callback function is called with various progress indicators as the algorithm executes. Note that it may be called from arbitrary kernel threads, including concurrently. Its prototype is <code>result&lt;void&gt;(remove_all_callback_reason reason, remove_all_callback_arg arg1, remove_all_callback_arg arg2)</code>. Returning a failure cause the whole operation to be cancelled as soon as is practical, and that failure is returned from <code>remove_all()</code>.</p>
+<p>The default callback function starts a timer when the first <code>remove_all_callback_reason::unremoveable</code> is seen. If more than ten seconds then elapses, it returns <code>errc::timed_out</code>, which in turn causes <code>remove_all()</code> to return with that failure.</p>
+<h2>Other notes</h2>
+<p>The implementation tries hard to not open too many file descriptors at a time in order to not exceed the system limit, which may be as low as 1024 on POSIX. The implementation does handle <code>EMFILE</code> by giving up what it is doing, and trying again later, however this will not help other code running concurrently in other kernel threads which may experience spurious <code>EMFILE</code> failures.</p>
+<p>Inevitably the open file descriptor count is a function of the thread count. Calling this function with <code>thread = 1</code> will use far fewer open file descriptors at a time. However, if say you are removing a directory containing 1024 other directories, this will unavoidably lead to this implementation attempting to open 1024 file descriptors, one for each directory. </p>
+<div class="fragment"><div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;  {</div><div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx_1_1algorithm.html#a8d527a8b5a5a829884151a40421fd457">detail::remove_all</a>(std::move(dirh), LLFIO_V2_NAMESPACE::detail::emplace_function_ptr&lt;result&lt;void&gt;(<a class="code" href="namespacellfio__v2__xxx_1_1algorithm.html#a89fb17908d9b35ffbc3628711b4fa7d6">remove_all_callback_reason</a> reason, remove_all_callback_arg arg1, remove_all_callback_arg arg2)&gt;(std::forward&lt;F&gt;(callback)), threads);</div><div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;  }</div><div class="ttc" id="namespacellfio__v2__xxx_1_1algorithm_html_a8d527a8b5a5a829884151a40421fd457"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1algorithm.html#a8d527a8b5a5a829884151a40421fd457">llfio_v2_xxx::algorithm::remove_all</a></div><div class="ttdeci">result&lt; size_t &gt; remove_all(directory_handle &amp;&amp;dirh, size_t threads=0) noexcept</div><div class="ttdef"><b>Definition:</b> remove_all.hpp:157</div></div>
+<div class="ttc" id="namespacellfio__v2__xxx_1_1algorithm_html_a89fb17908d9b35ffbc3628711b4fa7d6"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1algorithm.html#a89fb17908d9b35ffbc3628711b4fa7d6">llfio_v2_xxx::algorithm::remove_all_callback_reason</a></div><div class="ttdeci">remove_all_callback_reason</div><div class="ttdoc">The event for which the remove_all() callback is being invoked. </div><div class="ttdef"><b>Definition:</b> remove_all.hpp:65</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a8d527a8b5a5a829884151a40421fd457"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8d527a8b5a5a829884151a40421fd457">&#9670;&nbsp;</a></span>remove_all() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;size_t&gt; llfio_v2_xxx::algorithm::remove_all </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;&amp;&#160;</td>
+          <td class="paramname"><em>dirh</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>threads</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
+<div class="fragment"><div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx_1_1algorithm.html#a8d527a8b5a5a829884151a40421fd457">detail::remove_all</a>(std::move(dirh), {}, threads); }</div><div class="ttc" id="namespacellfio__v2__xxx_1_1algorithm_html_a8d527a8b5a5a829884151a40421fd457"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1algorithm.html#a8d527a8b5a5a829884151a40421fd457">llfio_v2_xxx::algorithm::remove_all</a></div><div class="ttdeci">result&lt; size_t &gt; remove_all(directory_handle &amp;&amp;dirh, size_t threads=0) noexcept</div><div class="ttdef"><b>Definition:</b> remove_all.hpp:157</div></div>
+</div><!-- fragment -->
 </div>
 </div>
 </div><!-- contents -->
