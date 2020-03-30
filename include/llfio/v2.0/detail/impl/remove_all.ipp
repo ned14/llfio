@@ -445,7 +445,7 @@ namespace algorithm
               // std::cout << "Removed " << path << std::endl;
               return true;
             }
-            return r.error();
+            return std::move(r).error();
           }
           return false;
         };
@@ -570,7 +570,7 @@ namespace algorithm
         }
         if(callback_error)
         {
-          return *callback_error;
+          return std::move(*callback_error);
         }
         OUTCOME_TRY(callback(remove_all_callback_reason::end_enumeration, {(uint64_t) totalnotremoved}, {(uint64_t) totalremoved}));
         while(totalnotremoved != 0)
@@ -587,7 +587,7 @@ namespace algorithm
           }
           if(callback_error)
           {
-            return *callback_error;
+            return std::move(*callback_error);
           }
           for(;;)
           {
@@ -599,7 +599,7 @@ namespace algorithm
                 (void) enumerate_and_remove(workqueue[level].front(), level);
                 if(callback_error)
                 {
-                  return *callback_error;
+                  return std::move(*callback_error);
                 }
                 workqueue[level].pop_front();
                 alldone = false;
