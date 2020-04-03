@@ -27,48 +27,80 @@ Distributed under the Boost Software License, Version 1.0.
 
 LLFIO_V2_NAMESPACE_BEGIN
 
-size_t io_handle::max_buffers() const noexcept
+size_t io_handle::_do_max_buffers() const noexcept
 {
-  return 1;  // async_file_handle may override this virtual function
+  return 1;  // TODO FIXME support ReadFileScatter/WriteFileGather
 }
 
-template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersType> do_read_write(const native_handle_type &nativeh, Syscall &&syscall, io_handle::io_request<BuffersType> reqs, deadline d) noexcept
+template <class BuffersType> inline bool do_cancel(const native_handle_type &nativeh, span<typename detail::io_operation_connection::_EXTENDED_IO_STATUS_BLOCK> ols, io_handle::io_request<BuffersType> reqs) noexcept
 {
+  using namespace windows_nt_kernel;
+  using EIOSB = typename detail::io_operation_connection::_EXTENDED_IO_STATUS_BLOCK;
+  bool did_cancel = false;
+  ols = span<EIOSB>(ols.data(), reqs.buffers.size());
+  for(auto &ol : ols)
+  {
+    if(ol.Status == -1)
+    {
+      // No need to cancel an i/o never begun
+      continue;
+    }
+    NTSTATUS ntstat = ntcancel_pending_io(nativeh.h, (IO_STATUS_BLOCK &) ol);
+    if(ntstat < 0 && ntstat != (NTSTATUS) 0xC0000120 /*STATUS_CANCELLED*/)
+    {
+      LLFIO_LOG_FATAL(nullptr, "Failed to cancel earlier i/o");
+      abort();
+    }
+    if(ntstat == (NTSTATUS) 0xC0000120 /*STATUS_CANCELLED*/)
+    {
+      did_cancel = true;
+    }
+  }
+  return did_cancel;
+}
+
+template <bool blocking, class Syscall, class BuffersType>
+inline bool do_read_write(io_handle::io_result<BuffersType> &ret, size_t &scheduled, Syscall &&syscall, const native_handle_type &nativeh, windows_nt_kernel::PIO_APC_ROUTINE routine, detail::io_operation_connection *op, span<typename detail::io_operation_connection::_EXTENDED_IO_STATUS_BLOCK> ols,
+                                                       io_handle::io_request<BuffersType> reqs, deadline d) noexcept
+{
+  using namespace windows_nt_kernel;
+  using EIOSB = typename detail::io_operation_connection::_EXTENDED_IO_STATUS_BLOCK;
   if(d && !nativeh.is_nonblocking())
   {
-    return errc::not_supported;
+    ret=errc::not_supported;
+    return true;
   }
   if(reqs.buffers.size() > 64)
   {
-    return errc::argument_list_too_long;
+    ret=errc::argument_list_too_long;
+    return true;
   }
-
   LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
-  std::array<OVERLAPPED, 64> _ols{};
-  memset(_ols.data(), 0, reqs.buffers.size() * sizeof(OVERLAPPED));
-  span<OVERLAPPED> ols(_ols.data(), reqs.buffers.size());
+  ols = span<EIOSB>(ols.data(), reqs.buffers.size());
+  memset(ols.data(), 0, reqs.buffers.size() * sizeof(EIOSB));
   auto ol_it = ols.begin();
-  DWORD transferred = 0;
+  for(auto &req : reqs.buffers)
+  {
+    EIOSB &ol = *ol_it++;
+    ol.Status = -1;
+  }
   auto cancel_io = undoer([&] {
     if(nativeh.is_nonblocking())
     {
-      for(auto &ol : ols)
+      if(ol_it != ols.begin() + 1)
       {
-        CancelIoEx(nativeh.h, &ol);
-      }
-      for(auto &ol : ols)
-      {
-        ntwait(nativeh.h, ol, deadline());
+        do_cancel(nativeh, ols, reqs);
       }
     }
   });
+  ol_it = ols.begin();
   for(auto &req : reqs.buffers)
   {
-    OVERLAPPED &ol = *ol_it++;
-    ol.Internal = static_cast<ULONG_PTR>(-1);
+    EIOSB &ol = *ol_it++;
+    LARGE_INTEGER offset;
     if(nativeh.is_append_only())
     {
-      ol.OffsetHigh = ol.Offset = 0xffffffff;
+      offset.QuadPart = -1;
     }
     else
     {
@@ -78,8 +110,7 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
         assert((reqs.offset & 511) == 0);
       }
 #endif
-      ol.OffsetHigh = (reqs.offset >> 32) & 0xffffffff;
-      ol.Offset = reqs.offset & 0xffffffff;
+      offset.QuadPart = reqs.offset;
     }
 #ifndef NDEBUG
     if(nativeh.requires_aligned_io())
@@ -88,52 +119,96 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
       assert((req.size() & 511) == 0);
     }
 #endif
-    if(!syscall(nativeh.h, req.data(), static_cast<DWORD>(req.size()), &transferred, &ol) && ERROR_IO_PENDING != GetLastError())
-    {
-      return win32_error();
-    }
     reqs.offset += req.size();
+    ol.Status = 0x103 /*STATUS_PENDING*/;
+    NTSTATUS ntstat = syscall(nativeh.h, nullptr, routine, op, (PIO_STATUS_BLOCK) &ol, (PVOID) req.data(), static_cast<DWORD>(req.size()), &offset, nullptr);
+    if(ntstat < 0 && ntstat != 0x103 /*STATUS_PENDING*/)
+    {
+      InterlockedCompareExchange(&ol.Status, ntstat, 0x103 /*STATUS_PENDING*/);
+      ret=ntkernel_error(ntstat);
+      return true;
+    }
+    ++scheduled;
   }
   // If handle is overlapped, wait for completion of each i/o.
-  if(nativeh.is_nonblocking())
+  if(nativeh.is_nonblocking() && blocking)
   {
     for(auto &ol : ols)
     {
       deadline nd;
       LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
-      if(STATUS_TIMEOUT == ntwait(nativeh.h, ol, nd))
+      if(STATUS_TIMEOUT == ntwait(nativeh.h, (IO_STATUS_BLOCK &) ol, nd))
       {
-        LLFIO_WIN_DEADLINE_TO_TIMEOUT_LOOP(d);
+        // ntwait cancels the i/o, undoer will cancel all the other i/o
+        auto r = [&]() -> result<void> {
+          LLFIO_WIN_DEADLINE_TO_TIMEOUT_LOOP(d);
+          return success();
+        }();
+        if(!r)
+        {
+          ret = r.error();
+          return true;
+        }
       }
     }
   }
   cancel_io.dismiss();
+  if(!blocking)
+  {
+    // If all the operations already completed, great
+    for(size_t n = 0; n < reqs.buffers.size(); n++)
+    {
+      if(ols[n].Status == static_cast<ULONG_PTR>(0x103 /*STATUS_PENDING*/))
+      {
+        return false;  // at least one buffer is not completed yet
+      }
+    }
+  }
+  ret = {reqs.buffers.data(), 0};
   for(size_t n = 0; n < reqs.buffers.size(); n++)
   {
-    // It seems the NT kernel is guilty of casting bugs sometimes
-    ols[n].Internal = ols[n].Internal & 0xffffffff;
-    if(ols[n].Internal != 0)
+    assert(ols[n].Status != -1);
+    if(ols[n].Status < 0)
     {
-      return ntkernel_error(static_cast<NTSTATUS>(ols[n].Internal));
+      ret= ntkernel_error(static_cast<NTSTATUS>(ols[n].Status));
+      return true;
     }
-    reqs.buffers[n] = {reqs.buffers[n].data(), ols[n].InternalHigh};
+    reqs.buffers[n] = {reqs.buffers[n].data(), ols[n].Information};
+    if(reqs.buffers[n].size() != 0)
+    {
+      ret = {reqs.buffers.data(), n + 1};
+    }
   }
-  return io_handle::io_result<BuffersType>(std::move(reqs.buffers));
+  return true;
 }
 
-io_handle::io_result<io_handle::buffers_type> io_handle::read(io_handle::io_request<io_handle::buffers_type> reqs, deadline d) noexcept
+io_handle::io_result<io_handle::buffers_type> io_handle::_do_read(io_handle::io_request<io_handle::buffers_type> reqs, deadline d) noexcept
 {
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
   LLFIO_LOG_FUNCTION_CALL(this);
-  return do_read_write(_v, &ReadFile, reqs, d);
+  using EIOSB = typename detail::io_operation_connection::_EXTENDED_IO_STATUS_BLOCK;
+  std::array<EIOSB, 64> _ols{};
+  io_handle::io_result<io_handle::buffers_type> ret(reqs.buffers);
+  size_t scheduled = 0;
+  do_read_write<true>(ret, scheduled, NtReadFile, _v, nullptr, nullptr, {_ols.data(), _ols.size()}, reqs, d);
+  return ret;
 }
 
-io_handle::io_result<io_handle::const_buffers_type> io_handle::write(io_handle::io_request<io_handle::const_buffers_type> reqs, deadline d) noexcept
+io_handle::io_result<io_handle::const_buffers_type> io_handle::_do_write(io_handle::io_request<io_handle::const_buffers_type> reqs, deadline d) noexcept
 {
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
   LLFIO_LOG_FUNCTION_CALL(this);
-  return do_read_write(_v, &WriteFile, reqs, d);
+  using EIOSB = typename detail::io_operation_connection::_EXTENDED_IO_STATUS_BLOCK;
+  std::array<EIOSB, 64> _ols{};
+  io_handle::io_result<io_handle::const_buffers_type> ret(reqs.buffers);
+  size_t scheduled = 0;
+  do_read_write<true>(ret, scheduled, NtWriteFile, _v, nullptr, nullptr, {_ols.data(), _ols.size()}, reqs, d);
+  return ret;
 }
 
-io_handle::io_result<io_handle::const_buffers_type> io_handle::barrier(io_handle::io_request<io_handle::const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
+io_handle::io_result<io_handle::const_buffers_type> io_handle::_do_barrier(io_handle::io_request<io_handle::const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -143,7 +218,8 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::barrier(io_handle
     return errc::not_supported;
   }
   LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
-  OVERLAPPED ol{};
+  using EIOSB = typename detail::io_operation_connection::_EXTENDED_IO_STATUS_BLOCK;
+  EIOSB ol{};
   memset(&ol, 0, sizeof(ol));
   auto *isb = reinterpret_cast<IO_STATUS_BLOCK *>(&ol);
   *isb = make_iostatus();
@@ -159,10 +235,9 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::barrier(io_handle
   NTSTATUS ntstat = NtFlushBuffersFileEx(_v.h, flags, nullptr, 0, isb);
   if(STATUS_PENDING == ntstat)
   {
-    ntstat = ntwait(_v.h, ol, d);
+    ntstat = ntwait(_v.h, (IO_STATUS_BLOCK &) ol, d);
     if(STATUS_TIMEOUT == ntstat)
     {
-      CancelIoEx(_v.h, &ol);
       return errc::timed_out;
     }
   }

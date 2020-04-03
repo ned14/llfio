@@ -155,6 +155,42 @@ protected:
   section_handle _sh;  // Tracks the file (i.e. *this) somewhat lazily
   map_handle _mh;      // The current map with valid extent
 
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t _do_max_buffers() const noexcept override { return _mh.max_buffers(); }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), barrier_kind kind = barrier_kind::nowait_data_only, deadline d = deadline()) noexcept override { return _mh.barrier(reqs, kind, d); }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> _do_read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override { return _mh.read(reqs, d); }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override
+  {
+    if(!!(_sh.section_flags() & section_handle::flag::write_via_syscall))
+    {
+      const auto batch = max_buffers();
+      io_request<const_buffers_type> thisreq(reqs);
+      LLFIO_DEADLINE_TO_SLEEP_INIT(d);
+      for(size_t n = 0; n < reqs.buffers.size();)
+      {
+        deadline nd;
+        LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+        thisreq.buffers = reqs.buffers.subspan(n, std::min(batch, reqs.buffers.size() - n));
+        OUTCOME_TRY(written, file_handle::write(thisreq, nd));
+        if(written.empty())
+        {
+          reqs.buffers = reqs.buffers.subspan(0, n);
+          break;
+        }
+        for(auto &b : written)
+        {
+          thisreq.offset += b.size();
+          n++;
+        }
+      }
+      if(thisreq.offset > _mh.length())
+      {
+        OUTCOME_TRY(_mh.update_map());
+      }
+      return reqs.buffers;
+    }
+    return _mh.write(reqs, d);
+  }
+
 public:
   //! Default constructor
   constexpr mapped_file_handle() {}  // NOLINT
@@ -369,11 +405,15 @@ public:
   }
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override;
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), barrier_kind kind = barrier_kind::nowait_data_only, deadline d = deadline()) noexcept override { return _mh.barrier(reqs, kind, d); }
   result<mapped_file_handle> reopen(size_type reservation, mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept
   {
     OUTCOME_TRY(fh, file_handle::reopen(mode_, caching_, d));
     return mapped_file_handle(std::move(fh), reservation, _sh.section_flags());
+  }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> set_multiplexer(io_multiplexer *c = this_thread::multiplexer()) noexcept override
+  {
+    OUTCOME_TRY(file_handle::set_multiplexer(c));
+    return _mh.set_multiplexer(file_handle::multiplexer());
   }
   /*! \brief Return the current maximum permitted extent of the file, after updating the map.
 
@@ -424,8 +464,6 @@ public:
     return bytes;
   }
 
-  using file_handle::read;
-  using file_handle::write;
 
   /*! \brief Read data from the mapped file.
 
@@ -440,7 +478,7 @@ public:
   \errors None, though the various signals and structured exception throws common to using memory maps may occur.
   \mallocs None.
   */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override { return _mh.read(reqs, d); }
+  using file_handle::read;
   /*! \brief Write data to the mapped file.
 
   If this mapped file handle was constructed with `section_handle::flag::write_via_syscall`, this function is
@@ -464,38 +502,7 @@ public:
   of the raised signal, but it is by far the most likely.
   \mallocs None if a `QUICKCPPLIB_NAMESPACE::signal_guard_install` is already instanced.
   */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override
-  {
-    if(!!(_sh.section_flags() & section_handle::flag::write_via_syscall))
-    {
-      const auto batch = max_buffers();
-      io_request<const_buffers_type> thisreq(reqs);
-      LLFIO_DEADLINE_TO_SLEEP_INIT(d);
-      for(size_t n = 0; n < reqs.buffers.size();)
-      {
-        deadline nd;
-        LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
-        thisreq.buffers = reqs.buffers.subspan(n, std::min(batch, reqs.buffers.size() - n));
-        OUTCOME_TRY(written, file_handle::write(thisreq, nd));
-        if(written.empty())
-        {
-          reqs.buffers = reqs.buffers.subspan(0, n);
-          break;
-        }
-        for(auto &b : written)
-        {
-          thisreq.offset += b.size();
-          n++;
-        }
-      }
-      if(thisreq.offset > _mh.length())
-      {
-        OUTCOME_TRY(_mh.update_map());
-      }
-      return reqs.buffers;
-    }
-    return _mh.write(reqs, d);
-  }
+  using file_handle::write;
 };
 
 //! \brief Constructor for `mapped_file_handle`

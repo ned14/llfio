@@ -12,7 +12,7 @@
 </table></center>
 
 Herein lies my proposed zero whole machine memory copy async file i/o and filesystem
-library for Boost and the C++ standard, intended for storage devices with ~1 microsecond
+library for the C++ standard, intended for storage devices with ~1 microsecond
 4Kb transfer latencies and those supporting Storage Class Memory (SCM)/Direct Access
 Storage (DAX). Its i/o overhead, including syscall overhead, has been benchmarked to
 100 nanoseconds on Linux which corresponds to a theoretical maximum of 10M IOPS @ QD1,

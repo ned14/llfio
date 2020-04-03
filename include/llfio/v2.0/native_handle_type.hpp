@@ -63,7 +63,14 @@ struct native_handle_type  // NOLINT
   section = 1U << 15U,      //!< Is a memory section
   allocation = 1U << 16U,   //!< Is a memory allocation
 
-  _child_close_executed = 1U << 28U  // used to trap when vptr has become corrupted
+  safety_barriers = 1U << 20U,  //!< Issue write reordering barriers at various points
+  cache_metadata = 1U << 21U,   //!< Is serving metadata from the kernel cache
+  cache_reads = 1U << 22U,      //!< Is serving reads from the kernel cache
+  cache_writes = 1U << 23U,     //!< Is writing back from kernel cache rather than writing through
+  cache_temporary = 1U << 24U,  //!< Writes are not flushed to storage quickly
+
+  _is_connected = 1U << 28U,         // used by pipe_handle on Windows to store connectedness
+  _child_close_executed = 1U << 30U  // used to trap when vptr has become corrupted
   } QUICKCPPLIB_BITFIELD_END(disposition)
 
   union {
@@ -74,6 +81,8 @@ struct native_handle_type  // NOLINT
     int pid;  // NOLINT
     //! A Windows HANDLE
     win::handle h;  // NOLINT
+    //! A third party pointer
+    void *ptr;
   };
   disposition behaviour;  //! The behaviour of the handle
   //! Constructs a default instance

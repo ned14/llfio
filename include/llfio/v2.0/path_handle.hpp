@@ -1,5 +1,5 @@
 /* A handle to a filesystem location
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: Jul 2017
 
 
@@ -70,7 +70,10 @@ public:
   {
   }
   //! Explicit conversion from handle permitted
-  explicit constexpr path_handle(handle &&o) noexcept : handle(std::move(o)) {}
+  explicit constexpr path_handle(handle &&o) noexcept
+      : handle(std::move(o))
+  {
+  }
   //! Move construction permitted
   path_handle(path_handle &&) = default;
   //! No copy construction (use `clone()`)
@@ -91,6 +94,13 @@ public:
     path_handle temp(std::move(*this));
     *this = std::move(o);
     o = std::move(temp);
+  }
+
+  //! Replaces `handle::clone()` with a `path_handle returning edition`
+  result<path_handle> clone() const noexcept
+  {
+    OUTCOME_TRY(newh, handle::clone());
+    return path_handle(std::move(newh));
   }
 
   /*! Create a path handle opening access to some location on the filing system.

@@ -38,8 +38,6 @@ Distributed under the Boost Software License, Version 1.0.
 
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
-class io_service;
-
 /*! \class file_handle
 \brief A handle to a regular file or device, kept data layout compatible with
 async_file_handle.
@@ -74,9 +72,6 @@ public:
   using ino_t = fs_handle::ino_t;
   using path_view_type = fs_handle::path_view_type;
 
-protected:
-  io_service *_service{nullptr};
-
 public:
   //! Default constructor
   constexpr file_handle() {}  // NOLINT
@@ -84,7 +79,6 @@ public:
   constexpr file_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching = caching::none, flag flags = flag::none)
       : lockable_io_handle(std::move(h), caching, flags)
       , fs_handle(devid, inode)
-      , _service(nullptr)
   {
   }
   //! No copy construction (use clone())
@@ -95,15 +89,12 @@ public:
   constexpr file_handle(file_handle &&o) noexcept
       : lockable_io_handle(std::move(o))
       , fs_handle(std::move(o))
-      , _service(o._service)
   {
-    o._service = nullptr;
   }
   //! Explicit conversion from handle and io_handle permitted
   explicit constexpr file_handle(handle &&o, dev_t devid, ino_t inode) noexcept
       : lockable_io_handle(std::move(o))
       , fs_handle(devid, inode)
-      , _service(nullptr)
   {
   }
   //! Move assignment of file_handle permitted
@@ -245,34 +236,6 @@ public:
 
   LLFIO_DEADLINE_TRY_FOR_UNTIL(reopen)
 
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<handle> clone() const noexcept override
-  {
-    // For file handles, we need a deeper clone than duph()
-    OUTCOME_TRY(ret, reopen());
-    return handle(ret.release());
-  }
-
-  //! The i/o service this handle is attached to, if any
-  io_service *service() const noexcept { return _service; }
-
-  using io_handle::read;
-  //! Convenience initialiser list based overload for `read()`
-  LLFIO_MAKE_FREE_FUNCTION
-  io_result<size_type> read(extent_type offset, std::initializer_list<buffer_type> lst, deadline d = deadline()) noexcept
-  {
-    buffer_type *_reqs = reinterpret_cast<buffer_type *>(alloca(sizeof(buffer_type) * lst.size()));
-    memcpy(_reqs, lst.begin(), sizeof(buffer_type) * lst.size());
-    io_request<buffers_type> reqs(buffers_type(_reqs, lst.size()), offset);
-    auto ret = read(reqs, d);
-    if(ret)
-    {
-      return ret.bytes_transferred();
-    }
-    return std::move(ret).error();
-  }
-
-  LLFIO_DEADLINE_TRY_FOR_UNTIL(read)
-
   /*! Return the current maximum permitted extent of the file.
 
   \errors Any of the values POSIX fstat() or GetFileInformationByHandleEx() can return.
@@ -335,6 +298,8 @@ public:
   */
   LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> zero(extent_type offset, extent_type bytes, deadline d = deadline()) noexcept;
+
+  LLFIO_DEADLINE_TRY_FOR_UNTIL(zero)
 };
 
 //! \brief Constructor for `file_handle`

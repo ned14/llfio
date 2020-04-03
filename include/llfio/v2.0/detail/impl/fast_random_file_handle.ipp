@@ -26,7 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
-fast_random_file_handle::io_result<fast_random_file_handle::buffers_type> fast_random_file_handle::read(io_request<buffers_type> reqs, deadline /* unused */) noexcept
+fast_random_file_handle::io_result<fast_random_file_handle::buffers_type> fast_random_file_handle::_do_read(io_request<buffers_type> reqs, deadline /* unused */) noexcept
 {
   if(reqs.offset >= _length)
   {

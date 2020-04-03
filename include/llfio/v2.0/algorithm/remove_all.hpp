@@ -74,7 +74,7 @@ namespace algorithm
 
   namespace detail
   {
-    LLFIO_HEADERS_ONLY_FUNC_SPEC result<size_t> remove_all(directory_handle &&dirh, LLFIO_V2_NAMESPACE::detail::function_ptr<result<void>(remove_all_callback_reason reason, remove_all_callback_arg arg1, remove_all_callback_arg arg2)> callback, size_t threads) noexcept;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC result<size_t> remove_all(directory_handle &&dirh, LLFIO_V2_NAMESPACE::function_ptr<result<void>(remove_all_callback_reason reason, remove_all_callback_arg arg1, remove_all_callback_arg arg2)> callback, size_t threads) noexcept;
   }  // namespace detail
 
   /*! \brief Reliably removes from the filesystem `dirh` and everything under `dirh`.
@@ -151,7 +151,7 @@ namespace algorithm
   */
   template <class F> inline result<size_t> remove_all(directory_handle &&dirh, F &&callback, size_t threads = 0) noexcept
   {
-    return detail::remove_all(std::move(dirh), LLFIO_V2_NAMESPACE::detail::emplace_function_ptr<result<void>(remove_all_callback_reason reason, remove_all_callback_arg arg1, remove_all_callback_arg arg2)>(std::forward<F>(callback)), threads);
+    return detail::remove_all(std::move(dirh), LLFIO_V2_NAMESPACE::emplace_function_ptr<result<void>(remove_all_callback_reason reason, remove_all_callback_arg arg1, remove_all_callback_arg arg2)>(std::forward<F>(callback)), threads);
   }
   //! \overload With default callback with removal failure timeout of 10 seconds
   inline result<size_t> remove_all(directory_handle &&dirh, size_t threads = 0) noexcept { return detail::remove_all(std::move(dirh), {}, threads); }

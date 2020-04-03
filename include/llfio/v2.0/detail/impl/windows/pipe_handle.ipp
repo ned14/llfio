@@ -31,6 +31,7 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
+  flags &= ~flag::unlink_on_first_close;
   result<pipe_handle> ret(pipe_handle(native_handle_type(), 0, 0, _caching, flags));
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
@@ -72,13 +73,20 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
 
   path_view::c_str<> zpath(path, true);
   UNICODE_STRING _path{};
-  _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
-  _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
-  if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
+  if(path.empty())
   {
-    _path.Buffer += 3;
-    _path.Length -= 3 * sizeof(wchar_t);
-    _path.MaximumLength -= 3 * sizeof(wchar_t);
+    memset(&_path, 0, sizeof(_path));
+  }
+  else
+  {
+    _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
+    _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
+    if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
+    {
+      _path.Buffer += 3;
+      _path.Length -= 3 * sizeof(wchar_t);
+      _path.MaximumLength -= 3 * sizeof(wchar_t);
+    }
   }
 
   OBJECT_ATTRIBUTES oa{};
@@ -107,7 +115,7 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
       }
       // If writable and not readable, fail if other end is not connected
       // This matches full duplex pipe behaviour on Linux
-      if(nativeh.is_readable() && nativeh.is_writable() && 0xC00000AE /*STATUS_PIPE_BUSY*/ == ntstat)
+      if(nativeh.is_readable() && nativeh.is_writable() && (NTSTATUS) 0xC00000AE /*STATUS_PIPE_BUSY*/ == ntstat)
       {
         return errc::no_such_device_or_address;  // ENXIO, as per Linux
       }
@@ -118,7 +126,7 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
       }
       // loop
     }
-    ret.value()._set_is_connected(true);
+    ret.value()._is_connected=true;
   }
   else
   {
@@ -138,56 +146,75 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
     {
       return ntkernel_error(ntstat);
     }
-    ret.value()._flags |= flag::unlink_on_first_close;
-  }
-  // If opening a pipe for reading and not writing, and this pipe is blocking,
-  // block until the other end opens for write
-  if(nativeh.is_readable() && !nativeh.is_writable() && !nativeh.is_nonblocking())
-  {
-    // Opening blocking pipes for reads must block until other end opens with write
-    if(!ConnectNamedPipe(nativeh.h, nullptr))
+
+    // If creating a pipe, and this pipe is blocking, block until the other end opens
+    if(!path.empty() && !nativeh.is_nonblocking())
     {
-      return win32_error();
+      // Opening blocking pipes must block until other end opens
+      if(!ConnectNamedPipe(nativeh.h, nullptr) && ERROR_PIPE_CONNECTED != GetLastError())
+      {
+        return win32_error();
+      }
+      ret.value()._is_connected=true;
     }
-    ret.value()._set_is_connected(true);
   }
   return ret;
 }
 
 result<std::pair<pipe_handle, pipe_handle>> pipe_handle::anonymous_pipe(caching _caching, flag flags) noexcept
 {
-  // TODO FIXME Use HANDLE cloning from https://stackoverflow.com/questions/40844884/windows-named-pipe-access-control
+  // Uses true anonymous pipe creation technique from https://stackoverflow.com/questions/40844884/windows-named-pipe-access-control
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  std::pair<pipe_handle, pipe_handle> ret(pipe_handle(native_handle_type(), 0, 0, _caching, flags), pipe_handle(native_handle_type(), 0, 0, _caching, flags));
+  // Create an unnamed new pipe
+  flags &= ~flag::unlink_on_first_close;
+  OUTCOME_TRY(anonpipe, pipe({}, mode::read, creation::only_if_not_exist, _caching, flags));
+  std::pair<pipe_handle, pipe_handle> ret(std::move(anonpipe), pipe_handle(native_handle_type(), 0, 0, _caching, flags));
   native_handle_type &readnativeh = ret.first._v, &writenativeh = ret.second._v;
-  LLFIO_LOG_FUNCTION_CALL(&ret);
-  readnativeh.behaviour |= native_handle_type::disposition::pipe;
-  readnativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
+  DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
+  OUTCOME_TRY(access, access_mask_from_handle_mode(writenativeh, mode::append, flags));
+  access = SYNCHRONIZE | DELETE | GENERIC_WRITE;  // correct for pipes
+  OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(writenativeh, _caching, flags));
   writenativeh.behaviour |= native_handle_type::disposition::pipe;
   writenativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
-  if(!CreatePipe(&readnativeh.h, &writenativeh.h, nullptr, 65536))
+  LLFIO_LOG_FUNCTION_CALL(&ret.first);
+
+  // Now clone the handle, but as a write privileged handle
+  attribs &= 0x00ffffff;  // the real attributes only, not the win32 flags
+  OUTCOME_TRY(ntflags, ntflags_from_handle_caching_and_flags(writenativeh, _caching, flags));
+  IO_STATUS_BLOCK isb = make_iostatus();
+
+  UNICODE_STRING _path{};
+  memset(&_path, 0, sizeof(_path));
+  OBJECT_ATTRIBUTES oa{};
+  memset(&oa, 0, sizeof(oa));
+  oa.Length = sizeof(OBJECT_ATTRIBUTES);
+  oa.ObjectName = &_path;
+  oa.RootDirectory = readnativeh.h;
+  oa.Attributes = 0x40 /*OBJ_CASE_INSENSITIVE*/;
+  NTSTATUS ntstat = NtOpenFile(&writenativeh.h, access, &oa, &isb, fileshare, ntflags);
+  if(STATUS_PENDING == ntstat)
   {
-    DWORD errcode = GetLastError();
-    // assert(false);
-    return win32_error(errcode);
+    ntstat = ntwait(writenativeh.h, isb, deadline());
   }
-  ret.first._set_is_connected(true);
-  ret.second._set_is_connected(true);
+  if(ntstat < 0)
+  {
+    return ntkernel_error(ntstat);
+  }
   return ret;
 }
 
-pipe_handle::io_result<pipe_handle::buffers_type> pipe_handle::read(pipe_handle::io_request<pipe_handle::buffers_type> reqs, deadline d) noexcept
+pipe_handle::io_result<pipe_handle::buffers_type> pipe_handle::_do_read(pipe_handle::io_request<pipe_handle::buffers_type> reqs, deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   // If not connected, it'll be non-blocking, so connect now.
-  if(!_is_connected())
+  if(!_is_connected)
   {
     LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
     OVERLAPPED ol{};
     memset(&ol, 0, sizeof(ol));
     ol.Internal = static_cast<ULONG_PTR>(-1);
-    if(!ConnectNamedPipe(_v.h, &ol))
+    if(!ConnectNamedPipe(_v.h, &ol) && ERROR_PIPE_CONNECTED != GetLastError())
     {
       if(ERROR_IO_PENDING != GetLastError())
       {
@@ -195,6 +222,7 @@ pipe_handle::io_result<pipe_handle::buffers_type> pipe_handle::read(pipe_handle:
       }
       if(STATUS_TIMEOUT == ntwait(_v.h, ol, d))
       {
+        // ntwait cancels timed out i/o
         return errc::timed_out;
       }
       // It seems the NT kernel is guilty of casting bugs sometimes
@@ -213,12 +241,12 @@ pipe_handle::io_result<pipe_handle::buffers_type> pipe_handle::read(pipe_handle:
         d = deadline(remaining);
       }
     }
-    _set_is_connected(true);
+    _is_connected=true;
   }
   return io_handle::read(reqs, d);
 }
 
-pipe_handle::io_result<pipe_handle::const_buffers_type> pipe_handle::write(pipe_handle::io_request<pipe_handle::const_buffers_type> reqs, deadline d) noexcept
+pipe_handle::io_result<pipe_handle::const_buffers_type> pipe_handle::_do_write(pipe_handle::io_request<pipe_handle::const_buffers_type> reqs, deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   return io_handle::write(reqs, d);
