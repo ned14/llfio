@@ -166,7 +166,7 @@ namespace utils
     {
       return posix_error();
     }
-    auto unh = undoer([&h] { ::close(h); });
+    auto unh = make_scope_exit([&h]() noexcept { ::close(h); });
     char v = '3';  // drop everything
     if(-1 == ::write(h, &v, 1))
     {
@@ -191,7 +191,7 @@ namespace utils
       cached = 1;
       return false;
     }
-    auto unh = undoer([&h] { ::close(h); });
+    auto unh = make_scope_exit([&h]() noexcept { ::close(h); });
     char buffer[257];
     ssize_t bytes = ::read(h, buffer, 256);
     if(bytes == -1)

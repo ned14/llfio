@@ -446,7 +446,7 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_type offs
     extent_type ret = 0;
     auto blocksize = utils::file_buffer_default_size();
     byte *buffer = utils::page_allocator<byte>().allocate(blocksize);
-    auto unbufferh = undoer([buffer, blocksize] { utils::page_allocator<byte>().deallocate(buffer, blocksize); });
+    auto unbufferh = make_scope_exit([buffer, blocksize]() noexcept { utils::page_allocator<byte>().deallocate(buffer, blocksize); });
     (void) unbufferh;
     while(bytes > 0)
     {

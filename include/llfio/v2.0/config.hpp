@@ -321,9 +321,12 @@ LLFIO_V2_NAMESPACE_END
 
 // Bring in bitfields
 #include "quickcpplib/bitfield.hpp"
-// Bring in scoped undo
-#include "quickcpplib/scoped_undo.hpp"
-LLFIO_V2_NAMESPACE_BEGIN using QUICKCPPLIB_NAMESPACE::scoped_undo::undoer;
+// Bring in a scope implementation
+#include "quickcpplib/scope.hpp"
+LLFIO_V2_NAMESPACE_BEGIN
+using QUICKCPPLIB_NAMESPACE::scope::make_scope_exit;
+using QUICKCPPLIB_NAMESPACE::scope::make_scope_fail;
+using QUICKCPPLIB_NAMESPACE::scope::make_scope_success;
 LLFIO_V2_NAMESPACE_END
 // Bring in a span implementation
 #include "quickcpplib/span.hpp"

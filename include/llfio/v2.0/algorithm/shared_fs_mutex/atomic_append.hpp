@@ -268,7 +268,7 @@ namespace algorithm
           }
         }
         // Fire this if an error occurs
-        auto disableunlock = undoer([&] { out.release(); });
+        auto disableunlock = make_scope_exit([&]() noexcept { out.release(); });
 
         // Write my lock request immediately
         memset(&lock_request, 0, sizeof(lock_request));
@@ -285,7 +285,7 @@ namespace algorithm
         OUTCOME_TRY(my_lock_request_offset, _h.maximum_extent());
         {
           OUTCOME_TRYV(_h.set_append_only(true));
-          auto undo = undoer([this] { (void) _h.set_append_only(false); });
+          auto undo = make_scope_exit([this]() noexcept { (void) _h.set_append_only(false); });
           file_handle::extent_guard append_guard;
           if(_nfs_compatibility)
           {
@@ -329,7 +329,7 @@ namespace algorithm
 
         // extent_guard is now valid and will be unlocked on error
         out.hint = my_lock_request_offset;
-        disableunlock.dismiss();
+        disableunlock.release();
 
         // Lock my request for writing so others can sleep on me
         file_handle::extent_guard my_request_guard;

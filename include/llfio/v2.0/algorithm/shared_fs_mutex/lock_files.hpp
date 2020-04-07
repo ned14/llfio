@@ -143,7 +143,7 @@ namespace algorithm
         {
           auto was_contended = static_cast<size_t>(-1);
           {
-            auto undo = undoer([&] {
+            auto undo = make_scope_exit([&]() noexcept {
               // 0 to (n-1) need to be closed
               if(n > 0)
               {
@@ -174,7 +174,7 @@ namespace algorithm
             }
             if(n == out.entities.size())
             {
-              undo.dismiss();
+              undo.release();
             }
           }
           if(n != out.entities.size())

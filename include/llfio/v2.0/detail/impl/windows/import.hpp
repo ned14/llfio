@@ -1681,7 +1681,7 @@ inline HANDLE CreateFileW_(_In_ LPCWSTR lpFileName, _In_ DWORD dwDesiredAccess, 
     SetLastError(ERROR_FILE_NOT_FOUND);
     return INVALID_HANDLE_VALUE;  // NOLINT
   }
-  auto unntpath = undoer([&NtPath] {
+  auto unntpath = make_scope_exit([&NtPath]() noexcept {
     if(HeapFree(GetProcessHeap(), 0, NtPath.Buffer) == 0)
     {
       abort();
@@ -1728,7 +1728,7 @@ inline bool running_under_suid_gid()
   {
     abort();
   }
-  auto unprocesstoken = undoer([&processtoken] { CloseHandle(processtoken); });
+  auto unprocesstoken = make_scope_exit([&processtoken]() noexcept { CloseHandle(processtoken); });
   (void) unprocesstoken;
   DWORD written;
   char buffer1[1024], buffer2[1024];

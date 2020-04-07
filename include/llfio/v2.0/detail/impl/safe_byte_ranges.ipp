@@ -149,7 +149,7 @@ namespace algorithm
             }
           }
           // Fire this if an error occurs
-          auto disableunlock = undoer([&] { out.release(); });
+          auto disableunlock = make_scope_exit([&]() noexcept { out.release(); });
           size_t n;
           for(;;)
           {
@@ -157,7 +157,7 @@ namespace algorithm
             bool pls_sleep = true;
             std::unique_lock<decltype(_m)> guard(_m);
             {
-              auto undo = undoer([&] {
+              auto undo = make_scope_exit([&]() noexcept {
                 // 0 to (n-1) need to be closed
                 if(n > 0)
                 {
@@ -310,8 +310,8 @@ namespace algorithm
                 it->second.writer_tid = mythreadid;
               }
               // Dismiss unwind of thread locking and return success
-              undo.dismiss();
-              disableunlock.dismiss();
+              undo.release();
+              disableunlock.release();
               return success();
             }
           failed:

@@ -184,7 +184,7 @@ namespace storage_profile
             chunksize = static_cast<size_t>(sp.mem_quantity.value / 4);
           }
           char *buffer = utils::page_allocator<char>().allocate(chunksize);
-          auto unbuffer = LLFIO_V2_NAMESPACE::undoer([buffer, chunksize] { utils::page_allocator<char>().deallocate(buffer, chunksize); });
+          auto unbuffer = LLFIO_V2_NAMESPACE::make_scope_exit([buffer, chunksize]() noexcept { utils::page_allocator<char>().deallocate(buffer, chunksize); });
           // Make sure all memory is really allocated first
           memset(buffer, 1, chunksize);
 
