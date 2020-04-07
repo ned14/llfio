@@ -119,7 +119,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
         {
           return posix_error();
         }
-        auto unmtab = undoer([mtab] { endmntent(mtab); });
+        auto unmtab = make_scope_exit([mtab]() noexcept { endmntent(mtab); });
         struct mntent m
         {
         };

@@ -84,7 +84,7 @@ inline bool do_read_write(io_handle::io_result<BuffersType> &ret, size_t &schedu
     EIOSB &ol = *ol_it++;
     ol.Status = -1;
   }
-  auto cancel_io = undoer([&] {
+  auto cancel_io = make_scope_exit([&]() noexcept {
     if(nativeh.is_nonblocking())
     {
       if(ol_it != ols.begin() + 1)
@@ -152,7 +152,7 @@ inline bool do_read_write(io_handle::io_result<BuffersType> &ret, size_t &schedu
       }
     }
   }
-  cancel_io.dismiss();
+  cancel_io.release();
   if(!blocking)
   {
     // If all the operations already completed, great

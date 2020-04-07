@@ -104,7 +104,7 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
         }
         return ntkernel_error(ntstat);
       }
-      auto unnh = undoer([nh] { CloseHandle(nh); });
+      auto unnh = make_scope_exit([nh]() noexcept { CloseHandle(nh); });
       (void) unnh;
       isb.Status = -1;
       FILE_INTERNAL_INFORMATION fii{};
@@ -144,7 +144,7 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
     {
       return win32_error(ERROR_FILE_NOT_FOUND);
     }
-    auto unntpath = undoer([&NtPath] {
+    auto unntpath = make_scope_exit([&NtPath]() noexcept {
       if(HeapFree(GetProcessHeap(), 0, NtPath.Buffer) == 0)
       {
         abort();
@@ -214,11 +214,11 @@ result<void> fs_handle::unlink(deadline d) noexcept
       return ntkernel_error(ntstat);
     }
   }
-  auto unduph = undoer([&duph] { CloseHandle(duph); });
+  auto unduph = make_scope_exit([&duph]() noexcept { CloseHandle(duph); });
   // If we failed to duplicate the handle, try using the original handle
   if(duph == INVALID_HANDLE_VALUE)
   {
-    unduph.dismiss();
+    unduph.release();
     duph = h.native_handle().h;
   }
   bool failed = true;

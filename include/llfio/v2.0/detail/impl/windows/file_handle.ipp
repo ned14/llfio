@@ -253,7 +253,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
           return ntkernel_error(ntstat);
         }
       }
-      auto unduph = undoer([&duph] { CloseHandle(duph); });
+      auto unduph = make_scope_exit([&duph]() noexcept { CloseHandle(duph); });
       (void) unduph;
       bool failed = true;
       // Immediately delete, try by POSIX delete first

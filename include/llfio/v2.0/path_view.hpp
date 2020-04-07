@@ -770,7 +770,8 @@ inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view_component x, path_vie
   }
   assert(x._bytestr != nullptr);
   assert(y._bytestr != nullptr);
-  return 0 == memcmp(x._bytestr, y._bytestr, x._length);
+  const auto bytes = (x._wchar || x._utf16) ? (x._length * 2) : x._length;
+  return 0 == memcmp(x._bytestr, y._bytestr, bytes);
 }
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view_component x, path_view_component y) noexcept
 {
@@ -804,7 +805,8 @@ inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view_component x, path_vie
   }
   assert(x._bytestr != nullptr);
   assert(y._bytestr != nullptr);
-  return 0 != memcmp(x._bytestr, y._bytestr, x._length);
+  const auto bytes = (x._wchar || x._utf16) ? (x._length * 2) : x._length;
+  return 0 != memcmp(x._bytestr, y._bytestr, bytes);
 }
 LLFIO_TEMPLATE(class CharT)
 LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_acceptable<CharT>))
@@ -1428,42 +1430,6 @@ template <class T, class Deleter, size_t _internal_buffer_size, typename std::en
 #endif
   friend struct c_str;
 };
-inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view x, path_view y) noexcept
-{
-  return x._state == y._state;
-}
-inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view x, path_view y) noexcept
-{
-  return x._state != y._state;
-}
-LLFIO_TEMPLATE(class CharT)
-LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<CharT>))
-inline constexpr bool operator==(path_view /*unused*/, const CharT * /*unused*/) noexcept
-{
-  static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator== with path_view and a string literal, use .compare<>()");
-  return false;
-}
-LLFIO_TEMPLATE(class CharT)
-LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<CharT>))
-inline constexpr bool operator==(const CharT * /*unused*/, path_view /*unused*/) noexcept
-{
-  static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator== with path_view and a string literal, use .compare<>()");
-  return false;
-}
-LLFIO_TEMPLATE(class CharT)
-LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<CharT>))
-inline constexpr bool operator!=(path_view /*unused*/, const CharT * /*unused*/) noexcept
-{
-  static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator!= with path_view and a string literal, use .compare<>()");
-  return false;
-}
-LLFIO_TEMPLATE(class CharT)
-LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<CharT>))
-inline constexpr bool operator!=(const CharT * /*unused*/, path_view /*unused*/) noexcept
-{
-  static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator!= with path_view and a string literal, use .compare<>()");
-  return false;
-}
 //! \brief Visit the underlying source for a `path_view`
 template <class F> inline LLFIO_PATH_VIEW_CONSTEXPR auto visit(path_view view, F &&f)
 {
@@ -1664,6 +1630,75 @@ constexpr inline path_view::const_iterator path_view::end() const noexcept
 constexpr inline path_view::iterator path_view::end() noexcept
 {
   return cend();
+}
+
+inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view x, path_view y) noexcept
+{
+  auto it1 = x.begin(), it2 = y.begin();
+  for(; it1 != x.end() && it2 != y.end(); ++it1, ++it2)
+  {
+    if(*it1 != *it2)
+    {
+      return false;
+    }
+  }
+  if(it1 == x.end() && it2 != y.end())
+  {
+    return false;
+  }
+  if(it1 != x.end() && it2 == y.end())
+  {
+    return false;
+  }
+  return true;
+}
+inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view x, path_view y) noexcept
+{
+  auto it1 = x.begin(), it2 = y.begin();
+  for(; it1 != x.end() && it2 != y.end(); ++it1, ++it2)
+  {
+    if(*it1 != *it2)
+    {
+      return true;
+    }
+  }
+  if(it1 == x.end() && it2 != y.end())
+  {
+    return true;
+  }
+  if(it1 != x.end() && it2 == y.end())
+  {
+    return true;
+  }
+  return false;
+}
+LLFIO_TEMPLATE(class CharT)
+LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<CharT>))
+inline constexpr bool operator==(path_view /*unused*/, const CharT * /*unused*/) noexcept
+{
+  static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator== with path_view and a string literal, use .compare<>()");
+  return false;
+}
+LLFIO_TEMPLATE(class CharT)
+LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<CharT>))
+inline constexpr bool operator==(const CharT * /*unused*/, path_view /*unused*/) noexcept
+{
+  static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator== with path_view and a string literal, use .compare<>()");
+  return false;
+}
+LLFIO_TEMPLATE(class CharT)
+LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<CharT>))
+inline constexpr bool operator!=(path_view /*unused*/, const CharT * /*unused*/) noexcept
+{
+  static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator!= with path_view and a string literal, use .compare<>()");
+  return false;
+}
+LLFIO_TEMPLATE(class CharT)
+LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<CharT>))
+inline constexpr bool operator!=(const CharT * /*unused*/, path_view /*unused*/) noexcept
+{
+  static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator!= with path_view and a string literal, use .compare<>()");
+  return false;
 }
 #ifdef __cpp_concepts
 template <class T, class Deleter, size_t _internal_buffer_size>
