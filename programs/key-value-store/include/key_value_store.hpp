@@ -35,7 +35,7 @@ namespace key_value_store
   namespace llfio = LLFIO_V2_NAMESPACE;
   template <class T> using optional = llfio::optional<T>;
   template <class T> using span = llfio::span<T>;
-  using llfio::undoer;
+  using llfio::make_scope_exit;
   using uint128 = QUICKCPPLIB_NAMESPACE::integers128::uint128;
   using key_type = uint128;
 
@@ -372,7 +372,7 @@ namespace key_value_store
       for(size_t n = 0; n < _smallfiles.blocking.size(); n++)
       {
         auto currentlength = _smallfiles.blocking[n].maximum_extent().value();
-        _smallfiles.mapped.push_back(llfio::mapped_file_handle(std::move(_smallfiles.blocking[n]), currentlength + overextension));
+        _smallfiles.mapped.push_back(llfio::mapped_file_handle(std::move(_smallfiles.blocking[n]), (unsigned)(currentlength + overextension)));
       }
       _smallfileguard.set_handle(&_smallfiles.mapped[_mysmallfileidx]);
       _smallfiles.blocking.clear();
@@ -874,7 +874,7 @@ namespace key_value_store
       if(_parent->_indexheader->magic != _parent->_goodmagic)
         throw corrupted_store();
       // Remove any newly inserted keys if we abort
-      auto removeinserted = undoer([this, &toupdate] {
+      auto removeinserted = make_scope_exit([this, &toupdate]() noexcept {
         for(auto updit = toupdate.rend(); updit != toupdate.rbegin(); ++updit)
         {
           if(updit->insertion && updit->it != _parent->_index->end())
@@ -920,7 +920,7 @@ namespace key_value_store
       // Finally actually perform the update as quickly as possible to reduce the
       // possibility of a partially issued update which is expensive to repair.
       // This can no longer abort, so dismiss the removeinserter
-      removeinserted.dismiss();
+      removeinserted.release();
       _parent->_indexheader->writes_occurring[_parent->_mysmallfileidx].fetch_add(1);
       for(auto &item : toupdate)
       {
