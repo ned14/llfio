@@ -327,13 +327,13 @@ namespace algorithm
         span<_entity_idx> entity_to_idx(_hash_entities(reinterpret_cast<_entity_idx *>(alloca(sizeof(_entity_idx) * out.entities.size())), out.entities));
         _hash_index_type &index = _index();
         // Fire this if an error occurs
-        auto disableunlock = undoer([&] { out.release(); });
+        auto disableunlock = make_scope_exit([&]() noexcept { out.release(); });
         size_t n;
         for(;;)
         {
           auto was_contended = static_cast<size_t>(-1);
           {
-            auto undo = undoer([&] {
+            auto undo = make_scope_exit([&]() noexcept {
               // 0 to (n-1) need to be closed
               if(n > 0)
               {
@@ -355,8 +355,8 @@ namespace algorithm
               }
             }
             // Everything is locked, exit
-            undo.dismiss();
-            disableunlock.dismiss();
+            undo.release();
+            disableunlock.release();
             return success();
           }
         failed:

@@ -92,7 +92,7 @@ template <class U> inline void map_handle_create_close_(U &&f)
           maph = std::move(testreturn.value());
         }
         // Need to close the map and any backing file as otherwise filesystem_setup won't be able to clear up the working dir on Windows
-        auto onexit = LLFIO_V2_NAMESPACE::undoer([&]{
+        auto onexit = LLFIO_V2_NAMESPACE::make_scope_exit([&]() noexcept {
           (void) maph.close();
           (void) temph.close();
         });

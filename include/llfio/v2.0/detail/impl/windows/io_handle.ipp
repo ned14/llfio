@@ -49,7 +49,7 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
   span<OVERLAPPED> ols(_ols.data(), reqs.buffers.size());
   auto ol_it = ols.begin();
   DWORD transferred = 0;
-  auto cancel_io = undoer([&] {
+  auto cancel_io = make_scope_exit([&]() noexcept {
     if(nativeh.is_nonblocking())
     {
       for(auto &ol : ols)
@@ -107,7 +107,7 @@ template <class BuffersType, class Syscall> inline io_handle::io_result<BuffersT
       }
     }
   }
-  cancel_io.dismiss();
+  cancel_io.release();
   for(size_t n = 0; n < reqs.buffers.size(); n++)
   {
     // It seems the NT kernel is guilty of casting bugs sometimes

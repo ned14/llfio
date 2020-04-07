@@ -97,7 +97,7 @@ namespace algorithm
       }
       auto &map = cached_path_handle_map();
       std::lock_guard<std::mutex> g(map.lock);
-      auto rungc = undoer([&map] {
+      auto rungc = make_scope_exit([&map]() noexcept {
         if(map.gc_count++ >= 1024)
         {
           for(auto it = map.by_path.begin(); it != map.by_path.end();)
