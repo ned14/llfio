@@ -521,14 +521,16 @@ public:
     template <class U, class source_type> void _make_passthrough(path_view_component /*unused*/, bool /*unused*/, U & /*unused*/, const source_type * /*unused*/) {}
     template <class U> void _make_passthrough(path_view_component view, bool no_zero_terminate, U &allocate, const value_type *source)
     {
+      // If the consuming API is a NT kernel API, and we have / in the path, we shall need to do slash conversion
+      const bool needs_slash_translation = (filesystem::path::preferred_separator != '/') && no_zero_terminate && view._invoke([](auto sv) { return sv.find('/') != _npos; });
       length = view._length;
-      if(no_zero_terminate || view._zero_terminated)
+      if(!needs_slash_translation && (no_zero_terminate || view._zero_terminated))
       {
         buffer = source;
       }
       else
       {
-        // Source must be not zero terminated, and zero terminated is required
+        // Source must be not zero terminated, and zero terminated is required, or slash conversion is required
         const size_t required_length = view._length + view._zero_terminated;
         const size_t required_bytes = required_length * sizeof(value_type);
         const size_t _buffer_bytes = sizeof(_buffer);
@@ -559,6 +561,16 @@ public:
             memcpy(buffer_, source, required_bytes);
             buffer_[required_length] = 0;
             buffer = buffer_;
+          }
+        }
+        if(needs_slash_translation)
+        {
+          basic_string_view<value_type> sv(buffer, required_length);
+          auto idx = sv.find('/');
+          while(idx != _npos)
+          {
+            const_cast<value_type *>(buffer)[idx] = filesystem::path::preferred_separator;
+            idx = sv.find('/', idx);
           }
         }
       }

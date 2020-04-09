@@ -209,6 +209,14 @@ namespace detail
       LLFIO_LOG_FATAL(ntstat, ntkernel_error(ntstat).message().c_str());
       abort();
     }
+    // Do any / to \ conversion now
+    for(size_t n = 0; n < state.buffer.Length / sizeof(wchar_t); n++)
+    {
+      if(state.buffer.Buffer[n] == '/')
+      {
+        state.buffer.Buffer[n] = '\\';
+      }
+    }
     // Convert from UTF-16 to ANSI
     ntstat = AreFileApisANSI() ? RtlUnicodeStringToAnsiString(&state.str, (PCUNICODE_STRING) &state.buffer, true) : RtlUnicodeStringToOemString(&state.str, (PCUNICODE_STRING) &state.buffer, true);
     if(ntstat < 0)
@@ -289,6 +297,14 @@ namespace detail
     NTSTATUS ntstat = AreFileApisANSI() ? RtlAnsiStringToUnicodeString(&state.buffer, &state.str, false) : RtlOemStringToUnicodeString(&state.buffer, &state.str, false);
     if(ntstat >= 0)
     {
+      // Do any / to \ conversion now
+      for(size_t n = 0; n < state.buffer.Length / sizeof(wchar_t); n++)
+      {
+        if(state.buffer.Buffer[n] == '/')
+        {
+          state.buffer.Buffer[n] = '\\';
+        }
+      }
       // Successful
       toallocate = 0;
       state.buffer.Buffer[(state.buffer.Length / sizeof(wchar_t))] = 0;
@@ -306,6 +322,14 @@ namespace detail
     {
       LLFIO_LOG_FATAL(ntstat, ntkernel_error(ntstat).message().c_str());
       abort();
+    }
+    // Do any / to \ conversion now
+    for(size_t n = 0; n < state.buffer.Length / sizeof(wchar_t); n++)
+    {
+      if(state.buffer.Buffer[n] == '/')
+      {
+        state.buffer.Buffer[n] = '\\';
+      }
     }
     // The thread local state will cache this for later
     state.buffer.MaximumLength = state.buffer.Length + sizeof(wchar_t);
