@@ -65,7 +65,7 @@ public:
   //! Default constructor
   constexpr path_handle() {}  // NOLINT
   //! Construct a handle from a supplied native handle
-  explicit constexpr path_handle(native_handle_type h, caching caching = caching::all, flag flags = flag::none)
+  explicit constexpr path_handle(native_handle_type h, caching caching, flag flags)
       : handle(h, caching, flags)
   {
   }

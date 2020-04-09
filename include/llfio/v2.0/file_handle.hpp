@@ -76,9 +76,14 @@ public:
   //! Default constructor
   constexpr file_handle() {}  // NOLINT
   //! Construct a handle from a supplied native handle
-  constexpr file_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching = caching::none, flag flags = flag::none)
-      : lockable_io_handle(std::move(h), caching, flags)
+  constexpr file_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching, flag flags, io_multiplexer *ctx)
+      : lockable_io_handle(std::move(h), caching, flags, ctx)
       , fs_handle(devid, inode)
+  {
+  }
+  //! Construct a handle from a supplied native handle
+  constexpr file_handle(native_handle_type h, caching caching, flag flags, io_multiplexer *ctx)
+      : lockable_io_handle(std::move(h), caching, flags, ctx)
   {
   }
   //! No copy construction (use clone())
@@ -91,10 +96,26 @@ public:
       , fs_handle(std::move(o))
   {
   }
-  //! Explicit conversion from handle and io_handle permitted
-  explicit constexpr file_handle(handle &&o, dev_t devid, ino_t inode) noexcept
+  //! Explicit conversion from handle permitted
+  explicit constexpr file_handle(handle &&o, dev_t devid, ino_t inode, io_multiplexer *ctx) noexcept
+      : lockable_io_handle(std::move(o), ctx)
+      , fs_handle(devid, inode)
+  {
+  }
+  //! Explicit conversion from handle permitted
+  explicit constexpr file_handle(handle &&o, io_multiplexer *ctx) noexcept
+      : lockable_io_handle(std::move(o), ctx)
+  {
+  }
+  //! Explicit conversion from io_handle permitted
+  explicit constexpr file_handle(io_handle &&o, dev_t devid, ino_t inode) noexcept
       : lockable_io_handle(std::move(o))
       , fs_handle(devid, inode)
+  {
+  }
+  //! Explicit conversion from io_handle permitted
+  explicit constexpr file_handle(io_handle &&o) noexcept
+      : lockable_io_handle(std::move(o))
   {
   }
   //! Move assignment of file_handle permitted

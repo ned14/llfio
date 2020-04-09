@@ -787,7 +787,7 @@ namespace detail
         struct registered_buffer_type_indirect
         {
           map_handle h;
-          io_handle::buffer_type buffer;
+          io_multiplexer::_registered_buffer_type buffer;
           registered_buffer_type_indirect(map_handle _h)
               : h(std::move(_h))
               , buffer(h.as_span())
@@ -795,7 +795,7 @@ namespace detail
           }
         };
         auto ptr = std::make_shared<registered_buffer_type_indirect>(std::move(h));
-        return io_handle::registered_buffer_type(ptr, &ptr->buffer);
+        return io_handle::registered_buffer_type(std::move(ptr), &ptr->buffer);
       };
       const auto &page_sizes = utils::page_sizes(true);
       size_t idx = 0;

@@ -76,12 +76,17 @@ public:
   constexpr lockable_io_handle() {}  // NOLINT
   ~lockable_io_handle() = default;
   //! Construct a handle from a supplied native handle
-  constexpr explicit lockable_io_handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none)
-      : io_handle(h, caching, flags)
+  constexpr explicit lockable_io_handle(native_handle_type h, caching caching, flag flags, io_multiplexer *ctx)
+      : io_handle(h, caching, flags, ctx)
   {
   }
   //! Explicit conversion from `handle` permitted
-  explicit constexpr lockable_io_handle(handle &&o) noexcept
+  explicit constexpr lockable_io_handle(handle &&o, io_multiplexer *ctx) noexcept
+      : io_handle(std::move(o), ctx)
+  {
+  }
+  //! Explicit conversion from `io_handle` permitted
+  explicit constexpr lockable_io_handle(io_handle &&o) noexcept
       : io_handle(std::move(o))
   {
   }

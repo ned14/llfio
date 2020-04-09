@@ -32,10 +32,10 @@ size_t io_handle::_do_max_buffers() const noexcept
   return 1;  // TODO FIXME support ReadFileScatter/WriteFileGather
 }
 
-template <class BuffersType> inline bool do_cancel(const native_handle_type &nativeh, span<typename detail::io_operation_connection::_EXTENDED_IO_STATUS_BLOCK> ols, io_handle::io_request<BuffersType> reqs) noexcept
+template <class BuffersType> inline bool do_cancel(const native_handle_type &nativeh, span<windows_nt_kernel::IO_STATUS_BLOCK> ols, io_handle::io_request<BuffersType> reqs) noexcept
 {
   using namespace windows_nt_kernel;
-  using EIOSB = typename detail::io_operation_connection::_EXTENDED_IO_STATUS_BLOCK;
+  using EIOSB = windows_nt_kernel::IO_STATUS_BLOCK;
   bool did_cancel = false;
   ols = span<EIOSB>(ols.data(), reqs.buffers.size());
   for(auto &ol : ols)
@@ -45,7 +45,7 @@ template <class BuffersType> inline bool do_cancel(const native_handle_type &nat
       // No need to cancel an i/o never begun
       continue;
     }
-    NTSTATUS ntstat = ntcancel_pending_io(nativeh.h, (IO_STATUS_BLOCK &) ol);
+    NTSTATUS ntstat = ntcancel_pending_io(nativeh.h, ol);
     if(ntstat < 0 && ntstat != (NTSTATUS) 0xC0000120 /*STATUS_CANCELLED*/)
     {
       LLFIO_LOG_FATAL(nullptr, "Failed to cancel earlier i/o");
@@ -60,19 +60,18 @@ template <class BuffersType> inline bool do_cancel(const native_handle_type &nat
 }
 
 template <bool blocking, class Syscall, class BuffersType>
-inline bool do_read_write(io_handle::io_result<BuffersType> &ret, size_t &scheduled, Syscall &&syscall, const native_handle_type &nativeh, windows_nt_kernel::PIO_APC_ROUTINE routine, detail::io_operation_connection *op, span<typename detail::io_operation_connection::_EXTENDED_IO_STATUS_BLOCK> ols,
-                                                       io_handle::io_request<BuffersType> reqs, deadline d) noexcept
+inline bool do_read_write(io_handle::io_result<BuffersType> &ret, size_t &scheduled, Syscall &&syscall, const native_handle_type &nativeh, windows_nt_kernel::PIO_APC_ROUTINE routine, span<windows_nt_kernel::IO_STATUS_BLOCK> ols, io_handle::io_request<BuffersType> reqs, deadline d) noexcept
 {
   using namespace windows_nt_kernel;
-  using EIOSB = typename detail::io_operation_connection::_EXTENDED_IO_STATUS_BLOCK;
+  using EIOSB = windows_nt_kernel::IO_STATUS_BLOCK;
   if(d && !nativeh.is_nonblocking())
   {
-    ret=errc::not_supported;
+    ret = errc::not_supported;
     return true;
   }
   if(reqs.buffers.size() > 64)
   {
-    ret=errc::argument_list_too_long;
+    ret = errc::argument_list_too_long;
     return true;
   }
   LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
@@ -81,6 +80,7 @@ inline bool do_read_write(io_handle::io_result<BuffersType> &ret, size_t &schedu
   auto ol_it = ols.begin();
   for(auto &req : reqs.buffers)
   {
+    (void) req;
     EIOSB &ol = *ol_it++;
     ol.Status = -1;
   }
@@ -121,11 +121,11 @@ inline bool do_read_write(io_handle::io_result<BuffersType> &ret, size_t &schedu
 #endif
     reqs.offset += req.size();
     ol.Status = 0x103 /*STATUS_PENDING*/;
-    NTSTATUS ntstat = syscall(nativeh.h, nullptr, routine, op, (PIO_STATUS_BLOCK) &ol, (PVOID) req.data(), static_cast<DWORD>(req.size()), &offset, nullptr);
+    NTSTATUS ntstat = syscall(nativeh.h, nullptr, routine, nullptr, &ol, (PVOID) req.data(), static_cast<DWORD>(req.size()), &offset, nullptr);
     if(ntstat < 0 && ntstat != 0x103 /*STATUS_PENDING*/)
     {
       InterlockedCompareExchange(&ol.Status, ntstat, 0x103 /*STATUS_PENDING*/);
-      ret=ntkernel_error(ntstat);
+      ret = ntkernel_error(ntstat);
       return true;
     }
     ++scheduled;
@@ -137,7 +137,7 @@ inline bool do_read_write(io_handle::io_result<BuffersType> &ret, size_t &schedu
     {
       deadline nd;
       LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
-      if(STATUS_TIMEOUT == ntwait(nativeh.h, (IO_STATUS_BLOCK &) ol, nd))
+      if(STATUS_TIMEOUT == ntwait(nativeh.h, ol, nd))
       {
         // ntwait cancels the i/o, undoer will cancel all the other i/o
         auto r = [&]() -> result<void> {
@@ -170,7 +170,7 @@ inline bool do_read_write(io_handle::io_result<BuffersType> &ret, size_t &schedu
     assert(ols[n].Status != -1);
     if(ols[n].Status < 0)
     {
-      ret= ntkernel_error(static_cast<NTSTATUS>(ols[n].Status));
+      ret = ntkernel_error(static_cast<NTSTATUS>(ols[n].Status));
       return true;
     }
     reqs.buffers[n] = {reqs.buffers[n].data(), ols[n].Information};
@@ -187,11 +187,11 @@ io_handle::io_result<io_handle::buffers_type> io_handle::_do_read(io_handle::io_
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   LLFIO_LOG_FUNCTION_CALL(this);
-  using EIOSB = typename detail::io_operation_connection::_EXTENDED_IO_STATUS_BLOCK;
+  using EIOSB = windows_nt_kernel::IO_STATUS_BLOCK;
   std::array<EIOSB, 64> _ols{};
   io_handle::io_result<io_handle::buffers_type> ret(reqs.buffers);
   size_t scheduled = 0;
-  do_read_write<true>(ret, scheduled, NtReadFile, _v, nullptr, nullptr, {_ols.data(), _ols.size()}, reqs, d);
+  do_read_write<true>(ret, scheduled, NtReadFile, _v, nullptr, {_ols.data(), _ols.size()}, reqs, d);
   return ret;
 }
 
@@ -200,11 +200,11 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::_do_write(io_hand
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   LLFIO_LOG_FUNCTION_CALL(this);
-  using EIOSB = typename detail::io_operation_connection::_EXTENDED_IO_STATUS_BLOCK;
+  using EIOSB = windows_nt_kernel::IO_STATUS_BLOCK;
   std::array<EIOSB, 64> _ols{};
   io_handle::io_result<io_handle::const_buffers_type> ret(reqs.buffers);
   size_t scheduled = 0;
-  do_read_write<true>(ret, scheduled, NtWriteFile, _v, nullptr, nullptr, {_ols.data(), _ols.size()}, reqs, d);
+  do_read_write<true>(ret, scheduled, NtWriteFile, _v, nullptr, {_ols.data(), _ols.size()}, reqs, d);
   return ret;
 }
 
@@ -218,10 +218,10 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::_do_barrier(io_ha
     return errc::not_supported;
   }
   LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
-  using EIOSB = typename detail::io_operation_connection::_EXTENDED_IO_STATUS_BLOCK;
+  using EIOSB = windows_nt_kernel::IO_STATUS_BLOCK;
   EIOSB ol{};
   memset(&ol, 0, sizeof(ol));
-  auto *isb = reinterpret_cast<IO_STATUS_BLOCK *>(&ol);
+  auto *isb = &ol;
   *isb = make_iostatus();
   ULONG flags = 0;
   if(kind == barrier_kind::nowait_data_only)
@@ -235,7 +235,7 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::_do_barrier(io_ha
   NTSTATUS ntstat = NtFlushBuffersFileEx(_v.h, flags, nullptr, 0, isb);
   if(STATUS_PENDING == ntstat)
   {
-    ntstat = ntwait(_v.h, (IO_STATUS_BLOCK &) ol, d);
+    ntstat = ntwait(_v.h, ol, d);
     if(STATUS_TIMEOUT == ntstat)
     {
       return errc::timed_out;

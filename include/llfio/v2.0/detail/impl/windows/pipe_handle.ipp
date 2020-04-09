@@ -32,7 +32,7 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   flags &= ~flag::unlink_on_first_close;
-  result<pipe_handle> ret(pipe_handle(native_handle_type(), 0, 0, _caching, flags));
+  result<pipe_handle> ret(pipe_handle(native_handle_type(), 0, 0, _caching, flags, nullptr));
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::pipe;
@@ -126,7 +126,7 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
       }
       // loop
     }
-    ret.value()._is_connected=true;
+    ret.value()._v.behaviour|=native_handle_type::disposition::_is_connected;
   }
   else
   {
@@ -155,7 +155,7 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
       {
         return win32_error();
       }
-      ret.value()._is_connected=true;
+      ret.value()._v.behaviour |= native_handle_type::disposition::_is_connected;
     }
   }
   return ret;
@@ -169,7 +169,7 @@ result<std::pair<pipe_handle, pipe_handle>> pipe_handle::anonymous_pipe(caching 
   // Create an unnamed new pipe
   flags &= ~flag::unlink_on_first_close;
   OUTCOME_TRY(anonpipe, pipe({}, mode::read, creation::only_if_not_exist, _caching, flags));
-  std::pair<pipe_handle, pipe_handle> ret(std::move(anonpipe), pipe_handle(native_handle_type(), 0, 0, _caching, flags));
+  std::pair<pipe_handle, pipe_handle> ret(std::move(anonpipe), pipe_handle(native_handle_type(), 0, 0, _caching, flags, nullptr));
   native_handle_type &readnativeh = ret.first._v, &writenativeh = ret.second._v;
   DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
   OUTCOME_TRY(access, access_mask_from_handle_mode(writenativeh, mode::append, flags));
@@ -208,7 +208,7 @@ pipe_handle::io_result<pipe_handle::buffers_type> pipe_handle::_do_read(pipe_han
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   // If not connected, it'll be non-blocking, so connect now.
-  if(!_is_connected)
+  if(!(_v.behaviour & native_handle_type::disposition::_is_connected))
   {
     LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
     OVERLAPPED ol{};
@@ -241,7 +241,7 @@ pipe_handle::io_result<pipe_handle::buffers_type> pipe_handle::_do_read(pipe_han
         d = deadline(remaining);
       }
     }
-    _is_connected=true;
+    _v.behaviour |= native_handle_type::disposition::_is_connected;
   }
   return io_handle::read(reqs, d);
 }

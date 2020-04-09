@@ -40,8 +40,8 @@ namespace algorithm
     {
       file_handle_wrapper() = default;
       using file_handle::file_handle;
-      file_handle_wrapper(native_handle_type nativeh, io_handle::caching _caching, io_handle::flag flags)
-          : file_handle(nativeh, 0, 0, _caching, flags)
+      file_handle_wrapper(native_handle_type nativeh, io_handle::caching _caching, io_handle::flag flags, io_multiplexer *ctx)
+          : file_handle(nativeh, 0, 0, _caching, flags, ctx)
       {
       }
     };

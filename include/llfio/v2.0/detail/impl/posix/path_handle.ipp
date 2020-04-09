@@ -30,7 +30,7 @@ LLFIO_V2_NAMESPACE_BEGIN
 
 result<path_handle> path_handle::path(const path_handle &base, path_handle::path_view_type path) noexcept
 {
-  result<path_handle> ret{path_handle(native_handle_type())};
+  result<path_handle> ret(in_place_type<path_handle>);
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::directory;

@@ -69,13 +69,13 @@ public:
   constexpr io_handle() {}  // NOLINT
   ~io_handle() = default;
   //! Construct a handle from a supplied native handle
-  constexpr explicit io_handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none, io_multiplexer *ctx = nullptr)
+  constexpr explicit io_handle(native_handle_type h, caching caching, flag flags, io_multiplexer *ctx)
       : handle(h, caching, flags)
       , _ctx(ctx)
   {
   }
   //! Explicit conversion from handle permitted
-  explicit constexpr io_handle(handle &&o, io_multiplexer *ctx = nullptr) noexcept
+  explicit constexpr io_handle(handle &&o, io_multiplexer *ctx) noexcept
       : handle(std::move(o))
       , _ctx(ctx)
   {
@@ -141,10 +141,43 @@ protected:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<registered_buffer_type> _do_allocate_registered_buffer(size_t &bytes) noexcept;  // default implementation is in map_handle.hpp
   //! The virtualised implementation of `read()` used if no multiplexer has been set.
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> _do_read(io_request<buffers_type> reqs, deadline d) noexcept;
+  //! The virtualised implementation of `read()` used if no multiplexer has been set.
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> _do_read(io_request<registered_buffers_type> reqs, deadline d) noexcept
+  {
+    auto _reqs_ = reinterpret_cast<buffer_type *>(alloca(sizeof(buffer_type) * reqs.buffers.size()));
+    for(size_t n = 0; n < reqs.buffers.size(); n++)
+    {
+      _reqs_[n] = *reqs.buffers[n];
+    }
+    io_request<buffers_type> _reqs(buffers_type(_reqs_, reqs.buffers.size()), reqs.offset);
+    return _do_read(_reqs, d);
+  }
   //! The virtualised implementation of `write()` used if no multiplexer has been set.
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_write(io_request<const_buffers_type> reqs, deadline d) noexcept;
+  //! The virtualised implementation of `write()` used if no multiplexer has been set.
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_write(io_request<registered_const_buffers_type> reqs, deadline d) noexcept
+  {
+    auto _reqs_ = reinterpret_cast<const_buffer_type *>(alloca(sizeof(const_buffer_type) * reqs.buffers.size()));
+    for(size_t n = 0; n < reqs.buffers.size(); n++)
+    {
+      _reqs_[n] = *reqs.buffers[n];
+    }
+    io_request<const_buffers_type> _reqs(const_buffers_type(_reqs_, reqs.buffers.size()), reqs.offset);
+    return _do_write(reqs, d);
+  }
   //! The virtualised implementation of `barrier()` used if no multiplexer has been set.
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_barrier(io_request<const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept;
+  //! The virtualised implementation of `barrier()` used if no multiplexer has been set.
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_barrier(io_request<registered_const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
+  {
+    auto _reqs_ = reinterpret_cast<const_buffer_type *>(alloca(sizeof(const_buffer_type) * reqs.buffers.size()));
+    for(size_t n = 0; n < reqs.buffers.size(); n++)
+    {
+      _reqs_[n] = *reqs.buffers[n];
+    }
+    io_request<const_buffers_type> _reqs(const_buffers_type(_reqs_, reqs.buffers.size()), reqs.offset);
+    return _do_barrier(_reqs, kind, d);
+  }
 
 public:
   /*! \brief The *maximum* number of buffers which a single read or write syscall can (atomically)
@@ -237,7 +270,14 @@ public:
   }
   //! \overload Registered buffers overload
   LLFIO_MAKE_FREE_FUNCTION
-  io_result<registered_buffers_type> read(io_request<registered_buffers_type> reqs, deadline d = deadline()) noexcept { return _ctx->do_io_handle_read(this, reqs, d); }
+  io_result<buffers_type> read(io_request<registered_buffers_type> reqs, deadline d = deadline()) noexcept
+  {
+    if(_ctx == nullptr)
+    {
+      return _do_read(reqs, d);
+    }
+    return _ctx->do_io_handle_read(this, reqs, d);
+  }
   //! \overload Convenience initialiser list based overload for `read()`
   LLFIO_MAKE_FREE_FUNCTION
   io_result<size_type> read(extent_type offset, std::initializer_list<buffer_type> lst, deadline d = deadline()) noexcept
@@ -287,7 +327,14 @@ public:
   }
   //! \overload Registered buffers overload
   LLFIO_MAKE_FREE_FUNCTION
-  io_result<registered_const_buffers_type> read(io_request<registered_const_buffers_type> reqs, deadline d = deadline()) noexcept { return _ctx->do_io_handle_write(this, reqs, d); }
+  io_result<const_buffers_type> write(io_request<registered_const_buffers_type> reqs, deadline d = deadline()) noexcept
+  {
+    if(_ctx == nullptr)
+    {
+      return _do_write(reqs, d);
+    }
+    return _ctx->do_io_handle_write(this, reqs, d);
+  }
   //! \overload Convenience initialiser list based overload for `write()`
   LLFIO_MAKE_FREE_FUNCTION
   io_result<size_type> write(extent_type offset, std::initializer_list<const_buffer_type> lst, deadline d = deadline()) noexcept
@@ -343,9 +390,19 @@ public:
     }
     return _ctx->do_io_handle_barrier(this, reqs, kind, d);
   }
+  //! \overload Convenience overload
+  LLFIO_MAKE_FREE_FUNCTION
+  io_result<const_buffers_type> barrier(barrier_kind kind, deadline d = deadline()) noexcept { return barrier(io_request<const_buffers_type>(), kind, d); }
   //! \overload Registered buffers overload
   LLFIO_MAKE_FREE_FUNCTION
-  io_result<registered_const_buffers_type> barrier(io_request<registered_const_buffers_type> reqs = io_request<registered_const_buffers_type>(), barrier_kind kind = barrier_kind::nowait_data_only, deadline d = deadline()) noexcept { return _ctx->do_io_handle_barrier(this, reqs, kind, d); }
+  io_result<const_buffers_type> barrier(io_request<registered_const_buffers_type> reqs = io_request<registered_const_buffers_type>(), barrier_kind kind = barrier_kind::nowait_data_only, deadline d = deadline()) noexcept
+  {
+    if(_ctx == nullptr)
+    {
+      return _do_barrier(reqs, kind, d);
+    }
+    return _ctx->do_io_handle_barrier(this, reqs, kind, d);
+  }
 
   LLFIO_DEADLINE_TRY_FOR_UNTIL(barrier)
 };

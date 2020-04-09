@@ -109,9 +109,14 @@ public:
   //! Default constructor
   constexpr pipe_handle() {}  // NOLINT
   //! Construct a handle from a supplied native handle
-  constexpr pipe_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching = caching::none, flag flags = flag::none, io_multiplexer *ctx = nullptr)
+  constexpr pipe_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching, flag flags, io_multiplexer *ctx)
       : io_handle(std::move(h), caching, flags, ctx)
       , fs_handle(devid, inode)
+  {
+  }
+  //! Construct a handle from a supplied native handle
+  constexpr pipe_handle(native_handle_type h, caching caching, flag flags, io_multiplexer *ctx)
+      : io_handle(std::move(h), caching, flags, ctx)
   {
   }
   //! No copy construction (use clone())
@@ -124,10 +129,26 @@ public:
       , fs_handle(std::move(o))
   {
   }
-  //! Explicit conversion from handle and io_handle permitted
-  explicit constexpr pipe_handle(handle &&o, dev_t devid, ino_t inode) noexcept
+  //! Explicit conversion from handle permitted
+  explicit constexpr pipe_handle(handle &&o, dev_t devid, ino_t inode, io_multiplexer *ctx) noexcept
+      : io_handle(std::move(o), ctx)
+      , fs_handle(devid, inode)
+  {
+  }
+  //! Explicit conversion from handle permitted
+  explicit constexpr pipe_handle(handle &&o, io_multiplexer *ctx) noexcept
+      : io_handle(std::move(o), ctx)
+  {
+  }
+  //! Explicit conversion from io_handle permitted
+  explicit constexpr pipe_handle(io_handle &&o, dev_t devid, ino_t inode) noexcept
       : io_handle(std::move(o))
       , fs_handle(devid, inode)
+  {
+  }
+  //! Explicit conversion from io_handle permitted
+  explicit constexpr pipe_handle(io_handle &&o) noexcept
+      : io_handle(std::move(o))
   {
   }
   //! Move assignment of `pipe_handle` permitted

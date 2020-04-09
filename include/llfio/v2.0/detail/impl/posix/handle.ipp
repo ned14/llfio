@@ -161,7 +161,7 @@ result<void> handle::close() noexcept
 result<handle> handle::clone() const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  result<handle> ret(handle(native_handle_type(), _caching, _flags));
+  result<handle> ret(handle(native_handle_type(), kernel_caching(), _flags));
   ret.value()._v.behaviour = _v.behaviour;
   ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC, 0);
   if(-1 == ret.value()._v.fd)

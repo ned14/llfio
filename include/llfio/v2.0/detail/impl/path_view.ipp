@@ -235,7 +235,14 @@ namespace detail
     abort();
 #endif
   }
-  char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const char16_t *src_buffer, size_t src_buffer_length) { return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, src_buffer, src_buffer_length); }
+  char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const char16_t *src_buffer, size_t src_buffer_length)
+  {
+#if __cplusplus >= 202000 || _HAS_CXX20
+    return (char *) _reencode_path_to(toallocate, (char8_t *) dest_buffer, dest_buffer_length, src_buffer, src_buffer_length);
+#else
+    return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, src_buffer, src_buffer_length);
+#endif
+  }
 
   wchar_t *reencode_path_to(size_t & /*unused*/, wchar_t * /*unused*/, size_t /*unused*/, const LLFIO_V2_NAMESPACE::byte * /*unused*/, size_t /*unused*/)
   {

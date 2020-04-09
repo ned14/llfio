@@ -170,7 +170,7 @@ result<void> map_handle::close() noexcept
   {
     if(is_writable() && (_flag & section_handle::flag::barrier_on_close))
     {
-      OUTCOME_TRYV(map_handle::barrier({}, barrier_kind::wait_all));
+      OUTCOME_TRYV(map_handle::barrier(barrier_kind::wait_all));
     }
     // printf("%d munmap %p-%p\n", getpid(), _addr, _addr+_reservation);
     if(-1 == ::munmap(_addr, _reservation))

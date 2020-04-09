@@ -158,8 +158,28 @@ public:
     pointer _data;
     size_type _len;
   };
+  struct _registered_buffer_type : std::enable_shared_from_this<_registered_buffer_type>, buffer_type
+  {
+    _registered_buffer_type() = default;
+    using buffer_type::buffer_type;
+  };
+  struct registered_const_buffer_type;
   //! The registered scatter buffer type used by this handle.
-  using registered_buffer_type = std::shared_ptr<buffer_type>;
+  struct registered_buffer_type : std::shared_ptr<_registered_buffer_type>
+  {
+  protected:
+    friend struct registered_const_buffer_type;
+    using _base = std::shared_ptr<_registered_buffer_type>;
+
+  public:
+    registered_buffer_type() = delete;
+    LLFIO_TEMPLATE(class Arg, class... Args)
+    LLFIO_TREQUIRES(LLFIO_TPRED(std::is_constructible<_base, Arg, Args...>::value))
+    explicit constexpr registered_buffer_type(Arg &&arg, Args &&... args)
+        : _base(std::forward<Arg>(arg), std::forward<Args>(args)...)
+    {
+    }
+  };
 
   //! The gather buffer type used by this handle. Guaranteed to be `TrivialType` and `StandardLayoutType`.
   //! Try to make address and length 64 byte, or ideally, `page_size()` aligned where possible.
@@ -240,8 +260,32 @@ public:
   static_assert(std::is_standard_layout<buffer_type>::value, "buffer_type is not a standard layout type!");
   static_assert(std::is_standard_layout<const_buffer_type>::value, "const_buffer_type is not a standard layout type!");
 #endif
+  struct _registered_const_buffer_type : _registered_buffer_type
+  {
+    _registered_const_buffer_type() = default;
+    using _registered_buffer_type::_registered_buffer_type;
+  };
   //! The registered gather buffer type used by this handle.
-  using registered_const_buffer_type = std::shared_ptr<const_buffer_type>;
+  struct registered_const_buffer_type : std::shared_ptr<_registered_const_buffer_type>
+  {
+  protected:
+    using _base = std::shared_ptr<_registered_const_buffer_type>;
+
+  public:
+    registered_const_buffer_type() = delete;
+
+    LLFIO_TEMPLATE(class Arg, class... Args)
+    LLFIO_TREQUIRES(LLFIO_TPRED(std::is_constructible<_base, Arg, Args...>::value))
+    explicit constexpr registered_const_buffer_type(Arg &&arg, Args &&... args)
+        : _base(std::forward<Arg>(arg), std::forward<Args>(args)...)
+    {
+    }
+
+    registered_const_buffer_type(registered_buffer_type &&o)
+        : _base(std::shared_ptr<_registered_const_buffer_type>(std::move(o), static_cast<_registered_const_buffer_type *>(o.get())))
+    {
+    }
+  };
 
   //! The scatter buffers type used by this handle. Guaranteed to be `TrivialType` apart from construction, and `StandardLayoutType`.
   using buffers_type = span<buffer_type>;
@@ -259,9 +303,9 @@ public:
   static_assert(std::is_standard_layout<buffers_type>::value, "buffers_type is not a standard layout type!");
 #endif
   //! The registered scatter buffers type used by this handle. Guaranteed to be `TrivialType` apart from construction, and `StandardLayoutType`.
-  using registered_buffers_type = span<registered_buffer_type *>;
+  using registered_buffers_type = span<registered_buffer_type>;
   //! The registered gather buffers type used by this handle. Guaranteed to be `TrivialType` apart from construction, and `StandardLayoutType`.
-  using registered_const_buffers_type = span<registered_const_buffer_type *>;
+  using registered_const_buffers_type = span<registered_const_buffer_type>;
 
   //! The i/o request type used by this handle. Guaranteed to be `TrivialType` apart from construction, and `StandardLayoutType`.
   template <class T> struct io_request
@@ -359,15 +403,15 @@ public:
   //! Implements `io_handle::read()`
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> do_io_handle_read(io_handle *h, io_request<buffers_type> reqs, deadline d) noexcept = 0;
   //! Implements `io_handle::read()`
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<registered_buffers_type> do_io_handle_read(io_handle *h, io_request<registered_buffers_type> reqs, deadline d) noexcept = 0;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> do_io_handle_read(io_handle *h, io_request<registered_buffers_type> reqs, deadline d) noexcept = 0;
   //! Implements `io_handle::write()`
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> do_io_handle_write(io_handle *h, io_request<const_buffers_type> reqs, deadline d) noexcept = 0;
   //! Implements `io_handle::write()`
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<registered_const_buffers_type> do_io_handle_write(io_handle *h, io_request<registered_const_buffers_type> reqs, deadline d) noexcept = 0;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> do_io_handle_write(io_handle *h, io_request<registered_const_buffers_type> reqs, deadline d) noexcept = 0;
   //! Implements `io_handle::barrier()`
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> do_io_handle_barrier(io_handle *h, io_request<const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept = 0;
   //! Implements `io_handle::barrier()`
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<registered_const_buffers_type> do_io_handle_barrier(io_handle *h, io_request<registered_const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept = 0;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> do_io_handle_barrier(io_handle *h, io_request<registered_const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept = 0;
 };
 //! A unique ptr to an i/o multiplexer implementation.
 using io_multiplexer_ptr = std::unique_ptr<io_multiplexer>;

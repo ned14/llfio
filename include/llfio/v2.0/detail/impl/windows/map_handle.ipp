@@ -473,7 +473,7 @@ result<void> map_handle::close() noexcept
     {
       if(is_writable() && (_flag & section_handle::flag::barrier_on_close))
       {
-        OUTCOME_TRYV(barrier({}, barrier_kind::wait_all));
+        OUTCOME_TRYV(barrier(barrier_kind::wait_all));
       }
       OUTCOME_TRYV(win32_maps_apply(_addr, _reservation, win32_map_sought::committed, [](byte *addr, size_t /* unused */) -> result<void> {
         NTSTATUS ntstat = NtUnmapViewOfSection(GetCurrentProcess(), addr);

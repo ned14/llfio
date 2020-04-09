@@ -44,7 +44,7 @@ namespace algorithm
 {
   namespace detail
   {
-    LLFIO_HEADERS_ONLY_FUNC_SPEC result<size_t> remove_all(directory_handle &&topdirh, LLFIO_V2_NAMESPACE::detail::function_ptr<result<void>(remove_all_callback_reason reason, remove_all_callback_arg arg1, remove_all_callback_arg arg2)> _callback, size_t threads) noexcept
+    LLFIO_HEADERS_ONLY_FUNC_SPEC result<size_t> remove_all(directory_handle &&topdirh, LLFIO_V2_NAMESPACE::function_ptr<result<void>(remove_all_callback_reason reason, remove_all_callback_arg arg1, remove_all_callback_arg arg2)> _callback, size_t threads) noexcept
     {
 #ifdef _WIN32
       windows_nt_kernel::init();
