@@ -784,18 +784,17 @@ namespace detail
     try
     {
       auto make_shared = [](map_handle h) {
-        struct registered_buffer_type_indirect
+        struct registered_buffer_type_indirect : io_multiplexer::_registered_buffer_type
         {
           map_handle h;
-          io_multiplexer::_registered_buffer_type buffer;
           registered_buffer_type_indirect(map_handle _h)
-              : h(std::move(_h))
-              , buffer(h.as_span())
+              : io_multiplexer::_registered_buffer_type(_h.as_span())
+              , h(std::move(_h))
           {
           }
         };
         auto ptr = std::make_shared<registered_buffer_type_indirect>(std::move(h));
-        return io_handle::registered_buffer_type(std::move(ptr), &ptr->buffer);
+        return ptr;
       };
       const auto &page_sizes = utils::page_sizes(true);
       size_t idx = 0;
@@ -850,7 +849,7 @@ namespace detail
 }  // namespace detail
 
 // Implement io_handle::_do_allocate_registered_buffer()
-LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<io_handle::registered_buffer_type> io_handle::_do_allocate_registered_buffer(size_t &bytes) noexcept
+inline result<io_handle::registered_buffer_type> io_handle::_do_allocate_registered_buffer(size_t &bytes) noexcept
 {
   return detail::map_handle_allocate_registered_buffer(bytes);
 }
