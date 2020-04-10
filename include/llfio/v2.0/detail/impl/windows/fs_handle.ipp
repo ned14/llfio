@@ -1,5 +1,5 @@
 /* A filing system handle
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2017 - 2020 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: Aug 2017
 
 
@@ -66,7 +66,7 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
       /* We have to be super careful here because \Device\HarddiskVolume4 != \Device\HarddiskVolume4\!
       The former opens the device, the latter the root directory of the device.
       */
-      if(currentpath.native().back() !='\\')
+      if(currentpath.native().back() != '\\')
       {
         const_cast<filesystem::path::string_type &>(currentpath.native()).push_back('\\');
       }
@@ -154,6 +154,39 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
     return relink(base, path_view_type(NtPath.Buffer, NtPath.Length / sizeof(wchar_t), false));
   }
 
+  HANDLE duph = INVALID_HANDLE_VALUE;
+#if 0  // Seems to not be necessary for directories to have DELETE privs to rename them?
+  // Get my DELETE privs if possible
+  if(h.is_directory())
+  {
+    OBJECT_ATTRIBUTES oa{};
+    memset(&oa, 0, sizeof(oa));
+    oa.Length = sizeof(OBJECT_ATTRIBUTES);
+    // It is entirely undocumented that this is how you clone a file handle with new privs
+    UNICODE_STRING _path{};
+    memset(&_path, 0, sizeof(_path));
+    oa.ObjectName = &_path;
+    oa.RootDirectory = h.native_handle().h;
+    IO_STATUS_BLOCK isb = make_iostatus();
+    DWORD ntflags = 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/;
+    if(h.is_symlink())
+      ntflags |= 0x00200000 /*FILE_OPEN_REPARSE_POINT*/;
+    NTSTATUS ntstat = NtOpenFile(&duph, SYNCHRONIZE | DELETE, &oa, &isb, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, ntflags);
+    // Can't duplicate the handle of a pipe not in the listening state
+    if(ntstat < 0 && !h.is_pipe())
+    {
+      return ntkernel_error(ntstat);
+    }
+  }
+#endif
+  auto unduph = make_scope_exit([&duph]() noexcept { CloseHandle(duph); });
+  // If we failed to duplicate the handle, try using the original handle
+  if(duph == INVALID_HANDLE_VALUE)
+  {
+    unduph.release();
+    duph = h.native_handle().h;
+  }
+
   path_view::c_str<> zpath(path, true);
   UNICODE_STRING _path{};
   _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
@@ -172,10 +205,10 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
   fni->RootDirectory = base.is_valid() ? base.native_handle().h : nullptr;
   fni->FileNameLength = _path.Length;
   memcpy(fni->FileName, _path.Buffer, fni->FileNameLength);
-  NTSTATUS ntstat = NtSetInformationFile(h.native_handle().h, &isb, fni, sizeof(FILE_RENAME_INFORMATION) + fni->FileNameLength, FileRenameInformation);
+  NTSTATUS ntstat = NtSetInformationFile(duph, &isb, fni, sizeof(FILE_RENAME_INFORMATION) + fni->FileNameLength, FileRenameInformation);
   if(STATUS_PENDING == ntstat)
   {
-    ntstat = ntwait(h.native_handle().h, isb, d);
+    ntstat = ntwait(duph, isb, d);
   }
   if(ntstat < 0)
   {
@@ -192,7 +225,8 @@ result<void> fs_handle::unlink(deadline d) noexcept
   LLFIO_LOG_FUNCTION_CALL(this);
   auto &h = _get_handle();
   HANDLE duph = INVALID_HANDLE_VALUE;
-  // Try by POSIX delete first
+  // Get myself DELETE privs if possible
+  if(h.is_directory())
   {
     OBJECT_ATTRIBUTES oa{};
     memset(&oa, 0, sizeof(oa));
