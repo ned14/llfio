@@ -267,7 +267,7 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_handle> parent_path_handle(deadline /*unused*/ = std::chrono::seconds(30)) const noexcept override
   {
     // Pipes parent handle is always the NT kernel namespace for pipes
-    return path_discovery::temporary_named_pipes_directory().clone();
+    return path_discovery::temporary_named_pipes_directory().clone_to_path_handle();
   }
 
 protected:

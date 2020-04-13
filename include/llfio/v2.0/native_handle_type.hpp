@@ -69,8 +69,10 @@ struct native_handle_type  // NOLINT
   cache_writes = 1U << 23U,     //!< Is writing back from kernel cache rather than writing through
   cache_temporary = 1U << 24U,  //!< Writes are not flushed to storage quickly
 
-  _is_connected = 1U << 28U,         // used by pipe_handle on Windows to store connectedness
-  _child_close_executed = 1U << 30U  // used to trap when vptr has become corrupted
+  _is_connected = 1U << 28U,            // used by pipe_handle on Windows to store connectedness
+  _multiplexer_state_bit0 = 1U << 29U,  // per-handle state bits used by an i/o multiplexer
+  _multiplexer_state_bit1 = 1U << 30U,  // per-handle state bits used by an i/o multiplexer
+  _child_close_executed = 1U << 31U     // used to trap when vptr has become corrupted
   } QUICKCPPLIB_BITFIELD_END(disposition)
 
   union {

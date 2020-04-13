@@ -254,7 +254,6 @@ public:
   trying to open the path returned. Thus many allocations may occur.
   */
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> reopen(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
-
   LLFIO_DEADLINE_TRY_FOR_UNTIL(reopen)
 
   /*! Return the current maximum permitted extent of the file.

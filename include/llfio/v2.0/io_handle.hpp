@@ -41,6 +41,8 @@ LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 */
 class LLFIO_DECL io_handle : public handle
 {
+  friend class io_multiplexer;
+
 public:
   using path_type = handle::path_type;
   using extent_type = handle::extent_type;
@@ -119,13 +121,21 @@ public:
     }
     if(_ctx != nullptr)
     {
-      OUTCOME_TRY(_ctx->_deregister_io_handle(this));
+      OUTCOME_TRY(_ctx->do_io_handle_deregister(this));
       _ctx = nullptr;
     }
     if(c != nullptr)
     {
-      OUTCOME_TRY(type, c->_register_io_handle(this));
-      (void) type;
+      OUTCOME_TRY(state, c->do_io_handle_register(this));
+      _v.behaviour = (_v.behaviour & ~(native_handle_type::disposition::_multiplexer_state_bit0 | native_handle_type::disposition::_multiplexer_state_bit1));
+      if((state & 1) != 0)
+      {
+        _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit0;
+      }
+      if((state & 2) != 0)
+      {
+        _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit1;
+      }
     }
     _ctx = c;
     return success();
@@ -374,6 +384,34 @@ public:
 };
 static_assert((sizeof(void *) == 4 && sizeof(io_handle) == 20) || (sizeof(void *) == 8 && sizeof(io_handle) == 32), "io_handle is not 20 or 32 bytes in size!");
 
+inline size_t io_multiplexer::do_io_handle_max_buffers(const io_handle *h) const noexcept
+{
+  return h->_do_max_buffers();
+}
+inline result<io_multiplexer::registered_buffer_type> io_multiplexer::do_io_handle_allocate_registered_buffer(io_handle *h, size_t &bytes) noexcept
+{
+  return h->_do_allocate_registered_buffer(bytes);
+}
+inline io_multiplexer::io_result<io_multiplexer::buffers_type> io_multiplexer::do_io_handle_read(io_handle *h, io_multiplexer::io_request<io_multiplexer::buffers_type> reqs, deadline d) noexcept
+{
+  return h->_do_read(reqs, d);
+}
+inline io_multiplexer::io_result<io_multiplexer::buffers_type> io_multiplexer::do_io_handle_read(io_handle *h, io_multiplexer::registered_buffer_type base, io_multiplexer::io_request<io_multiplexer::buffers_type> reqs, deadline d) noexcept
+{
+  return h->_do_read(std::move(base), reqs, d);
+}
+inline io_multiplexer::io_result<io_multiplexer::const_buffers_type> io_multiplexer::do_io_handle_write(io_handle *h, io_multiplexer::io_request<io_multiplexer::const_buffers_type> reqs, deadline d) noexcept
+{
+  return h->_do_write(reqs, d);
+}
+inline io_multiplexer::io_result<io_multiplexer::const_buffers_type> io_multiplexer::do_io_handle_write(io_handle *h, io_multiplexer::registered_buffer_type base, io_multiplexer::io_request<io_multiplexer::const_buffers_type> reqs, deadline d) noexcept
+{
+  return h->_do_write(std::move(base), reqs, d);
+}
+inline io_multiplexer::io_result<io_multiplexer::const_buffers_type> io_multiplexer::do_io_handle_barrier(io_handle *h, io_multiplexer::io_request<io_multiplexer::const_buffers_type> reqs, io_multiplexer::barrier_kind kind, deadline d) noexcept
+{
+  return h->_do_barrier(reqs, kind, d);
+}
 
 // BEGIN make_free_functions.py
 /*! \brief Read data from the open handle.

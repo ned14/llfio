@@ -73,11 +73,6 @@ you really need non-infinite deadline i/o.
 */
 class LLFIO_DECL io_multiplexer : public handle
 {
-  friend class io_handle;
-
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<int> _register_io_handle(io_handle *h) noexcept = 0;
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _deregister_io_handle(io_handle *h) noexcept = 0;
-
 public:
   using path_type = handle::path_type;
   using extent_type = handle::extent_type;
@@ -361,20 +356,24 @@ public:
   ~io_multiplexer() = default;
 
 public:
+  //! Implements `io_handle` registration. The bottom two bits of the returned value are set into `_v.behaviour`'s `_multiplexer_state_bit0` and `_multiplexer_state_bit`
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<uint8_t> do_io_handle_register(io_handle *h) noexcept = 0;
+  //! Implements `io_handle` deregistration
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> do_io_handle_deregister(io_handle *h) noexcept = 0;
   //! Implements `io_handle::max_buffers()`
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t do_io_handle_max_buffers(const io_handle *h) const noexcept = 0;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t do_io_handle_max_buffers(const io_handle *h) const noexcept;
   //! Implements `io_handle::allocate_registered_buffer()`
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<registered_buffer_type> do_io_handle_allocate_registered_buffer(io_handle *h, size_t &bytes) noexcept = 0;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<registered_buffer_type> do_io_handle_allocate_registered_buffer(io_handle *h, size_t &bytes) noexcept;
   //! Implements `io_handle::read()`
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> do_io_handle_read(io_handle *h, io_request<buffers_type> reqs, deadline d) noexcept = 0;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> do_io_handle_read(io_handle *h, io_request<buffers_type> reqs, deadline d) noexcept;
   //! Implements `io_handle::read()`
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> do_io_handle_read(io_handle *h, registered_buffer_type base, io_request<buffers_type> reqs, deadline d) noexcept = 0;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> do_io_handle_read(io_handle *h, registered_buffer_type base, io_request<buffers_type> reqs, deadline d) noexcept;
   //! Implements `io_handle::write()`
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> do_io_handle_write(io_handle *h, io_request<const_buffers_type> reqs, deadline d) noexcept = 0;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> do_io_handle_write(io_handle *h, io_request<const_buffers_type> reqs, deadline d) noexcept;
   //! Implements `io_handle::write()`
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> do_io_handle_write(io_handle *h, registered_buffer_type base, io_request<const_buffers_type> reqs, deadline d) noexcept = 0;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> do_io_handle_write(io_handle *h, registered_buffer_type base, io_request<const_buffers_type> reqs, deadline d) noexcept;
   //! Implements `io_handle::barrier()`
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> do_io_handle_barrier(io_handle *h, io_request<const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept = 0;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> do_io_handle_barrier(io_handle *h, io_request<const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept;
 };
 //! A unique ptr to an i/o multiplexer implementation.
 using io_multiplexer_ptr = std::unique_ptr<io_multiplexer>;
@@ -389,7 +388,8 @@ using io_multiplexer_ptr = std::unique_ptr<io_multiplexer>;
 // LLFIO_HEADERS_ONLY_FUNC_SPEC result<io_multiplexer_ptr> multiplexer_bsd_kqueue(size_t threads) noexcept;
 #endif
 #if defined(_WIN32) || DOXYGEN_IS_IN_THE_HOUSE
-// LLFIO_HEADERS_ONLY_FUNC_SPEC result<io_multiplexer_ptr> multiplexer_win_iocp(size_t threads) noexcept;
+//! \brief Return an i/o multiplexer implemented using Microsoft Windows IOCPW
+LLFIO_HEADERS_ONLY_FUNC_SPEC result<io_multiplexer_ptr> multiplexer_win_iocp(size_t threads) noexcept;
 #endif
 
 //! \brief Thread local settings

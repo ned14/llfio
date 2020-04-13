@@ -410,6 +410,7 @@ public:
     OUTCOME_TRY(fh, file_handle::reopen(mode_, caching_, d));
     return mapped_file_handle(std::move(fh), reservation, _sh.section_flags());
   }
+  LLFIO_DEADLINE_TRY_FOR_UNTIL(reopen)
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> set_multiplexer(io_multiplexer *c = this_thread::multiplexer()) noexcept override
   {
     OUTCOME_TRY(file_handle::set_multiplexer(c));

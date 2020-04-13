@@ -96,8 +96,8 @@ public:
     o = std::move(temp);
   }
 
-  //! Replaces `handle::clone()` with a `path_handle returning edition`
-  result<path_handle> clone() const noexcept
+  //! A `path_handle` returning edition of `handle::clone()`
+  result<path_handle> clone_to_path_handle() const noexcept
   {
     OUTCOME_TRY(newh, handle::clone());
     return path_handle(std::move(newh));

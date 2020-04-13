@@ -24,16 +24,38 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../../io_multiplexer.hpp"
 
+#include <mutex>
+
 LLFIO_V2_NAMESPACE_BEGIN
 
 namespace this_thread
 {
   static LLFIO_THREAD_LOCAL io_multiplexer *_thread_multiplexer;
-  LLFIO_HEADERS_ONLY_FUNC_SPEC io_multiplexer *multiplexer() noexcept
-  {
-    return _thread_multiplexer;
-  }
+  LLFIO_HEADERS_ONLY_FUNC_SPEC io_multiplexer *multiplexer() noexcept { return _thread_multiplexer; }
   LLFIO_HEADERS_ONLY_FUNC_SPEC void set_multiplexer(io_multiplexer *ctx) noexcept { _thread_multiplexer = ctx; }
 }  // namespace this_thread
 
+template <bool is_threadsafe> struct io_multiplexer_impl : io_multiplexer
+{
+  struct _lock_impl_type
+  {
+    void lock() {}
+    void unlock() {}
+  };
+  _lock_impl_type _lock;
+  using _lock_guard = std::unique_lock<_lock_impl_type>;
+};
+template <> struct io_multiplexer_impl<true> : io_multiplexer
+{
+  using _lock_impl_type = std::mutex;
+  _lock_impl_type _lock;
+  using _lock_guard = std::unique_lock<_lock_impl_type>;
+};
+
 LLFIO_V2_NAMESPACE_END
+
+#if defined(_WIN32)
+#include "windows/io_multiplexer.ipp"
+#else
+//#include "posix/io_multiplexer.ipp"
+#endif
