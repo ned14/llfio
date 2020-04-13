@@ -170,7 +170,7 @@ protected:
         deadline nd;
         LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
         thisreq.buffers = reqs.buffers.subspan(n, std::min(batch, reqs.buffers.size() - n));
-        OUTCOME_TRY(written, file_handle::write(thisreq, nd));
+        OUTCOME_TRY(written, file_handle::_do_write(thisreq, nd));
         if(written.empty())
         {
           reqs.buffers = reqs.buffers.subspan(0, n);

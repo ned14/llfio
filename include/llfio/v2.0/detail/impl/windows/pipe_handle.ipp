@@ -243,13 +243,13 @@ pipe_handle::io_result<pipe_handle::buffers_type> pipe_handle::_do_read(pipe_han
     }
     _v.behaviour |= native_handle_type::disposition::_is_connected;
   }
-  return io_handle::read(reqs, d);
+  return io_handle::_do_read(reqs, d);
 }
 
 pipe_handle::io_result<pipe_handle::const_buffers_type> pipe_handle::_do_write(pipe_handle::io_request<pipe_handle::const_buffers_type> reqs, deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  return io_handle::write(reqs, d);
+  return io_handle::_do_write(reqs, d);
 }
 
 LLFIO_V2_NAMESPACE_END
