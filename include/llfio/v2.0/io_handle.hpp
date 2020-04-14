@@ -252,7 +252,9 @@ public:
     {
       return _do_read(reqs, d);
     }
-    return _ctx->do_io_handle_read(this, reqs, d);
+    io_multiplexer::io_operation_state state(this, {}, d, std::move(reqs));
+    _ctx->do_io_operation(&state);
+    return std::move(state.payload.completed_read);
   }
   //! \overload Registered buffer overload, scatter list **must** be wholly within the registered buffer
   LLFIO_MAKE_FREE_FUNCTION
@@ -262,7 +264,9 @@ public:
     {
       return _do_read(std::move(base), reqs, d);
     }
-    return _ctx->do_io_handle_read(this, std::move(base), reqs, d);
+    io_multiplexer::io_operation_state state(this, std::move(base), d, std::move(reqs));
+    _ctx->do_io_operation(&state);
+    return std::move(state.payload.completed_read);
   }
   //! \overload Convenience initialiser list based overload for `read()`
   LLFIO_MAKE_FREE_FUNCTION
@@ -309,7 +313,9 @@ public:
     {
       return _do_write(reqs, d);
     }
-    return _ctx->do_io_handle_write(this, reqs, d);
+    io_multiplexer::io_operation_state state(this, {}, d, std::move(reqs));
+    _ctx->do_io_operation(&state);
+    return std::move(state.payload.completed_write_or_barrier);
   }
   //! \overload Registered buffer overload, gather list **must** be wholly within the registered buffer
   LLFIO_MAKE_FREE_FUNCTION
@@ -319,7 +325,9 @@ public:
     {
       return _do_write(std::move(base), reqs, d);
     }
-    return _ctx->do_io_handle_write(this, std::move(base), reqs, d);
+    io_multiplexer::io_operation_state state(this, std::move(base), d, std::move(reqs));
+    _ctx->do_io_operation(&state);
+    return std::move(state.payload.completed_write_or_barrier);
   }
   //! \overload Convenience initialiser list based overload for `write()`
   LLFIO_MAKE_FREE_FUNCTION
@@ -374,7 +382,9 @@ public:
     {
       return _do_barrier(reqs, kind, d);
     }
-    return _ctx->do_io_handle_barrier(this, reqs, kind, d);
+    io_multiplexer::io_operation_state state(this, {}, d, std::move(reqs), kind);
+    _ctx->do_io_operation(&state);
+    return std::move(state.payload.completed_write_or_barrier);
   }
   //! \overload Convenience overload
   LLFIO_MAKE_FREE_FUNCTION
@@ -392,25 +402,24 @@ inline result<io_multiplexer::registered_buffer_type> io_multiplexer::do_io_hand
 {
   return h->_do_allocate_registered_buffer(bytes);
 }
-inline io_multiplexer::io_result<io_multiplexer::buffers_type> io_multiplexer::do_io_handle_read(io_handle *h, io_multiplexer::io_request<io_multiplexer::buffers_type> reqs, deadline d) noexcept
+inline void io_multiplexer::do_io_operation(io_multiplexer::io_operation_state *op) noexcept
 {
-  return h->_do_read(reqs, d);
-}
-inline io_multiplexer::io_result<io_multiplexer::buffers_type> io_multiplexer::do_io_handle_read(io_handle *h, io_multiplexer::registered_buffer_type base, io_multiplexer::io_request<io_multiplexer::buffers_type> reqs, deadline d) noexcept
-{
-  return h->_do_read(std::move(base), reqs, d);
-}
-inline io_multiplexer::io_result<io_multiplexer::const_buffers_type> io_multiplexer::do_io_handle_write(io_handle *h, io_multiplexer::io_request<io_multiplexer::const_buffers_type> reqs, deadline d) noexcept
-{
-  return h->_do_write(reqs, d);
-}
-inline io_multiplexer::io_result<io_multiplexer::const_buffers_type> io_multiplexer::do_io_handle_write(io_handle *h, io_multiplexer::registered_buffer_type base, io_multiplexer::io_request<io_multiplexer::const_buffers_type> reqs, deadline d) noexcept
-{
-  return h->_do_write(std::move(base), reqs, d);
-}
-inline io_multiplexer::io_result<io_multiplexer::const_buffers_type> io_multiplexer::do_io_handle_barrier(io_handle *h, io_multiplexer::io_request<io_multiplexer::const_buffers_type> reqs, io_multiplexer::barrier_kind kind, deadline d) noexcept
-{
-  return h->_do_barrier(reqs, kind, d);
+  switch(op->state)
+  {
+  case io_multiplexer::io_operation_state::state_t::read_requested:
+    op->read_completed(op->payload.noncompleted.base ? op->h->_do_read(std::move(op->payload.noncompleted.base), std::move(op->payload.noncompleted.params.read.reqs), op->payload.noncompleted.d) : op->h->_do_read(std::move(op->payload.noncompleted.params.read.reqs), op->payload.noncompleted.d));
+    break;
+  case io_multiplexer::io_operation_state::state_t::write_requested:
+    op->write_completed(op->payload.noncompleted.base ? op->h->_do_write(std::move(op->payload.noncompleted.base), std::move(op->payload.noncompleted.params.write.reqs), op->payload.noncompleted.d) : op->h->_do_write(std::move(op->payload.noncompleted.params.write.reqs), op->payload.noncompleted.d));
+    break;
+  case io_multiplexer::io_operation_state::state_t::barrier_requested:
+    op->barrier_completed(op->h->_do_barrier(std::move(op->payload.noncompleted.params.barrier.reqs), op->payload.noncompleted.params.barrier.kind, op->payload.noncompleted.d));
+    break;
+  default:
+    // Invoke completion immediately with errc::invalid_argument
+    op->write_completed(errc::invalid_argument);
+    break;
+  }
 }
 
 // BEGIN make_free_functions.py

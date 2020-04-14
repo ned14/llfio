@@ -73,6 +73,10 @@ you really need non-infinite deadline i/o.
 */
 class LLFIO_DECL io_multiplexer : public handle
 {
+  struct _empty_t
+  {
+  };
+
 public:
   using path_type = handle::path_type;
   using extent_type = handle::extent_type;
@@ -357,23 +361,201 @@ public:
 
 public:
   //! Implements `io_handle` registration. The bottom two bits of the returned value are set into `_v.behaviour`'s `_multiplexer_state_bit0` and `_multiplexer_state_bit`
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<uint8_t> do_io_handle_register(io_handle *h) noexcept = 0;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<uint8_t> do_io_handle_register(io_handle * /*unused*/) noexcept { return (uint8_t) 0; }
   //! Implements `io_handle` deregistration
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> do_io_handle_deregister(io_handle *h) noexcept = 0;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> do_io_handle_deregister(io_handle * /*unused*/) noexcept { return success(); }
   //! Implements `io_handle::max_buffers()`
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t do_io_handle_max_buffers(const io_handle *h) const noexcept;
   //! Implements `io_handle::allocate_registered_buffer()`
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<registered_buffer_type> do_io_handle_allocate_registered_buffer(io_handle *h, size_t &bytes) noexcept;
-  //! Implements `io_handle::read()`
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> do_io_handle_read(io_handle *h, io_request<buffers_type> reqs, deadline d) noexcept;
-  //! Implements `io_handle::read()`
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> do_io_handle_read(io_handle *h, registered_buffer_type base, io_request<buffers_type> reqs, deadline d) noexcept;
-  //! Implements `io_handle::write()`
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> do_io_handle_write(io_handle *h, io_request<const_buffers_type> reqs, deadline d) noexcept;
-  //! Implements `io_handle::write()`
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> do_io_handle_write(io_handle *h, registered_buffer_type base, io_request<const_buffers_type> reqs, deadline d) noexcept;
-  //! Implements `io_handle::barrier()`
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> do_io_handle_barrier(io_handle *h, io_request<const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept;
+
+  //! i/o operation state
+  struct io_operation_state
+  {
+    enum class state_t
+    {
+      unknown,
+      read_requested,
+      read_initiated,
+      read_completed,
+      write_requested,
+      write_initiated,
+      barrier_requested,
+      barrier_initiated,
+      write_or_barrier_completed
+    } state{state_t::unknown};
+    io_handle *h{nullptr};
+    union payload_t {
+      _empty_t empty;
+      struct noncompleted_t
+      {
+        registered_buffer_type base;
+        deadline d;
+        union params_t {
+          struct read_params_t
+          {
+            io_request<buffers_type> reqs;
+          } read;
+          struct write_params_t
+          {
+            io_request<const_buffers_type> reqs;
+          } write;
+          struct barrier_params_t
+          {
+            io_request<const_buffers_type> reqs;
+            barrier_kind kind;
+          } barrier;
+
+          explicit params_t(io_request<buffers_type> reqs)
+              : read{std::move(reqs)}
+          {
+          }
+          explicit params_t(io_request<const_buffers_type> reqs)
+              : write{std::move(reqs)}
+          {
+          }
+          explicit params_t(io_request<const_buffers_type> reqs, barrier_kind kind)
+              : barrier{std::move(reqs), kind}
+          {
+          }
+        } params;
+
+        noncompleted_t(registered_buffer_type &&b, deadline _d, io_request<buffers_type> reqs)
+            : base(std::move(b))
+            , d(_d)
+            , params(std::move(reqs))
+        {
+        }
+        noncompleted_t(registered_buffer_type &&b, deadline _d, io_request<const_buffers_type> reqs)
+            : base(std::move(b))
+            , d(_d)
+            , params(std::move(reqs))
+        {
+        }
+        noncompleted_t(registered_buffer_type &&b, deadline _d, io_request<const_buffers_type> reqs, barrier_kind kind)
+            : base(std::move(b))
+            , d(_d)
+            , params(std::move(reqs), kind)
+        {
+        }
+      } noncompleted;
+      io_result<buffers_type> completed_read;
+      io_result<const_buffers_type> completed_write_or_barrier;
+
+      constexpr payload_t()
+          : empty()
+      {
+      }
+      ~payload_t() {}
+      payload_t(registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs)
+          : noncompleted(std::move(b), d, std::move(reqs))
+      {
+      }
+      payload_t(registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs)
+          : noncompleted(std::move(b), d, std::move(reqs))
+      {
+      }
+      payload_t(registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind)
+          : noncompleted(std::move(b), d, std::move(reqs), kind)
+      {
+      }
+      explicit payload_t(io_result<buffers_type> &&res)
+          : completed_read(std::move(res))
+      {
+      }
+      explicit payload_t(io_result<const_buffers_type> &&res)
+          : completed_write_or_barrier(std::move(res))
+      {
+      }
+    } payload;
+
+    constexpr io_operation_state() {}
+    io_operation_state(io_handle *_h, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs)
+        : state(state_t::read_requested)
+        , h(_h)
+        , payload(std::move(b), d, std::move(reqs))
+    {
+    }
+    io_operation_state(io_handle *_h, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs)
+        : state(state_t::write_requested)
+        , h(_h)
+        , payload(std::move(b), d, std::move(reqs))
+    {
+    }
+    io_operation_state(io_handle *_h, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind)
+        : state(state_t::barrier_requested)
+        , h(_h)
+        , payload(std::move(b), d, std::move(reqs), kind)
+    {
+    }
+    virtual ~io_operation_state()
+    {
+      clear_union_storage();
+    }
+    //! Used to clear the union-stored state in this operation state
+    void clear_union_storage()
+    {
+      switch(state)
+      {
+      case state_t::unknown:
+        break;
+      case state_t::read_requested:
+      case state_t::read_initiated:
+        payload.noncompleted.base.~registered_buffer_type();
+        payload.noncompleted.d.~deadline();
+        payload.noncompleted.params.read.~read_params_t();
+        break;
+      case state_t::read_completed:
+        payload.completed_read.~io_result<buffers_type>();
+        break;
+      case state_t::write_requested:
+      case state_t::write_initiated:
+        payload.noncompleted.base.~registered_buffer_type();
+        payload.noncompleted.d.~deadline();
+        payload.noncompleted.params.write.~write_params_t();
+        break;
+      case state_t::barrier_requested:
+      case state_t::barrier_initiated:
+        payload.noncompleted.base.~registered_buffer_type();
+        payload.noncompleted.d.~deadline();
+        payload.noncompleted.params.barrier.~barrier_params_t();
+        break;
+      case state_t::write_or_barrier_completed:
+        payload.completed_write_or_barrier.~io_result<const_buffers_type>();
+        break;
+      }
+      state = state_t::unknown;
+    }
+    //! Called when the read i/o has been initiated
+    virtual void read_initiated() { state = state_t::read_initiated; }
+    //! Called when the read i/o has been completed
+    virtual void read_completed(io_result<buffers_type> &&res)
+    {
+      clear_union_storage();
+      new(&payload.completed_read) io_result<buffers_type>(std::move(res));
+      state = state_t::read_completed;
+    }
+    //! Called when the write i/o has been initiated
+    virtual void write_initiated() { state = state_t::write_initiated; }
+    //! Called when the write i/o has been completed
+    virtual void write_completed(io_result<const_buffers_type> &&res)
+    {
+      clear_union_storage();
+      new(&payload.completed_write_or_barrier) io_result<const_buffers_type>(std::move(res));
+      state = state_t::write_or_barrier_completed;
+    }
+    //! Called when the barrier i/o has been initiated
+    virtual void barrier_initiated() { state = state_t::barrier_initiated; }
+    //! Called when the barrier i/o has been completed
+    virtual void barrier_completed(io_result<const_buffers_type> &&res)
+    {
+      clear_union_storage();
+      new(&payload.completed_write_or_barrier) io_result<const_buffers_type>(std::move(res));
+      state = state_t::write_or_barrier_completed;
+    }
+  };
+  //! Implements `io_handle::read()`, `io_handle::write()` and `io_handle::barrier()`.
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void do_io_operation(io_operation_state *op) noexcept;  // default implementation is in io_handle.hpp
 };
 //! A unique ptr to an i/o multiplexer implementation.
 using io_multiplexer_ptr = std::unique_ptr<io_multiplexer>;
