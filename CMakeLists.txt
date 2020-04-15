@@ -194,6 +194,14 @@ int main() {
 }
 " CXX_HAS_CXX17_FILESYSTEM)
 if(NOT CXX_HAS_CXX17_FILESYSTEM)
+  check_cxx_source_linkage("
+#include <experimental/filesystem>
+int main() {
+  try { return std::experimental::filesystem::path(\"hi\").empty(); } catch(std::experimental::filesystem::filesystem_error) { return 1; }
+}
+" CXX_HAS_CXX_EXPERIMENTAL_FILESYSTEM)
+endif()
+if(NOT CXX_HAS_CXX17_FILESYSTEM AND NOT CXX_HAS_CXX_EXPERIMENTAL_FILESYSTEM)
   indented_message(STATUS "NOTE: Standard <filesystem> not found in the current compiler configuration (try forcing C++ 17 or later?), attempting to figure out what <experimental/filesystem> linker flags to use for this STL ...")
   # Are we on libstdc++ or libc++?
   check_cxx_source_compiles("

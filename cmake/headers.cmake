@@ -63,6 +63,7 @@ set(llfio_HEADERS
   "include/llfio/v2.0/detail/impl/windows/statfs.ipp"
   "include/llfio/v2.0/detail/impl/windows/storage_profile.ipp"
   "include/llfio/v2.0/detail/impl/windows/symlink_handle.ipp"
+  "include/llfio/v2.0/detail/impl/windows/test/iocp_multiplexer.ipp"
   "include/llfio/v2.0/detail/impl/windows/utils.ipp"
   "include/llfio/v2.0/directory_handle.hpp"
   "include/llfio/v2.0/fast_random_file_handle.hpp"
