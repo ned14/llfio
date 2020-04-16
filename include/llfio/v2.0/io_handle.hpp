@@ -111,10 +111,16 @@ public:
   allocations and deallocations may occur, as well as multiple syscalls (i.e. this is
   an expensive call, try to do it from cold code).
 
+  If the handle was not created as multiplexable, this call always fails.
+
   \mallocs Multiple dynamic memory allocations and deallocations.
   */
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> set_multiplexer(io_multiplexer *c = this_thread::multiplexer()) noexcept
   {
+    if(!is_multiplexable())
+    {
+      return errc::operation_not_supported;
+    }
     if(c == _ctx)
     {
       return success();
@@ -141,7 +147,7 @@ public:
     return success();
   }
 
-protected:
+public:
   //! The virtualised implementation of `max_buffers()` used if no multiplexer has been set.
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t _do_max_buffers() const noexcept;
   //! The virtualised implementation of `allocate_registered_buffer()` used if no multiplexer has been set.
@@ -167,31 +173,40 @@ protected:
 
   io_result<buffers_type> _do_multiplexer_read(registered_buffer_type &&base, io_request<buffers_type> reqs, deadline d) noexcept
   {
-    io_multiplexer::io_operation_state state(this, std::move(base), d, std::move(reqs));
+    LLFIO_DEADLINE_TO_SLEEP_INIT(d);
+    io_multiplexer::unsynchronised_io_operation_state state(this, std::move(base), d, std::move(reqs));
     _ctx->begin_io_operation(&state);
     while(!is_finished(_ctx->check_io_operation(&state)))
     {
-      OUTCOME_TRY(_ctx->check_for_any_completed_io({}));
+      deadline nd;
+      LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+      OUTCOME_TRY(_ctx->check_for_any_completed_io(nd));
     }
     return std::move(state.payload.completed_read);
   }
   io_result<const_buffers_type> _do_multiplexer_write(registered_buffer_type &&base, io_request<const_buffers_type> reqs, deadline d) noexcept
   {
-    io_multiplexer::io_operation_state state(this, std::move(base), d, std::move(reqs));
+    LLFIO_DEADLINE_TO_SLEEP_INIT(d);
+    io_multiplexer::unsynchronised_io_operation_state state(this, std::move(base), d, std::move(reqs));
     _ctx->begin_io_operation(&state);
     while(!is_finished(_ctx->check_io_operation(&state)))
     {
-      OUTCOME_TRY(_ctx->check_for_any_completed_io({}));
+      deadline nd;
+      LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+      OUTCOME_TRY(_ctx->check_for_any_completed_io(nd));
     }
     return std::move(state.payload.completed_write_or_barrier);
   }
   io_result<const_buffers_type> _do_multiplexer_barrier(registered_buffer_type &&base, io_request<const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
   {
-    io_multiplexer::io_operation_state state(this, std::move(base), d, std::move(reqs), kind);
+    LLFIO_DEADLINE_TO_SLEEP_INIT(d);
+    io_multiplexer::unsynchronised_io_operation_state state(this, std::move(base), d, std::move(reqs), kind);
     _ctx->begin_io_operation(&state);
     while(!is_finished(_ctx->check_io_operation(&state)))
     {
-      OUTCOME_TRY(_ctx->check_for_any_completed_io({}));
+      deadline nd;
+      LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+      OUTCOME_TRY(_ctx->check_for_any_completed_io(nd));
     }
     return std::move(state.payload.completed_write_or_barrier);
   }
@@ -391,9 +406,9 @@ inline result<io_multiplexer::registered_buffer_type> io_multiplexer::do_io_hand
 {
   return h->_do_allocate_registered_buffer(bytes);
 }
-inline void io_multiplexer::begin_io_operation(io_multiplexer::io_operation_state *op) noexcept
+inline void io_multiplexer::begin_io_operation(io_multiplexer::unsynchronised_io_operation_state *op) noexcept
 {
-  switch(op->state)
+  switch(op->current_state())
   {
   case io_operation_state_type::read_requested:
     op->read_completed(op->payload.noncompleted.base ? op->h->_do_read(std::move(op->payload.noncompleted.base), std::move(op->payload.noncompleted.params.read.reqs), op->payload.noncompleted.d) : op->h->_do_read(std::move(op->payload.noncompleted.params.read.reqs), op->payload.noncompleted.d));

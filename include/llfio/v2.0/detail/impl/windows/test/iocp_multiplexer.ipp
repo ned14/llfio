@@ -48,8 +48,8 @@ namespace test
       }
     }
     // LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_type> current_path() const noexcept override;
-    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override { return _base::close(); }
-    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override { return _base::release(); }
+    //LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override { return _base::close(); }
+    //LLFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override { return _base::release(); }
 
     LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<uint8_t> do_io_handle_register(io_handle *h) noexcept override
     {
@@ -71,7 +71,9 @@ namespace test
         return ntkernel_error(ntstat);
       }
       // If this works, we can avoid IOCP entirely for immediately completing i/o
-      return (uint8_t) !SetFileCompletionNotificationModes(h->native_handle().h, FILE_SKIP_COMPLETION_PORT_ON_SUCCESS | FILE_SKIP_SET_EVENT_ON_HANDLE);
+      // It'll set native_handle_type::disposition::_multiplexer_state_bit0 if
+      // we successfully executed this
+      return SetFileCompletionNotificationModes(h->native_handle().h, FILE_SKIP_COMPLETION_PORT_ON_SUCCESS | FILE_SKIP_SET_EVENT_ON_HANDLE) ? (uint8_t) 1 : (uint8_t) 0;
     }
     LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> do_io_handle_deregister(io_handle *h) noexcept override
     {
@@ -96,7 +98,72 @@ namespace test
     }
     // LLFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t do_io_handle_max_buffers(const io_handle *h) const noexcept override {}
     // LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<registered_buffer_type> do_io_handle_allocate_registered_buffer(io_handle *h, size_t &bytes) noexcept override {}
-    // LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void begin_io_operation(io_operation_state *op) noexcept;  // default implementation is in io_handle.hpp
+    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void begin_io_operation(unsynchronised_io_operation_state *op) noexcept override
+    {
+      if(is_threadsafe)
+      {
+        // Restamp the vptr of the state to be synchronised
+        op = new(op) synchronised_io_operation_state(std::move(*op));
+      }
+      // On Windows, we can initiate the i/o using a zeroed deadline
+      constexpr deadline nonblocking(std::chrono::seconds(0));
+      switch(op->state)
+      {
+      case io_operation_state_type::unknown:
+      case io_operation_state_type::read_initiated:
+      case io_operation_state_type::read_completed:
+      case io_operation_state_type::read_finished:
+      case io_operation_state_type::write_initiated:
+      case io_operation_state_type::write_or_barrier_completed:
+      case io_operation_state_type::write_or_barrier_finished:
+      case io_operation_state_type::barrier_initiated:
+        abort();
+      case io_operation_state_type::read_requested:
+      {
+        auto res = op->payload.noncompleted.base ? op->h->_do_read(std::move(op->payload.noncompleted.base), std::move(op->payload.noncompleted.params.read.reqs), nonblocking) : op->h->_do_read(std::move(op->payload.noncompleted.params.read.reqs), nonblocking);
+        if(res)
+        {
+          op->read_completed(std::move(res).value());
+          if(op->h->native_handle().behaviour & native_handle_type::disposition::_multiplexer_state_bit0)
+          {
+            // SetFileCompletionNotificationModes() above was successful, so we are done
+            op->read_finished();
+            return;
+          }
+        }
+        break;
+      }
+      case io_operation_state_type::write_requested:
+      {
+        auto res = op->payload.noncompleted.base ? op->h->_do_write(std::move(op->payload.noncompleted.base), std::move(op->payload.noncompleted.params.write.reqs), nonblocking) : op->h->_do_write(std::move(op->payload.noncompleted.params.write.reqs), nonblocking);
+        if(res)
+        {
+          op->write_completed(std::move(res).value());
+          if(op->h->native_handle().behaviour & native_handle_type::disposition::_multiplexer_state_bit0)
+          {
+            // SetFileCompletionNotificationModes() above was successful, so we are done
+            op->write_finished();
+            return;
+          }
+        }
+        break;
+      }
+      case io_operation_state_type::barrier_requested:
+        auto res = op->h->_do_barrier(std::move(op->payload.noncompleted.params.barrier.reqs), op->payload.noncompleted.params.barrier.kind, nonblocking);
+        if(res)
+        {
+          op->barrier_completed(std::move(res).value());
+          if(op->h->native_handle().behaviour & native_handle_type::disposition::_multiplexer_state_bit0)
+          {
+            // SetFileCompletionNotificationModes() above was successful, so we are done
+            op->barrier_finished();
+            return;
+          }
+        }
+        break;
+      }
+      // TODO need to record this to call *_finished() when IOCP is done with it.
+    }
     // LLFIO_HEADERS_ONLY_VIRTUAL_SPEC bool check_io_operation(io_operation_state *op) noexcept { return false; }
     // LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<wait_for_completed_io_statistics> check_for_any_completed_io(deadline d = std::chrono::seconds(0), size_t max_completions = (size_t) -1) noexcept { return success(); }
     // LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> wake_check_for_any_completed_io() noexcept { return success(); }

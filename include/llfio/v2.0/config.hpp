@@ -380,6 +380,12 @@ using namespace QUICKCPPLIB_NAMESPACE::in_place_attach_detach;
 using QUICKCPPLIB_NAMESPACE::in_place_attach_detach::in_place_attach;
 using QUICKCPPLIB_NAMESPACE::in_place_attach_detach::in_place_detach;
 LLFIO_V2_NAMESPACE_END
+// Bring in a spinlock implementation
+#include "quickcpplib/spinlock.hpp"
+LLFIO_V2_NAMESPACE_BEGIN
+using spinlock = QUICKCPPLIB_NAMESPACE::configurable_spinlock::spinlock<uintptr_t>;
+using  QUICKCPPLIB_NAMESPACE::configurable_spinlock::lock_guard;
+LLFIO_V2_NAMESPACE_END
 
 
 LLFIO_V2_NAMESPACE_BEGIN

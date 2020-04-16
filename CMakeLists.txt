@@ -57,7 +57,14 @@ find_quickcpplib_library(outcome
   IS_HEADER_ONLY
 )
 if(WIN32)
+  set(OLD_PROJECT_IS_DEPENDENCY ${PROJECT_IS_DEPENDENCY})
+  set(PROJECT_IS_DEPENDENCY On)
   add_subdirectory("include/llfio/ntkernel-error-category" EXCLUDE_FROM_ALL)
+  if(OLD_PROJECT_IS_DEPENDENCY)
+    set(PROJECT_IS_DEPENDENCY ${OLD_PROJECT_IS_DEPENDENCY})
+  else()
+    set(PROJECT_IS_DEPENDENCY)
+  endif()
 endif()
 
 set(UNIT_TESTS_CXX_VERSION "latest" CACHE STRING "The version of C++ to use in the header-only unit tests")

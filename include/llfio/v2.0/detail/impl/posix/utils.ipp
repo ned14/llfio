@@ -24,8 +24,6 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../../../utils.hpp"
 
-#include "quickcpplib/spinlock.hpp"
-
 #include <mutex>  // for lock_guard
 
 #include <sys/mman.h>
@@ -53,7 +51,7 @@ namespace utils
   }
   const std::vector<size_t> &page_sizes(bool only_actually_available)
   {
-    static QUICKCPPLIB_NAMESPACE::configurable_spinlock::spinlock<bool> lock;
+    static spinlock lock;
     std::lock_guard<decltype(lock)> g(lock);
     static std::vector<size_t> pagesizes, pagesizes_available;
     if(pagesizes.empty())
@@ -136,7 +134,7 @@ namespace utils
 
   void random_fill(char *buffer, size_t bytes) noexcept
   {
-    static QUICKCPPLIB_NAMESPACE::configurable_spinlock::spinlock<bool> lock;
+    static spinlock lock;
     static std::atomic<int> randomfd(-1);
     int fd = randomfd;
     if(-1 == fd)
