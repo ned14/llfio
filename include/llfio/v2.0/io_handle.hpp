@@ -491,8 +491,14 @@ LLFIO_V2_NAMESPACE_END
 #define LLFIO_INCLUDED_BY_HEADER 1
 #ifdef _WIN32
 #include "detail/impl/windows/io_handle.ipp"
+#if LLFIO_ENABLE_TEST_IO_MULTIPLEXERS
+#include "detail/impl/windows/test/iocp_multiplexer.ipp"
+#endif
 #else
 #include "detail/impl/posix/io_handle.ipp"
+#if LLFIO_ENABLE_TEST_IO_MULTIPLEXERS
+//#include "detail/impl/posix/test/io_uring_multiplexer.ipp"
+#endif
 #endif
 #undef LLFIO_INCLUDED_BY_HEADER
 #endif

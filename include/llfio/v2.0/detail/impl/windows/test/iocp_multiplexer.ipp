@@ -42,7 +42,7 @@ namespace test
     explicit win_iocp_multiplexer(size_t threads) { (void) threads; }
     virtual ~win_iocp_multiplexer()
     {
-      if(_v)
+      if(this->_v)
       {
         (void) win_iocp_multiplexer::close();
       }
@@ -98,12 +98,12 @@ namespace test
     }
     // LLFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t do_io_handle_max_buffers(const io_handle *h) const noexcept override {}
     // LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<registered_buffer_type> do_io_handle_allocate_registered_buffer(io_handle *h, size_t &bytes) noexcept override {}
-    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void begin_io_operation(unsynchronised_io_operation_state *op) noexcept override
+    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void begin_io_operation(typename _base::unsynchronised_io_operation_state *op) noexcept override
     {
       if(is_threadsafe)
       {
         // Restamp the vptr of the state to be synchronised
-        op = new(op) synchronised_io_operation_state(std::move(*op));
+        op = new(op) typename _base::synchronised_io_operation_state(std::move(*op));
       }
       // On Windows, we can initiate the i/o using a zeroed deadline
       constexpr deadline nonblocking(std::chrono::seconds(0));

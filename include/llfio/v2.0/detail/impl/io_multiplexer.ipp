@@ -53,11 +53,3 @@ template <> struct io_multiplexer_impl<true> : io_multiplexer
 };
 
 LLFIO_V2_NAMESPACE_END
-
-#if LLFIO_ENABLE_TEST_IO_MULTIPLEXERS
-#if defined(_WIN32)
-#include "windows/test/iocp_multiplexer.ipp"
-#else
-//#include "posix/test/io_uring_multiplexer.ipp"
-#endif
-#endif
