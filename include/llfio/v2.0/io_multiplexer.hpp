@@ -454,6 +454,7 @@ public:
 #endif
 
   using handle::handle;
+  constexpr io_multiplexer() {}
   io_multiplexer(io_multiplexer &&) = default;
   io_multiplexer(const io_multiplexer &) = delete;
   io_multiplexer &operator=(io_multiplexer &&) = default;
