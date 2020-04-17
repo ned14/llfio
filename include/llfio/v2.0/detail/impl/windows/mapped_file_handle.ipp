@@ -57,11 +57,11 @@ result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type rese
     _reservation = reservation;
     return _reservation;
   }
-  section_handle::flag mapflags = section_handle::flag::read | section_handle::flag::nocommit;
+  section_handle::flag mapflags = section_handle::flag::read;
   // Reserve the full reservation in address space
   if(this->is_writable())
   {
-    mapflags |= section_handle::flag::write;
+    mapflags |= section_handle::flag::write | section_handle::flag::nocommit;
   }
   OUTCOME_TRYV(_mh.close());
   OUTCOME_TRY(mh, map_handle::map(_sh, reservation, 0, mapflags));
