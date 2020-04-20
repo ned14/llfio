@@ -118,8 +118,7 @@ $(document).ready(function(){initNavTree('md__build.html','');});
 <p>To build and test on POSIX (<code>make</code>, <code>ninja</code> etc):</p>
 <div class="fragment"><div class="line">mkdir build</div><div class="line">cd build</div><div class="line">cmake ..</div><div class="line">cmake --build . -- _dl</div><div class="line">ctest -R llfio_dl</div></div><!-- fragment --><p>To build and test on Windows or Mac OS (Visual Studio, XCode etc):</p>
 <div class="fragment"><div class="line">mkdir build</div><div class="line">cd build</div><div class="line">cmake .. -G&lt;your generator here&gt;</div><div class="line">cmake --build . --config Release --target _dl</div><div class="line">ctest -C Release -R llfio_dl</div></div><!-- fragment --><h2>Installing libraries from source</h2>
-<p>Installing the libraries from CMake does not currently work right due to unfinished single header generation. It's a TODO/FIXME item. </p>
-</div></div><!-- contents -->
+<div class="fragment"><div class="line">mkdir build</div><div class="line">cd build</div><div class="line">cmake ..</div><div class="line">cmake --build . -- _dl _sl _hl</div><div class="line">cmake --build . --target install</div></div><!-- fragment --> </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
