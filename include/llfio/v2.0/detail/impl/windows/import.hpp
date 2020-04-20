@@ -603,6 +603,14 @@ namespace windows_nt_kernel
     ULONG BytesPerSector;
   } FILE_FS_FULL_SIZE_INFORMATION, *PFILE_FS_FULL_SIZE_INFORMATION;
 
+  typedef struct _FILE_FS_SIZE_INFORMATION  // NOLINT
+  {
+    LARGE_INTEGER TotalAllocationUnits;
+    LARGE_INTEGER AvailableAllocationUnits;
+    ULONG SectorsPerAllocationUnit;
+    ULONG BytesPerSector;
+  } FILE_FS_SIZE_INFORMATION, *PFILE_FS_SIZE_INFORMATION;
+
   typedef struct _FILE_FS_OBJECTID_INFORMATION  // NOLINT
   {
     UCHAR ObjectId[16];
