@@ -126,4 +126,10 @@ ctest -C Release -R llfio_dl
 
 ## Installing libraries from source
 
-Installing the libraries from CMake does not currently work right due to unfinished single header generation. It's a TODO/FIXME item.
+~~~
+mkdir build
+cd build
+cmake ..
+cmake --build . -- _dl _sl _hl
+cmake --build . --target install
+~~~
