@@ -291,9 +291,9 @@ int main() {
 endif()
 
 # Set any macros this library requires
-all_compile_definitions(PRIVATE LLFIO_INCLUDE_ASYNC_FILE_HANDLE=1 LLFIO_INCLUDE_STORAGE_PROFILE=1)
+all_compile_definitions(PRIVATE LLFIO_INCLUDE_STORAGE_PROFILE=1)
 foreach(target ${llfio_EXAMPLE_TARGETS})
-  target_compile_definitions(${target} PRIVATE LLFIO_INCLUDE_ASYNC_FILE_HANDLE=1 LLFIO_INCLUDE_STORAGE_PROFILE=1)
+  target_compile_definitions(${target} PRIVATE LLFIO_INCLUDE_STORAGE_PROFILE=1)
 endforeach()
 if(LLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE)
   all_compile_definitions(PUBLIC LLFIO_EXPERIMENTAL_STATUS_CODE=1)
@@ -336,7 +336,7 @@ if(NOT PROJECT_IS_DEPENDENCY)
   include(QuickCppLibMakeStandardTests)
   # For each test target, set definitions and linkage
   foreach(target ${llfio_COMPILE_TEST_TARGETS} ${llfio_TEST_TARGETS})
-    target_compile_definitions(${target} PRIVATE LLFIO_INCLUDE_ASYNC_FILE_HANDLE=1 LLFIO_INCLUDE_STORAGE_PROFILE=1)
+    target_compile_definitions(${target} PRIVATE LLFIO_INCLUDE_STORAGE_PROFILE=1)
   endforeach()
   find_quickcpplib_library(kerneltest
     GIT_REPOSITORY "https://github.com/ned14/kerneltest.git"

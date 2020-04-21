@@ -1,5 +1,5 @@
 /* A handle to something
-(C) 2015-2019 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
+(C) 2015-2020 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
 File Created: Dec 2015
 
 
@@ -59,19 +59,15 @@ template <class BuffersType> inline bool do_cancel(const native_handle_type &nat
   return did_cancel;
 }
 
+// Returns true if operation completed immediately
 template <bool blocking, class Syscall, class BuffersType>
-inline bool do_read_write(io_handle::io_result<BuffersType> &ret, size_t &scheduled, Syscall &&syscall, const native_handle_type &nativeh, windows_nt_kernel::PIO_APC_ROUTINE routine, span<windows_nt_kernel::IO_STATUS_BLOCK> ols, io_handle::io_request<BuffersType> reqs, deadline d) noexcept
+inline bool do_read_write(io_handle::io_result<BuffersType> &ret, Syscall &&syscall, const native_handle_type &nativeh, io_multiplexer::io_operation_state *state, span<windows_nt_kernel::IO_STATUS_BLOCK> ols, io_handle::io_request<BuffersType> reqs, deadline d) noexcept
 {
   using namespace windows_nt_kernel;
   using EIOSB = windows_nt_kernel::IO_STATUS_BLOCK;
   if(d && !nativeh.is_nonblocking())
   {
     ret = errc::not_supported;
-    return true;
-  }
-  if(reqs.buffers.size() > 64)
-  {
-    ret = errc::argument_list_too_long;
     return true;
   }
   LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
@@ -121,14 +117,13 @@ inline bool do_read_write(io_handle::io_result<BuffersType> &ret, size_t &schedu
 #endif
     reqs.offset += req.size();
     ol.Status = 0x103 /*STATUS_PENDING*/;
-    NTSTATUS ntstat = syscall(nativeh.h, nullptr, routine, nullptr, &ol, (PVOID) req.data(), static_cast<DWORD>(req.size()), &offset, nullptr);
+    NTSTATUS ntstat = syscall(nativeh.h, nullptr, nullptr, state, &ol, (PVOID) req.data(), static_cast<DWORD>(req.size()), &offset, nullptr);
     if(ntstat < 0 && ntstat != 0x103 /*STATUS_PENDING*/)
     {
       InterlockedCompareExchange(&ol.Status, ntstat, 0x103 /*STATUS_PENDING*/);
       ret = ntkernel_error(ntstat);
       return true;
     }
-    ++scheduled;
   }
   // If handle is overlapped, wait for completion of each i/o.
   if(nativeh.is_nonblocking() && blocking)
@@ -189,9 +184,12 @@ io_handle::io_result<io_handle::buffers_type> io_handle::_do_read(io_handle::io_
   LLFIO_LOG_FUNCTION_CALL(this);
   using EIOSB = windows_nt_kernel::IO_STATUS_BLOCK;
   std::array<EIOSB, 64> _ols{};
+  if(reqs.buffers.size() > 64)
+  {
+    return errc::argument_list_too_long;
+  }
   io_handle::io_result<io_handle::buffers_type> ret(reqs.buffers);
-  size_t scheduled = 0;
-  do_read_write<true>(ret, scheduled, NtReadFile, _v, nullptr, {_ols.data(), _ols.size()}, reqs, d);
+  do_read_write<true>(ret, NtReadFile, _v, nullptr, {_ols.data(), _ols.size()}, reqs, d);
   return ret;
 }
 
@@ -202,9 +200,12 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::_do_write(io_hand
   LLFIO_LOG_FUNCTION_CALL(this);
   using EIOSB = windows_nt_kernel::IO_STATUS_BLOCK;
   std::array<EIOSB, 64> _ols{};
+  if(reqs.buffers.size() > 64)
+  {
+    return errc::argument_list_too_long;
+  }
   io_handle::io_result<io_handle::const_buffers_type> ret(reqs.buffers);
-  size_t scheduled = 0;
-  do_read_write<true>(ret, scheduled, NtWriteFile, _v, nullptr, {_ols.data(), _ols.size()}, reqs, d);
+  do_read_write<true>(ret, NtWriteFile, _v, nullptr, {_ols.data(), _ols.size()}, reqs, d);
   return ret;
 }
 
