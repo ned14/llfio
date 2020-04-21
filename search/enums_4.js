@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['lock_5fkind',['lock_kind',['../namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33',1,'llfio_v2_xxx']]]
+  ['kvstore_5ferrc',['kvstore_errc',['../namespacekvstore__v1__xxx.html#a7bc2f2673bddc429b098b16e413deb5f',1,'kvstore_v1_xxx']]]
 ];

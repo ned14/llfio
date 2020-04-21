@@ -106,10 +106,12 @@ $(document).ready(function(){initNavTree('config_8hpp.html','');});
 <code>#include &quot;quickcpplib/optional.hpp&quot;</code><br />
 <code>#include &quot;quickcpplib/byte.hpp&quot;</code><br />
 <code>#include &quot;quickcpplib/string_view.hpp&quot;</code><br />
+<code>#include &quot;quickcpplib/function_ptr.hpp&quot;</code><br />
 <code>#include &quot;quickcpplib/mem_flush_loads_stores.hpp&quot;</code><br />
 <code>#include &quot;quickcpplib/start_lifetime_as.hpp&quot;</code><br />
 <code>#include &quot;quickcpplib/detach_cast.hpp&quot;</code><br />
 <code>#include &quot;quickcpplib/in_place_detach_attach.hpp&quot;</code><br />
+<code>#include &quot;quickcpplib/spinlock.hpp&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
@@ -230,6 +232,13 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
+<tr class="memitem:a23358ae319d76dd1149a26b04b17796a"><td class="memTemplParams" colspan="2"><a id="a23358ae319d76dd1149a26b04b17796a"></a>
+template&lt;class F , size_t callable_storage_bytes = 32 - sizeof(uintptr_t)&gt; </td></tr>
+<tr class="memitem:a23358ae319d76dd1149a26b04b17796a"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>llfio_v2_xxx::function_ptr</b> = QUICKCPPLIB_NAMESPACE::function_ptr::function_ptr&lt; F, callable_storage_bytes &gt;</td></tr>
+<tr class="separator:a23358ae319d76dd1149a26b04b17796a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a138a48536b1700db01f10e8a371d0a4f"><td class="memItemLeft" align="right" valign="top"><a id="a138a48536b1700db01f10e8a371d0a4f"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::spinlock</b> = QUICKCPPLIB_NAMESPACE::configurable_spinlock::spinlock&lt; uintptr_t &gt;</td></tr>
+<tr class="separator:a138a48536b1700db01f10e8a371d0a4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af65fb3311b32b8757c3b7ebdd045afe9"><td class="memItemLeft" align="right" valign="top"><a id="af65fb3311b32b8757c3b7ebdd045afe9"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::win::handle</b> = void *</td></tr>
 <tr class="separator:af65fb3311b32b8757c3b7ebdd045afe9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -245,14 +254,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a77c52ccdc38be135a374dbb4a7d1d466"><td class="memItemLeft" align="right" valign="top"><a id="a77c52ccdc38be135a374dbb4a7d1d466"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::detail::LLFIO_TEMPLATE</b> (class T) LLFIO_TREQUIRES(LLFIO_TPRED(std</td></tr>
 <tr class="separator:a77c52ccdc38be135a374dbb4a7d1d466"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4369189d04a952a93cf182f2c7390412"><td class="memTemplParams" colspan="2"><a id="a4369189d04a952a93cf182f2c7390412"></a>
-template&lt;class R , class U &gt; </td></tr>
-<tr class="memitem:a4369189d04a952a93cf182f2c7390412"><td class="memTemplItemLeft" align="right" valign="top">function_ptr&lt; R &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>llfio_v2_xxx::detail::make_function_ptr</b> (U &amp;&amp;f)</td></tr>
-<tr class="separator:a4369189d04a952a93cf182f2c7390412"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace72a598b9cabfc3d6f6760895e893fd"><td class="memTemplParams" colspan="2"><a id="ace72a598b9cabfc3d6f6760895e893fd"></a>
-template&lt;class R , class U , class... Args&gt; </td></tr>
-<tr class="memitem:ace72a598b9cabfc3d6f6760895e893fd"><td class="memTemplItemLeft" align="right" valign="top">function_ptr&lt; R &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>llfio_v2_xxx::detail::emplace_function_ptr</b> (Args &amp;&amp;... args)</td></tr>
-<tr class="separator:ace72a598b9cabfc3d6f6760895e893fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Configures a compiler environment for LLFIO header and source code. </p>

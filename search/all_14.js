@@ -24,7 +24,6 @@ var searchData=
   ['update_5fmap',['update_map',['../classllfio__v2__xxx_1_1map__handle.html#ac7aeb0aa6182a22d0242340eb6d341b9',1,'llfio_v2_xxx::map_handle::update_map()'],['../classllfio__v2__xxx_1_1mapped__file__handle.html#acb5a5b1e9f5bd7b1555edbacd057972c',1,'llfio_v2_xxx::mapped_file_handle::update_map()']]],
   ['uri',['uri',['../classkvstore__v1__xxx_1_1basic__key__value__store.html#a6380b90bf98c1403827a6e7320367d98',1,'kvstore_v1_xxx::basic_key_value_store']]],
   ['uri_5ftype',['uri_type',['../structkvstore__v1__xxx_1_1basic__key__value__store__info.html#a6a2745145078cb237fb385a7ad4681af',1,'kvstore_v1_xxx::basic_key_value_store_info::uri_type()'],['../classkvstore__v1__xxx_1_1basic__key__value__store.html#a230f8e3e03df31d6647e4544853b1502',1,'kvstore_v1_xxx::basic_key_value_store::uri_type()']]],
-  ['using_5fkqueues',['using_kqueues',['../classllfio__v2__xxx_1_1io__service.html#ac4c9dfee053976f4dca0b91cd98caabb',1,'llfio_v2_xxx::io_service']]],
   ['utc',['utc',['../structllfio__v2__xxx_1_1deadline.html#acbc4f85fc48f6818ba7b418ac4c7a545',1,'llfio_v2_xxx::deadline']]],
   ['utils_2ehpp',['utils.hpp',['../utils_8hpp.html',1,'']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['mode',['mode',['../classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca',1,'llfio_v2_xxx::handle']]]
+  ['lock_5fkind',['lock_kind',['../namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33',1,'llfio_v2_xxx']]]
 ];

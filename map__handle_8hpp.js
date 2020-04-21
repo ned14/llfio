@@ -11,6 +11,7 @@ var map__handle_8hpp =
     [ "length", "map__handle_8hpp.html#a70e68bcf05636966ffefe001b903487e", null ],
     [ "map", "map__handle_8hpp.html#ab50d07405d17a8fff4e360fd2612bc6f", null ],
     [ "map", "map__handle_8hpp.html#ab9dbbe2fe79758ef87fe2dd1f61d824c", null ],
+    [ "map_handle_allocate_registered_buffer", "map__handle_8hpp.html#aa0394a25491c4c22cb2311f2b1503c73", null ],
     [ "nvram_barrier", "map__handle_8hpp.html#a86f75b69db68e6c0593919f0a878f838", null ],
     [ "operator<<", "map__handle_8hpp.html#aaf60dc6739dc2bd7d890630b1a50d15a", null ],
     [ "pagesize_from_flags", "map__handle_8hpp.html#acaa74d6fc6b9aef877233654f514041d", null ],

@@ -34,7 +34,7 @@ var classllfio__v2__xxx_1_1awaitable__handle =
     [ "are_safety_barriers_issued", "classllfio__v2__xxx_1_1awaitable__handle.html#a0a2a5896f5e373fa032cdae1c1fff2c1", null ],
     [ "are_writes_durable", "classllfio__v2__xxx_1_1awaitable__handle.html#a8036792f332459064172d7b0cfaee3cf", null ],
     [ "barrier", "classllfio__v2__xxx_1_1awaitable__handle.html#aa662339395dd63073132ad083ffe4577", null ],
-    [ "clone", "classllfio__v2__xxx_1_1awaitable__handle.html#a46ee43d56e2665596b94721de986928b", null ],
+    [ "clone", "classllfio__v2__xxx_1_1awaitable__handle.html#aeea4389189021b94dde6d8f2c3ccc5b3", null ],
     [ "close", "classllfio__v2__xxx_1_1awaitable__handle.html#a62a75b1a4a24fbc9ad2e98a641167db6", null ],
     [ "current_path", "classllfio__v2__xxx_1_1awaitable__handle.html#a00a85eec5a41f7edb2c574d40cf04535", null ],
     [ "flags", "classllfio__v2__xxx_1_1awaitable__handle.html#a013936bc1254b1a47567fe29698d1b1c", null ],
@@ -55,7 +55,6 @@ var classllfio__v2__xxx_1_1awaitable__handle =
     [ "is_valid", "classllfio__v2__xxx_1_1awaitable__handle.html#a5c7f6a0a8ffdea22763c75a9319ba0c2", null ],
     [ "is_writable", "classllfio__v2__xxx_1_1awaitable__handle.html#a211fee447a47bdeb5424a2a5ae1de852", null ],
     [ "kernel_caching", "classllfio__v2__xxx_1_1awaitable__handle.html#a90bf8668df002dac5a7d9397486b2946", null ],
-    [ "multiplexer", "classllfio__v2__xxx_1_1awaitable__handle.html#a02769f641a80a18ef52431df9c530d9b", null ],
     [ "native_handle", "classllfio__v2__xxx_1_1awaitable__handle.html#a942b0d276c9f20fe41baab679b88fe72", null ],
     [ "QUICKCPPLIB_BITFIELD_BEGIN", "classllfio__v2__xxx_1_1awaitable__handle.html#ac5222904f116c9beb0515a4a5aa850bf", null ],
     [ "QUICKCPPLIB_BITFIELD_END", "classllfio__v2__xxx_1_1awaitable__handle.html#aa7e9bedf8c7a4c4a79a644a6e1857ee4", null ],
@@ -74,11 +73,6 @@ var classllfio__v2__xxx_1_1awaitable__handle =
     [ "try_write_for", "classllfio__v2__xxx_1_1awaitable__handle.html#a3dad14fd2ff7107d066b1ac365d2e7d1", null ],
     [ "try_write_until", "classllfio__v2__xxx_1_1awaitable__handle.html#a5c3e328220dc0ab9d68b09dab659b1fc", null ],
     [ "write", "classllfio__v2__xxx_1_1awaitable__handle.html#abb0e2865ca62ca0715e8e1dce502f878", null ],
-    [ "_caching", "classllfio__v2__xxx_1_1awaitable__handle.html#affb091ded80ffde7c0c3854e2abc52fd", null ],
-    [ "_ctx", "classllfio__v2__xxx_1_1awaitable__handle.html#a62e96574f55004ba472515ad3dddfaf9", null ],
     [ "_flags", "classllfio__v2__xxx_1_1awaitable__handle.html#ad758cf1eb2e0b4c63583eab05e7f6820", null ],
-    [ "_spare1", "classllfio__v2__xxx_1_1awaitable__handle.html#ac9b7fc732e8377fa52998444ca017324", null ],
-    [ "_spare2", "classllfio__v2__xxx_1_1awaitable__handle.html#a06549b892262ce0bd9c19c8d3766c156", null ],
-    [ "_spare3", "classllfio__v2__xxx_1_1awaitable__handle.html#aab27d9f03fc2e650e73005b17e36605b", null ],
     [ "_v", "classllfio__v2__xxx_1_1awaitable__handle.html#a1d6911771ac743fd9d64063c12429deb", null ]
 ];

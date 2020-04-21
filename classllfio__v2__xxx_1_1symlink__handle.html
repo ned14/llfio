@@ -86,6 +86,7 @@ $(document).ready(function(){initNavTree('classllfio__v2__xxx_1_1symlink__handle
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pro-static-methods">Static Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classllfio__v2__xxx_1_1symlink__handle-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -216,6 +217,18 @@ virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom">
 <tr class="separator:a2a22f51ca307aa30660ed91b26785ec3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1eed91444d65330347cb89bbe206c13b"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html">symlink_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#a1eed91444d65330347cb89bbe206c13b">reopen</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a> mode_=mode::unchanged, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) const noexcept</td></tr>
 <tr class="separator:a1eed91444d65330347cb89bbe206c13b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2b320abbe2e64eb86da427bc7e48f67"><td class="memTemplParams" colspan="2"><a id="ac2b320abbe2e64eb86da427bc7e48f67"></a>
+template&lt;class... Args&gt; </td></tr>
+<tr class="memitem:ac2b320abbe2e64eb86da427bc7e48f67"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_reopen</b> (Args &amp;&amp;... args) noexcept</td></tr>
+<tr class="separator:ac2b320abbe2e64eb86da427bc7e48f67"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab84e4bb0a339810f8351b491f1525a61"><td class="memTemplParams" colspan="2"><a id="ab84e4bb0a339810f8351b491f1525a61"></a>
+template&lt;class... Args, class Rep , class Period &gt; </td></tr>
+<tr class="memitem:ab84e4bb0a339810f8351b491f1525a61"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_reopen_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
+<tr class="separator:ab84e4bb0a339810f8351b491f1525a61"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2aa9a90053f33201b054d79cc0c04d82"><td class="memTemplParams" colspan="2"><a id="a2aa9a90053f33201b054d79cc0c04d82"></a>
+template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
+<tr class="memitem:a2aa9a90053f33201b054d79cc0c04d82"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_reopen_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
+<tr class="separator:a2aa9a90053f33201b054d79cc0c04d82"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aea44ed050acfd8e4f9dec59ff194c746"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html#a33481bae57d9ccd0c97946416f9682f3">path_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#aea44ed050acfd8e4f9dec59ff194c746">current_path</a> () const noexcept override</td></tr>
 <tr class="separator:aea44ed050acfd8e4f9dec59ff194c746"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afea9ef2b36cac3f6dfcae7555ca3303c"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#afea9ef2b36cac3f6dfcae7555ca3303c">relink</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#abcd8c8171f4e561620864295e8d5879b">path_view_type</a> <a class="el" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>, bool atomic_replace=true, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept override</td></tr>
@@ -236,12 +249,8 @@ virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom">
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a4716696b8700953889006251e0678aa4">swap</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;o) noexcept</td></tr>
 <tr class="memdesc:a4716696b8700953889006251e0678aa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br /></td></tr>
 <tr class="separator:a4716696b8700953889006251e0678aa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a02769f641a80a18ef52431df9c530d9b"><td class="memItemLeft" align="right" valign="top"><a id="a02769f641a80a18ef52431df9c530d9b"></a>
-io_context *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a02769f641a80a18ef52431df9c530d9b">multiplexer</a> () const noexcept</td></tr>
-<tr class="memdesc:a02769f641a80a18ef52431df9c530d9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The i/o context this handle will use to multiplex i/o, if any. <br /></td></tr>
-<tr class="separator:a02769f641a80a18ef52431df9c530d9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a46ee43d56e2665596b94721de986928b"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a46ee43d56e2665596b94721de986928b">clone</a> () const noexcept</td></tr>
-<tr class="separator:a46ee43d56e2665596b94721de986928b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeea4389189021b94dde6d8f2c3ccc5b3"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#aeea4389189021b94dde6d8f2c3ccc5b3">clone</a> () const noexcept</td></tr>
+<tr class="separator:aeea4389189021b94dde6d8f2c3ccc5b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d273e38c061eb11f5012f624e9a202e"><td class="memItemLeft" align="right" valign="top"><a id="a1d273e38c061eb11f5012f624e9a202e"></a>
 virtual <a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a1d273e38c061eb11f5012f624e9a202e">release</a> () noexcept</td></tr>
 <tr class="memdesc:a1d273e38c061eb11f5012f624e9a202e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release the native handle type managed by this handle. <br /></td></tr>
@@ -355,6 +364,42 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 <tr class="separator:a9793fe40564fda2437783488bd51b9f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a865caad2f7f4bdf12fb74aabfe3c5ff5"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#a865caad2f7f4bdf12fb74aabfe3c5ff5">parent_path_handle</a> (<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) const noexcept</td></tr>
 <tr class="separator:a865caad2f7f4bdf12fb74aabfe3c5ff5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1eeaf9d77a1279b4f0d3062de509f77f"><td class="memTemplParams" colspan="2"><a id="a1eeaf9d77a1279b4f0d3062de509f77f"></a>
+template&lt;class... Args&gt; </td></tr>
+<tr class="memitem:a1eeaf9d77a1279b4f0d3062de509f77f"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_parent_path_handle</b> (Args &amp;&amp;... args) noexcept</td></tr>
+<tr class="separator:a1eeaf9d77a1279b4f0d3062de509f77f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a41ea4bd2d5a66fbde4cdbfe463166a4f"><td class="memTemplParams" colspan="2"><a id="a41ea4bd2d5a66fbde4cdbfe463166a4f"></a>
+template&lt;class... Args, class Rep , class Period &gt; </td></tr>
+<tr class="memitem:a41ea4bd2d5a66fbde4cdbfe463166a4f"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_parent_path_handle_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
+<tr class="separator:a41ea4bd2d5a66fbde4cdbfe463166a4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acbb1fe8c7901382307d84848fdc0afcb"><td class="memTemplParams" colspan="2"><a id="acbb1fe8c7901382307d84848fdc0afcb"></a>
+template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
+<tr class="memitem:acbb1fe8c7901382307d84848fdc0afcb"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_parent_path_handle_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
+<tr class="separator:acbb1fe8c7901382307d84848fdc0afcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f5f9892f6652359f2330bf6d9b89e17"><td class="memTemplParams" colspan="2"><a id="a7f5f9892f6652359f2330bf6d9b89e17"></a>
+template&lt;class... Args&gt; </td></tr>
+<tr class="memitem:a7f5f9892f6652359f2330bf6d9b89e17"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_relink</b> (Args &amp;&amp;... args) noexcept</td></tr>
+<tr class="separator:a7f5f9892f6652359f2330bf6d9b89e17"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5565cd5f2fcbb9472b2a00795cc0bcc"><td class="memTemplParams" colspan="2"><a id="af5565cd5f2fcbb9472b2a00795cc0bcc"></a>
+template&lt;class... Args, class Rep , class Period &gt; </td></tr>
+<tr class="memitem:af5565cd5f2fcbb9472b2a00795cc0bcc"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_relink_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
+<tr class="separator:af5565cd5f2fcbb9472b2a00795cc0bcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1fc4e2ade67dfb9140007cc31f4b6b20"><td class="memTemplParams" colspan="2"><a id="a1fc4e2ade67dfb9140007cc31f4b6b20"></a>
+template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
+<tr class="memitem:a1fc4e2ade67dfb9140007cc31f4b6b20"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_relink_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
+<tr class="separator:a1fc4e2ade67dfb9140007cc31f4b6b20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f77a249baf4e0c5de2172669a7724d7"><td class="memTemplParams" colspan="2"><a id="a7f77a249baf4e0c5de2172669a7724d7"></a>
+template&lt;class... Args&gt; </td></tr>
+<tr class="memitem:a7f77a249baf4e0c5de2172669a7724d7"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_unlink</b> (Args &amp;&amp;... args) noexcept</td></tr>
+<tr class="separator:a7f77a249baf4e0c5de2172669a7724d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a209de025a2d3e202a61c50b52d43f2af"><td class="memTemplParams" colspan="2"><a id="a209de025a2d3e202a61c50b52d43f2af"></a>
+template&lt;class... Args, class Rep , class Period &gt; </td></tr>
+<tr class="memitem:a209de025a2d3e202a61c50b52d43f2af"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_unlink_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
+<tr class="separator:a209de025a2d3e202a61c50b52d43f2af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9c4133fef23811abcb01e1faf2b19d3"><td class="memTemplParams" colspan="2"><a id="ae9c4133fef23811abcb01e1faf2b19d3"></a>
+template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
+<tr class="memitem:ae9c4133fef23811abcb01e1faf2b19d3"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_unlink_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
+<tr class="separator:ae9c4133fef23811abcb01e1faf2b19d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -370,26 +415,17 @@ result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class
 <tr class="memdesc:adc2b24484565bcb0cf654adf2f732f7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill in _devid and _inode from the handle via fstat() <br /></td></tr>
 <tr class="separator:adc2b24484565bcb0cf654adf2f732f7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-methods"></a>
+Static Protected Member Functions</h2></td></tr>
+<tr class="memitem:a1dd1abc0bd1fa1f10782301dddf802b7"><td class="memItemLeft" align="right" valign="top"><a id="a1dd1abc0bd1fa1f10782301dddf802b7"></a>
+static constexpr void&#160;</td><td class="memItemRight" valign="bottom"><b>_set_caching</b> (<a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a> &amp;nativeh, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a>) noexcept</td></tr>
+<tr class="separator:a1dd1abc0bd1fa1f10782301dddf802b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:a62e96574f55004ba472515ad3dddfaf9"><td class="memItemLeft" align="right" valign="top"><a id="a62e96574f55004ba472515ad3dddfaf9"></a>
-io_context *&#160;</td><td class="memItemRight" valign="bottom"><b>_ctx</b> {nullptr}</td></tr>
-<tr class="separator:a62e96574f55004ba472515ad3dddfaf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d6911771ac743fd9d64063c12429deb"><td class="memItemLeft" align="right" valign="top"><a id="a1d6911771ac743fd9d64063c12429deb"></a>
 <a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a>&#160;</td><td class="memItemRight" valign="bottom"><b>_v</b></td></tr>
 <tr class="separator:a1d6911771ac743fd9d64063c12429deb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:affb091ded80ffde7c0c3854e2abc52fd"><td class="memItemLeft" align="right" valign="top"><a id="affb091ded80ffde7c0c3854e2abc52fd"></a>
-<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a>&#160;</td><td class="memItemRight" valign="bottom"><b>_caching</b> {<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a334c4a4c42fdb79d7ebc3e73b517e6f8">caching::none</a>}</td></tr>
-<tr class="separator:affb091ded80ffde7c0c3854e2abc52fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac9b7fc732e8377fa52998444ca017324"><td class="memItemLeft" align="right" valign="top"><a id="ac9b7fc732e8377fa52998444ca017324"></a>
-char&#160;</td><td class="memItemRight" valign="bottom"><b>_spare1</b> {0}</td></tr>
-<tr class="separator:ac9b7fc732e8377fa52998444ca017324"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a06549b892262ce0bd9c19c8d3766c156"><td class="memItemLeft" align="right" valign="top"><a id="a06549b892262ce0bd9c19c8d3766c156"></a>
-char&#160;</td><td class="memItemRight" valign="bottom"><b>_spare2</b> {0}</td></tr>
-<tr class="separator:a06549b892262ce0bd9c19c8d3766c156"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aab27d9f03fc2e650e73005b17e36605b"><td class="memItemLeft" align="right" valign="top"><a id="aab27d9f03fc2e650e73005b17e36605b"></a>
-char&#160;</td><td class="memItemRight" valign="bottom"><b>_spare3</b> {0}</td></tr>
-<tr class="separator:aab27d9f03fc2e650e73005b17e36605b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad758cf1eb2e0b4c63583eab05e7f6820"><td class="memItemLeft" align="right" valign="top"><a id="ad758cf1eb2e0b4c63583eab05e7f6820"></a>
 flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b> {flag::none}</td></tr>
 <tr class="separator:ad758cf1eb2e0b4c63583eab05e7f6820"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -441,8 +477,8 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a46ee43d56e2665596b94721de986928b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a46ee43d56e2665596b94721de986928b">&#9670;&nbsp;</a></span>clone()</h2>
+<a id="aeea4389189021b94dde6d8f2c3ccc5b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeea4389189021b94dde6d8f2c3ccc5b3">&#9670;&nbsp;</a></span>clone()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -451,7 +487,7 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual result&lt;<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a>&gt; llfio_v2_xxx::handle::clone </td>
+          <td class="memname">result&lt;<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a>&gt; llfio_v2_xxx::handle::clone </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -459,14 +495,12 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 <p>Clone this handle (copy constructor is disabled to avoid accidental copying)</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or DuplicateHandle() can return. </dd></dl>
-
-<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a97713c4f87b28e62f856665185ea6a18">llfio_v2_xxx::file_handle</a>.</p>
 
 </div>
 </div>
@@ -848,7 +882,7 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
 </div><div class="memdoc">
 <p>Create a symlink handle creating a uniquely named symlink on a path. The symlink is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing symlink.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return, or failure to allocate memory. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;  {</div><div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;    <span class="keywordflow">try</span></div><div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;    {</div><div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;      <span class="keywordflow">for</span>(;;)</div><div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;      {</div><div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">utils::random_string</a>(32);</div><div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;        randomname.append(<span class="stringliteral">&quot;.random&quot;</span>);</div><div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;        result&lt;symlink_handle&gt; ret = <a class="code" href="classllfio__v2__xxx_1_1symlink__handle.html#a004563b5be8b75d20617018178f68e33">symlink</a>(dirpath, randomname, _mode, <a class="code" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255">creation::only_if_not_exist</a>, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>);</div><div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;        <span class="keywordflow">if</span>(ret || (!ret &amp;&amp; ret.error() != errc::file_exists))</div><div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;        {</div><div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;          <span class="keywordflow">return</span> ret;</div><div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;        }</div><div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;      }</div><div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    }</div><div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    <span class="keywordflow">catch</span>(...)</div><div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;    {</div><div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div><div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;    }</div><div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1handle_html_a013936bc1254b1a47567fe29698d1b1c"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">llfio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:370</div></div>
+<div class="fragment"><div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;  {</div><div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;    <span class="keywordflow">try</span></div><div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;    {</div><div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;      <span class="keywordflow">for</span>(;;)</div><div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;      {</div><div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">utils::random_string</a>(32);</div><div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;        randomname.append(<span class="stringliteral">&quot;.random&quot;</span>);</div><div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;        result&lt;symlink_handle&gt; ret = <a class="code" href="classllfio__v2__xxx_1_1symlink__handle.html#a004563b5be8b75d20617018178f68e33">symlink</a>(dirpath, randomname, _mode, <a class="code" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255">creation::only_if_not_exist</a>, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>);</div><div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;        <span class="keywordflow">if</span>(ret || (!ret &amp;&amp; ret.error() != errc::file_exists))</div><div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;        {</div><div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;          <span class="keywordflow">return</span> ret;</div><div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;        }</div><div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;      }</div><div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    }</div><div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;    <span class="keywordflow">catch</span>(...)</div><div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;    {</div><div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div><div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;    }</div><div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1handle_html_a013936bc1254b1a47567fe29698d1b1c"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">llfio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:412</div></div>
 <div class="ttc" id="classllfio__v2__xxx_1_1symlink__handle_html_a004563b5be8b75d20617018178f68e33"><div class="ttname"><a href="classllfio__v2__xxx_1_1symlink__handle.html#a004563b5be8b75d20617018178f68e33">llfio_v2_xxx::symlink_handle::symlink</a></div><div class="ttdeci">static result&lt; symlink_handle &gt; symlink(const path_handle &amp;base, path_view_type path, mode _mode=mode::read, creation _creation=creation::open_existing, flag flags=flag::none) noexcept</div></div>
 <div class="ttc" id="classllfio__v2__xxx_1_1handle_html_af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255">llfio_v2_xxx::handle::creation::only_if_not_exist</a></div><div class="ttdoc">Filesystem entry must NOT exist, and is atomically created by the success of this operation...</div></div>
 <div class="ttc" id="namespacellfio__v2__xxx_1_1utils_html_a6a29cf29a4b097411f6c1e5274bfb417"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">llfio_v2_xxx::utils::random_string</a></div><div class="ttdeci">std::string random_string(size_t randomlen)</div><div class="ttdoc">Returns a cryptographically random string capable of being used as a filename. Essentially random_fil...</div><div class="ttdef"><b>Definition:</b> utils.hpp:134</div></div>

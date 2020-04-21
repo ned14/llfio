@@ -12,6 +12,5 @@ var searchData=
   ['unlock_5ffile_5fshared',['unlock_file_shared',['../classllfio__v2__xxx_1_1lockable__io__handle.html#afc5ba16c0377a56b7e1a66a9c6d0a703',1,'llfio_v2_xxx::lockable_io_handle']]],
   ['unlock_5fshared',['unlock_shared',['../classllfio__v2__xxx_1_1unique__file__lock.html#a97a893fe4a3b5356ef26b6b9b80fdce2',1,'llfio_v2_xxx::unique_file_lock']]],
   ['update_5fmap',['update_map',['../classllfio__v2__xxx_1_1map__handle.html#ac7aeb0aa6182a22d0242340eb6d341b9',1,'llfio_v2_xxx::map_handle::update_map()'],['../classllfio__v2__xxx_1_1mapped__file__handle.html#acb5a5b1e9f5bd7b1555edbacd057972c',1,'llfio_v2_xxx::mapped_file_handle::update_map()']]],
-  ['uri',['uri',['../classkvstore__v1__xxx_1_1basic__key__value__store.html#a6380b90bf98c1403827a6e7320367d98',1,'kvstore_v1_xxx::basic_key_value_store']]],
-  ['using_5fkqueues',['using_kqueues',['../classllfio__v2__xxx_1_1io__service.html#ac4c9dfee053976f4dca0b91cd98caabb',1,'llfio_v2_xxx::io_service']]]
+  ['uri',['uri',['../classkvstore__v1__xxx_1_1basic__key__value__store.html#a6380b90bf98c1403827a6e7320367d98',1,'kvstore_v1_xxx::basic_key_value_store']]]
 ];

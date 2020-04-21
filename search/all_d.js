@@ -6,10 +6,11 @@ var searchData=
   ['native_5fhandle_5ftype_2ehpp',['native_handle_type.hpp',['../native__handle__type_8hpp.html',1,'']]],
   ['native_5fsize',['native_size',['../classllfio__v2__xxx_1_1path__view__component.html#aaba2705ba8660b2d9e28cbbd099a85ec',1,'llfio_v2_xxx::path_view_component::native_size()'],['../classllfio__v2__xxx_1_1path__view.html#a711aaeec6fcc29431b6996ef25c6043f',1,'llfio_v2_xxx::path_view::native_size()']]],
   ['noexec',['noexec',['../structllfio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#a4559dec0d0c4354feb0b0c131aab266b',1,'llfio_v2_xxx::statfs_t::f_flags_t']]],
+  ['noncompleted_5ft',['noncompleted_t',['../structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t_1_1noncompleted__t.html',1,'llfio_v2_xxx::io_multiplexer::_unsynchronised_io_operation_state::payload_t']]],
   ['none',['none',['../classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207a334c4a4c42fdb79d7ebc3e73b517e6f8',1,'llfio_v2_xxx::directory_handle::none()'],['../classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaa334c4a4c42fdb79d7ebc3e73b517e6f8',1,'llfio_v2_xxx::handle::none()'],['../classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a334c4a4c42fdb79d7ebc3e73b517e6f8',1,'llfio_v2_xxx::handle::none()'],['../classllfio__v2__xxx_1_1symlink__handle.html#a1908a242ca435cf1386fe96a86da4002a334c4a4c42fdb79d7ebc3e73b517e6f8',1,'llfio_v2_xxx::symlink_handle::none()']]],
   ['nosuid',['nosuid',['../structllfio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#a973d0ca8c51f329587144682aff54879',1,'llfio_v2_xxx::statfs_t::f_flags_t']]],
-  ['nowait_5fall',['nowait_all',['../classllfio__v2__xxx_1_1io__handle.html#a7816bb7ae5156fa2997b68e6300ae565ab7a52d26120f585b21e8960812db5bf1',1,'llfio_v2_xxx::io_handle']]],
-  ['nowait_5fdata_5fonly',['nowait_data_only',['../classllfio__v2__xxx_1_1io__handle.html#a7816bb7ae5156fa2997b68e6300ae565a2f6648dac37731813bb84ae9b24bdfdb',1,'llfio_v2_xxx::io_handle']]],
+  ['nowait_5fall',['nowait_all',['../classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26ab7a52d26120f585b21e8960812db5bf1',1,'llfio_v2_xxx::io_multiplexer']]],
+  ['nowait_5fdata_5fonly',['nowait_data_only',['../classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26a2f6648dac37731813bb84ae9b24bdfdb',1,'llfio_v2_xxx::io_multiplexer']]],
   ['nsecs',['nsecs',['../structllfio__v2__xxx_1_1deadline.html#aff7d0cc77c5d0a9c90b5f16140df5359',1,'llfio_v2_xxx::deadline']]],
   ['nvram_5fbarrier',['nvram_barrier',['../namespacellfio__v2__xxx.html#a86f75b69db68e6c0593919f0a878f838',1,'llfio_v2_xxx']]]
 ];

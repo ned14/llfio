@@ -29,9 +29,9 @@ var config_8hpp =
     [ "LLFIO_V2_NAMESPACE_END", "group__config.html#ga84df5d479525cd6b58f873c2f9869b22", null ],
     [ "LLFIO_V2_NAMESPACE_EXPORT_BEGIN", "group__config.html#gab2f82803f0ce479a2993d3b7696db8d3", null ],
     [ "dword", "config_8hpp.html#a79085acc20a53afe38d31c1af948301d", null ],
+    [ "function_ptr", "config_8hpp.html#a23358ae319d76dd1149a26b04b17796a", null ],
     [ "handle", "config_8hpp.html#af65fb3311b32b8757c3b7ebdd045afe9", null ],
-    [ "emplace_function_ptr", "config_8hpp.html#ace72a598b9cabfc3d6f6760895e893fd", null ],
+    [ "spinlock", "config_8hpp.html#a138a48536b1700db01f10e8a371d0a4f", null ],
     [ "LLFIO_TEMPLATE", "config_8hpp.html#a02c02d05e24d34c25324c192df11c0b4", null ],
-    [ "LLFIO_TEMPLATE", "config_8hpp.html#a77c52ccdc38be135a374dbb4a7d1d466", null ],
-    [ "make_function_ptr", "config_8hpp.html#a4369189d04a952a93cf182f2c7390412", null ]
+    [ "LLFIO_TEMPLATE", "config_8hpp.html#a77c52ccdc38be135a374dbb4a7d1d466", null ]
 ];

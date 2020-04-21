@@ -83,6 +83,7 @@ $(document).ready(function(){initNavTree('classllfio__v2__xxx_1_1handle.html',''
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-static-methods">Static Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="#friends">Friends</a> &#124;
 <a href="classllfio__v2__xxx_1_1handle-members.html">List of all members</a>  </div>
@@ -102,18 +103,18 @@ Inheritance diagram for llfio_v2_xxx::handle:</div>
   <img src="classllfio__v2__xxx_1_1handle.png" usemap="#llfio_5Fv2_5Fxxx::handle_map" alt=""/>
   <map id="llfio_5Fv2_5Fxxx::handle_map" name="llfio_5Fv2_5Fxxx::handle_map">
 <area href="classllfio__v2__xxx_1_1awaitable__handle.html" title="An awaitable handle which attempts to execute the i/o immediately. If the i/o can complete immediatel..." alt="llfio_v2_xxx::awaitable_handle&lt; IoHandleType &gt;" shape="rect" coords="0,56,284,80"/>
-<area href="classllfio__v2__xxx_1_1io__handle.html" title="A handle to something capable of scatter-gather i/o. " alt="llfio_v2_xxx::io_handle" shape="rect" coords="588,56,872,80"/>
+<area href="classllfio__v2__xxx_1_1io__handle.html" title="A handle to something capable of scatter-gather byte i/o. " alt="llfio_v2_xxx::io_handle" shape="rect" coords="441,56,725,80"/>
+<area href="classllfio__v2__xxx_1_1io__multiplexer.html" title="A multiplexer of byte-orientated i/o. " alt="llfio_v2_xxx::io_multiplexer" shape="rect" coords="735,56,1019,80"/>
 <area href="classllfio__v2__xxx_1_1path__handle.html" title="A handle to somewhere originally identified by a path on the filing system. Typically used as the lig..." alt="llfio_v2_xxx::path_handle" shape="rect" coords="1029,56,1313,80"/>
 <area href="classllfio__v2__xxx_1_1section__handle.html" title="A handle to a source of mapped memory. " alt="llfio_v2_xxx::section_handle" shape="rect" coords="1323,56,1607,80"/>
 <area href="classllfio__v2__xxx_1_1symlink__handle.html" title="A handle to an inode which redirects to a different path. " alt="llfio_v2_xxx::symlink_handle" shape="rect" coords="1617,56,1901,80"/>
-<area href="classllfio__v2__xxx_1_1lockable__io__handle.html" title="A handle to something capable of scatter-gather i/o and which can exclude other concurrent users..." alt="llfio_v2_xxx::lockable_io_handle" shape="rect" coords="441,112,725,136"/>
-<area href="classllfio__v2__xxx_1_1pipe__handle.html" title="A handle to a named or anonymous pipe. " alt="llfio_v2_xxx::pipe_handle" shape="rect" coords="735,112,1019,136"/>
+<area href="classllfio__v2__xxx_1_1lockable__io__handle.html" title="A handle to something capable of scatter-gather i/o and which can exclude other concurrent users..." alt="llfio_v2_xxx::lockable_io_handle" shape="rect" coords="294,112,578,136"/>
+<area href="classllfio__v2__xxx_1_1pipe__handle.html" title="A handle to a named or anonymous pipe. " alt="llfio_v2_xxx::pipe_handle" shape="rect" coords="588,112,872,136"/>
 <area href="classllfio__v2__xxx_1_1directory__handle.html" title="A handle to a directory which can be enumerated. " alt="llfio_v2_xxx::directory_handle" shape="rect" coords="1029,112,1313,136"/>
-<area href="classllfio__v2__xxx_1_1file__handle.html" title="A handle to a regular file or device, kept data layout compatible with async_file_handle. " alt="llfio_v2_xxx::file_handle" shape="rect" coords="294,168,578,192"/>
-<area href="classllfio__v2__xxx_1_1map__handle.html" title="A handle to a memory mapped region of memory, either backed by the system page file or by a section..." alt="llfio_v2_xxx::map_handle" shape="rect" coords="588,168,872,192"/>
-<area href="classllfio__v2__xxx_1_1async__file__handle.html" title="An asynchronous handle to an open something. " alt="llfio_v2_xxx::async_file_handle" shape="rect" coords="0,224,284,248"/>
-<area href="classllfio__v2__xxx_1_1fast__random__file__handle.html" title="A handle to synthesised, non-cryptographic, pseudo-random data. " alt="llfio_v2_xxx::fast_random_file_handle" shape="rect" coords="294,224,578,248"/>
-<area href="classllfio__v2__xxx_1_1mapped__file__handle.html" title="A memory mapped regular file or device. " alt="llfio_v2_xxx::mapped_file_handle" shape="rect" coords="588,224,872,248"/>
+<area href="classllfio__v2__xxx_1_1file__handle.html" title="A handle to a regular file or device, kept data layout compatible with async_file_handle. " alt="llfio_v2_xxx::file_handle" shape="rect" coords="147,168,431,192"/>
+<area href="classllfio__v2__xxx_1_1map__handle.html" title="A handle to a memory mapped region of memory, either backed by the system page file or by a section..." alt="llfio_v2_xxx::map_handle" shape="rect" coords="441,168,725,192"/>
+<area href="classllfio__v2__xxx_1_1fast__random__file__handle.html" title="A handle to synthesised, non-cryptographic, pseudo-random data. " alt="llfio_v2_xxx::fast_random_file_handle" shape="rect" coords="0,224,284,248"/>
+<area href="classllfio__v2__xxx_1_1mapped__file__handle.html" title="A memory mapped regular file or device. " alt="llfio_v2_xxx::mapped_file_handle" shape="rect" coords="294,224,578,248"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -182,10 +183,10 @@ Public Member Functions</h2></td></tr>
 constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#aea43917ff5cc28f3da3c622c0b3382c4">handle</a> ()</td></tr>
 <tr class="memdesc:aea43917ff5cc28f3da3c622c0b3382c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
 <tr class="separator:aea43917ff5cc28f3da3c622c0b3382c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a38078be376d13bdf4af2e7867c09ea24"><td class="memItemLeft" align="right" valign="top"><a id="a38078be376d13bdf4af2e7867c09ea24"></a>
-constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a38078be376d13bdf4af2e7867c09ea24">handle</a> (<a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a> h, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a>=<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a334c4a4c42fdb79d7ebc3e73b517e6f8">caching::none</a>, flag <a class="el" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>=flag::none, io_context *ctx=nullptr) noexcept</td></tr>
-<tr class="memdesc:a38078be376d13bdf4af2e7867c09ea24"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a handle from a supplied native handle. <br /></td></tr>
-<tr class="separator:a38078be376d13bdf4af2e7867c09ea24"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7912947fb8fe6270535eb6bddba50d4"><td class="memItemLeft" align="right" valign="top"><a id="ad7912947fb8fe6270535eb6bddba50d4"></a>
+constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#ad7912947fb8fe6270535eb6bddba50d4">handle</a> (<a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a> h, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a>=<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a334c4a4c42fdb79d7ebc3e73b517e6f8">caching::none</a>, flag <a class="el" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>=flag::none) noexcept</td></tr>
+<tr class="memdesc:ad7912947fb8fe6270535eb6bddba50d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a handle from a supplied native handle. <br /></td></tr>
+<tr class="separator:ad7912947fb8fe6270535eb6bddba50d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a798fa51a935da9b16ed7bb565b3a4c11"><td class="memItemLeft" align="right" valign="top"><a id="a798fa51a935da9b16ed7bb565b3a4c11"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a798fa51a935da9b16ed7bb565b3a4c11">handle</a> (const <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;)=delete</td></tr>
 <tr class="memdesc:a798fa51a935da9b16ed7bb565b3a4c11"><td class="mdescLeft">&#160;</td><td class="mdescRight">No copy construction (use clone()) <br /></td></tr>
@@ -206,18 +207,14 @@ constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a4716696b8700953889006251e0678aa4">swap</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;o) noexcept</td></tr>
 <tr class="memdesc:a4716696b8700953889006251e0678aa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br /></td></tr>
 <tr class="separator:a4716696b8700953889006251e0678aa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a02769f641a80a18ef52431df9c530d9b"><td class="memItemLeft" align="right" valign="top"><a id="a02769f641a80a18ef52431df9c530d9b"></a>
-io_context *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a02769f641a80a18ef52431df9c530d9b">multiplexer</a> () const noexcept</td></tr>
-<tr class="memdesc:a02769f641a80a18ef52431df9c530d9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The i/o context this handle will use to multiplex i/o, if any. <br /></td></tr>
-<tr class="separator:a02769f641a80a18ef52431df9c530d9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a00a85eec5a41f7edb2c574d40cf04535"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html#a33481bae57d9ccd0c97946416f9682f3">path_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a00a85eec5a41f7edb2c574d40cf04535">current_path</a> () const noexcept</td></tr>
 <tr class="separator:a00a85eec5a41f7edb2c574d40cf04535"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a62a75b1a4a24fbc9ad2e98a641167db6"><td class="memItemLeft" align="right" valign="top"><a id="a62a75b1a4a24fbc9ad2e98a641167db6"></a>
 virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a62a75b1a4a24fbc9ad2e98a641167db6">close</a> () noexcept</td></tr>
 <tr class="memdesc:a62a75b1a4a24fbc9ad2e98a641167db6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Immediately close the native handle type managed by this handle. <br /></td></tr>
 <tr class="separator:a62a75b1a4a24fbc9ad2e98a641167db6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a46ee43d56e2665596b94721de986928b"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a46ee43d56e2665596b94721de986928b">clone</a> () const noexcept</td></tr>
-<tr class="separator:a46ee43d56e2665596b94721de986928b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeea4389189021b94dde6d8f2c3ccc5b3"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#aeea4389189021b94dde6d8f2c3ccc5b3">clone</a> () const noexcept</td></tr>
+<tr class="separator:aeea4389189021b94dde6d8f2c3ccc5b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d273e38c061eb11f5012f624e9a202e"><td class="memItemLeft" align="right" valign="top"><a id="a1d273e38c061eb11f5012f624e9a202e"></a>
 virtual <a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a1d273e38c061eb11f5012f624e9a202e">release</a> () noexcept</td></tr>
 <tr class="memdesc:a1d273e38c061eb11f5012f624e9a202e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release the native handle type managed by this handle. <br /></td></tr>
@@ -318,26 +315,17 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memdesc:a942b0d276c9f20fe41baab679b88fe72"><td class="mdescLeft">&#160;</td><td class="mdescRight">The native handle used by this handle. <br /></td></tr>
 <tr class="separator:a942b0d276c9f20fe41baab679b88fe72"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-methods"></a>
+Static Protected Member Functions</h2></td></tr>
+<tr class="memitem:a1dd1abc0bd1fa1f10782301dddf802b7"><td class="memItemLeft" align="right" valign="top"><a id="a1dd1abc0bd1fa1f10782301dddf802b7"></a>
+static constexpr void&#160;</td><td class="memItemRight" valign="bottom"><b>_set_caching</b> (<a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a> &amp;nativeh, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a>) noexcept</td></tr>
+<tr class="separator:a1dd1abc0bd1fa1f10782301dddf802b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:a62e96574f55004ba472515ad3dddfaf9"><td class="memItemLeft" align="right" valign="top"><a id="a62e96574f55004ba472515ad3dddfaf9"></a>
-io_context *&#160;</td><td class="memItemRight" valign="bottom"><b>_ctx</b> {nullptr}</td></tr>
-<tr class="separator:a62e96574f55004ba472515ad3dddfaf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d6911771ac743fd9d64063c12429deb"><td class="memItemLeft" align="right" valign="top"><a id="a1d6911771ac743fd9d64063c12429deb"></a>
 <a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a>&#160;</td><td class="memItemRight" valign="bottom"><b>_v</b></td></tr>
 <tr class="separator:a1d6911771ac743fd9d64063c12429deb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:affb091ded80ffde7c0c3854e2abc52fd"><td class="memItemLeft" align="right" valign="top"><a id="affb091ded80ffde7c0c3854e2abc52fd"></a>
-<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a>&#160;</td><td class="memItemRight" valign="bottom"><b>_caching</b> {<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a334c4a4c42fdb79d7ebc3e73b517e6f8">caching::none</a>}</td></tr>
-<tr class="separator:affb091ded80ffde7c0c3854e2abc52fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac9b7fc732e8377fa52998444ca017324"><td class="memItemLeft" align="right" valign="top"><a id="ac9b7fc732e8377fa52998444ca017324"></a>
-char&#160;</td><td class="memItemRight" valign="bottom"><b>_spare1</b> {0}</td></tr>
-<tr class="separator:ac9b7fc732e8377fa52998444ca017324"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a06549b892262ce0bd9c19c8d3766c156"><td class="memItemLeft" align="right" valign="top"><a id="a06549b892262ce0bd9c19c8d3766c156"></a>
-char&#160;</td><td class="memItemRight" valign="bottom"><b>_spare2</b> {0}</td></tr>
-<tr class="separator:a06549b892262ce0bd9c19c8d3766c156"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aab27d9f03fc2e650e73005b17e36605b"><td class="memItemLeft" align="right" valign="top"><a id="aab27d9f03fc2e650e73005b17e36605b"></a>
-char&#160;</td><td class="memItemRight" valign="bottom"><b>_spare3</b> {0}</td></tr>
-<tr class="separator:aab27d9f03fc2e650e73005b17e36605b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad758cf1eb2e0b4c63583eab05e7f6820"><td class="memItemLeft" align="right" valign="top"><a id="ad758cf1eb2e0b4c63583eab05e7f6820"></a>
 flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b> {flag::none}</td></tr>
 <tr class="separator:ad758cf1eb2e0b4c63583eab05e7f6820"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -465,14 +453,14 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <tr><td class="fieldname"><a id="aa3930273a2d4cabbac309e0b75701dcaa9516dfb15f51c7ee19a4d46b8c0dbe1d"></a>append&#160;</td><td class="fielddoc"><p>All mainstream OSs and CIFS guarantee this is atomic with respect to all other appenders (FILE_APPEND_DATA|SYNCHRONISE or O_APPEND) </p>
 </td></tr>
 </table>
-<div class="fragment"><div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;                  : <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>  <span class="comment">// bit 0 set means writable</span></div><div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  {</div><div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    unchanged = 0,</div><div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    none = 2,        <span class="comment">//!&lt; No ability to read or write anything, but can synchronise (SYNCHRONIZE or 0)</span></div><div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="comment"></span>    attr_read = 4,   <span class="comment">//!&lt; Ability to read attributes (FILE_READ_ATTRIBUTES|SYNCHRONIZE or O_RDONLY)</span></div><div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment"></span>    attr_write = 5,  <span class="comment">//!&lt; Ability to read and write attributes (FILE_READ_ATTRIBUTES|FILE_WRITE_ATTRIBUTES|SYNCHRONIZE or O_RDONLY)</span></div><div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment"></span>    <a class="code" href="namespacellfio__v2__xxx.html#af678f58d20e1f0962ff0744150342683">read</a> = 6,        <span class="comment">//!&lt; Ability to read (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|SYNCHRONISE or O_RDONLY)</span></div><div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment"></span>    <a class="code" href="namespacellfio__v2__xxx.html#a5a8908704c9988bbecc69c2359e6fd4a">write</a> = 7,       <span class="comment">//!&lt; Ability to read and write (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|FILE_WRITE_DATA|FILE_WRITE_ATTRIBUTES|FILE_WRITE_EA|FILE_APPEND_DATA|SYNCHRONISE or O_RDWR)</span></div><div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="comment"></span>    append = 9       <span class="comment">//!&lt; All mainstream OSs and CIFS guarantee this is atomic with respect to all other appenders (FILE_APPEND_DATA|SYNCHRONISE or O_APPEND)</span></div><div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="comment"></span>                     <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div><div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  };</div><div class="ttc" id="namespacellfio__v2__xxx_html_af678f58d20e1f0962ff0744150342683"><div class="ttname"><a href="namespacellfio__v2__xxx.html#af678f58d20e1f0962ff0744150342683">llfio_v2_xxx::read</a></div><div class="ttdeci">file_handle::io_result&lt; file_handle::size_type &gt; read(file_handle &amp;self, file_handle::extent_type offset, std::initializer_list&lt; file_handle::buffer_type &gt; lst, deadline d=deadline()) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:420</div></div>
-<div class="ttc" id="namespacellfio__v2__xxx_html_a5a8908704c9988bbecc69c2359e6fd4a"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a5a8908704c9988bbecc69c2359e6fd4a">llfio_v2_xxx::write</a></div><div class="ttdeci">io_handle::io_result&lt; io_handle::const_buffers_type &gt; write(io_handle &amp;self, io_handle::io_request&lt; io_handle::const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the open handle. </div><div class="ttdef"><b>Definition:</b> io_handle.hpp:468</div></div>
+<div class="fragment"><div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;                  : <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>  <span class="comment">// bit 0 set means writable</span></div><div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  {</div><div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    unchanged = 0,</div><div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    none = 2,        <span class="comment">//!&lt; No ability to read or write anything, but can synchronise (SYNCHRONIZE or 0)</span></div><div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="comment"></span>    attr_read = 4,   <span class="comment">//!&lt; Ability to read attributes (FILE_READ_ATTRIBUTES|SYNCHRONIZE or O_RDONLY)</span></div><div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment"></span>    attr_write = 5,  <span class="comment">//!&lt; Ability to read and write attributes (FILE_READ_ATTRIBUTES|FILE_WRITE_ATTRIBUTES|SYNCHRONIZE or O_RDONLY)</span></div><div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment"></span>    <a class="code" href="namespacellfio__v2__xxx.html#af678f58d20e1f0962ff0744150342683">read</a> = 6,        <span class="comment">//!&lt; Ability to read (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|SYNCHRONISE or O_RDONLY)</span></div><div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment"></span>    <a class="code" href="namespacellfio__v2__xxx.html#a5a8908704c9988bbecc69c2359e6fd4a">write</a> = 7,       <span class="comment">//!&lt; Ability to read and write (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|FILE_WRITE_DATA|FILE_WRITE_ATTRIBUTES|FILE_WRITE_EA|FILE_APPEND_DATA|SYNCHRONISE or O_RDWR)</span></div><div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="comment"></span>    append = 9       <span class="comment">//!&lt; All mainstream OSs and CIFS guarantee this is atomic with respect to all other appenders (FILE_APPEND_DATA|SYNCHRONISE or O_APPEND)</span></div><div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="comment"></span>                     <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div><div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  };</div><div class="ttc" id="namespacellfio__v2__xxx_html_af678f58d20e1f0962ff0744150342683"><div class="ttname"><a href="namespacellfio__v2__xxx.html#af678f58d20e1f0962ff0744150342683">llfio_v2_xxx::read</a></div><div class="ttdeci">file_handle::io_result&lt; file_handle::size_type &gt; read(file_handle &amp;self, file_handle::extent_type offset, std::initializer_list&lt; file_handle::buffer_type &gt; lst, deadline d=deadline()) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:405</div></div>
+<div class="ttc" id="namespacellfio__v2__xxx_html_a5a8908704c9988bbecc69c2359e6fd4a"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a5a8908704c9988bbecc69c2359e6fd4a">llfio_v2_xxx::write</a></div><div class="ttdeci">io_handle::io_result&lt; io_handle::const_buffers_type &gt; write(io_handle &amp;self, io_handle::io_request&lt; io_handle::const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the open handle. </div><div class="ttdef"><b>Definition:</b> io_handle.hpp:475</div></div>
 </div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a46ee43d56e2665596b94721de986928b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a46ee43d56e2665596b94721de986928b">&#9670;&nbsp;</a></span>clone()</h2>
+<a id="aeea4389189021b94dde6d8f2c3ccc5b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeea4389189021b94dde6d8f2c3ccc5b3">&#9670;&nbsp;</a></span>clone()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -481,7 +469,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual result&lt;<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a>&gt; llfio_v2_xxx::handle::clone </td>
+          <td class="memname">result&lt;<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a>&gt; llfio_v2_xxx::handle::clone </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -489,14 +477,12 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 <p>Clone this handle (copy constructor is disabled to avoid accidental copying)</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or DuplicateHandle() can return. </dd></dl>
-
-<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a97713c4f87b28e62f856665185ea6a18">llfio_v2_xxx::file_handle</a>.</p>
 
 </div>
 </div>

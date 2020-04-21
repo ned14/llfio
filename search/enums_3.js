@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['kvstore_5ferrc',['kvstore_errc',['../namespacekvstore__v1__xxx.html#a7bc2f2673bddc429b098b16e413deb5f',1,'kvstore_v1_xxx']]]
+  ['io_5foperation_5fstate_5ftype',['io_operation_state_type',['../namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745',1,'llfio_v2_xxx']]]
 ];

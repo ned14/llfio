@@ -83,11 +83,14 @@ $(document).ready(function(){initNavTree('functions_i.html','');});
 <div class="textblock">Here is a list of all documented class members with links to the class documentation for each member:</div>
 
 <h3><a id="index_i"></a>- i -</h3><ul>
-<li>insert()
-: <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a9ce5b87e963aa7a8f968ed23adcd2046">llfio_v2_xxx::algorithm::impl::trivial_vector_impl&lt; has_default_construction, T &gt;</a>
+<li>init_io_operation()
+: <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#a0671539dc8999d202780ffa9841feac8">llfio_v2_xxx::io_multiplexer</a>
 </li>
-<li>interruption_signal()
-: <a class="el" href="classllfio__v2__xxx_1_1io__service.html#af8573e0ad8a91f3778867c710f30a914">llfio_v2_xxx::io_service</a>
+<li>initiated_ios_completed
+: <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1wait__for__completed__io__statistics.html#a387d81d311c22417971fd488b0f7e95a">llfio_v2_xxx::io_multiplexer::wait_for_completed_io_statistics</a>
+</li>
+<li>insert()
+: <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#af7813ac4dde322154b5ca70e06494905">llfio_v2_xxx::algorithm::impl::trivial_vector_impl&lt; has_default_construction, T &gt;</a>
 </li>
 <li>invoke()
 : <a class="el" href="structllfio__v2__xxx_1_1storage__profile_1_1item__erased.html#a304587736d13127b67f68e09a397a4fd">llfio_v2_xxx::storage_profile::item_erased</a>
@@ -102,19 +105,14 @@ $(document).ready(function(){initNavTree('functions_i.html','');});
 <li>io_request
 : <a class="el" href="classkvstore__v1__xxx_1_1basic__key__value__store.html#a2cea87068cef2cd35b2aec15a5130761">kvstore_v1_xxx::basic_key_value_store</a>
 , <a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1io__request.html#aaa243dbd10f9b7bab5e42d971804ab61">llfio_v2_xxx::directory_handle::io_request&lt; class &gt;</a>
-, <a class="el" href="classllfio__v2__xxx_1_1io__service.html#a0ea83f90b912f0a776aa0a4e657db78e">llfio_v2_xxx::io_service</a>
 , <a class="el" href="structllfio__v2__xxx_1_1symlink__handle_1_1io__request_3_01buffers__type_00_01_________01_4.html#a9712d301efd63761573e42c530860b6c">llfio_v2_xxx::symlink_handle::io_request&lt; buffers_type, ____ &gt;</a>
 , <a class="el" href="structllfio__v2__xxx_1_1symlink__handle_1_1io__request_3_01const__buffers__type_00_01_________01_4.html#a33e29e085faf927b441f5bc6432051fd">llfio_v2_xxx::symlink_handle::io_request&lt; const_buffers_type, ____ &gt;</a>
 </li>
 <li>io_result
 : <a class="el" href="classkvstore__v1__xxx_1_1basic__key__value__store.html#a67508b71656ccd24173677db521c263d">kvstore_v1_xxx::basic_key_value_store</a>
-, <a class="el" href="classllfio__v2__xxx_1_1io__service.html#a7db8542d0bb76eb78a40adb48cf9f96e">llfio_v2_xxx::io_service</a>
 </li>
-<li>io_service()
-: <a class="el" href="classllfio__v2__xxx_1_1io__service.html#a6a00c11cd49640dffc2bae95f13b6835">llfio_v2_xxx::io_service</a>
-</li>
-<li>io_state_ptr
-: <a class="el" href="classllfio__v2__xxx_1_1async__file__handle.html#a8c38344215baf024148e144735f3cb67">llfio_v2_xxx::async_file_handle</a>
+<li>io_state_requirements()
+: <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#afcc26074f96f9b403c539171335772b7">llfio_v2_xxx::io_multiplexer</a>
 </li>
 <li>is_allocation()
 : <a class="el" href="classllfio__v2__xxx_1_1handle.html#a028fbead3b3c4d4eed2da7fa51c75036">llfio_v2_xxx::handle</a>
@@ -195,8 +193,8 @@ $(document).ready(function(){initNavTree('functions_i.html','');});
 <li>iterator
 : <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a4d56314037ed44e7ca2c6ed352a53fb4">llfio_v2_xxx::algorithm::impl::trivial_vector_impl&lt; has_default_construction, T &gt;</a>
 , <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a4d7c7541169fc5a4daa1305bf0474a8d">llfio_v2_xxx::algorithm::impl::trivial_vector_impl&lt; true, T &gt;</a>
-, <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1buffer__type.html#a3a52ec7ae245e4056ccec17ecc97d7b5">llfio_v2_xxx::io_handle::buffer_type</a>
-, <a class="el" href="structllfio__v2__xxx_1_1io__handle_1_1const__buffer__type.html#aa3317755ad6cdbefb40f4e99c9f872ce">llfio_v2_xxx::io_handle::const_buffer_type</a>
+, <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1buffer__type.html#aea18fa562d4156b56742ddaba4c2dae2">llfio_v2_xxx::io_multiplexer::buffer_type</a>
+, <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1const__buffer__type.html#a0d9af8d5e7776761ca69c90016a6dcba">llfio_v2_xxx::io_multiplexer::const_buffer_type</a>
 , <a class="el" href="classllfio__v2__xxx_1_1mapped.html#a6645c7abab4aea56e09ba4241b106cc4">llfio_v2_xxx::mapped&lt; T &gt;</a>
 , <a class="el" href="classllfio__v2__xxx_1_1path__view.html#a7bfb0a79057416a10f43cf25b4c6c57a">llfio_v2_xxx::path_view</a>
 , <a class="el" href="structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html#ac72468c441bcfd2d3989381600f6c923">llfio_v2_xxx::storage_profile::storage_profile</a>

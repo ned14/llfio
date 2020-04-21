@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['rdonly',['rdonly',['../structllfio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#ab81fc2389da706385f01c68e45aa4d44',1,'llfio_v2_xxx::statfs_t::f_flags_t']]]
+  ['offset',['offset',['../structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html#a262bee34ba37e87b3a837ab45724693e',1,'llfio_v2_xxx::file_handle::extent_pair']]]
 ];
