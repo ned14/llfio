@@ -197,24 +197,49 @@ public:
 
 protected:
   // vptr takes 4 or 8 bytes
-  io_context *_ctx{nullptr};  // 8 or 16 bytes
-  native_handle_type _v;      // 16 or 28 bytes
-  caching _caching{caching::none};
-  char _spare1{0};  // used by pipe_handle
-  char _spare2{0};
-  char _spare3{0};          // 20 or 32 bytes
-  flag _flags{flag::none};  // 24 or 36 bytes
+  native_handle_type _v;    // +8 or +12: total 12 or 20 bytes
+  flag _flags{flag::none};  // +4: total 16 or 24 bytes
+
+  static constexpr void _set_caching(native_handle_type &nativeh, caching caching) noexcept
+  {
+    nativeh.behaviour &= ~(native_handle_type::disposition::safety_barriers | native_handle_type::disposition::cache_metadata | native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes | native_handle_type::disposition::cache_temporary);
+    switch(caching)
+    {
+    case caching::unchanged:
+      break;
+    case caching::none:
+      nativeh.behaviour |= native_handle_type::disposition::safety_barriers;
+      break;
+    case caching::only_metadata:
+      nativeh.behaviour |= native_handle_type::disposition::cache_metadata;
+      break;
+    case caching::reads:
+      nativeh.behaviour |= native_handle_type::disposition::cache_reads | native_handle_type::disposition::safety_barriers;
+      break;
+    case caching::reads_and_metadata:
+      nativeh.behaviour |= native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_metadata | native_handle_type::disposition::safety_barriers;
+      break;
+    case caching::all:
+      nativeh.behaviour |= native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes | native_handle_type::disposition::cache_metadata;
+      break;
+    case caching::safety_barriers:
+      nativeh.behaviour |= native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes | native_handle_type::disposition::cache_metadata | native_handle_type::disposition::safety_barriers;
+      break;
+    case caching::temporary:
+      nativeh.behaviour |= native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes | native_handle_type::disposition::cache_metadata | native_handle_type::disposition::cache_temporary;
+      break;
+    }
+  }
 
 public:
   //! Default constructor
   constexpr handle() {}  // NOLINT
   //! Construct a handle from a supplied native handle
-  explicit constexpr handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none, io_context *ctx = nullptr) noexcept
-      : _ctx(ctx)
-      , _v(std::move(h))
-      , _caching(caching)
+  explicit constexpr handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none) noexcept
+      : _v(std::move(h))
       , _flags(flags)
   {
+    _set_caching(_v, caching);
   }
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~handle();
   //! No copy construction (use clone())
@@ -223,17 +248,10 @@ public:
   handle &operator=(const handle &o) = delete;
   //! Move the handle.
   constexpr handle(handle &&o) noexcept
-      : _ctx(o._ctx)
-      , _v(std::move(o._v))
-      , _caching(o._caching)
-      , _spare1(o._spare1)
-      , _spare2(o._spare2)
-      , _spare3(o._spare3)
+      : _v(std::move(o._v))
       , _flags(o._flags)
   {
-    o._ctx = nullptr;
     o._v = native_handle_type();
-    o._caching = caching::none;
     o._flags = flag::none;
   }
   //! Move assignment of handle
@@ -251,9 +269,6 @@ public:
     *this = std::move(o);
     o = std::move(temp);
   }
-
-  //! The i/o context this handle will use to multiplex i/o, if any
-  io_context *multiplexer() const noexcept { return _ctx; }
 
   /*! Returns the current path of the open handle as said by the operating system. Note
   that you are NOT guaranteed that any path refreshed bears any resemblance to the original,
@@ -300,7 +315,7 @@ public:
 
   \errors Any of the values POSIX dup() or DuplicateHandle() can return.
   */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<handle> clone() const noexcept;
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<handle> clone() const noexcept;
   //! Release the native handle type managed by this handle
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept
   {
@@ -358,20 +373,47 @@ public:
   bool is_allocation() const noexcept { return _v.is_allocation(); }
 
   //! Kernel cache strategy used by this handle
-  caching kernel_caching() const noexcept { return _caching; }
+  caching kernel_caching() const noexcept { 
+    const bool safety_barriers = !!(_v.behaviour & native_handle_type::disposition::safety_barriers);
+    const bool cache_metadata = !!(_v.behaviour & native_handle_type::disposition::cache_metadata);
+    const bool cache_reads = !!(_v.behaviour & native_handle_type::disposition::cache_reads);
+    const bool cache_writes = !!(_v.behaviour & native_handle_type::disposition::cache_writes);
+    const bool cache_temporary = !!(_v.behaviour & native_handle_type::disposition::cache_temporary);
+    if(cache_temporary)
+    {
+      return caching::temporary;
+    }
+    if(cache_metadata && cache_reads && cache_writes)
+    {
+      return safety_barriers ? caching::safety_barriers : caching::all;
+    }
+    if(cache_metadata && cache_reads)
+    {
+      return caching::reads_and_metadata;
+    }
+    if(cache_reads)
+    {
+      return caching::reads;
+    }
+    if(cache_metadata)
+    {
+      return caching::only_metadata;
+    }
+    return caching::none;
+  }
   //! True if the handle uses the kernel page cache for reads
-  bool are_reads_from_cache() const noexcept { return _caching != caching::none && _caching != caching::only_metadata; }
+  bool are_reads_from_cache() const noexcept { return !!(_v.behaviour & native_handle_type::disposition::cache_reads); }
   //! True if writes are safely on storage on completion
-  bool are_writes_durable() const noexcept { return _caching == caching::none || _caching == caching::reads || _caching == caching::reads_and_metadata; }
+  bool are_writes_durable() const noexcept { return !(_v.behaviour & native_handle_type::disposition::cache_writes); }
   //! True if issuing safety fsyncs is on
-  bool are_safety_barriers_issued() const noexcept { return !(_flags & flag::disable_safety_barriers) && !((static_cast<unsigned>(_caching) & 1U) == 0U); }
+  bool are_safety_barriers_issued() const noexcept { return !!(_v.behaviour & native_handle_type::disposition::safety_barriers); }
 
   //! The flags this handle was opened with
   flag flags() const noexcept { return _flags; }
   //! The native handle used by this handle
   native_handle_type native_handle() const noexcept { return _v; }
 };
-static_assert((sizeof(void *) == 4 && sizeof(handle) == 24) || (sizeof(void *) == 8 && sizeof(handle) == 36), "handle is not 24 or 36 bytes in size!");
+static_assert((sizeof(void *) == 4 && sizeof(handle) == 16) || (sizeof(void *) == 8 && sizeof(handle) == 24), "handle is not 16 or 24 bytes in size!");
 
 #pragma pack(pop)
 

@@ -170,7 +170,7 @@ result<void> map_handle::close() noexcept
   {
     if(is_writable() && (_flag & section_handle::flag::barrier_on_close))
     {
-      OUTCOME_TRYV(map_handle::barrier({}, barrier_kind::wait_all));
+      OUTCOME_TRYV(map_handle::barrier(barrier_kind::wait_all));
     }
     // printf("%d munmap %p-%p\n", getpid(), _addr, _addr+_reservation);
     if(-1 == ::munmap(_addr, _reservation))
@@ -213,7 +213,7 @@ native_handle_type map_handle::release() noexcept
   return {};
 }
 
-map_handle::io_result<map_handle::const_buffers_type> map_handle::barrier(map_handle::io_request<map_handle::const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
+map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_barrier(map_handle::io_request<map_handle::const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   byte *addr = _addr + reqs.offset;
@@ -632,7 +632,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
   return region;
 }
 
-map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buffers_type> reqs, deadline /*d*/) noexcept
+map_handle::io_result<map_handle::buffers_type> map_handle::_do_read(io_request<buffers_type> reqs, deadline /*d*/) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   byte *addr = _addr + reqs.offset;
@@ -653,7 +653,7 @@ map_handle::io_result<map_handle::buffers_type> map_handle::read(io_request<buff
   return reqs.buffers;
 }
 
-map_handle::io_result<map_handle::const_buffers_type> map_handle::write(io_request<const_buffers_type> reqs, deadline d) noexcept
+map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_write(io_request<const_buffers_type> reqs, deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   if(!!(_flag & section_handle::flag::write_via_syscall) && _section != nullptr && _section->backing() != nullptr)

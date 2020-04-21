@@ -506,9 +506,14 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
   //! Releases the mapped view, but does NOT release the native handle.
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override;
-  LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), barrier_kind kind = barrier_kind::nowait_data_only, deadline d = deadline()) noexcept override;
 
+protected:
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t _do_max_buffers() const noexcept override { return 0; }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), barrier_kind kind = barrier_kind::nowait_data_only, deadline d = deadline()) noexcept override;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> _do_read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override;
+
+public:
   /*! Map unused memory into view, creating new memory if insufficient unused memory is available
   (i.e. add the returned memory to the process' commit charge, unless `flag::nocommit`
   was specified). Note that the memory mapped by this call may contain non-zero bits (recycled memory)
@@ -697,6 +702,7 @@ public:
     return *ret.data();
   }
 
+#if 0
   /*! \brief Read data from the mapped view.
 
   \note Because this implementation never copies memory, you can pass in buffers with a null address. As this
@@ -710,10 +716,10 @@ public:
   \errors None, though the various signals and structured exception throws common to using memory maps may occur.
   \mallocs None.
   */
-  LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
+#endif
   using io_handle::read;
 
+#if 0
   /*! \brief Write data to the mapped view.
 
   If this map is backed by a file, and `section_handle::flag::write_via_syscall` is set, this function is
@@ -722,7 +728,7 @@ public:
   a unified kernel page cache, so it should not be normally enabled. However, this technique is known to work
   around various kernel bugs, quirks and race conditions found in modern OS kernels when memory mapped i/o
   is performed at scale (files of many tens of Gb each).
- 
+
  \note This call traps signals and structured exception throws using `QUICKCPPLIB_NAMESPACE::signal_guard`.
   Instantiating a `QUICKCPPLIB_NAMESPACE::signal_guard_install` somewhere much higher up in the call stack
   will improve performance enormously. The signal guard may cost less than 100 CPU cycles depending on how
@@ -737,8 +743,7 @@ public:
   of the raised signal, but it is by far the most likely.
   \mallocs None if a `QUICKCPPLIB_NAMESPACE::signal_guard_install` is already instanced.
   */
-  LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override;
+#endif
   using io_handle::write;
 };
 
@@ -774,6 +779,83 @@ LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 template <class T> constexpr inline span<T> in_place_attach(map_handle &mh) noexcept
 {
   return span<T>{reinterpret_cast<T *>(mh.address()), mh.length() / sizeof(T)};
+}
+
+namespace detail
+{
+  inline result<io_handle::registered_buffer_type> map_handle_allocate_registered_buffer(size_t &bytes) noexcept
+  {
+    try
+    {
+      auto make_shared = [](map_handle h) {
+        struct registered_buffer_type_indirect : io_multiplexer::_registered_buffer_type
+        {
+          map_handle h;
+          registered_buffer_type_indirect(map_handle _h)
+              : io_multiplexer::_registered_buffer_type(_h.as_span())
+              , h(std::move(_h))
+          {
+          }
+        };
+        auto ptr = std::make_shared<registered_buffer_type_indirect>(std::move(h));
+        return ptr;
+      };
+      const auto &page_sizes = utils::page_sizes(true);
+      size_t idx = 0;
+      for(size_t n = 0; n < page_sizes.size(); ++n)
+      {
+        if(page_sizes[n] > bytes)
+        {
+          break;
+        }
+        if((bytes & (page_sizes[n] - 1)) == 0)
+        {
+          idx = n;
+        }
+      }
+      section_handle::flag flags = section_handle::flag::readwrite;
+      if(idx > 0)
+      {
+        switch(idx)
+        {
+        case 1:
+          flags |= section_handle::flag::page_sizes_1;
+          break;
+        case 2:
+          flags |= section_handle::flag::page_sizes_2;
+          break;
+        case 3:
+          flags |= section_handle::flag::page_sizes_3;
+          break;
+        default:
+          break;
+        }
+        auto r = map_handle::map(bytes, false, flags);
+        if(r)
+        {
+          bytes = (bytes + page_sizes[idx] - 1) & ~(page_sizes[idx] - 1);
+          return make_shared(std::move(r).value());
+        }
+      }
+      auto r = map_handle::map(bytes, false);
+      if(r)
+      {
+        bytes = (bytes + page_sizes[0] - 1) & ~(page_sizes[0] - 1);
+        return make_shared(std::move(r).value());
+      }
+      return errc::not_enough_memory;
+    }
+    catch(...)
+    {
+      return error_from_exception();
+    }
+  }
+}  // namespace detail
+
+// Implement io_handle::_do_allocate_registered_buffer()
+inline result<io_handle::registered_buffer_type> io_handle::_do_allocate_registered_buffer(size_t &bytes) noexcept
+{
+  return detail::map_handle_allocate_registered_buffer(bytes);
 }
 
 // BEGIN make_free_functions.py

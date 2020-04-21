@@ -25,7 +25,6 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../utils.hpp"
 
 #include "import.hpp"
-#include "quickcpplib/spinlock.hpp"
 
 LLFIO_V2_NAMESPACE_BEGIN
 
@@ -54,7 +53,7 @@ namespace utils
 #endif
   const std::vector<size_t> &page_sizes(bool only_actually_available)
   {
-    static QUICKCPPLIB_NAMESPACE::configurable_spinlock::spinlock<bool> lock;
+    static spinlock lock;
     std::lock_guard<decltype(lock)> g(lock);
     static std::vector<size_t> pagesizes, pagesizes_available;
     if(pagesizes.empty())

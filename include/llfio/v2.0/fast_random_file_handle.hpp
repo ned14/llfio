@@ -132,6 +132,30 @@ protected:
     return success();
   }
 
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t _do_max_buffers() const noexcept override { return 0; }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), barrier_kind /*unused*/ = barrier_kind::nowait_data_only, deadline /* unused */ = deadline()) noexcept override
+  {
+    OUTCOME_TRY(_perms_check());
+    // Return null written
+    for(auto &buffer : reqs.buffers)
+    {
+      buffer = {buffer.data(), 0};
+    }
+    return std::move(reqs.buffers);
+  }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> _do_read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override
+  {
+    (void) d;
+    OUTCOME_TRY(_perms_check());
+    // Return null written
+    for(auto &buffer : reqs.buffers)
+    {
+      buffer = {buffer.data(), 0};
+    }
+    return std::move(reqs.buffers);
+  }
+
 public:
   //! Default constructor
   fast_random_file_handle() = default;
@@ -227,10 +251,7 @@ public:
   //! \brief Return a single extent of the maximum extent
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<std::vector<file_handle::extent_pair>> extents() const noexcept override { return std::vector<file_handle::extent_pair>{{0, _length}}; }
 
-
-  using file_handle::read;
-  using file_handle::write;
-
+#if 0
   /*! \brief Read data from the random file.
 
   Note that ensuring that the scatter buffers are address and size aligned to 16 byte (128 bit) multiples will give
@@ -243,9 +264,10 @@ public:
   \errors None possible.
   \mallocs None possible.
   */
-  LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
+#endif
+  using file_handle::read;
 
+#if 0
   /*! \brief Fails to write to the random file.
 
   If the handle was not opened with write permissions, this will fail with a code comparing equal to `errc::permission_denied`.
@@ -257,30 +279,8 @@ public:
   \errors None possible if handle was opened with write permissions.
   \mallocs None possible.
   */
-  LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override
-  {
-    (void) d;
-    OUTCOME_TRY(_perms_check());
-    // Return null written
-    for(auto &buffer : reqs.buffers)
-    {
-      buffer = {buffer.data(), 0};
-    }
-    return std::move(reqs.buffers);
-  }
-
-  LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), barrier_kind /*unused*/ = barrier_kind::nowait_data_only, deadline /* unused */ = deadline()) noexcept override
-  {
-    OUTCOME_TRY(_perms_check());
-    // Return null written
-    for(auto &buffer : reqs.buffers)
-    {
-      buffer = {buffer.data(), 0};
-    }
-    return std::move(reqs.buffers);
-  }
+#endif
+  using file_handle::write;
 
 private:
   struct _extent_guard : public extent_guard

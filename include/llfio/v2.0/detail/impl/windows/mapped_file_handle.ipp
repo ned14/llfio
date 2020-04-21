@@ -58,13 +58,18 @@ result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type rese
     return _reservation;
   }
   section_handle::flag mapflags = section_handle::flag::read;
+  auto map_size = reservation;
   // Reserve the full reservation in address space
   if(this->is_writable())
   {
     mapflags |= section_handle::flag::write | section_handle::flag::nocommit;
   }
+  else if(map_size > length)
+  {
+    map_size = length;
+  }
   OUTCOME_TRYV(_mh.close());
-  OUTCOME_TRY(mh, map_handle::map(_sh, reservation, 0, mapflags));
+  OUTCOME_TRY(mh, map_handle::map(_sh, map_size, 0, mapflags));
   _mh = std::move(mh);
   _reservation = reservation;
   return _reservation;

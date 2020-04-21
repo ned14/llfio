@@ -113,7 +113,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     }
     if(ntstat < 0)
     {
-      if(creation::always_new == _creation && 0xc0000035 /*STATUS_OBJECT_NAME_COLLISION*/ == ntstat)
+      if(creation::always_new == _creation && (NTSTATUS) 0xc0000035 /*STATUS_OBJECT_NAME_COLLISION*/ == ntstat)
       {
         return errc::directory_not_empty;
       }
@@ -206,7 +206,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
 result<directory_handle> directory_handle::reopen(mode mode_, caching caching_, deadline /* unused */) const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  result<directory_handle> ret(directory_handle(native_handle_type(), _devid, _inode, _caching, _flags));
+  result<directory_handle> ret(directory_handle(native_handle_type(), _devid, _inode, kernel_caching(), _flags));
   OUTCOME_TRY(do_clone_handle(ret.value()._v, _v, mode_, caching_, _flags, true));
   return ret;
 }
@@ -214,7 +214,7 @@ result<directory_handle> directory_handle::reopen(mode mode_, caching caching_, 
 LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> directory_handle::clone_to_path_handle() const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  result<path_handle> ret(path_handle(native_handle_type(), _caching, _flags));
+  result<path_handle> ret(path_handle(native_handle_type(), kernel_caching(), _flags));
   ret.value()._v.behaviour = _v.behaviour;
   if(DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, 0, DUPLICATE_SAME_ACCESS) == 0)
   {
@@ -250,7 +250,7 @@ namespace detail
       return ntkernel_error(ntstat);
     }
     // Return as a file handle so the direct relink and unlink are used
-    return file_handle(nativeh, 0, 0, file_handle::caching::all);
+    return file_handle(nativeh, 0, 0, file_handle::caching::all, file_handle::flag::none, nullptr);
   }
 }  // namespace detail
 

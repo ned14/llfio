@@ -349,6 +349,15 @@ LLFIO_V2_NAMESPACE_END
 LLFIO_V2_NAMESPACE_BEGIN
 using namespace QUICKCPPLIB_NAMESPACE::string_view;
 LLFIO_V2_NAMESPACE_END
+// Bring in a function_ptr implementation
+#include "quickcpplib/function_ptr.hpp"
+LLFIO_V2_NAMESPACE_BEGIN
+template <class F, size_t callable_storage_bytes = 32 - sizeof(uintptr_t)> using function_ptr = QUICKCPPLIB_NAMESPACE::function_ptr::function_ptr<F, callable_storage_bytes>;
+using QUICKCPPLIB_NAMESPACE::function_ptr::emplace_function_ptr;
+using QUICKCPPLIB_NAMESPACE::function_ptr::emplace_function_ptr_nothrow;
+using QUICKCPPLIB_NAMESPACE::function_ptr::make_function_ptr;
+using QUICKCPPLIB_NAMESPACE::function_ptr::make_function_ptr_nothrow;
+LLFIO_V2_NAMESPACE_END
 // Bring in an ensure_flushes implementation
 #include "quickcpplib/mem_flush_loads_stores.hpp"
 LLFIO_V2_NAMESPACE_BEGIN
@@ -370,6 +379,12 @@ LLFIO_V2_NAMESPACE_BEGIN
 using namespace QUICKCPPLIB_NAMESPACE::in_place_attach_detach;
 using QUICKCPPLIB_NAMESPACE::in_place_attach_detach::in_place_attach;
 using QUICKCPPLIB_NAMESPACE::in_place_attach_detach::in_place_detach;
+LLFIO_V2_NAMESPACE_END
+// Bring in a spinlock implementation
+#include "quickcpplib/spinlock.hpp"
+LLFIO_V2_NAMESPACE_BEGIN
+using spinlock = QUICKCPPLIB_NAMESPACE::configurable_spinlock::spinlock<uintptr_t>;
+using  QUICKCPPLIB_NAMESPACE::configurable_spinlock::lock_guard;
 LLFIO_V2_NAMESPACE_END
 
 
@@ -393,92 +408,6 @@ LLFIO_V2_NAMESPACE_END
 
 
 LLFIO_V2_NAMESPACE_BEGIN
-
-namespace detail
-{
-  // A move only capable lightweight std::function, as std::function can't handle move only callables
-  template <class F> class function_ptr;
-  template <class R, class... Args> class function_ptr<R(Args...)>
-  {
-    struct function_ptr_storage
-    {
-      function_ptr_storage() = default;
-      function_ptr_storage(const function_ptr_storage &) = delete;
-      function_ptr_storage(function_ptr_storage &&) = delete;
-      function_ptr_storage &operator=(const function_ptr_storage &) = delete;
-      function_ptr_storage &operator=(function_ptr_storage &&) = delete;
-      virtual ~function_ptr_storage() = default;
-      virtual R operator()(Args &&... args) = 0;
-    };
-    template <class U> struct function_ptr_storage_impl : public function_ptr_storage
-    {
-      U c;
-      template <class... Args2>
-      constexpr explicit function_ptr_storage_impl(Args2 &&... args)
-          : c(std::forward<Args2>(args)...)
-      {
-      }
-      R operator()(Args &&... args) final { return c(std::move(args)...); }
-    };
-    function_ptr_storage *ptr;
-    template <class U> struct emplace_t
-    {
-    };
-    template <class U, class V> friend inline function_ptr<U> make_function_ptr(V &&f);  // NOLINT
-    template <class U>
-    explicit function_ptr(std::nullptr_t, U &&f)
-        : ptr(new function_ptr_storage_impl<typename std::decay<U>::type>(std::forward<U>(f)))
-    {
-    }
-    template <class R_, class U, class... Args2> friend inline function_ptr<R_> emplace_function_ptr(Args2 &&... args);  // NOLINT
-    template <class U, class... Args2>
-    explicit function_ptr(emplace_t<U> /*unused*/, Args2 &&... args)
-        : ptr(new function_ptr_storage_impl<U>(std::forward<Args2>(args)...))
-    {
-    }
-
-  public:
-    constexpr function_ptr() noexcept
-        : ptr(nullptr)
-    {
-    }
-    constexpr explicit function_ptr(function_ptr_storage *p) noexcept
-        : ptr(p)
-    {
-    }
-    constexpr function_ptr(function_ptr &&o) noexcept
-        : ptr(o.ptr)
-    {
-      o.ptr = nullptr;
-    }
-    function_ptr &operator=(function_ptr &&o) noexcept
-    {
-      delete ptr;
-      ptr = o.ptr;
-      o.ptr = nullptr;
-      return *this;
-    }
-    function_ptr(const function_ptr &) = delete;
-    function_ptr &operator=(const function_ptr &) = delete;
-    ~function_ptr() { delete ptr; }
-    explicit constexpr operator bool() const noexcept { return !!ptr; }
-    constexpr R operator()(Args... args) const { return (*ptr)(std::move(args)...); }
-    constexpr function_ptr_storage *get() noexcept { return ptr; }
-    constexpr void reset(function_ptr_storage *p = nullptr) noexcept
-    {
-      delete ptr;
-      ptr = p;
-    }
-    constexpr function_ptr_storage *release() noexcept
-    {
-      auto p = ptr;
-      ptr = nullptr;
-      return p;
-    }
-  };
-  template <class R, class U> inline function_ptr<R> make_function_ptr(U &&f) { return function_ptr<R>(nullptr, std::forward<U>(f)); }
-  template <class R, class U, class... Args> inline function_ptr<R> emplace_function_ptr(Args &&... args) { return function_ptr<R>(typename function_ptr<R>::template emplace_t<U>(), std::forward<Args>(args)...); }
-}  // namespace detail
 
 // Native handle support
 namespace win

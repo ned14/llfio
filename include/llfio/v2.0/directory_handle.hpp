@@ -167,9 +167,14 @@ public:
   //! Default constructor
   constexpr directory_handle() {}  // NOLINT
   //! Construct a directory_handle from a supplied native path_handle
-  explicit constexpr directory_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching = caching::all, flag flags = flag::none)
+  explicit constexpr directory_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching, flag flags)
       : path_handle(std::move(h), caching, flags)
       , fs_handle(devid, inode)
+  {
+  }
+  //! Construct a directory_handle from a supplied native path_handle
+  explicit constexpr directory_handle(native_handle_type h, caching caching, flag flags)
+      : path_handle(std::move(h), caching, flags)
   {
   }
   //! Implicit move construction of directory_handle permitted
@@ -280,6 +285,7 @@ public:
   trying to open the path returned. Thus many allocations may occur.
   */
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<directory_handle> reopen(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
+  LLFIO_DEADLINE_TRY_FOR_UNTIL(reopen)
 
   /*! Return a copy of this directory handle, but as a path handle.
 

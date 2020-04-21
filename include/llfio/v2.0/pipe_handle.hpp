@@ -36,10 +36,8 @@ LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 The only fully portable use of this class is to *create* a named pipe with
 read-only privileges (`pipe_create()`), and then to *open* an existing named pipe with
-append-only privileges (`pipe_open()`). This ordering is important - on POSIX opening
-pipes for reads blocks until a writer connects to the other side, and
-opening pipes for writes fails if no reader on the other side is present.
-The Windows implementation of this class matches these POSIX semantics.
+append-only privileges (`pipe_open()`). This ordering is important - it
+works irrespective of whether the pipe is multiplexable or not.
 
 This class doesn't prevent you opening fully duplex pipes
 (i.e. `mode::write`) if your system supports them, but semantics in this
@@ -47,18 +45,22 @@ situation are implementation defined. Linux and Windows support fully
 duplex pipes, and the Windows implementation matches the Linux bespoke
 semantics.
 
-When you create a named pipe, `flag::unlink_on_first_close` is
-always forced on. This is due to portability reasons -
+For the static functions which create a pipe, `flag::unlink_on_first_close`
+is the default. This is due to portability reasons -
 on some platforms (e.g. Windows), named pipes always get deleted when
 the last handle to them is closed in the system, so the closest
-matching semantic is for the creating handle to unlink its creation on
-first close on all platforms. If you don't want this, release the native
-handle before closing the handle instance, and take over its management.
+matching semantic on POSIX is for the creating handle to unlink its creation on
+first close on all platforms. If you don't want this, change the flags
+given during creation. Note that on Windows, `flag::unlink_on_first_close`
+is always masked out, this is because Windows appears to not permit
+renaming nor unlinking of open pipes.
 
 If `flag::multiplexable` is specified which causes the handle to
 be created as `native_handle_type::disposition::nonblocking`, opening
 pipes for reads no longer blocks in the constructor. However it will then
-block in `read()`, unless its deadline is zero.
+block in `read()`, unless its deadline is zero. Opening pipes for write
+in nonblocking mode will now fail if there is no reader present on the
+other side of the pipe.
 
 \warning On POSIX neither `creation::only_if_not_exist` nor
 `creation::always_new` is atomic due to lack of kernel API support.
@@ -85,9 +87,6 @@ class LLFIO_DECL pipe_handle : public io_handle, public fs_handle
 {
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept final { return *this; }
 
-  void _set_is_connected(bool v) noexcept { this->_spare1 = v; }
-  bool _is_connected() const noexcept { return this->_spare1 != 0; }
-
 public:
   using path_type = io_handle::path_type;
   using extent_type = io_handle::extent_type;
@@ -110,9 +109,14 @@ public:
   //! Default constructor
   constexpr pipe_handle() {}  // NOLINT
   //! Construct a handle from a supplied native handle
-  constexpr pipe_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching = caching::none, flag flags = flag::none, io_context *ctx = nullptr)
+  constexpr pipe_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching, flag flags, io_multiplexer *ctx)
       : io_handle(std::move(h), caching, flags, ctx)
       , fs_handle(devid, inode)
+  {
+  }
+  //! Construct a handle from a supplied native handle
+  constexpr pipe_handle(native_handle_type h, caching caching, flag flags, io_multiplexer *ctx)
+      : io_handle(std::move(h), caching, flags, ctx)
   {
   }
   //! No copy construction (use clone())
@@ -125,10 +129,26 @@ public:
       , fs_handle(std::move(o))
   {
   }
-  //! Explicit conversion from handle and io_handle permitted
-  explicit constexpr pipe_handle(handle &&o, dev_t devid, ino_t inode) noexcept
+  //! Explicit conversion from handle permitted
+  explicit constexpr pipe_handle(handle &&o, dev_t devid, ino_t inode, io_multiplexer *ctx) noexcept
+      : io_handle(std::move(o), ctx)
+      , fs_handle(devid, inode)
+  {
+  }
+  //! Explicit conversion from handle permitted
+  explicit constexpr pipe_handle(handle &&o, io_multiplexer *ctx) noexcept
+      : io_handle(std::move(o), ctx)
+  {
+  }
+  //! Explicit conversion from io_handle permitted
+  explicit constexpr pipe_handle(io_handle &&o, dev_t devid, ino_t inode) noexcept
       : io_handle(std::move(o))
       , fs_handle(devid, inode)
+  {
+  }
+  //! Explicit conversion from io_handle permitted
+  explicit constexpr pipe_handle(io_handle &&o) noexcept
+      : io_handle(std::move(o))
   {
   }
   //! Move assignment of `pipe_handle` permitted
@@ -165,7 +185,7 @@ public:
   is specified, this will block until the other end connects.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<pipe_handle> pipe_create(path_view_type path, caching _caching = caching::all, flag flags = flag::none, const path_handle &base = path_discovery::temporary_named_pipes_directory()) noexcept { return pipe(path, mode::read, creation::if_needed, _caching, flags, base); }
+  static inline result<pipe_handle> pipe_create(path_view_type path, caching _caching = caching::all, flag flags = flag::unlink_on_first_close, const path_handle &base = path_discovery::temporary_named_pipes_directory()) noexcept { return pipe(path, mode::read, creation::if_needed, _caching, flags, base); }
   /*! Convenience overload for `pipe()` opening an existing named pipe
   with write-only privileges. This will fail if no reader is waiting
   on the other end of the pipe.
@@ -180,7 +200,7 @@ public:
   \errors Any of the values POSIX `open()`, `mkfifo()`, `NtCreateFile()` or `NtCreateNamedPipeFile()` can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<pipe_handle> random_pipe(mode _mode = mode::read, caching _caching = caching::all, flag flags = flag::none, const path_handle &dirpath = path_discovery::temporary_named_pipes_directory()) noexcept
+  static inline result<pipe_handle> random_pipe(mode _mode = mode::read, caching _caching = caching::all, flag flags = flag::unlink_on_first_close, const path_handle &dirpath = path_discovery::temporary_named_pipes_directory()) noexcept
   {
     try
     {
@@ -243,36 +263,19 @@ public:
     return io_handle::close();
   }
 
-  using io_handle::read;
-  using io_handle::write;
 #ifdef _WIN32
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_handle> parent_path_handle(deadline /*unused*/ = std::chrono::seconds(30)) const noexcept override
   {
     // Pipes parent handle is always the NT kernel namespace for pipes
-    OUTCOME_TRY(h, path_discovery::temporary_named_pipes_directory().clone());
-    return path_handle(std::move(h));
-  }
-  LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
-  LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override;
-#endif
-  //! Convenience initialiser list based overload for `read()`
-  LLFIO_MAKE_FREE_FUNCTION
-  io_result<size_type> read(extent_type offset, std::initializer_list<buffer_type> lst, deadline d = deadline()) noexcept
-  {
-    buffer_type *_reqs = reinterpret_cast<buffer_type *>(alloca(sizeof(buffer_type) * lst.size()));
-    memcpy(_reqs, lst.begin(), sizeof(buffer_type) * lst.size());
-    io_request<buffers_type> reqs(buffers_type(_reqs, lst.size()), offset);
-    auto ret = read(reqs, d);
-    if(ret)
-    {
-      return ret.bytes_transferred();
-    }
-    return std::move(ret).error();
+    return path_discovery::temporary_named_pipes_directory().clone_to_path_handle();
   }
 
-  LLFIO_DEADLINE_TRY_FOR_UNTIL(read)
+protected:
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> _do_read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override;
+
+public:
+#endif
 };
 
 //! \brief Constructor for `pipe_handle`

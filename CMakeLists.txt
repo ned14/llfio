@@ -57,7 +57,14 @@ find_quickcpplib_library(outcome
   IS_HEADER_ONLY
 )
 if(WIN32)
+  set(OLD_PROJECT_IS_DEPENDENCY ${PROJECT_IS_DEPENDENCY})
+  set(PROJECT_IS_DEPENDENCY On)
   add_subdirectory("include/llfio/ntkernel-error-category" EXCLUDE_FROM_ALL)
+  if(OLD_PROJECT_IS_DEPENDENCY)
+    set(PROJECT_IS_DEPENDENCY ${OLD_PROJECT_IS_DEPENDENCY})
+  else()
+    set(PROJECT_IS_DEPENDENCY)
+  endif()
 endif()
 
 set(UNIT_TESTS_CXX_VERSION "latest" CACHE STRING "The version of C++ to use in the header-only unit tests")
@@ -194,6 +201,14 @@ int main() {
 }
 " CXX_HAS_CXX17_FILESYSTEM)
 if(NOT CXX_HAS_CXX17_FILESYSTEM)
+  check_cxx_source_linkage("
+#include <experimental/filesystem>
+int main() {
+  try { return std::experimental::filesystem::path(\"hi\").empty(); } catch(std::experimental::filesystem::filesystem_error) { return 1; }
+}
+" CXX_HAS_CXX_EXPERIMENTAL_FILESYSTEM)
+endif()
+if(NOT CXX_HAS_CXX17_FILESYSTEM AND NOT CXX_HAS_CXX_EXPERIMENTAL_FILESYSTEM)
   indented_message(STATUS "NOTE: Standard <filesystem> not found in the current compiler configuration (try forcing C++ 17 or later?), attempting to figure out what <experimental/filesystem> linker flags to use for this STL ...")
   # Are we on libstdc++ or libc++?
   check_cxx_source_compiles("
@@ -276,9 +291,9 @@ int main() {
 endif()
 
 # Set any macros this library requires
-all_compile_definitions(PRIVATE LLFIO_INCLUDE_ASYNC_FILE_HANDLE=1 LLFIO_INCLUDE_STORAGE_PROFILE=1)
+all_compile_definitions(PRIVATE LLFIO_INCLUDE_STORAGE_PROFILE=1)
 foreach(target ${llfio_EXAMPLE_TARGETS})
-  target_compile_definitions(${target} PRIVATE LLFIO_INCLUDE_ASYNC_FILE_HANDLE=1 LLFIO_INCLUDE_STORAGE_PROFILE=1)
+  target_compile_definitions(${target} PRIVATE LLFIO_INCLUDE_STORAGE_PROFILE=1)
 endforeach()
 if(LLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE)
   all_compile_definitions(PUBLIC LLFIO_EXPERIMENTAL_STATUS_CODE=1)
@@ -321,7 +336,7 @@ if(NOT PROJECT_IS_DEPENDENCY)
   include(QuickCppLibMakeStandardTests)
   # For each test target, set definitions and linkage
   foreach(target ${llfio_COMPILE_TEST_TARGETS} ${llfio_TEST_TARGETS})
-    target_compile_definitions(${target} PRIVATE LLFIO_INCLUDE_ASYNC_FILE_HANDLE=1 LLFIO_INCLUDE_STORAGE_PROFILE=1)
+    target_compile_definitions(${target} PRIVATE LLFIO_INCLUDE_STORAGE_PROFILE=1)
   endforeach()
   find_quickcpplib_library(kerneltest
     GIT_REPOSITORY "https://github.com/ned14/kerneltest.git"

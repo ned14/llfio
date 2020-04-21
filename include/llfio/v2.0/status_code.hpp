@@ -59,11 +59,9 @@ as that (a) enables safe header only LLFIO on Windows (b) produces better codege
 #include "outcome/try.hpp"
 // Bring in status code utility
 #include "outcome/experimental/status-code/include/system_code_from_exception.hpp"
-#if __cpp_coroutines
 #include "outcome/experimental/coroutine_support.hpp"
-#ifdef OUTCOME_FOUND_COROUTINE_HEADER
+#if !defined(LLFIO_ENABLE_COROUTINES) && defined(OUTCOME_FOUND_COROUTINE_HEADER)
 #define LLFIO_ENABLE_COROUTINES 1
-#endif
 #endif
 
 LLFIO_V2_NAMESPACE_BEGIN
@@ -255,6 +253,9 @@ template <class T> using atomic_lazy = OUTCOME_V2_NAMESPACE::experimental::await
 template <class T> using eager = OUTCOME_V2_NAMESPACE::experimental::awaitables::eager<T>;
 template <class T> using lazy = OUTCOME_V2_NAMESPACE::experimental::awaitables::lazy<T>;
 template <class T = void> using coroutine_handle = OUTCOME_V2_NAMESPACE::awaitables::coroutine_handle<T>;
+template <class... Args> using coroutine_traits = OUTCOME_V2_NAMESPACE::awaitables::coroutine_traits<Args...>;
+using OUTCOME_V2_NAMESPACE::awaitables::suspend_always;
+using OUTCOME_V2_NAMESPACE::awaitables::suspend_never;
 #endif
 
 //! Choose an errc implementation
@@ -291,11 +292,9 @@ LLFIO_V2_NAMESPACE_END
 #include "outcome/result.hpp"
 #include "outcome/try.hpp"
 #include "outcome/utils.hpp"
-#if __cpp_coroutines
 #include "outcome/coroutine_support.hpp"
-#ifdef OUTCOME_FOUND_COROUTINE_HEADER
+#if !defined(LLFIO_ENABLE_COROUTINES) && defined(OUTCOME_FOUND_COROUTINE_HEADER)
 #define LLFIO_ENABLE_COROUTINES 1
-#endif
 #endif
 
 LLFIO_V2_NAMESPACE_BEGIN
@@ -524,6 +523,9 @@ template <class T> using atomic_lazy = OUTCOME_V2_NAMESPACE::awaitables::atomic_
 template <class T> using eager = OUTCOME_V2_NAMESPACE::awaitables::eager<T>;
 template <class T> using lazy = OUTCOME_V2_NAMESPACE::awaitables::lazy<T>;
 template <class T = void> using coroutine_handle = OUTCOME_V2_NAMESPACE::awaitables::coroutine_handle<T>;
+template <class... Args> using coroutine_traits = OUTCOME_V2_NAMESPACE::awaitables::coroutine_traits<Args...>;
+using OUTCOME_V2_NAMESPACE::awaitables::suspend_always;
+using OUTCOME_V2_NAMESPACE::awaitables::suspend_never;
 #endif
 
 static_assert(OUTCOME_V2_NAMESPACE::trait::is_error_code_available_v<error_info>, "error_info is not detected to be an error code");

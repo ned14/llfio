@@ -40,8 +40,8 @@ namespace algorithm
     {
       file_handle_wrapper() = default;
       using file_handle::file_handle;
-      file_handle_wrapper(native_handle_type nativeh, io_handle::caching _caching, io_handle::flag flags)
-          : file_handle(nativeh, 0, 0, _caching, flags)
+      file_handle_wrapper(native_handle_type nativeh, io_handle::caching _caching, io_handle::flag flags, io_multiplexer *ctx)
+          : file_handle(nativeh, 0, 0, _caching, flags, ctx)
       {
       }
     };
@@ -115,14 +115,14 @@ namespace algorithm
 
     protected:
       combining_handle_adapter_base() = default;
-      constexpr combining_handle_adapter_base(target_handle_type *a, _source_handle_type *b, mode _mode, flag flags)
-          : Base(_native_handle(_mode), _combine_caching(a, b), flags)
+      constexpr combining_handle_adapter_base(target_handle_type *a, _source_handle_type *b, mode _mode, flag flags, io_multiplexer *ctx)
+          : Base(_native_handle(_mode), _combine_caching(a, b), flags, ctx)
           , _target(a)
           , _source(b)
       {
       }
-      combining_handle_adapter_base(target_handle_type *a, void *b, mode _mode, flag flags)
-          : Base(_native_handle(_mode), a->caching(), flags)
+      combining_handle_adapter_base(target_handle_type *a, void *b, mode _mode, flag flags, io_multiplexer *ctx)
+          : Base(_native_handle(_mode), a->caching(), flags, ctx)
           , _target(a)
           , _source(reinterpret_cast<_source_handle_type *>(b))
       {
@@ -144,11 +144,10 @@ namespace algorithm
         return success();
       }
 
-      using Base::read;
-      using Base::write;
+      protected:
 
       //! \brief Return the lowest of the two handles' maximum buffers
-      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t max_buffers() const noexcept override
+      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t _do_max_buffers() const noexcept override
       {
         size_t r = (size_t) -1;
         auto x = _target->max_buffers();
@@ -166,7 +165,7 @@ namespace algorithm
       (stack allocated if below a page size), and perform the combining operation
       into the supplied buffers.
       */
-      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override
+      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> _do_read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override
       {
         size_type bytes = 0;
         for(const auto &b : reqs.buffers)
@@ -243,7 +242,7 @@ namespace algorithm
 
       \todo Relative deadline is not being adjusted for source read time.
       */
-      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override
+      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override
       {
         size_type bytes = 0;
         for(const auto &b : reqs.buffers)
@@ -305,6 +304,8 @@ namespace algorithm
         }
         return std::move(reqs.buffers);
       }
+
+    public:
     };
     template <template <class, class> class Op, class Target, class Source> class combining_handle_adapter_base<Op, Target, Source, file_handle_wrapper, true> : public combining_handle_adapter_base<Op, Target, Source, file_handle_wrapper, false>
     {
@@ -562,8 +563,8 @@ namespace algorithm
     combining_handle_adapter() = default;
     //! Constructor, passing any extra arguments to `Op::override`.
     template <class... Args>
-    combining_handle_adapter(target_handle_type *a, source_handle_type *b, mode _mode = mode::write, flag flags = flag::none, Args &&... args)
-        : _base(a, b, _mode, flags, std::forward<Args>(args)...)
+    combining_handle_adapter(target_handle_type *a, source_handle_type *b, mode _mode = mode::write, flag flags = flag::none, io_multiplexer *ctx = nullptr, Args &&... args)
+        : _base(a, b, _mode, flags, ctx, std::forward<Args>(args)...)
     {
     }
 
