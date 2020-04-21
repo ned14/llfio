@@ -898,25 +898,25 @@ protected:
 
 public:
   //! Returns the number of bytes, and alignment required, for an `io_operation_state` for this multiplexer
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC std::pair<size_t, size_t> io_state_requirements() noexcept = 0;
+  virtual std::pair<size_t, size_t> io_state_requirements() noexcept = 0;
 
   /*! \brief Constructs either a `unsynchronised_io_operation_state` or a `synchronised_io_operation_state`
   for a read operation into the storage provided, possibly initiating the i/o as well. The storage must
   meet the requirements from `state_requirements()`.
   */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<io_operation_state *> init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept = 0;
+  virtual result<io_operation_state *> init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept = 0;
 
   /*! \brief Constructs either a `unsynchronised_io_operation_state` or a `synchronised_io_operation_state`
   for a write operation into the storage provided, possibly initiating the i/o as well. The storage must
   meet the requirements from `state_requirements()`.
   */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<io_operation_state *> init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept = 0;
+  virtual result<io_operation_state *> init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept = 0;
 
   /*! \brief Constructs either a `unsynchronised_io_operation_state` or a `synchronised_io_operation_state`
   for a barrier operation into the storage provided, possibly initiating the i/o as well. The storage must
   meet the requirements from `state_requirements()`.
   */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<io_operation_state *> init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept = 0;
+  virtual result<io_operation_state *> init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept = 0;
 
   //! Flushes any previously initiated i/o, if necessary for this i/o multiplexer
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> flush_inited_io_operations() noexcept { return success(); }
@@ -925,7 +925,7 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_operation_state_type check_io_operation(io_operation_state *op) noexcept { return op->current_state(); }
 
   //! Cancel an initiated i/o, returning its current state if successful.
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<io_operation_state_type> cancel_io_operation(io_operation_state *op, deadline d = {}) noexcept = 0;
+  virtual result<io_operation_state_type> cancel_io_operation(io_operation_state *op, deadline d = {}) noexcept = 0;
 
   //! Statistics about the just returned `wait_for_completed_io()` operation
   struct wait_for_completed_io_statistics
@@ -938,13 +938,13 @@ public:
   completions. Can optionally sleep the thread until at least one initiated i/o completes,
   though may return zero completed i/o's if another thread used `.wake_check_for_any_completed_io()`.
   */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<wait_for_completed_io_statistics> check_for_any_completed_io(deadline d = std::chrono::seconds(0), size_t max_completions = (size_t) -1) noexcept = 0;
+  virtual result<wait_for_completed_io_statistics> check_for_any_completed_io(deadline d = std::chrono::seconds(0), size_t max_completions = (size_t) -1) noexcept = 0;
 
   /*! \brief Can be called from any thread to wake any other single thread
   currently blocked within `check_for_any_completed_io()`. Which thread is
   woken is not specified.
   */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> wake_check_for_any_completed_io() noexcept = 0;
+  virtual result<void> wake_check_for_any_completed_io() noexcept = 0;
 };
 //! A unique ptr to an i/o multiplexer implementation.
 using io_multiplexer_ptr = std::unique_ptr<io_multiplexer>;

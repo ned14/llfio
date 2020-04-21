@@ -251,6 +251,7 @@ public:
   //! \brief Return a single extent of the maximum extent
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<std::vector<file_handle::extent_pair>> extents() const noexcept override { return std::vector<file_handle::extent_pair>{{0, _length}}; }
 
+#if 0
   /*! \brief Read data from the random file.
 
   Note that ensuring that the scatter buffers are address and size aligned to 16 byte (128 bit) multiples will give
@@ -263,8 +264,10 @@ public:
   \errors None possible.
   \mallocs None possible.
   */
+#endif
   using file_handle::read;
 
+#if 0
   /*! \brief Fails to write to the random file.
 
   If the handle was not opened with write permissions, this will fail with a code comparing equal to `errc::permission_denied`.
@@ -276,6 +279,7 @@ public:
   \errors None possible if handle was opened with write permissions.
   \mallocs None possible.
   */
+#endif
   using file_handle::write;
 
 private:

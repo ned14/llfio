@@ -702,6 +702,7 @@ public:
     return *ret.data();
   }
 
+#if 0
   /*! \brief Read data from the mapped view.
 
   \note Because this implementation never copies memory, you can pass in buffers with a null address. As this
@@ -715,8 +716,10 @@ public:
   \errors None, though the various signals and structured exception throws common to using memory maps may occur.
   \mallocs None.
   */
+#endif
   using io_handle::read;
 
+#if 0
   /*! \brief Write data to the mapped view.
 
   If this map is backed by a file, and `section_handle::flag::write_via_syscall` is set, this function is
@@ -740,6 +743,7 @@ public:
   of the raised signal, but it is by far the most likely.
   \mallocs None if a `QUICKCPPLIB_NAMESPACE::signal_guard_install` is already instanced.
   */
+#endif
   using io_handle::write;
 };
 
