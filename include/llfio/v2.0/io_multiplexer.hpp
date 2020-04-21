@@ -26,7 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define LLFIO_IO_MULTIPLEXER_H
 
 //#define LLFIO_DEBUG_PRINT
-#define LLFIO_ENABLE_TEST_IO_MULTIPLEXERS 1
+//#define LLFIO_ENABLE_TEST_IO_MULTIPLEXERS 1
 
 #include "handle.hpp"
 
