@@ -245,7 +245,7 @@ namespace detail
   }
   char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const char16_t *src_buffer, size_t src_buffer_length)
   {
-#if __cplusplus >= 202000 || _HAS_CXX20
+#if (__cplusplus >= 202000 || _HAS_CXX20) && !defined(_LIBCPP_VERSION)
     return (char *) _reencode_path_to(toallocate, (char8_t *) dest_buffer, dest_buffer_length, src_buffer, src_buffer_length);
 #else
     return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, src_buffer, src_buffer_length);
