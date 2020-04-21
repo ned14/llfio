@@ -1,5 +1,5 @@
 /* Information about the volume storing a file
-(C) 2015-2017 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
+(C) 2015-2020 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
 File Created: Dec 2015
 
 
@@ -79,7 +79,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
   {
     auto *fffsi = reinterpret_cast<FILE_FS_FULL_SIZE_INFORMATION *>(buffer);
     isb.Status = -1;
-    ntstat = NtQueryVolumeInformationFile(h.native_handle().h, &isb, fffsi, sizeof(buffer), FileFsFullSizeInformation);
+    ntstat = NtQueryVolumeInformationFile(h.native_handle().h, &isb, fffsi, sizeof(FILE_FS_FULL_SIZE_INFORMATION), FileFsFullSizeInformation);
     if(STATUS_PENDING == ntstat)
     {
       ntstat = ntwait(h.native_handle().h, isb, deadline());
@@ -113,7 +113,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
   {
     auto *ffoi = reinterpret_cast<FILE_FS_OBJECTID_INFORMATION *>(buffer);
     isb.Status = -1;
-    ntstat = NtQueryVolumeInformationFile(h.native_handle().h, &isb, ffoi, sizeof(buffer), FileFsObjectIdInformation);
+    ntstat = NtQueryVolumeInformationFile(h.native_handle().h, &isb, ffoi, sizeof(FILE_FS_OBJECTID_INFORMATION), FileFsObjectIdInformation);
     if(STATUS_PENDING == ntstat)
     {
       ntstat = ntwait(h.native_handle().h, isb, deadline());
@@ -129,7 +129,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
   {
     auto *ffssi = reinterpret_cast<FILE_FS_SECTOR_SIZE_INFORMATION *>(buffer);
     isb.Status = -1;
-    ntstat = NtQueryVolumeInformationFile(h.native_handle().h, &isb, ffssi, sizeof(buffer), FileFsSectorSizeInformation);
+    ntstat = NtQueryVolumeInformationFile(h.native_handle().h, &isb, ffssi, sizeof(FILE_FS_SECTOR_SIZE_INFORMATION), FileFsSectorSizeInformation);
     if(STATUS_PENDING == ntstat)
     {
       ntstat = ntwait(h.native_handle().h, isb, deadline());
@@ -165,17 +165,58 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
         {
           continue;  // path changed
         }
-        len -= pathlen;
-        // buffer should look like \Device\HarddiskVolumeX
-        if(memcmp(buffer, L"\\Device\\HarddiskVolume", 44) != 0)
+        // buffer should look like \Device\HarddiskVolumeX or \Device\Mup\SERVER\SHARE
+        const bool is_harddisk = (memcmp(buffer, L"\\Device\\HarddiskVolume", 44) == 0);
+        const bool is_unc = (memcmp(buffer, L"\\Device\\Mup", 22) == 0);
+        if(!is_harddisk && !is_unc)
         {
           return errc::illegal_byte_sequence;
         }
-        f_mntfromname.reserve(len + 3);
-        f_mntfromname.assign("\\!!");  // escape prefix for NT kernel path
-        for(size_t n = 0; n < len; n++)
+        if(is_harddisk)
         {
-          f_mntfromname.push_back(static_cast<char>(buffer[n]));
+          len -= pathlen;
+          f_mntfromname.reserve(len + 3);
+          f_mntfromname.assign("\\!!");  // escape prefix for NT kernel path
+          for(size_t n = 0; n < len; n++)
+          {
+            f_mntfromname.push_back(static_cast<char>(buffer[n]));
+          }
+        }
+        if(is_unc)
+        {
+#if 1
+          len -= pathlen - 1;
+          f_mntfromname.reserve(len + 3);
+          f_mntfromname.assign("\\!!");  // escape prefix for NT kernel path
+          while(buffer[len] != '\\')
+          {
+            len++;
+          }
+          len++;
+          while(buffer[len] != '\\')
+          {
+            len++;
+          }
+          for(size_t n = 0; n < len; n++)
+          {
+            f_mntfromname.push_back(static_cast<char>(buffer[n]));
+          }
+#else
+          f_mntfromname.reserve(pathlen + 1);
+          f_mntfromname.assign("\\\\?\\UNC");
+          int count = 3;
+          for(size_t n = 0; n < pathlen; n++)
+          {
+            if(buffer2[n] == '\\')
+            {
+              if(--count == 0)
+              {
+                break;
+              }
+            }
+            f_mntfromname.push_back(static_cast<char>(buffer2[n]));
+          }
+#endif
         }
         ++ret;
         wanted &= ~want::mntfromname;

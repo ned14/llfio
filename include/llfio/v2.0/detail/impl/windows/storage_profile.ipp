@@ -223,6 +223,11 @@ namespace storage_profile
       {
         try
         {
+          if(memcmp(_mntfromname.c_str(), "\\!!\\Device\\Mup", 14) == 0 || memcmp(_mntfromname.c_str(), "\\\\", 2) == 0)
+          {
+            sp.controller_type.value = "Network";
+            return success();
+          }
           alignas(8) wchar_t buffer[32769];
           // Firstly open a handle to the volume
           OUTCOME_TRY(volumeh, file_handle::file({}, _mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
@@ -360,7 +365,7 @@ namespace storage_profile
             {
               if(ERROR_IO_PENDING == GetLastError())
               {
-                NTSTATUS ntstat = ntwait(volumeh.native_handle().h, ol, deadline());
+                NTSTATUS ntstat = ntwait(diskh.native_handle().h, ol, deadline());
                 if(ntstat != 0)
                 {
                   return ntkernel_error(ntstat);
@@ -413,7 +418,7 @@ namespace storage_profile
             {
               if(ERROR_IO_PENDING == GetLastError())
               {
-                NTSTATUS ntstat = ntwait(volumeh.native_handle().h, ol, deadline());
+                NTSTATUS ntstat = ntwait(diskh.native_handle().h, ol, deadline());
                 if(ntstat != 0)
                 {
                   return ntkernel_error(ntstat);

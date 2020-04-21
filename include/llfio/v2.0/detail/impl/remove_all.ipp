@@ -53,6 +53,7 @@ namespace algorithm
       try
       {
         LLFIO_LOG_FUNCTION_CALL(nullptr);
+        log_level_guard logg(log_level::fatal);
         auto default_callback = [](remove_all_callback_reason reason, remove_all_callback_arg /*unused*/, remove_all_callback_arg /*unused*/) -> result<void> {
           // Ignore any unremoveable during directory enumeration, we only care about those
           // which occur after the tree has been removed.
@@ -461,6 +462,7 @@ namespace algorithm
 
         // Set up the threadpool of workers
         auto worker = [&] {
+          log_level_guard logg(log_level::fatal);
           for(;;)
           {
             directory_handle mywork;

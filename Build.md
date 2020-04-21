@@ -128,4 +128,10 @@ ctest -C Release -R llfio_dl
 
 ## Installing libraries from source
 
-It all works as per standard with cmake, a `make install` with the usual options and environment variables.
+~~~
+mkdir build
+cd build
+cmake ..
+cmake --build . -- _dl _sl _hl
+cmake --build . --target install
+~~~

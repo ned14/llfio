@@ -632,6 +632,14 @@ namespace windows_nt_kernel
     ULONG BytesPerSector;
   } FILE_FS_FULL_SIZE_INFORMATION, *PFILE_FS_FULL_SIZE_INFORMATION;
 
+  typedef struct _FILE_FS_SIZE_INFORMATION  // NOLINT
+  {
+    LARGE_INTEGER TotalAllocationUnits;
+    LARGE_INTEGER AvailableAllocationUnits;
+    ULONG SectorsPerAllocationUnit;
+    ULONG BytesPerSector;
+  } FILE_FS_SIZE_INFORMATION, *PFILE_FS_SIZE_INFORMATION;
+
   typedef struct _FILE_FS_OBJECTID_INFORMATION  // NOLINT
   {
     UCHAR ObjectId[16];
@@ -1153,6 +1161,11 @@ namespace windows_nt_kernel
     }
 
     // MAKE SURE you update the early exit check at the top to whatever the last of these is!
+
+#if !LLFIO_EXPERIMENTAL_STATUS_CODE
+    // Work around a race caused by fetching one of these for the first time during static deinit
+    (void) ntkernel_error_category::ntkernel_category();
+#endif
   }
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -1528,7 +1541,7 @@ inline result<DWORD> ntflags_from_handle_caching_and_flags(native_handle_type &n
   switch(_caching)
   {
   case handle::caching::unchanged:
-    break; // can be called by reopen()
+    break;  // can be called by reopen()
   case handle::caching::none:
     ntflags |= 0x00000008 /*FILE_NO_INTERMEDIATE_BUFFERING*/ | 0x00000002 /*FILE_WRITE_THROUGH*/;
     nativeh.behaviour |= native_handle_type::disposition::aligned_io;

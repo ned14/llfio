@@ -423,7 +423,7 @@ public:
   the call to `update_map()`, this call is not particularly efficient, and you ought to cache
   its value where possible.
   */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> maximum_extent() const noexcept override { return const_cast<mapped_file_handle *>(this)->update_map(); }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> maximum_extent() const noexcept override { return (0 == _reservation) ? underlying_file_maximum_extent() : const_cast<mapped_file_handle *>(this)->update_map(); }
 
   /*! \brief Resize the current maximum permitted extent of the mapped file to the given extent, avoiding any
   new allocation of physical storage where supported, and mapping or unmapping any new pages
