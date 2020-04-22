@@ -60,6 +60,8 @@ namespace test
     // static_assert(sizeof(_iocp_operation_state) <= _iocp_operation_state_alignment, "_iocp_operation_state alignment is insufficiently large!");
     using _state_lock_guard = typename _iocp_operation_state::_lock_guard;
 
+    bool _disable_immediate_completions{false};
+
   public:
     constexpr win_iocp_multiplexer() {}
     win_iocp_multiplexer(const win_iocp_multiplexer &) = delete;
@@ -73,13 +75,14 @@ namespace test
         (void) win_iocp_multiplexer::close();
       }
     }
-    result<void> init(size_t threads)
+    result<void> init(size_t threads, bool disable_immediate_completions)
     {
       this->_v.h = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, (DWORD) threads);
       if(nullptr == this->_v.h)
       {
         return win32_error();
       }
+      _disable_immediate_completions = disable_immediate_completions;
       return success();
     }
 
@@ -105,6 +108,10 @@ namespace test
       if(ntstat < 0)
       {
         return ntkernel_error(ntstat);
+      }
+      if(_disable_immediate_completions)
+      {
+        return success();
       }
       // If this works, we can avoid IOCP entirely for immediately completing i/o
       // It'll set native_handle_type::disposition::_multiplexer_state_bit0 if
@@ -210,13 +217,25 @@ namespace test
     // LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> flush_inited_io_operations() noexcept { return success(); }
     template <class U> io_operation_state_type _check_io_operation(_iocp_operation_state *state, U &&f) noexcept
     {
-      auto fill_io_result = [&](auto &ret, auto &params) {
+      auto fill_io_result = [&](auto &ret, auto &params) -> bool {
+        for(size_t n = 0; n < params.reqs.buffers.size(); n++)
+        {
+          if(state->_ols[n].Status == STATUS_PENDING)
+          {
+            f(state->_ols[n]);
+            break;
+          }
+        }
+        if(is_completed(state->state) || is_finished(state->state))
+        {
+          return false;
+        }
         for(size_t n = 0; n < params.reqs.buffers.size(); n++)
         {
           assert(state->_ols[n].Status != -1);
           if(state->_ols[n].Status == STATUS_PENDING)
           {
-            f();
+            return false;
           }
           if(state->_ols[n].Status < 0)
           {
@@ -229,6 +248,7 @@ namespace test
             ret = {params.reqs.buffers.data(), n + 1};
           }
         }
+        return true;
       };
       auto v = state->current_state();
       switch(v)
@@ -237,43 +257,52 @@ namespace test
       case io_operation_state_type::read_initiated:
       {
         io_result<buffers_type> ret = {state->payload.noncompleted.params.read.reqs.buffers.data(), 0};
-        fill_io_result(ret, state->payload.noncompleted.params.read);
-        state->read_completed(std::move(ret));
-        if(state->h->native_handle().behaviour & native_handle_type::disposition::_multiplexer_state_bit0)
+        if(fill_io_result(ret, state->payload.noncompleted.params.read))
         {
-          // SetFileCompletionNotificationModes() above was successful, so we are done
-          state->read_finished();
-          return io_operation_state_type::read_finished;
+          state->read_completed(std::move(ret));
+          if(state->h->native_handle().behaviour & native_handle_type::disposition::_multiplexer_state_bit0)
+          {
+            // SetFileCompletionNotificationModes() above was successful, so we are done
+            state->read_finished();
+            return io_operation_state_type::read_finished;
+          }
+          return io_operation_state_type::read_completed;
         }
-        return io_operation_state_type::read_completed;
+        return v;
       }
       case io_operation_state_type::write_initialised:
       case io_operation_state_type::write_initiated:
       {
         io_result<const_buffers_type> ret = {state->payload.noncompleted.params.write.reqs.buffers.data(), 0};
-        fill_io_result(ret, state->payload.noncompleted.params.write);
-        state->write_completed(std::move(ret));
-        if(state->h->native_handle().behaviour & native_handle_type::disposition::_multiplexer_state_bit0)
+        if(fill_io_result(ret, state->payload.noncompleted.params.write))
         {
-          // SetFileCompletionNotificationModes() above was successful, so we are done
-          state->write_or_barrier_finished();
-          return io_operation_state_type::write_or_barrier_finished;
+          state->write_completed(std::move(ret));
+          if(state->h->native_handle().behaviour & native_handle_type::disposition::_multiplexer_state_bit0)
+          {
+            // SetFileCompletionNotificationModes() above was successful, so we are done
+            state->write_or_barrier_finished();
+            return io_operation_state_type::write_or_barrier_finished;
+          }
+          return io_operation_state_type::write_or_barrier_completed;
         }
-        return io_operation_state_type::write_or_barrier_completed;
+        return v;
       }
       case io_operation_state_type::barrier_initialised:
       case io_operation_state_type::barrier_initiated:
       {
         io_result<const_buffers_type> ret = {state->payload.noncompleted.params.barrier.reqs.buffers.data(), 0};
-        fill_io_result(ret, state->payload.noncompleted.params.barrier);
-        state->barrier_completed(std::move(ret));
-        if(state->h->native_handle().behaviour & native_handle_type::disposition::_multiplexer_state_bit0)
+        if(fill_io_result(ret, state->payload.noncompleted.params.barrier))
         {
-          // SetFileCompletionNotificationModes() above was successful, so we are done
-          state->write_or_barrier_finished();
-          return io_operation_state_type::write_or_barrier_finished;
+          state->barrier_completed(std::move(ret));
+          if(state->h->native_handle().behaviour & native_handle_type::disposition::_multiplexer_state_bit0)
+          {
+            // SetFileCompletionNotificationModes() above was successful, so we are done
+            state->write_or_barrier_finished();
+            return io_operation_state_type::write_or_barrier_finished;
+          }
+          return io_operation_state_type::write_or_barrier_completed;
         }
-        return io_operation_state_type::write_or_barrier_completed;
+        return v;
       }
       default:
         break;
@@ -286,10 +315,15 @@ namespace test
       LLFIO_LOG_FUNCTION_CALL(this);
       auto *state = static_cast<_iocp_operation_state *>(_op);
       // On Windows, one can update the STATUS_PENDING in an IO_STATUS_BLOCK by calling NtWaitForSingleObject() on it
-      return _check_io_operation(state, [state] {
+      return _check_io_operation(state, [&](windows_nt_kernel::IO_STATUS_BLOCK &ol) {
         LARGE_INTEGER timeout;
         timeout.QuadPart = 0;  // poll, don't wait
         windows_nt_kernel::NtWaitForSingleObject(state->h->native_handle().h, false, &timeout);
+        if(ol.Status == STATUS_PENDING)
+        {
+          // If it still hasn't budged, try poking IOCP
+          (void) check_for_any_completed_io(std::chrono::seconds(0), 1);
+        }
       });
     }
     LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<io_operation_state_type> cancel_io_operation(io_operation_state *_op, deadline d = {}) noexcept override
@@ -388,7 +422,7 @@ namespace test
           // wake_check_for_any_completed_io() poke
           continue;
         }
-        if(is_completed(_check_io_operation(state, [&] {})))
+        if(is_completed(_check_io_operation(state, [&](windows_nt_kernel::IO_STATUS_BLOCK &) {})))
         {
           switch(state->state)
           {
@@ -420,18 +454,18 @@ namespace test
     }
   };
 
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<io_multiplexer_ptr> multiplexer_win_iocp(size_t threads) noexcept
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<io_multiplexer_ptr> multiplexer_win_iocp(size_t threads, bool disable_immediate_completions) noexcept
   {
     try
     {
       if(1 == threads)
       {
         auto ret = std::make_unique<win_iocp_multiplexer<false>>();
-        OUTCOME_TRY(ret->init(1));
+        OUTCOME_TRY(ret->init(1, disable_immediate_completions));
         return ret;
       }
       auto ret = std::make_unique<win_iocp_multiplexer<true>>();
-      OUTCOME_TRY(ret->init(threads));
+      OUTCOME_TRY(ret->init(threads, disable_immediate_completions));
       return ret;
     }
     catch(...)

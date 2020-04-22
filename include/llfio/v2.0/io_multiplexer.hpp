@@ -527,21 +527,22 @@ public:
 
     //! Used to retrieve the current state of the i/o operation
     virtual io_operation_state_type current_state() const noexcept = 0;
-    //! After an i/o operation has finished, used to retrieve the result. This can only be called once.
+    //! After an i/o operation has finished, can be used to retrieve the result if the visitor did not.
     virtual io_result<buffers_type> get_completed_read() &&noexcept = 0;
-    //! After an i/o operation has finished, used to retrieve the result. This can only be called once.
+    //! After an i/o operation has finished, can be used to retrieve the result if the visitor did not.
     virtual io_result<const_buffers_type> get_completed_write_or_barrier() &&noexcept = 0;
   };
+  //! \brief Called by an i/o operation state to inform you of state change. Note that the i/o operation state lock is HELD during these calls!
   struct io_operation_state_visitor
   {
     virtual ~io_operation_state_visitor() {}
     virtual void read_initiated(io_operation_state * /*state*/, io_operation_state_type /*former*/) {}
-    virtual void read_completed(io_operation_state * /*state*/, io_operation_state_type /*former*/) {}
+    virtual void read_completed(io_operation_state * /*state*/, io_operation_state_type /*former*/, io_result<buffers_type> && /*res*/) {}
     virtual void read_finished(io_operation_state * /*state*/, io_operation_state_type /*former*/) {}
     virtual void write_initiated(io_operation_state * /*state*/, io_operation_state_type /*former*/) {}
-    virtual void write_completed(io_operation_state * /*state*/, io_operation_state_type /*former*/) {}
+    virtual void write_completed(io_operation_state * /*state*/, io_operation_state_type /*former*/, io_result<const_buffers_type> && /*res*/) {}
     virtual void barrier_initiated(io_operation_state * /*state*/, io_operation_state_type /*former*/) {}
-    virtual void barrier_completed(io_operation_state * /*state*/, io_operation_state_type /*former*/) {}
+    virtual void barrier_completed(io_operation_state * /*state*/, io_operation_state_type /*former*/, io_result<const_buffers_type> && /*res*/) {}
     virtual void write_or_barrier_finished(io_operation_state * /*state*/, io_operation_state_type /*former*/) {}
   };
 
@@ -726,21 +727,11 @@ protected:
     virtual io_operation_state_type current_state() const noexcept override { return state; }
     virtual io_result<buffers_type> get_completed_read() && noexcept override
     {
-      assert(is_completed(state) || is_finished(state));
-      if(!is_completed(state) && !is_finished(state))
-      {
-        abort();
-      }
       io_result<buffers_type> ret(std::move(payload.completed_read));
       return ret;
     }
     virtual io_result<const_buffers_type> get_completed_write_or_barrier() && noexcept override
     {
-      assert(is_completed(state) || is_finished(state));
-      if(!is_completed(state) && !is_finished(state))
-      {
-        abort();
-      }
       io_result<const_buffers_type> ret(std::move(payload.completed_write_or_barrier));
       return ret;
     }
@@ -764,7 +755,7 @@ protected:
         new(&payload.completed_read) io_result<buffers_type>(std::move(res));
         if(this->visitor != nullptr)
         {
-          this->visitor->read_completed(this, state);
+          this->visitor->read_completed(this, state, std::move(payload.completed_read));
         }
         state = io_operation_state_type::read_completed;
       }
@@ -799,7 +790,7 @@ protected:
         new(&payload.completed_write_or_barrier) io_result<const_buffers_type>(std::move(res));
         if(this->visitor != nullptr)
         {
-          this->visitor->write_completed(this, state);
+          this->visitor->write_completed(this, state, std::move(payload.completed_write_or_barrier));
         }
         state = io_operation_state_type::write_or_barrier_completed;
       }
@@ -823,7 +814,7 @@ protected:
         new(&payload.completed_write_or_barrier) io_result<const_buffers_type>(std::move(res));
         if(this->visitor != nullptr)
         {
-          this->visitor->barrier_completed(this, state);
+          this->visitor->barrier_completed(this, state, std::move(payload.completed_write_or_barrier));
         }
         state = io_operation_state_type::write_or_barrier_completed;
       }
@@ -869,6 +860,11 @@ protected:
       return std::move(*this)._unsynchronised_io_operation_state::get_completed_write_or_barrier();
     }
 
+    virtual void read_initiated() override
+    {
+      _lock_guard g(this->_lock);
+      return _unsynchronised_io_operation_state::read_initiated();
+    }
     virtual void read_completed(io_result<buffers_type> &&res) override
     {
       _lock_guard g(this->_lock);
@@ -879,10 +875,20 @@ protected:
       _lock_guard g(this->_lock);
       return _unsynchronised_io_operation_state::read_finished();
     }
+    virtual void write_initiated() override
+    {
+      _lock_guard g(this->_lock);
+      return _unsynchronised_io_operation_state::write_initiated();
+    }
     virtual void write_completed(io_result<const_buffers_type> &&res) override
     {
       _lock_guard g(this->_lock);
       return _unsynchronised_io_operation_state::write_completed(std::move(res));
+    }
+    virtual void barrier_initiated() override
+    {
+      _lock_guard g(this->_lock);
+      return _unsynchronised_io_operation_state::barrier_initiated();
     }
     virtual void barrier_completed(io_result<const_buffers_type> &&res) override
     {
@@ -966,7 +972,7 @@ namespace test
   The multiplexer returned by this function is only a partial implementation, used
   only by the test suite. In particular it does not fully implement deadlined i/o.
   */
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<io_multiplexer_ptr> multiplexer_win_iocp(size_t threads) noexcept;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<io_multiplexer_ptr> multiplexer_win_iocp(size_t threads, bool disable_immediate_completions) noexcept;
 #endif
 }  // namespace test
 #endif
