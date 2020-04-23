@@ -687,7 +687,42 @@ protected:
     _unsynchronised_io_operation_state &operator=(_unsynchronised_io_operation_state &&) = delete;
 
   protected:
-    _unsynchronised_io_operation_state(_unsynchronised_io_operation_state &&) = default;
+    _unsynchronised_io_operation_state(_unsynchronised_io_operation_state &&o) noexcept
+        : io_operation_state(std::move(o)), state(o.state)
+    {
+      switch(state)
+      {
+      case io_operation_state_type::unknown:
+        break;
+      case io_operation_state_type::read_initialised:
+      case io_operation_state_type::read_initiated:
+        payload.noncompleted.base = std::move(o.payload.noncompleted.base);
+        payload.noncompleted.d = o.payload.noncompleted.d;
+        payload.noncompleted.params.read = o.payload.noncompleted.params.read;
+        break;
+      case io_operation_state_type::read_completed:
+      case io_operation_state_type::read_finished:
+        payload.completed_read = std::move(o.payload.completed_read);
+        break;
+      case io_operation_state_type::write_initialised:
+      case io_operation_state_type::write_initiated:
+        payload.noncompleted.base = std::move(o.payload.noncompleted.base);
+        payload.noncompleted.d = o.payload.noncompleted.d;
+        payload.noncompleted.params.write = o.payload.noncompleted.params.write;
+        break;
+      case io_operation_state_type::barrier_initialised:
+      case io_operation_state_type::barrier_initiated:
+        payload.noncompleted.base = std::move(o.payload.noncompleted.base);
+        payload.noncompleted.d = o.payload.noncompleted.d;
+        payload.noncompleted.params.barrier = o.payload.noncompleted.params.barrier;
+        break;
+      case io_operation_state_type::write_or_barrier_completed:
+      case io_operation_state_type::write_or_barrier_finished:
+        payload.completed_write_or_barrier = std::move(o.payload.completed_write_or_barrier);
+        break;
+      }
+      o.clear_storage();
+    }
 
   public:
     virtual ~_unsynchronised_io_operation_state() { clear_storage(); }
@@ -875,7 +910,7 @@ protected:
     virtual void *invoke(function_ptr<void *(io_operation_state_type)> c) const noexcept override
     {
       _lock_guard g(this->_lock);
-      return c(state);
+      return c(_unsynchronised_io_operation_state::current_state());
     }
     virtual void read_initiated() override
     {
@@ -997,8 +1032,8 @@ public:
 #if LLFIO_ENABLE_COROUTINES
     void await_suspend(coroutine_handle<> coro)
     {
-      _state->invoke(make_function_ptr([&](io_operation_state *state) {
-        if(is_finished(*state))
+      _state->invoke(make_function_ptr([&](io_operation_state_type s) {
+        if(is_finished(s))
         {
           coro.resume();
           return;
