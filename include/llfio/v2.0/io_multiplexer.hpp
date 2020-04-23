@@ -729,7 +729,7 @@ protected:
       state = io_operation_state_type::unknown;
     }
 
-    virtual void *invoke(function_ptr<void *(io_operation_state_type)> c) const noexcept { return c(state); }
+    virtual void *invoke(function_ptr<void *(io_operation_state_type)> c) const noexcept override { return c(state); }
     virtual io_operation_state_type current_state() const noexcept override { return state; }
     virtual io_result<buffers_type> get_completed_read() && noexcept override
     {
@@ -925,8 +925,8 @@ protected:
 #else
   static constexpr size_t _awaitable_size = 64;
 #endif
-  io_result<buffers_type> _result_type_from_io_operation_state(io_operation_state *state, buffers_type * /*unused*/) noexcept { return std::move(*state).get_completed_read(); }
-  io_result<const_buffers_type> _result_type_from_io_operation_state(io_operation_state *state, const_buffers_type * /*unused*/) noexcept { return std::move(*state).get_completed_write_or_barrier(); }
+  static io_result<buffers_type> _result_type_from_io_operation_state(io_operation_state *state, buffers_type * /*unused*/) noexcept { return std::move(*state).get_completed_read(); }
+  static io_result<const_buffers_type> _result_type_from_io_operation_state(io_operation_state *state, const_buffers_type * /*unused*/) noexcept { return std::move(*state).get_completed_write_or_barrier(); }
 
 public:
   /*! \brief A convenience coroutine awaitable type returned by `.co_read()`, `.co_write()` and
