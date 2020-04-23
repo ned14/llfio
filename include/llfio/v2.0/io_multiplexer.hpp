@@ -525,6 +525,8 @@ public:
   public:
     virtual ~io_operation_state() {}
 
+    //! Invoke the callable with the per-i/o state lock held, if any.
+    virtual void *invoke(function_ptr<void *(io_operation_state_type)> c) const noexcept = 0;
     //! Used to retrieve the current state of the i/o operation
     virtual io_operation_state_type current_state() const noexcept = 0;
     //! After an i/o operation has finished, can be used to retrieve the result if the visitor did not.
@@ -681,10 +683,48 @@ protected:
     {
     }
     _unsynchronised_io_operation_state(const _unsynchronised_io_operation_state &) = delete;
-    _unsynchronised_io_operation_state(_unsynchronised_io_operation_state &&) = delete;
     _unsynchronised_io_operation_state &operator=(const _unsynchronised_io_operation_state &) = delete;
     _unsynchronised_io_operation_state &operator=(_unsynchronised_io_operation_state &&) = delete;
 
+  protected:
+    _unsynchronised_io_operation_state(_unsynchronised_io_operation_state &&o) noexcept
+        : io_operation_state(std::move(o)), state(o.state)
+    {
+      switch(state)
+      {
+      case io_operation_state_type::unknown:
+        break;
+      case io_operation_state_type::read_initialised:
+      case io_operation_state_type::read_initiated:
+        payload.noncompleted.base = std::move(o.payload.noncompleted.base);
+        payload.noncompleted.d = o.payload.noncompleted.d;
+        payload.noncompleted.params.read = o.payload.noncompleted.params.read;
+        break;
+      case io_operation_state_type::read_completed:
+      case io_operation_state_type::read_finished:
+        payload.completed_read = std::move(o.payload.completed_read);
+        break;
+      case io_operation_state_type::write_initialised:
+      case io_operation_state_type::write_initiated:
+        payload.noncompleted.base = std::move(o.payload.noncompleted.base);
+        payload.noncompleted.d = o.payload.noncompleted.d;
+        payload.noncompleted.params.write = o.payload.noncompleted.params.write;
+        break;
+      case io_operation_state_type::barrier_initialised:
+      case io_operation_state_type::barrier_initiated:
+        payload.noncompleted.base = std::move(o.payload.noncompleted.base);
+        payload.noncompleted.d = o.payload.noncompleted.d;
+        payload.noncompleted.params.barrier = o.payload.noncompleted.params.barrier;
+        break;
+      case io_operation_state_type::write_or_barrier_completed:
+      case io_operation_state_type::write_or_barrier_finished:
+        payload.completed_write_or_barrier = std::move(o.payload.completed_write_or_barrier);
+        break;
+      }
+      o.clear_storage();
+    }
+
+  public:
     virtual ~_unsynchronised_io_operation_state() { clear_storage(); }
 
     //! Used to clear the storage in this operation state
@@ -724,6 +764,7 @@ protected:
       state = io_operation_state_type::unknown;
     }
 
+    virtual void *invoke(function_ptr<void *(io_operation_state_type)> c) const noexcept override { return c(state); }
     virtual io_operation_state_type current_state() const noexcept override { return state; }
     virtual io_result<buffers_type> get_completed_read() && noexcept override
     {
@@ -842,8 +883,14 @@ protected:
     using _lock_guard = lock_guard<spinlock>;
     mutable spinlock _lock;
 
-    _synchronised_io_operation_state() = default;
     using _unsynchronised_io_operation_state::_unsynchronised_io_operation_state;
+    _synchronised_io_operation_state() = default;
+    _synchronised_io_operation_state(const _synchronised_io_operation_state &) = delete;
+
+  protected:
+    _synchronised_io_operation_state(_synchronised_io_operation_state &&) = default;
+
+  public:
     virtual io_operation_state_type current_state() const noexcept override
     {
       _lock_guard g(this->_lock);
@@ -860,6 +907,11 @@ protected:
       return std::move(*this)._unsynchronised_io_operation_state::get_completed_write_or_barrier();
     }
 
+    virtual void *invoke(function_ptr<void *(io_operation_state_type)> c) const noexcept override
+    {
+      _lock_guard g(this->_lock);
+      return c(_unsynchronised_io_operation_state::current_state());
+    }
     virtual void read_initiated() override
     {
       _lock_guard g(this->_lock);
@@ -902,9 +954,144 @@ protected:
     }
   };
 
+// Size of an awaitable
+#ifdef _WIN32
+  static constexpr size_t _awaitable_size = 2048;  // IOCP implementation is unavoidably large
+#else
+  static constexpr size_t _awaitable_size = 64;
+#endif
+  static io_result<buffers_type> _result_type_from_io_operation_state(io_operation_state *state, buffers_type * /*unused*/) noexcept { return std::move(*state).get_completed_read(); }
+  static io_result<const_buffers_type> _result_type_from_io_operation_state(io_operation_state *state, const_buffers_type * /*unused*/) noexcept { return std::move(*state).get_completed_write_or_barrier(); }
+
+public:
+  /*! \brief A convenience coroutine awaitable type returned by `.co_read()`, `.co_write()` and
+  `.co_barrier()`. **Blocks execution** if no i/o multiplexer has been set on this handle!
+
+  Upon first `.await_ready()`, the awaitable initiates the i/o. If the i/o completes immediately,
+  the awaitable is immediately ready and no coroutine suspension occurs.
+
+  If the i/o does not complete immediately, the coroutine is suspended. To cause resumption
+  of execution, you will need to pump the associated i/o multiplexer for completions using
+  `io_multiplexer::check_for_any_completed_io()`.
+  */
+  template <class T> struct awaitable final : protected io_operation_state_visitor
+  {
+    static constexpr size_t _state_storage_bytes = _awaitable_size - sizeof(void *) - sizeof(io_operation_state *)
+#if LLFIO_ENABLE_COROUTINES
+                                                   - sizeof(coroutine_handle<>)
+#endif
+    ;
+    byte _state_storage[_state_storage_bytes];
+    io_operation_state *_state{nullptr};
+#if LLFIO_ENABLE_COROUTINES
+    coroutine_handle<> _coro;
+#endif
+
+    void set_state(io_operation_state *state) noexcept { _state = state;
+      _state->visitor = this;
+    }
+
+  public:
+    //! The result type of this awaitable
+    using result_type = T;
+    //! The buffers type of this awaitable
+    using buffers_type = typename result_type::value_type;
+
+    constexpr awaitable() {}
+    awaitable(const awaitable &) = delete;
+    awaitable(awaitable &&o) noexcept
+        : io_operation_state_visitor(std::move(o))
+        , _state_storage(o._state_storage)
+        , _state(o._state)
+#if LLFIO_ENABLE_COROUTINES
+        , _coro(o._coro)
+#endif
+    {
+      _state->visitor = this;
+      if(o._state != nullptr && !is_finished(o._state->current_state()))
+      {
+        abort();  // attempt to relocate an awaitable currently in use
+      }
+#if LLFIO_ENABLE_COROUTINES
+      o._coro = {};
+#endif
+    }
+    awaitable &operator=(const awaitable &) = delete;
+    awaitable &operator=(awaitable &&o) noexcept
+    {
+      this->~awaitable();
+      new(this) awaitable(std::move(o));
+      return *this;
+    }
+    inline ~awaitable();  // defined in io_handle.hpp
+
+    bool await_ready() noexcept { return is_finished(_state->current_state()); }
+
+    result_type await_resume() { return _result_type_from_io_operation_state(_state, (buffers_type *) nullptr); }
+
+#if LLFIO_ENABLE_COROUTINES
+    void await_suspend(coroutine_handle<> coro)
+    {
+      _state->invoke(make_function_ptr([&](io_operation_state_type s) {
+        if(is_finished(s))
+        {
+          coro.resume();
+          return;
+        }
+        _coro = coro;
+      }));
+    }
+#endif
+
+  protected:
+    // virtual void read_initiated(io_operation_state * /*state*/, io_operation_state_type /*former*/) override {}
+    // virtual void read_completed(io_operation_state * /*state*/, io_operation_state_type /*former*/, io_result<buffers_type> && /*res*/) override {}
+    virtual void read_finished(io_operation_state * /*state*/, io_operation_state_type /*former*/) override
+    {
+#if LLFIO_ENABLE_COROUTINES
+      if(_coro)
+      {
+        _coro.resume();
+      }
+#endif
+    }
+    // virtual void write_initiated(io_operation_state * /*state*/, io_operation_state_type /*former*/) override {}
+    // virtual void write_completed(io_operation_state * /*state*/, io_operation_state_type /*former*/, io_result<const_buffers_type> && /*res*/) override {}
+    // virtual void barrier_initiated(io_operation_state * /*state*/, io_operation_state_type /*former*/) override {}
+    // virtual void barrier_completed(io_operation_state * /*state*/, io_operation_state_type /*former*/, io_result<const_buffers_type> && /*res*/) override {}
+    virtual void write_or_barrier_finished(io_operation_state * /*state*/, io_operation_state_type /*former*/) override
+    {
+#if LLFIO_ENABLE_COROUTINES
+      if(_coro)
+      {
+        _coro.resume();
+      }
+#endif
+    }
+  };
+  static_assert(sizeof(awaitable<io_result<buffers_type>>) == _awaitable_size, "awaitable<io_result<buffers_type>> is not _awaitable_size bytes in length!");
+
 public:
   //! Returns the number of bytes, and alignment required, for an `io_operation_state` for this multiplexer
   virtual std::pair<size_t, size_t> io_state_requirements() noexcept = 0;
+
+  /*! \brief Constructs either a `unsynchronised_io_operation_state` or a `synchronised_io_operation_state`
+  for a read operation into the storage provided. The i/o is not initiated. The storage must
+  meet the requirements from `state_requirements()`.
+  */
+  virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept = 0;
+
+  /*! \brief Constructs either a `unsynchronised_io_operation_state` or a `synchronised_io_operation_state`
+  for a write operation into the storage provided. The i/o is not initiated. The storage must
+  meet the requirements from `state_requirements()`.
+  */
+  virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept = 0;
+
+  /*! \brief Constructs either a `unsynchronised_io_operation_state` or a `synchronised_io_operation_state`
+  for a barrier operation into the storage provided. The i/o is not initiated. The storage must
+  meet the requirements from `state_requirements()`.
+  */
+  virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept = 0;
 
   /*! \brief Constructs either a `unsynchronised_io_operation_state` or a `synchronised_io_operation_state`
   for a read operation into the storage provided, possibly initiating the i/o as well. The storage must
