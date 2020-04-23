@@ -86,11 +86,11 @@ namespace test
       return success();
     }
 
-    // LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_type> current_path() const noexcept override;
-    // LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override { return _base::close(); }
-    // LLFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override { return _base::release(); }
+    // virtual result<path_type> current_path() const noexcept override;
+    // virtual result<void> close() noexcept override { return _base::close(); }
+    // virtual native_handle_type release() noexcept override { return _base::release(); }
 
-    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<uint8_t> do_io_handle_register(io_handle *h) noexcept override
+    virtual result<uint8_t> do_io_handle_register(io_handle *h) noexcept override
     {
       windows_nt_kernel::init();
       using namespace windows_nt_kernel;
@@ -118,7 +118,7 @@ namespace test
       // we successfully executed this
       return SetFileCompletionNotificationModes(h->native_handle().h, FILE_SKIP_COMPLETION_PORT_ON_SUCCESS | FILE_SKIP_SET_EVENT_ON_HANDLE) ? (uint8_t) 1 : (uint8_t) 0;
     }
-    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> do_io_handle_deregister(io_handle *h) noexcept override
+    virtual result<void> do_io_handle_deregister(io_handle *h) noexcept override
     {
       windows_nt_kernel::init();
       using namespace windows_nt_kernel;
@@ -139,10 +139,40 @@ namespace test
       }
       return success();
     }
-    // LLFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t do_io_handle_max_buffers(const io_handle *h) const noexcept override {}
-    // LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<registered_buffer_type> do_io_handle_allocate_registered_buffer(io_handle *h, size_t &bytes) noexcept override {}
-    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC std::pair<size_t, size_t> io_state_requirements() noexcept override { return {sizeof(_iocp_operation_state), alignof(_iocp_operation_state)}; }
-    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<io_operation_state *> init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept override
+    // virtual size_t do_io_handle_max_buffers(const io_handle *h) const noexcept override {}
+    // virtual result<registered_buffer_type> do_io_handle_allocate_registered_buffer(io_handle *h, size_t &bytes) noexcept override {}
+    virtual std::pair<size_t, size_t> io_state_requirements() noexcept override { return {sizeof(_iocp_operation_state), alignof(_iocp_operation_state)}; }
+    virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept override
+    {
+      assert(storage.size() >= sizeof(_iocp_operation_state));
+      // assert(((uintptr_t) storage.data() & (_iocp_operation_state_alignment - 1)) == 0);
+      if(storage.size() < sizeof(_iocp_operation_state) /*|| ((uintptr_t) storage.data() & (_iocp_operation_state_alignment - 1)) != 0*/)
+      {
+        return nullptr;
+      }
+      return new(storage.data()) _iocp_operation_state(_h, _visitor, std::move(b), d, std::move(reqs));
+    }
+    virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept override
+    {
+      assert(storage.size() >= sizeof(_iocp_operation_state));
+      // assert(((uintptr_t) storage.data() & (_iocp_operation_state_alignment - 1)) == 0);
+      if(storage.size() < sizeof(_iocp_operation_state) /*|| ((uintptr_t) storage.data() & (_iocp_operation_state_alignment - 1)) != 0*/)
+      {
+        return nullptr;
+      }
+      return new(storage.data()) _iocp_operation_state(_h, _visitor, std::move(b), d, std::move(reqs));
+    }
+    virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept override
+    {
+      assert(storage.size() >= sizeof(_iocp_operation_state));
+      // assert(((uintptr_t) storage.data() & (_iocp_operation_state_alignment - 1)) == 0);
+      if(storage.size() < sizeof(_iocp_operation_state) /*|| ((uintptr_t) storage.data() & (_iocp_operation_state_alignment - 1)) != 0*/)
+      {
+        return nullptr;
+      }
+      return new(storage.data()) _iocp_operation_state(_h, _visitor, std::move(b), d, std::move(reqs), kind);
+    }
+    virtual result<io_operation_state *> init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept override
     {
       windows_nt_kernel::init();
       using namespace windows_nt_kernel;
@@ -172,7 +202,7 @@ namespace test
       }
       return state;
     }
-    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<io_operation_state *> init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept override
+    virtual result<io_operation_state *> init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept override
     {
       windows_nt_kernel::init();
       using namespace windows_nt_kernel;
@@ -202,7 +232,7 @@ namespace test
       }
       return state;
     }
-    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<io_operation_state *> init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept override
+    virtual result<io_operation_state *> init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept override
     {
       (void) storage;
       (void) _h;
@@ -214,7 +244,7 @@ namespace test
       LLFIO_LOG_FUNCTION_CALL(this);
       return errc::operation_not_supported;  // barrier requires work to implement :)
     }
-    // LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> flush_inited_io_operations() noexcept { return success(); }
+    // virtual result<void> flush_inited_io_operations() noexcept { return success(); }
     template <class U> io_operation_state_type _check_io_operation(_iocp_operation_state *state, U &&f) noexcept
     {
       auto fill_io_result = [&](auto &ret, auto &params) -> bool {
@@ -309,7 +339,7 @@ namespace test
       }
       return v;
     }
-    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_operation_state_type check_io_operation(io_operation_state *_op) noexcept override
+    virtual io_operation_state_type check_io_operation(io_operation_state *_op) noexcept override
     {
       windows_nt_kernel::init();
       LLFIO_LOG_FUNCTION_CALL(this);
@@ -326,7 +356,7 @@ namespace test
         }
       });
     }
-    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<io_operation_state_type> cancel_io_operation(io_operation_state *_op, deadline d = {}) noexcept override
+    virtual result<io_operation_state_type> cancel_io_operation(io_operation_state *_op, deadline d = {}) noexcept override
     {
       windows_nt_kernel::init();
       using namespace windows_nt_kernel;
@@ -377,7 +407,7 @@ namespace test
       }
       return state->state;
     }
-    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<wait_for_completed_io_statistics> check_for_any_completed_io(deadline d = std::chrono::seconds(0), size_t max_completions = (size_t) -1) noexcept override
+    virtual result<wait_for_completed_io_statistics> check_for_any_completed_io(deadline d = std::chrono::seconds(0), size_t max_completions = (size_t) -1) noexcept override
     {
       windows_nt_kernel::init();
       using namespace windows_nt_kernel;
@@ -440,7 +470,7 @@ namespace test
       }
       return stats;
     }
-    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> wake_check_for_any_completed_io() noexcept override
+    virtual result<void> wake_check_for_any_completed_io() noexcept override
     {
       windows_nt_kernel::init();
       using namespace windows_nt_kernel;

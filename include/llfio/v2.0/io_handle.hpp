@@ -424,6 +424,21 @@ inline result<io_multiplexer::registered_buffer_type> io_multiplexer::do_io_hand
 {
   return h->_do_allocate_registered_buffer(bytes);
 }
+template <class T> inline io_multiplexer::awaitable<T>::~awaitable()
+{
+  if(_state != nullptr && !is_finished(_state->current_state()))
+  {
+    if(!is_completed(_state->h->multiplexer()->check_io_operation(_state)))
+    {
+      // Cancel the i/o
+      (void) _state->h->multiplexer()->cancel_io_operation(_state);
+    }
+    while(!is_finished(_state->h->multiplexer()->check_io_operation(_state)))
+    {
+      // Spin until I finish
+    }
+  }
+}
 
 // BEGIN make_free_functions.py
 /*! \brief Read data from the open handle.
