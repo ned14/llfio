@@ -68,7 +68,9 @@ var hierarchy =
         [ "llfio_v2_xxx::io_multiplexer::_synchronised_io_operation_state", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html", null ]
       ] ]
     ] ],
-    [ "llfio_v2_xxx::io_multiplexer::io_operation_state_visitor", "structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state__visitor.html", null ],
+    [ "llfio_v2_xxx::io_multiplexer::io_operation_state_visitor", "structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state__visitor.html", [
+      [ "llfio_v2_xxx::io_multiplexer::awaitable< T >", "structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html", null ]
+    ] ],
     [ "llfio_v2_xxx::directory_handle::io_request< class >", "structllfio__v2__xxx_1_1directory__handle_1_1io__request.html", null ],
     [ "llfio_v2_xxx::io_multiplexer::io_request< T >", "structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html", null ],
     [ "llfio_v2_xxx::symlink_handle::io_request< T, bool >", "structllfio__v2__xxx_1_1symlink__handle_1_1io__request.html", null ],
@@ -102,8 +104,8 @@ var hierarchy =
     [ "llfio_v2_xxx::utils::process_memory_usage", "structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html", null ],
     [ "llfio_v2_xxx::io_multiplexer::_unsynchronised_io_operation_state::payload_t::noncompleted_t::params_t::read_params_t", "structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t_fd29c581ca55bf5954d3fa054ce41041.html", null ],
     [ "llfio_v2_xxx::read_receiver< IoHandleType >", "classllfio__v2__xxx_1_1read__receiver.html", null ],
-    [ "llfio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
     [ "llfio_v2_xxx::utils::page_allocator< void >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
+    [ "llfio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
     [ "llfio_v2_xxx::algorithm::remove_all_callback_arg", "unionllfio__v2__xxx_1_1algorithm_1_1remove__all__callback__arg.html", null ],
     [ "result", null, [
       [ "llfio_v2_xxx::io_multiplexer::io_result< buffers_type >", "structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html", null ],

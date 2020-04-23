@@ -85,6 +85,7 @@ $(document).ready(function(){initNavTree('structllfio__v2__xxx_1_1io__multiplexe
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">llfio_v2_xxx::io_multiplexer::_unsynchronised_io_operation_state Struct Reference</div>  </div>
@@ -141,9 +142,6 @@ constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <tr class="memitem:a4bb3966e906c5fb81cfa50244a8b7a8b"><td class="memItemLeft" align="right" valign="top"><a id="a4bb3966e906c5fb81cfa50244a8b7a8b"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>_unsynchronised_io_operation_state</b> (const <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html">_unsynchronised_io_operation_state</a> &amp;)=delete</td></tr>
 <tr class="separator:a4bb3966e906c5fb81cfa50244a8b7a8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afb37f610fea7e595a7005a863dfa899a"><td class="memItemLeft" align="right" valign="top"><a id="afb37f610fea7e595a7005a863dfa899a"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>_unsynchronised_io_operation_state</b> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html">_unsynchronised_io_operation_state</a> &amp;&amp;)=delete</td></tr>
-<tr class="separator:afb37f610fea7e595a7005a863dfa899a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0e7578c0eb50a0758a51d6eeb5855d56"><td class="memItemLeft" align="right" valign="top"><a id="a0e7578c0eb50a0758a51d6eeb5855d56"></a>
 <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html">_unsynchronised_io_operation_state</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html">_unsynchronised_io_operation_state</a> &amp;)=delete</td></tr>
 <tr class="separator:a0e7578c0eb50a0758a51d6eeb5855d56"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -154,6 +152,10 @@ constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#ad4eb0fe836f3853d4498a2e1f3f84a98">clear_storage</a> ()</td></tr>
 <tr class="memdesc:ad4eb0fe836f3853d4498a2e1f3f84a98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used to clear the storage in this operation state. <br /></td></tr>
 <tr class="separator:ad4eb0fe836f3853d4498a2e1f3f84a98"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6eac689d1ad153296e6a4a49f1ab0187"><td class="memItemLeft" align="right" valign="top"><a id="a6eac689d1ad153296e6a4a49f1ab0187"></a>
+virtual void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#a6eac689d1ad153296e6a4a49f1ab0187">invoke</a> (function_ptr&lt; void *(<a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745">io_operation_state_type</a>)&gt; c) const noexcept override</td></tr>
+<tr class="memdesc:a6eac689d1ad153296e6a4a49f1ab0187"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invoke the callable with the per-i/o state lock held, if any. <br /></td></tr>
+<tr class="separator:a6eac689d1ad153296e6a4a49f1ab0187"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a198468a39c9d472204cca865f0024c42"><td class="memItemLeft" align="right" valign="top"><a id="a198468a39c9d472204cca865f0024c42"></a>
 virtual <a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745">io_operation_state_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#a198468a39c9d472204cca865f0024c42">current_state</a> () const noexcept override</td></tr>
 <tr class="memdesc:a198468a39c9d472204cca865f0024c42"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used to retrieve the current state of the i/o operation. <br /></td></tr>
@@ -211,6 +213,12 @@ union <a class="el" href="unionllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchron
 <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state__visitor.html">io_operation_state_visitor</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html#a648d87148f5a16587c9f9c2a5663e20c">visitor</a> {nullptr}</td></tr>
 <tr class="memdesc:a648d87148f5a16587c9f9c2a5663e20c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The state visitor supplied when the operation was initialised. <br /></td></tr>
 <tr class="separator:a648d87148f5a16587c9f9c2a5663e20c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:abd229790898814742c93f2b29e534d4f"><td class="memItemLeft" align="right" valign="top"><a id="abd229790898814742c93f2b29e534d4f"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>_unsynchronised_io_operation_state</b> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html">_unsynchronised_io_operation_state</a> &amp;&amp;)=default</td></tr>
+<tr class="separator:abd229790898814742c93f2b29e534d4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An unsynchronised i/o operation state. </p>

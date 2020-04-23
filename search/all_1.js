@@ -21,5 +21,6 @@ var searchData=
   ['atomic_5fappend_2ehpp',['atomic_append.hpp',['../atomic__append_8hpp.html',1,'']]],
   ['attr_5fread',['attr_read',['../classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaaa4daf6d1e8da35af49c33bbe9ee91d79',1,'llfio_v2_xxx::handle']]],
   ['attr_5fwrite',['attr_write',['../classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaa9f56aff64cb748e078ab221474132d19',1,'llfio_v2_xxx::handle']]],
+  ['awaitable',['awaitable',['../structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html',1,'llfio_v2_xxx::io_multiplexer']]],
   ['awaitable_5fhandle',['awaitable_handle',['../classllfio__v2__xxx_1_1awaitable__handle.html',1,'llfio_v2_xxx']]]
 ];

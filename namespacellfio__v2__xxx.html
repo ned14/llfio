@@ -1374,7 +1374,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX read() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be returned if deadline i/o is not possible with this particular handle configuration (e.g. reading from regular files on POSIX or reading from a non-overlapped HANDLE on Windows). </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle performs one calloc and one free. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;{</div><div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;{</div><div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="ab993693c98cdb52e2d611f8f9e24e4e2"></a>
@@ -2164,7 +2164,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 </dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX write() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle performs one calloc and one free. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;{</div><div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;{</div><div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a5ea3d93e8b2c7f6e3fca7a9cde734312"></a>
@@ -2213,7 +2213,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;{</div><div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(offset)&gt;(offset), std::forward&lt;decltype(lst)&gt;(lst), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;{</div><div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(offset)&gt;(offset), std::forward&lt;decltype(lst)&gt;(lst), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a681ed7e98ac17e6bb336b9287365141b"></a>
