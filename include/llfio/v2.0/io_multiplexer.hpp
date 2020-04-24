@@ -1071,16 +1071,7 @@ public:
     inline ~awaitable();  // defined in io_handle.hpp
 
     //! True if the i/o state is finished. Begins the i/o if it is not initiated yet.
-    bool await_ready() noexcept
-    {
-      auto state = _state->current_state();
-      if(is_initialised(state))
-      {
-        // Begin the i/o
-        state = _state->h->init_io_operation(_state);
-      }
-      return is_finished(state);
-    }
+    inline bool await_ready() noexcept; // defined in io_handle.hpp
 
     //! Returns the result of the i/o
     result_type await_resume() { return _result_type_from_io_operation_state(_state, (buffers_type *) nullptr); }

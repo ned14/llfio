@@ -507,6 +507,16 @@ inline result<io_multiplexer::registered_buffer_type> io_multiplexer::do_io_hand
 {
   return h->_do_allocate_registered_buffer(bytes);
 }
+template <class T> inline bool io_multiplexer::awaitable<T>::await_ready() noexcept
+{
+  auto state = _state->current_state();
+  if(is_initialised(state))
+  {
+    // Begin the i/o
+    state = _state->h->init_io_operation(_state);
+  }
+  return is_finished(state);
+}
 template <class T> inline io_multiplexer::awaitable<T>::~awaitable()
 {
   if(_state != nullptr)
