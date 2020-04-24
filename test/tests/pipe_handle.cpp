@@ -149,8 +149,7 @@ static inline void TestMultiplexedPipeHandle()
           io_state = nullptr;
         }
         buffer = {_buffer, sizeof(_buffer)};
-        OUTCOME_TRY(s, multiplexer->init_io_operation({io_state_ptr.get(), 4096 /*lies*/}, &h, this, {}, {}, llfio::pipe_handle::io_request<llfio::pipe_handle::buffers_type>({&buffer, 1}, 0)));
-        io_state = s;
+        io_state = multiplexer->construct_and_init_io_operation({io_state_ptr.get(), 4096 /*lies*/}, &h, this, {}, {}, llfio::pipe_handle::io_request<llfio::pipe_handle::buffers_type>({&buffer, 1}, 0));
         return llfio::success();
       }
 
@@ -158,7 +157,7 @@ static inline void TestMultiplexedPipeHandle()
       virtual void read_initiated(llfio::io_multiplexer::io_operation_state * /*state*/, llfio::io_operation_state_type /*former*/) override { std::cout << "   Pipe " << myindex << " will complete read later" << std::endl; }
 
       // Called when the read completes
-      virtual void read_completed(llfio::io_multiplexer::io_operation_state * /*state*/, llfio::io_operation_state_type former, llfio::pipe_handle::io_result<llfio::pipe_handle::buffers_type> &&res) override
+      virtual bool read_completed(llfio::io_multiplexer::io_operation_state * /*state*/, llfio::io_operation_state_type former, llfio::pipe_handle::io_result<llfio::pipe_handle::buffers_type> &&res) override
       {
         if(is_initialised(former))
         {
@@ -178,6 +177,7 @@ static inline void TestMultiplexedPipeHandle()
           BOOST_CHECK(_index == myindex);
           received_for[_index]++;
         }
+        return true;
       }
 
       // Called when the state for the read can be disposed
