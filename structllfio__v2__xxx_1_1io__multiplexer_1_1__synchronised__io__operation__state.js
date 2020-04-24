@@ -14,6 +14,7 @@ var structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__st
     [ "read_completed", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#ad91b80c9cdb74d93aa86984f9b05a8c8", null ],
     [ "read_finished", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#ae00a5e9ca83a6e6dd499e21b2de41a33", null ],
     [ "read_initiated", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#a9b082db9550619210e18d41c43a401c6", null ],
+    [ "relocate_to", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#ae7c931c1bca9eb3feb9874e158e620d9", null ],
     [ "write_completed", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#a01bf271bda674c78f92c0daeb3be1255", null ],
     [ "write_initiated", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#a3fcec51351c69f0888b64c2097505644", null ],
     [ "write_or_barrier_finished", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#a321145a18f5f85416e41087a1dcc3a25", null ],

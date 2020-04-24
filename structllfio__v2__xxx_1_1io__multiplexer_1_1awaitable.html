@@ -86,6 +86,7 @@ $(document).ready(function(){initNavTree('structllfio__v2__xxx_1_1io__multiplexe
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="#pub-static-attribs">Static Public Attributes</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#friends">Friends</a> &#124;
 <a href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">llfio_v2_xxx::io_multiplexer::awaitable&lt; T &gt; Struct Template Reference<span class="mlabels"><span class="mlabel">final</span></span></div>  </div>
@@ -119,14 +120,20 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="str
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a20be335e45bf3d9c3f4369ba5692f247"><td class="memItemLeft" align="right" valign="top"><a id="a20be335e45bf3d9c3f4369ba5692f247"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>set_state</b> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html">io_operation_state</a> *state) noexcept</td></tr>
-<tr class="separator:a20be335e45bf3d9c3f4369ba5692f247"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8087d33fb104dac1261abbe4ba58b979"><td class="memItemLeft" align="right" valign="top"><a id="a8087d33fb104dac1261abbe4ba58b979"></a>
+constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html#a8087d33fb104dac1261abbe4ba58b979">awaitable</a> ()</td></tr>
+<tr class="memdesc:a8087d33fb104dac1261abbe4ba58b979"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
+<tr class="separator:a8087d33fb104dac1261abbe4ba58b979"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65537aacf96416de702e47cbde6b36c7"><td class="memItemLeft" align="right" valign="top"><a id="a65537aacf96416de702e47cbde6b36c7"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html#a65537aacf96416de702e47cbde6b36c7">awaitable</a> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html#a59fab1c0f3063106623f94e4ec42aab4">result_type</a> &amp;&amp;res) noexcept</td></tr>
+<tr class="memdesc:a65537aacf96416de702e47cbde6b36c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs an immediately finished awaitable. <br /></td></tr>
+<tr class="separator:a65537aacf96416de702e47cbde6b36c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71f45f3dc4b6aeae4bca751758e69423"><td class="memItemLeft" align="right" valign="top"><a id="a71f45f3dc4b6aeae4bca751758e69423"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>awaitable</b> (const <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html">awaitable</a> &amp;)=delete</td></tr>
 <tr class="separator:a71f45f3dc4b6aeae4bca751758e69423"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8f7eb5f31a556f508b1109edda19bac6"><td class="memItemLeft" align="right" valign="top"><a id="a8f7eb5f31a556f508b1109edda19bac6"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>awaitable</b> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html">awaitable</a> &amp;&amp;o) noexcept</td></tr>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html#a8f7eb5f31a556f508b1109edda19bac6">awaitable</a> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html">awaitable</a> &amp;&amp;o) noexcept</td></tr>
+<tr class="memdesc:a8f7eb5f31a556f508b1109edda19bac6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move construction, terminates the process if the i/o is in progress. <br /></td></tr>
 <tr class="separator:a8f7eb5f31a556f508b1109edda19bac6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a09f4f17a00a8fb700fd5cbb0b73d6d1d"><td class="memItemLeft" align="right" valign="top"><a id="a09f4f17a00a8fb700fd5cbb0b73d6d1d"></a>
 <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html">awaitable</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html">awaitable</a> &amp;)=delete</td></tr>
@@ -134,11 +141,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>set_state</b> (<a cla
 <tr class="memitem:acd04e91854d57489ae87872fc8f73065"><td class="memItemLeft" align="right" valign="top"><a id="acd04e91854d57489ae87872fc8f73065"></a>
 <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html">awaitable</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html">awaitable</a> &amp;&amp;o) noexcept</td></tr>
 <tr class="separator:acd04e91854d57489ae87872fc8f73065"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a298a3769fcea4e3cb54fe59f7402cdee"><td class="memItemLeft" align="right" valign="top"><a id="a298a3769fcea4e3cb54fe59f7402cdee"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html#a298a3769fcea4e3cb54fe59f7402cdee">~awaitable</a> ()</td></tr>
+<tr class="memdesc:a298a3769fcea4e3cb54fe59f7402cdee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor, blocks if the i/o is in progress. <br /></td></tr>
+<tr class="separator:a298a3769fcea4e3cb54fe59f7402cdee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a687e302e266f2666dd4186d0f9c74abc"><td class="memItemLeft" align="right" valign="top"><a id="a687e302e266f2666dd4186d0f9c74abc"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>await_ready</b> () noexcept</td></tr>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html#a687e302e266f2666dd4186d0f9c74abc">await_ready</a> () noexcept</td></tr>
+<tr class="memdesc:a687e302e266f2666dd4186d0f9c74abc"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if the i/o state is finished. Begins the i/o if it is not initiated yet. <br /></td></tr>
 <tr class="separator:a687e302e266f2666dd4186d0f9c74abc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aee7e418ca902b7b6096097ed771e8f33"><td class="memItemLeft" align="right" valign="top"><a id="aee7e418ca902b7b6096097ed771e8f33"></a>
-<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html#a59fab1c0f3063106623f94e4ec42aab4">result_type</a>&#160;</td><td class="memItemRight" valign="bottom"><b>await_resume</b> ()</td></tr>
+<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html#a59fab1c0f3063106623f94e4ec42aab4">result_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html#aee7e418ca902b7b6096097ed771e8f33">await_resume</a> ()</td></tr>
+<tr class="memdesc:aee7e418ca902b7b6096097ed771e8f33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the result of the i/o. <br /></td></tr>
 <tr class="separator:aee7e418ca902b7b6096097ed771e8f33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
@@ -158,30 +171,47 @@ static constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><b>_s
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
+<tr class="memitem:a20be335e45bf3d9c3f4369ba5692f247"><td class="memItemLeft" align="right" valign="top"><a id="a20be335e45bf3d9c3f4369ba5692f247"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>set_state</b> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html">io_operation_state</a> *state) noexcept</td></tr>
+<tr class="separator:a20be335e45bf3d9c3f4369ba5692f247"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2904d0933bd957920c1c9f1a38fd5f90"><td class="memItemLeft" align="right" valign="top"><a id="a2904d0933bd957920c1c9f1a38fd5f90"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>read_finished</b> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html">io_operation_state</a> *, <a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745">io_operation_state_type</a>) override</td></tr>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html#a2904d0933bd957920c1c9f1a38fd5f90">read_finished</a> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html">io_operation_state</a> *, <a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745">io_operation_state_type</a>) override</td></tr>
+<tr class="memdesc:a2904d0933bd957920c1c9f1a38fd5f90"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called when an i/o has finished, and its state can now be destroyed. <br /></td></tr>
 <tr class="separator:a2904d0933bd957920c1c9f1a38fd5f90"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a809f6ad1273b89fcd3c78aa030e0e4e1"><td class="memItemLeft" align="right" valign="top"><a id="a809f6ad1273b89fcd3c78aa030e0e4e1"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>write_or_barrier_finished</b> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html">io_operation_state</a> *, <a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745">io_operation_state_type</a>) override</td></tr>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html#a809f6ad1273b89fcd3c78aa030e0e4e1">write_or_barrier_finished</a> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html">io_operation_state</a> *, <a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745">io_operation_state_type</a>) override</td></tr>
+<tr class="memdesc:a809f6ad1273b89fcd3c78aa030e0e4e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called when an i/o has finished, and its state can now be destroyed. <br /></td></tr>
 <tr class="separator:a809f6ad1273b89fcd3c78aa030e0e4e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad338ed86afa136109d00cefc22ef95c2"><td class="memItemLeft" align="right" valign="top"><a id="ad338ed86afa136109d00cefc22ef95c2"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>read_initiated</b> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html">io_operation_state</a> *, <a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745">io_operation_state_type</a>)</td></tr>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state__visitor.html#ad338ed86afa136109d00cefc22ef95c2">read_initiated</a> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html">io_operation_state</a> *, <a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745">io_operation_state_type</a>)</td></tr>
+<tr class="memdesc:ad338ed86afa136109d00cefc22ef95c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called when an i/o has been initiated, and is now being processed asynchronously. <br /></td></tr>
 <tr class="separator:ad338ed86afa136109d00cefc22ef95c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa39597dc7b3a629a0299f5a68b0a913c"><td class="memItemLeft" align="right" valign="top"><a id="aa39597dc7b3a629a0299f5a68b0a913c"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>read_completed</b> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html">io_operation_state</a> *, <a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745">io_operation_state_type</a>, <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html#aca180155e6c98895c953ca2b96276c77">buffers_type</a> &gt; &amp;&amp;)</td></tr>
-<tr class="separator:aa39597dc7b3a629a0299f5a68b0a913c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7792445b6a91b975ccde986ca34230de"><td class="memItemLeft" align="right" valign="top"><a id="a7792445b6a91b975ccde986ca34230de"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state__visitor.html#a7792445b6a91b975ccde986ca34230de">read_completed</a> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html">io_operation_state</a> *, <a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745">io_operation_state_type</a>, <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html#aca180155e6c98895c953ca2b96276c77">buffers_type</a> &gt; &amp;&amp;)</td></tr>
+<tr class="memdesc:a7792445b6a91b975ccde986ca34230de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called when an i/o has completed, and its result is available. Return true if you consume the result. <br /></td></tr>
+<tr class="separator:a7792445b6a91b975ccde986ca34230de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f807c546b99a1db748dba4afd48b6de"><td class="memItemLeft" align="right" valign="top"><a id="a9f807c546b99a1db748dba4afd48b6de"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>write_initiated</b> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html">io_operation_state</a> *, <a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745">io_operation_state_type</a>)</td></tr>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state__visitor.html#a9f807c546b99a1db748dba4afd48b6de">write_initiated</a> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html">io_operation_state</a> *, <a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745">io_operation_state_type</a>)</td></tr>
+<tr class="memdesc:a9f807c546b99a1db748dba4afd48b6de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called when an i/o has been initiated, and is now being processed asynchronously. <br /></td></tr>
 <tr class="separator:a9f807c546b99a1db748dba4afd48b6de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad99e8ebef8e7c832d1fffd8fcbda6158"><td class="memItemLeft" align="right" valign="top"><a id="ad99e8ebef8e7c832d1fffd8fcbda6158"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>write_completed</b> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html">io_operation_state</a> *, <a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745">io_operation_state_type</a>, <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#abc6841b44841c72c3778a3aee296a051">const_buffers_type</a> &gt; &amp;&amp;)</td></tr>
-<tr class="separator:ad99e8ebef8e7c832d1fffd8fcbda6158"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a16586dbf43e186f7adb3f32c2ada129d"><td class="memItemLeft" align="right" valign="top"><a id="a16586dbf43e186f7adb3f32c2ada129d"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state__visitor.html#a16586dbf43e186f7adb3f32c2ada129d">write_completed</a> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html">io_operation_state</a> *, <a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745">io_operation_state_type</a>, <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#abc6841b44841c72c3778a3aee296a051">const_buffers_type</a> &gt; &amp;&amp;)</td></tr>
+<tr class="memdesc:a16586dbf43e186f7adb3f32c2ada129d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called when an i/o has completed, and its result is available. Return true if you consume the result. <br /></td></tr>
+<tr class="separator:a16586dbf43e186f7adb3f32c2ada129d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa6bc07c76a73c43c2663ae13dca8c2bb"><td class="memItemLeft" align="right" valign="top"><a id="aa6bc07c76a73c43c2663ae13dca8c2bb"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>barrier_initiated</b> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html">io_operation_state</a> *, <a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745">io_operation_state_type</a>)</td></tr>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state__visitor.html#aa6bc07c76a73c43c2663ae13dca8c2bb">barrier_initiated</a> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html">io_operation_state</a> *, <a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745">io_operation_state_type</a>)</td></tr>
+<tr class="memdesc:aa6bc07c76a73c43c2663ae13dca8c2bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called when an i/o has been initiated, and is now being processed asynchronously. <br /></td></tr>
 <tr class="separator:aa6bc07c76a73c43c2663ae13dca8c2bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a665cc9d6300cbaf848e53746c29ff9f1"><td class="memItemLeft" align="right" valign="top"><a id="a665cc9d6300cbaf848e53746c29ff9f1"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>barrier_completed</b> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html">io_operation_state</a> *, <a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745">io_operation_state_type</a>, <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#abc6841b44841c72c3778a3aee296a051">const_buffers_type</a> &gt; &amp;&amp;)</td></tr>
-<tr class="separator:a665cc9d6300cbaf848e53746c29ff9f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e78658c53716f2db23bbd5785a1b4dc"><td class="memItemLeft" align="right" valign="top"><a id="a6e78658c53716f2db23bbd5785a1b4dc"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state__visitor.html#a6e78658c53716f2db23bbd5785a1b4dc">barrier_completed</a> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html">io_operation_state</a> *, <a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745">io_operation_state_type</a>, <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#abc6841b44841c72c3778a3aee296a051">const_buffers_type</a> &gt; &amp;&amp;)</td></tr>
+<tr class="memdesc:a6e78658c53716f2db23bbd5785a1b4dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called when an i/o has completed, and its result is available. Return true if you consume the result. <br /></td></tr>
+<tr class="separator:a6e78658c53716f2db23bbd5785a1b4dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:a954c5d5a2b4f91a7af3caf7f36dbbdbe"><td class="memItemLeft" align="right" valign="top"><a id="a954c5d5a2b4f91a7af3caf7f36dbbdbe"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>io_handle</b></td></tr>
+<tr class="separator:a954c5d5a2b4f91a7af3caf7f36dbbdbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;class T&gt;<br />

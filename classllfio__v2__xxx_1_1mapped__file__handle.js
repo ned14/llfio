@@ -1,5 +1,6 @@
 var classllfio__v2__xxx_1_1mapped__file__handle =
 [
+    [ "awaitable", "classllfio__v2__xxx_1_1mapped__file__handle.html#ac7a2e68c2f5d49187ec3d179e40b33ea", null ],
     [ "barrier_kind", "classllfio__v2__xxx_1_1mapped__file__handle.html#a0e3d363c01073647a00a2fbbd7b50fbf", null ],
     [ "buffer_type", "classllfio__v2__xxx_1_1mapped__file__handle.html#a16593f18d4a9e83bf696d637ffcc8b5e", null ],
     [ "buffers_type", "classllfio__v2__xxx_1_1mapped__file__handle.html#a45b948ce8159d12dab88ed73cd445233", null ],
@@ -46,6 +47,11 @@ var classllfio__v2__xxx_1_1mapped__file__handle =
     [ "capacity", "classllfio__v2__xxx_1_1mapped__file__handle.html#ac3f6788f559c6e4f0f577eeebf120efe", null ],
     [ "clone", "classllfio__v2__xxx_1_1mapped__file__handle.html#aeea4389189021b94dde6d8f2c3ccc5b3", null ],
     [ "close", "classllfio__v2__xxx_1_1mapped__file__handle.html#a325b7470c78ae88bab851ff054bdbc6c", null ],
+    [ "co_barrier", "classllfio__v2__xxx_1_1mapped__file__handle.html#a359f780e7468407b38978cc5eb7b2555", null ],
+    [ "co_read", "classllfio__v2__xxx_1_1mapped__file__handle.html#a30eca672189ffc408a4e01b064e8b78e", null ],
+    [ "co_read", "classllfio__v2__xxx_1_1mapped__file__handle.html#a883a0fd7de8f10fd8b67a8aee415d735", null ],
+    [ "co_write", "classllfio__v2__xxx_1_1mapped__file__handle.html#a608634d1664d2a43fbdc2e18cae464ee", null ],
+    [ "co_write", "classllfio__v2__xxx_1_1mapped__file__handle.html#aa1847e17496a22bc107f509c3cdfecdd", null ],
     [ "current_path", "classllfio__v2__xxx_1_1mapped__file__handle.html#a00a85eec5a41f7edb2c574d40cf04535", null ],
     [ "extents", "classllfio__v2__xxx_1_1mapped__file__handle.html#a6e30345e9aa4fa263b009efe2c97466a", null ],
     [ "flags", "classllfio__v2__xxx_1_1mapped__file__handle.html#a013936bc1254b1a47567fe29698d1b1c", null ],

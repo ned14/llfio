@@ -21,6 +21,8 @@ var searchData=
   ['atomic_5fappend_2ehpp',['atomic_append.hpp',['../atomic__append_8hpp.html',1,'']]],
   ['attr_5fread',['attr_read',['../classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaaa4daf6d1e8da35af49c33bbe9ee91d79',1,'llfio_v2_xxx::handle']]],
   ['attr_5fwrite',['attr_write',['../classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaa9f56aff64cb748e078ab221474132d19',1,'llfio_v2_xxx::handle']]],
-  ['awaitable',['awaitable',['../structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html',1,'llfio_v2_xxx::io_multiplexer']]],
+  ['await_5fready',['await_ready',['../structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html#a687e302e266f2666dd4186d0f9c74abc',1,'llfio_v2_xxx::io_multiplexer::awaitable']]],
+  ['await_5fresume',['await_resume',['../structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html#aee7e418ca902b7b6096097ed771e8f33',1,'llfio_v2_xxx::io_multiplexer::awaitable']]],
+  ['awaitable',['awaitable',['../structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html',1,'llfio_v2_xxx::io_multiplexer::awaitable&lt; T &gt;'],['../structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html#a8087d33fb104dac1261abbe4ba58b979',1,'llfio_v2_xxx::io_multiplexer::awaitable::awaitable()'],['../structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html#a65537aacf96416de702e47cbde6b36c7',1,'llfio_v2_xxx::io_multiplexer::awaitable::awaitable(result_type &amp;&amp;res) noexcept'],['../structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html#a8f7eb5f31a556f508b1109edda19bac6',1,'llfio_v2_xxx::io_multiplexer::awaitable::awaitable(awaitable &amp;&amp;o) noexcept']]],
   ['awaitable_5fhandle',['awaitable_handle',['../classllfio__v2__xxx_1_1awaitable__handle.html',1,'llfio_v2_xxx']]]
 ];

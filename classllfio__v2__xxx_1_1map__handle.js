@@ -1,5 +1,6 @@
 var classllfio__v2__xxx_1_1map__handle =
 [
+    [ "awaitable", "classllfio__v2__xxx_1_1map__handle.html#ac7a2e68c2f5d49187ec3d179e40b33ea", null ],
     [ "barrier_kind", "classllfio__v2__xxx_1_1map__handle.html#a0e3d363c01073647a00a2fbbd7b50fbf", null ],
     [ "buffer_type", "classllfio__v2__xxx_1_1map__handle.html#acf99226dfe0cb36b0650d71159a74631", null ],
     [ "buffers_type", "classllfio__v2__xxx_1_1map__handle.html#a80e2ea0a3d7289b55911375fe44cf1fd", null ],
@@ -43,6 +44,11 @@ var classllfio__v2__xxx_1_1map__handle =
     [ "capacity", "classllfio__v2__xxx_1_1map__handle.html#ac7d048f830c0b2563fb4b50eb0597152", null ],
     [ "clone", "classllfio__v2__xxx_1_1map__handle.html#aeea4389189021b94dde6d8f2c3ccc5b3", null ],
     [ "close", "classllfio__v2__xxx_1_1map__handle.html#ab6704788ecc652589c3e155f47b40a5e", null ],
+    [ "co_barrier", "classllfio__v2__xxx_1_1map__handle.html#a359f780e7468407b38978cc5eb7b2555", null ],
+    [ "co_read", "classllfio__v2__xxx_1_1map__handle.html#a30eca672189ffc408a4e01b064e8b78e", null ],
+    [ "co_read", "classllfio__v2__xxx_1_1map__handle.html#a883a0fd7de8f10fd8b67a8aee415d735", null ],
+    [ "co_write", "classllfio__v2__xxx_1_1map__handle.html#a608634d1664d2a43fbdc2e18cae464ee", null ],
+    [ "co_write", "classllfio__v2__xxx_1_1map__handle.html#aa1847e17496a22bc107f509c3cdfecdd", null ],
     [ "commit", "classllfio__v2__xxx_1_1map__handle.html#a9b3f12d17a9fc0cfbe15d389f896caa7", null ],
     [ "current_path", "classllfio__v2__xxx_1_1map__handle.html#a00a85eec5a41f7edb2c574d40cf04535", null ],
     [ "decommit", "classllfio__v2__xxx_1_1map__handle.html#a518ff43602ac8e32ae48a198d0de1d75", null ],

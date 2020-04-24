@@ -1,6 +1,7 @@
 var classllfio__v2__xxx_1_1lockable__io__handle =
 [
     [ "extent_guard", "classllfio__v2__xxx_1_1lockable__io__handle_1_1extent__guard.html", "classllfio__v2__xxx_1_1lockable__io__handle_1_1extent__guard" ],
+    [ "awaitable", "classllfio__v2__xxx_1_1lockable__io__handle.html#ac7a2e68c2f5d49187ec3d179e40b33ea", null ],
     [ "barrier_kind", "classllfio__v2__xxx_1_1lockable__io__handle.html#a0e3d363c01073647a00a2fbbd7b50fbf", null ],
     [ "buffer_type", "classllfio__v2__xxx_1_1lockable__io__handle.html#aa225fc493078b94b592c4e740367c0ac", null ],
     [ "buffers_type", "classllfio__v2__xxx_1_1lockable__io__handle.html#a7ad11a1c8d7eb3fd6e8b86e9b71119b6", null ],
@@ -41,6 +42,11 @@ var classllfio__v2__xxx_1_1lockable__io__handle =
     [ "barrier", "classllfio__v2__xxx_1_1lockable__io__handle.html#aa38e8a96767e65a11b7b12b08a4b44ca", null ],
     [ "clone", "classllfio__v2__xxx_1_1lockable__io__handle.html#aeea4389189021b94dde6d8f2c3ccc5b3", null ],
     [ "close", "classllfio__v2__xxx_1_1lockable__io__handle.html#a8f174dc8dd23664251ee2a4f767283c2", null ],
+    [ "co_barrier", "classllfio__v2__xxx_1_1lockable__io__handle.html#a359f780e7468407b38978cc5eb7b2555", null ],
+    [ "co_read", "classllfio__v2__xxx_1_1lockable__io__handle.html#a30eca672189ffc408a4e01b064e8b78e", null ],
+    [ "co_read", "classllfio__v2__xxx_1_1lockable__io__handle.html#a883a0fd7de8f10fd8b67a8aee415d735", null ],
+    [ "co_write", "classllfio__v2__xxx_1_1lockable__io__handle.html#a608634d1664d2a43fbdc2e18cae464ee", null ],
+    [ "co_write", "classllfio__v2__xxx_1_1lockable__io__handle.html#aa1847e17496a22bc107f509c3cdfecdd", null ],
     [ "current_path", "classllfio__v2__xxx_1_1lockable__io__handle.html#a00a85eec5a41f7edb2c574d40cf04535", null ],
     [ "flags", "classllfio__v2__xxx_1_1lockable__io__handle.html#a013936bc1254b1a47567fe29698d1b1c", null ],
     [ "is_allocation", "classllfio__v2__xxx_1_1lockable__io__handle.html#a028fbead3b3c4d4eed2da7fa51c75036", null ],

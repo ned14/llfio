@@ -1,6 +1,7 @@
 var classllfio__v2__xxx_1_1fast__random__file__handle =
 [
     [ "prng", "structllfio__v2__xxx_1_1fast__random__file__handle_1_1prng.html", "structllfio__v2__xxx_1_1fast__random__file__handle_1_1prng" ],
+    [ "awaitable", "classllfio__v2__xxx_1_1fast__random__file__handle.html#ac7a2e68c2f5d49187ec3d179e40b33ea", null ],
     [ "barrier_kind", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a0e3d363c01073647a00a2fbbd7b50fbf", null ],
     [ "buffer_type", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a1020835dc0f70fbc8a7b852fa8d5c0b6", null ],
     [ "buffers_type", "classllfio__v2__xxx_1_1fast__random__file__handle.html#aa4a682714d5d3487bf2538facf4c02ee", null ],
@@ -45,6 +46,11 @@ var classllfio__v2__xxx_1_1fast__random__file__handle =
     [ "barrier", "classllfio__v2__xxx_1_1fast__random__file__handle.html#aa38e8a96767e65a11b7b12b08a4b44ca", null ],
     [ "clone", "classllfio__v2__xxx_1_1fast__random__file__handle.html#aeea4389189021b94dde6d8f2c3ccc5b3", null ],
     [ "close", "classllfio__v2__xxx_1_1fast__random__file__handle.html#ad67d4e8da0a8fa8719f301d577418165", null ],
+    [ "co_barrier", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a359f780e7468407b38978cc5eb7b2555", null ],
+    [ "co_read", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a30eca672189ffc408a4e01b064e8b78e", null ],
+    [ "co_read", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a883a0fd7de8f10fd8b67a8aee415d735", null ],
+    [ "co_write", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a608634d1664d2a43fbdc2e18cae464ee", null ],
+    [ "co_write", "classllfio__v2__xxx_1_1fast__random__file__handle.html#aa1847e17496a22bc107f509c3cdfecdd", null ],
     [ "current_path", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a00a85eec5a41f7edb2c574d40cf04535", null ],
     [ "extents", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a8026691789a70593329230076357fc96", null ],
     [ "flags", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a013936bc1254b1a47567fe29698d1b1c", null ],

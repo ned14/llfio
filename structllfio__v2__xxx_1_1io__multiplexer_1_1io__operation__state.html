@@ -123,6 +123,10 @@ virtual <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__resul
 virtual <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#abc6841b44841c72c3778a3aee296a051">const_buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html#af79be80a27c2e1096beaf30a14db961a">get_completed_write_or_barrier</a> () &amp;&amp;noexcept=0</td></tr>
 <tr class="memdesc:af79be80a27c2e1096beaf30a14db961a"><td class="mdescLeft">&#160;</td><td class="mdescRight">After an i/o operation has finished, can be used to retrieve the result if the visitor did not. <br /></td></tr>
 <tr class="separator:af79be80a27c2e1096beaf30a14db961a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a475a672b4867a9897ea026ab20362537"><td class="memItemLeft" align="right" valign="top"><a id="a475a672b4867a9897ea026ab20362537"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html#a475a672b4867a9897ea026ab20362537">relocate_to</a> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html">io_operation_state</a> *to) noexcept=0</td></tr>
+<tr class="memdesc:a475a672b4867a9897ea026ab20362537"><td class="mdescLeft">&#160;</td><td class="mdescRight">Relocate the state to new storage, destroying the original state. Terminates the process if the state is in use. <br /></td></tr>
+<tr class="separator:a475a672b4867a9897ea026ab20362537"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
