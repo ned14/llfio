@@ -513,7 +513,7 @@ template <class T> inline bool io_multiplexer::awaitable<T>::await_ready() noexc
   if(is_initialised(state))
   {
     // Begin the i/o
-    state = _state->h->init_io_operation(_state);
+    state = _state->h->multiplexer()->init_io_operation(_state);
   }
   return is_finished(state);
 }

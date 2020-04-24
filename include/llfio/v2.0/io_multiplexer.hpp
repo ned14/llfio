@@ -991,7 +991,7 @@ protected:
 #ifdef _WIN32
   static constexpr size_t _awaitable_size = 2048;  // IOCP implementation is unavoidably large
 #else
-  static constexpr size_t _awaitable_size = 64;
+  static constexpr size_t _awaitable_size = 128;
 #endif
   static io_result<buffers_type> _result_type_from_io_operation_state(io_operation_state *state, buffers_type * /*unused*/) noexcept { return std::move(*state).get_completed_read(); }
   static io_result<const_buffers_type> _result_type_from_io_operation_state(io_operation_state *state, const_buffers_type * /*unused*/) noexcept { return std::move(*state).get_completed_write_or_barrier(); }
