@@ -51,6 +51,7 @@ public:
   using creation = handle::creation;
   using caching = handle::caching;
   using flag = handle::flag;
+  using barrier_kind = io_multiplexer::barrier_kind;
   using buffer_type = io_multiplexer::buffer_type;
   using const_buffer_type = io_multiplexer::const_buffer_type;
   using buffers_type = io_multiplexer::buffers_type;
@@ -58,7 +59,7 @@ public:
   using registered_buffer_type = io_multiplexer::registered_buffer_type;
   template <class T> using io_request = io_multiplexer::io_request<T>;
   template <class T> using io_result = io_multiplexer::io_result<T>;
-  using barrier_kind = io_multiplexer::barrier_kind;
+  template <class T> using awaitable = io_multiplexer::awaitable<T>;
 
 protected:
   io_multiplexer *_ctx{nullptr};  // +4 or +8 bytes
@@ -178,7 +179,7 @@ protected:
     auto *storage = (byte *) alloca(state_reqs.first + state_reqs.second);
     const auto diff = (uintptr_t) storage & (state_reqs.second - 1);
     storage += state_reqs.second - diff;
-    OUTCOME_TRY(state, _ctx->init_io_operation({storage, state_reqs.first}, this, nullptr, std::move(base), d, std::move(reqs)));
+    auto *state = _ctx->construct_and_init_io_operation({storage, state_reqs.first}, this, nullptr, std::move(base), d, std::move(reqs));
     OUTCOME_TRY(_ctx->flush_inited_io_operations());
     while(!is_finished(_ctx->check_io_operation(state)))
     {
@@ -197,7 +198,7 @@ protected:
     auto *storage = (byte *) alloca(state_reqs.first + state_reqs.second);
     const auto diff = (uintptr_t) storage & (state_reqs.second - 1);
     storage += state_reqs.second - diff;
-    OUTCOME_TRY(state, _ctx->init_io_operation({storage, state_reqs.first}, this, nullptr, std::move(base), d, std::move(reqs)));
+    auto *state = _ctx->construct_and_init_io_operation({storage, state_reqs.first}, this, nullptr, std::move(base), d, std::move(reqs));
     OUTCOME_TRY(_ctx->flush_inited_io_operations());
     while(!is_finished(_ctx->check_io_operation(state)))
     {
@@ -216,7 +217,7 @@ protected:
     auto *storage = (byte *) alloca(state_reqs.first + state_reqs.second);
     const auto diff = (uintptr_t) storage & (state_reqs.second - 1);
     storage += state_reqs.second - diff;
-    OUTCOME_TRY(state, _ctx->init_io_operation({storage, state_reqs.first}, this, nullptr, std::move(base), d, std::move(reqs), kind));
+    auto *state = _ctx->construct_and_init_io_operation({storage, state_reqs.first}, this, nullptr, std::move(base), d, std::move(reqs), kind);
     OUTCOME_TRY(_ctx->flush_inited_io_operations());
     while(!is_finished(_ctx->check_io_operation(state)))
     {
@@ -413,6 +414,88 @@ public:
   io_result<const_buffers_type> barrier(barrier_kind kind, deadline d = deadline()) noexcept { return barrier(io_request<const_buffers_type>(), kind, d); }
 
   LLFIO_DEADLINE_TRY_FOR_UNTIL(barrier)
+
+public:
+  /*! \brief A coroutinised equivalent to `.read()` which suspends the coroutine until
+  the i/o finishes. **Blocks execution** i.e is equivalent to `.read()` if no i/o multiplexer
+  has been set on this handle!
+
+  The awaitable returned is **eager** i.e. it immediately begins the i/o. If the i/o completes
+  and finishes immediately, no coroutine suspension occurs.
+  */
+  LLFIO_MAKE_FREE_FUNCTION
+  awaitable<io_result<buffers_type>> co_read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept
+  {
+    if(_ctx == nullptr)
+    {
+      return awaitable<io_result<buffers_type>>(read(std::move(reqs), d));
+    }
+    awaitable<io_result<buffers_type>> ret;
+    ret.set_state(_ctx->construct(ret._state_storage, this, nullptr, {}, d, std::move(reqs)));
+    return ret;
+  }
+  //! \overload Registered buffer overload, scatter list **must** be wholly within the registered buffer
+  LLFIO_MAKE_FREE_FUNCTION
+  awaitable<io_result<buffers_type>> co_read(registered_buffer_type base, io_request<buffers_type> reqs, deadline d = deadline()) noexcept
+  {
+    if(_ctx == nullptr)
+    {
+      return awaitable<io_result<buffers_type>>(read(std::move(base), std::move(reqs), d));
+    }
+    awaitable<io_result<buffers_type>> ret;
+    ret.set_state(_ctx->construct(ret._state_storage, this, nullptr, std::move(base), d, std::move(reqs)));
+    return ret;
+  }
+
+  /*! \brief A coroutinised equivalent to `.write()` which suspends the coroutine until
+  the i/o finishes. **Blocks execution** i.e is equivalent to `.write()` if no i/o multiplexer
+  has been set on this handle!
+
+  The awaitable returned is **eager** i.e. it immediately begins the i/o. If the i/o completes
+  and finishes immediately, no coroutine suspension occurs.
+  */
+  LLFIO_MAKE_FREE_FUNCTION
+  awaitable<io_result<const_buffers_type>> co_write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept
+  {
+    if(_ctx == nullptr)
+    {
+      return awaitable<io_result<const_buffers_type>>(write(std::move(reqs), d));
+    }
+    awaitable<io_result<const_buffers_type>> ret;
+    ret.set_state(_ctx->construct(ret._state_storage, this, nullptr, {}, d, std::move(reqs)));
+    return ret;
+  }
+  //! \overload Registered buffer overload, gather list **must** be wholly within the registered buffer
+  LLFIO_MAKE_FREE_FUNCTION
+  awaitable<io_result<const_buffers_type>> co_write(registered_buffer_type base, io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept
+  {
+    if(_ctx == nullptr)
+    {
+      return awaitable<io_result<const_buffers_type>>(write(std::move(base), std::move(reqs), d));
+    }
+    awaitable<io_result<const_buffers_type>> ret;
+    ret.set_state(_ctx->construct(ret._state_storage, this, nullptr, std::move(base), d, std::move(reqs)));
+    return ret;
+  }
+
+  /*! \brief A coroutinised equivalent to `.barrier()` which suspends the coroutine until
+  the i/o finishes. **Blocks execution** i.e is equivalent to `.barrier()` if no i/o multiplexer
+  has been set on this handle!
+
+  The awaitable returned is **eager** i.e. it immediately begins the i/o. If the i/o completes
+  and finishes immediately, no coroutine suspension occurs.
+  */
+  LLFIO_MAKE_FREE_FUNCTION
+  awaitable<io_result<const_buffers_type>> co_barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), barrier_kind kind = barrier_kind::nowait_data_only, deadline d = deadline()) noexcept
+  {
+    if(_ctx == nullptr)
+    {
+      return awaitable<io_result<const_buffers_type>>(barrier(std::move(reqs), kind, d));
+    }
+    awaitable<io_result<const_buffers_type>> ret;
+    ret.set_state(_ctx->construct(ret._state_storage, this, nullptr, {}, d, std::move(reqs), kind));
+    return ret;
+  }
 };
 static_assert((sizeof(void *) == 4 && sizeof(io_handle) == 20) || (sizeof(void *) == 8 && sizeof(io_handle) == 32), "io_handle is not 20 or 32 bytes in size!");
 
@@ -426,17 +509,21 @@ inline result<io_multiplexer::registered_buffer_type> io_multiplexer::do_io_hand
 }
 template <class T> inline io_multiplexer::awaitable<T>::~awaitable()
 {
-  if(_state != nullptr && !is_finished(_state->current_state()))
+  if(_state != nullptr)
   {
-    if(!is_completed(_state->h->multiplexer()->check_io_operation(_state)))
+    if(!is_finished(_state->current_state()))
     {
-      // Cancel the i/o
-      (void) _state->h->multiplexer()->cancel_io_operation(_state);
+      if(!is_completed(_state->h->multiplexer()->check_io_operation(_state)))
+      {
+        // Cancel the i/o
+        (void) _state->h->multiplexer()->cancel_io_operation(_state);
+      }
+      while(!is_finished(_state->h->multiplexer()->check_io_operation(_state)))
+      {
+        // Spin until I finish
+      }
     }
-    while(!is_finished(_state->h->multiplexer()->check_io_operation(_state)))
-    {
-      // Spin until I finish
-    }
+    _state->~io_operation_state();
   }
 }
 

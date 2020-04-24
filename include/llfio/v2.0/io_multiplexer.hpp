@@ -533,18 +533,28 @@ public:
     virtual io_result<buffers_type> get_completed_read() &&noexcept = 0;
     //! After an i/o operation has finished, can be used to retrieve the result if the visitor did not.
     virtual io_result<const_buffers_type> get_completed_write_or_barrier() &&noexcept = 0;
+    //! Relocate the state to new storage, destroying the original state. Terminates the process if the state is in use.
+    virtual void relocate_to(io_operation_state *to) noexcept = 0;
   };
   //! \brief Called by an i/o operation state to inform you of state change. Note that the i/o operation state lock is HELD during these calls!
   struct io_operation_state_visitor
   {
     virtual ~io_operation_state_visitor() {}
+    //! Called when an i/o has been initiated, and is now being processed asynchronously.
     virtual void read_initiated(io_operation_state * /*state*/, io_operation_state_type /*former*/) {}
-    virtual void read_completed(io_operation_state * /*state*/, io_operation_state_type /*former*/, io_result<buffers_type> && /*res*/) {}
+    //! Called when an i/o has completed, and its result is available. Return true if you consume the result.
+    virtual bool read_completed(io_operation_state * /*state*/, io_operation_state_type /*former*/, io_result<buffers_type> && /*res*/) { return false; }
+    //! Called when an i/o has finished, and its state can now be destroyed.
     virtual void read_finished(io_operation_state * /*state*/, io_operation_state_type /*former*/) {}
+    //! Called when an i/o has been initiated, and is now being processed asynchronously.
     virtual void write_initiated(io_operation_state * /*state*/, io_operation_state_type /*former*/) {}
-    virtual void write_completed(io_operation_state * /*state*/, io_operation_state_type /*former*/, io_result<const_buffers_type> && /*res*/) {}
+    //! Called when an i/o has completed, and its result is available. Return true if you consume the result.
+    virtual bool write_completed(io_operation_state * /*state*/, io_operation_state_type /*former*/, io_result<const_buffers_type> && /*res*/) { return false; }
+    //! Called when an i/o has been initiated, and is now being processed asynchronously.
     virtual void barrier_initiated(io_operation_state * /*state*/, io_operation_state_type /*former*/) {}
-    virtual void barrier_completed(io_operation_state * /*state*/, io_operation_state_type /*former*/, io_result<const_buffers_type> && /*res*/) {}
+    //! Called when an i/o has completed, and its result is available. Return true if you consume the result.
+    virtual bool barrier_completed(io_operation_state * /*state*/, io_operation_state_type /*former*/, io_result<const_buffers_type> && /*res*/) { return false; }
+    //! Called when an i/o has finished, and its state can now be destroyed.
     virtual void write_or_barrier_finished(io_operation_state * /*state*/, io_operation_state_type /*former*/) {}
   };
 
@@ -682,46 +692,28 @@ protected:
         , payload(std::move(b), d, std::move(reqs), kind)
     {
     }
+    //! Construct a finished read operation state
+    explicit _unsynchronised_io_operation_state(io_result<buffers_type> &&res)
+        : state(io_operation_state_type::read_finished)
+        , payload(std::move(res))
+    {
+    }
+    //! Construct a finished write or barrier operation state
+    explicit _unsynchronised_io_operation_state(io_result<const_buffers_type> &&res)
+        : state(io_operation_state_type::write_or_barrier_finished)
+        , payload(std::move(res))
+    {
+    }
     _unsynchronised_io_operation_state(const _unsynchronised_io_operation_state &) = delete;
     _unsynchronised_io_operation_state &operator=(const _unsynchronised_io_operation_state &) = delete;
     _unsynchronised_io_operation_state &operator=(_unsynchronised_io_operation_state &&) = delete;
 
   protected:
+    // Do NOT use this directly, use .relocate_to()!
     _unsynchronised_io_operation_state(_unsynchronised_io_operation_state &&o) noexcept
-        : io_operation_state(std::move(o)), state(o.state)
+        : io_operation_state(std::move(o))
+        , state(o.state)
     {
-      switch(state)
-      {
-      case io_operation_state_type::unknown:
-        break;
-      case io_operation_state_type::read_initialised:
-      case io_operation_state_type::read_initiated:
-        payload.noncompleted.base = std::move(o.payload.noncompleted.base);
-        payload.noncompleted.d = o.payload.noncompleted.d;
-        payload.noncompleted.params.read = o.payload.noncompleted.params.read;
-        break;
-      case io_operation_state_type::read_completed:
-      case io_operation_state_type::read_finished:
-        payload.completed_read = std::move(o.payload.completed_read);
-        break;
-      case io_operation_state_type::write_initialised:
-      case io_operation_state_type::write_initiated:
-        payload.noncompleted.base = std::move(o.payload.noncompleted.base);
-        payload.noncompleted.d = o.payload.noncompleted.d;
-        payload.noncompleted.params.write = o.payload.noncompleted.params.write;
-        break;
-      case io_operation_state_type::barrier_initialised:
-      case io_operation_state_type::barrier_initiated:
-        payload.noncompleted.base = std::move(o.payload.noncompleted.base);
-        payload.noncompleted.d = o.payload.noncompleted.d;
-        payload.noncompleted.params.barrier = o.payload.noncompleted.params.barrier;
-        break;
-      case io_operation_state_type::write_or_barrier_completed:
-      case io_operation_state_type::write_or_barrier_finished:
-        payload.completed_write_or_barrier = std::move(o.payload.completed_write_or_barrier);
-        break;
-      }
-      o.clear_storage();
     }
 
   public:
@@ -768,14 +760,55 @@ protected:
     virtual io_operation_state_type current_state() const noexcept override { return state; }
     virtual io_result<buffers_type> get_completed_read() && noexcept override
     {
+      assert(state == io_operation_state_type::read_completed || state == io_operation_state_type::read_finished);
       io_result<buffers_type> ret(std::move(payload.completed_read));
+      clear_storage();
       return ret;
     }
     virtual io_result<const_buffers_type> get_completed_write_or_barrier() && noexcept override
     {
+      assert(state == io_operation_state_type::write_or_barrier_completed || state == io_operation_state_type::write_or_barrier_finished);
       io_result<const_buffers_type> ret(std::move(payload.completed_write_or_barrier));
+      clear_storage();
       return ret;
     }
+    virtual void relocate_to(io_operation_state *to_) noexcept override
+    {
+      auto *to = new(to_) _unsynchronised_io_operation_state(std::move(*this));
+      switch(state)
+      {
+      case io_operation_state_type::unknown:
+        break;
+      case io_operation_state_type::read_initialised:
+      case io_operation_state_type::read_initiated:
+        to->payload.noncompleted.base = std::move(payload.noncompleted.base);
+        to->payload.noncompleted.d = payload.noncompleted.d;
+        to->payload.noncompleted.params.read = payload.noncompleted.params.read;
+        break;
+      case io_operation_state_type::read_completed:
+      case io_operation_state_type::read_finished:
+        to->payload.completed_read = std::move(payload.completed_read);
+        break;
+      case io_operation_state_type::write_initialised:
+      case io_operation_state_type::write_initiated:
+        to->payload.noncompleted.base = std::move(payload.noncompleted.base);
+        to->payload.noncompleted.d = payload.noncompleted.d;
+        to->payload.noncompleted.params.write = payload.noncompleted.params.write;
+        break;
+      case io_operation_state_type::barrier_initialised:
+      case io_operation_state_type::barrier_initiated:
+        to->payload.noncompleted.base = std::move(payload.noncompleted.base);
+        to->payload.noncompleted.d = payload.noncompleted.d;
+        to->payload.noncompleted.params.barrier = payload.noncompleted.params.barrier;
+        break;
+      case io_operation_state_type::write_or_barrier_completed:
+      case io_operation_state_type::write_or_barrier_finished:
+        to->payload.completed_write_or_barrier = std::move(payload.completed_write_or_barrier);
+        break;
+      }
+      clear_storage();
+    }
+
 
     virtual void read_initiated()
     {
@@ -976,6 +1009,7 @@ public:
   */
   template <class T> struct awaitable final : protected io_operation_state_visitor
   {
+    friend class io_handle;
     static constexpr size_t _state_storage_bytes = _awaitable_size - sizeof(void *) - sizeof(io_operation_state *)
 #if LLFIO_ENABLE_COROUTINES
                                                    - sizeof(coroutine_handle<>)
@@ -986,8 +1020,10 @@ public:
 #if LLFIO_ENABLE_COROUTINES
     coroutine_handle<> _coro;
 #endif
-
-    void set_state(io_operation_state *state) noexcept { _state = state;
+  protected:
+    void set_state(io_operation_state *state) noexcept
+    {
+      _state = state;
       _state->visitor = this;
     }
 
@@ -997,21 +1033,29 @@ public:
     //! The buffers type of this awaitable
     using buffers_type = typename result_type::value_type;
 
+    //! Default constructor
     constexpr awaitable() {}
+    //! Constructs an immediately finished awaitable
+    explicit awaitable(result_type &&res) noexcept
+    {
+      _state = new(_state_storage) _unsynchronised_io_operation_state(std::move(res));
+      _state->visitor = this;
+    }
     awaitable(const awaitable &) = delete;
+    //! Move construction, terminates the process if the i/o is in progress
     awaitable(awaitable &&o) noexcept
         : io_operation_state_visitor(std::move(o))
-        , _state_storage(o._state_storage)
         , _state(o._state)
 #if LLFIO_ENABLE_COROUTINES
         , _coro(o._coro)
 #endif
     {
-      _state->visitor = this;
       if(o._state != nullptr && !is_finished(o._state->current_state()))
       {
         abort();  // attempt to relocate an awaitable currently in use
       }
+      o._state->relocate_to(reinterpret_cast<io_operation_state *>(_state_storage));
+      _state->visitor = this;
 #if LLFIO_ENABLE_COROUTINES
       o._coro = {};
 #endif
@@ -1023,13 +1067,26 @@ public:
       new(this) awaitable(std::move(o));
       return *this;
     }
+    //! Destructor, blocks if the i/o is in progress
     inline ~awaitable();  // defined in io_handle.hpp
 
-    bool await_ready() noexcept { return is_finished(_state->current_state()); }
+    //! True if the i/o state is finished. Begins the i/o if it is not initiated yet.
+    bool await_ready() noexcept
+    {
+      auto state = _state->current_state();
+      if(is_initialised(state))
+      {
+        // Begin the i/o
+        state = _state->h->init_io_operation(_state);
+      }
+      return is_finished(state);
+    }
 
+    //! Returns the result of the i/o
     result_type await_resume() { return _result_type_from_io_operation_state(_state, (buffers_type *) nullptr); }
 
 #if LLFIO_ENABLE_COROUTINES
+    //! Suspends the coroutine for resumption after the i/o finishes
     void await_suspend(coroutine_handle<> coro)
     {
       _state->invoke(make_function_ptr([&](io_operation_state_type s) {
@@ -1093,23 +1150,38 @@ public:
   */
   virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept = 0;
 
-  /*! \brief Constructs either a `unsynchronised_io_operation_state` or a `synchronised_io_operation_state`
-  for a read operation into the storage provided, possibly initiating the i/o as well. The storage must
-  meet the requirements from `state_requirements()`.
+  /*! \brief Initiates the i/o in a previously constructed state. Note that you should always call
+  `.flush_inited_io_operations()` after you finished initiating i/o. After this call returns,
+  you cannot relocate in memory `state` until `is_finished(state->current_state())` returns true.
   */
-  virtual result<io_operation_state *> init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept = 0;
+  virtual io_operation_state_type init_io_operation(io_operation_state *state) noexcept = 0;
 
-  /*! \brief Constructs either a `unsynchronised_io_operation_state` or a `synchronised_io_operation_state`
-  for a write operation into the storage provided, possibly initiating the i/o as well. The storage must
-  meet the requirements from `state_requirements()`.
-  */
-  virtual result<io_operation_state *> init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept = 0;
+  /*! \brief Combines `.construct()` with `.init_io_operation()` in a single call for improved efficiency.
+   */
+  virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept
+  {
+    io_operation_state *state = construct(storage, _h, _visitor, std::move(b), d, std::move(reqs));
+    init_io_operation(state);
+    return state;
+  }
 
-  /*! \brief Constructs either a `unsynchronised_io_operation_state` or a `synchronised_io_operation_state`
-  for a barrier operation into the storage provided, possibly initiating the i/o as well. The storage must
-  meet the requirements from `state_requirements()`.
-  */
-  virtual result<io_operation_state *> init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept = 0;
+  /*! \brief Combines `.construct()` with `.init_io_operation()` in a single call for improved efficiency.
+   */
+  virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept
+  {
+    io_operation_state *state = construct(storage, _h, _visitor, std::move(b), d, std::move(reqs));
+    init_io_operation(state);
+    return state;
+  }
+
+  /*! \brief Combines `.construct()` with `.init_io_operation()` in a single call for improved efficiency.
+   */
+  virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept
+  {
+    io_operation_state *state = construct(storage, _h, _visitor, std::move(b), d, std::move(reqs), kind);
+    init_io_operation(state);
+    return state;
+  }
 
   //! Flushes any previously initiated i/o, if necessary for this i/o multiplexer
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> flush_inited_io_operations() noexcept { return success(); }
@@ -1141,6 +1213,7 @@ public:
 };
 //! A unique ptr to an i/o multiplexer implementation.
 using io_multiplexer_ptr = std::unique_ptr<io_multiplexer>;
+
 
 #if LLFIO_ENABLE_TEST_IO_MULTIPLEXERS
 //! Namespace containing functions useful for test code

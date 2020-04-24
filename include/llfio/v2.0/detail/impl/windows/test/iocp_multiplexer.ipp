@@ -55,7 +55,18 @@ namespace test
       windows_nt_kernel::IO_STATUS_BLOCK _ols[64];  // 1Kb just on its own
 
       _iocp_operation_state() = default;
+      _iocp_operation_state(_impl &&o) noexcept
+          : _impl(std::move(o))
+      {
+      }
       using _impl::_impl;
+
+      virtual void relocate_to(io_operation_state *to) noexcept override
+      {
+        _impl::relocate_to(to);
+        // restamp the vptr with my own
+        new(to) _iocp_operation_state(std::move(*static_cast<_impl *>(to)));
+      }
     };
     // static_assert(sizeof(_iocp_operation_state) <= _iocp_operation_state_alignment, "_iocp_operation_state alignment is insufficiently large!");
     using _state_lock_guard = typename _iocp_operation_state::_lock_guard;
@@ -172,77 +183,78 @@ namespace test
       }
       return new(storage.data()) _iocp_operation_state(_h, _visitor, std::move(b), d, std::move(reqs), kind);
     }
-    virtual result<io_operation_state *> init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept override
+    virtual io_operation_state_type init_io_operation(io_operation_state *_op) noexcept override
     {
       windows_nt_kernel::init();
       using namespace windows_nt_kernel;
       LLFIO_LOG_FUNCTION_CALL(this);
-      assert(storage.size() >= sizeof(_iocp_operation_state));
-      // assert(((uintptr_t) storage.data() & (_iocp_operation_state_alignment - 1)) == 0);
-      if(storage.size() < sizeof(_iocp_operation_state) /*|| ((uintptr_t) storage.data() & (_iocp_operation_state_alignment - 1)) != 0*/)
+      auto *state = static_cast<_iocp_operation_state *>(_op);
+      switch(state->state)
       {
-        return nullptr;
-      }
-      auto *state = new(storage.data()) _iocp_operation_state(_h, _visitor, std::move(b), d, std::move(reqs));
-      io_handle::io_result<io_handle::buffers_type> ret(reqs.buffers);
-      if(do_read_write<false>(ret, NtReadFile, _h->native_handle(), state, state->_ols, reqs, d))
+      case io_operation_state_type::unknown:
+        abort();
+      case io_operation_state_type::read_initialised:
       {
-        // Completed immediately
-        const bool failed = !ret;
-        state->read_completed(std::move(ret).value());
-        if(failed || _h->native_handle().behaviour & native_handle_type::disposition::_multiplexer_state_bit0)
+        io_handle::io_result<io_handle::buffers_type> ret(state->payload.noncompleted.params.read.reqs.buffers);
+        if(do_read_write<false>(ret, NtReadFile, state->h->native_handle(), state, state->_ols, state->payload.noncompleted.params.read.reqs, state->payload.noncompleted.d))
         {
-          // SetFileCompletionNotificationModes() above was successful, so we are done
-          state->read_finished();
+          // Completed immediately
+          const bool failed = !ret;
+          state->read_completed(std::move(ret).value());
+          if(failed || state->h->native_handle().behaviour & native_handle_type::disposition::_multiplexer_state_bit0)
+          {
+            // SetFileCompletionNotificationModes() above was successful, so we are done
+            state->read_finished();
+            return io_operation_state_type::read_finished;
+          }
+          return io_operation_state_type::read_completed;
         }
-      }
-      else
-      {
-        state->read_initiated();
-      }
-      return state;
-    }
-    virtual result<io_operation_state *> init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept override
-    {
-      windows_nt_kernel::init();
-      using namespace windows_nt_kernel;
-      LLFIO_LOG_FUNCTION_CALL(this);
-      assert(storage.size() >= sizeof(_iocp_operation_state));
-      // assert(((uintptr_t) storage.data() & (_iocp_operation_state_alignment - 1)) == 0);
-      if(storage.size() < sizeof(_iocp_operation_state) /*|| ((uintptr_t) storage.data() & (_iocp_operation_state_alignment - 1)) != 0*/)
-      {
-        return nullptr;
-      }
-      auto *state = new(storage.data()) _iocp_operation_state(_h, _visitor, std::move(b), d, std::move(reqs));
-      io_handle::io_result<io_handle::const_buffers_type> ret(reqs.buffers);
-      if(do_read_write<false>(ret, NtWriteFile, _h->native_handle(), state, state->_ols, reqs, d))
-      {
-        // Completed immediately
-        const bool failed = !ret;
-        state->write_completed(std::move(ret).value());
-        if(failed || _h->native_handle().behaviour & native_handle_type::disposition::_multiplexer_state_bit0)
+        else
         {
-          // SetFileCompletionNotificationModes() above was successful, so we are done
-          state->write_or_barrier_finished();
+          state->read_initiated();
+          return io_operation_state_type::read_initiated;
         }
+        break;
       }
-      else
+      case io_operation_state_type::write_initialised:
       {
-        state->write_initiated();
+        io_handle::io_result<io_handle::const_buffers_type> ret(state->payload.noncompleted.params.write.reqs.buffers);
+        if(do_read_write<false>(ret, NtWriteFile, state->h->native_handle(), state, state->_ols, state->payload.noncompleted.params.write.reqs, state->payload.noncompleted.d))
+        {
+          // Completed immediately
+          const bool failed = !ret;
+          state->write_completed(std::move(ret).value());
+          if(failed || state->h->native_handle().behaviour & native_handle_type::disposition::_multiplexer_state_bit0)
+          {
+            // SetFileCompletionNotificationModes() above was successful, so we are done
+            state->write_or_barrier_finished();
+            return io_operation_state_type::write_or_barrier_finished;
+          }
+          return io_operation_state_type::write_or_barrier_completed;
+        }
+        else
+        {
+          state->write_initiated();
+          return io_operation_state_type::write_initiated;
+        }
+        break;
       }
-      return state;
-    }
-    virtual result<io_operation_state *> init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept override
-    {
-      (void) storage;
-      (void) _h;
-      (void) _visitor;
-      (void) b;
-      (void) d;
-      (void) reqs;
-      (void) kind;
-      LLFIO_LOG_FUNCTION_CALL(this);
-      return errc::operation_not_supported;  // barrier requires work to implement :)
+      case io_operation_state_type::barrier_initialised:
+      {
+        state->barrier_completed(errc::operation_not_supported);  // barrier requires work to implement :)
+        return io_operation_state_type::write_or_barrier_finished;
+      }
+      case io_operation_state_type::read_initiated:
+      case io_operation_state_type::read_completed:
+      case io_operation_state_type::read_finished:
+      case io_operation_state_type::write_initiated:
+      case io_operation_state_type::barrier_initiated:
+      case io_operation_state_type::write_or_barrier_completed:
+      case io_operation_state_type::write_or_barrier_finished:
+        assert(false);
+        break;
+      }
+      return state->state;
     }
     // virtual result<void> flush_inited_io_operations() noexcept { return success(); }
     template <class U> io_operation_state_type _check_io_operation(_iocp_operation_state *state, U &&f) noexcept
