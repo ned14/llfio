@@ -82,7 +82,6 @@ $(document).ready(function(){initNavTree('structllfio__v2__xxx_1_1io__multiplexe
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
@@ -109,17 +108,9 @@ Inheritance diagram for llfio_v2_xxx::io_multiplexer::_unsynchronised_io_operati
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state_1_1__lock__impl__type.html">_lock_impl_type</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">union &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="unionllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t.html">payload_t</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Variant storage.  <a href="unionllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
-Public Types</h2></td></tr>
-<tr class="memitem:aae0ccb245cf7f13ec70b667607a0e38b"><td class="memItemLeft" align="right" valign="top"><a id="aae0ccb245cf7f13ec70b667607a0e38b"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>_lock_guard</b> = lock_guard&lt; <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state_1_1__lock__impl__type.html">_lock_impl_type</a> &gt;</td></tr>
-<tr class="separator:aae0ccb245cf7f13ec70b667607a0e38b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -176,10 +167,34 @@ virtual <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__resul
 virtual <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#abc6841b44841c72c3778a3aee296a051">const_buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#a2c5cddbf8ac82a21701f314a772187e0">get_completed_write_or_barrier</a> () &amp;&amp;noexcept override</td></tr>
 <tr class="memdesc:a2c5cddbf8ac82a21701f314a772187e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">After an i/o operation has finished, can be used to retrieve the result if the visitor did not. <br /></td></tr>
 <tr class="separator:a2c5cddbf8ac82a21701f314a772187e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae7c931c1bca9eb3feb9874e158e620d9"><td class="memItemLeft" align="right" valign="top"><a id="ae7c931c1bca9eb3feb9874e158e620d9"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#ae7c931c1bca9eb3feb9874e158e620d9">relocate_to</a> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html">io_operation_state</a> *to_) noexcept override</td></tr>
-<tr class="memdesc:ae7c931c1bca9eb3feb9874e158e620d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Relocate the state to new storage, destroying the original state. Terminates the process if the state is in use. <br /></td></tr>
-<tr class="separator:ae7c931c1bca9eb3feb9874e158e620d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a58c5c78ce0aec95c010146024584ddcd"><td class="memItemLeft" align="right" valign="top"><a id="a58c5c78ce0aec95c010146024584ddcd"></a>
+virtual <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html">io_operation_state</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#a58c5c78ce0aec95c010146024584ddcd">relocate_to</a> (byte *to_) noexcept override</td></tr>
+<tr class="memdesc:a58c5c78ce0aec95c010146024584ddcd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Relocate the state to new storage, clearing the original state. Terminates the process if the state is in use. <br /></td></tr>
+<tr class="separator:a58c5c78ce0aec95c010146024584ddcd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa302f3e0b65077bc3721db595f6acb98"><td class="memItemLeft" align="right" valign="top"><a id="aa302f3e0b65077bc3721db595f6acb98"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>_read_initiated</b> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state_1_1lock__guard.html">lock_guard</a> &amp;g)</td></tr>
+<tr class="separator:aa302f3e0b65077bc3721db595f6acb98"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:addd6076ed27d82c3614930d4524935b8"><td class="memItemLeft" align="right" valign="top"><a id="addd6076ed27d82c3614930d4524935b8"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>_read_completed</b> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state_1_1lock__guard.html">lock_guard</a> &amp;g, <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#a6f5f10bf45bad03c994342e544675354">buffers_type</a> &gt; &amp;&amp;res)</td></tr>
+<tr class="separator:addd6076ed27d82c3614930d4524935b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac363efe90328c9a7790d94c249a78f6b"><td class="memItemLeft" align="right" valign="top"><a id="ac363efe90328c9a7790d94c249a78f6b"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>_read_finished</b> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state_1_1lock__guard.html">lock_guard</a> &amp;g)</td></tr>
+<tr class="separator:ac363efe90328c9a7790d94c249a78f6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad1ee50a73100f34335b64de59d94214"><td class="memItemLeft" align="right" valign="top"><a id="aad1ee50a73100f34335b64de59d94214"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>_write_initiated</b> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state_1_1lock__guard.html">lock_guard</a> &amp;g)</td></tr>
+<tr class="separator:aad1ee50a73100f34335b64de59d94214"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa08fb625c75115401d281b61a83b8beb"><td class="memItemLeft" align="right" valign="top"><a id="aa08fb625c75115401d281b61a83b8beb"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>_write_completed</b> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state_1_1lock__guard.html">lock_guard</a> &amp;g, <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#abc6841b44841c72c3778a3aee296a051">const_buffers_type</a> &gt; &amp;&amp;res)</td></tr>
+<tr class="separator:aa08fb625c75115401d281b61a83b8beb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a14859e2590300a009a7edddb82d6f035"><td class="memItemLeft" align="right" valign="top"><a id="a14859e2590300a009a7edddb82d6f035"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>_barrier_initiated</b> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state_1_1lock__guard.html">lock_guard</a> &amp;g)</td></tr>
+<tr class="separator:a14859e2590300a009a7edddb82d6f035"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69b3c0981c57dc979e239e48742b30b6"><td class="memItemLeft" align="right" valign="top"><a id="a69b3c0981c57dc979e239e48742b30b6"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>_barrier_completed</b> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state_1_1lock__guard.html">lock_guard</a> &amp;g, <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#abc6841b44841c72c3778a3aee296a051">const_buffers_type</a> &gt; &amp;&amp;res)</td></tr>
+<tr class="separator:a69b3c0981c57dc979e239e48742b30b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b3e1a73a321f965ee0d60deeebd2e62"><td class="memItemLeft" align="right" valign="top"><a id="a9b3e1a73a321f965ee0d60deeebd2e62"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>_write_or_barrier_finished</b> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state_1_1lock__guard.html">lock_guard</a> &amp;g)</td></tr>
+<tr class="separator:a9b3e1a73a321f965ee0d60deeebd2e62"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a726f236aee993a04e1088e927cb7dd22"><td class="memItemLeft" align="right" valign="top"><a id="a726f236aee993a04e1088e927cb7dd22"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>read_initiated</b> ()</td></tr>
 <tr class="separator:a726f236aee993a04e1088e927cb7dd22"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -207,9 +222,6 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>write_or_barr
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:ab42837af16efd4803b2dfd70ac869d25"><td class="memItemLeft" align="right" valign="top"><a id="ab42837af16efd4803b2dfd70ac869d25"></a>
-<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state_1_1__lock__impl__type.html">_lock_impl_type</a>&#160;</td><td class="memItemRight" valign="bottom"><b>_lock</b></td></tr>
-<tr class="separator:ab42837af16efd4803b2dfd70ac869d25"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa41379b452b50f267639b8d2ebbbdfa4"><td class="memItemLeft" align="right" valign="top"><a id="aa41379b452b50f267639b8d2ebbbdfa4"></a>
 <a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745">io_operation_state_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#aa41379b452b50f267639b8d2ebbbdfa4">state</a> {io_operation_state_type::unknown}</td></tr>
 <tr class="memdesc:aa41379b452b50f267639b8d2ebbbdfa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The current lifecycle state of this i/o operation. <br /></td></tr>
@@ -231,6 +243,12 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a8a3379a6af67a1656a2ee2f20058f847"><td class="memItemLeft" align="right" valign="top"><a id="a8a3379a6af67a1656a2ee2f20058f847"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>_unsynchronised_io_operation_state</b> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html">_unsynchronised_io_operation_state</a> &amp;&amp;o) noexcept</td></tr>
 <tr class="separator:a8a3379a6af67a1656a2ee2f20058f847"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01b43e5fc4b158b62f809eb7974bc9b6"><td class="memItemLeft" align="right" valign="top"><a id="a01b43e5fc4b158b62f809eb7974bc9b6"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>_lock</b> () noexcept</td></tr>
+<tr class="separator:a01b43e5fc4b158b62f809eb7974bc9b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a84e74147ea57e8276546fb28cb0a20c7"><td class="memItemLeft" align="right" valign="top"><a id="a84e74147ea57e8276546fb28cb0a20c7"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>_unlock</b> () noexcept</td></tr>
+<tr class="separator:a84e74147ea57e8276546fb28cb0a20c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An unsynchronised i/o operation state. </p>

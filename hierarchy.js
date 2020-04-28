@@ -1,7 +1,6 @@
 var hierarchy =
 [
     [ "llfio_v2_xxx::algorithm::shared_fs_mutex::memory_map< Hasher, HashIndexSize, SpinlockType >::_entity_idx", "structllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map_1_1__entity__idx.html", null ],
-    [ "llfio_v2_xxx::io_multiplexer::_unsynchronised_io_operation_state::_lock_impl_type", "structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state_1_1__lock__impl__type.html", null ],
     [ "llfio_v2_xxx::io_multiplexer::_unsynchronised_io_operation_state::payload_t::noncompleted_t::params_t::barrier_params_t", "structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t_1a5b5f3cdc6ab979c7730f57139fe29e.html", null ],
     [ "kvstore_v1_xxx::basic_key_value_store", "classkvstore__v1__xxx_1_1basic__key__value__store.html", [
       [ "kvstore_v1_xxx::basic_key_value_store::transaction", "classkvstore__v1__xxx_1_1basic__key__value__store_1_1transaction.html", null ]
@@ -91,6 +90,7 @@ var hierarchy =
       [ "llfio_v2_xxx::storage_profile::item< T >", "structllfio__v2__xxx_1_1storage__profile_1_1item.html", null ],
       [ "llfio_v2_xxx::storage_profile::item_erased", "structllfio__v2__xxx_1_1storage__profile_1_1item__erased.html", null ]
     ] ],
+    [ "llfio_v2_xxx::io_multiplexer::io_operation_state::lock_guard", "structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state_1_1lock__guard.html", null ],
     [ "llfio_v2_xxx::log_level_guard", "classllfio__v2__xxx_1_1log__level__guard.html", null ],
     [ "llfio_v2_xxx::native_handle_type", "structllfio__v2__xxx_1_1native__handle__type.html", null ],
     [ "llfio_v2_xxx::io_multiplexer::_unsynchronised_io_operation_state::payload_t::noncompleted_t", "structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t_1_1noncompleted__t.html", null ],
@@ -104,8 +104,8 @@ var hierarchy =
     [ "llfio_v2_xxx::utils::process_memory_usage", "structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html", null ],
     [ "llfio_v2_xxx::io_multiplexer::_unsynchronised_io_operation_state::payload_t::noncompleted_t::params_t::read_params_t", "structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t_fd29c581ca55bf5954d3fa054ce41041.html", null ],
     [ "llfio_v2_xxx::read_receiver< IoHandleType >", "classllfio__v2__xxx_1_1read__receiver.html", null ],
-    [ "llfio_v2_xxx::utils::page_allocator< void >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
     [ "llfio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
+    [ "llfio_v2_xxx::utils::page_allocator< void >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
     [ "llfio_v2_xxx::algorithm::remove_all_callback_arg", "unionllfio__v2__xxx_1_1algorithm_1_1remove__all__callback__arg.html", null ],
     [ "result", null, [
       [ "llfio_v2_xxx::io_multiplexer::io_result< buffers_type >", "structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html", null ],
