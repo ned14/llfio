@@ -61,15 +61,15 @@ namespace test
       }
       using _impl::_impl;
 
-      virtual void relocate_to(io_operation_state *to) noexcept override
+      virtual io_operation_state *relocate_to(byte *to_) noexcept override
       {
-        _impl::relocate_to(to);
+        auto *to = _impl::relocate_to(to_);
         // restamp the vptr with my own
         new(to) _iocp_operation_state(std::move(*static_cast<_impl *>(to)));
+        return to;
       }
     };
     // static_assert(sizeof(_iocp_operation_state) <= _iocp_operation_state_alignment, "_iocp_operation_state alignment is insufficiently large!");
-    using _state_lock_guard = typename _iocp_operation_state::_lock_guard;
 
     bool _disable_immediate_completions{false};
 
@@ -375,7 +375,7 @@ namespace test
       LLFIO_LOG_FUNCTION_CALL(this);
       auto *state = static_cast<_iocp_operation_state *>(_op);
       LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
-      _state_lock_guard g(state->_lock);
+      io_operation_state::lock_guard g(state);
       switch(state->state)
       {
       case io_operation_state_type::unknown:
@@ -464,19 +464,28 @@ namespace test
           // wake_check_for_any_completed_io() poke
           continue;
         }
-        if(is_completed(_check_io_operation(state, [&](windows_nt_kernel::IO_STATUS_BLOCK &) {})))
+        auto s = state->current_state();
+        //std::cout << "Coroutine " << state << " before check has state " << (int) s << std::endl;
+        s = _check_io_operation(state, [&](windows_nt_kernel::IO_STATUS_BLOCK &) {});
+        //std::cout << "Coroutine " << state << " after check has state " << (int) s << std::endl;
+        if(is_completed(s))
         {
           switch(state->state)
           {
           case io_operation_state_type::read_completed:
             state->read_finished();
+            s = io_operation_state_type::read_finished;
             break;
           case io_operation_state_type::write_or_barrier_completed:
             state->write_or_barrier_finished();
+            s = io_operation_state_type::write_or_barrier_finished;
             break;
           default:
             break;
           }
+        }
+        if(is_finished(s))
+        {
           ++stats.initiated_ios_completed;
         }
       }
