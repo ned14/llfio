@@ -514,6 +514,7 @@ template <class T> inline bool io_multiplexer::awaitable<T>::await_ready() noexc
   {
     // Begin the i/o
     state = _state->h->multiplexer()->init_io_operation(_state);
+    // std::cout << "Coroutine " << _state << " begins i/o, state on return was " << (int) state << std::endl;
   }
   return is_finished(state);
 }
@@ -521,16 +522,24 @@ template <class T> inline io_multiplexer::awaitable<T>::~awaitable()
 {
   if(_state != nullptr)
   {
-    if(!is_finished(_state->current_state()))
+    auto state = _state->current_state();
+    if(state != io_operation_state_type::unknown && !is_initialised(state) && !is_finished(state))
     {
-      if(!is_completed(_state->h->multiplexer()->check_io_operation(_state)))
+#if LLFIO_ENABLE_COROUTINES
+      // Resumption of the coroutine at this point causes recursion into this destructor, so prevent that
+      _coro = {};
+#endif
+      state = _state->h->multiplexer()->check_io_operation(_state);
+      if(!is_completed(state))
       {
         // Cancel the i/o
         (void) _state->h->multiplexer()->cancel_io_operation(_state);
       }
-      while(!is_finished(_state->h->multiplexer()->check_io_operation(_state)))
+      while(!is_finished(state))
       {
-        // Spin until I finish
+        // Block forever until I finish
+        (void) _state->h->multiplexer()->check_for_any_completed_io({});
+        state = _state->current_state();
       }
     }
     _state->~io_operation_state();
