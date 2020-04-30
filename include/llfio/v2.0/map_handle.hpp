@@ -316,6 +316,12 @@ which can be very useful.
 On Microsoft Windows, when mapping file content, you should try to always create the first map of that
 file using a writable handle. See `mapped_file_handle` for more detail on this.
 
+On Linux, be aware that there is a default limit of 65,530 non-contiguous VMAs per process. It is
+surprisingly easy to run into this limit in real world applications. You can either require users to
+issue `sysctl -w vm.max_map_count=262144` to increase the kernel limit, or take considerable care to
+never poke holes into large VMAs. `.do_not_store()` is very useful here for releasing the resources
+backing pages without decommitting them.
+
 ## Commit charge:
 
 All virtual memory systems account for memory allocated, even if never used. This is known as "commit charge".
@@ -392,8 +398,11 @@ large pages only works on `tmpfs`, this corresponds to `path_discovery::memory_b
 sourced anonymous section handles. Work is proceeding well for the major Linux filing systems to become
 able to map files using large pages soon, and in theory LLFIO based should "just work" on such a newer kernel.
 
-Note that many distributions enable transparent huge pages, whereby if you request allocations of large page multiples
+Note that some distributions enable transparent huge pages, whereby if you request allocations of large page multiples
 at large page offsets, the kernel uses large pages, without you needing to specify any `section_handle::flag::page_sizes_N`.
+Almost all distributions enable opt-in transparent huge pages, where you can explicitly request that pages
+within a region of memory transparently use huge pages as much as possible. LLFIO does not expose such
+facilities, you will need to manually invoke `madvise(MADV_HUGEPAGE)` on the region desired.
 
 ### FreeBSD:
 
@@ -682,6 +691,14 @@ public:
 
   Note that commit charge is not affected by this operation, as writes into
   the undirtied pages are guaranteed to succeed.
+
+  You should be aware that on Microsoft Windows, the platform syscall for discarding
+  virtual memory pages becomes hideously slow when called upon committed pages within
+  a large address space reservation. All three syscalls were trialled, and the least
+  worst is actually `DiscardVirtualMemory()` which is what this function uses.
+  However it still has exponential slow down as more pages within a large reservation
+  become committed e.g. 8Gb committed within a 2Tb reservation is approximately 20x
+  slower than when < 1Gb is committed. Non-Windows platforms do not have this problem.
 
   \warning This function destroys the contents of unwritten pages in the region
   in a totally unpredictable fashion. Only use it if you don't care how much of
