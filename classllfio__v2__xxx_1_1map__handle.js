@@ -94,7 +94,7 @@ var classllfio__v2__xxx_1_1map__handle =
     [ "requires_aligned_io", "classllfio__v2__xxx_1_1map__handle.html#a751e912d8dab755ea969a418c1d544eb", null ],
     [ "section", "classllfio__v2__xxx_1_1map__handle.html#a173539843aebd387bb8ca06246067ead", null ],
     [ "set_append_only", "classllfio__v2__xxx_1_1map__handle.html#a101620e9fff0c0e8c346af0e9de58b6a", null ],
-    [ "set_multiplexer", "classllfio__v2__xxx_1_1map__handle.html#aeb1317eb12abe4946817ed45dad02070", null ],
+    [ "set_multiplexer", "classllfio__v2__xxx_1_1map__handle.html#a281467f83f70f2e12aaedf5847fd818c", null ],
     [ "set_section", "classllfio__v2__xxx_1_1map__handle.html#a7a27e949d3333a75e96f5d979e2d6bbf", null ],
     [ "swap", "classllfio__v2__xxx_1_1map__handle.html#a4716696b8700953889006251e0678aa4", null ],
     [ "swap", "classllfio__v2__xxx_1_1map__handle.html#a2049c6f936df05dd539919f947355506", null ],

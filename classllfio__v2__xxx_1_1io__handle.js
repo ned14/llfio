@@ -77,7 +77,7 @@ var classllfio__v2__xxx_1_1io__handle =
     [ "release", "classllfio__v2__xxx_1_1io__handle.html#a1d273e38c061eb11f5012f624e9a202e", null ],
     [ "requires_aligned_io", "classllfio__v2__xxx_1_1io__handle.html#a751e912d8dab755ea969a418c1d544eb", null ],
     [ "set_append_only", "classllfio__v2__xxx_1_1io__handle.html#a101620e9fff0c0e8c346af0e9de58b6a", null ],
-    [ "set_multiplexer", "classllfio__v2__xxx_1_1io__handle.html#aeb1317eb12abe4946817ed45dad02070", null ],
+    [ "set_multiplexer", "classllfio__v2__xxx_1_1io__handle.html#a281467f83f70f2e12aaedf5847fd818c", null ],
     [ "swap", "classllfio__v2__xxx_1_1io__handle.html#a4716696b8700953889006251e0678aa4", null ],
     [ "try_barrier", "classllfio__v2__xxx_1_1io__handle.html#a89cb37107cf0ec70dc99ae1f944c1b1b", null ],
     [ "try_barrier_for", "classllfio__v2__xxx_1_1io__handle.html#ad021935ffbf5f753f123ac5af723184f", null ],

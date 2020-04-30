@@ -53,7 +53,7 @@ var NAVTREEINDEX6 =
 "classllfio__v2__xxx_1_1mapped__file__handle.html#af781e99c23d0a8158c249066214ac49c":[4,0,2,32,37],
 "classllfio__v2__xxx_1_1mapped__file__handle.html#afab4b38fba3730a36ba0b2f849dc6777":[4,0,2,32,135],
 "classllfio__v2__xxx_1_1mapped__file__handle.html#afc5ba16c0377a56b7e1a66a9c6d0a703":[4,0,2,32,143],
-"classllfio__v2__xxx_1_1mapped__file__handle.html#afed76a4061f91f4a6e05962bb2eadd68":[4,0,2,32,34],
+"classllfio__v2__xxx_1_1mapped__file__handle.html#afed76a4061f91f4a6e05962bb2eadd68":[4,0,2,32,35],
 "classllfio__v2__xxx_1_1path__handle.html":[4,0,2,34],
 "classllfio__v2__xxx_1_1path__handle.html#a00a85eec5a41f7edb2c574d40cf04535":[4,0,2,34,20],
 "classllfio__v2__xxx_1_1path__handle.html#a013936bc1254b1a47567fe29698d1b1c":[4,0,2,34,21],
@@ -225,6 +225,7 @@ var NAVTREEINDEX6 =
 "classllfio__v2__xxx_1_1pipe__handle.html#a2102f73a4872e8fd8bbe1c71ef82c97f":[4,0,2,38,38],
 "classllfio__v2__xxx_1_1pipe__handle.html#a211fee447a47bdeb5424a2a5ae1de852":[4,0,2,38,71],
 "classllfio__v2__xxx_1_1pipe__handle.html#a2427c3fc217848e107af94fb0f1590ba":[4,0,2,38,95],
+"classllfio__v2__xxx_1_1pipe__handle.html#a281467f83f70f2e12aaedf5847fd818c":[4,0,2,38,88],
 "classllfio__v2__xxx_1_1pipe__handle.html#a30eca672189ffc408a4e01b064e8b78e":[4,0,2,38,50],
 "classllfio__v2__xxx_1_1pipe__handle.html#a31ccfbd651d91a4f00e5192e0614cf6c":[4,0,2,38,114],
 "classllfio__v2__xxx_1_1pipe__handle.html#a32c60dec78576807a163d370e7a47409":[4,0,2,38,13],
@@ -248,6 +249,5 @@ var NAVTREEINDEX6 =
 "classllfio__v2__xxx_1_1pipe__handle.html#a684c961072904a3a7c83198aa595bb0d":[4,0,2,38,34],
 "classllfio__v2__xxx_1_1pipe__handle.html#a6926cae050b034558a3ae25ec9c0de94":[4,0,2,38,77],
 "classllfio__v2__xxx_1_1pipe__handle.html#a695ce0ed1606d540cfa452790ea71632":[4,0,2,38,67],
-"classllfio__v2__xxx_1_1pipe__handle.html#a69a64dbc83bff0cd3cdbdbbbf5790331":[4,0,2,38,5],
-"classllfio__v2__xxx_1_1pipe__handle.html#a6a1044eeb6ab16939e4669bbeb071b32":[4,0,2,38,45]
+"classllfio__v2__xxx_1_1pipe__handle.html#a69a64dbc83bff0cd3cdbdbbbf5790331":[4,0,2,38,5]
 };
