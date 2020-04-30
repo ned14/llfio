@@ -46,11 +46,14 @@ function(make_program program)
   )
 endfunction()
 
+make_program(benchmark-async llfio::hl)
 make_program(benchmark-iostreams llfio::hl)
 make_program(benchmark-locking llfio::hl kerneltest::hl)
 make_program(fs-probe llfio::hl)
 make_program(illegal-codepoints llfio::hl)
 make_program(key-value-store llfio::hl)
+
+target_include_directories(benchmark-async PRIVATE "benchmark-async/asio/asio/include")
 
 if(MSVC)
   target_compile_options(illegal-codepoints PUBLIC /utf-8)

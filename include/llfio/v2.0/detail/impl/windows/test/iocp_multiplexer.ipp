@@ -268,7 +268,7 @@ namespace test
             break;
           }
         }
-        if(is_completed(state->state) || is_finished(state->state))
+        if(state->state == io_operation_state_type::unknown || is_completed(state->state) || is_finished(state->state))
         {
           return false;
         }
@@ -310,7 +310,7 @@ namespace test
           }
           return io_operation_state_type::read_completed;
         }
-        return v;
+        return state->current_state();
       }
       case io_operation_state_type::write_initialised:
       case io_operation_state_type::write_initiated:
@@ -327,7 +327,7 @@ namespace test
           }
           return io_operation_state_type::write_or_barrier_completed;
         }
-        return v;
+        return state->current_state();
       }
       case io_operation_state_type::barrier_initialised:
       case io_operation_state_type::barrier_initiated:
@@ -344,7 +344,7 @@ namespace test
           }
           return io_operation_state_type::write_or_barrier_completed;
         }
-        return v;
+        return state->current_state();
       }
       default:
         break;
@@ -465,9 +465,9 @@ namespace test
           continue;
         }
         auto s = state->current_state();
-        //std::cout << "Coroutine " << state << " before check has state " << (int) s << std::endl;
+        // std::cout << "Coroutine " << state << " before check has state " << (int) s << std::endl;
         s = _check_io_operation(state, [&](windows_nt_kernel::IO_STATUS_BLOCK &) {});
-        //std::cout << "Coroutine " << state << " after check has state " << (int) s << std::endl;
+        // std::cout << "Coroutine " << state << " after check has state " << (int) s << std::endl;
         if(is_completed(s))
         {
           switch(state->state)

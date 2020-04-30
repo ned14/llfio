@@ -116,37 +116,7 @@ public:
 
   \mallocs Multiple dynamic memory allocations and deallocations.
   */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> set_multiplexer(io_multiplexer *c = this_thread::multiplexer()) noexcept
-  {
-    if(!is_multiplexable())
-    {
-      return errc::operation_not_supported;
-    }
-    if(c == _ctx)
-    {
-      return success();
-    }
-    if(_ctx != nullptr)
-    {
-      OUTCOME_TRY(_ctx->do_io_handle_deregister(this));
-      _ctx = nullptr;
-    }
-    if(c != nullptr)
-    {
-      OUTCOME_TRY(state, c->do_io_handle_register(this));
-      _v.behaviour = (_v.behaviour & ~(native_handle_type::disposition::_multiplexer_state_bit0 | native_handle_type::disposition::_multiplexer_state_bit1));
-      if((state & 1) != 0)
-      {
-        _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit0;
-      }
-      if((state & 2) != 0)
-      {
-        _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit1;
-      }
-    }
-    _ctx = c;
-    return success();
-  }
+  virtual result<void> set_multiplexer(io_multiplexer *c = this_thread::multiplexer()) noexcept;  // implementation is below
 
 protected:
   //! The virtualised implementation of `max_buffers()` used if no multiplexer has been set.
@@ -498,6 +468,40 @@ public:
   }
 };
 static_assert((sizeof(void *) == 4 && sizeof(io_handle) == 20) || (sizeof(void *) == 8 && sizeof(io_handle) == 32), "io_handle is not 20 or 32 bytes in size!");
+
+// Out of line definition purely to work around a bug in GCC where if marked inline,
+// its visibility is hidden and links fail
+inline result<void> io_handle::set_multiplexer(io_multiplexer *c) noexcept
+{
+  if(!is_multiplexable())
+  {
+    return errc::operation_not_supported;
+  }
+  if(c == _ctx)
+  {
+    return success();
+  }
+  if(_ctx != nullptr)
+  {
+    OUTCOME_TRY(_ctx->do_io_handle_deregister(this));
+    _ctx = nullptr;
+  }
+  if(c != nullptr)
+  {
+    OUTCOME_TRY(state, c->do_io_handle_register(this));
+    _v.behaviour = (_v.behaviour & ~(native_handle_type::disposition::_multiplexer_state_bit0 | native_handle_type::disposition::_multiplexer_state_bit1));
+    if((state & 1) != 0)
+    {
+      _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit0;
+    }
+    if((state & 2) != 0)
+    {
+      _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit1;
+    }
+  }
+  _ctx = c;
+  return success();
+}
 
 inline size_t io_multiplexer::do_io_handle_max_buffers(const io_handle *h) const noexcept
 {

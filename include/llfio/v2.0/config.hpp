@@ -34,8 +34,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! \defgroup config Configuration macros
 
-#if !defined(LLFIO_HEADERS_ONLY) && !defined(BOOST_ALL_DYN_LINK)
-//! \brief Whether LLFIO is a headers only library. Defaults to 1 unless BOOST_ALL_DYN_LINK is defined. \ingroup config
+#if !defined(LLFIO_HEADERS_ONLY)
+//! \brief Whether LLFIO is a headers only library. Defaults to 1. \ingroup config
 #define LLFIO_HEADERS_ONLY 1
 #endif
 
@@ -267,11 +267,9 @@ LLFIO_V2_NAMESPACE_END
 
 
 // Configure LLFIO_DECL
-#if(defined(LLFIO_DYN_LINK) || defined(BOOST_ALL_DYN_LINK)) && !defined(LLFIO_STATIC_LINK)
-
+#if defined(LLFIO_DYN_LINK) && !defined(LLFIO_STATIC_LINK)
 #if defined(LLFIO_SOURCE)
 #define LLFIO_DECL QUICKCPPLIB_SYMBOL_EXPORT
-#define LLFIO_BUILD_DLL
 #else
 #define LLFIO_DECL QUICKCPPLIB_SYMBOL_IMPORT
 #endif
@@ -419,23 +417,6 @@ namespace win
 LLFIO_V2_NAMESPACE_END
 
 
-#if 0
-///////////////////////////////////////////////////////////////////////////////
-//  Auto library naming
-#if !defined(LLFIO_SOURCE) && !defined(BOOST_ALL_NO_LIB) && !defined(LLFIO_NO_LIB) && !LLFIO_STANDALONE && !LLFIO_HEADERS_ONLY
-
-#define BOOST_LIB_NAME boost_llfio
-
-// tell the auto-link code to select a dll when required:
-#if defined(BOOST_ALL_DYN_LINK) || defined(LLFIO_DYN_LINK)
-#define BOOST_DYN_LINK
-#endif
-
-#include <boost/config/auto_link.hpp>
-
-#endif  // auto-linking disabled
-#endif
-
 //#define BOOST_THREAD_VERSION 4
 //#define BOOST_THREAD_PROVIDES_VARIADIC_THREAD
 //#define BOOST_THREAD_DONT_PROVIDE_FUTURE
@@ -457,6 +438,9 @@ function exported from the LLFIO DLL if not building headers only.
 */
 #define LLFIO_HEADERS_ONLY_VIRTUAL_SPEC inline virtual
 #else
+#if LLFIO_SOURCE && !LLFIO_HEADERS_ONLY
+#error LLFIO_HEADERS_ONLY should never be zero when compiling the static or dynamic library
+#endif
 #define LLFIO_HEADERS_ONLY_FUNC_SPEC extern LLFIO_DECL
 #define LLFIO_HEADERS_ONLY_MEMFUNC_SPEC
 #define LLFIO_HEADERS_ONLY_VIRTUAL_SPEC virtual

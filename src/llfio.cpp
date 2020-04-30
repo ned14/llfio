@@ -1,3 +1,7 @@
-#define LLFIO_DYN_LINK 1
-#define LLFIO_SOURCE 1
+#if !LLFIO_SOURCE
+#error This should not occur
+#endif
+#ifdef LLFIO_HEADERS_ONLY
+#error This should not occur
+#endif
 #include "../include/llfio/llfio.hpp"
