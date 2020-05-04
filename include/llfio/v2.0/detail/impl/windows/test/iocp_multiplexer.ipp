@@ -375,7 +375,7 @@ namespace test
       LLFIO_LOG_FUNCTION_CALL(this);
       auto *state = static_cast<_iocp_operation_state *>(_op);
       LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
-      io_operation_state::lock_guard g(state);
+      typename io_operation_state::lock_guard g(state);
       switch(state->state)
       {
       case io_operation_state_type::unknown:
