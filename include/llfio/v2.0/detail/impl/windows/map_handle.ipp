@@ -125,28 +125,27 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   nativeh.behaviour |= native_handle_type::disposition::section;
   OBJECT_ATTRIBUTES oa{}, *poa = nullptr;
   UNICODE_STRING _path{};
-  static wchar_t *buffer = []() -> wchar_t * {
-    static wchar_t buffer_[96] = L"\\Sessions\\0\\BaseNamedObjects\\";
-    DWORD sessionid = 0;
-    if(ProcessIdToSessionId(GetCurrentProcessId(), &sessionid) != 0)
-    {
-      wsprintfW(buffer_, L"\\Sessions\\%u\\BaseNamedObjects\\", sessionid);
-    }
-    return buffer_;
-  }();
-  static wchar_t *bufferid = wcschr(buffer, 0);
   if(_flag & flag::singleton)
   {
+    static thread_local const std::pair<wchar_t *, wchar_t *> buffer = []() -> std::pair<wchar_t *, wchar_t *> {
+      static thread_local wchar_t buffer_[96] = L"\\Sessions\\0\\BaseNamedObjects\\llfio_";
+      DWORD sessionid = 0;
+      if(ProcessIdToSessionId(GetCurrentProcessId(), &sessionid) != 0)
+      {
+        wsprintfW(buffer_, L"\\Sessions\\%u\\BaseNamedObjects\\llfio_", sessionid);
+        if(96 - wcslen(buffer_) < 33)
+        {
+          abort();
+        }
+      }
+      auto *end = wcschr(buffer_, 0);
+      return {buffer_, end};
+    }();
     auto unique_id = backing.unique_id();
-    auto *_buffer = reinterpret_cast<char *>(bufferid);
-    QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string(_buffer, 96 * sizeof(wchar_t), reinterpret_cast<char *>(unique_id.as_bytes), sizeof(unique_id));
-    for(size_t n = 31; n <= 31; n--)
-    {
-      bufferid[n] = _buffer[n];
-    }
-    bufferid[32] = 0;
-    _path.Buffer = buffer;
-    _path.MaximumLength = (_path.Length = static_cast<USHORT>((32 + bufferid - buffer) * sizeof(wchar_t))) + sizeof(wchar_t);
+    QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string(buffer.second, sizeof(unique_id) * 4, reinterpret_cast<char *>(unique_id.as_bytes), sizeof(unique_id));
+    buffer.second[32] = 0;
+    _path.Buffer = buffer.first;
+    _path.MaximumLength = (_path.Length = static_cast<USHORT>((32 + buffer.second - buffer.first) * sizeof(wchar_t))) + sizeof(wchar_t);
     memset(&oa, 0, sizeof(oa));
     oa.Length = sizeof(OBJECT_ATTRIBUTES);
     oa.ObjectName = &_path;

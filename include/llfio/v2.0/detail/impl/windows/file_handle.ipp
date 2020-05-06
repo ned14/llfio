@@ -160,7 +160,9 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   if(need_to_set_sparse && !(flags & flag::win_disable_sparse_file_creation))
   {
     DWORD bytesout = 0;
-    FILE_SET_SPARSE_BUFFER fssb = {1u};
+    FILE_SET_SPARSE_BUFFER fssb;
+    memset(&fssb, 0, sizeof(fssb));
+    fssb.SetSparse = 1u;
     if(DeviceIoControl(nativeh.h, FSCTL_SET_SPARSE, &fssb, sizeof(fssb), nullptr, 0, &bytesout, nullptr) == 0)
     {
 #if LLFIO_LOGGING_LEVEL >= 3
