@@ -141,7 +141,7 @@ inline bool do_read_write(io_handle::io_result<BuffersType> &ret, Syscall &&sysc
         }();
         if(!r)
         {
-          ret = r.error();
+          ret = std::move(r).error();
           return true;
         }
       }
