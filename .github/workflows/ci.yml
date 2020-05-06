@@ -19,7 +19,7 @@ jobs:
           }
           
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     
     - name: "cmake tests (error code)"
-      shell: ctest -S .ci.cmake -VV --timeout 300 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS
+      run: ctest -S .ci.cmake -VV --timeout 300 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS
