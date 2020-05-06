@@ -284,7 +284,7 @@ static inline void TestCoroutinedPipeHandle()
           auto r = co_await read_pipe.co_read({{&buffer, 1}, 0});
           if(!r)
           {
-            co_return r.error();
+            co_return std::move(r).error();
           }
           BOOST_CHECK(r.value().size() == 1);
           BOOST_CHECK(r.value()[0].size() == sizeof(_buffer));

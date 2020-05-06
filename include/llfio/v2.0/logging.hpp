@@ -47,7 +47,7 @@ inline LLFIO_DECL QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log<L
 }
 //! Enum for the log level
 using log_level = QUICKCPPLIB_NAMESPACE::ringbuffer_log::level;
-//! RAII class for temporarily adjusting the log level
+//! RAII class for temporarily adjusting the log level for the current thread
 class log_level_guard
 {
   log_level _v;
@@ -61,9 +61,9 @@ public:
   explicit log_level_guard(log_level n)
       : _v(log().log_level())
   {
-    log().log_level(n);
+    log().thread_log_level(n);
   }
-  ~log_level_guard() { log().log_level(_v); }
+  ~log_level_guard() { log().thread_log_level(_v); }
 };
 
 // Infrastructure for recording the current path for when failure occurs
