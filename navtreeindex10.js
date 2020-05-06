@@ -1,5 +1,6 @@
 var NAVTREEINDEX10 =
 {
+"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#afabb36b02ad5b92810490114f68fe7b4":[4,0,2,0,0,0,3],
 "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#afd59aa55d1e9bc3a9942f13b964badae":[4,0,2,0,0,0,42],
 "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#afff8e1a93ad371a5844543a3e782f471":[4,0,2,0,0,0,58],
 "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html":[4,0,2,0,0,1],
@@ -248,6 +249,5 @@ var NAVTREEINDEX10 =
 "structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#aa302f3e0b65077bc3721db595f6acb98":[4,0,2,27,2,15],
 "structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#aa41379b452b50f267639b8d2ebbbdfa4":[4,0,2,27,2,38],
 "structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#aad0107b8c14a99e3dc26c54ba862b46e":[4,0,2,27,2,21],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#aad1ee50a73100f34335b64de59d94214":[4,0,2,27,2,18],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#ac059f1ac51373dc506a7998fcf0b7147":[4,0,2,27,2,1]
+"structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#aad1ee50a73100f34335b64de59d94214":[4,0,2,27,2,18]
 };
