@@ -45,7 +45,7 @@ namespace test
     template <class T> using io_result = typename _base::template io_result<T>;
     using io_operation_state = typename _base::io_operation_state;
     using io_operation_state_visitor = typename _base::io_operation_state_visitor;
-    using wait_for_completed_io_statistics = typename _base::wait_for_completed_io_statistics;
+    using check_for_any_completed_io_statistics = typename _base::check_for_any_completed_io_statistics;
 
     // static constexpr size_t _iocp_operation_state_alignment = (sizeof(void *) == 4) ? 1024 : 2048;
     struct _iocp_operation_state final : public std::conditional_t<is_threadsafe, typename _base::_synchronised_io_operation_state, typename _base::_unsynchronised_io_operation_state>
@@ -94,11 +94,22 @@ namespace test
         return win32_error();
       }
       _disable_immediate_completions = disable_immediate_completions;
+      this->_v.behaviour |= native_handle_type::disposition::multiplexer;
       return success();
     }
 
     // virtual result<path_type> current_path() const noexcept override;
-    // virtual result<void> close() noexcept override { return _base::close(); }
+    virtual result<void> close() noexcept override
+    {
+#ifndef NDEBUG
+      if(_v)
+      {
+        // Tell handle::close() that we have correctly executed
+        _v.behaviour |= native_handle_type::disposition::_child_close_executed;
+      }
+#endif
+      return _base::close();
+    }
     // virtual native_handle_type release() noexcept override { return _base::release(); }
 
     virtual result<uint8_t> do_io_handle_register(io_handle *h) noexcept override
@@ -419,7 +430,7 @@ namespace test
       }
       return state->state;
     }
-    virtual result<wait_for_completed_io_statistics> check_for_any_completed_io(deadline d = std::chrono::seconds(0), size_t max_completions = (size_t) -1) noexcept override
+    virtual result<check_for_any_completed_io_statistics> check_for_any_completed_io(deadline d = std::chrono::seconds(0), size_t max_completions = (size_t) -1) noexcept override
     {
       windows_nt_kernel::init();
       using namespace windows_nt_kernel;
@@ -454,7 +465,7 @@ namespace test
       {
         return success();
       }
-      wait_for_completed_io_statistics stats;
+      check_for_any_completed_io_statistics stats;
       for(ULONG n = 0; n < filled; n++)
       {
         // The context is the i/o state
@@ -484,9 +495,13 @@ namespace test
             break;
           }
         }
-        if(is_finished(s))
+        if(is_completed(s))
         {
           ++stats.initiated_ios_completed;
+        }
+        else if(is_finished(s))
+        {
+          ++stats.initiated_ios_finished;
         }
       }
       return stats;
