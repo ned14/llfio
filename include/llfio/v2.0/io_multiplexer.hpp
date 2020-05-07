@@ -464,9 +464,9 @@ public:
 
 public:
   //! Implements `io_handle` registration. The bottom two bits of the returned value are set into `_v.behaviour`'s `_multiplexer_state_bit0` and `_multiplexer_state_bit`
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<uint8_t> do_io_handle_register(io_handle * /*unused*/) noexcept { return (uint8_t) 0; }
+  virtual result<uint8_t> do_io_handle_register(io_handle * /*unused*/) noexcept { return (uint8_t) 0; }
   //! Implements `io_handle` deregistration
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> do_io_handle_deregister(io_handle * /*unused*/) noexcept { return success(); }
+  virtual result<void> do_io_handle_deregister(io_handle * /*unused*/) noexcept { return success(); }
   //! Implements `io_handle::max_buffers()`
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t do_io_handle_max_buffers(const io_handle *h) const noexcept;
   //! Implements `io_handle::allocate_registered_buffer()`
@@ -1321,25 +1321,27 @@ public:
   }
 
   //! Flushes any previously initiated i/o, if necessary for this i/o multiplexer
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> flush_inited_io_operations() noexcept { return success(); }
+  virtual result<void> flush_inited_io_operations() noexcept { return success(); }
 
   //! Asks the system for the current state of the i/o, returning its current state.
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_operation_state_type check_io_operation(io_operation_state *op) noexcept { return op->current_state(); }
+  virtual io_operation_state_type check_io_operation(io_operation_state *op) noexcept { return op->current_state(); }
 
   //! Cancel an initiated i/o, returning its current state if successful.
   virtual result<io_operation_state_type> cancel_io_operation(io_operation_state *op, deadline d = {}) noexcept = 0;
 
   //! Statistics about the just returned `wait_for_completed_io()` operation
-  struct wait_for_completed_io_statistics
+  struct check_for_any_completed_io_statistics
   {
     size_t initiated_ios_completed{0};  //!< The number of initiated i/o which were completed by this call
+    size_t initiated_ios_finished{0};  //!< The number of initiated i/o which were finished by this call
   };
 
   /*! \brief Checks all i/o initiated on this i/o multiplexer to see which
   have completed, trying without guarantee to complete no more than `max_completions`
-  completions, and not to exceed `d` of waiting (this function never fails with timed out).
+  completions or finisheds, and not to exceed `d` of waiting (this function never
+  fails with timed out).
   */
-  virtual result<wait_for_completed_io_statistics> check_for_any_completed_io(deadline d = std::chrono::seconds(0), size_t max_completions = (size_t) -1) noexcept = 0;
+  virtual result<check_for_any_completed_io_statistics> check_for_any_completed_io(deadline d = std::chrono::seconds(0), size_t max_completions = (size_t) -1) noexcept = 0;
 
   /*! \brief Can be called from any thread to wake any other single thread
   currently blocked within `check_for_any_completed_io()`. Which thread is
@@ -1355,6 +1357,13 @@ using io_multiplexer_ptr = std::unique_ptr<io_multiplexer>;
 //! Namespace containing functions useful for test code
 namespace test
 {
+  /*! \brief Return a test null i/o multiplexer.
+
+  The multiplexer returned by this function is a null implementation
+  used by the test suite to benchmark performance.
+  */
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<io_multiplexer_ptr> multiplexer_null(size_t threads, bool disable_immediate_completions) noexcept;
+
 #if defined(__linux__) || DOXYGEN_IS_IN_THE_HOUSE
 // LLFIO_HEADERS_ONLY_FUNC_SPEC result<io_multiplexer_ptr> multiplexer_linux_epoll(size_t threads) noexcept;
 // LLFIO_HEADERS_ONLY_FUNC_SPEC result<io_multiplexer_ptr> multiplexer_linux_io_uring() noexcept;

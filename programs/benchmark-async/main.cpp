@@ -25,80 +25,134 @@ Distributed under the Boost Software License, Version 1.0.
 //! Seconds to run the benchmark
 static constexpr int BENCHMARK_DURATION = 10;
 
-/*
-Benchmarking llfio::pipe_handle and IOCP 1 thread with 1 handles ...
-   per-handle create 5.35e-05 cancel 0 destroy 1.82e-05
-   total i/o min 1800 max 344200 mean 2484.7 stddev 1126.92
-             @ 50% 2200 @ 95% 3800 @ 99% 6700 @ 99.9% 8700 @ 99.99% 32100
-   total results collected = 3745791
+/* Note that the IOCP 1 thread does not use locking, and enables IOCP immediate completions.
+Whereas the IOCP 2 thread does use locking, and disables IOCP immediate completions. This
+makes only the IOCP 2 thread results comparable to ASIO.
 
-Benchmarking llfio::pipe_handle and IOCP 1 thread with 4 handles ...
-   per-handle create 3.415e-05 cancel 0 destroy 7.025e-06
-   total i/o min 3500 max 321200 mean 5770.29 stddev 2508.58
-             @ 50% 4900 @ 95% 12100 @ 99% 13725 @ 99.9% 18650 @ 99.99% 42800
-   total results collected = 4300796
 
-Benchmarking llfio::pipe_handle and IOCP 1 thread with 16 handles ...
-   per-handle create 1.35562e-05 cancel 6.25e-09 destroy 4.675e-06
-   total i/o min 10100 max 494200 mean 17392.2 stddev 6125.96
-             @ 50% 15675 @ 95% 26325 @ 99% 38337.5 @ 99.9% 51443.8 @ 99.99% 78737.5
-   total results collected = 4882416
+Benchmarking Null i/o multiplexer unsynchronised with 1 handles ...
+   per-handle create 7e-06 cancel 0 destroy 6e-06
+   total i/o min 100 max 3.49408e+08 mean 152.97 stddev 66587.2
+             @ 50% 100 @ 95% 200 @ 99% 300 @ 99.9% 1500 @ 99.99% 3800
+   total results collected = 47732735
 
-Benchmarking llfio::pipe_handle and IOCP 1 thread with 64 handles ...
-   per-handle create 1.11453e-05 cancel 1.5625e-09 destroy 3.25625e-06
-   total i/o min 35500 max 550900 mean 68961.4 stddev 26275.6
-             @ 50% 61817.2 @ 95% 135423 @ 99% 152256 @ 99.9% 203555 @ 99.99% 282969
-   total results collected = 4784064
+Benchmarking Null i/o multiplexer unsynchronised with 4 handles ...
+   per-handle create 2.8e-06 cancel 2.5e-08 destroy 9.5e-07
+   total i/o min 300 max 4.47648e+08 mean 457.242 stddev 87215.2
+             @ 50% 400 @ 95% 625 @ 99% 950 @ 99.9% 3800 @ 99.99% 9250
+   total results collected = 47996924
 
-Benchmarking llfio::pipe_handle and IOCP 2 threads with 1 handles ...
-   per-handle create 7.49e-05 cancel 1e-07 destroy 1.77e-05
-   total i/o min 2000 max 325100 mean 2322.99 stddev 674.913
-             @ 50% 2200 @ 95% 2800 @ 99% 5500 @ 99.9% 7500 @ 99.99% 22500
-   total results collected = 3996671
+Benchmarking Null i/o multiplexer unsynchronised with 16 handles ...
+   per-handle create 1.69375e-06 cancel 0 destroy 7.125e-07
+   total i/o min 1200 max 387200 mean 1509.67 stddev 944.997
+             @ 50% 1325 @ 95% 2131.25 @ 99% 3287.5 @ 99.9% 11725 @ 99.99% 27293.8
+   total results collected = 54099952
 
-Benchmarking llfio::pipe_handle and IOCP 2 threads with 4 handles ...
-   per-handle create 2.52e-05 cancel 2.5e-08 destroy 7.525e-06
-   total i/o min 3900 max 2.0285e+06 mean 5438.3 stddev 2669.87
-             @ 50% 5025 @ 95% 7200 @ 99% 12525 @ 99.9% 16775 @ 99.99% 38750
-   total results collected = 4595708
+Benchmarking Null i/o multiplexer unsynchronised with 64 handles ...
+   per-handle create 7.10938e-07 cancel 1.5625e-09 destroy 1.84375e-07
+   total i/o min 4700 max 379100 mean 5767.38 stddev 3311.88
+             @ 50% 5142.19 @ 95% 8335.94 @ 99% 12454.7 @ 99.9% 45756.3 @ 99.99% 79676.6
+   total results collected = 55771072
 
-Benchmarking llfio::pipe_handle and IOCP 2 threads with 16 handles ...
-   per-handle create 1.4175e-05 cancel 6.25e-09 destroy 4.1125e-06
-   total i/o min 11200 max 196800 mean 17265.3 stddev 3723.17
-             @ 50% 16675 @ 95% 21118.8 @ 99% 26143.8 @ 99.9% 38668.8 @ 99.99% 61212.5
-   total results collected = 4964336
+Benchmarking Null i/o multiplexer synchronised with 1 handles ...
+   per-handle create 1.54e-05 cancel 1e-07 destroy 4.2e-06
+   total i/o min 100 max 2.66671e+08 mean 217.766 stddev 62937.9
+             @ 50% 200 @ 95% 300 @ 99% 400 @ 99.9% 1600 @ 99.99% 4100
+   total results collected = 27370495
 
-Benchmarking llfio::pipe_handle and IOCP 2 threads with 64 handles ...
-   per-handle create 9.15313e-06 cancel 1.5625e-09 destroy 4.40781e-06
-   total i/o min 39700 max 513000 mean 67858.5 stddev 18901.7
-             @ 50% 64514.1 @ 95% 87418.8 @ 99% 147325 @ 99.9% 192634 @ 99.99% 247348
-   total results collected = 4849600
+Benchmarking Null i/o multiplexer synchronised with 4 handles ...
+   per-handle create 3.475e-06 cancel 2.5e-08 destroy 1.15e-06
+   total i/o min 400 max 1.7367e+06 mean 557.487 stddev 503.662
+             @ 50% 500 @ 95% 725 @ 99% 1100 @ 99.9% 3825 @ 99.99% 9950
+   total results collected = 29659132
+
+Benchmarking Null i/o multiplexer synchronised with 16 handles ...
+   per-handle create 1.8125e-06 cancel 0 destroy 2.6875e-07
+   total i/o min 1600 max 258800 mean 1959.67 stddev 958.701
+             @ 50% 1800 @ 95% 2731.25 @ 99% 4150 @ 99.9% 12643.8 @ 99.99% 28087.5
+   total results collected = 30474224
+
+Benchmarking Null i/o multiplexer synchronised with 64 handles ...
+   per-handle create 7.125e-07 cancel 1.5625e-09 destroy 1.42187e-07
+   total i/o min 6400 max 680900 mean 7620.39 stddev 3574.9
+             @ 50% 6873.44 @ 95% 10735.9 @ 99% 16279.7 @ 99.9% 49046.9 @ 99.99% 86120.3
+   total results collected = 30605248
+
+Warming up ...
+
+Benchmarking llfio::pipe_handle and IOCP unsynchronised with 1 handles ...
+   per-handle create 8.48e-05 cancel 0 destroy 2.29e-05
+   total i/o min 1800 max 1.7352e+06 mean 2797.39 stddev 1916.54
+             @ 50% 2200 @ 95% 6000 @ 99% 7000 @ 99.9% 10900 @ 99.99% 36300
+   total results collected = 3343359
+
+Benchmarking llfio::pipe_handle and IOCP unsynchronised with 4 handles ...
+   per-handle create 2.6825e-05 cancel 0 destroy 8.15e-06
+   total i/o min 3500 max 597300 mean 6067.99 stddev 2926.52
+             @ 50% 5175 @ 95% 11650 @ 99% 14150 @ 99.9% 23175 @ 99.99% 60025
+   total results collected = 4075516
+
+Benchmarking llfio::pipe_handle and IOCP unsynchronised with 16 handles ...
+   per-handle create 1.4e-05 cancel 6.25e-09 destroy 4.5125e-06
+   total i/o min 10100 max 296900 mean 20019.7 stddev 8824.73
+             @ 50% 16875 @ 95% 37200 @ 99% 44187.5 @ 99.9% 62856.3 @ 99.99% 116219
+   total results collected = 4243440
+
+Benchmarking llfio::pipe_handle and IOCP unsynchronised with 64 handles ...
+   per-handle create 1.20625e-05 cancel 1.5625e-09 destroy 3.55938e-06
+   total i/o min 35200 max 718000 mean 82234.8 stddev 37723.6
+             @ 50% 67831.3 @ 95% 144358 @ 99% 175428 @ 99.9% 237444 @ 99.99% 340753
+   total results collected = 4063168
+
+Benchmarking llfio::pipe_handle and IOCP synchronised with 1 handles ...
+   per-handle create 4.45e-05 cancel 0 destroy 2.53e-05
+   total i/o min 1900 max 2.0515e+06 mean 3307.03 stddev 2632.33
+             @ 50% 2400 @ 95% 6400 @ 99% 7500 @ 99.9% 12900 @ 99.99% 41100
+   total results collected = 2837503
+
+Benchmarking llfio::pipe_handle and IOCP synchronised with 4 handles ...
+   per-handle create 2.3275e-05 cancel 2.5e-08 destroy 9.35e-06
+   total i/o min 3800 max 535800 mean 6425 stddev 2969.44
+             @ 50% 5450 @ 95% 12125 @ 99% 14700 @ 99.9% 22900 @ 99.99% 57325
+   total results collected = 3895292
+
+Benchmarking llfio::pipe_handle and IOCP synchronised with 16 handles ...
+   per-handle create 1.34688e-05 cancel 0 destroy 5.05e-06
+   total i/o min 10900 max 493400 mean 20738.4 stddev 9001.79
+             @ 50% 17337.5 @ 95% 37781.3 @ 99% 45787.5 @ 99.9% 64443.8 @ 99.99% 111206
+   total results collected = 4095984
+
+Benchmarking llfio::pipe_handle and IOCP synchronised with 64 handles ...
+   per-handle create 1.05984e-05 cancel 1.5625e-09 destroy 3.80313e-06
+   total i/o min 38900 max 3.5118e+06 mean 84476.3 stddev 40103.2
+             @ 50% 69626.6 @ 95% 149853 @ 99% 179666 @ 99.9% 245831 @ 99.99% 328900
+   total results collected = 3866560
 
 Warming up ...
 
 Benchmarking ASIO with pipes with 1 handles ...
-   per-handle create 6.99e-05 cancel 3.79796 destroy 2.14015
-   total i/o min 2500 max 195300 mean 3315.1 stddev 1842.59
-             @ 50% 3000 @ 95% 6100 @ 99% 7700 @ 99.9% 36200 @ 99.99% 61100
-   total results collected = 2197503
+   per-handle create 8.06e-05 cancel 3.47447 destroy 1.97703
+   total i/o min 2500 max 1.1078e+06 mean 3850.29 stddev 2548.2
+             @ 50% 3200 @ 95% 7400 @ 99% 9200 @ 99.9% 37800 @ 99.99% 75900
+   total results collected = 1899519
 
 Benchmarking ASIO with pipes with 4 handles ...
-   per-handle create 2.81e-05 cancel 1.37405 destroy 0.803539
-   total i/o min 4800 max 279900 mean 7914.51 stddev 3221.7
-             @ 50% 7300 @ 95% 10550 @ 99% 16375 @ 99.9% 48000 @ 99.99% 76675
-   total results collected = 2871292
+   per-handle create 3.1e-05 cancel 1.18692 destroy 0.667405
+   total i/o min 4800 max 683700 mean 9804.63 stddev 5227.67
+             @ 50% 7975 @ 95% 16350 @ 99% 21375 @ 99.9% 58775 @ 99.99% 105950
+   total results collected = 2342908
 
 Benchmarking ASIO with pipes with 16 handles ...
-   per-handle create 1.90375e-05 cancel 0.383017 destroy 0.236401
-   total i/o min 14100 max 383600 mean 26501.8 stddev 8173.35
-             @ 50% 24875 @ 95% 34231.3 @ 99% 57575 @ 99.9% 85012.5 @ 99.99% 115744
-   total results collected = 3145712
+   per-handle create 1.8575e-05 cancel 0.322137 destroy 0.186772
+   total i/o min 13900 max 1.8979e+06 mean 32992.2 stddev 14976.9
+             @ 50% 27331.3 @ 95% 53318.8 @ 99% 71643.8 @ 99.9% 116231 @ 99.99% 184725
+   total results collected = 2523120
 
 Benchmarking ASIO with pipes with 64 handles ...
-   per-handle create 1.15359e-05 cancel 0.0977114 destroy 0.0637886
-   total i/o min 52600 max 664000 mean 103353 stddev 30469.6
-             @ 50% 95793.8 @ 95% 143414 @ 99% 195903 @ 99.9% 248303 @ 99.99% 343616
-   total results collected = 3145664
+   per-handle create 1.145e-05 cancel 0.0913084 destroy 0.052539
+   total i/o min 51700 max 2.6473e+06 mean 122408 stddev 51918.8
+             @ 50% 105044 @ 95% 198478 @ 99% 253588 @ 99.9% 415041 @ 99.99% 748452
+   total results collected = 2686912
 */
 
 #define LLFIO_ENABLE_TEST_IO_MULTIPLEXERS 1
@@ -167,43 +221,54 @@ test_results do_benchmark(int handles, Args &&... args)
 
   long long overhead = INT_MAX;
   auto create1 = std::chrono::high_resolution_clock::now();
-  for(size_t n = 0; n < 1000; n++)
+  if(C::launch_writer_thread)
   {
-    auto old = create1;
-    create1 = std::chrono::high_resolution_clock::now();
-    auto diff = std::chrono::duration_cast<std::chrono::nanoseconds>(create1 - old).count();
-    if(diff != 0 && diff < overhead)
+    for(size_t n = 0; n < 1000; n++)
     {
-      overhead = diff;
+      auto old = create1;
+      create1 = std::chrono::high_resolution_clock::now();
+      auto diff = std::chrono::duration_cast<std::chrono::nanoseconds>(create1 - old).count();
+      if(diff != 0 && diff < overhead)
+      {
+        overhead = diff;
+      }
     }
-  };
+  }
+  else
+  {
+    overhead = 0;
+  }
   auto ios = C(handles, std::forward<Args>(args)...);
   auto create2 = std::chrono::high_resolution_clock::now();
   std::atomic<int> latch(1);
-  std::thread writer_thread([&]() {
-    --latch;
-    for(;;)
-    {
-      int v;
-      while((v = latch.load(std::memory_order_relaxed)) == 0)
-      {
-        //std::this_thread::yield();
-      }
-      if(v < 0)
-      {
-        return;
-      }
-      latch.fetch_sub(1, std::memory_order_relaxed);
-      for(int x = 0; x < handles; x++)
-      {
-        timings[x].back().write = std::chrono::high_resolution_clock::now();
-        ios.write(x);
-      }
-    }
-  });
-  while(latch == 1)
+  std::thread writer_thread;
+  if(C::launch_writer_thread)
   {
-    std::this_thread::yield();
+    writer_thread = std::thread([&]() {
+      --latch;
+      for(;;)
+      {
+        int v;
+        while((v = latch.load(std::memory_order_relaxed)) == 0)
+        {
+          // std::this_thread::yield();
+        }
+        if(v < 0)
+        {
+          return;
+        }
+        latch.fetch_sub(1, std::memory_order_relaxed);
+        for(int x = 0; x < handles; x++)
+        {
+          timings[x].back().write = std::chrono::high_resolution_clock::now();
+          ios.write(x);
+        }
+      }
+    });
+    while(latch == 1)
+    {
+      std::this_thread::yield();
+    }
   }
 
   for(;;)
@@ -217,6 +282,10 @@ test_results do_benchmark(int handles, Args &&... args)
         auto completion = ios.read(x);
         if(timings[x].size() > 1)
         {
+          if(!C::launch_writer_thread)
+          {
+            timings[x][timings[x].size() - 2].write = completion;
+          }
           timings[x][timings[x].size() - 2].read = completion;
         }
       }
@@ -237,7 +306,10 @@ test_results do_benchmark(int handles, Args &&... args)
   auto destroy1 = std::chrono::high_resolution_clock::now();
   ios.destroy();
   auto destroy2 = std::chrono::high_resolution_clock::now();
-  writer_thread.join();
+  if(C::launch_writer_thread)
+  {
+    writer_thread.join();
+  }
 
   test_results ret;
   ret.creation = ((double) std::chrono::duration_cast<std::chrono::nanoseconds>(create2 - create1).count()) / handles / 1000000000.0;
@@ -398,7 +470,54 @@ template <class C, class... Args> void benchmark(llfio::path_view csv, size_t ma
   of << "\n";
 }
 
-template <class HandleType> struct benchmark_llfio
+struct NoHandle final : public llfio::io_handle
+{
+  using mode = typename llfio::io_handle::mode;
+  using creation = typename llfio::io_handle::creation;
+  using caching = typename llfio::io_handle::caching;
+  using flag = typename llfio::io_handle::flag;
+  using buffer_type = typename llfio::io_handle::buffer_type;
+  using const_buffer_type = typename llfio::io_handle::const_buffer_type;
+  using buffers_type = typename llfio::io_handle::buffers_type;
+  using const_buffers_type = typename llfio::io_handle::const_buffers_type;
+  template <class T> using io_request = typename llfio::io_handle::template io_request<T>;
+  template <class T> using io_result = typename llfio::io_handle::template io_result<T>;
+
+  NoHandle()
+      : llfio::io_handle(llfio::native_handle_type(llfio::native_handle_type::disposition::nonblocking | llfio::native_handle_type::disposition::readable | llfio::native_handle_type::disposition::writable, -2 /* fake being open */), llfio::io_handle::caching::all, llfio::io_handle::flag::multiplexable, nullptr)
+  {
+  }
+  ~NoHandle()
+  {
+    this->_v._init = -1;  // fake closed
+  }
+  NoHandle(const NoHandle &) = delete;
+  NoHandle(NoHandle &&) = default;
+  virtual llfio::result<void> close() noexcept override
+  {
+    this->_v._init = -1;  // fake closed
+    return llfio::success();
+  }
+  virtual io_result<const_buffers_type> _do_write(io_request<const_buffers_type> reqs, llfio::deadline d) noexcept override
+  {
+    (void) d;
+    return reqs.buffers;
+  }
+};
+LLFIO_V2_NAMESPACE_BEGIN
+template <> struct construct<NoHandle>
+{
+  pipe_handle::path_view_type _path;
+  pipe_handle::mode _mode = pipe_handle::mode::read;
+  pipe_handle::creation _creation = pipe_handle::creation::if_needed;
+  pipe_handle::caching _caching = pipe_handle::caching::all;
+  pipe_handle::flag flags = pipe_handle::flag::none;
+  const path_handle &base = path_discovery::temporary_named_pipes_directory();
+  result<NoHandle> operator()() const noexcept { return success(); }
+};
+LLFIO_V2_NAMESPACE_END
+
+template <class HandleType = NoHandle> struct benchmark_llfio
 {
   using mode = typename HandleType::mode;
   using creation = typename HandleType::creation;
@@ -411,13 +530,15 @@ template <class HandleType> struct benchmark_llfio
   template <class T> using io_request = typename HandleType::template io_request<T>;
   template <class T> using io_result = typename HandleType::template io_result<T>;
 
+  static constexpr bool launch_writer_thread = !std::is_same<HandleType, NoHandle>::value;
+
   struct receiver_type final : public llfio::io_multiplexer::io_operation_state_visitor
   {
     benchmark_llfio *parent{nullptr};
     HandleType read_handle;
     std::unique_ptr<llfio::byte[]> io_state_ptr;
     llfio::byte _buffer[sizeof(size_t)];
-    llfio::pipe_handle::buffer_type buffer;
+    buffer_type buffer;
     llfio::io_multiplexer::io_operation_state *io_state{nullptr};
     std::chrono::high_resolution_clock::time_point when_read_completed;
 
@@ -538,7 +659,7 @@ template <class HandleType> struct benchmark_llfio
         }
       }
 #else
-      done += multiplexer->check_for_any_completed_io().value().initiated_ios_completed;
+      done += multiplexer->check_for_any_completed_io().value().initiated_ios_finished;
 #endif
     } while(done < read_states.size());
   }
@@ -573,6 +694,7 @@ struct benchmark_asio_pipe
 #else
   using handle_type = asio::posix::stream_descriptor;
 #endif
+  static constexpr bool launch_writer_thread = true;
 
   struct read_state
   {
@@ -673,16 +795,25 @@ struct benchmark_asio_pipe
 
 int main(void)
 {
-#ifdef _WIN32
   std::cout << "Warming up ..." << std::endl;
+  do_benchmark<benchmark_llfio<>>(-1, []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_null(2, true).value(); });
+  benchmark<benchmark_llfio<>>("llfio-null-unsynchronised.csv", 64, "Null i/o multiplexer unsynchronised", []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_null(1, false).value(); });
+  benchmark<benchmark_llfio<>>("llfio-null-synchronised.csv", 64, "Null i/o multiplexer synchronised", []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_null(2, true).value(); });
+
+#ifdef _WIN32
+  std::cout << "\nWarming up ..." << std::endl;
   do_benchmark<benchmark_llfio<llfio::pipe_handle>>(-1, []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_win_iocp(2, true).value(); });
-  benchmark<benchmark_llfio<llfio::pipe_handle>>("llfio-pipe-handle-1-readers.csv", 64, "llfio::pipe_handle and IOCP 1 thread", []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_win_iocp(1, false).value(); });
-  benchmark<benchmark_llfio<llfio::pipe_handle>>("llfio-pipe-handle-2-readers.csv", 64, "llfio::pipe_handle and IOCP 2 threads", []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_win_iocp(2, true).value(); });
+  // No locking, enable IOCP immediate completions. ASIO can't compete with this.
+  benchmark<benchmark_llfio<llfio::pipe_handle>>("llfio-pipe-handle-unsynchronised.csv", 64, "llfio::pipe_handle and IOCP unsynchronised", []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_win_iocp(1, false).value(); });
+  // Locking enabled, disable IOCP immediate completions so it's a fair comparison with ASIO
+  benchmark<benchmark_llfio<llfio::pipe_handle>>("llfio-pipe-handle-synchronised.csv", 64, "llfio::pipe_handle and IOCP synchronised", []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_win_iocp(2, true).value(); });
 #endif
+
 #if ENABLE_ASIO
   std::cout << "\nWarming up ..." << std::endl;
   do_benchmark<benchmark_asio_pipe>(-1, 2);
-  benchmark<benchmark_asio_pipe>("asio-pipe-handle-readers.csv", 64, "ASIO with pipes", 2);
+  benchmark<benchmark_asio_pipe>("asio-pipe-handle-synchronised.csv", 64, "ASIO with pipes synchronised", 2);
 #endif
+
   return 0;
 }

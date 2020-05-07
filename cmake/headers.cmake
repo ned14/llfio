@@ -47,6 +47,7 @@ set(llfio_HEADERS
   "include/llfio/v2.0/detail/impl/remove_all.ipp"
   "include/llfio/v2.0/detail/impl/safe_byte_ranges.ipp"
   "include/llfio/v2.0/detail/impl/storage_profile.ipp"
+  "include/llfio/v2.0/detail/impl/test/null_multiplexer.ipp"
   "include/llfio/v2.0/detail/impl/windows/directory_handle.ipp"
   "include/llfio/v2.0/detail/impl/windows/file_handle.ipp"
   "include/llfio/v2.0/detail/impl/windows/fs_handle.ipp"

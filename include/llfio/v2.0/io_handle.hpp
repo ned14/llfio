@@ -612,6 +612,10 @@ LLFIO_V2_NAMESPACE_END
 
 #if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 #define LLFIO_INCLUDED_BY_HEADER 1
+#if LLFIO_ENABLE_TEST_IO_MULTIPLEXERS
+#include "detail/impl/test/null_multiplexer.ipp"
+#endif
+
 #ifdef _WIN32
 #if LLFIO_ENABLE_TEST_IO_MULTIPLEXERS
 #include "detail/impl/windows/test/iocp_multiplexer.ipp"
