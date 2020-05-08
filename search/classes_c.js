@@ -10,5 +10,6 @@ var searchData=
   ['payload_5ft',['payload_t',['../unionllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t.html',1,'llfio_v2_xxx::io_multiplexer::_unsynchronised_io_operation_state']]],
   ['pipe_5fhandle',['pipe_handle',['../classllfio__v2__xxx_1_1pipe__handle.html',1,'llfio_v2_xxx']]],
   ['prng',['prng',['../structllfio__v2__xxx_1_1fast__random__file__handle_1_1prng.html',1,'llfio_v2_xxx::fast_random_file_handle']]],
+  ['process_5fhandle',['process_handle',['../classllfio__v2__xxx_1_1process__handle.html',1,'llfio_v2_xxx']]],
   ['process_5fmemory_5fusage',['process_memory_usage',['../structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html',1,'llfio_v2_xxx::utils']]]
 ];

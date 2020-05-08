@@ -1,8 +1,8 @@
 var searchData=
 [
+  ['wait',['wait',['../classllfio__v2__xxx_1_1process__handle.html#a2af6ecdb9948f3ddb05883d66cecbbb2',1,'llfio_v2_xxx::process_handle']]],
   ['wait_5fall',['wait_all',['../classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26a4e1789381cf8c976ec7a7118b3529345',1,'llfio_v2_xxx::io_multiplexer']]],
   ['wait_5fdata_5fonly',['wait_data_only',['../classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26af1d3baf03681db9a9986e0a76d6107ce',1,'llfio_v2_xxx::io_multiplexer']]],
-  ['wait_5ffor_5fcompleted_5fio_5fstatistics',['wait_for_completed_io_statistics',['../structllfio__v2__xxx_1_1io__multiplexer_1_1wait__for__completed__io__statistics.html',1,'llfio_v2_xxx::io_multiplexer']]],
   ['wake_5fcheck_5ffor_5fany_5fcompleted_5fio',['wake_check_for_any_completed_io',['../classllfio__v2__xxx_1_1io__multiplexer.html#a68df23fe7e7b730bed40614e7cfd48b5',1,'llfio_v2_xxx::io_multiplexer']]],
   ['win_5fjunction',['win_junction',['../classllfio__v2__xxx_1_1symlink__handle.html#a1908a242ca435cf1386fe96a86da4002ae295d0310a8145d4037bb19c69aa7a1a',1,'llfio_v2_xxx::symlink_handle']]],
   ['win_5fwsl',['win_wsl',['../classllfio__v2__xxx_1_1symlink__handle.html#a1908a242ca435cf1386fe96a86da4002a47a6c07b9ccfe0e2eb31469b3e3b1939',1,'llfio_v2_xxx::symlink_handle']]],

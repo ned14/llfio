@@ -165,6 +165,8 @@ constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <tr class="separator:a0d5e676b565090269032a91908a8c0bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0d5e676b565090269032a91908a8c0bf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a0d5e676b565090269032a91908a8c0bf">LLFIO_TEMPLATE</a> (class Char) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a></td></tr>
 <tr class="separator:a0d5e676b565090269032a91908a8c0bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d5e676b565090269032a91908a8c0bf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a0d5e676b565090269032a91908a8c0bf">LLFIO_TEMPLATE</a> (class Char) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a></td></tr>
+<tr class="separator:a0d5e676b565090269032a91908a8c0bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a83b86163124a03eadb509e3bb4bcce3e"><td class="memItemLeft" align="right" valign="top"><a id="a83b86163124a03eadb509e3bb4bcce3e"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a83b86163124a03eadb509e3bb4bcce3e">path_view</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> &amp;)=default</td></tr>
 <tr class="memdesc:a83b86163124a03eadb509e3bb4bcce3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default copy constructor. <br /></td></tr>
@@ -374,7 +376,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v
 <p>If however you are taking input from some external piece of code, then for maximum compatibility you should still use the Win32 API. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a0d5e676b565090269032a91908a8c0bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d5e676b565090269032a91908a8c0bf">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[1/5]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d5e676b565090269032a91908a8c0bf">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[1/6]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -397,11 +399,39 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v
 </table>
 </div><div class="memdoc">
 <p>Constructs a path view from a lengthed array of one of <code>byte</code>, <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. The input string MUST continue to exist for this view to be valid. </p>
-<div class="fragment"><div class="line"><a name="l01080"></a><span class="lineno"> 1080</span>&#160;      : _state(v, len, is_zero_terminated)</div><div class="line"><a name="l01081"></a><span class="lineno"> 1081</span>&#160;  {</div><div class="line"><a name="l01082"></a><span class="lineno"> 1082</span>&#160;  }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l01120"></a><span class="lineno"> 1120</span>&#160;      : _state(v, len, is_zero_terminated)</div><div class="line"><a name="l01121"></a><span class="lineno"> 1121</span>&#160;  {</div><div class="line"><a name="l01122"></a><span class="lineno"> 1122</span>&#160;  }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a0d5e676b565090269032a91908a8c0bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d5e676b565090269032a91908a8c0bf">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[2/5]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d5e676b565090269032a91908a8c0bf">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[2/6]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">llfio_v2_xxx::path_view::LLFIO_TEMPLATE </td>
+          <td>(</td>
+          <td class="paramtype">class Char&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Constructs a path view from a pair of pointers of one of <code>byte</code>, <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. The input string MUST continue to exist for this view to be valid. </p>
+<div class="fragment"><div class="line"><a name="l01130"></a><span class="lineno"> 1130</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(s, e - s, zt)</div><div class="line"><a name="l01131"></a><span class="lineno"> 1131</span>&#160;  {</div><div class="line"><a name="l01132"></a><span class="lineno"> 1132</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1path__view_html_a91540ade852194b9507184cdcaed3339"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">llfio_v2_xxx::path_view::path_view</a></div><div class="ttdeci">constexpr path_view()</div><div class="ttdoc">Constructs an empty path view. </div><div class="ttdef"><b>Definition:</b> path_view.hpp:1078</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a0d5e676b565090269032a91908a8c0bf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d5e676b565090269032a91908a8c0bf">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[3/6]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -424,12 +454,12 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v
 </table>
 </div><div class="memdoc">
 <p>Constructs from a basic string if the character type is one of <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. </p>
-<div class="fragment"><div class="line"><a name="l01089"></a><span class="lineno"> 1089</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), v.size(), <span class="keyword">true</span>)</div><div class="line"><a name="l01090"></a><span class="lineno"> 1090</span>&#160;  {</div><div class="line"><a name="l01091"></a><span class="lineno"> 1091</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1path__view_html_a91540ade852194b9507184cdcaed3339"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">llfio_v2_xxx::path_view::path_view</a></div><div class="ttdeci">constexpr path_view()</div><div class="ttdoc">Constructs an empty path view. </div><div class="ttdef"><b>Definition:</b> path_view.hpp:1038</div></div>
+<div class="fragment"><div class="line"><a name="l01139"></a><span class="lineno"> 1139</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), v.size(), <span class="keyword">true</span>)</div><div class="line"><a name="l01140"></a><span class="lineno"> 1140</span>&#160;  {</div><div class="line"><a name="l01141"></a><span class="lineno"> 1141</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1path__view_html_a91540ade852194b9507184cdcaed3339"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">llfio_v2_xxx::path_view::path_view</a></div><div class="ttdeci">constexpr path_view()</div><div class="ttdoc">Constructs an empty path view. </div><div class="ttdef"><b>Definition:</b> path_view.hpp:1078</div></div>
 </div><!-- fragment -->
 </div>
 </div>
 <a id="a0d5e676b565090269032a91908a8c0bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d5e676b565090269032a91908a8c0bf">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[3/5]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d5e676b565090269032a91908a8c0bf">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[4/6]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -452,12 +482,12 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v
 </table>
 </div><div class="memdoc">
 <p>Constructs from a basic string view if the character type is one of <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. </p>
-<div class="fragment"><div class="line"><a name="l01098"></a><span class="lineno"> 1098</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), v.size(), is_zero_terminated)</div><div class="line"><a name="l01099"></a><span class="lineno"> 1099</span>&#160;  {</div><div class="line"><a name="l01100"></a><span class="lineno"> 1100</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1path__view_html_a91540ade852194b9507184cdcaed3339"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">llfio_v2_xxx::path_view::path_view</a></div><div class="ttdeci">constexpr path_view()</div><div class="ttdoc">Constructs an empty path view. </div><div class="ttdef"><b>Definition:</b> path_view.hpp:1038</div></div>
+<div class="fragment"><div class="line"><a name="l01148"></a><span class="lineno"> 1148</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), v.size(), is_zero_terminated)</div><div class="line"><a name="l01149"></a><span class="lineno"> 1149</span>&#160;  {</div><div class="line"><a name="l01150"></a><span class="lineno"> 1150</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1path__view_html_a91540ade852194b9507184cdcaed3339"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">llfio_v2_xxx::path_view::path_view</a></div><div class="ttdeci">constexpr path_view()</div><div class="ttdoc">Constructs an empty path view. </div><div class="ttdef"><b>Definition:</b> path_view.hpp:1078</div></div>
 </div><!-- fragment -->
 </div>
 </div>
 <a id="afef4720fa17884bec1fd6eaa1d5faf56"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afef4720fa17884bec1fd6eaa1d5faf56">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[4/5]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#afef4720fa17884bec1fd6eaa1d5faf56">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[5/6]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -506,11 +536,11 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v
 <p>If the source encodings of the two path views are compatible, a lexicographical comparison is performed. If they are incompatible, either or both views are converted to the destination encoding using <code>c_str&lt;T, Delete, _internal_buffer_size&gt;</code>, and then a lexicographical comparison is performed.</p>
 <p>This can, for obvious reasons, be expensive. It can also throw exceptions, as <code>c_str</code> does.</p>
 <p>If the destination encoding is <code>byte</code>, <code>memcmp()</code> is used, and <code>c_str</code> is never invoked as the two sources are byte compared directly.This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l01412"></a><span class="lineno"> 1412</span>&#160;                                                                        { <span class="keywordflow">return</span> compare&lt;T, Deleter, _internal_buffer_size&gt;(path_view_component(s)); }</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l01462"></a><span class="lineno"> 1462</span>&#160;                                                                        { <span class="keywordflow">return</span> compare&lt;T, Deleter, _internal_buffer_size&gt;(path_view_component(s)); }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a1080207b46f1b48f0ee656995a506646"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1080207b46f1b48f0ee656995a506646">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[5/5]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a1080207b46f1b48f0ee656995a506646">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[6/6]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -553,7 +583,8 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v
 <p>Number of characters, excluding zero terminating char, at buffer</p>
 <p>See constructor for <code>path_view_component::c_str</code>.</p>
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l01418"></a><span class="lineno"> 1418</span>&#160;               : <span class="keyword">public</span> path_view_component::c_str&lt;T, Deleter, _internal_buffer_size&gt;</div><div class="line"><a name="l01419"></a><span class="lineno"> 1419</span>&#160;  {<span class="comment"></span></div><div class="line"><a name="l01420"></a><span class="lineno"> 1420</span>&#160;<span class="comment">    //! Number of characters, excluding zero terminating char, at buffer</span></div><div class="line"><a name="l01421"></a><span class="lineno"> 1421</span>&#160;<span class="comment"></span>    <span class="keyword">using</span> _base = path_view_component::c_str&lt;T, Deleter, _internal_buffer_size&gt;;<span class="comment"></span></div><div class="line"><a name="l01422"></a><span class="lineno"> 1422</span>&#160;<span class="comment">    /*! See constructor for `path_view_component::c_str`.</span></div><div class="line"><a name="l01423"></a><span class="lineno"> 1423</span>&#160;<span class="comment">     */</span></div><div class="line"><a name="l01424"></a><span class="lineno"> 1424</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">class</span> U&gt;</div><div class="line"><a name="l01425"></a><span class="lineno"> 1425</span>&#160;    c_str(<a class="code" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a> view, <span class="keywordtype">bool</span> no_zero_terminate, U &amp;&amp;allocate)</div><div class="line"><a name="l01426"></a><span class="lineno"> 1426</span>&#160;        : _base(view._state, no_zero_terminate, static_cast&lt;U &amp;&amp;&gt;(allocate))</div><div class="line"><a name="l01427"></a><span class="lineno"> 1427</span>&#160;    {</div><div class="line"><a name="l01428"></a><span class="lineno"> 1428</span>&#160;    }<span class="comment"></span></div><div class="line"><a name="l01429"></a><span class="lineno"> 1429</span>&#160;<span class="comment">    //! \overload</span></div><div class="line"><a name="l01430"></a><span class="lineno"> 1430</span>&#160;<span class="comment"></span>    c_str(<a class="code" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a> view, <span class="keywordtype">bool</span> no_zero_terminate = <span class="keyword">false</span>)</div><div class="line"><a name="l01431"></a><span class="lineno"> 1431</span>&#160;        : _base(view._state, no_zero_terminate)</div><div class="line"><a name="l01432"></a><span class="lineno"> 1432</span>&#160;    {</div><div class="line"><a name="l01433"></a><span class="lineno"> 1433</span>&#160;    }</div><div class="line"><a name="l01434"></a><span class="lineno"> 1434</span>&#160;  };</div><div class="ttc" id="classllfio__v2__xxx_1_1path__view_html_a91540ade852194b9507184cdcaed3339"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">llfio_v2_xxx::path_view::path_view</a></div><div class="ttdeci">constexpr path_view()</div><div class="ttdoc">Constructs an empty path view. </div><div class="ttdef"><b>Definition:</b> path_view.hpp:1038</div></div>
+<div class="fragment"><div class="line"><a name="l01468"></a><span class="lineno"> 1468</span>&#160;               : <span class="keyword">public</span> path_view_component::c_str&lt;T, Deleter, _internal_buffer_size&gt;</div><div class="line"><a name="l01469"></a><span class="lineno"> 1469</span>&#160;  {<span class="comment"></span></div><div class="line"><a name="l01470"></a><span class="lineno"> 1470</span>&#160;<span class="comment">    //! Number of characters, excluding zero terminating char, at buffer</span></div><div class="line"><a name="l01471"></a><span class="lineno"> 1471</span>&#160;<span class="comment"></span>    <span class="keyword">using</span> _base = path_view_component::c_str&lt;T, Deleter, _internal_buffer_size&gt;;</div><div class="line"><a name="l01472"></a><span class="lineno"> 1472</span>&#160;    c_str() = <span class="keywordflow">default</span>;</div><div class="line"><a name="l01473"></a><span class="lineno"> 1473</span>&#160;    c_str(<span class="keyword">const</span> c_str &amp;) = <span class="keyword">delete</span>;</div><div class="line"><a name="l01474"></a><span class="lineno"> 1474</span>&#160;    c_str(c_str &amp;&amp;) = <span class="keywordflow">default</span>;</div><div class="line"><a name="l01475"></a><span class="lineno"> 1475</span>&#160;    c_str &amp;<a class="code" href="classllfio__v2__xxx_1_1path__view.html#ad9c86fad629570418502318585ec9f2a">operator=</a>(<span class="keyword">const</span> c_str &amp;) = <span class="keyword">delete</span>;</div><div class="line"><a name="l01476"></a><span class="lineno"> 1476</span>&#160;    c_str &amp;<a class="code" href="classllfio__v2__xxx_1_1path__view.html#ad9c86fad629570418502318585ec9f2a">operator=</a>(c_str &amp;&amp;) = <span class="keywordflow">default</span>;</div><div class="line"><a name="l01477"></a><span class="lineno"> 1477</span>&#160;    ~c_str() = <span class="keywordflow">default</span>;</div><div class="line"><a name="l01478"></a><span class="lineno"> 1478</span>&#160;<span class="comment"></span></div><div class="line"><a name="l01479"></a><span class="lineno"> 1479</span>&#160;<span class="comment">    /*! See constructor for `path_view_component::c_str`.</span></div><div class="line"><a name="l01480"></a><span class="lineno"> 1480</span>&#160;<span class="comment">     */</span></div><div class="line"><a name="l01481"></a><span class="lineno"> 1481</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">class</span> U&gt;</div><div class="line"><a name="l01482"></a><span class="lineno"> 1482</span>&#160;    c_str(<a class="code" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a> view, <span class="keywordtype">bool</span> no_zero_terminate, U &amp;&amp;allocate)</div><div class="line"><a name="l01483"></a><span class="lineno"> 1483</span>&#160;        : _base(view._state, no_zero_terminate, static_cast&lt;U &amp;&amp;&gt;(allocate))</div><div class="line"><a name="l01484"></a><span class="lineno"> 1484</span>&#160;    {</div><div class="line"><a name="l01485"></a><span class="lineno"> 1485</span>&#160;    }<span class="comment"></span></div><div class="line"><a name="l01486"></a><span class="lineno"> 1486</span>&#160;<span class="comment">    //! \overload</span></div><div class="line"><a name="l01487"></a><span class="lineno"> 1487</span>&#160;<span class="comment"></span>    c_str(<a class="code" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a> view, <span class="keywordtype">bool</span> no_zero_terminate = <span class="keyword">false</span>)</div><div class="line"><a name="l01488"></a><span class="lineno"> 1488</span>&#160;        : _base(view._state, no_zero_terminate)</div><div class="line"><a name="l01489"></a><span class="lineno"> 1489</span>&#160;    {</div><div class="line"><a name="l01490"></a><span class="lineno"> 1490</span>&#160;    }</div><div class="line"><a name="l01491"></a><span class="lineno"> 1491</span>&#160;  };</div><div class="ttc" id="classllfio__v2__xxx_1_1path__view_html_a91540ade852194b9507184cdcaed3339"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">llfio_v2_xxx::path_view::path_view</a></div><div class="ttdeci">constexpr path_view()</div><div class="ttdoc">Constructs an empty path view. </div><div class="ttdef"><b>Definition:</b> path_view.hpp:1078</div></div>
+<div class="ttc" id="classllfio__v2__xxx_1_1path__view_html_ad9c86fad629570418502318585ec9f2a"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#ad9c86fad629570418502318585ec9f2a">llfio_v2_xxx::path_view::operator=</a></div><div class="ttdeci">path_view &amp; operator=(const path_view &amp;p)=default</div><div class="ttdoc">Default copy assignment. </div></div>
 </div><!-- fragment -->
 </div>
 </div>

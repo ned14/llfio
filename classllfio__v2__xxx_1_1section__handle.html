@@ -549,7 +549,7 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b> {flag::non
 <dl class="section user"><dt>Memory Allocations</dt><dd>At least one malloc for the <code>path_type</code>, likely several more. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><code>algorithm::cached_parent_handle_adapter&lt;T&gt;</code> which overrides this with an implementation based on retrieving the current path of a cached handle to the parent directory. On platforms with instability or failure to retrieve the correct current path for regular files, the cached parent handle adapter works around the problem by taking advantage of directory inodes not having the same instability problems on any platform. </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#aea44ed050acfd8e4f9dec59ff194c746">llfio_v2_xxx::symlink_handle</a>.</p>
+<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#aea44ed050acfd8e4f9dec59ff194c746">llfio_v2_xxx::symlink_handle</a>, and <a class="el" href="classllfio__v2__xxx_1_1process__handle.html#a8ed1f5dda9dcf9d59710acc9c91df943">llfio_v2_xxx::process_handle</a>.</p>
 
 </div>
 </div>
@@ -783,6 +783,8 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b> {flag::non
 <dl class="section warning"><dt>Warning</dt><dd>On Windows this is implemented as a bit of a hack to make it fast like on POSIX, so make sure you open the handle for read/write originally. Note unlike on POSIX the append_only disposition will be the only one toggled, seekable and readable will remain turned on.</dd></dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Whatever POSIX fcntl() returns. On Windows nothing is changed on the handle. </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>No memory allocation. </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1process__handle.html#ab64c9fc14fc555b5ec8571863458bf83">llfio_v2_xxx::process_handle</a>.</p>
 
 </div>
 </div>

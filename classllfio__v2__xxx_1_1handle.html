@@ -106,8 +106,9 @@ Inheritance diagram for llfio_v2_xxx::handle:</div>
 <area href="classllfio__v2__xxx_1_1io__handle.html" title="A handle to something capable of scatter-gather byte i/o. " alt="llfio_v2_xxx::io_handle" shape="rect" coords="441,56,725,80"/>
 <area href="classllfio__v2__xxx_1_1io__multiplexer.html" title="A multiplexer of byte-orientated i/o. " alt="llfio_v2_xxx::io_multiplexer" shape="rect" coords="735,56,1019,80"/>
 <area href="classllfio__v2__xxx_1_1path__handle.html" title="A handle to somewhere originally identified by a path on the filing system. Typically used as the lig..." alt="llfio_v2_xxx::path_handle" shape="rect" coords="1029,56,1313,80"/>
-<area href="classllfio__v2__xxx_1_1section__handle.html" title="A handle to a source of mapped memory. " alt="llfio_v2_xxx::section_handle" shape="rect" coords="1323,56,1607,80"/>
-<area href="classllfio__v2__xxx_1_1symlink__handle.html" title="A handle to an inode which redirects to a different path. " alt="llfio_v2_xxx::symlink_handle" shape="rect" coords="1617,56,1901,80"/>
+<area href="classllfio__v2__xxx_1_1process__handle.html" title="A handle to this, or another, process. " alt="llfio_v2_xxx::process_handle" shape="rect" coords="1323,56,1607,80"/>
+<area href="classllfio__v2__xxx_1_1section__handle.html" title="A handle to a source of mapped memory. " alt="llfio_v2_xxx::section_handle" shape="rect" coords="1617,56,1901,80"/>
+<area href="classllfio__v2__xxx_1_1symlink__handle.html" title="A handle to an inode which redirects to a different path. " alt="llfio_v2_xxx::symlink_handle" shape="rect" coords="1911,56,2195,80"/>
 <area href="classllfio__v2__xxx_1_1lockable__io__handle.html" title="A handle to something capable of scatter-gather i/o and which can exclude other concurrent users..." alt="llfio_v2_xxx::lockable_io_handle" shape="rect" coords="294,112,578,136"/>
 <area href="classllfio__v2__xxx_1_1pipe__handle.html" title="A handle to a named or anonymous pipe. " alt="llfio_v2_xxx::pipe_handle" shape="rect" coords="588,112,872,136"/>
 <area href="classllfio__v2__xxx_1_1directory__handle.html" title="A handle to a directory which can be enumerated. " alt="llfio_v2_xxx::directory_handle" shape="rect" coords="1029,112,1313,136"/>
@@ -515,7 +516,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <dl class="section user"><dt>Memory Allocations</dt><dd>At least one malloc for the <code>path_type</code>, likely several more. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><code>algorithm::cached_parent_handle_adapter&lt;T&gt;</code> which overrides this with an implementation based on retrieving the current path of a cached handle to the parent directory. On platforms with instability or failure to retrieve the correct current path for regular files, the cached parent handle adapter works around the problem by taking advantage of directory inodes not having the same instability problems on any platform. </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#aea44ed050acfd8e4f9dec59ff194c746">llfio_v2_xxx::symlink_handle</a>.</p>
+<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#aea44ed050acfd8e4f9dec59ff194c746">llfio_v2_xxx::symlink_handle</a>, and <a class="el" href="classllfio__v2__xxx_1_1process__handle.html#a8ed1f5dda9dcf9d59710acc9c91df943">llfio_v2_xxx::process_handle</a>.</p>
 
 </div>
 </div>
@@ -592,6 +593,8 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <dl class="section warning"><dt>Warning</dt><dd>On Windows this is implemented as a bit of a hack to make it fast like on POSIX, so make sure you open the handle for read/write originally. Note unlike on POSIX the append_only disposition will be the only one toggled, seekable and readable will remain turned on.</dd></dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Whatever POSIX fcntl() returns. On Windows nothing is changed on the handle. </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>No memory allocation. </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1process__handle.html#ab64c9fc14fc555b5ec8571863458bf83">llfio_v2_xxx::process_handle</a>.</p>
 
 </div>
 </div>

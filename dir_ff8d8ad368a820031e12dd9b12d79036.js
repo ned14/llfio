@@ -30,6 +30,7 @@ var dir_ff8d8ad368a820031e12dd9b12d79036 =
       [ "pipe_handle", "classllfio__v2__xxx_1_1pipe__handle.html", "classllfio__v2__xxx_1_1pipe__handle" ],
       [ "construct< pipe_handle >", "structllfio__v2__xxx_1_1construct_3_01pipe__handle_01_4.html", "structllfio__v2__xxx_1_1construct_3_01pipe__handle_01_4" ]
     ] ],
+    [ "process_handle.hpp", "process__handle_8hpp.html", "process__handle_8hpp" ],
     [ "stat.hpp", "stat_8hpp.html", [
       [ "stat_t", "structllfio__v2__xxx_1_1stat__t.html", "structllfio__v2__xxx_1_1stat__t" ]
     ] ],

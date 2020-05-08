@@ -122,6 +122,9 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1buffer__type.html">buffer_type</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1check__for__any__completed__io__statistics.html">check_for_any_completed_io_statistics</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Statistics about the just returned <code>wait_for_completed_io()</code> operation.  <a href="structllfio__v2__xxx_1_1io__multiplexer_1_1check__for__any__completed__io__statistics.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1const__buffer__type.html">const_buffer_type</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html">io_operation_state</a></td></tr>
@@ -135,9 +138,6 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The i/o result type used by this handle. Guaranteed to be <code>TrivialType</code> apart from construction.  <a href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1wait__for__completed__io__statistics.html">wait_for_completed_io_statistics</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Statistics about the just returned <code>wait_for_completed_io()</code> operation.  <a href="structllfio__v2__xxx_1_1io__multiplexer_1_1wait__for__completed__io__statistics.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
@@ -257,10 +257,10 @@ virtual <a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa42853
 virtual result&lt; <a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745">io_operation_state_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#a67bedbb8d86cbae91475f7f0dad9e9ff">cancel_io_operation</a> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html">io_operation_state</a> *op, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d={}) noexcept=0</td></tr>
 <tr class="memdesc:a67bedbb8d86cbae91475f7f0dad9e9ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cancel an initiated i/o, returning its current state if successful. <br /></td></tr>
 <tr class="separator:a67bedbb8d86cbae91475f7f0dad9e9ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5fa1078fcad4df7866a935e82ee15b7d"><td class="memItemLeft" align="right" valign="top"><a id="a5fa1078fcad4df7866a935e82ee15b7d"></a>
-virtual result&lt; <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1wait__for__completed__io__statistics.html">wait_for_completed_io_statistics</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#a5fa1078fcad4df7866a935e82ee15b7d">check_for_any_completed_io</a> (<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(0), size_t max_completions=(size_t) -1) noexcept=0</td></tr>
-<tr class="memdesc:a5fa1078fcad4df7866a935e82ee15b7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks all i/o initiated on this i/o multiplexer to see which have completed, trying without guarantee to complete no more than <code>max_completions</code> completions, and not to exceed <code>d</code> of waiting (this function never fails with timed out). <br /></td></tr>
-<tr class="separator:a5fa1078fcad4df7866a935e82ee15b7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a408f42437c337934d180d5a13a141e95"><td class="memItemLeft" align="right" valign="top"><a id="a408f42437c337934d180d5a13a141e95"></a>
+virtual result&lt; <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1check__for__any__completed__io__statistics.html">check_for_any_completed_io_statistics</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#a408f42437c337934d180d5a13a141e95">check_for_any_completed_io</a> (<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(0), size_t max_completions=(size_t) -1) noexcept=0</td></tr>
+<tr class="memdesc:a408f42437c337934d180d5a13a141e95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks all i/o initiated on this i/o multiplexer to see which have completed, trying without guarantee to complete no more than <code>max_completions</code> completions or finisheds, and not to exceed <code>d</code> of waiting (this function never fails with timed out). <br /></td></tr>
+<tr class="separator:a408f42437c337934d180d5a13a141e95"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a68df23fe7e7b730bed40614e7cfd48b5"><td class="memItemLeft" align="right" valign="top"><a id="a68df23fe7e7b730bed40614e7cfd48b5"></a>
 virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#a68df23fe7e7b730bed40614e7cfd48b5">wake_check_for_any_completed_io</a> () noexcept=0</td></tr>
 <tr class="memdesc:a68df23fe7e7b730bed40614e7cfd48b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Can be called from any thread to wake any other single thread currently blocked within <code>check_for_any_completed_io()</code>. Which thread is woken is not specified. <br /></td></tr>
@@ -525,7 +525,7 @@ static constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><b>_a
 <dl class="section user"><dt>Memory Allocations</dt><dd>At least one malloc for the <code>path_type</code>, likely several more. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><code>algorithm::cached_parent_handle_adapter&lt;T&gt;</code> which overrides this with an implementation based on retrieving the current path of a cached handle to the parent directory. On platforms with instability or failure to retrieve the correct current path for regular files, the cached parent handle adapter works around the problem by taking advantage of directory inodes not having the same instability problems on any platform. </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#aea44ed050acfd8e4f9dec59ff194c746">llfio_v2_xxx::symlink_handle</a>.</p>
+<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#aea44ed050acfd8e4f9dec59ff194c746">llfio_v2_xxx::symlink_handle</a>, and <a class="el" href="classllfio__v2__xxx_1_1process__handle.html#a8ed1f5dda9dcf9d59710acc9c91df943">llfio_v2_xxx::process_handle</a>.</p>
 
 </div>
 </div>
@@ -602,6 +602,8 @@ static constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><b>_a
 <dl class="section warning"><dt>Warning</dt><dd>On Windows this is implemented as a bit of a hack to make it fast like on POSIX, so make sure you open the handle for read/write originally. Note unlike on POSIX the append_only disposition will be the only one toggled, seekable and readable will remain turned on.</dd></dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Whatever POSIX fcntl() returns. On Windows nothing is changed on the handle. </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>No memory allocation. </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1process__handle.html#ab64c9fc14fc555b5ec8571863458bf83">llfio_v2_xxx::process_handle</a>.</p>
 
 </div>
 </div>
