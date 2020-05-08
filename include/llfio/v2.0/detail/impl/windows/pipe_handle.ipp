@@ -69,6 +69,7 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
 
   attribs &= 0x00ffffff;  // the real attributes only, not the win32 flags
   OUTCOME_TRY(ntflags, ntflags_from_handle_caching_and_flags(nativeh, _caching, flags));
+  ntflags &= ~0x00000008 /*FILE_NO_INTERMEDIATE_BUFFERING*/;  // pipes always buffer
   IO_STATUS_BLOCK isb = make_iostatus();
 
   path_view::c_str<> zpath(path, true);
@@ -126,7 +127,7 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
       }
       // loop
     }
-    ret.value()._v.behaviour|=native_handle_type::disposition::_is_connected;
+    ret.value()._v.behaviour |= native_handle_type::disposition::_is_connected;
   }
   else
   {
@@ -182,6 +183,7 @@ result<std::pair<pipe_handle, pipe_handle>> pipe_handle::anonymous_pipe(caching 
   // Now clone the handle, but as a write privileged handle
   attribs &= 0x00ffffff;  // the real attributes only, not the win32 flags
   OUTCOME_TRY(ntflags, ntflags_from_handle_caching_and_flags(writenativeh, _caching, flags));
+  ntflags &= ~0x00000008 /*FILE_NO_INTERMEDIATE_BUFFERING*/;  // pipes always buffer
   IO_STATUS_BLOCK isb = make_iostatus();
 
   UNICODE_STRING _path{};

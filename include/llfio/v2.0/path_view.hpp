@@ -202,6 +202,8 @@ private:
   unsigned _utf8 : 1;
   unsigned _utf16 : 1;
 
+public:
+  //! Constructs an empty path view component
   constexpr path_view_component()
       : _zero_terminated(false)
       , _passthrough(false)
@@ -266,6 +268,20 @@ private:
       , _utf16((l == 0) ? false : true)
   {
   }
+  LLFIO_TEMPLATE(class Char)
+  LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_acceptable<Char>))
+  constexpr path_view_component(const Char *s)
+      : path_view_component(s, detail::constexpr_strlen(s), true)
+  {
+  }
+  LLFIO_TEMPLATE(class Char)
+  LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_acceptable<Char>))
+  constexpr path_view_component(const Char *s, const Char *e, bool zt)
+      : path_view_component(s, e - s, zt)
+  {
+  }
+
+private:
   template <class U> constexpr auto _invoke(U &&f) const noexcept
   {
     return _utf8 ? f(basic_string_view<char8_t>(_char8str, _length))  //
@@ -397,7 +413,7 @@ private:
   template <class CharT> static filesystem::path _path_from_char_array(basic_string_view<CharT> v) { return {v.data(), v.data() + v.size()}; }
   static filesystem::path _path_from_char_array(basic_string_view<char8_t> v)
   {
-#if (__cplusplus >= 202000 || _HAS_CXX20) && (!defined(_LIBCPP_VERSION) || _LIBCPP_VERSION > 10000 /* approx start of 2020 */)
+#if(__cplusplus >= 202000 || _HAS_CXX20) && (!defined(_LIBCPP_VERSION) || _LIBCPP_VERSION > 10000 /* approx start of 2020 */)
     return filesystem::path(v);
 #else
     return filesystem::u8path((const char *) v.data(), (const char *) v.data() + v.size());
@@ -577,6 +593,7 @@ public:
     }
 
   public:
+    constexpr c_str() {}
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4127)  // conditional expression is constant
@@ -727,11 +744,34 @@ public:
         : c_str(view, no_zero_terminate, [](size_t length) { return new value_type[length]; })
     {
     }
-    ~c_str() = default;
+    ~c_str()
+    {
+      if(_call_deleter)
+      {
+        _deleter(const_cast<value_type *>(buffer));
+      }
+    }
     c_str(const c_str &) = delete;
-    c_str(c_str &&) = delete;
+    c_str(c_str &&o) noexcept
+        : length(o.length)
+        , buffer(o.buffer)
+        , _call_deleter(o._call_deleter)
+        , _deleter(std::move(o._deleter))
+    {
+      if(o.buffer == o._buffer)
+      {
+        memcpy(_buffer, o._buffer, (o.length + 1) * sizeof(value_type));
+        buffer = _buffer;
+      }
+      o._call_deleter = false;
+    }
     c_str &operator=(const c_str &) = delete;
-    c_str &operator=(c_str &&) = delete;
+    c_str &operator=(c_str &&o) noexcept
+    {
+      this->~c_str();
+      new(this) c_str(std::move(o));
+      return *this;
+    }
 
   private:
     bool _call_deleter{false};
@@ -1080,6 +1120,16 @@ public:
       : _state(v, len, is_zero_terminated)
   {
   }
+  /*! Constructs a path view from a pair of pointers of one of
+  `byte`, `char`, `wchar_t`, `char8_t` or `char16_t`. The input
+  string MUST continue to exist for this view to be valid.
+  */
+  LLFIO_TEMPLATE(class Char)
+  LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_acceptable<Char>))
+  constexpr path_view(const Char *s, const Char *e, bool zt)
+      : path_view(s, e - s, zt)
+  {
+  }
   /*! Constructs from a basic string if the character type is one of
   `char`, `wchar_t`, `char8_t` or `char16_t`.
   */
@@ -1419,6 +1469,13 @@ public:
   {
     //! Number of characters, excluding zero terminating char, at buffer
     using _base = path_view_component::c_str<T, Deleter, _internal_buffer_size>;
+    c_str() = default;
+    c_str(const c_str &) = delete;
+    c_str(c_str &&) = default;
+    c_str &operator=(const c_str &) = delete;
+    c_str &operator=(c_str &&) = default;
+    ~c_str() = default;
+
     /*! See constructor for `path_view_component::c_str`.
      */
     template <class U>

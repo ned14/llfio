@@ -102,10 +102,10 @@ namespace test
     virtual result<void> close() noexcept override
     {
 #ifndef NDEBUG
-      if(_v)
+      if(this->_v)
       {
         // Tell handle::close() that we have correctly executed
-        _v.behaviour |= native_handle_type::disposition::_child_close_executed;
+        this->_v.behaviour |= native_handle_type::disposition::_child_close_executed;
       }
 #endif
       return _base::close();
