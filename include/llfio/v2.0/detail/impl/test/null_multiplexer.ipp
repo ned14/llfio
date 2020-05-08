@@ -44,6 +44,13 @@ namespace test
     using _base = io_multiplexer_impl<is_threadsafe>;
     using _multiplexer_lock_guard = typename _base::_lock_guard;
 
+    using path_type = typename _base::path_type;
+    using extent_type = typename _base::extent_type;
+    using size_type = typename _base::size_type;
+    using mode = typename _base::mode;
+    using creation = typename _base::creation;
+    using caching = typename _base::caching;
+    using flag = typename _base::flag;
     using barrier_kind = typename _base::barrier_kind;
     using const_buffers_type = typename _base::const_buffers_type;
     using buffers_type = typename _base::buffers_type;
@@ -560,11 +567,11 @@ namespace test
       {
         auto ret = std::make_unique<null_multiplexer<false>>();
         OUTCOME_TRY(ret->init(1, disable_immediate_completions));
-        return ret;
+        return io_multiplexer_ptr(ret.release());
       }
       auto ret = std::make_unique<null_multiplexer<true>>();
       OUTCOME_TRY(ret->init(threads, disable_immediate_completions));
-      return ret;
+      return io_multiplexer_ptr(ret.release());
     }
     catch(...)
     {

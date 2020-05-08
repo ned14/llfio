@@ -25,134 +25,341 @@ Distributed under the Boost Software License, Version 1.0.
 //! Seconds to run the benchmark
 static constexpr int BENCHMARK_DURATION = 10;
 
-/* Note that the IOCP 1 thread does not use locking, and enables IOCP immediate completions.
-Whereas the IOCP 2 thread does use locking, and disables IOCP immediate completions. This
-makes only the IOCP 2 thread results comparable to ASIO.
+/* MSVC in Release build on Windows 10.
+
+Note that the IOCP without locking enables IOCP immediate completions.
+Whereas the IOCP with locking disables IOCP immediate completions. This
+makes only the IOCP with locking results comparable to ASIO.
 
 
 Benchmarking Null i/o multiplexer unsynchronised with 1 handles ...
-   per-handle create 7e-06 cancel 0 destroy 6e-06
-   total i/o min 100 max 3.49408e+08 mean 152.97 stddev 66587.2
-             @ 50% 100 @ 95% 200 @ 99% 300 @ 99.9% 1500 @ 99.99% 3800
-   total results collected = 47732735
+   per-handle create 6.2e-06 cancel 0 destroy 4.7e-06
+     total i/o min 100 max 1.472e+06 mean 120.738 stddev 266.984
+             @ 50% 100 @ 95% 200 @ 99% 200 @ 99.9% 400 @ 99.99% 2500
+  initiate i/o min 0 max 0 mean 0 stddev 0
+             @ 50% 0 @ 95% 0 @ 99% 0 @ 99.9% 0 @ 99.99% 0
+completion i/o min 100 max 1.472e+06 mean 120.738 stddev 266.984
+             @ 50% 100 @ 95% 200 @ 99% 200 @ 99.9% 400 @ 99.99% 2500
+   total results collected = 48710655
 
 Benchmarking Null i/o multiplexer unsynchronised with 4 handles ...
-   per-handle create 2.8e-06 cancel 2.5e-08 destroy 9.5e-07
-   total i/o min 300 max 4.47648e+08 mean 457.242 stddev 87215.2
-             @ 50% 400 @ 95% 625 @ 99% 950 @ 99.9% 3800 @ 99.99% 9250
-   total results collected = 47996924
+   per-handle create 2.45e-06 cancel 2.5e-08 destroy 1.6e-06
+     total i/o min 300 max 686900 mean 389.223 stddev 370.963
+             @ 50% 400 @ 95% 525 @ 99% 725 @ 99.9% 1200 @ 99.99% 6475
+  initiate i/o min 0 max 0 mean 0 stddev 0
+             @ 50% 0 @ 95% 0 @ 99% 0 @ 99.9% 0 @ 99.99% 0
+completion i/o min 300 max 686900 mean 389.223 stddev 370.963
+             @ 50% 400 @ 95% 525 @ 99% 725 @ 99.9% 1200 @ 99.99% 6475
+   total results collected = 47837180
 
 Benchmarking Null i/o multiplexer unsynchronised with 16 handles ...
-   per-handle create 1.69375e-06 cancel 0 destroy 7.125e-07
-   total i/o min 1200 max 387200 mean 1509.67 stddev 944.997
-             @ 50% 1325 @ 95% 2131.25 @ 99% 3287.5 @ 99.9% 11725 @ 99.99% 27293.8
-   total results collected = 54099952
+   per-handle create 1.825e-06 cancel 0 destroy 7.1875e-07
+     total i/o min 1200 max 973700 mean 1433.72 stddev 728.065
+             @ 50% 1325 @ 95% 1943.75 @ 99% 2631.25 @ 99.9% 4793.75 @ 99.99% 22375
+  initiate i/o min 0 max 0 mean 0 stddev 0
+             @ 50% 0 @ 95% 0 @ 99% 0 @ 99.9% 0 @ 99.99% 0
+completion i/o min 1200 max 973700 mean 1433.72 stddev 728.065
+             @ 50% 1325 @ 95% 1943.75 @ 99% 2631.25 @ 99.9% 4793.75 @ 99.99% 22375
+   total results collected = 49184752
 
 Benchmarking Null i/o multiplexer unsynchronised with 64 handles ...
-   per-handle create 7.10938e-07 cancel 1.5625e-09 destroy 1.84375e-07
-   total i/o min 4700 max 379100 mean 5767.38 stddev 3311.88
-             @ 50% 5142.19 @ 95% 8335.94 @ 99% 12454.7 @ 99.9% 45756.3 @ 99.99% 79676.6
-   total results collected = 55771072
+   per-handle create 6.78125e-07 cancel 0 destroy 1.32812e-07
+     total i/o min 4600 max 522400 mean 5657.96 stddev 1619.09
+             @ 50% 5139.06 @ 95% 7929.69 @ 99% 10550 @ 99.9% 17779.7 @ 99.99% 48004.7
+  initiate i/o min 0 max 0 mean 0 stddev 0
+             @ 50% 0 @ 95% 0 @ 99% 0 @ 99.9% 0 @ 99.99% 0
+completion i/o min 4600 max 522400 mean 5657.96 stddev 1619.09
+             @ 50% 5139.06 @ 95% 7929.69 @ 99% 10550 @ 99.9% 17779.7 @ 99.99% 48004.7
+   total results collected = 47251392
 
 Benchmarking Null i/o multiplexer synchronised with 1 handles ...
-   per-handle create 1.54e-05 cancel 1e-07 destroy 4.2e-06
-   total i/o min 100 max 2.66671e+08 mean 217.766 stddev 62937.9
-             @ 50% 200 @ 95% 300 @ 99% 400 @ 99.9% 1600 @ 99.99% 4100
-   total results collected = 27370495
+   per-handle create 1.05e-05 cancel 0 destroy 7.7e-06
+     total i/o min 100 max 278700 mean 197.164 stddev 168.029
+             @ 50% 200 @ 95% 300 @ 99% 300 @ 99.9% 600 @ 99.99% 3200
+  initiate i/o min 0 max 0 mean 0 stddev 0
+             @ 50% 0 @ 95% 0 @ 99% 0 @ 99.9% 0 @ 99.99% 0
+completion i/o min 100 max 278700 mean 197.164 stddev 168.029
+             @ 50% 200 @ 95% 300 @ 99% 300 @ 99.9% 600 @ 99.99% 3200
+   total results collected = 26737663
 
 Benchmarking Null i/o multiplexer synchronised with 4 handles ...
-   per-handle create 3.475e-06 cancel 2.5e-08 destroy 1.15e-06
-   total i/o min 400 max 1.7367e+06 mean 557.487 stddev 503.662
-             @ 50% 500 @ 95% 725 @ 99% 1100 @ 99.9% 3825 @ 99.99% 9950
-   total results collected = 29659132
+   per-handle create 2.825e-06 cancel 0 destroy 9.25e-07
+     total i/o min 400 max 357600 mean 548.041 stddev 314.785
+             @ 50% 500 @ 95% 700 @ 99% 1000 @ 99.9% 1800 @ 99.99% 7850
+  initiate i/o min 0 max 0 mean 0 stddev 0
+             @ 50% 0 @ 95% 0 @ 99% 0 @ 99.9% 0 @ 99.99% 0
+completion i/o min 400 max 357600 mean 548.041 stddev 314.785
+             @ 50% 500 @ 95% 700 @ 99% 1000 @ 99.9% 1800 @ 99.99% 7850
+   total results collected = 27656188
 
 Benchmarking Null i/o multiplexer synchronised with 16 handles ...
-   per-handle create 1.8125e-06 cancel 0 destroy 2.6875e-07
-   total i/o min 1600 max 258800 mean 1959.67 stddev 958.701
-             @ 50% 1800 @ 95% 2731.25 @ 99% 4150 @ 99.9% 12643.8 @ 99.99% 28087.5
-   total results collected = 30474224
+   per-handle create 8.6875e-07 cancel 6.25e-09 destroy 2.625e-07
+     total i/o min 1600 max 652100 mean 1927.42 stddev 688.299
+             @ 50% 1800 @ 95% 2600 @ 99% 3575 @ 99.9% 6243.75 @ 99.99% 24637.5
+  initiate i/o min 0 max 0 mean 0 stddev 0
+             @ 50% 0 @ 95% 0 @ 99% 0 @ 99.9% 0 @ 99.99% 0
+completion i/o min 1600 max 652100 mean 1927.42 stddev 688.299
+             @ 50% 1800 @ 95% 2600 @ 99% 3575 @ 99.9% 6243.75 @ 99.99% 24637.5
+   total results collected = 28229616
 
 Benchmarking Null i/o multiplexer synchronised with 64 handles ...
-   per-handle create 7.125e-07 cancel 1.5625e-09 destroy 1.42187e-07
-   total i/o min 6400 max 680900 mean 7620.39 stddev 3574.9
-             @ 50% 6873.44 @ 95% 10735.9 @ 99% 16279.7 @ 99.9% 49046.9 @ 99.99% 86120.3
-   total results collected = 30605248
+   per-handle create 6.78125e-07 cancel 1.5625e-09 destroy 3.45312e-07
+     total i/o min 6500 max 1.23258e+07 mean 7831.4 stddev 18620.9
+             @ 50% 6995.31 @ 95% 11178.1 @ 99% 13909.4 @ 99.9% 27435.9 @ 99.99% 94923.4
+  initiate i/o min 0 max 0 mean 0 stddev 0
+             @ 50% 0 @ 95% 0 @ 99% 0 @ 99.9% 0 @ 99.99% 0
+completion i/o min 6500 max 1.23258e+07 mean 7831.4 stddev 18620.9
+             @ 50% 6995.31 @ 95% 11178.1 @ 99% 13909.4 @ 99.9% 27435.9 @ 99.99% 94923.4
+   total results collected = 27656128
 
 Warming up ...
 
 Benchmarking llfio::pipe_handle and IOCP unsynchronised with 1 handles ...
-   per-handle create 8.48e-05 cancel 0 destroy 2.29e-05
-   total i/o min 1800 max 1.7352e+06 mean 2797.39 stddev 1916.54
-             @ 50% 2200 @ 95% 6000 @ 99% 7000 @ 99.9% 10900 @ 99.99% 36300
-   total results collected = 3343359
+   per-handle create 5.23e-05 cancel 1.68e-05 destroy 2.02e-05
+     total i/o min 1800 max 9.6511e+06 mean 2663.23 stddev 6638.02
+             @ 50% 2200 @ 95% 5900 @ 99% 6600 @ 99.9% 10800 @ 99.99% 36700
+  initiate i/o min 400 max 8.8199e+06 mean 751.918 stddev 5312.44
+             @ 50% 600 @ 95% 1800 @ 99% 2000 @ 99.9% 4000 @ 99.99% 18500
+completion i/o min 1200 max 3.0832e+06 mean 1811.31 stddev 2528.3
+             @ 50% 1500 @ 95% 4000 @ 99% 4500 @ 99.9% 7400 @ 99.99% 25200
+   total results collected = 3468287
 
 Benchmarking llfio::pipe_handle and IOCP unsynchronised with 4 handles ...
-   per-handle create 2.6825e-05 cancel 0 destroy 8.15e-06
-   total i/o min 3500 max 597300 mean 6067.99 stddev 2926.52
-             @ 50% 5175 @ 95% 11650 @ 99% 14150 @ 99.9% 23175 @ 99.99% 60025
-   total results collected = 4075516
+   per-handle create 2.2875e-05 cancel 2.5e-08 destroy 7e-06
+     total i/o min 3500 max 371100 mean 6936.17 stddev 3587.11
+             @ 50% 5200 @ 95% 12300 @ 99% 14350 @ 99.9% 22775 @ 99.99% 58400
+  initiate i/o min 2000 max 361900 mean 4725.03 stddev 2537.74
+             @ 50% 3650 @ 95% 8225 @ 99% 9700 @ 99.9% 14950 @ 99.99% 42825
+completion i/o min 1100 max 215400 mean 2111.14 stddev 1365.2
+             @ 50% 1500 @ 95% 4075 @ 99% 4650 @ 99.9% 9175 @ 99.99% 34625
+   total results collected = 3583996
 
 Benchmarking llfio::pipe_handle and IOCP unsynchronised with 16 handles ...
-   per-handle create 1.4e-05 cancel 6.25e-09 destroy 4.5125e-06
-   total i/o min 10100 max 296900 mean 20019.7 stddev 8824.73
-             @ 50% 16875 @ 95% 37200 @ 99% 44187.5 @ 99.9% 62856.3 @ 99.99% 116219
-   total results collected = 4243440
+   per-handle create 1.29437e-05 cancel 6.25e-09 destroy 2.76438e-05
+     total i/o min 9700 max 4.2575e+06 mean 20583.8 stddev 9944.7
+             @ 50% 16006.3 @ 95% 36425 @ 99% 42600 @ 99.9% 58800 @ 99.99% 107531
+  initiate i/o min 8200 max 4.2478e+06 mean 18540.7 stddev 9094.75
+             @ 50% 14481.3 @ 95% 32487.5 @ 99% 38062.5 @ 99.9% 50587.5 @ 99.99% 93925
+completion i/o min 1100 max 255200 mean 1943.07 stddev 1406.6
+             @ 50% 1412.5 @ 95% 3900 @ 99% 4468.75 @ 99.9% 11468.8 @ 99.99% 42962.5
+   total results collected = 4079600
 
 Benchmarking llfio::pipe_handle and IOCP unsynchronised with 64 handles ...
-   per-handle create 1.20625e-05 cancel 1.5625e-09 destroy 3.55938e-06
-   total i/o min 35200 max 718000 mean 82234.8 stddev 37723.6
-             @ 50% 67831.3 @ 95% 144358 @ 99% 175428 @ 99.9% 237444 @ 99.99% 340753
-   total results collected = 4063168
+   per-handle create 1.49281e-05 cancel 1.5625e-09 destroy 9.025e-06
+     total i/o min 34700 max 692700 mean 77425 stddev 33692.3
+             @ 50% 63237.5 @ 95% 139083 @ 99% 161567 @ 99.9% 202941 @ 99.99% 292984
+  initiate i/o min 32700 max 690400 mean 75414.1 stddev 32856.5
+             @ 50% 61657.8 @ 95% 134970 @ 99% 156755 @ 99.9% 194389 @ 99.99% 275211
+completion i/o min 1100 max 180500 mean 1910.91 stddev 1594.1
+             @ 50% 1468.75 @ 95% 4026.56 @ 99% 4673.44 @ 99.9% 16151.6 @ 99.99% 54842.2
+   total results collected = 4259776
 
 Benchmarking llfio::pipe_handle and IOCP synchronised with 1 handles ...
-   per-handle create 4.45e-05 cancel 0 destroy 2.53e-05
-   total i/o min 1900 max 2.0515e+06 mean 3307.03 stddev 2632.33
-             @ 50% 2400 @ 95% 6400 @ 99% 7500 @ 99.9% 12900 @ 99.99% 41100
-   total results collected = 2837503
+   per-handle create 5.42e-05 cancel 0 destroy 1.76e-05
+     total i/o min 2000 max 906000 mean 3098.49 stddev 1928.39
+             @ 50% 2400 @ 95% 6500 @ 99% 7300 @ 99.9% 11400 @ 99.99% 38000
+  initiate i/o min 500 max 888000 mean 937.688 stddev 978.843
+             @ 50% 700 @ 95% 2100 @ 99% 2400 @ 99.9% 4600 @ 99.99% 20700
+completion i/o min 1200 max 513900 mean 2060.8 stddev 1254.11
+             @ 50% 1600 @ 95% 4300 @ 99% 4800 @ 99.9% 7700 @ 99.99% 25700
+   total results collected = 2997247
 
 Benchmarking llfio::pipe_handle and IOCP synchronised with 4 handles ...
-   per-handle create 2.3275e-05 cancel 2.5e-08 destroy 9.35e-06
-   total i/o min 3800 max 535800 mean 6425 stddev 2969.44
-             @ 50% 5450 @ 95% 12125 @ 99% 14700 @ 99.9% 22900 @ 99.99% 57325
-   total results collected = 3895292
+   per-handle create 2.585e-05 cancel 0 destroy 9.925e-06
+     total i/o min 3800 max 245100 mean 6241.72 stddev 2823.55
+             @ 50% 5200 @ 95% 12100 @ 99% 14450 @ 99.9% 20975 @ 99.99% 52300
+  initiate i/o min 2300 max 202800 mean 4269.66 stddev 2015.05
+             @ 50% 3550 @ 95% 7975 @ 99% 9800 @ 99.9% 14475 @ 99.99% 38075
+completion i/o min 1200 max 157300 mean 1872.07 stddev 1071.64
+             @ 50% 1525 @ 95% 4000 @ 99% 4700 @ 99.9% 8900 @ 99.99% 28525
+   total results collected = 3964924
 
 Benchmarking llfio::pipe_handle and IOCP synchronised with 16 handles ...
-   per-handle create 1.34688e-05 cancel 0 destroy 5.05e-06
-   total i/o min 10900 max 493400 mean 20738.4 stddev 9001.79
-             @ 50% 17337.5 @ 95% 37781.3 @ 99% 45787.5 @ 99.9% 64443.8 @ 99.99% 111206
+   per-handle create 2.09937e-05 cancel 6.25e-09 destroy 1.37937e-05
+     total i/o min 10900 max 1.1805e+06 mean 20535.9 stddev 9746.82
+             @ 50% 16656.3 @ 95% 38012.5 @ 99% 44562.5 @ 99.9% 60831.3 @ 99.99% 132175
+  initiate i/o min 9300 max 1.1781e+06 mean 18490.4 stddev 8875.57
+             @ 50% 15068.8 @ 95% 33825 @ 99% 39806.3 @ 99.9% 52662.5 @ 99.99% 109144
+completion i/o min 1100 max 341600 mean 1945.51 stddev 1597.54
+             @ 50% 1500 @ 95% 4143.75 @ 99% 4781.25 @ 99.9% 14812.5 @ 99.99% 43850
    total results collected = 4095984
 
 Benchmarking llfio::pipe_handle and IOCP synchronised with 64 handles ...
-   per-handle create 1.05984e-05 cancel 1.5625e-09 destroy 3.80313e-06
-   total i/o min 38900 max 3.5118e+06 mean 84476.3 stddev 40103.2
-             @ 50% 69626.6 @ 95% 149853 @ 99% 179666 @ 99.9% 245831 @ 99.99% 328900
-   total results collected = 3866560
+   per-handle create 9.59375e-06 cancel 1.5625e-09 destroy 3.45313e-06
+     total i/o min 39100 max 1.4505e+06 mean 81997.4 stddev 34597.6
+             @ 50% 66200 @ 95% 140930 @ 99% 159941 @ 99.9% 206616 @ 99.99% 316448
+  initiate i/o min 36800 max 1.4431e+06 mean 79788.3 stddev 33637.6
+             @ 50% 64507.8 @ 95% 136655 @ 99% 154813 @ 99.9% 197528 @ 99.99% 282281
+completion i/o min 1100 max 1.0127e+06 mean 2109.12 stddev 2137.21
+             @ 50% 1571.88 @ 95% 4207.81 @ 99% 4868.75 @ 99.9% 19932.8 @ 99.99% 64629.7
+   total results collected = 3997632
 
 Warming up ...
 
-Benchmarking ASIO with pipes with 1 handles ...
-   per-handle create 8.06e-05 cancel 3.47447 destroy 1.97703
-   total i/o min 2500 max 1.1078e+06 mean 3850.29 stddev 2548.2
-             @ 50% 3200 @ 95% 7400 @ 99% 9200 @ 99.9% 37800 @ 99.99% 75900
-   total results collected = 1899519
+Benchmarking ASIO with pipes synchronised with 1 handles ...
+   per-handle create 7.99e-05 cancel 3.2726 destroy 1.80356
+     total i/o min 2500 max 3.514e+06 mean 4148.46 stddev 3612
+             @ 50% 3200 @ 95% 7600 @ 99% 9000 @ 99.9% 36200 @ 99.99% 67000
+  initiate i/o min 600 max 3.498e+06 mean 1133.85 stddev 3051.61
+             @ 50% 900 @ 95% 1800 @ 99% 2400 @ 99.9% 21800 @ 99.99% 59500
+completion i/o min 1600 max 310600 mean 2914.61 stddev 1614.86
+             @ 50% 2200 @ 95% 5800 @ 99% 6700 @ 99.9% 10200 @ 99.99% 31900
+   total results collected = 1752063
 
-Benchmarking ASIO with pipes with 4 handles ...
-   per-handle create 3.1e-05 cancel 1.18692 destroy 0.667405
-   total i/o min 4800 max 683700 mean 9804.63 stddev 5227.67
-             @ 50% 7975 @ 95% 16350 @ 99% 21375 @ 99.9% 58775 @ 99.99% 105950
-   total results collected = 2342908
+Benchmarking ASIO with pipes synchronised with 4 handles ...
+   per-handle create 2.4e-05 cancel 1.21012 destroy 0.680531
+     total i/o min 4800 max 473200 mean 9646.75 stddev 4707.28
+             @ 50% 7925 @ 95% 15950 @ 99% 19850 @ 99.9% 54775 @ 99.99% 93375
+  initiate i/o min 2800 max 306500 mean 6692.03 stddev 3709.62
+             @ 50% 5625 @ 95% 10575 @ 99% 13450 @ 99.9% 49600 @ 99.99% 81675
+completion i/o min 1600 max 460000 mean 2854.73 stddev 1773.49
+             @ 50% 2200 @ 95% 5475 @ 99% 6450 @ 99.9% 13675 @ 99.99% 43000
+   total results collected = 2367484
 
-Benchmarking ASIO with pipes with 16 handles ...
-   per-handle create 1.8575e-05 cancel 0.322137 destroy 0.186772
-   total i/o min 13900 max 1.8979e+06 mean 32992.2 stddev 14976.9
-             @ 50% 27331.3 @ 95% 53318.8 @ 99% 71643.8 @ 99.9% 116231 @ 99.99% 184725
-   total results collected = 2523120
+Benchmarking ASIO with pipes synchronised with 16 handles ...
+   per-handle create 1.60688e-05 cancel 0.327641 destroy 0.187406
+     total i/o min 14000 max 560600 mean 33731.1 stddev 14540.4
+             @ 50% 28031.3 @ 95% 51256.3 @ 99% 67225 @ 99.9% 107613 @ 99.99% 171400
+  initiate i/o min 11900 max 557400 mean 30488.7 stddev 13463.4
+             @ 50% 25687.5 @ 95% 45731.3 @ 99% 61668.8 @ 99.9% 98712.5 @ 99.99% 162169
+completion i/o min 1500 max 244500 mean 3142.47 stddev 1979.02
+             @ 50% 2218.75 @ 95% 5487.5 @ 99% 6893.75 @ 99.9% 22100 @ 99.99% 52331.3
+   total results collected = 2441200
 
-Benchmarking ASIO with pipes with 64 handles ...
-   per-handle create 1.145e-05 cancel 0.0913084 destroy 0.052539
-   total i/o min 51700 max 2.6473e+06 mean 122408 stddev 51918.8
-             @ 50% 105044 @ 95% 198478 @ 99% 253588 @ 99.9% 415041 @ 99.99% 748452
-   total results collected = 2686912
+Benchmarking ASIO with pipes synchronised with 64 handles ...
+   per-handle create 1.45484e-05 cancel 0.0953018 destroy 0.0601118
+     total i/o min 52400 max 949900 mean 111754 stddev 41214.4
+             @ 50% 97982.8 @ 95% 181498 @ 99% 218020 @ 99.9% 288830 @ 99.99% 396869
+  initiate i/o min 50000 max 940400 mean 109001 stddev 40275.5
+             @ 50% 95726.6 @ 95% 176273 @ 99% 211186 @ 99.9% 278759 @ 99.99% 378156
+completion i/o min 1600 max 365700 mean 2652.43 stddev 2774.02
+             @ 50% 2109.38 @ 95% 5167.19 @ 99% 7621.88 @ 99.9% 27915.6 @ 99.99% 91671.9
+   total results collected = 2883520
+*/
+
+/* GCC 7 in Release build on Linux kernel 5.3.
+
+Benchmarking Null i/o multiplexer unsynchronised with 1 handles ...
+   per-handle create 4.5e-06 cancel 2e-07 destroy 2.5e-06
+     total i/o min 0 max 354609 mean 67.6987 stddev 200.835
+             @ 50% 100 @ 95% 100 @ 99% 100 @ 99.9% 300 @ 99.99% 6400
+  initiate i/o min 0 max 0 mean 0 stddev 0
+             @ 50% 0 @ 95% 0 @ 99% 0 @ 99.9% 0 @ 99.99% 0
+completion i/o min 0 max 354609 mean 67.6987 stddev 200.835
+             @ 50% 100 @ 95% 100 @ 99% 100 @ 99.9% 300 @ 99.99% 6400
+   total results collected = 86642687
+
+Benchmarking Null i/o multiplexer unsynchronised with 4 handles ...
+   per-handle create 2.15e-06 cancel 7.5e-08 destroy 5e-07
+     total i/o min 100 max 1.35974e+06 mean 227.069 stddev 423.142
+             @ 50% 200 @ 95% 325 @ 99% 450 @ 99.9% 800.25 @ 99.99% 12575.2
+  initiate i/o min 0 max 0 mean 0 stddev 0
+             @ 50% 0 @ 95% 0 @ 99% 0 @ 99.9% 0 @ 99.99% 0
+completion i/o min 100 max 1.35974e+06 mean 227.069 stddev 423.142
+             @ 50% 200 @ 95% 325 @ 99% 450 @ 99.9% 800.25 @ 99.99% 12575.2
+   total results collected = 85409788
+
+Benchmarking Null i/o multiplexer unsynchronised with 16 handles ...
+   per-handle create 4.125e-07 cancel 1.875e-08 destroy 3.25e-07
+     total i/o min 600 max 862723 mean 823.572 stddev 809.781
+             @ 50% 750.062 @ 95% 1156.31 @ 99% 1543.88 @ 99.9% 10319.1 @ 99.99% 27325.9
+  initiate i/o min 0 max 0 mean 0 stddev 0
+             @ 50% 0 @ 95% 0 @ 99% 0 @ 99.9% 0 @ 99.99% 0
+completion i/o min 600 max 862723 mean 823.572 stddev 809.781
+             @ 50% 750.062 @ 95% 1156.31 @ 99% 1543.88 @ 99.9% 10319.1 @ 99.99% 27325.9
+   total results collected = 90095600
+
+Benchmarking Null i/o multiplexer unsynchronised with 64 handles ...
+   per-handle create 2.03141e-07 cancel 3.125e-09 destroy 1.125e-07
+     total i/o min 2400 max 1.01543e+06 mean 3266.72 stddev 2007.68
+             @ 50% 2981.34 @ 95% 4851.73 @ 99% 6573.52 @ 99.9% 18866.1 @ 99.99% 53393.6
+  initiate i/o min 0 max 0 mean 0 stddev 0
+             @ 50% 0 @ 95% 0 @ 99% 0 @ 99.9% 0 @ 99.99% 0
+completion i/o min 2400 max 1.01543e+06 mean 3266.72 stddev 2007.68
+             @ 50% 2981.34 @ 95% 4851.73 @ 99% 6573.52 @ 99.9% 18866.1 @ 99.99% 53393.6
+   total results collected = 87556032
+
+Benchmarking Null i/o multiplexer synchronised with 1 handles ...
+   per-handle create 8.1e-06 cancel 1e-07 destroy 1.5e-06
+     total i/o min 0 max 977826 mean 111.005 stddev 307.363
+             @ 50% 100 @ 95% 200 @ 99% 200 @ 99.9% 400 @ 99.99% 10700
+  initiate i/o min 0 max 0 mean 0 stddev 0
+             @ 50% 0 @ 95% 0 @ 99% 0 @ 99.9% 0 @ 99.99% 0
+completion i/o min 0 max 977826 mean 111.005 stddev 307.363
+             @ 50% 100 @ 95% 200 @ 99% 200 @ 99.9% 400 @ 99.99% 10700
+   total results collected = 46320639
+
+Benchmarking Null i/o multiplexer synchronised with 4 handles ...
+   per-handle create 1.07525e-06 cancel 5e-08 destroy 4.25e-07
+     total i/o min 200 max 1.62614e+06 mean 316.776 stddev 602.117
+             @ 50% 300 @ 95% 400 @ 99% 600 @ 99.9% 1100 @ 99.99% 14775
+  initiate i/o min 0 max 0 mean 0 stddev 0
+             @ 50% 0 @ 95% 0 @ 99% 0 @ 99.9% 0 @ 99.99% 0
+completion i/o min 200 max 1.62614e+06 mean 316.776 stddev 602.117
+             @ 50% 300 @ 95% 400 @ 99% 600 @ 99.9% 1100 @ 99.99% 14775
+   total results collected = 49463292
+
+Benchmarking Null i/o multiplexer synchronised with 16 handles ...
+   per-handle create 5.68812e-07 cancel 1.875e-08 destroy 2.875e-07
+     total i/o min 900 max 1.33044e+06 mean 1129.93 stddev 946.038
+             @ 50% 1043.88 @ 95% 1556.31 @ 99% 2081.31 @ 99.9% 11894.2 @ 99.99% 32181.9
+  initiate i/o min 0 max 0 mean 0 stddev 0
+             @ 50% 0 @ 95% 0 @ 99% 0 @ 99.9% 0 @ 99.99% 0
+completion i/o min 900 max 1.33044e+06 mean 1129.93 stddev 946.038
+             @ 50% 1043.88 @ 95% 1556.31 @ 99% 2081.31 @ 99.9% 11894.2 @ 99.99% 32181.9
+   total results collected = 51576816
+
+Benchmarking Null i/o multiplexer synchronised with 64 handles ...
+   per-handle create 2.34391e-07 cancel 1.5625e-09 destroy 1.125e-07
+     total i/o min 3800 max 1.02053e+06 mean 4373.35 stddev 2127.53
+             @ 50% 4029.75 @ 95% 6181.42 @ 99% 10033 @ 99.9% 23319.2 @ 99.99% 59809.6
+  initiate i/o min 0 max 0 mean 0 stddev 0
+             @ 50% 0 @ 95% 0 @ 99% 0 @ 99.9% 0 @ 99.99% 0
+completion i/o min 3800 max 1.02053e+06 mean 4373.35 stddev 2127.53
+             @ 50% 4029.75 @ 95% 6181.42 @ 99% 10033 @ 99.9% 23319.2 @ 99.99% 59809.6
+   total results collected = 50986944
+
+Warming up ...
+
+Benchmarking ASIO with pipes synchronised with 1 handles ...
+   per-handle create 3.4301e-05 cancel 0.448608 destroy 0.199209
+     total i/o min 1400 max 1.01183e+06 mean 2457.17 stddev 1998.98
+             @ 50% 1800 @ 95% 4501 @ 99% 5800 @ 99.9% 19001 @ 99.99% 52301
+  initiate i/o min 0 max 425011 mean 278.651 stddev 886.372
+             @ 50% 100 @ 95% 900 @ 99% 1500 @ 99.9% 8200 @ 99.99% 26200
+completion i/o min 1200 max 1.01013e+06 mean 2078.52 stddev 1593.43
+             @ 50% 1600 @ 95% 3600 @ 99% 4500 @ 99.9% 17400 @ 99.99% 40901
+   total results collected = 3436543
+
+Benchmarking ASIO with pipes synchronised with 4 handles ...
+   per-handle create 4.48012e-05 cancel 0.304211 destroy 0.18801
+     total i/o min 1800 max 737820 mean 4816.84 stddev 3238.06
+             @ 50% 3975.25 @ 95% 9075 @ 99% 13250.2 @ 99.9% 30075.8 @ 99.99% 73876.8
+  initiate i/o min 300 max 475213 mean 1664.63 stddev 1973.36
+             @ 50% 1100 @ 95% 4450.5 @ 99% 5475 @ 99.9% 17450.2 @ 99.99% 46401.8
+completion i/o min 1200 max 555915 mean 3052.21 stddev 1898.61
+             @ 50% 2850 @ 95% 4550 @ 99% 7125.25 @ 99.9% 21025.2 @ 99.99% 51452
+   total results collected = 5185532
+
+Benchmarking ASIO with pipes synchronised with 16 handles ...
+   per-handle create 1.91943e-05 cancel 0.111726 destroy 0.107368
+     total i/o min 3000 max 2.24566e+06 mean 14583 stddev 9893.31
+             @ 50% 12538 @ 95% 28319.6 @ 99% 37076.1 @ 99.9% 66533.1 @ 99.99% 136385
+  initiate i/o min 1200 max 2.20816e+06 mean 6852.63 stddev 6927.4
+             @ 50% 5100.06 @ 95% 18325.6 @ 99% 22525.7 @ 99.9% 41082.4 @ 99.99% 88033.8
+completion i/o min 1300 max 2.16076e+06 mean 7630.37 stddev 5250.77
+             @ 50% 7256.38 @ 95% 11500.2 @ 99% 19356.8 @ 99.9% 38957.2 @ 99.99% 96196.2
+   total results collected = 6258672
+
+Benchmarking ASIO with pipes synchronised with 64 handles ...
+   per-handle create 1.17987e-05 cancel 0.0257407 destroy 0.0205903
+     total i/o min 7100 max 3.19148e+06 mean 56624.7 stddev 35695.9
+             @ 50% 46837.2 @ 95% 100850 @ 99% 134705 @ 99.9% 208246 @ 99.99% 494421
+  initiate i/o min 5000 max 3.17368e+06 mean 33487.7 stddev 30373.1
+             @ 50% 21632 @ 95% 80023.9 @ 99% 109373 @ 99.9% 166306 @ 99.99% 345306
+completion i/o min 1300 max 1.40714e+06 mean 23037 stddev 15035.4
+             @ 50% 21644.4 @ 95% 37263.5 @ 99% 51470.1 @ 99.9% 95350.9 @ 99.99% 246896
+   total results collected = 6094784
 */
 
 #define LLFIO_ENABLE_TEST_IO_MULTIPLEXERS 1
@@ -205,6 +412,7 @@ test_results do_benchmark(int handles, Args &&... args)
   {
     std::chrono::high_resolution_clock::time_point initiate, write, read;
 
+    timing_info() = default;
     timing_info(std::chrono::high_resolution_clock::time_point i)
         : initiate(i)
     {
@@ -214,10 +422,6 @@ test_results do_benchmark(int handles, Args &&... args)
     double ns_completion(long long overhead) const { return (double) std::chrono::duration_cast<std::chrono::nanoseconds>(read - write).count() - overhead; }
   };
   std::vector<std::vector<timing_info>> timings(handles);
-  for(auto &i : timings)
-  {
-    i.reserve(10 * 1024 * 1024);
-  }
 
   long long overhead = INT_MAX;
   auto create1 = std::chrono::high_resolution_clock::now();
@@ -275,16 +479,20 @@ test_results do_benchmark(int handles, Args &&... args)
   {
     for(size_t n = 0; n < 1024; n++)
     {
-      // Begin all the reads
       for(int x = 0; x < handles; x++)
       {
-        timings[x].emplace_back(std::chrono::high_resolution_clock::now());
+        timings[x].emplace_back();  // this may reallocate, very expensive
+      }
+        // Begin all the reads
+      for(int x = 0; x < handles; x++)
+      {
+        timings[x].back().initiate = std::chrono::high_resolution_clock::now();
         auto completion = ios.read(x);
         if(timings[x].size() > 1)
         {
           if(!C::launch_writer_thread)
           {
-            timings[x][timings[x].size() - 2].write = completion;
+            timings[x][timings[x].size() - 2].write = timings[x][timings[x].size() - 2].initiate;
           }
           timings[x][timings[x].size() - 2].read = completion;
         }
@@ -363,6 +571,18 @@ test_results do_benchmark(int handles, Args &&... args)
     ret.total._99 += reader[(size_t)((reader.size() - 1) * 0.99)].ns_total(overhead);
     ret.total._999 += reader[(size_t)((reader.size() - 1) * 0.999)].ns_total(overhead);
     ret.total._9999 += reader[(size_t)((reader.size() - 1) * 0.9999)].ns_total(overhead);
+    std::sort(reader.begin(), reader.end(), [&](const timing_info &a, const timing_info &b) { return a.ns_initiate(overhead) < b.ns_initiate(overhead); });
+    ret.initiate._50 += reader[(size_t)((reader.size() - 1) * 0.5)].ns_initiate(overhead);
+    ret.initiate._95 += reader[(size_t)((reader.size() - 1) * 0.95)].ns_initiate(overhead);
+    ret.initiate._99 += reader[(size_t)((reader.size() - 1) * 0.99)].ns_initiate(overhead);
+    ret.initiate._999 += reader[(size_t)((reader.size() - 1) * 0.999)].ns_initiate(overhead);
+    ret.initiate._9999 += reader[(size_t)((reader.size() - 1) * 0.9999)].ns_initiate(overhead);
+    std::sort(reader.begin(), reader.end(), [&](const timing_info &a, const timing_info &b) { return a.ns_completion(overhead) < b.ns_completion(overhead); });
+    ret.completion._50 += reader[(size_t)((reader.size() - 1) * 0.5)].ns_completion(overhead);
+    ret.completion._95 += reader[(size_t)((reader.size() - 1) * 0.95)].ns_completion(overhead);
+    ret.completion._99 += reader[(size_t)((reader.size() - 1) * 0.99)].ns_completion(overhead);
+    ret.completion._999 += reader[(size_t)((reader.size() - 1) * 0.999)].ns_completion(overhead);
+    ret.completion._9999 += reader[(size_t)((reader.size() - 1) * 0.9999)].ns_completion(overhead);
   }
   ret.total.mean /= ret.total_readings;
   ret.initiate.mean /= ret.total_readings;
@@ -372,6 +592,16 @@ test_results do_benchmark(int handles, Args &&... args)
   ret.total._99 /= timings.size();
   ret.total._999 /= timings.size();
   ret.total._9999 /= timings.size();
+  ret.initiate._50 /= timings.size();
+  ret.initiate._95 /= timings.size();
+  ret.initiate._99 /= timings.size();
+  ret.initiate._999 /= timings.size();
+  ret.initiate._9999 /= timings.size();
+  ret.completion._50 /= timings.size();
+  ret.completion._95 /= timings.size();
+  ret.completion._99 /= timings.size();
+  ret.completion._999 /= timings.size();
+  ret.completion._9999 /= timings.size();
   for(auto &reader : timings)
   {
     for(timing_info &timing : reader)
@@ -397,8 +627,12 @@ template <class C, class... Args> void benchmark(llfio::path_view csv, size_t ma
     res.handles = n;
     results.push_back(res);
     std::cout << "   per-handle create " << res.creation << " cancel " << res.cancel << " destroy " << res.destruction;
-    std::cout << "\n   total i/o min " << res.total.min << " max " << res.total.max << " mean " << res.total.mean << " stddev " << sqrt(res.total.variance);
+    std::cout << "\n     total i/o min " << res.total.min << " max " << res.total.max << " mean " << res.total.mean << " stddev " << sqrt(res.total.variance);
     std::cout << "\n             @ 50% " << res.total._50 << " @ 95% " << res.total._95 << " @ 99% " << res.total._99 << " @ 99.9% " << res.total._999 << " @ 99.99% " << res.total._9999;
+    std::cout << "\n  initiate i/o min " << res.initiate.min << " max " << res.initiate.max << " mean " << res.initiate.mean << " stddev " << sqrt(res.initiate.variance);
+    std::cout << "\n             @ 50% " << res.initiate._50 << " @ 95% " << res.initiate._95 << " @ 99% " << res.initiate._99 << " @ 99.9% " << res.initiate._999 << " @ 99.99% " << res.initiate._9999;
+    std::cout << "\ncompletion i/o min " << res.completion.min << " max " << res.completion.max << " mean " << res.completion.mean << " stddev " << sqrt(res.completion.variance);
+    std::cout << "\n             @ 50% " << res.completion._50 << " @ 95% " << res.completion._95 << " @ 99% " << res.completion._99 << " @ 99.9% " << res.completion._999 << " @ 99.99% " << res.completion._9999;
     std::cout << "\n   total results collected = " << res.total_readings << std::endl;
   }
   std::ofstream of(csv.path());
@@ -422,50 +656,146 @@ template <class C, class... Args> void benchmark(llfio::path_view csv, size_t ma
   {
     of << "," << i.destruction;
   }
-  of << "\nMins";
+  of << "\n";
+
+  of << "\n\"Total Mins\"";
   for(auto &i : results)
   {
     of << "," << i.total.min;
   }
-  of << "\nMaxs";
+  of << "\n\"Total Maxs\"";
   for(auto &i : results)
   {
     of << "," << i.total.max;
   }
-  of << "\nMeans";
+  of << "\n\"Total Means\"";
   for(auto &i : results)
   {
     of << "," << i.total.mean;
   }
-  of << "\nStddevs";
+  of << "\n\"Total Stddevs\"";
   for(auto &i : results)
   {
     of << "," << sqrt(i.total.variance);
   }
-  of << "\n50%s";
+  of << "\n\"Total 50%s\"";
   for(auto &i : results)
   {
     of << "," << i.total._50;
   }
-  of << "\n95%s";
+  of << "\n\"Total 95%s\"";
   for(auto &i : results)
   {
     of << "," << i.total._95;
   }
-  of << "\n99%s";
+  of << "\n\"Total 99%s\"";
   for(auto &i : results)
   {
     of << "," << i.total._99;
   }
-  of << "\n99.9%s";
+  of << "\n\"Total 99.9%s\"";
   for(auto &i : results)
   {
     of << "," << i.total._999;
   }
-  of << "\n99.99%s";
+  of << "\n\"Total 99.99%s\"";
   for(auto &i : results)
   {
     of << "," << i.total._9999;
+  }
+  of << "\n";
+
+  of << "\n\"Initiate Mins\"";
+  for(auto &i : results)
+  {
+    of << "," << i.initiate.min;
+  }
+  of << "\n\"Initiate Maxs\"";
+  for(auto &i : results)
+  {
+    of << "," << i.initiate.max;
+  }
+  of << "\n\"Initiate Means\"";
+  for(auto &i : results)
+  {
+    of << "," << i.initiate.mean;
+  }
+  of << "\n\"Initiate Stddevs\"";
+  for(auto &i : results)
+  {
+    of << "," << sqrt(i.initiate.variance);
+  }
+  of << "\n\"Initiate 50%s\"";
+  for(auto &i : results)
+  {
+    of << "," << i.initiate._50;
+  }
+  of << "\n\"Initiate 95%s\"";
+  for(auto &i : results)
+  {
+    of << "," << i.initiate._95;
+  }
+  of << "\n\"Initiate 99%s\"";
+  for(auto &i : results)
+  {
+    of << "," << i.initiate._99;
+  }
+  of << "\n\"Initiate 99.9%s\"";
+  for(auto &i : results)
+  {
+    of << "," << i.initiate._999;
+  }
+  of << "\n\"Initiate 99.99%s\"";
+  for(auto &i : results)
+  {
+    of << "," << i.initiate._9999;
+  }
+  of << "\n";
+
+  of << "\n\"Completion Mins\"";
+  for(auto &i : results)
+  {
+    of << "," << i.completion.min;
+  }
+  of << "\n\"Completion Maxs\"";
+  for(auto &i : results)
+  {
+    of << "," << i.completion.max;
+  }
+  of << "\n\"Completion Means\"";
+  for(auto &i : results)
+  {
+    of << "," << i.completion.mean;
+  }
+  of << "\n\"Completion Stddevs\"";
+  for(auto &i : results)
+  {
+    of << "," << sqrt(i.completion.variance);
+  }
+  of << "\n\"Completion 50%s\"";
+  for(auto &i : results)
+  {
+    of << "," << i.completion._50;
+  }
+  of << "\n\"Completion 95%s\"";
+  for(auto &i : results)
+  {
+    of << "," << i.completion._95;
+  }
+  of << "\n\"Completion 99%s\"";
+  for(auto &i : results)
+  {
+    of << "," << i.completion._99;
+  }
+  of << "\n\"Completion 99.9%s\"";
+  for(auto &i : results)
+  {
+    of << "," << i.completion._999;
+  }
+  of << "\n\"Completion 99.99%s\"";
+  for(auto &i : results)
+  {
+    of << "," << i.completion._9999;
   }
   of << "\n";
 }
@@ -797,16 +1127,21 @@ int main(void)
 {
   std::cout << "Warming up ..." << std::endl;
   do_benchmark<benchmark_llfio<>>(-1, []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_null(2, true).value(); });
-  benchmark<benchmark_llfio<>>("llfio-null-unsynchronised.csv", 64, "Null i/o multiplexer unsynchronised", []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_null(1, false).value(); });
-  benchmark<benchmark_llfio<>>("llfio-null-synchronised.csv", 64, "Null i/o multiplexer synchronised", []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_null(2, true).value(); });
+  benchmark<benchmark_llfio<>>("llfio-null-unsynchronised.csv", 64, "Null i/o multiplexer unsynchronised", //
+    []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_null(1, false).value(); });
+  benchmark<benchmark_llfio<>>("llfio-null-synchronised.csv", 64, "Null i/o multiplexer synchronised", //
+    []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_null(2, true).value(); });
 
 #ifdef _WIN32
   std::cout << "\nWarming up ..." << std::endl;
-  do_benchmark<benchmark_llfio<llfio::pipe_handle>>(-1, []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_win_iocp(2, true).value(); });
+  do_benchmark<benchmark_llfio<llfio::pipe_handle>>(-1, //
+    []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_win_iocp(2, true).value(); });
   // No locking, enable IOCP immediate completions. ASIO can't compete with this.
-  benchmark<benchmark_llfio<llfio::pipe_handle>>("llfio-pipe-handle-unsynchronised.csv", 64, "llfio::pipe_handle and IOCP unsynchronised", []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_win_iocp(1, false).value(); });
+  benchmark<benchmark_llfio<llfio::pipe_handle>>("llfio-pipe-handle-unsynchronised.csv", 64, "llfio::pipe_handle and IOCP unsynchronised", //
+    []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_win_iocp(1, false).value(); });
   // Locking enabled, disable IOCP immediate completions so it's a fair comparison with ASIO
-  benchmark<benchmark_llfio<llfio::pipe_handle>>("llfio-pipe-handle-synchronised.csv", 64, "llfio::pipe_handle and IOCP synchronised", []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_win_iocp(2, true).value(); });
+  benchmark<benchmark_llfio<llfio::pipe_handle>>("llfio-pipe-handle-synchronised.csv", 64, "llfio::pipe_handle and IOCP synchronised", //
+    []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_win_iocp(2, true).value(); });
 #endif
 
 #if ENABLE_ASIO
