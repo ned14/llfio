@@ -142,7 +142,7 @@ result<void> handle::close() noexcept
       abort();
     }
 #endif
-    if(are_safety_barriers_issued() && is_writable())
+    if(are_safety_barriers_issued() && is_writable() && !is_pipe())
     {
       if(-1 == fsync(_v.fd))
       {
