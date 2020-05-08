@@ -194,23 +194,24 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<process_handle> process_handle::launch_pr
     LLFIO_LOG_FUNCTION_CALL(&ret);
     nativeh.behaviour |= native_handle_type::disposition::process;
     pipe_handle childinpipe, childoutpipe, childerrorpipe;
+    pipe_handle::flag pipeflags = !(flags & flag::no_multiplexable_pipes) ? pipe_handle::flag::multiplexable : pipe_handle::flag::none;
 
     if(!(flags & flag::no_redirect_in_pipe))
     {
-      OUTCOME_TRY(handles, pipe_handle::anonymous_pipe());
+      OUTCOME_TRY(handles, pipe_handle::anonymous_pipe(pipe_handle::caching::all, pipeflags));
       ret.value()._in_pipe = std::move(handles.first);
       childoutpipe = std::move(handles.second);
     }
     if(!(flags & flag::no_redirect_out_pipe))
     {
-      OUTCOME_TRY(handles, pipe_handle::anonymous_pipe());
+      OUTCOME_TRY(handles, pipe_handle::anonymous_pipe(pipe_handle::caching::all, pipeflags));
       ret.value()._out_pipe = std::move(handles.second);
       childinpipe = std::move(handles.first);
     }
     if(!(flags & flag::no_redirect_error_pipe))
     {
-      // stderr must not be buffered
-      OUTCOME_TRY(handles, pipe_handle::anonymous_pipe(pipe_handle::caching::none));
+      // stderr must not buffer writes
+      OUTCOME_TRY(handles, pipe_handle::anonymous_pipe(pipe_handle::caching::reads, pipeflags));
       ret.value()._error_pipe = std::move(handles.first);
       childerrorpipe = std::move(handles.second);
     }

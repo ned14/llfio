@@ -54,7 +54,8 @@ public:
                                    no_redirect_error_pipe = 1U << 3U,  //!< Do not redirect the `stderr` for a launched process
 
                                    wait_on_close = 1U << 4U,           //!< Wait for the process to exit in `.close()`
-                                   release_pipes_on_close = 1U << 5U,  //! Release the pipes in `.close()`. They are closed otherwise.
+                                   release_pipes_on_close = 1U << 5U,  //!< Release the pipes in `.close()`. They are closed otherwise.
+                                   no_multiplexable_pipes = 1U << 6U,  //!< Do not create any redirected pipes as multiplexable
 
                                    // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
                                    no_redirect = no_redirect_in_pipe | no_redirect_out_pipe | no_redirect_error_pipe} QUICKCPPLIB_BITFIELD_END(flag);
@@ -249,6 +250,10 @@ inline std::ostream &operator<<(std::ostream &s, const process_handle::flag &v)
   if(!!(v & process_handle::flag::release_pipes_on_close))
   {
     temp.append("release_pipes_on_close|");
+  }
+  if(!!(v & process_handle::flag::no_multiplexable_pipes))
+  {
+    temp.append("no_multiplexable_pipes|");
   }
   if(!temp.empty())
   {

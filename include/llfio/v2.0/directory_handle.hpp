@@ -304,6 +304,9 @@ public:
 
   /*! Fill the buffers type with as many directory entries as will fit into any optionally supplied buffer.
 
+  \warning The underlying syscall on Linux is racy if called by multiple kernel threads concurrently
+  on the same open file descriptor.
+
   \return Returns the buffers filled, what metadata was filled in and whether the entire directory
   was read or not.
   \param req A buffer fill (directory enumeration) request.
