@@ -791,6 +791,7 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
 </table>
 </div><div class="memdoc">
 <p>Fill the buffers type with as many directory entries as will fit into any optionally supplied buffer.</p>
+<dl class="section warning"><dt>Warning</dt><dd>The underlying syscall on Linux is racy if called by multiple kernel threads concurrently on the same open file descriptor.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>Returns the buffers filled, what metadata was filled in and whether the entire directory was read or not. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
