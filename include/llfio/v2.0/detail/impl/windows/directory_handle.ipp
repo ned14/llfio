@@ -276,7 +276,7 @@ result<void> directory_handle::unlink(deadline d) noexcept
   return h.unlink(d);
 }
 
-result<directory_handle::buffers_type> directory_handle::read(io_request<buffers_type> req) const noexcept
+result<directory_handle::buffers_type> directory_handle::read(io_request<buffers_type> req, deadline d) const noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -291,6 +291,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
   static constexpr stat_t::want default_stat_contents = stat_t::want::ino | stat_t::want::type | stat_t::want::atim | stat_t::want::mtim | stat_t::want::ctim | stat_t::want::size | stat_t::want::allocated | stat_t::want::birthtim | stat_t::want::sparse | stat_t::want::compressed | stat_t::want::reparse_point;
 #endif
   LLFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_DEADLINE_TO_SLEEP_INIT(d);
   if(req.buffers.empty())
   {
     return std::move(req.buffers);
@@ -323,12 +324,12 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
     (void) unlock;
     {
       char _buffer[65536];
-      auto *buffer = (FILE_NAMES_INFORMATION *) _buffer;
+      auto *buffer_ = (FILE_NAMES_INFORMATION *) _buffer;
       bool first = true, done = false;
       for(;;)
       {
         IO_STATUS_BLOCK isb = make_iostatus();
-        NTSTATUS ntstat = NtQueryDirectoryFile(_v.h, nullptr, nullptr, nullptr, &isb, buffer, sizeof(_buffer), FileNamesInformation, FALSE, req.glob.empty() ? nullptr : &_glob, first);
+        NTSTATUS ntstat = NtQueryDirectoryFile(_v.h, nullptr, nullptr, nullptr, &isb, buffer_, sizeof(_buffer), FileNamesInformation, FALSE, req.glob.empty() ? nullptr : &_glob, first);
         if(STATUS_PENDING == ntstat)
         {
           ntstat = ntwait(_v.h, isb, deadline());
@@ -339,7 +340,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
         }
         first = false;
         done = false;
-        for(FILE_NAMES_INFORMATION *fni = buffer; !done; fni = reinterpret_cast<FILE_NAMES_INFORMATION *>(reinterpret_cast<uintptr_t>(fni) + fni->NextEntryOffset))
+        for(FILE_NAMES_INFORMATION *fni = buffer_; !done; fni = reinterpret_cast<FILE_NAMES_INFORMATION *>(reinterpret_cast<uintptr_t>(fni) + fni->NextEntryOffset))
         {
           done = (fni->NextEntryOffset == 0);
           kernelbuffertoallocate += sizeof(what_to_enumerate_type);
@@ -388,6 +389,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
       if(ntstat != 0x80000006 /*STATUS_NO_MORE_FILES*/)
       {
         // The directory grew between first enumeration and second
+        LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
         goto retry;
       }
     }

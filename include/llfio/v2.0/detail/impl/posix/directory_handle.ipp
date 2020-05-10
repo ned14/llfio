@@ -258,7 +258,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> directory_handle::clone_to_p
   return ret;
 }
 
-result<directory_handle::buffers_type> directory_handle::read(io_request<buffers_type> req) const noexcept
+result<directory_handle::buffers_type> directory_handle::read(io_request<buffers_type> req, deadline /*unused*/) const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   if(req.buffers.empty())
