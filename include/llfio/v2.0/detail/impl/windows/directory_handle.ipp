@@ -276,12 +276,22 @@ result<void> directory_handle::unlink(deadline d) noexcept
   return h.unlink(d);
 }
 
-result<directory_handle::buffers_type> directory_handle::read(io_request<buffers_type> req) const noexcept
+result<directory_handle::buffers_type> directory_handle::read(io_request<buffers_type> req, deadline d) const noexcept
 {
-  static constexpr stat_t::want default_stat_contents = stat_t::want::ino | stat_t::want::type | stat_t::want::atim | stat_t::want::mtim | stat_t::want::ctim | stat_t::want::size | stat_t::want::allocated | stat_t::want::birthtim | stat_t::want::sparse | stat_t::want::compressed | stat_t::want::reparse_point;
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
+//#define LLFIO_DIRECTORY_HANDLE_ENUMERATE_LESS_INFO 1
+#ifdef LLFIO_DIRECTORY_HANDLE_ENUMERATE_LESS_INFO
+  using what_to_enumerate_type = FILE_DIRECTORY_INFORMATION;  // 68 bytes + filename
+  const auto what_to_enumerate = FileDirectoryInformation;
+  static constexpr stat_t::want default_stat_contents = /*stat_t::want::ino |*/ stat_t::want::type | stat_t::want::atim | stat_t::want::mtim | stat_t::want::ctim | stat_t::want::size | stat_t::want::allocated | stat_t::want::birthtim | stat_t::want::sparse | stat_t::want::compressed | stat_t::want::reparse_point;
+#else
+  using what_to_enumerate_type = FILE_ID_FULL_DIR_INFORMATION;  // 80 bytes + filename
+  const auto what_to_enumerate = FileIdFullDirectoryInformation;
+  static constexpr stat_t::want default_stat_contents = stat_t::want::ino | stat_t::want::type | stat_t::want::atim | stat_t::want::mtim | stat_t::want::ctim | stat_t::want::size | stat_t::want::allocated | stat_t::want::birthtim | stat_t::want::sparse | stat_t::want::compressed | stat_t::want::reparse_point;
+#endif
   LLFIO_LOG_FUNCTION_CALL(this);
+  LLFIO_DEADLINE_TO_SLEEP_INIT(d);
   if(req.buffers.empty())
   {
     return std::move(req.buffers);
@@ -295,55 +305,99 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
     _glob.Length = (USHORT)(zglob.length * sizeof(wchar_t));
     _glob.MaximumLength = _glob.Length + sizeof(wchar_t);
   }
-  if(!req.buffers._kernel_buffer && req.kernelbuffer.empty())
+  what_to_enumerate_type *buffer = nullptr;
   {
-    // Let's assume the average leafname will be 64 characters long.
-    size_t toallocate = (sizeof(FILE_ID_FULL_DIR_INFORMATION) + 64 * sizeof(wchar_t)) * req.buffers.size();
-    auto *mem = new(std::nothrow) char[toallocate];
-    if(mem == nullptr)
+    /* Recent editions of Windows call ProbeForWrite() on the buffer passed.
+    This is a very slow call, in fact it is worth calling the syscall multiple
+    times rather than have ProbeForWrite() repeatedly called on an excessively
+    large buffer. We therefore iterate the directory twice, firstly just for names
+    so we can calculate what buffer sizes we shall need. We then iterate the
+    directory for all entries + stat structures as a single snapshot.
+    */
+  retry:
+    size_t total_items = 0, kernelbuffertoallocate = 0;
+    while(_lock.exchange(1, std::memory_order_relaxed) != 0)
     {
-      return errc::not_enough_memory;
+      std::this_thread::yield();
     }
-    req.buffers._kernel_buffer = std::unique_ptr<char[]>(mem);
-    req.buffers._kernel_buffer_size = toallocate;
-  }
-  FILE_ID_FULL_DIR_INFORMATION *buffer;
-  ULONG bytes;
-  bool done = false;
-  do
-  {
-    buffer = req.kernelbuffer.empty() ? reinterpret_cast<FILE_ID_FULL_DIR_INFORMATION *>(req.buffers._kernel_buffer.get()) : reinterpret_cast<FILE_ID_FULL_DIR_INFORMATION *>(req.kernelbuffer.data());
-    bytes = req.kernelbuffer.empty() ? static_cast<ULONG>(req.buffers._kernel_buffer_size) : static_cast<ULONG>(req.kernelbuffer.size());
+    auto unlock = make_scope_exit([this]() noexcept { _lock.store(0, std::memory_order_release); });
+    (void) unlock;
+    {
+      char _buffer[65536];
+      auto *buffer_ = (FILE_NAMES_INFORMATION *) _buffer;
+      bool first = true, done = false;
+      for(;;)
+      {
+        IO_STATUS_BLOCK isb = make_iostatus();
+        NTSTATUS ntstat = NtQueryDirectoryFile(_v.h, nullptr, nullptr, nullptr, &isb, buffer_, sizeof(_buffer), FileNamesInformation, FALSE, req.glob.empty() ? nullptr : &_glob, first);
+        if(STATUS_PENDING == ntstat)
+        {
+          ntstat = ntwait(_v.h, isb, deadline());
+        }
+        if(0x80000006 /*STATUS_NO_MORE_FILES*/ == ntstat)
+        {
+          break;
+        }
+        first = false;
+        done = false;
+        for(FILE_NAMES_INFORMATION *fni = buffer_; !done; fni = reinterpret_cast<FILE_NAMES_INFORMATION *>(reinterpret_cast<uintptr_t>(fni) + fni->NextEntryOffset))
+        {
+          done = (fni->NextEntryOffset == 0);
+          kernelbuffertoallocate += sizeof(what_to_enumerate_type);
+          kernelbuffertoallocate += (fni->FileNameLength + 7) & ~7;
+          ++total_items;
+        }
+      }
+    }
+    if(req.kernelbuffer.empty())
+    {
+      if(!req.buffers._kernel_buffer || req.buffers._kernel_buffer_size < kernelbuffertoallocate)
+      {
+        auto *mem = (char *) operator new[](kernelbuffertoallocate, std::nothrow);  // don't initialise
+        if(mem == nullptr)
+        {
+          return errc::not_enough_memory;
+        }
+        req.buffers._kernel_buffer.reset();
+        req.buffers._kernel_buffer = std::unique_ptr<char[]>(mem);
+        req.buffers._kernel_buffer_size = kernelbuffertoallocate;
+      }
+    }
+    else if(req.kernelbuffer.size() < kernelbuffertoallocate)
+    {
+      return errc::no_buffer_space;  // user needs to supply a bigger buffer
+    }
+    ULONG max_bytes, bytes;
+    buffer = req.kernelbuffer.empty() ? reinterpret_cast<what_to_enumerate_type *>(req.buffers._kernel_buffer.get()) : reinterpret_cast<what_to_enumerate_type *>(req.kernelbuffer.data());
+    max_bytes = req.kernelbuffer.empty() ? static_cast<ULONG>(req.buffers._kernel_buffer_size) : static_cast<ULONG>(req.kernelbuffer.size());
+    bytes = std::min(max_bytes, (ULONG) kernelbuffertoallocate);
     IO_STATUS_BLOCK isb = make_iostatus();
-    NTSTATUS ntstat = NtQueryDirectoryFile(_v.h, nullptr, nullptr, nullptr, &isb, buffer, bytes, FileIdFullDirectoryInformation, FALSE, req.glob.empty() ? nullptr : &_glob, TRUE);
+    NTSTATUS ntstat = NtQueryDirectoryFile(_v.h, nullptr, nullptr, nullptr, &isb, buffer, bytes, what_to_enumerate, FALSE, req.glob.empty() ? nullptr : &_glob, TRUE);
     if(STATUS_PENDING == ntstat)
     {
       ntstat = ntwait(_v.h, isb, deadline());
     }
-    if(req.kernelbuffer.empty() && STATUS_BUFFER_OVERFLOW == ntstat)
+    if(ntstat < 0)
     {
-      req.buffers._kernel_buffer.reset();
-      size_t toallocate = req.buffers._kernel_buffer_size * 2;
-      auto *mem = new(std::nothrow) char[toallocate];
-      if(mem == nullptr)
-      {
-        return errc::not_enough_memory;
-      }
-      req.buffers._kernel_buffer = std::unique_ptr<char[]>(mem);
-      req.buffers._kernel_buffer_size = toallocate;
+      return ntkernel_error(ntstat);
     }
-    else
     {
-      if(ntstat < 0)
+      alignas(8) char _buffer[4096];
+      auto *buffer_ = (what_to_enumerate_type *) _buffer;
+      isb = make_iostatus();
+      ntstat = NtQueryDirectoryFile(_v.h, nullptr, nullptr, nullptr, &isb, buffer_, sizeof(_buffer), what_to_enumerate, TRUE, req.glob.empty() ? nullptr : &_glob, FALSE);
+      if(ntstat != 0x80000006 /*STATUS_NO_MORE_FILES*/)
       {
-        return ntkernel_error(ntstat);
+        // The directory grew between first enumeration and second
+        LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
+        goto retry;
       }
-      done = true;
     }
-  } while(!done);
+  }
+
   size_t n = 0;
-  done = false;
-  for(FILE_ID_FULL_DIR_INFORMATION *ffdi = buffer; !done; ffdi = reinterpret_cast<FILE_ID_FULL_DIR_INFORMATION *>(reinterpret_cast<uintptr_t>(ffdi) + ffdi->NextEntryOffset))
+  bool done = false;
+  for(what_to_enumerate_type *ffdi = buffer; !done; ffdi = reinterpret_cast<what_to_enumerate_type *>(reinterpret_cast<uintptr_t>(ffdi) + ffdi->NextEntryOffset))
   {
     size_t length = ffdi->FileNameLength / sizeof(wchar_t);
     done = (ffdi->NextEntryOffset == 0);
@@ -370,8 +424,12 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
       continue;
     }
     item.stat = stat_t(nullptr);
+#ifndef LLFIO_DIRECTORY_HANDLE_ENUMERATE_LESS_INFO
     item.stat.st_ino = ffdi->FileId.QuadPart;
     item.stat.st_type = to_st_type(ffdi->FileAttributes, ffdi->ReparsePointTag);
+#else
+    item.stat.st_type = to_st_type(ffdi->FileAttributes, IO_REPARSE_TAG_SYMLINK /* not accurate, but best we can do */);
+#endif
     item.stat.st_atim = to_timepoint(ffdi->LastAccessTime);
     item.stat.st_mtim = to_timepoint(ffdi->LastWriteTime);
     item.stat.st_ctim = to_timepoint(ffdi->ChangeTime);
