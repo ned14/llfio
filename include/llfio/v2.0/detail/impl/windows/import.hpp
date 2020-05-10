@@ -657,6 +657,31 @@ namespace windows_nt_kernel
     ULONG ByteOffsetForPartitionAlignment;
   } FILE_FS_SECTOR_SIZE_INFORMATION, *PFILE_FS_SECTOR_SIZE_INFORMATION;
 
+  // From https://docs.microsoft.com/en-gb/windows-hardware/drivers/ddi/ntifs/ns-ntifs-_file_names_information
+  typedef struct _FILE_NAMES_INFORMATION
+  {
+    ULONG NextEntryOffset;
+    ULONG FileIndex;
+    ULONG FileNameLength;
+    WCHAR FileName[1];
+  } FILE_NAMES_INFORMATION, *PFILE_NAMES_INFORMATION;
+
+  // From https://docs.microsoft.com/en-gb/windows-hardware/drivers/ddi/ntifs/ns-ntifs-_file_directory_information
+  typedef struct _FILE_DIRECTORY_INFORMATION
+  {
+    ULONG NextEntryOffset;
+    ULONG FileIndex;
+    LARGE_INTEGER CreationTime;
+    LARGE_INTEGER LastAccessTime;
+    LARGE_INTEGER LastWriteTime;
+    LARGE_INTEGER ChangeTime;
+    LARGE_INTEGER EndOfFile;
+    LARGE_INTEGER AllocationSize;
+    ULONG FileAttributes;
+    ULONG FileNameLength;
+    WCHAR FileName[1];
+  } FILE_DIRECTORY_INFORMATION, *PFILE_DIRECTORY_INFORMATION;
+
   // From http://msdn.microsoft.com/en-us/library/windows/hardware/ff540310(v=vs.85).aspx
   typedef struct _FILE_ID_FULL_DIR_INFORMATION  // NOLINT
   {

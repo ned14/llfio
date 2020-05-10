@@ -350,7 +350,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
   {
     // Let's assume the average leafname will be 64 characters long.
     size_t toallocate = (sizeof(dirent) + 64) * req.buffers.size();
-    auto *mem = new(std::nothrow) char[toallocate];
+    auto *mem = (char *) operator new[](toallocate, std::nothrow);  // don't initialise
     if(mem == nullptr)
     {
       return errc::not_enough_memory;
@@ -367,6 +367,12 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
   {
     buffer = req.kernelbuffer.empty() ? reinterpret_cast<dirent *>(req.buffers._kernel_buffer.get()) : reinterpret_cast<dirent *>(req.kernelbuffer.data());
     bytesavailable = req.kernelbuffer.empty() ? req.buffers._kernel_buffer_size : req.kernelbuffer.size();
+    while(_lock.exchange(1, std::memory_order_relaxed) != 0)
+    {
+      std::this_thread::yield();
+    }
+    auto unlock = make_scope_exit([this]() noexcept { _lock.store(0, std::memory_order_release); });
+    (void) unlock;
 // Seek to start
 #ifdef __linux__
     if(-1 == ::lseek64(_v.fd, 0, SEEK_SET))
@@ -380,13 +386,13 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
     bytes = getdents(_v.fd, reinterpret_cast<char *>(buffer), bytesavailable);
     if(req.kernelbuffer.empty() && bytes == -1 && EINVAL == errno)
     {
-      req.buffers._kernel_buffer.reset();
       size_t toallocate = req.buffers._kernel_buffer_size * 2;
-      auto *mem = new(std::nothrow) char[toallocate];
+      auto *mem = (char *) operator new[](toallocate, std::nothrow);  // don't initialise
       if(mem == nullptr)
       {
         return errc::not_enough_memory;
       }
+      req.buffers._kernel_buffer.reset();
       req.buffers._kernel_buffer = std::unique_ptr<char[]>(mem);
       req.buffers._kernel_buffer_size = toallocate;
     }

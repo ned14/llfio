@@ -60,10 +60,17 @@ static_assert(std::is_standard_layout<directory_entry>::value, "directory_entry 
 
 /*! \class directory_handle
 \brief A handle to a directory which can be enumerated.
+
+\note For good performance, make sure you reuse `buffers_type` across calls to `read()`, including
+across different instances of `directory_handle`. This is because a kernel buffer is allocated
+within the first use of a `buffers_type` in a `read()`, so reusing `buffers_type` will save on
+an allocation-free cycle per directory enumeration.
 */
 class LLFIO_DECL directory_handle : public path_handle, public fs_handle
 {
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept final { return *this; }
+
+  mutable std::atomic<unsigned> _lock{0};  // used to serialise read()
 
 public:
   using path_type = path_handle::path_type;
@@ -303,19 +310,21 @@ public:
 #endif
 
   /*! Fill the buffers type with as many directory entries as will fit into any optionally supplied buffer.
-
-  \warning The underlying syscall on Linux is racy if called by multiple kernel threads concurrently
-  on the same open file descriptor.
+  This operation returns a **snapshot**, without races, of the directory contents at the moment of the
+  call.
 
   \return Returns the buffers filled, what metadata was filled in and whether the entire directory
-  was read or not.
+  was read or not. You should *always* examine `.metadata()` for the metadata you are about to use,
+  fetching it with `stat_t::fill()` if not yet present.
   \param req A buffer fill (directory enumeration) request.
   \errors todo
   \mallocs If the `kernelbuffer` parameter is set in the request, no memory allocations.
-  If unset, at least one memory allocation, possibly more is performed.
+  If unset, at least one memory allocation, possibly more is performed. MAKE SURE you reuse the
+  `buffers_type` across calls once you are no longer using the buffers filled (simply restamp
+  its span range, the internal kernel buffer will then get reused).
   */
   LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<buffers_type> read(io_request<buffers_type> req) const noexcept;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<buffers_type> read(io_request<buffers_type> req, deadline d = std::chrono::seconds(30)) const noexcept;
 };
 inline std::ostream &operator<<(std::ostream &s, const directory_handle::filter &v)
 {
