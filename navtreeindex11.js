@@ -1,11 +1,12 @@
 var NAVTREEINDEX11 =
 {
-"structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a49ed1fc7d1b5b0b6bc8e039b228d3888":[4,0,2,19,0,2],
-"structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a6211e0e13161ab09825492cc6efb0fa5":[4,0,2,19,0,6],
-"structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a642a415d3444c11886c3bace729b917b":[4,0,2,19,0,4],
-"structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a83249c8307c80703efff0eb0c8cde85e":[4,0,2,19,0,7],
-"structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a8d1148aa4702fbdbf8386c39ade9df05":[4,0,2,19,0,1],
-"structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#ab98213f3667f45cc5429e9d6ed6073fb":[4,0,2,19,0,8],
+"structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a49ed1fc7d1b5b0b6bc8e039b228d3888":[4,0,2,19,0,3],
+"structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a6211e0e13161ab09825492cc6efb0fa5":[4,0,2,19,0,7],
+"structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a642a415d3444c11886c3bace729b917b":[4,0,2,19,0,5],
+"structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a83249c8307c80703efff0eb0c8cde85e":[4,0,2,19,0,8],
+"structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a8d1148aa4702fbdbf8386c39ade9df05":[4,0,2,19,0,2],
+"structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a92ffa4a0d93d289bf1f9173f0d220d41":[4,0,2,19,0,1],
+"structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#ab98213f3667f45cc5429e9d6ed6073fb":[4,0,2,19,0,9],
 "structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#ac99d361654291d463bfce813c0d15989":[4,0,2,19,0,0],
 "structllfio__v2__xxx_1_1directory__handle_1_1io__request.html":[4,0,2,19,1],
 "structllfio__v2__xxx_1_1directory__handle_1_1io__request.html#a3978006ca70b2e28a1ae0dff588e3ff8":[4,0,2,19,1,3],
@@ -248,6 +249,5 @@ var NAVTREEINDEX11 =
 "structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html#a50e820845148e148e5093f561f2ced6d":[4,0,2,28,10,1],
 "structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html#a5fe282d6dd7c7511d873bb5d78e1f8f1":[4,0,2,28,10,2],
 "structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html#a7e3b4b1f10afdef025e4b938a34902ff":[4,0,2,28,10,5],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html#a80018e9da3c27dca3f825fe3ebbfbf62":[4,0,2,28,10,4],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html#a81cfe21db8a4f042ce46a9c89ec743a2":[4,0,2,28,10,7]
+"structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html#a80018e9da3c27dca3f825fe3ebbfbf62":[4,0,2,28,10,4]
 };
