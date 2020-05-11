@@ -128,24 +128,23 @@ namespace algorithm
         // in order to encourage maximum possible concurrency.
         std::vector<std::forward_list<directory_handle>> workqueue;
         workqueue.reserve(16);
-        auto enumerate_and_remove = [&](directory_handle &dirh, size_t mylevel) -> result<bool> {
-          char _kernelbuffer[65536];
-          directory_handle::buffer_type _entries[4096];  // assumes ~16 everage bytes of kernel buffer per entry
+        auto enumerate_and_remove = [&](directory_handle &dirh, size_t mylevel, directory_handle::buffers_type &buffers) -> result<bool> {
+          directory_handle::buffer_type _entries[4096];  // we don't care if it isn't big enough
           bool all_deleted = true;
           for(;;)
           {
-            auto _filled = dirh.read({{_entries}, {}, directory_handle::filter::none, {_kernelbuffer}});
+            auto _filled = dirh.read({directory_handle::buffers_type(_entries, std::move(buffers)), {}, directory_handle::filter::none });
             if(!_filled)
             {
               // std::cout << "Directory enumeration failed with " << _filled.error().message() << std::endl;
               break;
             }
-            auto &entries = _filled.value();
+            buffers = std::move(_filled).value();
             size_t thisnotremoved = 0, thisremoved = 0;
-            for(auto &entry : entries)
+            for(auto &entry : buffers)
             {
               int entry_type = 0;  // 0 = unknown, 1 = file, 2 = directory
-              if(entries.metadata() & stat_t::want::type)
+              if(buffers.metadata() & stat_t::want::type)
               {
                 switch(entry.stat.st_type)
                 {
@@ -418,7 +417,7 @@ namespace algorithm
               thisremoved++;
 #endif
             }
-            if(entries.done())
+            if(buffers.done())
             {
               totalnotremoved.fetch_add(thisnotremoved, std::memory_order_relaxed);
               totalremoved.fetch_add(thisremoved, std::memory_order_relaxed);
@@ -451,8 +450,9 @@ namespace algorithm
           return false;
         };
         // Try a fast path exit without needing a thread pool
+        directory_handle::buffers_type main_thread_buffers;
         {
-          auto r = enumerate_and_remove(topdirh, 0);
+          auto r = enumerate_and_remove(topdirh, 0, main_thread_buffers);
           if(r && r.value())
           {
             // There were no subdirectories, so we are done
@@ -463,6 +463,7 @@ namespace algorithm
         // Set up the threadpool of workers
         auto worker = [&] {
           log_level_guard logg(log_level::fatal);
+          directory_handle::buffers_type my_thread_buffers;
           for(;;)
           {
             directory_handle mywork;
@@ -495,7 +496,7 @@ namespace algorithm
                 }
               }
             } while(!mywork.is_valid());
-            auto r = enumerate_and_remove(mywork, mylevel);
+            auto r = enumerate_and_remove(mywork, mylevel, my_thread_buffers);
             (void) r;
           }
         };
@@ -513,7 +514,7 @@ namespace algorithm
         // Kick off parallel unlinking
         for(size_t n = 0; n < threads; n++)
         {
-          threadpool.emplace_back(worker);
+            threadpool.emplace_back(worker);
         }
 
         // Wait until the thread pool falls inactive, then loop removing the tree
@@ -550,7 +551,7 @@ namespace algorithm
             }
             // Run it again
             lasttotalremoved = totalremoved;
-            auto r = enumerate_and_remove(topdirh, 0);
+            auto r = enumerate_and_remove(topdirh, 0, main_thread_buffers);
             if(r && r.value())
             {
               // There were no subdirectories, so we are done
@@ -580,7 +581,7 @@ namespace algorithm
           totalnotremoved = 0;
           // We now fall back to a single threaded traversal of the directory tree,
           // repeatedly trying to unlink the items
-          auto r = enumerate_and_remove(topdirh, 0);
+          auto r = enumerate_and_remove(topdirh, 0, main_thread_buffers);
           if(r && r.value())
           {
             // There were no subdirectories, so we are done
@@ -598,7 +599,7 @@ namespace algorithm
             {
               if(!workqueue[level].empty())
               {
-                (void) enumerate_and_remove(workqueue[level].front(), level);
+                (void) enumerate_and_remove(workqueue[level].front(), level, main_thread_buffers);
                 if(callback_error)
                 {
                   return std::move(*callback_error);

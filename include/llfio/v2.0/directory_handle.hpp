@@ -110,6 +110,17 @@ public:
     : span<buffer_type>(v)
     {
     }
+    //! Construct from a span, using a kernel buffer from a preceding `buffers_type`.
+    buffers_type(span<buffer_type> v, buffers_type &&o) noexcept
+        : span<buffer_type>(std::move(v))
+        , _kernel_buffer(std::move(o._kernel_buffer))
+        , _kernel_buffer_size(o._kernel_buffer_size)
+        , _metadata(o._metadata)
+        , _done(o._done)
+    {
+      static_cast<span<buffer_type> &>(o) = {};
+      o._kernel_buffer_size = 0;
+    }
     ~buffers_type() = default;
     //! Move constructor
     /* constexpr */ buffers_type(buffers_type &&o) noexcept : span<buffer_type>(std::move(o)), _kernel_buffer(std::move(o._kernel_buffer)), _kernel_buffer_size(o._kernel_buffer_size), _metadata(o._metadata), _done(o._done)
@@ -122,8 +133,16 @@ public:
     //! Move assignment
     buffers_type &operator=(buffers_type &&o) noexcept
     {
+      std::unique_ptr<char[]> kernel_buffer = std::move(_kernel_buffer);
+      size_t kernel_buffer_size = _kernel_buffer_size;
       this->~buffers_type();
       new(this) buffers_type(std::move(o));
+      if(kernel_buffer_size > _kernel_buffer_size)
+      {
+        _kernel_buffer.reset();
+        _kernel_buffer = std::move(kernel_buffer);
+        _kernel_buffer_size = kernel_buffer_size;
+      }
       return *this;
     }
     //! No copy assignment
