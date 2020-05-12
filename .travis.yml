@@ -5,8 +5,8 @@ git:
   submodules: false
 os:
  - linux
-# - osx  ## disabled until MacOS 10.15 deploys on Travis
-#osx_image: xcode11.4
+ - osx
+osx_image: xcode11.4
 branches:
   only:
     - develop
@@ -36,52 +36,78 @@ matrix:
   include:
   - name: "g++ 7.5 x64 cmake tests (error_code)"
     compiler: g++
+    os: linux
     env: NAME=x64_EC_tests
   - name: "clang++ 7.0 x64 cmake tests (error_code)"
     compiler: clang++
+    os: linux
     env: NAME=x64_EC_tests
   - name: "libc++ x64 cmake tests (error_code)"
     compiler: clang++-10
+    os: linux
     env:
      - NAME=x64_EC_tests
      - CMAKE_CONFIGURE_OPTIONS=-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake
+  - name: "Xcode 11.4 x64 cmake tests (error_code)"
+    compiler: clang++
+    os: osx
+    env: NAME=x64_EC_tests
   - name: "g++ 7.5 x64 cmake tests (status_code)"
     compiler: g++
+    os: linux
     env:
      - NAME=x64_SC_tests
      - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - name: "clang++ 7.0 x64 cmake tests (status_code)"
     compiler: clang++
+    os: linux
     env:
      - NAME=x64_SC_tests
      - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - name: "libc++ x64 cmake tests (status_code)"
     compiler: clang++-10
+    os: linux
     env:
      - NAME=x64_SC_tests
      - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake
+  - name: "Xcode 11.4 x64 cmake tests (status_code)"
+    compiler: clang++
+    os: osx
+    env:
+     - NAME=x64_SC_tests
+     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - name: "g++ ARM32 cmake build (error_code)"
     compiler: g++
+    os: linux
     env: NAME=ARM32_EC_build
   - name: "g++ ARM32 cmake build (status_code)"
     compiler: g++
+    os: linux
     env:
      - NAME=ARM32_SC_build
      - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - name: "Documentation"
     compiler: clang++
+    os: linux
     env: NAME=Documentation
   - name: "g++ 7.5 x64 Programs (error_code)"
     compiler: g++
+    os: linux
     env: NAME=x64_EC_programs
   - name: "clang++ 7.0 x64 Programs (error_code)"
     compiler: clang++
+    os: linux
     env: NAME=x64_EC_programs
   - name: "libc++ x64 Programs (error_code)"
     compiler: clang++-10
+    os: linux
     env:
      - NAME=x64_EC_programs
      - CMAKE_CONFIGURE_OPTIONS=-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake
+  - name: "Xcode 11.4 x64 Programs (error_code)"
+    compiler: clang++
+    os: osx
+    env: NAME=x64_EC_programs
 #  - name: "x64 Programs (status_code)"
 #    compiler:
 #     - g++
@@ -92,30 +118,46 @@ matrix:
 #     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - name: "g++ 7.5 Installability (error_code)"
     compiler: g++
+    os: linux
     env: NAME=x64_EC_install
   - name: "clang++ 7.0 Installability (error_code)"
     compiler: clang++
+    os: linux
     env: NAME=x64_EC_install
   - name: "libc++ Installability (error_code)"
     compiler: clang++-10
+    os: linux
     env:
      - NAME=x64_EC_install
      - CMAKE_CONFIGURE_OPTIONS=-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake
+  - name: "Xcode 11.4 Installability (error_code)"
+    compiler: clang++
+    os: osx
+    env: NAME=x64_EC_install
   - name: "g++ 7.5 Installability (status_code)"
     compiler: g++
+    os: linux
     env:
      - NAME=x64_SC_install
      - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - name: "clang++ 7.0 Installability (status_code)"
     compiler: clang++
+    os: linux
     env:
      - NAME=x64_SC_install
      - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - name: "libc++ Installability (status_code)"
     compiler: clang++-10
+    os: linux
     env:
      - NAME=x64_SC_install
      - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake
+  - name: "Xcode 11.4 Installability (status_code)"
+    compiler: clang++
+    os: osx
+    env:
+     - NAME=x64_SC_install
+     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
     
 before_install:
  - if [ "$TRAVIS_COMPILER" = "clang++-10" ]; then
