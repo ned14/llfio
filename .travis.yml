@@ -3,9 +3,6 @@ language: cpp
 sudo: true
 git:
   submodules: false
-os:
- - linux
- - osx
 osx_image: xcode11.4
 branches:
   only:
@@ -27,6 +24,9 @@ addons:
     - doxygen
     - python3
     - python3-pip
+#  homebrew:
+#    packages:
+#    - 
 
 env:
   global:
