@@ -30,6 +30,15 @@ Distributed under the Boost Software License, Version 1.0.
 #include <spawn.h>
 #include <sys/wait.h>
 
+#ifdef __FreeBSD__
+#include <sys/sysctl.h>
+extern "C" char **environ;
+#endif
+#ifdef __APPLE__
+#include <mach-o/dyld.h>  // for _NSGetExecutablePath
+extern "C" char **environ;
+#endif
+
 LLFIO_V2_NAMESPACE_BEGIN
 
 LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool process_handle::is_running() const noexcept
