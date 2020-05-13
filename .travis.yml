@@ -3,7 +3,6 @@ language: cpp
 sudo: true
 git:
   submodules: false
-osx_image: xcode11.4
 branches:
   only:
     - develop
@@ -51,6 +50,7 @@ matrix:
   - name: "Xcode 11.4 x64 cmake tests (error_code)"
     compiler: clang++
     os: osx
+    osx_image: xcode11.4
     env: NAME=x64_EC_tests
   - name: "g++ 7.5 x64 cmake tests (status_code)"
     compiler: g++
@@ -73,6 +73,7 @@ matrix:
   - name: "Xcode 11.4 x64 cmake tests (status_code)"
     compiler: clang++
     os: osx
+    osx_image: xcode11.4
     env:
      - NAME=x64_SC_tests
      - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
@@ -107,6 +108,7 @@ matrix:
   - name: "Xcode 11.4 x64 Programs (error_code)"
     compiler: clang++
     os: osx
+    osx_image: xcode11.4
     env: NAME=x64_EC_programs
 #  - name: "x64 Programs (status_code)"
 #    compiler:
@@ -133,6 +135,7 @@ matrix:
   - name: "Xcode 11.4 Installability (error_code)"
     compiler: clang++
     os: osx
+    osx_image: xcode11.4
     env: NAME=x64_EC_install
   - name: "g++ 7.5 Installability (status_code)"
     compiler: g++
@@ -155,6 +158,7 @@ matrix:
   - name: "Xcode 11.4 Installability (status_code)"
     compiler: clang++
     os: osx
+    osx_image: xcode11.4
     env:
      - NAME=x64_SC_install
      - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
