@@ -5,7 +5,7 @@ This is the post-peer-review LLFIO v2 rewrite. You can view its documentation at
 Tarballs of source and prebuilt binaries for Linux x64, MacOS x64 and Windows x64:
 - https://dedi5.nedprod.com/static/files/llfio-v2.0-source-latest.tar.xz
 - https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-linux64-latest.tgz (Ubuntu 18.04 LTS x64)
-- https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-darwin64-latest.tgz (disabled pending XCode supporting Filesystem TS)
+- https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-darwin64-latest.tgz (Mac OS 10.15)
 - https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-win64-latest.zip (VS2017 x64)
 
 USAGE AND CONFIGURATION INSTRUCTIONS CAN BE FOUND AT https://ned14.github.io/llfio/
