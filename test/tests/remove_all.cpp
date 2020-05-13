@@ -32,7 +32,7 @@ Distributed under the Boost Software License, Version 1.0.
 static inline void TestRemoveAll()
 {
   static constexpr size_t rounds = 10;
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
   static constexpr size_t total_entries = 100;  // create 100 directories in each random directory tree
 #else
   static constexpr size_t total_entries = 1000;  // create 10000 directories in each random directory tree
