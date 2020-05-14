@@ -117,11 +117,11 @@ public:
   //! The iterator type
   using iterator = typename span<T>::iterator;
   //! The const iterator type
-  using const_iterator = typename span<T>::const_iterator;
+  //using const_iterator = typename span<T>::const_iterator;
   //! The reverse iterator type
   using reverse_iterator = typename span<T>::reverse_iterator;
   //! The const reverse iterator type
-  using const_reverse_iterator = typename span<T>::const_reverse_iterator;
+  //using const_reverse_iterator = typename span<T>::const_reverse_iterator;
   //! The difference type
   using difference_type = typename span<T>::difference_type;
 
@@ -199,13 +199,13 @@ public:
   using span<T>::data;
   using span<T>::begin;
   using span<T>::end;
-  using span<T>::cbegin;
-  using span<T>::cend;
+  //using span<T>::cbegin;
+  //using span<T>::cend;
   using span<T>::rbegin;
   using span<T>::rend;
-  using span<T>::crbegin;
-  using span<T>::crend;
-  using span<T>::swap;
+  //using span<T>::crbegin;
+  //using span<T>::crend;
+  //using span<T>::swap;
 
   /*! Create a view of newly allocated unused memory, creating new memory if insufficient unused memory is available.
   Note that the memory mapped by this call may contain non-zero bits (recycled memory) unless `zeroed` is true.

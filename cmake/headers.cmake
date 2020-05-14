@@ -44,6 +44,7 @@ set(llfio_HEADERS
   "include/llfio/v2.0/detail/impl/posix/statfs.ipp"
   "include/llfio/v2.0/detail/impl/posix/storage_profile.ipp"
   "include/llfio/v2.0/detail/impl/posix/symlink_handle.ipp"
+  "include/llfio/v2.0/detail/impl/posix/test/io_uring_multiplexer.ipp"
   "include/llfio/v2.0/detail/impl/posix/utils.ipp"
   "include/llfio/v2.0/detail/impl/remove_all.ipp"
   "include/llfio/v2.0/detail/impl/safe_byte_ranges.ipp"

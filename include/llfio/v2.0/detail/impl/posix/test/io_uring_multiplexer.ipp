@@ -30,6 +30,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <linux/fs.h>
 #include <linux/types.h>
+#include <sched.h>
+#include <sys/syscall.h>
 
 LLFIO_V2_NAMESPACE_BEGIN
 
@@ -298,15 +300,47 @@ namespace test
       struct _io_uring_probe_op ops[0];
     };
 
-    template<class T> static T _io_uring_smp_load_acquire(const T &_v) noexcept{
+    template <class T> static T _io_uring_smp_load_acquire(const T &_v) noexcept
+    {
       auto *v = (const std::atomic<T> *) &_v;
       return v->load(std::memory_order_acquire);
     }
-    template<class T> static void _io_uring_smp_store_release(T &_v, T x) noexcept{
+    template <class T> static void _io_uring_smp_store_release(T &_v, T x) noexcept
+    {
       auto *v = (std::atomic<T> *) &_v;
       v->store(x, std::memory_order_release);
     }
-
+    static int _io_uring_setup(unsigned entries, struct _io_uring_params *p)
+    {
+#ifdef __alpha__
+      return syscall(535 /*__NR_io_uring_setup*/, entries, p);
+#else
+      return syscall(425 /*__NR_io_uring_setup*/, entries, p);
+#endif
+    }
+    static int _io_uring_register(int fd, unsigned opcode, void* arg, unsigned nr_args) {
+#ifdef __alpha__
+      return syscall(537 /*__NR_io_uring_register*/, fd, opcode, arg, nr_args);
+#else
+      return syscall(427 /*__NR_io_uring_register*/, fd, opcode, arg, nr_args);
+#endif
+    }
+    static int _io_uring_enter(int fd, unsigned to_submit, unsigned min_complete, unsigned flags, sigset_t *sig)
+    {
+#ifdef __alpha__
+      return syscall(536 /*__NR_io_uring_enter*/, fd, to_submit, min_complete, flags, sig, _NSIG / 8);
+#else
+      return syscall(426 /*__NR_io_uring_enter*/, fd, to_submit, min_complete, flags, sig, _NSIG / 8);
+#endif
+    }
+    static int _io_uring_enter(int fd, unsigned to_submit, unsigned min_complete, unsigned flags)
+    {
+#ifdef __alpha__
+      return syscall(536 /*__NR_io_uring_enter*/, fd, to_submit, min_complete, flags, nullptr, 0);
+#else
+      return syscall(426 /*__NR_io_uring_enter*/, fd, to_submit, min_complete, flags, nullptr, 0);
+#endif
+    }
 
 
     /* We need to choose a finalised i/o operation state implementation.
@@ -387,14 +421,6 @@ namespace test
       }
     }
 
-    // Per-thread statistics
-    struct _thread_statistics_t
-    {
-    };
-    std::vector<_thread_statistics_t> _thread_statistics;
-    // Whether to simulate finishing immediately after completion
-    bool _disable_immediate_completions{false};
-
   public:
     constexpr linux_io_uring_multiplexer() {}
     linux_io_uring_multiplexer(const linux_io_uring_multiplexer &) = delete;
@@ -408,32 +434,45 @@ namespace test
         (void) linux_io_uring_multiplexer::close();
       }
     }
-    result<void> init(size_t threads, bool disable_immediate_completions)
+    result<void> init(size_t threads, bool is_polling)
     {
-      _thread_statistics.resize(threads);
-      _disable_immediate_completions = disable_immediate_completions;
-      // In a real multiplexer, you need to create the system's i/o multiplexer
-      // and store it into this->_v. We shall store something other than -1
-      // to make this handle appear open.
-      this->_v._init = -2;  // otherwise appears closed
+      _io_uring_params params;
+      memset(*params, 0, sizeof(params));
+      if(is_polling)
+      {
+        // We don't implement IORING_SETUP_IOPOLL, it is files only
+        params.flags |= _IORING_SETUP_SQPOLL;
+        if(threads == 1)
+        {
+          // Pin kernel submission polling thread to same CPU as I am pinned to, if I am pinned
+          cpu_set_t affinity;
+          CPU_ZERO(&affinity);
+          if(-1!=sched_get_affinity(0, sizeof(affinity), &affinity) && CPU_COUNT(&affinity) == 1)
+          {
+            for(size_t n=0; n<CPU_SET_SIZE; n++)
+            {
+              if(CPU_ISSET(n, &affinity))
+              {
+                params.flags |= _IORING_SETUP_SQ_AFF;
+                params.sq_thread_cpu = n;
+                break;
+              }
+            }
+          }
+        }
+      }
+      this->_v.fd = _io_uring_setup(getpagesize() / sizeof(_io_uring_sqe), &params);
+      if(this->_v.fd < 0)
+      {
+        return posix_error();
+      }
       this->_v.behaviour |= native_handle_type::disposition::multiplexer;
       return success();
     }
 
     // These functions are inherited from handle
-    virtual result<path_type> current_path() const noexcept override
-    {
-      // handle::current_path() does the right thing for handles registered with the kernel
-      // but we'll need to return something sensible here
-      return success();  // empty path, means it has been deleted
-    }
-    virtual result<void> close() noexcept override
-    {
-      // handle::close() would close the handle with the kernel, which might suit your multiplexer implementation.
-      // However we need to not do that here.
-      this->_v._init = -1;  // make it appear closed
-      return success();
-    }
+    // virtual result<path_type> current_path() const noexcept override
+    // virtual result<void> close() noexcept override
     // virtual native_handle_type release() noexcept override { return _base::release(); }
 
     // This registers an i/o handle with the system i/o multiplexer
@@ -451,7 +490,7 @@ namespace test
 
     // This returns the maximum *atomic* number of scatter-gather i/o that this i/o multiplexer can do
     // This is the value returned by io_handle::max_buffers()
-    virtual size_t do_io_handle_max_buffers(const io_handle * /*unused*/) const noexcept override { return 1; }
+    virtual size_t do_io_handle_max_buffers(const io_handle * /*unused*/) const noexcept override { return IOV_MAX; }
 
     // This allocates a registered i/o buffer with the system i/o multiplexer
     // The default implementation calls mmap()/VirtualAlloc(), creates a deallocating
@@ -807,18 +846,18 @@ namespace test
     }
   };
 
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<io_multiplexer_ptr> multiplexer_null(size_t threads, bool disable_immediate_completions) noexcept
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<io_multiplexer_ptr> multiplexer_linux_io_uring_multiplexer(size_t threads, bool is_polling) noexcept
   {
     try
     {
       if(1 == threads)
       {
         auto ret = std::make_unique<linux_io_uring_multiplexer<false>>();
-        OUTCOME_TRY(ret->init(1, disable_immediate_completions));
+        OUTCOME_TRY(ret->init(1, is_polling));
         return io_multiplexer_ptr(ret.release());
       }
       auto ret = std::make_unique<linux_io_uring_multiplexer<true>>();
-      OUTCOME_TRY(ret->init(threads, disable_immediate_completions));
+      OUTCOME_TRY(ret->init(threads, is_polling));
       return io_multiplexer_ptr(ret.release());
     }
     catch(...)
