@@ -129,11 +129,15 @@ namespace algorithm
         std::vector<std::forward_list<directory_handle>> workqueue;
         workqueue.reserve(16);
         auto enumerate_and_remove = [&](directory_handle &dirh, size_t mylevel, directory_handle::buffers_type &buffers) -> result<bool> {
+#ifdef __APPLE__
+          std::vector<directory_handle::buffer_type> _entries(4096);  // we don't care if it isn't big enough
+#else
           directory_handle::buffer_type _entries[4096];  // we don't care if it isn't big enough
+#endif
           bool all_deleted = true;
           for(;;)
           {
-            auto _filled = dirh.read({directory_handle::buffers_type(_entries, std::move(buffers)), {}, directory_handle::filter::none });
+            auto _filled = dirh.read({directory_handle::buffers_type(_entries, std::move(buffers)), {}, directory_handle::filter::none});
             if(!_filled)
             {
               // std::cout << "Directory enumeration failed with " << _filled.error().message() << std::endl;
@@ -514,7 +518,7 @@ namespace algorithm
         // Kick off parallel unlinking
         for(size_t n = 0; n < threads; n++)
         {
-            threadpool.emplace_back(worker);
+          threadpool.emplace_back(worker);
         }
 
         // Wait until the thread pool falls inactive, then loop removing the tree
