@@ -26,6 +26,11 @@ Distributed under the Boost Software License, Version 1.0.
 
 static inline void TestCurrentProcessMemoryUsage()
 {
+#if defined(__has_feature)
+#if __has_feature(address_sanitizer) || __has_feature(thread_sanitizer)
+  return;  // Memory usage stats are confounded by the address sanitiser
+#endif
+#endif
   namespace llfio = LLFIO_V2_NAMESPACE;
   static const llfio::utils::process_memory_usage *last_pmu;
   auto print = [](llfio::utils::process_memory_usage &pmu) -> std::ostream &(*) (std::ostream &) {
