@@ -200,8 +200,7 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
   IO_STATUS_BLOCK isb = make_iostatus();
   alignas(8) char buffer[sizeof(FILE_RENAME_INFORMATION) + 65536];
   auto *fni = reinterpret_cast<FILE_RENAME_INFORMATION *>(buffer);
-  fni->Flags = atomic_replace ? 0x1 /*FILE_RENAME_REPLACE_IF_EXISTS*/ : 0;
-  fni->Flags |= 0x2 /*FILE_RENAME_POSIX_SEMANTICS*/;
+  fni->Flags = atomic_replace ? (0x1 /*FILE_RENAME_REPLACE_IF_EXISTS*/ | 0x2 /*FILE_RENAME_POSIX_SEMANTICS*/) : 0;
   fni->RootDirectory = base.is_valid() ? base.native_handle().h : nullptr;
   fni->FileNameLength = _path.Length;
   memcpy(fni->FileName, _path.Buffer, fni->FileNameLength);
