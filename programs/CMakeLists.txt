@@ -59,6 +59,6 @@ if(MSVC)
   target_compile_options(illegal-codepoints PUBLIC /utf-8)
 endif()
 
-if(NOT WIN32)
+if(NOT WIN32 AND NOT APPLE)
   add_subdirectory(collision-check)
 endif()

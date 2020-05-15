@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 
-if(WIN32)
-  message(FATAL_ERROR "FATAL: Not supported on Windows")
+if(WIN32 OR APPLE)
+  message(FATAL_ERROR "FATAL: Not supported on Windows or Mac OS")
 endif()
 
 if(NOT TARGET llfio::hl)

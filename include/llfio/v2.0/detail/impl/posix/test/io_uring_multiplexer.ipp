@@ -318,7 +318,8 @@ namespace test
       return syscall(425 /*__NR_io_uring_setup*/, entries, p);
 #endif
     }
-    static int _io_uring_register(int fd, unsigned opcode, void* arg, unsigned nr_args) {
+    static int _io_uring_register(int fd, unsigned opcode, void *arg, unsigned nr_args)
+    {
 #ifdef __alpha__
       return syscall(537 /*__NR_io_uring_register*/, fd, opcode, arg, nr_args);
 #else
@@ -401,6 +402,12 @@ namespace test
     };
     _null_operation_state *_first{nullptr}, *_last{nullptr};
     int _wakecount{0};
+    span<__u32> _submission_queue;
+    span<_io_uring_sqe> _submission_entries;
+    span<_io_uring_cqe> _completion_queue;
+    std::vector<int> _known_fds;
+    bool _have_ioring_register_files_update{true};
+    std::vector<registered_buffer_type> _registered_buffers;
 
     void _insert(_null_operation_state *state)
     {
@@ -440,16 +447,17 @@ namespace test
       memset(*params, 0, sizeof(params));
       if(is_polling)
       {
-        // We don't implement IORING_SETUP_IOPOLL, it is files only
+        // We don't implement IORING_SETUP_IOPOLL, it is O_DIRECT files only
         params.flags |= _IORING_SETUP_SQPOLL;
+        params.sq_thread_idle = 100;  // 100 milliseconds
         if(threads == 1)
         {
           // Pin kernel submission polling thread to same CPU as I am pinned to, if I am pinned
           cpu_set_t affinity;
           CPU_ZERO(&affinity);
-          if(-1!=sched_get_affinity(0, sizeof(affinity), &affinity) && CPU_COUNT(&affinity) == 1)
+          if(-1 != sched_get_affinity(0, sizeof(affinity), &affinity) && CPU_COUNT(&affinity) == 1)
           {
-            for(size_t n=0; n<CPU_SET_SIZE; n++)
+            for(size_t n = 0; n < CPU_SET_SIZE; n++)
             {
               if(CPU_ISSET(n, &affinity))
               {
@@ -466,42 +474,169 @@ namespace test
       {
         return posix_error();
       }
+      {
+        auto *p = ::mmap(nullptr, params.sq_off.array + params.sq_entries * sizeof(__u32), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_POPULATE, this->_v.fd, _IORING_OFF_SQ_RING);
+        if(p == nullptr)
+        {
+          return posix_error();
+        }
+        _submission_queue = {(__u32 *) p, params.sq_entries};
+      }
+      {
+        auto *p = ::mmap(nullptr, params.sq_entries * sizeof(_io_uring_sqe), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_POPULATE, this->_v.fd, _IORING_OFF_SQES);
+        if(p == nullptr)
+        {
+          return posix_error();
+        }
+        _submission_entries = {(_io_uring_sqe *) p, params.sq_entries};
+      }
+      {
+        auto *p = ::mmap(nullptr, params.cq_off.cqes + params.cq_entries * sizeof(_io_uring_cqe), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_POPULATE, this->_v.fd, _IORING_OFF_CQ_RING);
+        if(p == nullptr)
+        {
+          return posix_error();
+        }
+        _submission_queue = {(_io_uring_cqe *) p, params.cq_entries};
+      }
       this->_v.behaviour |= native_handle_type::disposition::multiplexer;
       return success();
     }
 
     // These functions are inherited from handle
     // virtual result<path_type> current_path() const noexcept override
-    // virtual result<void> close() noexcept override
-    // virtual native_handle_type release() noexcept override { return _base::release(); }
-
-    // This registers an i/o handle with the system i/o multiplexer
-    virtual result<uint8_t> do_io_handle_register(io_handle * /*unused*/) noexcept override
+    virtual result<void> close() noexcept override
     {
-      _multiplexer_lock_guard g(this->_lock);
+      if(!_submission_queue.empty())
+      {
+        if(-1 == ::munmap(_submission_queue.data(), _submission_queue.size_bytes()))
+        {
+          return posix_error();
+        }
+        _submission_queue = {};
+      }
+      if(!_submission_entries.empty())
+      {
+        if(-1 == ::munmap(_submission_entries.data(), _submission_entries.size_bytes()))
+        {
+          return posix_error();
+        }
+        _submission_entries = {};
+      }
+      if(!_completion_queue.empty())
+      {
+        if(-1 == ::munmap(_completion_queue.data(), _completion_queue.size_bytes()))
+        {
+          return posix_error();
+        }
+        _completion_queue = {};
+      }
+      OUTCOME_TRY(_base::close());
+      _known_fds.clear();
+      _registered_buffers.clear();
       return success();
     }
-    // This deregisters an i/o handle from the system i/o multiplexer
-    virtual result<void> do_io_handle_deregister(io_handle * /*unused*/) noexcept override
+    virtual native_handle_type release() noexcept override
     {
-      _multiplexer_lock_guard g(this->_lock);
-      return success();
+      if(!_submission_queue.empty())
+      {
+        if(-1 == ::munmap(_submission_queue.data(), _submission_queue.size_bytes()))
+        {
+          return posix_error();
+        }
+        _submission_queue = {};
+      }
+      if(!_submission_entries.empty())
+      {
+        if(-1 == ::munmap(_submission_entries.data(), _submission_entries.size_bytes()))
+        {
+          return posix_error();
+        }
+        _submission_entries = {};
+      }
+      if(!_completion_queue.empty())
+      {
+        if(-1 == ::munmap(_completion_queue.data(), _completion_queue.size_bytes()))
+        {
+          return posix_error();
+        }
+        _completion_queue = {};
+      }
+      return _base::release();
     }
 
-    // This returns the maximum *atomic* number of scatter-gather i/o that this i/o multiplexer can do
-    // This is the value returned by io_handle::max_buffers()
+    result<void> _recalculate_registered_fds(int index, int fd) noexcept
+    {
+      if(_have_ioring_register_files_update)
+      {
+        __s32 newvalue = fd;
+        _io_uring_files_update upd;
+        memset(&upd, 0, sizeof(upd));
+        upd.offset = index;
+        upd.fds = (__aligned_u64) &newvalue;
+        if(_io_uring_register(this->_v.fd, _IORING_REGISTER_FILES_UPDATE, &upd, 1) >= 0)
+        {
+          return success();
+        }
+        _have_ioring_register_files_update = false;
+      }
+#if 0  // Hangs the ring until it empties, which locks this implementation
+      // Fall back to the old inefficient API
+      std::vector<__s32> map(_known_fds.back() + 1, -1);
+      for(auto fd : _known_fds)
+      {
+        map[fd] = fd;
+      }
+      (void) _io_uring_register(this->_v.fd, _IORING_UNREGISTER_FILES, nullptr, 0);
+      if(_io_uring_register(this->_v.fd, _IORING_REGISTER_FILES, map.data(), map.size()) < 0)
+      {
+        return posix_error();
+      }
+#endif
+      return success();
+    }
+    virtual result<uint8_t> do_io_handle_register(io_handle *h) noexcept override
+    {
+      _multiplexer_lock_guard g(this->_lock);
+      int toinsert = h->native_handle().fd;
+      //_known_fds.insert(std::lower_bound(_known_fds.begin(), _known_fds.end(), toinsert), toinsert);
+      return _recalculate_registered_fds(toinsert, toinsert);
+    }
+    virtual result<void> do_io_handle_deregister(io_handle *h) noexcept override
+    {
+      _multiplexer_lock_guard g(this->_lock);
+      int toremove = h->native_handle().fd;
+      //_known_fds.erase(std::lower_bound(_known_fds.begin(), _known_fds.end(), toremove));
+      return _recalculate_registered_fds(toremove, -1);
+    }
+
     virtual size_t do_io_handle_max_buffers(const io_handle * /*unused*/) const noexcept override { return IOV_MAX; }
 
-    // This allocates a registered i/o buffer with the system i/o multiplexer
-    // The default implementation calls mmap()/VirtualAlloc(), creates a deallocating
-    // wrapper calling munmap()/VirtualFree(), and returns an aliasing shared_ptr for
-    // those memory pages.
-    //
-    // A RDMA-capable i/o multiplexer would allocate the memory in a region mapped from the
-    // RDMA device into the CPU. The program would read and write that shared memory. Upon
-    // i/o, the buffer would be locked/unmapped for RDMA, thus implementing true zero whole
-    // system memory copy i/o
-    // virtual result<registered_buffer_type> do_io_handle_allocate_registered_buffer(io_handle *h, size_t &bytes) noexcept override {}
+    virtual result<registered_buffer_type> do_io_handle_allocate_registered_buffer(io_handle *h, size_t &bytes) noexcept override
+    {
+      _multiplexer_lock_guard g(this->_lock);
+      // Try to reuse any previously registered buffers no longer in use, as
+      // registered buffer registration is one-way in io_uring
+      for(auto &b : _registered_buffers)
+      {
+        if(b.use_count() == 1)
+        {
+          return b;
+        }
+      }
+      // The default implementation uses mmap, so this is done for us
+      OUTCOME_TRY(ret, _base::do_io_handle_allocate_registered_buffer(h, bytes));
+      // Register this buffer with io_uring
+      struct iovec upd;
+      upd.iov_base = ret->data();
+      upd.iov_len = ret->size();
+      if(_io_uring_register(this->_v.fd, _IORING_REGISTER_BUFFERS, &upd, 1) < 0)
+      {
+        return posix_error();
+      }
+      _registered_buffers.push_back(ret);
+      return result<registered_buffer_type>(std::move(ret));
+    }
+
 
     // Code other side of the formal ABI boundary allocate the storage for i/o operation
     // states. They need to know how many bytes to allocate, and what alignment they must
