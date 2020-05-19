@@ -373,7 +373,8 @@ public:
   bool is_allocation() const noexcept { return _v.is_allocation(); }
 
   //! Kernel cache strategy used by this handle
-  caching kernel_caching() const noexcept { 
+  caching kernel_caching() const noexcept
+  {
     const bool safety_barriers = !!(_v.behaviour & native_handle_type::disposition::safety_barriers);
     const bool cache_metadata = !!(_v.behaviour & native_handle_type::disposition::cache_metadata);
     const bool cache_reads = !!(_v.behaviour & native_handle_type::disposition::cache_reads);
@@ -531,7 +532,7 @@ template <class T> struct construct
   result<T> operator()() const noexcept { static_assert(!std::is_same<T, T>::value, "construct<T>() was not specialised for the type T supplied"); }
 };
 
-#ifndef LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
+#if !LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
 namespace detail
 {
   template <class Dest, class Src> inline void fill_failure_info(Dest &dest, const Src &src)
@@ -577,7 +578,7 @@ namespace detail
 
 #if LLFIO_EXPERIMENTAL_STATUS_CODE
 
-#ifndef LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
+#if !LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
 
 //! Helper for constructing an error code from an errc
 inline file_io_error generic_error(errc c)

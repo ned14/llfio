@@ -58,8 +58,8 @@ as that (a) enables safe header only LLFIO on Windows (b) produces better codege
 #include "outcome/experimental/status_result.hpp"
 #include "outcome/try.hpp"
 // Bring in status code utility
-#include "outcome/experimental/status-code/include/system_code_from_exception.hpp"
 #include "outcome/experimental/coroutine_support.hpp"
+#include "outcome/experimental/status-code/include/system_code_from_exception.hpp"
 #if !defined(LLFIO_ENABLE_COROUTINES) && defined(OUTCOME_FOUND_COROUTINE_HEADER)
 #define LLFIO_ENABLE_COROUTINES 1
 #endif
@@ -263,16 +263,41 @@ using OUTCOME_V2_NAMESPACE::awaitables::suspend_never;
 //! Choose an errc implementation
 using SYSTEM_ERROR2_NAMESPACE::errc;
 
-//! Helper for constructing an error code from an errc
-inline file_io_error generic_error(errc c);
+#if LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
+inline file_io_error generic_error(errc c)
+{
+  return SYSTEM_ERROR2_NAMESPACE::generic_code(c);
+}
 #ifndef _WIN32
 //! Helper for constructing an error code from a POSIX errno
-inline file_io_error posix_error(int c = errno);
+inline file_io_error posix_error(int c = errno)
+{
+  return SYSTEM_ERROR2_NAMESPACE::posix_code(c);
+}
 #else
 //! Helper for constructing an error code from a DWORD
-inline file_io_error win32_error(SYSTEM_ERROR2_NAMESPACE::win32::DWORD c = SYSTEM_ERROR2_NAMESPACE::win32::GetLastError());
+inline file_io_error win32_error(SYSTEM_ERROR2_NAMESPACE::win32::DWORD c = SYSTEM_ERROR2_NAMESPACE::win32::GetLastError())
+{
+  return SYSTEM_ERROR2_NAMESPACE::win32_code(c);
+}
 //! Helper for constructing an error code from a NTSTATUS
-inline file_io_error ntkernel_error(SYSTEM_ERROR2_NAMESPACE::win32::NTSTATUS c);
+inline file_io_error ntkernel_error(SYSTEM_ERROR2_NAMESPACE::win32::NTSTATUS c)
+{
+  return SYSTEM_ERROR2_NAMESPACE::nt_code(c);
+}
+#endif
+#else
+//! Helper for constructing an error code from an errc
+inline file_io_error generic_error(errc c);  // implemented in handle.hpp
+#ifndef _WIN32
+//! Helper for constructing an error code from a POSIX errno
+inline file_io_error posix_error(int c = errno);  // implemented in handle.hpp
+#else
+//! Helper for constructing an error code from a DWORD
+inline file_io_error win32_error(SYSTEM_ERROR2_NAMESPACE::win32::DWORD c = SYSTEM_ERROR2_NAMESPACE::win32::GetLastError());  // implemented in handle.hpp
+//! Helper for constructing an error code from a NTSTATUS
+inline file_io_error ntkernel_error(SYSTEM_ERROR2_NAMESPACE::win32::NTSTATUS c);  // implemented in handle.hpp
+#endif
 #endif
 
 namespace detail
@@ -291,10 +316,10 @@ LLFIO_V2_NAMESPACE_END
 
 
 // Bring in a result implementation based on std::error_code
+#include "outcome/coroutine_support.hpp"
 #include "outcome/result.hpp"
 #include "outcome/try.hpp"
 #include "outcome/utils.hpp"
-#include "outcome/coroutine_support.hpp"
 #if !defined(LLFIO_ENABLE_COROUTINES) && defined(OUTCOME_FOUND_COROUTINE_HEADER)
 #define LLFIO_ENABLE_COROUTINES 1
 #endif
@@ -323,7 +348,7 @@ private:
   // The error code for the failure
   std::error_code ec;
 
-#ifndef LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
+#if !LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
   // The id of the thread where this failure occurred
   uint32_t _thread_id{0};
   // The TLS path store entry
@@ -354,7 +379,7 @@ public:
   //! Retrieve any first path associated with this failure. Note this only works if called from the same thread as where the failure occurred.
   inline filesystem::path path1() const
   {
-#ifndef LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
+#if !LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
     if(QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id() == _thread_id)
     {
       auto &tls = detail::tls_errored_results();
@@ -370,7 +395,7 @@ public:
   //! Retrieve any second path associated with this failure. Note this only works if called from the same thread as where the failure occurred.
   inline filesystem::path path2() const
   {
-#ifndef LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
+#if !LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
     if(QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id() == _thread_id)
     {
       auto &tls = detail::tls_errored_results();
@@ -387,7 +412,7 @@ public:
   inline std::string message() const
   {
     std::string ret(ec.message());
-#ifndef LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
+#if !LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
     detail::append_path_info(*this, ret);
 #endif
     return ret;
