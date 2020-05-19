@@ -230,14 +230,16 @@ protected:
   }
 };
 
-#else   // LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
-template <class BaseStatusCodeDomain> using file_io_error_domain = BaseStatusCodeDomain;
-#endif  // LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
-
 namespace detail
 {
   using file_io_error_domain_value_system_code = file_io_error_value_type<SYSTEM_ERROR2_NAMESPACE::system_code::value_type>;
 }
+#else   // LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
+namespace detail
+{
+  using file_io_error_domain_value_system_code = SYSTEM_ERROR2_NAMESPACE::system_code::value_type;
+}
+#endif  // LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
 
 //! An erased status code
 using file_io_error = SYSTEM_ERROR2_NAMESPACE::errored_status_code<SYSTEM_ERROR2_NAMESPACE::erased<detail::file_io_error_domain_value_system_code>>;
