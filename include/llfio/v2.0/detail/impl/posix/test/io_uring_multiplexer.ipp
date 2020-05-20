@@ -400,6 +400,10 @@ namespace test
       using _impl = std::conditional_t<is_threadsafe, typename _base::_synchronised_io_operation_state, typename _base::_unsynchronised_io_operation_state>;
 
       _io_uring_operation_state *prev{nullptr}, *next{nullptr};
+      // These are cached here from the handle for performance
+      int fd{-1};
+      bool is_seekable{false};
+      bool submitted_to_iouring{false};
 
       _io_uring_operation_state() = default;
       // Construct implicitly from the base implementation, see relocate_to()
@@ -418,7 +422,9 @@ namespace test
         auto *to = _impl::relocate_to(to_);
         // restamp the vptr with my own
         auto _to = new(to) _io_uring_operation_state(std::move(*static_cast<_impl *>(to)));
-        _to->count = count;
+        _to->fd = fd;
+        _to->is_seekable = is_seekable;
+        _to->submitted_to_iouring = submitted_to_iouring;
         return _to;
       }
     };
@@ -429,13 +435,15 @@ namespace test
     {
       struct submission_t
       {
-        uint32_t *head{nullptr}, *tail{nullptr}, ring_mask{0}, ring_entries{0}, flags{0}, *dropped{nullptr}, *array{nullptr};
+        std::atomic<uint32_t> *head{nullptr}, *tail{nullptr}, *flags{nullptr}, *dropped{nullptr}, *array{nullptr};
+        uint32_t ring_mask{0}, ring_entries{0}; 
         span<uint32_t> queue;
         span<_io_uring_sqe> entries;
       } submission;
       struct completion_t
       {
-        uint32_t *head{nullptr}, *tail{nullptr}, ring_mask{0}, ring_entries{0}, *overflow{nullptr};
+        std::atomic<uint32_t> *head{nullptr}, *tail{nullptr}, *overflow{nullptr};
+        uint32_t ring_mask{0}, ring_entries{0};
         span<uint32_t> queue;
         span<_io_uring_cqe> entries;
       } completion;
@@ -447,7 +455,21 @@ namespace test
     struct _registered_fd
     {
       int fd{-1};
-      _io_uring_operation_state *first{nullptr}, *last{nullptr};
+      struct queue_t
+      {
+        _io_uring_operation_state *first{nullptr}, *last{nullptr};
+      };
+      // contains initiated i/o not yet submitted to io_uring. state->submitted_to_iouring will be false.
+      queue_t queued_reads, queued_writes_or_barriers;
+      // contains initiated i/o submitted to io_uring. state->submitted_to_iouring will be true.
+      struct
+      {
+        // For seekable devices, there can be multiple, concurrent, reads.
+        // For non-seekable devices, there is only one read submitted per file descriptor at a time.
+        queue_t reads;
+        // Only a single write/barrier, per file descriptor is submitted at a time.
+        _io_uring_operation_state *write_or_barrier{nullptr};
+      } inprogress;
 
       constexpr _registered_fd() {}
       explicit _registered_fd(int _fd)
@@ -460,51 +482,248 @@ namespace test
     bool _have_ioring_register_files_update{true};
     std::vector<registered_buffer_type> _registered_buffers;
 
-    std::vector<_registered_fd> _find_fd(int fd) const { auto ret = std::lower_bound(_registered_fds.begin(), _registered_fds.end(), fd);
+    std::vector<_registered_fd>::iterator _find_fd(int fd) const
+    {
+      auto ret = std::lower_bound(_registered_fds.begin(), _registered_fds.end(), fd);
       assert(fd == ret->fd);
       return ret;
     }
-    void _insert(int fd, _io_uring_operation_state *state)
+    static void _enqueue_to(_registered_fd::queue_t &queue, _io_uring_operation_state *state)
     {
       assert(state->prev == nullptr);
       assert(state->next == nullptr);
-      _registered_fd &mine = *_find_fd(fd);
-      assert(mine.first != state);
-      assert(mine.last != state);
-      if(mine.first == nullptr)
+      assert(queue.first != state);
+      assert(queue.last != state);
+      if(queue.first == nullptr)
       {
-        mine.first = mine.last = state;
+        queue.first = queue.last = state;
       }
       else
       {
-        assert(mine.last->next == nullptr);
-        state->prev = mine.last;
-        mine.last->next = state;
-        mine.last = state;
+        assert(queue.last->next == nullptr);
+        state->prev = queue.last;
+        queue.last->next = state;
+        queue.last = state;
       }
     }
-    void _detach(int fd, linux_io_uring_multiplexer *parent)
+    static void _dequeue_from(_registered_fd::queue_t &queue, _io_uring_operation_state *state)
     {
-      _registered_fd &mine = *_find_fd(fd);
-      if(prev == nullptr)
+      if(state->prev == nullptr)
       {
-        assert(mine.first == this);
-        mine.first = next;
+        assert(queue.first == this);
+        queue.first = state->next;
       }
       else
       {
-        prev->next = next;
+        state->prev->next = next;
       }
       if(next == nullptr)
       {
-        assert(mine.last == this);
-        mine.last = prev;
+        assert(queue.last == this);
+        queue.last = state->prev;
       }
       else
       {
-        next->prev = prev;
+        state->next->prev = state->prev;
       }
-      next = prev = nullptr;
+      state->next = state->prev = nullptr;
+    }
+    void _pump(_multiplexer_lock_guard &g)
+    {
+      // Drain completions first
+      auto drain_completions = [&](_nonseekable_t &inst) { 
+        for(;;)
+        {
+          uint32_t head = inst.completion.head->load(std::memory_order_acquire);
+          if(head == inst.completion.tail->load(std::memory_order_relaxed))
+          {
+            break;
+          }
+          _io_uring_cqe *cqe = &inst.completion.entries[head & inst.completion.ring_mask];
+          auto *state = (_io_uring_operation_state *) (uintptr_t) cqe->user_data;
+          assert(state->submitted_to_iouring);
+          assert(is_initiated(state->state));
+          auto it = _find_fd(state->fd);
+          assert(it != _registered_fds.end());
+          switch(state->state)
+          {
+          default:
+            abort();
+          case io_operation_state_type::read_initiated:
+          {
+            _dequeue_from(it->inprogress.reads, state);
+            auto &reqs = state->payload.noncompleted.params.read.reqs;
+            io_handle::io_result<io_handle::buffers_type> ret(reqs.buffers);
+            if(cqe->res < 0)
+            {
+              ret = posix_error(-cqe->res);
+            }
+            else
+            {
+              size_t bytesread = cqe->res;
+              for(size_t i = 0; i < reqs.buffers.size(); i++)
+              {
+                auto &buffer = reqs.buffers[i];
+                if(buffer.size() <= static_cast<size_t>(bytesread))
+                {
+                  bytesread -= buffer.size();
+                }
+                else
+                {
+                  buffer = {buffer.data(), (size_type) bytesread};
+                  reqs.buffers = {reqs.buffers.data(), i + 1};
+                  break;
+                }
+              }
+            }
+            g.unlock();
+            state->read_completed(std::move(ret));
+            g.lock();
+            break;
+          }
+          case io_operation_state_type::write_initiated:
+          {
+            assert(it->inprogress.write_or_barrier == state);
+            it->inprogress.write_or_barrier = nullptr;
+            auto &reqs = state->payload.noncompleted.params.write.reqs;
+            io_handle::io_result<io_handle::const_buffers_type> ret(reqs.buffers);
+            if(cqe->res < 0)
+            {
+              ret = posix_error(-cqe->res);
+            }
+            else
+            {
+              size_t bytesread = cqe->res;
+              for(size_t i = 0; i < reqs.buffers.size(); i++)
+              {
+                auto &buffer = reqs.buffers[i];
+                if(buffer.size() <= static_cast<size_t>(bytesread))
+                {
+                  bytesread -= buffer.size();
+                }
+                else
+                {
+                  buffer = {buffer.data(), (size_type) bytesread};
+                  reqs.buffers = {reqs.buffers.data(), i + 1};
+                  break;
+                }
+              }
+            }
+            g.unlock();
+            state->write_completed(std::move(ret));
+            g.lock();
+            break;
+          }
+          case io_operation_state_type::barrier_initiated:
+          {
+            assert(it->inprogress.write_or_barrier == state);
+            it->inprogress.write_or_barrier = nullptr;
+            auto &reqs = state->payload.noncompleted.params.barrier.reqs;
+            io_handle::io_result<io_handle::const_buffers_type> ret(reqs.buffers);
+            if(cqe->res < 0)
+            {
+              ret = posix_error(-cqe->res);
+            }
+            else
+            {
+              size_t bytesread = cqe->res;
+              for(size_t i = 0; i < reqs.buffers.size(); i++)
+              {
+                auto &buffer = reqs.buffers[i];
+                if(buffer.size() <= static_cast<size_t>(bytesread))
+                {
+                  bytesread -= buffer.size();
+                }
+                else
+                {
+                  buffer = {buffer.data(), (size_type) bytesread};
+                  reqs.buffers = {reqs.buffers.data(), i + 1};
+                  break;
+                }
+              }
+            }
+            g.unlock();
+            state->barrier_completed(std::move(ret));
+            g.lock();
+            break;
+          }
+          }
+        }
+      };
+      drain_completions(_nonseekable);
+      drain_completions(_seekable);
+
+      // For all registered fds without an inprogress operation and a non-empty queue,
+      // submit i/o
+      const uint32_t index = queue.submission.tail & queue.submission.ring_mask;
+      _io_uring_sqe *sqe = &queue.submission.entries[index];
+      auto submit = [&] {
+        queue.submission.array[index] = index;
+        queue.tail++;
+        WHAT AM I DOING HERE ? ;
+      };
+      switch(s)
+      {
+      case io_operation_state_type::read_initialised:
+      {
+        io_handle::io_result<io_handle::buffers_type> ret(state->payload.noncompleted.params.read.reqs.buffers);
+
+        /* Try to eagerly complete the i/o now, if so ... */
+        if(false /* completed immediately */)
+        {
+          state->read_completed(std::move(ret).value());
+          if(!_disable_immediate_completions /* state is no longer in use by anyone else */)
+          {
+            state->read_finished();
+            return io_operation_state_type::read_finished;
+          }
+          return io_operation_state_type::read_completed;
+        }
+        /* Otherwise the i/o has been initiated and will complete at some later point */
+        state->read_initiated();
+        _multiplexer_lock_guard g(this->_lock);
+        _insert(state);
+        return io_operation_state_type::read_initiated;
+      }
+      case io_operation_state_type::write_initialised:
+      {
+        io_handle::io_result<io_handle::const_buffers_type> ret(state->payload.noncompleted.params.write.reqs.buffers);
+        if(false /* completed immediately */)
+        {
+          state->write_completed(std::move(ret).value());
+          if(!_disable_immediate_completions /* state is no longer in use by anyone else */)
+          {
+            state->write_or_barrier_finished();
+            return io_operation_state_type::write_or_barrier_finished;
+          }
+          return io_operation_state_type::write_or_barrier_completed;
+        }
+        state->write_initiated();
+        _multiplexer_lock_guard g(this->_lock);
+        _insert(state);
+        return io_operation_state_type::write_initiated;
+      }
+      case io_operation_state_type::barrier_initialised:
+      {
+        io_handle::io_result<io_handle::const_buffers_type> ret(state->payload.noncompleted.params.write.reqs.buffers);
+        if(false /* completed immediately */)
+        {
+          state->barrier_completed(std::move(ret).value());
+          if(!_disable_immediate_completions /* state is no longer in use by anyone else */)
+          {
+            state->write_or_barrier_finished();
+            return io_operation_state_type::write_or_barrier_finished;
+          }
+          return io_operation_state_type::write_or_barrier_completed;
+        }
+        state->write_initiated();
+        _multiplexer_lock_guard g(this->_lock);
+        _insert(state);
+        return io_operation_state_type::barrier_initiated;
+      }
+      default:
+        break;
+      }
     }
 
   public:
@@ -549,7 +768,9 @@ namespace test
           }
         }
       }
-      fd = _io_uring_setup(getpagesize() / sizeof(_io_uring_sqe), &params);
+      // 64 items is 4Kb of sqe entries. Given the binary searched registered fd table, more than
+      // this would not be useful.
+      fd = _io_uring_setup(64, &params);
       if(fd < 0)
       {
         return posix_error();
@@ -561,13 +782,13 @@ namespace test
           return posix_error();
         }
         out.submission.queue = {(uint32_t *) p, params.sq_entries};
-        out.head = &out.submission.queue[params.sq_off.head];
-        out.tail = &out.submission.queue[params.sq_off.tail];
-        out.ring_mask = out.submission.queue[params.sq_off.ring_mask];
-        out.ring_entries = out.submission.queue[params.sq_off.ring_entries];
-        out.flags = out.submission.queue[params.sq_off.flags];
-        out.dropped = &out.submission.queue[params.sq_off.dropped];
-        out.array = &out.submission.queue[params.sq_off.array];
+        out.head = &out.submission.queue[params.sq_off.head / sizeof(uint32_t)];
+        out.tail = &out.submission.queue[params.sq_off.tail / sizeof(uint32_t)];
+        out.ring_mask = out.submission.queue[params.sq_off.ring_mask / sizeof(uint32_t)];
+        out.ring_entries = out.submission.queue[params.sq_off.ring_entries / sizeof(uint32_t)];
+        out.flags = out.submission.queue[params.sq_off.flags / sizeof(uint32_t)];
+        out.dropped = &out.submission.queue[params.sq_off.dropped / sizeof(uint32_t)];
+        out.array = &out.submission.queue[params.sq_off.array / sizeof(uint32_t)];
       }
       {
         auto *p = ::mmap(nullptr, params.sq_entries * sizeof(_io_uring_sqe), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_POPULATE, fd, _IORING_OFF_SQES);
@@ -584,12 +805,12 @@ namespace test
           return posix_error();
         }
         out.completion.queue = {(uint32_t *) p, params.cq_entries};
-        out.head = &out.completion.queue[params.cq_off.head];
-        out.tail = &out.completion.queue[params.cq_off.tail];
-        out.ring_mask = out.completion.queue[params.cq_off.ring_mask];
-        out.ring_entries = out.completion.queue[params.cq_off.ring_entries];
-        out.overflow = out.completion.queue[params.cq_off.overflow];
-        out.completion.entries = {(_io_uring_cqe *) &out.completion.queue[params.cq_off.cqes], params.cq_entries};
+        out.head = &out.completion.queue[params.cq_off.head / sizeof(uint32_t)];
+        out.tail = &out.completion.queue[params.cq_off.tail / sizeof(uint32_t)];
+        out.ring_mask = out.completion.queue[params.cq_off.ring_mask / sizeof(uint32_t)];
+        out.ring_entries = out.completion.queue[params.cq_off.ring_entries / sizeof(uint32_t)];
+        out.overflow = out.completion.queue[params.cq_off.overflow / sizeof(uint32_t)];
+        out.completion.entries = {(_io_uring_cqe *) &out.completion.queue[params.cq_off.cqes / sizeof(uint32_t)], params.cq_entries};
       }
       this->_v.behaviour |= native_handle_type::disposition::multiplexer;
       return fd;
@@ -626,7 +847,7 @@ namespace test
         }
       };
       do_close(_seekable);
-      if(-1!=_seekable.fd)
+      if(-1 != _seekable.fd)
       {
         if(-1 == ::close(_seekable.fd))
         {
@@ -681,8 +902,12 @@ namespace test
     virtual result<uint8_t> do_io_handle_register(io_handle *h) noexcept override  // linear complexity to total handles registered
     {
       _multiplexer_lock_guard g(this->_lock);
+      if(_registered_fds.size() >= 64)
+      {
+        return errc::resource_unavailable_try_again;  // This test multiplexer can't handle more than 64 handles
+      }
       int toinsert = h->native_handle().fd;
-      _registered_fds.push_back(); // capacity expansion
+      _registered_fds.push_back();  // capacity expansion
       _registered_fds.pop_back();
       _registered_fds.insert(std::lower_bound(_registered_fds.begin(), _registered_fds.end(), toinsert), toinsert);
       return _recalculate_registered_fds(toinsert, toinsert);
@@ -693,7 +918,7 @@ namespace test
       int toremove = h->native_handle().fd;
       auto it = _find_fd(fd);
       assert(it->first == nullptr);
-      if(it->first!=nullptr)
+      if(it->first != nullptr)
       {
         return errc::operation_in_progress;
       }
@@ -772,180 +997,58 @@ namespace test
         assert(false);
         return s;
       }
-      _nonseekable_t &queue = state->h->is_seekable() ? _seekable : _nonseekable;
-      const uint32_t index = queue.submission.tail & queue.submission.ring_mask;
-      _io_uring_sqe *sqe = &queue.submission.entries[index];
-      auto submit = [&] { queue.submission.array[index] = index;
-        queue.tail++;
-        WHAT AM I DOING HERE ? ;
-      };
+      bool use_write_barrier_queue = false;
       switch(s)
       {
       case io_operation_state_type::read_initialised:
       {
-        io_handle::io_result<io_handle::buffers_type> ret(state->payload.noncompleted.params.read.reqs.buffers);
-
-        /* Try to eagerly complete the i/o now, if so ... */
-        if(false /* completed immediately */)
-        {
-          state->read_completed(std::move(ret).value());
-          if(!_disable_immediate_completions /* state is no longer in use by anyone else */)
-          {
-            state->read_finished();
-            return io_operation_state_type::read_finished;
-          }
-          return io_operation_state_type::read_completed;
-        }
-        /* Otherwise the i/o has been initiated and will complete at some later point */
         state->read_initiated();
-        _multiplexer_lock_guard g(this->_lock);
-        _insert(state);
-        return io_operation_state_type::read_initiated;
+        break;
       }
       case io_operation_state_type::write_initialised:
       {
-        io_handle::io_result<io_handle::const_buffers_type> ret(state->payload.noncompleted.params.write.reqs.buffers);
-        if(false /* completed immediately */)
-        {
-          state->write_completed(std::move(ret).value());
-          if(!_disable_immediate_completions /* state is no longer in use by anyone else */)
-          {
-            state->write_or_barrier_finished();
-            return io_operation_state_type::write_or_barrier_finished;
-          }
-          return io_operation_state_type::write_or_barrier_completed;
-        }
         state->write_initiated();
-        _multiplexer_lock_guard g(this->_lock);
-        _insert(state);
-        return io_operation_state_type::write_initiated;
+        use_write_barrier_queue = true;
+        break;
       }
       case io_operation_state_type::barrier_initialised:
       {
-        io_handle::io_result<io_handle::const_buffers_type> ret(state->payload.noncompleted.params.write.reqs.buffers);
-        if(false /* completed immediately */)
-        {
-          state->barrier_completed(std::move(ret).value());
-          if(!_disable_immediate_completions /* state is no longer in use by anyone else */)
-          {
-            state->write_or_barrier_finished();
-            return io_operation_state_type::write_or_barrier_finished;
-          }
-          return io_operation_state_type::write_or_barrier_completed;
-        }
-        state->write_initiated();
-        _multiplexer_lock_guard g(this->_lock);
-        _insert(state);
-        return io_operation_state_type::barrier_initiated;
-      }
-      default:
+        state->barrier_initiated();
+        use_write_barrier_queue = true;
         break;
       }
-      return s;
+      }
+      state->fd = state->h->native_handle().fd;
+      state->is_seekable = state->h->is_seekable();
+      assert(state->submitted_to_iouring == false);
+      _multiplexer_lock_guard g(this->_lock);
+      auto it = _find_fd(state->fd);
+      assert(it != _registered_fds.end());
+      _enqueue_to(use_write_barrier_queue ? it->queued_writes_or_barriers : it->queued_reads, state);
+      return state->state;
     }
 
-    // If you can combine `construct()` with `init_io_operation()` into a more efficient implementation,
-    // you should override these
     // virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept override
     // virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept override
     // virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept override
 
-    // On some implementations, `init_io_operation()` just enqueues request packets, and
-    // a separate operation is required to submit the enqueued list.
-    virtual result<void> flush_inited_io_operations() noexcept override { return success(); }
+    virtual result<void> flush_inited_io_operations() noexcept override
+    {
+      _multiplexer_lock_guard g(this->_lock);
+      _pump(g);
+      return success();
+    }
 
-    // This must check an individual i/o state, if it has completed or finished you must invoke its
-    // visitor
     virtual io_operation_state_type check_io_operation(io_operation_state *_op) noexcept override
     {
       auto *state = static_cast<_io_uring_operation_state *>(_op);
       typename io_operation_state::lock_guard g(state);
-      if(state->count > 0)
-      {
-        --state->count;
-      }
-      if(state->count < 2)
-      {
-        switch(state->state)
-        {
-        case io_operation_state_type::unknown:
-          abort();
-        case io_operation_state_type::read_initialised:
-        case io_operation_state_type::write_initialised:
-        case io_operation_state_type::barrier_initialised:
-          assert(false);
-          break;
-        case io_operation_state_type::read_initiated:
-        {
-          io_handle::io_result<io_handle::buffers_type> ret(state->payload.noncompleted.params.read.reqs.buffers);
-          state->_read_completed(g, std::move(ret).value());
-          if(_disable_immediate_completions)
-          {
-            return io_operation_state_type::read_completed;
-          }
-          state->_read_finished(g);
-          _multiplexer_lock_guard g2(this->_lock);
-          state->detach(this);
-          state->count = 0;
-          return io_operation_state_type::read_finished;
-        }
-        case io_operation_state_type::read_completed:
-        {
-          state->_read_finished(g);
-          _multiplexer_lock_guard g2(this->_lock);
-          state->detach(this);
-          state->count = 0;
-          return io_operation_state_type::read_finished;
-        }
-        case io_operation_state_type::write_initiated:
-        {
-          io_handle::io_result<io_handle::const_buffers_type> ret(state->payload.noncompleted.params.write.reqs.buffers);
-          state->_write_completed(g, std::move(ret).value());
-          if(_disable_immediate_completions)
-          {
-            return io_operation_state_type::write_or_barrier_completed;
-          }
-          state->_write_or_barrier_finished(g);
-          _multiplexer_lock_guard g2(this->_lock);
-          state->detach(this);
-          state->count = 0;
-          return io_operation_state_type::write_or_barrier_finished;
-        }
-        case io_operation_state_type::barrier_initiated:
-        {
-          io_handle::io_result<io_handle::const_buffers_type> ret(state->payload.noncompleted.params.barrier.reqs.buffers);
-          state->_barrier_completed(g, std::move(ret).value());
-          if(_disable_immediate_completions)
-          {
-            return io_operation_state_type::write_or_barrier_completed;
-          }
-          state->_write_or_barrier_finished(g);
-          _multiplexer_lock_guard g2(this->_lock);
-          state->detach(this);
-          state->count = 0;
-          return io_operation_state_type::write_or_barrier_finished;
-        }
-        case io_operation_state_type::write_or_barrier_completed:
-        {
-          state->_write_or_barrier_finished(g);
-          _multiplexer_lock_guard g2(this->_lock);
-          state->detach(this);
-          state->count = 0;
-          return io_operation_state_type::write_or_barrier_finished;
-        }
-        case io_operation_state_type::read_finished:
-        case io_operation_state_type::write_or_barrier_finished:
-          assert(false);
-          break;
-        }
-      }
+      _pump(g);
       return state->state;
     }
 
-    // This attempts to cancel the in-progress i/o within the given deadline.
     virtual result<io_operation_state_type> cancel_io_operation(io_operation_state *_op, deadline d = {}) noexcept override
     {
-      (void) d;
       auto *state = static_cast<_io_uring_operation_state *>(_op);
       typename io_operation_state::lock_guard g(state);
       switch(state->state)
