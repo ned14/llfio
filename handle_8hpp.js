@@ -3,6 +3,7 @@ var handle_8hpp =
     [ "handle", "classllfio__v2__xxx_1_1handle.html", "classllfio__v2__xxx_1_1handle" ],
     [ "construct", "structllfio__v2__xxx_1_1construct.html", "structllfio__v2__xxx_1_1construct" ],
     [ "close", "handle_8hpp.html#af6109ac3bc59d2b15edcded08060d1b0", null ],
+    [ "fill_failure_info", "handle_8hpp.html#a286da8606a5eb74cf26dcc9838c49ae8", null ],
     [ "log_inst_to_info", "handle_8hpp.html#a72a6e1add1783bc959c4954ac92300f8", null ],
     [ "operator<<", "handle_8hpp.html#ae33af5701ff0ec4573bd72c7e71a04cf", null ],
     [ "operator<<", "handle_8hpp.html#a869dd7b04685be755d854dea281f84c6", null ],
