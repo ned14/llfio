@@ -318,7 +318,7 @@ namespace test
           }
           return io_operation_state_type::write_or_barrier_completed;
         }
-        state->write_initiated();
+        state->barrier_initiated();
         _multiplexer_lock_guard g(this->_lock);
         _insert(state);
         return io_operation_state_type::barrier_initiated;
