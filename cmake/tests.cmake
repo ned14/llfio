@@ -27,6 +27,7 @@ set(llfio_TESTS
   "test/tests/shared_fs_mutex.cpp"
   "test/tests/symlink_handle_create_close/kernel_symlink_handle.cpp.hpp"
   "test/tests/symlink_handle_create_close/runner.cpp"
+  "test/tests/traverse.cpp"
   "test/tests/trivial_vector.cpp"
   "test/tests/utils.cpp"
 )
