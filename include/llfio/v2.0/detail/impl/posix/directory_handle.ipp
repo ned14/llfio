@@ -458,7 +458,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
       case DT_SOCK:
         item.stat.st_type = filesystem::file_type::socket;
         break;
-      default:
+      case DT_UNKNOWN:
         // Don't say we return type
         default_stat_contents = default_stat_contents & ~stat_t::want::type;
         break;

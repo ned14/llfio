@@ -57,7 +57,7 @@ if(NOT quickcpplib_done)
     if(NOT EXISTS "${CTEST_QUICKCPPLIB_CLONE_DIR}/repo/cmakelib")
       message(STATUS "quickcpplib not found, cloning git repository and installing into ${CTEST_QUICKCPPLIB_CLONE_DIR} ...")
       include(FindGit)
-      execute_process(COMMAND "${GIT_EXECUTABLE}" clone "https://github.com/ned14/quickcpplib.git" repo
+      execute_process(COMMAND "${GIT_EXECUTABLE}" clone --recurse-submodules --depth 1 --jobs 8 --shallow-submodules "https://github.com/ned14/quickcpplib.git" repo
         WORKING_DIRECTORY "${CTEST_QUICKCPPLIB_CLONE_DIR}"
         OUTPUT_VARIABLE cloneout
         ERROR_VARIABLE errout
