@@ -46,6 +46,8 @@ namespace algorithm
     /*! \brief Called when we failed to open a directory for enumeration.
     The default fails the traversal with that error. Return a default constructed
     instance to ignore the failure.
+
+    \note May be called from multiple kernel threads concurrently.
     */
     virtual result<directory_handle> directory_open_failed(result<void>::error_type &&error, const directory_handle &dirh, path_view leaf) noexcept
     {
@@ -63,6 +65,8 @@ namespace algorithm
     a different filesystem from the root, here is best.
 
     The default returns `true`.
+
+    \note May be called from multiple kernel threads concurrently.
     */
     virtual result<bool> pre_enumeration(const directory_handle &dirh) noexcept
     {
@@ -76,6 +80,8 @@ namespace algorithm
     You are guaranteed that at least `stat.st_type` is valid for
     every entry in `contents`, and items whose type is a directory will
     be enqueued after this call for later traversal.
+
+    \note May be called from multiple kernel threads concurrently.
     */
     virtual result<void> post_enumeration(const directory_handle &dirh, directory_handle::buffers_type &contents) noexcept
     {
@@ -95,6 +101,8 @@ namespace algorithm
     traversed.
     \param known_depth_remaining The currently known number of levels we
     shall traverse.
+
+    \note May be called from multiple kernel threads concurrently.
     */
     virtual result<void> stack_updated(size_t dirs_processed, size_t known_dirs_remaining, size_t depth_processed, size_t known_depth_remaining) noexcept
     {
@@ -104,6 +112,11 @@ namespace algorithm
       (void) known_depth_remaining;
       return success();
     }
+
+    /*! \brief Called with a traversal finishes, whether due to success
+    or failure. Always called from the original thread.
+    */
+    virtual result<size_t> finished(result<size_t> result) noexcept { return result; }
   };
 
 
