@@ -1,5 +1,12 @@
 var NAVTREEINDEX11 =
 {
+"structllfio__v2__xxx_1_1directory__entry.html":[4,0,2,18],
+"structllfio__v2__xxx_1_1directory__entry.html#a5a6d56ab917ea2a44ec06019bb9dd45e":[4,0,2,18,0],
+"structllfio__v2__xxx_1_1directory__entry.html#ac679ef1297de655163136230986c0ffe":[4,0,2,18,1],
+"structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html":[4,0,2,19,0],
+"structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a14d4df3a12986e4938ec8a5f8427e4ca":[4,0,2,19,0,6],
+"structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a181d1decd2c1456924e5029096a294e2":[4,0,2,19,0,4],
+"structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a49ed1fc7d1b5b0b6bc8e039b228d3888":[4,0,2,19,0,3],
 "structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a6211e0e13161ab09825492cc6efb0fa5":[4,0,2,19,0,7],
 "structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a642a415d3444c11886c3bace729b917b":[4,0,2,19,0,5],
 "structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a83249c8307c80703efff0eb0c8cde85e":[4,0,2,19,0,8],
@@ -242,12 +249,5 @@ var NAVTREEINDEX11 =
 "structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state__visitor.html#ad9ded29fcb56dcbb2da09a8283522fde":[4,0,2,28,8,2],
 "structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state__visitor.html#ae46b4b960372e5dad3a53d45150b01a1":[4,0,2,28,8,6],
 "structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state__visitor.html#aebc252f2af1bd28a52f2007dc0469dcd":[4,0,2,28,8,9],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state__visitor.html#aee18da8642e904dca9fa1fdd329ca8da":[4,0,2,28,8,1],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html":[4,0,2,28,9],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html#a04660f54ccc5b567f5eab5c17c6b2603":[4,0,2,28,9,3],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html#a69b2277c0380ceaa1ba4ec5b7db2393a":[4,0,2,28,9,1],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html#aaa060d6a214d592e7d3e99e65c0071e5":[4,0,2,28,9,0],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html#af0f3675316aad33663b29fbcc18ecd13":[4,0,2,28,9,2],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html":[4,0,2,28,10],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html#a24c0f3c8835b190aa68b62c63b2785ad":[4,0,2,28,10,3]
+"structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state__visitor.html#aee18da8642e904dca9fa1fdd329ca8da":[4,0,2,28,8,1]
 };

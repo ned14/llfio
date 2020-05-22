@@ -114,6 +114,8 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">union &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="unionllfio__v2__xxx_1_1algorithm_1_1remove__all__callback__arg.html">remove_all_callback_arg</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of an argument for a <code>remove_all()</code> callback.  <a href="unionllfio__v2__xxx_1_1algorithm_1_1remove__all__callback__arg.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html">traverse_visitor</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides a constant time capacity expanding move-only STL vector. Requires <code>T</code> to be trivially copyable.  <a href="classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -148,6 +150,9 @@ Functions</h2></td></tr>
 <tr class="separator:a3009e68eae33fa0675e3eddc9a1d3043"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8d527a8b5a5a829884151a40421fd457"><td class="memItemLeft" align="right" valign="top">result&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a8d527a8b5a5a829884151a40421fd457">remove_all</a> (<a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;&amp;dirh, size_t threads=0) noexcept</td></tr>
 <tr class="separator:a8d527a8b5a5a829884151a40421fd457"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa0a9067dc6e22ae1125b8c20466d9e0"><td class="memItemLeft" align="right" valign="top">result&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#afa0a9067dc6e22ae1125b8c20466d9e0">traverse</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;dirh, <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html">traverse_visitor</a> *visitor, size_t threads=0, bool force_slow_path=false) noexcept</td></tr>
+<tr class="memdesc:afa0a9067dc6e22ae1125b8c20466d9e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Traverse everything within and under <code>dirh</code>.  <a href="#afa0a9067dc6e22ae1125b8c20466d9e0">More...</a><br /></td></tr>
+<tr class="separator:afa0a9067dc6e22ae1125b8c20466d9e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6e8566ac7a5eeb0c14cf2387dfb8c1a1"><td class="memTemplParams" colspan="2"><a id="a6e8566ac7a5eeb0c14cf2387dfb8c1a1"></a>
 template&lt;class T &gt; </td></tr>
 <tr class="memitem:a6e8566ac7a5eeb0c14cf2387dfb8c1a1"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a6e8566ac7a5eeb0c14cf2387dfb8c1a1">operator==</a> (const <a class="el" href="classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a>&lt; T &gt; &amp;a, const <a class="el" href="classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html">trivial_vector</a>&lt; T &gt; &amp;b)</td></tr>
@@ -395,6 +400,76 @@ template&lt;class F &gt; </div>
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
 <div class="fragment"><div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx_1_1algorithm.html#a8d527a8b5a5a829884151a40421fd457">detail::remove_all</a>(std::move(dirh), {}, threads); }</div><div class="ttc" id="namespacellfio__v2__xxx_1_1algorithm_html_a8d527a8b5a5a829884151a40421fd457"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1algorithm.html#a8d527a8b5a5a829884151a40421fd457">llfio_v2_xxx::algorithm::remove_all</a></div><div class="ttdeci">result&lt; size_t &gt; remove_all(directory_handle &amp;&amp;dirh, size_t threads=0) noexcept</div><div class="ttdef"><b>Definition:</b> remove_all.hpp:157</div></div>
 </div><!-- fragment -->
+</div>
+</div>
+<a id="afa0a9067dc6e22ae1125b8c20466d9e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afa0a9067dc6e22ae1125b8c20466d9e0">&#9670;&nbsp;</a></span>traverse()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;size_t&gt; llfio_v2_xxx::algorithm::traverse </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>dirh</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html">traverse_visitor</a> *&#160;</td>
+          <td class="paramname"><em>visitor</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>threads</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>force_slow_path</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Traverse everything within and under <code>dirh</code>. </p>
+<p>The algorithm is as follows:</p>
+<ol type="1">
+<li>Call <code>pre_enumeration()</code> of the visitor on the <code>directory_handle</code> about to be enumerated.</li>
+<li>Enumerate the contents of the directory.</li>
+<li>Call <code>post_enumeration()</code> of the visitor on the contents just enumerated.</li>
+<li>For each directory in the contents, append the directory handle and each directory leafname to its hierarchy depth level in a stack of lists.</li>
+<li>Loop, using the least deep available item in the stack, until the stack is empty.</li>
+</ol>
+<p>If <code>known_dirs_remaining</code> exceeds four, a threadpool of not more than <code>threads</code> threads is spun up in order to traverse the hierarchy more quickly.</p>
+<p>This algorithm is therefore primarily a breadth-first algorithm, in that we proceed from root, level by level, to the tips. The number returned is the total number of directories traversed.</p>
+<h2>Notes</h2>
+<p>The implementation tries hard to not open too many file descriptors at a time in order to not exceed the system limit, which may be as low as 1024 on POSIX. On POSIX, it checks <code>getrlimit(RLIMIT_NOFILE)</code> for the soft limit on open file descriptors, and if the remaining unused open file descriptors is less than 65536, it will prefer a slow path implementation which exchanges file descriptor usage for lots more dynamic memory allocation and memory copying. You can force this slow path on any platform using <code>force_slow_path</code>, and in correct code you should always check for failures in <code>directory_open_failed()</code> comparing equal to <code>errc::too_many_files_open</code>, and if encountered restart the traversal using the slow path forced.</p>
+<p>Almost every modern POSIX system allows a <code>RLIMIT_NOFILE</code> of over a million nowadays, so you should <code>setrlimit(RLIMIT_NOFILE)</code> appropriately in your program if you are absolutely sure that doing so will not break code in your program (e.g. <code>select()</code> fails spectacularly if file descriptors exceed 1024 on most POSIX).</p>
+<p>To give an idea of the difference slow path makes, for Linux ext4:</p>
+<ul>
+<li>Slow path, 1 thread, traversed 131,915 directories and 8,254,162 entries in 3.10 seconds.</li>
+<li>Slow path, 16 threads, traversed 131,915 directories and 8,254,162 entries in 0.966 seconds.</li>
+<li>Fast path, 1 thread, traversed 131,915 directories and 8,254,162 entries in 2.73 seconds (+12%).</li>
+<li>Fast path, 16 threads, traversed 131,915 directories and 8,254,162 entries in 0.525 seconds (+46%). </li>
+</ul>
+
 </div>
 </div>
 </div><!-- contents -->
