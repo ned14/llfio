@@ -46,6 +46,8 @@ namespace algorithm
     /*! \brief Called when we failed to open a directory for enumeration.
     The default fails the traversal with that error. Return a default constructed
     instance to ignore the failure.
+
+    \note May be called from multiple kernel threads concurrently.
     */
     virtual result<directory_handle> directory_open_failed(result<void>::error_type &&error, const directory_handle &dirh, path_view leaf) noexcept
     {
@@ -56,12 +58,15 @@ namespace algorithm
 
     /*! \brief Called to decide whether to enumerate a directory.
 
-    Note that it is more efficient to remove the directory entry in
+    Note that it is more efficient to ignore the directory entry in
     `post_enumeration()` than to ignore it here, as a handle is opened
     for the directory before this callback. Equally, if you need that
-    handle to inspect the directory, here is best.
+    handle to inspect the directory e.g. to check if one is entering
+    a different filesystem from the root, here is best.
 
     The default returns `true`.
+
+    \note May be called from multiple kernel threads concurrently.
     */
     virtual result<bool> pre_enumeration(const directory_handle &dirh) noexcept
     {
@@ -70,7 +75,13 @@ namespace algorithm
     }
 
     /*! \brief Called just after each directory enumeration. You can
-    modify the results to affect the traversal.
+    modify the results to affect the traversal, typically you would
+    set the stat to default constructed to cause it to be ignored.
+    You are guaranteed that at least `stat.st_type` is valid for
+    every entry in `contents`, and items whose type is a directory will
+    be enqueued after this call for later traversal.
+
+    \note May be called from multiple kernel threads concurrently.
     */
     virtual result<void> post_enumeration(const directory_handle &dirh, directory_handle::buffers_type &contents) noexcept
     {
@@ -90,6 +101,8 @@ namespace algorithm
     traversed.
     \param known_depth_remaining The currently known number of levels we
     shall traverse.
+
+    \note May be called from multiple kernel threads concurrently.
     */
     virtual result<void> stack_updated(size_t dirs_processed, size_t known_dirs_remaining, size_t depth_processed, size_t known_depth_remaining) noexcept
     {
@@ -99,6 +112,11 @@ namespace algorithm
       (void) known_depth_remaining;
       return success();
     }
+
+    /*! \brief Called with a traversal finishes, whether due to success
+    or failure. Always called from the original thread.
+    */
+    virtual result<size_t> finished(result<size_t> result) noexcept { return result; }
   };
 
 
@@ -120,16 +138,38 @@ namespace algorithm
   If `known_dirs_remaining` exceeds four, a threadpool of not more than `threads` threads
   is spun up in order to traverse the hierarchy more quickly.
 
-  The number returned is the total number of directories traversed.
+  This algorithm is therefore primarily a breadth-first algorithm, in that we proceed from
+  root, level by level, to the tips. The number returned is the total number of directories
+  traversed.
 
   ## Notes
 
   The implementation tries hard to not open too many file descriptors at a time in order to
-  not exceed the system limit, which may be as low as 1024 on POSIX. Inevitably the open file
-  descriptor count is a function of the thread count, with approximately two open file
-  descriptors possible per thread.
+  not exceed the system limit, which may be as low as 1024 on POSIX. On POSIX, it checks
+  `getrlimit(RLIMIT_NOFILE)` for the soft limit on open file descriptors, and if the remaining
+  unused open file descriptors is less than 65536, it will prefer a slow path implementation
+  which exchanges file descriptor usage for lots more dynamic memory allocation and memory
+  copying. You can force this slow path on any platform using `force_slow_path`, and in
+  correct code you should always check for failures in `directory_open_failed()` comparing
+  equal to `errc::too_many_files_open`, and if encountered restart the traversal using the
+  slow path forced.
+
+  Almost every modern POSIX system allows a `RLIMIT_NOFILE` of over a million nowadays,
+  so you should `setrlimit(RLIMIT_NOFILE)` appropriately in your program if you are absolutely
+  sure that doing so will not break code in your program (e.g. `select()` fails spectacularly
+  if file descriptors exceed 1024 on most POSIX).
+
+  To give an idea of the difference slow path makes, for Linux ext4:
+
+  - Slow path, 1 thread, traversed 131,915 directories and 8,254,162 entries in 3.10 seconds.
+
+  - Slow path, 16 threads, traversed 131,915 directories and 8,254,162 entries in 0.966 seconds.
+
+  - Fast path, 1 thread, traversed 131,915 directories and 8,254,162 entries in 2.73 seconds (+12%).
+
+  - Fast path, 16 threads, traversed 131,915 directories and 8,254,162 entries in 0.525 seconds (+46%).
   */
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<size_t> traverse(const path_handle &dirh, traverse_visitor *visitor, size_t threads = 0) noexcept;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<size_t> traverse(const path_handle &dirh, traverse_visitor *visitor, size_t threads = 0, bool force_slow_path = false) noexcept;
 
 }  // namespace algorithm
 

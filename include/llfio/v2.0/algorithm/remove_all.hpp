@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef LLFIO_ALGORITHM_REMOVE_ALL_HPP
 #define LLFIO_ALGORITHM_REMOVE_ALL_HPP
 
-#include "../directory_handle.hpp"
+#include "traverse.hpp"
 
 
 //! \file remove_all.hpp Provides a reliable directory tree removal algorithm.
