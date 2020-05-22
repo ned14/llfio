@@ -29,6 +29,10 @@ Distributed under the Boost Software License, Version 1.0.
 #include "quickcpplib/algorithm/small_prng.hpp"
 #include "quickcpplib/algorithm/string.hpp"
 
+#ifndef _WIN32
+#include <sys/resource.h>
+#endif
+
 static inline void TestTraverse()
 {
   using namespace LLFIO_V2_NAMESPACE;
@@ -52,11 +56,13 @@ static inline void TestTraverse()
       (void) error;
       (void) dirh;
       (void) leaf;
-      //std::cerr << "  Failed to open " << (dirh.current_path().value() / leaf.path()) << " due to " << error.message() << std::endl;
+      // std::cerr << "  Failed to open " << (dirh.current_path().value() / leaf.path()) << " due to " << error.message() << std::endl;
       return success();
     }
     virtual result<bool> pre_enumeration(const directory_handle &dirh) noexcept override
     {
+      (void) dirh;
+#ifndef _WIN32
       if(root_dev_id == 0)
       {
         root_dev_id = dirh.st_dev();
@@ -64,18 +70,19 @@ static inline void TestTraverse()
       else
       {
         // Don't enter other filesystems
-        if(dirh.st_dev()!=root_dev_id)
+        if(dirh.st_dev() != root_dev_id)
         {
           return false;
         }
       }
+#endif
       return true;
     }
     virtual result<void> post_enumeration(const directory_handle &dirh, directory_handle::buffers_type &contents) noexcept override
     {
       (void) dirh;
       items_enumerated.fetch_add(contents.size(), std::memory_order_relaxed);
-      //std::cerr << "  " << dirh.current_path().value() << std::endl;
+      // std::cerr << "  " << dirh.current_path().value() << std::endl;
       return success();
     }
     virtual result<void> stack_updated(size_t dirs_processed, size_t known_dirs_remaining, size_t depth_processed, size_t known_depth_remaining) noexcept override
@@ -95,6 +102,62 @@ static inline void TestTraverse()
       return success();
     }
   };
+#ifndef _WIN32
+  {
+    struct rlimit r
+    {
+      1024 * 1024, 1024 * 1024
+    };
+    setrlimit(RLIMIT_NOFILE, &r);
+  }
+#endif
+#if 0
+  {
+    static constexpr size_t total_entries = 100000;  // create 100000 directories in each random directory tree
+    using LLFIO_V2_NAMESPACE::file_handle;
+    using QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng;
+    using QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string;
+    small_prng rand;
+    std::vector<directory_handle> dirhs;
+    dirhs.reserve(total_entries);
+    size_t entries_created = 1;
+    dirhs.clear();
+    dirhs.emplace_back(directory_handle::temp_directory().value());
+    auto dirhpath = dirhs.front().current_path().value();
+    std::cout << "\n\nCreating a random directory tree containing " << total_entries << " directories at " << dirhpath << " ..." << std::endl;
+    auto begin = std::chrono::high_resolution_clock::now();
+    for(size_t entries = 0; entries < total_entries; entries++)
+    {
+      const auto v = rand();
+      const auto dir_idx = ((v >> 8) % dirhs.size());
+      const auto file_entries = (v & 255);
+      const auto &dirh = dirhs[dir_idx];
+      filesystem::path::value_type buffer[10];
+      {
+        auto c = (uint32_t) entries;
+        buffer[0] = 'd';
+        to_hex_string(buffer + 1, 8, (const char *) &c, 4);
+        buffer[9] = 0;
+      }
+      auto h = directory_handle::directory(dirh, path_view(buffer, 9, true), directory_handle::mode::write, directory_handle::creation::if_needed).value();
+      for(size_t n = 0; n < file_entries; n++)
+      {
+        auto c = (uint8_t) n;
+        buffer[0] = 'f';
+        to_hex_string(buffer + 1, 2, (const char *) &c, 1);
+        buffer[3] = 0;
+        file_handle::file(h, path_view(buffer, 3, true), file_handle::mode::write, file_handle::creation::if_needed).value();
+        entries_created++;
+      }
+      entries_created++;
+      dirhs.emplace_back(std::move(h));
+    }
+    auto end = std::chrono::high_resolution_clock::now();
+    dirhs.resize(1);
+    std::cout << "Created " << entries_created << " filesystem entries in " << (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000000.0) << " seconds (which is " << (entries_created / (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000000.0))
+              << " entries/sec).\n";
+  }
+#endif
 
   std::cout << "Traversing " << to_traverse_path << " using a single thread ..." << std::endl;
   my_traverse_visitor visitor_st;

@@ -35,7 +35,7 @@ static inline void TestRemoveAll()
 #if defined(_WIN32) || defined(__APPLE__)
   static constexpr size_t total_entries = 100;  // create 100 directories in each random directory tree
 #else
-  static constexpr size_t total_entries = 1000;  // create 10000 directories in each random directory tree
+  static constexpr size_t total_entries = 1000;  // create 1000 directories in each random directory tree
 #endif
   using namespace LLFIO_V2_NAMESPACE;
   using LLFIO_V2_NAMESPACE::file_handle;

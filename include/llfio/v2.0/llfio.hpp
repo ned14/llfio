@@ -78,7 +78,6 @@ import LLFIO_MODULE_NAME;
 #include "algorithm/shared_fs_mutex/byte_ranges.hpp"
 #include "algorithm/shared_fs_mutex/lock_files.hpp"
 #include "algorithm/shared_fs_mutex/safe_byte_ranges.hpp"
-#include "algorithm/traverse.hpp"
 
 #ifndef LLFIO_EXCLUDE_MAPPED_FILE_HANDLE
 #include "mapped.hpp"

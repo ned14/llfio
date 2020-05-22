@@ -334,7 +334,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
         {
           ntstat = ntwait(_v.h, isb, deadline());
         }
-        if(0x80000006 /*STATUS_NO_MORE_FILES*/ == ntstat)
+        if(0x80000006 /*STATUS_NO_MORE_FILES*/ == ntstat || ntstat < 0)
         {
           break;
         }
