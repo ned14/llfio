@@ -44,7 +44,7 @@ var searchData=
   ['st_5fsparse',['st_sparse',['../structllfio__v2__xxx_1_1stat__t.html#a40efc73a0eee503c070ae843754504d2',1,'llfio_v2_xxx::stat_t']]],
   ['st_5ftype',['st_type',['../structllfio__v2__xxx_1_1stat__t.html#a407dbe624125b5d0d40ebfe647d41214',1,'llfio_v2_xxx::stat_t']]],
   ['st_5fuid',['st_uid',['../structllfio__v2__xxx_1_1stat__t.html#ad42affc84324ad00a39379ab3d9a428b',1,'llfio_v2_xxx::stat_t']]],
-  ['stack_5fupdated',['stack_updated',['../structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html#a6a6d9fb77c29d3d5cd5efa061c197ee4',1,'llfio_v2_xxx::algorithm::traverse_visitor']]],
+  ['stack_5fupdated',['stack_updated',['../structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html#a44e3a5ace0aa50d8f6f836c48e510c54',1,'llfio_v2_xxx::algorithm::traverse_visitor']]],
   ['stamp',['stamp',['../structllfio__v2__xxx_1_1stat__t.html#a4ca693399bffd1b5004d31897e5b72e7',1,'llfio_v2_xxx::stat_t']]],
   ['stat',['stat',['../structllfio__v2__xxx_1_1directory__entry.html#ac679ef1297de655163136230986c0ffe',1,'llfio_v2_xxx::directory_entry::stat()'],['../structllfio__v2__xxx_1_1path__discovery_1_1discovered__path.html#a9a05ee5192ed88b7727574b6502dec61',1,'llfio_v2_xxx::path_discovery::discovered_path::stat()']]],
   ['stat_2ehpp',['stat.hpp',['../stat_8hpp.html',1,'']]],

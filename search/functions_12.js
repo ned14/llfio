@@ -17,7 +17,7 @@ var searchData=
   ['snapshot',['snapshot',['../classkvstore__v1__xxx_1_1basic__key__value__store.html#a16e68740144469de54dd234540ac9c72',1,'kvstore_v1_xxx::basic_key_value_store']]],
   ['st_5fdev',['st_dev',['../classllfio__v2__xxx_1_1fs__handle.html#ac24ed4cdb96690d7da95cd17b0f3d090',1,'llfio_v2_xxx::fs_handle']]],
   ['st_5fino',['st_ino',['../classllfio__v2__xxx_1_1fs__handle.html#aad6465d30ee438b860ccc59c0e0fc4dc',1,'llfio_v2_xxx::fs_handle']]],
-  ['stack_5fupdated',['stack_updated',['../structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html#a6a6d9fb77c29d3d5cd5efa061c197ee4',1,'llfio_v2_xxx::algorithm::traverse_visitor']]],
+  ['stack_5fupdated',['stack_updated',['../structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html#a44e3a5ace0aa50d8f6f836c48e510c54',1,'llfio_v2_xxx::algorithm::traverse_visitor']]],
   ['stamp',['stamp',['../structllfio__v2__xxx_1_1stat__t.html#a4ca693399bffd1b5004d31897e5b72e7',1,'llfio_v2_xxx::stat_t']]],
   ['stat_5ft',['stat_t',['../structllfio__v2__xxx_1_1stat__t.html#aef93718067115fcb4c596f4c8fe4cc2f',1,'llfio_v2_xxx::stat_t']]],
   ['stem',['stem',['../classllfio__v2__xxx_1_1path__view__component.html#a4a0bfc3e06986b6287a22fdc97799181',1,'llfio_v2_xxx::path_view_component::stem()'],['../classllfio__v2__xxx_1_1path__view.html#a8e0dbd474d2c668a0c33a01e7a5aafe8',1,'llfio_v2_xxx::path_view::stem()']]],

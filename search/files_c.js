@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['remove_5fall_2ehpp',['remove_all.hpp',['../remove__all_8hpp.html',1,'']]]
+  ['reduce_2ehpp',['reduce.hpp',['../reduce_8hpp.html',1,'']]]
 ];

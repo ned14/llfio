@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['read',['read',['../classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaaecae13117d6f0584c25a9da6c8f8415e',1,'llfio_v2_xxx::handle']]],
-  ['reads',['reads',['../classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a0fb9cf5f04f61bb6f1151da57ceb1ca1',1,'llfio_v2_xxx::handle']]],
-  ['reads_5fand_5fmetadata',['reads_and_metadata',['../classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852adec4ecca8ae1593f84eea4656599a693',1,'llfio_v2_xxx::handle']]]
+  ['temporary',['temporary',['../classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852ad5197d93c063a2b1e22d1630a39b7aef',1,'llfio_v2_xxx::handle']]],
+  ['transaction_5faborted_5fcollision',['transaction_aborted_collision',['../namespacekvstore__v1__xxx.html#a7bc2f2673bddc429b098b16e413deb5fa203fd50f72dbec98aa499192e1844fc8',1,'kvstore_v1_xxx']]],
+  ['truncate_5fexisting',['truncate_existing',['../classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42abb872caae430ba70f670508aca38feed',1,'llfio_v2_xxx::handle']]]
 ];

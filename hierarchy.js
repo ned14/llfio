@@ -110,7 +110,6 @@ var hierarchy =
     [ "llfio_v2_xxx::read_receiver< IoHandleType >", "classllfio__v2__xxx_1_1read__receiver.html", null ],
     [ "llfio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
     [ "llfio_v2_xxx::utils::page_allocator< void >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
-    [ "llfio_v2_xxx::algorithm::remove_all_callback_arg", "unionllfio__v2__xxx_1_1algorithm_1_1remove__all__callback__arg.html", null ],
     [ "result", null, [
       [ "llfio_v2_xxx::io_multiplexer::io_result< buffers_type >", "structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html", null ],
       [ "llfio_v2_xxx::io_multiplexer::io_result< const_buffers_type >", "structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html", null ],
@@ -140,7 +139,9 @@ var hierarchy =
     [ "template override_< detail::combining_handle_adapter_base< Op, Target, Source, detail::combining_handle_adapter_choose_base< Target, Source > > >", null, [
       [ "llfio_v2_xxx::algorithm::combining_handle_adapter< Op, Target, Source >", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html", null ]
     ] ],
-    [ "llfio_v2_xxx::algorithm::traverse_visitor", "structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html", null ],
+    [ "llfio_v2_xxx::algorithm::traverse_visitor", "structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html", [
+      [ "llfio_v2_xxx::algorithm::reduce_visitor", "structllfio__v2__xxx_1_1algorithm_1_1reduce__visitor.html", null ]
+    ] ],
     [ "llfio_v2_xxx::algorithm::impl::trivial_vector_impl< has_default_construction, T >", "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html", null ],
     [ "llfio_v2_xxx::algorithm::impl::trivial_vector_impl< false, T >", "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html", [
       [ "llfio_v2_xxx::algorithm::impl::trivial_vector_impl< true, T >", "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html", [

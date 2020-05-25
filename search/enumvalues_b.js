@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['safety_5fbarriers',['safety_barriers',['../classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a9cd65f46f55fb6a4b198fcee6f0a63c1',1,'llfio_v2_xxx::handle']]],
-  ['shared',['shared',['../namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33a9e81e7b963c71363e2fb3eefcfecfc0e',1,'llfio_v2_xxx']]],
-  ['symbolic',['symbolic',['../classllfio__v2__xxx_1_1symlink__handle.html#a1908a242ca435cf1386fe96a86da4002a7bf46ad61adc2265f803fc3b798b3559',1,'llfio_v2_xxx::symlink_handle']]],
-  ['system',['system',['../structllfio__v2__xxx_1_1path__discovery_1_1discovered__path.html#ae02f172851c050f6a7f5929410428c7da54b53072540eeeb8f8e9343e71f28176',1,'llfio_v2_xxx::path_discovery::discovered_path']]]
+  ['unknown',['unknown',['../structllfio__v2__xxx_1_1path__discovery_1_1discovered__path.html#ae02f172851c050f6a7f5929410428c7daad921d60486366258809553a3db49a4a',1,'llfio_v2_xxx::path_discovery::discovered_path']]],
+  ['unlocked',['unlocked',['../namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33ad821dbe5ef2db3d805cd0f7eea0ec33f',1,'llfio_v2_xxx']]],
+  ['unsupported_5fintegrity',['unsupported_integrity',['../namespacekvstore__v1__xxx.html#a7bc2f2673bddc429b098b16e413deb5fadfa4eb2805883a2c1653229e6c18aa70',1,'kvstore_v1_xxx']]],
+  ['unsupported_5furi',['unsupported_uri',['../namespacekvstore__v1__xxx.html#a7bc2f2673bddc429b098b16e413deb5fa88845d2baf0c5f2c895cd23bd72e3b07',1,'kvstore_v1_xxx']]]
 ];
