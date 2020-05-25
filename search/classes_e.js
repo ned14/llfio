@@ -6,5 +6,6 @@ var searchData=
   ['stat_5ft',['stat_t',['../structllfio__v2__xxx_1_1stat__t.html',1,'llfio_v2_xxx']]],
   ['statfs_5ft',['statfs_t',['../structllfio__v2__xxx_1_1statfs__t.html',1,'llfio_v2_xxx']]],
   ['storage_5fprofile',['storage_profile',['../structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html',1,'llfio_v2_xxx::storage_profile']]],
+  ['summarize_5fvisitor',['summarize_visitor',['../structllfio__v2__xxx_1_1algorithm_1_1summarize__visitor.html',1,'llfio_v2_xxx::algorithm']]],
   ['symlink_5fhandle',['symlink_handle',['../classllfio__v2__xxx_1_1symlink__handle.html',1,'llfio_v2_xxx']]]
 ];

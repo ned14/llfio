@@ -139,8 +139,10 @@ var hierarchy =
     [ "template override_< detail::combining_handle_adapter_base< Op, Target, Source, detail::combining_handle_adapter_choose_base< Target, Source > > >", null, [
       [ "llfio_v2_xxx::algorithm::combining_handle_adapter< Op, Target, Source >", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html", null ]
     ] ],
+    [ "llfio_v2_xxx::algorithm::traversal_summary", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html", null ],
     [ "llfio_v2_xxx::algorithm::traverse_visitor", "structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html", [
-      [ "llfio_v2_xxx::algorithm::reduce_visitor", "structllfio__v2__xxx_1_1algorithm_1_1reduce__visitor.html", null ]
+      [ "llfio_v2_xxx::algorithm::reduce_visitor", "structllfio__v2__xxx_1_1algorithm_1_1reduce__visitor.html", null ],
+      [ "llfio_v2_xxx::algorithm::summarize_visitor", "structllfio__v2__xxx_1_1algorithm_1_1summarize__visitor.html", null ]
     ] ],
     [ "llfio_v2_xxx::algorithm::impl::trivial_vector_impl< has_default_construction, T >", "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html", null ],
     [ "llfio_v2_xxx::algorithm::impl::trivial_vector_impl< false, T >", "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html", [

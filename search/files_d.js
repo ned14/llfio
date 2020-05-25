@@ -4,5 +4,6 @@ var searchData=
   ['stat_2ehpp',['stat.hpp',['../stat_8hpp.html',1,'']]],
   ['statfs_2ehpp',['statfs.hpp',['../statfs_8hpp.html',1,'']]],
   ['storage_5fprofile_2ehpp',['storage_profile.hpp',['../storage__profile_8hpp.html',1,'']]],
+  ['summarize_2ehpp',['summarize.hpp',['../summarize_8hpp.html',1,'']]],
   ['symlink_5fhandle_2ehpp',['symlink_handle.hpp',['../symlink__handle_8hpp.html',1,'']]]
 ];

@@ -1,6 +1,7 @@
 var searchData=
 [
   ['transaction',['transaction',['../classkvstore__v1__xxx_1_1basic__key__value__store_1_1transaction.html',1,'kvstore_v1_xxx::basic_key_value_store']]],
+  ['traversal_5fsummary',['traversal_summary',['../structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html',1,'llfio_v2_xxx::algorithm']]],
   ['traverse_5fvisitor',['traverse_visitor',['../structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html',1,'llfio_v2_xxx::algorithm']]],
   ['trivial_5fvector',['trivial_vector',['../classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html',1,'llfio_v2_xxx::algorithm']]],
   ['trivial_5fvector_5fimpl',['trivial_vector_impl',['../structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html',1,'llfio_v2_xxx::algorithm::impl']]],

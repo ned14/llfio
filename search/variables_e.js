@@ -1,6 +1,7 @@
 var searchData=
 [
   ['score',['score',['../structkvstore__v1__xxx_1_1basic__key__value__store__info.html#a42ce844ff625bc9912a30d0fac3c5f45',1,'kvstore_v1_xxx::basic_key_value_store_info']]],
+  ['size',['size',['../structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#abd22fa87036c07f28e92469b970878a9',1,'llfio_v2_xxx::algorithm::traversal_summary']]],
   ['st_5fallocated',['st_allocated',['../structllfio__v2__xxx_1_1stat__t.html#a57ae0ee58e01481b7879596f319b9e1d',1,'llfio_v2_xxx::stat_t']]],
   ['st_5fatim',['st_atim',['../structllfio__v2__xxx_1_1stat__t.html#a3e33b115cae22ba75360660274f660b9',1,'llfio_v2_xxx::stat_t']]],
   ['st_5fbirthtim',['st_birthtim',['../structllfio__v2__xxx_1_1stat__t.html#a7175e9ba3f0dae6ae87fb3001ca47e61',1,'llfio_v2_xxx::stat_t']]],

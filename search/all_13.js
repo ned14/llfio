@@ -11,7 +11,9 @@ var searchData=
   ['total_5faddress_5fspace_5fpaged_5fin',['total_address_space_paged_in',['../structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html#ad5b2ceeb0974a4a3115bdc74fc9d5b8f',1,'llfio_v2_xxx::utils::process_memory_usage']]],
   ['transaction',['transaction',['../classkvstore__v1__xxx_1_1basic__key__value__store_1_1transaction.html',1,'kvstore_v1_xxx::basic_key_value_store']]],
   ['transaction_5faborted_5fcollision',['transaction_aborted_collision',['../namespacekvstore__v1__xxx.html#a7bc2f2673bddc429b098b16e413deb5fa203fd50f72dbec98aa499192e1844fc8',1,'kvstore_v1_xxx']]],
+  ['traversal_5fsummary',['traversal_summary',['../structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html',1,'llfio_v2_xxx::algorithm']]],
   ['traverse',['traverse',['../namespacellfio__v2__xxx_1_1algorithm.html#ae068bc16598189811d0ce2b3530f1de7',1,'llfio_v2_xxx::algorithm']]],
+  ['traverse_2ehpp',['traverse.hpp',['../traverse_8hpp.html',1,'']]],
   ['traverse_5fvisitor',['traverse_visitor',['../structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html',1,'llfio_v2_xxx::algorithm']]],
   ['trivial_5fvector',['trivial_vector',['../classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html',1,'llfio_v2_xxx::algorithm']]],
   ['trivial_5fvector_2ehpp',['trivial_vector.hpp',['../trivial__vector_8hpp.html',1,'']]],
@@ -25,5 +27,6 @@ var searchData=
   ['try_5flock_5ffile',['try_lock_file',['../classllfio__v2__xxx_1_1lockable__io__handle.html#a6e6a25ad5d9efd45e69d22e70a754a9e',1,'llfio_v2_xxx::lockable_io_handle']]],
   ['try_5flock_5ffile_5fshared',['try_lock_file_shared',['../classllfio__v2__xxx_1_1lockable__io__handle.html#ad8e3d809cb954d99e228ee756bac1c64',1,'llfio_v2_xxx::lockable_io_handle']]],
   ['try_5flock_5fshared',['try_lock_shared',['../classllfio__v2__xxx_1_1unique__file__lock.html#aa1ab80cdfbb9bdb4e64ec8b61e4d3a83',1,'llfio_v2_xxx::unique_file_lock']]],
-  ['type',['type',['../structllfio__v2__xxx_1_1storage__profile_1_1item__base.html#a948529cb03ceb639a2b5f9c7d20542eb',1,'llfio_v2_xxx::storage_profile::item_base::type()'],['../structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#ac44ca889e5423c1bdeb02e5bee5f645a',1,'llfio_v2_xxx::symlink_handle::buffers_type::type()'],['../structllfio__v2__xxx_1_1symlink__handle_1_1const__buffers__type.html#abe8fb78c928a515db8f017af10436852',1,'llfio_v2_xxx::symlink_handle::const_buffers_type::type()']]]
+  ['type',['type',['../structllfio__v2__xxx_1_1storage__profile_1_1item__base.html#a948529cb03ceb639a2b5f9c7d20542eb',1,'llfio_v2_xxx::storage_profile::item_base::type()'],['../structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#ac44ca889e5423c1bdeb02e5bee5f645a',1,'llfio_v2_xxx::symlink_handle::buffers_type::type()'],['../structllfio__v2__xxx_1_1symlink__handle_1_1const__buffers__type.html#abe8fb78c928a515db8f017af10436852',1,'llfio_v2_xxx::symlink_handle::const_buffers_type::type()']]],
+  ['types',['types',['../structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#a51f79229a629006e28869656111d97e7',1,'llfio_v2_xxx::algorithm::traversal_summary']]]
 ];
