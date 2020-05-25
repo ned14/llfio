@@ -1,4 +1,4 @@
-/* Integration test kernel for whether remove_all() works
+/* Integration test kernel for whether reduce() works
 (C) 2020 Niall Douglas <http://www.nedproductions.biz/> (2 commits)
 File Created: Mar 2020
 
@@ -29,7 +29,11 @@ Distributed under the Boost Software License, Version 1.0.
 #include "quickcpplib/algorithm/small_prng.hpp"
 #include "quickcpplib/algorithm/string.hpp"
 
-static inline void TestRemoveAll()
+#ifndef _WIN32
+#include <sys/resource.h>
+#endif
+
+static inline void TestReduce()
 {
   static constexpr size_t rounds = 10;
 #if defined(_WIN32) || defined(__APPLE__)
@@ -41,6 +45,15 @@ static inline void TestRemoveAll()
   using LLFIO_V2_NAMESPACE::file_handle;
   using QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng;
   using QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string;
+#ifndef _WIN32
+  {
+    struct rlimit r
+    {
+      1024 * 1024, 1024 * 1024
+    };
+    setrlimit(RLIMIT_NOFILE, &r);
+  }
+#endif
   small_prng rand;
   std::vector<directory_handle> dirhs;
   dirhs.reserve(total_entries);
@@ -66,6 +79,7 @@ static inline void TestRemoveAll()
         buffer[9] = 0;
       }
       auto h = directory_handle::directory(dirh, path_view(buffer, 9, true), directory_handle::mode::write, directory_handle::creation::if_needed).value();
+      entries_created++;
       for(size_t n = 0; n < file_entries; n++)
       {
         auto c = (uint8_t) n;
@@ -75,7 +89,6 @@ static inline void TestRemoveAll()
         file_handle::file(h, path_view(buffer, 3, true), file_handle::mode::write, file_handle::creation::if_needed).value();
         entries_created++;
       }
-      entries_created++;
       dirhs.emplace_back(std::move(h));
     }
     auto end = std::chrono::high_resolution_clock::now();
@@ -83,18 +96,27 @@ static inline void TestRemoveAll()
     std::cout << "Created " << entries_created << " filesystem entries in " << (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000000.0) << " seconds (which is " << (entries_created / (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000000.0))
               << " entries/sec).\n";
 
-    std::cout << "\nCalling llfio::algorithm::remove_all() on that randomised directory tree ..." << std::endl;
+    auto summary = algorithm::summarize(dirhs.front()).value();
+    std::cout << "Summary: " << summary.types[filesystem::file_type::regular] << " files and " << summary.types[filesystem::file_type::directory] << " directories created of " << summary.size << " bytes, " << summary.allocated << " bytes allocated in " << summary.blocks << " blocks with depth of " << summary.max_depth << "." << std::endl;
+    BOOST_CHECK(summary.types[filesystem::file_type::regular] + summary.types[filesystem::file_type::directory] == entries_created);
+
+    std::cout << "\nCalling llfio::algorithm::reduce() on that randomised directory tree ..." << std::endl;
     begin = std::chrono::high_resolution_clock::now();
-    auto entries_removed = algorithm::remove_all(std::move(dirhs.front())).value();
+    auto entries_removed = algorithm::reduce(std::move(dirhs.front())).value();
     end = std::chrono::high_resolution_clock::now();
     // std::cout << entries_removed << " " << entries_created << std::endl;
-    BOOST_REQUIRE(entries_removed == entries_created);
-    std::cout << "Removed " << entries_created << " filesystem entries in " << (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000000.0) << " seconds (which is " << (entries_created / (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000000.0))
+    BOOST_CHECK(entries_removed == entries_created);
+    if(entries_removed != entries_created)
+    {
+      std::cout << "Entries created " << entries_created << ", entries removed " << entries_removed << std::endl;
+    }
+    std::cout << "Reduced " << entries_created << " filesystem entries in " << (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000000.0) << " seconds (which is " << (entries_created / (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000000.0))
               << " entries/sec).\n";
 
+    log_level_guard g(log_level::fatal);
     auto r = directory_handle::directory({}, dirhpath);
     BOOST_REQUIRE(!r && r.error() == errc::no_such_file_or_directory);
   }
 }
 
-KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, remove_all, "Tests that llfio::algorithm::remove_all() works as expected", TestRemoveAll())
+KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, reduce, "Tests that llfio::algorithm::reduce() works as expected", TestReduce())

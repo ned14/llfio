@@ -1352,6 +1352,9 @@ public:
 //! A unique ptr to an i/o multiplexer implementation.
 using io_multiplexer_ptr = std::unique_ptr<io_multiplexer>;
 
+#ifndef NDEBUG
+static_assert(OUTCOME_V2_NAMESPACE::concepts::basic_result<io_multiplexer::io_result<int>>, "io_multiplexer::io_result<int> does not match the Outcome basic_result concept!");
+#endif
 
 #if LLFIO_ENABLE_TEST_IO_MULTIPLEXERS
 //! Namespace containing functions useful for test code
