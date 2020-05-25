@@ -22,8 +22,8 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#ifndef LLFIO_ALGORITHM_REMOVE_ALL_HPP
-#define LLFIO_ALGORITHM_REMOVE_ALL_HPP
+#ifndef LLFIO_ALGORITHM_REDUCE_HPP
+#define LLFIO_ALGORITHM_REDUCE_HPP
 
 #include "traverse.hpp"
 
@@ -33,7 +33,7 @@ LLFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
-  /*! \struct reduce_visitor A visitor for the filesystem traversal and reduction algorithm.
+  /*! \brief A visitor for the filesystem traversal and reduction algorithm.
 
   Note that at any time, returning a failure causes `reduce()` to exit as soon
   as possible with the same failure.

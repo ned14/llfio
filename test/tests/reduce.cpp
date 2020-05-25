@@ -96,6 +96,10 @@ static inline void TestReduce()
     std::cout << "Created " << entries_created << " filesystem entries in " << (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000000.0) << " seconds (which is " << (entries_created / (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000000.0))
               << " entries/sec).\n";
 
+    auto summary = algorithm::summarize(dirhs.front()).value();
+    std::cout << "Summary: " << summary.types[filesystem::file_type::regular] << " files and " << summary.types[filesystem::file_type::directory] << " directories created of " << summary.size << " bytes, " << summary.allocated << " bytes allocated in " << summary.blocks << " blocks with depth of " << summary.max_depth << "." << std::endl;
+    BOOST_CHECK(summary.types[filesystem::file_type::regular] + summary.types[filesystem::file_type::directory] == entries_created);
+
     std::cout << "\nCalling llfio::algorithm::reduce() on that randomised directory tree ..." << std::endl;
     begin = std::chrono::high_resolution_clock::now();
     auto entries_removed = algorithm::reduce(std::move(dirhs.front())).value();

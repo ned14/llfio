@@ -28,13 +28,13 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../directory_handle.hpp"
 
 
-//! \file remove_all.hpp Provides a directory tree traversal algorithm.
+//! \file traverse.hpp Provides a directory tree traversal algorithm.
 
 LLFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
-  /*! \struct traverse_visitor A visitor for the filesystem traversal algorithm.
+  /*! \brief A visitor for the filesystem traversal algorithm.
 
   Note that at any time, returning a failure causes `traverse()` to exit as soon
   as possible with the same failure. Depth is how deep into the directory
@@ -101,6 +101,7 @@ namespace algorithm
     This can act as an estimated progress indicator, or to give an
     accurate progress indicator by matching it against a previous
     traversal.
+    \data The third party data pointer passed to `traverse()`.
     \param dirs_processed The total number of directories traversed so far.
     \param known_dirs_remaining The currently known number of directories
     awaiting traversal.
