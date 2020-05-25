@@ -21,7 +21,7 @@ set(llfio_TESTS
   "test/tests/path_view.cpp"
   "test/tests/pipe_handle.cpp"
   "test/tests/process_handle.cpp"
-  "test/tests/remove_all.cpp"
+  "test/tests/reduce.cpp"
   "test/tests/section_handle_create_close/kernel_section_handle.cpp.hpp"
   "test/tests/section_handle_create_close/runner.cpp"
   "test/tests/shared_fs_mutex.cpp"

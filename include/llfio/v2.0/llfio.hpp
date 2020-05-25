@@ -73,7 +73,7 @@ import LLFIO_MODULE_NAME;
 #include "symlink_handle.hpp"
 
 #include "algorithm/handle_adapter/cached_parent.hpp"
-#include "algorithm/remove_all.hpp"
+#include "algorithm/reduce.hpp"
 #include "algorithm/shared_fs_mutex/atomic_append.hpp"
 #include "algorithm/shared_fs_mutex/byte_ranges.hpp"
 #include "algorithm/shared_fs_mutex/lock_files.hpp"

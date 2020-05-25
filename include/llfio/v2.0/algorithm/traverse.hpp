@@ -37,7 +37,8 @@ namespace algorithm
   /*! \struct traverse_visitor A visitor for the filesystem traversal algorithm.
 
   Note that at any time, returning a failure causes `traverse()` to exit as soon
-  as possible with the same failure.
+  as possible with the same failure. Depth is how deep into the directory
+  hierarchy we are, with zero being the base path handle being traversed.
   */
   struct traverse_visitor
   {
@@ -49,10 +50,12 @@ namespace algorithm
 
     \note May be called from multiple kernel threads concurrently.
     */
-    virtual result<directory_handle> directory_open_failed(result<void>::error_type &&error, const directory_handle &dirh, path_view leaf) noexcept
+    virtual result<directory_handle> directory_open_failed(void *data, result<void>::error_type &&error, const directory_handle &dirh, path_view leaf, size_t depth) noexcept
     {
+      (void) data;
       (void) dirh;
       (void) leaf;
+      (void) depth;
       return failure(std::move(error));
     }
 
@@ -68,9 +71,11 @@ namespace algorithm
 
     \note May be called from multiple kernel threads concurrently.
     */
-    virtual result<bool> pre_enumeration(const directory_handle &dirh) noexcept
+    virtual result<bool> pre_enumeration(void *data, const directory_handle &dirh, size_t depth) noexcept
     {
+      (void) data;
       (void) dirh;
+      (void) depth;
       return true;
     }
 
@@ -83,10 +88,12 @@ namespace algorithm
 
     \note May be called from multiple kernel threads concurrently.
     */
-    virtual result<void> post_enumeration(const directory_handle &dirh, directory_handle::buffers_type &contents) noexcept
+    virtual result<void> post_enumeration(void *data, const directory_handle &dirh, directory_handle::buffers_type &contents, size_t depth) noexcept
     {
+      (void) data;
       (void) dirh;
       (void) contents;
+      (void) depth;
       return success();
     }
 
@@ -104,8 +111,9 @@ namespace algorithm
 
     \note May be called from multiple kernel threads concurrently.
     */
-    virtual result<void> stack_updated(size_t dirs_processed, size_t known_dirs_remaining, size_t depth_processed, size_t known_depth_remaining) noexcept
+    virtual result<void> stack_updated(void *data, size_t dirs_processed, size_t known_dirs_remaining, size_t depth_processed, size_t known_depth_remaining) noexcept
     {
+      (void) data;
       (void) dirs_processed;
       (void) known_dirs_remaining;
       (void) depth_processed;
@@ -113,10 +121,14 @@ namespace algorithm
       return success();
     }
 
-    /*! \brief Called with a traversal finishes, whether due to success
+    /*! \brief Called when a traversal finishes, whether due to success
     or failure. Always called from the original thread.
     */
-    virtual result<size_t> finished(result<size_t> result) noexcept { return result; }
+    virtual result<size_t> finished(void *data, result<size_t> result) noexcept
+    {
+      (void) data;
+      return result;
+    }
   };
 
 
@@ -169,7 +181,7 @@ namespace algorithm
 
   - Fast path, 16 threads, traversed 131,915 directories and 8,254,162 entries in 0.525 seconds (+46%).
   */
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<size_t> traverse(const path_handle &dirh, traverse_visitor *visitor, size_t threads = 0, bool force_slow_path = false) noexcept;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<size_t> traverse(const path_handle &dirh, traverse_visitor *visitor, size_t threads = 0, void *data = nullptr, bool force_slow_path = false) noexcept;
 
 }  // namespace algorithm
 

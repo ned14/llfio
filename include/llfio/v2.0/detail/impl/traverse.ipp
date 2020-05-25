@@ -40,12 +40,12 @@ LLFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<size_t> traverse(const path_handle &_topdirh, traverse_visitor *visitor, size_t threads, bool force_slow_path) noexcept
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<size_t> traverse(const path_handle &_topdirh, traverse_visitor *visitor, size_t threads, void *data, bool force_slow_path) noexcept
   {
-    return visitor->finished([&]() -> result<size_t> {
+    return visitor->finished(data, [&]() -> result<size_t> {
       try
       {
-        LLFIO_LOG_FUNCTION_CALL(nullptr);
+        LLFIO_LOG_FUNCTION_CALL(&_topdirh);
         std::shared_ptr<directory_handle> topdirh;
         {
           OUTCOME_TRY(dirh, directory_handle::directory(_topdirh, {}));
@@ -181,9 +181,9 @@ namespace algorithm
           {
           }
 
-          result<void> run(std::unique_lock<std::mutex> &g, bool use_slow_path, std::shared_ptr<directory_handle> &topdirh)
+          result<void> run(std::unique_lock<std::mutex> &g, bool use_slow_path, std::shared_ptr<directory_handle> &topdirh, void *data)
           {
-            state_t::workitem mywork;
+            typename state_t::workitem mywork;
             size_t mylevel = 0;
             assert(g.owns_lock());
             for(size_t n = state->workqueue_base; n < state->workqueue.size(); n++)
@@ -222,7 +222,7 @@ namespace algorithm
               auto r = directory_handle::directory(*mywork.dirh, mywork.leaf());
               if(!r)
               {
-                OUTCOME_TRY(replacementh, state->visitor->directory_open_failed(std::move(r).error(), *mywork.dirh, mywork.leaf()));
+                OUTCOME_TRY(replacementh, state->visitor->directory_open_failed(data, std::move(r).error(), *mywork.dirh, mywork.leaf(), mylevel));
                 mydirh = std::make_shared<directory_handle>(std::move(replacementh));
               }
               else
@@ -232,7 +232,7 @@ namespace algorithm
             }
             if(mydirh->is_valid())
             {
-              OUTCOME_TRY(do_enumerate, state->visitor->pre_enumeration(*mydirh));
+              OUTCOME_TRY(do_enumerate, state->visitor->pre_enumeration(data, *mydirh, mylevel));
               if(do_enumerate)
               {
                 for(;;)
@@ -246,11 +246,10 @@ namespace algorithm
                   }
                   entries.resize(entries.size() << 1);
                 }
-                OUTCOME_TRY(state->visitor->post_enumeration(*mydirh, buffers));
+                OUTCOME_TRY(state->visitor->post_enumeration(data, *mydirh, buffers, mylevel));
                 std::list<state_t::workitem> newwork;
                 for(auto &entry : buffers)
                 {
-                  int entry_type = 0;  // 0 = unknown, 1 = file, 2 = directory
                   if(!(buffers.metadata() & stat_t::want::type))
                   {
 #ifdef _WIN32
@@ -261,35 +260,50 @@ namespace algorithm
                     path_view::c_str<> zpath(entry.leafname);
                     if(::fstatat(mydirh->native_handle().fd, zpath.buffer, &stat, AT_SYMLINK_NOFOLLOW) >= 0)
                     {
-                      if((stat.st_mode & S_IFDIR) != 0)
-                      {
-                        entry_type = 2;
-                      }
-                      else if((stat.st_mode & S_IFREG) != 0)
-                      {
-                        entry_type = 1;
-                      }
+                      entry.stat.st_type = [](uint16_t mode) {
+                        switch(mode & S_IFMT)
+                        {
+                        case S_IFBLK:
+                          return filesystem::file_type::block;
+                        case S_IFCHR:
+                          return filesystem::file_type::character;
+                        case S_IFDIR:
+                          return filesystem::file_type::directory;
+                        case S_IFIFO:
+                          return filesystem::file_type::fifo;
+                        case S_IFLNK:
+                          return filesystem::file_type::symlink;
+                        case S_IFREG:
+                          return filesystem::file_type::regular;
+                        case S_IFSOCK:
+                          return filesystem::file_type::socket;
+                        default:
+                          return filesystem::file_type::unknown;
+                        }
+                      }(stat.st_mode);
+                    }
+                    else
+                    {
+                      return posix_error();
                     }
 #endif
                   }
-                  if(entry_type == 0)
+                  int entry_type = 0;  // 0 = unknown, 1 = file, 2 = directory
+                  switch(entry.stat.st_type)
                   {
-                    switch(entry.stat.st_type)
-                    {
-                    case filesystem::file_type::directory:
-                      entry_type = 2;
-                      break;
-                    case filesystem::file_type::regular:
-                    case filesystem::file_type::symlink:
-                    case filesystem::file_type::block:
-                    case filesystem::file_type::character:
-                    case filesystem::file_type::fifo:
-                    case filesystem::file_type::socket:
-                      entry_type = 1;
-                      break;
-                    default:
-                      break;
-                    }
+                  case filesystem::file_type::directory:
+                    entry_type = 2;
+                    break;
+                  case filesystem::file_type::regular:
+                  case filesystem::file_type::symlink:
+                  case filesystem::file_type::block:
+                  case filesystem::file_type::character:
+                  case filesystem::file_type::fifo:
+                  case filesystem::file_type::socket:
+                    entry_type = 1;
+                    break;
+                  default:
+                    break;
                   }
                   if(2 == entry_type)
                   {
@@ -316,7 +330,7 @@ namespace algorithm
                 }
                 size_t dirs_processed = state->dirs_processed, known_dirs_remaining = state->known_dirs_remaining, depth_processed = state->depth_processed, known_depth_remaining = state->workqueue.size();
                 g.unlock();
-                OUTCOME_TRY(state->visitor->stack_updated(dirs_processed, known_dirs_remaining, depth_processed, known_depth_remaining));
+                OUTCOME_TRY(state->visitor->stack_updated(data, dirs_processed, known_dirs_remaining, depth_processed, known_depth_remaining));
               }
             }
             return success();
@@ -334,7 +348,7 @@ namespace algorithm
             {
               g.lock();
             }
-            OUTCOME_TRY(firstworker.run(g, use_slow_path, topdirh));
+            OUTCOME_TRY(firstworker.run(g, use_slow_path, topdirh, data));
           }
         }
         if(state.known_dirs_remaining > 0)
@@ -385,7 +399,7 @@ namespace algorithm
                   // wake everybody
                   cond.notify_all();
                 }
-                auto r = w->run(g, use_slow_path, topdirh);
+                auto r = w->run(g, use_slow_path, topdirh, data);
                 if(!g.owns_lock())
                 {
                   g.lock();

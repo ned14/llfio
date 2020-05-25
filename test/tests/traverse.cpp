@@ -46,22 +46,26 @@ static inline void TestTraverse()
   {
     directory_handle::dev_t root_dev_id{0};
     std::atomic<size_t> failed_to_open{0}, items_enumerated{0}, max_depth{0}, count{0};
-    virtual result<directory_handle> directory_open_failed(result<void>::error_type &&error, const directory_handle &dirh, path_view leaf) noexcept override
+    virtual result<directory_handle> directory_open_failed(void *data, result<void>::error_type &&error, const directory_handle &dirh, path_view leaf, size_t depth) noexcept override
     {
       if(error == errc::too_many_files_open)
       {
         return std::move(error);
       }
       failed_to_open.fetch_add(1, std::memory_order_relaxed);
+      (void) data;
       (void) error;
       (void) dirh;
       (void) leaf;
+      (void) depth;
       // std::cerr << "  Failed to open " << (dirh.current_path().value() / leaf.path()) << " due to " << error.message() << std::endl;
       return success();
     }
-    virtual result<bool> pre_enumeration(const directory_handle &dirh) noexcept override
+    virtual result<bool> pre_enumeration(void *data, const directory_handle &dirh, size_t depth) noexcept override
     {
+      (void) data;
       (void) dirh;
+      (void) depth;
 #ifndef _WIN32
       if(root_dev_id == 0)
       {
@@ -78,15 +82,18 @@ static inline void TestTraverse()
 #endif
       return true;
     }
-    virtual result<void> post_enumeration(const directory_handle &dirh, directory_handle::buffers_type &contents) noexcept override
+    virtual result<void> post_enumeration(void *data, const directory_handle &dirh, directory_handle::buffers_type &contents, size_t depth) noexcept override
     {
+      (void) data;
       (void) dirh;
+      (void) depth;
       items_enumerated.fetch_add(contents.size(), std::memory_order_relaxed);
       // std::cerr << "  " << dirh.current_path().value() << std::endl;
       return success();
     }
-    virtual result<void> stack_updated(size_t dirs_processed, size_t known_dirs_remaining, size_t depth_processed, size_t known_depth_remaining) noexcept override
+    virtual result<void> stack_updated(void *data, size_t dirs_processed, size_t known_dirs_remaining, size_t depth_processed, size_t known_depth_remaining) noexcept override
     {
+      (void) data;
       (void) dirs_processed;
       (void) known_dirs_remaining;
       auto m = depth_processed + known_depth_remaining;
