@@ -65,10 +65,45 @@ namespace utils
   /*! \brief Round a pair of a pointer and a size_t to their nearest page size multiples. The pointer will be rounded
   down, the size_t upwards.
   */
-  template <class T> inline T round_to_page_size(T i, size_t pagesize) noexcept
+  LLFIO_TEMPLATE(class T)
+  LLFIO_TREQUIRES(LLFIO_TEXPR(std::declval<T>().data()), LLFIO_TEXPR(std::declval<T>().size()))
+  inline T round_to_page_size_larger(T i, size_t pagesize) noexcept
   {
     assert(pagesize > 0);
-    i = {reinterpret_cast<byte *>((LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i.data())) & ~(pagesize - 1)), (i.size() + pagesize - 1) & ~(pagesize - 1)};
+    const auto base = LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i.data());
+    i = {reinterpret_cast<byte *>(base & ~(pagesize - 1)), ((base + i.size() + pagesize - 1) & ~(pagesize - 1)) - (base & ~(pagesize - 1))};
+    return i;
+  }
+  /*! \brief Round a pair of a pointer and a size_t to their nearest page size multiples. The pointer will be rounded
+  upwards, the size_t downwards.
+  */
+  LLFIO_TEMPLATE(class T)
+  LLFIO_TREQUIRES(LLFIO_TEXPR(std::declval<T>().data()), LLFIO_TEXPR(std::declval<T>().size()))
+  inline T round_to_page_size_smaller(T i, size_t pagesize) noexcept
+  {
+    assert(pagesize > 0);
+    const auto base = LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i.data());
+    i = {reinterpret_cast<byte *>((base + pagesize - 1) & ~(pagesize - 1)), ((base + i.size()) & ~(pagesize - 1)) - ((base + pagesize - 1) & ~(pagesize - 1))};
+    return i;
+  }
+  /*! \brief Round a pair of values to their nearest page size multiples. The first will be rounded
+  down, the second upwards.
+  */
+  template <class A, class B> inline std::pair<A, B> round_to_page_size_larger(std::pair<A, B> i, size_t pagesize) noexcept
+  {
+    assert(pagesize > 0);
+    const auto base = LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i.first);
+    i = {static_cast<A>(base & ~(pagesize - 1)), static_cast<B>(((base + i.second + pagesize - 1) & ~(pagesize - 1)) - (base & ~(pagesize - 1)))};
+    return i;
+  }
+  /*! \brief Round a pair of values to their nearest page size multiples. The first will be rounded
+  upwards, the second downwards.
+  */
+  template <class A, class B> inline std::pair<A, B> round_to_page_size_smaller(std::pair<A, B> i, size_t pagesize) noexcept
+  {
+    assert(pagesize > 0);
+    const auto base = LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i.first);
+    i = {static_cast<A>((base + pagesize - 1) & ~(pagesize - 1)), static_cast<B>(((base + i.second) & ~(pagesize - 1)) - ((base + pagesize - 1) & ~(pagesize - 1)))};
     return i;
   }
 
@@ -160,7 +195,7 @@ namespace utils
 #endif
 
   /*! \brief Memory usage statistics for a process.
-  */
+   */
   struct process_memory_usage
   {
     //! The total virtual address space in use.
@@ -174,7 +209,7 @@ namespace utils
     size_t private_paged_in{0};
   };
   /*! \brief Retrieve the current memory usage statistics for this process.
-   
+
    \note Mac OS provides no way of reading how much memory a process has committed. We therefore supply as `private_committed` the same value as `private_paged_in`.
   */
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<process_memory_usage> current_process_memory_usage() noexcept;

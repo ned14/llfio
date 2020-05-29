@@ -52,7 +52,8 @@ namespace algorithm
     map_type<filesystem::file_type> types;  //!< The number of items with the given type
     handle::extent_type size{0};            //!< The sum of maximum extents. On Windows, is for file content only.
     handle::extent_type allocated{0};       //!< The sum of allocated extents. On Windows, is for file content only.
-    handle::extent_type blocks{0};          //!< The sum of file and directory allocated blocks.
+    handle::extent_type file_blocks{0};          //!< The sum of file allocated blocks.
+    handle::extent_type directory_blocks{0};     //!< The sum of directory allocated blocks.
     size_t max_depth{0};                    //!< The maximum depth of the hierarchy
 
     //! Adds another summary to this
@@ -70,7 +71,8 @@ namespace algorithm
       }
       size += o.size;
       allocated += o.allocated;
-      blocks += o.blocks;
+      file_blocks += o.file_blocks;
+      directory_blocks += o.directory_blocks;
       max_depth = std::max(max_depth, o.max_depth);
       return *this;
     }
@@ -85,7 +87,7 @@ namespace algorithm
   that `summarize()` is entirely implemented using `traverse()`, so not calling the
   implementations here will affect operation.
   */
-  struct LLFIO_DECL summarize_visitor : public traverse_visitor
+  struct summarize_visitor : public traverse_visitor
   {
     static result<void> accumulate(traversal_summary &acc, traversal_summary *state, const directory_handle *dirh, directory_entry &entry, stat_t::want already_have_metadata)
     {
@@ -121,7 +123,14 @@ namespace algorithm
       }
       if(state->want & stat_t::want::blocks)
       {
-        acc.blocks += entry.stat.st_blocks;
+        if(entry.stat.st_type == filesystem::file_type::directory)
+        {
+          acc.directory_blocks += entry.stat.st_blocks;
+        }
+        else
+        {
+          acc.file_blocks += entry.stat.st_blocks;
+        }
       }
       return success();
     }

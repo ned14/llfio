@@ -60,8 +60,10 @@ namespace algorithm
       */
       const DWORD access = SYNCHRONIZE | DELETE;
       const DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
-      const DWORD deletefile_ntflags = 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/ | 0x00001000 /*FILE_DELETE_ON_CLOSE*/ | 0x040 /*FILE_NON_DIRECTORY_FILE*/;
-      const DWORD deletedir_ntflags = 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/ | 0x00001000 /*FILE_DELETE_ON_CLOSE*/ | 0x01 /*FILE_DIRECTORY_FILE*/;
+      const DWORD deletefile_ntflags =
+      0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/ | 0x00001000 /*FILE_DELETE_ON_CLOSE*/ | 0x040 /*FILE_NON_DIRECTORY_FILE*/;
+      const DWORD deletedir_ntflags =
+      0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/ | 0x00001000 /*FILE_DELETE_ON_CLOSE*/ | 0x01 /*FILE_DIRECTORY_FILE*/;
       const DWORD renamefile_ntflags = 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/ | 0x040 /*FILE_NON_DIRECTORY_FILE*/;
       const DWORD renamedir_ntflags = 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/ | 0x01 /*FILE_DIRECTORY_FILE*/;
       IO_STATUS_BLOCK isb = make_iostatus();
@@ -160,8 +162,10 @@ namespace algorithm
       using namespace windows_nt_kernel;
       const DWORD access = SYNCHRONIZE | DELETE;
       const DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
-      const DWORD deletefile_ntflags = 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/ | 0x00001000 /*FILE_DELETE_ON_CLOSE*/ | 0x040 /*FILE_NON_DIRECTORY_FILE*/;
-      const DWORD deletedir_ntflags = 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/ | 0x00001000 /*FILE_DELETE_ON_CLOSE*/ | 0x01 /*FILE_DIRECTORY_FILE*/;
+      const DWORD deletefile_ntflags =
+      0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/ | 0x00001000 /*FILE_DELETE_ON_CLOSE*/ | 0x040 /*FILE_NON_DIRECTORY_FILE*/;
+      const DWORD deletedir_ntflags =
+      0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/ | 0x00001000 /*FILE_DELETE_ON_CLOSE*/ | 0x01 /*FILE_DIRECTORY_FILE*/;
       const DWORD renamefile_ntflags = 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/ | 0x040 /*FILE_NON_DIRECTORY_FILE*/;
       const DWORD renamedir_ntflags = 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/ | 0x01 /*FILE_DIRECTORY_FILE*/;
       IO_STATUS_BLOCK isb = make_iostatus();
@@ -254,7 +258,8 @@ namespace algorithm
     };
   }  // namespace detail
 
-  result<directory_handle> reduce_visitor::directory_open_failed(void *data, result<void>::error_type &&error, const directory_handle &dirh, path_view leaf, size_t depth) noexcept
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<directory_handle>
+  reduce_visitor::directory_open_failed(void *data, result<void>::error_type &&error, const directory_handle &dirh, path_view leaf, size_t depth) noexcept
   {
     (void) error;
     (void) depth;
@@ -268,7 +273,8 @@ namespace algorithm
     return success();  // ignore failure to enter
   }
 
-  result<void> reduce_visitor::post_enumeration(void *data, const directory_handle &dirh, directory_handle::buffers_type &contents, size_t depth) noexcept
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> reduce_visitor::post_enumeration(void *data, const directory_handle &dirh,
+                                                                                directory_handle::buffers_type &contents, size_t depth) noexcept
   {
     auto *state = (detail::reduction_state *) data;
     bool removed_everything = true;
@@ -324,7 +330,8 @@ namespace algorithm
     return success();
   }
 
-  result<bool> reduce_visitor::unlink_failed(void *data, result<void>::error_type &&error, const directory_handle &dirh, directory_entry &entry, size_t depth) noexcept
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<bool> reduce_visitor::unlink_failed(void *data, result<void>::error_type &&error, const directory_handle &dirh,
+                                                                             directory_entry &entry, size_t depth) noexcept
   {
     (void) error;
     auto *state = (detail::reduction_state *) data;
@@ -341,7 +348,7 @@ namespace algorithm
     return false;
   }
 
-  result<size_t> reduce(directory_handle &&topdirh, reduce_visitor *visitor, size_t threads, bool force_slow_path) noexcept
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> reduce(directory_handle &&topdirh, reduce_visitor *visitor, size_t threads, bool force_slow_path) noexcept
   {
     LLFIO_LOG_FUNCTION_CALL(&topdirh);
     reduce_visitor default_visitor;
@@ -368,7 +375,8 @@ namespace algorithm
     size_t round = 0;
     detail::reduction_state state(topdirh, visitor);
     OUTCOME_TRY(traverse(topdirh, visitor, threads, &state, force_slow_path));
-    auto not_removed = state.directory_open_failed.load(std::memory_order_relaxed) + state.failed_to_remove.load(std::memory_order_relaxed) + state.failed_to_rename.load(std::memory_order_relaxed);
+    auto not_removed = state.directory_open_failed.load(std::memory_order_relaxed) + state.failed_to_remove.load(std::memory_order_relaxed) +
+                       state.failed_to_rename.load(std::memory_order_relaxed);
     OUTCOME_TRY(visitor->reduction_round(&state, round++, state.items_removed.load(std::memory_order_relaxed), not_removed));
     while(not_removed > 0)
     {
@@ -376,7 +384,8 @@ namespace algorithm
       state.failed_to_remove.store(0, std::memory_order_relaxed);
       state.failed_to_rename.store(0, std::memory_order_relaxed);
       OUTCOME_TRY(traverse(topdirh, visitor, (round > 16) ? 1 : threads, &state, force_slow_path));
-      not_removed = state.directory_open_failed.load(std::memory_order_relaxed) + state.failed_to_remove.load(std::memory_order_relaxed) + state.failed_to_rename.load(std::memory_order_relaxed);
+      not_removed = state.directory_open_failed.load(std::memory_order_relaxed) + state.failed_to_remove.load(std::memory_order_relaxed) +
+                    state.failed_to_rename.load(std::memory_order_relaxed);
       OUTCOME_TRY(visitor->reduction_round(&state, round++, state.items_removed.load(std::memory_order_relaxed), not_removed));
     }
     OUTCOME_TRY(topdirh.unlink());

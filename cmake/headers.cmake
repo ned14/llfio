@@ -18,6 +18,7 @@ set(llfio_HEADERS
   "include/llfio/v2.0/algorithm/shared_fs_mutex/lock_files.hpp"
   "include/llfio/v2.0/algorithm/shared_fs_mutex/memory_map.hpp"
   "include/llfio/v2.0/algorithm/shared_fs_mutex/safe_byte_ranges.hpp"
+  "include/llfio/v2.0/algorithm/summarize.hpp"
   "include/llfio/v2.0/algorithm/traverse.hpp"
   "include/llfio/v2.0/algorithm/trivial_vector.hpp"
   "include/llfio/v2.0/config.hpp"
