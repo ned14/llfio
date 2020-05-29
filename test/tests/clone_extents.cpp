@@ -76,7 +76,7 @@ static inline void TestCloneOrCopyFile()
     {
       if(srcfh.address()[n] != destfh.address()[n])
       {
-        std::cerr << "Byte at offset " << n << " is '" << (char) srcfh.address()[n] << "' in source and is '" << (char) destfh.address()[n]
+        std::cerr << "Byte at offset " << n << " is '" << *(char *) &srcfh.address()[n] << "' in source and is '" << *(char *) &destfh.address()[n]
                   << "' in destination." << std::endl;
         BOOST_CHECK(srcfh.address()[n] == destfh.address()[n]);
       }

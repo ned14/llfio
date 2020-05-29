@@ -62,7 +62,7 @@ if and only if st_allocated < st_size which can include compressed files if that
 with compression enabled (e.g. ZFS with ZLE compression which elides runs of zeros).
 - The st_reparse_point is a Windows only flag and is never set on POSIX, even on a NTFS volume.
 */
-struct stat_t  // NOLINT
+struct LLFIO_DECL stat_t  // NOLINT
 {
   /* NOTE TO THOSE WHO WOULD MODIFY THIS:
 

@@ -30,6 +30,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifdef __linux__
 #include <fcntl.h>
 #include <sys/syscall.h>
+#include <sys/sysmacros.h>
 #endif
 
 LLFIO_V2_NAMESPACE_BEGIN
@@ -65,7 +66,8 @@ static inline filesystem::file_type to_st_type(uint16_t mode)
 static inline std::chrono::system_clock::time_point to_timepoint(struct timespec ts)
 {
   // Need to have this self-adapt to the STL being used
-  static constexpr unsigned long long STL_TICKS_PER_SEC = static_cast<unsigned long long>(std::chrono::system_clock::period::den) / std::chrono::system_clock::period::num;
+  static constexpr unsigned long long STL_TICKS_PER_SEC =
+  static_cast<unsigned long long>(std::chrono::system_clock::period::den) / std::chrono::system_clock::period::num;
   static constexpr unsigned long long multiplier = STL_TICKS_PER_SEC >= 1000000000ULL ? STL_TICKS_PER_SEC / 1000000000ULL : 1;
   static constexpr unsigned long long divider = STL_TICKS_PER_SEC >= 1000000000ULL ? 1 : 1000000000ULL / STL_TICKS_PER_SEC;
   // For speed we make the big assumption that the STL's system_clock is based on the time_t epoch 1st Jan 1970.
@@ -75,7 +77,8 @@ static inline std::chrono::system_clock::time_point to_timepoint(struct timespec
 inline struct timespec from_timepoint(std::chrono::system_clock::time_point time)
 {
   // Need to have this self-adapt to the STL being used
-  static constexpr unsigned long long STL_TICKS_PER_SEC = static_cast<unsigned long long>(std::chrono::system_clock::period::den) / std::chrono::system_clock::period::num;
+  static constexpr unsigned long long STL_TICKS_PER_SEC =
+  static_cast<unsigned long long>(std::chrono::system_clock::period::den) / std::chrono::system_clock::period::num;
   static constexpr unsigned long long multiplier = STL_TICKS_PER_SEC >= 1000000000ULL ? STL_TICKS_PER_SEC / 1000000000ULL : 1;
   static constexpr unsigned long long divider = STL_TICKS_PER_SEC >= 1000000000ULL ? 1 : 1000000000ULL / STL_TICKS_PER_SEC;
   // For speed we make the big assumption that the STL's system_clock is based on the time_t epoch 1st Jan 1970.
@@ -106,9 +109,9 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, sta
       uint32_t stx_gid;        /* Group ID of owner */
       uint16_t stx_mode;       /* File type and mode */
       uint16_t __spare0[1];
-      uint64_t stx_ino;        /* Inode number */
-      uint64_t stx_size;       /* Total size in bytes */
-      uint64_t stx_blocks;     /* Number of 512B blocks allocated */
+      uint64_t stx_ino;    /* Inode number */
+      uint64_t stx_size;   /* Total size in bytes */
+      uint64_t stx_blocks; /* Number of 512B blocks allocated */
       uint64_t stx_attributes_mask;
       /* Mask to show what's supported
          in stx_attributes */
@@ -121,25 +124,13 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, sta
 
       /* If this file represents a device, then the next two
          fields contain the ID of the device */
-      union {
-        struct
-        {
-          uint32_t stx_rdev_major; /* Major ID */
-          uint32_t stx_rdev_minor; /* Minor ID */
-        };
-        uint64_t stx_rdev;
-      };
+      uint32_t stx_rdev_major; /* Major ID */
+      uint32_t stx_rdev_minor; /* Minor ID */
 
       /* The next two fields contain the ID of the device
          containing the filesystem where the file resides */
-      union {
-        struct
-        {
-          uint32_t stx_dev_major; /* Major ID */
-          uint32_t stx_dev_minor; /* Minor ID */
-        };
-        uint64_t stx_dev;
-      };
+      uint32_t stx_dev_major; /* Major ID */
+      uint32_t stx_dev_minor; /* Minor ID */
 
       uint64_t __spare2[14];
     } s;
@@ -231,7 +222,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, sta
     {
       if(wanted & want::dev)
       {
-        st_dev = s.stx_dev_minor;
+        st_dev = makedev(s.stx_dev_major, s.stx_dev_minor);
         ++ret;
       }
       if(wanted & want::ino)
@@ -266,7 +257,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, sta
       }
       if(wanted & want::rdev)
       {
-        st_rdev = s.stx_rdev_minor;
+        st_rdev = makedev(s.stx_rdev_major, s.stx_rdev_minor);
         ++ret;
       }
       if(wanted & want::atim)
@@ -321,7 +312,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, sta
       }
       return ret;
     }
-    //std::cerr << "statx failed with " << strerror(errno) << std::endl;
+    // std::cerr << "statx failed with " << strerror(errno) << std::endl;
   }
 #endif
   {
