@@ -46,6 +46,40 @@ template <class FileHandleType, class DirectoryHandleType> static inline void Te
 #endif
 
   {
+    llfio::stat_t s(nullptr);
+    auto print = [](const llfio::stat_t &s) {
+      auto print_dt = [](const std::chrono::system_clock::time_point &tp) {
+        time_t tt = std::chrono::system_clock::to_time_t(tp);
+        std::stringstream ss;
+        ss << std::ctime(&tt);
+        ss.seekp(-1, ss.cur);
+        ss << "." << std::chrono::duration_cast<std::chrono::nanoseconds>(tp - std::chrono::system_clock::from_time_t(tt)).count();
+        return ss.str();
+      };
+      std::cout << "Handle has stat_t:";
+      std::cout << "\n           dev : " << s.st_dev;
+      std::cout << "\n           ino : " << s.st_ino;
+      std::cout << "\n          type : " << (int) s.st_type;
+      std::cout << "\n         nlink : " << s.st_nlink;
+      std::cout << "\n          atim : " << print_dt(s.st_atim);
+      std::cout << "\n          mtim : " << print_dt(s.st_mtim);
+      std::cout << "\n          ctim : " << print_dt(s.st_ctim);
+      std::cout << "\n          size : " << s.st_size;
+      std::cout << "\n     allocated : " << s.st_allocated;
+      std::cout << "\n        blocks : " << s.st_blocks;
+      std::cout << "\n       blksize : " << s.st_blksize;
+      std::cout << "\n         flags : " << s.st_flags;
+      std::cout << "\n           gen : " << s.st_gen;
+      std::cout << "\n      birthtim : " << print_dt(s.st_birthtim);
+      std::cout << "\n        sparse : " << s.st_sparse;
+      std::cout << "\n    compressed : " << s.st_compressed;
+      std::cout << "\n reparse_point : " << s.st_reparse_point;
+      std::cout << "\n" << std::endl;
+    };
+    s.fill(h1).value();
+    print(s);
+  }
+  {
     auto h1path = h1.current_path();
     BOOST_CHECK(h1path);
     if(!h1path)

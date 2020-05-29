@@ -96,10 +96,10 @@ struct stat_t  // NOLINT
                         otherwise) */
   uint32_t st_gen;                                   /*!< file generation number          (FreeBSD, OS X, zero
                         otherwise)*/
-  std::chrono::system_clock::time_point st_birthtim; /*!< time of file creation           (Windows, FreeBSD, OS X, zero otherwise) */
+  std::chrono::system_clock::time_point st_birthtim; /*!< time of file creation           (Windows, POSIX) */
 
   unsigned st_sparse : 1;        /*!< if this file is sparse, or this directory capable of sparse files (Windows, POSIX) */
-  unsigned st_compressed : 1;    /*!< if this file is compressed, or this directory capable of compressed files (Windows) */
+  unsigned st_compressed : 1;    /*!< if this file is compressed, or this directory capable of compressed files (Windows, Linux) */
   unsigned st_reparse_point : 1; /*!< if this file or directory is a reparse point (Windows) */
 
   //! Used to indicate what metadata should be filled in
