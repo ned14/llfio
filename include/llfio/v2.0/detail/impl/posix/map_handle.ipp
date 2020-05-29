@@ -526,7 +526,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
     return errc::invalid_argument;
   }
   // Set permissions on the pages
-  region = utils::round_to_page_size(region, _pagesize);
+  region = utils::round_to_page_size_larger(region, _pagesize);
   extent_type offset = _offset + (region.data() - _addr);
   size_type bytes = region.size();
   OUTCOME_TRYV(do_mmap(_v, region.data(), MAP_FIXED, _section, _pagesize, bytes, offset, flag));
@@ -545,7 +545,7 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
   {
     return errc::invalid_argument;
   }
-  region = utils::round_to_page_size(region, _pagesize);
+  region = utils::round_to_page_size_larger(region, _pagesize);
   // If decommitting a mapped file, tell the kernel to kick these pages back to storage
   if(_section != nullptr && -1 == ::madvise(region.data(), region.size(), MADV_DONTNEED))
   {
@@ -609,7 +609,7 @@ result<span<map_handle::buffer_type>> map_handle::prefetch(span<buffer_type> reg
 result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(0);
-  region = utils::round_to_page_size(region, _pagesize);
+  region = utils::round_to_page_size_larger(region, _pagesize);
   if(region.data() == nullptr)
   {
     return errc::invalid_argument;

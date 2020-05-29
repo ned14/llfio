@@ -419,11 +419,33 @@ result<std::vector<file_handle::extent_pair>> file_handle::extents() const noexc
   }
 }
 
-result<file_handle::extent_type> file_handle::zero(file_handle::extent_type offset, file_handle::extent_type bytes, deadline d) noexcept
+result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::extent_pair extent, io_handle &dest_, io_handle::extent_type destoffset, deadline d, bool force_copy_now, bool emulate_if_unsupported) noexcept
+{
+  try
+  {
+    (void) extent;
+    (void) dest_;
+    (void) destoffset;
+    (void) d;
+    (void) force_copy_now;
+    (void) emulate_if_unsupported;
+    return errc::operation_not_supported;
+  }
+  catch(...)
+  {
+    return error_from_exception();
+  }
+}
+
+result<file_handle::extent_type> file_handle::zero(file_handle::extent_pair extent, deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
+  if(extent.offset + extent.length < extent.offset)
+  {
+    return errc::value_too_large;
+  }
 #if defined(__linux__)
-  if(-1 == fallocate(_v.fd, 0x02 /*FALLOC_FL_PUNCH_HOLE*/ | 0x01 /*FALLOC_FL_KEEP_SIZE*/, offset, bytes))
+  if(-1 == fallocate(_v.fd, 0x02 /*FALLOC_FL_PUNCH_HOLE*/ | 0x01 /*FALLOC_FL_KEEP_SIZE*/, extent.offset, extent.length))
   {
     // The filing system may not support trim
     if(EOPNOTSUPP != errno)
@@ -433,11 +455,11 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_type offs
   }
 #endif
   // Fall back onto a write of zeros
-  if(bytes < utils::page_size())
+  if(extent.length < utils::page_size())
   {
-    auto *buffer = static_cast<byte *>(alloca((size_type) bytes));
-    memset(buffer, 0, (size_type) bytes);
-    OUTCOME_TRY(written, write(offset, {{buffer, (size_type) bytes}}, d));
+    auto *buffer = static_cast<byte *>(alloca((size_type) extent.length));
+    memset(buffer, 0, (size_type) extent.length);
+    OUTCOME_TRY(written, write(extent.offset, {{buffer, (size_type) extent.length}}, d));
     return written;
   }
   try
@@ -447,12 +469,12 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_type offs
     byte *buffer = utils::page_allocator<byte>().allocate(blocksize);
     auto unbufferh = make_scope_exit([buffer, blocksize]() noexcept { utils::page_allocator<byte>().deallocate(buffer, blocksize); });
     (void) unbufferh;
-    while(bytes > 0)
+    while(extent.length > 0)
     {
-      auto towrite = (bytes < blocksize) ? (size_t) bytes : blocksize;
-      OUTCOME_TRY(written, write(offset, {{buffer, towrite}}, d));
-      offset += written;
-      bytes -= written;
+      auto towrite = (extent.length < blocksize) ? (size_t) extent.length : blocksize;
+      OUTCOME_TRY(written, write(extent.offset, {{buffer, towrite}}, d));
+      extent.offset += written;
+      extent.length -= written;
       ret += written;
     }
     return ret;

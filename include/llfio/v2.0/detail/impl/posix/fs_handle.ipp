@@ -93,6 +93,7 @@ namespace detail
         struct stat s
         {
         };
+        memset(&s, 0, sizeof(s));
         if(-1 == ::fstatat(currentdirh.native_handle().fd, zpath.buffer, &s, AT_SYMLINK_NOFOLLOW))
         {
           continue;

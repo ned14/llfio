@@ -381,18 +381,286 @@ result<std::vector<file_handle::extent_pair>> file_handle::extents() const noexc
   }
 }
 
-result<file_handle::extent_type> file_handle::zero(file_handle::extent_type offset, file_handle::extent_type bytes, deadline /*unused*/) noexcept
+result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::extent_pair extent, io_handle &dest_, io_handle::extent_type destoffset, deadline d, bool force_copy_now, bool emulate_if_unsupported) noexcept
+{
+  try
+  {
+    windows_nt_kernel::init();
+    using namespace windows_nt_kernel;
+    LLFIO_LOG_FUNCTION_CALL(this);
+    if(extent.offset == (extent_type) -1 && extent.length == (extent_type)-1)
+    {
+      extent.offset = 0;
+      OUTCOME_TRY(_, maximum_extent());
+      extent.length = _;
+    }
+    if(extent.offset + extent.length < extent.offset)
+    {
+      return errc::value_too_large;
+    }
+    if(destoffset + extent.length < destoffset)
+    {
+      return errc::value_too_large;
+    }
+    LLFIO_DEADLINE_TO_SLEEP_INIT(d);
+    const auto blocksize = utils::file_buffer_default_size();
+    byte *buffer = nullptr;
+    auto unbufferh = make_scope_exit([&]() noexcept {
+      if(buffer != nullptr)
+        utils::page_allocator<byte>().deallocate(buffer, blocksize);
+    });
+    (void) unbufferh;
+    extent_pair ret(extent.offset, 0);
+    if(!dest_.is_regular())
+    {
+      // TODO: Use TransmitFile() here when we implement socket_handle.
+      buffer = utils::page_allocator<byte>().allocate(blocksize);
+      while(extent.length > 0)
+      {
+        deadline nd;
+        auto towrite = (extent.length < blocksize) ? (size_t) extent.length : blocksize;
+        buffer_type b(buffer, towrite);
+        LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+        OUTCOME_TRY(readed, read({{&b, 1}, extent.offset}, nd));
+        const_buffer_type cb(readed.front());
+        if(cb.size() == 0)
+        {
+          return ret;
+        }
+        LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+        OUTCOME_TRY(written_, dest_.write({{&cb, 1}, destoffset}, nd));
+        const auto written = written_.front().size();
+        extent.offset += written;
+        destoffset += written;
+        extent.length -= written;
+        ret.length += written;
+      }
+      return ret;
+    }
+    const auto page_size = utils::page_size();
+    struct workitem
+    {
+      extent_pair src;
+      enum
+      {
+        copy_bytes,
+        clone_extents,
+        delete_extents,
+      } op;
+    };
+    std::vector<workitem> todo;  // if destination length is 0, punch hole
+    todo.reserve(8);
+    // Firstly fill todo with the list of allocated and non-allocated extents
+    for(auto offset = extent.offset; offset < extent.offset + extent.length;)
+    {
+      FILE_ALLOCATED_RANGE_BUFFER farb_query{}, farb_allocated[8];
+      farb_query.FileOffset.QuadPart = offset;
+      farb_query.Length.QuadPart = extent.offset + extent.length - offset;
+      DWORD bytesout = 0;
+      OVERLAPPED ol{};
+      memset(&ol, 0, sizeof(ol));
+      ol.Internal = static_cast<ULONG_PTR>(-1);
+      if(DeviceIoControl(_v.h, FSCTL_QUERY_ALLOCATED_RANGES, &farb_query, sizeof(farb_query), &farb_allocated, sizeof(farb_allocated), &bytesout, &ol) == 0)
+      {
+        if(ERROR_MORE_DATA != GetLastError())
+        {
+          return win32_error();
+        }
+      }
+      for(size_t n=0; n<bytesout/sizeof(farb_allocated[0]); n++)
+      {
+        if(!todo.empty())
+        {
+          auto endoflastregion = todo.back().src.offset + todo.back().src.length;
+          if(endoflastregion != (extent_type) farb_allocated[n].FileOffset.QuadPart)
+          {
+            // Insert a delete region
+            todo.push_back(workitem{extent_pair(endoflastregion, farb_allocated[n].FileOffset.QuadPart - endoflastregion), workitem::delete_extents});
+          }
+        }
+        todo.push_back(workitem{extent_pair(farb_allocated[n].FileOffset.QuadPart, farb_allocated[n].Length.QuadPart), workitem::clone_extents});
+        offset = farb_allocated[n].FileOffset.QuadPart + farb_allocated[n].Length.QuadPart;
+      }
+    }
+    // The list of extents will spill outside initially requested range.
+    // FSCTL_DUPLICATE_EXTENTS also requires cluster aligned blocks, for which we shall
+    // round front and back to their nearest 4Kb and use byte copying for any sub-4Kb slice.
+    {
+      auto diff = (extent.offset - todo.front().src.offset + page_size - 1) & ~(page_size - 1);
+      todo.front().src.length -= diff;
+      todo.front().src.offset += diff;
+      if(todo.front().src.offset != extent.offset)
+      {
+        assert(todo.front().src.offset > extent.offset);
+        todo.insert(todo.begin(), workitem{{extent.offset, todo.front().src.offset - extent.offset}, workitem::copy_bytes});
+      }
+    }
+    {
+      auto todoend = todo.back().src.offset + todo.back().src.length;
+      auto extentend = extent.offset + extent.length;
+      auto diff = (todoend + page_size - 1 - extentend) & ~(page_size - 1);
+      todo.back().src.length -= diff;
+      if(todoend != extentend)
+      {
+        assert(todoend < extentend);
+        todo.push_back(workitem{{todoend, extentend - todoend}, workitem::copy_bytes});
+      }
+    }
+    // Ensure the destination file is big enough
+    auto &dest = static_cast<file_handle &>(dest_);
+    OUTCOME_TRY(dest_length, dest.maximum_extent());
+    if(destoffset + extent.length < dest_length)
+    {
+      OUTCOME_TRY(dest.truncate(destoffset + extent.length));
+    }
+    bool duplicate_extents = !force_copy_now, zero_extents = true, buffer_dirty=true;
+    for(const workitem &item : todo)
+    {
+      for(size_t thisoffset = 0; thisoffset < item.src.length; thisoffset += blocksize)
+      {
+        bool done = false;
+        const auto thisblock = std::min(blocksize, item.src.length - thisoffset);
+        if(duplicate_extents && item.op == workitem::clone_extents)
+        {
+          typedef struct _DUPLICATE_EXTENTS_DATA
+          {
+            HANDLE FileHandle;
+            LARGE_INTEGER SourceFileOffset;
+            LARGE_INTEGER TargetFileOffset;
+            LARGE_INTEGER ByteCount;
+          } DUPLICATE_EXTENTS_DATA, *PDUPLICATE_EXTENTS_DATA;
+          DUPLICATE_EXTENTS_DATA ded;
+          memset(&ded, 0, sizeof(ded));
+          ded.FileHandle = _v.h;
+          ded.SourceFileOffset.QuadPart = item.src.offset + thisoffset;
+          ded.TargetFileOffset.QuadPart = destoffset;
+          ded.ByteCount.QuadPart = thisblock;
+          DWORD bytesout = 0;
+          OVERLAPPED ol{};
+          memset(&ol, 0, sizeof(ol));
+          ol.Internal = static_cast<ULONG_PTR>(-1);
+          if(DeviceIoControl(dest.native_handle().h, CTL_CODE(FILE_DEVICE_FILE_SYSTEM, 209, METHOD_BUFFERED, FILE_WRITE_DATA) /*FSCTL_DUPLICATE_EXTENTS*/, &ded, sizeof(ded), nullptr, 0, &bytesout, &ol) == 0)
+          {
+            if(ERROR_IO_PENDING == GetLastError())
+            {
+              NTSTATUS ntstat = ntwait(dest.native_handle().h, ol, deadline());
+              if(ntstat != 0)
+              {
+                return ntkernel_error(ntstat);
+              }
+            }
+            if(ERROR_SUCCESS != GetLastError() && !emulate_if_unsupported)
+            {
+              return win32_error();
+            }
+            duplicate_extents = false;  // emulate using copy of bytes
+          }
+          else
+          {
+            done = true;
+          }
+        }
+        if(!done && item.op == workitem::copy_bytes || (!duplicate_extents && item.op == workitem::clone_extents))
+        {
+          if(buffer == nullptr)
+          {
+            buffer = utils::page_allocator<byte>().allocate(blocksize);
+          }
+          deadline nd;
+          buffer_type b(buffer, thisblock);
+          LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+          OUTCOME_TRY(readed, read({{&b, 1}, item.src.offset + thisoffset}, nd));
+          buffer_dirty = true;
+          const_buffer_type cb(readed.front());
+          if(cb.size() != thisblock)
+          {
+            return errc::resource_unavailable_try_again;  // something is wrong
+          }
+          LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+          OUTCOME_TRY(written, dest.write({{&cb, 1}, destoffset}, nd));
+          if(written.front().size()!=thisblock)
+          {
+            return errc::resource_unavailable_try_again;  // something is wrong
+          }
+          done = true;
+        }
+        if(!done && zero_extents && item.op == workitem::delete_extents)
+        {
+          FILE_ZERO_DATA_INFORMATION fzdi{};
+          fzdi.FileOffset.QuadPart = item.src.offset + thisoffset;
+          fzdi.BeyondFinalZero.QuadPart = item.src.offset + thisoffset + thisblock;
+          DWORD bytesout = 0;
+          OVERLAPPED ol{};
+          memset(&ol, 0, sizeof(ol));
+          ol.Internal = static_cast<ULONG_PTR>(-1);
+          if(DeviceIoControl(dest.native_handle().h, FSCTL_SET_ZERO_DATA, &fzdi, sizeof(fzdi), nullptr, 0, &bytesout, &ol) == 0)
+          {
+            if(ERROR_IO_PENDING == GetLastError())
+            {
+              NTSTATUS ntstat = ntwait(dest.native_handle().h, ol, deadline());
+              if(ntstat != 0)
+              {
+                return ntkernel_error(ntstat);
+              }
+            }
+            if(ERROR_SUCCESS != GetLastError() && !emulate_if_unsupported)
+            {
+              return win32_error();
+            }
+            zero_extents = false; // emulate using a write of bytes
+          }
+          else
+          {
+            done = true;
+          }
+        }
+        if(!done && !zero_extents && item.op == workitem::delete_extents)
+        {
+          if(buffer == nullptr)
+          {
+            buffer = utils::page_allocator<byte>().allocate(blocksize);
+          }
+          deadline nd;
+          const_buffer_type cb(buffer, thisblock);
+          if(buffer_dirty)
+          {
+            memset(buffer, 0, thisblock);
+            buffer_dirty = false;
+          }
+          LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+          OUTCOME_TRY(written, dest.write({{&cb, 1}, destoffset}, nd));
+          if(written.front().size() != thisblock)
+          {
+            return errc::resource_unavailable_try_again;  // something is wrong
+          }
+          done = true;
+        }
+        assert(done);
+        LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
+        destoffset += thisblock;
+        ret.length += thisblock;
+      }
+    }
+    return ret;
+  }
+  catch(...)
+  {
+    return error_from_exception();
+  }
+}
+
+result<file_handle::extent_type> file_handle::zero(file_handle::extent_pair extent, deadline /*unused*/) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   LLFIO_LOG_FUNCTION_CALL(this);
-  if(offset + bytes < offset)
+  if(extent.offset + extent.length < extent.offset)
   {
     return errc::value_too_large;
   }
   FILE_ZERO_DATA_INFORMATION fzdi{};
-  fzdi.FileOffset.QuadPart = offset;
-  fzdi.BeyondFinalZero.QuadPart = offset + bytes;
+  fzdi.FileOffset.QuadPart = extent.offset;
+  fzdi.BeyondFinalZero.QuadPart = extent.offset + extent.length;
   DWORD bytesout = 0;
   OVERLAPPED ol{};
   memset(&ol, 0, sizeof(ol));

@@ -1,5 +1,5 @@
 /* Allows the test kernel to be compiled standalone
-(C) 2016-2017 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
+(C) 2016-2020 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
 Created: May 2016
 
 
@@ -25,6 +25,8 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef LLFIO_TEST_KERNEL_DECL_HPP
 #define LLFIO_TEST_KERNEL_DECL_HPP
 
+#define _CRT_SECURE_NO_WARNINGS 1
+
 #ifdef BOOST_KERNELTEST_PLEASE_INLINE_TEST_KERNELS
 // We have been included as part of an inline test suite
 #define LLFIO_TEST_KERNEL_DECL inline
@@ -43,7 +45,7 @@ template <class T> using il_result = OUTCOME_V2_NAMESPACE::experimental::status_
 #else
 template <class T> using il_result = LLFIO_V2_NAMESPACE::result<T>;
 #endif
-#include "kerneltest//kerneltest.hpp"
+#include "kerneltest/kerneltest.hpp"
 
 #if 0
 // Tell KernelTest's outcome how to grok LLFIO's result

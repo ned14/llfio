@@ -45,8 +45,9 @@ async_file_handle.
 <table>
 <tr><th></th><th>Cost of opening</th><th>Cost of i/o</th><th>Concurrency and Atomicity</th><th>Other remarks</th></tr>
 <tr><td>`file_handle`</td><td>Least</td><td>Syscall</td><td>POSIX guarantees (usually)</td><td>Least gotcha</td></tr>
-<tr><td>`async_file_handle`</td><td>More</td><td>Most (syscall + malloc/free + reactor)</td><td>POSIX guarantees (usually)</td><td>Makes no sense to use with cached i/o as it's a very expensive way to call `memcpy()`</td></tr>
-<tr><td>`mapped_file_handle`</td><td>Most</td><td>Least</td><td>None</td><td>Cannot be used with uncached i/o</td></tr>
+<tr><td>`async_file_handle`</td><td>More</td><td>Most (syscall + malloc/free + reactor)</td><td>POSIX guarantees (usually)</td><td>Makes no sense to use with
+cached i/o as it's a very expensive way to call `memcpy()`</td></tr> <tr><td>`mapped_file_handle`</td><td>Most</td><td>Least</td><td>None</td><td>Cannot be used
+with uncached i/o</td></tr>
 </table>
 
 */
@@ -145,7 +146,9 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> file(const path_handle &base, path_view_type path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept;
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> file(const path_handle &base, path_view_type path, mode _mode = mode::read,
+                                                                  creation _creation = creation::open_existing, caching _caching = caching::all,
+                                                                  flag flags = flag::none) noexcept;
   /*! Create a file handle creating a uniquely named file on a path.
   The file is opened exclusively with `creation::only_if_not_exist` so it
   will never collide with nor overwrite any existing file. Note also
@@ -155,7 +158,8 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<file_handle> uniquely_named_file(const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::temporary, flag flags = flag::none) noexcept
+  static inline result<file_handle> uniquely_named_file(const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::temporary,
+                                                        flag flags = flag::none) noexcept
   {
     try
     {
@@ -191,7 +195,8 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<file_handle> temp_file(path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::temporary, flag flags = flag::unlink_on_first_close) noexcept
+  static inline result<file_handle> temp_file(path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed,
+                                              caching _caching = caching::temporary, flag flags = flag::unlink_on_first_close) noexcept
   {
     auto &tempdirh = path_discovery::storage_backed_temporary_files_directory();
     return name.empty() ? uniquely_named_file(tempdirh, _mode, _caching, flags) : file(tempdirh, name, _mode, _creation, _caching, flags);
@@ -207,7 +212,8 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> temp_inode(const path_handle &dirh = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none) noexcept;
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> temp_inode(const path_handle &dirh = path_discovery::storage_backed_temporary_files_directory(),
+                                                                        mode _mode = mode::write, flag flags = flag::none) noexcept;
 
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~file_handle() override
   {
@@ -253,7 +259,8 @@ public:
   \mallocs On POSIX if changing the mode, we must loop calling `current_path()` and
   trying to open the path returned. Thus many allocations may occur.
   */
-  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> reopen(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> reopen(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged,
+                                                             deadline d = std::chrono::seconds(30)) const noexcept;
   LLFIO_DEADLINE_TRY_FOR_UNTIL(reopen)
 
   /*! Return the current maximum permitted extent of the file.
@@ -286,6 +293,9 @@ public:
         , length(_length)
     {
     }
+    bool operator==(const extent_pair &o) const noexcept { return offset == o.offset && length == o.length; }
+    bool operator!=(const extent_pair &o) const noexcept { return offset != o.offset || length != o.length; }
+    bool operator<(const extent_pair &o) const noexcept { return offset < o.offset || (offset == o.offset && length < o.length); }
   };
 
   /*! \brief Returns a list of currently valid extents for this open file. WARNING: racy!
@@ -295,6 +305,43 @@ public:
   */
   LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<std::vector<extent_pair>> extents() const noexcept;
+
+  /*! \brief Clones the extents referred to by `extent` to `dest` at `destoffset`. This
+  is how you ought to copy file content, including within the same file. This is
+  fundamentally a racy call with respect to concurrent modification of the files.
+
+  Some of the filesystems on the major operating systems implement copy-on-write extent
+  reference counting, and thus can very cheaply link a "copy" of extents in one file into
+  another file. Upon first write into an extent, only then is a new copy formed for the
+  specific extents being modified.
+
+  Networked filing systems typically can also implement remote extent copying, such that
+  extents can be copied between files entirely upon the remote server, and avoiding the
+  copy going over the network. This is usually far more efficient.
+
+  This implementation first enumerates the valid extents for the region requested, and
+  only clones extents which are valid. It
+  then iterates the platform specific syscall to cause the extents to be cloned in
+  `utils::page_allocator<T>` sized chunks (i.e. the next large page greater or equal
+  to 1Mb). Generally speaking, if the dedicated syscalls fail, the implementation falls
+  back to a user space emulation, unless `emulate_if_unsupported` is false.
+
+  If you really want the copy to happen now, and not later via copy-on-write, set
+  `force_copy_now`. Note that this forces `emulate_if_unsupported` to true.
+
+  If `dest` is not a `file_handle`, `sendfile()` is used and the destination offset
+  and gaps in the source valid extents are ignored.
+  */
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
+  result<extent_pair> clone_extents_to(extent_pair extent, io_handle &dest, io_handle::extent_type destoffset, deadline d = {}, bool force_copy_now = false,
+                                       bool emulate_if_unsupported = true) noexcept;
+  //! \overload
+  LLFIO_MAKE_FREE_FUNCTION
+  result<extent_pair> clone_extents_to(io_handle &dest, deadline d = {}, bool force_copy_now = false, bool emulate_if_unsupported = true) noexcept
+  {
+    return clone_extents_to({(extent_type)-1, (extent_type)-1}, dest, 0, d, force_copy_now, emulate_if_unsupported);
+  }
 
   /*! \brief Efficiently zero, and possibly deallocate, data on storage.
 
@@ -317,7 +364,10 @@ public:
   The asynchronous implementation in async_file_handle may perform one calloc and one free.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> zero(extent_type offset, extent_type bytes, deadline d = deadline()) noexcept;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> zero(extent_pair extent, deadline d = deadline()) noexcept;
+  //! \overload
+  LLFIO_MAKE_FREE_FUNCTION
+  result<extent_type> zero(extent_type offset, extent_type bytes, deadline d = deadline()) noexcept { return zero({offset, bytes}, d); }
 
   LLFIO_DEADLINE_TRY_FOR_UNTIL(zero)
 };
@@ -350,10 +400,12 @@ inline void swap(file_handle &self, file_handle &o) noexcept
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<file_handle> file(const path_handle &base, file_handle::path_view_type path, file_handle::mode _mode = file_handle::mode::read, file_handle::creation _creation = file_handle::creation::open_existing, file_handle::caching _caching = file_handle::caching::all,
-                                file_handle::flag flags = file_handle::flag::none) noexcept
+inline result<file_handle> file(const path_handle &base, file_handle::path_view_type path, file_handle::mode _mode = file_handle::mode::read,
+                                file_handle::creation _creation = file_handle::creation::open_existing,
+                                file_handle::caching _caching = file_handle::caching::all, file_handle::flag flags = file_handle::flag::none) noexcept
 {
-  return file_handle::file(std::forward<decltype(base)>(base), std::forward<decltype(path)>(path), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
+  return file_handle::file(std::forward<decltype(base)>(base), std::forward<decltype(path)>(path), std::forward<decltype(_mode)>(_mode),
+                           std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }
 /*! Create a file handle creating a randomly named file on a path.
 The file is opened exclusively with `creation::only_if_not_exist` so it
@@ -363,9 +415,12 @@ flush changes to physical storage as lately as possible.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<file_handle> uniquely_named_file(const path_handle &dirpath, file_handle::mode _mode = file_handle::mode::write, file_handle::caching _caching = file_handle::caching::temporary, file_handle::flag flags = file_handle::flag::none) noexcept
+inline result<file_handle> uniquely_named_file(const path_handle &dirpath, file_handle::mode _mode = file_handle::mode::write,
+                                               file_handle::caching _caching = file_handle::caching::temporary,
+                                               file_handle::flag flags = file_handle::flag::none) noexcept
 {
-  return file_handle::uniquely_named_file(std::forward<decltype(dirpath)>(dirpath), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
+  return file_handle::uniquely_named_file(std::forward<decltype(dirpath)>(dirpath), std::forward<decltype(_mode)>(_mode),
+                                          std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }
 /*! Create a file handle creating the named file on some path which
 the OS declares to be suitable for temporary files. Most OSs are
@@ -382,10 +437,13 @@ to use. Use `temp_inode()` instead, it is far more secure.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<file_handle> temp_file(file_handle::path_view_type name = file_handle::path_view_type(), file_handle::mode _mode = file_handle::mode::write, file_handle::creation _creation = file_handle::creation::if_needed, file_handle::caching _caching = file_handle::caching::temporary,
+inline result<file_handle> temp_file(file_handle::path_view_type name = file_handle::path_view_type(), file_handle::mode _mode = file_handle::mode::write,
+                                     file_handle::creation _creation = file_handle::creation::if_needed,
+                                     file_handle::caching _caching = file_handle::caching::temporary,
                                      file_handle::flag flags = file_handle::flag::unlink_on_first_close) noexcept
 {
-  return file_handle::temp_file(std::forward<decltype(name)>(name), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
+  return file_handle::temp_file(std::forward<decltype(name)>(name), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation),
+                                std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }
 /*! \em Securely create a file handle creating a temporary anonymous inode in
 the filesystem referred to by \em dirpath. The inode created has
@@ -397,12 +455,14 @@ is for backing shared memory maps).
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<file_handle> temp_inode(const path_handle &dirh = path_discovery::storage_backed_temporary_files_directory(), file_handle::mode _mode = file_handle::mode::write, file_handle::flag flags = file_handle::flag::none) noexcept
+inline result<file_handle> temp_inode(const path_handle &dirh = path_discovery::storage_backed_temporary_files_directory(),
+                                      file_handle::mode _mode = file_handle::mode::write, file_handle::flag flags = file_handle::flag::none) noexcept
 {
   return file_handle::temp_inode(std::forward<decltype(dirh)>(dirh), std::forward<decltype(_mode)>(_mode), std::forward<decltype(flags)>(flags));
 }
 //! \overload
-inline file_handle::io_result<file_handle::size_type> read(file_handle &self, file_handle::extent_type offset, std::initializer_list<file_handle::buffer_type> lst, deadline d = deadline()) noexcept
+inline file_handle::io_result<file_handle::size_type> read(file_handle &self, file_handle::extent_type offset,
+                                                           std::initializer_list<file_handle::buffer_type> lst, deadline d = deadline()) noexcept
 {
   return self.read(std::forward<decltype(offset)>(offset), std::forward<decltype(lst)>(lst), std::forward<decltype(d)>(d));
 }
@@ -453,7 +513,8 @@ writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windo
 \mallocs The default synchronous implementation in file_handle performs no memory allocation.
 The asynchronous implementation in async_file_handle may perform one calloc and one free.
 */
-inline result<file_handle::extent_type> zero(file_handle &self, file_handle::extent_type offset, file_handle::extent_type bytes, deadline d = deadline()) noexcept
+inline result<file_handle::extent_type> zero(file_handle &self, file_handle::extent_type offset, file_handle::extent_type bytes,
+                                             deadline d = deadline()) noexcept
 {
   return self.zero(std::forward<decltype(offset)>(offset), std::forward<decltype(bytes)>(bytes), std::forward<decltype(d)>(d));
 }

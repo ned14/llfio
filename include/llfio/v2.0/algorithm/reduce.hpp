@@ -33,6 +33,10 @@ LLFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4275)  // dll interface
+#endif
   /*! \brief A visitor for the filesystem traversal and reduction algorithm.
 
   Note that at any time, returning a failure causes `reduce()` to exit as soon
@@ -105,6 +109,9 @@ namespace algorithm
       return success();
     }
   };
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
   /*! \brief Reduce the directory identified `dirh`, and everything therein, to the null set.
 

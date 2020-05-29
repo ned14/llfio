@@ -437,7 +437,7 @@ namespace algorithm
       //! \brief Always returns a failed matching `errc::operation_not_supported` as the meaning of combined valid extents is hard to discern here.
       LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<std::vector<file_handle::extent_pair>> extents() const noexcept override { return errc::operation_not_supported; }
       //! \brief Punches a hole in one or both attached handles. Note that no combination operation is performed.
-      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> zero(extent_type offset, extent_type bytes, deadline d = deadline()) noexcept override
+      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> zero(file_handle::extent_pair extent, deadline d = deadline()) noexcept override
       {
         optional<result<extent_type>> r[2];
 #if !defined(LLFIO_DISABLE_OPENMP) && defined(_OPENMP)
@@ -447,11 +447,11 @@ namespace algorithm
         {
           if(n == 0)
           {
-            r[n] = this->_target->zero(offset, bytes, d);
+            r[n] = this->_target->zero(extent, d);
           }
           else if(_have_source)
           {
-            r[n] = this->_source->zero(offset, bytes, d);
+            r[n] = this->_source->zero(extent, d);
           }
         }
         extent_type ret = (extent_type) -1;

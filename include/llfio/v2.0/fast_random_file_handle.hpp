@@ -242,10 +242,10 @@ public:
 
   //! \brief Zero a portion of the random file (does nothing).
   LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> zero(extent_type /*unused*/, extent_type bytes, deadline /*unused*/ = deadline()) noexcept override
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> zero(file_handle::extent_pair extent, deadline /*unused*/ = deadline()) noexcept override
   {
     OUTCOME_TRY(_perms_check());
-    return bytes;
+    return extent.length;
   }
 
   //! \brief Return a single extent of the maximum extent
