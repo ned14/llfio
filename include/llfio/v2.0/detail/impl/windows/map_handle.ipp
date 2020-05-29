@@ -749,7 +749,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
   {
     prot = PAGE_EXECUTE;
   }
-  region = utils::round_to_page_size(region, _pagesize);
+  region = utils::round_to_page_size_larger(region, _pagesize);
   OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed | win32_map_sought::freed | win32_map_sought::reserved, [prot](byte *addr, size_t bytes) -> result<void> {
     if(VirtualAlloc(addr, bytes, MEM_COMMIT, prot) == nullptr)
     {
@@ -767,7 +767,7 @@ result<map_handle::buffer_type> map_handle::decommit(buffer_type region) noexcep
   {
     return errc::invalid_argument;
   }
-  region = utils::round_to_page_size(region, _pagesize);
+  region = utils::round_to_page_size_larger(region, _pagesize);
 #if 1
   OUTCOME_TRYV(win32_release_allocations(region.data(), region.size(), MEM_DECOMMIT));
 #else
@@ -795,7 +795,7 @@ result<void> map_handle::zero_memory(buffer_type region) noexcept
   memset(region.data(), 0, region.size());
   if(region.size() >= utils::page_size())
   {
-    region = utils::round_to_page_size(region, _pagesize);
+    region = utils::round_to_page_size_larger(region, _pagesize);
     if(region.size() > 0)
     {
       OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed, [](byte *addr, size_t bytes) -> result<void> {
@@ -850,7 +850,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   LLFIO_LOG_FUNCTION_CALL(0);
-  region = utils::round_to_page_size(region, _pagesize);
+  region = utils::round_to_page_size_larger(region, _pagesize);
   if(region.data() == nullptr)
   {
     return errc::invalid_argument;

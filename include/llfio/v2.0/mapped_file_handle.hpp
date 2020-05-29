@@ -459,10 +459,10 @@ public:
   */
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<extent_type> update_map() noexcept;
 
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> zero(extent_type offset, extent_type bytes, deadline /*unused*/ = deadline()) noexcept override
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> zero(extent_pair extent, deadline /*unused*/ = deadline()) noexcept override
   {
-    OUTCOME_TRYV(_mh.zero_memory({_mh.address() + offset, (size_type) bytes}));
-    return bytes;
+    OUTCOME_TRYV(_mh.zero_memory({_mh.address() + extent.offset, (size_type) extent.length}));
+    return extent.length;
   }
 
 

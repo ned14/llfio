@@ -1,6 +1,6 @@
-/* Integration test kernel for whether reduce() works
+/* Integration test kernel for whether clone() works
 (C) 2020 Niall Douglas <http://www.nedproductions.biz/> (2 commits)
-File Created: Mar 2020
+File Created: May 2020
 
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,7 +33,59 @@ Distributed under the Boost Software License, Version 1.0.
 #include <sys/resource.h>
 #endif
 
-static inline void TestReduce()
+static inline void TestCloneOrCopyFile()
+{
+  static constexpr size_t rounds = 100;
+  static constexpr size_t max_file_extent = (size_t) 100 * 1024 * 1024;
+  namespace llfio = LLFIO_V2_NAMESPACE;
+  using QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng;
+  const auto &tempdirh = llfio::path_discovery::storage_backed_temporary_files_directory();
+  small_prng rand;
+  for(size_t round = 0; round < rounds; round++)
+  {
+    auto srcfh = llfio::mapped_file_handle::mapped_temp_inode().value();
+    auto maximum_extent = rand() % max_file_extent;
+    srcfh.truncate(maximum_extent).value();
+    for(uint8_t c = 1; c != 0; c++)
+    {
+      auto offset = rand() % maximum_extent;
+      auto size = rand() % std::min(maximum_extent - offset, maximum_extent/8);
+      llfio::byte buffer[65536];
+      memset(&buffer, c, sizeof(buffer));
+      for(unsigned n = 0; n < size; n += sizeof(buffer))
+      {
+        auto towrite = std::min((size_t) size - n, sizeof(buffer));
+        srcfh.write(offset+n, {{buffer, towrite}}).value();
+      }
+    }
+
+    auto randomname = llfio::utils::random_string(32);
+    randomname.append(".random");
+    llfio::algorithm::clone_or_copy(srcfh, tempdirh, randomname).value();
+
+    auto destfh = llfio::mapped_file_handle::mapped_file(tempdirh, randomname).value();
+    BOOST_REQUIRE(srcfh.maximum_extent().value() == destfh.maximum_extent().value());
+    llfio::stat_t src_stat(nullptr), dest_stat(nullptr);
+    src_stat.fill(srcfh).value();
+    dest_stat.fill(destfh).value();
+    std::cout << "Source file has " << src_stat.st_blocks << " blocks allocated. Destination file has " << dest_stat.st_blocks << " blocks allocated."
+              << std::endl;
+    BOOST_CHECK(src_stat.st_blocks == dest_stat.st_blocks);
+
+    for(size_t n=0; n<maximum_extent; n++)
+    {
+      if(srcfh.address()[n] != destfh.address()[n])
+      {
+        std::cerr << "Byte at offset " << n << " is '" << (char) srcfh.address()[n] << "' in source and is '" << (char) destfh.address()[n]
+                  << "' in destination." << std::endl;
+        BOOST_CHECK(srcfh.address()[n] == destfh.address()[n]);
+      }
+    }
+  }
+}
+
+#if 0
+static inline void TestCloneOrCopyTree()
 {
   static constexpr size_t rounds = 10;
 #if defined(_WIN32) || defined(__APPLE__)
@@ -97,7 +149,7 @@ static inline void TestReduce()
               << " entries/sec).\n";
 
     auto summary = algorithm::summarize(dirhs.front()).value();
-    std::cout << "Summary: " << summary.types[filesystem::file_type::regular] << " files and " << summary.types[filesystem::file_type::directory] << " directories created of " << summary.size << " bytes, " << summary.allocated << " bytes allocated in " << (summary.directory_blocks+summary.file_blocks) << " blocks with depth of " << summary.max_depth << "." << std::endl;
+    std::cout << "Summary: " << summary.types[filesystem::file_type::regular] << " files and " << summary.types[filesystem::file_type::directory] << " directories created of " << summary.size << " bytes, " << summary.allocated << " bytes allocated in " << summary.blocks << " blocks with depth of " << summary.max_depth << "." << std::endl;
     BOOST_CHECK(summary.types[filesystem::file_type::regular] + summary.types[filesystem::file_type::directory] == entries_created);
 
     std::cout << "\nCalling llfio::algorithm::reduce() on that randomised directory tree ..." << std::endl;
@@ -118,5 +170,6 @@ static inline void TestReduce()
     BOOST_REQUIRE(!r && r.error() == errc::no_such_file_or_directory);
   }
 }
+#endif
 
-KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, reduce, "Tests that llfio::algorithm::reduce() works as expected", TestReduce())
+KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, clone_or_copy_file, "Tests that llfio::algorithm::clone_or_copy(file_handle) works as expected", TestCloneOrCopyFile())
