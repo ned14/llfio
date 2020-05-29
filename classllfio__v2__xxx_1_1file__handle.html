@@ -261,9 +261,16 @@ template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
 <tr class="memitem:a6e30345e9aa4fa263b009efe2c97466a"><td class="memItemLeft" align="right" valign="top">virtual result&lt; std::vector&lt; <a class="el" href="structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html">extent_pair</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a6e30345e9aa4fa263b009efe2c97466a">extents</a> () const noexcept</td></tr>
 <tr class="memdesc:a6e30345e9aa4fa263b009efe2c97466a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list of currently valid extents for this open file. WARNING: racy!  <a href="#a6e30345e9aa4fa263b009efe2c97466a">More...</a><br /></td></tr>
 <tr class="separator:a6e30345e9aa4fa263b009efe2c97466a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a50caa94c51aae1f23e7708d3c6a21364"><td class="memItemLeft" align="right" valign="top">virtual result&lt; extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a50caa94c51aae1f23e7708d3c6a21364">zero</a> (extent_type offset, extent_type bytes, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
-<tr class="memdesc:a50caa94c51aae1f23e7708d3c6a21364"><td class="mdescLeft">&#160;</td><td class="mdescRight">Efficiently zero, and possibly deallocate, data on storage.  <a href="#a50caa94c51aae1f23e7708d3c6a21364">More...</a><br /></td></tr>
-<tr class="separator:a50caa94c51aae1f23e7708d3c6a21364"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2aea4109a6ac4323b8cb4ea435ec9c94"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html">extent_pair</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a2aea4109a6ac4323b8cb4ea435ec9c94">clone_extents_to</a> (<a class="el" href="structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html">extent_pair</a> extent, <a class="el" href="classllfio__v2__xxx_1_1io__handle.html">io_handle</a> &amp;dest, io_handle::extent_type destoffset, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d={}, bool force_copy_now=false, bool emulate_if_unsupported=true) noexcept</td></tr>
+<tr class="memdesc:a2aea4109a6ac4323b8cb4ea435ec9c94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clones the extents referred to by <code>extent</code> to <code>dest</code> at <code>destoffset</code>. This is how you ought to copy file content, including within the same file. This is fundamentally a racy call with respect to concurrent modification of the files.  <a href="#a2aea4109a6ac4323b8cb4ea435ec9c94">More...</a><br /></td></tr>
+<tr class="separator:a2aea4109a6ac4323b8cb4ea435ec9c94"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c7af63bc67f6eacd7097e4cae3f85ce"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html">extent_pair</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a4c7af63bc67f6eacd7097e4cae3f85ce">clone_extents_to</a> (<a class="el" href="classllfio__v2__xxx_1_1io__handle.html">io_handle</a> &amp;dest, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d={}, bool force_copy_now=false, bool emulate_if_unsupported=true) noexcept</td></tr>
+<tr class="separator:a4c7af63bc67f6eacd7097e4cae3f85ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a299dd43c5d218b0253e0ce9760c955ab"><td class="memItemLeft" align="right" valign="top">virtual result&lt; extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a299dd43c5d218b0253e0ce9760c955ab">zero</a> (<a class="el" href="structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html">extent_pair</a> extent, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="memdesc:a299dd43c5d218b0253e0ce9760c955ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Efficiently zero, and possibly deallocate, data on storage.  <a href="#a299dd43c5d218b0253e0ce9760c955ab">More...</a><br /></td></tr>
+<tr class="separator:a299dd43c5d218b0253e0ce9760c955ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a800b4d046b9648a9a4a69a7797548ee4"><td class="memItemLeft" align="right" valign="top">result&lt; extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a800b4d046b9648a9a4a69a7797548ee4">zero</a> (extent_type offset, extent_type bytes, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="separator:a800b4d046b9648a9a4a69a7797548ee4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afab4b38fba3730a36ba0b2f849dc6777"><td class="memTemplParams" colspan="2"><a id="afab4b38fba3730a36ba0b2f849dc6777"></a>
 template&lt;class... Args&gt; </td></tr>
 <tr class="memitem:afab4b38fba3730a36ba0b2f849dc6777"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_zero</b> (Args &amp;&amp;... args) noexcept</td></tr>
@@ -822,6 +829,123 @@ For portability, you can only assume that barriers write order for a single hand
 <p>Clone this handle (copy constructor is disabled to avoid accidental copying)</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or DuplicateHandle() can return. </dd></dl>
 
+</div>
+</div>
+<a id="a2aea4109a6ac4323b8cb4ea435ec9c94"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2aea4109a6ac4323b8cb4ea435ec9c94">&#9670;&nbsp;</a></span>clone_extents_to() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual result&lt;<a class="el" href="structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html">extent_pair</a>&gt; llfio_v2_xxx::file_handle::clone_extents_to </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html">extent_pair</a>&#160;</td>
+          <td class="paramname"><em>extent</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1io__handle.html">io_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>dest</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">io_handle::extent_type&#160;</td>
+          <td class="paramname"><em>destoffset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code>{}</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>force_copy_now</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>emulate_if_unsupported</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Clones the extents referred to by <code>extent</code> to <code>dest</code> at <code>destoffset</code>. This is how you ought to copy file content, including within the same file. This is fundamentally a racy call with respect to concurrent modification of the files. </p>
+<p>Some of the filesystems on the major operating systems implement copy-on-write extent reference counting, and thus can very cheaply link a "copy" of extents in one file into another file. Upon first write into an extent, only then is a new copy formed for the specific extents being modified.</p>
+<p>Networked filing systems typically can also implement remote extent copying, such that extents can be copied between files entirely upon the remote server, and avoiding the copy going over the network. This is usually far more efficient.</p>
+<p>This implementation first enumerates the valid extents for the region requested, and only clones extents which are valid. It then iterates the platform specific syscall to cause the extents to be cloned in <code>utils::page_allocator&lt;T&gt;</code> sized chunks (i.e. the next large page greater or equal to 1Mb). Generally speaking, if the dedicated syscalls fail, the implementation falls back to a user space emulation, unless <code>emulate_if_unsupported</code> is false.</p>
+<p>If you really want the copy to happen now, and not later via copy-on-write, set <code>force_copy_now</code>. Note that this forces <code>emulate_if_unsupported</code> to true.</p>
+<p>If <code>dest</code> is not a <code>file_handle</code>, <code>sendfile()</code> is used and the destination offset and gaps in the source valid extents are ignored. </p>
+
+</div>
+</div>
+<a id="a4c7af63bc67f6eacd7097e4cae3f85ce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c7af63bc67f6eacd7097e4cae3f85ce">&#9670;&nbsp;</a></span>clone_extents_to() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;<a class="el" href="structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html">extent_pair</a>&gt; llfio_v2_xxx::file_handle::clone_extents_to </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1io__handle.html">io_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>dest</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code>{}</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>force_copy_now</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>emulate_if_unsupported</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
+<div class="fragment"><div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;                                                                     {}, <span class="keywordtype">bool</span> force_copy_now = <span class="keyword">false</span>, <span class="keywordtype">bool</span> emulate_if_unsupported = <span class="keyword">true</span>) noexcept</div><div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;  {</div><div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classllfio__v2__xxx_1_1file__handle.html#a2aea4109a6ac4323b8cb4ea435ec9c94">clone_extents_to</a>({(extent_type)-1, (extent_type)-1}, dest, 0, d, force_copy_now, emulate_if_unsupported);</div><div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1file__handle_html_a2aea4109a6ac4323b8cb4ea435ec9c94"><div class="ttname"><a href="classllfio__v2__xxx_1_1file__handle.html#a2aea4109a6ac4323b8cb4ea435ec9c94">llfio_v2_xxx::file_handle::clone_extents_to</a></div><div class="ttdeci">virtual result&lt; extent_pair &gt; clone_extents_to(extent_pair extent, io_handle &amp;dest, io_handle::extent_type destoffset, deadline d={}, bool force_copy_now=false, bool emulate_if_unsupported=true) noexcept</div><div class="ttdoc">Clones the extents referred to by extent to dest at destoffset. This is how you ought to copy file co...</div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a359f780e7468407b38978cc5eb7b2555"></a>
@@ -1893,7 +2017,7 @@ For portability, you can only assume that barriers write order for a single hand
 <p>Create a file handle creating the named file on some path which the OS declares to be suitable for temporary files. Most OSs are very lazy about flushing changes made to these temporary files. Note the default flags are to have the newly created file deleted on first handle close. Note also that an empty name is equivalent to calling <code>uniquely_named_file(path_discovery::storage_backed_temporary_files_directory())</code> and the creation parameter is ignored.</p>
 <dl class="section note"><dt>Note</dt><dd>If the temporary file you are creating is not going to have its path sent to another process for usage, this is the WRONG function to use. Use <code>temp_inode()</code> instead, it is far more secure.</dd></dl>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;  {</div><div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="keyword">auto</span> &amp;tempdirh = <a class="code" href="namespacellfio__v2__xxx_1_1path__discovery.html#a2dd74ea752f3f511d58ccccdcac7f4fd">path_discovery::storage_backed_temporary_files_directory</a>();</div><div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <span class="keywordflow">return</span> name.empty() ? <a class="code" href="classllfio__v2__xxx_1_1file__handle.html#a8b7aa986243527fe224425f61c179709">uniquely_named_file</a>(tempdirh, _mode, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>) : <a class="code" href="classllfio__v2__xxx_1_1file__handle.html#a09e6b3e9806b328a687a55e955b885a3">file</a>(tempdirh, name, _mode, _creation, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>);</div><div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1file__handle_html_a8b7aa986243527fe224425f61c179709"><div class="ttname"><a href="classllfio__v2__xxx_1_1file__handle.html#a8b7aa986243527fe224425f61c179709">llfio_v2_xxx::file_handle::uniquely_named_file</a></div><div class="ttdeci">static result&lt; file_handle &gt; uniquely_named_file(const path_handle &amp;dirpath, mode _mode=mode::write, caching _caching=caching::temporary, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:158</div></div>
+<div class="fragment"><div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;  {</div><div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    <span class="keyword">auto</span> &amp;tempdirh = <a class="code" href="namespacellfio__v2__xxx_1_1path__discovery.html#a2dd74ea752f3f511d58ccccdcac7f4fd">path_discovery::storage_backed_temporary_files_directory</a>();</div><div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <span class="keywordflow">return</span> name.empty() ? <a class="code" href="classllfio__v2__xxx_1_1file__handle.html#a8b7aa986243527fe224425f61c179709">uniquely_named_file</a>(tempdirh, _mode, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>) : <a class="code" href="classllfio__v2__xxx_1_1file__handle.html#a09e6b3e9806b328a687a55e955b885a3">file</a>(tempdirh, name, _mode, _creation, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>);</div><div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1file__handle_html_a8b7aa986243527fe224425f61c179709"><div class="ttname"><a href="classllfio__v2__xxx_1_1file__handle.html#a8b7aa986243527fe224425f61c179709">llfio_v2_xxx::file_handle::uniquely_named_file</a></div><div class="ttdeci">static result&lt; file_handle &gt; uniquely_named_file(const path_handle &amp;dirpath, mode _mode=mode::write, caching _caching=caching::temporary, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:161</div></div>
 <div class="ttc" id="classllfio__v2__xxx_1_1file__handle_html_a09e6b3e9806b328a687a55e955b885a3"><div class="ttname"><a href="classllfio__v2__xxx_1_1file__handle.html#a09e6b3e9806b328a687a55e955b885a3">llfio_v2_xxx::file_handle::file</a></div><div class="ttdeci">static result&lt; file_handle &gt; file(const path_handle &amp;base, path_view_type path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div></div>
 <div class="ttc" id="classllfio__v2__xxx_1_1handle_html_a013936bc1254b1a47567fe29698d1b1c"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">llfio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:413</div></div>
 <div class="ttc" id="namespacellfio__v2__xxx_1_1path__discovery_html_a2dd74ea752f3f511d58ccccdcac7f4fd"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1path__discovery.html#a2dd74ea752f3f511d58ccccdcac7f4fd">llfio_v2_xxx::path_discovery::storage_backed_temporary_files_directory</a></div><div class="ttdeci">const path_handle &amp; storage_backed_temporary_files_directory() noexcept</div><div class="ttdoc">Returns a reference to an open handle to a verified temporary directory where files created are store...</div></div>
@@ -2086,10 +2210,10 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 <p>Create a file handle creating a uniquely named file on a path. The file is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing file. Note also that caching defaults to temporary which hints to the OS to only flush changes to physical storage as lately as possible.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  {</div><div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    <span class="keywordflow">try</span></div><div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    {</div><div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;      <span class="keywordflow">for</span>(;;)</div><div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;      {</div><div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">utils::random_string</a>(32);</div><div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;        randomname.append(<span class="stringliteral">&quot;.random&quot;</span>);</div><div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;        result&lt;file_handle&gt; ret = <a class="code" href="classllfio__v2__xxx_1_1file__handle.html#a09e6b3e9806b328a687a55e955b885a3">file</a>(dirpath, randomname, _mode, <a class="code" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255">creation::only_if_not_exist</a>, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>);</div><div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;        <span class="keywordflow">if</span>(ret || (!ret &amp;&amp; ret.error() != errc::file_exists))</div><div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        {</div><div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;          <span class="keywordflow">return</span> ret;</div><div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;        }</div><div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;      }</div><div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    }</div><div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="keywordflow">catch</span>(...)</div><div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    {</div><div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div><div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    }</div><div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1file__handle_html_a09e6b3e9806b328a687a55e955b885a3"><div class="ttname"><a href="classllfio__v2__xxx_1_1file__handle.html#a09e6b3e9806b328a687a55e955b885a3">llfio_v2_xxx::file_handle::file</a></div><div class="ttdeci">static result&lt; file_handle &gt; file(const path_handle &amp;base, path_view_type path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div></div>
+<div class="fragment"><div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;  {</div><div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="keywordflow">try</span></div><div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    {</div><div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;      <span class="keywordflow">for</span>(;;)</div><div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;      {</div><div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">utils::random_string</a>(32);</div><div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;        randomname.append(<span class="stringliteral">&quot;.random&quot;</span>);</div><div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;        result&lt;file_handle&gt; ret = <a class="code" href="classllfio__v2__xxx_1_1file__handle.html#a09e6b3e9806b328a687a55e955b885a3">file</a>(dirpath, randomname, _mode, <a class="code" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255">creation::only_if_not_exist</a>, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>);</div><div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        <span class="keywordflow">if</span>(ret || (!ret &amp;&amp; ret.error() != errc::file_exists))</div><div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        {</div><div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;          <span class="keywordflow">return</span> ret;</div><div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        }</div><div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;      }</div><div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    }</div><div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <span class="keywordflow">catch</span>(...)</div><div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    {</div><div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div><div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    }</div><div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1file__handle_html_a09e6b3e9806b328a687a55e955b885a3"><div class="ttname"><a href="classllfio__v2__xxx_1_1file__handle.html#a09e6b3e9806b328a687a55e955b885a3">llfio_v2_xxx::file_handle::file</a></div><div class="ttdeci">static result&lt; file_handle &gt; file(const path_handle &amp;base, path_view_type path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div></div>
 <div class="ttc" id="classllfio__v2__xxx_1_1handle_html_a013936bc1254b1a47567fe29698d1b1c"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">llfio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:413</div></div>
 <div class="ttc" id="classllfio__v2__xxx_1_1handle_html_af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255">llfio_v2_xxx::handle::creation::only_if_not_exist</a></div><div class="ttdoc">Filesystem entry must NOT exist, and is atomically created by the success of this operation...</div></div>
-<div class="ttc" id="namespacellfio__v2__xxx_1_1utils_html_a6a29cf29a4b097411f6c1e5274bfb417"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">llfio_v2_xxx::utils::random_string</a></div><div class="ttdeci">std::string random_string(size_t randomlen)</div><div class="ttdoc">Returns a cryptographically random string capable of being used as a filename. Essentially random_fil...</div><div class="ttdef"><b>Definition:</b> utils.hpp:134</div></div>
+<div class="ttc" id="namespacellfio__v2__xxx_1_1utils_html_a6a29cf29a4b097411f6c1e5274bfb417"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">llfio_v2_xxx::utils::random_string</a></div><div class="ttdeci">std::string random_string(size_t randomlen)</div><div class="ttdoc">Returns a cryptographically random string capable of being used as a filename. Essentially random_fil...</div><div class="ttdef"><b>Definition:</b> utils.hpp:169</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2318,8 +2442,8 @@ For portability, you can only assume that barriers write order for a single hand
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a50caa94c51aae1f23e7708d3c6a21364"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a50caa94c51aae1f23e7708d3c6a21364">&#9670;&nbsp;</a></span>zero()</h2>
+<a id="a299dd43c5d218b0253e0ce9760c955ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a299dd43c5d218b0253e0ce9760c955ab">&#9670;&nbsp;</a></span>zero() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2330,14 +2454,8 @@ For portability, you can only assume that barriers write order for a single hand
         <tr>
           <td class="memname">virtual result&lt;extent_type&gt; llfio_v2_xxx::file_handle::zero </td>
           <td>(</td>
-          <td class="paramtype">extent_type&#160;</td>
-          <td class="paramname"><em>offset</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">extent_type&#160;</td>
-          <td class="paramname"><em>bytes</em>, </td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html">extent_pair</a>&#160;</td>
+          <td class="paramname"><em>extent</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -2372,8 +2490,52 @@ For portability, you can only assume that barriers write order for a single hand
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX write() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. The asynchronous implementation in async_file_handle may perform one calloc and one free. </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1mapped__file__handle.html#aecc5c8f55550a0c83e63b73e50e5ed0b">llfio_v2_xxx::mapped_file_handle</a>, and <a class="el" href="classllfio__v2__xxx_1_1fast__random__file__handle.html#ab88d8d93300d1525d52ad1eb4e00e504">llfio_v2_xxx::fast_random_file_handle</a>.</p>
+<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1mapped__file__handle.html#a85989f7ebfd02ed54fbfa0afa6550d90">llfio_v2_xxx::mapped_file_handle</a>, and <a class="el" href="classllfio__v2__xxx_1_1fast__random__file__handle.html#a8393617b1f8ea7cc16ec5e15ee8166bd">llfio_v2_xxx::fast_random_file_handle</a>.</p>
 
+</div>
+</div>
+<a id="a800b4d046b9648a9a4a69a7797548ee4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a800b4d046b9648a9a4a69a7797548ee4">&#9670;&nbsp;</a></span>zero() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;extent_type&gt; llfio_v2_xxx::file_handle::zero </td>
+          <td>(</td>
+          <td class="paramtype">extent_type&#160;</td>
+          <td class="paramname"><em>offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">extent_type&#160;</td>
+          <td class="paramname"><em>bytes</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
+<div class="fragment"><div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classllfio__v2__xxx_1_1file__handle.html#a299dd43c5d218b0253e0ce9760c955ab">zero</a>({offset, bytes}, d); }</div><div class="ttc" id="classllfio__v2__xxx_1_1file__handle_html_a299dd43c5d218b0253e0ce9760c955ab"><div class="ttname"><a href="classllfio__v2__xxx_1_1file__handle.html#a299dd43c5d218b0253e0ce9760c955ab">llfio_v2_xxx::file_handle::zero</a></div><div class="ttdeci">virtual result&lt; extent_type &gt; zero(extent_pair extent, deadline d=deadline()) noexcept</div><div class="ttdoc">Efficiently zero, and possibly deallocate, data on storage. </div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>

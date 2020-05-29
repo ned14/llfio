@@ -135,6 +135,9 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:af04e3c96902ebdf100c63034212d7ae1"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle::extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#af04e3c96902ebdf100c63034212d7ae1">clone_or_copy</a> (const <a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;src, const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;destdir, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> destleaf={}, bool preserve_timestamps=true, bool force_copy_now=false, <a class="el" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42">file_handle::creation</a> creation=<a class="el" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42af7cf95e0f43dc8f79e39ae628c85a11d">file_handle::creation::always_new</a>, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d={}) noexcept</td></tr>
+<tr class="memdesc:af04e3c96902ebdf100c63034212d7ae1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clone or copy the extents of the filesystem entity identified by <code>src</code> to <code>destdir</code> optionally renamed to <code>destleaf</code>.  <a href="#af04e3c96902ebdf100c63034212d7ae1">More...</a><br /></td></tr>
+<tr class="separator:af04e3c96902ebdf100c63034212d7ae1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a05594f7c8ae275fa65b2acd57cc9b8ac"><td class="memItemLeft" align="right" valign="top">result&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a05594f7c8ae275fa65b2acd57cc9b8ac">reduce</a> (<a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;&amp;dirh, <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1reduce__visitor.html">reduce_visitor</a> *visitor=nullptr, size_t threads=0, bool force_slow_path=false) noexcept</td></tr>
 <tr class="memdesc:a05594f7c8ae275fa65b2acd57cc9b8ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reduce the directory identified <code>dirh</code>, and everything therein, to the null set.  <a href="#a05594f7c8ae275fa65b2acd57cc9b8ac">More...</a><br /></td></tr>
 <tr class="separator:a05594f7c8ae275fa65b2acd57cc9b8ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -243,6 +246,92 @@ template&lt;class T , class... Args&gt; </div>
 <p>Constructs a <code>T</code> adapted into a parent handle caching implementation. </p>
 <p>This function works via the <code>construct&lt;T&gt;()</code> free function framework for which your <code>handle</code> implementation must have registered its construction details. </p>
 <div class="fragment"><div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;  {</div><div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    construct&lt;T&gt; constructor{std::forward&lt;Args&gt;(args)...};</div><div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    OUTCOME_TRY(h, constructor());</div><div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    <span class="keywordflow">try</span></div><div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    {</div><div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;      <span class="keywordflow">return</span> cached_parent_handle_adapter&lt;T&gt;(std::move(h), constructor.base, constructor._path);</div><div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    }</div><div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="keywordflow">catch</span>(...)</div><div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    {</div><div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div><div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    }</div><div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;  }</div></div><!-- fragment -->
+</div>
+</div>
+<a id="af04e3c96902ebdf100c63034212d7ae1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af04e3c96902ebdf100c63034212d7ae1">&#9670;&nbsp;</a></span>clone_or_copy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;file_handle::extent_type&gt; llfio_v2_xxx::algorithm::clone_or_copy </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>src</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>destdir</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td>
+          <td class="paramname"><em>destleaf</em> = <code>{}</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>preserve_timestamps</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>force_copy_now</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42">file_handle::creation</a>&#160;</td>
+          <td class="paramname"><em>creation</em> = <code><a class="el" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42af7cf95e0f43dc8f79e39ae628c85a11d">file_handle::creation::always_new</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code>{}</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Clone or copy the extents of the filesystem entity identified by <code>src</code> to <code>destdir</code> optionally renamed to <code>destleaf</code>. </p>
+<dl class="section return"><dt>Returns</dt><dd>The number of bytes cloned or copied. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">src</td><td>The file to clone or copy. </td></tr>
+    <tr><td class="paramname">destdir</td><td>The base to lookup <code>destleaf</code> within. </td></tr>
+    <tr><td class="paramname">destleaf</td><td>The leafname to use. If empty, use the same leafname as <code>src</code> currently has. </td></tr>
+    <tr><td class="paramname">preserve_timestamps</td><td>Use <code>stat_t::stamp()</code> to preserve as much metadata from the original to the clone/copy as possible. </td></tr>
+    <tr><td class="paramname">force_copy_now</td><td>Parameter to pass to <code>file_handle::clone_extents()</code> to force extents to be copied now, not copy-on-write lazily later. </td></tr>
+    <tr><td class="paramname">creation</td><td>How to create the destination file handle. </td></tr>
+    <tr><td class="paramname">d</td><td>Deadline by which to complete the operation.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Firstly, a <code>file_handle</code> is constructed at the destination using <code>creation</code>, which defaults to always creating a new inode. The caching used for the destination handle is replicated from the source handle &ndash; be aware that not caching metadata is expensive.</p>
+<p>Next <code>file_handle::clone_extents()</code> with <code>emulate_if_unsupported = false</code> is called on the whole file content. If extent cloning is supported, this will be very fast and not consume new disk space (note: except on networked filesystems). If the source file is sparsely allocated, the destination will have identical sparse allocation.</p>
+<p>If the previous operation did not succeed, the disk free space is checked using <code>statfs_t</code>, and if the copy would exceed current disk free space, the destination file is unlinked and an error code comparing equal to <code>errc::no_space_on_device</code> is returned.</p>
+<p>Next, <code>file_handle::clone_extents()</code> with <code>emulate_if_unsupported = true</code> is called on the whole file content. This copies only the allocated extents in blocks sized whatever is the large page size on this platform (2Mb on x64).</p>
+<p>Finally, if <code>preserve_timestamps</code> is true, the destination file handle is restamped with the metadata from the source file handle just before the destination file handle is closed. </p>
+
 </div>
 </div>
 <a id="a05594f7c8ae275fa65b2acd57cc9b8ac"></a>
@@ -361,7 +450,7 @@ template&lt;class T , class... Args&gt; </div>
 <p>Summarise the directory identified <code>dirh</code>, and everything therein. </p>
 <p>It can be useful to summarise a directory hierarchy, especially to determine how much storage it occupies, but also how many mounted filesystems it straddles etc. You should specify what metadata you wish to summarise, if this is a subset of what metadata <code>directory_handle::read()</code> returns, performance will be considerably better. The default summarises all possible metadata.</p>
 <p>This is a trivial implementation on top of <code>algorithm::traverse()</code>, indeed it is implemented entirely as header code. You should review the documentation for <code>algorithm::traverse()</code>, as this algorithm is entirely implemented using that algorithm. </p>
-<div class="fragment"><div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;  {</div><div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    LLFIO_LOG_FUNCTION_CALL(&amp;dirh);</div><div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    summarize_visitor default_visitor;</div><div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    <span class="keywordflow">if</span>(visitor == <span class="keyword">nullptr</span>)</div><div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    {</div><div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;      visitor = &amp;default_visitor;</div><div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    }</div><div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    traversal_summary state;</div><div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    state.want = want;</div><div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    directory_entry entry{{}, stat_t(<span class="keyword">nullptr</span>)};</div><div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    OUTCOME_TRY(entry.stat.fill(dirh, want));</div><div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    OUTCOME_TRY(summarize_visitor::accumulate(state, &amp;state, <span class="keyword">nullptr</span>, entry, want));</div><div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    OUTCOME_TRY(<a class="code" href="namespacellfio__v2__xxx_1_1algorithm.html#ae068bc16598189811d0ce2b3530f1de7">traverse</a>(dirh, visitor, threads, &amp;state, force_slow_path));</div><div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    <span class="keywordflow">return</span> state;</div><div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  }</div><div class="ttc" id="namespacellfio__v2__xxx_1_1algorithm_html_ae068bc16598189811d0ce2b3530f1de7"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1algorithm.html#ae068bc16598189811d0ce2b3530f1de7">llfio_v2_xxx::algorithm::traverse</a></div><div class="ttdeci">result&lt; size_t &gt; traverse(const path_handle &amp;dirh, traverse_visitor *visitor, size_t threads=0, void *data=nullptr, bool force_slow_path=false) noexcept</div><div class="ttdoc">Traverse everything within and under dirh. </div></div>
+<div class="fragment"><div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;  {</div><div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    LLFIO_LOG_FUNCTION_CALL(&amp;dirh);</div><div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    summarize_visitor default_visitor;</div><div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <span class="keywordflow">if</span>(visitor == <span class="keyword">nullptr</span>)</div><div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    {</div><div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;      visitor = &amp;default_visitor;</div><div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    }</div><div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    traversal_summary state;</div><div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    state.want = want;</div><div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    directory_entry entry{{}, stat_t(<span class="keyword">nullptr</span>)};</div><div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    OUTCOME_TRY(entry.stat.fill(dirh, want));</div><div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    OUTCOME_TRY(summarize_visitor::accumulate(state, &amp;state, <span class="keyword">nullptr</span>, entry, want));</div><div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    OUTCOME_TRY(<a class="code" href="namespacellfio__v2__xxx_1_1algorithm.html#ae068bc16598189811d0ce2b3530f1de7">traverse</a>(dirh, visitor, threads, &amp;state, force_slow_path));</div><div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    <span class="keywordflow">return</span> state;</div><div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;  }</div><div class="ttc" id="namespacellfio__v2__xxx_1_1algorithm_html_ae068bc16598189811d0ce2b3530f1de7"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1algorithm.html#ae068bc16598189811d0ce2b3530f1de7">llfio_v2_xxx::algorithm::traverse</a></div><div class="ttdeci">result&lt; size_t &gt; traverse(const path_handle &amp;dirh, traverse_visitor *visitor, size_t threads=0, void *data=nullptr, bool force_slow_path=false) noexcept</div><div class="ttdoc">Traverse everything within and under dirh. </div></div>
 </div><!-- fragment -->
 </div>
 </div>

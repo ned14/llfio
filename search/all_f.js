@@ -3,7 +3,6 @@ var searchData=
   ['page_5fallocator',['page_allocator',['../classllfio__v2__xxx_1_1utils_1_1page__allocator.html',1,'llfio_v2_xxx::utils']]],
   ['page_5fallocator_3c_20void_20_3e',['page_allocator&lt; void &gt;',['../classllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4.html',1,'llfio_v2_xxx::utils']]],
   ['page_5fsize',['page_size',['../classllfio__v2__xxx_1_1map__handle.html#a7224b586e457183ebcb0a694e282d0fc',1,'llfio_v2_xxx::map_handle::page_size()'],['../classllfio__v2__xxx_1_1mapped__file__handle.html#a0f147e2d7d2758605019d9ea0dd8a35b',1,'llfio_v2_xxx::mapped_file_handle::page_size()'],['../namespacellfio__v2__xxx_1_1utils.html#a42fc69cae3dbbf66498545cbe358e2ba',1,'llfio_v2_xxx::utils::page_size()']]],
-  ['page_5fsizes',['page_sizes',['../namespacellfio__v2__xxx_1_1utils.html#a6c41e314d4d4b8362b96a3b4c1c363f5',1,'llfio_v2_xxx::utils']]],
   ['params_5ft',['params_t',['../unionllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t_1_1noncompleted__t_1_1params__t.html',1,'llfio_v2_xxx::io_multiplexer::_unsynchronised_io_operation_state::payload_t::noncompleted_t']]],
   ['parent_5fpath',['parent_path',['../classllfio__v2__xxx_1_1path__view.html#a3572b45e9a180899d0c5eac7605cc562',1,'llfio_v2_xxx::path_view']]],
   ['parent_5fpath_5fhandle',['parent_path_handle',['../classllfio__v2__xxx_1_1fs__handle.html#a865caad2f7f4bdf12fb74aabfe3c5ff5',1,'llfio_v2_xxx::fs_handle']]],

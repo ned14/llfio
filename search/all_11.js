@@ -38,7 +38,6 @@ var searchData=
   ['root_5fname',['root_name',['../classllfio__v2__xxx_1_1path__view.html#a57047ecaa75f039c61b6bbeb5b5c33af',1,'llfio_v2_xxx::path_view']]],
   ['root_5fpath',['root_path',['../classllfio__v2__xxx_1_1path__view.html#a5dde24635b2a5ab43e3622fefb2c656a',1,'llfio_v2_xxx::path_view']]],
   ['round_5fdown_5fto_5fpage_5fsize',['round_down_to_page_size',['../namespacellfio__v2__xxx_1_1utils.html#a5499feaf6b774e774a26e7decd11e3fa',1,'llfio_v2_xxx::utils']]],
-  ['round_5fto_5fpage_5fsize',['round_to_page_size',['../namespacellfio__v2__xxx_1_1utils.html#afa36e8bc2a1f004696c09d104e23d685',1,'llfio_v2_xxx::utils']]],
   ['round_5fup_5fto_5fpage_5fsize',['round_up_to_page_size',['../namespacellfio__v2__xxx_1_1utils.html#a67f8f31f6b93293a22a4b30d686eb3af',1,'llfio_v2_xxx::utils']]],
   ['running_5funder_5fwsl',['running_under_wsl',['../namespacellfio__v2__xxx_1_1utils.html#a7aae80908cc5521ef67234152c5c5044',1,'llfio_v2_xxx::utils']]]
 ];
