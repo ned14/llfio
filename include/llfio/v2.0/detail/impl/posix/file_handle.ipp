@@ -423,6 +423,12 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
 {
   try
   {
+    (void) extent;
+    (void) dest_;
+    (void) destoffset;
+    (void) d;
+    (void) force_copy_now;
+    (void) emulate_if_unsupported;
     return errc::operation_not_supported;
   }
   catch(...)

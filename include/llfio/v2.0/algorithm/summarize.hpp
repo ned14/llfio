@@ -42,19 +42,22 @@ namespace algorithm
   struct traversal_summary
   {
     //! The default metadata summarised
-    static constexpr stat_t::want default_metadata() { return stat_t::want::dev | stat_t::want::type | stat_t::want::size | stat_t::want::allocated | stat_t::want::blocks; }
+    static constexpr stat_t::want default_metadata()
+    {
+      return stat_t::want::dev | stat_t::want::type | stat_t::want::size | stat_t::want::allocated | stat_t::want::blocks;
+    }
     template <class T> using map_type = std::unordered_map<T, size_t>;
     spinlock _lock;
     size_t directory_opens_failed{0};  //!< The number of directories which could not be opened.
 
-    stat_t::want want{stat_t::want::none};  //!< The summary items desired
-    map_type<uint64_t> devs;                //!< The number of items with the given device id
-    map_type<filesystem::file_type> types;  //!< The number of items with the given type
-    handle::extent_type size{0};            //!< The sum of maximum extents. On Windows, is for file content only.
-    handle::extent_type allocated{0};       //!< The sum of allocated extents. On Windows, is for file content only.
-    handle::extent_type file_blocks{0};          //!< The sum of file allocated blocks.
-    handle::extent_type directory_blocks{0};     //!< The sum of directory allocated blocks.
-    size_t max_depth{0};                    //!< The maximum depth of the hierarchy
+    stat_t::want want{stat_t::want::none};    //!< The summary items desired
+    map_type<uint64_t> devs;                  //!< The number of items with the given device id
+    map_type<filesystem::file_type> types;    //!< The number of items with the given type
+    handle::extent_type size{0};              //!< The sum of maximum extents. On Windows, is for file content only.
+    handle::extent_type allocated{0};         //!< The sum of allocated extents. On Windows, is for file content only.
+    handle::extent_type file_blocks{0};       //!< The sum of file allocated blocks.
+    handle::extent_type directory_blocks{0};  //!< The sum of directory allocated blocks.
+    size_t max_depth{0};                      //!< The maximum depth of the hierarchy
 
     //! Adds another summary to this
     traversal_summary &operator+=(const traversal_summary &o)
@@ -89,7 +92,8 @@ namespace algorithm
   */
   struct summarize_visitor : public traverse_visitor
   {
-    static result<void> accumulate(traversal_summary &acc, traversal_summary *state, const directory_handle *dirh, directory_entry &entry, stat_t::want already_have_metadata)
+    static result<void> accumulate(traversal_summary &acc, traversal_summary *state, const directory_handle *dirh, directory_entry &entry,
+                                   stat_t::want already_have_metadata)
     {
       if((state->want & already_have_metadata) != state->want)
       {
@@ -136,7 +140,8 @@ namespace algorithm
     }
 
     //! This override ignores failures to traverse into the directory.
-    virtual result<directory_handle> directory_open_failed(void *data, result<void>::error_type &&error, const directory_handle &dirh, path_view leaf, size_t depth) noexcept override
+    virtual result<directory_handle> directory_open_failed(void *data, result<void>::error_type &&error, const directory_handle &dirh, path_view leaf,
+                                                           size_t depth) noexcept override
     {
       (void) error;
       (void) dirh;
@@ -181,7 +186,8 @@ namespace algorithm
   implemented entirely as header code. You should review the documentation for
   `algorithm::traverse()`, as this algorithm is entirely implemented using that algorithm.
   */
-  inline result<traversal_summary> summarize(const path_handle &dirh, stat_t::want want = traversal_summary::default_metadata(), summarize_visitor *visitor = nullptr, size_t threads = 0, bool force_slow_path = false) noexcept
+  inline result<traversal_summary> summarize(const path_handle &dirh, stat_t::want want = traversal_summary::default_metadata(),
+                                             summarize_visitor *visitor = nullptr, size_t threads = 0, bool force_slow_path = false) noexcept
   {
     LLFIO_LOG_FUNCTION_CALL(&dirh);
     summarize_visitor default_visitor;
@@ -189,12 +195,12 @@ namespace algorithm
     {
       visitor = &default_visitor;
     }
-    traversal_summary state;
-    state.want = want;
+    result<traversal_summary> state(in_place_type<traversal_summary>);
+    state.assume_value().want = want;
     directory_entry entry{{}, stat_t(nullptr)};
     OUTCOME_TRY(entry.stat.fill(dirh, want));
-    OUTCOME_TRY(summarize_visitor::accumulate(state, &state, nullptr, entry, want));
-    OUTCOME_TRY(traverse(dirh, visitor, threads, &state, force_slow_path));
+    OUTCOME_TRY(summarize_visitor::accumulate(state.assume_value(), &state.assume_value(), nullptr, entry, want));
+    OUTCOME_TRY(traverse(dirh, visitor, threads, &state.assume_value(), force_slow_path));
     return state;
   }
 
