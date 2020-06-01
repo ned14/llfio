@@ -174,7 +174,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<intptr_t> process_handle::wait(deadline d
   // We currently spin poll non-infinite non-zero waits :(
   for(;;)
   {
-    OUTCOME_TRY(running, check_child());
+    OUTCOME_TRY(auto &&running, check_child());
     if(!running)
       return ret;
     LLFIO_POSIX_DEADLINE_TO_TIMEOUT_LOOP(d);
@@ -207,20 +207,20 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<process_handle> process_handle::launch_pr
 
     if(!(flags & flag::no_redirect_in_pipe))
     {
-      OUTCOME_TRY(handles, pipe_handle::anonymous_pipe(pipe_handle::caching::all, pipeflags));
+      OUTCOME_TRY(auto &&handles, pipe_handle::anonymous_pipe(pipe_handle::caching::all, pipeflags));
       ret.value()._in_pipe = std::move(handles.first);
       childoutpipe = std::move(handles.second);
     }
     if(!(flags & flag::no_redirect_out_pipe))
     {
-      OUTCOME_TRY(handles, pipe_handle::anonymous_pipe(pipe_handle::caching::all, pipeflags));
+      OUTCOME_TRY(auto &&handles, pipe_handle::anonymous_pipe(pipe_handle::caching::all, pipeflags));
       ret.value()._out_pipe = std::move(handles.second);
       childinpipe = std::move(handles.first);
     }
     if(!(flags & flag::no_redirect_error_pipe))
     {
       // stderr must not buffer writes
-      OUTCOME_TRY(handles, pipe_handle::anonymous_pipe(pipe_handle::caching::reads, pipeflags));
+      OUTCOME_TRY(auto &&handles, pipe_handle::anonymous_pipe(pipe_handle::caching::reads, pipeflags));
       ret.value()._error_pipe = std::move(handles.first);
       childerrorpipe = std::move(handles.second);
     }

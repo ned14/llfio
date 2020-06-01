@@ -35,7 +35,7 @@ namespace file_handle_create_close
   }
   LLFIO_TEST_KERNEL_DECL LLFIO_V2_NAMESPACE::result<LLFIO_V2_NAMESPACE::file_handle> test_kernel_file_handle_relative(LLFIO_V2_NAMESPACE::file_handle::mode m, LLFIO_V2_NAMESPACE::file_handle::creation c, LLFIO_V2_NAMESPACE::file_handle::flag f)
   {
-    OUTCOME_TRY(b, LLFIO_V2_NAMESPACE::path_handle::path("."));
+    OUTCOME_TRY(auto &&b, LLFIO_V2_NAMESPACE::path_handle::path("."));
     auto h = LLFIO_V2_NAMESPACE::file_handle::file(b, "testfile.txt", m, c, LLFIO_V2_NAMESPACE::file_handle::caching::all, f);
     if(h) {
       h.value().close().value(); }

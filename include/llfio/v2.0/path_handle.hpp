@@ -99,7 +99,7 @@ public:
   //! A `path_handle` returning edition of `handle::clone()`
   result<path_handle> clone_to_path_handle() const noexcept
   {
-    OUTCOME_TRY(newh, handle::clone());
+    OUTCOME_TRY(auto &&newh, handle::clone());
     return path_handle(std::move(newh));
   }
 

@@ -28,7 +28,7 @@ namespace directory_handle_enumerate
 {
   LLFIO_TEST_KERNEL_DECL LLFIO_V2_NAMESPACE::result<LLFIO_V2_NAMESPACE::directory_handle::buffers_type> test_kernel_directory_handle_enumerate(LLFIO_V2_NAMESPACE::span<LLFIO_V2_NAMESPACE::directory_entry> *buffers, LLFIO_V2_NAMESPACE::path_view glob, LLFIO_V2_NAMESPACE::directory_handle::filter filtering)
   {
-    OUTCOME_TRY(h, LLFIO_V2_NAMESPACE::directory_handle::directory({}, "."));
+    OUTCOME_TRY(auto &&h, LLFIO_V2_NAMESPACE::directory_handle::directory({}, "."));
     auto ret = h.read({*buffers, glob, filtering});
     h.close().value();
     return ret;

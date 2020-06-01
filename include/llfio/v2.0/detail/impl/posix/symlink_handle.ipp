@@ -130,7 +130,7 @@ result<symlink_handle> symlink_handle::reopen(mode mode_, deadline d) const noex
 #if LLFIO_SYMLINK_HANDLE_IS_FAKED
   result<symlink_handle> ret(symlink_handle(native_handle_type(), _devid, _inode, _flags));
   ret.value()._v.behaviour = _v.behaviour;
-  OUTCOME_TRY(dirh, _dirh.clone());
+  OUTCOME_TRY(auto &&dirh, _dirh.clone());
   ret.value()._dirh = path_handle(std::move(dirh));
   try
   {
@@ -171,7 +171,7 @@ result<symlink_handle> symlink_handle::reopen(mode mode_, deadline d) const noex
   for(;;)
   {
     // Get the current path of myself
-    OUTCOME_TRY(currentpath, current_path());
+    OUTCOME_TRY(auto &&currentpath, current_path());
     // Open myself
     auto fh = symlink({}, currentpath, mode_, creation::open_existing, _flags);
     if(fh)
@@ -228,7 +228,7 @@ result<symlink_handle::path_type> symlink_handle::current_path() const noexcept
       {
         return posix_error();
       }
-      OUTCOME_TRY(dirpath, _dirh.current_path());
+      OUTCOME_TRY(auto &&dirpath, _dirh.current_path());
       dirpath /= _leafname;
       if(-1 == ::lstat(dirpath.c_str(), &s2) || s1.st_dev != s2.st_dev || s1.st_ino != s2.st_ino)
       {
@@ -254,12 +254,12 @@ result<void> symlink_handle::relink(const path_handle &base, path_view_type path
     _leafname = path.filename().path();
     if(base.is_valid() && path_parent.empty())
     {
-      OUTCOME_TRY(dh, base.clone());
+      OUTCOME_TRY(auto &&dh, base.clone());
       _dirh = path_handle(std::move(dh));
     }
     else if(!path_parent.empty())
     {
-      OUTCOME_TRY(dh, path_handle::path(base, path_parent));
+      OUTCOME_TRY(auto &&dh, path_handle::path(base, path_parent));
       _dirh = std::move(dh);
     }
   }
@@ -290,7 +290,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
   {
     return errc::function_not_supported;
   }
-  OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, caching::all, flags));
+  OUTCOME_TRY(auto &&attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, caching::all, flags));
   attribs &= ~O_NONBLOCK;
   nativeh.behaviour &= ~native_handle_type::disposition::nonblocking;
   nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
@@ -313,7 +313,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
 #if !LLFIO_SYMLINK_HANDLE_IS_FAKED
       dirhfd = base.native_handle().fd;
 #else
-      OUTCOME_TRY(dh, base.clone());
+      OUTCOME_TRY(auto &&dh, base.clone());
       dirh = path_handle(std::move(dh));
       dirhfd = dirh.native_handle().fd;
 #endif
@@ -323,7 +323,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
     if(!path_parent.empty())
 #endif
     {
-      OUTCOME_TRY(dh, path_handle::path(base, path_parent.empty() ? "." : path_parent));
+      OUTCOME_TRY(auto &&dh, path_handle::path(base, path_parent.empty() ? "." : path_parent));
       dirh = std::move(dh);
       dirhfd = dirh.native_handle().fd;
     }
@@ -443,7 +443,7 @@ result<symlink_handle::const_buffers_type> symlink_handle::write(symlink_handle:
     OUTCOME_TRY(_fetch_inode());
   }
   path_type filename;
-  OUTCOME_TRY(dirh, detail::containing_directory(std::ref(filename), *this, *this, d));
+  OUTCOME_TRY(auto &&dirh, detail::containing_directory(std::ref(filename), *this, *this, d));
 #else
   const path_handle &dirh = _dirh;
   const path_type &filename = _leafname;

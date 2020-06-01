@@ -146,7 +146,7 @@ namespace algorithm
         do
         {
           file_handle::buffer_type req{reinterpret_cast<byte *>(&_header), 48};
-          OUTCOME_TRY(_, _h.read({{&req, 1}, 0}));
+          OUTCOME_TRY(auto &&_, _h.read({{&req, 1}, 0}));
           if(_[0].data() != reinterpret_cast<byte *>(&_header))
           {
             memcpy(&_header, _[0].data(), _[0].size());
@@ -203,7 +203,7 @@ namespace algorithm
       static result<atomic_append> fs_mutex_append(const path_handle &base, path_view lockfile, bool nfs_compatibility = false, bool skip_hashing = false) noexcept
       {
         LLFIO_LOG_FUNCTION_CALL(0);
-        OUTCOME_TRY(ret, file_handle::file(base, lockfile, file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
+        OUTCOME_TRY(auto &&ret, file_handle::file(base, lockfile, file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
         atomic_append_detail::header header;
         // Lock the entire header for exclusive access
         auto lockresult = ret.lock_file_range(0, sizeof(header), lock_kind::exclusive, std::chrono::seconds(0));
@@ -231,7 +231,7 @@ namespace algorithm
           OUTCOME_TRYV(ret.write(0, {{reinterpret_cast<byte *>(&header), sizeof(header)}}));
         }
         // Open a shared lock on last byte in header to prevent other users zomping the file
-        OUTCOME_TRY(guard, ret.lock_file_range(sizeof(header) - 1, 1, lock_kind::shared));
+        OUTCOME_TRY(auto &&guard, ret.lock_file_range(sizeof(header) - 1, 1, lock_kind::shared));
         // Unlock any exclusive lock I gained earlier now
         if(lockresult)
         {
@@ -282,7 +282,7 @@ namespace algorithm
           lock_request.hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash((reinterpret_cast<char *>(&lock_request)) + 16, sizeof(lock_request) - 16);
         }
         // My lock request will be the file's current length or higher
-        OUTCOME_TRY(my_lock_request_offset, _h.maximum_extent());
+        OUTCOME_TRY(auto &&my_lock_request_offset, _h.maximum_extent());
         {
           OUTCOME_TRYV(_h.set_append_only(true));
           auto undo = make_scope_exit([this]() noexcept { (void) _h.set_append_only(false); });
@@ -292,7 +292,7 @@ namespace algorithm
             auto lastbyte = static_cast<file_handle::extent_type>(-1);
             // Lock up to the beginning of the shadow lock space
             lastbyte &= ~(1ULL << 63U);
-            OUTCOME_TRY(append_guard_, _h.lock_file_range(my_lock_request_offset, lastbyte, lock_kind::exclusive));
+            OUTCOME_TRY(auto &&append_guard_, _h.lock_file_range(my_lock_request_offset, lastbyte, lock_kind::exclusive));
             append_guard = std::move(append_guard_);
           }
           OUTCOME_TRYV(_h.write(0, {{reinterpret_cast<byte *>(&lock_request), sizeof(lock_request)}}));
@@ -338,7 +338,7 @@ namespace algorithm
           auto lock_offset = my_lock_request_offset;
           // Set the top bit to use the shadow lock space on Windows
           lock_offset |= (1ULL << 63U);
-          OUTCOME_TRY(my_request_guard_, _h.lock_file_range(lock_offset, sizeof(lock_request), lock_kind::exclusive));
+          OUTCOME_TRY(auto &&my_request_guard_, _h.lock_file_range(lock_offset, sizeof(lock_request), lock_kind::exclusive));
           my_request_guard = std::move(my_request_guard_);
         }
 
@@ -371,7 +371,7 @@ namespace algorithm
           assert(record_offset >= start_offset);
           assert(record_offset - start_offset <= sizeof(_buffer));
           file_handle::buffer_type req{_buffer, (size_t)(record_offset - start_offset) + sizeof(atomic_append_detail::lock_request)};
-          OUTCOME_TRY(batchread, _h.read({{&req, 1}, start_offset}));
+          OUTCOME_TRY(auto &&batchread, _h.read({{&req, 1}, start_offset}));
           assert(batchread[0].size() == record_offset - start_offset + sizeof(atomic_append_detail::lock_request));
           const atomic_append_detail::lock_request *record = reinterpret_cast<atomic_append_detail::lock_request *>(batchread[0].data() + batchread[0].size() - sizeof(atomic_append_detail::lock_request));
           const atomic_append_detail::lock_request *firstrecord = reinterpret_cast<atomic_append_detail::lock_request *>(batchread[0].data());

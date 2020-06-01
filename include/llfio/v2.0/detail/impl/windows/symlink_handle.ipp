@@ -77,8 +77,8 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
       return errc::function_not_supported;
     }
   }
-  OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode, flags));
-  OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, caching::all, flags));
+  OUTCOME_TRY(auto &&access, access_mask_from_handle_mode(nativeh, _mode, flags));
+  OUTCOME_TRY(auto &&attribs, attributes_from_handle_caching_and_flags(nativeh, caching::all, flags));
   nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
   if(base.is_valid() || path.is_ntpath())
   {
@@ -102,7 +102,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
     }
 
     attribs &= 0x00ffffff;  // the real attributes only, not the win32 flags
-    OUTCOME_TRY(ntflags, ntflags_from_handle_caching_and_flags(nativeh, caching::all, flags));
+    OUTCOME_TRY(auto &&ntflags, ntflags_from_handle_caching_and_flags(nativeh, caching::all, flags));
     ntflags |= 0x4000 /*FILE_OPEN_FOR_BACKUP_INTENT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/;
     ntflags |= 0x040 /*FILE_NON_DIRECTORY_FILE*/;  // do not open a directory
     IO_STATUS_BLOCK isb = make_iostatus();

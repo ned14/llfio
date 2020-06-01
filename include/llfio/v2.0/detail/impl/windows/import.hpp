@@ -1618,7 +1618,7 @@ inline result<void> do_clone_handle(native_handle_type &dest, const native_handl
   using namespace windows_nt_kernel;
   dest.behaviour |= src.behaviour & ~127U;  // propagate type of handle only
   DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
-  OUTCOME_TRY(access, access_mask_from_handle_mode(dest, mode_, _flags));
+  OUTCOME_TRY(auto &&access, access_mask_from_handle_mode(dest, mode_, _flags));
   OUTCOME_TRYV(attributes_from_handle_caching_and_flags(dest, caching_, _flags));
   if(isdir)
   {
@@ -1627,7 +1627,7 @@ inline result<void> do_clone_handle(native_handle_type &dest, const native_handl
     */
     access &= ~DELETE;
   }
-  OUTCOME_TRY(ntflags, ntflags_from_handle_caching_and_flags(dest, caching_, _flags));
+  OUTCOME_TRY(auto &&ntflags, ntflags_from_handle_caching_and_flags(dest, caching_, _flags));
   ntflags |= 0x040 /*FILE_NON_DIRECTORY_FILE*/;  // do not open a directory
   OBJECT_ATTRIBUTES oa{};
   memset(&oa, 0, sizeof(oa));

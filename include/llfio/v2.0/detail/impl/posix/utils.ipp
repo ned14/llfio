@@ -362,10 +362,10 @@ namespace utils
       //std::cerr << "Anon entries:";
       for(auto &i : anon_entries)
       {
-        OUTCOME_TRY(size, parse(i, "\nSize:"));
-        OUTCOME_TRY(rss, parse(i, "\nRss:"));
-        OUTCOME_TRY(anonymous, parse(i, "\nAnonymous:"));
-        OUTCOME_TRY(lazyfree, parse(i, "\nLazyFree:"));
+        OUTCOME_TRY(auto &&size, parse(i, "\nSize:"));
+        OUTCOME_TRY(auto &&rss, parse(i, "\nRss:"));
+        OUTCOME_TRY(auto &&anonymous, parse(i, "\nAnonymous:"));
+        OUTCOME_TRY(auto &&lazyfree, parse(i, "\nLazyFree:"));
         if(size != (uint64_t) -1 && rss != (uint64_t) -1 && anonymous != (uint64_t) -1)
         {
           ret.total_address_space_in_use += size;
@@ -383,9 +383,9 @@ namespace utils
       //std::cerr << "\n\nNon-anon entries:";
       for(auto &i : non_anon_entries)
       {
-        OUTCOME_TRY(size, parse(i, "\nSize:"));
-        OUTCOME_TRY(rss, parse(i, "\nRss:"));
-        OUTCOME_TRY(lazyfree, parse(i, "\nLazyFree:"));
+        OUTCOME_TRY(auto &&size, parse(i, "\nSize:"));
+        OUTCOME_TRY(auto &&rss, parse(i, "\nRss:"));
+        OUTCOME_TRY(auto &&lazyfree, parse(i, "\nLazyFree:"));
         if(size != (uint64_t) -1 && rss != (uint64_t) -1)
         {
           ret.total_address_space_in_use += size;

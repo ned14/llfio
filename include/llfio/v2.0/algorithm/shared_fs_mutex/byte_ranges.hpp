@@ -104,7 +104,7 @@ namespace algorithm
       static result<byte_ranges> fs_mutex_byte_ranges(const path_handle &base, path_view lockfile) noexcept
       {
         LLFIO_LOG_FUNCTION_CALL(0);
-        OUTCOME_TRY(ret, file_handle::file(base, lockfile, file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
+        OUTCOME_TRY(auto &&ret, file_handle::file(base, lockfile, file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::temporary));
         return byte_ranges(std::move(ret));
       }
 

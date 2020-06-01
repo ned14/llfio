@@ -100,12 +100,12 @@ namespace algorithm
         // Fetch any missing metadata
         if(entry.stat.st_type == filesystem::file_type::directory)
         {
-          OUTCOME_TRY(fh, directory_handle::directory(*dirh, entry.leafname, file_handle::mode::attr_read));
+          OUTCOME_TRY(auto &&fh, directory_handle::directory(*dirh, entry.leafname, file_handle::mode::attr_read));
           OUTCOME_TRY(entry.stat.fill(fh, state->want & ~already_have_metadata));
         }
         else
         {
-          OUTCOME_TRY(fh, file_handle::file(*dirh, entry.leafname, file_handle::mode::attr_read));
+          OUTCOME_TRY(auto &&fh, file_handle::file(*dirh, entry.leafname, file_handle::mode::attr_read));
           OUTCOME_TRY(entry.stat.fill(fh, state->want & ~already_have_metadata));
         }
       }

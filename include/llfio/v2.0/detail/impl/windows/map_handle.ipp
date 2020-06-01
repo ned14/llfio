@@ -181,7 +181,7 @@ result<section_handle> section_handle::section(extent_type bytes, const path_han
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  OUTCOME_TRY(_anonh, file_handle::temp_inode(dirh));
+  OUTCOME_TRY(auto &&_anonh, file_handle::temp_inode(dirh));
   OUTCOME_TRYV(_anonh.truncate(bytes));
   result<section_handle> ret(section_handle(native_handle_type(), nullptr, std::move(_anonh), _flag));
   native_handle_type &nativeh = ret.value()._v;
@@ -288,7 +288,7 @@ result<section_handle::extent_type> section_handle::truncate(extent_type newsize
   {
     if(_backing != nullptr)
     {
-      OUTCOME_TRY(length, _backing->maximum_extent());
+      OUTCOME_TRY(auto &&length, _backing->maximum_extent());
       newsize = length;
     }
     else
@@ -556,7 +556,7 @@ result<map_handle> map_handle::map(size_type bytes, bool /*unused*/, section_han
   native_handle_type &nativeh = ret.value()._v;
   DWORD allocation = MEM_RESERVE | MEM_COMMIT, prot;
   PVOID addr = nullptr;
-  OUTCOME_TRY(pagesize, detail::pagesize_from_flags(ret.value()._flag));
+  OUTCOME_TRY(auto &&pagesize, detail::pagesize_from_flags(ret.value()._flag));
   bytes = utils::round_up_to_page_size(bytes, pagesize);
   {
     size_t commitsize;
@@ -602,7 +602,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   size_t commitsize = bytes;
   LARGE_INTEGER _offset{};
   _offset.QuadPart = offset;
-  OUTCOME_TRY(pagesize, detail::pagesize_from_flags(ret.value()._flag));
+  OUTCOME_TRY(auto &&pagesize, detail::pagesize_from_flags(ret.value()._flag));
   SIZE_T _bytes = bytes;
   OUTCOME_TRY(win32_map_flags(nativeh, allocation, prot, commitsize, section.backing() != nullptr, ret.value()._flag));
   LLFIO_LOG_FUNCTION_CALL(&ret);
@@ -678,7 +678,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool /* un
   }
 
   // So this must be file backed memory. Totally different APIs for that :)
-  OUTCOME_TRY(length, _section->length());  // length of the backing file
+  OUTCOME_TRY(auto &&length, _section->length());  // length of the backing file
   if(newsize < _reservation)
   {
     // If newsize isn't exactly a previous extension, this will fail, same as for the VirtualAlloc case

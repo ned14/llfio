@@ -303,7 +303,7 @@ namespace algorithm
         auto r = detail::remove(dirh, entry.leafname, false);
         if(!r)
         {
-          OUTCOME_TRY(success, state->visitor->unlink_failed(data, std::move(r).error(), dirh, entry, depth));
+          OUTCOME_TRY(auto &&success, state->visitor->unlink_failed(data, std::move(r).error(), dirh, entry, depth));
           if(success)
           {
             state->items_removed.fetch_add(1, std::memory_order_relaxed);
@@ -339,7 +339,7 @@ namespace algorithm
     auto r = detail::rename(dirh, entry.leafname, false, state->topdirh);
     if(!r)
     {
-      OUTCOME_TRY(success, state->visitor->rename_failed(data, std::move(r).error(), dirh, entry, depth));
+      OUTCOME_TRY(auto &&success, state->visitor->rename_failed(data, std::move(r).error(), dirh, entry, depth));
       if(!success)
       {
         state->failed_to_rename.fetch_add(1, std::memory_order_relaxed);
@@ -357,7 +357,7 @@ namespace algorithm
       visitor = &default_visitor;
     }
     {
-      OUTCOME_TRY(dirhparent, topdirh.parent_path_handle());
+      OUTCOME_TRY(auto &&dirhparent, topdirh.parent_path_handle());
       for(;;)
       {
         auto randomname = utils::random_string(32);

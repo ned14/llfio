@@ -941,7 +941,7 @@ namespace test
         }
       }
       // The default implementation uses mmap, so this is done for us
-      OUTCOME_TRY(ret, _base::do_io_handle_allocate_registered_buffer(h, bytes));
+      OUTCOME_TRY(auto &&ret, _base::do_io_handle_allocate_registered_buffer(h, bytes));
       // Register this buffer with io_uring
       struct iovec upd;
       upd.iov_base = ret->data();

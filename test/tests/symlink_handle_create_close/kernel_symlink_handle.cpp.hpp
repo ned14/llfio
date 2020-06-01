@@ -41,7 +41,7 @@ namespace symlink_handle_create_close
   }
   LLFIO_TEST_KERNEL_DECL LLFIO_V2_NAMESPACE::result<LLFIO_V2_NAMESPACE::symlink_handle> test_kernel_symlink_handle_relative(LLFIO_V2_NAMESPACE::symlink_handle::mode m, LLFIO_V2_NAMESPACE::symlink_handle::creation c, LLFIO_V2_NAMESPACE::symlink_handle::flag f)
   {
-    OUTCOME_TRY(b, LLFIO_V2_NAMESPACE::path_handle::path("."));
+    OUTCOME_TRY(auto &&b, LLFIO_V2_NAMESPACE::path_handle::path("."));
     auto h = LLFIO_V2_NAMESPACE::symlink_handle::symlink(b, "testlink", m, c, f);
     if(h)
     {

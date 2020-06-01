@@ -37,8 +37,8 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
   LLFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::pipe;
   DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
-  OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode, flags));
-  OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
+  OUTCOME_TRY(auto &&access, access_mask_from_handle_mode(nativeh, _mode, flags));
+  OUTCOME_TRY(auto &&attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
   nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
   if(creation::truncate_existing == _creation || creation::always_new == _creation || !base.is_valid())
   {
@@ -68,7 +68,7 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
   }
 
   attribs &= 0x00ffffff;  // the real attributes only, not the win32 flags
-  OUTCOME_TRY(ntflags, ntflags_from_handle_caching_and_flags(nativeh, _caching, flags));
+  OUTCOME_TRY(auto &&ntflags, ntflags_from_handle_caching_and_flags(nativeh, _caching, flags));
   ntflags &= ~0x00000008 /*FILE_NO_INTERMEDIATE_BUFFERING*/;  // pipes always buffer
   IO_STATUS_BLOCK isb = make_iostatus();
 
@@ -169,20 +169,20 @@ result<std::pair<pipe_handle, pipe_handle>> pipe_handle::anonymous_pipe(caching 
   using namespace windows_nt_kernel;
   // Create an unnamed new pipe
   flags &= ~flag::unlink_on_first_close;
-  OUTCOME_TRY(anonpipe, pipe({}, mode::read, creation::only_if_not_exist, _caching, flags));
+  OUTCOME_TRY(auto &&anonpipe, pipe({}, mode::read, creation::only_if_not_exist, _caching, flags));
   std::pair<pipe_handle, pipe_handle> ret(std::move(anonpipe), pipe_handle(native_handle_type(), 0, 0, _caching, flags, nullptr));
   native_handle_type &readnativeh = ret.first._v, &writenativeh = ret.second._v;
   DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
-  OUTCOME_TRY(access, access_mask_from_handle_mode(writenativeh, mode::append, flags));
+  OUTCOME_TRY(auto &&access, access_mask_from_handle_mode(writenativeh, mode::append, flags));
   access = SYNCHRONIZE | DELETE | GENERIC_WRITE;  // correct for pipes
-  OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(writenativeh, _caching, flags));
+  OUTCOME_TRY(auto &&attribs, attributes_from_handle_caching_and_flags(writenativeh, _caching, flags));
   writenativeh.behaviour |= native_handle_type::disposition::pipe;
   writenativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
   LLFIO_LOG_FUNCTION_CALL(&ret.first);
 
   // Now clone the handle, but as a write privileged handle
   attribs &= 0x00ffffff;  // the real attributes only, not the win32 flags
-  OUTCOME_TRY(ntflags, ntflags_from_handle_caching_and_flags(writenativeh, _caching, flags));
+  OUTCOME_TRY(auto &&ntflags, ntflags_from_handle_caching_and_flags(writenativeh, _caching, flags));
   ntflags &= ~0x00000008 /*FILE_NO_INTERMEDIATE_BUFFERING*/;  // pipes always buffer
   IO_STATUS_BLOCK isb = make_iostatus();
 

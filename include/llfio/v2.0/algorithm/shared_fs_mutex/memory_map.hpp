@@ -197,7 +197,7 @@ namespace algorithm
         LLFIO_LOG_FUNCTION_CALL(0);
         try
         {
-          OUTCOME_TRY(ret, file_handle::file(base, lockfile, file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::reads));
+          OUTCOME_TRY(auto &&ret, file_handle::file(base, lockfile, file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::reads));
           file_handle temph;
           // Am I the first person to this file? Lock everything exclusively
           auto lockinuse = ret.lock_file_range(_initialisingoffset, 2, lock_kind::exclusive, std::chrono::seconds(0));
@@ -227,25 +227,25 @@ namespace algorithm
             }
             temph = std::move(_temph.value());
             // Map the hash index file into memory for read/write access
-            OUTCOME_TRY(temphsection, section_handle::section(temph, HashIndexSize));
-            OUTCOME_TRY(temphmap, map_handle::map(temphsection, HashIndexSize));
+            OUTCOME_TRY(auto &&temphsection, section_handle::section(temph, HashIndexSize));
+            OUTCOME_TRY(auto &&temphmap, map_handle::map(temphsection, HashIndexSize));
             // Map the path file into memory with its maximum possible size, read only
-            OUTCOME_TRY(hsection, section_handle::section(ret, 65536, section_handle::flag::read));
-            OUTCOME_TRY(hmap, map_handle::map(hsection, 0, 0, section_handle::flag::read));
+            OUTCOME_TRY(auto &&hsection, section_handle::section(ret, 65536, section_handle::flag::read));
+            OUTCOME_TRY(auto &&hmap, map_handle::map(hsection, 0, 0, section_handle::flag::read));
             return memory_map(std::move(ret), std::move(temph), std::move(lockinuse.value()), std::move(hmap), std::move(temphmap));
           }
 
           // I am the first person to be using this (stale?) file, so create a new hash index file in /tmp
           auto &tempdirh = path_discovery::memory_backed_temporary_files_directory().is_valid() ? path_discovery::memory_backed_temporary_files_directory() : path_discovery::storage_backed_temporary_files_directory();
-          OUTCOME_TRY(_temph, file_handle::uniquely_named_file(tempdirh));
+          OUTCOME_TRY(auto &&_temph, file_handle::uniquely_named_file(tempdirh));
           temph = std::move(_temph);
           // Truncate it out to the hash index size, and map it into memory for read/write access
           OUTCOME_TRYV(temph.truncate(HashIndexSize));
-          OUTCOME_TRY(temphsection, section_handle::section(temph, HashIndexSize));
-          OUTCOME_TRY(temphmap, map_handle::map(temphsection, HashIndexSize));
+          OUTCOME_TRY(auto &&temphsection, section_handle::section(temph, HashIndexSize));
+          OUTCOME_TRY(auto &&temphmap, map_handle::map(temphsection, HashIndexSize));
           // Write the path of my new hash index file, padding zeros to the nearest page size
           // multiple to work around a race condition in the Linux kernel
-          OUTCOME_TRY(temppath, temph.current_path());
+          OUTCOME_TRY(auto &&temppath, temph.current_path());
           char buffer[4096];
           memset(buffer, 0, sizeof(buffer));
           size_t bytes = temppath.native().size() * sizeof(*temppath.c_str());
@@ -253,13 +253,13 @@ namespace algorithm
           OUTCOME_TRYV(ret.truncate(65536));
           OUTCOME_TRYV(ret.write({buffers, 0}));
           // Map for read the maximum possible path file size, again to avoid race problems
-          OUTCOME_TRY(hsection, section_handle::section(ret, 65536, section_handle::flag::read));
-          OUTCOME_TRY(hmap, map_handle::map(hsection, 0, 0, section_handle::flag::read));
+          OUTCOME_TRY(auto &&hsection, section_handle::section(ret, 65536, section_handle::flag::read));
+          OUTCOME_TRY(auto &&hmap, map_handle::map(hsection, 0, 0, section_handle::flag::read));
           /* Take shared locks on inuse. Even if this implementation doesn't implement
           atomic downgrade of exclusive range to shared range, we're fully prepared for other users
           now. The _initialisingoffset remains exclusive to prevent double entry into this init routine.
           */
-          OUTCOME_TRY(lockinuse2, ret.lock_file_range(_lockinuseoffset, 1, lock_kind::shared));
+          OUTCOME_TRY(auto &&lockinuse2, ret.lock_file_range(_lockinuseoffset, 1, lock_kind::shared));
           lockinuse = std::move(lockinuse2);  // releases exclusive lock on all three offsets
           return memory_map(std::move(ret), std::move(temph), std::move(lockinuse.value()), std::move(hmap), std::move(temphmap));
         }

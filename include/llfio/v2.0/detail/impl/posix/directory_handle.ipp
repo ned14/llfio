@@ -63,7 +63,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
   {
     return errc::is_a_directory;
   }
-  OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, _caching, flags));
+  OUTCOME_TRY(auto &&attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, _caching, flags));
   attribs &= ~O_NONBLOCK;
   nativeh.behaviour &= ~native_handle_type::disposition::nonblocking;
   nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
@@ -86,16 +86,16 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     path_handle dirh;
     if(base.is_valid() && path_parent.empty())
     {
-      OUTCOME_TRY(dh, base.clone());
+      OUTCOME_TRY(auto &&dh, base.clone());
       dirh = path_handle(std::move(dh));
     }
     else if(!path_parent.empty())
     {
-      OUTCOME_TRY(dh, path_handle::path(base, path_parent));
+      OUTCOME_TRY(auto &&dh, path_handle::path(base, path_parent));
       dirh = std::move(dh);
     }
     // Create a randomly named directory, and rename it over
-    OUTCOME_TRY(rfh, uniquely_named_directory(dirh, _mode, _caching, flags));
+    OUTCOME_TRY(auto &&rfh, uniquely_named_directory(dirh, _mode, _caching, flags));
     auto r = rfh.relink(dirh, path.filename());
     if(r)
     {
@@ -207,7 +207,7 @@ result<directory_handle> directory_handle::reopen(mode mode_, caching caching_, 
   for(;;)
   {
     // Get the current path of myself
-    OUTCOME_TRY(currentpath, current_path());
+    OUTCOME_TRY(auto &&currentpath, current_path());
     // Open myself
     auto fh = directory({}, currentpath, mode_, creation::open_existing, caching_, _flags);
     if(fh)

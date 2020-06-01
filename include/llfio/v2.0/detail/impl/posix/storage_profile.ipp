@@ -291,7 +291,7 @@ namespace storage_profile
 #endif
               return errc::function_not_supported;
           }
-          OUTCOME_TRY(deviceh, file_handle::file({}, mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
+          OUTCOME_TRY(auto &&deviceh, file_handle::file({}, mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
 
 // TODO(ned): See https://github.com/baruch/diskscan/blob/master/arch/arch-linux.c
 //          sp.controller_type.value = "SCSI";

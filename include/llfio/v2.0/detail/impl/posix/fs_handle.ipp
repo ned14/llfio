@@ -62,7 +62,7 @@ namespace detail
       for(;;)
       {
         // Get current path for handle and open its containing dir
-        OUTCOME_TRY(_currentpath, h.current_path());
+        OUTCOME_TRY(auto &&_currentpath, h.current_path());
         // If current path is empty, it's been deleted
         if(_currentpath.empty())
         {
@@ -174,7 +174,7 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
   {
     OUTCOME_TRY(_fetch_inode());
   }
-  OUTCOME_TRY(dirh, detail::containing_directory(std::ref(filename), h, *this, d));
+  OUTCOME_TRY(auto &&dirh, detail::containing_directory(std::ref(filename), h, *this, d));
   if(!atomic_replace)
   {
 // Some systems provide an extension for atomic non-replacing renames
@@ -207,7 +207,7 @@ result<void> fs_handle::unlink(deadline d) noexcept
   {
     OUTCOME_TRY(_fetch_inode());
   }
-  OUTCOME_TRY(dirh, detail::containing_directory(std::ref(filename), h, *this, d));
+  OUTCOME_TRY(auto &&dirh, detail::containing_directory(std::ref(filename), h, *this, d));
   if(-1 == ::unlinkat(dirh.native_handle().fd, filename.c_str(), h.is_directory() ? AT_REMOVEDIR : 0))
   {
     return posix_error();

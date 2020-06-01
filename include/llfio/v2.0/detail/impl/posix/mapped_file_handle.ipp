@@ -30,7 +30,7 @@ LLFIO_V2_NAMESPACE_BEGIN
 result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type reservation) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  OUTCOME_TRY(length, underlying_file_maximum_extent());
+  OUTCOME_TRY(auto &&length, underlying_file_maximum_extent());
   if(length == 0)
   {
     // Not portable to map an empty file, so do nothing
@@ -44,7 +44,7 @@ result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type rese
   if(!_sh.is_valid())
   {
     section_handle::flag sectionflags = _sh.section_flags() | section_handle::flag::readwrite;
-    OUTCOME_TRY(sh, section_handle::section(*this, length, sectionflags));
+    OUTCOME_TRY(auto &&sh, section_handle::section(*this, length, sectionflags));
     _sh = std::move(sh);
   }
   if(_mh.is_valid() && reservation == _mh.length())
@@ -59,7 +59,7 @@ result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type rese
     mapflags |= section_handle::flag::write;
   }
   OUTCOME_TRYV(_mh.close());
-  OUTCOME_TRY(mh, map_handle::map(_sh, reservation, 0, mapflags));
+  OUTCOME_TRY(auto &&mh, map_handle::map(_sh, reservation, 0, mapflags));
   _mh = std::move(mh);
   _reservation = reservation;
   return _reservation;
@@ -104,7 +104,7 @@ result<mapped_file_handle::extent_type> mapped_file_handle::truncate(extent_type
   }
   if(!_sh.is_valid())
   {
-    OUTCOME_TRY(ret, file_handle::truncate(newsize));
+    OUTCOME_TRY(auto &&ret, file_handle::truncate(newsize));
     if(newsize > _reservation)
     {
       _reservation = newsize;
@@ -114,7 +114,7 @@ result<mapped_file_handle::extent_type> mapped_file_handle::truncate(extent_type
     return ret;
   }
   // On POSIX the section's size is the file's size
-  OUTCOME_TRY(size, _sh.length());
+  OUTCOME_TRY(auto &&size, _sh.length());
   if(size != newsize)
   {
     // If we are making this smaller, we must discard the pages about to get truncated
@@ -130,7 +130,7 @@ result<mapped_file_handle::extent_type> mapped_file_handle::truncate(extent_type
     // Have we exceeded the reservation? If so, reserve a new reservation which will recreate the map.
     if(newsize > _reservation)
     {
-      OUTCOME_TRY(ret, reserve(newsize));
+      OUTCOME_TRY(auto &&ret, reserve(newsize));
       return ret;
     }
     size = newsize;
@@ -142,7 +142,7 @@ result<mapped_file_handle::extent_type> mapped_file_handle::truncate(extent_type
 
 result<mapped_file_handle::extent_type> mapped_file_handle::update_map() noexcept
 {
-  OUTCOME_TRY(length, underlying_file_maximum_extent());
+  OUTCOME_TRY(auto &&length, underlying_file_maximum_extent());
   if(length > _reservation)
   {
     // This API never exceeds the reservation

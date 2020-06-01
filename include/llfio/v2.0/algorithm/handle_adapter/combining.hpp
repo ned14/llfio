@@ -184,7 +184,7 @@ namespace algorithm
         else
         {
           auto _bytes = (bytes + 63) & ~63;
-          OUTCOME_TRY(_, map_handle::map(_bytes * (1 + _have_source)));
+          OUTCOME_TRY(auto &&_, map_handle::map(_bytes * (1 + _have_source)));
           buffersh = std::move(_);
           buffers[0] = buffer_type{buffersh.address(), bytes};
           if(_have_source)
@@ -213,19 +213,19 @@ namespace algorithm
         // Handle any errors
         buffer_type filleds[2];
         {
-          OUTCOME_TRY(_filled, std::move(*_filleds[0]));
+          OUTCOME_TRY(auto &&_filled, std::move(*_filleds[0]));
           filleds[0] = std::move(_filled[0]);
         }
         if(_have_source)
         {
-          OUTCOME_TRY(_filled, std::move(*_filleds[1]));
+          OUTCOME_TRY(auto &&_filled, std::move(*_filleds[1]));
           filleds[1] = std::move(_filled[0]);
         }
 
         // For each buffer in the request, perform Op, consuming temporary buffers as we go
         for(auto &b : reqs.buffers)
         {
-          OUTCOME_TRY(_b, Op<target_handle_type, source_handle_type>::do_read(b, filleds[0], filleds[1]));
+          OUTCOME_TRY(auto &&_b, Op<target_handle_type, source_handle_type>::do_read(b, filleds[0], filleds[1]));
           b = _b;
           filleds[0] = buffer_type{filleds[0].data() + b.size(), filleds[0].size() - b.size()};
           if(_have_source)
@@ -261,7 +261,7 @@ namespace algorithm
         else
         {
           auto _bytes = (bytes + 63) & ~63;
-          OUTCOME_TRY(_, map_handle::map(_bytes * (1 + _have_source)));
+          OUTCOME_TRY(auto &&_, map_handle::map(_bytes * (1 + _have_source)));
           buffersh = std::move(_);
           buffers[0] = buffer_type{buffers[0].data(), bytes};
           if(_have_source)
@@ -275,7 +275,7 @@ namespace algorithm
         if(_have_source)
         {
           io_request<buffers_type> req({&buffers[1], 1}, reqs.offset);
-          OUTCOME_TRY(_, _source->read(req, d));
+          OUTCOME_TRY(auto &&_, _source->read(req, d));
           tempbuffers[1] = buffer_type{_[0].data(), _[0].size()};
         }
 
@@ -283,7 +283,7 @@ namespace algorithm
         for(auto &b : reqs.buffers)
         {
           // Returns buffers to be written into target
-          OUTCOME_TRY(_b, Op<target_handle_type, source_handle_type>::do_write(tempbuffers[0], tempbuffers[1], b));
+          OUTCOME_TRY(auto &&_b, Op<target_handle_type, source_handle_type>::do_write(tempbuffers[0], tempbuffers[1], b));
           // Adjust inputs to match
           tempbuffers[0] = buffer_type{tempbuffers[0].data() + _b.size(), tempbuffers[0].size() - _b.size()};
           if(_have_source)
@@ -299,7 +299,7 @@ namespace algorithm
         {
           const_buffer_type b(buffers[0]);
           io_request<const_buffers_type> req({&b, 1}, reqs.offset);
-          OUTCOME_TRY(_, _target->write(req, d));
+          OUTCOME_TRY(auto &&_, _target->write(req, d));
           OUTCOME_TRY((Op<target_handle_type, source_handle_type>::adjust_written_buffers(reqs.buffers, _[0], buffers[0])));
         }
         return std::move(reqs.buffers);
@@ -366,12 +366,12 @@ namespace algorithm
         }
         // Handle any errors
         {
-          OUTCOME_TRY(_, std::move(*_locks[0]));
+          OUTCOME_TRY(auto &&_, std::move(*_locks[0]));
           _.release();
         }
         if(_have_source)
         {
-          OUTCOME_TRY(_, std::move(*_locks[1]));
+          OUTCOME_TRY(auto &&_, std::move(*_locks[1]));
           _.release();
         }
         return _extent_guard(this, offset, bytes, kind);
@@ -390,12 +390,12 @@ namespace algorithm
       LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> maximum_extent() const noexcept override
       {
         extent_type r = (extent_type) -1;
-        OUTCOME_TRY(x, this->_target->maximum_extent());
+        OUTCOME_TRY(auto &&x, this->_target->maximum_extent());
         if(x < r)
           r = x;
         if(_have_source)
         {
-          OUTCOME_TRY(y, this->_source->maximum_extent());
+          OUTCOME_TRY(auto &&y, this->_source->maximum_extent());
           if(y < r)
             r = y;
         }
@@ -422,13 +422,13 @@ namespace algorithm
         extent_type ret = (extent_type) -1;
         // Handle any errors
         {
-          OUTCOME_TRY(_, std::move(*r[0]));
+          OUTCOME_TRY(auto &&_, std::move(*r[0]));
           if(_ < ret)
             ret = _;
         }
         if(_have_source)
         {
-          OUTCOME_TRY(_, std::move(*r[1]));
+          OUTCOME_TRY(auto &&_, std::move(*r[1]));
           if(_ < ret)
             ret = _;
         }
@@ -457,13 +457,13 @@ namespace algorithm
         extent_type ret = (extent_type) -1;
         // Handle any errors
         {
-          OUTCOME_TRY(_, std::move(*r[0]));
+          OUTCOME_TRY(auto &&_, std::move(*r[0]));
           if(_ < ret)
             ret = _;
         }
         if(_have_source)
         {
-          OUTCOME_TRY(_, std::move(*r[1]));
+          OUTCOME_TRY(auto &&_, std::move(*r[1]));
           if(_ < ret)
             ret = _;
         }

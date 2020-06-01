@@ -54,7 +54,7 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
     for(;;)
     {
       // Get current path for handle and open its containing dir
-      OUTCOME_TRY(currentpath, h.current_path());
+      OUTCOME_TRY(auto &&currentpath, h.current_path());
       // If current path is empty, it's been deleted
       if(currentpath.empty())
       {
@@ -282,7 +282,7 @@ result<void> fs_handle::unlink(deadline d) noexcept
       {
         return error_from_exception();
       }
-      OUTCOME_TRY(dirh, parent_path_handle(d));
+      OUTCOME_TRY(auto &&dirh, parent_path_handle(d));
       result<void> out = relink(dirh, randomname);
       if(!out)
       {

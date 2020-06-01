@@ -42,7 +42,7 @@ namespace directory_handle_create_close
   LLFIO_TEST_KERNEL_DECL LLFIO_V2_NAMESPACE::result<LLFIO_V2_NAMESPACE::directory_handle> test_kernel_directory_handle_relative(LLFIO_V2_NAMESPACE::directory_handle::mode m, LLFIO_V2_NAMESPACE::directory_handle::creation c, LLFIO_V2_NAMESPACE::directory_handle::flag f,
                                                                                                                                 LLFIO_V2_NAMESPACE::directory_handle::buffers_type *entries, LLFIO_V2_NAMESPACE::result<LLFIO_V2_NAMESPACE::directory_handle::buffers_type> *info)
   {
-    OUTCOME_TRY(b, LLFIO_V2_NAMESPACE::path_handle::path("."));
+    OUTCOME_TRY(auto &&b, LLFIO_V2_NAMESPACE::path_handle::path("."));
     auto h = LLFIO_V2_NAMESPACE::directory_handle::directory(b, "testdir", m, c, LLFIO_V2_NAMESPACE::directory_handle::caching::all, f);
     if(h)
     {
