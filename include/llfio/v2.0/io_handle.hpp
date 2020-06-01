@@ -488,7 +488,7 @@ inline result<void> io_handle::set_multiplexer(io_multiplexer *c) noexcept
   }
   if(c != nullptr)
   {
-    OUTCOME_TRY(state, c->do_io_handle_register(this));
+    OUTCOME_TRY(auto &&state, c->do_io_handle_register(this));
     _v.behaviour = (_v.behaviour & ~(native_handle_type::disposition::_multiplexer_state_bit0 | native_handle_type::disposition::_multiplexer_state_bit1));
     if((state & 1) != 0)
     {

@@ -98,7 +98,7 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
 
 result<section_handle> section_handle::section(extent_type bytes, const path_handle &dirh, flag _flag) noexcept
 {
-  OUTCOME_TRY(_anonh, file_handle::temp_inode(dirh));
+  OUTCOME_TRY(auto &&_anonh, file_handle::temp_inode(dirh));
   OUTCOME_TRYV(_anonh.truncate(bytes));
   result<section_handle> ret(section_handle(native_handle_type(), nullptr, std::move(_anonh), _flag));
   native_handle_type &nativeh = ret.value()._v;
@@ -397,8 +397,8 @@ result<map_handle> map_handle::map(size_type bytes, bool /*unused*/, section_han
   bytes = utils::round_up_to_page_size(bytes, /*FIXME*/ utils::page_size());
   result<map_handle> ret(map_handle(nullptr, _flag));
   native_handle_type &nativeh = ret.value()._v;
-  OUTCOME_TRY(pagesize, detail::pagesize_from_flags(ret.value()._flag));
-  OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, 0, nullptr, pagesize, bytes, 0, ret.value()._flag));
+  OUTCOME_TRY(auto &&pagesize, detail::pagesize_from_flags(ret.value()._flag));
+  OUTCOME_TRY(auto &&addr, do_mmap(nativeh, nullptr, 0, nullptr, pagesize, bytes, 0, ret.value()._flag));
   ret.value()._addr = static_cast<byte *>(addr);
   ret.value()._reservation = bytes;
   ret.value()._length = bytes;
@@ -411,15 +411,15 @@ result<map_handle> map_handle::map(size_type bytes, bool /*unused*/, section_han
 
 result<map_handle> map_handle::map(section_handle &section, size_type bytes, extent_type offset, section_handle::flag _flag) noexcept
 {
-  OUTCOME_TRY(length, section.length());  // length of the backing file
+  OUTCOME_TRY(auto &&length, section.length());  // length of the backing file
   if(bytes == 0u)
   {
     bytes = length - offset;
   }
   result<map_handle> ret{map_handle(&section, _flag)};
   native_handle_type &nativeh = ret.value()._v;
-  OUTCOME_TRY(pagesize, detail::pagesize_from_flags(ret.value()._flag));
-  OUTCOME_TRY(addr, do_mmap(nativeh, nullptr, 0, &section, pagesize, bytes, offset, ret.value()._flag));
+  OUTCOME_TRY(auto &&pagesize, detail::pagesize_from_flags(ret.value()._flag));
+  OUTCOME_TRY(auto &&addr, do_mmap(nativeh, nullptr, 0, &section, pagesize, bytes, offset, ret.value()._flag));
   ret.value()._addr = static_cast<byte *>(addr);
   ret.value()._offset = offset;
   ret.value()._reservation = utils::round_up_to_page_size(bytes, pagesize);
@@ -439,7 +439,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
   extent_type length = _length;
   if(_section != nullptr)
   {
-    OUTCOME_TRY(length_, _section->length());  // length of the backing file
+    OUTCOME_TRY(auto &&length_, _section->length());  // length of the backing file
     length = length_;
   }
   auto _newsize = utils::round_up_to_page_size(newsize, _pagesize);
@@ -462,7 +462,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
   // If not mapped yet ...
   if(_addr == nullptr)
   {
-    OUTCOME_TRY(addr, do_mmap(_v, nullptr, 0, _section, _pagesize, newsize, _offset, _flag));
+    OUTCOME_TRY(auto &&addr, do_mmap(_v, nullptr, 0, _section, _pagesize, newsize, _offset, _flag));
     _addr = static_cast<byte *>(addr);
     _reservation = _newsize;
     _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
@@ -488,7 +488,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
     byte *addrafter = _addr + _reservation;
     size_type bytes = newsize - _reservation;
     extent_type offset = _offset + _reservation;
-    OUTCOME_TRY(addr, do_mmap(_v, addrafter, MAP_FIXED | MAP_EXCL, _section, _pagesize, bytes, offset, _flag));
+    OUTCOME_TRY(auto &&addr, do_mmap(_v, addrafter, MAP_FIXED | MAP_EXCL, _section, _pagesize, bytes, offset, _flag));
     _reservation = _newsize;
     _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
     return newsize;
@@ -496,7 +496,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
     byte *addrafter = _addr + _reservation;
     size_type bytes = newsize - _reservation;
     extent_type offset = _offset + _reservation;
-    OUTCOME_TRY(addr, do_mmap(_v, addrafter, 0, _section, _pagesize, bytes, offset, _flag));
+    OUTCOME_TRY(auto &&addr, do_mmap(_v, addrafter, 0, _section, _pagesize, bytes, offset, _flag));
     if(addr != addrafter)
     {
       ::munmap(addr, bytes);

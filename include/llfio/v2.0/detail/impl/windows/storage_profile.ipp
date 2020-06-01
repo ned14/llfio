@@ -230,7 +230,7 @@ namespace storage_profile
           }
           alignas(8) wchar_t buffer[32769];
           // Firstly open a handle to the volume
-          OUTCOME_TRY(volumeh, file_handle::file({}, _mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
+          OUTCOME_TRY(auto &&volumeh, file_handle::file({}, _mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
           STORAGE_PROPERTY_QUERY spq{};
           memset(&spq, 0, sizeof(spq));
           spq.PropertyId = StorageAdapterProperty;
@@ -355,7 +355,7 @@ namespace storage_profile
             }
             *e++ = '0' + (vde->Extents[0].DiskNumber % 10);
             *e = 0;
-            OUTCOME_TRY(diskh, file_handle::file({}, path_view(physicaldrivename, e - physicaldrivename, true), handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
+            OUTCOME_TRY(auto &&diskh, file_handle::file({}, path_view(physicaldrivename, e - physicaldrivename, true), handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
             memset(&spq, 0, sizeof(spq));
             spq.PropertyId = StorageDeviceProperty;
             spq.QueryType = PropertyStandardQuery;

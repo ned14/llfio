@@ -33,7 +33,7 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::pipe;
-  OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, _caching, flags));
+  OUTCOME_TRY(auto &&attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, _caching, flags));
   attribs &= ~(O_CREAT | O_EXCL);                                   // needs to be emulated for fifos
   nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
   if(creation::truncate_existing == _creation)
@@ -54,7 +54,7 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
     }
     else if(!path_parent.empty())
     {
-      OUTCOME_TRY(dh, path_handle::path(base, path_parent.empty() ? "." : path_parent));
+      OUTCOME_TRY(auto &&dh, path_handle::path(base, path_parent.empty() ? "." : path_parent));
       dirh = std::move(dh);
       dirhfd = dirh.native_handle().fd;
     }
@@ -132,7 +132,7 @@ result<std::pair<pipe_handle, pipe_handle>> pipe_handle::anonymous_pipe(caching 
   result<std::pair<pipe_handle, pipe_handle>> ret(pipe_handle(native_handle_type(), 0, 0, _caching, flags, nullptr), pipe_handle(native_handle_type(), 0, 0, _caching, flags, nullptr));
   native_handle_type &readnativeh = ret.value().first._v, &writenativeh = ret.value().second._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
-  OUTCOME_TRY(readattribs, attribs_from_handle_mode_caching_and_flags(readnativeh, mode::read, creation::open_existing, _caching, flags));
+  OUTCOME_TRY(auto &&readattribs, attribs_from_handle_mode_caching_and_flags(readnativeh, mode::read, creation::open_existing, _caching, flags));
   OUTCOME_TRY(attribs_from_handle_mode_caching_and_flags(writenativeh, mode::append, creation::open_existing, _caching, flags));
 #ifdef O_DIRECT
   readattribs &= O_DIRECT | O_NONBLOCK;

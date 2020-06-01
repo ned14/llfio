@@ -1057,7 +1057,7 @@ namespace storage_profile
       {
         return success();
       }
-      OUTCOME_TRY(s, _latency_test(srch, 1, 0, false));
+      OUTCOME_TRY(auto &&s, _latency_test(srch, 1, 0, false));
       sp.read_qd1_min.value = s.min;
       sp.read_qd1_mean.value = s.mean;
       sp.read_qd1_max.value = s.max;
@@ -1073,7 +1073,7 @@ namespace storage_profile
       {
         return success();
       }
-      OUTCOME_TRY(s, _latency_test(srch, 0, 1, false));
+      OUTCOME_TRY(auto &&s, _latency_test(srch, 0, 1, false));
       sp.write_qd1_min.value = s.min;
       sp.write_qd1_mean.value = s.mean;
       sp.write_qd1_max.value = s.max;
@@ -1089,7 +1089,7 @@ namespace storage_profile
       {
         return success();
       }
-      OUTCOME_TRY(s, _latency_test(srch, 16, 0, true));
+      OUTCOME_TRY(auto &&s, _latency_test(srch, 16, 0, true));
       sp.read_qd16_min.value = s.min;
       sp.read_qd16_mean.value = s.mean;
       sp.read_qd16_max.value = s.max;
@@ -1105,7 +1105,7 @@ namespace storage_profile
       {
         return success();
       }
-      OUTCOME_TRY(s, _latency_test(srch, 0, 16, true));
+      OUTCOME_TRY(auto &&s, _latency_test(srch, 0, 16, true));
       sp.write_qd16_min.value = s.min;
       sp.write_qd16_mean.value = s.mean;
       sp.write_qd16_max.value = s.max;
@@ -1121,7 +1121,7 @@ namespace storage_profile
       {
         return success();
       }
-      OUTCOME_TRY(s, _latency_test(srch, 3, 1, true));
+      OUTCOME_TRY(auto &&s, _latency_test(srch, 3, 1, true));
       sp.readwrite_qd4_min.value = s.min;
       sp.readwrite_qd4_mean.value = s.mean;
       sp.readwrite_qd4_max.value = s.max;
@@ -1307,7 +1307,7 @@ namespace storage_profile
         return success();
       }
       size_t items = srch.are_writes_durable() ? 256 : 16384;
-      OUTCOME_TRY(s, _traversal_N(srch, items, 0, false, true, false));
+      OUTCOME_TRY(auto &&s, _traversal_N(srch, items, 0, false, true, false));
       sp.create_file_warm_racefree_0b.value = s.create;
       sp.enumerate_file_warm_racefree_0b.value = s.enumerate;
       sp.open_file_read_warm_racefree_0b.value = s.open_read;
@@ -1322,7 +1322,7 @@ namespace storage_profile
         return success();
       }
       size_t items = srch.are_writes_durable() ? 256 : 16384;
-      OUTCOME_TRY(s, _traversal_N(srch, items, 0, false, false, false));
+      OUTCOME_TRY(auto &&s, _traversal_N(srch, items, 0, false, false, false));
       sp.create_file_warm_nonracefree_0b.value = s.create;
       sp.enumerate_file_warm_nonracefree_0b.value = s.enumerate;
       sp.open_file_read_warm_nonracefree_0b.value = s.open_read;
@@ -1337,7 +1337,7 @@ namespace storage_profile
         return success();
       }
       size_t items = srch.are_writes_durable() ? 256 : 16384;
-      OUTCOME_TRY(s, _traversal_N(srch, items, 0, true, true, false));
+      OUTCOME_TRY(auto &&s, _traversal_N(srch, items, 0, true, true, false));
       sp.create_file_cold_racefree_0b.value = s.create;
       sp.enumerate_file_cold_racefree_0b.value = s.enumerate;
       sp.open_file_read_cold_racefree_0b.value = s.open_read;
@@ -1354,7 +1354,7 @@ namespace storage_profile
       {
         return errc::invalid_argument;
       }
-      OUTCOME_TRY(s, _traversal_N(srch, 1000000, 0, false, false, true));
+      OUTCOME_TRY(auto &&s, _traversal_N(srch, 1000000, 0, false, false, true));
       sp.create_1M_files.value = s.create;
       sp.enumerate_1M_files.value = s.enumerate;
       sp.delete_1M_files.value = s.destroy;

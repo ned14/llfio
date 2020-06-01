@@ -45,8 +45,8 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
   {
     return errc::is_a_directory;
   }
-  OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode, flags));
-  OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
+  OUTCOME_TRY(auto &&access, access_mask_from_handle_mode(nativeh, _mode, flags));
+  OUTCOME_TRY(auto &&attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
   nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
   /* It is super important that we remove the DELETE permission for directories as otherwise relative renames
   will always fail due to an unfortunate design choice by Microsoft. This breaks renaming by open handle,
@@ -80,7 +80,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     }
 
     attribs &= 0x00ffffff;  // the real attributes only, not the win32 flags
-    OUTCOME_TRY(ntflags, ntflags_from_handle_caching_and_flags(nativeh, _caching, flags));
+    OUTCOME_TRY(auto &&ntflags, ntflags_from_handle_caching_and_flags(nativeh, _caching, flags));
     ntflags |= 0x01 /*FILE_DIRECTORY_FILE*/;  // required to open a directory
     IO_STATUS_BLOCK isb = make_iostatus();
 
@@ -261,7 +261,7 @@ result<void> directory_handle::relink(const path_handle &base, directory_handle:
   race free renames into that directory will fail, so we are forced to duplicate the
   handle with DELETE privs temporarily in order to issue the rename
   */
-  OUTCOME_TRY(h, detail::duplicate_handle_with_delete_privs(this));
+  OUTCOME_TRY(auto &&h, detail::duplicate_handle_with_delete_privs(this));
   return h.relink(base, newpath, atomic_replace, d);
 }
 
@@ -272,7 +272,7 @@ result<void> directory_handle::unlink(deadline d) noexcept
   race free renames into that directory will fail, so we are forced to duplicate the
   handle with DELETE privs temporarily in order to issue the unlink
   */
-  OUTCOME_TRY(h, detail::duplicate_handle_with_delete_privs(this));
+  OUTCOME_TRY(auto &&h, detail::duplicate_handle_with_delete_privs(this));
   return h.unlink(d);
 }
 

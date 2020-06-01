@@ -137,7 +137,7 @@ namespace algorithm
     LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<path_handle> parent_path_handle(deadline /* unused */ = std::chrono::seconds(30)) const noexcept override
     {
       LLFIO_LOG_FUNCTION_CALL(this);
-      OUTCOME_TRY(ret, _sph->h.clone_to_path_handle());
+      OUTCOME_TRY(auto &&ret, _sph->h.clone_to_path_handle());
       return {std::move(ret)};
     }
     LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
@@ -177,7 +177,7 @@ namespace algorithm
   template <class T, class... Args> inline result<cached_parent_handle_adapter<T>> cache_parent(Args &&... args) noexcept
   {
     construct<T> constructor{std::forward<Args>(args)...};
-    OUTCOME_TRY(h, constructor());
+    OUTCOME_TRY(auto &&h, constructor());
     try
     {
       return cached_parent_handle_adapter<T>(std::move(h), constructor.base, constructor._path);
@@ -196,7 +196,7 @@ template <class T> struct construct<algorithm::cached_parent_handle_adapter<T>>
   construct<T> args;
   result<algorithm::cached_parent_handle_adapter<T>> operator()() const noexcept
   {
-    OUTCOME_TRY(h, args());
+    OUTCOME_TRY(auto &&h, args());
     try
     {
       return algorithm::cached_parent_handle_adapter<T>(std::move(h), args.base, args._path);

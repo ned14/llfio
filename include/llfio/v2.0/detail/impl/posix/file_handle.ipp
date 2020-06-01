@@ -34,7 +34,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::file;
-  OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, _caching, flags));
+  OUTCOME_TRY(auto &&attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, _caching, flags));
   attribs &= ~O_NONBLOCK;
   nativeh.behaviour &= ~native_handle_type::disposition::nonblocking;
   path_view::c_str<> zpath(path);
@@ -55,16 +55,16 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
       path_handle dirh;
       if(base.is_valid() && path_parent.empty())
       {
-        OUTCOME_TRY(dh, base.clone());
+        OUTCOME_TRY(auto &&dh, base.clone());
         dirh = path_handle(std::move(dh));
       }
       else if(!path_parent.empty())
       {
-        OUTCOME_TRY(dh, path_handle::path(base, path_parent));
+        OUTCOME_TRY(auto &&dh, path_handle::path(base, path_parent));
         dirh = std::move(dh);
       }
       // Create a randomly named file, and rename it over
-      OUTCOME_TRY(rfh, uniquely_named_file(dirh, _mode, _caching, flags));
+      OUTCOME_TRY(auto &&rfh, uniquely_named_file(dirh, _mode, _caching, flags));
       auto r = rfh.relink(dirh, path.filename());
       if(r)
       {
@@ -109,7 +109,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   LLFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::file;
   // Open file exclusively to prevent collision
-  OUTCOME_TRY(attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, creation::only_if_not_exist, _caching, flags));
+  OUTCOME_TRY(auto &&attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, creation::only_if_not_exist, _caching, flags));
   attribs &= ~O_NONBLOCK;
   nativeh.behaviour &= ~native_handle_type::disposition::nonblocking;
 #ifdef O_TMPFILE
@@ -263,7 +263,7 @@ result<file_handle> file_handle::reopen(mode mode_, caching caching_, deadline d
   for(;;)
   {
     // Get the current path of myself
-    OUTCOME_TRY(currentpath, current_path());
+    OUTCOME_TRY(auto &&currentpath, current_path());
     if(currentpath.empty())
     {
       // Cannot reopen a file which has been unlinked
@@ -387,7 +387,7 @@ result<std::vector<file_handle::extent_pair>> file_handle::extents() const noexc
         // If it failed with no output, probably this filing system doesn't support extents
         if(out.empty())
         {
-          OUTCOME_TRY(size, file_handle::maximum_extent());
+          OUTCOME_TRY(auto &&size, file_handle::maximum_extent());
           out.emplace_back(0, size);
           return out;
         }
@@ -459,7 +459,7 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_pair exte
   {
     auto *buffer = static_cast<byte *>(alloca((size_type) extent.length));
     memset(buffer, 0, (size_type) extent.length);
-    OUTCOME_TRY(written, write(extent.offset, {{buffer, (size_type) extent.length}}, d));
+    OUTCOME_TRY(auto &&written, write(extent.offset, {{buffer, (size_type) extent.length}}, d));
     return written;
   }
   try
@@ -472,7 +472,7 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_pair exte
     while(extent.length > 0)
     {
       auto towrite = (extent.length < blocksize) ? (size_t) extent.length : blocksize;
-      OUTCOME_TRY(written, write(extent.offset, {{buffer, towrite}}, d));
+      OUTCOME_TRY(auto &&written, write(extent.offset, {{buffer, towrite}}, d));
       extent.offset += written;
       extent.length -= written;
       ret += written;

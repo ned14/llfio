@@ -36,7 +36,7 @@ namespace algorithm
     filesystem::path destleaf_;
     if(destleaf.empty())
     {
-      OUTCOME_TRY(_, src.current_path());
+      OUTCOME_TRY(auto &&_, src.current_path());
       if(_.empty())
       {
         // Source has been deleted, so can't infer leafname
@@ -47,7 +47,7 @@ namespace algorithm
     }
     stat_t stat(nullptr);
     OUTCOME_TRY(stat.fill(src));
-    OUTCOME_TRY(dest, file_handle::file(destdir, destleaf, file_handle::mode::write, creation, src.kernel_caching()));
+    OUTCOME_TRY(auto &&dest, file_handle::file(destdir, destleaf, file_handle::mode::write, creation, src.kernel_caching()));
     bool failed = true;
     auto undest = make_scope_exit([&]() noexcept {
       if(failed)
@@ -73,7 +73,7 @@ namespace algorithm
     {
       return errc::no_space_on_device;
     }
-    OUTCOME_TRY(copied, dest.clone_extents_to(dest, d, force_copy_now, true));
+    OUTCOME_TRY(auto &&copied, dest.clone_extents_to(dest, d, force_copy_now, true));
     failed = false;
     return copied.length;
   }

@@ -37,8 +37,8 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
   nativeh.behaviour |= native_handle_type::disposition::directory;
   DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
   // Open directory with no access requested, this is much faster than asking for access
-  OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, mode::none, flag::none));
-  OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, caching::all, flag::none));
+  OUTCOME_TRY(auto &&access, access_mask_from_handle_mode(nativeh, mode::none, flag::none));
+  OUTCOME_TRY(auto &&attribs, attributes_from_handle_caching_and_flags(nativeh, caching::all, flag::none));
   nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
   /* It is super important that we remove the DELETE permission for directories as otherwise relative renames
   will always fail due to an unfortunate design choice by Microsoft.
@@ -48,7 +48,7 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
   {
     DWORD creatdisp = 0x00000001 /*FILE_OPEN*/;
     attribs &= 0x00ffffff;  // the real attributes only, not the win32 flags
-    OUTCOME_TRY(ntflags, ntflags_from_handle_caching_and_flags(nativeh, caching::all, flag::none));
+    OUTCOME_TRY(auto &&ntflags, ntflags_from_handle_caching_and_flags(nativeh, caching::all, flag::none));
     ntflags |= 0x01 /*FILE_DIRECTORY_FILE*/;  // required to open a directory
     IO_STATUS_BLOCK isb = make_iostatus();
 

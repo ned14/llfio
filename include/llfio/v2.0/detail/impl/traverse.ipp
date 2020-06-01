@@ -48,7 +48,7 @@ namespace algorithm
         LLFIO_LOG_FUNCTION_CALL(&_topdirh);
         std::shared_ptr<directory_handle> topdirh;
         {
-          OUTCOME_TRY(dirh, directory_handle::directory(_topdirh, {}));
+          OUTCOME_TRY(auto &&dirh, directory_handle::directory(_topdirh, {}));
           topdirh = std::make_shared<directory_handle>(std::move(dirh));
         }
         bool use_slow_path = force_slow_path;
@@ -222,7 +222,7 @@ namespace algorithm
               auto r = directory_handle::directory(*mywork.dirh, mywork.leaf());
               if(!r)
               {
-                OUTCOME_TRY(replacementh, state->visitor->directory_open_failed(data, std::move(r).error(), *mywork.dirh, mywork.leaf(), mylevel));
+                OUTCOME_TRY(auto &&replacementh, state->visitor->directory_open_failed(data, std::move(r).error(), *mywork.dirh, mywork.leaf(), mylevel));
                 mydirh = std::make_shared<directory_handle>(std::move(replacementh));
               }
               else
@@ -232,13 +232,13 @@ namespace algorithm
             }
             if(mydirh->is_valid())
             {
-              OUTCOME_TRY(do_enumerate, state->visitor->pre_enumeration(data, *mydirh, mylevel));
+              OUTCOME_TRY(auto &&do_enumerate, state->visitor->pre_enumeration(data, *mydirh, mylevel));
               if(do_enumerate)
               {
                 for(;;)
                 {
                   buffers = {entries, std::move(buffers)};
-                  OUTCOME_TRY(filled, mydirh->read({std::move(buffers), {}, directory_handle::filter::none}));
+                  OUTCOME_TRY(auto &&filled, mydirh->read({std::move(buffers), {}, directory_handle::filter::none}));
                   buffers = std::move(filled);
                   if(buffers.done())
                   {

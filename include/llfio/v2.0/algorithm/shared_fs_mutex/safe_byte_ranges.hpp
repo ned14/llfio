@@ -45,7 +45,7 @@ namespace algorithm
       LLFIO_MAKE_FREE_FUNCTION
       static result<safe_byte_ranges> fs_mutex_safe_byte_ranges(const path_handle &base, path_view lockfile) noexcept
       {
-        OUTCOME_TRY(v, byte_ranges::fs_mutex_byte_ranges(base, lockfile));
+        OUTCOME_TRY(auto &&v, byte_ranges::fs_mutex_byte_ranges(base, lockfile));
         return safe_byte_ranges(std::move(v));
       }
     };
@@ -152,7 +152,7 @@ namespace algorithm
       LLFIO_MAKE_FREE_FUNCTION
       static result<safe_byte_ranges> fs_mutex_safe_byte_ranges(const path_handle &base, path_view lockfile) noexcept
       {
-        OUTCOME_TRY(ret, detail::inode_to_fs_mutex(base, lockfile));
+        OUTCOME_TRY(auto &&ret, detail::inode_to_fs_mutex(base, lockfile));
         return safe_byte_ranges(std::move(ret));
       }
 

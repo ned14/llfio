@@ -615,7 +615,7 @@ public:
     {
       return _reservation;
     }
-    OUTCOME_TRY(length, _section->length());  // length of the backing file
+    OUTCOME_TRY(auto &&length, _section->length());  // length of the backing file
     length -= _offset;
     if(length > _reservation)
     {
@@ -715,7 +715,7 @@ public:
   //! \overload
   static result<buffer_type> prefetch(buffer_type region) noexcept
   {
-    OUTCOME_TRY(ret, prefetch(span<buffer_type>(&region, 1)));
+    OUTCOME_TRY(auto &&ret, prefetch(span<buffer_type>(&region, 1)));
     return *ret.data();
   }
 

@@ -170,7 +170,7 @@ protected:
         deadline nd;
         LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
         thisreq.buffers = reqs.buffers.subspan(n, std::min(batch, reqs.buffers.size() - n));
-        OUTCOME_TRY(written, file_handle::_do_write(thisreq, nd));
+        OUTCOME_TRY(auto &&written, file_handle::_do_write(thisreq, nd));
         if(written.empty())
         {
           reqs.buffers = reqs.buffers.subspan(0, n);
@@ -265,7 +265,7 @@ public:
     {
       return errc::invalid_argument;
     }
-    OUTCOME_TRY(fh, file_handle::file(base, _path, _mode, _creation, _caching, flags));
+    OUTCOME_TRY(auto &&fh, file_handle::file(base, _path, _mode, _creation, _caching, flags));
     switch(_creation)
     {
     default:
@@ -356,7 +356,7 @@ public:
   LLFIO_MAKE_FREE_FUNCTION
   static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<mapped_file_handle> mapped_temp_inode(size_type reservation = 0, const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none, section_handle::flag sflags = section_handle::flag::none) noexcept
   {
-    OUTCOME_TRY(v, file_handle::temp_inode(dir, _mode, flags));
+    OUTCOME_TRY(auto &&v, file_handle::temp_inode(dir, _mode, flags));
     mapped_file_handle ret(std::move(v), sflags);
     ret._reservation = reservation;
     return {std::move(ret)};
@@ -407,7 +407,7 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override;
   result<mapped_file_handle> reopen(size_type reservation, mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept
   {
-    OUTCOME_TRY(fh, file_handle::reopen(mode_, caching_, d));
+    OUTCOME_TRY(auto &&fh, file_handle::reopen(mode_, caching_, d));
     return mapped_file_handle(std::move(fh), reservation, _sh.section_flags());
   }
   LLFIO_DEADLINE_TRY_FOR_UNTIL(reopen)

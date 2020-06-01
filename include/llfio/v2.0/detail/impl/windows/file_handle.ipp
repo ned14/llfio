@@ -36,8 +36,8 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   LLFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::file;
   DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
-  OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode, flags));
-  OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
+  OUTCOME_TRY(auto &&access, access_mask_from_handle_mode(nativeh, _mode, flags));
+  OUTCOME_TRY(auto &&attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
   bool need_to_set_sparse = false;
   if(base.is_valid() || path.is_ntpath())
   {
@@ -61,7 +61,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
     }
 
     attribs &= 0x00ffffff;  // the real attributes only, not the win32 flags
-    OUTCOME_TRY(ntflags, ntflags_from_handle_caching_and_flags(nativeh, _caching, flags));
+    OUTCOME_TRY(auto &&ntflags, ntflags_from_handle_caching_and_flags(nativeh, _caching, flags));
     ntflags |= 0x040 /*FILE_NON_DIRECTORY_FILE*/;  // do not open a directory
     IO_STATUS_BLOCK isb = make_iostatus();
 
@@ -192,12 +192,12 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   LLFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::file;
   DWORD fileshare = /* no read nor write access for others */ FILE_SHARE_DELETE;
-  OUTCOME_TRY(access, access_mask_from_handle_mode(nativeh, _mode, flags));
-  OUTCOME_TRY(attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
+  OUTCOME_TRY(auto &&access, access_mask_from_handle_mode(nativeh, _mode, flags));
+  OUTCOME_TRY(auto &&attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
   DWORD creatdisp = 0x00000002 /*FILE_CREATE*/;
 
   attribs &= 0x00ffffff;  // the real attributes only, not the win32 flags
-  OUTCOME_TRY(ntflags, ntflags_from_handle_caching_and_flags(nativeh, _caching, flags));
+  OUTCOME_TRY(auto &&ntflags, ntflags_from_handle_caching_and_flags(nativeh, _caching, flags));
   ntflags |= 0x040 /*FILE_NON_DIRECTORY_FILE*/;  // do not open a directory
   UNICODE_STRING _path{};
   _path.MaximumLength = (_path.Length = static_cast<USHORT>(68 * sizeof(wchar_t))) + sizeof(wchar_t);
@@ -391,7 +391,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
     if(extent.offset == (extent_type) -1 && extent.length == (extent_type)-1)
     {
       extent.offset = 0;
-      OUTCOME_TRY(_, maximum_extent());
+      OUTCOME_TRY(auto &&_, maximum_extent());
       extent.length = _;
     }
     if(extent.offset + extent.length < extent.offset)
@@ -421,14 +421,14 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
         auto towrite = (extent.length < blocksize) ? (size_t) extent.length : blocksize;
         buffer_type b(buffer, towrite);
         LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
-        OUTCOME_TRY(readed, read({{&b, 1}, extent.offset}, nd));
+        OUTCOME_TRY(auto &&readed, read({{&b, 1}, extent.offset}, nd));
         const_buffer_type cb(readed.front());
         if(cb.size() == 0)
         {
           return ret;
         }
         LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
-        OUTCOME_TRY(written_, dest_.write({{&cb, 1}, destoffset}, nd));
+        OUTCOME_TRY(auto &&written_, dest_.write({{&cb, 1}, destoffset}, nd));
         const auto written = written_.front().size();
         extent.offset += written;
         destoffset += written;
@@ -508,7 +508,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
     }
     // Ensure the destination file is big enough
     auto &dest = static_cast<file_handle &>(dest_);
-    OUTCOME_TRY(dest_length, dest.maximum_extent());
+    OUTCOME_TRY(auto &&dest_length, dest.maximum_extent());
     if(destoffset + extent.length < dest_length)
     {
       OUTCOME_TRY(dest.truncate(destoffset + extent.length));
@@ -569,7 +569,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
           deadline nd;
           buffer_type b(buffer, thisblock);
           LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
-          OUTCOME_TRY(readed, read({{&b, 1}, item.src.offset + thisoffset}, nd));
+          OUTCOME_TRY(auto &&readed, read({{&b, 1}, item.src.offset + thisoffset}, nd));
           buffer_dirty = true;
           const_buffer_type cb(readed.front());
           if(cb.size() != thisblock)
@@ -577,7 +577,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
             return errc::resource_unavailable_try_again;  // something is wrong
           }
           LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
-          OUTCOME_TRY(written, dest.write({{&cb, 1}, destoffset}, nd));
+          OUTCOME_TRY(auto &&written, dest.write({{&cb, 1}, destoffset}, nd));
           if(written.front().size()!=thisblock)
           {
             return errc::resource_unavailable_try_again;  // something is wrong
@@ -628,7 +628,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
             buffer_dirty = false;
           }
           LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
-          OUTCOME_TRY(written, dest.write({{&cb, 1}, destoffset}, nd));
+          OUTCOME_TRY(auto &&written, dest.write({{&cb, 1}, destoffset}, nd));
           if(written.front().size() != thisblock)
           {
             return errc::resource_unavailable_try_again;  // something is wrong
