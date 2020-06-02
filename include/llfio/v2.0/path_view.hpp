@@ -284,6 +284,7 @@ public:
 private:
   template <class U> constexpr auto _invoke(U &&f) const noexcept
   {
+    using LLFIO_V2_NAMESPACE::basic_string_view;
     return _utf8 ? f(basic_string_view<char8_t>(_char8str, _length))  //
                    :
                    (_utf16 ? f(basic_string_view<char16_t>(_char16str, _length))  //
@@ -294,6 +295,7 @@ private:
   }
   constexpr auto _find_first_sep(size_t startidx = 0) const noexcept
   {
+    using LLFIO_V2_NAMESPACE::basic_string_view;
 #ifdef _WIN32
     return _utf8 ? basic_string_view<char8_t>(_char8str, _length).find_first_of((const char8_t *) "/\\", startidx)  //
                    :
@@ -314,6 +316,7 @@ private:
   }
   constexpr auto _find_last_sep(size_t endidx = _npos) const noexcept
   {
+    using LLFIO_V2_NAMESPACE::basic_string_view;
 #ifdef _WIN32
     return _utf8 ? basic_string_view<char8_t>(_char8str, _length).find_last_of((const char8_t *) "/\\", endidx)  //
                    :
@@ -537,6 +540,7 @@ public:
     template <class U, class source_type> void _make_passthrough(path_view_component /*unused*/, bool /*unused*/, U & /*unused*/, const source_type * /*unused*/) {}
     template <class U> void _make_passthrough(path_view_component view, bool no_zero_terminate, U &allocate, const value_type *source)
     {
+      using LLFIO_V2_NAMESPACE::basic_string_view;
       // If the consuming API is a NT kernel API, and we have / in the path, we shall need to do slash conversion
       const bool needs_slash_translation = (filesystem::path::preferred_separator != '/') && no_zero_terminate && view._invoke([](auto sv) { return sv.find('/') != _npos; });
       length = view._length;
