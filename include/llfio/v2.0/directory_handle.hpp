@@ -96,6 +96,7 @@ public:
   */
   struct buffers_type : public span<buffer_type>
   {
+    using _base = span<buffer_type>;
     /*! The list of stat metadata retrieved. Sometimes, due to kernel API design,
     enumerating a directory retrieves more than the metadata requested in the read
     request. This indidicates what stat metadata is in the buffers filled.
@@ -104,28 +105,28 @@ public:
     //! Whether the directory was entirely read or not into any buffers supplied.
     bool done() const noexcept { return _done; }
 
-    using span<buffer_type>::span;
+    using _base::_base;
     //! Implicit construction from a span
     /* constexpr */ buffers_type(span<buffer_type> v)  // NOLINT TODO FIXME Make this constexpr when span becomes constexpr. SAME for move constructor below
-    : span<buffer_type>(v)
+    : _base(v)
     {
     }
     //! Construct from a span, using a kernel buffer from a preceding `buffers_type`.
     buffers_type(span<buffer_type> v, buffers_type &&o) noexcept
-        : span<buffer_type>(std::move(v))
+        : _base(std::move(v))
         , _kernel_buffer(std::move(o._kernel_buffer))
         , _kernel_buffer_size(o._kernel_buffer_size)
         , _metadata(o._metadata)
         , _done(o._done)
     {
-      static_cast<span<buffer_type> &>(o) = {};
+      static_cast<_base &>(o) = {};
       o._kernel_buffer_size = 0;
     }
     ~buffers_type() = default;
     //! Move constructor
-    /* constexpr */ buffers_type(buffers_type &&o) noexcept : span<buffer_type>(std::move(o)), _kernel_buffer(std::move(o._kernel_buffer)), _kernel_buffer_size(o._kernel_buffer_size), _metadata(o._metadata), _done(o._done)
+    /* constexpr */ buffers_type(buffers_type &&o) noexcept : _base(std::move(o)), _kernel_buffer(std::move(o._kernel_buffer)), _kernel_buffer_size(o._kernel_buffer_size), _metadata(o._metadata), _done(o._done)
     {
-      static_cast<span<buffer_type> &>(o) = {};
+      static_cast<_base &>(o) = {};
       o._kernel_buffer_size = 0;
     }
     //! No copy construction

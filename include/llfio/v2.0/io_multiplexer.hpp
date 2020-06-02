@@ -192,9 +192,9 @@ public:
   enum class barrier_kind : uint8_t
   {
     nowait_data_only,  //!< Barrier data only, non-blocking. This is highly optimised on NV-DIMM storage, but consider using `nvram_barrier()` for even better performance.
-    wait_data_only,    //!< Barrier data only, block until it is done. This is highly optimised on NV-DIMM storage, but consider using `nvram_barrier()` for even better performance.
-    nowait_all,        //!< Barrier data and the metadata to retrieve it, non-blocking.
-    wait_all           //!< Barrier data and the metadata to retrieve it, block until it is done.
+    wait_data_only,  //!< Barrier data only, block until it is done. This is highly optimised on NV-DIMM storage, but consider using `nvram_barrier()` for even better performance.
+    nowait_all,  //!< Barrier data and the metadata to retrieve it, non-blocking.
+    wait_all     //!< Barrier data and the metadata to retrieve it, block until it is done.
   };
 
   //! The scatter buffer type used by this handle. Guaranteed to be `TrivialType` and `StandardLayoutType`.
@@ -370,7 +370,9 @@ public:
   // static_assert(std::is_trivially_move_constructible<buffers_type>::value, "buffers_type is not trivially move constructible!");
   // static_assert(std::is_trivially_copy_assignable<buffers_type>::value, "buffers_type is not trivially copy assignable!");
   // static_assert(std::is_trivially_move_assignable<buffers_type>::value, "buffers_type is not trivially move assignable!");
+#if !defined(_MSC_VER) || _MSC_VER < 1926
   static_assert(std::is_standard_layout<buffers_type>::value, "buffers_type is not a standard layout type!");
+#endif
 #endif
 
   //! The i/o request type used by this handle. Guaranteed to be `TrivialType` apart from construction, and `StandardLayoutType`.
@@ -388,13 +390,15 @@ public:
 #ifndef NDEBUG
   // Is trivial in all ways, except default constructibility
   static_assert(std::is_trivially_copyable<io_request<buffers_type>>::value, "io_request<buffers_type> is not trivially copyable!");
-  // static_assert(std::is_trivially_assignable<io_request<buffers_type>, io_request<buffers_type>>::value, "io_request<buffers_type> is not trivially assignable!");
-  // static_assert(std::is_trivially_destructible<io_request<buffers_type>>::value, "io_request<buffers_type> is not trivially destructible!");
+  // static_assert(std::is_trivially_assignable<io_request<buffers_type>, io_request<buffers_type>>::value, "io_request<buffers_type> is not trivially
+  // assignable!"); static_assert(std::is_trivially_destructible<io_request<buffers_type>>::value, "io_request<buffers_type> is not trivially destructible!");
   // static_assert(std::is_trivially_copy_constructible<io_request<buffers_type>>::value, "io_request<buffers_type> is not trivially copy constructible!");
   // static_assert(std::is_trivially_move_constructible<io_request<buffers_type>>::value, "io_request<buffers_type> is not trivially move constructible!");
   // static_assert(std::is_trivially_copy_assignable<io_request<buffers_type>>::value, "io_request<buffers_type> is not trivially copy assignable!");
   // static_assert(std::is_trivially_move_assignable<io_request<buffers_type>>::value, "io_request<buffers_type> is not trivially move assignable!");
+#if !defined(_MSC_VER) || _MSC_VER < 1926
   static_assert(std::is_standard_layout<io_request<buffers_type>>::value, "io_request<buffers_type> is not a standard layout type!");
+#endif
 #endif
   //! The i/o result type used by this handle. Guaranteed to be `TrivialType` apart from construction.
   template <class T> struct io_result : public LLFIO_V2_NAMESPACE::result<T>
@@ -463,7 +467,8 @@ public:
   ~io_multiplexer() = default;
 
 public:
-  //! Implements `io_handle` registration. The bottom two bits of the returned value are set into `_v.behaviour`'s `_multiplexer_state_bit0` and `_multiplexer_state_bit`
+  //! Implements `io_handle` registration. The bottom two bits of the returned value are set into `_v.behaviour`'s `_multiplexer_state_bit0` and
+  //! `_multiplexer_state_bit`
   virtual result<uint8_t> do_io_handle_register(io_handle * /*unused*/) noexcept { return (uint8_t) 0; }
   //! Implements `io_handle` deregistration
   virtual result<void> do_io_handle_deregister(io_handle * /*unused*/) noexcept { return success(); }
@@ -625,7 +630,8 @@ protected:
     //! The current lifecycle state of this i/o operation
     io_operation_state_type state{io_operation_state_type::unknown};
     //! Variant storage
-    union payload_t {
+    union payload_t
+    {
       //! Used for unknown state
       _empty_t empty;
       //! Storage for non-completed i/o
@@ -636,7 +642,8 @@ protected:
         //! The deadline to complete the i/o by, if any
         deadline d;
         //! Variant storage for the possible kinds of non-completed i/o
-        union params_t {
+        union params_t
+        {
           //! Storage for a read i/o, the buffers to fill.
           struct read_params_t
           {
@@ -729,14 +736,16 @@ protected:
     {
     }
     //! Construct a write operation state
-    _unsynchronised_io_operation_state(io_handle *_h, io_operation_state_visitor *_v, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs)
+    _unsynchronised_io_operation_state(io_handle *_h, io_operation_state_visitor *_v, registered_buffer_type &&b, deadline d,
+                                       io_request<const_buffers_type> reqs)
         : io_operation_state(_h, _v)
         , state(io_operation_state_type::write_initialised)
         , payload(std::move(b), d, std::move(reqs))
     {
     }
     //! Construct a barrier operation state
-    _unsynchronised_io_operation_state(io_handle *_h, io_operation_state_visitor *_v, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind)
+    _unsynchronised_io_operation_state(io_handle *_h, io_operation_state_visitor *_v, registered_buffer_type &&b, deadline d,
+                                       io_request<const_buffers_type> reqs, barrier_kind kind)
         : io_operation_state(_h, _v)
         , state(io_operation_state_type::barrier_initialised)
         , payload(std::move(b), d, std::move(reqs), kind)
@@ -808,14 +817,14 @@ protected:
 
     virtual void *invoke(function_ptr<void *(io_operation_state_type)> c) const noexcept override { return c(state); }
     virtual io_operation_state_type current_state() const noexcept override { return state; }
-    virtual io_result<buffers_type> get_completed_read() && noexcept override
+    virtual io_result<buffers_type> get_completed_read() &&noexcept override
     {
       assert(state == io_operation_state_type::read_completed || state == io_operation_state_type::read_finished);
       io_result<buffers_type> ret(std::move(payload.completed_read));
       clear_storage();
       return ret;
     }
-    virtual io_result<const_buffers_type> get_completed_write_or_barrier() && noexcept override
+    virtual io_result<const_buffers_type> get_completed_write_or_barrier() &&noexcept override
     {
       assert(state == io_operation_state_type::write_or_barrier_completed || state == io_operation_state_type::write_or_barrier_finished);
       io_result<const_buffers_type> ret(std::move(payload.completed_write_or_barrier));
@@ -831,7 +840,8 @@ protected:
         break;
       case io_operation_state_type::read_initialised:
       case io_operation_state_type::read_initiated:
-        new(&to->payload) _unsynchronised_io_operation_state::payload_t(std::move(payload.noncompleted.base), payload.noncompleted.d, std::move(payload.noncompleted.params.read.reqs));
+        new(&to->payload) _unsynchronised_io_operation_state::payload_t(std::move(payload.noncompleted.base), payload.noncompleted.d,
+                                                                        std::move(payload.noncompleted.params.read.reqs));
         break;
       case io_operation_state_type::read_completed:
       case io_operation_state_type::read_finished:
@@ -839,11 +849,14 @@ protected:
         break;
       case io_operation_state_type::write_initialised:
       case io_operation_state_type::write_initiated:
-        new(&to->payload) _unsynchronised_io_operation_state::payload_t(std::move(payload.noncompleted.base), payload.noncompleted.d, std::move(payload.noncompleted.params.write.reqs));
+        new(&to->payload) _unsynchronised_io_operation_state::payload_t(std::move(payload.noncompleted.base), payload.noncompleted.d,
+                                                                        std::move(payload.noncompleted.params.write.reqs));
         break;
       case io_operation_state_type::barrier_initialised:
       case io_operation_state_type::barrier_initiated:
-        new(&to->payload) _unsynchronised_io_operation_state::payload_t(std::move(payload.noncompleted.base), payload.noncompleted.d, std::move(payload.noncompleted.params.barrier.reqs), payload.noncompleted.params.barrier.kind);
+        new(&to->payload)
+        _unsynchronised_io_operation_state::payload_t(std::move(payload.noncompleted.base), payload.noncompleted.d,
+                                                      std::move(payload.noncompleted.params.barrier.reqs), payload.noncompleted.params.barrier.kind);
         break;
       case io_operation_state_type::write_or_barrier_completed:
       case io_operation_state_type::write_or_barrier_finished:
@@ -1020,12 +1033,12 @@ protected:
       lock_guard g(const_cast<_synchronised_io_operation_state *>(this));
       return _unsynchronised_io_operation_state::current_state();
     }
-    virtual io_result<buffers_type> get_completed_read() && noexcept override
+    virtual io_result<buffers_type> get_completed_read() &&noexcept override
     {
       lock_guard g(this);
       return std::move(*this)._unsynchronised_io_operation_state::get_completed_read();
     }
-    virtual io_result<const_buffers_type> get_completed_write_or_barrier() && noexcept override
+    virtual io_result<const_buffers_type> get_completed_write_or_barrier() &&noexcept override
     {
       lock_guard g(this);
       return std::move(*this)._unsynchronised_io_operation_state::get_completed_write_or_barrier();
@@ -1084,8 +1097,14 @@ protected:
 #else
   static constexpr size_t _awaitable_size = 128;
 #endif
-  static io_result<buffers_type> _result_type_from_io_operation_state(io_operation_state *state, buffers_type * /*unused*/) noexcept { return std::move(*state).get_completed_read(); }
-  static io_result<const_buffers_type> _result_type_from_io_operation_state(io_operation_state *state, const_buffers_type * /*unused*/) noexcept { return std::move(*state).get_completed_write_or_barrier(); }
+  static io_result<buffers_type> _result_type_from_io_operation_state(io_operation_state *state, buffers_type * /*unused*/) noexcept
+  {
+    return std::move(*state).get_completed_read();
+  }
+  static io_result<const_buffers_type> _result_type_from_io_operation_state(io_operation_state *state, const_buffers_type * /*unused*/) noexcept
+  {
+    return std::move(*state).get_completed_write_or_barrier();
+  }
 
 public:
   /*! \brief A convenience coroutine awaitable type returned by `.co_read()`, `.co_write()` and
@@ -1226,7 +1245,10 @@ public:
       return _identifying_address() < o._identifying_address();
     }
     //! Provides equality, so awaitables can be placed into maps
-    bool operator==(const awaitable &o) const noexcept { return this->h == o.h && this->visitor == o.visitor && _identifying_address() == o._identifying_address(); }
+    bool operator==(const awaitable &o) const noexcept
+    {
+      return this->h == o.h && this->visitor == o.visitor && _identifying_address() == o._identifying_address();
+    }
 
   protected:
     // virtual void read_initiated(lock_guard &g, io_operation_state_type /*former*/) override {}
@@ -1273,19 +1295,22 @@ public:
   for a read operation into the storage provided. The i/o is not initiated. The storage must
   meet the requirements from `state_requirements()`.
   */
-  virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept = 0;
+  virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d,
+                                        io_request<buffers_type> reqs) noexcept = 0;
 
   /*! \brief Constructs either a `unsynchronised_io_operation_state` or a `synchronised_io_operation_state`
   for a write operation into the storage provided. The i/o is not initiated. The storage must
   meet the requirements from `state_requirements()`.
   */
-  virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept = 0;
+  virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d,
+                                        io_request<const_buffers_type> reqs) noexcept = 0;
 
   /*! \brief Constructs either a `unsynchronised_io_operation_state` or a `synchronised_io_operation_state`
   for a barrier operation into the storage provided. The i/o is not initiated. The storage must
   meet the requirements from `state_requirements()`.
   */
-  virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept = 0;
+  virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d,
+                                        io_request<const_buffers_type> reqs, barrier_kind kind) noexcept = 0;
 
   /*! \brief Initiates the i/o in a previously constructed state. Note that you should always call
   `.flush_inited_io_operations()` after you finished initiating i/o. After this call returns,
@@ -1295,7 +1320,8 @@ public:
 
   /*! \brief Combines `.construct()` with `.init_io_operation()` in a single call for improved efficiency.
    */
-  virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept
+  virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor,
+                                                              registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept
   {
     io_operation_state *state = construct(storage, _h, _visitor, std::move(b), d, std::move(reqs));
     init_io_operation(state);
@@ -1304,7 +1330,8 @@ public:
 
   /*! \brief Combines `.construct()` with `.init_io_operation()` in a single call for improved efficiency.
    */
-  virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept
+  virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor,
+                                                              registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept
   {
     io_operation_state *state = construct(storage, _h, _visitor, std::move(b), d, std::move(reqs));
     init_io_operation(state);
@@ -1313,7 +1340,9 @@ public:
 
   /*! \brief Combines `.construct()` with `.init_io_operation()` in a single call for improved efficiency.
    */
-  virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept
+  virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor,
+                                                              registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs,
+                                                              barrier_kind kind) noexcept
   {
     io_operation_state *state = construct(storage, _h, _visitor, std::move(b), d, std::move(reqs), kind);
     init_io_operation(state);
@@ -1333,7 +1362,7 @@ public:
   struct check_for_any_completed_io_statistics
   {
     size_t initiated_ios_completed{0};  //!< The number of initiated i/o which were completed by this call
-    size_t initiated_ios_finished{0};  //!< The number of initiated i/o which were finished by this call
+    size_t initiated_ios_finished{0};   //!< The number of initiated i/o which were finished by this call
   };
 
   /*! \brief Checks all i/o initiated on this i/o multiplexer to see which
@@ -1341,7 +1370,8 @@ public:
   completions or finisheds, and not to exceed `d` of waiting (this function never
   fails with timed out).
   */
-  virtual result<check_for_any_completed_io_statistics> check_for_any_completed_io(deadline d = std::chrono::seconds(0), size_t max_completions = (size_t) -1) noexcept = 0;
+  virtual result<check_for_any_completed_io_statistics> check_for_any_completed_io(deadline d = std::chrono::seconds(0),
+                                                                                   size_t max_completions = (size_t) -1) noexcept = 0;
 
   /*! \brief Can be called from any thread to wake any other single thread
   currently blocked within `check_for_any_completed_io()`. Which thread is
@@ -1353,7 +1383,8 @@ public:
 using io_multiplexer_ptr = std::unique_ptr<io_multiplexer>;
 
 #ifndef NDEBUG
-static_assert(OUTCOME_V2_NAMESPACE::concepts::basic_result<io_multiplexer::io_result<int>>, "io_multiplexer::io_result<int> does not match the Outcome basic_result concept!");
+static_assert(OUTCOME_V2_NAMESPACE::concepts::basic_result<io_multiplexer::io_result<int>>,
+              "io_multiplexer::io_result<int> does not match the Outcome basic_result concept!");
 #endif
 
 #if LLFIO_ENABLE_TEST_IO_MULTIPLEXERS
