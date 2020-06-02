@@ -197,9 +197,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac0ca2e5eed9d06d2647dd0d2367f820c"><td class="memItemLeft" align="right" valign="top"><a id="ac0ca2e5eed9d06d2647dd0d2367f820c"></a>
 <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html">io_multiplexer</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html">io_multiplexer</a> &amp;)=delete</td></tr>
 <tr class="separator:ac0ca2e5eed9d06d2647dd0d2367f820c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a04d99f9603d31c674aaf865d58abc4d6"><td class="memItemLeft" align="right" valign="top"><a id="a04d99f9603d31c674aaf865d58abc4d6"></a>
-virtual result&lt; uint8_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#a04d99f9603d31c674aaf865d58abc4d6">do_io_handle_register</a> (<a class="el" href="classllfio__v2__xxx_1_1io__handle.html">io_handle</a> *) noexcept</td></tr>
-<tr class="memdesc:a04d99f9603d31c674aaf865d58abc4d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implements <code>io_handle</code> registration. The bottom two bits of the returned value are set into <code>_v.behaviour</code>'s <code>_multiplexer_state_bit0</code> and <code>_multiplexer_state_bit</code> <br /></td></tr>
+<tr class="memitem:a04d99f9603d31c674aaf865d58abc4d6"><td class="memItemLeft" align="right" valign="top">virtual result&lt; uint8_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#a04d99f9603d31c674aaf865d58abc4d6">do_io_handle_register</a> (<a class="el" href="classllfio__v2__xxx_1_1io__handle.html">io_handle</a> *) noexcept</td></tr>
 <tr class="separator:a04d99f9603d31c674aaf865d58abc4d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7c9d163a9e1ca06acbce1f135cfef087"><td class="memItemLeft" align="right" valign="top"><a id="a7c9d163a9e1ca06acbce1f135cfef087"></a>
 virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#a7c9d163a9e1ca06acbce1f135cfef087">do_io_handle_deregister</a> (<a class="el" href="classllfio__v2__xxx_1_1io__handle.html">io_handle</a> *) noexcept</td></tr>
@@ -465,7 +463,7 @@ static constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><b>_a
 <tr><td class="fieldname"><a id="ace3fed6888ea1b5b6f1f641e2cf7cd26a4e1789381cf8c976ec7a7118b3529345"></a>wait_all&#160;</td><td class="fielddoc"><p>Barrier data and the metadata to retrieve it, block until it is done. </p>
 </td></tr>
 </table>
-<div class="fragment"><div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;                          : uint8_t</div><div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;  {</div><div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    nowait_data_only,  <span class="comment">//!&lt; Barrier data only, non-blocking. This is highly optimised on NV-DIMM storage, but consider using `nvram_barrier()` for even better performance.</span></div><div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;<span class="comment"></span>    wait_data_only,    <span class="comment">//!&lt; Barrier data only, block until it is done. This is highly optimised on NV-DIMM storage, but consider using `nvram_barrier()` for even better performance.</span></div><div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;<span class="comment"></span>    nowait_all,        <span class="comment">//!&lt; Barrier data and the metadata to retrieve it, non-blocking.</span></div><div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;<span class="comment"></span>    wait_all           <span class="comment">//!&lt; Barrier data and the metadata to retrieve it, block until it is done.</span></div><div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;<span class="comment"></span>  };</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;                          : uint8_t</div><div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;  {</div><div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    nowait_data_only,  <span class="comment">//!&lt; Barrier data only, non-blocking. This is highly optimised on NV-DIMM storage, but consider using `nvram_barrier()` for even better performance.</span></div><div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;<span class="comment"></span>    wait_data_only,  <span class="comment">//!&lt; Barrier data only, block until it is done. This is highly optimised on NV-DIMM storage, but consider using `nvram_barrier()` for even better performance.</span></div><div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;<span class="comment"></span>    nowait_all,  <span class="comment">//!&lt; Barrier data and the metadata to retrieve it, non-blocking.</span></div><div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;<span class="comment"></span>    wait_all     <span class="comment">//!&lt; Barrier data and the metadata to retrieve it, block until it is done.</span></div><div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;<span class="comment"></span>  };</div></div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -527,6 +525,33 @@ static constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><b>_a
 
 <p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#aea44ed050acfd8e4f9dec59ff194c746">llfio_v2_xxx::symlink_handle</a>, and <a class="el" href="classllfio__v2__xxx_1_1process__handle.html#a8ed1f5dda9dcf9d59710acc9c91df943">llfio_v2_xxx::process_handle</a>.</p>
 
+</div>
+</div>
+<a id="a04d99f9603d31c674aaf865d58abc4d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a04d99f9603d31c674aaf865d58abc4d6">&#9670;&nbsp;</a></span>do_io_handle_register()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual result&lt;uint8_t&gt; llfio_v2_xxx::io_multiplexer::do_io_handle_register </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1io__handle.html">io_handle</a> *&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Implements <code>io_handle</code> registration. The bottom two bits of the returned value are set into <code>_v.behaviour</code>'s <code>_multiplexer_state_bit0</code> and <code>_multiplexer_state_bit</code> </p>
+<div class="fragment"><div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;{ <span class="keywordflow">return</span> (uint8_t) 0; }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="ac5222904f116c9beb0515a4a5aa850bf"></a>
