@@ -225,13 +225,22 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::_do_barrier(io_ha
   auto *isb = &ol;
   *isb = make_iostatus();
   ULONG flags = 0;
-  if(kind == barrier_kind::nowait_data_only)
+  switch(kind)
   {
-    flags = 1 /*FLUSH_FLAGS_FILE_DATA_ONLY*/;  // note this doesn't block
+  case barrier_kind::nowait_view_only:
+  case barrier_kind::wait_view_only:
+  case barrier_kind::nowait_data_only:
+  case barrier_kind::wait_data_only:
+    flags = 1 /*FLUSH_FLAGS_FILE_DATA_ONLY*/;
+    break;
+  case barrier_kind::nowait_all:
+  case barrier_kind::wait_all:
+    flags = 0;
+    break;
   }
-  else if(kind == barrier_kind::nowait_all)
+  if(((uint8_t) kind & 1) == 0)
   {
-    flags = 2 /*FLUSH_FLAGS_NO_SYNC*/;
+    flags |= 2 /*FLUSH_FLAGS_NO_SYNC*/;
   }
   NTSTATUS ntstat = NtFlushBuffersFileEx(_v.h, flags, nullptr, 0, isb);
   if(STATUS_PENDING == ntstat)

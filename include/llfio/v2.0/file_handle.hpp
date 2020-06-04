@@ -313,18 +313,23 @@ public:
   Some of the filesystems on the major operating systems implement copy-on-write extent
   reference counting, and thus can very cheaply link a "copy" of extents in one file into
   another file. Upon first write into an extent, only then is a new copy formed for the
-  specific extents being modified.
+  specific extents being modified. Note that extent cloning is usually only possible in
+  cluster sized amounts, so if the portion you clone is not so aligned, new extents
+  will be allocated for the spill into non-aligned portions. Obviously, cloning an entire
+  file in a single shot does not have that problem.
 
   Networked filing systems typically can also implement remote extent copying, such that
   extents can be copied between files entirely upon the remote server, and avoiding the
   copy going over the network. This is usually far more efficient.
 
   This implementation first enumerates the valid extents for the region requested, and
-  only clones extents which are valid. It
+  only clones extents which are reported as valid. It
   then iterates the platform specific syscall to cause the extents to be cloned in
   `utils::page_allocator<T>` sized chunks (i.e. the next large page greater or equal
   to 1Mb). Generally speaking, if the dedicated syscalls fail, the implementation falls
   back to a user space emulation, unless `emulate_if_unsupported` is false.
+
+  \note Some filing systems 
 
   If you really want the copy to happen now, and not later via copy-on-write, set
   `force_copy_now`. Note that this forces `emulate_if_unsupported` to true.

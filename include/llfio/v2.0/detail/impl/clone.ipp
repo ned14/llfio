@@ -28,7 +28,7 @@ LLFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<file_handle::extent_type> clone_or_copy(const file_handle &src, const path_handle &destdir, path_view destleaf,
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<file_handle::extent_type> clone_or_copy(file_handle &src, const path_handle &destdir, path_view destleaf,
                                                                               bool preserve_timestamps, bool force_copy_now, file_handle::creation creation,
                                                                               deadline d) noexcept
   {
@@ -47,7 +47,7 @@ namespace algorithm
     }
     stat_t stat(nullptr);
     OUTCOME_TRY(stat.fill(src));
-    OUTCOME_TRY(auto &&dest, file_handle::file(destdir, destleaf, file_handle::mode::write, creation, src.kernel_caching()));
+    OUTCOME_TRY(auto dest, file_handle::file(destdir, destleaf, file_handle::mode::write, creation, src.kernel_caching()));
     bool failed = true;
     auto undest = make_scope_exit([&]() noexcept {
       if(failed)
@@ -61,11 +61,14 @@ namespace algorithm
       (void) dest.close();
     });
     (void) undest;
-    auto r = dest.clone_extents_to(dest, d, force_copy_now, false);
-    if(r)
     {
-      failed = false;
-      return r.assume_value().length;
+      log_level_guard g(log_level::fatal);
+      auto r = src.clone_extents_to(dest, d, force_copy_now, false);
+      if(r)
+      {
+        failed = false;
+        return r.assume_value().length;
+      }
     }
     statfs_t statfs;
     OUTCOME_TRY(statfs.fill(src, statfs_t::want::bavail));
@@ -73,7 +76,7 @@ namespace algorithm
     {
       return errc::no_space_on_device;
     }
-    OUTCOME_TRY(auto &&copied, dest.clone_extents_to(dest, d, force_copy_now, true));
+    OUTCOME_TRY(auto &&copied, src.clone_extents_to(dest, d, force_copy_now, true));
     failed = false;
     return copied.length;
   }

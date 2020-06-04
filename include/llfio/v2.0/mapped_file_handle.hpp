@@ -37,8 +37,9 @@ LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 <table>
 <tr><th></th><th>Cost of opening</th><th>Cost of i/o</th><th>Concurrency and Atomicity</th><th>Other remarks</th></tr>
 <tr><td>`file_handle`</td><td>Least</td><td>Syscall</td><td>POSIX guarantees (usually)</td><td>Least gotcha</td></tr>
-<tr><td>`async_file_handle`</td><td>More</td><td>Most (syscall + malloc/free + reactor)</td><td>POSIX guarantees (usually)</td><td>Makes no sense to use with cached i/o as it's a very expensive way to call `memcpy()`</td></tr>
-<tr><td>`mapped_file_handle`</td><td>Most</td><td>Least</td><td>None</td><td>Cannot be used with uncached i/o</td></tr>
+<tr><td>`async_file_handle`</td><td>More</td><td>Most (syscall + malloc/free + reactor)</td><td>POSIX guarantees (usually)</td><td>Makes no sense to use with
+cached i/o as it's a very expensive way to call `memcpy()`</td></tr> <tr><td>`mapped_file_handle`</td><td>Most</td><td>Least</td><td>None</td><td>Cannot be used
+with uncached i/o</td></tr>
 </table>
 
 All the major OSs on all the major 64 bit CPU architectures now offer at least 127 Tb of address
@@ -156,8 +157,48 @@ protected:
   map_handle _mh;      // The current map with valid extent
 
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t _do_max_buffers() const noexcept override { return _mh.max_buffers(); }
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), barrier_kind kind = barrier_kind::nowait_data_only, deadline d = deadline()) noexcept override { return _mh.barrier(reqs, kind, d); }
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> _do_read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override { return _mh.read(reqs, d); }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(),
+                                                                            barrier_kind kind = barrier_kind::nowait_data_only,
+                                                                            deadline d = deadline()) noexcept override
+  {
+    switch(kind)
+    {
+    case barrier_kind::nowait_view_only:
+    {
+      OUTCOME_TRY(_mh.barrier(reqs, barrier_kind::nowait_view_only, d));
+      return file_handle::_do_barrier(reqs, kind, d);
+    }
+    case barrier_kind::wait_view_only:
+    {
+      OUTCOME_TRY(_mh.barrier(reqs, barrier_kind::wait_view_only, d));
+      return file_handle::_do_barrier(reqs, kind, d);
+    }
+    case barrier_kind::nowait_data_only:
+    {
+      OUTCOME_TRY(_mh.barrier(reqs, barrier_kind::nowait_view_only, d));
+      return file_handle::_do_barrier(reqs, kind, d);
+    }
+    case barrier_kind::wait_data_only:
+    {
+      OUTCOME_TRY(_mh.barrier(reqs, barrier_kind::wait_view_only, d));
+      return file_handle::_do_barrier(reqs, kind, d);
+    }
+    case barrier_kind::nowait_all:
+    {
+      OUTCOME_TRY(_mh.barrier(reqs, barrier_kind::nowait_view_only, d));
+      return file_handle::_do_barrier(reqs, kind, d);
+    }
+    default:
+    {
+      OUTCOME_TRY(_mh.barrier(reqs, barrier_kind::wait_view_only, d));
+      return file_handle::_do_barrier(reqs, kind, d);
+    }
+    }
+  }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> _do_read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override
+  {
+    return _mh.read(reqs, d);
+  }
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override
   {
     if(!!(_sh.section_flags() & section_handle::flag::write_via_syscall))
@@ -259,7 +300,9 @@ public:
   \errors Any of the values which the constructors for `file_handle`, `section_handle` and `map_handle` can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<mapped_file_handle> mapped_file(size_type reservation, const path_handle &base, path_view_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none, section_handle::flag sflags = section_handle::flag::none) noexcept
+  static inline result<mapped_file_handle> mapped_file(size_type reservation, const path_handle &base, path_view_type _path, mode _mode = mode::read,
+                                                       creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none,
+                                                       section_handle::flag sflags = section_handle::flag::none) noexcept
   {
     if(_mode == mode::append)
     {
@@ -287,7 +330,9 @@ public:
   }
   //! \overload
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<mapped_file_handle> mapped_file(const path_handle &base, path_view_type _path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none, section_handle::flag sflags = section_handle::flag::none) noexcept
+  static inline result<mapped_file_handle> mapped_file(const path_handle &base, path_view_type _path, mode _mode = mode::read,
+                                                       creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none,
+                                                       section_handle::flag sflags = section_handle::flag::none) noexcept
   {
     return mapped_file(0, base, _path, _mode, _creation, _caching, flags, sflags);
   }
@@ -301,7 +346,9 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<mapped_file_handle> mapped_uniquely_named_file(size_type reservation, const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::temporary, flag flags = flag::none, section_handle::flag sflags = section_handle::flag::none) noexcept
+  static inline result<mapped_file_handle> mapped_uniquely_named_file(size_type reservation, const path_handle &dirpath, mode _mode = mode::write,
+                                                                      caching _caching = caching::temporary, flag flags = flag::none,
+                                                                      section_handle::flag sflags = section_handle::flag::none) noexcept
   {
     try
     {
@@ -337,11 +384,14 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<mapped_file_handle> mapped_temp_file(size_type reservation, path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::temporary, flag flags = flag::unlink_on_first_close,
+  static inline result<mapped_file_handle> mapped_temp_file(size_type reservation, path_view_type name = path_view_type(), mode _mode = mode::write,
+                                                            creation _creation = creation::if_needed, caching _caching = caching::temporary,
+                                                            flag flags = flag::unlink_on_first_close,
                                                             section_handle::flag sflags = section_handle::flag::none) noexcept
   {
     auto &tempdirh = path_discovery::storage_backed_temporary_files_directory();
-    return name.empty() ? mapped_uniquely_named_file(reservation, tempdirh, _mode, _caching, flags, sflags) : mapped_file(reservation, tempdirh, name, _mode, _creation, _caching, flags, sflags);
+    return name.empty() ? mapped_uniquely_named_file(reservation, tempdirh, _mode, _caching, flags, sflags) :
+                          mapped_file(reservation, tempdirh, name, _mode, _creation, _caching, flags, sflags);
   }
   /*! \em Securely create a mapped file handle creating a temporary anonymous inode in
   the filesystem referred to by \em dirpath. The inode created has
@@ -354,7 +404,9 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<mapped_file_handle> mapped_temp_inode(size_type reservation = 0, const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write, flag flags = flag::none, section_handle::flag sflags = section_handle::flag::none) noexcept
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<mapped_file_handle>
+  mapped_temp_inode(size_type reservation = 0, const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write,
+                    flag flags = flag::none, section_handle::flag sflags = section_handle::flag::none) noexcept
   {
     OUTCOME_TRY(auto &&v, file_handle::temp_inode(dir, _mode, flags));
     mapped_file_handle ret(std::move(v), sflags);
@@ -405,7 +457,8 @@ public:
   }
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override;
-  result<mapped_file_handle> reopen(size_type reservation, mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept
+  result<mapped_file_handle> reopen(size_type reservation, mode mode_ = mode::unchanged, caching caching_ = caching::unchanged,
+                                    deadline d = std::chrono::seconds(30)) const noexcept
   {
     OUTCOME_TRY(auto &&fh, file_handle::reopen(mode_, caching_, d));
     return mapped_file_handle(std::move(fh), reservation, _sh.section_flags());
@@ -423,7 +476,10 @@ public:
   the call to `update_map()`, this call is not particularly efficient, and you ought to cache
   its value where possible.
   */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> maximum_extent() const noexcept override { return (0 == _reservation) ? underlying_file_maximum_extent() : const_cast<mapped_file_handle *>(this)->update_map(); }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> maximum_extent() const noexcept override
+  {
+    return (0 == _reservation) ? underlying_file_maximum_extent() : const_cast<mapped_file_handle *>(this)->update_map();
+  }
 
   /*! \brief Resize the current maximum permitted extent of the mapped file to the given extent, avoiding any
   new allocation of physical storage where supported, and mapping or unmapping any new pages
@@ -520,7 +576,10 @@ template <> struct construct<mapped_file_handle>
   mapped_file_handle::creation _creation = mapped_file_handle::creation::open_existing;
   mapped_file_handle::caching _caching = mapped_file_handle::caching::all;
   mapped_file_handle::flag flags = mapped_file_handle::flag::none;
-  result<mapped_file_handle> operator()() const noexcept { return mapped_file_handle::mapped_file(reservation, base, _path, _mode, _creation, _caching, flags); }
+  result<mapped_file_handle> operator()() const noexcept
+  {
+    return mapped_file_handle::mapped_file(reservation, base, _path, _mode, _creation, _caching, flags);
+  }
 };
 
 LLFIO_V2_NAMESPACE_END
@@ -567,17 +626,27 @@ later when `truncate()` or `update_map()` is called.
 
 \errors Any of the values which the constructors for `file_handle`, `section_handle` and `map_handle` can return.
 */
-inline result<mapped_file_handle> mapped_file(mapped_file_handle::size_type reservation, const path_handle &base, mapped_file_handle::path_view_type _path, mapped_file_handle::mode _mode = mapped_file_handle::mode::read, mapped_file_handle::creation _creation = mapped_file_handle::creation::open_existing,
-                                              mapped_file_handle::caching _caching = mapped_file_handle::caching::all, mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
+inline result<mapped_file_handle> mapped_file(mapped_file_handle::size_type reservation, const path_handle &base, mapped_file_handle::path_view_type _path,
+                                              mapped_file_handle::mode _mode = mapped_file_handle::mode::read,
+                                              mapped_file_handle::creation _creation = mapped_file_handle::creation::open_existing,
+                                              mapped_file_handle::caching _caching = mapped_file_handle::caching::all,
+                                              mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
 {
-  return mapped_file_handle::mapped_file(std::forward<decltype(reservation)>(reservation), std::forward<decltype(base)>(base), std::forward<decltype(_path)>(_path), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching),
+  return mapped_file_handle::mapped_file(std::forward<decltype(reservation)>(reservation), std::forward<decltype(base)>(base),
+                                         std::forward<decltype(_path)>(_path), std::forward<decltype(_mode)>(_mode),
+                                         std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching),
                                          std::forward<decltype(flags)>(flags));
 }
 //! \overload
-inline result<mapped_file_handle> mapped_file(const path_handle &base, mapped_file_handle::path_view_type _path, mapped_file_handle::mode _mode = mapped_file_handle::mode::read, mapped_file_handle::creation _creation = mapped_file_handle::creation::open_existing,
-                                              mapped_file_handle::caching _caching = mapped_file_handle::caching::all, mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
+inline result<mapped_file_handle> mapped_file(const path_handle &base, mapped_file_handle::path_view_type _path,
+                                              mapped_file_handle::mode _mode = mapped_file_handle::mode::read,
+                                              mapped_file_handle::creation _creation = mapped_file_handle::creation::open_existing,
+                                              mapped_file_handle::caching _caching = mapped_file_handle::caching::all,
+                                              mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
 {
-  return mapped_file_handle::mapped_file(std::forward<decltype(base)>(base), std::forward<decltype(_path)>(_path), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
+  return mapped_file_handle::mapped_file(std::forward<decltype(base)>(base), std::forward<decltype(_path)>(_path), std::forward<decltype(_mode)>(_mode),
+                                         std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching),
+                                         std::forward<decltype(flags)>(flags));
 }
 /*! Create an mapped file handle creating a randomly named file on a path.
 The file is opened exclusively with `creation::only_if_not_exist` so it
@@ -587,10 +656,14 @@ flush changes to physical storage as lately as possible.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<mapped_file_handle> mapped_uniquely_named_file(mapped_file_handle::size_type reservation, const path_handle &dirpath, mapped_file_handle::mode _mode = mapped_file_handle::mode::write, mapped_file_handle::caching _caching = mapped_file_handle::caching::temporary,
+inline result<mapped_file_handle> mapped_uniquely_named_file(mapped_file_handle::size_type reservation, const path_handle &dirpath,
+                                                             mapped_file_handle::mode _mode = mapped_file_handle::mode::write,
+                                                             mapped_file_handle::caching _caching = mapped_file_handle::caching::temporary,
                                                              mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
 {
-  return mapped_file_handle::mapped_uniquely_named_file(std::forward<decltype(reservation)>(reservation), std::forward<decltype(dirpath)>(dirpath), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
+  return mapped_file_handle::mapped_uniquely_named_file(std::forward<decltype(reservation)>(reservation), std::forward<decltype(dirpath)>(dirpath),
+                                                        std::forward<decltype(_mode)>(_mode), std::forward<decltype(_caching)>(_caching),
+                                                        std::forward<decltype(flags)>(flags));
 }
 /*! Create a mapped file handle creating the named file on some path which
 the OS declares to be suitable for temporary files. Most OSs are
@@ -607,10 +680,16 @@ to use. Use `temp_inode()` instead, it is far more secure.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<mapped_file_handle> mapped_temp_file(mapped_file_handle::size_type reservation, mapped_file_handle::path_view_type name = mapped_file_handle::path_view_type(), mapped_file_handle::mode _mode = mapped_file_handle::mode::write,
-                                                   mapped_file_handle::creation _creation = mapped_file_handle::creation::if_needed, mapped_file_handle::caching _caching = mapped_file_handle::caching::temporary, mapped_file_handle::flag flags = mapped_file_handle::flag::unlink_on_first_close) noexcept
+inline result<mapped_file_handle> mapped_temp_file(mapped_file_handle::size_type reservation,
+                                                   mapped_file_handle::path_view_type name = mapped_file_handle::path_view_type(),
+                                                   mapped_file_handle::mode _mode = mapped_file_handle::mode::write,
+                                                   mapped_file_handle::creation _creation = mapped_file_handle::creation::if_needed,
+                                                   mapped_file_handle::caching _caching = mapped_file_handle::caching::temporary,
+                                                   mapped_file_handle::flag flags = mapped_file_handle::flag::unlink_on_first_close) noexcept
 {
-  return mapped_file_handle::mapped_temp_file(std::forward<decltype(reservation)>(reservation), std::forward<decltype(name)>(name), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
+  return mapped_file_handle::mapped_temp_file(std::forward<decltype(reservation)>(reservation), std::forward<decltype(name)>(name),
+                                              std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation),
+                                              std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }
 /*! \em Securely create a mapped file handle creating a temporary anonymous inode in
 the filesystem referred to by \em dirpath. The inode created has
@@ -622,10 +701,13 @@ is for backing shared memory maps).
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<mapped_file_handle> mapped_temp_inode(mapped_file_handle::size_type reservation = 0, const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mapped_file_handle::mode _mode = mapped_file_handle::mode::write,
+inline result<mapped_file_handle> mapped_temp_inode(mapped_file_handle::size_type reservation = 0,
+                                                    const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(),
+                                                    mapped_file_handle::mode _mode = mapped_file_handle::mode::write,
                                                     mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
 {
-  return mapped_file_handle::mapped_temp_inode(std::forward<decltype(reservation)>(reservation), std::forward<decltype(dir)>(dir), std::forward<decltype(_mode)>(_mode), std::forward<decltype(flags)>(flags));
+  return mapped_file_handle::mapped_temp_inode(std::forward<decltype(reservation)>(reservation), std::forward<decltype(dir)>(dir),
+                                               std::forward<decltype(_mode)>(_mode), std::forward<decltype(flags)>(flags));
 }
 // END make_free_functions.py
 
