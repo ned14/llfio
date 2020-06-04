@@ -22,6 +22,8 @@ var classllfio__v2__xxx_1_1io__multiplexer =
     [ "registered_buffer_type", "classllfio__v2__xxx_1_1io__multiplexer.html#a9991b48f4cd8c77ef7fd31e6c48003b3", null ],
     [ "size_type", "classllfio__v2__xxx_1_1io__multiplexer.html#a58197ed3d18b980f4edda260c0776848", null ],
     [ "barrier_kind", "classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26", [
+      [ "nowait_view_only", "classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26a4737abe1cca6f14bc88bb6ba1f83b89c", null ],
+      [ "wait_view_only", "classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26aaa8388b23ccb35c9893a9d44e1d2f54c", null ],
       [ "nowait_data_only", "classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26a2f6648dac37731813bb84ae9b24bdfdb", null ],
       [ "wait_data_only", "classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26af1d3baf03681db9a9986e0a76d6107ce", null ],
       [ "nowait_all", "classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26ab7a52d26120f585b21e8960812db5bf1", null ],

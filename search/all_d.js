@@ -11,6 +11,7 @@ var searchData=
   ['nosuid',['nosuid',['../structllfio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#a973d0ca8c51f329587144682aff54879',1,'llfio_v2_xxx::statfs_t::f_flags_t']]],
   ['nowait_5fall',['nowait_all',['../classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26ab7a52d26120f585b21e8960812db5bf1',1,'llfio_v2_xxx::io_multiplexer']]],
   ['nowait_5fdata_5fonly',['nowait_data_only',['../classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26a2f6648dac37731813bb84ae9b24bdfdb',1,'llfio_v2_xxx::io_multiplexer']]],
+  ['nowait_5fview_5fonly',['nowait_view_only',['../classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26a4737abe1cca6f14bc88bb6ba1f83b89c',1,'llfio_v2_xxx::io_multiplexer']]],
   ['nsecs',['nsecs',['../structllfio__v2__xxx_1_1deadline.html#aff7d0cc77c5d0a9c90b5f16140df5359',1,'llfio_v2_xxx::deadline']]],
   ['nvram_5fbarrier',['nvram_barrier',['../namespacellfio__v2__xxx.html#a86f75b69db68e6c0593919f0a878f838',1,'llfio_v2_xxx']]]
 ];
