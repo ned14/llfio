@@ -72,7 +72,7 @@ namespace algorithm
   restamped with the metadata from the source file handle just before the
   destination file handle is closed.
   */
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<file_handle::extent_type> clone_or_copy(const file_handle &src, const path_handle &destdir, path_view destleaf = {},
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<file_handle::extent_type> clone_or_copy(file_handle &src, const path_handle &destdir, path_view destleaf = {},
                                                                               bool preserve_timestamps = true, bool force_copy_now = false,
                                                                               file_handle::creation creation = file_handle::creation::always_new,
                                                                               deadline d = {}) noexcept;

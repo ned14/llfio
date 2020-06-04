@@ -35,35 +35,54 @@ Distributed under the Boost Software License, Version 1.0.
 
 static inline void TestCloneOrCopyFile()
 {
-  static constexpr size_t rounds = 100;
+  static constexpr int DURATION = 30;
   static constexpr size_t max_file_extent = (size_t) 100 * 1024 * 1024;
   namespace llfio = LLFIO_V2_NAMESPACE;
   using QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng;
   const auto &tempdirh = llfio::path_discovery::storage_backed_temporary_files_directory();
   small_prng rand;
-  for(size_t round = 0; round < rounds; round++)
+  auto begin = std::chrono::steady_clock::now();
+  for(size_t round = 0; std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - begin).count() < DURATION; round++)
   {
-    auto srcfh = llfio::mapped_file_handle::mapped_temp_inode().value();
+    std::vector<llfio::file_handle::extent_pair> extents_written;
+    auto srcfh = llfio::mapped_file_handle::mapped_uniquely_named_file(0, tempdirh).value();
     auto maximum_extent = rand() % max_file_extent;
     srcfh.truncate(maximum_extent).value();
     for(uint8_t c = 1; c != 0; c++)
     {
-      auto offset = rand() % maximum_extent;
-      auto size = rand() % std::min(maximum_extent - offset, maximum_extent/8);
+      auto r = rand();
+      auto offset = r % (maximum_extent / 2);
+      if(r & 30)
+      {
+        offset += maximum_extent / 2;
+      }
+      auto size = rand() % std::min(maximum_extent - offset, maximum_extent / 256);
       llfio::byte buffer[65536];
       memset(&buffer, c, sizeof(buffer));
+      extents_written.push_back({offset, size});
       for(unsigned n = 0; n < size; n += sizeof(buffer))
       {
         auto towrite = std::min((size_t) size - n, sizeof(buffer));
-        srcfh.write(offset+n, {{buffer, towrite}}).value();
+        srcfh.write(offset + n, {{buffer, towrite}}).value();
       }
     }
+#ifdef _WIN32
+    // On some filing systems, need to force block allocation
+    srcfh.barrier(llfio::file_handle::barrier_kind::nowait_view_only).value();
+#endif
+    // std::sort(extents_written.begin(), extents_written.end());
+    // for(auto &i : extents_written)
+    //{
+    //  std::cout << i.offset << "," << i.length << std::endl;
+    //}
 
     auto randomname = llfio::utils::random_string(32);
     randomname.append(".random");
     llfio::algorithm::clone_or_copy(srcfh, tempdirh, randomname).value();
 
     auto destfh = llfio::mapped_file_handle::mapped_file(tempdirh, randomname).value();
+    std::cout << "\nRound " << (round + 1) << ": Source file has " << srcfh.maximum_extent().value() << " maximum extent. Destination file has "
+              << destfh.maximum_extent().value() << " maximum extent." << std::endl;
     BOOST_REQUIRE(srcfh.maximum_extent().value() == destfh.maximum_extent().value());
     llfio::stat_t src_stat(nullptr), dest_stat(nullptr);
     src_stat.fill(srcfh).value();
@@ -72,7 +91,7 @@ static inline void TestCloneOrCopyFile()
               << std::endl;
     BOOST_CHECK(src_stat.st_blocks == dest_stat.st_blocks);
 
-    for(size_t n=0; n<maximum_extent; n++)
+    for(size_t n = 0; n < maximum_extent; n++)
     {
       if(srcfh.address()[n] != destfh.address()[n])
       {
@@ -172,4 +191,5 @@ static inline void TestCloneOrCopyTree()
 }
 #endif
 
-KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, clone_or_copy_file, "Tests that llfio::algorithm::clone_or_copy(file_handle) works as expected", TestCloneOrCopyFile())
+KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, clone_or_copy_file, "Tests that llfio::algorithm::clone_or_copy(file_handle) works as expected",
+                       TestCloneOrCopyFile())

@@ -233,7 +233,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_barrier(ma
     bytes = _length;
   }
   // If nvram and not syncing metadata, use lightweight barrier
-  if((kind == barrier_kind::nowait_data_only || kind == barrier_kind::wait_data_only) && is_nvram())
+  if(kind <= barrier_kind::wait_data_only && is_nvram())
   {
     auto synced = nvram_barrier({addr, bytes});
     if(synced.size() >= bytes)
@@ -241,13 +241,13 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_barrier(ma
       return {reqs.buffers};
     }
   }
-  int flags = (kind != barrier_kind::nowait_data_only) ? MS_SYNC : MS_ASYNC;
+  int flags = ((uint8_t) kind & 1) ? MS_SYNC : MS_ASYNC;
   if(-1 == ::msync(addr, bytes, flags))
   {
     return posix_error();
   }
   // Don't fsync temporary inodes
-  if(_section != nullptr && (_section->backing() != nullptr) && kind != barrier_kind::nowait_data_only)
+  if(_section != nullptr && (_section->backing() != nullptr) && kind >= barrier_kind::nowait_all)
   {
     reqs.offset += _offset;
     return _section->backing()->barrier(reqs, kind, d);

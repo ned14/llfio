@@ -277,7 +277,7 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::_do_barrier(io_ha
     return errc::not_supported;
   }
 #ifdef __linux__
-  if(kind == barrier_kind::nowait_data_only || kind == barrier_kind::wait_data_only)
+  if(kind <= barrier_kind::wait_data_only)
   {
     // Linux has a lovely dedicated syscall giving us exactly what we need here
     extent_type offset = reqs.offset, bytes = 0;
@@ -298,7 +298,7 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::_do_barrier(io_ha
   }
 #endif
 #if !defined(__FreeBSD__) && !defined(__APPLE__)  // neither of these have fdatasync()
-  if(kind == barrier_kind::nowait_data_only || kind == barrier_kind::wait_data_only)
+  if(kind <= barrier_kind::wait_data_only)
   {
     if(-1 == ::fdatasync(_v.fd))
     {
@@ -308,7 +308,7 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::_do_barrier(io_ha
   }
 #endif
 #ifdef __APPLE__
-  if(kind == barrier_kind::nowait_data_only || kind == barrier_kind::nowait_all)
+  if(((uint8_t) kind & 1) == 0)
   {
     // OS X fsync doesn't wait for the device to flush its buffers
     if(-1 == ::fsync(_v.fd))

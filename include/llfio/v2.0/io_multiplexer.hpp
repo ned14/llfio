@@ -191,6 +191,8 @@ public:
   //! The kinds of write reordering barrier which can be performed.
   enum class barrier_kind : uint8_t
   {
+    nowait_view_only, //!< Barrier mapped data only, non-blocking. This is highly optimised on NV-DIMM storage, but consider using `nvram_barrier()` for even better performance.
+    wait_view_only,   //!< Barrier mapped data only, block until it is done. This is highly optimised on NV-DIMM storage, but consider using `nvram_barrier()` for even better performance.
     nowait_data_only,  //!< Barrier data only, non-blocking. This is highly optimised on NV-DIMM storage, but consider using `nvram_barrier()` for even better performance.
     wait_data_only,  //!< Barrier data only, block until it is done. This is highly optimised on NV-DIMM storage, but consider using `nvram_barrier()` for even better performance.
     nowait_all,  //!< Barrier data and the metadata to retrieve it, non-blocking.
