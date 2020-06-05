@@ -329,7 +329,16 @@ public:
   to 1Mb). Generally speaking, if the dedicated syscalls fail, the implementation falls
   back to a user space emulation, unless `emulate_if_unsupported` is false.
 
-  \note Some filing systems 
+  If the region being cloned does not exist in the source file, the region is truncated
+  to what is available. If the destination file is not big enough to receive the cloned
+  region, it is extended. If the clone is occurring within the same inode, you should
+  ensure that the regions do not overlap, as cloning regions which overlap has platform-specific
+  semantics. If they do overlap, you should always set `force_copy_now` for portable
+  code.
+
+  \note The current implementation does not permit overlapping clones within the same
+  inode to differ by less than `utils::page_allocator<T>` sized chunks. It will fail
+  with an error code comparing equal to `errc::invalid_parameter`.
 
   If you really want the copy to happen now, and not later via copy-on-write, set
   `force_copy_now`. Note that this forces `emulate_if_unsupported` to true.

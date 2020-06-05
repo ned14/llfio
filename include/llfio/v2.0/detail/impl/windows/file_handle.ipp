@@ -410,14 +410,11 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
     windows_nt_kernel::init();
     using namespace windows_nt_kernel;
     LLFIO_LOG_FUNCTION_CALL(this);
+    OUTCOME_TRY(auto mycurrentlength, maximum_extent());
     if(extent.offset == (extent_type) -1 && extent.length == (extent_type) -1)
     {
       extent.offset = 0;
-      OUTCOME_TRY(extent.length, maximum_extent());
-    }
-    if(extent.length == 0)
-    {
-      return extent;
+      extent.length= mycurrentlength;
     }
     if(extent.offset + extent.length < extent.offset)
     {
@@ -426,6 +423,18 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
     if(destoffset + extent.length < destoffset)
     {
       return errc::value_too_large;
+    }
+    if(extent.length == 0)
+    {
+      return extent;
+    }
+    if(extent.offset>=mycurrentlength)
+    {
+      return {extent.offset, 0};
+    }
+    if(extent.offset+extent.length >= mycurrentlength)
+    {
+      extent.length = mycurrentlength - extent.offset;
     }
     LLFIO_DEADLINE_TO_SLEEP_INIT(d);
     const auto blocksize = utils::file_buffer_default_size();
@@ -514,59 +523,73 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
         offset = farb_allocated[n].FileOffset.QuadPart + farb_allocated[n].Length.QuadPart;
       }
     }
-    // The list of extents will spill outside initially requested range. Fill it in.
-    if(todo.front().src.offset < extent.offset)
+    if(!todo.empty())
     {
-      auto diff = (extent.offset - todo.front().src.offset + page_size - 1) & ~(page_size - 1);
-      todo.front().src.length -= diff;
-      todo.front().src.offset += diff;
-      if(todo.front().src.offset != extent.offset)
+      // The list of extents will spill outside initially requested range. Fill it in.
+      if(todo.front().src.offset < extent.offset)
       {
-        assert(todo.front().src.offset > extent.offset);
-        todo.insert(todo.begin(), workitem{{extent.offset, todo.front().src.offset - extent.offset},
-                                           (todo.front().op == workitem::clone_extents) ? workitem::copy_bytes : workitem::zero_bytes});
+        auto diff = (extent.offset - todo.front().src.offset + page_size - 1) & ~(page_size - 1);
+        todo.front().src.length -= diff;
+        todo.front().src.offset += diff;
+        if(todo.front().src.offset != extent.offset)
+        {
+          assert(todo.front().src.offset > extent.offset);
+          todo.insert(todo.begin(), workitem{{extent.offset, todo.front().src.offset - extent.offset},
+                                             (todo.front().op == workitem::clone_extents) ? workitem::copy_bytes : workitem::zero_bytes});
+        }
       }
-    }
-    else if(todo.front().src.offset > extent.offset)
-    {
-      todo.insert(todo.begin(), workitem{{extent.offset, todo.front().src.offset - extent.offset}, workitem::delete_extents});
-    }
-    if(todo.back().src.offset + todo.back().src.length > extent.offset + extent.length)
-    {
-      auto todoend = todo.back().src.offset + todo.back().src.length;
-      auto extentend = extent.offset + extent.length;
-      auto diff = (todoend + page_size - 1 - extentend) & ~(page_size - 1);
-      todo.back().src.length -= diff;
-      if(todoend != extentend)
+      else if(todo.front().src.offset > extent.offset)
       {
-        assert(todoend < extentend);
-        todo.push_back(workitem{{todoend, extentend - todoend}, (todo.back().op == workitem::clone_extents) ? workitem::copy_bytes : workitem::zero_bytes});
+        todo.insert(todo.begin(), workitem{{extent.offset, todo.front().src.offset - extent.offset}, workitem::delete_extents});
       }
-    }
-    else if(todo.back().src.offset + todo.back().src.length < extent.offset + extent.length)
-    {
-      todo.push_back(
-      workitem{{todo.back().src.offset + todo.back().src.length, extent.offset + extent.length - (todo.back().src.offset + todo.back().src.length)},
-               workitem::delete_extents});
-    }
+      if(todo.back().src.offset + todo.back().src.length > extent.offset + extent.length)
+      {
+        auto todoend = todo.back().src.offset + todo.back().src.length;
+        auto extentend = extent.offset + extent.length;
+        auto diff = (todoend + page_size - 1 - extentend) & ~(page_size - 1);
+        todo.back().src.length -= diff;
+        if(todoend != extentend)
+        {
+          assert(todoend < extentend);
+          todo.push_back(workitem{{todoend, extentend - todoend}, (todo.back().op == workitem::clone_extents) ? workitem::copy_bytes : workitem::zero_bytes});
+        }
+      }
+      else if(todo.back().src.offset + todo.back().src.length < extent.offset + extent.length)
+      {
+        todo.push_back(
+        workitem{{todo.back().src.offset + todo.back().src.length, extent.offset + extent.length - (todo.back().src.offset + todo.back().src.length)},
+                 workitem::delete_extents});
+      }
 #ifndef NDEBUG
-    {
-      assert(todo.front().src.offset == extent.offset);
-      assert(todo.back().src.offset + todo.back().src.length == extent.offset + extent.length);
-      for(size_t n = 1; n < todo.size(); n++)
       {
-        assert(todo[n - 1].src.offset + todo[n - 1].src.length == todo[n].src.offset);
+        assert(todo.front().src.offset == extent.offset);
+        assert(todo.back().src.offset + todo.back().src.length == extent.offset + extent.length);
+        for(size_t n = 1; n < todo.size(); n++)
+        {
+          assert(todo[n - 1].src.offset + todo[n - 1].src.length == todo[n].src.offset);
+        }
       }
-    }
 #endif
+    }
     // Ensure the destination file is big enough
     auto &dest = static_cast<file_handle &>(dest_);
+    if(dest.unique_id() == unique_id())
+    {
+      if(abs((int64_t) destoffset - (int64_t) extent.offset) < (int64_t) blocksize)
+      {
+        return errc::invalid_argument;
+      }
+      if(destoffset > extent.offset)
+      {
+        std::reverse(todo.begin(), todo.end());
+      }
+    }
     OUTCOME_TRY(auto dest_length, dest.maximum_extent());
     if(destoffset + extent.length > dest_length)
     {
       // No need to zero nor deallocate extents in the new length
       auto it = todo.begin();
-      while(it->src.offset < dest_length)
+      while(it!=todo.end() && destoffset + it->src.length < dest_length)
       {
         ++it;
       }
@@ -596,10 +619,10 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
         (void) dest.truncate(dest_length);
       }
     });
+#if 0
     for(const workitem &item : todo)
     {
-#if 0
-      std::cout << "From offset " << item.src.offset << " " << item.src.length << " bytes do ";
+      std::cout << "  From offset " << item.src.offset << " " << item.src.length << " bytes do ";
       switch(item.op)
       {
       case workitem::copy_bytes:
@@ -620,7 +643,10 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
         std::cout << " (destination extents are new)";
       }
       std::cout << std::endl;
+    }
 #endif
+    for(const workitem &item : todo)
+    {
       for(size_t thisoffset = 0; thisoffset < item.src.length; thisoffset += blocksize)
       {
         bool done = false;
@@ -710,7 +736,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
                 // Write portion from ds to zs
                 cb = {(const byte *) ds, (size_t)(zs - ds)};
                 auto localoffset = cb.data() - readed.front().data();
-                //std::cout << "*** " << (item.src.offset + thisoffset + localoffset) << " - " << cb.size() << std::endl;
+                // std::cout << "*** " << (item.src.offset + thisoffset + localoffset) << " - " << cb.size() << std::endl;
                 OUTCOME_TRY(auto written, dest.write({{&cb, 1}, item.src.offset + thisoffset + localoffset + destoffsetdiff}, nd));
                 if(written.front().size() != (size_t)(zs - ds))
                 {
@@ -734,8 +760,8 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
         if(!done && (zero_extents && item.op == workitem::delete_extents))
         {
           FILE_ZERO_DATA_INFORMATION fzdi{};
-          fzdi.FileOffset.QuadPart = item.src.offset + thisoffset;
-          fzdi.BeyondFinalZero.QuadPart = item.src.offset + thisoffset + thisblock;
+          fzdi.FileOffset.QuadPart = item.src.offset + thisoffset + destoffsetdiff;
+          fzdi.BeyondFinalZero.QuadPart = item.src.offset + thisoffset + destoffsetdiff + thisblock;
           DWORD bytesout = 0;
           OVERLAPPED ol{};
           memset(&ol, 0, sizeof(ol));
