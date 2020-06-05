@@ -33,7 +33,106 @@ Distributed under the Boost Software License, Version 1.0.
 #include <sys/resource.h>
 #endif
 
-static inline void TestCloneOrCopyFile()
+static inline void TestCloneExtents()
+{
+  static constexpr int DURATION = 30;
+  static constexpr size_t max_file_extent = (size_t) 100 * 1024 * 1024;
+  namespace llfio = LLFIO_V2_NAMESPACE;
+  using QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng;
+  static const auto &tempdirh = llfio::path_discovery::storage_backed_temporary_files_directory();
+  small_prng rand;
+  auto begin = std::chrono::steady_clock::now();
+  for(size_t round = 0; std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - begin).count() < DURATION; round++)
+  {
+    struct handle_t
+    {
+      std::vector<llfio::file_handle::extent_pair> extents_written;
+      llfio::mapped_file_handle fh{llfio::mapped_file_handle::mapped_uniquely_named_file(0, tempdirh, llfio::mapped_file_handle::mode::write,
+                                                                                         llfio::mapped_file_handle::caching::all,
+                                                                                         llfio::mapped_file_handle::flag::unlink_on_first_close)
+                                   .value()};
+      llfio::mapped_file_handle::extent_type maximum_extent{0};
+    } handles[2];
+    std::vector<llfio::byte> shouldbe;
+    handles[0].extents_written.reserve(128);
+    handles[0].maximum_extent = rand() % (max_file_extent * 3 / 4);
+    handles[0].fh.truncate(handles[0].maximum_extent).value();
+    handles[1].extents_written.reserve(128);
+    handles[1].maximum_extent = rand() % max_file_extent;
+    handles[1].fh.truncate(handles[1].maximum_extent).value();
+    for(uint8_t c = 1; c != 0; c++)
+    {
+      auto r = rand();
+      handle_t &h = handles[c & 1];
+      auto offset = r % (h.maximum_extent / 2);
+      if(r & 30)  // cluster around two poles
+      {
+        offset += h.maximum_extent / 2;
+      }
+      auto size = rand() % std::min(h.maximum_extent - offset, h.maximum_extent / 256);
+      llfio::byte buffer[65536];
+      memset(&buffer, c, sizeof(buffer));
+      h.extents_written.push_back({offset, size});
+      for(unsigned n = 0; n < size; n += sizeof(buffer))
+      {
+        auto towrite = std::min((size_t) size - n, sizeof(buffer));
+        h.fh.write(offset + n, {{buffer, towrite}}).value();
+      }
+    }
+    for(auto &h : handles)
+    {
+#ifdef _WIN32
+      // On some filing systems, need to force block allocation
+      h.fh.barrier(llfio::file_handle::barrier_kind::nowait_view_only).value();
+#endif
+#if 0
+      std::cout << (&h - handles) << ":\n";
+      std::sort(h.extents_written.begin(), h.extents_written.end());
+      for(auto &i : h.extents_written)
+      {
+        std::cout << "  " << i.offset << "," << i.length << std::endl;
+      }
+#endif
+    }
+    shouldbe.resize(handles[1].maximum_extent);
+    memcpy(shouldbe.data(), handles[1].fh.address(), shouldbe.size());
+
+    // Choose some random extent in source to clone into dest. Make it big.
+    llfio::mapped_file_handle::extent_pair srcregion{(rand() % (handles[0].maximum_extent / 2)), (rand() % (handles[0].maximum_extent / 2))};
+    auto destoffset = rand() % (handles[1].maximum_extent / 2);
+    std::cout << "\nRound " << (round + 1) << ": Cloning " << srcregion.offset << "-" << srcregion.length << " to offset " << destoffset << " ..." << std::endl;
+    handles[0].fh.clone_extents_to(srcregion, handles[1].fh, destoffset).value();
+    // Destination will be original maximum extent, or any overlap of extents copied
+    auto maxtobecopied = std::min(srcregion.length, handles[0].maximum_extent - srcregion.offset);
+    auto destshouldbe = std::max(handles[1].maximum_extent, destoffset + maxtobecopied);
+    shouldbe.resize(destshouldbe);
+    memcpy(shouldbe.data() + destoffset, handles[0].fh.address() + srcregion.offset, maxtobecopied);
+
+    std::cout << "   Source file has " << handles[0].fh.maximum_extent().value() << " maximum extent. Destination file has "
+              << handles[1].fh.maximum_extent().value() << " maximum extent (was " << handles[1].maximum_extent << ")." << std::endl;
+    // Source maximum extent should be unchanged
+    BOOST_CHECK(handles[0].fh.maximum_extent().value() == handles[0].maximum_extent);
+    BOOST_REQUIRE(handles[1].fh.maximum_extent().value() == destshouldbe);
+    llfio::stat_t src_stat(nullptr), dest_stat(nullptr);
+    src_stat.fill(handles[0].fh).value();
+    dest_stat.fill(handles[1].fh).value();
+    std::cout << "   Source file has " << src_stat.st_blocks << " blocks allocated. Destination file has " << dest_stat.st_blocks << " blocks allocated."
+              << std::endl;
+
+    for(size_t n = 0; n < destshouldbe; n++)
+    {
+      if(shouldbe.data()[n] != handles[1].fh.address()[n])
+      {
+        std::cerr << "Byte at offset " << n << " is '" << *(char *) &shouldbe.data()[n] << "' in source and is '" << *(char *) &handles[1].fh.address()[n]
+                  << "' in destination." << std::endl;
+        BOOST_CHECK(shouldbe.data()[n] == handles[1].fh.address()[n]);
+        break;
+      }
+    }
+  }
+}
+
+static inline void TestCloneOrCopyFileWhole()
 {
   static constexpr int DURATION = 30;
   static constexpr size_t max_file_extent = (size_t) 100 * 1024 * 1024;
@@ -45,7 +144,11 @@ static inline void TestCloneOrCopyFile()
   for(size_t round = 0; std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - begin).count() < DURATION; round++)
   {
     std::vector<llfio::file_handle::extent_pair> extents_written;
-    auto srcfh = llfio::mapped_file_handle::mapped_uniquely_named_file(0, tempdirh).value();
+    extents_written.reserve(256);
+    auto srcfh =
+    llfio::mapped_file_handle::mapped_uniquely_named_file(0, tempdirh, llfio::mapped_file_handle::mode::write, llfio::mapped_file_handle::caching::all,
+                                                          llfio::mapped_file_handle::flag::unlink_on_first_close)
+    .value();
     auto maximum_extent = rand() % max_file_extent;
     srcfh.truncate(maximum_extent).value();
     for(uint8_t c = 1; c != 0; c++)
@@ -80,7 +183,10 @@ static inline void TestCloneOrCopyFile()
     randomname.append(".random");
     llfio::algorithm::clone_or_copy(srcfh, tempdirh, randomname).value();
 
-    auto destfh = llfio::mapped_file_handle::mapped_file(tempdirh, randomname).value();
+    auto destfh =
+    llfio::mapped_file_handle::mapped_file(tempdirh, randomname, llfio::mapped_file_handle::mode::write, llfio::mapped_file_handle::creation::open_existing,
+                                           llfio::mapped_file_handle::caching::all, llfio::mapped_file_handle::flag::unlink_on_first_close)
+    .value();
     std::cout << "\nRound " << (round + 1) << ": Source file has " << srcfh.maximum_extent().value() << " maximum extent. Destination file has "
               << destfh.maximum_extent().value() << " maximum extent." << std::endl;
     BOOST_REQUIRE(srcfh.maximum_extent().value() == destfh.maximum_extent().value());
@@ -98,6 +204,7 @@ static inline void TestCloneOrCopyFile()
         std::cerr << "Byte at offset " << n << " is '" << *(char *) &srcfh.address()[n] << "' in source and is '" << *(char *) &destfh.address()[n]
                   << "' in destination." << std::endl;
         BOOST_CHECK(srcfh.address()[n] == destfh.address()[n]);
+        break;
       }
     }
   }
@@ -191,5 +298,7 @@ static inline void TestCloneOrCopyTree()
 }
 #endif
 
-KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, clone_or_copy_file, "Tests that llfio::algorithm::clone_or_copy(file_handle) works as expected",
-                       TestCloneOrCopyFile())
+KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, clone_extents, "Tests that llfio::file_handle::clone_extents() of partial extents works as expected",
+                       TestCloneExtents())
+KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, clone_or_copy_file_whole,
+                       "Tests that llfio::algorithm::clone_or_copy(file_handle) of whole files works as expected", TestCloneOrCopyFileWhole())
