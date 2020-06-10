@@ -85,7 +85,7 @@ static inline void TestCloneExtents()
       // On some filing systems, need to force block allocation
       h.fh.barrier(llfio::file_handle::barrier_kind::nowait_view_only).value();
 #endif
-#if 0
+#if 1
       std::cout << (&h - handles) << ":\n";
       std::sort(h.extents_written.begin(), h.extents_written.end());
       for(auto &i : h.extents_written)

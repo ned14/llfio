@@ -1,5 +1,5 @@
 /* A handle to a file
-(C) 2015-2017 Niall Douglas <http://www.nedproductions.biz/> (16 commits)
+(C) 2015-2020 Niall Douglas <http://www.nedproductions.biz/> (16 commits)
 File Created: Dec 2015
 
 
@@ -437,7 +437,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
       extent.length = mycurrentlength - extent.offset;
     }
     LLFIO_DEADLINE_TO_SLEEP_INIT(d);
-    const auto blocksize = utils::file_buffer_default_size();
+    const extent_type blocksize = utils::file_buffer_default_size();
     byte *buffer = nullptr;
     auto unbufferh = make_scope_exit([&]() noexcept {
       if(buffer != nullptr)
@@ -647,7 +647,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
 #endif
     for(const workitem &item : todo)
     {
-      for(size_t thisoffset = 0; thisoffset < item.src.length; thisoffset += blocksize)
+      for(extent_type thisoffset = 0; thisoffset < item.src.length; thisoffset += blocksize)
       {
         bool done = false;
         const auto thisblock = std::min(blocksize, item.src.length - thisoffset);

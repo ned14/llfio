@@ -366,8 +366,7 @@ public:
   with NTFS, and FreeBSD with ZFS. On other systems it simply writes zeros.
 
   \return The bytes zeroed.
-  \param offset The offset to start zeroing from.
-  \param bytes The number of bytes to zero.
+  \param extent The offset to start zeroing from and the number of bytes to zero.
   \param d An optional deadline by which the i/o must complete, else it is cancelled.
   Note function may return significantly after this deadline if the i/o takes long to cancel.
   \errors Any of the values POSIX write() can return, `errc::timed_out`, `errc::operation_canceled`.
