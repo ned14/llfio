@@ -81,11 +81,12 @@ static inline void TestCloneExtents()
     }
     for(auto &h : handles)
     {
+      (void) h;
 #ifdef _WIN32
       // On some filing systems, need to force block allocation
       h.fh.barrier(llfio::file_handle::barrier_kind::nowait_view_only).value();
 #endif
-#if 1
+#if 0
       std::cout << (&h - handles) << ":\n";
       std::sort(h.extents_written.begin(), h.extents_written.end());
       for(auto &i : h.extents_written)
@@ -125,7 +126,7 @@ static inline void TestCloneExtents()
       {
         std::cerr << "Byte at offset " << n << " is '" << *(char *) &shouldbe.data()[n] << "' in source and is '" << *(char *) &handles[1].fh.address()[n]
                   << "' in destination." << std::endl;
-        BOOST_CHECK(shouldbe.data()[n] == handles[1].fh.address()[n]);
+        BOOST_REQUIRE(shouldbe.data()[n] == handles[1].fh.address()[n]);
         break;
       }
     }
@@ -203,7 +204,7 @@ static inline void TestCloneOrCopyFileWhole()
       {
         std::cerr << "Byte at offset " << n << " is '" << *(char *) &srcfh.address()[n] << "' in source and is '" << *(char *) &destfh.address()[n]
                   << "' in destination." << std::endl;
-        BOOST_CHECK(srcfh.address()[n] == destfh.address()[n]);
+        BOOST_REQUIRE(srcfh.address()[n] == destfh.address()[n]);
         break;
       }
     }

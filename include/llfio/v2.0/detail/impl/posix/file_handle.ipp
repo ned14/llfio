@@ -686,7 +686,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
         (void) dest.truncate(dest_length);
       }
     });
-#if 1
+#if 0
     for(const workitem &item : todo)
     {
       std::cout << "  From offset " << item.src.offset << " " << item.src.length << " bytes do ";
