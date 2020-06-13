@@ -35,7 +35,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 static inline void TestCloneExtents()
 {
-  static constexpr int DURATION = 30;
+  static constexpr int DURATION = 300;
   static constexpr size_t max_file_extent = (size_t) 100 * 1024 * 1024;
   namespace llfio = LLFIO_V2_NAMESPACE;
   using QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng;
@@ -124,7 +124,7 @@ static inline void TestCloneExtents()
     {
       if(shouldbe.data()[n] != handles[1].fh.address()[n])
       {
-        std::cerr << "Byte at offset " << n << " is '" << *(char *) &shouldbe.data()[n] << "' in source and is '" << *(char *) &handles[1].fh.address()[n]
+        std::cerr << "Byte at offset " << n << " is '" << (int) *(char *) &shouldbe.data()[n] << "' in source and is '" << (int) *(char *) &handles[1].fh.address()[n]
                   << "' in destination." << std::endl;
         BOOST_REQUIRE(shouldbe.data()[n] == handles[1].fh.address()[n]);
         break;
@@ -196,7 +196,7 @@ static inline void TestCloneOrCopyFileWhole()
     dest_stat.fill(destfh).value();
     std::cout << "Source file has " << src_stat.st_blocks << " blocks allocated. Destination file has " << dest_stat.st_blocks << " blocks allocated."
               << std::endl;
-    BOOST_CHECK(src_stat.st_blocks == dest_stat.st_blocks);
+    BOOST_CHECK(src_stat.st_blocks <= dest_stat.st_blocks);
 
     for(size_t n = 0; n < maximum_extent; n++)
     {
