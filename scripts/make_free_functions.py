@@ -3,7 +3,7 @@
 # (C) 2017 Niall Douglas
 
 from __future__ import print_function
-import sys, glob, re
+import glob, re
 
 for header in glob.glob("../include/afio/*/*.hpp"):
     with open(header, "rt") as ih:
