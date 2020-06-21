@@ -37,9 +37,9 @@ static inline void TestTraverse()
 {
   using namespace LLFIO_V2_NAMESPACE;
 #ifdef _WIN32
-  static constexpr path_view to_traverse_path("c:\\");
+  static constexpr path_view to_traverse_path("c:\\windows");
 #else
-  static constexpr path_view to_traverse_path("/");
+  static constexpr path_view to_traverse_path("/usr");
 #endif
   auto to_traverse = path_handle::path(to_traverse_path).value();
   struct my_traverse_visitor final : algorithm::traverse_visitor
