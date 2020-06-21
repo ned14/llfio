@@ -1,6 +1,7 @@
 var structllfio__v2__xxx_1_1directory__handle_1_1buffers__type =
 [
     [ "_base", "structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a528b7a4f0ce374154791c6c79efcee96", null ],
+    [ "buffers_type", "structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a5d249881aa831fb0300b5681de3af11e", null ],
     [ "buffers_type", "structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#ac99d361654291d463bfce813c0d15989", null ],
     [ "buffers_type", "structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a92ffa4a0d93d289bf1f9173f0d220d41", null ],
     [ "~buffers_type", "structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a8d1148aa4702fbdbf8386c39ade9df05", null ],
