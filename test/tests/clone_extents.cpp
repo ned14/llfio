@@ -35,7 +35,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 static inline void TestCloneExtents()
 {
-  static constexpr int DURATION = 300;
+  static constexpr int DURATION = 20;
   static constexpr size_t max_file_extent = (size_t) 100 * 1024 * 1024;
   namespace llfio = LLFIO_V2_NAMESPACE;
   using QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng;
@@ -135,7 +135,7 @@ static inline void TestCloneExtents()
 
 static inline void TestCloneOrCopyFileWhole()
 {
-  static constexpr int DURATION = 30;
+  static constexpr int DURATION = 20;
   static constexpr size_t max_file_extent = (size_t) 100 * 1024 * 1024;
   namespace llfio = LLFIO_V2_NAMESPACE;
   using QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng;
