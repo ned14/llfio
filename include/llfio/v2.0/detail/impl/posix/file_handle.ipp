@@ -586,7 +586,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
         }
         if(end >= extent.offset + extent.length)
         {
-          break; // done
+          break;  // done
         }
         // hole goes from end to start. end is inclusive, start is exclusive.
         if((end >= extent.offset && end < extent.offset + extent.length) || (start > extent.offset && start <= extent.offset + extent.length))
@@ -597,7 +597,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
         }
         if(start >= extent.offset + extent.length)
         {
-          break; // done
+          break;  // done
         }
 #ifdef __linux__
         end = lseek64(_v.fd, start, SEEK_HOLE);
@@ -728,22 +728,25 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
       // This gets implemented in FreeBSD 13. See https://reviews.freebsd.org/D20584
       return syscall(569 /*copy_file_range*/, intfd, inoffp, outfd, outoffp, len, flags);
 #else
-      if(!emulate_if_unsupported)
-      {
-        errno = EOPNOTSUPP;
-        return -1;
-      }
+      (void) infd;
+      (void) inoffp;
+      (void) outfd;
+      (void) outoffp;
+      (void) len;
+      (void) flags;
+      errno = EOPNOTSUPP;
+      return -1;
 #endif
     };
     auto _zero_file_range = [&](int fd, off_t offset, size_t len) -> int {
 #if defined(__linux__)
       return fallocate(fd, 0x02 /*FALLOC_FL_PUNCH_HOLE*/ | 0x01 /*FALLOC_FL_KEEP_SIZE*/, offset, len);
 #else
-      if(!emulate_if_unsupported)
-      {
-        errno = EOPNOTSUPP;
-        return -1;
-      }
+      (void) fd;
+      (void) offset;
+      (void) len;
+      errno = EOPNOTSUPP;
+      return -1;
 #endif
     };
     for(const workitem &item : todo)

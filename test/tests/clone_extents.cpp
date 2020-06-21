@@ -124,8 +124,8 @@ static inline void TestCloneExtents()
     {
       if(shouldbe.data()[n] != handles[1].fh.address()[n])
       {
-        std::cerr << "Byte at offset " << n << " is '" << (int) *(char *) &shouldbe.data()[n] << "' in source and is '" << (int) *(char *) &handles[1].fh.address()[n]
-                  << "' in destination." << std::endl;
+        std::cerr << "Byte at offset " << n << " is '" << (int) *(char *) &shouldbe.data()[n] << "' in source and is '"
+                  << (int) *(char *) &handles[1].fh.address()[n] << "' in destination." << std::endl;
         BOOST_REQUIRE(shouldbe.data()[n] == handles[1].fh.address()[n]);
         break;
       }
@@ -196,7 +196,7 @@ static inline void TestCloneOrCopyFileWhole()
     dest_stat.fill(destfh).value();
     std::cout << "Source file has " << src_stat.st_blocks << " blocks allocated. Destination file has " << dest_stat.st_blocks << " blocks allocated."
               << std::endl;
-    BOOST_CHECK(src_stat.st_blocks <= dest_stat.st_blocks);
+    BOOST_CHECK(abs((long) src_stat.st_blocks - (long) dest_stat.st_blocks) < ((long) src_stat.st_blocks / 8));
 
     for(size_t n = 0; n < maximum_extent; n++)
     {
