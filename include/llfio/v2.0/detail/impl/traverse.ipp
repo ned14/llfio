@@ -40,7 +40,8 @@ LLFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<size_t> traverse(const path_handle &_topdirh, traverse_visitor *visitor, size_t threads, void *data, bool force_slow_path) noexcept
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<size_t> traverse(const path_handle &_topdirh, traverse_visitor *visitor, size_t threads, void *data,
+                                                       bool force_slow_path) noexcept
   {
     return visitor->finished(data, [&]() -> result<size_t> {
       try
@@ -62,7 +63,9 @@ namespace algorithm
             {
               use_slow_path = true;
 #ifndef NDEBUG
-              std::cerr << "WARNING: llfio::traverse() is using slow path due to " << (r.rlim_cur - topdirh->native_handle().fd) << " unused file descriptors remaining! Raise the limit using setrlimit(RLIMIT_NOFILE) if your application is > 1024 fd count safe." << std::endl;
+              std::cerr << "WARNING: llfio::traverse() is using slow path due to " << (r.rlim_cur - topdirh->native_handle().fd)
+                        << " unused file descriptors remaining! Raise the limit using setrlimit(RLIMIT_NOFILE) if your application is > 1024 fd count safe."
+                        << std::endl;
 #endif
             }
           }
@@ -238,23 +241,20 @@ namespace algorithm
                 for(;;)
                 {
                   buffers = {entries, std::move(buffers)};
-                  OUTCOME_TRY(auto &&filled, mydirh->read({std::move(buffers), {}, directory_handle::filter::none}));
-                  buffers = std::move(filled);
+                  OUTCOME_TRY(buffers, mydirh->read({std::move(buffers), {}, directory_handle::filter::none}));
                   if(buffers.done())
                   {
                     break;
                   }
                   entries.resize(entries.size() << 1);
                 }
-                OUTCOME_TRY(state->visitor->post_enumeration(data, *mydirh, buffers, mylevel));
-                std::list<state_t::workitem> newwork;
-                for(auto &entry : buffers)
+                if(!(buffers.metadata() & stat_t::want::type))
                 {
-                  if(!(buffers.metadata() & stat_t::want::type))
-                  {
 #ifdef _WIN32
-                    abort();  // this should never occur on Windows
+                  abort();  // this should never occur on Windows
 #else
+                  for(auto &entry : buffers)
+                  {
                     struct ::stat stat;
                     memset(&stat, 0, sizeof(stat));
                     path_view::c_str<> zpath(entry.leafname);
@@ -286,8 +286,13 @@ namespace algorithm
                     {
                       return posix_error();
                     }
-#endif
                   }
+#endif
+                }
+                OUTCOME_TRY(state->visitor->post_enumeration(data, *mydirh, buffers, mylevel));
+                std::list<state_t::workitem> newwork;
+                for(auto &entry : buffers)
+                {
                   int entry_type = 0;  // 0 = unknown, 1 = file, 2 = directory
                   switch(entry.stat.st_type)
                   {
@@ -328,7 +333,8 @@ namespace algorithm
                 {
                   state->workqueue_base = mylevel + 1;
                 }
-                size_t dirs_processed = state->dirs_processed, known_dirs_remaining = state->known_dirs_remaining, depth_processed = state->depth_processed, known_depth_remaining = state->workqueue.size();
+                size_t dirs_processed = state->dirs_processed, known_dirs_remaining = state->known_dirs_remaining, depth_processed = state->depth_processed,
+                       known_depth_remaining = state->workqueue.size();
                 g.unlock();
                 OUTCOME_TRY(state->visitor->stack_updated(data, dirs_processed, known_dirs_remaining, depth_processed, known_depth_remaining));
               }

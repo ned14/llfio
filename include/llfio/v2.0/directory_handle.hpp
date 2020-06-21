@@ -106,6 +106,7 @@ public:
     bool done() const noexcept { return _done; }
 
     using _base::_base;
+    buffers_type() = default;
     //! Implicit construction from a span
     /* constexpr */ buffers_type(span<buffer_type> v)  // NOLINT TODO FIXME Make this constexpr when span becomes constexpr. SAME for move constructor below
     : _base(v)
