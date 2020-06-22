@@ -177,6 +177,20 @@ template&lt;class... Args, class Rep , class Period &gt; </td></tr>
 template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
 <tr class="memitem:a1fc4e2ade67dfb9140007cc31f4b6b20"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_relink_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
 <tr class="separator:a1fc4e2ade67dfb9140007cc31f4b6b20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7770c6b7c478d74654f25b8c1a1585c"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#aa7770c6b7c478d74654f25b8c1a1585c">link</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#abcd8c8171f4e561620864295e8d5879b">path_view_type</a> <a class="el" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
+<tr class="separator:aa7770c6b7c478d74654f25b8c1a1585c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad43b812385c7fc8aae9e59838a1411bb"><td class="memTemplParams" colspan="2"><a id="ad43b812385c7fc8aae9e59838a1411bb"></a>
+template&lt;class... Args&gt; </td></tr>
+<tr class="memitem:ad43b812385c7fc8aae9e59838a1411bb"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_link</b> (Args &amp;&amp;... args) noexcept</td></tr>
+<tr class="separator:ad43b812385c7fc8aae9e59838a1411bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65d73e0e89bac484ce40427b58dcfe53"><td class="memTemplParams" colspan="2"><a id="a65d73e0e89bac484ce40427b58dcfe53"></a>
+template&lt;class... Args, class Rep , class Period &gt; </td></tr>
+<tr class="memitem:a65d73e0e89bac484ce40427b58dcfe53"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_link_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
+<tr class="separator:a65d73e0e89bac484ce40427b58dcfe53"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2703814c7599d2081ca10763bbeba4a"><td class="memTemplParams" colspan="2"><a id="ad2703814c7599d2081ca10763bbeba4a"></a>
+template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
+<tr class="memitem:ad2703814c7599d2081ca10763bbeba4a"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_link_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
+<tr class="separator:ad2703814c7599d2081ca10763bbeba4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1dd7923bb65456af4da41ebe7cb84982"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#a1dd7923bb65456af4da41ebe7cb84982">unlink</a> (<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
 <tr class="separator:a1dd7923bb65456af4da41ebe7cb84982"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7f77a249baf4e0c5de2172669a7724d7"><td class="memTemplParams" colspan="2"><a id="a7f77a249baf4e0c5de2172669a7724d7"></a>
@@ -231,6 +245,59 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
 <div class="textblock"><p>A handle to something with a device and inode number. </p>
 <dl class="section see"><dt>See also</dt><dd><code>algorithm::cached_parent_handle_adapter&lt;T&gt;</code> </dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="aa7770c6b7c478d74654f25b8c1a1585c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa7770c6b7c478d74654f25b8c1a1585c">&#9670;&nbsp;</a></span>link()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual result&lt;void&gt; llfio_v2_xxx::fs_handle::link </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>base</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#abcd8c8171f4e561620864295e8d5879b">path_view_type</a>&#160;</td>
+          <td class="paramname"><em>path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code>std::chrono::seconds(30)</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Links the inode referred to by this open handle to the path specified. The current path of this open handle is not changed, unless it has no current path due to being unlinked.</p>
+<dl class="section warning"><dt>Warning</dt><dd>Some operating systems provide a race free syscall for linking an open handle to a new location (Linux, Windows). On all other operating systems this call is <b>racy</b> and can result in the wrong inode being linked. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation opens a <code>path_handle</code> to the source containing directory first, then checks before linking that the item about to be hard linked has the same inode as the open file handle. It will retry this matching until success until the deadline given. This should prevent most unmalicious accidental loss of data.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">base</td><td>Base for any relative path. </td></tr>
+    <tr><td class="paramname">path</td><td>The relative or absolute new path to hard link to. </td></tr>
+    <tr><td class="paramname">d</td><td>The deadline by which the matching of the containing directory to the open handle's inode must succeed, else <code>errc::timed_out</code> will be returned. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>Except on platforms with race free syscalls for renaming open handles (Windows), calls <code>current_path()</code> via <code>parent_path_handle()</code> and thus is both expensive and calls malloc many times. </dd></dl>
+
+</div>
+</div>
 <a id="a865caad2f7f4bdf12fb74aabfe3c5ff5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a865caad2f7f4bdf12fb74aabfe3c5ff5">&#9670;&nbsp;</a></span>parent_path_handle()</h2>
 

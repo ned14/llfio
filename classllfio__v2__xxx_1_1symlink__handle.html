@@ -388,6 +388,20 @@ template&lt;class... Args, class Rep , class Period &gt; </td></tr>
 template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
 <tr class="memitem:a1fc4e2ade67dfb9140007cc31f4b6b20"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_relink_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
 <tr class="separator:a1fc4e2ade67dfb9140007cc31f4b6b20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7770c6b7c478d74654f25b8c1a1585c"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#aa7770c6b7c478d74654f25b8c1a1585c">link</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#abcd8c8171f4e561620864295e8d5879b">path_view_type</a> <a class="el" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
+<tr class="separator:aa7770c6b7c478d74654f25b8c1a1585c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad43b812385c7fc8aae9e59838a1411bb"><td class="memTemplParams" colspan="2"><a id="ad43b812385c7fc8aae9e59838a1411bb"></a>
+template&lt;class... Args&gt; </td></tr>
+<tr class="memitem:ad43b812385c7fc8aae9e59838a1411bb"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_link</b> (Args &amp;&amp;... args) noexcept</td></tr>
+<tr class="separator:ad43b812385c7fc8aae9e59838a1411bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65d73e0e89bac484ce40427b58dcfe53"><td class="memTemplParams" colspan="2"><a id="a65d73e0e89bac484ce40427b58dcfe53"></a>
+template&lt;class... Args, class Rep , class Period &gt; </td></tr>
+<tr class="memitem:a65d73e0e89bac484ce40427b58dcfe53"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_link_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
+<tr class="separator:a65d73e0e89bac484ce40427b58dcfe53"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2703814c7599d2081ca10763bbeba4a"><td class="memTemplParams" colspan="2"><a id="ad2703814c7599d2081ca10763bbeba4a"></a>
+template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
+<tr class="memitem:ad2703814c7599d2081ca10763bbeba4a"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_link_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
+<tr class="separator:ad2703814c7599d2081ca10763bbeba4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7f77a249baf4e0c5de2172669a7724d7"><td class="memTemplParams" colspan="2"><a id="a7f77a249baf4e0c5de2172669a7724d7"></a>
 template&lt;class... Args&gt; </td></tr>
 <tr class="memitem:a7f77a249baf4e0c5de2172669a7724d7"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_unlink</b> (Args &amp;&amp;... args) noexcept</td></tr>
@@ -534,6 +548,59 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
 <dl class="section see"><dt>See also</dt><dd><code>algorithm::cached_parent_handle_adapter&lt;T&gt;</code> which overrides this with an implementation based on retrieving the current path of a cached handle to the parent directory. On platforms with instability or failure to retrieve the correct current path for regular files, the cached parent handle adapter works around the problem by taking advantage of directory inodes not having the same instability problems on any platform. </dd></dl>
 
 <p>Reimplemented from <a class="el" href="classllfio__v2__xxx_1_1handle.html#a00a85eec5a41f7edb2c574d40cf04535">llfio_v2_xxx::handle</a>.</p>
+
+</div>
+</div>
+<a id="aa7770c6b7c478d74654f25b8c1a1585c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa7770c6b7c478d74654f25b8c1a1585c">&#9670;&nbsp;</a></span>link()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual result&lt;void&gt; llfio_v2_xxx::fs_handle::link </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>base</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#abcd8c8171f4e561620864295e8d5879b">path_view_type</a>&#160;</td>
+          <td class="paramname"><em>path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code>std::chrono::seconds(30)</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Links the inode referred to by this open handle to the path specified. The current path of this open handle is not changed, unless it has no current path due to being unlinked.</p>
+<dl class="section warning"><dt>Warning</dt><dd>Some operating systems provide a race free syscall for linking an open handle to a new location (Linux, Windows). On all other operating systems this call is <b>racy</b> and can result in the wrong inode being linked. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation opens a <code>path_handle</code> to the source containing directory first, then checks before linking that the item about to be hard linked has the same inode as the open file handle. It will retry this matching until success until the deadline given. This should prevent most unmalicious accidental loss of data.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">base</td><td>Base for any relative path. </td></tr>
+    <tr><td class="paramname">path</td><td>The relative or absolute new path to hard link to. </td></tr>
+    <tr><td class="paramname">d</td><td>The deadline by which the matching of the containing directory to the open handle's inode must succeed, else <code>errc::timed_out</code> will be returned. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>Except on platforms with race free syscalls for renaming open handles (Windows), calls <code>current_path()</code> via <code>parent_path_handle()</code> and thus is both expensive and calls malloc many times. </dd></dl>
 
 </div>
 </div>
@@ -884,7 +951,7 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
 </div><div class="memdoc">
 <p>Create a symlink handle creating a uniquely named symlink on a path. The symlink is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing symlink.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return, or failure to allocate memory. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;  {</div><div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;    <span class="keywordflow">try</span></div><div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;    {</div><div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;      <span class="keywordflow">for</span>(;;)</div><div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;      {</div><div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">utils::random_string</a>(32);</div><div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;        randomname.append(<span class="stringliteral">&quot;.random&quot;</span>);</div><div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;        result&lt;symlink_handle&gt; ret = <a class="code" href="classllfio__v2__xxx_1_1symlink__handle.html#a004563b5be8b75d20617018178f68e33">symlink</a>(dirpath, randomname, _mode, <a class="code" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255">creation::only_if_not_exist</a>, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>);</div><div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;        <span class="keywordflow">if</span>(ret || (!ret &amp;&amp; ret.error() != errc::file_exists))</div><div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;        {</div><div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;          <span class="keywordflow">return</span> ret;</div><div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;        }</div><div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;      }</div><div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    }</div><div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;    <span class="keywordflow">catch</span>(...)</div><div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;    {</div><div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div><div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;    }</div><div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1handle_html_a013936bc1254b1a47567fe29698d1b1c"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">llfio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:413</div></div>
+<div class="fragment"><div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;  {</div><div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    <span class="keywordflow">try</span></div><div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;    {</div><div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;      <span class="keywordflow">for</span>(;;)</div><div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;      {</div><div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">utils::random_string</a>(32);</div><div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;        randomname.append(<span class="stringliteral">&quot;.random&quot;</span>);</div><div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;        result&lt;symlink_handle&gt; ret = <a class="code" href="classllfio__v2__xxx_1_1symlink__handle.html#a004563b5be8b75d20617018178f68e33">symlink</a>(dirpath, randomname, _mode, <a class="code" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255">creation::only_if_not_exist</a>, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>);</div><div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;        <span class="keywordflow">if</span>(ret || (!ret &amp;&amp; ret.error() != errc::file_exists))</div><div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;        {</div><div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;          <span class="keywordflow">return</span> ret;</div><div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;        }</div><div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;      }</div><div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;    }</div><div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;    <span class="keywordflow">catch</span>(...)</div><div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;    {</div><div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div><div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;    }</div><div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1handle_html_a013936bc1254b1a47567fe29698d1b1c"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">llfio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with. </div><div class="ttdef"><b>Definition:</b> handle.hpp:417</div></div>
 <div class="ttc" id="classllfio__v2__xxx_1_1symlink__handle_html_a004563b5be8b75d20617018178f68e33"><div class="ttname"><a href="classllfio__v2__xxx_1_1symlink__handle.html#a004563b5be8b75d20617018178f68e33">llfio_v2_xxx::symlink_handle::symlink</a></div><div class="ttdeci">static result&lt; symlink_handle &gt; symlink(const path_handle &amp;base, path_view_type path, mode _mode=mode::read, creation _creation=creation::open_existing, flag flags=flag::none) noexcept</div></div>
 <div class="ttc" id="classllfio__v2__xxx_1_1handle_html_af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255">llfio_v2_xxx::handle::creation::only_if_not_exist</a></div><div class="ttdoc">Filesystem entry must NOT exist, and is atomically created by the success of this operation...</div></div>
 <div class="ttc" id="namespacellfio__v2__xxx_1_1utils_html_a6a29cf29a4b097411f6c1e5274bfb417"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">llfio_v2_xxx::utils::random_string</a></div><div class="ttdeci">std::string random_string(size_t randomlen)</div><div class="ttdoc">Returns a cryptographically random string capable of being used as a filename. Essentially random_fil...</div><div class="ttdef"><b>Definition:</b> utils.hpp:169</div></div>
