@@ -70,13 +70,13 @@ matrix:
     env:
      - NAME=x64_SC_tests
      - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake
-  - name: "Xcode 11.6 x64 cmake tests (status_code)"
-    compiler: clang++
-    os: osx
-    osx_image: xcode11.6
-    env:
-     - NAME=x64_SC_tests
-     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+#  - name: "Xcode 11.6 x64 cmake tests (status_code)"
+#    compiler: clang++
+#    os: osx
+#    osx_image: xcode11.6
+#    env:
+#     - NAME=x64_SC_tests
+#     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - name: "g++ ARM32 cmake build (error_code)"
     compiler: g++
     os: linux
@@ -155,13 +155,13 @@ matrix:
     env:
      - NAME=x64_SC_install
      - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake
-  - name: "Xcode 11.6 Installability (status_code)"
-    compiler: clang++
-    os: osx
-    osx_image: xcode11.6
-    env:
-     - NAME=x64_SC_install
-     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+#  - name: "Xcode 11.6 Installability (status_code)"
+#    compiler: clang++
+#    os: osx
+#    osx_image: xcode11.6
+#    env:
+#     - NAME=x64_SC_install
+#     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
     
 before_install:
  - if [ "$TRAVIS_COMPILER" = "clang++-10" ]; then
