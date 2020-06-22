@@ -96,6 +96,10 @@ namespace algorithm
     cached_parent_handle_adapter &operator=(const cached_parent_handle_adapter &) = default;
     cached_parent_handle_adapter &operator=(cached_parent_handle_adapter &&o) noexcept
     {
+      if(this == &o)
+      {
+        return *this;
+      }
       this->~cached_parent_handle_adapter();
       new(this) cached_parent_handle_adapter(std::move(o));
       return *this;

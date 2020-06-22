@@ -122,6 +122,10 @@ public:
   //! Move assignment of file_handle permitted
   file_handle &operator=(file_handle &&o) noexcept
   {
+    if(this == &o)
+    {
+      return *this;
+    }
     this->~file_handle();
     new(this) file_handle(std::move(o));
     return *this;

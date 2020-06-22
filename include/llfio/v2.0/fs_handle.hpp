@@ -84,6 +84,10 @@ protected:
   //! Move assignment of fs_handle permitted
   fs_handle &operator=(fs_handle &&o) noexcept
   {
+    if(this == &o)
+    {
+      return *this;
+    }
     _devid = o._devid;
     _inode = o._inode;
     o._devid = 0;

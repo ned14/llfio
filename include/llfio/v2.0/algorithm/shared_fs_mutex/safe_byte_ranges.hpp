@@ -144,6 +144,10 @@ namespace algorithm
       //! Move assign
       safe_byte_ranges &operator=(safe_byte_ranges &&o) noexcept
       {
+        if(this == &o)
+        {
+          return *this;
+        }
         _p = std::move(o._p);
         return *this;
       }

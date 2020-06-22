@@ -216,6 +216,10 @@ namespace algorithm
       //! Move assignment
       trivial_vector_impl &operator=(trivial_vector_impl &&o) noexcept
       {
+        if(this == &o)
+        {
+          return *this;
+        }
         this->~trivial_vector_impl();
         new(this) trivial_vector_impl(std::move(o));
         return *this;

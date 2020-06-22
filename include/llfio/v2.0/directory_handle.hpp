@@ -135,6 +135,10 @@ public:
     //! Move assignment
     buffers_type &operator=(buffers_type &&o) noexcept
     {
+      if(this == &o)
+      {
+        return *this;
+      }
       std::unique_ptr<char[]> kernel_buffer = std::move(_kernel_buffer);
       size_t kernel_buffer_size = _kernel_buffer_size;
       this->~buffers_type();
@@ -214,6 +218,10 @@ public:
   //! Move assignment of directory_handle permitted
   directory_handle &operator=(directory_handle &&o) noexcept
   {
+    if(this == &o)
+    {
+      return *this;
+    }
     this->~directory_handle();
     new(this) directory_handle(std::move(o));
     return *this;

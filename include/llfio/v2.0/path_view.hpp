@@ -772,6 +772,10 @@ public:
     c_str &operator=(const c_str &) = delete;
     c_str &operator=(c_str &&o) noexcept
     {
+      if(this == &o)
+      {
+        return *this;
+      }
       this->~c_str();
       new(this) c_str(std::move(o));
       return *this;

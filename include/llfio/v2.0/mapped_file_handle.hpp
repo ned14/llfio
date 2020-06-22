@@ -269,6 +269,10 @@ public:
   //! Move assignment of mapped_file_handle permitted
   mapped_file_handle &operator=(mapped_file_handle &&o) noexcept
   {
+    if(this == &o)
+    {
+      return *this;
+    }
     this->~mapped_file_handle();
     new(this) mapped_file_handle(std::move(o));
     return *this;

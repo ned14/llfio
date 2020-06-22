@@ -117,6 +117,10 @@ public:
   //! Move assignment of section_handle permitted
   section_handle &operator=(section_handle &&o) noexcept
   {
+    if(this == &o)
+    {
+      return *this;
+    }
     this->~section_handle();
     new(this) section_handle(std::move(o));
     return *this;
@@ -495,6 +499,10 @@ public:
   //! Move assignment of map_handle permitted
   map_handle &operator=(map_handle &&o) noexcept
   {
+    if(this == &o)
+    {
+      return *this;
+    }
     this->~map_handle();
     new(this) map_handle(std::move(o));
     return *this;

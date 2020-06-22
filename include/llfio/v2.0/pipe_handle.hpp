@@ -154,6 +154,10 @@ public:
   //! Move assignment of `pipe_handle` permitted
   pipe_handle &operator=(pipe_handle &&o) noexcept
   {
+    if(this == &o)
+    {
+      return *this;
+    }
     this->~pipe_handle();
     new(this) pipe_handle(std::move(o));
     return *this;

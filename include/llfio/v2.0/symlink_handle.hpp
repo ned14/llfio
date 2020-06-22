@@ -158,6 +158,10 @@ public:
     //! Move assignment
     buffers_type &operator=(buffers_type &&o) noexcept
     {
+      if(this == &o)
+      {
+        return *this;
+      }
       this->~buffers_type();
       new(this) buffers_type(std::move(o));
       return *this;
@@ -221,6 +225,10 @@ public:
     //! Move assignment
     const_buffers_type &operator=(const_buffers_type &&o) noexcept
     {
+      if(this == &o)
+      {
+        return *this;
+      }
       this->~const_buffers_type();
       new(this) const_buffers_type(std::move(o));
       return *this;
@@ -320,6 +328,10 @@ public:
   //! Move assignment permitted
   symlink_handle &operator=(symlink_handle &&o) noexcept
   {
+    if(this == &o)
+    {
+      return *this;
+    }
     this->~symlink_handle();
     new(this) symlink_handle(std::move(o));
     return *this;

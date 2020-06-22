@@ -411,6 +411,10 @@ namespace key_value_store
       keyvalue_info(keyvalue_info &&o) noexcept : key(std::move(o.key)), value(std::move(o.value)), transaction_counter(std::move(o.transaction_counter)), _value_buffer(std::move(o._value_buffer)) { o._value_buffer = nullptr; }
       keyvalue_info &operator=(keyvalue_info &&o) noexcept
       {
+        if(this == &o)
+        {
+          return *this;
+        }
         this->~keyvalue_info();
         new(this) keyvalue_info(std::move(o));
         return *this;

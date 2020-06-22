@@ -575,6 +575,10 @@ namespace algorithm
     //! Move assignment of combining_handle_adapter permitted
     combining_handle_adapter &operator=(combining_handle_adapter &&o) noexcept
     {
+      if(this == &o)
+      {
+        return *this;
+      }
       this->~combining_handle_adapter();
       new(this) combining_handle_adapter(std::move(o));
       return *this;

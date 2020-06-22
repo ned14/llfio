@@ -157,6 +157,10 @@ namespace algorithm
             }
             workitem &operator=(workitem &&o) noexcept
             {
+              if(this == &o)
+              {
+                return *this;
+              }
               this->~workitem();
               new(this) workitem(std::move(o));
               return *this;
