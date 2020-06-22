@@ -312,7 +312,8 @@ public:
 
   Some of the filesystems on the major operating systems implement copy-on-write extent
   reference counting, and thus can very cheaply link a "copy" of extents in one file into
-  another file. Upon first write into an extent, only then is a new copy formed for the
+  another file (at the time of writing - Linux: XFS, btrfs, ocfs2, smbfs; Mac OS: APFS;
+  Windows: ReFS, CIFS). Upon first write into an extent, only then is a new copy formed for the
   specific extents being modified. Note that extent cloning is usually only possible in
   cluster sized amounts, so if the portion you clone is not so aligned, new extents
   will be allocated for the spill into non-aligned portions. Obviously, cloning an entire
