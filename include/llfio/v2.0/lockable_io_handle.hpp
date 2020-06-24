@@ -183,6 +183,10 @@ public:
     //! Move assign
     extent_guard &operator=(extent_guard &&o) noexcept
     {
+      if(this == &o)
+      {
+        return *this;
+      }
       unlock();
       _h = o._h;
       _offset = o._offset;
@@ -339,6 +343,10 @@ public:
   unique_file_lock(const unique_file_lock &) = delete;
   unique_file_lock &operator=(unique_file_lock &&o) noexcept
   {
+    if(this == &o)
+    {
+      return *this;
+    }
     this->~unique_file_lock();
     new(this) unique_file_lock(std::move(o));
     return *this;

@@ -173,6 +173,10 @@ public:
   //! Move assignment of fast_random_file_handle permitted
   fast_random_file_handle &operator=(fast_random_file_handle &&o) noexcept
   {
+    if(this == &o)
+    {
+      return *this;
+    }
     this->~fast_random_file_handle();
     new(this) fast_random_file_handle(std::move(o));
     return *this;

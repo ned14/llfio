@@ -1,5 +1,5 @@
 /* A handle to a file
-(C) 2015-2017 Niall Douglas <http://www.nedproductions.biz/> (16 commits)
+(C) 2015-2020 Niall Douglas <http://www.nedproductions.biz/> (16 commits)
 File Created: Dec 2015
 
 
@@ -414,7 +414,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
     if(extent.offset == (extent_type) -1 && extent.length == (extent_type) -1)
     {
       extent.offset = 0;
-      extent.length= mycurrentlength;
+      extent.length = mycurrentlength;
     }
     if(extent.offset + extent.length < extent.offset)
     {
@@ -428,16 +428,16 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
     {
       return extent;
     }
-    if(extent.offset>=mycurrentlength)
+    if(extent.offset >= mycurrentlength)
     {
       return {extent.offset, 0};
     }
-    if(extent.offset+extent.length >= mycurrentlength)
+    if(extent.offset + extent.length >= mycurrentlength)
     {
       extent.length = mycurrentlength - extent.offset;
     }
     LLFIO_DEADLINE_TO_SLEEP_INIT(d);
-    const auto blocksize = utils::file_buffer_default_size();
+    const extent_type blocksize = utils::file_buffer_default_size();
     byte *buffer = nullptr;
     auto unbufferh = make_scope_exit([&]() noexcept {
       if(buffer != nullptr)
@@ -560,19 +560,25 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
         workitem{{todo.back().src.offset + todo.back().src.length, extent.offset + extent.length - (todo.back().src.offset + todo.back().src.length)},
                  workitem::delete_extents});
       }
-#ifndef NDEBUG
-      {
-        assert(todo.front().src.offset == extent.offset);
-        assert(todo.back().src.offset + todo.back().src.length == extent.offset + extent.length);
-        for(size_t n = 1; n < todo.size(); n++)
-        {
-          assert(todo[n - 1].src.offset + todo[n - 1].src.length == todo[n].src.offset);
-        }
-      }
-#endif
     }
-    // Ensure the destination file is big enough
+    // Handle there being insufficient source to fill dest
+    if(todo.empty())
+    {
+      todo.push_back(workitem{{extent.offset, extent.length}, workitem::delete_extents});
+    }
+#ifndef NDEBUG
+    {
+      assert(todo.front().src.offset == extent.offset);
+      assert(todo.back().src.offset + todo.back().src.length == extent.offset + extent.length);
+      for(size_t n = 1; n < todo.size(); n++)
+      {
+        assert(todo[n - 1].src.offset + todo[n - 1].src.length == todo[n].src.offset);
+      }
+    }
+#endif
+    // If cloning within the same file, use the appropriate direction
     auto &dest = static_cast<file_handle &>(dest_);
+    OUTCOME_TRY(auto dest_length, dest.maximum_extent());
     if(dest.unique_id() == unique_id())
     {
       if(abs((int64_t) destoffset - (int64_t) extent.offset) < (int64_t) blocksize)
@@ -584,26 +590,29 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
         std::reverse(todo.begin(), todo.end());
       }
     }
-    OUTCOME_TRY(auto dest_length, dest.maximum_extent());
+    // Ensure the destination file is big enough
     if(destoffset + extent.length > dest_length)
     {
       // No need to zero nor deallocate extents in the new length
       auto it = todo.begin();
-      while(it!=todo.end() && destoffset + it->src.length < dest_length)
+      while(it != todo.end() && it->src.offset + it->src.length + destoffsetdiff <= dest_length)
       {
         ++it;
       }
-      while(it != todo.end())
+      if(it != todo.end() && it->src.offset + destoffsetdiff < dest_length)
       {
+        // If it is a zero or remove, split the block
         if(it->op == workitem::delete_extents || it->op == workitem::zero_bytes)
         {
-          it = todo.erase(it);
+          // TODO
         }
-        else
-        {
-          it->destination_extents_are_new = true;
-          ++it;
-        }
+        ++it;
+      }
+      // Mark all remaining blocks as writing into new extents
+      while(it != todo.end())
+      {
+        it->destination_extents_are_new = true;
+        ++it;
       }
     }
     bool duplicate_extents = !force_copy_now, zero_extents = true, buffer_dirty = true;
@@ -647,7 +656,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
 #endif
     for(const workitem &item : todo)
     {
-      for(size_t thisoffset = 0; thisoffset < item.src.length; thisoffset += blocksize)
+      for(extent_type thisoffset = 0; thisoffset < item.src.length; thisoffset += blocksize)
       {
         bool done = false;
         const auto thisblock = std::min(blocksize, item.src.length - thisoffset);
@@ -757,7 +766,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
           }
           done = true;
         }
-        if(!done && (zero_extents && item.op == workitem::delete_extents))
+        if(!done && !item.destination_extents_are_new && (zero_extents && item.op == workitem::delete_extents))
         {
           FILE_ZERO_DATA_INFORMATION fzdi{};
           fzdi.FileOffset.QuadPart = item.src.offset + thisoffset + destoffsetdiff;
@@ -787,7 +796,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
             done = true;
           }
         }
-        if(!done && (item.op == workitem::zero_bytes || (!zero_extents && item.op == workitem::delete_extents)))
+        if(!done && !item.destination_extents_are_new && (item.op == workitem::zero_bytes || (!zero_extents && item.op == workitem::delete_extents)))
         {
           if(buffer == nullptr)
           {

@@ -95,6 +95,10 @@ namespace algorithm
       //! Move assign
       byte_ranges &operator=(byte_ranges &&o) noexcept
       {
+        if(this == &o)
+        {
+          return *this;
+        }
         _h = std::move(o._h);
         return *this;
       }

@@ -109,6 +109,10 @@ public:
   //! Move assignment of handle
   process_handle &operator=(process_handle &&o) noexcept
   {
+    if(this == &o)
+    {
+      return *this;
+    }
     this->~process_handle();
     new(this) process_handle(std::move(o));
     return *this;

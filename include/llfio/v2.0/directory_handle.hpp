@@ -106,6 +106,7 @@ public:
     bool done() const noexcept { return _done; }
 
     using _base::_base;
+    buffers_type() = default;
     //! Implicit construction from a span
     /* constexpr */ buffers_type(span<buffer_type> v)  // NOLINT TODO FIXME Make this constexpr when span becomes constexpr. SAME for move constructor below
     : _base(v)
@@ -134,6 +135,10 @@ public:
     //! Move assignment
     buffers_type &operator=(buffers_type &&o) noexcept
     {
+      if(this == &o)
+      {
+        return *this;
+      }
       std::unique_ptr<char[]> kernel_buffer = std::move(_kernel_buffer);
       size_t kernel_buffer_size = _kernel_buffer_size;
       this->~buffers_type();
@@ -213,6 +218,10 @@ public:
   //! Move assignment of directory_handle permitted
   directory_handle &operator=(directory_handle &&o) noexcept
   {
+    if(this == &o)
+    {
+      return *this;
+    }
     this->~directory_handle();
     new(this) directory_handle(std::move(o));
     return *this;

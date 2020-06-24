@@ -97,6 +97,10 @@ namespace algorithm
       //! Move assign
       lock_files &operator=(lock_files &&o) noexcept
       {
+        if(this == &o)
+        {
+          return *this;
+        }
         this->~lock_files();
         new(this) lock_files(std::move(o));
         return *this;

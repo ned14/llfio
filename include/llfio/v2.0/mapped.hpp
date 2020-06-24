@@ -165,6 +165,10 @@ public:
   mapped &operator=(const mapped &) = delete;
   mapped &operator=(mapped &&o) noexcept
   {
+    if(this == &o)
+    {
+      return *this;
+    }
     this->~mapped();
     new(this) mapped(std::move(o));
     return *this;

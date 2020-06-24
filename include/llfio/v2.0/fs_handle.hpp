@@ -84,6 +84,10 @@ protected:
   //! Move assignment of fs_handle permitted
   fs_handle &operator=(fs_handle &&o) noexcept
   {
+    if(this == &o)
+    {
+      return *this;
+    }
     _devid = o._devid;
     _inode = o._inode;
     o._devid = 0;
@@ -179,7 +183,6 @@ public:
 
   LLFIO_DEADLINE_TRY_FOR_UNTIL(relink)
 
-#if 0  // Not implemented yet for absolutely no good reason
   /*! Links the inode referred to by this open handle to the path specified. The current path
   of this open handle is not changed, unless it has no current path due to being unlinked.
 
@@ -204,28 +207,6 @@ public:
   result<void> link(const path_handle &base, path_view_type path, deadline d = std::chrono::seconds(30)) noexcept;
 
   LLFIO_DEADLINE_TRY_FOR_UNTIL(link)
-
-  /*! Clones the inode referenced by the open handle into a new inode referencing the same extents
-  for the file content, with a copy of the same metadata, apart from ownership which is for the
-  current user. Changes to either inode are guaranteed to not be seen by the other inode i.e. they
-  become completely independent, even though they initially reference the same file content extents.
-  If your filing system supports this call (at the time of writing - Linux: XFS, btrfs, ocfs2, smbfs;
-  Mac OS: APFS; Windows: ReFS, CIFS), this is a very cheap way of copying even very large files.
-  Be aware that on Samba/CIFS, rather than erroring out if the storage filesystem doesn't implement
-  support, this call is implemented by having the remove machine perform the file
-  copy, which is usually much faster than doing the copy over the network.
-
-  \return A file handle instance referring to the cloned inode.
-  \param base Base for any relative path.
-  \param path The relative or absolute new path to clone the inode to.
-  */
-  LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
-  result<file_handle> clone_inode(const path_handle &base,
-                          path_view_type path) noexcept;
-
-  LLFIO_DEADLINE_TRY_FOR_UNTIL(clone_inode)
-#endif
 
   /*! Unlinks the current path of this open handle, causing its entry to immediately disappear
   from the filing system. On Windows before Windows 10 1709 unless

@@ -357,18 +357,21 @@ namespace algorithm
       visitor = &default_visitor;
     }
     {
-      OUTCOME_TRY(auto &&dirhparent, topdirh.parent_path_handle());
-      for(;;)
+      auto dirhparent = topdirh.parent_path_handle();
+      if(dirhparent)
       {
-        auto randomname = utils::random_string(32);
-        auto ret = topdirh.relink(dirhparent, randomname);
-        if(ret)
+        for(;;)
         {
-          break;
-        }
-        if(!ret && ret.error() != errc::file_exists)
-        {
-          break;
+          auto randomname = utils::random_string(32);
+          auto ret = topdirh.relink(dirhparent.value(), randomname);
+          if(ret)
+          {
+            break;
+          }
+          if(!ret && ret.error() != errc::file_exists)
+          {
+            break;
+          }
         }
       }
     }

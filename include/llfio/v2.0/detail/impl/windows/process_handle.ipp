@@ -268,7 +268,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<process_handle> process_handle::launch_pr
     }));
   }
   *envbuffere = 0;
-  path_view::c_str zpath(path);
+  path_view::c_str<> zpath(path);
   PROCESS_INFORMATION pi;
   if(!CreateProcessW(zpath.buffer, argsbuffer, nullptr, nullptr, true, CREATE_UNICODE_ENVIRONMENT, envbuffer, nullptr, &si, &pi))
     return win32_error();

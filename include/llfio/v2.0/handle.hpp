@@ -257,6 +257,10 @@ public:
   //! Move assignment of handle
   handle &operator=(handle &&o) noexcept
   {
+    if(this == &o)
+    {
+      return *this;
+    }
     this->~handle();
     new(this) handle(std::move(o));
     return *this;

@@ -47,10 +47,10 @@ matrix:
     env:
      - NAME=x64_EC_tests
      - CMAKE_CONFIGURE_OPTIONS=-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake
-  - name: "Xcode 11.4 x64 cmake tests (error_code)"
+  - name: "Xcode 11.6 x64 cmake tests (error_code)"
     compiler: clang++
     os: osx
-    osx_image: xcode11.4
+    osx_image: xcode11.6
     env: NAME=x64_EC_tests
   - name: "g++ 7.5 x64 cmake tests (status_code)"
     compiler: g++
@@ -70,13 +70,13 @@ matrix:
     env:
      - NAME=x64_SC_tests
      - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake
-  - name: "Xcode 11.4 x64 cmake tests (status_code)"
-    compiler: clang++
-    os: osx
-    osx_image: xcode11.4
-    env:
-     - NAME=x64_SC_tests
-     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+#  - name: "Xcode 11.6 x64 cmake tests (status_code)"
+#    compiler: clang++
+#    os: osx
+#    osx_image: xcode11.6
+#    env:
+#     - NAME=x64_SC_tests
+#     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
   - name: "g++ ARM32 cmake build (error_code)"
     compiler: g++
     os: linux
@@ -105,10 +105,10 @@ matrix:
     env:
      - NAME=x64_EC_programs
      - CMAKE_CONFIGURE_OPTIONS=-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake
-  - name: "Xcode 11.4 x64 Programs (error_code)"
+  - name: "Xcode 11.6 x64 Programs (error_code)"
     compiler: clang++
     os: osx
-    osx_image: xcode11.4
+    osx_image: xcode11.6
     env: NAME=x64_EC_programs
 #  - name: "x64 Programs (status_code)"
 #    compiler:
@@ -132,10 +132,10 @@ matrix:
     env:
      - NAME=x64_EC_install
      - CMAKE_CONFIGURE_OPTIONS=-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake
-  - name: "Xcode 11.4 Installability (error_code)"
+  - name: "Xcode 11.6 Installability (error_code)"
     compiler: clang++
     os: osx
-    osx_image: xcode11.4
+    osx_image: xcode11.6
     env: NAME=x64_EC_install
   - name: "g++ 7.5 Installability (status_code)"
     compiler: g++
@@ -155,13 +155,13 @@ matrix:
     env:
      - NAME=x64_SC_install
      - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake
-  - name: "Xcode 11.4 Installability (status_code)"
-    compiler: clang++
-    os: osx
-    osx_image: xcode11.4
-    env:
-     - NAME=x64_SC_install
-     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
+#  - name: "Xcode 11.6 Installability (status_code)"
+#    compiler: clang++
+#    os: osx
+#    osx_image: xcode11.6
+#    env:
+#     - NAME=x64_SC_install
+#     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
     
 before_install:
  - if [ "$TRAVIS_COMPILER" = "clang++-10" ]; then
@@ -220,7 +220,7 @@ script:
    if [[ "$NAME" == "x64_"*"_install" ]]; then
      git clone --depth 1 https://github.com/ned14/quickcpplib.git;
      pip3 install --user gitpython;
-     python3 quickcpplib/scripts/test_cpp-pm_install.py test-packaging/example.cpp quickcpplib quickcpplib::hl https://github.com/ned14/quickcpplib outcome outcome::hl https://github.com/ned14/outcome llfio llfio::sl https://github.com/ned14/llfio;
+     python3 quickcpplib/scripts/test_cpp-pm_install.py test-packaging/example.cpp quickcpplib quickcpplib::hl https://github.com/ned14/quickcpplib master outcome outcome::hl https://github.com/ned14/outcome better_optimisation llfio llfio::sl https://github.com/ned14/llfio master;
      cd test_cpp-pm_install;
      mkdir build;
      cd build;

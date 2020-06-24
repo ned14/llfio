@@ -179,6 +179,10 @@ namespace algorithm
         }
         entities_guard &operator=(entities_guard &&o) noexcept
         {
+          if(this == &o)
+          {
+            return *this;
+          }
           this->~entities_guard();
           new(this) entities_guard(std::move(o));
           return *this;

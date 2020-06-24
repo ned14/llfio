@@ -184,6 +184,10 @@ namespace algorithm
       //! Move assign
       atomic_append &operator=(atomic_append &&o) noexcept
       {
+        if(this == &o)
+        {
+          return *this;
+        }
         this->~atomic_append();
         new(this) atomic_append(std::move(o));
         return *this;

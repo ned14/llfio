@@ -1,5 +1,5 @@
 /* A filing system handle
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: Aug 2017
 
 
@@ -42,7 +42,8 @@ result<void> fs_handle::_fetch_inode() const noexcept
 
 namespace detail
 {
-  result<path_handle> containing_directory(optional<std::reference_wrapper<filesystem::path>> out_filename, const handle &h, const fs_handle &fsh, deadline d) noexcept
+  result<path_handle> containing_directory(optional<std::reference_wrapper<filesystem::path>> out_filename, const handle &h, const fs_handle &fsh,
+                                           deadline d) noexcept
   {
     std::chrono::steady_clock::time_point began_steady;
     std::chrono::system_clock::time_point end_utc;
@@ -132,7 +133,7 @@ namespace detail
       return error_from_exception();
     }
   }
-}
+}  // namespace detail
 
 result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
 {
@@ -191,6 +192,32 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
     }
   }
   if(-1 == ::renameat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer))
+  {
+    return posix_error();
+  }
+  return success();
+}
+
+result<void> fs_handle::link(const path_handle &base, path_view_type path, deadline d) noexcept
+{
+  LLFIO_LOG_FUNCTION_CALL(this);
+  auto &h = const_cast<handle &>(_get_handle());
+  path_view::c_str<> zpath(path);
+#ifdef AT_EMPTY_PATH
+  // Try to use the fd linking syscall
+  if(-1 != ::linkat(h.native_handle().fd, "", base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, AT_EMPTY_PATH))
+  {
+    return success();
+  }
+#endif
+  // Open our containing directory
+  filesystem::path filename;
+  if(_devid == 0 && _inode == 0)
+  {
+    OUTCOME_TRY(_fetch_inode());
+  }
+  OUTCOME_TRY(auto &&dirh, detail::containing_directory(std::ref(filename), h, *this, d));
+  if(-1 == ::linkat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, 0))
   {
     return posix_error();
   }

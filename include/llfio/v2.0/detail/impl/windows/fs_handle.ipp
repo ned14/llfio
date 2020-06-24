@@ -1,5 +1,5 @@
 /* A filing system handle
-(C) 2017 - 2020 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: Aug 2017
 
 
@@ -95,7 +95,8 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
       LARGE_INTEGER AllocationSize{};
       memset(&AllocationSize, 0, sizeof(AllocationSize));
       HANDLE nh = nullptr;
-      NTSTATUS ntstat = NtCreateFile(&nh, SYNCHRONIZE, &oa, &isb, &AllocationSize, 0, fileshare, 0x00000001 /*FILE_OPEN*/, 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/, nullptr, 0);
+      NTSTATUS ntstat =
+      NtCreateFile(&nh, SYNCHRONIZE, &oa, &isb, &AllocationSize, 0, fileshare, 0x00000001 /*FILE_OPEN*/, 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/, nullptr, 0);
       if(STATUS_SUCCESS != ntstat)
       {
         if(static_cast<NTSTATUS>(0xC000000F) /*STATUS_NO_SUCH_FILE*/ == ntstat || static_cast<NTSTATUS>(0xC0000034) /*STATUS_OBJECT_NAME_NOT_FOUND*/ == ntstat)
@@ -151,7 +152,7 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
       }
     });
     // RtlDosPathNameToNtPathName_U outputs \??\path, so path.is_ntpath() will be false.
-    return relink(base, path_view_type(NtPath.Buffer, NtPath.Length / sizeof(wchar_t), false));
+    return relink(base, path_view_type(NtPath.Buffer, NtPath.Length / sizeof(wchar_t), false), atomic_replace, d);
   }
 
   HANDLE duph = INVALID_HANDLE_VALUE;
@@ -205,6 +206,63 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
   fni->FileNameLength = _path.Length;
   memcpy(fni->FileName, _path.Buffer, fni->FileNameLength);
   NTSTATUS ntstat = NtSetInformationFile(duph, &isb, fni, sizeof(FILE_RENAME_INFORMATION) + fni->FileNameLength, FileRenameInformation);
+  if(STATUS_PENDING == ntstat)
+  {
+    ntstat = ntwait(duph, isb, d);
+  }
+  if(ntstat < 0)
+  {
+    return ntkernel_error(ntstat);
+  }
+  return success();
+}
+
+result<void> fs_handle::link(const path_handle &base, path_view_type path, deadline d) noexcept
+{
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  LLFIO_LOG_FUNCTION_CALL(this);
+  auto &h = _get_handle();
+
+  // If the target is a win32 path, we need to convert to NT path and call ourselves
+  if(!base.is_valid() && !path.is_ntpath())
+  {
+    path_view::c_str<> zpath(path, false);
+    UNICODE_STRING NtPath{};
+    if(RtlDosPathNameToNtPathName_U(zpath.buffer, &NtPath, nullptr, nullptr) == 0u)
+    {
+      return win32_error(ERROR_FILE_NOT_FOUND);
+    }
+    auto unntpath = make_scope_exit([&NtPath]() noexcept {
+      if(HeapFree(GetProcessHeap(), 0, NtPath.Buffer) == 0)
+      {
+        abort();
+      }
+    });
+    // RtlDosPathNameToNtPathName_U outputs \??\path, so path.is_ntpath() will be false.
+    return link(base, path_view_type(NtPath.Buffer, NtPath.Length / sizeof(wchar_t), false), d);
+  }
+
+  HANDLE duph = h.native_handle().h;
+
+  path_view::c_str<> zpath(path, true);
+  UNICODE_STRING _path{};
+  _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
+  _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
+  if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
+  {
+    _path.Buffer += 3;
+    _path.Length -= 3 * sizeof(wchar_t);
+    _path.MaximumLength -= 3 * sizeof(wchar_t);
+  }
+  IO_STATUS_BLOCK isb = make_iostatus();
+  alignas(8) char buffer[sizeof(FILE_LINK_INFORMATION) + 65536];
+  auto *fni = reinterpret_cast<FILE_LINK_INFORMATION *>(buffer);
+  fni->ReplaceIfExists = 0;
+  fni->RootDirectory = base.is_valid() ? base.native_handle().h : nullptr;
+  fni->FileNameLength = _path.Length;
+  memcpy(fni->FileName, _path.Buffer, fni->FileNameLength);
+  NTSTATUS ntstat = NtSetInformationFile(duph, &isb, fni, sizeof(FILE_LINK_INFORMATION) + fni->FileNameLength, FileLinkInformation);
   if(STATUS_PENDING == ntstat)
   {
     ntstat = ntwait(duph, isb, d);

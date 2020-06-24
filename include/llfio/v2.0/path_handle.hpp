@@ -81,6 +81,10 @@ public:
   //! Move assignment permitted
   path_handle &operator=(path_handle &&o) noexcept
   {
+    if(this == &o)
+    {
+      return *this;
+    }
     this->~path_handle();
     new(this) path_handle(std::move(o));
     return *this;

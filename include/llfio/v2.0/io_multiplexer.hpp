@@ -1176,6 +1176,10 @@ public:
     awaitable &operator=(const awaitable &) = delete;
     awaitable &operator=(awaitable &&o) noexcept
     {
+      if(this == &o)
+      {
+        return *this;
+      }
       this->~awaitable();
       new(this) awaitable(std::move(o));
       return *this;

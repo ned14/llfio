@@ -1,5 +1,5 @@
 /* A handle to something
-(C) 2015-2017 Niall Douglas <http://www.nedproductions.biz/> (8 commits)
+(C) 2015-2020 Niall Douglas <http://www.nedproductions.biz/> (8 commits)
 File Created: Dec 2015
 
 
@@ -26,9 +26,16 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "import.hpp"
 
+#if defined(__FreeBSD__) || defined(__APPLE__)
+#include <sys/socket.h>
+#include <sys/syscall.h>
+#include <sys/uio.h>
+#endif
+
 LLFIO_V2_NAMESPACE_BEGIN
 
-result<file_handle> file_handle::file(const path_handle &base, file_handle::path_view_type path, file_handle::mode _mode, file_handle::creation _creation, file_handle::caching _caching, file_handle::flag flags) noexcept
+result<file_handle> file_handle::file(const path_handle &base, file_handle::path_view_type path, file_handle::mode _mode, file_handle::creation _creation,
+                                      file_handle::caching _caching, file_handle::flag flags) noexcept
 {
   result<file_handle> ret(file_handle(native_handle_type(), 0, 0, _caching, flags, nullptr));
   native_handle_type &nativeh = ret.value()._v;
@@ -419,17 +426,459 @@ result<std::vector<file_handle::extent_pair>> file_handle::extents() const noexc
   }
 }
 
-result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::extent_pair extent, io_handle &dest_, io_handle::extent_type destoffset, deadline d, bool force_copy_now, bool emulate_if_unsupported) noexcept
+result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::extent_pair extent, io_handle &dest_, io_handle::extent_type destoffset, deadline d,
+                                                               bool force_copy_now, bool emulate_if_unsupported) noexcept
 {
   try
   {
-    (void) extent;
-    (void) dest_;
-    (void) destoffset;
-    (void) d;
-    (void) force_copy_now;
-    (void) emulate_if_unsupported;
-    return errc::operation_not_supported;
+    LLFIO_LOG_FUNCTION_CALL(this);
+    OUTCOME_TRY(auto mycurrentlength, maximum_extent());
+    if(extent.offset == (extent_type) -1 && extent.length == (extent_type) -1)
+    {
+      extent.offset = 0;
+      extent.length = mycurrentlength;
+    }
+    if(extent.offset + extent.length < extent.offset)
+    {
+      return errc::value_too_large;
+    }
+    if(destoffset + extent.length < destoffset)
+    {
+      return errc::value_too_large;
+    }
+    if(extent.length == 0)
+    {
+      return extent;
+    }
+    if(extent.offset >= mycurrentlength)
+    {
+      return {extent.offset, 0};
+    }
+    if(extent.offset + extent.length >= mycurrentlength)
+    {
+      extent.length = mycurrentlength - extent.offset;
+    }
+    LLFIO_POSIX_DEADLINE_TO_SLEEP_INIT(d);
+    const extent_type blocksize = utils::file_buffer_default_size();
+    byte *buffer = nullptr;
+    auto unbufferh = make_scope_exit([&]() noexcept {
+      if(buffer != nullptr)
+        utils::page_allocator<byte>().deallocate(buffer, blocksize);
+    });
+    (void) unbufferh;
+    extent_pair ret(extent.offset, 0);
+    if(!dest_.is_regular())
+    {
+#if defined(__linux__) || defined(__FreeBSD__) || defined(__APPLE__)
+      while(extent.length > 0)
+      {
+#ifdef __APPLE__
+        off_t written = extent.length;
+        if(-1 == ::sendfile(_v.fd, dest_.native_handle().fd, extent.offset, &written, nullptr, 0))
+#elif defined(__FreeBSD__)
+        off_t written = 0;
+        if(-1 == ::sendfile(_v.fd, dest_.native_handle().fd, extent.offset, extent.length, nullptr, &written, 0))
+#else
+        off_t off_in = extent.offset, off_out = 0;
+        auto written = ::splice(_v.fd, &off_in, dest_.native_handle().fd, &off_out, extent.length, 0);
+        if(written < 0)
+#endif
+        {
+          if(EAGAIN != errno && EWOULDBLOCK == errno)
+          {
+            if(ret.length == 0)
+            {
+              break;
+            }
+            return posix_error();
+          }
+        }
+        extent.offset += written;
+        destoffset += written;
+        extent.length -= written;
+        ret.length += written;
+        if(extent.length == 0)
+        {
+          break;
+        }
+        if(!d || !d.steady || d.nsecs != 0)
+        {
+          LLFIO_POSIX_DEADLINE_TO_SLEEP_LOOP(d);
+          int mstimeout = (timeout == nullptr) ? -1 : (timeout->tv_sec * 1000 + timeout->tv_nsec / 1000000LL);
+          pollfd p;
+          memset(&p, 0, sizeof(p));
+          p.fd = dest_.native_handle().fd;
+          p.events = POLLOUT | POLLERR;
+          if(-1 == ::poll(&p, 1, mstimeout))
+          {
+            return posix_error();
+          }
+        }
+        LLFIO_POSIX_DEADLINE_TO_TIMEOUT_LOOP(d);
+      }
+      if(ret.length > 0)
+      {
+        return ret;
+      }
+#endif
+      buffer = utils::page_allocator<byte>().allocate(blocksize);
+      while(extent.length > 0)
+      {
+        deadline nd;
+        auto towrite = (extent.length < blocksize) ? (size_t) extent.length : blocksize;
+        buffer_type b(buffer, towrite);
+        LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+        OUTCOME_TRY(auto &&readed, read({{&b, 1}, extent.offset}, nd));
+        const_buffer_type cb(readed.front());
+        if(cb.size() == 0)
+        {
+          return ret;
+        }
+        LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+        OUTCOME_TRY(auto written_, dest_.write({{&cb, 1}, destoffset}, nd));
+        const auto written = written_.front().size();
+        extent.offset += written;
+        destoffset += written;
+        extent.length -= written;
+        ret.length += written;
+      }
+      return ret;
+    }
+    const auto destoffsetdiff = destoffset - extent.offset;
+    struct workitem
+    {
+      extent_pair src;
+      enum
+      {
+        copy_bytes,
+        zero_bytes,
+        clone_extents,
+        delete_extents
+      } op;
+      bool destination_extents_are_new{false};
+    };
+    std::vector<workitem> todo;  // if destination length is 0, punch hole
+    todo.reserve(8);
+    // Firstly fill todo with the list of allocated and non-allocated extents
+    {
+      extent_type start = 0, end = 0;
+#ifdef SEEK_DATA
+      for(;;)
+      {
+#ifdef __linux__
+        start = lseek64(_v.fd, end, SEEK_DATA);
+#else
+        start = lseek(_v.fd, end, SEEK_DATA);
+#endif
+        if(static_cast<extent_type>(-1) == start)
+        {
+          if(ENXIO == errno)
+          {
+            // There is no data between end, and the file length
+            start = mycurrentlength;
+          }
+          else if(start == 0)
+          {
+            // extents enumeration is not supported
+            todo.push_back(workitem{extent_pair(0, mycurrentlength), workitem::clone_extents});
+            break;
+          }
+        }
+        if(end >= extent.offset + extent.length)
+        {
+          break;  // done
+        }
+        // hole goes from end to start. end is inclusive, start is exclusive.
+        if((end >= extent.offset && end < extent.offset + extent.length) || (start > extent.offset && start <= extent.offset + extent.length))
+        {
+          const auto clampedstart = std::max(end, extent.offset);
+          const auto clampedend = std::min(start, extent.offset + extent.length);
+          todo.push_back(workitem{extent_pair(clampedstart, clampedend - clampedstart), workitem::delete_extents});
+        }
+        if(start >= extent.offset + extent.length)
+        {
+          break;  // done
+        }
+#ifdef __linux__
+        end = lseek64(_v.fd, start, SEEK_HOLE);
+#else
+        end = lseek(_v.fd, start, SEEK_HOLE);
+#endif
+        if(static_cast<extent_type>(-1) == end)
+        {
+          if(ENXIO == errno)
+          {
+            // There is no data between start, and the file length
+            end = mycurrentlength;
+          }
+          else if(start == 0)
+          {
+            // extents enumeration is not supported
+            todo.push_back(workitem{extent_pair(0, mycurrentlength), workitem::clone_extents});
+            break;
+          }
+        }
+        // allocated goes from start to end. start is inclusive, end is exclusive.
+        if((start >= extent.offset && start < extent.offset + extent.length) || (end > extent.offset && end <= extent.offset + extent.length))
+        {
+          const auto clampedstart = std::max(start, extent.offset);
+          const auto clampedend = std::min(end, extent.offset + extent.length);
+          todo.push_back(workitem{extent_pair(clampedstart, clampedend - clampedstart), workitem::clone_extents});
+        }
+      }
+#endif
+    }
+    // Handle there being insufficient source to fill dest
+    if(todo.empty())
+    {
+      todo.push_back(workitem{{extent.offset, extent.length}, workitem::delete_extents});
+    }
+#ifndef NDEBUG
+    {
+      assert(todo.front().src.offset == extent.offset);
+      assert(todo.back().src.offset + todo.back().src.length == extent.offset + extent.length);
+      for(size_t n = 1; n < todo.size(); n++)
+      {
+        assert(todo[n - 1].src.offset + todo[n - 1].src.length == todo[n].src.offset);
+      }
+    }
+#endif
+    // If cloning within the same file, use the appropriate direction
+    auto &dest = static_cast<file_handle &>(dest_);
+    OUTCOME_TRY(auto dest_length, dest.maximum_extent());
+    if(dest.unique_id() == unique_id())
+    {
+      if(abs((int64_t) destoffset - (int64_t) extent.offset) < (int64_t) blocksize)
+      {
+        return errc::invalid_argument;
+      }
+      if(destoffset > extent.offset)
+      {
+        std::reverse(todo.begin(), todo.end());
+      }
+    }
+    // Ensure the destination file is big enough
+    if(destoffset + extent.length > dest_length)
+    {
+      // No need to zero nor deallocate extents in the new length
+      auto it = todo.begin();
+      while(it != todo.end() && it->src.offset + it->src.length + destoffsetdiff <= dest_length)
+      {
+        ++it;
+      }
+      if(it != todo.end() && it->src.offset + destoffsetdiff < dest_length)
+      {
+        // If it is a zero or remove, split the block
+        if(it->op == workitem::delete_extents || it->op == workitem::zero_bytes)
+        {
+          // TODO
+        }
+        ++it;
+      }
+      // Mark all remaining blocks as writing into new extents
+      while(it != todo.end())
+      {
+        it->destination_extents_are_new = true;
+        ++it;
+      }
+    }
+    bool duplicate_extents = !force_copy_now, zero_extents = true, buffer_dirty = true;
+    bool truncate_back_on_failure = false;
+    if(dest_length < destoffset + extent.length)
+    {
+      OUTCOME_TRY(dest.truncate(destoffset + extent.length));
+      truncate_back_on_failure = true;
+    }
+    auto untruncate = make_scope_exit([&]() noexcept {
+      if(truncate_back_on_failure)
+      {
+        (void) dest.truncate(dest_length);
+      }
+    });
+#if 0
+    for(const workitem &item : todo)
+    {
+      std::cout << "  From offset " << item.src.offset << " " << item.src.length << " bytes do ";
+      switch(item.op)
+      {
+      case workitem::copy_bytes:
+        std::cout << "copy bytes";
+        break;
+      case workitem::zero_bytes:
+        std::cout << "zero bytes";
+        break;
+      case workitem::clone_extents:
+        std::cout << "clone extents";
+        break;
+      case workitem::delete_extents:
+        std::cout << "delete extents";
+        break;
+      }
+      if(item.destination_extents_are_new)
+      {
+        std::cout << " (destination extents are new)";
+      }
+      std::cout << std::endl;
+    }
+#endif
+    auto _copy_file_range = [&](int infd, off_t *inoffp, int outfd, off_t *outoffp, size_t len, unsigned int flags) -> ssize_t {
+#if defined(__linux__)
+      return copy_file_range(infd, inoffp, outfd, outoffp, len, flags);
+#elif defined(__FreeBSD__)
+      // This gets implemented in FreeBSD 13. See https://reviews.freebsd.org/D20584
+      return syscall(569 /*copy_file_range*/, intfd, inoffp, outfd, outoffp, len, flags);
+#else
+      (void) infd;
+      (void) inoffp;
+      (void) outfd;
+      (void) outoffp;
+      (void) len;
+      (void) flags;
+      errno = EOPNOTSUPP;
+      return -1;
+#endif
+    };
+    auto _zero_file_range = [&](int fd, off_t offset, size_t len) -> int {
+#if defined(__linux__)
+      return fallocate(fd, 0x02 /*FALLOC_FL_PUNCH_HOLE*/ | 0x01 /*FALLOC_FL_KEEP_SIZE*/, offset, len);
+#else
+      (void) fd;
+      (void) offset;
+      (void) len;
+      errno = EOPNOTSUPP;
+      return -1;
+#endif
+    };
+    for(const workitem &item : todo)
+    {
+      for(extent_type thisoffset = 0; thisoffset < item.src.length; thisoffset += blocksize)
+      {
+        bool done = false;
+        const auto thisblock = std::min(blocksize, item.src.length - thisoffset);
+        if(duplicate_extents && item.op == workitem::clone_extents)
+        {
+          off_t off_in = item.src.offset + thisoffset, off_out = item.src.offset + thisoffset + destoffsetdiff;
+          if(_copy_file_range(_v.fd, &off_in, dest.native_handle().fd, &off_out, thisblock, 0) < 0)
+          {
+            if((EXDEV != errno && EOPNOTSUPP != errno) || !emulate_if_unsupported)
+            {
+              return posix_error();
+            }
+            duplicate_extents = false;  // emulate using copy of bytes
+          }
+          else
+          {
+            done = true;
+          }
+        }
+        if(!done && (item.op == workitem::copy_bytes || (!duplicate_extents && item.op == workitem::clone_extents)))
+        {
+          if(buffer == nullptr)
+          {
+            buffer = utils::page_allocator<byte>().allocate(blocksize);
+          }
+          deadline nd;
+          buffer_type b(buffer, thisblock);
+          LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+          OUTCOME_TRY(auto readed, read({{&b, 1}, item.src.offset + thisoffset}, nd));
+          buffer_dirty = true;
+          if(readed.front().size() != thisblock)
+          {
+            return errc::resource_unavailable_try_again;  // something is wrong
+          }
+          LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+          const_buffer_type cb(readed.front());
+          if(item.destination_extents_are_new)
+          {
+            // If we don't need to reset the bytes in the destination, try to elide
+            // regions of zero bytes before writing to save on extents newly allocated
+            const char *ds = (const char *) readed.front().data(), *e = (const char *) readed.front().data() + readed.front().size(), *zs, *ze;
+            while(ds < e)
+            {
+              // Take zs to end of non-zero data
+              for(zs = ds; zs < e && *zs != 0; ++zs)
+              {
+              }
+            zero_block_too_small:
+              // Take ze to end of zero data
+              for(ze = zs; ze < e && *ze == 0; ++ze)
+              {
+              }
+              if(ze - zs < 1024 && ze < e)
+              {
+                zs = ze + 1;
+                goto zero_block_too_small;
+              }
+              if(zs != ds)
+              {
+                // Write portion from ds to zs
+                cb = {(const byte *) ds, (size_t)(zs - ds)};
+                auto localoffset = cb.data() - readed.front().data();
+                // std::cout << "*** " << (item.src.offset + thisoffset + localoffset) << " - " << cb.size() << std::endl;
+                OUTCOME_TRY(auto written, dest.write({{&cb, 1}, item.src.offset + thisoffset + localoffset + destoffsetdiff}, nd));
+                if(written.front().size() != (size_t)(zs - ds))
+                {
+                  return errc::resource_unavailable_try_again;  // something is wrong
+                }
+              }
+              ds = ze;
+            }
+          }
+          else
+          {
+            // Straight write
+            OUTCOME_TRY(auto written, dest.write({{&cb, 1}, item.src.offset + thisoffset + destoffsetdiff}, nd));
+            if(written.front().size() != thisblock)
+            {
+              return errc::resource_unavailable_try_again;  // something is wrong
+            }
+          }
+          done = true;
+        }
+        if(!done && !item.destination_extents_are_new && (zero_extents && item.op == workitem::delete_extents))
+        {
+          if(_zero_file_range(dest.native_handle().fd, item.src.offset + thisoffset + destoffsetdiff, thisblock) < 0)
+          {
+            if(EOPNOTSUPP != errno || !emulate_if_unsupported)
+            {
+              return posix_error();
+            }
+            zero_extents = false;  // emulate using a write of bytes
+          }
+          else
+          {
+            done = true;
+          }
+        }
+        if(!done && !item.destination_extents_are_new && (item.op == workitem::zero_bytes || (!zero_extents && item.op == workitem::delete_extents)))
+        {
+          if(buffer == nullptr)
+          {
+            buffer = utils::page_allocator<byte>().allocate(blocksize);
+          }
+          deadline nd;
+          const_buffer_type cb(buffer, thisblock);
+          if(buffer_dirty)
+          {
+            memset(buffer, 0, thisblock);
+            buffer_dirty = false;
+          }
+          LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+          OUTCOME_TRY(auto &&written, dest.write({{&cb, 1}, item.src.offset + thisoffset + destoffsetdiff}, nd));
+          if(written.front().size() != thisblock)
+          {
+            return errc::resource_unavailable_try_again;  // something is wrong
+          }
+          done = true;
+        }
+        assert(done);
+        dest_length = destoffset + extent.length;
+        truncate_back_on_failure = false;
+        LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
+        ret.length += thisblock;
+      }
+    }
+    return ret;
   }
   catch(...)
   {

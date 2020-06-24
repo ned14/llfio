@@ -118,6 +118,10 @@ struct native_handle_type  // NOLINT
   //! Move assign
   constexpr native_handle_type &operator=(native_handle_type &&o) noexcept
   {
+    if(this == &o)
+    {
+      return *this;
+    }
     _init = o._init;
     behaviour = o.behaviour;
     o.behaviour = disposition();
