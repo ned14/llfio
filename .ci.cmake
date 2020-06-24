@@ -100,7 +100,7 @@ else()
 endif()
 set(retval2 0)
 set(retval3 0)
-if(NOT CTEST_DISABLE_TESTING)
+if(NOT CTEST_DISABLE_TESTING AND NOT APPLE)  # Travis takes too long :(
   if(("$ENV{CXX}" MATCHES "clang") OR ("$ENV{CXX}" MATCHES "g\\+\\+"))
     if("$ENV{CXX}" MATCHES "clang")
       ctest_build(TARGET _sl-asan)
