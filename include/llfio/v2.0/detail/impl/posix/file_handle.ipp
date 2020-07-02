@@ -32,6 +32,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include <sys/uio.h>
 #endif
 
+//#include <iostream>
+
 LLFIO_V2_NAMESPACE_BEGIN
 
 result<file_handle> file_handle::file(const path_handle &base, file_handle::path_view_type path, file_handle::mode _mode, file_handle::creation _creation,
@@ -561,8 +563,8 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
     todo.reserve(8);
     // Firstly fill todo with the list of allocated and non-allocated extents
     {
+#if defined(SEEK_DATA)
       extent_type start = 0, end = 0;
-#ifdef SEEK_DATA
       for(;;)
       {
 #ifdef __linux__
@@ -570,6 +572,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
 #else
         start = lseek(_v.fd, end, SEEK_DATA);
 #endif
+        //std::cout << "SEEK_DATA from " << end << " finds " << start << std::endl;
         if(static_cast<extent_type>(-1) == start)
         {
           if(ENXIO == errno)
@@ -588,8 +591,10 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
         {
           break;  // done
         }
+        //std::cout << "There are deallocated extents between " << end << " " << (start - end) << " bytes" << std::endl;
         // hole goes from end to start. end is inclusive, start is exclusive.
-        if((end >= extent.offset && end < extent.offset + extent.length) || (start > extent.offset && start <= extent.offset + extent.length))
+        if((end <= extent.offset && start >= extent.offset + extent.length) || (end >= extent.offset && end < extent.offset + extent.length) ||
+           (start > extent.offset && start <= extent.offset + extent.length))
         {
           const auto clampedstart = std::max(end, extent.offset);
           const auto clampedend = std::min(start, extent.offset + extent.length);
@@ -604,6 +609,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
 #else
         end = lseek(_v.fd, start, SEEK_HOLE);
 #endif
+        //std::cout << "SEEK_HOLE from " << start << " finds " << end << std::endl;
         if(static_cast<extent_type>(-1) == end)
         {
           if(ENXIO == errno)
@@ -618,14 +624,18 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
             break;
           }
         }
+        //std::cout << "There are allocated extents between " << start << " " << (end - start) << " bytes" << std::endl;
         // allocated goes from start to end. start is inclusive, end is exclusive.
-        if((start >= extent.offset && start < extent.offset + extent.length) || (end > extent.offset && end <= extent.offset + extent.length))
+        if((start <= extent.offset && end >= extent.offset + extent.length) || (start >= extent.offset && start < extent.offset + extent.length) ||
+           (end > extent.offset && end <= extent.offset + extent.length))
         {
           const auto clampedstart = std::max(start, extent.offset);
           const auto clampedend = std::min(end, extent.offset + extent.length);
           todo.push_back(workitem{extent_pair(clampedstart, clampedend - clampedstart), workitem::clone_extents});
         }
       }
+#else
+      todo.push_back(workitem{{extent.offset, extent.length}, workitem::clone_extents});
 #endif
     }
     // Handle there being insufficient source to fill dest
@@ -871,7 +881,6 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
           }
           done = true;
         }
-        assert(done);
         dest_length = destoffset + extent.length;
         truncate_back_on_failure = false;
         LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
