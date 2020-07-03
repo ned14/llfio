@@ -41,10 +41,13 @@ static inline void TestProcessHandle(bool with_redirection) {
   {
     for(auto &i : *myenv)
     {
+      visit(i, [](auto sv) { fwprintf(stderr, L"appveyor debug environment(): about to cout '%s'\n", (wchar_t *) sv.data()); });
       std::cout << "\n  " << i;
     }
   }
+  fprintf(stderr, "appveyor debug environment(): just after iteration\n");
   std::cout << "\n" << std::endl;
+  fprintf(stderr, "appveyor debug environment(): just before launch process setup\n");
   llfio::process_handle::flag flags = llfio::process_handle::flag::wait_on_close;
   if(!with_redirection)
   {
@@ -55,6 +58,7 @@ static inline void TestProcessHandle(bool with_redirection) {
     char buffer[64];
     sprintf(buffer, "--testchild,%u", (unsigned) n);
     llfio::path_view_component arg(buffer);
+    fprintf(stderr, "appveyor debug environment(): just before launch process %u\n", (unsigned) n);
     children.push_back(llfio::process_handle::launch_process(myexepath, {&arg, 1}, flags).value());
   }
   if(with_redirection)

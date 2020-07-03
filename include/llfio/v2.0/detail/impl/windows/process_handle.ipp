@@ -87,10 +87,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC std::unique_ptr<span<path_view_component>, proce
     // Laziness ...
     return {};
   }
-  fprintf(stderr, "appveyor debug environment(): just before GetEnvironmentStringsW\n");
   wchar_t *strings = GetEnvironmentStringsW();
-  fprintf(stderr, "appveyor debug environment(): just after GetEnvironmentStringsW which returned %p\n", strings);
-  fwprintf(stderr, L"appveyor debug environment(): GetEnvironmentStringsW %s\n", strings);
   if(strings == nullptr)
   {
     return {};
@@ -103,11 +100,9 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC std::unique_ptr<span<path_view_component>, proce
     for(; *e; e++)
     {
     }
-    fwprintf(stderr, L"appveyor debug environment(): parsed %s\n", s);
     if(*s != '=')
       ++count;
   }
-  fprintf(stderr, "appveyor debug environment(): there are %u strings\n", (unsigned) count);
   const size_t bytesneeded = sizeof(span<path_view_component>) + sizeof(path_view_component) * count + (e - strings + 1) * sizeof(wchar_t);
   auto ret = std::make_unique<byte[]>(bytesneeded);
   auto &out = *(span<path_view_component> *) ret.get();
@@ -123,12 +118,10 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC std::unique_ptr<span<path_view_component>, proce
     }
     if(*s != '=')
     {
-      fwprintf(stderr, L"appveyor debug environment(): Adding %s\n", s);
       *arraye++ = path_view_component(s, e, true);
       out = {array, arraye};
     }
   }
-  fprintf(stderr, "appveyor debug environment(): just before returning unique_ptr\n");
   return std::unique_ptr<span<path_view_component>, process_handle::_byte_array_deleter>((span<path_view_component> *) ret.release());
 }
 
