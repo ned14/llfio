@@ -198,7 +198,7 @@ static inline void TestCloneOrCopyFileWhole()
               << std::endl;
 #ifndef __APPLE__
     // Mac OS has a broken extent enumeration API, so we just do straight copies on it
-    BOOST_CHECK(abs((long) src_stat.st_blocks - (long) dest_stat.st_blocks) < ((long) src_stat.st_blocks / 8));
+    BOOST_CHECK(abs((long) src_stat.st_blocks - (long) dest_stat.st_blocks) < ((long) src_stat.st_blocks / 4));
 #endif
 
     for(size_t n = 0; n < maximum_extent; n++)

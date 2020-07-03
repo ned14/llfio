@@ -76,7 +76,6 @@ namespace algorithm
                                                                               bool preserve_timestamps = true, bool force_copy_now = false,
                                                                               file_handle::creation creation = file_handle::creation::always_new,
                                                                               deadline d = {}) noexcept;
-
 #if 0
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -84,95 +83,44 @@ namespace algorithm
 #endif
   /*! \brief A visitor for the filesystem traversal and cloning algorithm.
 
-  Note that at any time, returning a failure causes `clone()` to exit as soon
-  as possible with the same failure.
+  Note that at any time, returning a failure causes `copy_directory_hierarchy()`
+  or `clone_or_copy()` to exit as soon as possible with the same failure.
 
   You can override the members here inherited from `traverse_visitor`, however note
-  that `clone()` is entirely implemented using `traverse()`, so not calling the
-  implementations here will affect operation.
+  that `copy_directory_hierarchy()` or `clone_or_copy()` is entirely implemented
+  using `traverse()`, so not calling the implementations here will affect operation.
   */
-  struct LLFIO_DECL clone_copy_link_visitor : public traverse_visitor
+  struct LLFIO_DECL clone_copy_link_symlink_visitor : public traverse_visitor
   {
+    enum op_t
+    {
+      none = 0,//!< File content is to be ignored, directories only
+      clone,   //!< File content is to be extents cloned when possible
+      copy,    //!< File content is to copied now into its destination
+      link,    //!< File content is to be hard linked into its destination
+      symlink  //! File content is to be symlinked into its destination
+    } op;
+    bool follow_symlinks{false};
     std::chrono::steady_clock::duration timeout{std::chrono::seconds(10)};
     std::chrono::steady_clock::time_point begin;
 
     //! Constructs an instance with the default timeout of ten seconds.
-    constexpr clone_copy_link_visitor() {}
+    constexpr clone_copy_link_symlink_visitor(op_t _op, bool _follow_symlinks = false) : op(_op), follow_symlinks(_follow_symlinks) {}
     //! Constructs an instance with the specified timeout.
-    constexpr explicit clone_copy_link_visitor(std::chrono::steady_clock::duration _timeout)
-        : timeout(_timeout)
+    constexpr explicit clone_copy_link_symlink_visitor(op_t _op, std::chrono::steady_clock::duration _timeout, bool _follow_symlinks = false)
+        : op(_op), follow_symlinks(_follow_symlinks), timeout(_timeout)
     {
     }
 
-    //! This override ignores failures to traverse into the directory, and tries renaming the item into the base directory.
-    virtual result<directory_handle> directory_open_failed(void *data, result<void>::error_type &&error, const directory_handle &dirh, path_view leaf, size_t depth) noexcept override;
-    //! This override invokes deletion of all non-directory items. If there are no directory items, also deletes the directory.
+    /*! \brief This override creates directories in the destination for
+    every directory in the source, and optionally clones/copies/links/symlinks
+    any file content, optionally dereferencing or not dereferencing symlinks.
+    */
     virtual result<void> post_enumeration(void *data, const directory_handle &dirh, directory_handle::buffers_type &contents, size_t depth) noexcept override;
-
-    /*! \brief Called when the unlink of a file entry failed. The default
-    implementation attempts to rename the entry into the base directory.
-    If your reimplementation achieves the unlink, return true.
-
-    \note May be called from multiple kernel threads concurrently.
-    */
-    virtual result<bool> unlink_failed(void *data, result<void>::error_type &&error, const directory_handle &dirh, directory_entry &entry, size_t depth) noexcept;
-    /*! \brief Called when the rename of a file entry into the base directory
-    failed. The default implementation ignores the failure. If your
-    reimplementation achieves the rename, return true.
-
-    \note May be called from multiple kernel threads concurrently.
-    */
-    virtual result<bool> rename_failed(void *data, result<void>::error_type &&error, const directory_handle &dirh, directory_entry &entry, size_t depth) noexcept
-    {
-      (void) data;
-      (void) error;
-      (void) dirh;
-      (void) entry;
-      (void) depth;
-      return false;
-    }
-    /*! \brief Called when we have performed a single full round of reduction.
-
-    \note Always called from the original kernel thread.
-    */
-    virtual result<void> reduction_round(void *data, size_t round_completed, size_t items_unlinked, size_t items_remaining) noexcept
-    {
-      (void) data;
-      (void) round_completed;
-      (void) items_unlinked;
-      if(items_remaining > 0)
-      {
-        if(begin == std::chrono::steady_clock::time_point())
-        {
-          begin = std::chrono::steady_clock::now();
-        }
-        else if((std::chrono::steady_clock::now() - begin) > timeout)
-        {
-          return errc::timed_out;
-        }
-      }
-      return success();
-    }
   };
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-
-  /*! \brief Copy the directory hierarchy identified by `srcdir` to `destdir`.
-
-  This algorithm firstly traverses the source directory tree to calculate the filesystem
-  blocks which would be used by a copy of all the directories. If insufficient disc space
-  remains on the destination volume, the operation exits with an error code comparing equal to
-  `errc::no_space_on_device`.
-
-  If there is sufficient disc space, the directory hierarchy -- without any files -- is
-  replicated exactly. Timestamps are NOT replicated (any subsequent newly added files
-  would change the timestamps in any case).
-
-  You should review the documentation for `algorithm::traverse()`, as this algorithm is
-  entirely implemented using that algorithm.
-  */
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<size_t> copy_hierarchy(const directory_handle &srcdir, directory_handle &destdir, clone_copy_link_visitor *visitor = nullptr, size_t threads = 0, bool force_slow_path = false) noexcept;
 
   /*! \brief Clone or copy the extents of the filesystem entity identified by `srcdir`
   and `srcleaf`, and everything therein, to `destdir` named `srcleaf` or `destleaf`.

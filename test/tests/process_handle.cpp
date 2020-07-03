@@ -36,9 +36,12 @@ static inline void TestProcessHandle(bool with_redirection) {
   std::cout << "My process executable's path is " << myexepath << std::endl;
   auto myenv = self.environment();
   std::cout << "My process environment contains:";
-  for(auto &i : *myenv)
+  if(myenv)
   {
-    std::cout << "\n  " << i;
+    for(auto &i : *myenv)
+    {
+      std::cout << "\n  " << i;
+    }
   }
   std::cout << "\n" << std::endl;
   llfio::process_handle::flag flags = llfio::process_handle::flag::wait_on_close;
