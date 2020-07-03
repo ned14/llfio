@@ -28,7 +28,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../test_kernel_decl.hpp"
 
-static inline void TestProcessHandle(bool with_redirection) {
+static inline void TestProcessHandle(bool with_redirection)
+{
   namespace llfio = LLFIO_V2_NAMESPACE;
   std::vector<llfio::process_handle> children;
   auto &self = llfio::process_handle::current();
@@ -36,9 +37,22 @@ static inline void TestProcessHandle(bool with_redirection) {
   std::cout << "My process executable's path is " << myexepath << std::endl;
   auto myenv = self.environment();
   std::cout << "My process environment contains:";
-  for(auto &i : *myenv)
+  if(myenv)
   {
-    std::cout << "\n  " << i;
+    for(auto &i : *myenv)
+    {
+      if(visit(i, [](auto sv) -> bool {
+           if(sv.size() >= 512)
+             return false;
+           using _string_view = std::decay_t<decltype(sv)>;
+           _string_view a((const typename _string_view::value_type *) "JENKINS_NEDPROD_PASSWORD");
+           _string_view b((const typename _string_view::value_type *) L"JENKINS_NEDPROD_PASSWORD");
+           return (sv.npos == sv.find(a)) && (sv.npos == sv.find(b));
+         }))
+      {
+        std::cout << "\n  " << i;
+      }
+    }
   }
   std::cout << "\n" << std::endl;
   llfio::process_handle::flag flags = llfio::process_handle::flag::wait_on_close;
@@ -46,7 +60,7 @@ static inline void TestProcessHandle(bool with_redirection) {
   {
     flags |= llfio::process_handle::flag::no_redirect;
   }
-  for(size_t n=0; n<4; n++)
+  for(size_t n = 0; n < 4; n++)
   {
     char buffer[64];
     sprintf(buffer, "--testchild,%u", (unsigned) n);
@@ -72,8 +86,10 @@ static inline void TestProcessHandle(bool with_redirection) {
   }
 }
 
-KERNELTEST_TEST_KERNEL(integration, llfio, process_handle, no_redirect, "Tests that llfio::process_handle without redirection works as expected", TestProcessHandle(false))
-KERNELTEST_TEST_KERNEL(integration, llfio, process_handle, redirect, "Tests that llfio::process_handle with redirection works as expected", TestProcessHandle(true))
+KERNELTEST_TEST_KERNEL(integration, llfio, process_handle, no_redirect, "Tests that llfio::process_handle without redirection works as expected",
+                       TestProcessHandle(false))
+KERNELTEST_TEST_KERNEL(integration, llfio, process_handle, redirect, "Tests that llfio::process_handle with redirection works as expected",
+                       TestProcessHandle(true))
 
 int main(int argc, char *argv[])
 {

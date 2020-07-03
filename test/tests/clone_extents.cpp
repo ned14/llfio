@@ -35,15 +35,15 @@ Distributed under the Boost Software License, Version 1.0.
 
 static inline void TestCloneExtents()
 {
-  static constexpr int DURATION = 20;
+  static constexpr int DURATION = 30;
   static constexpr size_t max_file_extent = (size_t) 100 * 1024 * 1024;
   namespace llfio = LLFIO_V2_NAMESPACE;
   using QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng;
   static const auto &tempdirh = llfio::path_discovery::storage_backed_temporary_files_directory();
-  small_prng rand;
   auto begin = std::chrono::steady_clock::now();
   for(size_t round = 0; std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - begin).count() < DURATION; round++)
   {
+    small_prng rand((uint32_t) round);
     struct handle_t
     {
       std::vector<llfio::file_handle::extent_pair> extents_written;
@@ -71,7 +71,7 @@ static inline void TestCloneExtents()
       }
       auto size = rand() % std::min(h.maximum_extent - offset, h.maximum_extent / 256);
       llfio::byte buffer[65536];
-      memset(&buffer, c, sizeof(buffer));
+      memset(buffer, c, sizeof(buffer));
       h.extents_written.push_back({offset, size});
       for(unsigned n = 0; n < size; n += sizeof(buffer))
       {
@@ -196,7 +196,10 @@ static inline void TestCloneOrCopyFileWhole()
     dest_stat.fill(destfh).value();
     std::cout << "Source file has " << src_stat.st_blocks << " blocks allocated. Destination file has " << dest_stat.st_blocks << " blocks allocated."
               << std::endl;
-    BOOST_CHECK(abs((long) src_stat.st_blocks - (long) dest_stat.st_blocks) < ((long) src_stat.st_blocks / 8));
+#ifndef __APPLE__
+    // Mac OS has a broken extent enumeration API, so we just do straight copies on it
+    BOOST_CHECK(abs((long) src_stat.st_blocks - (long) dest_stat.st_blocks) < ((long) src_stat.st_blocks / 4));
+#endif
 
     for(size_t n = 0; n < maximum_extent; n++)
     {

@@ -240,8 +240,9 @@ namespace algorithm
         {
           return success();
         }
+        return posix_error();
       }
-      return posix_error();
+      return success();
 #endif
     }
     struct reduction_state
@@ -289,7 +290,7 @@ namespace algorithm
         if(r)
         {
           state->items_removed.fetch_add(1, std::memory_order_relaxed);
-          entry = {};  // prevent traversal
+          entry.stat = stat_t(nullptr);  // prevent traversal
         }
         else
         {

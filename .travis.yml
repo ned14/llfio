@@ -13,6 +13,8 @@ notifications:
 
 addons:
   apt:
+#    sources:
+#    - sourceline: "ppa:ubuntu-toolchain-r/test"
     packages:
     - g++
     - clang

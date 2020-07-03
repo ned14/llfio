@@ -63,11 +63,44 @@ namespace detail
       for(;;)
       {
         // Get current path for handle and open its containing dir
-        OUTCOME_TRY(auto &&_currentpath, h.current_path());
+        OUTCOME_TRY(auto _currentpath, h.current_path());
         // If current path is empty, it's been deleted
         if(_currentpath.empty())
         {
-          return errc::no_such_file_or_directory;
+#if defined(__linux__) && 0  // not the cause of the Travis failure
+          if(h.is_directory())
+          {
+            /* Docker's mechanism for protecting /proc on Linux is bugged. For files,
+            we simply must give up. For directories, we can hack a workaround.
+            */
+            fprintf(stderr, "llfio: Docker bug failure to retrieve parent path workaround is being employed\n");
+            auto tempname = utils::random_string(32);
+            int tffd = ::openat(h.native_handle().fd, tempname.c_str(), O_RDWR | O_CLOEXEC | O_CREAT | O_EXCL, 0x1b0 /*660*/);
+            if(tffd >= 0)
+            {
+              auto untffd = make_scope_exit([&]() noexcept {
+                ::unlinkat(h.native_handle().fd, tempname.c_str(), 0);
+                ::close(tffd);
+              });
+              std::string ret(32769, '\0');
+              auto *out = const_cast<char *>(ret.data());
+              // Linux keeps a symlink at /proc/self/fd/n
+              char in[64];
+              snprintf(in, sizeof(in), "/proc/self/fd/%d", tffd);
+              ssize_t len;
+              if((len = readlink(in, out, 32768)) >= 0)
+              {
+                ret.resize(len);
+                _currentpath = std::move(ret);
+                _currentpath = _currentpath.parent_path();
+              }
+            }
+          }
+          if(_currentpath.empty())
+#endif
+          {
+            return errc::no_such_file_or_directory;
+          }
         }
         // Split the path into root and leafname
         path_view currentpath(_currentpath);
