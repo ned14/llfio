@@ -67,7 +67,7 @@ namespace detail
         // If current path is empty, it's been deleted
         if(_currentpath.empty())
         {
-#if defined(__linux__)
+#if defined(__linux__) && 0  // not the cause of the Travis failure
           if(h.is_directory())
           {
             /* Docker's mechanism for protecting /proc on Linux is bugged. For files,
@@ -267,7 +267,9 @@ result<void> fs_handle::unlink(deadline d) noexcept
   {
     OUTCOME_TRY(_fetch_inode());
   }
+  fprintf(stderr, "travis debug unlink(): just before containing_directory\n");
   OUTCOME_TRY(auto &&dirh, detail::containing_directory(std::ref(filename), h, *this, d));
+  fprintf(stderr, "travis debug unlink(): just before unlinkat '%s'\n", filename.c_str());
   if(-1 == ::unlinkat(dirh.native_handle().fd, filename.c_str(), h.is_directory() ? AT_REMOVEDIR : 0))
   {
     return posix_error();

@@ -196,7 +196,10 @@ static inline void TestCloneOrCopyFileWhole()
     dest_stat.fill(destfh).value();
     std::cout << "Source file has " << src_stat.st_blocks << " blocks allocated. Destination file has " << dest_stat.st_blocks << " blocks allocated."
               << std::endl;
+#ifndef __APPLE__
+    // Mac OS has a broken extent enumeration API, so we just do straight copies on it
     BOOST_CHECK(abs((long) src_stat.st_blocks - (long) dest_stat.st_blocks) < ((long) src_stat.st_blocks / 8));
+#endif
 
     for(size_t n = 0; n < maximum_extent; n++)
     {
