@@ -150,7 +150,6 @@ namespace algorithm
             return success();
           }
         }
-        fprintf(stderr, "travis debug reduce(): remove of '%s' fails\n", zpath.buffer);
         return posix_error();
       }
       return success();
@@ -241,9 +240,9 @@ namespace algorithm
         {
           return success();
         }
+        return posix_error();
       }
-      fprintf(stderr, "travis debug reduce(): rename of '%s' fails\n", zpath.buffer);
-      return posix_error();
+      return success();
 #endif
     }
     struct reduction_state
@@ -291,7 +290,7 @@ namespace algorithm
         if(r)
         {
           state->items_removed.fetch_add(1, std::memory_order_relaxed);
-          entry = {};  // prevent traversal
+          entry.stat = stat_t(nullptr);  // prevent traversal
         }
         else
         {
@@ -379,11 +378,9 @@ namespace algorithm
     }
     size_t round = 0;
     detail::reduction_state state(topdirh, visitor);
-    fprintf(stderr, "travis debug reduce(): just before first traverse\n");
     OUTCOME_TRY(traverse(topdirh, visitor, threads, &state, force_slow_path));
     auto not_removed = state.directory_open_failed.load(std::memory_order_relaxed) + state.failed_to_remove.load(std::memory_order_relaxed) +
                        state.failed_to_rename.load(std::memory_order_relaxed);
-    fprintf(stderr, "travis debug reduce(): just after first traverse, not_removed=%u\n", (unsigned) not_removed);
     OUTCOME_TRY(visitor->reduction_round(&state, round++, state.items_removed.load(std::memory_order_relaxed), not_removed));
     while(not_removed > 0)
     {
@@ -393,16 +390,12 @@ namespace algorithm
       OUTCOME_TRY(traverse(topdirh, visitor, (round > 16) ? 1 : threads, &state, force_slow_path));
       not_removed = state.directory_open_failed.load(std::memory_order_relaxed) + state.failed_to_remove.load(std::memory_order_relaxed) +
                     state.failed_to_rename.load(std::memory_order_relaxed);
-      fprintf(stderr, "travis debug reduce(): round %u, not_removed=%u\n", (unsigned) round, (unsigned) not_removed);
       OUTCOME_TRY(visitor->reduction_round(&state, round++, state.items_removed.load(std::memory_order_relaxed), not_removed));
     }
-    fprintf(stderr, "travis debug reduce(): just before topdirh unlink\n");
     OUTCOME_TRY(topdirh.unlink());
-    fprintf(stderr, "travis debug reduce(): just after topdirh unlink\n");
     state.items_removed.fetch_add(1, std::memory_order_relaxed);
     // If we successfully unlinked it, move the directory in here, and close it.
     auto _topdirh(std::move(topdirh));
-    fprintf(stderr, "travis debug reduce(): just before topdirh close\n");
     OUTCOME_TRY(_topdirh.close());
     return state.items_removed;
   }

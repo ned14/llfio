@@ -45,8 +45,8 @@ static inline void TestProcessHandle(bool with_redirection)
            if(sv.size() >= 512)
              return false;
            using _string_view = std::decay_t<decltype(sv)>;
-           _string_view a((const _string_view::value_type *) "JENKINS_NEDPROD_PASSWORD");
-           _string_view b((const _string_view::value_type *) L"JENKINS_NEDPROD_PASSWORD");
+           _string_view a((const typename _string_view::value_type *) "JENKINS_NEDPROD_PASSWORD");
+           _string_view b((const typename _string_view::value_type *) L"JENKINS_NEDPROD_PASSWORD");
            return (sv.npos == sv.find(a)) && (sv.npos == sv.find(b));
          }))
       {
