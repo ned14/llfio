@@ -28,37 +28,43 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../test_kernel_decl.hpp"
 
-static inline void TestProcessHandle(bool with_redirection) {
+static inline void TestProcessHandle(bool with_redirection)
+{
   namespace llfio = LLFIO_V2_NAMESPACE;
   std::vector<llfio::process_handle> children;
   auto &self = llfio::process_handle::current();
   auto myexepath = self.current_path().value();
   std::cout << "My process executable's path is " << myexepath << std::endl;
   auto myenv = self.environment();
-  fprintf(stderr, "appveyor debug environment(): just after environment, it returned %p\n", myenv.get());
   std::cout << "My process environment contains:";
   if(myenv)
   {
     for(auto &i : *myenv)
     {
-      visit(i, [](auto sv) { fwprintf(stderr, L"appveyor debug environment(): about to cout '%s'\n", (wchar_t *) sv.data()); });
-      std::cout << "\n  " << i;
+      if(visit(i, [](auto sv) -> bool {
+           if(sv.size() >= 512)
+             return false;
+           using _string_view = std::decay_t<decltype(sv)>;
+           _string_view a((const _string_view::value_type *) "JENKINS_NEDPROD_PASSWORD");
+           _string_view b((const _string_view::value_type *) L"JENKINS_NEDPROD_PASSWORD");
+           return (sv.npos == sv.find(a)) && (sv.npos == sv.find(b));
+         }))
+      {
+        std::cout << "\n  " << i;
+      }
     }
   }
-  fprintf(stderr, "appveyor debug environment(): just after iteration\n");
   std::cout << "\n" << std::endl;
-  fprintf(stderr, "appveyor debug environment(): just before launch process setup\n");
   llfio::process_handle::flag flags = llfio::process_handle::flag::wait_on_close;
   if(!with_redirection)
   {
     flags |= llfio::process_handle::flag::no_redirect;
   }
-  for(size_t n=0; n<4; n++)
+  for(size_t n = 0; n < 4; n++)
   {
     char buffer[64];
     sprintf(buffer, "--testchild,%u", (unsigned) n);
     llfio::path_view_component arg(buffer);
-    fprintf(stderr, "appveyor debug environment(): just before launch process %u\n", (unsigned) n);
     children.push_back(llfio::process_handle::launch_process(myexepath, {&arg, 1}, flags).value());
   }
   if(with_redirection)
@@ -80,8 +86,10 @@ static inline void TestProcessHandle(bool with_redirection) {
   }
 }
 
-KERNELTEST_TEST_KERNEL(integration, llfio, process_handle, no_redirect, "Tests that llfio::process_handle without redirection works as expected", TestProcessHandle(false))
-KERNELTEST_TEST_KERNEL(integration, llfio, process_handle, redirect, "Tests that llfio::process_handle with redirection works as expected", TestProcessHandle(true))
+KERNELTEST_TEST_KERNEL(integration, llfio, process_handle, no_redirect, "Tests that llfio::process_handle without redirection works as expected",
+                       TestProcessHandle(false))
+KERNELTEST_TEST_KERNEL(integration, llfio, process_handle, redirect, "Tests that llfio::process_handle with redirection works as expected",
+                       TestProcessHandle(true))
 
 int main(int argc, char *argv[])
 {

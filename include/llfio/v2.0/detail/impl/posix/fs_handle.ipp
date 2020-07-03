@@ -267,9 +267,7 @@ result<void> fs_handle::unlink(deadline d) noexcept
   {
     OUTCOME_TRY(_fetch_inode());
   }
-  fprintf(stderr, "travis debug unlink(): just before containing_directory\n");
   OUTCOME_TRY(auto &&dirh, detail::containing_directory(std::ref(filename), h, *this, d));
-  fprintf(stderr, "travis debug unlink(): just before unlinkat '%s'\n", filename.c_str());
   if(-1 == ::unlinkat(dirh.native_handle().fd, filename.c_str(), h.is_directory() ? AT_REMOVEDIR : 0))
   {
     return posix_error();

@@ -150,6 +150,7 @@ namespace algorithm
             return success();
           }
         }
+        fprintf(stderr, "travis debug reduce(): remove of '%s' fails\n", zpath.buffer);
         return posix_error();
       }
       return success();
@@ -241,6 +242,7 @@ namespace algorithm
           return success();
         }
       }
+      fprintf(stderr, "travis debug reduce(): rename of '%s' fails\n", zpath.buffer);
       return posix_error();
 #endif
     }
@@ -391,6 +393,7 @@ namespace algorithm
       OUTCOME_TRY(traverse(topdirh, visitor, (round > 16) ? 1 : threads, &state, force_slow_path));
       not_removed = state.directory_open_failed.load(std::memory_order_relaxed) + state.failed_to_remove.load(std::memory_order_relaxed) +
                     state.failed_to_rename.load(std::memory_order_relaxed);
+      fprintf(stderr, "travis debug reduce(): round %u, not_removed=%u\n", (unsigned) round, (unsigned) not_removed);
       OUTCOME_TRY(visitor->reduction_round(&state, round++, state.items_removed.load(std::memory_order_relaxed), not_removed));
     }
     fprintf(stderr, "travis debug reduce(): just before topdirh unlink\n");

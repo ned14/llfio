@@ -16,7 +16,7 @@ addons:
 #    sources:
 #    - sourceline: "ppa:ubuntu-toolchain-r/test"
     packages:
-    - g++-8
+    - g++
     - clang
     - g++-arm-linux-gnueabihf
     - python3
@@ -35,8 +35,8 @@ env:
  
 matrix:
   include:
-  - name: "g++ 8.4 x64 cmake tests (error_code)"
-    compiler: g++-8
+  - name: "g++ 7.5 x64 cmake tests (error_code)"
+    compiler: g++
     os: linux
     env: NAME=x64_EC_tests
   - name: "clang++ 7.0 x64 cmake tests (error_code)"
@@ -54,8 +54,8 @@ matrix:
     os: osx
     osx_image: xcode11.6
     env: NAME=x64_EC_tests
-  - name: "g++ 8.4 x64 cmake tests (status_code)"
-    compiler: g++-8
+  - name: "g++ 7.5 x64 cmake tests (status_code)"
+    compiler: g++
     os: linux
     env:
      - NAME=x64_SC_tests
@@ -93,8 +93,8 @@ matrix:
     compiler: clang++
     os: linux
     env: NAME=Documentation
-  - name: "g++ 8.4 x64 Programs (error_code)"
-    compiler: g++-8
+  - name: "g++ 7.5 x64 Programs (error_code)"
+    compiler: g++
     os: linux
     env: NAME=x64_EC_programs
   - name: "clang++ 7.0 x64 Programs (error_code)"
@@ -120,8 +120,8 @@ matrix:
 #    env:
 #     - NAME=x64_SC_programs
 #     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
-  - name: "g++ 8.4 Installability (error_code)"
-    compiler: g++-8
+  - name: "g++ 7.5 Installability (error_code)"
+    compiler: g++
     os: linux
     env: NAME=x64_EC_install
   - name: "clang++ 7.0 Installability (error_code)"
@@ -139,8 +139,8 @@ matrix:
     os: osx
     osx_image: xcode11.6
     env: NAME=x64_EC_install
-  - name: "g++ 8.4 Installability (status_code)"
-    compiler: g++-8
+  - name: "g++ 7.5 Installability (status_code)"
+    compiler: g++
     os: linux
     env:
      - NAME=x64_SC_install
@@ -166,9 +166,6 @@ matrix:
 #     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
     
 before_install:
- - if [ "$TRAVIS_COMPILER" = "g++-8" ]; then
-     export CXX=g++-8;
-   fi
  - if [ "$TRAVIS_COMPILER" = "clang++-10" ]; then
      wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -;
      echo "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-10 main" >> /etc/apt/sources.list;
@@ -236,7 +233,7 @@ script:
 after_success:
 # - bash -x ./update_coveralls.sh `pwd`
 #  - NEWNAME=llfio-v2.0-binaries-linux64-$(date +%Y%m%d%H%M%S).tgz
-  - if [ "$NAME" = "linux_g++-8_x64_EC_tests" ]; then   
+  - if [ "$NAME" = "linux_g++_x64_EC_tests" ]; then   
       NEWNAME=llfio-v2.0-binaries-linux64-$TRAVIS_COMMIT.tgz;
       mv llfio-v2.0-binaries-linux-x64.tgz $NEWNAME;
       curl -T $NEWNAME -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD https://dedi5.nedprod.com/static/files/upload/;
