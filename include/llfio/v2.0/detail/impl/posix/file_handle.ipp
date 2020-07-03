@@ -563,7 +563,11 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
     todo.reserve(8);
     // Firstly fill todo with the list of allocated and non-allocated extents
     {
-#if defined(SEEK_DATA)
+#if defined(SEEK_DATA) && !defined(__APPLE__)
+      /* Apple's SEEK_HOLE implementation is basically unusable. I discovered this the
+      hard way :). There is lots of useful detail as to why at
+      https://lists.gnu.org/archive/html/bug-gnulib/2018-09/msg00054.html
+      */
       extent_type start = 0, end = 0;
       for(;;)
       {
@@ -572,7 +576,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
 #else
         start = lseek(_v.fd, end, SEEK_DATA);
 #endif
-        //std::cout << "SEEK_DATA from " << end << " finds " << start << std::endl;
+        // std::cout << "SEEK_DATA from " << end << " finds " << start << std::endl;
         if(static_cast<extent_type>(-1) == start)
         {
           if(ENXIO == errno)
@@ -591,7 +595,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
         {
           break;  // done
         }
-        //std::cout << "There are deallocated extents between " << end << " " << (start - end) << " bytes" << std::endl;
+        // std::cout << "There are deallocated extents between " << end << " " << (start - end) << " bytes" << std::endl;
         // hole goes from end to start. end is inclusive, start is exclusive.
         if((end <= extent.offset && start >= extent.offset + extent.length) || (end >= extent.offset && end < extent.offset + extent.length) ||
            (start > extent.offset && start <= extent.offset + extent.length))
@@ -609,7 +613,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
 #else
         end = lseek(_v.fd, start, SEEK_HOLE);
 #endif
-        //std::cout << "SEEK_HOLE from " << start << " finds " << end << std::endl;
+        // std::cout << "SEEK_HOLE from " << start << " finds " << end << std::endl;
         if(static_cast<extent_type>(-1) == end)
         {
           if(ENXIO == errno)
@@ -624,7 +628,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
             break;
           }
         }
-        //std::cout << "There are allocated extents between " << start << " " << (end - start) << " bytes" << std::endl;
+        // std::cout << "There are allocated extents between " << start << " " << (end - start) << " bytes" << std::endl;
         // allocated goes from start to end. start is inclusive, end is exclusive.
         if((start <= extent.offset && end >= extent.offset + extent.length) || (start >= extent.offset && start < extent.offset + extent.length) ||
            (end > extent.offset && end <= extent.offset + extent.length))
