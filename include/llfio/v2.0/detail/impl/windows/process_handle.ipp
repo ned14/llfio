@@ -128,6 +128,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC std::unique_ptr<span<path_view_component>, proce
       out = {array, arraye};
     }
   }
+  fprintf(stderr, "appveyor debug environment(): just before returning unique_ptr\n");
   return std::unique_ptr<span<path_view_component>, process_handle::_byte_array_deleter>((span<path_view_component> *) ret.release());
 }
 

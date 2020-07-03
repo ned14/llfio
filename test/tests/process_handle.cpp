@@ -35,6 +35,7 @@ static inline void TestProcessHandle(bool with_redirection) {
   auto myexepath = self.current_path().value();
   std::cout << "My process executable's path is " << myexepath << std::endl;
   auto myenv = self.environment();
+  fprintf(stderr, "appveyor debug environment(): just after environment, it returned %p\n", myenv.get());
   std::cout << "My process environment contains:";
   if(myenv)
   {
