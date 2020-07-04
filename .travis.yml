@@ -185,13 +185,11 @@ before_install:
 script:
  -
    if [[ "$NAME" == "x64_"*"_tests" ]]; then
-     export NAME=$TRAVIS_OSNAME_$TRAVIS_COMPILER_$NAME;
      export ASAN_OPTIONS=detect_leaks=0;
      ctest -S .ci.cmake -VV --timeout 300 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS ;
    fi
  -
    if [[ "$NAME" == "ARM32_"*"_build" ]]; then
-     export NAME=$TRAVIS_OSNAME_$TRAVIS_COMPILER_$NAME;
      ctest -S .ci.cmake -V --timeout 300 -DCTEST_DISABLE_TESTING=1 '-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-arm.cmake';
    fi
  -
@@ -231,17 +229,17 @@ script:
    fi
  
 after_success:
-  - echo $TRAVIS_OSNAME
+  - echo $TRAVIS_OS_NAME
   - echo $TRAVIS_COMPILER
   - echo $NAME
 # - bash -x ./update_coveralls.sh `pwd`
 #  - NEWNAME=llfio-v2-binaries-linux64-$(date +%Y%m%d%H%M%S).tgz
-  - if [ "$TRAVIS_OSNAME" = "linux" ] && [ "$TRAVIS_COMPILER" = "g++" ] && [ "$NAME" = "x64_EC_tests" ]; then   
+  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$TRAVIS_COMPILER" = "g++" ] && [ "$NAME" = "x64_EC_tests" ]; then   
       NEWNAME=llfio-v2-binaries-linux64-$TRAVIS_COMMIT.tgz;
       mv llfio-v2.0-binaries-linux-x64.tgz $NEWNAME;
       curl -T $NEWNAME -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD https://dedi5.nedprod.com/static/files/upload/;
     fi
-  - if [ "$TRAVIS_OSNAME" = "osx" ] && [ "$NAME" = "x64_EC_tests" ]; then   
+  - if [ "$TRAVIS_OS_NAME" = "osx" ] && [ "$NAME" = "x64_EC_tests" ]; then   
       NEWNAME=llfio-v2-binaries-darwin64-$TRAVIS_COMMIT.tgz;
       mv llfio-v2.0-binaries-darwin-x64.tgz $NEWNAME;
       curl -T $NEWNAME -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD https://dedi5.nedprod.com/static/files/upload/;
