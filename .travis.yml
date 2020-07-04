@@ -231,16 +231,17 @@ script:
    fi
  
 after_success:
-  - export NAME=$TRAVIS_OSNAME_$TRAVIS_COMPILER_$NAME
+  - echo $TRAVIS_OSNAME
+  - echo $TRAVIS_COMPILER
   - echo $NAME
 # - bash -x ./update_coveralls.sh `pwd`
 #  - NEWNAME=llfio-v2-binaries-linux64-$(date +%Y%m%d%H%M%S).tgz
-  - if [ "$NAME" = "linux_g++_x64_EC_tests" ]; then   
+  - if [ "$TRAVIS_OSNAME" = "linux" ] && [ "$TRAVIS_COMPILER" = "g++" ] && [ "$NAME" = "x64_EC_tests" ]; then   
       NEWNAME=llfio-v2-binaries-linux64-$TRAVIS_COMMIT.tgz;
       mv llfio-v2.0-binaries-linux-x64.tgz $NEWNAME;
       curl -T $NEWNAME -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD https://dedi5.nedprod.com/static/files/upload/;
     fi
-  - if [ "$NAME" = "osx_clang++_x64_EC_tests" ]; then   
+  - if [ "$TRAVIS_OSNAME" = "osx" ] && [ "$NAME" = "x64_EC_tests" ]; then   
       NEWNAME=llfio-v2-binaries-darwin64-$TRAVIS_COMMIT.tgz;
       mv llfio-v2.0-binaries-darwin-x64.tgz $NEWNAME;
       curl -T $NEWNAME -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD https://dedi5.nedprod.com/static/files/upload/;
