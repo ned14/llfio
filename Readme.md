@@ -3,10 +3,10 @@ This is the post-peer-review LLFIO v2 rewrite. You can view its documentation at
 <b>master branch test status</b> Linux & OS X: [![Build Status](https://travis-ci.org/ned14/llfio.svg?branch=master)](https://travis-ci.org/ned14/llfio) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/dfctqfap3kpx89om/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/llfio/branch/master) <b>CMake dashboard</b>: http://my.cdash.org/index.php?project=Boost.AFIO
 
 Tarballs of source and prebuilt binaries for Linux x64, MacOS x64 and Windows x64:
-- https://dedi5.nedprod.com/static/files/llfio-v2.0-source-latest.tar.xz
-- https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-linux64-latest.tgz (Ubuntu 18.04 LTS x64)
-- https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-darwin64-latest.tgz (Mac OS 10.15)
-- https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-win64-latest.zip (VS2017 x64)
+- https://dedi5.nedprod.com/static/files/llfio-v2-source-latest.tar.xz
+- https://dedi5.nedprod.com/static/files/llfio-v2-binaries-linux64-latest.tgz (Ubuntu 18.04 LTS x64)
+- https://dedi5.nedprod.com/static/files/llfio-v2-binaries-darwin64-latest.tgz (Mac OS 10.15)
+- https://dedi5.nedprod.com/static/files/llfio-v2-binaries-win64-latest.zip (VS2017 x64)
 
 USAGE AND CONFIGURATION INSTRUCTIONS CAN BE FOUND AT https://ned14.github.io/llfio/
 
@@ -129,7 +129,7 @@ compress the additional 4Kb very quickly using the dictionary from the 1Mb.
     - LATER: Use guard pages to toggle dirty flag per initial COW
 - [ ] Store in EA or a file called .spookyhashes or .spookyhash the 128 bit hash of
 a file and the time it was calculated. This can save lots of hashing work later.
-- [ ] Correct directory hierarchy delete
+- [x] Correct directory hierarchy delete
   i.e.:
   - Delete files first tips to trunk, retrying for some given timeout. If fail to
   immediately delete, rename to base directory under a long random hex name, try

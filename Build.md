@@ -2,11 +2,10 @@
 
 These compilers and OSs are regularly tested:
 
-- [GCC](https://gcc.gnu.org/) 7.4 (Linux 4.x x64)
-- [Clang](https://clang.llvm.org/) 4.0 (Linux 4.x x64)
-- Clang 5.0 (macOS 10.12 x64)
-- Visual Studio 2017 (Windows 10 x64). Note that LLFIO does not currently
-compile with `/permissive-` due a bug in MSVC.
+- [GCC](https://gcc.gnu.org/) 7.5 (Linux 4.x x64)
+- [Clang](https://clang.llvm.org/) 7 (Linux 4.x x64)
+- Xcode 11.6 (macOS 10.15 x64)
+- Visual Studio 2017 (Windows 10 x64).
 
 Other compilers, architectures and OSs may work, but are not tested regularly.
 You will need a working [Filesystem TS](https://en.cppreference.com/w/cpp/experimental/fs)
@@ -14,7 +13,7 @@ implementation in your STL, and at least C++ 14.
 
 ## Get a copy of the source
 
-Download [this archive](https://dedi5.nedprod.com/static/files/llfio-v2.0-source-latest.tar.xz)
+Download [this archive](https://dedi5.nedprod.com/static/files/llfio-v2-source-latest.tar.xz)
 or clone from the GitHub repository:
 
 ~~~
@@ -73,8 +72,9 @@ Don't use header only LLFIO on Windows (see below).
 It is faster to build programs using LLFIO if you don't use a header only build.
 In this situation, define `LLFIO_HEADERS_ONLY=0`, and choose one of `LLFIO_DYN_LINK` or `LLFIO_STATIC_LINK` depending on whether you are using the prebuilt shared or static libraries respectively.
 
-- https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-linux64-latest.tgz
-- https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-win64-latest.zip
+- https://dedi5.nedprod.com/static/files/llfio-v2-binaries-darwin-latest.zip
+- https://dedi5.nedprod.com/static/files/llfio-v2-binaries-linux64-latest.tgz
+- https://dedi5.nedprod.com/static/files/llfio-v2-binaries-win64-latest.zip
 
 ## Build static libraries from source
 
