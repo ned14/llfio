@@ -91,8 +91,9 @@ else()
       COMMAND cp -a include llfio/
       COMMAND cp -a Readme.md llfio/
       COMMAND cp -a release_notes.md llfio/
-      COMMAND cp -a --parents prebuilt/lib/libllfio_sl-2.0-Darwin-x86_64-Release.a llfio/
-      COMMAND cp -a --parents prebuilt/lib/libllfio_dl-2.0-Darwin-x86_64-Release.dylib llfio/
+      COMMAND mkdir -p llfio/prebuilt/lib
+      COMMAND cp -a prebuilt/lib/libllfio_sl-2.0-Darwin-x86_64-Release.a llfio/prebuilt/lib/
+      COMMAND cp -a prebuilt/lib/libllfio_dl-2.0-Darwin-x86_64-Release.dylib llfio/prebuilt/lib/
       COMMAND "${CMAKE_COMMAND}" -E tar cfz llfio-v2.0-binaries-darwin-x64.tgz llfio
     )
     get_filename_component(toupload llfio-v2.0-binaries-darwin-x64.tgz ABSOLUTE)
