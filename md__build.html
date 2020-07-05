@@ -86,14 +86,14 @@ $(document).ready(function(){initNavTree('md__build.html','');});
 <div class="contents">
 <div class="textblock"><p>These compilers and OSs are regularly tested:</p>
 <ul>
-<li><a href="https://gcc.gnu.org/">GCC</a> 7.4 (Linux 4.x x64)</li>
-<li><a href="https://clang.llvm.org/">Clang</a> 4.0 (Linux 4.x x64)</li>
-<li>Clang 5.0 (macOS 10.12 x64)</li>
-<li>Visual Studio 2017 (Windows 10 x64). Note that LLFIO does not currently compile with <code>/permissive-</code> due a bug in MSVC.</li>
+<li><a href="https://gcc.gnu.org/">GCC</a> 7.5 (Linux 4.x x64)</li>
+<li><a href="https://clang.llvm.org/">Clang</a> 7 (Linux 4.x x64)</li>
+<li>Xcode 11.6 (macOS 10.15 x64)</li>
+<li>Visual Studio 2017 (Windows 10 x64).</li>
 </ul>
 <p>Other compilers, architectures and OSs may work, but are not tested regularly. You will need a working <a href="https://en.cppreference.com/w/cpp/experimental/fs">Filesystem TS</a> implementation in your STL, and at least C++ 14.</p>
 <h2>Get a copy of the source</h2>
-<p>Download <a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-source-latest.tar.xz">this archive</a> or clone from the GitHub repository:</p>
+<p>Download <a href="https://dedi5.nedprod.com/static/files/llfio-v2-source-latest.tar.xz">this archive</a> or clone from the GitHub repository:</p>
 <div class="fragment"><div class="line">git config --system core.longpaths true</div><div class="line">git clone --recursive https://github.com/ned14/llfio.git</div><div class="line">cd llfio</div></div><!-- fragment --><p>The first command is relevant so deeply nested paths on Windows will work when cloning the repository and submodules. It may require elevated privileges, but you can also use <code>git config --global core.longpaths true</code> instead.</p>
 <h3>If you already cloned before reading this</h3>
 <p>If you had already cloned <em>this</em> repository, but didn't use the <code>--recursive</code> switch, you can simply run the following command from inside the work tree:</p>
@@ -106,8 +106,9 @@ $(document).ready(function(){initNavTree('md__build.html','');});
 <h2>Prebuilt binaries</h2>
 <p>It is faster to build programs using LLFIO if you don't use a header only build. In this situation, define <code>LLFIO_HEADERS_ONLY=0</code>, and choose one of <code>LLFIO_DYN_LINK</code> or <code>LLFIO_STATIC_LINK</code> depending on whether you are using the prebuilt shared or static libraries respectively.</p>
 <ul>
-<li><a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-linux64-latest.tgz">https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-linux64-latest.tgz</a></li>
-<li><a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-win64-latest.zip">https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-win64-latest.zip</a></li>
+<li><a href="https://dedi5.nedprod.com/static/files/llfio-v2-binaries-darwin-latest.zip">https://dedi5.nedprod.com/static/files/llfio-v2-binaries-darwin-latest.zip</a></li>
+<li><a href="https://dedi5.nedprod.com/static/files/llfio-v2-binaries-linux64-latest.tgz">https://dedi5.nedprod.com/static/files/llfio-v2-binaries-linux64-latest.tgz</a></li>
+<li><a href="https://dedi5.nedprod.com/static/files/llfio-v2-binaries-win64-latest.zip">https://dedi5.nedprod.com/static/files/llfio-v2-binaries-win64-latest.zip</a></li>
 </ul>
 <h2>Build static libraries from source</h2>
 <p>You will need <a href="https://cmake.org/">CMake</a> installed, v3.5 or better. It is important to do an out-of-tree build, because the build will otherwise fail.</p>

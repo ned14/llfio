@@ -94,11 +94,11 @@ $(document).ready(function(){initNavTree('index.html','');});
   </td><td align="center"><a href="https://ci.appveyor.com/project/ned14/llfio/branch/master">Windows CI:</a><div class="image">
 <img src="https://ci.appveyor.com/api/projects/status/dfctqfap3kpx89om/branch/master?svg=true"/>
 </div>
-  </td><td align="center"><a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-source-latest.tar.xz">Latest stable</a><br />
-<a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-source-latest.tar.xz">sources</a>  </td><td align="center"><a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-linux64-latest.tgz">Latest stable</a><br />
-<a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-linux64-latest.tgz">Ubuntu 18.04 x64 prebuilt</a>  </td><td align="center"><a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-darwin-latest.tgz">Latest stable</a><br />
-<a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-darwin64-latest.tgz">OS X x64 prebuilt</a>  </td><td align="center"><a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-win64-latest.zip">Latest stable</a><br />
-<a href="https://dedi5.nedprod.com/static/files/llfio-v2.0-binaries-win64-latest.zip">VS2017 x64 prebuilt</a>   </td></tr>
+  </td><td align="center"><a href="https://dedi5.nedprod.com/static/files/llfio-v2-source-latest.tar.xz">Latest stable</a><br />
+<a href="https://dedi5.nedprod.com/static/files/llfio-v2-source-latest.tar.xz">sources</a>  </td><td align="center"><a href="https://dedi5.nedprod.com/static/files/llfio-v2-binaries-linux64-latest.tgz">Latest stable</a><br />
+<a href="https://dedi5.nedprod.com/static/files/llfio-v2-binaries-linux64-latest.tgz">Ubuntu 18.04 x64 prebuilt</a>  </td><td align="center"><a href="https://dedi5.nedprod.com/static/files/llfio-v2-binaries-darwin-latest.tgz">Latest stable</a><br />
+<a href="https://dedi5.nedprod.com/static/files/llfio-v2-binaries-darwin64-latest.tgz">OS X x64 prebuilt</a>  </td><td align="center"><a href="https://dedi5.nedprod.com/static/files/llfio-v2-binaries-win64-latest.zip">Latest stable</a><br />
+<a href="https://dedi5.nedprod.com/static/files/llfio-v2-binaries-win64-latest.zip">VS2017 x64 prebuilt</a>   </td></tr>
 </table>
 </center><p>Herein lies my proposed zero whole machine memory copy async file i/o and filesystem library for the C++ standard, intended for storage devices with ~1 microsecond 4Kb transfer latencies and those supporting Storage Class Memory (SCM)/Direct Access Storage (DAX). Its i/o overhead, including syscall overhead, has been benchmarked to 100 nanoseconds on Linux which corresponds to a theoretical maximum of 10M IOPS @ QD1, approx 40Gb/sec per thread. It has particularly strong support for writing portable filesystem algorithms which work well with directly mapped non-volatile storage such as Intel Optane.</p>
 <p>It is a complete rewrite after a Boost peer review in August 2015. Its github source code repository lives at <a href="https://github.com/ned14/llfio">https://github.com/ned14/llfio</a>.</p>
