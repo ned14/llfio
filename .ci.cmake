@@ -84,7 +84,7 @@ else()
     )
     get_filename_component(toupload llfio-v2.0-binaries-linux-armhf.tgz ABSOLUTE)
   endif()
-  if(EXISTS "prebuilt/lib/libllfio_dl-2.0-Darwin-x86_64-Release.so")
+  if(EXISTS "prebuilt/lib/libllfio_dl-2.0-Darwin-x86_64-Release.dylib")
     checked_execute_process("Tarring up binaries"
       COMMAND mkdir llfio
       COMMAND cp -a doc llfio/
