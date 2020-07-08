@@ -45,7 +45,10 @@ namespace algorithm
   the original to the clone/copy as possible.
   \param force_copy_now Parameter to pass to `file_handle::clone_extents()` to force
   extents to be copied now, not copy-on-write lazily later.
-  \param creation How to create the destination file handle.
+  \param creation How to create the destination file handle. NOTE that if this
+  is NOT `always_new`, if the destination has identical maximum extent and
+  timestamps (and permissions on POSIX) to the source, it is NOT copied, and
+  zero is returned.
   \param d Deadline by which to complete the operation.
 
   Firstly, a `file_handle` is constructed at the destination using `creation`,
@@ -76,6 +79,7 @@ namespace algorithm
                                                                               bool preserve_timestamps = true, bool force_copy_now = false,
                                                                               file_handle::creation creation = file_handle::creation::always_new,
                                                                               deadline d = {}) noexcept;
+
 #if 0
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -98,17 +102,24 @@ namespace algorithm
       clone,   //!< File content is to be extents cloned when possible
       copy,    //!< File content is to copied now into its destination
       link,    //!< File content is to be hard linked into its destination
-      symlink  //! File content is to be symlinked into its destination
-    } op;
+      symlink  //!< File content is to be symlinked into its destination
+    } op{op_t::clone};
+    bool always_create_new_files{false};
     bool follow_symlinks{false};
     std::chrono::steady_clock::duration timeout{std::chrono::seconds(10)};
     std::chrono::steady_clock::time_point begin;
 
+    //! Default constructor
+    clone_copy_link_symlink_visitor() = default;
     //! Constructs an instance with the default timeout of ten seconds.
-    constexpr clone_copy_link_symlink_visitor(op_t _op, bool _follow_symlinks = false) : op(_op), follow_symlinks(_follow_symlinks) {}
+    constexpr clone_copy_link_symlink_visitor(op_t _op, bool _always_create_new_files = false, bool _follow_symlinks = false) : op(_op), always_create_new_files(_always_create_new_files), follow_symlinks(_follow_symlinks) {}
     //! Constructs an instance with the specified timeout.
-    constexpr explicit clone_copy_link_symlink_visitor(op_t _op, std::chrono::steady_clock::duration _timeout, bool _follow_symlinks = false)
-        : op(_op), follow_symlinks(_follow_symlinks), timeout(_timeout)
+    constexpr explicit clone_copy_link_symlink_visitor(op_t _op, std::chrono::steady_clock::duration _timeout, bool _always_create_new_files = false,
+                                                       bool _follow_symlinks = false)
+        : op(_op)
+        , always_create_new_files(_always_create_new_files)
+        , follow_symlinks(_follow_symlinks)
+        , timeout(_timeout)
     {
     }
 
@@ -149,9 +160,17 @@ namespace algorithm
   would exceed the free disc space on the destination volume, the destination is removed
   and an error code is returned comparing equal to `errc::no_space_on_device`.
 
-  Otherwise, for every file in the source, its contents are cloned with `emulate_if_unsupported = true`
+  Otherwise, for every file in the source, its contents are cloned with `clone_or_copy()`
   into an equivalent file in the destination. This means that the contents are either
-  cloned or copied to the best extent of your filesystems and kernel.
+  cloned or copied to the best extent of your filesystems and kernel. If failure occurs
+  during this stage, the destination is left as-is in a partially copied state.
+
+  Note the default visitor parameters: Extent cloning is preferred, we do nothing
+  if destination file maximum extent and timestamps are identical to source, we don't
+  follow symlinks, instead cloning the symlink itself.
+
+  Note also that files or directories in the destination which are not in the source
+  are left untouched.
 
   You should review the documentation for `algorithm::traverse()`, as this algorithm is
   entirely implemented using that algorithm.
