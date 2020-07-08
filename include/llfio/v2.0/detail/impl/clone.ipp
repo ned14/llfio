@@ -36,17 +36,34 @@ namespace algorithm
     filesystem::path destleaf_;
     if(destleaf.empty())
     {
-      OUTCOME_TRY(auto &&_, src.current_path());
-      if(_.empty())
+      OUTCOME_TRY(destleaf_, src.current_path());
+      if(destleaf_.empty())
       {
         // Source has been deleted, so can't infer leafname
         return errc::no_such_file_or_directory;
       }
-      destleaf_ = std::move(_);
       destleaf = destleaf_;
     }
     stat_t stat(nullptr);
     OUTCOME_TRY(stat.fill(src));
+    if(creation != file_handle::creation::always_new)
+    {
+      auto r = file_handle::file(destdir, destleaf, file_handle::mode::attr_read, file_handle::creation::open_existing);
+      if(r)
+      {
+        stat_t deststat(nullptr);
+        OUTCOME_TRY(deststat.fill(r.value()));
+        if((stat.st_type == deststat.st_type) && (stat.st_mtim == deststat.st_mtim) && (stat.st_ctim == deststat.st_ctim) &&
+           (stat.st_birthtim == deststat.st_birthtim) && (stat.st_size == deststat.st_size)
+#ifndef _WIN32
+           && (stat.st_perms == deststat.st_perms) && (stat.st_uid == deststat.st_uid) && (stat.st_gid == deststat.st_gid) && (stat.st_rdev == deststat.st_rdev)
+#endif
+        )
+        {
+          return 0;  // nothing copied
+        }
+      }
+    }
     OUTCOME_TRY(auto dest, file_handle::file(destdir, destleaf, file_handle::mode::write, creation, src.kernel_caching()));
     bool failed = true;
     auto undest = make_scope_exit([&]() noexcept {
@@ -76,7 +93,7 @@ namespace algorithm
     {
       return errc::no_space_on_device;
     }
-    OUTCOME_TRY(auto &&copied, src.clone_extents_to(dest, d, force_copy_now, true));
+    OUTCOME_TRY(auto copied, src.clone_extents_to(dest, d, force_copy_now, true));
     failed = false;
     return copied.length;
   }
