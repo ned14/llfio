@@ -321,7 +321,7 @@ template&lt;class T , class... Args&gt; </div>
     <tr><td class="paramname">destleaf</td><td>The leafname to use. If empty, use the same leafname as <code>src</code> currently has. </td></tr>
     <tr><td class="paramname">preserve_timestamps</td><td>Use <code>stat_t::stamp()</code> to preserve as much metadata from the original to the clone/copy as possible. </td></tr>
     <tr><td class="paramname">force_copy_now</td><td>Parameter to pass to <code>file_handle::clone_extents()</code> to force extents to be copied now, not copy-on-write lazily later. </td></tr>
-    <tr><td class="paramname">creation</td><td>How to create the destination file handle. </td></tr>
+    <tr><td class="paramname">creation</td><td>How to create the destination file handle. NOTE that if this is NOT <code>always_new</code>, if the destination has identical maximum extent and timestamps (and permissions on POSIX) to the source, it is NOT copied, and zero is returned. </td></tr>
     <tr><td class="paramname">d</td><td>Deadline by which to complete the operation.</td></tr>
   </table>
   </dd>
