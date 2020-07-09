@@ -45,9 +45,10 @@ namespace detail
     return success();
 #endif
   }
-}
+}  // namespace detail
 
-LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> symlink_handle::_create_symlink(const path_handle &dirh, const handle::path_type &filename, path_view target, deadline d, bool atomic_replace) noexcept
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> symlink_handle::_create_symlink(const path_handle &dirh, const handle::path_type &filename, path_view target,
+                                                                             deadline d, bool atomic_replace, bool exists_is_ok) noexcept
 {
   std::chrono::steady_clock::time_point began_steady;
   std::chrono::system_clock::time_point end_utc;
@@ -101,7 +102,8 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> symlink_handle::_create_symlink(con
           return posix_error();
         }
         // std::cerr << "renameat " << dirh.native_handle().fd << " " << randomname << " " << filename << std::endl;
-        if(-1 == ::renameat(dirh.is_valid() ? dirh.native_handle().fd : AT_FDCWD, randomname.c_str(), dirh.is_valid() ? dirh.native_handle().fd : AT_FDCWD, filename.c_str()))
+        if(-1 == ::renameat(dirh.is_valid() ? dirh.native_handle().fd : AT_FDCWD, randomname.c_str(), dirh.is_valid() ? dirh.native_handle().fd : AT_FDCWD,
+                            filename.c_str()))
         {
           return posix_error();
         }
@@ -113,6 +115,10 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> symlink_handle::_create_symlink(con
       // std::cerr << "symlinkat " << zpath.buffer << " " << dirh.native_handle().fd << " " << filename << std::endl;
       if(-1 == ::symlinkat(zpath.buffer, dirh.is_valid() ? dirh.native_handle().fd : AT_FDCWD, filename.c_str()))
       {
+        if(exists_is_ok && EEXIST == errno)
+        {
+          return success();
+        }
         return posix_error();
       }
       return success();
@@ -280,7 +286,9 @@ result<void> symlink_handle::unlink(deadline d) noexcept
 }
 #endif
 
-LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(const path_handle &base, symlink_handle::path_view_type path, symlink_handle::mode _mode, symlink_handle::creation _creation, flag flags) noexcept
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(const path_handle &base, symlink_handle::path_view_type path,
+                                                                               symlink_handle::mode _mode, symlink_handle::creation _creation,
+                                                                               flag flags) noexcept
 {
   result<symlink_handle> ret(symlink_handle(native_handle_type(), 0, 0, flags));
   native_handle_type &nativeh = ret.value()._v;
@@ -295,11 +303,11 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
   nativeh.behaviour &= ~native_handle_type::disposition::nonblocking;
   nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
 #if !LLFIO_SYMLINK_HANDLE_IS_FAKED
-  path_handle dirh;
+  path_handle _dirh_, *dirh = &_dirh_;
   path_type leafname;
 #else
   (void) attribs;
-  path_handle &dirh = ret.value()._dirh;
+  path_handle *dirh = &ret.value()._dirh;
   path_type &leafname = ret.value()._leafname;
 #endif
   int dirhfd = AT_FDCWD;
@@ -312,10 +320,11 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
     {
 #if !LLFIO_SYMLINK_HANDLE_IS_FAKED
       dirhfd = base.native_handle().fd;
+      dirh = const_cast<path_handle *>(&base);
 #else
-      OUTCOME_TRY(auto &&dh, base.clone());
-      dirh = path_handle(std::move(dh));
-      dirhfd = dirh.native_handle().fd;
+      OUTCOME_TRY(auto dh, base.clone());
+      *dirh = path_handle(std::move(dh));
+      dirhfd = dirh->native_handle().fd;
 #endif
     }
     else
@@ -323,9 +332,9 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
     if(!path_parent.empty())
 #endif
     {
-      OUTCOME_TRY(auto &&dh, path_handle::path(base, path_parent.empty() ? "." : path_parent));
-      dirh = std::move(dh);
-      dirhfd = dirh.native_handle().fd;
+      // If faking the symlink, write this directly into the member variable cache
+      OUTCOME_TRY(*dirh, path_handle::path(base, path_parent.empty() ? "." : path_parent));
+      dirhfd = dirh->native_handle().fd;
     }
   }
   catch(...)
@@ -350,19 +359,16 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
   case creation::always_new:
   {
     // Create an empty symlink, ignoring any file exists errors, unless only_if_not_exist
-    auto r = ret.value()._create_symlink(dirh, leafname,
+    auto r = ret.value()._create_symlink(*dirh, leafname,
 #if defined(__linux__) || defined(__APPLE__)
                                          ".",  // Linux and Mac OS is not POSIX conforming here, and refuses to create empty symlinks
 #else
                                          "",
 #endif
-                                         std::chrono::seconds(10), creation::always_new == _creation);
+                                         std::chrono::seconds(10), creation::always_new == _creation, creation::if_needed == _creation);
     if(!r)
     {
-      if(_creation == creation::only_if_not_exist || r.error() != errc::file_exists)
-      {
-        return std::move(r).error();
-      }
+      return std::move(r).error();
     }
     break;
   }
@@ -448,7 +454,7 @@ result<symlink_handle::const_buffers_type> symlink_handle::write(symlink_handle:
   const path_handle &dirh = _dirh;
   const path_type &filename = _leafname;
 #endif
-  OUTCOME_TRY(_create_symlink(dirh, filename, req.buffers.path(), d, true));
+  OUTCOME_TRY(_create_symlink(dirh, filename, req.buffers.path(), d, true, false));
 #if !LLFIO_SYMLINK_HANDLE_IS_FAKED
   {
     // Current fd now points at the symlink we just atomically replaced, so need to reopen
