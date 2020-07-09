@@ -53,8 +53,7 @@ namespace algorithm
       {
         stat_t deststat(nullptr);
         OUTCOME_TRY(deststat.fill(r.value()));
-        if((stat.st_type == deststat.st_type) && (stat.st_mtim == deststat.st_mtim) && (stat.st_ctim == deststat.st_ctim) &&
-           (stat.st_birthtim == deststat.st_birthtim) && (stat.st_size == deststat.st_size)
+        if((stat.st_type == deststat.st_type) && (stat.st_mtim == deststat.st_mtim) && (stat.st_size == deststat.st_size)
 #ifndef _WIN32
            && (stat.st_perms == deststat.st_perms) && (stat.st_uid == deststat.st_uid) && (stat.st_gid == deststat.st_gid) && (stat.st_rdev == deststat.st_rdev)
 #endif
