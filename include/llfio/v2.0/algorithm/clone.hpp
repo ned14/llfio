@@ -46,8 +46,8 @@ namespace algorithm
   \param force_copy_now Parameter to pass to `file_handle::clone_extents()` to force
   extents to be copied now, not copy-on-write lazily later.
   \param creation How to create the destination file handle. NOTE that if this
-  is NOT `always_new`, if the destination has identical maximum extent and
-  timestamps (and permissions on POSIX) to the source, it is NOT copied, and
+  is NOT `always_new`, if the destination has identical maximum extent and last
+  modified timestamp (and permissions on POSIX) to the source, it is NOT copied, and
   zero is returned.
   \param d Deadline by which to complete the operation.
 

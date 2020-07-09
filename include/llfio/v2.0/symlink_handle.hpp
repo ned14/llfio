@@ -43,9 +43,10 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4251)  // dll interface
 #endif
 
-extern "C" {
+extern "C"
+{
   struct stat;
-} 
+}
 
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
@@ -89,7 +90,8 @@ class LLFIO_DECL symlink_handle : public handle, public fs_handle
 
 #ifndef _WIN32
   friend result<void> detail::stat_from_symlink(struct stat &s, const handle &h) noexcept;
-  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> _create_symlink(const path_handle &dirh, const handle::path_type &filename, path_view target, deadline d, bool atomic_replace) noexcept;
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> _create_symlink(const path_handle &dirh, const handle::path_type &filename, path_view target, deadline d,
+                                                               bool atomic_replace, bool exists_is_ok) noexcept;
 #endif
 
 public:
@@ -139,7 +141,7 @@ public:
     constexpr buffers_type() {}  // NOLINT
 
     /*! Constructor
-    */
+     */
     constexpr buffers_type(path_view link, symlink_type type = symlink_type::symbolic)
         : _link(link)
         , _type(type)
@@ -147,7 +149,11 @@ public:
     }
     ~buffers_type() = default;
     //! Move constructor
-    buffers_type(buffers_type &&o) noexcept : _link(o._link), _type(o._type), _kernel_buffer(std::move(o._kernel_buffer)), _kernel_buffer_size(o._kernel_buffer_size)
+    buffers_type(buffers_type &&o) noexcept
+        : _link(o._link)
+        , _type(o._type)
+        , _kernel_buffer(std::move(o._kernel_buffer))
+        , _kernel_buffer_size(o._kernel_buffer_size)
     {
       o._link = {};
       o._type = symlink_type::none;
@@ -195,7 +201,7 @@ public:
     size_t _kernel_buffer_size{0};
   };
   /*! The constant buffers type used by this handle for writes, which is a single item sequence of `path_view`.
-  */
+   */
   struct const_buffers_type
   {
     //! Type of the pointer to the buffer.
@@ -215,7 +221,9 @@ public:
     }
     ~const_buffers_type() = default;
     //! Move constructor
-    const_buffers_type(const_buffers_type &&o) noexcept : _link(o._link), _type(o._type)
+    const_buffers_type(const_buffers_type &&o) noexcept
+        : _link(o._link)
+        , _type(o._type)
     {
       o._link = {};
       o._type = symlink_type::none;
@@ -275,7 +283,10 @@ public:
     //! Convenience constructor constructing from anything a `span<char>` can construct from
     LLFIO_TEMPLATE(class... Args)
     LLFIO_TREQUIRES(LLFIO_TPRED(std::is_constructible<span<char>, Args...>::value))
-    constexpr io_request(Args &&... args) noexcept : io_request(span<char>(static_cast<Args &&>(args)...)) {}
+    constexpr io_request(Args &&... args) noexcept
+        : io_request(span<char>(static_cast<Args &&>(args)...))
+    {
+    }
   };
   //! Specialisation for writing symlinks
   template <bool ____> struct io_request<const_buffers_type, ____>  // workaround lack of nested specialisation support on older compilers
@@ -291,11 +302,17 @@ public:
     //! Convenience constructor constructing from anything a `path_view` can construct from
     LLFIO_TEMPLATE(class... Args)
     LLFIO_TREQUIRES(LLFIO_TPRED(std::is_constructible<path_view, Args...>::value))
-    constexpr io_request(Args &&... args) noexcept : buffers(path_view(static_cast<Args &&>(args)...)) {}
+    constexpr io_request(Args &&... args) noexcept
+        : buffers(path_view(static_cast<Args &&>(args)...))
+    {
+    }
     //! Convenience constructor constructing a specific type of link from anything a `path_view` can construct from
     LLFIO_TEMPLATE(class... Args)
     LLFIO_TREQUIRES(LLFIO_TPRED(std::is_constructible<path_view, Args...>::value))
-    constexpr io_request(symlink_type type, Args &&... args) noexcept : buffers(path_view(static_cast<Args &&>(args)...), type) {}
+    constexpr io_request(symlink_type type, Args &&... args) noexcept
+        : buffers(path_view(static_cast<Args &&>(args)...), type)
+    {
+    }
   };
 
 //! Default constructor
@@ -318,7 +335,8 @@ public:
 #if !LLFIO_SYMLINK_HANDLE_IS_FAKED
   constexpr
 #endif
-  explicit symlink_handle(handle &&o) noexcept : handle(std::move(o))
+  explicit symlink_handle(handle &&o) noexcept
+      : handle(std::move(o))
   {
   }
   //! Move construction permitted
@@ -420,7 +438,8 @@ public:
   \mallocs None, unless `LLFIO_SYMLINK_HANDLE_IS_FAKED` is on, in which case one.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink(const path_handle &base, path_view_type path, mode _mode = mode::read, creation _creation = creation::open_existing, flag flags = flag::none) noexcept;
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink(const path_handle &base, path_view_type path, mode _mode = mode::read,
+                                                                        creation _creation = creation::open_existing, flag flags = flag::none) noexcept;
   /*! Create a symlink handle creating a uniquely named symlink on a path.
   The symlink is opened exclusively with `creation::only_if_not_exist` so it
   will never collide with nor overwrite any existing symlink.

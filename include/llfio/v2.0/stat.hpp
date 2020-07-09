@@ -85,54 +85,92 @@ struct LLFIO_DECL stat_t  // NOLINT
   int16_t st_gid; /*!< group ID of the file            (POSIX only) */
   dev_t st_rdev;  /*!< id of file if special           (POSIX only) */
 #endif
-  std::chrono::system_clock::time_point st_atim;     /*!< time of last access             (Windows, POSIX) */
-  std::chrono::system_clock::time_point st_mtim;     /*!< time of last data modification  (Windows, POSIX) */
-  std::chrono::system_clock::time_point st_ctim;     /*!< time of last status change      (Windows, POSIX) */
-  handle::extent_type st_size;                       /*!< file size, in bytes             (Windows, POSIX) */
-  handle::extent_type st_allocated;                  /*!< bytes allocated for file        (Windows, POSIX) */
-  handle::extent_type st_blocks;                     /*!< number of blocks allocated      (Windows, POSIX) */
-  uint16_t st_blksize;                               /*!< block size used by this device  (Windows, POSIX) */
-  uint32_t st_flags;                                 /*!< user defined flags for file     (FreeBSD, OS X, zero
-                        otherwise) */
-  uint32_t st_gen;                                   /*!< file generation number          (FreeBSD, OS X, zero
-                        otherwise)*/
-  std::chrono::system_clock::time_point st_birthtim; /*!< time of file creation           (Windows, POSIX) */
+  union
+  {
+    std::chrono::system_clock::time_point st_atim; /*!< time of last access             (Windows, POSIX) */
+  };
+  union
+  {
+    std::chrono::system_clock::time_point st_mtim; /*!< time of last data modification  (Windows, POSIX) */
+  };
+  union
+  {
+    std::chrono::system_clock::time_point st_ctim; /*!< time of last status change      (Windows, POSIX) */
+  };
+  handle::extent_type st_size;      /*!< file size, in bytes             (Windows, POSIX) */
+  handle::extent_type st_allocated; /*!< bytes allocated for file        (Windows, POSIX) */
+  handle::extent_type st_blocks;    /*!< number of blocks allocated      (Windows, POSIX) */
+  uint16_t st_blksize;              /*!< block size used by this device  (Windows, POSIX) */
+  uint32_t st_flags;                /*!< user defined flags for file     (FreeBSD, OS X, zero
+       otherwise) */
+  uint32_t st_gen;                  /*!< file generation number          (FreeBSD, OS X, zero
+       otherwise)*/
+  union
+  {
+    std::chrono::system_clock::time_point st_birthtim; /*!< time of file creation           (Windows, POSIX) */
+  };
+  static_assert(std::is_trivially_destructible<std::chrono::system_clock::time_point>::value,
+                "std::chrono::system_clock::time_point is not trivally destructible!");
 
   unsigned st_sparse : 1;        /*!< if this file is sparse, or this directory capable of sparse files (Windows, POSIX) */
   unsigned st_compressed : 1;    /*!< if this file is compressed, or this directory capable of compressed files (Windows, Linux) */
   unsigned st_reparse_point : 1; /*!< if this file or directory is a reparse point (Windows) */
 
   //! Used to indicate what metadata should be filled in
-  QUICKCPPLIB_BITFIELD_BEGIN(want)
-  {
-    dev = 1 << 0, ino = 1 << 1, type = 1 << 2, perms = 1 << 3, nlink = 1 << 4, uid = 1 << 5, gid = 1 << 6, rdev = 1 << 7, atim = 1 << 8, mtim = 1 << 9, ctim = 1 << 10, size = 1 << 11, allocated = 1 << 12, blocks = 1 << 13, blksize = 1 << 14, flags = 1 << 15, gen = 1 << 16, birthtim = 1 << 17, sparse = 1 << 24,
-    compressed = 1 << 25, reparse_point = 1 << 26, all = static_cast<unsigned>(-1), none = 0
-  }
-  QUICKCPPLIB_BITFIELD_END(want)
+  QUICKCPPLIB_BITFIELD_BEGIN(want){dev = 1 << 0,
+                                   ino = 1 << 1,
+                                   type = 1 << 2,
+                                   perms = 1 << 3,
+                                   nlink = 1 << 4,
+                                   uid = 1 << 5,
+                                   gid = 1 << 6,
+                                   rdev = 1 << 7,
+                                   atim = 1 << 8,
+                                   mtim = 1 << 9,
+                                   ctim = 1 << 10,
+                                   size = 1 << 11,
+                                   allocated = 1 << 12,
+                                   blocks = 1 << 13,
+                                   blksize = 1 << 14,
+                                   flags = 1 << 15,
+                                   gen = 1 << 16,
+                                   birthtim = 1 << 17,
+                                   sparse = 1 << 24,
+                                   compressed = 1 << 25,
+                                   reparse_point = 1 << 26,
+                                   all = static_cast<unsigned>(-1),
+                                   none = 0} QUICKCPPLIB_BITFIELD_END(want)
   //! Constructs a UNINITIALIZED instance i.e. full of random garbage
-  stat_t() {}  // NOLINT   CANNOT be constexpr because we are INTENTIONALLY not initialising the storage
+  stat_t()
+  {
+  }  // NOLINT   CANNOT be constexpr because we are INTENTIONALLY not initialising the storage
   //! Constructs a zeroed instance
-  constexpr explicit stat_t(std::nullptr_t) noexcept : st_dev(0),                                // NOLINT
-                                                       st_ino(0),                                // NOLINT
-                                                       st_type(filesystem::file_type::unknown),  // NOLINT
+  constexpr explicit stat_t(std::nullptr_t) noexcept
+      : st_dev(0)                                // NOLINT
+      , st_ino(0)                                // NOLINT
+      , st_type(filesystem::file_type::unknown)  // NOLINT
 #ifndef _WIN32
-                                                       st_perms(0),  // NOLINT
+      , st_perms(0)  // NOLINT
 #endif
-                                                       st_nlink(0),  // NOLINT
+      , st_nlink(0)  // NOLINT
 #ifndef _WIN32
-                                                       st_uid(0),   // NOLINT
-                                                       st_gid(0),   // NOLINT
-                                                       st_rdev(0),  // NOLINT
+      , st_uid(0)   // NOLINT
+      , st_gid(0)   // NOLINT
+      , st_rdev(0)  // NOLINT
 #endif
-                                                       st_size(0),          // NOLINT
-                                                       st_allocated(0),     // NOLINT
-                                                       st_blocks(0),        // NOLINT
-                                                       st_blksize(0),       // NOLINT
-                                                       st_flags(0),         // NOLINT
-                                                       st_gen(0),           // NOLINT
-                                                       st_sparse(0),        // NOLINT
-                                                       st_compressed(0),    // NOLINT
-                                                       st_reparse_point(0)  // NOLINT
+      , st_atim{}            // NOLINT
+      , st_mtim{}            // NOLINT
+      , st_ctim{}            // NOLINT
+      , st_size(0)           // NOLINT
+      , st_allocated(0)      // NOLINT
+      , st_blocks(0)         // NOLINT
+      , st_blksize(0)        // NOLINT
+      , st_flags(0)          // NOLINT
+      , st_gen(0)            // NOLINT
+      , st_birthtim{}        // NOLINT
+      , st_sparse(0)         // NOLINT
+      , st_compressed(0)     // NOLINT
+      , st_reparse_point(0)  // NOLINT
   {
   }
 #ifdef __cpp_exceptions
@@ -147,6 +185,24 @@ struct LLFIO_DECL stat_t  // NOLINT
     }
   }
 #endif
+  //! Equality comparison
+  bool operator==(const stat_t &o) const noexcept {
+    // This is probably bold ...
+    return 0 == memcmp(this, &o, sizeof(o));
+  }
+  //! Inequality comparison
+  bool operator!=(const stat_t &o) const noexcept
+  {
+    // This is probably bold ...
+    return 0 != memcmp(this, &o, sizeof(o));
+  }
+  //! Ordering
+  bool operator<(const stat_t &o) const noexcept
+  {
+    // This is probably bold ...
+    return memcmp(this, &o, sizeof(o)) < 0;
+  }
+
   /*! Fills the structure with metadata.
 
   \return The number of items filled in. You should use a nullptr constructed structure if you wish
@@ -176,7 +232,7 @@ struct LLFIO_DECL stat_t  // NOLINT
   - `perms`, `uid`, `gid`  (POSIX only)
   - `atim`                 (Windows, POSIX)
   - `mtim`                 (Windows, POSIX)
-  - `birthtim`             (Windows, FreeBSD, OS X)
+  - `birthtim`             (Windows, POSIX)
 
   Note that on POSIX, setting birth time involves two syscalls, the first of which
   temporarily sets the modified date to the birth time, which is racy. This is
@@ -188,6 +244,7 @@ struct LLFIO_DECL stat_t  // NOLINT
   */
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<want> stamp(handle &h, want wanted = want::all) noexcept;
 };
+static_assert(std::is_trivially_copyable<stat_t>::value, "stat_t is not trivally copyable!");
 
 LLFIO_V2_NAMESPACE_END
 

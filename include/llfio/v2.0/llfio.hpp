@@ -73,6 +73,7 @@ import LLFIO_MODULE_NAME;
 #include "symlink_handle.hpp"
 
 #include "algorithm/clone.hpp"
+#include "algorithm/contents.hpp"
 #include "algorithm/handle_adapter/cached_parent.hpp"
 #include "algorithm/reduce.hpp"
 #include "algorithm/shared_fs_mutex/atomic_append.hpp"
