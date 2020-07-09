@@ -22,7 +22,8 @@ var NAVTREE =
         [ "Functions", "functions_func.html", "functions_func" ],
         [ "Variables", "functions_vars.html", null ],
         [ "Typedefs", "functions_type.html", null ],
-        [ "Enumerations", "functions_enum.html", null ]
+        [ "Enumerations", "functions_enum.html", null ],
+        [ "Enumerator", "functions_eval.html", null ]
       ] ]
     ] ],
     [ "Files", null, [
@@ -46,11 +47,11 @@ var NAVTREEINDEX =
 "classllfio__v2__xxx_1_1mapped__file__handle.html#a8036792f332459064172d7b0cfaee3cf",
 "classllfio__v2__xxx_1_1pipe__handle.html#a15f621ed9c82e7c9e9c24d2ba299ee85",
 "classllfio__v2__xxx_1_1section__handle.html#aa3930273a2d4cabbac309e0b75701dca",
-"functions_func.html",
-"storage__profile_8hpp.html#a51c017aed8f7fe2568fa29506ac03e43",
-"structllfio__v2__xxx_1_1construct_3_01directory__handle_01_4.html#ab0814aefe3c103e08c222dfb2f832232",
-"structllfio__v2__xxx_1_1io__multiplexer_1_1buffer__type.html#ab2de2ead971d4d3902707d0c896446a6",
-"structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a70f32c33de7d02ed2c39ff98b1027ce1"
+"functions_f.html",
+"storage__profile_8hpp.html#a42ddc873c6d7178340a72417d1cc42b3",
+"structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#a87a9c093f4545e1e3a9aa056f7e888c7",
+"structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html#acd04e91854d57489ae87872fc8f73065",
+"structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a241f0cdd60088ce514b71f460dd555f4"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

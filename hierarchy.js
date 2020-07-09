@@ -25,6 +25,7 @@ var hierarchy =
     [ "llfio_v2_xxx::construct< section_handle >", "structllfio__v2__xxx_1_1construct_3_01section__handle_01_4.html", null ],
     [ "llfio_v2_xxx::construct< symlink_handle >", "structllfio__v2__xxx_1_1construct_3_01symlink__handle_01_4.html", null ],
     [ "llfio_v2_xxx::deadline", "structllfio__v2__xxx_1_1deadline.html", null ],
+    [ "llfio_v2_xxx::algorithm::difference_item", "structllfio__v2__xxx_1_1algorithm_1_1difference__item.html", null ],
     [ "llfio_v2_xxx::directory_entry", "structllfio__v2__xxx_1_1directory__entry.html", null ],
     [ "llfio_v2_xxx::path_discovery::discovered_path", "structllfio__v2__xxx_1_1path__discovery_1_1discovered__path.html", null ],
     [ "enable_shared_from_this", null, [
@@ -141,6 +142,7 @@ var hierarchy =
     ] ],
     [ "llfio_v2_xxx::algorithm::traversal_summary", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html", null ],
     [ "llfio_v2_xxx::algorithm::traverse_visitor", "structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html", [
+      [ "llfio_v2_xxx::algorithm::compare_visitor", "structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html", null ],
       [ "llfio_v2_xxx::algorithm::reduce_visitor", "structllfio__v2__xxx_1_1algorithm_1_1reduce__visitor.html", null ],
       [ "llfio_v2_xxx::algorithm::summarize_visitor", "structllfio__v2__xxx_1_1algorithm_1_1summarize__visitor.html", null ]
     ] ],

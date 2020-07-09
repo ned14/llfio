@@ -3,6 +3,7 @@ var searchData=
   ['cached_5fparent_5fhandle_5fadapter',['cached_parent_handle_adapter',['../classllfio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter.html',1,'llfio_v2_xxx::algorithm']]],
   ['check_5ffor_5fany_5fcompleted_5fio_5fstatistics',['check_for_any_completed_io_statistics',['../structllfio__v2__xxx_1_1io__multiplexer_1_1check__for__any__completed__io__statistics.html',1,'llfio_v2_xxx::io_multiplexer']]],
   ['combining_5fhandle_5fadapter',['combining_handle_adapter',['../classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html',1,'llfio_v2_xxx::algorithm']]],
+  ['compare_5fvisitor',['compare_visitor',['../structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html',1,'llfio_v2_xxx::algorithm']]],
   ['const_5fbuffer_5ftype',['const_buffer_type',['../structllfio__v2__xxx_1_1io__multiplexer_1_1const__buffer__type.html',1,'llfio_v2_xxx::io_multiplexer']]],
   ['const_5fbuffers_5ftype',['const_buffers_type',['../structllfio__v2__xxx_1_1symlink__handle_1_1const__buffers__type.html',1,'llfio_v2_xxx::symlink_handle']]],
   ['construct',['construct',['../structllfio__v2__xxx_1_1construct.html',1,'llfio_v2_xxx']]],

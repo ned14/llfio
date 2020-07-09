@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>LLFIO: llfio_v2_xxx::algorithm::traverse_visitor Struct Reference</title>
+<title>LLFIO: llfio_v2_xxx::algorithm::compare_visitor Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,7 +62,7 @@ $(function() {
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html','');});
+$(document).ready(function(){initNavTree('structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -82,39 +82,39 @@ $(document).ready(function(){initNavTree('structllfio__v2__xxx_1_1algorithm_1_1t
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor-members.html">List of all members</a>  </div>
+<a href="structllfio__v2__xxx_1_1algorithm_1_1compare__visitor-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">llfio_v2_xxx::algorithm::traverse_visitor Struct Reference</div>  </div>
+<div class="title">llfio_v2_xxx::algorithm::compare_visitor Struct Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>A visitor for the filesystem traversal algorithm.  
- <a href="structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html#details">More...</a></p>
+<p>A visitor for the filesystem traversal and comparison algorithm.  
+ <a href="structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html#details">More...</a></p>
 
-<p><code>#include &quot;traverse.hpp&quot;</code></p>
+<p><code>#include &quot;difference.hpp&quot;</code></p>
 <div class="dynheader">
-Inheritance diagram for llfio_v2_xxx::algorithm::traverse_visitor:</div>
+Inheritance diagram for llfio_v2_xxx::algorithm::compare_visitor:</div>
 <div class="dyncontent">
  <div class="center">
-  <img src="structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.png" usemap="#llfio_5Fv2_5Fxxx::algorithm::traverse_5Fvisitor_map" alt=""/>
-  <map id="llfio_5Fv2_5Fxxx::algorithm::traverse_5Fvisitor_map" name="llfio_5Fv2_5Fxxx::algorithm::traverse_5Fvisitor_map">
-<area href="structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html" title="A visitor for the filesystem traversal and comparison algorithm. " alt="llfio_v2_xxx::algorithm::compare_visitor" shape="rect" coords="0,56,241,80"/>
-<area href="structllfio__v2__xxx_1_1algorithm_1_1reduce__visitor.html" title="A visitor for the filesystem traversal and reduction algorithm. " alt="llfio_v2_xxx::algorithm::reduce_visitor" shape="rect" coords="251,56,492,80"/>
-<area href="structllfio__v2__xxx_1_1algorithm_1_1summarize__visitor.html" title="A visitor for the filesystem traversal and summary algorithm. " alt="llfio_v2_xxx::algorithm::summarize_visitor" shape="rect" coords="502,56,743,80"/>
+  <img src="structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.png" usemap="#llfio_5Fv2_5Fxxx::algorithm::compare_5Fvisitor_map" alt=""/>
+  <map id="llfio_5Fv2_5Fxxx::algorithm::compare_5Fvisitor_map" name="llfio_5Fv2_5Fxxx::algorithm::compare_5Fvisitor_map">
+<area href="structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html" title="A visitor for the filesystem traversal algorithm. " alt="llfio_v2_xxx::algorithm::traverse_visitor" shape="rect" coords="0,0,231,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a649d2496caac9dd869eb0ab2e135a0a2"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html#a649d2496caac9dd869eb0ab2e135a0a2">directory_open_failed</a> (void *data, result&lt; void &gt;::error_type &amp;&amp;<a class="el" href="classllfio__v2__xxx_1_1error.html">error</a>, const <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;dirh, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> leaf, size_t depth) noexcept</td></tr>
-<tr class="memdesc:a649d2496caac9dd869eb0ab2e135a0a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called when we failed to open a directory for enumeration. The default fails the traversal with that error. Return a default constructed instance to ignore the failure.  <a href="#a649d2496caac9dd869eb0ab2e135a0a2">More...</a><br /></td></tr>
-<tr class="separator:a649d2496caac9dd869eb0ab2e135a0a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ec4aafb16d931783d190cbd8b9c5f7d"><td class="memItemLeft" align="right" valign="top"><a id="a7ec4aafb16d931783d190cbd8b9c5f7d"></a>
+virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html#a7ec4aafb16d931783d190cbd8b9c5f7d">directory_open_failed</a> (void *data, result&lt; void &gt;::error_type &amp;&amp;<a class="el" href="classllfio__v2__xxx_1_1error.html">error</a>, const <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;dirh, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> leaf, size_t depth) noexcept override</td></tr>
+<tr class="memdesc:a7ec4aafb16d931783d190cbd8b9c5f7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">This override ignores failures to traverse into the directory. <br /></td></tr>
+<tr class="separator:a7ec4aafb16d931783d190cbd8b9c5f7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acec6f86b0ee269eb534f715b2affc5ae"><td class="memItemLeft" align="right" valign="top"><a id="acec6f86b0ee269eb534f715b2affc5ae"></a>
+virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html#acec6f86b0ee269eb534f715b2affc5ae">post_enumeration</a> (void *data, const <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;dirh, <a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html">directory_handle::buffers_type</a> &amp;contents, size_t depth) noexcept override</td></tr>
+<tr class="memdesc:acec6f86b0ee269eb534f715b2affc5ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">This override implements the summary. <br /></td></tr>
+<tr class="separator:acec6f86b0ee269eb534f715b2affc5ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d3c4b226532089d121dc3d96ed88b39"><td class="memItemLeft" align="right" valign="top">virtual result&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html#a4d3c4b226532089d121dc3d96ed88b39">pre_enumeration</a> (void *data, const <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;dirh, size_t depth) noexcept</td></tr>
 <tr class="memdesc:a4d3c4b226532089d121dc3d96ed88b39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called to decide whether to enumerate a directory.  <a href="#a4d3c4b226532089d121dc3d96ed88b39">More...</a><br /></td></tr>
 <tr class="separator:a4d3c4b226532089d121dc3d96ed88b39"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adcbfbc5dec3d2ab556937a11bdd96937"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html#adcbfbc5dec3d2ab556937a11bdd96937">post_enumeration</a> (void *data, const <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;dirh, <a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html">directory_handle::buffers_type</a> &amp;contents, size_t depth) noexcept</td></tr>
-<tr class="memdesc:adcbfbc5dec3d2ab556937a11bdd96937"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called just after each directory enumeration. You can modify the results to affect the traversal, typically you would set the stat to default constructed to cause it to be ignored. You are guaranteed that at least <code>stat.st_type</code> is valid for every entry in <code>contents</code>, and items whose type is a directory will be enqueued after this call for later traversal.  <a href="#adcbfbc5dec3d2ab556937a11bdd96937">More...</a><br /></td></tr>
-<tr class="separator:adcbfbc5dec3d2ab556937a11bdd96937"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a44e3a5ace0aa50d8f6f836c48e510c54"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html#a44e3a5ace0aa50d8f6f836c48e510c54">stack_updated</a> (void *data, size_t dirs_processed, size_t known_dirs_remaining, size_t depth_processed, size_t known_depth_remaining) noexcept</td></tr>
 <tr class="memdesc:a44e3a5ace0aa50d8f6f836c48e510c54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called whenever the traversed stack of directory hierarchy is updated. This can act as an estimated progress indicator, or to give an accurate progress indicator by matching it against a previous traversal.  The third party data pointer passed to <code>traverse()</code>.  <a href="#a44e3a5ace0aa50d8f6f836c48e510c54">More...</a><br /></td></tr>
 <tr class="separator:a44e3a5ace0aa50d8f6f836c48e510c54"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -124,121 +124,10 @@ virtual result&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom
 <tr class="separator:ac188f8691259ec970aeff79b47a5685b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>A visitor for the filesystem traversal algorithm. </p>
-<p>Note that at any time, returning a failure causes <code>traverse()</code> to exit as soon as possible with the same failure. Depth is how deep into the directory hierarchy we are, with zero being the base path handle being traversed. </p>
+<div class="textblock"><p>A visitor for the filesystem traversal and comparison algorithm. </p>
+<p>Note that at any time, returning a failure causes <code>compare()</code> to exit as soon as possible with the same failure.</p>
+<p>You can override the members here inherited from <code>traverse_visitor</code>, however note that <code>compare()</code> is entirely implemented using <code>traverse()</code>, so not calling the implementations here will affect operation. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a649d2496caac9dd869eb0ab2e135a0a2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a649d2496caac9dd869eb0ab2e135a0a2">&#9670;&nbsp;</a></span>directory_open_failed()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual result&lt;<a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a>&gt; llfio_v2_xxx::algorithm::traverse_visitor::directory_open_failed </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>data</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">result&lt; void &gt;::error_type &amp;&amp;&#160;</td>
-          <td class="paramname"><em>error</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;&#160;</td>
-          <td class="paramname"><em>dirh</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td>
-          <td class="paramname"><em>leaf</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>depth</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Called when we failed to open a directory for enumeration. The default fails the traversal with that error. Return a default constructed instance to ignore the failure. </p>
-<dl class="section note"><dt>Note</dt><dd>May be called from multiple kernel threads concurrently. </dd></dl>
-
-<p>Reimplemented in <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1summarize__visitor.html#a2d6b2c113d9c3fad2318e9d0e5f83c13">llfio_v2_xxx::algorithm::summarize_visitor</a>, <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html#a7ec4aafb16d931783d190cbd8b9c5f7d">llfio_v2_xxx::algorithm::compare_visitor</a>, and <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1reduce__visitor.html#a5af71cbf83dd3c499898f03405a5e698">llfio_v2_xxx::algorithm::reduce_visitor</a>.</p>
-<div class="fragment"><div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    {</div><div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;      (void) data;</div><div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      (void) dirh;</div><div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      (void) leaf;</div><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;      (void) depth;</div><div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      <span class="keywordflow">return</span> failure(std::move(error));</div><div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    }</div></div><!-- fragment -->
-</div>
-</div>
-<a id="adcbfbc5dec3d2ab556937a11bdd96937"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adcbfbc5dec3d2ab556937a11bdd96937">&#9670;&nbsp;</a></span>post_enumeration()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual result&lt;void&gt; llfio_v2_xxx::algorithm::traverse_visitor::post_enumeration </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>data</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;&#160;</td>
-          <td class="paramname"><em>dirh</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html">directory_handle::buffers_type</a> &amp;&#160;</td>
-          <td class="paramname"><em>contents</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>depth</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Called just after each directory enumeration. You can modify the results to affect the traversal, typically you would set the stat to default constructed to cause it to be ignored. You are guaranteed that at least <code>stat.st_type</code> is valid for every entry in <code>contents</code>, and items whose type is a directory will be enqueued after this call for later traversal. </p>
-<dl class="section note"><dt>Note</dt><dd>May be called from multiple kernel threads concurrently. </dd></dl>
-
-<p>Reimplemented in <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1summarize__visitor.html#a35fefdd810e1ce57734832a22916ca05">llfio_v2_xxx::algorithm::summarize_visitor</a>, <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html#acec6f86b0ee269eb534f715b2affc5ae">llfio_v2_xxx::algorithm::compare_visitor</a>, and <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1reduce__visitor.html#a25405bfa34b4e6d4f2f47babf518f082">llfio_v2_xxx::algorithm::reduce_visitor</a>.</p>
-<div class="fragment"><div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    {</div><div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;      (void) data;</div><div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;      (void) dirh;</div><div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      (void) contents;</div><div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;      (void) depth;</div><div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;      <span class="keywordflow">return</span> success();</div><div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    }</div></div><!-- fragment -->
-</div>
-</div>
 <a id="a4d3c4b226532089d121dc3d96ed88b39"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4d3c4b226532089d121dc3d96ed88b39">&#9670;&nbsp;</a></span>pre_enumeration()</h2>
 
@@ -274,7 +163,7 @@ virtual result&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -333,7 +222,7 @@ virtual result&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -353,14 +242,14 @@ virtual result&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li>include/llfio/v2.0/algorithm/<a class="el" href="traverse_8hpp.html">traverse.hpp</a></li>
+<li>include/llfio/v2.0/algorithm/difference.hpp</li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespacellfio__v2__xxx.html">llfio_v2_xxx</a></li><li class="navelem"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html">algorithm</a></li><li class="navelem"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html">traverse_visitor</a></li>
+    <li class="navelem"><a class="el" href="namespacellfio__v2__xxx.html">llfio_v2_xxx</a></li><li class="navelem"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html">algorithm</a></li><li class="navelem"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html">compare_visitor</a></li>
     <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
