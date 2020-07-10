@@ -2,6 +2,7 @@ var hierarchy =
 [
     [ "llfio_v2_xxx::process_handle::_byte_array_deleter", "structllfio__v2__xxx_1_1process__handle_1_1__byte__array__deleter.html", null ],
     [ "llfio_v2_xxx::algorithm::shared_fs_mutex::memory_map< Hasher, HashIndexSize, SpinlockType >::_entity_idx", "structllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map_1_1__entity__idx.html", null ],
+    [ "llfio_v2_xxx::algorithm::contents_visitor::_state_type", "structllfio__v2__xxx_1_1algorithm_1_1contents__visitor_1_1__state__type.html", null ],
     [ "llfio_v2_xxx::io_multiplexer::_unsynchronised_io_operation_state::payload_t::noncompleted_t::params_t::barrier_params_t", "structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t_1a5b5f3cdc6ab979c7730f57139fe29e.html", null ],
     [ "kvstore_v1_xxx::basic_key_value_store", "classkvstore__v1__xxx_1_1basic__key__value__store.html", [
       [ "kvstore_v1_xxx::basic_key_value_store::transaction", "classkvstore__v1__xxx_1_1basic__key__value__store_1_1transaction.html", null ]
@@ -143,6 +144,7 @@ var hierarchy =
     [ "llfio_v2_xxx::algorithm::traversal_summary", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html", null ],
     [ "llfio_v2_xxx::algorithm::traverse_visitor", "structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html", [
       [ "llfio_v2_xxx::algorithm::compare_visitor", "structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html", null ],
+      [ "llfio_v2_xxx::algorithm::contents_visitor", "structllfio__v2__xxx_1_1algorithm_1_1contents__visitor.html", null ],
       [ "llfio_v2_xxx::algorithm::reduce_visitor", "structllfio__v2__xxx_1_1algorithm_1_1reduce__visitor.html", null ],
       [ "llfio_v2_xxx::algorithm::summarize_visitor", "structllfio__v2__xxx_1_1algorithm_1_1summarize__visitor.html", null ]
     ] ],
@@ -158,6 +160,9 @@ var hierarchy =
       [ "in_place_attach_detach::traits::disable_attached_for< llfio_v2_xxx::mapped_file_handle >", "structin__place__attach__detach_1_1traits_1_1disable__attached__for_3_01llfio__v2__xxx_1_1mapped__file__handle_01_4.html", null ]
     ] ],
     [ "llfio_v2_xxx::unique_file_lock", "classllfio__v2__xxx_1_1unique__file__lock.html", null ],
+    [ "std::vector< T >", null, [
+      [ "llfio_v2_xxx::algorithm::contents_visitor::contents_type", "structllfio__v2__xxx_1_1algorithm_1_1contents__visitor_1_1contents__type.html", null ]
+    ] ],
     [ "llfio_v2_xxx::io_multiplexer::_unsynchronised_io_operation_state::payload_t::noncompleted_t::params_t::write_params_t", "structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t_b77b7ebd449ef5b26dd9c1883f4a3555.html", null ],
     [ "llfio_v2_xxx::write_receiver< IoHandleType >", "classllfio__v2__xxx_1_1write__receiver.html", null ]
 ];

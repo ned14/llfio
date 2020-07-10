@@ -113,6 +113,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html">compare_visitor</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A visitor for the filesystem traversal and comparison algorithm.  <a href="structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1contents__visitor.html">contents_visitor</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A visitor for the filesystem contents algorithm.  <a href="structllfio__v2__xxx_1_1algorithm_1_1contents__visitor.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1difference__item.html">difference_item</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1reduce__visitor.html">reduce_visitor</a></td></tr>
@@ -143,6 +146,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a3c661d6cba0da25fe9e1211ede1fd004"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle::extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a3c661d6cba0da25fe9e1211ede1fd004">clone_or_copy</a> (<a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;src, const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;destdir, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> destleaf={}, bool preserve_timestamps=true, bool force_copy_now=false, <a class="el" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42">file_handle::creation</a> creation=<a class="el" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42af7cf95e0f43dc8f79e39ae628c85a11d">file_handle::creation::always_new</a>, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d={}) noexcept</td></tr>
 <tr class="memdesc:a3c661d6cba0da25fe9e1211ede1fd004"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clone or copy the extents of the filesystem entity identified by <code>src</code> to <code>destdir</code> optionally renamed to <code>destleaf</code>.  <a href="#a3c661d6cba0da25fe9e1211ede1fd004">More...</a><br /></td></tr>
 <tr class="separator:a3c661d6cba0da25fe9e1211ede1fd004"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afae251fc3bfb7280b47b6135e2f6c7e2"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1contents__visitor_1_1contents__type.html">contents_visitor::contents_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#afae251fc3bfb7280b47b6135e2f6c7e2">contents</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;dirh, <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1contents__visitor.html">contents_visitor</a> *visitor=nullptr, size_t threads=0, bool force_slow_path=false) noexcept</td></tr>
+<tr class="memdesc:afae251fc3bfb7280b47b6135e2f6c7e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the contents of everything within and under <code>dirh</code>. What is returned is unordered.  <a href="#afae251fc3bfb7280b47b6135e2f6c7e2">More...</a><br /></td></tr>
+<tr class="separator:afae251fc3bfb7280b47b6135e2f6c7e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6165d32704ff21b4aed3046f11b31cb0"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html">traversal_summary</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a6165d32704ff21b4aed3046f11b31cb0">summarize</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;dirh, stat_t::want want=<a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#a8904eee9435edf3562642294046c634e">traversal_summary::default_metadata</a>(), <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1summarize__visitor.html">summarize_visitor</a> *visitor=nullptr, size_t threads=0, bool force_slow_path=false) noexcept</td></tr>
 <tr class="memdesc:a6165d32704ff21b4aed3046f11b31cb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Summarise the directory identified <code>dirh</code>, and everything therein.  <a href="#a6165d32704ff21b4aed3046f11b31cb0">More...</a><br /></td></tr>
 <tr class="separator:a6165d32704ff21b4aed3046f11b31cb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -326,7 +332,7 @@ template&lt;class T , class... Args&gt; </div>
     <tr><td class="paramname">destleaf</td><td>The leafname to use. If empty, use the same leafname as <code>src</code> currently has. </td></tr>
     <tr><td class="paramname">preserve_timestamps</td><td>Use <code>stat_t::stamp()</code> to preserve as much metadata from the original to the clone/copy as possible. </td></tr>
     <tr><td class="paramname">force_copy_now</td><td>Parameter to pass to <code>file_handle::clone_extents()</code> to force extents to be copied now, not copy-on-write lazily later. </td></tr>
-    <tr><td class="paramname">creation</td><td>How to create the destination file handle. NOTE that if this is NOT <code>always_new</code>, if the destination has identical maximum extent and timestamps (and permissions on POSIX) to the source, it is NOT copied, and zero is returned. </td></tr>
+    <tr><td class="paramname">creation</td><td>How to create the destination file handle. NOTE that if this is NOT <code>always_new</code>, if the destination has identical maximum extent and last modified timestamp (and permissions on POSIX) to the source, it is NOT copied, and zero is returned. </td></tr>
     <tr><td class="paramname">d</td><td>Deadline by which to complete the operation.</td></tr>
   </table>
   </dd>
@@ -337,6 +343,59 @@ template&lt;class T , class... Args&gt; </div>
 <p>Next, <code>file_handle::clone_extents()</code> with <code>emulate_if_unsupported = true</code> is called on the whole file content. This copies only the allocated extents in blocks sized whatever is the large page size on this platform (2Mb on x64).</p>
 <p>Finally, if <code>preserve_timestamps</code> is true, the destination file handle is restamped with the metadata from the source file handle just before the destination file handle is closed. </p>
 
+</div>
+</div>
+<a id="afae251fc3bfb7280b47b6135e2f6c7e2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afae251fc3bfb7280b47b6135e2f6c7e2">&#9670;&nbsp;</a></span>contents()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;<a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1contents__visitor_1_1contents__type.html">contents_visitor::contents_type</a>&gt; llfio_v2_xxx::algorithm::contents </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>dirh</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1contents__visitor.html">contents_visitor</a> *&#160;</td>
+          <td class="paramname"><em>visitor</em> = <code>nullptr</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>threads</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>force_slow_path</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculate the contents of everything within and under <code>dirh</code>. What is returned is unordered. </p>
+<p>This is a very thin veneer over <code>traverse()</code> which came out of the fact that I kept writing "get me the contents" traversal visitors again and again, so eventually I just wrote a library edition. Its only "clever" bit is that it stores the contents in thread local storage, and merges the contents afterwards.</p>
+<p>It is race free to concurrent relocations of <code>dirh</code>. It is entirely implemented in header-only code, as it is very simple. </p>
+<div class="fragment"><div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;  {</div><div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    contents_visitor default_visitor;</div><div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="keywordflow">if</span>(visitor == <span class="keyword">nullptr</span>)</div><div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    {</div><div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;      visitor = &amp;default_visitor;</div><div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    }</div><div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    contents_visitor::_state_type state(dirh);</div><div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    OUTCOME_TRY(<span class="keyword">auto</span> dirhpath, dirh.current_path());</div><div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    state.rootdirpathlen.store(dirhpath.native().size() + 1, std::memory_order_relaxed);</div><div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    OUTCOME_TRY(<a class="code" href="namespacellfio__v2__xxx_1_1algorithm.html#ae068bc16598189811d0ce2b3530f1de7">traverse</a>(dirh, visitor, threads, &amp;state, force_slow_path));</div><div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    <span class="keywordflow">return</span> {std::move(state.contents)};</div><div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;  }</div><div class="ttc" id="namespacellfio__v2__xxx_1_1algorithm_html_ae068bc16598189811d0ce2b3530f1de7"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1algorithm.html#ae068bc16598189811d0ce2b3530f1de7">llfio_v2_xxx::algorithm::traverse</a></div><div class="ttdeci">result&lt; size_t &gt; traverse(const path_handle &amp;dirh, traverse_visitor *visitor, size_t threads=0, void *data=nullptr, bool force_slow_path=false) noexcept</div><div class="ttdoc">Traverse everything within and under dirh. </div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a05594f7c8ae275fa65b2acd57cc9b8ac"></a>

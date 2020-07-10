@@ -17,5 +17,7 @@ var searchData=
   ['construct_3c_20pipe_5fhandle_20_3e',['construct&lt; pipe_handle &gt;',['../structllfio__v2__xxx_1_1construct_3_01pipe__handle_01_4.html',1,'llfio_v2_xxx']]],
   ['construct_3c_20process_5fhandle_20_3e',['construct&lt; process_handle &gt;',['../structllfio__v2__xxx_1_1construct_3_01process__handle_01_4.html',1,'llfio_v2_xxx']]],
   ['construct_3c_20section_5fhandle_20_3e',['construct&lt; section_handle &gt;',['../structllfio__v2__xxx_1_1construct_3_01section__handle_01_4.html',1,'llfio_v2_xxx']]],
-  ['construct_3c_20symlink_5fhandle_20_3e',['construct&lt; symlink_handle &gt;',['../structllfio__v2__xxx_1_1construct_3_01symlink__handle_01_4.html',1,'llfio_v2_xxx']]]
+  ['construct_3c_20symlink_5fhandle_20_3e',['construct&lt; symlink_handle &gt;',['../structllfio__v2__xxx_1_1construct_3_01symlink__handle_01_4.html',1,'llfio_v2_xxx']]],
+  ['contents_5ftype',['contents_type',['../structllfio__v2__xxx_1_1algorithm_1_1contents__visitor_1_1contents__type.html',1,'llfio_v2_xxx::algorithm::contents_visitor']]],
+  ['contents_5fvisitor',['contents_visitor',['../structllfio__v2__xxx_1_1algorithm_1_1contents__visitor.html',1,'llfio_v2_xxx::algorithm']]]
 ];

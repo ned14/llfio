@@ -494,7 +494,7 @@ LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom
 <tr class="memitem:afb0c1c2fcbfe481393f9122019d3f3e3"><td class="memTemplParams" colspan="2"><a id="afb0c1c2fcbfe481393f9122019d3f3e3"></a>
 template&lt;class F &gt; </td></tr>
 <tr class="memitem:afb0c1c2fcbfe481393f9122019d3f3e3"><td class="memTemplItemLeft" align="right" valign="top">LLFIO_PATH_VIEW_CONSTEXPR auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#afb0c1c2fcbfe481393f9122019d3f3e3">visit</a> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> view, F &amp;&amp;f)</td></tr>
-<tr class="memdesc:afb0c1c2fcbfe481393f9122019d3f3e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit the underlying source for a <code>path_view</code> <br /></td></tr>
+<tr class="memdesc:afb0c1c2fcbfe481393f9122019d3f3e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit the underlying source for a <code>path_view</code> (LLFIO backwards compatible overload) <br /></td></tr>
 <tr class="separator:afb0c1c2fcbfe481393f9122019d3f3e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae057a480e66afcac3fe44d6a62f07433"><td class="memItemLeft" align="right" valign="top"><a id="ae057a480e66afcac3fe44d6a62f07433"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> &amp;v)</td></tr>
@@ -502,6 +502,36 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <tr class="memitem:a3e68b8ef674b43bc67a04576a5d9a99e"><td class="memItemLeft" align="right" valign="top"><a id="a3e68b8ef674b43bc67a04576a5d9a99e"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>LLFIO_TEMPLATE</b> (class CharT) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a></td></tr>
 <tr class="separator:a3e68b8ef674b43bc67a04576a5d9a99e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d381d16b152632f617c82182fcf22a1"><td class="memTemplParams" colspan="2"><a id="a1d381d16b152632f617c82182fcf22a1"></a>
+template&lt;class F &gt; </td></tr>
+<tr class="memitem:a1d381d16b152632f617c82182fcf22a1"><td class="memTemplItemLeft" align="right" valign="top">LLFIO_PATH_VIEW_CONSTEXPR auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a1d381d16b152632f617c82182fcf22a1">visit</a> (F &amp;&amp;f, <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> view)</td></tr>
+<tr class="memdesc:a1d381d16b152632f617c82182fcf22a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit the underlying source for a <code>path_view_component</code> (std compatible overload) <br /></td></tr>
+<tr class="separator:a1d381d16b152632f617c82182fcf22a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1c1af47ab01fb68d01528deca91f6f2"><td class="memTemplParams" colspan="2"><a id="ae1c1af47ab01fb68d01528deca91f6f2"></a>
+template&lt;class F &gt; </td></tr>
+<tr class="memitem:ae1c1af47ab01fb68d01528deca91f6f2"><td class="memTemplItemLeft" align="right" valign="top">LLFIO_PATH_VIEW_CONSTEXPR auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#ae1c1af47ab01fb68d01528deca91f6f2">visit</a> (F &amp;&amp;f, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> view)</td></tr>
+<tr class="memdesc:ae1c1af47ab01fb68d01528deca91f6f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit the underlying source for a <code>path_view</code> (std compatible overload) <br /></td></tr>
+<tr class="separator:ae1c1af47ab01fb68d01528deca91f6f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa689b48f1fe2893f13e689a346a5dd5c"><td class="memItemLeft" align="right" valign="top"><a id="aa689b48f1fe2893f13e689a346a5dd5c"></a>
+filesystem::path &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#aa689b48f1fe2893f13e689a346a5dd5c">operator/=</a> (filesystem::path &amp;a, <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> b)</td></tr>
+<tr class="memdesc:aa689b48f1fe2893f13e689a346a5dd5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Append a path view component to a path. <br /></td></tr>
+<tr class="separator:aa689b48f1fe2893f13e689a346a5dd5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb6fd77ac7479b6c5b6dc5ec29c5e8df"><td class="memItemLeft" align="right" valign="top"><a id="afb6fd77ac7479b6c5b6dc5ec29c5e8df"></a>
+filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#afb6fd77ac7479b6c5b6dc5ec29c5e8df">operator/</a> (filesystem::path a, <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> b)</td></tr>
+<tr class="memdesc:afb6fd77ac7479b6c5b6dc5ec29c5e8df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Append a path view component to a path. <br /></td></tr>
+<tr class="separator:afb6fd77ac7479b6c5b6dc5ec29c5e8df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade90d96b4cc3e5d76fc4a4c91d88011f"><td class="memItemLeft" align="right" valign="top"><a id="ade90d96b4cc3e5d76fc4a4c91d88011f"></a>
+filesystem::path &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#ade90d96b4cc3e5d76fc4a4c91d88011f">operator+=</a> (filesystem::path &amp;a, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> b)</td></tr>
+<tr class="memdesc:ade90d96b4cc3e5d76fc4a4c91d88011f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Append a path view to a path. <br /></td></tr>
+<tr class="separator:ade90d96b4cc3e5d76fc4a4c91d88011f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2b460476cde40f8d2c27e16f4c10c4e0"><td class="memItemLeft" align="right" valign="top"><a id="a2b460476cde40f8d2c27e16f4c10c4e0"></a>
+filesystem::path &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a2b460476cde40f8d2c27e16f4c10c4e0">operator/=</a> (filesystem::path &amp;a, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> b)</td></tr>
+<tr class="memdesc:a2b460476cde40f8d2c27e16f4c10c4e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Append a path view to a path. <br /></td></tr>
+<tr class="separator:a2b460476cde40f8d2c27e16f4c10c4e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3c3e3a55d9c69a8ec4e24625c2e0b2a2"><td class="memItemLeft" align="right" valign="top"><a id="a3c3e3a55d9c69a8ec4e24625c2e0b2a2"></a>
+filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a3c3e3a55d9c69a8ec4e24625c2e0b2a2">operator/</a> (filesystem::path a, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> b)</td></tr>
+<tr class="memdesc:a3c3e3a55d9c69a8ec4e24625c2e0b2a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Append a path view to a path. <br /></td></tr>
+<tr class="separator:a3c3e3a55d9c69a8ec4e24625c2e0b2a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a94167268e0b7e7573e4599fd7872ef0f"><td class="memItemLeft" align="right" valign="top"><a id="a94167268e0b7e7573e4599fd7872ef0f"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const process_handle::flag &amp;v)</td></tr>
 <tr class="separator:a94167268e0b7e7573e4599fd7872ef0f"><td class="memSeparator" colspan="2">&#160;</td></tr>

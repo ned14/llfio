@@ -2,6 +2,9 @@ var structllfio__v2__xxx_1_1stat__t =
 [
     [ "stat_t", "structllfio__v2__xxx_1_1stat__t.html#aef93718067115fcb4c596f4c8fe4cc2f", null ],
     [ "fill", "structllfio__v2__xxx_1_1stat__t.html#aa08a4b9530403b4689498706b0738db4", null ],
+    [ "operator!=", "structllfio__v2__xxx_1_1stat__t.html#a00e9ca499bb50e3117744a98c0176f27", null ],
+    [ "operator<", "structllfio__v2__xxx_1_1stat__t.html#acbcf2ad965fdfefc7dbead1ad3c90a4a", null ],
+    [ "operator==", "structllfio__v2__xxx_1_1stat__t.html#a4227ceec0d2fbb66c62c4f71859ff841", null ],
     [ "QUICKCPPLIB_BITFIELD_BEGIN", "structllfio__v2__xxx_1_1stat__t.html#a7c281295d6ae22631336206446f37581", null ],
     [ "QUICKCPPLIB_BITFIELD_END", "structllfio__v2__xxx_1_1stat__t.html#a8fc0ebfd31e3e3c5fe561f61fb86a6b7", null ],
     [ "stamp", "structllfio__v2__xxx_1_1stat__t.html#a4ca693399bffd1b5004d31897e5b72e7", null ],
