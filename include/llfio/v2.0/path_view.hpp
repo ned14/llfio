@@ -1857,61 +1857,18 @@ constexpr inline int path_view::compare(path_view o) const
   return 0;  // identical
 }
 
-namespace detail
-{
-  template <bool do_concat> struct path_view_concatenate_visitor
-  {
-    filesystem::path &a;
-    explicit path_view_concatenate_visitor(filesystem::path &_a)
-        : a(_a)
-    {
-    }
-    template <class CharT> void operator()(basic_string_view<CharT> sv) const
-    {
-      if(do_concat)
-      {
-        a.concat(sv);
-      }
-      else
-      {
-        a.append(sv);
-      }
-    }
-    void operator()(basic_string_view<char8_t> sv)
-    {
-#if(__cplusplus >= 202000 || _HAS_CXX20) && (!defined(_LIBCPP_VERSION) || _LIBCPP_VERSION > 10000 /* approx start of 2020 */)
-      if(do_concat)
-      {
-        a.concat(sv);
-      }
-      else
-      {
-        a.append(sv);
-      }
-#else
-      if(do_concat)
-      {
-        a+=filesystem::u8path((const char *) sv.data(), (const char *) sv.data() + sv.size());
-      }
-      else
-      {
-        a/=filesystem::u8path((const char *) sv.data(), (const char *) sv.data() + sv.size());
-      }
-#endif
-    }
-  };
-}  // namespace detail
-
 //! Append a path view component to a path
 inline filesystem::path &operator+=(filesystem::path &a, path_view_component b)
 {
-  visit(b, detail::path_view_concatenate_visitor<true>(a));
+  path_view_component::c_str<> zpath(b);
+  a.concat(zpath.buffer);
   return a;
 }
 //! Append a path view component to a path
 inline filesystem::path &operator/=(filesystem::path &a, path_view_component b)
 {
-  visit(b, detail::path_view_concatenate_visitor<false>(a));
+  path_view_component::c_str<> zpath(b);
+  a.append(zpath.buffer);
   return a;
 }
 //! Append a path view component to a path
@@ -1922,13 +1879,15 @@ inline filesystem::path operator/(filesystem::path a, path_view_component b)
 //! Append a path view to a path
 inline filesystem::path &operator+=(filesystem::path &a, path_view b)
 {
-  visit(b, detail::path_view_concatenate_visitor<true>(a));
+  path_view::c_str<> zpath(b);
+  a.concat(zpath.buffer);
   return a;
 }
 //! Append a path view to a path
 inline filesystem::path &operator/=(filesystem::path &a, path_view b)
 {
-  visit(b, detail::path_view_concatenate_visitor<false>(a));
+  path_view::c_str<> zpath(b);
+  a.append(zpath.buffer);
   return a;
 }
 //! Append a path view to a path

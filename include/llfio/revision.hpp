@@ -1,4 +1,4 @@
 // Note the second line of this file must ALWAYS be the git SHA, third line ALWAYS the git SHA update time
-#define LLFIO_PREVIOUS_COMMIT_REF    cc0e5e5ad9c04b23aadfc8eed704b2c2194292ea
-#define LLFIO_PREVIOUS_COMMIT_DATE   "2020-07-08 12:34:00 +00:00"
-#define LLFIO_PREVIOUS_COMMIT_UNIQUE cc0e5e5a
+#define LLFIO_PREVIOUS_COMMIT_REF    804dcb157c208bf918aea37eb98e149934b51e4f
+#define LLFIO_PREVIOUS_COMMIT_DATE   "2020-07-10 14:04:55 +00:00"
+#define LLFIO_PREVIOUS_COMMIT_UNIQUE 804dcb15

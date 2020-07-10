@@ -9,6 +9,8 @@ set(llfio_HEADERS
   "include/llfio/ntkernel-error-category/include/ntkernel-error-category/ntkernel_category.hpp"
   "include/llfio/revision.hpp"
   "include/llfio/v2.0/algorithm/clone.hpp"
+  "include/llfio/v2.0/algorithm/contents.hpp"
+  "include/llfio/v2.0/algorithm/difference.hpp"
   "include/llfio/v2.0/algorithm/handle_adapter/cached_parent.hpp"
   "include/llfio/v2.0/algorithm/handle_adapter/combining.hpp"
   "include/llfio/v2.0/algorithm/handle_adapter/xor.hpp"
