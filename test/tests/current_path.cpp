@@ -1,5 +1,5 @@
 /* Integration test kernel for whether current path works
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (2 commits)
+(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (2 commits)
 File Created: Aug 2017
 
 
@@ -29,11 +29,15 @@ template <class FileHandleType, class DirectoryHandleType> static inline void Te
   namespace llfio = LLFIO_V2_NAMESPACE;
   {
     std::error_code ec;
+    llfio::filesystem::current_path(llfio::filesystem::temp_directory_path());
     llfio::filesystem::remove_all("tempfile", ec);
     llfio::filesystem::remove_all("tempfile2", ec);
+    llfio::filesystem::remove_all("tempfile3", ec);
+    llfio::filesystem::remove_all("tempfile4", ec);
     llfio::filesystem::remove_all("tempdir", ec);
     llfio::filesystem::remove_all("tempdir2", ec);
-  }
+    llfio::filesystem::remove_all("tempdir3", ec);
+  }  // namespace ;
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-braces"
@@ -79,109 +83,176 @@ template <class FileHandleType, class DirectoryHandleType> static inline void Te
     s.fill(h1).value();
     print(s);
   }
+  std::cout << "\ncurrent_path() works at all:\n";
   {
     auto h1path = h1.current_path();
     BOOST_CHECK(h1path);
     if(!h1path)
     {
-      std::cerr << "Getting the current path of a file FAILED due to " << h1path.error().message().c_str() << std::endl;
+      std::cerr << "   Getting the current path of a file FAILED due to " << h1path.error().message().c_str() << std::endl;
     }
     else if(h1path.value().empty())
     {
       BOOST_CHECK(!h1path.value().empty());
-      std::cerr << "Getting the current path of a file FAILED due to the returned path being empty" << std::endl;
+      std::cerr << "   Getting the current path of a file FAILED due to the returned path being empty" << std::endl;
     }
     else
     {
-      std::cout << "The path of the file is " << h1path.value() << std::endl;
+      std::cout << "   The path of the file is " << h1path.value() << std::endl;
     }
 
     auto h2path = h2.current_path();
     BOOST_CHECK(h2path);
     if(!h2path)
     {
-      std::cerr << "Getting the current path of a directory FAILED due to " << h2path.error().message().c_str() << std::endl;
+      std::cerr << "   Getting the current path of a directory FAILED due to " << h2path.error().message().c_str() << std::endl;
     }
     else if(h2path.value().empty())
     {
       BOOST_CHECK(!h2path.value().empty());
-      std::cerr << "Getting the current path of a directory FAILED due to the returned path being empty" << std::endl;
+      std::cerr << "   Getting the current path of a directory FAILED due to the returned path being empty" << std::endl;
     }
     else
     {
-      std::cout << "The path of the directory is " << h2path.value() << std::endl;
+      std::cout << "   The path of the directory is " << h2path.value() << std::endl;
     }
   }
 
-  h1.relink({}, "tempfile2").value();
-  h2.relink({}, "tempdir2").value();
+  // Atomic relink
+  std::cout << "\ncurrent_path() after atomic relink:\n";
+  h1.relink({}, "tempfile2", true).value();
+  h2.relink({}, "tempdir2", true).value();
 
   {
     auto h1path = h1.current_path();
     BOOST_CHECK(h1path);
     if(!h1path)
     {
-      std::cerr << "Getting the current path of a file FAILED due to " << h1path.error().message().c_str() << std::endl;
+      std::cerr << "   Getting the current path of a file FAILED due to " << h1path.error().message().c_str() << std::endl;
     }
     else if(h1path.value().empty())
     {
       BOOST_CHECK(!h1path.value().empty());
-      std::cerr << "Getting the current path of a file FAILED due to the returned path being empty" << std::endl;
+      std::cerr << "   Getting the current path of a file FAILED due to the returned path being empty" << std::endl;
     }
     else if(h1path.value().filename() != "tempfile2")
     {
       BOOST_CHECK(h1path.value().filename() == "tempfile2");
-      std::cerr << "Getting the current path of a file FAILED due to the wrong path being returned: " << h1path.value() << std::endl;
+      std::cerr << "   Getting the current path of a file FAILED due to the wrong path being returned: " << h1path.value() << std::endl;
     }
     else
     {
-      std::cout << "The path of the file is " << h1path.value() << std::endl;
+      std::cout << "   The path of the file is " << h1path.value() << std::endl;
     }
 
     auto h2path = h2.current_path();
     BOOST_CHECK(h2path);
     if(!h2path)
     {
-      std::cerr << "Getting the current path of a directory FAILED due to " << h2path.error().message().c_str() << std::endl;
+      std::cerr << "   Getting the current path of a directory FAILED due to " << h2path.error().message().c_str() << std::endl;
     }
     else if(h2path.value().empty())
     {
       BOOST_CHECK(!h2path.value().empty());
-      std::cerr << "Getting the current path of a directory FAILED due to the returned path being empty" << std::endl;
+      std::cerr << "   Getting the current path of a directory FAILED due to the returned path being empty" << std::endl;
     }
     else if(h2path.value().filename() != "tempdir2")
     {
       BOOST_CHECK(h2path.value().filename() == "tempdir2");
-      std::cerr << "Getting the current path of a directory FAILED due to the wrong path being returned: " << h2path.value() << std::endl;
+      std::cerr << "   Getting the current path of a directory FAILED due to the wrong path being returned: " << h2path.value() << std::endl;
     }
     else
     {
-      std::cout << "The path of the directory is " << h2path.value() << std::endl;
+      std::cout << "   The path of the directory is " << h2path.value() << std::endl;
     }
   }
 
-  h1.relink(h2, "tempfile3").value();
+  // Non-atomic relink
+  std::cout << "\ncurrent_path() after non-atomic relink:\n";
+  h1.relink({}, "tempfile3", false).value();
 
   {
     auto h1path = h1.current_path();
     BOOST_CHECK(h1path);
     if(!h1path)
     {
-      std::cerr << "Getting the current path of a file FAILED due to " << h1path.error().message().c_str() << std::endl;
+      std::cerr << "   Getting the current path of a file FAILED due to " << h1path.error().message().c_str() << std::endl;
     }
     else if(h1path.value().empty())
     {
       BOOST_CHECK(!h1path.value().empty());
-      std::cerr << "Getting the current path of a file FAILED due to the returned path being empty" << std::endl;
+      std::cerr << "   Getting the current path of a file FAILED due to the returned path being empty" << std::endl;
     }
     else if(h1path.value().filename() != "tempfile3")
     {
       BOOST_CHECK(h1path.value().filename() == "tempfile3");
-      std::cerr << "Getting the current path of a file FAILED due to the wrong path being returned: " << h1path.value() << std::endl;
+      std::cerr << "   Getting the current path of a file FAILED due to the wrong path being returned: " << h1path.value() << std::endl;
     }
     else
     {
-      std::cout << "The path of the file is " << h1path.value() << std::endl;
+      std::cout << "   The path of the file is " << h1path.value() << std::endl;
+    }
+  }
+  {
+    llfio::stat_t s(nullptr);
+    auto print = [](const llfio::stat_t &s) {
+      auto print_dt = [](const std::chrono::system_clock::time_point &tp) {
+        time_t tt = std::chrono::system_clock::to_time_t(tp);
+        std::stringstream ss;
+        ss << std::ctime(&tt);
+        ss.seekp(-1, ss.cur);
+        ss << "." << std::chrono::duration_cast<std::chrono::nanoseconds>(tp - std::chrono::system_clock::from_time_t(tt)).count();
+        return ss.str();
+      };
+      std::cout << "Handle has stat_t:";
+      std::cout << "\n           dev : " << s.st_dev;
+      std::cout << "\n           ino : " << s.st_ino;
+      std::cout << "\n          type : " << (int) s.st_type;
+      std::cout << "\n         nlink : " << s.st_nlink;
+      std::cout << "\n          atim : " << print_dt(s.st_atim);
+      std::cout << "\n          mtim : " << print_dt(s.st_mtim);
+      std::cout << "\n          ctim : " << print_dt(s.st_ctim);
+      std::cout << "\n          size : " << s.st_size;
+      std::cout << "\n     allocated : " << s.st_allocated;
+      std::cout << "\n        blocks : " << s.st_blocks;
+      std::cout << "\n       blksize : " << s.st_blksize;
+      std::cout << "\n         flags : " << s.st_flags;
+      std::cout << "\n           gen : " << s.st_gen;
+      std::cout << "\n      birthtim : " << print_dt(s.st_birthtim);
+      std::cout << "\n        sparse : " << s.st_sparse;
+      std::cout << "\n    compressed : " << s.st_compressed;
+      std::cout << "\n reparse_point : " << s.st_reparse_point;
+      std::cout << "\n" << std::endl;
+    };
+    s.fill(h1).value();
+    print(s);
+    BOOST_CHECK(s.st_nlink == 1);
+  }
+
+  // Non-atomic relink file into dir
+  std::cout << "\ncurrent_path() after relink into directory:\n";
+  h1.relink(h2, "tempfile4", false).value();
+
+  {
+    auto h1path = h1.current_path();
+    BOOST_CHECK(h1path);
+    if(!h1path)
+    {
+      std::cerr << "   Getting the current path of a file FAILED due to " << h1path.error().message().c_str() << std::endl;
+    }
+    else if(h1path.value().empty())
+    {
+      BOOST_CHECK(!h1path.value().empty());
+      std::cerr << "   Getting the current path of a file FAILED due to the returned path being empty" << std::endl;
+    }
+    else if(h1path.value().filename() != "tempfile4")
+    {
+      BOOST_CHECK(h1path.value().filename() == "tempfile4");
+      std::cerr << "   Getting the current path of a file FAILED due to the wrong path being returned: " << h1path.value() << std::endl;
+    }
+    else
+    {
+      std::cout << "   The path of the file is " << h1path.value() << std::endl;
     }
   }
 
