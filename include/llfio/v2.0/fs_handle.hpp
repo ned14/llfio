@@ -151,8 +151,15 @@ public:
 
   /*! Relinks the current path of this open handle to the new path specified. If `atomic_replace` is
   true, the relink \b atomically and silently replaces any item at the new path specified. This
-  operation is both atomic and silent matching POSIX behaviour even on Microsoft Windows where
+  operation is both atomic and matching POSIX behaviour even on Microsoft Windows where
   no Win32 API can match POSIX semantics.
+
+  Note that if `atomic_replace` is false, the operation *may* be implemented as creating a hard
+  link to the destination (which fails if the destination exists), opening a new file descriptor
+  to the destination, closing the existing file descriptor, replacing the existing file descriptor
+  with the new one (this is to ensure path tracking continues to work), then unlinking the previous
+  link. Thus `native_handle()`'s value *may* change. This is not the case on Microsoft Windows nor
+  Linux, both of which provide syscalls capable of refusing to rename if the destination exists.
 
   If the handle refers to a pipe, on Microsoft Windows the base path handle is ignored as there is
   a single global named pipe namespace. Unless the path fragment begins with `\`, the string `\??\`

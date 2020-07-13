@@ -29,6 +29,11 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <climits>  // for PATH_MAX
 
+#ifdef __linux__
+#include <sys/syscall.h>
+#include <sys/sysmacros.h>
+#endif
+
 LLFIO_V2_NAMESPACE_BEGIN
 
 result<void> fs_handle::_fetch_inode() const noexcept
@@ -208,21 +213,92 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
   {
     OUTCOME_TRY(_fetch_inode());
   }
-  OUTCOME_TRY(auto &&dirh, detail::containing_directory(std::ref(filename), h, *this, d));
+  OUTCOME_TRY(auto dirh, detail::containing_directory(std::ref(filename), h, *this, d));
   if(!atomic_replace)
   {
-// Some systems provide an extension for atomic non-replacing renames
-#ifdef RENAME_NOREPLACE
-    if(-1 != ::renameat2(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, RENAME_NOREPLACE))
-      return success();
-    if(EEXIST == errno)
-      return posix_error();
+// Linux has an extension for atomic non-replacing renames
+#ifdef __linux__
+    errno = 0;
+    if(-1 != 
+#if defined __aarch64__
+    syscall(276 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, 1 /*RENAME_NOREPLACE*/)
+#elif defined __arm__
+    syscall(382 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, 1 /*RENAME_NOREPLACE*/)
+#elif defined __i386__
+    syscall(353 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, 1 /*RENAME_NOREPLACE*/)
+#elif defined __powerpc64__
+    syscall(357 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, 1 /*RENAME_NOREPLACE*/)
+#elif defined __sparc__
+    syscall(345 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, 1 /*RENAME_NOREPLACE*/)
+#elif defined __x86_64__
+    syscall(316 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, 1 /*RENAME_NOREPLACE*/)
+#else
+#error Unknown Linux platform
 #endif
-    // Otherwise we need to use linkat followed by renameat (non-atomic)
+      )
+    {
+      return success();
+    }
+    if(EEXIST == errno)
+    {
+      return posix_error();
+    }
+#endif
+    // Otherwise we need to use linkat followed by unlinkat, carefully reopening the file descriptor
+    // to preserve path tracking
     if(-1 == ::linkat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, 0))
     {
       return posix_error();
     }
+    int attribs = fcntl(h.native_handle().fd, F_GETFL);
+    int errcode = errno;
+    if(-1 != attribs)
+    {
+#if 0
+      attribs &= (O_RDONLY | O_WRONLY | O_RDWR
+#ifdef O_EXEC
+                  | O_EXEC
+#endif
+                  | O_CLOEXEC | O_DIRECTORY | O_NOFOLLOW
+#ifdef O_TMPFILE
+                  | O_TMPFILE
+#endif
+                  | O_APPEND | O_DIRECT
+#ifdef O_DSYNC
+                  | O_DSYNC
+#endif
+#ifdef O_LARGEFILE
+                  | O_LARGEFILE
+#endif
+#ifdef O_NOATIME
+                  | O_NOATIME
+#endif
+#ifdef O_PATH
+                  | O_PATH
+#endif
+                  | O_SYNC);
+#endif
+      int fd = ::openat(base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, attribs, 0x1b0 /*660*/);
+      if(-1 == fd)
+      {
+        errcode = errno;
+      }
+      else
+      {
+        ::close(h._v.fd);
+        h._v.fd = fd;
+        errcode = 0;
+      }
+    }
+    if(-1 == ::unlinkat(dirh.native_handle().fd, filename.c_str(), 0))
+    {
+      return posix_error();
+    }
+    if(errcode != 0)
+    {
+      return posix_error(errcode);
+    }
+    return success();
   }
   if(-1 == ::renameat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer))
   {

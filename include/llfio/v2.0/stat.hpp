@@ -186,21 +186,127 @@ struct LLFIO_DECL stat_t  // NOLINT
   }
 #endif
   //! Equality comparison
-  bool operator==(const stat_t &o) const noexcept {
-    // This is probably bold ...
-    return 0 == memcmp(this, &o, sizeof(o));
+  bool operator==(const stat_t &o) const noexcept
+  {
+    return st_dev == o.st_dev && st_ino == o.st_ino && st_type == o.st_type
+#ifndef _WIN32
+           && st_perms == o.st_perms
+#endif
+           && st_nlink == o.st_nlink
+#ifndef _WIN32
+           && st_uid == o.st_uid && st_gid == o.st_gid && st_rdev == o.st_rdev
+#endif
+           && st_atim == o.st_atim && st_mtim == o.st_mtim && st_ctim == o.st_ctim && st_size == o.st_size && st_allocated == o.st_allocated &&
+           st_blocks == o.st_blocks && st_blksize == o.st_blksize && st_flags == o.st_flags && st_gen == o.st_gen && st_birthtim == o.st_birthtim &&
+           st_sparse == o.st_sparse && st_compressed == o.st_compressed && st_reparse_point == o.st_reparse_point;
   }
   //! Inequality comparison
   bool operator!=(const stat_t &o) const noexcept
   {
-    // This is probably bold ...
-    return 0 != memcmp(this, &o, sizeof(o));
+    return st_dev != o.st_dev || st_ino != o.st_ino || st_type != o.st_type
+#ifndef _WIN32
+           || st_perms != o.st_perms
+#endif
+           || st_nlink != o.st_nlink
+#ifndef _WIN32
+           || st_uid != o.st_uid || st_gid != o.st_gid || st_rdev != o.st_rdev
+#endif
+           || st_atim != o.st_atim || st_mtim != o.st_mtim || st_ctim != o.st_ctim || st_size != o.st_size || st_allocated != o.st_allocated ||
+           st_blocks != o.st_blocks || st_blksize != o.st_blksize || st_flags != o.st_flags || st_gen != o.st_gen || st_birthtim != o.st_birthtim ||
+           st_sparse != o.st_sparse || st_compressed != o.st_compressed || st_reparse_point != o.st_reparse_point;
   }
   //! Ordering
   bool operator<(const stat_t &o) const noexcept
   {
-    // This is probably bold ...
-    return memcmp(this, &o, sizeof(o)) < 0;
+    if(st_dev != o.st_dev)
+    {
+      return st_dev < o.st_dev;
+    }
+    if(st_ino != o.st_ino)
+    {
+      return st_ino < o.st_ino;
+    }
+    if(st_type != o.st_type)
+    {
+      return st_type < o.st_type;
+    }
+#ifndef _WIN32
+    if(st_perms != o.st_perms)
+    {
+      return st_perms < o.st_perms;
+    }
+#endif
+    if(st_nlink != o.st_nlink)
+    {
+      return st_nlink < o.st_nlink;
+    }
+#ifndef _WIN32
+    if(st_uid != o.st_uid)
+    {
+      return st_uid < o.st_uid;
+    }
+    if(st_gid != o.st_gid)
+    {
+      return st_gid < o.st_gid;
+    }
+    if(st_rdev != o.st_rdev)
+    {
+      return st_rdev < o.st_rdev;
+    }
+#endif
+    if(st_atim != o.st_atim)
+    {
+      return st_atim < o.st_atim;
+    }
+    if(st_mtim != o.st_mtim)
+    {
+      return st_mtim < o.st_mtim;
+    }
+    if(st_ctim != o.st_ctim)
+    {
+      return st_ctim < o.st_ctim;
+    }
+    if(st_size != o.st_size)
+    {
+      return st_size < o.st_size;
+    }
+    if(st_allocated != o.st_allocated)
+    {
+      return st_allocated < o.st_allocated;
+    }
+    if(st_blocks != o.st_blocks)
+    {
+      return st_blocks < o.st_blocks;
+    }
+    if(st_blksize != o.st_blksize)
+    {
+      return st_blksize < o.st_blksize;
+    }
+    if(st_flags != o.st_flags)
+    {
+      return st_flags < o.st_flags;
+    }
+    if(st_gen != o.st_gen)
+    {
+      return st_gen < o.st_gen;
+    }
+    if(st_birthtim != o.st_birthtim)
+    {
+      return st_birthtim < o.st_birthtim;
+    }
+    if(st_sparse != o.st_sparse)
+    {
+      return st_sparse < o.st_sparse;
+    }
+    if(st_compressed != o.st_compressed)
+    {
+      return st_compressed < o.st_compressed;
+    }
+    if(st_reparse_point != o.st_reparse_point)
+    {
+      return st_reparse_point < o.st_reparse_point;
+    }
+    return false;
   }
 
   /*! Fills the structure with metadata.
