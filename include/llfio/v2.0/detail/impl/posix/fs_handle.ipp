@@ -219,23 +219,29 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
 // Linux has an extension for atomic non-replacing renames
 #ifdef __linux__
     errno = 0;
-    if(-1 != 
+    if(-1 !=
 #if defined __aarch64__
-    syscall(276 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, 1 /*RENAME_NOREPLACE*/)
+       syscall(276 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer,
+               1 /*RENAME_NOREPLACE*/)
 #elif defined __arm__
-    syscall(382 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, 1 /*RENAME_NOREPLACE*/)
+       syscall(382 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer,
+               1 /*RENAME_NOREPLACE*/)
 #elif defined __i386__
-    syscall(353 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, 1 /*RENAME_NOREPLACE*/)
+       syscall(353 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer,
+               1 /*RENAME_NOREPLACE*/)
 #elif defined __powerpc64__
-    syscall(357 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, 1 /*RENAME_NOREPLACE*/)
+       syscall(357 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer,
+               1 /*RENAME_NOREPLACE*/)
 #elif defined __sparc__
-    syscall(345 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, 1 /*RENAME_NOREPLACE*/)
+       syscall(345 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer,
+               1 /*RENAME_NOREPLACE*/)
 #elif defined __x86_64__
-    syscall(316 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, 1 /*RENAME_NOREPLACE*/)
+       syscall(316 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer,
+               1 /*RENAME_NOREPLACE*/)
 #else
 #error Unknown Linux platform
 #endif
-      )
+    )
     {
       return success();
     }
@@ -244,8 +250,16 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
       return posix_error();
     }
 #endif
-    // Otherwise we need to use linkat followed by unlinkat, carefully reopening the file descriptor
-    // to preserve path tracking
+// Otherwise we need to use linkat followed by unlinkat, carefully reopening the file descriptor
+// to preserve path tracking
+#ifdef __APPLE__
+    // Apple randomly loses link tracking if you open a file with more than
+    // one hard link, so we unlink before opening the handle
+    if(-1 == ::unlinkat(dirh.native_handle().fd, filename.c_str(), 0))
+    {
+      return posix_error();
+    }
+#endif
     if(-1 == ::linkat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, 0))
     {
       return posix_error();
@@ -290,10 +304,12 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
         errcode = 0;
       }
     }
+#ifndef __APPLE__
     if(-1 == ::unlinkat(dirh.native_handle().fd, filename.c_str(), 0))
     {
       return posix_error();
     }
+#endif
     if(errcode != 0)
     {
       return posix_error(errcode);
