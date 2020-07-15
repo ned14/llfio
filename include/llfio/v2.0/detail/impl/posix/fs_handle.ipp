@@ -252,6 +252,10 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
 #endif
 // Otherwise we need to use linkat followed by unlinkat, carefully reopening the file descriptor
 // to preserve path tracking
+    if(-1 == ::linkat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, 0))
+    {
+      return posix_error();
+    }
 #ifdef __APPLE__
     // Apple randomly loses link tracking if you open a file with more than
     // one hard link, so we unlink before opening the handle
@@ -260,10 +264,6 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
       return posix_error();
     }
 #endif
-    if(-1 == ::linkat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, 0))
-    {
-      return posix_error();
-    }
     int attribs = fcntl(h.native_handle().fd, F_GETFL);
     int errcode = errno;
     if(-1 != attribs)
