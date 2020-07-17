@@ -50,9 +50,11 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool process_handle::is_running() const noexcept
   }
   siginfo_t info;
   memset(&info, 0, sizeof(info));
-  if(-1 == ::waitid(P_PID, _v.pid, &info, WNOHANG | WNOWAIT))
+  if(-1 == ::waitid(P_PID, _v.pid, &info, WEXITED | WNOHANG | WNOWAIT))
+  {
     return false;
-  return info.si_pid != 0;
+  }
+  return info.si_pid == 0;
 }
 
 LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<process_handle::path_type> process_handle::current_path() const noexcept
