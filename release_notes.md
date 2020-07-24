@@ -23,7 +23,7 @@ as Intel Optane.
 It is a complete rewrite after a Boost peer review in August 2015. Its github
 source code repository lives at https://github.com/ned14/llfio.
 
-- LLFIO is the reference implementation for these C++ standardisation:
+- LLFIO is the reference implementation for these C++ standardisations:
     - `llfio::path_view` is expected to enter the C++ 23 standard.
     - `llfio::file_handle` and `llfio::mapped_file_handle` are on track for entering the C++ 23 standard.
 - Portable to any conforming C++ 14 compiler with a working Filesystem TS in its STL.
@@ -31,6 +31,8 @@ source code repository lives at https://github.com/ned14/llfio.
 - Fully clean with C++ 20.
     - Will make use of any Coroutines, Concepts, Span, Byte etc if you have them, otherwise swaps in C++ 14 compatible alternatives.
     - NOTE that Ubuntu 18.04's libstdc++ 9 does not currently provide symbols for `<codecvt>` if you are building in C++ 20, so linking LLFIO programs on libstdc++ on that Linux if in C++ 20 will fail. Either use a different STL, manually rebuild libstdc++, or use C++ 17.
+- Aims to support Microsoft Windows, Linux, Android, iOS, Mac OS and FreeBSD.
+    - Best effort to support older kernels up to their EOL (as of July 2020: >= Windows 8.1, >= Linux 2.6.32 (RHEL EOL), >= Mac OS 10.13, >= FreeBSD 11).
 - Original error code is always preserved, even down to the original NT kernel error code if a NT kernel API was used.
     - Optional configuration based on [P1028](https://wg21.link/P1028) *SG14 status_code and standard error object
     for P0709 Zero-overhead deterministic exceptions*.
@@ -38,7 +40,7 @@ source code repository lives at https://github.com/ned14/llfio.
 - Zero malloc, zero exception throw and zero whole system memory copy design used throughout, even down to paths (which can hit 64Kb!).
 - Comprehensive support for virtual and mapped memory of both SCM/DAX and page cached storage, including large, huge and super pages.
 
-\note This code is of late beta quality. It has been shipping in production with multiple vendors for some years now. It is quite reliable on Windows and Linux (less well tested on Mac OS), so be careful when using it!
+\note Most of this code is of early mature quality. It has been shipping in production with multiple vendors for some years now, indeed amongst many big data solutions it powers the low level custom database component of the US Security and Exchange Commission's MIDAS solution which ingresses Terabytes of trade data per day. It is quite reliable on Windows and Linux (less well tested on Mac OS), so be careful when using it!
 
 Examples of use:
 <table width="100%" border="0" cellpadding="4">
@@ -129,25 +131,28 @@ Todo:
 | ✔ | ✔ | ✔ | `llfio::algorithm::trivial_vector<T>` with constant time reallocation if `T` is trivially copyable.
 |   | ✔ | ✔ | `symlink_handle`.
 | ✔ | ✔ | ✔ | Large, huge and massive page size support for memory allocation and (POSIX only) file maps.
+| ✔ | ✔ | ✔ | A mechanism for writing a `stat_t` onto an inode.
+| ✔ | ✔ | ✔ | Graph based directory hierarchy traveral algorithm.
+| ✔ | ✔ | ✔ | Graph based directory hierarchy summary algorithm.
+| ✔ | ✔ | ✔ | Graph based reliable directory hierarchy deletion algorithm.
+| ✔ | ✔ | ✔ | Intelligent file contents cloning between file handles.
 
 Todo thereafter in order of priority:
 
 | NEW in v2 | Windows | POSIX |     |
 | --------- | --------| ----- | --- |
-| ✔ |   |   | A mechanism for writing a `stat_t` onto an inode.
 | ✔ |   |   | Page allocator based on an index of linked list of free pages. See notes.
 | ✔ |   |   | Optionally concurrent B+ tree index based on page allocator for key-value store.
 | ✔ |   |   | Attributes extending `span<buffers_type>` with DMA colouring.
 | ✔ |   |   | Coroutine generator for iterating a file's contents in DMA friendly way.
-| ✔ |   |   | Ranges & Concurrency based reliable directory hierarchy deletion algorithm.
 | ✔ |   |   | Ranges & Concurrency based reliable directory hierarchy copy algorithm.
 | ✔ |   |   | Ranges & Concurrency based reliable directory hierarchy update (two and three way) algorithm.
-| ✔ |   |   | Linux KAIO support for native non-blocking `O_DIRECT` i/o
+| ✔ |   |   | Linux io_uring support for native non-blocking `O_DIRECT` i/o
 | ✔ |   |   | `std::pmr::memory_resource` adapting a file backing if on C++ 17.
 | ✔ |   |   | Extended attributes support.
 | ✔ |   |   | Algorithm to replace all duplicate content with hard links.
 | ✔ |   |   | Algorithm to figure out all paths for a hard linked inode.
-| ✔ |   |   | Algorithm to compare two or three directory enumerations and give differences. Probably blocked on the Ranges TS.
+| ✔ |   |   | Algorithm to compare two or three directory enumerations and give differences.
 
 Features possibly to be added after a Boost peer review:
 - Directory change monitoring.

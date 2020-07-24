@@ -32,6 +32,11 @@ Distributed under the Boost Software License, Version 1.0.
 #include <sys/uio.h>
 #endif
 
+#ifdef __linux__
+#include <sys/syscall.h>
+#include <sys/sysmacros.h>
+#endif
+
 //#include <iostream>
 
 LLFIO_V2_NAMESPACE_BEGIN
@@ -741,7 +746,21 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
 #endif
     auto _copy_file_range = [&](int infd, off_t *inoffp, int outfd, off_t *outoffp, size_t len, unsigned int flags) -> ssize_t {
 #if defined(__linux__)
-      return copy_file_range(infd, inoffp, outfd, outoffp, len, flags);
+#if defined __aarch64__
+       return syscall(285 /*__NR_copy_file_range*/, infd, inoffp, outfd, outoffp, len, flags);
+#elif defined __arm__
+       return syscall(391 /*__NR_copy_file_range*/, infd, inoffp, outfd, outoffp, len, flags);
+#elif defined __i386__
+       return syscall(377 /*__NR_copy_file_range*/, infd, inoffp, outfd, outoffp, len, flags);
+#elif defined __powerpc64__
+       return syscall(379 /*__NR_copy_file_range*/, infd, inoffp, outfd, outoffp, len, flags);
+#elif defined __sparc__
+       return syscall(357 /*__NR_copy_file_range*/, infd, inoffp, outfd, outoffp, len, flags);
+#elif defined __x86_64__
+       return syscall(326 /*__NR_copy_file_range*/, infd, inoffp, outfd, outoffp, len, flags);
+#else
+#error Unknown Linux platform
+#endif
 #elif defined(__FreeBSD__)
       // This gets implemented in FreeBSD 13. See https://reviews.freebsd.org/D20584
       return syscall(569 /*copy_file_range*/, intfd, inoffp, outfd, outoffp, len, flags);
