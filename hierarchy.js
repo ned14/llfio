@@ -76,8 +76,8 @@ var hierarchy =
     [ "llfio_v2_xxx::io_multiplexer::io_operation_state_visitor", "structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state__visitor.html", [
       [ "llfio_v2_xxx::io_multiplexer::awaitable< T >", "structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html", null ]
     ] ],
-    [ "llfio_v2_xxx::directory_handle::io_request< class >", "structllfio__v2__xxx_1_1directory__handle_1_1io__request.html", null ],
     [ "llfio_v2_xxx::io_multiplexer::io_request< T >", "structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html", null ],
+    [ "llfio_v2_xxx::directory_handle::io_request< class >", "structllfio__v2__xxx_1_1directory__handle_1_1io__request.html", null ],
     [ "llfio_v2_xxx::symlink_handle::io_request< T, bool >", "structllfio__v2__xxx_1_1symlink__handle_1_1io__request.html", null ],
     [ "llfio_v2_xxx::io_multiplexer::io_request< buffers_type >", "structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html", null ],
     [ "llfio_v2_xxx::symlink_handle::io_request< buffers_type, ____ >", "structllfio__v2__xxx_1_1symlink__handle_1_1io__request_3_01buffers__type_00_01_________01_4.html", null ],

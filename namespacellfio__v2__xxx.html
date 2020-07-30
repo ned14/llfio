@@ -262,6 +262,10 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="nam
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a8b7cb2a8ae49464e9a5b708f1d6b4783">log_level</a> = QUICKCPPLIB_NAMESPACE::ringbuffer_log::level</td></tr>
 <tr class="memdesc:a8b7cb2a8ae49464e9a5b708f1d6b4783"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enum for the log level. <br /></td></tr>
 <tr class="separator:a8b7cb2a8ae49464e9a5b708f1d6b4783"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca929614e4fad8cb074325503044845a"><td class="memItemLeft" align="right" valign="top"><a id="aca929614e4fad8cb074325503044845a"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#aca929614e4fad8cb074325503044845a">log_implementation_type</a> = QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log&lt; <a class="el" href="group__config.html#ga2e45ede29ed7b2aa06eb19aff2485541">LLFIO_LOGGING_MEMORY</a>, detail::thread_local_log_level_filter &gt;</td></tr>
+<tr class="memdesc:aca929614e4fad8cb074325503044845a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of the logger. <br /></td></tr>
+<tr class="separator:aca929614e4fad8cb074325503044845a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae5d37600965dbac07498cc811c93bae5"><td class="memTemplParams" colspan="2"><a id="ae5d37600965dbac07498cc811c93bae5"></a>
 template&lt;class T &gt; </td></tr>
 <tr class="memitem:ae5d37600965dbac07498cc811c93bae5"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>result</b> = OUTCOME_V2_NAMESPACE::result&lt; T, <a class="el" href="structllfio__v2__xxx_1_1error__info.html">error_info</a> &gt;</td></tr>
@@ -392,10 +396,10 @@ constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a7f32245d09ba18756513c19b053fd057">is_finished</a> (<a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745">io_operation_state_type</a> s) noexcept</td></tr>
 <tr class="memdesc:a7f32245d09ba18756513c19b053fd057"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if the i/o operation state is finished. <br /></td></tr>
 <tr class="separator:a7f32245d09ba18756513c19b053fd057"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a797b0860963b9de1781023de7f9da826"><td class="memItemLeft" align="right" valign="top"><a id="a797b0860963b9de1781023de7f9da826"></a>
-QUICKCPPLIB_NAMESPACE::ringbuffer_log::simple_ringbuffer_log&lt; <a class="el" href="group__config.html#ga2e45ede29ed7b2aa06eb19aff2485541">LLFIO_LOGGING_MEMORY</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a797b0860963b9de1781023de7f9da826">log</a> () noexcept</td></tr>
-<tr class="memdesc:a797b0860963b9de1781023de7f9da826"><td class="mdescLeft">&#160;</td><td class="mdescRight">The log used by LLFIO. <br /></td></tr>
-<tr class="separator:a797b0860963b9de1781023de7f9da826"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af54eb9dc436578bd4f28ba955293986d"><td class="memItemLeft" align="right" valign="top"><a id="af54eb9dc436578bd4f28ba955293986d"></a>
+<a class="el" href="namespacellfio__v2__xxx.html#aca929614e4fad8cb074325503044845a">log_implementation_type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#af54eb9dc436578bd4f28ba955293986d">log</a> () noexcept</td></tr>
+<tr class="memdesc:af54eb9dc436578bd4f28ba955293986d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The log used by LLFIO. <br /></td></tr>
+<tr class="separator:af54eb9dc436578bd4f28ba955293986d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaf60dc6739dc2bd7d890630b1a50d15a"><td class="memItemLeft" align="right" valign="top"><a id="aaf60dc6739dc2bd7d890630b1a50d15a"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const section_handle::flag &amp;v)</td></tr>
 <tr class="separator:aaf60dc6739dc2bd7d890630b1a50d15a"><td class="memSeparator" colspan="2">&#160;</td></tr>
