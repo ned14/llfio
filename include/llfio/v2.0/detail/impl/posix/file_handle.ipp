@@ -771,7 +771,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
       (void) outoffp;
       (void) len;
       (void) flags;
-      errno = EOPNOTSUPP;
+      errno = ENOSYS;
       return -1;
 #endif
     };
@@ -797,7 +797,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
           off_t off_in = item.src.offset + thisoffset, off_out = item.src.offset + thisoffset + destoffsetdiff;
           if(_copy_file_range(_v.fd, &off_in, dest.native_handle().fd, &off_out, thisblock, 0) < 0)
           {
-            if((EXDEV != errno && EOPNOTSUPP != errno) || !emulate_if_unsupported)
+            if((EXDEV != errno && EOPNOTSUPP != errno && ENOSYS != errno) || !emulate_if_unsupported)
             {
               return posix_error();
             }
@@ -876,7 +876,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
         {
           if(_zero_file_range(dest.native_handle().fd, item.src.offset + thisoffset + destoffsetdiff, thisblock) < 0)
           {
-            if(EOPNOTSUPP != errno || !emulate_if_unsupported)
+            if((EOPNOTSUPP != errno && ENOSYS != errno) || !emulate_if_unsupported)
             {
               return posix_error();
             }
