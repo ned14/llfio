@@ -142,7 +142,8 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
       return {buffer_, end};
     }();
     auto unique_id = backing.unique_id();
-    QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string(buffer.second, sizeof(unique_id) * 4, reinterpret_cast<char *>(unique_id.as_bytes), sizeof(unique_id));
+    QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string(buffer.second, sizeof(unique_id) * 4, reinterpret_cast<char *>(unique_id.as_bytes),
+                                                            sizeof(unique_id));
     buffer.second[32] = 0;
     _path.Buffer = buffer.first;
     _path.MaximumLength = (_path.Length = static_cast<USHORT>((32 + buffer.second - buffer.first) * sizeof(wchar_t))) + sizeof(wchar_t);
@@ -315,7 +316,8 @@ template <class T> static inline T win32_round_up_to_allocation_size(T i) noexce
   i = (T)((LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i) + 65535) & ~(65535));  // NOLINT
   return i;
 }
-static inline result<void> win32_map_flags(native_handle_type &nativeh, DWORD &allocation, DWORD &prot, size_t &commitsize, bool enable_reservation, section_handle::flag _flag)
+static inline result<void> win32_map_flags(native_handle_type &nativeh, DWORD &allocation, DWORD &prot, size_t &commitsize, bool enable_reservation,
+                                           section_handle::flag _flag)
 {
   prot = PAGE_NOACCESS;
   if(enable_reservation && ((_flag & section_handle::flag::nocommit) || (_flag == section_handle::flag::none)))
@@ -372,7 +374,12 @@ static inline result<void> win32_map_flags(native_handle_type &nativeh, DWORD &a
   return success();
 }
 
-QUICKCPPLIB_BITFIELD_BEGIN(win32_map_sought){committed = 1U << 0U, freed = 1U << 1U, reserved = 1U << 2U} QUICKCPPLIB_BITFIELD_END(win32_map_sought)
+QUICKCPPLIB_BITFIELD_BEGIN(win32_map_sought){
+committed = 1U << 0U,  // Call F for committed pages
+freed = 1U << 1U,      // Call F for free pages
+reserved = 1U << 2U,   // Call F for reserved pages
+only_bases = 1U << 3U  // Only call F for AllocationBase changing regions only. You want this for maps of files, reservations etc.
+} QUICKCPPLIB_BITFIELD_END(win32_map_sought)
 // Used to apply an operation to all maps within a region
 template <class F>
 static inline result<void> win32_maps_apply(byte *addr, size_t bytes, win32_map_sought sought, F &&f)
@@ -380,7 +387,7 @@ static inline result<void> win32_maps_apply(byte *addr, size_t bytes, win32_map_
   /* Ok, so we have to be super careful here, indeed this routine has been
   completely rewritten three times now. Do NOT change it unless you are aware
   of the following:
-  
+
   Version 1:
   ----------
   We would call VirtualQuery() to find a matching region, perform
@@ -409,8 +416,14 @@ static inline result<void> win32_maps_apply(byte *addr, size_t bytes, win32_map_
   generally speaking, a TLB shootdown is a lot more expensive than malloc.
   */
   MEMORY_BASIC_INFORMATION mbi;
-  static thread_local std::vector<std::pair<byte *, size_t>> toinvoke([] {
-    std::vector<std::pair<byte *, size_t>> ret;
+  struct toinvoke_t
+  {
+    byte *addr;
+    size_t length;
+    void *base;
+  };
+  static thread_local std::vector<toinvoke_t> toinvoke([] {
+    std::vector<toinvoke_t> ret;
     ret.reserve(64);
     return ret;
   }());
@@ -431,10 +444,24 @@ static inline result<void> win32_maps_apply(byte *addr, size_t bytes, win32_map_
     doit = doit || ((MEM_RESERVE == mbi.State) && (sought & win32_map_sought::reserved));
     if(doit)
     {
-      /* mbi.RegionSize will be that from mbi.AllocationBase to end of a reserved region,
-      so clamp to region size originally requested.
-      */
-      toinvoke.emplace_back(reinterpret_cast<byte *>(mbi.BaseAddress), std::min(mbi.RegionSize, bytes));
+      if(!(sought & win32_map_sought::only_bases))
+      {
+        /* mbi.RegionSize will be that from mbi.BaseAddress to end of a reserved region,
+        so clamp to region size originally requested.
+        */
+        toinvoke.push_back({reinterpret_cast<byte *>(mbi.BaseAddress), std::min(mbi.RegionSize, bytes), mbi.AllocationBase});
+      }
+      else
+      {
+        if(toinvoke.empty() || mbi.AllocationBase != toinvoke.back().base)
+        {
+          toinvoke.push_back({reinterpret_cast<byte *>(mbi.BaseAddress), std::min(mbi.RegionSize, bytes), mbi.AllocationBase});
+        }
+        else if(!toinvoke.empty())
+        {
+          toinvoke.back().length += std::min(mbi.RegionSize, bytes);
+        }
+      }
     }
     addr += mbi.RegionSize;
     if(mbi.RegionSize < bytes)
@@ -448,7 +475,8 @@ static inline result<void> win32_maps_apply(byte *addr, size_t bytes, win32_map_
   }
   for(auto &i : toinvoke)
   {
-    OUTCOME_TRY(f(i.first, i.second));
+    //std::cout << "f(" << i.addr << ", " << i.length << ")" << std::endl;
+    OUTCOME_TRY(f(i.addr, i.length));
   }
   return success();
 }
@@ -501,7 +529,8 @@ result<void> map_handle::close() noexcept
       {
         OUTCOME_TRYV(barrier(barrier_kind::wait_all));
       }
-      OUTCOME_TRYV(win32_maps_apply(_addr, _reservation, win32_map_sought::committed, [](byte *addr, size_t /* unused */) -> result<void> {
+      OUTCOME_TRYV(
+      win32_maps_apply(_addr, _reservation, win32_map_sought::committed | win32_map_sought::only_bases, [](byte *addr, size_t /* unused */) -> result<void> {
         NTSTATUS ntstat = NtUnmapViewOfSection(GetCurrentProcess(), addr);
         if(ntstat < 0)
         {
@@ -532,7 +561,8 @@ native_handle_type map_handle::release() noexcept
   return {};
 }
 
-map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_barrier(map_handle::io_request<map_handle::const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
+map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_barrier(map_handle::io_request<map_handle::const_buffers_type> reqs, barrier_kind kind,
+                                                                              deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   byte *addr = _addr + reqs.offset;
@@ -709,14 +739,15 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool /* un
   if(newsize < _reservation)
   {
     // If newsize isn't exactly a previous extension, this will fail, same as for the VirtualAlloc case
-    OUTCOME_TRYV(win32_maps_apply(_addr + newsize, _reservation - newsize, win32_map_sought::committed, [](byte *addr, size_t /* unused */) -> result<void> {
-      NTSTATUS ntstat = NtUnmapViewOfSection(GetCurrentProcess(), addr);
-      if(ntstat < 0)
-      {
-        return ntkernel_error(ntstat);
-      }
-      return success();
-    }));
+    OUTCOME_TRYV(win32_maps_apply(_addr + newsize, _reservation - newsize, win32_map_sought::committed | win32_map_sought::only_bases,
+                                  [](byte *addr, size_t /* unused */) -> result<void> {
+                                    NTSTATUS ntstat = NtUnmapViewOfSection(GetCurrentProcess(), addr);
+                                    if(ntstat < 0)
+                                    {
+                                      return ntkernel_error(ntstat);
+                                    }
+                                    return success();
+                                  }));
     _reservation = newsize;
     _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
     return _reservation;
@@ -777,13 +808,14 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
     prot = PAGE_EXECUTE;
   }
   region = utils::round_to_page_size_larger(region, _pagesize);
-  OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed | win32_map_sought::freed | win32_map_sought::reserved, [prot](byte *addr, size_t bytes) -> result<void> {
-    if(VirtualAlloc(addr, bytes, MEM_COMMIT, prot) == nullptr)
-    {
-      return win32_error();
-    }
-    return success();
-  }));
+  OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed | win32_map_sought::freed | win32_map_sought::reserved,
+                                [prot](byte *addr, size_t bytes) -> result<void> {
+                                  if(VirtualAlloc(addr, bytes, MEM_COMMIT, prot) == nullptr)
+                                  {
+                                    return win32_error();
+                                  }
+                                  return success();
+                                }));
   return region;
 }
 
