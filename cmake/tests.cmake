@@ -12,6 +12,7 @@ set(llfio_TESTS
   "test/tests/file_handle_create_close/runner.cpp"
   "test/tests/file_handle_lock_unlock.cpp"
   "test/tests/handle_adapter_xor.cpp"
+  "test/tests/issue0009.cpp"
   "test/tests/issue0027.cpp"
   "test/tests/issue0028.cpp"
   "test/tests/large_pages.cpp"

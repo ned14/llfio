@@ -1,5 +1,5 @@
 /* A handle to a source of mapped memory
-(C) 2016-2017 Niall Douglas <http://www.nedproductions.biz/> (17 commits)
+(C) 2016-2020 Niall Douglas <http://www.nedproductions.biz/> (17 commits)
 File Created: August 2016
 
 
@@ -377,19 +377,45 @@ QUICKCPPLIB_BITFIELD_BEGIN(win32_map_sought){committed = 1U << 0U, freed = 1U <<
 template <class F>
 static inline result<void> win32_maps_apply(byte *addr, size_t bytes, win32_map_sought sought, F &&f)
 {
-  /* Ok, so we have to be super careful here, because calling VirtualQuery()
-  somewhere in the middle of a region causes a linear scan until the beginning
-  or end of the region is found. For a reservation of say 2^42, that takes a
-  LONG time.
+  /* Ok, so we have to be super careful here, indeed this routine has been
+  completely rewritten three times now. Do NOT change it unless you are aware
+  of the following:
+  
+  Version 1:
+  ----------
+  We would call VirtualQuery() to find a matching region, perform
+  F on it, and then call VirtualQuery() on the address where the matching region
+  ended. Unfortunately, F might cause coalescing of the regions, and it turns out
+  that calling VirtualQuery() somewhere in the middle of a region
+  causes a linear scan until the beginning or end of the region is found. If the
+  region just unmapped was within say a reservation of 2^42, that takes a LONG time.
+  Users rightly complained about crap performance.
 
-  What we do instead is to query the current block, perform F on it, then query
-  it again to get the next point of change, query that, perhaps perform F on it,
-  and so on.
+  Version 2:
+  ----------
+  We would call VirtualQuery() to find a matching region, perform F on it, then query
+  the *same* block again to get the next point of change, query that, perhaps perform F on it,
+  and so on. This introduced twice the number of VirtualQuery() calls as ought to be necessary,
+  but this version worked well for nearly two years before the now-obvious race
+  condition was discovered: if the region was freed, and another thread performs
+  an allocation whose address just happens to land within the region just freed, the
+  second VirtualQuery() will now free another thread's allocation!
 
-  This causes twice the number of VirtualQuery() calls as ought to be necessary,
-  but such is this API's design.
+  Version 3:
+  ----------
+  We iterate VirtualQuery() over the input byte range, storing all the matching results
+  into a vector. We then iterate the vector, calling the function. The dynamic memory
+  allocation is unfortunate, but we cache the vector storage thread locally. And,
+  generally speaking, a TLB shootdown is a lot more expensive than malloc.
   */
   MEMORY_BASIC_INFORMATION mbi;
+  static thread_local std::vector<std::pair<byte *, size_t>> toinvoke([] {
+    std::vector<std::pair<byte *, size_t>> ret;
+    ret.reserve(64);
+    return ret;
+  }());
+  toinvoke.clear();
+  //std::cout << "win32_maps_apply addr=" << addr << " size=" << bytes << std::endl;
   while(bytes > 0)
   {
     if(!VirtualQuery(addr, &mbi, sizeof(mbi)))
@@ -397,6 +423,8 @@ static inline result<void> win32_maps_apply(byte *addr, size_t bytes, win32_map_
       LLFIO_LOG_FATAL(nullptr, "map_handle::win32_maps_apply VirtualQuery() 1 failed");
       abort();
     }
+    //std::cout << "VQ1 baseaddr=" << mbi.BaseAddress << " size=" << mbi.RegionSize << " allocbase=" << mbi.AllocationBase << " state=" << mbi.State
+    //          << " type=" << mbi.Type << std::endl;
     bool doit = false;
     doit = doit || ((MEM_COMMIT == mbi.State) && (sought & win32_map_sought::committed));
     doit = doit || ((MEM_FREE == mbi.State) && (sought & win32_map_sought::freed));
@@ -406,12 +434,7 @@ static inline result<void> win32_maps_apply(byte *addr, size_t bytes, win32_map_
       /* mbi.RegionSize will be that from mbi.AllocationBase to end of a reserved region,
       so clamp to region size originally requested.
       */
-      OUTCOME_TRYV(f(reinterpret_cast<byte *>(mbi.BaseAddress), std::min(mbi.RegionSize, bytes)));
-    }
-    if(!VirtualQuery(addr, &mbi, sizeof(mbi)))
-    {
-      LLFIO_LOG_FATAL(nullptr, "map_handle::win32_maps_apply VirtualQuery() 2 failed");
-      abort();
+      toinvoke.emplace_back(reinterpret_cast<byte *>(mbi.BaseAddress), std::min(mbi.RegionSize, bytes));
     }
     addr += mbi.RegionSize;
     if(mbi.RegionSize < bytes)
@@ -422,6 +445,10 @@ static inline result<void> win32_maps_apply(byte *addr, size_t bytes, win32_map_
     {
       bytes = 0;
     }
+  }
+  for(auto &i : toinvoke)
+  {
+    OUTCOME_TRY(f(i.first, i.second));
   }
   return success();
 }

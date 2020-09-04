@@ -28,12 +28,20 @@ foreach(item ${CMAKE_MODULE_PATH})
     set(quickcpplib_done ON)
   endif()
 endforeach()
+if(DEFINED quickcpplib_DIR)
+  find_package(quickcpplib QUIET CONFIG)
+  if(quickcpplib_FOUND)
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${quickcpplib_DIR}/cmakelib")
+    set(CTEST_QUICKCPPLIB_SCRIPTS "${quickcpplib_DIR}/scripts")
+    set(quickcpplib_done ON)
+  endif()
+endif()
 if(NOT quickcpplib_done)
   # CMAKE_SOURCE_DIR is the very topmost parent cmake project
   # CMAKE_CURRENT_SOURCE_DIR is the current cmake subproject
   if(NOT DEFINED CTEST_QUICKCPPLIB_CLONE_DIR)
-    # If there is a magic .quickcpplib_use_siblings directory above the topmost project, use sibling edition
     if(EXISTS "${CMAKE_SOURCE_DIR}/../.quickcpplib_use_siblings" AND NOT QUICKCPPLIB_DISABLE_SIBLINGS)
+      # If there is a magic .quickcpplib_use_siblings directory above the topmost project, use sibling edition
       set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../quickcpplib/cmakelib")
       set(CTEST_QUICKCPPLIB_SCRIPTS "${CMAKE_SOURCE_DIR}/../quickcpplib/scripts")
       # Copy latest version of myself into end user
