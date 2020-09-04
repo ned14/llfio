@@ -90,6 +90,11 @@ namespace algorithm
         {
           ntstat = ntwait(h, isb, deadline());
         }
+        if(0xC0000056 /*STATUS_DELETE_PENDING*/ == ntstat)
+        {
+          // Can skip this fellow
+          return success();
+        }
       }
       else
       {
@@ -98,6 +103,11 @@ namespace algorithm
         if(STATUS_PENDING == ntstat)
         {
           ntstat = ntwait(h, isb, deadline());
+        }
+        if(0xC0000056 /*STATUS_DELETE_PENDING*/ == ntstat)
+        {
+          // Can skip this fellow
+          return success();
         }
         if(ntstat >= 0)
         {
@@ -196,6 +206,11 @@ namespace algorithm
           {
             ntstat = ntwait(h, isb, deadline());
           }
+          if(0xC0000056 /*STATUS_DELETE_PENDING*/ == ntstat)
+          {
+            // Can skip this fellow
+            return success();
+          }
         }
         else
         {
@@ -203,6 +218,11 @@ namespace algorithm
           if(STATUS_PENDING == ntstat)
           {
             ntstat = ntwait(h, isb, deadline());
+          }
+          if(0xC0000056 /*STATUS_DELETE_PENDING*/ == ntstat)
+          {
+            // Can skip this fellow
+            return success();
           }
         }
         if(h != INVALID_HANDLE_VALUE)

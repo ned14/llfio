@@ -31,6 +31,12 @@ namespace detail
 #if defined(LLFIO_SOURCE) && !defined(LLFIO_DISABLE_SIZEOF_FILESYSTEM_PATH_CHECK)
   LLFIO_HEADERS_ONLY_FUNC_SPEC size_t sizeof_filesystem_path() noexcept { return sizeof(filesystem::path); }
 #endif
+
+  LLFIO_HEADERS_ONLY_FUNC_SPEC char &thread_local_log_level()
+  {
+    static LLFIO_THREAD_LOCAL char v;
+    return v;
+  }
 }  // namespace detail
 
 LLFIO_V2_NAMESPACE_END

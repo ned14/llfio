@@ -102,7 +102,7 @@ result<mapped_file_handle::extent_type> mapped_file_handle::truncate(extent_type
     OUTCOME_TRYV(_sh.close());
     return file_handle::truncate(newsize);
   }
-  if(!_sh.is_valid())
+  if(!_sh.is_valid() || !_mh.is_valid())
   {
     OUTCOME_TRY(auto &&ret, file_handle::truncate(newsize));
     if(newsize > _reservation)

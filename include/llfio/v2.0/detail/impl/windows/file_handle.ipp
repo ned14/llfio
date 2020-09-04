@@ -821,7 +821,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
           }
           done = true;
         }
-        assert(done);
+        //assert(done);
         dest_length = destoffset + extent.length;
         truncate_back_on_failure = false;
         LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
