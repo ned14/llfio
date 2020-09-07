@@ -87,7 +87,22 @@ static inline void TestIssue09b()
   BOOST_CHECK(diff < 250);
 }
 
+static inline void TestIssue09c()
+{
+  namespace llfio = LLFIO_V2_NAMESPACE;
+  auto begin = std::chrono::steady_clock::now();
+  auto mfh = llfio::mapped_file_handle::mapped_temp_file(1ULL << 40ULL).value();
+  mfh.truncate(100 * 1024).value();
+  mfh.close().value();
+  auto end = std::chrono::steady_clock::now();
+  auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+  std::cout << "Construct and tear down a small mapped_file_handle with a reservation of 2^40 took " << diff << "ms." << std::endl;
+  BOOST_CHECK(diff < 250);
+}
+
 KERNELTEST_TEST_KERNEL(regression, llfio, issues, 9a,
                        "Tests issue #9 map_handle and mapped_file_handle are very slow with large address reservations on Windows", TestIssue09a())
 KERNELTEST_TEST_KERNEL(regression, llfio, issues, 9b,
                        "Tests issue #9 map_handle and mapped_file_handle are very slow with large address reservations on Windows", TestIssue09b())
+KERNELTEST_TEST_KERNEL(regression, llfio, issues, 9c,
+                       "Tests issue #9 map_handle and mapped_file_handle are very slow with large address reservations on Windows", TestIssue09c())

@@ -55,7 +55,8 @@ Distributed under the Boost Software License, Version 1.0.
 // Bring in the custom NT kernel error code category
 #if LLFIO_HEADERS_ONLY
 #if !defined(NTKERNEL_ERROR_CATEGORY_INLINE)
-#pragma message("WARNING: LLFIO_HEADERS_ONLY=1, LLFIO_EXPERIMENTAL_STATUS_CODE=0 and NTKERNEL_ERROR_CATEGORY_INLINE=1 on Windows, this can produce unreliable binaries where semantic comparisons of error codes randomly fail!")
+#pragma message(                                                                                                                                               \
+"WARNING: LLFIO_HEADERS_ONLY=1, LLFIO_EXPERIMENTAL_STATUS_CODE=0 and NTKERNEL_ERROR_CATEGORY_INLINE=1 on Windows, this can produce unreliable binaries where semantic comparisons of error codes randomly fail!")
 #define NTKERNEL_ERROR_CATEGORY_INLINE 1  // BOLD!
 #define NTKERNEL_ERROR_CATEGORY_STATIC 1
 #endif
@@ -212,7 +213,8 @@ namespace windows_nt_kernel
   // From http://msdn.microsoft.com/en-us/library/windows/hardware/ff550671(v=vs.85).aspx
   typedef struct _IO_STATUS_BLOCK  // NOLINT
   {
-    union {
+    union
+    {
       NTSTATUS Status;
       PVOID Pointer;
     };
@@ -277,33 +279,47 @@ namespace windows_nt_kernel
   } SECTION_BASIC_INFORMATION, *PSECTION_BASIC_INFORMATION;
 
   // From https://msdn.microsoft.com/en-us/library/bb432383%28v=vs.85%29.aspx
-  using NtQueryObject_t = NTSTATUS(NTAPI *)(_In_opt_ HANDLE Handle, _In_ OBJECT_INFORMATION_CLASS ObjectInformationClass, _Out_opt_ PVOID ObjectInformation, _In_ ULONG ObjectInformationLength, _Out_opt_ PULONG ReturnLength);
+  using NtQueryObject_t = NTSTATUS(NTAPI *)(_In_opt_ HANDLE Handle, _In_ OBJECT_INFORMATION_CLASS ObjectInformationClass, _Out_opt_ PVOID ObjectInformation,
+                                            _In_ ULONG ObjectInformationLength, _Out_opt_ PULONG ReturnLength);
 
   // From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/NtQueryInformationFile.html
   // and http://msdn.microsoft.com/en-us/library/windows/hardware/ff567052(v=vs.85).aspx
-  using NtQueryInformationFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _Out_ PVOID FileInformation, _In_ ULONG Length, _In_ FILE_INFORMATION_CLASS FileInformationClass);
+  using NtQueryInformationFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _Out_ PVOID FileInformation,
+                                                     _In_ ULONG Length, _In_ FILE_INFORMATION_CLASS FileInformationClass);
 
   // From http://msdn.microsoft.com/en-us/library/windows/hardware/ff567070(v=vs.85).aspx
-  using NtQueryVolumeInformationFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _Out_ PVOID FsInformation, _In_ ULONG Length, _In_ FS_INFORMATION_CLASS FsInformationClass);
+  using NtQueryVolumeInformationFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _Out_ PVOID FsInformation,
+                                                           _In_ ULONG Length, _In_ FS_INFORMATION_CLASS FsInformationClass);
 
   // From http://msdn.microsoft.com/en-us/library/windows/hardware/ff566492(v=vs.85).aspx
   using NtOpenDirectoryObject_t = NTSTATUS(NTAPI *)(_Out_ PHANDLE DirectoryHandle, _In_ ACCESS_MASK DesiredAccess, _In_ POBJECT_ATTRIBUTES ObjectAttributes);
 
 
   // From http://msdn.microsoft.com/en-us/library/windows/hardware/ff567011(v=vs.85).aspx
-  using NtOpenFile_t = NTSTATUS(NTAPI *)(_Out_ PHANDLE FileHandle, _In_ ACCESS_MASK DesiredAccess, _In_ POBJECT_ATTRIBUTES ObjectAttributes, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ ULONG ShareAccess, _In_ ULONG OpenOptions);
+  using NtOpenFile_t = NTSTATUS(NTAPI *)(_Out_ PHANDLE FileHandle, _In_ ACCESS_MASK DesiredAccess, _In_ POBJECT_ATTRIBUTES ObjectAttributes,
+                                         _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ ULONG ShareAccess, _In_ ULONG OpenOptions);
 
   // From http://msdn.microsoft.com/en-us/library/windows/hardware/ff566424(v=vs.85).aspx
-  using NtCreateFile_t = NTSTATUS(NTAPI *)(_Out_ PHANDLE FileHandle, _In_ ACCESS_MASK DesiredAccess, _In_ POBJECT_ATTRIBUTES ObjectAttributes, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_opt_ PLARGE_INTEGER AllocationSize, _In_ ULONG FileAttributes, _In_ ULONG ShareAccess, _In_ ULONG CreateDisposition,
-                                           _In_ ULONG CreateOptions, _In_opt_ PVOID EaBuffer, _In_ ULONG EaLength);
+  using NtCreateFile_t = NTSTATUS(NTAPI *)(_Out_ PHANDLE FileHandle, _In_ ACCESS_MASK DesiredAccess, _In_ POBJECT_ATTRIBUTES ObjectAttributes,
+                                           _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_opt_ PLARGE_INTEGER AllocationSize, _In_ ULONG FileAttributes,
+                                           _In_ ULONG ShareAccess, _In_ ULONG CreateDisposition, _In_ ULONG CreateOptions, _In_opt_ PVOID EaBuffer,
+                                           _In_ ULONG EaLength);
 
-  using NtReadFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _In_opt_ HANDLE Event, _In_opt_ PIO_APC_ROUTINE ApcRoutine, _In_opt_ PVOID ApcContext, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _Out_ PVOID Buffer, _In_ ULONG Length, _In_opt_ PLARGE_INTEGER ByteOffset, _In_opt_ PULONG Key);
+  using NtReadFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _In_opt_ HANDLE Event, _In_opt_ PIO_APC_ROUTINE ApcRoutine, _In_opt_ PVOID ApcContext,
+                                         _Out_ PIO_STATUS_BLOCK IoStatusBlock, _Out_ PVOID Buffer, _In_ ULONG Length, _In_opt_ PLARGE_INTEGER ByteOffset,
+                                         _In_opt_ PULONG Key);
 
-  using NtReadFileScatter_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _In_opt_ HANDLE Event, _In_opt_ PIO_APC_ROUTINE ApcRoutine, _In_opt_ PVOID ApcContext, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ FILE_SEGMENT_ELEMENT SegmentArray, _In_ ULONG Length, _In_opt_ PLARGE_INTEGER ByteOffset, _In_opt_ PULONG Key);
+  using NtReadFileScatter_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _In_opt_ HANDLE Event, _In_opt_ PIO_APC_ROUTINE ApcRoutine, _In_opt_ PVOID ApcContext,
+                                                _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ FILE_SEGMENT_ELEMENT SegmentArray, _In_ ULONG Length,
+                                                _In_opt_ PLARGE_INTEGER ByteOffset, _In_opt_ PULONG Key);
 
-  using NtWriteFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _In_opt_ HANDLE Event, _In_opt_ PIO_APC_ROUTINE ApcRoutine, _In_opt_ PVOID ApcContext, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ PVOID Buffer, _In_ ULONG Length, _In_opt_ PLARGE_INTEGER ByteOffset, _In_opt_ PULONG Key);
+  using NtWriteFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _In_opt_ HANDLE Event, _In_opt_ PIO_APC_ROUTINE ApcRoutine, _In_opt_ PVOID ApcContext,
+                                          _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ PVOID Buffer, _In_ ULONG Length, _In_opt_ PLARGE_INTEGER ByteOffset,
+                                          _In_opt_ PULONG Key);
 
-  using NtWriteFileGather_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _In_opt_ HANDLE Event, _In_opt_ PIO_APC_ROUTINE ApcRoutine, _In_opt_ PVOID ApcContext, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ FILE_SEGMENT_ELEMENT SegmentArray, _In_ ULONG Length, _In_opt_ PLARGE_INTEGER ByteOffset, _In_opt_ PULONG Key);
+  using NtWriteFileGather_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _In_opt_ HANDLE Event, _In_opt_ PIO_APC_ROUTINE ApcRoutine, _In_opt_ PVOID ApcContext,
+                                                _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ FILE_SEGMENT_ELEMENT SegmentArray, _In_ ULONG Length,
+                                                _In_opt_ PLARGE_INTEGER ByteOffset, _In_opt_ PULONG Key);
 
   using NtDeleteFile_t = NTSTATUS(NTAPI *)(_In_ POBJECT_ATTRIBUTES ObjectAttributes);
 
@@ -312,17 +328,23 @@ namespace windows_nt_kernel
   using NtClose_t = NTSTATUS(NTAPI *)(_Out_ HANDLE FileHandle);
 
   // From https://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/NtCreateNamedPipeFile.html
-  using NtCreateNamedPipeFile_t = NTSTATUS(NTAPI *)(_Out_ PHANDLE NamedPipeFileHandle, _In_ ACCESS_MASK DesiredAccess, _In_ POBJECT_ATTRIBUTES ObjectAttributes, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ ULONG ShareAccess, _In_ ULONG CreateDisposition, _In_ ULONG CreateOptions, _In_ ULONG WriteModeMessage,
-                                                    _In_ ULONG ReadModeMessage, _In_ ULONG NonBlocking, _In_ ULONG MaxInstances, _In_ ULONG InBufferSize, _In_ ULONG OutBufferSize, _In_ PLARGE_INTEGER DefaultTimeOut);
+  using NtCreateNamedPipeFile_t = NTSTATUS(NTAPI *)(_Out_ PHANDLE NamedPipeFileHandle, _In_ ACCESS_MASK DesiredAccess, _In_ POBJECT_ATTRIBUTES ObjectAttributes,
+                                                    _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ ULONG ShareAccess, _In_ ULONG CreateDisposition,
+                                                    _In_ ULONG CreateOptions, _In_ ULONG WriteModeMessage, _In_ ULONG ReadModeMessage, _In_ ULONG NonBlocking,
+                                                    _In_ ULONG MaxInstances, _In_ ULONG InBufferSize, _In_ ULONG OutBufferSize,
+                                                    _In_ PLARGE_INTEGER DefaultTimeOut);
 
   // From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/NtQueryDirectoryFile.html
   // and http://msdn.microsoft.com/en-us/library/windows/hardware/ff567047(v=vs.85).aspx
-  using NtQueryDirectoryFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _In_opt_ HANDLE Event, _In_opt_ PIO_APC_ROUTINE ApcRoutine, _In_opt_ PVOID ApcContext, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _Out_ PVOID FileInformation, _In_ ULONG Length, _In_ FILE_INFORMATION_CLASS FileInformationClass,
-                                                   _In_ BOOLEAN ReturnSingleEntry, _In_opt_ PUNICODE_STRING FileName, _In_ BOOLEAN RestartScan);
+  using NtQueryDirectoryFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _In_opt_ HANDLE Event, _In_opt_ PIO_APC_ROUTINE ApcRoutine,
+                                                   _In_opt_ PVOID ApcContext, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _Out_ PVOID FileInformation,
+                                                   _In_ ULONG Length, _In_ FILE_INFORMATION_CLASS FileInformationClass, _In_ BOOLEAN ReturnSingleEntry,
+                                                   _In_opt_ PUNICODE_STRING FileName, _In_ BOOLEAN RestartScan);
 
   // From http://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/NtSetInformationFile.html
   // and http://msdn.microsoft.com/en-us/library/windows/hardware/ff567096(v=vs.85).aspx
-  using NtSetInformationFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ PVOID FileInformation, _In_ ULONG Length, _In_ FILE_INFORMATION_CLASS FileInformationClass);
+  using NtSetInformationFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ PVOID FileInformation, _In_ ULONG Length,
+                                                   _In_ FILE_INFORMATION_CLASS FileInformationClass);
 
   // From http://msdn.microsoft.com/en-us/library/ms648412(v=vs.85).aspx
   using NtWaitForSingleObject_t = NTSTATUS(NTAPI *)(_In_ HANDLE Handle, _In_ BOOLEAN Alertable, _In_opt_ PLARGE_INTEGER Timeout);
@@ -334,13 +356,16 @@ namespace windows_nt_kernel
   } OBJECT_WAIT_TYPE,
   *POBJECT_WAIT_TYPE;  // NOLINT
 
-  using NtWaitForMultipleObjects_t = NTSTATUS(NTAPI *)(_In_ ULONG Count, _In_ HANDLE Object[], _In_ OBJECT_WAIT_TYPE WaitType, _In_ BOOLEAN Alertable, _In_opt_ PLARGE_INTEGER Time);
+  using NtWaitForMultipleObjects_t = NTSTATUS(NTAPI *)(_In_ ULONG Count, _In_ HANDLE Object[], _In_ OBJECT_WAIT_TYPE WaitType, _In_ BOOLEAN Alertable,
+                                                       _In_opt_ PLARGE_INTEGER Time);
 
   using NtDelayExecution_t = NTSTATUS(NTAPI *)(_In_ BOOLEAN Alertable, _In_opt_ LARGE_INTEGER *Interval);
 
-  using NtSetIoCompletion_t = NTSTATUS(NTAPI *)(_In_ HANDLE IoCompletionHandle, _In_ ULONG KeyContext, _In_ PVOID ApcContext, _In_ NTSTATUS IoStatus, _In_ ULONG IoStatusInformation);
+  using NtSetIoCompletion_t = NTSTATUS(NTAPI *)(_In_ HANDLE IoCompletionHandle, _In_ ULONG KeyContext, _In_ PVOID ApcContext, _In_ NTSTATUS IoStatus,
+                                                _In_ ULONG IoStatusInformation);
 
-  using NtRemoveIoCompletion_t = NTSTATUS(NTAPI *)(_In_ HANDLE IoCompletionHandle, _Out_ PVOID* CompletionKey, _Out_ PVOID* ApcContext, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_opt_ PLARGE_INTEGER Timeout);
+  using NtRemoveIoCompletion_t = NTSTATUS(NTAPI *)(_In_ HANDLE IoCompletionHandle, _Out_ PVOID *CompletionKey, _Out_ PVOID *ApcContext,
+                                                   _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_opt_ PLARGE_INTEGER Timeout);
 
   typedef struct _FILE_IO_COMPLETION_INFORMATION
   {
@@ -349,33 +374,42 @@ namespace windows_nt_kernel
     IO_STATUS_BLOCK IoStatusBlock;
   } FILE_IO_COMPLETION_INFORMATION, *PFILE_IO_COMPLETION_INFORMATION;
 
-  using NtRemoveIoCompletionEx_t = NTSTATUS(NTAPI *)(_In_ HANDLE IoCompletionHandle, PFILE_IO_COMPLETION_INFORMATION IoCompletionInformation, _In_ ULONG Count, _Out_ PULONG NumEntriesRemoved, _In_opt_ PLARGE_INTEGER Timeout, _In_ BOOLEAN Alertable);
+  using NtRemoveIoCompletionEx_t = NTSTATUS(NTAPI *)(_In_ HANDLE IoCompletionHandle, PFILE_IO_COMPLETION_INFORMATION IoCompletionInformation, _In_ ULONG Count,
+                                                     _Out_ PULONG NumEntriesRemoved, _In_opt_ PLARGE_INTEGER Timeout, _In_ BOOLEAN Alertable);
 
   // From https://msdn.microsoft.com/en-us/library/windows/hardware/ff566474(v=vs.85).aspx
-  using NtLockFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _In_opt_ HANDLE Event, _In_opt_ PIO_APC_ROUTINE ApcRoutine, _In_opt_ PVOID ApcContext, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ PLARGE_INTEGER ByteOffset, _In_ PLARGE_INTEGER Length, _In_ ULONG Key, _In_ BOOLEAN FailImmediately,
-                                         _In_ BOOLEAN ExclusiveLock);
+  using NtLockFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _In_opt_ HANDLE Event, _In_opt_ PIO_APC_ROUTINE ApcRoutine, _In_opt_ PVOID ApcContext,
+                                         _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ PLARGE_INTEGER ByteOffset, _In_ PLARGE_INTEGER Length, _In_ ULONG Key,
+                                         _In_ BOOLEAN FailImmediately, _In_ BOOLEAN ExclusiveLock);
 
   // From https://msdn.microsoft.com/en-us/library/windows/hardware/ff567118(v=vs.85).aspx
-  using NtUnlockFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ PLARGE_INTEGER ByteOffset, _In_ PLARGE_INTEGER Length, _In_ ULONG Key);
+  using NtUnlockFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ PLARGE_INTEGER ByteOffset,
+                                           _In_ PLARGE_INTEGER Length, _In_ ULONG Key);
 
-  using NtCreateSection_t = NTSTATUS(NTAPI *)(_Out_ PHANDLE SectionHandle, _In_ ACCESS_MASK DesiredAccess, _In_opt_ POBJECT_ATTRIBUTES ObjectAttributes, _In_opt_ PLARGE_INTEGER MaximumSize, _In_ ULONG SectionPageProtection, _In_ ULONG AllocationAttributes, _In_opt_ HANDLE FileHandle);
+  using NtCreateSection_t = NTSTATUS(NTAPI *)(_Out_ PHANDLE SectionHandle, _In_ ACCESS_MASK DesiredAccess, _In_opt_ POBJECT_ATTRIBUTES ObjectAttributes,
+                                              _In_opt_ PLARGE_INTEGER MaximumSize, _In_ ULONG SectionPageProtection, _In_ ULONG AllocationAttributes,
+                                              _In_opt_ HANDLE FileHandle);
 
   using NtOpenSection_t = NTSTATUS(NTAPI *)(_Out_ PHANDLE SectionHandle, _In_ ACCESS_MASK DesiredAccess, _In_opt_ POBJECT_ATTRIBUTES ObjectAttributes);
 
-  using NtQuerySection_t = NTSTATUS(NTAPI *)(_In_ HANDLE SectionHandle, _In_ SECTION_INFORMATION_CLASS InformationClass, _Out_ PVOID InformationBuffer, _In_ ULONG InformationBufferSize, _Out_opt_ PULONG ResultLength);
+  using NtQuerySection_t = NTSTATUS(NTAPI *)(_In_ HANDLE SectionHandle, _In_ SECTION_INFORMATION_CLASS InformationClass, _Out_ PVOID InformationBuffer,
+                                             _In_ ULONG InformationBufferSize, _Out_opt_ PULONG ResultLength);
 
   using NtExtendSection_t = NTSTATUS(NTAPI *)(_In_ HANDLE SectionHandle, _In_opt_ PLARGE_INTEGER MaximumSize);
 
-  using NtMapViewOfSection_t = NTSTATUS(NTAPI *)(_In_ HANDLE SectionHandle, _In_ HANDLE ProcessHandle, _Inout_ PVOID *BaseAddress, _In_ ULONG_PTR ZeroBits, _In_ SIZE_T CommitSize, _Inout_opt_ PLARGE_INTEGER SectionOffset, _Inout_ PSIZE_T ViewSize, _In_ SECTION_INHERIT InheritDisposition, _In_ ULONG AllocationType,
-                                                 _In_ ULONG Win32Protect);
+  using NtMapViewOfSection_t = NTSTATUS(NTAPI *)(_In_ HANDLE SectionHandle, _In_ HANDLE ProcessHandle, _Inout_ PVOID *BaseAddress, _In_ ULONG_PTR ZeroBits,
+                                                 _In_ SIZE_T CommitSize, _Inout_opt_ PLARGE_INTEGER SectionOffset, _Inout_ PSIZE_T ViewSize,
+                                                 _In_ SECTION_INHERIT InheritDisposition, _In_ ULONG AllocationType, _In_ ULONG Win32Protect);
 
   using NtUnmapViewOfSection_t = NTSTATUS(NTAPI *)(_In_ HANDLE ProcessHandle, _In_opt_ PVOID BaseAddress);
 
-  using NtFlushBuffersFileEx_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _In_ ULONG Flags, _In_reads_bytes_(ParametersSize) PVOID Parameters, _In_ ULONG ParametersSize, _Out_ PIO_STATUS_BLOCK IoStatusBlock);
+  using NtFlushBuffersFileEx_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _In_ ULONG Flags, _In_reads_bytes_(ParametersSize) PVOID Parameters,
+                                                   _In_ ULONG ParametersSize, _Out_ PIO_STATUS_BLOCK IoStatusBlock);
 
   using NtSetSystemInformation_t = NTSTATUS(NTAPI *)(_In_ INT SystemInformationClass, _In_ PVOID SystemInformation, _In_ ULONG SystemInformationLength);
 
-  using NtAllocateVirtualMemory_t = NTSTATUS(NTAPI *)(_In_ HANDLE ProcessHandle, _Inout_ PVOID *BaseAddress, _In_ ULONG_PTR ZeroBits, _Inout_ PSIZE_T RegionSize, _In_ ULONG AllocationType, _In_ ULONG Protect);
+  using NtAllocateVirtualMemory_t = NTSTATUS(NTAPI *)(_In_ HANDLE ProcessHandle, _Inout_ PVOID *BaseAddress, _In_ ULONG_PTR ZeroBits,
+                                                      _Inout_ PSIZE_T RegionSize, _In_ ULONG AllocationType, _In_ ULONG Protect);
 
   using NtFreeVirtualMemory_t = NTSTATUS(NTAPI *)(_In_ HANDLE ProcessHandle, _Inout_ PVOID *BaseAddress, _Inout_ PSIZE_T RegionSize, _In_ ULONG FreeType);
 
@@ -474,7 +508,8 @@ namespace windows_nt_kernel
     MaxProcessInfoClass
   } PROCESSINFOCLASS;
 
-  using NtQueryInformationProcess_t = NTSTATUS(NTAPI *)(_In_ HANDLE ProcessHandle, _In_ PROCESSINFOCLASS ProcessInformationClass, _Out_ PVOID ProcessInformation, _In_ ULONG ProcessInformationLength, _Out_opt_ PULONG ReturnLength);
+  using NtQueryInformationProcess_t = NTSTATUS(NTAPI *)(_In_ HANDLE ProcessHandle, _In_ PROCESSINFOCLASS ProcessInformationClass,
+                                                        _Out_ PVOID ProcessInformation, _In_ ULONG ProcessInformationLength, _Out_opt_ PULONG ReturnLength);
 
 
   using RtlGenRandom_t = BOOLEAN(NTAPI *)(_Out_ PVOID RandomBuffer, _In_ ULONG RandomBufferLength);
@@ -483,23 +518,29 @@ namespace windows_nt_kernel
 
   using LookupPrivilegeValue_t = BOOL(NTAPI *)(_In_opt_ LPCWSTR lpSystemName, _In_ LPCWSTR lpName, _Out_ PLUID lpLuid);
 
-  using AdjustTokenPrivileges_t = BOOL(NTAPI *)(_In_ HANDLE TokenHandle, _In_ BOOL DisableAllPrivileges, _In_opt_ PTOKEN_PRIVILEGES NewState, _In_ DWORD BufferLength, _Out_opt_ PTOKEN_PRIVILEGES PreviousState, _Out_opt_ PDWORD ReturnLength);
+  using AdjustTokenPrivileges_t = BOOL(NTAPI *)(_In_ HANDLE TokenHandle, _In_ BOOL DisableAllPrivileges, _In_opt_ PTOKEN_PRIVILEGES NewState,
+                                                _In_ DWORD BufferLength, _Out_opt_ PTOKEN_PRIVILEGES PreviousState, _Out_opt_ PDWORD ReturnLength);
 
-  using PrefetchVirtualMemory_t = BOOL(NTAPI *)(_In_ HANDLE hProcess, _In_ ULONG_PTR NumberOfEntries, _In_ PWIN32_MEMORY_RANGE_ENTRY VirtualAddresses, _In_ ULONG Flags);
+  using PrefetchVirtualMemory_t = BOOL(NTAPI *)(_In_ HANDLE hProcess, _In_ ULONG_PTR NumberOfEntries, _In_ PWIN32_MEMORY_RANGE_ENTRY VirtualAddresses,
+                                                _In_ ULONG Flags);
 
   using DiscardVirtualMemory_t = BOOL(NTAPI *)(_In_ PVOID VirtualAddress, _In_ SIZE_T Size);
 
-  using RtlCaptureStackBackTrace_t = USHORT(NTAPI *)(_In_ ULONG FramesToSkip, _In_ ULONG FramesToCapture, _Out_ PVOID *BackTrace, _Out_opt_ PULONG BackTraceHash);
+  using RtlCaptureStackBackTrace_t = USHORT(NTAPI *)(_In_ ULONG FramesToSkip, _In_ ULONG FramesToCapture, _Out_ PVOID *BackTrace,
+                                                     _Out_opt_ PULONG BackTraceHash);
 
   using SymInitialize_t = BOOL(NTAPI *)(_In_ HANDLE hProcess, _In_opt_ PCWSTR UserSearchPath, _In_ BOOL fInvadeProcess);
 
   using SymGetLineFromAddr64_t = BOOL(NTAPI *)(_In_ HANDLE hProcess, _In_ DWORD64 dwAddr, _Out_ PDWORD pdwDisplacement, _Out_ PIMAGEHLP_LINEW64 Line);
 
-  using RtlDosPathNameToNtPathName_U_t = BOOLEAN(NTAPI *)(__in PCWSTR DosFileName, __out PUNICODE_STRING NtFileName, __out_opt PWSTR *FilePart, __out_opt PVOID RelativeName);
+  using RtlDosPathNameToNtPathName_U_t = BOOLEAN(NTAPI *)(__in PCWSTR DosFileName, __out PUNICODE_STRING NtFileName, __out_opt PWSTR *FilePart,
+                                                          __out_opt PVOID RelativeName);
 
-  using RtlUTF8ToUnicodeN_t = NTSTATUS(NTAPI *)(_Out_opt_ PWSTR UnicodeStringDestination, _In_ ULONG UnicodeStringMaxByteCount, _Out_ PULONG UnicodeStringActualByteCount, _In_ PCCH UTF8StringSource, _In_ ULONG UTF8StringByteCount);
+  using RtlUTF8ToUnicodeN_t = NTSTATUS(NTAPI *)(_Out_opt_ PWSTR UnicodeStringDestination, _In_ ULONG UnicodeStringMaxByteCount,
+                                                _Out_ PULONG UnicodeStringActualByteCount, _In_ PCCH UTF8StringSource, _In_ ULONG UTF8StringByteCount);
 
-  using RtlUnicodeToUTF8N_t = NTSTATUS(NTAPI *)(_Out_opt_ PCHAR UTF8StringDestination, _In_ ULONG UTF8StringMaxByteCount, _Out_ PULONG UTF8StringActualByteCount, _In_ PCWCH UnicodeStringSource, _In_ ULONG UnicodeStringByteCount);
+  using RtlUnicodeToUTF8N_t = NTSTATUS(NTAPI *)(_Out_opt_ PCHAR UTF8StringDestination, _In_ ULONG UTF8StringMaxByteCount,
+                                                _Out_ PULONG UTF8StringActualByteCount, _In_ PCWCH UnicodeStringSource, _In_ ULONG UnicodeStringByteCount);
 
   using RtlAnsiStringToUnicodeString_t = NTSTATUS(NTAPI *)(PUNICODE_STRING DestinationString, PCANSI_STRING SourceString, BOOLEAN AllocateDestinationString);
 
@@ -538,7 +579,8 @@ namespace windows_nt_kernel
 
   typedef struct _FILE_EA_INFORMATION  // NOLINT
   {
-    union {
+    union
+    {
       ULONG EaSize;
       ULONG ReparsePointTag;
     };
@@ -695,7 +737,8 @@ namespace windows_nt_kernel
     LARGE_INTEGER AllocationSize;
     ULONG FileAttributes;
     ULONG FileNameLength;
-    union {
+    union
+    {
       ULONG EaSize;
       ULONG ReparsePointTag;
     };
@@ -716,7 +759,8 @@ namespace windows_nt_kernel
     ULONG ReparseTag;
     USHORT ReparseDataLength;
     USHORT Reserved;
-    union {
+    union
+    {
       struct
       {
         USHORT SubstituteNameOffset;
@@ -745,6 +789,132 @@ namespace windows_nt_kernel
   {
     ULONG Flags;
   } FILE_CASE_SENSITIVE_INFORMATION, *PFILE_CASE_SENSITIVE_INFORMATION;
+
+
+  // Borrowed from https://processhacker.sourceforge.io/doc/ntmmapi_8h_source.html
+  typedef enum _MEMORY_INFORMATION_CLASS
+  {
+    MemoryBasicInformation,           // MEMORY_BASIC_INFORMATION
+    MemoryWorkingSetInformation,      // MEMORY_WORKING_SET_INFORMATION (QueryWorkingSet from Win32)
+    MemoryMappedFilenameInformation,  // UNICODE_STRING (GetMappedFilename from Win32)
+    MemoryRegionInformation,          // MEMORY_REGION_INFORMATION
+    MemoryWorkingSetExInformation,    // MEMORY_WORKING_SET_EX_INFORMATION (QueryWorkingSetEx from Win32)
+    MemorySharedCommitInformation     // MEMORY_SHARED_COMMIT_INFORMATION
+  } MEMORY_INFORMATION_CLASS;
+
+  // Borrowed from https://processhacker.sourceforge.io/doc/ntmmapi_8h_source.html
+  // Same as https://docs.microsoft.com/en-us/windows/win32/api/psapi/ns-psapi-psapi_working_set_block
+  typedef struct _MEMORY_WORKING_SET_BLOCK
+  {
+    ULONG_PTR Protection : 5;
+    ULONG_PTR ShareCount : 3;
+    ULONG_PTR Shared : 1;
+    ULONG_PTR Node : 3;
+#ifdef _WIN64
+    ULONG_PTR VirtualPage : 52;
+#else
+    ULONG VirtualPage : 20;
+#endif
+  } MEMORY_WORKING_SET_BLOCK, *PMEMORY_WORKING_SET_BLOCK;
+  // Same as https://docs.microsoft.com/en-us/windows/win32/api/psapi/ns-psapi-psapi_working_set_ex_information
+  typedef struct _MEMORY_WORKING_SET_INFORMATION
+  {
+    ULONG_PTR NumberOfEntries;
+    MEMORY_WORKING_SET_BLOCK WorkingSetInfo[1];
+  } MEMORY_WORKING_SET_INFORMATION, *PMEMORY_WORKING_SET_INFORMATION;
+
+  // Borrowed from https://processhacker.sourceforge.io/doc/ntmmapi_8h_source.html
+  typedef struct _MEMORY_REGION_INFORMATION
+  {
+    PVOID AllocationBase;
+    ULONG AllocationProtect;
+    ULONG RegionType;  // MEM_IMAGE, MEM_MAPPED, or MEM_PRIVATE
+    SIZE_T RegionSize;
+  } MEMORY_REGION_INFORMATION, *PMEMORY_REGION_INFORMATION;
+
+  // Borrowed from https://processhacker.sourceforge.io/doc/ntmmapi_8h_source.html
+  // Almost identical to https://docs.microsoft.com/en-us/windows/win32/api/psapi/ns-psapi-psapi_working_set_ex_block
+  typedef struct _MEMORY_WORKING_SET_EX_BLOCK
+  {
+    union
+    {
+      struct  // If Valid == 1 ...
+      {
+        ULONG_PTR Valid : 1;
+        ULONG_PTR ShareCount : 3;
+        ULONG_PTR Win32Protection : 11;
+        ULONG_PTR Shared : 1;
+        ULONG_PTR Node : 6;
+        ULONG_PTR Locked : 1;
+        ULONG_PTR LargePage : 1;
+        ULONG_PTR Priority : 3;  // new
+        ULONG_PTR Reserved : 3;
+        ULONG_PTR SharedOriginal : 1;  // new
+        ULONG_PTR Bad : 1;
+#ifdef _WIN64
+        ULONG_PTR ReservedUlong : 32;
+#endif
+      } IfValid;
+      struct  // If Valid == 0 ...
+      {
+        ULONG_PTR Valid : 1;
+        ULONG_PTR Reserved0 : 14;
+        ULONG_PTR Shared : 1;
+        ULONG_PTR Reserved1 : 5;
+        ULONG_PTR PageTable : 1;     // new
+        ULONG_PTR Location : 2;      // new
+        ULONG_PTR Priority : 3;      // new
+        ULONG_PTR ModifiedList : 1;  // new
+        ULONG_PTR Reserved2 : 2;
+        ULONG_PTR SharedOriginal : 1;  // new
+        ULONG_PTR Bad : 1;
+#ifdef _WIN64
+        ULONG_PTR ReservedUlong : 32;
+#endif
+      } IfInvalid;
+    };
+
+  } MEMORY_WORKING_SET_EX_BLOCK, *PMEMORY_WORKING_SET_EX_BLOCK;
+  // Same as https://docs.microsoft.com/en-us/windows/win32/api/psapi/ns-psapi-psapi_working_set_ex_information
+  typedef struct _MEMORY_WORKING_SET_EX_INFORMATION
+  {
+    PVOID VirtualAddress;
+    union
+    {
+      MEMORY_WORKING_SET_EX_BLOCK VirtualAttributes;
+      ULONG_PTR Long;
+    } DUMMYUNIONNAME;
+  } MEMORY_WORKING_SET_EX_INFORMATION, *PMEMORY_WORKING_SET_EX_INFORMATION;
+
+  // Borrowed from https://processhacker.sourceforge.io/doc/ntmmapi_8h_source.html
+  typedef struct _MEMORY_SHARED_COMMIT_INFORMATION
+  {
+    SIZE_T CommitSize;
+  } MEMORY_SHARED_COMMIT_INFORMATION, *PMEMORY_SHARED_COMMIT_INFORMATION;
+
+  // TODO(niall): Investigate if supported in older Windows.
+  // The Win10-only API QueryVirtualMemoryInformation() returns this. I would assume
+  // that some new _MEMORY_INFORMATION_CLASS enum value corresponds to this. In any
+  // case, if Win8 doesn't support it, we can't rely on it.
+  //
+  // Note that this structure name is pure invention by inference by me.
+  typedef struct _MEMORY_REGION_INFORMATION_EX
+  {
+    PVOID AllocationBase;
+    ULONG AllocationProtect;
+    ULONG Private : 1;
+    ULONG MappedDataFile : 1;
+    ULONG MappedImage : 1;
+    ULONG MappedPageFile : 1;
+    ULONG MappedPhysical : 1;
+    ULONG DirectMapped : 1;
+    ULONG Reserved : 26;
+    SIZE_T RegionSize;
+    SIZE_T CommitSize;
+  } _MEMORY_REGION_INFORMATION_EX;
+
+  using NtQueryVirtualMemory_t = NTSTATUS(NTAPI *)(_In_ HANDLE ProcessHandle, _In_ PVOID BaseAddress, _In_ MEMORY_INFORMATION_CLASS MemoryInformationClass,
+                                                   _Out_ PVOID MemoryInformation, _In_ SIZE_T MemoryInformationLength, _Out_opt_ PSIZE_T ReturnLength);
 
   static NtQueryObject_t NtQueryObject;
   static NtQueryInformationFile_t NtQueryInformationFile;
@@ -781,6 +951,8 @@ namespace windows_nt_kernel
   static NtAllocateVirtualMemory_t NtAllocateVirtualMemory;
   static NtFreeVirtualMemory_t NtFreeVirtualMemory;
   static NtQueryInformationProcess_t NtQueryInformationProcess;
+  static NtQueryVirtualMemory_t NtQueryVirtualMemory;
+
   static RtlGenRandom_t RtlGenRandom;
   static OpenProcessToken_t OpenProcessToken;
   static LookupPrivilegeValue_t LookupPrivilegeValue;
@@ -1061,6 +1233,13 @@ namespace windows_nt_kernel
         abort();
       }
     }
+    if(NtQueryVirtualMemory == nullptr)
+    {
+      if((NtQueryVirtualMemory = reinterpret_cast<NtQueryVirtualMemory_t>(GetProcAddress(ntdllh, "NtQueryVirtualMemory"))) == nullptr)
+      {
+        abort();
+      }
+    }
 
 
     HMODULE advapi32 = LoadLibraryA("ADVAPI32.DLL");
@@ -1241,7 +1420,8 @@ namespace windows_nt_kernel
     // For speed we make the big assumption that the STL's system_clock is based on the time_t epoch 1st Jan 1970.
     static constexpr unsigned long long FILETIME_OFFSET_TO_1970 = ((27111902ULL << 32U) + 3577643008ULL);
     // Need to have this self-adapt to the STL being used
-    static constexpr unsigned long long STL_TICKS_PER_SEC = static_cast<unsigned long long>(std::chrono::system_clock::period::den) / std::chrono::system_clock::period::num;
+    static constexpr unsigned long long STL_TICKS_PER_SEC =
+    static_cast<unsigned long long>(std::chrono::system_clock::period::den) / std::chrono::system_clock::period::num;
     static constexpr unsigned long long multiplier = STL_TICKS_PER_SEC >= 10000000ULL ? STL_TICKS_PER_SEC / 10000000ULL : 1;
     static constexpr unsigned long long divider = STL_TICKS_PER_SEC >= 10000000ULL ? 1 : 10000000ULL / STL_TICKS_PER_SEC;
 
@@ -1320,47 +1500,48 @@ inline void fill_stat_t(stat_t &stat, LLFIO_POSIX_STAT_STRUCT s, metadata_flags 
 - sleep_interval: Set to the number of steady milliseconds until the sleep must end
 - sleep_object: Set to a primed deadline timer HANDLE which will signal when the system clock reaches the deadline
 */
-#define LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d)                                                                                                                                                                                                                                                                                    \
-  std::chrono::steady_clock::time_point began_steady;                                                                                                                                                                                                                                                                          \
-  std::chrono::system_clock::time_point end_utc;                                                                                                                                                                                                                                                                               \
-  alignas(8) LARGE_INTEGER _timeout{};                                                                                                                                                                                                                                                                                         \
-  memset(&_timeout, 0, sizeof(_timeout));                                                                                                                                                                                                                                                                                      \
-  LARGE_INTEGER *timeout = nullptr;                                                                                                                                                                                                                                                                                            \
-  if(d)                                                                                                                                                                                                                                                                                                                        \
-  {                                                                                                                                                                                                                                                                                                                            \
-    if((d).steady)                                                                                                                                                                                                                                                                                                             \
-      began_steady = std::chrono::steady_clock::now();                                                                                                                                                                                                                                                                         \
-    else                                                                                                                                                                                                                                                                                                                       \
-    {                                                                                                                                                                                                                                                                                                                          \
-      end_utc = (d).to_time_point();                                                                                                                                                                                                                                                                                           \
-      _timeout = windows_nt_kernel::from_timepoint(end_utc);                                                                                                                                                                                                                                                                   \
-    }                                                                                                                                                                                                                                                                                                                          \
-    timeout = &_timeout;                                                                                                                                                                                                                                                                                                       \
+#define LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d)                                                                                                                    \
+  std::chrono::steady_clock::time_point began_steady;                                                                                                          \
+  std::chrono::system_clock::time_point end_utc;                                                                                                               \
+  alignas(8) LARGE_INTEGER _timeout{};                                                                                                                         \
+  memset(&_timeout, 0, sizeof(_timeout));                                                                                                                      \
+  LARGE_INTEGER *timeout = nullptr;                                                                                                                            \
+  if(d)                                                                                                                                                        \
+  {                                                                                                                                                            \
+    if((d).steady)                                                                                                                                             \
+      began_steady = std::chrono::steady_clock::now();                                                                                                         \
+    else                                                                                                                                                       \
+    {                                                                                                                                                          \
+      end_utc = (d).to_time_point();                                                                                                                           \
+      _timeout = windows_nt_kernel::from_timepoint(end_utc);                                                                                                   \
+    }                                                                                                                                                          \
+    timeout = &_timeout;                                                                                                                                       \
   }
 
-#define LLFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d)                                                                                                                                                                                                                                                                                    \
-  if((d) && (d).steady)                                                                                                                                                                                                                                                                                                        \
-  {                                                                                                                                                                                                                                                                                                                            \
-    std::chrono::nanoseconds ns = std::chrono::duration_cast<std::chrono::nanoseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());                                                                                                                                               \
-    if(ns.count() < 0)                                                                                                                                                                                                                                                                                                         \
-      _timeout.QuadPart = 0;                                                                                                                                                                                                                                                                                                   \
-    else                                                                                                                                                                                                                                                                                                                       \
-      _timeout.QuadPart = ns.count() / -100;                                                                                                                                                                                                                                                                                   \
+#define LLFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d)                                                                                                                    \
+  if((d) && (d).steady)                                                                                                                                        \
+  {                                                                                                                                                            \
+    std::chrono::nanoseconds ns =                                                                                                                              \
+    std::chrono::duration_cast<std::chrono::nanoseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());             \
+    if(ns.count() < 0)                                                                                                                                         \
+      _timeout.QuadPart = 0;                                                                                                                                   \
+    else                                                                                                                                                       \
+      _timeout.QuadPart = ns.count() / -100;                                                                                                                   \
   }
 
-#define LLFIO_WIN_DEADLINE_TO_TIMEOUT_LOOP(d)                                                                                                                                                                                                                                                                                  \
-  if(d)                                                                                                                                                                                                                                                                                                                        \
-  {                                                                                                                                                                                                                                                                                                                            \
-    if((d).steady)                                                                                                                                                                                                                                                                                                             \
-    {                                                                                                                                                                                                                                                                                                                          \
-      if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))                                                                                                                                                                                                                             \
-        return errc::timed_out;                                                                                                                                                                                                                                                                                                \
-    }                                                                                                                                                                                                                                                                                                                          \
-    else                                                                                                                                                                                                                                                                                                                       \
-    {                                                                                                                                                                                                                                                                                                                          \
-      if(std::chrono::system_clock::now() >= end_utc)                                                                                                                                                                                                                                                                          \
-        return errc::timed_out;                                                                                                                                                                                                                                                                                                \
-    }                                                                                                                                                                                                                                                                                                                          \
+#define LLFIO_WIN_DEADLINE_TO_TIMEOUT_LOOP(d)                                                                                                                  \
+  if(d)                                                                                                                                                        \
+  {                                                                                                                                                            \
+    if((d).steady)                                                                                                                                             \
+    {                                                                                                                                                          \
+      if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))                                                             \
+        return errc::timed_out;                                                                                                                                \
+    }                                                                                                                                                          \
+    else                                                                                                                                                       \
+    {                                                                                                                                                          \
+      if(std::chrono::system_clock::now() >= end_utc)                                                                                                          \
+        return errc::timed_out;                                                                                                                                \
+    }                                                                                                                                                          \
   }
 
 // Initialise an IO_STATUS_BLOCK for later wait operations
@@ -1601,7 +1782,8 @@ inline result<DWORD> ntflags_from_handle_caching_and_flags(native_handle_type &n
   return ntflags;
 }
 
-inline result<void> do_clone_handle(native_handle_type &dest, const native_handle_type &src, handle::mode mode_, handle::caching caching_, handle::flag _flags, bool isdir = false) noexcept
+inline result<void> do_clone_handle(native_handle_type &dest, const native_handle_type &src, handle::mode mode_, handle::caching caching_, handle::flag _flags,
+                                    bool isdir = false) noexcept
 {
   // Fast path
   if(mode_ == handle::mode::unchanged && caching_ == handle::caching::unchanged)
@@ -1746,7 +1928,8 @@ not replace the inode if it already exists. We map it correctly to FILE_SUPERSED
 This edition does pretty much the same as the Win32 edition, minus support for file
 templates and lpFileName being anything but a file path.
 */
-inline HANDLE CreateFileW_(_In_ LPCWSTR lpFileName, _In_ DWORD dwDesiredAccess, _In_ DWORD dwShareMode, _In_opt_ LPSECURITY_ATTRIBUTES lpSecurityAttributes, _In_ DWORD dwCreationDisposition, _In_ DWORD dwFlagsAndAttributes, _In_opt_ HANDLE hTemplateFile, bool forcedir = false)
+inline HANDLE CreateFileW_(_In_ LPCWSTR lpFileName, _In_ DWORD dwDesiredAccess, _In_ DWORD dwShareMode, _In_opt_ LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                           _In_ DWORD dwCreationDisposition, _In_ DWORD dwFlagsAndAttributes, _In_opt_ HANDLE hTemplateFile, bool forcedir = false)
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -1873,7 +2056,8 @@ inline HANDLE CreateFileW_(_In_ LPCWSTR lpFileName, _In_ DWORD dwDesiredAccess, 
   HANDLE ret = INVALID_HANDLE_VALUE;  // NOLINT
   IO_STATUS_BLOCK isb = make_iostatus();
   dwFlagsAndAttributes &= ~0xfff80000;
-  NTSTATUS ntstat = NtCreateFile(&ret, dwDesiredAccess, &ObjectAttributes, &isb, nullptr, dwFlagsAndAttributes, dwShareMode, dwCreationDisposition, flags, nullptr, 0);
+  NTSTATUS ntstat =
+  NtCreateFile(&ret, dwDesiredAccess, &ObjectAttributes, &isb, nullptr, dwFlagsAndAttributes, dwShareMode, dwCreationDisposition, flags, nullptr, 0);
   if(STATUS_SUCCESS == ntstat)
   {
     return ret;
