@@ -1535,12 +1535,12 @@ inline void fill_stat_t(stat_t &stat, LLFIO_POSIX_STAT_STRUCT s, metadata_flags 
     if((d).steady)                                                                                                                                             \
     {                                                                                                                                                          \
       if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))                                                             \
-        return errc::timed_out;                                                                                                                                \
+        return LLFIO_V2_NAMESPACE::failure(LLFIO_V2_NAMESPACE::errc::timed_out);                                                                               \
     }                                                                                                                                                          \
     else                                                                                                                                                       \
     {                                                                                                                                                          \
       if(std::chrono::system_clock::now() >= end_utc)                                                                                                          \
-        return errc::timed_out;                                                                                                                                \
+        return LLFIO_V2_NAMESPACE::failure(LLFIO_V2_NAMESPACE::errc::timed_out);                                                                               \
     }                                                                                                                                                          \
   }
 
