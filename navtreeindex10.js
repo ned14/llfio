@@ -1,5 +1,6 @@
 var NAVTREEINDEX10 =
 {
+"stat_8hpp.html":[5,0,0,1,0,20],
 "statfs_8hpp.html":[5,0,0,1,0,21],
 "storage__profile_8hpp.html":[5,0,0,1,0,22],
 "storage__profile_8hpp.html#a064c04652078a531d09bc211f000e170":[5,0,0,1,0,22,40],
@@ -248,6 +249,5 @@ var NAVTREEINDEX10 =
 "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#af7813ac4dde322154b5ca70e06494905":[4,0,2,0,0,1,42],
 "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#afd59aa55d1e9bc3a9942f13b964badae":[4,0,2,0,0,1,37],
 "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#afff8e1a93ad371a5844543a3e782f471":[4,0,2,0,0,1,51],
-"structllfio__v2__xxx_1_1algorithm_1_1reduce__visitor.html":[4,0,2,0,7],
-"structllfio__v2__xxx_1_1algorithm_1_1reduce__visitor.html#a16b342d3c85e95c2c7da9b14d00c8a85":[4,0,2,0,7,6]
+"structllfio__v2__xxx_1_1algorithm_1_1reduce__visitor.html":[4,0,2,0,7]
 };
