@@ -49,7 +49,8 @@ struct LLFIO_DEADLINE_NAME
 {
   //! True if deadline does not change with system clock changes
   bool steady;  // NOLINT
-  union {
+  union
+  {
     //! System time from timespec_get(&ts, TIME_UTC)
     struct timespec utc;  // NOLINT
     //! Nanosecond ticks from start of operation
@@ -108,63 +109,87 @@ struct LLFIO_DEADLINE_NAME
 
 - began_steady: Set to the steady clock at the beginning of a sleep
 */
-#define LLFIO_DEADLINE_TO_SLEEP_INIT(d)                                                                                                                                                                                                                                                                                  \
-  std::chrono::steady_clock::time_point began_steady;                                                                                                                                                                                                                                                                          \
-  if(d)                                                                                                                                                                                                                                                                                                                        \
-  {                                                                                                                                                                                                                                                                                                                            \
-    if((d).steady && (d).nsecs != 0)                                                                                                                                                                                                                                                                                                             \
-      began_steady = std::chrono::steady_clock::now();                                                                                                                                                                                                                                                                         \
+#define LLFIO_DEADLINE_TO_SLEEP_INIT(d)                                                                                                                        \
+  std::chrono::steady_clock::time_point began_steady;                                                                                                          \
+  if(d)                                                                                                                                                        \
+  {                                                                                                                                                            \
+    if((d).steady && (d).nsecs != 0)                                                                                                                           \
+      began_steady = std::chrono::steady_clock::now();                                                                                                         \
   }
 
 //! Run inside a series of steps to create a sub-deadline from a master deadline
-#define LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d)                                                                                                                                                                                                                                                                              \
-  if(d)                                                                                                                                                                                                                                                                                                                        \
-  {                                                                                                                                                                                                                                                                                                                            \
-    if((d).steady)                                                                                                                                                                                                                                                                                                             \
-    {                                                                                                                                                                                                                                                                                                                          \
-      (nd).steady = true;                                                                                                                                                                                                                                                                                                      \
-      std::chrono::nanoseconds ns = ((d).nsecs != 0) ? std::chrono::duration_cast<std::chrono::nanoseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now()) : std::chrono::nanoseconds(0);                                                                                                                                             \
-      if(ns.count() < 0)                                                                                                                                                                                                                                                                                                       \
-        (nd).nsecs = 0;                                                                                                                                                                                                                                                                                                        \
-      else                                                                                                                                                                                                                                                                                                                     \
-        (nd).nsecs = ns.count();                                                                                                                                                                                                                                                                                               \
-    }                                                                                                                                                                                                                                                                                                                          \
-    else                                                                                                                                                                                                                                                                                                                       \
-      (nd) = (d);                                                                                                                                                                                                                                                                                                              \
+#define LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d)                                                                                                              \
+  if(d)                                                                                                                                                        \
+  {                                                                                                                                                            \
+    if((d).steady)                                                                                                                                             \
+    {                                                                                                                                                          \
+      (nd).steady = true;                                                                                                                                      \
+      std::chrono::nanoseconds ns =                                                                                                                            \
+      ((d).nsecs != 0) ?                                                                                                                                       \
+      std::chrono::duration_cast<std::chrono::nanoseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now()) :          \
+      std::chrono::nanoseconds(0);                                                                                                                             \
+      if(ns.count() < 0)                                                                                                                                       \
+        (nd).nsecs = 0;                                                                                                                                        \
+      else                                                                                                                                                     \
+        (nd).nsecs = ns.count();                                                                                                                               \
+    }                                                                                                                                                          \
+    else                                                                                                                                                       \
+      (nd) = (d);                                                                                                                                              \
+  }
+
+//! Run inside a series of steps to create a relative timeout from now from a master deadline
+#define LLFIO_DEADLINE_TO_PARTIAL_TIMEOUT(timeout, d)                                                                                                          \
+  {                                                                                                                                                            \
+    using timeout_type = std::decay_t<decltype(timeout)>;                                                                                                      \
+    timeout = timeout_type();                                                                                                                                  \
+    if(d)                                                                                                                                                      \
+    {                                                                                                                                                          \
+      if((d).steady)                                                                                                                                           \
+      {                                                                                                                                                        \
+        timeout = ((d).nsecs != 0) ?                                                                                                                           \
+                  std::chrono::duration_cast<timeout_type>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now()) :          \
+                  timeout_type(0);                                                                                                                             \
+      }                                                                                                                                                        \
+      else                                                                                                                                                     \
+        timeout = std::chrono::duration_cast<timeout_type>(d.as_timepoint() - std::chrono::system_clock::now());                                               \
+      if(timeout.count() < 0)                                                                                                                                  \
+        timeout = timeout_type(0);                                                                                                                             \
+    }                                                                                                                                                          \
   }
 
 //! Run inside a loop to detect if the operation has timed out.
-#define LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d)                                                                                                                                                                                                                                                                                \
-  if(d)                                                                                                                                                                                                                                                                                                                        \
-  {                                                                                                                                                                                                                                                                                                                            \
-    if((d).steady)                                                                                                                                                                                                                                                                                                             \
-    {                                                                                                                                                                                                                                                                                                                          \
-      if((d).nsecs == 0 || std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))                                                                                                                                                                                                                             \
-        return errc::timed_out;                                                                                                                                                                                                                                                                                                \
-    }                                                                                                                                                                                                                                                                                                                          \
-    else                                                                                                                                                                                                                                                                                                                       \
-    {                                                                                                                                                                                                                                                                                                                          \
-      LLFIO_V2_NAMESPACE::deadline now(std::chrono::system_clock::now());                                                                                                                                                                                                                                                                          \
-      if(now.utc.tv_sec > (d).utc.tv_sec || (now.utc.tv_sec == (d).utc.tv_sec && now.utc.tv_nsec >= (d).utc.tv_nsec))                                                                                                                                                                                                          \
-        return errc::timed_out;                                                                                                                                                                                                                                                                                                \
-    }                                                                                                                                                                                                                                                                                                                          \
+#define LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d)                                                                                                                      \
+  if(d)                                                                                                                                                        \
+  {                                                                                                                                                            \
+    if((d).steady)                                                                                                                                             \
+    {                                                                                                                                                          \
+      if((d).nsecs == 0 || std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))                                           \
+        return LLFIO_V2_NAMESPACE::failure(LLFIO_V2_NAMESPACE::errc::timed_out);                                                                               \
+    }                                                                                                                                                          \
+    else                                                                                                                                                       \
+    {                                                                                                                                                          \
+      LLFIO_V2_NAMESPACE::deadline now(std::chrono::system_clock::now());                                                                                      \
+      if(now.utc.tv_sec > (d).utc.tv_sec || (now.utc.tv_sec == (d).utc.tv_sec && now.utc.tv_nsec >= (d).utc.tv_nsec))                                          \
+        return LLFIO_V2_NAMESPACE::failure(LLFIO_V2_NAMESPACE::errc::timed_out);                                                                               \
+    }                                                                                                                                                          \
   }
 
-#define LLFIO_DEADLINE_TRY_FOR_UNTIL(name)                                                                                                                                                                                                                                                                               \
-  template <class... Args> bool try_##name (Args && ... args) noexcept                                                                                                                                                                                                                                                           \
-  {                                                                                                                                                                                                                                                                                                                            \
-    auto r = name(std::forward<Args>(args)..., std::chrono::seconds(0));                                                                                                                                                                                                                                                       \
-    return !!r;                                                                                                                                                                                                                                                                                                                \
-  }                                                                                                                                                                                                                                                                                                                            \
-  template <class... Args, class Rep, class Period> bool try_##name##_for(Args &&... args, const std::chrono::duration<Rep, Period> &duration) noexcept                                                                                                                                                                          \
-  {                                                                                                                                                                                                                                                                                                                            \
-    auto r = name(std::forward<Args>(args)..., duration);                                                                                                                                                                                                                                                                      \
-    return !!r;                                                                                                                                                                                                                                                                                                                \
-  }                                                                                                                                                                                                                                                                                                                            \
-  template <class... Args, class Clock, class Duration> bool try_##name##_until(Args &&... args, const std::chrono::time_point<Clock, Duration> &timeout) noexcept                                                                                                                                                               \
-  {                                                                                                                                                                                                                                                                                                                            \
-    auto r = name(std::forward<Args>(args)..., timeout);                                                                                                                                                                                                                                                                       \
-    return !!r;                                                                                                                                                                                                                                                                                                                \
+#define LLFIO_DEADLINE_TRY_FOR_UNTIL(name)                                                                                                                     \
+  template <class... Args> bool try_##name(Args &&... args) noexcept                                                                                           \
+  {                                                                                                                                                            \
+    auto r = name(std::forward<Args>(args)..., std::chrono::seconds(0));                                                                                       \
+    return !!r;                                                                                                                                                \
+  }                                                                                                                                                            \
+  template <class... Args, class Rep, class Period> bool try_##name##_for(Args &&... args, const std::chrono::duration<Rep, Period> &duration) noexcept        \
+  {                                                                                                                                                            \
+    auto r = name(std::forward<Args>(args)..., duration);                                                                                                      \
+    return !!r;                                                                                                                                                \
+  }                                                                                                                                                            \
+  template <class... Args, class Clock, class Duration>                                                                                                        \
+  bool try_##name##_until(Args &&... args, const std::chrono::time_point<Clock, Duration> &timeout) noexcept                                                   \
+  {                                                                                                                                                            \
+    auto r = name(std::forward<Args>(args)..., timeout);                                                                                                       \
+    return !!r;                                                                                                                                                \
   }
 
 #undef LLFIO_DEADLINE_NAME
