@@ -1,5 +1,5 @@
 /* LLFIO error handling
-(C) 2018 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2018-2020 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: June 2018
 
 
@@ -176,6 +176,16 @@ public:
   file_io_error_domain &operator=(file_io_error_domain &&) = default;
   ~file_io_error_domain() = default;
 
+#if __cplusplus < 201402L && !defined(_MSC_VER)
+  static inline const file_io_error_domain &get()
+  {
+    static file_io_error_domain v;
+    return v;
+  }
+#else
+  static inline constexpr const file_io_error_domain &get();
+#endif
+
 protected:
   virtual inline string_ref _do_message(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept override final
   {
@@ -229,6 +239,13 @@ protected:
     return atomic_refcounted_string_ref(p, ret.size());
   }
 };
+#if __cplusplus >= 201402L || defined(_MSC_VER)
+template <class BaseStatusCodeDomain> constexpr file_io_error_domain<BaseStatusCodeDomain> file_io_error_domain_inst = {};
+template <class BaseStatusCodeDomain> inline constexpr const file_io_error_domain<BaseStatusCodeDomain> &file_io_error_domain<BaseStatusCodeDomain>::get()
+{
+  return file_io_error_domain_inst<BaseStatusCodeDomain>;
+}
+#endif
 
 namespace detail
 {
@@ -304,9 +321,11 @@ namespace detail
 {
   inline std::ostream &operator<<(std::ostream &s, const file_io_error &v) { return s << "llfio::file_io_error(" << v.message().c_str() << ")"; }
 }  // namespace detail
-inline file_io_error error_from_exception(std::exception_ptr &&ep = std::current_exception(), SYSTEM_ERROR2_NAMESPACE::system_code not_matched = errc::resource_unavailable_try_again) noexcept
+inline file_io_error error_from_exception(std::exception_ptr &&ep = std::current_exception(),
+                                          SYSTEM_ERROR2_NAMESPACE::system_code not_matched = errc::resource_unavailable_try_again) noexcept
 {
-  return SYSTEM_ERROR2_NAMESPACE::system_code_from_exception(static_cast<std::exception_ptr &&>(ep), static_cast<SYSTEM_ERROR2_NAMESPACE::system_code &&>(not_matched));
+  return SYSTEM_ERROR2_NAMESPACE::system_code_from_exception(static_cast<std::exception_ptr &&>(ep),
+                                                             static_cast<SYSTEM_ERROR2_NAMESPACE::system_code &&>(not_matched));
 }
 
 LLFIO_V2_NAMESPACE_END
@@ -408,7 +427,8 @@ public:
 #endif
     return {};
   }
-  //! Retrieve a descriptive message for this failure, possibly with paths and stack backtraces. Extra detail only appears if called from the same thread as where the failure occurred.
+  //! Retrieve a descriptive message for this failure, possibly with paths and stack backtraces. Extra detail only appears if called from the same thread as
+  //! where the failure occurred.
   inline std::string message() const
   {
     std::string ret(ec.message());
@@ -539,7 +559,8 @@ inline void error_info::throw_exception() const
 template <class T> using result = OUTCOME_V2_NAMESPACE::result<T, error_info>;
 using OUTCOME_V2_NAMESPACE::failure;
 using OUTCOME_V2_NAMESPACE::success;
-inline error_info error_from_exception(std::exception_ptr &&ep = std::current_exception(), std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept
+inline error_info error_from_exception(std::exception_ptr &&ep = std::current_exception(),
+                                       std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept
 {
   return error_info(OUTCOME_V2_NAMESPACE::error_from_exception(std::move(ep), not_matched));
 }
