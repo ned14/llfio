@@ -355,7 +355,8 @@ namespace storage_profile
             }
             *e++ = '0' + (vde->Extents[0].DiskNumber % 10);
             *e = 0;
-            OUTCOME_TRY(auto &&diskh, file_handle::file({}, path_view(physicaldrivename, e - physicaldrivename, true), handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
+            OUTCOME_TRY(auto &&diskh, file_handle::file({}, path_view(physicaldrivename, e - physicaldrivename, path_view::zero_terminated),
+                                                        handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
             memset(&spq, 0, sizeof(spq));
             spq.PropertyId = StorageDeviceProperty;
             spq.QueryType = PropertyStandardQuery;

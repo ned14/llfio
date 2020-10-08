@@ -146,14 +146,14 @@ static inline void TestTraverse()
         to_hex_string(buffer + 1, 8, (const char *) &c, 4);
         buffer[9] = 0;
       }
-      auto h = directory_handle::directory(dirh, path_view(buffer, 9, true), directory_handle::mode::write, directory_handle::creation::if_needed).value();
+      auto h = directory_handle::directory(dirh, path_view(buffer, 9, path_view::zero_terminated), directory_handle::mode::write, directory_handle::creation::if_needed).value();
       for(size_t n = 0; n < file_entries; n++)
       {
         auto c = (uint8_t) n;
         buffer[0] = 'f';
         to_hex_string(buffer + 1, 2, (const char *) &c, 1);
         buffer[3] = 0;
-        file_handle::file(h, path_view(buffer, 3, true), file_handle::mode::write, file_handle::creation::if_needed).value();
+        file_handle::file(h, path_view(buffer, 3, path_view::zero_terminated), file_handle::mode::write, file_handle::creation::if_needed).value();
         entries_created++;
       }
       entries_created++;

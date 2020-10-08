@@ -278,6 +278,15 @@ namespace windows_nt_kernel
     LARGE_INTEGER MaximumSize;
   } SECTION_BASIC_INFORMATION, *PSECTION_BASIC_INFORMATION;
 
+  typedef struct _FILE_BASIC_INFORMATION  // NOLINT
+  {
+    LARGE_INTEGER CreationTime;
+    LARGE_INTEGER LastAccessTime;
+    LARGE_INTEGER LastWriteTime;
+    LARGE_INTEGER ChangeTime;
+    ULONG FileAttributes;
+  } FILE_BASIC_INFORMATION, *PFILE_BASIC_INFORMATION;
+
   // From https://msdn.microsoft.com/en-us/library/bb432383%28v=vs.85%29.aspx
   using NtQueryObject_t = NTSTATUS(NTAPI *)(_In_opt_ HANDLE Handle, _In_ OBJECT_INFORMATION_CLASS ObjectInformationClass, _Out_opt_ PVOID ObjectInformation,
                                             _In_ ULONG ObjectInformationLength, _Out_opt_ PULONG ReturnLength);
@@ -294,6 +303,8 @@ namespace windows_nt_kernel
   // From http://msdn.microsoft.com/en-us/library/windows/hardware/ff566492(v=vs.85).aspx
   using NtOpenDirectoryObject_t = NTSTATUS(NTAPI *)(_Out_ PHANDLE DirectoryHandle, _In_ ACCESS_MASK DesiredAccess, _In_ POBJECT_ATTRIBUTES ObjectAttributes);
 
+  // From https://docs.microsoft.com/en-us/windows/win32/devnotes/ntqueryattributesfile
+  using NtQueryAttributesFile_t = NTSTATUS(NTAPI *)(_In_ POBJECT_ATTRIBUTES ObjectAttributes, _Out_ PFILE_BASIC_INFORMATION FileInformation);
 
   // From http://msdn.microsoft.com/en-us/library/windows/hardware/ff567011(v=vs.85).aspx
   using NtOpenFile_t = NTSTATUS(NTAPI *)(_Out_ PHANDLE FileHandle, _In_ ACCESS_MASK DesiredAccess, _In_ POBJECT_ATTRIBUTES ObjectAttributes,
@@ -553,15 +564,6 @@ namespace windows_nt_kernel
   using RtlFreeAnsiString_t = NTSTATUS(NTAPI *)(PANSI_STRING String);
 
   using RtlFreeUnicodeString_t = NTSTATUS(NTAPI *)(PUNICODE_STRING String);
-
-  typedef struct _FILE_BASIC_INFORMATION  // NOLINT
-  {
-    LARGE_INTEGER CreationTime;
-    LARGE_INTEGER LastAccessTime;
-    LARGE_INTEGER LastWriteTime;
-    LARGE_INTEGER ChangeTime;
-    ULONG FileAttributes;
-  } FILE_BASIC_INFORMATION, *PFILE_BASIC_INFORMATION;
 
   typedef struct _FILE_STANDARD_INFORMATION  // NOLINT
   {
@@ -920,6 +922,7 @@ namespace windows_nt_kernel
   static NtQueryInformationFile_t NtQueryInformationFile;
   static NtQueryVolumeInformationFile_t NtQueryVolumeInformationFile;
   static NtOpenDirectoryObject_t NtOpenDirectoryObject;
+  static NtQueryAttributesFile_t NtQueryAttributesFile;
   static NtOpenFile_t NtOpenFile;
   static NtCreateFile_t NtCreateFile;
   static NtReadFile_t NtReadFile;
@@ -1012,6 +1015,13 @@ namespace windows_nt_kernel
     if(NtOpenDirectoryObject == nullptr)
     {
       if((NtOpenDirectoryObject = reinterpret_cast<NtOpenDirectoryObject_t>(GetProcAddress(ntdllh, "NtOpenDirectoryObject"))) == nullptr)
+      {
+        abort();
+      }
+    }
+    if(NtQueryAttributesFile == nullptr)
+    {
+      if((NtQueryAttributesFile = reinterpret_cast<NtQueryAttributesFile_t>(GetProcAddress(ntdllh, "NtQueryAttributesFile"))) == nullptr)
       {
         abort();
       }

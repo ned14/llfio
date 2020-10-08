@@ -79,7 +79,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     // really ought to be cloning the handle. But let's humour him.
     path = ".";
   }
-  path_view::c_str<> zpath(path);
+  path_view::c_str<> zpath(path, path_view::zero_terminated);
   auto rename_random_dir_over_existing_dir = [_mode, _caching, flags](const path_handle &base, path_view_type path) -> result<directory_handle> {
     // Take a path handle to the directory containing the file
     auto path_parent = path.parent_path();
@@ -266,7 +266,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
     return std::move(req.buffers);
   }
   // Is glob a single entry match? If so, this is really a stat call
-  path_view_type::c_str<> zglob(req.glob);
+  path_view_type::c_str<> zglob(req.glob, path_view::zero_terminated);
   if(!req.glob.empty() && !req.glob.contains_glob())
   {
     struct stat s
@@ -431,7 +431,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
         goto cont;
       }
       directory_entry &item = req.buffers[n];
-      item.leafname = path_view(dent->d_name, length, true);
+      item.leafname = path_view(dent->d_name, length, path_view::zero_terminated);
       item.stat = stat_t(nullptr);
       item.stat.st_ino = dent->d_ino;
       char d_type = dent->d_type;

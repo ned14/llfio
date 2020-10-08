@@ -165,7 +165,7 @@ namespace algorithm
               new(this) workitem(std::move(o));
               return *this;
             }
-            path_view leaf() const noexcept { return using_sso ? path_view(_sso, _sso_length, true) : path_view(_alloc); }
+            path_view leaf() const noexcept { return using_sso ? path_view(_sso, _sso_length, path_view::zero_terminated) : path_view(_alloc); }
           };
 #endif
           std::vector<std::list<workitem>> workqueue;
@@ -261,7 +261,7 @@ namespace algorithm
                   {
                     struct ::stat stat;
                     memset(&stat, 0, sizeof(stat));
-                    path_view::c_str<> zpath(entry.leafname);
+                    path_view::c_str<> zpath(entry.leafname, path_view::zero_terminated);
                     if(::fstatat(mydirh->native_handle().fd, zpath.buffer, &stat, AT_SYMLINK_NOFOLLOW) >= 0)
                     {
                       entry.stat.st_type = [](uint16_t mode) {
@@ -318,7 +318,7 @@ namespace algorithm
                   {
                     if(use_slow_path)
                     {
-                      newwork.push_back(state_t::workitem(topdirh, mywork.leaf().path() / entry.leafname.path()));
+                      newwork.push_back(state_t::workitem(topdirh, mywork.leaf() / entry.leafname));
                     }
                     else
                     {

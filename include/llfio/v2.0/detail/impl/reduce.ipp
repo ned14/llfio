@@ -67,7 +67,7 @@ namespace algorithm
       const DWORD renamefile_ntflags = 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/ | 0x040 /*FILE_NON_DIRECTORY_FILE*/;
       const DWORD renamedir_ntflags = 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/ | 0x01 /*FILE_DIRECTORY_FILE*/;
       IO_STATUS_BLOCK isb = make_iostatus();
-      path_view::c_str<> zpath(leafname, true);
+      path_view::c_str<> zpath(leafname, path_view::zero_terminated);
       UNICODE_STRING _path{};
       _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
       _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
@@ -142,7 +142,7 @@ namespace algorithm
       }
       return ntkernel_error(ntstat);
 #else
-      path_view::c_str<> zpath(leafname);
+      path_view::c_str<> zpath(leafname, path_view::zero_terminated);
       errno = 0;
       if(is_dir || -1 == ::unlinkat(dirh.native_handle().fd, zpath.buffer, 0))
       {
@@ -179,7 +179,7 @@ namespace algorithm
       const DWORD renamefile_ntflags = 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/ | 0x040 /*FILE_NON_DIRECTORY_FILE*/;
       const DWORD renamedir_ntflags = 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/ | 0x01 /*FILE_DIRECTORY_FILE*/;
       IO_STATUS_BLOCK isb = make_iostatus();
-      path_view::c_str<> zpath(leafname, true);
+      path_view::c_str<> zpath(leafname, path_view::zero_terminated);
       UNICODE_STRING _path{};
       _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
       _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
@@ -251,7 +251,7 @@ namespace algorithm
       return success();
 #else
       (void) is_dir;
-      path_view::c_str<> zpath(leafname);
+      path_view::c_str<> zpath(leafname, path_view::zero_terminated);
       if(dirh.unique_id() != topdirh.unique_id())
       {
         // Try renaming it into topdirh

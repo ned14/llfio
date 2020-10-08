@@ -143,7 +143,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC std::unique_ptr<span<path_view_component>, proce
   {
     size_t len = strlen(*e);
     memcpy(after, *e, len + 1);
-    *arraye++ = path_view_component(after, len, true);
+    *arraye++ = path_view_component(after, len, path_view::zero_terminated);
     out = {array, arraye};
     after += len + 1;
   }
@@ -247,11 +247,11 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<process_handle> process_handle::launch_pr
     std::vector<const char *> argptrs(args.size() + 2);
     std::vector<small_path_view_c_str> _args;
     _args.reserve(args.size() + 1);
-    _args.emplace_back(path);
+    _args.emplace_back(path, path_view::zero_terminated);
     argptrs[0] = _args[0].buffer;
     for(size_t n = 0; n < args.size(); ++n)
     {
-      _args.emplace_back(args[n]);
+      _args.emplace_back(args[n], path_view::zero_terminated);
       argptrs[n + 1] = _args[n + 1].buffer;
     }
     std::vector<small_path_view_c_str> _envs;
@@ -260,7 +260,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<process_handle> process_handle::launch_pr
     envptrs.reserve(env.size() + 1);
     for(const auto &i : env)
     {
-      _envs.emplace_back(i);
+      _envs.emplace_back(i, path_view::zero_terminated);
       envptrs.push_back(_envs.back().buffer);
     }
     envptrs.push_back(nullptr);

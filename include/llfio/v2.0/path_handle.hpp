@@ -107,6 +107,17 @@ public:
     return path_handle(std::move(newh));
   }
 
+  /*! Returns whether a file entry exists more efficiently that opening and
+  closing a `file_handle`. Note that this can be a rich source of TOCTOU
+  security attacks! Be aware that symbolic links are NOT dereferenced, so
+  a subsequent file handle open may fail.
+  */
+  LLFIO_MAKE_FREE_FUNCTION
+  result<bool> exists(path_view_type path) const noexcept;
+  //! \overload
+  LLFIO_MAKE_FREE_FUNCTION
+  static inline result<bool> exists(const path_handle &base, path_view_type path) noexcept { return base.exists(path); }
+
   /*! Create a path handle opening access to some location on the filing system.
   Some operating systems provide a particularly lightweight method of doing this
   (Linux: `O_PATH`, Windows: no access perms) which is much faster than opening

@@ -72,7 +72,7 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
   ntflags &= ~0x00000008 /*FILE_NO_INTERMEDIATE_BUFFERING*/;  // pipes always buffer
   IO_STATUS_BLOCK isb = make_iostatus();
 
-  path_view::c_str<> zpath(path, true);
+  path_view::c_str<> zpath(path, path_view::not_zero_terminated);
   UNICODE_STRING _path{};
   if(path.empty())
   {

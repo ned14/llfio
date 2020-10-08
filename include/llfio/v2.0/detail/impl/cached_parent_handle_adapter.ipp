@@ -77,7 +77,7 @@ namespace algorithm
       filesystem::path dirpath;
       if(base.is_valid())
       {
-        dirpath = base.current_path().value() / path.path();
+        dirpath = base.current_path().value() / path;
       }
       else
       {

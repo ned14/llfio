@@ -118,9 +118,9 @@ static inline void TestPathView()
   BOOST_CHECK(0 == f.compare<>("0"));
 #ifndef _WIN32
   // cstr
-  llfio::path_view::c_str<> g(e);
+  llfio::path_view::c_str<> g(e, llfio::path_view::zero_terminated);
   BOOST_CHECK(g.buffer != p);  // NOLINT
-  llfio::path_view::c_str<> h(f);
+  llfio::path_view::c_str<> h(f, llfio::path_view::zero_terminated);
   BOOST_CHECK(h.buffer == p + 70);  // NOLINT
 #endif
   CheckPathView("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir");
@@ -162,11 +162,11 @@ static inline void TestPathView()
   BOOST_CHECK(0 == g.compare<>("\\mnt\\c\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir"));
   BOOST_CHECK(0 == h.compare<>("0"));
   // cstr
-  llfio::path_view::c_str<> i(g, false);
+  llfio::path_view::c_str<> i(g, llfio::path_view::not_zero_terminated);
   BOOST_CHECK(i.buffer != p2);
-  llfio::path_view::c_str<> j(g, true);
+  llfio::path_view::c_str<> j(g, llfio::path_view::zero_terminated);
   BOOST_CHECK(j.buffer == p2);
-  llfio::path_view::c_str<> k(h, false);
+  llfio::path_view::c_str<> k(h, llfio::path_view::not_zero_terminated);
   BOOST_CHECK(k.buffer == p2 + 70);
 
   CheckPathView(L"\\mnt\\c\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir\\0");

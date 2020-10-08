@@ -28,6 +28,29 @@ Distributed under the Boost Software License, Version 1.0.
 
 LLFIO_V2_NAMESPACE_BEGIN
 
+result<bool> path_handle::exists(path_view_type path) const noexcept {
+  try
+  {
+    LLFIO_LOG_FUNCTION_CALL(this);
+    path_view::c_str<> zpath(path, path_view::zero_terminated);
+    int x = ::faccessat(native_handle().fd, zpath.buffer, F_OK, AT_SYMLINK_NOFOLLOW);
+    if(x < 0)
+    {
+      auto ret = posix_error();
+      if(ret == errc::no_such_file_or_directory)
+      {
+        return false;
+      }
+      return failure(std::move(ret));
+    }
+    return (x == F_OK);
+  }
+  catch(...)
+  {
+    return error_from_exception();
+  }
+}
+
 result<path_handle> path_handle::path(const path_handle &base, path_handle::path_view_type path) noexcept
 {
   result<path_handle> ret(in_place_type<path_handle>);
@@ -43,7 +66,7 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
   // Linux provides this extension opening a super light weight fd to just an anchor on the filing system
   attribs |= O_PATH;
 #endif
-  path_view::c_str<> zpath(path);
+  path_view::c_str<> zpath(path, path_view::zero_terminated);
   if(base.is_valid())
   {
     nativeh.fd = ::openat(base.native_handle().fd, zpath.buffer, attribs);

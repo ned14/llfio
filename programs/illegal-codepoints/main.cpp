@@ -6170,7 +6170,7 @@ int main()
       auto &entry = entries[n];
       if(entry.second == status::created)
       {
-        if(item.leafname == llfio::path_view(entry.first.data(), 3, true))
+        if(item.leafname == llfio::path_view(entry.first.data(), 3, llfio::path_view::zero_terminated))
         {
           entry.second = status::found;
           break;
