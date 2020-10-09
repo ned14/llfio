@@ -70,9 +70,11 @@ namespace detail
   /* Returns where the last character was written to.
   toallocate may be written with how much must be written if there wasn't enough space.
   */
-  template <class DestT, class SrcT> inline DestT *_reencode_path_to(size_t &toallocate, DestT *dest_buffer, size_t dest_buffer_length, const SrcT *src_buffer, size_t src_buffer_length)
+  template <class DestT, class SrcT>
+  inline DestT *_reencode_path_to(size_t &toallocate, DestT *dest_buffer, size_t dest_buffer_length, const SrcT *src_buffer, size_t src_buffer_length,
+                                  const std::locale *loc)
   {
-    auto &convert = _get_codecvt<SrcT, DestT>();
+    auto &convert = (loc == nullptr) ? _get_codecvt<SrcT, DestT>() : std::use_facet<_codecvt<SrcT, DestT>>(*loc);
     std::mbstate_t cstate{};
     auto *src_ptr = src_buffer;
     auto *dest_ptr = dest_buffer;
@@ -123,18 +125,24 @@ namespace detail
 #pragma warning(pop)
 #endif
 
-  char *reencode_path_to(size_t & /*unused*/, char * /*unused*/, size_t /*unused*/, const LLFIO_V2_NAMESPACE::byte * /*unused*/, size_t /*unused*/)
+  char *reencode_path_to(size_t & /*unused*/, char * /*unused*/, size_t /*unused*/, const LLFIO_V2_NAMESPACE::byte * /*unused*/, size_t /*unused*/,
+                         const std::locale * /*unused*/)
   {
     LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str reencoding function should never see passthrough.");
     abort();
   }
-  char *reencode_path_to(size_t & /*unused*/, char * /*unused*/, size_t /*unused*/, const char * /*unused*/, size_t /*unused*/)
+  char *reencode_path_to(size_t & /*unused*/, char * /*unused*/, size_t /*unused*/, const char * /*unused*/, size_t /*unused*/, const std::locale * /*unused*/)
   {
     LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str reencoding function should never see identity.");
     abort();
   }
-  char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const wchar_t *src_buffer, size_t src_buffer_length) { return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, src_buffer, src_buffer_length); }
-  char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const char8_t *src_buffer, size_t src_buffer_length)
+  char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const wchar_t *src_buffer, size_t src_buffer_length,
+                         const std::locale *loc)
+  {
+    return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, src_buffer, src_buffer_length, loc);
+  }
+  char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const char8_t *src_buffer, size_t src_buffer_length,
+                         const std::locale *loc)
   {
 #ifdef _WIN32
     if(dest_buffer_length * sizeof(wchar_t) > 65535)
@@ -188,26 +196,65 @@ namespace detail
       state.src_buffer = nullptr;
     }
     ULONG written = 0;
-    // Ask for the length needed
-    NTSTATUS ntstat = RtlUTF8ToUnicodeN(nullptr, 0, &written, (const char *) src_buffer, static_cast<ULONG>(src_buffer_length));
-    if(ntstat < 0)
+    NTSTATUS ntstat;
+    if(loc == nullptr)
     {
-      LLFIO_LOG_FATAL(ntstat, ntkernel_error(ntstat).message().c_str());
-      abort();
+      // Ask for the length needed
+      ntstat = RtlUTF8ToUnicodeN(nullptr, 0, &written, (const char *) src_buffer, static_cast<ULONG>(src_buffer_length));
+      if(ntstat < 0)
+      {
+        LLFIO_LOG_FATAL(ntstat, ntkernel_error(ntstat).message().c_str());
+        abort();
+      }
+      state.buffer.Length = (USHORT) written;
+      state.buffer.MaximumLength = (USHORT)(written + sizeof(wchar_t));
+      state.buffer.Buffer = (wchar_t *) malloc(state.buffer.MaximumLength);
+      if(nullptr == state.buffer.Buffer)
+      {
+        throw std::bad_alloc();
+      }
+      // Do the conversion UTF-8 to UTF-16
+      ntstat = RtlUTF8ToUnicodeN(state.buffer.Buffer, state.buffer.Length, &written, (const char *) src_buffer, static_cast<ULONG>(src_buffer_length));
+      if(ntstat < 0)
+      {
+        LLFIO_LOG_FATAL(ntstat, ntkernel_error(ntstat).message().c_str());
+        abort();
+      }
     }
-    state.buffer.Length = (USHORT) written;
-    state.buffer.MaximumLength = (USHORT)(written + sizeof(wchar_t));
-    state.buffer.Buffer = (wchar_t *) malloc(state.buffer.MaximumLength);
-    if(nullptr == state.buffer.Buffer)
+    else
     {
-      throw std::bad_alloc();
-    }
-    // Do the conversion UTF-8 to UTF-16
-    ntstat = RtlUTF8ToUnicodeN(state.buffer.Buffer, state.buffer.Length, &written, (const char *) src_buffer, static_cast<ULONG>(src_buffer_length));
-    if(ntstat < 0)
-    {
-      LLFIO_LOG_FATAL(ntstat, ntkernel_error(ntstat).message().c_str());
-      abort();
+      auto &convert = std::use_facet<_codecvt<char8_t, wchar_t>>(*loc);
+      std::mbstate_t cstate{};
+      written = (DWORD)(src_buffer_length * convert.max_length() * sizeof(wchar_t));
+      state.buffer.Length = (USHORT) written;
+      state.buffer.MaximumLength = (USHORT)(written + sizeof(wchar_t));
+      state.buffer.Buffer = (wchar_t *) malloc(state.buffer.MaximumLength);
+      if(nullptr == state.buffer.Buffer)
+      {
+        throw std::bad_alloc();
+      }
+      // Do the conversion UTF-8 to UTF-16
+      auto *src_ptr = src_buffer;
+      auto *dest_ptr = state.buffer.Buffer;
+      auto result =
+      convert.out(cstate, src_ptr, src_buffer + src_buffer_length, src_ptr, dest_ptr, state.buffer.Buffer + state.buffer.Length / sizeof(wchar_t), dest_ptr);
+      assert(std::codecvt_base::noconv != result);
+      if(std::codecvt_base::noconv == result)
+      {
+        LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str should never do identity reencoding");
+        abort();
+      }
+      if(std::codecvt_base::error == result)
+      {
+        // If input is supposed to be valid UTF, barf
+        throw std::system_error(make_error_code(std::errc::illegal_byte_sequence));
+      }
+      written = (DWORD)((dest_ptr - state.buffer.Buffer) * sizeof(wchar_t));
+      if(written > 65535)
+      {
+        throw std::system_error(make_error_code(std::errc::no_buffer_space));
+      }
+      state.buffer.Length = (USHORT) written;
     }
     // Do any / to \ conversion now
     for(size_t n = 0; n < state.buffer.Length / sizeof(wchar_t); n++)
@@ -218,7 +265,8 @@ namespace detail
       }
     }
     // Convert from UTF-16 to ANSI
-    ntstat = AreFileApisANSI() ? RtlUnicodeStringToAnsiString(&state.str, (PCUNICODE_STRING) &state.buffer, true) : RtlUnicodeStringToOemString(&state.str, (PCUNICODE_STRING) &state.buffer, true);
+    ntstat = AreFileApisANSI() ? RtlUnicodeStringToAnsiString(&state.str, (PCUNICODE_STRING) &state.buffer, true) :
+                                 RtlUnicodeStringToOemString(&state.str, (PCUNICODE_STRING) &state.buffer, true);
     if(ntstat < 0)
     {
       LLFIO_LOG_FATAL(ntstat, ntkernel_error(ntstat).message().c_str());
@@ -239,27 +287,32 @@ namespace detail
     (void) dest_buffer_length;
     (void) src_buffer;
     (void) src_buffer_length;
+    (void) loc;
     LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str reencoding function should never see identity.");
     abort();
 #endif
   }
-  char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const char16_t *src_buffer, size_t src_buffer_length)
+  char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const char16_t *src_buffer, size_t src_buffer_length,
+                         const std::locale *loc)
   {
-#if (__cplusplus >= 202000 || _HAS_CXX20) && !defined(_LIBCPP_VERSION)
-    return (char *) _reencode_path_to(toallocate, (char8_t *) dest_buffer, dest_buffer_length, src_buffer, src_buffer_length);
+#if(__cplusplus >= 202000 || _HAS_CXX20) && !defined(_LIBCPP_VERSION)
+    return (char *) _reencode_path_to(toallocate, (char8_t *) dest_buffer, dest_buffer_length, src_buffer, src_buffer_length, loc);
 #else
-    return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, src_buffer, src_buffer_length);
+    return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, src_buffer, src_buffer_length, loc);
 #endif
   }
 
-  wchar_t *reencode_path_to(size_t & /*unused*/, wchar_t * /*unused*/, size_t /*unused*/, const LLFIO_V2_NAMESPACE::byte * /*unused*/, size_t /*unused*/)
+  wchar_t *reencode_path_to(size_t & /*unused*/, wchar_t * /*unused*/, size_t /*unused*/, const LLFIO_V2_NAMESPACE::byte * /*unused*/, size_t /*unused*/,
+                            const std::locale * /*unused*/)
   {
     LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str reencoding function should never see passthrough.");
     abort();
   }
-  wchar_t *reencode_path_to(size_t &toallocate, wchar_t *dest_buffer, size_t dest_buffer_length, const char *src_buffer, size_t src_buffer_length)
+  wchar_t *reencode_path_to(size_t &toallocate, wchar_t *dest_buffer, size_t dest_buffer_length, const char *src_buffer, size_t src_buffer_length,
+                            const std::locale *loc)
   {
 #ifdef _WIN32
+    (void) loc;  // can't use on windows
     if(dest_buffer_length * sizeof(wchar_t) > 65535)
     {
       LLFIO_LOG_FATAL(nullptr, "Paths exceeding 64Kb are impossible on Microsoft Windows");
@@ -301,7 +354,8 @@ namespace detail
     state.str.Buffer = const_cast<char *>(src_buffer);
     state.str.Length = state.str.MaximumLength = (USHORT) src_buffer_length;
     // Try using the internal buffer
-    NTSTATUS ntstat = AreFileApisANSI() ? RtlAnsiStringToUnicodeString(&state.buffer, &state.str, false) : RtlOemStringToUnicodeString(&state.buffer, &state.str, false);
+    NTSTATUS ntstat =
+    AreFileApisANSI() ? RtlAnsiStringToUnicodeString(&state.buffer, &state.str, false) : RtlOemStringToUnicodeString(&state.buffer, &state.str, false);
     if(ntstat >= 0)
     {
       // Do any / to \ conversion now
@@ -349,6 +403,7 @@ namespace detail
     (void) dest_buffer_length;
     (void) src_buffer;
     (void) src_buffer_length;
+    (void) loc;
     LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str reencoding function does not support char to wchar_t conversion on libc++.");
     abort();
 #elif defined(__GLIBCXX__)
@@ -357,18 +412,21 @@ namespace detail
     (void) dest_buffer_length;
     (void) src_buffer;
     (void) src_buffer_length;
+    (void) loc;
     LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str reencoding function does not support char to wchar_t conversion on libstdc++.");
     abort();
 #else
-    return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, src_buffer, src_buffer_length);
+    return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, src_buffer, src_buffer_length, loc);
 #endif
   }
-  wchar_t *reencode_path_to(size_t & /*unused*/, wchar_t * /*unused*/, size_t /*unused*/, const wchar_t * /*unused*/, size_t /*unused*/)
+  wchar_t *reencode_path_to(size_t & /*unused*/, wchar_t * /*unused*/, size_t /*unused*/, const wchar_t * /*unused*/, size_t /*unused*/,
+                            const std::locale * /*unused*/)
   {
     LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str reencoding function should never see identity.");
     abort();
   }
-  wchar_t *reencode_path_to(size_t &toallocate, wchar_t *dest_buffer, size_t dest_buffer_length, const char8_t *src_buffer, size_t src_buffer_length)
+  wchar_t *reencode_path_to(size_t &toallocate, wchar_t *dest_buffer, size_t dest_buffer_length, const char8_t *src_buffer, size_t src_buffer_length,
+                            const std::locale *loc)
   {
 #if LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED
 #if defined(_LIBCPP_VERSION)
@@ -377,6 +435,7 @@ namespace detail
     (void) dest_buffer_length;
     (void) src_buffer;
     (void) src_buffer_length;
+    (void) loc;
     LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str reencoding function does not support char8_t to wchar_t conversion on libc++.");
     abort();
 #elif defined(__GLIBCXX__)
@@ -385,10 +444,11 @@ namespace detail
     (void) dest_buffer_length;
     (void) src_buffer;
     (void) src_buffer_length;
+    (void) loc;
     LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str reencoding function does not support char8_t to wchar_t conversion on libstdc++.");
     abort();
 #else
-    return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, (const char *) src_buffer, src_buffer_length);
+    return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, (const char *) src_buffer, src_buffer_length, loc);
 #endif
 #else
 #if defined(_LIBCPP_VERSION)
@@ -398,14 +458,16 @@ namespace detail
     (void) dest_buffer_length;
     (void) src_buffer;
     (void) src_buffer_length;
+    (void) loc;
     LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str reencoding function does not support char8_t to wchar_t conversion on libc++.");
     abort();
 #else
-    return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, src_buffer, src_buffer_length);
+    return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, src_buffer, src_buffer_length, loc);
 #endif
 #endif
   }
-  wchar_t *reencode_path_to(size_t &toallocate, wchar_t *dest_buffer, size_t dest_buffer_length, const char16_t *src_buffer, size_t src_buffer_length)
+  wchar_t *reencode_path_to(size_t &toallocate, wchar_t *dest_buffer, size_t dest_buffer_length, const char16_t *src_buffer, size_t src_buffer_length,
+                            const std::locale *loc)
   {
 #ifdef _WIN32
     (void) toallocate;
@@ -413,6 +475,7 @@ namespace detail
     (void) dest_buffer_length;
     (void) src_buffer;
     (void) src_buffer_length;
+    (void) loc;
     LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str reencoding function should never see identity.");
     abort();
 #elif defined(_LIBCPP_VERSION)
@@ -421,6 +484,7 @@ namespace detail
     (void) dest_buffer_length;
     (void) src_buffer;
     (void) src_buffer_length;
+    (void) loc;
     LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str reencoding function does not support char16_t to wchar_t conversion on libc++.");
     abort();
 #elif defined(__GLIBCXX__)
@@ -429,10 +493,11 @@ namespace detail
     (void) dest_buffer_length;
     (void) src_buffer;
     (void) src_buffer_length;
+    (void) loc;
     LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str reencoding function does not support char16_t to wchar_t conversion on libstdc++.");
     abort();
 #else
-    return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, src_buffer, src_buffer_length);
+    return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, src_buffer, src_buffer_length, loc);
 #endif
   }
 

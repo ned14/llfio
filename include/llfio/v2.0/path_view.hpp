@@ -1,5 +1,5 @@
 /* A view of a path to something
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: Jul 2017
 
 
@@ -258,9 +258,11 @@ public:
       , _reserved1(0)
   {
   }  // NOLINT
-  //! Implicitly constructs a path view from a path. The input path MUST continue to exist for this view to be valid.
-  path_view_component(const filesystem::path &v) noexcept  // NOLINT
-      : path_view_component(v.native().c_str(), v.native().size(), zero_terminated, native_format)
+  /*! Implicitly constructs a path view from a path. The input path MUST continue to exist for this view to be valid
+  (DEVIATES from P1030 due to filesystem::path not exposing its path formatting).
+  */
+  path_view_component(const filesystem::path &v, format fmt = auto_format) noexcept  // NOLINT
+      : path_view_component(v.native().c_str(), v.native().size(), zero_terminated, fmt)
   {
   }
   /*! Constructs from a basic string if the character type is one of
@@ -268,14 +270,14 @@ public:
   */
   LLFIO_TEMPLATE(class Char)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable<Char>))
-  constexpr path_view_component(const std::basic_string<Char> &v, format fmt = auto_format) noexcept  // NOLINT
+  constexpr path_view_component(const std::basic_string<Char> &v, format fmt = binary_format) noexcept  // NOLINT
       : path_view_component(v.data(), v.size(), zero_terminated, fmt)
   {
   }
   /*! Constructs from a lengthed array of one of `char`, `wchar_t`, `char8_t` or `char16_t`. The input
   string MUST continue to exist for this view to be valid.
   */
-  constexpr path_view_component(const char *b, size_t l, enum zero_termination zt, format fmt = auto_format) noexcept
+  constexpr path_view_component(const char *b, size_t l, enum zero_termination zt, format fmt = binary_format) noexcept
       : _charstr((l == 0) ? nullptr : b)
       , _length((l == 0) ? 0 : l)
       , _zero_terminated((l == 0) ? false : (zt == zero_terminated))
@@ -291,7 +293,7 @@ public:
   /*! Constructs from a lengthed array of one of `char`, `wchar_t`, `char8_t` or `char16_t`. The input
   string MUST continue to exist for this view to be valid.
   */
-  constexpr path_view_component(const wchar_t *b, size_t l, enum zero_termination zt, format fmt = auto_format) noexcept
+  constexpr path_view_component(const wchar_t *b, size_t l, enum zero_termination zt, format fmt = binary_format) noexcept
       : _wcharstr((l == 0) ? nullptr : b)
       , _length((l == 0) ? 0 : l)
       , _zero_terminated((l == 0) ? false : (zt == zero_terminated))
@@ -307,7 +309,7 @@ public:
   /*! Constructs from a lengthed array of one of `char`, `wchar_t`, `char8_t` or `char16_t`. The input
   string MUST continue to exist for this view to be valid.
   */
-  constexpr path_view_component(const char8_t *b, size_t l, enum zero_termination zt, format fmt = auto_format) noexcept
+  constexpr path_view_component(const char8_t *b, size_t l, enum zero_termination zt, format fmt = binary_format) noexcept
       : _char8str((l == 0) ? nullptr : b)
       , _length((l == 0) ? 0 : l)
       , _zero_terminated((l == 0) ? false : (zt == zero_terminated))
@@ -323,7 +325,7 @@ public:
   /*! Constructs from a lengthed array of one of `char`, `wchar_t`, `char8_t` or `char16_t`. The input
   string MUST continue to exist for this view to be valid.
   */
-  constexpr path_view_component(const char16_t *b, size_t l, enum zero_termination zt, format fmt = auto_format) noexcept
+  constexpr path_view_component(const char16_t *b, size_t l, enum zero_termination zt, format fmt = binary_format) noexcept
       : _char16str((l == 0) ? nullptr : b)
       , _length((l == 0) ? 0 : l)
       , _zero_terminated((l == 0) ? false : (zt == zero_terminated))
@@ -359,7 +361,7 @@ public:
   */
   LLFIO_TEMPLATE(class Char)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable<Char>))
-  constexpr path_view_component(const Char *s, format fmt = auto_format) noexcept
+  constexpr path_view_component(const Char *s, format fmt = binary_format) noexcept
       : path_view_component(s, detail::constexpr_strlen(s), zero_terminated, fmt)
   {
   }
@@ -376,7 +378,7 @@ public:
   */
   LLFIO_TEMPLATE(class Char)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable<Char>))
-  constexpr path_view_component(basic_string_view<Char> v, enum zero_termination zt, format fmt = auto_format) noexcept
+  constexpr path_view_component(basic_string_view<Char> v, enum zero_termination zt, format fmt = binary_format) noexcept
       : path_view_component(v.data(), v.size(), zt, fmt)
   {
   }
@@ -394,14 +396,14 @@ public:
   */
   LLFIO_TEMPLATE(class It, class End)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable<typename It::value_type>), LLFIO_TPRED(is_source_chartype_acceptable<typename End::value_type>))
-  constexpr path_view_component(It b, End e, enum zero_termination zt, format fmt = auto_format) noexcept
+  constexpr path_view_component(It b, End e, enum zero_termination zt, format fmt = binary_format) noexcept
       : path_view_component(addressof(*b), e - b, zt, fmt)
   {
   }
   //! \overload
   LLFIO_TEMPLATE(class It, class End)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable<std::decay_t<It>>), LLFIO_TPRED(is_source_chartype_acceptable<std::decay_t<End>>))
-  constexpr path_view_component(It *b, End *e, enum zero_termination zt, format fmt = auto_format) noexcept
+  constexpr path_view_component(It *b, End *e, enum zero_termination zt, format fmt = binary_format) noexcept
       : path_view_component(b, e - b, zt, fmt)
   {
   }
@@ -443,6 +445,7 @@ private:
     {
     case format::binary_format:
       return _npos;
+    default:
 #ifdef _WIN32
     case format::auto_format:
       return _utf8 ? basic_string_view<char8_t>(_char8str, _length).find_first_of((const char8_t *) "/\\", startidx)  //
@@ -469,7 +472,6 @@ private:
                                          :
                                          basic_string_view<char>((const char *) _bytestr, _length).find('/', startidx)));
 #else
-    default:
       return _utf8 ? basic_string_view<char8_t>(_char8str, _length).find(preferred_separator, startidx)  //
                      :
                      (_utf16 ? basic_string_view<char16_t>(_char16str, _length).find(preferred_separator, startidx)  //
@@ -487,6 +489,7 @@ private:
     {
     case format::binary_format:
       return _npos;
+    default:
 #ifdef _WIN32
     case format::auto_format:
       return _utf8 ? basic_string_view<char8_t>(_char8str, _length).find_last_of((const char8_t *) "/\\", endidx)  //
@@ -513,7 +516,6 @@ private:
                                          :
                                          basic_string_view<char>((const char *) _bytestr, _length).rfind('/', endidx)));
 #else
-    default:
       return _utf8 ? basic_string_view<char8_t>(_char8str, _length).rfind(preferred_separator, endidx)  //
                      :
                      (_utf16 ? basic_string_view<char16_t>(_char16str, _length).rfind(preferred_separator, endidx)  //
@@ -615,13 +617,16 @@ public:
   }
 
 private:
-  template <class CharT> static filesystem::path _path_from_char_array(basic_string_view<CharT> v) { return {v.data(), v.data() + v.size()}; }
-  static filesystem::path _path_from_char_array(basic_string_view<char8_t> v)
+  template <class CharT> static filesystem::path _path_from_char_array(basic_string_view<CharT> v, filesystem::path::format f)
+  {
+    return {v.data(), v.data() + v.size(), f};
+  }
+  static filesystem::path _path_from_char_array(basic_string_view<char8_t> v, filesystem::path::format f)
   {
 #if(__cplusplus >= 202000 || _HAS_CXX20) && (!defined(_LIBCPP_VERSION) || _LIBCPP_VERSION > 10000 /* approx start of 2020 */)
-    return filesystem::path(v);
+    return filesystem::path(v, f);
 #else
-    return filesystem::u8path((const char *) v.data(), (const char *) v.data() + v.size());
+    return filesystem::u8path((const char *) v.data(), (const char *) v.data() + v.size(), f);
 #endif
   }
 
@@ -674,7 +679,19 @@ public:
   //! Return the path view as a path. Allocates and copies memory!
   filesystem::path path() const
   {
-    return _invoke([](const auto &v) { return _path_from_char_array(v); });
+    return _invoke([&](const auto &v) {
+      return _path_from_char_array(v, [](format f) -> filesystem::path::format {
+        switch(f)
+        {
+        case format::generic_format:
+          return filesystem::path::format::generic_format;
+        case format::native_format:
+          return filesystem::path::format::native_format;
+        default:
+          return filesystem::path::format::auto_format;
+        }
+      }(formatting()));
+    });
   }
 
   /*! Compares the two path views for equivalence or ordering using `T`
@@ -1329,12 +1346,90 @@ public:
   ~path_view() = default;
 
   using path_view_component::path_view_component;
-
   //! Implicitly constructs a path view from a path view component. The input path MUST continue to exist for this view to be valid.
   constexpr path_view(path_view_component v) noexcept  // NOLINT
       : path_view_component(v)
   {
   }
+
+  /*! Constructs from a basic string if the character type is one of
+  `char`, `wchar_t`, `char8_t` or `char16_t`.
+  */
+  LLFIO_TEMPLATE(class Char)
+  LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable<Char>))
+  constexpr path_view(const std::basic_string<Char> &v, format fmt = auto_format) noexcept  // NOLINT
+      : path_view_component(v.data(), v.size(), zero_terminated, fmt)
+  {
+  }
+  /*! Constructs from a lengthed array of one of `char`, `wchar_t`, `char8_t` or `char16_t`. The input
+  string MUST continue to exist for this view to be valid.
+  */
+  constexpr path_view(const char *b, size_t l, enum zero_termination zt, format fmt = auto_format) noexcept
+      : path_view_component(b, l, zt, fmt)
+  {
+  }
+  /*! Constructs from a lengthed array of one of `char`, `wchar_t`, `char8_t` or `char16_t`. The input
+  string MUST continue to exist for this view to be valid.
+  */
+  constexpr path_view(const wchar_t *b, size_t l, enum zero_termination zt, format fmt = auto_format) noexcept
+      : path_view_component(b, l, zt, fmt)
+  {
+  }
+  /*! Constructs from a lengthed array of one of `char`, `wchar_t`, `char8_t` or `char16_t`. The input
+  string MUST continue to exist for this view to be valid.
+  */
+  constexpr path_view(const char8_t *b, size_t l, enum zero_termination zt, format fmt = auto_format) noexcept
+      : path_view_component(b, l, zt, fmt)
+  {
+  }
+  /*! Constructs from a lengthed array of one of `char`, `wchar_t`, `char8_t` or `char16_t`. The input
+  string MUST continue to exist for this view to be valid.
+  */
+  constexpr path_view(const char16_t *b, size_t l, enum zero_termination zt, format fmt = auto_format) noexcept
+      : path_view_component(b, l, zt, fmt)
+  {
+  }
+
+  /*! Implicitly constructs a path view from a zero terminated pointer to a
+  character array, which must be one of `char`, `wchar_t`, `char8_t` or `char16_t`.
+  The input string MUST continue to exist for this view to be valid.
+  */
+  LLFIO_TEMPLATE(class Char)
+  LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable<Char>))
+  constexpr path_view(const Char *s, format fmt = auto_format) noexcept
+      : path_view_component(s, detail::constexpr_strlen(s), zero_terminated, fmt)
+  {
+  }
+
+  /*! Constructs from a basic string view if the character type is one of
+  `char`, `wchar_t`, `char8_t` or `char16_t`.
+  */
+  LLFIO_TEMPLATE(class Char)
+  LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable<Char>))
+  constexpr path_view(basic_string_view<Char> v, enum zero_termination zt, format fmt = auto_format) noexcept
+      : path_view_component(v.data(), v.size(), zt, fmt)
+  {
+  }
+
+  /*! Constructs from an iterator sequence if the iterator is contiguous, if its
+  value type is one of `char`, `wchar_t`, `char8_t` or `char16_t`.
+
+  (DEVIATES from P1030, cannot detect contiguous iterator in SFINAE in C++ 14)
+  */
+  LLFIO_TEMPLATE(class It, class End)
+  LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable<typename It::value_type>), LLFIO_TPRED(is_source_chartype_acceptable<typename End::value_type>))
+  constexpr path_view(It b, End e, enum zero_termination zt, format fmt = auto_format) noexcept
+      : path_view_component(addressof(*b), e - b, zt, fmt)
+  {
+  }
+  //! \overload
+  LLFIO_TEMPLATE(class It, class End)
+  LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable<std::decay_t<It>>), LLFIO_TPRED(is_source_chartype_acceptable<std::decay_t<End>>))
+  constexpr path_view(It *b, End *e, enum zero_termination zt, format fmt = auto_format) noexcept
+      : path_view_component(b, e - b, zt, fmt)
+  {
+  }
+
   //! Default copy constructor
   path_view(const path_view &) = default;
   //! Default move constructor
@@ -1464,8 +1559,6 @@ public:
     }
     return this->_invoke([sep_idx](auto v) { return path_view(v.data(), sep_idx, not_zero_terminated); });
   }
-  //! Returns the size of the view in characters.
-  LLFIO_PATH_VIEW_CONSTEXPR size_t native_size() const noexcept { return this->native_size(); }
   //! Returns a view of the root name part of this view e.g. C:
   LLFIO_PATH_VIEW_CONSTEXPR path_view root_name() const noexcept
   {
@@ -1991,9 +2084,9 @@ namespace detail
     filesystem::path ret;
     template <class CharT, class Traits> void operator()(basic_string_view<CharT, Traits> sv) { ret.assign(sv.begin(), sv.end()); }
 #if LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED
-    template <class Traits> void operator()(basic_string_view<path_view_component::char8_t, Traits> sv)
+    void operator()(basic_string_view<path_view_component::char8_t> sv)
     {
-      basic_string_view<char, Traits> _((const char *) sv.data(), sv.size());
+      basic_string_view<char> _((const char *) sv.data(), sv.size());
       ret.assign(_.begin(), _.end());
     }
 #endif

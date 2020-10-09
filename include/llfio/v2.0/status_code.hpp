@@ -64,6 +64,10 @@ as that (a) enables safe header only LLFIO on Windows (b) produces better codege
 #define LLFIO_ENABLE_COROUTINES 1
 #endif
 
+#if OUTCOME_VERSION_MAJOR == 2 && OUTCOME_VERSION_MINOR < 2
+#error LLFIO needs Outcome v2.2 or higher
+#endif
+
 LLFIO_V2_NAMESPACE_BEGIN
 
 #ifndef LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
@@ -341,6 +345,10 @@ LLFIO_V2_NAMESPACE_END
 #include "outcome/utils.hpp"
 #if !defined(LLFIO_ENABLE_COROUTINES) && defined(OUTCOME_FOUND_COROUTINE_HEADER)
 #define LLFIO_ENABLE_COROUTINES 1
+#endif
+
+#if OUTCOME_VERSION_MAJOR == 2 && OUTCOME_VERSION_MINOR < 2
+#error LLFIO needs Outcome v2.2 or higher
 #endif
 
 LLFIO_V2_NAMESPACE_BEGIN

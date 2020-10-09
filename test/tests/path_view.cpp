@@ -162,9 +162,9 @@ static inline void TestPathView()
   BOOST_CHECK(0 == g.compare<>("\\mnt\\c\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir"));
   BOOST_CHECK(0 == h.compare<>("0"));
   // cstr
-  llfio::path_view::c_str<> i(g, llfio::path_view::not_zero_terminated);
+  llfio::path_view::c_str<> i(g, llfio::path_view::zero_terminated);
   BOOST_CHECK(i.buffer != p2);
-  llfio::path_view::c_str<> j(g, llfio::path_view::zero_terminated);
+  llfio::path_view::c_str<> j(g, llfio::path_view::not_zero_terminated);
   BOOST_CHECK(j.buffer == p2);
   llfio::path_view::c_str<> k(h, llfio::path_view::not_zero_terminated);
   BOOST_CHECK(k.buffer == p2 + 70);
