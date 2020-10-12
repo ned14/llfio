@@ -617,6 +617,7 @@ public:
   }
 
 private:
+#ifdef LLFIO_USING_STD_FILESYSTEM
   template <class CharT> static filesystem::path _path_from_char_array(basic_string_view<CharT> v, filesystem::path::format f)
   {
     return {v.data(), v.data() + v.size(), f};
@@ -626,9 +627,25 @@ private:
 #if(__cplusplus >= 202000 || _HAS_CXX20) && (!defined(_LIBCPP_VERSION) || _LIBCPP_VERSION > 10000 /* approx start of 2020 */)
     return filesystem::path(v, f);
 #else
-    return filesystem::u8path((const char *) v.data(), (const char *) v.data() + v.size(), f);
+    if(f != filesystem::path::format::auto_format)
+    {
+      throw std::runtime_error("UTF-8 path conversion pre-C++20 cannot handle non-auto_format formatting.");
+    }
+    return filesystem::u8path((const char *) v.data(), (const char *) v.data() + v.size());
 #endif
   }
+#endif
+#ifdef LLFIO_USING_EXPERIMENTAL_FILESYSTEM
+  template <class CharT> static filesystem::path _path_from_char_array(basic_string_view<CharT> v) { return {v.data(), v.data() + v.size()}; }
+  static filesystem::path _path_from_char_array(basic_string_view<char8_t> v)
+  {
+#if(__cplusplus >= 202000 || _HAS_CXX20) && (!defined(_LIBCPP_VERSION) || _LIBCPP_VERSION > 10000 /* approx start of 2020 */)
+    return filesystem::path(v);
+#else
+    return filesystem::u8path((const char *) v.data(), (const char *) v.data() + v.size());
+#endif
+  }
+#endif
 
   template <class CharT> static int _do_compare(const CharT *a, const CharT *b, size_t length) noexcept { return memcmp(a, b, length * sizeof(CharT)); }
   static int _do_compare(const char8_t *_a, const char8_t *_b, size_t length) noexcept
@@ -680,6 +697,7 @@ public:
   filesystem::path path() const
   {
     return _invoke([&](const auto &v) {
+#ifdef LLFIO_USING_STD_FILESYSTEM
       return _path_from_char_array(v, [](format f) -> filesystem::path::format {
         switch(f)
         {
@@ -691,6 +709,14 @@ public:
           return filesystem::path::format::auto_format;
         }
       }(formatting()));
+#endif
+#ifdef LLFIO_USING_EXPERIMENTAL_FILESYSTEM
+      if(formatting() == generic_format || formatting() == native_format)
+      {
+        throw std::runtime_error("Path conversion with <experimental/filesystem> cannot handle generic_format or native_format formatting.");
+      }
+      return _path_from_char_array(v);
+#endif
     });
   }
 

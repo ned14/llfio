@@ -1,5 +1,5 @@
 /* Integration test kernel for whether pipe handles work
-(C) 2019 Niall Douglas <http://www.nedproductions.biz/> (2 commits)
+(C) 2019-2020 Niall Douglas <http://www.nedproductions.biz/> (2 commits)
 File Created: Nov 2019
 
 
@@ -319,7 +319,7 @@ static inline void TestCoroutinedPipeHandle()
       {
         // Have the kernel tell me when an i/o completion is ready
         auto r = multiplexer->check_for_any_completed_io();
-        if(r.value().initiated_ios_completed == 0)
+        if(r.value().initiated_ios_completed == 0 && r.value().initiated_ios_finished == 0)
         {
           break;
         }

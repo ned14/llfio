@@ -220,6 +220,7 @@ LLFIO_V2_NAMESPACE_END
 #if defined(__has_include)
 // clang-format off
 #if !LLFIO_FORCE_EXPERIMENTAL_FILESYSTEM && __has_include(<filesystem>) && (__cplusplus >= 201700 || _HAS_CXX17)
+#define LLFIO_USING_STD_FILESYSTEM 1
 #include <filesystem>
 LLFIO_V2_NAMESPACE_BEGIN
 namespace filesystem = std::filesystem;
@@ -227,6 +228,7 @@ LLFIO_V2_NAMESPACE_END
 // C++ 14 filesystem support was dropped in VS2019 16.3
 // C++ 14 filesystem support was dropped in LLVM 11
 #elif __has_include(<experimental/filesystem>) && (!defined(_MSC_VER) || _MSC_VER < 1923) && (!defined(_LIBCPP_VERSION) || _LIBCPP_VERSION < 11000)  
+#define LLFIO_USING_EXPERIMENTAL_FILESYSTEM 1
 #include <experimental/filesystem>
 LLFIO_V2_NAMESPACE_BEGIN
 namespace filesystem = std::experimental::filesystem;
@@ -238,18 +240,21 @@ LLFIO_V2_NAMESPACE_END
 #if defined(_LIBCPP_VERSION) && _LIBCPP_VERSION >= 11000
 #error libc++ dropped support for C++ 14 <filesystem> from LLVM 11 onwards. Please enable C++ 17 or later.
 #endif
+#define LLFIO_USING_STD_FILESYSTEM 1
 #include <filesystem>
 LLFIO_V2_NAMESPACE_BEGIN
 namespace filesystem = std::filesystem;
 LLFIO_V2_NAMESPACE_END
 #endif
 #elif __PCPP_ALWAYS_TRUE__
+#define LLFIO_USING_EXPERIMENTAL_FILESYSTEM 1
 #include <experimental/filesystem>
 LLFIO_V2_NAMESPACE_BEGIN
 namespace filesystem = std::experimental::filesystem;
 LLFIO_V2_NAMESPACE_END
 // clang-format on
 #elif defined(_MSC_VER)
+#define LLFIO_USING_STD_FILESYSTEM 1
 #include <filesystem>
 LLFIO_V2_NAMESPACE_BEGIN
 namespace filesystem = std::experimental::filesystem;
