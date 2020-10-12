@@ -107,7 +107,11 @@ static inline void TestIssue09c()
   auto end = std::chrono::steady_clock::now();
   auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
   std::cout << "Construct and tear down a small mapped_file_handle with a reservation of 2^40 took " << diff << "ms." << std::endl;
+#ifdef __APPLE_
+  BOOST_CHECK(diff < 2500);
+#else
   BOOST_CHECK(diff < 250);
+#endif
 }
 
 KERNELTEST_TEST_KERNEL(regression, llfio, issues, 9a,
