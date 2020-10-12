@@ -6146,7 +6146,7 @@ int main()
     buffer[1] = (llfio::filesystem::path::value_type) n;
     buffer[2] = 'z';
     buffer[3] = 0;
-    llfio::path_view leaf(buffer, 3, true);
+    llfio::path_view leaf(buffer, 3, llfio::path_view::zero_terminated);
     auto h = llfio::file(testdir, leaf, llfio::file_handle::mode::write, llfio::file_handle::creation::if_needed);
     if(h)
     {
