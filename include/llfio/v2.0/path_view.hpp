@@ -2109,8 +2109,8 @@ namespace detail
   {
     filesystem::path ret;
     template <class CharT, class Traits> void operator()(basic_string_view<CharT, Traits> sv) { ret.assign(sv.begin(), sv.end()); }
-#if LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED || (defined(_LIBCPP_VERSION) && _LIBCPP_VERSION <= 10000 /* approx start of 2020 */)
-    void operator()(basic_string_view<path_view_component::char8_t> sv)
+#if LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED || (defined(_LIBCPP_VERSION) && _LIBCPP_VERSION < 11000 /* approx start of 2020 */)
+    void operator()(basic_string_view<char8_t> sv)
     {
       basic_string_view<char> _((const char *) sv.data(), sv.size());
       ret.assign(_.begin(), _.end());
