@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['environment',['environment',['../structllfio__v2__xxx_1_1path__discovery_1_1discovered__path.html#ae02f172851c050f6a7f5929410428c7dae900e40bc91d3f9f7f0a99fed68a2e96',1,'llfio_v2_xxx::path_discovery::discovered_path']]],
-  ['exclusive',['exclusive',['../namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33aa4293995cfbfa9ce60ce71ade2ff75f7',1,'llfio_v2_xxx']]]
+  ['directory_5fadded',['directory_added',['../structllfio__v2__xxx_1_1algorithm_1_1difference__item.html#aa63255f48ab96f35618852c8a7ca1c95ae2b66949209c74e8f1b6ef219c959ea9',1,'llfio_v2_xxx::algorithm::difference_item']]],
+  ['directory_5fremoved',['directory_removed',['../structllfio__v2__xxx_1_1algorithm_1_1difference__item.html#aa63255f48ab96f35618852c8a7ca1c95a9a47482a9329c68cbdffe361a9acbdf5',1,'llfio_v2_xxx::algorithm::difference_item']]],
+  ['directory_5frenamed',['directory_renamed',['../structllfio__v2__xxx_1_1algorithm_1_1difference__item.html#aa63255f48ab96f35618852c8a7ca1c95a1155bb560422fcc3322a8317be88567f',1,'llfio_v2_xxx::algorithm::difference_item']]]
 ];

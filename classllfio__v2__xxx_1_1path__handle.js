@@ -21,6 +21,7 @@ var classllfio__v2__xxx_1_1path__handle =
     [ "clone_to_path_handle", "classllfio__v2__xxx_1_1path__handle.html#a978bbd5a812eaf2b08f220ba94a42d5a", null ],
     [ "close", "classllfio__v2__xxx_1_1path__handle.html#ad397dbfc5cd5eb53f203a2c1c9540a2e", null ],
     [ "current_path", "classllfio__v2__xxx_1_1path__handle.html#a00a85eec5a41f7edb2c574d40cf04535", null ],
+    [ "exists", "classllfio__v2__xxx_1_1path__handle.html#a03229b163152b540c3eb6edd41cf5d32", null ],
     [ "flags", "classllfio__v2__xxx_1_1path__handle.html#a013936bc1254b1a47567fe29698d1b1c", null ],
     [ "is_allocation", "classllfio__v2__xxx_1_1path__handle.html#a028fbead3b3c4d4eed2da7fa51c75036", null ],
     [ "is_append_only", "classllfio__v2__xxx_1_1path__handle.html#ac3aa3dc009822c0e437f317864534feb", null ],

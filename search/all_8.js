@@ -5,5 +5,14 @@ var searchData=
   ['handle_2ehpp',['handle.hpp',['../handle_8hpp.html',1,'']]],
   ['handle_5ftype',['handle_type',['../structkvstore__v1__xxx_1_1basic__key__value__store__info.html#a22d02c2c96725ea238c5eed0e7a80c85',1,'kvstore_v1_xxx::basic_key_value_store_info::handle_type()'],['../classkvstore__v1__xxx_1_1basic__key__value__store.html#af19ad33ae6cebe248028231d917ff4c1',1,'kvstore_v1_xxx::basic_key_value_store::handle_type()'],['../structllfio__v2__xxx_1_1storage__profile_1_1item__base.html#ae1026037f706015d2e10a545a64834c0',1,'llfio_v2_xxx::storage_profile::item_base::handle_type()'],['../structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html#a83312b218da0b17c6407fbedb902cb1d',1,'llfio_v2_xxx::storage_profile::storage_profile::handle_type()']]],
   ['hardcoded',['hardcoded',['../structllfio__v2__xxx_1_1path__discovery_1_1discovered__path.html#ae02f172851c050f6a7f5929410428c7daeca7a05085eba86cbab65a157f848354',1,'llfio_v2_xxx::path_discovery::discovered_path']]],
+  ['has_5fextension',['has_extension',['../classllfio__v2__xxx_1_1path__view__component.html#af286c0256f4800e35d816f4ba7571de4',1,'llfio_v2_xxx::path_view_component']]],
+  ['has_5ffilename',['has_filename',['../classllfio__v2__xxx_1_1path__view.html#a257d31cbb37fc019033bab262d01d50e',1,'llfio_v2_xxx::path_view']]],
+  ['has_5fparent_5fpath',['has_parent_path',['../classllfio__v2__xxx_1_1path__view.html#ae4f0f2678b636b59e50114a0bcdbc6ca',1,'llfio_v2_xxx::path_view']]],
+  ['has_5frelative_5fpath',['has_relative_path',['../classllfio__v2__xxx_1_1path__view.html#ad4ba638203e3fc1e6cbcef9b6c4ca956',1,'llfio_v2_xxx::path_view']]],
+  ['has_5froot_5fdirectory',['has_root_directory',['../classllfio__v2__xxx_1_1path__view.html#afe52198fb027adfce8f86c5ae8e7a2ad',1,'llfio_v2_xxx::path_view']]],
+  ['has_5froot_5fname',['has_root_name',['../classllfio__v2__xxx_1_1path__view.html#acbd047c290ab91eaf1067036194f1e8f',1,'llfio_v2_xxx::path_view']]],
+  ['has_5froot_5fpath',['has_root_path',['../classllfio__v2__xxx_1_1path__view.html#a345b745ec73e1a9615a420e9295a0257',1,'llfio_v2_xxx::path_view']]],
+  ['has_5fstem',['has_stem',['../classllfio__v2__xxx_1_1path__view__component.html#a964de9984b51e6bfd021f7c1587863c0',1,'llfio_v2_xxx::path_view_component']]],
+  ['has_5fzero_5ftermination',['has_zero_termination',['../classllfio__v2__xxx_1_1path__view__component.html#a258fe430d6aa8a6f9cd9a3894cae5c44',1,'llfio_v2_xxx::path_view_component']]],
   ['hasher_5ftype',['hasher_type',['../classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html#aa93c292c86b6447bafd9849ad03cfe78',1,'llfio_v2_xxx::algorithm::shared_fs_mutex::memory_map']]]
 ];

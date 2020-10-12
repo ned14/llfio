@@ -83,6 +83,7 @@ $(document).ready(function(){initNavTree('classllfio__v2__xxx_1_1path__view.html
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="#pub-static-attribs">Static Public Attributes</a> &#124;
 <a href="#friends">Friends</a> &#124;
 <a href="classllfio__v2__xxx_1_1path__view-members.html">List of all members</a>  </div>
@@ -95,11 +96,18 @@ $(document).ready(function(){initNavTree('classllfio__v2__xxx_1_1path__view.html
  <a href="classllfio__v2__xxx_1_1path__view.html#details">More...</a></p>
 
 <p><code>#include &quot;path_view.hpp&quot;</code></p>
+<div class="dynheader">
+Inheritance diagram for llfio_v2_xxx::path_view:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classllfio__v2__xxx_1_1path__view.png" usemap="#llfio_5Fv2_5Fxxx::path_5Fview_map" alt=""/>
+  <map id="llfio_5Fv2_5Fxxx::path_5Fview_map" name="llfio_5Fv2_5Fxxx::path_5Fview_map">
+<area href="classllfio__v2__xxx_1_1path__view__component.html" title="An iterated part of a path_view. " alt="llfio_v2_xxx::path_view_component" shape="rect" coords="0,0,209,24"/>
+</map>
+ </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:ae1cf7b922e5bb83510b787b64479d304"><td class="memItemLeft" align="right" valign="top"><a id="ae1cf7b922e5bb83510b787b64479d304"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><b>char16_t</b> : unsigned short </td></tr>
-<tr class="separator:ae1cf7b922e5bb83510b787b64479d304"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae064112c51630be49c33bd51e4380cbd"><td class="memItemLeft" align="right" valign="top"><a id="ae064112c51630be49c33bd51e4380cbd"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#ae064112c51630be49c33bd51e4380cbd">const_iterator</a> = detail::path_view_iterator</td></tr>
 <tr class="memdesc:ae064112c51630be49c33bd51e4380cbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Const iterator type. <br /></td></tr>
@@ -116,18 +124,42 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#af613a5a2995dd0fca21d914b59e4aff8">const_reverse_iterator</a> = std::reverse_iterator&lt; <a class="el" href="classllfio__v2__xxx_1_1path__view.html#ae064112c51630be49c33bd51e4380cbd">const_iterator</a> &gt;</td></tr>
 <tr class="memdesc:af613a5a2995dd0fca21d914b59e4aff8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Const reverse iterator. <br /></td></tr>
 <tr class="separator:af613a5a2995dd0fca21d914b59e4aff8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac797abdc80bbd5f5b94ccb4e30117cbb"><td class="memItemLeft" align="right" valign="top"><a id="ac797abdc80bbd5f5b94ccb4e30117cbb"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#ac797abdc80bbd5f5b94ccb4e30117cbb">size_type</a> = std::size_t</td></tr>
-<tr class="memdesc:ac797abdc80bbd5f5b94ccb4e30117cbb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size type. <br /></td></tr>
-<tr class="separator:ac797abdc80bbd5f5b94ccb4e30117cbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5144026296227cb66bca4db8057a12f5"><td class="memItemLeft" align="right" valign="top"><a id="a5144026296227cb66bca4db8057a12f5"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a5144026296227cb66bca4db8057a12f5">size_type</a> = <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#aaddc29d3eb4bd29e2a676ad0eac864c0">path_view_component::size_type</a></td></tr>
+<tr class="memdesc:a5144026296227cb66bca4db8057a12f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size type. <br /></td></tr>
+<tr class="separator:a5144026296227cb66bca4db8057a12f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4e14fc71abee0765b06af857bd6a025"><td class="memItemLeft" align="right" valign="top"><a id="ad4e14fc71abee0765b06af857bd6a025"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#ad4e14fc71abee0765b06af857bd6a025">difference_type</a> = std::ptrdiff_t</td></tr>
 <tr class="memdesc:ad4e14fc71abee0765b06af857bd6a025"><td class="mdescLeft">&#160;</td><td class="mdescRight">Difference type. <br /></td></tr>
 <tr class="separator:ad4e14fc71abee0765b06af857bd6a025"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1aaf2407fed87b3b4c077e71495039ca"><td class="memItemLeft" align="right" valign="top"><a id="a1aaf2407fed87b3b4c077e71495039ca"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a1aaf2407fed87b3b4c077e71495039ca">byte</a> = llfio_v2_xxx::byte</td></tr>
-<tr class="memdesc:a1aaf2407fed87b3b4c077e71495039ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Character type for passthrough input. <br /></td></tr>
-<tr class="separator:a1aaf2407fed87b3b4c077e71495039ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d0688505b971f8ff6f9b9075817d48d"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48d">format</a> : uint8_t { <br />
+&#160;&#160;<b>unknown</b>, 
+<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48dafc810cf94971424955357c610a506b7b">native_format</a>, 
+<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48da570096cfe6db7f309f5932170f5c3455">generic_format</a>, 
+<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48daf492c0880bf0f47ff3ba9bdad908f039">auto_format</a>, 
+<br />
+&#160;&#160;<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48dad2ec403bd4441cca9391d09fbf694055">binary_format</a>
+<br />
+ }<tr class="memdesc:a3d0688505b971f8ff6f9b9075817d48d"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to interpret separators.  <a href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48d">More...</a><br /></td></tr>
+</td></tr>
+<tr class="separator:a3d0688505b971f8ff6f9b9075817d48d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a24bb2d232a1aa744c3ba4018f8732e"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732e">zero_termination</a> { <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732ead0eba8da8c1d0dab5c4196d6bbcc37a6">zero_terminated</a>, 
+<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732ea86968f101145830aa8b984150d82392f">not_zero_terminated</a>
+ }<tr class="memdesc:a4a24bb2d232a1aa744c3ba4018f8732e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The zero termination to use.  <a href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732e">More...</a><br /></td></tr>
+</td></tr>
+<tr class="separator:a4a24bb2d232a1aa744c3ba4018f8732e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7663cb908516be3f8bf17b6826da186a"><td class="memItemLeft" align="right" valign="top"><a id="a7663cb908516be3f8bf17b6826da186a"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a7663cb908516be3f8bf17b6826da186a">byte</a> = llfio_v2_xxx::byte</td></tr>
+<tr class="memdesc:a7663cb908516be3f8bf17b6826da186a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Character type for passthrough input. <br /></td></tr>
+<tr class="separator:a7663cb908516be3f8bf17b6826da186a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38ff18893dfc84c562fb36c299702bf5"><td class="memItemLeft" align="right" valign="top"><a id="a38ff18893dfc84c562fb36c299702bf5"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>char16_t</b> = detail::char16_t</td></tr>
+<tr class="separator:a38ff18893dfc84c562fb36c299702bf5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a89ecc9bd8ee2b5eb89d39c5fd1e973be"><td class="memTemplParams" colspan="2"><a id="a89ecc9bd8ee2b5eb89d39c5fd1e973be"></a>
+template&lt;class T &gt; </td></tr>
+<tr class="memitem:a89ecc9bd8ee2b5eb89d39c5fd1e973be"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a89ecc9bd8ee2b5eb89d39c5fd1e973be">default_deleter</a> = std::default_delete&lt; T &gt;</td></tr>
+<tr class="memdesc:a89ecc9bd8ee2b5eb89d39c5fd1e973be"><td class="mdescLeft">&#160;</td><td class="mdescRight">The default deleter to use. <br /></td></tr>
+<tr class="separator:a89ecc9bd8ee2b5eb89d39c5fd1e973be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -135,34 +167,22 @@ Public Member Functions</h2></td></tr>
 constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a> ()</td></tr>
 <tr class="memdesc:a91540ade852194b9507184cdcaed3339"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs an empty path view. <br /></td></tr>
 <tr class="separator:a91540ade852194b9507184cdcaed3339"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab423783d2a907166248f3074f3750045"><td class="memItemLeft" align="right" valign="top"><a id="ab423783d2a907166248f3074f3750045"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#ab423783d2a907166248f3074f3750045">path_view</a> (const filesystem::path &amp;v) noexcept</td></tr>
-<tr class="memdesc:ab423783d2a907166248f3074f3750045"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implicitly constructs a path view from a path. The input path MUST continue to exist for this view to be valid. <br /></td></tr>
-<tr class="separator:ab423783d2a907166248f3074f3750045"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9bfb80a086ac6f7848639a818de9841a"><td class="memItemLeft" align="right" valign="top"><a id="a9bfb80a086ac6f7848639a818de9841a"></a>
 constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a9bfb80a086ac6f7848639a818de9841a">path_view</a> (<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> v) noexcept</td></tr>
 <tr class="memdesc:a9bfb80a086ac6f7848639a818de9841a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implicitly constructs a path view from a path view component. The input path MUST continue to exist for this view to be valid. <br /></td></tr>
 <tr class="separator:a9bfb80a086ac6f7848639a818de9841a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a711521276cb79a9483a27bf5692ab30d"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a711521276cb79a9483a27bf5692ab30d">path_view</a> (const char *v) noexcept</td></tr>
-<tr class="separator:a711521276cb79a9483a27bf5692ab30d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a38729f67ca5ce1801b5cf951dcd71a28"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a38729f67ca5ce1801b5cf951dcd71a28">path_view</a> (const wchar_t *v) noexcept</td></tr>
-<tr class="separator:a38729f67ca5ce1801b5cf951dcd71a28"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab5cf1494522b2422c9b6e645e5837deb"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#ab5cf1494522b2422c9b6e645e5837deb">path_view</a> (const char8_t *v) noexcept</td></tr>
-<tr class="separator:ab5cf1494522b2422c9b6e645e5837deb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5f649112f30854859d95629a460dca23"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a5f649112f30854859d95629a460dca23">path_view</a> (const char16_t *v) noexcept</td></tr>
-<tr class="separator:a5f649112f30854859d95629a460dca23"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0d5e676b565090269032a91908a8c0bf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a0d5e676b565090269032a91908a8c0bf">LLFIO_TEMPLATE</a> (class Char) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a></td></tr>
-<tr class="separator:a0d5e676b565090269032a91908a8c0bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0d5e676b565090269032a91908a8c0bf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a0d5e676b565090269032a91908a8c0bf">LLFIO_TEMPLATE</a> (class Char) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a></td></tr>
-<tr class="separator:a0d5e676b565090269032a91908a8c0bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0d5e676b565090269032a91908a8c0bf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a0d5e676b565090269032a91908a8c0bf">LLFIO_TEMPLATE</a> (class Char) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a></td></tr>
-<tr class="separator:a0d5e676b565090269032a91908a8c0bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0d5e676b565090269032a91908a8c0bf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a0d5e676b565090269032a91908a8c0bf">LLFIO_TEMPLATE</a> (class Char) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a></td></tr>
-<tr class="separator:a0d5e676b565090269032a91908a8c0bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a83b86163124a03eadb509e3bb4bcce3e"><td class="memItemLeft" align="right" valign="top"><a id="a83b86163124a03eadb509e3bb4bcce3e"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a83b86163124a03eadb509e3bb4bcce3e">path_view</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> &amp;)=default</td></tr>
-<tr class="memdesc:a83b86163124a03eadb509e3bb4bcce3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default copy constructor. <br /></td></tr>
-<tr class="separator:a83b86163124a03eadb509e3bb4bcce3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a347bdf25436d0e99f1af1bcc11b4cda4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a347bdf25436d0e99f1af1bcc11b4cda4">LLFIO_TEMPLATE</a> (class Char) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3c5feb7fca596c44418f89c9e60b8165">is_source_chartype_acceptable</a>&lt; Char &gt;)) const expr <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>(const std</td></tr>
+<tr class="separator:a347bdf25436d0e99f1af1bcc11b4cda4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c6f713611d051664daaa75146b4a2dc"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a7c6f713611d051664daaa75146b4a2dc">path_view</a> (const char *b, size_t l, enum <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732e">zero_termination</a> zt, <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48d">format</a> fmt=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48daf492c0880bf0f47ff3ba9bdad908f039">auto_format</a>) noexcept</td></tr>
+<tr class="separator:a7c6f713611d051664daaa75146b4a2dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf0848bab6bea4f142f1f65c5ed24a0d"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#abf0848bab6bea4f142f1f65c5ed24a0d">path_view</a> (const wchar_t *b, size_t l, enum <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732e">zero_termination</a> zt, <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48d">format</a> fmt=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48daf492c0880bf0f47ff3ba9bdad908f039">auto_format</a>) noexcept</td></tr>
+<tr class="separator:abf0848bab6bea4f142f1f65c5ed24a0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e29d17c4f7714b3a32cf580165c4c0c"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a5e29d17c4f7714b3a32cf580165c4c0c">path_view</a> (const char8_t *b, size_t l, enum <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732e">zero_termination</a> zt, <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48d">format</a> fmt=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48daf492c0880bf0f47ff3ba9bdad908f039">auto_format</a>) noexcept</td></tr>
+<tr class="separator:a5e29d17c4f7714b3a32cf580165c4c0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6fc737972479dc5c20ffd4a60aa4c68e"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a6fc737972479dc5c20ffd4a60aa4c68e">path_view</a> (const char16_t *b, size_t l, enum <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732e">zero_termination</a> zt, <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48d">format</a> fmt=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48daf492c0880bf0f47ff3ba9bdad908f039">auto_format</a>) noexcept</td></tr>
+<tr class="separator:a6fc737972479dc5c20ffd4a60aa4c68e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a290c98c372e746211245aa5a1e6aef11"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a290c98c372e746211245aa5a1e6aef11">LLFIO_TEMPLATE</a> (class Char) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3c5feb7fca596c44418f89c9e60b8165">is_source_chartype_acceptable</a>&lt; Char &gt;)) const expr <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>(const Char *s</td></tr>
+<tr class="separator:a290c98c372e746211245aa5a1e6aef11"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4fb290145d390bd9e8cf3b5e2553c266"><td class="memItemLeft" align="right" valign="top"><a id="a4fb290145d390bd9e8cf3b5e2553c266"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a4fb290145d390bd9e8cf3b5e2553c266">path_view</a> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> &amp;&amp;o) noexcept=default</td></tr>
 <tr class="memdesc:a4fb290145d390bd9e8cf3b5e2553c266"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default move constructor. <br /></td></tr>
@@ -175,50 +195,38 @@ constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a3cfdc7d5b0557c4f5d1c7f7ca9b0a76f">operator=</a> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> &amp;&amp;p) noexcept=default</td></tr>
 <tr class="memdesc:a3cfdc7d5b0557c4f5d1c7f7ca9b0a76f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default move assignment. <br /></td></tr>
 <tr class="separator:a3cfdc7d5b0557c4f5d1c7f7ca9b0a76f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab7ae611a6aa7fed01b4447a3f5133c14"><td class="memItemLeft" align="right" valign="top"><a id="ab7ae611a6aa7fed01b4447a3f5133c14"></a>
-constexpr void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#ab7ae611a6aa7fed01b4447a3f5133c14">swap</a> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> &amp;o) noexcept</td></tr>
-<tr class="memdesc:ab7ae611a6aa7fed01b4447a3f5133c14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap the view with another. <br /></td></tr>
-<tr class="separator:ab7ae611a6aa7fed01b4447a3f5133c14"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a99db0dd434afa24ee6f2b6ae9287ecb2"><td class="memItemLeft" align="right" valign="top"><a id="a99db0dd434afa24ee6f2b6ae9287ecb2"></a>
-const <a class="el" href="classllfio__v2__xxx_1_1path__view.html#a1aaf2407fed87b3b4c077e71495039ca">byte</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>_raw_data</b> () const noexcept</td></tr>
-<tr class="separator:a99db0dd434afa24ee6f2b6ae9287ecb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a35074d82517e50c28aa99f4a13e8c501"><td class="memItemLeft" align="right" valign="top"><a id="a35074d82517e50c28aa99f4a13e8c501"></a>
-LLFIO_NODISCARD LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a35074d82517e50c28aa99f4a13e8c501">empty</a> () const noexcept</td></tr>
-<tr class="memdesc:a35074d82517e50c28aa99f4a13e8c501"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if empty. <br /></td></tr>
-<tr class="separator:a35074d82517e50c28aa99f4a13e8c501"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a345b745ec73e1a9615a420e9295a0257"><td class="memItemLeft" align="right" valign="top"><a id="a345b745ec73e1a9615a420e9295a0257"></a>
-LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>has_root_path</b> () const noexcept</td></tr>
+LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a345b745ec73e1a9615a420e9295a0257">has_root_path</a> () const noexcept</td></tr>
+<tr class="memdesc:a345b745ec73e1a9615a420e9295a0257"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if has root path. <br /></td></tr>
 <tr class="separator:a345b745ec73e1a9615a420e9295a0257"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acbd047c290ab91eaf1067036194f1e8f"><td class="memItemLeft" align="right" valign="top"><a id="acbd047c290ab91eaf1067036194f1e8f"></a>
-LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>has_root_name</b> () const noexcept</td></tr>
+LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#acbd047c290ab91eaf1067036194f1e8f">has_root_name</a> () const noexcept</td></tr>
+<tr class="memdesc:acbd047c290ab91eaf1067036194f1e8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if has root name. <br /></td></tr>
 <tr class="separator:acbd047c290ab91eaf1067036194f1e8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe52198fb027adfce8f86c5ae8e7a2ad"><td class="memItemLeft" align="right" valign="top"><a id="afe52198fb027adfce8f86c5ae8e7a2ad"></a>
-LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>has_root_directory</b> () const noexcept</td></tr>
+LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#afe52198fb027adfce8f86c5ae8e7a2ad">has_root_directory</a> () const noexcept</td></tr>
+<tr class="memdesc:afe52198fb027adfce8f86c5ae8e7a2ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if has root directory. <br /></td></tr>
 <tr class="separator:afe52198fb027adfce8f86c5ae8e7a2ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4ba638203e3fc1e6cbcef9b6c4ca956"><td class="memItemLeft" align="right" valign="top"><a id="ad4ba638203e3fc1e6cbcef9b6c4ca956"></a>
-LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>has_relative_path</b> () const noexcept</td></tr>
+LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#ad4ba638203e3fc1e6cbcef9b6c4ca956">has_relative_path</a> () const noexcept</td></tr>
+<tr class="memdesc:ad4ba638203e3fc1e6cbcef9b6c4ca956"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if has relative path. <br /></td></tr>
 <tr class="separator:ad4ba638203e3fc1e6cbcef9b6c4ca956"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae4f0f2678b636b59e50114a0bcdbc6ca"><td class="memItemLeft" align="right" valign="top"><a id="ae4f0f2678b636b59e50114a0bcdbc6ca"></a>
-LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>has_parent_path</b> () const noexcept</td></tr>
+LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#ae4f0f2678b636b59e50114a0bcdbc6ca">has_parent_path</a> () const noexcept</td></tr>
+<tr class="memdesc:ae4f0f2678b636b59e50114a0bcdbc6ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if has parent path. <br /></td></tr>
 <tr class="separator:ae4f0f2678b636b59e50114a0bcdbc6ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a257d31cbb37fc019033bab262d01d50e"><td class="memItemLeft" align="right" valign="top"><a id="a257d31cbb37fc019033bab262d01d50e"></a>
-LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>has_filename</b> () const noexcept</td></tr>
+LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a257d31cbb37fc019033bab262d01d50e">has_filename</a> () const noexcept</td></tr>
+<tr class="memdesc:a257d31cbb37fc019033bab262d01d50e"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if has filename. <br /></td></tr>
 <tr class="separator:a257d31cbb37fc019033bab262d01d50e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a512962b9588d3d4d15f366ae3cb09d34"><td class="memItemLeft" align="right" valign="top"><a id="a512962b9588d3d4d15f366ae3cb09d34"></a>
-LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>has_stem</b> () const noexcept</td></tr>
-<tr class="separator:a512962b9588d3d4d15f366ae3cb09d34"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4578d185306681fe2bc7996b53396d0f"><td class="memItemLeft" align="right" valign="top"><a id="a4578d185306681fe2bc7996b53396d0f"></a>
-LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>has_extension</b> () const noexcept</td></tr>
-<tr class="separator:a4578d185306681fe2bc7996b53396d0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa764357828bed56ec356828a090aff86"><td class="memItemLeft" align="right" valign="top"><a id="aa764357828bed56ec356828a090aff86"></a>
-constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>is_absolute</b> () const noexcept</td></tr>
+constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#aa764357828bed56ec356828a090aff86">is_absolute</a> () const noexcept</td></tr>
+<tr class="memdesc:aa764357828bed56ec356828a090aff86"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if absolute. <br /></td></tr>
 <tr class="separator:aa764357828bed56ec356828a090aff86"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae9532a152294cc91153584a909210b30"><td class="memItemLeft" align="right" valign="top"><a id="ae9532a152294cc91153584a909210b30"></a>
-constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>is_relative</b> () const noexcept</td></tr>
+constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#ae9532a152294cc91153584a909210b30">is_relative</a> () const noexcept</td></tr>
+<tr class="memdesc:ae9532a152294cc91153584a909210b30"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if relative. <br /></td></tr>
 <tr class="separator:ae9532a152294cc91153584a909210b30"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1ac23fffe202146b4aecfb82a99c9a77"><td class="memItemLeft" align="right" valign="top"><a id="a1ac23fffe202146b4aecfb82a99c9a77"></a>
-LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>contains_glob</b> () const noexcept</td></tr>
-<tr class="separator:a1ac23fffe202146b4aecfb82a99c9a77"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8efb8be3b3f3b224680e9f10149bb2da"><td class="memItemLeft" align="right" valign="top"><a id="a8efb8be3b3f3b224680e9f10149bb2da"></a>
 constexpr <a class="el" href="classllfio__v2__xxx_1_1path__view.html#ae064112c51630be49c33bd51e4380cbd">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a8efb8be3b3f3b224680e9f10149bb2da">cbegin</a> () const noexcept</td></tr>
 <tr class="memdesc:a8efb8be3b3f3b224680e9f10149bb2da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the first path component. <br /></td></tr>
@@ -247,10 +255,6 @@ constexpr <a class="el" href="classllfio__v2__xxx_1_1path__view.html#a7bfb0a7905
 LLFIO_PATH_VIEW_CONSTEXPR <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#ac33ed45573976ace5610de51d40de0ee">remove_filename</a> () const noexcept</td></tr>
 <tr class="memdesc:ac33ed45573976ace5610de51d40de0ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a copy of this view with the end adjusted to match the final separator. <br /></td></tr>
 <tr class="separator:ac33ed45573976ace5610de51d40de0ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a711aaeec6fcc29431b6996ef25c6043f"><td class="memItemLeft" align="right" valign="top"><a id="a711aaeec6fcc29431b6996ef25c6043f"></a>
-LLFIO_PATH_VIEW_CONSTEXPR size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a711aaeec6fcc29431b6996ef25c6043f">native_size</a> () const noexcept</td></tr>
-<tr class="memdesc:a711aaeec6fcc29431b6996ef25c6043f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the view in characters. <br /></td></tr>
-<tr class="separator:a711aaeec6fcc29431b6996ef25c6043f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a57047ecaa75f039c61b6bbeb5b5c33af"><td class="memItemLeft" align="right" valign="top"><a id="a57047ecaa75f039c61b6bbeb5b5c33af"></a>
 LLFIO_PATH_VIEW_CONSTEXPR <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a57047ecaa75f039c61b6bbeb5b5c33af">root_name</a> () const noexcept</td></tr>
 <tr class="memdesc:a57047ecaa75f039c61b6bbeb5b5c33af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a view of the root name part of this view e.g. C: <br /></td></tr>
@@ -275,60 +279,109 @@ LLFIO_PATH_VIEW_CONSTEXPR <a class="el" href="classllfio__v2__xxx_1_1path__view.
 LLFIO_PATH_VIEW_CONSTEXPR <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#abccf122f0c4d537e0e41b87e86aeb61a">filename</a> () const noexcept</td></tr>
 <tr class="memdesc:abccf122f0c4d537e0e41b87e86aeb61a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a view of the filename part of this view. <br /></td></tr>
 <tr class="separator:abccf122f0c4d537e0e41b87e86aeb61a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8e0dbd474d2c668a0c33a01e7a5aafe8"><td class="memItemLeft" align="right" valign="top"><a id="a8e0dbd474d2c668a0c33a01e7a5aafe8"></a>
-LLFIO_PATH_VIEW_CONSTEXPR <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a8e0dbd474d2c668a0c33a01e7a5aafe8">stem</a> () const noexcept</td></tr>
-<tr class="memdesc:a8e0dbd474d2c668a0c33a01e7a5aafe8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a view of the filename without any file extension. <br /></td></tr>
-<tr class="separator:a8e0dbd474d2c668a0c33a01e7a5aafe8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad799e35ea5899df97ee570337376f8c1"><td class="memItemLeft" align="right" valign="top"><a id="ad799e35ea5899df97ee570337376f8c1"></a>
-LLFIO_PATH_VIEW_CONSTEXPR <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#ad799e35ea5899df97ee570337376f8c1">extension</a> () const noexcept</td></tr>
-<tr class="memdesc:ad799e35ea5899df97ee570337376f8c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a view of the file extension part of this view. <br /></td></tr>
-<tr class="separator:ad799e35ea5899df97ee570337376f8c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab86fa3a4456b6d298ec78e18e76f999d"><td class="memItemLeft" align="right" valign="top"><a id="ab86fa3a4456b6d298ec78e18e76f999d"></a>
-filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#ab86fa3a4456b6d298ec78e18e76f999d">path</a> () const</td></tr>
-<tr class="memdesc:ab86fa3a4456b6d298ec78e18e76f999d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the path view as a path. Allocates and copies memory! <br /></td></tr>
-<tr class="separator:ab86fa3a4456b6d298ec78e18e76f999d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afef4720fa17884bec1fd6eaa1d5faf56"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#afef4720fa17884bec1fd6eaa1d5faf56">LLFIO_TEMPLATE</a> (class T=typename filesystem::path::value_type, class Deleter=std::default_delete&lt; T[]&gt;, size_t _internal_buffer_size=<a class="el" href="classllfio__v2__xxx_1_1path__view.html#a2a8bf49225c71090012ed30260f117bf">default_internal_buffer_size</a>, class Char) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view.html#ab44ed2bb7b699babc60d4d91b4fc5724">is_source_acceptable</a>&lt; T &gt; &amp;&amp;<a class="el" href="classllfio__v2__xxx_1_1path__view.html#a3d8c5a6551685e57ed19e1924feaa07a">is_source_chartype_acceptable</a>&lt; Char &gt;)) const expr int compare(const basic_string_view&lt; Char &gt; s) const noexcept</td></tr>
-<tr class="separator:afef4720fa17884bec1fd6eaa1d5faf56"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1080207b46f1b48f0ee656995a506646"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a1080207b46f1b48f0ee656995a506646">LLFIO_TEMPLATE</a> (class T=typename filesystem::path::value_type, class Deleter=std::default_delete&lt; T[]&gt;, size_t _internal_buffer_size=<a class="el" href="classllfio__v2__xxx_1_1path__view.html#a2a8bf49225c71090012ed30260f117bf">default_internal_buffer_size</a>) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view.html#ab44ed2bb7b699babc60d4d91b4fc5724">is_source_acceptable</a>&lt; T &gt;)) struct c_str</td></tr>
-<tr class="memdesc:a1080207b46f1b48f0ee656995a506646"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate from a <code>path_view</code> to get a path suitable for feeding to other code. See <code>path_view_component::c_str</code>.  <a href="#a1080207b46f1b48f0ee656995a506646">More...</a><br /></td></tr>
-<tr class="separator:a1080207b46f1b48f0ee656995a506646"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac12652236847087552e7a8cc01ef5a71"><td class="memItemLeft" align="right" valign="top"><a id="ac12652236847087552e7a8cc01ef5a71"></a>
+constexpr enum <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732e">zero_termination</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#ac12652236847087552e7a8cc01ef5a71">zero_termination</a> () const noexcept</td></tr>
+<tr class="memdesc:ac12652236847087552e7a8cc01ef5a71"><td class="mdescLeft">&#160;</td><td class="mdescRight">The zero termination during construction. <br /></td></tr>
+<tr class="separator:ac12652236847087552e7a8cc01ef5a71"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8cfa29fa5e587eee9f05c324cb271e09"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a8cfa29fa5e587eee9f05c324cb271e09">LLFIO_TEMPLATE</a> (class T=typename filesystem::path::value_type, class Deleter=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a89ecc9bd8ee2b5eb89d39c5fd1e973be">default_deleter</a>&lt; T[]&gt;, size_t _internal_buffer_size=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a7b52fa10c4359dcc25aed43be0be8a91">default_internal_buffer_size</a>) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a411e9c36a49bd37d596ab34f99b656fd">is_source_acceptable</a>&lt; T &gt;)) const expr int compare(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> p</td></tr>
+<tr class="separator:a8cfa29fa5e587eee9f05c324cb271e09"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a826d5618954f315f6d02717c25580c6b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a826d5618954f315f6d02717c25580c6b">LLFIO_TEMPLATE</a> (class T=typename filesystem::path::value_type, class Deleter=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a89ecc9bd8ee2b5eb89d39c5fd1e973be">default_deleter</a>&lt; T[]&gt;, size_t _internal_buffer_size=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a7b52fa10c4359dcc25aed43be0be8a91">default_internal_buffer_size</a>) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a411e9c36a49bd37d596ab34f99b656fd">is_source_acceptable</a>&lt; T &gt;)) struct c_str</td></tr>
+<tr class="separator:a826d5618954f315f6d02717c25580c6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a026f3fd0f948212028182d1b501dffbb"><td class="memItemLeft" align="right" valign="top"><a id="a026f3fd0f948212028182d1b501dffbb"></a>
+const <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a7663cb908516be3f8bf17b6826da186a">byte</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>_raw_data</b> () const noexcept</td></tr>
+<tr class="separator:a026f3fd0f948212028182d1b501dffbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a247fba2fecd5b850a17b0994f5913b4f"><td class="memItemLeft" align="right" valign="top"><a id="a247fba2fecd5b850a17b0994f5913b4f"></a>
+constexpr void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a247fba2fecd5b850a17b0994f5913b4f">swap</a> (<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> &amp;o) noexcept</td></tr>
+<tr class="memdesc:a247fba2fecd5b850a17b0994f5913b4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap the view with another. <br /></td></tr>
+<tr class="separator:a247fba2fecd5b850a17b0994f5913b4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a467256884725db92974c8a5a2c786bc2"><td class="memItemLeft" align="right" valign="top"><a id="a467256884725db92974c8a5a2c786bc2"></a>
+LLFIO_NODISCARD constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a467256884725db92974c8a5a2c786bc2">empty</a> () const noexcept</td></tr>
+<tr class="memdesc:a467256884725db92974c8a5a2c786bc2"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if empty. <br /></td></tr>
+<tr class="separator:a467256884725db92974c8a5a2c786bc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaba2705ba8660b2d9e28cbbd099a85ec"><td class="memItemLeft" align="right" valign="top"><a id="aaba2705ba8660b2d9e28cbbd099a85ec"></a>
+LLFIO_PATH_VIEW_CONSTEXPR size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#aaba2705ba8660b2d9e28cbbd099a85ec">native_size</a> () const noexcept</td></tr>
+<tr class="memdesc:aaba2705ba8660b2d9e28cbbd099a85ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the view in characters. <br /></td></tr>
+<tr class="separator:aaba2705ba8660b2d9e28cbbd099a85ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b6792638386aa705083c173e5d9b948"><td class="memItemLeft" align="right" valign="top"><a id="a6b6792638386aa705083c173e5d9b948"></a>
+constexpr <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48d">format</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a> () const noexcept</td></tr>
+<tr class="memdesc:a6b6792638386aa705083c173e5d9b948"><td class="mdescLeft">&#160;</td><td class="mdescRight">How path separators shall be interpreted. <br /></td></tr>
+<tr class="separator:a6b6792638386aa705083c173e5d9b948"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a258fe430d6aa8a6f9cd9a3894cae5c44"><td class="memItemLeft" align="right" valign="top"><a id="a258fe430d6aa8a6f9cd9a3894cae5c44"></a>
+constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a258fe430d6aa8a6f9cd9a3894cae5c44">has_zero_termination</a> () const noexcept</td></tr>
+<tr class="memdesc:a258fe430d6aa8a6f9cd9a3894cae5c44"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if input is declared to be zero terminated. <br /></td></tr>
+<tr class="separator:a258fe430d6aa8a6f9cd9a3894cae5c44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a964de9984b51e6bfd021f7c1587863c0"><td class="memItemLeft" align="right" valign="top"><a id="a964de9984b51e6bfd021f7c1587863c0"></a>
+LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a964de9984b51e6bfd021f7c1587863c0">has_stem</a> () const noexcept</td></tr>
+<tr class="memdesc:a964de9984b51e6bfd021f7c1587863c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if <code>stem()</code> returns a non-empty path. <br /></td></tr>
+<tr class="separator:a964de9984b51e6bfd021f7c1587863c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af286c0256f4800e35d816f4ba7571de4"><td class="memItemLeft" align="right" valign="top"><a id="af286c0256f4800e35d816f4ba7571de4"></a>
+LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#af286c0256f4800e35d816f4ba7571de4">has_extension</a> () const noexcept</td></tr>
+<tr class="memdesc:af286c0256f4800e35d816f4ba7571de4"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if <code>extension()</code> returns a non-empty path. <br /></td></tr>
+<tr class="separator:af286c0256f4800e35d816f4ba7571de4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acef767fc47e96966c201baf528193204"><td class="memItemLeft" align="right" valign="top"><a id="acef767fc47e96966c201baf528193204"></a>
+LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#acef767fc47e96966c201baf528193204">contains_glob</a> () const noexcept</td></tr>
+<tr class="memdesc:acef767fc47e96966c201baf528193204"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if the view contains any of the characters <code>*</code>, <code>?</code>, (POSIX only: <code>[</code> or <code>]</code>). <br /></td></tr>
+<tr class="separator:acef767fc47e96966c201baf528193204"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a0bfc3e06986b6287a22fdc97799181"><td class="memItemLeft" align="right" valign="top"><a id="a4a0bfc3e06986b6287a22fdc97799181"></a>
+LLFIO_PATH_VIEW_CONSTEXPR <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a4a0bfc3e06986b6287a22fdc97799181">stem</a> () const noexcept</td></tr>
+<tr class="memdesc:a4a0bfc3e06986b6287a22fdc97799181"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a view of the filename without any file extension. <br /></td></tr>
+<tr class="separator:a4a0bfc3e06986b6287a22fdc97799181"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d62abddb51d080a8c2e42998bc6fb58"><td class="memItemLeft" align="right" valign="top"><a id="a2d62abddb51d080a8c2e42998bc6fb58"></a>
+LLFIO_PATH_VIEW_CONSTEXPR <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a2d62abddb51d080a8c2e42998bc6fb58">extension</a> () const noexcept</td></tr>
+<tr class="memdesc:a2d62abddb51d080a8c2e42998bc6fb58"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a view of the file extension part of this view. <br /></td></tr>
+<tr class="separator:a2d62abddb51d080a8c2e42998bc6fb58"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac367f2c429245c567448780511f24c0d"><td class="memItemLeft" align="right" valign="top"><a id="ac367f2c429245c567448780511f24c0d"></a>
+filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#ac367f2c429245c567448780511f24c0d">path</a> () const</td></tr>
+<tr class="memdesc:ac367f2c429245c567448780511f24c0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the path view as a path. Allocates and copies memory! <br /></td></tr>
+<tr class="separator:ac367f2c429245c567448780511f24c0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:abc5abda4e162d9a530fb73fa47a2f20a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48d">format</a>&#160;</td><td class="memItemRight" valign="bottom"><b>fmt</b></td></tr>
+<tr class="separator:abc5abda4e162d9a530fb73fa47a2f20a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3959313447e495b2cbe86aee7fc635b"><td class="memItemLeft" align="right" valign="top">const std::locale &amp;loc&#160;</td><td class="memItemRight" valign="bottom"><b>const</b></td></tr>
+<tr class="separator:ab3959313447e495b2cbe86aee7fc635b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad71dcb87f377236474b948d621b3b2a8"><td class="memItemLeft" align="right" valign="top"><a id="ad71dcb87f377236474b948d621b3b2a8"></a>
+const <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a7663cb908516be3f8bf17b6826da186a">byte</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>_bytestr</b> {nullptr}</td></tr>
+<tr class="separator:ad71dcb87f377236474b948d621b3b2a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1531ffbbfb4d089a18f09809290190cc"><td class="memItemLeft" align="right" valign="top"><a id="a1531ffbbfb4d089a18f09809290190cc"></a>
+const char *&#160;</td><td class="memItemRight" valign="bottom"><b>_charstr</b></td></tr>
+<tr class="separator:a1531ffbbfb4d089a18f09809290190cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a03281bf06f85b14622386bd87b9a947e"><td class="memItemLeft" align="right" valign="top"><a id="a03281bf06f85b14622386bd87b9a947e"></a>
+const wchar_t *&#160;</td><td class="memItemRight" valign="bottom"><b>_wcharstr</b></td></tr>
+<tr class="separator:a03281bf06f85b14622386bd87b9a947e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad560fb8127764a5cf07357c07a35d8b0"><td class="memItemLeft" align="right" valign="top"><a id="ad560fb8127764a5cf07357c07a35d8b0"></a>
+const char8_t *&#160;</td><td class="memItemRight" valign="bottom"><b>_char8str</b></td></tr>
+<tr class="separator:ad560fb8127764a5cf07357c07a35d8b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3a413fa5bbe8dbe10765bc790c1b762"><td class="memItemLeft" align="right" valign="top"><a id="ac3a413fa5bbe8dbe10765bc790c1b762"></a>
+const char16_t *&#160;</td><td class="memItemRight" valign="bottom"><b>_char16str</b></td></tr>
+<tr class="separator:ac3a413fa5bbe8dbe10765bc790c1b762"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
-<tr class="memitem:a5d34d5bd6de76ad2d56817214a7b8aee"><td class="memItemLeft" align="right" valign="top"><a id="a5d34d5bd6de76ad2d56817214a7b8aee"></a>
-static constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a5d34d5bd6de76ad2d56817214a7b8aee">preferred_separator</a> = filesystem::path::preferred_separator</td></tr>
-<tr class="memdesc:a5d34d5bd6de76ad2d56817214a7b8aee"><td class="mdescLeft">&#160;</td><td class="mdescRight">The preferred separator type. <br /></td></tr>
-<tr class="separator:a5d34d5bd6de76ad2d56817214a7b8aee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d8c5a6551685e57ed19e1924feaa07a"><td class="memTemplParams" colspan="2">template&lt;class Char &gt; </td></tr>
-<tr class="memitem:a3d8c5a6551685e57ed19e1924feaa07a"><td class="memTemplItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a3d8c5a6551685e57ed19e1924feaa07a">is_source_chartype_acceptable</a> = path_view_component::is_source_chartype_acceptable&lt;Char&gt;</td></tr>
-<tr class="separator:a3d8c5a6551685e57ed19e1924feaa07a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab44ed2bb7b699babc60d4d91b4fc5724"><td class="memTemplParams" colspan="2">template&lt;class Char &gt; </td></tr>
-<tr class="memitem:ab44ed2bb7b699babc60d4d91b4fc5724"><td class="memTemplItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#ab44ed2bb7b699babc60d4d91b4fc5724">is_source_acceptable</a> = path_view_component::is_source_acceptable&lt;Char&gt;</td></tr>
-<tr class="separator:ab44ed2bb7b699babc60d4d91b4fc5724"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a8bf49225c71090012ed30260f117bf"><td class="memItemLeft" align="right" valign="top"><a id="a2a8bf49225c71090012ed30260f117bf"></a>
-static constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a2a8bf49225c71090012ed30260f117bf">default_internal_buffer_size</a> = path_view_component::default_internal_buffer_size</td></tr>
-<tr class="memdesc:a2a8bf49225c71090012ed30260f117bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">The default internal buffer size used by <code>c_str</code>. <br /></td></tr>
-<tr class="separator:a2a8bf49225c71090012ed30260f117bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c7def30502a37e61b83836e52a0a40b"><td class="memItemLeft" align="right" valign="top"><a id="a7c7def30502a37e61b83836e52a0a40b"></a>
+static constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a7c7def30502a37e61b83836e52a0a40b">preferred_separator</a> = filesystem::path::preferred_separator</td></tr>
+<tr class="memdesc:a7c7def30502a37e61b83836e52a0a40b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The preferred separator type. <br /></td></tr>
+<tr class="separator:a7c7def30502a37e61b83836e52a0a40b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3c5feb7fca596c44418f89c9e60b8165"><td class="memTemplParams" colspan="2">template&lt;class Char &gt; </td></tr>
+<tr class="memitem:a3c5feb7fca596c44418f89c9e60b8165"><td class="memTemplItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3c5feb7fca596c44418f89c9e60b8165">is_source_chartype_acceptable</a> = detail::is_source_chartype_acceptable&lt;Char&gt;::value</td></tr>
+<tr class="separator:a3c5feb7fca596c44418f89c9e60b8165"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a411e9c36a49bd37d596ab34f99b656fd"><td class="memTemplParams" colspan="2">template&lt;class Char &gt; </td></tr>
+<tr class="memitem:a411e9c36a49bd37d596ab34f99b656fd"><td class="memTemplItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a411e9c36a49bd37d596ab34f99b656fd">is_source_acceptable</a> = detail::is_source_acceptable&lt;Char&gt;::value</td></tr>
+<tr class="separator:a411e9c36a49bd37d596ab34f99b656fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b52fa10c4359dcc25aed43be0be8a91"><td class="memItemLeft" align="right" valign="top"><a id="a7b52fa10c4359dcc25aed43be0be8a91"></a>
+static constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a7b52fa10c4359dcc25aed43be0be8a91">default_internal_buffer_size</a> = 1024</td></tr>
+<tr class="memdesc:a7b52fa10c4359dcc25aed43be0be8a91"><td class="mdescLeft">&#160;</td><td class="mdescRight">The default internal buffer size used by <code>c_str</code>. <br /></td></tr>
+<tr class="separator:a7b52fa10c4359dcc25aed43be0be8a91"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
-<tr class="memitem:a9c02c1b6cc56f8221abea75a1e92a776"><td class="memTemplParams" colspan="2"><a id="a9c02c1b6cc56f8221abea75a1e92a776"></a>
-template&lt;class T , class Deleter , size_t _internal_buffer_size, typename std::enable_if&lt;(is_source_acceptable&lt; T &gt;), bool &gt;::type &gt; </td></tr>
-<tr class="memitem:a9c02c1b6cc56f8221abea75a1e92a776"><td class="memTemplItemLeft" align="right" valign="top">struct&#160;</td><td class="memTemplItemRight" valign="bottom"><b>c_str</b></td></tr>
-<tr class="separator:a9c02c1b6cc56f8221abea75a1e92a776"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a04eaaa00f1a82c4160c60043df70c8f9"><td class="memItemLeft" align="right" valign="top"><a id="a04eaaa00f1a82c4160c60043df70c8f9"></a>
 LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::operator==</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> x, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> y) noexcept</td></tr>
 <tr class="separator:a04eaaa00f1a82c4160c60043df70c8f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2abd5b3147c3dadfd9f556dff8679c46"><td class="memItemLeft" align="right" valign="top"><a id="a2abd5b3147c3dadfd9f556dff8679c46"></a>
 LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::operator!=</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> x, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> y) noexcept</td></tr>
 <tr class="separator:a2abd5b3147c3dadfd9f556dff8679c46"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a33c2b4df34059bab2ec3c9239f29b1a9"><td class="memTemplParams" colspan="2"><a id="a33c2b4df34059bab2ec3c9239f29b1a9"></a>
-template&lt;class F &gt; </td></tr>
-<tr class="memitem:a33c2b4df34059bab2ec3c9239f29b1a9"><td class="memTemplItemLeft" align="right" valign="top">LLFIO_PATH_VIEW_CONSTEXPR auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>llfio_v2_xxx::visit</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> view, F &amp;&amp;f)</td></tr>
-<tr class="separator:a33c2b4df34059bab2ec3c9239f29b1a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af2f7621850a85841df4db5f456d63dc4"><td class="memItemLeft" align="right" valign="top"><a id="af2f7621850a85841df4db5f456d63dc4"></a>
-std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> &amp;v)</td></tr>
-<tr class="separator:af2f7621850a85841df4db5f456d63dc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A borrowed view of a path. A lightweight trivial-type alternative to <code>std::filesystem::path</code>. </p>
@@ -366,9 +419,80 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v
 </ul>
 <p>If you really care about performance, you are very strongly recommended to use the NT kernel API wherever possible. Where paths are involved, it is often three to five times faster due to the multiple memory allocations and string translations that the Win32 functions perform before calling the NT kernel routine.</p>
 <p>If however you are taking input from some external piece of code, then for maximum compatibility you should still use the Win32 API. </p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a711521276cb79a9483a27bf5692ab30d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a711521276cb79a9483a27bf5692ab30d">&#9670;&nbsp;</a></span>path_view() <span class="overload">[1/4]</span></h2>
+</div><h2 class="groupheader">Member Enumeration Documentation</h2>
+<a id="a3d0688505b971f8ff6f9b9075817d48d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3d0688505b971f8ff6f9b9075817d48d">&#9670;&nbsp;</a></span>format</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48d">llfio_v2_xxx::path_view_component::format</a> : uint8_t</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>How to interpret separators. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a3d0688505b971f8ff6f9b9075817d48dafc810cf94971424955357c610a506b7b"></a>native_format&#160;</td><td class="fielddoc"><p>Separate at the native path separator only. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a3d0688505b971f8ff6f9b9075817d48da570096cfe6db7f309f5932170f5c3455"></a>generic_format&#160;</td><td class="fielddoc"><p>Separate at the generic path separator only. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a3d0688505b971f8ff6f9b9075817d48daf492c0880bf0f47ff3ba9bdad908f039"></a>auto_format&#160;</td><td class="fielddoc"><p>Separate at both the native and generic path separators. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a3d0688505b971f8ff6f9b9075817d48dad2ec403bd4441cca9391d09fbf694055"></a>binary_format&#160;</td><td class="fielddoc"><p>Do not separate at any path separator. </p>
+</td></tr>
+</table>
+<div class="fragment"><div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;              : uint8_t</div><div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  {</div><div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    unknown,</div><div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48dafc810cf94971424955357c610a506b7b">native_format</a>,   <span class="comment">//!&lt; Separate at the native path separator only.</span></div><div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;<span class="comment"></span>    <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48da570096cfe6db7f309f5932170f5c3455">generic_format</a>,  <span class="comment">//!&lt; Separate at the generic path separator only.</span></div><div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;<span class="comment"></span>    <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48daf492c0880bf0f47ff3ba9bdad908f039">auto_format</a>,     <span class="comment">//!&lt; Separate at both the native and generic path separators.</span></div><div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;<span class="comment"></span>    <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48dad2ec403bd4441cca9391d09fbf694055">binary_format</a>    <span class="comment">//!&lt; Do not separate at any path separator.</span></div><div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;<span class="comment"></span>  };</div><div class="ttc" id="classllfio__v2__xxx_1_1path__view__component_html_a3d0688505b971f8ff6f9b9075817d48da570096cfe6db7f309f5932170f5c3455"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48da570096cfe6db7f309f5932170f5c3455">llfio_v2_xxx::path_view_component::generic_format</a></div><div class="ttdoc">Separate at the generic path separator only. </div><div class="ttdef"><b>Definition:</b> path_view.hpp:213</div></div>
+<div class="ttc" id="classllfio__v2__xxx_1_1path__view__component_html_a3d0688505b971f8ff6f9b9075817d48dad2ec403bd4441cca9391d09fbf694055"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48dad2ec403bd4441cca9391d09fbf694055">llfio_v2_xxx::path_view_component::binary_format</a></div><div class="ttdoc">Do not separate at any path separator. </div><div class="ttdef"><b>Definition:</b> path_view.hpp:215</div></div>
+<div class="ttc" id="classllfio__v2__xxx_1_1path__view__component_html_a3d0688505b971f8ff6f9b9075817d48dafc810cf94971424955357c610a506b7b"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48dafc810cf94971424955357c610a506b7b">llfio_v2_xxx::path_view_component::native_format</a></div><div class="ttdoc">Separate at the native path separator only. </div><div class="ttdef"><b>Definition:</b> path_view.hpp:212</div></div>
+<div class="ttc" id="classllfio__v2__xxx_1_1path__view__component_html_a3d0688505b971f8ff6f9b9075817d48daf492c0880bf0f47ff3ba9bdad908f039"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48daf492c0880bf0f47ff3ba9bdad908f039">llfio_v2_xxx::path_view_component::auto_format</a></div><div class="ttdoc">Separate at both the native and generic path separators. </div><div class="ttdef"><b>Definition:</b> path_view.hpp:214</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a4a24bb2d232a1aa744c3ba4018f8732e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a24bb2d232a1aa744c3ba4018f8732e">&#9670;&nbsp;</a></span>zero_termination</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732e">llfio_v2_xxx::path_view_component::zero_termination</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The zero termination to use. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a4a24bb2d232a1aa744c3ba4018f8732ead0eba8da8c1d0dab5c4196d6bbcc37a6"></a>zero_terminated&#160;</td><td class="fielddoc"><p>The input is zero terminated, or requested output ought to be zero terminated. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a4a24bb2d232a1aa744c3ba4018f8732ea86968f101145830aa8b984150d82392f"></a>not_zero_terminated&#160;</td><td class="fielddoc"><p>The input is not zero terminated, or requested output ought to not be zero terminated. </p>
+</td></tr>
+</table>
+<div class="fragment"><div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;  {</div><div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732ead0eba8da8c1d0dab5c4196d6bbcc37a6">zero_terminated</a>,      <span class="comment">//!&lt; The input is zero terminated, or requested output ought to be zero terminated.</span></div><div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;<span class="comment"></span>    <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732ea86968f101145830aa8b984150d82392f">not_zero_terminated</a>,  <span class="comment">//!&lt; The input is not zero terminated, or requested output ought to not be zero terminated.</span></div><div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;<span class="comment"></span>  };</div><div class="ttc" id="classllfio__v2__xxx_1_1path__view__component_html_a4a24bb2d232a1aa744c3ba4018f8732ead0eba8da8c1d0dab5c4196d6bbcc37a6"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732ead0eba8da8c1d0dab5c4196d6bbcc37a6">llfio_v2_xxx::path_view_component::zero_terminated</a></div><div class="ttdoc">The input is zero terminated, or requested output ought to be zero terminated. </div><div class="ttdef"><b>Definition:</b> path_view.hpp:221</div></div>
+<div class="ttc" id="classllfio__v2__xxx_1_1path__view__component_html_a4a24bb2d232a1aa744c3ba4018f8732ea86968f101145830aa8b984150d82392f"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732ea86968f101145830aa8b984150d82392f">llfio_v2_xxx::path_view_component::not_zero_terminated</a></div><div class="ttdoc">The input is not zero terminated, or requested output ought to not be zero terminated. </div><div class="ttdef"><b>Definition:</b> path_view.hpp:222</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a7c6f713611d051664daaa75146b4a2dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c6f713611d051664daaa75146b4a2dc">&#9670;&nbsp;</a></span>path_view() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -380,8 +504,30 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v
           <td class="memname">constexpr llfio_v2_xxx::path_view::path_view </td>
           <td>(</td>
           <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>v</em></td><td>)</td>
+          <td class="paramname"><em>b</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>l</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">enum <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732e">zero_termination</a>&#160;</td>
+          <td class="paramname"><em>zt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48d">format</a>&#160;</td>
+          <td class="paramname"><em>fmt</em> = <code><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48daf492c0880bf0f47ff3ba9bdad908f039">auto_format</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -390,12 +536,13 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Implicitly constructs a path view from a zero terminated <code>const char *</code>. Convenience wrapper for the <code>byte</code> constructor. The input string MUST continue to exist for this view to be valid. </p>
-<div class="fragment"><div class="line"><a name="l01137"></a><span class="lineno"> 1137</span>&#160;      : _state(v, detail::constexpr_strlen(v), <span class="keyword">true</span>)</div><div class="line"><a name="l01138"></a><span class="lineno"> 1138</span>&#160;  {</div><div class="line"><a name="l01139"></a><span class="lineno"> 1139</span>&#160;  }</div></div><!-- fragment -->
+<p>Constructs from a lengthed array of one of <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. The input string MUST continue to exist for this view to be valid. </p>
+<div class="fragment"><div class="line"><a name="l01394"></a><span class="lineno"> 1394</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, l, zt, fmt)</div><div class="line"><a name="l01395"></a><span class="lineno"> 1395</span>&#160;  {</div><div class="line"><a name="l01396"></a><span class="lineno"> 1396</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1path__view__component_html_a9595c5841e26ca5e0fc18e6d735b1142"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">llfio_v2_xxx::path_view_component::path_view_component</a></div><div class="ttdeci">constexpr path_view_component() noexcept</div><div class="ttdoc">Constructs an empty path view component (DEVIATES from P1030, is not trivial due to C++ 14 compatibil...</div><div class="ttdef"><b>Definition:</b> path_view.hpp:251</div></div>
+</div><!-- fragment -->
 </div>
 </div>
-<a id="a38729f67ca5ce1801b5cf951dcd71a28"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a38729f67ca5ce1801b5cf951dcd71a28">&#9670;&nbsp;</a></span>path_view() <span class="overload">[2/4]</span></h2>
+<a id="abf0848bab6bea4f142f1f65c5ed24a0d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf0848bab6bea4f142f1f65c5ed24a0d">&#9670;&nbsp;</a></span>path_view() <span class="overload">[2/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -407,8 +554,30 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v
           <td class="memname">constexpr llfio_v2_xxx::path_view::path_view </td>
           <td>(</td>
           <td class="paramtype">const wchar_t *&#160;</td>
-          <td class="paramname"><em>v</em></td><td>)</td>
+          <td class="paramname"><em>b</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>l</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">enum <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732e">zero_termination</a>&#160;</td>
+          <td class="paramname"><em>zt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48d">format</a>&#160;</td>
+          <td class="paramname"><em>fmt</em> = <code><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48daf492c0880bf0f47ff3ba9bdad908f039">auto_format</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -417,12 +586,13 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Implicitly constructs a path view from a zero terminated <code>const wchar_t *</code>. Convenience wrapper for the <code>byte</code> constructor. The input string MUST continue to exist for this view to be valid. </p>
-<div class="fragment"><div class="line"><a name="l01143"></a><span class="lineno"> 1143</span>&#160;      : _state(v, detail::constexpr_strlen(v), <span class="keyword">true</span>)</div><div class="line"><a name="l01144"></a><span class="lineno"> 1144</span>&#160;  {</div><div class="line"><a name="l01145"></a><span class="lineno"> 1145</span>&#160;  }</div></div><!-- fragment -->
+<p>Constructs from a lengthed array of one of <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. The input string MUST continue to exist for this view to be valid. </p>
+<div class="fragment"><div class="line"><a name="l01401"></a><span class="lineno"> 1401</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, l, zt, fmt)</div><div class="line"><a name="l01402"></a><span class="lineno"> 1402</span>&#160;  {</div><div class="line"><a name="l01403"></a><span class="lineno"> 1403</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1path__view__component_html_a9595c5841e26ca5e0fc18e6d735b1142"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">llfio_v2_xxx::path_view_component::path_view_component</a></div><div class="ttdeci">constexpr path_view_component() noexcept</div><div class="ttdoc">Constructs an empty path view component (DEVIATES from P1030, is not trivial due to C++ 14 compatibil...</div><div class="ttdef"><b>Definition:</b> path_view.hpp:251</div></div>
+</div><!-- fragment -->
 </div>
 </div>
-<a id="ab5cf1494522b2422c9b6e645e5837deb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab5cf1494522b2422c9b6e645e5837deb">&#9670;&nbsp;</a></span>path_view() <span class="overload">[3/4]</span></h2>
+<a id="a5e29d17c4f7714b3a32cf580165c4c0c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5e29d17c4f7714b3a32cf580165c4c0c">&#9670;&nbsp;</a></span>path_view() <span class="overload">[3/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -434,8 +604,30 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v
           <td class="memname">constexpr llfio_v2_xxx::path_view::path_view </td>
           <td>(</td>
           <td class="paramtype">const char8_t *&#160;</td>
-          <td class="paramname"><em>v</em></td><td>)</td>
+          <td class="paramname"><em>b</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>l</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">enum <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732e">zero_termination</a>&#160;</td>
+          <td class="paramname"><em>zt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48d">format</a>&#160;</td>
+          <td class="paramname"><em>fmt</em> = <code><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48daf492c0880bf0f47ff3ba9bdad908f039">auto_format</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -444,12 +636,13 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Implicitly constructs a path view from a zero terminated <code>const char8_t *</code>. Performs a UTF-8 to native encoding if necessary. The input string MUST continue to exist for this view to be valid. </p>
-<div class="fragment"><div class="line"><a name="l01149"></a><span class="lineno"> 1149</span>&#160;      : _state(v, detail::constexpr_strlen(v), <span class="keyword">true</span>)</div><div class="line"><a name="l01150"></a><span class="lineno"> 1150</span>&#160;  {</div><div class="line"><a name="l01151"></a><span class="lineno"> 1151</span>&#160;  }</div></div><!-- fragment -->
+<p>Constructs from a lengthed array of one of <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. The input string MUST continue to exist for this view to be valid. </p>
+<div class="fragment"><div class="line"><a name="l01408"></a><span class="lineno"> 1408</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, l, zt, fmt)</div><div class="line"><a name="l01409"></a><span class="lineno"> 1409</span>&#160;  {</div><div class="line"><a name="l01410"></a><span class="lineno"> 1410</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1path__view__component_html_a9595c5841e26ca5e0fc18e6d735b1142"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">llfio_v2_xxx::path_view_component::path_view_component</a></div><div class="ttdeci">constexpr path_view_component() noexcept</div><div class="ttdoc">Constructs an empty path view component (DEVIATES from P1030, is not trivial due to C++ 14 compatibil...</div><div class="ttdef"><b>Definition:</b> path_view.hpp:251</div></div>
+</div><!-- fragment -->
 </div>
 </div>
-<a id="a5f649112f30854859d95629a460dca23"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5f649112f30854859d95629a460dca23">&#9670;&nbsp;</a></span>path_view() <span class="overload">[4/4]</span></h2>
+<a id="a6fc737972479dc5c20ffd4a60aa4c68e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6fc737972479dc5c20ffd4a60aa4c68e">&#9670;&nbsp;</a></span>path_view() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -461,211 +654,25 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v
           <td class="memname">constexpr llfio_v2_xxx::path_view::path_view </td>
           <td>(</td>
           <td class="paramtype">const char16_t *&#160;</td>
-          <td class="paramname"><em>v</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Implicitly constructs a path view from a zero terminated <code>const char16_t *</code>. Performs a UTF-16 to native encoding if necessary. The input string MUST continue to exist for this view to be valid. </p>
-<div class="fragment"><div class="line"><a name="l01155"></a><span class="lineno"> 1155</span>&#160;      : _state(v, detail::constexpr_strlen(v), <span class="keyword">true</span>)</div><div class="line"><a name="l01156"></a><span class="lineno"> 1156</span>&#160;  {</div><div class="line"><a name="l01157"></a><span class="lineno"> 1157</span>&#160;  }</div></div><!-- fragment -->
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a id="a0d5e676b565090269032a91908a8c0bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d5e676b565090269032a91908a8c0bf">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[1/6]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">llfio_v2_xxx::path_view::LLFIO_TEMPLATE </td>
-          <td>(</td>
-          <td class="paramtype">class Char&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Constructs a path view from a lengthed array of one of <code>byte</code>, <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. The input string MUST continue to exist for this view to be valid. </p>
-<div class="fragment"><div class="line"><a name="l01166"></a><span class="lineno"> 1166</span>&#160;      : _state(v, len, is_zero_terminated)</div><div class="line"><a name="l01167"></a><span class="lineno"> 1167</span>&#160;  {</div><div class="line"><a name="l01168"></a><span class="lineno"> 1168</span>&#160;  }</div></div><!-- fragment -->
-</div>
-</div>
-<a id="a0d5e676b565090269032a91908a8c0bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d5e676b565090269032a91908a8c0bf">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[2/6]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">llfio_v2_xxx::path_view::LLFIO_TEMPLATE </td>
-          <td>(</td>
-          <td class="paramtype">class Char&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Constructs a path view from a pair of pointers of one of <code>byte</code>, <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. The input string MUST continue to exist for this view to be valid. </p>
-<div class="fragment"><div class="line"><a name="l01176"></a><span class="lineno"> 1176</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(s, e - s, zt)</div><div class="line"><a name="l01177"></a><span class="lineno"> 1177</span>&#160;  {</div><div class="line"><a name="l01178"></a><span class="lineno"> 1178</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1path__view_html_a91540ade852194b9507184cdcaed3339"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">llfio_v2_xxx::path_view::path_view</a></div><div class="ttdeci">constexpr path_view()</div><div class="ttdoc">Constructs an empty path view. </div><div class="ttdef"><b>Definition:</b> path_view.hpp:1120</div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="a0d5e676b565090269032a91908a8c0bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d5e676b565090269032a91908a8c0bf">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[3/6]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">llfio_v2_xxx::path_view::LLFIO_TEMPLATE </td>
-          <td>(</td>
-          <td class="paramtype">class Char&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Constructs from a basic string if the character type is one of <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. </p>
-<div class="fragment"><div class="line"><a name="l01185"></a><span class="lineno"> 1185</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), v.size(), <span class="keyword">true</span>)</div><div class="line"><a name="l01186"></a><span class="lineno"> 1186</span>&#160;  {</div><div class="line"><a name="l01187"></a><span class="lineno"> 1187</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1path__view_html_a91540ade852194b9507184cdcaed3339"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">llfio_v2_xxx::path_view::path_view</a></div><div class="ttdeci">constexpr path_view()</div><div class="ttdoc">Constructs an empty path view. </div><div class="ttdef"><b>Definition:</b> path_view.hpp:1120</div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="a0d5e676b565090269032a91908a8c0bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d5e676b565090269032a91908a8c0bf">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[4/6]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">llfio_v2_xxx::path_view::LLFIO_TEMPLATE </td>
-          <td>(</td>
-          <td class="paramtype">class Char&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Constructs from a basic string view if the character type is one of <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. </p>
-<div class="fragment"><div class="line"><a name="l01194"></a><span class="lineno"> 1194</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), v.size(), is_zero_terminated)</div><div class="line"><a name="l01195"></a><span class="lineno"> 1195</span>&#160;  {</div><div class="line"><a name="l01196"></a><span class="lineno"> 1196</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1path__view_html_a91540ade852194b9507184cdcaed3339"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">llfio_v2_xxx::path_view::path_view</a></div><div class="ttdeci">constexpr path_view()</div><div class="ttdoc">Constructs an empty path view. </div><div class="ttdef"><b>Definition:</b> path_view.hpp:1120</div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="afef4720fa17884bec1fd6eaa1d5faf56"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afef4720fa17884bec1fd6eaa1d5faf56">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[5/6]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">llfio_v2_xxx::path_view::LLFIO_TEMPLATE </td>
-          <td>(</td>
-          <td class="paramtype">class T&#160;</td>
-          <td class="paramname"> = <code>typename&#160;filesystem::path::value_type</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">class Deleter&#160;</td>
-          <td class="paramname"> = <code>std::default_delete&lt;T[]&gt;</code>, </td>
+          <td class="paramname"><em>b</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>_internal_buffer_size</em> = <code><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a2a8bf49225c71090012ed30260f117bf">default_internal_buffer_size</a></code>, </td>
+          <td class="paramname"><em>l</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">class Char&#160;</td>
-          <td class="paramname">&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const &amp;&amp;</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.</p>
-<p>Compares the two path views for equivalence or ordering using <code>T</code> as the destination encoding, if necessary.</p>
-<p>If the source encodings of the two path views are compatible, a lexicographical comparison is performed. If they are incompatible, either or both views are converted to the destination encoding using <code>c_str&lt;T, Delete, _internal_buffer_size&gt;</code>, and then a lexicographical comparison is performed.</p>
-<p>This can, for obvious reasons, be expensive. It can also throw exceptions, as <code>c_str</code> does.</p>
-<p>If the destination encoding is <code>byte</code>, <code>memcmp()</code> is used, and <code>c_str</code> is never invoked as the two sources are byte compared directly.This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l01514"></a><span class="lineno"> 1514</span>&#160;                                                                        { <span class="keywordflow">return</span> compare&lt;T, Deleter, _internal_buffer_size&gt;(path_view_component(s)); }</div></div><!-- fragment -->
-</div>
-</div>
-<a id="a1080207b46f1b48f0ee656995a506646"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1080207b46f1b48f0ee656995a506646">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[6/6]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">llfio_v2_xxx::path_view::LLFIO_TEMPLATE </td>
-          <td>(</td>
-          <td class="paramtype">class T&#160;</td>
-          <td class="paramname"> = <code>typename&#160;filesystem::path::value_type</code>, </td>
+          <td class="paramtype">enum <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732e">zero_termination</a>&#160;</td>
+          <td class="paramname"><em>zt</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">class Deleter&#160;</td>
-          <td class="paramname"> = <code>std::default_delete&lt;T[]&gt;</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>_internal_buffer_size</em> = <code><a class="el" href="classllfio__v2__xxx_1_1path__view.html#a2a8bf49225c71090012ed30260f117bf">default_internal_buffer_size</a></code>&#160;</td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48d">format</a>&#160;</td>
+          <td class="paramname"><em>fmt</em> = <code><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48daf492c0880bf0f47ff3ba9bdad908f039">auto_format</a></code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -675,23 +682,226 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v
       </table>
   </td>
   <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Constructs from a lengthed array of one of <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. The input string MUST continue to exist for this view to be valid. </p>
+<div class="fragment"><div class="line"><a name="l01415"></a><span class="lineno"> 1415</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, l, zt, fmt)</div><div class="line"><a name="l01416"></a><span class="lineno"> 1416</span>&#160;  {</div><div class="line"><a name="l01417"></a><span class="lineno"> 1417</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1path__view__component_html_a9595c5841e26ca5e0fc18e6d735b1142"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">llfio_v2_xxx::path_view_component::path_view_component</a></div><div class="ttdeci">constexpr path_view_component() noexcept</div><div class="ttdoc">Constructs an empty path view component (DEVIATES from P1030, is not trivial due to C++ 14 compatibil...</div><div class="ttdef"><b>Definition:</b> path_view.hpp:251</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a8cfa29fa5e587eee9f05c324cb271e09"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8cfa29fa5e587eee9f05c324cb271e09">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[1/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">llfio_v2_xxx::path_view_component::LLFIO_TEMPLATE </td>
+          <td>(</td>
+          <td class="paramtype">class T&#160;</td>
+          <td class="paramname"> = <code>typename&#160;filesystem::path::value_type</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">class Deleter&#160;</td>
+          <td class="paramname"> = <code><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a89ecc9bd8ee2b5eb89d39c5fd1e973be">default_deleter</a>&lt;T[]&gt;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>_internal_buffer_size</em> = <code><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a7b52fa10c4359dcc25aed43be0be8a91">default_internal_buffer_size</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Compares the two path views for equivalence or ordering using <code>T</code> as the destination encoding, if necessary.</p>
+<p>If the source encodings of the two path views are compatible, a lexicographical comparison is performed. If they are incompatible, either or both views are converted to the destination encoding using <code>c_str&lt;T, Delete, _internal_buffer_size&gt;</code>, and then a lexicographical comparison is performed.</p>
+<p>This can, for obvious reasons, be expensive. It can also throw exceptions, as <code>c_str</code> does.</p>
+<p>If the destination encoding is <code>byte</code>, <code>memcmp()</code> is used, and <code>c_str</code> is never invoked as the two sources are byte compared directly. </p>
+
+</div>
+</div>
+<a id="a826d5618954f315f6d02717c25580c6b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a826d5618954f315f6d02717c25580c6b">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">llfio_v2_xxx::path_view_component::LLFIO_TEMPLATE </td>
+          <td>(</td>
+          <td class="paramtype">class T&#160;</td>
+          <td class="paramname"> = <code>typename&#160;filesystem::path::value_type</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">class Deleter&#160;</td>
+          <td class="paramname"> = <code><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a89ecc9bd8ee2b5eb89d39c5fd1e973be">default_deleter</a>&lt;T[]&gt;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>_internal_buffer_size</em> = <code><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a7b52fa10c4359dcc25aed43be0be8a91">default_internal_buffer_size</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Instantiate from a <code>path_view_component</code> to get a path suitable for feeding to other code. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>The destination encoding required. </td></tr>
+    <tr><td class="paramname">Deleter</td><td>A custom deleter for any temporary buffer. </td></tr>
+    <tr><td class="paramname">_internal_buffer_size</td><td>Override the size of the internal temporary buffer, thus reducing stack space consumption (most compilers optimise away the internal temporary buffer if it can be proved it will never be used). The default is 1024 values of <code>T</code>.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>This makes the input to the path view component into a destination format suitable for consumption by other code. If the source has the same format as the destination, and the zero termination requirements are the same, the source is used directly without memory copying nor reencoding.</p>
+<p>If the format is compatible, but the destination requires zero termination, and the source is not zero terminated, a straight memory copy is performed into the temporary buffer.</p>
+<p><code>c_str</code> contains a temporary buffer sized according to the template parameter. Output below that amount involves no dynamic memory allocation. Output above that amount calls <code>operator new[]</code>. You can use an externally supplied larger temporary buffer to avoid dynamic memory allocation in all situations. </p>
+<p>Type of the value type</p>
+<p>Type of the deleter</p>
+<p>The size of the internal temporary buffer</p>
+<p>Pointer to the possibly-converted path</p>
+<p>Number of characters, excluding zero terminating char, at buffer </p><pre class="fragment">Construct, performing any reencoding or memory copying required.
+</pre> <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">view</td><td>The path component view to use as source. </td></tr>
+    <tr><td class="paramname">output_zero_termination</td><td>The zero termination in the output desired </td></tr>
+    <tr><td class="paramname">loc</td><td>The locale to use to perform reencoding. </td></tr>
+    <tr><td class="paramname">allocate</td><td>A callable with prototype <code>value_type *(size_t length)</code> which is defaulted to <code>return static_cast&lt;value_type *&gt;(operator new[](length * sizeof(value_type)));</code>. You can return <code>nullptr</code> if you wish, the consumer of <code>c_str</code> will see a <code>buffer</code> set to <code>nullptr</code>.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>If <code>loc</code> is defaulted, and an error occurs during any conversion from UTF-8 or UTF-16, an exception of <code>system_error(errc::illegal_byte_sequence)</code> is thrown. This is because if you tell <code>path_view</code> that its source is UTF-8 or UTF-16, then that must be <b>valid</b> UTF. If you wish to supply UTF-invalid paths (which are legal on most filesystems), use native narrow or wide encoded source, or binary.</p>
+<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.</p>
+<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.</p>
+<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
+<div class="fragment"><div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;  {</div><div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;    static_assert(is_source_acceptable&lt;T&gt;, <span class="stringliteral">&quot;path_view_component::c_str&lt;T&gt; does not have a T which is one of byte, char, wchar_t, char8_t nor char16_t&quot;</span>);</div><div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">class</span> DestT, <span class="keyword">class</span> _Deleter, <span class="keywordtype">size_t</span> _<span class="keywordtype">int</span>ernal_buffer_size_, <span class="keyword">class</span> Char1T, <span class="keyword">class</span> Char2T&gt;</div><div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;    <span class="keyword">friend</span> <span class="keywordtype">int</span> path_view_component::_compare(basic_string_view&lt;Char1T&gt; a, <span class="keyword">enum</span> <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#ac12652236847087552e7a8cc01ef5a71">zero_termination</a> a_zt, basic_string_view&lt;Char2T&gt; b, <span class="keyword">enum</span> <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#ac12652236847087552e7a8cc01ef5a71">zero_termination</a> b_zt,</div><div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;                                             <span class="keyword">const</span> std::locale *loc) noexcept;</div><div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;<span class="comment"></span></div><div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;<span class="comment">    //! Type of the value type</span></div><div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;<span class="comment"></span>    <span class="keyword">using</span> value_type = T;<span class="comment"></span></div><div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;<span class="comment">    //! Type of the deleter</span></div><div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;<span class="comment"></span>    <span class="keyword">using</span> deleter_type = Deleter;<span class="comment"></span></div><div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;<span class="comment">    //! The size of the internal temporary buffer</span></div><div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;<span class="comment"></span>    <span class="keyword">static</span> constexpr <span class="keywordtype">size_t</span> internal_buffer_size = (_internal_buffer_size == 0) ? 1 : _internal_buffer_size;</div><div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;<span class="comment"></span></div><div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;<span class="comment">    //! Pointer to the possibly-converted path</span></div><div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;<span class="comment"></span>    <span class="keyword">const</span> value_type *buffer{<span class="keyword">nullptr</span>};<span class="comment"></span></div><div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;<span class="comment">    //! Number of characters, excluding zero terminating char, at buffer</span></div><div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;<span class="comment"></span>    <span class="keywordtype">size_t</span> <a class="code" href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">length</a>{0};</div><div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;</div><div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;  <span class="keyword">private</span>:</div><div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">class</span> U, <span class="keyword">class</span> source_type&gt;</div><div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;    <span class="keywordtype">void</span> _make_passthrough(<a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a> <span class="comment">/*unused*/</span>, <span class="keywordtype">bool</span> <span class="comment">/*unused*/</span>, U &amp; <span class="comment">/*unused*/</span>, <span class="keyword">const</span> source_type * <span class="comment">/*unused*/</span>)</div><div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;    {</div><div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;    }</div><div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">class</span> U&gt; <span class="keywordtype">void</span> _make_passthrough(<a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a> view, <span class="keyword">enum</span> <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#ac12652236847087552e7a8cc01ef5a71">zero_termination</a> output_zero_termination, U &amp;allocate, <span class="keyword">const</span> value_type *source)</div><div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160;    {</div><div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160;      <span class="keyword">using</span> LLFIO_V2_NAMESPACE::basic_string_view;</div><div class="line"><a name="l00813"></a><span class="lineno">  813</span>&#160;      <span class="comment">// If the consuming API is a NT kernel API, and we have / in the path, we shall need to do slash conversion</span></div><div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">bool</span> needs_slash_translation = (filesystem::path::preferred_separator != <span class="charliteral">&#39;/&#39;</span>) &amp;&amp;</div><div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;                                           (view.formatting() == format::auto_format || view.formatting() == format::generic_format) &amp;&amp;</div><div class="line"><a name="l00816"></a><span class="lineno">  816</span>&#160;                                           view._invoke([](<span class="keyword">auto</span> sv) { return sv.find(<span class="stringliteral">&#39;/&#39;</span>) != _npos; });</div><div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;      <a class="code" href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">length</a> = view._length;</div><div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;      <span class="keywordflow">if</span>(!needs_slash_translation &amp;&amp; (output_zero_termination == <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732ea86968f101145830aa8b984150d82392f">not_zero_terminated</a> || view._zero_terminated))</div><div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;      {</div><div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;        buffer = source;</div><div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;      }</div><div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;      <span class="keywordflow">else</span></div><div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;      {</div><div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;        <span class="comment">// Source must be not zero terminated, and zero terminated is required, or slash conversion is required</span></div><div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> required_length = view._length + view._zero_terminated;</div><div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> required_bytes = required_length * <span class="keyword">sizeof</span>(value_type);</div><div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> _buffer_bytes = <span class="keyword">sizeof</span>(_buffer);</div><div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;<span class="preprocessor">#ifdef _WIN32</span></div><div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;        <span class="keywordflow">if</span>(required_bytes &gt; 65535)</div><div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;        {</div><div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160;          LLFIO_LOG_FATAL(<span class="keyword">nullptr</span>, <span class="stringliteral">&quot;Paths exceeding 64Kb are impossible on Microsoft Windows&quot;</span>);</div><div class="line"><a name="l00832"></a><span class="lineno">  832</span>&#160;          abort();</div><div class="line"><a name="l00833"></a><span class="lineno">  833</span>&#160;        }</div><div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160;<span class="preprocessor">#endif</span></div><div class="line"><a name="l00835"></a><span class="lineno">  835</span>&#160;        <span class="keywordflow">if</span>(required_bytes &lt;= _buffer_bytes)</div><div class="line"><a name="l00836"></a><span class="lineno">  836</span>&#160;        {</div><div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;          <span class="comment">// Use the internal buffer</span></div><div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160;          memcpy(_buffer, source, required_bytes);</div><div class="line"><a name="l00839"></a><span class="lineno">  839</span>&#160;          _buffer[required_length] = 0;</div><div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160;          buffer = _buffer;</div><div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160;        }</div><div class="line"><a name="l00842"></a><span class="lineno">  842</span>&#160;        <span class="keywordflow">else</span></div><div class="line"><a name="l00843"></a><span class="lineno">  843</span>&#160;        {</div><div class="line"><a name="l00844"></a><span class="lineno">  844</span>&#160;          <span class="keyword">auto</span> *buffer_ = allocate(required_length);</div><div class="line"><a name="l00845"></a><span class="lineno">  845</span>&#160;          <span class="keywordflow">if</span>(<span class="keyword">nullptr</span> == buffer_)</div><div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160;          {</div><div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;            <a class="code" href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">length</a> = 0;</div><div class="line"><a name="l00848"></a><span class="lineno">  848</span>&#160;          }</div><div class="line"><a name="l00849"></a><span class="lineno">  849</span>&#160;          <span class="keywordflow">else</span></div><div class="line"><a name="l00850"></a><span class="lineno">  850</span>&#160;          {</div><div class="line"><a name="l00851"></a><span class="lineno">  851</span>&#160;            _call_deleter = <span class="keyword">true</span>;</div><div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;            memcpy(buffer_, source, required_bytes);</div><div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160;            buffer_[required_length] = 0;</div><div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160;            buffer = buffer_;</div><div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160;          }</div><div class="line"><a name="l00856"></a><span class="lineno">  856</span>&#160;        }</div><div class="line"><a name="l00857"></a><span class="lineno">  857</span>&#160;        <span class="keywordflow">if</span>(needs_slash_translation)</div><div class="line"><a name="l00858"></a><span class="lineno">  858</span>&#160;        {</div><div class="line"><a name="l00859"></a><span class="lineno">  859</span>&#160;          basic_string_view&lt;value_type&gt; sv(buffer, required_length);</div><div class="line"><a name="l00860"></a><span class="lineno">  860</span>&#160;          <span class="keyword">auto</span> idx = sv.find(<span class="charliteral">&#39;/&#39;</span>);</div><div class="line"><a name="l00861"></a><span class="lineno">  861</span>&#160;          <span class="keywordflow">while</span>(idx != _npos)</div><div class="line"><a name="l00862"></a><span class="lineno">  862</span>&#160;          {</div><div class="line"><a name="l00863"></a><span class="lineno">  863</span>&#160;            <span class="keyword">const_cast&lt;</span>value_type *<span class="keyword">&gt;</span>(buffer)[idx] = filesystem::path::preferred_separator;</div><div class="line"><a name="l00864"></a><span class="lineno">  864</span>&#160;            idx = sv.find(<span class="charliteral">&#39;/&#39;</span>, idx);</div><div class="line"><a name="l00865"></a><span class="lineno">  865</span>&#160;          }</div><div class="line"><a name="l00866"></a><span class="lineno">  866</span>&#160;        }</div><div class="line"><a name="l00867"></a><span class="lineno">  867</span>&#160;      }</div><div class="line"><a name="l00868"></a><span class="lineno">  868</span>&#160;    }</div><div class="line"><a name="l00869"></a><span class="lineno">  869</span>&#160;</div><div class="line"><a name="l00870"></a><span class="lineno">  870</span>&#160;  <span class="keyword">public</span>:</div><div class="line"><a name="l00871"></a><span class="lineno">  871</span>&#160;    constexpr c_str() {}</div><div class="line"><a name="l00872"></a><span class="lineno">  872</span>&#160;<span class="preprocessor">#ifdef _MSC_VER</span></div><div class="line"><a name="l00873"></a><span class="lineno">  873</span>&#160;<span class="preprocessor">#pragma warning(push)</span></div><div class="line"><a name="l00874"></a><span class="lineno">  874</span>&#160;<span class="preprocessor">#pragma warning(disable : 4127)  // conditional expression is constant</span></div><div class="line"><a name="l00875"></a><span class="lineno">  875</span>&#160;<span class="preprocessor">#endif</span></div><div class="line"><a name="l00876"></a><span class="lineno">  876</span>&#160;  <span class="keyword">private</span>:</div><div class="line"><a name="l00877"></a><span class="lineno">  877</span>&#160;    <span class="keyword">struct </span>_internal_construct_tag</div><div class="line"><a name="l00878"></a><span class="lineno">  878</span>&#160;    {</div><div class="line"><a name="l00879"></a><span class="lineno">  879</span>&#160;    };</div><div class="line"><a name="l00880"></a><span class="lineno">  880</span>&#160;    <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#aa83c384b9a61f57c318b61e8feb30d63">LLFIO_TEMPLATE</a>(<span class="keyword">class</span> U, <span class="keyword">class</span> V)</div><div class="line"><a name="l00881"></a><span class="lineno">  881</span>&#160;    LLFIO_TREQUIRES(LLFIO_TEXPR(std::declval&lt;U&gt;()((<span class="keywordtype">size_t</span>) 1)), LLFIO_TEXPR(std::declval&lt;V&gt;()((value_type *) <span class="keyword">nullptr</span>)))</div><div class="line"><a name="l00882"></a><span class="lineno">  882</span>&#160;    c_str(_internal_construct_tag <span class="comment">/*unused*/</span>, <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a> view, <span class="keyword">enum</span> <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#ac12652236847087552e7a8cc01ef5a71">zero_termination</a> output_zero_termination, <span class="keyword">const</span> std::locale *loc, U &amp;&amp;allocate,</div><div class="line"><a name="l00883"></a><span class="lineno">  883</span>&#160;          V &amp;&amp;deleter)</div><div class="line"><a name="l00884"></a><span class="lineno">  884</span>&#160;        : _deleter(static_cast&lt;V &amp;&amp;&gt;(deleter))</div><div class="line"><a name="l00885"></a><span class="lineno">  885</span>&#160;    {</div><div class="line"><a name="l00886"></a><span class="lineno">  886</span>&#160;      <span class="keywordflow">if</span>(0 == view._length)</div><div class="line"><a name="l00887"></a><span class="lineno">  887</span>&#160;      {</div><div class="line"><a name="l00888"></a><span class="lineno">  888</span>&#160;        _buffer[0] = 0;</div><div class="line"><a name="l00889"></a><span class="lineno">  889</span>&#160;        buffer = _buffer;</div><div class="line"><a name="l00890"></a><span class="lineno">  890</span>&#160;        <a class="code" href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">length</a> = 0;</div><div class="line"><a name="l00891"></a><span class="lineno">  891</span>&#160;        <span class="keywordflow">return</span>;</div><div class="line"><a name="l00892"></a><span class="lineno">  892</span>&#160;      }</div><div class="line"><a name="l00893"></a><span class="lineno">  893</span>&#160;      <span class="keywordflow">if</span>(std::is_same&lt;T, byte&gt;::value || view._passthrough)</div><div class="line"><a name="l00894"></a><span class="lineno">  894</span>&#160;      {</div><div class="line"><a name="l00895"></a><span class="lineno">  895</span>&#160;        <a class="code" href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">length</a> = view._length;</div><div class="line"><a name="l00896"></a><span class="lineno">  896</span>&#160;        buffer = (<span class="keyword">const</span> value_type *) view._bytestr;</div><div class="line"><a name="l00897"></a><span class="lineno">  897</span>&#160;        <span class="keywordflow">return</span>;</div><div class="line"><a name="l00898"></a><span class="lineno">  898</span>&#160;      }</div><div class="line"><a name="l00899"></a><span class="lineno">  899</span>&#160;      <span class="keywordflow">if</span>(std::is_same&lt;T, char&gt;::value &amp;&amp; view._char)</div><div class="line"><a name="l00900"></a><span class="lineno">  900</span>&#160;      {</div><div class="line"><a name="l00901"></a><span class="lineno">  901</span>&#160;        _make_passthrough(view, output_zero_termination, allocate, view._charstr);</div><div class="line"><a name="l00902"></a><span class="lineno">  902</span>&#160;        <span class="keywordflow">return</span>;</div><div class="line"><a name="l00903"></a><span class="lineno">  903</span>&#160;      }</div><div class="line"><a name="l00904"></a><span class="lineno">  904</span>&#160;      <span class="keywordflow">if</span>(std::is_same&lt;T, wchar_t&gt;::value &amp;&amp; view._wchar)</div><div class="line"><a name="l00905"></a><span class="lineno">  905</span>&#160;      {</div><div class="line"><a name="l00906"></a><span class="lineno">  906</span>&#160;        _make_passthrough(view, output_zero_termination, allocate, view._wcharstr);</div><div class="line"><a name="l00907"></a><span class="lineno">  907</span>&#160;        <span class="keywordflow">return</span>;</div><div class="line"><a name="l00908"></a><span class="lineno">  908</span>&#160;      }</div><div class="line"><a name="l00909"></a><span class="lineno">  909</span>&#160;      <span class="keywordflow">if</span>(std::is_same&lt;T, char8_t&gt;::value &amp;&amp; view._utf8)</div><div class="line"><a name="l00910"></a><span class="lineno">  910</span>&#160;      {</div><div class="line"><a name="l00911"></a><span class="lineno">  911</span>&#160;        _make_passthrough(view, output_zero_termination, allocate, view._char8str);</div><div class="line"><a name="l00912"></a><span class="lineno">  912</span>&#160;        <span class="keywordflow">return</span>;</div><div class="line"><a name="l00913"></a><span class="lineno">  913</span>&#160;      }</div><div class="line"><a name="l00914"></a><span class="lineno">  914</span>&#160;      <span class="keywordflow">if</span>(std::is_same&lt;T, char16_t&gt;::value &amp;&amp; view._utf16)</div><div class="line"><a name="l00915"></a><span class="lineno">  915</span>&#160;      {</div><div class="line"><a name="l00916"></a><span class="lineno">  916</span>&#160;        _make_passthrough(view, output_zero_termination, allocate, view._char16str);</div><div class="line"><a name="l00917"></a><span class="lineno">  917</span>&#160;        <span class="keywordflow">return</span>;</div><div class="line"><a name="l00918"></a><span class="lineno">  918</span>&#160;      }</div><div class="line"><a name="l00919"></a><span class="lineno">  919</span>&#160;<span class="preprocessor">#ifdef _WIN32</span></div><div class="line"><a name="l00920"></a><span class="lineno">  920</span>&#160;      <span class="comment">// On Windows, consider char16_t input equivalent to wchar_t</span></div><div class="line"><a name="l00921"></a><span class="lineno">  921</span>&#160;      <span class="keywordflow">if</span>(std::is_same&lt;T, wchar_t&gt;::value &amp;&amp; view._utf16)</div><div class="line"><a name="l00922"></a><span class="lineno">  922</span>&#160;      {</div><div class="line"><a name="l00923"></a><span class="lineno">  923</span>&#160;        _make_passthrough(view, output_zero_termination, allocate, view._wcharstr);</div><div class="line"><a name="l00924"></a><span class="lineno">  924</span>&#160;        <span class="keywordflow">return</span>;</div><div class="line"><a name="l00925"></a><span class="lineno">  925</span>&#160;      }</div><div class="line"><a name="l00926"></a><span class="lineno">  926</span>&#160;<span class="preprocessor">#else</span></div><div class="line"><a name="l00927"></a><span class="lineno">  927</span>&#160;      <span class="comment">// On POSIX, consider char8_t input equivalent to char</span></div><div class="line"><a name="l00928"></a><span class="lineno">  928</span>&#160;      <span class="keywordflow">if</span>(std::is_same&lt;T, char&gt;::value &amp;&amp; view._utf8)</div><div class="line"><a name="l00929"></a><span class="lineno">  929</span>&#160;      {</div><div class="line"><a name="l00930"></a><span class="lineno">  930</span>&#160;        _make_passthrough(view, output_zero_termination, allocate, view._charstr);</div><div class="line"><a name="l00931"></a><span class="lineno">  931</span>&#160;        <span class="keywordflow">return</span>;</div><div class="line"><a name="l00932"></a><span class="lineno">  932</span>&#160;      }</div><div class="line"><a name="l00933"></a><span class="lineno">  933</span>&#160;<span class="preprocessor">#endif</span></div><div class="line"><a name="l00934"></a><span class="lineno">  934</span>&#160;      <span class="comment">// A reencode is required. We keep this out of header because reencoding</span></div><div class="line"><a name="l00935"></a><span class="lineno">  935</span>&#160;      <span class="comment">// requires dragging in lots of system header files.</span></div><div class="line"><a name="l00936"></a><span class="lineno">  936</span>&#160;      <span class="keywordtype">size_t</span> required_length = 0;</div><div class="line"><a name="l00937"></a><span class="lineno">  937</span>&#160;      value_type *end = <span class="keyword">nullptr</span>;</div><div class="line"><a name="l00938"></a><span class="lineno">  938</span>&#160;      <span class="keywordflow">if</span>(view._passthrough)</div><div class="line"><a name="l00939"></a><span class="lineno">  939</span>&#160;      {</div><div class="line"><a name="l00940"></a><span class="lineno">  940</span>&#160;        end = detail::reencode_path_to(required_length, _buffer, _internal_buffer_size, view._bytestr, view._length, loc);</div><div class="line"><a name="l00941"></a><span class="lineno">  941</span>&#160;      }</div><div class="line"><a name="l00942"></a><span class="lineno">  942</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(view._char)</div><div class="line"><a name="l00943"></a><span class="lineno">  943</span>&#160;      {</div><div class="line"><a name="l00944"></a><span class="lineno">  944</span>&#160;        end = detail::reencode_path_to(required_length, _buffer, _internal_buffer_size, view._charstr, view._length, loc);</div><div class="line"><a name="l00945"></a><span class="lineno">  945</span>&#160;      }</div><div class="line"><a name="l00946"></a><span class="lineno">  946</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(view._wchar)</div><div class="line"><a name="l00947"></a><span class="lineno">  947</span>&#160;      {</div><div class="line"><a name="l00948"></a><span class="lineno">  948</span>&#160;        end = detail::reencode_path_to(required_length, _buffer, _internal_buffer_size, view._wcharstr, view._length, loc);</div><div class="line"><a name="l00949"></a><span class="lineno">  949</span>&#160;      }</div><div class="line"><a name="l00950"></a><span class="lineno">  950</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(view._utf8)</div><div class="line"><a name="l00951"></a><span class="lineno">  951</span>&#160;      {</div><div class="line"><a name="l00952"></a><span class="lineno">  952</span>&#160;        end = detail::reencode_path_to(required_length, _buffer, _internal_buffer_size, view._char8str, view._length, loc);</div><div class="line"><a name="l00953"></a><span class="lineno">  953</span>&#160;      }</div><div class="line"><a name="l00954"></a><span class="lineno">  954</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(view._utf16)</div><div class="line"><a name="l00955"></a><span class="lineno">  955</span>&#160;      {</div><div class="line"><a name="l00956"></a><span class="lineno">  956</span>&#160;        end = detail::reencode_path_to(required_length, _buffer, _internal_buffer_size, view._char16str, view._length, loc);</div><div class="line"><a name="l00957"></a><span class="lineno">  957</span>&#160;      }</div><div class="line"><a name="l00958"></a><span class="lineno">  958</span>&#160;      <span class="keywordflow">else</span></div><div class="line"><a name="l00959"></a><span class="lineno">  959</span>&#160;      {</div><div class="line"><a name="l00960"></a><span class="lineno">  960</span>&#160;        LLFIO_LOG_FATAL(<span class="keyword">nullptr</span>, <span class="stringliteral">&quot;path_view_component::cstr somehow sees no state!&quot;</span>);</div><div class="line"><a name="l00961"></a><span class="lineno">  961</span>&#160;        abort();</div><div class="line"><a name="l00962"></a><span class="lineno">  962</span>&#160;      }</div><div class="line"><a name="l00963"></a><span class="lineno">  963</span>&#160;      <span class="keywordflow">if</span>(0 == required_length)</div><div class="line"><a name="l00964"></a><span class="lineno">  964</span>&#160;      {</div><div class="line"><a name="l00965"></a><span class="lineno">  965</span>&#160;        <span class="comment">// The internal buffer was sufficient.</span></div><div class="line"><a name="l00966"></a><span class="lineno">  966</span>&#160;        buffer = _buffer;</div><div class="line"><a name="l00967"></a><span class="lineno">  967</span>&#160;        <a class="code" href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">length</a> = end - _buffer;</div><div class="line"><a name="l00968"></a><span class="lineno">  968</span>&#160;        <span class="keywordflow">return</span>;</div><div class="line"><a name="l00969"></a><span class="lineno">  969</span>&#160;      }</div><div class="line"><a name="l00970"></a><span class="lineno">  970</span>&#160;      <span class="comment">// The internal buffer is too small. Fall back to dynamic allocation. This may throw.</span></div><div class="line"><a name="l00971"></a><span class="lineno">  971</span>&#160;      <span class="keyword">auto</span> *allocated_buffer = allocate(required_length);</div><div class="line"><a name="l00972"></a><span class="lineno">  972</span>&#160;      <span class="keywordflow">if</span>(<span class="keyword">nullptr</span> == allocated_buffer)</div><div class="line"><a name="l00973"></a><span class="lineno">  973</span>&#160;      {</div><div class="line"><a name="l00974"></a><span class="lineno">  974</span>&#160;        <a class="code" href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">length</a> = 0;</div><div class="line"><a name="l00975"></a><span class="lineno">  975</span>&#160;        <span class="keywordflow">return</span>;</div><div class="line"><a name="l00976"></a><span class="lineno">  976</span>&#160;      }</div><div class="line"><a name="l00977"></a><span class="lineno">  977</span>&#160;      _call_deleter = <span class="keyword">true</span>;</div><div class="line"><a name="l00978"></a><span class="lineno">  978</span>&#160;      memcpy(allocated_buffer, _buffer, end - _buffer);</div><div class="line"><a name="l00979"></a><span class="lineno">  979</span>&#160;      required_length -= (end - _buffer);</div><div class="line"><a name="l00980"></a><span class="lineno">  980</span>&#160;      end = allocated_buffer + (end - _buffer);</div><div class="line"><a name="l00981"></a><span class="lineno">  981</span>&#160;      <span class="keywordflow">if</span>(view._passthrough)</div><div class="line"><a name="l00982"></a><span class="lineno">  982</span>&#160;      {</div><div class="line"><a name="l00983"></a><span class="lineno">  983</span>&#160;        end = detail::reencode_path_to(<a class="code" href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">length</a>, end, required_length, view._bytestr, view._length, loc);</div><div class="line"><a name="l00984"></a><span class="lineno">  984</span>&#160;      }</div><div class="line"><a name="l00985"></a><span class="lineno">  985</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(view._char)</div><div class="line"><a name="l00986"></a><span class="lineno">  986</span>&#160;      {</div><div class="line"><a name="l00987"></a><span class="lineno">  987</span>&#160;        end = detail::reencode_path_to(<a class="code" href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">length</a>, end, required_length, view._charstr, view._length, loc);</div><div class="line"><a name="l00988"></a><span class="lineno">  988</span>&#160;      }</div><div class="line"><a name="l00989"></a><span class="lineno">  989</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(view._wchar)</div><div class="line"><a name="l00990"></a><span class="lineno">  990</span>&#160;      {</div><div class="line"><a name="l00991"></a><span class="lineno">  991</span>&#160;        end = detail::reencode_path_to(<a class="code" href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">length</a>, end, required_length, view._wcharstr, view._length, loc);</div><div class="line"><a name="l00992"></a><span class="lineno">  992</span>&#160;      }</div><div class="line"><a name="l00993"></a><span class="lineno">  993</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(view._utf8)</div><div class="line"><a name="l00994"></a><span class="lineno">  994</span>&#160;      {</div><div class="line"><a name="l00995"></a><span class="lineno">  995</span>&#160;        end = detail::reencode_path_to(<a class="code" href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">length</a>, end, required_length, view._char8str, view._length, loc);</div><div class="line"><a name="l00996"></a><span class="lineno">  996</span>&#160;      }</div><div class="line"><a name="l00997"></a><span class="lineno">  997</span>&#160;      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(view._utf16)</div><div class="line"><a name="l00998"></a><span class="lineno">  998</span>&#160;      {</div><div class="line"><a name="l00999"></a><span class="lineno">  999</span>&#160;        end = detail::reencode_path_to(<a class="code" href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">length</a>, end, required_length, view._char16str, view._length, loc);</div><div class="line"><a name="l01000"></a><span class="lineno"> 1000</span>&#160;      }</div><div class="line"><a name="l01001"></a><span class="lineno"> 1001</span>&#160;      <span class="keywordflow">else</span></div><div class="line"><a name="l01002"></a><span class="lineno"> 1002</span>&#160;      {</div><div class="line"><a name="l01003"></a><span class="lineno"> 1003</span>&#160;        LLFIO_LOG_FATAL(<span class="keyword">nullptr</span>, <span class="stringliteral">&quot;path_view_component::cstr somehow sees no state!&quot;</span>);</div><div class="line"><a name="l01004"></a><span class="lineno"> 1004</span>&#160;        abort();</div><div class="line"><a name="l01005"></a><span class="lineno"> 1005</span>&#160;      }</div><div class="line"><a name="l01006"></a><span class="lineno"> 1006</span>&#160;      buffer = allocated_buffer;</div><div class="line"><a name="l01007"></a><span class="lineno"> 1007</span>&#160;      <a class="code" href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">length</a> = end - buffer;</div><div class="line"><a name="l01008"></a><span class="lineno"> 1008</span>&#160;    }</div><div class="line"><a name="l01009"></a><span class="lineno"> 1009</span>&#160;<span class="preprocessor">#ifdef _MSC_VER</span></div><div class="line"><a name="l01010"></a><span class="lineno"> 1010</span>&#160;<span class="preprocessor">#pragma warning(pop)</span></div><div class="line"><a name="l01011"></a><span class="lineno"> 1011</span>&#160;<span class="preprocessor">#endif</span></div><div class="line"><a name="l01012"></a><span class="lineno"> 1012</span>&#160;    c_str(<a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a> view, <span class="keyword">enum</span> <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#ac12652236847087552e7a8cc01ef5a71">zero_termination</a> output_zero_termination, <span class="keyword">const</span> std::locale *loc)</div><div class="line"><a name="l01013"></a><span class="lineno"> 1013</span>&#160;        : c_str(</div><div class="line"><a name="l01014"></a><span class="lineno"> 1014</span>&#160;          _internal_construct_tag(), view, output_zero_termination, loc,</div><div class="line"><a name="l01015"></a><span class="lineno"> 1015</span>&#160;          [](size_t <a class="code" href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">length</a>) { <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>value_type *<span class="keyword">&gt;</span>(::operator <span class="keyword">new</span>[](<a class="code" href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">length</a> * <span class="keyword">sizeof</span>(value_type))); }, deleter_type())</div><div class="line"><a name="l01016"></a><span class="lineno"> 1016</span>&#160;    {</div><div class="line"><a name="l01017"></a><span class="lineno"> 1017</span>&#160;    }</div><div class="line"><a name="l01018"></a><span class="lineno"> 1018</span>&#160;</div><div class="line"><a name="l01019"></a><span class="lineno"> 1019</span>&#160;  <span class="keyword">public</span>:<span class="comment"></span></div><div class="line"><a name="l01020"></a><span class="lineno"> 1020</span>&#160;<span class="comment">    /*! Construct, performing any reencoding or memory copying required.</span></div><div class="line"><a name="l01021"></a><span class="lineno"> 1021</span>&#160;<span class="comment">    \param view The path component view to use as source.</span></div><div class="line"><a name="l01022"></a><span class="lineno"> 1022</span>&#160;<span class="comment">    \param output_zero_termination The zero termination in the output desired</span></div><div class="line"><a name="l01023"></a><span class="lineno"> 1023</span>&#160;<span class="comment">    \param loc The locale to use to perform reencoding.</span></div><div class="line"><a name="l01024"></a><span class="lineno"> 1024</span>&#160;<span class="comment">    \param allocate A callable with prototype `value_type *(size_t length)` which</span></div><div class="line"><a name="l01025"></a><span class="lineno"> 1025</span>&#160;<span class="comment">    is defaulted to `return static_cast&lt;value_type *&gt;(::operator new[](length * sizeof(value_type)));`.</span></div><div class="line"><a name="l01026"></a><span class="lineno"> 1026</span>&#160;<span class="comment">    You can return `nullptr` if you wish, the consumer of `c_str` will</span></div><div class="line"><a name="l01027"></a><span class="lineno"> 1027</span>&#160;<span class="comment">    see a `buffer` set to `nullptr`.</span></div><div class="line"><a name="l01028"></a><span class="lineno"> 1028</span>&#160;<span class="comment"></span></div><div class="line"><a name="l01029"></a><span class="lineno"> 1029</span>&#160;<span class="comment">    If `loc` is defaulted, and an error occurs during any conversion from UTF-8 or UTF-16, an exception of</span></div><div class="line"><a name="l01030"></a><span class="lineno"> 1030</span>&#160;<span class="comment">    `system_error(errc::illegal_byte_sequence)` is thrown.</span></div><div class="line"><a name="l01031"></a><span class="lineno"> 1031</span>&#160;<span class="comment">    This is because if you tell `path_view` that its source is UTF-8 or UTF-16, then that</span></div><div class="line"><a name="l01032"></a><span class="lineno"> 1032</span>&#160;<span class="comment">    must be **valid** UTF. If you wish to supply UTF-invalid paths (which are legal</span></div><div class="line"><a name="l01033"></a><span class="lineno"> 1033</span>&#160;<span class="comment">    on most filesystems), use native narrow or wide encoded source, or binary.</span></div><div class="line"><a name="l01034"></a><span class="lineno"> 1034</span>&#160;<span class="comment">    */</span></div><div class="line"><a name="l01035"></a><span class="lineno"> 1035</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">class</span> U, <span class="keyword">class</span> V&gt;</div><div class="line"><a name="l01036"></a><span class="lineno"> 1036</span>&#160;    c_str(<a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a> view, <span class="keyword">enum</span> <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#ac12652236847087552e7a8cc01ef5a71">zero_termination</a> output_zero_termination, <span class="keyword">const</span> std::locale &amp;loc, U &amp;&amp;allocate, V &amp;&amp;deleter = deleter_type())</div><div class="line"><a name="l01037"></a><span class="lineno"> 1037</span>&#160;        : c_str(_internal_construct_tag(), view, output_zero_termination, &amp;loc, static_cast&lt;U &amp;&amp;&gt;(allocate), static_cast&lt;V &amp;&amp;&gt;(deleter))</div><div class="line"><a name="l01038"></a><span class="lineno"> 1038</span>&#160;    {</div><div class="line"><a name="l01039"></a><span class="lineno"> 1039</span>&#160;    }<span class="comment"></span></div><div class="line"><a name="l01040"></a><span class="lineno"> 1040</span>&#160;<span class="comment">    //! \overload</span></div><div class="line"><a name="l01041"></a><span class="lineno"> 1041</span>&#160;<span class="comment"></span>    <span class="keyword">template</span> &lt;<span class="keyword">class</span> U, <span class="keyword">class</span> V&gt;</div><div class="line"><a name="l01042"></a><span class="lineno"> 1042</span>&#160;    c_str(<a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a> view, <span class="keyword">enum</span> <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#ac12652236847087552e7a8cc01ef5a71">zero_termination</a> output_zero_termination, U &amp;&amp;allocate, V &amp;&amp;deleter = deleter_type())</div><div class="line"><a name="l01043"></a><span class="lineno"> 1043</span>&#160;        : c_str(_internal_construct_tag(), view, output_zero_termination, (const <a class="code" href="namespacestd.html">std</a>::locale *) nullptr, static_cast&lt;U &amp;&amp;&gt;(allocate),</div><div class="line"><a name="l01044"></a><span class="lineno"> 1044</span>&#160;                static_cast&lt;V &amp;&amp;&gt;(deleter))</div><div class="line"><a name="l01045"></a><span class="lineno"> 1045</span>&#160;    {</div><div class="line"><a name="l01046"></a><span class="lineno"> 1046</span>&#160;    }<span class="comment"></span></div><div class="line"><a name="l01047"></a><span class="lineno"> 1047</span>&#160;<span class="comment">    //! \overload</span></div><div class="line"><a name="l01048"></a><span class="lineno"> 1048</span>&#160;<span class="comment"></span>    c_str(<a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a> view, <span class="keyword">enum</span> <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#ac12652236847087552e7a8cc01ef5a71">zero_termination</a> output_zero_termination, <span class="keyword">const</span> std::locale &amp;loc)</div><div class="line"><a name="l01049"></a><span class="lineno"> 1049</span>&#160;        : c_str(</div><div class="line"><a name="l01050"></a><span class="lineno"> 1050</span>&#160;          _internal_construct_tag(), view, output_zero_termination, &amp;loc,</div><div class="line"><a name="l01051"></a><span class="lineno"> 1051</span>&#160;          [](size_t <a class="code" href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">length</a>) { <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>value_type *<span class="keyword">&gt;</span>(::operator <span class="keyword">new</span>[](<a class="code" href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">length</a> * <span class="keyword">sizeof</span>(value_type))); }, deleter_type())</div><div class="line"><a name="l01052"></a><span class="lineno"> 1052</span>&#160;    {</div><div class="line"><a name="l01053"></a><span class="lineno"> 1053</span>&#160;    }<span class="comment"></span></div><div class="line"><a name="l01054"></a><span class="lineno"> 1054</span>&#160;<span class="comment">    //! \overload</span></div><div class="line"><a name="l01055"></a><span class="lineno"> 1055</span>&#160;<span class="comment"></span>    c_str(<a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a> view, <span class="keyword">enum</span> <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#ac12652236847087552e7a8cc01ef5a71">zero_termination</a> output_zero_termination)</div><div class="line"><a name="l01056"></a><span class="lineno"> 1056</span>&#160;        : c_str(</div><div class="line"><a name="l01057"></a><span class="lineno"> 1057</span>&#160;          _internal_construct_tag(), view, output_zero_termination, (const <a class="code" href="namespacestd.html">std</a>::locale *) nullptr,</div><div class="line"><a name="l01058"></a><span class="lineno"> 1058</span>&#160;          [](size_t <a class="code" href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">length</a>) { <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>value_type *<span class="keyword">&gt;</span>(::operator <span class="keyword">new</span>[](<a class="code" href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">length</a> * <span class="keyword">sizeof</span>(value_type))); }, deleter_type())</div><div class="line"><a name="l01059"></a><span class="lineno"> 1059</span>&#160;    {</div><div class="line"><a name="l01060"></a><span class="lineno"> 1060</span>&#160;    }</div><div class="line"><a name="l01061"></a><span class="lineno"> 1061</span>&#160;    ~c_str()</div><div class="line"><a name="l01062"></a><span class="lineno"> 1062</span>&#160;    {</div><div class="line"><a name="l01063"></a><span class="lineno"> 1063</span>&#160;      <span class="keywordflow">if</span>(_call_deleter)</div><div class="line"><a name="l01064"></a><span class="lineno"> 1064</span>&#160;      {</div><div class="line"><a name="l01065"></a><span class="lineno"> 1065</span>&#160;        _deleter(const_cast&lt;value_type *&gt;(buffer));</div><div class="line"><a name="l01066"></a><span class="lineno"> 1066</span>&#160;      }</div><div class="line"><a name="l01067"></a><span class="lineno"> 1067</span>&#160;    }</div><div class="line"><a name="l01068"></a><span class="lineno"> 1068</span>&#160;    c_str(<span class="keyword">const</span> c_str &amp;) = <span class="keyword">delete</span>;</div><div class="line"><a name="l01069"></a><span class="lineno"> 1069</span>&#160;    c_str(c_str &amp;&amp;o) noexcept</div><div class="line"><a name="l01070"></a><span class="lineno"> 1070</span>&#160;        : buffer(o.buffer)</div><div class="line"><a name="l01071"></a><span class="lineno"> 1071</span>&#160;        , <a class="code" href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">length</a>(o.length)</div><div class="line"><a name="l01072"></a><span class="lineno"> 1072</span>&#160;        , _call_deleter(o._call_deleter)</div><div class="line"><a name="l01073"></a><span class="lineno"> 1073</span>&#160;        , _deleter(std::move(o._deleter))</div><div class="line"><a name="l01074"></a><span class="lineno"> 1074</span>&#160;    {</div><div class="line"><a name="l01075"></a><span class="lineno"> 1075</span>&#160;      <span class="keywordflow">if</span>(o.buffer == o._buffer)</div><div class="line"><a name="l01076"></a><span class="lineno"> 1076</span>&#160;      {</div><div class="line"><a name="l01077"></a><span class="lineno"> 1077</span>&#160;        memcpy(_buffer, o._buffer, (o.length + 1) * <span class="keyword">sizeof</span>(value_type));</div><div class="line"><a name="l01078"></a><span class="lineno"> 1078</span>&#160;        buffer = _buffer;</div><div class="line"><a name="l01079"></a><span class="lineno"> 1079</span>&#160;      }</div><div class="line"><a name="l01080"></a><span class="lineno"> 1080</span>&#160;      o._call_deleter = <span class="keyword">false</span>;</div><div class="line"><a name="l01081"></a><span class="lineno"> 1081</span>&#160;    }</div><div class="line"><a name="l01082"></a><span class="lineno"> 1082</span>&#160;    c_str &amp;operator=(<span class="keyword">const</span> c_str &amp;) = <span class="keyword">delete</span>;</div><div class="line"><a name="l01083"></a><span class="lineno"> 1083</span>&#160;    c_str &amp;operator=(c_str &amp;&amp;o) noexcept</div><div class="line"><a name="l01084"></a><span class="lineno"> 1084</span>&#160;    {</div><div class="line"><a name="l01085"></a><span class="lineno"> 1085</span>&#160;      <span class="keywordflow">if</span>(<span class="keyword">this</span> == &amp;o)</div><div class="line"><a name="l01086"></a><span class="lineno"> 1086</span>&#160;      {</div><div class="line"><a name="l01087"></a><span class="lineno"> 1087</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div><div class="line"><a name="l01088"></a><span class="lineno"> 1088</span>&#160;      }</div><div class="line"><a name="l01089"></a><span class="lineno"> 1089</span>&#160;      this-&gt;~c_str();</div><div class="line"><a name="l01090"></a><span class="lineno"> 1090</span>&#160;      <span class="keyword">new</span>(<span class="keyword">this</span>) c_str(std::move(o));</div><div class="line"><a name="l01091"></a><span class="lineno"> 1091</span>&#160;      <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div><div class="line"><a name="l01092"></a><span class="lineno"> 1092</span>&#160;    }</div><div class="line"><a name="l01093"></a><span class="lineno"> 1093</span>&#160;</div><div class="line"><a name="l01094"></a><span class="lineno"> 1094</span>&#160;  <span class="keyword">private</span>:</div><div class="line"><a name="l01095"></a><span class="lineno"> 1095</span>&#160;    <span class="keywordtype">bool</span> _call_deleter{<span class="keyword">false</span>};</div><div class="line"><a name="l01096"></a><span class="lineno"> 1096</span>&#160;    Deleter _deleter;</div><div class="line"><a name="l01097"></a><span class="lineno"> 1097</span>&#160;    <span class="comment">// MAKE SURE this is the final item in storage, the compiler will elide the storage</span></div><div class="line"><a name="l01098"></a><span class="lineno"> 1098</span>&#160;    <span class="comment">// under optimisation if it can prove it is never used.</span></div><div class="line"><a name="l01099"></a><span class="lineno"> 1099</span>&#160;    value_type _buffer[internal_buffer_size]{};</div><div class="line"><a name="l01100"></a><span class="lineno"> 1100</span>&#160;  };</div><div class="ttc" id="namespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdoc">STL namespace. </div></div>
+<div class="ttc" id="namespacellfio__v2__xxx_html_aa3676f0dd69f4b54cf7e14e3f86d32b9"><div class="ttname"><a href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">llfio_v2_xxx::length</a></div><div class="ttdeci">result&lt; section_handle::extent_type &gt; length(const section_handle &amp;self) noexcept</div><div class="ttdoc">Return the current maximum permitted extent of the memory section. </div><div class="ttdef"><b>Definition:</b> map_handle.hpp:927</div></div>
+<div class="ttc" id="classllfio__v2__xxx_1_1path__view__component_html_a9595c5841e26ca5e0fc18e6d735b1142"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">llfio_v2_xxx::path_view_component::path_view_component</a></div><div class="ttdeci">constexpr path_view_component() noexcept</div><div class="ttdoc">Constructs an empty path view component (DEVIATES from P1030, is not trivial due to C++ 14 compatibil...</div><div class="ttdef"><b>Definition:</b> path_view.hpp:251</div></div>
+<div class="ttc" id="classllfio__v2__xxx_1_1path__view__component_html_a4a24bb2d232a1aa744c3ba4018f8732ea86968f101145830aa8b984150d82392f"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732ea86968f101145830aa8b984150d82392f">llfio_v2_xxx::path_view_component::not_zero_terminated</a></div><div class="ttdoc">The input is not zero terminated, or requested output ought to not be zero terminated. </div><div class="ttdef"><b>Definition:</b> path_view.hpp:222</div></div>
+<div class="ttc" id="classllfio__v2__xxx_1_1path__view__component_html_aa83c384b9a61f57c318b61e8feb30d63"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#aa83c384b9a61f57c318b61e8feb30d63">llfio_v2_xxx::path_view_component::LLFIO_TEMPLATE</a></div><div class="ttdeci">LLFIO_TEMPLATE(class Char) LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable&lt; Char &gt;)) const expr path_view_component(const std</div><div class="ttdef"><b>Definition:</b> path_view.hpp:271</div></div>
+<div class="ttc" id="classllfio__v2__xxx_1_1path__view__component_html_ac12652236847087552e7a8cc01ef5a71"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#ac12652236847087552e7a8cc01ef5a71">llfio_v2_xxx::path_view_component::zero_termination</a></div><div class="ttdeci">constexpr enum zero_termination zero_termination() const noexcept</div><div class="ttdoc">The zero termination during construction. </div><div class="ttdef"><b>Definition:</b> path_view.hpp:571</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a347bdf25436d0e99f1af1bcc11b4cda4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a347bdf25436d0e99f1af1bcc11b4cda4">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">llfio_v2_xxx::path_view::LLFIO_TEMPLATE </td>
+          <td>(</td>
+          <td class="paramtype">class Char&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
 <span class="mlabels"><span class="mlabel">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Instantiate from a <code>path_view</code> to get a path suitable for feeding to other code. See <code>path_view_component::c_str</code>. </p>
-<p>Number of characters, excluding zero terminating char, at buffer</p>
-<p>See constructor for <code>path_view_component::c_str</code>.</p>
-<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l01521"></a><span class="lineno"> 1521</span>&#160;               : <span class="keyword">public</span> path_view_component::c_str&lt;T, Deleter, _internal_buffer_size&gt;</div><div class="line"><a name="l01522"></a><span class="lineno"> 1522</span>&#160;  {<span class="comment"></span></div><div class="line"><a name="l01523"></a><span class="lineno"> 1523</span>&#160;<span class="comment">    //! Number of characters, excluding zero terminating char, at buffer</span></div><div class="line"><a name="l01524"></a><span class="lineno"> 1524</span>&#160;<span class="comment"></span>    <span class="keyword">using</span> _base = path_view_component::c_str&lt;T, Deleter, _internal_buffer_size&gt;;</div><div class="line"><a name="l01525"></a><span class="lineno"> 1525</span>&#160;    c_str() = <span class="keywordflow">default</span>;</div><div class="line"><a name="l01526"></a><span class="lineno"> 1526</span>&#160;    c_str(<span class="keyword">const</span> c_str &amp;) = <span class="keyword">delete</span>;</div><div class="line"><a name="l01527"></a><span class="lineno"> 1527</span>&#160;    c_str(c_str &amp;&amp;) = <span class="keywordflow">default</span>;</div><div class="line"><a name="l01528"></a><span class="lineno"> 1528</span>&#160;    c_str &amp;<a class="code" href="classllfio__v2__xxx_1_1path__view.html#ad9c86fad629570418502318585ec9f2a">operator=</a>(<span class="keyword">const</span> c_str &amp;) = <span class="keyword">delete</span>;</div><div class="line"><a name="l01529"></a><span class="lineno"> 1529</span>&#160;    c_str &amp;<a class="code" href="classllfio__v2__xxx_1_1path__view.html#ad9c86fad629570418502318585ec9f2a">operator=</a>(c_str &amp;&amp;) = <span class="keywordflow">default</span>;</div><div class="line"><a name="l01530"></a><span class="lineno"> 1530</span>&#160;    ~c_str() = <span class="keywordflow">default</span>;</div><div class="line"><a name="l01531"></a><span class="lineno"> 1531</span>&#160;<span class="comment"></span></div><div class="line"><a name="l01532"></a><span class="lineno"> 1532</span>&#160;<span class="comment">    /*! See constructor for `path_view_component::c_str`.</span></div><div class="line"><a name="l01533"></a><span class="lineno"> 1533</span>&#160;<span class="comment">     */</span></div><div class="line"><a name="l01534"></a><span class="lineno"> 1534</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">class</span> U&gt;</div><div class="line"><a name="l01535"></a><span class="lineno"> 1535</span>&#160;    c_str(<a class="code" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a> view, <span class="keywordtype">bool</span> no_zero_terminate, U &amp;&amp;allocate)</div><div class="line"><a name="l01536"></a><span class="lineno"> 1536</span>&#160;        : _base(view._state, no_zero_terminate, static_cast&lt;U &amp;&amp;&gt;(allocate))</div><div class="line"><a name="l01537"></a><span class="lineno"> 1537</span>&#160;    {</div><div class="line"><a name="l01538"></a><span class="lineno"> 1538</span>&#160;    }<span class="comment"></span></div><div class="line"><a name="l01539"></a><span class="lineno"> 1539</span>&#160;<span class="comment">    //! \overload</span></div><div class="line"><a name="l01540"></a><span class="lineno"> 1540</span>&#160;<span class="comment"></span>    c_str(<a class="code" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a> view, <span class="keywordtype">bool</span> no_zero_terminate = <span class="keyword">false</span>)</div><div class="line"><a name="l01541"></a><span class="lineno"> 1541</span>&#160;        : _base(view._state, no_zero_terminate)</div><div class="line"><a name="l01542"></a><span class="lineno"> 1542</span>&#160;    {</div><div class="line"><a name="l01543"></a><span class="lineno"> 1543</span>&#160;    }</div><div class="line"><a name="l01544"></a><span class="lineno"> 1544</span>&#160;  };</div><div class="ttc" id="classllfio__v2__xxx_1_1path__view_html_a91540ade852194b9507184cdcaed3339"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">llfio_v2_xxx::path_view::path_view</a></div><div class="ttdeci">constexpr path_view()</div><div class="ttdoc">Constructs an empty path view. </div><div class="ttdef"><b>Definition:</b> path_view.hpp:1120</div></div>
-<div class="ttc" id="classllfio__v2__xxx_1_1path__view_html_ad9c86fad629570418502318585ec9f2a"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#ad9c86fad629570418502318585ec9f2a">llfio_v2_xxx::path_view::operator=</a></div><div class="ttdeci">path_view &amp; operator=(const path_view &amp;p)=default</div><div class="ttdoc">Default copy assignment. </div></div>
+<p>Constructs from a basic string if the character type is one of <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. </p>
+<div class="fragment"><div class="line"><a name="l01387"></a><span class="lineno"> 1387</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(v.data(), v.size(), <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732ead0eba8da8c1d0dab5c4196d6bbcc37a6">zero_terminated</a>, fmt)</div><div class="line"><a name="l01388"></a><span class="lineno"> 1388</span>&#160;  {</div><div class="line"><a name="l01389"></a><span class="lineno"> 1389</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1path__view__component_html_a4a24bb2d232a1aa744c3ba4018f8732ead0eba8da8c1d0dab5c4196d6bbcc37a6"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732ead0eba8da8c1d0dab5c4196d6bbcc37a6">llfio_v2_xxx::path_view_component::zero_terminated</a></div><div class="ttdoc">The input is zero terminated, or requested output ought to be zero terminated. </div><div class="ttdef"><b>Definition:</b> path_view.hpp:221</div></div>
+<div class="ttc" id="classllfio__v2__xxx_1_1path__view__component_html_a9595c5841e26ca5e0fc18e6d735b1142"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">llfio_v2_xxx::path_view_component::path_view_component</a></div><div class="ttdeci">constexpr path_view_component() noexcept</div><div class="ttdoc">Constructs an empty path view component (DEVIATES from P1030, is not trivial due to C++ 14 compatibil...</div><div class="ttdef"><b>Definition:</b> path_view.hpp:251</div></div>
 </div><!-- fragment -->
 </div>
 </div>
+<a id="a290c98c372e746211245aa5a1e6aef11"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a290c98c372e746211245aa5a1e6aef11">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">llfio_v2_xxx::path_view::LLFIO_TEMPLATE </td>
+          <td>(</td>
+          <td class="paramtype">class Char&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Implicitly constructs a path view from a zero terminated pointer to a character array, which must be one of <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. The input string MUST continue to exist for this view to be valid. </p>
+
+</div>
+</div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="ab44ed2bb7b699babc60d4d91b4fc5724"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab44ed2bb7b699babc60d4d91b4fc5724">&#9670;&nbsp;</a></span>is_source_acceptable</h2>
+<a id="ab3959313447e495b2cbe86aee7fc635b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3959313447e495b2cbe86aee7fc635b">&#9670;&nbsp;</a></span>const</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::locale&amp; loc llfio_v2_xxx::path_view_component::const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">{</div><div class="line">    <span class="keywordflow">return</span> _invoke([&amp;](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<span class="keyword">self</span>) {</div><div class="line">      <span class="keywordflow">return</span> p._invoke(</div><div class="line">      [&amp;](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;other) { <span class="keywordflow">return</span> _compare&lt;T, Deleter, _internal_buffer_size&gt;(<span class="keyword">self</span>, <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#ac12652236847087552e7a8cc01ef5a71">zero_termination</a>(), other, p.zero_termination(), &amp;loc); });</div><div class="line">    })</div></div><!-- fragment -->
+</div>
+</div>
+<a id="abc5abda4e162d9a530fb73fa47a2f20a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc5abda4e162d9a530fb73fa47a2f20a">&#9670;&nbsp;</a></span>fmt</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48d">format</a> llfio_v2_xxx::path_view::fmt</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48daf492c0880bf0f47ff3ba9bdad908f039">auto_format</a>) noexcept</div><div class="line">      : <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(s, detail::constexpr_strlen(s), <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732ead0eba8da8c1d0dab5c4196d6bbcc37a6">zero_terminated</a>, fmt)</div><div class="line">  {</div><div class="line">  }</div><div class="line"></div><div class="line">  </div><div class="line">  <a class="code" href="classllfio__v2__xxx_1_1path__view.html#a347bdf25436d0e99f1af1bcc11b4cda4">LLFIO_TEMPLATE</a>(<span class="keyword">class</span> Char)</div><div class="line">  LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable&lt;Char&gt;))</div><div class="line">  constexpr <a class="code" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(basic_string_view&lt;Char&gt; v, <span class="keyword">enum</span> <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#ac12652236847087552e7a8cc01ef5a71">zero_termination</a> zt, <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48d">format</a> fmt = <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48daf492c0880bf0f47ff3ba9bdad908f039">auto_format</a>) noexcept</div><div class="line">      : <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(v.data(), v.size(), zt, fmt)</div><div class="line">  {</div><div class="line">  }</div><div class="line"></div><div class="line">  </div><div class="line">  <a class="code" href="classllfio__v2__xxx_1_1path__view.html#a347bdf25436d0e99f1af1bcc11b4cda4">LLFIO_TEMPLATE</a>(<span class="keyword">class</span> It, <span class="keyword">class</span> End)</div><div class="line">  LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable&lt;typename It::value_type&gt;), LLFIO_TPRED(is_source_chartype_acceptable&lt;typename End::value_type&gt;))</div><div class="line">  constexpr <a class="code" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(It b, End e, <span class="keyword">enum</span> <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#ac12652236847087552e7a8cc01ef5a71">zero_termination</a> zt, <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48d">format</a> fmt = <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48daf492c0880bf0f47ff3ba9bdad908f039">auto_format</a>) noexcept</div><div class="line">      : <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(addressof(*b), e - b, zt, fmt)</div><div class="line">  {</div><div class="line">  }</div><div class="line">  </div><div class="line">  <a class="code" href="classllfio__v2__xxx_1_1path__view.html#a347bdf25436d0e99f1af1bcc11b4cda4">LLFIO_TEMPLATE</a>(<span class="keyword">class</span> It, <span class="keyword">class</span> End)</div><div class="line">  LLFIO_TREQUIRES(LLFIO_TPRED(<a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a3c5feb7fca596c44418f89c9e60b8165">is_source_chartype_acceptable</a>&lt;std::decay_t&lt;It&gt;&gt;), LLFIO_TPRED(<a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a3c5feb7fca596c44418f89c9e60b8165">is_source_chartype_acceptable</a>&lt;std::decay_t&lt;End&gt;&gt;))</div><div class="line">  constexpr <a class="code" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(It *b, End *e, enum <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#ac12652236847087552e7a8cc01ef5a71">zero_termination</a> zt, <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48d">format</a> fmt = <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48daf492c0880bf0f47ff3ba9bdad908f039">auto_format</a>) noexcept</div><div class="line">      : <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, e - b, zt, fmt)</div><div class="line">  {</div><div class="line">  }</div><div class="line"></div><div class="line">  </div><div class="line">  <a class="code" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(<span class="keyword">const</span> <a class="code" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a> &amp;) = <span class="keywordflow">default</span></div></div><!-- fragment -->
+</div>
+</div>
+<a id="a411e9c36a49bd37d596ab34f99b656fd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a411e9c36a49bd37d596ab34f99b656fd">&#9670;&nbsp;</a></span>is_source_acceptable</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -702,12 +912,12 @@ template&lt;class Char &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr bool llfio_v2_xxx::path_view::is_source_acceptable = path_view_component::is_source_acceptable&lt;Char&gt;</td>
+          <td class="memname">constexpr bool llfio_v2_xxx::path_view_component::is_source_acceptable = detail::is_source_acceptable&lt;Char&gt;::value</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -715,8 +925,8 @@ template&lt;class Char &gt; </div>
 
 </div>
 </div>
-<a id="a3d8c5a6551685e57ed19e1924feaa07a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3d8c5a6551685e57ed19e1924feaa07a">&#9670;&nbsp;</a></span>is_source_chartype_acceptable</h2>
+<a id="a3c5feb7fca596c44418f89c9e60b8165"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3c5feb7fca596c44418f89c9e60b8165">&#9670;&nbsp;</a></span>is_source_chartype_acceptable</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -727,12 +937,12 @@ template&lt;class Char &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr bool llfio_v2_xxx::path_view::is_source_chartype_acceptable = path_view_component::is_source_chartype_acceptable&lt;Char&gt;</td>
+          <td class="memname">constexpr bool llfio_v2_xxx::path_view_component::is_source_chartype_acceptable = detail::is_source_chartype_acceptable&lt;Char&gt;::value</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
