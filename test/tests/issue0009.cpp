@@ -31,8 +31,18 @@ static inline void TestIssue09a()
   fh.truncate(1).value();
   auto sh = llfio::section_handle::section(fh).value();
   sh.truncate(1ULL << 40ULL).value();
+#ifdef _WIN32
   auto mh = llfio::map_handle::map(sh, 1ULL << 35ULL).value();
   auto *addr1 = mh.address();
+#else
+  auto mh = llfio::map_handle::map(sh, 1ULL << 40ULL).value();
+  auto *addr1 = mh.address();
+  mh.truncate(1ULL << 35ULL).value();
+  {
+    auto *addr0 = mh.address();
+    BOOST_CHECK(addr1 == addr0);
+  }
+#endif
   mh.truncate(1ULL << 36ULL).value();
   {
     auto *addr2 = mh.address();
