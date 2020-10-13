@@ -43,8 +43,8 @@ matrix:
     compiler: clang++
     os: linux
     env: NAME=x64_EC_tests
-  - name: "libc++ x64 cmake tests (error_code)"
-    compiler: clang++-10
+  - name: "libc++ x64 C++ 20 cmake tests (error_code)"
+    compiler: clang++-11
     os: linux
     env:
      - NAME=x64_EC_tests
@@ -66,8 +66,8 @@ matrix:
     env:
      - NAME=x64_SC_tests
      - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
-  - name: "libc++ x64 cmake tests (status_code)"
-    compiler: clang++-10
+  - name: "libc++ x64 C++ 20 cmake tests (status_code)"
+    compiler: clang++-11
     os: linux
     env:
      - NAME=x64_SC_tests
@@ -101,8 +101,8 @@ matrix:
     compiler: clang++
     os: linux
     env: NAME=x64_EC_programs
-  - name: "libc++ x64 Programs (error_code)"
-    compiler: clang++-10
+  - name: "libc++ x64 C++ 20 Programs (error_code)"
+    compiler: clang++-11
     os: linux
     env:
      - NAME=x64_EC_programs
@@ -116,7 +116,7 @@ matrix:
 #    compiler:
 #     - g++
 #     - clang++
-#     - clang++-10
+#     - clang++-11
 #    env:
 #     - NAME=x64_SC_programs
 #     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
@@ -128,8 +128,8 @@ matrix:
     compiler: clang++
     os: linux
     env: NAME=x64_EC_install
-  - name: "libc++ Installability (error_code)"
-    compiler: clang++-10
+  - name: "libc++ C++ 20 Installability (error_code)"
+    compiler: clang++-11
     os: linux
     env:
      - NAME=x64_EC_install
@@ -151,8 +151,8 @@ matrix:
     env:
      - NAME=x64_SC_install
      - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
-  - name: "libc++ Installability (status_code)"
-    compiler: clang++-10
+  - name: "libc++ C++ 20 Installability (status_code)"
+    compiler: clang++-11
     os: linux
     env:
      - NAME=x64_SC_install
@@ -166,11 +166,11 @@ matrix:
 #     - CMAKE_CONFIGURE_OPTIONS=-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON
     
 before_install:
- - if [ "$TRAVIS_COMPILER" = "clang++-10" ]; then
+ - if [ "$TRAVIS_COMPILER" = "clang++-11" ]; then
      wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -;
-     echo "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-10 main" >> /etc/apt/sources.list;
+     echo "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-11 main" >> /etc/apt/sources.list;
      sudo apt update;
-     sudo apt install clang-10 libc++-10-dev libc++abi-10-dev libomp-10-dev;
+     sudo apt install clang-11 libc++-11-dev libc++abi-11-dev libomp-11-dev;
    fi
  - mount
 

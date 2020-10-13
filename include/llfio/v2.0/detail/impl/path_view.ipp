@@ -59,6 +59,7 @@ namespace detail
 #endif
   template <class InT, class OutT> static _codecvt<InT, OutT> &_get_codecvt() noexcept
   {
+    static_assert(std::is_same<OutT, char>::value, "Standard C++ only supports OutT = char!");
     static _codecvt<InT, OutT> ret;
     return ret;
   }
@@ -460,6 +461,15 @@ namespace detail
     (void) src_buffer_length;
     (void) loc;
     LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str reencoding function does not support char8_t to wchar_t conversion on libc++.");
+    abort();
+#elif defined(__GLIBCXX__)
+    (void) toallocate;
+    (void) dest_buffer;
+    (void) dest_buffer_length;
+    (void) src_buffer;
+    (void) src_buffer_length;
+    (void) loc;
+    LLFIO_LOG_FATAL(nullptr, "path_view_component::c_str reencoding function does not support char8_t to wchar_t conversion on libstdc++.");
     abort();
 #else
     return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, src_buffer, src_buffer_length, loc);
