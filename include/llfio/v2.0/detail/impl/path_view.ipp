@@ -59,7 +59,12 @@ namespace detail
 #endif
   template <class InT, class OutT> static _codecvt<InT, OutT> &_get_codecvt() noexcept
   {
-    static_assert(std::is_same<OutT, char>::value, "Standard C++ only supports OutT = char!");
+#ifdef _MSC_VER
+    static_assert(std::is_same<OutT, char>::value || std::is_same<OutT, char8_t>::value || std::is_same<OutT, wchar_t>::value,
+                  "MSVC only supports OutT = char|char8_t|wchar_t!");
+#else
+    static_assert(std::is_same<OutT, char>::value || std::is_same<OutT, char8_t>::value, "Standard C++ only supports OutT = char|char8_t!");
+#endif
     static _codecvt<InT, OutT> ret;
     return ret;
   }
