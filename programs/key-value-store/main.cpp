@@ -37,8 +37,8 @@ namespace stackoverflow
   optional<std::string> read_first_line(filesystem::path path)
   {
     using namespace LLFIO_V2_NAMESPACE;
-    using LLFIO_V2_NAMESPACE::file_handle;
     using LLFIO_V2_NAMESPACE::byte;
+    using LLFIO_V2_NAMESPACE::file_handle;
     // The result<T> is from WG21 P0762, it looks quite like an `expected<T, std::error_code>` object
     // See Outcome v2 at https://ned14.github.io/outcome/ and https://lists.boost.org/boost-announce/2017/06/0510.php
 
@@ -87,7 +87,7 @@ namespace stackoverflow
     // Return a string copying the first line from the file, or all 4096 bytes read if no newline found.
     return std::string(line);
   }
-}
+}  // namespace stackoverflow
 
 void benchmark(key_value_store::basic_key_value_store &store, const char *desc)
 {
@@ -164,7 +164,8 @@ int main()
         auto kvi = store.find(78);
         if(kvi)
         {
-          std::cout << "Key 78 has value " << kvi.value << " and it was last updated at " << kvi.transaction_counter << std::endl;
+          std::cout << "Key 78 has value " << LLFIO_V2_NAMESPACE::string_view(kvi.value.data(), kvi.value.size()) << " and it was last updated at "
+                    << kvi.transaction_counter << std::endl;
         }
         else
         {
@@ -179,7 +180,8 @@ int main()
         auto kvi = store.find(79);
         if(kvi)
         {
-          std::cout << "Key 79 has value " << kvi.value << " and it was last updated at " << kvi.transaction_counter << std::endl;
+          std::cout << "Key 79 has value " << LLFIO_V2_NAMESPACE::string_view(kvi.value.data(), kvi.value.size()) << " and it was last updated at "
+                    << kvi.transaction_counter << std::endl;
         }
         else
         {
@@ -194,7 +196,8 @@ int main()
         auto kvi = store.find(78, 0);
         if(kvi)
         {
-          std::cerr << "FAILURE: Revision 0 of Key 78 has value " << kvi.value << " and it was last updated at " << kvi.transaction_counter << std::endl;
+          std::cerr << "FAILURE: Revision 0 of Key 78 has value " << LLFIO_V2_NAMESPACE::string_view(kvi.value.data(), kvi.value.size())
+                    << " and it was last updated at " << kvi.transaction_counter << std::endl;
         }
         else
         {
@@ -203,7 +206,8 @@ int main()
         kvi = store.find(78, 1);
         if(kvi)
         {
-          std::cout << "Revision 1 of Key 78 has value " << kvi.value << " and it was last updated at " << kvi.transaction_counter << std::endl;
+          std::cout << "Revision 1 of Key 78 has value " << LLFIO_V2_NAMESPACE::string_view(kvi.value.data(), kvi.value.size())
+                    << " and it was last updated at " << kvi.transaction_counter << std::endl;
         }
         else
         {
@@ -217,7 +221,8 @@ int main()
       auto kvi = store.find(79);
       if(kvi)
       {
-        std::cout << "Key 79 has value " << kvi.value << " and it was last updated at " << kvi.transaction_counter << std::endl;
+        std::cout << "Key 79 has value " << LLFIO_V2_NAMESPACE::string_view(kvi.value.data(), kvi.value.size()) << " and it was last updated at "
+                  << kvi.transaction_counter << std::endl;
       }
       else
       {
@@ -263,7 +268,8 @@ int main()
       LLFIO_V2_NAMESPACE::filesystem::remove_all("teststore", ec);
     }
     {
-      key_value_store::basic_key_value_store store("teststore", 2000000, true, LLFIO_V2_NAMESPACE::file_handle::mode::write, LLFIO_V2_NAMESPACE::file_handle::caching::reads);
+      key_value_store::basic_key_value_store store("teststore", 2000000, true, LLFIO_V2_NAMESPACE::file_handle::mode::write,
+                                                   LLFIO_V2_NAMESPACE::file_handle::caching::reads);
       store.use_mmaps();
       benchmark(store, "integrity, durability, mmaps");
     }
