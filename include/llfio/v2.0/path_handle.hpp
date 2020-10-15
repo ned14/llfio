@@ -113,7 +113,7 @@ public:
   a subsequent file handle open may fail.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  result<bool> exists(path_view_type path) const noexcept;
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<bool> exists(path_view_type path) const noexcept;
   //! \overload
   LLFIO_MAKE_FREE_FUNCTION
   static inline result<bool> exists(const path_handle &base, path_view_type path) noexcept { return base.exists(path); }
