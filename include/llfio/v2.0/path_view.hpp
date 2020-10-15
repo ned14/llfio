@@ -258,6 +258,20 @@ public:
       , _reserved1(0)
   {
   }  // NOLINT
+  //! Constructs a path view component identical to the input, except with different format interpretation.
+  constexpr path_view_component(path_view_component p, format fmt) noexcept
+      : _charstr(p._charstr)
+      , _length(p._length)
+      , _zero_terminated(p._zero_terminated)
+      , _passthrough(p._passthrough)
+      , _char(p._char)
+      , _wchar(p._wchar)
+      , _utf8(p._utf8)
+      , _utf16(p._utf16)
+      , _reserved1(p._reserved1)
+      , _format(fmt)
+  {
+  }
   /*! Implicitly constructs a path view from a path. The input path MUST continue to exist for this view to be valid
   (DEVIATES from P1030 due to filesystem::path not exposing its path formatting).
   */
