@@ -862,7 +862,7 @@ public:
           }
           else
           {
-            _call_deleter = true;
+            _bytes_to_delete = required_bytes;
             memcpy(buffer_, source, required_bytes);
             buffer_[required_length] = 0;
             buffer = buffer_;
@@ -888,14 +888,8 @@ public:
 #pragma warning(disable : 4127)  // conditional expression is constant
 #endif
   private:
-    struct _internal_construct_tag
-    {
-    };
-    LLFIO_TEMPLATE(class U, class V)
-    LLFIO_TREQUIRES(LLFIO_TEXPR(std::declval<U>()((size_t) 1)), LLFIO_TEXPR(std::declval<V>()((value_type *) nullptr)))
-    c_str(_internal_construct_tag /*unused*/, path_view_component view, enum zero_termination output_zero_termination, const std::locale *loc, U &&allocate,
-          V &&deleter)
-        : _deleter(static_cast<V &&>(deleter))
+    template<class U>
+    void _init(path_view_component view, enum zero_termination output_zero_termination, const std::locale *loc, U&&allocate)
     {
       if(0 == view._length)
       {
@@ -988,7 +982,7 @@ public:
         length = 0;
         return;
       }
-      _call_deleter = true;
+      _bytes_to_delete = required_length * sizeof(value_type);
       memcpy(allocated_buffer, _buffer, end - _buffer);
       required_length -= (end - _buffer);
       end = allocated_buffer + (end - _buffer);
@@ -1020,6 +1014,25 @@ public:
       buffer = allocated_buffer;
       length = end - buffer;
     }
+    struct _internal_construct_tag
+    {
+    };
+    LLFIO_TEMPLATE(class U, class V)
+    LLFIO_TREQUIRES(LLFIO_TEXPR(std::declval<U>()((size_t) 1)), LLFIO_TEXPR(std::declval<V>()((value_type *) nullptr)))
+    c_str(_internal_construct_tag /*unused*/, path_view_component view, enum zero_termination output_zero_termination, const std::locale *loc, U &&allocate,
+          V &&deleter)
+        : _deleter(static_cast<V &&>(deleter))
+    {
+      _init(view, output_zero_termination, loc, static_cast<U &&>(allocate));
+    }
+    template <class V>
+    c_str(_internal_construct_tag /*unused*/, path_view_component view, enum zero_termination output_zero_termination, const std::locale *loc,
+          pmr::memory_resource &mr, V &&deleter)
+        : _mr(&mr)
+        , _deleter(static_cast<V &&>(deleter))
+    {
+      _init(view, output_zero_termination, loc, [&](size_t n) { return static_cast<value_type *>(_mr->allocate(n * sizeof(value_type))); });
+    }
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
@@ -1035,9 +1048,9 @@ public:
     \param view The path component view to use as source.
     \param output_zero_termination The zero termination in the output desired
     \param loc The locale to use to perform reencoding.
-    \param allocate A callable with prototype `value_type *(size_t length)` which
-    is defaulted to `return static_cast<value_type *>(::operator new[](length * sizeof(value_type)));`.
-    You can return `nullptr` if you wish, the consumer of `c_str` will
+    \param allocate Either a callable with prototype `value_type *(size_t length)` which
+    is defaulted to `return static_cast<value_type *>(::operator new[](length * sizeof(value_type)));`,
+    or a `pmr::memory_resource *`. You can return `nullptr` if you wish, the consumer of `c_str` will
     see a `buffer` set to `nullptr`.
 
     If `loc` is defaulted, and an error occurs during any conversion from UTF-8 or UTF-16, an exception of
@@ -1074,16 +1087,24 @@ public:
     }
     ~c_str()
     {
-      if(_call_deleter)
+      if(_bytes_to_delete > 0)
       {
-        _deleter(const_cast<value_type *>(buffer));
+        if(_mr == nullptr)
+        {
+          _deleter(const_cast<value_type *>(buffer));
+        }
+        else
+        {
+          _mr->deallocate(const_cast<value_type *>(buffer), _bytes_to_delete);
+        }
       }
     }
     c_str(const c_str &) = delete;
     c_str(c_str &&o) noexcept
         : buffer(o.buffer)
         , length(o.length)
-        , _call_deleter(o._call_deleter)
+        , _bytes_to_delete(o._bytes_to_delete)
+        , _mr(o._mr)
         , _deleter(std::move(o._deleter))
     {
       if(o.buffer == o._buffer)
@@ -1091,7 +1112,8 @@ public:
         memcpy(_buffer, o._buffer, (o.length + 1) * sizeof(value_type));
         buffer = _buffer;
       }
-      o._call_deleter = false;
+      o._bytes_to_delete = 0;
+      o._mr = nullptr;
     }
     c_str &operator=(const c_str &) = delete;
     c_str &operator=(c_str &&o) noexcept
@@ -1106,7 +1128,8 @@ public:
     }
 
   private:
-    bool _call_deleter{false};
+    size_t _bytes_to_delete{0};
+    pmr::memory_resource *_mr{nullptr};
     Deleter _deleter;
     // MAKE SURE this is the final item in storage, the compiler will elide the storage
     // under optimisation if it can prove it is never used.
