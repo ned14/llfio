@@ -162,7 +162,12 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
           }
           scores[n].second = n;
         }
-        std::sort(scores.begin(), scores.end());
+        std::sort(scores.begin(), scores.end(), [](const auto& a, const auto& b) noexcept {
+          if (a.first == b.first) {
+            return a.second > b.second;
+          }
+          return a.first < b.first;
+        });
         auto temp(std::move(mountentries[scores.front().second]));
         mountentries.clear();
         mountentries.push_back(std::move(temp));
