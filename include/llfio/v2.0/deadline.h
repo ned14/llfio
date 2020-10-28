@@ -151,7 +151,7 @@ struct LLFIO_DEADLINE_NAME
                   timeout_type(0);                                                                                                                             \
       }                                                                                                                                                        \
       else                                                                                                                                                     \
-        timeout = std::chrono::duration_cast<timeout_type>(d.as_timepoint() - std::chrono::system_clock::now());                                               \
+        timeout = std::chrono::duration_cast<timeout_type>(d.to_time_point() - std::chrono::system_clock::now());                                               \
       if(timeout.count() < 0)                                                                                                                                  \
         timeout = timeout_type(0);                                                                                                                             \
     }                                                                                                                                                          \
