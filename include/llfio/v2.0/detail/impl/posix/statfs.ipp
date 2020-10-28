@@ -31,6 +31,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include <sys/statfs.h>
 #endif
 
+#include <iostream>
+
 LLFIO_V2_NAMESPACE_BEGIN
 
 LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, statfs_t::want wanted) noexcept
@@ -146,24 +148,38 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
       {
         return errc::no_such_file_or_directory;
       }
-      // Choose the mount entry with the most closely matching statfs. You can't choose
-      // exclusively based on mount point because of bind mounts
+      /* Choose the mount entry with the most closely matching statfs. You can't choose
+      exclusively based on mount point because of bind mounts. Note that we have a
+      particular problem in Docker:
+
+      rootfs    /          rootfs  rw                       0 0
+      overlay   /          overlay rw,relatime,lowerdir=... 0 0
+      /dev/sda3 /etc       xfs     rw,relatime,...          0 0
+      tmpfs     /dev       tmpfs   rw,nosuid,...            0 0
+      tmpfs     /proc/acpi tmpfs   rw,nosuid,...            0 0
+      ...
+
+      If f_type and f_fsid are identical for the statfs for the mount as for our file,
+      then you will get multiple mountentries, and there is no obvious way of
+      disambiguating them. What we do is match mount based on the longest match
+      of the mount point with the current path of our file.
+      */
       if(mountentries.size() > 1)
       {
+        OUTCOME_TRY(auto currentfilepath_, h.current_path());
+        string_view currentfilepath(currentfilepath_.native());
         std::vector<std::pair<size_t, size_t>> scores(mountentries.size());
+        //std::cout << "*** For matching mount entries to file with path " << currentfilepath << ":\n";
         for(size_t n = 0; n < mountentries.size(); n++)
         {
-          const auto *a = reinterpret_cast<const char *>(&mountentries[n].second);
-          const auto *b = reinterpret_cast<const char *>(&s);
-          scores[n].first = 0;
-          for(size_t x = 0; x < sizeof(struct statfs64); x++)
-          {
-            scores[n].first += abs(a[x] - b[x]);
-          }
+          scores[n].first =
+          (currentfilepath.substr(0, mountentries[n].first.mnt_dir.size()) == mountentries[n].first.mnt_dir) ? mountentries[n].first.mnt_dir.size() : 0;
+          //std::cout << "***    Mount entry " << mountentries[n].first.mnt_dir << " get score " << scores[n].first << std::endl;
           scores[n].second = n;
         }
         std::sort(scores.begin(), scores.end());
-        auto temp(std::move(mountentries[scores.front().second]));
+        // Choose the item whose mnt_dir most matched the current path for our file.
+        auto temp(std::move(mountentries[scores.back().second]));
         mountentries.clear();
         mountentries.push_back(std::move(temp));
       }
@@ -173,11 +189,14 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
         f_flags.rdonly = static_cast<uint32_t>((s.f_flags & MS_RDONLY) != 0);
         f_flags.noexec = static_cast<uint32_t>((s.f_flags & MS_NOEXEC) != 0);
         f_flags.nosuid = static_cast<uint32_t>((s.f_flags & MS_NOSUID) != 0);
-        f_flags.acls = static_cast<uint32_t>(std::string::npos != mountentries.front().first.mnt_opts.find("acl") && std::string::npos == mountentries.front().first.mnt_opts.find("noacl"));
-        f_flags.xattr = static_cast<uint32_t>(std::string::npos != mountentries.front().first.mnt_opts.find("xattr") && std::string::npos == mountentries.front().first.mnt_opts.find("nouser_xattr"));
+        f_flags.acls = static_cast<uint32_t>(std::string::npos != mountentries.front().first.mnt_opts.find("acl") &&
+                                             std::string::npos == mountentries.front().first.mnt_opts.find("noacl"));
+        f_flags.xattr = static_cast<uint32_t>(std::string::npos != mountentries.front().first.mnt_opts.find("xattr") &&
+                                              std::string::npos == mountentries.front().first.mnt_opts.find("nouser_xattr"));
         //                out.f_flags.compression=0;
         // Those filing systems supporting FALLOC_FL_PUNCH_HOLE
-        f_flags.extents = static_cast<uint32_t>(mountentries.front().first.mnt_type == "btrfs" || mountentries.front().first.mnt_type == "ext4" || mountentries.front().first.mnt_type == "xfs" || mountentries.front().first.mnt_type == "tmpfs");
+        f_flags.extents = static_cast<uint32_t>(mountentries.front().first.mnt_type == "btrfs" || mountentries.front().first.mnt_type == "ext4" ||
+                                                mountentries.front().first.mnt_type == "xfs" || mountentries.front().first.mnt_type == "tmpfs");
         ++ret;
       }
       if(!!(wanted & want::fstypename))
