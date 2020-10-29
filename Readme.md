@@ -1,12 +1,6 @@
 This is the post-peer-review LLFIO v2 rewrite. You can view its documentation at https://ned14.github.io/llfio/
 
-<b>master branch test status</b> Linux & OS X: [![Build Status](https://travis-ci.org/ned14/llfio.svg?branch=master)](https://travis-ci.org/ned14/llfio) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/dfctqfap3kpx89om/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/llfio/branch/master) <b>CMake dashboard</b>: http://my.cdash.org/index.php?project=Boost.AFIO
-
-Tarballs of source and prebuilt binaries for Linux x64, MacOS x64 and Windows x64:
-- https://dedi5.nedprod.com/static/files/llfio-v2-source-latest.tar.xz
-- https://dedi5.nedprod.com/static/files/llfio-v2-binaries-linux64-latest.tgz (Ubuntu 18.04 LTS x64)
-- https://dedi5.nedprod.com/static/files/llfio-v2-binaries-darwin64-latest.tgz (Mac OS 10.15)
-- https://dedi5.nedprod.com/static/files/llfio-v2-binaries-win64-latest.zip (VS2017 x64)
+<b>master branch test status</b> Linux & OS X: [![Build Status](https://travis-ci.org/ned14/llfio.svg?branch=master)](https://travis-ci.org/ned14/llfio) Windows: [![Build status](https://ci.appveyor.com/api/projects/status/dfctqfap3kpx89om/branch/master?svg=true)](https://ci.appveyor.com/project/ned14/llfio/branch/master) <b>CMake dashboard</b>: https://my.cdash.org/index.php?project=Boost.AFIO
 
 USAGE AND CONFIGURATION INSTRUCTIONS CAN BE FOUND AT https://ned14.github.io/llfio/
 

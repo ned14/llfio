@@ -237,12 +237,12 @@ after_success:
   - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$TRAVIS_COMPILER" = "g++" ] && [ "$NAME" = "x64_EC_tests" ]; then   
       NEWNAME=llfio-v2-binaries-linux64-$TRAVIS_COMMIT.tgz;
       mv llfio-v2.0-binaries-linux-x64.tgz $NEWNAME;
-      curl -T $NEWNAME -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD https://dedi5.nedprod.com/static/files/upload/;
+      curl -T $NEWNAME -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD https://dedi6.nedprod.com/static/files/upload/;
     fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ] && [ "$NAME" = "x64_EC_tests" ]; then   
       NEWNAME=llfio-v2-binaries-darwin64-$TRAVIS_COMMIT.tgz;
       mv llfio-v2.0-binaries-darwin-x64.tgz $NEWNAME;
-      curl -T $NEWNAME -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD https://dedi5.nedprod.com/static/files/upload/;
+      curl -T $NEWNAME -u jenkins-nedprod:$JENKINS_NEDPROD_PASSWORD https://dedi6.nedprod.com/static/files/upload/;
     fi
 
 after_failure:

@@ -1,13 +1,9 @@
 <center><table border="0" cellpadding="4">
 <tr>
 <td align="center"> <a href="https://github.com/ned14/llfio">LLFIO</a><br><a href="https://github.com/ned14/llfio">on GitHub</a> </td>
-<td align="center"> <a href="http://my.cdash.org/index.php?project=Boost.AFIO">CTest summary</a><br><a href="http://my.cdash.org/index.php?project=Boost.AFIO">dashboard</a> </td>
+<td align="center"> <a href="https://my.cdash.org/index.php?project=Boost.AFIO">CTest summary</a><br><a href="https://my.cdash.org/index.php?project=Boost.AFIO">dashboard</a> </td>
 <td align="center"> <a href="https://travis-ci.org/ned14/llfio">Linux and MacOS CI:</a><img src="https://travis-ci.org/ned14/llfio.svg?branch=master"/> </td>
 <td align="center"> <a href="https://ci.appveyor.com/project/ned14/llfio/branch/master">Windows CI:</a><img src="https://ci.appveyor.com/api/projects/status/dfctqfap3kpx89om/branch/master?svg=true"/> </td>
-<td align="center"> <a href="https://dedi5.nedprod.com/static/files/llfio-v2-source-latest.tar.xz">Latest stable</a><br><a href="https://dedi5.nedprod.com/static/files/llfio-v2-source-latest.tar.xz">sources</a> </td>
-<td align="center"> <a href="https://dedi5.nedprod.com/static/files/llfio-v2-binaries-linux64-latest.tgz">Latest stable</a><br><a href="https://dedi5.nedprod.com/static/files/llfio-v2-binaries-linux64-latest.tgz">Ubuntu 18.04 x64 prebuilt</a> </td>
-<td align="center"> <a href="https://dedi5.nedprod.com/static/files/llfio-v2-binaries-darwin-latest.tgz">Latest stable</a><br><a href="https://dedi5.nedprod.com/static/files/llfio-v2-binaries-darwin64-latest.tgz">OS X x64 prebuilt</a> </td>
-<td align="center"> <a href="https://dedi5.nedprod.com/static/files/llfio-v2-binaries-win64-latest.zip">Latest stable</a><br/><a href="https://dedi5.nedprod.com/static/files/llfio-v2-binaries-win64-latest.zip">VS2017 x64 prebuilt</a> </td>
 </tr>
 </table></center>
 
