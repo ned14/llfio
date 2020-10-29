@@ -31,8 +31,6 @@ Distributed under the Boost Software License, Version 1.0.
 #include <sys/statfs.h>
 #endif
 
-#include <iostream>
-
 LLFIO_V2_NAMESPACE_BEGIN
 
 LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, statfs_t::want wanted) noexcept
