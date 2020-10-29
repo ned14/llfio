@@ -49,7 +49,7 @@ clang defines __cpp_char8_t if there is a char8_t.
 MSVC seems to only implement char8_t if C++ 20 is enabled.
 */
 #ifndef LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED
-#if(defined(_MSC_VER) && !defined(__clang__) && !_HAS_CXX20) || (defined(__GNUC__) && !defined(__clang__) && !defined(__CHAR8_TYPE__)) ||                      \
+#if(defined(_MSC_VER) && !defined(__clang__) && (!_HAS_CXX20 || _MSC_VER < 1921)) || (defined(__GNUC__) && !defined(__clang__) && !defined(__CHAR8_TYPE__)) ||  \
 (defined(__clang__) && !defined(__cpp_char8_t))
 #define LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED 1
 #else
@@ -888,8 +888,7 @@ public:
 #pragma warning(disable : 4127)  // conditional expression is constant
 #endif
   private:
-    template<class U>
-    void _init(path_view_component view, enum zero_termination output_zero_termination, const std::locale *loc, U&&allocate)
+    template <class U> void _init(path_view_component view, enum zero_termination output_zero_termination, const std::locale *loc, U &&allocate)
     {
       if(0 == view._length)
       {
@@ -1620,7 +1619,7 @@ public:
     {
       return path_view();
     }
-    return this->_invoke([&](auto v) { return path_view(v.data(), sep_idx, not_zero_terminated); });
+    return this->_invoke([sep_idx](auto v) { return path_view(v.data(), sep_idx, not_zero_terminated); });
   }
   //! Returns a view of the root name part of this view e.g. C:
   LLFIO_PATH_VIEW_CONSTEXPR path_view root_name() const noexcept
@@ -1630,7 +1629,7 @@ public:
     {
       return path_view();
     }
-    return this->_invoke([&](const auto &v) { return path_view(v.data(), sep_idx, not_zero_terminated); });
+    return this->_invoke([sep_idx](const auto &v) { return path_view(v.data(), sep_idx, not_zero_terminated); });
   }
   //! Returns a view of the root directory, if there is one e.g. /
   LLFIO_PATH_VIEW_CONSTEXPR path_view root_directory() const noexcept
@@ -1640,7 +1639,7 @@ public:
     {
       return path_view();
     }
-    return this->_invoke([&](const auto &v) {
+    return this->_invoke([sep_idx](const auto &v) {
 #ifdef _WIN32
       auto colon_idx = v.find(':');
       if(colon_idx < sep_idx)
@@ -1664,7 +1663,7 @@ public:
       return path_view();
     }
 #ifdef _WIN32
-    return this->_invoke([&](const auto &v) mutable {
+    return this->_invoke([this, sep_idx](const auto &v) mutable {
       // Special case \\.\ and \\?\ to match filesystem::path
       if(is_ntpath() || (v.size() >= 4 && sep_idx == 0 && v[1] == '\\' && (v[2] == '.' || v[2] == '?') && v[3] == '\\'))
       {
@@ -1705,7 +1704,7 @@ public:
       return *this;
     }
 #ifdef _WIN32
-    return this->_invoke([&](const auto &v) mutable {
+    return this->_invoke([this, sep_idx](const auto &v) mutable {
       // Special case \\.\ and \\?\ to match filesystem::path
       if(is_ntpath() || (v.size() >= 4 && sep_idx == 0 && v[1] == '\\' && (v[2] == '.' || v[2] == '?') && v[3] == '\\'))
       {
@@ -1746,7 +1745,7 @@ public:
       return path_view();
     }
 #ifdef _WIN32
-    return this->_invoke([&](const auto &v) {
+    return this->_invoke([this, sep_idx](const auto &v) {
       // UNC paths return a trailing slash if the parent path is the server name
       if(is_uncpath())
       {
