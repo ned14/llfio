@@ -1,5 +1,5 @@
 /* Integration test kernel for whether path views work
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (2 commits)
+(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (2 commits)
 File Created: Aug 2017
 
 
@@ -212,6 +212,78 @@ static inline void TestPathView()
   // Does visitation work right?
   visit(llfio::path_view("hi"), [](auto sv) { BOOST_CHECK(0 == memcmp(sv.data(), "hi", 2)); });
   visit(*llfio::path_view(L"hi").begin(), [](auto sv) { BOOST_CHECK(0 == memcmp(sv.data(), L"hi", 4)); });
+
+  // Custom allocator and deleter
+  {
+    struct custom_allocate
+    {
+      mutable int called{0};
+      char *operator()(size_t /*unused*/) const
+      {
+        called++;
+        static char buff[4];
+        return buff;
+      }
+    } allocator;
+    struct custom_delete
+    {
+      int sig{0};
+      mutable int called{0};
+      void operator()(char * /*unused*/) const { called++; }
+    } deleter{5};
+    llfio::path_view v("foo", 3, llfio::path_view::not_zero_terminated);
+    llfio::path_view::c_str<char, custom_delete, 0> zbuff(v, llfio::path_view::zero_terminated, allocator, deleter);
+    zbuff.reset();
+    BOOST_CHECK(allocator.called == 1);  // copy must not be taken
+    BOOST_CHECK(deleter.called == 0);    // copy must be taken
+    BOOST_CHECK(zbuff.deleter().called == 1);
+    BOOST_CHECK(zbuff.deleter().sig == 5);
+  }
+  // Custom memory_resource
+  {
+    struct custom_memory_resource final : llfio::pmr::memory_resource
+    {
+      int allocated{0}, deleted{0};
+      void *do_allocate(size_t /*unused*/, size_t /*unused*/) override
+      {
+        allocated++;
+        static char buff[4];
+        return buff;
+      }
+      void do_deallocate(void * /*unused*/, size_t /*unused*/, size_t /*unused*/) override { deleted++; }
+      bool do_is_equal(const llfio::pmr::memory_resource & /*unused*/) const noexcept override { return false; }
+    } resource;
+    llfio::path_view v("foo", 3, llfio::path_view::not_zero_terminated);
+    llfio::path_view::c_str<char, std::default_delete<char[]>, 0> zbuff(v, llfio::path_view::zero_terminated, resource);
+    zbuff.reset();
+    BOOST_CHECK(resource.allocated == 1);
+    BOOST_CHECK(resource.deleted == 1);
+    BOOST_CHECK(zbuff.memory_resource() == &resource);
+  }
+  // Custom STL allocator
+  {
+    struct custom_allocator
+    {
+      int sig{0};
+      using value_type = char;
+      int allocated{0}, deleted{0};
+      value_type *allocate(size_t /*unused*/)
+      {
+        allocated++;
+        static char buff[4];
+        return buff;
+      }
+      void deallocate(void * /*unused*/, size_t /*unused*/) { deleted++; }
+    } allocator{5};
+    llfio::path_view v("foo", 3, llfio::path_view::not_zero_terminated);
+    llfio::path_view::c_str<char, custom_allocator, 0> zbuff(v, llfio::path_view::zero_terminated, allocator);
+    zbuff.reset();
+    BOOST_CHECK(allocator.allocated == 0);  // copy must be taken
+    BOOST_CHECK(allocator.deleted == 0);    // copy must be taken
+    BOOST_CHECK(zbuff.allocator().allocated == 1);
+    BOOST_CHECK(zbuff.allocator().deleted == 1);
+    BOOST_CHECK(zbuff.allocator().sig == 5);
+  }
 }
 
 KERNELTEST_TEST_KERNEL(integration, llfio, path_view, path_view, "Tests that llfio::path_view() works as expected", TestPathView())

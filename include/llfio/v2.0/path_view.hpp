@@ -49,7 +49,7 @@ clang defines __cpp_char8_t if there is a char8_t.
 MSVC seems to only implement char8_t if C++ 20 is enabled.
 */
 #ifndef LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED
-#if(defined(_MSC_VER) && !defined(__clang__) && (!_HAS_CXX20 || _MSC_VER < 1921)) || (defined(__GNUC__) && !defined(__clang__) && !defined(__CHAR8_TYPE__)) ||  \
+#if(defined(_MSC_VER) && !defined(__clang__) && (!_HAS_CXX20 || _MSC_VER < 1921)) || (defined(__GNUC__) && !defined(__clang__) && !defined(__CHAR8_TYPE__)) || \
 (defined(__clang__) && !defined(__cpp_char8_t))
 #define LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED 1
 #else
@@ -154,6 +154,19 @@ namespace detail
   LLFIO_HEADERS_ONLY_FUNC_SPEC wchar_t *reencode_path_to(size_t &toallocate, wchar_t *dest_buffer, size_t dest_buffer_length, const char16_t *src_buffer,
                                                          size_t src_buffer_length, const std::locale *loc);
   class path_view_iterator;
+
+  LLFIO_TEMPLATE(class T, class U)
+  LLFIO_TREQUIRES(LLFIO_TEXPR(std::declval<U>()((T *) nullptr))) constexpr inline U is_deleter(U &&v) { return v; }
+  template <class T> constexpr inline void is_deleter(...) {}
+  LLFIO_TEMPLATE(class U)
+  LLFIO_TREQUIRES(LLFIO_TEXPR(std::declval<U>().deallocate((typename U::value_type *) nullptr, (size_t) 0))) constexpr inline U is_allocator(U &&v)
+  {
+    return v;
+  }
+  constexpr inline void is_allocator(...) {}
+  static_assert(!std::is_void<decltype(is_deleter<int>(std::declval<std::default_delete<int>>()))>::value,
+                "std::default_delete<T> is not detected as a deleter!");
+  static_assert(!std::is_void<decltype(is_allocator(std::declval<std::allocator<int>>()))>::value, "std::allocator<T> is not detected as an allocator!");
 }  // namespace detail
 
 class path_view;
@@ -772,10 +785,9 @@ public:
     });
   }
 
-
   /*! Instantiate from a `path_view_component` to get a path suitable for feeding to other code.
   \tparam T The destination encoding required.
-  \tparam Deleter A custom deleter for any temporary buffer.
+  \tparam Deleter A custom deleter OR STL allocator for any temporary buffer.
   \tparam _internal_buffer_size Override the size of the internal temporary buffer, thus
   reducing stack space consumption (most compilers optimise away the internal temporary buffer
   if it can be proved it will never be used). The default is 1024 values of `T`.
@@ -794,7 +806,7 @@ public:
   `operator new[]`. You can use an externally supplied larger temporary buffer to avoid
   dynamic memory allocation in all situations.
   */
-  LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = default_deleter<T[]>,
+  LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class AllocatorOrDeleter = default_deleter<T[]>,
                  size_t _internal_buffer_size = default_internal_buffer_size)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>))
   struct c_str
@@ -806,8 +818,10 @@ public:
 
     //! Type of the value type
     using value_type = T;
-    //! Type of the deleter
-    using deleter_type = Deleter;
+    //! Type of the allocator, or `void` if that was not configured
+    using allocator_type = decltype(detail::is_allocator(std::declval<AllocatorOrDeleter>()));
+    //! Type of the deleter, or `void` if that was not configured
+    using deleter_type = decltype(detail::is_deleter<value_type>(std::declval<AllocatorOrDeleter>()));
     //! The size of the internal temporary buffer
     static constexpr size_t internal_buffer_size = (_internal_buffer_size == 0) ? 1 : _internal_buffer_size;
 
@@ -817,6 +831,10 @@ public:
     size_t length{0};
 
   private:
+    static constexpr bool _is_deleter_based = std::is_void<allocator_type>::value;
+    static constexpr bool _is_allocator_based = std::is_void<deleter_type>::value;
+    static_assert(_is_allocator_based + _is_deleter_based == 1, "AllocatorOrDeleter must be either a callable deleter, or a STL allocator, for value_type");
+
     template <class U, class source_type>
     void _make_passthrough(path_view_component /*unused*/, bool /*unused*/, U & /*unused*/, const source_type * /*unused*/)
     {
@@ -1013,32 +1031,32 @@ public:
       buffer = allocated_buffer;
       length = end - buffer;
     }
-    struct _internal_construct_tag
-    {
-    };
-    LLFIO_TEMPLATE(class U, class V)
-    LLFIO_TREQUIRES(LLFIO_TEXPR(std::declval<U>()((size_t) 1)), LLFIO_TEXPR(std::declval<V>()((value_type *) nullptr)))
-    c_str(_internal_construct_tag /*unused*/, path_view_component view, enum zero_termination output_zero_termination, const std::locale *loc, U &&allocate,
-          V &&deleter)
-        : _deleter(static_cast<V &&>(deleter))
-    {
-      _init(view, output_zero_termination, loc, static_cast<U &&>(allocate));
-    }
-    template <class V>
-    c_str(_internal_construct_tag /*unused*/, path_view_component view, enum zero_termination output_zero_termination, const std::locale *loc,
-          pmr::memory_resource &mr, V &&deleter)
-        : _mr(&mr)
-        , _deleter(static_cast<V &&>(deleter))
-    {
-      _init(view, output_zero_termination, loc, [&](size_t n) { return static_cast<value_type *>(_mr->allocate(n * sizeof(value_type))); });
-    }
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
+    template <bool> struct _internal_construct_tag
+    {
+    };
+    struct _custom_callable_deleter_tag
+    {
+    };
+    struct _memory_resource_tag
+    {
+    };
+    struct _stl_allocator_tag
+    {
+    };
+    c_str(_internal_construct_tag<true> /*unused*/, path_view_component view, enum zero_termination output_zero_termination, const std::locale *loc)
+    {
+      _init(view, output_zero_termination, loc, [](size_t length) { return static_cast<value_type *>(::operator new[](length * sizeof(value_type))); });
+    }
+    c_str(_internal_construct_tag<false> /*unused*/, path_view_component view, enum zero_termination output_zero_termination, const std::locale *loc)
+    {
+      _init(view, output_zero_termination, loc, [&](size_t n) { return _deleter2.allocate(n); });
+    }
+    // used by compare()
     c_str(path_view_component view, enum zero_termination output_zero_termination, const std::locale *loc)
-        : c_str(
-          _internal_construct_tag(), view, output_zero_termination, loc,
-          [](size_t length) { return static_cast<value_type *>(::operator new[](length * sizeof(value_type))); }, deleter_type())
+        : c_str(_internal_construct_tag<_is_deleter_based>(), view, output_zero_termination, loc)
     {
     }
 
@@ -1058,61 +1076,113 @@ public:
     must be **valid** UTF. If you wish to supply UTF-invalid paths (which are legal
     on most filesystems), use native narrow or wide encoded source, or binary.
     */
-    template <class U, class V>
-    c_str(path_view_component view, enum zero_termination output_zero_termination, const std::locale &loc, U &&allocate, V &&deleter = deleter_type())
-        : c_str(_internal_construct_tag(), view, output_zero_termination, &loc, static_cast<U &&>(allocate), static_cast<V &&>(deleter))
+    LLFIO_TEMPLATE(class U, class V)
+    LLFIO_TREQUIRES(LLFIO_TPRED(_is_deleter_based), LLFIO_TEXPR(std::declval<U>()((size_t) 1)), LLFIO_TEXPR(std::declval<V>()((value_type *) nullptr)))
+    c_str(path_view_component view, enum zero_termination output_zero_termination, const std::locale &loc, U &&allocate, V &&deleter = AllocatorOrDeleter(),
+          _custom_callable_deleter_tag = {})
+        : _deleter1([](void *_del, value_type *p, size_t /*unused*/) {
+          auto *del = static_cast<std::decay_t<V> *>(_del);
+          (*del)(p);
+        })
+        , _deleter1arg(&_deleter2)
+        , _deleter2(static_cast<V &&>(deleter))
     {
+      _init(view, output_zero_termination, loc, static_cast<U &&>(allocate));
     }
     //! \overload
-    template <class U, class V>
-    c_str(path_view_component view, enum zero_termination output_zero_termination, U &&allocate, V &&deleter = deleter_type())
-        : c_str(_internal_construct_tag(), view, output_zero_termination, (const std::locale *) nullptr, static_cast<U &&>(allocate),
-                static_cast<V &&>(deleter))
+    LLFIO_TEMPLATE(class U, class V)
+    LLFIO_TREQUIRES(LLFIO_TPRED(_is_deleter_based), LLFIO_TEXPR(std::declval<U>()((size_t) 1)), LLFIO_TEXPR(std::declval<V>()((value_type *) nullptr)))
+    c_str(path_view_component view, enum zero_termination output_zero_termination, U &&allocate, V &&deleter = AllocatorOrDeleter(),
+          _custom_callable_deleter_tag = {})
+        : _deleter1([](void *_del, value_type *p, size_t /*unused*/) {
+          auto *del = static_cast<std::decay_t<V> *>(_del);
+          (*del)(p);
+        })
+        , _deleter1arg(&_deleter2)
+        , _deleter2(static_cast<V &&>(deleter))
     {
+      _init(view, output_zero_termination, (const std::locale *) nullptr, static_cast<U &&>(allocate));
     }
-    //! \overload
+    //! \overload memory_resource
+    c_str(path_view_component view, enum zero_termination output_zero_termination, const std::locale &loc, pmr::memory_resource &mr, _memory_resource_tag = {})
+        : _deleter1([](void *_mr, value_type *p, size_t bytes) {
+          auto *mr = static_cast<pmr::memory_resource *>(_mr);
+          mr->deallocate(p, bytes);
+        })
+        , _deleter1arg(&mr)
+    {
+      _init(view, output_zero_termination, &loc, [&](size_t n) { return static_cast<value_type *>(mr.allocate(n * sizeof(value_type))); });
+    }
+    //! \overload memory_resource
+    c_str(path_view_component view, enum zero_termination output_zero_termination, pmr::memory_resource &mr, _memory_resource_tag = {})
+        : _deleter1([](void *_mr, value_type *p, size_t bytes) {
+          auto *mr = static_cast<pmr::memory_resource *>(_mr);
+          mr->deallocate(p, bytes);
+        })
+        , _deleter1arg(&mr)
+    {
+      _init(view, output_zero_termination, (const std::locale *) nullptr,
+            [&](size_t n) { return static_cast<value_type *>(mr.allocate(n * sizeof(value_type))); });
+    }
+    //! \overload STL allocator
+    LLFIO_TEMPLATE(class U)
+    LLFIO_TREQUIRES(LLFIO_TPRED(_is_allocator_based), LLFIO_TEXPR(std::declval<U>().allocate((size_t) 1)))
+    c_str(path_view_component view, enum zero_termination output_zero_termination, const std::locale &loc, U &&allocate, _stl_allocator_tag = {})
+        : _deleter1([](void *_del, value_type *p, size_t bytes) {
+          auto *del = static_cast<allocator_type *>(_del);
+          del->deallocate(p, bytes);
+        })
+        , _deleter1arg(&_deleter2)
+        , _deleter2(static_cast<U &&>(allocate))
+    {
+      _init(view, output_zero_termination, &loc, [&](size_t n) { return _deleter2.allocate(n); });
+    }
+    //! \overload STL allocator
+    LLFIO_TEMPLATE(class U)
+    LLFIO_TREQUIRES(LLFIO_TPRED(_is_allocator_based), LLFIO_TEXPR(std::declval<U>().allocate((size_t) 1)))
+    c_str(path_view_component view, enum zero_termination output_zero_termination, U &&allocate, _stl_allocator_tag = {})
+        : _deleter1([](void *_del, value_type *p, size_t bytes) {
+          auto *del = static_cast<allocator_type *>(_del);
+          del->deallocate(p, bytes);
+        })
+        , _deleter1arg(&_deleter2)
+        , _deleter2(static_cast<U &&>(allocate))
+    {
+      _init(view, output_zero_termination, (const std::locale *) nullptr, [&](size_t n) { return _deleter2.allocate(n); });
+    }
+    //! \overload default allocation
     c_str(path_view_component view, enum zero_termination output_zero_termination, const std::locale &loc)
-        : c_str(
-          _internal_construct_tag(), view, output_zero_termination, &loc,
-          [](size_t length) { return static_cast<value_type *>(::operator new[](length * sizeof(value_type))); }, deleter_type())
+        : c_str(_internal_construct_tag<_is_deleter_based>(), view, output_zero_termination, &loc)
     {
     }
     //! \overload
     c_str(path_view_component view, enum zero_termination output_zero_termination)
-        : c_str(
-          _internal_construct_tag(), view, output_zero_termination, (const std::locale *) nullptr,
-          [](size_t length) { return static_cast<value_type *>(::operator new[](length * sizeof(value_type))); }, deleter_type())
+        : c_str(_internal_construct_tag<_is_deleter_based>(), view, output_zero_termination, (const std::locale *) nullptr)
     {
     }
-    ~c_str()
-    {
-      if(_bytes_to_delete > 0)
-      {
-        if(_mr == nullptr)
-        {
-          _deleter(const_cast<value_type *>(buffer));
-        }
-        else
-        {
-          _mr->deallocate(const_cast<value_type *>(buffer), _bytes_to_delete);
-        }
-      }
-    }
+    ~c_str() { reset(); }
     c_str(const c_str &) = delete;
     c_str(c_str &&o) noexcept
         : buffer(o.buffer)
         , length(o.length)
         , _bytes_to_delete(o._bytes_to_delete)
-        , _mr(o._mr)
-        , _deleter(std::move(o._deleter))
+        , _deleter1(o._deleter1)
+        , _deleter1arg(o._deleter1arg)
+        , _deleter2(std::move(o._deleter2))
     {
       if(o.buffer == o._buffer)
       {
         memcpy(_buffer, o._buffer, (o.length + 1) * sizeof(value_type));
         buffer = _buffer;
       }
+      if(o._deleter1arg == &o._deleter2)
+      {
+        _deleter1arg = &_deleter2;
+      }
+      o.buffer = nullptr;
       o._bytes_to_delete = 0;
-      o._mr = nullptr;
+      o._deleter1 = nullptr;
+      o._deleter1arg = nullptr;
     }
     c_str &operator=(const c_str &) = delete;
     c_str &operator=(c_str &&o) noexcept
@@ -1126,10 +1196,49 @@ public:
       return *this;
     }
 
+    //! Delete any held resources now
+    void reset()
+    {
+      if(_bytes_to_delete > 0)
+      {
+        _deleter1(_deleter1arg, const_cast<value_type *>(buffer), _bytes_to_delete);
+        buffer = nullptr;
+        length = 0;
+        _bytes_to_delete = 0;
+      }
+    }
+    //! Release from ownership any resources
+    value_type *release()
+    {
+      if(_bytes_to_delete > 0)
+      {
+        auto *ret = buffer;
+        buffer = nullptr;
+        length = 0;
+        _bytes_to_delete = 0;
+        return ret;
+      }
+      return nullptr;
+    }
+
+    //! Access the custom deleter instance passed to the constructor
+    const AllocatorOrDeleter &deleter() const noexcept { return _deleter2; }
+    //! Access the custom deleter instance passed to the constructor
+    AllocatorOrDeleter &deleter() noexcept { return _deleter2; }
+
+    //! The memory resource passed to the constructor
+    pmr::memory_resource *memory_resource() noexcept { return (pmr::memory_resource *) _deleter1arg; }
+
+    //! Access the custom allocator instance passed to the constructor
+    const AllocatorOrDeleter &allocator() const noexcept { return _deleter2; }
+    //! Access the custom allocator instance passed to the constructor
+    AllocatorOrDeleter &allocator() noexcept { return _deleter2; }
+
   private:
     size_t _bytes_to_delete{0};
-    pmr::memory_resource *_mr{nullptr};
-    Deleter _deleter;
+    void (*_deleter1)(void *arg, value_type *buffer, size_t bytes_to_delete){nullptr};
+    void *_deleter1arg{nullptr};
+    AllocatorOrDeleter _deleter2;
     // MAKE SURE this is the final item in storage, the compiler will elide the storage
     // under optimisation if it can prove it is never used.
     value_type _buffer[internal_buffer_size]{};
