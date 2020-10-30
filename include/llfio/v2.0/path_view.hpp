@@ -1407,10 +1407,16 @@ public:
   constexpr path_view() {}  // NOLINT
   ~path_view() = default;
 
-  using path_view_component::path_view_component;
-  //! Implicitly constructs a path view from a path view component. The input path MUST continue to exist for this view to be valid.
-  constexpr path_view(path_view_component v) noexcept  // NOLINT
-      : path_view_component(v)
+  //! Constructs a path view component identical to the input, except with different format interpretation.
+  constexpr path_view(path_view_component p, format fmt = auto_format) noexcept
+      : path_view_component(p, fmt)
+  {
+  }
+  /*! Implicitly constructs a path view from a path. The input path MUST continue to exist for this view to be valid
+  (DEVIATES from P1030 due to filesystem::path not exposing its path formatting).
+  */
+  path_view(const filesystem::path &v, format fmt = auto_format) noexcept  // NOLINT
+      : path_view_component(v, fmt)
   {
   }
 
@@ -1451,6 +1457,13 @@ public:
       : path_view_component(b, l, zt, fmt)
   {
   }
+  /*! Constructs from a lengthed array of `byte`. The input
+  array MUST continue to exist for this view to be valid.
+  */
+  constexpr path_view(const byte *b, size_t l, enum zero_termination zt) noexcept
+      : path_view_component(b, l, zt)
+  {
+  }
 
   /*! Implicitly constructs a path view from a zero terminated pointer to a
   character array, which must be one of `char`, `wchar_t`, `char8_t` or `char16_t`.
@@ -1462,6 +1475,13 @@ public:
       : path_view_component(s, detail::constexpr_strlen(s), zero_terminated, fmt)
   {
   }
+  /*! Implicitly constructs a path view from a zero terminated pointer to byte array.
+  The input array MUST continue to exist for this view to be valid.
+  */
+  constexpr path_view(const byte *s) noexcept
+      : path_view_component(s)
+  {
+  }
 
   /*! Constructs from a basic string view if the character type is one of
   `char`, `wchar_t`, `char8_t` or `char16_t`.
@@ -1470,6 +1490,12 @@ public:
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable<Char>))
   constexpr path_view(basic_string_view<Char> v, enum zero_termination zt, format fmt = auto_format) noexcept
       : path_view_component(v.data(), v.size(), zt, fmt)
+  {
+  }
+  /*! Constructs from a `span<const byte>`.
+   */
+  constexpr path_view(span<const byte> v, enum zero_termination zt) noexcept
+      : path_view_component(v, zt)
   {
   }
 
@@ -1489,6 +1515,24 @@ public:
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable<std::decay_t<It>>), LLFIO_TPRED(is_source_chartype_acceptable<std::decay_t<End>>))
   constexpr path_view(It *b, End *e, enum zero_termination zt, format fmt = auto_format) noexcept
       : path_view_component(b, e - b, zt, fmt)
+  {
+  }
+  /*! Constructs from an iterator sequence if the iterator is contiguous, if its
+  value type is `byte`.
+
+  (DEVIATES from P1030, cannot detect contiguous iterator in SFINAE in C++ 14)
+  */
+  LLFIO_TEMPLATE(class It, class End)
+  LLFIO_TREQUIRES(LLFIO_TPRED(std::is_same<typename It::value_type, byte>::value), LLFIO_TPRED(std::is_same<typename End::value_type, byte>::value))
+  constexpr path_view(It b, End e, enum zero_termination zt) noexcept
+      : path_view_component(addressof(*b), e - b, zt, binary_format)
+  {
+  }
+  //! \overload
+  LLFIO_TEMPLATE(class It, class End)
+  LLFIO_TREQUIRES(LLFIO_TPRED(std::is_same<std::decay_t<It>, byte>::value), LLFIO_TPRED(std::is_same<std::decay_t<End>, byte>::value))
+  constexpr path_view(It *b, End *e, enum zero_termination zt) noexcept
+      : path_view_component(b, e - b, zt, binary_format)
   {
   }
 
@@ -1619,7 +1663,7 @@ public:
     {
       return path_view();
     }
-    return this->_invoke([sep_idx](auto v) { return path_view(v.data(), sep_idx, not_zero_terminated); });
+    return this->_invoke([sep_idx, this](auto v) { return path_view(v.data(), sep_idx, not_zero_terminated, formatting()); });
   }
   //! Returns a view of the root name part of this view e.g. C:
   LLFIO_PATH_VIEW_CONSTEXPR path_view root_name() const noexcept
@@ -1629,7 +1673,7 @@ public:
     {
       return path_view();
     }
-    return this->_invoke([sep_idx](const auto &v) { return path_view(v.data(), sep_idx, not_zero_terminated); });
+    return this->_invoke([sep_idx, this](const auto &v) { return path_view(v.data(), sep_idx, not_zero_terminated, formatting()); });
   }
   //! Returns a view of the root directory, if there is one e.g. /
   LLFIO_PATH_VIEW_CONSTEXPR path_view root_directory() const noexcept
@@ -1639,17 +1683,17 @@ public:
     {
       return path_view();
     }
-    return this->_invoke([sep_idx](const auto &v) {
+    return this->_invoke([sep_idx, this](const auto &v) {
 #ifdef _WIN32
       auto colon_idx = v.find(':');
       if(colon_idx < sep_idx)
       {
-        return path_view(v.data() + sep_idx, 1, not_zero_terminated);
+        return path_view(v.data() + sep_idx, 1, not_zero_terminated, formatting());
       }
 #endif
       if(sep_idx == 0)
       {
-        return path_view(v.data(), 1, not_zero_terminated);
+        return path_view(v.data(), 1, not_zero_terminated, formatting());
       }
       return path_view();
     });
@@ -1667,13 +1711,13 @@ public:
       // Special case \\.\ and \\?\ to match filesystem::path
       if(is_ntpath() || (v.size() >= 4 && sep_idx == 0 && v[1] == '\\' && (v[2] == '.' || v[2] == '?') && v[3] == '\\'))
       {
-        return path_view(v.data() + 0, 4, not_zero_terminated);
+        return path_view(v.data() + 0, 4, not_zero_terminated, formatting());
       }
       // Is there a drive letter before the first separator?
       auto colon_idx = v.find(':');
       if(colon_idx < sep_idx)
       {
-        return path_view(v.data(), sep_idx + 1, not_zero_terminated);
+        return path_view(v.data(), sep_idx + 1, not_zero_terminated, formatting());
       }
       // UNC paths return the server name as the root path
       if(is_uncpath())
@@ -1683,14 +1727,14 @@ public:
         {
           return *this;
         }
-        return path_view(v.data(), sep_idx + 1, not_zero_terminated);
+        return path_view(v.data(), sep_idx + 1, not_zero_terminated, formatting());
       }
 #else
-    return this->_invoke([sep_idx](const auto &v) {
+    return this->_invoke([this, sep_idx](const auto &v) {
 #endif
       if(sep_idx == 0)
       {
-        return path_view(v.data(), 1, not_zero_terminated);
+        return path_view(v.data(), 1, not_zero_terminated, formatting());
       }
       return path_view();
     });
@@ -1708,13 +1752,13 @@ public:
       // Special case \\.\ and \\?\ to match filesystem::path
       if(is_ntpath() || (v.size() >= 4 && sep_idx == 0 && v[1] == '\\' && (v[2] == '.' || v[2] == '?') && v[3] == '\\'))
       {
-        return path_view(v.data() + 4, v.size() - 4, this->zero_termination());
+        return path_view(v.data() + 4, v.size() - 4, this->zero_termination(), formatting());
       }
       // Is there a drive letter before the first separator?
       auto colon_idx = v.find(':');
       if(colon_idx < sep_idx)
       {
-        return path_view(v.data() + sep_idx + 1, v.size() - sep_idx - 1, this->zero_termination());
+        return path_view(v.data() + sep_idx + 1, v.size() - sep_idx - 1, this->zero_termination(), formatting());
       }
       // UNC paths return the server name as the root path
       if(is_uncpath())
@@ -1724,14 +1768,14 @@ public:
         {
           return path_view();
         }
-        return path_view(v.data() + sep_idx + 1, v.size() - sep_idx - 1, this->zero_termination());
+        return path_view(v.data() + sep_idx + 1, v.size() - sep_idx - 1, this->zero_termination(), formatting());
       }
 #else
     return this->_invoke([this, sep_idx](const auto &v) {
 #endif
       if(sep_idx == 0)
       {
-        return path_view(v.data() + 1, v.size() - 1, this->zero_termination());
+        return path_view(v.data() + 1, v.size() - 1, this->zero_termination(), formatting());
       }
       return *this;
     });
@@ -1752,13 +1796,13 @@ public:
         auto sep_idx2 = this->_find_first_sep(2);
         if(sep_idx2 == sep_idx)
         {
-          return path_view(v.data(), sep_idx + 1, not_zero_terminated);
+          return path_view(v.data(), sep_idx + 1, not_zero_terminated, formatting());
         }
       }
-      return path_view(v.data(), sep_idx, not_zero_terminated);
+      return path_view(v.data(), sep_idx, not_zero_terminated, formatting());
     });
 #else
-    return this->_invoke([sep_idx](const auto &v) { return path_view(v.data(), sep_idx, not_zero_terminated); });
+    return this->_invoke([this, sep_idx](const auto &v) { return path_view(v.data(), sep_idx, not_zero_terminated, formatting()); });
 #endif
   }
   //! Returns a view of the filename part of this view.

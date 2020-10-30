@@ -1,5 +1,5 @@
 /* A view of a path to something
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: Jul 2017
 
 
@@ -301,8 +301,10 @@ namespace detail
   char *reencode_path_to(size_t &toallocate, char *dest_buffer, size_t dest_buffer_length, const char16_t *src_buffer, size_t src_buffer_length,
                          const std::locale *loc)
   {
-#if(__cplusplus >= 202000 || _HAS_CXX20) && !defined(_LIBCPP_VERSION)
+#if(__cplusplus >= 202000 || (_HAS_CXX20 && _MSC_VER >= 1921)) && !defined(_LIBCPP_VERSION)
     return (char *) _reencode_path_to(toallocate, (char8_t *) dest_buffer, dest_buffer_length, src_buffer, src_buffer_length, loc);
+#elif defined(_MSC_VER) && _MSC_VER < 1920
+    return (char *) _reencode_path_to(toallocate,dest_buffer, dest_buffer_length, (const wchar_t *) src_buffer, src_buffer_length, loc);
 #else
     return _reencode_path_to(toallocate, dest_buffer, dest_buffer_length, src_buffer, src_buffer_length, loc);
 #endif
