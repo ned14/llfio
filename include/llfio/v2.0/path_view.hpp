@@ -831,9 +831,9 @@ public:
     size_t length{0};
 
   private:
-    static constexpr bool _is_deleter_based = std::is_void<allocator_type>::value;
-    static constexpr bool _is_allocator_based = std::is_void<deleter_type>::value;
-    static_assert(_is_allocator_based + _is_deleter_based == 1, "AllocatorOrDeleter must be either a callable deleter, or a STL allocator, for value_type");
+    template <class X = void> static constexpr bool _is_deleter_based = std::is_void<allocator_type>::value;
+    template <class X = void> static constexpr bool _is_allocator_based = std::is_void<deleter_type>::value;
+    static_assert(_is_allocator_based<> + _is_deleter_based<> == 1, "AllocatorOrDeleter must be either a callable deleter, or a STL allocator, for value_type");
 
     template <class U, class source_type>
     void _make_passthrough(path_view_component /*unused*/, bool /*unused*/, U & /*unused*/, const source_type * /*unused*/)
@@ -1056,7 +1056,7 @@ public:
     }
     // used by compare()
     c_str(path_view_component view, enum zero_termination output_zero_termination, const std::locale *loc)
-        : c_str(_internal_construct_tag<_is_deleter_based>(), view, output_zero_termination, loc)
+        : c_str(_internal_construct_tag<_is_deleter_based<>>(), view, output_zero_termination, loc)
     {
     }
 
@@ -1077,7 +1077,7 @@ public:
     on most filesystems), use native narrow or wide encoded source, or binary.
     */
     LLFIO_TEMPLATE(class U, class V)
-    LLFIO_TREQUIRES(LLFIO_TPRED(_is_deleter_based), LLFIO_TEXPR(std::declval<U>()((size_t) 1)), LLFIO_TEXPR(std::declval<V>()((value_type *) nullptr)))
+    LLFIO_TREQUIRES(LLFIO_TPRED(_is_deleter_based<U>), LLFIO_TEXPR(std::declval<U>()((size_t) 1)), LLFIO_TEXPR(std::declval<V>()((value_type *) nullptr)))
     c_str(path_view_component view, enum zero_termination output_zero_termination, const std::locale &loc, U &&allocate, V &&deleter = AllocatorOrDeleter(),
           _custom_callable_deleter_tag = {})
         : _deleter1([](void *_del, value_type *p, size_t /*unused*/) {
@@ -1091,7 +1091,7 @@ public:
     }
     //! \overload
     LLFIO_TEMPLATE(class U, class V)
-    LLFIO_TREQUIRES(LLFIO_TPRED(_is_deleter_based), LLFIO_TEXPR(std::declval<U>()((size_t) 1)), LLFIO_TEXPR(std::declval<V>()((value_type *) nullptr)))
+    LLFIO_TREQUIRES(LLFIO_TPRED(_is_deleter_based<U>), LLFIO_TEXPR(std::declval<U>()((size_t) 1)), LLFIO_TEXPR(std::declval<V>()((value_type *) nullptr)))
     c_str(path_view_component view, enum zero_termination output_zero_termination, U &&allocate, V &&deleter = AllocatorOrDeleter(),
           _custom_callable_deleter_tag = {})
         : _deleter1([](void *_del, value_type *p, size_t /*unused*/) {
@@ -1126,7 +1126,7 @@ public:
     }
     //! \overload STL allocator
     LLFIO_TEMPLATE(class U)
-    LLFIO_TREQUIRES(LLFIO_TPRED(_is_allocator_based), LLFIO_TEXPR(std::declval<U>().allocate((size_t) 1)))
+    LLFIO_TREQUIRES(LLFIO_TPRED(_is_allocator_based<U>), LLFIO_TEXPR(std::declval<U>().allocate((size_t) 1)))
     c_str(path_view_component view, enum zero_termination output_zero_termination, const std::locale &loc, U &&allocate, _stl_allocator_tag = {})
         : _deleter1([](void *_del, value_type *p, size_t bytes) {
           auto *del = static_cast<allocator_type *>(_del);
@@ -1139,7 +1139,7 @@ public:
     }
     //! \overload STL allocator
     LLFIO_TEMPLATE(class U)
-    LLFIO_TREQUIRES(LLFIO_TPRED(_is_allocator_based), LLFIO_TEXPR(std::declval<U>().allocate((size_t) 1)))
+    LLFIO_TREQUIRES(LLFIO_TPRED(_is_allocator_based<U>), LLFIO_TEXPR(std::declval<U>().allocate((size_t) 1)))
     c_str(path_view_component view, enum zero_termination output_zero_termination, U &&allocate, _stl_allocator_tag = {})
         : _deleter1([](void *_del, value_type *p, size_t bytes) {
           auto *del = static_cast<allocator_type *>(_del);
@@ -1152,12 +1152,12 @@ public:
     }
     //! \overload default allocation
     c_str(path_view_component view, enum zero_termination output_zero_termination, const std::locale &loc)
-        : c_str(_internal_construct_tag<_is_deleter_based>(), view, output_zero_termination, &loc)
+        : c_str(_internal_construct_tag<_is_deleter_based<>>(), view, output_zero_termination, &loc)
     {
     }
     //! \overload
     c_str(path_view_component view, enum zero_termination output_zero_termination)
-        : c_str(_internal_construct_tag<_is_deleter_based>(), view, output_zero_termination, (const std::locale *) nullptr)
+        : c_str(_internal_construct_tag<_is_deleter_based<>>(), view, output_zero_termination, (const std::locale *) nullptr)
     {
     }
     ~c_str() { reset(); }

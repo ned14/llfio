@@ -27,7 +27,9 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../directory_handle.hpp"
 #include "../../statfs.hpp"
 
+#include <algorithm>
 #include <mutex>
+#include <new>
 #include <regex>
 #include <vector>
 

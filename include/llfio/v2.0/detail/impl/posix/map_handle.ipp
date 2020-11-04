@@ -1,5 +1,5 @@
 /* A handle to a source of mapped memory
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (10 commits)
+(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (10 commits)
 File Created: Apr 2017
 
 
@@ -679,6 +679,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_write(io_r
          const_buffer_type &req = reqs.buffers[i];
          if(req.size() > togo)
          {
+           assert(req.data() != nullptr);
            memcpy(addr, req.data(), togo);
            req = {addr, togo};
            reqs.buffers = {reqs.buffers.data(), i + 1};
@@ -686,6 +687,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_write(io_r
          }
          else
          {
+           assert(req.data() != nullptr);
            memcpy(addr, req.data(), req.size());
            req = {addr, req.size()};
            addr += req.size();
