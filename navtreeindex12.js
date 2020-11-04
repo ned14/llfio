@@ -1,5 +1,11 @@
 var NAVTREEINDEX12 =
 {
+"structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#a198468a39c9d472204cca865f0024c42":[4,0,2,28,2,23],
+"structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#a20b4d5b23f288f9174e723f314adb298":[4,0,2,28,2,9],
+"structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#a25b833d23952b4f790d852ca67bf2498":[4,0,2,28,2,29],
+"structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#a2c5cddbf8ac82a21701f314a772187e0":[4,0,2,28,2,25],
+"structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#a33dd639809167638c5ff88876ce6704e":[4,0,2,28,2,28],
+"structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#a3b5ca94b944cff01b36d4d85dcaf0975":[4,0,2,28,2,4],
 "structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#a3bd5f8aa3fff63f40b7280987e9e92f1":[4,0,2,28,2,2],
 "structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#a4bb3966e906c5fb81cfa50244a8b7a8b":[4,0,2,28,2,7],
 "structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#a4e19333dfa7de8cd69b17e8cb8ddc32f":[4,0,2,28,2,20],
@@ -243,11 +249,5 @@ var NAVTREEINDEX12 =
 "structllfio__v2__xxx_1_1stat__t.html#ac6b928c490cef1f12fbd92cd96e49d9c":[4,0,2,43,15],
 "structllfio__v2__xxx_1_1stat__t.html#acbcf2ad965fdfefc7dbead1ad3c90a4a":[4,0,2,43,3],
 "structllfio__v2__xxx_1_1stat__t.html#ad42affc84324ad00a39379ab3d9a428b":[4,0,2,43,28],
-"structllfio__v2__xxx_1_1stat__t.html#ad6de8a630079dc8fda3370a0bf1599e2":[4,0,2,43,19],
-"structllfio__v2__xxx_1_1stat__t.html#adddfea199a341a46824f6deec2952bb4":[4,0,2,43,21],
-"structllfio__v2__xxx_1_1stat__t.html#aef93718067115fcb4c596f4c8fe4cc2f":[4,0,2,43,0],
-"structllfio__v2__xxx_1_1stat__t.html#aefe8c88dad824c911fa7bf6e1baef1c4":[4,0,2,43,20],
-"structllfio__v2__xxx_1_1statfs__t.html":[4,0,2,44],
-"structllfio__v2__xxx_1_1statfs__t.html#a1a1a822aca4e26f793e526f1779947bb":[4,0,2,44,1],
-"structllfio__v2__xxx_1_1statfs__t.html#a2655807be6194967c2768ab834ce8c4b":[4,0,2,44,9]
+"structllfio__v2__xxx_1_1stat__t.html#ad6de8a630079dc8fda3370a0bf1599e2":[4,0,2,43,19]
 };
