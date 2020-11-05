@@ -1059,6 +1059,16 @@ public:
         : c_str(_internal_construct_tag<_is_deleter_based<>>(), view, output_zero_termination, loc)
     {
     }
+    static void _memory_resouce_deallocate(void *_mr, value_type *p, size_t bytes)
+    {
+      auto *mr = static_cast<pmr::memory_resource *>(_mr);
+      mr->deallocate(p, bytes);
+    }
+    template <class Alloc> static void _stl_allocator_deallocate(void *_del, value_type *p, size_t bytes)
+    {
+      auto *del = static_cast<Alloc *>(_del);
+      del->deallocate(p, bytes);
+    }
 
   public:
     /*! Construct, performing any reencoding or memory copying required.
@@ -1080,7 +1090,7 @@ public:
     LLFIO_TREQUIRES(LLFIO_TPRED(_is_deleter_based<U>), LLFIO_TEXPR(std::declval<U>()((size_t) 1)), LLFIO_TEXPR(std::declval<V>()((value_type *) nullptr)))
     c_str(path_view_component view, enum zero_termination output_zero_termination, const std::locale &loc, U &&allocate, V &&deleter = AllocatorOrDeleter(),
           _custom_callable_deleter_tag = {})
-        : _deleter1([](void *_del, value_type *p, size_t /*unused*/) {
+        : _deleter1([](void *_del, value_type *p, size_t /*unused*/) -> void {
           auto *del = static_cast<std::decay_t<V> *>(_del);
           (*del)(p);
         })
@@ -1094,7 +1104,7 @@ public:
     LLFIO_TREQUIRES(LLFIO_TPRED(_is_deleter_based<U>), LLFIO_TEXPR(std::declval<U>()((size_t) 1)), LLFIO_TEXPR(std::declval<V>()((value_type *) nullptr)))
     c_str(path_view_component view, enum zero_termination output_zero_termination, U &&allocate, V &&deleter = AllocatorOrDeleter(),
           _custom_callable_deleter_tag = {})
-        : _deleter1([](void *_del, value_type *p, size_t /*unused*/) {
+        : _deleter1([](void *_del, value_type *p, size_t /*unused*/) -> void {
           auto *del = static_cast<std::decay_t<V> *>(_del);
           (*del)(p);
         })
@@ -1105,20 +1115,14 @@ public:
     }
     //! \overload memory_resource
     c_str(path_view_component view, enum zero_termination output_zero_termination, const std::locale &loc, pmr::memory_resource &mr, _memory_resource_tag = {})
-        : _deleter1([](void *_mr, value_type *p, size_t bytes) {
-          auto *mr = static_cast<pmr::memory_resource *>(_mr);
-          mr->deallocate(p, bytes);
-        })
+        : _deleter1(_memory_resouce_deallocate)
         , _deleter1arg(&mr)
     {
       _init(view, output_zero_termination, &loc, [&](size_t n) { return static_cast<value_type *>(mr.allocate(n * sizeof(value_type))); });
     }
     //! \overload memory_resource
     c_str(path_view_component view, enum zero_termination output_zero_termination, pmr::memory_resource &mr, _memory_resource_tag = {})
-        : _deleter1([](void *_mr, value_type *p, size_t bytes) {
-          auto *mr = static_cast<pmr::memory_resource *>(_mr);
-          mr->deallocate(p, bytes);
-        })
+        : _deleter1(_memory_resouce_deallocate)
         , _deleter1arg(&mr)
     {
       _init(view, output_zero_termination, (const std::locale *) nullptr,
@@ -1128,10 +1132,7 @@ public:
     LLFIO_TEMPLATE(class U)
     LLFIO_TREQUIRES(LLFIO_TPRED(_is_allocator_based<U>), LLFIO_TEXPR(std::declval<U>().allocate((size_t) 1)))
     c_str(path_view_component view, enum zero_termination output_zero_termination, const std::locale &loc, U &&allocate, _stl_allocator_tag = {})
-        : _deleter1([](void *_del, value_type *p, size_t bytes) {
-          auto *del = static_cast<allocator_type *>(_del);
-          del->deallocate(p, bytes);
-        })
+        : _deleter1(_stl_allocator_deallocate<allocator_type>)
         , _deleter1arg(&_deleter2)
         , _deleter2(static_cast<U &&>(allocate))
     {
@@ -1141,10 +1142,7 @@ public:
     LLFIO_TEMPLATE(class U)
     LLFIO_TREQUIRES(LLFIO_TPRED(_is_allocator_based<U>), LLFIO_TEXPR(std::declval<U>().allocate((size_t) 1)))
     c_str(path_view_component view, enum zero_termination output_zero_termination, U &&allocate, _stl_allocator_tag = {})
-        : _deleter1([](void *_del, value_type *p, size_t bytes) {
-          auto *del = static_cast<allocator_type *>(_del);
-          del->deallocate(p, bytes);
-        })
+        : _deleter1(_stl_allocator_deallocate<allocator_type>)
         , _deleter1arg(&_deleter2)
         , _deleter2(static_cast<U &&>(allocate))
     {

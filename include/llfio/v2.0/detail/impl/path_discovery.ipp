@@ -203,7 +203,14 @@ namespace path_discovery
       ps.verified = span<discovered_path>(ps.all.data(), it - ps.all.begin());
       if(ps.verified.empty())
       {
-        LLFIO_LOG_FATAL(nullptr, "path_discovery::verified_temporary_directories() could not find at least one writable temporary directory");
+        std::stringstream msg;
+        msg << "path_discovery::verified_temporary_directories() could not find at least one writable temporary directory. Directories probed were:\n";
+        for(size_t n=0; n<ps.all.size(); n++)
+        {
+          msg << "\n   " << ps.all[n].path << " (" << ps.all[n].source << ") fs type = " << ps._all[n].fstypename << " valid = " << (bool) ps.all[n].stat;
+        }
+        msg << "\n";
+        LLFIO_LOG_FATAL(nullptr, msg.str().c_str());
         abort();
       }
 
