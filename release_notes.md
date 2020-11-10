@@ -2,8 +2,8 @@
 <tr>
 <td align="center"> <a href="https://github.com/ned14/llfio">LLFIO</a><br><a href="https://github.com/ned14/llfio">on GitHub</a> </td>
 <td align="center"> <a href="https://my.cdash.org/index.php?project=Boost.AFIO">CTest summary</a><br><a href="https://my.cdash.org/index.php?project=Boost.AFIO">dashboard</a> </td>
-<td align="center"> <a href="https://travis-ci.org/ned14/llfio">Linux and MacOS CI:</a><img src="https://travis-ci.org/ned14/llfio.svg?branch=master"/> </td>
-<td align="center"> <a href="https://ci.appveyor.com/project/ned14/llfio/branch/master">Windows CI:</a><img src="https://ci.appveyor.com/api/projects/status/dfctqfap3kpx89om/branch/master?svg=true"/> </td>
+<td align="center"> Mac OS, Linux and Windows CI: <img src="https://github.com/ned14/llfio/workflows/CI/badge.svg?branch=master"/> </td>
+<td align="center"> <a href="https://github.com/ned14/llfio/packages">Prebuilt binaries</a> </td>
 </tr>
 </table></center>
 

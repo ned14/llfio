@@ -138,6 +138,8 @@ namespace path_discovery
     buffer = "/run/user/" + std::to_string(geteuid());
     ret.emplace_back(discovered_path::source_type::hardcoded, buffer);
     ret.emplace_back(discovered_path::source_type::hardcoded, "/run/shm");
+    // Finally, on some Docker images there is no /tmp, /var/tmp, /run nor anywhere sane
+    ret.emplace_back(discovered_path::source_type::hardcoded, "/");
     return ret;
   }
 
