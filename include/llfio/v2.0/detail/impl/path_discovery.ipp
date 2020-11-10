@@ -159,7 +159,7 @@ namespace path_discovery
         auto _fh = file_handle::uniquely_named_file(ps._all[n].h, file_handle::mode::write, file_handle::caching::temporary, file_handle::flag::unlink_on_first_close);
         if(!_fh)
         {
-#if LLFIO_LOGGING_LEVEL >= 3
+#if LLFIO_LOGGING_LEVEL >= 3 || defined(__clang__)
           std::string msg("path_discovery::verified_temporary_directories() failed to create a file in ");
           msg.append(ps._all[n].path.string());
           msg.append(" due to ");
@@ -185,7 +185,7 @@ namespace path_discovery
         }
         else
         {
-#if LLFIO_LOGGING_LEVEL >= 3
+#if LLFIO_LOGGING_LEVEL >= 3 || defined(__clang__)
           std::string msg("path_discovery::verified_temporary_directories() failed to statfs the temp directory ");
           msg.append(ps._all[n].path.string());
           msg.append(" due to ");
