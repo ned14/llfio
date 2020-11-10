@@ -75,7 +75,7 @@ static inline void TestIssue09a()
   auto end = std::chrono::steady_clock::now();
   auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
   std::cout << "Closing a map_handle (file) with six, appended, very large reservations up to 2^40 took " << diff << "ms." << std::endl;
-  BOOST_CHECK(diff < 250);
+  BOOST_CHECK(diff < 3000);
 }
 
 static inline void TestIssue09b()

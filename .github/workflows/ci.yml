@@ -14,9 +14,10 @@ jobs:
     runs-on: ubuntu-18.04
     strategy:
       matrix:
-        compiler: [clang++, g++]
+        compiler: [clang++, g++, clang++-11, arm-linux-gnueabihf-g++]
+        configuration: [error_code, status_code]
     env:
-      NAME: Linux-${{ matrix.compiler }}
+      NAME: Linux-${{ matrix.configuration }}-${{ matrix.compiler }}
       CXX: ${{ matrix.compiler }}
           
     steps:
@@ -24,71 +25,100 @@ jobs:
 
     - name: CMake tests Linux
       shell: bash
-      run: ctest -S .ci.cmake -V
+      run: |
+       if [ "${{ matrix.compiler }}" = "clang++-11" ]; then
+         wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -;
+         echo "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-11 main" >> /etc/apt/sources.list;
+         sudo apt update;
+         sudo apt install clang-11 libc++-11-dev libc++abi-11-dev libomp-11-dev;
+         export CMAKE_CONFIGURE_OPTIONS=-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake;
+       fi
+       if [ "${{ matrix.configuration }}" = "status_code" ]; then
+         export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON"
+       fi
+       if [ "${{ matrix.compiler }}" = "arm-linux-gnueabihf-g++" ]; then
+         ctest -S .ci.cmake -V --timeout 300 -DCTEST_DISABLE_TESTING=1 '-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-arm.cmake'
+       else
+         ctest -S .ci.cmake -V --timeout 300 '-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS'
+       fi
       
     - name: Upload Prebuilt Binaries
       uses: actions/upload-artifact@v2
       with:
-        name: Linux ${{ matrix.compiler }} prebuilt binaries
+        name: Linux ${{ matrix.configuration }} ${{ matrix.compiler }} prebuilt binaries
         path: llfio-v2.0-binaries-linux-x64.tgz
       
     - name: Upload Test Results
       if: always()
       uses: actions/upload-artifact@v2
       with:
-        name: Linux ${{ matrix.compiler }} test results
+        name: Linux ${{ matrix.configuration }} ${{ matrix.compiler }} test results
         path: prebuilt/merged_junit_results.xml
 
   MacOS:
     name: Mac OS 10.15
     runs-on: macos-10.15
+    strategy:
+      matrix:
+        configuration: [error_code, status_code]
     env:
-      NAME: MacOS
+      NAME: MacOS-${{ matrix.configuration }}
           
     steps:
     - uses: actions/checkout@v2
 
     - name: CMake tests Mac OS
       shell: bash
-      run: ctest -S .ci.cmake -V -E noexcept
+      run: |
+       if [ "${{ matrix.configuration }}" = "status_code" ]; then
+         export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON"
+       fi
+       ctest -S .ci.cmake -V -E noexcept --timeout 300 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS
       
     - name: Upload Prebuilt Binaries
       uses: actions/upload-artifact@v2
       with:
-        name: Mac OS prebuilt binaries
+        name: Mac OS ${{ matrix.configuration }} prebuilt binaries
         path: llfio-v2.0-binaries-darwin-x64.tgz
       
     - name: Upload Test Results
       if: always()
       uses: actions/upload-artifact@v2
       with:
-        name: Mac OS test results
+        name: Mac OS ${{ matrix.configuration }} test results
         path: prebuilt/merged_junit_results.xml
 
   WinVS2019:
     name: Windows VS2019
     runs-on: windows-2019
+    strategy:
+      matrix:
+        configuration: [error_code, status_code]
     env:
-      NAME: WinVS2019
+      NAME: WinVS2019-${{ matrix.configuration }}
           
     steps:
     - uses: actions/checkout@v2
 
     - name: CMake tests Windows
       shell: bash
-      run: ctest -S .ci.cmake -V
+      run: |
+       if [ "${{ matrix.configuration }}" = "status_code" ]; then
+         export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON"
+       fi
+       ctest -S .ci.cmake -V --timeout 300 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS
       
     - name: Upload Prebuilt Binaries
       uses: actions/upload-artifact@v2
       with:
-        name: Windows VS2019 prebuilt binaries
+        name: Windows VS2019 ${{ matrix.configuration }} prebuilt binaries
         path: llfio-v2.0-binaries-win64.zip
       
     - name: Upload Test Results
       if: always()
       uses: actions/upload-artifact@v2
       with:
-        name: Windows VS2019 test results
+        name: Windows VS2019 ${{ matrix.configuration }} test results
         path: prebuilt/merged_junit_results.xml
 
   publish-test-results:
@@ -100,12 +130,6 @@ jobs:
       NAME: Documentation
 
     steps:
-      - name: Checkout Documentation
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-          submodules: true
-
       - name: Download Artifacts
         uses: actions/download-artifact@v2
         with:
@@ -118,6 +142,12 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           files: '**/merged_junit_results.xml'
           
+      - name: Checkout Documentation
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
       - name: Regenerate Documentation
         shell: bash
         run: |
@@ -131,3 +161,50 @@ jobs:
           BRANCH: gh-pages
           FOLDER: doc/html
           CLEAN: true
+
+  installability:
+    name: "Installability"
+    strategy:
+      matrix:
+        os: [ubuntu-18.04, macos-10.15, windows-2019]
+        configuration: [error_code, status_code]
+    env:
+      NAME: Install-${{ matrix.os }}-${{ matrix.configuration }}
+    runs-on: ${{ matrix.os }}
+          
+    steps:
+    - name: Install
+      shell: bash
+      run: |
+       if [ "${{ matrix.configuration }}" = "status_code" ]; then
+         export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON"
+       fi
+       git clone --depth 1 https://github.com/ned14/quickcpplib.git
+       pip3 install --user gitpython
+       python3 quickcpplib/scripts/test_cpp-pm_install.py test-packaging/example.cpp quickcpplib quickcpplib::hl https://github.com/ned14/quickcpplib master outcome outcome::hl https://github.com/ned14/outcome better_optimisation llfio llfio::sl https://github.com/ned14/llfio master
+       cd test_cpp-pm_install
+       mkdir build
+       cd build
+       cmake .. -DCMAKE_BUILD_TYPE=Release $CMAKE_CONFIGURE_OPTIONS
+       cmake --build .
+
+  programs:
+    name: "Programs"
+    strategy:
+      matrix:
+        os: [ubuntu-18.04, macos-10.15, windows-2019]
+    env:
+      NAME: Programs-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+          
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build
+      shell: bash
+      run: |
+       cd programs
+       mkdir build
+       cd build
+       cmake ..  $CMAKE_CONFIGURE_OPTIONS -DCMAKE_BUILD_TYPE=Release
+       cmake --build .
