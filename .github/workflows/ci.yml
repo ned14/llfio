@@ -12,6 +12,7 @@ jobs:
   Linux:
     name: Ubuntu 18.04
     runs-on: ubuntu-18.04
+    if: success() || failure()
     strategy:
       matrix:
         compiler: [clang++, g++, clang++-11, arm-linux-gnueabihf-g++]
@@ -28,7 +29,7 @@ jobs:
       run: |
        if [ "${{ matrix.compiler }}" = "clang++-11" ]; then
          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -;
-         echo "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-11 main" >> /etc/apt/sources.list;
+         sudo echo "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-11 main" >> /etc/apt/sources.list;
          sudo apt update;
          sudo apt install clang-11 libc++-11-dev libc++abi-11-dev libomp-11-dev;
          export CMAKE_CONFIGURE_OPTIONS=-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake;
@@ -58,6 +59,7 @@ jobs:
   MacOS:
     name: Mac OS 10.15
     runs-on: macos-10.15
+    if: success() || failure()
     strategy:
       matrix:
         configuration: [error_code, status_code]
@@ -91,6 +93,7 @@ jobs:
   WinVS2019:
     name: Windows VS2019
     runs-on: windows-2019
+    if: success() || failure()
     strategy:
       matrix:
         configuration: [error_code, status_code]
@@ -171,6 +174,7 @@ jobs:
     env:
       NAME: Install-${{ matrix.os }}-${{ matrix.configuration }}
     runs-on: ${{ matrix.os }}
+    if: success() || failure()
           
     steps:
     - name: Install
@@ -196,6 +200,7 @@ jobs:
     env:
       NAME: Programs-${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    if: success() || failure()
           
     steps:
     - uses: actions/checkout@v2
