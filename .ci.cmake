@@ -53,7 +53,7 @@ if(WIN32)
       COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/bin/Release/ntkernel-error-category_dl.dll llfio/prebuilt/bin/Release/
     )
     checked_execute_process("Tarring up binaries final"
-      COMMAND 7z a -tzip llfio-v2.0-binaries-win64.zip llfio\\
+      COMMAND "${CMAKE_COMMAND}" -E tar cfv llfio-v2.0-binaries-win64.zip --format=zip llfio/
     )
     get_filename_component(toupload llfio-v2.0-binaries-win64.zip ABSOLUTE)
   endif()

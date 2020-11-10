@@ -1,41 +1,38 @@
 # version format
-version: 1.40.{build}-{branch}
+version: 2.00.{build}-{branch}
  
 # branches to build
 branches:
   # blacklist
   except:
+    - master
     - gh-pages
 skip_tags: true
  
-# Operating system (build VM template)
-os: Visual Studio 2015
+image: Visual Studio 2017
 init:
   - git config --global core.longpaths true
 
-clone_folder: c:\boost.afio
+clone_folder: c:\boost.llfio
 platform: x64 
 configuration: Release
+environment:
+  JENKINS_NEDPROD_PASSWORD:
+    secure: 9Bx/dfr0ne9DTgnezRILRuOrPOZ71pVuzWBAscR9vTG9n42gIvNhYVCaCnr6FMa/
 
-before_build:
-  - git submodule update --init --recursive
-  - git submodule foreach git checkout master
-  - git submodule foreach git pull origin master
-  - cd test
-  - call test_file_glob.bat
-  - cd ..
-  - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
 build_script:
-  - standalone_alltests_msvc.bat
+  - ctest -S .ci.cmake -V --timeout 300
 after_build:
 
 before_test:
 test_script:
-#  - test_all.exe --reporter junit --out results_all.xml
-  - test_all.exe
 after_test:
-#  - type results_all.xml
 
 on_success:
+#  - set "NEWNAME=llfio-v2-binaries-win64-%date:~10,4%%date:~4,2%%date:~7,2%%time:~0,2%%time:~3,2%.zip"
+  - set "NEWNAME=llfio-v2-binaries-win64-%APPVEYOR_REPO_COMMIT%.zip"
+  - rename llfio-v2.0-binaries-win64.zip %NEWNAME%
+  - curl -T %NEWNAME% -u jenkins-nedprod:%JENKINS_NEDPROD_PASSWORD% https://dedi6.nedprod.com/static/files/upload/
 on_failure:
 on_finish:
+  - ps: (new-object net.webclient).UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path prebuilt\merged_junit_results.xml))

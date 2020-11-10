@@ -1,0 +1,133 @@
+name: CI
+
+on:
+  push:
+    branches:
+    - develop
+  pull_request:
+  schedule:
+  - cron: '0 0 1 * *'
+
+jobs:
+  Linux:
+    name: Ubuntu 18.04
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        compiler: [clang++, g++]
+    env:
+      NAME: Linux-${{ matrix.compiler }}
+      CXX: ${{ matrix.compiler }}
+          
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: CMake tests Linux
+      shell: bash
+      run: ctest -S .ci.cmake -V
+      
+    - name: Upload Prebuilt Binaries
+      uses: actions/upload-artifact@v2
+      with:
+        name: Linux ${{ matrix.compiler }} prebuilt binaries
+        path: llfio-v2.0-binaries-linux-x64.tgz
+      
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: Linux ${{ matrix.compiler }} test results
+        path: prebuilt/merged_junit_results.xml
+
+  MacOS:
+    name: Mac OS 10.15
+    runs-on: macos-10.15
+    env:
+      NAME: MacOS
+          
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: CMake tests Mac OS
+      shell: bash
+      run: ctest -S .ci.cmake -V -E noexcept
+      
+    - name: Upload Prebuilt Binaries
+      uses: actions/upload-artifact@v2
+      with:
+        name: Mac OS prebuilt binaries
+        path: llfio-v2.0-binaries-darwin-x64.tgz
+      
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: Mac OS test results
+        path: prebuilt/merged_junit_results.xml
+
+  WinVS2019:
+    name: Windows VS2019
+    runs-on: windows-2019
+    env:
+      NAME: WinVS2019
+          
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: CMake tests Windows
+      shell: bash
+      run: ctest -S .ci.cmake -V
+      
+    - name: Upload Prebuilt Binaries
+      uses: actions/upload-artifact@v2
+      with:
+        name: Windows VS2019 prebuilt binaries
+        path: llfio-v2.0-binaries-win64.zip
+      
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: Windows VS2019 test results
+        path: prebuilt/merged_junit_results.xml
+
+  publish-test-results:
+    name: "Publish Documentation and Unit Tests Results"
+    needs: [Linux, MacOS, WinVS2019]
+    runs-on: ubuntu-latest
+    if: success() || failure()
+    env:
+      NAME: Documentation
+
+    steps:
+      - name: Checkout Documentation
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          submodules: true
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: artifacts
+
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1.3
+        with:
+          check_name: Unit Test Results
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          files: '**/merged_junit_results.xml'
+          
+      - name: Regenerate Documentation
+        shell: bash
+        run: |
+         sudo apt-get install -y doxygen graphviz
+         ctest -S .docs.cmake -V
+          
+      - name: Publish Documentation
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: doc/html
+          CLEAN: true
