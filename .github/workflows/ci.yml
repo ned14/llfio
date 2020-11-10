@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [clang++, g++, clang++-11, arm-linux-gnueabihf-g++]
+        compiler: [clang++, g++, clang++-11, arm-linux-gnueabihf-g++-8]
         configuration: [error_code, status_code]
     env:
       NAME: Linux-${{ matrix.configuration }}-${{ matrix.compiler }}

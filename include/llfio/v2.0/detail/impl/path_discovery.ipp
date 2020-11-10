@@ -165,6 +165,8 @@ namespace path_discovery
           msg.append(" due to ");
           msg.append(_fh.error().message().c_str());
           LLFIO_LOG_WARN(nullptr, msg.c_str());
+          puts(msg.c_str());
+          puts("\n");
 #endif
           ps._all[n].h = {};
           continue;
@@ -191,6 +193,8 @@ namespace path_discovery
           msg.append(" due to ");
           msg.append(statfsres.error().message().c_str());
           LLFIO_LOG_WARN(nullptr, msg.c_str());
+          puts(msg.c_str());
+          puts("\n");
 #endif
           ps.all[n].stat = {};
           ps._all[n].h = {};
