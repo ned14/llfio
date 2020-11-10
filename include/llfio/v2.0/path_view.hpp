@@ -836,7 +836,7 @@ public:
     static_assert(_is_allocator_based<> + _is_deleter_based<> == 1, "AllocatorOrDeleter must be either a callable deleter, or a STL allocator, for value_type");
 
     template <class U, class source_type>
-    void _make_passthrough(path_view_component /*unused*/, bool /*unused*/, U & /*unused*/, const source_type * /*unused*/)
+    void _make_passthrough(path_view_component /*unused*/, enum zero_termination /*unused*/, U & /*unused*/, const source_type * /*unused*/)
     {
     }
     template <class U> void _make_passthrough(path_view_component view, enum zero_termination output_zero_termination, U &allocate, const value_type *source)

@@ -40,7 +40,7 @@ jobs:
          export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON";
        fi
        if [ "${{ matrix.compiler }}" = "arm-linux-gnueabihf-g++" ]; then
-         sudo apt install arm-linux-gnueabihf-g++;
+         sudo apt install arm-linux-gnueabihf-g++ ;
          ctest -S .ci.cmake -VV --timeout 600 -DCTEST_DISABLE_TESTING=1 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-arm.cmake";
        else
          ctest -S .ci.cmake -VV --timeout 600 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS";
@@ -190,6 +190,7 @@ jobs:
     - name: Install
       shell: bash
       run: |
+       git config --system core.longpaths true
        if [ "${{ matrix.configuration }}" = "status_code" ]; then
          export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON"
        fi
