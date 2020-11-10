@@ -12,6 +12,7 @@ set(CTEST_GIT_COMMAND "${GIT_EXECUTABLE}")
 
 ctest_start("Experimental")
 ctest_update()
+message(STATUS "NOTE: CTEST_CONFIGURE_OPTIONS are '${CTEST_CONFIGURE_OPTIONS}'")
 ctest_configure(OPTIONS "${CTEST_CONFIGURE_OPTIONS}")
 ctest_build(TARGET _hl)
 ctest_build(TARGET _dl)

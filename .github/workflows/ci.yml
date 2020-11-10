@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [clang++, g++, clang++-11, arm-linux-gnueabihf-g++-8]
+        compiler: [clang++, g++, clang++-11, arm-linux-gnueabihf-g++]
         configuration: [error_code, status_code]
     env:
       NAME: Linux-${{ matrix.configuration }}-${{ matrix.compiler }}
@@ -34,17 +34,16 @@ jobs:
          sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-11 main";
          sudo apt update;
          sudo apt install clang-11 libc++-11-dev libc++abi-11-dev libomp-11-dev;
-         export CMAKE_CONFIGURE_OPTIONS=-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake;
+         export CMAKE_CONFIGURE_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake";
        fi
        if [ "${{ matrix.configuration }}" = "status_code" ]; then
          export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON";
        fi
        if [ "${{ matrix.compiler }}" = "arm-linux-gnueabihf-g++" ]; then
-         sudo apt install g++-8-arm-linux-gnueabihf;
-         ctest -S .ci.cmake -VV --timeout 600 -DCTEST_DISABLE_TESTING=1 '-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-arm.cmake';
+         sudo apt install arm-linux-gnueabihf-g++;
+         ctest -S .ci.cmake -VV --timeout 600 -DCTEST_DISABLE_TESTING=1 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-arm.cmake";
        else
-         echo Configure options are '$CMAKE_CONFIGURE_OPTIONS'
-         ctest -S .ci.cmake -VV --timeout 600 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS;
+         ctest -S .ci.cmake -VV --timeout 600 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS";
        fi
       
     - name: Upload Prebuilt Binaries
@@ -79,7 +78,7 @@ jobs:
        if [ "${{ matrix.configuration }}" = "status_code" ]; then
          export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON"
        fi
-       ctest -S .ci.cmake -VV -E noexcept --timeout 600 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS
+       ctest -S .ci.cmake -VV -E noexcept --timeout 600 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS"
       
     - name: Upload Prebuilt Binaries
       uses: actions/upload-artifact@v2
@@ -113,7 +112,7 @@ jobs:
        if [ "${{ matrix.configuration }}" = "status_code" ]; then
          export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON"
        fi
-       ctest -S .ci.cmake -VV --timeout 600 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS
+       ctest -S .ci.cmake -VV --timeout 600 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS"
       
     - name: Upload Prebuilt Binaries
       uses: actions/upload-artifact@v2
@@ -196,7 +195,7 @@ jobs:
        fi
        git clone --depth 1 https://github.com/ned14/quickcpplib.git
        pip install --user gitpython
-       python quickcpplib/scripts/test_cpp-pm_install.py test-packaging/example.cpp quickcpplib quickcpplib::hl https://github.com/ned14/quickcpplib master outcome outcome::hl https://github.com/ned14/outcome better_optimisation llfio llfio::sl https://github.com/ned14/llfio master
+       python quickcpplib/scripts/test_cpp-pm_install.py test-packaging/example.cpp quickcpplib quickcpplib::hl https://github.com/ned14/quickcpplib master outcome outcome::hl https://github.com/ned14/outcome better_optimisation llfio llfio::sl https://github.com/ned14/llfio develop
        cd test_cpp-pm_install
        mkdir build
        cd build
