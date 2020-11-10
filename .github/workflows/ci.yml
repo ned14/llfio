@@ -12,8 +12,8 @@ jobs:
   Linux:
     name: Ubuntu 18.04
     runs-on: ubuntu-18.04
-    if: success() || failure()
     strategy:
+      fail-fast: false
       matrix:
         compiler: [clang++, g++, clang++-11, arm-linux-gnueabihf-g++]
         configuration: [error_code, status_code]
@@ -29,18 +29,19 @@ jobs:
       run: |
        if [ "${{ matrix.compiler }}" = "clang++-11" ]; then
          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -;
-         sudo echo "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-11 main" >> /etc/apt/sources.list;
+         sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-11 main";
          sudo apt update;
          sudo apt install clang-11 libc++-11-dev libc++abi-11-dev libomp-11-dev;
          export CMAKE_CONFIGURE_OPTIONS=-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake;
        fi
        if [ "${{ matrix.configuration }}" = "status_code" ]; then
-         export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON"
+         export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON";
        fi
        if [ "${{ matrix.compiler }}" = "arm-linux-gnueabihf-g++" ]; then
-         ctest -S .ci.cmake -V --timeout 300 -DCTEST_DISABLE_TESTING=1 '-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-arm.cmake'
+         sudo apt install g++-arm-linux-gnueabihf;
+         ctest -S .ci.cmake -V --timeout 300 -DCTEST_DISABLE_TESTING=1 '-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-arm.cmake';
        else
-         ctest -S .ci.cmake -V --timeout 300 '-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS'
+         ctest -S .ci.cmake -VV --timeout 300 '-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS';
        fi
       
     - name: Upload Prebuilt Binaries
@@ -59,8 +60,8 @@ jobs:
   MacOS:
     name: Mac OS 10.15
     runs-on: macos-10.15
-    if: success() || failure()
     strategy:
+      fail-fast: false
       matrix:
         configuration: [error_code, status_code]
     env:
@@ -93,8 +94,8 @@ jobs:
   WinVS2019:
     name: Windows VS2019
     runs-on: windows-2019
-    if: success() || failure()
     strategy:
+      fail-fast: false
       matrix:
         configuration: [error_code, status_code]
     env:
@@ -168,15 +169,17 @@ jobs:
   installability:
     name: "Installability"
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-18.04, macos-10.15, windows-2019]
         configuration: [error_code, status_code]
     env:
       NAME: Install-${{ matrix.os }}-${{ matrix.configuration }}
     runs-on: ${{ matrix.os }}
-    if: success() || failure()
           
     steps:
+    - uses: actions/checkout@v2
+
     - name: Install
       shell: bash
       run: |
@@ -195,12 +198,12 @@ jobs:
   programs:
     name: "Programs"
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-18.04, macos-10.15, windows-2019]
     env:
       NAME: Programs-${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    if: success() || failure()
           
     steps:
     - uses: actions/checkout@v2
