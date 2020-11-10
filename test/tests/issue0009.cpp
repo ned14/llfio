@@ -75,7 +75,14 @@ static inline void TestIssue09a()
   auto end = std::chrono::steady_clock::now();
   auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
   std::cout << "Closing a map_handle (file) with six, appended, very large reservations up to 2^40 took " << diff << "ms." << std::endl;
-  BOOST_CHECK(diff < 3000);
+  if(getenv("GITHUB_ACTIONS") != nullptr)
+  {
+    BOOST_CHECK(diff < 5000);
+  }
+  else
+  {
+    BOOST_CHECK(diff < 250);
+  }
 }
 
 static inline void TestIssue09b()

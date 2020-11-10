@@ -27,6 +27,8 @@ jobs:
     - name: CMake tests Linux
       shell: bash
       run: |
+       sudo apt-get remove -y libstdc++-10-dev g++-10 gcc-10
+       sudo apt-get autoremove
        if [ "${{ matrix.compiler }}" = "clang++-11" ]; then
          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -;
          sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-11 main";
@@ -39,9 +41,10 @@ jobs:
        fi
        if [ "${{ matrix.compiler }}" = "arm-linux-gnueabihf-g++" ]; then
          sudo apt install g++-8-arm-linux-gnueabihf;
-         ctest -S .ci.cmake -V --timeout 600 -DCTEST_DISABLE_TESTING=1 '-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-arm.cmake';
+         ctest -S .ci.cmake -VV --timeout 600 -DCTEST_DISABLE_TESTING=1 '-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-arm.cmake';
        else
-         ctest -S .ci.cmake -VV --timeout 600 '-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS';
+         echo Configure options are '$CMAKE_CONFIGURE_OPTIONS'
+         ctest -S .ci.cmake -VV --timeout 600 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS;
        fi
       
     - name: Upload Prebuilt Binaries
@@ -76,7 +79,7 @@ jobs:
        if [ "${{ matrix.configuration }}" = "status_code" ]; then
          export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON"
        fi
-       ctest -S .ci.cmake -V -E noexcept --timeout 600 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS
+       ctest -S .ci.cmake -VV -E noexcept --timeout 600 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS
       
     - name: Upload Prebuilt Binaries
       uses: actions/upload-artifact@v2
@@ -110,7 +113,7 @@ jobs:
        if [ "${{ matrix.configuration }}" = "status_code" ]; then
          export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON"
        fi
-       ctest -S .ci.cmake -V --timeout 600 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS
+       ctest -S .ci.cmake -VV --timeout 600 -DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS
       
     - name: Upload Prebuilt Binaries
       uses: actions/upload-artifact@v2

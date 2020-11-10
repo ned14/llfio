@@ -151,6 +151,9 @@ namespace path_discovery
           if(!_h)
           {
             // Error during opening
+#if defined(__clang__)
+            fprintf(stderr, "path_discovery::verified_temporary_directories() failed to open %s due to %s\n", ps.all[n].path.path().c_str(), _h.error().message().c_str());
+#endif
             continue;
           }
           ps._all[n].h = std::move(_h).value();
@@ -159,21 +162,23 @@ namespace path_discovery
         auto _fh = file_handle::uniquely_named_file(ps._all[n].h, file_handle::mode::write, file_handle::caching::temporary, file_handle::flag::unlink_on_first_close);
         if(!_fh)
         {
-#if LLFIO_LOGGING_LEVEL >= 3 || defined(__clang__)
+#if LLFIO_LOGGING_LEVEL >= 3
           std::string msg("path_discovery::verified_temporary_directories() failed to create a file in ");
           msg.append(ps._all[n].path.string());
           msg.append(" due to ");
           msg.append(_fh.error().message().c_str());
           LLFIO_LOG_WARN(nullptr, msg.c_str());
-          puts(msg.c_str());
-          puts("\n");
 #endif
           ps._all[n].h = {};
           continue;
         }
         ps.all[n].stat = stat_t(nullptr);
-        if(!ps.all[n].stat->fill(ps._all[n].h))
+        auto r = ps.all[n].stat->fill(ps._all[n].h);
+        if(!r)
         {
+#if defined(__clang__)
+            fprintf(stderr, "path_discovery::verified_temporary_directories() failed to stat %s due to %s\n", ps._all[n].h.current_path().value().c_str(), r.error().message().c_str());
+#endif
           LLFIO_LOG_WARN(nullptr, "path_discovery::verified_temporary_directories() failed to stat an open handle to a temp directory");
           ps.all[n].stat = {};
           ps._all[n].h = {};
@@ -187,14 +192,12 @@ namespace path_discovery
         }
         else
         {
-#if LLFIO_LOGGING_LEVEL >= 3 || defined(__clang__)
+#if LLFIO_LOGGING_LEVEL >= 3
           std::string msg("path_discovery::verified_temporary_directories() failed to statfs the temp directory ");
           msg.append(ps._all[n].path.string());
           msg.append(" due to ");
           msg.append(statfsres.error().message().c_str());
           LLFIO_LOG_WARN(nullptr, msg.c_str());
-          puts(msg.c_str());
-          puts("\n");
 #endif
           ps.all[n].stat = {};
           ps._all[n].h = {};
