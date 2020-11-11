@@ -262,17 +262,17 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, sta
       }
       if(wanted & want::atim)
       {
-        st_atim = to_timepoint(timespec{s.stx_atime.tv_sec, s.stx_atime.tv_nsec});
+        st_atim = to_timepoint(timespec{(time_t) s.stx_atime.tv_sec, (long) s.stx_atime.tv_nsec});
         ++ret;
       }
       if(wanted & want::mtim)
       {
-        st_mtim = to_timepoint(timespec{s.stx_mtime.tv_sec, s.stx_mtime.tv_nsec});
+        st_mtim = to_timepoint(timespec{(time_t) s.stx_mtime.tv_sec, (long) s.stx_mtime.tv_nsec});
         ++ret;
       }
       if(wanted & want::ctim)
       {
-        st_ctim = to_timepoint(timespec{s.stx_ctime.tv_sec, s.stx_ctime.tv_nsec});
+        st_ctim = to_timepoint(timespec{(time_t) s.stx_ctime.tv_sec, (long) s.stx_ctime.tv_nsec});
         ++ret;
       }
       if(wanted & want::size)
@@ -297,7 +297,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, sta
       }
       if(wanted & want::birthtim)
       {
-        st_birthtim = to_timepoint(timespec{s.stx_btime.tv_sec, s.stx_btime.tv_nsec});
+        st_birthtim = to_timepoint(timespec{(time_t) s.stx_btime.tv_sec, (long) s.stx_btime.tv_nsec});
         ++ret;
       }
       if(wanted & want::sparse)

@@ -412,4 +412,13 @@ include(QuickCppLibCacheLibrarySources)
 
 # Make available this library for install and export
 include(QuickCppLibMakeInstall)
+if(WIN32)
+  install(TARGETS ntkernel-error-category_hl ntkernel-error-category_sl ntkernel-error-category_dl
+          EXPORT llfioExports
+          INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+          ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+          LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+          RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+  )
+endif()
 include(QuickCppLibMakeExport)

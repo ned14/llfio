@@ -108,7 +108,7 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
     path_handle dirhfdwrap(dirhfd_, path_handle::caching::none, path_handle::flag::none);
     auto dirhpath = dirhfdwrap.current_path();
     dirhfdwrap.release();
-    OUTCOME_TRY(dirhpath);
+    OUTCOME_TRY(std::move(dirhpath));
     dirhpath.value() /= leafname;
     if(-1 == ::mkfifo(dirhpath.value().c_str(), 0x1b0 /*660*/))
 #else
