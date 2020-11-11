@@ -608,9 +608,9 @@ public:
     return _invoke([](const auto &v) {
       using value_type = typename std::remove_reference<decltype(*v.data())>::type;
 #ifdef _WIN32
-      const value_type *tofind = sizeof(value_type) > 1 ? (const value_type *) L"*?" : (const value_type *) "*?";
+      const value_type *tofind = (sizeof(value_type) > 1) ? (const value_type *) L"*?" : (const value_type *) "*?";
 #else
-      const value_type *tofind = sizeof(value_type) > 1 ? (const value_type *) L"*?[]" : (const value_type *) "*?[]";
+      const value_type *tofind = (sizeof(value_type) > 1) ? (const value_type *) L"*?[]" : (const value_type *) "*?[]";
 #endif
       return string_view::npos != v.find_first_of(tofind);
     });
@@ -1168,19 +1168,22 @@ public:
         , _deleter1arg(o._deleter1arg)
         , _deleter2(std::move(o._deleter2))
     {
-      if(o.buffer == o._buffer)
+      if(this != &o)
       {
-        memcpy(_buffer, o._buffer, (o.length + 1) * sizeof(value_type));
-        buffer = _buffer;
+        if(o.buffer == o._buffer)
+        {
+          memcpy(_buffer, o._buffer, (o.length + 1) * sizeof(value_type));
+          buffer = _buffer;
+        }
+        if(o._deleter1arg == &o._deleter2)
+        {
+          _deleter1arg = &_deleter2;
+        }
+        o.buffer = nullptr;
+        o._bytes_to_delete = 0;
+        o._deleter1 = nullptr;
+        o._deleter1arg = nullptr;
       }
-      if(o._deleter1arg == &o._deleter2)
-      {
-        _deleter1arg = &_deleter2;
-      }
-      o.buffer = nullptr;
-      o._bytes_to_delete = 0;
-      o._deleter1 = nullptr;
-      o._deleter1arg = nullptr;
     }
     c_str &operator=(const c_str &) = delete;
     c_str &operator=(c_str &&o) noexcept
