@@ -97,9 +97,11 @@ namespace path_discovery
         raw[n].second.priority = n;
       }
       // Firstly sort by source and path so duplicates are side by side
-      std::sort(raw.begin(), raw.end(), [](const auto &a, const auto &b) { return (a.first < b.first) || (a.first == b.first && a.second.path < b.second.path); });
+      std::sort(raw.begin(), raw.end(),
+                [](const auto &a, const auto &b) { return (a.first < b.first) || (a.first == b.first && a.second.path < b.second.path); });
       // Remove duplicates
-      raw.erase(std::unique(raw.begin(), raw.end(), [](const auto &a, const auto &b) { return a.first == b.first && a.second.path == b.second.path; }), raw.end());
+      raw.erase(std::unique(raw.begin(), raw.end(), [](const auto &a, const auto &b) { return a.first == b.first && a.second.path == b.second.path; }),
+                raw.end());
       // Put them back into the order in which they were returned
       std::sort(raw.begin(), raw.end(), [](const auto &a, const auto &b) { return a.second.priority < b.second.priority; });
       ps.all.reserve(raw.size());
@@ -152,16 +154,24 @@ namespace path_discovery
           {
             // Error during opening
 #if defined(__clang__)
-            fprintf(stderr, "path_discovery::verified_temporary_directories() failed to open %s due to %s\n", ps.all[n].path.path().c_str(), _h.error().message().c_str());
+            fprintf(stderr, "path_discovery::verified_temporary_directories() failed to open %s due to %s\n", ps.all[n].path.path().c_str(),
+                    _h.error().message().c_str());
             path_view::c_str<> zpath(ps.all[n].path, path_view::zero_terminated);
             fprintf(stderr, "path_view::c_str says buffer = %p (%s) length = %u\n", zpath.buffer, zpath.buffer, (unsigned) zpath.length);
+            visit(ps.all[n].path, [](auto _sv) {
+              char buffer[1024];
+              memcpy(buffer, (const char *) _sv.data(), _sv.size());
+              buffer[_sv.size()] = 0;
+              fprintf(stderr, "path_view has pointer %p content %s length = %u\n", _sv.data(), buffer, (unsigned) _sv.size());
+            });
 #endif
             continue;
           }
           ps._all[n].h = std::move(_h).value();
         }
         // Try to create a small file in that directory
-        auto _fh = file_handle::uniquely_named_file(ps._all[n].h, file_handle::mode::write, file_handle::caching::temporary, file_handle::flag::unlink_on_first_close);
+        auto _fh =
+        file_handle::uniquely_named_file(ps._all[n].h, file_handle::mode::write, file_handle::caching::temporary, file_handle::flag::unlink_on_first_close);
         if(!_fh)
         {
 #if LLFIO_LOGGING_LEVEL >= 3
@@ -178,9 +188,6 @@ namespace path_discovery
         auto r = ps.all[n].stat->fill(ps._all[n].h);
         if(!r)
         {
-#if defined(__clang__)
-            fprintf(stderr, "path_discovery::verified_temporary_directories() failed to stat %s due to %s\n", ps._all[n].h.current_path().value().c_str(), r.error().message().c_str());
-#endif
           LLFIO_LOG_WARN(nullptr, "path_discovery::verified_temporary_directories() failed to stat an open handle to a temp directory");
           ps.all[n].stat = {};
           ps._all[n].h = {};
@@ -214,7 +221,7 @@ namespace path_discovery
       {
         std::stringstream msg;
         msg << "path_discovery::verified_temporary_directories() could not find at least one writable temporary directory. Directories probed were:\n";
-        for(size_t n=0; n<ps.all.size(); n++)
+        for(size_t n = 0; n < ps.all.size(); n++)
         {
           msg << "\n   " << ps.all[n].path << " (" << ps.all[n].source << ") fs type = " << ps._all[n].fstypename << " valid = " << (bool) ps.all[n].stat;
         }
@@ -224,7 +231,8 @@ namespace path_discovery
       }
 
       // Finally, need to choose storage and memory backed directories
-      std::regex storage_backed_regex("btrfs|cifs|exfat|ext[2-4]|f2fs|hfs|apfs|jfs|lxfs|nfs|nilf2|ufs|vfat|xfs|zfs|msdosfs|newnfs|ntfs|smbfs|unionfs|fat|fat32", std::regex::icase);
+      std::regex storage_backed_regex("btrfs|cifs|exfat|ext[2-4]|f2fs|hfs|apfs|jfs|lxfs|nfs|nilf2|ufs|vfat|xfs|zfs|msdosfs|newnfs|ntfs|smbfs|unionfs|fat|fat32",
+                                      std::regex::icase);
       std::regex memory_backed_regex("tmpfs|ramfs", std::regex::icase);
       for(size_t n = 0; n < ps.verified.size(); n++)
       {

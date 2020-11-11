@@ -24,6 +24,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../test_kernel_decl.hpp"
 
+#if !defined(__GNUC__) || __SIZE_WIDTH__ > 32
+
 static inline void TestIssue09a()
 {
   namespace llfio = LLFIO_V2_NAMESPACE;
@@ -127,3 +129,4 @@ KERNELTEST_TEST_KERNEL(regression, llfio, issues, 9b,
                        "Tests issue #9 map_handle and mapped_file_handle are very slow with large address reservations on Windows", TestIssue09b())
 KERNELTEST_TEST_KERNEL(regression, llfio, issues, 9c,
                        "Tests issue #9 map_handle and mapped_file_handle are very slow with large address reservations on Windows", TestIssue09c())
+#endif
