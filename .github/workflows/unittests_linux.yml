@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [clang++, g++, clang++-11, arm-linux-gnueabihf-g++]
+        compiler: [clang++, g++, libc++, arm-linux-gnueabihf-g++]
         configuration: [error_code, status_code]
     env:
       NAME: Linux-${{ matrix.configuration }}-${{ matrix.compiler }}
@@ -29,7 +29,7 @@ jobs:
       run: |
        sudo apt-get remove -y libstdc++-10-dev g++-10 gcc-10
        sudo apt-get autoremove
-       if [ "${{ matrix.compiler }}" = "clang++-11" ]; then
+       if [ "${{ matrix.compiler }}" = "libc++" ]; then
          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -;
          sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-11 main";
          sudo apt update;

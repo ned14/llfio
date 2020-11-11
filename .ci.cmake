@@ -43,16 +43,24 @@ if(WIN32)
     )
     checked_execute_process("Tarring up binaries 3"
       COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/Release/llfio_sl-2.0-Windows-AMD64-Release.lib llfio/prebuilt/lib/Release/
-      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/Release/ntkernel-error-category_sl-1.0-Windows-AMD64-Release.lib llfio/prebuilt/lib/Release/
     )
     checked_execute_process("Tarring up binaries 4"
       COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/Release/llfio_dl-2.0-Windows-AMD64-Release.lib llfio/prebuilt/lib/Release/
-      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/Release/ntkernel-error-category_dl-1.0-Windows-AMD64-Release.lib llfio/prebuilt/lib/Release/
     )
     checked_execute_process("Tarring up binaries 5"
       COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/bin/Release/llfio_dl-2.0-Windows-AMD64-Release.dll llfio/prebuilt/bin/Release/
-      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/bin/Release/ntkernel-error-category_dl-1.0-Windows-AMD64-Release.dll llfio/prebuilt/bin/Release/
     )
+    if(EXISTS "prebuilt/bin/Release/ntkernel-error-category_dl-1.0-Windows-AMD64-Release.dll")
+      checked_execute_process("Tarring up binaries 6"
+        COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/Release/ntkernel-error-category_sl-1.0-Windows-AMD64-Release.lib llfio/prebuilt/lib/Release/
+      )
+      checked_execute_process("Tarring up binaries 7"
+        COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/Release/ntkernel-error-category_dl-1.0-Windows-AMD64-Release.lib llfio/prebuilt/lib/Release/
+      )
+      checked_execute_process("Tarring up binaries 8"
+        COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/bin/Release/ntkernel-error-category_dl-1.0-Windows-AMD64-Release.dll llfio/prebuilt/bin/Release/
+      )
+    endif()
     checked_execute_process("Tarring up binaries final"
       COMMAND "${CMAKE_COMMAND}" -E tar cfv llfio-v2.0-binaries-win64.zip --format=zip llfio/
     )

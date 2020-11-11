@@ -903,7 +903,11 @@ public:
     }
 
   public:
-    constexpr c_str() {}
+    constexpr c_str() {
+#if defined(__clang__)
+      fprintf(stderr, "path_view::c_str default constructor\n");
+#endif
+    }
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4127)  // conditional expression is constant
@@ -1057,16 +1061,25 @@ public:
     };
     c_str(_internal_construct_tag<true> /*unused*/, path_view_component view, enum zero_termination output_zero_termination, const std::locale *loc)
     {
+#if defined(__clang__)
+      fprintf(stderr, "path_view::c_str internal true constructor\n");
+#endif
       _init(view, output_zero_termination, loc, [](size_t length) { return static_cast<value_type *>(::operator new[](length * sizeof(value_type))); });
     }
     c_str(_internal_construct_tag<false> /*unused*/, path_view_component view, enum zero_termination output_zero_termination, const std::locale *loc)
     {
+#if defined(__clang__)
+      fprintf(stderr, "path_view::c_str internal false constructor\n");
+#endif
       _init(view, output_zero_termination, loc, [&](size_t n) { return _deleter2.allocate(n); });
     }
     // used by compare()
     c_str(path_view_component view, enum zero_termination output_zero_termination, const std::locale *loc)
         : c_str(_internal_construct_tag<_is_deleter_based<>>(), view, output_zero_termination, loc)
     {
+#if defined(__clang__)
+      fprintf(stderr, "path_view::c_str internal compare constructor\n");
+#endif
     }
     static void _memory_resouce_deallocate(void *_mr, value_type *p, size_t bytes)
     {
@@ -1106,6 +1119,9 @@ public:
         , _deleter1arg(&_deleter2)
         , _deleter2(static_cast<V &&>(deleter))
     {
+#if defined(__clang__)
+      fprintf(stderr, "path_view::c_str deleter based loc allocate deleter constructor\n");
+#endif
       _init(view, output_zero_termination, loc, static_cast<U &&>(allocate));
     }
     //! \overload
@@ -1120,6 +1136,9 @@ public:
         , _deleter1arg(&_deleter2)
         , _deleter2(static_cast<V &&>(deleter))
     {
+#if defined(__clang__)
+      fprintf(stderr, "path_view::c_str deleter based allocate deleter constructor\n");
+#endif
       _init(view, output_zero_termination, (const std::locale *) nullptr, static_cast<U &&>(allocate));
     }
     //! \overload memory_resource
@@ -1127,6 +1146,9 @@ public:
         : _deleter1(_memory_resouce_deallocate)
         , _deleter1arg(&mr)
     {
+#if defined(__clang__)
+      fprintf(stderr, "path_view::c_str deleter based loc memory resource constructor\n");
+#endif
       _init(view, output_zero_termination, &loc, [&](size_t n) { return static_cast<value_type *>(mr.allocate(n * sizeof(value_type))); });
     }
     //! \overload memory_resource
@@ -1134,6 +1156,9 @@ public:
         : _deleter1(_memory_resouce_deallocate)
         , _deleter1arg(&mr)
     {
+#if defined(__clang__)
+      fprintf(stderr, "path_view::c_str deleter based memory resource constructor\n");
+#endif
       _init(view, output_zero_termination, (const std::locale *) nullptr,
             [&](size_t n) { return static_cast<value_type *>(mr.allocate(n * sizeof(value_type))); });
     }
@@ -1145,6 +1170,9 @@ public:
         , _deleter1arg(&_deleter2)
         , _deleter2(static_cast<U &&>(allocate))
     {
+#if defined(__clang__)
+      fprintf(stderr, "path_view::c_str allocator based loc constructor\n");
+#endif
       _init(view, output_zero_termination, &loc, [&](size_t n) { return _deleter2.allocate(n); });
     }
     //! \overload STL allocator
@@ -1155,17 +1183,26 @@ public:
         , _deleter1arg(&_deleter2)
         , _deleter2(static_cast<U &&>(allocate))
     {
+#if defined(__clang__)
+      fprintf(stderr, "path_view::c_str allocator based constructor\n");
+#endif
       _init(view, output_zero_termination, (const std::locale *) nullptr, [&](size_t n) { return _deleter2.allocate(n); });
     }
     //! \overload default allocation
     c_str(path_view_component view, enum zero_termination output_zero_termination, const std::locale &loc)
         : c_str(_internal_construct_tag<_is_deleter_based<>>(), view, output_zero_termination, &loc)
     {
+#if defined(__clang__)
+      fprintf(stderr, "path_view::c_str loc default constructor\n");
+#endif
     }
     //! \overload
     c_str(path_view_component view, enum zero_termination output_zero_termination)
         : c_str(_internal_construct_tag<_is_deleter_based<>>(), view, output_zero_termination, (const std::locale *) nullptr)
     {
+#if defined(__clang__)
+      fprintf(stderr, "path_view::c_str default constructor\n");
+#endif
     }
     ~c_str() { reset(); }
     c_str(const c_str &) = delete;

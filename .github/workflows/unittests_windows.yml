@@ -48,8 +48,6 @@ jobs:
     needs: [WinVS2019]
     runs-on: ubuntu-latest
     if: success() || failure()
-    env:
-      NAME: Documentation
 
     steps:
       - name: Download Artifacts

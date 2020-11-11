@@ -48,8 +48,6 @@ jobs:
     needs: [MacOS]
     runs-on: ubuntu-latest
     if: success() || failure()
-    env:
-      NAME: Documentation
 
     steps:
       - name: Download Artifacts
@@ -63,9 +61,51 @@ jobs:
           check_name: Unit Test Results
           github_token: ${{ secrets.GITHUB_TOKEN }}
           files: '**/merged_junit_results.xml'
-          
-      - name: Checkout Documentation
-        uses: actions/checkout@v2
+
+  publish-binaries:
+    name: "Publish Prebuilt Binaries"
+    needs: [MacOS]
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Download Artifacts
+        uses: actions/download-artifact@v2
         with:
-          fetch-depth: 0
-          submodules: recursive
+          path: artifacts
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Commit ${{ github.sha }}
+          body: ${{ github.event.head_commit.message }}
+          draft: false
+          prerelease: true
+          
+      - name: Upload Release Asset 1
+        id: upload-release-asset-1
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/Mac OS error_code prebuilt binaries/llfio-v2.0-binaries-darwin-x64.tgz
+          asset_name: llfio-v2.0-binaries-darwin-x64-error_code.tgz
+          asset_content_type: application/gzip
+          
+      - name: Upload Release Asset 2
+        id: upload-release-asset-2
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/Mac OS status_code prebuilt binaries/llfio-v2.0-binaries-darwin-x64.tgz
+          asset_name: llfio-v2.0-binaries-darwin-x64-status_code.tgz
+          asset_content_type: application/gzip

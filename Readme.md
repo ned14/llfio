@@ -1,14 +1,18 @@
 This is the post-peer-review LLFIO v2 rewrite. You can view its documentation at https://ned14.github.io/llfio/
 
-<b>master branch test status</b> Mac OS, Linux & Windows: Documentation ![Documentation](https://github.com/ned14/llfio/workflows/Documentation/badge.svg?branch=master) Installability ![Installability](https://github.com/ned14/llfio/workflows/Installability/badge.svg?branch=master) Programs ![Programs](https://github.com/ned14/llfio/workflows/Programs/badge.svg?branch=master)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Unit tests Linux ![Unit tests Linux](https://github.com/ned14/llfio/workflows/Unit%20tests%20Linux/badge.svg?branch=master) Unit tests Mac OS ![Unit tests Mac OS](https://github.com/ned14/llfio/workflows/Unit%20tests%20Mac%20OS/badge.svg?branch=master) Unit tests Windows ![Unit tests Windows](https://github.com/ned14/llfio/workflows/Unit%20tests%20Windows/badge.svg?branch=master)
-
-<b>develop branch test status</b> Mac OS, Linux & Windows: Documentation ![Documentation](https://github.com/ned14/llfio/workflows/Documentation/badge.svg?branch=develop) Installability ![Installability](https://github.com/ned14/llfio/workflows/Installability/badge.svg?branch=develop) Programs ![Programs](https://github.com/ned14/llfio/workflows/Programs/badge.svg?branch=develop)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Unit tests Linux ![Unit tests Linux](https://github.com/ned14/llfio/workflows/Unit%20tests%20Linux/badge.svg?branch=develop) Unit tests Mac OS ![Unit tests Mac OS](https://github.com/ned14/llfio/workflows/Unit%20tests%20Mac%20OS/badge.svg?branch=develop) Unit tests Windows ![Unit tests Windows](https://github.com/ned14/llfio/workflows/Unit%20tests%20Windows/badge.svg?branch=develop)
+<table width="100%">
+<tr>><th>master branch<th>develop branch
+<tr><td align="center"><img src="https://github.com/ned14/llfio/workflows/Documentation/badge.svg?branch=master"><td align="center"><img src="https://github.com/ned14/llfio/workflows/Documentation/badge.svg?branch=develop">
+<tr><td align="center"><img src="https://github.com/ned14/llfio/workflows/Installability/badge.svg?branch=master"><td align="center"><img src="https://github.com/ned14/llfio/workflows/Installability/badge.svg?branch=develop">
+<tr><td align="center"><img src="https://github.com/ned14/llfio/workflows/Programs/badge.svg?branch=master"><td align="center"><img src="https://github.com/ned14/llfio/workflows/Programs/badge.svg?branch=develop">
+<tr><td align="center"><a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Linux%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Linux/badge.svg?branch=master"></a><td align="center"><a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Linux%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Linux/badge.svg?branch=develop"></a>
+<tr><td align="center"><a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Mac+OS%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Mac%20OS/badge.svg?branch=master"></a><td align="center"><a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Mac+OS%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Mac%20OS/badge.svg?branch=develop"></a>
+<tr><td align="center"><a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Windows%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Windows/badge.svg?branch=master"></a><td align="center"><a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Windows%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Windows/badge.svg?branch=develop"></a>
+</table>
 
 <b>CMake dashboard</b>: https://my.cdash.org/index.php?project=Boost.AFIO
 
-PREBUILT BINARIES CAN BE FOUND AT https://github.com/ned14/llfio/packages
+PREBUILT BINARIES FOR LINUX (x64 and ARM), MAC OS AND WINDOWS CAN BE FOUND AT https://github.com/ned14/llfio/releases
 
 USAGE AND CONFIGURATION INSTRUCTIONS CAN BE FOUND AT https://ned14.github.io/llfio/
 
