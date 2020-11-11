@@ -903,9 +903,7 @@ public:
     }
 
   public:
-    constexpr c_str()
-    {
-    }
+    constexpr c_str() {}
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4127)  // conditional expression is constant
@@ -1089,11 +1087,19 @@ public:
       auto *del = static_cast<Alloc *>(_del);
       del->deallocate(p, bytes / sizeof(value_type));
     }
-    template <bool delete_by_allocator = std::is_void<deleter_type>::value> static void _default_deleter(void *_del, value_type *p, size_t bytes)
+    struct _wrap_invoke_deleter
     {
-      _invoke_deleter<>(_del, p, bytes);
+      _wrap_invoke_deleter(void *_del, value_type *p, size_t bytes) { _invoke_deleter<>(_del, p, bytes); }
+    };
+    struct _wrap_stl_allocator_deallocate
+    {
+      _wrap_stl_allocator_deallocate(void *_del, value_type *p, size_t bytes) { _stl_allocator_deallocate<>(_del, p, bytes); }
+    };
+    static void _default_deleter(void *_del, value_type *p, size_t bytes)
+    {
+      using type = std::conditional_t<std::is_void<deleter_type>::value, _wrap_stl_allocator_deallocate, _wrap_invoke_deleter>;
+      type(_del, p, bytes);
     }
-    template <> void _default_deleter<true>(void *_del, value_type *p, size_t bytes) { _stl_allocator_deallocate<>(_del, p, bytes); }
 
     // used by compare()
     c_str(path_view_component view, enum zero_termination output_zero_termination, const std::locale *loc)
