@@ -1,0 +1,32 @@
+name: Programs
+
+on:
+  push:
+    branches:
+    - develop
+  pull_request:
+  schedule:
+  - cron: '0 0 1 * *'
+
+jobs:
+  programs:
+    name: "Programs"
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-18.04, macos-10.15, windows-2019]
+    env:
+      NAME: Programs-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+          
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build
+      shell: bash
+      run: |
+       cd programs
+       mkdir build
+       cd build
+       cmake ..  $CMAKE_CONFIGURE_OPTIONS -DCMAKE_BUILD_TYPE=Release
+       cmake --build .

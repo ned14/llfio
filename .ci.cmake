@@ -30,7 +30,7 @@ if(NOT CTEST_DISABLE_TESTING)
   endif()
 endif()
 if(WIN32)
-  if(EXISTS "prebuilt/bin/Release/llfio_dl-2.0-Windows-x64-Release.dll")
+  if(EXISTS "prebuilt/bin/Release/llfio_dl-2.0-Windows-AMD64-Release.dll")
     checked_execute_process("Tarring up binaries 1"
       COMMAND "${CMAKE_COMMAND}" -E make_directory llfio/prebuilt/bin/Release
       COMMAND "${CMAKE_COMMAND}" -E make_directory llfio/prebuilt/lib/Release
@@ -42,16 +42,16 @@ if(WIN32)
       COMMAND "${CMAKE_COMMAND}" -E copy release_notes.md llfio/
     )
     checked_execute_process("Tarring up binaries 3"
-      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/Release/llfio_sl-2.0-Windows-x64-Release.lib llfio/prebuilt/lib/Release/
-      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/Release/ntkernel-error-category_sl.lib llfio/prebuilt/lib/Release/
+      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/Release/llfio_sl-2.0-Windows-AMD64-Release.lib llfio/prebuilt/lib/Release/
+      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/Release/ntkernel-error-category_sl-1.0-Windows-AMD64-Release.lib llfio/prebuilt/lib/Release/
     )
     checked_execute_process("Tarring up binaries 4"
-      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/Release/llfio_dl-2.0-Windows-x64-Release.lib llfio/prebuilt/lib/Release/
-      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/Release/ntkernel-error-category_dl.lib llfio/prebuilt/lib/Release/
+      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/Release/llfio_dl-2.0-Windows-AMD64-Release.lib llfio/prebuilt/lib/Release/
+      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/Release/ntkernel-error-category_dl-1.0-Windows-AMD64-Release.lib llfio/prebuilt/lib/Release/
     )
     checked_execute_process("Tarring up binaries 5"
-      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/bin/Release/llfio_dl-2.0-Windows-x64-Release.dll llfio/prebuilt/bin/Release/
-      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/bin/Release/ntkernel-error-category_dl.dll llfio/prebuilt/bin/Release/
+      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/bin/Release/llfio_dl-2.0-Windows-AMD64-Release.dll llfio/prebuilt/bin/Release/
+      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/bin/Release/ntkernel-error-category_dl-1.0-Windows-AMD64-Release.dll llfio/prebuilt/bin/Release/
     )
     checked_execute_process("Tarring up binaries final"
       COMMAND "${CMAKE_COMMAND}" -E tar cfv llfio-v2.0-binaries-win64.zip --format=zip llfio/

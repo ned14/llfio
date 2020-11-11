@@ -1,8 +1,10 @@
 This is the post-peer-review LLFIO v2 rewrite. You can view its documentation at https://ned14.github.io/llfio/
 
-<b>master branch test status</b> Mac OS, Linux & Windows: ![CI](https://github.com/ned14/llfio/workflows/CI/badge.svg?branch=master)
+<b>master branch test status</b> Mac OS, Linux & Windows: Documentation ![Documentation](https://github.com/ned14/llfio/workflows/Documentation/badge.svg?branch=master) Installability ![Installability](https://github.com/ned14/llfio/workflows/Installability/badge.svg?branch=master) Programs ![Programs](https://github.com/ned14/llfio/workflows/Programs/badge.svg?branch=master)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Unit tests Linux ![Unit tests Linux](https://github.com/ned14/llfio/workflows/Unit%20tests%20Linux/badge.svg?branch=master) Unit tests Mac OS ![Unit tests Mac OS](https://github.com/ned14/llfio/workflows/Unit%20tests%20Mac%20OS/badge.svg?branch=master) Unit tests Windows ![Unit tests Windows](https://github.com/ned14/llfio/workflows/Unit%20tests%20Windows/badge.svg?branch=master)
 
-<b>develop branch test status</b> Mac OS, Linux & Windows: ![CI](https://github.com/ned14/llfio/workflows/CI/badge.svg?branch=develop)
+<b>develop branch test status</b> Mac OS, Linux & Windows: Documentation ![Documentation](https://github.com/ned14/llfio/workflows/Documentation/badge.svg?branch=develop) Installability ![Installability](https://github.com/ned14/llfio/workflows/Installability/badge.svg?branch=develop) Programs ![Programs](https://github.com/ned14/llfio/workflows/Programs/badge.svg?branch=develop)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Unit tests Linux ![Unit tests Linux](https://github.com/ned14/llfio/workflows/Unit%20tests%20Linux/badge.svg?branch=develop) Unit tests Mac OS ![Unit tests Mac OS](https://github.com/ned14/llfio/workflows/Unit%20tests%20Mac%20OS/badge.svg?branch=develop) Unit tests Windows ![Unit tests Windows](https://github.com/ned14/llfio/workflows/Unit%20tests%20Windows/badge.svg?branch=develop)
 
 <b>CMake dashboard</b>: https://my.cdash.org/index.php?project=Boost.AFIO
 

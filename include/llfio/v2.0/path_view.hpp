@@ -835,9 +835,12 @@ public:
     template <class X = void> static constexpr bool _is_allocator_based = std::is_void<deleter_type>::value;
     static_assert(_is_allocator_based<> + _is_deleter_based<> == 1, "AllocatorOrDeleter must be either a callable deleter, or a STL allocator, for value_type");
 
-    template <class U, class source_type>
+    LLFIO_TEMPLATE(class U, class source_type)
+    LLFIO_TREQUIRES(LLFIO_TPRED(!std::is_same<source_type, value_type>::value))
     void _make_passthrough(path_view_component /*unused*/, enum zero_termination /*unused*/, U & /*unused*/, const source_type * /*unused*/)
     {
+      LLFIO_LOG_FATAL(nullptr, "Passthrough to non-identity type ought to never be called!");
+      abort();
     }
     template <class U> void _make_passthrough(path_view_component view, enum zero_termination output_zero_termination, U &allocate, const value_type *source)
     {
@@ -908,6 +911,9 @@ public:
   private:
     template <class U> void _init(path_view_component view, enum zero_termination output_zero_termination, const std::locale *loc, U &&allocate)
     {
+#if defined(__clang__)
+      fprintf(stderr, "path_view::c_str::init() sees view with length %u\n", (unsigned) view._length);
+#endif
       if(0 == view._length)
       {
         _buffer[0] = 0;
@@ -923,6 +929,9 @@ public:
       }
       if(std::is_same<T, char>::value && view._char)
       {
+#if defined(__clang__)
+      fprintf(stderr, "path_view::c_str::init() calls char _make_passthrough\n");
+#endif
         _make_passthrough(view, output_zero_termination, allocate, view._charstr);
         return;
       }

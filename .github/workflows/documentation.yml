@@ -1,0 +1,37 @@
+name: Documentation
+
+on:
+  push:
+    branches:
+    - develop
+  pull_request:
+  schedule:
+  - cron: '0 0 1 * *'
+
+jobs:
+  documentation:
+    name: "Regenerate and publish Documentation"
+    runs-on: ubuntu-latest
+    env:
+      NAME: Documentation
+
+    steps:
+      - name: Checkout Documentation
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Regenerate Documentation
+        shell: bash
+        run: |
+         sudo apt-get install -y doxygen graphviz
+         ctest -S .docs.cmake -V
+          
+      - name: Publish Documentation
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: doc/html
+          CLEAN: true

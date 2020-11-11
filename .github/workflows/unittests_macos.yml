@@ -1,0 +1,71 @@
+name: Unit tests Mac OS
+
+on:
+  push:
+    branches:
+    - develop
+  pull_request:
+  schedule:
+  - cron: '0 0 1 * *'
+
+jobs:
+  MacOS:
+    name: Mac OS 10.15
+    runs-on: macos-10.15
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [error_code, status_code]
+    env:
+      NAME: MacOS-${{ matrix.configuration }}
+          
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: CMake tests Mac OS
+      shell: bash
+      run: |
+       if [ "${{ matrix.configuration }}" = "status_code" ]; then
+         export CMAKE_CONFIGURE_OPTIONS="-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON"
+       fi
+       ctest -S .ci.cmake -VV -E noexcept --timeout 900 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS"
+      
+    - name: Upload Prebuilt Binaries
+      uses: actions/upload-artifact@v2
+      with:
+        name: Mac OS ${{ matrix.configuration }} prebuilt binaries
+        path: llfio-v2.0-binaries-darwin-x64.tgz
+      
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: Mac OS ${{ matrix.configuration }} test results
+        path: prebuilt/merged_junit_results.xml
+
+  publish-test-results:
+    name: "Publish Unit Tests Results"
+    needs: [MacOS]
+    runs-on: ubuntu-latest
+    if: success() || failure()
+    env:
+      NAME: Documentation
+
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: artifacts
+
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1.3
+        with:
+          check_name: Unit Test Results
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          files: '**/merged_junit_results.xml'
+          
+      - name: Checkout Documentation
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          submodules: recursive

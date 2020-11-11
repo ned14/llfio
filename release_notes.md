@@ -2,7 +2,9 @@
 <tr>
 <td align="center"> <a href="https://github.com/ned14/llfio">LLFIO</a><br><a href="https://github.com/ned14/llfio">on GitHub</a> </td>
 <td align="center"> <a href="https://my.cdash.org/index.php?project=Boost.AFIO">CTest summary</a><br><a href="https://my.cdash.org/index.php?project=Boost.AFIO">dashboard</a> </td>
-<td align="center"> Mac OS, Linux and Windows CI: <img src="https://github.com/ned14/llfio/workflows/CI/badge.svg?branch=master"/> </td>
+<td align="center"> <a href="https://github.com/ned14/llfio/actions?query=workflow%3AUnit%20tests%20Linux">Linux CI:</a><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Linux/badge.svg?branch=master"/> </td>
+<td align="center"> <a href="https://github.com/ned14/llfio/actions?query=workflow%3AUnit%20tests%20Mac%20OS">Mac OS CI:</a><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Mac%20OS/badge.svg?branch=master"/> </td>
+<td align="center"> <a href="https://github.com/ned14/llfio/actions?query=workflow%3AUnit%20tests%20Windows">Windows CI:</a><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Windows/badge.svg?branch=master"/> </td>
 <td align="center"> <a href="https://github.com/ned14/llfio/packages">Prebuilt binaries</a> </td>
 </tr>
 </table></center>
