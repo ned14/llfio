@@ -190,7 +190,7 @@ jobs:
     - name: Install
       shell: bash
       run: |
-       sudo git config --system core.longpaths true
+       git config --global core.longpaths true
        if [ "${{ matrix.configuration }}" = "status_code" ]; then
          export CMAKE_CONFIGURE_OPTIONS="-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON"
        fi
