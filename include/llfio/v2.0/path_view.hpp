@@ -903,10 +903,8 @@ public:
     }
 
   public:
-    constexpr c_str() {
-#if defined(__clang__)
-      fprintf(stderr, "path_view::c_str default constructor\n");
-#endif
+    constexpr c_str()
+    {
     }
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -915,9 +913,6 @@ public:
   private:
     template <class U> void _init(path_view_component view, enum zero_termination output_zero_termination, const std::locale *loc, U &&allocate)
     {
-#if defined(__clang__)
-      fprintf(stderr, "path_view::c_str::init() sees view with length %u\n", (unsigned) view._length);
-#endif
       if(0 == view._length)
       {
         _buffer[0] = 0;
@@ -933,9 +928,6 @@ public:
       }
       if(std::is_same<T, char>::value && view._char)
       {
-#if defined(__clang__)
-      fprintf(stderr, "path_view::c_str::init() calls char _make_passthrough\n");
-#endif
         _make_passthrough(view, output_zero_termination, allocate, view._charstr);
         return;
       }
@@ -1047,9 +1039,6 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-    template <bool> struct _internal_construct_tag
-    {
-    };
     struct _custom_callable_deleter_tag
     {
     };
@@ -1059,37 +1048,59 @@ public:
     struct _stl_allocator_tag
     {
     };
-    c_str(_internal_construct_tag<true> /*unused*/, path_view_component view, enum zero_termination output_zero_termination, const std::locale *loc)
+
+    struct _allocate_not_anything_else
     {
-#if defined(__clang__)
-      fprintf(stderr, "path_view::c_str internal true constructor\n");
-#endif
-      _init(view, output_zero_termination, loc, [](size_t length) { return static_cast<value_type *>(::operator new[](length * sizeof(value_type))); });
+      template <class U> explicit _allocate_not_anything_else(U * /*unused*/) {}
+      value_type *operator()(size_t length) const { return static_cast<value_type *>(::operator new[](length * sizeof(value_type))); }
+    };
+    struct _memory_resource_allocate
+    {
+      pmr::memory_resource *mr{nullptr};
+      value_type *operator()(size_t bytes) const { return static_cast<value_type *>(mr->allocate(bytes)); }
+    };
+    template <class Alloc> struct _stl_allocator_allocate
+    {
+      Alloc *alloc{nullptr};
+      explicit _stl_allocator_allocate(Alloc *a)
+          : alloc(a)
+      {
+      }
+      value_type *operator()(size_t count) const { return alloc->allocate(count); }
+    };
+    template <class Alloc> static auto _default_allocate(Alloc *alloc)
+    {
+      using type = std::conditional_t<std::is_void<deleter_type>::value, _stl_allocator_allocate<Alloc>, _allocate_not_anything_else>;
+      return type(alloc);
     }
-    c_str(_internal_construct_tag<false> /*unused*/, path_view_component view, enum zero_termination output_zero_termination, const std::locale *loc)
+
+    template <class U = deleter_type> static void _invoke_deleter(void *_del, value_type *p, size_t /*unused*/)
     {
-#if defined(__clang__)
-      fprintf(stderr, "path_view::c_str internal false constructor\n");
-#endif
-      _init(view, output_zero_termination, loc, [&](size_t n) { return _deleter2.allocate(n); });
-    }
-    // used by compare()
-    c_str(path_view_component view, enum zero_termination output_zero_termination, const std::locale *loc)
-        : c_str(_internal_construct_tag<_is_deleter_based<>>(), view, output_zero_termination, loc)
-    {
-#if defined(__clang__)
-      fprintf(stderr, "path_view::c_str internal compare constructor\n");
-#endif
+      auto *del = static_cast<U *>(_del);
+      (*del)(p);
     }
     static void _memory_resouce_deallocate(void *_mr, value_type *p, size_t bytes)
     {
       auto *mr = static_cast<pmr::memory_resource *>(_mr);
       mr->deallocate(p, bytes);
     }
-    template <class Alloc> static void _stl_allocator_deallocate(void *_del, value_type *p, size_t bytes)
+    template <class Alloc = allocator_type> static void _stl_allocator_deallocate(void *_del, value_type *p, size_t bytes)
     {
       auto *del = static_cast<Alloc *>(_del);
-      del->deallocate(p, bytes);
+      del->deallocate(p, bytes / sizeof(value_type));
+    }
+    template <bool delete_by_allocator = std::is_void<deleter_type>::value> static void _default_deleter(void *_del, value_type *p, size_t bytes)
+    {
+      _invoke_deleter<>(_del, p, bytes);
+    }
+    template <> void _default_deleter<true>(void *_del, value_type *p, size_t bytes) { _stl_allocator_deallocate<>(_del, p, bytes); }
+
+    // used by compare()
+    c_str(path_view_component view, enum zero_termination output_zero_termination, const std::locale *loc)
+        : _deleter1(_default_deleter)
+        , _deleter1arg(&_deleter2)
+    {
+      _init(view, output_zero_termination, loc, _default_allocate<AllocatorOrDeleter>(&_deleter2));
     }
 
   public:
@@ -1112,16 +1123,10 @@ public:
     LLFIO_TREQUIRES(LLFIO_TPRED(_is_deleter_based<U>), LLFIO_TEXPR(std::declval<U>()((size_t) 1)), LLFIO_TEXPR(std::declval<V>()((value_type *) nullptr)))
     c_str(path_view_component view, enum zero_termination output_zero_termination, const std::locale &loc, U &&allocate, V &&deleter = AllocatorOrDeleter(),
           _custom_callable_deleter_tag = {})
-        : _deleter1([](void *_del, value_type *p, size_t /*unused*/) -> void {
-          auto *del = static_cast<std::decay_t<V> *>(_del);
-          (*del)(p);
-        })
+        : _deleter1(_invoke_deleter)
         , _deleter1arg(&_deleter2)
         , _deleter2(static_cast<V &&>(deleter))
     {
-#if defined(__clang__)
-      fprintf(stderr, "path_view::c_str deleter based loc allocate deleter constructor\n");
-#endif
       _init(view, output_zero_termination, loc, static_cast<U &&>(allocate));
     }
     //! \overload
@@ -1129,16 +1134,10 @@ public:
     LLFIO_TREQUIRES(LLFIO_TPRED(_is_deleter_based<U>), LLFIO_TEXPR(std::declval<U>()((size_t) 1)), LLFIO_TEXPR(std::declval<V>()((value_type *) nullptr)))
     c_str(path_view_component view, enum zero_termination output_zero_termination, U &&allocate, V &&deleter = AllocatorOrDeleter(),
           _custom_callable_deleter_tag = {})
-        : _deleter1([](void *_del, value_type *p, size_t /*unused*/) -> void {
-          auto *del = static_cast<std::decay_t<V> *>(_del);
-          (*del)(p);
-        })
+        : _deleter1(_invoke_deleter)
         , _deleter1arg(&_deleter2)
         , _deleter2(static_cast<V &&>(deleter))
     {
-#if defined(__clang__)
-      fprintf(stderr, "path_view::c_str deleter based allocate deleter constructor\n");
-#endif
       _init(view, output_zero_termination, (const std::locale *) nullptr, static_cast<U &&>(allocate));
     }
     //! \overload memory_resource
@@ -1146,21 +1145,14 @@ public:
         : _deleter1(_memory_resouce_deallocate)
         , _deleter1arg(&mr)
     {
-#if defined(__clang__)
-      fprintf(stderr, "path_view::c_str deleter based loc memory resource constructor\n");
-#endif
-      _init(view, output_zero_termination, &loc, [&](size_t n) { return static_cast<value_type *>(mr.allocate(n * sizeof(value_type))); });
+      _init(view, output_zero_termination, &loc, _memory_resource_allocate{&mr});
     }
     //! \overload memory_resource
     c_str(path_view_component view, enum zero_termination output_zero_termination, pmr::memory_resource &mr, _memory_resource_tag = {})
         : _deleter1(_memory_resouce_deallocate)
         , _deleter1arg(&mr)
     {
-#if defined(__clang__)
-      fprintf(stderr, "path_view::c_str deleter based memory resource constructor\n");
-#endif
-      _init(view, output_zero_termination, (const std::locale *) nullptr,
-            [&](size_t n) { return static_cast<value_type *>(mr.allocate(n * sizeof(value_type))); });
+      _init(view, output_zero_termination, (const std::locale *) nullptr, _memory_resource_allocate{&mr});
     }
     //! \overload STL allocator
     LLFIO_TEMPLATE(class U)
@@ -1170,10 +1162,7 @@ public:
         , _deleter1arg(&_deleter2)
         , _deleter2(static_cast<U &&>(allocate))
     {
-#if defined(__clang__)
-      fprintf(stderr, "path_view::c_str allocator based loc constructor\n");
-#endif
-      _init(view, output_zero_termination, &loc, [&](size_t n) { return _deleter2.allocate(n); });
+      _init(view, output_zero_termination, &loc, _stl_allocator_allocate<std::decay_t<U>>(static_cast<std::decay_t<U> *>(&_deleter2)));
     }
     //! \overload STL allocator
     LLFIO_TEMPLATE(class U)
@@ -1183,26 +1172,21 @@ public:
         , _deleter1arg(&_deleter2)
         , _deleter2(static_cast<U &&>(allocate))
     {
-#if defined(__clang__)
-      fprintf(stderr, "path_view::c_str allocator based constructor\n");
-#endif
-      _init(view, output_zero_termination, (const std::locale *) nullptr, [&](size_t n) { return _deleter2.allocate(n); });
+      _init(view, output_zero_termination, (const std::locale *) nullptr, _stl_allocator_allocate<std::decay_t<U>>(static_cast<std::decay_t<U> *>(&_deleter2)));
     }
     //! \overload default allocation
     c_str(path_view_component view, enum zero_termination output_zero_termination, const std::locale &loc)
-        : c_str(_internal_construct_tag<_is_deleter_based<>>(), view, output_zero_termination, &loc)
+        : _deleter1(_default_deleter)
+        , _deleter1arg(&_deleter2)
     {
-#if defined(__clang__)
-      fprintf(stderr, "path_view::c_str loc default constructor\n");
-#endif
+      _init(view, output_zero_termination, &loc, _default_allocate<AllocatorOrDeleter>(&_deleter2));
     }
     //! \overload
     c_str(path_view_component view, enum zero_termination output_zero_termination)
-        : c_str(_internal_construct_tag<_is_deleter_based<>>(), view, output_zero_termination, (const std::locale *) nullptr)
+        : _deleter1(_default_deleter)
+        , _deleter1arg(&_deleter2)
     {
-#if defined(__clang__)
-      fprintf(stderr, "path_view::c_str default constructor\n");
-#endif
+      _init(view, output_zero_termination, nullptr, _default_allocate<AllocatorOrDeleter>(&_deleter2));
     }
     ~c_str() { reset(); }
     c_str(const c_str &) = delete;

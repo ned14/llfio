@@ -284,6 +284,30 @@ static inline void TestPathView()
     BOOST_CHECK(zbuff.allocator().deleted == 1);
     BOOST_CHECK(zbuff.allocator().sig == 5);
   }
+  // Default custom allocator
+  {
+    struct custom_allocator
+    {
+      int sig{0};
+      using value_type = char;
+      int allocated{0}, deleted{0};
+      value_type *allocate(size_t /*unused*/)
+      {
+        allocated++;
+        static char buff[4];
+        return buff;
+      }
+      void deallocate(void * /*unused*/, size_t /*unused*/) { deleted++; }
+    } allocator{5};
+    llfio::path_view v("foo", 3, llfio::path_view::not_zero_terminated);
+    llfio::path_view::c_str<char, custom_allocator, 0> zbuff(v, llfio::path_view::zero_terminated);
+    zbuff.reset();
+    BOOST_CHECK(allocator.allocated == 0);  // copy must be taken
+    BOOST_CHECK(allocator.deleted == 0);    // copy must be taken
+    BOOST_CHECK(zbuff.allocator().allocated == 1);
+    BOOST_CHECK(zbuff.allocator().deleted == 1);
+    BOOST_CHECK(zbuff.allocator().sig == 0);  // default initialised
+  }
 }
 
 KERNELTEST_TEST_KERNEL(integration, llfio, path_view, path_view, "Tests that llfio::path_view() works as expected", TestPathView())
