@@ -1,0 +1,134 @@
+name: Make release
+
+on:
+  workflow_run:
+    workflows: ["Unit tests Linux", "Unit tests Mac OS", "Unit tests Windows"]
+    branches: [develop]
+    types:
+      - completed
+
+jobs:
+  publish-binaries:
+    name: "Create release with Binaries"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Download Linux artifacts
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{secrets.GITHUB_TOKEN}}
+          workflow: unittests_linux.yml
+          path: artifacts
+    
+      - name: Download Mac OS artifacts
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{secrets.GITHUB_TOKEN}}
+          workflow: unittests_macos.yml
+          path: artifacts
+    
+      - name: Download Windows artifacts
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{secrets.GITHUB_TOKEN}}
+          workflow: unittests_windows.yml
+          path: artifacts
+    
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Commit ${{ github.sha }}
+          body: |
+            ```
+            ${{ github.event.head_commit.message }}
+            ```
+            
+            Prebuilt binaries for platforms with all tests passing are in Assets below:
+          draft: false
+          prerelease: true
+          
+      - name: Upload MacOS 1
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/Mac OS error_code prebuilt binaries/llfio-v2.0-binaries-darwin-x64.tgz
+          asset_name: llfio-v2.0-binaries-darwin-10.15-x64-error_code.tgz
+          asset_content_type: application/gzip
+          
+      - name: Upload MacOS 2
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/Mac OS status_code prebuilt binaries/llfio-v2.0-binaries-darwin-x64.tgz
+          asset_name: llfio-v2.0-binaries-darwin-10.15-x64-status_code.tgz
+          asset_content_type: application/gzip
+
+      - name: Upload Linux 1
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/Linux error_code g++ prebuilt binaries/llfio-v2.0-binaries-linux-x64.tgz
+          asset_name: llfio-v2.0-binaries-ubuntu18.04-x64-error_code.tgz
+          asset_content_type: application/gzip
+          
+      - name: Upload Linux 2
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/Linux status_code g++ prebuilt binaries/llfio-v2.0-binaries-linux-x64.tgz
+          asset_name: llfio-v2.0-binaries-ubuntu18.04-x64-status_code.tgz
+          asset_content_type: application/gzip
+          
+      - name: Upload Linux 3
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/Linux error_code arm-linux-gnueabihf-g++ prebuilt binaries/llfio-v2.0-binaries-linux-armhf.tgz
+          asset_name: llfio-v2.0-binaries-ubuntu18.04-armhf-error_code.tgz
+          asset_content_type: application/gzip
+          
+      - name: Upload Linux 4
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/Linux status_code arm-linux-gnueabihf-g++ prebuilt binaries/llfio-v2.0-binaries-linux-armhf.tgz
+          asset_name: llfio-v2.0-binaries-ubuntu18.04-armhf-status_code.tgz
+          asset_content_type: application/gzip
+
+      - name: Upload Windows 1
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/Windows VS2019 error_code prebuilt binaries/llfio-v2.0-binaries-win64.zip
+          asset_name: llfio-v2.0-binaries-win64-vs2019-error_code.zip
+          asset_content_type: application/zip
+          
+      - name: Upload Windows 2
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/Windows VS2019 status_code prebuilt binaries/llfio-v2.0-binaries-win64.zip
+          asset_name: llfio-v2.0-binaries-win64-vs2019-status_code.zip
+          asset_content_type: application/zip
