@@ -1,22 +1,32 @@
-name: Make release
+name: Create release if everything passes
 
 on:
-  workflow_run:
-    workflows: ["Unit tests Linux", "Unit tests Mac OS", "Unit tests Windows"]
-    branches: [develop]
-    types:
-      - completed
+  push:
+    branches:
+    - develop
+  pull_request:
+  schedule:
+  - cron: '0 0 1 * *'
 
 jobs:
   publish-binaries:
-    name: "Create release with Binaries"
+    name: "Publish Binaries"
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
       
+      - name: 'Wait for status checks'
+        id: waitforstatuschecks
+        uses: "WyriHaximus/github-action-wait-for-status@v2"
+        with:
+          checkInterval: 60
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
       - name: Download Linux artifacts
         uses: dawidd6/action-download-artifact@v2
+        if: steps.waitforstatuschecks.outputs.status == 'success'
         with:
           github_token: ${{secrets.GITHUB_TOKEN}}
           workflow: unittests_linux.yml
@@ -24,6 +34,7 @@ jobs:
     
       - name: Download Mac OS artifacts
         uses: dawidd6/action-download-artifact@v2
+        if: steps.waitforstatuschecks.outputs.status == 'success'
         with:
           github_token: ${{secrets.GITHUB_TOKEN}}
           workflow: unittests_macos.yml
@@ -31,50 +42,41 @@ jobs:
     
       - name: Download Windows artifacts
         uses: dawidd6/action-download-artifact@v2
+        if: steps.waitforstatuschecks.outputs.status == 'success'
         with:
           github_token: ${{secrets.GITHUB_TOKEN}}
           workflow: unittests_windows.yml
           path: artifacts
     
+#      - name: Delete Tag
+#        uses: dev-drprasad/delete-tag-and-release@v0.1.2
+#        with:
+#          delete_release: true
+#          tag_name: last_all_tests_passing
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
+        if: steps.waitforstatuschecks.outputs.status == 'success'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Commit ${{ github.sha }}
+          tag_name: all_tests_passing_${{ github.sha }}
+          release_name: All tests passed ${{ github.sha }}
           body: |
             ```
             ${{ github.event.head_commit.message }}
             ```
             
-            Prebuilt binaries for platforms with all tests passing are in Assets below:
+            Prebuilt binaries with development headers and documentation for common platforms are in Assets below:
           draft: false
           prerelease: true
           
-      - name: Upload MacOS 1
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifacts/Mac OS error_code prebuilt binaries/llfio-v2.0-binaries-darwin-x64.tgz
-          asset_name: llfio-v2.0-binaries-darwin-10.15-x64-error_code.tgz
-          asset_content_type: application/gzip
-          
-      - name: Upload MacOS 2
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifacts/Mac OS status_code prebuilt binaries/llfio-v2.0-binaries-darwin-x64.tgz
-          asset_name: llfio-v2.0-binaries-darwin-10.15-x64-status_code.tgz
-          asset_content_type: application/gzip
-
       - name: Upload Linux 1
         uses: actions/upload-release-asset@v1
+        if: steps.waitforstatuschecks.outputs.status == 'success'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -85,6 +87,7 @@ jobs:
           
       - name: Upload Linux 2
         uses: actions/upload-release-asset@v1
+        if: steps.waitforstatuschecks.outputs.status == 'success'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -95,6 +98,7 @@ jobs:
           
       - name: Upload Linux 3
         uses: actions/upload-release-asset@v1
+        if: steps.waitforstatuschecks.outputs.status == 'success'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -105,6 +109,7 @@ jobs:
           
       - name: Upload Linux 4
         uses: actions/upload-release-asset@v1
+        if: steps.waitforstatuschecks.outputs.status == 'success'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -113,8 +118,31 @@ jobs:
           asset_name: llfio-v2.0-binaries-ubuntu18.04-armhf-status_code.tgz
           asset_content_type: application/gzip
 
+      - name: Upload MacOS 1
+        uses: actions/upload-release-asset@v1
+        if: steps.waitforstatuschecks.outputs.status == 'success'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/Mac OS error_code prebuilt binaries/llfio-v2.0-binaries-darwin-x64.tgz
+          asset_name: llfio-v2.0-binaries-darwin-10.15-x64-error_code.tgz
+          asset_content_type: application/gzip
+          
+      - name: Upload MacOS 2
+        uses: actions/upload-release-asset@v1
+        if: steps.waitforstatuschecks.outputs.status == 'success'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/Mac OS status_code prebuilt binaries/llfio-v2.0-binaries-darwin-x64.tgz
+          asset_name: llfio-v2.0-binaries-darwin-10.15-x64-status_code.tgz
+          asset_content_type: application/gzip
+
       - name: Upload Windows 1
         uses: actions/upload-release-asset@v1
+        if: steps.waitforstatuschecks.outputs.status == 'success'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -125,6 +153,7 @@ jobs:
           
       - name: Upload Windows 2
         uses: actions/upload-release-asset@v1
+        if: steps.waitforstatuschecks.outputs.status == 'success'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
