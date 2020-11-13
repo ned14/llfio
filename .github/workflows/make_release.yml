@@ -20,7 +20,7 @@ jobs:
         id: waitforstatuschecks
         uses: "WyriHaximus/github-action-wait-for-status@v1.2"
         with:
-          ignoreActions: publish-binaries
+          ignoreActions: "Publish Binaries"
           checkInterval: 60
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
