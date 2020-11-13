@@ -64,7 +64,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: all_tests_passing_${{ github.sha }}
+          tag_name: all_tests_passed_${{ github.sha }}
           release_name: All tests passed ${{ github.sha }}
           body: |
             ```
@@ -127,7 +127,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: artifacts/Mac OS error_code prebuilt binaries/llfio-v2.0-binaries-darwin-x64.tgz
-          asset_name: llfio-v2.0-binaries-darwin-10.15-x64-error_code.tgz
+          asset_name: llfio-v2.0-binaries-macos-10.15-x64-error_code.tgz
           asset_content_type: application/gzip
           
       - name: Upload MacOS 2
@@ -138,7 +138,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: artifacts/Mac OS status_code prebuilt binaries/llfio-v2.0-binaries-darwin-x64.tgz
-          asset_name: llfio-v2.0-binaries-darwin-10.15-x64-status_code.tgz
+          asset_name: llfio-v2.0-binaries-macos-10.15-x64-status_code.tgz
           asset_content_type: application/gzip
 
       - name: Upload Windows 1
