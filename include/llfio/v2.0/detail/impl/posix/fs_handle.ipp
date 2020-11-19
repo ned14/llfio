@@ -112,7 +112,10 @@ namespace detail
         path_view filename = currentpath.filename();
         currentpath = currentpath.remove_filename().without_trailing_separator();
         // Zero terminate the root path so it doesn't get copied later
-        const_cast<filesystem::path::string_type &>(_currentpath.native())[currentpath.native_size()] = 0;
+        if(_currentpath.native()[currentpath.native_size()] == '/')
+        {
+          const_cast<filesystem::path::string_type &>(_currentpath.native())[currentpath.native_size()] = 0;
+        }
         auto currentdirh_ = path_handle::path(currentpath);
         if(!currentdirh_)
         {
