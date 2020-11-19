@@ -56,6 +56,7 @@ static inline void CheckPathView(const LLFIO_V2_NAMESPACE::filesystem::path &pat
   CheckPathView(path, "filename()", [](const auto &p) { return p.filename(); });
   CheckPathView(path, "stem()", [](const auto &p) { return p.stem(); });
   CheckPathView(path, "extension()", [](const auto &p) { return p.extension(); });
+  CheckPathView(path, "remove_filename()", [](auto p) { return p.remove_filename(); });
 }
 
 static inline void CheckPathIteration(const LLFIO_V2_NAMESPACE::filesystem::path &path)
@@ -114,7 +115,7 @@ static inline void TestPathView()
   llfio::path_view e(p);  // NOLINT
   llfio::path_view f(e.filename());
   e = e.remove_filename();
-  BOOST_CHECK(0 == e.compare<>("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir"));
+  BOOST_CHECK(0 == e.compare<>("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir/"));
   BOOST_CHECK(0 == f.compare<>("0"));
 #ifndef _WIN32
   // cstr
@@ -160,7 +161,7 @@ static inline void TestPathView()
   llfio::path_view g(p2);
   llfio::path_view h(g.filename());
   g = g.remove_filename();
-  BOOST_CHECK(0 == g.compare<>("\\mnt\\c\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir"));
+  BOOST_CHECK(0 == g.compare<>("\\mnt\\c\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir\\"));
   BOOST_CHECK(0 == h.compare<>("0"));
   // cstr
   llfio::path_view::c_str<> i(g, llfio::path_view::zero_terminated);

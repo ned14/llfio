@@ -1809,7 +1809,7 @@ public:
     {
       return path_view();
     }
-    return this->_invoke([sep_idx, this](auto v) { return path_view(v.data(), sep_idx, not_zero_terminated, formatting()); });
+    return this->_invoke([sep_idx, this](auto v) { return path_view(v.data(), sep_idx + 1, not_zero_terminated, formatting()); });
   }
   //! Returns a view of the root name part of this view e.g. C:
   LLFIO_PATH_VIEW_CONSTEXPR path_view root_name() const noexcept
