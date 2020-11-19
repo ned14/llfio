@@ -153,7 +153,7 @@ namespace path_discovery
           if(!_h)
           {
             // Error during opening
-#if defined(__clang__)
+#if 0
             fprintf(stderr, "path_discovery::verified_temporary_directories() failed to open %s due to %s\n", ps.all[n].path.path().c_str(),
                     _h.error().message().c_str());
             path_view::c_str<> zpath(ps.all[n].path, path_view::zero_terminated);
