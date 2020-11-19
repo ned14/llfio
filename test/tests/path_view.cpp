@@ -120,6 +120,7 @@ static inline void TestPathView()
   // Trailing
   BOOST_CHECK(0 == llfio::path_view("/a/b/").without_trailing_separator().compare<>("/a/b"));
   BOOST_CHECK(0 == llfio::path_view("/a/b").without_trailing_separator().compare<>("/a/b"));
+  BOOST_CHECK(0 == llfio::path_view("/").without_trailing_separator().compare<>("/"));
 #ifndef _WIN32
   // cstr
   llfio::path_view::c_str<> g(e, llfio::path_view::zero_terminated);
