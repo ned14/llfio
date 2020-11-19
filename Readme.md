@@ -1,7 +1,7 @@
 This is the post-peer-review LLFIO v2 rewrite. You can view its documentation at https://ned14.github.io/llfio/
 
 <table width="100%">
-<tr>><th>master branch<th>develop branch
+<tr><th>master branch<th>develop branch
 <tr><td align="center"><img src="https://github.com/ned14/llfio/workflows/Documentation/badge.svg?branch=master"><td align="center"><img src="https://github.com/ned14/llfio/workflows/Documentation/badge.svg?branch=develop">
 <tr><td align="center"><img src="https://github.com/ned14/llfio/workflows/Installability/badge.svg?branch=master"><td align="center"><img src="https://github.com/ned14/llfio/workflows/Installability/badge.svg?branch=develop">
 <tr><td align="center"><img src="https://github.com/ned14/llfio/workflows/Programs/badge.svg?branch=master"><td align="center"><img src="https://github.com/ned14/llfio/workflows/Programs/badge.svg?branch=develop">

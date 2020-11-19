@@ -144,6 +144,7 @@ static inline void TestPathView()
   CheckPathView("");
   CheckPathView(".");
   CheckPathView("..");
+  CheckPathView("/3398e8946ce71e36910b7021170a08c141d8a696ca7226a4c9222ac5924d1f4c.random");
 
 #ifdef _WIN32
   // On Windows, UTF-8 and UTF-16 paths are equivalent and backslash conversion happens

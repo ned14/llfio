@@ -1945,10 +1945,10 @@ public:
           return path_view(v.data(), sep_idx + 1, not_zero_terminated, formatting());
         }
       }
-      return path_view(v.data(), sep_idx, not_zero_terminated, formatting());
+      return path_view(v.data(), (sep_idx == 0) ? 1 : sep_idx, not_zero_terminated, formatting());
     });
 #else
-    return this->_invoke([this, sep_idx](const auto &v) { return path_view(v.data(), sep_idx, not_zero_terminated, formatting()); });
+    return this->_invoke([this, sep_idx](const auto &v) { return path_view(v.data(), (sep_idx == 0) ? 1 : sep_idx, not_zero_terminated, formatting()); });
 #endif
   }
   //! Returns a view of the filename part of this view.
