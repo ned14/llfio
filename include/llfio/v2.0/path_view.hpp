@@ -1953,6 +1953,21 @@ public:
   }
   //! Returns a view of the filename part of this view.
   LLFIO_PATH_VIEW_CONSTEXPR path_view filename() const noexcept { return this->_filename(); }
+  //! Returns a view of this view without a trailing separator, if there is one
+  LLFIO_PATH_VIEW_CONSTEXPR path_view without_trailing_separator() const noexcept
+  {
+    auto sep_idx = this->_find_last_sep();
+    return this->_invoke([this, sep_idx](const auto &v) {
+      if(v.size() - 1 == sep_idx)
+      {
+        return path_view(v.data(), sep_idx, not_zero_terminated, formatting());
+      }
+      else
+      {
+        return *this;
+      }
+    });
+  }
 
   /*! Compares the two path views for equivalence or ordering using `T`
   as the destination encoding, if necessary.
