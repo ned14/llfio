@@ -69,6 +69,7 @@ var classllfio__v2__xxx_1_1path__view =
     [ "root_path", "classllfio__v2__xxx_1_1path__view.html#a5dde24635b2a5ab43e3622fefb2c656a", null ],
     [ "stem", "classllfio__v2__xxx_1_1path__view.html#a4a0bfc3e06986b6287a22fdc97799181", null ],
     [ "swap", "classllfio__v2__xxx_1_1path__view.html#a247fba2fecd5b850a17b0994f5913b4f", null ],
+    [ "without_trailing_separator", "classllfio__v2__xxx_1_1path__view.html#a3ad9b291bcdb45528f2cedcabd5ed998", null ],
     [ "zero_termination", "classllfio__v2__xxx_1_1path__view.html#ac12652236847087552e7a8cc01ef5a71", null ],
     [ "llfio_v2_xxx::operator!=", "classllfio__v2__xxx_1_1path__view.html#a2abd5b3147c3dadfd9f556dff8679c46", null ],
     [ "llfio_v2_xxx::operator==", "classllfio__v2__xxx_1_1path__view.html#a04eaaa00f1a82c4160c60043df70c8f9", null ],
