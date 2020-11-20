@@ -557,8 +557,8 @@ private:
   {
     auto sep_idx = _find_last_sep();
     if(_npos == sep_idx
-#ifndef _WIN32
-       || (_length == 1 && sep_idx == 0)  // Windows doesn't think the filename() of "/" is "/". I'd rather agree personally!
+#if defined(__GLIBCXX__)
+       || (_length == 1 && sep_idx == 0)  // libstdc++ thinks the filename() of "/" is "/"
 #endif
     )
     {
@@ -1966,8 +1966,11 @@ public:
       }
       return path_view(v.data(), (sep_idx == 0) ? 1 : sep_idx, not_zero_terminated, formatting());
     });
+#elif defined(__GLIBCXX__)  // libstdc++ returns parent path "" for "/"
+    return this->_invoke(
+    [this, sep_idx](const auto &v) { return path_view(v.data(), (sep_idx == 0 && this->_length > 1) ? 1 : sep_idx, not_zero_terminated, formatting()); });
 #else
-    return this->_invoke([this, sep_idx](const auto &v) { return path_view(v.data(), (sep_idx == 0 && this->_length > 1) ? 1 : sep_idx, not_zero_terminated, formatting()); });
+    return this->_invoke([this, sep_idx](const auto &v) { return path_view(v.data(), (sep_idx == 0) ? 1 : sep_idx, not_zero_terminated, formatting()); });
 #endif
   }
   //! Returns a view of the filename part of this view.
