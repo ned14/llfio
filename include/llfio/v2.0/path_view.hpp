@@ -556,7 +556,11 @@ private:
   LLFIO_PATH_VIEW_CONSTEXPR path_view_component _filename() const noexcept
   {
     auto sep_idx = _find_last_sep();
-    if(_npos == sep_idx)
+    if(_npos == sep_idx
+#ifndef _WIN32
+       || (_length == 1 && sep_idx == 0)  // Windows doesn't think the filename() of "/" is "/". I'd rather agree personally!
+#endif
+    )
     {
       return *this;
     }
@@ -1812,9 +1816,9 @@ public:
     return this->_invoke([sep_idx, this](auto v) {
       return path_view(v.data(),
 #ifdef _WIN32
-                       sep_idx + 1  // Windows leaves the final separator in place
+                       (sep_idx + 1)  // On Windows, a terminating separator is significant, so it is not removed.
 #else
-                       (sep_idx == 0) ? 1 : sep_idx  // POSIX removes the final separator
+                       (v.size() - 1 == sep_idx) ? sep_idx : (sep_idx + 1)
 #endif
                        ,
                        not_zero_terminated, formatting());
@@ -1954,10 +1958,16 @@ public:
           return path_view(v.data(), sep_idx + 1, not_zero_terminated, formatting());
         }
       }
+      // If a C:\ or whatever, return exactly that.
+      auto rp = root_path();
+      if(rp.native_size() == native_size())
+      {
+        return *this;
+      }
       return path_view(v.data(), (sep_idx == 0) ? 1 : sep_idx, not_zero_terminated, formatting());
     });
 #else
-    return this->_invoke([this, sep_idx](const auto &v) { return path_view(v.data(), (sep_idx == 0) ? 1 : sep_idx, not_zero_terminated, formatting()); });
+    return this->_invoke([this, sep_idx](const auto &v) { return path_view(v.data(), (sep_idx == 0 && this->_length > 1) ? 1 : sep_idx, not_zero_terminated, formatting()); });
 #endif
   }
   //! Returns a view of the filename part of this view.
