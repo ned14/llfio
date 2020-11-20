@@ -12,8 +12,7 @@ on:
 jobs:
   WinVS2019:
     name: Windows VS2019
-#    runs-on: windows-2019
-    runs-on: windows-2016
+    runs-on: windows-2019
     strategy:
       fail-fast: false
       matrix:

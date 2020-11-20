@@ -1814,7 +1814,7 @@ public:
 #ifdef _WIN32
                        sep_idx + 1  // Windows leaves the final separator in place
 #else
-                       sep_idx  // POSIX removes the final separator
+                       (sep_idx == 0) ? 1 : sep_idx  // POSIX removes the final separator
 #endif
                        ,
                        not_zero_terminated, formatting());
