@@ -115,7 +115,11 @@ static inline void TestPathView()
   llfio::path_view e(p);  // NOLINT
   llfio::path_view f(e.filename());
   e = e.remove_filename();
+#ifdef _WIN32
   BOOST_CHECK(0 == e.compare<>("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir/"));
+#else
+  BOOST_CHECK(0 == e.compare<>("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir"));
+#endif
   BOOST_CHECK(0 == f.compare<>("0"));
   // Trailing
   BOOST_CHECK(0 == llfio::path_view("/a/b/").without_trailing_separator().compare<>("/a/b"));

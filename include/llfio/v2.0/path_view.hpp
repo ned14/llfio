@@ -867,7 +867,7 @@ public:
           abort();
         }
 #endif
-        if(required_bytes <= _buffer_bytes)
+        if(required_bytes < _buffer_bytes)
         {
           // Use the internal buffer
           memcpy(_buffer, source, required_bytes);
@@ -1809,7 +1809,16 @@ public:
     {
       return path_view();
     }
-    return this->_invoke([sep_idx, this](auto v) { return path_view(v.data(), sep_idx + 1, not_zero_terminated, formatting()); });
+    return this->_invoke([sep_idx, this](auto v) {
+      return path_view(v.data(),
+#ifdef _WIN32
+                       sep_idx + 1  // Windows leaves the final separator in place
+#else
+                       sep_idx  // POSIX removes the final separator
+#endif
+                       ,
+                       not_zero_terminated, formatting());
+    });
   }
   //! Returns a view of the root name part of this view e.g. C:
   LLFIO_PATH_VIEW_CONSTEXPR path_view root_name() const noexcept
