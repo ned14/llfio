@@ -1816,7 +1816,7 @@ public:
     return this->_invoke([sep_idx, this](auto v) {
       return path_view(v.data(),
 #if LLFIO_USING_EXPERIMENTAL_FILESYSTEM
-                       (v.size() - 1 == sep_idx || sep_idx > 0) ? sep_idx : (sep_idx + 1)
+                       (v.size() - 1 == sep_idx) ? sep_idx : (sep_idx + 1)
 #else
                        (sep_idx + 1)
 #endif

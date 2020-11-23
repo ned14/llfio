@@ -30,7 +30,7 @@ jobs:
        if [ "${{ matrix.configuration }}" = "status_code" ]; then
          export CMAKE_CONFIGURE_OPTIONS="-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON"
        fi
-       ctest -S .ci.cmake -VV --timeout 900 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS;CTEST_CMAKE_GENERATOR=\"Visual Studio 15 2019 Win64\"" -DCTEST_SITE=$NAME
+       ctest -S .ci.cmake -VV --timeout 900 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS" -DCTEST_SITE=$NAME -DCTEST_CMAKE_GENERATOR="Visual Studio 15 2019 Win64"
       
     - name: Upload Prebuilt Binaries
       uses: actions/upload-artifact@v2
