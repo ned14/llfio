@@ -262,11 +262,11 @@ LLFIO_V2_NAMESPACE_END
 #else
 #error No <filesystem> implementation found
 #endif
-#if LLFIO_USING_EXPERIMENTAL_FILESYSTEM
+#if LLFIO_USING_EXPERIMENTAL_FILESYSTEM && !LLFIO_DISABLE_USING_EXPERIMENTAL_FILESYSTEM_WARNING
 #ifdef _MSC_VER
-#pragma message("WARNING: LLFIO is using the experimental Filesystem TS instead of the standard Filesystem, there are many corner case surprises in the former!")
+#pragma message("WARNING: LLFIO is using the experimental Filesystem TS instead of the standard Filesystem, there are many corner case surprises in the former! Support for the Experimental Filesystem TS is expected to be deprecated at some point, and C++ 17 shall become the minimum required for LLFIO.")
 #else
-#warning WARNING: LLFIO is using the experimental Filesystem TS instead of the standard Filesystem, there are many corner case surprises in the former!
+#warning WARNING: LLFIO is using the experimental Filesystem TS instead of the standard Filesystem, there are many corner case surprises in the former! Support for the Experimental Filesystem TS is expected to be deprecated at some point, and C++ 17 shall become the minimum required for LLFIO.
 #endif
 #endif
 LLFIO_V2_NAMESPACE_BEGIN
