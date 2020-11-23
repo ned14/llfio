@@ -262,6 +262,13 @@ LLFIO_V2_NAMESPACE_END
 #else
 #error No <filesystem> implementation found
 #endif
+#if LLFIO_USING_EXPERIMENTAL_FILESYSTEM
+#ifdef _MSC_VER
+#pragma message("WARNING: LLFIO is using the experimental Filesystem TS instead of the standard Filesystem, there are many corner case surprises in the former!")
+#else
+#warning WARNING: LLFIO is using the experimental Filesystem TS instead of the standard Filesystem, there are many corner case surprises in the former!
+#endif
+#endif
 LLFIO_V2_NAMESPACE_BEGIN
 struct path_hasher
 {

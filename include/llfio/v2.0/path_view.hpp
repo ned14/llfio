@@ -557,8 +557,8 @@ private:
   {
     auto sep_idx = _find_last_sep();
     if(_npos == sep_idx
-#if defined(__GLIBCXX__)
-       || (_length == 1 && sep_idx == 0)  // libstdc++ thinks the filename() of "/" is "/"
+#if LLFIO_USING_EXPERIMENTAL_FILESYSTEM
+       || (_length == 1 && sep_idx == 0)  // Filesystem TS thinks the filename() of "/" is "/"
 #endif
     )
     {
@@ -1817,8 +1817,10 @@ public:
       return path_view(v.data(),
 #ifdef _WIN32
                        (sep_idx + 1)  // On Windows, a terminating separator is significant, so it is not removed.
-#else
+#elif LLFIO_USING_EXPERIMENTAL_FILESYSTEM
                        (v.size() - 1 == sep_idx) ? sep_idx : (sep_idx + 1)
+#else
+                       (v.size() - 1 == sep_idx || sep_idx > 0) ? sep_idx : (sep_idx + 1)
 #endif
                        ,
                        not_zero_terminated, formatting());
@@ -1966,7 +1968,7 @@ public:
       }
       return path_view(v.data(), (sep_idx == 0) ? 1 : sep_idx, not_zero_terminated, formatting());
     });
-#elif defined(__GLIBCXX__)  // libstdc++ returns parent path "" for "/"
+#elif LLFIO_USING_EXPERIMENTAL_FILESYSTEM  // Filesystem TS returns parent path "" for "/"
     return this->_invoke(
     [this, sep_idx](const auto &v) { return path_view(v.data(), (sep_idx == 0 && this->_length > 1) ? 1 : sep_idx, not_zero_terminated, formatting()); });
 #else
