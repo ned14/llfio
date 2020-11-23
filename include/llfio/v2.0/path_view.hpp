@@ -1198,6 +1198,19 @@ public:
     {
       _init(view, output_zero_termination, nullptr, _default_allocate<AllocatorOrDeleter>(&_deleter2));
     }
+    //! Construct from a compatible `c_str`.
+    LLFIO_TEMPLATE(class AllocatorOrDeleter2, size_t _internal_buffer_size2)
+    LLFIO_TREQUIRES(LLFIO_TPRED(!std::is_same<c_str, c_str<T, AllocatorOrDeleter2, _internal_buffer_size2>>::value),
+                    LLFIO_TPRED(std::is_constructible<AllocatorOrDeleter, AllocatorOrDeleter2>::value))
+    explicit c_str(c_str<T, AllocatorOrDeleter2, _internal_buffer_size2> &&o) noexcept
+        : buffer(o.buffer)
+        , length(o.length)
+        , _bytes_to_delete(o._bytes_to_delete)
+        , _deleter1(o._deleter1)
+        , _deleter1arg(o._deleter1arg)
+        , _deleter2(std::move(o._deleter2))
+    {
+    }
     ~c_str() { reset(); }
     c_str(const c_str &) = delete;
     c_str(c_str &&o) noexcept
