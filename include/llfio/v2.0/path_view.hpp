@@ -1815,12 +1815,10 @@ public:
     }
     return this->_invoke([sep_idx, this](auto v) {
       return path_view(v.data(),
-#ifdef _WIN32
-                       (sep_idx + 1)  // On Windows, a terminating separator is significant, so it is not removed.
-#elif LLFIO_USING_EXPERIMENTAL_FILESYSTEM
-                       (v.size() - 1 == sep_idx) ? sep_idx : (sep_idx + 1)
-#else
+#if LLFIO_USING_EXPERIMENTAL_FILESYSTEM
                        (v.size() - 1 == sep_idx || sep_idx > 0) ? sep_idx : (sep_idx + 1)
+#else
+                       (sep_idx + 1)
 #endif
                        ,
                        not_zero_terminated, formatting());
@@ -1972,7 +1970,7 @@ public:
     return this->_invoke(
     [this, sep_idx](const auto &v) { return path_view(v.data(), (sep_idx == 0 && this->_length > 1) ? 1 : sep_idx, not_zero_terminated, formatting()); });
 #else
-    return this->_invoke([this, sep_idx](const auto &v) { return path_view(v.data(), (sep_idx == 0) ? 1 : sep_idx, not_zero_terminated, formatting()); });
+  return this->_invoke([this, sep_idx](const auto &v) { return path_view(v.data(), (sep_idx == 0) ? 1 : sep_idx, not_zero_terminated, formatting()); });
 #endif
   }
   //! Returns a view of the filename part of this view.
