@@ -20,8 +20,12 @@ ctest_build(TARGET _sl)
 set(retval 0)
 if(NOT CTEST_DISABLE_TESTING)
   if(WIN32)
-    # Appveyor's Windows version doesn't permit unprivileged creation of symbolic links
-    ctest_test(RETURN_VALUE retval EXCLUDE "shared_fs_mutex|symlink")
+    # Azure's Windows version doesn't permit unprivileged creation of symbolic links
+    if(CMAKE_GENERATOR MATCHES "Visual Studio 15 2017 Win64")
+      ctest_test(RETURN_VALUE retval EXCLUDE "shared_fs_mutex|symlink|process")
+    else()
+      ctest_test(RETURN_VALUE retval EXCLUDE "shared_fs_mutex|symlink")
+    endif()
   elseif("$ENV{CXX}" MATCHES "clang")
     # clang 10 with libc++ in C++ 20 currently segfaults
     ctest_test(RETURN_VALUE retval EXCLUDE "shared_fs_mutex|llfio_hl--coroutines")

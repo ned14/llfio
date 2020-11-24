@@ -1839,7 +1839,8 @@ public:
     auto sep_idx = this->_find_last_sep();
     if(_npos == sep_idx)
     {
-#if LLFIO_USING_EXPERIMENTAL_FILESYSTEM && defined(_MSC_VER)
+      // Sorry, this semantic is so broken that it's unwise to emulate!
+#if 0 // LLFIO_USING_EXPERIMENTAL_FILESYSTEM && defined(_MSC_VER)
       return this->_invoke([&](const auto &v) {
         // MSVC's Experimental Filesystem has some really, really weird semantics :(
         return *this;

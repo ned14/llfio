@@ -56,7 +56,10 @@ static inline void CheckPathView(const LLFIO_V2_NAMESPACE::filesystem::path &pat
   CheckPathView(path, "filename()", [](const auto &p) { return p.filename(); });
   CheckPathView(path, "stem()", [](const auto &p) { return p.stem(); });
   CheckPathView(path, "extension()", [](const auto &p) { return p.extension(); });
+#if !(LLFIO_USING_EXPERIMENTAL_FILESYSTEM && defined(_MSC_VER))
+  // remove_filename() is completely stupid on MSVC's Experimental Filesystem
   CheckPathView(path, "remove_filename()", [](auto p) { return p.remove_filename(); });
+#endif
 }
 
 static inline void CheckPathIteration(const LLFIO_V2_NAMESPACE::filesystem::path &path)
