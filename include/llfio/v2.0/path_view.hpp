@@ -556,14 +556,29 @@ private:
   LLFIO_PATH_VIEW_CONSTEXPR path_view_component _filename() const noexcept
   {
     auto sep_idx = _find_last_sep();
-    if(_npos == sep_idx
 #if LLFIO_USING_EXPERIMENTAL_FILESYSTEM
-       || (_length == 1 && sep_idx == 0)  // Filesystem TS thinks the filename() of "/" is "/"
+#ifdef _WIN32
+    if(sep_idx == 2 && _length == 3)
+    {
+      return this->_invoke([this, sep_idx](const auto &v) mutable {
+        if(v[1] == ':')
+        {
+          return path_view_component(v.data() + 2, 1, zero_termination(), formatting());
+        }
+        return *this;
+      });
+    }
 #endif
-    )
+    if(_npos == sep_idx || (_length == 1 && sep_idx == 0))  // Filesystem TS thinks the filename() of "/" is "/"
     {
       return *this;
     }
+#else
+    if(_npos == sep_idx)
+    {
+      return *this;
+    }
+#endif
     return _invoke([sep_idx, this](const auto &v) { return path_view_component(v.data() + sep_idx + 1, v.size() - sep_idx - 1, zero_termination()); });
   }
 
@@ -1824,12 +1839,23 @@ public:
     auto sep_idx = this->_find_last_sep();
     if(_npos == sep_idx)
     {
+#if LLFIO_USING_EXPERIMENTAL_FILESYSTEM && defined(_MSC_VER)
+      return this->_invoke([&](const auto &v) {
+        // MSVC's Experimental Filesystem has some really, really weird semantics :(
+        return *this;
+      });
+#else
       return path_view();
+#endif
     }
     return this->_invoke([sep_idx, this](auto v) {
       return path_view(v.data(),
 #if LLFIO_USING_EXPERIMENTAL_FILESYSTEM
+#ifdef _MSC_VER
+                       (sep_idx > 3 && (!is_uncpath() || v.data()[2] == '.' || v.data()[2] == '?')) ? sep_idx : (sep_idx + 1)
+#else
                        (v.size() - 1 == sep_idx) ? sep_idx : (sep_idx + 1)
+#endif
 #else
                        (sep_idx + 1)
 #endif
@@ -1971,6 +1997,7 @@ public:
           return path_view(v.data(), sep_idx + 1, not_zero_terminated, formatting());
         }
       }
+#if !LLFIO_USING_EXPERIMENTAL_FILESYSTEM
       // If a C:\ or whatever, return exactly that.
       auto rp = root_path();
       if(rp.native_size() == native_size())
@@ -1978,6 +2005,9 @@ public:
         return *this;
       }
       return path_view(v.data(), (sep_idx == 0) ? 1 : sep_idx, not_zero_terminated, formatting());
+#else
+      return path_view(v.data(), (sep_idx == 0 && this->_length > 1) ? 1 : sep_idx, not_zero_terminated, formatting());
+#endif
     });
 #elif LLFIO_USING_EXPERIMENTAL_FILESYSTEM  // Filesystem TS returns parent path "" for "/"
     return this->_invoke(

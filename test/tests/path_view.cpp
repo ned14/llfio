@@ -115,7 +115,11 @@ static inline void TestPathView()
   llfio::path_view e(p);  // NOLINT
   llfio::path_view f(e.filename());
   e = e.remove_filename();
+#if LLFIO_USING_EXPERIMENTAL_FILESYSTEM && defined(_MSC_VER)
+  BOOST_CHECK(0 == e.compare<>("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir"));
+#else
   BOOST_CHECK(0 == e.compare<>("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir/"));
+#endif
   BOOST_CHECK(0 == f.compare<>("0"));
   // Trailing
   BOOST_CHECK(0 == llfio::path_view("/a/b/").without_trailing_separator().compare<>("/a/b"));
@@ -166,7 +170,11 @@ static inline void TestPathView()
   llfio::path_view g(p2);
   llfio::path_view h(g.filename());
   g = g.remove_filename();
+#if LLFIO_USING_EXPERIMENTAL_FILESYSTEM && defined(_MSC_VER)
+  BOOST_CHECK(0 == g.compare<>("\\mnt\\c\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir"));
+#else
   BOOST_CHECK(0 == g.compare<>("\\mnt\\c\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir\\"));
+#endif
   BOOST_CHECK(0 == h.compare<>("0"));
   // cstr
   llfio::path_view::c_str<> i(g, llfio::path_view::zero_terminated);
