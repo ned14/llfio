@@ -72,6 +72,10 @@ if(WIN32)
     file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "outcome.tgz")
     file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "quickcpplib.tgz")
     checked_execute_process("Tarring up binaries 9"
+      COMMAND echo Current directory is %CD%
+      COMMAND dir
+      COMMAND dir ..
+      COMMAND dir ..\..
       COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../outcome.tgz"
       COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../quickcpplib.tgz"
       WORKING_DIRECTORY "llfio/include"
@@ -83,7 +87,7 @@ if(WIN32)
   endif()
 else()
   if(EXISTS "prebuilt/lib/libllfio_dl-2.0-Linux-x86_64-Release.so")
-    checked_execute_process("Tarring up binaries"
+    checked_execute_process("Tarring up binaries 1"
       COMMAND mkdir llfio
       COMMAND cp -a doc llfio/
       COMMAND cp -a example llfio/
@@ -95,21 +99,23 @@ else()
       COMMAND cp -a release_notes.md llfio/
       COMMAND cp -a --parents prebuilt/lib/libllfio_sl-2.0-Linux-x86_64-Release.a llfio/
       COMMAND cp -a --parents prebuilt/lib/libllfio_dl-2.0-Linux-x86_64-Release.so llfio/
-      COMMAND "${CMAKE_COMMAND}" -E tar cfz llfio-v2.0-binaries-linux-x64.tgz llfio
     )
     file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "outcome.tgz")
     file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "quickcpplib.tgz")
     checked_execute_process("Tarring up binaries 2"
       COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../outcome.tgz"
       COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../quickcpplib.tgz"
-      COMMAND mv outcome* outcome
-      COMMAND mv quickcpplib* quickcpplib
+      COMMAND mv ned14-outcome* outcome
+      COMMAND mv ned14-quickcpplib* quickcpplib
       WORKING_DIRECTORY "llfio/include"
+    )
+    checked_execute_process("Tarring up binaries 3"
+      COMMAND "${CMAKE_COMMAND}" -E tar cfz llfio-v2.0-binaries-linux-x64.tgz llfio
     )
     get_filename_component(toupload llfio-v2.0-binaries-linux-x64.tgz ABSOLUTE)
   endif()
   if(EXISTS "prebuilt/lib/libllfio_dl-2.0-Linux-armhf-Release.so")
-    checked_execute_process("Tarring up binaries"
+    checked_execute_process("Tarring up binaries 1"
       COMMAND mkdir llfio
       COMMAND cp -a doc llfio/
       COMMAND cp -a example llfio/
@@ -121,21 +127,23 @@ else()
       COMMAND cp -a release_notes.md llfio/
       COMMAND cp -a --parents prebuilt/lib/libllfio_sl-2.0-Linux-armhf-Release.a llfio/
       COMMAND cp -a --parents prebuilt/lib/libllfio_dl-2.0-Linux-armhf-Release.so llfio/
-      COMMAND "${CMAKE_COMMAND}" -E tar cfz llfio-v2.0-binaries-linux-armhf.tgz llfio
     )
     file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "outcome.tgz")
     file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "quickcpplib.tgz")
     checked_execute_process("Tarring up binaries 2"
       COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../outcome.tgz"
       COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../quickcpplib.tgz"
-      COMMAND mv outcome* outcome
-      COMMAND mv quickcpplib* quickcpplib
+      COMMAND mv ned14-outcome* outcome
+      COMMAND mv ned14-quickcpplib* quickcpplib
       WORKING_DIRECTORY "llfio/include"
+    )
+    checked_execute_process("Tarring up binaries 3"
+      COMMAND "${CMAKE_COMMAND}" -E tar cfz llfio-v2.0-binaries-linux-armhf.tgz llfio
     )
     get_filename_component(toupload llfio-v2.0-binaries-linux-armhf.tgz ABSOLUTE)
   endif()
   if(EXISTS "prebuilt/lib/libllfio_dl-2.0-Darwin-x86_64-Release.dylib")
-    checked_execute_process("Tarring up binaries"
+    checked_execute_process("Tarring up binaries 1"
       COMMAND mkdir llfio
       COMMAND cp -a doc llfio/
       COMMAND cp -a example llfio/
@@ -148,16 +156,18 @@ else()
       COMMAND mkdir -p llfio/prebuilt/lib
       COMMAND cp -a prebuilt/lib/libllfio_sl-2.0-Darwin-x86_64-Release.a llfio/prebuilt/lib/
       COMMAND cp -a prebuilt/lib/libllfio_dl-2.0-Darwin-x86_64-Release.dylib llfio/prebuilt/lib/
-      COMMAND "${CMAKE_COMMAND}" -E tar cfz llfio-v2.0-binaries-darwin-x64.tgz llfio
     )
     file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "outcome.tgz")
     file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "quickcpplib.tgz")
     checked_execute_process("Tarring up binaries 2"
       COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../outcome.tgz"
       COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../quickcpplib.tgz"
-      COMMAND mv outcome* outcome
-      COMMAND mv quickcpplib* quickcpplib
+      COMMAND mv ned14-outcome* outcome
+      COMMAND mv ned14-quickcpplib* quickcpplib
       WORKING_DIRECTORY "llfio/include"
+    )
+    checked_execute_process("Tarring up binaries 3"
+      COMMAND "${CMAKE_COMMAND}" -E tar cfz llfio-v2.0-binaries-darwin-x64.tgz llfio
     )
     get_filename_component(toupload llfio-v2.0-binaries-darwin-x64.tgz ABSOLUTE)
   endif()
