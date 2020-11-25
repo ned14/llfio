@@ -72,15 +72,10 @@ if(WIN32)
     file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "outcome.tgz")
     file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "quickcpplib.tgz")
     checked_execute_process("Tarring up binaries 9"
-      COMMAND bash -c "pwd"
-      COMMAND bash -c "ls"
-      COMMAND bash -c "ls .."
-      COMMAND bash -c "ls ../.."
-      COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../outcome.tgz"
-      COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../quickcpplib.tgz"
-      COMMAND bash -c "mv ned14-outcome* outcome"
-      COMMAND bash -c "mv ned14-quickcpplib* quickcpplib"
-      WORKING_DIRECTORY "llfio/include"
+      COMMAND "${CMAKE_COMMAND}" -E tar xfz "outcome.tgz" "llfio/include/"
+      COMMAND "${CMAKE_COMMAND}" -E tar xfz "quickcpplib.tgz" "llfio/include/"
+      COMMAND bash -c "mv llfio/include/ned14-outcome* llfio/include/outcome"
+      COMMAND bash -c "mv llfio/include/ned14-quickcpplib* llfio/include/quickcpplib"
     )
     checked_execute_process("Tarring up binaries final"
       COMMAND "${CMAKE_COMMAND}" -E tar cfv llfio-v2.0-binaries-win64.zip --format=zip llfio/
@@ -105,11 +100,10 @@ else()
     file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "outcome.tgz")
     file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "quickcpplib.tgz")
     checked_execute_process("Tarring up binaries 2"
-      COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../outcome.tgz"
-      COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../quickcpplib.tgz"
-      COMMAND bash -c "mv ned14-outcome* outcome"
-      COMMAND bash -c "mv ned14-quickcpplib* quickcpplib"
-      WORKING_DIRECTORY "llfio/include"
+      COMMAND "${CMAKE_COMMAND}" -E tar xfz "outcome.tgz" "llfio/include/"
+      COMMAND "${CMAKE_COMMAND}" -E tar xfz "quickcpplib.tgz" "llfio/include/"
+      COMMAND bash -c "mv llfio/include/ned14-outcome* llfio/include/outcome"
+      COMMAND bash -c "mv llfio/include/ned14-quickcpplib* llfio/include/quickcpplib"
     )
     checked_execute_process("Tarring up binaries 3"
       COMMAND "${CMAKE_COMMAND}" -E tar cfz llfio-v2.0-binaries-linux-x64.tgz llfio
@@ -133,11 +127,10 @@ else()
     file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "outcome.tgz")
     file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "quickcpplib.tgz")
     checked_execute_process("Tarring up binaries 2"
-      COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../outcome.tgz"
-      COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../quickcpplib.tgz"
-      COMMAND bash -c "mv ned14-outcome* outcome"
-      COMMAND bash -c "mv ned14-quickcpplib* quickcpplib"
-      WORKING_DIRECTORY "llfio/include"
+      COMMAND "${CMAKE_COMMAND}" -E tar xfz "outcome.tgz" "llfio/include/"
+      COMMAND "${CMAKE_COMMAND}" -E tar xfz "quickcpplib.tgz" "llfio/include/"
+      COMMAND bash -c "mv llfio/include/ned14-outcome* llfio/include/outcome"
+      COMMAND bash -c "mv llfio/include/ned14-quickcpplib* llfio/include/quickcpplib"
     )
     checked_execute_process("Tarring up binaries 3"
       COMMAND "${CMAKE_COMMAND}" -E tar cfz llfio-v2.0-binaries-linux-armhf.tgz llfio
@@ -162,11 +155,10 @@ else()
     file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "outcome.tgz")
     file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "quickcpplib.tgz")
     checked_execute_process("Tarring up binaries 2"
-      COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../outcome.tgz"
-      COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../quickcpplib.tgz"
-      COMMAND bash -c "mv ned14-outcome* outcome"
-      COMMAND bash -c "mv ned14-quickcpplib* quickcpplib"
-      WORKING_DIRECTORY "llfio/include"
+      COMMAND "${CMAKE_COMMAND}" -E tar xfz "outcome.tgz" "llfio/include/"
+      COMMAND "${CMAKE_COMMAND}" -E tar xfz "quickcpplib.tgz" "llfio/include/"
+      COMMAND bash -c "mv llfio/include/ned14-outcome* llfio/include/outcome"
+      COMMAND bash -c "mv llfio/include/ned14-quickcpplib* llfio/include/quickcpplib"
     )
     checked_execute_process("Tarring up binaries 3"
       COMMAND "${CMAKE_COMMAND}" -E tar cfz llfio-v2.0-binaries-darwin-x64.tgz llfio
