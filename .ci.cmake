@@ -21,8 +21,8 @@ set(retval 0)
 if(NOT CTEST_DISABLE_TESTING)
   if(WIN32)
     # Azure's Windows version doesn't permit unprivileged creation of symbolic links
-    if(CMAKE_GENERATOR MATCHES "Visual Studio 15 2017 Win64")
-      ctest_test(RETURN_VALUE retval EXCLUDE "shared_fs_mutex|symlink|process")
+    if(CTEST_CMAKE_GENERATOR MATCHES "Visual Studio 15 2017.*")
+      ctest_test(RETURN_VALUE retval EXCLUDE "shared_fs_mutex|symlink|process_handle")
     else()
       ctest_test(RETURN_VALUE retval EXCLUDE "shared_fs_mutex|symlink")
     endif()
@@ -38,10 +38,14 @@ if(WIN32)
     checked_execute_process("Tarring up binaries 1"
       COMMAND "${CMAKE_COMMAND}" -E make_directory llfio/prebuilt/bin/Release
       COMMAND "${CMAKE_COMMAND}" -E make_directory llfio/prebuilt/lib/Release
-      COMMAND xcopy doc llfio\\doc\\ /s /q
-      COMMAND xcopy include llfio\\include\\ /s /q
+      COMMAND "${CMAKE_COMMAND}" -E copy_directory doc llfio/
+      COMMAND "${CMAKE_COMMAND}" -E copy_directory example llfio/
+      COMMAND "${CMAKE_COMMAND}" -E copy_directory include llfio/
     )
     checked_execute_process("Tarring up binaries 2"
+      COMMAND "${CMAKE_COMMAND}" -E copy Build.md llfio/
+      COMMAND "${CMAKE_COMMAND}" -E copy index.html llfio/
+      COMMAND "${CMAKE_COMMAND}" -E copy Licence.txt llfio/
       COMMAND "${CMAKE_COMMAND}" -E copy Readme.md llfio/
       COMMAND "${CMAKE_COMMAND}" -E copy release_notes.md llfio/
     )
@@ -65,6 +69,13 @@ if(WIN32)
         COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/bin/Release/ntkernel-error-category_dl-1.0-Windows-AMD64-Release.dll llfio/prebuilt/bin/Release/
       )
     endif()
+    file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "outcome.tgz")
+    file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "quickcpplib.tgz")
+    checked_execute_process("Tarring up binaries 9"
+      COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../outcome.tgz"
+      COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../quickcpplib.tgz"
+      WORKING_DIRECTORY "llfio/include"
+    )
     checked_execute_process("Tarring up binaries final"
       COMMAND "${CMAKE_COMMAND}" -E tar cfv llfio-v2.0-binaries-win64.zip --format=zip llfio/
     )
@@ -75,12 +86,25 @@ else()
     checked_execute_process("Tarring up binaries"
       COMMAND mkdir llfio
       COMMAND cp -a doc llfio/
+      COMMAND cp -a example llfio/
       COMMAND cp -a include llfio/
+      COMMAND cp -a Build.md llfio/
+      COMMAND cp -a index.html llfio/
+      COMMAND cp -a Licence.txt llfio/
       COMMAND cp -a Readme.md llfio/
       COMMAND cp -a release_notes.md llfio/
       COMMAND cp -a --parents prebuilt/lib/libllfio_sl-2.0-Linux-x86_64-Release.a llfio/
       COMMAND cp -a --parents prebuilt/lib/libllfio_dl-2.0-Linux-x86_64-Release.so llfio/
       COMMAND "${CMAKE_COMMAND}" -E tar cfz llfio-v2.0-binaries-linux-x64.tgz llfio
+    )
+    file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "outcome.tgz")
+    file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "quickcpplib.tgz")
+    checked_execute_process("Tarring up binaries 2"
+      COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../outcome.tgz"
+      COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../quickcpplib.tgz"
+      COMMAND mv outcome* outcome
+      COMMAND mv quickcpplib* quickcpplib
+      WORKING_DIRECTORY "llfio/include"
     )
     get_filename_component(toupload llfio-v2.0-binaries-linux-x64.tgz ABSOLUTE)
   endif()
@@ -88,12 +112,25 @@ else()
     checked_execute_process("Tarring up binaries"
       COMMAND mkdir llfio
       COMMAND cp -a doc llfio/
+      COMMAND cp -a example llfio/
       COMMAND cp -a include llfio/
+      COMMAND cp -a Build.md llfio/
+      COMMAND cp -a index.html llfio/
+      COMMAND cp -a Licence.txt llfio/
       COMMAND cp -a Readme.md llfio/
       COMMAND cp -a release_notes.md llfio/
       COMMAND cp -a --parents prebuilt/lib/libllfio_sl-2.0-Linux-armhf-Release.a llfio/
       COMMAND cp -a --parents prebuilt/lib/libllfio_dl-2.0-Linux-armhf-Release.so llfio/
       COMMAND "${CMAKE_COMMAND}" -E tar cfz llfio-v2.0-binaries-linux-armhf.tgz llfio
+    )
+    file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "outcome.tgz")
+    file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "quickcpplib.tgz")
+    checked_execute_process("Tarring up binaries 2"
+      COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../outcome.tgz"
+      COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../quickcpplib.tgz"
+      COMMAND mv outcome* outcome
+      COMMAND mv quickcpplib* quickcpplib
+      WORKING_DIRECTORY "llfio/include"
     )
     get_filename_component(toupload llfio-v2.0-binaries-linux-armhf.tgz ABSOLUTE)
   endif()
@@ -101,13 +138,26 @@ else()
     checked_execute_process("Tarring up binaries"
       COMMAND mkdir llfio
       COMMAND cp -a doc llfio/
+      COMMAND cp -a example llfio/
       COMMAND cp -a include llfio/
+      COMMAND cp -a Build.md llfio/
+      COMMAND cp -a index.html llfio/
+      COMMAND cp -a Licence.txt llfio/
       COMMAND cp -a Readme.md llfio/
       COMMAND cp -a release_notes.md llfio/
       COMMAND mkdir -p llfio/prebuilt/lib
       COMMAND cp -a prebuilt/lib/libllfio_sl-2.0-Darwin-x86_64-Release.a llfio/prebuilt/lib/
       COMMAND cp -a prebuilt/lib/libllfio_dl-2.0-Darwin-x86_64-Release.dylib llfio/prebuilt/lib/
       COMMAND "${CMAKE_COMMAND}" -E tar cfz llfio-v2.0-binaries-darwin-x64.tgz llfio
+    )
+    file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "outcome.tgz")
+    file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "quickcpplib.tgz")
+    checked_execute_process("Tarring up binaries 2"
+      COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../outcome.tgz"
+      COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../quickcpplib.tgz"
+      COMMAND mv outcome* outcome
+      COMMAND mv quickcpplib* quickcpplib
+      WORKING_DIRECTORY "llfio/include"
     )
     get_filename_component(toupload llfio-v2.0-binaries-darwin-x64.tgz ABSOLUTE)
   endif()

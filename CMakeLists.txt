@@ -90,57 +90,41 @@ if(NOT PROJECT_IS_DEPENDENCY)
   if(NOT PYTHONINTERP_FOUND)
     indented_message(WARNING "NOT rebuilding preprocessed edition of library due to python not being installed")
   elseif(FALSE)
-    # See if the ply package is installed so pcpp can run
-    execute_process(COMMAND python -c "import ply" RESULT_VARIABLE python_has_ply)
-    if(NOT python_has_ply EQUAL 0)
-      indented_message(WARNING "NOT rebuilding preprocessed edition of library due to installed python not having the ply package installed. "
-        "Do 'pip install ply' to fix. NOTE that doxygen docs will NOT build without the precompiled edition.")
-    else()
-      function(make_single_header target name)
-        add_partial_preprocess(${target}
-                              "${name}"
-                              "${CMAKE_CURRENT_SOURCE_DIR}/include/llfio/revision.hpp"
-                              ${ARGN}
-                              -I ..
-                              --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs
-                              --line-directive #--passthru-comments --debug
-                              -U QUICKCPPLIB_ENABLE_VALGRIND
-                              -U DOXYGEN_SHOULD_SKIP_THIS -U DOXYGEN_IS_IN_THE_HOUSE
-                              -U STANDARDESE_IS_IN_THE_HOUSE
-                              -U __has_include -U __has_feature -U __has_cpp_attribute
-                              -U __cpp_modules
-                             -U gsl_FEATURE_WITH_CONTAINER_TO_STD -U gsl_FEATURE_MAKE_SPAN_TO_STD -U gsl_FEATURE_BYTE_SPAN_TO_STD
-                             -U gsl_FEATURE_HAVE_IMPLICIT_MACRO -U gsl_FEATURE_HAVE_OWNER_MACRO -U gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
-                              WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-                              )
-        if(NOT CMAKE_VERSION VERSION_LESS 3.3)
-          add_dependencies(llfio_hl ${target})
-        endif()
-      endfunction()
-      make_single_header(llfio_hl-pp-posix
-                         "${CMAKE_CURRENT_SOURCE_DIR}/single-header/llfio-posix.hpp"
-                         "${CMAKE_CURRENT_SOURCE_DIR}/include/llfio/v2.0/llfio.hpp"
-                         #-D QUICKCPPLIB_USE_STD_BYTE -D QUICKCPPLIB_USE_STD_OPTIONAL -D QUICKCPPLIB_USE_STD_SPAN
-                         -U gsl_COMPILER_MSVC_VERSION -U gsl_HAS_CPP0X -D gsl_CPLUSPLUS=201703 -D __cplusplus=201703
-                         -D LLFIO_LEAN_AND_MEAN -U _WIN32
-                         -D LLFIO_EXPERIMENTAL_STATUS_CODE=1)
-      make_single_header(llfio_hl-pp-win
-                         "${CMAKE_CURRENT_SOURCE_DIR}/single-header/llfio-win.hpp"
-                         "${CMAKE_CURRENT_SOURCE_DIR}/include/llfio/v2.0/llfio.hpp"
-                         #-D QUICKCPPLIB_USE_STD_BYTE -D QUICKCPPLIB_USE_STD_OPTIONAL -D QUICKCPPLIB_USE_STD_SPAN
-                         -D gsl_CPLUSPLUS=201703 -D __cplusplus=201703
-                         -D LLFIO_LEAN_AND_MEAN -D _WIN32
-                         -D LLFIO_EXPERIMENTAL_STATUS_CODE=1)
-      make_single_header(llfio_hl-pp-abi
-                         "${CMAKE_CURRENT_SOURCE_DIR}/single-header/abi.hpp"
-                         "${CMAKE_CURRENT_SOURCE_DIR}/include/llfio/v2.0/llfio.hpp"
-                         -D LLFIO_EXPERIMENTAL_STATUS_CODE=1
-                         -D LLFIO_DISABLE_ABI_PERMUTATION=1
-                         -D OUTCOME_DISABLE_ABI_PERMUTATION=1
-                         -D QUICKCPPLIB_DISABLE_ABI_PERMUTATION=1
-                         -U LLFIO_UNSTABLE_VERSION
-                         -U OUTCOME_UNSTABLE_VERSION)
-    endif()
+    function(make_single_header target name)
+      add_partial_preprocess(${target}
+                            "${name}"
+                            "${CMAKE_CURRENT_SOURCE_DIR}/include/llfio/revision.hpp"
+                            ${ARGN}
+                            -I ../quickcpplib/include -I ../outcome/include
+                            --passthru-defines --passthru-unfound-includes --passthru-unknown-exprs
+                            --passthru-comments --line-directive --compress # --debug
+                            -U QUICKCPPLIB_ENABLE_VALGRIND
+                            -U DOXYGEN_SHOULD_SKIP_THIS -U DOXYGEN_IS_IN_THE_HOUSE
+                            -U STANDARDESE_IS_IN_THE_HOUSE -U __cpp_modules
+                            -D LLFIO_INCLUDE_ALL
+                            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                            )
+      if(NOT CMAKE_VERSION VERSION_LESS 3.3)
+        add_dependencies(llfio_hl ${target})
+      endif()
+    endfunction()
+    make_single_header(llfio_hl-pp
+                       "${CMAKE_CURRENT_SOURCE_DIR}/single-header/llfio.hpp"
+                       "${CMAKE_CURRENT_SOURCE_DIR}/include/llfio/v2.0/llfio.hpp"
+                       #-D QUICKCPPLIB_USE_STD_BYTE -D QUICKCPPLIB_USE_STD_OPTIONAL -D QUICKCPPLIB_USE_STD_SPAN
+                       #-U gsl_COMPILER_MSVC_VERSION -U gsl_HAS_CPP0X -D gsl_CPLUSPLUS=201703 -D __cplusplus=201703
+                       #-D LLFIO_LEAN_AND_MEAN -U _WIN32
+                       #-D LLFIO_EXPERIMENTAL_STATUS_CODE=1
+                       )
+    make_single_header(llfio_hl-pp-abi
+                       "${CMAKE_CURRENT_SOURCE_DIR}/single-header/abi.hpp"
+                       "${CMAKE_CURRENT_SOURCE_DIR}/include/llfio/v2.0/llfio.hpp"
+                       -D LLFIO_EXPERIMENTAL_STATUS_CODE=1
+                       -D LLFIO_DISABLE_ABI_PERMUTATION=1
+                       -D OUTCOME_DISABLE_ABI_PERMUTATION=1
+                       -D QUICKCPPLIB_DISABLE_ABI_PERMUTATION=1
+                       -U LLFIO_UNSTABLE_VERSION
+                       -U OUTCOME_UNSTABLE_VERSION)
   endif()
 
   # Create a custom doxygen generation target
