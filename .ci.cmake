@@ -72,12 +72,14 @@ if(WIN32)
     file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "outcome.tgz")
     file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "quickcpplib.tgz")
     checked_execute_process("Tarring up binaries 9"
-      COMMAND echo Current directory is %CD%
-      COMMAND dir
-      COMMAND dir ..
-      COMMAND dir ..\..
+      COMMAND bash -c "pwd"
+      COMMAND bash -c "ls"
+      COMMAND bash -c "ls .."
+      COMMAND bash -c "ls ../.."
       COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../outcome.tgz"
       COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../quickcpplib.tgz"
+      COMMAND bash -c "mv ned14-outcome* outcome"
+      COMMAND bash -c "mv ned14-quickcpplib* quickcpplib"
       WORKING_DIRECTORY "llfio/include"
     )
     checked_execute_process("Tarring up binaries final"
@@ -105,8 +107,8 @@ else()
     checked_execute_process("Tarring up binaries 2"
       COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../outcome.tgz"
       COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../quickcpplib.tgz"
-      COMMAND mv ned14-outcome* outcome
-      COMMAND mv ned14-quickcpplib* quickcpplib
+      COMMAND bash -c "mv ned14-outcome* outcome"
+      COMMAND bash -c "mv ned14-quickcpplib* quickcpplib"
       WORKING_DIRECTORY "llfio/include"
     )
     checked_execute_process("Tarring up binaries 3"
@@ -133,8 +135,8 @@ else()
     checked_execute_process("Tarring up binaries 2"
       COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../outcome.tgz"
       COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../quickcpplib.tgz"
-      COMMAND mv ned14-outcome* outcome
-      COMMAND mv ned14-quickcpplib* quickcpplib
+      COMMAND bash -c "mv ned14-outcome* outcome"
+      COMMAND bash -c "mv ned14-quickcpplib* quickcpplib"
       WORKING_DIRECTORY "llfio/include"
     )
     checked_execute_process("Tarring up binaries 3"
@@ -162,8 +164,8 @@ else()
     checked_execute_process("Tarring up binaries 2"
       COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../outcome.tgz"
       COMMAND "${CMAKE_COMMAND}" -E tar xfz "../../quickcpplib.tgz"
-      COMMAND mv ned14-outcome* outcome
-      COMMAND mv ned14-quickcpplib* quickcpplib
+      COMMAND bash -c "mv ned14-outcome* outcome"
+      COMMAND bash -c "mv ned14-quickcpplib* quickcpplib"
       WORKING_DIRECTORY "llfio/include"
     )
     checked_execute_process("Tarring up binaries 3"
