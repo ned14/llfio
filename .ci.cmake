@@ -11,7 +11,7 @@ include(FindGit)
 set(CTEST_GIT_COMMAND "${GIT_EXECUTABLE}")
 
 ctest_start("Experimental")
-ctest_update()
+#ctest_update()
 message(STATUS "NOTE: CTEST_CONFIGURE_OPTIONS are '${CTEST_CONFIGURE_OPTIONS}'")
 ctest_configure(OPTIONS "${CTEST_CONFIGURE_OPTIONS}")
 ctest_build(TARGET _hl)
@@ -35,12 +35,18 @@ if(NOT CTEST_DISABLE_TESTING)
 endif()
 if(WIN32)
   if(EXISTS "prebuilt/bin/Release/llfio_dl-2.0-Windows-AMD64-Release.dll")
+    file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "${CMAKE_CURRENT_LIST_DIR}/outcome.tgz")
+    file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "${CMAKE_CURRENT_LIST_DIR}/quickcpplib.tgz")
+    checked_execute_process("Tarring up binaries 0"
+      COMMAND "${CMAKE_COMMAND}" -E tar xfz "outcome.tgz"
+      COMMAND "${CMAKE_COMMAND}" -E tar xfz "quickcpplib.tgz"
+    )
     checked_execute_process("Tarring up binaries 1"
       COMMAND "${CMAKE_COMMAND}" -E make_directory llfio/prebuilt/bin/Release
       COMMAND "${CMAKE_COMMAND}" -E make_directory llfio/prebuilt/lib/Release
-      COMMAND "${CMAKE_COMMAND}" -E copy_directory doc llfio/
-      COMMAND "${CMAKE_COMMAND}" -E copy_directory example llfio/
-      COMMAND "${CMAKE_COMMAND}" -E copy_directory include llfio/
+      COMMAND "${CMAKE_COMMAND}" -E copy_directory doc llfio/doc/
+      COMMAND "${CMAKE_COMMAND}" -E copy_directory example llfio/example/
+      COMMAND "${CMAKE_COMMAND}" -E copy_directory include llfio/include/
     )
     checked_execute_process("Tarring up binaries 2"
       COMMAND "${CMAKE_COMMAND}" -E copy Build.md llfio/
@@ -69,13 +75,9 @@ if(WIN32)
         COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/bin/Release/ntkernel-error-category_dl-1.0-Windows-AMD64-Release.dll llfio/prebuilt/bin/Release/
       )
     endif()
-    file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "outcome.tgz")
-    file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "quickcpplib.tgz")
     checked_execute_process("Tarring up binaries 9"
-      COMMAND "${CMAKE_COMMAND}" -E tar xfz "outcome.tgz" "llfio/include/"
-      COMMAND "${CMAKE_COMMAND}" -E tar xfz "quickcpplib.tgz" "llfio/include/"
-      COMMAND bash -c "mv llfio/include/ned14-outcome* llfio/include/outcome"
-      COMMAND bash -c "mv llfio/include/ned14-quickcpplib* llfio/include/quickcpplib"
+      COMMAND bash -c "mv ned14-outcome* llfio/include/outcome"
+      COMMAND bash -c "mv ned14-quickcpplib* llfio/include/quickcpplib"
     )
     checked_execute_process("Tarring up binaries final"
       COMMAND "${CMAKE_COMMAND}" -E tar cfv llfio-v2.0-binaries-win64.zip --format=zip llfio/
@@ -84,6 +86,12 @@ if(WIN32)
   endif()
 else()
   if(EXISTS "prebuilt/lib/libllfio_dl-2.0-Linux-x86_64-Release.so")
+    file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "${CMAKE_CURRENT_LIST_DIR}/outcome.tgz")
+    file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "${CMAKE_CURRENT_LIST_DIR}/quickcpplib.tgz")
+    checked_execute_process("Tarring up binaries 0"
+      COMMAND "${CMAKE_COMMAND}" -E tar xfz "outcome.tgz"
+      COMMAND "${CMAKE_COMMAND}" -E tar xfz "quickcpplib.tgz"
+    )
     checked_execute_process("Tarring up binaries 1"
       COMMAND mkdir llfio
       COMMAND cp -a doc llfio/
@@ -97,13 +105,9 @@ else()
       COMMAND cp -a --parents prebuilt/lib/libllfio_sl-2.0-Linux-x86_64-Release.a llfio/
       COMMAND cp -a --parents prebuilt/lib/libllfio_dl-2.0-Linux-x86_64-Release.so llfio/
     )
-    file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "outcome.tgz")
-    file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "quickcpplib.tgz")
     checked_execute_process("Tarring up binaries 2"
-      COMMAND "${CMAKE_COMMAND}" -E tar xfz "outcome.tgz" "llfio/include/"
-      COMMAND "${CMAKE_COMMAND}" -E tar xfz "quickcpplib.tgz" "llfio/include/"
-      COMMAND bash -c "mv llfio/include/ned14-outcome* llfio/include/outcome"
-      COMMAND bash -c "mv llfio/include/ned14-quickcpplib* llfio/include/quickcpplib"
+      COMMAND bash -c "mv ned14-outcome* llfio/include/outcome"
+      COMMAND bash -c "mv ned14-quickcpplib* llfio/include/quickcpplib"
     )
     checked_execute_process("Tarring up binaries 3"
       COMMAND "${CMAKE_COMMAND}" -E tar cfz llfio-v2.0-binaries-linux-x64.tgz llfio
@@ -111,6 +115,12 @@ else()
     get_filename_component(toupload llfio-v2.0-binaries-linux-x64.tgz ABSOLUTE)
   endif()
   if(EXISTS "prebuilt/lib/libllfio_dl-2.0-Linux-armhf-Release.so")
+    file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "${CMAKE_CURRENT_LIST_DIR}/outcome.tgz")
+    file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "${CMAKE_CURRENT_LIST_DIR}/quickcpplib.tgz")
+    checked_execute_process("Tarring up binaries 0"
+      COMMAND "${CMAKE_COMMAND}" -E tar xfz "outcome.tgz"
+      COMMAND "${CMAKE_COMMAND}" -E tar xfz "quickcpplib.tgz"
+    )
     checked_execute_process("Tarring up binaries 1"
       COMMAND mkdir llfio
       COMMAND cp -a doc llfio/
@@ -124,13 +134,9 @@ else()
       COMMAND cp -a --parents prebuilt/lib/libllfio_sl-2.0-Linux-armhf-Release.a llfio/
       COMMAND cp -a --parents prebuilt/lib/libllfio_dl-2.0-Linux-armhf-Release.so llfio/
     )
-    file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "outcome.tgz")
-    file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "quickcpplib.tgz")
     checked_execute_process("Tarring up binaries 2"
-      COMMAND "${CMAKE_COMMAND}" -E tar xfz "outcome.tgz" "llfio/include/"
-      COMMAND "${CMAKE_COMMAND}" -E tar xfz "quickcpplib.tgz" "llfio/include/"
-      COMMAND bash -c "mv llfio/include/ned14-outcome* llfio/include/outcome"
-      COMMAND bash -c "mv llfio/include/ned14-quickcpplib* llfio/include/quickcpplib"
+      COMMAND bash -c "mv ned14-outcome* llfio/include/outcome"
+      COMMAND bash -c "mv ned14-quickcpplib* llfio/include/quickcpplib"
     )
     checked_execute_process("Tarring up binaries 3"
       COMMAND "${CMAKE_COMMAND}" -E tar cfz llfio-v2.0-binaries-linux-armhf.tgz llfio
@@ -138,6 +144,12 @@ else()
     get_filename_component(toupload llfio-v2.0-binaries-linux-armhf.tgz ABSOLUTE)
   endif()
   if(EXISTS "prebuilt/lib/libllfio_dl-2.0-Darwin-x86_64-Release.dylib")
+    file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "${CMAKE_CURRENT_LIST_DIR}/outcome.tgz")
+    file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "${CMAKE_CURRENT_LIST_DIR}/quickcpplib.tgz")
+    checked_execute_process("Tarring up binaries 0"
+      COMMAND "${CMAKE_COMMAND}" -E tar xfz "outcome.tgz"
+      COMMAND "${CMAKE_COMMAND}" -E tar xfz "quickcpplib.tgz"
+    )
     checked_execute_process("Tarring up binaries 1"
       COMMAND mkdir llfio
       COMMAND cp -a doc llfio/
@@ -152,13 +164,9 @@ else()
       COMMAND cp -a prebuilt/lib/libllfio_sl-2.0-Darwin-x86_64-Release.a llfio/prebuilt/lib/
       COMMAND cp -a prebuilt/lib/libllfio_dl-2.0-Darwin-x86_64-Release.dylib llfio/prebuilt/lib/
     )
-    file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "outcome.tgz")
-    file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "quickcpplib.tgz")
     checked_execute_process("Tarring up binaries 2"
-      COMMAND "${CMAKE_COMMAND}" -E tar xfz "outcome.tgz" "llfio/include/"
-      COMMAND "${CMAKE_COMMAND}" -E tar xfz "quickcpplib.tgz" "llfio/include/"
-      COMMAND bash -c "mv llfio/include/ned14-outcome* llfio/include/outcome"
-      COMMAND bash -c "mv llfio/include/ned14-quickcpplib* llfio/include/quickcpplib"
+      COMMAND bash -c "mv ned14-outcome* llfio/include/outcome"
+      COMMAND bash -c "mv ned14-quickcpplib* llfio/include/quickcpplib"
     )
     checked_execute_process("Tarring up binaries 3"
       COMMAND "${CMAKE_COMMAND}" -E tar cfz llfio-v2.0-binaries-darwin-x64.tgz llfio
