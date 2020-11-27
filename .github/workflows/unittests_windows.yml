@@ -10,16 +10,15 @@ on:
   - cron: '0 0 1 * *'
 
 jobs:
-  WinVS2019:
-    name: Windows VS2019
-#    runs-on: windows-2019
+  WinVS2017:
+    name: Windows VS2017
     runs-on: windows-2016
     strategy:
       fail-fast: false
       matrix:
         configuration: [error_code, status_code]
     env:
-      NAME: WinVS2019-${{ matrix.configuration }}
+      NAME: WinVS2017-${{ matrix.configuration }}
           
     steps:
     - uses: actions/checkout@v2
@@ -35,19 +34,19 @@ jobs:
     - name: Upload Prebuilt Binaries
       uses: actions/upload-artifact@v2
       with:
-        name: Windows VS2019 ${{ matrix.configuration }} prebuilt binaries
+        name: Windows VS2017 ${{ matrix.configuration }} prebuilt binaries
         path: llfio-v2.0-binaries-win64.zip
       
     - name: Upload Test Results
       if: always()
       uses: actions/upload-artifact@v2
       with:
-        name: Windows VS2019 ${{ matrix.configuration }} test results
+        name: Windows VS2017 ${{ matrix.configuration }} test results
         path: prebuilt/merged_junit_results.xml
 
   publish-test-results:
     name: "Publish Unit Tests Results"
-    needs: [WinVS2019]
+    needs: [WinVS2017]
     runs-on: ubuntu-latest
     if: success() || failure()
 

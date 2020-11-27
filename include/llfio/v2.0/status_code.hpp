@@ -173,7 +173,7 @@ public:
   //! \brief The value type of errors in LLFIO
   using value_type = detail::file_io_error_value_type<typename _base::value_type>;
 
-  file_io_error_domain() = default;
+  constexpr file_io_error_domain() {}  // cannot be default else triggers a compile failure in VS2017
   file_io_error_domain(const file_io_error_domain &) = default;
   file_io_error_domain(file_io_error_domain &&) = default;
   file_io_error_domain &operator=(const file_io_error_domain &) = default;
