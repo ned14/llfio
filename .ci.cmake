@@ -102,8 +102,9 @@ else()
       COMMAND cp -a Licence.txt llfio/
       COMMAND cp -a Readme.md llfio/
       COMMAND cp -a release_notes.md llfio/
-      COMMAND cp -a --parents prebuilt/lib/libllfio_sl-2.0-Linux-x86_64-Release.a llfio/
-      COMMAND cp -a --parents prebuilt/lib/libllfio_dl-2.0-Linux-x86_64-Release.so llfio/
+      COMMAND mkdir -p llfio/prebuilt/lib
+      COMMAND cp -a prebuilt/lib/libllfio_sl-2.0-Linux-x86_64-Release.a llfio/prebuilt/lib/
+      COMMAND cp -a prebuilt/lib/libllfio_dl-2.0-Linux-x86_64-Release.so llfio/prebuilt/lib/
     )
     checked_execute_process("Tarring up binaries 2"
       COMMAND bash -c "mv ned14-outcome* llfio/include/outcome"
@@ -131,8 +132,9 @@ else()
       COMMAND cp -a Licence.txt llfio/
       COMMAND cp -a Readme.md llfio/
       COMMAND cp -a release_notes.md llfio/
-      COMMAND cp -a --parents prebuilt/lib/libllfio_sl-2.0-Linux-armhf-Release.a llfio/
-      COMMAND cp -a --parents prebuilt/lib/libllfio_dl-2.0-Linux-armhf-Release.so llfio/
+      COMMAND mkdir -p llfio/prebuilt/lib
+      COMMAND cp -a prebuilt/lib/libllfio_sl-2.0-Linux-armhf-Release.a llfio/prebuilt/lib/
+      COMMAND cp -a prebuilt/lib/libllfio_dl-2.0-Linux-armhf-Release.so llfio/prebuilt/lib/
     )
     checked_execute_process("Tarring up binaries 2"
       COMMAND bash -c "mv ned14-outcome* llfio/include/outcome"
