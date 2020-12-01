@@ -93,18 +93,17 @@ else()
       COMMAND "${CMAKE_COMMAND}" -E tar xfz "quickcpplib.tgz"
     )
     checked_execute_process("Tarring up binaries 1"
-      COMMAND mkdir llfio
-      COMMAND cp -a doc llfio/
-      COMMAND cp -a example llfio/
-      COMMAND cp -a include llfio/
-      COMMAND cp -a Build.md llfio/
-      COMMAND cp -a index.html llfio/
-      COMMAND cp -a Licence.txt llfio/
-      COMMAND cp -a Readme.md llfio/
-      COMMAND cp -a release_notes.md llfio/
-      COMMAND mkdir -p llfio/prebuilt/lib
-      COMMAND cp -a prebuilt/lib/libllfio_sl-2.0-Linux-x86_64-Release.a llfio/prebuilt/lib/
-      COMMAND cp -a prebuilt/lib/libllfio_dl-2.0-Linux-x86_64-Release.so llfio/prebuilt/lib/
+      COMMAND "${CMAKE_COMMAND}" -E make_directory llfio/prebuilt/lib
+      COMMAND "${CMAKE_COMMAND}" -E copy_directory doc llfio/doc/
+      COMMAND "${CMAKE_COMMAND}" -E copy_directory example llfio/example/
+      COMMAND "${CMAKE_COMMAND}" -E copy_directory include llfio/include/
+      COMMAND "${CMAKE_COMMAND}" -E copy Build.md llfio/
+      COMMAND "${CMAKE_COMMAND}" -E copy index.html llfio/
+      COMMAND "${CMAKE_COMMAND}" -E copy Licence.txt llfio/
+      COMMAND "${CMAKE_COMMAND}" -E copy Readme.md llfio/
+      COMMAND "${CMAKE_COMMAND}" -E copy release_notes.md llfio/
+      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/libllfio_sl-2.0-Linux-x86_64-Release.a llfio/prebuilt/lib/
+      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/libllfio_dl-2.0-Linux-x86_64-Release.so llfio/prebuilt/lib/
     )
     checked_execute_process("Tarring up binaries 2"
       COMMAND bash -c "mv ned14-outcome* llfio/include/outcome"
@@ -123,18 +122,17 @@ else()
       COMMAND "${CMAKE_COMMAND}" -E tar xfz "quickcpplib.tgz"
     )
     checked_execute_process("Tarring up binaries 1"
-      COMMAND mkdir llfio
-      COMMAND cp -a doc llfio/
-      COMMAND cp -a example llfio/
-      COMMAND cp -a include llfio/
-      COMMAND cp -a Build.md llfio/
-      COMMAND cp -a index.html llfio/
-      COMMAND cp -a Licence.txt llfio/
-      COMMAND cp -a Readme.md llfio/
-      COMMAND cp -a release_notes.md llfio/
-      COMMAND mkdir -p llfio/prebuilt/lib
-      COMMAND cp -a prebuilt/lib/libllfio_sl-2.0-Linux-armhf-Release.a llfio/prebuilt/lib/
-      COMMAND cp -a prebuilt/lib/libllfio_dl-2.0-Linux-armhf-Release.so llfio/prebuilt/lib/
+      COMMAND "${CMAKE_COMMAND}" -E make_directory llfio/prebuilt/lib
+      COMMAND "${CMAKE_COMMAND}" -E copy_directory doc llfio/doc/
+      COMMAND "${CMAKE_COMMAND}" -E copy_directory example llfio/example/
+      COMMAND "${CMAKE_COMMAND}" -E copy_directory include llfio/include/
+      COMMAND "${CMAKE_COMMAND}" -E copy Build.md llfio/
+      COMMAND "${CMAKE_COMMAND}" -E copy index.html llfio/
+      COMMAND "${CMAKE_COMMAND}" -E copy Licence.txt llfio/
+      COMMAND "${CMAKE_COMMAND}" -E copy Readme.md llfio/
+      COMMAND "${CMAKE_COMMAND}" -E copy release_notes.md llfio/
+      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/libllfio_sl-2.0-Linux-armhf-Release.a llfio/prebuilt/lib/
+      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/libllfio_dl-2.0-Linux-armhf-Release.so llfio/prebuilt/lib/
     )
     checked_execute_process("Tarring up binaries 2"
       COMMAND bash -c "mv ned14-outcome* llfio/include/outcome"
@@ -153,18 +151,17 @@ else()
       COMMAND "${CMAKE_COMMAND}" -E tar xfz "quickcpplib.tgz"
     )
     checked_execute_process("Tarring up binaries 1"
-      COMMAND mkdir llfio
-      COMMAND cp -a doc llfio/
-      COMMAND cp -a example llfio/
-      COMMAND cp -a include llfio/
-      COMMAND cp -a Build.md llfio/
-      COMMAND cp -a index.html llfio/
-      COMMAND cp -a Licence.txt llfio/
-      COMMAND cp -a Readme.md llfio/
-      COMMAND cp -a release_notes.md llfio/
-      COMMAND mkdir -p llfio/prebuilt/lib
-      COMMAND cp -a prebuilt/lib/libllfio_sl-2.0-Darwin-x86_64-Release.a llfio/prebuilt/lib/
-      COMMAND cp -a prebuilt/lib/libllfio_dl-2.0-Darwin-x86_64-Release.dylib llfio/prebuilt/lib/
+      COMMAND "${CMAKE_COMMAND}" -E make_directory llfio/prebuilt/lib
+      COMMAND "${CMAKE_COMMAND}" -E copy_directory doc llfio/doc/
+      COMMAND "${CMAKE_COMMAND}" -E copy_directory example llfio/example/
+      COMMAND "${CMAKE_COMMAND}" -E copy_directory include llfio/include/
+      COMMAND "${CMAKE_COMMAND}" -E copy Build.md llfio/
+      COMMAND "${CMAKE_COMMAND}" -E copy index.html llfio/
+      COMMAND "${CMAKE_COMMAND}" -E copy Licence.txt llfio/
+      COMMAND "${CMAKE_COMMAND}" -E copy Readme.md llfio/
+      COMMAND "${CMAKE_COMMAND}" -E copy release_notes.md llfio/
+      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/libllfio_sl-2.0-Darwin-x86_64-Release.a llfio/prebuilt/lib/
+      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/libllfio_dl-2.0-Darwin-x86_64-Release.dylib llfio/prebuilt/lib/
     )
     checked_execute_process("Tarring up binaries 2"
       COMMAND bash -c "mv ned14-outcome* llfio/include/outcome"
