@@ -236,7 +236,7 @@ public:
   };
 
   //! The default deleter to use
-  template <class T> using default_deleter = std::default_delete<T>;
+  template <class T> using default_c_str_deleter = std::default_delete<T>;
 
 private:
   static constexpr auto _npos = string_view::npos;
@@ -782,7 +782,7 @@ public:
   and `c_str` is never invoked as the two sources are byte
   compared directly.
   */
-  LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = default_deleter<T[]>,
+  LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = default_c_str_deleter<T[]>,
                  size_t _internal_buffer_size = default_internal_buffer_size)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>))
   constexpr int compare(path_view_component p, const std::locale &loc) const
@@ -793,7 +793,7 @@ public:
     });
   }
   //! \overload
-  LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = default_deleter<T[]>,
+  LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = default_c_str_deleter<T[]>,
                  size_t _internal_buffer_size = default_internal_buffer_size)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>))
   constexpr int compare(path_view_component p) const
@@ -825,7 +825,7 @@ public:
   `operator new[]`. You can use an externally supplied larger temporary buffer to avoid
   dynamic memory allocation in all situations.
   */
-  LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class AllocatorOrDeleter = default_deleter<T[]>,
+  LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class AllocatorOrDeleter = default_c_str_deleter<T[]>,
                  size_t _internal_buffer_size = default_internal_buffer_size)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>))
   struct c_str
@@ -2051,12 +2051,12 @@ public:
   and `c_str` is never invoked as the two sources are byte
   compared directly.
   */
-  LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = default_deleter<T[]>,
+  LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = default_c_str_deleter<T[]>,
                  size_t _internal_buffer_size = default_internal_buffer_size)
   LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<T>))
   constexpr inline int compare(path_view p, const std::locale &loc) const;
   //! \overload
-  LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = default_deleter<T[]>,
+  LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = default_c_str_deleter<T[]>,
                  size_t _internal_buffer_size = default_internal_buffer_size)
   LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<T>))
   constexpr inline int compare(path_view p) const;

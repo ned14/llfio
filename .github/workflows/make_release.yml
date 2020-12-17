@@ -25,6 +25,11 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
+      - name: Sleep until all binaries get uploaded
+        shell: bash
+        run: |
+         sleep 60
+
       - name: Download Linux artifacts
         uses: dawidd6/action-download-artifact@v2
         if: steps.waitforstatuschecks.outputs.status == 'success'

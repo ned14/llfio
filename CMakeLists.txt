@@ -51,8 +51,7 @@ find_quickcpplib_library(quickcpplib
 )
 find_quickcpplib_library(outcome
   GIT_REPOSITORY "https://github.com/ned14/outcome.git"
-#  GIT_TAG "develop"
-  GIT_TAG "better_optimisation"  ## future Outcome v2.2
+  GIT_TAG "master"
   REQUIRED
   IS_HEADER_ONLY
 )
