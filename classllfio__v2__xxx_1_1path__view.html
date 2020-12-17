@@ -155,11 +155,11 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 <tr class="memitem:a38ff18893dfc84c562fb36c299702bf5"><td class="memItemLeft" align="right" valign="top"><a id="a38ff18893dfc84c562fb36c299702bf5"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>char16_t</b> = detail::char16_t</td></tr>
 <tr class="separator:a38ff18893dfc84c562fb36c299702bf5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89ecc9bd8ee2b5eb89d39c5fd1e973be"><td class="memTemplParams" colspan="2"><a id="a89ecc9bd8ee2b5eb89d39c5fd1e973be"></a>
+<tr class="memitem:aaa1116ad357d1c73d1cc26ce28b29c82"><td class="memTemplParams" colspan="2"><a id="aaa1116ad357d1c73d1cc26ce28b29c82"></a>
 template&lt;class T &gt; </td></tr>
-<tr class="memitem:a89ecc9bd8ee2b5eb89d39c5fd1e973be"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a89ecc9bd8ee2b5eb89d39c5fd1e973be">default_deleter</a> = std::default_delete&lt; T &gt;</td></tr>
-<tr class="memdesc:a89ecc9bd8ee2b5eb89d39c5fd1e973be"><td class="mdescLeft">&#160;</td><td class="mdescRight">The default deleter to use. <br /></td></tr>
-<tr class="separator:a89ecc9bd8ee2b5eb89d39c5fd1e973be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa1116ad357d1c73d1cc26ce28b29c82"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#aaa1116ad357d1c73d1cc26ce28b29c82">default_c_str_deleter</a> = std::default_delete&lt; T &gt;</td></tr>
+<tr class="memdesc:aaa1116ad357d1c73d1cc26ce28b29c82"><td class="mdescLeft">&#160;</td><td class="mdescRight">The default deleter to use. <br /></td></tr>
+<tr class="separator:aaa1116ad357d1c73d1cc26ce28b29c82"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -291,10 +291,10 @@ LLFIO_PATH_VIEW_CONSTEXPR <a class="el" href="classllfio__v2__xxx_1_1path__view.
 constexpr enum <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732e">zero_termination</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#ac12652236847087552e7a8cc01ef5a71">zero_termination</a> () const noexcept</td></tr>
 <tr class="memdesc:ac12652236847087552e7a8cc01ef5a71"><td class="mdescLeft">&#160;</td><td class="mdescRight">The zero termination during construction. <br /></td></tr>
 <tr class="separator:ac12652236847087552e7a8cc01ef5a71"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8cfa29fa5e587eee9f05c324cb271e09"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a8cfa29fa5e587eee9f05c324cb271e09">LLFIO_TEMPLATE</a> (class T=typename filesystem::path::value_type, class Deleter=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a89ecc9bd8ee2b5eb89d39c5fd1e973be">default_deleter</a>&lt; T[]&gt;, size_t _internal_buffer_size=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a7b52fa10c4359dcc25aed43be0be8a91">default_internal_buffer_size</a>) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a411e9c36a49bd37d596ab34f99b656fd">is_source_acceptable</a>&lt; T &gt;)) const expr int compare(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> p</td></tr>
-<tr class="separator:a8cfa29fa5e587eee9f05c324cb271e09"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a09d386984be04793b0f933be34e52ccf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a09d386984be04793b0f933be34e52ccf">LLFIO_TEMPLATE</a> (class T=typename filesystem::path::value_type, class AllocatorOrDeleter=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a89ecc9bd8ee2b5eb89d39c5fd1e973be">default_deleter</a>&lt; T[]&gt;, size_t _internal_buffer_size=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a7b52fa10c4359dcc25aed43be0be8a91">default_internal_buffer_size</a>) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a411e9c36a49bd37d596ab34f99b656fd">is_source_acceptable</a>&lt; T &gt;)) struct c_str</td></tr>
-<tr class="separator:a09d386984be04793b0f933be34e52ccf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a486c1bc907c6de489ac94069d6681c53"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a486c1bc907c6de489ac94069d6681c53">LLFIO_TEMPLATE</a> (class T=typename filesystem::path::value_type, class Deleter=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#aaa1116ad357d1c73d1cc26ce28b29c82">default_c_str_deleter</a>&lt; T[]&gt;, size_t _internal_buffer_size=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a7b52fa10c4359dcc25aed43be0be8a91">default_internal_buffer_size</a>) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a411e9c36a49bd37d596ab34f99b656fd">is_source_acceptable</a>&lt; T &gt;)) const expr int compare(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> p</td></tr>
+<tr class="separator:a486c1bc907c6de489ac94069d6681c53"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3384b4bb85789ce3f9d336bab3487481"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a3384b4bb85789ce3f9d336bab3487481">LLFIO_TEMPLATE</a> (class T=typename filesystem::path::value_type, class AllocatorOrDeleter=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#aaa1116ad357d1c73d1cc26ce28b29c82">default_c_str_deleter</a>&lt; T[]&gt;, size_t _internal_buffer_size=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a7b52fa10c4359dcc25aed43be0be8a91">default_internal_buffer_size</a>) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a411e9c36a49bd37d596ab34f99b656fd">is_source_acceptable</a>&lt; T &gt;)) struct c_str</td></tr>
+<tr class="separator:a3384b4bb85789ce3f9d336bab3487481"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a026f3fd0f948212028182d1b501dffbb"><td class="memItemLeft" align="right" valign="top"><a id="a026f3fd0f948212028182d1b501dffbb"></a>
 const <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a7663cb908516be3f8bf17b6826da186a">byte</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>_raw_data</b> () const noexcept</td></tr>
 <tr class="separator:a026f3fd0f948212028182d1b501dffbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -783,8 +783,8 @@ LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a8cfa29fa5e587eee9f05c324cb271e09"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8cfa29fa5e587eee9f05c324cb271e09">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[1/4]</span></h2>
+<a id="a486c1bc907c6de489ac94069d6681c53"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a486c1bc907c6de489ac94069d6681c53">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -802,7 +802,7 @@ LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">class Deleter&#160;</td>
-          <td class="paramname"> = <code><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a89ecc9bd8ee2b5eb89d39c5fd1e973be">default_deleter</a>&lt;T[]&gt;</code>, </td>
+          <td class="paramname"> = <code><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#aaa1116ad357d1c73d1cc26ce28b29c82">default_c_str_deleter</a>&lt;T[]&gt;</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -829,8 +829,8 @@ LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom
 
 </div>
 </div>
-<a id="a09d386984be04793b0f933be34e52ccf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a09d386984be04793b0f933be34e52ccf">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[2/4]</span></h2>
+<a id="a3384b4bb85789ce3f9d336bab3487481"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3384b4bb85789ce3f9d336bab3487481">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[2/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -848,7 +848,7 @@ LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">class AllocatorOrDeleter&#160;</td>
-          <td class="paramname"> = <code><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a89ecc9bd8ee2b5eb89d39c5fd1e973be">default_deleter</a>&lt;T[]&gt;</code>, </td>
+          <td class="paramname"> = <code><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#aaa1116ad357d1c73d1cc26ce28b29c82">default_c_str_deleter</a>&lt;T[]&gt;</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>

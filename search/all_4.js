@@ -5,7 +5,7 @@ var searchData=
   ['deadline',['deadline',['../structllfio__v2__xxx_1_1deadline.html',1,'llfio_v2_xxx']]],
   ['deadline_2eh',['deadline.h',['../deadline_8h.html',1,'']]],
   ['decommit',['decommit',['../classllfio__v2__xxx_1_1map__handle.html#a518ff43602ac8e32ae48a198d0de1d75',1,'llfio_v2_xxx::map_handle']]],
-  ['default_5fdeleter',['default_deleter',['../classllfio__v2__xxx_1_1path__view__component.html#a89ecc9bd8ee2b5eb89d39c5fd1e973be',1,'llfio_v2_xxx::path_view_component']]],
+  ['default_5fc_5fstr_5fdeleter',['default_c_str_deleter',['../classllfio__v2__xxx_1_1path__view__component.html#aaa1116ad357d1c73d1cc26ce28b29c82',1,'llfio_v2_xxx::path_view_component']]],
   ['default_5finternal_5fbuffer_5fsize',['default_internal_buffer_size',['../classllfio__v2__xxx_1_1path__view__component.html#a7b52fa10c4359dcc25aed43be0be8a91',1,'llfio_v2_xxx::path_view_component']]],
   ['default_5fmetadata',['default_metadata',['../structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#a8904eee9435edf3562642294046c634e',1,'llfio_v2_xxx::algorithm::traversal_summary']]],
   ['default_5fvalue',['default_value',['../namespacellfio__v2__xxx_1_1storage__profile.html#aac385da4b780e8a6a87444fe3579578c',1,'llfio_v2_xxx::storage_profile']]],
