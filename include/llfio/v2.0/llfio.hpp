@@ -34,10 +34,7 @@
 
 // If C++ Modules are on and we are not compiling the library,
 // we are either generating the interface or importing
-#if !defined(__cpp_modules) || defined(GENERATING_LLFIO_MODULE_INTERFACE) || LLFIO_DISABLE_CXX_MODULES
-// C++ Modules not on, therefore include as usual
-#define LLFIO_INCLUDE_ALL
-#else
+#if defined(__cpp_modules)
 #if defined(GENERATING_LLFIO_MODULE_INTERFACE)
 // We are generating this module's interface
 #define QUICKCPPLIB_HEADERS_ONLY 0
@@ -51,6 +48,9 @@
 import LLFIO_MODULE_NAME;
 #undef LLFIO_INCLUDE_ALL
 #endif
+#else
+// C++ Modules not on, therefore include as usual
+#define LLFIO_INCLUDE_ALL
 #endif
 
 #ifdef LLFIO_INCLUDE_ALL
@@ -63,13 +63,14 @@ import LLFIO_MODULE_NAME;
 #include "utils.hpp"
 
 #include "directory_handle.hpp"
+#include "fast_random_file_handle.hpp"
 #include "file_handle.hpp"
+//#include "io_thread_pool_group.hpp"
 #include "process_handle.hpp"
 #include "statfs.hpp"
 #ifdef LLFIO_INCLUDE_STORAGE_PROFILE
 #include "storage_profile.hpp"
 #endif
-#include "fast_random_file_handle.hpp"
 #include "symlink_handle.hpp"
 
 #include "algorithm/clone.hpp"
@@ -83,10 +84,10 @@ import LLFIO_MODULE_NAME;
 #include "algorithm/summarize.hpp"
 
 #ifndef LLFIO_EXCLUDE_MAPPED_FILE_HANDLE
+#include "mapped.hpp"
 #include "algorithm/handle_adapter/xor.hpp"
 #include "algorithm/shared_fs_mutex/memory_map.hpp"
 #include "algorithm/trivial_vector.hpp"
-#include "mapped.hpp"
 #endif
 
 #endif
