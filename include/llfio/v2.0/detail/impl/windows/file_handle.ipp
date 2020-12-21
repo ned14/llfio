@@ -25,6 +25,11 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../file_handle.hpp"
 #include "import.hpp"
 
+#include "../../../statfs.hpp"
+
+#include <mutex>
+#include <vector>
+
 LLFIO_V2_NAMESPACE_BEGIN
 
 result<file_handle> file_handle::file(const path_handle &base, file_handle::path_view_type path, file_handle::mode _mode, file_handle::creation _creation,
@@ -821,7 +826,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
           }
           done = true;
         }
-        //assert(done);
+        // assert(done);
         dest_length = destoffset + extent.length;
         truncate_back_on_failure = false;
         LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
@@ -868,6 +873,110 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_pair exte
     }
   }
   return success();
+}
+
+
+/******************************************* statfs_t ************************************************/
+
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<uint32_t, float>> statfs_t::_fill_ios(const handle & /*unused*/, const std::string &mntfromname) noexcept
+{
+  try
+  {
+    alignas(8) wchar_t buffer[32769];
+    // Firstly open a handle to the volume
+    OUTCOME_TRY(auto volumeh, file_handle::file({}, mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
+    // Now ask the volume what physical disks it spans
+    auto *vde = reinterpret_cast<VOLUME_DISK_EXTENTS *>(buffer);
+    OVERLAPPED ol{};
+    memset(&ol, 0, sizeof(ol));
+    ol.Internal = static_cast<ULONG_PTR>(-1);
+    if(DeviceIoControl(volumeh.native_handle().h, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, nullptr, 0, vde, sizeof(buffer), nullptr, &ol) == 0)
+    {
+      if(ERROR_IO_PENDING == GetLastError())
+      {
+        NTSTATUS ntstat = ntwait(volumeh.native_handle().h, ol, deadline());
+        if(ntstat != 0)
+        {
+          return ntkernel_error(ntstat);
+        }
+      }
+      if(ERROR_SUCCESS != GetLastError())
+      {
+        return win32_error();
+      }
+    }
+    static struct last_reading_t
+    {
+      struct item
+      {
+        int64_t ReadTime{0}, WriteTime{0}, IdleTime{0};
+      };
+      std::mutex lock;
+      std::vector<item> items;
+    } last_reading;
+
+    uint32_t iosinprogress = 0;
+    float ioswaittime = 0;
+    DWORD disk_extents = vde->NumberOfDiskExtents;
+    for(DWORD disk_extent = 0; disk_extent < disk_extents; disk_extent++)
+    {
+      alignas(8) wchar_t physicaldrivename[32] = L"\\\\.\\PhysicalDrive", *e = physicaldrivename + 17;
+      const auto DiskNumber = vde->Extents[disk_extent].DiskNumber;
+      if(DiskNumber >= 100)
+      {
+        *e++ = '0' + ((DiskNumber / 100) % 10);
+      }
+      if(DiskNumber >= 10)
+      {
+        *e++ = '0' + ((DiskNumber / 10) % 10);
+      }
+      *e++ = '0' + (DiskNumber % 10);
+      *e = 0;
+      OUTCOME_TRY(auto diskh, file_handle::file({}, path_view(physicaldrivename, e - physicaldrivename, path_view::zero_terminated), handle::mode::none,
+                                                handle::creation::open_existing, handle::caching::only_metadata));
+      ol.Internal = static_cast<ULONG_PTR>(-1);
+      auto *dp = reinterpret_cast<DISK_PERFORMANCE *>(buffer);
+      if(DeviceIoControl(diskh.native_handle().h, IOCTL_DISK_PERFORMANCE, nullptr, 0, dp, sizeof(buffer), nullptr, &ol) == 0)
+      {
+        if(ERROR_IO_PENDING == GetLastError())
+        {
+          NTSTATUS ntstat = ntwait(diskh.native_handle().h, ol, deadline());
+          if(ntstat != 0)
+          {
+            return ntkernel_error(ntstat);
+          }
+        }
+        if(ERROR_SUCCESS != GetLastError())
+        {
+          return win32_error();
+        }
+      }
+      //printf("%llu,%llu,%llu\n", dp->ReadTime.QuadPart, dp->WriteTime.QuadPart, dp->IdleTime.QuadPart);
+      iosinprogress += dp->QueueDepth;
+      std::lock_guard<std::mutex> g(last_reading.lock);
+      if(last_reading.items.size() < DiskNumber + 1)
+      {
+        last_reading.items.resize(DiskNumber + 1);
+      }
+      else
+      {
+        uint64_t rd = (uint64_t) dp->ReadTime.QuadPart - (uint64_t) last_reading.items[DiskNumber].ReadTime;
+        uint64_t wd = (uint64_t) dp->WriteTime.QuadPart - (uint64_t) last_reading.items[DiskNumber].WriteTime;
+        uint64_t id = (uint64_t) dp->IdleTime.QuadPart - (uint64_t) last_reading.items[DiskNumber].IdleTime;
+        ioswaittime += 1 - (float) ((double) id / (rd + wd + id));
+      }
+      last_reading.items[DiskNumber].ReadTime = dp->ReadTime.QuadPart;
+      last_reading.items[DiskNumber].WriteTime = dp->WriteTime.QuadPart;
+      last_reading.items[DiskNumber].IdleTime = dp->IdleTime.QuadPart;
+    }
+    iosinprogress /= disk_extents;
+    ioswaittime /= disk_extents;
+    return {iosinprogress, std::min(ioswaittime, 1.0f)};
+  }
+  catch(...)
+  {
+    return error_from_exception();
+  }
 }
 
 LLFIO_V2_NAMESPACE_END

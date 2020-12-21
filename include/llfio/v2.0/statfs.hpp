@@ -1,5 +1,5 @@
 /* Information about the volume storing a file
-(C) 2015-2017 Niall Douglas <http://www.nedproductions.biz/> (8 commits)
+(C) 2015-2020 Niall Douglas <http://www.nedproductions.biz/> (8 commits)
 File Created: Dec 2015
 
 
@@ -41,13 +41,40 @@ LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 class handle;
 
+namespace detail
+{
+  inline constexpr float constexpr_float_allbits_set_nan()
+  {
+#if defined(_MSC_VER) && !defined(__clang__)
+    // Not all bits 1, but I can't see how to do better whilst inside constexpr
+    return -NAN;
+#else
+    return -__builtin_nanf("0xffffff");  // all bits 1
+#endif
+  }
+}  // namespace detail
+
 /*! \struct statfs_t
 \brief Metadata about a filing system. Unsupported entries are all bits set.
+
+Note also that for some fields, a soft failure to read the requested value manifests
+as all bits set. For example, `f_iosinprogress` might not be computable if the
+filing system for your handle reports a `dev_t` from `fstat()` which does not
+match anything in the system's disk hardware i/o stats. As this can be completely
+benign (e.g. your handle is a socket), this is treated as a soft failure.
+
+Note for `f_iosinprogress` and `f_ioswaittime` that support is not implemented yet
+outside Microsoft Windows and Linux. Note also that for Linux, filing systems
+spanning multiple hardware devices have undefined outcomes, whereas on Windows
+you are given the average of the values for all underlying hardware devices.
+Code donations improving the support for these items on Mac OS, FreeBSD and Linux
+would be welcomed.
 */
 struct LLFIO_DECL statfs_t
 {
   static constexpr uint32_t _allbits1_32 = ~0U;
   static constexpr uint64_t _allbits1_64 = ~0ULL;
+  static constexpr float _allbits1_float = detail::constexpr_float_allbits_set_nan();
   struct f_flags_t
   {
     uint32_t rdonly : 1;             //!< Filing system is read only                                      (Windows, POSIX)
@@ -75,11 +102,31 @@ struct LLFIO_DECL statfs_t
   std::string f_mntfromname;                      /*!< mounted filesystem                 (Windows, POSIX) */
   filesystem::path f_mntonname;                   /*!< directory on which mounted         (Windows, POSIX) */
 
+  uint32_t f_iosinprogress{_allbits1_32}; /*!< i/o's currently in progress (i.e. queue depth)  (Windows, Linux) */
+  float f_ioswaittime{_allbits1_float};   /*!< percentage of time spent doing i/o (1.0 = 100%) (Windows, Linux) */
+
   //! Used to indicate what metadata should be filled in
-  QUICKCPPLIB_BITFIELD_BEGIN(want) { flags = 1 << 0, bsize = 1 << 1, iosize = 1 << 2, blocks = 1 << 3, bfree = 1 << 4, bavail = 1 << 5, files = 1 << 6, ffree = 1 << 7, namemax = 1 << 8, owner = 1 << 9, fsid = 1 << 10, fstypename = 1 << 11, mntfromname = 1 << 12, mntonname = 1 << 13, all = static_cast<unsigned>(-1) }
-  QUICKCPPLIB_BITFIELD_END(want)
+  QUICKCPPLIB_BITFIELD_BEGIN(want){flags = 1 << 0,
+                                   bsize = 1 << 1,
+                                   iosize = 1 << 2,
+                                   blocks = 1 << 3,
+                                   bfree = 1 << 4,
+                                   bavail = 1 << 5,
+                                   files = 1 << 6,
+                                   ffree = 1 << 7,
+                                   namemax = 1 << 8,
+                                   owner = 1 << 9,
+                                   fsid = 1 << 10,
+                                   fstypename = 1 << 11,
+                                   mntfromname = 1 << 12,
+                                   mntonname = 1 << 13,
+                                   iosinprogress = 1 << 14,
+                                   ioswaittime = 1 << 15,
+                                   all = static_cast<unsigned>(-1)} QUICKCPPLIB_BITFIELD_END(want)
   //! Constructs a default initialised instance (all bits set)
-  statfs_t() {}  // NOLINT  Cannot be constexpr due to lack of constexpe string default constructor :(
+  statfs_t()
+  {
+  }  // NOLINT  Cannot be constexpr due to lack of constexpe string default constructor :(
 #ifdef __cpp_exceptions
   //! Constructs a filled instance, throwing as an exception any error which might occur
   explicit statfs_t(const handle &h, want wanted = want::all)
@@ -94,6 +141,10 @@ struct LLFIO_DECL statfs_t
 #endif
   //! Fills in the structure with metadata, returning number of items filled in
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> fill(const handle &h, want wanted = want::all) noexcept;
+
+private:
+  // Implemented in file_handle.ipp on Windows, otherwise in statfs.ipp
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<uint32_t, float>> _fill_ios(const handle &h, const std::string &mntfromname) noexcept;
 };
 
 LLFIO_V2_NAMESPACE_END
