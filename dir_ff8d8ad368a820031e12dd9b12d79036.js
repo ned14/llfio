@@ -34,10 +34,7 @@ var dir_ff8d8ad368a820031e12dd9b12d79036 =
     [ "stat.hpp", "stat_8hpp.html", [
       [ "stat_t", "structllfio__v2__xxx_1_1stat__t.html", "structllfio__v2__xxx_1_1stat__t" ]
     ] ],
-    [ "statfs.hpp", "statfs_8hpp.html", [
-      [ "statfs_t", "structllfio__v2__xxx_1_1statfs__t.html", "structllfio__v2__xxx_1_1statfs__t" ],
-      [ "f_flags_t", "structllfio__v2__xxx_1_1statfs__t_1_1f__flags__t.html", "structllfio__v2__xxx_1_1statfs__t_1_1f__flags__t" ]
-    ] ],
+    [ "statfs.hpp", "statfs_8hpp.html", "statfs_8hpp" ],
     [ "storage_profile.hpp", "storage__profile_8hpp.html", "storage__profile_8hpp" ],
     [ "symlink_handle.hpp", "symlink__handle_8hpp.html", "symlink__handle_8hpp" ],
     [ "utils.hpp", "utils_8hpp.html", "utils_8hpp" ]
