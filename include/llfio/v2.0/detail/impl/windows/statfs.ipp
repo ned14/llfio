@@ -141,6 +141,13 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
     f_iosize = ffssi->PhysicalBytesPerSectorForPerformance;
     ++ret;
   }
+  if(!!(wanted & want::iosinprogress) || !!(wanted & want::ioswaittime))
+  {
+    if(f_mntfromname.empty())
+    {
+      wanted |= want::mntfromname;
+    }
+  }
   if((wanted & want::mntfromname) || (wanted & want::mntonname))
   {
     // Irrespective we need the path before figuring out the mounted device
@@ -238,6 +245,20 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
         ++ret;
       }
       break;
+    }
+  }
+  if(!!(wanted & want::iosinprogress) || !!(wanted & want::ioswaittime))
+  {
+    OUTCOME_TRY(auto ios, _fill_ios(h, f_mntfromname));
+    if(!!(wanted & want::iosinprogress))
+    {
+      f_iosinprogress = ios.first;
+      ++ret;
+    }
+    if(!!(wanted & want::ioswaittime))
+    {
+      f_ioswaittime = ios.second;
+      ++ret;
     }
   }
   return ret;
