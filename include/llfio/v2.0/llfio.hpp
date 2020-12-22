@@ -63,9 +63,9 @@ import LLFIO_MODULE_NAME;
 #include "utils.hpp"
 
 #include "directory_handle.hpp"
+#include "dynamic_thread_pool_group.hpp"
 #include "fast_random_file_handle.hpp"
 #include "file_handle.hpp"
-//#include "io_thread_pool_group.hpp"
 #include "process_handle.hpp"
 #include "statfs.hpp"
 #ifdef LLFIO_INCLUDE_STORAGE_PROFILE

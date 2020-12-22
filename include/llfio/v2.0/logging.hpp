@@ -77,7 +77,7 @@ public:
   {
     reinterpret_cast<log_level &>(detail::thread_local_log_level()) = n;
   }
-  ~log_level_guard() {reinterpret_cast<log_level &>(detail::thread_local_log_level()) = _v; }
+  ~log_level_guard() { reinterpret_cast<log_level &>(detail::thread_local_log_level()) = _v; }
 };
 
 // Infrastructure for recording the current path for when failure occurs
@@ -262,8 +262,9 @@ namespace detail
     return span<char>(buffer, length);
   }
   // Strips a __PRETTY_FUNCTION__ of all instances of ::LLFIO_V2_NAMESPACE:: and ::LLFIO_V2_NAMESPACE::
-  inline void strip_pretty_function(char *out, size_t bytes, const char *in)
+  inline void strip_pretty_function(char *_out, size_t bytes, const char *in)
   {
+    char *out = _out;
     const span<char> remove1 = llfio_namespace_string();
     const span<char> remove2 = outcome_namespace_string();
     for(--bytes; bytes && *in; --bytes)
@@ -272,6 +273,32 @@ namespace detail
         in += remove1.size();
       if(!strncmp(in, remove2.data(), remove2.size()))
         in += remove2.size();
+      if(!strncmp(in, "basic_result<", 13))
+      {
+        int count = 13;
+        for(--bytes; bytes && *in && count; --bytes, --count)
+        {
+          *out++ = *in++;
+        }
+        if(!*in || bytes ==0)
+        {
+          break;
+        }
+        count = 1;
+        while(*in && count > 0)
+        {
+          if(*in == '<')
+          {
+            count++;
+          }
+          else if(*in == '>')
+          {
+            count--;
+          }
+          in++;
+        }
+        in--;
+      }
       *out++ = *in++;
     }
     *out = 0;
