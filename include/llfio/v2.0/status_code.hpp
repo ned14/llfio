@@ -25,8 +25,6 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef LLFIO_STATUS_CODE_HPP
 #define LLFIO_STATUS_CODE_HPP
 
-#include "logging.hpp"
-
 /* The SG14 status code implementation is quite profoundly different to the
 error code implementation. In the error code implementation, std::error_code
 is fixed by the standard library, so we wrap it with extra metadata into
@@ -67,6 +65,8 @@ as that (a) enables safe header only LLFIO on Windows (b) produces better codege
 #if OUTCOME_VERSION_MAJOR == 2 && OUTCOME_VERSION_MINOR < 2
 #error LLFIO needs Outcome v2.2 or higher
 #endif
+
+#include "logging.hpp"
 
 LLFIO_V2_NAMESPACE_BEGIN
 
@@ -350,6 +350,8 @@ LLFIO_V2_NAMESPACE_END
 #if OUTCOME_VERSION_MAJOR == 2 && OUTCOME_VERSION_MINOR < 2
 #error LLFIO needs Outcome v2.2 or higher
 #endif
+
+#include "logging.hpp"
 
 LLFIO_V2_NAMESPACE_BEGIN
 

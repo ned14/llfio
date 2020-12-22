@@ -293,7 +293,8 @@ if(LLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE)
   all_compile_definitions(PUBLIC LLFIO_EXPERIMENTAL_STATUS_CODE=1)
 endif()
 if(WIN32)
-  all_compile_definitions(PRIVATE _WIN32_WINNT=0x601)  ## Target Win7
+  all_compile_definitions(PRIVATE _WIN32_WINNT=0x601)                ## Target Win7
+  target_compile_definitions(llfio_hl INTERFACE _WIN32_WINNT=0x601)  ## Target Win7
   if(NOT LLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE)
     target_link_libraries(llfio_hl INTERFACE ntkernel-error-category::hl)
     target_link_libraries(llfio_dl PUBLIC ntkernel-error-category::dl)
