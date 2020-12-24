@@ -158,20 +158,56 @@ public:
     dynamic_thread_pool_group_impl *_parent{nullptr};
     void *_internalworkh{nullptr}, *_internaltimerh{nullptr};
     work_item *_prev{nullptr}, *_next{nullptr};
-    intptr_t _nextwork{0};
+    intptr_t _nextwork{-1};
     std::chrono::steady_clock::time_point _timepoint1;
     std::chrono::system_clock::time_point _timepoint2;
     int _internalworkh_inuse{0};
 
   protected:
     work_item() = default;
-    work_item(const work_item &) = default;
-    work_item(work_item &&) = default;
-    work_item &operator=(const work_item &) = default;
-    work_item &operator=(work_item &&) = default;
+    work_item(const work_item &o) = delete;
+    work_item(work_item &&o) noexcept
+        : _parent(o._parent)
+        , _internalworkh(o._internalworkh)
+        , _internaltimerh(o._internaltimerh)
+        , _prev(o._prev)
+        , _next(o._next)
+        , _nextwork(o._nextwork)
+        , _timepoint1(o._timepoint1)
+        , _timepoint2(o._timepoint2)
+    {
+      assert(o._parent == nullptr);
+      assert(o._internalworkh == nullptr);
+      assert(o._internaltimerh == nullptr);
+      if(o._parent != nullptr || o._internalworkh != nullptr)
+      {
+        LLFIO_LOG_FATAL(this, "FATAL: dynamic_thread_pool_group::work_item was relocated in memory during use!");
+        abort();
+      }
+      o._prev = o._next = nullptr;
+      o._nextwork = -1;
+    }
+    work_item &operator=(const work_item &) = delete;
+    work_item &operator=(work_item &&) = delete;
 
   public:
-    virtual ~work_item() {}
+    virtual ~work_item()
+    {
+      assert(_nextwork == -1);
+      if(_nextwork != -1)
+      {
+        LLFIO_LOG_FATAL(this, "FATAL: dynamic_thread_pool_group::work_item destroyed before all work was done!");
+        abort();
+      }
+      assert(_internalworkh == nullptr);
+      assert(_internaltimerh == nullptr);
+      assert(_parent == nullptr);
+      if(_internalworkh != nullptr || _parent != nullptr)
+      {
+        LLFIO_LOG_FATAL(this, "FATAL: dynamic_thread_pool_group::work_item destroyed before group_complete() was executed!");
+        abort();
+      }
+    }
 
     //! Returns the parent work group between successful submission and just before `group_complete()`.
     dynamic_thread_pool_group *parent() const noexcept { return reinterpret_cast<dynamic_thread_pool_group *>(_parent); }
@@ -245,6 +281,20 @@ public:
   `errc::operation_canceled` is returned if you try.
   */
   virtual result<void> submit(span<work_item *> work) noexcept = 0;
+  //! \overload
+  result<void> submit(work_item *wi) noexcept { return submit(span<work_item *>(&wi, 1)); }
+  //! \overload
+  LLFIO_TEMPLATE(class T)
+  LLFIO_TREQUIRES(LLFIO_TPRED(!std::is_pointer<T>::value), LLFIO_TPRED(std::is_base_of<work_item, T>::value))
+  result<void> submit(span<T> wi) noexcept
+  {
+    auto *wis = (T **) alloca(sizeof(T *) * wi.size());
+    for(size_t n = 0; n < wi.size(); n++)
+    {
+      wis[n] = &wi[n];
+    }
+    return submit(span<work_item *>((work_item **) wis, wi.size()));
+  }
 
   //! Threadsafe. Cancel any remaining work previously submitted, but without blocking (use `wait()` to block).
   virtual result<void> stop() noexcept = 0;
