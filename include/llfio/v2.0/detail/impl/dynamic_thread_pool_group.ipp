@@ -475,7 +475,7 @@ namespace detail
   {
     (void) g;
 #ifdef _WIN32
-    if(1 == i->_internalworkh_inuse)
+    if(i->_internalworkh_inuse > 0)
     {
       i->_internalworkh_inuse = 2;
     }
@@ -504,6 +504,7 @@ namespace detail
       for(; v != nullptr; v = n)
       {
         v->_parent = nullptr;
+        v->_nextwork = -1;
         n = v->_next;
       }
       n = v = parent->_work_items_done.front;
@@ -590,27 +591,49 @@ namespace detail
           auto *i = group->_work_items_active.front;
           if(nullptr != i->_internalworkh)
           {
-            i->_internalworkh_inuse = 1;
+            if(0 == i->_internalworkh_inuse)
+            {
+              i->_internalworkh_inuse = 1;
+            }
             g.unlock();
             WaitForThreadpoolWorkCallbacks((PTP_WORK) i->_internalworkh, true);
             g.lock();
             if(i->_internalworkh_inuse == 2)
             {
-              CloseThreadpoolWork((PTP_WORK) i->_internalworkh);
-              i->_internalworkh = nullptr;
+              if(nullptr != i->_internalworkh)
+              {
+                CloseThreadpoolWork((PTP_WORK) i->_internalworkh);
+                i->_internalworkh = nullptr;
+              }
+              if(nullptr != i->_internaltimerh)
+              {
+                CloseThreadpoolTimer((PTP_TIMER) i->_internaltimerh);
+                i->_internaltimerh = nullptr;
+              }
             }
             i->_internalworkh_inuse = 0;
           }
           if(nullptr != i->_internaltimerh)
           {
-            i->_internalworkh_inuse = 1;
+            if(0 == i->_internalworkh_inuse)
+            {
+              i->_internalworkh_inuse = 1;
+            }
             g.unlock();
             WaitForThreadpoolTimerCallbacks((PTP_TIMER) i->_internaltimerh, true);
             g.lock();
             if(i->_internalworkh_inuse == 2)
             {
-              CloseThreadpoolTimer((PTP_TIMER) i->_internaltimerh);
-              i->_internalworkh = nullptr;
+              if(nullptr != i->_internalworkh)
+              {
+                CloseThreadpoolWork((PTP_WORK) i->_internalworkh);
+                i->_internalworkh = nullptr;
+              }
+              if(nullptr != i->_internaltimerh)
+              {
+                CloseThreadpoolTimer((PTP_TIMER) i->_internaltimerh);
+                i->_internaltimerh = nullptr;
+              }
             }
             i->_internalworkh_inuse = 0;
           }
@@ -632,27 +655,49 @@ namespace detail
           auto *i = group->_work_items_active.front;
           if(nullptr != i->_internalworkh)
           {
-            i->_internalworkh_inuse = 1;
+            if(0 == i->_internalworkh_inuse)
+            {
+              i->_internalworkh_inuse = 1;
+            }
             g.unlock();
             WaitForThreadpoolWorkCallbacks((PTP_WORK) i->_internalworkh, false);
             g.lock();
             if(i->_internalworkh_inuse == 2)
             {
-              CloseThreadpoolWork((PTP_WORK) i->_internalworkh);
-              i->_internalworkh = nullptr;
+              if(nullptr != i->_internalworkh)
+              {
+                CloseThreadpoolWork((PTP_WORK) i->_internalworkh);
+                i->_internalworkh = nullptr;
+              }
+              if(nullptr != i->_internaltimerh)
+              {
+                CloseThreadpoolTimer((PTP_TIMER) i->_internaltimerh);
+                i->_internaltimerh = nullptr;
+              }
             }
             i->_internalworkh_inuse = 0;
           }
           if(nullptr != i->_internaltimerh)
           {
-            i->_internalworkh_inuse = 1;
+            if(0 == i->_internalworkh_inuse)
+            {
+              i->_internalworkh_inuse = 1;
+            }
             g.unlock();
             WaitForThreadpoolTimerCallbacks((PTP_TIMER) i->_internaltimerh, false);
             g.lock();
             if(i->_internalworkh_inuse == 2)
             {
-              CloseThreadpoolTimer((PTP_TIMER) i->_internaltimerh);
-              i->_internalworkh = nullptr;
+              if(nullptr != i->_internalworkh)
+              {
+                CloseThreadpoolWork((PTP_WORK) i->_internalworkh);
+                i->_internalworkh = nullptr;
+              }
+              if(nullptr != i->_internaltimerh)
+              {
+                CloseThreadpoolTimer((PTP_TIMER) i->_internaltimerh);
+                i->_internaltimerh = nullptr;
+              }
             }
             i->_internalworkh_inuse = 0;
           }
@@ -707,7 +752,7 @@ namespace detail
     auto old_thread_local_state = tls;
     tls.workitem = workitem;
     tls.current_callback_instance = selfthreadh;
-    tls.nesting_level++;
+    tls.nesting_level = workitem->_parent->_nesting_level + 1;
     auto r = (*workitem)(workitem->_nextwork);
     workitem->_nextwork = 0;  // call next() next time
     tls = old_thread_local_state;
