@@ -144,6 +144,8 @@ public:
   using path_view_type = path_view;
   //! The unique identifier type used by this handle
   using unique_id_type = QUICKCPPLIB_NAMESPACE::integers128::uint128;
+  //! A hasher for the unique identifier type used by this handle
+  using unique_id_type_hasher = QUICKCPPLIB_NAMESPACE::integers128::uint128_hasher;
 
 protected:
   mutable dev_t _devid{0};
