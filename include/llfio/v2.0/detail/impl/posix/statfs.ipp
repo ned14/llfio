@@ -42,7 +42,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
 {
   size_t ret = 0;
 #ifdef __linux__
-  if(!!(wanted & ~(want::iosinprogress | want::ioswaittime)))
+  if(!!(wanted & ~(want::iosinprogress | want::iosbusytime)))
   {
     struct statfs64 s
     {
@@ -319,7 +319,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
     ++ret;
   }
 #endif
-  if(!!(wanted & want::iosinprogress) || !!(wanted & want::ioswaittime))
+  if(!!(wanted & want::iosinprogress) || !!(wanted & want::iosbusytime))
   {
     OUTCOME_TRY(auto ios, _fill_ios(h, f_mntfromname));
     if(!!(wanted & want::iosinprogress))
@@ -327,9 +327,9 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
       f_iosinprogress = ios.first;
       ++ret;
     }
-    if(!!(wanted & want::ioswaittime))
+    if(!!(wanted & want::iosbusytime))
     {
-      f_ioswaittime = ios.second;
+      f_iosbusytime = ios.second;
       ++ret;
     }
   }
@@ -367,7 +367,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<uint32_t, float>> statfs_t::_fi
         std::chrono::steady_clock::time_point last_updated;
 
         uint32_t f_iosinprogress{0};
-        float f_ioswaittime{0};
+        float f_iosbusytime{0};
       };
       std::mutex lock;
       std::vector<item> items;
@@ -381,7 +381,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<uint32_t, float>> statfs_t::_fi
         {
           if(std::chrono::duration_cast<std::chrono::milliseconds>(now - i.last_updated) < std::chrono::milliseconds(100))
           {
-            return {i.f_iosinprogress, i.f_ioswaittime};  // exit with old readings
+            return {i.f_iosinprogress, i.f_iosbusytime};  // exit with old readings
           }
           break;
         }
@@ -458,12 +458,12 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<uint32_t, float>> statfs_t::_fi
             else
             {
               auto timediff = std::chrono::duration_cast<std::chrono::milliseconds>(now - it->last_updated);
-              it->f_ioswaittime = std::min((float) ((double) (fields[9] - it->millis) / timediff.count()), 1.0f);
+              it->f_iosbusytime = std::min((float) ((double) (fields[9] - it->millis) / timediff.count()), 1.0f);
               it->millis = fields[9];
             }
             it->f_iosinprogress = (uint32_t) fields[8];
             it->last_updated = now;
-            return {it->f_iosinprogress, it->f_ioswaittime};
+            return {it->f_iosinprogress, it->f_iosbusytime};
           }
         }
         // It's totally possible that the dev_t reported by stat()
@@ -476,7 +476,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<uint32_t, float>> statfs_t::_fi
       return error_from_exception();
     }
 #else
-    /* On FreeBSD, want::iosinprogress and want::ioswaittime could be implemented
+    /* On FreeBSD, want::iosinprogress and want::iosbusytime could be implemented
     using libdevstat. See https://www.freebsd.org/cgi/man.cgi?query=devstat&sektion=3.
     Code donations welcome!
 

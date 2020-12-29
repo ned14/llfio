@@ -916,7 +916,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<uint32_t, float>> statfs_t::_fi
     } last_reading;
 
     uint32_t iosinprogress = 0;
-    float ioswaittime = 0;
+    float iosbusytime = 0;
     DWORD disk_extents = vde->NumberOfDiskExtents;
     for(DWORD disk_extent = 0; disk_extent < disk_extents; disk_extent++)
     {
@@ -963,15 +963,15 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<uint32_t, float>> statfs_t::_fi
         uint64_t rd = (uint64_t) dp->ReadTime.QuadPart - (uint64_t) last_reading.items[DiskNumber].ReadTime;
         uint64_t wd = (uint64_t) dp->WriteTime.QuadPart - (uint64_t) last_reading.items[DiskNumber].WriteTime;
         uint64_t id = (uint64_t) dp->IdleTime.QuadPart - (uint64_t) last_reading.items[DiskNumber].IdleTime;
-        ioswaittime += 1 - (float) ((double) id / (rd + wd + id));
+        iosbusytime += 1 - (float) ((double) id / (rd + wd + id));
       }
       last_reading.items[DiskNumber].ReadTime = dp->ReadTime.QuadPart;
       last_reading.items[DiskNumber].WriteTime = dp->WriteTime.QuadPart;
       last_reading.items[DiskNumber].IdleTime = dp->IdleTime.QuadPart;
     }
     iosinprogress /= disk_extents;
-    ioswaittime /= disk_extents;
-    return {iosinprogress, std::min(ioswaittime, 1.0f)};
+    iosbusytime /= disk_extents;
+    return {iosinprogress, std::min(iosbusytime, 1.0f)};
   }
   catch(...)
   {

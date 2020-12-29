@@ -49,7 +49,7 @@ static inline void TestStatfsIosInProgress()
     std::cout << "\n mounted filesystem = " << statfs.f_mntfromname;
     std::cout << "\n directory on which mounted = " << statfs.f_mntonname;
     std::cout << "\n i/o's currently in progress (i.e. queue depth) = " << statfs.f_iosinprogress;
-    std::cout << "\n percentage of time spent doing i/o (1.0 = 100%) = " << statfs.f_ioswaittime;
+    std::cout << "\n percentage of time spent doing i/o (1.0 = 100%) = " << statfs.f_iosbusytime;
     std::cout << std::endl;
   };
   llfio::statfs_t s1base, s2base;
@@ -78,7 +78,7 @@ static inline void TestStatfsIosInProgress()
     print_statfs(h1, s1load);
     print_statfs(h2, s2load);
     // BOOST_CHECK(s1load.f_iosinprogress > s1base.f_iosinprogress);
-    BOOST_CHECK(std::isnan(s1base.f_ioswaittime) || s1load.f_ioswaittime > s1base.f_ioswaittime);
+    BOOST_CHECK(std::isnan(s1base.f_iosbusytime) || s1load.f_iosbusytime > s1base.f_iosbusytime);
     f.get();
     done = false;
   }
@@ -92,7 +92,7 @@ static inline void TestStatfsIosInProgress()
     print_statfs(h1, s1load);
     print_statfs(h2, s2load);
     // BOOST_CHECK(s2load.f_iosinprogress > s2base.f_iosinprogress);
-    BOOST_CHECK(std::isnan(s2base.f_ioswaittime) || s2load.f_ioswaittime > s2base.f_ioswaittime);
+    BOOST_CHECK(std::isnan(s2base.f_iosbusytime) || s2load.f_iosbusytime > s2base.f_iosbusytime);
     f.get();
     done = false;
   }
