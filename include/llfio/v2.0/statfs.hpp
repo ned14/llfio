@@ -63,7 +63,7 @@ filing system for your handle reports a `dev_t` from `fstat()` which does not
 match anything in the system's disk hardware i/o stats. As this can be completely
 benign (e.g. your handle is a socket), this is treated as a soft failure.
 
-Note for `f_iosinprogress` and `f_ioswaittime` that support is not implemented yet
+Note for `f_iosinprogress` and `f_iosbusytime` that support is not implemented yet
 outside Microsoft Windows and Linux. Note also that for Linux, filing systems
 spanning multiple hardware devices have undefined outcomes, whereas on Windows
 you are given the average of the values for all underlying hardware devices.
@@ -103,7 +103,7 @@ struct LLFIO_DECL statfs_t
   filesystem::path f_mntonname;                   /*!< directory on which mounted         (Windows, POSIX) */
 
   uint32_t f_iosinprogress{_allbits1_32}; /*!< i/o's currently in progress (i.e. queue depth)  (Windows, Linux) */
-  float f_ioswaittime{_allbits1_float};   /*!< percentage of time spent doing i/o (1.0 = 100%) (Windows, Linux) */
+  float f_iosbusytime{_allbits1_float};   /*!< percentage of time spent doing i/o (1.0 = 100%) (Windows, Linux) */
 
   //! Used to indicate what metadata should be filled in
   QUICKCPPLIB_BITFIELD_BEGIN(want){flags = 1 << 0,
@@ -121,7 +121,7 @@ struct LLFIO_DECL statfs_t
                                    mntfromname = 1 << 12,
                                    mntonname = 1 << 13,
                                    iosinprogress = 1 << 14,
-                                   ioswaittime = 1 << 15,
+                                   iosbusytime = 1 << 15,
                                    all = static_cast<unsigned>(-1)} QUICKCPPLIB_BITFIELD_END(want)
   //! Constructs a default initialised instance (all bits set)
   statfs_t()

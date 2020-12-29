@@ -141,7 +141,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
     f_iosize = ffssi->PhysicalBytesPerSectorForPerformance;
     ++ret;
   }
-  if(!!(wanted & want::iosinprogress) || !!(wanted & want::ioswaittime))
+  if(!!(wanted & want::iosinprogress) || !!(wanted & want::iosbusytime))
   {
     if(f_mntfromname.empty())
     {
@@ -247,7 +247,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
       break;
     }
   }
-  if(!!(wanted & want::iosinprogress) || !!(wanted & want::ioswaittime))
+  if(!!(wanted & want::iosinprogress) || !!(wanted & want::iosbusytime))
   {
     OUTCOME_TRY(auto ios, _fill_ios(h, f_mntfromname));
     if(!!(wanted & want::iosinprogress))
@@ -255,9 +255,9 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
       f_iosinprogress = ios.first;
       ++ret;
     }
-    if(!!(wanted & want::ioswaittime))
+    if(!!(wanted & want::iosbusytime))
     {
-      f_ioswaittime = ios.second;
+      f_iosbusytime = ios.second;
       ++ret;
     }
   }
