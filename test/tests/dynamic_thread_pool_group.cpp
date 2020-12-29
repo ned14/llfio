@@ -231,7 +231,7 @@ static inline void TestDynamicThreadPoolGroupNestingWorks()
       uint64_t mean = 0, count = 0;
       for(auto &i : time_bucket)
       {
-        mean += i.first*i.second;
+        mean += i.first * i.second;
         count += i.second;
       }
       mean /= count;
@@ -329,7 +329,96 @@ static inline void TestDynamicThreadPoolGroupNestingWorks()
   BOOST_CHECK(shared_states[MAX_NESTING - 1].stddev < shared_states[MAX_NESTING / 2].stddev / 2);
 }
 
+static inline void TestDynamicThreadPoolGroupIoAwareWorks()
+{
+  namespace llfio = LLFIO_V2_NAMESPACE;
+  static constexpr size_t WORK_ITEMS = 1000;
+  static constexpr size_t IO_SIZE = 1 * 65536;
+  struct shared_state_t
+  {
+    llfio::file_handle h;
+    llfio::dynamic_thread_pool_group::io_aware_work_item::io_handle_awareness awareness;
+    std::atomic<size_t> concurrency{0}, max_concurrency{0};
+    std::atomic<uint64_t> current_pacing{0};
+  } shared_state;
+  struct work_item final : public llfio::dynamic_thread_pool_group::io_aware_work_item
+  {
+    using _base = llfio::dynamic_thread_pool_group::io_aware_work_item;
+    shared_state_t *shared_state;
+
+    work_item() = default;
+    explicit work_item(shared_state_t *_shared_state)
+        : _base({&_shared_state->awareness, 1})
+        , shared_state(_shared_state)
+    {
+    }
+    work_item(work_item &&o) noexcept
+        : _base(std::move(o))
+        , shared_state(o.shared_state)
+    {
+    }
+
+    virtual intptr_t io_aware_next(llfio::deadline &d) noexcept override
+    {
+      shared_state->current_pacing.store(d.nsecs, std::memory_order_relaxed);
+      return 1;
+    }
+    virtual llfio::result<void> operator()(intptr_t /*unused*/) noexcept override
+    {
+      auto concurrency = shared_state->concurrency.fetch_add(1, std::memory_order_relaxed) + 1;
+      for(size_t expected_ = shared_state->max_concurrency; concurrency > expected_;)
+      {
+        shared_state->max_concurrency.compare_exchange_weak(expected_, concurrency);
+      }
+      static thread_local std::vector<llfio::byte, llfio::utils::page_allocator<llfio::byte>> buffer(IO_SIZE);
+      OUTCOME_TRY(shared_state->h.read((concurrency - 1) * IO_SIZE, {{buffer}}));
+      shared_state->concurrency.fetch_sub(1, std::memory_order_relaxed);
+      return llfio::success();
+    }
+    // virtual void group_complete(const llfio::result<void> &/*unused*/) noexcept override { }
+  };
+  shared_state.h = llfio::file_handle::temp_file({}, llfio::file_handle::mode::write, llfio::file_handle::creation::only_if_not_exist,
+                                                 llfio::file_handle::caching::only_metadata)
+                   .value();
+  shared_state.awareness.h = &shared_state.h;
+  shared_state.h.truncate(WORK_ITEMS * IO_SIZE).value();
+  alignas(4096) llfio::byte buffer[IO_SIZE];
+  llfio::utils::random_fill((char *) buffer, sizeof(buffer));
+  std::vector<work_item> workitems;
+  for(size_t n = 0; n < WORK_ITEMS; n++)
+  {
+    workitems.emplace_back(&shared_state);
+    shared_state.h.write(n * IO_SIZE, {{buffer, sizeof(buffer)}}).value();
+  }
+  auto tpg = llfio::make_dynamic_thread_pool_group().value();
+  tpg->submit(llfio::span<work_item>(workitems)).value();
+  auto begin = std::chrono::steady_clock::now();
+  size_t paced = 0;
+  while(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - begin) < std::chrono::seconds(60))
+  {
+    llfio::statfs_t statfs;
+    statfs.fill(shared_state.h, llfio::statfs_t::want::iosinprogress | llfio::statfs_t::want::iosbusytime | llfio::statfs_t::want::mntonname).value();
+    std::cout << "\nStorage device at " << statfs.f_mntonname << " is at " << (100.0f * statfs.f_iosbusytime) << "% utilisation and has an i/o queue depth of "
+              << statfs.f_iosinprogress << ". Current concurrency is " << shared_state.concurrency.load(std::memory_order_relaxed) << " and current pacing is "
+              << (shared_state.current_pacing.load(std::memory_order_relaxed) / 1000.0) << " microseconds." << std::endl;
+    if(shared_state.current_pacing.load(std::memory_order_relaxed) > 0)
+    {
+      paced++;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(250));
+  }
+  tpg->stop().value();
+  auto r = tpg->wait();
+  if(!r && r.error() != llfio::errc::operation_canceled)
+  {
+    r.value();
+  }
+  BOOST_CHECK(paced > 0);
+}
+
 KERNELTEST_TEST_KERNEL(integration, llfio, dynamic_thread_pool_group, works, "Tests that llfio::dynamic_thread_pool_group works as expected",
-                       TestDynamicThreadPoolGroupWorks())
+                      TestDynamicThreadPoolGroupWorks())
 KERNELTEST_TEST_KERNEL(integration, llfio, dynamic_thread_pool_group, nested, "Tests that nesting of llfio::dynamic_thread_pool_group works as expected",
-                       TestDynamicThreadPoolGroupNestingWorks())
+                      TestDynamicThreadPoolGroupNestingWorks())
+KERNELTEST_TEST_KERNEL(integration, llfio, dynamic_thread_pool_group, io_aware_work_item,
+                       "Tests that llfio::dynamic_thread_pool_group::io_aware_work_item works as expected", TestDynamicThreadPoolGroupIoAwareWorks())

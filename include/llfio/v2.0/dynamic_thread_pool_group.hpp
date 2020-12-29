@@ -155,7 +155,7 @@ public:
   {
     friend struct detail::global_dynamic_thread_pool_impl;
     friend class dynamic_thread_pool_group_impl;
-    dynamic_thread_pool_group_impl *_parent{nullptr};
+    std::atomic<dynamic_thread_pool_group_impl *> _parent{nullptr};
     void *_internalworkh{nullptr}, *_internaltimerh{nullptr};
     work_item *_prev{nullptr}, *_next{nullptr};
     intptr_t _nextwork{-1};
@@ -164,10 +164,12 @@ public:
     int _internalworkh_inuse{0};
 
   protected:
-    work_item() = default;
+    void *_private{nullptr};
+
+    constexpr work_item() {}
     work_item(const work_item &o) = delete;
     work_item(work_item &&o) noexcept
-        : _parent(o._parent)
+        : _parent(o._parent.load(std::memory_order_relaxed))
         , _internalworkh(o._internalworkh)
         , _internaltimerh(o._internaltimerh)
         , _prev(o._prev)
@@ -175,17 +177,21 @@ public:
         , _nextwork(o._nextwork)
         , _timepoint1(o._timepoint1)
         , _timepoint2(o._timepoint2)
+        , _internalworkh_inuse(o._internalworkh_inuse)
+        , _private(o._private)
     {
-      assert(o._parent == nullptr);
+      assert(o._parent.load(std::memory_order_relaxed) == nullptr);
       assert(o._internalworkh == nullptr);
       assert(o._internaltimerh == nullptr);
-      if(o._parent != nullptr || o._internalworkh != nullptr)
+      if(o._parent.load(std::memory_order_relaxed) != nullptr || o._internalworkh != nullptr)
       {
         LLFIO_LOG_FATAL(this, "FATAL: dynamic_thread_pool_group::work_item was relocated in memory during use!");
         abort();
       }
       o._prev = o._next = nullptr;
       o._nextwork = -1;
+      o._internalworkh_inuse = 0;
+      o._private = nullptr;
     }
     work_item &operator=(const work_item &) = delete;
     work_item &operator=(work_item &&) = delete;
@@ -210,7 +216,7 @@ public:
     }
 
     //! Returns the parent work group between successful submission and just before `group_complete()`.
-    dynamic_thread_pool_group *parent() const noexcept { return reinterpret_cast<dynamic_thread_pool_group *>(_parent); }
+    dynamic_thread_pool_group *parent() const noexcept { return reinterpret_cast<dynamic_thread_pool_group *>(_parent.load(std::memory_order_relaxed)); }
 
     /*! Invoked by the i/o thread pool to determine if this work item
     has more work to do.
@@ -270,6 +276,91 @@ public:
     value during this call.
     */
     virtual void group_complete(const result<void> &cancelled) noexcept { (void) cancelled; }
+  };
+
+  /*! \class io_aware_work_item
+  \brief A work item which paces when it next executes according to i/o congestion.
+
+  Currently there is only a working implementation of this for the Microsoft Windows
+  and Linux platforms, due to lack of working `statfs_t::f_iosinprogress` on other
+  platforms. If retrieving that for a seekable handle does not work, the constructor
+  throws an exception.
+
+  For seekable handles, currently `reads`, `writes` and `barriers` are ignored. We
+  simply retrieve, periodically, `statfs_t::f_iosinprogress` and `statfs_t::f_iosbusytime`
+  for the storage devices backing the seekable handle. If the i/o wait time exceeds
+  95% and the i/o in progress > 1, `next()` will start setting the default deadline passed to
+  `io_aware_next()`. Thereafter, every 1/10th of a second, if `statfs_t::f_iosinprogress`
+  is above 1, it will increase the deadline by 1/16th, whereas if it is
+  below 2, it will decrease the deadline by 1/16th. The default deadline chosen is always the worst of all the
+  storage devices of all the handles. This will reduce concurrency within the kernel thread pool
+  in order to reduce congestion on the storage devices. If at any point `statfs_t::f_iosbusytime`
+  drops below 95% as averaged across one second, the additional
+  throttling is completely removed. `io_aware_next()` can ignore the default deadline
+  passed into it, and can set any other deadline.
+
+  For non-seekable handles, the handle must have an i/o multiplexer set upon it, and on
+  Microsoft Windows, that i/o multiplexer must be utilising the IOCP instance of the
+  global Win32 thread pool. For each `reads`, `writes` and `barriers` which is non-zero,
+  a corresponding zero length i/o is constructed and initiated. When the i/o completes,
+  and all readable handles in the work item's set have data waiting to be read, and all
+  writable handles in the work item's set have space to allow writes, only then is the
+  work item invoked with the next piece of work.
+
+  \note Non-seekable handle support is not implemented yet.
+  */ 
+  class LLFIO_DECL io_aware_work_item : public work_item
+  {
+  public:
+    //! Information about an i/o handle this work item will use
+    struct io_handle_awareness
+    {
+      //! An i/o handle this work item will use
+      io_handle *h{nullptr};
+      //! The relative amount of reading done by this work item from the handle.
+      float reads{0};
+      //! The relative amount of writing done by this work item to the handle.
+      float writes{0};
+      //! The relative amount of write barriering done by this work item to the handle.
+      float barriers{0};
+
+      void *_internal{nullptr};
+    };
+
+  private:
+    const span<io_handle_awareness> _handles;
+
+    LLFIO_HEADERS_ONLY_VIRTUAL_SPEC intptr_t next(deadline &d) noexcept override final;
+
+  public:
+    constexpr io_aware_work_item() {}
+    /*! \brief Constructs a work item aware of i/o done to the handles in `hs`.
+    
+    Note that the `reads`, `writes` and `barriers` are normalised to proportions
+    out of `1.0` by this constructor, so if for example you had `reads/writes/barriers = 200/100/0`,
+    after normalisation those become `0.66/0.33/0.0` such that the total is `1.0`.
+    If `reads/writes/barriers = 0/0/0` on entry, they are replaced with `0.5/0.5/0.0`.
+
+    Note that normalisation is across *all* i/o handles in the set, so three handles
+    each with `reads/writes/barriers = 200/100/0` on entry would have `0.22/0.11/0.0`
+    each after construction.
+    */
+    explicit LLFIO_HEADERS_ONLY_MEMFUNC_SPEC io_aware_work_item(span<io_handle_awareness> hs);
+    io_aware_work_item(io_aware_work_item &&o) noexcept
+        : work_item(std::move(o))
+        , _handles(o._handles)
+    {
+    }
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC ~io_aware_work_item();
+
+    //! The handles originally registered during construction.
+    span<io_handle_awareness> handles() const noexcept { return _handles; }
+
+    /*! \brief As for `work_item::next()`, but deadline may be extended to
+    reduce i/o congestion on the hardware devices to which the handles
+    refer.
+    */
+    virtual intptr_t io_aware_next(deadline &d) noexcept = 0;
   };
 
   virtual ~dynamic_thread_pool_group() {}
