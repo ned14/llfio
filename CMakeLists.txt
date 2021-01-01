@@ -28,6 +28,7 @@ include(QuickCppLibUtils)
 include(QuickCppLibPolicies)
 
 option(LLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE "Whether to use SG14 status_code for failure handling" OFF)
+option(LLFIO_DISABLE_LIBDISPATCH "Whether to disable automatic discovery of libdispatch/Grand Unified Dispatch" OFF)
 option(LLFIO_ENABLE_DEPENDENCY_SMOKE_TEST "Whether to build executables which are smoke tests that LLFIO is fully working. Used by various package managers such as vcpkg." OFF)
 option(LLFIO_ASSUME_CROSS_COMPILING "Whether to assume we are cross compiling. Normally automatically detected, but if automatic detection doesn't work, a working <filesystem> will not be found during cmake configure." OFF)
 option(UNIT_TESTS_BUILD_ALL "Whether to run all of the unit test suite." OFF)
@@ -282,6 +283,27 @@ int main() {
   if(NOT CXX_HAS_CXX_FILESYSTEM_AFTER_FLAGS AND CXX_HAS_CXX_EXPERIMENTAL_FILESYSTEM_AFTER_FLAGS)
     all_compile_definitions(PUBLIC LLFIO_FORCE_EXPERIMENTAL_FILESYSTEM=1 KERNELTEST_FORCE_EXPERIMENTAL_FILESYSTEM=1)
   endif()
+endif()
+# Do we have Grand Central Dispatch on this platform?
+if(NOT LLFIO_DISABLE_LIBDISPATCH)
+  function(check_have_libdispatch)
+    set(CMAKE_REQUIRED_LIBRARIES dispatch)
+    check_cxx_source_compiles("
+#include <dispatch/dispatch.h>
+int main() {
+  dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+  return 0;
+}
+" LLFIO_HAS_LIBDISPATCH)
+  endfunction()
+  check_have_libdispatch()
+  if(LLFIO_HAS_LIBDISPATCH)
+    all_compile_definitions(PUBLIC LLFIO_FORCE_USE_LIBDISPATCH=1)
+    all_link_libraries(PUBLIC dispatch)
+  endif()
+endif()
+if(NOT LLFIO_HAS_LIBDISPATCH AND (CMAKE_SYSTEM_NAME MATCHES "FreeBSD" OR APPLE))
+  indented_message(FATAL_ERROR "FATAL: Grand Central Dispatch as libdispatch was not found on this FreeBSD or Mac OS system. libdispatch is required for LLFIO to build on those systems.")
 endif()
 
 # Set any macros this library requires
