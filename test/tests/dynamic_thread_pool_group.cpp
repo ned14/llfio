@@ -26,6 +26,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../test_kernel_decl.hpp"
 
+#include <cmath>  // for sqrt
+
 static inline void TestDynamicThreadPoolGroupWorks()
 {
   namespace llfio = LLFIO_V2_NAMESPACE;
@@ -85,7 +87,7 @@ static inline void TestDynamicThreadPoolGroupWorks()
       BOOST_CHECK(llfio::dynamic_thread_pool_group::current_nesting_level() == 1);
       BOOST_CHECK(llfio::dynamic_thread_pool_group::current_work_item() == this);
       // std::cout << "   () executes " << work << std::endl;
-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+      std::this_thread::sleep_for(std::chrono::milliseconds(50));
       auto *executed = (std::atomic<size_t> *) &shared->executed[work];
       executed->fetch_add(1);
       shared->concurrency.fetch_sub(1);
@@ -263,7 +265,8 @@ static inline void TestDynamicThreadPoolGroupNestingWorks()
       }
     }
     work_item(work_item &&o) noexcept
-        : nesting(o.nesting)
+        : _base(std::move(o))
+        , nesting(o.nesting)
         , shared_states(o.shared_states)
         , childwi(std::move(o.childwi))
     {
@@ -331,6 +334,10 @@ static inline void TestDynamicThreadPoolGroupNestingWorks()
 
 static inline void TestDynamicThreadPoolGroupIoAwareWorks()
 {
+  // statfs_t::iosinprogress not implemented for these yet
+#if defined(__APPLE__) || defined(__FreeBSD__)
+  return;
+#endif
   namespace llfio = LLFIO_V2_NAMESPACE;
   static constexpr size_t WORK_ITEMS = 1000;
   static constexpr size_t IO_SIZE = 1 * 65536;
@@ -407,7 +414,14 @@ static inline void TestDynamicThreadPoolGroupIoAwareWorks()
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(250));
   }
+  std::cout << "\nStopping ..." << std::endl;
   tpg->stop().value();
+  while(!tpg->stopped())
+  {
+    std::cout << "\nCurrent concurrency is " << shared_state.concurrency.load(std::memory_order_relaxed) << " and current pacing is "
+              << (shared_state.current_pacing.load(std::memory_order_relaxed) / 1000.0) << " microseconds." << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  }
   auto r = tpg->wait();
   if(!r && r.error() != llfio::errc::operation_canceled)
   {
@@ -417,8 +431,8 @@ static inline void TestDynamicThreadPoolGroupIoAwareWorks()
 }
 
 KERNELTEST_TEST_KERNEL(integration, llfio, dynamic_thread_pool_group, works, "Tests that llfio::dynamic_thread_pool_group works as expected",
-                      TestDynamicThreadPoolGroupWorks())
+                       TestDynamicThreadPoolGroupWorks())
 KERNELTEST_TEST_KERNEL(integration, llfio, dynamic_thread_pool_group, nested, "Tests that nesting of llfio::dynamic_thread_pool_group works as expected",
-                      TestDynamicThreadPoolGroupNestingWorks())
+                       TestDynamicThreadPoolGroupNestingWorks())
 KERNELTEST_TEST_KERNEL(integration, llfio, dynamic_thread_pool_group, io_aware_work_item,
                        "Tests that llfio::dynamic_thread_pool_group::io_aware_work_item works as expected", TestDynamicThreadPoolGroupIoAwareWorks())
