@@ -24,6 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../../dynamic_thread_pool_group.hpp"
 
+#include "../../file_handle.hpp"
 #include "../../statfs.hpp"
 
 #include <atomic>
@@ -32,12 +33,24 @@ Distributed under the Boost Software License, Version 1.0.
 #include <unordered_set>
 #include <vector>
 
+#include <iostream>
+
+#if LLFIO_FORCE_USE_LIBDISPATCH
+#include <dispatch/dispatch.h>
+#define LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD 1
+#else
 #ifdef _WIN32
 #include "windows/import.hpp"
 #include <threadpoolapiset.h>
 #else
-#include <pthread.h>
-#include <thread>
+#if __has_include(<dispatch/dispatch.h>)
+#include <dispatch/dispatch.h>
+#define LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD 1
+#else
+#define LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD 0
+#error Right now dynamic_thread_pool_group requires libdispatch to be available on POSIX. It should get auto discovered if installed, which is the default on BSD and Mac OS. Try installing libdispatch-dev if on Linux.
+#endif
+#endif
 #endif
 
 LLFIO_V2_NAMESPACE_BEGIN
@@ -46,7 +59,20 @@ namespace detail
 {
   struct global_dynamic_thread_pool_impl
   {
-#ifdef _WIN32
+#if LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD
+    using threadh_type = void *;
+    using grouph_type = dispatch_group_t;
+    static void _gcd_dispatch_callback(void *arg)
+    {
+      auto *workitem = (dynamic_thread_pool_group::work_item *) arg;
+      global_dynamic_thread_pool()._workerthread(workitem, nullptr);
+    }
+    static void _gcd_timer_callback(void *arg)
+    {
+      auto *workitem = (dynamic_thread_pool_group::work_item *) arg;
+      global_dynamic_thread_pool()._timerthread(workitem, nullptr);
+    }
+#elif defined(_WIN32)
     using threadh_type = PTP_CALLBACK_INSTANCE;
     using grouph_type = PTP_CALLBACK_ENVIRON;
     static void CALLBACK _win32_worker_thread_callback(threadh_type threadh, PVOID Parameter, PTP_WORK /*unused*/)
@@ -59,7 +85,6 @@ namespace detail
       auto *workitem = (dynamic_thread_pool_group::work_item *) Parameter;
       global_dynamic_thread_pool()._timerthread(workitem, threadh);
     }
-#else
 #endif
 
     std::mutex workqueue_lock;
@@ -75,11 +100,11 @@ namespace detail
     {
       size_t refcount{0};
       deadline default_deadline;
-      float average_busy{0};
+      float average_busy{0}, average_queuedepth{0};
       std::chrono::steady_clock::time_point last_updated;
       statfs_t statfs;
     };
-    std::unordered_map<file_handle::unique_id_type, io_aware_work_item_statfs, file_handle::unique_id_type_hasher> io_aware_work_item_handles;
+    std::unordered_map<fs_handle::unique_id_type, io_aware_work_item_statfs, fs_handle::unique_id_type_hasher> io_aware_work_item_handles;
 
     global_dynamic_thread_pool_impl()
     {
@@ -140,15 +165,22 @@ namespace detail
       {
         return errc::invalid_argument;
       }
+      workitem->_timepoint1 = {};
+      workitem->_timepoint2 = {};
       if(workitem->_nextwork == 0 || d.nsecs > 0)
       {
         if(nullptr == workitem->_internaltimerh)
         {
+#if LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD
+          (void) grouph;
+          workitem->_internaltimerh = (void *) (uintptr_t) -1;
+#elif defined(_WIN32)
           workitem->_internaltimerh = CreateThreadpoolTimer(_win32_timer_thread_callback, workitem, grouph);
           if(nullptr == workitem->_internaltimerh)
           {
             return win32_error();
           }
+#endif
         }
         if(d.nsecs > 0)
         {
@@ -213,7 +245,9 @@ class dynamic_thread_pool_group_impl final : public dynamic_thread_pool_group
   std::atomic<bool> _stopping{false}, _stopped{true}, _completing{false};
   result<void> _abnormal_completion_cause{success()};  // The cause of any abnormal group completion
 
-#ifdef _WIN32
+#if LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD
+  dispatch_group_t _grouph;
+#elif defined(_WIN32)
   TP_CALLBACK_ENVIRON _callbackenviron;
   PTP_CALLBACK_ENVIRON _grouph{&_callbackenviron};
 #endif
@@ -226,9 +260,14 @@ public:
     {
       auto &impl = detail::global_dynamic_thread_pool();
       _nesting_level = detail::global_dynamic_thread_pool_thread_local_state().nesting_level;
-#ifdef _WIN32
+#if LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD
+      _grouph = dispatch_group_create();
+      if(_grouph == nullptr)
+      {
+        return errc::not_enough_memory;
+      }
+#elif defined(_WIN32)
       InitializeThreadpoolEnvironment(_grouph);
-#else
 #endif
       detail::global_dynamic_thread_pool_impl::_lock_guard g(impl.workqueue_lock);
       // Append this group to the global work queue at its nesting level
@@ -250,13 +289,18 @@ public:
     LLFIO_LOG_FUNCTION_CALL(this);
     (void) wait();
     auto &impl = detail::global_dynamic_thread_pool();
-#ifdef _WIN32
+#if LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD
+    if(nullptr != _grouph)
+    {
+      dispatch_release(_grouph);
+      _grouph = nullptr;
+    }
+#elif defined(_WIN32)
     if(nullptr != _grouph)
     {
       DestroyThreadpoolEnvironment(_grouph);
       _grouph = nullptr;
     }
-#else
 #endif
     detail::global_dynamic_thread_pool_impl::_lock_guard g(impl.workqueue_lock);
     assert(impl.workqueue.size() > _nesting_level);
@@ -356,14 +400,45 @@ namespace detail
   inline void global_dynamic_thread_pool_impl::_submit_work_item(_lock_guard &g, dynamic_thread_pool_group::work_item *workitem)
   {
     (void) g;
-    if(workitem->_nextwork != -1 && !workitem->_parent.load(std::memory_order_relaxed)->_stopping.load(std::memory_order_relaxed))
+    if(workitem->_nextwork != -1)
     {
       // If no work item for now, or there is a delay, schedule a timer
       if(workitem->_nextwork == 0 || workitem->_timepoint1 != std::chrono::steady_clock::time_point() ||
          workitem->_timepoint2 != std::chrono::system_clock::time_point())
       {
         assert(workitem->_internaltimerh != nullptr);
-#ifdef _WIN32
+#if LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD
+        dispatch_time_t when;
+        if(workitem->_timepoint1 != std::chrono::steady_clock::time_point())
+        {
+          auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(workitem->_timepoint1 - std::chrono::steady_clock::now()).count();
+          if(duration > 1000000000LL)
+          {
+            // Because GCD has no way of cancelling timers, nor assigning them to a group,
+            // we clamp the timer to 1 second. Then if cancellation is ever done to the group,
+            // the worst possible wait is 1 second. _timerthread will reschedule the timer
+            // if it gets called short.
+            duration = 1000000000LL;
+          }
+          when = dispatch_time(DISPATCH_TIME_NOW, duration);
+        }
+        else if(workitem->_timepoint2 != std::chrono::system_clock::time_point())
+        {
+          deadline d(workitem->_timepoint2);
+          auto now = std::chrono::system_clock::now();
+          if(workitem->_timepoint2 - now > std::chrono::seconds(1))
+          {
+            d = now + std::chrono::seconds(1);
+          }
+          when = dispatch_walltime(&d.utc, 0);
+        }
+        else
+        {
+          when = dispatch_time(DISPATCH_TIME_NOW, 1);  // smallest possible non immediate duration from now
+        }
+        // std::cout << "*** timer " << workitem << std::endl;
+        dispatch_after_f(when, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), workitem, _gcd_timer_callback);
+#elif defined(_WIN32)
         LARGE_INTEGER li;
         DWORD slop = 1000;
         if(workitem->_timepoint1 != std::chrono::steady_clock::time_point())
@@ -392,12 +467,24 @@ namespace detail
         ft.dwLowDateTime = li.LowPart;
         // std::cout << "*** timer " << workitem << std::endl;
         SetThreadpoolTimer((PTP_TIMER) workitem->_internaltimerh, &ft, 0, slop);
-#else
 #endif
       }
       else
       {
-#ifdef _WIN32
+#if LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD
+        intptr_t priority = DISPATCH_QUEUE_PRIORITY_LOW;
+        if(workqueue.size() - workitem->_parent.load(std::memory_order_relaxed)->_nesting_level == 1)
+        {
+          priority = DISPATCH_QUEUE_PRIORITY_HIGH;
+        }
+        else if(workqueue.size() - workitem->_parent.load(std::memory_order_relaxed)->_nesting_level == 2)
+        {
+          priority = DISPATCH_QUEUE_PRIORITY_DEFAULT;
+        }
+        // std::cout << "*** submit " << workitem << std::endl;
+        dispatch_group_async_f(workitem->_parent.load(std::memory_order_relaxed)->_grouph, dispatch_get_global_queue(priority, 0), workitem,
+                               _gcd_dispatch_callback);
+#elif defined(_WIN32)
         // Set the priority of the group according to distance from the top
         TP_CALLBACK_PRIORITY priority = TP_CALLBACK_PRIORITY_LOW;
         if(workqueue.size() - workitem->_parent.load(std::memory_order_relaxed)->_nesting_level == 1)
@@ -411,7 +498,6 @@ namespace detail
         SetThreadpoolCallbackPriority(workitem->_parent.load(std::memory_order_relaxed)->_grouph, priority);
         // std::cout << "*** submit " << workitem << std::endl;
         SubmitThreadpoolWork((PTP_WORK) workitem->_internalworkh);
-#else
 #endif
       }
     }
@@ -437,7 +523,10 @@ namespace detail
         for(auto *i : work)
         {
           _remove_from_list(group->_work_items_active, i);
-#ifdef _WIN32
+#if LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD
+          i->_internalworkh = nullptr;
+          i->_internaltimerh = nullptr;
+#elif defined(_WIN32)
           if(nullptr != i->_internaltimerh)
           {
             CloseThreadpoolTimer((PTP_TIMER) i->_internaltimerh);
@@ -448,7 +537,6 @@ namespace detail
             CloseThreadpoolWork((PTP_WORK) i->_internalworkh);
             i->_internalworkh = nullptr;
           }
-#else
 #endif
           i->_parent.store(nullptr, std::memory_order_release);
         }
@@ -464,13 +552,14 @@ namespace detail
         }
         else
         {
-#ifdef _WIN32
+#if LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD
+          i->_internalworkh = (void *) (uintptr_t) -1;
+#elif defined(_WIN32)
           i->_internalworkh = CreateThreadpoolWork(_win32_worker_thread_callback, i, group->_grouph);
           if(nullptr == i->_internalworkh)
           {
             return win32_error();
           }
-#else
 #endif
           OUTCOME_TRY(_prepare_work_item_delay(i, group->_grouph, d));
           _append_to_list(group->_work_items_active, i);
@@ -494,7 +583,11 @@ namespace detail
   inline void global_dynamic_thread_pool_impl::_work_item_done(_lock_guard &g, dynamic_thread_pool_group::work_item *i) noexcept
   {
     (void) g;
-#ifdef _WIN32
+    // std::cout << "*** _work_item_done " << i << std::endl;
+#if LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD
+    i->_internaltimerh = nullptr;
+    i->_internalworkh = nullptr;
+#elif defined(_WIN32)
     if(i->_internalworkh_inuse > 0)
     {
       i->_internalworkh_inuse = 2;
@@ -512,7 +605,6 @@ namespace detail
         i->_internalworkh = nullptr;
       }
     }
-#else
 #endif
     _remove_from_list(i->_parent.load(std::memory_order_relaxed)->_work_items_active, i);
     _append_to_list(i->_parent.load(std::memory_order_relaxed)->_work_items_done, i);
@@ -593,21 +685,39 @@ namespace detail
     LLFIO_DEADLINE_TO_SLEEP_INIT(d);
     if(!d || d.nsecs > 0)
     {
+#if LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD
+      while(group->_work_items_active.count > 0)
+      {
+        LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
+        dispatch_time_t timeout = DISPATCH_TIME_FOREVER;
+        if(d)
+        {
+          std::chrono::nanoseconds duration;
+          LLFIO_DEADLINE_TO_PARTIAL_TIMEOUT(duration, d);
+          timeout = dispatch_time(DISPATCH_TIME_NOW, duration.count());
+        }
+        g.unlock();
+        dispatch_group_wait(group->_grouph, timeout);
+        g.lock();
+        // if(1 == group->_work_items_active.count)
+        //{
+        //  std::cout << "*** wait item remaining is " << group->_work_items_active.front << std::endl;
+        //  std::this_thread::sleep_for(std::chrono::seconds(1));
+        //}
+      }
+#elif defined(_WIN32)
       auto &tls = detail::global_dynamic_thread_pool_thread_local_state();
-#ifdef _WIN32
       if(tls.current_callback_instance != nullptr)
       {
         // I am being called from within a thread worker. Tell
         // the thread pool that I am not going to exit promptly.
         CallbackMayRunLong(tls.current_callback_instance);
       }
-#endif
       // Is this a cancellation?
       if(group->_stopping.load(std::memory_order_relaxed))
       {
         while(group->_work_items_active.count > 0)
         {
-#ifdef _WIN32
           auto *i = group->_work_items_active.front;
           if(nullptr != i->_internalworkh)
           {
@@ -662,8 +772,6 @@ namespace detail
             // This item got cancelled before it started
             _work_item_done(g, group->_work_items_active.front);
           }
-#else
-#endif
         }
         assert(!group->_stopping.load(std::memory_order_relaxed));
       }
@@ -671,7 +779,6 @@ namespace detail
       {
         while(group->_work_items_active.count > 0)
         {
-#ifdef _WIN32
           auto *i = group->_work_items_active.front;
           if(nullptr != i->_internalworkh)
           {
@@ -721,8 +828,6 @@ namespace detail
             }
             i->_internalworkh_inuse = 0;
           }
-#else
-#endif
         }
       }
       else
@@ -735,6 +840,7 @@ namespace detail
           g.lock();
         }
       }
+#endif
     }
     if(group->_work_items_active.count > 0)
     {
@@ -750,10 +856,40 @@ namespace detail
   inline void global_dynamic_thread_pool_impl::_timerthread(dynamic_thread_pool_group::work_item *workitem, threadh_type /*unused*/)
   {
     LLFIO_LOG_FUNCTION_CALL(this);
-    // std::cout << "*** _timerthread " << workitem << std::endl;
+    assert(workitem->_nextwork != -1);
     _lock_guard g(workitem->_parent.load(std::memory_order_relaxed)->_lock);
-    workitem->_timepoint1 = {};
-    workitem->_timepoint2 = {};
+    // std::cout << "*** _timerthread " << workitem << std::endl;
+    if(workitem->_parent.load(std::memory_order_relaxed)->_stopping.load(std::memory_order_relaxed))
+    {
+      _work_item_done(g, workitem);
+      return;
+    }
+    if(workitem->_timepoint1 != std::chrono::steady_clock::time_point())
+    {
+#if LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD
+      auto now = std::chrono::steady_clock::now();
+      if(workitem->_timepoint1 - now > std::chrono::seconds(0))
+      {
+        // Timer fired short, so schedule it again
+        _submit_work_item(g, workitem);
+        return;
+      }
+#endif
+      workitem->_timepoint1 = {};
+    }
+    if(workitem->_timepoint2 != std::chrono::system_clock::time_point())
+    {
+#if LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD
+      auto now = std::chrono::system_clock::now();
+      if(workitem->_timepoint2 - now > std::chrono::seconds(0))
+      {
+        // Timer fired short, so schedule it again
+        _submit_work_item(g, workitem);
+        return;
+      }
+#endif
+      workitem->_timepoint2 = {};
+    }
     _work_item_next(g, workitem);
   }
 
@@ -761,10 +897,13 @@ namespace detail
   inline void global_dynamic_thread_pool_impl::_workerthread(dynamic_thread_pool_group::work_item *workitem, threadh_type selfthreadh)
   {
     LLFIO_LOG_FUNCTION_CALL(this);
-    // std::cout << "*** _workerthread " << workitem << " with work " << workitem->_nextwork << std::endl;
+    //{
+    //  _lock_guard g(workitem->_parent.load(std::memory_order_relaxed)->_lock);
+    //  std::cout << "*** _workerthread " << workitem << " begins with work " << workitem->_nextwork << std::endl;
+    //}
     assert(workitem->_nextwork != -1);
     assert(workitem->_nextwork != 0);
-    if(workitem->_parent.load(std::memory_order_relaxed)->_stopped.load(std::memory_order_relaxed))
+    if(workitem->_parent.load(std::memory_order_relaxed)->_stopping.load(std::memory_order_relaxed))
     {
       _lock_guard g(workitem->_parent.load(std::memory_order_relaxed)->_lock);
       _work_item_done(g, workitem);
@@ -779,11 +918,16 @@ namespace detail
     workitem->_nextwork = 0;  // call next() next time
     tls = old_thread_local_state;
     _lock_guard g(workitem->_parent.load(std::memory_order_relaxed)->_lock);
+    // std::cout << "*** _workerthread " << workitem << " ends with work " << workitem->_nextwork << std::endl;
     if(!r)
     {
       (void) stop(g, workitem->_parent.load(std::memory_order_relaxed), std::move(r));
       _work_item_done(g, workitem);
       workitem = nullptr;
+    }
+    else if(workitem->_parent.load(std::memory_order_relaxed)->_stopping.load(std::memory_order_relaxed))
+    {
+      _work_item_done(g, workitem);
     }
     else
     {
@@ -885,21 +1029,31 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC intptr_t dynamic_thread_pool_group::io_aware_wor
         (void) i->second.statfs.fill(*h.h, statfs_t::want::iosinprogress | statfs_t::want::iosbusytime);
         i->second.last_updated = now;
 
-        if(elapsed>std::chrono::seconds(5))
+        if(elapsed > std::chrono::seconds(5))
         {
           i->second.average_busy = i->second.statfs.f_iosbusytime;
+          i->second.average_queuedepth = (float) i->second.statfs.f_iosinprogress;
         }
         else
         {
           i->second.average_busy = (i->second.average_busy * 0.9f) + (i->second.statfs.f_iosbusytime * 0.1f);
+          i->second.average_queuedepth = (i->second.average_queuedepth * 0.9f) + (i->second.statfs.f_iosinprogress * 0.1f);
         }
-        if(i->second.average_busy < 0.90f)
+        if(i->second.average_busy < 0.95f && i->second.average_queuedepth < 4)
         {
           i->second.default_deadline = std::chrono::seconds(0);  // remove pacing
         }
-        else if(i->second.statfs.f_iosinprogress > 1)
+#ifdef _WIN32
+        else if(i->second.average_queuedepth > 1)  // windows appears to do a lot of i/o coalescing
+#else
+        else if(i->second.average_queuedepth > 32)
+#endif
         {
-          if((i->second.default_deadline.nsecs >> 4) > 0)
+          if(0 == i->second.default_deadline.nsecs)
+          {
+            i->second.default_deadline = std::chrono::milliseconds(1);  // start with 1ms, it'll reduce from there if needed
+          }
+          else if((i->second.default_deadline.nsecs >> 4) > 0)
           {
             i->second.default_deadline.nsecs += i->second.default_deadline.nsecs >> 4;
           }
