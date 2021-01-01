@@ -32,11 +32,13 @@ Distributed under the Boost Software License, Version 1.0.
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4251)  // dll interface
+#pragma warning(disable : 4275)  // dll interface
 #endif
 
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 class dynamic_thread_pool_group_impl;
+class io_handle;
 
 namespace detail
 {
@@ -87,7 +89,8 @@ you need to submit a separate work item for each possible amount of
 concurrency (e.g. `std::thread::hardware_concurrency()`).
 
 You can have as many or as few items of work as you like. You can
-dynamically submit additional work items at any time. The group of work items can
+dynamically submit additional work items at any time, except when a group
+is currently in the process of being stopped. The group of work items can
 be waited upon to complete, after which the work group becomes reset as
 if back to freshly constructed. You can also stop executing all the work
 items in the group, even if they have not fully completed. If any work
@@ -131,21 +134,37 @@ of the initial `make_dynamic_thread_pool_group()`. The Win32 thread pool
 API may perform dynamic memory allocation internally, but that is outside
 our control.
 
+### POSIX
+
+If an installation of libdispatch is detected by LLFIO cmake during
+configuration, it is used preferentially. libdispatch is better known as
+Grand Central Dispatch, originally a Mac OS technology but since ported
+to a high quality kernel based implementation on recent FreeBSDs, and to
+a lower quality userspace based implementation on Linux. Generally
+libdispatch should get automatically found on Mac OS without additional
+effort; on FreeBSD it may need installing from ports; on Linux you would
+need to explicitly install `libdispatch-dev` or the equivalent. You can
+disable the automatic discovery in cmake of libdispatch by setting the
+cmake variable `LLFIO_DISABLE_LIBDISPATCH` to On.
+
 ### Linux
 
-On Linux, a similar strategy to Microsoft Windows' approach is used. We
+If libdispatch is not found, we have a custom Linux only userspace
+implementation. A a similar strategy to Microsoft Windows' approach is used. We
 dynamically increase the number of kernel threads until none are sleeping
 awaiting i/o. If more kernel threads are running than 1.5x the number of
 CPUs in the system, the number of kernel threads is dynamically reduced.
-For portability, we also gate the maximum number of kernel threads to 500.
+For portability, we also gate the maximum number of kernel threads to 500,
+except where threads have been detected as being in prolonged wait states.
 Note that **all** the kernel threads for the current process are considered,
 not just the kernel threads created by this thread pool implementation.
 Therefore, if you have alternative thread pool implementations (e.g. OpenMP,
 `std::async`), those are also included in the dynamic adjustment.
 
 As this is wholly implemented by this library, dynamic memory allocation
-occurs in the initial `make_dynamic_thread_pool_group()`, but otherwise
-the implementation does not perform dynamic memory allocations.
+occurs in the initial `make_dynamic_thread_pool_group()` and per thread
+creation, but otherwise the implementation does not perform dynamic memory
+allocations.
 */
 class LLFIO_DECL dynamic_thread_pool_group
 {
@@ -288,14 +307,15 @@ public:
 
   For seekable handles, currently `reads`, `writes` and `barriers` are ignored. We
   simply retrieve, periodically, `statfs_t::f_iosinprogress` and `statfs_t::f_iosbusytime`
-  for the storage devices backing the seekable handle. If the i/o wait time exceeds
-  95% and the i/o in progress > 1, `next()` will start setting the default deadline passed to
+  for the storage devices backing the seekable handle. If the recent averaged i/o wait time exceeds
+  95% and the i/o in progress > 32, `next()` will start setting the default deadline passed to
   `io_aware_next()`. Thereafter, every 1/10th of a second, if `statfs_t::f_iosinprogress`
-  is above 1, it will increase the deadline by 1/16th, whereas if it is
-  below 2, it will decrease the deadline by 1/16th. The default deadline chosen is always the worst of all the
+  is above 32, it will increase the deadline by 1/16th, whereas if it is
+  below 32, it will decrease the deadline by 1/16th. The default deadline chosen is always the worst of all the
   storage devices of all the handles. This will reduce concurrency within the kernel thread pool
   in order to reduce congestion on the storage devices. If at any point `statfs_t::f_iosbusytime`
-  drops below 95% as averaged across one second, the additional
+  drops below 95% as averaged across one second, and `statfs_t::f_iosinprogress` drops
+  below 4, the additional
   throttling is completely removed. `io_aware_next()` can ignore the default deadline
   passed into it, and can set any other deadline.
 
