@@ -308,14 +308,16 @@ public:
   For seekable handles, currently `reads`, `writes` and `barriers` are ignored. We
   simply retrieve, periodically, `statfs_t::f_iosinprogress` and `statfs_t::f_iosbusytime`
   for the storage devices backing the seekable handle. If the recent averaged i/o wait time exceeds
-  95% and the i/o in progress > 32, `next()` will start setting the default deadline passed to
+  `max_iosbusytime` and the i/o in progress > `max_iosinprogress`, `next()` will
+  start setting the default deadline passed to
   `io_aware_next()`. Thereafter, every 1/10th of a second, if `statfs_t::f_iosinprogress`
-  is above 32, it will increase the deadline by 1/16th, whereas if it is
-  below 32, it will decrease the deadline by 1/16th. The default deadline chosen is always the worst of all the
+  is above `max_iosinprogress`, it will increase the deadline by 1/16th, whereas if it is
+  below `min_iosinprogress`, it will decrease the deadline by 1/16th. The default deadline
+  chosen is always the worst of all the
   storage devices of all the handles. This will reduce concurrency within the kernel thread pool
   in order to reduce congestion on the storage devices. If at any point `statfs_t::f_iosbusytime`
-  drops below 95% as averaged across one second, and `statfs_t::f_iosinprogress` drops
-  below 4, the additional
+  drops below `max_iosbusytime` as averaged across one second, and `statfs_t::f_iosinprogress` drops
+  below `min_iosinprogress`, the additional
   throttling is completely removed. `io_aware_next()` can ignore the default deadline
   passed into it, and can set any other deadline.
 
@@ -328,10 +330,20 @@ public:
   work item invoked with the next piece of work.
 
   \note Non-seekable handle support is not implemented yet.
-  */ 
+  */
   class LLFIO_DECL io_aware_work_item : public work_item
   {
   public:
+    //! Maximum i/o busyness above which throttling is to begin.
+    float max_iosbusytime{0.95f};
+    //! Minimum i/o in progress to target if `iosbusytime` exceeded. The default of 16 suits SSDs, you want around 4 for spinning rust or NV-RAM.
+    uint32_t min_iosinprogress{16};
+    //! Maximum i/o in progress to target if `iosbusytime` exceeded. The default of 32 suits SSDs, you want around 8 for spinning rust or NV-RAM.
+#ifdef _WIN32
+    uint32_t max_iosinprogress{1};  // windows appears to do a lot of i/o coalescing
+#else
+    uint32_t max_iosinprogress{32};
+#endif
     //! Information about an i/o handle this work item will use
     struct io_handle_awareness
     {
@@ -355,7 +367,7 @@ public:
   public:
     constexpr io_aware_work_item() {}
     /*! \brief Constructs a work item aware of i/o done to the handles in `hs`.
-    
+
     Note that the `reads`, `writes` and `barriers` are normalised to proportions
     out of `1.0` by this constructor, so if for example you had `reads/writes/barriers = 200/100/0`,
     after normalisation those become `0.66/0.33/0.0` such that the total is `1.0`.

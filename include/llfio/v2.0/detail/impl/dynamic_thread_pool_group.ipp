@@ -35,6 +35,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <iostream>
 
+#ifndef LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD
 #if LLFIO_FORCE_USE_LIBDISPATCH
 #include <dispatch/dispatch.h>
 #define LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD 1
@@ -49,6 +50,7 @@ Distributed under the Boost Software License, Version 1.0.
 #else
 #define LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD 0
 #error Right now dynamic_thread_pool_group requires libdispatch to be available on POSIX. It should get auto discovered if installed, which is the default on BSD and Mac OS. Try installing libdispatch-dev if on Linux.
+#endif
 #endif
 #endif
 #endif
@@ -1039,15 +1041,11 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC intptr_t dynamic_thread_pool_group::io_aware_wor
           i->second.average_busy = (i->second.average_busy * 0.9f) + (i->second.statfs.f_iosbusytime * 0.1f);
           i->second.average_queuedepth = (i->second.average_queuedepth * 0.9f) + (i->second.statfs.f_iosinprogress * 0.1f);
         }
-        if(i->second.average_busy < 0.95f && i->second.average_queuedepth < 4)
+        if(i->second.average_busy < this->max_iosbusytime && i->second.average_queuedepth < this->min_iosinprogress)
         {
           i->second.default_deadline = std::chrono::seconds(0);  // remove pacing
         }
-#ifdef _WIN32
-        else if(i->second.average_queuedepth > 1)  // windows appears to do a lot of i/o coalescing
-#else
-        else if(i->second.average_queuedepth > 32)
-#endif
+        else if(i->second.average_queuedepth > this->max_iosinprogress)
         {
           if(0 == i->second.default_deadline.nsecs)
           {
@@ -1062,7 +1060,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC intptr_t dynamic_thread_pool_group::io_aware_wor
             i->second.default_deadline.nsecs++;
           }
         }
-        else
+        else if(i->second.average_queuedepth < this->min_iosinprogress)
         {
           if(i->second.default_deadline.nsecs > (i->second.default_deadline.nsecs >> 4) && (i->second.default_deadline.nsecs >> 4) > 0)
           {
