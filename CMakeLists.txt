@@ -286,23 +286,25 @@ int main() {
 endif()
 # Do we have Grand Central Dispatch on this platform?
 if(NOT LLFIO_DISABLE_LIBDISPATCH)
-  function(check_have_libdispatch)
-    set(CMAKE_REQUIRED_LIBRARIES dispatch)
+  function(check_have_libdispatch postfix)
+    set(CMAKE_REQUIRED_LIBRARIES ${ARGN})
     check_cxx_source_compiles("
 #include <dispatch/dispatch.h>
 int main() {
   dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
   return 0;
 }
-" LLFIO_HAS_LIBDISPATCH)
+" LLFIO_HAS_LIBDISPATCH_${postfix})
   endfunction()
-  check_have_libdispatch()
-  if(LLFIO_HAS_LIBDISPATCH)
-    all_compile_definitions(PUBLIC LLFIO_FORCE_USE_LIBDISPATCH=1)
-    all_link_libraries(PUBLIC dispatch)
+  check_have_libdispatch(BUILTIN)
+  if(NOT LLFIO_HAS_LIBDISPATCH_BUILTIN)
+    check_have_libdispatch(WITH_LIBDISPATCH)
+    if(LLFIO_HAS_LIBDISPATCH_WITH_LIBDISPATCH)
+      all_link_libraries(PUBLIC dispatch)
+    endif()
   endif()
 endif()
-if(NOT LLFIO_HAS_LIBDISPATCH AND (CMAKE_SYSTEM_NAME MATCHES "FreeBSD" OR APPLE))
+if(NOT LLFIO_HAS_LIBDISPATCH_BUILTIN AND NOT LLFIO_HAS_LIBDISPATCH_WITH_LIBDISPATCH AND (CMAKE_SYSTEM_NAME MATCHES "FreeBSD" OR APPLE))
   indented_message(FATAL_ERROR "FATAL: Grand Central Dispatch as libdispatch was not found on this FreeBSD or Mac OS system. libdispatch is required for LLFIO to build on those systems.")
 endif()
 
