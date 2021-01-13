@@ -1,5 +1,5 @@
 /* Information about the volume storing a file
-(C) 2016-2017 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
+(C) 2016-2020 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Jan 2016
 
 
@@ -483,7 +483,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<uint32_t, float>> statfs_t::_fi
     On Mac OS, getting the current i/o wait time appears to be privileged only?
     */
 #endif
-    return {-1, _allbits1_float};
+    return {-1, detail::constexpr_float_allbits_set_nan()};
   }
   catch(...)
   {

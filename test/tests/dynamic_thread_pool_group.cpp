@@ -146,7 +146,12 @@ static inline void TestDynamicThreadPoolGroupWorks()
     BOOST_CHECK(llfio::dynamic_thread_pool_group::current_work_item() == nullptr);
   };
   auto check = [&] {
-    shared_state.tpg->wait().value();
+    auto r = shared_state.tpg->wait();
+    if(!r)
+    {
+      std::cerr << "ERROR: wait() reports failure " << r.error().message() << std::endl;
+      r.value();
+    }
     BOOST_CHECK(!shared_state.tpg->stopping());
     BOOST_CHECK(shared_state.tpg->stopped());
     BOOST_CHECK(llfio::dynamic_thread_pool_group::current_nesting_level() == 0);
@@ -186,6 +191,9 @@ static inline void TestDynamicThreadPoolGroupWorks()
     }
     std::cout << "Maximum concurrency achieved with " << workitems.size() << " work items = " << shared_state.max_concurrency << "\n" << std::endl;
   };
+  auto print_exception_throw = llfio::make_scope_fail([]() noexcept {
+    std::cout << "NOTE: Exception throw occurred!" << std::endl;
+  });
 
   // Test a single work item
   reset(1);
@@ -430,9 +438,9 @@ static inline void TestDynamicThreadPoolGroupIoAwareWorks()
   BOOST_CHECK(paced > 0);
 }
 
-KERNELTEST_TEST_KERNEL(integration, llfio, dynamic_thread_pool_group, works, "Tests that llfio::dynamic_thread_pool_group works as expected",
-                       TestDynamicThreadPoolGroupWorks())
+//KERNELTEST_TEST_KERNEL(integration, llfio, dynamic_thread_pool_group, works, "Tests that llfio::dynamic_thread_pool_group works as expected",
+//                       TestDynamicThreadPoolGroupWorks())
 KERNELTEST_TEST_KERNEL(integration, llfio, dynamic_thread_pool_group, nested, "Tests that nesting of llfio::dynamic_thread_pool_group works as expected",
                        TestDynamicThreadPoolGroupNestingWorks())
-KERNELTEST_TEST_KERNEL(integration, llfio, dynamic_thread_pool_group, io_aware_work_item,
-                       "Tests that llfio::dynamic_thread_pool_group::io_aware_work_item works as expected", TestDynamicThreadPoolGroupIoAwareWorks())
+//KERNELTEST_TEST_KERNEL(integration, llfio, dynamic_thread_pool_group, io_aware_work_item,
+//                       "Tests that llfio::dynamic_thread_pool_group::io_aware_work_item works as expected", TestDynamicThreadPoolGroupIoAwareWorks())
