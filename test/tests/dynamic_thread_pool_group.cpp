@@ -226,6 +226,11 @@ static inline void TestDynamicThreadPoolGroupWorks()
 
 static inline void TestDynamicThreadPoolGroupNestingWorks()
 {
+  if(std::thread::hardware_concurrency() < 4)
+  {
+    std::cout << "NOTE: Skipping TestDynamicThreadPoolGroupNestingWorks as hardware concurrency is below 4." << std::endl;
+    return;
+  }
   namespace llfio = LLFIO_V2_NAMESPACE;
   static constexpr size_t MAX_NESTING = 10;
   static constexpr int COUNT_PER_WORK_ITEM = 1000;
@@ -299,6 +304,7 @@ static inline void TestDynamicThreadPoolGroupNestingWorks()
       }
       uint64_t idx = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
       std::lock_guard<std::mutex> g(shared_states[nesting].lock);
+      //std::cout << "wi " << this << " nesting " << nesting << " work " << work << std::endl;
       if(COUNT_PER_WORK_ITEM == work && childwi)
       {
         if(!shared_states[nesting].tpg)
@@ -438,8 +444,8 @@ static inline void TestDynamicThreadPoolGroupIoAwareWorks()
   BOOST_CHECK(paced > 0);
 }
 
-//KERNELTEST_TEST_KERNEL(integration, llfio, dynamic_thread_pool_group, works, "Tests that llfio::dynamic_thread_pool_group works as expected",
-//                       TestDynamicThreadPoolGroupWorks())
+KERNELTEST_TEST_KERNEL(integration, llfio, dynamic_thread_pool_group, works, "Tests that llfio::dynamic_thread_pool_group works as expected",
+                       TestDynamicThreadPoolGroupWorks())
 KERNELTEST_TEST_KERNEL(integration, llfio, dynamic_thread_pool_group, nested, "Tests that nesting of llfio::dynamic_thread_pool_group works as expected",
                        TestDynamicThreadPoolGroupNestingWorks())
 //KERNELTEST_TEST_KERNEL(integration, llfio, dynamic_thread_pool_group, io_aware_work_item,
