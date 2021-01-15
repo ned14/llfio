@@ -548,6 +548,7 @@ namespace detail
 #if LLFIO_DYNAMIC_THREAD_POOL_GROUP_PRINTING
     std::cout << "*** DTP " << self << " begins." << std::endl;
 #endif
+    size_t workqueue_depth = workqueue.size() - 1;
     while(self->state > 0)
     {
     restart:
@@ -556,10 +557,8 @@ namespace detail
       std::chrono::system_clock::time_point earliest_absolute;
       if(!workqueue.empty())
       {
-        auto wq = --workqueue.end();
-#if LLFIO_DYNAMIC_THREAD_POOL_GROUP_PRINTING
-        std::cout << "*** DTP " << self << " restarts from top of work queue" << std::endl;
-#endif
+        auto wq_it = (workqueue_depth >= workqueue.size()) ? --workqueue.end() : (workqueue.begin() + workqueue_depth);
+        auto *wq = &(*wq_it);
         for(;;)
         {
           dynamic_thread_pool_group_impl *tpg = *wq->currentgroup;
@@ -583,7 +582,7 @@ namespace detail
               workitem->_internalworkh = self;
 #if LLFIO_DYNAMIC_THREAD_POOL_GROUP_PRINTING
               std::cout << "*** DTP " << self << " chooses work item " << workitem << " from group " << tpg << " distance from top "
-                        << (workqueue.end() - wq - 1) << std::endl;
+                        << (workqueue.end() - wq_it - 1) << std::endl;
 #endif
               break;
             }
@@ -634,6 +633,7 @@ namespace detail
           else
           {
             auto startinggroup = wq->currentgroup;
+            bool at_top = (workqueue_depth == workqueue.size() - 1);
             do
             {
               gg.unlock();  // unlock group
@@ -641,18 +641,26 @@ namespace detail
               {
                 wq->currentgroup = wq->items.begin();
               }
+              if(!at_top)
+              {
+                workqueue_depth = workqueue.size() - 1;
+                wq_it = --workqueue.end();
+                at_top = true;
+                wq = &(*wq_it);
+                startinggroup = wq->currentgroup;
+              }
               tpg = *wq->currentgroup;
               gg = _lock_guard(tpg->_lock);  // lock group
+#if LLFIO_DYNAMIC_THREAD_POOL_GROUP_PRINTING
+              std::cout << "*** DTP " << self << " workqueue distance " << (workqueue.end() - wq_it - 1) << " examining " << tpg
+                        << " finds _work_items_active.count = " << tpg->_work_items_active.count << "." << std::endl;
+#endif
               if(startinggroup == wq->currentgroup)
               {
-#if LLFIO_DYNAMIC_THREAD_POOL_GROUP_PRINTING
-                std::cout << "*** DTP " << self << " workqueue distance " << (workqueue.end() - wq - 1) << " examining " << tpg
-                          << " finds _work_items_active.count = " << tpg->_work_items_active.count << "." << std::endl;
-#endif
                 if(tpg->_work_items_active.count == 0 || tpg->_work_items_active.front->_internalworkh != nullptr)
                 {
                   // Nothing for me to do in this workqueue
-                  if(wq == workqueue.begin())
+                  if(wq_it == workqueue.begin())
                   {
                     assert(workitem == nullptr);
 #if LLFIO_DYNAMIC_THREAD_POOL_GROUP_PRINTING
@@ -661,12 +669,15 @@ namespace detail
                     goto workqueue_empty;
                   }
                   gg.unlock();  // unlock group
-                  --wq;
+                  --wq_it;
+                  workqueue_depth = wq_it - workqueue.begin();
+                  wq = &(*wq_it);
                   tpg = *wq->currentgroup;
                   startinggroup = wq->currentgroup;
                   gg = _lock_guard(tpg->_lock);  // lock group
 #if LLFIO_DYNAMIC_THREAD_POOL_GROUP_PRINTING
-                  std::cout << "*** DTP " << self << " moves work search up to distance from top = " << (workqueue.end() - wq - 1) << std::endl;
+                  std::cout << "*** DTP " << self << " moves work search up to distance from top = " << (workqueue.end() - wq_it - 1) << " examining " << tpg
+                            << " finds _work_items_active.count = " << tpg->_work_items_active.count << "." << std::endl;
 #endif
                   continue;
                 }
