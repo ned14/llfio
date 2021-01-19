@@ -13,6 +13,8 @@ var structllfio__v2__xxx_1_1statfs__t =
     [ "f_flags", "structllfio__v2__xxx_1_1statfs__t.html#a9684fea78f72efeafdbaa4a11f402060", null ],
     [ "f_fsid", "structllfio__v2__xxx_1_1statfs__t.html#a3a5739137cee606782d47afbd4bac38c", null ],
     [ "f_fstypename", "structllfio__v2__xxx_1_1statfs__t.html#abe7361e7f354e4de36b64f80b4c6c72e", null ],
+    [ "f_iosbusytime", "structllfio__v2__xxx_1_1statfs__t.html#a628819f907c707648266194410b7b6f2", null ],
+    [ "f_iosinprogress", "structllfio__v2__xxx_1_1statfs__t.html#ae3d5ec73abd75cb58c8be3e196c6cfbd", null ],
     [ "f_iosize", "structllfio__v2__xxx_1_1statfs__t.html#a378f9f413ad7178b65bbdab76a29a06d", null ],
     [ "f_mntfromname", "structllfio__v2__xxx_1_1statfs__t.html#a7b8ea29dcda069ef2af42a25eb283786", null ],
     [ "f_mntonname", "structllfio__v2__xxx_1_1statfs__t.html#ac7bedb646a6855541633e7bb7232b5e0", null ],

@@ -15,6 +15,7 @@ var classllfio__v2__xxx_1_1directory__handle =
     [ "path_view_type", "classllfio__v2__xxx_1_1directory__handle.html#af39b5b7a73266dc1dd435f4fb1dfb463", null ],
     [ "size_type", "classllfio__v2__xxx_1_1directory__handle.html#aafd3eb03845b55c19154cab76956efad", null ],
     [ "unique_id_type", "classllfio__v2__xxx_1_1directory__handle.html#a1a65884346740af7fb4648c79d44a750", null ],
+    [ "unique_id_type_hasher", "classllfio__v2__xxx_1_1directory__handle.html#ab82a83c5e44659e01a2218f0af41bde7", null ],
     [ "filter", "classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207", [
       [ "none", "classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207a334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
       [ "fastdeleted", "classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207a14847befc159c1492671b53718fc46f8", null ]
