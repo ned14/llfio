@@ -89,11 +89,11 @@ Distributed under the Boost Software License, Version 1.0.
 #if defined(_WIN32)
 #if !defined(_WIN32_WINNT)
 #define _WIN32_WINNT 0x0600
-#elif _WIN32_WINNT < 0x0600
-#error _WIN32_WINNT must at least be set to Windows Vista for LLFIO to work
+#elif _WIN32_WINNT < 0x0601
+#error _WIN32_WINNT must at least be set to Windows 7 for LLFIO to work
 #endif
-#if defined(NTDDI_VERSION) && NTDDI_VERSION < 0x06000000
-#error NTDDI_VERSION must at least be set to Windows Vista for LLFIO to work
+#if defined(NTDDI_VERSION) && NTDDI_VERSION < 0x06010000
+#error NTDDI_VERSION must at least be set to Windows 7 for LLFIO to work
 #endif
 #endif
 
