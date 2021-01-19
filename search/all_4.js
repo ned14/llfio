@@ -33,5 +33,7 @@ var searchData=
   ['do_5fio_5fhandle_5fregister',['do_io_handle_register',['../classllfio__v2__xxx_1_1io__multiplexer.html#a04d99f9603d31c674aaf865d58abc4d6',1,'llfio_v2_xxx::io_multiplexer']]],
   ['do_5fnot_5fstore',['do_not_store',['../classllfio__v2__xxx_1_1map__handle.html#a3efb39f1b54a7c156a3e0ee2a953712d',1,'llfio_v2_xxx::map_handle']]],
   ['done',['done',['../structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a642a415d3444c11886c3bace729b917b',1,'llfio_v2_xxx::directory_handle::buffers_type']]],
-  ['drop_5ffilesystem_5fcache',['drop_filesystem_cache',['../namespacellfio__v2__xxx_1_1utils.html#abacefaf60ae391226c4775cf8a61276a',1,'llfio_v2_xxx::utils']]]
+  ['drop_5ffilesystem_5fcache',['drop_filesystem_cache',['../namespacellfio__v2__xxx_1_1utils.html#abacefaf60ae391226c4775cf8a61276a',1,'llfio_v2_xxx::utils']]],
+  ['dynamic_5fthread_5fpool_5fgroup',['dynamic_thread_pool_group',['../classllfio__v2__xxx_1_1dynamic__thread__pool__group.html',1,'llfio_v2_xxx']]],
+  ['dynamic_5fthread_5fpool_5fgroup_5fptr',['dynamic_thread_pool_group_ptr',['../namespacellfio__v2__xxx.html#a1cebefd1c4caade9a0abbd9d7a5f89a3',1,'llfio_v2_xxx']]]
 ];
