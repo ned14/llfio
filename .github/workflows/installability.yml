@@ -38,7 +38,7 @@ jobs:
        fi
        git clone --depth 1 https://github.com/ned14/quickcpplib.git
        pip install --user gitpython
-       python quickcpplib/scripts/test_cpp-pm_install.py test-packaging/example.cpp quickcpplib quickcpplib::hl https://github.com/ned14/quickcpplib master outcome outcome::hl https://github.com/ned14/outcome better_optimisation llfio llfio::sl https://github.com/ned14/llfio develop
+       python quickcpplib/scripts/test_cpp-pm_install.py test-packaging/example.cpp quickcpplib quickcpplib::hl https://github.com/ned14/quickcpplib master outcome outcome::hl https://github.com/ned14/outcome master llfio llfio::sl https://github.com/ned14/llfio develop
        cd test_cpp-pm_install
        mkdir build
        cd build
