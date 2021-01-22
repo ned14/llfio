@@ -163,9 +163,10 @@ namespace detail
       size_t count{0};
       threadmetrics_item *front{nullptr}, *back{nullptr};
       uint32_t blocked{0}, running{0};
-    } threadmetrics_queue;  // items at end are least recently updated
-    std::vector<threadmetrics_item *> threadmetrics_sorted;
+    } threadmetrics_queue;                                   // items at front are least recently updated
+    std::vector<threadmetrics_item *> threadmetrics_sorted;  // sorted by threadid
     std::chrono::steady_clock::time_point threadmetrics_last_updated;
+    std::atomic<bool> update_threadmetrics_reentrancy{false};
 #ifdef __linux__
     int proc_self_task_fd{-1};
 #endif
@@ -239,129 +240,6 @@ namespace detail
     }
 
 #if !LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD && !defined(_WIN32)
-#ifdef __linux__
-    void populate_threadmetrics(std::chrono::steady_clock::time_point now)
-    {
-      static thread_local std::vector<char> kernelbuffer(1024);
-      static thread_local std::vector<threadmetrics_threadid> threadidsbuffer(1024 / sizeof(dirent));
-      using getdents64_t = int (*)(int, char *, unsigned int);
-      static auto getdents = static_cast<getdents64_t>([](int fd, char *buf, unsigned count) -> int { return syscall(SYS_getdents64, fd, buf, count); });
-      using dirent = dirent64;
-      int bytes = 0;
-      {
-        _lock_guard g(threadmetrics_lock);
-        if(now - threadmetrics_last_updated < std::chrono::milliseconds(100))
-        {
-          return;
-        }
-        if(proc_self_task_fd < 0)
-        {
-          proc_self_task_fd = ::open("/proc/self/task", O_RDONLY | O_DIRECTORY | O_CLOEXEC);
-          if(proc_self_task_fd < 0)
-          {
-            posix_error().throw_exception();
-          }
-        }
-        for(;;)
-        {
-          if(-1 == ::lseek64(proc_self_task_fd, 0, SEEK_SET))
-          {
-            posix_error().throw_exception();
-          }
-          bytes = getdents(proc_self_task_fd, kernelbuffer.data(), kernelbuffer.size());
-          if(bytes < (int) kernelbuffer.size())
-          {
-            break;
-          }
-          kernelbuffer.resize(kernelbuffer.size() << 1);
-        }
-      }
-      threadidsbuffer.clear();
-      for(auto *dent = (dirent *) kernelbuffer.data();; dent = reinterpret_cast<dirent *>(reinterpret_cast<uintptr_t>(dent) + dent->d_reclen))
-      {
-        if(dent->d_ino != 0u && dent->d_type == DT_DIR && dent->d_name[0] != '.')
-        {
-          size_t length = strchr(dent->d_name, 0) - dent->d_name;
-          threadidsbuffer.push_back(string_view(dent->d_name, length));
-        }
-        if((bytes -= dent->d_reclen) <= 0)
-        {
-          break;
-        }
-      }
-      std::sort(threadidsbuffer.begin(), threadidsbuffer.end());
-      _lock_guard g(threadmetrics_lock);
-      auto d_it = threadmetrics_sorted.begin();
-      auto s_it = threadidsbuffer.begin();
-      auto remove_item = [&] {
-        std::cout << "Removing thread " << (*d_it)->threadid_name() << std::endl;
-        if((*d_it)->blocked_since != std::chrono::steady_clock::time_point())
-        {
-          threadmetrics_queue.blocked--;
-        }
-        else
-        {
-          threadmetrics_queue.running--;
-        }
-        _remove_from_list(threadmetrics_queue, *d_it);
-        d_it = threadmetrics_sorted.erase(d_it);
-      };
-      auto add_item = [&] {
-        auto p = std::make_unique<threadmetrics_item>(*s_it++);
-        if(d_it != threadmetrics_sorted.end())
-        {
-          ++d_it;
-        }
-        d_it = threadmetrics_sorted.insert(d_it, p.get());
-        _append_to_list(threadmetrics_queue, p.get());
-        std::cout << "Adding thread " << p->threadid_name() << std::endl;
-        p.release();
-        threadmetrics_queue.running++;
-      };
-      for(; d_it != threadmetrics_sorted.end() && s_it != threadidsbuffer.end();)
-      {
-        auto c = (*d_it)->threadid.compare(*s_it);
-        // std::cout << "Comparing " << (*d_it)->threadid_name() << " with " << string_view(s_it->text, 12) << " = " << c << std::endl;
-        if(0 == c)
-        {
-          ++d_it;
-          ++s_it;
-          continue;
-        }
-        if(c < 0)
-        {
-          // d_it has gone away
-          remove_item();
-        }
-        if(c > 0)
-        {
-          // s_it is a new entry
-          add_item();
-        }
-      }
-      while(d_it != threadmetrics_sorted.end())
-      {
-        remove_item();
-      }
-      while(s_it != threadidsbuffer.end())
-      {
-        add_item();
-      }
-#if 0
-      std::cout << "Threadmetrics:";
-      for(auto *p : threadmetrics_sorted)
-      {
-        std::cout << "\n   " << p->threadid_name();
-      }
-      std::cout << std::endl;
-#endif
-      assert(threadmetrics_sorted.size() == threadidsbuffer.size());
-      assert(std::is_sorted(threadmetrics_sorted.begin(), threadmetrics_sorted.end(),
-                            [](threadmetrics_item *a, threadmetrics_item *b) { return a->threadid < b->threadid; }));
-      threadmetrics_last_updated = now;
-    }
-#endif
-
     inline void _execute_work(thread_t *self);
 
     void _add_thread(_lock_guard & /*unused*/)
@@ -391,6 +269,11 @@ namespace detail
       }
       // Threads which went to sleep the longest ago are at the front
       auto *t = which.front;
+      if(t->state < 0)
+      {
+        // He's already exiting
+        return false;
+      }
       assert(t->state == 0);
       t->state--;
 #if LLFIO_DYNAMIC_THREAD_POOL_GROUP_PRINTING
@@ -446,6 +329,298 @@ namespace detail
       }
 #endif
     }
+
+#ifdef __linux__
+    bool update_threadmetrics(_lock_guard &&g, std::chrono::steady_clock::time_point now, threadmetrics_item *new_items)
+    {
+      auto update_item = [&](threadmetrics_item *item) {
+        char path[64] = "/proc/self/task/", *pend = path + 16, *tend = item->threadid.text;
+        while(*tend == '0' && (tend - item->threadid.text) < (ssize_t) sizeof(item->threadid.text))
+        {
+          ++tend;
+        }
+        while((tend - item->threadid.text) < (ssize_t) sizeof(item->threadid.text))
+        {
+          *pend++ = *tend++;
+        }
+        memcpy(pend, "/stat", 6);
+        int fd = ::open(path, O_RDONLY);
+        if(-1 == fd)
+        {
+          // Thread may have exited since we last populated
+          if(item->blocked_since == std::chrono::steady_clock::time_point())
+          {
+            threadmetrics_queue.running--;
+            threadmetrics_queue.blocked++;
+          }
+          item->blocked_since = now;
+          item->last_updated = now;
+          return;
+        }
+        char buffer[1024];
+        auto bytesread = ::read(fd, buffer, sizeof(buffer));
+        ::close(fd);
+        buffer[std::max((size_t) bytesread, sizeof(buffer) - 1)] = 0;
+        char state = 0;
+        unsigned long majflt = 0, utime = 0, stime = 0;
+        sscanf(buffer, "%*d %*s %c %*d %*d %*d %*d %*d %*u %*u %*u %lu %*u %lu %lu", &state, &majflt, &utime, &stime);
+        if(item->utime != (uint32_t) -1 || item->stime != (uint32_t) -1)
+        {
+          if(item->utime == (uint32_t) utime && item->stime == (uint32_t) stime && state != 'R')
+          {
+            // This thread made no progress since last time
+            if(item->blocked_since == std::chrono::steady_clock::time_point())
+            {
+              threadmetrics_queue.running--;
+              threadmetrics_queue.blocked++;
+              item->blocked_since = now;
+            }
+          }
+          else
+          {
+            if(item->blocked_since != std::chrono::steady_clock::time_point())
+            {
+              threadmetrics_queue.running++;
+              threadmetrics_queue.blocked--;
+              item->blocked_since = std::chrono::steady_clock::time_point();
+            }
+          }
+        }
+        std::cout << "Threadmetrics " << path << " " << state << " " << majflt << " " << utime << " " << stime << ". Previously " << item->diskfaults << " "
+                  << item->utime << " " << item->stime << std::endl;
+        item->diskfaults = (uint32_t) majflt;
+        item->utime = (uint32_t) utime;
+        item->stime = (uint32_t) stime;
+        item->last_updated = now;
+      };
+      if(new_items != nullptr)
+      {
+        for(; new_items != nullptr; new_items = new_items->_next)
+        {
+          update_item(new_items);
+        }
+        return false;
+      }
+      if(threadmetrics_queue.count == 0)
+      {
+        return false;
+      }
+      size_t updated = 0;
+      while(updated++ < 10 && now - threadmetrics_queue.front->last_updated >= std::chrono::milliseconds(100))
+      {
+        auto *p = threadmetrics_queue.front;
+        update_item(p);
+        _remove_from_list(threadmetrics_queue, p);
+        _append_to_list(threadmetrics_queue, p);
+      }
+      static const auto min_hardware_concurrency = std::thread::hardware_concurrency();
+      static const auto max_hardware_concurrency = min_hardware_concurrency + (min_hardware_concurrency >> 1);
+      auto toadd = std::max((ssize_t) 0, std::min((ssize_t) min_hardware_concurrency - (ssize_t) threadmetrics_queue.running,
+                                                  (ssize_t) total_submitted_workitems.load(std::memory_order_relaxed) -
+                                                  (ssize_t) threadpool_threads.load(std::memory_order_relaxed)));
+      auto toremove = std::max((ssize_t) 0, (ssize_t) threadmetrics_queue.running - (ssize_t) max_hardware_concurrency);
+      // std::cout << "Threadmetrics toadd = " << (toadd - (ssize_t) threadpool_sleeping.count) << " toremove = " << toremove
+      //          << " running = " << threadmetrics_queue.running << " blocked = " << threadmetrics_queue.blocked << " total = " << threadmetrics_queue.count
+      //          << ". Actual active = " << threadpool_active.count << " sleeping = " << threadpool_sleeping.count
+      //          << ". Current working threads = " << threadpool_threads.load(std::memory_order_relaxed)
+      //          << ". Current submitted work items = " << total_submitted_workitems.load(std::memory_order_relaxed) << std::endl;
+      if(toadd > 0 || toremove > 0)
+      {
+        if(update_threadmetrics_reentrancy.exchange(true, std::memory_order_relaxed))
+        {
+          return false;
+        }
+        auto unupdate_threadmetrics_reentrancy =
+        make_scope_exit([this]() noexcept { update_threadmetrics_reentrancy.store(false, std::memory_order_relaxed); });
+        g.unlock();
+        _lock_guard gg(workqueue_lock);
+        toadd -= (ssize_t) threadpool_sleeping.count;
+        for(; toadd > 0; toadd--)
+        {
+          _add_thread(gg);
+        }
+        for(; toremove > 0 && threadpool_sleeping.count > 0; toremove--)
+        {
+          if(!_remove_thread(gg, threadpool_sleeping))
+          {
+            break;
+          }
+        }
+        if(toremove > 0 && threadpool_active.count > 1)
+        {
+          // Kill myself, but not if I'm the final thread who needs to run timers
+          return true;
+        }
+        return false;
+      }
+      return false;
+    }
+    // Returns true if calling thread is to exit
+    bool populate_threadmetrics(std::chrono::steady_clock::time_point now)
+    {
+      static thread_local std::vector<char> kernelbuffer(1024);
+      static thread_local std::vector<threadmetrics_threadid> threadidsbuffer(1024 / sizeof(dirent));
+      using getdents64_t = int (*)(int, char *, unsigned int);
+      static auto getdents = static_cast<getdents64_t>([](int fd, char *buf, unsigned count) -> int { return syscall(SYS_getdents64, fd, buf, count); });
+      using dirent = dirent64;
+      size_t bytes = 0;
+      {
+        _lock_guard g(threadmetrics_lock);
+        if(now - threadmetrics_last_updated < std::chrono::milliseconds(100) &&
+           threadmetrics_queue.running + threadmetrics_queue.blocked >= threadpool_threads.load(std::memory_order_relaxed))
+        {
+          return update_threadmetrics(std::move(g), now, nullptr);
+        }
+        if(proc_self_task_fd < 0)
+        {
+          proc_self_task_fd = ::open("/proc/self/task", O_RDONLY | O_DIRECTORY | O_CLOEXEC);
+          if(proc_self_task_fd < 0)
+          {
+            posix_error().throw_exception();
+          }
+        }
+        for(auto done = false; !done;)
+        {
+          if(-1 == ::lseek64(proc_self_task_fd, 0, SEEK_SET))
+          {
+            posix_error().throw_exception();
+          }
+          bytes = 0;
+          for(;;)
+          {
+            int _bytes = getdents(proc_self_task_fd, kernelbuffer.data() + bytes, kernelbuffer.size() - bytes);
+            // std::cout << "getdents(" << (kernelbuffer.size()-bytes) << ") returns " << _bytes << std::endl;
+            if(_bytes == 0)
+            {
+              done = true;
+              break;
+            }
+            if(_bytes == -1 && errno == EINVAL)
+            {
+              kernelbuffer.resize(kernelbuffer.size() << 1);
+              continue;
+            }
+            if(_bytes < 0)
+            {
+              posix_error().throw_exception();
+            }
+            bytes += _bytes;
+          }
+        }
+      }
+      threadidsbuffer.clear();
+      for(auto *dent = (dirent *) kernelbuffer.data();; dent = reinterpret_cast<dirent *>(reinterpret_cast<uintptr_t>(dent) + dent->d_reclen))
+      {
+        if(dent->d_ino != 0u && dent->d_type == DT_DIR && dent->d_name[0] != '.')
+        {
+          size_t length = strchr(dent->d_name, 0) - dent->d_name;
+          threadidsbuffer.push_back(string_view(dent->d_name, length));
+        }
+        if((bytes -= dent->d_reclen) <= 0)
+        {
+          break;
+        }
+      }
+      std::cout << "Parsed from /proc " << threadidsbuffer.size() << " entries." << std::endl;
+      std::sort(threadidsbuffer.begin(), threadidsbuffer.end());
+      threadmetrics_item *firstnewitem = nullptr;
+      _lock_guard g(threadmetrics_lock);
+#if 0
+      {
+        auto d_it = threadmetrics_sorted.begin();
+        auto s_it = threadidsbuffer.begin();
+        for(; d_it != threadmetrics_sorted.end() && s_it != threadidsbuffer.end(); ++d_it, ++s_it)
+        {
+          std::cout << (*d_it)->threadid_name() << "   " << string_view(s_it->text, 12) << "\n";
+        }
+        for(; d_it != threadmetrics_sorted.end(); ++d_it)
+        {
+          std::cout << (*d_it)->threadid_name() << "   XXXXXXXXXXXX\n";
+        }
+        for(; s_it != threadidsbuffer.end(); ++s_it)
+        {
+          std::cout << "XXXXXXXXXXXX   " << string_view(s_it->text, 12) << "\n";
+        }
+        std::cout << std::flush;
+      }
+#endif
+      auto d_it = threadmetrics_sorted.begin();
+      auto s_it = threadidsbuffer.begin();
+      auto remove_item = [&] {
+        // std::cout << "Removing thread metrics for " << (*d_it)->threadid_name() << std::endl;
+        if((*d_it)->blocked_since != std::chrono::steady_clock::time_point())
+        {
+          threadmetrics_queue.blocked--;
+        }
+        else
+        {
+          threadmetrics_queue.running--;
+        }
+        _remove_from_list(threadmetrics_queue, *d_it);
+        d_it = threadmetrics_sorted.erase(d_it);
+      };
+      auto add_item = [&] {
+        auto p = std::make_unique<threadmetrics_item>(*s_it);
+        d_it = threadmetrics_sorted.insert(d_it, p.get());
+        _append_to_list(threadmetrics_queue, p.get());
+        // std::cout << "Adding thread metrics for " << p->threadid_name() << std::endl;
+        if(firstnewitem == nullptr)
+        {
+          firstnewitem = p.get();
+        }
+        p.release();
+        threadmetrics_queue.running++;
+      };
+      for(; d_it != threadmetrics_sorted.end() && s_it != threadidsbuffer.end();)
+      {
+        auto c = (*d_it)->threadid.compare(*s_it);
+        // std::cout << "Comparing " << (*d_it)->threadid_name() << " with " << string_view(s_it->text, 12) << " = " << c << std::endl;
+        if(0 == c)
+        {
+          ++d_it;
+          ++s_it;
+          continue;
+        }
+        if(c < 0)
+        {
+          // d_it has gone away
+          remove_item();
+        }
+        if(c > 0)
+        {
+          // s_it is a new entry
+          add_item();
+        }
+      }
+      while(d_it != threadmetrics_sorted.end())
+      {
+        remove_item();
+      }
+      while(s_it != threadidsbuffer.end())
+      {
+        add_item();
+        ++d_it;
+        ++s_it;
+      }
+      assert(threadmetrics_sorted.size() == threadidsbuffer.size());
+#if 1
+      if(!std::is_sorted(threadmetrics_sorted.begin(), threadmetrics_sorted.end(),
+                         [](threadmetrics_item *a, threadmetrics_item *b) { return a->threadid < b->threadid; }))
+      {
+        std::cout << "Threadmetrics:";
+        for(auto *p : threadmetrics_sorted)
+        {
+          std::cout << "\n   " << p->threadid_name();
+        }
+        std::cout << std::endl;
+        abort();
+      }
+#endif
+      assert(threadmetrics_queue.running + threadmetrics_queue.blocked == threadidsbuffer.size());
+      threadmetrics_last_updated = now;
+      return update_threadmetrics(std::move(g), now, firstnewitem);
+    }
+#endif
 #endif
 
     result<void> _prepare_work_item_delay(dynamic_thread_pool_group::work_item *workitem, grouph_type grouph, deadline d)
@@ -890,6 +1065,7 @@ namespace detail
         else if(now - self->last_did_work >= std::chrono::minutes(1))
         {
           _remove_from_list(threadpool_active, self);
+          threadpool_threads.fetch_sub(1, std::memory_order_release);
           self->thread.detach();
           delete self;
           return;
@@ -941,7 +1117,14 @@ namespace detail
       // workitem->_internalworkh should be null, however workitem may also no longer exist
       try
       {
-        populate_threadmetrics(now);
+        if(populate_threadmetrics(now))
+        {
+          _remove_from_list(threadpool_active, self);
+          threadpool_threads.fetch_sub(1, std::memory_order_release);
+          self->thread.detach();
+          delete self;
+          return;
+        }
       }
       catch(...)
       {
@@ -1075,9 +1258,6 @@ namespace detail
           _lock_guard gg(workqueue_lock);  // lock global
           if(threadpool_active.count == 0 && threadpool_sleeping.count == 0)
           {
-            _add_thread(gg);
-            _add_thread(gg);
-            _add_thread(gg);
             _add_thread(gg);
           }
           else if(threadpool_sleeping.count > 0 && active_work_items > threadpool_active.count)
