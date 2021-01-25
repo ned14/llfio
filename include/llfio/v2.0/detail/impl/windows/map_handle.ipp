@@ -887,6 +887,7 @@ result<span<map_handle::buffer_type>> map_handle::prefetch(span<buffer_type> reg
   {
     return span<map_handle::buffer_type>();
   }
+  static_assert(sizeof(WIN32_MEMORY_RANGE_ENTRY) == sizeof(buffer_type), "WIN32_MEMORY_RANGE_ENTRY is not the same size as a buffer_type!");
   auto wmre = reinterpret_cast<PWIN32_MEMORY_RANGE_ENTRY>(regions.data());
   if(PrefetchVirtualMemory_(GetCurrentProcess(), regions.size(), wmre, 0) == 0)
   {

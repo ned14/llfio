@@ -573,13 +573,13 @@ public:
 //! \brief Constructor for `mapped_file_handle`
 template <> struct construct<mapped_file_handle>
 {
-  mapped_file_handle::size_type reservation;
   const path_handle &base;
   mapped_file_handle::path_view_type _path;
   mapped_file_handle::mode _mode = mapped_file_handle::mode::read;
   mapped_file_handle::creation _creation = mapped_file_handle::creation::open_existing;
   mapped_file_handle::caching _caching = mapped_file_handle::caching::all;
   mapped_file_handle::flag flags = mapped_file_handle::flag::none;
+  mapped_file_handle::size_type reservation{0};
   result<mapped_file_handle> operator()() const noexcept
   {
     return mapped_file_handle::mapped_file(reservation, base, _path, _mode, _creation, _caching, flags);
