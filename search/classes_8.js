@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['io_5faware_5fwork_5fitem',['io_aware_work_item',['../classllfio__v2__xxx_1_1dynamic__thread__pool__group_1_1io__aware__work__item.html',1,'llfio_v2_xxx::dynamic_thread_pool_group']]],
   ['io_5fhandle',['io_handle',['../classllfio__v2__xxx_1_1io__handle.html',1,'llfio_v2_xxx']]],
-  ['io_5fhandle_5fawareness',['io_handle_awareness',['../structllfio__v2__xxx_1_1dynamic__thread__pool__group_1_1io__aware__work__item_1_1io__handle__awareness.html',1,'llfio_v2_xxx::dynamic_thread_pool_group::io_aware_work_item']]],
   ['io_5fmultiplexer',['io_multiplexer',['../classllfio__v2__xxx_1_1io__multiplexer.html',1,'llfio_v2_xxx']]],
   ['io_5foperation_5fstate',['io_operation_state',['../structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html',1,'llfio_v2_xxx::io_multiplexer']]],
   ['io_5foperation_5fstate_5fvisitor',['io_operation_state_visitor',['../structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state__visitor.html',1,'llfio_v2_xxx::io_multiplexer']]],
