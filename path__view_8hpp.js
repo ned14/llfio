@@ -31,6 +31,9 @@ var path__view_8hpp =
     [ "reencode_path_to", "path__view_8hpp.html#a76bb62584e742b0b8397a63c333f7d59", null ],
     [ "reencode_path_to", "path__view_8hpp.html#aa43d4352669c668ec5882e7d953b3ea6", null ],
     [ "reencode_path_to", "path__view_8hpp.html#aaf8e44c460932265c6c97b949eeaac92", null ],
+    [ "to_win32_path", "path__view_8hpp.html#a845b3856461bcc205848b36ef8757480", null ],
+    [ "to_win32_path", "path__view_8hpp.html#a850b4121780e52d4547da6dcca778646", null ],
+    [ "to_win32_path", "path__view_8hpp.html#a25b1f6c46ff29d4aab1e59f0df2cc2eb", null ],
     [ "visit", "path__view_8hpp.html#a1374384491dae4c33de1ddd218336f98", null ],
     [ "visit", "path__view_8hpp.html#a1d381d16b152632f617c82182fcf22a1", null ]
 ];

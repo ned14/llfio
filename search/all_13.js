@@ -6,6 +6,7 @@ var searchData=
   ['temporary',['temporary',['../classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852ad5197d93c063a2b1e22d1630a39b7aef',1,'llfio_v2_xxx::handle']]],
   ['temporary_5fnamed_5fpipes_5fdirectory',['temporary_named_pipes_directory',['../namespacellfio__v2__xxx_1_1path__discovery.html#a2d3e2ea602c3195433c7898c41744188',1,'llfio_v2_xxx::path_discovery']]],
   ['throw_5fexception',['throw_exception',['../structllfio__v2__xxx_1_1error__info.html#ab08549050a7e020a9939b1961ed1ae2c',1,'llfio_v2_xxx::error_info']]],
+  ['to_5fwin32_5fpath',['to_win32_path',['../namespacellfio__v2__xxx.html#a850b4121780e52d4547da6dcca778646',1,'llfio_v2_xxx::to_win32_path(path_view p, bool need_dos_path_form=false)'],['../namespacellfio__v2__xxx.html#a25b1f6c46ff29d4aab1e59f0df2cc2eb',1,'llfio_v2_xxx::to_win32_path(filesystem::path &amp;&amp;p, bool need_dos_path_form=false)']]],
   ['todo_20list',['Todo List',['../todo.html',1,'']]],
   ['total_5faddress_5fspace_5fin_5fuse',['total_address_space_in_use',['../structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html#adf45c0d5909d6067817a07dc1a11676b',1,'llfio_v2_xxx::utils::process_memory_usage']]],
   ['total_5faddress_5fspace_5fpaged_5fin',['total_address_space_paged_in',['../structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html#ad5b2ceeb0974a4a3115bdc74fc9d5b8f',1,'llfio_v2_xxx::utils::process_memory_usage']]],

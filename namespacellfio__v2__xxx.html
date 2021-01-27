@@ -519,6 +519,11 @@ filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#adb4db47e035ae1ee5043008492e8986b">LLFIO_TEMPLATE</a> (class T) LLFIO_TREQUIRES(LLFIO_TPRED(std</td></tr>
 <tr class="memdesc:adb4db47e035ae1ee5043008492e8986b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Append a path view component to a path view component. <br /></td></tr>
 <tr class="separator:adb4db47e035ae1ee5043008492e8986b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a850b4121780e52d4547da6dcca778646"><td class="memItemLeft" align="right" valign="top">filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a850b4121780e52d4547da6dcca778646">to_win32_path</a> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> p, bool need_dos_path_form=false)</td></tr>
+<tr class="memdesc:a850b4121780e52d4547da6dcca778646"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms the input path into a form suitable for Win32 APIs. Passes through unmodified on POSIX.  <a href="#a850b4121780e52d4547da6dcca778646">More...</a><br /></td></tr>
+<tr class="separator:a850b4121780e52d4547da6dcca778646"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25b1f6c46ff29d4aab1e59f0df2cc2eb"><td class="memItemLeft" align="right" valign="top">filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a25b1f6c46ff29d4aab1e59f0df2cc2eb">to_win32_path</a> (filesystem::path &amp;&amp;p, bool need_dos_path_form=false)</td></tr>
+<tr class="separator:a25b1f6c46ff29d4aab1e59f0df2cc2eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a94167268e0b7e7573e4599fd7872ef0f"><td class="memItemLeft" align="right" valign="top"><a id="a94167268e0b7e7573e4599fd7872ef0f"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const process_handle::flag &amp;v)</td></tr>
 <tr class="separator:a94167268e0b7e7573e4599fd7872ef0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1840,6 +1845,89 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 <p><em>Securely</em> create a file handle creating a temporary anonymous inode in the filesystem referred to by <em>dirpath</em>. The inode created has no name nor accessible path on the filing system and ceases to exist as soon as the last handle is closed, making it ideal for use as a temporary file where other processes do not need to have access to its contents via some path on the filing system (a classic use case is for backing shared memory maps).</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
 <div class="fragment"><div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;{</div><div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#ac8d9dc908fe39f9c896e99f6b7a39d81">file_handle::temp_inode</a>(std::forward&lt;decltype(dirh)&gt;(dirh), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(flags)&gt;(flags));</div><div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;}</div><div class="ttc" id="namespacellfio__v2__xxx_html_ac8d9dc908fe39f9c896e99f6b7a39d81"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ac8d9dc908fe39f9c896e99f6b7a39d81">llfio_v2_xxx::temp_inode</a></div><div class="ttdeci">result&lt; file_handle &gt; temp_inode(const path_handle &amp;dirh=path_discovery::storage_backed_temporary_files_directory(), file_handle::mode _mode=file_handle::mode::write, file_handle::flag flags=file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:476</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a850b4121780e52d4547da6dcca778646"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a850b4121780e52d4547da6dcca778646">&#9670;&nbsp;</a></span>to_win32_path() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">filesystem::path llfio_v2_xxx::to_win32_path </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td>
+          <td class="paramname"><em>p</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>need_dos_path_form</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Transforms the input path into a form suitable for Win32 APIs. Passes through unmodified on POSIX. </p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">If</td><td>the path cannot be turned into a valid Win32 path, an exception is thrown. </td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="fragment"><div class="line"><a name="l02477"></a><span class="lineno"> 2477</span>&#160;{</div><div class="line"><a name="l02478"></a><span class="lineno"> 2478</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a25b1f6c46ff29d4aab1e59f0df2cc2eb">detail::to_win32_path</a>(p.path(), need_dos_path_form);</div><div class="line"><a name="l02479"></a><span class="lineno"> 2479</span>&#160;}</div><div class="ttc" id="namespacellfio__v2__xxx_html_a25b1f6c46ff29d4aab1e59f0df2cc2eb"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a25b1f6c46ff29d4aab1e59f0df2cc2eb">llfio_v2_xxx::to_win32_path</a></div><div class="ttdeci">filesystem::path to_win32_path(filesystem::path &amp;&amp;p, bool need_dos_path_form=false)</div><div class="ttdef"><b>Definition:</b> path_view.hpp:2481</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a25b1f6c46ff29d4aab1e59f0df2cc2eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25b1f6c46ff29d4aab1e59f0df2cc2eb">&#9670;&nbsp;</a></span>to_win32_path() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">filesystem::path llfio_v2_xxx::to_win32_path </td>
+          <td>(</td>
+          <td class="paramtype">filesystem::path &amp;&amp;&#160;</td>
+          <td class="paramname"><em>p</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>need_dos_path_form</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
+<div class="fragment"><div class="line"><a name="l02482"></a><span class="lineno"> 2482</span>&#160;{</div><div class="line"><a name="l02483"></a><span class="lineno"> 2483</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a25b1f6c46ff29d4aab1e59f0df2cc2eb">detail::to_win32_path</a>(std::move(p), need_dos_path_form);</div><div class="line"><a name="l02484"></a><span class="lineno"> 2484</span>&#160;}</div><div class="ttc" id="namespacellfio__v2__xxx_html_a25b1f6c46ff29d4aab1e59f0df2cc2eb"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a25b1f6c46ff29d4aab1e59f0df2cc2eb">llfio_v2_xxx::to_win32_path</a></div><div class="ttdeci">filesystem::path to_win32_path(filesystem::path &amp;&amp;p, bool need_dos_path_form=false)</div><div class="ttdef"><b>Definition:</b> path_view.hpp:2481</div></div>
 </div><!-- fragment -->
 </div>
 </div>

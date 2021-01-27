@@ -1,5 +1,8 @@
 var NAVTREEINDEX11 =
 {
+"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a45eac1f6f721ee11caf82a22851d3f5e":[4,0,2,0,0,1,12],
+"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a499cc1593d16f042c2d3266b8e0c205a":[4,0,2,0,0,1,10],
+"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a4d7c7541169fc5a4daa1305bf0474a8d":[4,0,2,0,0,1,5],
 "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a5410c333fddcafa614cf23c6f6c350e2":[4,0,2,0,0,1,2],
 "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a58741241cb681e797af0862a0571d149":[4,0,2,0,0,1,29],
 "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a613636af8f329f42f395c22511ed5e70":[4,0,2,0,0,1,41],
@@ -246,8 +249,5 @@ var NAVTREEINDEX11 =
 "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#ae00a5e9ca83a6e6dd499e21b2de41a33":[4,0,2,28,1,21],
 "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#af4cb1c032dcf9d7bc390e116e0d28094":[4,0,2,28,1,27],
 "structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html":[4,0,2,28,2],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#a01b43e5fc4b158b62f809eb7974bc9b6":[4,0,2,28,2,12],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#a040be822742b91e92faf58626d9f315b":[4,0,2,28,2,30],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#a0e7578c0eb50a0758a51d6eeb5855d56":[4,0,2,28,2,27],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#a14859e2590300a009a7edddb82d6f035":[4,0,2,28,2,11]
+"structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#a01b43e5fc4b158b62f809eb7974bc9b6":[4,0,2,28,2,12]
 };
