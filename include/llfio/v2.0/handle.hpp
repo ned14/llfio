@@ -296,6 +296,12 @@ public:
   It is up to you to detect if `current_path()` is not working, and to change how you
   call LLFIO appropriately.
 
+  On Windows, you will almost certainly get back a path of the form `\!!\Device\HarddiskVolume10\Users\ned\...`.
+  See `path_view` for what all the path prefix sequences mean, but to summarise the `\!!\`
+  prefix is LLFIO-only and will not be accepted by other Windows APIs. Pass LLFIO derived
+  paths through the function `to_win32_path()` to Win32-ise them. This function is also
+  available on Linux where it does nothing, so you can use it in portable code.
+
   \warning This call is expensive, it always asks the kernel for the current path, and no
   checking is done to ensure what the kernel returns is accurate or even sensible.
   Be aware that despite these precautions, paths are unstable and **can change randomly at

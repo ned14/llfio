@@ -1840,7 +1840,7 @@ public:
     if(_npos == sep_idx)
     {
       // Sorry, this semantic is so broken that it's unwise to emulate!
-#if 0 // LLFIO_USING_EXPERIMENTAL_FILESYSTEM && defined(_MSC_VER)
+#if 0  // LLFIO_USING_EXPERIMENTAL_FILESYSTEM && defined(_MSC_VER)
       return this->_invoke([&](const auto &v) {
         // MSVC's Experimental Filesystem has some really, really weird semantics :(
         return *this;
@@ -2434,6 +2434,53 @@ inline filesystem::path operator/(T a, path_view_component b)
   detail::path_view_component_operator_slash_visitor x;
   visit(x, a);
   return x.ret /= b;
+}
+
+
+namespace detail
+{
+  inline filesystem::path to_win32_path(filesystem::path &&p, bool need_dos_path_form)
+  {
+#ifdef _WIN32
+    if(need_dos_path_form)
+    {
+      throw std::runtime_error("Not implemented yet");
+    }
+    auto &str = const_cast<filesystem::path::string_type &>(p.native());
+    if(str.size() >= 4 && str[0] == '\\' && str[1] == '!' && str[2] == '!' && str[3] == '\\')
+    {
+      /* Paths of form \!!\Device\... => \\.\ */
+      if(0 == str.compare(0, 11, L"\\!!\\Device\\"))
+      {
+        str[1] = '\\';
+        str[2] = '.';
+        memcpy(&str[4], &str[11], (str.size() - 7) * sizeof(wchar_t));
+        str.resize(str.size() - 7);
+      }
+      else
+      {
+        throw std::runtime_error("cannot convert path into Win32 path");
+      }
+    }
+#endif
+    return std::move(p);
+  }
+}  // namespace detail
+
+/*! \brief Transforms the input path into a form suitable for Win32 APIs.
+Passes through unmodified on POSIX.
+
+\throws If the path cannot be turned into a valid Win32 path, an exception
+is thrown.
+*/
+inline filesystem::path to_win32_path(path_view p, bool need_dos_path_form = false)
+{
+  return detail::to_win32_path(p.path(), need_dos_path_form);
+}
+//! \overload
+inline filesystem::path to_win32_path(filesystem::path &&p, bool need_dos_path_form = false)
+{
+  return detail::to_win32_path(std::move(p), need_dos_path_form);
 }
 
 
