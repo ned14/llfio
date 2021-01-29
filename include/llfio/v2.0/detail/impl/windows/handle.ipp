@@ -51,6 +51,9 @@ result<handle::path_type> handle::current_path() const noexcept
     buffer.resize(32769);
     auto *_buffer = const_cast<wchar_t *>(buffer.data());
     memcpy(_buffer, L"\\!!", 6);
+    // Should I use FILE_NAME_OPENED here instead of the default FILE_NAME_NORMALIZED?
+    // I think the latter more likely to trap buggy assumptions, so let's do that. If
+    // people really want FILE_NAME_OPENED, see to_win32_path().
     DWORD len = GetFinalPathNameByHandleW(_v.h, _buffer + 3, (DWORD)(buffer.size() - 4 * sizeof(wchar_t)), VOLUME_NAME_NT);  // NOLINT
     if(len == 0)
     {

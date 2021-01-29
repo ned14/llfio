@@ -43,8 +43,20 @@ template <class FileHandleType, class DirectoryHandleType> static inline void Te
 #pragma clang diagnostic ignored "-Wmissing-braces"
 #endif
   llfio::path_handle null_path_handle;
-  FileHandleType h1 = llfio::construct<FileHandleType>{null_path_handle, "tempfile", llfio::file_handle::mode::write, llfio::file_handle::creation::if_needed, llfio::file_handle::caching::temporary, llfio::file_handle::flag::none}().value();     // NOLINT
-  DirectoryHandleType h2 = llfio::construct<DirectoryHandleType>{null_path_handle, "tempdir", llfio::file_handle::mode::write, llfio::file_handle::creation::if_needed, llfio::file_handle::caching::all, llfio::file_handle::flag::none}().value();  // NOLINT
+  FileHandleType h1 = llfio::construct<FileHandleType>{null_path_handle,
+                                                       "tempfile",
+                                                       llfio::file_handle::mode::write,
+                                                       llfio::file_handle::creation::if_needed,
+                                                       llfio::file_handle::caching::temporary,
+                                                       llfio::file_handle::flag::none}()
+                      .value();  // NOLINT
+  DirectoryHandleType h2 = llfio::construct<DirectoryHandleType>{null_path_handle,
+                                                                 "tempdir",
+                                                                 llfio::file_handle::mode::write,
+                                                                 llfio::file_handle::creation::if_needed,
+                                                                 llfio::file_handle::caching::all,
+                                                                 llfio::file_handle::flag::none}()
+                           .value();  // NOLINT
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
@@ -261,6 +273,128 @@ template <class FileHandleType, class DirectoryHandleType> static inline void Te
   h2.unlink().value();
 }
 
-KERNELTEST_TEST_KERNEL(integration, llfio, current_path, handle, "Tests that llfio::handle::current_path() works as expected", TestHandleCurrentPath<LLFIO_V2_NAMESPACE::file_handle, LLFIO_V2_NAMESPACE::directory_handle>())
-KERNELTEST_TEST_KERNEL(integration, llfio, current_path, cached_parent_handle_adapter, "Tests that llfio::cached_parent_handle_adapter::current_path() works as expected",
-                       TestHandleCurrentPath<LLFIO_V2_NAMESPACE::algorithm::cached_parent_handle_adapter<LLFIO_V2_NAMESPACE::file_handle>, LLFIO_V2_NAMESPACE::algorithm::cached_parent_handle_adapter<LLFIO_V2_NAMESPACE::directory_handle>>())
+template <class FileHandleType, class DirectoryHandleType> static inline void TestToWin32Path()
+{
+  namespace llfio = LLFIO_V2_NAMESPACE;
+  {
+    std::error_code ec;
+    llfio::filesystem::current_path(llfio::filesystem::temp_directory_path());
+    llfio::filesystem::remove_all("tempfile", ec);
+    llfio::filesystem::remove_all("tempfile2", ec);
+    llfio::filesystem::remove_all("tempfile3", ec);
+    llfio::filesystem::remove_all("tempfile4", ec);
+    llfio::filesystem::remove_all("tempdir", ec);
+    llfio::filesystem::remove_all("tempdir2", ec);
+    llfio::filesystem::remove_all("tempdir3", ec);
+  }  // namespace ;
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-braces"
+#endif
+  llfio::path_handle null_path_handle;
+  FileHandleType h1 = llfio::construct<FileHandleType>{null_path_handle,
+                                                       "tempfile",
+                                                       llfio::file_handle::mode::write,
+                                                       llfio::file_handle::creation::if_needed,
+                                                       llfio::file_handle::caching::temporary,
+                                                       llfio::file_handle::flag::none}()
+                      .value();  // NOLINT
+  DirectoryHandleType h2 = llfio::construct<DirectoryHandleType>{null_path_handle,
+                                                                 "tempdir",
+                                                                 llfio::file_handle::mode::write,
+                                                                 llfio::file_handle::creation::if_needed,
+                                                                 llfio::file_handle::caching::all,
+                                                                 llfio::file_handle::flag::none}()
+                           .value();  // NOLINT
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
+  auto check = [](llfio::result<llfio::filesystem::path> res, const char *desc) -> llfio::filesystem::path {
+    BOOST_CHECK(res);
+    if(!res)
+    {
+      std::cerr << "   Getting the win32 path of a " << desc << " FAILED due to " << res.error().message().c_str() << std::endl;
+    }
+    else if(res.value().empty())
+    {
+      BOOST_CHECK(!res.value().empty());
+      std::cerr << "   Getting the win32 path of a " << desc << " FAILED due to the returned path being empty" << std::endl;
+    }
+    else
+    {
+      std::cout << "   The win32 path of a " << desc << " is " << res.value() << std::endl;
+      return std::move(res).value();
+    }
+    return {};
+  };
+  std::cout << "\nwin32_path_namespace::any:\n";
+  auto h1path_any = check(to_win32_path(h1, llfio::win32_path_namespace::any), "file");
+  auto h2path_any = check(to_win32_path(h2, llfio::win32_path_namespace::any), "directory");
+  std::cout << "\nwin32_path_namespace::device:\n";
+  auto h1path_device = check(to_win32_path(h1, llfio::win32_path_namespace::device), "file");
+  auto h2path_device = check(to_win32_path(h2, llfio::win32_path_namespace::device), "directory");
+  std::cout << "\nwin32_path_namespace::dos:\n";
+  auto h1path_dos = check(to_win32_path(h1, llfio::win32_path_namespace::dos), "file");
+  auto h2path_dos = check(to_win32_path(h2, llfio::win32_path_namespace::dos), "directory");
+  std::cout << "\nwin32_path_namespace::guid_volume:\n";
+  auto h1path_guid_volume = check(to_win32_path(h1, llfio::win32_path_namespace::guid_volume), "file");
+  auto h2path_guid_volume = check(to_win32_path(h2, llfio::win32_path_namespace::guid_volume), "directory");
+  //std::cout << "\nwin32_path_namespace::guid_all:\n";
+  //auto h1path_guid_all = check(to_win32_path(h1, llfio::win32_path_namespace::guid_all), "file");
+  //auto h2path_guid_all = check(to_win32_path(h2, llfio::win32_path_namespace::guid_all), "directory");
+
+  for(auto &path : {
+      h1path_any,
+      h1path_device,
+      h1path_dos,
+      h1path_guid_volume,
+      //h1path_guid_all,
+      })
+  {
+    if(!path.empty())
+    {
+      std::cout << "\nChecking file " << path << " can be opened ...";
+      auto res = llfio::file_handle::file({}, path);
+      BOOST_CHECK(res);
+      if(res)
+      {
+        BOOST_CHECK(res.value().st_dev() == h1.st_dev());
+        BOOST_CHECK(res.value().st_ino() == h1.st_ino());
+      }
+    }
+  }
+  std::cout << "\n";
+  for(auto &path : {
+      h2path_any,
+      h2path_device,
+      h2path_dos,
+      h2path_guid_volume,
+      //h2path_guid_all,
+      })
+  {
+    if(!path.empty())
+    {
+      std::cout << "\nChecking directory " << path << " can be opened ...";
+      auto res = llfio::directory_handle::directory({}, path);
+      BOOST_CHECK(res);
+      if(res)
+      {
+        BOOST_CHECK(res.value().st_dev() == h2.st_dev());
+        BOOST_CHECK(res.value().st_ino() == h2.st_ino());
+      }
+    }
+  }
+  std::cout << std::endl;
+  h1.unlink().value();
+  h2.unlink().value();
+}
+
+KERNELTEST_TEST_KERNEL(integration, llfio, current_path, handle, "Tests that llfio::handle::current_path() works as expected",
+                       TestHandleCurrentPath<LLFIO_V2_NAMESPACE::file_handle, LLFIO_V2_NAMESPACE::directory_handle>())
+KERNELTEST_TEST_KERNEL(integration, llfio, current_path, cached_parent_handle_adapter,
+                       "Tests that llfio::cached_parent_handle_adapter::current_path() works as expected",
+                       TestHandleCurrentPath<LLFIO_V2_NAMESPACE::algorithm::cached_parent_handle_adapter<LLFIO_V2_NAMESPACE::file_handle>,
+                                             LLFIO_V2_NAMESPACE::algorithm::cached_parent_handle_adapter<LLFIO_V2_NAMESPACE::directory_handle>>())
+KERNELTEST_TEST_KERNEL(integration, llfio, to_win32_path, handle, "Tests that llfio::to_win32_path() works as expected",
+                       TestToWin32Path<LLFIO_V2_NAMESPACE::file_handle, LLFIO_V2_NAMESPACE::directory_handle>())

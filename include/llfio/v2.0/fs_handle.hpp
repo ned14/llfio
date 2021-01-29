@@ -39,6 +39,91 @@ Distributed under the Boost Software License, Version 1.0.
 
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
+class fs_handle;
+
+//! \brief The kinds of win32 path namespace possible.
+enum class win32_path_namespace
+{
+  /*! Map the input path to a valid win32 path as fast as possible for the input.
+  This is currently `guid_volume` followed by `dos`, but may change in the future.
+  */
+  any,
+  /*! Map `\!!\Device\...` form input paths to `\\.\...` for which it is _usually_
+  the case there is a mapping, which results in a valid Win32 path, but which
+  legacy code bases may not accept. This efficiently covers the vast majority of
+  what can be returned by `handle::current_path()` on Windows, but if the input
+  path cannot be mapped, a failure is returned.
+  */
+  device,
+  /*! Map the input path to a DOS drive letter prefix, possibly with `\\?\` prefix
+  to opt out of strict DOS path parsing if the mapped DOS path is incompatible with
+  traditional DOS (e.g. it contains one of the forbidden character sequences such
+  as `CON`, or it exceeds 260 codepoints, and so on). Well written software will
+  correctly handle `\\?\` prefixes, but if the code you are handing the path to is
+  particularly legacy, you ought to ensure that the prefix is not present.
+
+  \warning There is not a one-one mapping between NT kernel paths (which is what
+  LLFIO returns from `handle::current_path()`) and DOS style paths, so what you get
+  may be surprising. It is also possible that there is no mapping at all, in which
+  case a failure is returned.
+  */
+  dos,
+  /*! Map the input path replacing the volume as a GUID, such that say an input path
+  of `C:\foo\bar` might be mapped to `\\?\Volume{9f9bd10e-9003-4da5-b146-70584e30854a}\foo\bar`.
+  This is a valid Win32 path, but legacy code bases may not accept it. This eliminates
+  problems with drive letters vanishing or being ambiguous, and unlike with `dos`,
+  there is a guaranteed one-one mapping between NT kernel paths and `guid_volume` paths.
+  The mapped path is NOT checked for equivalence to the input file.
+  */
+  guid_volume
+#if 0
+  /*! Map the input path replacing the the whole path as a GUID, such that say an input
+  path of `C:\foo\bar` might be mapped to `\\?\Volume{9f9bd10e-9003-4da5-b146-70584e30854a}\{5a13b46c-44b9-40f3-9303-23cf7d918708}`.
+  This is a valid Win32 path, but legacy code bases may not accept it. This eliminates
+  problems with long paths or if the file could be renamed concurrently. Note this may
+  cause the creation of a GUID for the file on some filesystems (NTFS). The mapped path
+  is NOT checked for equivalence to the input file.
+  */
+  guid_all
+
+/*
+- `win32_path_namespace::guid_all` does the same as `guid_volume`, but additionally
+asks Windows for the GUID for the file upon the volume, creating one if one
+doesn't exist if necessary. The path returned consists of two GUIDs, and is a
+perfectly valid Win32 path which most Win32 APIs will accept.
+*/
+#endif
+};
+
+/*! \brief Maps the current path of `h` into a form suitable for Win32 APIs.
+Passes through unmodified on POSIX, so you can use this in portable code.
+\return The mapped current path of `h`, which may have been validated to refer to
+the exact same inode via `.unique_id()` (see below).
+\param h The handle whose `.current_path()` is to be mapped into a form suitable
+for Win32 APIs.
+\param mapping Which Win32 path namespace to map onto.
+
+This implementation may need to validate that the mapping of the current path of `h`
+onto the desired Win32 path namespace does indeed refer to the same file:
+
+- `win32_path_namespace::device` transforms `\!!\Device\...` => `\\.\...` and
+ensures that the mapped file's unique id matches the original, otherwise
+returning failure.
+- `win32_path_namespace::dos` enumerates all the DOS devices on the system and
+what those map onto within the NT kernel namespace. This mapping is for
+obvious reasons quite slow.
+- `win32_path_namespace::guid_volume` simply fetches the GUID of the volume of
+the handle, and constructs a valid Win32 path from that.
+- `win32_path_namespace::any` means attempt `guid_volume` first, and if it fails
+(e.g. your file is on a network share) then it attempts `dos`. This semantic may
+change in the future, however any path emitted will always be a valid Win32 path.
+*/
+#ifdef _WIN32
+LLFIO_HEADERS_ONLY_FUNC_SPEC result<filesystem::path> to_win32_path(const fs_handle &h, win32_path_namespace mapping = win32_path_namespace::any) noexcept;
+#else
+inline result<filesystem::path> to_win32_path(const fs_handle &h, win32_path_namespace mapping = win32_path_namespace::any) noexcept;
+#endif
+
 /*! \class fs_handle
 \brief A handle to something with a device and inode number.
 
@@ -46,6 +131,12 @@ LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 */
 class LLFIO_DECL fs_handle
 {
+#ifdef _WIN32
+  friend LLFIO_HEADERS_ONLY_FUNC_SPEC result<filesystem::path> to_win32_path(const fs_handle &h, win32_path_namespace mapping) noexcept;
+#else
+  friend inline result<filesystem::path> to_win32_path(const fs_handle &h, win32_path_namespace mapping) noexcept { return h._get_handle().current_path(); }
+#endif
+
 public:
   using dev_t = uint64_t;
   using ino_t = uint64_t;
@@ -246,7 +337,8 @@ public:
 
 namespace detail
 {
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<path_handle> containing_directory(optional<std::reference_wrapper<filesystem::path>> out_filename, const handle &h, const fs_handle &fsh, deadline d) noexcept;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<path_handle> containing_directory(optional<std::reference_wrapper<filesystem::path>> out_filename, const handle &h,
+                                                                        const fs_handle &fsh, deadline d) noexcept;
 }
 
 // BEGIN make_free_functions.py
@@ -274,9 +366,11 @@ must succeed, else `errc::timed_out` will be returned.
 \mallocs Except on platforms with race free syscalls for renaming open handles (Windows), calls
 `current_path()` via `parent_path_handle()` and thus is both expensive and calls malloc many times.
 */
-inline result<void> relink(fs_handle &self, const path_handle &base, fs_handle::path_view_type path, bool atomic_replace = true, deadline d = std::chrono::seconds(30)) noexcept
+inline result<void> relink(fs_handle &self, const path_handle &base, fs_handle::path_view_type path, bool atomic_replace = true,
+                           deadline d = std::chrono::seconds(30)) noexcept
 {
-  return self.relink(std::forward<decltype(base)>(base), std::forward<decltype(path)>(path), std::forward<decltype(atomic_replace)>(atomic_replace), std::forward<decltype(d)>(d));
+  return self.relink(std::forward<decltype(base)>(base), std::forward<decltype(path)>(path), std::forward<decltype(atomic_replace)>(atomic_replace),
+                     std::forward<decltype(d)>(d));
 }
 /*! Unlinks the current path of this open handle, causing its entry to immediately disappear from the filing system.
 On Windows unless `flag::win_disable_unlink_emulation` is set, this behaviour is

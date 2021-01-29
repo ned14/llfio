@@ -391,4 +391,167 @@ result<void> fs_handle::unlink(deadline d) noexcept
   return success();
 }
 
+
+/**************************************** to_win32_path() *******************************************/
+
+LLFIO_HEADERS_ONLY_FUNC_SPEC result<filesystem::path> to_win32_path(const fs_handle &_h, win32_path_namespace mapping) noexcept
+{
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  HANDLE h = _h._get_handle().native_handle().h;
+  LLFIO_LOG_FUNCTION_CALL(&h);
+  // Most efficient, least memory copying method is direct fill of a wstring which is moved into filesystem::path
+  filesystem::path::string_type buffer;
+  buffer.resize(32769);
+  auto *_buffer = const_cast<wchar_t *>(buffer.data());
+  // Unlike h.current_path() which uses FILE_NAME_NORMALIZED, we shall use here FILE_NAME_OPENED
+  DWORD flags = FILE_NAME_OPENED;
+  switch(mapping)
+  {
+  case win32_path_namespace::device:
+    flags |= VOLUME_NAME_NT;
+    break;
+  case win32_path_namespace::dos:
+    flags |= VOLUME_NAME_DOS;
+    break;
+  case win32_path_namespace::any:          // fallthrough
+  case win32_path_namespace::guid_volume:  // fallthrough
+                                           // case win32_path_namespace::guid_all:
+    flags |= VOLUME_NAME_GUID;
+    break;
+  }
+  {
+    // Before Vista, I had to do this by hand, now I have a nice simple API. Thank you Microsoft!
+    DWORD len = GetFinalPathNameByHandleW(h, _buffer, (DWORD) buffer.size(), flags);  // NOLINT
+    if(len == 0)
+    {
+      if(win32_path_namespace::any == mapping)
+      {
+        len = GetFinalPathNameByHandleW(h, _buffer, (DWORD) buffer.size(), FILE_NAME_OPENED | VOLUME_NAME_DOS);
+        if(len == 0)
+        {
+          return win32_error();
+        }
+        mapping = win32_path_namespace::dos;
+      }
+      else
+      {
+        return win32_error();
+      }
+    }
+    if(win32_path_namespace::any == mapping)
+    {
+      mapping = win32_path_namespace::guid_volume;
+    }
+    buffer.resize(len);
+  }
+  if(win32_path_namespace::guid_volume == mapping)
+  {
+    return filesystem::path(std::move(buffer));
+  }
+#if 0
+  if(win32_path_namespace::guid_all == mapping)
+  {
+    FILE_OBJECTID_BUFFER fob;
+    DWORD out;
+    if(!DeviceIoControl(h, FSCTL_CREATE_OR_GET_OBJECT_ID, nullptr, 0, &fob, sizeof(fob), &out, nullptr))
+    {
+      return win32_error();
+    }
+    GUID *guid = (GUID *) &fob.ObjectId;
+    /* Form is `\\?\Volume{9f9bd10e-9003-4da5-b146-70584e30854a}\{5a13b46c-44b9-40f3-9303-23cf7d918708}`
+     */
+    buffer.resize(87);
+    swprintf_s(_buffer + 49, 64, L"{%08x-%04hx-%04hx-%02x%02x-%02x%02x%02x%02x%02x%02x}", guid->Data1, guid->Data2, guid->Data3, guid->Data4[0], guid->Data4[1],
+               guid->Data4[2], guid->Data4[3], guid->Data4[4], guid->Data4[5], guid->Data4[6], guid->Data4[7]);
+    return filesystem::path(std::move(buffer));
+  }
+#endif
+  if(win32_path_namespace::device == mapping)
+  {
+    /* Paths of form \Device\... => \\.\ */
+    if(0 == buffer.compare(0, 8, L"\\Device\\"))
+    {
+      buffer[1] = '\\';
+      buffer[2] = '.';
+      buffer[3] = '\\';
+      memmove(&buffer[4], &buffer[8], (buffer.size() - 8) * sizeof(wchar_t));
+      buffer.resize(buffer.size() - 4);
+    }
+    else
+    {
+      return errc::no_such_file_or_directory;
+    }
+  }
+  OUTCOME_TRY(_h._fetch_inode());
+  // Ensure the mapped path exists and is the same file as our source
+  handle checkh(native_handle_type(native_handle_type::disposition::file | native_handle_type::disposition::_child_close_executed,
+                                   CreateFileW(buffer.c_str(), SYNCHRONIZE | FILE_READ_ATTRIBUTES, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                                               nullptr, OPEN_ALWAYS, FILE_FLAG_BACKUP_SEMANTICS, nullptr)));
+  if(INVALID_HANDLE_VALUE != checkh.native_handle().h)
+  {
+    stat_t scheck;
+    OUTCOME_TRYV(scheck.fill(checkh, stat_t::want::dev | stat_t::want::ino));
+    if(_h.st_dev() == scheck.st_dev && _h.st_ino() == scheck.st_ino)
+    {
+      if(win32_path_namespace::dos == mapping)
+      {
+        // Can we remove the \\?\ prefix safely from this DOS path?
+        bool needsExtendedPrefix = (buffer.size() > 260);
+        if(!needsExtendedPrefix)
+        {
+          // Are there any illegal Win32 characters in here?
+          static constexpr char reserved_chars[] = "\"*/:<>?|";
+          for(size_t n = 7; !needsExtendedPrefix && n < buffer.size(); n++)
+          {
+            if(buffer[n] >= 1 && buffer[n] <= 31)
+            {
+              needsExtendedPrefix = true;
+              break;
+            }
+            for(size_t x = 0; x < sizeof(reserved_chars); x++)
+            {
+              if(buffer[n] == reserved_chars[x])
+              {
+                needsExtendedPrefix = true;
+                break;
+              }
+            }
+          }
+        }
+        if(!needsExtendedPrefix)
+        {
+          // Are any segments of the filename a reserved name?
+          static constexpr const wstring_view reserved_names[] = {
+          L"\\CON\\",  L"\\PRN\\",  L"\\AUX\\",  L"\\NUL\\",  L"\\COM1\\", L"\\COM2\\", L"\\COM3\\", L"\\COM4\\", L"\\COM5\\", L"\\COM6\\", L"\\COM7\\",
+          L"\\COM8\\", L"\\COM9\\", L"\\LPT1\\", L"\\LPT2\\", L"\\LPT3\\", L"\\LPT4\\", L"\\LPT5\\", L"\\LPT6\\", L"\\LPT7\\", L"\\LPT8\\", L"\\LPT9\\"};
+          wstring_view _buffer_(buffer);
+          for(auto name : reserved_names)
+          {
+            if(_buffer_.npos != _buffer_.find(name))
+            {
+              needsExtendedPrefix = true;
+              break;
+            }
+            auto idx = _buffer_.find(name.substr(0, name.size() - 1));
+            if(_buffer_.npos != idx && idx + name.size() - 1 == _buffer_.size())
+            {
+              needsExtendedPrefix = true;
+              break;
+            }
+          }
+        }
+        if(!needsExtendedPrefix)
+        {
+          // This is safe to deprefix
+          memmove(&buffer[0], &buffer[4], (buffer.size() - 4) * sizeof(wchar_t));
+          buffer.resize(buffer.size() - 4);
+        }
+      }
+      return filesystem::path(std::move(buffer));
+    }
+  }
+  return errc::no_such_file_or_directory;
+}
+
 LLFIO_V2_NAMESPACE_END
