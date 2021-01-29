@@ -1,5 +1,9 @@
 var NAVTREEINDEX11 =
 {
+"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a3e63c1cb08d63bb46ea73cbbae5adb07":[4,0,2,0,0,1,30],
+"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a3fb1e66f29e8d90eec09316946d3d4f0":[4,0,2,0,0,1,59],
+"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a3fc85e32b4db9b8d683ba47e9de4179b":[4,0,2,0,0,1,38],
+"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a3feb4c15c7805fd403138d677953b285":[4,0,2,0,0,1,26],
 "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a45eac1f6f721ee11caf82a22851d3f5e":[4,0,2,0,0,1,12],
 "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a499cc1593d16f042c2d3266b8e0c205a":[4,0,2,0,0,1,10],
 "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a4d7c7541169fc5a4daa1305bf0474a8d":[4,0,2,0,0,1,5],
@@ -245,9 +249,5 @@ var NAVTREEINDEX11 =
 "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#acd0454f68047ee21a2b850c04bf2a205":[4,0,2,28,1,1],
 "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#ad4eb0fe836f3853d4498a2e1f3f84a98":[4,0,2,28,1,15],
 "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#ad91b80c9cdb74d93aa86984f9b05a8c8":[4,0,2,28,1,20],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#addd6076ed27d82c3614930d4524935b8":[4,0,2,28,1,6],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#ae00a5e9ca83a6e6dd499e21b2de41a33":[4,0,2,28,1,21],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#af4cb1c032dcf9d7bc390e116e0d28094":[4,0,2,28,1,27],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html":[4,0,2,28,2],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#a01b43e5fc4b158b62f809eb7974bc9b6":[4,0,2,28,2,12]
+"structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#addd6076ed27d82c3614930d4524935b8":[4,0,2,28,1,6]
 };

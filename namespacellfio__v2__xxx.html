@@ -277,6 +277,13 @@ template&lt;class T &gt; </td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
+<tr class="memitem:abcb445e5dfcc0eb04ce49ac8af0bc89a"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89a">win32_path_namespace</a> { <a class="el" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aa100b8cad7cf2a56f6df78f171f97a1ec">win32_path_namespace::any</a>, 
+<a class="el" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aa913f9c49dcb544e2087cee284f4a00b7">win32_path_namespace::device</a>, 
+<a class="el" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aa0196f6c4f97df3f48d570c23e46501ae">win32_path_namespace::dos</a>, 
+<a class="el" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aac9d7bcde106cf090f174db82fd3dcba0">win32_path_namespace::guid_volume</a>
+ }<tr class="memdesc:abcb445e5dfcc0eb04ce49ac8af0bc89a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The kinds of win32 path namespace possible.  <a href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89a">More...</a><br /></td></tr>
+</td></tr>
+<tr class="separator:abcb445e5dfcc0eb04ce49ac8af0bc89a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8884e1fc12d34aeaa428539bf6298745"><td class="memItemLeft" align="right" valign="top"><a id="a8884e1fc12d34aeaa428539bf6298745"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745">io_operation_state_type</a> { <br />
 &#160;&#160;<b>unknown</b>, 
 <b>read_initialised</b>, 
@@ -345,6 +352,9 @@ result&lt; std::vector&lt; <a class="el" href="structllfio__v2__xxx_1_1file__han
 <tr class="memitem:ad0fb15649a46da0d75b5797bfda8dc2e"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle::extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#ad0fb15649a46da0d75b5797bfda8dc2e">zero</a> (<a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;self, file_handle::extent_type offset, file_handle::extent_type bytes, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="memdesc:ad0fb15649a46da0d75b5797bfda8dc2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Efficiently zero, and possibly deallocate, data on storage.  <a href="#ad0fb15649a46da0d75b5797bfda8dc2e">More...</a><br /></td></tr>
 <tr class="separator:ad0fb15649a46da0d75b5797bfda8dc2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab561e45415bf19b8cc6064b6b313d94d"><td class="memItemLeft" align="right" valign="top">result&lt; filesystem::path &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#ab561e45415bf19b8cc6064b6b313d94d">to_win32_path</a> (const <a class="el" href="classllfio__v2__xxx_1_1fs__handle.html">fs_handle</a> &amp;h, <a class="el" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89a">win32_path_namespace</a> mapping=<a class="el" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aa100b8cad7cf2a56f6df78f171f97a1ec">win32_path_namespace::any</a>) noexcept</td></tr>
+<tr class="memdesc:ab561e45415bf19b8cc6064b6b313d94d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maps the current path of <code>h</code> into a form suitable for Win32 APIs. Passes through unmodified on POSIX, so you can use this in portable code.  <a href="#ab561e45415bf19b8cc6064b6b313d94d">More...</a><br /></td></tr>
+<tr class="separator:ab561e45415bf19b8cc6064b6b313d94d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a60fa5c64c83ce05c8287c5379d082e49"><td class="memItemLeft" align="right" valign="top">result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a60fa5c64c83ce05c8287c5379d082e49">relink</a> (<a class="el" href="classllfio__v2__xxx_1_1fs__handle.html">fs_handle</a> &amp;self, const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#abcd8c8171f4e561620864295e8d5879b">fs_handle::path_view_type</a> <a class="el" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>, bool atomic_replace=true, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
 <tr class="separator:a60fa5c64c83ce05c8287c5379d082e49"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c20b46beeb225aa63ade3dc42e73362"><td class="memItemLeft" align="right" valign="top">result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a3c20b46beeb225aa63ade3dc42e73362">unlink</a> (<a class="el" href="classllfio__v2__xxx_1_1fs__handle.html">fs_handle</a> &amp;self, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
@@ -519,11 +529,6 @@ filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#adb4db47e035ae1ee5043008492e8986b">LLFIO_TEMPLATE</a> (class T) LLFIO_TREQUIRES(LLFIO_TPRED(std</td></tr>
 <tr class="memdesc:adb4db47e035ae1ee5043008492e8986b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Append a path view component to a path view component. <br /></td></tr>
 <tr class="separator:adb4db47e035ae1ee5043008492e8986b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a850b4121780e52d4547da6dcca778646"><td class="memItemLeft" align="right" valign="top">filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a850b4121780e52d4547da6dcca778646">to_win32_path</a> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> p, bool need_dos_path_form=false)</td></tr>
-<tr class="memdesc:a850b4121780e52d4547da6dcca778646"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms the input path into a form suitable for Win32 APIs. Passes through unmodified on POSIX.  <a href="#a850b4121780e52d4547da6dcca778646">More...</a><br /></td></tr>
-<tr class="separator:a850b4121780e52d4547da6dcca778646"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a25b1f6c46ff29d4aab1e59f0df2cc2eb"><td class="memItemLeft" align="right" valign="top">filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a25b1f6c46ff29d4aab1e59f0df2cc2eb">to_win32_path</a> (filesystem::path &amp;&amp;p, bool need_dos_path_form=false)</td></tr>
-<tr class="separator:a25b1f6c46ff29d4aab1e59f0df2cc2eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a94167268e0b7e7573e4599fd7872ef0f"><td class="memItemLeft" align="right" valign="top"><a id="a94167268e0b7e7573e4599fd7872ef0f"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const process_handle::flag &amp;v)</td></tr>
 <tr class="separator:a94167268e0b7e7573e4599fd7872ef0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -593,6 +598,44 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 <div class="fragment"><div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;{</div><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <a class="code" href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33ad821dbe5ef2db3d805cd0f7eea0ec33f">unlocked</a>,  <span class="comment">//!&lt; Exclude none.</span></div><div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="comment"></span>  <a class="code" href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33a9e81e7b963c71363e2fb3eefcfecfc0e">shared</a>,    <span class="comment">//!&lt; Exclude only those requesting an exclusive lock on the same inode.</span></div><div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="comment"></span>  <a class="code" href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33aa4293995cfbfa9ce60ce71ade2ff75f7">exclusive</a>  <span class="comment">//!&lt; Exclude those requesting any kind of lock on the same inode.</span></div><div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="comment"></span>};</div><div class="ttc" id="namespacellfio__v2__xxx_html_ae79486289ff1386b26d1ce60bb797d33aa4293995cfbfa9ce60ce71ade2ff75f7"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33aa4293995cfbfa9ce60ce71ade2ff75f7">llfio_v2_xxx::lock_kind::exclusive</a></div><div class="ttdoc">Exclude those requesting any kind of lock on the same inode. </div></div>
 <div class="ttc" id="namespacellfio__v2__xxx_html_ae79486289ff1386b26d1ce60bb797d33ad821dbe5ef2db3d805cd0f7eea0ec33f"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33ad821dbe5ef2db3d805cd0f7eea0ec33f">llfio_v2_xxx::lock_kind::unlocked</a></div><div class="ttdoc">Exclude none. </div></div>
 <div class="ttc" id="namespacellfio__v2__xxx_html_ae79486289ff1386b26d1ce60bb797d33a9e81e7b963c71363e2fb3eefcfecfc0e"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33a9e81e7b963c71363e2fb3eefcfecfc0e">llfio_v2_xxx::lock_kind::shared</a></div><div class="ttdoc">Exclude only those requesting an exclusive lock on the same inode. </div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="abcb445e5dfcc0eb04ce49ac8af0bc89a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abcb445e5dfcc0eb04ce49ac8af0bc89a">&#9670;&nbsp;</a></span>win32_path_namespace</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89a">llfio_v2_xxx::win32_path_namespace</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The kinds of win32 path namespace possible. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="abcb445e5dfcc0eb04ce49ac8af0bc89aa100b8cad7cf2a56f6df78f171f97a1ec"></a>any&#160;</td><td class="fielddoc"><p>Map the input path to a valid win32 path as fast as possible for the input. This is currently <code>guid_volume</code> followed by <code>dos</code>, but may change in the future. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="abcb445e5dfcc0eb04ce49ac8af0bc89aa913f9c49dcb544e2087cee284f4a00b7"></a>device&#160;</td><td class="fielddoc"><p>Map <code>\!!\Device\...</code> form input paths to <code>\\.\...</code> for which it is <em>usually</em> the case there is a mapping, which results in a valid Win32 path, but which legacy code bases may not accept. This efficiently covers the vast majority of what can be returned by <code>handle::current_path()</code> on Windows, but if the input path cannot be mapped, a failure is returned. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="abcb445e5dfcc0eb04ce49ac8af0bc89aa0196f6c4f97df3f48d570c23e46501ae"></a>dos&#160;</td><td class="fielddoc"><p>Map the input path to a DOS drive letter prefix, possibly with <code>\\?\</code> prefix to opt out of strict DOS path parsing if the mapped DOS path is incompatible with traditional DOS (e.g. it contains one of the forbidden character sequences such as <code>CON</code>, or it exceeds 260 codepoints, and so on). Well written software will correctly handle <code>\\?\</code> prefixes, but if the code you are handing the path to is particularly legacy, you ought to ensure that the prefix is not present.</p>
+<dl class="section warning"><dt>Warning</dt><dd>There is not a one-one mapping between NT kernel paths (which is what LLFIO returns from <code>handle::current_path()</code>) and DOS style paths, so what you get may be surprising. It is also possible that there is no mapping at all, in which case a failure is returned. </dd></dl>
+</td></tr>
+<tr><td class="fieldname"><a id="abcb445e5dfcc0eb04ce49ac8af0bc89aac9d7bcde106cf090f174db82fd3dcba0"></a>guid_volume&#160;</td><td class="fielddoc"><p>Map the input path replacing the volume as a GUID, such that say an input path of <code>C:\foo\bar</code> might be mapped to <code>\\?\Volume{9f9bd10e-9003-4da5-b146-70584e30854a}\foo\bar</code>. This is a valid Win32 path, but legacy code bases may not accept it. This eliminates problems with drive letters vanishing or being ambiguous, and unlike with <code>dos</code>, there is a guaranteed one-one mapping between NT kernel paths and <code>guid_volume</code> paths. The mapped path is NOT checked for equivalence to the input file. </p>
+</td></tr>
+</table>
+<div class="fragment"><div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;{<span class="comment"></span></div><div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="comment">  /*! Map the input path to a valid win32 path as fast as possible for the input.</span></div><div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="comment">  This is currently `guid_volume` followed by `dos`, but may change in the future.</span></div><div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="comment">  */</span></div><div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <a class="code" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aa100b8cad7cf2a56f6df78f171f97a1ec">any</a>,<span class="comment"></span></div><div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="comment">  /*! Map `\!!\Device\...` form input paths to `\\.\...` for which it is _usually_</span></div><div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="comment">  the case there is a mapping, which results in a valid Win32 path, but which</span></div><div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="comment">  legacy code bases may not accept. This efficiently covers the vast majority of</span></div><div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="comment">  what can be returned by `handle::current_path()` on Windows, but if the input</span></div><div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="comment">  path cannot be mapped, a failure is returned.</span></div><div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="comment">  */</span></div><div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  device,<span class="comment"></span></div><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="comment">  /*! Map the input path to a DOS drive letter prefix, possibly with `\\?\` prefix</span></div><div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="comment">  to opt out of strict DOS path parsing if the mapped DOS path is incompatible with</span></div><div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="comment">  traditional DOS (e.g. it contains one of the forbidden character sequences such</span></div><div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="comment">  as `CON`, or it exceeds 260 codepoints, and so on). Well written software will</span></div><div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="comment">  correctly handle `\\?\` prefixes, but if the code you are handing the path to is</span></div><div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="comment">  particularly legacy, you ought to ensure that the prefix is not present.</span></div><div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="comment"></span></div><div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="comment">  \warning There is not a one-one mapping between NT kernel paths (which is what</span></div><div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="comment">  LLFIO returns from `handle::current_path()`) and DOS style paths, so what you get</span></div><div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment">  may be surprising. It is also possible that there is no mapping at all, in which</span></div><div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="comment">  case a failure is returned.</span></div><div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment">  */</span></div><div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  <a class="code" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aa0196f6c4f97df3f48d570c23e46501ae">dos</a>,<span class="comment"></span></div><div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment">  /*! Map the input path replacing the volume as a GUID, such that say an input path</span></div><div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment">  of `C:\foo\bar` might be mapped to `\\?\Volume{9f9bd10e-9003-4da5-b146-70584e30854a}\foo\bar`.</span></div><div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment">  This is a valid Win32 path, but legacy code bases may not accept it. This eliminates</span></div><div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="comment">  problems with drive letters vanishing or being ambiguous, and unlike with `dos`,</span></div><div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="comment">  there is a guaranteed one-one mapping between NT kernel paths and `guid_volume` paths.</span></div><div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="comment">  The mapped path is NOT checked for equivalence to the input file.</span></div><div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="comment">  */</span></div><div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  <a class="code" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aac9d7bcde106cf090f174db82fd3dcba0">guid_volume</a></div><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="preprocessor">#if 0</span></div><div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="comment">  /*! Map the input path replacing the the whole path as a GUID, such that say an input</span></div><div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="comment">  path of `C:\foo\bar` might be mapped to `\\?\Volume{9f9bd10e-9003-4da5-b146-70584e30854a}\{5a13b46c-44b9-40f3-9303-23cf7d918708}`.</span></div><div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="comment">  This is a valid Win32 path, but legacy code bases may not accept it. This eliminates</span></div><div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="comment">  problems with long paths or if the file could be renamed concurrently. Note this may</span></div><div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="comment">  cause the creation of a GUID for the file on some filesystems (NTFS). The mapped path</span></div><div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="comment">  is NOT checked for equivalence to the input file.</span></div><div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="comment">  */</span></div><div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  guid_all</div><div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div><div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="comment">/*</span></div><div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="comment">- `win32_path_namespace::guid_all` does the same as `guid_volume`, but additionally</span></div><div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="comment">asks Windows for the GUID for the file upon the volume, creating one if one</span></div><div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="comment">doesn&#39;t exist if necessary. The path returned consists of two GUIDs, and is a</span></div><div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="comment">perfectly valid Win32 path which most Win32 APIs will accept.</span></div><div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="comment">*/</span></div><div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="preprocessor">#endif</span></div><div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;};</div><div class="ttc" id="namespacellfio__v2__xxx_html_abcb445e5dfcc0eb04ce49ac8af0bc89aa100b8cad7cf2a56f6df78f171f97a1ec"><div class="ttname"><a href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aa100b8cad7cf2a56f6df78f171f97a1ec">llfio_v2_xxx::win32_path_namespace::any</a></div></div>
+<div class="ttc" id="namespacellfio__v2__xxx_html_abcb445e5dfcc0eb04ce49ac8af0bc89aa0196f6c4f97df3f48d570c23e46501ae"><div class="ttname"><a href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aa0196f6c4f97df3f48d570c23e46501ae">llfio_v2_xxx::win32_path_namespace::dos</a></div></div>
+<div class="ttc" id="namespacellfio__v2__xxx_html_abcb445e5dfcc0eb04ce49ac8af0bc89aac9d7bcde106cf090f174db82fd3dcba0"><div class="ttname"><a href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aac9d7bcde106cf090f174db82fd3dcba0">llfio_v2_xxx::win32_path_namespace::guid_volume</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1528,7 +1571,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
   </dd>
 </dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>Except on platforms with race free syscalls for renaming open handles (Windows), calls <code>current_path()</code> via <code>parent_path_handle()</code> and thus is both expensive and calls malloc many times. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;{</div><div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.relink(std::forward&lt;decltype(base)&gt;(base), std::forward&lt;decltype(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>)&gt;(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>), std::forward&lt;decltype(atomic_replace)&gt;(atomic_replace), std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;}</div><div class="ttc" id="namespacellfio__v2__xxx_html_a49f7bb77eb38fbe1280019225b66b78b"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">llfio_v2_xxx::path</a></div><div class="ttdeci">result&lt; path_handle &gt; path(const path_handle &amp;base, path_handle::path_view_type path) noexcept</div><div class="ttdef"><b>Definition:</b> path_handle.hpp:171</div></div>
+<div class="fragment"><div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;{</div><div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.relink(std::forward&lt;decltype(base)&gt;(base), std::forward&lt;decltype(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>)&gt;(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>), std::forward&lt;decltype(atomic_replace)&gt;(atomic_replace),</div><div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;                     std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;}</div><div class="ttc" id="namespacellfio__v2__xxx_html_a49f7bb77eb38fbe1280019225b66b78b"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">llfio_v2_xxx::path</a></div><div class="ttdeci">result&lt; path_handle &gt; path(const path_handle &amp;base, path_handle::path_view_type path) noexcept</div><div class="ttdef"><b>Definition:</b> path_handle.hpp:171</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1848,8 +1891,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a850b4121780e52d4547da6dcca778646"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a850b4121780e52d4547da6dcca778646">&#9670;&nbsp;</a></span>to_win32_path() <span class="overload">[1/2]</span></h2>
+<a id="ab561e45415bf19b8cc6064b6b313d94d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab561e45415bf19b8cc6064b6b313d94d">&#9670;&nbsp;</a></span>to_win32_path()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1858,16 +1901,16 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">filesystem::path llfio_v2_xxx::to_win32_path </td>
+          <td class="memname">result&lt;filesystem::path&gt; llfio_v2_xxx::to_win32_path </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td>
-          <td class="paramname"><em>p</em>, </td>
+          <td class="paramtype">const <a class="el" href="classllfio__v2__xxx_1_1fs__handle.html">fs_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>h</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>need_dos_path_form</em> = <code>false</code>&#160;</td>
+          <td class="paramtype"><a class="el" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89a">win32_path_namespace</a>&#160;</td>
+          <td class="paramname"><em>mapping</em> = <code><a class="el" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aa100b8cad7cf2a56f6df78f171f97a1ec">win32_path_namespace::any</a></code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1877,58 +1920,28 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Transforms the input path into a form suitable for Win32 APIs. Passes through unmodified on POSIX. </p>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">If</td><td>the path cannot be turned into a valid Win32 path, an exception is thrown. </td></tr>
+<p>Maps the current path of <code>h</code> into a form suitable for Win32 APIs. Passes through unmodified on POSIX, so you can use this in portable code. </p>
+<dl class="section return"><dt>Returns</dt><dd>The mapped current path of <code>h</code>, which may have been validated to refer to the exact same inode via <code>.unique_id()</code> (see below). </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">h</td><td>The handle whose <code>.current_path()</code> is to be mapped into a form suitable for Win32 APIs. </td></tr>
+    <tr><td class="paramname">mapping</td><td>Which Win32 path namespace to map onto.</td></tr>
   </table>
   </dd>
 </dl>
-<div class="fragment"><div class="line"><a name="l02477"></a><span class="lineno"> 2477</span>&#160;{</div><div class="line"><a name="l02478"></a><span class="lineno"> 2478</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a25b1f6c46ff29d4aab1e59f0df2cc2eb">detail::to_win32_path</a>(p.path(), need_dos_path_form);</div><div class="line"><a name="l02479"></a><span class="lineno"> 2479</span>&#160;}</div><div class="ttc" id="namespacellfio__v2__xxx_html_a25b1f6c46ff29d4aab1e59f0df2cc2eb"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a25b1f6c46ff29d4aab1e59f0df2cc2eb">llfio_v2_xxx::to_win32_path</a></div><div class="ttdeci">filesystem::path to_win32_path(filesystem::path &amp;&amp;p, bool need_dos_path_form=false)</div><div class="ttdef"><b>Definition:</b> path_view.hpp:2481</div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="a25b1f6c46ff29d4aab1e59f0df2cc2eb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a25b1f6c46ff29d4aab1e59f0df2cc2eb">&#9670;&nbsp;</a></span>to_win32_path() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">filesystem::path llfio_v2_xxx::to_win32_path </td>
-          <td>(</td>
-          <td class="paramtype">filesystem::path &amp;&amp;&#160;</td>
-          <td class="paramname"><em>p</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>need_dos_path_form</em> = <code>false</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l02482"></a><span class="lineno"> 2482</span>&#160;{</div><div class="line"><a name="l02483"></a><span class="lineno"> 2483</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a25b1f6c46ff29d4aab1e59f0df2cc2eb">detail::to_win32_path</a>(std::move(p), need_dos_path_form);</div><div class="line"><a name="l02484"></a><span class="lineno"> 2484</span>&#160;}</div><div class="ttc" id="namespacellfio__v2__xxx_html_a25b1f6c46ff29d4aab1e59f0df2cc2eb"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a25b1f6c46ff29d4aab1e59f0df2cc2eb">llfio_v2_xxx::to_win32_path</a></div><div class="ttdeci">filesystem::path to_win32_path(filesystem::path &amp;&amp;p, bool need_dos_path_form=false)</div><div class="ttdef"><b>Definition:</b> path_view.hpp:2481</div></div>
-</div><!-- fragment -->
+<p>This implementation may need to validate that the mapping of the current path of <code>h</code> onto the desired Win32 path namespace does indeed refer to the same file:</p>
+<ul>
+<li><code>win32_path_namespace::device</code> transforms <code>\!!\Device\...</code> =&gt; <code>\\.\...</code> and ensures that the mapped file's unique id matches the original, otherwise returning failure.</li>
+<li><code>win32_path_namespace::dos</code> enumerates all the DOS devices on the system and what those map onto within the NT kernel namespace. This mapping is for obvious reasons quite slow.</li>
+<li><code>win32_path_namespace::guid_volume</code> simply fetches the GUID of the volume of the handle, and constructs a valid Win32 path from that.</li>
+<li><code>win32_path_namespace::any</code> means attempt <code>guid_volume</code> first, and if it fails (e.g. your file is on a network share) then it attempts <code>dos</code>. This semantic may change in the future, however any path emitted will always be a valid Win32 path. </li>
+</ul>
+<div class="fragment"><div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;{ <span class="keywordflow">return</span> h._get_handle().current_path(); }</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a16ee1bea5a5791ecde266420e00fba81"></a>
@@ -2222,7 +2235,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
   </dd>
 </dl>
 <dl class="section user"><dt>Memory Allocations</dt><dd>Except on platforms with race free syscalls for unlinking open handles (Windows), calls <code>current_path()</code> and thus is both expensive and calls malloc many times. On Windows, also calls <code>current_path()</code> if <code>flag::disable_safety_unlinks</code> is not set. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;{</div><div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.unlink(std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;}</div></div><!-- fragment -->
+<div class="fragment"><div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;{</div><div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.unlink(std::forward&lt;decltype(d)&gt;(d));</div><div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;}</div></div><!-- fragment -->
 </div>
 </div>
 <a id="a5a8908704c9988bbecc69c2359e6fd4a"></a>

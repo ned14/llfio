@@ -85,6 +85,7 @@ $(document).ready(function(){initNavTree('classllfio__v2__xxx_1_1fs__handle.html
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
+<a href="#friends">Friends</a> &#124;
 <a href="classllfio__v2__xxx_1_1fs__handle-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">llfio_v2_xxx::fs_handle Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
@@ -240,6 +241,12 @@ dev_t&#160;</td><td class="memItemRight" valign="bottom"><b>_devid</b> {0}</td><
 <tr class="memitem:a8454764db3cd47e65ec7853b9cb0b3fa"><td class="memItemLeft" align="right" valign="top"><a id="a8454764db3cd47e65ec7853b9cb0b3fa"></a>
 ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td></tr>
 <tr class="separator:a8454764db3cd47e65ec7853b9cb0b3fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:a98c35067c7ee7e6f61943cb192f006bc"><td class="memItemLeft" align="right" valign="top">result&lt; filesystem::path &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#a98c35067c7ee7e6f61943cb192f006bc">to_win32_path</a> (const <a class="el" href="classllfio__v2__xxx_1_1fs__handle.html">fs_handle</a> &amp;h, <a class="el" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89a">win32_path_namespace</a> mapping) noexcept</td></tr>
+<tr class="memdesc:a98c35067c7ee7e6f61943cb192f006bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maps the current path of <code>h</code> into a form suitable for Win32 APIs. Passes through unmodified on POSIX, so you can use this in portable code.  <a href="#a98c35067c7ee7e6f61943cb192f006bc">More...</a><br /></td></tr>
+<tr class="separator:a98c35067c7ee7e6f61943cb192f006bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A handle to something with a device and inode number. </p>
@@ -427,6 +434,60 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
 
 <p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#a002c9dab669604d58e08aa8f4dbc99c8">llfio_v2_xxx::symlink_handle</a>.</p>
 
+</div>
+</div>
+<h2 class="groupheader">Friends And Related Function Documentation</h2>
+<a id="a98c35067c7ee7e6f61943cb192f006bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a98c35067c7ee7e6f61943cb192f006bc">&#9670;&nbsp;</a></span>to_win32_path</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;filesystem::path&gt; to_win32_path </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classllfio__v2__xxx_1_1fs__handle.html">fs_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>h</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89a">win32_path_namespace</a>&#160;</td>
+          <td class="paramname"><em>mapping</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Maps the current path of <code>h</code> into a form suitable for Win32 APIs. Passes through unmodified on POSIX, so you can use this in portable code. </p>
+<dl class="section return"><dt>Returns</dt><dd>The mapped current path of <code>h</code>, which may have been validated to refer to the exact same inode via <code>.unique_id()</code> (see below). </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">h</td><td>The handle whose <code>.current_path()</code> is to be mapped into a form suitable for Win32 APIs. </td></tr>
+    <tr><td class="paramname">mapping</td><td>Which Win32 path namespace to map onto.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>This implementation may need to validate that the mapping of the current path of <code>h</code> onto the desired Win32 path namespace does indeed refer to the same file:</p>
+<ul>
+<li><code>win32_path_namespace::device</code> transforms <code>\!!\Device\...</code> =&gt; <code>\\.\...</code> and ensures that the mapped file's unique id matches the original, otherwise returning failure.</li>
+<li><code>win32_path_namespace::dos</code> enumerates all the DOS devices on the system and what those map onto within the NT kernel namespace. This mapping is for obvious reasons quite slow.</li>
+<li><code>win32_path_namespace::guid_volume</code> simply fetches the GUID of the volume of the handle, and constructs a valid Win32 path from that.</li>
+<li><code>win32_path_namespace::any</code> means attempt <code>guid_volume</code> first, and if it fails (e.g. your file is on a network share) then it attempts <code>dos</code>. This semantic may change in the future, however any path emitted will always be a valid Win32 path. </li>
+</ul>
+<div class="fragment"><div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;{ <span class="keywordflow">return</span> h._get_handle().current_path(); }</div></div><!-- fragment -->
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>

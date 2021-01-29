@@ -1,5 +1,9 @@
 var NAVTREEINDEX12 =
 {
+"structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#ae00a5e9ca83a6e6dd499e21b2de41a33":[4,0,2,28,1,21],
+"structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#af4cb1c032dcf9d7bc390e116e0d28094":[4,0,2,28,1,27],
+"structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html":[4,0,2,28,2],
+"structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#a01b43e5fc4b158b62f809eb7974bc9b6":[4,0,2,28,2,12],
 "structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#a040be822742b91e92faf58626d9f315b":[4,0,2,28,2,30],
 "structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#a0e7578c0eb50a0758a51d6eeb5855d56":[4,0,2,28,2,27],
 "structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state.html#a14859e2590300a009a7edddb82d6f035":[4,0,2,28,2,11],
@@ -245,9 +249,5 @@ var NAVTREEINDEX12 =
 "structllfio__v2__xxx_1_1stat__t.html#a6cd05a47e04d120baa71d8898c345b29":[4,0,2,43,12],
 "structllfio__v2__xxx_1_1stat__t.html#a7175e9ba3f0dae6ae87fb3001ca47e61":[4,0,2,43,10],
 "structllfio__v2__xxx_1_1stat__t.html#a7c281295d6ae22631336206446f37581":[4,0,2,43,5],
-"structllfio__v2__xxx_1_1stat__t.html#a83827c7cbf9ebc2b5c965e509ed1748b":[4,0,2,43,18],
-"structllfio__v2__xxx_1_1stat__t.html#a8fc0ebfd31e3e3c5fe561f61fb86a6b7":[4,0,2,43,6],
-"structllfio__v2__xxx_1_1stat__t.html#aa08a4b9530403b4689498706b0738db4":[4,0,2,43,1],
-"structllfio__v2__xxx_1_1stat__t.html#aad72b484858508a738a8ef478fbfd26f":[4,0,2,43,22],
-"structllfio__v2__xxx_1_1stat__t.html#abbe9fc921f2cbb96d68da4e0b208597a":[4,0,2,43,25]
+"structllfio__v2__xxx_1_1stat__t.html#a83827c7cbf9ebc2b5c965e509ed1748b":[4,0,2,43,18]
 };

@@ -6,6 +6,7 @@ var searchData=
   ['wait_5fview_5fonly',['wait_view_only',['../classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26aaa8388b23ccb35c9893a9d44e1d2f54c',1,'llfio_v2_xxx::io_multiplexer']]],
   ['wake_5fcheck_5ffor_5fany_5fcompleted_5fio',['wake_check_for_any_completed_io',['../classllfio__v2__xxx_1_1io__multiplexer.html#a68df23fe7e7b730bed40614e7cfd48b5',1,'llfio_v2_xxx::io_multiplexer']]],
   ['want',['want',['../structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#a0a99a9a1846577f6925479671480bd28',1,'llfio_v2_xxx::algorithm::traversal_summary']]],
+  ['win32_5fpath_5fnamespace',['win32_path_namespace',['../namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89a',1,'llfio_v2_xxx']]],
   ['win_5fjunction',['win_junction',['../classllfio__v2__xxx_1_1symlink__handle.html#a1908a242ca435cf1386fe96a86da4002ae295d0310a8145d4037bb19c69aa7a1a',1,'llfio_v2_xxx::symlink_handle']]],
   ['win_5fwsl',['win_wsl',['../classllfio__v2__xxx_1_1symlink__handle.html#a1908a242ca435cf1386fe96a86da4002a47a6c07b9ccfe0e2eb31469b3e3b1939',1,'llfio_v2_xxx::symlink_handle']]],
   ['without_5ftrailing_5fseparator',['without_trailing_separator',['../classllfio__v2__xxx_1_1path__view.html#a3ad9b291bcdb45528f2cedcabd5ed998',1,'llfio_v2_xxx::path_view']]],

@@ -32,6 +32,7 @@ var classllfio__v2__xxx_1_1fs__handle =
     [ "try_unlink_until", "classllfio__v2__xxx_1_1fs__handle.html#ae9c4133fef23811abcb01e1faf2b19d3", null ],
     [ "unique_id", "classllfio__v2__xxx_1_1fs__handle.html#a9793fe40564fda2437783488bd51b9f1", null ],
     [ "unlink", "classllfio__v2__xxx_1_1fs__handle.html#a1dd7923bb65456af4da41ebe7cb84982", null ],
+    [ "to_win32_path", "classllfio__v2__xxx_1_1fs__handle.html#a98c35067c7ee7e6f61943cb192f006bc", null ],
     [ "_devid", "classllfio__v2__xxx_1_1fs__handle.html#a4d20a64cf182162a49962ed25d2126b3", null ],
     [ "_inode", "classllfio__v2__xxx_1_1fs__handle.html#a8454764db3cd47e65ec7853b9cb0b3fa", null ]
 ];

@@ -11,6 +11,7 @@ var searchData=
   ['default_5fvalue',['default_value',['../namespacellfio__v2__xxx_1_1storage__profile.html#aac385da4b780e8a6a87444fe3579578c',1,'llfio_v2_xxx::storage_profile']]],
   ['dependencies',['dependencies',['../classkvstore__v1__xxx_1_1basic__key__value__store_1_1transaction.html#a844ec2c3ede9688a0ae1be106ef92df8',1,'kvstore_v1_xxx::basic_key_value_store::transaction']]],
   ['description',['description',['../structllfio__v2__xxx_1_1storage__profile_1_1item__base.html#a8f9536ff1752dee8f073e3dafac18fe0',1,'llfio_v2_xxx::storage_profile::item_base']]],
+  ['device',['device',['../namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aa913f9c49dcb544e2087cee284f4a00b7',1,'llfio_v2_xxx']]],
   ['devs',['devs',['../structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#a87a9c093f4545e1e3a9aa056f7e888c7',1,'llfio_v2_xxx::algorithm::traversal_summary']]],
   ['difference_5fitem',['difference_item',['../structllfio__v2__xxx_1_1algorithm_1_1difference__item.html',1,'llfio_v2_xxx::algorithm']]],
   ['difference_5ftype',['difference_type',['../classllfio__v2__xxx_1_1mapped.html#a1e8b86dd97d7d2e01436407160495e11',1,'llfio_v2_xxx::mapped::difference_type()'],['../classllfio__v2__xxx_1_1path__view.html#ad4e14fc71abee0765b06af857bd6a025',1,'llfio_v2_xxx::path_view::difference_type()'],['../classllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__iterator.html#aa8d8f5c1656378091389ac0a7abc6c68',1,'llfio_v2_xxx::algorithm::impl::trivial_vector_iterator::difference_type()'],['../structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#ac4987a3f30cfd57fa669e66998b7e0c8',1,'llfio_v2_xxx::algorithm::impl::trivial_vector_impl::difference_type()'],['../structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a2d09a83a6f59afb7d1f0f06ebc79e7bf',1,'llfio_v2_xxx::algorithm::impl::trivial_vector_impl&lt; true, T &gt;::difference_type()']]],
@@ -33,5 +34,6 @@ var searchData=
   ['do_5fio_5fhandle_5fregister',['do_io_handle_register',['../classllfio__v2__xxx_1_1io__multiplexer.html#a04d99f9603d31c674aaf865d58abc4d6',1,'llfio_v2_xxx::io_multiplexer']]],
   ['do_5fnot_5fstore',['do_not_store',['../classllfio__v2__xxx_1_1map__handle.html#a3efb39f1b54a7c156a3e0ee2a953712d',1,'llfio_v2_xxx::map_handle']]],
   ['done',['done',['../structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a642a415d3444c11886c3bace729b917b',1,'llfio_v2_xxx::directory_handle::buffers_type']]],
+  ['dos',['dos',['../namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aa0196f6c4f97df3f48d570c23e46501ae',1,'llfio_v2_xxx']]],
   ['drop_5ffilesystem_5fcache',['drop_filesystem_cache',['../namespacellfio__v2__xxx_1_1utils.html#abacefaf60ae391226c4775cf8a61276a',1,'llfio_v2_xxx::utils']]]
 ];

@@ -83,6 +83,7 @@ $(document).ready(function(){initNavTree('fs__handle_8hpp.html','');});
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">fs_handle.hpp File Reference</div>  </div>
@@ -107,8 +108,21 @@ Namespaces</h2></td></tr>
 <tr class="memdesc:namespacellfio__v2__xxx"><td class="mdescLeft">&#160;</td><td class="mdescRight">The LLFIO namespace. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:abcb445e5dfcc0eb04ce49ac8af0bc89a"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89a">llfio_v2_xxx::win32_path_namespace</a> { <a class="el" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aa100b8cad7cf2a56f6df78f171f97a1ec">llfio_v2_xxx::win32_path_namespace::any</a>, 
+<a class="el" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aa913f9c49dcb544e2087cee284f4a00b7">llfio_v2_xxx::win32_path_namespace::device</a>, 
+<a class="el" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aa0196f6c4f97df3f48d570c23e46501ae">llfio_v2_xxx::win32_path_namespace::dos</a>, 
+<a class="el" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aac9d7bcde106cf090f174db82fd3dcba0">llfio_v2_xxx::win32_path_namespace::guid_volume</a>
+ }<tr class="memdesc:abcb445e5dfcc0eb04ce49ac8af0bc89a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The kinds of win32 path namespace possible.  <a href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89a">More...</a><br /></td></tr>
+</td></tr>
+<tr class="separator:abcb445e5dfcc0eb04ce49ac8af0bc89a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:ab561e45415bf19b8cc6064b6b313d94d"><td class="memItemLeft" align="right" valign="top">result&lt; filesystem::path &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#ab561e45415bf19b8cc6064b6b313d94d">llfio_v2_xxx::to_win32_path</a> (const fs_handle &amp;h, win32_path_namespace mapping=win32_path_namespace::any) noexcept</td></tr>
+<tr class="memdesc:ab561e45415bf19b8cc6064b6b313d94d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maps the current path of <code>h</code> into a form suitable for Win32 APIs. Passes through unmodified on POSIX, so you can use this in portable code.  <a href="namespacellfio__v2__xxx.html#ab561e45415bf19b8cc6064b6b313d94d">More...</a><br /></td></tr>
+<tr class="separator:ab561e45415bf19b8cc6064b6b313d94d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f5764bb77ec58ac60c6b92958a16043"><td class="memItemLeft" align="right" valign="top"><a id="a1f5764bb77ec58ac60c6b92958a16043"></a>
 result&lt; path_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::detail::containing_directory</b> (optional&lt; std::reference_wrapper&lt; filesystem::path &gt;&gt; out_filename, const handle &amp;h, const fs_handle &amp;fsh, deadline d) noexcept</td></tr>
 <tr class="separator:a1f5764bb77ec58ac60c6b92958a16043"><td class="memSeparator" colspan="2">&#160;</td></tr>
