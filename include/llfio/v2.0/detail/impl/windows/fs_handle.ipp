@@ -522,7 +522,11 @@ LLFIO_HEADERS_ONLY_FUNC_SPEC result<filesystem::path> to_win32_path(const fs_han
         if(!needsExtendedPrefix)
         {
           // Are any segments of the filename a reserved name?
-          static constexpr const wstring_view reserved_names[] = {
+          static
+#if(_HAS_CXX17 || __cplusplus >= 201700) && (!defined(__GLIBCXX__) || __GLIBCXX__ > 20170519)  // libstdc++'s string_view is missing constexpr
+          constexpr
+#endif
+          const wstring_view reserved_names[] = {
           L"\\CON\\",  L"\\PRN\\",  L"\\AUX\\",  L"\\NUL\\",  L"\\COM1\\", L"\\COM2\\", L"\\COM3\\", L"\\COM4\\", L"\\COM5\\", L"\\COM6\\", L"\\COM7\\",
           L"\\COM8\\", L"\\COM9\\", L"\\LPT1\\", L"\\LPT2\\", L"\\LPT3\\", L"\\LPT4\\", L"\\LPT5\\", L"\\LPT6\\", L"\\LPT7\\", L"\\LPT8\\", L"\\LPT9\\"};
           wstring_view _buffer_(buffer);
