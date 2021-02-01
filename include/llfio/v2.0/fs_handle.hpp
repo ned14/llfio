@@ -134,7 +134,7 @@ class LLFIO_DECL fs_handle
 #ifdef _WIN32
   friend LLFIO_HEADERS_ONLY_FUNC_SPEC result<filesystem::path> to_win32_path(const fs_handle &h, win32_path_namespace mapping) noexcept;
 #else
-  friend inline result<filesystem::path> to_win32_path(const fs_handle &h, win32_path_namespace mapping) noexcept { return h._get_handle().current_path(); }
+  friend inline result<filesystem::path> to_win32_path(const fs_handle &h, win32_path_namespace /*unused*/) noexcept { return h._get_handle().current_path(); }
 #endif
 
 public:
