@@ -568,7 +568,18 @@ namespace detail
 #pragma warning(push)
 #pragma warning(disable : 4996)  // the function may be unsafe
 #endif
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
+          // The type in TLS is char paths[190][16]{};
+          // If I index that by paths[x], I get back a type of char(&)[190].
+          // See https://godbolt.org/z/d69xzd for proof.
+          // So I don't know why there is a warning here about overflowing a buffer of 16!
           strncpy(tls.next(dest._tls_path_id1), QUICKCPPLIB_NAMESPACE::ringbuffer_log::last190(currentpath), 190);
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
