@@ -455,7 +455,7 @@ static inline result<void> win32_maps_apply(byte *addr, size_t bytes, win32_map_
       /* mbi.RegionSize will be that from mbi.BaseAddress to end of a reserved region,
       so clamp to region size originally requested.
       */
-      OUTCOME_TRY(f(reinterpret_cast<byte *>(mbi.BaseAddress), std::min(mbi.RegionSize, bytes)));
+      OUTCOME_TRY(f(reinterpret_cast<byte *>(mbi.BaseAddress), std::min((size_t) mbi.RegionSize, bytes)));
     }
     addr += mbi.RegionSize;
     if(mbi.RegionSize < bytes)
@@ -597,13 +597,13 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_barrier(ma
   // If nvram and not syncing metadata, use lightweight barrier
   if(kind <= barrier_kind::wait_data_only && is_nvram())
   {
-    auto synced = nvram_barrier({addr, bytes});
+    auto synced = nvram_barrier({addr, (size_type) bytes});
     if(synced.size() >= bytes)
     {
       return {reqs.buffers};
     }
   }
-  OUTCOME_TRYV(win32_maps_apply(addr, bytes, win32_map_sought::committed, [](byte *addr, size_t bytes) -> result<void> {
+  OUTCOME_TRYV(win32_maps_apply(addr, (size_type) bytes, win32_map_sought::committed, [](byte *addr, size_t bytes) -> result<void> {
     if(FlushViewOfFile(addr, static_cast<SIZE_T>(bytes)) == 0)
     {
       return win32_error();
@@ -684,7 +684,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   ret.value()._addr = static_cast<byte *>(addr);
   ret.value()._offset = offset;
   ret.value()._reservation = _bytes;
-  ret.value()._length = section.length().value() - offset;
+  ret.value()._length = (size_type) (section.length().value() - offset);
   ret.value()._pagesize = pagesize;
   // Make my handle borrow the native handle of my backing storage
   ret.value()._v.h = section.backing_native_handle().h;
@@ -754,7 +754,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool /* un
     // If newsize isn't exactly a previous extension, this will fail, same as for the VirtualAlloc case
     OUTCOME_TRY(win32_release_file_allocations(_addr + newsize, _reservation - newsize));
     _reservation = newsize;
-    _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
+    _length = (size_type)((length - _offset < newsize) ? (length - _offset) : newsize);  // length of backing, not reservation
     return _reservation;
   }
   // Try to map an additional part of the section directly after this map
@@ -772,7 +772,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool /* un
     return ntkernel_error(ntstat);
   }
   _reservation += _bytes;
-  _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
+  _length = (size_type)((length - _offset < newsize) ? (length - _offset) : newsize);  // length of backing, not reservation
   return _reservation;
 }
 

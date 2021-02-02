@@ -123,10 +123,10 @@ fast_random_file_handle::io_result<fast_random_file_handle::buffers_type> fast_r
         }
         if(p == &blk)
         {
-          memcpy(buffer.data() + i, ((const char *) p) + thisblockoffset, thisblocklen);
+          memcpy(buffer.data() + i, ((const char *) p) + thisblockoffset, (size_type) thisblocklen);
         }
         reqs.offset += thisblocklen;
-        i += thisblocklen;
+        i += (size_type) thisblocklen;
         togo -= thisblocklen;
         if(togo == 0)
         {
