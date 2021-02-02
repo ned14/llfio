@@ -24,37 +24,34 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <llfio.hpp>
 
-#include <vector>
+#include <iostream>
 
 int main()
 {
-  //! [file_entire_file1]
   namespace llfio = LLFIO_V2_NAMESPACE;
 
-  // Open the file for read
-  llfio::file_handle fh = llfio::file(  //
-    {},       // path_handle to base directory
-    "foo"     // path_view to path fragment relative to base directory
-              // default mode is read only
-              // default creation is open existing
-              // default caching is all
-              // default flags is none
-  ).value();  // If failed, throw a filesystem_error exception
-
-  // Make a vector sized the current maximum extent of the file
-  std::vector<llfio::byte> buffer(fh.maximum_extent().value());
-
-  // Synchronous scatter read from file
-  llfio::file_handle::size_type bytesread = llfio::read(
-    fh,                                 // handle to read from
-    0,                                  // offset
-    {{ buffer.data(), buffer.size() }}  // Single scatter buffer of the vector 
-                                        // default deadline is infinite
-  ).value();                            // If failed, throw a filesystem_error exception
-
-  // In case of racy truncation of file by third party to new length, adjust buffer to
-  // bytes actually read
-  buffer.resize(bytesread);
-  //! [file_entire_file1]
-  return 0;
+  auto r = []() -> llfio::result<int> {
+    OUTCOME_TRY(auto fh, llfio::file_handle::temp_file());
+    static const char *buffers[] = { "He", "llo", " world" };
+    OUTCOME_TRY(fh.write(0, { { (const llfio::byte *) buffers[0], 2 }, { (const llfio::byte *) buffers[1], 3 }, { (const llfio::byte *) buffers[2], 6 } } ));
+    llfio::byte buffer[64];
+    OUTCOME_TRY(auto read, fh.read(0, { {buffer, sizeof(buffer)} }));
+    if(read != 11)
+    {
+      std::cerr << "FAILURE: Did not read 11 bytes!" << std::endl;
+      return 1;
+    }
+    if(0 != memcmp(buffer, "Hello world", 11))
+    {
+      std::cerr << "FAILURE: Did not read what was written!" << std::endl;
+      return 1;
+    }
+    return 0;
+  }();
+  if(!r)
+  {
+    std::cerr << "ERROR: " << r.error().message().c_str() << std::endl;
+    return 1;
+  }
+  return r.value();
 }
