@@ -39,7 +39,7 @@ result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type rese
   }
   if(reservation == 0)
   {
-    reservation = length;
+    reservation = (size_type) length;
   }
   if(!_sh.is_valid())
   {
@@ -66,7 +66,7 @@ result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type rese
   }
   else if(map_size > length)
   {
-    map_size = length;
+    map_size = (size_type) length;
   }
   OUTCOME_TRYV(_mh.close());
   OUTCOME_TRY(auto &&mh, map_handle::map(_sh, map_size, 0, mapflags));
@@ -117,7 +117,7 @@ result<mapped_file_handle::extent_type> mapped_file_handle::truncate(extent_type
     OUTCOME_TRY(auto &&ret, file_handle::truncate(newsize));
     if(newsize > _reservation)
     {
-      _reservation = newsize;
+      _reservation = (size_type) newsize;
     }
     // Reserve now we have resized, it'll create a new section for the new size
     OUTCOME_TRYV(reserve(_reservation));
@@ -149,13 +149,13 @@ result<mapped_file_handle::extent_type> mapped_file_handle::truncate(extent_type
     // Have we exceeded the reservation? If so, reserve a new reservation which will recreate the map.
     if(newsize > _reservation)
     {
-      OUTCOME_TRY(auto &&ret, reserve(newsize));
+      OUTCOME_TRY(auto &&ret, reserve((size_type) newsize));
       return ret;
     }
     size = newsize;
   }
   // Adjust the map to reflect the new size of the section
-  _mh._length = size;
+  _mh._length = (size_type) size;
   return newsize;
 }
 
@@ -183,13 +183,13 @@ result<mapped_file_handle::extent_type> mapped_file_handle::update_map() noexcep
   if(size >= length)
   {
     // Section is already the same size as the file, or is as big as it can go
-    _mh._length = length;
+    _mh._length = (size_type) length;
     return length;
   }
   // Nobody appears to have extended the section to match the file yet
   OUTCOME_TRYV(_sh.truncate(length));
   // Adjust the map to reflect the new size of the section
-  _mh._length = length;
+  _mh._length = (size_type) length;
   return length;
 }
 

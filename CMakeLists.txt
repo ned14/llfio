@@ -28,6 +28,8 @@ include(QuickCppLibUtils)
 include(QuickCppLibPolicies)
 
 option(LLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE "Whether to use SG14 status_code for failure handling" OFF)
+option(LLFIO_ENABLE_DEPENDENCY_SMOKE_TEST "Whether to build executables which are smoke tests that LLFIO is fully working. Used by various package managers such as vcpkg." OFF)
+set(UNIT_TESTS_CXX_VERSION "latest" CACHE STRING "The version of C++ to use in the header-only unit tests")
 
 ensure_git_subrepo("${CMAKE_CURRENT_SOURCE_DIR}/include/llfio/ntkernel-error-category/include" "https://github.com/ned14/ntkernel-error-category.git")
 
@@ -65,8 +67,6 @@ if(WIN32)
     set(PROJECT_IS_DEPENDENCY)
   endif()
 endif()
-
-set(UNIT_TESTS_CXX_VERSION "latest" CACHE STRING "The version of C++ to use in the header-only unit tests")
 
 # Make the standard static and shared libraries, and if supported by this compiler, C++ modules
 # for both static and shared libraries as well. For the non-C++ module variants, makes the
@@ -161,7 +161,13 @@ if((MSVC AND MSVC_VERSION VERSION_GREATER_EQUAL 1923) OR APPLE)
   endif()
 endif()
 # Set the library dependencies this library has
-all_link_libraries(PUBLIC quickcpplib::hl outcome::hl Threads::Threads $<$<PLATFORM_ID:Linux>:rt>)
+all_link_libraries(PUBLIC Threads::Threads $<$<PLATFORM_ID:Linux>:rt>)
+if(TARGET outcome::hl)
+  all_link_libraries(PUBLIC outcome::hl)
+endif()
+if(TARGET quickcpplib::hl)
+  all_link_libraries(PUBLIC quickcpplib::hl)
+endif()
 
 # Set the system dependencies this library has
 include(CheckCXXSourceCompiles)
@@ -388,6 +394,21 @@ if(NOT PROJECT_IS_DEPENDENCY)
       endif()
     endforeach()
   endif()
+endif()
+
+if(LLFIO_ENABLE_DEPENDENCY_SMOKE_TEST)
+  set(LLFIO_SMOKE_TESTS)
+  add_executable(llfio-dependency-smoke-test "test-packaging/example.cpp")
+  list(APPEND LLFIO_SMOKE_TESTS llfio-dependency-smoke-test)
+  foreach(target ${LLFIO_SMOKE_TESTS})
+    target_link_libraries(${target} PRIVATE llfio::dl)
+    set_target_properties(${target} PROPERTIES
+      RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    )
+    add_test(NAME ${target} CONFIGURATIONS Debug Release RelWithDebInfo MinSizeRel
+      COMMAND $<TARGET_FILE:${target}> --reporter junit --out $<TARGET_FILE:${target}>.junit.xml
+    )
+  endforeach()
 endif()
 
 # Cache this library's auto scanned sources for later reuse

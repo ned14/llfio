@@ -441,7 +441,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
       extent.length = mycurrentlength - extent.offset;
     }
     LLFIO_DEADLINE_TO_SLEEP_INIT(d);
-    const extent_type blocksize = utils::file_buffer_default_size();
+    const size_type blocksize = utils::file_buffer_default_size();
     byte *buffer = nullptr;
     auto unbufferh = make_scope_exit([&]() noexcept {
       if(buffer != nullptr)
@@ -663,7 +663,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
       for(extent_type thisoffset = 0; thisoffset < item.src.length; thisoffset += blocksize)
       {
         bool done = false;
-        const auto thisblock = std::min(blocksize, item.src.length - thisoffset);
+        const auto thisblock = std::min((extent_type) blocksize, item.src.length - thisoffset);
         if(duplicate_extents && item.op == workitem::clone_extents)
         {
           typedef struct _DUPLICATE_EXTENTS_DATA
@@ -713,7 +713,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
             buffer = utils::page_allocator<byte>().allocate(blocksize);
           }
           deadline nd;
-          buffer_type b(buffer, thisblock);
+          buffer_type b(buffer, (size_type) thisblock);
           LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
           OUTCOME_TRY(auto readed, read({{&b, 1}, item.src.offset + thisoffset}, nd));
           buffer_dirty = true;
@@ -807,10 +807,10 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
             buffer = utils::page_allocator<byte>().allocate(blocksize);
           }
           deadline nd;
-          const_buffer_type cb(buffer, thisblock);
+          const_buffer_type cb(buffer, (size_type) thisblock);
           if(buffer_dirty)
           {
-            memset(buffer, 0, thisblock);
+            memset(buffer, 0, (size_type) thisblock);
             buffer_dirty = false;
           }
           LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
