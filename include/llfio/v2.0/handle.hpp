@@ -568,7 +568,7 @@ namespace detail
 #pragma warning(push)
 #pragma warning(disable : 4996)  // the function may be unsafe
 #endif
-#ifdef __GNUC__
+#if (__GNUC__ >= 8) && !defined(__clang__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstringop-overflow"
 #endif
@@ -577,7 +577,7 @@ namespace detail
           // See https://godbolt.org/z/d69xzd for proof.
           // So I don't know why there is a warning here about overflowing a buffer of 16!
           strncpy(tls.next(dest._tls_path_id1), QUICKCPPLIB_NAMESPACE::ringbuffer_log::last190(currentpath), 190);
-#ifdef __GNUC__
+#if (__GNUC__ >= 8) && !defined(__clang__)
 #pragma GCC diagnostic pop
 #endif
 #ifdef _MSC_VER
