@@ -416,7 +416,7 @@ include(QuickCppLibCacheLibrarySources)
 
 # Make available this library for install and export
 include(QuickCppLibMakeInstall)
-if(WIN32)
+if(WIN32 AND NOT LLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE)
   set_target_properties(ntkernel-error-category_hl PROPERTIES EXPORT_NAME ntkernel-error-category_hl)
   set_target_properties(ntkernel-error-category_sl PROPERTIES EXPORT_NAME ntkernel-error-category_sl)
   set_target_properties(ntkernel-error-category_dl PROPERTIES EXPORT_NAME ntkernel-error-category_dl)
