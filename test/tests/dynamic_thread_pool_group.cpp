@@ -199,6 +199,7 @@ static inline void TestDynamicThreadPoolGroupWorks()
   reset(1);
   submit();
   check();
+  exit(0);
 
   // Test 10 work items
   reset(10);
