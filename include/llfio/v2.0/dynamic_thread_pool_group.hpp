@@ -1,5 +1,5 @@
 /* Dynamic thread pool group
-(C) 2020 Niall Douglas <http://www.nedproductions.biz/> (9 commits)
+(C) 2020-2021 Niall Douglas <http://www.nedproductions.biz/> (9 commits)
 File Created: Dec 2020
 
 
@@ -168,6 +168,7 @@ allocations.
 */
 class LLFIO_DECL dynamic_thread_pool_group
 {
+  friend class dynamic_thread_pool_group_impl;
 public:
   //! An individual item of work within the work group.
   class work_item
@@ -175,7 +176,8 @@ public:
     friend struct detail::global_dynamic_thread_pool_impl;
     friend class dynamic_thread_pool_group_impl;
     std::atomic<dynamic_thread_pool_group_impl *> _parent{nullptr};
-    void *_internalworkh{nullptr}, *_internaltimerh{nullptr};
+    void *_internalworkh{nullptr};
+    void *_internaltimerh{nullptr};  // lazily created if next() ever returns a deadline
     work_item *_prev{nullptr}, *_next{nullptr};
     intptr_t _nextwork{-1};
     std::chrono::steady_clock::time_point _timepoint1;
@@ -183,7 +185,9 @@ public:
     int _internalworkh_inuse{0};
 
   protected:
-    void *_private{nullptr};
+    constexpr bool _has_timer_set_relative() const noexcept { return _timepoint1 != std::chrono::steady_clock::time_point(); }
+    constexpr bool _has_timer_set_absolute() const noexcept { return _timepoint2 != std::chrono::system_clock::time_point(); }
+    constexpr bool _has_timer_set() const noexcept { return _has_timer_set_relative() || _has_timer_set_absolute(); }
 
     constexpr work_item() {}
     work_item(const work_item &o) = delete;
@@ -197,7 +201,6 @@ public:
         , _timepoint1(o._timepoint1)
         , _timepoint2(o._timepoint2)
         , _internalworkh_inuse(o._internalworkh_inuse)
-        , _private(o._private)
     {
       assert(o._parent.load(std::memory_order_relaxed) == nullptr);
       assert(o._internalworkh == nullptr);
@@ -210,7 +213,6 @@ public:
       o._prev = o._next = nullptr;
       o._nextwork = -1;
       o._internalworkh_inuse = 0;
-      o._private = nullptr;
     }
     work_item &operator=(const work_item &) = delete;
     work_item &operator=(work_item &&) = delete;
@@ -459,6 +461,20 @@ public:
   static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC size_t current_nesting_level() noexcept;
   //! Returns the work item the calling thread is running within, if any.
   static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC work_item *current_work_item() noexcept;
+  /*! \brief Returns the number of milliseconds that a thread is without work before it is shut down.
+  Note that this will be zero on all but on Linux if using our local thread pool
+  implementation, because the system controls this value on Windows, Grand Central
+  Dispatch etc.
+  */
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC uint32_t ms_sleep_for_more_work() noexcept;
+  /*! \brief Sets the number of milliseconds that a thread is without work before it is shut down,
+  returning the value actually set.
+
+  Note that this will have no effect (and thus return zero) on all but on Linux if
+  using our local thread pool implementation, because the system controls this value
+  on Windows, Grand Central Dispatch etc.
+  */
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC uint32_t ms_sleep_for_more_work(uint32_t v) noexcept;
 };
 //! A unique ptr to a work group within the global dynamic thread pool.
 using dynamic_thread_pool_group_ptr = std::unique_ptr<dynamic_thread_pool_group>;
