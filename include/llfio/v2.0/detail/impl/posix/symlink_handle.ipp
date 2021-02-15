@@ -322,7 +322,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
       dirhfd = base.native_handle().fd;
       dirh = const_cast<path_handle *>(&base);
 #else
-      OUTCOME_TRY(auto dh, base.clone());
+      OUTCOME_TRY(auto &&dh, base.clone());
       *dirh = path_handle(std::move(dh));
       dirhfd = dirh->native_handle().fd;
 #endif

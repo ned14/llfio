@@ -229,7 +229,7 @@ namespace algorithm
       visitor = &default_visitor;
     }
     contents_visitor::_state_type state(dirh);
-    OUTCOME_TRY(auto dirhpath, dirh.current_path());
+    OUTCOME_TRY(auto &&dirhpath, dirh.current_path());
     state.rootdirpathlen.store(dirhpath.native().size() + 1, std::memory_order_relaxed);
     OUTCOME_TRY(traverse(dirh, visitor, threads, &state, force_slow_path));
     return {std::move(state.contents)};

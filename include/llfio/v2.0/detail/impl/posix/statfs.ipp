@@ -164,7 +164,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
       */
       if(mountentries.size() > 1)
       {
-        OUTCOME_TRY(auto currentfilepath_, h.current_path());
+        OUTCOME_TRY(auto &&currentfilepath_, h.current_path());
         string_view currentfilepath(currentfilepath_.native());
         std::vector<std::pair<size_t, size_t>> scores(mountentries.size());
         //std::cout << "*** For matching mount entries to file with path " << currentfilepath << ":\n";

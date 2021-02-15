@@ -63,7 +63,7 @@ namespace algorithm
         }
       }
     }
-    OUTCOME_TRY(auto dest, file_handle::file(destdir, destleaf, file_handle::mode::write, creation, src.kernel_caching()));
+    OUTCOME_TRY(auto &&dest, file_handle::file(destdir, destleaf, file_handle::mode::write, creation, src.kernel_caching()));
     bool failed = true;
     auto undest = make_scope_exit([&]() noexcept {
       if(failed)
@@ -92,7 +92,7 @@ namespace algorithm
     {
       return errc::no_space_on_device;
     }
-    OUTCOME_TRY(auto copied, src.clone_extents_to(dest, d, force_copy_now, true));
+    OUTCOME_TRY(auto &&copied, src.clone_extents_to(dest, d, force_copy_now, true));
     failed = false;
     return copied.length;
   }

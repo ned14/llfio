@@ -31,11 +31,11 @@ int main()
   namespace llfio = LLFIO_V2_NAMESPACE;
 
   auto r = []() -> llfio::result<int> {
-    OUTCOME_TRY(auto fh, llfio::file_handle::temp_file());
+    OUTCOME_TRY(auto &&fh, llfio::file_handle::temp_file());
     static const char *buffers[] = { "He", "llo", " world" };
     OUTCOME_TRY(fh.write(0, { { (const llfio::byte *) buffers[0], 2 }, { (const llfio::byte *) buffers[1], 3 }, { (const llfio::byte *) buffers[2], 6 } } ));
     llfio::byte buffer[64];
-    OUTCOME_TRY(auto read, fh.read(0, { {buffer, sizeof(buffer)} }));
+    OUTCOME_TRY(auto &&read, fh.read(0, { {buffer, sizeof(buffer)} }));
     if(read != 11)
     {
       std::cerr << "FAILURE: Did not read 11 bytes!" << std::endl;

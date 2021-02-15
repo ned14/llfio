@@ -443,7 +443,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
     {
       return errc::bad_file_descriptor;
     }
-    OUTCOME_TRY(auto mycurrentlength, maximum_extent());
+    OUTCOME_TRY(auto &&mycurrentlength, maximum_extent());
     if(extent.offset == (extent_type) -1 && extent.length == (extent_type) -1)
     {
       extent.offset = 0;
@@ -546,7 +546,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
           return ret;
         }
         LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
-        OUTCOME_TRY(auto written_, dest_.write({{&cb, 1}, destoffset}, nd));
+        OUTCOME_TRY(auto &&written_, dest_.write({{&cb, 1}, destoffset}, nd));
         const auto written = written_.front().size();
         extent.offset += written;
         destoffset += written;
@@ -668,7 +668,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
 #endif
     // If cloning within the same file, use the appropriate direction
     auto &dest = static_cast<file_handle &>(dest_);
-    OUTCOME_TRY(auto dest_length, dest.maximum_extent());
+    OUTCOME_TRY(auto &&dest_length, dest.maximum_extent());
     if(dest.unique_id() == unique_id())
     {
       if(abs((int64_t) destoffset - (int64_t) extent.offset) < (int64_t) blocksize)
@@ -817,7 +817,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
           deadline nd;
           buffer_type b(buffer, thisblock);
           LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
-          OUTCOME_TRY(auto readed, read({{&b, 1}, item.src.offset + thisoffset}, nd));
+          OUTCOME_TRY(auto &&readed, read({{&b, 1}, item.src.offset + thisoffset}, nd));
           buffer_dirty = true;
           if(readed.front().size() != thisblock)
           {
@@ -852,7 +852,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
                 cb = {(const byte *) ds, (size_t)(zs - ds)};
                 auto localoffset = cb.data() - readed.front().data();
                 // std::cout << "*** " << (item.src.offset + thisoffset + localoffset) << " - " << cb.size() << std::endl;
-                OUTCOME_TRY(auto written, dest.write({{&cb, 1}, item.src.offset + thisoffset + localoffset + destoffsetdiff}, nd));
+                OUTCOME_TRY(auto &&written, dest.write({{&cb, 1}, item.src.offset + thisoffset + localoffset + destoffsetdiff}, nd));
                 if(written.front().size() != (size_t)(zs - ds))
                 {
                   return errc::resource_unavailable_try_again;  // something is wrong
@@ -864,7 +864,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
           else
           {
             // Straight write
-            OUTCOME_TRY(auto written, dest.write({{&cb, 1}, item.src.offset + thisoffset + destoffsetdiff}, nd));
+            OUTCOME_TRY(auto &&written, dest.write({{&cb, 1}, item.src.offset + thisoffset + destoffsetdiff}, nd));
             if(written.front().size() != thisblock)
             {
               return errc::resource_unavailable_try_again;  // something is wrong

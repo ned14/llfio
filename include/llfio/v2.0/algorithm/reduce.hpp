@@ -35,6 +35,7 @@ namespace algorithm
 {
 #ifdef _MSC_VER
 #pragma warning(push)
+#pragma warning(disable : 4251)  // dll interface
 #pragma warning(disable : 4275)  // dll interface
 #endif
   /*! \brief A visitor for the filesystem traversal and reduction algorithm.
