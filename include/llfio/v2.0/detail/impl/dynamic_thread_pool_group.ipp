@@ -1089,7 +1089,6 @@ namespace detail
             if(invoketimer)
             {
               wi->_internalworkh = self;
-              wi->_internaltimerh = nullptr;
 #if 1  // LLFIO_DYNAMIC_THREAD_POOL_GROUP_PRINTING
               std::cout << "*** DTP " << self << " executes timer item " << wi << std::endl;
 #endif
@@ -1097,7 +1096,6 @@ namespace detail
               g.unlock();
               _timerthread(wi, nullptr);
               g.lock();
-              // wi->_internalworkh should be null, however wi may also no longer exist
               goto restart;
             }
 #if 1  // LLFIO_DYNAMIC_THREAD_POOL_GROUP_PRINTING
