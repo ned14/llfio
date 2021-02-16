@@ -1,5 +1,5 @@
 /* A handle to something
-(C) 2015-2020 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
+(C) 2015-2021 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
 File Created: Dec 2015
 
 
@@ -224,25 +224,33 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::_do_barrier(io_ha
   memset(&ol, 0, sizeof(ol));
   auto *isb = &ol;
   *isb = make_iostatus();
-  ULONG flags = 0;
-  switch(kind)
+  NTSTATUS ntstat;
+  if(NtFlushBuffersFileEx != nullptr)
   {
-  case barrier_kind::nowait_view_only:
-  case barrier_kind::wait_view_only:
-  case barrier_kind::nowait_data_only:
-  case barrier_kind::wait_data_only:
-    flags = 1 /*FLUSH_FLAGS_FILE_DATA_ONLY*/;
-    break;
-  case barrier_kind::nowait_all:
-  case barrier_kind::wait_all:
-    flags = 0;
-    break;
+    ULONG flags = 0;
+    switch(kind)
+    {
+    case barrier_kind::nowait_view_only:
+    case barrier_kind::wait_view_only:
+    case barrier_kind::nowait_data_only:
+    case barrier_kind::wait_data_only:
+      flags = 1 /*FLUSH_FLAGS_FILE_DATA_ONLY*/;
+      break;
+    case barrier_kind::nowait_all:
+    case barrier_kind::wait_all:
+      flags = 0;
+      break;
+    }
+    if(((uint8_t) kind & 1) == 0)
+    {
+      flags |= 2 /*FLUSH_FLAGS_NO_SYNC*/;
+    }
+    ntstat = NtFlushBuffersFileEx(_v.h, flags, nullptr, 0, isb);
   }
-  if(((uint8_t) kind & 1) == 0)
+  else
   {
-    flags |= 2 /*FLUSH_FLAGS_NO_SYNC*/;
+    ntstat = NtFlushBuffersFile(_v.h, isb);
   }
-  NTSTATUS ntstat = NtFlushBuffersFileEx(_v.h, flags, nullptr, 0, isb);
   if(STATUS_PENDING == ntstat)
   {
     ntstat = ntwait(_v.h, ol, d);

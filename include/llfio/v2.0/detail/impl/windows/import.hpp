@@ -1,5 +1,5 @@
 /* Declarations for Microsoft Windows system APIs
-(C) 2015-2018 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
+(C) 2015-2021 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
 File Created: Dec 2015
 
 
@@ -413,6 +413,8 @@ namespace windows_nt_kernel
                                                  _In_ SECTION_INHERIT InheritDisposition, _In_ ULONG AllocationType, _In_ ULONG Win32Protect);
 
   using NtUnmapViewOfSection_t = NTSTATUS(NTAPI *)(_In_ HANDLE ProcessHandle, _In_opt_ PVOID BaseAddress);
+
+  using NtFlushBuffersFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock);
 
   using NtFlushBuffersFileEx_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _In_ ULONG Flags, _In_reads_bytes_(ParametersSize) PVOID Parameters,
                                                    _In_ ULONG ParametersSize, _Out_ PIO_STATUS_BLOCK IoStatusBlock);
@@ -949,6 +951,7 @@ namespace windows_nt_kernel
   static NtExtendSection_t NtExtendSection;
   static NtMapViewOfSection_t NtMapViewOfSection;
   static NtUnmapViewOfSection_t NtUnmapViewOfSection;
+  static NtFlushBuffersFile_t NtFlushBuffersFile;
   static NtFlushBuffersFileEx_t NtFlushBuffersFileEx;
   static NtSetSystemInformation_t NtSetSystemInformation;
   static NtAllocateVirtualMemory_t NtAllocateVirtualMemory;
@@ -1208,11 +1211,18 @@ namespace windows_nt_kernel
         abort();
       }
     }
+    if(NtFlushBuffersFile == nullptr)
+    {
+      if((NtFlushBuffersFile = reinterpret_cast<NtFlushBuffersFile_t>(GetProcAddress(ntdllh, "NtFlushBuffersFile"))) == nullptr)
+      {
+        abort();
+      }
+    }
     if(NtFlushBuffersFileEx == nullptr)
     {
       if((NtFlushBuffersFileEx = reinterpret_cast<NtFlushBuffersFileEx_t>(GetProcAddress(ntdllh, "NtFlushBuffersFileEx"))) == nullptr)
       {
-        abort();
+        // Fails on Win7
       }
     }
     if(NtSetSystemInformation == nullptr)
