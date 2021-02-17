@@ -249,7 +249,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
   }
   if(!!(wanted & want::iosinprogress) || !!(wanted & want::iosbusytime))
   {
-    OUTCOME_TRY(auto ios, _fill_ios(h, f_mntfromname));
+    OUTCOME_TRY(auto &&ios, _fill_ios(h, f_mntfromname));
     if(!!(wanted & want::iosinprogress))
     {
       f_iosinprogress = ios.first;

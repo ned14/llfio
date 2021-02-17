@@ -191,15 +191,12 @@ static inline void TestDynamicThreadPoolGroupWorks()
     }
     std::cout << "Maximum concurrency achieved with " << workitems.size() << " work items = " << shared_state.max_concurrency << "\n" << std::endl;
   };
-  auto print_exception_throw = llfio::make_scope_fail([]() noexcept {
-    std::cout << "NOTE: Exception throw occurred!" << std::endl;
-  });
+  auto print_exception_throw = llfio::make_scope_fail([]() noexcept { std::cout << "NOTE: Exception throw occurred!" << std::endl; });
 
   // Test a single work item
   reset(1);
   submit();
   check();
-  exit(0);
 
   // Test 10 work items
   reset(10);
@@ -305,7 +302,7 @@ static inline void TestDynamicThreadPoolGroupNestingWorks()
       }
       uint64_t idx = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
       std::lock_guard<std::mutex> g(shared_states[nesting].lock);
-      //std::cout << "wi " << this << " nesting " << nesting << " work " << work << std::endl;
+      // std::cout << "wi " << this << " nesting " << nesting << " work " << work << std::endl;
       if(COUNT_PER_WORK_ITEM == work && childwi)
       {
         if(!shared_states[nesting].tpg)
@@ -449,5 +446,5 @@ KERNELTEST_TEST_KERNEL(integration, llfio, dynamic_thread_pool_group, works, "Te
                        TestDynamicThreadPoolGroupWorks())
 KERNELTEST_TEST_KERNEL(integration, llfio, dynamic_thread_pool_group, nested, "Tests that nesting of llfio::dynamic_thread_pool_group works as expected",
                        TestDynamicThreadPoolGroupNestingWorks())
-//KERNELTEST_TEST_KERNEL(integration, llfio, dynamic_thread_pool_group, io_aware_work_item,
+// KERNELTEST_TEST_KERNEL(integration, llfio, dynamic_thread_pool_group, io_aware_work_item,
 //                       "Tests that llfio::dynamic_thread_pool_group::io_aware_work_item works as expected", TestDynamicThreadPoolGroupIoAwareWorks())

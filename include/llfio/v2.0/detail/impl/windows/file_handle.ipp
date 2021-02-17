@@ -884,7 +884,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<uint32_t, float>> statfs_t::_fi
   {
     alignas(8) wchar_t buffer[32769];
     // Firstly open a handle to the volume
-    OUTCOME_TRY(auto volumeh, file_handle::file({}, mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
+    OUTCOME_TRY(auto &&volumeh, file_handle::file({}, mntfromname, handle::mode::none, handle::creation::open_existing, handle::caching::only_metadata));
     // Now ask the volume what physical disks it spans
     auto *vde = reinterpret_cast<VOLUME_DISK_EXTENTS *>(buffer);
     OVERLAPPED ol{};
@@ -932,7 +932,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<uint32_t, float>> statfs_t::_fi
       }
       *e++ = '0' + (DiskNumber % 10);
       *e = 0;
-      OUTCOME_TRY(auto diskh, file_handle::file({}, path_view(physicaldrivename, e - physicaldrivename, path_view::zero_terminated), handle::mode::none,
+      OUTCOME_TRY(auto &&diskh, file_handle::file({}, path_view(physicaldrivename, e - physicaldrivename, path_view::zero_terminated), handle::mode::none,
                                                 handle::creation::open_existing, handle::caching::only_metadata));
       ol.Internal = static_cast<ULONG_PTR>(-1);
       auto *dp = reinterpret_cast<DISK_PERFORMANCE *>(buffer);
