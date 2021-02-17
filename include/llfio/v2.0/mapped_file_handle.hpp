@@ -197,6 +197,14 @@ protected:
   }
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> _do_read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override
   {
+    if(_mh.address() == nullptr)
+    {
+      OUTCOME_TRY(auto &&length, _sh.length());
+      if(length > 0)
+      {
+        return errc::not_enough_memory;  // reserve() failed probably due to VMA exhaustion
+      }
+    }
     return _mh.read(reqs, d);
   }
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override
@@ -228,6 +236,14 @@ protected:
         OUTCOME_TRY(_mh.update_map());
       }
       return reqs.buffers;
+    }
+    if(_mh.address() == nullptr)
+    {
+      OUTCOME_TRY(auto &&length, _sh.length());
+      if(length > 0)
+      {
+        return errc::not_enough_memory;  // reserve() failed probably due to VMA exhaustion
+      }
     }
     return _mh.write(reqs, d);
   }
