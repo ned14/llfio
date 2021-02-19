@@ -43,6 +43,7 @@ class io_handle;
 namespace detail
 {
   struct global_dynamic_thread_pool_impl;
+  struct global_dynamic_thread_pool_impl_workqueue_item;
   LLFIO_HEADERS_ONLY_FUNC_SPEC global_dynamic_thread_pool_impl &global_dynamic_thread_pool() noexcept;
 }  // namespace detail
 
@@ -174,11 +175,12 @@ public:
   class work_item
   {
     friend struct detail::global_dynamic_thread_pool_impl;
+    friend struct detail::global_dynamic_thread_pool_impl_workqueue_item;
     friend class dynamic_thread_pool_group_impl;
     std::atomic<dynamic_thread_pool_group_impl *> _parent{nullptr};
     void *_internalworkh{nullptr};
     void *_internaltimerh{nullptr};  // lazily created if next() ever returns a deadline
-    work_item *_prev{nullptr}, *_next{nullptr};
+    work_item *_prev{nullptr}, *_next{nullptr}, *_next_scheduled{nullptr};
     intptr_t _nextwork{-1};
     std::chrono::steady_clock::time_point _timepoint1;
     std::chrono::system_clock::time_point _timepoint2;
@@ -197,6 +199,7 @@ public:
         , _internaltimerh(o._internaltimerh)
         , _prev(o._prev)
         , _next(o._next)
+        , _next_scheduled(o._next_scheduled)
         , _nextwork(o._nextwork)
         , _timepoint1(o._timepoint1)
         , _timepoint2(o._timepoint2)
@@ -210,7 +213,7 @@ public:
         LLFIO_LOG_FATAL(this, "FATAL: dynamic_thread_pool_group::work_item was relocated in memory during use!");
         abort();
       }
-      o._prev = o._next = nullptr;
+      o._prev = o._next = o._next_scheduled = nullptr;
       o._nextwork = -1;
       o._internalworkh_inuse = 0;
     }
