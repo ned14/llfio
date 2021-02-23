@@ -1893,7 +1893,7 @@ namespace detail
       if(workitem->_timepoint1 - now > std::chrono::seconds(0))
       {
         // Timer fired short, so schedule it again
-        _submit_work_item(g, workitem, false);
+        _submit_work_item(g, true, false, workitem, false);
         return;
       }
 #endif
@@ -1906,7 +1906,7 @@ namespace detail
       if(workitem->_timepoint2 - now > std::chrono::seconds(0))
       {
         // Timer fired short, so schedule it again
-        _submit_work_item(g, workitem, false);
+        _submit_work_item(g, true, false, workitem, false);
         return;
       }
 #endif
