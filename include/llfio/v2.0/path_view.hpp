@@ -1468,7 +1468,7 @@ inline std::ostream &operator<<(std::ostream &s, const path_view_component &v)
 {
   if(v._passthrough)
   {
-    return s << '"' << QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string({v._charstr, v._length}) << '"';
+    return s << '"' << QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string(v._charstr, v._length) << '"';
   }
   v._invoke(detail::string_view_printer{s});
   return s;
