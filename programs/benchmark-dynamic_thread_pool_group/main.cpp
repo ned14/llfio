@@ -23,7 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 //! Seconds to run the benchmark
-static constexpr unsigned BENCHMARK_DURATION = 3;
+static constexpr unsigned BENCHMARK_DURATION = 5;
 //! Maximum work items to create
 static constexpr unsigned MAX_WORK_ITEMS = 1024;
 
@@ -54,6 +54,53 @@ static constexpr unsigned MAX_WORK_ITEMS = 1024;
 
 namespace llfio = LLFIO_V2_NAMESPACE;
 
+struct llfio_runner
+{
+  std::atomic<bool> cancel{false};
+  llfio::dynamic_thread_pool_group_ptr group = llfio::make_dynamic_thread_pool_group().value();
+  std::vector<llfio::dynamic_thread_pool_group::work_item *> workitems;
+
+  ~llfio_runner()
+  {
+    for(auto *p : workitems)
+    {
+      delete p;
+    }
+  }
+  template <class F> void add_workitem(F &&f)
+  {
+    struct workitem final : public llfio::dynamic_thread_pool_group::work_item
+    {
+      llfio_runner *parent;
+      F f;
+      workitem(llfio_runner *_parent, F &&_f)
+          : parent(_parent)
+          , f(std::move(_f))
+      {
+      }
+      virtual intptr_t next(llfio::deadline & /*unused*/) noexcept override { return parent->cancel.load(std::memory_order_relaxed) ? -1 : 1; }
+      virtual llfio::result<void> operator()(intptr_t /*unused*/) noexcept override
+      {
+        f();
+        return llfio::success();
+      }
+    };
+    workitems.push_back(new workitem(this, std::move(f)));
+  }
+  std::chrono::microseconds run(unsigned seconds)
+  {
+    group->submit(workitems).value();
+    auto begin = std::chrono::steady_clock::now();
+    std::this_thread::sleep_for(std::chrono::seconds(seconds));
+    cancel.store(true, std::memory_order_release);
+    group->wait().value();
+    auto end = std::chrono::steady_clock::now();
+    return std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
+  }
+};
+
+
+#if ENABLE_ASIO
 struct asio_runner
 {
   std::atomic<bool> cancel{false};
@@ -78,25 +125,29 @@ struct asio_runner
     }
   };
   template <class F> void add_workitem(F &&f) { ctx.post(C(this, std::move(f))); }
-  void run(unsigned seconds)
+  std::chrono::microseconds run(unsigned seconds)
   {
     std::vector<std::thread> threads;
     for(size_t n = 0; n < std::thread::hardware_concurrency(); n++)
     {
       threads.emplace_back([&] { ctx.run(); });
     }
+    auto begin = std::chrono::steady_clock::now();
     std::this_thread::sleep_for(std::chrono::seconds(seconds));
     cancel.store(true, std::memory_order_release);
     for(auto &i : threads)
     {
       i.join();
     }
+    auto end = std::chrono::steady_clock::now();
+    return std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
   }
 };
+#endif
 
 template <class Runner> void benchmark(const char *name)
 {
-  std::cout << "Benchmarking " << name << " ..." << std::endl;
+  std::cout << "\nBenchmarking " << name << " ..." << std::endl;
   struct shared_t
   {
     std::atomic<unsigned> concurrency{0};
@@ -146,15 +197,13 @@ template <class Runner> void benchmark(const char *name)
     {
       runner.add_workitem([&] { i(); });
     }
-    auto begin = std::chrono::steady_clock::now();
-    runner.run(BENCHMARK_DURATION);
-    auto end = std::chrono::steady_clock::now();
+    auto duration = runner.run(BENCHMARK_DURATION);
     uint64_t total = 0;
     for(auto &i : workers)
     {
       total += i.count;
     }
-    results.emplace_back(items, 1000000.0 * total / std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count(), shared.max_concurrency);
+    results.emplace_back(items, 1000000.0 * total / duration.count(), shared.max_concurrency);
     std::cout << "   For " << std::get<0>(results.back()) << " work items got " << std::get<1>(results.back()) << " SHA256 hashes/sec with "
               << std::get<2>(results.back()) << " maximum concurrency." << std::endl;
   }
@@ -169,6 +218,7 @@ template <class Runner> void benchmark(const char *name)
 
 int main(void)
 {
+  benchmark<llfio_runner>("llfio");
 #if ENABLE_ASIO
   benchmark<asio_runner>("asio");
 #endif
