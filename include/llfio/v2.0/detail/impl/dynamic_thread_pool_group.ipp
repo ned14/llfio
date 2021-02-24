@@ -64,6 +64,125 @@ Distributed under the Boost Software License, Version 1.0.
 
 #define LLFIO_DYNAMIC_THREAD_POOL_GROUP_PRINTING 0
 
+/* NOTE that the Linux results are from a VM with half the CPUs of the Windows results,
+so they are not directly comparable.
+
+Linux 4Kb and 64Kb
+
+Benchmarking asio ...
+   For 1 work items got 33635.5 SHA256 hashes/sec with 1 maximum concurrency.
+   For 2 work items got 59420.4 SHA256 hashes/sec with 2 maximum concurrency.
+   For 4 work items got 65653.8 SHA256 hashes/sec with 4 maximum concurrency.
+   For 8 work items got 42216.3 SHA256 hashes/sec with 8 maximum concurrency.
+   For 16 work items got 458911 SHA256 hashes/sec with 16 maximum concurrency.
+   For 32 work items got 578462 SHA256 hashes/sec with 27 maximum concurrency.
+   For 64 work items got 572456 SHA256 hashes/sec with 27 maximum concurrency.
+   For 128 work items got 572326 SHA256 hashes/sec with 26 maximum concurrency.
+   For 256 work items got 568558 SHA256 hashes/sec with 25 maximum concurrency.
+   For 512 work items got 570342 SHA256 hashes/sec with 26 maximum concurrency.
+   For 1024 work items got 567351 SHA256 hashes/sec with 26 maximum concurrency.
+
+Benchmarking asio ...
+   For 1 work items got 3768.07 SHA256 hashes/sec with 1 maximum concurrency.
+   For 2 work items got 7672.47 SHA256 hashes/sec with 2 maximum concurrency.
+   For 4 work items got 14169.5 SHA256 hashes/sec with 4 maximum concurrency.
+   For 8 work items got 21785.9 SHA256 hashes/sec with 8 maximum concurrency.
+   For 16 work items got 30875 SHA256 hashes/sec with 16 maximum concurrency.
+   For 32 work items got 43614.4 SHA256 hashes/sec with 32 maximum concurrency.
+   For 64 work items got 46075.4 SHA256 hashes/sec with 32 maximum concurrency.
+   For 128 work items got 47111.6 SHA256 hashes/sec with 32 maximum concurrency.
+   For 256 work items got 45926.6 SHA256 hashes/sec with 32 maximum concurrency.
+   For 512 work items got 45923.9 SHA256 hashes/sec with 32 maximum concurrency.
+   For 1024 work items got 46250.9 SHA256 hashes/sec with 32 maximum concurrency.
+
+
+Windows 4Kb and 64kB
+
+Benchmarking asio ...
+   For 1 work items got 49443.6 SHA256 hashes/sec with 1 maximum concurrency.
+   For 2 work items got 97189 SHA256 hashes/sec with 2 maximum concurrency.
+   For 4 work items got 185187 SHA256 hashes/sec with 4 maximum concurrency.
+   For 8 work items got 328105 SHA256 hashes/sec with 8 maximum concurrency.
+   For 16 work items got 513294 SHA256 hashes/sec with 16 maximum concurrency.
+   For 32 work items got 493040 SHA256 hashes/sec with 32 maximum concurrency.
+   For 64 work items got 1.00736e+06 SHA256 hashes/sec with 64 maximum concurrency.
+   For 128 work items got 996193 SHA256 hashes/sec with 64 maximum concurrency.
+   For 256 work items got 993805 SHA256 hashes/sec with 64 maximum concurrency.
+   For 512 work items got 998211 SHA256 hashes/sec with 64 maximum concurrency.
+   For 1024 work items got 990231 SHA256 hashes/sec with 64 maximum concurrency.
+
+Benchmarking asio ...
+   For 1 work items got 3797.05 SHA256 hashes/sec with 1 maximum concurrency.
+   For 2 work items got 7869.94 SHA256 hashes/sec with 2 maximum concurrency.
+   For 4 work items got 15612 SHA256 hashes/sec with 4 maximum concurrency.
+   For 8 work items got 28481.1 SHA256 hashes/sec with 8 maximum concurrency.
+   For 16 work items got 41255.2 SHA256 hashes/sec with 16 maximum concurrency.
+   For 32 work items got 66182.4 SHA256 hashes/sec with 32 maximum concurrency.
+   For 64 work items got 67230.5 SHA256 hashes/sec with 64 maximum concurrency.
+   For 128 work items got 66988.5 SHA256 hashes/sec with 64 maximum concurrency.
+   For 256 work items got 66926.1 SHA256 hashes/sec with 64 maximum concurrency.
+   For 512 work items got 66964.7 SHA256 hashes/sec with 64 maximum concurrency.
+   For 1024 work items got 66911 SHA256 hashes/sec with 64 maximum concurrency.
+*/
+
+/* Linux 4Kb and 64Kb libdispatch
+
+Benchmarking llfio (Grand Central Dispatch) ...
+   For 1 work items got 32058.2 SHA256 hashes/sec with 1 maximum concurrency.
+   For 2 work items got 26084.1 SHA256 hashes/sec with 2 maximum concurrency.
+   For 4 work items got 24906.8 SHA256 hashes/sec with 4 maximum concurrency.
+   For 8 work items got 24729.5 SHA256 hashes/sec with 8 maximum concurrency.
+   For 16 work items got 73749.1 SHA256 hashes/sec with 16 maximum concurrency.
+   For 32 work items got 526656 SHA256 hashes/sec with 21 maximum concurrency.
+   For 64 work items got 535043 SHA256 hashes/sec with 27 maximum concurrency.
+   For 128 work items got 541809 SHA256 hashes/sec with 30 maximum concurrency.
+   For 256 work items got 543568 SHA256 hashes/sec with 33 maximum concurrency.
+   For 512 work items got 545540 SHA256 hashes/sec with 37 maximum concurrency.
+   For 1024 work items got 542017 SHA256 hashes/sec with 41 maximum concurrency.
+
+Benchmarking llfio (Grand Central Dispatch) ...
+   For 1 work items got 3857.82 SHA256 hashes/sec with 1 maximum concurrency.
+   For 2 work items got 7666.2 SHA256 hashes/sec with 2 maximum concurrency.
+   For 4 work items got 14993.6 SHA256 hashes/sec with 4 maximum concurrency.
+   For 8 work items got 25160 SHA256 hashes/sec with 8 maximum concurrency.
+   For 16 work items got 39015.5 SHA256 hashes/sec with 16 maximum concurrency.
+   For 32 work items got 43494.4 SHA256 hashes/sec with 16 maximum concurrency.
+   For 64 work items got 42874.5 SHA256 hashes/sec with 16 maximum concurrency.
+   For 128 work items got 42678.7 SHA256 hashes/sec with 16 maximum concurrency.
+   For 256 work items got 42661.7 SHA256 hashes/sec with 16 maximum concurrency.
+   For 512 work items got 42670.9 SHA256 hashes/sec with 16 maximum concurrency.
+   For 1024 work items got 44609.5 SHA256 hashes/sec with 16 maximum concurrency.
+*/
+
+/* Windows 4Kb and 64Kb Win32 thread pool
+
+Benchmarking llfio (Win32 thread pool (Vista+)) ...
+   For 1 work items got 56553.8 SHA256 hashes/sec with 1 maximum concurrency.
+   For 2 work items got 110711 SHA256 hashes/sec with 2 maximum concurrency.
+   For 4 work items got 207273 SHA256 hashes/sec with 4 maximum concurrency.
+   For 8 work items got 269391 SHA256 hashes/sec with 8 maximum concurrency.
+   For 16 work items got 245053 SHA256 hashes/sec with 16 maximum concurrency.
+   For 32 work items got 260854 SHA256 hashes/sec with 21 maximum concurrency.
+   For 64 work items got 402240 SHA256 hashes/sec with 19 maximum concurrency.
+   For 128 work items got 400192 SHA256 hashes/sec with 19 maximum concurrency.
+   For 256 work items got 405973 SHA256 hashes/sec with 20 maximum concurrency.
+   For 512 work items got 406156 SHA256 hashes/sec with 22 maximum concurrency.
+   For 1024 work items got 405901 SHA256 hashes/sec with 23 maximum concurrency.
+
+Benchmarking llfio (Win32 thread pool (Vista+)) ...
+   For 1 work items got 4020.88 SHA256 hashes/sec with 1 maximum concurrency.
+   For 2 work items got 8028.79 SHA256 hashes/sec with 2 maximum concurrency.
+   For 4 work items got 15813 SHA256 hashes/sec with 4 maximum concurrency.
+   For 8 work items got 25539.4 SHA256 hashes/sec with 8 maximum concurrency.
+   For 16 work items got 40522.3 SHA256 hashes/sec with 16 maximum concurrency.
+   For 32 work items got 65182 SHA256 hashes/sec with 32 maximum concurrency.
+   For 64 work items got 65572.9 SHA256 hashes/sec with 33 maximum concurrency.
+   For 128 work items got 66462.3 SHA256 hashes/sec with 33 maximum concurrency.
+   For 256 work items got 66315.3 SHA256 hashes/sec with 33 maximum concurrency.
+   For 512 work items got 66341.5 SHA256 hashes/sec with 33 maximum concurrency.
+   For 1024 work items got 66416.2 SHA256 hashes/sec with 33 maximum concurrency.
+*/
+
 LLFIO_V2_NAMESPACE_BEGIN
 
 namespace detail
@@ -262,7 +381,7 @@ namespace detail
       thread_t *front{nullptr}, *back{nullptr};
     } threadpool_active, threadpool_sleeping;
     std::atomic<size_t> total_submitted_workitems{0}, threadpool_threads{0}, threadpool_sleeping_count{0};
-    std::atomic<uint32_t> ms_sleep_for_more_work{5000};  // TODO put back to 60000
+    std::atomic<uint32_t> ms_sleep_for_more_work{30000};  // TODO put back to 60000
 
     std::mutex threadmetrics_lock;
     struct threadmetrics_threadid
@@ -740,6 +859,7 @@ namespace detail
           threadmetrics_queue.running--;
         }
         _remove_from_list(threadmetrics_queue, *d_it);
+        delete *d_it;
         d_it = threadmetrics_sorted.erase(d_it);
       };
       auto add_item = [&] {
@@ -887,6 +1007,19 @@ namespace detail
   }
 }  // namespace detail
 
+
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC const char *dynamic_thread_pool_group::implementation_description() noexcept
+{
+#if LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD
+  return "Grand Central Dispatch";
+#elif defined(_WIN32)
+  return "Win32 thread pool (Vista+)";
+#elif defined(__linux__)
+  return "Linux native";
+#else
+#error Unknown platform
+#endif
+}
 
 class dynamic_thread_pool_group_impl final : public dynamic_thread_pool_group
 {
