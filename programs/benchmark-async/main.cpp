@@ -377,13 +377,13 @@ completion i/o min 1300 max 1.40714e+06 mean 23037 stddev 15035.4
 #include <typeinfo>
 #include <vector>
 
-#if __has_include("asio/asio/include/asio.hpp")
+#if __has_include("../asio/asio/include/asio.hpp")
 #define ENABLE_ASIO 1
 #if defined(__clang__) && defined(_MSC_VER)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmicrosoft-include"
 #endif
-#include "asio/asio/include/asio.hpp"
+#include "../asio/asio/include/asio.hpp"
 #if defined(__clang__) && defined(_MSC_VER)
 #pragma clang diagnostic pop
 #endif
