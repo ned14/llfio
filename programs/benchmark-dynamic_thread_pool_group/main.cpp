@@ -26,6 +26,8 @@ Distributed under the Boost Software License, Version 1.0.
 static constexpr unsigned BENCHMARK_DURATION = 10;
 //! Maximum work items to create
 static constexpr unsigned MAX_WORK_ITEMS = 1024;
+// Size of buffer to SHA256
+static constexpr unsigned SHA256_BUFFER_SIZE = 4096;
 
 #include "../../include/llfio/llfio.hpp"
 
@@ -156,7 +158,7 @@ template <class Runner> void benchmark(const char *name)
   struct worker
   {
     shared_t *shared;
-    char buffer[65536];
+    char buffer[SHA256_BUFFER_SIZE];
     QUICKCPPLIB_NAMESPACE::algorithm::hash::sha256_hash::result_type hash;
     uint64_t count{0};
 
