@@ -402,6 +402,20 @@ public:
 
   virtual ~dynamic_thread_pool_group() {}
 
+  /*! \brief A textual description of the underlying implementation of
+  this dynamic thread pool group.
+
+  The current possible underlying implementations are:
+
+  - "Grand Central Dispatch" (Mac OS, FreeBSD, Linux)
+  - "Linux native" (Linux)
+  - "Win32 thread pool (Vista+)" (Windows)
+
+  Which one is chosen depends on what was detected at cmake configure time,
+  and possibly what the host OS running the program binary supports.
+  */
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC const char *implementation_description() noexcept;
+
   /*! \brief Threadsafe. Submit one or more work items for execution. Note that you can submit more later.
 
   Note that if the group is currently stopping, you cannot submit more

@@ -23,7 +23,7 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 //! Seconds to run the benchmark
-static constexpr unsigned BENCHMARK_DURATION = 5;
+static constexpr unsigned BENCHMARK_DURATION = 10;
 //! Maximum work items to create
 static constexpr unsigned MAX_WORK_ITEMS = 1024;
 
@@ -124,11 +124,11 @@ struct asio_runner
       }
     }
   };
-  template <class F> void add_workitem(F &&f) { ctx.post(C(this, std::move(f))); }
+  template <class F> void add_workitem(F &&f) { ctx.post(C<F>(this, std::move(f))); }
   std::chrono::microseconds run(unsigned seconds)
   {
     std::vector<std::thread> threads;
-    for(size_t n = 0; n < std::thread::hardware_concurrency(); n++)
+    for(size_t n = 0; n < std::thread::hardware_concurrency() * 2; n++)
     {
       threads.emplace_back([&] { ctx.run(); });
     }
@@ -156,7 +156,7 @@ template <class Runner> void benchmark(const char *name)
   struct worker
   {
     shared_t *shared;
-    char buffer[4096];
+    char buffer[65536];
     QUICKCPPLIB_NAMESPACE::algorithm::hash::sha256_hash::result_type hash;
     uint64_t count{0};
 
@@ -218,10 +218,13 @@ template <class Runner> void benchmark(const char *name)
 
 int main(void)
 {
-  benchmark<llfio_runner>("llfio");
+  std::string llfio_name("llfio (");
+  llfio_name.append(llfio::dynamic_thread_pool_group::implementation_description());
+  llfio_name.push_back(')');
+  benchmark<llfio_runner>(llfio_name.c_str());
+
 #if ENABLE_ASIO
   benchmark<asio_runner>("asio");
 #endif
-
   return 0;
 }
