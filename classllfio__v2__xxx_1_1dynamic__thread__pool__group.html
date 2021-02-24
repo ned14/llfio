@@ -129,6 +129,9 @@ virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom">
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
+<tr class="memitem:ab9e2295ae9773e218e21cd2cd28355bf"><td class="memItemLeft" align="right" valign="top">static const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#ab9e2295ae9773e218e21cd2cd28355bf">implementation_description</a> () noexcept</td></tr>
+<tr class="memdesc:ab9e2295ae9773e218e21cd2cd28355bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">A textual description of the underlying implementation of this dynamic thread pool group.  <a href="#ab9e2295ae9773e218e21cd2cd28355bf">More...</a><br /></td></tr>
+<tr class="separator:ab9e2295ae9773e218e21cd2cd28355bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c4fac496df18522877ed70f86613212"><td class="memItemLeft" align="right" valign="top"><a id="a3c4fac496df18522877ed70f86613212"></a>
 static size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#a3c4fac496df18522877ed70f86613212">current_nesting_level</a> () noexcept</td></tr>
 <tr class="memdesc:a3c4fac496df18522877ed70f86613212"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the work item nesting level which would be used if a new dynamic thread pool group were created within the current work item. <br /></td></tr>
@@ -174,6 +177,40 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>dynamic_thread_pool_
 <p>If libdispatch is not found, we have a custom Linux only userspace implementation. A a similar strategy to Microsoft Windows' approach is used. We dynamically increase the number of kernel threads until none are sleeping awaiting i/o. If more kernel threads are running than 1.5x the number of CPUs in the system, the number of kernel threads is dynamically reduced. For portability, we also gate the maximum number of kernel threads to 500, except where threads have been detected as being in prolonged wait states. Note that <b>all</b> the kernel threads for the current process are considered, not just the kernel threads created by this thread pool implementation. Therefore, if you have alternative thread pool implementations (e.g. OpenMP, <code>std::async</code>), those are also included in the dynamic adjustment.</p>
 <p>As this is wholly implemented by this library, dynamic memory allocation occurs in the initial <code>make_dynamic_thread_pool_group()</code> and per thread creation, but otherwise the implementation does not perform dynamic memory allocations. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="ab9e2295ae9773e218e21cd2cd28355bf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9e2295ae9773e218e21cd2cd28355bf">&#9670;&nbsp;</a></span>implementation_description()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static const char* llfio_v2_xxx::dynamic_thread_pool_group::implementation_description </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>A textual description of the underlying implementation of this dynamic thread pool group. </p>
+<p>The current possible underlying implementations are:</p>
+<ul>
+<li>"Grand Central Dispatch" (Mac OS, FreeBSD, Linux)</li>
+<li>"Linux native" (Linux)</li>
+<li>"Win32 thread pool (Vista+)" (Windows)</li>
+</ul>
+<p>Which one is chosen depends on what was detected at cmake configure time, and possibly what the host OS running the program binary supports. </p>
+
+</div>
+</div>
 <a id="af3df91fd2d5b6e0036267142f0c5af4a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af3df91fd2d5b6e0036267142f0c5af4a">&#9670;&nbsp;</a></span>ms_sleep_for_more_work()</h2>
 
@@ -256,7 +293,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>dynamic_thread_pool_
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#a47cfab482020b317f9a2532963650965">submit</a>(span&lt;work_item *&gt;(&amp;wi, 1)); }</div><div class="ttc" id="classllfio__v2__xxx_1_1dynamic__thread__pool__group_html_a47cfab482020b317f9a2532963650965"><div class="ttname"><a href="classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#a47cfab482020b317f9a2532963650965">llfio_v2_xxx::dynamic_thread_pool_group::submit</a></div><div class="ttdeci">virtual result&lt; void &gt; submit(span&lt; work_item *&gt; work) noexcept=0</div><div class="ttdoc">Threadsafe. Submit one or more work items for execution. Note that you can submit more later...</div></div>
+<div class="fragment"><div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#a47cfab482020b317f9a2532963650965">submit</a>(span&lt;work_item *&gt;(&amp;wi, 1)); }</div><div class="ttc" id="classllfio__v2__xxx_1_1dynamic__thread__pool__group_html_a47cfab482020b317f9a2532963650965"><div class="ttname"><a href="classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#a47cfab482020b317f9a2532963650965">llfio_v2_xxx::dynamic_thread_pool_group::submit</a></div><div class="ttdeci">virtual result&lt; void &gt; submit(span&lt; work_item *&gt; work) noexcept=0</div><div class="ttdoc">Threadsafe. Submit one or more work items for execution. Note that you can submit more later...</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -286,7 +323,7 @@ template&lt;class Rep , class Period &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;  {</div><div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;    <span class="keyword">auto</span> r = <a class="code" href="classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#a26d88fd329e5c0e04739b3214831a887">wait</a>(duration);</div><div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;    <span class="keywordflow">if</span>(!r &amp;&amp; r.error() == errc::timed_out)</div><div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;    {</div><div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div><div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;    }</div><div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;    OUTCOME_TRY(std::move(r));</div><div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div><div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1dynamic__thread__pool__group_html_a26d88fd329e5c0e04739b3214831a887"><div class="ttname"><a href="classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#a26d88fd329e5c0e04739b3214831a887">llfio_v2_xxx::dynamic_thread_pool_group::wait</a></div><div class="ttdeci">virtual result&lt; void &gt; wait(deadline d={}) const noexcept=0</div><div class="ttdoc">Threadsafe. Wait for work previously submitted to complete, returning any failures by any work item...</div></div>
+<div class="fragment"><div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;  {</div><div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;    <span class="keyword">auto</span> r = <a class="code" href="classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#a26d88fd329e5c0e04739b3214831a887">wait</a>(duration);</div><div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;    <span class="keywordflow">if</span>(!r &amp;&amp; r.error() == errc::timed_out)</div><div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;    {</div><div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div><div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;    }</div><div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;    OUTCOME_TRY(std::move(r));</div><div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div><div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1dynamic__thread__pool__group_html_a26d88fd329e5c0e04739b3214831a887"><div class="ttname"><a href="classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#a26d88fd329e5c0e04739b3214831a887">llfio_v2_xxx::dynamic_thread_pool_group::wait</a></div><div class="ttdeci">virtual result&lt; void &gt; wait(deadline d={}) const noexcept=0</div><div class="ttdoc">Threadsafe. Wait for work previously submitted to complete, returning any failures by any work item...</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -316,7 +353,7 @@ template&lt;class Clock , class Duration &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;  {</div><div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;    <span class="keyword">auto</span> r = <a class="code" href="classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#a26d88fd329e5c0e04739b3214831a887">wait</a>(timeout);</div><div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;    <span class="keywordflow">if</span>(!r &amp;&amp; r.error() == errc::timed_out)</div><div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;    {</div><div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div><div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;    }</div><div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;    OUTCOME_TRY(std::move(r));</div><div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div><div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1dynamic__thread__pool__group_html_a26d88fd329e5c0e04739b3214831a887"><div class="ttname"><a href="classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#a26d88fd329e5c0e04739b3214831a887">llfio_v2_xxx::dynamic_thread_pool_group::wait</a></div><div class="ttdeci">virtual result&lt; void &gt; wait(deadline d={}) const noexcept=0</div><div class="ttdoc">Threadsafe. Wait for work previously submitted to complete, returning any failures by any work item...</div></div>
+<div class="fragment"><div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;  {</div><div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;    <span class="keyword">auto</span> r = <a class="code" href="classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#a26d88fd329e5c0e04739b3214831a887">wait</a>(timeout);</div><div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;    <span class="keywordflow">if</span>(!r &amp;&amp; r.error() == errc::timed_out)</div><div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;    {</div><div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div><div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;    }</div><div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;    OUTCOME_TRY(std::move(r));</div><div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div><div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;  }</div><div class="ttc" id="classllfio__v2__xxx_1_1dynamic__thread__pool__group_html_a26d88fd329e5c0e04739b3214831a887"><div class="ttname"><a href="classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#a26d88fd329e5c0e04739b3214831a887">llfio_v2_xxx::dynamic_thread_pool_group::wait</a></div><div class="ttdeci">virtual result&lt; void &gt; wait(deadline d={}) const noexcept=0</div><div class="ttdoc">Threadsafe. Wait for work previously submitted to complete, returning any failures by any work item...</div></div>
 </div><!-- fragment -->
 </div>
 </div>

@@ -1,6 +1,7 @@
 var searchData=
 [
   ['if_5fneeded',['if_needed',['../classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42a8f0339e854eb5321306a443ce9199e1d',1,'llfio_v2_xxx::handle']]],
+  ['implementation_5fdescription',['implementation_description',['../classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#ab9e2295ae9773e218e21cd2cd28355bf',1,'llfio_v2_xxx::dynamic_thread_pool_group']]],
   ['in_5fpipe',['in_pipe',['../classllfio__v2__xxx_1_1process__handle.html#a1d0b03dfcc6aa09f0fdba5ae6f794dd7',1,'llfio_v2_xxx::process_handle::in_pipe() noexcept'],['../classllfio__v2__xxx_1_1process__handle.html#a9625e344aa94845353aaa144e13cf137',1,'llfio_v2_xxx::process_handle::in_pipe() const noexcept']]],
   ['in_5fplace_5fattach',['in_place_attach',['../namespacellfio__v2__xxx.html#a96135062edc7cb1fa33460ff521498f5',1,'llfio_v2_xxx::in_place_attach(map_handle &amp;mh) noexcept'],['../namespacellfio__v2__xxx.html#a933649fdb097431a1b84360b9a5ed5c4',1,'llfio_v2_xxx::in_place_attach(mapped_file_handle &amp;mfh) noexcept']]],
   ['init_5fio_5foperation',['init_io_operation',['../classllfio__v2__xxx_1_1io__multiplexer.html#ad0b9a8df7efdc2defbc2f09c20855e18',1,'llfio_v2_xxx::io_multiplexer']]],
