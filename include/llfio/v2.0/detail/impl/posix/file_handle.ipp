@@ -581,6 +581,18 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
       for(;;)
       {
 #ifdef __linux__
+        if(1)
+        {
+          /* There is a bug in ZFSOnLinux where SEEK_DATA returns no data in file
+          if the file was rewritten using a mmap which is then closed, and the file
+          immediately reopened and SEEK_DATA called upon it. If you read a single
+          byte, it seems to kick SEEK_DATA into working correctly.
+
+          See https://github.com/openzfs/zfs/issues/11697 for more.
+          */
+          char b;
+          (void) ::pread(_v.fd, &b, 1, end);
+        }
         start = lseek64(_v.fd, end, SEEK_DATA);
 #else
         start = lseek(_v.fd, end, SEEK_DATA);
@@ -747,17 +759,17 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
     auto _copy_file_range = [&](int infd, off_t *inoffp, int outfd, off_t *outoffp, size_t len, unsigned int flags) -> ssize_t {
 #if defined(__linux__)
 #if defined __aarch64__
-       return syscall(285 /*__NR_copy_file_range*/, infd, inoffp, outfd, outoffp, len, flags);
+      return syscall(285 /*__NR_copy_file_range*/, infd, inoffp, outfd, outoffp, len, flags);
 #elif defined __arm__
-       return syscall(391 /*__NR_copy_file_range*/, infd, inoffp, outfd, outoffp, len, flags);
+      return syscall(391 /*__NR_copy_file_range*/, infd, inoffp, outfd, outoffp, len, flags);
 #elif defined __i386__
-       return syscall(377 /*__NR_copy_file_range*/, infd, inoffp, outfd, outoffp, len, flags);
+      return syscall(377 /*__NR_copy_file_range*/, infd, inoffp, outfd, outoffp, len, flags);
 #elif defined __powerpc64__
-       return syscall(379 /*__NR_copy_file_range*/, infd, inoffp, outfd, outoffp, len, flags);
+      return syscall(379 /*__NR_copy_file_range*/, infd, inoffp, outfd, outoffp, len, flags);
 #elif defined __sparc__
-       return syscall(357 /*__NR_copy_file_range*/, infd, inoffp, outfd, outoffp, len, flags);
+      return syscall(357 /*__NR_copy_file_range*/, infd, inoffp, outfd, outoffp, len, flags);
 #elif defined __x86_64__
-       return syscall(326 /*__NR_copy_file_range*/, infd, inoffp, outfd, outoffp, len, flags);
+      return syscall(326 /*__NR_copy_file_range*/, infd, inoffp, outfd, outoffp, len, flags);
 #else
 #error Unknown Linux platform
 #endif
@@ -790,22 +802,29 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
     {
       for(extent_type thisoffset = 0; thisoffset < item.src.length; thisoffset += blocksize)
       {
+      retry_clone:
         bool done = false;
         const auto thisblock = std::min(blocksize, item.src.length - thisoffset);
         if(duplicate_extents && item.op == workitem::clone_extents)
         {
           off_t off_in = item.src.offset + thisoffset, off_out = item.src.offset + thisoffset + destoffsetdiff;
-          if(_copy_file_range(_v.fd, &off_in, dest.native_handle().fd, &off_out, thisblock, 0) < 0)
+          auto bytes_cloned = _copy_file_range(_v.fd, &off_in, dest.native_handle().fd, &off_out, thisblock, 0);
+          if(bytes_cloned <= 0)
           {
-            if((EXDEV != errno && EOPNOTSUPP != errno && ENOSYS != errno) || !emulate_if_unsupported)
+            if(bytes_cloned < 0 && ((EXDEV != errno && EOPNOTSUPP != errno && ENOSYS != errno) || !emulate_if_unsupported))
             {
               return posix_error();
             }
             duplicate_extents = false;  // emulate using copy of bytes
           }
-          else
+          else if((size_t) bytes_cloned == thisblock)
           {
             done = true;
+          }
+          else
+          {
+            thisoffset += bytes_cloned;
+            goto retry_clone;
           }
         }
         if(!done && (item.op == workitem::copy_bytes || (!duplicate_extents && item.op == workitem::clone_extents)))

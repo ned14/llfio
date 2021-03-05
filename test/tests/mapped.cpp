@@ -73,7 +73,6 @@ static inline void TestMappedView2()
     filesystem::remove("testfile", ec);
   }
   mapped_file_handle mfh = mapped_file_handle::mapped_file(1024 * 1024, {}, "testfile", file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::all, file_handle::flag::unlink_on_first_close).value();
-  BOOST_CHECK(mfh.address() == nullptr);
   mfh.truncate(10000 * sizeof(int)).value();
   byte *addr = mfh.address();
   BOOST_CHECK(addr != nullptr);

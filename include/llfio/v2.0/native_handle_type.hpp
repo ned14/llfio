@@ -75,7 +75,8 @@ struct native_handle_type  // NOLINT
   _child_close_executed = 1U << 31U     // used to trap when vptr has become corrupted
   } QUICKCPPLIB_BITFIELD_END(disposition)
 
-  union {
+  union
+  {
     intptr_t _init{-1};
     //! A POSIX file descriptor
     int fd;  // NOLINT
@@ -140,6 +141,11 @@ struct native_handle_type  // NOLINT
   //! True if invalid
   constexpr bool operator!() const noexcept { return !is_valid(); }
 
+  //! True if equal
+  constexpr bool operator==(const native_handle_type &o) const noexcept { return behaviour == o.behaviour && _init == o._init; }
+  //! True if unequal
+  constexpr bool operator!=(const native_handle_type &o) const noexcept { return behaviour != o.behaviour || _init != o._init; }
+
   //! True if the handle is valid
   constexpr bool is_valid() const noexcept { return _init != -1 && static_cast<unsigned>(behaviour) != 0; }
 
@@ -176,7 +182,8 @@ struct native_handle_type  // NOLINT
   //! True if a memory allocation
   constexpr bool is_allocation() const noexcept { return (behaviour & disposition::allocation) ? true : false; }
 };
-static_assert((sizeof(void *) == 4 && sizeof(native_handle_type) == 8) || (sizeof(void *) == 8 && sizeof(native_handle_type) == 12), "native_handle_type is not 8 or 12 bytes in size!");
+static_assert((sizeof(void *) == 4 && sizeof(native_handle_type) == 8) || (sizeof(void *) == 8 && sizeof(native_handle_type) == 12),
+              "native_handle_type is not 8 or 12 bytes in size!");
 // Not trivially copyable, as has non-trivial move.
 static_assert(std::is_trivially_destructible<native_handle_type>::value, "native_handle_type is not trivially destructible!");
 static_assert(std::is_trivially_copy_constructible<native_handle_type>::value, "native_handle_type is not trivially copy constructible!");

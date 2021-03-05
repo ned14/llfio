@@ -1,5 +1,5 @@
 /* An mapped handle to a file
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
+(C) 2017-2021 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
 File Created: Sept 2017
 
 
@@ -27,15 +27,20 @@ Distributed under the Boost Software License, Version 1.0.
 
 LLFIO_V2_NAMESPACE_BEGIN
 
-result<mapped_file_handle::size_type> mapped_file_handle::reserve(size_type reservation) noexcept
+result<mapped_file_handle::size_type> mapped_file_handle::_reserve(extent_type &length, size_type reservation) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  OUTCOME_TRY(auto &&length, underlying_file_maximum_extent());
+#ifndef NDEBUG
+  if(_mh.is_valid())
+  {
+    assert(_mh.native_handle()._init == native_handle()._init);
+  }
+#endif
+  OUTCOME_TRY(length, underlying_file_maximum_extent());
   if(length == 0)
   {
-    // Not portable to map an empty file, so do nothing
+    // Not portable to map an empty file, but retain reservation
     _reservation = reservation;
-    return success();
   }
   if(reservation == 0)
   {
@@ -70,6 +75,7 @@ result<void> mapped_file_handle::close() noexcept
   LLFIO_LOG_FUNCTION_CALL(this);
   if(_mh.is_valid())
   {
+    assert(_mh.native_handle()._init == native_handle()._init);
     OUTCOME_TRYV(_mh.close());
   }
   if(_sh.is_valid())
@@ -83,6 +89,7 @@ native_handle_type mapped_file_handle::release() noexcept
   LLFIO_LOG_FUNCTION_CALL(this);
   if(_mh.is_valid())
   {
+    assert(_mh.native_handle()._init == native_handle()._init);
     (void) _mh.close();
   }
   if(_sh.is_valid())
@@ -95,6 +102,12 @@ native_handle_type mapped_file_handle::release() noexcept
 result<mapped_file_handle::extent_type> mapped_file_handle::truncate(extent_type newsize) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
+#ifndef NDEBUG
+  if(_mh.is_valid())
+  {
+    assert(_mh.native_handle()._init == native_handle()._init);
+  }
+#endif
   // Release all maps and sections and truncate the backing file to zero
   if(newsize == 0)
   {
@@ -142,6 +155,12 @@ result<mapped_file_handle::extent_type> mapped_file_handle::truncate(extent_type
 
 result<mapped_file_handle::extent_type> mapped_file_handle::update_map() noexcept
 {
+#ifndef NDEBUG
+  if(_mh.is_valid())
+  {
+    assert(_mh.native_handle()._init == native_handle()._init);
+  }
+#endif
   OUTCOME_TRY(auto &&length, underlying_file_maximum_extent());
   if(length > _reservation)
   {
@@ -156,12 +175,47 @@ result<mapped_file_handle::extent_type> mapped_file_handle::update_map() noexcep
   }
   if(!_sh.is_valid())
   {
-    OUTCOME_TRYV(reserve(_reservation));
+    (void) reserve(_reservation);
     return length;
   }
   // Adjust the map to reflect the new size of the section
   _mh._length = length;
   return length;
 }
+
+result<void> mapped_file_handle::relink(const path_handle &base, path_view_type path, bool atomic_replace, deadline d) noexcept
+{
+#ifndef NDEBUG
+  if(_mh.is_valid())
+  {
+    assert(_mh.native_handle()._init == native_handle()._init);
+  }
+#endif
+  // On POSIX relink() may change _v.fd sometimes.
+  auto ret = file_handle::relink(base, path, atomic_replace, d);
+  bool restore_maps = false;
+  if(_sh.is_valid() && _v.fd != _sh.native_handle().fd)
+  {
+    OUTCOME_TRY(_sh.close());
+    restore_maps = true;
+  }
+  if(_mh.is_valid() && _v.fd != _mh.native_handle().fd)
+  {
+    OUTCOME_TRY(_mh.close());
+    restore_maps = true;
+  }
+  if(restore_maps)
+  {
+    OUTCOME_TRY(reserve(_reservation));
+  }
+#ifndef NDEBUG
+  if(_mh.is_valid())
+  {
+    assert(_mh.native_handle()._init == native_handle()._init);
+  }
+#endif
+  return ret;
+}
+
 
 LLFIO_V2_NAMESPACE_END

@@ -1,5 +1,5 @@
 /* An mapped handle to a file
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
+(C) 2017-2021 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
 File Created: Sept 2017
 
 
@@ -62,13 +62,13 @@ Reads always return the original mapped data, and do not fill any buffers passed
 For obvious reasons the utility of this class on 32-bit systems is limited,
 but can be useful when used with smaller files.
 
-Note that zero length files cannot be memory mapped, and writes past the maximum
+Note that zero length files cannot be memory mapped on most platforms, and writes past the maximum
 extent do NOT auto-extend the size of the file, rather the data written beyond the maximum valid
 extent has undefined kernel-specific behaviour, which includes segfaulting. You must therefore always
 `truncate(newsize)` to resize the file and its maps before you can read or write to it,
 and be VERY careful to not read or write beyond the maximum extent of the file.
 
-Therefore, when a file is created or is otherwise of zero length, `address()` will return
+On most platforms, when a file is created or is otherwise of zero length, `address()` will return
 a null pointer. Similarly, calling `truncate(0)` will close the map and section handles,
 they will be recreated on next truncation to a non-zero size.
 
@@ -81,9 +81,23 @@ file into the beginning of the reservation. The remainder of the pages may be in
 and may generate a segfault, or they may automatically reflect any growth in the underlying
 file. This is why `read()` and `write()` only know about the reservation size, and will read
 and write memory up to that reservation size, without checking if the memory involved exists
-or not yet. You are guaranteed on POSIX only that `address()` will not return a new
-value unless you truncate from a bigger length to a smaller length, or you call `reserve()`
-with a new reservation or `truncate()` with a value bigger than the reservation.
+or not yet.
+
+You are guaranteed on POSIX only that `address()` will not return a new value unless:
+
+1. You truncate from a bigger length to a smaller length.
+2. You call `reserve()` with a new reservation.
+3. You call `truncate()` with a value bigger than the reservation.
+4. You call `relink()` with `atomic_replace = false`, which may on some platforms require
+a close-open file descriptor cycle as part of its implementation.
+
+You are guaranteed on Windows only that `address()` will not return a new value unless:
+
+1. You truncate from a bigger length to a smaller length.
+2. You call `reserve()` with a new reservation.
+3. You call `truncate()` with a value bigger than the reservation.
+4. You call `relink()`, which requires closing and reopening the map because you cannot
+rename a file with an open map on Windows.
 
 `maximum_extent()` in mapped file handle is an alias for `update_map()`. `update_map()`
 fetches the maximum extent of the underlying file, and if it has changed from the map's
@@ -102,6 +116,14 @@ not using this `mapped_file_handle` to write the new data. With unified page cac
 mixing mapped and normal i/o is generally safe except at the end of a file where race
 conditions and outright kernel bugs tend to abound. To avoid these, solely and exclusively
 use a dedicated handle configured to atomic append only to do the appends.
+
+\warning For 64-bit systems under heavy load, or all 32-bit systems, one can run out of
+enough contiguous virtual memory address space to map all of a large file. This generally
+presents itself as an error code comparing equal to `errc::not_enough_memory`, and it can
+appear from the constructor, `truncate()`, `reserve()` and most of the other functions
+in this class not inherited from base classes. `update_map()` never returns
+`errc::not_enough_memory`, but `relink()` may do so, due to the potential map teardown
+and recreate.
 
 ## Microsoft Windows only
 
@@ -161,6 +183,7 @@ protected:
                                                                             barrier_kind kind = barrier_kind::nowait_data_only,
                                                                             deadline d = deadline()) noexcept override
   {
+    assert(_mh.native_handle()._init == native_handle()._init);
     switch(kind)
     {
     case barrier_kind::nowait_view_only:
@@ -197,18 +220,12 @@ protected:
   }
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> _do_read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override
   {
-    if(_mh.address() == nullptr)
-    {
-      OUTCOME_TRY(auto &&length, _sh.length());
-      if(length > 0)
-      {
-        return errc::not_enough_memory;  // reserve() failed probably due to VMA exhaustion
-      }
-    }
+    assert(_mh.native_handle()._init == native_handle()._init);
     return _mh.read(reqs, d);
   }
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override
   {
+    assert(_mh.native_handle()._init == native_handle()._init);
     if(!!(_sh.section_flags() & section_handle::flag::write_via_syscall))
     {
       const auto batch = max_buffers();
@@ -237,16 +254,10 @@ protected:
       }
       return reqs.buffers;
     }
-    if(_mh.address() == nullptr)
-    {
-      OUTCOME_TRY(auto &&length, _sh.length());
-      if(length > 0)
-      {
-        return errc::not_enough_memory;  // reserve() failed probably due to VMA exhaustion
-      }
-    }
     return _mh.write(reqs, d);
   }
+
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_type> _reserve(extent_type &length, size_type reservation) noexcept;
 
 public:
   //! Default constructor
@@ -259,6 +270,12 @@ public:
       , _sh(std::move(o._sh))
       , _mh(std::move(o._mh))
   {
+#ifndef NDEBUG
+    if(_mh.is_valid())
+    {
+      assert(_mh.native_handle()._init == native_handle()._init);
+    }
+#endif
     _sh.set_backing(this);
     _mh.set_section(&_sh);
   }
@@ -275,12 +292,23 @@ public:
       : file_handle(std::move(o))
       , _sh(sflags)
   {
-    auto out = reserve(reservation);
+    auto length = (extent_type) -1;
+    auto out = _reserve(length, reservation);
     if(!out)
     {
+      if(length != 0)
+      {
+        out.value();  // throw
+      }
+      // sink the error as file length is currently zero, which cannot map on some platforms
       _reservation = reservation;
-      // sink the error
     }
+#ifndef NDEBUG
+    if(_mh.is_valid())
+    {
+      assert(_mh.native_handle()._init == native_handle()._init);
+    }
+#endif
   }
   //! Move assignment of mapped_file_handle permitted
   mapped_file_handle &operator=(mapped_file_handle &&o) noexcept
@@ -291,6 +319,12 @@ public:
     }
     this->~mapped_file_handle();
     new(this) mapped_file_handle(std::move(o));
+#ifndef NDEBUG
+    if(_mh.is_valid())
+    {
+      assert(_mh.native_handle()._init == native_handle()._init);
+    }
+#endif
     return *this;
   }
   //! No copy assignment
@@ -324,28 +358,35 @@ public:
                                                        creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none,
                                                        section_handle::flag sflags = section_handle::flag::none) noexcept
   {
-    if(_mode == mode::append)
+    try
     {
-      return errc::invalid_argument;
+      if(_mode == mode::append)
+      {
+        return errc::invalid_argument;
+      }
+      OUTCOME_TRY(auto &&fh, file_handle::file(base, _path, _mode, _creation, _caching, flags));
+      switch(_creation)
+      {
+      default:
+      {
+        // Attempt mapping now (may silently fail if file is empty)
+        mapped_file_handle mfh(std::move(fh), reservation, sflags);
+        return {std::move(mfh)};
+      }
+      case creation::only_if_not_exist:
+      case creation::truncate_existing:
+      case creation::always_new:
+      {
+        // Don't attempt mapping now as file will be empty
+        mapped_file_handle mfh(std::move(fh), sflags);
+        mfh._reservation = reservation;
+        return {std::move(mfh)};
+      }
+      }
     }
-    OUTCOME_TRY(auto &&fh, file_handle::file(base, _path, _mode, _creation, _caching, flags));
-    switch(_creation)
+    catch(...)
     {
-    default:
-    {
-      // Attempt mapping now (may silently fail if file is empty)
-      mapped_file_handle mfh(std::move(fh), reservation, sflags);
-      return {std::move(mfh)};
-    }
-    case creation::only_if_not_exist:
-    case creation::truncate_existing:
-    case creation::always_new:
-    {
-      // Don't attempt mapping now as file will be empty
-      mapped_file_handle mfh(std::move(fh), sflags);
-      mfh._reservation = reservation;
-      return {std::move(mfh)};
-    }
+      return error_from_exception();
     }
   }
   //! \overload
@@ -428,10 +469,17 @@ public:
   mapped_temp_inode(size_type reservation = 0, const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write,
                     flag flags = flag::none, section_handle::flag sflags = section_handle::flag::none) noexcept
   {
-    OUTCOME_TRY(auto &&v, file_handle::temp_inode(dir, _mode, flags));
-    mapped_file_handle ret(std::move(v), sflags);
-    ret._reservation = reservation;
-    return {std::move(ret)};
+    try
+    {
+      OUTCOME_TRY(auto &&v, file_handle::temp_inode(dir, _mode, flags));
+      mapped_file_handle ret(std::move(v), sflags);
+      ret._reservation = reservation;
+      return {std::move(ret)};
+    }
+    catch(...)
+    {
+      return error_from_exception();
+    }
   }
 
   //! The memory section this handle is using
@@ -466,7 +514,11 @@ public:
   Note that this is an expensive call, and `address()` may return a different value afterwards.
   This call will fail if the underlying file has zero length.
   */
-  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_type> reserve(size_type reservation = 0) noexcept;
+  result<size_type> reserve(size_type reservation = 0) noexcept
+  {
+    auto length = (extent_type) -1;
+    return _reserve(length, reservation);
+  }
 
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~mapped_file_handle() override
   {
@@ -480,8 +532,15 @@ public:
   result<mapped_file_handle> reopen(size_type reservation, mode mode_ = mode::unchanged, caching caching_ = caching::unchanged,
                                     deadline d = std::chrono::seconds(30)) const noexcept
   {
-    OUTCOME_TRY(auto &&fh, file_handle::reopen(mode_, caching_, d));
-    return mapped_file_handle(std::move(fh), reservation, _sh.section_flags());
+    try
+    {
+      OUTCOME_TRY(auto &&fh, file_handle::reopen(mode_, caching_, d));
+      return mapped_file_handle(std::move(fh), reservation, _sh.section_flags());
+    }
+    catch(...)
+    {
+      return error_from_exception();
+    }
   }
   LLFIO_DEADLINE_TRY_FOR_UNTIL(reopen)
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> set_multiplexer(io_multiplexer *c = this_thread::multiplexer()) noexcept override
@@ -532,6 +591,8 @@ public:
   If the internal section and map handle are invalid, they are restored unless the underlying file is zero length.
 
   If the size of the underlying file has become zero length, the internal section and map handle are closed.
+
+  This function never returns `errc::not_enough_memory`, even if it calls `reserve()`.
   */
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<extent_type> update_map() noexcept;
 
@@ -584,6 +645,12 @@ public:
   */
 #endif
   using file_handle::write;
+
+  LLFIO_MAKE_FREE_FUNCTION
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
+  result<void> relink(const path_handle &base, path_view_type path, bool atomic_replace = true, deadline d = std::chrono::seconds(30)) noexcept override;
+
+  LLFIO_DEADLINE_TRY_FOR_UNTIL(relink)
 };
 
 //! \brief Constructor for `mapped_file_handle`
