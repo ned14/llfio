@@ -591,7 +591,10 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
           See https://github.com/openzfs/zfs/issues/11697 for more.
           */
           char b;
-          (void) ::pread(_v.fd, &b, 1, end);
+          if(-1 == ::pread(_v.fd, &b, 1, end))
+          {
+            return posix_error();
+          }
         }
         start = lseek64(_v.fd, end, SEEK_DATA);
 #else
