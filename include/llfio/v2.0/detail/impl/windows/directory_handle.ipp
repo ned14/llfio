@@ -25,6 +25,8 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include "../../../directory_handle.hpp"
 #include "import.hpp"
 
+#include "../../../file_handle.hpp"
+
 LLFIO_V2_NAMESPACE_BEGIN
 
 result<directory_handle> directory_handle::directory(const path_handle &base, path_view_type path, mode _mode, creation _creation, caching _caching, flag flags) noexcept
