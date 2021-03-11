@@ -11,8 +11,7 @@ find_quickcpplib_library(quickcpplib
 )
 find_quickcpplib_library(outcome
   GIT_REPOSITORY "https://github.com/ned14/outcome.git"
-#  GIT_TAG "develop"
-  GIT_TAG "better_optimisation"  ## future Outcome v2.2
+  GIT_TAG "master"
   REQUIRED
   IS_HEADER_ONLY
 )
@@ -48,13 +47,15 @@ function(make_program program)
 endfunction()
 
 make_program(benchmark-async llfio::hl)
+make_program(benchmark-dynamic_thread_pool_group llfio::hl)
 make_program(benchmark-iostreams llfio::hl)
 make_program(benchmark-locking llfio::hl kerneltest::hl)
 make_program(fs-probe llfio::hl)
 make_program(illegal-codepoints llfio::hl)
 make_program(key-value-store llfio::hl)
 
-target_include_directories(benchmark-async PRIVATE "benchmark-async/asio/asio/include")
+target_include_directories(benchmark-async PRIVATE "asio/asio/include")
+target_include_directories(benchmark-dynamic_thread_pool_group PRIVATE "asio/asio/include")
 
 if(MSVC)
   target_compile_options(illegal-codepoints PUBLIC /utf-8)
