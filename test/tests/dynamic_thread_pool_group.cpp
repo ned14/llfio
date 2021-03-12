@@ -341,7 +341,7 @@ static inline void TestDynamicThreadPoolGroupNestingWorks()
     shared_states[n].calc_stddev();
     std::cout << "   Standard deviation for nesting level " << (n + 1) << " was " << shared_states[n].stddev << std::endl;
   }
-  BOOST_CHECK(shared_states[MAX_NESTING - 1].stddev < shared_states[MAX_NESTING / 2].stddev / 2);
+  BOOST_CHECK(shared_states[MAX_NESTING - 1].stddev < shared_states[MAX_NESTING / 4].stddev * 3 / 4);
 }
 
 static inline void TestDynamicThreadPoolGroupIoAwareWorks()
