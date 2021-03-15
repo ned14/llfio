@@ -23,6 +23,9 @@ http://www.boost.org/LICENSE_1_0.txt)
 */
 
 #include "../../../directory_handle.hpp"
+
+#include "../../../file_handle.hpp"
+
 #include "import.hpp"
 
 LLFIO_V2_NAMESPACE_BEGIN

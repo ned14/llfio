@@ -1,5 +1,5 @@
 /* A handle to a directory
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2017-2021 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: Aug 2017
 
 
