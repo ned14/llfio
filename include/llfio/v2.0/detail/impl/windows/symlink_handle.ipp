@@ -35,7 +35,9 @@ result<symlink_handle> symlink_handle::reopen(mode mode_, deadline /*unused*/) c
   return ret;
 }
 
-LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(const path_handle &base, symlink_handle::path_view_type path, symlink_handle::mode _mode, symlink_handle::creation _creation, flag flags) noexcept
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(const path_handle &base, symlink_handle::path_view_type path,
+                                                                               symlink_handle::mode _mode, symlink_handle::creation _creation,
+                                                                               flag flags) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -104,7 +106,6 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
     attribs &= 0x00ffffff;  // the real attributes only, not the win32 flags
     OUTCOME_TRY(auto &&ntflags, ntflags_from_handle_caching_and_flags(nativeh, caching::all, flags));
     ntflags |= 0x4000 /*FILE_OPEN_FOR_BACKUP_INTENT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/;
-    ntflags |= 0x040 /*FILE_NON_DIRECTORY_FILE*/;  // do not open a directory
     IO_STATUS_BLOCK isb = make_iostatus();
 
     path_view::c_str<> zpath(path, path_view::not_zero_terminated);
@@ -195,7 +196,8 @@ result<symlink_handle::buffers_type> symlink_handle::read(symlink_handle::io_req
   size_t bytes;
   for(;;)
   {
-    rpd = req.kernelbuffer.empty() ? reinterpret_cast<REPARSE_DATA_BUFFER *>(tofill._kernel_buffer.get()) : reinterpret_cast<REPARSE_DATA_BUFFER *>(req.kernelbuffer.data());
+    rpd = req.kernelbuffer.empty() ? reinterpret_cast<REPARSE_DATA_BUFFER *>(tofill._kernel_buffer.get()) :
+                                     reinterpret_cast<REPARSE_DATA_BUFFER *>(req.kernelbuffer.data());
     bytes = req.kernelbuffer.empty() ? static_cast<ULONG>(tofill._kernel_buffer_size) : static_cast<ULONG>(req.kernelbuffer.size());
     DWORD written = 0;
     if(!DeviceIoControl(_v.h, FSCTL_GET_REPARSE_POINT, NULL, 0, rpd, (DWORD) bytes, &written, NULL))
@@ -235,7 +237,8 @@ result<symlink_handle::buffers_type> symlink_handle::read(symlink_handle::io_req
   }
 }
 
-result<symlink_handle::const_buffers_type> symlink_handle::write(symlink_handle::io_request<symlink_handle::const_buffers_type> req, deadline /*unused*/) noexcept
+result<symlink_handle::const_buffers_type> symlink_handle::write(symlink_handle::io_request<symlink_handle::const_buffers_type> req,
+                                                                 deadline /*unused*/) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -267,7 +270,8 @@ result<symlink_handle::const_buffers_type> symlink_handle::write(symlink_handle:
       rpd->SymbolicLinkReparseBuffer.SubstituteNameLength = (USHORT) destpathbytes - 6;
       rpd->SymbolicLinkReparseBuffer.PrintNameOffset = (USHORT)(destpathbytes - 6 + sizeof(wchar_t));
       rpd->SymbolicLinkReparseBuffer.PrintNameLength = (USHORT) destpathbytes - 6;
-      memcpy(rpd->SymbolicLinkReparseBuffer.PathBuffer + rpd->SymbolicLinkReparseBuffer.PrintNameOffset / sizeof(wchar_t), zpath.buffer + 3, rpd->SymbolicLinkReparseBuffer.PrintNameLength - 6 + sizeof(wchar_t));
+      memcpy(rpd->SymbolicLinkReparseBuffer.PathBuffer + rpd->SymbolicLinkReparseBuffer.PrintNameOffset / sizeof(wchar_t), zpath.buffer + 3,
+             rpd->SymbolicLinkReparseBuffer.PrintNameLength - 6 + sizeof(wchar_t));
     }
     else
     {
@@ -276,10 +280,12 @@ result<symlink_handle::const_buffers_type> symlink_handle::write(symlink_handle:
       rpd->SymbolicLinkReparseBuffer.SubstituteNameLength = (USHORT) destpathbytes;
       rpd->SymbolicLinkReparseBuffer.PrintNameOffset = (USHORT)(destpathbytes + sizeof(wchar_t));
       rpd->SymbolicLinkReparseBuffer.PrintNameLength = (USHORT) destpathbytes;
-      memcpy(rpd->SymbolicLinkReparseBuffer.PathBuffer + rpd->SymbolicLinkReparseBuffer.PrintNameOffset / sizeof(wchar_t), zpath.buffer, rpd->SymbolicLinkReparseBuffer.PrintNameLength + sizeof(wchar_t));
+      memcpy(rpd->SymbolicLinkReparseBuffer.PathBuffer + rpd->SymbolicLinkReparseBuffer.PrintNameOffset / sizeof(wchar_t), zpath.buffer,
+             rpd->SymbolicLinkReparseBuffer.PrintNameLength + sizeof(wchar_t));
     }
     rpd->SymbolicLinkReparseBuffer.Flags = req.buffers.path().is_relative() ? 0x1 /*SYMLINK_FLAG_RELATIVE*/ : 0;
-    rpd->ReparseDataLength = (USHORT)(rpd->SymbolicLinkReparseBuffer.SubstituteNameLength + rpd->SymbolicLinkReparseBuffer.PrintNameLength + 2 * sizeof(wchar_t) + reparsebufferheaderlen);
+    rpd->ReparseDataLength = (USHORT)(rpd->SymbolicLinkReparseBuffer.SubstituteNameLength + rpd->SymbolicLinkReparseBuffer.PrintNameLength +
+                                      2 * sizeof(wchar_t) + reparsebufferheaderlen);
     break;
   }
   case symlink_type::win_wsl:
@@ -296,7 +302,8 @@ result<symlink_handle::const_buffers_type> symlink_handle::write(symlink_handle:
       rpd->MountPointReparseBuffer.SubstituteNameLength = (USHORT) destpathbytes - 6;
       rpd->MountPointReparseBuffer.PrintNameOffset = (USHORT)(destpathbytes - 6 + sizeof(wchar_t));
       rpd->MountPointReparseBuffer.PrintNameLength = (USHORT) destpathbytes - 6;
-      memcpy(rpd->MountPointReparseBuffer.PathBuffer + rpd->MountPointReparseBuffer.PrintNameOffset / sizeof(wchar_t), zpath.buffer + 3, rpd->MountPointReparseBuffer.PrintNameLength - 6 + sizeof(wchar_t));
+      memcpy(rpd->MountPointReparseBuffer.PathBuffer + rpd->MountPointReparseBuffer.PrintNameOffset / sizeof(wchar_t), zpath.buffer + 3,
+             rpd->MountPointReparseBuffer.PrintNameLength - 6 + sizeof(wchar_t));
     }
     else
     {
@@ -305,9 +312,11 @@ result<symlink_handle::const_buffers_type> symlink_handle::write(symlink_handle:
       rpd->MountPointReparseBuffer.SubstituteNameLength = (USHORT) destpathbytes;
       rpd->MountPointReparseBuffer.PrintNameOffset = (USHORT)(destpathbytes + sizeof(wchar_t));
       rpd->MountPointReparseBuffer.PrintNameLength = (USHORT) destpathbytes;
-      memcpy(rpd->MountPointReparseBuffer.PathBuffer + rpd->MountPointReparseBuffer.PrintNameOffset / sizeof(wchar_t), zpath.buffer, rpd->MountPointReparseBuffer.PrintNameLength + sizeof(wchar_t));
+      memcpy(rpd->MountPointReparseBuffer.PathBuffer + rpd->MountPointReparseBuffer.PrintNameOffset / sizeof(wchar_t), zpath.buffer,
+             rpd->MountPointReparseBuffer.PrintNameLength + sizeof(wchar_t));
     }
-    rpd->ReparseDataLength = (USHORT)(rpd->MountPointReparseBuffer.SubstituteNameLength + rpd->MountPointReparseBuffer.PrintNameLength + 2 * sizeof(wchar_t) + reparsebufferheaderlen);
+    rpd->ReparseDataLength =
+    (USHORT)(rpd->MountPointReparseBuffer.SubstituteNameLength + rpd->MountPointReparseBuffer.PrintNameLength + 2 * sizeof(wchar_t) + reparsebufferheaderlen);
     break;
   }
   }

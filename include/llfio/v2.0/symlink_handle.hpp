@@ -1,5 +1,5 @@
 /* A handle to a symbolic link
-(C) 2018 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2018-2021 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: Jul 2018
 
 
@@ -78,6 +78,9 @@ code comparing equal to `errc::protocol_not_supported`. One should note that mod
 links was not historically permitted by users with ordinary permissions on Microsoft Windows,
 however recent versions of Windows 10 do support symbolic links for ordinary users. All versions
 of Windows support directory symbolic links (junctions), these work for all users in any configuration.
+
+(Note that to create a directory junction on Windows, first create a directory, open that
+empty directory for modification using symlink_handle, then write using `symlink_type::win_junction`)
 */
 class LLFIO_DECL symlink_handle : public handle, public fs_handle
 {
@@ -112,7 +115,7 @@ public:
     none,      //!<! No link
     symbolic,  //!< Standard symbolic link
 
-    win_wsl,      //!< WSL symbolic link (Windows only)
+    win_wsl,      //!< WSL symbolic link (Windows only, not actually implemented currently)
     win_junction  //!< NTFS directory junction (Windows only, directories and volumes only)
   };
 
