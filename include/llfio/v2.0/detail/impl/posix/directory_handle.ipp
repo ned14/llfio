@@ -39,7 +39,8 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 LLFIO_V2_NAMESPACE_BEGIN
 
-result<directory_handle> directory_handle::directory(const path_handle &base, path_view_type path, mode _mode, creation _creation, caching _caching, flag flags) noexcept
+result<directory_handle> directory_handle::directory(const path_handle &base, path_view_type path, mode _mode, creation _creation, caching _caching,
+                                                     flag flags) noexcept
 {
   if(flags & flag::unlink_on_first_close)
   {
@@ -314,9 +315,12 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
     req.buffers[0].stat.st_birthtim = to_timepoint(s.st_birthtim);
 #endif
 #endif
-    req.buffers[0].stat.st_sparse = static_cast<unsigned int>((static_cast<handle::extent_type>(s.st_blocks) * 512) < static_cast<handle::extent_type>(s.st_size));
+    req.buffers[0].stat.st_sparse =
+    static_cast<unsigned int>((static_cast<handle::extent_type>(s.st_blocks) * 512) < static_cast<handle::extent_type>(s.st_size));
     req.buffers._resize(1);
-    static constexpr stat_t::want default_stat_contents = stat_t::want::dev | stat_t::want::ino | stat_t::want::type | stat_t::want::perms | stat_t::want::nlink | stat_t::want::uid | stat_t::want::gid | stat_t::want::rdev | stat_t::want::atim | stat_t::want::mtim | stat_t::want::ctim | stat_t::want::size |
+    static constexpr stat_t::want default_stat_contents = stat_t::want::dev | stat_t::want::ino | stat_t::want::type | stat_t::want::perms |
+                                                          stat_t::want::nlink | stat_t::want::uid | stat_t::want::gid | stat_t::want::rdev |
+                                                          stat_t::want::atim | stat_t::want::mtim | stat_t::want::ctim | stat_t::want::size |
                                                           stat_t::want::allocated | stat_t::want::blocks | stat_t::want::blksize
 #ifdef HAVE_STAT_FLAGS
                                                           | stat_t::want::flags
@@ -360,8 +364,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
   }
   stat_t::want default_stat_contents = stat_t::want::ino | stat_t::want::type;
   dirent *buffer;
-  size_t bytesavailable;
-  int bytes;
+  size_t bytesavailable, bytes;
   bool done = false;
   do
   {
@@ -383,27 +386,41 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
     if(-1 == ::lseek(_v.fd, 0, SEEK_SET))
       return posix_error();
 #endif
-    bytes = getdents(_v.fd, reinterpret_cast<char *>(buffer), bytesavailable);
-    if(req.kernelbuffer.empty() && bytes == -1 && EINVAL == errno)
+    bytes = 0;
+    int _bytes;
+    do
     {
-      size_t toallocate = req.buffers._kernel_buffer_size * 2;
-      auto *mem = (char *) operator new[](toallocate, std::nothrow);  // don't initialise
-      if(mem == nullptr)
+      assert(bytes <= bytesavailable);
+      _bytes = getdents(_v.fd, reinterpret_cast<char *>(buffer) + bytes, bytesavailable - bytes);
+      if(_bytes == 0)
       {
-        return errc::not_enough_memory;
+        done = true;
+        break;
       }
-      req.buffers._kernel_buffer.reset();
-      req.buffers._kernel_buffer = std::unique_ptr<char[]>(mem);
-      req.buffers._kernel_buffer_size = toallocate;
-    }
-    else
-    {
-      if(bytes == -1)
+      if(req.kernelbuffer.empty() && _bytes == -1 && EINVAL == errno)
+      {
+        size_t toallocate = req.buffers._kernel_buffer_size * 2;
+        auto *mem = (char *) operator new[](toallocate, std::nothrow);  // don't initialise
+        if(mem == nullptr)
+        {
+          return errc::not_enough_memory;
+        }
+        req.buffers._kernel_buffer.reset();
+        req.buffers._kernel_buffer = std::unique_ptr<char[]>(mem);
+        req.buffers._kernel_buffer_size = toallocate;
+        // We need to reset and do the whole thing against to ensure single shot atomicity
+        break;
+      }
+      else if(_bytes == -1)
       {
         return posix_error();
       }
-      done = true;
-    }
+      else
+      {
+        assert(_bytes > 0);
+        bytes += _bytes;
+      }
+    } while(!done);
   } while(!done);
   if(bytes == 0)
   {
