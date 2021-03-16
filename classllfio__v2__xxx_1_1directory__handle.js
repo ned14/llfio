@@ -15,6 +15,7 @@ var classllfio__v2__xxx_1_1directory__handle =
     [ "path_view_type", "classllfio__v2__xxx_1_1directory__handle.html#af39b5b7a73266dc1dd435f4fb1dfb463", null ],
     [ "size_type", "classllfio__v2__xxx_1_1directory__handle.html#aafd3eb03845b55c19154cab76956efad", null ],
     [ "unique_id_type", "classllfio__v2__xxx_1_1directory__handle.html#a1a65884346740af7fb4648c79d44a750", null ],
+    [ "unique_id_type_hasher", "classllfio__v2__xxx_1_1directory__handle.html#ab82a83c5e44659e01a2218f0af41bde7", null ],
     [ "filter", "classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207", [
       [ "none", "classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207a334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
       [ "fastdeleted", "classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207a14847befc159c1492671b53718fc46f8", null ]
@@ -55,8 +56,8 @@ var classllfio__v2__xxx_1_1directory__handle =
     [ "kernel_caching", "classllfio__v2__xxx_1_1directory__handle.html#a90bf8668df002dac5a7d9397486b2946", null ],
     [ "link", "classllfio__v2__xxx_1_1directory__handle.html#aa7770c6b7c478d74654f25b8c1a1585c", null ],
     [ "native_handle", "classllfio__v2__xxx_1_1directory__handle.html#a942b0d276c9f20fe41baab679b88fe72", null ],
-    [ "operator=", "classllfio__v2__xxx_1_1directory__handle.html#a42cba9c448ac59e4f7057e01eb0ddf49", null ],
     [ "operator=", "classllfio__v2__xxx_1_1directory__handle.html#a9acfca399be5d868fe659fce5166d630", null ],
+    [ "operator=", "classllfio__v2__xxx_1_1directory__handle.html#a42cba9c448ac59e4f7057e01eb0ddf49", null ],
     [ "parent_path_handle", "classllfio__v2__xxx_1_1directory__handle.html#a865caad2f7f4bdf12fb74aabfe3c5ff5", null ],
     [ "QUICKCPPLIB_BITFIELD_BEGIN", "classllfio__v2__xxx_1_1directory__handle.html#ac5222904f116c9beb0515a4a5aa850bf", null ],
     [ "QUICKCPPLIB_BITFIELD_END", "classllfio__v2__xxx_1_1directory__handle.html#aa7e9bedf8c7a4c4a79a644a6e1857ee4", null ],
@@ -68,9 +69,9 @@ var classllfio__v2__xxx_1_1directory__handle =
     [ "set_append_only", "classllfio__v2__xxx_1_1directory__handle.html#a101620e9fff0c0e8c346af0e9de58b6a", null ],
     [ "st_dev", "classllfio__v2__xxx_1_1directory__handle.html#ac24ed4cdb96690d7da95cd17b0f3d090", null ],
     [ "st_ino", "classllfio__v2__xxx_1_1directory__handle.html#aad6465d30ee438b860ccc59c0e0fc4dc", null ],
-    [ "swap", "classllfio__v2__xxx_1_1directory__handle.html#a8752c5e4f4189c7bdfcd6eccb637bef9", null ],
     [ "swap", "classllfio__v2__xxx_1_1directory__handle.html#a988fca7e79f17902068f2fe8f0356782", null ],
     [ "swap", "classllfio__v2__xxx_1_1directory__handle.html#a4716696b8700953889006251e0678aa4", null ],
+    [ "swap", "classllfio__v2__xxx_1_1directory__handle.html#a8752c5e4f4189c7bdfcd6eccb637bef9", null ],
     [ "try_link", "classllfio__v2__xxx_1_1directory__handle.html#ad43b812385c7fc8aae9e59838a1411bb", null ],
     [ "try_link_for", "classllfio__v2__xxx_1_1directory__handle.html#a65d73e0e89bac484ce40427b58dcfe53", null ],
     [ "try_link_until", "classllfio__v2__xxx_1_1directory__handle.html#ad2703814c7599d2081ca10763bbeba4a", null ],

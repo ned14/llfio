@@ -32,6 +32,6 @@ var config_8hpp =
     [ "function_ptr", "config_8hpp.html#a23358ae319d76dd1149a26b04b17796a", null ],
     [ "handle", "config_8hpp.html#af65fb3311b32b8757c3b7ebdd045afe9", null ],
     [ "spinlock", "config_8hpp.html#a138a48536b1700db01f10e8a371d0a4f", null ],
-    [ "LLFIO_TEMPLATE", "config_8hpp.html#a02c02d05e24d34c25324c192df11c0b4", null ],
-    [ "LLFIO_TEMPLATE", "config_8hpp.html#a77c52ccdc38be135a374dbb4a7d1d466", null ]
+    [ "LLFIO_TEMPLATE", "config_8hpp.html#a77c52ccdc38be135a374dbb4a7d1d466", null ],
+    [ "LLFIO_TEMPLATE", "config_8hpp.html#a02c02d05e24d34c25324c192df11c0b4", null ]
 ];

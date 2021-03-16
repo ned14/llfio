@@ -10,6 +10,14 @@ var structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__st
     [ "_read_finished", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#ac363efe90328c9a7790d94c249a78f6b", null ],
     [ "_read_initiated", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#aa302f3e0b65077bc3721db595f6acb98", null ],
     [ "_unlock", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#abab4b9301e4e4bbf8b24e3769cd5bb1d", null ],
+    [ "_unsynchronised_io_operation_state", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#ac059f1ac51373dc506a7998fcf0b7147", null ],
+    [ "_unsynchronised_io_operation_state", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#a8a3379a6af67a1656a2ee2f20058f847", null ],
+    [ "_unsynchronised_io_operation_state", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#a4bb3966e906c5fb81cfa50244a8b7a8b", null ],
+    [ "_unsynchronised_io_operation_state", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#a3bd5f8aa3fff63f40b7280987e9e92f1", null ],
+    [ "_unsynchronised_io_operation_state", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#a72236e836e8d931921eed3969aee19e4", null ],
+    [ "_unsynchronised_io_operation_state", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#a3b5ca94b944cff01b36d4d85dcaf0975", null ],
+    [ "_unsynchronised_io_operation_state", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#a6121c00e99a0f542a3a3dd7948e70385", null ],
+    [ "_unsynchronised_io_operation_state", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#a15ba07e7c8a65bd0e68b66a246341fef", null ],
     [ "_write_completed", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#aa08fb625c75115401d281b61a83b8beb", null ],
     [ "_write_initiated", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#aad1ee50a73100f34335b64de59d94214", null ],
     [ "_write_or_barrier_finished", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#a9b3e1a73a321f965ee0d60deeebd2e62", null ],
@@ -29,7 +37,7 @@ var structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__st
     [ "write_or_barrier_finished", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#a321145a18f5f85416e41087a1dcc3a25", null ],
     [ "_lock_", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#af4cb1c032dcf9d7bc390e116e0d28094", null ],
     [ "h", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#aa0ea732afb9aed27c04d6f333ed815ae", null ],
-    [ "payload", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#a6cb6f315fe66846f31c5a0184ae413a5", null ],
+    [ "payload", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#acda4e1f8e7713fb5a0c5e1cffbb8dcac", null ],
     [ "state", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#aa41379b452b50f267639b8d2ebbbdfa4", null ],
     [ "visitor", "structllfio__v2__xxx_1_1io__multiplexer_1_1__synchronised__io__operation__state.html#a648d87148f5a16587c9f9c2a5663e20c", null ]
 ];
