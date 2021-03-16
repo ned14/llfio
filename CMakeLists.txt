@@ -28,11 +28,15 @@ include(QuickCppLibUtils)
 include(QuickCppLibPolicies)
 
 option(LLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE "Whether to use SG14 status_code for failure handling" OFF)
-option(LLFIO_DISABLE_LIBDISPATCH "Whether to disable automatic discovery of libdispatch/Grand Unified Dispatch" OFF)
 option(LLFIO_ENABLE_DEPENDENCY_SMOKE_TEST "Whether to build executables which are smoke tests that LLFIO is fully working. Used by various package managers such as vcpkg." OFF)
 option(LLFIO_ASSUME_CROSS_COMPILING "Whether to assume we are cross compiling. Normally automatically detected, but if automatic detection doesn't work, a working <filesystem> will not be found during cmake configure." OFF)
 option(UNIT_TESTS_BUILD_ALL "Whether to run all of the unit test suite." OFF)
 set(UNIT_TESTS_CXX_VERSION "latest" CACHE STRING "The version of C++ to use in the header-only unit tests")
+if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD" OR APPLE)
+  option(LLFIO_USE_LIBDISPATCH "Whether to use libdispatch/Grand Unified Dispatch (defaults on on BSD/Mac OS)" ON)
+else()
+  option(LLFIO_USE_LIBDISPATCH "Whether to use libdispatch/Grand Unified Dispatch (defaults on on BSD/Mac OS)" OFF)
+endif()
 
 ensure_git_subrepo("${CMAKE_CURRENT_SOURCE_DIR}/include/llfio/ntkernel-error-category/include" "https://github.com/ned14/ntkernel-error-category.git")
 
@@ -285,7 +289,7 @@ int main() {
   endif()
 endif()
 # Do we have Grand Central Dispatch on this platform?
-if(NOT LLFIO_DISABLE_LIBDISPATCH)
+if(LLFIO_USE_LIBDISPATCH)
   function(check_have_libdispatch postfix)
     set(CMAKE_REQUIRED_LIBRARIES ${ARGN})
     check_cxx_source_compiles("

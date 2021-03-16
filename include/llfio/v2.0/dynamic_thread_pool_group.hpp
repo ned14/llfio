@@ -135,28 +135,32 @@ of the initial `make_dynamic_thread_pool_group()`. The Win32 thread pool
 API may perform dynamic memory allocation internally, but that is outside
 our control.
 
+Overhead of LLFIO above the Win32 thread pool API is very low, statistically
+unmeasurable.
+
 ### POSIX
 
-If an installation of libdispatch is detected by LLFIO cmake during
-configuration, it is used preferentially. libdispatch is better known as
+If not on Linux, you will need libdispatch which is detected by LLFIO cmake
+during configuration. libdispatch is better known as
 Grand Central Dispatch, originally a Mac OS technology but since ported
 to a high quality kernel based implementation on recent FreeBSDs, and to
 a lower quality userspace based implementation on Linux. Generally
 libdispatch should get automatically found on Mac OS without additional
 effort; on FreeBSD it may need installing from ports; on Linux you would
 need to explicitly install `libdispatch-dev` or the equivalent. You can
-disable the automatic discovery in cmake of libdispatch by setting the
-cmake variable `LLFIO_DISABLE_LIBDISPATCH` to On.
+force the use in cmake of libdispatch by setting the cmake variable
+`LLFIO_USE_LIBDISPATCH` to On.
+
+Overhead of LLFIO above the libdispatch API is very low, statistically
+unmeasurable.
 
 ### Linux
 
-If libdispatch is not found, we have a custom Linux only userspace
-implementation. A a similar strategy to Microsoft Windows' approach is used. We
+On Linux only, we have a custom userspace implementation with superior performance.
+A similar strategy to Microsoft Windows' approach is used. We
 dynamically increase the number of kernel threads until none are sleeping
-awaiting i/o. If more kernel threads are running than 1.5x the number of
+awaiting i/o. If more kernel threads are running than three more than the number of
 CPUs in the system, the number of kernel threads is dynamically reduced.
-For portability, we also gate the maximum number of kernel threads to 500,
-except where threads have been detected as being in prolonged wait states.
 Note that **all** the kernel threads for the current process are considered,
 not just the kernel threads created by this thread pool implementation.
 Therefore, if you have alternative thread pool implementations (e.g. OpenMP,
@@ -166,6 +170,15 @@ As this is wholly implemented by this library, dynamic memory allocation
 occurs in the initial `make_dynamic_thread_pool_group()` and per thread
 creation, but otherwise the implementation does not perform dynamic memory
 allocations.
+
+After multiple rewrites, eventually I got this custom userspace implementation
+to have superior performance to both ASIO and libdispatch. For larger work
+items the difference is meaningless between all three, however for smaller
+work items I benchmarked this custom userspace implementation as beating
+(non-dynamic) ASIO by approx 29% and Linux libdispatch by approx 52% (note
+that Linux libdispatch appears to have a scale up bug when work items are
+small and few, it is often less than half the performance of LLFIO's custom
+implementation).
 */
 class LLFIO_DECL dynamic_thread_pool_group
 {
