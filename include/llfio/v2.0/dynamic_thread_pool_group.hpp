@@ -194,7 +194,7 @@ public:
     void *_internalworkh{nullptr};
     void *_internaltimerh{nullptr};  // lazily created if next() ever returns a deadline
     work_item *_prev{nullptr}, *_next{nullptr}, *_next_scheduled{nullptr};
-    intptr_t _nextwork{-1};
+    std::atomic<intptr_t> _nextwork{-1};
     std::chrono::steady_clock::time_point _timepoint1;
     std::chrono::system_clock::time_point _timepoint2;
     int _internalworkh_inuse{0};
@@ -213,7 +213,7 @@ public:
         , _prev(o._prev)
         , _next(o._next)
         , _next_scheduled(o._next_scheduled)
-        , _nextwork(o._nextwork)
+        , _nextwork(o._nextwork.load(std::memory_order_relaxed))
         , _timepoint1(o._timepoint1)
         , _timepoint2(o._timepoint2)
         , _internalworkh_inuse(o._internalworkh_inuse)
@@ -227,7 +227,7 @@ public:
         abort();
       }
       o._prev = o._next = o._next_scheduled = nullptr;
-      o._nextwork = -1;
+      o._nextwork.store(-1, std::memory_order_relaxed);
       o._internalworkh_inuse = 0;
     }
     work_item &operator=(const work_item &) = delete;
@@ -236,8 +236,8 @@ public:
   public:
     virtual ~work_item()
     {
-      assert(_nextwork == -1);
-      if(_nextwork != -1)
+      assert(_nextwork.load(std::memory_order_relaxed) == -1);
+      if(_nextwork.load(std::memory_order_relaxed) != -1)
       {
         LLFIO_LOG_FATAL(this, "FATAL: dynamic_thread_pool_group::work_item destroyed before all work was done!");
         abort();
