@@ -63,13 +63,16 @@ import LLFIO_MODULE_NAME;
 #include "utils.hpp"
 
 #include "directory_handle.hpp"
+#ifndef LLFIO_EXCLUDE_DYNAMIC_THREAD_POOL_GROUP
+#include "dynamic_thread_pool_group.hpp"
+#endif
+#include "fast_random_file_handle.hpp"
 #include "file_handle.hpp"
 #include "process_handle.hpp"
 #include "statfs.hpp"
 #ifdef LLFIO_INCLUDE_STORAGE_PROFILE
 #include "storage_profile.hpp"
 #endif
-#include "fast_random_file_handle.hpp"
 #include "symlink_handle.hpp"
 
 #include "algorithm/clone.hpp"

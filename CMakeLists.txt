@@ -32,6 +32,11 @@ option(LLFIO_ENABLE_DEPENDENCY_SMOKE_TEST "Whether to build executables which ar
 option(LLFIO_ASSUME_CROSS_COMPILING "Whether to assume we are cross compiling. Normally automatically detected, but if automatic detection doesn't work, a working <filesystem> will not be found during cmake configure." OFF)
 option(UNIT_TESTS_BUILD_ALL "Whether to run all of the unit test suite." OFF)
 set(UNIT_TESTS_CXX_VERSION "latest" CACHE STRING "The version of C++ to use in the header-only unit tests")
+if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD" OR APPLE)
+  option(LLFIO_USE_LIBDISPATCH "Whether to use libdispatch/Grand Unified Dispatch (defaults on on BSD/Mac OS)" ON)
+else()
+  option(LLFIO_USE_LIBDISPATCH "Whether to use libdispatch/Grand Unified Dispatch (defaults on on BSD/Mac OS)" OFF)
+endif()
 
 ensure_git_subrepo("${CMAKE_CURRENT_SOURCE_DIR}/include/llfio/ntkernel-error-category/include" "https://github.com/ned14/ntkernel-error-category.git")
 
@@ -283,6 +288,30 @@ int main() {
     all_compile_definitions(PUBLIC LLFIO_FORCE_EXPERIMENTAL_FILESYSTEM=1 KERNELTEST_FORCE_EXPERIMENTAL_FILESYSTEM=1)
   endif()
 endif()
+# Do we have Grand Central Dispatch on this platform?
+if(LLFIO_USE_LIBDISPATCH)
+  function(check_have_libdispatch postfix)
+    set(CMAKE_REQUIRED_LIBRARIES ${ARGN})
+    check_cxx_source_compiles("
+#include <dispatch/dispatch.h>
+int main() {
+  return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0) != nullptr;
+}
+" LLFIO_HAS_LIBDISPATCH_${postfix})
+  endfunction()
+  check_have_libdispatch(BUILTIN)
+  if(NOT LLFIO_HAS_LIBDISPATCH_BUILTIN)
+    check_have_libdispatch(WITH_LIBDISPATCH dispatch)
+    if(LLFIO_HAS_LIBDISPATCH_WITH_LIBDISPATCH)
+      all_link_libraries(PUBLIC dispatch)
+    endif()
+  endif()
+else()
+  all_compile_definitions(PUBLIC LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD=0)
+endif()
+if(NOT LLFIO_HAS_LIBDISPATCH_BUILTIN AND NOT LLFIO_HAS_LIBDISPATCH_WITH_LIBDISPATCH AND (CMAKE_SYSTEM_NAME MATCHES "FreeBSD" OR APPLE))
+  indented_message(FATAL_ERROR "FATAL: Grand Central Dispatch as libdispatch was not found on this FreeBSD or Mac OS system. libdispatch is required for LLFIO to build on those systems.")
+endif()
 
 # Set any macros this library requires
 all_compile_definitions(PRIVATE LLFIO_INCLUDE_STORAGE_PROFILE=1 LLFIO_ENABLE_TEST_IO_MULTIPLEXERS=1)
@@ -293,7 +322,8 @@ if(LLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE)
   all_compile_definitions(PUBLIC LLFIO_EXPERIMENTAL_STATUS_CODE=1)
 endif()
 if(WIN32)
-  all_compile_definitions(PRIVATE _WIN32_WINNT=0x601)  ## Target Win7
+  all_compile_definitions(PRIVATE _WIN32_WINNT=0x601)                ## Target Win7
+  target_compile_definitions(llfio_hl INTERFACE _WIN32_WINNT=0x601)  ## Target Win7
   if(NOT LLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE)
     target_link_libraries(llfio_hl INTERFACE ntkernel-error-category::hl)
     target_link_libraries(llfio_dl PUBLIC ntkernel-error-category::dl)
