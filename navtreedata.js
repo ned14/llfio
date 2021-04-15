@@ -26,11 +26,11 @@ var NAVTREE =
     [ "Build instructions", "md__build.html", [
       [ "v2 architecture and design implemented:", "index.html#autotoc_md18", null ],
       [ "Planned features implemented:", "index.html#autotoc_md19", null ],
-      [ "Get a copy of the source", "md__build.html#autotoc_md21", [
-        [ "If you already cloned before reading this", "md__build.html#autotoc_md22", null ]
+      [ "Install from the vcpkg package manager", "md__build.html#autotoc_md21", null ],
+      [ "Prebuilt binaries", "md__build.html#autotoc_md22", null ],
+      [ "Get a copy of the source", "md__build.html#autotoc_md23", [
+        [ "If you already cloned before reading this", "md__build.html#autotoc_md24", null ]
       ] ],
-      [ "Header only usage", "md__build.html#autotoc_md23", null ],
-      [ "Prebuilt binaries", "md__build.html#autotoc_md24", null ],
       [ "Build static libraries from source", "md__build.html#autotoc_md25", null ],
       [ "Build shared libraries from source", "md__build.html#autotoc_md26", null ],
       [ "Installing libraries from source", "md__build.html#autotoc_md27", null ]
