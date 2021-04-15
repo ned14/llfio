@@ -346,6 +346,10 @@ static inline void TestDynamicThreadPoolGroupNestingWorks()
 
 static inline void TestDynamicThreadPoolGroupIoAwareWorks()
 {
+  if(getenv("CI") != nullptr)
+  {
+    return;
+  }
   namespace llfio = LLFIO_V2_NAMESPACE;
   static constexpr size_t WORK_ITEMS = 1000;
   static constexpr size_t IO_SIZE = 1 * 65536;
