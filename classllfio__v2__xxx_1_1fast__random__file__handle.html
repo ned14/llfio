@@ -106,7 +106,7 @@ Inheritance diagram for llfio_v2_xxx::fast_random_file_handle:</div>
  <div class="center">
   <img src="classllfio__v2__xxx_1_1fast__random__file__handle.png" usemap="#llfio_5Fv2_5Fxxx::fast_5Frandom_5Ffile_5Fhandle_map" alt=""/>
   <map id="llfio_5Fv2_5Fxxx::fast_5Frandom_5Ffile_5Fhandle_map" name="llfio_5Fv2_5Fxxx::fast_5Frandom_5Ffile_5Fhandle_map">
-<area href="classllfio__v2__xxx_1_1file__handle.html" title="A handle to a regular file or device, kept data layout compatible with async_file_handle." alt="llfio_v2_xxx::file_handle" shape="rect" coords="116,168,338,192"/>
+<area href="classllfio__v2__xxx_1_1file__handle.html" title="A handle to a regular file or device." alt="llfio_v2_xxx::file_handle" shape="rect" coords="116,168,338,192"/>
 <area href="classllfio__v2__xxx_1_1lockable__io__handle.html" title="A handle to something capable of scatter-gather i/o and which can exclude other concurrent users...." alt="llfio_v2_xxx::lockable_io_handle" shape="rect" coords="0,112,222,136"/>
 <area href="classllfio__v2__xxx_1_1fs__handle.html" title="A handle to something with a device and inode number." alt="llfio_v2_xxx::fs_handle" shape="rect" coords="232,112,454,136"/>
 <area href="classllfio__v2__xxx_1_1io__handle.html" title="A handle to something capable of scatter-gather byte i/o." alt="llfio_v2_xxx::io_handle" shape="rect" coords="0,56,222,80"/>
@@ -802,9 +802,9 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX fdatasync() or Windows NtFlushBuffersFileEx() can return.</dt><dd></dd></dl>
 <dl class="section user"><dt>Memory Allocations\n None.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;  {</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;    <span class="keywordflow">return</span> (_ctx == <span class="keyword">nullptr</span>) ? <a class="code" href="classllfio__v2__xxx_1_1io__handle.html#a0f1d67fa1ad7f0d0b1256b6138929d60">_do_barrier</a>(reqs, kind, d) : _do_multiplexer_barrier({}, std::move(reqs), kind, d);</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;  {</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;    <span class="keywordflow">return</span> (_ctx == <span class="keyword">nullptr</span>) ? <a class="code" href="classllfio__v2__xxx_1_1io__handle.html#a0f1d67fa1ad7f0d0b1256b6138929d60">_do_barrier</a>(reqs, kind, d) : _do_multiplexer_barrier({}, std::move(reqs), kind, d);</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -946,15 +946,15 @@ For portability, you can only assume that barriers write order for a single hand
 
 <p>A coroutinised equivalent to <code>.barrier()</code> which suspends the coroutine until the i/o finishes. <b>Blocks execution</b> i.e is equivalent to <code>.barrier()</code> if no i/o multiplexer has been set on this handle! </p>
 <p>The awaitable returned is <b>eager</b> i.e. it immediately begins the i/o. If the i/o completes and finishes immediately, no coroutine suspension occurs. </p>
-<div class="fragment"><div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;  {</div>
-<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;    <span class="keywordflow">if</span>(_ctx == <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;    {</div>
-<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;      <span class="keywordflow">return</span> awaitable&lt;io_result&lt;const_buffers_type&gt;&gt;(<a class="code" href="classllfio__v2__xxx_1_1io__handle.html#a6a1044eeb6ab16939e4669bbeb071b32">barrier</a>(std::move(reqs), kind, d));</div>
-<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;    }</div>
-<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;    awaitable&lt;io_result&lt;const_buffers_type&gt;&gt; ret;</div>
-<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;    ret.set_state(_ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1io__multiplexer.html#a00bf4ea26d854a7e8c9734f357d417f3">construct</a>(ret._state_storage, <span class="keyword">this</span>, <span class="keyword">nullptr</span>, {}, d, std::move(reqs), kind));</div>
-<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;    <span class="keywordflow">return</span> ret;</div>
-<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;  {</div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;    <span class="keywordflow">if</span>(_ctx == <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;    {</div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;      <span class="keywordflow">return</span> awaitable&lt;io_result&lt;const_buffers_type&gt;&gt;(<a class="code" href="classllfio__v2__xxx_1_1io__handle.html#a6a1044eeb6ab16939e4669bbeb071b32">barrier</a>(std::move(reqs), kind, d));</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;    }</div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;    awaitable&lt;io_result&lt;const_buffers_type&gt;&gt; ret;</div>
+<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;    ret.set_state(_ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1io__multiplexer.html#a00bf4ea26d854a7e8c9734f357d417f3">construct</a>(ret._state_storage, <span class="keyword">this</span>, <span class="keyword">nullptr</span>, {}, d, std::move(reqs), kind));</div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;    <span class="keywordflow">return</span> ret;</div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -994,15 +994,15 @@ For portability, you can only assume that barriers write order for a single hand
 
 <p>A coroutinised equivalent to <code>.read()</code> which suspends the coroutine until the i/o finishes. <b>Blocks execution</b> i.e is equivalent to <code>.read()</code> if no i/o multiplexer has been set on this handle! </p>
 <p>The awaitable returned is <b>eager</b> i.e. it immediately begins the i/o. If the i/o completes and finishes immediately, no coroutine suspension occurs. </p>
-<div class="fragment"><div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;  {</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;    <span class="keywordflow">if</span>(_ctx == <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;    {</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;      <span class="keywordflow">return</span> awaitable&lt;io_result&lt;buffers_type&gt;&gt;(<a class="code" href="classllfio__v2__xxx_1_1io__handle.html#ae04ada27942187f03b59044cd1328f49">read</a>(std::move(reqs), d));</div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;    }</div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;    awaitable&lt;io_result&lt;buffers_type&gt;&gt; ret;</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;    ret.set_state(_ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1io__multiplexer.html#a00bf4ea26d854a7e8c9734f357d417f3">construct</a>(ret._state_storage, <span class="keyword">this</span>, <span class="keyword">nullptr</span>, {}, d, std::move(reqs)));</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;    <span class="keywordflow">return</span> ret;</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;  {</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;    <span class="keywordflow">if</span>(_ctx == <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;    {</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;      <span class="keywordflow">return</span> awaitable&lt;io_result&lt;buffers_type&gt;&gt;(<a class="code" href="classllfio__v2__xxx_1_1io__handle.html#ae04ada27942187f03b59044cd1328f49">read</a>(std::move(reqs), d));</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;    }</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;    awaitable&lt;io_result&lt;buffers_type&gt;&gt; ret;</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;    ret.set_state(_ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1io__multiplexer.html#a00bf4ea26d854a7e8c9734f357d417f3">construct</a>(ret._state_storage, <span class="keyword">this</span>, <span class="keyword">nullptr</span>, {}, d, std::move(reqs)));</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;    <span class="keywordflow">return</span> ret;</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1042,15 +1042,15 @@ For portability, you can only assume that barriers write order for a single hand
 
 <p>A coroutinised equivalent to <code>.write()</code> which suspends the coroutine until the i/o finishes. <b>Blocks execution</b> i.e is equivalent to <code>.write()</code> if no i/o multiplexer has been set on this handle! </p>
 <p>The awaitable returned is <b>eager</b> i.e. it immediately begins the i/o. If the i/o completes and finishes immediately, no coroutine suspension occurs. </p>
-<div class="fragment"><div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;  {</div>
-<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;    <span class="keywordflow">if</span>(_ctx == <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;    {</div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;      <span class="keywordflow">return</span> awaitable&lt;io_result&lt;const_buffers_type&gt;&gt;(<a class="code" href="classllfio__v2__xxx_1_1io__handle.html#a7848ef15e774eacec7e4446a8c365a3d">write</a>(std::move(reqs), d));</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    }</div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    awaitable&lt;io_result&lt;const_buffers_type&gt;&gt; ret;</div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;    ret.set_state(_ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1io__multiplexer.html#a00bf4ea26d854a7e8c9734f357d417f3">construct</a>(ret._state_storage, <span class="keyword">this</span>, <span class="keyword">nullptr</span>, {}, d, std::move(reqs)));</div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;    <span class="keywordflow">return</span> ret;</div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;  {</div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;    <span class="keywordflow">if</span>(_ctx == <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;    {</div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;      <span class="keywordflow">return</span> awaitable&lt;io_result&lt;const_buffers_type&gt;&gt;(<a class="code" href="classllfio__v2__xxx_1_1io__handle.html#a7848ef15e774eacec7e4446a8c365a3d">write</a>(std::move(reqs), d));</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;    }</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;    awaitable&lt;io_result&lt;const_buffers_type&gt;&gt; ret;</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    ret.set_state(_ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1io__multiplexer.html#a00bf4ea26d854a7e8c9734f357d417f3">construct</a>(ret._state_storage, <span class="keyword">this</span>, <span class="keyword">nullptr</span>, {}, d, std::move(reqs)));</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    <span class="keywordflow">return</span> ret;</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1311,7 +1311,7 @@ For portability, you can only assume that barriers write order for a single hand
 
 <p>Locks the inode referred to by the open handle for exclusive access. </p>
 <p>Note that this may, or may not, interact with the byte range lock extensions. See <code>unique_file_lock</code> for a RAII locker. </p><dl class="section user"><dt>Errors returnable\n Any of the values POSIX flock() can return.</dt><dd></dd></dl>
-<dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd>The asynchronous implementation in <code>async_file_handle</code> performs one calloc and one free. </dd></dl>
+<dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd></dd></dl>
 
 </div>
 </div>
@@ -1380,7 +1380,7 @@ For portability, you can only assume that barriers write order for a single hand
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX fcntl() can return, errc::timed_out, errc::not_supported may be</dt><dd>returned if deadline i/o is not possible with this particular handle configuration (e.g. non-overlapped HANDLE on Windows). </dd></dl>
-<dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd>The asynchronous implementation in async_file_handle performs one calloc and one free. </dd></dl>
+<dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd></dd></dl>
 
 <p>Reimplemented from <a class="el" href="classllfio__v2__xxx_1_1lockable__io__handle.html#a0ece4f0a48e1e67debc438a9742a1f4c">llfio_v2_xxx::lockable_io_handle</a>.</p>
 <div class="fragment"><div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  {</div>
@@ -1415,7 +1415,7 @@ For portability, you can only assume that barriers write order for a single hand
 
 <p>Locks the inode referred to by the open handle for shared access. </p>
 <p>Note that this may, or may not, interact with the byte range lock extensions. See <code>unique_file_lock</code> for a RAII locker. </p><dl class="section user"><dt>Errors returnable\n Any of the values POSIX flock() can return.</dt><dd></dd></dl>
-<dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd>The asynchronous implementation in <code>async_file_handle</code> performs one calloc and one free. </dd></dl>
+<dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd></dd></dl>
 
 </div>
 </div>
@@ -1674,8 +1674,8 @@ For portability, you can only assume that barriers write order for a single hand
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX read() can return, errc::timed_out, errc::operation_canceled. errc::not_supported may be</dt><dd>returned if deadline i/o is not possible with this particular handle configuration (e.g. reading from regular files on POSIX or reading from a non-overlapped HANDLE on Windows). </dd></dl>
-<dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd>The asynchronous implementation in async_file_handle performs one calloc and one free. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;{ <span class="keywordflow">return</span> (_ctx == <span class="keyword">nullptr</span>) ? <a class="code" href="classllfio__v2__xxx_1_1io__handle.html#a4379e3f84b913f606bb2ec6a194d4380">_do_read</a>(reqs, d) : _do_multiplexer_read({}, reqs, d); }</div>
+<dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd></dd></dl>
+<div class="fragment"><div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;{ <span class="keywordflow">return</span> (_ctx == <span class="keyword">nullptr</span>) ? <a class="code" href="classllfio__v2__xxx_1_1io__handle.html#a4379e3f84b913f606bb2ec6a194d4380">_do_read</a>(reqs, d) : _do_multiplexer_read({}, reqs, d); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1852,36 +1852,36 @@ For portability, you can only assume that barriers write order for a single hand
 <dl class="section user"><dt>Memory Allocations\n Multiple dynamic memory allocations and deallocations.</dt><dd></dd></dl>
 
 <p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1mapped__file__handle.html#ac9a87793288b496940bdae0ff07cae0c">llfio_v2_xxx::mapped_file_handle</a>.</p>
-<div class="fragment"><div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;{</div>
-<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;  <span class="keywordflow">if</span>(!<a class="code" href="classllfio__v2__xxx_1_1handle.html#ade2416b9154d1e56937c99cd514324f8">is_multiplexable</a>())</div>
-<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;  {</div>
-<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;    <span class="keywordflow">return</span> errc::operation_not_supported;</div>
-<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;  }</div>
-<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;  <span class="keywordflow">if</span>(c == _ctx)</div>
-<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;  {</div>
-<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;    <span class="keywordflow">return</span> success();</div>
-<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;  }</div>
-<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;  <span class="keywordflow">if</span>(_ctx != <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;  {</div>
-<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;    OUTCOME_TRY(_ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1io__multiplexer.html#a7c9d163a9e1ca06acbce1f135cfef087">do_io_handle_deregister</a>(<span class="keyword">this</span>));</div>
-<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;    _ctx = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;  }</div>
-<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;  <span class="keywordflow">if</span>(c != <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;  {</div>
-<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;    OUTCOME_TRY(<span class="keyword">auto</span> &amp;&amp;state, c-&gt;do_io_handle_register(<span class="keyword">this</span>));</div>
-<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;    _v.behaviour = (_v.behaviour &amp; ~(native_handle_type::disposition::_multiplexer_state_bit0 | native_handle_type::disposition::_multiplexer_state_bit1));</div>
-<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;    <span class="keywordflow">if</span>((state &amp; 1) != 0)</div>
-<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;    {</div>
-<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;      _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit0;</div>
-<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;    }</div>
-<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;    <span class="keywordflow">if</span>((state &amp; 2) != 0)</div>
-<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;    {</div>
-<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;      _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit1;</div>
-<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;    }</div>
-<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;  }</div>
-<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;  _ctx = c;</div>
-<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;  <span class="keywordflow">return</span> success();</div>
-<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;{</div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;  <span class="keywordflow">if</span>(!<a class="code" href="classllfio__v2__xxx_1_1handle.html#ade2416b9154d1e56937c99cd514324f8">is_multiplexable</a>())</div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;  {</div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;    <span class="keywordflow">return</span> errc::operation_not_supported;</div>
+<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;  }</div>
+<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;  <span class="keywordflow">if</span>(c == _ctx)</div>
+<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;  {</div>
+<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;    <span class="keywordflow">return</span> success();</div>
+<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;  }</div>
+<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;  <span class="keywordflow">if</span>(_ctx != <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;  {</div>
+<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;    OUTCOME_TRY(_ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1io__multiplexer.html#a7c9d163a9e1ca06acbce1f135cfef087">do_io_handle_deregister</a>(<span class="keyword">this</span>));</div>
+<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;    _ctx = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;  }</div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;  <span class="keywordflow">if</span>(c != <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;  {</div>
+<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;    OUTCOME_TRY(<span class="keyword">auto</span> &amp;&amp;state, c-&gt;do_io_handle_register(<span class="keyword">this</span>));</div>
+<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;    _v.behaviour = (_v.behaviour &amp; ~(native_handle_type::disposition::_multiplexer_state_bit0 | native_handle_type::disposition::_multiplexer_state_bit1));</div>
+<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;    <span class="keywordflow">if</span>((state &amp; 1) != 0)</div>
+<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;    {</div>
+<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;      _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit0;</div>
+<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;    }</div>
+<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;    <span class="keywordflow">if</span>((state &amp; 2) != 0)</div>
+<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;    {</div>
+<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;      _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit1;</div>
+<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;    }</div>
+<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;  }</div>
+<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;  _ctx = c;</div>
+<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;  <span class="keywordflow">return</span> success();</div>
+<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1939,10 +1939,10 @@ For portability, you can only assume that barriers write order for a single hand
 <p>Create a file handle creating the named file on some path which the OS declares to be suitable for temporary files. Most OSs are very lazy about flushing changes made to these temporary files. Note the default flags are to have the newly created file deleted on first handle close. Note also that an empty name is equivalent to calling <code>uniquely_named_file(path_discovery::storage_backed_temporary_files_directory())</code> and the creation parameter is ignored.</p>
 <dl class="section note"><dt>Note</dt><dd>If the temporary file you are creating is not going to have its path sent to another process for usage, this is the WRONG function to use. Use <code>temp_inode()</code> instead, it is far more secure.</dd></dl>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX open() or CreateFile() can return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  {</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <span class="keyword">auto</span> &amp;tempdirh = <a class="code" href="namespacellfio__v2__xxx_1_1path__discovery.html#a2dd74ea752f3f511d58ccccdcac7f4fd">path_discovery::storage_backed_temporary_files_directory</a>();</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="keywordflow">return</span> name.empty() ? <a class="code" href="classllfio__v2__xxx_1_1file__handle.html#a8b7aa986243527fe224425f61c179709">uniquely_named_file</a>(tempdirh, _mode, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>) : <a class="code" href="classllfio__v2__xxx_1_1file__handle.html#a09e6b3e9806b328a687a55e955b885a3">file</a>(tempdirh, name, _mode, _creation, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>);</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  {</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    <span class="keyword">auto</span> &amp;tempdirh = <a class="code" href="namespacellfio__v2__xxx_1_1path__discovery.html#a2dd74ea752f3f511d58ccccdcac7f4fd">path_discovery::storage_backed_temporary_files_directory</a>();</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    <span class="keywordflow">return</span> name.empty() ? <a class="code" href="classllfio__v2__xxx_1_1file__handle.html#a8b7aa986243527fe224425f61c179709">uniquely_named_file</a>(tempdirh, _mode, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>) : <a class="code" href="classllfio__v2__xxx_1_1file__handle.html#a09e6b3e9806b328a687a55e955b885a3">file</a>(tempdirh, name, _mode, _creation, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>);</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2015,7 +2015,7 @@ For portability, you can only assume that barriers write order for a single hand
 
 <p>Tries to lock the inode referred to by the open handle for exclusive access, returning <code>false</code> if lock is currently unavailable. </p>
 <p>Note that this may, or may not, interact with the byte range lock extensions. See <code>unique_file_lock</code> for a RAII locker. </p><dl class="section user"><dt>Errors returnable\n Any of the values POSIX flock() can return.</dt><dd></dd></dl>
-<dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd>The asynchronous implementation in <code>async_file_handle</code> performs one calloc and one free. </dd></dl>
+<dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd></dd></dl>
 
 </div>
 </div>
@@ -2044,7 +2044,7 @@ For portability, you can only assume that barriers write order for a single hand
 
 <p>Tries to lock the inode referred to by the open handle for shared access, returning <code>false</code> if lock is currently unavailable. </p>
 <p>Note that this may, or may not, interact with the byte range lock extensions. See <code>unique_file_lock</code> for a RAII locker. </p><dl class="section user"><dt>Errors returnable\n Any of the values POSIX flock() can return.</dt><dd></dd></dl>
-<dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd>The asynchronous implementation in <code>async_file_handle</code> performs one calloc and one free. </dd></dl>
+<dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd></dd></dl>
 
 </div>
 </div>
@@ -2095,25 +2095,25 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 <p>Create a file handle creating a uniquely named file on a path. The file is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing file. Note also that caching defaults to temporary which hints to the OS to only flush changes to physical storage as lately as possible.</p>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX open() or CreateFile() can return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;  {</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="keywordflow">try</span></div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    {</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;      <span class="keywordflow">for</span>(;;)</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;      {</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">utils::random_string</a>(32);</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        randomname.append(<span class="stringliteral">&quot;.random&quot;</span>);</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        result&lt;file_handle&gt; ret = <a class="code" href="classllfio__v2__xxx_1_1file__handle.html#a09e6b3e9806b328a687a55e955b885a3">file</a>(dirpath, randomname, _mode, <a class="code" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255">creation::only_if_not_exist</a>, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>);</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;        <span class="keywordflow">if</span>(ret || (!ret &amp;&amp; ret.error() != errc::file_exists))</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;        {</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;          <span class="keywordflow">return</span> ret;</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;        }</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;      }</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    }</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    <span class="keywordflow">catch</span>(...)</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    {</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    }</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  {</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <span class="keywordflow">try</span></div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    {</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;      <span class="keywordflow">for</span>(;;)</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;      {</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">utils::random_string</a>(32);</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        randomname.append(<span class="stringliteral">&quot;.random&quot;</span>);</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        result&lt;file_handle&gt; ret = <a class="code" href="classllfio__v2__xxx_1_1file__handle.html#a09e6b3e9806b328a687a55e955b885a3">file</a>(dirpath, randomname, _mode, <a class="code" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255">creation::only_if_not_exist</a>, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>);</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        <span class="keywordflow">if</span>(ret || (!ret &amp;&amp; ret.error() != errc::file_exists))</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        {</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;          <span class="keywordflow">return</span> ret;</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;        }</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;      }</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    }</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    <span class="keywordflow">catch</span>(...)</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    {</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    }</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2251,8 +2251,8 @@ For portability, you can only assume that barriers write order for a single hand
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX write() can return, errc::timed_out, errc::operation_canceled. errc::not_supported may be</dt><dd>returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
-<dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd>The asynchronous implementation in async_file_handle performs one calloc and one free. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;{ <span class="keywordflow">return</span> (_ctx == <span class="keyword">nullptr</span>) ? <a class="code" href="classllfio__v2__xxx_1_1io__handle.html#a2102f73a4872e8fd8bbe1c71ef82c97f">_do_write</a>(reqs, d) : _do_multiplexer_write({}, std::move(reqs), d); }</div>
+<dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd></dd></dl>
+<div class="fragment"><div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;{ <span class="keywordflow">return</span> (_ctx == <span class="keyword">nullptr</span>) ? <a class="code" href="classllfio__v2__xxx_1_1io__handle.html#a2102f73a4872e8fd8bbe1c71ef82c97f">_do_write</a>(reqs, d) : _do_multiplexer_write({}, std::move(reqs), d); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2261,25 +2261,25 @@ For portability, you can only assume that barriers write order for a single hand
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a7848ef15e774eacec7e4446a8c365a3d"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a7848ef15e774eacec7e4446a8c365a3d">llfio_v2_xxx::io_handle::write</a></div><div class="ttdeci">io_result&lt; const_buffers_type &gt; write(io_request&lt; const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the open handle, preferentially using any i/o multiplexer set over the virtually overri...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:327</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a7848ef15e774eacec7e4446a8c365a3d"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a7848ef15e774eacec7e4446a8c365a3d">llfio_v2_xxx::io_handle::write</a></div><div class="ttdeci">io_result&lt; const_buffers_type &gt; write(io_request&lt; const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the open handle, preferentially using any i/o multiplexer set over the virtually overri...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:325</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255">llfio_v2_xxx::handle::creation::only_if_not_exist</a></div><div class="ttdeci">@ only_if_not_exist</div><div class="ttdoc">Filesystem entry must NOT exist, and is atomically created by the success of this operation.</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a6a1044eeb6ab16939e4669bbeb071b32"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a6a1044eeb6ab16939e4669bbeb071b32">llfio_v2_xxx::io_handle::barrier</a></div><div class="ttdeci">virtual io_result&lt; const_buffers_type &gt; barrier(io_request&lt; const_buffers_type &gt; reqs=io_request&lt; const_buffers_type &gt;(), barrier_kind kind=barrier_kind::nowait_data_only, deadline d=deadline()) noexcept</div><div class="ttdoc">Issue a write reordering barrier such that writes preceding the barrier will reach storage before wri...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:378</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a6a1044eeb6ab16939e4669bbeb071b32"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a6a1044eeb6ab16939e4669bbeb071b32">llfio_v2_xxx::io_handle::barrier</a></div><div class="ttdeci">virtual io_result&lt; const_buffers_type &gt; barrier(io_request&lt; const_buffers_type &gt; reqs=io_request&lt; const_buffers_type &gt;(), barrier_kind kind=barrier_kind::nowait_data_only, deadline d=deadline()) noexcept</div><div class="ttdoc">Issue a write reordering barrier such that writes preceding the barrier will reach storage before wri...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:376</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1fast__random__file__handle_html_a4661a9c1551d33d054ccd80599806ba7"><div class="ttname"><a href="classllfio__v2__xxx_1_1fast__random__file__handle.html#a4661a9c1551d33d054ccd80599806ba7">llfio_v2_xxx::fast_random_file_handle::fast_random_file_handle</a></div><div class="ttdeci">fast_random_file_handle()=default</div><div class="ttdoc">Default constructor.</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_ad17b8879c355d86174187f198b70baaa"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#ad17b8879c355d86174187f198b70baaa">llfio_v2_xxx::io_handle::_do_allocate_registered_buffer</a></div><div class="ttdeci">virtual result&lt; registered_buffer_type &gt; _do_allocate_registered_buffer(size_t &amp;bytes) noexcept</div><div class="ttdoc">The virtualised implementation of allocate_registered_buffer() used if no multiplexer has been set.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:881</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a4379e3f84b913f606bb2ec6a194d4380"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a4379e3f84b913f606bb2ec6a194d4380">llfio_v2_xxx::io_handle::_do_read</a></div><div class="ttdeci">virtual io_result&lt; buffers_type &gt; _do_read(io_request&lt; buffers_type &gt; reqs, deadline d) noexcept</div><div class="ttdoc">The virtualised implementation of read() used if no multiplexer has been set.</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__multiplexer_html_a00bf4ea26d854a7e8c9734f357d417f3"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__multiplexer.html#a00bf4ea26d854a7e8c9734f357d417f3">llfio_v2_xxx::io_multiplexer::construct</a></div><div class="ttdeci">virtual io_operation_state * construct(span&lt; byte &gt; storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &amp;&amp;b, deadline d, io_request&lt; buffers_type &gt; reqs) noexcept=0</div><div class="ttdoc">Constructs either a unsynchronised_io_operation_state or a synchronised_io_operation_state for a read...</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1io__multiplexer_html_a1cc4f56ad15d1bed49d68c56a278ad0c"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__multiplexer.html#a1cc4f56ad15d1bed49d68c56a278ad0c">llfio_v2_xxx::io_multiplexer::do_io_handle_max_buffers</a></div><div class="ttdeci">virtual size_t do_io_handle_max_buffers(const io_handle *h) const noexcept</div><div class="ttdoc">Implements io_handle::max_buffers()</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:506</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1file__handle_html_a8b7aa986243527fe224425f61c179709"><div class="ttname"><a href="classllfio__v2__xxx_1_1file__handle.html#a8b7aa986243527fe224425f61c179709">llfio_v2_xxx::file_handle::uniquely_named_file</a></div><div class="ttdeci">static result&lt; file_handle &gt; uniquely_named_file(const path_handle &amp;dirpath, mode _mode=mode::write, caching _caching=caching::temporary, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:165</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1io__multiplexer_html_a1cc4f56ad15d1bed49d68c56a278ad0c"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__multiplexer.html#a1cc4f56ad15d1bed49d68c56a278ad0c">llfio_v2_xxx::io_multiplexer::do_io_handle_max_buffers</a></div><div class="ttdeci">virtual size_t do_io_handle_max_buffers(const io_handle *h) const noexcept</div><div class="ttdoc">Implements io_handle::max_buffers()</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:504</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1file__handle_html_a8b7aa986243527fe224425f61c179709"><div class="ttname"><a href="classllfio__v2__xxx_1_1file__handle.html#a8b7aa986243527fe224425f61c179709">llfio_v2_xxx::file_handle::uniquely_named_file</a></div><div class="ttdeci">static result&lt; file_handle &gt; uniquely_named_file(const path_handle &amp;dirpath, mode _mode=mode::write, caching _caching=caching::temporary, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:163</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1file__handle_html_a09e6b3e9806b328a687a55e955b885a3"><div class="ttname"><a href="classllfio__v2__xxx_1_1file__handle.html#a09e6b3e9806b328a687a55e955b885a3">llfio_v2_xxx::file_handle::file</a></div><div class="ttdeci">static result&lt; file_handle &gt; file(const path_handle &amp;base, path_view_type path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_1_1utils_html_a6a29cf29a4b097411f6c1e5274bfb417"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">llfio_v2_xxx::utils::random_string</a></div><div class="ttdeci">std::string random_string(size_t randomlen)</div><div class="ttdoc">Returns a cryptographically random string capable of being used as a filename. Essentially random_fil...</div><div class="ttdef"><b>Definition:</b> utils.hpp:169</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1io__multiplexer_html_a3e79fd19de80e77c274b93d0d01b2f10"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__multiplexer.html#a3e79fd19de80e77c274b93d0d01b2f10">llfio_v2_xxx::io_multiplexer::do_io_handle_allocate_registered_buffer</a></div><div class="ttdeci">virtual result&lt; registered_buffer_type &gt; do_io_handle_allocate_registered_buffer(io_handle *h, size_t &amp;bytes) noexcept</div><div class="ttdoc">Implements io_handle::allocate_registered_buffer()</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:510</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1io__multiplexer_html_a3e79fd19de80e77c274b93d0d01b2f10"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__multiplexer.html#a3e79fd19de80e77c274b93d0d01b2f10">llfio_v2_xxx::io_multiplexer::do_io_handle_allocate_registered_buffer</a></div><div class="ttdeci">virtual result&lt; registered_buffer_type &gt; do_io_handle_allocate_registered_buffer(io_handle *h, size_t &amp;bytes) noexcept</div><div class="ttdoc">Implements io_handle::allocate_registered_buffer()</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:508</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_1_1utils_html_ae61e2de30b06776a1c24643a1d1dc64e"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1utils.html#ae61e2de30b06776a1c24643a1d1dc64e">llfio_v2_xxx::utils::random_fill</a></div><div class="ttdeci">void random_fill(char *buffer, size_t bytes) noexcept</div><div class="ttdoc">Fills the buffer supplied with cryptographically strong randomness. Uses the OS kernel API.</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_1_1path__discovery_html_a2dd74ea752f3f511d58ccccdcac7f4fd"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1path__discovery.html#a2dd74ea752f3f511d58ccccdcac7f4fd">llfio_v2_xxx::path_discovery::storage_backed_temporary_files_directory</a></div><div class="ttdeci">const path_handle &amp; storage_backed_temporary_files_directory() noexcept</div><div class="ttdoc">Returns a reference to an open handle to a verified temporary directory where files created are store...</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__multiplexer_html_a7c9d163a9e1ca06acbce1f135cfef087"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__multiplexer.html#a7c9d163a9e1ca06acbce1f135cfef087">llfio_v2_xxx::io_multiplexer::do_io_handle_deregister</a></div><div class="ttdeci">virtual result&lt; void &gt; do_io_handle_deregister(io_handle *) noexcept</div><div class="ttdoc">Implements io_handle deregistration.</div><div class="ttdef"><b>Definition:</b> io_multiplexer.hpp:476</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_ae04ada27942187f03b59044cd1328f49"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#ae04ada27942187f03b59044cd1328f49">llfio_v2_xxx::io_handle::read</a></div><div class="ttdeci">io_result&lt; buffers_type &gt; read(io_request&lt; buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Read data from the open handle, preferentially using any i/o multiplexer set over the virtually overr...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:284</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_ae04ada27942187f03b59044cd1328f49"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#ae04ada27942187f03b59044cd1328f49">llfio_v2_xxx::io_handle::read</a></div><div class="ttdeci">io_result&lt; buffers_type &gt; read(io_request&lt; buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Read data from the open handle, preferentially using any i/o multiplexer set over the virtually overr...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:283</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_ae5ec845b3e2c2e31c2dc3de1d276a7e3"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#ae5ec845b3e2c2e31c2dc3de1d276a7e3">llfio_v2_xxx::io_handle::_do_max_buffers</a></div><div class="ttdeci">virtual size_t _do_max_buffers() const noexcept</div><div class="ttdoc">The virtualised implementation of max_buffers() used if no multiplexer has been set.</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_a013936bc1254b1a47567fe29698d1b1c"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">llfio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with.</div><div class="ttdef"><b>Definition:</b> handle.hpp:423</div></div>
-<div class="ttc" id="anamespacellfio__v2__xxx_html_af31a062639499a79ef5cc8aed16ba65d"><div class="ttname"><a href="namespacellfio__v2__xxx.html#af31a062639499a79ef5cc8aed16ba65d">llfio_v2_xxx::file</a></div><div class="ttdeci">result&lt; file_handle &gt; file(const path_handle &amp;base, file_handle::path_view_type path, file_handle::mode _mode=file_handle::mode::read, file_handle::creation _creation=file_handle::creation::open_existing, file_handle::caching _caching=file_handle::caching::all, file_handle::flag flags=file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:421</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_af31a062639499a79ef5cc8aed16ba65d"><div class="ttname"><a href="namespacellfio__v2__xxx.html#af31a062639499a79ef5cc8aed16ba65d">llfio_v2_xxx::file</a></div><div class="ttdeci">result&lt; file_handle &gt; file(const path_handle &amp;base, file_handle::path_view_type path, file_handle::mode _mode=file_handle::mode::read, file_handle::creation _creation=file_handle::creation::open_existing, file_handle::caching _caching=file_handle::caching::all, file_handle::flag flags=file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:418</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_aa3930273a2d4cabbac309e0b75701dcaa9516dfb15f51c7ee19a4d46b8c0dbe1d"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaa9516dfb15f51c7ee19a4d46b8c0dbe1d">llfio_v2_xxx::handle::mode::append</a></div><div class="ttdeci">@ append</div><div class="ttdoc">All mainstream OSs and CIFS guarantee this is atomic with respect to all other appenders (FILE_APPEND...</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_aa3930273a2d4cabbac309e0b75701dcaaefb2a684e4afb7d55e6147fbe5a332ee"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaaefb2a684e4afb7d55e6147fbe5a332ee">llfio_v2_xxx::handle::mode::write</a></div><div class="ttdeci">@ write</div><div class="ttdoc">Ability to read and write (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|FILE_WRITE_D...</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_ade2416b9154d1e56937c99cd514324f8"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#ade2416b9154d1e56937c99cd514324f8">llfio_v2_xxx::handle::is_multiplexable</a></div><div class="ttdeci">bool is_multiplexable() const noexcept</div><div class="ttdoc">True if multiplexable.</div><div class="ttdef"><b>Definition:</b> handle.hpp:358</div></div>

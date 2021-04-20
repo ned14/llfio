@@ -139,24 +139,7 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <div class="line">  <span class="comment">// Write and read as you see fit, if you exceed physical RAM it&#39;ll be paged out</span></div>
 <div class="line">  one_trillion_int_array[0] = 5;</div>
 <div class="line">  one_trillion_int_array[999999999999ULL] = 6;</div>
-</div><!-- fragment --> </td><td width="50%" valign="top"><div class="fragment"><div class="line">  <span class="keyword">namespace </span><a class="code" href="namespacellfio__v2__xxx.html">llfio</a> = <a class="code" href="group__config.html#gac9f7f0153adb9034d26c4554728f817a">LLFIO_V2_NAMESPACE</a>;</div>
-<div class="line"> </div>
-<div class="line">  <span class="comment">// Create an asynchronous file handle</span></div>
-<div class="line">  llfio::io_service service;</div>
-<div class="line">  llfio::async_file_handle fh =</div>
-<div class="line">    llfio::async_file(service, {}, <span class="stringliteral">&quot;testfile.txt&quot;</span>,</div>
-<div class="line">      <a class="code" href="namespacellfio__v2__xxx.html#a5a8908704c9988bbecc69c2359e6fd4a">llfio::async_file_handle::mode::write</a>,</div>
-<div class="line">      llfio::async_file_handle::creation::if_needed).value();</div>
-<div class="line"> </div>
-<div class="line">  <span class="comment">// Resize it to 1024 bytes</span></div>
-<div class="line">  <a class="code" href="namespacellfio__v2__xxx.html#a16ee1bea5a5791ecde266420e00fba81">truncate</a>(fh, 1024).value();</div>
-<div class="line"> </div>
-<div class="line">  <span class="comment">// Begin to asynchronously write &quot;hello world&quot; into the file at offset 0,</span></div>
-<div class="line">  <span class="comment">// suspending execution of this coroutine until completion and then resuming</span></div>
-<div class="line">  <span class="comment">// execution. Requires the Coroutines TS.</span></div>
-<div class="line">  <span class="keyword">alignas</span>(4096) <span class="keywordtype">char</span> buffer[] = <span class="stringliteral">&quot;hello world&quot;</span>;</div>
-<div class="line">  co_await co_write(fh, 0, { { <span class="keyword">reinterpret_cast&lt;</span>llfio::byte *<span class="keyword">&gt;</span>(buffer), <span class="keyword">sizeof</span>(buffer) } }).value();</div>
-</div><!-- fragment -->  </td></tr>
+</div><!-- fragment --> </td><td width="50%" valign="top"><div class="fragment"></div><!-- fragment -->  </td></tr>
 </table>
 <p>See <a href="https://github.com/ned14/llfio/blob/master/programs/fs-probe/fs_probe_results.yaml">https://github.com/ned14/llfio/blob/master/programs/fs-probe/fs_probe_results.yaml</a> for a database of latencies for various previously tested OS, filing systems and storage devices.</p>
 <p>Todo list for already implemented parts: <a href="https://ned14.github.io/llfio/todo.html">https://ned14.github.io/llfio/todo.html</a></p>
@@ -187,8 +170,6 @@ directory_handle - enumerates the filesystem</li>
 io_handle - adds synchronous scatter-gather i/o, byte range locking</li>
 <li>
 file_handle - adds open/create file, get and set maximum extent</li>
-<li>
-async_file_handle - adds asynchronous scatter-gather i/o</li>
 <li>
 mapped_file_handle - adds low latency memory mapped scatter-gather i/o</li>
 </ol>
@@ -293,22 +274,20 @@ Planned features implemented:</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"></td><td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">Set random or sequential i/o (prefetch).  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">i/o on <code>async_file_handle</code> is coroutines awaitable.  </td></tr>
-<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone"><code>llfio::algorithm::trivial_vector&lt;T&gt;</code> with constant time reallocation if <code>T</code> is trivially copyable.  </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"></td><td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone"><code>symlink_handle</code>.  </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">Large, huge and massive page size support for memory allocation and (POSIX only) file maps.  </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">A mechanism for writing a <code>stat_t</code> onto an inode.  </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">Graph based directory hierarchy traveral algorithm.  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">Graph based directory hierarchy summary algorithm.  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">Graph based reliable directory hierarchy deletion algorithm.  </td></tr>
+<td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">Graph based directory hierarchy summary algorithm.  </td></tr>
 <tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">Graph based reliable directory hierarchy deletion algorithm.  </td></tr>
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">✔ </td><td class="markdownTableBodyNone">Intelligent file contents cloning between file handles.  </td></tr>
 </table>
 <p>Todo thereafter in order of priority:</p>
@@ -381,13 +360,11 @@ Planned features implemented:</h2>
 </div></div><!-- PageDoc -->
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="anamespacellfio__v2__xxx_html_a16ee1bea5a5791ecde266420e00fba81"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a16ee1bea5a5791ecde266420e00fba81">llfio_v2_xxx::truncate</a></div><div class="ttdeci">result&lt; file_handle::extent_type &gt; truncate(file_handle &amp;self, file_handle::extent_type newsize) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:504</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1mapped__file__handle_html_a01a5da3834fd354c5c3d38284b84ef75"><div class="ttname"><a href="classllfio__v2__xxx_1_1mapped__file__handle.html#a01a5da3834fd354c5c3d38284b84ef75">llfio_v2_xxx::mapped_file_handle::truncate</a></div><div class="ttdeci">virtual result&lt; extent_type &gt; truncate(extent_type newsize) noexcept override</div><div class="ttdoc">Resize the current maximum permitted extent of the mapped file to the given extent,...</div></div>
-<div class="ttc" id="anamespacellfio__v2__xxx_html_a58d5390cad390de24a80748c8cd7dc5b"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a58d5390cad390de24a80748c8cd7dc5b">llfio_v2_xxx::mapped_temp_inode</a></div><div class="ttdeci">result&lt; mapped_file_handle &gt; mapped_temp_inode(mapped_file_handle::size_type reservation=0, const path_handle &amp;dir=path_discovery::storage_backed_temporary_files_directory(), mapped_file_handle::mode _mode=mapped_file_handle::mode::write, mapped_file_handle::flag flags=mapped_file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:791</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_a58d5390cad390de24a80748c8cd7dc5b"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a58d5390cad390de24a80748c8cd7dc5b">llfio_v2_xxx::mapped_temp_inode</a></div><div class="ttdeci">result&lt; mapped_file_handle &gt; mapped_temp_inode(mapped_file_handle::size_type reservation=0, const path_handle &amp;dir=path_discovery::storage_backed_temporary_files_directory(), mapped_file_handle::mode _mode=mapped_file_handle::mode::write, mapped_file_handle::flag flags=mapped_file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:790</div></div>
 <div class="ttc" id="agroup__config_html_gac9f7f0153adb9034d26c4554728f817a"><div class="ttname"><a href="group__config.html#gac9f7f0153adb9034d26c4554728f817a">LLFIO_V2_NAMESPACE</a></div><div class="ttdeci">#define LLFIO_V2_NAMESPACE</div><div class="ttdoc">The namespace of this LLFIO v2 which will be some unknown inline namespace starting with v2_ inside t...</div><div class="ttdef"><b>Definition:</b> config.hpp:178</div></div>
-<div class="ttc" id="anamespacellfio__v2__xxx_html_a5a8908704c9988bbecc69c2359e6fd4a"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a5a8908704c9988bbecc69c2359e6fd4a">llfio_v2_xxx::write</a></div><div class="ttdeci">io_handle::io_result&lt; io_handle::const_buffers_type &gt; write(io_handle &amp;self, io_handle::io_request&lt; io_handle::const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the open handle.</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:600</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html"><div class="ttname"><a href="namespacellfio__v2__xxx.html">llfio_v2_xxx</a></div><div class="ttdoc">The LLFIO namespace.</div><div class="ttdef"><b>Definition:</b> config.hpp:159</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1mapped__file__handle_html"><div class="ttname"><a href="classllfio__v2__xxx_1_1mapped__file__handle.html">llfio_v2_xxx::mapped_file_handle</a></div><div class="ttdoc">A memory mapped regular file or device.</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:156</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1mapped__file__handle_html"><div class="ttname"><a href="classllfio__v2__xxx_1_1mapped__file__handle.html">llfio_v2_xxx::mapped_file_handle</a></div><div class="ttdoc">A memory mapped regular file or device.</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:155</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
