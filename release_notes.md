@@ -68,7 +68,7 @@ Todo list for already implemented parts: https://ned14.github.io/llfio/todo.html
 | ✔ | ✔ | Universal native handle/fd abstraction instead of `void *`.
 | ✔ | ✔ | Perfectly/Ideally low memory (de)allocation per op (usually none).
 | ✔ | ✔ | noexcept API throughout returning error_code for failure instead of throwing exceptions.
-| ✔ | ✔ | LLFIO v1 handle type split into hierarchy of types:<ol><li>handle - provides open, close, get path, clone, set/unset append only, change caching, characteristics<li>fs_handle - handles with an inode number<li>path_handle - a race free anchor to a subset of the filesystem<li>directory_handle - enumerates the filesystem<li>io_handle - adds synchronous scatter-gather i/o, byte range locking<li>file_handle - adds open/create file, get and set maximum extent<li>async_file_handle - adds asynchronous scatter-gather i/o<li>mapped_file_handle - adds low latency memory mapped scatter-gather i/o</ol>
+| ✔ | ✔ | LLFIO v1 handle type split into hierarchy of types:<ol><li>handle - provides open, close, get path, clone, set/unset append only, change caching, characteristics<li>fs_handle - handles with an inode number<li>path_handle - a race free anchor to a subset of the filesystem<li>directory_handle - enumerates the filesystem<li>io_handle - adds synchronous scatter-gather i/o, byte range locking<li>file_handle - adds open/create file, get and set maximum extent<li>mapped_file_handle - adds low latency memory mapped scatter-gather i/o</ol>
 | ✔ | ✔ | Cancelable i/o (made possible thanks to dropping XP support).
 | ✔ | ✔ | All shared_ptr usage removed as all use of multiple threads removed.
 | ✔ | ✔ | Use of std::vector to transport scatter-gather sequences replaced with C++ 20 `span<>` borrowed views.
@@ -125,7 +125,6 @@ Todo:
 |   | ✔ | ✔ | Directory handles and very fast directory enumeration ported over from LLFIO v1.
 | ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on safe byte ranges
 |   | ✔ | ✔ | Set random or sequential i/o (prefetch).
-| ✔ | ✔ | ✔ | i/o on `async_file_handle` is coroutines awaitable.
 | ✔ | ✔ | ✔ | `llfio::algorithm::trivial_vector<T>` with constant time reallocation if `T` is trivially copyable.
 |   | ✔ | ✔ | `symlink_handle`.
 | ✔ | ✔ | ✔ | Large, huge and massive page size support for memory allocation and (POSIX only) file maps.

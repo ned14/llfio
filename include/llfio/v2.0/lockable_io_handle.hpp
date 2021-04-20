@@ -105,7 +105,6 @@ public:
   for a RAII locker.
   \errors Any of the values POSIX `flock()` can return.
   \mallocs The default synchronous implementation in `file_handle` performs no memory allocation.
-  The asynchronous implementation in `async_file_handle` performs one calloc and one free.
   */
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> lock_file() noexcept;
   /*! \brief Tries to lock the inode referred to by the open handle for exclusive access,
@@ -115,7 +114,6 @@ public:
   for a RAII locker.
   \errors Any of the values POSIX `flock()` can return.
   \mallocs The default synchronous implementation in `file_handle` performs no memory allocation.
-  The asynchronous implementation in `async_file_handle` performs one calloc and one free.
   */
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC bool try_lock_file() noexcept;
   /*! \brief Unlocks a previously acquired exclusive lock.
@@ -128,7 +126,6 @@ public:
   for a RAII locker.
   \errors Any of the values POSIX `flock()` can return.
   \mallocs The default synchronous implementation in `file_handle` performs no memory allocation.
-  The asynchronous implementation in `async_file_handle` performs one calloc and one free.
   */
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> lock_file_shared() noexcept;
   /*! \brief Tries to lock the inode referred to by the open handle for shared access,
@@ -138,7 +135,6 @@ public:
   for a RAII locker.
   \errors Any of the values POSIX `flock()` can return.
   \mallocs The default synchronous implementation in `file_handle` performs no memory allocation.
-  The asynchronous implementation in `async_file_handle` performs one calloc and one free.
   */
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC bool try_lock_file_shared() noexcept;
   /*! \brief Unlocks a previously acquired shared lock.
@@ -268,7 +264,6 @@ public:
   returned if deadline i/o is not possible with this particular handle configuration (e.g.
   non-overlapped HANDLE on Windows).
   \mallocs The default synchronous implementation in file_handle performs no memory allocation.
-  The asynchronous implementation in async_file_handle performs one calloc and one free.
   */
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_guard> lock_file_range(extent_type offset, extent_type bytes, lock_kind kind, deadline d = deadline()) noexcept;
   //! \overload EXTENSION: Locks for shared access

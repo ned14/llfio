@@ -307,31 +307,6 @@ void sparse_array()
 }
 #endif
 
-#if LLFIO_HAVE_COROUTINES
-std::future<void> coroutine_write()
-{
-  //! [coroutine_write]
-  namespace llfio = LLFIO_V2_NAMESPACE;
-
-  // Create an asynchronous file handle
-  llfio::io_service service;
-  llfio::async_file_handle fh =
-    llfio::async_file(service, {}, "testfile.txt",
-      llfio::async_file_handle::mode::write,
-      llfio::async_file_handle::creation::if_needed).value();
-
-  // Resize it to 1024 bytes
-  truncate(fh, 1024).value();
-
-  // Begin to asynchronously write "hello world" into the file at offset 0,
-  // suspending execution of this coroutine until completion and then resuming
-  // execution. Requires the Coroutines TS.
-  alignas(4096) char buffer[] = "hello world";
-  co_await co_write(fh, 0, { { reinterpret_cast<llfio::byte *>(buffer), sizeof(buffer) } }).value();
-  //! [coroutine_write]
-}
-#endif
-
 int main()
 {
   return 0;

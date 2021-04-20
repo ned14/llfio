@@ -278,7 +278,6 @@ public:
   returned if deadline i/o is not possible with this particular handle configuration (e.g.
   reading from regular files on POSIX or reading from a non-overlapped HANDLE on Windows).
   \mallocs The default synchronous implementation in file_handle performs no memory allocation.
-  The asynchronous implementation in async_file_handle performs one calloc and one free.
   */
   LLFIO_MAKE_FREE_FUNCTION
   io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept { return (_ctx == nullptr) ? _do_read(reqs, d) : _do_multiplexer_read({}, reqs, d); }
@@ -321,7 +320,6 @@ public:
   returned if deadline i/o is not possible with this particular handle configuration (e.g.
   writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows).
   \mallocs The default synchronous implementation in file_handle performs no memory allocation.
-  The asynchronous implementation in async_file_handle performs one calloc and one free.
   */
   LLFIO_MAKE_FREE_FUNCTION
   io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept { return (_ctx == nullptr) ? _do_write(reqs, d) : _do_multiplexer_write({}, std::move(reqs), d); }
@@ -569,7 +567,6 @@ Note function may return significantly after this deadline if the i/o takes long
 returned if deadline i/o is not possible with this particular handle configuration (e.g.
 reading from regular files on POSIX or reading from a non-overlapped HANDLE on Windows).
 \mallocs The default synchronous implementation in file_handle performs no memory allocation.
-The asynchronous implementation in async_file_handle performs one calloc and one free.
 */
 inline io_handle::io_result<io_handle::buffers_type> read(io_handle &self, io_handle::io_request<io_handle::buffers_type> reqs, deadline d = deadline()) noexcept
 {
@@ -595,7 +592,6 @@ Note function may return significantly after this deadline if the i/o takes long
 returned if deadline i/o is not possible with this particular handle configuration (e.g.
 writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows).
 \mallocs The default synchronous implementation in file_handle performs no memory allocation.
-The asynchronous implementation in async_file_handle performs one calloc and one free.
 */
 inline io_handle::io_result<io_handle::const_buffers_type> write(io_handle &self, io_handle::io_request<io_handle::const_buffers_type> reqs, deadline d = deadline()) noexcept
 {
