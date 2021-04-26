@@ -287,7 +287,7 @@ public:
   {
   }
   //! Explicit conversion from file_handle permitted, this overload also attempts to map the file
-  explicit mapped_file_handle(file_handle &&o, size_type reservation, section_handle::flag sflags) noexcept
+  explicit mapped_file_handle(file_handle &&o, size_type reservation, section_handle::flag sflags)
       : file_handle(std::move(o))
       , _sh(sflags)
   {
