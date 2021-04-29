@@ -170,7 +170,7 @@ namespace algorithm
 #endif
           std::vector<std::list<workitem>> workqueue;
           size_t workqueue_base{0};
-          size_t dirs_processed{0}, known_dirs_remaining{0}, depth_processed{0}, threads_sleeping{0};
+          size_t dirs_processed{0}, known_dirs_remaining{0}, depth_processed{0}, threads_sleeping{0}, threads_running{0};
 
           explicit state_t(traverse_visitor *_visitor)
               : visitor(_visitor)
@@ -385,49 +385,67 @@ namespace algorithm
           std::condition_variable cond, maincond;
           bool done = false;
           optional<result<void>::error_type> run_error;
-          for(size_t n = 0; n < threads; n++)
           {
-            workerthreads.push_back(std::thread(
-            [&](worker *w) {
+            auto handle_failure = make_scope_fail([&]() noexcept {
               std::unique_lock<std::mutex> g(state.lock);
-              while(!done)
+              done = true;
+              while(state.threads_running > 0)
               {
-                if(state.known_dirs_remaining == 0)
+                g.unlock();
+                cond.notify_all();
+                g.lock();
+              }
+              g.unlock();
+              for(auto &i : workerthreads)
+              {
+                i.join();
+              }
+            });
+            for(size_t n = 0; n < threads; n++)
+            {
+              workerthreads.push_back(std::thread(
+              [&](worker *w) {
+                std::unique_lock<std::mutex> g(state.lock);
+                state.threads_running++;
+                while(!done)
                 {
-                  // sleep
-                  state.threads_sleeping++;
-                  maincond.notify_all();
-                  cond.wait(g);
-                  if(done)
+                  if(state.known_dirs_remaining == 0)
                   {
+                    // sleep
+                    state.threads_sleeping++;
+                    maincond.notify_all();
+                    cond.wait(g);
+                    if(done)
+                    {
+                      break;
+                    }
+                    state.threads_sleeping--;
+                  }
+                  else
+                  {
+                    // wake everybody
+                    cond.notify_all();
+                  }
+                  auto r = w->run(g, use_slow_path, topdirh, data);
+                  if(!g.owns_lock())
+                  {
+                    g.lock();
+                  }
+                  if(!r)
+                  {
+                    done = true;
+                    if(!run_error)
+                    {
+                      run_error = std::move(r).error();
+                    }
                     break;
                   }
-                  state.threads_sleeping--;
                 }
-                else
-                {
-                  // wake everybody
-                  cond.notify_all();
-                }
-                auto r = w->run(g, use_slow_path, topdirh, data);
-                if(!g.owns_lock())
-                {
-                  g.lock();
-                }
-                if(!r)
-                {
-                  done = true;
-                  if(!run_error)
-                  {
-                    run_error = std::move(r).error();
-                  }
-                  break;
-                }
-              }
-              state.threads_sleeping++;
-              maincond.notify_all();
-            },
-            &workers[n]));
+                state.threads_running--;
+                maincond.notify_all();
+              },
+              &workers[n]));
+            }
           }
           {
             std::unique_lock<std::mutex> g(state.lock);
@@ -436,7 +454,12 @@ namespace algorithm
               maincond.wait(g);
             }
             done = true;
-            cond.notify_all();
+            while(state.threads_running > 0)
+            {
+              g.unlock();
+              cond.notify_all();
+              g.lock();
+            }
           }
           for(auto &i : workerthreads)
           {
