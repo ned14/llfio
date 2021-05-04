@@ -497,7 +497,7 @@ template&lt;class T , class... Args&gt; </div>
           <td class="memname">result&lt; <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html">traversal_summary</a> &gt; llfio_v2_xxx::algorithm::summarize </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td>
-          <td class="paramname"><em>dirh</em>, </td>
+          <td class="paramname"><em>topdirh</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -537,6 +537,7 @@ template&lt;class T , class... Args&gt; </div>
 </div><div class="memdoc">
 
 <p>Summarise the directory identified <code>dirh</code>, and everything therein. </p>
+<p>Summarise the directory identified <code>topdirh</code>, and everything therein.</p>
 <p>It can be useful to summarise a directory hierarchy, especially to determine how much storage it occupies, but also how many mounted filesystems it straddles etc. You should specify what metadata you wish to summarise, if this is a subset of what metadata <code>directory_handle::read()</code> returns, performance will be considerably better. The default summarises all possible metadata.</p>
 <p>This is a trivial implementation on top of <code>algorithm::traverse()</code>, indeed it is implemented entirely as header code. You should review the documentation for <code>algorithm::traverse()</code>, as this algorithm is entirely implemented using that algorithm. </p>
 <div class="fragment"><div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  {</div>

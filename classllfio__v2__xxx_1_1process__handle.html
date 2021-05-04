@@ -132,7 +132,7 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>size_type</b> = <a c
 <a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaa9f56aff64cb748e078ab221474132d19">mode::attr_write</a> = 5, 
 <br />
 &#160;&#160;<a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaaecae13117d6f0584c25a9da6c8f8415e">mode::read</a> = 6, 
-<a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaaefb2a684e4afb7d55e6147fbe5a332ee">mode::write</a> = 7, 
+<a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaaefb2a684e4afb7d55e6147fbe5a332ee">mode::write</a>, 
 <a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaa9516dfb15f51c7ee19a4d46b8c0dbe1d">mode::append</a> = 9
 <br />
  }</td></tr>
@@ -151,14 +151,14 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>size_type</b> = <a c
 <tr class="separator:af0b352d0f273ba6fa70c178b2c2fee42"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aecd3a7db6cee3aec07d32fe6f99e6852"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> : unsigned char { <br />
 &#160;&#160;<b>unchanged</b> = 0, 
-<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a334c4a4c42fdb79d7ebc3e73b517e6f8">caching::none</a> = 1, 
-<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852ab8a61dd00ce6fc5888706bda8fab2e98">caching::only_metadata</a> = 2, 
-<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a0fb9cf5f04f61bb6f1151da57ceb1ca1">caching::reads</a> = 3, 
+<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a334c4a4c42fdb79d7ebc3e73b517e6f8">caching::none</a>, 
+<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852ab8a61dd00ce6fc5888706bda8fab2e98">caching::only_metadata</a>, 
+<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a0fb9cf5f04f61bb6f1151da57ceb1ca1">caching::reads</a>, 
 <br />
-&#160;&#160;<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852adec4ecca8ae1593f84eea4656599a693">caching::reads_and_metadata</a> = 5, 
-<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852aa181a603769c1f98ad927e7367c7aa51">caching::all</a> = 6, 
-<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a9cd65f46f55fb6a4b198fcee6f0a63c1">caching::safety_barriers</a> = 7, 
-<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852ad5197d93c063a2b1e22d1630a39b7aef">caching::temporary</a> = 8
+&#160;&#160;<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852adec4ecca8ae1593f84eea4656599a693">caching::reads_and_metadata</a>, 
+<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852aa181a603769c1f98ad927e7367c7aa51">caching::all</a>, 
+<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a9cd65f46f55fb6a4b198fcee6f0a63c1">caching::safety_barriers</a>, 
+<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852ad5197d93c063a2b1e22d1630a39b7aef">caching::temporary</a>
 <br />
  }</td></tr>
 <tr class="memdesc:aecd3a7db6cee3aec07d32fe6f99e6852"><td class="mdescLeft">&#160;</td><td class="mdescRight">What i/o on the handle may complete immediately due to kernel caching.  <a href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">More...</a><br /></td></tr>
@@ -333,6 +333,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a028fbead3b3c4d4eed2da7fa51c75036">is_allocation</a> () const noexcept</td></tr>
 <tr class="memdesc:a028fbead3b3c4d4eed2da7fa51c75036"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if a memory allocation. <br /></td></tr>
 <tr class="separator:a028fbead3b3c4d4eed2da7fa51c75036"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf27a33c88cb7463ee228983690bce0f"><td class="memItemLeft" align="right" valign="top"><a id="acf27a33c88cb7463ee228983690bce0f"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#acf27a33c88cb7463ee228983690bce0f">is_path</a> () const noexcept</td></tr>
+<tr class="memdesc:acf27a33c88cb7463ee228983690bce0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if a path or a directory. <br /></td></tr>
+<tr class="separator:acf27a33c88cb7463ee228983690bce0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a90bf8668df002dac5a7d9397486b2946"><td class="memItemLeft" align="right" valign="top"><a id="a90bf8668df002dac5a7d9397486b2946"></a>
 <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a90bf8668df002dac5a7d9397486b2946">kernel_caching</a> () const noexcept</td></tr>
 <tr class="memdesc:a90bf8668df002dac5a7d9397486b2946"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kernel cache strategy used by this handle. <br /></td></tr>
@@ -433,18 +437,25 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b> {flag::non
 <tr><td class="fieldname"><a id="aecd3a7db6cee3aec07d32fe6f99e6852ad5197d93c063a2b1e22d1630a39b7aef"></a>temporary&#160;</td><td class="fielddoc"><p>Cache reads and writes of data and metadata so they complete immediately, only sending any updates to storage on last handle close in the system or if memory becomes tight as this file is expected to be temporary (Windows and FreeBSD only). </p>
 </td></tr>
 </table>
-<div class="fragment"><div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;                     : <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>  <span class="comment">// bit 0 set means safety barriers enabled</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  {</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    unchanged = 0,</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    none = 1,                <span class="comment">//!&lt; No caching whatsoever, all reads and writes come from storage (i.e. &lt;tt&gt;O_DIRECT|O_SYNC&lt;/tt&gt;). Align all i/o to 4Kb boundaries for this to work. &lt;tt&gt;disable_safety_barriers&lt;/tt&gt; can be used here.</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="comment"></span>    only_metadata = 2,       <span class="comment">//!&lt; Cache reads and writes of metadata but avoid caching data (&lt;tt&gt;O_DIRECT&lt;/tt&gt;), thus i/o here does not affect other cached data for other handles. Align all i/o to 4Kb boundaries for this to work.</span></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="comment"></span>    reads = 3,               <span class="comment">//!&lt; Cache reads only. Writes of data and metadata do not complete until reaching storage (&lt;tt&gt;O_SYNC&lt;/tt&gt;). &lt;tt&gt;disable_safety_barriers&lt;/tt&gt; can be used here.</span></div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="comment"></span>    reads_and_metadata = 5,  <span class="comment">//!&lt; Cache reads and writes of metadata, but writes of data do not complete until reaching storage (&lt;tt&gt;O_DSYNC&lt;/tt&gt;). &lt;tt&gt;disable_safety_barriers&lt;/tt&gt; can be used here.</span></div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="comment"></span>    all = 6,                 <span class="comment">//!&lt; Cache reads and writes of data and metadata so they complete immediately, sending writes to storage at some point when the kernel decides (this is the default file system caching on a system).</span></div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="comment"></span>    safety_barriers = 7,     <span class="comment">//!&lt; Cache reads and writes of data and metadata so they complete immediately, but issue safety barriers at certain points. See documentation for &lt;tt&gt;disable_safety_barriers&lt;/tt&gt;.</span></div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="comment"></span>    temporary = 8            <span class="comment">//!&lt; Cache reads and writes of data and metadata so they complete immediately, only sending any updates to storage on last handle close in the system or if memory becomes tight as this file is expected to be temporary (Windows and FreeBSD only).</span></div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="comment"></span>                             <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  };</div>
+<div class="fragment"><div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;                     : <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>  <span class="comment">// bit 0 set means safety barriers enabled</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  {</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    unchanged = 0,</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    none =</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    1,  <span class="comment">//!&lt; No caching whatsoever, all reads and writes come from storage (i.e. &lt;tt&gt;O_DIRECT|O_SYNC&lt;/tt&gt;). Align all i/o to 4Kb boundaries for this to work. &lt;tt&gt;disable_safety_barriers&lt;/tt&gt; can be used here.</span></div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="comment"></span>    only_metadata =</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    2,  <span class="comment">//!&lt; Cache reads and writes of metadata but avoid caching data (&lt;tt&gt;O_DIRECT&lt;/tt&gt;), thus i/o here does not affect other cached data for other handles. Align all i/o to 4Kb boundaries for this to work.</span></div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="comment"></span>    reads =</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    3,  <span class="comment">//!&lt; Cache reads only. Writes of data and metadata do not complete until reaching storage (&lt;tt&gt;O_SYNC&lt;/tt&gt;). &lt;tt&gt;disable_safety_barriers&lt;/tt&gt; can be used here.</span></div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="comment"></span>    reads_and_metadata =</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    5,  <span class="comment">//!&lt; Cache reads and writes of metadata, but writes of data do not complete until reaching storage (&lt;tt&gt;O_DSYNC&lt;/tt&gt;). &lt;tt&gt;disable_safety_barriers&lt;/tt&gt; can be used here.</span></div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="comment"></span>    all =</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    6,  <span class="comment">//!&lt; Cache reads and writes of data and metadata so they complete immediately, sending writes to storage at some point when the kernel decides (this is the default file system caching on a system).</span></div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="comment"></span>    safety_barriers =</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    7,  <span class="comment">//!&lt; Cache reads and writes of data and metadata so they complete immediately, but issue safety barriers at certain points. See documentation for &lt;tt&gt;disable_safety_barriers&lt;/tt&gt;.</span></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="comment"></span>    temporary =</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    8  <span class="comment">//!&lt; Cache reads and writes of data and metadata so they complete immediately, only sending any updates to storage on last handle close in the system or if memory becomes tight as this file is expected to be temporary (Windows and FreeBSD only).</span></div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="comment"></span>       <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  };</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -481,15 +492,15 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b> {flag::non
 <tr><td class="fieldname"><a id="af0b352d0f273ba6fa70c178b2c2fee42af7cf95e0f43dc8f79e39ae628c85a11d"></a>always_new&#160;</td><td class="fielddoc"><p>If filesystem entry exists, it is atomically replaced with a new inode, else a new entry is created. </p>
 </td></tr>
 </table>
-<div class="fragment"><div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;                      : <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span></div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  {</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    open_existing = 0,  <span class="comment">//!&lt; Filesystem entry must already exist</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="comment"></span>    only_if_not_exist,  <span class="comment">//!&lt; Filesystem entry must NOT exist, and is atomically created by the success of this operation</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="comment"></span>    if_needed,          <span class="comment">//!&lt; If filesystem entry exists that is used, else one is created</span></div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="comment"></span>    truncate_existing,  <span class="comment">//!&lt; Filesystem entry must already exist. It is atomically truncated on open, leaving creation date and unique identifier unmodified.</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="comment"></span>    always_new          <span class="comment">//!&lt; If filesystem entry exists, it is atomically replaced with a new inode, else a new entry is created.</span></div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="comment"></span>                        <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  };</div>
+<div class="fragment"><div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;                      : <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  {</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    open_existing = 0,  <span class="comment">//!&lt; Filesystem entry must already exist</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="comment"></span>    only_if_not_exist,  <span class="comment">//!&lt; Filesystem entry must NOT exist, and is atomically created by the success of this operation</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="comment"></span>    if_needed,          <span class="comment">//!&lt; If filesystem entry exists that is used, else one is created</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="comment"></span>    truncate_existing,  <span class="comment">//!&lt; Filesystem entry must already exist. It is atomically truncated on open, leaving creation date and unique identifier unmodified.</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="comment"></span>    always_new          <span class="comment">//!&lt; If filesystem entry exists, it is atomically replaced with a new inode, else a new entry is created.</span></div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="comment"></span>                        <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  };</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -535,10 +546,11 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b> {flag::non
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="comment"></span>    attr_read = 4,   <span class="comment">//!&lt; Ability to read attributes (FILE_READ_ATTRIBUTES|SYNCHRONIZE or O_RDONLY)</span></div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment"></span>    attr_write = 5,  <span class="comment">//!&lt; Ability to read and write attributes (FILE_READ_ATTRIBUTES|FILE_WRITE_ATTRIBUTES|SYNCHRONIZE or O_RDONLY)</span></div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment"></span>    <a class="code" href="namespacellfio__v2__xxx.html#af678f58d20e1f0962ff0744150342683">read</a> = 6,        <span class="comment">//!&lt; Ability to read (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|SYNCHRONISE or O_RDONLY)</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment"></span>    <a class="code" href="namespacellfio__v2__xxx.html#a5a8908704c9988bbecc69c2359e6fd4a">write</a> = 7,       <span class="comment">//!&lt; Ability to read and write (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|FILE_WRITE_DATA|FILE_WRITE_ATTRIBUTES|FILE_WRITE_EA|FILE_APPEND_DATA|SYNCHRONISE or O_RDWR)</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="comment"></span>    append = 9       <span class="comment">//!&lt; All mainstream OSs and CIFS guarantee this is atomic with respect to all other appenders (FILE_APPEND_DATA|SYNCHRONISE or O_APPEND)</span></div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="comment"></span>                     <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  };</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment"></span>    <a class="code" href="namespacellfio__v2__xxx.html#a5a8908704c9988bbecc69c2359e6fd4a">write</a> =</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    7,  <span class="comment">//!&lt; Ability to read and write (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|FILE_WRITE_DATA|FILE_WRITE_ATTRIBUTES|FILE_WRITE_EA|FILE_APPEND_DATA|SYNCHRONISE or O_RDWR)</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="comment"></span>    append = 9  <span class="comment">//!&lt; All mainstream OSs and CIFS guarantee this is atomic with respect to all other appenders (FILE_APPEND_DATA|SYNCHRONISE or O_APPEND)</span></div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="comment"></span>                <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  };</div>
 </div><!-- fragment -->
 </div>
 </div>

@@ -11,6 +11,7 @@ var structllfio__v2__xxx_1_1native__handle__type =
     [ "is_directory", "structllfio__v2__xxx_1_1native__handle__type.html#af4d88dcf57bbfcc2f5c30210225c5fbd", null ],
     [ "is_multiplexer", "structllfio__v2__xxx_1_1native__handle__type.html#aa9773fae5d91f769e281cc05df1f0e6c", null ],
     [ "is_nonblocking", "structllfio__v2__xxx_1_1native__handle__type.html#ae5b2862752c1af2b4419a5fefa4938aa", null ],
+    [ "is_path", "structllfio__v2__xxx_1_1native__handle__type.html#a32fc1a1881a45034b4f5bef972b3eb22", null ],
     [ "is_pipe", "structllfio__v2__xxx_1_1native__handle__type.html#a6624b7cdc2d9bd750de87485b9a1555e", null ],
     [ "is_process", "structllfio__v2__xxx_1_1native__handle__type.html#a891f8248afda36a4999f6a09ab139b45", null ],
     [ "is_readable", "structllfio__v2__xxx_1_1native__handle__type.html#a0ab82c7a29033fef50d914173694e672", null ],

@@ -61,6 +61,7 @@ var classllfio__v2__xxx_1_1map__handle =
     [ "is_multiplexer", "classllfio__v2__xxx_1_1map__handle.html#a018de0f7c177e3cff239016d14582e9a", null ],
     [ "is_nonblocking", "classllfio__v2__xxx_1_1map__handle.html#a501aa723172f6852e82738b0969278ae", null ],
     [ "is_nvram", "classllfio__v2__xxx_1_1map__handle.html#a77452c0f4be2e1c9cdda5a59512b1887", null ],
+    [ "is_path", "classllfio__v2__xxx_1_1map__handle.html#acf27a33c88cb7463ee228983690bce0f", null ],
     [ "is_pipe", "classllfio__v2__xxx_1_1map__handle.html#ac52242425f6e71c3fddcb6cdbe2c3b4e", null ],
     [ "is_process", "classllfio__v2__xxx_1_1map__handle.html#ade0d0e05b844e77f425669da87bf48bb", null ],
     [ "is_readable", "classllfio__v2__xxx_1_1map__handle.html#a97e0884c27147b4929be98961b8e9254", null ],
