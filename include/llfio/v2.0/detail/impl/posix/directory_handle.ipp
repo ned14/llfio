@@ -49,7 +49,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
   result<directory_handle> ret(directory_handle(native_handle_type(), 0, 0, _caching, flags));
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
-  nativeh.behaviour |= native_handle_type::disposition::directory;
+  nativeh.behaviour |= native_handle_type::disposition::directory | native_handle_type::disposition::path;
   // POSIX does not permit directory opens with O_RDWR like Windows, so silently convert to read
   if(_mode == mode::attr_write)
   {

@@ -70,9 +70,10 @@ public:
     attr_read = 4,   //!< Ability to read attributes (FILE_READ_ATTRIBUTES|SYNCHRONIZE or O_RDONLY)
     attr_write = 5,  //!< Ability to read and write attributes (FILE_READ_ATTRIBUTES|FILE_WRITE_ATTRIBUTES|SYNCHRONIZE or O_RDONLY)
     read = 6,        //!< Ability to read (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|SYNCHRONISE or O_RDONLY)
-    write = 7,       //!< Ability to read and write (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|FILE_WRITE_DATA|FILE_WRITE_ATTRIBUTES|FILE_WRITE_EA|FILE_APPEND_DATA|SYNCHRONISE or O_RDWR)
-    append = 9       //!< All mainstream OSs and CIFS guarantee this is atomic with respect to all other appenders (FILE_APPEND_DATA|SYNCHRONISE or O_APPEND)
-                     // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
+    write =
+    7,  //!< Ability to read and write (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|FILE_WRITE_DATA|FILE_WRITE_ATTRIBUTES|FILE_WRITE_EA|FILE_APPEND_DATA|SYNCHRONISE or O_RDWR)
+    append = 9  //!< All mainstream OSs and CIFS guarantee this is atomic with respect to all other appenders (FILE_APPEND_DATA|SYNCHRONISE or O_APPEND)
+                // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
   };
   //! On opening, do we also create a new file or truncate an existing one?
   enum class creation : unsigned char
@@ -88,14 +89,21 @@ public:
   enum class caching : unsigned char  // bit 0 set means safety barriers enabled
   {
     unchanged = 0,
-    none = 1,                //!< No caching whatsoever, all reads and writes come from storage (i.e. <tt>O_DIRECT|O_SYNC</tt>). Align all i/o to 4Kb boundaries for this to work. <tt>disable_safety_barriers</tt> can be used here.
-    only_metadata = 2,       //!< Cache reads and writes of metadata but avoid caching data (<tt>O_DIRECT</tt>), thus i/o here does not affect other cached data for other handles. Align all i/o to 4Kb boundaries for this to work.
-    reads = 3,               //!< Cache reads only. Writes of data and metadata do not complete until reaching storage (<tt>O_SYNC</tt>). <tt>disable_safety_barriers</tt> can be used here.
-    reads_and_metadata = 5,  //!< Cache reads and writes of metadata, but writes of data do not complete until reaching storage (<tt>O_DSYNC</tt>). <tt>disable_safety_barriers</tt> can be used here.
-    all = 6,                 //!< Cache reads and writes of data and metadata so they complete immediately, sending writes to storage at some point when the kernel decides (this is the default file system caching on a system).
-    safety_barriers = 7,     //!< Cache reads and writes of data and metadata so they complete immediately, but issue safety barriers at certain points. See documentation for <tt>disable_safety_barriers</tt>.
-    temporary = 8            //!< Cache reads and writes of data and metadata so they complete immediately, only sending any updates to storage on last handle close in the system or if memory becomes tight as this file is expected to be temporary (Windows and FreeBSD only).
-                             // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
+    none =
+    1,  //!< No caching whatsoever, all reads and writes come from storage (i.e. <tt>O_DIRECT|O_SYNC</tt>). Align all i/o to 4Kb boundaries for this to work. <tt>disable_safety_barriers</tt> can be used here.
+    only_metadata =
+    2,  //!< Cache reads and writes of metadata but avoid caching data (<tt>O_DIRECT</tt>), thus i/o here does not affect other cached data for other handles. Align all i/o to 4Kb boundaries for this to work.
+    reads =
+    3,  //!< Cache reads only. Writes of data and metadata do not complete until reaching storage (<tt>O_SYNC</tt>). <tt>disable_safety_barriers</tt> can be used here.
+    reads_and_metadata =
+    5,  //!< Cache reads and writes of metadata, but writes of data do not complete until reaching storage (<tt>O_DSYNC</tt>). <tt>disable_safety_barriers</tt> can be used here.
+    all =
+    6,  //!< Cache reads and writes of data and metadata so they complete immediately, sending writes to storage at some point when the kernel decides (this is the default file system caching on a system).
+    safety_barriers =
+    7,  //!< Cache reads and writes of data and metadata so they complete immediately, but issue safety barriers at certain points. See documentation for <tt>disable_safety_barriers</tt>.
+    temporary =
+    8  //!< Cache reads and writes of data and metadata so they complete immediately, only sending any updates to storage on last handle close in the system or if memory becomes tight as this file is expected to be temporary (Windows and FreeBSD only).
+       // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
   };
   //! Bitwise flags which can be specified
   QUICKCPPLIB_BITFIELD_BEGIN(flag){
@@ -202,7 +210,9 @@ protected:
 
   static constexpr void _set_caching(native_handle_type &nativeh, caching caching) noexcept
   {
-    nativeh.behaviour &= ~(native_handle_type::disposition::safety_barriers | native_handle_type::disposition::cache_metadata | native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes | native_handle_type::disposition::cache_temporary);
+    nativeh.behaviour &=
+    ~(native_handle_type::disposition::safety_barriers | native_handle_type::disposition::cache_metadata | native_handle_type::disposition::cache_reads |
+      native_handle_type::disposition::cache_writes | native_handle_type::disposition::cache_temporary);
     switch(caching)
     {
     case caching::unchanged:
@@ -217,16 +227,20 @@ protected:
       nativeh.behaviour |= native_handle_type::disposition::cache_reads | native_handle_type::disposition::safety_barriers;
       break;
     case caching::reads_and_metadata:
-      nativeh.behaviour |= native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_metadata | native_handle_type::disposition::safety_barriers;
+      nativeh.behaviour |=
+      native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_metadata | native_handle_type::disposition::safety_barriers;
       break;
     case caching::all:
-      nativeh.behaviour |= native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes | native_handle_type::disposition::cache_metadata;
+      nativeh.behaviour |=
+      native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes | native_handle_type::disposition::cache_metadata;
       break;
     case caching::safety_barriers:
-      nativeh.behaviour |= native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes | native_handle_type::disposition::cache_metadata | native_handle_type::disposition::safety_barriers;
+      nativeh.behaviour |= native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes |
+                           native_handle_type::disposition::cache_metadata | native_handle_type::disposition::safety_barriers;
       break;
     case caching::temporary:
-      nativeh.behaviour |= native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes | native_handle_type::disposition::cache_metadata | native_handle_type::disposition::cache_temporary;
+      nativeh.behaviour |= native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes |
+                           native_handle_type::disposition::cache_metadata | native_handle_type::disposition::cache_temporary;
       break;
     }
   }
@@ -381,6 +395,8 @@ public:
   bool is_section() const noexcept { return _v.is_section(); }
   //! True if a memory allocation
   bool is_allocation() const noexcept { return _v.is_allocation(); }
+  //! True if a path or a directory
+  bool is_path() const noexcept { return _v.is_path(); }
 
   //! Kernel cache strategy used by this handle
   caching kernel_caching() const noexcept
@@ -568,7 +584,7 @@ namespace detail
 #pragma warning(push)
 #pragma warning(disable : 4996)  // the function may be unsafe
 #endif
-#if (__GNUC__ >= 8) && !defined(__clang__)
+#if(__GNUC__ >= 8) && !defined(__clang__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstringop-overflow"
 #endif
@@ -577,7 +593,7 @@ namespace detail
           // See https://godbolt.org/z/d69xzd for proof.
           // So I don't know why there is a warning here about overflowing a buffer of 16!
           strncpy(tls.next(dest._tls_path_id1), QUICKCPPLIB_NAMESPACE::ringbuffer_log::last190(currentpath), 190);
-#if (__GNUC__ >= 8) && !defined(__clang__)
+#if(__GNUC__ >= 8) && !defined(__clang__)
 #pragma GCC diagnostic pop
 #endif
 #ifdef _MSC_VER

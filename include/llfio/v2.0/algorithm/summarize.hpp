@@ -174,7 +174,7 @@ namespace algorithm
     }
   };
 
-  /*! \brief Summarise the directory identified `dirh`, and everything therein.
+  /*! \brief Summarise the directory identified `topdirh`, and everything therein.
 
   It can be useful to summarise a directory hierarchy, especially to determine how
   much storage it occupies, but also how many mounted filesystems it straddles etc.
@@ -186,10 +186,10 @@ namespace algorithm
   implemented entirely as header code. You should review the documentation for
   `algorithm::traverse()`, as this algorithm is entirely implemented using that algorithm.
   */
-  inline result<traversal_summary> summarize(const path_handle &dirh, stat_t::want want = traversal_summary::default_metadata(),
+  inline result<traversal_summary> summarize(const path_handle &topdirh, stat_t::want want = traversal_summary::default_metadata(),
                                              summarize_visitor *visitor = nullptr, size_t threads = 0, bool force_slow_path = false) noexcept
   {
-    LLFIO_LOG_FUNCTION_CALL(&dirh);
+    LLFIO_LOG_FUNCTION_CALL(&topdirh);
     summarize_visitor default_visitor;
     if(visitor == nullptr)
     {
@@ -198,6 +198,12 @@ namespace algorithm
     result<traversal_summary> state(in_place_type<traversal_summary>);
     state.assume_value().want = want;
     directory_entry entry{{}, stat_t(nullptr)};
+    directory_handle _dirh;
+    if(!topdirh.is_directory())
+    {
+      OUTCOME_TRY(_dirh, directory_handle::directory(topdirh, {}));
+    }
+    const path_handle &dirh = _dirh.is_valid() ? _dirh : topdirh;
     OUTCOME_TRY(entry.stat.fill(dirh, want));
     OUTCOME_TRY(summarize_visitor::accumulate(state.assume_value(), &state.assume_value(), nullptr, entry, want));
     OUTCOME_TRY(traverse(dirh, visitor, threads, &state.assume_value(), force_slow_path));

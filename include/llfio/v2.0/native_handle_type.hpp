@@ -62,6 +62,7 @@ struct native_handle_type  // NOLINT
   process = 1U << 14U,      //!< Is a child process
   section = 1U << 15U,      //!< Is a memory section
   allocation = 1U << 16U,   //!< Is a memory allocation
+  path = 1U << 17U,         //!< Is a path
 
   safety_barriers = 1U << 20U,  //!< Issue write reordering barriers at various points
   cache_metadata = 1U << 21U,   //!< Is serving metadata from the kernel cache
@@ -181,6 +182,8 @@ struct native_handle_type  // NOLINT
   constexpr bool is_section() const noexcept { return (behaviour & disposition::section) ? true : false; }
   //! True if a memory allocation
   constexpr bool is_allocation() const noexcept { return (behaviour & disposition::allocation) ? true : false; }
+  //! True if a path or a directory
+  constexpr bool is_path() const noexcept { return (behaviour & disposition::path) ? true : false; }
 };
 static_assert((sizeof(void *) == 4 && sizeof(native_handle_type) == 8) || (sizeof(void *) == 8 && sizeof(native_handle_type) == 12),
               "native_handle_type is not 8 or 12 bytes in size!");

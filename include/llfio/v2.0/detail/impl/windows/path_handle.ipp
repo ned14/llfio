@@ -81,7 +81,7 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
   result<path_handle> ret{path_handle(native_handle_type(), caching::none, flag::none)};
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
-  nativeh.behaviour |= native_handle_type::disposition::directory;
+  nativeh.behaviour |= native_handle_type::disposition::path;
   DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
   // Open directory with no access requested, this is much faster than asking for access
   OUTCOME_TRY(auto &&access, access_mask_from_handle_mode(nativeh, mode::none, flag::none));

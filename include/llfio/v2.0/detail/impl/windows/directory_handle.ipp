@@ -43,7 +43,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
   result<directory_handle> ret(directory_handle(native_handle_type(), 0, 0, _caching, flags));
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
-  nativeh.behaviour |= native_handle_type::disposition::directory;
+  nativeh.behaviour |= native_handle_type::disposition::directory | native_handle_type::disposition::path;
   DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
   // Trying to truncate a directory returns EISDIR rather than some internal Win32 error code uncomparable to errc
   if(_creation == creation::truncate_existing)
