@@ -415,11 +415,11 @@ namespace algorithm
                     state.threads_sleeping++;
                     maincond.notify_all();
                     cond.wait(g);
+                    state.threads_sleeping--;
                     if(done)
                     {
                       break;
                     }
-                    state.threads_sleeping--;
                   }
                   else
                   {
@@ -441,6 +441,7 @@ namespace algorithm
                     break;
                   }
                 }
+                state.threads_sleeping++;
                 state.threads_running--;
                 maincond.notify_all();
               },
@@ -449,7 +450,7 @@ namespace algorithm
           }
           {
             std::unique_lock<std::mutex> g(state.lock);
-            while(state.threads_sleeping < threads)
+            while(state.threads_sleeping < threads && !done)
             {
               maincond.wait(g);
             }
