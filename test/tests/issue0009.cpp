@@ -39,33 +39,33 @@ static inline void TestIssue09a()
 #else
   auto mh = llfio::map_handle::map(sh, 1ULL << 40ULL).value();
   auto *addr1 = mh.address();
-  mh.truncate(1ULL << 35ULL).value();
+  mh.truncate(1ULL << 35ULL, false).value();
   {
     auto *addr0 = mh.address();
     BOOST_CHECK(addr1 == addr0);
   }
 #endif
-  mh.truncate(1ULL << 36ULL).value();
+  mh.truncate(1ULL << 36ULL, false).value();
   {
     auto *addr2 = mh.address();
     BOOST_CHECK(addr1 == addr2);
   }
-  mh.truncate(1ULL << 37ULL).value();
+  mh.truncate(1ULL << 37ULL, false).value();
   {
     auto *addr2 = mh.address();
     BOOST_CHECK(addr1 == addr2);
   }
-  mh.truncate(1ULL << 38ULL).value();
+  mh.truncate(1ULL << 38ULL, false).value();
   {
     auto *addr2 = mh.address();
     BOOST_CHECK(addr1 == addr2);
   }
-  mh.truncate(1ULL << 39ULL).value();
+  mh.truncate(1ULL << 39ULL, false).value();
   {
     auto *addr2 = mh.address();
     BOOST_CHECK(addr1 == addr2);
   }
-  mh.truncate(1ULL << 40ULL).value();
+  mh.truncate(1ULL << 40ULL, false).value();
   {
     auto *addr2 = mh.address();
     BOOST_CHECK(addr1 == addr2);
