@@ -659,7 +659,7 @@ public:
   \errors Any of the values POSIX `mremap()`, `mmap(addr)` or `VirtualAlloc(addr)` can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_type> truncate(size_type newsize, bool permit_relocation = false) noexcept;
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_type> truncate(size_type newsize, bool permit_relocation) noexcept;
 
   /*! Ask the system to commit the system resources to make the memory represented
   by the buffer available with the given permissions. addr and length should be page

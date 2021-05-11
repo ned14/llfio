@@ -439,13 +439,16 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
   extent_type length = _length;
   if(_section != nullptr)
   {
-    OUTCOME_TRY(auto &&length_, _section->length());  // length of the backing file
-    length = length_;
+    OUTCOME_TRY(length, _section->length());  // length of the backing file
   }
   auto _newsize = utils::round_up_to_page_size(newsize, _pagesize);
   if(_newsize == _reservation)
   {
     return success();
+  }
+  if(_section == nullptr)
+  {
+    length = _newsize;  // newsize, but rounded up
   }
   // If wiping the map ...
   if(newsize == 0)
