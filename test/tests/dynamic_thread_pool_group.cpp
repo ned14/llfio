@@ -239,7 +239,7 @@ static inline void TestDynamicThreadPoolGroupWorkItemDelayWorks()
   {
     using _base = llfio::dynamic_thread_pool_group::work_item;
     shared_state_t *shared{nullptr};
-    const size_t myidx;
+    const size_t myidx{0};
 
     work_item() = default;
     explicit work_item(shared_state_t *_shared, size_t _myidx)
@@ -313,7 +313,11 @@ static inline void TestDynamicThreadPoolGroupWorkItemDelayWorks()
   std::cout << "  " << shared_state.within_100ms << " delayed work items were scheduled within 100ms of request." << std::endl;
   std::cout << "  " << shared_state.over_100ms << " delayed work items were scheduled over 100ms of request." << std::endl;
   BOOST_CHECK(shared_state.within_1ms > 0);
+#ifdef __APPLE__
+  BOOST_CHECK(shared_state.over_100ms < 40);  // Mac OS appears to apply significant slop to timers
+#else
   BOOST_CHECK(shared_state.over_100ms < 10);
+#endif
 }
 
 static inline void TestDynamicThreadPoolGroupNestingWorks()

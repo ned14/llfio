@@ -28,7 +28,7 @@ jobs:
     - name: CMake tests Linux
       shell: bash
       run: |
-       sudo apt-get remove -y libstdc++-10-dev g++-10 gcc-10
+       sudo apt-get remove -y libstdc++-11-dev g++-11 gcc-11
        sudo apt-get autoremove
        if [ "${{ matrix.compiler }}" = "libc++" ]; then
          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -;
