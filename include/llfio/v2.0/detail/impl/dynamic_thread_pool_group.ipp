@@ -458,7 +458,7 @@ namespace detail
           bool done = false;
           for(dynamic_thread_pool_group::work_item *p = nullptr, *n = next_timer_relative.front; n != nullptr; p = n, n = n->_next_scheduled)
           {
-            if(n->_timepoint1 <= i->_timepoint1)
+            if(n->_timepoint1 > i->_timepoint1)
             {
               if(p == nullptr)
               {
@@ -480,6 +480,21 @@ namespace detail
             i->_next_scheduled = nullptr;
             next_timer_relative.back = i;
           }
+#if 0
+          {
+            auto now = std::chrono::steady_clock::now();
+            std::cout << "\n";
+            for(dynamic_thread_pool_group::work_item *p = nullptr, *n = next_timer_relative.front; n != nullptr; p = n, n = n->_next_scheduled)
+            {
+              if(p != nullptr)
+              {
+                assert(n->_timepoint1 >= p->_timepoint1);
+              }
+              std::cout << "\nRelative timer: " << std::chrono::duration_cast<std::chrono::milliseconds>(n->_timepoint1 - now).count();
+            }
+            std::cout << std::endl;
+          }
+#endif
         }
         next_timer_relative.lock.unlock();
       }
@@ -496,7 +511,7 @@ namespace detail
           bool done = false;
           for(dynamic_thread_pool_group::work_item *p = nullptr, *n = next_timer_absolute.front; n != nullptr; p = n, n = n->_next_scheduled)
           {
-            if(n->_timepoint2 <= i->_timepoint2)
+            if(n->_timepoint2 > i->_timepoint2)
             {
               if(p == nullptr)
               {
@@ -1151,8 +1166,12 @@ namespace detail
         {
           if(d.steady)
           {
-            workitem->_timepoint1 = std::chrono::steady_clock::now() + std::chrono::nanoseconds(d.nsecs);
-            workitem->_timepoint2 = {};
+            std::chrono::microseconds diff(d.nsecs / 1000);
+            if(diff > std::chrono::microseconds(0))
+            {
+              workitem->_timepoint1 = std::chrono::steady_clock::now() + diff;
+              workitem->_timepoint2 = {};
+            }
           }
           else
           {

@@ -64,8 +64,6 @@ namespace algorithm
       0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/ | 0x00001000 /*FILE_DELETE_ON_CLOSE*/ | 0x040 /*FILE_NON_DIRECTORY_FILE*/;
       const DWORD deletedir_ntflags =
       0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/ | 0x00001000 /*FILE_DELETE_ON_CLOSE*/ | 0x01 /*FILE_DIRECTORY_FILE*/;
-      const DWORD renamefile_ntflags = 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/ | 0x040 /*FILE_NON_DIRECTORY_FILE*/;
-      const DWORD renamedir_ntflags = 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/ | 0x01 /*FILE_DIRECTORY_FILE*/;
       IO_STATUS_BLOCK isb = make_iostatus();
       path_view::c_str<> zpath(leafname, path_view::zero_terminated);
       UNICODE_STRING _path{};
@@ -172,10 +170,6 @@ namespace algorithm
       using namespace windows_nt_kernel;
       const DWORD access = SYNCHRONIZE | DELETE;
       const DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
-      const DWORD deletefile_ntflags =
-      0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/ | 0x00001000 /*FILE_DELETE_ON_CLOSE*/ | 0x040 /*FILE_NON_DIRECTORY_FILE*/;
-      const DWORD deletedir_ntflags =
-      0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/ | 0x00001000 /*FILE_DELETE_ON_CLOSE*/ | 0x01 /*FILE_DIRECTORY_FILE*/;
       const DWORD renamefile_ntflags = 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/ | 0x040 /*FILE_NON_DIRECTORY_FILE*/;
       const DWORD renamedir_ntflags = 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/ | 0x01 /*FILE_DIRECTORY_FILE*/;
       IO_STATUS_BLOCK isb = make_iostatus();

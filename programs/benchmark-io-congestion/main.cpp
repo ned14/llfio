@@ -210,7 +210,7 @@ struct llfio_runner_paced
         if(last_pace != d.nsecs)
         {
           parent->last_pace.store(d.nsecs, std::memory_order_relaxed);
-          std::cout << "Pacing work by milliseconds " << (d.nsecs / 1000.0) << std::endl;
+          std::cout << "Pacing work by milliseconds " << (d.nsecs / 1000000.0) << std::endl;
         }
 #endif
         return parent->cancel.load(std::memory_order_relaxed) ? -1 : 1;
