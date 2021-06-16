@@ -59,6 +59,65 @@ namespace algorithm
     handle::extent_type directory_blocks{0};  //!< The sum of directory allocated blocks.
     size_t max_depth{0};                      //!< The maximum depth of the hierarchy
 
+    traversal_summary() {}
+    traversal_summary(const traversal_summary &o)
+        : directory_opens_failed(o.directory_opens_failed)
+        , want(o.want)
+        , devs(o.devs)
+        , types(o.types)
+        , size(o.size)
+        , allocated(o.allocated)
+        , file_blocks(o.file_blocks)
+        , directory_blocks(o.directory_blocks)
+        , max_depth(o.max_depth)
+    {
+      assert(!is_lockable_locked(o._lock));
+    }
+    traversal_summary(traversal_summary &&o) noexcept
+        : directory_opens_failed(o.directory_opens_failed)
+        , want(o.want)
+        , devs(std::move(o.devs))
+        , types(std::move(o.types))
+        , size(o.size)
+        , allocated(o.allocated)
+        , file_blocks(o.file_blocks)
+        , directory_blocks(o.directory_blocks)
+        , max_depth(o.max_depth)
+    {
+      assert(!is_lockable_locked(o._lock));
+    }
+    traversal_summary &operator=(const traversal_summary &o)
+    {
+      if(this != &o)
+      {
+        directory_opens_failed = o.directory_opens_failed;
+        want = o.want;
+        devs = o.devs;
+        types = o.types;
+        size = o.size;
+        allocated = o.allocated;
+        file_blocks = o.file_blocks;
+        directory_blocks = o.directory_blocks;
+        max_depth = o.max_depth;
+      }
+      return *this;
+    }
+    traversal_summary &operator=(traversal_summary &&o) noexcept
+    {
+      if(this != &o)
+      {
+        directory_opens_failed = o.directory_opens_failed;
+        want = o.want;
+        devs = std::move(o.devs);
+        types = std::move(o.types);
+        size = o.size;
+        allocated = o.allocated;
+        file_blocks = o.file_blocks;
+        directory_blocks = o.directory_blocks;
+        max_depth = o.max_depth;
+      }
+      return *this;
+    }
     //! Adds another summary to this
     traversal_summary &operator+=(const traversal_summary &o)
     {
