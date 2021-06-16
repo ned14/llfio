@@ -1,5 +1,10 @@
 var NAVTREEINDEX12 =
 {
+"structllfio__v2__xxx_1_1deadline.html#acbc4f85fc48f6818ba7b418ac4c7a545":[4,0,2,17,2],
+"structllfio__v2__xxx_1_1deadline.html#aff7d0cc77c5d0a9c90b5f16140df5359":[4,0,2,17,0],
+"structllfio__v2__xxx_1_1directory__entry.html":[4,0,2,18],
+"structllfio__v2__xxx_1_1directory__entry.html#a5a6d56ab917ea2a44ec06019bb9dd45e":[4,0,2,18,0],
+"structllfio__v2__xxx_1_1directory__entry.html#ac679ef1297de655163136230986c0ffe":[4,0,2,18,1],
 "structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html":[4,0,2,19,0],
 "structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a14d4df3a12986e4938ec8a5f8427e4ca":[4,0,2,19,0,8],
 "structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a181d1decd2c1456924e5029096a294e2":[4,0,2,19,0,6],
@@ -244,10 +249,5 @@ var NAVTREEINDEX12 =
 "structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html#abd0c1c217adbd06f9cffa25478b2cd9b":[4,0,2,29,7,1],
 "structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html#af660d4ec2843dd1192cbb16e62c7d4e2":[4,0,2,29,7,7],
 "structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state.html#af79be80a27c2e1096beaf30a14db961a":[4,0,2,29,7,8],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state_1_1lock__guard.html":[4,0,2,29,7,0],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state_1_1lock__guard.html#a0494a80eaf01a43e614d5d49a81fa091":[4,0,2,29,7,0,9],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state_1_1lock__guard.html#a10b11fc79c1d85e42e54c8636ca94996":[4,0,2,29,7,0,0],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state_1_1lock__guard.html#a1a350db0a1b4b233efe5d49c4b279022":[4,0,2,29,7,0,4],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state_1_1lock__guard.html#a22628597533a471ff24f587878817a0c":[4,0,2,29,7,0,1],
-"structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state_1_1lock__guard.html#a274efbaa733f39ac2d9616da3ff89b65":[4,0,2,29,7,0,6]
+"structllfio__v2__xxx_1_1io__multiplexer_1_1io__operation__state_1_1lock__guard.html":[4,0,2,29,7,0]
 };
