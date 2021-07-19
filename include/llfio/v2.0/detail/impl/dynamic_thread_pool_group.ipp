@@ -850,6 +850,7 @@ namespace detail
         int fd = ::open(path, O_RDONLY);
         if(-1 == fd)
         {
+        threadearlyexited:
           // Thread may have exited since we last populated
           if(item->blocked_since == std::chrono::steady_clock::time_point())
           {
@@ -863,7 +864,11 @@ namespace detail
         char buffer[1024];
         auto bytesread = ::read(fd, buffer, sizeof(buffer));
         ::close(fd);
-        buffer[std::max((size_t) bytesread, sizeof(buffer) - 1)] = 0;
+        if(bytesread <= 0)
+        {
+          goto threadearlyexited;
+        }
+        buffer[std::min((size_t) bytesread, sizeof(buffer) - 1)] = 0;
         char state = 0;
         unsigned long majflt = 0, utime = 0, stime = 0;
         sscanf(buffer, "%*d %*s %c %*d %*d %*d %*d %*d %*u %*u %*u %lu %*u %lu %lu", &state, &majflt, &utime, &stime);
