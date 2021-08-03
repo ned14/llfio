@@ -1,5 +1,5 @@
 /* Misc utilities
-(C) 2016-2017 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
+(C) 2016-2021 Niall Douglas <http://www.nedproductions.biz/> (6 commits)
 File Created: Jan 2015
 
 
@@ -555,12 +555,12 @@ namespace utils
       ret.system_ns_in_kernel_mode += cpuInfo[CPU_STATE_MAX * n + CPU_STATE_SYSTEM];
       ret.system_ns_in_idle_mode += cpuInfo[CPU_STATE_MAX * n + CPU_STATE_IDLE];
     }
-    vm_deallocate(mach_task_self(), cpuInfo, sizeof(integer_t) * numCPUInfo);
+    vm_deallocate(mach_task_self(), cpuInfo, sizeof(integer_t) * numCpuInfo);
     static const double ts_multiplier = [] {
       mach_timebase_info_data_t timebase;
       mach_timebase_info(&timebase);
       return (double) timebase.numer / timebase.denom;
-    };
+    }();
     ret.system_ns_in_user_mode = (uint64_t)(ts_multiplier * ret.system_ns_in_user_mode);
     ret.system_ns_in_kernel_mode = (uint64_t)(ts_multiplier * ret.system_ns_in_kernel_mode);
     ret.system_ns_in_idle_mode = (uint64_t)(ts_multiplier * ret.system_ns_in_idle_mode);

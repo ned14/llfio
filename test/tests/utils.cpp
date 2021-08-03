@@ -29,7 +29,7 @@ static inline void TestCurrentProcessCPUUsage()
   namespace llfio = LLFIO_V2_NAMESPACE;
   std::vector<std::thread> threads;
   std::atomic<unsigned> done{0};
-  for(size_t n = 0; n < std::thread::hardware_concurrency() / 4; n++)
+  for(size_t n = 0; n < std::thread::hardware_concurrency() / 2; n++)
   {
     threads.push_back(std::thread([&] {
       while(!done)
@@ -41,12 +41,13 @@ static inline void TestCurrentProcessCPUUsage()
   std::this_thread::sleep_for(std::chrono::seconds(1));
   llfio::utils::process_cpu_usage pcu2 = llfio::utils::current_process_cpu_usage().value();
   auto diff = pcu2 - pcu1;
-  BOOST_CHECK(diff.process_ns_in_user_mode >= 900000000ULL * std::thread::hardware_concurrency() / 4);
-  BOOST_CHECK(diff.system_ns_in_user_mode >= 900000000ULL * std::thread::hardware_concurrency() / 4);
-  BOOST_CHECK(diff.system_ns_in_idle_mode <= 1100000000ULL * std::thread::hardware_concurrency() * 3 / 4);
-  std::cout << "With " << (std::thread::hardware_concurrency() / 4) << " threads busy the process spent " << diff.process_ns_in_user_mode << " ns in user mode and "
-            << diff.process_ns_in_kernel_mode << " ns in kernel mode. The system spent " << diff.system_ns_in_user_mode << " ns in user mode, "
-            << diff.system_ns_in_kernel_mode << " ns in kernel mode, and " << diff.system_ns_in_idle_mode << " in idle mode." << std::endl;
+  BOOST_CHECK(diff.process_ns_in_user_mode >= 900000000ULL * std::thread::hardware_concurrency() / 2);
+  BOOST_CHECK(diff.system_ns_in_user_mode >= 900000000ULL * std::thread::hardware_concurrency() / 2);
+  BOOST_CHECK(diff.system_ns_in_idle_mode <= 1100000000ULL * std::thread::hardware_concurrency() * 2);
+  std::cout << "With " << (std::thread::hardware_concurrency() / 2) << " threads busy the process spent " << diff.process_ns_in_user_mode
+            << " ns in user mode and " << diff.process_ns_in_kernel_mode << " ns in kernel mode. The system spent " << diff.system_ns_in_user_mode
+            << " ns in user mode, " << diff.system_ns_in_kernel_mode << " ns in kernel mode, and " << diff.system_ns_in_idle_mode << " in idle mode."
+            << std::endl;
   done = true;
   for(auto &t : threads)
   {
