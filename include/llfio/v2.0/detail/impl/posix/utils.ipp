@@ -37,6 +37,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <mach/processor_info.h>
 #include <mach/task.h>
 #include <mach/task_info.h>
+#include <mach/vm_map.h>
 #endif
 
 LLFIO_V2_NAMESPACE_BEGIN
