@@ -32,6 +32,9 @@ Distributed under the Boost Software License, Version 1.0.
 #include <unistd.h>  // for preadv
 #endif
 #ifdef __APPLE__
+#include <mach/mach_host.h>
+#include <mach/mach_time.h>
+#include <mach/processor_info.h>
 #include <mach/task.h>
 #include <mach/task_info.h>
 #endif
@@ -259,7 +262,7 @@ namespace utils
         buffer.resize(buffer.size() * 2);
       }
       const string_view totalview(buffer.data(), buffer.size());
-      //std::cerr << totalview << std::endl;
+      // std::cerr << totalview << std::endl;
       std::vector<string_view> anon_entries, non_anon_entries;
       anon_entries.reserve(32);
       non_anon_entries.reserve(32);
@@ -298,16 +301,17 @@ namespace utils
         // Is there " ac" after vmflagsidx?
         if(string_view::npos != item.find(" ac", vmflagsidx) && inode == 0)
         {
-          //std::cerr << "Adding anon entry at offset " << itemtopidx << std::endl;
+          // std::cerr << "Adding anon entry at offset " << itemtopidx << std::endl;
           anon_entries.push_back(item);
         }
         else
         {
-          //std::cerr << "Adding non-anon entry at offset " << itemtopidx << std::endl;
+          // std::cerr << "Adding non-anon entry at offset " << itemtopidx << std::endl;
           non_anon_entries.push_back(item);
         }
       }
-      auto parse = [](string_view item, string_view what) ->result<uint64_t> { auto idx = item.find(what);
+      auto parse = [](string_view item, string_view what) -> result<uint64_t> {
+        auto idx = item.find(what);
         if(string_view::npos == idx)
         {
           return (uint64_t) -1;
@@ -359,7 +363,7 @@ namespace utils
         return value;
       };
       process_memory_usage ret;
-      //std::cerr << "Anon entries:";
+      // std::cerr << "Anon entries:";
       for(auto &i : anon_entries)
       {
         OUTCOME_TRY(auto &&size, parse(i, "\nSize:"));
@@ -378,9 +382,9 @@ namespace utils
             ret.private_paged_in -= lazyfree;
           }
         }
-        //std::cerr << i << "\nSize = " << size << " Rss = " << rss << std::endl;
+        // std::cerr << i << "\nSize = " << size << " Rss = " << rss << std::endl;
       }
-      //std::cerr << "\n\nNon-anon entries:";
+      // std::cerr << "\n\nNon-anon entries:";
       for(auto &i : non_anon_entries)
       {
         OUTCOME_TRY(auto &&size, parse(i, "\nSize:"));
@@ -395,7 +399,7 @@ namespace utils
             ret.total_address_space_paged_in -= lazyfree;
           }
         }
-        //std::cerr << i << "\nSize = " << size << " Rss = " << rss << std::endl;
+        // std::cerr << i << "\nSize = " << size << " Rss = " << rss << std::endl;
       }
       return ret;
     }
@@ -404,32 +408,167 @@ namespace utils
       return error_from_exception();
     }
 #elif defined(__APPLE__)
-  kern_return_t error;
-  mach_msg_type_number_t outCount;
-  task_vm_info_data_t vmInfo;
-  //task_kernelmemory_info_data_t kmInfo;
+    kern_return_t error;
+    mach_msg_type_number_t outCount;
+    task_vm_info_data_t vmInfo;
+    // task_kernelmemory_info_data_t kmInfo;
 
-  outCount = TASK_VM_INFO_COUNT;
-  error = task_info(mach_task_self(), TASK_VM_INFO, (task_info_t)&vmInfo, &outCount);
-  if (error != KERN_SUCCESS) {
-    return errc::invalid_argument;
-  }
-  //outCount = TASK_KERNELMEMORY_INFO_COUNT;
-  //error = task_info(mach_task_self(), TASK_KERNELMEMORY_INFO, (task_info_t)&kmInfo, &outCount);
-  //if (error != KERN_SUCCESS) {
-  //  return errc::invalid_argument;
-  //}
-  //std::cout << vmInfo.virtual_size << "\n" << vmInfo.region_count << "\n" << vmInfo.resident_size << "\n" << vmInfo.device << "\n" << vmInfo.internal << "\n" << vmInfo.external << "\n" << vmInfo.reusable << "\n" << vmInfo.purgeable_volatile_pmap<< "\n" << vmInfo.purgeable_volatile_resident << "\n" << vmInfo.purgeable_volatile_virtual << "\n" << vmInfo.compressed << "\n" << vmInfo.phys_footprint << std::endl;
-  //std::cout << "\n" << kmInfo.total_palloc << "\n" << kmInfo.total_pfree << "\n" << kmInfo.total_salloc << "\n" << kmInfo.total_sfree << std::endl;
-  process_memory_usage ret;
-  ret.total_address_space_in_use = vmInfo.virtual_size;
-  ret.total_address_space_paged_in = vmInfo.resident_size;
-  ret.private_committed = vmInfo.internal + vmInfo.compressed;
-  ret.private_paged_in = vmInfo.phys_footprint;
-  return ret;
+    outCount = TASK_VM_INFO_COUNT;
+    error = task_info(mach_task_self(), TASK_VM_INFO, (task_info_t) &vmInfo, &outCount);
+    if(error != KERN_SUCCESS)
+    {
+      return errc::invalid_argument;
+    }
+    // outCount = TASK_KERNELMEMORY_INFO_COUNT;
+    // error = task_info(mach_task_self(), TASK_KERNELMEMORY_INFO, (task_info_t)&kmInfo, &outCount);
+    // if (error != KERN_SUCCESS) {
+    //  return errc::invalid_argument;
+    //}
+    // std::cout << vmInfo.virtual_size << "\n" << vmInfo.region_count << "\n" << vmInfo.resident_size << "\n" << vmInfo.device << "\n" << vmInfo.internal <<
+    // "\n" << vmInfo.external << "\n" << vmInfo.reusable << "\n" << vmInfo.purgeable_volatile_pmap<< "\n" << vmInfo.purgeable_volatile_resident << "\n" <<
+    // vmInfo.purgeable_volatile_virtual << "\n" << vmInfo.compressed << "\n" << vmInfo.phys_footprint << std::endl; std::cout << "\n" << kmInfo.total_palloc <<
+    // "\n" << kmInfo.total_pfree << "\n" << kmInfo.total_salloc << "\n" << kmInfo.total_sfree << std::endl;
+    process_memory_usage ret;
+    ret.total_address_space_in_use = vmInfo.virtual_size;
+    ret.total_address_space_paged_in = vmInfo.resident_size;
+    ret.private_committed = vmInfo.internal + vmInfo.compressed;
+    ret.private_paged_in = vmInfo.phys_footprint;
+    return ret;
 #else
 #error Unknown platform
 #endif
+  }
+
+  result<process_cpu_usage> current_process_cpu_usage() noexcept
+  {
+    process_cpu_usage ret;
+    memset(&ret, 0, sizeof(ret));
+#ifdef __linux__
+    try
+    {
+      /* Need to multiply all below by 1000000000ULL / sysconf(_SC_CLK_TCK)
+
+      /proc/[pid]/stat:
+
+      %*d %*s %*c %*d %*d %*d %*d %*d %*u %*lu %*lu %*lu %*lu %lu %lu
+
+      The last two are process user time and process kernel time.
+
+      /proc/stat:
+
+      cpu <user> <user-nice> <kernel> <idle>
+      */
+      std::vector<char> buffer1(65536), buffer2(65536);
+      auto fill_buffer = [](std::vector<char> &buffer, const char *path) -> result<void> {
+        for(;;)
+        {
+          int ih = ::open(path, O_RDONLY);
+          if(ih == -1)
+          {
+            return posix_error();
+          }
+          size_t totalbytesread = 0;
+          for(;;)
+          {
+            auto bytesread = ::read(ih, buffer.data() + totalbytesread, buffer.size() - totalbytesread);
+            if(bytesread < 0)
+            {
+              ::close(ih);
+              return posix_error();
+            }
+            if(bytesread == 0)
+            {
+              break;
+            }
+            totalbytesread += bytesread;
+          }
+          ::close(ih);
+          if(totalbytesread < buffer.size())
+          {
+            buffer.resize(totalbytesread);
+            break;
+          }
+          buffer.resize(buffer.size() * 2);
+        }
+        return success();
+      };
+      static const uint64_t ts_multiplier = 1000000000ULL / sysconf(_SC_CLK_TCK);
+      OUTCOME_TRY(fill_buffer(buffer1, "/proc/self/stat"));
+      OUTCOME_TRY(fill_buffer(buffer2, "/proc/stat"));
+      if(sscanf(buffer1.data(), "%*d %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %lu %lu", &ret.process_ns_in_user_mode,
+                &ret.process_ns_in_kernel_mode) < 2)
+      {
+        return errc::protocol_error;
+      }
+      uint64_t user_nice;
+      if(sscanf(buffer2.data(), "cpu %lu %lu %lu %lu", &ret.system_ns_in_user_mode, &user_nice, &ret.system_ns_in_kernel_mode, &ret.system_ns_in_idle_mode) <
+         4)
+      {
+        return errc::protocol_error;
+      }
+      ret.system_ns_in_user_mode += user_nice;
+      ret.process_ns_in_user_mode *= ts_multiplier;
+      ret.process_ns_in_kernel_mode *= ts_multiplier;
+      ret.system_ns_in_user_mode *= ts_multiplier;
+      ret.system_ns_in_kernel_mode *= ts_multiplier;
+      ret.system_ns_in_idle_mode *= ts_multiplier;
+      return ret;
+    }
+    catch(...)
+    {
+      return error_from_exception();
+    }
+#elif defined(__APPLE__)
+    kern_return_t error;
+    mach_msg_type_number_t outCount;
+    task_basic_info_64 processInfo1;
+    task_thread_times_info processInfo2;
+
+    outCount = TASK_BASIC_INFO_64_COUNT;
+    error = task_info(mach_task_self(), TASK_BASIC_INFO_64, (task_info_t) &processInfo1, &outCount);
+    if(error != KERN_SUCCESS)
+    {
+      return errc::invalid_argument;
+    }
+    outCount = TASK_THREAD_TIMES_INFO_COUNT;
+    error = task_info(mach_task_self(), TASK_THREAD_TIMES_INFO, (task_info_t) &processInfo2, &outCount);
+    if(error != KERN_SUCCESS)
+    {
+      return errc::invalid_argument;
+    }
+    ret.process_ns_in_user_mode = (processInfo1.user_time.seconds + processInfo2.user_time.seconds) * 1000000000ULL +
+                                  (processInfo1.user_time.microseconds + processInfo2.user_time.microseconds) * 1000ULL;
+    ret.process_ns_in_kernel_mode = (processInfo1.system_time.seconds + processInfo2.system_time.seconds) * 1000000000ULL +
+                                    (processInfo1.system_time.microseconds + processInfo2.system_time.microseconds) * 1000ULL;
+
+    natural_t numCPU = 0;
+    processor_info_array_t cpuInfo;
+    mach_msg_type_number_t numCpuInfo;
+    error = host_processor_info(mach_host_self(), PROCESSOR_CPU_LOAD_INFO, &numCPU, &cpuInfo, &numCpuInfo);
+    if(error != KERN_SUCCESS)
+    {
+      return errc::invalid_argument;
+    }
+    for(natural_t n = 0; n < numCPU; n++)
+    {
+      ret.system_ns_in_user_mode += cpuInfo[CPU_STATE_MAX * n + CPU_STATE_USER] + cpuInfo[CPU_STATE_MAX * n + CPU_STATE_NICE];
+      ret.system_ns_in_kernel_mode += cpuInfo[CPU_STATE_MAX * n + CPU_STATE_SYSTEM];
+      ret.system_ns_in_idle_mode += cpuInfo[CPU_STATE_MAX * n + CPU_STATE_IDLE];
+    }
+    vm_deallocate(mach_task_self(), cpuInfo, sizeof(integer_t) * numCPUInfo);
+    static const double ts_multiplier = [] {
+      mach_timebase_info_data_t timebase;
+      mach_timebase_info(&timebase);
+      return (double) timebase.numer / timebase.denom;
+    };
+    ret.system_ns_in_user_mode = (uint64_t)(ts_multiplier * ret.system_ns_in_user_mode);
+    ret.system_ns_in_kernel_mode = (uint64_t)(ts_multiplier * ret.system_ns_in_kernel_mode);
+    ret.system_ns_in_idle_mode = (uint64_t)(ts_multiplier * ret.system_ns_in_idle_mode);
+    return ret;
+#else
+#error Unknown platform
+#endif
+    return ret;
   }
 
   namespace detail

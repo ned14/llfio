@@ -208,11 +208,62 @@ namespace utils
     //! The total anonymous memory currently paged into the process. Always `<= private_committed`. Also known as "active anonymous pages".
     size_t private_paged_in{0};
   };
+  static_assert(std::is_trivially_copyable<process_memory_usage>::value, "process_memory_usage is not trivially copyable!");
+
   /*! \brief Retrieve the current memory usage statistics for this process.
 
    \note Mac OS provides no way of reading how much memory a process has committed. We therefore supply as `private_committed` the same value as `private_paged_in`.
   */
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<process_memory_usage> current_process_memory_usage() noexcept;
+
+  /*! \brief CPU usage statistics for a process.
+  */
+  struct process_cpu_usage
+  {
+    //! The amount of nanoseconds all processes ever have spent in user mode.
+    uint64_t system_ns_in_user_mode;
+    //! The amount of nanoseconds all processes ever have spent in kernel mode.
+    uint64_t system_ns_in_kernel_mode;
+    //! The amount of nanoseconds all processes ever have spent in idle mode.
+    uint64_t system_ns_in_idle_mode;
+
+    //! The amount of nanoseconds this process has spent in user mode.
+    uint64_t process_ns_in_user_mode;
+    //! The amount of nanoseconds this process has spent in kernel mode.
+    uint64_t process_ns_in_kernel_mode;
+
+    //! Subtracts an earlier result from a later result.
+    process_cpu_usage operator-(const process_cpu_usage &o) const noexcept
+    {
+      return {system_ns_in_user_mode - o.system_ns_in_user_mode, system_ns_in_kernel_mode - o.system_ns_in_kernel_mode,
+              system_ns_in_idle_mode - o.system_ns_in_idle_mode, process_ns_in_user_mode - o.process_ns_in_user_mode,
+              process_ns_in_kernel_mode - o.process_ns_in_kernel_mode};
+    }
+    //! Subtracts an earlier result from a later result.
+    process_cpu_usage &operator-=(const process_cpu_usage &o) noexcept
+    {
+      system_ns_in_user_mode -= o.system_ns_in_user_mode;
+      system_ns_in_kernel_mode -= o.system_ns_in_kernel_mode;
+      system_ns_in_idle_mode -= o.system_ns_in_idle_mode;
+      process_ns_in_user_mode -= o.process_ns_in_user_mode;
+      process_ns_in_kernel_mode -= o.process_ns_in_kernel_mode;
+      return *this;
+    }
+  };
+  static_assert(std::is_trivially_copyable<process_cpu_usage>::value, "process_cpu_usage is not trivially copyable!");
+
+  /*! \brief Retrieve the current CPU usage statistics for this system and this process. These
+  are unsigned counters which always increment, and so may eventually wrap.
+
+  The simplest way to use this API is to call it whilst also taking the current monotonic
+  clock/CPU TSC and then calculating the delta change over that period of time.
+  
+  \note The returned values may not be a snapshot accurate against one another as they
+  may get derived from multiple sources. Also, granularity is probably either a lot more
+  than one nanosecond on most platforms, but may be CPU TSC based on others (you can test
+  it to be sure).
+  */
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<process_cpu_usage> current_process_cpu_usage() noexcept;
 
   namespace detail
   {

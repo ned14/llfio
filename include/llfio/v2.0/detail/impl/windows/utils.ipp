@@ -129,7 +129,8 @@ namespace utils
         tp.PrivilegeCount = 1;
         tp.Privileges[0].Luid = luid;
         tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-        if(AdjustTokenPrivileges(processToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), static_cast<PTOKEN_PRIVILEGES>(nullptr), static_cast<PDWORD>(nullptr)) == 0)
+        if(AdjustTokenPrivileges(processToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), static_cast<PTOKEN_PRIVILEGES>(nullptr), static_cast<PDWORD>(nullptr)) ==
+           0)
         {
           return win32_error();
         }
@@ -184,7 +185,8 @@ namespace utils
         tp.PrivilegeCount = 1;
         tp.Privileges[0].Luid = luid;
         tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-        if(AdjustTokenPrivileges(processToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), static_cast<PTOKEN_PRIVILEGES>(nullptr), static_cast<PDWORD>(nullptr)) == 0)
+        if(AdjustTokenPrivileges(processToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), static_cast<PTOKEN_PRIVILEGES>(nullptr), static_cast<PDWORD>(nullptr)) ==
+           0)
         {
           return win32_error();
         }
@@ -205,7 +207,8 @@ namespace utils
     return success();
   }
 
-  result<process_memory_usage> current_process_memory_usage() noexcept {
+  result<process_memory_usage> current_process_memory_usage() noexcept
+  {
     // Amazingly Win32 doesn't expose private working set, so to avoid having
     // to iterate all the pages in the process and calculate, use a hidden
     // NT kernel call
@@ -236,6 +239,33 @@ namespace utils
 
     ret.private_committed = vmc.PrivateUsage;
     ret.private_paged_in = vmc.PrivateWorkingSetSize;
+    return ret;
+  }
+
+  result<process_cpu_usage> current_process_cpu_usage() noexcept
+  {
+    process_cpu_usage ret;
+    memset(&ret, 0, sizeof(ret));
+    {
+      FILETIME IdleTime, KernelTime, UserTime;
+      if(GetSystemTimes(&IdleTime, &KernelTime, &UserTime) == 0)
+      {
+        return win32_error();
+      }
+      ret.system_ns_in_idle_mode = (((uint64_t) IdleTime.dwHighDateTime << 32U) | IdleTime.dwLowDateTime) * 100;
+      ret.system_ns_in_kernel_mode = (((uint64_t) KernelTime.dwHighDateTime << 32U) | KernelTime.dwLowDateTime) * 100;
+      ret.system_ns_in_user_mode = (((uint64_t) UserTime.dwHighDateTime << 32U) | UserTime.dwLowDateTime) * 100;
+    }
+    {
+      FILETIME CreationTime, ExitTime, KernelTime, UserTime;
+      if(GetProcessTimes(GetCurrentProcess(), &CreationTime, &ExitTime, &KernelTime, &UserTime) == 0)
+      {
+        return win32_error();
+      }
+      // Is it worth adjusting KernelTime and UserTime by QueryProcessCycleTime to make them TSC granularity?
+      ret.process_ns_in_kernel_mode = (((uint64_t) KernelTime.dwHighDateTime << 32U) | KernelTime.dwLowDateTime) * 100;
+      ret.process_ns_in_user_mode = (((uint64_t) UserTime.dwHighDateTime << 32U) | UserTime.dwLowDateTime) * 100;
+    }
     return ret;
   }
 

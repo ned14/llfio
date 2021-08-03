@@ -24,6 +24,36 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../test_kernel_decl.hpp"
 
+static inline void TestCurrentProcessCPUUsage()
+{
+  namespace llfio = LLFIO_V2_NAMESPACE;
+  std::vector<std::thread> threads;
+  std::atomic<unsigned> done{0};
+  for(size_t n = 0; n < std::thread::hardware_concurrency() / 4; n++)
+  {
+    threads.push_back(std::thread([&] {
+      while(!done)
+      {
+      }
+    }));
+  }
+  llfio::utils::process_cpu_usage pcu1 = llfio::utils::current_process_cpu_usage().value();
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+  llfio::utils::process_cpu_usage pcu2 = llfio::utils::current_process_cpu_usage().value();
+  auto diff = pcu2 - pcu1;
+  BOOST_CHECK(diff.process_ns_in_user_mode >= 900000000ULL * std::thread::hardware_concurrency() / 4);
+  BOOST_CHECK(diff.system_ns_in_user_mode >= 900000000ULL * std::thread::hardware_concurrency() / 4);
+  BOOST_CHECK(diff.system_ns_in_idle_mode <= 1100000000ULL * std::thread::hardware_concurrency() * 3 / 4);
+  std::cout << "With " << (std::thread::hardware_concurrency() / 4) << " threads busy the process spent " << diff.process_ns_in_user_mode << " ns in user mode and "
+            << diff.process_ns_in_kernel_mode << " ns in kernel mode. The system spent " << diff.system_ns_in_user_mode << " ns in user mode, "
+            << diff.system_ns_in_kernel_mode << " ns in kernel mode, and " << diff.system_ns_in_idle_mode << " in idle mode." << std::endl;
+  done = true;
+  for(auto &t : threads)
+  {
+    t.join();
+  }
+}
+
 static inline void TestCurrentProcessMemoryUsage()
 {
 #if defined(__has_feature)
@@ -37,20 +67,21 @@ static inline void TestCurrentProcessMemoryUsage()
     pmu = llfio::utils::current_process_memory_usage().value();
     last_pmu = &pmu;
     return [](std::ostream &s) -> std::ostream & {
-      return s << "      " << (last_pmu->total_address_space_in_use / 1024.0 / 1024.0) << "," << (last_pmu->total_address_space_paged_in / 1024.0 / 1024.0) << "," << (last_pmu->private_committed / 1024.0 / 1024.0) << "," << (last_pmu->private_paged_in / 1024.0 / 1024.0) << std::endl;
+      return s << "      " << (last_pmu->total_address_space_in_use / 1024.0 / 1024.0) << "," << (last_pmu->total_address_space_paged_in / 1024.0 / 1024.0)
+               << "," << (last_pmu->private_committed / 1024.0 / 1024.0) << "," << (last_pmu->private_paged_in / 1024.0 / 1024.0) << std::endl;
     };
   };
-  auto fakefault = [](llfio::map_handle &maph){
+  auto fakefault = [](llfio::map_handle &maph) {
 #ifdef __APPLE__
-      // Mac OS doesn't implement map page table prefaulting at all,
-      // so fake it so the memory statistics work right
-      for(size_t n = 0; n < maph.length(); n += 4096)
-      {
-          auto *p = (volatile llfio::byte *) maph.address() + n;
-          *p;
-      }
+    // Mac OS doesn't implement map page table prefaulting at all,
+    // so fake it so the memory statistics work right
+    for(size_t n = 0; n < maph.length(); n += 4096)
+    {
+      auto *p = (volatile llfio::byte *) maph.address() + n;
+      *p;
+    }
 #else
-      (void) maph;
+    (void) maph;
 #endif
   };
   {
@@ -103,7 +134,8 @@ static inline void TestCurrentProcessMemoryUsage()
       maph.do_not_store({maph.address(), maph.length()}).value();
       std::cout << "   After committing and faulting and do not storing 1Gb:\n" << print(after_do_not_store) << std::endl;
     }
-    auto within = [](const llfio::utils::process_memory_usage &a, const llfio::utils::process_memory_usage &b, int total_address_space_in_use, int total_address_space_paged_in, int private_committed, int private_paged_in) {
+    auto within = [](const llfio::utils::process_memory_usage &a, const llfio::utils::process_memory_usage &b, int total_address_space_in_use,
+                     int total_address_space_paged_in, int private_committed, int private_paged_in) {
       auto check = [](size_t a, size_t b, int bound) {
         auto diff = abs((b / 1024.0 / 1024.0) - (a / 1024.0 / 1024.0));
         return diff > bound - 10 && diff < bound + 10;
@@ -153,34 +185,39 @@ static inline void TestCurrentProcessMemoryUsage()
     }
     {
       // Should raise total_address_space_in_use and total_address_space_paged_in by 1Gb
-      auto mapfileh = llfio::map_handle::map(sectionh, 1024 * 1024 * 1024, 0, llfio::section_handle::flag::readwrite | llfio::section_handle::flag::prefault).value();
+      auto mapfileh =
+      llfio::map_handle::map(sectionh, 1024 * 1024 * 1024, 0, llfio::section_handle::flag::readwrite | llfio::section_handle::flag::prefault).value();
       fakefault(mapfileh);
       std::cout << "   After committing and faulting 1Gb:\n" << print(after_fault) << std::endl;
     }
 #ifndef _WIN32
     {
       // Should raise total_address_space_in_use by 1Gb, but not private_committed
-      auto mapfileh = llfio::map_handle::map(sectionh, 1024 * 1024 * 1024, 0, llfio::section_handle::flag::readwrite | llfio::section_handle::flag::prefault).value();
+      auto mapfileh =
+      llfio::map_handle::map(sectionh, 1024 * 1024 * 1024, 0, llfio::section_handle::flag::readwrite | llfio::section_handle::flag::prefault).value();
       fakefault(mapfileh);
       mapfileh.decommit({mapfileh.address(), mapfileh.length()}).value();
       std::cout << "   After committing and faulting and decommitting 1Gb:\n" << print(after_decommit) << std::endl;
     }
     {
       // Should raise total_address_space_in_use by 1Gb, but not private_committed
-      auto mapfileh = llfio::map_handle::map(sectionh, 1024 * 1024 * 1024, 0, llfio::section_handle::flag::readwrite | llfio::section_handle::flag::prefault).value();
+      auto mapfileh =
+      llfio::map_handle::map(sectionh, 1024 * 1024 * 1024, 0, llfio::section_handle::flag::readwrite | llfio::section_handle::flag::prefault).value();
       fakefault(mapfileh);
       mapfileh.zero_memory({mapfileh.address(), mapfileh.length()}).value();
       std::cout << "   After committing and faulting and zeroing 1Gb:\n" << print(after_zero) << std::endl;
     }
     {
       // Should raise total_address_space_in_use by 1Gb, but not private_committed
-      auto mapfileh = llfio::map_handle::map(sectionh, 1024 * 1024 * 1024, 0, llfio::section_handle::flag::readwrite | llfio::section_handle::flag::prefault).value();
+      auto mapfileh =
+      llfio::map_handle::map(sectionh, 1024 * 1024 * 1024, 0, llfio::section_handle::flag::readwrite | llfio::section_handle::flag::prefault).value();
       fakefault(mapfileh);
       mapfileh.do_not_store({mapfileh.address(), mapfileh.length()}).value();
       std::cout << "   After committing and faulting and do not storing 1Gb:\n" << print(after_do_not_store) << std::endl;
     }
 #endif
-    auto within = [](const llfio::utils::process_memory_usage &a, const llfio::utils::process_memory_usage &b, int total_address_space_in_use, int total_address_space_paged_in, int private_committed, int private_paged_in) {
+    auto within = [](const llfio::utils::process_memory_usage &a, const llfio::utils::process_memory_usage &b, int total_address_space_in_use,
+                     int total_address_space_paged_in, int private_committed, int private_paged_in) {
       auto check = [](size_t a, size_t b, int bound) {
         auto diff = abs((b / 1024.0 / 1024.0) - (a / 1024.0 / 1024.0));
         return diff > bound - 10 && diff < bound + 10;
@@ -196,7 +233,7 @@ static inline void TestCurrentProcessMemoryUsage()
     BOOST_CHECK(within(before_anything, after_commit, 1024, 0, 0, 0));
     BOOST_CHECK(within(before_anything, after_fault, 1024, 1024, 0, 0));
     BOOST_CHECK(within(before_anything, after_decommit, 1024, 0, 0, 0));
-    BOOST_CHECK(within(before_anything, after_zero, 1024, 1024, 0, 0));  // doesn't implement zero()
+    BOOST_CHECK(within(before_anything, after_zero, 1024, 1024, 0, 0));          // doesn't implement zero()
     BOOST_CHECK(within(before_anything, after_do_not_store, 1024, 1024, 0, 0));  // do_not_store() doesn't decrease RSS
 #else
     BOOST_CHECK(within(before_anything, after_reserve, 1024, 0, 0, 0));
@@ -215,4 +252,7 @@ static inline void TestCurrentProcessMemoryUsage()
   }
 }
 
-KERNELTEST_TEST_KERNEL(integration, llfio, utils, current_process_memory_usage, "Tests that llfio::utils::current_process_memory_usage() works as expected", TestCurrentProcessMemoryUsage())
+KERNELTEST_TEST_KERNEL(integration, llfio, utils, current_process_cpu_usage, "Tests that llfio::utils::current_process_cpu_usage() works as expected",
+                       TestCurrentProcessCPUUsage())
+KERNELTEST_TEST_KERNEL(integration, llfio, utils, current_process_memory_usage, "Tests that llfio::utils::current_process_memory_usage() works as expected",
+                       TestCurrentProcessMemoryUsage())
