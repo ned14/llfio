@@ -556,11 +556,11 @@ namespace utils
       ret.system_ns_in_idle_mode += cpuInfo[CPU_STATE_MAX * n + CPU_STATE_IDLE];
     }
     vm_deallocate(mach_task_self(), (vm_address_t) cpuInfo, sizeof(integer_t) * numCpuInfo);
-    static const double ts_multiplier = [] {
+    static const double ts_multiplier = /*[] {
       mach_timebase_info_data_t timebase;
       mach_timebase_info(&timebase);
       return (double) timebase.numer / timebase.denom;
-    }();
+    }();*/ 10000000.0;  // no idea why, but apparently this is the multiplier according to Mac CI runners
     ret.system_ns_in_user_mode = (uint64_t)(ts_multiplier * ret.system_ns_in_user_mode);
     ret.system_ns_in_kernel_mode = (uint64_t)(ts_multiplier * ret.system_ns_in_kernel_mode);
     ret.system_ns_in_idle_mode = (uint64_t)(ts_multiplier * ret.system_ns_in_idle_mode);
