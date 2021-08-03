@@ -110,11 +110,12 @@ var hierarchy =
       [ "llfio_v2_xxx::path_view", "classllfio__v2__xxx_1_1path__view.html", null ]
     ] ],
     [ "llfio_v2_xxx::io_multiplexer::_unsynchronised_io_operation_state::payload_t", "unionllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t.html", null ],
+    [ "llfio_v2_xxx::utils::process_cpu_usage", "structllfio__v2__xxx_1_1utils_1_1process__cpu__usage.html", null ],
     [ "llfio_v2_xxx::utils::process_memory_usage", "structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html", null ],
     [ "llfio_v2_xxx::io_multiplexer::_unsynchronised_io_operation_state::payload_t::noncompleted_t::params_t::read_params_t", "structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t_fd29c581ca55bf5954d3fa054ce41041.html", null ],
     [ "llfio_v2_xxx::read_receiver< IoHandleType >", "classllfio__v2__xxx_1_1read__receiver.html", null ],
-    [ "llfio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
     [ "llfio_v2_xxx::utils::page_allocator< void >::rebind", "structllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
+    [ "llfio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
     [ "result", null, [
       [ "llfio_v2_xxx::io_multiplexer::io_result< buffers_type >", "structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html", null ],
       [ "llfio_v2_xxx::io_multiplexer::io_result< const_buffers_type >", "structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html", null ],

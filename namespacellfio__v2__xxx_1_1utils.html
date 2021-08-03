@@ -100,6 +100,9 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4.html">page_allocator&lt; void &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1utils_1_1process__cpu__usage.html">process_cpu_usage</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">CPU usage statistics for a process.  <a href="structllfio__v2__xxx_1_1utils_1_1process__cpu__usage.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html">process_memory_usage</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Memory usage statistics for a process.  <a href="structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -142,6 +145,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="name
 <tr class="memitem:a5a2d8f932686b4c35a67a6aa972b4e92"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html">process_memory_usage</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1utils.html#a5a2d8f932686b4c35a67a6aa972b4e92">current_process_memory_usage</a> () noexcept</td></tr>
 <tr class="memdesc:a5a2d8f932686b4c35a67a6aa972b4e92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the current memory usage statistics for this process.  <a href="namespacellfio__v2__xxx_1_1utils.html#a5a2d8f932686b4c35a67a6aa972b4e92">More...</a><br /></td></tr>
 <tr class="separator:a5a2d8f932686b4c35a67a6aa972b4e92"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a264d603db8cc67ce5bfc468d71e0ffaf"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="structllfio__v2__xxx_1_1utils_1_1process__cpu__usage.html">process_cpu_usage</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1utils.html#a264d603db8cc67ce5bfc468d71e0ffaf">current_process_cpu_usage</a> () noexcept</td></tr>
+<tr class="memdesc:a264d603db8cc67ce5bfc468d71e0ffaf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the current CPU usage statistics for this system and this process. These are unsigned counters which always increment, and so may eventually wrap.  <a href="namespacellfio__v2__xxx_1_1utils.html#a264d603db8cc67ce5bfc468d71e0ffaf">More...</a><br /></td></tr>
+<tr class="separator:a264d603db8cc67ce5bfc468d71e0ffaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae880ebd5681dcf6b700d67fb10b4547e"><td class="memTemplParams" colspan="2"><a id="ae880ebd5681dcf6b700d67fb10b4547e"></a>
 template&lt;class T , class U &gt; </td></tr>
 <tr class="memitem:ae880ebd5681dcf6b700d67fb10b4547e"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>operator==</b> (const <a class="el" href="classllfio__v2__xxx_1_1utils_1_1page__allocator.html">page_allocator</a>&lt; T &gt; &amp;, const <a class="el" href="classllfio__v2__xxx_1_1utils_1_1page__allocator.html">page_allocator</a>&lt; U &gt; &amp;) noexcept</td></tr>
@@ -150,6 +156,35 @@ template&lt;class T , class U &gt; </td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Utility routines often useful when using LLFIO. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="a264d603db8cc67ce5bfc468d71e0ffaf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a264d603db8cc67ce5bfc468d71e0ffaf">&#9670;&nbsp;</a></span>current_process_cpu_usage()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;<a class="el" href="structllfio__v2__xxx_1_1utils_1_1process__cpu__usage.html">process_cpu_usage</a>&gt; llfio_v2_xxx::utils::current_process_cpu_usage </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retrieve the current CPU usage statistics for this system and this process. These are unsigned counters which always increment, and so may eventually wrap. </p>
+<p>The simplest way to use this API is to call it whilst also taking the current monotonic clock/CPU TSC and then calculating the delta change over that period of time.</p>
+<dl class="section note"><dt>Note</dt><dd>The returned values may not be a snapshot accurate against one another as they may get derived from multiple sources. Also, granularity is probably either a lot more than one nanosecond on most platforms, but may be CPU TSC based on others (you can test it to be sure). </dd></dl>
+
+</div>
+</div>
 <a id="a5a2d8f932686b4c35a67a6aa972b4e92"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5a2d8f932686b4c35a67a6aa972b4e92">&#9670;&nbsp;</a></span>current_process_memory_usage()</h2>
 
