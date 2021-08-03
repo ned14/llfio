@@ -496,14 +496,13 @@ namespace utils
       static const uint64_t ts_multiplier = 1000000000ULL / sysconf(_SC_CLK_TCK);
       OUTCOME_TRY(fill_buffer(buffer1, "/proc/self/stat"));
       OUTCOME_TRY(fill_buffer(buffer2, "/proc/stat"));
-      if(sscanf(buffer1.data(), "%*d %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %lu %lu", &ret.process_ns_in_user_mode,
-                &ret.process_ns_in_kernel_mode) < 2)
+      if(sscanf(buffer1.data(), "%*d %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %lu %lu", &ret.process_ns_in_user_mode, &ret.process_ns_in_kernel_mode) <
+         2)
       {
         return errc::protocol_error;
       }
       uint64_t user_nice;
-      if(sscanf(buffer2.data(), "cpu %lu %lu %lu %lu", &ret.system_ns_in_user_mode, &user_nice, &ret.system_ns_in_kernel_mode, &ret.system_ns_in_idle_mode) <
-         4)
+      if(sscanf(buffer2.data(), "cpu %lu %lu %lu %lu", &ret.system_ns_in_user_mode, &user_nice, &ret.system_ns_in_kernel_mode, &ret.system_ns_in_idle_mode) < 4)
       {
         return errc::protocol_error;
       }
@@ -556,7 +555,7 @@ namespace utils
       ret.system_ns_in_kernel_mode += cpuInfo[CPU_STATE_MAX * n + CPU_STATE_SYSTEM];
       ret.system_ns_in_idle_mode += cpuInfo[CPU_STATE_MAX * n + CPU_STATE_IDLE];
     }
-    vm_deallocate(mach_task_self(), cpuInfo, sizeof(integer_t) * numCpuInfo);
+    vm_deallocate(mach_task_self(), (vm_address_t) cpuInfo, sizeof(integer_t) * numCpuInfo);
     static const double ts_multiplier = [] {
       mach_timebase_info_data_t timebase;
       mach_timebase_info(&timebase);
