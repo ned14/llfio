@@ -1,5 +1,5 @@
 /* Misc utilities
-(C) 2015-2020 Niall Douglas <http://www.nedproductions.biz/> (8 commits)
+(C) 2015-2021 Niall Douglas <http://www.nedproductions.biz/> (8 commits)
 File Created: Dec 2015
 
 
@@ -221,16 +221,16 @@ namespace utils
   struct process_cpu_usage
   {
     //! The amount of nanoseconds all processes ever have spent in user mode.
-    uint64_t system_ns_in_user_mode;
+    uint64_t system_ns_in_user_mode{0};
     //! The amount of nanoseconds all processes ever have spent in kernel mode.
-    uint64_t system_ns_in_kernel_mode;
+    uint64_t system_ns_in_kernel_mode{0};
     //! The amount of nanoseconds all processes ever have spent in idle mode.
-    uint64_t system_ns_in_idle_mode;
+    uint64_t system_ns_in_idle_mode{0};
 
     //! The amount of nanoseconds this process has spent in user mode.
-    uint64_t process_ns_in_user_mode;
+    uint64_t process_ns_in_user_mode{0};
     //! The amount of nanoseconds this process has spent in kernel mode.
-    uint64_t process_ns_in_kernel_mode;
+    uint64_t process_ns_in_kernel_mode{0};
 
     //! Subtracts an earlier result from a later result.
     process_cpu_usage operator-(const process_cpu_usage &o) const noexcept
@@ -262,6 +262,8 @@ namespace utils
   may get derived from multiple sources. Also, granularity is probably either a lot more
   than one nanosecond on most platforms, but may be CPU TSC based on others (you can test
   it to be sure).
+
+  \note Within some versions of Docker, the per-process counters are not available.
   */
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<process_cpu_usage> current_process_cpu_usage() noexcept;
 
