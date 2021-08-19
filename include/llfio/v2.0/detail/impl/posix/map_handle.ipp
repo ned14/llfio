@@ -534,7 +534,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
   size_type bytes = region.size();
   OUTCOME_TRYV(do_mmap(_v, region.data(), MAP_FIXED, _section, _pagesize, bytes, offset, flag));
   // Tell the kernel we will be using these pages soon
-  if(-1 == ::madvise(region.data(), region.size(), MADV_WILLNEED))
+  if(_section != nullptr && -1 == ::madvise(region.data(), region.size(), MADV_WILLNEED))
   {
     return posix_error();
   }

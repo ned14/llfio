@@ -443,7 +443,6 @@ namespace utils
   result<process_cpu_usage> current_process_cpu_usage() noexcept
   {
     process_cpu_usage ret;
-    memset(&ret, 0, sizeof(ret));
 #ifdef __linux__
     try
     {
