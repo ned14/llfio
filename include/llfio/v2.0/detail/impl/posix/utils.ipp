@@ -28,6 +28,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <sys/mman.h>
 
+// #include <iostream>
+
 #ifdef __linux__
 #include <unistd.h>  // for preadv
 #endif
@@ -267,35 +269,31 @@ namespace utils
       std::vector<string_view> anon_entries, non_anon_entries;
       anon_entries.reserve(32);
       non_anon_entries.reserve(32);
-      auto sizeidx = totalview.find("\nSize:");
-      while(sizeidx < totalview.size())
+      auto find_item = [&](size_t idx) -> string_view {
+        auto x = totalview.rfind("\nSize:", idx);
+        if(x == string_view::npos)
+        {
+          return {};
+        }
+        x = totalview.rfind("\n", x - 1);
+        if(x == string_view::npos)
+        {
+          x = 0;
+        }
+        else
+        {
+          x++;
+        }
+        return totalview.substr(x, idx - x);
+      };
+      for(string_view item = find_item(totalview.size()); item != string_view(); item = find_item(item.data() - totalview.data()))
       {
-        auto itemtopidx = totalview.rfind("\n", sizeidx - 1);
-        if(string_view::npos == itemtopidx)
-        {
-          itemtopidx = 0;
-        }
+        //std::cout << "***" << item << "***";
         // hexaddr-hexaddr flags offset dev:id inode [path]
-        size_t begin, end, offset, inode = 1;
-        char f1, f2, f3, f4, f5, f6, f7, f8;
-        sscanf(totalview.data() + itemtopidx, "%zx-%zx %c%c%c%c %zx %c%c:%c%c %zu", &begin, &end, &f1, &f2, &f3, &f4, &offset, &f5, &f6, &f7, &f8, &inode);
-        sizeidx = totalview.find("\nSize:", sizeidx + 1);
-        if(string_view::npos == sizeidx)
-        {
-          sizeidx = totalview.size();
-        }
-        auto itemendidx = totalview.rfind("\n", sizeidx - 1);
-        if(string_view::npos == itemendidx)
-        {
-          abort();
-        }
-        const string_view item(totalview.substr(itemtopidx + 1, itemendidx - itemtopidx - 1));
-        auto vmflagsidx = item.rfind("\n");
-        if(string_view::npos == itemendidx)
-        {
-          abort();
-        }
-        if(0 != memcmp(item.data() + vmflagsidx, "\nVmFlags:", 9))
+        size_t inode = 1;
+        sscanf(item.data(), "%*x-%*x %*c%*c%*c%*c %*x %*c%*c:%*c%*c %zu", &inode);
+        auto vmflagsidx = item.rfind("\nVmFlags:");
+        if(vmflagsidx == string_view::npos)
         {
           return errc::illegal_byte_sequence;
         }
@@ -559,7 +557,8 @@ namespace utils
       mach_timebase_info_data_t timebase;
       mach_timebase_info(&timebase);
       return (double) timebase.numer / timebase.denom;
-    }();*/ 10000000.0;  // no idea why, but apparently this is the multiplier according to Mac CI runners
+    }();*/
+    10000000.0;                         // no idea why, but apparently this is the multiplier according to Mac CI runners
     ret.system_ns_in_user_mode = (uint64_t)(ts_multiplier * ret.system_ns_in_user_mode);
     ret.system_ns_in_kernel_mode = (uint64_t)(ts_multiplier * ret.system_ns_in_kernel_mode);
     ret.system_ns_in_idle_mode = (uint64_t)(ts_multiplier * ret.system_ns_in_idle_mode);
