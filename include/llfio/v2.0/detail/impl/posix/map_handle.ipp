@@ -1,5 +1,5 @@
 /* A handle to a source of mapped memory
-(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (10 commits)
+(C) 2017-2021 Niall Douglas <http://www.nedproductions.biz/> (10 commits)
 File Created: Apr 2017
 
 
@@ -156,8 +156,10 @@ map_handle::~map_handle()
     auto ret = map_handle::close();
     if(ret.has_error())
     {
-      LLFIO_LOG_FATAL(_v.fd, "map_handle::~map_handle() close failed. Cause is typically other code modifying mapped regions. If on Linux, you may have exceeded the 64k VMA process limit, set the LLFIO_DEBUG_LINUX_MUNMAP macro at the top of posix/map_handle.ipp to cause dumping of VMAs to "
-                             "/tmp/llfio_unmap_debug_smaps.txt, and combine with strace to figure it out.");
+      LLFIO_LOG_FATAL(_v.fd,
+                      "map_handle::~map_handle() close failed. Cause is typically other code modifying mapped regions. If on Linux, you may have exceeded the "
+                      "64k VMA process limit, set the LLFIO_DEBUG_LINUX_MUNMAP macro at the top of posix/map_handle.ipp to cause dumping of VMAs to "
+                      "/tmp/llfio_unmap_debug_smaps.txt, and combine with strace to figure it out.");
       abort();
     }
   }
@@ -173,27 +175,31 @@ result<void> map_handle::close() noexcept
       OUTCOME_TRYV(map_handle::barrier(barrier_kind::wait_all));
     }
     // printf("%d munmap %p-%p\n", getpid(), _addr, _addr+_reservation);
-    if(-1 == ::munmap(_addr, _reservation))
+    if(_section != nullptr || !_recycle_map())
     {
-#ifdef LLFIO_DEBUG_LINUX_MUNMAP
-      int olderrno = errno;
-      ssize_t bytesread;
-      // Refresh the /proc file
-      (void) ::lseek(llfio_linux_munmap_debug.smaps_fd, 0, SEEK_END);
-      (void) ::lseek(llfio_linux_munmap_debug.smaps_fd, 0, SEEK_SET);
-      char buffer[4096];
-      (void) ::write(llfio_linux_munmap_debug.dumpfile_fd, buffer, sprintf(buffer, "\n---\nCause of munmap failure by process %d: %d (%s)\n\n", getpid(), olderrno, strerror(olderrno)));
-      do
+      if(-1 == ::munmap(_addr, _reservation))
       {
-        bytesread = ::read(llfio_linux_munmap_debug.smaps_fd, buffer, sizeof(buffer));
-        if(bytesread > 0)
+#ifdef LLFIO_DEBUG_LINUX_MUNMAP
+        int olderrno = errno;
+        ssize_t bytesread;
+        // Refresh the /proc file
+        (void) ::lseek(llfio_linux_munmap_debug.smaps_fd, 0, SEEK_END);
+        (void) ::lseek(llfio_linux_munmap_debug.smaps_fd, 0, SEEK_SET);
+        char buffer[4096];
+        (void) ::write(llfio_linux_munmap_debug.dumpfile_fd, buffer,
+                       sprintf(buffer, "\n---\nCause of munmap failure by process %d: %d (%s)\n\n", getpid(), olderrno, strerror(olderrno)));
+        do
         {
-          (void) ::write(llfio_linux_munmap_debug.dumpfile_fd, buffer, bytesread);
-        }
-      } while(bytesread > 0);
-      errno = olderrno;
+          bytesread = ::read(llfio_linux_munmap_debug.smaps_fd, buffer, sizeof(buffer));
+          if(bytesread > 0)
+          {
+            (void) ::write(llfio_linux_munmap_debug.dumpfile_fd, buffer, bytesread);
+          }
+        } while(bytesread > 0);
+        errno = olderrno;
 #endif
-      return posix_error();
+        return posix_error();
+      }
     }
   }
   // We don't want ~handle() to close our borrowed handle
@@ -213,7 +219,8 @@ native_handle_type map_handle::release() noexcept
   return {};
 }
 
-map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_barrier(map_handle::io_request<map_handle::const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
+map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_barrier(map_handle::io_request<map_handle::const_buffers_type> reqs, barrier_kind kind,
+                                                                              deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   byte *addr = _addr + reqs.offset;
@@ -255,8 +262,38 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_barrier(ma
   return {reqs.buffers};
 }
 
+#ifdef __linux__
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC map_handle::memory_accounting_kind map_handle::memory_accounting() noexcept
+{
+  static memory_accounting_kind v{memory_accounting_kind::unknown};
+  if(v != memory_accounting_kind::unknown)
+  {
+    return v;
+  }
+  int fd = ::open("/proc/sys/vm/overcommit_memory", O_RDONLY);
+  if(fd != -1)
+  {
+    char buffer[8];
+    if(::read(fd, buffer, 8) > 0)
+    {
+      if(buffer[0] == '2')
+      {
+        v = memory_accounting_kind::commit_charge;
+      }
+      else
+      {
+        v = memory_accounting_kind::over_commit;
+      }
+    }
+    ::close(fd);
+  }
+  return v;
+}
+#endif
 
-static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, int extra_flags, section_handle *section, map_handle::size_type pagesize, map_handle::size_type &bytes, map_handle::extent_type offset, section_handle::flag _flag) noexcept
+
+static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, int extra_flags, section_handle *section, map_handle::size_type pagesize,
+                                     map_handle::size_type &bytes, map_handle::extent_type offset, section_handle::flag _flag) noexcept
 {
   bool have_backing = (section != nullptr);
   int prot = 0, flags = have_backing ? MAP_SHARED : (MAP_PRIVATE | MAP_ANONYMOUS);
@@ -387,9 +424,8 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
   return addr;
 }
 
-result<map_handle> map_handle::map(size_type bytes, bool /*unused*/, section_handle::flag _flag) noexcept
+result<map_handle> map_handle::_new_map(size_type bytes, section_handle::flag _flag) noexcept
 {
-  // TODO: Keep a cache of MADV_FREE pages deallocated
   if(bytes == 0u)
   {
     return errc::argument_out_of_domain;
@@ -495,7 +531,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
     _reservation = _newsize;
     _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
     return newsize;
-#else                  // generic POSIX, inefficient
+#else  // generic POSIX, inefficient
     byte *addrafter = _addr + _reservation;
     size_type bytes = newsize - _reservation;
     extent_type offset = _offset + _reservation;

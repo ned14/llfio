@@ -1,5 +1,5 @@
 /* A handle to a source of mapped memory
-(C) 2016-2020 Niall Douglas <http://www.nedproductions.biz/> (17 commits)
+(C) 2016-2021 Niall Douglas <http://www.nedproductions.biz/> (17 commits)
 File Created: August 2016
 
 
@@ -554,7 +554,10 @@ result<void> map_handle::close() noexcept
     }
     else
     {
-      OUTCOME_TRYV(win32_release_nonfile_allocations(_addr, _reservation, MEM_RELEASE));
+      if(!_recycle_map())
+      {
+        OUTCOME_TRYV(win32_release_nonfile_allocations(_addr, _reservation, MEM_RELEASE));
+      }
     }
   }
   // We don't want ~handle() to close our borrowed handle
@@ -619,9 +622,12 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_barrier(ma
 }
 
 
-result<map_handle> map_handle::map(size_type bytes, bool /*unused*/, section_handle::flag _flag) noexcept
+result<map_handle> map_handle::_new_map(size_type bytes, section_handle::flag _flag) noexcept
 {
-  // TODO: Keep a cache of DiscardVirtualMemory()/MEM_RESET pages deallocated
+  if(bytes == 0u)
+  {
+    return errc::argument_out_of_domain;
+  }
   result<map_handle> ret(map_handle(nullptr, _flag));
   native_handle_type &nativeh = ret.value()._v;
   DWORD allocation = MEM_RESERVE | MEM_COMMIT, prot;

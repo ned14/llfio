@@ -32,6 +32,7 @@ set(llfio_HEADERS
   "include/llfio/v2.0/detail/impl/dynamic_thread_pool_group.ipp"
   "include/llfio/v2.0/detail/impl/fast_random_file_handle.ipp"
   "include/llfio/v2.0/detail/impl/io_multiplexer.ipp"
+  "include/llfio/v2.0/detail/impl/map_handle.ipp"
   "include/llfio/v2.0/detail/impl/path_discovery.ipp"
   "include/llfio/v2.0/detail/impl/path_view.ipp"
   "include/llfio/v2.0/detail/impl/posix/directory_handle.ipp"

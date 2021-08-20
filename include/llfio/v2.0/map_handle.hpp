@@ -1,5 +1,5 @@
 /* A handle to a source of mapped memory
-(C) 2016-2018 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
+(C) 2016-2021 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
 File Created: August 2016
 
 
@@ -55,28 +55,32 @@ public:
   using size_type = handle::size_type;
 
   //! The behaviour of the memory section
-  QUICKCPPLIB_BITFIELD_BEGIN(flag){none = 0U,           //!< No flags
-                                   read = 1U << 0U,     //!< Memory views can be read
-                                   write = 1U << 1U,    //!< Memory views can be written
-                                   cow = 1U << 2U,      //!< Memory views can be copy on written
-                                   execute = 1U << 3U,  //!< Memory views can execute code
+  QUICKCPPLIB_BITFIELD_BEGIN(flag){
+  none = 0U,           //!< No flags
+  read = 1U << 0U,     //!< Memory views can be read
+  write = 1U << 1U,    //!< Memory views can be written
+  cow = 1U << 2U,      //!< Memory views can be copy on written
+  execute = 1U << 3U,  //!< Memory views can execute code
 
-                                   nocommit = 1U << 8U,     //!< Don't allocate space for this memory in the system immediately
-                                   prefault = 1U << 9U,     //!< Prefault, as if by reading every page, any views of memory upon creation.
-                                   executable = 1U << 10U,  //!< The backing storage is in fact an executable program binary.
-                                   singleton = 1U << 11U,   //!< A single instance of this section is to be shared by all processes using the same backing file.
+  nocommit = 1U << 8U,     //!< Don't allocate space for this memory in the system immediately
+  prefault = 1U << 9U,     //!< Prefault, as if by reading every page, any views of memory upon creation.
+  executable = 1U << 10U,  //!< The backing storage is in fact an executable program binary.
+  singleton = 1U << 11U,   //!< A single instance of this section is to be shared by all processes using the same backing file.
 
-                                   barrier_on_close = 1U << 16U,   //!< Maps of this section, if writable, issue a `barrier()` when destructed blocking until data (not metadata) reaches physical storage.
-                                   nvram = 1U << 17U,              //!< This section is of non-volatile RAM.
-                                   write_via_syscall = 1U << 18U,  //!< For file backed maps, `map_handle::write()` is implemented as a `write()` syscall to the file descriptor. This causes the map to be mapped read-only.
+  barrier_on_close =
+  1U << 16U,          //!< Maps of this section, if writable, issue a `barrier()` when destructed blocking until data (not metadata) reaches physical storage.
+  nvram = 1U << 17U,  //!< This section is of non-volatile RAM.
+  write_via_syscall =
+  1U
+  << 18U,  //!< For file backed maps, `map_handle::write()` is implemented as a `write()` syscall to the file descriptor. This causes the map to be mapped read-only.
 
-                                   page_sizes_1 = 1U << 24U,  //!< Use `utils::page_sizes()[1]` sized pages, or fail.
-                                   page_sizes_2 = 2U << 24U,  //!< Use `utils::page_sizes()[2]` sized pages, or fail.
-                                   page_sizes_3 = 3U << 24U,  //!< Use `utils::page_sizes()[3]` sized pages, or fail.
+  page_sizes_1 = 1U << 24U,  //!< Use `utils::page_sizes()[1]` sized pages, or fail.
+  page_sizes_2 = 2U << 24U,  //!< Use `utils::page_sizes()[2]` sized pages, or fail.
+  page_sizes_3 = 3U << 24U,  //!< Use `utils::page_sizes()[3]` sized pages, or fail.
 
-                                   // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
+  // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
 
-                                   readwrite = (read | write)};
+  readwrite = (read | write)};
   QUICKCPPLIB_BITFIELD_END(flag);
 
 protected:
@@ -154,7 +158,10 @@ public:
   \errors Any of the values POSIX dup(), open() or NtCreateSection() can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static result<section_handle> section(file_handle &backing, extent_type bytes = 0) noexcept { return section(backing, bytes, backing.is_writable() ? (flag::readwrite) : (flag::read)); }
+  static result<section_handle> section(file_handle &backing, extent_type bytes = 0) noexcept
+  {
+    return section(backing, bytes, backing.is_writable() ? (flag::readwrite) : (flag::read));
+  }
   /*! \brief Create a memory section backed by an anonymous, managed file.
   \param bytes The initial size of this section. Cannot be zero.
   \param dirh Where to create the anonymous, managed file.
@@ -163,7 +170,9 @@ public:
   \errors Any of the values POSIX dup(), open() or NtCreateSection() can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<section_handle> section(extent_type bytes, const path_handle &dirh = path_discovery::storage_backed_temporary_files_directory(), flag _flag = flag::read | flag::write) noexcept;
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<section_handle> section(extent_type bytes,
+                                                                        const path_handle &dirh = path_discovery::storage_backed_temporary_files_directory(),
+                                                                        flag _flag = flag::read | flag::write) noexcept;
 
   //! Returns the memory section's flags
   flag section_flags() const noexcept { return _flag; }
@@ -454,7 +463,8 @@ protected:
     if(section != nullptr)
     {
       // Apart from read/write/cow/execute, the section's flags override the map's flags
-      _flag |= (section->section_flags() & ~(section_handle::flag::read | section_handle::flag::write | section_handle::flag::cow | section_handle::flag::execute));
+      _flag |=
+      (section->section_flags() & ~(section_handle::flag::read | section_handle::flag::write | section_handle::flag::cow | section_handle::flag::execute));
     }
   }
 
@@ -463,7 +473,8 @@ public:
   constexpr map_handle() {}  // NOLINT
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~map_handle() override;
   //! Construct an instance managing pages at `addr`, `length`, `pagesize` and `flags`
-  explicit map_handle(byte *addr, size_type length, size_type pagesize, section_handle::flag flags, section_handle *section = nullptr, extent_type offset = 0) noexcept
+  explicit map_handle(byte *addr, size_type length, size_type pagesize, section_handle::flag flags, section_handle *section = nullptr,
+                      extent_type offset = 0) noexcept
       : _section(section)
       , _addr(addr)
       , _offset(offset)
@@ -526,9 +537,17 @@ public:
 
 protected:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t _do_max_buffers() const noexcept override { return 0; }
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), barrier_kind kind = barrier_kind::nowait_data_only, deadline d = deadline()) noexcept override;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(),
+                                                                            barrier_kind kind = barrier_kind::nowait_data_only,
+                                                                            deadline d = deadline()) noexcept override;
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> _do_read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override;
+
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> _new_map(size_type bytes, section_handle::flag _flag) noexcept;
+
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> _recycled_map(size_type bytes, section_handle::flag _flag) noexcept;
+
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool _recycle_map() noexcept;
 
 public:
   /*! Map unused memory into view, creating new memory if insufficient unused memory is available
@@ -538,7 +557,9 @@ public:
 
   \param bytes How many bytes to map. Typically will be rounded up to a multiple of the page size
   (see `page_size()`).
-  \param zeroed Set to true if only all bits zeroed memory is wanted.
+  \param zeroed Set to true if only all bits zeroed memory is wanted. If this is true, a syscall
+  is always performed as the kernel probably has zeroed pages ready to go, whereas if false, the
+  request may be satisfied from a local cache instead. The default is false.
   \param _flag The permissions with which to map the view.
 
   \note On Microsoft Windows this constructor uses the faster `VirtualAlloc()` which creates less
@@ -547,10 +568,35 @@ public:
   the other constructor. This makes available all those very useful VM tricks Windows can do with
   section mapped memory which `VirtualAlloc()` memory cannot do.
 
+  When this kind of map handle is closed, it is added to an internal cache so new map
+  handle creations of this kind with `zeroed = false` are very quick and avoid a syscall. The
+  internal cache may return a map slightly bigger than requested. If you wish to always invoke
+  the syscall, specify `zeroed = true`.
+
+  When maps are added to the internal cache, on all systems except Linux the memory is decommitted
+  first. This reduces commit charge appropriately, thus only virtual address space remains
+  consumed. On Linux, if `memory_accounting()` is `memory_accounting_kind::commit_charge`, we also
+  decommit, however be aware that this can increase the average VMA use count in the Linux kernel, and most
+  Linux kernels are configured with a very low per-process limit of 64k VMAs (this is easy to raise
+  using `sysctl -w vm.max_map_count=262144`). Otherwise on Linux to avoid increasing VMA count
+  we instead mark closed maps as `LazyFree`, which means that their contents can be arbitrarily
+  disposed of by the Linux kernel as needed, but also allows Linux to coalesce VMAs so the very
+  low per-process limit is less likely to be exceeded. If the `LazyFree` syscall is not implemented on this
+  Linux, we do nothing.
+
+  \warning The cache does not self-trim on its own, you MUST call `trim_cache()` to trim allocations of
+  virtual address (these don't count towards process commit charge, but they do consume address space
+  and precious VMAs in the Linux kernel). Only on 32 bit processes where virtual address space is limited, or on
+  Linux where VMAs allocated is considered by the Linux OOM killer, will you need to probably
+  care much about regular cache trimming.
+
   \errors Any of the values POSIX `mmap()` or `VirtualAlloc()` can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(size_type bytes, bool zeroed = false, section_handle::flag _flag = section_handle::flag::readwrite) noexcept;
+  static inline result<map_handle> map(size_type bytes, bool zeroed = false, section_handle::flag _flag = section_handle::flag::readwrite) noexcept
+  {
+    return (zeroed || (_flag & section_handle::flag::nocommit)) ? _new_map(bytes, _flag) : _recycled_map(bytes, _flag);
+  }
 
   /*! Reserve address space within which individual pages can later be committed. Reserved address
   space is NOT added to the process' commit charge.
@@ -566,7 +612,7 @@ public:
   \errors Any of the values POSIX `mmap()` or `VirtualAlloc()` can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<map_handle> reserve(size_type bytes) noexcept { return map(bytes, false, section_handle::flag::none | section_handle::flag::nocommit); }
+  static inline result<map_handle> reserve(size_type bytes) noexcept { return _new_map(bytes, section_handle::flag::none | section_handle::flag::nocommit); }
 
   /*! Create a memory mapped view of a backing storage, optionally reserving additional address
   space for later growth.
@@ -585,7 +631,41 @@ public:
   \errors Any of the values POSIX `mmap()` or `NtMapViewOfSection()` can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(section_handle &section, size_type bytes = 0, extent_type offset = 0, section_handle::flag _flag = section_handle::flag::readwrite) noexcept;
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> map(section_handle &section, size_type bytes = 0, extent_type offset = 0,
+                                                                section_handle::flag _flag = section_handle::flag::readwrite) noexcept;
+
+  //! The kind of memory accounting this system uses
+  enum class memory_accounting_kind
+  {
+    unknown,
+    /*! This system will not permit more than physical RAM and your swap files to be committed.
+    On every OS except for Linux, this is always the case.
+    */
+    commit_charge,
+    /*! This system will permit more memory to be committed than physical RAM and your swap
+    files, and will terminate your process without warning at some unknown point
+    if you write into enough of the pages committed. This is typically the default on Linux,
+    but it can be changed at runtime.
+    */
+    over_commit
+  };
+#ifdef __linux__
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC memory_accounting_kind memory_accounting() noexcept;
+#else
+  static memory_accounting_kind memory_accounting() noexcept { return memory_accounting_kind::commit_charge; }
+#endif
+
+  //! Statistics about the map handle cache
+  struct cache_statistics
+  {
+    size_t items_in_cache{0};
+    size_t bytes_in_cache{0};
+    size_t items_just_trimmed{0};
+    size_t bytes_just_trimmed{0};
+  };
+  /*! Get statistics about the map handle cache, optionally trimming the least recently used maps.
+   */
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC cache_statistics trim_cache(std::chrono::steady_clock::time_point older_than = {}) noexcept;
 
   //! The memory section this handle is using
   section_handle *section() const noexcept { return _section; }
@@ -718,7 +798,8 @@ public:
   */
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<buffer_type> do_not_store(buffer_type region) noexcept;
 
-  //! Ask the system to begin to asynchronously prefetch the span of memory regions given, returning the regions actually prefetched. Note that on Windows 7 or earlier the system call to implement this was not available, and so you will see an empty span returned.
+  //! Ask the system to begin to asynchronously prefetch the span of memory regions given, returning the regions actually prefetched. Note that on Windows 7 or
+  //! earlier the system call to implement this was not available, and so you will see an empty span returned.
   static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<span<buffer_type>> prefetch(span<buffer_type> regions) noexcept;
   //! \overload
   static result<buffer_type> prefetch(buffer_type region) noexcept
@@ -898,7 +979,8 @@ inline void swap(section_handle &self, section_handle &o) noexcept
 */
 inline result<section_handle> section(file_handle &backing, section_handle::extent_type maximum_size, section_handle::flag _flag) noexcept
 {
-  return section_handle::section(std::forward<decltype(backing)>(backing), std::forward<decltype(maximum_size)>(maximum_size), std::forward<decltype(_flag)>(_flag));
+  return section_handle::section(std::forward<decltype(backing)>(backing), std::forward<decltype(maximum_size)>(maximum_size),
+                                 std::forward<decltype(_flag)>(_flag));
 }
 /*! \brief Create a memory section backed by a file.
 \param backing The handle to use as backing storage.
@@ -919,7 +1001,8 @@ inline result<section_handle> section(file_handle &backing, section_handle::exte
 
 \errors Any of the values POSIX dup(), open() or NtCreateSection() can return.
 */
-inline result<section_handle> section(section_handle::extent_type bytes, const path_handle &dirh = path_discovery::storage_backed_temporary_files_directory(), section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept
+inline result<section_handle> section(section_handle::extent_type bytes, const path_handle &dirh = path_discovery::storage_backed_temporary_files_directory(),
+                                      section_handle::flag _flag = section_handle::flag::read | section_handle::flag::write) noexcept
 {
   return section_handle::section(std::forward<decltype(bytes)>(bytes), std::forward<decltype(dirh)>(dirh), std::forward<decltype(_flag)>(_flag));
 }
@@ -952,7 +1035,8 @@ inline result<void> close(map_handle &self) noexcept
 /*! Create new memory and map it into view.
 \param bytes How many bytes to create and map. Typically will be rounded up to a multiple of the page size (see `page_size()`) on POSIX, 64Kb on Windows.
 \param zeroed Set to true if only all bits zeroed memory is wanted.
-\param _flag The permissions with which to map the view. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
+\param _flag The permissions with which to map the view. `flag::none` can be useful for reserving virtual address space without committing system resources, use
+commit() to later change availability of memory.
 
 \note On Microsoft Windows this constructor uses the faster VirtualAlloc() which creates less versatile page backed memory. If you want anonymous memory
 allocated from a paging file backed section instead, create a page file backed section and then a mapped view from that using
@@ -968,14 +1052,18 @@ inline result<map_handle> map(map_handle::size_type bytes, bool zeroed = false, 
 /*! Create a memory mapped view of a backing storage, optionally reserving additional address space for later growth.
 \param section A memory section handle specifying the backing storage to use.
 \param bytes How many bytes to reserve (0 = the size of the section). Rounded up to nearest 64Kb on Windows.
-\param offset The offset into the backing storage to map from. Typically needs to be at least a multiple of the page size (see `page_size()`), on Windows it needs to be a multiple of the kernel memory allocation granularity (typically 64Kb).
-\param _flag The permissions with which to map the view which are constrained by the permissions of the memory section. `flag::none` can be useful for reserving virtual address space without committing system resources, use commit() to later change availability of memory.
+\param offset The offset into the backing storage to map from. Typically needs to be at least a multiple of the page size (see `page_size()`), on Windows it
+needs to be a multiple of the kernel memory allocation granularity (typically 64Kb). \param _flag The permissions with which to map the view which are
+constrained by the permissions of the memory section. `flag::none` can be useful for reserving virtual address space without committing system resources, use
+commit() to later change availability of memory.
 
 \errors Any of the values POSIX mmap() or NtMapViewOfSection() can return.
 */
-inline result<map_handle> map(section_handle &section, map_handle::size_type bytes = 0, map_handle::extent_type offset = 0, section_handle::flag _flag = section_handle::flag::readwrite) noexcept
+inline result<map_handle> map(section_handle &section, map_handle::size_type bytes = 0, map_handle::extent_type offset = 0,
+                              section_handle::flag _flag = section_handle::flag::readwrite) noexcept
 {
-  return map_handle::map(std::forward<decltype(section)>(section), std::forward<decltype(bytes)>(bytes), std::forward<decltype(offset)>(offset), std::forward<decltype(_flag)>(_flag));
+  return map_handle::map(std::forward<decltype(section)>(section), std::forward<decltype(bytes)>(bytes), std::forward<decltype(offset)>(offset),
+                         std::forward<decltype(_flag)>(_flag));
 }
 //! The size of the memory map. This is the accessible size, NOT the reservation size.
 inline map_handle::size_type length(const map_handle &self) noexcept
@@ -1024,7 +1112,8 @@ The size of each scatter-gather buffer is updated with the number of bytes of th
 \errors None, though the various signals and structured exception throws common to using memory maps may occur.
 \mallocs None.
 */
-inline map_handle::io_result<map_handle::buffers_type> read(map_handle &self, map_handle::io_request<map_handle::buffers_type> reqs, deadline d = deadline()) noexcept
+inline map_handle::io_result<map_handle::buffers_type> read(map_handle &self, map_handle::io_request<map_handle::buffers_type> reqs,
+                                                            deadline d = deadline()) noexcept
 {
   return self.read(std::forward<decltype(reqs)>(reqs), std::forward<decltype(d)>(d));
 }
@@ -1038,7 +1127,8 @@ The size of each scatter-gather buffer is updated with the number of bytes of th
 \errors None, though the various signals and structured exception throws common to using memory maps may occur.
 \mallocs None.
 */
-inline map_handle::io_result<map_handle::const_buffers_type> write(map_handle &self, map_handle::io_request<map_handle::const_buffers_type> reqs, deadline d = deadline()) noexcept
+inline map_handle::io_result<map_handle::const_buffers_type> write(map_handle &self, map_handle::io_request<map_handle::const_buffers_type> reqs,
+                                                                   deadline d = deadline()) noexcept
 {
   return self.write(std::forward<decltype(reqs)>(reqs), std::forward<decltype(d)>(d));
 }
@@ -1094,6 +1184,7 @@ LLFIO_V2_NAMESPACE_END
 #include "detail/impl/posix/map_handle.ipp"
 #endif
 #undef LLFIO_INCLUDED_BY_HEADER
+#include "detail/impl/map_handle.ipp"
 #endif
 
 #ifdef _MSC_VER
