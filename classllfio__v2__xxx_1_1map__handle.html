@@ -83,6 +83,7 @@ $(document).ready(function(){initNavTree('classllfio__v2__xxx_1_1map__handle.htm
 
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
@@ -112,8 +113,20 @@ Inheritance diagram for llfio_v2_xxx::map_handle:</div>
   </map>
 </div></div>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1map__handle_1_1cache__statistics.html">cache_statistics</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Statistics about the map handle cache.  <a href="structllfio__v2__xxx_1_1map__handle_1_1cache__statistics.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
+<tr class="memitem:a22f9cba517e54e36ef80a788af737b8b"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a22f9cba517e54e36ef80a788af737b8b">memory_accounting_kind</a> { <b>unknown</b>, 
+<a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a22f9cba517e54e36ef80a788af737b8ba55677e6eb6d6c52c6f69d98b1905903f">memory_accounting_kind::commit_charge</a>, 
+<a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a22f9cba517e54e36ef80a788af737b8ba10cae1239f2f367d8bfa752a29811e9e">memory_accounting_kind::over_commit</a>
+ }</td></tr>
+<tr class="memdesc:a22f9cba517e54e36ef80a788af737b8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The kind of memory accounting this system uses.  <a href="classllfio__v2__xxx_1_1map__handle.html#a22f9cba517e54e36ef80a788af737b8b">More...</a><br /></td></tr>
+<tr class="separator:a22f9cba517e54e36ef80a788af737b8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab352528186444502bbd2784518e61548"><td class="memItemLeft" align="right" valign="top"><a id="ab352528186444502bbd2784518e61548"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>extent_type</b> = io_handle::extent_type</td></tr>
 <tr class="separator:ab352528186444502bbd2784518e61548"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -530,9 +543,12 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:ac0c02775e3288da59f5912f8110b45cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e6163e135f2a0eebf62a127f0125533"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classllfio__v2__xxx_1_1map__handle.html">map_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a8e6163e135f2a0eebf62a127f0125533">map</a> (<a class="el" href="classllfio__v2__xxx_1_1section__handle.html">section_handle</a> &amp;<a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a173539843aebd387bb8ca06246067ead">section</a>, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aed9587571c3fb932adadddc1beeeed58">size_type</a> bytes=0, <a class="el" href="classllfio__v2__xxx_1_1handle.html#a4ee58f1b6a24af5e64d850d1e3eed07f">extent_type</a> <a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a9b65f62129418d02a925e6ef56220198">offset</a>=0, section_handle::flag _flag=section_handle::flag::readwrite) noexcept</td></tr>
 <tr class="separator:a8e6163e135f2a0eebf62a127f0125533"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a25dcce3a7127c5552687c540c37b9f27"><td class="memItemLeft" align="right" valign="top"><a id="a25dcce3a7127c5552687c540c37b9f27"></a>
-static result&lt; span&lt; <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1buffer__type.html">buffer_type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a25dcce3a7127c5552687c540c37b9f27">prefetch</a> (span&lt; <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1buffer__type.html">buffer_type</a> &gt; regions) noexcept</td></tr>
-<tr class="memdesc:a25dcce3a7127c5552687c540c37b9f27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ask the system to begin to asynchronously prefetch the span of memory regions given, returning the regions actually prefetched. Note that on Windows 7 or earlier the system call to implement this was not available, and so you will see an empty span returned. <br /></td></tr>
+<tr class="memitem:a7823285220b4f35bd5d07d71d1d586f1"><td class="memItemLeft" align="right" valign="top"><a id="a7823285220b4f35bd5d07d71d1d586f1"></a>
+static <a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a22f9cba517e54e36ef80a788af737b8b">memory_accounting_kind</a>&#160;</td><td class="memItemRight" valign="bottom"><b>memory_accounting</b> () noexcept</td></tr>
+<tr class="separator:a7823285220b4f35bd5d07d71d1d586f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac5854d5e5780d4cebadbf30caf98ed64"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structllfio__v2__xxx_1_1map__handle_1_1cache__statistics.html">cache_statistics</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#ac5854d5e5780d4cebadbf30caf98ed64">trim_cache</a> (std::chrono::steady_clock::time_point older_than={}) noexcept</td></tr>
+<tr class="separator:ac5854d5e5780d4cebadbf30caf98ed64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25dcce3a7127c5552687c540c37b9f27"><td class="memItemLeft" align="right" valign="top">static result&lt; span&lt; <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1buffer__type.html">buffer_type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a25dcce3a7127c5552687c540c37b9f27">prefetch</a> (span&lt; <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1buffer__type.html">buffer_type</a> &gt; regions) noexcept</td></tr>
 <tr class="separator:a25dcce3a7127c5552687c540c37b9f27"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af047e43f418d68c618fab258b733302d"><td class="memItemLeft" align="right" valign="top"><a id="af047e43f418d68c618fab258b733302d"></a>
 static result&lt; <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1buffer__type.html">buffer_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#af047e43f418d68c618fab258b733302d">prefetch</a> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1buffer__type.html">buffer_type</a> region) noexcept</td></tr>
@@ -560,6 +576,9 @@ virtual <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__resul
 virtual <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a19cffabe54e3136730247bac668ccc0d">_do_write</a> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept override</td></tr>
 <tr class="memdesc:a19cffabe54e3136730247bac668ccc0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The virtualised implementation of <code>write()</code> used if no multiplexer has been set. <br /></td></tr>
 <tr class="separator:a19cffabe54e3136730247bac668ccc0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9e8b6224408a61125580c4d54bb6b0d"><td class="memItemLeft" align="right" valign="top"><a id="aa9e8b6224408a61125580c4d54bb6b0d"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>_recycle_map</b> () noexcept</td></tr>
+<tr class="separator:aa9e8b6224408a61125580c4d54bb6b0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad17b8879c355d86174187f198b70baaa"><td class="memItemLeft" align="right" valign="top"><a id="ad17b8879c355d86174187f198b70baaa"></a>
 virtual result&lt; registered_buffer_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__handle.html#ad17b8879c355d86174187f198b70baaa">_do_allocate_registered_buffer</a> (size_t &amp;bytes) noexcept</td></tr>
 <tr class="memdesc:ad17b8879c355d86174187f198b70baaa"><td class="mdescLeft">&#160;</td><td class="mdescRight">The virtualised implementation of <code>allocate_registered_buffer()</code> used if no multiplexer has been set. <br /></td></tr>
@@ -584,6 +603,12 @@ virtual <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__resul
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-methods"></a>
 Static Protected Member Functions</h2></td></tr>
+<tr class="memitem:ae7912569d03601657c8ff6f5b97cc417"><td class="memItemLeft" align="right" valign="top"><a id="ae7912569d03601657c8ff6f5b97cc417"></a>
+static result&lt; <a class="el" href="classllfio__v2__xxx_1_1map__handle.html">map_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_new_map</b> (<a class="el" href="classllfio__v2__xxx_1_1handle.html#aed9587571c3fb932adadddc1beeeed58">size_type</a> bytes, section_handle::flag _flag) noexcept</td></tr>
+<tr class="separator:ae7912569d03601657c8ff6f5b97cc417"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b01cef734a50439e36295781e130e6b"><td class="memItemLeft" align="right" valign="top"><a id="a6b01cef734a50439e36295781e130e6b"></a>
+static result&lt; <a class="el" href="classllfio__v2__xxx_1_1map__handle.html">map_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_recycled_map</b> (<a class="el" href="classllfio__v2__xxx_1_1handle.html#aed9587571c3fb932adadddc1beeeed58">size_type</a> bytes, section_handle::flag _flag) noexcept</td></tr>
+<tr class="separator:a6b01cef734a50439e36295781e130e6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1dd1abc0bd1fa1f10782301dddf802b7"><td class="memItemLeft" align="right" valign="top"><a id="a1dd1abc0bd1fa1f10782301dddf802b7"></a>
 static constexpr void&#160;</td><td class="memItemRight" valign="bottom"><b>_set_caching</b> (<a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a> &amp;nativeh, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a>) noexcept</td></tr>
 <tr class="separator:a1dd1abc0bd1fa1f10782301dddf802b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -665,7 +690,51 @@ FreeBSD:</h3>
 MacOS:</h3>
 <p>MacOS only supports large pages for memory allocations, not for mapping files. It fails if large pages could not be used when a large page allocation was requested.</p>
 <dl class="section see"><dt>See also</dt><dd><code>mapped_file_handle</code>, <code>algorithm::mapped_span</code> </dd></dl>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Member Enumeration Documentation</h2>
+<a id="a22f9cba517e54e36ef80a788af737b8b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a22f9cba517e54e36ef80a788af737b8b">&#9670;&nbsp;</a></span>memory_accounting_kind</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a22f9cba517e54e36ef80a788af737b8b">llfio_v2_xxx::map_handle::memory_accounting_kind</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The kind of memory accounting this system uses. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a22f9cba517e54e36ef80a788af737b8ba55677e6eb6d6c52c6f69d98b1905903f"></a>commit_charge&#160;</td><td class="fielddoc"><p>This system will not permit more than physical RAM and your swap files to be committed. On every OS except for Linux, this is always the case. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a22f9cba517e54e36ef80a788af737b8ba10cae1239f2f367d8bfa752a29811e9e"></a>over_commit&#160;</td><td class="fielddoc"><p>This system will permit more memory to be committed than physical RAM and your swap files, and will terminate your process without warning at some unknown point if you write into enough of the pages committed. This is typically the default on Linux, but it can be changed at runtime. </p>
+</td></tr>
+</table>
+<div class="fragment"><div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;  {</div>
+<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;    unknown,<span class="comment"></span></div>
+<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;<span class="comment">    /*! This system will not permit more than physical RAM and your swap files to be committed.</span></div>
+<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;<span class="comment">    On every OS except for Linux, this is always the case.</span></div>
+<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;<span class="comment">    */</span></div>
+<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;    commit_charge,<span class="comment"></span></div>
+<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;<span class="comment">    /*! This system will permit more memory to be committed than physical RAM and your swap</span></div>
+<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;<span class="comment">    files, and will terminate your process without warning at some unknown point</span></div>
+<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;<span class="comment">    if you write into enough of the pages committed. This is typically the default on Linux,</span></div>
+<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;<span class="comment">    but it can be changed at runtime.</span></div>
+<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;<span class="comment">    */</span></div>
+<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;    over_commit</div>
+<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;  };</div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="a97ac1b43da39d9935919ac848ee3e8d3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a97ac1b43da39d9935919ac848ee3e8d3">&#9670;&nbsp;</a></span>allocate_registered_buffer()</h2>
 
@@ -1310,14 +1379,20 @@ For portability, you can only assume that barriers write order for a single hand
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">bytes</td><td>How many bytes to map. Typically will be rounded up to a multiple of the page size (see <code>page_size()</code>). </td></tr>
-    <tr><td class="paramname">zeroed</td><td>Set to true if only all bits zeroed memory is wanted. </td></tr>
+    <tr><td class="paramname">zeroed</td><td>Set to true if only all bits zeroed memory is wanted. If this is true, a syscall is always performed as the kernel probably has zeroed pages ready to go, whereas if false, the request may be satisfied from a local cache instead. The default is false. </td></tr>
     <tr><td class="paramname">_flag</td><td>The permissions with which to map the view.</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>On Microsoft Windows this constructor uses the faster <code>VirtualAlloc()</code> which creates less versatile page backed memory. If you want anonymous memory allocated from a paging file backed section instead, create a page file backed section and then a mapped view from that using the other constructor. This makes available all those very useful VM tricks Windows can do with section mapped memory which <code>VirtualAlloc()</code> memory cannot do.</dd></dl>
+<p>When this kind of map handle is closed, it is added to an internal cache so new map handle creations of this kind with <code>zeroed = false</code> are very quick and avoid a syscall. The internal cache may return a map slightly bigger than requested. If you wish to always invoke the syscall, specify <code>zeroed = true</code>.</p>
+<p>When maps are added to the internal cache, on all systems except Linux the memory is decommitted first. This reduces commit charge appropriately, thus only virtual address space remains consumed. On Linux, if <code>memory_accounting()</code> is <code>memory_accounting_kind::commit_charge</code>, we also decommit, however be aware that this can increase the average VMA use count in the Linux kernel, and most Linux kernels are configured with a very low per-process limit of 64k VMAs (this is easy to raise using <code>sysctl -w vm.max_map_count=262144</code>). Otherwise on Linux to avoid increasing VMA count we instead mark closed maps as <code>LazyFree</code>, which means that their contents can be arbitrarily disposed of by the Linux kernel as needed, but also allows Linux to coalesce VMAs so the very low per-process limit is less likely to be exceeded. If the <code>LazyFree</code> syscall is not implemented on this Linux, we do nothing.</p>
+<dl class="section warning"><dt>Warning</dt><dd>The cache does not self-trim on its own, you MUST call <code>trim_cache()</code> to trim allocations of virtual address (these don't count towards process commit charge, but they do consume address space and precious VMAs in the Linux kernel). Only on 32 bit processes where virtual address space is limited, or on Linux where VMAs allocated is considered by the Linux OOM killer, will you need to probably care much about regular cache trimming.</dd></dl>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX mmap() or VirtualAlloc() can return.</dt><dd></dd></dl>
-
+<div class="fragment"><div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;  {</div>
+<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;    <span class="keywordflow">return</span> (zeroed || (_flag &amp; section_handle::flag::nocommit)) ? _new_map(bytes, _flag) : _recycled_map(bytes, _flag);</div>
+<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;  }</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="aa3465a87f2c732cd6465cd3a832a26f0"></a>
@@ -1357,6 +1432,33 @@ For portability, you can only assume that barriers write order for a single hand
 <div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <span class="keywordflow">return</span> _ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1io__multiplexer.html#a1cc4f56ad15d1bed49d68c56a278ad0c">do_io_handle_max_buffers</a>(<span class="keyword">this</span>);</div>
 <div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  }</div>
 </div><!-- fragment -->
+</div>
+</div>
+<a id="a25dcce3a7127c5552687c540c37b9f27"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25dcce3a7127c5552687c540c37b9f27">&#9670;&nbsp;</a></span>prefetch()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static result&lt;span&lt;<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1buffer__type.html">buffer_type</a>&gt; &gt; llfio_v2_xxx::map_handle::prefetch </td>
+          <td>(</td>
+          <td class="paramtype">span&lt; <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1buffer__type.html">buffer_type</a> &gt;&#160;</td>
+          <td class="paramname"><em>regions</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Ask the system to begin to asynchronously prefetch the span of memory regions given, returning the regions actually prefetched. Note that on Windows 7 or earlier the system call to implement this was not available, and so you will see an empty span returned. </p>
+
 </div>
 </div>
 <a id="ac5222904f116c9beb0515a4a5aa850bf"></a>
@@ -1618,7 +1720,7 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section note"><dt>Note</dt><dd>On Microsoft Windows this constructor uses the faster <code>VirtualAlloc()</code> which creates less versatile page backed memory. If you want anonymous memory allocated from a paging file backed section instead, create a page file backed section and then a mapped view from that using the other constructor. This makes available all those very useful VM tricks Windows can do with section mapped memory which <code>VirtualAlloc()</code> memory cannot do.</dd></dl>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX mmap() or VirtualAlloc() can return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classllfio__v2__xxx_1_1map__handle.html#adf0cad925c9d6accd5bd7fc3aa49884c">map</a>(bytes, <span class="keyword">false</span>, section_handle::flag::none | section_handle::flag::nocommit); }</div>
+<div class="fragment"><div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;{ <span class="keywordflow">return</span> _new_map(bytes, section_handle::flag::none | section_handle::flag::nocommit); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1716,6 +1818,33 @@ For portability, you can only assume that barriers write order for a single hand
 <div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;  <span class="keywordflow">return</span> success();</div>
 <div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;}</div>
 </div><!-- fragment -->
+</div>
+</div>
+<a id="ac5854d5e5780d4cebadbf30caf98ed64"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac5854d5e5780d4cebadbf30caf98ed64">&#9670;&nbsp;</a></span>trim_cache()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="structllfio__v2__xxx_1_1map__handle_1_1cache__statistics.html">cache_statistics</a> llfio_v2_xxx::map_handle::trim_cache </td>
+          <td>(</td>
+          <td class="paramtype">std::chrono::steady_clock::time_point&#160;</td>
+          <td class="paramname"><em>older_than</em> = <code>{}</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Get statistics about the map handle cache, optionally trimming the least recently used maps. </p>
+
 </div>
 </div>
 <a id="a94b1f23fd6cd734e09b14ccb27e4332e"></a>
@@ -1997,11 +2126,10 @@ For portability, you can only assume that barriers write order for a single hand
 </div><!-- doc-content -->
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a7848ef15e774eacec7e4446a8c365a3d"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a7848ef15e774eacec7e4446a8c365a3d">llfio_v2_xxx::io_handle::write</a></div><div class="ttdeci">io_result&lt; const_buffers_type &gt; write(io_request&lt; const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the open handle, preferentially using any i/o multiplexer set over the virtually overri...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:325</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a6a1044eeb6ab16939e4669bbeb071b32"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a6a1044eeb6ab16939e4669bbeb071b32">llfio_v2_xxx::io_handle::barrier</a></div><div class="ttdeci">virtual io_result&lt; const_buffers_type &gt; barrier(io_request&lt; const_buffers_type &gt; reqs=io_request&lt; const_buffers_type &gt;(), barrier_kind kind=barrier_kind::nowait_data_only, deadline d=deadline()) noexcept</div><div class="ttdoc">Issue a write reordering barrier such that writes preceding the barrier will reach storage before wri...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:376</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_ad17b8879c355d86174187f198b70baaa"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#ad17b8879c355d86174187f198b70baaa">llfio_v2_xxx::io_handle::_do_allocate_registered_buffer</a></div><div class="ttdeci">virtual result&lt; registered_buffer_type &gt; _do_allocate_registered_buffer(size_t &amp;bytes) noexcept</div><div class="ttdoc">The virtualised implementation of allocate_registered_buffer() used if no multiplexer has been set.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:881</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_ad17b8879c355d86174187f198b70baaa"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#ad17b8879c355d86174187f198b70baaa">llfio_v2_xxx::io_handle::_do_allocate_registered_buffer</a></div><div class="ttdeci">virtual result&lt; registered_buffer_type &gt; _do_allocate_registered_buffer(size_t &amp;bytes) noexcept</div><div class="ttdoc">The virtualised implementation of allocate_registered_buffer() used if no multiplexer has been set.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:962</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a4379e3f84b913f606bb2ec6a194d4380"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a4379e3f84b913f606bb2ec6a194d4380">llfio_v2_xxx::io_handle::_do_read</a></div><div class="ttdeci">virtual io_result&lt; buffers_type &gt; _do_read(io_request&lt; buffers_type &gt; reqs, deadline d) noexcept</div><div class="ttdoc">The virtualised implementation of read() used if no multiplexer has been set.</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__multiplexer_html_a00bf4ea26d854a7e8c9734f357d417f3"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__multiplexer.html#a00bf4ea26d854a7e8c9734f357d417f3">llfio_v2_xxx::io_multiplexer::construct</a></div><div class="ttdeci">virtual io_operation_state * construct(span&lt; byte &gt; storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &amp;&amp;b, deadline d, io_request&lt; buffers_type &gt; reqs) noexcept=0</div><div class="ttdoc">Constructs either a unsynchronised_io_operation_state or a synchronised_io_operation_state for a read...</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__multiplexer_html_a1cc4f56ad15d1bed49d68c56a278ad0c"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__multiplexer.html#a1cc4f56ad15d1bed49d68c56a278ad0c">llfio_v2_xxx::io_multiplexer::do_io_handle_max_buffers</a></div><div class="ttdeci">virtual size_t do_io_handle_max_buffers(const io_handle *h) const noexcept</div><div class="ttdoc">Implements io_handle::max_buffers()</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:504</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1map__handle_html_adf0cad925c9d6accd5bd7fc3aa49884c"><div class="ttname"><a href="classllfio__v2__xxx_1_1map__handle.html#adf0cad925c9d6accd5bd7fc3aa49884c">llfio_v2_xxx::map_handle::map</a></div><div class="ttdeci">static result&lt; map_handle &gt; map(size_type bytes, bool zeroed=false, section_handle::flag _flag=section_handle::flag::readwrite) noexcept</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__multiplexer_html_a3e79fd19de80e77c274b93d0d01b2f10"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__multiplexer.html#a3e79fd19de80e77c274b93d0d01b2f10">llfio_v2_xxx::io_multiplexer::do_io_handle_allocate_registered_buffer</a></div><div class="ttdeci">virtual result&lt; registered_buffer_type &gt; do_io_handle_allocate_registered_buffer(io_handle *h, size_t &amp;bytes) noexcept</div><div class="ttdoc">Implements io_handle::allocate_registered_buffer()</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:508</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__multiplexer_html_a7c9d163a9e1ca06acbce1f135cfef087"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__multiplexer.html#a7c9d163a9e1ca06acbce1f135cfef087">llfio_v2_xxx::io_multiplexer::do_io_handle_deregister</a></div><div class="ttdeci">virtual result&lt; void &gt; do_io_handle_deregister(io_handle *) noexcept</div><div class="ttdoc">Implements io_handle deregistration.</div><div class="ttdef"><b>Definition:</b> io_multiplexer.hpp:476</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_ae04ada27942187f03b59044cd1328f49"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#ae04ada27942187f03b59044cd1328f49">llfio_v2_xxx::io_handle::read</a></div><div class="ttdeci">io_result&lt; buffers_type &gt; read(io_request&lt; buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Read data from the open handle, preferentially using any i/o multiplexer set over the virtually overr...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:283</div></div>

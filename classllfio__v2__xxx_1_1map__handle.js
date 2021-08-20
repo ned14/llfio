@@ -1,5 +1,6 @@
 var classllfio__v2__xxx_1_1map__handle =
 [
+    [ "cache_statistics", "structllfio__v2__xxx_1_1map__handle_1_1cache__statistics.html", "structllfio__v2__xxx_1_1map__handle_1_1cache__statistics" ],
     [ "awaitable", "classllfio__v2__xxx_1_1map__handle.html#ac7a2e68c2f5d49187ec3d179e40b33ea", null ],
     [ "barrier_kind", "classllfio__v2__xxx_1_1map__handle.html#a0e3d363c01073647a00a2fbbd7b50fbf", null ],
     [ "buffer_type", "classllfio__v2__xxx_1_1map__handle.html#acf99226dfe0cb36b0650d71159a74631", null ],
@@ -16,6 +17,11 @@ var classllfio__v2__xxx_1_1map__handle =
     [ "path_type", "classllfio__v2__xxx_1_1map__handle.html#a79e1ddfc16d4d99a66f8a4781aeca28d", null ],
     [ "registered_buffer_type", "classllfio__v2__xxx_1_1map__handle.html#a9f6466750a7411512da502cd60d3c461", null ],
     [ "size_type", "classllfio__v2__xxx_1_1map__handle.html#addcc662f728bb854dc83d7fbbbef7f19", null ],
+    [ "memory_accounting_kind", "classllfio__v2__xxx_1_1map__handle.html#a22f9cba517e54e36ef80a788af737b8b", [
+      [ "unknown", "classllfio__v2__xxx_1_1map__handle.html#a22f9cba517e54e36ef80a788af737b8baad921d60486366258809553a3db49a4a", null ],
+      [ "commit_charge", "classllfio__v2__xxx_1_1map__handle.html#a22f9cba517e54e36ef80a788af737b8ba55677e6eb6d6c52c6f69d98b1905903f", null ],
+      [ "over_commit", "classllfio__v2__xxx_1_1map__handle.html#a22f9cba517e54e36ef80a788af737b8ba10cae1239f2f367d8bfa752a29811e9e", null ]
+    ] ],
     [ "map_handle", "classllfio__v2__xxx_1_1map__handle.html#aa954d9b40b2685bbc8a229e3907c297d", null ],
     [ "map_handle", "classllfio__v2__xxx_1_1map__handle.html#a9c69e0d3f3fa2c213bdd4deabc6c2279", null ],
     [ "~map_handle", "classllfio__v2__xxx_1_1map__handle.html#a433596cf8fbaf7fa81c6ff8807c18b4e", null ],
@@ -32,6 +38,7 @@ var classllfio__v2__xxx_1_1map__handle =
     [ "_do_read", "classllfio__v2__xxx_1_1map__handle.html#adc47501ff4d4278e497758643ddb332a", null ],
     [ "_do_write", "classllfio__v2__xxx_1_1map__handle.html#a19cffabe54e3136730247bac668ccc0d", null ],
     [ "_do_write", "classllfio__v2__xxx_1_1map__handle.html#aa0611d9a49a6d5fd5ffd713ecaf4da1f", null ],
+    [ "_recycle_map", "classllfio__v2__xxx_1_1map__handle.html#aa9e8b6224408a61125580c4d54bb6b0d", null ],
     [ "address", "classllfio__v2__xxx_1_1map__handle.html#a7456b95e191ec373af61af6541dd4737", null ],
     [ "allocate_registered_buffer", "classllfio__v2__xxx_1_1map__handle.html#a97ac1b43da39d9935919ac848ee3e8d3", null ],
     [ "are_reads_from_cache", "classllfio__v2__xxx_1_1map__handle.html#a7126a726b2a06e4c1eca1a94c41163ff", null ],

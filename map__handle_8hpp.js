@@ -3,6 +3,7 @@ var map__handle_8hpp =
     [ "section_handle", "classllfio__v2__xxx_1_1section__handle.html", "classllfio__v2__xxx_1_1section__handle" ],
     [ "construct< section_handle >", "structllfio__v2__xxx_1_1construct_3_01section__handle_01_4.html", "structllfio__v2__xxx_1_1construct_3_01section__handle_01_4" ],
     [ "map_handle", "classllfio__v2__xxx_1_1map__handle.html", "classllfio__v2__xxx_1_1map__handle" ],
+    [ "cache_statistics", "structllfio__v2__xxx_1_1map__handle_1_1cache__statistics.html", "structllfio__v2__xxx_1_1map__handle_1_1cache__statistics" ],
     [ "construct< map_handle >", "structllfio__v2__xxx_1_1construct_3_01map__handle_01_4.html", "structllfio__v2__xxx_1_1construct_3_01map__handle_01_4" ],
     [ "disable_attached_for< llfio_v2_xxx::map_handle >", "structin__place__attach__detach_1_1traits_1_1disable__attached__for_3_01llfio__v2__xxx_1_1map__handle_01_4.html", null ],
     [ "close", "map__handle_8hpp.html#a30183de3590a31b5ef3b2952f700b110", null ],
