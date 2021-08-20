@@ -30,6 +30,11 @@ Distributed under the Boost Software License, Version 1.0.
 #include "windows/import.hpp"
 #endif
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"  // for codecvt
+#endif
+
 LLFIO_V2_NAMESPACE_BEGIN
 
 namespace detail
@@ -521,3 +526,8 @@ namespace detail
 }  // namespace detail
 
 LLFIO_V2_NAMESPACE_END
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
+
