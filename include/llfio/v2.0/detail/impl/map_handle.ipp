@@ -57,7 +57,7 @@ namespace detail
     size_t trie_count{0};
     map_handle_cache_item_t *trie_children[8 * sizeof(size_t)];
     bool trie_nobbledir{0};
-    size_t bytes_in_cache{0};
+    size_t bytes_in_cache{0}, hits{0}, misses{0};
   };
   static const size_t page_size_shift = [] { return QUICKCPPLIB_NAMESPACE::algorithm::bitwise_trie::detail::bitscanr(utils::page_size()); }();
   class map_handle_cache_t : protected QUICKCPPLIB_NAMESPACE::algorithm::bitwise_trie::bitwise_trie<map_handle_cache_base_t, map_handle_cache_item_t>
@@ -66,7 +66,11 @@ namespace detail
     using _lock_guard = std::unique_lock<std::mutex>;
 
   public:
+#ifdef __linux__
     std::atomic<unsigned> do_not_store_failed_count{0};
+#endif
+
+    ~map_handle_cache_t() { trim_cache(std::chrono::steady_clock::now(), (size_t)-1); }
 
     using _base::size;
     void *get(size_t bytes, size_t page_size)
@@ -79,8 +83,10 @@ namespace detail
       }
       if(it == _base::end() || page_size != it->page_size || _bytes != it->trie_key)
       {
+        misses++;
         return nullptr;
       }
+      hits++;
       auto *p = *it;
       _base::erase(it);
       _base::bytes_in_cache -= bytes;
@@ -98,18 +104,20 @@ namespace detail
       _base::insert(p);
       _base::bytes_in_cache += bytes;
     }
-    map_handle::cache_statistics trim_cache(std::chrono::steady_clock::time_point older_than)
+    map_handle::cache_statistics trim_cache(std::chrono::steady_clock::time_point older_than, size_t max_items)
     {
       _lock_guard g(lock);
       map_handle::cache_statistics ret;
-      if(older_than != std::chrono::steady_clock::time_point())
+
+      if(older_than != std::chrono::steady_clock::time_point() && max_items > 0)
       {
-        for(auto it = _base::begin(); it != _base::end();)
+        // Prefer bigger items to trim than smaller ones
+        for(auto it = --_base::end(); it != _base::end() && max_items > 0;)
         {
           if(it->when_added <= older_than)
           {
             auto *p = *it;
-            it = _base::erase(it);
+            _base::erase(it--);
             const auto _bytes = p->trie_key << page_size_shift;
 #ifdef _WIN32
             if(!win32_release_nonfile_allocations((byte *) p->addr, _bytes, MEM_RELEASE))
@@ -117,24 +125,28 @@ namespace detail
             if(-1 == ::munmap(p->addr, _bytes))
 #endif
             {
-              LLFIO_LOG_FATAL(nullptr, "map_handle cache failed to trim a map! If on Linux, you may have exceeded the "
-                      "64k VMA process limit, set the LLFIO_DEBUG_LINUX_MUNMAP macro at the top of posix/map_handle.ipp to cause dumping of VMAs to "
-                      "/tmp/llfio_unmap_debug_smaps.txt, and combine with strace to figure it out.");
+              LLFIO_LOG_FATAL(nullptr,
+                              "map_handle cache failed to trim a map! If on Linux, you may have exceeded the "
+                              "64k VMA process limit, set the LLFIO_DEBUG_LINUX_MUNMAP macro at the top of posix/map_handle.ipp to cause dumping of VMAs to "
+                              "/tmp/llfio_unmap_debug_smaps.txt, and combine with strace to figure it out.");
               abort();
             }
             _base::bytes_in_cache -= _bytes;
             ret.bytes_just_trimmed += _bytes;
             ret.items_just_trimmed++;
+            max_items--;
             delete p;
           }
           else
           {
-            ++it;
+            --it;
           }
         }
       }
       ret.items_in_cache = _base::size();
       ret.bytes_in_cache = _base::bytes_in_cache;
+      ret.hits = _base::hits;
+      ret.misses = _base::misses;
       return ret;
     }
   };
@@ -249,9 +261,9 @@ bool map_handle::_recycle_map() noexcept
   }
 }
 
-map_handle::cache_statistics map_handle::trim_cache(std::chrono::steady_clock::time_point older_than) noexcept
+map_handle::cache_statistics map_handle::trim_cache(std::chrono::steady_clock::time_point older_than, size_t max_items) noexcept
 {
-  return detail::map_handle_cache().trim_cache(older_than);
+  return detail::map_handle_cache().trim_cache(older_than, max_items);
 }
 
 

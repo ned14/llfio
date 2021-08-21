@@ -172,14 +172,20 @@ static inline void TestCurrentProcessMemoryUsage()
     BOOST_CHECK(within(before_anything, after_fault, 1024, 1024, 1024, 1024));
     BOOST_CHECK(within(before_anything, after_decommit, 1024, 0, 0, 0));
 #ifdef _WIN32
-    BOOST_CHECK(within(before_anything, after_zero, 1024, 0, 1024, 0));  // may not evict faulted set on POSIX
+    BOOST_CHECK(within(before_anything, after_zero, 1024, 0, 1024, 0));
+    BOOST_CHECK(within(before_anything, after_do_not_store, 1024, 0, 1024, 0));  // do_not_store() decreases RSS but not commit on Windows
 #else
-    (void) after_zero;
+    (void) after_zero;  // may not evict faulted set on POSIX
+    BOOST_CHECK(within(before_anything, after_do_not_store, 1024, 1024, 0, 1024));  // do_not_store() decreases commit but does not RSS on POSIX
 #endif
-    BOOST_CHECK(within(before_anything, after_do_not_store, 1024, 0, 1024, 0));
 #endif
   }
   std::cout << "\nFor file mapping:\n";
+  {
+    auto stats = llfio::map_handle::trim_cache(std::chrono::steady_clock::now());
+    BOOST_REQUIRE(stats.bytes_in_cache == 0);
+    BOOST_REQUIRE(stats.items_in_cache == 0);
+  }
   {
     auto sectionh = llfio::section_handle::section(1024 * 1024 * 1024).value();
     llfio::utils::process_memory_usage before_anything, after_reserve, after_commit, after_fault, after_decommit, after_zero, after_do_not_store;

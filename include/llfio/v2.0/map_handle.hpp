@@ -345,6 +345,9 @@ guaranteed that writing into it will not fail. Note that memory mapped files hav
 their file contents, so except for pages written into and not yet flushed to storage, memory mapped files
 usually do not contribute more than a few pages each to commit charge.
 
+\note You can determine the virtual memory accounting model for your system using `map_handle::memory_accounting()`.
+This caches the result of interrogating the system, so it is fast after its first call.
+
 The system commit limit can be easily exceeded if programs commit a lot of memory that they never use.
 To avoid this, for large allocations you should *reserve* pages which you don't expect to use immediately,
 and *later* explicitly commit and decommit them. You can request pages not accounted against the system
@@ -359,6 +362,40 @@ memory consumption of a process only considers the portion of the total commit c
 modified pages. This makes sense, given the prevalence of code which commits memory it never uses,
 however it also leads to anti-social outcomes such as Linux distributions enabling pathological
 workarounds such as over commit and specialised OOM killers.
+
+## Map handle caching
+
+Repeatedly freeing and allocating virtual memory is particularly expensive because page contents must
+be cleared by the system before they can be handed out again. Most kernels clear pages using an idle
+loop, but if the system is busy then a surprising amount of CPU time can get consumed wiping pages.
+
+Most users of page allocated memory can tolerate receiving dirty pages, so `map_handle` implements
+a process-local cache of previously allocated page regions which have since been `close()`d. If a
+new `map_handle::map()` asks for virtual memory and there is a region in the cache, that region is
+returned instead of a new region.
+
+Before a region is added to the cache, it is decommitted (except on Linux when overcommit is enabled,
+see below). It therefore only consumes virtual address space in your process, and does not otherwise
+consume any resources apart from a VMA entry in the kernel. In particular, it does not appear in
+your process' RAM consumption (except on Linux). When a region is removed from the cache,
+it is committed, thus adding it to your process' RAM consumption. During this decommit-recommit
+process the kernel **may** choose to scavenge the memory, in which case fresh pages will be restored.
+However there is a good chance that whatever the pages contained before decommit will still be there
+after recommit.
+
+Linux has a famously messed up virtual memory implementation. LLFIO implements a strict memory
+accounting model, and ordinarily we tell Linux what pages are to be counted towards commit charge
+or not so you don't have to. If overcommit is disabled in the system, you then get identical strict
+memory accounting like on every other OS.
+
+If however overcommit is enabled, we don't decommit pages, but rather mark them `LazyFree`. This is
+to avoid inhibiting VMA coalescing, which is super important on Linux because of its ridiculously
+low per-process VMA limit typically 64k regions on most installs. Therefore, if you do disable
+overcommit, you will also need to substantially raise the maximum per process VMA limit as now LLFIO
+will strictly decommit memory, which prevents VMA coalescing and thus generates lots more VMAs.
+
+The process local map handle cache does not self trim over time, so if you wish to reclaim virtual
+address space you need to manually call `map_handle::trim_cache()` from time to time.
 
 ## Barriers:
 
@@ -665,10 +702,12 @@ public:
     size_t bytes_in_cache{0};
     size_t items_just_trimmed{0};
     size_t bytes_just_trimmed{0};
+    size_t hits{0}, misses{0};
   };
   /*! Get statistics about the map handle cache, optionally trimming the least recently used maps.
    */
-  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC cache_statistics trim_cache(std::chrono::steady_clock::time_point older_than = {}) noexcept;
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC cache_statistics trim_cache(std::chrono::steady_clock::time_point older_than = {},
+                                                                     size_t max_items = (size_t) -1) noexcept;
 
   //! The memory section this handle is using
   section_handle *section() const noexcept { return _section; }
