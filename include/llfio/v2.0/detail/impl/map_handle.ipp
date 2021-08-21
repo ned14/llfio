@@ -125,8 +125,9 @@ namespace detail
             if(-1 == ::munmap(p->addr, _bytes))
 #endif
             {
+              std::cerr << "munmap failed with " << strerror(errno) << ". addr was " << p->addr << " bytes was " << _bytes << std::endl;
               LLFIO_LOG_FATAL(nullptr,
-                              "map_handle cache failed to trim a map! If on Linux, you may have exceeded the "
+                              "FATAL: map_handle cache failed to trim a map! If on Linux, you may have exceeded the "
                               "64k VMA process limit, set the LLFIO_DEBUG_LINUX_MUNMAP macro at the top of posix/map_handle.ipp to cause dumping of VMAs to "
                               "/tmp/llfio_unmap_debug_smaps.txt, and combine with strace to figure it out.");
               abort();

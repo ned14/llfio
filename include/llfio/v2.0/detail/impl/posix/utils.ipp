@@ -341,7 +341,7 @@ namespace utils
       private_paged_in = ??? MISSING
 
       */
-      if(want & process_memory_usage::want::private_committed_inaccurate)
+      if(!(want & process_memory_usage::want::private_committed) || (want & process_memory_usage::want::private_committed_inaccurate))
       {
         process_memory_usage ret;
         if((want & process_memory_usage::want::total_address_space_in_use) || (want & process_memory_usage::want::total_address_space_paged_in) ||
