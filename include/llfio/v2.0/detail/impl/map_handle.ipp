@@ -73,7 +73,7 @@ namespace detail
     {
       const auto _bytes = bytes >> page_size_shift;
       _lock_guard g(lock);
-      auto it = _base::find_equal_or_larger(_bytes, 7 /* 99% close to the key after page size shift */);
+      auto it = _base::find(_bytes);
       for(; it != _base::end() && page_size != it->page_size && _bytes == it->trie_key; ++it)
       {
       }
@@ -106,11 +106,22 @@ namespace detail
       {
         for(auto it = _base::begin(); it != _base::end();)
         {
-          if(it->when_added < older_than)
+          if(it->when_added <= older_than)
           {
             auto *p = *it;
             it = _base::erase(it);
             const auto _bytes = p->trie_key << page_size_shift;
+#ifdef _WIN32
+            if(!win32_release_nonfile_allocations((byte *) p->addr, _bytes, MEM_RELEASE))
+#else
+            if(-1 == ::munmap(p->addr, _bytes))
+#endif
+            {
+              LLFIO_LOG_FATAL(nullptr, "map_handle cache failed to trim a map! If on Linux, you may have exceeded the "
+                      "64k VMA process limit, set the LLFIO_DEBUG_LINUX_MUNMAP macro at the top of posix/map_handle.ipp to cause dumping of VMAs to "
+                      "/tmp/llfio_unmap_debug_smaps.txt, and combine with strace to figure it out.");
+              abort();
+            }
             _base::bytes_in_cache -= _bytes;
             ret.bytes_just_trimmed += _bytes;
             ret.items_just_trimmed++;
@@ -148,7 +159,7 @@ result<map_handle> map_handle::_recycled_map(size_type bytes, section_handle::fl
   void *addr = detail::map_handle_cache().get(bytes, pagesize);
   if(addr == nullptr)
   {
-    return _new_map(bytes, _flag);
+    return _new_map(bytes, false, _flag);
   }
 #ifdef _WIN32
   {

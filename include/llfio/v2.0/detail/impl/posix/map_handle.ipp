@@ -298,7 +298,7 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
   bool have_backing = (section != nullptr);
   int prot = 0, flags = have_backing ? MAP_SHARED : (MAP_PRIVATE | MAP_ANONYMOUS);
   void *addr = nullptr;
-  if(_flag == section_handle::flag::none)
+  if(!(_flag & section_handle::flag::read) && !(_flag & section_handle::flag::write) && !(_flag & section_handle::flag::execute))
   {
     prot |= PROT_NONE;
 #ifdef MAP_GUARD
@@ -424,7 +424,7 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
   return addr;
 }
 
-result<map_handle> map_handle::_new_map(size_type bytes, section_handle::flag _flag) noexcept
+result<map_handle> map_handle::_new_map(size_type bytes, bool fallback, section_handle::flag _flag) noexcept
 {
   if(bytes == 0u)
   {
@@ -434,8 +434,22 @@ result<map_handle> map_handle::_new_map(size_type bytes, section_handle::flag _f
   result<map_handle> ret(map_handle(nullptr, _flag));
   native_handle_type &nativeh = ret.value()._v;
   OUTCOME_TRY(auto &&pagesize, detail::pagesize_from_flags(ret.value()._flag));
-  OUTCOME_TRY(auto &&addr, do_mmap(nativeh, nullptr, 0, nullptr, pagesize, bytes, 0, ret.value()._flag));
-  ret.value()._addr = static_cast<byte *>(addr);
+  auto addr = do_mmap(nativeh, nullptr, 0, nullptr, pagesize, bytes, 0, ret.value()._flag);
+  if(!addr)
+  {
+    if(fallback && addr.error() == errc::not_enough_memory)
+    {
+      // Try the cache
+      auto r = _recycled_map(bytes, _flag);
+      if(r)
+      {
+        memset(r.assume_value().address(), 0, r.assume_value().length());
+        return r;
+      }
+    }
+    return std::move(addr).error();
+  }
+  ret.value()._addr = static_cast<byte *>(addr.assume_value());
   ret.value()._reservation = bytes;
   ret.value()._length = bytes;
   ret.value()._pagesize = pagesize;

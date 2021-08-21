@@ -100,6 +100,11 @@ static inline void TestCurrentProcessMemoryUsage()
     auto maph = llfio::map_handle::map(1024 * 1024 * 1024).value();
     auto mapfileh = llfio::mapped_file_handle::mapped_temp_inode(1024 * 1024 * 1024).value();
   }  // namespace llfio=LLFIO_V2_NAMESPACE;
+  {
+    auto stats = llfio::map_handle::trim_cache(std::chrono::steady_clock::now());
+    BOOST_REQUIRE(stats.bytes_in_cache == 0);
+    BOOST_REQUIRE(stats.items_in_cache == 0);
+  }
   std::cout << "For page allocation:\n";
   {
     llfio::utils::process_memory_usage before_anything, after_reserve, after_commit, after_fault, after_decommit, after_zero, after_do_not_store;
@@ -107,7 +112,7 @@ static inline void TestCurrentProcessMemoryUsage()
     std::cout << "   Before anything:\n" << print(before_anything) << std::endl;
     {
       // Should raise total_address_space_in_use by 1Gb
-      auto maph = llfio::map_handle::map(1024 * 1024 * 1024, false, llfio::section_handle::flag::nocommit).value();
+      auto maph = llfio::map_handle::reserve(1024 * 1024 * 1024).value();
       std::cout << "   After reserving 1Gb:\n" << print(after_reserve) << std::endl;
     }
     {

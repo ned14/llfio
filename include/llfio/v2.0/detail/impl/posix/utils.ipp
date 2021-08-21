@@ -214,101 +214,44 @@ namespace utils
     return false;
   }
 
-  result<process_memory_usage> current_process_memory_usage() noexcept
+  result<process_memory_usage> current_process_memory_usage(process_memory_usage::want want) noexcept
   {
 #ifdef __linux__
     try
     {
-      /* /proc/[pid]/status:
-
-      total_address_space_in_use = VmSize
-      total_address_space_paged_in = VmRSS
-      private_committed = ???  MISSING
-      private_paged_in = RssAnon
-
-      /proc/[pid]/smaps:
-
-      total_address_space_in_use = Sum of Size
-      total_address_space_paged_in = Sum of Rss
-      private_committed = Sum of Size for all entries with VmFlags containing ac, and inode = 0?
-      private_paged_in = (Sum of Anonymous - Sum of LazyFree) for all entries with VmFlags containing ac, and inode = 0?
-      */
-      std::vector<char> buffer(65536);
-      for(;;)
-      {
-        int ih = ::open("/proc/self/smaps", O_RDONLY);
-        if(ih == -1)
-        {
-          return posix_error();
-        }
-        size_t totalbytesread = 0;
+      auto fill_buffer = [](std::vector<char> &buffer, const char *path) -> result<void> {
         for(;;)
         {
-          auto bytesread = ::read(ih, buffer.data() + totalbytesread, buffer.size() - totalbytesread);
-          if(bytesread < 0)
+          int ih = ::open(path, O_RDONLY);
+          if(ih == -1)
           {
-            ::close(ih);
             return posix_error();
           }
-          if(bytesread == 0)
+          size_t totalbytesread = 0;
+          for(;;)
           {
+            auto bytesread = ::read(ih, buffer.data() + totalbytesread, buffer.size() - totalbytesread);
+            if(bytesread < 0)
+            {
+              ::close(ih);
+              return posix_error();
+            }
+            if(bytesread == 0)
+            {
+              break;
+            }
+            totalbytesread += bytesread;
+          }
+          ::close(ih);
+          if(totalbytesread < buffer.size())
+          {
+            buffer.resize(totalbytesread);
             break;
           }
-          totalbytesread += bytesread;
+          buffer.resize(buffer.size() * 2);
         }
-        ::close(ih);
-        if(totalbytesread < buffer.size())
-        {
-          buffer.resize(totalbytesread);
-          break;
-        }
-        buffer.resize(buffer.size() * 2);
-      }
-      const string_view totalview(buffer.data(), buffer.size());
-      // std::cerr << totalview << std::endl;
-      std::vector<string_view> anon_entries, non_anon_entries;
-      anon_entries.reserve(32);
-      non_anon_entries.reserve(32);
-      auto find_item = [&](size_t idx) -> string_view {
-        auto x = totalview.rfind("\nSize:", idx);
-        if(x == string_view::npos)
-        {
-          return {};
-        }
-        x = totalview.rfind("\n", x - 1);
-        if(x == string_view::npos)
-        {
-          x = 0;
-        }
-        else
-        {
-          x++;
-        }
-        return totalview.substr(x, idx - x);
+        return success();
       };
-      for(string_view item = find_item(totalview.size()); item != string_view(); item = find_item(item.data() - totalview.data()))
-      {
-        //std::cout << "***" << item << "***";
-        // hexaddr-hexaddr flags offset dev:id inode [path]
-        size_t inode = 1;
-        sscanf(item.data(), "%*x-%*x %*c%*c%*c%*c %*x %*c%*c:%*c%*c %zu", &inode);
-        auto vmflagsidx = item.rfind("\nVmFlags:");
-        if(vmflagsidx == string_view::npos)
-        {
-          return errc::illegal_byte_sequence;
-        }
-        // Is there " ac" after vmflagsidx?
-        if(string_view::npos != item.find(" ac", vmflagsidx) && inode == 0)
-        {
-          // std::cerr << "Adding anon entry at offset " << itemtopidx << std::endl;
-          anon_entries.push_back(item);
-        }
-        else
-        {
-          // std::cerr << "Adding non-anon entry at offset " << itemtopidx << std::endl;
-          non_anon_entries.push_back(item);
-        }
-      }
       auto parse = [](string_view item, string_view what) -> result<uint64_t> {
         auto idx = item.find(what);
         if(string_view::npos == idx)
@@ -361,6 +304,146 @@ namespace utils
         }
         return value;
       };
+      /* /proc/[pid]/status:
+
+      total_address_space_in_use = VmSize
+      total_address_space_paged_in = VmRSS
+      private_committed = ???  MISSING
+      private_paged_in = RssAnon
+
+      /proc/[pid]/smaps:
+
+      total_address_space_in_use = Sum of Size
+      total_address_space_paged_in = Sum of Rss
+      private_committed = (Sum of Anonymous - Sum of LazyFree) for all entries with VmFlags containing ac, and inode = 0?
+      private_paged_in = Sum of Rss for all entries with VmFlags containing ac, and inode = 0?
+
+      /proc/[pid]/maps:
+
+      hexstart-hexend rw-p offset devid:devid inode                      pathname
+
+      total_address_space_in_use = Sum of regions
+      total_address_space_paged_in = ???  MISSING
+      private_committed = Sum of Size for all entries with rw-p, and inode = 0?
+      private_paged_in = ??? MISSING
+
+      /proc/[pid]/statm:
+
+      %zu %zu %zu ...  total_address_space_in_use total_address_space_paged_in file_shared_pages_paged_in
+
+      (values are in pages)
+
+      /proc/[pid]/smaps_rollup:
+
+      total_address_space_in_use = ??? MISSING
+      total_address_space_paged_in = ??? MISSING
+      private_committed = Anonymous - LazyFree (but, can't distinguish reservations!)
+      private_paged_in = ??? MISSING
+
+      */
+      if(want & process_memory_usage::want::private_committed_inaccurate)
+      {
+        process_memory_usage ret;
+        if((want & process_memory_usage::want::total_address_space_in_use) || (want & process_memory_usage::want::total_address_space_paged_in) ||
+           (want & process_memory_usage::want::private_paged_in))
+        {
+          std::vector<char> buffer(256);
+          OUTCOME_TRY(fill_buffer(buffer, "/proc/self/statm"));
+          if(buffer.size() > 1)
+          {
+            size_t file_and_shared_pages_paged_in = 0;
+            sscanf(buffer.data(), "%zu %zu %zu", &ret.total_address_space_in_use, &ret.total_address_space_paged_in, &file_and_shared_pages_paged_in);
+            ret.private_paged_in = ret.total_address_space_paged_in - file_and_shared_pages_paged_in;
+            ret.total_address_space_in_use *= page_size();
+            ret.total_address_space_paged_in *= page_size();
+            ret.private_paged_in *= page_size();
+            //std::cout << string_view(buffer.data(), buffer.size()) << std::endl;
+          }
+        }
+        if(want & process_memory_usage::want::private_committed)
+        {
+          std::vector<char> smaps_rollup(256), maps(65536);
+          OUTCOME_TRY(fill_buffer(smaps_rollup, "/proc/self/smaps_rollup"));
+          OUTCOME_TRY(fill_buffer(maps, "/proc/self/maps"));
+          uint64_t lazyfree = 0;
+          {
+            string_view i(smaps_rollup.data(), smaps_rollup.size());
+            OUTCOME_TRY(lazyfree, parse(i, "\nLazyFree:"));
+          }
+          string_view i(maps.data(), maps.size());
+          size_t anonymous = 0;
+          for(size_t idx = 0;;)
+          {
+            idx = i.find("\n", idx);
+            if(idx == i.npos)
+            {
+              break;
+            }
+            idx++;
+            size_t start = 0, end = 0, inode = 1;
+            char read = 0, write = 0, executable = 0, private_ = 0;
+            sscanf(i.data() + idx, "%zx-%zx %c%c%c%c %*u %*u:%*u %zd", &start, &end, &read, &write, &executable, &private_, &inode);
+            if(inode == 0 && read == 'r' && write == 'w' && executable == '-' && private_ == 'p')
+            {
+              anonymous += end - start;
+              // std::cout << (end - start) << " " << i.substr(idx, 40) << std::endl;
+            }
+          }
+          if(lazyfree != (uint64_t) -1)
+          {
+            anonymous -= (size_t) lazyfree;
+          }
+          ret.private_committed = anonymous;
+        }
+        return ret;
+      }
+      std::vector<char> buffer(1024 * 1024);
+      OUTCOME_TRY(fill_buffer(buffer, "/proc/self/smaps"));
+      const string_view totalview(buffer.data(), buffer.size());
+      // std::cerr << totalview << std::endl;
+      std::vector<string_view> anon_entries, non_anon_entries;
+      anon_entries.reserve(32);
+      non_anon_entries.reserve(32);
+      auto find_item = [&](size_t idx) -> string_view {
+        auto x = totalview.rfind("\nSize:", idx);
+        if(x == string_view::npos)
+        {
+          return {};
+        }
+        x = totalview.rfind("\n", x - 1);
+        if(x == string_view::npos)
+        {
+          x = 0;
+        }
+        else
+        {
+          x++;
+        }
+        return totalview.substr(x, idx - x);
+      };
+      for(string_view item = find_item(totalview.size()); item != string_view(); item = find_item(item.data() - totalview.data()))
+      {
+        // std::cout << "***" << item << "***";
+        // hexaddr-hexaddr flags offset dev:id inode [path]
+        size_t inode = 1;
+        sscanf(item.data(), "%*x-%*x %*c%*c%*c%*c %*x %*c%*c:%*c%*c %zu", &inode);
+        auto vmflagsidx = item.rfind("\nVmFlags:");
+        if(vmflagsidx == string_view::npos)
+        {
+          return errc::illegal_byte_sequence;
+        }
+        // Is there " ac" after vmflagsidx?
+        if(string_view::npos != item.find(" ac", vmflagsidx) && inode == 0)
+        {
+          // std::cerr << "Adding anon entry at offset " << itemtopidx << std::endl;
+          anon_entries.push_back(item);
+        }
+        else
+        {
+          // std::cerr << "Adding non-anon entry at offset " << itemtopidx << std::endl;
+          non_anon_entries.push_back(item);
+        }
+      }
       process_memory_usage ret;
       // std::cerr << "Anon entries:";
       for(auto &i : anon_entries)
@@ -373,13 +456,13 @@ namespace utils
         {
           ret.total_address_space_in_use += size;
           ret.total_address_space_paged_in += rss;
-          ret.private_committed += size;
-          ret.private_paged_in += anonymous;
+          ret.private_committed += anonymous;
           if(lazyfree != (uint64_t) -1)
           {
             ret.total_address_space_paged_in -= lazyfree;
-            ret.private_paged_in -= lazyfree;
+            ret.private_committed -= lazyfree;
           }
+          ret.private_paged_in += rss;
         }
         // std::cerr << i << "\nSize = " << size << " Rss = " << rss << std::endl;
       }
@@ -395,7 +478,7 @@ namespace utils
           ret.total_address_space_paged_in += rss;
           if(lazyfree != (uint64_t) -1)
           {
-            ret.total_address_space_paged_in -= lazyfree;
+            ret.total_address_space_in_use -= lazyfree;
           }
         }
         // std::cerr << i << "\nSize = " << size << " Rss = " << rss << std::endl;
@@ -407,6 +490,7 @@ namespace utils
       return error_from_exception();
     }
 #elif defined(__APPLE__)
+    (void) want;
     kern_return_t error;
     mach_msg_type_number_t outCount;
     task_vm_info_data_t vmInfo;

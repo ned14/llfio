@@ -1,5 +1,5 @@
 /* Misc utilities
-(C) 2015-2017 Niall Douglas <http://www.nedproductions.biz/> (7 commits)
+(C) 2015-2021 Niall Douglas <http://www.nedproductions.biz/> (7 commits)
 File Created: Dec 2015
 
 
@@ -207,7 +207,7 @@ namespace utils
     return success();
   }
 
-  result<process_memory_usage> current_process_memory_usage() noexcept
+  result<process_memory_usage> current_process_memory_usage(process_memory_usage::want /*unused*/) noexcept
   {
     // Amazingly Win32 doesn't expose private working set, so to avoid having
     // to iterate all the pages in the process and calculate, use a hidden

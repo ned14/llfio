@@ -103,7 +103,8 @@ namespace utils
   {
     assert(pagesize > 0);
     const auto base = LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i.first);
-    i = {static_cast<A>((base + pagesize - 1) & ~(pagesize - 1)), static_cast<B>(((base + i.second) & ~(pagesize - 1)) - ((base + pagesize - 1) & ~(pagesize - 1)))};
+    i = {static_cast<A>((base + pagesize - 1) & ~(pagesize - 1)),
+         static_cast<B>(((base + i.second) & ~(pagesize - 1)) - ((base + pagesize - 1) & ~(pagesize - 1)))};
     return i;
   }
 
@@ -198,9 +199,21 @@ namespace utils
    */
   struct process_memory_usage
   {
+    //! Fields wanted
+    QUICKCPPLIB_BITFIELD_BEGIN(want){
+    total_address_space_in_use = 1U << 0U,
+    total_address_space_paged_in = 1U << 1U,
+    private_committed = 1U << 2U,
+    private_paged_in = 1U << 3U,
+    private_committed_inaccurate = 1U << 8U,
+
+    all = (unsigned) -1  //
+    } QUICKCPPLIB_BITFIELD_END(want)
+
     //! The total virtual address space in use.
     size_t total_address_space_in_use{0};
-    //! The total memory currently paged into the process. Always `<= total_address_space_in_use`. Also known as "working set", or "resident set size including shared".
+    //! The total memory currently paged into the process. Always `<= total_address_space_in_use`. Also known as "working set", or "resident set size including
+    //! shared".
     size_t total_address_space_paged_in{0};
 
     //! The total anonymous memory committed. Also known as "commit charge".
@@ -212,12 +225,25 @@ namespace utils
 
   /*! \brief Retrieve the current memory usage statistics for this process.
 
-   \note Mac OS provides no way of reading how much memory a process has committed. We therefore supply as `private_committed` the same value as `private_paged_in`.
+  Be aware that because Linux provides no summary counter for `private_committed`, we
+  have to manually parse through `/proc/pid/smaps` to calculate it. This can start to
+  take seconds for a process with a complex virtual memory space. If you are sure that
+  you never use `section_handle::flag::nocommit` without `section_handle::flag::none`
+  (i.e. you don't nocommit accessible memory), then specifying the flag
+  `process_memory_usage::want::private_committed_inaccurate` can yield significant
+  performance gains. If you set `process_memory_usage::want::private_committed_inaccurate`,
+  we use `/proc/pid/smaps_rollup` and `/proc/pid/maps` to calculate the results. This
+  cannot distinguish between regions with the accounted
+  flag enabled or disabled. By default, this fast path is enabled.
+
+  \note Mac OS provides no way of reading how much memory a process has committed.
+  We therefore supply as `private_committed` the same value as `private_paged_in`.
   */
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<process_memory_usage> current_process_memory_usage() noexcept;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<process_memory_usage>
+  current_process_memory_usage(process_memory_usage::want want = process_memory_usage::want::all) noexcept;
 
   /*! \brief CPU usage statistics for a process.
-  */
+   */
   struct process_cpu_usage
   {
     //! The amount of nanoseconds all processes ever have spent in user mode.
@@ -257,7 +283,7 @@ namespace utils
 
   The simplest way to use this API is to call it whilst also taking the current monotonic
   clock/CPU TSC and then calculating the delta change over that period of time.
-  
+
   \note The returned values may not be a snapshot accurate against one another as they
   may get derived from multiple sources. Also, granularity is probably either a lot more
   than one nanosecond on most platforms, but may be CPU TSC based on others (you can test
@@ -372,7 +398,7 @@ namespace utils
       detail::deallocate_large_pages(p, n * sizeof(T));
     }
 
-    template <class U, class... Args> void construct(U *p, Args &&... args) { ::new(reinterpret_cast<void *>(p)) U(std::forward<Args>(args)...); }
+    template <class U, class... Args> void construct(U *p, Args &&...args) { ::new(reinterpret_cast<void *>(p)) U(std::forward<Args>(args)...); }
 
     template <class U> void destroy(U *p) { p->~U(); }
   };

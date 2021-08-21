@@ -622,7 +622,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_barrier(ma
 }
 
 
-result<map_handle> map_handle::_new_map(size_type bytes, section_handle::flag _flag) noexcept
+result<map_handle> map_handle::_new_map(size_type bytes, bool fallback, section_handle::flag _flag) noexcept
 {
   if(bytes == 0u)
   {
@@ -642,7 +642,18 @@ result<map_handle> map_handle::_new_map(size_type bytes, section_handle::flag _f
   addr = VirtualAlloc(nullptr, bytes, allocation, prot);
   if(addr == nullptr)
   {
-    return win32_error();
+    auto err = win32_error();
+    if(fallback && err == errc::not_enough_memory)
+    {
+      // Try the cache
+      auto r = _recycled_map(bytes, _flag);
+      if(r)
+      {
+        memset(r.assume_value().address(), 0, r.assume_value().length());
+        return r;
+      }
+    }
+    return err;
   }
   ret.value()._addr = static_cast<byte *>(addr);
   ret.value()._reservation = bytes;
@@ -690,7 +701,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   ret.value()._addr = static_cast<byte *>(addr);
   ret.value()._offset = offset;
   ret.value()._reservation = _bytes;
-  ret.value()._length = (size_type) (section.length().value() - offset);
+  ret.value()._length = (size_type)(section.length().value() - offset);
   ret.value()._pagesize = pagesize;
   // Make my handle borrow the native handle of my backing storage
   ret.value()._v.h = section.backing_native_handle().h;
@@ -790,7 +801,7 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
     return errc::invalid_argument;
   }
   DWORD prot = 0;
-  if(flag == section_handle::flag::none)
+  if(flag == section_handle::flag::none || flag == section_handle::flag::nocommit)
   {
     OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed, [](byte *addr, size_t bytes) -> result<void> {
       DWORD _ = 0;

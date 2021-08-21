@@ -543,7 +543,7 @@ protected:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> _do_read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override;
 
-  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> _new_map(size_type bytes, section_handle::flag _flag) noexcept;
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> _new_map(size_type bytes, bool fallback, section_handle::flag _flag) noexcept;
 
   static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<map_handle> _recycled_map(size_type bytes, section_handle::flag _flag) noexcept;
 
@@ -595,7 +595,7 @@ public:
   LLFIO_MAKE_FREE_FUNCTION
   static inline result<map_handle> map(size_type bytes, bool zeroed = false, section_handle::flag _flag = section_handle::flag::readwrite) noexcept
   {
-    return (zeroed || (_flag & section_handle::flag::nocommit)) ? _new_map(bytes, _flag) : _recycled_map(bytes, _flag);
+    return (zeroed || (_flag & section_handle::flag::nocommit)) ? _new_map(bytes, true, _flag) : _recycled_map(bytes, _flag);
   }
 
   /*! Reserve address space within which individual pages can later be committed. Reserved address
@@ -612,7 +612,10 @@ public:
   \errors Any of the values POSIX `mmap()` or `VirtualAlloc()` can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<map_handle> reserve(size_type bytes) noexcept { return _new_map(bytes, section_handle::flag::none | section_handle::flag::nocommit); }
+  static inline result<map_handle> reserve(size_type bytes) noexcept
+  {
+    return _new_map(bytes, false, section_handle::flag::none | section_handle::flag::nocommit);
+  }
 
   /*! Create a memory mapped view of a backing storage, optionally reserving additional address
   space for later growth.
