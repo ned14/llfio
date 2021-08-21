@@ -77,6 +77,7 @@ namespace detail
     {
       const auto _bytes = bytes >> page_size_shift;
       _lock_guard g(lock);
+      // TODO: Consider finding slightly bigger, and returning a length shorter than reservation?
       auto it = _base::find(_bytes);
       for(; it != _base::end() && page_size != it->page_size && _bytes == it->trie_key; ++it)
       {
@@ -96,13 +97,18 @@ namespace detail
       delete p;
       return ret;
     }
-    void add(size_t bytes, size_t page_size, void *addr)
+    bool add(size_t bytes, size_t page_size, void *addr)
     {
       const auto _bytes = bytes >> page_size_shift;
+      if(_bytes == 0)
+      {
+        return false;
+      }
       auto *p = new map_handle_cache_item_t(_bytes, page_size, addr);
       _lock_guard g(lock);
       _base::insert(p);
       _base::bytes_in_cache += bytes;
+      return true;
     }
     map_handle::cache_statistics trim_cache(std::chrono::steady_clock::time_point older_than, size_t max_items)
     {
@@ -125,7 +131,7 @@ namespace detail
             if(-1 == ::munmap(p->addr, _bytes))
 #endif
             {
-              fprintf(stderr, "munmap failed with %s. addr was %p bytes was %zu\n", strerror(errno), p->addr, _bytes);
+              // fprintf(stderr, "munmap failed with %s. addr was %p bytes was %zu. page_size_shift was %zu\n", strerror(errno), p->addr, _bytes, page_size_shift);
               LLFIO_LOG_FATAL(nullptr,
                               "FATAL: map_handle cache failed to trim a map! If on Linux, you may have exceeded the "
                               "64k VMA process limit, set the LLFIO_DEBUG_LINUX_MUNMAP macro at the top of posix/map_handle.ipp to cause dumping of VMAs to "
@@ -253,8 +259,7 @@ bool map_handle::_recycle_map() noexcept
 #endif
     }
 #endif
-    c.add(_length, _pagesize, _addr);
-    return true;  // cached
+    return c.add(_reservation, _pagesize, _addr);
   }
   catch(...)
   {
