@@ -42,9 +42,11 @@ var NAVTREEINDEX13 =
 "structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html#a80018e9da3c27dca3f825fe3ebbfbf62":[4,0,2,29,10,4],
 "structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html#a81cfe21db8a4f042ce46a9c89ec743a2":[4,0,2,29,10,6],
 "structllfio__v2__xxx_1_1map__handle_1_1cache__statistics.html":[4,0,2,32,0],
-"structllfio__v2__xxx_1_1map__handle_1_1cache__statistics.html#a1cde04d70c5c044be2091eb669b31d3d":[4,0,2,32,0,3],
+"structllfio__v2__xxx_1_1map__handle_1_1cache__statistics.html#a04dbd01f90e7a6cba06673d2ba8c4671":[4,0,2,32,0,5],
+"structllfio__v2__xxx_1_1map__handle_1_1cache__statistics.html#a1cde04d70c5c044be2091eb669b31d3d":[4,0,2,32,0,4],
 "structllfio__v2__xxx_1_1map__handle_1_1cache__statistics.html#a534ec8f1dce2e067c7a17e8883d42cd6":[4,0,2,32,0,1],
-"structllfio__v2__xxx_1_1map__handle_1_1cache__statistics.html#a7c8d677d06a197ec2930b7c3a87f9674":[4,0,2,32,0,2],
+"structllfio__v2__xxx_1_1map__handle_1_1cache__statistics.html#a5444d36c962f81856fd18a61bf723831":[4,0,2,32,0,2],
+"structllfio__v2__xxx_1_1map__handle_1_1cache__statistics.html#a7c8d677d06a197ec2930b7c3a87f9674":[4,0,2,32,0,3],
 "structllfio__v2__xxx_1_1map__handle_1_1cache__statistics.html#aa5f8a86a171d01ab1f8494a56091c00e":[4,0,2,32,0,0],
 "structllfio__v2__xxx_1_1native__handle__type.html":[4,0,2,35],
 "structllfio__v2__xxx_1_1native__handle__type.html#a01c13e76854f03aa1656cde5622646dd":[4,0,2,35,15],
@@ -247,7 +249,5 @@ var NAVTREEINDEX13 =
 "structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html#ab2c9c64343a7a5d1b627d4600193601f":[4,0,2,2,3,24],
 "structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html#ab37b713eb3727019db5cc2adcfb606a4":[4,0,2,2,3,35],
 "structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html#ab3b3aa3747cfb1e2e2890ee99003c087":[4,0,2,2,3,49],
-"structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html#ab602c4b6ebe5f30cce8f745cbafe7c53":[4,0,2,2,3,33],
-"structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html#ab8c970b2f0eabac132840f5f1818f2f3":[4,0,2,2,3,27],
-"structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html#abaa22b10dc7620d7b8a5bc43dc0a1952":[4,0,2,2,3,84]
+"structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html#ab602c4b6ebe5f30cce8f745cbafe7c53":[4,0,2,2,3,33]
 };

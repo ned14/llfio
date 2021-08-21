@@ -546,8 +546,8 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a7823285220b4f35bd5d07d71d1d586f1"><td class="memItemLeft" align="right" valign="top"><a id="a7823285220b4f35bd5d07d71d1d586f1"></a>
 static <a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a22f9cba517e54e36ef80a788af737b8b">memory_accounting_kind</a>&#160;</td><td class="memItemRight" valign="bottom"><b>memory_accounting</b> () noexcept</td></tr>
 <tr class="separator:a7823285220b4f35bd5d07d71d1d586f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac5854d5e5780d4cebadbf30caf98ed64"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structllfio__v2__xxx_1_1map__handle_1_1cache__statistics.html">cache_statistics</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#ac5854d5e5780d4cebadbf30caf98ed64">trim_cache</a> (std::chrono::steady_clock::time_point older_than={}) noexcept</td></tr>
-<tr class="separator:ac5854d5e5780d4cebadbf30caf98ed64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4063087e080f36951a1dc7f640580a1"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structllfio__v2__xxx_1_1map__handle_1_1cache__statistics.html">cache_statistics</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#ad4063087e080f36951a1dc7f640580a1">trim_cache</a> (std::chrono::steady_clock::time_point older_than={}, size_t max_items=(size_t) -1) noexcept</td></tr>
+<tr class="separator:ad4063087e080f36951a1dc7f640580a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a25dcce3a7127c5552687c540c37b9f27"><td class="memItemLeft" align="right" valign="top">static result&lt; span&lt; <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1buffer__type.html">buffer_type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a25dcce3a7127c5552687c540c37b9f27">prefetch</a> (span&lt; <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1buffer__type.html">buffer_type</a> &gt; regions) noexcept</td></tr>
 <tr class="separator:a25dcce3a7127c5552687c540c37b9f27"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af047e43f418d68c618fab258b733302d"><td class="memItemLeft" align="right" valign="top"><a id="af047e43f418d68c618fab258b733302d"></a>
@@ -663,30 +663,39 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>mapped_file_handle</
 <h2><a class="anchor" id="autotoc_md7"></a>
 Commit charge:</h2>
 <p>All virtual memory systems account for memory allocated, even if never used. This is known as "commit charge". All virtual memory systems will not permit more pages to be committed than there is storage for them between RAM and the swap files (except for Linux, where most distributions configure "over commit" in the Linux kernel). This ensures that if the system gives you a committed memory page, you are hard guaranteed that writing into it will not fail. Note that memory mapped files have storage backed by their file contents, so except for pages written into and not yet flushed to storage, memory mapped files usually do not contribute more than a few pages each to commit charge.</p>
+<dl class="section note"><dt>Note</dt><dd>You can determine the virtual memory accounting model for your system using <code>map_handle::memory_accounting()</code>. This caches the result of interrogating the system, so it is fast after its first call.</dd></dl>
 <p>The system commit limit can be easily exceeded if programs commit a lot of memory that they never use. To avoid this, for large allocations you should <em>reserve</em> pages which you don't expect to use immediately, and <em>later</em> explicitly commit and decommit them. You can request pages not accounted against the system commit charge using <code>flag::nocommit</code>. For portability, you should <b>always</b> combine <code>flag::nocommit</code> with <code>flag::none</code>, indeed only Linux permits the allocation of usable pages which are not charged against commit. All other platforms enforce that reserved pages must be unusable, and only pages which are committed are usable.</p>
 <p>Separate to whether a page is committed or not is whether it actually consumes resources or not. Pages never written into are not stored by virtual memory systems, and much code when considering the memory consumption of a process only considers the portion of the total commit charge which contains modified pages. This makes sense, given the prevalence of code which commits memory it never uses, however it also leads to anti-social outcomes such as Linux distributions enabling pathological workarounds such as over commit and specialised OOM killers.</p>
 <h2><a class="anchor" id="autotoc_md8"></a>
+Map handle caching</h2>
+<p>Repeatedly freeing and allocating virtual memory is particularly expensive because page contents must be cleared by the system before they can be handed out again. Most kernels clear pages using an idle loop, but if the system is busy then a surprising amount of CPU time can get consumed wiping pages.</p>
+<p>Most users of page allocated memory can tolerate receiving dirty pages, so <code>map_handle</code> implements a process-local cache of previously allocated page regions which have since been <code>close()</code>d. If a new <code>map_handle::map()</code> asks for virtual memory and there is a region in the cache, that region is returned instead of a new region.</p>
+<p>Before a region is added to the cache, it is decommitted (except on Linux when overcommit is enabled, see below). It therefore only consumes virtual address space in your process, and does not otherwise consume any resources apart from a VMA entry in the kernel. In particular, it does not appear in your process' RAM consumption (except on Linux). When a region is removed from the cache, it is committed, thus adding it to your process' RAM consumption. During this decommit-recommit process the kernel <b>may</b> choose to scavenge the memory, in which case fresh pages will be restored. However there is a good chance that whatever the pages contained before decommit will still be there after recommit.</p>
+<p>Linux has a famously messed up virtual memory implementation. LLFIO implements a strict memory accounting model, and ordinarily we tell Linux what pages are to be counted towards commit charge or not so you don't have to. If overcommit is disabled in the system, you then get identical strict memory accounting like on every other OS.</p>
+<p>If however overcommit is enabled, we don't decommit pages, but rather mark them <code>LazyFree</code>. This is to avoid inhibiting VMA coalescing, which is super important on Linux because of its ridiculously low per-process VMA limit typically 64k regions on most installs. Therefore, if you do disable overcommit, you will also need to substantially raise the maximum per process VMA limit as now LLFIO will strictly decommit memory, which prevents VMA coalescing and thus generates lots more VMAs.</p>
+<p>The process local map handle cache does not self trim over time, so if you wish to reclaim virtual address space you need to manually call <code>map_handle::trim_cache()</code> from time to time.</p>
+<h2><a class="anchor" id="autotoc_md9"></a>
 Barriers:</h2>
 <p><code>map_handle</code>, because it implements <code>io_handle</code>, implements <code>barrier()</code> in a very conservative way to account for OS differences i.e. it calls <code>msync()</code>, and then the <code>barrier()</code> implementation for the backing file (probably <code>fsync()</code> or equivalent on most platforms, which synchronises the entire file).</p>
 <p>This is vast overkill if you are using non-volatile RAM, so a special <em>inlined</em> <code>nvram_barrier()</code> implementation taking a single buffer and no other arguments is also provided as a free function. This calls the appropriate architecture-specific instructions to cause the CPU to write all preceding writes out of the write buffers and CPU caches to main memory, so for Intel CPUs this would be <code>CLWB &lt;each cache line&gt;; SFENCE;</code>. As this is inlined, it ought to produce optimal code. If your CPU does not support the requisite instructions (or LLFIO has not added support), and empty buffer will be returned to indicate that nothing was barriered, same as the normal <code>barrier()</code> function.</p>
-<h2><a class="anchor" id="autotoc_md9"></a>
+<h2><a class="anchor" id="autotoc_md10"></a>
 Large page support:</h2>
 <p>Large, huge, massive and super page support is available via the <code>section_handle::flag::page_sizes_N</code> flags. Use these in combination with <code>utils::page_size()</code> to request allocations or maps which use different page sizes.</p>
-<h3><a class="anchor" id="autotoc_md10"></a>
+<h3><a class="anchor" id="autotoc_md11"></a>
 Windows:</h3>
 <p>Firstly, explicit large page support is only available to processes and logged in users who have been assigned the <code>SeLockMemoryPrivilege</code>. A default Windows installation assigns that privilege to nothing, so explicit action will need to be taken to assign that privilege per Windows installation.</p>
 <p>Secondly, as of Windows 10 1803, there is the large page size or the normal page size. There isn't (useful) support for pages of any other size, as there is on other systems.</p>
 <p>For allocating memory, large page allocation can randomly fail depending on what the system is feeling like, same as on all the other operating systems. It is not permitted to reserve address space using large pages.</p>
 <p>For mapping files, large page maps do not work as of Windows 10 1803 (curiously, ReactOS <em>does</em> implement this). There is a big exception to this, which is for DAX formatted NTFS volumes with a formatted cluster size of the large page size, where if you map in large page sized multiples, the Windows kernel uses large pages (and one need not hold <code>SeLockMemoryPrivilege</code> either). Therefore, if you specify <code>section_handle::flag::nvram</code> with a <code>section_handle::flag::page_sizes_N</code>, LLFIO does not ask for large pages which would fail, it merely rounds all requests up to the nearest large page multiple.</p>
-<h3><a class="anchor" id="autotoc_md11"></a>
+<h3><a class="anchor" id="autotoc_md12"></a>
 Linux:</h3>
 <p>As usual on Linux, large page (often called huge page on Linux) support comes in many forms.</p>
 <p>Explicit support is via <code>MAP_HUGETLB</code> to <code>mmap()</code>, and whether an explicit request succeeds or not is up to how many huge pages were configured into the running system via boot-time kernel parameters, and how many huge pages are in use already. For most recent kernels on most distributions, explicit memory allocation requests using large pages generally works without issue. As of Linux kernel 4.18, mapping files using large pages only works on <code>tmpfs</code>, this corresponds to <code>path_discovery::memory_backed_temporary_files_directory()</code> sourced anonymous section handles. Work is proceeding well for the major Linux filing systems to become able to map files using large pages soon, and in theory LLFIO based should "just work" on such a newer kernel.</p>
 <p>Note that some distributions enable transparent huge pages, whereby if you request allocations of large page multiples at large page offsets, the kernel uses large pages, without you needing to specify any <code>section_handle::flag::page_sizes_N</code>. Almost all distributions enable opt-in transparent huge pages, where you can explicitly request that pages within a region of memory transparently use huge pages as much as possible. LLFIO does not expose such facilities, you will need to manually invoke <code>madvise(MADV_HUGEPAGE)</code> on the region desired.</p>
-<h3><a class="anchor" id="autotoc_md12"></a>
+<h3><a class="anchor" id="autotoc_md13"></a>
 FreeBSD:</h3>
 <p>FreeBSD has no support for failing if large pages cannot be used for a specific <code>mmap()</code>. The best you can do is to ask for large pages, and you may or may not get them depending on available system resources, filing system in use, etc. LLFIO does not check returned maps to discover if large pages were actually used, that is on end user code to check if it really needs to know.</p>
-<h3><a class="anchor" id="autotoc_md13"></a>
+<h3><a class="anchor" id="autotoc_md14"></a>
 MacOS:</h3>
 <p>MacOS only supports large pages for memory allocations, not for mapping files. It fails if large pages could not be used when a large page allocation was requested.</p>
 <dl class="section see"><dt>See also</dt><dd><code>mapped_file_handle</code>, <code>algorithm::mapped_span</code> </dd></dl>
@@ -718,19 +727,19 @@ MacOS:</h3>
 <tr><td class="fieldname"><a id="a22f9cba517e54e36ef80a788af737b8ba10cae1239f2f367d8bfa752a29811e9e"></a>over_commit&#160;</td><td class="fielddoc"><p>This system will permit more memory to be committed than physical RAM and your swap files, and will terminate your process without warning at some unknown point if you write into enough of the pages committed. This is typically the default on Linux, but it can be changed at runtime. </p>
 </td></tr>
 </table>
-<div class="fragment"><div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;  {</div>
-<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;    unknown,<span class="comment"></span></div>
-<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;<span class="comment">    /*! This system will not permit more than physical RAM and your swap files to be committed.</span></div>
-<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;<span class="comment">    On every OS except for Linux, this is always the case.</span></div>
-<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;<span class="comment">    */</span></div>
-<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;    commit_charge,<span class="comment"></span></div>
-<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;<span class="comment">    /*! This system will permit more memory to be committed than physical RAM and your swap</span></div>
-<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;<span class="comment">    files, and will terminate your process without warning at some unknown point</span></div>
-<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;<span class="comment">    if you write into enough of the pages committed. This is typically the default on Linux,</span></div>
-<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;<span class="comment">    but it can be changed at runtime.</span></div>
-<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;<span class="comment">    */</span></div>
-<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;    over_commit</div>
-<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;  };</div>
+<div class="fragment"><div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;  {</div>
+<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;    unknown,<span class="comment"></span></div>
+<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;<span class="comment">    /*! This system will not permit more than physical RAM and your swap files to be committed.</span></div>
+<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;<span class="comment">    On every OS except for Linux, this is always the case.</span></div>
+<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;<span class="comment">    */</span></div>
+<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;    commit_charge,<span class="comment"></span></div>
+<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;<span class="comment">    /*! This system will permit more memory to be committed than physical RAM and your swap</span></div>
+<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;<span class="comment">    files, and will terminate your process without warning at some unknown point</span></div>
+<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;<span class="comment">    if you write into enough of the pages committed. This is typically the default on Linux,</span></div>
+<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;<span class="comment">    but it can be changed at runtime.</span></div>
+<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;<span class="comment">    */</span></div>
+<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;    over_commit</div>
+<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;  };</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1389,9 +1398,9 @@ For portability, you can only assume that barriers write order for a single hand
 <p>When maps are added to the internal cache, on all systems except Linux the memory is decommitted first. This reduces commit charge appropriately, thus only virtual address space remains consumed. On Linux, if <code>memory_accounting()</code> is <code>memory_accounting_kind::commit_charge</code>, we also decommit, however be aware that this can increase the average VMA use count in the Linux kernel, and most Linux kernels are configured with a very low per-process limit of 64k VMAs (this is easy to raise using <code>sysctl -w vm.max_map_count=262144</code>). Otherwise on Linux to avoid increasing VMA count we instead mark closed maps as <code>LazyFree</code>, which means that their contents can be arbitrarily disposed of by the Linux kernel as needed, but also allows Linux to coalesce VMAs so the very low per-process limit is less likely to be exceeded. If the <code>LazyFree</code> syscall is not implemented on this Linux, we do nothing.</p>
 <dl class="section warning"><dt>Warning</dt><dd>The cache does not self-trim on its own, you MUST call <code>trim_cache()</code> to trim allocations of virtual address (these don't count towards process commit charge, but they do consume address space and precious VMAs in the Linux kernel). Only on 32 bit processes where virtual address space is limited, or on Linux where VMAs allocated is considered by the Linux OOM killer, will you need to probably care much about regular cache trimming.</dd></dl>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX mmap() or VirtualAlloc() can return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;  {</div>
-<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;    <span class="keywordflow">return</span> (zeroed || (_flag &amp; section_handle::flag::nocommit)) ? _new_map(bytes, <span class="keyword">true</span>, _flag) : _recycled_map(bytes, _flag);</div>
-<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;  {</div>
+<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;    <span class="keywordflow">return</span> (zeroed || (_flag &amp; section_handle::flag::nocommit)) ? _new_map(bytes, <span class="keyword">true</span>, _flag) : _recycled_map(bytes, _flag);</div>
+<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1720,9 +1729,9 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section note"><dt>Note</dt><dd>On Microsoft Windows this constructor uses the faster <code>VirtualAlloc()</code> which creates less versatile page backed memory. If you want anonymous memory allocated from a paging file backed section instead, create a page file backed section and then a mapped view from that using the other constructor. This makes available all those very useful VM tricks Windows can do with section mapped memory which <code>VirtualAlloc()</code> memory cannot do.</dd></dl>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX mmap() or VirtualAlloc() can return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;  {</div>
-<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;    <span class="keywordflow">return</span> _new_map(bytes, <span class="keyword">false</span>, section_handle::flag::none | section_handle::flag::nocommit);</div>
-<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;  {</div>
+<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;    <span class="keywordflow">return</span> _new_map(bytes, <span class="keyword">false</span>, section_handle::flag::none | section_handle::flag::nocommit);</div>
+<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1822,8 +1831,8 @@ For portability, you can only assume that barriers write order for a single hand
 </div><!-- fragment -->
 </div>
 </div>
-<a id="ac5854d5e5780d4cebadbf30caf98ed64"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac5854d5e5780d4cebadbf30caf98ed64">&#9670;&nbsp;</a></span>trim_cache()</h2>
+<a id="ad4063087e080f36951a1dc7f640580a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad4063087e080f36951a1dc7f640580a1">&#9670;&nbsp;</a></span>trim_cache()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1835,8 +1844,18 @@ For portability, you can only assume that barriers write order for a single hand
           <td class="memname">static <a class="el" href="structllfio__v2__xxx_1_1map__handle_1_1cache__statistics.html">cache_statistics</a> llfio_v2_xxx::map_handle::trim_cache </td>
           <td>(</td>
           <td class="paramtype">std::chrono::steady_clock::time_point&#160;</td>
-          <td class="paramname"><em>older_than</em> = <code>{}</code></td><td>)</td>
+          <td class="paramname"><em>older_than</em> = <code>{}</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>max_items</em> = <code>(size_t)&#160;-1</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -2128,7 +2147,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><!-- doc-content -->
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a7848ef15e774eacec7e4446a8c365a3d"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a7848ef15e774eacec7e4446a8c365a3d">llfio_v2_xxx::io_handle::write</a></div><div class="ttdeci">io_result&lt; const_buffers_type &gt; write(io_request&lt; const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the open handle, preferentially using any i/o multiplexer set over the virtually overri...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:325</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a6a1044eeb6ab16939e4669bbeb071b32"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a6a1044eeb6ab16939e4669bbeb071b32">llfio_v2_xxx::io_handle::barrier</a></div><div class="ttdeci">virtual io_result&lt; const_buffers_type &gt; barrier(io_request&lt; const_buffers_type &gt; reqs=io_request&lt; const_buffers_type &gt;(), barrier_kind kind=barrier_kind::nowait_data_only, deadline d=deadline()) noexcept</div><div class="ttdoc">Issue a write reordering barrier such that writes preceding the barrier will reach storage before wri...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:376</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_ad17b8879c355d86174187f198b70baaa"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#ad17b8879c355d86174187f198b70baaa">llfio_v2_xxx::io_handle::_do_allocate_registered_buffer</a></div><div class="ttdeci">virtual result&lt; registered_buffer_type &gt; _do_allocate_registered_buffer(size_t &amp;bytes) noexcept</div><div class="ttdoc">The virtualised implementation of allocate_registered_buffer() used if no multiplexer has been set.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:965</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_ad17b8879c355d86174187f198b70baaa"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#ad17b8879c355d86174187f198b70baaa">llfio_v2_xxx::io_handle::_do_allocate_registered_buffer</a></div><div class="ttdeci">virtual result&lt; registered_buffer_type &gt; _do_allocate_registered_buffer(size_t &amp;bytes) noexcept</div><div class="ttdoc">The virtualised implementation of allocate_registered_buffer() used if no multiplexer has been set.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:1004</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a4379e3f84b913f606bb2ec6a194d4380"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a4379e3f84b913f606bb2ec6a194d4380">llfio_v2_xxx::io_handle::_do_read</a></div><div class="ttdeci">virtual io_result&lt; buffers_type &gt; _do_read(io_request&lt; buffers_type &gt; reqs, deadline d) noexcept</div><div class="ttdoc">The virtualised implementation of read() used if no multiplexer has been set.</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__multiplexer_html_a00bf4ea26d854a7e8c9734f357d417f3"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__multiplexer.html#a00bf4ea26d854a7e8c9734f357d417f3">llfio_v2_xxx::io_multiplexer::construct</a></div><div class="ttdeci">virtual io_operation_state * construct(span&lt; byte &gt; storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &amp;&amp;b, deadline d, io_request&lt; buffers_type &gt; reqs) noexcept=0</div><div class="ttdoc">Constructs either a unsynchronised_io_operation_state or a synchronised_io_operation_state for a read...</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__multiplexer_html_a1cc4f56ad15d1bed49d68c56a278ad0c"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__multiplexer.html#a1cc4f56ad15d1bed49d68c56a278ad0c">llfio_v2_xxx::io_multiplexer::do_io_handle_max_buffers</a></div><div class="ttdeci">virtual size_t do_io_handle_max_buffers(const io_handle *h) const noexcept</div><div class="ttdoc">Implements io_handle::max_buffers()</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:504</div></div>
