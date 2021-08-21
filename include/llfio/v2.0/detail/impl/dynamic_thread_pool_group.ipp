@@ -449,6 +449,7 @@ namespace detail
       {
         next_timer_relative.lock.lock();
         next_timer_relative.count.fetch_add(1, std::memory_order_relaxed);
+        // std::cout << "wq = " << this << " nesting_level = " << nesting_level << std::endl;
         if(next_timer_relative.front == nullptr)
         {
           next_timer_relative.front = next_timer_relative.back = i;
@@ -1165,29 +1166,21 @@ namespace detail
       {
         return errc::invalid_argument;
       }
-      if(workitem->_nextwork.load(std::memory_order_acquire) == 0 || d.nsecs > 0)
+      if(d.nsecs > 0)
       {
-        if(d.nsecs > 0)
+        if(d.steady)
         {
-          if(d.steady)
+          std::chrono::microseconds diff(d.nsecs / 1000);
+          if(diff > std::chrono::microseconds(0))
           {
-            std::chrono::microseconds diff(d.nsecs / 1000);
-            if(diff > std::chrono::microseconds(0))
-            {
-              workitem->_timepoint1 = std::chrono::steady_clock::now() + diff;
-              workitem->_timepoint2 = {};
-            }
-          }
-          else
-          {
-            workitem->_timepoint1 = {};
-            workitem->_timepoint2 = d.to_time_point();
+            workitem->_timepoint1 = std::chrono::steady_clock::now() + diff;
+            workitem->_timepoint2 = {};
           }
         }
         else
         {
-          workitem->_timepoint1 = std::chrono::steady_clock::time_point(std::chrono::steady_clock::duration(1));
-          workitem->_timepoint2 = {};
+          workitem->_timepoint1 = {};
+          workitem->_timepoint2 = d.to_time_point();
         }
         assert(workitem->_has_timer_set());
 #if defined(_WIN32)
@@ -1484,8 +1477,12 @@ namespace detail
       // Start from highest priority work group, executing any timers due before selecting a work item
       {
         auto examine_wq = [&](global_dynamic_thread_pool_impl_workqueue_item &wq) -> dynamic_thread_pool_group::work_item * {
+          //std::cout << "wq = " << &wq << " next_timer_relative.count = " << wq.next_timer_relative.count.load(std::memory_order_relaxed)
+          //          << " next_active.count = " << wq.next_actives[0].count.load(std::memory_order_relaxed) << std::endl;
           if(wq.next_timer_relative.count.load(std::memory_order_relaxed) > 0)
           {
+            //std::cout << "next_timer_relative.count = " << wq.next_timer_relative.count.load(std::memory_order_relaxed)
+            //          << " wq.next_timer_relative.front = " << wq.next_timer_relative.front << std::endl;
             if(now_steady == std::chrono::steady_clock::time_point())
             {
               now_steady = std::chrono::steady_clock::now();
@@ -1493,6 +1490,9 @@ namespace detail
             wq.next_timer_relative.lock.lock();
             if(wq.next_timer_relative.front != nullptr)
             {
+              //std::cout << "*** next_timer_relative = "
+              //          << (std::chrono::duration_cast<std::chrono::microseconds>(now_steady - wq.next_timer_relative.front->_timepoint1).count() / 1000.0)
+              //          << std::endl;
               if(wq.next_timer_relative.front->_timepoint1 <= now_steady)
               {
                 workitem = wq.next_timer<1>();  // unlocks wq.next_timer_relative.lock
@@ -1678,92 +1678,97 @@ namespace detail
   {
     (void) submit_into_highest_priority;
     (void) defer_pool_wake;
-    const auto nextwork = workitem->_nextwork.load(std::memory_order_acquire);
-    if(nextwork != -1)
+    assert(-1 != workitem->_nextwork.load(std::memory_order_acquire));
+    auto *parent = workitem->_parent.load(std::memory_order_relaxed);
+    // If there is a delay, schedule a timer
+    if(workitem->_has_timer_set())
     {
-      auto *parent = workitem->_parent.load(std::memory_order_relaxed);
-      // If no work item for now, or there is a delay, schedule a timer
-      if(nextwork == 0 || workitem->_has_timer_set())
-      {
 #if LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD
-        dispatch_time_t when;
-        if(workitem->_has_timer_set_relative())
+      dispatch_time_t when;
+      if(workitem->_has_timer_set_relative())
+      {
+        // Special constant for immediately rescheduled work items
+        if(workitem->_timepoint1 == std::chrono::steady_clock::time_point(std::chrono::steady_clock::duration(1)))
         {
-          // Special constant for immediately rescheduled work items
-          if(workitem->_timepoint1 == std::chrono::steady_clock::time_point(std::chrono::steady_clock::duration(1)))
-          {
-            when = dispatch_time(DISPATCH_TIME_NOW, 0);
-          }
-          else
-          {
-            auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(workitem->_timepoint1 - std::chrono::steady_clock::now()).count();
-            if(duration > 1000000000LL)
-            {
-              // Because GCD has no way of cancelling timers, nor assigning them to a group,
-              // we clamp the timer to 1 second. Then if cancellation is ever done to the group,
-              // the worst possible wait is 1 second. _timerthread will reschedule the timer
-              // if it gets called short.
-              duration = 1000000000LL;
-            }
-            when = dispatch_time(DISPATCH_TIME_NOW, duration);
-          }
-        }
-        else if(workitem->_has_timer_set_absolute())
-        {
-          deadline d(workitem->_timepoint2);
-          auto now = std::chrono::system_clock::now();
-          if(workitem->_timepoint2 - now > std::chrono::seconds(1))
-          {
-            d = now + std::chrono::seconds(1);
-          }
-          when = dispatch_walltime(&d.utc, 0);
+          when = dispatch_time(DISPATCH_TIME_NOW, 0);
         }
         else
         {
-          when = dispatch_time(DISPATCH_TIME_NOW, 1);  // smallest possible non immediate duration from now
+          auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(workitem->_timepoint1 - std::chrono::steady_clock::now()).count();
+          if(duration > 1000000000LL)
+          {
+            // Because GCD has no way of cancelling timers, nor assigning them to a group,
+            // we clamp the timer to 1 second. Then if cancellation is ever done to the group,
+            // the worst possible wait is 1 second. _timerthread will reschedule the timer
+            // if it gets called short.
+            duration = 1000000000LL;
+          }
+          when = dispatch_time(DISPATCH_TIME_NOW, duration);
         }
-        // std::cout << "*** timer " << workitem << std::endl;
-        dispatch_after_f(when, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), workitem, _gcd_timer_callback);
+      }
+      else if(workitem->_has_timer_set_absolute())
+      {
+        deadline d(workitem->_timepoint2);
+        auto now = std::chrono::system_clock::now();
+        if(workitem->_timepoint2 - now > std::chrono::seconds(1))
+        {
+          d = now + std::chrono::seconds(1);
+        }
+        when = dispatch_walltime(&d.utc, 0);
+      }
+      else
+      {
+        when = dispatch_time(DISPATCH_TIME_NOW, 1);  // smallest possible non immediate duration from now
+      }
+      // std::cout << "*** timer " << workitem << std::endl;
+      dispatch_after_f(when, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), workitem, _gcd_timer_callback);
 #elif defined(_WIN32)
-        LARGE_INTEGER li;
-        DWORD slop = 1000;
-        if(workitem->_has_timer_set_relative())
-        {
-          // Special constant for immediately rescheduled work items
-          if(workitem->_timepoint1 == std::chrono::steady_clock::time_point(std::chrono::steady_clock::duration(1)))
-          {
-            li.QuadPart = -1;  // smallest possible non immediate duration from now
-          }
-          else
-          {
-            li.QuadPart = std::chrono::duration_cast<std::chrono::nanoseconds>(workitem->_timepoint1 - std::chrono::steady_clock::now()).count() / 100;
-            if(li.QuadPart < 0)
-            {
-              li.QuadPart = 0;
-            }
-            if(li.QuadPart / 8 < (int64_t) slop)
-            {
-              slop = (DWORD)(li.QuadPart / 8);
-            }
-            li.QuadPart = -li.QuadPart;  // negative is relative
-          }
-        }
-        else if(workitem->_has_timer_set_absolute())
-        {
-          li = windows_nt_kernel::from_timepoint(workitem->_timepoint2);
-        }
-        else
+      LARGE_INTEGER li;
+      DWORD slop = 1000;
+      if(workitem->_has_timer_set_relative())
+      {
+        // Special constant for immediately rescheduled work items
+        if(workitem->_timepoint1 == std::chrono::steady_clock::time_point(std::chrono::steady_clock::duration(1)))
         {
           li.QuadPart = -1;  // smallest possible non immediate duration from now
         }
-        FILETIME ft;
-        ft.dwHighDateTime = (DWORD) li.HighPart;
-        ft.dwLowDateTime = li.LowPart;
-        // std::cout << "*** timer " << workitem << std::endl;
-        SetThreadpoolTimer((PTP_TIMER) workitem->_internaltimerh, &ft, 0, slop);
+        else
+        {
+          li.QuadPart = std::chrono::duration_cast<std::chrono::nanoseconds>(workitem->_timepoint1 - std::chrono::steady_clock::now()).count() / 100;
+          if(li.QuadPart < 0)
+          {
+            li.QuadPart = 0;
+          }
+          if(li.QuadPart / 8 < (int64_t) slop)
+          {
+            slop = (DWORD)(li.QuadPart / 8);
+          }
+          li.QuadPart = -li.QuadPart;  // negative is relative
+        }
+      }
+      else if(workitem->_has_timer_set_absolute())
+      {
+        li = windows_nt_kernel::from_timepoint(workitem->_timepoint2);
+      }
+      else
+      {
+        li.QuadPart = -1;  // smallest possible non immediate duration from now
+      }
+      FILETIME ft;
+      ft.dwHighDateTime = (DWORD) li.HighPart;
+      ft.dwLowDateTime = li.LowPart;
+      // std::cout << "*** timer " << workitem << std::endl;
+      SetThreadpoolTimer((PTP_TIMER) workitem->_internaltimerh, &ft, 0, slop);
 #else
-        workqueue_guard gg(workqueue_lock);
-        for(auto *p = workqueue.get(); p != nullptr; p = p->next.get())
+      workqueue_guard gg(workqueue_lock);
+      if(submit_into_highest_priority)
+      {
+        first_execute.append_timer(workitem);
+      }
+      else
+      {
+        global_dynamic_thread_pool_impl_workqueue_item *p = nullptr;
+        for(p = workqueue.get(); p != nullptr; p = p->next.get())
         {
           if(p->nesting_level == parent->_nesting_level)
           {
@@ -1771,95 +1776,106 @@ namespace detail
             break;
           }
         }
-#endif
-      }
-      else
-      {
-#if LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD
-        intptr_t priority = DISPATCH_QUEUE_PRIORITY_LOW;
+        assert(p != nullptr);
+        if(p == nullptr)
         {
-          global_dynamic_thread_pool_impl::workqueue_guard gg(workqueue_lock);
-          if(workqueue->nesting_level == parent->_nesting_level)
-          {
-            priority = DISPATCH_QUEUE_PRIORITY_HIGH;
-          }
-          else if(workqueue->nesting_level == parent->_nesting_level + 1)
-          {
-            priority = DISPATCH_QUEUE_PRIORITY_DEFAULT;
-          }
-        }
-        // std::cout << "*** submit " << workitem << std::endl;
-        dispatch_group_async_f(parent->_grouph, dispatch_get_global_queue(priority, 0), workitem, _gcd_dispatch_callback);
-#elif defined(_WIN32)
-        // Set the priority of the group according to distance from the top
-        TP_CALLBACK_PRIORITY priority = TP_CALLBACK_PRIORITY_LOW;
-        {
-          global_dynamic_thread_pool_impl::workqueue_guard gg(workqueue_lock);
-          if(workqueue->nesting_level == parent->_nesting_level)
-          {
-            priority = TP_CALLBACK_PRIORITY_HIGH;
-          }
-          else if(workqueue->nesting_level == parent->_nesting_level + 1)
-          {
-            priority = TP_CALLBACK_PRIORITY_NORMAL;
-          }
-        }
-        SetThreadpoolCallbackPriority(parent->_grouph, priority);
-        // std::cout << "*** submit " << workitem << std::endl;
-        SubmitThreadpoolWork((PTP_WORK) workitem->_internalworkh);
-#else
-        global_dynamic_thread_pool_impl::workqueue_guard gg(workqueue_lock);
-        if(submit_into_highest_priority)
-        {
-          // TODO: It would be super nice if we prepended this instead if it came from a timer
-          first_execute.append_active(workitem);
-          // std::cout << "append_active _nesting_level = " << parent->_nesting_level << std::endl;
-        }
-        else
-        {
-          for(auto *p = workqueue.get(); p != nullptr; p = p->next.get())
-          {
-            if(p->nesting_level == parent->_nesting_level)
-            {
-              // TODO: It would be super nice if we prepended this instead if it came from a timer
-              p->append_active(workitem);
-              // std::cout << "append_active _nesting_level = " << parent->_nesting_level << std::endl;
-              break;
-            }
-          }
-        }
-#endif
-      }
-
-#if !LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD && !defined(_WIN32)
-#if LLFIO_DYNAMIC_THREAD_POOL_GROUP_PRINTING
-      std::cout << "*** DTP submits work item " << workitem << std::endl;
-#endif
-      const auto active_work_items = total_submitted_workitems.fetch_add(1, std::memory_order_relaxed) + 1;
-      if(!defer_pool_wake)
-      {
-        {
-          threadpool_guard gg(threadpool_lock);
-          if(threadpool_active.count == 0 && threadpool_sleeping.count == 0)
-          {
-            _add_thread(gg);
-          }
-          else if(threadpool_sleeping.count > 0 && active_work_items > threadpool_active.count)
-          {
-            // Try to wake the most recently slept first
-            auto *t = threadpool_sleeping.back;
-            auto now = std::chrono::steady_clock::now();
-            for(size_t n = std::min(active_work_items - threadpool_active.count, threadpool_sleeping.count); n > 0; n--)
-            {
-              t->last_did_work = now;  // prevent reap
-              t->cond.notify_one();
-              t = t->_prev;
-            }
-          }
+          abort();
         }
       }
 #endif
     }
+    else
+    {
+#if LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD
+      intptr_t priority = DISPATCH_QUEUE_PRIORITY_LOW;
+      {
+        global_dynamic_thread_pool_impl::workqueue_guard gg(workqueue_lock);
+        if(workqueue->nesting_level == parent->_nesting_level)
+        {
+          priority = DISPATCH_QUEUE_PRIORITY_HIGH;
+        }
+        else if(workqueue->nesting_level == parent->_nesting_level + 1)
+        {
+          priority = DISPATCH_QUEUE_PRIORITY_DEFAULT;
+        }
+      }
+      // std::cout << "*** submit " << workitem << std::endl;
+      dispatch_group_async_f(parent->_grouph, dispatch_get_global_queue(priority, 0), workitem, _gcd_dispatch_callback);
+#elif defined(_WIN32)
+      // Set the priority of the group according to distance from the top
+      TP_CALLBACK_PRIORITY priority = TP_CALLBACK_PRIORITY_LOW;
+      {
+        global_dynamic_thread_pool_impl::workqueue_guard gg(workqueue_lock);
+        if(workqueue->nesting_level == parent->_nesting_level)
+        {
+          priority = TP_CALLBACK_PRIORITY_HIGH;
+        }
+        else if(workqueue->nesting_level == parent->_nesting_level + 1)
+        {
+          priority = TP_CALLBACK_PRIORITY_NORMAL;
+        }
+      }
+      SetThreadpoolCallbackPriority(parent->_grouph, priority);
+      // std::cout << "*** submit " << workitem << std::endl;
+      SubmitThreadpoolWork((PTP_WORK) workitem->_internalworkh);
+#else
+      global_dynamic_thread_pool_impl::workqueue_guard gg(workqueue_lock);
+      if(submit_into_highest_priority)
+      {
+        // TODO: It would be super nice if we prepended this instead if it came from a timer
+        first_execute.append_active(workitem);
+        // std::cout << "append_active _nesting_level = " << parent->_nesting_level << std::endl;
+      }
+      else
+      {
+        global_dynamic_thread_pool_impl_workqueue_item *p = nullptr;
+        for(p = workqueue.get(); p != nullptr; p = p->next.get())
+        {
+          if(p->nesting_level == parent->_nesting_level)
+          {
+            // TODO: It would be super nice if we prepended this instead if it came from a timer
+            p->append_active(workitem);
+            // std::cout << "append_active _nesting_level = " << parent->_nesting_level << std::endl;
+            break;
+          }
+        }
+        assert(p != nullptr);
+        if(p == nullptr)
+        {
+          abort();
+        }
+      }
+#endif
+    }
+
+#if !LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD && !defined(_WIN32)
+#if LLFIO_DYNAMIC_THREAD_POOL_GROUP_PRINTING
+    std::cout << "*** DTP submits work item " << workitem << std::endl;
+#endif
+    const auto active_work_items = total_submitted_workitems.fetch_add(1, std::memory_order_relaxed) + 1;
+    if(!defer_pool_wake)
+    {
+      {
+        threadpool_guard gg(threadpool_lock);
+        if(threadpool_active.count == 0 && threadpool_sleeping.count == 0)
+        {
+          _add_thread(gg);
+        }
+        else if(threadpool_sleeping.count > 0 && active_work_items > threadpool_active.count)
+        {
+          // Try to wake the most recently slept first
+          auto *t = threadpool_sleeping.back;
+          auto now = std::chrono::steady_clock::now();
+          for(size_t n = std::min(active_work_items - threadpool_active.count, threadpool_sleeping.count); n > 0; n--)
+          {
+            t->last_did_work = now;  // prevent reap
+            t->cond.notify_one();
+            t = t->_prev;
+          }
+        }
+      }
+    }
+#endif
   }
 
   inline result<void> global_dynamic_thread_pool_impl::submit(dynamic_thread_pool_group_impl_guard &g, dynamic_thread_pool_group_impl *group,
@@ -1901,23 +1917,16 @@ namespace detail
       {
         deadline d(std::chrono::seconds(0));
         i->_parent.store(group, std::memory_order_release);
-        i->_nextwork.store(i->next(d), std::memory_order_release);
-        if(-1 == i->_nextwork.load(std::memory_order_acquire))
-        {
-          _append_to_list(group->_work_items_done, i);
-        }
-        else
-        {
+        i->_nextwork.store(0, std::memory_order_release);
 #if defined(_WIN32)
-          i->_internalworkh = CreateThreadpoolWork(_win32_worker_thread_callback, i, group->_grouph);
-          if(nullptr == i->_internalworkh)
-          {
-            return win32_error();
-          }
-#endif
-          OUTCOME_TRY(_prepare_work_item_delay(i, group->_grouph, d));
-          _prepend_to_list(group->_work_items_active, i);
+        i->_internalworkh = CreateThreadpoolWork(_win32_worker_thread_callback, i, group->_grouph);
+        if(nullptr == i->_internalworkh)
+        {
+          return win32_error();
         }
+#endif
+        OUTCOME_TRY(_prepare_work_item_delay(i, group->_grouph, d));
+        _prepend_to_list(group->_work_items_active, i);
       }
       uninit.release();
       g.unlock();
@@ -2242,19 +2251,12 @@ namespace detail
     return success();
   }
 
-  inline void global_dynamic_thread_pool_impl::_timerthread(dynamic_thread_pool_group::work_item *workitem, threadh_type /*unused*/)
+  inline void global_dynamic_thread_pool_impl::_timerthread(dynamic_thread_pool_group::work_item *workitem, threadh_type selfthreadh)
   {
     LLFIO_LOG_FUNCTION_CALL(this);
     assert(workitem->_nextwork.load(std::memory_order_relaxed) != -1);
     assert(workitem->_has_timer_set());
-    auto *parent = workitem->_parent.load(std::memory_order_relaxed);
-    // std::cout << "*** _timerthread " << workitem << std::endl;
-    if(parent->_stopping.load(std::memory_order_relaxed))
-    {
-      dynamic_thread_pool_group_impl_guard g(parent->_lock);  // lock group
-      _work_item_done(g, workitem);
-      return;
-    }
+    // std::cout << "*** _timerthread " << workitem << " begins with work " << workitem->_nextwork.load(std::memory_order_relaxed) << std::endl;
     if(workitem->_has_timer_set_relative())
     {
 #if LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD
@@ -2282,40 +2284,16 @@ namespace detail
       workitem->_timepoint2 = {};
     }
     assert(!workitem->_has_timer_set());
-    if(workitem->_nextwork.load(std::memory_order_acquire) == 0)
-    {
-      deadline d(std::chrono::seconds(0));
-      workitem->_nextwork.store(workitem->next(d), std::memory_order_release);
-      auto r2 = _prepare_work_item_delay(workitem, parent->_grouph, d);
-      if(!r2)
-      {
-        dynamic_thread_pool_group_impl_guard g(parent->_lock);  // lock group
-        (void) stop(g, parent, std::move(r2));
-        _work_item_done(g, workitem);
-        return;
-      }
-      if(-1 == workitem->_nextwork.load(std::memory_order_relaxed))
-      {
-        dynamic_thread_pool_group_impl_guard g(parent->_lock);  // lock group
-        _work_item_done(g, workitem);
-        return;
-      }
-      _submit_work_item(false, workitem, false);
-      return;
-    }
-    _submit_work_item(false, workitem, false);
+    _workerthread(workitem, selfthreadh);
   }
 
   // Worker thread entry point
   inline void global_dynamic_thread_pool_impl::_workerthread(dynamic_thread_pool_group::work_item *workitem, threadh_type selfthreadh)
   {
     LLFIO_LOG_FUNCTION_CALL(this);
-    //{
-    //  _lock_guard g(parent->_lock);
-    //  std::cout << "*** _workerthread " << workitem << " begins with work " << workitem->_nextwork.load(std::memory_order_relaxed) << std::endl;
-    //}
+    // std::cout << "*** _workerthread " << workitem << " begins with work " << workitem->_nextwork.load(std::memory_order_relaxed) << std::endl;
     assert(workitem->_nextwork.load(std::memory_order_relaxed) != -1);
-    assert(workitem->_nextwork.load(std::memory_order_relaxed) != 0);
+    assert(!workitem->_has_timer_set());
     auto *parent = workitem->_parent.load(std::memory_order_relaxed);
     if(parent->_stopping.load(std::memory_order_relaxed))
     {
@@ -2323,12 +2301,43 @@ namespace detail
       _work_item_done(g, workitem);
       return;
     }
+
+    auto nextwork = workitem->_nextwork.load(std::memory_order_acquire);
+    if(0 == nextwork)
+    {
+      deadline d(std::chrono::seconds(0));
+      nextwork = workitem->next(d);
+      workitem->_nextwork.store(nextwork, std::memory_order_release);
+      auto r2 = _prepare_work_item_delay(workitem, parent->_grouph, d);
+      if(!r2)
+      {
+        // Failed
+        dynamic_thread_pool_group_impl_guard g(parent->_lock);  // lock group
+        (void) stop(g, parent, std::move(r2));
+        _work_item_done(g, workitem);
+        return;
+      }
+      if(-1 == nextwork)
+      {
+        // Work item is done
+        dynamic_thread_pool_group_impl_guard g(parent->_lock);  // lock group
+        _work_item_done(g, workitem);
+        return;
+      }
+      if(0 == nextwork || d.nsecs > 0)
+      {
+        // Defer work item execution
+        _submit_work_item(false, workitem, false);
+        return;
+      }
+    }
+
     auto &tls = detail::global_dynamic_thread_pool_thread_local_state();
     auto old_thread_local_state = tls;
     tls.workitem = workitem;
     tls.current_callback_instance = selfthreadh;
     tls.nesting_level = parent->_nesting_level + 1;
-    auto r = (*workitem)(workitem->_nextwork.load(std::memory_order_acquire));
+    auto r = (*workitem)(nextwork);
     workitem->_nextwork.store(0, std::memory_order_release);  // call next() next time
     tls = old_thread_local_state;
     // std::cout << "*** _workerthread " << workitem << " ends with work " << workitem->_nextwork << std::endl;
@@ -2338,32 +2347,15 @@ namespace detail
       (void) stop(g, parent, std::move(r));
       _work_item_done(g, workitem);
       workitem = nullptr;
+      return;
     }
     else if(parent->_stopping.load(std::memory_order_relaxed))
     {
       dynamic_thread_pool_group_impl_guard g(parent->_lock);  // lock group
       _work_item_done(g, workitem);
+      return;
     }
-    else
-    {
-      deadline d(std::chrono::seconds(0));
-      workitem->_nextwork.store(workitem->next(d), std::memory_order_release);
-      auto r2 = _prepare_work_item_delay(workitem, parent->_grouph, d);
-      if(!r2)
-      {
-        dynamic_thread_pool_group_impl_guard g(parent->_lock);  // lock group
-        (void) stop(g, parent, std::move(r2));
-        _work_item_done(g, workitem);
-        return;
-      }
-      if(-1 == workitem->_nextwork.load(std::memory_order_relaxed))
-      {
-        dynamic_thread_pool_group_impl_guard g(parent->_lock);  // lock group
-        _work_item_done(g, workitem);
-        return;
-      }
-      _submit_work_item(false, workitem, false);
-    }
+    _submit_work_item(false, workitem, false);
   }
 }  // namespace detail
 
@@ -2470,6 +2462,9 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC intptr_t dynamic_thread_pool_group::io_aware_wor
           i->second.average_busy = (i->second.average_busy * 0.9f) + (i->second.statfs.f_iosbusytime * 0.1f);
           i->second.average_queuedepth = (i->second.average_queuedepth * 0.9f) + (i->second.statfs.f_iosinprogress * 0.1f);
         }
+        std::cout << "average_queuedepth = " << i->second.average_queuedepth << " this->max_iosinprogress = " << this->max_iosinprogress
+                  << " this->min_iosinprogress = " << this->min_iosinprogress << " i->second.default_deadline.nsecs = " << i->second.default_deadline.nsecs
+                  << std::endl;
         if(i->second.average_busy < this->max_iosbusytime && i->second.average_queuedepth < this->min_iosinprogress)
         {
           i->second.default_deadline = std::chrono::seconds(0);  // remove pacing
@@ -2480,13 +2475,9 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC intptr_t dynamic_thread_pool_group::io_aware_wor
           {
             i->second.default_deadline = std::chrono::milliseconds(1);  // start with 1ms, it'll reduce from there if needed
           }
-          else if((i->second.default_deadline.nsecs >> 4) > 0)
+          else if(i->second.default_deadline.nsecs < 10000000000ULL)
           {
             i->second.default_deadline.nsecs += i->second.default_deadline.nsecs >> 4;
-          }
-          else
-          {
-            i->second.default_deadline.nsecs++;
           }
         }
         else if(i->second.average_queuedepth < this->min_iosinprogress)
@@ -2495,9 +2486,9 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC intptr_t dynamic_thread_pool_group::io_aware_wor
           {
             i->second.default_deadline.nsecs -= i->second.default_deadline.nsecs >> 4;
           }
-          else if(i->second.default_deadline.nsecs > 1)
+          else
           {
-            i->second.default_deadline.nsecs--;
+            i->second.default_deadline = std::chrono::seconds(0);  // remove pacing
           }
         }
       }

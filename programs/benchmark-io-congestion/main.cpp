@@ -205,15 +205,19 @@ struct llfio_runner_paced
       }
       virtual intptr_t io_aware_next(llfio::deadline &d) noexcept override
       {
-#if 1
-        auto last_pace = parent->last_pace.load(std::memory_order_relaxed);
-        if(last_pace != d.nsecs)
+        if(!parent->cancel.load(std::memory_order_relaxed))
         {
-          parent->last_pace.store(d.nsecs, std::memory_order_relaxed);
-          std::cout << "Pacing work by milliseconds " << (d.nsecs / 1000000.0) << std::endl;
-        }
+#if 1
+          auto last_pace = parent->last_pace.load(std::memory_order_relaxed);
+          if(last_pace != d.nsecs)
+          {
+            parent->last_pace.store(d.nsecs, std::memory_order_relaxed);
+            std::cout << "Pacing work by milliseconds " << (d.nsecs / 1000000.0) << std::endl;
+          }
 #endif
-        return parent->cancel.load(std::memory_order_relaxed) ? -1 : 1;
+          return 1;
+        }
+        return -1;
       }
       virtual llfio::result<void> operator()(intptr_t /*unused*/) noexcept override
       {
@@ -358,6 +362,10 @@ template <class Runner> void benchmark(llfio::mapped_file_handle &maph, const ch
     {
       continue;
     }
+    if(name != nullptr && items != 4096)
+    {
+      continue;  // temporary until we get 4096 work items up to >= 40 SHA256 hashes/sec
+    }
     shared_t shared{maph.map().as_span()};
     workers.clear();
     for(uint32_t n = 0; n < items; n++)
@@ -440,7 +448,7 @@ int main(int argc, char *argv[])
       memset(fileh.address(), 0xff, TEST_FILE_SIZE);
     }
 
-    benchmark<llfio_runner_unpaced>(fileh, nullptr);
+    //benchmark<llfio_runner_unpaced>(fileh, nullptr);
 
 #if 0
     {

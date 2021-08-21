@@ -107,6 +107,8 @@ progress slowly, whereas the work items in the second set progress quickly.
 
 `work_item::next()` may optionally set a deadline to delay when that work
 item ought to be processed again. Deadlines can be relative or absolute.
+It can also defer the work item being executed now, but to call `work_item::next()`
+again as soon as all other work in the same priority has been executed.
 
 ## C++ 23 Executors
 
@@ -355,12 +357,12 @@ public:
     //! Maximum i/o busyness above which throttling is to begin.
     float max_iosbusytime{0.95f};
     //! Minimum i/o in progress to target if `iosbusytime` exceeded. The default of 16 suits SSDs, you want around 4 for spinning rust or NV-RAM.
-    uint32_t min_iosinprogress{16};
+    uint32_t min_iosinprogress{2};
     //! Maximum i/o in progress to target if `iosbusytime` exceeded. The default of 32 suits SSDs, you want around 8 for spinning rust or NV-RAM.
 #ifdef _WIN32
     uint32_t max_iosinprogress{1};  // windows appears to do a lot of i/o coalescing
 #else
-    uint32_t max_iosinprogress{32};
+    uint32_t max_iosinprogress{4};
 #endif
     //! Information about an i/o handle this work item will use
     struct io_handle_awareness
