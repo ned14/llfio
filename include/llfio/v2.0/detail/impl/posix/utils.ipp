@@ -333,7 +333,7 @@ namespace utils
 
       (values are in pages)
 
-      /proc/[pid]/smaps_rollup:
+      /proc/[pid]/smaps_rollup (Linux 3.16 onwards only):
 
       total_address_space_in_use = ??? MISSING
       total_address_space_paged_in = ??? MISSING
@@ -363,7 +363,16 @@ namespace utils
         if(want & process_memory_usage::want::private_committed)
         {
           std::vector<char> smaps_rollup(256), maps(65536);
-          OUTCOME_TRY(fill_buffer(smaps_rollup, "/proc/self/smaps_rollup"));
+          auto r = fill_buffer(smaps_rollup, "/proc/self/smaps_rollup");
+          if(!r)
+          {
+            if(r.error() == errc::no_such_file_or_directory)
+            {
+              // Linux kernel is too old
+              return errc::operation_not_supported;
+            }
+            return std::move(r).error();
+          }
           OUTCOME_TRY(fill_buffer(maps, "/proc/self/maps"));
           uint64_t lazyfree = 0;
           {

@@ -236,6 +236,14 @@ namespace utils
   cannot distinguish between regions with the accounted
   flag enabled or disabled. By default, this fast path is enabled.
 
+  \note `/proc/pid/smaps_rollup` was added in Linux kernel 3.16, so the default specifying
+  `process_memory_usage::want::private_committed_inaccurate` will always fail on Linux
+  kernels preceding that with an error code comparing equal to `errc::operation_not_supported`.
+  As one would assume users would prefer this operation to fail on older kernels rather than
+  silently go slowly in complex memory spaces, it is left opt-in to request
+  the accurate implementation which works on older Linux kernels. Or, just don't request
+  `private_committed` at all, and pretend `private_paged_in` means the same thing.
+
   \note Mac OS provides no way of reading how much memory a process has committed.
   We therefore supply as `private_committed` the same value as `private_paged_in`.
   */
