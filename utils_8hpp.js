@@ -9,7 +9,7 @@ var utils_8hpp =
     [ "allocate_large_pages", "utils_8hpp.html#a85afc40cff0ecfd3a13520ea7e5176a1", null ],
     [ "calculate_large_page_allocation", "utils_8hpp.html#acf1b1646f257d85f7f2655df1042483f", null ],
     [ "current_process_cpu_usage", "utils_8hpp.html#a264d603db8cc67ce5bfc468d71e0ffaf", null ],
-    [ "current_process_memory_usage", "utils_8hpp.html#ac0e3bd3831d2fc895048222c4cc2b171", null ],
+    [ "current_process_memory_usage", "utils_8hpp.html#aab584554620ce071569198652607b5a9", null ],
     [ "deallocate_large_pages", "utils_8hpp.html#a2305cf865b7952f58aba997c4ac95efb", null ],
     [ "drop_filesystem_cache", "utils_8hpp.html#abacefaf60ae391226c4775cf8a61276a", null ],
     [ "file_buffer_default_size", "utils_8hpp.html#a83420c7c9af03ca93d5ed029c34d5dd6", null ],

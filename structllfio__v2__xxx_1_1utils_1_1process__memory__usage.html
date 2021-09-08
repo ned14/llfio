@@ -102,13 +102,25 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html#a304129ee80599b6473db350b4e96b781">QUICKCPPLIB_BITFIELD_BEGIN</a> (want)</td></tr>
 <tr class="memdesc:a304129ee80599b6473db350b4e96b781"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fields wanted. <br /></td></tr>
 <tr class="separator:a304129ee80599b6473db350b4e96b781"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aadbf83c648f5fab1b3f08119fca93135"><td class="memItemLeft" align="right" valign="top"><a id="aadbf83c648f5fab1b3f08119fca93135"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html#aadbf83c648f5fab1b3f08119fca93135">QUICKCPPLIB_BITFIELD_END</a> (want) size_t total_address_space_in_use</td></tr>
-<tr class="memdesc:aadbf83c648f5fab1b3f08119fca93135"><td class="mdescLeft">&#160;</td><td class="mdescRight">The total virtual address space in use. <br /></td></tr>
-<tr class="separator:aadbf83c648f5fab1b3f08119fca93135"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a409c932091879e54f4823307ec090113"><td class="memItemLeft" align="right" valign="top"><a id="a409c932091879e54f4823307ec090113"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html#a409c932091879e54f4823307ec090113">QUICKCPPLIB_BITFIELD_END</a> (want) uint64_t system_physical_memory_total</td></tr>
+<tr class="memdesc:a409c932091879e54f4823307ec090113"><td class="mdescLeft">&#160;</td><td class="mdescRight">The total physical memory in this system. <br /></td></tr>
+<tr class="separator:a409c932091879e54f4823307ec090113"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
+<tr class="memitem:ad39fad2cabef9757f2151d58b9de1503"><td class="memItemLeft" align="right" valign="top"><a id="ad39fad2cabef9757f2151d58b9de1503"></a>
+uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html#ad39fad2cabef9757f2151d58b9de1503">system_physical_memory_available</a> {0}</td></tr>
+<tr class="memdesc:ad39fad2cabef9757f2151d58b9de1503"><td class="mdescLeft">&#160;</td><td class="mdescRight">The physical memory in this system not containing dirty pages i.e. is currently used for file system caching, or unused. <br /></td></tr>
+<tr class="separator:ad39fad2cabef9757f2151d58b9de1503"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71a7794b7c8b829e8a40d1addb550c9d"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html#a71a7794b7c8b829e8a40d1addb550c9d">system_commit_charge_maximum</a> {0}</td></tr>
+<tr class="separator:a71a7794b7c8b829e8a40d1addb550c9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ee6fde7e3f58576e863f5ba9a8ac1bb"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html#a3ee6fde7e3f58576e863f5ba9a8ac1bb">system_commit_charge_available</a> {0}</td></tr>
+<tr class="separator:a3ee6fde7e3f58576e863f5ba9a8ac1bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf45c0d5909d6067817a07dc1a11676b"><td class="memItemLeft" align="right" valign="top"><a id="adf45c0d5909d6067817a07dc1a11676b"></a>
+size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html#adf45c0d5909d6067817a07dc1a11676b">total_address_space_in_use</a> {0}</td></tr>
+<tr class="memdesc:adf45c0d5909d6067817a07dc1a11676b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The total virtual address space in use. <br /></td></tr>
+<tr class="separator:adf45c0d5909d6067817a07dc1a11676b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad5b2ceeb0974a4a3115bdc74fc9d5b8f"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html#ad5b2ceeb0974a4a3115bdc74fc9d5b8f">total_address_space_paged_in</a> {0}</td></tr>
 <tr class="separator:ad5b2ceeb0974a4a3115bdc74fc9d5b8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa8f23435fe2b317cf7c0901e384c265f"><td class="memItemLeft" align="right" valign="top"><a id="aa8f23435fe2b317cf7c0901e384c265f"></a>
@@ -123,6 +135,36 @@ size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="st
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Memory usage statistics for a process. </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
+<a id="a3ee6fde7e3f58576e863f5ba9a8ac1bb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3ee6fde7e3f58576e863f5ba9a8ac1bb">&#9670;&nbsp;</a></span>system_commit_charge_available</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint64_t llfio_v2_xxx::utils::process_memory_usage::system_commit_charge_available {0}</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The amount of commit charge remaining before the maximum. Subtract this from <code>system_commit_charge_maximum</code> to determine the amount of commit charge consumed by all processes in the system. </p>
+
+</div>
+</div>
+<a id="a71a7794b7c8b829e8a40d1addb550c9d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a71a7794b7c8b829e8a40d1addb550c9d">&#9670;&nbsp;</a></span>system_commit_charge_maximum</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint64_t llfio_v2_xxx::utils::process_memory_usage::system_commit_charge_maximum {0}</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The maximum amount of memory which can be committed by all processes. This is typically physical RAM plus swap files. Note that swap files can be added and removed over time. </p>
+
+</div>
+</div>
 <a id="ad5b2ceeb0974a4a3115bdc74fc9d5b8f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad5b2ceeb0974a4a3115bdc74fc9d5b8f">&#9670;&nbsp;</a></span>total_address_space_paged_in</h2>
 

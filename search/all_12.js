@@ -72,7 +72,10 @@ var searchData=
   ['symlink_5fremoved_659',['symlink_removed',['../structllfio__v2__xxx_1_1algorithm_1_1difference__item.html#aa63255f48ab96f35618852c8a7ca1c95a268673f973f6ad2bc7b1042bb5735fb4',1,'llfio_v2_xxx::algorithm::difference_item']]],
   ['symlink_5ftype_660',['symlink_type',['../classllfio__v2__xxx_1_1symlink__handle.html#a1908a242ca435cf1386fe96a86da4002',1,'llfio_v2_xxx::symlink_handle']]],
   ['system_661',['system',['../structllfio__v2__xxx_1_1path__discovery_1_1discovered__path.html#ae02f172851c050f6a7f5929410428c7da54b53072540eeeb8f8e9343e71f28176',1,'llfio_v2_xxx::path_discovery::discovered_path']]],
-  ['system_5fns_5fin_5fidle_5fmode_662',['system_ns_in_idle_mode',['../structllfio__v2__xxx_1_1utils_1_1process__cpu__usage.html#a55e2c32be8d648b39854d1679d879f92',1,'llfio_v2_xxx::utils::process_cpu_usage']]],
-  ['system_5fns_5fin_5fkernel_5fmode_663',['system_ns_in_kernel_mode',['../structllfio__v2__xxx_1_1utils_1_1process__cpu__usage.html#a9df8fbb936167cf8599b0017de3596ec',1,'llfio_v2_xxx::utils::process_cpu_usage']]],
-  ['system_5fns_5fin_5fuser_5fmode_664',['system_ns_in_user_mode',['../structllfio__v2__xxx_1_1utils_1_1process__cpu__usage.html#aea54e0e07a284fe73472a7ff070cf0e2',1,'llfio_v2_xxx::utils::process_cpu_usage']]]
+  ['system_5fcommit_5fcharge_5favailable_662',['system_commit_charge_available',['../structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html#a3ee6fde7e3f58576e863f5ba9a8ac1bb',1,'llfio_v2_xxx::utils::process_memory_usage']]],
+  ['system_5fcommit_5fcharge_5fmaximum_663',['system_commit_charge_maximum',['../structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html#a71a7794b7c8b829e8a40d1addb550c9d',1,'llfio_v2_xxx::utils::process_memory_usage']]],
+  ['system_5fns_5fin_5fidle_5fmode_664',['system_ns_in_idle_mode',['../structllfio__v2__xxx_1_1utils_1_1process__cpu__usage.html#a55e2c32be8d648b39854d1679d879f92',1,'llfio_v2_xxx::utils::process_cpu_usage']]],
+  ['system_5fns_5fin_5fkernel_5fmode_665',['system_ns_in_kernel_mode',['../structllfio__v2__xxx_1_1utils_1_1process__cpu__usage.html#a9df8fbb936167cf8599b0017de3596ec',1,'llfio_v2_xxx::utils::process_cpu_usage']]],
+  ['system_5fns_5fin_5fuser_5fmode_666',['system_ns_in_user_mode',['../structllfio__v2__xxx_1_1utils_1_1process__cpu__usage.html#aea54e0e07a284fe73472a7ff070cf0e2',1,'llfio_v2_xxx::utils::process_cpu_usage']]],
+  ['system_5fphysical_5fmemory_5favailable_667',['system_physical_memory_available',['../structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html#ad39fad2cabef9757f2151d58b9de1503',1,'llfio_v2_xxx::utils::process_memory_usage']]]
 ];
