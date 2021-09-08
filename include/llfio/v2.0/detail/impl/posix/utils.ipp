@@ -534,7 +534,7 @@ namespace utils
     kern_return_t error;
     mach_msg_type_number_t outCount;
     process_memory_usage ret;
-    if(!!(wanted & process_memory_usage::want::this_process))
+    if(!!(want & process_memory_usage::want::this_process))
     {
       task_vm_info_data_t vmInfo;
       // task_kernelmemory_info_data_t kmInfo;
@@ -560,7 +560,7 @@ namespace utils
       ret.private_committed = vmInfo.internal + vmInfo.compressed;
       ret.private_paged_in = vmInfo.phys_footprint;
     }
-    if(!!(wanted & process_memory_usage::want::this_system))
+    if(!!(want & process_memory_usage::want::this_system))
     {
       vm_statistics_data_t vmStat;
       outCount = HOST_VM_INFO_COUNT;
