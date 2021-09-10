@@ -901,9 +901,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 </dl>
 <dl class="section note"><dt>Note</dt><dd>On Microsoft Windows this constructor uses the faster VirtualAlloc() which creates less versatile page backed memory. If you want anonymous memory allocated from a paging file backed section instead, create a page file backed section and then a mapped view from that using the other constructor. This makes available all those very useful VM tricks Windows can do with section mapped memory which VirtualAlloc() memory cannot do.</dd></dl>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX mmap() or VirtualAlloc() can return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l01091"></a><span class="lineno"> 1091</span>&#160;{</div>
-<div class="line"><a name="l01092"></a><span class="lineno"> 1092</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#ab9dbbe2fe79758ef87fe2dd1f61d824c">map_handle::map</a>(std::forward&lt;decltype(bytes)&gt;(bytes), zeroed, std::forward&lt;decltype(_flag)&gt;(_flag));</div>
-<div class="line"><a name="l01093"></a><span class="lineno"> 1093</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l01095"></a><span class="lineno"> 1095</span>&#160;{</div>
+<div class="line"><a name="l01096"></a><span class="lineno"> 1096</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#ab9dbbe2fe79758ef87fe2dd1f61d824c">map_handle::map</a>(std::forward&lt;decltype(bytes)&gt;(bytes), zeroed, std::forward&lt;decltype(_flag)&gt;(_flag));</div>
+<div class="line"><a name="l01097"></a><span class="lineno"> 1097</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -962,10 +962,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX mmap() or NtMapViewOfSection() can return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l01106"></a><span class="lineno"> 1106</span>&#160;{</div>
-<div class="line"><a name="l01107"></a><span class="lineno"> 1107</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#ab9dbbe2fe79758ef87fe2dd1f61d824c">map_handle::map</a>(std::forward&lt;decltype(<a class="code" href="namespacellfio__v2__xxx.html#a5323ac4d73623d99f92109a5c184e5dd">section</a>)&gt;(<a class="code" href="namespacellfio__v2__xxx.html#a5323ac4d73623d99f92109a5c184e5dd">section</a>), std::forward&lt;decltype(bytes)&gt;(bytes), std::forward&lt;decltype(offset)&gt;(offset),</div>
-<div class="line"><a name="l01108"></a><span class="lineno"> 1108</span>&#160;                         std::forward&lt;decltype(_flag)&gt;(_flag));</div>
-<div class="line"><a name="l01109"></a><span class="lineno"> 1109</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l01110"></a><span class="lineno"> 1110</span>&#160;{</div>
+<div class="line"><a name="l01111"></a><span class="lineno"> 1111</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#ab9dbbe2fe79758ef87fe2dd1f61d824c">map_handle::map</a>(std::forward&lt;decltype(<a class="code" href="namespacellfio__v2__xxx.html#a5323ac4d73623d99f92109a5c184e5dd">section</a>)&gt;(<a class="code" href="namespacellfio__v2__xxx.html#a5323ac4d73623d99f92109a5c184e5dd">section</a>), std::forward&lt;decltype(bytes)&gt;(bytes), std::forward&lt;decltype(offset)&gt;(offset),</div>
+<div class="line"><a name="l01112"></a><span class="lineno"> 1112</span>&#160;                         std::forward&lt;decltype(_flag)&gt;(_flag));</div>
+<div class="line"><a name="l01113"></a><span class="lineno"> 1113</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1476,9 +1476,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 </dl>
 <dl class="section user"><dt>Errors returnable\n None, though the various signals and structured exception throws common to using memory maps may occur.</dt><dd></dd></dl>
 <dl class="section user"><dt>Memory Allocations\n None.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l01159"></a><span class="lineno"> 1159</span>&#160;{</div>
-<div class="line"><a name="l01160"></a><span class="lineno"> 1160</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
-<div class="line"><a name="l01161"></a><span class="lineno"> 1161</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l01163"></a><span class="lineno"> 1163</span>&#160;{</div>
+<div class="line"><a name="l01164"></a><span class="lineno"> 1164</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
+<div class="line"><a name="l01165"></a><span class="lineno"> 1165</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1597,9 +1597,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 </dl>
 <p>This convenience overload create a writable section if the backing file is writable, otherwise a read-only section.</p>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX dup(), open() or NtCreateSection() can return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l01036"></a><span class="lineno"> 1036</span>&#160;{</div>
-<div class="line"><a name="l01037"></a><span class="lineno"> 1037</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a5323ac4d73623d99f92109a5c184e5dd">section_handle::section</a>(std::forward&lt;decltype(backing)&gt;(backing), std::forward&lt;decltype(bytes)&gt;(bytes));</div>
-<div class="line"><a name="l01038"></a><span class="lineno"> 1038</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l01040"></a><span class="lineno"> 1040</span>&#160;{</div>
+<div class="line"><a name="l01041"></a><span class="lineno"> 1041</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a5323ac4d73623d99f92109a5c184e5dd">section_handle::section</a>(std::forward&lt;decltype(backing)&gt;(backing), std::forward&lt;decltype(bytes)&gt;(bytes));</div>
+<div class="line"><a name="l01042"></a><span class="lineno"> 1042</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1653,10 +1653,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX dup(), open() or NtCreateSection() can return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l01023"></a><span class="lineno"> 1023</span>&#160;{</div>
-<div class="line"><a name="l01024"></a><span class="lineno"> 1024</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a5323ac4d73623d99f92109a5c184e5dd">section_handle::section</a>(std::forward&lt;decltype(backing)&gt;(backing), std::forward&lt;decltype(maximum_size)&gt;(maximum_size),</div>
-<div class="line"><a name="l01025"></a><span class="lineno"> 1025</span>&#160;                                 std::forward&lt;decltype(_flag)&gt;(_flag));</div>
-<div class="line"><a name="l01026"></a><span class="lineno"> 1026</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l01027"></a><span class="lineno"> 1027</span>&#160;{</div>
+<div class="line"><a name="l01028"></a><span class="lineno"> 1028</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a5323ac4d73623d99f92109a5c184e5dd">section_handle::section</a>(std::forward&lt;decltype(backing)&gt;(backing), std::forward&lt;decltype(maximum_size)&gt;(maximum_size),</div>
+<div class="line"><a name="l01029"></a><span class="lineno"> 1029</span>&#160;                                 std::forward&lt;decltype(_flag)&gt;(_flag));</div>
+<div class="line"><a name="l01030"></a><span class="lineno"> 1030</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1710,9 +1710,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX dup(), open() or NtCreateSection() can return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l01048"></a><span class="lineno"> 1048</span>&#160;{</div>
-<div class="line"><a name="l01049"></a><span class="lineno"> 1049</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a5323ac4d73623d99f92109a5c184e5dd">section_handle::section</a>(std::forward&lt;decltype(bytes)&gt;(bytes), std::forward&lt;decltype(dirh)&gt;(dirh), std::forward&lt;decltype(_flag)&gt;(_flag));</div>
-<div class="line"><a name="l01050"></a><span class="lineno"> 1050</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l01052"></a><span class="lineno"> 1052</span>&#160;{</div>
+<div class="line"><a name="l01053"></a><span class="lineno"> 1053</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a5323ac4d73623d99f92109a5c184e5dd">section_handle::section</a>(std::forward&lt;decltype(bytes)&gt;(bytes), std::forward&lt;decltype(dirh)&gt;(dirh), std::forward&lt;decltype(_flag)&gt;(_flag));</div>
+<div class="line"><a name="l01054"></a><span class="lineno"> 1054</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2039,9 +2039,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX mremap(), mmap(addr) or VirtualAlloc(addr) can return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l01142"></a><span class="lineno"> 1142</span>&#160;{</div>
-<div class="line"><a name="l01143"></a><span class="lineno"> 1143</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.truncate(std::forward&lt;decltype(newsize)&gt;(newsize), std::forward&lt;decltype(permit_relocation)&gt;(permit_relocation));</div>
-<div class="line"><a name="l01144"></a><span class="lineno"> 1144</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l01146"></a><span class="lineno"> 1146</span>&#160;{</div>
+<div class="line"><a name="l01147"></a><span class="lineno"> 1147</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.truncate(std::forward&lt;decltype(newsize)&gt;(newsize), std::forward&lt;decltype(permit_relocation)&gt;(permit_relocation));</div>
+<div class="line"><a name="l01148"></a><span class="lineno"> 1148</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2086,9 +2086,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable\n Any of the values NtExtendSection() or ftruncate() can return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l01064"></a><span class="lineno"> 1064</span>&#160;{</div>
-<div class="line"><a name="l01065"></a><span class="lineno"> 1065</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.truncate(std::forward&lt;decltype(newsize)&gt;(newsize));</div>
-<div class="line"><a name="l01066"></a><span class="lineno"> 1066</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l01068"></a><span class="lineno"> 1068</span>&#160;{</div>
+<div class="line"><a name="l01069"></a><span class="lineno"> 1069</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.truncate(std::forward&lt;decltype(newsize)&gt;(newsize));</div>
+<div class="line"><a name="l01070"></a><span class="lineno"> 1070</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2359,9 +2359,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 </dl>
 <dl class="section user"><dt>Errors returnable\n None, though the various signals and structured exception throws common to using memory maps may occur.</dt><dd></dd></dl>
 <dl class="section user"><dt>Memory Allocations\n None.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l01174"></a><span class="lineno"> 1174</span>&#160;{</div>
-<div class="line"><a name="l01175"></a><span class="lineno"> 1175</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
-<div class="line"><a name="l01176"></a><span class="lineno"> 1176</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l01178"></a><span class="lineno"> 1178</span>&#160;{</div>
+<div class="line"><a name="l01179"></a><span class="lineno"> 1179</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
+<div class="line"><a name="l01180"></a><span class="lineno"> 1180</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2433,7 +2433,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 </div>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="anamespacellfio__v2__xxx_html_ab9dbbe2fe79758ef87fe2dd1f61d824c"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ab9dbbe2fe79758ef87fe2dd1f61d824c">llfio_v2_xxx::map</a></div><div class="ttdeci">result&lt; map_handle &gt; map(section_handle &amp;section, map_handle::size_type bytes=0, map_handle::extent_type offset=0, section_handle::flag _flag=section_handle::flag::readwrite) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:1104</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_ab9dbbe2fe79758ef87fe2dd1f61d824c"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ab9dbbe2fe79758ef87fe2dd1f61d824c">llfio_v2_xxx::map</a></div><div class="ttdeci">result&lt; map_handle &gt; map(section_handle &amp;section, map_handle::size_type bytes=0, map_handle::extent_type offset=0, section_handle::flag _flag=section_handle::flag::readwrite) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:1108</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a70d9ef3b988a880d171015b754bb7b27"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a70d9ef3b988a880d171015b754bb7b27">llfio_v2_xxx::temp_file</a></div><div class="ttdeci">result&lt; file_handle &gt; temp_file(file_handle::path_view_type name=file_handle::path_view_type(), file_handle::mode _mode=file_handle::mode::write, file_handle::creation _creation=file_handle::creation::if_needed, file_handle::caching _caching=file_handle::caching::temporary, file_handle::flag flags=file_handle::flag::unlink_on_first_close) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:455</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_ae79486289ff1386b26d1ce60bb797d33aa4293995cfbfa9ce60ce71ade2ff75f7"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33aa4293995cfbfa9ce60ce71ade2ff75f7">llfio_v2_xxx::lock_kind::exclusive</a></div><div class="ttdeci">@ exclusive</div><div class="ttdoc">Exclude those requesting any kind of lock on the same inode.</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_addbdc12d4993a8ee40c105a02a105a61"><div class="ttname"><a href="namespacellfio__v2__xxx.html#addbdc12d4993a8ee40c105a02a105a61">llfio_v2_xxx::temp_directory</a></div><div class="ttdeci">result&lt; directory_handle &gt; temp_directory(directory_handle::path_view_type name=directory_handle::path_view_type(), directory_handle::mode _mode=directory_handle::mode::write, directory_handle::creation _creation=directory_handle::creation::if_needed, directory_handle::caching _caching=directory_handle::caching::all, directory_handle::flag flags=directory_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:417</div></div>
@@ -2449,7 +2449,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 <div class="ttc" id="anamespacellfio__v2__xxx_html_abcb445e5dfcc0eb04ce49ac8af0bc89aac9d7bcde106cf090f174db82fd3dcba0"><div class="ttname"><a href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aac9d7bcde106cf090f174db82fd3dcba0">llfio_v2_xxx::win32_path_namespace::guid_volume</a></div><div class="ttdeci">@ guid_volume</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_af31a062639499a79ef5cc8aed16ba65d"><div class="ttname"><a href="namespacellfio__v2__xxx.html#af31a062639499a79ef5cc8aed16ba65d">llfio_v2_xxx::file</a></div><div class="ttdeci">result&lt; file_handle &gt; file(const path_handle &amp;base, file_handle::path_view_type path, file_handle::mode _mode=file_handle::mode::read, file_handle::creation _creation=file_handle::creation::open_existing, file_handle::caching _caching=file_handle::caching::all, file_handle::flag flags=file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:418</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a58d5390cad390de24a80748c8cd7dc5b"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a58d5390cad390de24a80748c8cd7dc5b">llfio_v2_xxx::mapped_temp_inode</a></div><div class="ttdeci">result&lt; mapped_file_handle &gt; mapped_temp_inode(mapped_file_handle::size_type reservation=0, const path_handle &amp;dir=path_discovery::storage_backed_temporary_files_directory(), mapped_file_handle::mode _mode=mapped_file_handle::mode::write, mapped_file_handle::flag flags=mapped_file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:790</div></div>
-<div class="ttc" id="anamespacellfio__v2__xxx_html_a5323ac4d73623d99f92109a5c184e5dd"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a5323ac4d73623d99f92109a5c184e5dd">llfio_v2_xxx::section</a></div><div class="ttdeci">result&lt; section_handle &gt; section(section_handle::extent_type bytes, const path_handle &amp;dirh=path_discovery::storage_backed_temporary_files_directory(), section_handle::flag _flag=section_handle::flag::read|section_handle::flag::write) noexcept</div><div class="ttdoc">Create a memory section backed by an anonymous, managed file.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:1046</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_a5323ac4d73623d99f92109a5c184e5dd"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a5323ac4d73623d99f92109a5c184e5dd">llfio_v2_xxx::section</a></div><div class="ttdeci">result&lt; section_handle &gt; section(section_handle::extent_type bytes, const path_handle &amp;dirh=path_discovery::storage_backed_temporary_files_directory(), section_handle::flag _flag=section_handle::flag::read|section_handle::flag::write) noexcept</div><div class="ttdoc">Create a memory section backed by an anonymous, managed file.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:1050</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_ad8b12afdd4c80d69d2530bd40f92427c"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ad8b12afdd4c80d69d2530bd40f92427c">llfio_v2_xxx::path</a></div><div class="ttdeci">result&lt; path_handle &gt; path(path_handle::path_view_type _path) noexcept</div><div class="ttdoc">This is an overloaded member function, provided for convenience. It differs from the above function o...</div><div class="ttdef"><b>Definition:</b> path_handle.hpp:176</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a3eb3e8ef0ddff1270b3d78d4178335c7"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a3eb3e8ef0ddff1270b3d78d4178335c7">llfio_v2_xxx::mapped_temp_file</a></div><div class="ttdeci">result&lt; mapped_file_handle &gt; mapped_temp_file(mapped_file_handle::size_type reservation, mapped_file_handle::path_view_type name=mapped_file_handle::path_view_type(), mapped_file_handle::mode _mode=mapped_file_handle::mode::write, mapped_file_handle::creation _creation=mapped_file_handle::creation::if_needed, mapped_file_handle::caching _caching=mapped_file_handle::caching::temporary, mapped_file_handle::flag flags=mapped_file_handle::flag::unlink_on_first_close) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:769</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_abcb445e5dfcc0eb04ce49ac8af0bc89aa100b8cad7cf2a56f6df78f171f97a1ec"><div class="ttname"><a href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aa100b8cad7cf2a56f6df78f171f97a1ec">llfio_v2_xxx::win32_path_namespace::any</a></div><div class="ttdeci">@ any</div></div>

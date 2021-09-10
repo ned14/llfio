@@ -548,6 +548,8 @@ static <a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a22f9cba517e5
 <tr class="separator:a7823285220b4f35bd5d07d71d1d586f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4063087e080f36951a1dc7f640580a1"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structllfio__v2__xxx_1_1map__handle_1_1cache__statistics.html">cache_statistics</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#ad4063087e080f36951a1dc7f640580a1">trim_cache</a> (std::chrono::steady_clock::time_point older_than={}, size_t max_items=(size_t) -1) noexcept</td></tr>
 <tr class="separator:ad4063087e080f36951a1dc7f640580a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65776d55ae892b04e358b57d8f90a0be"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a65776d55ae892b04e358b57d8f90a0be">set_cache_disabled</a> (bool disabled) noexcept</td></tr>
+<tr class="separator:a65776d55ae892b04e358b57d8f90a0be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a25dcce3a7127c5552687c540c37b9f27"><td class="memItemLeft" align="right" valign="top">static result&lt; span&lt; <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1buffer__type.html">buffer_type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a25dcce3a7127c5552687c540c37b9f27">prefetch</a> (span&lt; <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1buffer__type.html">buffer_type</a> &gt; regions) noexcept</td></tr>
 <tr class="separator:a25dcce3a7127c5552687c540c37b9f27"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af047e43f418d68c618fab258b733302d"><td class="memItemLeft" align="right" valign="top"><a id="af047e43f418d68c618fab258b733302d"></a>
@@ -1768,6 +1770,33 @@ For portability, you can only assume that barriers write order for a single hand
 
 </div>
 </div>
+<a id="a65776d55ae892b04e358b57d8f90a0be"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a65776d55ae892b04e358b57d8f90a0be">&#9670;&nbsp;</a></span>set_cache_disabled()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool llfio_v2_xxx::map_handle::set_cache_disabled </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>disabled</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Disable the map handle cache, returning its previous setting. Note that you may also wish to explicitly trim the cache. </p>
+
+</div>
+</div>
 <a id="a281467f83f70f2e12aaedf5847fd818c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a281467f83f70f2e12aaedf5847fd818c">&#9670;&nbsp;</a></span>set_multiplexer()</h2>
 
@@ -2147,7 +2176,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><!-- doc-content -->
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a7848ef15e774eacec7e4446a8c365a3d"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a7848ef15e774eacec7e4446a8c365a3d">llfio_v2_xxx::io_handle::write</a></div><div class="ttdeci">io_result&lt; const_buffers_type &gt; write(io_request&lt; const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the open handle, preferentially using any i/o multiplexer set over the virtually overri...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:325</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a6a1044eeb6ab16939e4669bbeb071b32"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a6a1044eeb6ab16939e4669bbeb071b32">llfio_v2_xxx::io_handle::barrier</a></div><div class="ttdeci">virtual io_result&lt; const_buffers_type &gt; barrier(io_request&lt; const_buffers_type &gt; reqs=io_request&lt; const_buffers_type &gt;(), barrier_kind kind=barrier_kind::nowait_data_only, deadline d=deadline()) noexcept</div><div class="ttdoc">Issue a write reordering barrier such that writes preceding the barrier will reach storage before wri...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:376</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_ad17b8879c355d86174187f198b70baaa"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#ad17b8879c355d86174187f198b70baaa">llfio_v2_xxx::io_handle::_do_allocate_registered_buffer</a></div><div class="ttdeci">virtual result&lt; registered_buffer_type &gt; _do_allocate_registered_buffer(size_t &amp;bytes) noexcept</div><div class="ttdoc">The virtualised implementation of allocate_registered_buffer() used if no multiplexer has been set.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:1004</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_ad17b8879c355d86174187f198b70baaa"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#ad17b8879c355d86174187f198b70baaa">llfio_v2_xxx::io_handle::_do_allocate_registered_buffer</a></div><div class="ttdeci">virtual result&lt; registered_buffer_type &gt; _do_allocate_registered_buffer(size_t &amp;bytes) noexcept</div><div class="ttdoc">The virtualised implementation of allocate_registered_buffer() used if no multiplexer has been set.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:1008</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a4379e3f84b913f606bb2ec6a194d4380"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a4379e3f84b913f606bb2ec6a194d4380">llfio_v2_xxx::io_handle::_do_read</a></div><div class="ttdeci">virtual io_result&lt; buffers_type &gt; _do_read(io_request&lt; buffers_type &gt; reqs, deadline d) noexcept</div><div class="ttdoc">The virtualised implementation of read() used if no multiplexer has been set.</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__multiplexer_html_a00bf4ea26d854a7e8c9734f357d417f3"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__multiplexer.html#a00bf4ea26d854a7e8c9734f357d417f3">llfio_v2_xxx::io_multiplexer::construct</a></div><div class="ttdeci">virtual io_operation_state * construct(span&lt; byte &gt; storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &amp;&amp;b, deadline d, io_request&lt; buffers_type &gt; reqs) noexcept=0</div><div class="ttdoc">Constructs either a unsynchronised_io_operation_state or a synchronised_io_operation_state for a read...</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__multiplexer_html_a1cc4f56ad15d1bed49d68c56a278ad0c"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__multiplexer.html#a1cc4f56ad15d1bed49d68c56a278ad0c">llfio_v2_xxx::io_multiplexer::do_io_handle_max_buffers</a></div><div class="ttdeci">virtual size_t do_io_handle_max_buffers(const io_handle *h) const noexcept</div><div class="ttdoc">Implements io_handle::max_buffers()</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:504</div></div>
