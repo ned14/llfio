@@ -708,6 +708,10 @@ public:
    */
   static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC cache_statistics trim_cache(std::chrono::steady_clock::time_point older_than = {},
                                                                      size_t max_items = (size_t) -1) noexcept;
+  /*! Disable the map handle cache, returning its previous setting. Note that you may also
+  wish to explicitly trim the cache.
+  */
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool set_cache_disabled(bool disabled) noexcept;
 
   //! The memory section this handle is using
   section_handle *section() const noexcept { return _section; }

@@ -53,10 +53,10 @@ namespace detail
   };
   struct map_handle_cache_base_t
   {
-    std::mutex lock;
+    mutable std::mutex lock;
     size_t trie_count{0};
     map_handle_cache_item_t *trie_children[8 * sizeof(size_t)];
-    bool trie_nobbledir{0};
+    bool trie_nobbledir{0}, disabled{false};
     size_t bytes_in_cache{0}, hits{0}, misses{0};
   };
   static const size_t page_size_shift = [] { return QUICKCPPLIB_NAMESPACE::algorithm::bitwise_trie::detail::bitscanr(utils::page_size()); }();
@@ -71,6 +71,12 @@ namespace detail
 #endif
 
     ~map_handle_cache_t() { trim_cache(std::chrono::steady_clock::now(), (size_t) -1); }
+
+    bool is_disabled() const noexcept
+    {
+      _lock_guard g(lock);
+      return _base::disabled;
+    }
 
     using _base::size;
     void *get(size_t bytes, size_t page_size)
@@ -157,6 +163,13 @@ namespace detail
       ret.misses = _base::misses;
       return ret;
     }
+    bool set_cache_disabled(bool v)
+    {
+      _lock_guard g(lock);
+      bool ret = _base::disabled;
+      _base::disabled = v;
+      return ret;
+    }
   };
   extern inline QUICKCPPLIB_SYMBOL_EXPORT map_handle_cache_t &map_handle_cache()
   {
@@ -171,12 +184,17 @@ result<map_handle> map_handle::_recycled_map(size_type bytes, section_handle::fl
   {
     return errc::argument_out_of_domain;
   }
+  auto &c = detail::map_handle_cache();
+  if(c.is_disabled())
+  {
+    return _new_map(bytes, false, _flag);
+  }
   result<map_handle> ret(map_handle(nullptr, _flag));
   native_handle_type &nativeh = ret.value()._v;
   OUTCOME_TRY(auto &&pagesize, detail::pagesize_from_flags(ret.value()._flag));
   bytes = utils::round_up_to_page_size(bytes, pagesize);
   LLFIO_LOG_FUNCTION_CALL(&ret);
-  void *addr = detail::map_handle_cache().get(bytes, pagesize);
+  void *addr = c.get(bytes, pagesize);
   if(addr == nullptr)
   {
     return _new_map(bytes, false, _flag);
@@ -233,6 +251,10 @@ bool map_handle::_recycle_map() noexcept
   {
     LLFIO_LOG_FUNCTION_CALL(this);
     auto &c = detail::map_handle_cache();
+    if(c.is_disabled())
+    {
+      return false;
+    }
 #ifdef _WIN32
     if(!win32_release_nonfile_allocations(_addr, _length, MEM_DECOMMIT))
     {
@@ -254,7 +276,7 @@ bool map_handle::_recycle_map() noexcept
       if(c.do_not_store_failed_count.load(std::memory_order_relaxed) < 10)
       {
         auto r = do_not_store({_addr, _length});
-        if(!r)
+        if(!r || r.assume_value().size() == 0)
         {
           c.do_not_store_failed_count.fetch_add(1, std::memory_order_relaxed);
         }
@@ -275,5 +297,9 @@ map_handle::cache_statistics map_handle::trim_cache(std::chrono::steady_clock::t
   return detail::map_handle_cache().trim_cache(older_than, max_items);
 }
 
+bool map_handle::set_cache_disabled(bool disabled) noexcept
+{
+  return detail::map_handle_cache().set_cache_disabled(disabled);
+}
 
 LLFIO_V2_NAMESPACE_END
