@@ -70,7 +70,7 @@ namespace detail
     std::atomic<unsigned> do_not_store_failed_count{0};
 #endif
 
-    ~map_handle_cache_t() { trim_cache(std::chrono::steady_clock::now(), (size_t)-1); }
+    ~map_handle_cache_t() { trim_cache(std::chrono::steady_clock::now(), (size_t) -1); }
 
     using _base::size;
     void *get(size_t bytes, size_t page_size)
@@ -131,7 +131,8 @@ namespace detail
             if(-1 == ::munmap(p->addr, _bytes))
 #endif
             {
-              // fprintf(stderr, "munmap failed with %s. addr was %p bytes was %zu. page_size_shift was %zu\n", strerror(errno), p->addr, _bytes, page_size_shift);
+              // fprintf(stderr, "munmap failed with %s. addr was %p bytes was %zu. page_size_shift was %zu\n", strerror(errno), p->addr, _bytes,
+              // page_size_shift);
               LLFIO_LOG_FATAL(nullptr,
                               "FATAL: map_handle cache failed to trim a map! If on Linux, you may have exceeded the "
                               "64k VMA process limit, set the LLFIO_DEBUG_LINUX_MUNMAP macro at the top of posix/map_handle.ipp to cause dumping of VMAs to "
@@ -238,16 +239,18 @@ bool map_handle::_recycle_map() noexcept
       return false;
     }
 #else
+#ifdef __linux__
     if(memory_accounting() == memory_accounting_kind::commit_charge)
+#endif
     {
       if(!do_mmap(_v, _addr, MAP_FIXED, nullptr, _pagesize, _length, 0, section_handle::flag::none | section_handle::flag::nocommit))
       {
         return false;
       }
     }
+#ifdef __linux__
     else
     {
-#ifdef __linux__
       if(c.do_not_store_failed_count.load(std::memory_order_relaxed) < 10)
       {
         auto r = do_not_store({_addr, _length});
@@ -256,8 +259,8 @@ bool map_handle::_recycle_map() noexcept
           c.do_not_store_failed_count.fetch_add(1, std::memory_order_relaxed);
         }
       }
-#endif
     }
+#endif
 #endif
     return c.add(_reservation, _pagesize, _addr);
   }

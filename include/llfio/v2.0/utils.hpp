@@ -253,8 +253,10 @@ namespace utils
   `process_memory_usage::want::private_committed_inaccurate` can yield significant
   performance gains. If you set `process_memory_usage::want::private_committed_inaccurate`,
   we use `/proc/pid/smaps_rollup` and `/proc/pid/maps` to calculate the results. This
-  cannot distinguish between regions with the accounted
-  flag enabled or disabled. By default, this fast path is enabled.
+  cannot distinguish between regions with the accounted flag enabled or disabled, and
+  be aware that glibc's `malloc()` for some inexplicable reason doesn't set the
+  accounted flag on regions it commits, so the inaccurate flag will always yield
+  higher numbers for private commited on Linux. By default, this fast path is enabled.
 
   \note `/proc/pid/smaps_rollup` was added in Linux kernel 3.16, so the default specifying
   `process_memory_usage::want::private_committed_inaccurate` will always fail on Linux

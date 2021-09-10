@@ -459,15 +459,15 @@ namespace utils
           // std::cerr << "Anon entries:";
           for(auto &i : anon_entries)
           {
-            OUTCOME_TRY(auto &&size, parse(i, "\nSize:"));
-            OUTCOME_TRY(auto &&rss, parse(i, "\nRss:"));
-            OUTCOME_TRY(auto &&anonymous, parse(i, "\nAnonymous:"));
-            OUTCOME_TRY(auto &&lazyfree, parse(i, "\nLazyFree:"));
+            OUTCOME_TRY(auto &&size, parse(i, "\nSize:"));            // amount committed
+            OUTCOME_TRY(auto &&rss, parse(i, "\nRss:"));              // amount paged in
+            OUTCOME_TRY(auto &&anonymous, parse(i, "\nAnonymous:"));  // amount actually dirtied
+            OUTCOME_TRY(auto &&lazyfree, parse(i, "\nLazyFree:"));    // amount "decommitted" on Linux to avoid a VMA split
             if(size != (uint64_t) -1 && rss != (uint64_t) -1 && anonymous != (uint64_t) -1)
             {
               ret.total_address_space_in_use += size;
               ret.total_address_space_paged_in += rss;
-              ret.private_committed += anonymous;
+              ret.private_committed += size;
               if(lazyfree != (uint64_t) -1)
               {
                 ret.total_address_space_paged_in -= lazyfree;
