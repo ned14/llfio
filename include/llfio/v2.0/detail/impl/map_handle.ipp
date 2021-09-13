@@ -171,7 +171,7 @@ namespace detail
       return ret;
     }
   };
-  extern inline QUICKCPPLIB_SYMBOL_EXPORT map_handle_cache_t &map_handle_cache()
+  extern inline LLFIO_DECL map_handle_cache_t &map_handle_cache()
   {
     static map_handle_cache_t v;
     return v;
