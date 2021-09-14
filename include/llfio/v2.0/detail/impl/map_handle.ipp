@@ -171,10 +171,10 @@ namespace detail
       return ret;
     }
   };
-  extern inline QUICKCPPLIB_SYMBOL_EXPORT map_handle_cache_t &map_handle_cache()
+  extern inline QUICKCPPLIB_SYMBOL_VISIBLE map_handle_cache_t *map_handle_cache()
   {
-    static map_handle_cache_t v;
-    return v;
+    static auto v = std::make_unique<map_handle_cache_t>();
+    return v.get();
   }
 }  // namespace detail
 
@@ -184,8 +184,8 @@ result<map_handle> map_handle::_recycled_map(size_type bytes, section_handle::fl
   {
     return errc::argument_out_of_domain;
   }
-  auto &c = detail::map_handle_cache();
-  if(c.is_disabled())
+  auto *c = detail::map_handle_cache();
+  if(c == nullptr || c->is_disabled())
   {
     return _new_map(bytes, false, _flag);
   }
@@ -194,7 +194,7 @@ result<map_handle> map_handle::_recycled_map(size_type bytes, section_handle::fl
   OUTCOME_TRY(auto &&pagesize, detail::pagesize_from_flags(ret.value()._flag));
   bytes = utils::round_up_to_page_size(bytes, pagesize);
   LLFIO_LOG_FUNCTION_CALL(&ret);
-  void *addr = c.get(bytes, pagesize);
+  void *addr = c->get(bytes, pagesize);
   if(addr == nullptr)
   {
     return _new_map(bytes, false, _flag);
@@ -250,8 +250,8 @@ bool map_handle::_recycle_map() noexcept
   try
   {
     LLFIO_LOG_FUNCTION_CALL(this);
-    auto &c = detail::map_handle_cache();
-    if(c.is_disabled())
+    auto *c = detail::map_handle_cache();
+    if(c == nullptr || c->is_disabled())
     {
       return false;
     }
@@ -284,7 +284,7 @@ bool map_handle::_recycle_map() noexcept
     }
 #endif
 #endif
-    return c.add(_reservation, _pagesize, _addr);
+    return c->add(_reservation, _pagesize, _addr);
   }
   catch(...)
   {
@@ -294,12 +294,14 @@ bool map_handle::_recycle_map() noexcept
 
 map_handle::cache_statistics map_handle::trim_cache(std::chrono::steady_clock::time_point older_than, size_t max_items) noexcept
 {
-  return detail::map_handle_cache().trim_cache(older_than, max_items);
+  auto *c = detail::map_handle_cache();
+  return (c != nullptr) ? c->trim_cache(older_than, max_items) : cache_statistics{};
 }
 
 bool map_handle::set_cache_disabled(bool disabled) noexcept
 {
-  return detail::map_handle_cache().set_cache_disabled(disabled);
+  auto *c = detail::map_handle_cache();
+  return (c != nullptr) ? set_cache_disabled(disabled) : true;
 }
 
 LLFIO_V2_NAMESPACE_END
