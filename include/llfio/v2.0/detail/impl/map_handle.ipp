@@ -273,12 +273,12 @@ bool map_handle::_recycle_map() noexcept
 #ifdef __linux__
     else
     {
-      if(c.do_not_store_failed_count.load(std::memory_order_relaxed) < 10)
+      if(c->do_not_store_failed_count.load(std::memory_order_relaxed) < 10)
       {
         auto r = do_not_store({_addr, _length});
         if(!r || r.assume_value().size() == 0)
         {
-          c.do_not_store_failed_count.fetch_add(1, std::memory_order_relaxed);
+          c->do_not_store_failed_count.fetch_add(1, std::memory_order_relaxed);
         }
       }
     }
