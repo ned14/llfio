@@ -173,8 +173,24 @@ namespace detail
   };
   extern inline QUICKCPPLIB_SYMBOL_VISIBLE map_handle_cache_t *map_handle_cache()
   {
-    static auto v = std::make_unique<map_handle_cache_t>();
-    return v.get();
+    static struct _
+    {
+      map_handle_cache_t *v;
+      _()
+          : v(new map_handle_cache_t)
+      {
+      }
+      ~_()
+      {
+        if(v != nullptr)
+        {
+          auto *r = v;
+          *(volatile map_handle_cache_t **) &v = nullptr;
+          delete r;
+        }
+      }
+    } v;
+    return v.v;
   }
 }  // namespace detail
 
