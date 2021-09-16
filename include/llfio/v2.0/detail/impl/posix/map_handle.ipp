@@ -156,10 +156,10 @@ map_handle::~map_handle()
     auto ret = map_handle::close();
     if(ret.has_error())
     {
-      LLFIO_LOG_FATAL(_v.fd,
-                      "FATAL: map_handle::~map_handle() close failed. Cause is typically other code modifying mapped regions. If on Linux, you may have exceeded the "
-                      "64k VMA process limit, set the LLFIO_DEBUG_LINUX_MUNMAP macro at the top of posix/map_handle.ipp to cause dumping of VMAs to "
-                      "/tmp/llfio_unmap_debug_smaps.txt, and combine with strace to figure it out.");
+      LLFIO_LOG_FATAL(
+      _v.fd, "FATAL: map_handle::~map_handle() close failed. Cause is typically other code modifying mapped regions. If on Linux, you may have exceeded the "
+             "64k VMA process limit, set the LLFIO_DEBUG_LINUX_MUNMAP macro at the top of posix/map_handle.ipp to cause dumping of VMAs to "
+             "/tmp/llfio_unmap_debug_smaps.txt, and combine with strace to figure it out.");
       abort();
     }
   }
@@ -313,17 +313,31 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
     prot |= PROT_READ | PROT_WRITE;
     flags &= ~MAP_SHARED;
     flags |= MAP_PRIVATE;
-    nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
+    if((nativeh.behaviour &
+        (native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable)) !=
+       (native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable))
+    {
+      nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
+    }
   }
   else if(_flag & section_handle::flag::write)
   {
     prot = (_flag & section_handle::flag::write_via_syscall) ? PROT_READ : (PROT_READ | PROT_WRITE);
-    nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
+    if((nativeh.behaviour &
+        (native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable)) !=
+       (native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable))
+    {
+      nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
+    }
   }
   else if(_flag & section_handle::flag::read)
   {
     prot |= PROT_READ;
-    nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable;
+    if((nativeh.behaviour & (native_handle_type::disposition::seekable | native_handle_type::disposition::readable)) !=
+       (native_handle_type::disposition::seekable | native_handle_type::disposition::readable))
+    {
+      nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable;
+    }
   }
   if(_flag & section_handle::flag::execute)
   {
