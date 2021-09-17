@@ -317,7 +317,7 @@ map_handle::cache_statistics map_handle::trim_cache(std::chrono::steady_clock::t
 bool map_handle::set_cache_disabled(bool disabled) noexcept
 {
   auto *c = detail::map_handle_cache();
-  return (c != nullptr) ? set_cache_disabled(disabled) : true;
+  return (c != nullptr) ? c->set_cache_disabled(disabled) : true;
 }
 
 LLFIO_V2_NAMESPACE_END
