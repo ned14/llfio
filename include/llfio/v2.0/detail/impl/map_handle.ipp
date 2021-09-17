@@ -59,7 +59,11 @@ namespace detail
     bool trie_nobbledir{0}, disabled{false};
     size_t bytes_in_cache{0}, hits{0}, misses{0};
   };
-  static const size_t page_size_shift = [] { return QUICKCPPLIB_NAMESPACE::algorithm::bitwise_trie::detail::bitscanr(utils::page_size()); }();
+  inline size_t page_size_shift()
+  {
+    static size_t v = [] { return QUICKCPPLIB_NAMESPACE::algorithm::bitwise_trie::detail::bitscanr(utils::page_size()); }();
+    return v;
+  }
   class map_handle_cache_t : protected QUICKCPPLIB_NAMESPACE::algorithm::bitwise_trie::bitwise_trie<map_handle_cache_base_t, map_handle_cache_item_t>
   {
     using _base = QUICKCPPLIB_NAMESPACE::algorithm::bitwise_trie::bitwise_trie<map_handle_cache_base_t, map_handle_cache_item_t>;
@@ -81,7 +85,7 @@ namespace detail
     using _base::size;
     void *get(size_t bytes, size_t page_size)
     {
-      const auto _bytes = bytes >> page_size_shift;
+      const auto _bytes = bytes >> page_size_shift();
       _lock_guard g(lock);
       // TODO: Consider finding slightly bigger, and returning a length shorter than reservation?
       auto it = _base::find(_bytes);
@@ -97,7 +101,8 @@ namespace detail
       auto *p = *it;
       _base::erase(it);
       _base::bytes_in_cache -= bytes;
-      assert(bytes == p->trie_key << page_size_shift);
+      assert(bytes == p->trie_key << page_size_shift());
+      // std::cout << "map_handle::get(" << p->addr << ", " << bytes << "). Index item was " << p << std::endl;
       g.unlock();
       void *ret = p->addr;
       delete p;
@@ -105,13 +110,14 @@ namespace detail
     }
     bool add(size_t bytes, size_t page_size, void *addr)
     {
-      const auto _bytes = bytes >> page_size_shift;
+      const auto _bytes = bytes >> page_size_shift();
       if(_bytes == 0)
       {
         return false;
       }
       auto *p = new map_handle_cache_item_t(_bytes, page_size, addr);
       _lock_guard g(lock);
+      // std::cout << "map_handle::add(" << addr << ", " << bytes << "). Index item was " << p << ". Trie key is " << _bytes << std::endl;
       _base::insert(p);
       _base::bytes_in_cache += bytes;
       return true;
@@ -130,7 +136,8 @@ namespace detail
           {
             auto *p = *it;
             _base::erase(it--);
-            const auto _bytes = p->trie_key << page_size_shift;
+            const auto _bytes = p->trie_key << page_size_shift();
+            // std::cout << "map_handle::trim_cache(" << p->addr << ", " << _bytes << "). Index item was " << p << ". Trie key is " << p->trie_key << std::endl;
 #ifdef _WIN32
             if(!win32_release_nonfile_allocations((byte *) p->addr, _bytes, MEM_RELEASE))
 #else
@@ -184,9 +191,11 @@ namespace detail
       {
         if(v != nullptr)
         {
+          // std::cout << "map_handle_cache static deinit begin" << std::endl;
           auto *r = v;
           *(volatile map_handle_cache_t **) &v = nullptr;
           delete r;
+          // std::cout << "map_handle_cache static deinit complete" << std::endl;
         }
       }
     } v;
@@ -201,7 +210,7 @@ result<map_handle> map_handle::_recycled_map(size_type bytes, section_handle::fl
     return errc::argument_out_of_domain;
   }
   auto *c = detail::map_handle_cache();
-  if(c == nullptr || c->is_disabled())
+  if(c == nullptr || c->is_disabled() || bytes >= (1ULL << 30U) /*1Gb*/)
   {
     return _new_map(bytes, false, _flag);
   }
@@ -267,7 +276,7 @@ bool map_handle::_recycle_map() noexcept
   {
     LLFIO_LOG_FUNCTION_CALL(this);
     auto *c = detail::map_handle_cache();
-    if(c == nullptr || c->is_disabled())
+    if(c == nullptr || c->is_disabled() || _reservation >= (1ULL << 30U) /*1Gb*/)
     {
       return false;
     }
