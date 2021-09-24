@@ -227,7 +227,7 @@ protected:
     assert(_mh.native_handle()._init == native_handle()._init);
     if(!!(_sh.section_flags() & section_handle::flag::write_via_syscall))
     {
-      const auto batch = max_buffers();
+      const auto batch = file_handle::_do_max_buffers();
       io_request<const_buffers_type> thisreq(reqs);
       LLFIO_DEADLINE_TO_SLEEP_INIT(d);
       for(size_t n = 0; n < reqs.buffers.size();)
@@ -235,6 +235,11 @@ protected:
         deadline nd;
         LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
         thisreq.buffers = reqs.buffers.subspan(n, std::min(batch, reqs.buffers.size() - n));
+        if(thisreq.buffers.size() == 1 && thisreq.buffers.front().size() == 0)
+        {
+          n++;
+          continue;
+        }
         OUTCOME_TRY(auto &&written, file_handle::_do_write(thisreq, nd));
         if(written.empty())
         {

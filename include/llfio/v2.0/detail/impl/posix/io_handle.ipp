@@ -52,7 +52,7 @@ size_t io_handle::_do_max_buffers() const noexcept
     v = 1;
 #else
     long r = sysconf(_SC_IOV_MAX);
-    if(r == -1)
+    if(r < 1)
     {
 #ifdef IOV_MAX
       r = IOV_MAX;
