@@ -1000,7 +1000,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_write(io_r
   byte *addr = _addr + reqs.offset;
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
   if(QUICKCPPLIB_NAMESPACE::signal_guard::signal_guard(
-     QUICKCPPLIB_NAMESPACE::signal_guard::signalc_set::undefined_memory_access,
+     QUICKCPPLIB_NAMESPACE::signal_guard::signalc_set::undefined_memory_access | QUICKCPPLIB_NAMESPACE::signal_guard::signalc_set::segmentation_fault,
      [&] {
        for(size_t i = 0; i < reqs.buffers.size(); i++)
        {
