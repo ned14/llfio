@@ -63,7 +63,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> symlink_handle::_create_symlink(con
       end_utc = d.to_time_point();
     }
   }
-  path_view::c_str<> zpath(target, path_view::zero_terminated);
+  path_view::zero_terminated_rendered_path<> zpath(target);
   try
   {
     if(atomic_replace)

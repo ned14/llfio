@@ -71,7 +71,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
     ntflags |= 0x040 /*FILE_NON_DIRECTORY_FILE*/;  // do not open a directory
     IO_STATUS_BLOCK isb = make_iostatus();
 
-    path_view::c_str<> zpath(path, path_view::not_zero_terminated);
+    path_view::not_zero_terminated_rendered_path<> zpath(path);
     UNICODE_STRING _path{};
     _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
     _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
@@ -139,7 +139,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
       creation = CREATE_ALWAYS;
       break;
     }
-    path_view::c_str<> zpath(path, path_view::zero_terminated);
+    path_view::zero_terminated_rendered_path<> zpath(path);
     if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.buffer, access, fileshare, nullptr, creation, attribs, nullptr)))  // NOLINT
     {
       DWORD errcode = GetLastError();
