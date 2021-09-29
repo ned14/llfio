@@ -130,9 +130,9 @@ static inline void TestPathView()
   BOOST_CHECK(0 == llfio::path_view("/").without_trailing_separator().compare<>("/"));
 #ifndef _WIN32
   // cstr
-  llfio::path_view::c_str<> g(e, llfio::path_view::zero_terminated);
+  llfio::path_view::zero_terminated_rendered_path<> g(e);
   BOOST_CHECK(g.buffer != p);  // NOLINT
-  llfio::path_view::c_str<> h(f, llfio::path_view::zero_terminated);
+  llfio::path_view::zero_terminated_rendered_path<> h(f);
   BOOST_CHECK(h.buffer == p + 70);  // NOLINT
 #endif
   CheckPathView("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir");
@@ -180,11 +180,11 @@ static inline void TestPathView()
 #endif
   BOOST_CHECK(0 == h.compare<>("0"));
   // cstr
-  llfio::path_view::c_str<> i(g, llfio::path_view::zero_terminated);
+  llfio::path_view::zero_terminated_rendered_path<> i(g);
   BOOST_CHECK(i.buffer != p2);
-  llfio::path_view::c_str<> j(g, llfio::path_view::not_zero_terminated);
+  llfio::path_view::not_zero_terminated_rendered_path<> j(g);
   BOOST_CHECK(j.buffer == p2);
-  llfio::path_view::c_str<> k(h, llfio::path_view::not_zero_terminated);
+  llfio::path_view::not_zero_terminated_rendered_path<> k(h);
   BOOST_CHECK(k.buffer == p2 + 70);
 
   CheckPathView(L"\\");
@@ -253,7 +253,7 @@ static inline void TestPathView()
       void operator()(char * /*unused*/) const { called++; }
     } deleter{5};
     llfio::path_view v("foo", 3, llfio::path_view::not_zero_terminated);
-    llfio::path_view::c_str<char, custom_delete, 0> zbuff(v, llfio::path_view::zero_terminated, allocator, deleter);
+    llfio::path_view::zero_terminated_rendered_path<char, custom_delete, 0> zbuff(v, allocator, deleter);
     zbuff.reset();
     BOOST_CHECK(allocator.called == 1);  // copy must not be taken
     BOOST_CHECK(deleter.called == 0);    // copy must be taken
@@ -275,7 +275,7 @@ static inline void TestPathView()
       bool do_is_equal(const llfio::pmr::memory_resource & /*unused*/) const noexcept override { return false; }
     } resource;
     llfio::path_view v("foo", 3, llfio::path_view::not_zero_terminated);
-    llfio::path_view::c_str<char, std::default_delete<char[]>, 0> zbuff(v, llfio::path_view::zero_terminated, resource);
+    llfio::path_view::zero_terminated_rendered_path<char, std::default_delete<char[]>, 0> zbuff(v, resource);
     zbuff.reset();
     BOOST_CHECK(resource.allocated == 1);
     BOOST_CHECK(resource.deleted == 1);
@@ -297,7 +297,7 @@ static inline void TestPathView()
       void deallocate(void * /*unused*/, size_t /*unused*/) { deleted++; }
     } allocator{5};
     llfio::path_view v("foo", 3, llfio::path_view::not_zero_terminated);
-    llfio::path_view::c_str<char, custom_allocator, 0> zbuff(v, llfio::path_view::zero_terminated, allocator);
+    llfio::path_view::zero_terminated_rendered_path<char, custom_allocator, 0> zbuff(v, allocator);
     zbuff.reset();
     BOOST_CHECK(allocator.allocated == 0);  // copy must be taken
     BOOST_CHECK(allocator.deleted == 0);    // copy must be taken
@@ -321,7 +321,7 @@ static inline void TestPathView()
       void deallocate(void * /*unused*/, size_t /*unused*/) { deleted++; }
     } allocator{5};
     llfio::path_view v("foo", 3, llfio::path_view::not_zero_terminated);
-    llfio::path_view::c_str<char, custom_allocator, 0> zbuff(v, llfio::path_view::zero_terminated);
+    llfio::path_view::zero_terminated_rendered_path<char, custom_allocator, 0> zbuff(v);
     zbuff.reset();
     BOOST_CHECK(allocator.allocated == 0);  // copy must be taken
     BOOST_CHECK(allocator.deleted == 0);    // copy must be taken

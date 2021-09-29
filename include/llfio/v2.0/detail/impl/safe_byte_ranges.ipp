@@ -379,7 +379,7 @@ namespace algorithm
       {
         try
         {
-          path_view::c_str<> zpath(lockfile, path_view::zero_terminated);
+          path_view::zero_terminated_rendered_path<> zpath(lockfile);
           struct stat s
           {
           };

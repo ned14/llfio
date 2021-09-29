@@ -83,7 +83,7 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
 
       DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
       IO_STATUS_BLOCK isb = make_iostatus();
-      path_view::c_str<> zpath(filename, path_view::not_zero_terminated);
+      path_view::not_zero_terminated_rendered_path<> zpath(filename);
       UNICODE_STRING _path{};
       _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
       _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
@@ -139,7 +139,7 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
   // If the target is a win32 path, we need to convert to NT path and call ourselves
   if(!base.is_valid() && !path.is_ntpath())
   {
-    path_view::c_str<> zpath(path, path_view::zero_terminated);
+    path_view::zero_terminated_rendered_path<> zpath(path);
     UNICODE_STRING NtPath{};
     if(RtlDosPathNameToNtPathName_U(zpath.buffer, &NtPath, nullptr, nullptr) == 0u)
     {
@@ -188,7 +188,7 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
     duph = h.native_handle().h;
   }
 
-  path_view::c_str<> zpath(path, path_view::not_zero_terminated);
+  path_view::not_zero_terminated_rendered_path<> zpath(path);
   UNICODE_STRING _path{};
   _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
   _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
@@ -227,7 +227,7 @@ result<void> fs_handle::link(const path_handle &base, path_view_type path, deadl
   // If the target is a win32 path, we need to convert to NT path and call ourselves
   if(!base.is_valid() && !path.is_ntpath())
   {
-    path_view::c_str<> zpath(path, path_view::zero_terminated);
+    path_view::zero_terminated_rendered_path<> zpath(path);
     UNICODE_STRING NtPath{};
     if(RtlDosPathNameToNtPathName_U(zpath.buffer, &NtPath, nullptr, nullptr) == 0u)
     {
@@ -245,7 +245,7 @@ result<void> fs_handle::link(const path_handle &base, path_view_type path, deadl
 
   HANDLE duph = h.native_handle().h;
 
-  path_view::c_str<> zpath(path, path_view::not_zero_terminated);
+  path_view::not_zero_terminated_rendered_path<> zpath(path);
   UNICODE_STRING _path{};
   _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
   _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);

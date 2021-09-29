@@ -32,7 +32,7 @@ result<bool> path_handle::exists(path_view_type path) const noexcept {
   try
   {
     LLFIO_LOG_FUNCTION_CALL(this);
-    path_view::c_str<> zpath(path, path_view::zero_terminated);
+    path_view::zero_terminated_rendered_path<> zpath(path);
     int x = ::faccessat(native_handle().fd, zpath.buffer, F_OK, AT_SYMLINK_NOFOLLOW);
     if(x < 0)
     {
@@ -66,7 +66,7 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
   // Linux provides this extension opening a super light weight fd to just an anchor on the filing system
   attribs |= O_PATH;
 #endif
-  path_view::c_str<> zpath(path, path_view::zero_terminated);
+  path_view::zero_terminated_rendered_path<> zpath(path);
   if(base.is_valid())
   {
     nativeh.fd = ::openat(base.native_handle().fd, zpath.buffer, attribs);
