@@ -229,18 +229,11 @@ public:
   };
 
   //! The zero termination to use
-#ifdef _MSC_VER
-  enum _msvc_zero_termination_enum
-#else
   enum zero_termination
-#endif
   {
     zero_terminated,      //!< The input is zero terminated, or requested output ought to be zero terminated.
     not_zero_terminated,  //!< The input is not zero terminated, or requested output ought to not be zero terminated.
   };
-#ifndef _MSC_VER
-  using _msvc_zero_termination_enum = zero_termination;
-#endif
 
   //! The default deleter to use
   template <class T> using default_rendered_path_deleter = std::default_delete<T>;
@@ -311,7 +304,7 @@ public:
   /*! Constructs from a lengthed array of one of `char`, `wchar_t`, `char8_t` or `char16_t`. The input
   string MUST continue to exist for this view to be valid.
   */
-  constexpr path_view_component(const char *b, size_t l, _msvc_zero_termination_enum zt, format fmt = binary_format) noexcept
+  constexpr path_view_component(const char *b, size_t l, enum zero_termination zt, format fmt = binary_format) noexcept
       : _charstr((l == 0) ? nullptr : b)
       , _length((l == 0) ? 0 : l)
       , _zero_terminated((l == 0) ? false : (zt == zero_terminated))
@@ -327,7 +320,7 @@ public:
   /*! Constructs from a lengthed array of one of `char`, `wchar_t`, `char8_t` or `char16_t`. The input
   string MUST continue to exist for this view to be valid.
   */
-  constexpr path_view_component(const wchar_t *b, size_t l, _msvc_zero_termination_enum zt, format fmt = binary_format) noexcept
+  constexpr path_view_component(const wchar_t *b, size_t l, enum zero_termination zt, format fmt = binary_format) noexcept
       : _wcharstr((l == 0) ? nullptr : b)
       , _length((l == 0) ? 0 : l)
       , _zero_terminated((l == 0) ? false : (zt == zero_terminated))
@@ -343,7 +336,7 @@ public:
   /*! Constructs from a lengthed array of one of `char`, `wchar_t`, `char8_t` or `char16_t`. The input
   string MUST continue to exist for this view to be valid.
   */
-  constexpr path_view_component(const char8_t *b, size_t l, _msvc_zero_termination_enum zt, format fmt = binary_format) noexcept
+  constexpr path_view_component(const char8_t *b, size_t l, enum zero_termination zt, format fmt = binary_format) noexcept
       : _char8str((l == 0) ? nullptr : b)
       , _length((l == 0) ? 0 : l)
       , _zero_terminated((l == 0) ? false : (zt == zero_terminated))
@@ -359,7 +352,7 @@ public:
   /*! Constructs from a lengthed array of one of `char`, `wchar_t`, `char8_t` or `char16_t`. The input
   string MUST continue to exist for this view to be valid.
   */
-  constexpr path_view_component(const char16_t *b, size_t l, _msvc_zero_termination_enum zt, format fmt = binary_format) noexcept
+  constexpr path_view_component(const char16_t *b, size_t l, enum zero_termination zt, format fmt = binary_format) noexcept
       : _char16str((l == 0) ? nullptr : b)
       , _length((l == 0) ? 0 : l)
       , _zero_terminated((l == 0) ? false : (zt == zero_terminated))
@@ -375,7 +368,7 @@ public:
   /*! Constructs from a lengthed array of `byte`. The input
   array MUST continue to exist for this view to be valid.
   */
-  constexpr path_view_component(const byte *b, size_t l, _msvc_zero_termination_enum zt) noexcept
+  constexpr path_view_component(const byte *b, size_t l, enum zero_termination zt) noexcept
       : _bytestr((l == 0) ? nullptr : b)
       , _length((l == 0) ? 0 : l)
       , _zero_terminated((l == 0) ? false : (zt == zero_terminated))
@@ -412,13 +405,13 @@ public:
   */
   LLFIO_TEMPLATE(class Char)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable<Char>))
-  constexpr path_view_component(basic_string_view<Char> v, _msvc_zero_termination_enum zt, format fmt = binary_format) noexcept
+  constexpr path_view_component(basic_string_view<Char> v, enum zero_termination zt, format fmt = binary_format) noexcept
       : path_view_component(v.data(), v.size(), zt, fmt)
   {
   }
   /*! Constructs from a `span<const byte>`.
    */
-  constexpr path_view_component(span<const byte> v, _msvc_zero_termination_enum zt) noexcept
+  constexpr path_view_component(span<const byte> v, enum zero_termination zt) noexcept
       : path_view_component(v.data(), v.size(), zt)
   {
   }
@@ -430,14 +423,14 @@ public:
   */
   LLFIO_TEMPLATE(class It, class End)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable<typename It::value_type>), LLFIO_TPRED(is_source_chartype_acceptable<typename End::value_type>))
-  constexpr path_view_component(It b, End e, _msvc_zero_termination_enum zt, format fmt = binary_format) noexcept
+  constexpr path_view_component(It b, End e, enum zero_termination zt, format fmt = binary_format) noexcept
       : path_view_component(addressof(*b), e - b, zt, fmt)
   {
   }
   //! \overload
   LLFIO_TEMPLATE(class It, class End)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable<std::decay_t<It>>), LLFIO_TPRED(is_source_chartype_acceptable<std::decay_t<End>>))
-  constexpr path_view_component(It *b, End *e, _msvc_zero_termination_enum zt, format fmt = binary_format) noexcept
+  constexpr path_view_component(It *b, End *e, enum zero_termination zt, format fmt = binary_format) noexcept
       : path_view_component(b, e - b, zt, fmt)
   {
   }
@@ -448,14 +441,14 @@ public:
   */
   LLFIO_TEMPLATE(class It, class End)
   LLFIO_TREQUIRES(LLFIO_TPRED(std::is_same<typename It::value_type, byte>::value), LLFIO_TPRED(std::is_same<typename End::value_type, byte>::value))
-  constexpr path_view_component(It b, End e, _msvc_zero_termination_enum zt) noexcept
+  constexpr path_view_component(It b, End e, enum zero_termination zt) noexcept
       : path_view_component(addressof(*b), e - b, zt, binary_format)
   {
   }
   //! \overload
   LLFIO_TEMPLATE(class It, class End)
   LLFIO_TREQUIRES(LLFIO_TPRED(std::is_same<std::decay_t<It>, byte>::value), LLFIO_TPRED(std::is_same<std::decay_t<End>, byte>::value))
-  constexpr path_view_component(It *b, End *e, _msvc_zero_termination_enum zt) noexcept
+  constexpr path_view_component(It *b, End *e, enum zero_termination zt) noexcept
       : path_view_component(b, e - b, zt, binary_format)
   {
   }
@@ -621,7 +614,7 @@ public:
   //! True if input is declared to be zero terminated
   constexpr bool has_zero_termination() const noexcept { return _zero_terminated; }
   //! The zero termination during construction
-  constexpr _msvc_zero_termination_enum zero_termination() const noexcept { return _zero_terminated ? zero_terminated : not_zero_terminated; }
+  constexpr enum zero_termination zero_termination() const noexcept { return _zero_terminated ? zero_terminated : not_zero_terminated; }
 
   //! True if `stem()` returns a non-empty path.
   LLFIO_PATH_VIEW_CONSTEXPR bool has_stem() const noexcept { return !stem().empty(); }
@@ -720,20 +713,20 @@ private:
   }
   // Identical source encodings compare lexiographically
   template <class DestT, class Deleter, size_t _internal_buffer_size, class CharT>
-  static int _compare(basic_string_view<CharT> a, _msvc_zero_termination_enum /*unused*/, basic_string_view<CharT> b, _msvc_zero_termination_enum /*unused*/,
+  static int _compare(basic_string_view<CharT> a, enum zero_termination /*unused*/, basic_string_view<CharT> b, enum zero_termination /*unused*/,
                       const std::locale * /*unused*/) noexcept
   {
     return a.compare(b);
   }
   // Disparate source encodings compare via rendered_path
   template <class DestT, class Deleter, size_t _internal_buffer_size, class Char1T, class Char2T>
-  static int _compare(basic_string_view<Char1T> a, _msvc_zero_termination_enum a_zt, basic_string_view<Char2T> b, _msvc_zero_termination_enum b_zt,
+  static int _compare(basic_string_view<Char1T> a, enum zero_termination a_zt, basic_string_view<Char2T> b, enum zero_termination b_zt,
                       const std::locale *loc) noexcept
   {
     path_view_component _a_(a.data(), a.size(), a_zt);
     path_view_component _b_(b.data(), b.size(), b_zt);
-    rendered_path<_msvc_zero_termination_enum::not_zero_terminated, DestT, Deleter, _internal_buffer_size> _a(_a_, loc);
-    rendered_path<_msvc_zero_termination_enum::not_zero_terminated, DestT, Deleter, _internal_buffer_size> _b(_b_, loc);
+    rendered_path<zero_termination::not_zero_terminated, DestT, Deleter, _internal_buffer_size> _a(_a_, loc);
+    rendered_path<zero_termination::not_zero_terminated, DestT, Deleter, _internal_buffer_size> _b(_b_, loc);
     if(_a.length < _b.length)
     {
       return -1;
@@ -811,6 +804,117 @@ public:
     });
   }
 
+private:
+  template <class T>
+  struct _rendered_path_base_
+  {
+  protected:
+    using _view_type = span<T>;
+    _view_type _ref;
+
+  public:
+    //! Type of the value type
+    using value_type = T;
+    //! Type of the pointer type
+    using pointer = T*;
+    //! Type of the const pointer type
+    using const_pointer = const T*;
+    //! Type of the reference type
+    using reference = T&;
+    //! Type of the const reference type
+    using const_reference=const T&;
+    //! Type of the iterator type
+    using iterator=typename _view_type::iterator;
+    //! Type of the const iterator type
+    using const_iterator = typename _view_type::const_iterator;
+    //! Type of the reverse iterator type
+    using reverse_iterator = typename _view_type::reverse_iterator;
+    //! Type of the const reverse iterator type
+    using const_reverse_iterator = typename _view_type::const_reverse_iterator;
+    //! Type of the size type
+    using size_type = typename _view_type::size_type;
+    //! Type of the difference type
+    using difference_type = typename _view_type::difference_type;
+
+    _rendered_path_base_() = default;
+    _rendered_path_base_(const _rendered_path_base_ &) = default;
+    _rendered_path_base_ &operator=(const _rendered_path_base_ &) = default;
+    ~_rendered_path_base_() = default;
+
+    //! Begin iteration
+    constexpr iterator begin() { return _ref.begin(); }
+    //! Begin iteration
+    constexpr const_iterator begin() const { return _ref.begin(); }
+    //! Begin iteration
+    constexpr const_iterator cbegin() const { return _ref.cbegin(); }
+    //! End iteration
+    constexpr iterator end() { return _ref.end(); }
+    //! End iteration
+    constexpr const_iterator end() const { return _ref.end(); }
+    //! End iteration
+    constexpr const_iterator cend() const { return _ref.cend(); }
+    //! Begin reverse iteration
+    constexpr reverse_iterator rbegin() { return _ref.rbegin(); }
+    //! Begin reverse iteration
+    constexpr const_reverse_iterator rbegin() const { return _ref.rbegin(); }
+    //! Begin reverse iteration
+    constexpr const_reverse_iterator crbegin() const { return _ref.crbegin(); }
+    //! End reverse iteration
+    constexpr reverse_iterator rend() { return _ref.rend(); }
+    //! End reverse iteration
+    constexpr const_reverse_iterator rend() const { return _ref.rend(); }
+    //! End reverse iteration
+    constexpr const_reverse_iterator crend() const { return _ref.crend(); }
+
+    //! Access
+    constexpr reference operator[](size_type idx) { return _ref[idx]; }
+    //! Access
+    constexpr const_reference operator[](size_type idx) const { return _ref[idx]; }
+    //! Access
+    constexpr reference at(size_type idx) { return _ref.at(idx); }
+    //! Access
+    constexpr const_reference at(size_type idx) const { return _ref.at(idx); }
+    //! Access
+    constexpr reference front() { return _ref.front(); }
+    //! Access
+    constexpr const_reference front() const { return _ref.front(); }
+    //! Access
+    constexpr reference back() { return _ref.back(); }
+    //! Access
+    constexpr const_reference back() const { return _ref.back(); }
+    //! Access
+    constexpr pointer data() { return _ref.data(); }
+    //! Access
+    constexpr const_pointer data() const { return _ref.data(); }
+    //! Size
+    constexpr size_type size() const { return _ref.size(); }
+    //! Size
+    constexpr size_type length() const { return _ref.length(); }
+    //! Max size
+    constexpr size_type max_size() const { return _ref.max_size(); }
+    //! Empty
+    QUICKCPPLIB_NODISCARD constexpr bool empty() const { return _ref.empty(); }
+    //! As span
+    constexpr _view_type as_span() const { return _ref; }
+  };
+  template <enum path_view_component::zero_termination ZeroTermination, class T, bool = false> struct _rendered_path_base : public _rendered_path_base_<T>
+  {
+    //! As string view
+    constexpr basic_string_view<T> as_string_view() const { return {this->_ref.data(), this->_ref.size()}; }
+  };
+  template <class T> struct _rendered_path_base<zero_terminated, T> : public _rendered_path_base_<T>
+  {
+    //! Return a zero-terminated character array suitable for use as a C string
+    constexpr const T *c_str() const noexcept { return this->_ref.data(); }
+  };
+  template <bool _> struct _rendered_path_base<zero_terminated, byte, _> : public _rendered_path_base_<byte>
+  {
+  };
+  template <bool _> struct _rendered_path_base<not_zero_terminated, byte, _> : public _rendered_path_base_<byte>
+  {
+  };
+
+public:
   /*! Instantiate from a `path_view_component` to get a path suitable for feeding to other code.
   \tparam T The destination encoding required.
   \tparam Deleter A custom deleter OR STL allocator for any temporary buffer.
@@ -832,28 +936,23 @@ public:
   `operator new[]`. You can use an externally supplied larger temporary buffer to avoid
   dynamic memory allocation in all situations.
   */
-  LLFIO_TEMPLATE(_msvc_zero_termination_enum ZeroTermination, class T = typename filesystem::path::value_type,
+  LLFIO_TEMPLATE(enum path_view_component::zero_termination ZeroTermination, class T = typename filesystem::path::value_type,
                  class AllocatorOrDeleter = default_rendered_path_deleter<T[]>, size_t _internal_buffer_size = default_internal_buffer_size)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>))
-  struct rendered_path
+  class rendered_path : public _rendered_path_base<ZeroTermination, T>
   {
+    using _base = _rendered_path_base<ZeroTermination, T>;
     static_assert(is_source_acceptable<T>, "path_view_component::rendered_path<T> does not have a T which is one of byte, char, wchar_t, char8_t nor char16_t");
     template <class DestT, class _Deleter, size_t _internal_buffer_size_, class Char1T, class Char2T>
-    friend int path_view_component::_compare(basic_string_view<Char1T> a, _msvc_zero_termination_enum a_zt, basic_string_view<Char2T> b,
-                                             _msvc_zero_termination_enum b_zt,
+    friend int path_view_component::_compare(basic_string_view<Char1T> a, enum zero_termination a_zt, basic_string_view<Char2T> b, enum zero_termination b_zt,
                                              const std::locale *loc) noexcept;
 
-    //! Type of the value type
-    using value_type = T;
+  public:
+    using value_type = typename _base::value_type;
     //! Type of the allocator, or `void` if that was not configured
     using allocator_type = decltype(detail::is_allocator(std::declval<AllocatorOrDeleter>()));
     //! Type of the deleter, or `void` if that was not configured
     using deleter_type = decltype(detail::is_deleter<value_type>(std::declval<AllocatorOrDeleter>()));
-
-    //! Pointer to the possibly-converted path
-    const value_type *buffer{nullptr};
-    //! Number of characters, excluding zero terminating char, at buffer
-    size_t length{0};
 
   private:
     template <class X = void> static constexpr bool _is_deleter_based = std::is_void<allocator_type>::value;
@@ -874,10 +973,9 @@ public:
       const bool needs_slash_translation = (filesystem::path::preferred_separator != '/') &&
                                            (view.formatting() == format::auto_format || view.formatting() == format::generic_format) &&
                                            view._invoke([](auto sv) { return sv.find('/') != _npos; });
-      length = view._length;
       if(!needs_slash_translation && (this->zero_termination() == not_zero_terminated || view._zero_terminated))
       {
-        buffer = source;
+        _base::_ref = {source, view._length};
       }
       else
       {
@@ -897,31 +995,26 @@ public:
           // Use the internal buffer
           memcpy(_buffer, source, required_bytes);
           _buffer[required_length] = 0;
-          buffer = _buffer;
+          _base::_ref = {_buffer, view._length};
         }
         else
         {
           auto *buffer_ = allocate(required_length);
-          if(nullptr == buffer_)
-          {
-            length = 0;
-          }
-          else
+          if(nullptr != buffer_)
           {
             _bytes_to_delete = required_bytes;
             memcpy(buffer_, source, required_bytes);
             buffer_[required_length] = 0;
-            buffer = buffer_;
+            _base::_ref = {_buffer, view._length};
           }
         }
         if(needs_slash_translation)
         {
-          basic_string_view<value_type> sv(buffer, required_length);
-          auto idx = sv.find('/');
+          auto idx = _base::_ref.find('/');
           while(idx != _npos)
           {
-            const_cast<value_type *>(buffer)[idx] = filesystem::path::preferred_separator;
-            idx = sv.find('/', idx);
+            const_cast<value_type *>(_base::ref.data())[idx] = filesystem::path::preferred_separator;
+            idx = _base::_ref.find('/', idx);
           }
         }
       }
@@ -939,14 +1032,12 @@ public:
       if(0 == view._length)
       {
         _buffer[0] = 0;
-        buffer = _buffer;
-        length = 0;
+        _base::_ref = {_buffer, 0};
         return;
       }
       if(std::is_same<T, byte>::value || view._passthrough)
       {
-        length = view._length;
-        buffer = (const value_type *) view._bytestr;
+        _base::_ref = {(const value_type *) view._bytestr, view._length};
         return;
       }
       if(std::is_same<T, char>::value && view._char)
@@ -1016,15 +1107,13 @@ public:
       if(0 == required_length)
       {
         // The internal buffer was sufficient.
-        buffer = _buffer;
-        length = end - _buffer;
+        _base::_ref = {_buffer, end-_buffer};
         return;
       }
       // The internal buffer is too small. Fall back to dynamic allocation. This may throw.
       auto *allocated_buffer = allocate(required_length);
       if(nullptr == allocated_buffer)
       {
-        length = 0;
         return;
       }
       _bytes_to_delete = required_length * sizeof(value_type);
@@ -1033,31 +1122,30 @@ public:
       end = allocated_buffer + (end - _buffer);
       if(view._passthrough)
       {
-        end = detail::reencode_path_to(length, end, required_length, view._bytestr, view._length, loc);
+        end = detail::reencode_path_to(view._length, end, required_length, view._bytestr, view._length, loc);
       }
       else if(view._char)
       {
-        end = detail::reencode_path_to(length, end, required_length, view._charstr, view._length, loc);
+        end = detail::reencode_path_to(view._length, end, required_length, view._charstr, view._length, loc);
       }
       else if(view._wchar)
       {
-        end = detail::reencode_path_to(length, end, required_length, view._wcharstr, view._length, loc);
+        end = detail::reencode_path_to(view._length, end, required_length, view._wcharstr, view._length, loc);
       }
       else if(view._utf8)
       {
-        end = detail::reencode_path_to(length, end, required_length, view._char8str, view._length, loc);
+        end = detail::reencode_path_to(view._length, end, required_length, view._char8str, view._length, loc);
       }
       else if(view._utf16)
       {
-        end = detail::reencode_path_to(length, end, required_length, view._char16str, view._length, loc);
+        end = detail::reencode_path_to(view._length, end, required_length, view._char16str, view._length, loc);
       }
       else
       {
         LLFIO_LOG_FATAL(nullptr, "path_view_component::cstr somehow sees no state!");
         abort();
       }
-      buffer = allocated_buffer;
-      length = end - buffer;
+      _base::_ref = {allocated_buffer, end - allocated_buffer};
     }
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -1222,8 +1310,7 @@ public:
     LLFIO_TREQUIRES(LLFIO_TPRED(!std::is_same<rendered_path, rendered_path<ZeroTermination, T, AllocatorOrDeleter2, _internal_buffer_size2>>::value),
                     LLFIO_TPRED(std::is_constructible<AllocatorOrDeleter, AllocatorOrDeleter2>::value))
     explicit rendered_path(rendered_path<ZeroTermination, T, AllocatorOrDeleter2, _internal_buffer_size2> &&o) noexcept
-        : buffer(o.buffer)
-        , length(o.length)
+        : _base(o)
         , _bytes_to_delete(o._bytes_to_delete)
         , _deleter1(o._deleter1)
         , _deleter1arg(o._deleter1arg)
@@ -1233,8 +1320,7 @@ public:
     ~rendered_path() { reset(); }
     rendered_path(const rendered_path &) = delete;
     rendered_path(rendered_path &&o) noexcept
-        : buffer(o.buffer)
-        , length(o.length)
+        : _base(o)
         , _bytes_to_delete(o._bytes_to_delete)
         , _deleter1(o._deleter1)
         , _deleter1arg(o._deleter1arg)
@@ -1245,13 +1331,13 @@ public:
         if(o.buffer == o._buffer)
         {
           memcpy(_buffer, o._buffer, (o.length + 1) * sizeof(value_type));
-          buffer = _buffer;
+          _base::_ref = {_buffer, _base::_ref.size()};
         }
         if(o._deleter1arg == &o._deleter2)
         {
           _deleter1arg = &_deleter2;
         }
-        o.buffer = nullptr;
+        o._ref = {};
         o._bytes_to_delete = 0;
         o._deleter1 = nullptr;
         o._deleter1arg = nullptr;
@@ -1274,9 +1360,8 @@ public:
     {
       if(_bytes_to_delete > 0)
       {
-        _deleter1(_deleter1arg, const_cast<value_type *>(buffer), _bytes_to_delete);
-        buffer = nullptr;
-        length = 0;
+        _deleter1(_deleter1arg, const_cast<value_type *>(_base::_ref.data()), _bytes_to_delete);
+        _base::_ref = {};
         _bytes_to_delete = 0;
       }
     }
@@ -1285,9 +1370,8 @@ public:
     {
       if(_bytes_to_delete > 0)
       {
-        auto *ret = buffer;
-        buffer = nullptr;
-        length = 0;
+        auto *ret = _base::_ref.data();
+        _base::_ref = {};
         _bytes_to_delete = 0;
         return ret;
       }
@@ -1295,7 +1379,7 @@ public:
     }
 
     //! The zero termination of this rendered path
-    static constexpr _msvc_zero_termination_enum zero_termination() noexcept { return ZeroTermination; }
+    static constexpr enum zero_termination zero_termination() noexcept { return ZeroTermination; }
     //! The size of the internal buffer
     static constexpr size_t internal_buffer_size() noexcept { return (_internal_buffer_size > 0) ? _internal_buffer_size : 1; }
 
@@ -1321,26 +1405,24 @@ public:
     // under optimisation if it can prove it is never used.
     value_type _buffer[internal_buffer_size()]{};
   };
-
-public:
   //! Convenience type alias
   template <class T = typename filesystem::path::value_type, class AllocatorOrDeleter = default_rendered_path_deleter<T[]>,
             size_t _internal_buffer_size = default_internal_buffer_size>
-  using zero_terminated_rendered_path = rendered_path<_msvc_zero_termination_enum::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>;
+  using zero_terminated_rendered_path = rendered_path<zero_termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>;
   //! Convenience type alias
   template <class T = typename filesystem::path::value_type, class AllocatorOrDeleter = default_rendered_path_deleter<T[]>,
             size_t _internal_buffer_size = default_internal_buffer_size>
-  using not_zero_terminated_rendered_path = rendered_path<_msvc_zero_termination_enum::not_zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>;
+  using not_zero_terminated_rendered_path = rendered_path<zero_termination::not_zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>;
 #ifdef __cpp_concepts
-  template <_msvc_zero_termination_enum ZeroTermination, class T, class Deleter, size_t _internal_buffer_size>
+  template <enum path_view_component::zero_termination ZeroTermination, class T, class Deleter, size_t _internal_buffer_size>
   requires(is_source_acceptable<T>)
 #elif defined(_MSC_VER)
-  template <_msvc_zero_termination_enum ZeroTermination, class T, class Deleter, size_t _internal_buffer_size, class>
+  template <enum path_view_component::zero_termination ZeroTermination, class T, class Deleter, size_t _internal_buffer_size, class>
 #else
-  template <_msvc_zero_termination_enum ZeroTermination, class T, class Deleter, size_t _internal_buffer_size,
+  template <enum path_view_component::zero_termination ZeroTermination, class T, class Deleter, size_t _internal_buffer_size,
             typename std::enable_if<(is_source_acceptable<T>), bool>::type>
 #endif
-  friend struct rendered_path;
+  friend class rendered_path;
 };
 static_assert(std::is_trivially_copyable<path_view_component>::value, "path_view_component is not trivially copyable!");
 static_assert(sizeof(path_view_component) == 3 * sizeof(void *), "path_view_component is not three pointers in size!");
@@ -1630,35 +1712,35 @@ public:
   /*! Constructs from a lengthed array of one of `char`, `wchar_t`, `char8_t` or `char16_t`. The input
   string MUST continue to exist for this view to be valid.
   */
-  constexpr path_view(const char *b, size_t l, _msvc_zero_termination_enum zt, format fmt = auto_format) noexcept
+  constexpr path_view(const char *b, size_t l, enum zero_termination zt, format fmt = auto_format) noexcept
       : path_view_component(b, l, zt, fmt)
   {
   }
   /*! Constructs from a lengthed array of one of `char`, `wchar_t`, `char8_t` or `char16_t`. The input
   string MUST continue to exist for this view to be valid.
   */
-  constexpr path_view(const wchar_t *b, size_t l, _msvc_zero_termination_enum zt, format fmt = auto_format) noexcept
+  constexpr path_view(const wchar_t *b, size_t l, enum zero_termination zt, format fmt = auto_format) noexcept
       : path_view_component(b, l, zt, fmt)
   {
   }
   /*! Constructs from a lengthed array of one of `char`, `wchar_t`, `char8_t` or `char16_t`. The input
   string MUST continue to exist for this view to be valid.
   */
-  constexpr path_view(const char8_t *b, size_t l, _msvc_zero_termination_enum zt, format fmt = auto_format) noexcept
+  constexpr path_view(const char8_t *b, size_t l, enum zero_termination zt, format fmt = auto_format) noexcept
       : path_view_component(b, l, zt, fmt)
   {
   }
   /*! Constructs from a lengthed array of one of `char`, `wchar_t`, `char8_t` or `char16_t`. The input
   string MUST continue to exist for this view to be valid.
   */
-  constexpr path_view(const char16_t *b, size_t l, _msvc_zero_termination_enum zt, format fmt = auto_format) noexcept
+  constexpr path_view(const char16_t *b, size_t l, enum zero_termination zt, format fmt = auto_format) noexcept
       : path_view_component(b, l, zt, fmt)
   {
   }
   /*! Constructs from a lengthed array of `byte`. The input
   array MUST continue to exist for this view to be valid.
   */
-  constexpr path_view(const byte *b, size_t l, _msvc_zero_termination_enum zt) noexcept
+  constexpr path_view(const byte *b, size_t l, enum zero_termination zt) noexcept
       : path_view_component(b, l, zt)
   {
   }
@@ -1686,13 +1768,13 @@ public:
   */
   LLFIO_TEMPLATE(class Char)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable<Char>))
-  constexpr path_view(basic_string_view<Char> v, _msvc_zero_termination_enum zt, format fmt = auto_format) noexcept
+  constexpr path_view(basic_string_view<Char> v, enum zero_termination zt, format fmt = auto_format) noexcept
       : path_view_component(v.data(), v.size(), zt, fmt)
   {
   }
   /*! Constructs from a `span<const byte>`.
    */
-  constexpr path_view(span<const byte> v, _msvc_zero_termination_enum zt) noexcept
+  constexpr path_view(span<const byte> v, enum zero_termination zt) noexcept
       : path_view_component(v, zt)
   {
   }
@@ -1704,14 +1786,14 @@ public:
   */
   LLFIO_TEMPLATE(class It, class End)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable<typename It::value_type>), LLFIO_TPRED(is_source_chartype_acceptable<typename End::value_type>))
-  constexpr path_view(It b, End e, _msvc_zero_termination_enum zt, format fmt = auto_format) noexcept
+  constexpr path_view(It b, End e, enum zero_termination zt, format fmt = auto_format) noexcept
       : path_view_component(addressof(*b), e - b, zt, fmt)
   {
   }
   //! \overload
   LLFIO_TEMPLATE(class It, class End)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable<std::decay_t<It>>), LLFIO_TPRED(is_source_chartype_acceptable<std::decay_t<End>>))
-  constexpr path_view(It *b, End *e, _msvc_zero_termination_enum zt, format fmt = auto_format) noexcept
+  constexpr path_view(It *b, End *e, enum zero_termination zt, format fmt = auto_format) noexcept
       : path_view_component(b, e - b, zt, fmt)
   {
   }
@@ -1722,14 +1804,14 @@ public:
   */
   LLFIO_TEMPLATE(class It, class End)
   LLFIO_TREQUIRES(LLFIO_TPRED(std::is_same<typename It::value_type, byte>::value), LLFIO_TPRED(std::is_same<typename End::value_type, byte>::value))
-  constexpr path_view(It b, End e, _msvc_zero_termination_enum zt) noexcept
+  constexpr path_view(It b, End e, enum zero_termination zt) noexcept
       : path_view_component(addressof(*b), e - b, zt, binary_format)
   {
   }
   //! \overload
   LLFIO_TEMPLATE(class It, class End)
   LLFIO_TREQUIRES(LLFIO_TPRED(std::is_same<std::decay_t<It>, byte>::value), LLFIO_TPRED(std::is_same<std::decay_t<End>, byte>::value))
-  constexpr path_view(It *b, End *e, _msvc_zero_termination_enum zt) noexcept
+  constexpr path_view(It *b, End *e, enum zero_termination zt) noexcept
       : path_view_component(b, e - b, zt, binary_format)
   {
   }
@@ -2406,7 +2488,7 @@ constexpr inline int path_view::compare(path_view o) const
 inline filesystem::path &operator+=(filesystem::path &a, path_view_component b)
 {
   path_view_component::not_zero_terminated_rendered_path<> zpath(b);
-  basic_string_view<filesystem::path::value_type> _(zpath.buffer, zpath.length);
+  basic_string_view<filesystem::path::value_type> _ = zpath.as_string_view();
   a.concat(_.begin(), _.end());
   return a;
 }
@@ -2414,7 +2496,7 @@ inline filesystem::path &operator+=(filesystem::path &a, path_view_component b)
 inline filesystem::path &operator/=(filesystem::path &a, path_view_component b)
 {
   path_view_component::not_zero_terminated_rendered_path<> zpath(b);
-  basic_string_view<filesystem::path::value_type> _(zpath.buffer, zpath.length);
+  basic_string_view<filesystem::path::value_type> _ = zpath.as_string_view();
   a.append(_.begin(), _.end());
   return a;
 }
