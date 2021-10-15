@@ -526,9 +526,9 @@ LLFIO_HEADERS_ONLY_FUNC_SPEC result<filesystem::path> to_win32_path(const fs_han
 #if(_HAS_CXX17 || __cplusplus >= 201700) && (!defined(__GLIBCXX__) || __GLIBCXX__ > 20170519)  // libstdc++'s string_view is missing constexpr
           constexpr
 #endif
-          const wstring_view reserved_names[] = {
-          L"\\CON\\",  L"\\PRN\\",  L"\\AUX\\",  L"\\NUL\\",  L"\\COM1\\", L"\\COM2\\", L"\\COM3\\", L"\\COM4\\", L"\\COM5\\", L"\\COM6\\", L"\\COM7\\",
-          L"\\COM8\\", L"\\COM9\\", L"\\LPT1\\", L"\\LPT2\\", L"\\LPT3\\", L"\\LPT4\\", L"\\LPT5\\", L"\\LPT6\\", L"\\LPT7\\", L"\\LPT8\\", L"\\LPT9\\"};
+          const wstring_view reserved_names[] = {L"\\CON\\",  L"\\PRN\\",  L"\\AUX\\",  L"\\NUL\\",  L"\\COM1\\", L"\\COM2\\", L"\\COM3\\", L"\\COM4\\",
+                                                 L"\\COM5\\", L"\\COM6\\", L"\\COM7\\", L"\\COM8\\", L"\\COM9\\", L"\\LPT1\\", L"\\LPT2\\", L"\\LPT3\\",
+                                                 L"\\LPT4\\", L"\\LPT5\\", L"\\LPT6\\", L"\\LPT7\\", L"\\LPT8\\", L"\\LPT9\\"};
           wstring_view _buffer_(buffer);
           for(auto name : reserved_names)
           {
@@ -556,6 +556,19 @@ LLFIO_HEADERS_ONLY_FUNC_SPEC result<filesystem::path> to_win32_path(const fs_han
     }
   }
   return errc::no_such_file_or_directory;
+}
+LLFIO_HEADERS_ONLY_FUNC_SPEC result<filesystem::path> to_win32_path(const path_handle &_h, win32_path_namespace mapping) noexcept
+{
+  struct wrapper final : public fs_handle
+  {
+    const handle &_h;
+    explicit wrapper(const handle &h)
+        : _h(h)
+    {
+    }
+    virtual const handle &_get_handle() const noexcept override { return _h; }
+  } _(_h);
+  return to_win32_path(_, mapping);
 }
 
 LLFIO_V2_NAMESPACE_END
