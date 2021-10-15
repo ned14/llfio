@@ -805,8 +805,7 @@ public:
   }
 
 private:
-  template <class T>
-  struct _rendered_path_base_
+  template <class T> struct _rendered_path_base_
   {
   protected:
     using _view_type = span<T>;
@@ -816,15 +815,15 @@ private:
     //! Type of the value type
     using value_type = T;
     //! Type of the pointer type
-    using pointer = T*;
+    using pointer = T *;
     //! Type of the const pointer type
-    using const_pointer = const T*;
+    using const_pointer = const T *;
     //! Type of the reference type
-    using reference = T&;
+    using reference = T &;
     //! Type of the const reference type
-    using const_reference=const T&;
+    using const_reference = const T &;
     //! Type of the iterator type
-    using iterator=typename _view_type::iterator;
+    using iterator = typename _view_type::iterator;
     //! Type of the const iterator type
     using const_iterator = typename _view_type::const_iterator;
     //! Type of the reverse iterator type
@@ -1107,7 +1106,7 @@ public:
       if(0 == required_length)
       {
         // The internal buffer was sufficient.
-        _base::_ref = {_buffer, end-_buffer};
+        _base::_ref = {_buffer, end - _buffer};
         return;
       }
       // The internal buffer is too small. Fall back to dynamic allocation. This may throw.
@@ -1382,6 +1381,8 @@ public:
     static constexpr enum zero_termination zero_termination() noexcept { return ZeroTermination; }
     //! The size of the internal buffer
     static constexpr size_t internal_buffer_size() noexcept { return (_internal_buffer_size > 0) ? _internal_buffer_size : 1; }
+    //! The storage capacity, which may be larger than `size()` if the internal buffer is in use
+    size_t capacity() noexcept { return (this->data() == _buffer) ? internal_buffer_size() : this->size(); }
 
     //! Access the custom deleter instance passed to the constructor
     const AllocatorOrDeleter &deleter() const noexcept { return _deleter2; }

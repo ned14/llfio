@@ -120,8 +120,13 @@ change in the future, however any path emitted will always be a valid Win32 path
 */
 #ifdef _WIN32
 LLFIO_HEADERS_ONLY_FUNC_SPEC result<filesystem::path> to_win32_path(const fs_handle &h, win32_path_namespace mapping = win32_path_namespace::any) noexcept;
+LLFIO_HEADERS_ONLY_FUNC_SPEC result<filesystem::path> to_win32_path(const path_handle &h, win32_path_namespace mapping = win32_path_namespace::any) noexcept;
 #else
 inline result<filesystem::path> to_win32_path(const fs_handle &h, win32_path_namespace mapping = win32_path_namespace::any) noexcept;
+inline result<filesystem::path> to_win32_path(const path_handle &h, win32_path_namespace mapping = win32_path_namespace::any) noexcept
+{
+  return h.current_path();
+}
 #endif
 
 /*! \class fs_handle
