@@ -110,7 +110,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
   {
     if(_creation == creation::if_needed || _creation == creation::only_if_not_exist || _creation == creation::always_new)
     {
-      if(-1 == ::mkdirat(base.native_handle().fd, zpath.buffer, 0x1f8 /*770*/))
+      if(-1 == ::mkdirat(base.native_handle().fd, zpath.c_str(), 0x1f8 /*770*/))
       {
         if(EEXIST != errno || _creation == creation::only_if_not_exist)
         {
@@ -129,13 +129,13 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
       }
       attribs &= ~(O_CREAT | O_EXCL);
     }
-    nativeh.fd = ::openat(base.native_handle().fd, zpath.buffer, attribs);
+    nativeh.fd = ::openat(base.native_handle().fd, zpath.c_str(), attribs);
   }
   else
   {
     if(_creation == creation::if_needed || _creation == creation::only_if_not_exist || _creation == creation::always_new)
     {
-      if(-1 == ::mkdir(zpath.buffer, 0x1f8 /*770*/))
+      if(-1 == ::mkdir(zpath.c_str(), 0x1f8 /*770*/))
       {
         if(EEXIST != errno || _creation == creation::only_if_not_exist)
         {
@@ -154,7 +154,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
       }
       attribs &= ~(O_CREAT | O_EXCL);
     }
-    nativeh.fd = ::open(zpath.buffer, attribs);
+    nativeh.fd = ::open(zpath.c_str(), attribs);
   }
   if(-1 == nativeh.fd)
   {
@@ -273,7 +273,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
     struct stat s
     {
     };
-    if(-1 == ::fstatat(_v.fd, zglob.buffer, &s, AT_SYMLINK_NOFOLLOW))
+    if(-1 == ::fstatat(_v.fd, zglob.c_str(), &s, AT_SYMLINK_NOFOLLOW))
     {
       return posix_error();
     }
@@ -443,7 +443,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
           goto cont;
         }
       }
-      if(!req.glob.empty() && fnmatch(zglob.buffer, dent->d_name, 0) != 0)
+      if(!req.glob.empty() && fnmatch(zglob.c_str(), dent->d_name, 0) != 0)
       {
         goto cont;
       }

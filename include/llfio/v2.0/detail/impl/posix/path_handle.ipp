@@ -33,7 +33,7 @@ result<bool> path_handle::exists(path_view_type path) const noexcept {
   {
     LLFIO_LOG_FUNCTION_CALL(this);
     path_view::zero_terminated_rendered_path<> zpath(path);
-    int x = ::faccessat(native_handle().fd, zpath.buffer, F_OK, AT_SYMLINK_NOFOLLOW);
+    int x = ::faccessat(native_handle().fd, zpath.c_str(), F_OK, AT_SYMLINK_NOFOLLOW);
     if(x < 0)
     {
       auto ret = posix_error();
@@ -69,11 +69,11 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
   path_view::zero_terminated_rendered_path<> zpath(path);
   if(base.is_valid())
   {
-    nativeh.fd = ::openat(base.native_handle().fd, zpath.buffer, attribs);
+    nativeh.fd = ::openat(base.native_handle().fd, zpath.c_str(), attribs);
   }
   else
   {
-    nativeh.fd = ::open(zpath.buffer, attribs);
+    nativeh.fd = ::open(zpath.c_str(), attribs);
   }
   if(-1 == nativeh.fd)
   {

@@ -67,8 +67,8 @@ namespace algorithm
       IO_STATUS_BLOCK isb = make_iostatus();
       path_view::zero_terminated_rendered_path<> zpath(leafname);
       UNICODE_STRING _path{};
-      _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
-      _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
+      _path.Buffer = const_cast<wchar_t *>(zpath.data());
+      _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.size() * sizeof(wchar_t))) + sizeof(wchar_t);
 
       OBJECT_ATTRIBUTES oa{};
       memset(&oa, 0, sizeof(oa));
@@ -142,7 +142,7 @@ namespace algorithm
 #else
       path_view::zero_terminated_rendered_path<> zpath(leafname);
       errno = 0;
-      if(is_dir || -1 == ::unlinkat(dirh.native_handle().fd, zpath.buffer, 0))
+      if(is_dir || -1 == ::unlinkat(dirh.native_handle().fd, zpath.data(), 0))
       {
         if(ENOENT == errno)
         {
@@ -152,7 +152,7 @@ namespace algorithm
         if(is_dir || EISDIR == errno)
         {
           // Try to remove it as a directory, if it's empty we've saved a recurse
-          if(-1 != ::unlinkat(dirh.native_handle().fd, zpath.buffer, AT_REMOVEDIR))
+          if(-1 != ::unlinkat(dirh.native_handle().fd, zpath.data(), AT_REMOVEDIR))
           {
             // std::cout << "Removed quickly " << (dirh.current_path().value() / entry.leafname.path()) << std::endl;
             return success();
@@ -175,8 +175,8 @@ namespace algorithm
       IO_STATUS_BLOCK isb = make_iostatus();
       path_view::zero_terminated_rendered_path<> zpath(leafname);
       UNICODE_STRING _path{};
-      _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
-      _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
+      _path.Buffer = const_cast<wchar_t *>(zpath.data());
+      _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.size() * sizeof(wchar_t))) + sizeof(wchar_t);
 
       OBJECT_ATTRIBUTES oa{};
       memset(&oa, 0, sizeof(oa));
@@ -250,7 +250,7 @@ namespace algorithm
       {
         // Try renaming it into topdirh
         auto randomname = utils::random_string(32);
-        if(-1 != ::renameat(topdirh.native_handle().fd, randomname.c_str(), dirh.native_handle().fd, zpath.buffer))
+        if(-1 != ::renameat(topdirh.native_handle().fd, randomname.c_str(), dirh.native_handle().fd, zpath.data()))
         {
           return success();
         }

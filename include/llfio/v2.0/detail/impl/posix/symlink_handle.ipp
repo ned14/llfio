@@ -74,8 +74,8 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> symlink_handle::_create_symlink(con
       {
         auto randomname = utils::random_string(32);
         randomname.append(".random");
-        // std::cerr << "symlinkat " << zpath.buffer << " " << dirh.native_handle().fd << " " << randomname << std::endl;
-        if(-1 == ::symlinkat(zpath.buffer, dirh.is_valid() ? dirh.native_handle().fd : AT_FDCWD, randomname.c_str()))
+        // std::cerr << "symlinkat " << zpath.c_str() << " " << dirh.native_handle().fd << " " << randomname << std::endl;
+        if(-1 == ::symlinkat(zpath.c_str(), dirh.is_valid() ? dirh.native_handle().fd : AT_FDCWD, randomname.c_str()))
         {
           if(EEXIST == errno)
           {
@@ -112,8 +112,8 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> symlink_handle::_create_symlink(con
     }
     else
     {
-      // std::cerr << "symlinkat " << zpath.buffer << " " << dirh.native_handle().fd << " " << filename << std::endl;
-      if(-1 == ::symlinkat(zpath.buffer, dirh.is_valid() ? dirh.native_handle().fd : AT_FDCWD, filename.c_str()))
+      // std::cerr << "symlinkat " << zpath.c_str() << " " << dirh.native_handle().fd << " " << filename << std::endl;
+      if(-1 == ::symlinkat(zpath.c_str(), dirh.is_valid() ? dirh.native_handle().fd : AT_FDCWD, filename.c_str()))
       {
         if(exists_is_ok && EEXIST == errno)
         {
