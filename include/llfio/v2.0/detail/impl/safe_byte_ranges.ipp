@@ -383,7 +383,7 @@ namespace algorithm
           struct stat s
           {
           };
-          if(-1 == ::fstatat(base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, &s, AT_SYMLINK_NOFOLLOW))
+          if(-1 == ::fstatat(base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.data(), &s, AT_SYMLINK_NOFOLLOW))
           {
             return posix_error();
           }

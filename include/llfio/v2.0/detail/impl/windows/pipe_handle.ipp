@@ -80,9 +80,9 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
   }
   else
   {
-    _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
-    _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
-    if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
+    _path.Buffer = const_cast<wchar_t *>(zpath.data());
+    _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.size() * sizeof(wchar_t))) + sizeof(wchar_t);
+    if(zpath.size() >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
     {
       _path.Buffer += 3;
       _path.Length -= 3 * sizeof(wchar_t);

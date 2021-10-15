@@ -248,11 +248,11 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<process_handle> process_handle::launch_pr
     std::vector<small_path_view_c_str> _args;
     _args.reserve(args.size() + 1);
     _args.emplace_back(path);
-    argptrs[0] = _args[0].buffer;
+    argptrs[0] = _args[0].c_str();
     for(size_t n = 0; n < args.size(); ++n)
     {
       _args.emplace_back(args[n]);
-      argptrs[n + 1] = _args[n + 1].buffer;
+      argptrs[n + 1] = _args[n + 1].c_str();
     }
     std::vector<small_path_view_c_str> _envs;
     std::vector<const char *> envptrs;
@@ -261,7 +261,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<process_handle> process_handle::launch_pr
     for(const auto &i : env)
     {
       _envs.emplace_back(i);
-      envptrs.push_back(_envs.back().buffer);
+      envptrs.push_back(_envs.back().c_str());
     }
     envptrs.push_back(nullptr);
 #if 0

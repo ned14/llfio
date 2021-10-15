@@ -85,8 +85,8 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
       IO_STATUS_BLOCK isb = make_iostatus();
       path_view::not_zero_terminated_rendered_path<> zpath(filename);
       UNICODE_STRING _path{};
-      _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
-      _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
+      _path.Buffer = const_cast<wchar_t *>(zpath.data());
+      _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.size() * sizeof(wchar_t))) + sizeof(wchar_t);
       OBJECT_ATTRIBUTES oa{};
       memset(&oa, 0, sizeof(oa));
       oa.Length = sizeof(OBJECT_ATTRIBUTES);
@@ -141,7 +141,7 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
   {
     path_view::zero_terminated_rendered_path<> zpath(path);
     UNICODE_STRING NtPath{};
-    if(RtlDosPathNameToNtPathName_U(zpath.buffer, &NtPath, nullptr, nullptr) == 0u)
+    if(RtlDosPathNameToNtPathName_U(zpath.data(), &NtPath, nullptr, nullptr) == 0u)
     {
       return win32_error(ERROR_FILE_NOT_FOUND);
     }
@@ -190,9 +190,9 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
 
   path_view::not_zero_terminated_rendered_path<> zpath(path);
   UNICODE_STRING _path{};
-  _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
-  _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
-  if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
+  _path.Buffer = const_cast<wchar_t *>(zpath.data());
+  _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.size() * sizeof(wchar_t))) + sizeof(wchar_t);
+  if(zpath.size() >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
   {
     _path.Buffer += 3;
     _path.Length -= 3 * sizeof(wchar_t);
@@ -229,7 +229,7 @@ result<void> fs_handle::link(const path_handle &base, path_view_type path, deadl
   {
     path_view::zero_terminated_rendered_path<> zpath(path);
     UNICODE_STRING NtPath{};
-    if(RtlDosPathNameToNtPathName_U(zpath.buffer, &NtPath, nullptr, nullptr) == 0u)
+    if(RtlDosPathNameToNtPathName_U(zpath.data(), &NtPath, nullptr, nullptr) == 0u)
     {
       return win32_error(ERROR_FILE_NOT_FOUND);
     }
@@ -247,9 +247,9 @@ result<void> fs_handle::link(const path_handle &base, path_view_type path, deadl
 
   path_view::not_zero_terminated_rendered_path<> zpath(path);
   UNICODE_STRING _path{};
-  _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
-  _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
-  if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
+  _path.Buffer = const_cast<wchar_t *>(zpath.data());
+  _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.size() * sizeof(wchar_t))) + sizeof(wchar_t);
+  if(zpath.size() >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
   {
     _path.Buffer += 3;
     _path.Length -= 3 * sizeof(wchar_t);
@@ -556,19 +556,6 @@ LLFIO_HEADERS_ONLY_FUNC_SPEC result<filesystem::path> to_win32_path(const fs_han
     }
   }
   return errc::no_such_file_or_directory;
-}
-LLFIO_HEADERS_ONLY_FUNC_SPEC result<filesystem::path> to_win32_path(const path_handle &_h, win32_path_namespace mapping) noexcept
-{
-  struct wrapper final : public fs_handle
-  {
-    const handle &_h;
-    explicit wrapper(const handle &h)
-        : _h(h)
-    {
-    }
-    virtual const handle &_get_handle() const noexcept override { return _h; }
-  } _(_h);
-  return to_win32_path(_, mapping);
 }
 
 LLFIO_V2_NAMESPACE_END

@@ -136,7 +136,7 @@ namespace detail
         {
         };
         memset(&s, 0, sizeof(s));
-        if(-1 == ::fstatat(currentdirh.native_handle().fd, zpath.buffer, &s, AT_SYMLINK_NOFOLLOW))
+        if(-1 == ::fstatat(currentdirh.native_handle().fd, zpath.c_str(), &s, AT_SYMLINK_NOFOLLOW))
         {
           continue;
         }
@@ -202,7 +202,7 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
     }
     char _path[PATH_MAX];
     snprintf(_path, PATH_MAX, "/proc/self/fd/%d", h.native_handle().fd);
-    if(-1 == ::linkat(AT_FDCWD, _path, base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, AT_SYMLINK_FOLLOW))
+    if(-1 == ::linkat(AT_FDCWD, _path, base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.c_str(), AT_SYMLINK_FOLLOW))
     {
       return posix_error();
     }
@@ -224,22 +224,22 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
     errno = 0;
     if(-1 !=
 #if defined __aarch64__
-       syscall(276 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer,
+       syscall(276 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.c_str(),
                1 /*RENAME_NOREPLACE*/)
 #elif defined __arm__
-       syscall(382 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer,
+       syscall(382 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.c_str(),
                1 /*RENAME_NOREPLACE*/)
 #elif defined __i386__
-       syscall(353 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer,
+       syscall(353 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.c_str(),
                1 /*RENAME_NOREPLACE*/)
 #elif defined __powerpc64__
-       syscall(357 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer,
+       syscall(357 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.c_str(),
                1 /*RENAME_NOREPLACE*/)
 #elif defined __sparc__
-       syscall(345 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer,
+       syscall(345 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.c_str(),
                1 /*RENAME_NOREPLACE*/)
 #elif defined __x86_64__
-       syscall(316 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer,
+       syscall(316 /*__NR_renameat2*/, dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.c_str(),
                1 /*RENAME_NOREPLACE*/)
 #else
 #error Unknown Linux platform
@@ -255,7 +255,7 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
 #endif
 // Otherwise we need to use linkat followed by unlinkat, carefully reopening the file descriptor
 // to preserve path tracking
-    if(-1 == ::linkat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, 0))
+    if(-1 == ::linkat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.c_str(), 0))
     {
       return posix_error();
     }
@@ -295,7 +295,7 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
 #endif
                   | O_SYNC);
 #endif
-      int fd = ::openat(base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, attribs, 0x1b0 /*660*/);
+      int fd = ::openat(base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.c_str(), attribs, 0x1b0 /*660*/);
       if(-1 == fd)
       {
         errcode = errno;
@@ -319,7 +319,7 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
     }
     return success();
   }
-  if(-1 == ::renameat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer))
+  if(-1 == ::renameat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.c_str()))
   {
     return posix_error();
   }
@@ -333,7 +333,7 @@ result<void> fs_handle::link(const path_handle &base, path_view_type path, deadl
   path_view::zero_terminated_rendered_path<> zpath(path);
 #ifdef AT_EMPTY_PATH
   // Try to use the fd linking syscall
-  if(-1 != ::linkat(h.native_handle().fd, "", base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, AT_EMPTY_PATH))
+  if(-1 != ::linkat(h.native_handle().fd, "", base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.c_str(), AT_EMPTY_PATH))
   {
     return success();
   }
@@ -345,7 +345,7 @@ result<void> fs_handle::link(const path_handle &base, path_view_type path, deadl
     OUTCOME_TRY(_fetch_inode());
   }
   OUTCOME_TRY(auto &&dirh, detail::containing_directory(std::ref(filename), h, *this, d));
-  if(-1 == ::linkat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.buffer, 0))
+  if(-1 == ::linkat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.c_str(), 0))
   {
     return posix_error();
   }

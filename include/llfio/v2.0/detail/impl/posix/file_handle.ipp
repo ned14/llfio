@@ -54,11 +54,11 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   path_view::zero_terminated_rendered_path<> zpath(path);
   if(base.is_valid())
   {
-    nativeh.fd = ::openat(base.native_handle().fd, zpath.buffer, attribs, 0x1b0 /*660*/);
+    nativeh.fd = ::openat(base.native_handle().fd, zpath.c_str(), attribs, 0x1b0 /*660*/);
   }
   else
   {
-    nativeh.fd = ::open(zpath.buffer, attribs, 0x1b0 /*660*/);
+    nativeh.fd = ::open(zpath.c_str(), attribs, 0x1b0 /*660*/);
   }
   if(-1 == nativeh.fd)
   {

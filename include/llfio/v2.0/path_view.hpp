@@ -727,15 +727,15 @@ private:
     path_view_component _b_(b.data(), b.size(), b_zt);
     rendered_path<zero_termination::not_zero_terminated, DestT, Deleter, _internal_buffer_size> _a(_a_, loc);
     rendered_path<zero_termination::not_zero_terminated, DestT, Deleter, _internal_buffer_size> _b(_b_, loc);
-    if(_a.length < _b.length)
+    if(_a.size() < _b.size())
     {
       return -1;
     }
-    if(_a.length > _b.length)
+    if(_a.size() > _b.size())
     {
       return 1;
     }
-    return _do_compare(_a.buffer, _b.buffer, _a.length);
+    return _do_compare(_a.data(), _b.data(), _a.size());
   }
 
 public:
@@ -808,18 +808,20 @@ private:
   template <class T> struct _rendered_path_base_
   {
   protected:
-    using _view_type = span<T>;
+    using _view_type = span<const T>;
     _view_type _ref;
+
+    constexpr basic_string_view<T> _as_string_view() const { return {_ref.data(), _ref.size()}; }
 
   public:
     //! Type of the value type
     using value_type = T;
     //! Type of the pointer type
-    using pointer = T *;
+    using pointer = const T *;
     //! Type of the const pointer type
     using const_pointer = const T *;
     //! Type of the reference type
-    using reference = T &;
+    using reference = const T &;
     //! Type of the const reference type
     using const_reference = const T &;
     //! Type of the iterator type
@@ -974,7 +976,7 @@ public:
                                            view._invoke([](auto sv) { return sv.find('/') != _npos; });
       if(!needs_slash_translation && (this->zero_termination() == not_zero_terminated || view._zero_terminated))
       {
-        _base::_ref = {source, view._length};
+        _base::_ref = typename _base::_view_type(source, view._length);
       }
       else
       {
@@ -994,7 +996,7 @@ public:
           // Use the internal buffer
           memcpy(_buffer, source, required_bytes);
           _buffer[required_length] = 0;
-          _base::_ref = {_buffer, view._length};
+          _base::_ref = typename _base::_view_type(_buffer, view._length);
         }
         else
         {
@@ -1004,16 +1006,17 @@ public:
             _bytes_to_delete = required_bytes;
             memcpy(buffer_, source, required_bytes);
             buffer_[required_length] = 0;
-            _base::_ref = {_buffer, view._length};
+            _base::_ref = typename _base::_view_type(_buffer, view._length);
           }
         }
         if(needs_slash_translation)
         {
-          auto idx = _base::_ref.find('/');
+          auto sv = _base::_as_string_view();
+          auto idx = sv.find('/');
           while(idx != _npos)
           {
-            const_cast<value_type *>(_base::ref.data())[idx] = filesystem::path::preferred_separator;
-            idx = _base::_ref.find('/', idx);
+            const_cast<value_type *>(sv.data())[idx] = filesystem::path::preferred_separator;
+            idx = sv.find('/', idx);
           }
         }
       }
@@ -1031,12 +1034,12 @@ public:
       if(0 == view._length)
       {
         _buffer[0] = 0;
-        _base::_ref = {_buffer, 0};
+        _base::_ref = typename _base::_view_type(_buffer, size_t(0));
         return;
       }
       if(std::is_same<T, byte>::value || view._passthrough)
       {
-        _base::_ref = {(const value_type *) view._bytestr, view._length};
+        _base::_ref = typename _base::_view_type((value_type *) view._bytestr, view._length);
         return;
       }
       if(std::is_same<T, char>::value && view._char)
@@ -1106,7 +1109,7 @@ public:
       if(0 == required_length)
       {
         // The internal buffer was sufficient.
-        _base::_ref = {_buffer, end - _buffer};
+        _base::_ref = typename _base::_view_type(_buffer, end - _buffer);
         return;
       }
       // The internal buffer is too small. Fall back to dynamic allocation. This may throw.
@@ -1144,7 +1147,7 @@ public:
         LLFIO_LOG_FATAL(nullptr, "path_view_component::cstr somehow sees no state!");
         abort();
       }
-      _base::_ref = {allocated_buffer, end - allocated_buffer};
+      _base::_ref = typename _base::_view_type(allocated_buffer, end - allocated_buffer);
     }
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -1327,10 +1330,10 @@ public:
     {
       if(this != &o)
       {
-        if(o.buffer == o._buffer)
+        if(o.data() == o._buffer)
         {
-          memcpy(_buffer, o._buffer, (o.length + 1) * sizeof(value_type));
-          _base::_ref = {_buffer, _base::_ref.size()};
+          memcpy(_buffer, o._buffer, (o.size() + 1) * sizeof(value_type));
+          _base::_ref = typename _base::_view_type(_buffer, _base::_ref.size());
         }
         if(o._deleter1arg == &o._deleter2)
         {
@@ -1360,7 +1363,7 @@ public:
       if(_bytes_to_delete > 0)
       {
         _deleter1(_deleter1arg, const_cast<value_type *>(_base::_ref.data()), _bytes_to_delete);
-        _base::_ref = {};
+        _base::_ref = typename _base::_view_type{};
         _bytes_to_delete = 0;
       }
     }
@@ -1370,7 +1373,7 @@ public:
       if(_bytes_to_delete > 0)
       {
         auto *ret = _base::_ref.data();
-        _base::_ref = {};
+        _base::_ref = typename _base::_view_type{};
         _bytes_to_delete = 0;
         return ret;
       }
