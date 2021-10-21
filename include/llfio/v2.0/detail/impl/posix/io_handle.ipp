@@ -95,6 +95,7 @@ io_handle::io_result<io_handle::buffers_type> io_handle::_do_read(io_handle::io_
     for(size_t n = 0; n < reqs.buffers.size(); n++)
     {
       assert((reinterpret_cast<uintptr_t>(iov[n].iov_base) & 511) == 0);
+      // Reads must have aligned length for portability
       assert((iov[n].iov_len & 511) == 0);
     }
   }
@@ -191,7 +192,7 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::_do_write(io_hand
     for(size_t n = 0; n < reqs.buffers.size(); n++)
     {
       assert((reinterpret_cast<uintptr_t>(iov[n].iov_base) & 511) == 0);
-      assert((iov[n].iov_len & 511) == 0);
+      // length can be unaligned for writes
     }
   }
 #endif

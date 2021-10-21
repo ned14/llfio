@@ -536,8 +536,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
       while(extent.length > 0)
       {
         deadline nd;
-        auto towrite = (extent.length < blocksize) ? (size_t) extent.length : blocksize;
-        buffer_type b(buffer, towrite);
+        buffer_type b(buffer, blocksize /* to allow aligned i/o files */);
         LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
         OUTCOME_TRY(auto &&readed, read({{&b, 1}, extent.offset}, nd));
         const_buffer_type cb(readed.front());
@@ -590,8 +589,8 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
 
           See https://github.com/openzfs/zfs/issues/11697 for more.
           */
-          char b;
-          if(-1 == ::pread(_v.fd, &b, 1, end))
+          alignas(4096) char b[4096];
+          if(-1 == ::pread(_v.fd, b, requires_aligned_io() ? 4096 : 1, end))
           {
             return posix_error();
           }
@@ -837,7 +836,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
             buffer = utils::page_allocator<byte>().allocate(blocksize);
           }
           deadline nd;
-          buffer_type b(buffer, thisblock);
+          buffer_type b(buffer, blocksize /* to allow aligned i/o files */);
           LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
           OUTCOME_TRY(auto &&readed, read({{&b, 1}, item.src.offset + thisoffset}, nd));
           buffer_dirty = true;

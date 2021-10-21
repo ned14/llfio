@@ -461,8 +461,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
       while(extent.length > 0)
       {
         deadline nd;
-        auto towrite = (extent.length < blocksize) ? (size_t) extent.length : blocksize;
-        buffer_type b(buffer, towrite);
+        buffer_type b(buffer, blocksize /* to allow aligned i/o files */);
         LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
         OUTCOME_TRY(auto &&readed, read({{&b, 1}, extent.offset}, nd));
         const_buffer_type cb(readed.front());
@@ -718,7 +717,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
             buffer = utils::page_allocator<byte>().allocate(blocksize);
           }
           deadline nd;
-          buffer_type b(buffer, (size_type) thisblock);
+          buffer_type b(buffer, blocksize /* to allow aligned i/o files */);
           LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
           OUTCOME_TRY(auto &&readed, read({{&b, 1}, item.src.offset + thisoffset}, nd));
           buffer_dirty = true;

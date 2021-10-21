@@ -112,7 +112,8 @@ inline bool do_read_write(io_handle::io_result<BuffersType> &ret, Syscall &&sysc
     if(nativeh.requires_aligned_io())
     {
       assert(((uintptr_t) req.data() & 511) == 0);
-      assert((req.size() & 511) == 0);
+      // Reads must use aligned length as well
+      assert(std::is_const<typename BuffersType::value_type>::value || (req.size() & 511) == 0);
     }
 #endif
     reqs.offset += req.size();
