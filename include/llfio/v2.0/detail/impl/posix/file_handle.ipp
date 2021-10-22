@@ -536,7 +536,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
       while(extent.length > 0)
       {
         deadline nd;
-        const auto towrite = (extent.length < blocksize) ? (size_t) extent.length : blocksize;
+        const size_t towrite = (extent.length < blocksize) ? (size_t) extent.length : blocksize;
         buffer_type b(buffer, utils::round_up_to_page_size(towrite, 4096) /* to allow aligned i/o files */);
         LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
         OUTCOME_TRY(auto &&readed, read({{&b, 1}, extent.offset}, nd));
