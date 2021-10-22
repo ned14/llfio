@@ -1,5 +1,5 @@
 /* A handle to something
-(C) 2015-2020 Niall Douglas <http://www.nedproductions.biz/> (8 commits)
+(C) 2015-2021 Niall Douglas <http://www.nedproductions.biz/> (8 commits)
 File Created: Dec 2015
 
 
@@ -536,10 +536,11 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
       while(extent.length > 0)
       {
         deadline nd;
-        buffer_type b(buffer, blocksize /* to allow aligned i/o files */);
+        const auto towrite = (extent.length < blocksize) ? (size_t) extent.length : blocksize;
+        buffer_type b(buffer, utils::round_up_to_page_size(towrite, 4096) /* to allow aligned i/o files */);
         LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
         OUTCOME_TRY(auto &&readed, read({{&b, 1}, extent.offset}, nd));
-        const_buffer_type cb(readed.front());
+        const_buffer_type cb(readed.front().data(), std::min(readed.front().size(), towrite));
         if(cb.size() == 0)
         {
           return ret;
@@ -836,16 +837,16 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
             buffer = utils::page_allocator<byte>().allocate(blocksize);
           }
           deadline nd;
-          buffer_type b(buffer, blocksize /* to allow aligned i/o files */);
+          buffer_type b(buffer, utils::round_up_to_page_size(thisblock, 4096) /* to allow aligned i/o files */);
           LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
           OUTCOME_TRY(auto &&readed, read({{&b, 1}, item.src.offset + thisoffset}, nd));
           buffer_dirty = true;
-          if(readed.front().size() != thisblock)
+          if(readed.front().size() < thisblock)
           {
             return errc::resource_unavailable_try_again;  // something is wrong
           }
           LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
-          const_buffer_type cb(readed.front());
+          const_buffer_type cb(readed.front().data(), thisblock);
           if(item.destination_extents_are_new)
           {
             // If we don't need to reset the bytes in the destination, try to elide
