@@ -845,6 +845,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
           {
             return errc::resource_unavailable_try_again;  // something is wrong
           }
+          readed = {readed.data(), thisblock};
           LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
           const_buffer_type cb(readed.front().data(), thisblock);
           if(item.destination_extents_are_new)
