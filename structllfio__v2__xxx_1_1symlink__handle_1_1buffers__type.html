@@ -119,7 +119,7 @@ Public Member Functions</h2></td></tr>
 constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#a8e897069034acea0439397ea4aeb777a">buffers_type</a> ()</td></tr>
 <tr class="memdesc:a8e897069034acea0439397ea4aeb777a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
 <tr class="separator:a8e897069034acea0439397ea4aeb777a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa4d9b043e638ad6e1b592f2b93a5c9c2"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#aa4d9b043e638ad6e1b592f2b93a5c9c2">buffers_type</a> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> <a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#aa7770c6b7c478d74654f25b8c1a1585c">link</a>, <a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#a1908a242ca435cf1386fe96a86da4002">symlink_type</a> <a class="el" href="structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#ac44ca889e5423c1bdeb02e5bee5f645a">type</a>=<a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#a1908a242ca435cf1386fe96a86da4002a7bf46ad61adc2265f803fc3b798b3559">symlink_type::symbolic</a>)</td></tr>
+<tr class="memitem:aa4d9b043e638ad6e1b592f2b93a5c9c2"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#aa4d9b043e638ad6e1b592f2b93a5c9c2">buffers_type</a> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> link, <a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#a1908a242ca435cf1386fe96a86da4002">symlink_type</a> <a class="el" href="structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#ac44ca889e5423c1bdeb02e5bee5f645a">type</a>=<a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#a1908a242ca435cf1386fe96a86da4002a7bf46ad61adc2265f803fc3b798b3559">symlink_type::symbolic</a>)</td></tr>
 <tr class="separator:aa4d9b043e638ad6e1b592f2b93a5c9c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3880885ec5694a6ca77b4325a0684848"><td class="memItemLeft" align="right" valign="top"><a id="a3880885ec5694a6ca77b4325a0684848"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#a3880885ec5694a6ca77b4325a0684848">buffers_type</a> (<a class="el" href="structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html">buffers_type</a> &amp;&amp;o) noexcept</td></tr>
@@ -214,7 +214,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>symlink_handle</b></
 </table>
 </div><div class="memdoc">
 <p>Constructor </p>
-<div class="fragment"><div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        : _link(<a class="code" href="classllfio__v2__xxx_1_1fs__handle.html#aa7770c6b7c478d74654f25b8c1a1585c">link</a>)</div>
+<div class="fragment"><div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        : _link(link)</div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        , _type(<a class="code" href="structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#ac44ca889e5423c1bdeb02e5bee5f645a">type</a>)</div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    {</div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    }</div>
@@ -227,7 +227,6 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>symlink_handle</b></
 </div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="astructllfio__v2__xxx_1_1symlink__handle_1_1buffers__type_html_ac44ca889e5423c1bdeb02e5bee5f645a"><div class="ttname"><a href="structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html#ac44ca889e5423c1bdeb02e5bee5f645a">llfio_v2_xxx::symlink_handle::buffers_type::type</a></div><div class="ttdeci">symlink_type type() const noexcept</div><div class="ttdoc">The type of the symbolic link.</div><div class="ttdef"><b>Definition:</b> symlink_handle.hpp:197</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1fs__handle_html_aa7770c6b7c478d74654f25b8c1a1585c"><div class="ttname"><a href="classllfio__v2__xxx_1_1fs__handle.html#aa7770c6b7c478d74654f25b8c1a1585c">llfio_v2_xxx::fs_handle::link</a></div><div class="ttdeci">virtual result&lt; void &gt; link(const path_handle &amp;base, path_view_type path, deadline d=std::chrono::seconds(30)) noexcept</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

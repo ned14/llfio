@@ -83,6 +83,7 @@ $(document).ready(function(){initNavTree('classllfio__v2__xxx_1_1path__view__com
 
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
@@ -137,11 +138,20 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 <tr class="memitem:a38ff18893dfc84c562fb36c299702bf5"><td class="memItemLeft" align="right" valign="top"><a id="a38ff18893dfc84c562fb36c299702bf5"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>char16_t</b> = detail::char16_t</td></tr>
 <tr class="separator:a38ff18893dfc84c562fb36c299702bf5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa1116ad357d1c73d1cc26ce28b29c82"><td class="memTemplParams" colspan="2"><a id="aaa1116ad357d1c73d1cc26ce28b29c82"></a>
+<tr class="memitem:a47b83e7b5de763a6595d1c670faad77a"><td class="memTemplParams" colspan="2"><a id="a47b83e7b5de763a6595d1c670faad77a"></a>
 template&lt;class T &gt; </td></tr>
-<tr class="memitem:aaa1116ad357d1c73d1cc26ce28b29c82"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#aaa1116ad357d1c73d1cc26ce28b29c82">default_c_str_deleter</a> = std::default_delete&lt; T &gt;</td></tr>
-<tr class="memdesc:aaa1116ad357d1c73d1cc26ce28b29c82"><td class="mdescLeft">&#160;</td><td class="mdescRight">The default deleter to use. <br /></td></tr>
-<tr class="separator:aaa1116ad357d1c73d1cc26ce28b29c82"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47b83e7b5de763a6595d1c670faad77a"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a47b83e7b5de763a6595d1c670faad77a">default_rendered_path_deleter</a> = std::default_delete&lt; T &gt;</td></tr>
+<tr class="memdesc:a47b83e7b5de763a6595d1c670faad77a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The default deleter to use. <br /></td></tr>
+<tr class="separator:a47b83e7b5de763a6595d1c670faad77a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1445489215e7cd1a3aa04a9636ecfedc"><td class="memTemplParams" colspan="2">template&lt;class T  = typename filesystem::path::value_type, class AllocatorOrDeleter  = default_rendered_path_deleter&lt;T[]&gt;, size_t _internal_buffer_size = default_internal_buffer_size&gt; </td></tr>
+<tr class="memitem:a1445489215e7cd1a3aa04a9636ecfedc"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a1445489215e7cd1a3aa04a9636ecfedc">zero_terminated_rendered_path</a> = (enum <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732e">path_view_component::zero_termination</a> ZeroTermination, class T=typename filesystem::path::value_type, class AllocatorOrDeleter=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a47b83e7b5de763a6595d1c670faad77a">default_rendered_path_deleter</a>&lt; T[]&gt;, size_t _internal_buffer_size=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a7b52fa10c4359dcc25aed43be0be8a91">default_internal_buffer_size</a>) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a411e9c36a49bd37d596ab34f99b656fd">is_source_acceptable</a>&lt; T &gt;)) class rendered_path rendered_path&lt; zero_termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size &gt;</td></tr>
+<tr class="memdesc:a1445489215e7cd1a3aa04a9636ecfedc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience type alias.  <a href="classllfio__v2__xxx_1_1path__view__component.html#a1445489215e7cd1a3aa04a9636ecfedc">More...</a><br /></td></tr>
+<tr class="separator:a1445489215e7cd1a3aa04a9636ecfedc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a507043318f5b9cdecf9418edbc7402ce"><td class="memTemplParams" colspan="2"><a id="a507043318f5b9cdecf9418edbc7402ce"></a>
+template&lt;class T  = typename filesystem::path::value_type, class AllocatorOrDeleter  = default_rendered_path_deleter&lt;T[]&gt;, size_t _internal_buffer_size = default_internal_buffer_size&gt; </td></tr>
+<tr class="memitem:a507043318f5b9cdecf9418edbc7402ce"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a507043318f5b9cdecf9418edbc7402ce">not_zero_terminated_rendered_path</a> = rendered_path&lt; zero_termination::not_zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size &gt;</td></tr>
+<tr class="memdesc:a507043318f5b9cdecf9418edbc7402ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience type alias. <br /></td></tr>
+<tr class="separator:a507043318f5b9cdecf9418edbc7402ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -229,12 +239,12 @@ LLFIO_PATH_VIEW_CONSTEXPR <a class="el" href="classllfio__v2__xxx_1_1path__view_
 filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#ac367f2c429245c567448780511f24c0d">path</a> () const</td></tr>
 <tr class="memdesc:ac367f2c429245c567448780511f24c0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the path view as a path. Allocates and copies memory! <br /></td></tr>
 <tr class="separator:ac367f2c429245c567448780511f24c0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a486c1bc907c6de489ac94069d6681c53"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a486c1bc907c6de489ac94069d6681c53">LLFIO_TEMPLATE</a> (class T=typename filesystem::path::value_type, class Deleter=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#aaa1116ad357d1c73d1cc26ce28b29c82">default_c_str_deleter</a>&lt; T[]&gt;, size_t _internal_buffer_size=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a7b52fa10c4359dcc25aed43be0be8a91">default_internal_buffer_size</a>) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a411e9c36a49bd37d596ab34f99b656fd">is_source_acceptable</a>&lt; T &gt;)) const expr int compare(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> p</td></tr>
-<tr class="separator:a486c1bc907c6de489ac94069d6681c53"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad6e825af1c4052830156ebac93862858"><td class="memItemLeft" align="right" valign="top"><a id="ad6e825af1c4052830156ebac93862858"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#ad6e825af1c4052830156ebac93862858">LLFIO_TEMPLATE</a> (class T=typename filesystem::path::value_type, class Deleter=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#aaa1116ad357d1c73d1cc26ce28b29c82">default_c_str_deleter</a>&lt; T[]&gt;, size_t _internal_buffer_size=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a7b52fa10c4359dcc25aed43be0be8a91">default_internal_buffer_size</a>) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a411e9c36a49bd37d596ab34f99b656fd">is_source_acceptable</a>&lt; T &gt;)) const expr int compare(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> p) const</td></tr>
-<tr class="memdesc:ad6e825af1c4052830156ebac93862858"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br /></td></tr>
-<tr class="separator:ad6e825af1c4052830156ebac93862858"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6e27d02fd4196fa0f4daee6224cc8cc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#ac6e27d02fd4196fa0f4daee6224cc8cc">LLFIO_TEMPLATE</a> (class T=typename filesystem::path::value_type, class Deleter=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a47b83e7b5de763a6595d1c670faad77a">default_rendered_path_deleter</a>&lt; T[]&gt;, size_t _internal_buffer_size=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a7b52fa10c4359dcc25aed43be0be8a91">default_internal_buffer_size</a>) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a411e9c36a49bd37d596ab34f99b656fd">is_source_acceptable</a>&lt; T &gt;)) const expr int compare(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> p</td></tr>
+<tr class="separator:ac6e27d02fd4196fa0f4daee6224cc8cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6fdc7f09fcf1c8e67c174b8ecde06736"><td class="memItemLeft" align="right" valign="top"><a id="a6fdc7f09fcf1c8e67c174b8ecde06736"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a6fdc7f09fcf1c8e67c174b8ecde06736">LLFIO_TEMPLATE</a> (class T=typename filesystem::path::value_type, class Deleter=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a47b83e7b5de763a6595d1c670faad77a">default_rendered_path_deleter</a>&lt; T[]&gt;, size_t _internal_buffer_size=<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a7b52fa10c4359dcc25aed43be0be8a91">default_internal_buffer_size</a>) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a411e9c36a49bd37d596ab34f99b656fd">is_source_acceptable</a>&lt; T &gt;)) const expr int compare(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> p) const</td></tr>
+<tr class="memdesc:a6fdc7f09fcf1c8e67c174b8ecde06736"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br /></td></tr>
+<tr class="separator:a6fdc7f09fcf1c8e67c174b8ecde06736"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -273,7 +283,7 @@ static constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a clas
 <tr class="separator:a411e9c36a49bd37d596ab34f99b656fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b52fa10c4359dcc25aed43be0be8a91"><td class="memItemLeft" align="right" valign="top"><a id="a7b52fa10c4359dcc25aed43be0be8a91"></a>
 static constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a7b52fa10c4359dcc25aed43be0be8a91">default_internal_buffer_size</a> = 1024</td></tr>
-<tr class="memdesc:a7b52fa10c4359dcc25aed43be0be8a91"><td class="mdescLeft">&#160;</td><td class="mdescRight">The default internal buffer size used by <code>c_str</code>. <br /></td></tr>
+<tr class="memdesc:a7b52fa10c4359dcc25aed43be0be8a91"><td class="mdescLeft">&#160;</td><td class="mdescRight">The default internal buffer size used by <code>rendered_path</code>. <br /></td></tr>
 <tr class="separator:a7b52fa10c4359dcc25aed43be0be8a91"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
@@ -281,10 +291,10 @@ Friends</h2></td></tr>
 <tr class="memitem:ad10ef737f6f91fc67cc2c26326b45c2f"><td class="memItemLeft" align="right" valign="top"><a id="ad10ef737f6f91fc67cc2c26326b45c2f"></a>
 class&#160;</td><td class="memItemRight" valign="bottom"><b>path_view</b></td></tr>
 <tr class="separator:ad10ef737f6f91fc67cc2c26326b45c2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9c02c1b6cc56f8221abea75a1e92a776"><td class="memTemplParams" colspan="2"><a id="a9c02c1b6cc56f8221abea75a1e92a776"></a>
-template&lt;class T , class Deleter , size_t _internal_buffer_size, typename std::enable_if&lt;(is_source_acceptable&lt; T &gt;), bool &gt;::type &gt; </td></tr>
-<tr class="memitem:a9c02c1b6cc56f8221abea75a1e92a776"><td class="memTemplItemLeft" align="right" valign="top">struct&#160;</td><td class="memTemplItemRight" valign="bottom"><b>c_str</b></td></tr>
-<tr class="separator:a9c02c1b6cc56f8221abea75a1e92a776"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d38f4da32ec326ad1376cf61c67d828"><td class="memTemplParams" colspan="2"><a id="a7d38f4da32ec326ad1376cf61c67d828"></a>
+template&lt;enum path_view_component::zero_termination ZeroTermination, class T , class Deleter , size_t _internal_buffer_size, typename std::enable_if&lt;(is_source_acceptable&lt; T &gt;), bool &gt;::type &gt; </td></tr>
+<tr class="memitem:a7d38f4da32ec326ad1376cf61c67d828"><td class="memTemplItemLeft" align="right" valign="top">class&#160;</td><td class="memTemplItemRight" valign="bottom"><b>rendered_path</b></td></tr>
+<tr class="separator:a7d38f4da32ec326ad1376cf61c67d828"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4a9a4f820db0394db4c89c45e514a33c"><td class="memItemLeft" align="right" valign="top"><a id="a4a9a4f820db0394db4c89c45e514a33c"></a>
 LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::operator==</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> x, <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> y) noexcept</td></tr>
 <tr class="separator:a4a9a4f820db0394db4c89c45e514a33c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -305,7 +315,47 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An iterated part of a <code>path_view</code>. </p>
-</div><h2 class="groupheader">Member Enumeration Documentation</h2>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a id="a1445489215e7cd1a3aa04a9636ecfedc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1445489215e7cd1a3aa04a9636ecfedc">&#9670;&nbsp;</a></span>zero_terminated_rendered_path</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class T  = typename filesystem::path::value_type, class AllocatorOrDeleter  = default_rendered_path_deleter&lt;T[]&gt;, size_t _internal_buffer_size = default_internal_buffer_size&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a1445489215e7cd1a3aa04a9636ecfedc">llfio_v2_xxx::path_view_component::zero_terminated_rendered_path</a> =  (enum <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732e">path_view_component::zero_termination</a> ZeroTermination, class T = typename filesystem::path::value_type, class AllocatorOrDeleter = <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a47b83e7b5de763a6595d1c670faad77a">default_rendered_path_deleter</a>&lt;T[]&gt;, size_t _internal_buffer_size = <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a7b52fa10c4359dcc25aed43be0be8a91">default_internal_buffer_size</a>) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a411e9c36a49bd37d596ab34f99b656fd">is_source_acceptable</a>&lt;T&gt;)) class rendered_path rendered_path&lt;zero_termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convenience type alias. </p>
+<p>Instantiate from a <code>path_view_component</code> to get a path suitable for feeding to other code. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>The destination encoding required. </td></tr>
+    <tr><td class="paramname">Deleter</td><td>A custom deleter OR STL allocator for any temporary buffer. </td></tr>
+    <tr><td class="paramname">_internal_buffer_size</td><td>Override the size of the internal temporary buffer, thus reducing stack space consumption (most compilers optimise away the internal temporary buffer if it can be proved it will never be used). The default is 1024 values of <code>T</code>.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>This makes the input to the path view component into a destination format suitable for consumption by other code. If the source has the same format as the destination, and the zero termination requirements are the same, the source is used directly without memory copying nor reencoding.</p>
+<p>If the format is compatible, but the destination requires zero termination, and the source is not zero terminated, a straight memory copy is performed into the temporary buffer.</p>
+<p><code>rendered_path</code> contains a temporary buffer sized according to the template parameter. Output below that amount involves no dynamic memory allocation. Output above that amount calls <code>operator new[]</code>. You can use an externally supplied larger temporary buffer to avoid dynamic memory allocation in all situations.</p>
+<p>Construct, performing any reencoding or memory copying required. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">view</td><td>The path component view to use as source. </td></tr>
+    <tr><td class="paramname">output_zero_termination</td><td>The zero termination in the output desired </td></tr>
+    <tr><td class="paramname">loc</td><td>The locale to use to perform reencoding. </td></tr>
+    <tr><td class="paramname">allocate</td><td>Either a callable with prototype <code>value_type *(size_t length)</code> which is defaulted to <code>return static_cast&lt;value_type *&gt;(operator new[](length * sizeof(value_type)));</code>, or a <code>pmr::memory_resource *</code>. You can return <code>nullptr</code> if you wish, the consumer of <code>rendered_path</code> will see a <code>buffer</code> set to <code>nullptr</code>.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>If <code>loc</code> is defaulted, and an error occurs during any conversion from UTF-8 or UTF-16, an exception of <code>system_error(errc::illegal_byte_sequence)</code> is thrown. This is because if you tell <code>path_view</code> that its source is UTF-8 or UTF-16, then that must be <b>valid</b> UTF. If you wish to supply UTF-invalid paths (which are legal on most filesystems), use native narrow or wide encoded source, or binary. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Enumeration Documentation</h2>
 <a id="a3d0688505b971f8ff6f9b9075817d48d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3d0688505b971f8ff6f9b9075817d48d">&#9670;&nbsp;</a></span>format</h2>
 
@@ -756,8 +806,8 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a486c1bc907c6de489ac94069d6681c53"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a486c1bc907c6de489ac94069d6681c53">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[3/3]</span></h2>
+<a id="ac6e27d02fd4196fa0f4daee6224cc8cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac6e27d02fd4196fa0f4daee6224cc8cc">&#9670;&nbsp;</a></span>LLFIO_TEMPLATE() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -772,7 +822,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">class Deleter&#160;</td>
-          <td class="paramname"> = <code><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#aaa1116ad357d1c73d1cc26ce28b29c82">default_c_str_deleter</a>&lt;T[]&gt;</code>, </td>
+          <td class="paramname"> = <code><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html#a47b83e7b5de763a6595d1c670faad77a">default_rendered_path_deleter</a>&lt;T[]&gt;</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -788,9 +838,9 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v
       </table>
 </div><div class="memdoc">
 <p>Compares the two path views for equivalence or ordering using <code>T</code> as the destination encoding, if necessary.</p>
-<p>If the source encodings of the two path views are compatible, a lexicographical comparison is performed. If they are incompatible, either or both views are converted to the destination encoding using <code>c_str&lt;T, Delete, _internal_buffer_size&gt;</code>, and then a lexicographical comparison is performed.</p>
-<p>This can, for obvious reasons, be expensive. It can also throw exceptions, as <code>c_str</code> does.</p>
-<p>If the destination encoding is <code>byte</code>, <code>memcmp()</code> is used, and <code>c_str</code> is never invoked as the two sources are byte compared directly. </p>
+<p>If the source encodings of the two path views are compatible, a lexicographical comparison is performed. If they are incompatible, either or both views are converted to the destination encoding using <code>rendered_path&lt;T, Delete, _internal_buffer_size&gt;</code>, and then a lexicographical comparison is performed.</p>
+<p>This can, for obvious reasons, be expensive. It can also throw exceptions, as <code>rendered_path</code> does.</p>
+<p>If the destination encoding is <code>byte</code>, <code>memcmp()</code> is used, and <code>rendered_path</code> is never invoked as the two sources are byte compared directly. </p>
 
 </div>
 </div>
