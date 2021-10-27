@@ -55,8 +55,8 @@ than memory maps. However for lots of say 64 byte i/o, the gain of memory maps o
 syscalls is unsurpassable.
 
 This class combines a `file_handle` with a `section_handle` and a `map_handle` to
-implement a fully memory mapped `file_handle`. The whole file is always mapped entirely
-into memory, and `read()` and `write()` i/o is performed directly with the map.
+implement a fully memory mapped `file_handle`. The portion of the file between `starting_offset()`
+and `capacity()` is mapped into memory, and `read()` and `write()` i/o is performed directly with the map.
 Reads always return the original mapped data, and do not fill any buffers passed in.
 For obvious reasons the utility of this class on 32-bit systems is limited,
 but can be useful when used with smaller files.
@@ -103,6 +103,18 @@ fetches the maximum extent of the underlying file, and if it has changed from th
 length, the map is updated to match the underlying file, up to the reservation limit.
 You can of course explicitly call `update_map()` whenever you need the map to reflect
 changes to the maximum extent of the underlying file.
+
+`starting_offset()` offsets all map i/o, truncation, and sizing, it is always as if the
+underlying file starts from that offset. This *only* applies to the `map_handle` portion,
+the `section_handle` portion has no concept of starting offsets. Starting offsets can
+be byte granularity, the underlying map will use an appropriate platform specific
+granularity (typically the page size on POSIX and 64Kb on Windows). You might note that
+combined with how reservations work, this allows a `mapped_file_handle` to wholly reflect
+a subset of a very large file -- only the relevant portion of that very large file will
+be mapped into memory, `read()` and `write()` will not exceed the boundaries of
+`starting_offset() - capacity()`, and `maximum_extent()` will not return a value
+exceeding the reservation. This effectively means such a subset file quacks like a
+`file_handle` of a complete file reflecting just that subset proportion.
 
 It is up to you to detect that the reservation has been exhausted, and to
 reserve a new reservation which will change the value returned by `address()`. This
@@ -174,6 +186,7 @@ public:
 
 protected:
   size_type _reservation{0};
+  extent_type _offset{0};
   section_handle _sh;  // Tracks the file (i.e. *this) somewhat lazily
   map_handle _mh;      // The current map with valid extent
 
@@ -228,6 +241,7 @@ protected:
     if(!!(_sh.section_flags() & section_handle::flag::write_via_syscall))
     {
       const auto batch = file_handle::_do_max_buffers();
+      reqs.offset += _offset;
       io_request<const_buffers_type> thisreq(reqs);
       LLFIO_DEADLINE_TO_SLEEP_INIT(d);
       for(size_t n = 0; n < reqs.buffers.size();)
@@ -271,6 +285,7 @@ public:
   mapped_file_handle(mapped_file_handle &&o) noexcept
       : file_handle(std::move(o))
       , _reservation(o._reservation)
+      , _offset(o._offset)
       , _sh(std::move(o._sh))
       , _mh(std::move(o._mh))
   {
@@ -286,14 +301,22 @@ public:
   //! No copy construction (use `clone()`)
   mapped_file_handle(const mapped_file_handle &) = delete;
   //! Explicit conversion from file_handle permitted
-  explicit constexpr mapped_file_handle(file_handle &&o, section_handle::flag sflags) noexcept
+  LLFIO_TEMPLATE(class SHF)
+  LLFIO_TREQUIRES(LLFIO_TPRED(std::is_same<typename std::decay<SHF>::type, section_handle::flag>::value ||
+                              std::is_same<typename std::decay<SHF>::type, section_handle::flag::enum_type>::value))
+  explicit constexpr mapped_file_handle(file_handle &&o, SHF sflags, extent_type offset) noexcept
       : file_handle(std::move(o))
+      , _offset(offset)
       , _sh(sflags)
   {
   }
   //! Explicit conversion from file_handle permitted, this overload also attempts to map the file
-  explicit mapped_file_handle(file_handle &&o, size_type reservation, section_handle::flag sflags)
+  LLFIO_TEMPLATE(class SHF)
+  LLFIO_TREQUIRES(LLFIO_TPRED(std::is_same<typename std::decay<SHF>::type, section_handle::flag>::value ||
+                              std::is_same<typename std::decay<SHF>::type, section_handle::flag::enum_type>::value))
+  explicit mapped_file_handle(file_handle &&o, size_type reservation, SHF sflags, extent_type offset)
       : file_handle(std::move(o))
+      , _offset(offset)
       , _sh(sflags)
   {
     auto length = (extent_type) -1;
@@ -360,7 +383,7 @@ public:
   LLFIO_MAKE_FREE_FUNCTION
   static inline result<mapped_file_handle> mapped_file(size_type reservation, const path_handle &base, path_view_type _path, mode _mode = mode::read,
                                                        creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none,
-                                                       section_handle::flag sflags = section_handle::flag::none) noexcept
+                                                       section_handle::flag sflags = section_handle::flag::none, extent_type offset = 0) noexcept
   {
     try
     {
@@ -374,7 +397,7 @@ public:
       default:
       {
         // Attempt mapping now (may silently fail if file is empty)
-        mapped_file_handle mfh(std::move(fh), reservation, sflags);
+        mapped_file_handle mfh(std::move(fh), reservation, sflags, offset);
         return {std::move(mfh)};
       }
       case creation::only_if_not_exist:
@@ -382,7 +405,7 @@ public:
       case creation::always_new:
       {
         // Don't attempt mapping now as file will be empty
-        mapped_file_handle mfh(std::move(fh), sflags);
+        mapped_file_handle mfh(std::move(fh), sflags, offset);
         mfh._reservation = reservation;
         return {std::move(mfh)};
       }
@@ -397,9 +420,9 @@ public:
   LLFIO_MAKE_FREE_FUNCTION
   static inline result<mapped_file_handle> mapped_file(const path_handle &base, path_view_type _path, mode _mode = mode::read,
                                                        creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none,
-                                                       section_handle::flag sflags = section_handle::flag::none) noexcept
+                                                       section_handle::flag sflags = section_handle::flag::none, extent_type offset = 0) noexcept
   {
-    return mapped_file(0, base, _path, _mode, _creation, _caching, flags, sflags);
+    return mapped_file(0, base, _path, _mode, _creation, _caching, flags, sflags, offset);
   }
 
   /*! Create an mapped file handle creating a uniquely named file on a path.
@@ -476,7 +499,7 @@ public:
     try
     {
       OUTCOME_TRY(auto &&v, file_handle::temp_inode(dir, _mode, flags));
-      mapped_file_handle ret(std::move(v), sflags);
+      mapped_file_handle ret(std::move(v), sflags, 0);
       ret._reservation = reservation;
       return {std::move(ret)};
     }
@@ -496,8 +519,10 @@ public:
   //! The map this handle is using
   map_handle &map() noexcept { return _mh; }
 
-  //! The address in memory where this mapped file resides
+  //! The address in memory where this mapped file currently resides
   byte *address() const noexcept { return _mh.address(); }
+  //! The offset into the backing file from which this mapped file begins
+  extent_type starting_offset() const noexcept { return _offset; }
 
   //! The page size used by the map, in bytes.
   size_type page_size() const noexcept { return _mh.page_size(); }
@@ -505,8 +530,16 @@ public:
   //! True if the map is of non-volatile RAM
   bool is_nvram() const noexcept { return _mh.is_nvram(); }
 
-  //! The maximum extent of the underlying file
-  result<extent_type> underlying_file_maximum_extent() const noexcept { return file_handle::maximum_extent(); }
+  //! The maximum extent of the underlying file, minus any offset.
+  result<extent_type> underlying_file_maximum_extent() const noexcept
+  {
+    OUTCOME_TRY(auto &&ret, file_handle::maximum_extent());
+    if(ret <= _offset)
+    {
+      return 0;
+    }
+    return ret - _offset;
+  }
 
   //! The address space (to be) reserved for future expansion of this file.
   size_type capacity() const noexcept { return _reservation; }
@@ -539,7 +572,7 @@ public:
     try
     {
       OUTCOME_TRY(auto &&fh, file_handle::reopen(mode_, caching_, d));
-      return mapped_file_handle(std::move(fh), reservation, _sh.section_flags());
+      return mapped_file_handle(std::move(fh), reservation, _sh.section_flags(), _offset);
     }
     catch(...)
     {
@@ -656,6 +689,17 @@ public:
 
   LLFIO_DEADLINE_TRY_FOR_UNTIL(relink)
 };
+static_assert(!std::is_constructible<mapped_file_handle, file_handle, int, int>::value, "mapped_file_handle(file_handle, int, int) must not be constructible!");
+static_assert(!std::is_constructible<mapped_file_handle, file_handle, int, int, int>::value,
+              "mapped_file_handle(file_handle, int, int, int) must not be constructible!");
+static_assert(std::is_constructible<mapped_file_handle, file_handle, section_handle::flag, int>::value,
+              "mapped_file_handle(file_handle, section_handle::flag, int) must be constructible!");
+static_assert(std::is_constructible<mapped_file_handle, file_handle, section_handle::flag::enum_type, int>::value,
+              "mapped_file_handle(file_handle, section_handle::flag::enum_type, int) must be constructible!");
+static_assert(std::is_constructible<mapped_file_handle, file_handle, int, section_handle::flag, int>::value,
+              "mapped_file_handle(file_handle, int, section_handle::flag, int) must be constructible!");
+static_assert(std::is_constructible<mapped_file_handle, file_handle, int, section_handle::flag::enum_type, int>::value,
+              "mapped_file_handle(file_handle, int, section_handle::flag::enum_type, int) must be constructible!");
 
 //! \brief Constructor for `mapped_file_handle`
 template <> struct construct<mapped_file_handle>

@@ -223,7 +223,7 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_barrier(ma
                                                                               deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  byte *addr = _addr + reqs.offset;
+  byte *addr = _addr + reqs.offset + (_offset & (_pagesize - 1));
   size_type bytes = 0;
   // Check for overflow
   for(const auto &req : reqs.buffers)
@@ -402,12 +402,12 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
   {
     int flagscopy = flags & ~MAP_SHARED;
     flagscopy |= MAP_SHARED_VALIDATE | MAP_SYNC;
-    addr = ::mmap(ataddr, bytes, prot, flagscopy, fd_to_use, offset);
+    addr = ::mmap(ataddr, bytes, prot, flagscopy, fd_to_use, offset & ~(pagesize - 1));
   }
 #endif
   if(addr == nullptr)
   {
-    addr = ::mmap(ataddr, bytes, prot, flags, fd_to_use, offset);
+    addr = ::mmap(ataddr, bytes, prot, flags, fd_to_use, offset & ~(pagesize - 1));
   }
   // printf("%d mmap %p-%p\n", getpid(), addr, (char *) addr+bytes);
   if(MAP_FAILED == addr)  // NOLINT
@@ -480,6 +480,14 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   {
     bytes = length - offset;
   }
+  if(length <= offset)
+  {
+    length = 0;
+  }
+  else
+  {
+    length -= offset;
+  }
   result<map_handle> ret{map_handle(&section, _flag)};
   native_handle_type &nativeh = ret.value()._v;
   OUTCOME_TRY(auto &&pagesize, detail::pagesize_from_flags(ret.value()._flag));
@@ -487,7 +495,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   ret.value()._addr = static_cast<byte *>(addr);
   ret.value()._offset = offset;
   ret.value()._reservation = utils::round_up_to_page_size(bytes, pagesize);
-  ret.value()._length = (length - offset < bytes) ? (length - offset) : bytes;  // length of backing, not reservation
+  ret.value()._length = length;
   ret.value()._pagesize = pagesize;
   // Make my handle borrow the native handle of my backing storage
   ret.value()._v.fd = section.native_handle().fd;
@@ -504,6 +512,14 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
   if(_section != nullptr)
   {
     OUTCOME_TRY(length, _section->length());  // length of the backing file
+    if(length <= _offset)
+    {
+      length = 0;
+    }
+    else
+    {
+      length -= _offset;
+    }
   }
   auto _newsize = utils::round_up_to_page_size(newsize, _pagesize);
   if(_newsize == _reservation)
@@ -532,7 +548,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
     OUTCOME_TRY(auto &&addr, do_mmap(_v, nullptr, 0, _section, _pagesize, newsize, _offset, _flag));
     _addr = static_cast<byte *>(addr);
     _reservation = _newsize;
-    _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
+    _length = length;
     return newsize;
   }
 #ifdef __linux__
@@ -544,7 +560,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
   }
   _addr = static_cast<byte *>(newaddr);
   _reservation = _newsize;
-  _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
+  _length = length;
   return newsize;
 #else
   (void) permit_relocation;
@@ -557,7 +573,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
     extent_type offset = _offset + _reservation;
     OUTCOME_TRY(auto &&addr, do_mmap(_v, addrafter, MAP_FIXED | MAP_EXCL, _section, _pagesize, bytes, offset, _flag));
     _reservation = _newsize;
-    _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
+    _length = length;
     return newsize;
 #else  // generic POSIX, inefficient
     byte *addrafter = _addr + _reservation;
@@ -570,7 +586,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
       return errc::not_enough_memory;
     }
     _reservation = _newsize;
-    _length = (length - _offset < newsize) ? (length - _offset) : newsize;  // length of backing, not reservation
+    _length = length;
     return newsize;
 #endif
   }
@@ -580,7 +596,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
     return posix_error();
   }
   _reservation = newsize;
-  _length = (length - _offset < newsize) ? (length - _offset) : newsize;
+  _length = length;
   return newsize;
 #endif
 }
@@ -702,7 +718,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
 map_handle::io_result<map_handle::buffers_type> map_handle::_do_read(io_request<buffers_type> reqs, deadline /*d*/) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  byte *addr = _addr + reqs.offset;
+  byte *addr = _addr + reqs.offset + (_offset & (_pagesize - 1));
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
   for(size_t i = 0; i < reqs.buffers.size(); i++)
   {
@@ -725,18 +741,20 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_write(io_r
   LLFIO_LOG_FUNCTION_CALL(this);
   if(!!(_flag & section_handle::flag::write_via_syscall) && _section != nullptr && _section->backing() != nullptr)
   {
+    reqs.offset += _offset;
     auto r = _section->backing()->write(reqs, d);
     if(!r)
     {
       return std::move(r).error();
     }
+    reqs.offset += _offset;
     if(reqs.offset + r.bytes_transferred() > _length)
     {
       OUTCOME_TRY(update_map());
     }
     return std::move(r).value();
   }
-  byte *addr = _addr + reqs.offset;
+  byte *addr = _addr + reqs.offset + (_offset & (_pagesize - 1));
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
   if(QUICKCPPLIB_NAMESPACE::signal_guard::signal_guard(
      QUICKCPPLIB_NAMESPACE::signal_guard::signalc_set::undefined_memory_access | QUICKCPPLIB_NAMESPACE::signal_guard::signalc_set::segmentation_fault,
