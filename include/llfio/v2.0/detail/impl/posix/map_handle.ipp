@@ -397,7 +397,7 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
   }
   auto _offset = offset & ~(pagesize - 1);
   auto _bytes = bytes + (offset & (pagesize - 1));
-// printf("mmap(%p, %u, %d, %d, %d, %u)\n", ataddr, (unsigned) bytes, prot, flags, have_backing ? section->native_handle().fd : -1, (unsigned) offset);
+// printf("mmap(%p, %u (%u), %d, %d, %d, %u (%u))\n", ataddr, (unsigned) _bytes, (unsigned) bytes, prot, flags, have_backing ? section->native_handle().fd : -1, (unsigned) _offset, (unsigned) offset);
 #ifdef MAP_SYNC  // Linux kernel 4.15 or later only
   // If backed by a file into persistent shared memory, ask the kernel to use persistent memory safe semantics
   if(have_backing && (_flag & section_handle::flag::nvram) && (flags & MAP_SHARED) != 0)
@@ -478,10 +478,6 @@ result<map_handle> map_handle::_new_map(size_type bytes, bool fallback, section_
 result<map_handle> map_handle::map(section_handle &section, size_type bytes, extent_type offset, section_handle::flag _flag) noexcept
 {
   OUTCOME_TRY(auto &&length, section.length());  // length of the backing file
-  if(bytes == 0u)
-  {
-    bytes = length - offset;
-  }
   if(length <= offset)
   {
     length = 0;
@@ -490,7 +486,11 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   {
     length -= offset;
   }
-  if(length < bytes)
+  if(bytes == 0u)
+  {
+    bytes = length;
+  }
+  else if(length > bytes)
   {
     length = bytes;
   }
@@ -525,6 +525,10 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
     else
     {
       length -= _offset;
+    }
+    if(length > _reservation)
+    {
+      length = _reservation;
     }
   }
   auto _newsize = utils::round_up_to_page_size(newsize, _pagesize);

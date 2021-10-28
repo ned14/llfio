@@ -682,6 +682,23 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
+  OUTCOME_TRY(auto &&length, section.length());  // length of the backing file
+  if(length <= offset)
+  {
+    length = 0;
+  }
+  else
+  {
+    length -= offset;
+  }
+  if(bytes == 0u)
+  {
+    bytes = length;
+  }
+  else if(length > bytes)
+  {
+    length = bytes;
+  }
   result<map_handle> ret{map_handle(&section, _flag)};
   native_handle_type &nativeh = ret.value()._v;
   ULONG allocation = 0, prot;
@@ -701,7 +718,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   ret.value()._addr = static_cast<byte *>(addr);
   ret.value()._offset = offset;
   ret.value()._reservation = _bytes - (offset & 65535);
-  ret.value()._length = std::min((size_type)(section.length().value() - offset), bytes);
+  ret.value()._length = length;
   ret.value()._pagesize = pagesize;
   // Make my handle borrow the native handle of my backing storage
   ret.value()._v.h = section.backing_native_handle().h;
@@ -773,6 +790,10 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool /* un
   else
   {
     length -= _offset;
+  }
+  if(length > _reservation)
+  {
+    length = _reservation;
   }
   if(newsize < _reservation)
   {
