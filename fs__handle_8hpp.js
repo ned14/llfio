@@ -1,5 +1,6 @@
 var fs__handle_8hpp =
 [
+    [ "fs_handle", "classllfio__v2__xxx_1_1fs__handle.html", "classllfio__v2__xxx_1_1fs__handle" ],
     [ "win32_path_namespace", "fs__handle_8hpp.html#abcb445e5dfcc0eb04ce49ac8af0bc89a", [
       [ "any", "fs__handle_8hpp.html#abcb445e5dfcc0eb04ce49ac8af0bc89aa100b8cad7cf2a56f6df78f171f97a1ec", null ],
       [ "device", "fs__handle_8hpp.html#abcb445e5dfcc0eb04ce49ac8af0bc89aa913f9c49dcb544e2087cee284f4a00b7", null ],

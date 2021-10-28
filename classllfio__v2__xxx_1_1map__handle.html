@@ -729,19 +729,19 @@ MacOS:</h3>
 <tr><td class="fieldname"><a id="a22f9cba517e54e36ef80a788af737b8ba10cae1239f2f367d8bfa752a29811e9e"></a>over_commit&#160;</td><td class="fielddoc"><p>This system will permit more memory to be committed than physical RAM and your swap files, and will terminate your process without warning at some unknown point if you write into enough of the pages committed. This is typically the default on Linux, but it can be changed at runtime. </p>
 </td></tr>
 </table>
-<div class="fragment"><div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;  {</div>
-<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;    unknown,<span class="comment"></span></div>
-<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;<span class="comment">    /*! This system will not permit more than physical RAM and your swap files to be committed.</span></div>
-<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;<span class="comment">    On every OS except for Linux, this is always the case.</span></div>
-<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;<span class="comment">    */</span></div>
-<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;    commit_charge,<span class="comment"></span></div>
-<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;<span class="comment">    /*! This system will permit more memory to be committed than physical RAM and your swap</span></div>
-<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;<span class="comment">    files, and will terminate your process without warning at some unknown point</span></div>
-<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;<span class="comment">    if you write into enough of the pages committed. This is typically the default on Linux,</span></div>
-<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;<span class="comment">    but it can be changed at runtime.</span></div>
-<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;<span class="comment">    */</span></div>
-<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;    over_commit</div>
-<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;  };</div>
+<div class="fragment"><div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;  {</div>
+<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;    unknown,<span class="comment"></span></div>
+<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;<span class="comment">    /*! This system will not permit more than physical RAM and your swap files to be committed.</span></div>
+<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;<span class="comment">    On every OS except for Linux, this is always the case.</span></div>
+<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;<span class="comment">    */</span></div>
+<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;    commit_charge,<span class="comment"></span></div>
+<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;<span class="comment">    /*! This system will permit more memory to be committed than physical RAM and your swap</span></div>
+<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;<span class="comment">    files, and will terminate your process without warning at some unknown point</span></div>
+<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;<span class="comment">    if you write into enough of the pages committed. This is typically the default on Linux,</span></div>
+<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;<span class="comment">    but it can be changed at runtime.</span></div>
+<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;<span class="comment">    */</span></div>
+<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;    over_commit</div>
+<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;  };</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1338,7 +1338,7 @@ For portability, you can only assume that barriers write order for a single hand
   <table class="params">
     <tr><td class="paramname">section</td><td>A memory section handle specifying the backing storage to use. </td></tr>
     <tr><td class="paramname">bytes</td><td>How many bytes to reserve (0 = the size of the section). Rounded up to nearest 64Kb on Windows. </td></tr>
-    <tr><td class="paramname">offset</td><td>The offset into the backing storage to map from. Typically needs to be at least a multiple of the page size (see <code>page_size()</code>), on Windows it needs to be a multiple of the kernel memory allocation granularity (typically 64Kb). </td></tr>
+    <tr><td class="paramname">offset</td><td>The offset into the backing storage to map from. This can be byte granularity, but be careful if you use non-pagesize offsets (see below). </td></tr>
     <tr><td class="paramname">_flag</td><td>The permissions with which to map the view which are constrained by the permissions of the memory section. <code>flag::none</code> can be useful for reserving virtual address space without committing system resources, use <code>commit()</code> to later change availability of memory. Note that apart from read/write/cow/execute, the section's flags override the map's flags.</td></tr>
   </table>
   </dd>
@@ -2176,7 +2176,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><!-- doc-content -->
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a7848ef15e774eacec7e4446a8c365a3d"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a7848ef15e774eacec7e4446a8c365a3d">llfio_v2_xxx::io_handle::write</a></div><div class="ttdeci">io_result&lt; const_buffers_type &gt; write(io_request&lt; const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the open handle, preferentially using any i/o multiplexer set over the virtually overri...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:325</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a6a1044eeb6ab16939e4669bbeb071b32"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a6a1044eeb6ab16939e4669bbeb071b32">llfio_v2_xxx::io_handle::barrier</a></div><div class="ttdeci">virtual io_result&lt; const_buffers_type &gt; barrier(io_request&lt; const_buffers_type &gt; reqs=io_request&lt; const_buffers_type &gt;(), barrier_kind kind=barrier_kind::nowait_data_only, deadline d=deadline()) noexcept</div><div class="ttdoc">Issue a write reordering barrier such that writes preceding the barrier will reach storage before wri...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:376</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_ad17b8879c355d86174187f198b70baaa"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#ad17b8879c355d86174187f198b70baaa">llfio_v2_xxx::io_handle::_do_allocate_registered_buffer</a></div><div class="ttdeci">virtual result&lt; registered_buffer_type &gt; _do_allocate_registered_buffer(size_t &amp;bytes) noexcept</div><div class="ttdoc">The virtualised implementation of allocate_registered_buffer() used if no multiplexer has been set.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:1008</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_ad17b8879c355d86174187f198b70baaa"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#ad17b8879c355d86174187f198b70baaa">llfio_v2_xxx::io_handle::_do_allocate_registered_buffer</a></div><div class="ttdeci">virtual result&lt; registered_buffer_type &gt; _do_allocate_registered_buffer(size_t &amp;bytes) noexcept</div><div class="ttdoc">The virtualised implementation of allocate_registered_buffer() used if no multiplexer has been set.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:1023</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a4379e3f84b913f606bb2ec6a194d4380"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a4379e3f84b913f606bb2ec6a194d4380">llfio_v2_xxx::io_handle::_do_read</a></div><div class="ttdeci">virtual io_result&lt; buffers_type &gt; _do_read(io_request&lt; buffers_type &gt; reqs, deadline d) noexcept</div><div class="ttdoc">The virtualised implementation of read() used if no multiplexer has been set.</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__multiplexer_html_a00bf4ea26d854a7e8c9734f357d417f3"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__multiplexer.html#a00bf4ea26d854a7e8c9734f357d417f3">llfio_v2_xxx::io_multiplexer::construct</a></div><div class="ttdeci">virtual io_operation_state * construct(span&lt; byte &gt; storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &amp;&amp;b, deadline d, io_request&lt; buffers_type &gt; reqs) noexcept=0</div><div class="ttdoc">Constructs either a unsynchronised_io_operation_state or a synchronised_io_operation_state for a read...</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__multiplexer_html_a1cc4f56ad15d1bed49d68c56a278ad0c"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__multiplexer.html#a1cc4f56ad15d1bed49d68c56a278ad0c">llfio_v2_xxx::io_multiplexer::do_io_handle_max_buffers</a></div><div class="ttdeci">virtual size_t do_io_handle_max_buffers(const io_handle *h) const noexcept</div><div class="ttdoc">Implements io_handle::max_buffers()</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:504</div></div>

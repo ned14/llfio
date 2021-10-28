@@ -106,7 +106,7 @@ Inheritance diagram for llfio_v2_xxx::pipe_handle:</div>
   <img src="classllfio__v2__xxx_1_1pipe__handle.png" usemap="#llfio_5Fv2_5Fxxx::pipe_5Fhandle_map" alt=""/>
   <map id="llfio_5Fv2_5Fxxx::pipe_5Fhandle_map" name="llfio_5Fv2_5Fxxx::pipe_5Fhandle_map">
 <area href="classllfio__v2__xxx_1_1io__handle.html" title="A handle to something capable of scatter-gather byte i/o." alt="llfio_v2_xxx::io_handle" shape="rect" coords="0,56,153,80"/>
-<area href="classfs__handle.html" title="A handle to something with a device and inode number." alt="fs_handle" shape="rect" coords="163,56,316,80"/>
+<area href="classllfio__v2__xxx_1_1fs__handle.html" title="A handle to something with a device and inode number." alt="llfio_v2_xxx::fs_handle" shape="rect" coords="163,56,316,80"/>
 <area href="classllfio__v2__xxx_1_1handle.html" title="A native_handle_type which is managed by the lifetime of this object instance." alt="llfio_v2_xxx::handle" shape="rect" coords="0,0,153,24"/>
   </map>
 </div></div>
@@ -161,7 +161,7 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>dev_t</b> = fs_handl
 using&#160;</td><td class="memItemRight" valign="bottom"><b>ino_t</b> = fs_handle::ino_t</td></tr>
 <tr class="separator:a391dfad3885f1586224c44c6824e30eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac121cc7fa9d30c0c4ffecd0d8469c37d"><td class="memItemLeft" align="right" valign="top"><a id="ac121cc7fa9d30c0c4ffecd0d8469c37d"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>path_view_type</b> = fs_handle::path_view_type</td></tr>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>path_view_type</b> = <a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#abcd8c8171f4e561620864295e8d5879b">fs_handle::path_view_type</a></td></tr>
 <tr class="separator:ac121cc7fa9d30c0c4ffecd0d8469c37d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0e3d363c01073647a00a2fbbd7b50fbf"><td class="memItemLeft" align="right" valign="top"><a id="a0e3d363c01073647a00a2fbbd7b50fbf"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>barrier_kind</b> = <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26">io_multiplexer::barrier_kind</a></td></tr>
@@ -173,6 +173,14 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>registered_buffer_ty
 template&lt;class T &gt; </td></tr>
 <tr class="memitem:ac7a2e68c2f5d49187ec3d179e40b33ea"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>awaitable</b> = <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html">io_multiplexer::awaitable</a>&lt; T &gt;</td></tr>
 <tr class="separator:ac7a2e68c2f5d49187ec3d179e40b33ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a65884346740af7fb4648c79d44a750"><td class="memItemLeft" align="right" valign="top"><a id="a1a65884346740af7fb4648c79d44a750"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#a1a65884346740af7fb4648c79d44a750">unique_id_type</a> = QUICKCPPLIB_NAMESPACE::integers128::uint128</td></tr>
+<tr class="memdesc:a1a65884346740af7fb4648c79d44a750"><td class="mdescLeft">&#160;</td><td class="mdescRight">The unique identifier type used by this handle. <br /></td></tr>
+<tr class="separator:a1a65884346740af7fb4648c79d44a750"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab82a83c5e44659e01a2218f0af41bde7"><td class="memItemLeft" align="right" valign="top"><a id="ab82a83c5e44659e01a2218f0af41bde7"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#ab82a83c5e44659e01a2218f0af41bde7">unique_id_type_hasher</a> = QUICKCPPLIB_NAMESPACE::integers128::uint128_hasher</td></tr>
+<tr class="memdesc:ab82a83c5e44659e01a2218f0af41bde7"><td class="mdescLeft">&#160;</td><td class="mdescRight">A hasher for the unique identifier type used by this handle. <br /></td></tr>
+<tr class="separator:ab82a83c5e44659e01a2218f0af41bde7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -433,14 +441,82 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a942b0d276c9f20fe41baab679b88fe72">native_handle</a> () const noexcept</td></tr>
 <tr class="memdesc:a942b0d276c9f20fe41baab679b88fe72"><td class="mdescLeft">&#160;</td><td class="mdescRight">The native handle used by this handle. <br /></td></tr>
 <tr class="separator:a942b0d276c9f20fe41baab679b88fe72"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac24ed4cdb96690d7da95cd17b0f3d090"><td class="memItemLeft" align="right" valign="top"><a id="ac24ed4cdb96690d7da95cd17b0f3d090"></a>
+dev_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#ac24ed4cdb96690d7da95cd17b0f3d090">st_dev</a> () const noexcept</td></tr>
+<tr class="memdesc:ac24ed4cdb96690d7da95cd17b0f3d090"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unless <code>flag::disable_safety_unlinks</code> is set, the device id of the file when opened. <br /></td></tr>
+<tr class="separator:ac24ed4cdb96690d7da95cd17b0f3d090"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad6465d30ee438b860ccc59c0e0fc4dc"><td class="memItemLeft" align="right" valign="top"><a id="aad6465d30ee438b860ccc59c0e0fc4dc"></a>
+ino_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#aad6465d30ee438b860ccc59c0e0fc4dc">st_ino</a> () const noexcept</td></tr>
+<tr class="memdesc:aad6465d30ee438b860ccc59c0e0fc4dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unless <code>flag::disable_safety_unlinks</code> is set, the inode of the file when opened. When combined with st_dev(), forms a unique identifer on this system. <br /></td></tr>
+<tr class="separator:aad6465d30ee438b860ccc59c0e0fc4dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9793fe40564fda2437783488bd51b9f1"><td class="memItemLeft" align="right" valign="top"><a id="a9793fe40564fda2437783488bd51b9f1"></a>
+<a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#a1a65884346740af7fb4648c79d44a750">unique_id_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#a9793fe40564fda2437783488bd51b9f1">unique_id</a> () const noexcept</td></tr>
+<tr class="memdesc:a9793fe40564fda2437783488bd51b9f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">A unique identifier for this handle across the entire system. Can be used in hash tables etc. <br /></td></tr>
+<tr class="separator:a9793fe40564fda2437783488bd51b9f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a865caad2f7f4bdf12fb74aabfe3c5ff5"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#a865caad2f7f4bdf12fb74aabfe3c5ff5">parent_path_handle</a> (<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) const noexcept</td></tr>
+<tr class="separator:a865caad2f7f4bdf12fb74aabfe3c5ff5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1eeaf9d77a1279b4f0d3062de509f77f"><td class="memTemplParams" colspan="2"><a id="a1eeaf9d77a1279b4f0d3062de509f77f"></a>
+template&lt;class... Args&gt; </td></tr>
+<tr class="memitem:a1eeaf9d77a1279b4f0d3062de509f77f"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_parent_path_handle</b> (Args &amp;&amp;... args) noexcept</td></tr>
+<tr class="separator:a1eeaf9d77a1279b4f0d3062de509f77f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a41ea4bd2d5a66fbde4cdbfe463166a4f"><td class="memTemplParams" colspan="2"><a id="a41ea4bd2d5a66fbde4cdbfe463166a4f"></a>
+template&lt;class... Args, class Rep , class Period &gt; </td></tr>
+<tr class="memitem:a41ea4bd2d5a66fbde4cdbfe463166a4f"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_parent_path_handle_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
+<tr class="separator:a41ea4bd2d5a66fbde4cdbfe463166a4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acbb1fe8c7901382307d84848fdc0afcb"><td class="memTemplParams" colspan="2"><a id="acbb1fe8c7901382307d84848fdc0afcb"></a>
+template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
+<tr class="memitem:acbb1fe8c7901382307d84848fdc0afcb"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_parent_path_handle_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
+<tr class="separator:acbb1fe8c7901382307d84848fdc0afcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8700edc9ecd4dd35d5aad7c65dd0eca2"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#a8700edc9ecd4dd35d5aad7c65dd0eca2">relink</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#abcd8c8171f4e561620864295e8d5879b">path_view_type</a> <a class="el" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>, bool atomic_replace=true, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
+<tr class="separator:a8700edc9ecd4dd35d5aad7c65dd0eca2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f5f9892f6652359f2330bf6d9b89e17"><td class="memTemplParams" colspan="2"><a id="a7f5f9892f6652359f2330bf6d9b89e17"></a>
+template&lt;class... Args&gt; </td></tr>
+<tr class="memitem:a7f5f9892f6652359f2330bf6d9b89e17"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_relink</b> (Args &amp;&amp;... args) noexcept</td></tr>
+<tr class="separator:a7f5f9892f6652359f2330bf6d9b89e17"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5565cd5f2fcbb9472b2a00795cc0bcc"><td class="memTemplParams" colspan="2"><a id="af5565cd5f2fcbb9472b2a00795cc0bcc"></a>
+template&lt;class... Args, class Rep , class Period &gt; </td></tr>
+<tr class="memitem:af5565cd5f2fcbb9472b2a00795cc0bcc"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_relink_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
+<tr class="separator:af5565cd5f2fcbb9472b2a00795cc0bcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1fc4e2ade67dfb9140007cc31f4b6b20"><td class="memTemplParams" colspan="2"><a id="a1fc4e2ade67dfb9140007cc31f4b6b20"></a>
+template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
+<tr class="memitem:a1fc4e2ade67dfb9140007cc31f4b6b20"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_relink_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
+<tr class="separator:a1fc4e2ade67dfb9140007cc31f4b6b20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7770c6b7c478d74654f25b8c1a1585c"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#aa7770c6b7c478d74654f25b8c1a1585c">link</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#abcd8c8171f4e561620864295e8d5879b">path_view_type</a> <a class="el" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
+<tr class="separator:aa7770c6b7c478d74654f25b8c1a1585c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad43b812385c7fc8aae9e59838a1411bb"><td class="memTemplParams" colspan="2"><a id="ad43b812385c7fc8aae9e59838a1411bb"></a>
+template&lt;class... Args&gt; </td></tr>
+<tr class="memitem:ad43b812385c7fc8aae9e59838a1411bb"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_link</b> (Args &amp;&amp;... args) noexcept</td></tr>
+<tr class="separator:ad43b812385c7fc8aae9e59838a1411bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65d73e0e89bac484ce40427b58dcfe53"><td class="memTemplParams" colspan="2"><a id="a65d73e0e89bac484ce40427b58dcfe53"></a>
+template&lt;class... Args, class Rep , class Period &gt; </td></tr>
+<tr class="memitem:a65d73e0e89bac484ce40427b58dcfe53"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_link_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
+<tr class="separator:a65d73e0e89bac484ce40427b58dcfe53"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2703814c7599d2081ca10763bbeba4a"><td class="memTemplParams" colspan="2"><a id="ad2703814c7599d2081ca10763bbeba4a"></a>
+template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
+<tr class="memitem:ad2703814c7599d2081ca10763bbeba4a"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_link_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
+<tr class="separator:ad2703814c7599d2081ca10763bbeba4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1dd7923bb65456af4da41ebe7cb84982"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#a1dd7923bb65456af4da41ebe7cb84982">unlink</a> (<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
+<tr class="separator:a1dd7923bb65456af4da41ebe7cb84982"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f77a249baf4e0c5de2172669a7724d7"><td class="memTemplParams" colspan="2"><a id="a7f77a249baf4e0c5de2172669a7724d7"></a>
+template&lt;class... Args&gt; </td></tr>
+<tr class="memitem:a7f77a249baf4e0c5de2172669a7724d7"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_unlink</b> (Args &amp;&amp;... args) noexcept</td></tr>
+<tr class="separator:a7f77a249baf4e0c5de2172669a7724d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a209de025a2d3e202a61c50b52d43f2af"><td class="memTemplParams" colspan="2"><a id="a209de025a2d3e202a61c50b52d43f2af"></a>
+template&lt;class... Args, class Rep , class Period &gt; </td></tr>
+<tr class="memitem:a209de025a2d3e202a61c50b52d43f2af"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_unlink_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
+<tr class="separator:a209de025a2d3e202a61c50b52d43f2af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9c4133fef23811abcb01e1faf2b19d3"><td class="memTemplParams" colspan="2"><a id="ae9c4133fef23811abcb01e1faf2b19d3"></a>
+template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
+<tr class="memitem:ae9c4133fef23811abcb01e1faf2b19d3"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_unlink_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
+<tr class="separator:ae9c4133fef23811abcb01e1faf2b19d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:ab2a30c788731707f70ff08c107ca1c97"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html">pipe_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html#ab2a30c788731707f70ff08c107ca1c97">pipe</a> (path_view_type <a class="el" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a> _mode, <a class="el" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42">creation</a> _creation, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> _caching=<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852aa181a603769c1f98ad927e7367c7aa51">caching::all</a>, flag <a class="el" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>=flag::none, const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base=<a class="el" href="namespacellfio__v2__xxx_1_1path__discovery.html#a2d3e2ea602c3195433c7898c41744188">path_discovery::temporary_named_pipes_directory</a>()) noexcept</td></tr>
+<tr class="memitem:ab2a30c788731707f70ff08c107ca1c97"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html">pipe_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html#ab2a30c788731707f70ff08c107ca1c97">pipe</a> (<a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#abcd8c8171f4e561620864295e8d5879b">path_view_type</a> <a class="el" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a> _mode, <a class="el" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42">creation</a> _creation, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> _caching=<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852aa181a603769c1f98ad927e7367c7aa51">caching::all</a>, flag <a class="el" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>=flag::none, const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base=<a class="el" href="namespacellfio__v2__xxx_1_1path__discovery.html#a2d3e2ea602c3195433c7898c41744188">path_discovery::temporary_named_pipes_directory</a>()) noexcept</td></tr>
 <tr class="separator:ab2a30c788731707f70ff08c107ca1c97"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6654057ec3ebf6eb2c7ea03f38882c15"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html">pipe_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html#a6654057ec3ebf6eb2c7ea03f38882c15">pipe_create</a> (path_view_type <a class="el" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> _caching=<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852aa181a603769c1f98ad927e7367c7aa51">caching::all</a>, flag <a class="el" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>=flag::unlink_on_first_close, const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base=<a class="el" href="namespacellfio__v2__xxx_1_1path__discovery.html#a2d3e2ea602c3195433c7898c41744188">path_discovery::temporary_named_pipes_directory</a>()) noexcept</td></tr>
+<tr class="memitem:a6654057ec3ebf6eb2c7ea03f38882c15"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html">pipe_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html#a6654057ec3ebf6eb2c7ea03f38882c15">pipe_create</a> (<a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#abcd8c8171f4e561620864295e8d5879b">path_view_type</a> <a class="el" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> _caching=<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852aa181a603769c1f98ad927e7367c7aa51">caching::all</a>, flag <a class="el" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>=flag::unlink_on_first_close, const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base=<a class="el" href="namespacellfio__v2__xxx_1_1path__discovery.html#a2d3e2ea602c3195433c7898c41744188">path_discovery::temporary_named_pipes_directory</a>()) noexcept</td></tr>
 <tr class="separator:a6654057ec3ebf6eb2c7ea03f38882c15"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad4f0b65aeb1df79398607012b6b3d5b2"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html">pipe_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html#ad4f0b65aeb1df79398607012b6b3d5b2">pipe_open</a> (path_view_type <a class="el" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> _caching=<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852aa181a603769c1f98ad927e7367c7aa51">caching::all</a>, flag <a class="el" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>=flag::none, const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base=<a class="el" href="namespacellfio__v2__xxx_1_1path__discovery.html#a2d3e2ea602c3195433c7898c41744188">path_discovery::temporary_named_pipes_directory</a>()) noexcept</td></tr>
+<tr class="memitem:ad4f0b65aeb1df79398607012b6b3d5b2"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html">pipe_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html#ad4f0b65aeb1df79398607012b6b3d5b2">pipe_open</a> (<a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#abcd8c8171f4e561620864295e8d5879b">path_view_type</a> <a class="el" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> _caching=<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852aa181a603769c1f98ad927e7367c7aa51">caching::all</a>, flag <a class="el" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>=flag::none, const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base=<a class="el" href="namespacellfio__v2__xxx_1_1path__discovery.html#a2d3e2ea602c3195433c7898c41744188">path_discovery::temporary_named_pipes_directory</a>()) noexcept</td></tr>
 <tr class="separator:ad4f0b65aeb1df79398607012b6b3d5b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af30e3385fb8e985df8c743b6c5e272d3"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html">pipe_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html#af30e3385fb8e985df8c743b6c5e272d3">random_pipe</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a> _mode=<a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaaecae13117d6f0584c25a9da6c8f8415e">mode::read</a>, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> _caching=<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852aa181a603769c1f98ad927e7367c7aa51">caching::all</a>, flag <a class="el" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>=flag::unlink_on_first_close, const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;dirpath=<a class="el" href="namespacellfio__v2__xxx_1_1path__discovery.html#a2d3e2ea602c3195433c7898c41744188">path_discovery::temporary_named_pipes_directory</a>()) noexcept</td></tr>
 <tr class="separator:af30e3385fb8e985df8c743b6c5e272d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -486,6 +562,10 @@ virtual <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__resul
 <tr class="memitem:a6ad2a78d5e63c1f12f34e496e2cc999e"><td class="memItemLeft" align="right" valign="top"><a id="a6ad2a78d5e63c1f12f34e496e2cc999e"></a>
 <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_do_multiplexer_barrier</b> (registered_buffer_type &amp;&amp;base, <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26">barrier_kind</a> kind, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d) noexcept</td></tr>
 <tr class="separator:a6ad2a78d5e63c1f12f34e496e2cc999e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc2b24484565bcb0cf654adf2f732f7e"><td class="memItemLeft" align="right" valign="top"><a id="adc2b24484565bcb0cf654adf2f732f7e"></a>
+result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#adc2b24484565bcb0cf654adf2f732f7e">_fetch_inode</a> () const noexcept</td></tr>
+<tr class="memdesc:adc2b24484565bcb0cf654adf2f732f7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill in _devid and _inode from the handle via fstat() <br /></td></tr>
+<tr class="separator:adc2b24484565bcb0cf654adf2f732f7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-methods"></a>
 Static Protected Member Functions</h2></td></tr>
@@ -504,6 +584,12 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:ad758cf1eb2e0b4c63583eab05e7f6820"><td class="memItemLeft" align="right" valign="top"><a id="ad758cf1eb2e0b4c63583eab05e7f6820"></a>
 flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b> {flag::none}</td></tr>
 <tr class="separator:ad758cf1eb2e0b4c63583eab05e7f6820"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d20a64cf182162a49962ed25d2126b3"><td class="memItemLeft" align="right" valign="top"><a id="a4d20a64cf182162a49962ed25d2126b3"></a>
+dev_t&#160;</td><td class="memItemRight" valign="bottom"><b>_devid</b> {0}</td></tr>
+<tr class="separator:a4d20a64cf182162a49962ed25d2126b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8454764db3cd47e65ec7853b9cb0b3fa"><td class="memItemLeft" align="right" valign="top"><a id="a8454764db3cd47e65ec7853b9cb0b3fa"></a>
+ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td></tr>
+<tr class="separator:a8454764db3cd47e65ec7853b9cb0b3fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A handle to a named or anonymous pipe. </p>
@@ -875,6 +961,59 @@ For portability, you can only assume that barriers write order for a single hand
 
 </div>
 </div>
+<a id="aa7770c6b7c478d74654f25b8c1a1585c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa7770c6b7c478d74654f25b8c1a1585c">&#9670;&nbsp;</a></span>link()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual result&lt;void&gt; llfio_v2_xxx::fs_handle::link </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>base</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#abcd8c8171f4e561620864295e8d5879b">path_view_type</a>&#160;</td>
+          <td class="paramname"><em>path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code>std::chrono::seconds(30)</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Links the inode referred to by this open handle to the path specified. The current path of this open handle is not changed, unless it has no current path due to being unlinked.</p>
+<dl class="section warning"><dt>Warning</dt><dd>Some operating systems provide a race free syscall for linking an open handle to a new location (Linux, Windows). On all other operating systems this call is <b>racy</b> and can result in the wrong inode being linked. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation opens a <code>path_handle</code> to the source containing directory first, then checks before linking that the item about to be hard linked has the same inode as the open file handle. It will retry this matching until success until the deadline given. This should prevent most unmalicious accidental loss of data.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">base</td><td>Base for any relative path. </td></tr>
+    <tr><td class="paramname">path</td><td>The relative or absolute new path to hard link to. </td></tr>
+    <tr><td class="paramname">d</td><td>The deadline by which the matching of the containing directory to the open handle's inode must succeed, else <code>errc::timed_out</code> will be returned. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Memory Allocations\n Except on platforms with race free syscalls for renaming open handles (Windows), calls</dt><dd><code>current_path()</code> via <code>parent_path_handle()</code> and thus is both expensive and calls malloc many times. </dd></dl>
+
+</div>
+</div>
 <a id="aa3465a87f2c732cd6465cd3a832a26f0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa3465a87f2c732cd6465cd3a832a26f0">&#9670;&nbsp;</a></span>max_buffers()</h2>
 
@@ -914,6 +1053,36 @@ For portability, you can only assume that barriers write order for a single hand
 </div><!-- fragment -->
 </div>
 </div>
+<a id="a865caad2f7f4bdf12fb74aabfe3c5ff5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a865caad2f7f4bdf12fb74aabfe3c5ff5">&#9670;&nbsp;</a></span>parent_path_handle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual result&lt;<a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a>&gt; llfio_v2_xxx::fs_handle::parent_path_handle </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code>std::chrono::seconds(30)</code></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Obtain a handle to the path <b>currently</b> containing this handle's file entry.</p>
+<dl class="section warning"><dt>Warning</dt><dd>This call is <b>racy</b> and can result in the wrong path handle being returned. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation opens a <code>path_handle</code> to the source containing directory, then checks if the file entry within has the same inode as the open file handle. It will retry this matching until success until the deadline given.</dd></dl>
+<dl class="section user"><dt>Memory Allocations\n Calls current_path() and thus is both expensive and calls malloc many times.</dt><dd></dd></dl>
+<dl class="section see"><dt>See also</dt><dd><code>algorithm::cached_parent_handle_adapter&lt;T&gt;</code> which overrides this with a zero cost implementation, thus making unlinking and relinking very considerably quicker. </dd></dl>
+
+</div>
+</div>
 <a id="ab2a30c788731707f70ff08c107ca1c97"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab2a30c788731707f70ff08c107ca1c97">&#9670;&nbsp;</a></span>pipe()</h2>
 
@@ -926,7 +1095,7 @@ For portability, you can only assume that barriers write order for a single hand
         <tr>
           <td class="memname">static result&lt;<a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html">pipe_handle</a>&gt; llfio_v2_xxx::pipe_handle::pipe </td>
           <td>(</td>
-          <td class="paramtype">path_view_type&#160;</td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#abcd8c8171f4e561620864295e8d5879b">path_view_type</a>&#160;</td>
           <td class="paramname"><em>path</em>, </td>
         </tr>
         <tr>
@@ -998,7 +1167,7 @@ For portability, you can only assume that barriers write order for a single hand
         <tr>
           <td class="memname">static result&lt;<a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html">pipe_handle</a>&gt; llfio_v2_xxx::pipe_handle::pipe_create </td>
           <td>(</td>
-          <td class="paramtype">path_view_type&#160;</td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#abcd8c8171f4e561620864295e8d5879b">path_view_type</a>&#160;</td>
           <td class="paramname"><em>path</em>, </td>
         </tr>
         <tr>
@@ -1048,7 +1217,7 @@ For portability, you can only assume that barriers write order for a single hand
         <tr>
           <td class="memname">static result&lt;<a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html">pipe_handle</a>&gt; llfio_v2_xxx::pipe_handle::pipe_open </td>
           <td>(</td>
-          <td class="paramtype">path_view_type&#160;</td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#abcd8c8171f4e561620864295e8d5879b">path_view_type</a>&#160;</td>
           <td class="paramname"><em>path</em>, </td>
         </tr>
         <tr>
@@ -1346,6 +1515,70 @@ For portability, you can only assume that barriers write order for a single hand
 </div><!-- fragment -->
 </div>
 </div>
+<a id="a8700edc9ecd4dd35d5aad7c65dd0eca2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8700edc9ecd4dd35d5aad7c65dd0eca2">&#9670;&nbsp;</a></span>relink()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual result&lt;void&gt; llfio_v2_xxx::fs_handle::relink </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>base</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#abcd8c8171f4e561620864295e8d5879b">path_view_type</a>&#160;</td>
+          <td class="paramname"><em>path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>atomic_replace</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code>std::chrono::seconds(30)</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Relinks the current path of this open handle to the new path specified. If <code>atomic_replace</code> is true, the relink <b>atomically</b> and silently replaces any item at the new path specified. This operation is both atomic and matching POSIX behaviour even on Microsoft Windows where no Win32 API can match POSIX semantics.</p>
+<p>Note that if <code>atomic_replace</code> is false, the operation <em>may</em> be implemented as creating a hard link to the destination (which fails if the destination exists), opening a new file descriptor to the destination, closing the existing file descriptor, replacing the existing file descriptor with the new one (this is to ensure path tracking continues to work), then unlinking the previous link. Thus <code>native_handle()</code>'s value <em>may</em> change. This is not the case on Microsoft Windows nor Linux, both of which provide syscalls capable of refusing to rename if the destination exists.</p>
+<p>If the handle refers to a pipe, on Microsoft Windows the base path handle is ignored as there is a single global named pipe namespace. Unless the path fragment begins with <code>\</code>, the string <code>\??\</code> is prefixed to the name before passing it to the NT kernel API which performs the rename. This is because <code>\\.\</code> in Win32 maps onto <code>\??\</code> in the NT kernel.</p>
+<dl class="section warning"><dt>Warning</dt><dd>Some operating systems provide a race free syscall for renaming an open handle (Windows). On all other operating systems this call is <b>racy</b> and can result in the wrong file entry being relinked. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation opens a <code>path_handle</code> to the source containing directory first, then checks before relinking that the item about to be relinked has the same inode as the open file handle. It will retry this matching until success until the deadline given. This should prevent most unmalicious accidental loss of data.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">base</td><td>Base for any relative path. </td></tr>
+    <tr><td class="paramname">path</td><td>The relative or absolute new path to relink to. </td></tr>
+    <tr><td class="paramname">atomic_replace</td><td>Atomically replace the destination if a file entry already is present there. Choosing false for this will fail if a file entry is already present at the destination, and may not be an atomic operation on some platforms (i.e. both the old and new names may be linked to the same inode for a very short period of time). Windows and recent Linuxes are always atomic. </td></tr>
+    <tr><td class="paramname">d</td><td>The deadline by which the matching of the containing directory to the open handle's inode must succeed, else <code>errc::timed_out</code> will be returned. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Memory Allocations\n Except on platforms with race free syscalls for renaming open handles (Windows), calls</dt><dd><code>current_path()</code> via <code>parent_path_handle()</code> and thus is both expensive and calls malloc many times. </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1mapped__file__handle.html#a35d3754438d64a63a7fe63c5ade23a62">llfio_v2_xxx::mapped_file_handle</a>, and <a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#afea9ef2b36cac3f6dfcae7555ca3303c">llfio_v2_xxx::symlink_handle</a>.</p>
+
+</div>
+</div>
 <a id="a101620e9fff0c0e8c346af0e9de58b6a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a101620e9fff0c0e8c346af0e9de58b6a">&#9670;&nbsp;</a></span>set_append_only()</h2>
 
@@ -1442,6 +1675,43 @@ For portability, you can only assume that barriers write order for a single hand
 </div><!-- fragment -->
 </div>
 </div>
+<a id="a1dd7923bb65456af4da41ebe7cb84982"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1dd7923bb65456af4da41ebe7cb84982">&#9670;&nbsp;</a></span>unlink()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual result&lt;void&gt; llfio_v2_xxx::fs_handle::unlink </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code>std::chrono::seconds(30)</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Unlinks the current path of this open handle, causing its entry to immediately disappear from the filing system. On Windows before Windows 10 1709 unless <code>flag::win_disable_unlink_emulation</code> is set, this behaviour is simulated by renaming the file to something random and setting its delete-on-last-close flag. Note that Windows may prevent the renaming of a file in use by another process, if so it will NOT be renamed. After the next handle to that file closes, it will become permanently unopenable by anyone else until the last handle is closed, whereupon the entry will be eventually removed by the operating system.</p>
+<dl class="section warning"><dt>Warning</dt><dd>Some operating systems provide a race free syscall for unlinking an open handle (Windows). On all other operating systems this call is <b>racy</b> and can result in the wrong file entry being unlinked. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation opens a <code>path_handle</code> to the containing directory first, then checks that the item about to be unlinked has the same inode as the open file handle. It will retry this matching until success until the deadline given. This should prevent most unmalicious accidental loss of data.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">d</td><td>The deadline by which the matching of the containing directory to the open handle's inode must succeed, else <code>errc::timed_out</code> will be returned. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Memory Allocations\n Except on platforms with race free syscalls for unlinking open handles (Windows), calls</dt><dd><code>current_path()</code> and thus is both expensive and calls malloc many times. On Windows, also calls <code>current_path()</code> if <code>flag::disable_safety_unlinks</code> is not set. </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#a002c9dab669604d58e08aa8f4dbc99c8">llfio_v2_xxx::symlink_handle</a>.</p>
+
+</div>
+</div>
 <a id="a7848ef15e774eacec7e4446a8c365a3d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7848ef15e774eacec7e4446a8c365a3d">&#9670;&nbsp;</a></span>write()</h2>
 
@@ -1500,7 +1770,7 @@ For portability, you can only assume that barriers write order for a single hand
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a7848ef15e774eacec7e4446a8c365a3d"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a7848ef15e774eacec7e4446a8c365a3d">llfio_v2_xxx::io_handle::write</a></div><div class="ttdeci">io_result&lt; const_buffers_type &gt; write(io_request&lt; const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the open handle, preferentially using any i/o multiplexer set over the virtually overri...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:325</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255">llfio_v2_xxx::handle::creation::only_if_not_exist</a></div><div class="ttdeci">@ only_if_not_exist</div><div class="ttdoc">Filesystem entry must NOT exist, and is atomically created by the success of this operation.</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a6a1044eeb6ab16939e4669bbeb071b32"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a6a1044eeb6ab16939e4669bbeb071b32">llfio_v2_xxx::io_handle::barrier</a></div><div class="ttdeci">virtual io_result&lt; const_buffers_type &gt; barrier(io_request&lt; const_buffers_type &gt; reqs=io_request&lt; const_buffers_type &gt;(), barrier_kind kind=barrier_kind::nowait_data_only, deadline d=deadline()) noexcept</div><div class="ttdoc">Issue a write reordering barrier such that writes preceding the barrier will reach storage before wri...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:376</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_ad17b8879c355d86174187f198b70baaa"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#ad17b8879c355d86174187f198b70baaa">llfio_v2_xxx::io_handle::_do_allocate_registered_buffer</a></div><div class="ttdeci">virtual result&lt; registered_buffer_type &gt; _do_allocate_registered_buffer(size_t &amp;bytes) noexcept</div><div class="ttdoc">The virtualised implementation of allocate_registered_buffer() used if no multiplexer has been set.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:1008</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_ad17b8879c355d86174187f198b70baaa"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#ad17b8879c355d86174187f198b70baaa">llfio_v2_xxx::io_handle::_do_allocate_registered_buffer</a></div><div class="ttdeci">virtual result&lt; registered_buffer_type &gt; _do_allocate_registered_buffer(size_t &amp;bytes) noexcept</div><div class="ttdoc">The virtualised implementation of allocate_registered_buffer() used if no multiplexer has been set.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:1023</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a4379e3f84b913f606bb2ec6a194d4380"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a4379e3f84b913f606bb2ec6a194d4380">llfio_v2_xxx::io_handle::_do_read</a></div><div class="ttdeci">virtual io_result&lt; buffers_type &gt; _do_read(io_request&lt; buffers_type &gt; reqs, deadline d) noexcept</div><div class="ttdoc">The virtualised implementation of read() used if no multiplexer has been set.</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1io__multiplexer_html_a00bf4ea26d854a7e8c9734f357d417f3"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__multiplexer.html#a00bf4ea26d854a7e8c9734f357d417f3">llfio_v2_xxx::io_multiplexer::construct</a></div><div class="ttdeci">virtual io_operation_state * construct(span&lt; byte &gt; storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &amp;&amp;b, deadline d, io_request&lt; buffers_type &gt; reqs) noexcept=0</div><div class="ttdoc">Constructs either a unsynchronised_io_operation_state or a synchronised_io_operation_state for a read...</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1pipe__handle_html_ab2a30c788731707f70ff08c107ca1c97"><div class="ttname"><a href="classllfio__v2__xxx_1_1pipe__handle.html#ab2a30c788731707f70ff08c107ca1c97">llfio_v2_xxx::pipe_handle::pipe</a></div><div class="ttdeci">static result&lt; pipe_handle &gt; pipe(path_view_type path, mode _mode, creation _creation, caching _caching=caching::all, flag flags=flag::none, const path_handle &amp;base=path_discovery::temporary_named_pipes_directory()) noexcept</div></div>
