@@ -395,6 +395,8 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
 #error Do not know how to specify large/huge/super pages on this platform
 #endif
   }
+  auto _offset = offset & ~(pagesize - 1);
+  auto _bytes = bytes + (offset & (pagesize - 1));
 // printf("mmap(%p, %u, %d, %d, %d, %u)\n", ataddr, (unsigned) bytes, prot, flags, have_backing ? section->native_handle().fd : -1, (unsigned) offset);
 #ifdef MAP_SYNC  // Linux kernel 4.15 or later only
   // If backed by a file into persistent shared memory, ask the kernel to use persistent memory safe semantics
@@ -402,12 +404,12 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
   {
     int flagscopy = flags & ~MAP_SHARED;
     flagscopy |= MAP_SHARED_VALIDATE | MAP_SYNC;
-    addr = ::mmap(ataddr, bytes, prot, flagscopy, fd_to_use, offset & ~(pagesize - 1));
+    addr = ::mmap(ataddr, _bytes, prot, flagscopy, fd_to_use, _offset);
   }
 #endif
   if(addr == nullptr)
   {
-    addr = ::mmap(ataddr, bytes, prot, flags, fd_to_use, offset & ~(pagesize - 1));
+    addr = ::mmap(ataddr, _bytes, prot, flags, fd_to_use, _offset);
   }
   // printf("%d mmap %p-%p\n", getpid(), addr, (char *) addr+bytes);
   if(MAP_FAILED == addr)  // NOLINT
@@ -421,7 +423,7 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
     // for committed memory first and then decommit it. Which can potentially
     // blow out the commit limit for really large reservations,
     // but this is literally the only game in town on Mac OS.
-    if(-1 == ::madvise(addr, bytes, MADV_FREE_REUSABLE))
+    if(-1 == ::madvise(addr, _bytes, MADV_FREE_REUSABLE))
     {
       return posix_error();
     }
@@ -431,7 +433,7 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
   if(have_backing && ((flags & map_handle::flag::disable_prefetching) || (flags & map_handle::flag::maximum_prefetching)))
   {
     int advice = (flags & map_handle::flag::disable_prefetching) ? MADV_RANDOM : MADV_SEQUENTIAL;
-    if(-1 == ::madvise(addr, bytes, advice))
+    if(-1 == ::madvise(addr, _bytes, advice))
       return posix_error();
   }
 #endif
@@ -487,6 +489,10 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   else
   {
     length -= offset;
+  }
+  if(length < bytes)
+  {
+    length = bytes;
   }
   result<map_handle> ret{map_handle(&section, _flag)};
   native_handle_type &nativeh = ret.value()._v;

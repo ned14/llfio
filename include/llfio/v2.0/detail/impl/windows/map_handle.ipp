@@ -686,11 +686,11 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   native_handle_type &nativeh = ret.value()._v;
   ULONG allocation = 0, prot;
   PVOID addr = nullptr;
-  size_t commitsize = bytes;
+  size_t commitsize = bytes + (offset & 65535);
   LARGE_INTEGER _offset{};
   _offset.QuadPart = offset & ~65535;
   OUTCOME_TRY(auto &&pagesize, detail::pagesize_from_flags(ret.value()._flag));
-  SIZE_T _bytes = bytes;
+  SIZE_T _bytes = bytes + (offset & 65535);
   OUTCOME_TRY(win32_map_flags(nativeh, allocation, prot, commitsize, section.backing() != nullptr, ret.value()._flag));
   LLFIO_LOG_FUNCTION_CALL(&ret);
   NTSTATUS ntstat = NtMapViewOfSection(section.native_handle().h, GetCurrentProcess(), &addr, 0, commitsize, &_offset, &_bytes, ViewUnmap, allocation, prot);
@@ -700,8 +700,8 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   }
   ret.value()._addr = static_cast<byte *>(addr);
   ret.value()._offset = offset;
-  ret.value()._reservation = _bytes;
-  ret.value()._length = (size_type)(section.length().value() - offset);
+  ret.value()._reservation = _bytes - (offset & 65535);
+  ret.value()._length = std::min((size_type)(section.length().value() - offset), bytes);
   ret.value()._pagesize = pagesize;
   // Make my handle borrow the native handle of my backing storage
   ret.value()._v.h = section.backing_native_handle().h;

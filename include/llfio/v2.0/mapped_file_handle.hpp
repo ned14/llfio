@@ -566,13 +566,13 @@ public:
   }
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC native_handle_type release() noexcept override;
-  result<mapped_file_handle> reopen(size_type reservation, mode mode_ = mode::unchanged, caching caching_ = caching::unchanged,
+  result<mapped_file_handle> reopen(size_type reservation, extent_type offset = 0, mode mode_ = mode::unchanged, caching caching_ = caching::unchanged,
                                     deadline d = std::chrono::seconds(30)) const noexcept
   {
     try
     {
       OUTCOME_TRY(auto &&fh, file_handle::reopen(mode_, caching_, d));
-      return mapped_file_handle(std::move(fh), reservation, _sh.section_flags(), _offset);
+      return mapped_file_handle(std::move(fh), reservation, _sh.section_flags(), _offset + offset);
     }
     catch(...)
     {
