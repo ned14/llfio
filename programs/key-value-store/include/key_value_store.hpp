@@ -128,11 +128,12 @@ namespace key_value_store
 
     struct index
     {
-      uint64_t magic;                              // versionmagic, currently "AFIOKV01" for valid, "DEADKV01" for requires repair
-      std::atomic<uint64_t> transaction_counter;   // top 16 bits are number of keys changed this transaction, bottom 48 bits are monotonic counter
-      uint128 hash;                                // Optional hash of index file written on last close to guard against systems which don't write mmaps properly
+      uint64_t magic;                             // versionmagic, currently "AFIOKV01" for valid, "DEADKV01" for requires repair
+      std::atomic<uint64_t> transaction_counter;  // top 16 bits are number of keys changed this transaction, bottom 48 bits are monotonic counter
+      uint128 hash;                               // Optional hash of index file written on last close to guard against systems which don't write mmaps properly
       std::atomic<unsigned> writes_occurring[48];  // Incremented just before an update, decremented after, per writer
-      std::atomic<bool> all_writes_synced;         // Set if all writers since the first which has opened this store did so with `O_SYNC` on (i.e. safe during fsck to check small file tails only)
+      std::atomic<bool> all_writes_synced;  // Set if all writers since the first which has opened this store did so with `O_SYNC` on (i.e. safe during fsck to
+                                            // check small file tails only)
 
       uint64_t contents_hashed : 1;       // If records written are hashed and checked on fetch
       uint64_t key_is_hash_of_value : 1;  // On read, check hash of value equals key
@@ -146,12 +147,12 @@ namespace key_value_store
       uint64_t length;               // (uint64_t)-1 means key was deleted
     };
     static_assert(sizeof(value_tail) == 48, "value_tail is wrong size");
-  }
+  }  // namespace index
 
   class transaction;
 
   /*! A transactional key-value store.
-  */
+   */
   class basic_key_value_store
   {
     friend class transaction;
@@ -196,7 +197,8 @@ namespace key_value_store
         for(size_t n = 0; n < 48; n++)
         {
           name = std::to_string(n);
-          auto fh = llfio::file_handle::file(dir, name, smallfilemode, llfio::file_handle::creation::open_existing, llfio::file_handle::caching::all, llfio::file_handle::flag::disable_prefetching);
+          auto fh = llfio::file_handle::file(dir, name, smallfilemode, llfio::file_handle::creation::open_existing, llfio::file_handle::caching::all,
+                                             llfio::file_handle::flag::disable_prefetching);
           if(fh)
           {
           retry:
@@ -207,7 +209,8 @@ namespace key_value_store
               auto smallfileclaimed = fh.value().lock_file_range(_indexinuseoffset, 1, llfio::lock_kind::exclusive, std::chrono::seconds(0));
               if(smallfileclaimed)
               {
-                _mysmallfile = llfio::file_handle::file(dir, name, llfio::file_handle::mode::write, llfio::file_handle::creation::open_existing, caching).value();
+                _mysmallfile =
+                llfio::file_handle::file(dir, name, llfio::file_handle::mode::write, llfio::file_handle::creation::open_existing, caching).value();
                 _mysmallfile.set_append_only(true).value();
                 _smallfileguard = std::move(smallfileclaimed).value();
                 _mysmallfileidx = n;
@@ -220,7 +223,8 @@ namespace key_value_store
             {
 #ifndef _WIN32
               // We really need this to only have read only perms, otherwise any mmaps will extend the file ludicrously
-              fh = llfio::file_handle::file(dir, name, llfio::file_handle::mode::read, llfio::file_handle::creation::open_existing, llfio::file_handle::caching::all, llfio::file_handle::flag::disable_prefetching);
+              fh = llfio::file_handle::file(dir, name, llfio::file_handle::mode::read, llfio::file_handle::creation::open_existing,
+                                            llfio::file_handle::caching::all, llfio::file_handle::flag::disable_prefetching);
 #endif
               _smallfiles.blocking.push_back(std::move(fh).value());
             }
@@ -244,7 +248,9 @@ namespace key_value_store
           throw maximum_writers_reached();
         }
         // Set up the index, either r/w or read only with copy on write
-        llfio::section_handle::flag mapflags = (mode == llfio::file_handle::mode::write) ? llfio::section_handle::flag::readwrite : (llfio::section_handle::flag::read | llfio::section_handle::flag::cow);
+        llfio::section_handle::flag mapflags = (mode == llfio::file_handle::mode::write) ?
+                                               llfio::section_handle::flag::readwrite :
+                                               (llfio::section_handle::flag::read | llfio::section_handle::flag::cow);
         llfio::section_handle sh = llfio::section_handle::section(_indexfile, 0, mapflags).value();
         llfio::file_handle::extent_type len = sh.length().value();
         len -= sizeof(index::index);
@@ -266,8 +272,14 @@ namespace key_value_store
     basic_key_value_store &operator=(const basic_key_value_store &) = delete;
     basic_key_value_store &operator=(basic_key_value_store &&) = delete;
 
-    basic_key_value_store(const llfio::path_handle &dir, size_t hashtableentries, bool enable_integrity = false, llfio::file_handle::mode mode = llfio::file_handle::mode::write, llfio::file_handle::caching caching = llfio::file_handle::caching::all)
-        : _indexfile(llfio::file_handle::file(dir, "index", mode, (mode == llfio::file_handle::mode::write) ? llfio::file_handle::creation::if_needed : llfio::file_handle::creation::open_existing, caching, llfio::file_handle::flag::disable_prefetching).value())
+    basic_key_value_store(const llfio::path_handle &dir, size_t hashtableentries, bool enable_integrity = false,
+                          llfio::file_handle::mode mode = llfio::file_handle::mode::write,
+                          llfio::file_handle::caching caching = llfio::file_handle::caching::all)
+        : _indexfile(llfio::file_handle::file(dir, "index", mode,
+                                              (mode == llfio::file_handle::mode::write) ? llfio::file_handle::creation::if_needed :
+                                                                                          llfio::file_handle::creation::open_existing,
+                                              caching, llfio::file_handle::flag::disable_prefetching)
+                     .value())
     {
       if(mode == llfio::file_handle::mode::write)
       {
@@ -330,8 +342,12 @@ namespace key_value_store
       }
     }
     //! \overload
-    basic_key_value_store(const llfio::path_view &dir, size_t hashtableentries, bool enable_integrity = false, llfio::file_handle::mode mode = llfio::file_handle::mode::write, llfio::file_handle::caching caching = llfio::file_handle::caching::all)
-        : basic_key_value_store(llfio::directory_handle::directory({}, dir, llfio::directory_handle::mode::write, llfio::directory_handle::creation::if_needed).value(), hashtableentries, enable_integrity, mode, caching)
+    basic_key_value_store(const llfio::path_view &dir, size_t hashtableentries, bool enable_integrity = false,
+                          llfio::file_handle::mode mode = llfio::file_handle::mode::write,
+                          llfio::file_handle::caching caching = llfio::file_handle::caching::all)
+        : basic_key_value_store(
+          llfio::directory_handle::directory({}, dir, llfio::directory_handle::mode::write, llfio::directory_handle::creation::if_needed).value(),
+          hashtableentries, enable_integrity, mode, caching)
     {
     }
     //! Opens the store for read only access
@@ -372,7 +388,8 @@ namespace key_value_store
       for(size_t n = 0; n < _smallfiles.blocking.size(); n++)
       {
         auto currentlength = _smallfiles.blocking[n].maximum_extent().value();
-        _smallfiles.mapped.push_back(llfio::mapped_file_handle(std::move(_smallfiles.blocking[n]), (unsigned)(currentlength + overextension)));
+        _smallfiles.mapped.push_back(
+        llfio::mapped_file_handle(std::move(_smallfiles.blocking[n]), (unsigned) (currentlength + overextension), llfio::section_handle::flag::none, 0));
       }
       _smallfileguard.set_handle(&_smallfiles.mapped[_mysmallfileidx]);
       _smallfiles.blocking.clear();
@@ -408,7 +425,14 @@ namespace key_value_store
       //! When this value was last modified
       uint64_t transaction_counter;
 
-      keyvalue_info(keyvalue_info &&o) noexcept : key(std::move(o.key)), value(std::move(o.value)), transaction_counter(std::move(o.transaction_counter)), _value_buffer(std::move(o._value_buffer)) { o._value_buffer = nullptr; }
+      keyvalue_info(keyvalue_info &&o) noexcept
+          : key(std::move(o.key))
+          , value(std::move(o.value))
+          , transaction_counter(std::move(o.transaction_counter))
+          , _value_buffer(std::move(o._value_buffer))
+      {
+        o._value_buffer = nullptr;
+      }
       keyvalue_info &operator=(keyvalue_info &&o) noexcept
       {
         if(this == &o)
@@ -538,7 +562,7 @@ namespace key_value_store
   };
 
   /*! A transaction object.
-  */
+   */
   class transaction
   {
     friend class basic_key_value_store;
@@ -718,7 +742,8 @@ namespace key_value_store
       uint64_t this_transaction_counter = 0;
       {
         uint64_t old_transaction_counter;
-        union {
+        union
+        {
           struct
           {
             uint64_t values_updated : 16;
@@ -732,7 +757,8 @@ namespace key_value_store
           // Increment bottom 48 bits, letting it wrap if necessary
           _.counter++;
           _.values_updated = _items.size();
-        } while(!_parent->_indexheader->transaction_counter.compare_exchange_weak(old_transaction_counter, _.this_transaction_counter, std::memory_order_release, std::memory_order_relaxed));
+        } while(!_parent->_indexheader->transaction_counter.compare_exchange_weak(old_transaction_counter, _.this_transaction_counter,
+                                                                                  std::memory_order_release, std::memory_order_relaxed));
         this_transaction_counter = _.this_transaction_counter;
       }
 
@@ -952,6 +978,6 @@ namespace key_value_store
       _parent->_indexheader->writes_occurring[_parent->_mysmallfileidx].fetch_sub(1);
     }
   };
-}
+}  // namespace key_value_store
 
 #endif
