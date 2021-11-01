@@ -30,6 +30,8 @@ include(QuickCppLibPolicies)
 option(LLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE "Whether to use SG14 status_code for failure handling" OFF)
 option(LLFIO_ENABLE_DEPENDENCY_SMOKE_TEST "Whether to build executables which are smoke tests that LLFIO is fully working. Used by various package managers such as vcpkg." OFF)
 option(LLFIO_ASSUME_CROSS_COMPILING "Whether to assume we are cross compiling. Normally automatically detected, but if automatic detection doesn't work, a working <filesystem> will not be found during cmake configure." OFF)
+option(LLFIO_FORCE_CONCEPTS_OFF "Whether to not auto detect and enable concepts for the LLFIO cmake targets" OFF)
+option(LLFIO_FORCE_COROUTINES_OFF "Whether to not auto detect and enable coroutines for the LLFIO cmake targets" OFF)
 option(UNIT_TESTS_BUILD_ALL "Whether to run all of the unit test suite." OFF)
 set(UNIT_TESTS_CXX_VERSION "latest" CACHE STRING "The version of C++ to use in the header-only unit tests")
 if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD" OR APPLE)
@@ -84,12 +86,16 @@ include(QuickCppLibMakeLibrary)
 include(QuickCppLibMakeHeaderOnlyLibrary)
 
 # If we have concepts, enable those for both myself and all inclusions
-apply_cxx_concepts_to(INTERFACE llfio_hl)
-apply_cxx_concepts_to(PUBLIC llfio_sl llfio_dl)
+if(NOT LLFIO_FORCE_CONCEPTS_OFF)
+  apply_cxx_concepts_to(INTERFACE llfio_hl)
+  apply_cxx_concepts_to(PUBLIC llfio_sl llfio_dl)
+endif()
 
 # If we have coroutines, enable those for both myself and all inclusions
-apply_cxx_coroutines_to(INTERFACE llfio_hl)
-apply_cxx_coroutines_to(PUBLIC llfio_sl llfio_dl)
+if(NOT LLFIO_FORCE_COROUTINES_OFF)
+  apply_cxx_coroutines_to(INTERFACE llfio_hl)
+  apply_cxx_coroutines_to(PUBLIC llfio_sl llfio_dl)
+endif()
 
 # Make preprocessed edition of this library target
 if(NOT PROJECT_IS_DEPENDENCY)
