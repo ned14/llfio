@@ -74,7 +74,7 @@ result<mapped_file_handle::size_type> mapped_file_handle::_reserve(extent_type &
     map_size = (size_type) length;
   }
   OUTCOME_TRYV(_mh.close());
-  OUTCOME_TRY(auto &&mh, map_handle::map(_sh, map_size, 0, mapflags));
+  OUTCOME_TRY(auto &&mh, map_handle::map(_sh, map_size, _offset, mapflags));
   _mh = std::move(mh);
   _reservation = reservation;
   return _reservation;
