@@ -26,7 +26,6 @@ var namespacellfio__v2__xxx =
     [ "executor", "classllfio__v2__xxx_1_1executor.html", "classllfio__v2__xxx_1_1executor" ],
     [ "fast_random_file_handle", "classllfio__v2__xxx_1_1fast__random__file__handle.html", "classllfio__v2__xxx_1_1fast__random__file__handle" ],
     [ "file_handle", "classllfio__v2__xxx_1_1file__handle.html", "classllfio__v2__xxx_1_1file__handle" ],
-    [ "fs_handle", "classllfio__v2__xxx_1_1fs__handle.html", "classllfio__v2__xxx_1_1fs__handle" ],
     [ "handle", "classllfio__v2__xxx_1_1handle.html", "classllfio__v2__xxx_1_1handle" ],
     [ "io_handle", "classllfio__v2__xxx_1_1io__handle.html", "classllfio__v2__xxx_1_1io__handle" ],
     [ "io_multiplexer", "classllfio__v2__xxx_1_1io__multiplexer.html", "classllfio__v2__xxx_1_1io__multiplexer" ],

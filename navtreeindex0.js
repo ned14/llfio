@@ -13,6 +13,7 @@ var NAVTREEINDEX0 =
 "cached__parent_8hpp.html#a9ec9e3c4b8183126c1f645181d3f1160":[5,0,0,1,0,0,0,0,4],
 "cached__parent_8hpp.html#acb1cc37df760619bb579c4ec007e1239":[5,0,0,1,0,0,0,0,2],
 "classes.html":[4,1],
+"classfs__handle.html":[4,0,3],
 "classkvstore__v1__xxx_1_1basic__key__value__store.html":[4,0,1,1],
 "classkvstore__v1__xxx_1_1basic__key__value__store.html#a0608d53e48b38adcb71682ed62cc05e3":[4,0,1,1,4],
 "classkvstore__v1__xxx_1_1basic__key__value__store.html#a11a8bb4729443919359e42ce426d8849":[4,0,1,1,31],
@@ -248,6 +249,5 @@ var NAVTREEINDEX0 =
 "classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1lock__files.html#ae5fb3b8a373a61c6cdad578281843395":[4,0,2,0,1,2,13],
 "classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1lock__files.html#ae8935d7f9ebfb12b39340c7badd18186":[4,0,2,0,1,2,11],
 "classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1lock__files.html#af3593bcad8dcb03a5c037af008203994":[4,0,2,0,1,2,2],
-"classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1lock__files.html#afb28aedaf5caa53e851165a4f1927207":[4,0,2,0,1,2,7],
-"classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html":[4,0,2,0,1,3]
+"classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1lock__files.html#afb28aedaf5caa53e851165a4f1927207":[4,0,2,0,1,2,7]
 };
