@@ -44,7 +44,7 @@ var hierarchy =
     [ "filesystem_error", null, [
       [ "llfio_v2_xxx::error", "classllfio__v2__xxx_1_1error.html", null ]
     ] ],
-    [ "fs_handle", "classfs__handle.html", [
+    [ "llfio_v2_xxx::fs_handle", "classllfio__v2__xxx_1_1fs__handle.html", [
       [ "llfio_v2_xxx::directory_handle", "classllfio__v2__xxx_1_1directory__handle.html", null ],
       [ "llfio_v2_xxx::file_handle", "classllfio__v2__xxx_1_1file__handle.html", [
         [ "llfio_v2_xxx::fast_random_file_handle", "classllfio__v2__xxx_1_1fast__random__file__handle.html", null ],
