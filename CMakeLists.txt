@@ -32,6 +32,8 @@ option(LLFIO_ENABLE_DEPENDENCY_SMOKE_TEST "Whether to build executables which ar
 option(LLFIO_ASSUME_CROSS_COMPILING "Whether to assume we are cross compiling. Normally automatically detected, but if automatic detection doesn't work, a working <filesystem> will not be found during cmake configure." OFF)
 option(LLFIO_FORCE_CONCEPTS_OFF "Whether to not auto detect and enable concepts for the LLFIO cmake targets" OFF)
 option(LLFIO_FORCE_COROUTINES_OFF "Whether to not auto detect and enable coroutines for the LLFIO cmake targets" OFF)
+set(LLFIO_DEPENDENCY_QUICKCPPLIB_GIT_TAG "master" CACHE STRING "Which git tag to use for the QuickCppLib dependency")
+set(LLFIO_DEPENDENCY_OUTCOME_GIT_TAG "master" CACHE STRING "Which git tag to use for the Outcome dependency")
 option(UNIT_TESTS_BUILD_ALL "Whether to run all of the unit test suite." OFF)
 set(UNIT_TESTS_CXX_VERSION "latest" CACHE STRING "The version of C++ to use in the header-only unit tests")
 if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD" OR APPLE)
@@ -57,12 +59,13 @@ endif()
 # Find my library dependencies
 find_quickcpplib_library(quickcpplib
   GIT_REPOSITORY "https://github.com/ned14/quickcpplib.git"
+  GIT_TAG "${LLFIO_DEPENDENCY_QUICKCPPLIB_GIT_TAG}"
   REQUIRED
   IS_HEADER_ONLY
 )
 find_quickcpplib_library(outcome
   GIT_REPOSITORY "https://github.com/ned14/outcome.git"
-  GIT_TAG "master"
+  GIT_TAG "${LLFIO_DEPENDENCY_OUTCOME_GIT_TAG}"
   REQUIRED
   IS_HEADER_ONLY
 )
