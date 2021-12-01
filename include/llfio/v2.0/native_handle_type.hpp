@@ -88,9 +88,12 @@ struct native_handle_type  // NOLINT
     //! A third party pointer
     void *ptr;
   };
-  disposition behaviour;  //! The behaviour of the handle
+  disposition behaviour{disposition::invalid};  //! The behaviour of the handle
   //! Constructs a default instance
-  constexpr native_handle_type() {}  // NOLINT
+  constexpr native_handle_type()
+      : _init{-1}
+  {
+  }  // NOLINT
   ~native_handle_type() = default;
   //! Construct from a POSIX file descriptor
   constexpr native_handle_type(disposition _behaviour, int _fd) noexcept

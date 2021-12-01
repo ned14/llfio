@@ -682,15 +682,32 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
+  OUTCOME_TRY(auto &&length, section.length());  // length of the backing file
+  if(length <= offset)
+  {
+    length = 0;
+  }
+  else
+  {
+    length -= offset;
+  }
+  if(bytes == 0u)
+  {
+    bytes = length;
+  }
+  else if(length > bytes)
+  {
+    length = bytes;
+  }
   result<map_handle> ret{map_handle(&section, _flag)};
   native_handle_type &nativeh = ret.value()._v;
   ULONG allocation = 0, prot;
   PVOID addr = nullptr;
-  size_t commitsize = bytes;
+  size_t commitsize = bytes + (offset & 65535);
   LARGE_INTEGER _offset{};
-  _offset.QuadPart = offset;
+  _offset.QuadPart = offset & ~65535;
   OUTCOME_TRY(auto &&pagesize, detail::pagesize_from_flags(ret.value()._flag));
-  SIZE_T _bytes = bytes;
+  SIZE_T _bytes = bytes + (offset & 65535);
   OUTCOME_TRY(win32_map_flags(nativeh, allocation, prot, commitsize, section.backing() != nullptr, ret.value()._flag));
   LLFIO_LOG_FUNCTION_CALL(&ret);
   NTSTATUS ntstat = NtMapViewOfSection(section.native_handle().h, GetCurrentProcess(), &addr, 0, commitsize, &_offset, &_bytes, ViewUnmap, allocation, prot);
@@ -700,8 +717,8 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   }
   ret.value()._addr = static_cast<byte *>(addr);
   ret.value()._offset = offset;
-  ret.value()._reservation = _bytes;
-  ret.value()._length = (size_type)(section.length().value() - offset);
+  ret.value()._reservation = _bytes - (offset & 65535);
+  ret.value()._length = length;
   ret.value()._pagesize = pagesize;
   // Make my handle borrow the native handle of my backing storage
   ret.value()._v.h = section.backing_native_handle().h;
@@ -766,12 +783,24 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool /* un
 
   // So this must be file backed memory. Totally different APIs for that :)
   OUTCOME_TRY(auto &&length, _section->length());  // length of the backing file
+  if(length <= _offset)
+  {
+    length = 0;
+  }
+  else
+  {
+    length -= _offset;
+  }
+  if(length > _reservation)
+  {
+    length = _reservation;
+  }
   if(newsize < _reservation)
   {
     // If newsize isn't exactly a previous extension, this will fail, same as for the VirtualAlloc case
     OUTCOME_TRY(win32_release_file_allocations(_addr + newsize, _reservation - newsize));
     _reservation = newsize;
-    _length = (size_type)((length - _offset < newsize) ? (length - _offset) : newsize);  // length of backing, not reservation
+    _length = length;
     return _reservation;
   }
   // Try to map an additional part of the section directly after this map
@@ -779,7 +808,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool /* un
   PVOID addr = _addr + _reservation;
   size_t commitsize = newsize - _reservation;
   LARGE_INTEGER offset{};
-  offset.QuadPart = _offset + _reservation;
+  offset.QuadPart = (_offset + _reservation) & ~65535;
   SIZE_T _bytes = newsize - _reservation;
   native_handle_type nativeh;
   OUTCOME_TRY(win32_map_flags(nativeh, allocation, prot, commitsize, _section->backing() != nullptr, _flag));
@@ -789,7 +818,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool /* un
     return ntkernel_error(ntstat);
   }
   _reservation += _bytes;
-  _length = (size_type)((length - _offset < newsize) ? (length - _offset) : newsize);  // length of backing, not reservation
+  _length = length;
   return _reservation;
 }
 
@@ -963,7 +992,7 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
 map_handle::io_result<map_handle::buffers_type> map_handle::_do_read(io_request<buffers_type> reqs, deadline /*d*/) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  byte *addr = _addr + reqs.offset;
+  byte *addr = _addr + reqs.offset + (_offset & 65535);
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
   for(size_t i = 0; i < reqs.buffers.size(); i++)
   {
@@ -986,21 +1015,23 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_write(io_r
   LLFIO_LOG_FUNCTION_CALL(this);
   if(!!(_flag & section_handle::flag::write_via_syscall) && _section != nullptr && _section->backing() != nullptr)
   {
+    reqs.offset += _offset;
     auto r = _section->backing()->write(reqs, d);
     if(!r)
     {
       return std::move(r).error();
     }
+    reqs.offset -= _offset;
     if(reqs.offset + r.bytes_transferred() > _length)
     {
       OUTCOME_TRY(update_map());
     }
     return std::move(r).value();
   }
-  byte *addr = _addr + reqs.offset;
+  byte *addr = _addr + reqs.offset + (_offset & 65535);
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
   if(QUICKCPPLIB_NAMESPACE::signal_guard::signal_guard(
-     QUICKCPPLIB_NAMESPACE::signal_guard::signalc_set::undefined_memory_access,
+     QUICKCPPLIB_NAMESPACE::signal_guard::signalc_set::undefined_memory_access | QUICKCPPLIB_NAMESPACE::signal_guard::signalc_set::segmentation_fault,
      [&] {
        for(size_t i = 0; i < reqs.buffers.size(); i++)
        {

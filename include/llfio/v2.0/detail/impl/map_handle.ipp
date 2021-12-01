@@ -53,13 +53,17 @@ namespace detail
   };
   struct map_handle_cache_base_t
   {
-    std::mutex lock;
+    mutable std::mutex lock;
     size_t trie_count{0};
     map_handle_cache_item_t *trie_children[8 * sizeof(size_t)];
-    bool trie_nobbledir{0};
+    bool trie_nobbledir{0}, disabled{false};
     size_t bytes_in_cache{0}, hits{0}, misses{0};
   };
-  static const size_t page_size_shift = [] { return QUICKCPPLIB_NAMESPACE::algorithm::bitwise_trie::detail::bitscanr(utils::page_size()); }();
+  inline size_t page_size_shift()
+  {
+    static size_t v = [] { return QUICKCPPLIB_NAMESPACE::algorithm::bitwise_trie::detail::bitscanr(utils::page_size()); }();
+    return v;
+  }
   class map_handle_cache_t : protected QUICKCPPLIB_NAMESPACE::algorithm::bitwise_trie::bitwise_trie<map_handle_cache_base_t, map_handle_cache_item_t>
   {
     using _base = QUICKCPPLIB_NAMESPACE::algorithm::bitwise_trie::bitwise_trie<map_handle_cache_base_t, map_handle_cache_item_t>;
@@ -70,13 +74,20 @@ namespace detail
     std::atomic<unsigned> do_not_store_failed_count{0};
 #endif
 
-    ~map_handle_cache_t() { trim_cache(std::chrono::steady_clock::now(), (size_t)-1); }
+    ~map_handle_cache_t() { trim_cache(std::chrono::steady_clock::now(), (size_t) -1); }
+
+    bool is_disabled() const noexcept
+    {
+      _lock_guard g(lock);
+      return _base::disabled;
+    }
 
     using _base::size;
     void *get(size_t bytes, size_t page_size)
     {
-      const auto _bytes = bytes >> page_size_shift;
+      const auto _bytes = bytes >> page_size_shift();
       _lock_guard g(lock);
+      // TODO: Consider finding slightly bigger, and returning a length shorter than reservation?
       auto it = _base::find(_bytes);
       for(; it != _base::end() && page_size != it->page_size && _bytes == it->trie_key; ++it)
       {
@@ -90,19 +101,26 @@ namespace detail
       auto *p = *it;
       _base::erase(it);
       _base::bytes_in_cache -= bytes;
-      assert(bytes == p->trie_key << page_size_shift);
+      assert(bytes == p->trie_key << page_size_shift());
+      // std::cout << "map_handle::get(" << p->addr << ", " << bytes << "). Index item was " << p << std::endl;
       g.unlock();
       void *ret = p->addr;
       delete p;
       return ret;
     }
-    void add(size_t bytes, size_t page_size, void *addr)
+    bool add(size_t bytes, size_t page_size, void *addr)
     {
-      const auto _bytes = bytes >> page_size_shift;
+      const auto _bytes = bytes >> page_size_shift();
+      if(_bytes == 0)
+      {
+        return false;
+      }
       auto *p = new map_handle_cache_item_t(_bytes, page_size, addr);
       _lock_guard g(lock);
+      // std::cout << "map_handle::add(" << addr << ", " << bytes << "). Index item was " << p << ". Trie key is " << _bytes << std::endl;
       _base::insert(p);
       _base::bytes_in_cache += bytes;
+      return true;
     }
     map_handle::cache_statistics trim_cache(std::chrono::steady_clock::time_point older_than, size_t max_items)
     {
@@ -118,15 +136,18 @@ namespace detail
           {
             auto *p = *it;
             _base::erase(it--);
-            const auto _bytes = p->trie_key << page_size_shift;
+            const auto _bytes = p->trie_key << page_size_shift();
+            // std::cout << "map_handle::trim_cache(" << p->addr << ", " << _bytes << "). Index item was " << p << ". Trie key is " << p->trie_key << std::endl;
 #ifdef _WIN32
             if(!win32_release_nonfile_allocations((byte *) p->addr, _bytes, MEM_RELEASE))
 #else
             if(-1 == ::munmap(p->addr, _bytes))
 #endif
             {
+              // fprintf(stderr, "munmap failed with %s. addr was %p bytes was %zu. page_size_shift was %zu\n", strerror(errno), p->addr, _bytes,
+              // page_size_shift);
               LLFIO_LOG_FATAL(nullptr,
-                              "map_handle cache failed to trim a map! If on Linux, you may have exceeded the "
+                              "FATAL: map_handle cache failed to trim a map! If on Linux, you may have exceeded the "
                               "64k VMA process limit, set the LLFIO_DEBUG_LINUX_MUNMAP macro at the top of posix/map_handle.ipp to cause dumping of VMAs to "
                               "/tmp/llfio_unmap_debug_smaps.txt, and combine with strace to figure it out.");
               abort();
@@ -149,11 +170,36 @@ namespace detail
       ret.misses = _base::misses;
       return ret;
     }
+    bool set_cache_disabled(bool v)
+    {
+      _lock_guard g(lock);
+      bool ret = _base::disabled;
+      _base::disabled = v;
+      return ret;
+    }
   };
-  extern inline QUICKCPPLIB_SYMBOL_EXPORT map_handle_cache_t &map_handle_cache()
+  extern inline QUICKCPPLIB_SYMBOL_VISIBLE map_handle_cache_t *map_handle_cache()
   {
-    static map_handle_cache_t v;
-    return v;
+    static struct _
+    {
+      map_handle_cache_t *v;
+      _()
+          : v(new map_handle_cache_t)
+      {
+      }
+      ~_()
+      {
+        if(v != nullptr)
+        {
+          // std::cout << "map_handle_cache static deinit begin" << std::endl;
+          auto *r = v;
+          *(volatile map_handle_cache_t **) &v = nullptr;
+          delete r;
+          // std::cout << "map_handle_cache static deinit complete" << std::endl;
+        }
+      }
+    } v;
+    return v.v;
   }
 }  // namespace detail
 
@@ -163,12 +209,17 @@ result<map_handle> map_handle::_recycled_map(size_type bytes, section_handle::fl
   {
     return errc::argument_out_of_domain;
   }
+  auto *c = detail::map_handle_cache();
+  if(c == nullptr || c->is_disabled() || bytes >= (1ULL << 30U) /*1Gb*/)
+  {
+    return _new_map(bytes, false, _flag);
+  }
   result<map_handle> ret(map_handle(nullptr, _flag));
   native_handle_type &nativeh = ret.value()._v;
   OUTCOME_TRY(auto &&pagesize, detail::pagesize_from_flags(ret.value()._flag));
   bytes = utils::round_up_to_page_size(bytes, pagesize);
   LLFIO_LOG_FUNCTION_CALL(&ret);
-  void *addr = detail::map_handle_cache().get(bytes, pagesize);
+  void *addr = c->get(bytes, pagesize);
   if(addr == nullptr)
   {
     return _new_map(bytes, false, _flag);
@@ -224,36 +275,41 @@ bool map_handle::_recycle_map() noexcept
   try
   {
     LLFIO_LOG_FUNCTION_CALL(this);
-    auto &c = detail::map_handle_cache();
+    auto *c = detail::map_handle_cache();
+    if(c == nullptr || c->is_disabled() || _reservation >= (1ULL << 30U) /*1Gb*/)
+    {
+      return false;
+    }
 #ifdef _WIN32
     if(!win32_release_nonfile_allocations(_addr, _length, MEM_DECOMMIT))
     {
       return false;
     }
 #else
+#ifdef __linux__
     if(memory_accounting() == memory_accounting_kind::commit_charge)
+#endif
     {
       if(!do_mmap(_v, _addr, MAP_FIXED, nullptr, _pagesize, _length, 0, section_handle::flag::none | section_handle::flag::nocommit))
       {
         return false;
       }
     }
+#ifdef __linux__
     else
     {
-#ifdef __linux__
-      if(c.do_not_store_failed_count.load(std::memory_order_relaxed) < 10)
+      if(c->do_not_store_failed_count.load(std::memory_order_relaxed) < 10)
       {
         auto r = do_not_store({_addr, _length});
-        if(!r)
+        if(!r || r.assume_value().size() == 0)
         {
-          c.do_not_store_failed_count.fetch_add(1, std::memory_order_relaxed);
+          c->do_not_store_failed_count.fetch_add(1, std::memory_order_relaxed);
         }
       }
-#endif
     }
 #endif
-    c.add(_length, _pagesize, _addr);
-    return true;  // cached
+#endif
+    return c->add(_reservation, _pagesize, _addr);
   }
   catch(...)
   {
@@ -263,8 +319,14 @@ bool map_handle::_recycle_map() noexcept
 
 map_handle::cache_statistics map_handle::trim_cache(std::chrono::steady_clock::time_point older_than, size_t max_items) noexcept
 {
-  return detail::map_handle_cache().trim_cache(older_than, max_items);
+  auto *c = detail::map_handle_cache();
+  return (c != nullptr) ? c->trim_cache(older_than, max_items) : cache_statistics{};
 }
 
+bool map_handle::set_cache_disabled(bool disabled) noexcept
+{
+  auto *c = detail::map_handle_cache();
+  return (c != nullptr) ? c->set_cache_disabled(disabled) : true;
+}
 
 LLFIO_V2_NAMESPACE_END

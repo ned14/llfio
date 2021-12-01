@@ -261,8 +261,8 @@ namespace algorithm
                   {
                     struct ::stat stat;
                     memset(&stat, 0, sizeof(stat));
-                    path_view::c_str<> zpath(entry.leafname, path_view::zero_terminated);
-                    if(::fstatat(mydirh->native_handle().fd, zpath.buffer, &stat, AT_SYMLINK_NOFOLLOW) >= 0)
+                    path_view::zero_terminated_rendered_path<> zpath(entry.leafname);
+                    if(::fstatat(mydirh->native_handle().fd, zpath.data(), &stat, AT_SYMLINK_NOFOLLOW) >= 0)
                     {
                       entry.stat.st_type = [](uint16_t mode) {
                         switch(mode & S_IFMT)

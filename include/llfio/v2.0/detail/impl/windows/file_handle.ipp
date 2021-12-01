@@ -1,5 +1,5 @@
 /* A handle to a file
-(C) 2015-2020 Niall Douglas <http://www.nedproductions.biz/> (16 commits)
+(C) 2015-2021 Niall Douglas <http://www.nedproductions.biz/> (16 commits)
 File Created: Dec 2015
 
 
@@ -71,11 +71,11 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
     ntflags |= 0x040 /*FILE_NON_DIRECTORY_FILE*/;  // do not open a directory
     IO_STATUS_BLOCK isb = make_iostatus();
 
-    path_view::c_str<> zpath(path, path_view::not_zero_terminated);
+    path_view::not_zero_terminated_rendered_path<> zpath(path);
     UNICODE_STRING _path{};
-    _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
-    _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
-    if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
+    _path.Buffer = const_cast<wchar_t *>(zpath.data());
+    _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.size() * sizeof(wchar_t))) + sizeof(wchar_t);
+    if(zpath.size() >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
     {
       _path.Buffer += 3;
       _path.Length -= 3 * sizeof(wchar_t);
@@ -139,8 +139,8 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
       creation = CREATE_ALWAYS;
       break;
     }
-    path_view::c_str<> zpath(path, path_view::zero_terminated);
-    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.buffer, access, fileshare, nullptr, creation, attribs, nullptr)))  // NOLINT
+    path_view::zero_terminated_rendered_path<> zpath(path);
+    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.data(), access, fileshare, nullptr, creation, attribs, nullptr)))  // NOLINT
     {
       DWORD errcode = GetLastError();
       // assert(false);
@@ -461,11 +461,11 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
       while(extent.length > 0)
       {
         deadline nd;
-        auto towrite = (extent.length < blocksize) ? (size_t) extent.length : blocksize;
-        buffer_type b(buffer, towrite);
+        const size_t towrite = (extent.length < blocksize) ? (size_t) extent.length : blocksize;
+        buffer_type b(buffer, utils::round_up_to_page_size(towrite, 4096) /* to allow aligned i/o files */);
         LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
         OUTCOME_TRY(auto &&readed, read({{&b, 1}, extent.offset}, nd));
-        const_buffer_type cb(readed.front());
+        const_buffer_type cb(readed.front().data(), std::min(readed.front().size(), towrite));
         if(cb.size() == 0)
         {
           return ret;
@@ -718,16 +718,17 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
             buffer = utils::page_allocator<byte>().allocate(blocksize);
           }
           deadline nd;
-          buffer_type b(buffer, (size_type) thisblock);
+          buffer_type b(buffer, utils::round_up_to_page_size(thisblock, 4096) /* to allow aligned i/o files */);
           LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
           OUTCOME_TRY(auto &&readed, read({{&b, 1}, item.src.offset + thisoffset}, nd));
           buffer_dirty = true;
-          if(readed.front().size() != thisblock)
+          if(readed.front().size() < thisblock)
           {
             return errc::resource_unavailable_try_again;  // something is wrong
           }
+          readed.front() = {readed.front().data(), thisblock};
           LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
-          const_buffer_type cb(readed.front());
+          const_buffer_type cb(readed.front().data(), thisblock);
           if(item.destination_extents_are_new)
           {
             // If we don't need to reset the bytes in the destination, try to elide

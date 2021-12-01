@@ -51,10 +51,9 @@ static inline void TestCurrentProcessCPUUsage()
 #ifndef __APPLE__  // On Mac CI at least, idle is approx 2x user which ought to not occur on a two CPU VM
   BOOST_CHECK(diff.system_ns_in_idle_mode <= 1100000000ULL * thread_count);
 #endif
-  std::cout << "With " << thread_count << " threads busy the process spent " << diff.process_ns_in_user_mode
-            << " ns in user mode and " << diff.process_ns_in_kernel_mode << " ns in kernel mode. The system spent " << diff.system_ns_in_user_mode
-            << " ns in user mode, " << diff.system_ns_in_kernel_mode << " ns in kernel mode, and " << diff.system_ns_in_idle_mode << " in idle mode."
-            << std::endl;
+  std::cout << "With " << thread_count << " threads busy the process spent " << diff.process_ns_in_user_mode << " ns in user mode and "
+            << diff.process_ns_in_kernel_mode << " ns in kernel mode. The system spent " << diff.system_ns_in_user_mode << " ns in user mode, "
+            << diff.system_ns_in_kernel_mode << " ns in kernel mode, and " << diff.system_ns_in_idle_mode << " in idle mode." << std::endl;
   done = true;
   for(auto &t : threads)
   {
@@ -72,11 +71,12 @@ static inline void TestCurrentProcessMemoryUsage()
   namespace llfio = LLFIO_V2_NAMESPACE;
   static const llfio::utils::process_memory_usage *last_pmu;
   auto print = [](llfio::utils::process_memory_usage &pmu) -> std::ostream &(*) (std::ostream &) {
-    pmu = llfio::utils::current_process_memory_usage().value();
+    pmu = llfio::utils::current_process_memory_usage(llfio::utils::process_memory_usage::want::all).value();
     last_pmu = &pmu;
     return [](std::ostream &s) -> std::ostream & {
       return s << "      " << (last_pmu->total_address_space_in_use / 1024.0 / 1024.0) << "," << (last_pmu->total_address_space_paged_in / 1024.0 / 1024.0)
-               << "," << (last_pmu->private_committed / 1024.0 / 1024.0) << "," << (last_pmu->private_paged_in / 1024.0 / 1024.0) << std::endl;
+               << "," << (last_pmu->private_committed / 1024.0 / 1024.0) << "," << (last_pmu->private_paged_in / 1024.0 / 1024.0) << ","
+               << ((last_pmu->system_commit_charge_maximum - last_pmu->system_commit_charge_available) / 1024.0 / 1024.0) << std::endl;
     };
   };
   auto fakefault = [](llfio::map_handle &maph) {
@@ -108,7 +108,7 @@ static inline void TestCurrentProcessMemoryUsage()
   std::cout << "For page allocation:\n";
   {
     llfio::utils::process_memory_usage before_anything, after_reserve, after_commit, after_fault, after_decommit, after_zero, after_do_not_store;
-    std::cout << "   Total address space, Total address space paged in, Private bytes committed, Private bytes paged in\n\n";
+    std::cout << "   Total address space, Total address space paged in, Private bytes committed, Private bytes paged in, System commit charge\n\n";
     std::cout << "   Before anything:\n" << print(before_anything) << std::endl;
     {
       // Should raise total_address_space_in_use by 1Gb
@@ -148,35 +148,41 @@ static inline void TestCurrentProcessMemoryUsage()
       std::cout << "   After committing and faulting and do not storing 1Gb:\n" << print(after_do_not_store) << std::endl;
     }
     auto within = [](const llfio::utils::process_memory_usage &a, const llfio::utils::process_memory_usage &b, int total_address_space_in_use,
-                     int total_address_space_paged_in, int private_committed, int private_paged_in) {
+                     int total_address_space_paged_in, int private_committed, int private_paged_in, int system_committed) {
       auto check = [](size_t a, size_t b, int bound) {
-        auto diff = abs((b / 1024.0 / 1024.0) - (a / 1024.0 / 1024.0));
-        return diff > bound - 10 && diff < bound + 10;
+        if(bound == INT_MAX)
+        {
+          return true;
+        }
+        auto diff = (b / 1024.0 / 1024.0) - (a / 1024.0 / 1024.0);
+        return diff > bound - 50 && diff < bound + 50;
       };
       return check(a.total_address_space_in_use, b.total_address_space_in_use, total_address_space_in_use)           //
              && check(a.total_address_space_paged_in, b.total_address_space_paged_in, total_address_space_paged_in)  //
              && check(a.private_committed, b.private_committed, private_committed)                                   //
-             && check(a.private_paged_in, b.private_paged_in, private_paged_in);
+             && check(a.private_paged_in, b.private_paged_in, private_paged_in)                                      //
+             && check(b.system_commit_charge_available, a.system_commit_charge_available, system_committed);
     };
 #ifdef __APPLE__
     // Mac OS has no way of differentiating between committed and paged in pages :(
-    BOOST_CHECK(within(before_anything, after_reserve, 1024, 0, 0, 0));
-    BOOST_CHECK(within(before_anything, after_commit, 1024, 0, 0, 0));
-    BOOST_CHECK(within(before_anything, after_fault, 1024, 1024, 1024, 1024));
-    BOOST_CHECK(within(before_anything, after_decommit, 1024, 0, 0, 0));
-    BOOST_CHECK(within(before_anything, after_zero, 1024, 1024, 0, 0));
-    BOOST_CHECK(within(before_anything, after_do_not_store, 1024, 1024, 1024, 1024));  // do_not_store() doesn't decrease RSS
+    BOOST_CHECK(within(before_anything, after_reserve, 1024, 0, 0, 0, 0));
+    BOOST_CHECK(within(before_anything, after_commit, 1024, 0, 0, 0, 0));
+    BOOST_CHECK(within(before_anything, after_fault, 1024, 1024, 1024, 1024, 0));
+    BOOST_CHECK(within(before_anything, after_decommit, 1024, 0, 0, 0, 0));
+    BOOST_CHECK(within(before_anything, after_zero, 1024, 1024, 0, 0, 0));
+    BOOST_CHECK(within(before_anything, after_do_not_store, 1024, 1024, 1024, 1024, 0));  // do_not_store() doesn't decrease RSS
 #else
-    BOOST_CHECK(within(before_anything, after_reserve, 1024, 0, 0, 0));
-    BOOST_CHECK(within(before_anything, after_commit, 1024, 0, 1024, 0));
-    BOOST_CHECK(within(before_anything, after_fault, 1024, 1024, 1024, 1024));
-    BOOST_CHECK(within(before_anything, after_decommit, 1024, 0, 0, 0));
+    BOOST_CHECK(within(before_anything, after_reserve, 1024, 0, 0, 0, 0));
+    BOOST_CHECK(within(before_anything, after_commit, 1024, 0, 1024, 0, 1024));
+    BOOST_CHECK(within(before_anything, after_fault, 1024, 1024, 1024, 1024, 1024));
+    BOOST_CHECK(within(before_anything, after_decommit, 1024, 0, 0, 0, 0));
 #ifdef _WIN32
-    BOOST_CHECK(within(before_anything, after_zero, 1024, 0, 1024, 0));
-    BOOST_CHECK(within(before_anything, after_do_not_store, 1024, 0, 1024, 0));  // do_not_store() decreases RSS but not commit on Windows
+    BOOST_CHECK(within(before_anything, after_zero, 1024, 0, 1024, 0, 1024));
+    BOOST_CHECK(within(before_anything, after_do_not_store, 1024, 0, 1024, 0, 1024));  // do_not_store() decreases RSS but not commit on Windows
 #else
     (void) after_zero;  // may not evict faulted set on POSIX
-    BOOST_CHECK(within(before_anything, after_do_not_store, 1024, 1024, 0, 1024));  // do_not_store() decreases commit but does not RSS on POSIX
+    BOOST_CHECK(within(before_anything, after_do_not_store, 1024, 1024, 0, 1024,
+                       INT_MAX));  // do_not_store() decreases commit but does not RSS on POSIX BUT not the system commit if Linux < 4.12
 #endif
 #endif
   }
@@ -189,7 +195,7 @@ static inline void TestCurrentProcessMemoryUsage()
   {
     auto sectionh = llfio::section_handle::section(1024 * 1024 * 1024).value();
     llfio::utils::process_memory_usage before_anything, after_reserve, after_commit, after_fault, after_decommit, after_zero, after_do_not_store;
-    std::cout << "   Total address space, Total address space paged in, Private bytes committed, Private bytes paged in\n\n";
+    std::cout << "   Total address space, Total address space paged in, Private bytes committed, Private bytes paged in, System commit charge\n\n";
     std::cout << "   Before anything:\n" << print(before_anything) << std::endl;
 
     {
@@ -236,32 +242,37 @@ static inline void TestCurrentProcessMemoryUsage()
     }
 #endif
     auto within = [](const llfio::utils::process_memory_usage &a, const llfio::utils::process_memory_usage &b, int total_address_space_in_use,
-                     int total_address_space_paged_in, int private_committed, int private_paged_in) {
+                     int total_address_space_paged_in, int private_committed, int private_paged_in, int system_committed) {
       auto check = [](size_t a, size_t b, int bound) {
-        auto diff = abs((b / 1024.0 / 1024.0) - (a / 1024.0 / 1024.0));
-        return diff > bound - 10 && diff < bound + 10;
+        if(bound == INT_MAX)
+        {
+          return true;
+        }
+        auto diff = (b / 1024.0 / 1024.0) - (a / 1024.0 / 1024.0);
+        return diff > bound - 50 && diff < bound + 50;
       };
       return check(a.total_address_space_in_use, b.total_address_space_in_use, total_address_space_in_use)           //
              && check(a.total_address_space_paged_in, b.total_address_space_paged_in, total_address_space_paged_in)  //
              && check(a.private_committed, b.private_committed, private_committed)                                   //
-             && check(a.private_paged_in, b.private_paged_in, private_paged_in);
+             && check(a.private_paged_in, b.private_paged_in, private_paged_in)                                      //
+             && check(b.system_commit_charge_available, a.system_commit_charge_available, system_committed);
     };
 #ifdef __APPLE__
     // Mac OS has no way of differentiating between committed and paged in pages :(
-    BOOST_CHECK(within(before_anything, after_reserve, 1024, 0, 0, 0));
-    BOOST_CHECK(within(before_anything, after_commit, 1024, 0, 0, 0));
-    BOOST_CHECK(within(before_anything, after_fault, 1024, 1024, 0, 0));
-    BOOST_CHECK(within(before_anything, after_decommit, 1024, 0, 0, 0));
-    BOOST_CHECK(within(before_anything, after_zero, 1024, 1024, 0, 0));          // doesn't implement zero()
-    BOOST_CHECK(within(before_anything, after_do_not_store, 1024, 1024, 0, 0));  // do_not_store() doesn't decrease RSS
+    BOOST_CHECK(within(before_anything, after_reserve, 1024, 0, 0, 0, 0));
+    BOOST_CHECK(within(before_anything, after_commit, 1024, 0, 0, 0, 0));
+    BOOST_CHECK(within(before_anything, after_fault, 1024, 1024, 0, 0, 0));
+    BOOST_CHECK(within(before_anything, after_decommit, 1024, 0, 0, 0, 0));
+    BOOST_CHECK(within(before_anything, after_zero, 1024, 1024, 0, 0, 0));          // doesn't implement zero()
+    BOOST_CHECK(within(before_anything, after_do_not_store, 1024, 1024, 0, 0, 0));  // do_not_store() doesn't decrease RSS
 #else
-    BOOST_CHECK(within(before_anything, after_reserve, 1024, 0, 0, 0));
-    BOOST_CHECK(within(before_anything, after_commit, 1024, 0, 0, 0));
-    BOOST_CHECK(within(before_anything, after_fault, 1024, 1024, 0, 0));
+    BOOST_CHECK(within(before_anything, after_reserve, 1024, 0, 0, 0, 0));
+    BOOST_CHECK(within(before_anything, after_commit, 1024, 0, 0, 0, 0));
+    BOOST_CHECK(within(before_anything, after_fault, 1024, 1024, 0, 0, 0));
 #ifndef _WIN32
-    BOOST_CHECK(within(before_anything, after_decommit, 1024, 0, 0, 0));
-    BOOST_CHECK(within(before_anything, after_zero, 1024, 0, 0, 0));
-    BOOST_CHECK(within(before_anything, after_do_not_store, 1024, 0, 0, 0));
+    BOOST_CHECK(within(before_anything, after_decommit, 1024, 0, 0, 0, 0));
+    BOOST_CHECK(within(before_anything, after_zero, 1024, 0, 0, 0, 0));
+    BOOST_CHECK(within(before_anything, after_do_not_store, 1024, 0, 0, 0, INT_MAX)); // system commit varies if Linux > 4.12
 #else
     (void) after_decommit;
     (void) after_zero;

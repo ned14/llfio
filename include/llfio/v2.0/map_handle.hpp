@@ -660,9 +660,8 @@ public:
   \param section A memory section handle specifying the backing storage to use.
   \param bytes How many bytes to reserve (0 = the size of the section). Rounded up to nearest
   64Kb on Windows.
-  \param offset The offset into the backing storage to map from. Typically needs to be at least
-  a multiple of the page size (see `page_size()`), on Windows it needs to be a multiple of the
-  kernel memory allocation granularity (typically 64Kb).
+  \param offset The offset into the backing storage to map from. This can be byte granularity,
+  but be careful if you use non-pagesize offsets (see below).
   \param _flag The permissions with which to map the view which are constrained by the
   permissions of the memory section. `flag::none` can be useful for reserving virtual address
   space without committing system resources, use `commit()` to later change availability of memory.
@@ -708,6 +707,10 @@ public:
    */
   static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC cache_statistics trim_cache(std::chrono::steady_clock::time_point older_than = {},
                                                                      size_t max_items = (size_t) -1) noexcept;
+  /*! Disable the map handle cache, returning its previous setting. Note that you may also
+  wish to explicitly trim the cache.
+  */
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool set_cache_disabled(bool disabled) noexcept;
 
   //! The memory section this handle is using
   section_handle *section() const noexcept { return _section; }
@@ -715,7 +718,16 @@ public:
   void set_section(section_handle *s) noexcept { _section = s; }
 
   //! The address in memory where this mapped view resides
-  byte *address() const noexcept { return _addr; }
+  byte *address() const noexcept
+  {
+#ifdef _WIN32
+    if(_pagesize <= 65536)
+    {
+      return _addr + (_offset & 65535);
+    }
+#endif
+    return _addr + (_offset & (_pagesize - 1));
+  }
 
   //! The offset of the memory map.
   extent_type offset() const noexcept { return _offset; }
@@ -746,7 +758,14 @@ public:
       return _reservation;
     }
     OUTCOME_TRY(auto &&length, _section->length());  // length of the backing file
-    length -= _offset;
+    if(length <= _offset)
+    {
+      length = 0;
+    }
+    else
+    {
+      length -= _offset;
+    }
     if(length > _reservation)
     {
       length = _reservation;
@@ -1094,8 +1113,8 @@ inline result<map_handle> map(map_handle::size_type bytes, bool zeroed = false, 
 /*! Create a memory mapped view of a backing storage, optionally reserving additional address space for later growth.
 \param section A memory section handle specifying the backing storage to use.
 \param bytes How many bytes to reserve (0 = the size of the section). Rounded up to nearest 64Kb on Windows.
-\param offset The offset into the backing storage to map from. Typically needs to be at least a multiple of the page size (see `page_size()`), on Windows it
-needs to be a multiple of the kernel memory allocation granularity (typically 64Kb). \param _flag The permissions with which to map the view which are
+\param offset The offset into the backing storage to map from
+\param _flag The permissions with which to map the view which are
 constrained by the permissions of the memory section. `flag::none` can be useful for reserving virtual address space without committing system resources, use
 commit() to later change availability of memory.
 

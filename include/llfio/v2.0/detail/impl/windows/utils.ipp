@@ -207,38 +207,55 @@ namespace utils
     return success();
   }
 
-  result<process_memory_usage> current_process_memory_usage(process_memory_usage::want /*unused*/) noexcept
+  result<process_memory_usage> current_process_memory_usage(process_memory_usage::want wanted) noexcept
   {
     // Amazingly Win32 doesn't expose private working set, so to avoid having
     // to iterate all the pages in the process and calculate, use a hidden
     // NT kernel call
     windows_nt_kernel::init();
     using namespace windows_nt_kernel;
-    ULONG written = 0;
-    _VM_COUNTERS_EX2 vmc;
-    memset(&vmc, 0, sizeof(vmc));
-    NTSTATUS ntstat = NtQueryInformationProcess(GetCurrentProcess(), ProcessVmCounters, &vmc, sizeof(vmc), &written);
-    if(ntstat < 0)
-    {
-      return ntkernel_error(ntstat);
-    }
     process_memory_usage ret;
-    /* Notes:
+    if(!!(wanted & process_memory_usage::want::this_process))
+    {
+      ULONG written = 0;
+      _VM_COUNTERS_EX2 vmc;
+      memset(&vmc, 0, sizeof(vmc));
+      NTSTATUS ntstat = NtQueryInformationProcess(GetCurrentProcess(), ProcessVmCounters, &vmc, sizeof(vmc), &written);
+      if(ntstat < 0)
+      {
+        return ntkernel_error(ntstat);
+      }
+      /* Notes:
 
-    Apparently PrivateUsage is the commit charge on Windows. It always equals PagefileUsage.
-    It is the total amount of private anonymous pages committed.
-    SharedCommitUsage is amount of non-binary Shared memory committed.
-    Therefore total non-binary commit = PrivateUsage + SharedCommitUsage
+      Apparently PrivateUsage is the commit charge on Windows. It always equals PagefileUsage.
+      It is the total amount of private anonymous pages committed.
+      SharedCommitUsage is amount of non-binary Shared memory committed.
+      Therefore total non-binary commit = PrivateUsage + SharedCommitUsage
 
-    WorkingSetSize is the total amount of program binaries, non-binary shared memory, and anonymous pages faulted in.
-    PrivateWorkingSetSize is the amount of private anonymous pages faulted into the process.
-    Therefore remainder is all shared working set faulted into the process.
-    */
-    ret.total_address_space_in_use = vmc.VirtualSize;
-    ret.total_address_space_paged_in = vmc.WorkingSetSize;
+      WorkingSetSize is the total amount of program binaries, non-binary shared memory, and anonymous pages faulted in.
+      PrivateWorkingSetSize is the amount of private anonymous pages faulted into the process.
+      Therefore remainder is all shared working set faulted into the process.
+      */
+      ret.total_address_space_in_use = vmc.VirtualSize;
+      ret.total_address_space_paged_in = vmc.WorkingSetSize;
 
-    ret.private_committed = vmc.PrivateUsage;
-    ret.private_paged_in = vmc.PrivateWorkingSetSize;
+      ret.private_committed = vmc.PrivateUsage;
+      ret.private_paged_in = vmc.PrivateWorkingSetSize;
+    }
+    if(!!(wanted & process_memory_usage::want::this_system))
+    {
+      PERFORMANCE_INFORMATION pi;
+      memset(&pi, 0, sizeof(pi));
+      pi.cb = sizeof(pi);
+      if(!GetPerformanceInfo(&pi, sizeof(pi)))
+      {
+        return win32_error();
+      }
+      ret.system_physical_memory_total = (uint64_t) pi.PhysicalTotal * pi.PageSize;
+      ret.system_physical_memory_available = (uint64_t) pi.PhysicalAvailable * pi.PageSize;
+      ret.system_commit_charge_maximum = (uint64_t) pi.CommitLimit * pi.PageSize;
+      ret.system_commit_charge_available = (uint64_t)(pi.CommitLimit - pi.CommitTotal) * pi.PageSize;
+    }
     return ret;
   }
 

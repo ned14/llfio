@@ -1,5 +1,5 @@
 /* A handle to something
-(C) 2015-2020 Niall Douglas <http://www.nedproductions.biz/> (8 commits)
+(C) 2015-2021 Niall Douglas <http://www.nedproductions.biz/> (8 commits)
 File Created: Dec 2015
 
 
@@ -51,14 +51,14 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   OUTCOME_TRY(auto &&attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, _caching, flags));
   attribs &= ~O_NONBLOCK;
   nativeh.behaviour &= ~native_handle_type::disposition::nonblocking;
-  path_view::c_str<> zpath(path, path_view::zero_terminated);
+  path_view::zero_terminated_rendered_path<> zpath(path);
   if(base.is_valid())
   {
-    nativeh.fd = ::openat(base.native_handle().fd, zpath.buffer, attribs, 0x1b0 /*660*/);
+    nativeh.fd = ::openat(base.native_handle().fd, zpath.c_str(), attribs, 0x1b0 /*660*/);
   }
   else
   {
-    nativeh.fd = ::open(zpath.buffer, attribs, 0x1b0 /*660*/);
+    nativeh.fd = ::open(zpath.c_str(), attribs, 0x1b0 /*660*/);
   }
   if(-1 == nativeh.fd)
   {
@@ -536,11 +536,11 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
       while(extent.length > 0)
       {
         deadline nd;
-        auto towrite = (extent.length < blocksize) ? (size_t) extent.length : blocksize;
-        buffer_type b(buffer, towrite);
+        const size_t towrite = (extent.length < blocksize) ? (size_t) extent.length : blocksize;
+        buffer_type b(buffer, utils::round_up_to_page_size(towrite, 4096) /* to allow aligned i/o files */);
         LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
         OUTCOME_TRY(auto &&readed, read({{&b, 1}, extent.offset}, nd));
-        const_buffer_type cb(readed.front());
+        const_buffer_type cb(readed.front().data(), std::min(readed.front().size(), towrite));
         if(cb.size() == 0)
         {
           return ret;
@@ -590,8 +590,8 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
 
           See https://github.com/openzfs/zfs/issues/11697 for more.
           */
-          char b;
-          if(-1 == ::pread(_v.fd, &b, 1, end))
+          alignas(4096) char b[4096];
+          if(-1 == ::pread(_v.fd, b, requires_aligned_io() ? 4096 : 1, end))
           {
             return posix_error();
           }
@@ -837,16 +837,17 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
             buffer = utils::page_allocator<byte>().allocate(blocksize);
           }
           deadline nd;
-          buffer_type b(buffer, thisblock);
+          buffer_type b(buffer, utils::round_up_to_page_size(thisblock, 4096) /* to allow aligned i/o files */);
           LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
           OUTCOME_TRY(auto &&readed, read({{&b, 1}, item.src.offset + thisoffset}, nd));
           buffer_dirty = true;
-          if(readed.front().size() != thisblock)
+          if(readed.front().size() < thisblock)
           {
             return errc::resource_unavailable_try_again;  // something is wrong
           }
+          readed.front() = {readed.front().data(), thisblock};
           LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
-          const_buffer_type cb(readed.front());
+          const_buffer_type cb(readed.front().data(), thisblock);
           if(item.destination_extents_are_new)
           {
             // If we don't need to reset the bytes in the destination, try to elide

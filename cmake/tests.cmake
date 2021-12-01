@@ -22,6 +22,7 @@ set(llfio_TESTS
   "test/tests/map_handle_create_close/kernel_map_handle.cpp.hpp"
   "test/tests/map_handle_create_close/runner.cpp"
   "test/tests/mapped.cpp"
+  "test/tests/mapped_file_handle.cpp"
   "test/tests/path_discovery.cpp"
   "test/tests/path_view.cpp"
   "test/tests/pipe_handle.cpp"

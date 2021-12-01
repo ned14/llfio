@@ -89,11 +89,11 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     ntflags |= 0x01 /*FILE_DIRECTORY_FILE*/;  // required to open a directory
     IO_STATUS_BLOCK isb = make_iostatus();
 
-    path_view::c_str<> zpath(path, path_view::not_zero_terminated);
+    path_view::not_zero_terminated_rendered_path<> zpath(path);
     UNICODE_STRING _path{};
-    _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
-    _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
-    if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
+    _path.Buffer = const_cast<wchar_t *>(zpath.data());
+    _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.size() * sizeof(wchar_t))) + sizeof(wchar_t);
+    if(zpath.size() >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
     {
       _path.Buffer += 3;
       _path.Length -= 3 * sizeof(wchar_t);
@@ -164,8 +164,8 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
       break;
     }
     attribs |= FILE_FLAG_BACKUP_SEMANTICS;  // required to open a directory
-    path_view::c_str<> zpath(path, path_view::zero_terminated);
-    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.buffer, access, fileshare, nullptr, creation, attribs, nullptr, true)))  // NOLINT
+    path_view::zero_terminated_rendered_path<> zpath(path);
+    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.data(), access, fileshare, nullptr, creation, attribs, nullptr, true)))  // NOLINT
     {
       DWORD errcode = GetLastError();
       if(creation::always_new == _creation && 0xb7 /*ERROR_ALREADY_EXISTS*/ == errcode)
@@ -303,11 +303,11 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
   }
   UNICODE_STRING _glob{};
   memset(&_glob, 0, sizeof(_glob));
-  path_view_type::c_str<> zglob(req.glob, path_view::not_zero_terminated);
+  path_view_type::not_zero_terminated_rendered_path<> zglob(req.glob);
   if(!req.glob.empty())
   {
-    _glob.Buffer = const_cast<wchar_t *>(zglob.buffer);
-    _glob.Length = (USHORT)(zglob.length * sizeof(wchar_t));
+    _glob.Buffer = const_cast<wchar_t *>(zglob.data());
+    _glob.Length = (USHORT)(zglob.size() * sizeof(wchar_t));
     _glob.MaximumLength = _glob.Length + sizeof(wchar_t);
   }
   what_to_enumerate_type *buffer = nullptr;

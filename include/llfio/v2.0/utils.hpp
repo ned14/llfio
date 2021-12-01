@@ -205,10 +205,30 @@ namespace utils
     total_address_space_paged_in = 1U << 1U,
     private_committed = 1U << 2U,
     private_paged_in = 1U << 3U,
+
     private_committed_inaccurate = 1U << 8U,
 
-    all = (unsigned) -1  //
+    system_physical_memory_total = 1U << 16U,
+    system_physical_memory_available = 1U << 17U,
+    system_commit_charge_maximum = 1U << 18U,
+    system_commit_charge_available = 1U << 19U,
+
+    this_process = 0x0000ffff,  //
+    this_system = 0xffff0000,   //
+    all = 0xffffffff            //
     } QUICKCPPLIB_BITFIELD_END(want)
+
+    //! The total physical memory in this system.
+    uint64_t system_physical_memory_total{0};
+    //! The physical memory in this system not containing dirty pages i.e. is currently used for file system caching, or unused.
+    uint64_t system_physical_memory_available{0};
+
+    //! The maximum amount of memory which can be committed by all processes. This is typically physical RAM plus swap files. Note that swap files can be added
+    //! and removed over time.
+    uint64_t system_commit_charge_maximum{0};
+    //! The amount of commit charge remaining before the maximum. Subtract this from `system_commit_charge_maximum` to determine the amount of commit charge
+    //! consumed by all processes in the system.
+    uint64_t system_commit_charge_available{0};
 
     //! The total virtual address space in use.
     size_t total_address_space_in_use{0};
@@ -233,14 +253,24 @@ namespace utils
   `process_memory_usage::want::private_committed_inaccurate` can yield significant
   performance gains. If you set `process_memory_usage::want::private_committed_inaccurate`,
   we use `/proc/pid/smaps_rollup` and `/proc/pid/maps` to calculate the results. This
-  cannot distinguish between regions with the accounted
-  flag enabled or disabled. By default, this fast path is enabled.
+  cannot distinguish between regions with the accounted flag enabled or disabled, and
+  be aware that glibc's `malloc()` for some inexplicable reason doesn't set the
+  accounted flag on regions it commits, so the inaccurate flag will always yield
+  higher numbers for private commited on Linux. By default, this fast path is enabled.
+
+  \note `/proc/pid/smaps_rollup` was added in Linux kernel 3.16, so the default specifying
+  `process_memory_usage::want::private_committed_inaccurate` will always fail on Linux
+  kernels preceding that with an error code comparing equal to `errc::operation_not_supported`.
+  As one would assume users would prefer this operation to fail on older kernels rather than
+  silently go slowly in complex memory spaces, it is left opt-in to request
+  the accurate implementation which works on older Linux kernels. Or, just don't request
+  `private_committed` at all, and pretend `private_paged_in` means the same thing.
 
   \note Mac OS provides no way of reading how much memory a process has committed.
   We therefore supply as `private_committed` the same value as `private_paged_in`.
   */
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<process_memory_usage>
-  current_process_memory_usage(process_memory_usage::want want = process_memory_usage::want::all) noexcept;
+  current_process_memory_usage(process_memory_usage::want want = process_memory_usage::want::this_process) noexcept;
 
   /*! \brief CPU usage statistics for a process.
    */

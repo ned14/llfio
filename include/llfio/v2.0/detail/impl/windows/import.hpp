@@ -539,6 +539,26 @@ namespace windows_nt_kernel
 
   using DiscardVirtualMemory_t = BOOL(NTAPI *)(_In_ PVOID VirtualAddress, _In_ SIZE_T Size);
 
+  typedef struct _PERFORMANCE_INFORMATION
+  {
+    DWORD cb;
+    SIZE_T CommitTotal;
+    SIZE_T CommitLimit;
+    SIZE_T CommitPeak;
+    SIZE_T PhysicalTotal;
+    SIZE_T PhysicalAvailable;
+    SIZE_T SystemCache;
+    SIZE_T KernelTotal;
+    SIZE_T KernelPaged;
+    SIZE_T KernelNonpaged;
+    SIZE_T PageSize;
+    DWORD HandleCount;
+    DWORD ProcessCount;
+    DWORD ThreadCount;
+  } PERFORMANCE_INFORMATION, *PPERFORMANCE_INFORMATION, PERFORMACE_INFORMATION, *PPERFORMACE_INFORMATION;
+
+  using GetPerformanceInfo_t = BOOL(NTAPI*)(PPERFORMANCE_INFORMATION pPerformanceInformation, DWORD cb);
+
   using RtlCaptureStackBackTrace_t = USHORT(NTAPI *)(_In_ ULONG FramesToSkip, _In_ ULONG FramesToCapture, _Out_ PVOID *BackTrace,
                                                      _Out_opt_ PULONG BackTraceHash);
 
@@ -965,6 +985,7 @@ namespace windows_nt_kernel
   static AdjustTokenPrivileges_t AdjustTokenPrivileges;
   static PrefetchVirtualMemory_t PrefetchVirtualMemory_;
   static DiscardVirtualMemory_t DiscardVirtualMemory_;
+  static GetPerformanceInfo_t GetPerformanceInfo;
   static SymInitialize_t SymInitialize;
   static SymGetLineFromAddr64_t SymGetLineFromAddr64;
   static RtlCaptureStackBackTrace_t RtlCaptureStackBackTrace;
@@ -1299,6 +1320,13 @@ namespace windows_nt_kernel
     if(DiscardVirtualMemory_ == nullptr)
     {
       DiscardVirtualMemory_ = reinterpret_cast<DiscardVirtualMemory_t>(GetProcAddress(kernel32, "DiscardVirtualMemory"));
+    }
+    if(GetPerformanceInfo == nullptr)
+    {
+      if((GetPerformanceInfo = reinterpret_cast<GetPerformanceInfo_t>(GetProcAddress(kernel32, "K32GetPerformanceInfo"))) == nullptr)
+      {
+        abort();
+      }
     }
 #ifdef LLFIO_OP_STACKBACKTRACEDEPTH
     if(dbghelp)

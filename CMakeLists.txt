@@ -22,6 +22,18 @@
 #           http://www.boost.org/LICENSE_1_0.txt)
 
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+
+set(LLFIO_DEPENDENCY_QUICKCPPLIB_GIT_TAG "master" CACHE STRING "Which git tag to use for the QuickCppLib dependency")
+set(LLFIO_DEPENDENCY_OUTCOME_GIT_TAG "master" CACHE STRING "Which git tag to use for the Outcome dependency")
+if(NOT LLFIO_DEPENDENCY_QUICKCPPLIB_GIT_TAG STREQUAL "master")
+  # Don't reuse the bootstrapped git clone as the dependency itself
+  if(CMAKE_BINARY_DIR)
+    set(CTEST_QUICKCPPLIB_CLONE_DIR "${CMAKE_BINARY_DIR}/quickcpplib-bootstrap")
+  else()
+    set(CTEST_QUICKCPPLIB_CLONE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/quickcpplib-bootstrap")
+  endif()
+endif()
+
 include(cmake/QuickCppLibBootstrap.cmake)
 include(QuickCppLibRequireOutOfSourceBuild)
 include(QuickCppLibUtils)
@@ -30,6 +42,8 @@ include(QuickCppLibPolicies)
 option(LLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE "Whether to use SG14 status_code for failure handling" OFF)
 option(LLFIO_ENABLE_DEPENDENCY_SMOKE_TEST "Whether to build executables which are smoke tests that LLFIO is fully working. Used by various package managers such as vcpkg." OFF)
 option(LLFIO_ASSUME_CROSS_COMPILING "Whether to assume we are cross compiling. Normally automatically detected, but if automatic detection doesn't work, a working <filesystem> will not be found during cmake configure." OFF)
+option(LLFIO_FORCE_CONCEPTS_OFF "Whether to not auto detect and enable concepts for the LLFIO cmake targets" OFF)
+option(LLFIO_FORCE_COROUTINES_OFF "Whether to not auto detect and enable coroutines for the LLFIO cmake targets" OFF)
 option(UNIT_TESTS_BUILD_ALL "Whether to run all of the unit test suite." OFF)
 set(UNIT_TESTS_CXX_VERSION "latest" CACHE STRING "The version of C++ to use in the header-only unit tests")
 if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD" OR APPLE)
@@ -55,12 +69,13 @@ endif()
 # Find my library dependencies
 find_quickcpplib_library(quickcpplib
   GIT_REPOSITORY "https://github.com/ned14/quickcpplib.git"
+  GIT_TAG "${LLFIO_DEPENDENCY_QUICKCPPLIB_GIT_TAG}"
   REQUIRED
   IS_HEADER_ONLY
 )
 find_quickcpplib_library(outcome
   GIT_REPOSITORY "https://github.com/ned14/outcome.git"
-  GIT_TAG "master"
+  GIT_TAG "${LLFIO_DEPENDENCY_OUTCOME_GIT_TAG}"
   REQUIRED
   IS_HEADER_ONLY
 )
@@ -84,12 +99,16 @@ include(QuickCppLibMakeLibrary)
 include(QuickCppLibMakeHeaderOnlyLibrary)
 
 # If we have concepts, enable those for both myself and all inclusions
-apply_cxx_concepts_to(INTERFACE llfio_hl)
-apply_cxx_concepts_to(PUBLIC llfio_sl llfio_dl)
+if(NOT LLFIO_FORCE_CONCEPTS_OFF)
+  apply_cxx_concepts_to(INTERFACE llfio_hl)
+  apply_cxx_concepts_to(PUBLIC llfio_sl llfio_dl)
+endif()
 
 # If we have coroutines, enable those for both myself and all inclusions
-apply_cxx_coroutines_to(INTERFACE llfio_hl)
-apply_cxx_coroutines_to(PUBLIC llfio_sl llfio_dl)
+if(NOT LLFIO_FORCE_COROUTINES_OFF)
+  apply_cxx_coroutines_to(INTERFACE llfio_hl)
+  apply_cxx_coroutines_to(PUBLIC llfio_sl llfio_dl)
+endif()
 
 # Make preprocessed edition of this library target
 if(NOT PROJECT_IS_DEPENDENCY)
