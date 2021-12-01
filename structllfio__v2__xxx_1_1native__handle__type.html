@@ -222,7 +222,7 @@ constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a967ace482f3fe7fd3c6e24bffee25888"><td class="memItemLeft" align="right" valign="top"><a id="a967ace482f3fe7fd3c6e24bffee25888"></a>
-disposition&#160;</td><td class="memItemRight" valign="bottom"><b>behaviour</b></td></tr>
+disposition&#160;</td><td class="memItemRight" valign="bottom"><b>behaviour</b> {disposition::invalid}</td></tr>
 <tr class="separator:a967ace482f3fe7fd3c6e24bffee25888"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -253,7 +253,9 @@ disposition&#160;</td><td class="memItemRight" valign="bottom"><b>behaviour</b><
 
 <p>Constructs a default instance. </p>
 <p>The behaviour of the handle </p>
-<div class="fragment"><div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;{}  <span class="comment">// NOLINT</span></div>
+<div class="fragment"><div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;      : _init{-1}</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  {</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  }  <span class="comment">// NOLINT</span></div>
 </div><!-- fragment -->
 </div>
 </div>
