@@ -156,8 +156,8 @@ namespace path_discovery
 #if 0
             fprintf(stderr, "path_discovery::verified_temporary_directories() failed to open %s due to %s\n", ps.all[n].path.path().c_str(),
                     _h.error().message().c_str());
-            path_view::c_str<> zpath(ps.all[n].path, path_view::zero_terminated);
-            fprintf(stderr, "path_view::c_str says buffer = %p (%s) length = %u\n", zpath.buffer, zpath.buffer, (unsigned) zpath.length);
+            path_view::zero_terminated_rendered_path<> zpath(ps.all[n].path);
+            fprintf(stderr, "path_view::c_str says buffer = %p (%s) length = %u\n", zpath.c_str(), zpath.c_str(), (unsigned) zpath.size());
             visit(ps.all[n].path, [](auto _sv) {
               char buffer[1024];
               memcpy(buffer, (const char *) _sv.data(), _sv.size());

@@ -120,8 +120,29 @@ change in the future, however any path emitted will always be a valid Win32 path
 */
 #ifdef _WIN32
 LLFIO_HEADERS_ONLY_FUNC_SPEC result<filesystem::path> to_win32_path(const fs_handle &h, win32_path_namespace mapping = win32_path_namespace::any) noexcept;
+LLFIO_TEMPLATE(class T)
+LLFIO_TREQUIRES(LLFIO_TPRED(!std::is_base_of<fs_handle, T>::value && std::is_base_of<handle, T>::value))
+inline result<filesystem::path> to_win32_path(const T &h, win32_path_namespace mapping = win32_path_namespace::any) noexcept
+{
+  struct wrapper final : public fs_handle
+  {
+    const handle &_h;
+    explicit wrapper(const handle &h)
+        : _h(h)
+    {
+    }
+    virtual const handle &_get_handle() const noexcept override { return _h; }
+  } _(h);
+  return to_win32_path(_, mapping);
+}
 #else
 inline result<filesystem::path> to_win32_path(const fs_handle &h, win32_path_namespace mapping = win32_path_namespace::any) noexcept;
+LLFIO_TEMPLATE(class T)
+LLFIO_TREQUIRES(LLFIO_TPRED(!std::is_base_of<fs_handle, T>::value && std::is_base_of<handle, T>::value))
+inline result<filesystem::path> to_win32_path(const T &h, win32_path_namespace /*unused*/ = win32_path_namespace::any) noexcept
+{
+  return h.current_path();
+}
 #endif
 
 /*! \class fs_handle

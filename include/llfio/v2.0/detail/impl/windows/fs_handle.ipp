@@ -83,10 +83,10 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
 
       DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
       IO_STATUS_BLOCK isb = make_iostatus();
-      path_view::c_str<> zpath(filename, path_view::not_zero_terminated);
+      path_view::not_zero_terminated_rendered_path<> zpath(filename);
       UNICODE_STRING _path{};
-      _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
-      _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
+      _path.Buffer = const_cast<wchar_t *>(zpath.data());
+      _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.size() * sizeof(wchar_t))) + sizeof(wchar_t);
       OBJECT_ATTRIBUTES oa{};
       memset(&oa, 0, sizeof(oa));
       oa.Length = sizeof(OBJECT_ATTRIBUTES);
@@ -139,9 +139,9 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
   // If the target is a win32 path, we need to convert to NT path and call ourselves
   if(!base.is_valid() && !path.is_ntpath())
   {
-    path_view::c_str<> zpath(path, path_view::zero_terminated);
+    path_view::zero_terminated_rendered_path<> zpath(path);
     UNICODE_STRING NtPath{};
-    if(RtlDosPathNameToNtPathName_U(zpath.buffer, &NtPath, nullptr, nullptr) == 0u)
+    if(RtlDosPathNameToNtPathName_U(zpath.data(), &NtPath, nullptr, nullptr) == 0u)
     {
       return win32_error(ERROR_FILE_NOT_FOUND);
     }
@@ -188,11 +188,11 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
     duph = h.native_handle().h;
   }
 
-  path_view::c_str<> zpath(path, path_view::not_zero_terminated);
+  path_view::not_zero_terminated_rendered_path<> zpath(path);
   UNICODE_STRING _path{};
-  _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
-  _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
-  if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
+  _path.Buffer = const_cast<wchar_t *>(zpath.data());
+  _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.size() * sizeof(wchar_t))) + sizeof(wchar_t);
+  if(zpath.size() >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
   {
     _path.Buffer += 3;
     _path.Length -= 3 * sizeof(wchar_t);
@@ -227,9 +227,9 @@ result<void> fs_handle::link(const path_handle &base, path_view_type path, deadl
   // If the target is a win32 path, we need to convert to NT path and call ourselves
   if(!base.is_valid() && !path.is_ntpath())
   {
-    path_view::c_str<> zpath(path, path_view::zero_terminated);
+    path_view::zero_terminated_rendered_path<> zpath(path);
     UNICODE_STRING NtPath{};
-    if(RtlDosPathNameToNtPathName_U(zpath.buffer, &NtPath, nullptr, nullptr) == 0u)
+    if(RtlDosPathNameToNtPathName_U(zpath.data(), &NtPath, nullptr, nullptr) == 0u)
     {
       return win32_error(ERROR_FILE_NOT_FOUND);
     }
@@ -245,11 +245,11 @@ result<void> fs_handle::link(const path_handle &base, path_view_type path, deadl
 
   HANDLE duph = h.native_handle().h;
 
-  path_view::c_str<> zpath(path, path_view::not_zero_terminated);
+  path_view::not_zero_terminated_rendered_path<> zpath(path);
   UNICODE_STRING _path{};
-  _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
-  _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
-  if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
+  _path.Buffer = const_cast<wchar_t *>(zpath.data());
+  _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.size() * sizeof(wchar_t))) + sizeof(wchar_t);
+  if(zpath.size() >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
   {
     _path.Buffer += 3;
     _path.Length -= 3 * sizeof(wchar_t);
@@ -526,9 +526,9 @@ LLFIO_HEADERS_ONLY_FUNC_SPEC result<filesystem::path> to_win32_path(const fs_han
 #if(_HAS_CXX17 || __cplusplus >= 201700) && (!defined(__GLIBCXX__) || __GLIBCXX__ > 20170519)  // libstdc++'s string_view is missing constexpr
           constexpr
 #endif
-          const wstring_view reserved_names[] = {
-          L"\\CON\\",  L"\\PRN\\",  L"\\AUX\\",  L"\\NUL\\",  L"\\COM1\\", L"\\COM2\\", L"\\COM3\\", L"\\COM4\\", L"\\COM5\\", L"\\COM6\\", L"\\COM7\\",
-          L"\\COM8\\", L"\\COM9\\", L"\\LPT1\\", L"\\LPT2\\", L"\\LPT3\\", L"\\LPT4\\", L"\\LPT5\\", L"\\LPT6\\", L"\\LPT7\\", L"\\LPT8\\", L"\\LPT9\\"};
+          const wstring_view reserved_names[] = {L"\\CON\\",  L"\\PRN\\",  L"\\AUX\\",  L"\\NUL\\",  L"\\COM1\\", L"\\COM2\\", L"\\COM3\\", L"\\COM4\\",
+                                                 L"\\COM5\\", L"\\COM6\\", L"\\COM7\\", L"\\COM8\\", L"\\COM9\\", L"\\LPT1\\", L"\\LPT2\\", L"\\LPT3\\",
+                                                 L"\\LPT4\\", L"\\LPT5\\", L"\\LPT6\\", L"\\LPT7\\", L"\\LPT8\\", L"\\LPT9\\"};
           wstring_view _buffer_(buffer);
           for(auto name : reserved_names)
           {

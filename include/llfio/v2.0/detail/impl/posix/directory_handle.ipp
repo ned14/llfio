@@ -80,7 +80,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     // really ought to be cloning the handle. But let's humour him.
     path = ".";
   }
-  path_view::c_str<> zpath(path, path_view::zero_terminated);
+  path_view::zero_terminated_rendered_path<> zpath(path);
   auto rename_random_dir_over_existing_dir = [_mode, _caching, flags](const path_handle &base, path_view_type path) -> result<directory_handle> {
     // Take a path handle to the directory containing the file
     auto path_parent = path.parent_path();
@@ -110,7 +110,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
   {
     if(_creation == creation::if_needed || _creation == creation::only_if_not_exist || _creation == creation::always_new)
     {
-      if(-1 == ::mkdirat(base.native_handle().fd, zpath.buffer, 0x1f8 /*770*/))
+      if(-1 == ::mkdirat(base.native_handle().fd, zpath.c_str(), 0x1f8 /*770*/))
       {
         if(EEXIST != errno || _creation == creation::only_if_not_exist)
         {
@@ -129,13 +129,13 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
       }
       attribs &= ~(O_CREAT | O_EXCL);
     }
-    nativeh.fd = ::openat(base.native_handle().fd, zpath.buffer, attribs);
+    nativeh.fd = ::openat(base.native_handle().fd, zpath.c_str(), attribs);
   }
   else
   {
     if(_creation == creation::if_needed || _creation == creation::only_if_not_exist || _creation == creation::always_new)
     {
-      if(-1 == ::mkdir(zpath.buffer, 0x1f8 /*770*/))
+      if(-1 == ::mkdir(zpath.c_str(), 0x1f8 /*770*/))
       {
         if(EEXIST != errno || _creation == creation::only_if_not_exist)
         {
@@ -154,7 +154,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
       }
       attribs &= ~(O_CREAT | O_EXCL);
     }
-    nativeh.fd = ::open(zpath.buffer, attribs);
+    nativeh.fd = ::open(zpath.c_str(), attribs);
   }
   if(-1 == nativeh.fd)
   {
@@ -267,13 +267,13 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
     return std::move(req.buffers);
   }
   // Is glob a single entry match? If so, this is really a stat call
-  path_view_type::c_str<> zglob(req.glob, path_view::zero_terminated);
+  path_view_type::zero_terminated_rendered_path<> zglob(req.glob);
   if(!req.glob.empty() && !req.glob.contains_glob())
   {
     struct stat s
     {
     };
-    if(-1 == ::fstatat(_v.fd, zglob.buffer, &s, AT_SYMLINK_NOFOLLOW))
+    if(-1 == ::fstatat(_v.fd, zglob.c_str(), &s, AT_SYMLINK_NOFOLLOW))
     {
       return posix_error();
     }
@@ -443,7 +443,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
           goto cont;
         }
       }
-      if(!req.glob.empty() && fnmatch(zglob.buffer, dent->d_name, 0) != 0)
+      if(!req.glob.empty() && fnmatch(zglob.c_str(), dent->d_name, 0) != 0)
       {
         goto cont;
       }

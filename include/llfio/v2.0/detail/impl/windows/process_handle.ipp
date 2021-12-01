@@ -268,9 +268,9 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<process_handle> process_handle::launch_pr
     }));
   }
   *envbuffere = 0;
-  path_view::c_str<> zpath(path, path_view::zero_terminated);
+  path_view::zero_terminated_rendered_path<> zpath(path);
   PROCESS_INFORMATION pi;
-  if(!CreateProcessW(zpath.buffer, argsbuffer, nullptr, nullptr, true, CREATE_UNICODE_ENVIRONMENT, envbuffer, nullptr, &si, &pi))
+  if(!CreateProcessW(zpath.data(), argsbuffer, nullptr, nullptr, true, CREATE_UNICODE_ENVIRONMENT, envbuffer, nullptr, &si, &pi))
     return win32_error();
   nativeh.h = pi.hProcess;
   (void) CloseHandle(pi.hThread);

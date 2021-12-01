@@ -34,11 +34,11 @@ result<bool> path_handle::exists(path_view_type path) const noexcept
     windows_nt_kernel::init();
     using namespace windows_nt_kernel;
     LLFIO_LOG_FUNCTION_CALL(this);
-    path_view::c_str<> zpath(path, path_view::not_zero_terminated);
+    path_view::not_zero_terminated_rendered_path<> zpath(path);
     UNICODE_STRING _path{};
-    _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
-    _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
-    if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
+    _path.Buffer = const_cast<wchar_t *>(zpath.data());
+    _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.size() * sizeof(wchar_t))) + sizeof(wchar_t);
+    if(zpath.size() >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
     {
       _path.Buffer += 3;
       _path.Length -= 3 * sizeof(wchar_t);
@@ -99,11 +99,11 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
     ntflags |= 0x01 /*FILE_DIRECTORY_FILE*/;  // required to open a directory
     IO_STATUS_BLOCK isb = make_iostatus();
 
-    path_view::c_str<> zpath(path, path_view::not_zero_terminated);
+    path_view::not_zero_terminated_rendered_path<> zpath(path);
     UNICODE_STRING _path{};
-    _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
-    _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
-    if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
+    _path.Buffer = const_cast<wchar_t *>(zpath.data());
+    _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.size() * sizeof(wchar_t))) + sizeof(wchar_t);
+    if(zpath.size() >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
     {
       _path.Buffer += 3;
       _path.Length -= 3 * sizeof(wchar_t);
@@ -135,8 +135,8 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
   {
     DWORD creation = OPEN_EXISTING;
     attribs |= FILE_FLAG_BACKUP_SEMANTICS;  // required to open a directory
-    path_view::c_str<> zpath(path, path_view::zero_terminated);
-    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.buffer, access, fileshare, nullptr, creation, attribs, nullptr)))  // NOLINT
+    path_view::zero_terminated_rendered_path<> zpath(path);
+    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.data(), access, fileshare, nullptr, creation, attribs, nullptr)))  // NOLINT
     {
       DWORD errcode = GetLastError();
       // assert(false);

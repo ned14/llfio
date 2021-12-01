@@ -108,11 +108,11 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
     ntflags |= 0x4000 /*FILE_OPEN_FOR_BACKUP_INTENT*/ | 0x00200000 /*FILE_OPEN_REPARSE_POINT*/;
     IO_STATUS_BLOCK isb = make_iostatus();
 
-    path_view::c_str<> zpath(path, path_view::not_zero_terminated);
+    path_view::not_zero_terminated_rendered_path<> zpath(path);
     UNICODE_STRING _path{};
-    _path.Buffer = const_cast<wchar_t *>(zpath.buffer);
-    _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.length * sizeof(wchar_t))) + sizeof(wchar_t);
-    if(zpath.length >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
+    _path.Buffer = const_cast<wchar_t *>(zpath.data());
+    _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.size() * sizeof(wchar_t))) + sizeof(wchar_t);
+    if(zpath.size() >= 4 && _path.Buffer[0] == '\\' && _path.Buffer[1] == '!' && _path.Buffer[2] == '!' && _path.Buffer[3] == '\\')
     {
       _path.Buffer += 3;
       _path.Length -= 3 * sizeof(wchar_t);
@@ -162,8 +162,8 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
     }
     // required to open a symlink
     attribs |= FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT;
-    path_view::c_str<> zpath(path, path_view::zero_terminated);
-    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.buffer, access, fileshare, nullptr, creation, attribs, nullptr)))  // NOLINT
+    path_view::zero_terminated_rendered_path<> zpath(path);
+    if(INVALID_HANDLE_VALUE == (nativeh.h = CreateFileW_(zpath.data(), access, fileshare, nullptr, creation, attribs, nullptr)))  // NOLINT
     {
       DWORD errcode = GetLastError();
       // assert(false);
@@ -254,7 +254,7 @@ result<symlink_handle::const_buffers_type> symlink_handle::write(symlink_handle:
   auto *buffer = req.kernelbuffer.empty() ? alloca(buffersize) : req.kernelbuffer.data();
   memset(buffer, 0, sizeof(REPARSE_DATA_BUFFER));
   auto *rpd = (REPARSE_DATA_BUFFER *) buffer;
-  path_view::c_str<> zpath(req.buffers.path(), path_view::zero_terminated);
+  path_view::zero_terminated_rendered_path<> zpath(req.buffers.path());
   switch(req.buffers.type())
   {
   case symlink_type::none:
@@ -263,24 +263,24 @@ result<symlink_handle::const_buffers_type> symlink_handle::write(symlink_handle:
   {
     const size_t reparsebufferheaderlen = offsetof(REPARSE_DATA_BUFFER, SymbolicLinkReparseBuffer.PathBuffer) - headerlen;
     rpd->ReparseTag = IO_REPARSE_TAG_SYMLINK;
-    if(zpath.length >= 4 && zpath.buffer[0] == '\\' && zpath.buffer[1] == '!' && zpath.buffer[2] == '!' && zpath.buffer[3] == '\\')
+    if(zpath.size() >= 4 && zpath.data()[0] == '\\' && zpath.data()[1] == '!' && zpath.data()[2] == '!' && zpath.data()[3] == '\\')
     {
-      memcpy(rpd->SymbolicLinkReparseBuffer.PathBuffer, zpath.buffer + 3, destpathbytes - 6 + sizeof(wchar_t));
+      memcpy(rpd->SymbolicLinkReparseBuffer.PathBuffer, zpath.data() + 3, destpathbytes - 6 + sizeof(wchar_t));
       rpd->SymbolicLinkReparseBuffer.SubstituteNameOffset = 0;
       rpd->SymbolicLinkReparseBuffer.SubstituteNameLength = (USHORT) destpathbytes - 6;
       rpd->SymbolicLinkReparseBuffer.PrintNameOffset = (USHORT)(destpathbytes - 6 + sizeof(wchar_t));
       rpd->SymbolicLinkReparseBuffer.PrintNameLength = (USHORT) destpathbytes - 6;
-      memcpy(rpd->SymbolicLinkReparseBuffer.PathBuffer + rpd->SymbolicLinkReparseBuffer.PrintNameOffset / sizeof(wchar_t), zpath.buffer + 3,
+      memcpy(rpd->SymbolicLinkReparseBuffer.PathBuffer + rpd->SymbolicLinkReparseBuffer.PrintNameOffset / sizeof(wchar_t), zpath.data() + 3,
              rpd->SymbolicLinkReparseBuffer.PrintNameLength - 6 + sizeof(wchar_t));
     }
     else
     {
-      memcpy(rpd->SymbolicLinkReparseBuffer.PathBuffer, zpath.buffer, destpathbytes + sizeof(wchar_t));
+      memcpy(rpd->SymbolicLinkReparseBuffer.PathBuffer, zpath.data(), destpathbytes + sizeof(wchar_t));
       rpd->SymbolicLinkReparseBuffer.SubstituteNameOffset = 0;
       rpd->SymbolicLinkReparseBuffer.SubstituteNameLength = (USHORT) destpathbytes;
       rpd->SymbolicLinkReparseBuffer.PrintNameOffset = (USHORT)(destpathbytes + sizeof(wchar_t));
       rpd->SymbolicLinkReparseBuffer.PrintNameLength = (USHORT) destpathbytes;
-      memcpy(rpd->SymbolicLinkReparseBuffer.PathBuffer + rpd->SymbolicLinkReparseBuffer.PrintNameOffset / sizeof(wchar_t), zpath.buffer,
+      memcpy(rpd->SymbolicLinkReparseBuffer.PathBuffer + rpd->SymbolicLinkReparseBuffer.PrintNameOffset / sizeof(wchar_t), zpath.data(),
              rpd->SymbolicLinkReparseBuffer.PrintNameLength + sizeof(wchar_t));
     }
     rpd->SymbolicLinkReparseBuffer.Flags = req.buffers.path().is_relative() ? 0x1 /*SYMLINK_FLAG_RELATIVE*/ : 0;
@@ -295,24 +295,24 @@ result<symlink_handle::const_buffers_type> symlink_handle::write(symlink_handle:
   {
     const size_t reparsebufferheaderlen = offsetof(REPARSE_DATA_BUFFER, MountPointReparseBuffer.PathBuffer) - headerlen;
     rpd->ReparseTag = IO_REPARSE_TAG_MOUNT_POINT;
-    if(zpath.length >= 4 && zpath.buffer[0] == '\\' && zpath.buffer[1] == '!' && zpath.buffer[2] == '!' && zpath.buffer[3] == '\\')
+    if(zpath.size() >= 4 && zpath.data()[0] == '\\' && zpath.data()[1] == '!' && zpath.data()[2] == '!' && zpath.data()[3] == '\\')
     {
-      memcpy(rpd->MountPointReparseBuffer.PathBuffer, zpath.buffer + 3, destpathbytes - 6 + sizeof(wchar_t));
+      memcpy(rpd->MountPointReparseBuffer.PathBuffer, zpath.data() + 3, destpathbytes - 6 + sizeof(wchar_t));
       rpd->MountPointReparseBuffer.SubstituteNameOffset = 0;
       rpd->MountPointReparseBuffer.SubstituteNameLength = (USHORT) destpathbytes - 6;
       rpd->MountPointReparseBuffer.PrintNameOffset = (USHORT)(destpathbytes - 6 + sizeof(wchar_t));
       rpd->MountPointReparseBuffer.PrintNameLength = (USHORT) destpathbytes - 6;
-      memcpy(rpd->MountPointReparseBuffer.PathBuffer + rpd->MountPointReparseBuffer.PrintNameOffset / sizeof(wchar_t), zpath.buffer + 3,
+      memcpy(rpd->MountPointReparseBuffer.PathBuffer + rpd->MountPointReparseBuffer.PrintNameOffset / sizeof(wchar_t), zpath.data() + 3,
              rpd->MountPointReparseBuffer.PrintNameLength - 6 + sizeof(wchar_t));
     }
     else
     {
-      memcpy(rpd->MountPointReparseBuffer.PathBuffer, zpath.buffer, destpathbytes + sizeof(wchar_t));
+      memcpy(rpd->MountPointReparseBuffer.PathBuffer, zpath.data(), destpathbytes + sizeof(wchar_t));
       rpd->MountPointReparseBuffer.SubstituteNameOffset = 0;
       rpd->MountPointReparseBuffer.SubstituteNameLength = (USHORT) destpathbytes;
       rpd->MountPointReparseBuffer.PrintNameOffset = (USHORT)(destpathbytes + sizeof(wchar_t));
       rpd->MountPointReparseBuffer.PrintNameLength = (USHORT) destpathbytes;
-      memcpy(rpd->MountPointReparseBuffer.PathBuffer + rpd->MountPointReparseBuffer.PrintNameOffset / sizeof(wchar_t), zpath.buffer,
+      memcpy(rpd->MountPointReparseBuffer.PathBuffer + rpd->MountPointReparseBuffer.PrintNameOffset / sizeof(wchar_t), zpath.data(),
              rpd->MountPointReparseBuffer.PrintNameLength + sizeof(wchar_t));
     }
     rpd->ReparseDataLength =
