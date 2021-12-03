@@ -827,11 +827,11 @@ private:
     //! Type of the iterator type
     using iterator = typename _view_type::iterator;
     //! Type of the const iterator type
-    using const_iterator = typename _view_type::const_iterator;
+    using const_iterator = typename _view_type::iterator;
     //! Type of the reverse iterator type
     using reverse_iterator = typename _view_type::reverse_iterator;
     //! Type of the const reverse iterator type
-    using const_reverse_iterator = typename _view_type::const_reverse_iterator;
+    using const_reverse_iterator = typename _view_type::reverse_iterator;
     //! Type of the size type
     using size_type = typename _view_type::size_type;
     //! Type of the difference type
