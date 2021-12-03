@@ -27,6 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../file_handle.hpp"
 #include "../../statfs.hpp"
 
+#include "quickcpplib/aligned_allocator.hpp"
 #include "quickcpplib/spinlock.hpp"
 
 #include <atomic>
@@ -539,6 +540,7 @@ namespace detail
     }
 #endif
   };
+  using global_dynamic_thread_pool_impl_workqueue_item_allocator = QUICKCPPLIB_NAMESPACE::aligned_allocator::aligned_allocator<global_dynamic_thread_pool_impl_workqueue_item>;
   struct global_dynamic_thread_pool_impl
   {
     using _spinlock_type = QUICKCPPLIB_NAMESPACE::configurable_spinlock::spinlock<unsigned>;
@@ -1309,7 +1311,10 @@ public:
       // Append this group to the global work queue at its nesting level
       if(!impl.workqueue || impl.workqueue->nesting_level <= _nesting_level)
       {
-        impl.workqueue = std::make_shared<detail::global_dynamic_thread_pool_impl_workqueue_item>(_nesting_level, std::move(impl.workqueue));
+        // It is stupid we need to use a custom allocator here, but older libstdc++ don't
+        // implement overaligned allocation for std::make_shared().
+        impl.workqueue = std::allocate_shared<detail::global_dynamic_thread_pool_impl_workqueue_item>(
+        detail::global_dynamic_thread_pool_impl_workqueue_item_allocator(), _nesting_level, std::move(impl.workqueue));
       }
       impl.workqueue->items.insert(this);
       return success();
