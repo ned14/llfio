@@ -693,7 +693,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   }
   if(bytes == 0u)
   {
-    bytes = length;
+    bytes = (size_type) length;
   }
   else if(length > bytes)
   {
@@ -718,7 +718,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   ret.value()._addr = static_cast<byte *>(addr);
   ret.value()._offset = offset;
   ret.value()._reservation = _bytes - (offset & 65535);
-  ret.value()._length = length;
+  ret.value()._length = (size_type) length;
   ret.value()._pagesize = pagesize;
   // Make my handle borrow the native handle of my backing storage
   ret.value()._v.h = section.backing_native_handle().h;
@@ -800,7 +800,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool /* un
     // If newsize isn't exactly a previous extension, this will fail, same as for the VirtualAlloc case
     OUTCOME_TRY(win32_release_file_allocations(_addr + newsize, _reservation - newsize));
     _reservation = newsize;
-    _length = length;
+    _length = (size_type) length;
     return _reservation;
   }
   // Try to map an additional part of the section directly after this map
@@ -818,7 +818,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool /* un
     return ntkernel_error(ntstat);
   }
   _reservation += _bytes;
-  _length = length;
+  _length = (size_type) length;
   return _reservation;
 }
 

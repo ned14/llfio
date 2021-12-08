@@ -718,7 +718,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
             buffer = utils::page_allocator<byte>().allocate(blocksize);
           }
           deadline nd;
-          buffer_type b(buffer, utils::round_up_to_page_size(thisblock, 4096) /* to allow aligned i/o files */);
+          buffer_type b(buffer, utils::round_up_to_page_size((size_t) thisblock, 4096) /* to allow aligned i/o files */);
           LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
           OUTCOME_TRY(auto &&readed, read({{&b, 1}, item.src.offset + thisoffset}, nd));
           buffer_dirty = true;
@@ -726,9 +726,9 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
           {
             return errc::resource_unavailable_try_again;  // something is wrong
           }
-          readed.front() = {readed.front().data(), thisblock};
+          readed.front() = {readed.front().data(), (size_t) thisblock};
           LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
-          const_buffer_type cb(readed.front().data(), thisblock);
+          const_buffer_type cb(readed.front().data(), (size_t) thisblock);
           if(item.destination_extents_are_new)
           {
             // If we don't need to reset the bytes in the destination, try to elide
