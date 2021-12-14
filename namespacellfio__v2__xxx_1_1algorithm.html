@@ -539,6 +539,9 @@ template&lt;class T , class... Args&gt; </div>
 <p>Summarise the directory identified <code>dirh</code>, and everything therein. </p>
 <p>Summarise the directory identified <code>topdirh</code>, and everything therein.</p>
 <p>It can be useful to summarise a directory hierarchy, especially to determine how much storage it occupies, but also how many mounted filesystems it straddles etc. You should specify what metadata you wish to summarise, if this is a subset of what metadata <code>directory_handle::read()</code> returns, performance will be considerably better. The default summarises all possible metadata.</p>
+<p>This is a trivial implementation on top of <code>algorithm::traverse()</code>, indeed it is implemented entirely as header code. You should review the documentation for <code>algorithm::traverse()</code>, as this algorithm is entirely implemented using that algorithm.</p>
+<p>It can be useful to summarise a directory hierarchy, especially to determine how much storage it occupies, but also how many mounted filesystems it straddles etc. You should specify what metadata you wish to summarise, if this is a subset of what metadata <code>directory_handle::read()</code> returns, performance will be considerably better. The default summarises all possible metadata.</p>
+<p>Most errors during summary are accumulated into <code>stats_failed</code> and <code>directory_opens_failed</code>, rather than failing the summary.</p>
 <p>This is a trivial implementation on top of <code>algorithm::traverse()</code>, indeed it is implemented entirely as header code. You should review the documentation for <code>algorithm::traverse()</code>, as this algorithm is entirely implemented using that algorithm. </p>
 <div class="fragment"><div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  {</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    LLFIO_LOG_FUNCTION_CALL(&amp;dirh);</div>
