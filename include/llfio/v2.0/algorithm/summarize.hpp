@@ -48,6 +48,7 @@ namespace algorithm
     }
     template <class T> using map_type = std::unordered_map<T, size_t>;
     spinlock _lock;
+    size_t stats_failed{0};            //!< The number of handle stat's which failed.
     size_t directory_opens_failed{0};  //!< The number of directories which could not be opened.
 
     stat_t::want want{stat_t::want::none};    //!< The summary items desired
@@ -151,21 +152,43 @@ namespace algorithm
   */
   struct summarize_visitor : public traverse_visitor
   {
-    static result<void> accumulate(traversal_summary &acc, traversal_summary *state, const directory_handle *dirh, directory_entry &entry,
-                                   stat_t::want already_have_metadata)
+    static void accumulate(traversal_summary &acc, traversal_summary *state, const directory_handle *dirh, directory_entry &entry,
+                           stat_t::want already_have_metadata)
     {
       if((state->want & already_have_metadata) != state->want)
       {
         // Fetch any missing metadata
         if(entry.stat.st_type == filesystem::file_type::directory)
         {
-          OUTCOME_TRY(auto &&fh, directory_handle::directory(*dirh, entry.leafname, file_handle::mode::attr_read));
-          OUTCOME_TRY(entry.stat.fill(fh, state->want & ~already_have_metadata));
+          if(auto fh = directory_handle::directory(*dirh, entry.leafname, file_handle::mode::attr_read))
+          {
+            if(!entry.stat.fill(fh.assume_value(), state->want & ~already_have_metadata))
+            {
+              acc.stats_failed++;
+              return;
+            }
+          }
+          else
+          {
+            acc.stats_failed++;
+            return;
+          }
         }
         else
         {
-          OUTCOME_TRY(auto &&fh, file_handle::file(*dirh, entry.leafname, file_handle::mode::attr_read));
-          OUTCOME_TRY(entry.stat.fill(fh, state->want & ~already_have_metadata));
+          if(auto fh = file_handle::file(*dirh, entry.leafname, file_handle::mode::attr_read))
+          {
+            if(!entry.stat.fill(fh.assume_value(), state->want & ~already_have_metadata))
+            {
+              acc.stats_failed++;
+              return;
+            }
+          }
+          else
+          {
+            acc.stats_failed++;
+            return;
+          }
         }
       }
       if(state->want & stat_t::want::dev)
@@ -195,7 +218,6 @@ namespace algorithm
           acc.file_blocks += entry.stat.st_blocks;
         }
       }
-      return success();
     }
 
     //! This override ignores failures to traverse into the directory.
@@ -221,7 +243,7 @@ namespace algorithm
         acc.max_depth = depth;
         for(auto &entry : contents)
         {
-          OUTCOME_TRY(accumulate(acc, state, &dirh, entry, contents.metadata()));
+          accumulate(acc, state, &dirh, entry, contents.metadata());
         }
         state->operator+=(acc);
         return success();
@@ -240,6 +262,9 @@ namespace algorithm
   You should specify what metadata you wish to summarise, if this is a subset of
   what metadata `directory_handle::read()` returns, performance will be considerably
   better. The default summarises all possible metadata.
+
+  Most errors during summary are accumulated into `stats_failed` and `directory_opens_failed`,
+  rather than failing the summary.
 
   This is a trivial implementation on top of `algorithm::traverse()`, indeed it is
   implemented entirely as header code. You should review the documentation for
@@ -263,8 +288,9 @@ namespace algorithm
       OUTCOME_TRY(_dirh, directory_handle::directory(topdirh, {}));
     }
     const path_handle &dirh = _dirh.is_valid() ? _dirh : topdirh;
+    // We should fail here if we can't stat topdirh
     OUTCOME_TRY(entry.stat.fill(dirh, want));
-    OUTCOME_TRY(summarize_visitor::accumulate(state.assume_value(), &state.assume_value(), nullptr, entry, want));
+    summarize_visitor::accumulate(state.assume_value(), &state.assume_value(), nullptr, entry, want);
     OUTCOME_TRY(traverse(dirh, visitor, threads, &state.assume_value(), force_slow_path));
     return state;
   }
