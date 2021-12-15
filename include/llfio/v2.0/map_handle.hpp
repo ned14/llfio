@@ -954,7 +954,8 @@ namespace detail
   {
     try
     {
-      auto make_shared = [](map_handle h) {
+      auto make_shared = [](map_handle h) -> io_handle::registered_buffer_type
+      {
         struct registered_buffer_type_indirect : io_multiplexer::_registered_buffer_type
         {
           map_handle h;
@@ -965,7 +966,7 @@ namespace detail
           }
         };
         auto ptr = std::make_shared<registered_buffer_type_indirect>(std::move(h));
-        return ptr;
+        return io_handle::registered_buffer_type(ptr);
       };
       const auto &page_sizes = utils::page_sizes(true);
       size_t idx = 0;
