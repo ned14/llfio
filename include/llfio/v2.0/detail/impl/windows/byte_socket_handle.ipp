@@ -130,7 +130,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<byte_socket_handle> byte_socket_handle::b
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
   OUTCOME_TRY(detail::create_socket(nativeh, addr.family(), _mode, _caching, flags));
-  if(SOCKET_ERROR == ::connect(nativeh.sock, addr.as_sockaddr(), addr.sockaddrlen()))
+  if(SOCKET_ERROR == ::connect(nativeh.sock, addr.to_sockaddr(), addr.sockaddrlen()))
   {
     auto retcode = WSAGetLastError();
     if(retcode != WSA_IO_PENDING)
@@ -184,7 +184,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> listening_socket_handle::bind(const
       return generic_error((errc) WSAGetLastError());
     }
   }
-  if(SOCKET_ERROR == ::bind(_v.sock, addr.as_sockaddr(), addr.sockaddrlen()))
+  if(SOCKET_ERROR == ::bind(_v.sock, addr.to_sockaddr(), addr.sockaddrlen()))
   {
     return generic_error((errc) WSAGetLastError());
   }

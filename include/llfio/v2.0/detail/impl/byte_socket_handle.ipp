@@ -80,34 +80,35 @@ namespace ip
     switch(v._family)
     {
     case AF_INET:
-      return s << (uint8_t) v.ipv4._addr[0] << "." << (uint8_t) v.ipv4._addr[1] << "." << (uint8_t) v.ipv4._addr[2] << "." << (uint8_t) v.ipv4._addr[3];
+      return s << (uint16_t) v.ipv4._addr[0] << "." << (uint16_t) v.ipv4._addr[1] << "." << (uint16_t) v.ipv4._addr[2] << "." << (uint16_t) v.ipv4._addr[3]
+               << ":"
+               << v._port;
     case AF_INET6:
     {
       std::stringstream ss;
-      ss << std::hex;
+      ss << std::hex << "[";
       for(size_t n = 0; n < 8; n++)
       {
-        ss << (uint8_t) v.ipv6._addr[n * 2 + 0] << (uint8_t) v.ipv6._addr[n * 2 + 1] << ":";
+        #ifdef __BIG_ENDIAN__
+        ss << ((uint16_t) v.ipv6._addr[n * 2 + 0] | ((uint16_t) v.ipv6._addr[n * 2 + 1] << 8)) << ":";
+#else
+        ss << ((uint16_t) v.ipv6._addr[n * 2 + 1] | ((uint16_t) v.ipv6._addr[n * 2 + 0] << 8)) << ":";
+#endif
       }
+      ss << std::dec << "]:" << v._port;
       std::string str(std::move(ss.str()));
-      for(;;)
+      string_view zeros("0:0:0:0:0:0:0:0");
+      for(size_t len = zeros.size(); len > 2; len -= 2)
       {
-        auto idx = str.rfind(":0000");
+        auto idx = str.find(zeros.substr(0, len));
         if(idx != str.npos)
         {
+          str.replace(idx, len, ":");
           break;
         }
-        str.erase(idx + 1, 4);
       }
-      for(;;)
-      {
-        auto idx = str.rfind(":::");
-        if(idx != str.npos)
-        {
-          break;
-        }
-        str.erase(idx, 1);
-      }
+      auto idx = str.rfind(":]:");
+      str.erase(idx, 1);
       return s << str;
     }
     default:
@@ -133,19 +134,18 @@ namespace ip
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC address_v4::bytes_type address_v4::to_bytes() const noexcept { return ipv4._addr; }
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC address_v4::uint_type address_v4::to_uint() const noexcept { return ntohl(ipv4._addr_be); }
 
-  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC address_v4 address_v4::any() noexcept { return {}; }
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC address_v4 address_v4::any() noexcept { return address_v4(0, 0); }
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC address_v4 address_v4::loopback() noexcept { return address_v4(INADDR_LOOPBACK, 0); }
 
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<address_v4> make_address_v4(string_view str) noexcept
   {
     address_v4 ret;
-    auto parse = [&](size_t &idx) -> result<byte>
-    {
+    auto parse = [&](auto &out, size_t &idx, char sep) -> result<void> {
       if(idx >= str.size())
       {
         return errc::invalid_argument;
       }
-      auto idx2 = str.find('.', idx);
+      auto idx2 = (sep != 0) ? str.find(sep, idx) : str.npos;
       if(idx2 == str.npos)
       {
         idx2 = str.size();
@@ -157,13 +157,15 @@ namespace ip
         return errc::invalid_argument;
       }
       idx = idx2 + 1;
-      return (byte) res;
+      out = reinterpret_cast<decltype(out)>(res);
+      return success();
     };
     size_t idx = 0;
-    OUTCOME_TRY(ret.ipv4._addr[0], parse(idx));
-    OUTCOME_TRY(ret.ipv4._addr[1], parse(idx));
-    OUTCOME_TRY(ret.ipv4._addr[2], parse(idx));
-    OUTCOME_TRY(ret.ipv4._addr[3], parse(idx));
+    OUTCOME_TRY(parse(ret.ipv4._addr[0], idx, '.'));
+    OUTCOME_TRY(parse(ret.ipv4._addr[1], idx, '.'));
+    OUTCOME_TRY(parse(ret.ipv4._addr[2], idx, '.'));
+    OUTCOME_TRY(parse(ret.ipv4._addr[3], idx, ':'));
+    OUTCOME_TRY(parse(ret._port, idx, 0));
     return ret;
   }
 
@@ -178,15 +180,22 @@ namespace ip
   }
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC address_v6::bytes_type address_v6::to_bytes() const noexcept { return ipv6._addr; }
 
-  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC address_v6 address_v6::any() noexcept { return {}; }
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC address_v6 address_v6::any() noexcept { return address_v6(bytes_type{(const byte *) &in6addr_any, 16}); }
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC address_v6 address_v6::loopback() noexcept { return address_v6(bytes_type{(const byte *) &in6addr_loopback, 16}); }
 
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<address_v6> make_address_v6(string_view str) noexcept
   {
     address_v6 ret;
-    const auto compactidx = str.find("::");
-    auto parse = [&](size_t &idx) -> result<uint16_t>
+    if(str.empty() || str.front() != '[')
     {
+      return errc::invalid_argument;
+    }
+    const auto compactidx = str.find("::"), portidx = str.rfind("]:");
+    if(portidx == str.npos)
+    {
+      return errc::invalid_argument;
+    }
+    auto parse = [&](size_t &idx) -> result<uint16_t> {
       if(idx >= str.size())
       {
         return errc::invalid_argument;
@@ -209,13 +218,12 @@ namespace ip
     do
     {
       OUTCOME_TRY(auto res, parse(idx));
-      ret.ipv6._addr[n++] = (byte) (res & 0xff);
-      ret.ipv6._addr[n++] = (byte) (res >> 8);
-    } while(idx < compactidx);
+      ret.ipv6._addr[n++] = (byte)(res & 0xff);
+      ret.ipv6._addr[n++] = (byte)(res >> 8);
+    } while(idx < compactidx && idx<portidx);
     if(compactidx != str.npos)
     {
-      auto parse2 = [&](size_t &idx) -> result<uint16_t>
-      {
+      auto parse2 = [&](size_t &idx) -> result<uint16_t> {
         auto idx2 = str.rfind(':', idx);
         if(idx2 == str.npos)
         {
@@ -230,15 +238,22 @@ namespace ip
         idx = idx2;
         return (uint16_t) res;
       };
-      idx = str.size();
+      idx = portidx;
       n = 15;
       do
       {
         OUTCOME_TRY(auto res, parse2(idx));
-        ret.ipv6._addr[n--] = (byte) (res >> 8);
-        ret.ipv6._addr[n--] = (byte) (res & 0xff);
+        ret.ipv6._addr[n--] = (byte)(res >> 8);
+        ret.ipv6._addr[n--] = (byte)(res & 0xff);
       } while(idx > compactidx + 1);
     }
+    const char *end = str.data() + str.size();
+    auto res =strtoul(str.data() + portidx + 2, (char **) &end, 10);
+    if(res == ULONG_MAX || end != str.data() + str.size())
+    {
+      return errc::invalid_argument;
+    }
+    ret._port = (uint16_t) res; 
     return ret;
   }
 }  // namespace ip

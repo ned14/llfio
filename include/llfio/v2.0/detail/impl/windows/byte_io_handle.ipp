@@ -34,13 +34,14 @@ size_t byte_io_handle::_do_max_buffers() const noexcept
 {
   if(is_socket())
   {
-      // The actual limit appears to be unspecified on Windows
+    // The actual limit appears to be unspecified on Windows
     return 64;
   }
   return 1;  // TODO FIXME support ReadFileScatter/WriteFileGather
 }
 
-template <class BuffersType> inline bool do_cancel(const native_handle_type &nativeh, span<windows_nt_kernel::IO_STATUS_BLOCK> ols, byte_io_handle::io_request<BuffersType> reqs) noexcept
+template <class BuffersType>
+inline bool do_cancel(const native_handle_type &nativeh, span<windows_nt_kernel::IO_STATUS_BLOCK> ols, byte_io_handle::io_request<BuffersType> reqs) noexcept
 {
   using namespace windows_nt_kernel;
   using EIOSB = windows_nt_kernel::IO_STATUS_BLOCK;
@@ -69,7 +70,9 @@ template <class BuffersType> inline bool do_cancel(const native_handle_type &nat
 
 // Returns true if operation completed immediately
 template <bool blocking, class Syscall, class BuffersType>
-inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &&syscall, const native_handle_type &nativeh, byte_io_multiplexer::io_operation_state *state, span<windows_nt_kernel::IO_STATUS_BLOCK> ols, byte_io_handle::io_request<BuffersType> reqs, deadline d) noexcept
+inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &&syscall, const native_handle_type &nativeh,
+                          byte_io_multiplexer::io_operation_state *state, span<windows_nt_kernel::IO_STATUS_BLOCK> ols,
+                          byte_io_handle::io_request<BuffersType> reqs, deadline d) noexcept
 {
   using namespace windows_nt_kernel;
   using EIOSB = windows_nt_kernel::IO_STATUS_BLOCK;
@@ -180,8 +183,87 @@ inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &
   }
   return true;
 }
+#ifndef LLFIO_EXCLUDE_NETWORKING
+// Returns true if operation completed immediately
+template <bool blocking, class Syscall, class Flags, class BuffersType>
+inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &&syscall, const native_handle_type &nativeh,
+                          span<WSABUF> bufs, Flags flags, byte_io_handle::io_request<BuffersType> reqs,
+                          deadline d) noexcept
+{
+  LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+  for(size_t n = 0; n < reqs.buffers.size(); n++)
+  {
+    bufs[n].buf = (char *) reqs.buffers[n].data();
+    bufs[n].len = (ULONG) reqs.buffers[n].size();
+  }
+  DWORD transferred = 0;
+  WSAOVERLAPPED ol;
+  memset(&ol, 0, sizeof(ol));
+  ol.Internal = (ULONG_PTR) -1;
+  if(SOCKET_ERROR == syscall(nativeh.sock, bufs.data(), (DWORD) reqs.buffers.size(), &transferred, flags, d ? &ol : nullptr, nullptr))
+  {
+    auto retcode = WSAGetLastError();
+    if(WSA_IO_PENDING != retcode)
+    {
+      ret= generic_error((errc) retcode);
+      return true;
+    }
+    if(nativeh.is_nonblocking() && blocking)
+    {
+      deadline nd;
+      LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+      if(STATUS_TIMEOUT == ntwait(nativeh.h, ol, nd))
+      {
+        // ntwait cancels the i/o, undoer will cancel all the other i/o
+        auto r = [&]() -> result<void> {
+          LLFIO_WIN_DEADLINE_TO_TIMEOUT_LOOP(d);
+          return success();
+        }();
+        if(!r)
+        {
+          ret= std::move(r).error();
+          return true;
+        }
+      }
+      DWORD flags_ = 0;
+      if(!WSAGetOverlappedResult(nativeh.sock, &ol, &transferred, false, &flags_))
+      {
+        ret= generic_error((errc) WSAGetLastError());
+        return true;
+      }
+    }
+  }
+  if(!blocking)
+  {
+    // If all the operations already completed, great
+    if(ol.Internal == static_cast<ULONG_PTR>(0x103 /*STATUS_PENDING*/))
+    {
+      return false;  // at least one buffer is not completed yet
+    }
+  }
+  ret = {reqs.buffers.data(), 0};
+  for(size_t n = 0; n < reqs.buffers.size() && transferred > 0; n++)
+  {
+    if(reqs.buffers[n].size() >= transferred)
+    {
+      transferred -= (DWORD) reqs.buffers[n].size();
+    }
+    else
+    {
+      reqs.buffers[n] = {reqs.buffers[n].data(), transferred};
+      transferred = 0;
+    }
+    if(reqs.buffers[n].size() != 0)
+    {
+      ret = {reqs.buffers.data(), n + 1};
+    }
+  }
+  return true;
+}
+#endif
 
-byte_io_handle::io_result<byte_io_handle::buffers_type> byte_io_handle::_do_read(byte_io_handle::io_request<byte_io_handle::buffers_type> reqs, deadline d) noexcept
+byte_io_handle::io_result<byte_io_handle::buffers_type> byte_io_handle::_do_read(byte_io_handle::io_request<byte_io_handle::buffers_type> reqs,
+                                                                                 deadline d) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -197,62 +279,14 @@ byte_io_handle::io_result<byte_io_handle::buffers_type> byte_io_handle::_do_read
   }
   if(is_socket())
   {
-    LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+#ifdef LLFIO_EXCLUDE_NETWORKING
+    return errc::not_supported;
+#else
     std::array<WSABUF, 64> bufs;
-    for(size_t n = 0; n < reqs.buffers.size(); n++)
-    {
-      bufs[n].buf = (char *) reqs.buffers[n].data();
-      bufs[n].len = (ULONG) reqs.buffers[n].size();
-    }
-    DWORD received = 0, flags = 0;
-    WSAOVERLAPPED ol;
-    memset(&ol, 0, sizeof(ol));
-    ol.Internal = (ULONG_PTR) - 1;
-    if(SOCKET_ERROR == WSARecv(_v.sock, bufs.data(), (DWORD) reqs.buffers.size(), &received, &flags, d ? &ol : nullptr, nullptr))
-    {
-      auto retcode = WSAGetLastError();
-      if(WSA_IO_PENDING != retcode)
-      {
-        return generic_error((errc) retcode);
-      }
-      deadline nd;
-      LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
-      if(STATUS_TIMEOUT == ntwait(_v.h, ol, nd))
-      {
-        // ntwait cancels the i/o, undoer will cancel all the other i/o
-        auto r = [&]() -> result<void>
-        {
-          LLFIO_WIN_DEADLINE_TO_TIMEOUT_LOOP(d);
-          return success();
-        }();
-        if(!r)
-        {
-          return std::move(r).error();
-        }
-      }
-      if(!WSAGetOverlappedResult(_v.sock, &ol, &received, false, &flags))
-      {
-        return generic_error((errc) WSAGetLastError());
-      }
-    }
-    ret = {reqs.buffers.data(), 0};
-    for(size_t n = 0; n < reqs.buffers.size() && received>0; n++)
-    {
-      if(reqs.buffers[n].size() >= received)
-      {
-        received -= (DWORD) reqs.buffers[n].size();
-      }
-      else
-      {
-        reqs.buffers[n] = {reqs.buffers[n].data(), received};
-        received = 0;
-      }
-      if(reqs.buffers[n].size() != 0)
-      {
-        ret = {reqs.buffers.data(), n + 1};
-      }
-    }
+    DWORD flags = 0;
+    do_read_write<true>(ret, WSARecv, _v, bufs, &flags, reqs, d);
     return ret;
+#endif
   }
   using EIOSB = windows_nt_kernel::IO_STATUS_BLOCK;
   std::array<EIOSB, 64> _ols{};
@@ -260,7 +294,8 @@ byte_io_handle::io_result<byte_io_handle::buffers_type> byte_io_handle::_do_read
   return ret;
 }
 
-byte_io_handle::io_result<byte_io_handle::const_buffers_type> byte_io_handle::_do_write(byte_io_handle::io_request<byte_io_handle::const_buffers_type> reqs, deadline d) noexcept
+byte_io_handle::io_result<byte_io_handle::const_buffers_type> byte_io_handle::_do_write(byte_io_handle::io_request<byte_io_handle::const_buffers_type> reqs,
+                                                                                        deadline d) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -276,62 +311,14 @@ byte_io_handle::io_result<byte_io_handle::const_buffers_type> byte_io_handle::_d
   }
   if(is_socket())
   {
-    LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+#ifdef LLFIO_EXCLUDE_NETWORKING
+    return errc::not_supported;
+#else
     std::array<WSABUF, 64> bufs;
-    for(size_t n = 0; n < reqs.buffers.size(); n++)
-    {
-      bufs[n].buf = (char *) reqs.buffers[n].data();
-      bufs[n].len = (ULONG) reqs.buffers[n].size();
-    }
-    DWORD sent = 0, flags = 0;
-    WSAOVERLAPPED ol;
-    memset(&ol, 0, sizeof(ol));
-    ol.Internal = (ULONG_PTR) - 1;
-    if(SOCKET_ERROR == WSASend(_v.sock, bufs.data(), (DWORD) reqs.buffers.size(), &sent, flags, d ? &ol : nullptr, nullptr))
-    {
-      auto retcode = WSAGetLastError();
-      if(WSA_IO_PENDING != retcode)
-      {
-        return generic_error((errc) retcode);
-      }
-      deadline nd;
-      LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
-      if(STATUS_TIMEOUT == ntwait(_v.h, ol, nd))
-      {
-        // ntwait cancels the i/o, undoer will cancel all the other i/o
-        auto r = [&]() -> result<void>
-        {
-          LLFIO_WIN_DEADLINE_TO_TIMEOUT_LOOP(d);
-          return success();
-        }();
-        if(!r)
-        {
-          return std::move(r).error();
-        }
-      }
-      if(!WSAGetOverlappedResult(_v.sock, &ol, &sent, false, &flags))
-      {
-        return generic_error((errc) WSAGetLastError());
-      }
-    }
-    ret = {reqs.buffers.data(), 0};
-    for(size_t n = 0; n < reqs.buffers.size() && sent > 0; n++)
-    {
-      if(reqs.buffers[n].size() >= sent)
-      {
-        sent -= (DWORD) reqs.buffers[n].size();
-      }
-      else
-      {
-        reqs.buffers[n] = {reqs.buffers[n].data(), sent};
-        sent = 0;
-      }
-      if(reqs.buffers[n].size() != 0)
-      {
-        ret = {reqs.buffers.data(), n + 1};
-      }
-    }
+    DWORD flags = 0;
+    do_read_write<true>(ret, WSASend, _v, bufs, flags, reqs, d);
     return ret;
+#endif
   }
   using EIOSB = windows_nt_kernel::IO_STATUS_BLOCK;
   std::array<EIOSB, 64> _ols{};
@@ -339,7 +326,8 @@ byte_io_handle::io_result<byte_io_handle::const_buffers_type> byte_io_handle::_d
   return ret;
 }
 
-byte_io_handle::io_result<byte_io_handle::const_buffers_type> byte_io_handle::_do_barrier(byte_io_handle::io_request<byte_io_handle::const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
+byte_io_handle::io_result<byte_io_handle::const_buffers_type> byte_io_handle::_do_barrier(byte_io_handle::io_request<byte_io_handle::const_buffers_type> reqs,
+                                                                                          barrier_kind kind, deadline d) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;

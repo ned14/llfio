@@ -139,9 +139,9 @@ namespace ip
     uint32_t scope_id() const noexcept { return is_v6() ? ipv6._scope_id : 0; }
 
     //! Returns the bytes of the address in network order
-    span<const byte> as_bytes() const noexcept { return is_v6() ? span<const byte>(ipv6._addr) : span<const byte>(ipv4._addr); }
+    span<const byte> to_bytes() const noexcept { return is_v6() ? span<const byte>(ipv6._addr) : span<const byte>(ipv4._addr); }
     //! Returns the address as a `sockaddr *`.
-    const sockaddr *as_sockaddr() const noexcept { return (const sockaddr *) _storage; }
+    const sockaddr *to_sockaddr() const noexcept { return (const sockaddr *) _storage; }
     //! Returns the size of the `sockaddr`
     LLFIO_HEADERS_ONLY_MEMFUNC_SPEC int sockaddrlen() const noexcept;
   };
@@ -215,8 +215,19 @@ namespace ip
   {
     return address_v6(bytes, port, scope_id);
   }
-  //! Make an `address_v6`
+  //! Make an `address_v6`. v6 addresses need to have the form `[::]:port`.
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<address_v6> make_address_v6(string_view str) noexcept;
+  //! Make a v4 or v6 `address`. v6 addresses need to have the form `[::]:port`.
+  inline result<address> make_address(string_view str) noexcept
+  {
+    if(str.size() > 0 && str[0] == '[')
+    {
+      OUTCOME_TRY(auto &&addr, make_address_v6(str));
+      return addr;
+    }
+    OUTCOME_TRY(auto &&addr, make_address_v4(str));
+    return addr;
+  }
 }  // namespace ip
 
 /*! \class byte_socket_handle
