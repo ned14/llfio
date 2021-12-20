@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../../lockable_io_handle.hpp"
+#include "../../../lockable_byte_io_handle.hpp"
 #include "import.hpp"
 
 #include <sys/file.h>
@@ -52,7 +52,7 @@ LLFIO_V2_NAMESPACE_BEGIN
 #endif
 
 
-result<void> lockable_io_handle::lock_file() noexcept
+result<void> lockable_byte_io_handle::lock_file() noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   if(-1 == flock(_v.fd, LOCK_EX))
@@ -61,7 +61,7 @@ result<void> lockable_io_handle::lock_file() noexcept
   }
   return success();
 }
-bool lockable_io_handle::try_lock_file() noexcept
+bool lockable_byte_io_handle::try_lock_file() noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   if(-1 == flock(_v.fd, LOCK_EX | LOCK_NB))
@@ -70,13 +70,13 @@ bool lockable_io_handle::try_lock_file() noexcept
   }
   return true;
 }
-void lockable_io_handle::unlock_file() noexcept
+void lockable_byte_io_handle::unlock_file() noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   (void) flock(_v.fd, LOCK_UN);
 }
 
-result<void> lockable_io_handle::lock_file_shared() noexcept
+result<void> lockable_byte_io_handle::lock_file_shared() noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   if(-1 == flock(_v.fd, LOCK_SH))
@@ -85,7 +85,7 @@ result<void> lockable_io_handle::lock_file_shared() noexcept
   }
   return success();
 }
-bool lockable_io_handle::try_lock_file_shared() noexcept
+bool lockable_byte_io_handle::try_lock_file_shared() noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   if(-1 == flock(_v.fd, LOCK_SH | LOCK_NB))
@@ -94,14 +94,14 @@ bool lockable_io_handle::try_lock_file_shared() noexcept
   }
   return true;
 }
-void lockable_io_handle::unlock_file_shared() noexcept
+void lockable_byte_io_handle::unlock_file_shared() noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   (void) flock(_v.fd, LOCK_UN);
 }
 
 
-result<lockable_io_handle::extent_guard> lockable_io_handle::lock_file_range(io_handle::extent_type offset, io_handle::extent_type bytes, lock_kind kind, deadline d) noexcept
+result<lockable_byte_io_handle::extent_guard> lockable_byte_io_handle::lock_file_range(byte_io_handle::extent_type offset, byte_io_handle::extent_type bytes, lock_kind kind, deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   if(d && d.nsecs > 0)
@@ -162,7 +162,7 @@ result<lockable_io_handle::extent_guard> lockable_io_handle::lock_file_range(io_
   return extent_guard(this, offset, bytes, kind);
 }
 
-void lockable_io_handle::unlock_file_range(io_handle::extent_type offset, io_handle::extent_type bytes) noexcept
+void lockable_byte_io_handle::unlock_file_range(byte_io_handle::extent_type offset, byte_io_handle::extent_type bytes) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   bool failed = false;
@@ -198,7 +198,7 @@ void lockable_io_handle::unlock_file_range(io_handle::extent_type offset, io_han
   {
     auto ret(posix_error());
     (void) ret;
-    LLFIO_LOG_FATAL(_v.fd, "io_handle::unlock() failed");
+    LLFIO_LOG_FATAL(_v.fd, "byte_io_handle::unlock() failed");
     std::terminate();
   }
 }

@@ -22,17 +22,17 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../../io_handle.hpp"
+#include "../../../byte_io_handle.hpp"
 #include "import.hpp"
 
 LLFIO_V2_NAMESPACE_BEGIN
 
-size_t io_handle::_do_max_buffers() const noexcept
+size_t byte_io_handle::_do_max_buffers() const noexcept
 {
   return 1;  // TODO FIXME support ReadFileScatter/WriteFileGather
 }
 
-template <class BuffersType> inline bool do_cancel(const native_handle_type &nativeh, span<windows_nt_kernel::IO_STATUS_BLOCK> ols, io_handle::io_request<BuffersType> reqs) noexcept
+template <class BuffersType> inline bool do_cancel(const native_handle_type &nativeh, span<windows_nt_kernel::IO_STATUS_BLOCK> ols, byte_io_handle::io_request<BuffersType> reqs) noexcept
 {
   using namespace windows_nt_kernel;
   using EIOSB = windows_nt_kernel::IO_STATUS_BLOCK;
@@ -61,7 +61,7 @@ template <class BuffersType> inline bool do_cancel(const native_handle_type &nat
 
 // Returns true if operation completed immediately
 template <bool blocking, class Syscall, class BuffersType>
-inline bool do_read_write(io_handle::io_result<BuffersType> &ret, Syscall &&syscall, const native_handle_type &nativeh, io_multiplexer::io_operation_state *state, span<windows_nt_kernel::IO_STATUS_BLOCK> ols, io_handle::io_request<BuffersType> reqs, deadline d) noexcept
+inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &&syscall, const native_handle_type &nativeh, byte_io_multiplexer::io_operation_state *state, span<windows_nt_kernel::IO_STATUS_BLOCK> ols, byte_io_handle::io_request<BuffersType> reqs, deadline d) noexcept
 {
   using namespace windows_nt_kernel;
   using EIOSB = windows_nt_kernel::IO_STATUS_BLOCK;
@@ -178,7 +178,7 @@ inline bool do_read_write(io_handle::io_result<BuffersType> &ret, Syscall &&sysc
   return true;
 }
 
-io_handle::io_result<io_handle::buffers_type> io_handle::_do_read(io_handle::io_request<io_handle::buffers_type> reqs, deadline d) noexcept
+byte_io_handle::io_result<byte_io_handle::buffers_type> byte_io_handle::_do_read(byte_io_handle::io_request<byte_io_handle::buffers_type> reqs, deadline d) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -189,12 +189,12 @@ io_handle::io_result<io_handle::buffers_type> io_handle::_do_read(io_handle::io_
   {
     return errc::argument_list_too_long;
   }
-  io_handle::io_result<io_handle::buffers_type> ret(reqs.buffers);
+  byte_io_handle::io_result<byte_io_handle::buffers_type> ret(reqs.buffers);
   do_read_write<true>(ret, NtReadFile, _v, nullptr, {_ols.data(), _ols.size()}, reqs, d);
   return ret;
 }
 
-io_handle::io_result<io_handle::const_buffers_type> io_handle::_do_write(io_handle::io_request<io_handle::const_buffers_type> reqs, deadline d) noexcept
+byte_io_handle::io_result<byte_io_handle::const_buffers_type> byte_io_handle::_do_write(byte_io_handle::io_request<byte_io_handle::const_buffers_type> reqs, deadline d) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -205,12 +205,12 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::_do_write(io_hand
   {
     return errc::argument_list_too_long;
   }
-  io_handle::io_result<io_handle::const_buffers_type> ret(reqs.buffers);
+  byte_io_handle::io_result<byte_io_handle::const_buffers_type> ret(reqs.buffers);
   do_read_write<true>(ret, NtWriteFile, _v, nullptr, {_ols.data(), _ols.size()}, reqs, d);
   return ret;
 }
 
-io_handle::io_result<io_handle::const_buffers_type> io_handle::_do_barrier(io_handle::io_request<io_handle::const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
+byte_io_handle::io_result<byte_io_handle::const_buffers_type> byte_io_handle::_do_barrier(byte_io_handle::io_request<byte_io_handle::const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;

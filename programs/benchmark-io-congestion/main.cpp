@@ -131,7 +131,7 @@ struct llfio_runner_unpaced
   llfio::dynamic_thread_pool_group_ptr group = llfio::make_dynamic_thread_pool_group().value();
   std::vector<llfio::dynamic_thread_pool_group::work_item *> workitems;
 
-  llfio_runner_unpaced(llfio::io_handle * /*unused*/) {}
+  llfio_runner_unpaced(llfio::byte_io_handle * /*unused*/) {}
   ~llfio_runner_unpaced()
   {
     for(auto *p : workitems)
@@ -176,11 +176,11 @@ struct llfio_runner_paced
 {
   std::atomic<bool> cancel{false};
   llfio::dynamic_thread_pool_group_ptr group = llfio::make_dynamic_thread_pool_group().value();
-  llfio::dynamic_thread_pool_group::io_aware_work_item::io_handle_awareness awareness;
+  llfio::dynamic_thread_pool_group::io_aware_work_item::byte_io_handle_awareness awareness;
   std::vector<llfio::dynamic_thread_pool_group::work_item *> workitems;
   std::atomic<int64_t> last_pace{0};
 
-  llfio_runner_paced(llfio::io_handle *h)
+  llfio_runner_paced(llfio::byte_io_handle *h)
       : awareness{h, 1.0f /* 100% reads */}
   {
   }
@@ -243,7 +243,7 @@ struct asio_runner
   std::atomic<bool> cancel{false};
   asio::io_context ctx;
 
-  asio_runner(llfio::io_handle * /*unused*/) {}
+  asio_runner(llfio::byte_io_handle * /*unused*/) {}
   template <class F> struct C
   {
     asio_runner *parent;

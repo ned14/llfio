@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef LLFIO_PIPE_HANDLE_H
 #define LLFIO_PIPE_HANDLE_H
 
-#include "io_handle.hpp"
+#include "byte_io_handle.hpp"
 
 //! \file pipe_handle.hpp Provides `pipe_handle`
 
@@ -83,24 +83,24 @@ So long as you use `path_discovery::temporary_named_pipes_directory()`
 as your base directory, you can write quite portable code between POSIX
 and Windows.
 */
-class LLFIO_DECL pipe_handle : public io_handle, public fs_handle
+class LLFIO_DECL pipe_handle : public byte_io_handle, public fs_handle
 {
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept final { return *this; }
 
 public:
-  using path_type = io_handle::path_type;
-  using extent_type = io_handle::extent_type;
-  using size_type = io_handle::size_type;
-  using mode = io_handle::mode;
-  using creation = io_handle::creation;
-  using caching = io_handle::caching;
-  using flag = io_handle::flag;
-  using buffer_type = io_handle::buffer_type;
-  using const_buffer_type = io_handle::const_buffer_type;
-  using buffers_type = io_handle::buffers_type;
-  using const_buffers_type = io_handle::const_buffers_type;
-  template <class T> using io_request = io_handle::io_request<T>;
-  template <class T> using io_result = io_handle::io_result<T>;
+  using path_type = byte_io_handle::path_type;
+  using extent_type = byte_io_handle::extent_type;
+  using size_type = byte_io_handle::size_type;
+  using mode = byte_io_handle::mode;
+  using creation = byte_io_handle::creation;
+  using caching = byte_io_handle::caching;
+  using flag = byte_io_handle::flag;
+  using buffer_type = byte_io_handle::buffer_type;
+  using const_buffer_type = byte_io_handle::const_buffer_type;
+  using buffers_type = byte_io_handle::buffers_type;
+  using const_buffers_type = byte_io_handle::const_buffers_type;
+  template <class T> using io_request = byte_io_handle::io_request<T>;
+  template <class T> using io_result = byte_io_handle::io_result<T>;
   using dev_t = fs_handle::dev_t;
   using ino_t = fs_handle::ino_t;
   using path_view_type = fs_handle::path_view_type;
@@ -109,14 +109,14 @@ public:
   //! Default constructor
   constexpr pipe_handle() {}  // NOLINT
   //! Construct a handle from a supplied native handle
-  constexpr pipe_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching, flag flags, io_multiplexer *ctx)
-      : io_handle(std::move(h), caching, flags, ctx)
+  constexpr pipe_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching, flag flags, byte_io_multiplexer *ctx)
+      : byte_io_handle(std::move(h), caching, flags, ctx)
       , fs_handle(devid, inode)
   {
   }
   //! Construct a handle from a supplied native handle
-  constexpr pipe_handle(native_handle_type h, caching caching, flag flags, io_multiplexer *ctx)
-      : io_handle(std::move(h), caching, flags, ctx)
+  constexpr pipe_handle(native_handle_type h, caching caching, flag flags, byte_io_multiplexer *ctx)
+      : byte_io_handle(std::move(h), caching, flags, ctx)
   {
   }
   //! No copy construction (use clone())
@@ -125,30 +125,30 @@ public:
   pipe_handle &operator=(const pipe_handle &) = delete;
   //! Implicit move construction of `pipe_handle` permitted
   constexpr pipe_handle(pipe_handle &&o) noexcept
-      : io_handle(std::move(o))
+      : byte_io_handle(std::move(o))
       , fs_handle(std::move(o))
   {
   }
   //! Explicit conversion from handle permitted
-  explicit constexpr pipe_handle(handle &&o, dev_t devid, ino_t inode, io_multiplexer *ctx) noexcept
-      : io_handle(std::move(o), ctx)
+  explicit constexpr pipe_handle(handle &&o, dev_t devid, ino_t inode, byte_io_multiplexer *ctx) noexcept
+      : byte_io_handle(std::move(o), ctx)
       , fs_handle(devid, inode)
   {
   }
   //! Explicit conversion from handle permitted
-  explicit constexpr pipe_handle(handle &&o, io_multiplexer *ctx) noexcept
-      : io_handle(std::move(o), ctx)
+  explicit constexpr pipe_handle(handle &&o, byte_io_multiplexer *ctx) noexcept
+      : byte_io_handle(std::move(o), ctx)
   {
   }
-  //! Explicit conversion from io_handle permitted
-  explicit constexpr pipe_handle(io_handle &&o, dev_t devid, ino_t inode) noexcept
-      : io_handle(std::move(o))
+  //! Explicit conversion from byte_io_handle permitted
+  explicit constexpr pipe_handle(byte_io_handle &&o, dev_t devid, ino_t inode) noexcept
+      : byte_io_handle(std::move(o))
       , fs_handle(devid, inode)
   {
   }
-  //! Explicit conversion from io_handle permitted
-  explicit constexpr pipe_handle(io_handle &&o) noexcept
-      : io_handle(std::move(o))
+  //! Explicit conversion from byte_io_handle permitted
+  explicit constexpr pipe_handle(byte_io_handle &&o) noexcept
+      : byte_io_handle(std::move(o))
   {
   }
   //! Move assignment of `pipe_handle` permitted
@@ -264,7 +264,7 @@ public:
       _v.behaviour |= native_handle_type::disposition::_child_close_executed;
     }
 #endif
-    return io_handle::close();
+    return byte_io_handle::close();
   }
 
 #ifdef _WIN32

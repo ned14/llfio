@@ -2375,8 +2375,8 @@ namespace detail
 
 /****************************************** io_aware_work_item *********************************************/
 
-LLFIO_HEADERS_ONLY_MEMFUNC_SPEC dynamic_thread_pool_group::io_aware_work_item::io_aware_work_item(span<io_handle_awareness> hs)
-    : _handles([](span<io_handle_awareness> hs) -> span<io_handle_awareness> {
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC dynamic_thread_pool_group::io_aware_work_item::io_aware_work_item(span<byte_io_handle_awareness> hs)
+    : _handles([](span<byte_io_handle_awareness> hs) -> span<byte_io_handle_awareness> {
       float all = 0;
       for(auto &i : hs)
       {

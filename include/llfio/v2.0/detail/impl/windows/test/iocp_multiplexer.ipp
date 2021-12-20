@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../io_handle.ipp"
+#include "../byte_io_handle.ipp"
 
 #ifndef _WIN32
 #error This implementation file is for Microsoft Windows only
@@ -32,9 +32,9 @@ LLFIO_V2_NAMESPACE_BEGIN
 
 namespace test
 {
-  template <bool is_threadsafe> class win_iocp_multiplexer final : public io_multiplexer_impl<is_threadsafe>
+  template <bool is_threadsafe> class win_iocp_multiplexer final : public byte_io_multiplexer_impl<is_threadsafe>
   {
-    using _base = io_multiplexer_impl<is_threadsafe>;
+    using _base = byte_io_multiplexer_impl<is_threadsafe>;
     using _multiplexer_lock_guard = typename _base::_lock_guard;
 
     using barrier_kind = typename _base::barrier_kind;
@@ -112,7 +112,7 @@ namespace test
     }
     // virtual native_handle_type release() noexcept override { return _base::release(); }
 
-    virtual result<uint8_t> do_io_handle_register(io_handle *h) noexcept override
+    virtual result<uint8_t> do_byte_io_handle_register(byte_io_handle *h) noexcept override
     {
       windows_nt_kernel::init();
       using namespace windows_nt_kernel;
@@ -140,7 +140,7 @@ namespace test
       // we successfully executed this
       return SetFileCompletionNotificationModes(h->native_handle().h, FILE_SKIP_COMPLETION_PORT_ON_SUCCESS | FILE_SKIP_SET_EVENT_ON_HANDLE) ? (uint8_t) 1 : (uint8_t) 0;
     }
-    virtual result<void> do_io_handle_deregister(io_handle *h) noexcept override
+    virtual result<void> do_byte_io_handle_deregister(byte_io_handle *h) noexcept override
     {
       windows_nt_kernel::init();
       using namespace windows_nt_kernel;
@@ -161,10 +161,10 @@ namespace test
       }
       return success();
     }
-    // virtual size_t do_io_handle_max_buffers(const io_handle *h) const noexcept override {}
-    // virtual result<registered_buffer_type> do_io_handle_allocate_registered_buffer(io_handle *h, size_t &bytes) noexcept override {}
+    // virtual size_t do_byte_io_handle_max_buffers(const byte_io_handle *h) const noexcept override {}
+    // virtual result<registered_buffer_type> do_byte_io_handle_allocate_registered_buffer(byte_io_handle *h, size_t &bytes) noexcept override {}
     virtual std::pair<size_t, size_t> io_state_requirements() noexcept override { return {sizeof(_iocp_operation_state), alignof(_iocp_operation_state)}; }
-    virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept override
+    virtual io_operation_state *construct(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept override
     {
       assert(storage.size() >= sizeof(_iocp_operation_state));
       // assert(((uintptr_t) storage.data() & (_iocp_operation_state_alignment - 1)) == 0);
@@ -174,7 +174,7 @@ namespace test
       }
       return new(storage.data()) _iocp_operation_state(_h, _visitor, std::move(b), d, std::move(reqs));
     }
-    virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept override
+    virtual io_operation_state *construct(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept override
     {
       assert(storage.size() >= sizeof(_iocp_operation_state));
       // assert(((uintptr_t) storage.data() & (_iocp_operation_state_alignment - 1)) == 0);
@@ -184,7 +184,7 @@ namespace test
       }
       return new(storage.data()) _iocp_operation_state(_h, _visitor, std::move(b), d, std::move(reqs));
     }
-    virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept override
+    virtual io_operation_state *construct(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept override
     {
       assert(storage.size() >= sizeof(_iocp_operation_state));
       // assert(((uintptr_t) storage.data() & (_iocp_operation_state_alignment - 1)) == 0);
@@ -206,7 +206,7 @@ namespace test
         abort();
       case io_operation_state_type::read_initialised:
       {
-        io_handle::io_result<io_handle::buffers_type> ret(state->payload.noncompleted.params.read.reqs.buffers);
+        byte_io_handle::io_result<byte_io_handle::buffers_type> ret(state->payload.noncompleted.params.read.reqs.buffers);
         if(do_read_write<false>(ret, NtReadFile, state->h->native_handle(), state, state->_ols, state->payload.noncompleted.params.read.reqs, state->payload.noncompleted.d))
         {
           // Completed immediately
@@ -229,7 +229,7 @@ namespace test
       }
       case io_operation_state_type::write_initialised:
       {
-        io_handle::io_result<io_handle::const_buffers_type> ret(state->payload.noncompleted.params.write.reqs.buffers);
+        byte_io_handle::io_result<byte_io_handle::const_buffers_type> ret(state->payload.noncompleted.params.write.reqs.buffers);
         if(do_read_write<false>(ret, NtWriteFile, state->h->native_handle(), state, state->_ols, state->payload.noncompleted.params.write.reqs, state->payload.noncompleted.d))
         {
           // Completed immediately
@@ -520,7 +520,7 @@ namespace test
     }
   };
 
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<io_multiplexer_ptr> multiplexer_win_iocp(size_t threads, bool disable_immediate_completions) noexcept
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<byte_io_multiplexer_ptr> multiplexer_win_iocp(size_t threads, bool disable_immediate_completions) noexcept
   {
     try
     {

@@ -454,7 +454,7 @@ static inline void TestDynamicThreadPoolGroupIoAwareWorks()
   struct shared_state_t
   {
     llfio::file_handle h;
-    llfio::dynamic_thread_pool_group::io_aware_work_item::io_handle_awareness awareness;
+    llfio::dynamic_thread_pool_group::io_aware_work_item::byte_io_handle_awareness awareness;
     std::atomic<size_t> concurrency{0}, max_concurrency{0};
     std::atomic<uint64_t> current_pacing{0};
   } shared_state;

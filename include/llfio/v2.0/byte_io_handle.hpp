@@ -25,9 +25,9 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef LLFIO_IO_HANDLE_H
 #define LLFIO_IO_HANDLE_H
 
-#include "io_multiplexer.hpp"
+#include "byte_io_multiplexer.hpp"
 
-//! \file io_handle.hpp Provides a byte-orientated i/o handle
+//! \file byte_io_handle.hpp Provides a byte-orientated i/o handle
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -36,12 +36,12 @@ Distributed under the Boost Software License, Version 1.0.
 
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
-/*! \class io_handle
+/*! \class byte_io_handle
 \brief A handle to something capable of scatter-gather byte i/o.
 */
-class LLFIO_DECL io_handle : public handle
+class LLFIO_DECL byte_io_handle : public handle
 {
-  friend class io_multiplexer;
+  friend class byte_io_multiplexer;
 
 public:
   using path_type = handle::path_type;
@@ -51,43 +51,43 @@ public:
   using creation = handle::creation;
   using caching = handle::caching;
   using flag = handle::flag;
-  using barrier_kind = io_multiplexer::barrier_kind;
-  using buffer_type = io_multiplexer::buffer_type;
-  using const_buffer_type = io_multiplexer::const_buffer_type;
-  using buffers_type = io_multiplexer::buffers_type;
-  using const_buffers_type = io_multiplexer::const_buffers_type;
-  using registered_buffer_type = io_multiplexer::registered_buffer_type;
-  template <class T> using io_request = io_multiplexer::io_request<T>;
-  template <class T> using io_result = io_multiplexer::io_result<T>;
-  template <class T> using awaitable = io_multiplexer::awaitable<T>;
+  using barrier_kind = byte_io_multiplexer::barrier_kind;
+  using buffer_type = byte_io_multiplexer::buffer_type;
+  using const_buffer_type = byte_io_multiplexer::const_buffer_type;
+  using buffers_type = byte_io_multiplexer::buffers_type;
+  using const_buffers_type = byte_io_multiplexer::const_buffers_type;
+  using registered_buffer_type = byte_io_multiplexer::registered_buffer_type;
+  template <class T> using io_request = byte_io_multiplexer::io_request<T>;
+  template <class T> using io_result = byte_io_multiplexer::io_result<T>;
+  template <class T> using awaitable = byte_io_multiplexer::awaitable<T>;
 
 protected:
-  io_multiplexer *_ctx{nullptr};  // +4 or +8 bytes
+  byte_io_multiplexer *_ctx{nullptr};  // +4 or +8 bytes
 
 public:
   //! Default constructor
-  constexpr io_handle() {}  // NOLINT
-  ~io_handle() = default;
+  constexpr byte_io_handle() {}  // NOLINT
+  ~byte_io_handle() = default;
   //! Construct a handle from a supplied native handle
-  constexpr explicit io_handle(native_handle_type h, caching caching, flag flags, io_multiplexer *ctx)
+  constexpr explicit byte_io_handle(native_handle_type h, caching caching, flag flags, byte_io_multiplexer *ctx)
       : handle(h, caching, flags)
       , _ctx(ctx)
   {
   }
   //! Explicit conversion from handle permitted
-  explicit constexpr io_handle(handle &&o, io_multiplexer *ctx) noexcept
+  explicit constexpr byte_io_handle(handle &&o, byte_io_multiplexer *ctx) noexcept
       : handle(std::move(o))
       , _ctx(ctx)
   {
   }
   //! Move construction permitted
-  io_handle(io_handle &&) = default;
+  byte_io_handle(byte_io_handle &&) = default;
   //! No copy construction (use `clone()`)
-  io_handle(const io_handle &) = delete;
+  byte_io_handle(const byte_io_handle &) = delete;
   //! Move assignment permitted
-  io_handle &operator=(io_handle &&) = default;
+  byte_io_handle &operator=(byte_io_handle &&) = default;
   //! No copy assignment
-  io_handle &operator=(const io_handle &) = delete;
+  byte_io_handle &operator=(const byte_io_handle &) = delete;
 
   LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override
@@ -102,7 +102,7 @@ public:
   /*! \brief The i/o multiplexer this handle will use to multiplex i/o. If this returns null,
   then this handle has not been registered with an i/o multiplexer yet.
   */
-  io_multiplexer *multiplexer() const noexcept { return _ctx; }
+  byte_io_multiplexer *multiplexer() const noexcept { return _ctx; }
 
   /*! \brief Sets the i/o multiplexer this handle will use to implement `read()`, `write()` and `barrier()`.
 
@@ -116,7 +116,7 @@ public:
 
   \mallocs Multiple dynamic memory allocations and deallocations.
   */
-  virtual result<void> set_multiplexer(io_multiplexer *c = this_thread::multiplexer()) noexcept;  // implementation is below
+  virtual result<void> set_multiplexer(byte_io_multiplexer *c = this_thread::multiplexer()) noexcept;  // implementation is below
 
 protected:
   //! The virtualised implementation of `max_buffers()` used if no multiplexer has been set.
@@ -228,7 +228,7 @@ public:
     {
       return _do_max_buffers();
     }
-    return _ctx->do_io_handle_max_buffers(this);
+    return _ctx->do_byte_io_handle_max_buffers(this);
   }
 
   /*! \brief Request the allocation of a new registered i/o buffer with the system suitable
@@ -257,7 +257,7 @@ public:
     {
       return _do_allocate_registered_buffer(bytes);
     }
-    return _ctx->do_io_handle_allocate_registered_buffer(this, bytes);
+    return _ctx->do_byte_io_handle_allocate_registered_buffer(this, bytes);
   }
 
   /*! \brief Read data from the open handle, preferentially using any i/o multiplexer set over the
@@ -465,11 +465,11 @@ public:
     return ret;
   }
 };
-static_assert((sizeof(void *) == 4 && sizeof(io_handle) == 20) || (sizeof(void *) == 8 && sizeof(io_handle) == 32), "io_handle is not 20 or 32 bytes in size!");
+static_assert((sizeof(void *) == 4 && sizeof(byte_io_handle) == 20) || (sizeof(void *) == 8 && sizeof(byte_io_handle) == 32), "byte_io_handle is not 20 or 32 bytes in size!");
 
 // Out of line definition purely to work around a bug in GCC where if marked inline,
 // its visibility is hidden and links fail
-inline result<void> io_handle::set_multiplexer(io_multiplexer *c) noexcept
+inline result<void> byte_io_handle::set_multiplexer(byte_io_multiplexer *c) noexcept
 {
   if(!is_multiplexable())
   {
@@ -481,12 +481,12 @@ inline result<void> io_handle::set_multiplexer(io_multiplexer *c) noexcept
   }
   if(_ctx != nullptr)
   {
-    OUTCOME_TRY(_ctx->do_io_handle_deregister(this));
+    OUTCOME_TRY(_ctx->do_byte_io_handle_deregister(this));
     _ctx = nullptr;
   }
   if(c != nullptr)
   {
-    OUTCOME_TRY(auto &&state, c->do_io_handle_register(this));
+    OUTCOME_TRY(auto &&state, c->do_byte_io_handle_register(this));
     _v.behaviour = (_v.behaviour & ~(native_handle_type::disposition::_multiplexer_state_bit0 | native_handle_type::disposition::_multiplexer_state_bit1));
     if((state & 1) != 0)
     {
@@ -501,15 +501,15 @@ inline result<void> io_handle::set_multiplexer(io_multiplexer *c) noexcept
   return success();
 }
 
-inline size_t io_multiplexer::do_io_handle_max_buffers(const io_handle *h) const noexcept
+inline size_t byte_io_multiplexer::do_byte_io_handle_max_buffers(const byte_io_handle *h) const noexcept
 {
   return h->_do_max_buffers();
 }
-inline result<io_multiplexer::registered_buffer_type> io_multiplexer::do_io_handle_allocate_registered_buffer(io_handle *h, size_t &bytes) noexcept
+inline result<byte_io_multiplexer::registered_buffer_type> byte_io_multiplexer::do_byte_io_handle_allocate_registered_buffer(byte_io_handle *h, size_t &bytes) noexcept
 {
   return h->_do_allocate_registered_buffer(bytes);
 }
-template <class T> inline bool io_multiplexer::awaitable<T>::await_ready() noexcept
+template <class T> inline bool byte_io_multiplexer::awaitable<T>::await_ready() noexcept
 {
   auto state = _state->current_state();
   if(is_initialised(state))
@@ -520,7 +520,7 @@ template <class T> inline bool io_multiplexer::awaitable<T>::await_ready() noexc
   }
   return is_finished(state);
 }
-template <class T> inline io_multiplexer::awaitable<T>::~awaitable()
+template <class T> inline byte_io_multiplexer::awaitable<T>::~awaitable()
 {
   if(_state != nullptr)
   {
@@ -568,7 +568,7 @@ returned if deadline i/o is not possible with this particular handle configurati
 reading from regular files on POSIX or reading from a non-overlapped HANDLE on Windows).
 \mallocs The default synchronous implementation in file_handle performs no memory allocation.
 */
-inline io_handle::io_result<io_handle::buffers_type> read(io_handle &self, io_handle::io_request<io_handle::buffers_type> reqs, deadline d = deadline()) noexcept
+inline byte_io_handle::io_result<byte_io_handle::buffers_type> read(byte_io_handle &self, byte_io_handle::io_request<byte_io_handle::buffers_type> reqs, deadline d = deadline()) noexcept
 {
   return self.read(std::forward<decltype(reqs)>(reqs), std::forward<decltype(d)>(d));
 }
@@ -593,12 +593,12 @@ returned if deadline i/o is not possible with this particular handle configurati
 writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows).
 \mallocs The default synchronous implementation in file_handle performs no memory allocation.
 */
-inline io_handle::io_result<io_handle::const_buffers_type> write(io_handle &self, io_handle::io_request<io_handle::const_buffers_type> reqs, deadline d = deadline()) noexcept
+inline byte_io_handle::io_result<byte_io_handle::const_buffers_type> write(byte_io_handle &self, byte_io_handle::io_request<byte_io_handle::const_buffers_type> reqs, deadline d = deadline()) noexcept
 {
   return self.write(std::forward<decltype(reqs)>(reqs), std::forward<decltype(d)>(d));
 }
 //! \overload
-inline io_handle::io_result<io_handle::size_type> write(io_handle &self, io_handle::extent_type offset, std::initializer_list<io_handle::const_buffer_type> lst, deadline d = deadline()) noexcept
+inline byte_io_handle::io_result<byte_io_handle::size_type> write(byte_io_handle &self, byte_io_handle::extent_type offset, std::initializer_list<byte_io_handle::const_buffer_type> lst, deadline d = deadline()) noexcept
 {
   return self.write(std::forward<decltype(offset)>(offset), std::forward<decltype(lst)>(lst), std::forward<decltype(d)>(d));
 }
@@ -616,14 +616,14 @@ LLFIO_V2_NAMESPACE_END
 #if LLFIO_ENABLE_TEST_IO_MULTIPLEXERS
 #include "detail/impl/windows/test/iocp_multiplexer.ipp"
 #else
-#include "detail/impl/windows/io_handle.ipp"
+#include "detail/impl/windows/byte_io_handle.ipp"
 #endif
 #else
 #if LLFIO_ENABLE_TEST_IO_MULTIPLEXERS
 //#include "detail/impl/posix/test/io_uring_multiplexer.ipp"
 #else
 #endif
-#include "detail/impl/posix/io_handle.ipp"
+#include "detail/impl/posix/byte_io_handle.ipp"
 #endif
 #undef LLFIO_INCLUDED_BY_HEADER
 #endif

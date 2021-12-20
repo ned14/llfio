@@ -1,5 +1,5 @@
-/* Multiplex file i/o
-(C) 2019-2020 Niall Douglas <http://www.nedproductions.biz/> (9 commits)
+/* Multiplex i/o
+(C) 2019-2021 Niall Douglas <http://www.nedproductions.biz/> (9 commits)
 File Created: Nov 2019
 
 
@@ -39,7 +39,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
-class io_handle;
+class byte_io_handle;
 
 //! The possible states of the i/o operation
 enum class io_operation_state_type
@@ -141,11 +141,11 @@ constexpr inline bool is_finished(io_operation_state_type s) noexcept
   return false;
 }
 
-/*! \class io_multiplexer
+/*! \class byte_io_multiplexer
 \brief A multiplexer of byte-orientated i/o.
 
 LLFIO does not provide out-of-the-box multiplexing of byte i/o, however it does provide the ability
-to create `io_handle` instances with the `handle::flag::multiplexable` set. With that flag set, the
+to create `byte_io_handle` instances with the `handle::flag::multiplexable` set. With that flag set, the
 following LLFIO classes change how they create handles with the kernel:
 
 <table>
@@ -156,24 +156,25 @@ following LLFIO classes change how they create handles with the kernel:
 <tr><td><code>mapped_file_handle</code><td>No effect<td>Creates `HANDLE` as `OVERLAPPED`, but i/o is to map not file
 <tr><td><code>pipe_handle</code><td>Creates file descriptor as non-blocking<td>Creates `HANDLE` as `OVERLAPPED`
 <tr><td><code>section_handle</code><td>No effect<td>Creates `HANDLE` as `OVERLAPPED`
+<tr><td><code>socket_handle</code><td>Creates file descriptor as non-blocking<td>Creates `HANDLE` as `OVERLAPPED`
 <tr><td><code>symlink_handle</code><td>No effect<td>Creates `HANDLE` as `OVERLAPPED`
 </table>
 
 If the i/o handle's multiplexer pointer is not null, the multiplexer instance is invoked to implement
-`io_handle::read()`, `io_handle::write()` and `io_handle::barrier()` by constructing an i/o
+`byte_io_handle::read()`, `byte_io_handle::write()` and `byte_io_handle::barrier()` by constructing an i/o
 operation state on the stack, calling `.init_io_operation()` followed by `.flush_inited_io_operations()`,
 and then spinning on `.check_io_operation()` and `.check_for_any_completed_io()` with the deadline
 specified to the original blocking operation.
 
-If the i/o handle's multiplexer pointer is null, `io_handle::read()`, `io_handle::write()` and
-`io_handle::barrier()` all use virtually overridable implementations. The default implementations
+If the i/o handle's multiplexer pointer is null, `byte_io_handle::read()`, `byte_io_handle::write()` and
+`byte_io_handle::barrier()` all use virtually overridable implementations. The default implementations
 emulate blocking semantics using the kernel's i/o poll function (literally `poll()` on POSIX,
 `NtWaitForSingleObject()` on Windows) to sleep the thread until at least one byte of i/o occurs, or
 the deadline specified is exceeded. This, obviously enough, can double the number of kernel syscalls
 done per i/o, so using handles with the `handle::flag::multiplexable` flag set is not wise unless
 you really need non-infinite deadline i/o.
 */
-class LLFIO_DECL io_multiplexer : public handle
+class LLFIO_DECL byte_io_multiplexer : public handle
 {
   struct _empty_t
   {
@@ -461,57 +462,57 @@ public:
 #endif
 
   using handle::handle;
-  constexpr io_multiplexer() {}
-  io_multiplexer(io_multiplexer &&) = default;
-  io_multiplexer(const io_multiplexer &) = delete;
-  io_multiplexer &operator=(io_multiplexer &&) = default;
-  io_multiplexer &operator=(const io_multiplexer &) = delete;
-  ~io_multiplexer() = default;
+  constexpr byte_io_multiplexer() {}
+  byte_io_multiplexer(byte_io_multiplexer &&) = default;
+  byte_io_multiplexer(const byte_io_multiplexer &) = delete;
+  byte_io_multiplexer &operator=(byte_io_multiplexer &&) = default;
+  byte_io_multiplexer &operator=(const byte_io_multiplexer &) = delete;
+  ~byte_io_multiplexer() = default;
 
 public:
-  //! Implements `io_handle` registration. The bottom two bits of the returned value are set into `_v.behaviour`'s `_multiplexer_state_bit0` and
+  //! Implements `byte_io_handle` registration. The bottom two bits of the returned value are set into `_v.behaviour`'s `_multiplexer_state_bit0` and
   //! `_multiplexer_state_bit`
-  virtual result<uint8_t> do_io_handle_register(io_handle * /*unused*/) noexcept { return (uint8_t) 0; }
-  //! Implements `io_handle` deregistration
-  virtual result<void> do_io_handle_deregister(io_handle * /*unused*/) noexcept { return success(); }
-  //! Implements `io_handle::max_buffers()`
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t do_io_handle_max_buffers(const io_handle *h) const noexcept;
-  //! Implements `io_handle::allocate_registered_buffer()`
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<registered_buffer_type> do_io_handle_allocate_registered_buffer(io_handle *h, size_t &bytes) noexcept;
+  virtual result<uint8_t> do_byte_io_handle_register(byte_io_handle * /*unused*/) noexcept { return (uint8_t) 0; }
+  //! Implements `byte_io_handle` deregistration
+  virtual result<void> do_byte_io_handle_deregister(byte_io_handle * /*unused*/) noexcept { return success(); }
+  //! Implements `byte_io_handle::max_buffers()`
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t do_byte_io_handle_max_buffers(const byte_io_handle *h) const noexcept;
+  //! Implements `byte_io_handle::allocate_registered_buffer()`
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<registered_buffer_type> do_byte_io_handle_allocate_registered_buffer(byte_io_handle *h, size_t &bytes) noexcept;
 
   struct io_operation_state_visitor;
   /*! \brief An interface to a state for an i/o operation scheduled against an i/o multiplexer.
 
   You will need to ask the i/o multiplexer for how much storage, and alignment, is required to
-  store one of these using `io_multiplexer::io_state_requirements()`. Be aware that for some
+  store one of these using `byte_io_multiplexer::io_state_requirements()`. Be aware that for some
   i/o multiplexers, quite a lot of storage (e.g. > 1Kb for IOCP on Windows) may be required.
   You can either preallocate i/o operation states for later use, or use other determinism-maintaining
   tricks to avoid dynamic memory allocation for i/o operation states.
 
-  When you construct one of these using `io_multiplexer::init_io_operation()`, you must
+  When you construct one of these using `byte_io_multiplexer::init_io_operation()`, you must
   pass in a pointer to a `io_operation_state_visitor`. This visitor will be called whenever
   the lifecycle for the i/o state is about to change (it is called just before
   `.current_state()` is changed, and with any per-state locks held).
 
   The lifecycle for one of these is as follows:
 
-  1. i/o initialised. This is after `io_multiplexer::init_io_operation()` has been
+  1. i/o initialised. This is after `byte_io_multiplexer::init_io_operation()` has been
   called to initialise the i/o operation state. You can now no longer relocate the i/o
   operation state in memory until the corresponding `*_finished()` visitor function is called.
 
   2. i/o initiated. One is notified of this by the call of the corresponding visitor
-  `*_initiated()` function. This may occur in `io_multiplexer::init_io_operation()`,
-  in `io_multiplexer::flush_inited_io_operations()`, or **never at all** if the i/o
+  `*_initiated()` function. This may occur in `byte_io_multiplexer::init_io_operation()`,
+  in `byte_io_multiplexer::flush_inited_io_operations()`, or **never at all** if the i/o
   completed immediately.
 
   3. When the i/o completes, one is notified of the i/o's result by the call of the
   corresponding `*_completed()` visitor function. This can occur *at any time*, and can be called
   by **any** kernel thread, if the i/o multiplexer in use is used by multiple kernel threads.
-  The completion functions are *usually* invoked by somebody calling `io_multiplexer::check_io_operation()`
-  or `io_multiplexer::check_for_any_completed_io()`, but may also be called by an asynchronous system agent.
+  The completion functions are *usually* invoked by somebody calling `byte_io_multiplexer::check_io_operation()`
+  or `byte_io_multiplexer::check_for_any_completed_io()`, but may also be called by an asynchronous system agent.
 
   4. The i/o operation state may still be in use by others. You must not relocate in memory the
-  i/o operation state after `io_multiplexer::init_io_operation()` returns until the corresponding
+  i/o operation state after `byte_io_multiplexer::init_io_operation()` returns until the corresponding
   `*_finished()` visitor function is called.
   */
   struct io_operation_state
@@ -520,7 +521,7 @@ public:
     friend struct lock_guard;
 
     //! The i/o handle the i/o operation is upon
-    io_handle *h{nullptr};
+    byte_io_handle *h{nullptr};
     //! The state visitor supplied when the operation was initialised
     io_operation_state_visitor *visitor{nullptr};
     //! Used by the visitor to control the state lock
@@ -576,7 +577,7 @@ public:
 
   protected:
     constexpr io_operation_state() {}
-    constexpr io_operation_state(io_handle *_h, io_operation_state_visitor *_visitor)
+    constexpr io_operation_state(byte_io_handle *_h, io_operation_state_visitor *_visitor)
         : h(_h)
         , visitor(_visitor)
     {
@@ -731,14 +732,14 @@ protected:
     //! Construct an unknown state
     constexpr _unsynchronised_io_operation_state() {}
     //! Construct a read operation state
-    _unsynchronised_io_operation_state(io_handle *_h, io_operation_state_visitor *_v, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs)
+    _unsynchronised_io_operation_state(byte_io_handle *_h, io_operation_state_visitor *_v, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs)
         : io_operation_state(_h, _v)
         , state(io_operation_state_type::read_initialised)
         , payload(std::move(b), d, std::move(reqs))
     {
     }
     //! Construct a write operation state
-    _unsynchronised_io_operation_state(io_handle *_h, io_operation_state_visitor *_v, registered_buffer_type &&b, deadline d,
+    _unsynchronised_io_operation_state(byte_io_handle *_h, io_operation_state_visitor *_v, registered_buffer_type &&b, deadline d,
                                        io_request<const_buffers_type> reqs)
         : io_operation_state(_h, _v)
         , state(io_operation_state_type::write_initialised)
@@ -746,7 +747,7 @@ protected:
     {
     }
     //! Construct a barrier operation state
-    _unsynchronised_io_operation_state(io_handle *_h, io_operation_state_visitor *_v, registered_buffer_type &&b, deadline d,
+    _unsynchronised_io_operation_state(byte_io_handle *_h, io_operation_state_visitor *_v, registered_buffer_type &&b, deadline d,
                                        io_request<const_buffers_type> reqs, barrier_kind kind)
         : io_operation_state(_h, _v)
         , state(io_operation_state_type::barrier_initialised)
@@ -1117,11 +1118,11 @@ public:
 
   If the i/o does not complete immediately, the coroutine is suspended. To cause resumption
   of execution, you will need to pump the associated i/o multiplexer for completions using
-  `io_multiplexer::check_for_any_completed_io()`.
+  `byte_io_multiplexer::check_for_any_completed_io()`.
   */
   template <class T> struct awaitable final : protected io_operation_state_visitor
   {
-    friend class io_handle;
+    friend class byte_io_handle;
     static constexpr size_t _state_storage_bytes = _awaitable_size - sizeof(void *) - sizeof(io_operation_state *)
 #if LLFIO_ENABLE_COROUTINES
                                                    - sizeof(coroutine_handle<>)
@@ -1185,10 +1186,10 @@ public:
       return *this;
     }
     //! Destructor, blocks if the i/o is in progress
-    inline ~awaitable();  // defined in io_handle.hpp
+    inline ~awaitable();  // defined in byte_io_handle.hpp
 
     //! True if the i/o state is finished. Begins the i/o if it is not initiated yet.
-    inline bool await_ready() noexcept;  // defined in io_handle.hpp
+    inline bool await_ready() noexcept;  // defined in byte_io_handle.hpp
 
     //! Returns the result of the i/o
     result_type await_resume()
@@ -1301,21 +1302,21 @@ public:
   for a read operation into the storage provided. The i/o is not initiated. The storage must
   meet the requirements from `state_requirements()`.
   */
-  virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d,
+  virtual io_operation_state *construct(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d,
                                         io_request<buffers_type> reqs) noexcept = 0;
 
   /*! \brief Constructs either a `unsynchronised_io_operation_state` or a `synchronised_io_operation_state`
   for a write operation into the storage provided. The i/o is not initiated. The storage must
   meet the requirements from `state_requirements()`.
   */
-  virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d,
+  virtual io_operation_state *construct(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d,
                                         io_request<const_buffers_type> reqs) noexcept = 0;
 
   /*! \brief Constructs either a `unsynchronised_io_operation_state` or a `synchronised_io_operation_state`
   for a barrier operation into the storage provided. The i/o is not initiated. The storage must
   meet the requirements from `state_requirements()`.
   */
-  virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d,
+  virtual io_operation_state *construct(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d,
                                         io_request<const_buffers_type> reqs, barrier_kind kind) noexcept = 0;
 
   /*! \brief Initiates the i/o in a previously constructed state. Note that you should always call
@@ -1326,7 +1327,7 @@ public:
 
   /*! \brief Combines `.construct()` with `.init_io_operation()` in a single call for improved efficiency.
    */
-  virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor,
+  virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor,
                                                               registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept
   {
     io_operation_state *state = construct(storage, _h, _visitor, std::move(b), d, std::move(reqs));
@@ -1336,7 +1337,7 @@ public:
 
   /*! \brief Combines `.construct()` with `.init_io_operation()` in a single call for improved efficiency.
    */
-  virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor,
+  virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor,
                                                               registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept
   {
     io_operation_state *state = construct(storage, _h, _visitor, std::move(b), d, std::move(reqs));
@@ -1346,7 +1347,7 @@ public:
 
   /*! \brief Combines `.construct()` with `.init_io_operation()` in a single call for improved efficiency.
    */
-  virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor,
+  virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor,
                                                               registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs,
                                                               barrier_kind kind) noexcept
   {
@@ -1386,11 +1387,11 @@ public:
   virtual result<void> wake_check_for_any_completed_io() noexcept = 0;
 };
 //! A unique ptr to an i/o multiplexer implementation.
-using io_multiplexer_ptr = std::unique_ptr<io_multiplexer>;
+using byte_io_multiplexer_ptr = std::unique_ptr<byte_io_multiplexer>;
 
 #ifndef NDEBUG
-static_assert(OUTCOME_V2_NAMESPACE::concepts::basic_result<io_multiplexer::io_result<int>>,
-              "io_multiplexer::io_result<int> does not match the Outcome basic_result concept!");
+static_assert(OUTCOME_V2_NAMESPACE::concepts::basic_result<byte_io_multiplexer::io_result<int>>,
+              "byte_io_multiplexer::io_result<int> does not match the Outcome basic_result concept!");
 #endif
 
 #if LLFIO_ENABLE_TEST_IO_MULTIPLEXERS
@@ -1402,14 +1403,14 @@ namespace test
   The multiplexer returned by this function is a null implementation
   used by the test suite to benchmark performance.
   */
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<io_multiplexer_ptr> multiplexer_null(size_t threads, bool disable_immediate_completions) noexcept;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<byte_io_multiplexer_ptr> multiplexer_null(size_t threads, bool disable_immediate_completions) noexcept;
 
 #if defined(__linux__) || DOXYGEN_IS_IN_THE_HOUSE
-// LLFIO_HEADERS_ONLY_FUNC_SPEC result<io_multiplexer_ptr> multiplexer_linux_epoll(size_t threads) noexcept;
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<io_multiplexer_ptr> multiplexer_linux_io_uring(size_t threads, bool is_polling) noexcept;
+// LLFIO_HEADERS_ONLY_FUNC_SPEC result<byte_io_multiplexer_ptr> multiplexer_linux_epoll(size_t threads) noexcept;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<byte_io_multiplexer_ptr> multiplexer_linux_io_uring(size_t threads, bool is_polling) noexcept;
 #endif
 #if(defined(__FreeBSD__) || defined(__APPLE__)) || DOXYGEN_IS_IN_THE_HOUSE
-// LLFIO_HEADERS_ONLY_FUNC_SPEC result<io_multiplexer_ptr> multiplexer_bsd_kqueue(size_t threads) noexcept;
+// LLFIO_HEADERS_ONLY_FUNC_SPEC result<byte_io_multiplexer_ptr> multiplexer_bsd_kqueue(size_t threads) noexcept;
 #endif
 #if defined(_WIN32) || DOXYGEN_IS_IN_THE_HOUSE
   /*! \brief Return a test i/o multiplexer implemented using Microsoft Windows IOCP.
@@ -1417,7 +1418,7 @@ namespace test
   The multiplexer returned by this function is only a partial implementation, used
   only by the test suite. In particular it does not fully implement deadlined i/o.
   */
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<io_multiplexer_ptr> multiplexer_win_iocp(size_t threads, bool disable_immediate_completions) noexcept;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<byte_io_multiplexer_ptr> multiplexer_win_iocp(size_t threads, bool disable_immediate_completions) noexcept;
 #endif
 }  // namespace test
 #endif
@@ -1426,9 +1427,9 @@ namespace test
 namespace this_thread
 {
   //! \brief Return the calling thread's current i/o multiplexer.
-  LLFIO_HEADERS_ONLY_FUNC_SPEC io_multiplexer *multiplexer() noexcept;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC byte_io_multiplexer *multiplexer() noexcept;
   //! \brief Set the calling thread's current i/o multiplexer.
-  LLFIO_HEADERS_ONLY_FUNC_SPEC void set_multiplexer(io_multiplexer *ctx) noexcept;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC void set_multiplexer(byte_io_multiplexer *ctx) noexcept;
 }  // namespace this_thread
 
 // BEGIN make_free_functions.py
@@ -1442,7 +1443,7 @@ LLFIO_V2_NAMESPACE_END
 
 #if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 #define LLFIO_INCLUDED_BY_HEADER 1
-#include "detail/impl/io_multiplexer.ipp"
+#include "detail/impl/byte_io_multiplexer.ipp"
 #undef LLFIO_INCLUDED_BY_HEADER
 #endif
 

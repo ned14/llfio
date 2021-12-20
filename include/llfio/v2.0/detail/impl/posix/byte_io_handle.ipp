@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../../io_handle.hpp"
+#include "../../../byte_io_handle.hpp"
 
 #include "import.hpp"
 
@@ -38,12 +38,12 @@ LLFIO_V2_NAMESPACE_BEGIN
 
 constexpr inline void _check_iovec_match()
 {
-  static_assert(sizeof(io_handle::buffer_type) == sizeof(iovec), "buffer_type and struct iovec do not match in size");
-  static_assert(offsetof(io_handle::buffer_type, _data) == offsetof(iovec, iov_base), "buffer_type and struct iovec do not have same offset of data member");
-  static_assert(offsetof(io_handle::buffer_type, _len) == offsetof(iovec, iov_len), "buffer_type and struct iovec do not have same offset of len member");
+  static_assert(sizeof(byte_io_handle::buffer_type) == sizeof(iovec), "buffer_type and struct iovec do not match in size");
+  static_assert(offsetof(byte_io_handle::buffer_type, _data) == offsetof(iovec, iov_base), "buffer_type and struct iovec do not have same offset of data member");
+  static_assert(offsetof(byte_io_handle::buffer_type, _len) == offsetof(iovec, iov_len), "buffer_type and struct iovec do not have same offset of len member");
 }
 
-size_t io_handle::_do_max_buffers() const noexcept
+size_t byte_io_handle::_do_max_buffers() const noexcept
 {
   static size_t v;
   if(v == 0u)
@@ -66,7 +66,7 @@ size_t io_handle::_do_max_buffers() const noexcept
   return v;
 }
 
-io_handle::io_result<io_handle::buffers_type> io_handle::_do_read(io_handle::io_request<io_handle::buffers_type> reqs, deadline d) noexcept
+byte_io_handle::io_result<byte_io_handle::buffers_type> byte_io_handle::_do_read(byte_io_handle::io_request<byte_io_handle::buffers_type> reqs, deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   if(d && !_v.is_nonblocking())
@@ -163,7 +163,7 @@ io_handle::io_result<io_handle::buffers_type> io_handle::_do_read(io_handle::io_
   return {reqs.buffers};
 }
 
-io_handle::io_result<io_handle::const_buffers_type> io_handle::_do_write(io_handle::io_request<io_handle::const_buffers_type> reqs, deadline d) noexcept
+byte_io_handle::io_result<byte_io_handle::const_buffers_type> byte_io_handle::_do_write(byte_io_handle::io_request<byte_io_handle::const_buffers_type> reqs, deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   if(d && !_v.is_nonblocking())
@@ -265,7 +265,7 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::_do_write(io_hand
   return {reqs.buffers};
 }
 
-io_handle::io_result<io_handle::const_buffers_type> io_handle::_do_barrier(io_handle::io_request<io_handle::const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
+byte_io_handle::io_result<byte_io_handle::const_buffers_type> byte_io_handle::_do_barrier(byte_io_handle::io_request<byte_io_handle::const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
 {
   (void) kind;
   LLFIO_LOG_FUNCTION_CALL(this);

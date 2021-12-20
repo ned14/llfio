@@ -25,11 +25,11 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef LLFIO_LOCKABLE_IO_HANDLE_H
 #define LLFIO_LOCKABLE_IO_HANDLE_H
 
-#include "io_handle.hpp"
+#include "byte_io_handle.hpp"
 
 #include <cassert>
 
-//! \file lockable_io_handle.hpp Provides a lockable i/o handle
+//! \file lockable_byte_io_handle.hpp Provides a lockable i/o handle
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -46,7 +46,7 @@ enum class lock_kind
   exclusive  //!< Exclude those requesting any kind of lock on the same inode.
 };
 
-/*! \class lockable_io_handle
+/*! \class lockable_byte_io_handle
 \brief A handle to something capable of scatter-gather i/o and which can exclude other concurrent users.
 Models `SharedMutex`, though note that the locks are per-handle, not per-thread.
 
@@ -54,50 +54,50 @@ Models `SharedMutex`, though note that the locks are per-handle, not per-thread.
 emulation of advisory whole-file locking. This causes byte range locks to work (probably) independently
 of these locks.
 */
-class LLFIO_DECL lockable_io_handle : public io_handle
+class LLFIO_DECL lockable_byte_io_handle : public byte_io_handle
 {
 public:
-  using path_type = io_handle::path_type;
-  using extent_type = io_handle::extent_type;
-  using size_type = io_handle::size_type;
-  using mode = io_handle::mode;
-  using creation = io_handle::creation;
-  using caching = io_handle::caching;
-  using flag = io_handle::flag;
-  using buffer_type = io_handle::buffer_type;
-  using const_buffer_type = io_handle::const_buffer_type;
-  using buffers_type = io_handle::buffers_type;
-  using const_buffers_type = io_handle::const_buffers_type;
-  template <class T> using io_request = io_handle::io_request<T>;
-  template <class T> using io_result = io_handle::io_result<T>;
+  using path_type = byte_io_handle::path_type;
+  using extent_type = byte_io_handle::extent_type;
+  using size_type = byte_io_handle::size_type;
+  using mode = byte_io_handle::mode;
+  using creation = byte_io_handle::creation;
+  using caching = byte_io_handle::caching;
+  using flag = byte_io_handle::flag;
+  using buffer_type = byte_io_handle::buffer_type;
+  using const_buffer_type = byte_io_handle::const_buffer_type;
+  using buffers_type = byte_io_handle::buffers_type;
+  using const_buffers_type = byte_io_handle::const_buffers_type;
+  template <class T> using io_request = byte_io_handle::io_request<T>;
+  template <class T> using io_result = byte_io_handle::io_result<T>;
 
 public:
   //! Default constructor
-  constexpr lockable_io_handle() {}  // NOLINT
-  ~lockable_io_handle() = default;
+  constexpr lockable_byte_io_handle() {}  // NOLINT
+  ~lockable_byte_io_handle() = default;
   //! Construct a handle from a supplied native handle
-  constexpr explicit lockable_io_handle(native_handle_type h, caching caching, flag flags, io_multiplexer *ctx)
-      : io_handle(h, caching, flags, ctx)
+  constexpr explicit lockable_byte_io_handle(native_handle_type h, caching caching, flag flags, byte_io_multiplexer *ctx)
+      : byte_io_handle(h, caching, flags, ctx)
   {
   }
   //! Explicit conversion from `handle` permitted
-  explicit constexpr lockable_io_handle(handle &&o, io_multiplexer *ctx) noexcept
-      : io_handle(std::move(o), ctx)
+  explicit constexpr lockable_byte_io_handle(handle &&o, byte_io_multiplexer *ctx) noexcept
+      : byte_io_handle(std::move(o), ctx)
   {
   }
-  //! Explicit conversion from `io_handle` permitted
-  explicit constexpr lockable_io_handle(io_handle &&o) noexcept
-      : io_handle(std::move(o))
+  //! Explicit conversion from `byte_io_handle` permitted
+  explicit constexpr lockable_byte_io_handle(byte_io_handle &&o) noexcept
+      : byte_io_handle(std::move(o))
   {
   }
   //! Move construction permitted
-  lockable_io_handle(lockable_io_handle &&) = default;
+  lockable_byte_io_handle(lockable_byte_io_handle &&) = default;
   //! No copy construction (use `clone()`)
-  lockable_io_handle(const lockable_io_handle &) = delete;
+  lockable_byte_io_handle(const lockable_byte_io_handle &) = delete;
   //! Move assignment permitted
-  lockable_io_handle &operator=(lockable_io_handle &&) = default;
+  lockable_byte_io_handle &operator=(lockable_byte_io_handle &&) = default;
   //! No copy assignment
-  lockable_io_handle &operator=(const lockable_io_handle &) = delete;
+  lockable_byte_io_handle &operator=(const lockable_byte_io_handle &) = delete;
 
   /*! \brief Locks the inode referred to by the open handle for exclusive access.
 
@@ -147,13 +147,13 @@ public:
   */
   class extent_guard
   {
-    friend class lockable_io_handle;
-    lockable_io_handle *_h{nullptr};
+    friend class lockable_byte_io_handle;
+    lockable_byte_io_handle *_h{nullptr};
     extent_type _offset{0}, _length{0};
     lock_kind _kind{lock_kind::unlocked};
 
   protected:
-    constexpr extent_guard(lockable_io_handle *h, extent_type offset, extent_type length, lock_kind kind)
+    constexpr extent_guard(lockable_byte_io_handle *h, extent_type offset, extent_type length, lock_kind kind)
         : _h(h)
         , _offset(offset)
         , _length(length)
@@ -201,10 +201,10 @@ public:
     //! True if extent guard is valid
     explicit operator bool() const noexcept { return _h != nullptr; }
 
-    //! The `lockable_io_handle` to be unlocked
-    lockable_io_handle *handle() const noexcept { return _h; }
-    //! Sets the `lockable_io_handle` to be unlocked
-    void set_handle(lockable_io_handle *h) noexcept { _h = h; }
+    //! The `lockable_byte_io_handle` to be unlocked
+    lockable_byte_io_handle *handle() const noexcept { return _h; }
+    //! Sets the `lockable_byte_io_handle` to be unlocked
+    void set_handle(lockable_byte_io_handle *h) noexcept { _h = h; }
     //! The extent to be unlocked
     std::tuple<extent_type, extent_type, lock_kind> extent() const noexcept { return std::make_tuple(_offset, _length, _kind); }
 
@@ -307,16 +307,16 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC void unlock_file_range(extent_type offset, extent_type bytes) noexcept;
 };
 
-/*! \brief RAII locker matching `std::unique_lock` for `lockable_io_handle`, but untemplated.
+/*! \brief RAII locker matching `std::unique_lock` for `lockable_byte_io_handle`, but untemplated.
  */
 class unique_file_lock
 {
-  lockable_io_handle *_h{nullptr};
+  lockable_byte_io_handle *_h{nullptr};
   lock_kind _lock_state{lock_kind::unlocked};
 
 public:
   unique_file_lock() = default;
-  explicit unique_file_lock(lockable_io_handle &h, lock_kind kind)
+  explicit unique_file_lock(lockable_byte_io_handle &h, lock_kind kind)
       : _h(&h)
   {
     if(kind == lock_kind::exclusive)
@@ -364,16 +364,16 @@ public:
   }
 
   //! Returns the associated mutex
-  lockable_io_handle *mutex() const noexcept { return _h; }
+  lockable_byte_io_handle *mutex() const noexcept { return _h; }
   //! True if the associated mutex is owned by this lock
   bool owns_lock() const noexcept { return (_h != nullptr) && _lock_state != lock_kind::unlocked; }
   //! True if the associated mutex is owned by this lock
   explicit operator bool() const noexcept { return owns_lock(); }
 
   //! Releases the mutex from management
-  lockable_io_handle *release() noexcept
+  lockable_byte_io_handle *release() noexcept
   {
-    lockable_io_handle *ret = _h;
+    lockable_byte_io_handle *ret = _h;
     _h = nullptr;
     return ret;
   }
@@ -480,9 +480,9 @@ LLFIO_V2_NAMESPACE_END
 #if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 #define LLFIO_INCLUDED_BY_HEADER 1
 #ifdef _WIN32
-#include "detail/impl/windows/lockable_io_handle.ipp"
+#include "detail/impl/windows/lockable_byte_io_handle.ipp"
 #else
-#include "detail/impl/posix/lockable_io_handle.ipp"
+#include "detail/impl/posix/lockable_byte_io_handle.ipp"
 #endif
 #undef LLFIO_INCLUDED_BY_HEADER
 #endif

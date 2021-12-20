@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../../io_handle.hpp"
+#include "../../../byte_io_handle.hpp"
 
 #if !LLFIO_INCLUDED_BY_HEADER || !defined(LLFIO_IO_HANDLE_H)
 #error This file should never be included directly
@@ -35,13 +35,13 @@ namespace test
   /* You generally speaking want threadsafe and non-threadsafe implementations of
   an i/o multiplexer to avoid all locking overheads in the non-threadsafe edition.
 
-  io_multiplexer_impl is defined in io_multiplexer.ipp. It provides _lock_guard
+  byte_io_multiplexer_impl is defined in byte_io_multiplexer.ipp. It provides _lock_guard
   and _lock appropriately defined to a null mutex or std::mutex so you can write
   identical implementation code.
   */
-  template <bool is_threadsafe> class null_multiplexer final : public io_multiplexer_impl<is_threadsafe>
+  template <bool is_threadsafe> class null_multiplexer final : public byte_io_multiplexer_impl<is_threadsafe>
   {
-    using _base = io_multiplexer_impl<is_threadsafe>;
+    using _base = byte_io_multiplexer_impl<is_threadsafe>;
     using _multiplexer_lock_guard = typename _base::_lock_guard;
 
     using path_type = typename _base::path_type;
@@ -189,21 +189,21 @@ namespace test
     // virtual native_handle_type release() noexcept override { return _base::release(); }
 
     // This registers an i/o handle with the system i/o multiplexer
-    virtual result<uint8_t> do_io_handle_register(io_handle * /*unused*/) noexcept override
+    virtual result<uint8_t> do_byte_io_handle_register(byte_io_handle * /*unused*/) noexcept override
     {
       _multiplexer_lock_guard g(this->_lock);
       return success();
     }
     // This deregisters an i/o handle from the system i/o multiplexer
-    virtual result<void> do_io_handle_deregister(io_handle * /*unused*/) noexcept override
+    virtual result<void> do_byte_io_handle_deregister(byte_io_handle * /*unused*/) noexcept override
     {
       _multiplexer_lock_guard g(this->_lock);
       return success();
     }
 
     // This returns the maximum *atomic* number of scatter-gather i/o that this i/o multiplexer can do
-    // This is the value returned by io_handle::max_buffers()
-    virtual size_t do_io_handle_max_buffers(const io_handle * /*unused*/) const noexcept override { return 1; }
+    // This is the value returned by byte_io_handle::max_buffers()
+    virtual size_t do_byte_io_handle_max_buffers(const byte_io_handle * /*unused*/) const noexcept override { return 1; }
 
     // This allocates a registered i/o buffer with the system i/o multiplexer
     // The default implementation calls mmap()/VirtualAlloc(), creates a deallocating
@@ -214,7 +214,7 @@ namespace test
     // RDMA device into the CPU. The program would read and write that shared memory. Upon
     // i/o, the buffer would be locked/unmapped for RDMA, thus implementing true zero whole
     // system memory copy i/o
-    // virtual result<registered_buffer_type> do_io_handle_allocate_registered_buffer(io_handle *h, size_t &bytes) noexcept override {}
+    // virtual result<registered_buffer_type> do_byte_io_handle_allocate_registered_buffer(byte_io_handle *h, size_t &bytes) noexcept override {}
 
     // Code other side of the formal ABI boundary allocate the storage for i/o operation
     // states. They need to know how many bytes to allocate, and what alignment they must
@@ -227,7 +227,7 @@ namespace test
     virtual std::pair<size_t, size_t> io_state_requirements() noexcept override { return {sizeof(_null_operation_state), alignof(_null_operation_state)}; }
 
     // These are straight i/o state construction functions, one each for read, write and barrier
-    virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept override
+    virtual io_operation_state *construct(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept override
     {
       assert(storage.size() >= sizeof(_null_operation_state));
       assert(((uintptr_t) storage.data() % alignof(_null_operation_state)) == 0);
@@ -237,7 +237,7 @@ namespace test
       }
       return new(storage.data()) _null_operation_state(_h, _visitor, std::move(b), d, std::move(reqs));
     }
-    virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept override
+    virtual io_operation_state *construct(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept override
     {
       assert(storage.size() >= sizeof(_null_operation_state));
       assert(((uintptr_t) storage.data() % alignof(_null_operation_state)) == 0);
@@ -247,7 +247,7 @@ namespace test
       }
       return new(storage.data()) _null_operation_state(_h, _visitor, std::move(b), d, std::move(reqs));
     }
-    virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept override
+    virtual io_operation_state *construct(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept override
     {
       assert(storage.size() >= sizeof(_null_operation_state));
       assert(((uintptr_t) storage.data() % alignof(_null_operation_state)) == 0);
@@ -269,7 +269,7 @@ namespace test
         abort();
       case io_operation_state_type::read_initialised:
       {
-        io_handle::io_result<io_handle::buffers_type> ret(state->payload.noncompleted.params.read.reqs.buffers);
+        byte_io_handle::io_result<byte_io_handle::buffers_type> ret(state->payload.noncompleted.params.read.reqs.buffers);
         /* Try to eagerly complete the i/o now, if so ... */
         if(false /* completed immediately */)
         {
@@ -289,7 +289,7 @@ namespace test
       }
       case io_operation_state_type::write_initialised:
       {
-        io_handle::io_result<io_handle::const_buffers_type> ret(state->payload.noncompleted.params.write.reqs.buffers);
+        byte_io_handle::io_result<byte_io_handle::const_buffers_type> ret(state->payload.noncompleted.params.write.reqs.buffers);
         if(false /* completed immediately */)
         {
           state->write_completed(std::move(ret).value());
@@ -307,7 +307,7 @@ namespace test
       }
       case io_operation_state_type::barrier_initialised:
       {
-        io_handle::io_result<io_handle::const_buffers_type> ret(state->payload.noncompleted.params.write.reqs.buffers);
+        byte_io_handle::io_result<byte_io_handle::const_buffers_type> ret(state->payload.noncompleted.params.write.reqs.buffers);
         if(false /* completed immediately */)
         {
           state->barrier_completed(std::move(ret).value());
@@ -338,9 +338,9 @@ namespace test
 
     // If you can combine `construct()` with `init_io_operation()` into a more efficient implementation,
     // you should override these
-    // virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept override
-    // virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept override
-    // virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept override
+    // virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept override
+    // virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept override
+    // virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept override
 
     // On some implementations, `init_io_operation()` just enqueues request packets, and
     // a separate operation is required to submit the enqueued list.
@@ -369,7 +369,7 @@ namespace test
           break;
         case io_operation_state_type::read_initiated:
         {
-          io_handle::io_result<io_handle::buffers_type> ret(state->payload.noncompleted.params.read.reqs.buffers);
+          byte_io_handle::io_result<byte_io_handle::buffers_type> ret(state->payload.noncompleted.params.read.reqs.buffers);
           state->_read_completed(g, std::move(ret).value());
           if(_disable_immediate_completions)
           {
@@ -391,7 +391,7 @@ namespace test
         }
         case io_operation_state_type::write_initiated:
         {
-          io_handle::io_result<io_handle::const_buffers_type> ret(state->payload.noncompleted.params.write.reqs.buffers);
+          byte_io_handle::io_result<byte_io_handle::const_buffers_type> ret(state->payload.noncompleted.params.write.reqs.buffers);
           state->_write_completed(g, std::move(ret).value());
           if(_disable_immediate_completions)
           {
@@ -405,7 +405,7 @@ namespace test
         }
         case io_operation_state_type::barrier_initiated:
         {
-          io_handle::io_result<io_handle::const_buffers_type> ret(state->payload.noncompleted.params.barrier.reqs.buffers);
+          byte_io_handle::io_result<byte_io_handle::const_buffers_type> ret(state->payload.noncompleted.params.barrier.reqs.buffers);
           state->_barrier_completed(g, std::move(ret).value());
           if(_disable_immediate_completions)
           {
@@ -451,21 +451,21 @@ namespace test
         break;
       case io_operation_state_type::read_initiated:
       {
-        io_handle::io_result<io_handle::buffers_type> ret(errc::operation_canceled);
+        byte_io_handle::io_result<byte_io_handle::buffers_type> ret(errc::operation_canceled);
         state->_read_completed(g, std::move(ret).value());
         state->count = 1;
         return io_operation_state_type::read_completed;
       }
       case io_operation_state_type::write_initiated:
       {
-        io_handle::io_result<io_handle::const_buffers_type> ret(errc::operation_canceled);
+        byte_io_handle::io_result<byte_io_handle::const_buffers_type> ret(errc::operation_canceled);
         state->_write_completed(g, std::move(ret).value());
         state->count = 1;
         return io_operation_state_type::write_or_barrier_completed;
       }
       case io_operation_state_type::barrier_initiated:
       {
-        io_handle::io_result<io_handle::const_buffers_type> ret(errc::operation_canceled);
+        byte_io_handle::io_result<byte_io_handle::const_buffers_type> ret(errc::operation_canceled);
         state->_barrier_completed(g, std::move(ret).value());
         state->count = 1;
         return io_operation_state_type::write_or_barrier_completed;
@@ -559,7 +559,7 @@ namespace test
     }
   };
 
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<io_multiplexer_ptr> multiplexer_null(size_t threads, bool disable_immediate_completions) noexcept
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<byte_io_multiplexer_ptr> multiplexer_null(size_t threads, bool disable_immediate_completions) noexcept
   {
     try
     {
@@ -567,11 +567,11 @@ namespace test
       {
         auto ret = std::make_unique<null_multiplexer<false>>();
         OUTCOME_TRY(ret->init(1, disable_immediate_completions));
-        return io_multiplexer_ptr(ret.release());
+        return byte_io_multiplexer_ptr(ret.release());
       }
       auto ret = std::make_unique<null_multiplexer<true>>();
       OUTCOME_TRY(ret->init(threads, disable_immediate_completions));
-      return io_multiplexer_ptr(ret.release());
+      return byte_io_multiplexer_ptr(ret.release());
     }
     catch(...)
     {
