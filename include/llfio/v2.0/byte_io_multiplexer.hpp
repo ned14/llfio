@@ -414,7 +414,8 @@ public:
         : Base()
     {
     }
-    template <class... Args>
+    LLFIO_TEMPLATE(class... Args)
+    LLFIO_TREQUIRES(LLFIO_TEXPR(Base(std::declval<Args>()...)))
     constexpr io_result(Args &&... args)
         : Base(std::forward<Args>(args)...)
     {

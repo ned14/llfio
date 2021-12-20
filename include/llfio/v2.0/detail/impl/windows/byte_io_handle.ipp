@@ -25,10 +25,18 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../byte_io_handle.hpp"
 #include "import.hpp"
 
+#include <WinSock2.h>
+#include <ws2ipdef.h>
+
 LLFIO_V2_NAMESPACE_BEGIN
 
 size_t byte_io_handle::_do_max_buffers() const noexcept
 {
+  if(is_socket())
+  {
+      // The actual limit appears to be unspecified on Windows
+    return 64;
+  }
   return 1;  // TODO FIXME support ReadFileScatter/WriteFileGather
 }
 
@@ -65,11 +73,6 @@ inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &
 {
   using namespace windows_nt_kernel;
   using EIOSB = windows_nt_kernel::IO_STATUS_BLOCK;
-  if(d && !nativeh.is_nonblocking())
-  {
-    ret = errc::not_supported;
-    return true;
-  }
   LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
   ols = span<EIOSB>(ols.data(), reqs.buffers.size());
   memset(ols.data(), 0, reqs.buffers.size() * sizeof(EIOSB));
@@ -183,13 +186,76 @@ byte_io_handle::io_result<byte_io_handle::buffers_type> byte_io_handle::_do_read
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   LLFIO_LOG_FUNCTION_CALL(this);
-  using EIOSB = windows_nt_kernel::IO_STATUS_BLOCK;
-  std::array<EIOSB, 64> _ols{};
+  byte_io_handle::io_result<byte_io_handle::buffers_type> ret(reqs.buffers);
+  if(d && !_v.is_nonblocking())
+  {
+    return errc::not_supported;
+  }
   if(reqs.buffers.size() > 64)
   {
     return errc::argument_list_too_long;
   }
-  byte_io_handle::io_result<byte_io_handle::buffers_type> ret(reqs.buffers);
+  if(is_socket())
+  {
+    LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+    std::array<WSABUF, 64> bufs;
+    for(size_t n = 0; n < reqs.buffers.size(); n++)
+    {
+      bufs[n].buf = (char *) reqs.buffers[n].data();
+      bufs[n].len = (ULONG) reqs.buffers[n].size();
+    }
+    DWORD received = 0, flags = 0;
+    WSAOVERLAPPED ol;
+    memset(&ol, 0, sizeof(ol));
+    ol.Internal = (ULONG_PTR) - 1;
+    if(SOCKET_ERROR == WSARecv(_v.sock, bufs.data(), (DWORD) reqs.buffers.size(), &received, &flags, d ? &ol : nullptr, nullptr))
+    {
+      auto retcode = WSAGetLastError();
+      if(WSA_IO_PENDING != retcode)
+      {
+        return generic_error((errc) retcode);
+      }
+      deadline nd;
+      LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+      if(STATUS_TIMEOUT == ntwait(_v.h, ol, nd))
+      {
+        // ntwait cancels the i/o, undoer will cancel all the other i/o
+        auto r = [&]() -> result<void>
+        {
+          LLFIO_WIN_DEADLINE_TO_TIMEOUT_LOOP(d);
+          return success();
+        }();
+        if(!r)
+        {
+          return std::move(r).error();
+        }
+      }
+      if(!WSAGetOverlappedResult(_v.sock, &ol, &received, false, &flags))
+      {
+        return generic_error((errc) WSAGetLastError());
+      }
+    }
+    ret = {reqs.buffers.data(), 0};
+    for(size_t n = 0; n < reqs.buffers.size() && received>0; n++)
+    {
+      if(reqs.buffers[n].size() >= received)
+      {
+        received -= (DWORD) reqs.buffers[n].size();
+      }
+      else
+      {
+        reqs.buffers[n] = {reqs.buffers[n].data(), received};
+        received = 0;
+      }
+      if(reqs.buffers[n].size() != 0)
+      {
+        ret = {reqs.buffers.data(), n + 1};
+      }
+    }
+    return ret;
+  }
+  using EIOSB = windows_nt_kernel::IO_STATUS_BLOCK;
+  std::array<EIOSB, 64> _ols{};
   do_read_write<true>(ret, NtReadFile, _v, nullptr, {_ols.data(), _ols.size()}, reqs, d);
   return ret;
 }
@@ -199,13 +265,76 @@ byte_io_handle::io_result<byte_io_handle::const_buffers_type> byte_io_handle::_d
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   LLFIO_LOG_FUNCTION_CALL(this);
-  using EIOSB = windows_nt_kernel::IO_STATUS_BLOCK;
-  std::array<EIOSB, 64> _ols{};
+  byte_io_handle::io_result<byte_io_handle::const_buffers_type> ret(reqs.buffers);
+  if(d && !_v.is_nonblocking())
+  {
+    return errc::not_supported;
+  }
   if(reqs.buffers.size() > 64)
   {
     return errc::argument_list_too_long;
   }
-  byte_io_handle::io_result<byte_io_handle::const_buffers_type> ret(reqs.buffers);
+  if(is_socket())
+  {
+    LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+    std::array<WSABUF, 64> bufs;
+    for(size_t n = 0; n < reqs.buffers.size(); n++)
+    {
+      bufs[n].buf = (char *) reqs.buffers[n].data();
+      bufs[n].len = (ULONG) reqs.buffers[n].size();
+    }
+    DWORD sent = 0, flags = 0;
+    WSAOVERLAPPED ol;
+    memset(&ol, 0, sizeof(ol));
+    ol.Internal = (ULONG_PTR) - 1;
+    if(SOCKET_ERROR == WSASend(_v.sock, bufs.data(), (DWORD) reqs.buffers.size(), &sent, flags, d ? &ol : nullptr, nullptr))
+    {
+      auto retcode = WSAGetLastError();
+      if(WSA_IO_PENDING != retcode)
+      {
+        return generic_error((errc) retcode);
+      }
+      deadline nd;
+      LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+      if(STATUS_TIMEOUT == ntwait(_v.h, ol, nd))
+      {
+        // ntwait cancels the i/o, undoer will cancel all the other i/o
+        auto r = [&]() -> result<void>
+        {
+          LLFIO_WIN_DEADLINE_TO_TIMEOUT_LOOP(d);
+          return success();
+        }();
+        if(!r)
+        {
+          return std::move(r).error();
+        }
+      }
+      if(!WSAGetOverlappedResult(_v.sock, &ol, &sent, false, &flags))
+      {
+        return generic_error((errc) WSAGetLastError());
+      }
+    }
+    ret = {reqs.buffers.data(), 0};
+    for(size_t n = 0; n < reqs.buffers.size() && sent > 0; n++)
+    {
+      if(reqs.buffers[n].size() >= sent)
+      {
+        sent -= (DWORD) reqs.buffers[n].size();
+      }
+      else
+      {
+        reqs.buffers[n] = {reqs.buffers[n].data(), sent};
+        sent = 0;
+      }
+      if(reqs.buffers[n].size() != 0)
+      {
+        ret = {reqs.buffers.data(), n + 1};
+      }
+    }
+    return ret;
+  }
+  using EIOSB = windows_nt_kernel::IO_STATUS_BLOCK;
+  std::array<EIOSB, 64> _ols{};
   do_read_write<true>(ret, NtWriteFile, _v, nullptr, {_ols.data(), _ols.size()}, reqs, d);
   return ret;
 }

@@ -397,6 +397,10 @@ public:
   bool is_allocation() const noexcept { return _v.is_allocation(); }
   //! True if a path or a directory
   bool is_path() const noexcept { return _v.is_path(); }
+  //! True if a TLS socket
+  bool is_tls_socket() const noexcept { return _v.is_tls_socket(); }
+  //! True if a HTTP socket
+  bool is_http_socket() const noexcept { return _v.is_http_socket(); }
 
   //! Kernel cache strategy used by this handle
   caching kernel_caching() const noexcept
