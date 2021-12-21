@@ -58,11 +58,11 @@ namespace ip
   /*! \class address
   \brief A version independent IP address.
 
-  This is pretty close to `asio::ip::address`, but it also adds `port()` from `asio::ip::endpoint`
+  This is inspired by `asio::ip::address`, but it also adds `port()` from `asio::ip::endpoint`
   and a few other observer member functions i.e. it fuses ASIO's many types into one.
 
   The reason why is that this type is a simple wrap of `struct sockaddr_in` or `struct sockaddr_in6`,
-  it doesn't split those structures.
+  it doesn't split those structures into multiple C++ types.
   */
   class LLFIO_DECL address
   {
@@ -122,8 +122,10 @@ namespace ip
     LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool is_loopback() const noexcept;
     //! True if address is multicast
     LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool is_multicast() const noexcept;
-    //! True if address is unspecified
-    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool is_unspecified() const noexcept;
+    //! True if address is any
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool is_any() const noexcept;
+    //! True if address is default constructed
+    bool is_default() const noexcept { return _family == 0; }
     //! True if address is v4
     LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool is_v4() const noexcept;
     //! True if address is v6
@@ -259,6 +261,35 @@ unless its deadline is zero.
 If you want to create a socket which awaits connections, you need
 to instance a `listening_socket_handle`. Reads from that handle yield
 new `byte_socket_handle` instances.
+
+### `caching::safety_barriers`
+
+TCP connections need to be closed by both parties in a specific way
+to not cause the tail of data sent to get truncated:
+
+1. Local side calls `shutdown(SHUT_WR)` to send the FIN packet.
+2. Remote side calls `shutdown(SHUT_WR)` to send the FIN packet.
+3. Local side `read()` returns no bytes read as remote side has closed
+down. Local side can now call `close()`.
+4. Remote side `read()` returns no bytes read as local side has closed
+down. Remote side can now call `close()`.
+
+This is obviously inefficient and prone to issues if the remote side
+is not a good faith actor, so most TCP based protocols such as HTTP
+send the length of the data to be transferred, and one loops reading
+until that length of data is read, whereupon the TCP connection is
+immediately forced closed without the TCP shutdown ceremony.
+
+The default caching is when `close()` is called it immediately
+closes the socket handle, causing an abort in the connection if any
+data remains in buffers. If you wish `close()` to instead issue
+a shutdown and to then block on `read()` until it returns no bytes
+before closing, set `caching::safety_barriers`.
+
+This *should* avoid the need for `SO_LINGER` for remote sides
+acting in good faith. If you don't control remote side code quality,
+you may still need to set `SO_LINGER`, though be aware that that
+socket option is full of gotchas.
 */
 class LLFIO_DECL byte_socket_handle : public byte_io_handle
 {

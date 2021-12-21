@@ -35,7 +35,7 @@ static inline void TestSocketAddress()
     auto a = llfio::ip::address_v4::loopback();
     BOOST_CHECK(a.is_loopback());
     BOOST_CHECK(!a.is_multicast());
-    BOOST_CHECK(!a.is_unspecified());
+    BOOST_CHECK(!a.is_any());
     BOOST_CHECK(a.is_v4());
     BOOST_CHECK(!a.is_v6());
     BOOST_CHECK(a.port()==0);
@@ -54,7 +54,7 @@ static inline void TestSocketAddress()
     auto a = llfio::ip::address_v6::loopback();
     BOOST_CHECK(a.is_loopback());
     BOOST_CHECK(!a.is_multicast());
-    BOOST_CHECK(!a.is_unspecified());
+    BOOST_CHECK(!a.is_any());
     BOOST_CHECK(!a.is_v4());
     BOOST_CHECK(a.is_v6());
     BOOST_CHECK(a.port() == 0);
@@ -84,7 +84,7 @@ static inline void TestSocketAddress()
     auto a = llfio::ip::address_v4::any();
     BOOST_CHECK(!a.is_loopback());
     BOOST_CHECK(!a.is_multicast());
-    BOOST_CHECK(a.is_unspecified());
+    BOOST_CHECK(a.is_any());
     BOOST_CHECK(a.is_v4());
     BOOST_CHECK(!a.is_v6());
     BOOST_CHECK(a.port() == 0);
@@ -103,7 +103,7 @@ static inline void TestSocketAddress()
     auto a = llfio::ip::address_v6::any();
     BOOST_CHECK(!a.is_loopback());
     BOOST_CHECK(!a.is_multicast());
-    BOOST_CHECK(a.is_unspecified());
+    BOOST_CHECK(a.is_any());
     BOOST_CHECK(!a.is_v4());
     BOOST_CHECK(a.is_v6());
     BOOST_CHECK(a.port() == 0);
@@ -133,7 +133,7 @@ static inline void TestSocketAddress()
     auto a = llfio::ip::make_address("78.68.1.255:1234").value();
     BOOST_CHECK(!a.is_loopback());
     BOOST_CHECK(!a.is_multicast());
-    BOOST_CHECK(a.is_unspecified());
+    BOOST_CHECK(!a.is_any());
     BOOST_CHECK(a.is_v4());
     BOOST_CHECK(!a.is_v6());
     BOOST_CHECK(a.port() == 1234);
@@ -151,7 +151,7 @@ static inline void TestSocketAddress()
     auto a = llfio::ip::make_address("[78aa:bb68::1:255]:1234").value();
     BOOST_CHECK(!a.is_loopback());
     BOOST_CHECK(!a.is_multicast());
-    BOOST_CHECK(a.is_unspecified());
+    BOOST_CHECK(!a.is_any());
     BOOST_CHECK(!a.is_v4());
     BOOST_CHECK(a.is_v6());
     BOOST_CHECK(a.port() == 1234);
@@ -182,7 +182,7 @@ static inline void TestSocketAddress()
     auto a = llfio::ip::make_address("[78aa:0:0:bb68:0:0:0:255]:1234").value();
     BOOST_CHECK(!a.is_loopback());
     BOOST_CHECK(!a.is_multicast());
-    BOOST_CHECK(a.is_unspecified());
+    BOOST_CHECK(!a.is_any());
     BOOST_CHECK(!a.is_v4());
     BOOST_CHECK(a.is_v6());
     BOOST_CHECK(a.port() == 1234);
@@ -212,7 +212,7 @@ static inline void TestSocketAddress()
     auto a = llfio::ip::make_address("[78aa:0:0:0:bb68:0:0:255]:1234").value();
     BOOST_CHECK(!a.is_loopback());
     BOOST_CHECK(!a.is_multicast());
-    BOOST_CHECK(a.is_unspecified());
+    BOOST_CHECK(!a.is_any());
     BOOST_CHECK(!a.is_v4());
     BOOST_CHECK(a.is_v6());
     BOOST_CHECK(a.port() == 1234);
@@ -237,6 +237,36 @@ static inline void TestSocketAddress()
     ss << a;
     std::cout << ss.str() << std::endl;
     BOOST_CHECK(ss.str() == "[78aa::bb68:0:0:255]:1234");
+  }
+  {
+    auto a = llfio::ip::make_address("[1000::]:1234").value();
+    BOOST_CHECK(!a.is_loopback());
+    BOOST_CHECK(!a.is_multicast());
+    BOOST_CHECK(!a.is_any());
+    BOOST_CHECK(!a.is_v4());
+    BOOST_CHECK(a.is_v6());
+    BOOST_CHECK(a.port() == 1234);
+    BOOST_CHECK(a.to_bytes().size() == 16);
+    BOOST_CHECK(a.to_bytes()[0] == (llfio::byte) 0x10);
+    BOOST_CHECK(a.to_bytes()[1] == (llfio::byte) 0);
+    BOOST_CHECK(a.to_bytes()[2] == (llfio::byte) 0);
+    BOOST_CHECK(a.to_bytes()[3] == (llfio::byte) 0);
+    BOOST_CHECK(a.to_bytes()[4] == (llfio::byte) 0);
+    BOOST_CHECK(a.to_bytes()[5] == (llfio::byte) 0);
+    BOOST_CHECK(a.to_bytes()[6] == (llfio::byte) 0);
+    BOOST_CHECK(a.to_bytes()[7] == (llfio::byte) 0);
+    BOOST_CHECK(a.to_bytes()[8] == (llfio::byte) 0);
+    BOOST_CHECK(a.to_bytes()[9] == (llfio::byte) 0);
+    BOOST_CHECK(a.to_bytes()[10] == (llfio::byte) 0);
+    BOOST_CHECK(a.to_bytes()[11] == (llfio::byte) 0);
+    BOOST_CHECK(a.to_bytes()[12] == (llfio::byte) 0);
+    BOOST_CHECK(a.to_bytes()[13] == (llfio::byte) 0);
+    BOOST_CHECK(a.to_bytes()[14] == (llfio::byte) 0);
+    BOOST_CHECK(a.to_bytes()[15] == (llfio::byte) 0);
+    std::stringstream ss;
+    ss << a;
+    std::cout << ss.str() << std::endl;
+    BOOST_CHECK(ss.str() == "[1000::]:1234");
   }
 }
 
