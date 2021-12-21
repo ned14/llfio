@@ -43,6 +43,11 @@ LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 class byte_socket_handle;
 class listening_socket_handle;
+namespace ip
+{
+  class address;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC std::ostream &operator<<(std::ostream &s, const address &v);
+}  // namespace ip
 
 namespace detail
 {
@@ -66,9 +71,9 @@ namespace ip
   */
   class LLFIO_DECL address
   {
-    friend class byte_socket_handle;
-    friend class listening_socket_handle;
-    friend LLFIO_HEADERS_ONLY_FUNC_SPEC std::ostream &operator<<(std::ostream &s, const address &v);
+    friend class LLFIO_V2_NAMESPACE::byte_socket_handle;
+    friend class LLFIO_V2_NAMESPACE::listening_socket_handle;
+    friend LLFIO_HEADERS_ONLY_MEMFUNC_SPEC std::ostream &operator<<(std::ostream &s, const address &v);
 
   protected:
     union
@@ -81,10 +86,9 @@ namespace ip
         {
           struct
           {
-            uint32_t _flowinfo{0};
-            byte _addr[16]{(byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0,
-                           (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0};
-            uint32_t _scope_id{0};
+            uint32_t _flowinfo;
+            byte _addr[16];
+            uint32_t _scope_id;
           } ipv6;
           union
           {
@@ -100,7 +104,10 @@ namespace ip
     constexpr address() noexcept
         : _family(0)
         , _port(0)
-        , ipv4{}
+        , ipv6{0,
+               {to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0),
+                to_byte(0), to_byte(0), to_byte(0), to_byte(0)},
+               0}
     {
     }
     LLFIO_HEADERS_ONLY_MEMFUNC_SPEC explicit address(const sockaddr_in &storage) noexcept;
@@ -154,7 +161,7 @@ namespace ip
   */
   class LLFIO_DECL address_v4 : public address
   {
-    friend LLFIO_HEADERS_ONLY_FUNC_SPEC result<address_v4> make_address_v4(string_view str) noexcept;
+    friend LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<address_v4> make_address_v4(string_view str) noexcept;
 
   public:
 #if QUICKCPPLIB_USE_STD_SPAN
@@ -190,7 +197,7 @@ namespace ip
   */
   class LLFIO_DECL address_v6 : public address
   {
-    friend LLFIO_HEADERS_ONLY_FUNC_SPEC result<address_v6> make_address_v6(string_view str) noexcept;
+    friend LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<address_v6> make_address_v6(string_view str) noexcept;
 
   public:
 #if QUICKCPPLIB_USE_STD_SPAN
@@ -310,6 +317,10 @@ public:
   template <class T> using io_request = byte_io_handle::io_request<T>;
   template <class T> using io_result = byte_io_handle::io_result<T>;
 
+protected:
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> _do_read(io_request<buffers_type> reqs, deadline d) noexcept override;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_write(io_request<const_buffers_type> reqs, deadline d) noexcept override;
+
 public:
   //! Default constructor
   constexpr byte_socket_handle() {}  // NOLINT
@@ -409,7 +420,7 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> shutdown(shutdown_kind = shutdown_write) noexcept;
 
   /*! Create a socket handle connecting to a specified address.
-  \param address The address to connect to.
+  \param addr The address to connect to.
   \param _mode How to open the socket. If this is `mode::append`, the read side of the socket
   is shutdown; if this is `mode::read`, the write side of the socket is shutdown.
   \param _caching How to ask the kernel to cache the socket. If writes are not cached,
@@ -427,7 +438,13 @@ public:
   {
     if(_v)
     {
-      (void) byte_socket_handle::close();
+      auto r = byte_socket_handle::close();
+      if(!r)
+      {
+        std::cout << r.error().message() << std::endl;
+        LLFIO_LOG_FATAL(_v.fd, "byte_socket_handle::~byte_socket_handle() close failed");
+        abort();
+      }
     }
   }
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;

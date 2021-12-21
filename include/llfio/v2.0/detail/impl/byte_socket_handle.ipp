@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../byte_io_handle.hpp"
+#include "../../byte_socket_handle.hpp"
 
 #ifdef _WIN32
 #include <WinSock2.h>
@@ -57,15 +57,15 @@ namespace ip
   }
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool address::is_multicast() const noexcept
   {
-    return (is_v4() && IN_MULTICAST(ntohl(ipv4._addr_be))) || (is_v6() && ipv6._addr[0] == (byte) 0xff && ipv6._addr[1] == (byte) 0x00);
+    return (is_v4() && IN_MULTICAST(ntohl(ipv4._addr_be))) || (is_v6() && ipv6._addr[0] == to_byte(0xff) && ipv6._addr[1] == to_byte(0x00));
   }
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool address::is_any() const noexcept
   {
     return (_family == AF_INET && 0 == ipv4._addr_be && 0 == _port) ||
-           (_family == AF_INET6 && ipv6._addr[0] == (byte) 0 && ipv6._addr[1] == (byte) 0 && ipv6._addr[2] == (byte) 0 && ipv6._addr[3] == (byte) 0 &&
-            ipv6._addr[4] == (byte) 0 && ipv6._addr[5] == (byte) 0 && ipv6._addr[6] == (byte) 0 && ipv6._addr[7] == (byte) 0 && ipv6._addr[8] == (byte) 0 &&
-            ipv6._addr[9] == (byte) 0 && ipv6._addr[10] == (byte) 0 && ipv6._addr[11] == (byte) 0 && ipv6._addr[12] == (byte) 0 && ipv6._addr[13] == (byte) 0 &&
-            ipv6._addr[14] == (byte) 0 && ipv6._addr[15] == (byte) 0 && _port == 0);
+           (_family == AF_INET6 && ipv6._addr[0] == to_byte(0) && ipv6._addr[1] == to_byte(0) && ipv6._addr[2] == to_byte(0) && ipv6._addr[3] == to_byte(0) &&
+            ipv6._addr[4] == to_byte(0) && ipv6._addr[5] == to_byte(0) && ipv6._addr[6] == to_byte(0) && ipv6._addr[7] == to_byte(0) &&
+            ipv6._addr[8] == to_byte(0) && ipv6._addr[9] == to_byte(0) && ipv6._addr[10] == to_byte(0) && ipv6._addr[11] == to_byte(0) &&
+            ipv6._addr[12] == to_byte(0) && ipv6._addr[13] == to_byte(0) && ipv6._addr[14] == to_byte(0) && ipv6._addr[15] == to_byte(0) && _port == 0);
   }
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool address::is_v4() const noexcept { return _family == AF_INET; }
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool address::is_v6() const noexcept { return _family == AF_INET6; }
@@ -84,10 +84,15 @@ namespace ip
 
   LLFIO_HEADERS_ONLY_FUNC_SPEC std::ostream &operator<<(std::ostream &s, const address &v)
   {
+    auto print_byte = [](const byte &b) -> uint16_t
+    {
+      auto *v = (const uint8_t *) &b;
+      return *v;
+    };
     switch(v._family)
     {
     case AF_INET:
-      return s << (uint16_t) v.ipv4._addr[0] << "." << (uint16_t) v.ipv4._addr[1] << "." << (uint16_t) v.ipv4._addr[2] << "." << (uint16_t) v.ipv4._addr[3]
+      return s << print_byte(v.ipv4._addr[0]) << "." << print_byte(v.ipv4._addr[1]) << "." << print_byte(v.ipv4._addr[2]) << "." << print_byte(v.ipv4._addr[3])
                << ":" << v._port;
     case AF_INET6:
     {
@@ -96,15 +101,15 @@ namespace ip
       for(size_t n = 0; n < 8; n++)
       {
 #ifdef __BIG_ENDIAN__
-        ss << ((uint16_t) v.ipv6._addr[n * 2 + 0] | ((uint16_t) v.ipv6._addr[n * 2 + 1] << 8)) << ":";
+        ss << (print_byte(v.ipv6._addr[n * 2 + 0]) | (print_byte(v.ipv6._addr[n * 2 + 1]) << 8)) << ":";
 #else
-        ss << ((uint16_t) v.ipv6._addr[n * 2 + 1] | ((uint16_t) v.ipv6._addr[n * 2 + 0] << 8)) << ":";
+        ss << (print_byte(v.ipv6._addr[n * 2 + 1]) | (print_byte(v.ipv6._addr[n * 2 + 0]) << 8)) << ":";
 #endif
       }
       ss << std::dec << "]" << v._port;
-      std::string str(std::move(ss.str()));
+      std::string str(std::move(ss).str());
       string_view zeros(":0:0:0:0:0:0:0:0:");
-      if(0 == str.find(zeros))
+      if(0 == string_view(str).find(zeros))
       {
         str.replace(0, zeros.size(), "::::");
       }
@@ -112,7 +117,7 @@ namespace ip
       {
         for(size_t len = zeros.size(); len > 3; len -= 2)
         {
-          auto idx = str.find(zeros.substr(0, len));
+          auto idx = string_view(str).find(zeros.substr(0, len));
           if(idx != str.npos)
           {
             str.replace(idx, len, (idx == 0 || (str[idx + len] == ']')) ? ":::" : "::");
@@ -155,7 +160,8 @@ namespace ip
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<address_v4> make_address_v4(string_view str) noexcept
   {
     address_v4 ret(0);
-    auto parse = [&](auto &out, size_t &idx, char sep) -> result<void> {
+    auto parse = [&](auto &out, size_t &idx, char sep) -> result<void>
+    {
       if(idx >= str.size())
       {
         return errc::invalid_argument;
@@ -172,14 +178,14 @@ namespace ip
         return errc::invalid_argument;
       }
       idx = idx2 + 1;
-      out = reinterpret_cast<decltype(out)>(res);
+      out = static_cast<std::decay_t<decltype(out)>>(res);
       return success();
     };
     size_t idx = 0;
-    OUTCOME_TRY(parse(ret.ipv4._addr[0], idx, '.'));
-    OUTCOME_TRY(parse(ret.ipv4._addr[1], idx, '.'));
-    OUTCOME_TRY(parse(ret.ipv4._addr[2], idx, '.'));
-    OUTCOME_TRY(parse(ret.ipv4._addr[3], idx, ':'));
+    OUTCOME_TRY(parse(*(uint8_t *) &ret.ipv4._addr[0], idx, '.'));
+    OUTCOME_TRY(parse(*(uint8_t *) &ret.ipv4._addr[1], idx, '.'));
+    OUTCOME_TRY(parse(*(uint8_t *) &ret.ipv4._addr[2], idx, '.'));
+    OUTCOME_TRY(parse(*(uint8_t *) &ret.ipv4._addr[3], idx, ':'));
     OUTCOME_TRY(parse(ret._port, idx, 0));
     return ret;
   }
@@ -210,7 +216,8 @@ namespace ip
     {
       return errc::invalid_argument;
     }
-    auto parse = [&](size_t &idx, char sep) -> result<uint16_t> {
+    auto parse = [&](size_t &idx, char sep) -> result<uint16_t>
+    {
       if(idx >= str.size())
       {
         return errc::invalid_argument;
@@ -233,12 +240,13 @@ namespace ip
     do
     {
       OUTCOME_TRY(auto res, parse(idx, (n == 14) ? ']' : ':'));
-      ret.ipv6._addr[n++] = (byte)(res >> 8);
-      ret.ipv6._addr[n++] = (byte)(res & 0xff);
+      ret.ipv6._addr[n++] = to_byte(res >> 8);
+      ret.ipv6._addr[n++] = to_byte(res & 0xff);
     } while(idx < compactidx && idx < portidx);
     if(compactidx != str.npos)
     {
-      auto parse2 = [&](size_t &idx) -> result<uint16_t> {
+      auto parse2 = [&](size_t &idx) -> result<uint16_t>
+      {
         auto idx2 = str.rfind(':', idx - 1);
         if(idx2 == str.npos)
         {
@@ -258,8 +266,8 @@ namespace ip
       do
       {
         OUTCOME_TRY(auto res, parse2(idx));
-        ret.ipv6._addr[n--] = (byte)(res & 0xff);
-        ret.ipv6._addr[n--] = (byte)(res >> 8);
+        ret.ipv6._addr[n--] = to_byte(res & 0xff);
+        ret.ipv6._addr[n--] = to_byte(res >> 8);
       } while(idx > compactidx + 1);
     }
     const char *end = str.data() + str.size();
@@ -272,6 +280,66 @@ namespace ip
     return ret;
   }
 }  // namespace ip
+
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC byte_socket_handle::io_result<byte_socket_handle::buffers_type> byte_socket_handle::_do_read(io_request<buffers_type> reqs,
+                                                                                                                             deadline d) noexcept
+{
+  LLFIO_LOG_FUNCTION_CALL(this);
+  auto ret = byte_io_handle::_do_read(std::move(reqs), d);
+  if(!(_v.behaviour & native_handle_type::disposition::_is_connected))
+  {
+    if(!ret)
+    {
+      if(ret.error() == errc::not_connected)
+      {
+        return errc::operation_would_block;
+      }
+    }
+    else
+    {
+      _v.behaviour |= native_handle_type::disposition::_is_connected;
+      if(!is_writable())
+      {
+        OUTCOME_TRY(shutdown(shutdown_write));
+      }
+      else if(!is_readable())
+      {
+        OUTCOME_TRY(shutdown(shutdown_read));
+      }
+    }
+  }
+  return ret;
+}
+
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC byte_socket_handle::io_result<byte_socket_handle::const_buffers_type>
+byte_socket_handle::_do_write(io_request<const_buffers_type> reqs, deadline d) noexcept
+{
+  LLFIO_LOG_FUNCTION_CALL(this);
+  auto ret = byte_io_handle::_do_write(std::move(reqs), d);
+  if(!(_v.behaviour & native_handle_type::disposition::_is_connected))
+  {
+    if(!ret)
+    {
+      if(ret.error() == errc::not_connected)
+      {
+        return errc::operation_would_block;
+      }
+    }
+    else
+    {
+      _v.behaviour |= native_handle_type::disposition::_is_connected;
+      if(!is_writable())
+      {
+        OUTCOME_TRY(shutdown(shutdown_write));
+      }
+      else if(!is_readable())
+      {
+        OUTCOME_TRY(shutdown(shutdown_read));
+      }
+    }
+  }
+  return ret;
+}
 
 LLFIO_V2_NAMESPACE_END
 

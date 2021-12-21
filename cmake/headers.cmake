@@ -40,6 +40,7 @@ set(llfio_HEADERS
   "include/llfio/v2.0/detail/impl/path_discovery.ipp"
   "include/llfio/v2.0/detail/impl/path_view.ipp"
   "include/llfio/v2.0/detail/impl/posix/byte_io_handle.ipp"
+  "include/llfio/v2.0/detail/impl/posix/byte_socket_handle.ipp"
   "include/llfio/v2.0/detail/impl/posix/directory_handle.ipp"
   "include/llfio/v2.0/detail/impl/posix/file_handle.ipp"
   "include/llfio/v2.0/detail/impl/posix/fs_handle.ipp"
