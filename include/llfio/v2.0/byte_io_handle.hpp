@@ -150,6 +150,10 @@ protected:
     const auto diff = (uintptr_t) storage & (state_reqs.second - 1);
     storage += state_reqs.second - diff;
     auto *state = _ctx->construct_and_init_io_operation({storage, state_reqs.first}, this, nullptr, std::move(base), d, std::move(reqs));
+    if(state == nullptr)
+    {
+      return errc::resource_unavailable_try_again;
+    }
     OUTCOME_TRY(_ctx->flush_inited_io_operations());
     while(!is_finished(_ctx->check_io_operation(state)))
     {
@@ -169,6 +173,10 @@ protected:
     const auto diff = (uintptr_t) storage & (state_reqs.second - 1);
     storage += state_reqs.second - diff;
     auto *state = _ctx->construct_and_init_io_operation({storage, state_reqs.first}, this, nullptr, std::move(base), d, std::move(reqs));
+    if(state == nullptr)
+    {
+      return errc::resource_unavailable_try_again;
+    }
     OUTCOME_TRY(_ctx->flush_inited_io_operations());
     while(!is_finished(_ctx->check_io_operation(state)))
     {
@@ -188,6 +196,10 @@ protected:
     const auto diff = (uintptr_t) storage & (state_reqs.second - 1);
     storage += state_reqs.second - diff;
     auto *state = _ctx->construct_and_init_io_operation({storage, state_reqs.first}, this, nullptr, std::move(base), d, std::move(reqs), kind);
+    if(state == nullptr)
+    {
+      return errc::resource_unavailable_try_again;
+    }
     OUTCOME_TRY(_ctx->flush_inited_io_operations());
     while(!is_finished(_ctx->check_io_operation(state)))
     {

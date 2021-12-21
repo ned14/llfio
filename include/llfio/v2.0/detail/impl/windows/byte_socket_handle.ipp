@@ -250,8 +250,8 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle> listening_socket
   return ret;
 }
 
-LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle::buffers_type> listening_socket_handle::read(io_request<buffers_type> req,
-                                                                                                            deadline d) const noexcept
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle::buffers_type> listening_socket_handle::_do_read(io_request<buffers_type> req,
+                                                                                                            deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   if(req.buffers.empty())

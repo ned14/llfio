@@ -40,6 +40,12 @@ Distributed under the Boost Software License, Version 1.0.
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 class byte_io_handle;
+class byte_socket_handle;
+class listening_socket_handle;
+namespace ip
+{
+  class address;
+}
 
 //! The possible states of the i/o operation
 enum class io_operation_state_type
@@ -192,8 +198,8 @@ public:
   //! The kinds of write reordering barrier which can be performed.
   enum class barrier_kind : uint8_t
   {
-    nowait_view_only, //!< Barrier mapped data only, non-blocking. This is highly optimised on NV-DIMM storage, but consider using `nvram_barrier()` for even better performance.
-    wait_view_only,   //!< Barrier mapped data only, block until it is done. This is highly optimised on NV-DIMM storage, but consider using `nvram_barrier()` for even better performance.
+    nowait_view_only,  //!< Barrier mapped data only, non-blocking. This is highly optimised on NV-DIMM storage, but consider using `nvram_barrier()` for even better performance.
+    wait_view_only,  //!< Barrier mapped data only, block until it is done. This is highly optimised on NV-DIMM storage, but consider using `nvram_barrier()` for even better performance.
     nowait_data_only,  //!< Barrier data only, non-blocking. This is highly optimised on NV-DIMM storage, but consider using `nvram_barrier()` for even better performance.
     wait_data_only,  //!< Barrier data only, block until it is done. This is highly optimised on NV-DIMM storage, but consider using `nvram_barrier()` for even better performance.
     nowait_all,  //!< Barrier data and the metadata to retrieve it, non-blocking.
@@ -416,7 +422,7 @@ public:
     }
     LLFIO_TEMPLATE(class... Args)
     LLFIO_TREQUIRES(LLFIO_TEXPR(Base(std::declval<Args>()...)))
-    constexpr io_result(Args &&... args)
+    constexpr io_result(Args &&...args)
         : Base(std::forward<Args>(args)...)
     {
     }
@@ -476,6 +482,11 @@ public:
   virtual result<uint8_t> do_byte_io_handle_register(byte_io_handle * /*unused*/) noexcept { return (uint8_t) 0; }
   //! Implements `byte_io_handle` deregistration
   virtual result<void> do_byte_io_handle_deregister(byte_io_handle * /*unused*/) noexcept { return success(); }
+  //! Implements `listening_socket_handle` registration. The bottom two bits of the returned value are set into `_v.behaviour`'s `_multiplexer_state_bit0` and
+  //! `_multiplexer_state_bit`
+  virtual result<uint8_t> do_byte_io_handle_register(listening_socket_handle * /*unused*/) noexcept { return errc::operation_not_supported; }
+  //! Implements `listening_socket_handle` deregistration
+  virtual result<void> do_byte_io_handle_deregister(listening_socket_handle * /*unused*/) noexcept { return errc::operation_not_supported; }  
   //! Implements `byte_io_handle::max_buffers()`
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t do_byte_io_handle_max_buffers(const byte_io_handle *h) const noexcept;
   //! Implements `byte_io_handle::allocate_registered_buffer()`
@@ -733,7 +744,8 @@ protected:
     //! Construct an unknown state
     constexpr _unsynchronised_io_operation_state() {}
     //! Construct a read operation state
-    _unsynchronised_io_operation_state(byte_io_handle *_h, io_operation_state_visitor *_v, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs)
+    _unsynchronised_io_operation_state(byte_io_handle *_h, io_operation_state_visitor *_v, registered_buffer_type &&b, deadline d,
+                                       io_request<buffers_type> reqs)
         : io_operation_state(_h, _v)
         , state(io_operation_state_type::read_initialised)
         , payload(std::move(b), d, std::move(reqs))
@@ -1203,7 +1215,9 @@ public:
     //! Suspends the coroutine for resumption after the i/o finishes
     void await_suspend(coroutine_handle<> coro)
     {
-      _state->invoke(make_function_ptr<void *(io_operation_state_type)>([&](io_operation_state_type s) -> void * {
+      _state->invoke(make_function_ptr<void *(io_operation_state_type)>(
+      [&](io_operation_state_type s) -> void *
+      {
         if(is_finished(s))
         {
           coro.resume();
@@ -1320,6 +1334,20 @@ public:
   virtual io_operation_state *construct(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d,
                                         io_request<const_buffers_type> reqs, barrier_kind kind) noexcept = 0;
 
+  /*! \brief Constructs either a `unsynchronised_io_operation_state` or a `synchronised_io_operation_state`
+  for a `listening_socket_handle` read operation into the storage provided. The i/o is not initiated. The storage must
+  meet the requirements from `state_requirements()`.
+  */
+  virtual io_operation_state *construct(span<byte> storage, listening_socket_handle *_h, io_operation_state_visitor *_visitor, deadline d,
+                                        std::pair<byte_socket_handle, ip::address> & /*unused*/) noexcept
+  {
+    (void) storage;
+    (void) _h;
+    (void) _visitor;
+    (void) d;
+    return nullptr;
+  }
+
   /*! \brief Initiates the i/o in a previously constructed state. Note that you should always call
   `.flush_inited_io_operations()` after you finished initiating i/o. After this call returns,
   you cannot relocate in memory `state` until `is_finished(state->current_state())` returns true.
@@ -1332,7 +1360,10 @@ public:
                                                               registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept
   {
     io_operation_state *state = construct(storage, _h, _visitor, std::move(b), d, std::move(reqs));
-    init_io_operation(state);
+    if(state != nullptr)
+    {
+      init_io_operation(state);
+    }
     return state;
   }
 
@@ -1342,7 +1373,10 @@ public:
                                                               registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept
   {
     io_operation_state *state = construct(storage, _h, _visitor, std::move(b), d, std::move(reqs));
-    init_io_operation(state);
+    if(state != nullptr)
+    {
+      init_io_operation(state);
+    }
     return state;
   }
 
@@ -1353,7 +1387,23 @@ public:
                                                               barrier_kind kind) noexcept
   {
     io_operation_state *state = construct(storage, _h, _visitor, std::move(b), d, std::move(reqs), kind);
-    init_io_operation(state);
+    if(state != nullptr)
+    {
+      init_io_operation(state);
+    }
+    return state;
+  }
+
+  /*! \brief Combines `.construct()` with `.init_io_operation()` in a single call for improved efficiency.
+   */
+  virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, listening_socket_handle *_h, io_operation_state_visitor *_visitor, deadline d,
+                                                              std::pair<byte_socket_handle, ip::address> &req) noexcept
+  {
+    io_operation_state *state = construct(storage, _h, _visitor, d, req);
+    if(state != nullptr)
+    {
+      init_io_operation(state);
+    }
     return state;
   }
 
@@ -1407,7 +1457,7 @@ namespace test
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<byte_io_multiplexer_ptr> multiplexer_null(size_t threads, bool disable_immediate_completions) noexcept;
 
 #if defined(__linux__) || DOXYGEN_IS_IN_THE_HOUSE
-// LLFIO_HEADERS_ONLY_FUNC_SPEC result<byte_io_multiplexer_ptr> multiplexer_linux_epoll(size_t threads) noexcept;
+  // LLFIO_HEADERS_ONLY_FUNC_SPEC result<byte_io_multiplexer_ptr> multiplexer_linux_epoll(size_t threads) noexcept;
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<byte_io_multiplexer_ptr> multiplexer_linux_io_uring(size_t threads, bool is_polling) noexcept;
 #endif
 #if(defined(__FreeBSD__) || defined(__APPLE__)) || DOXYGEN_IS_IN_THE_HOUSE

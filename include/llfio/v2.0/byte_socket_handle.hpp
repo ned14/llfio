@@ -575,6 +575,33 @@ public:
   };
   template <class T> using io_result = result<T>;
 
+protected:
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<buffers_type> _do_read(io_request<buffers_type> req, deadline d) noexcept;
+
+  io_result<buffers_type> _do_multiplexer_read(io_request<buffers_type> reqs, deadline d) noexcept
+  {
+    LLFIO_DEADLINE_TO_SLEEP_INIT(d);
+    const auto state_reqs = _ctx->io_state_requirements();
+    auto *storage = (byte *) alloca(state_reqs.first + state_reqs.second);
+    const auto diff = (uintptr_t) storage & (state_reqs.second - 1);
+    storage += state_reqs.second - diff;
+    auto *state = _ctx->construct_and_init_io_operation({storage, state_reqs.first}, this, nullptr, d, reqs.buffers.connected_socket());
+    if(state == nullptr)
+    {
+      return errc::resource_unavailable_try_again;
+    }
+    OUTCOME_TRY(_ctx->flush_inited_io_operations());
+    while(!is_finished(_ctx->check_io_operation(state)))
+    {
+      deadline nd;
+      LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+      OUTCOME_TRY(_ctx->check_for_any_completed_io(nd));
+    }
+    OUTCOME_TRY(std::move(*state).get_completed_read());
+    state->~io_operation_state();
+    return {std::move(reqs.buffers)};
+  }
+
 public:
   //! Default constructor
   constexpr listening_socket_handle() {}  // NOLINT
@@ -733,7 +760,10 @@ public:
   \errors Any of the errors which `accept()` or `WSAAccept()` might return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<buffers_type> read(io_request<buffers_type> req, deadline d = {}) const noexcept;
+  result<buffers_type> read(io_request<buffers_type> req, deadline d = {}) noexcept
+  {
+    return (_ctx == nullptr) ? _do_read(std::move(req), d) : _do_multiplexer_read(std::move(req), d);
+  }
 };
 
 // Out of line definition purely to work around a bug in GCC where if marked inline,
@@ -750,12 +780,12 @@ inline result<void> listening_socket_handle::set_multiplexer(byte_io_multiplexer
   }
   if(_ctx != nullptr)
   {
-    // OUTCOME_TRY(_ctx->do_byte_io_handle_deregister(this));
+    OUTCOME_TRY(_ctx->do_byte_io_handle_deregister(this));
     _ctx = nullptr;
   }
   if(c != nullptr)
   {
-    /* OUTCOME_TRY(auto &&state, c->do_byte_io_handle_register(this));
+    OUTCOME_TRY(auto &&state, c->do_byte_io_handle_register(this));
     _v.behaviour = (_v.behaviour & ~(native_handle_type::disposition::_multiplexer_state_bit0 | native_handle_type::disposition::_multiplexer_state_bit1));
     if((state & 1) != 0)
     {
@@ -765,7 +795,6 @@ inline result<void> listening_socket_handle::set_multiplexer(byte_io_multiplexer
     {
       _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit1;
     }
-    */
   }
   _ctx = c;
   return success();

@@ -331,8 +331,8 @@ static inline void TestBlockingSocketHandles()
 static inline void TestNonBlockingSocketHandles()
 {
   namespace llfio = LLFIO_V2_NAMESPACE;
-  auto serversocket = llfio::listening_socket_handle::listening_socket(true, llfio::listening_socket_handle::mode::read, llfio::pipe_handle::caching::all,
-                                                                       llfio::pipe_handle::flag::multiplexable)
+  auto serversocket = llfio::listening_socket_handle::listening_socket(true, llfio::listening_socket_handle::mode::read,
+                                                                       llfio::byte_socket_handle::caching::all, llfio::byte_socket_handle::flag::multiplexable)
                       .value();
   BOOST_REQUIRE(serversocket.is_valid());
   BOOST_CHECK(serversocket.is_socket());
@@ -356,7 +356,7 @@ static inline void TestNonBlockingSocketHandles()
 
   // Form the connection.
   auto writer = llfio::byte_socket_handle::byte_socket(endpoint, llfio::byte_socket_handle::mode::append, llfio::byte_socket_handle::caching::reads,
-                                                       llfio::pipe_handle::flag::multiplexable)
+                                                       llfio::byte_socket_handle::flag::multiplexable)
                 .value();
   serversocket.read({reader}, std::chrono::milliseconds(0)).value();
   std::cout << "Server socket sees incoming connection from " << reader.second << std::endl;
@@ -384,25 +384,26 @@ static inline void TestNonBlockingSocketHandles()
   reader.first.close().value();
 }
 
-#if 0
 #if LLFIO_ENABLE_TEST_IO_MULTIPLEXERS
-static inline void TestMultiplexedPipeHandle()
+static inline void TestMultiplexedSocketHandles()
 {
-  static constexpr size_t MAX_PIPES = 64;
+  static constexpr size_t MAX_SOCKETS = 64;
   namespace llfio = LLFIO_V2_NAMESPACE;
-  auto test_multiplexer = [](llfio::byte_io_multiplexer_ptr multiplexer) {
-    std::vector<llfio::pipe_handle> read_pipes, write_pipes;
-    std::vector<size_t> received_for(MAX_PIPES);
+  auto test_multiplexer = [](llfio::byte_io_multiplexer_ptr multiplexer)
+  {
+    std::vector<llfio::byte_socket_handle> read_sockets, write_sockets;
+    std::vector<size_t> received_for(MAX_SOCKETS);
     struct checking_receiver final : public llfio::byte_io_multiplexer::io_operation_state_visitor
     {
       size_t myindex;
       std::unique_ptr<llfio::byte[]> io_state_ptr;
       std::vector<size_t> &received_for;
-      union {
+      union
+      {
         llfio::byte _buffer[sizeof(size_t)];
         size_t _index;
       };
-      llfio::pipe_handle::buffer_type buffer;
+      llfio::byte_socket_handle::buffer_type buffer;
       llfio::byte_io_multiplexer::io_operation_state *io_state{nullptr};
 
       checking_receiver(size_t _myindex, llfio::byte_io_multiplexer_ptr &multiplexer, std::vector<size_t> &r)
@@ -440,23 +441,28 @@ static inline void TestMultiplexedPipeHandle()
           io_state = nullptr;
         }
         buffer = {_buffer, sizeof(_buffer)};
-        io_state = multiplexer->construct_and_init_io_operation({io_state_ptr.get(), 4096 /*lies*/}, &h, this, {}, {}, llfio::pipe_handle::io_request<llfio::pipe_handle::buffers_type>({&buffer, 1}, 0));
+        io_state = multiplexer->construct_and_init_io_operation(
+        {io_state_ptr.get(), 4096 /*lies*/}, &h, this, {}, {}, llfio::byte_socket_handle::io_request<llfio::byte_socket_handle::buffers_type>({&buffer, 1}, 0));
         return llfio::success();
       }
 
       // Called if the read did not complete immediately
-      virtual void read_initiated(llfio::byte_io_multiplexer::io_operation_state::lock_guard & /*g*/, llfio::io_operation_state_type /*former*/) override { std::cout << "   Pipe " << myindex << " will complete read later" << std::endl; }
+      virtual void read_initiated(llfio::byte_io_multiplexer::io_operation_state::lock_guard & /*g*/, llfio::io_operation_state_type /*former*/) override
+      {
+        std::cout << "   Socket " << myindex << " will complete read later" << std::endl;
+      }
 
       // Called when the read completes
-      virtual bool read_completed(llfio::byte_io_multiplexer::io_operation_state::lock_guard & /*g*/, llfio::io_operation_state_type former, llfio::pipe_handle::io_result<llfio::pipe_handle::buffers_type> &&res) override
+      virtual bool read_completed(llfio::byte_io_multiplexer::io_operation_state::lock_guard & /*g*/, llfio::io_operation_state_type former,
+                                  llfio::byte_socket_handle::io_result<llfio::byte_socket_handle::buffers_type> &&res) override
       {
         if(is_initialised(former))
         {
-          std::cout << "   Pipe " << myindex << " read completes immediately" << std::endl;
+          std::cout << "   Socket " << myindex << " read completes immediately" << std::endl;
         }
         else
         {
-          std::cout << "   Pipe " << myindex << " read completes asynchronously" << std::endl;
+          std::cout << "   Socket " << myindex << " read completes asynchronously" << std::endl;
         }
         BOOST_CHECK(res.has_value());
         if(res)
@@ -464,7 +470,7 @@ static inline void TestMultiplexedPipeHandle()
           BOOST_REQUIRE(res.value().size() == 1);
           BOOST_CHECK(res.value()[0].data() == _buffer);
           BOOST_CHECK(res.value()[0].size() == sizeof(size_t));
-          BOOST_REQUIRE(_index < MAX_PIPES);
+          BOOST_REQUIRE(_index < MAX_SOCKETS);
           BOOST_CHECK(_index == myindex);
           received_for[_index]++;
         }
@@ -474,37 +480,51 @@ static inline void TestMultiplexedPipeHandle()
       // Called when the state for the read can be disposed
       virtual void read_finished(llfio::byte_io_multiplexer::io_operation_state::lock_guard & /*g*/, llfio::io_operation_state_type former) override
       {
-        std::cout << "   Pipe " << myindex << " read finishes" << std::endl;
+        std::cout << "   Socket " << myindex << " read finishes" << std::endl;
         BOOST_REQUIRE(former == llfio::io_operation_state_type::read_completed);
       }
     };
+    auto serversocket =
+    llfio::listening_socket_handle::listening_socket(true, llfio::listening_socket_handle::mode::write, llfio::byte_socket_handle::caching::all,
+                                                     llfio::byte_socket_handle::flag::multiplexable)
+    .value();
+    serversocket.bind(llfio::ip::address_v6::loopback()).value();
+    auto endpoint = serversocket.local_endpoint().value();
+    std::cout << "Server socket is listening on " << endpoint << std::endl;
+
     std::vector<checking_receiver> async_reads;
-    for(size_t n = 0; n < MAX_PIPES; n++)
+    for(size_t n = 0; n < MAX_SOCKETS; n++)
     {
-      auto ret = llfio::pipe_handle::anonymous_pipe(llfio::pipe_handle::caching::reads, llfio::pipe_handle::flag::multiplexable).value();
-      ret.first.set_multiplexer(multiplexer.get()).value();
+      auto write_socket = llfio::byte_socket_handle::byte_socket(endpoint, llfio::byte_socket_handle::mode::write, llfio::byte_socket_handle::caching::all,
+                                                                 llfio::byte_socket_handle::flag::multiplexable)
+                          .value();
+      std::pair<llfio::byte_socket_handle, llfio::ip::address> read_socket;
+      serversocket.read({read_socket}).value();
+      read_socket.first.set_multiplexer(multiplexer.get()).value();
       async_reads.push_back(checking_receiver(n, multiplexer, received_for));
-      read_pipes.push_back(std::move(ret.first));
-      write_pipes.push_back(std::move(ret.second));
+      read_sockets.push_back(std::move(read_socket.first));
+      write_sockets.push_back(std::move(write_socket));
     }
-    auto writerthread = std::async([&] {
+    auto writerthread = std::async(
+    [&]
+    {
       std::this_thread::sleep_for(std::chrono::milliseconds(500));
-      for(size_t n = MAX_PIPES - 1; n < MAX_PIPES; n--)
+      for(size_t n = MAX_SOCKETS - 1; n < MAX_SOCKETS; n--)
       {
-        auto r = write_pipes[n].write(0, {{(llfio::byte *) &n, sizeof(n)}});
+        auto r = write_sockets[n].write(0, {{(llfio::byte *) &n, sizeof(n)}});
         if(!r)
         {
           abort();
         }
       }
     });
-    // Start the pipe reads. They cannot move in memory until complete
-    for(size_t n = 0; n < MAX_PIPES; n++)
+    // Start the socket reads. They cannot move in memory until complete
+    for(size_t n = 0; n < MAX_SOCKETS; n++)
     {
-      async_reads[n].read_begin(multiplexer, read_pipes[n]).value();
+      async_reads[n].read_begin(multiplexer, read_sockets[n]).value();
     }
     // Wait for all reads to complete
-    for(size_t n = 0; n < MAX_PIPES; n++)
+    for(size_t n = 0; n < MAX_SOCKETS; n++)
     {
       // Spin until this i/o completes
       for(;;)
@@ -516,12 +536,12 @@ static inline void TestMultiplexedPipeHandle()
         }
       }
     }
-    for(size_t n = 0; n < MAX_PIPES; n++)
+    for(size_t n = 0; n < MAX_SOCKETS; n++)
     {
       BOOST_CHECK(received_for[n] == 1);
     }
     // Wait for all reads to finish
-    for(size_t n = 0; n < MAX_PIPES; n++)
+    for(size_t n = 0; n < MAX_SOCKETS; n++)
     {
       llfio::io_operation_state_type state;
       while(!is_finished(state = async_reads[n].io_state->current_state()))
@@ -546,64 +566,78 @@ static inline void TestMultiplexedPipeHandle()
 }
 
 #if LLFIO_ENABLE_COROUTINES
-static inline void TestCoroutinedPipeHandle()
+static inline void TestCoroutinedSocketHandles()
 {
-  static constexpr size_t MAX_PIPES = 70;
+  static constexpr size_t MAX_SOCKETS = 70;
   namespace llfio = LLFIO_V2_NAMESPACE;
-  auto test_multiplexer = [](llfio::byte_io_multiplexer_ptr multiplexer) {
+  auto test_multiplexer = [](llfio::byte_io_multiplexer_ptr multiplexer)
+  {
     struct coroutine
     {
-      llfio::pipe_handle read_pipe, write_pipe;
+      llfio::byte_socket_handle read_socket, write_socket;
       size_t received_for{0};
 
-      explicit coroutine(llfio::pipe_handle &&r, llfio::pipe_handle &&w)
-          : read_pipe(std::move(r))
-          , write_pipe(std::move(w))
+      explicit coroutine(llfio::byte_socket_handle &&r, llfio::byte_socket_handle &&w)
+          : read_socket(std::move(r))
+          , write_socket(std::move(w))
       {
       }
       llfio::eager<llfio::result<void>> operator()()
       {
-        union {
+        union
+        {
           llfio::byte _buffer[sizeof(size_t)];
           size_t _index;
         };
-        llfio::pipe_handle::buffer_type buffer;
+        llfio::byte_socket_handle::buffer_type buffer;
         for(;;)
         {
           buffer = {_buffer, sizeof(_buffer)};
           // This will never return if the coroutine gets cancelled
-          auto r = co_await read_pipe.co_read({{&buffer, 1}, 0});
+          auto r = co_await read_socket.co_read({{&buffer, 1}, 0});
           if(!r)
           {
             co_return std::move(r).error();
           }
           BOOST_CHECK(r.value().size() == 1);
           BOOST_CHECK(r.value()[0].size() == sizeof(_buffer));
-          received_for+=_index;
+          received_for += _index;
         }
       }
     };
+    auto serversocket =
+    llfio::listening_socket_handle::listening_socket(true, llfio::listening_socket_handle::mode::write, llfio::byte_socket_handle::caching::all,
+                                                     llfio::byte_socket_handle::flag::multiplexable)
+    .value();
+    serversocket.bind(llfio::ip::address_v6::loopback()).value();
+    auto endpoint = serversocket.local_endpoint().value();
+    std::cout << "Server socket is listening on " << endpoint << std::endl;
+
     std::vector<coroutine> coroutines;
-    for(size_t n = 0; n < MAX_PIPES; n++)
+    for(size_t n = 0; n < MAX_SOCKETS; n++)
     {
-      auto ret = llfio::pipe_handle::anonymous_pipe(llfio::pipe_handle::caching::reads, llfio::pipe_handle::flag::multiplexable).value();
-      ret.first.set_multiplexer(multiplexer.get()).value();
-      coroutines.push_back(coroutine(std::move(ret.first), std::move(ret.second)));
+      auto write_socket = llfio::byte_socket_handle::byte_socket(endpoint, llfio::byte_socket_handle::mode::write, llfio::byte_socket_handle::caching::all,
+                                                                 llfio::byte_socket_handle::flag::multiplexable)
+                          .value();
+      std::pair<llfio::byte_socket_handle, llfio::ip::address> read_socket;
+      serversocket.read({read_socket}).value();
+      read_socket.first.set_multiplexer(multiplexer.get()).value();
+      coroutines.push_back(coroutine(std::move(read_socket.first), std::move(write_socket)));
     }
     // Start the coroutines, all of whom will begin a read and then suspend
-    std::vector<llfio::optional<llfio::eager<llfio::result<void>>>> states(MAX_PIPES);
-    for(size_t n = 0; n < MAX_PIPES; n++)
+    std::vector<llfio::optional<llfio::eager<llfio::result<void>>>> states(MAX_SOCKETS);
+    for(size_t n = 0; n < MAX_SOCKETS; n++)
     {
       states[n].emplace(coroutines[n]());
     }
-    // Write to all the pipes, then pump coroutine resumption until all completions done
+    // Write to all the sockets, then pump coroutine resumption until all completions done
     size_t count = 0, failures = 0;
     for(size_t i = 1; i <= 10; i++)
     {
       std::cout << "\nWrite no " << i << std::endl;
-      for(size_t n = MAX_PIPES - 1; n < MAX_PIPES; n--)
+      for(size_t n = MAX_SOCKETS - 1; n < MAX_SOCKETS; n--)
       {
-        coroutines[n].write_pipe.write(0, {{(llfio::byte *) &i, sizeof(i)}}).value();
+        coroutines[n].write_socket.write(0, {{(llfio::byte *) &i, sizeof(i)}}).value();
       }
       // Take a copy of all pending i/o
       for(;;)
@@ -616,7 +650,7 @@ static inline void TestCoroutinedPipeHandle()
         }
       }
       count += i;
-      for(size_t n = 0; n < MAX_PIPES; n++)
+      for(size_t n = 0; n < MAX_SOCKETS; n++)
       {
         if(coroutines[n].received_for != count)
         {
@@ -628,7 +662,7 @@ static inline void TestCoroutinedPipeHandle()
       BOOST_REQUIRE(failures == 0);
     }
     // Rethrow any failures
-    for(size_t n = 0; n < MAX_PIPES; n++)
+    for(size_t n = 0; n < MAX_SOCKETS; n++)
     {
       if(states[n]->await_ready())
       {
@@ -657,17 +691,17 @@ static inline void TestCoroutinedPipeHandle()
 }
 #endif
 #endif
-#endif
 
 KERNELTEST_TEST_KERNEL(integration, llfio, ip, address, "Tests that llfio::ip::address works as expected", TestSocketAddress())
 KERNELTEST_TEST_KERNEL(integration, llfio, socket_handle, blocking, "Tests that blocking llfio::byte_socket_handle works as expected",
                        TestBlockingSocketHandles())
-KERNELTEST_TEST_KERNEL(integration, llfio, socket_handle, nonblocking, "Tests that nonblocking llfio::byte_socket_handle works as expected", TestNonBlockingSocketHandles())
-#if 0
+KERNELTEST_TEST_KERNEL(integration, llfio, socket_handle, nonblocking, "Tests that nonblocking llfio::byte_socket_handle works as expected",
+                       TestNonBlockingSocketHandles())
 #if LLFIO_ENABLE_TEST_IO_MULTIPLEXERS
-KERNELTEST_TEST_KERNEL(integration, llfio, pipe_handle, multiplexed, "Tests that multiplexed llfio::pipe_handle works as expected", TestMultiplexedPipeHandle())
+KERNELTEST_TEST_KERNEL(integration, llfio, socket_handle, multiplexed, "Tests that multiplexed llfio::byte_socket_handle works as expected",
+                       TestMultiplexedSocketHandles())
 #if LLFIO_ENABLE_COROUTINES
-KERNELTEST_TEST_KERNEL(integration, llfio, pipe_handle, coroutined, "Tests that coroutined llfio::pipe_handle works as expected", TestCoroutinedPipeHandle())
-#endif
+KERNELTEST_TEST_KERNEL(integration, llfio, socket_handle, coroutined, "Tests that coroutined llfio::byte_socket_handle works as expected",
+                       TestCoroutinedSocketHandles())
 #endif
 #endif

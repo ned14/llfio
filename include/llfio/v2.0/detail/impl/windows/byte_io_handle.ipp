@@ -34,7 +34,12 @@ size_t byte_io_handle::_do_max_buffers() const noexcept
 {
   if(is_socket())
   {
-    // The actual limit appears to be unspecified on Windows
+    /* On Windows we make use of the ApcContext parameter in NtReadFile/NtWriteFile to pass through the operation state
+    to IOCP which is not a facility WSASend provides, so if an i/o multiplexer is set, we do each scatter-gather buffer
+    individually.
+
+    Note that a non-test IOCP multiplexer would override max_buffers() in any case so this code would never get called.
+    */
     return 64;
   }
   return 1;  // TODO FIXME support ReadFileScatter/WriteFileGather
@@ -187,6 +192,11 @@ inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &
   return true;
 }
 #ifndef LLFIO_EXCLUDE_NETWORKING
+// We use a separate implementation here so for non-multiplexed as-if blocking socket i/o so
+// we get proper atomic scatter-gather i/o. A proper IOCP multiplexer would need to implement
+// the usual tricks of appending to OVERLAPPED etc to store the i/o state pointer, and not
+// be naughty like our test IOCP multiplexer is by misusing the ApcContext parameter.
+// 
 // Returns true if operation completed immediately
 template <bool blocking, class Syscall, class Flags, class BuffersType>
 inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &&syscall, const native_handle_type &nativeh, span<WSABUF> bufs, Flags flags,
