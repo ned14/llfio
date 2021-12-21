@@ -393,6 +393,21 @@ public:
   //! Returns the remote endpoint of this socket instance
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<ip::address> remote_endpoint() const noexcept;
 
+  //! The channels which can be shut down.
+  enum shutdown_kind
+  {
+    shutdown_read,   //!< Shutdown further reads.
+    shutdown_write,  //!< Shutdown further writes.
+    shutdown_both    //!< Shutdown both further reads and writes.
+  };
+  /*! \brief Initiates shutting down further communication on the socket.
+
+  The default is `shutdown_write`, as generally if shutting down you want send
+  a FIN packet to remote and loop polling reads until you receive a FIN from
+  remote.
+  */
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> shutdown(shutdown_kind = shutdown_write) noexcept;
+
   /*! Create a socket handle connecting to a specified address.
   \param address The address to connect to.
   \param _mode How to open the socket. If this is `mode::append`, the read side of the socket
@@ -415,23 +430,27 @@ public:
       (void) byte_socket_handle::close();
     }
   }
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
+
+  /*! \brief Convenience function to shut down the outbound connection and wait for the other side to shut down our
+  inbound connection by throwing away any bytes read, then closing the socket.
+  */
+  result<void> shutdown_and_close(deadline d = {}) noexcept
   {
-    LLFIO_LOG_FUNCTION_CALL(this);
-#ifndef NDEBUG
-    if(_v)
+    LLFIO_DEADLINE_TO_SLEEP_INIT(d);
+    OUTCOME_TRY(shutdown());
+    byte buffer[4096];
+    for(;;)
     {
-      // Tell handle::close() that we have correctly executed
-      _v.behaviour |= native_handle_type::disposition::_child_close_executed;
+      deadline nd;
+      LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+      OUTCOME_TRY(auto readed, read(0, {{buffer}}, nd));
+      if(readed == 0)
+      {
+        break;
+      }
     }
-#endif
-#ifdef _WIN32
-    if(_v)
-    {
-      detail::unregister_socket_handle_instance(this);
-    }
-#endif
-    return byte_io_handle::close();
+    return close();
   }
 };
 

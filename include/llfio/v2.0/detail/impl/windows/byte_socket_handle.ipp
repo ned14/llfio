@@ -32,17 +32,19 @@ LLFIO_V2_NAMESPACE_BEGIN
 
 namespace detail
 {
-  LLFIO_HEADERS_ONLY_FUNC_SPEC std::atomic<int> &socket_handle_instance_count()
+  LLFIO_HEADERS_ONLY_FUNC_SPEC std::pair<std::atomic<int>, WSAData> &socket_handle_instance_count()
   {
-    static std::atomic<int> v;
+    static std::pair<std::atomic<int>, WSAData> v;
     return v;
   }
   LLFIO_HEADERS_ONLY_FUNC_SPEC void register_socket_handle_instance(void * /*unused*/) noexcept
   {
-    if(socket_handle_instance_count().fetch_add(1, std::memory_order_relaxed) == 0)
+    auto &inst = socket_handle_instance_count();
+    auto prev = inst.first.fetch_add(1, std::memory_order_relaxed);
+    assert(prev >= 0);
+    if(prev == 0)
     {
-      WSAData data;
-      int retcode = WSAStartup(MAKEWORD(2, 2), &data);
+      int retcode = WSAStartup(MAKEWORD(2, 2), &inst.second);
       if(retcode != 0)
       {
         LLFIO_LOG_FATAL(nullptr, "FATAL: Failed to initialise Winsock!");
@@ -52,14 +54,19 @@ namespace detail
   }
   LLFIO_HEADERS_ONLY_FUNC_SPEC void unregister_socket_handle_instance(void * /*unused*/) noexcept
   {
-    if(socket_handle_instance_count().fetch_sub(1, std::memory_order_relaxed) == 1)
+    auto &inst = socket_handle_instance_count();
+    auto prev = inst.first.fetch_sub(1, std::memory_order_relaxed);
+    assert(prev >= 0);
+    if(prev == 1)
     {
+      /*
       int retcode = WSACleanup();
       if(retcode != 0)
       {
         LLFIO_LOG_FATAL(nullptr, "FATAL: Failed to deinitialise Winsock!");
         abort();
       }
+      */
     }
   }
   result<void> create_socket(native_handle_type &nativeh, unsigned short family, handle::mode _mode, handle::caching _caching, handle::flag flags) noexcept
@@ -77,7 +84,7 @@ namespace detail
     {
       auto retcode = WSAGetLastError();
       detail::unregister_socket_handle_instance(nullptr);
-      return generic_error((errc) retcode);
+      return win32_error(retcode);
     }
     if(_caching < handle::caching::all)
     {
@@ -85,14 +92,14 @@ namespace detail
         int val = 1;
         if(SOCKET_ERROR == ::setsockopt(nativeh.sock, SOL_SOCKET, SO_SNDBUF, (char *) &val, sizeof(val)))
         {
-          return generic_error((errc) WSAGetLastError());
+          return win32_error(WSAGetLastError());
         }
       }
       {
         BOOL val = 1;
         if(SOCKET_ERROR == ::setsockopt(nativeh.sock, IPPROTO_TCP, TCP_NODELAY, (char *) &val, sizeof(val)))
         {
-          return generic_error((errc) WSAGetLastError());
+          return win32_error(WSAGetLastError());
         }
       }
     }
@@ -107,7 +114,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<ip::address> byte_socket_handle::local_en
   int len = (int) sizeof(ret._storage);
   if(SOCKET_ERROR == getsockname(_v.sock, (::sockaddr *) ret._storage, &len))
   {
-    return generic_error((errc) WSAGetLastError());
+    return win32_error(WSAGetLastError());
   }
   return ret;
 }
@@ -118,10 +125,22 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<ip::address> byte_socket_handle::remote_e
   int len = (int) sizeof(ret._storage);
   if(SOCKET_ERROR == getpeername(_v.sock, (::sockaddr *) ret._storage, &len))
   {
-    return generic_error((errc) WSAGetLastError());
+    return win32_error(WSAGetLastError());
   }
   return ret;
 }
+
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> byte_socket_handle::shutdown(shutdown_kind kind) noexcept
+{
+  LLFIO_LOG_FUNCTION_CALL(this);
+  const int how = (kind == shutdown_write) ? SD_SEND : ((kind == shutdown_both) ? SD_BOTH : SD_RECEIVE);
+  if(SOCKET_ERROR == ::shutdown(_v.sock, how))
+  {
+    return win32_error(WSAGetLastError());
+  }
+  return success();
+}
+
 
 LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<byte_socket_handle> byte_socket_handle::byte_socket(const ip::address &addr, mode _mode, caching _caching,
                                                                                            flag flags) noexcept
@@ -135,7 +154,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<byte_socket_handle> byte_socket_handle::b
     auto retcode = WSAGetLastError();
     if(retcode != WSA_IO_PENDING)
     {
-      return generic_error((errc) retcode);
+      return win32_error(retcode);
     }
   }
   else
@@ -144,20 +163,44 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<byte_socket_handle> byte_socket_handle::b
   }
   if(_mode == mode::read)
   {
-    if(SOCKET_ERROR == ::shutdown(nativeh.sock, SD_SEND))
-    {
-      return generic_error((errc) WSAGetLastError());
-    }
+    OUTCOME_TRY(ret.value().shutdown(shutdown_write));
   }
   else if(_mode == mode::append)
   {
-    if(SOCKET_ERROR == ::shutdown(nativeh.sock, SD_RECEIVE))
-    {
-      return generic_error((errc) WSAGetLastError());
-    }
+    OUTCOME_TRY(ret.value().shutdown(shutdown_read));
   }
   return ret;
 }
+
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> byte_socket_handle::close() noexcept
+{
+  LLFIO_LOG_FUNCTION_CALL(this);
+  if(_v)
+  {
+    if(are_safety_barriers_issued() && is_writable())
+    {
+      OUTCOME_TRY(shutdown());
+      byte buffer[4096];
+      for(;;)
+      {
+        deadline nd;
+        OUTCOME_TRY(auto readed, read(0, {{buffer}}));
+        if(readed == 0)
+        {
+          break;
+        }
+      }
+    }
+    if(SOCKET_ERROR == ::closesocket(_v.sock))
+    {
+      return win32_error(WSAGetLastError());
+    }
+    _v = {};
+    detail::unregister_socket_handle_instance(this);
+  }
+  return success();
+}
+
 
 /*******************************************************************************************************************/
 
@@ -168,7 +211,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<ip::address> listening_socket_handle::loc
   int len = (int) sizeof(ret._storage);
   if(SOCKET_ERROR == getsockname(_v.sock, (::sockaddr *) ret._storage, &len))
   {
-    return generic_error((errc) WSAGetLastError());
+    return win32_error(WSAGetLastError());
   }
   return ret;
 }
@@ -181,16 +224,16 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> listening_socket_handle::bind(const
     BOOL val = 1;
     if(SOCKET_ERROR == ::setsockopt(_v.sock, SOL_SOCKET, SO_REUSEADDR, (char *) &val, sizeof(val)))
     {
-      return generic_error((errc) WSAGetLastError());
+      return win32_error(WSAGetLastError());
     }
   }
   if(SOCKET_ERROR == ::bind(_v.sock, addr.to_sockaddr(), addr.sockaddrlen()))
   {
-    return generic_error((errc) WSAGetLastError());
+    return win32_error(WSAGetLastError());
   }
   if(SOCKET_ERROR == ::listen(_v.sock, (backlog == -1) ? SOMAXCONN : backlog))
   {
-    return generic_error((errc) WSAGetLastError());
+    return win32_error(WSAGetLastError());
   }
   return success();
 }
@@ -232,7 +275,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle::buffers_type> li
     auto retcode = WSAGetLastError();
     if(WSAEWOULDBLOCK != retcode)
     {
-      return generic_error((errc) retcode);
+      return win32_error(retcode);
     }
     if(d.nsecs == 0)
     {
@@ -267,7 +310,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle::buffers_type> li
     }
     if(SOCKET_ERROR == ::select(1, &readfds, nullptr, nullptr, timeout))
     {
-      return generic_error((errc) WSAGetLastError());
+      return win32_error(WSAGetLastError());
     }
   }
   nativeh.behaviour |= native_handle_type::disposition::_is_connected;
@@ -277,14 +320,14 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle::buffers_type> li
       int val = 1;
       if(SOCKET_ERROR == ::setsockopt(nativeh.sock, SOL_SOCKET, SO_SNDBUF, (char *) &val, sizeof(val)))
       {
-        return generic_error((errc) WSAGetLastError());
+        return win32_error(WSAGetLastError());
       }
     }
     {
       BOOL val = 1;
       if(SOCKET_ERROR == ::setsockopt(nativeh.sock, IPPROTO_TCP, TCP_NODELAY, (char *) &val, sizeof(val)))
       {
-        return generic_error((errc) WSAGetLastError());
+        return win32_error(WSAGetLastError());
       }
     }
   }
@@ -292,14 +335,14 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle::buffers_type> li
   {
     if(SOCKET_ERROR == ::shutdown(nativeh.sock, SD_SEND))
     {
-      return generic_error((errc) WSAGetLastError());
+      return win32_error(WSAGetLastError());
     }
   }
   else if(_mode == mode::append)
   {
     if(SOCKET_ERROR == ::shutdown(nativeh.sock, SD_RECEIVE))
     {
-      return generic_error((errc) WSAGetLastError());
+      return win32_error(WSAGetLastError());
     }
   }
   b.first = byte_socket_handle(nativeh, _caching, _flags, _ctx);

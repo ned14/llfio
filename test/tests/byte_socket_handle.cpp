@@ -275,9 +275,9 @@ static inline void TestSocketAddress()
   namespace llfio = LLFIO_V2_NAMESPACE;
   auto serversocket = llfio::listening_socket_handle::listening_socket(true, llfio::listening_socket_handle::mode::read).value();
   BOOST_REQUIRE(serversocket.is_valid());
-  BOOST_REQUIRE(serversocket.is_socket());
-  BOOST_REQUIRE(serversocket.is_readable());
-  BOOST_REQUIRE(!serversocket.is_writable());
+  BOOST_CHECK(serversocket.is_socket());
+  BOOST_CHECK(serversocket.is_readable());
+  BOOST_CHECK(!serversocket.is_writable());
   serversocket.bind(llfio::ip::address_v6::loopback()).value();
   auto endpoint = serversocket.local_endpoint().value();
   std::cout << "Server socket is listening on " << endpoint << std::endl;
@@ -285,9 +285,9 @@ static inline void TestSocketAddress()
     std::pair<llfio::byte_socket_handle, llfio::ip::address> s;
     serversocket.read({s}).value();  // This immediately blocks in blocking mode
     BOOST_REQUIRE(s.first.is_valid());
-    BOOST_REQUIRE(s.first.is_socket());
-    BOOST_REQUIRE(s.first.is_readable());
-    BOOST_REQUIRE(!s.first.is_writable());
+    BOOST_CHECK(s.first.is_socket());
+    BOOST_CHECK(s.first.is_readable());
+    BOOST_CHECK(!s.first.is_writable());
     std::cout << "Server thread sees incoming connection from " << s.second << std::endl;
     serversocket.close().value();
     llfio::byte buffer[64];
@@ -309,7 +309,7 @@ static inline void TestSocketAddress()
   begin = std::chrono::steady_clock::now();
   while(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count() < 1000)
   {
-    auto r = llfio::byte_socket_handle::byte_socket(endpoint, llfio::byte_socket_handle::mode::write);
+    auto r = llfio::byte_socket_handle::byte_socket(endpoint, llfio::byte_socket_handle::mode::append, llfio::byte_socket_handle::caching::reads);
     if(r)
     {
       writer = std::move(r.value());
@@ -317,13 +317,12 @@ static inline void TestSocketAddress()
     }
   }
   BOOST_REQUIRE(writer.is_valid());
-  BOOST_REQUIRE(writer.is_socket());
-  BOOST_REQUIRE(!writer.is_readable());
-  BOOST_REQUIRE(writer.is_writable());
+  BOOST_CHECK(writer.is_socket());
+  BOOST_CHECK(!writer.is_readable());
+  BOOST_CHECK(writer.is_writable());
   auto written = writer.write(0, {{(const llfio::byte *) "hello", 5}}).value();
   BOOST_REQUIRE(written == 5);
-  writer.barrier().value();
-  writer.close().value();
+  writer.shutdown_and_close().value();
   readerthread.get();
 }
 

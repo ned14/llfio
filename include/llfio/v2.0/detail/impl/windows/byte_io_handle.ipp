@@ -86,7 +86,9 @@ inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &
     EIOSB &ol = *ol_it++;
     ol.Status = -1;
   }
-  auto cancel_io = make_scope_exit([&]() noexcept {
+  auto cancel_io = make_scope_exit(
+  [&]() noexcept
+  {
     if(nativeh.is_nonblocking())
     {
       if(ol_it != ols.begin() + 1)
@@ -142,7 +144,8 @@ inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &
       if(STATUS_TIMEOUT == ntwait(nativeh.h, ol, nd))
       {
         // ntwait cancels the i/o, undoer will cancel all the other i/o
-        auto r = [&]() -> result<void> {
+        auto r = [&]() -> result<void>
+        {
           LLFIO_WIN_DEADLINE_TO_TIMEOUT_LOOP(d);
           return success();
         }();
@@ -186,9 +189,8 @@ inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &
 #ifndef LLFIO_EXCLUDE_NETWORKING
 // Returns true if operation completed immediately
 template <bool blocking, class Syscall, class Flags, class BuffersType>
-inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &&syscall, const native_handle_type &nativeh,
-                          span<WSABUF> bufs, Flags flags, byte_io_handle::io_request<BuffersType> reqs,
-                          deadline d) noexcept
+inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &&syscall, const native_handle_type &nativeh, span<WSABUF> bufs, Flags flags,
+                          byte_io_handle::io_request<BuffersType> reqs, deadline d) noexcept
 {
   LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
   for(size_t n = 0; n < reqs.buffers.size(); n++)
@@ -205,7 +207,13 @@ inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &
     auto retcode = WSAGetLastError();
     if(WSA_IO_PENDING != retcode)
     {
-      ret= generic_error((errc) retcode);
+      if(WSAESHUTDOWN == retcode)
+      {
+        // Emulate POSIX here
+        transferred = 0;
+        goto exit_now;
+      }
+      ret = win32_error(retcode);
       return true;
     }
     if(nativeh.is_nonblocking() && blocking)
@@ -215,20 +223,21 @@ inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &
       if(STATUS_TIMEOUT == ntwait(nativeh.h, ol, nd))
       {
         // ntwait cancels the i/o, undoer will cancel all the other i/o
-        auto r = [&]() -> result<void> {
+        auto r = [&]() -> result<void>
+        {
           LLFIO_WIN_DEADLINE_TO_TIMEOUT_LOOP(d);
           return success();
         }();
         if(!r)
         {
-          ret= std::move(r).error();
+          ret = std::move(r).error();
           return true;
         }
       }
       DWORD flags_ = 0;
       if(!WSAGetOverlappedResult(nativeh.sock, &ol, &transferred, false, &flags_))
       {
-        ret= generic_error((errc) WSAGetLastError());
+        ret = win32_error(WSAGetLastError());
         return true;
       }
     }
@@ -241,21 +250,19 @@ inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &
       return false;  // at least one buffer is not completed yet
     }
   }
-  ret = {reqs.buffers.data(), 0};
-  for(size_t n = 0; n < reqs.buffers.size() && transferred > 0; n++)
+exit_now:
+  for(size_t i = 0; i < reqs.buffers.size(); i++)
   {
-    if(reqs.buffers[n].size() >= transferred)
+    auto &buffer = reqs.buffers[i];
+    if(buffer.size() <= static_cast<size_t>(transferred))
     {
-      transferred -= (DWORD) reqs.buffers[n].size();
+      transferred -= (DWORD) buffer.size();
     }
     else
     {
-      reqs.buffers[n] = {reqs.buffers[n].data(), transferred};
-      transferred = 0;
-    }
-    if(reqs.buffers[n].size() != 0)
-    {
-      ret = {reqs.buffers.data(), n + 1};
+      buffer = {buffer.data(), (size_t) transferred};
+      ret = {reqs.buffers.data(), i + 1};
+      break;
     }
   }
   return true;
