@@ -1,0 +1,5 @@
+var structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1paylobe6936dde2cabbe8f7d748b023b68c21 =
+[
+    [ "kind", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1paylobe6936dde2cabbe8f7d748b023b68c21.html#a0b07716468b558e8a5c6d4e0de3aa4d8", null ],
+    [ "reqs", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1paylobe6936dde2cabbe8f7d748b023b68c21.html#aae74317b0b9a2305b359e34bfee846d7", null ]
+];

@@ -24,16 +24,16 @@ var NAVTREE =
 [
   [ "LLFIO", "index.html", [
     [ "Build instructions", "md__build.html", [
-      [ "v2 architecture and design implemented:", "index.html#autotoc_md19", null ],
-      [ "Planned features implemented:", "index.html#autotoc_md20", null ],
-      [ "Install from the vcpkg package manager", "md__build.html#autotoc_md22", null ],
-      [ "Prebuilt binaries", "md__build.html#autotoc_md23", null ],
-      [ "Get a copy of the source", "md__build.html#autotoc_md24", [
-        [ "If you already cloned before reading this", "md__build.html#autotoc_md25", null ]
+      [ "v2 architecture and design implemented:", "index.html#autotoc_md20", null ],
+      [ "Planned features implemented:", "index.html#autotoc_md21", null ],
+      [ "Install from the vcpkg package manager", "md__build.html#autotoc_md23", null ],
+      [ "Prebuilt binaries", "md__build.html#autotoc_md24", null ],
+      [ "Get a copy of the source", "md__build.html#autotoc_md25", [
+        [ "If you already cloned before reading this", "md__build.html#autotoc_md26", null ]
       ] ],
-      [ "Build static libraries from source", "md__build.html#autotoc_md26", null ],
-      [ "Build shared libraries from source", "md__build.html#autotoc_md27", null ],
-      [ "Installing libraries from source", "md__build.html#autotoc_md28", null ]
+      [ "Build static libraries from source", "md__build.html#autotoc_md27", null ],
+      [ "Build shared libraries from source", "md__build.html#autotoc_md28", null ],
+      [ "Installing libraries from source", "md__build.html#autotoc_md29", null ]
     ] ],
     [ "Todo List", "todo.html", null ],
     [ "Modules", "modules.html", "modules" ],
@@ -73,20 +73,21 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 ".html",
-"classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html",
-"classllfio__v2__xxx_1_1directory__handle.html#aa4670fd2bc968291f5e0c8a98d675aae",
-"classllfio__v2__xxx_1_1file__handle.html#a665ddf5aa47e1d8a94580570a0457c8a",
-"classllfio__v2__xxx_1_1io__multiplexer.html#a00a85eec5a41f7edb2c574d40cf04535",
-"classllfio__v2__xxx_1_1map__handle.html#a486f8bbb3ea986b6f2e877d9ea5ba81d",
-"classllfio__v2__xxx_1_1mapped__file__handle.html#ac9a87793288b496940bdae0ff07cae0c",
-"classllfio__v2__xxx_1_1pipe__handle.html#a3efccd17a106ade83e13cce154627c6f",
-"classllfio__v2__xxx_1_1section__handle.html#af0b352d0f273ba6fa70c178b2c2fee42af7cf95e0f43dc8f79e39ae628c85a11d",
-"functions_z.html",
-"storage__profile_8hpp.html#ac4910e412ff87c1c9e33615d81b2d238a4bc411266f0603994dc9c47c239c47b5",
-"structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#a7ba41ce2ef1ecb93e764d7a60ad9a006",
-"structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html#a2782aa849f1881bd782da6714ec5435a",
-"structllfio__v2__xxx_1_1storage__profile_1_1item.html#aeaca8fe0437080153716297e8dfdbcaa",
-"v2_80_2llfio_8hpp.html#a699beb5138cc8f2a2df12d833e4d96be"
+"classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1lock__files.html#a5a7f463e9235bb95ddd84b69e2642613",
+"classllfio__v2__xxx_1_1byte__io__handle.html#a501aa723172f6852e82738b0969278ae",
+"classllfio__v2__xxx_1_1byte__socket__handle.html#ade2416b9154d1e56937c99cd514324f8",
+"classllfio__v2__xxx_1_1fast__random__file__handle.html#ae80e58316f9f1ed3c522cfe5553196ec",
+"classllfio__v2__xxx_1_1ip_1_1address.html#af15952469793e50f7c7733d03ba64f8a",
+"classllfio__v2__xxx_1_1lockable__byte__io__handle.html#acbcd4d6f6364f8494104287305ff9d2b",
+"classllfio__v2__xxx_1_1mapped__file__handle.html#a308969448e8934b7a86bcc693b9cc578",
+"classllfio__v2__xxx_1_1path__view.html#ae9532a152294cc91153584a909210b30",
+"classllfio__v2__xxx_1_1process__handle.html#aecd3a7db6cee3aec07d32fe6f99e6852adec4ecca8ae1593f84eea4656599a693",
+"deadline_8h.html#a8248d979e402cb0538f7f6f2840b55c1",
+"namespacellfio__v2__xxx_1_1this__thread.html",
+"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a01a933a3116abd41955118b607b47bfd",
+"structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#a419e4bdfd9328c50aac3e83c912058fd",
+"structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type.html#a98091969c9f4829d6a88e782e096b114",
+"structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html#af8906857ccc0bc91120d1d05f632b91d"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

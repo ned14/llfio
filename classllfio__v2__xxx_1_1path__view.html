@@ -417,7 +417,7 @@ LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom
 <li>POSIX: The native platform encoding is assumed to be UTF-8. If the input is <code>char8_t</code> or <code>char</code>, it is not translated. If the input is <code>char16_t</code>, a UTF-16 to UTF-8 translation is performed.</li>
 <li>Microsoft Windows: The native platform encoding is assumed to be UTF-16. If the input is <code>char16_t</code> or <code>wchar_t</code>, it is not translated. If the input is <code>char8_t</code>, a UTF-8 to UTF-16 translation is performed. If the input is <code>char</code>, the Microsoft Windows API for ANSI to UTF-16 translation is invoked in order to match how Windows ANSI APIs are mapped onto the Windows Unicode APIs (be aware this is very slow).</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md16"></a>
+<h1><a class="anchor" id="autotoc_md17"></a>
 Windows specific notes:</h1>
 <p>On Microsoft Windows, filesystem paths may require to be zero terminated, or they may not. Which is the case depends on whether LLFIO calls the NT kernel API directly rather than the Win32 API. As a general rule as to when which is used, the NT kernel API is called instead of the Win32 API when:</p>
 <ul>
