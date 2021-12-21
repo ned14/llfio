@@ -714,13 +714,14 @@ public:
       _v.behaviour |= native_handle_type::disposition::_child_close_executed;
     }
 #endif
+    auto ret = handle::close();
 #ifdef _WIN32
     if(_v)
     {
       detail::unregister_socket_handle_instance(this);
     }
 #endif
-    return handle::close();
+    return ret;
   }
 
   /*! Read the contents of the listening socket for newly connected byte sockets.

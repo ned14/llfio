@@ -25,8 +25,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../test_kernel_decl.hpp"
 
 #include <future>
-#include <unordered_set>
 #include <sstream>
+#include <unordered_set>
 
 static inline void TestSocketAddress()
 {
@@ -38,7 +38,7 @@ static inline void TestSocketAddress()
     BOOST_CHECK(!a.is_any());
     BOOST_CHECK(a.is_v4());
     BOOST_CHECK(!a.is_v6());
-    BOOST_CHECK(a.port()==0);
+    BOOST_CHECK(a.port() == 0);
     BOOST_CHECK(a.to_bytes().size() == 4);
     BOOST_CHECK(a.to_bytes()[0] == (llfio::byte) 127);
     BOOST_CHECK(a.to_bytes()[1] == (llfio::byte) 0);
@@ -49,7 +49,7 @@ static inline void TestSocketAddress()
     ss << a;
     std::cout << ss.str() << std::endl;
     BOOST_CHECK(ss.str() == "127.0.0.1:0");
-  } 
+  }  // namespace ;
   {
     auto a = llfio::ip::address_v6::loopback();
     BOOST_CHECK(a.is_loopback());
@@ -270,7 +270,7 @@ static inline void TestSocketAddress()
   }
 }
 
-  static inline void TestBlockingSocketHandles()
+static inline void TestBlockingSocketHandles()
 {
   namespace llfio = LLFIO_V2_NAMESPACE;
   auto serversocket = llfio::listening_socket_handle::listening_socket(true, llfio::listening_socket_handle::mode::read).value();
@@ -281,7 +281,9 @@ static inline void TestSocketAddress()
   serversocket.bind(llfio::ip::address_v6::loopback()).value();
   auto endpoint = serversocket.local_endpoint().value();
   std::cout << "Server socket is listening on " << endpoint << std::endl;
-  auto readerthread = std::async([serversocket = std::move(serversocket)]() mutable {
+  auto readerthread = std::async(
+  [serversocket = std::move(serversocket)]() mutable
+  {
     std::pair<llfio::byte_socket_handle, llfio::ip::address> s;
     serversocket.read({s}).value();  // This immediately blocks in blocking mode
     BOOST_REQUIRE(s.first.is_valid());
@@ -326,35 +328,63 @@ static inline void TestSocketAddress()
   readerthread.get();
 }
 
-#if 0
-static inline void TestNonBlockingPipeHandle()
+static inline void TestNonBlockingSocketHandles()
 {
   namespace llfio = LLFIO_V2_NAMESPACE;
-  llfio::pipe_handle reader = llfio::pipe_handle::pipe_create("llfio-pipe-handle-test", llfio::pipe_handle::caching::all, llfio::pipe_handle::flag::multiplexable).value();
+  auto serversocket = llfio::listening_socket_handle::listening_socket(true, llfio::listening_socket_handle::mode::read, llfio::pipe_handle::caching::all,
+                                                                       llfio::pipe_handle::flag::multiplexable)
+                      .value();
+  BOOST_REQUIRE(serversocket.is_valid());
+  BOOST_CHECK(serversocket.is_socket());
+  BOOST_CHECK(serversocket.is_readable());
+  BOOST_CHECK(!serversocket.is_writable());
+  serversocket.bind(llfio::ip::address_v6::loopback()).value();
+  auto endpoint = serversocket.local_endpoint().value();
+  std::cout << "Server socket is listening on " << endpoint << std::endl;
+
+  std::pair<llfio::byte_socket_handle, llfio::ip::address> reader;
+  {  // no incoming, so non-blocking read should time out
+    auto read = serversocket.read({reader}, std::chrono::milliseconds(0));
+    BOOST_REQUIRE(read.has_error());
+    BOOST_REQUIRE(read.error() == llfio::errc::timed_out);
+  }
+  {  // no incoming, so blocking read should time out
+    auto read = serversocket.read({reader}, std::chrono::seconds(1));
+    BOOST_REQUIRE(read.has_error());
+    BOOST_REQUIRE(read.error() == llfio::errc::timed_out);
+  }
+
+  // Form the connection.
+  auto writer = llfio::byte_socket_handle::byte_socket(endpoint, llfio::byte_socket_handle::mode::append, llfio::byte_socket_handle::caching::reads,
+                                                       llfio::pipe_handle::flag::multiplexable)
+                .value();
+  serversocket.read({reader}, std::chrono::milliseconds(0)).value();
+  std::cout << "Server socket sees incoming connection from " << reader.second << std::endl;
+
   llfio::byte buffer[64];
-  {  // no writer, so non-blocking read should time out
-    auto read = reader.read(0, {{buffer, 64}}, std::chrono::milliseconds(0));
+  {  // no data, so non-blocking read should time out
+    auto read = reader.first.read(0, {{buffer, 64}}, std::chrono::milliseconds(0));
     BOOST_REQUIRE(read.has_error());
     BOOST_REQUIRE(read.error() == llfio::errc::timed_out);
   }
-  {  // no writer, so blocking read should time out
-    auto read = reader.read(0, {{buffer, 64}}, std::chrono::seconds(1));
+  {  // no data, so blocking read should time out
+    auto read = reader.first.read(0, {{buffer, 64}}, std::chrono::seconds(1));
     BOOST_REQUIRE(read.has_error());
     BOOST_REQUIRE(read.error() == llfio::errc::timed_out);
   }
-  llfio::pipe_handle writer = llfio::pipe_handle::pipe_open("llfio-pipe-handle-test", llfio::pipe_handle::caching::all, llfio::pipe_handle::flag::multiplexable).value();
   auto written = writer.write(0, {{(const llfio::byte *) "hello", 5}}).value();
   BOOST_REQUIRE(written == 5);
-  // writer.barrier().value();  // would block until pipe drained by reader
-  // writer.close().value();  // would cause all further reads to fail due to pipe broken
-  auto read = reader.read(0, {{buffer, 64}}, std::chrono::milliseconds(0));
+  // writer.shutdown_and_close().value();  // would block until socket drained by reader
+  // writer.close().value();  // would cause all further reads to fail due to socket broken
+  auto read = reader.first.read(0, {{buffer, 64}}, std::chrono::milliseconds(0));
   BOOST_REQUIRE(read.value() == 5);
   BOOST_CHECK(0 == memcmp(buffer, "hello", 5));
-  writer.barrier().value();  // must not block nor fail
+  writer.shutdown_and_close().value();  // must not block nor fail
   writer.close().value();
-  reader.close().value();
+  reader.first.close().value();
 }
 
+#if 0
 #if LLFIO_ENABLE_TEST_IO_MULTIPLEXERS
 static inline void TestMultiplexedPipeHandle()
 {
@@ -632,8 +662,8 @@ static inline void TestCoroutinedPipeHandle()
 KERNELTEST_TEST_KERNEL(integration, llfio, ip, address, "Tests that llfio::ip::address works as expected", TestSocketAddress())
 KERNELTEST_TEST_KERNEL(integration, llfio, socket_handle, blocking, "Tests that blocking llfio::byte_socket_handle works as expected",
                        TestBlockingSocketHandles())
+KERNELTEST_TEST_KERNEL(integration, llfio, socket_handle, nonblocking, "Tests that nonblocking llfio::byte_socket_handle works as expected", TestNonBlockingSocketHandles())
 #if 0
-KERNELTEST_TEST_KERNEL(integration, llfio, pipe_handle, nonblocking, "Tests that nonblocking llfio::pipe_handle works as expected", TestNonBlockingPipeHandle())
 #if LLFIO_ENABLE_TEST_IO_MULTIPLEXERS
 KERNELTEST_TEST_KERNEL(integration, llfio, pipe_handle, multiplexed, "Tests that multiplexed llfio::pipe_handle works as expected", TestMultiplexedPipeHandle())
 #if LLFIO_ENABLE_COROUTINES
