@@ -415,15 +415,14 @@ public:
     using Base = LLFIO_V2_NAMESPACE::result<T>;
     size_type _bytes_transferred{static_cast<size_type>(-1)};
 
-#if defined(_MSC_VER) && !defined(__clang__)  // workaround MSVC parsing bug
+#if defined(_MSC_VER) && _MSC_VER < 1930 /*VS2022*/ && !defined(__clang__)  // workaround MSVC parsing bug
     constexpr io_result()
         : Base()
     {
     }
-    LLFIO_TEMPLATE(class Arg, class... Args)
-    LLFIO_TREQUIRES(LLFIO_TPRED(!std::is_same<std::decay_t<Arg>, io_result>::value), LLFIO_TEXPR(Base(std::declval<Arg>(), std::declval<Args>()...)))
-    constexpr io_result(Arg &&arg, Args &&...args)
-        : Base(std::forward<Arg>(arg), std::forward<Args>(args)...)
+    template <class... Args>
+    constexpr io_result(Args &&...args)
+        : Base(std::forward<Args>(args)...)
     {
     }
 #else

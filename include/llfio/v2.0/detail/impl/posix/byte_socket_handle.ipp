@@ -47,21 +47,33 @@ namespace detail
     nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
 
     nativeh.fd = ::socket(family,
-                          SOCK_STREAM |
+                          SOCK_STREAM
 #ifdef SOCK_CLOEXEC
-                          SOCK_CLOEXEC |
+                          | SOCK_CLOEXEC
 #endif
-                          ((flags & handle::flag::multiplexable) ? SOCK_NONBLOCK : 0),
+#ifdef SOCK_NONBLOCK
+                          | ((flags & handle::flag::multiplexable) ? SOCK_NONBLOCK : 0)
+#endif
+       ,
                           IPPROTO_TCP);
     if(nativeh.fd == -1)
     {
       return posix_error();
     }
 #ifndef SOCK_CLOEXEC
-    // Not FD_CLOEXEC as it's only MacOS that doesn't implement SOCK_NONBLOCK, and its F_SETFD requires bit 0.
+    // Not FD_CLOEXEC as it's only MacOS that doesn't implement SOCK_CLOEXEC, and its F_SETFD requires bit 0.
     if(-1 == ::fcntl(nativeh.fd, F_SETFD, 1))
     {
       return posix_error();
+    }
+#endif
+#ifndef SOCK_NONBLOCK
+    if(flags & handle::flag::multiplexable)
+    {
+      if(-1 == ::fcntl(nativeh.fd, F_SETFL, O_NONBLOCK))
+      {
+        return posix_error();
+      }
     }
 #endif
     if(_caching < handle::caching::all)
