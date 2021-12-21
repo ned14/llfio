@@ -217,6 +217,11 @@ inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &
     auto retcode = WSAGetLastError();
     if(WSA_IO_PENDING != retcode)
     {
+      if(WSAEWOULDBLOCK == retcode)
+      {
+        transferred = 0;
+        goto exit_now;
+      }
       if(WSAESHUTDOWN == retcode)
       {
         // Emulate POSIX here

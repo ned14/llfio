@@ -69,6 +69,18 @@ namespace ip
   }
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool address::is_v4() const noexcept { return _family == AF_INET; }
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool address::is_v6() const noexcept { return _family == AF_INET6; }
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC enum family address::family() const noexcept
+  {
+    switch(_family)
+    {
+    case AF_INET:
+      return family::v4;
+    case AF_INET6:
+      return family::v6;
+    default:
+      return family::unknown;
+    }
+  }
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC int address::sockaddrlen() const noexcept
   {
     switch(_family)
@@ -280,66 +292,6 @@ namespace ip
     return ret;
   }
 }  // namespace ip
-
-LLFIO_HEADERS_ONLY_MEMFUNC_SPEC byte_socket_handle::io_result<byte_socket_handle::buffers_type> byte_socket_handle::_do_read(io_request<buffers_type> reqs,
-                                                                                                                             deadline d) noexcept
-{
-  LLFIO_LOG_FUNCTION_CALL(this);
-  auto ret = byte_io_handle::_do_read(std::move(reqs), d);
-  if(!(_v.behaviour & native_handle_type::disposition::_is_connected))
-  {
-    if(!ret)
-    {
-      if(ret.error() == errc::not_connected)
-      {
-        return errc::operation_would_block;
-      }
-    }
-    else
-    {
-      _v.behaviour |= native_handle_type::disposition::_is_connected;
-      if(!is_writable())
-      {
-        OUTCOME_TRY(shutdown(shutdown_write));
-      }
-      else if(!is_readable())
-      {
-        OUTCOME_TRY(shutdown(shutdown_read));
-      }
-    }
-  }
-  return ret;
-}
-
-LLFIO_HEADERS_ONLY_MEMFUNC_SPEC byte_socket_handle::io_result<byte_socket_handle::const_buffers_type>
-byte_socket_handle::_do_write(io_request<const_buffers_type> reqs, deadline d) noexcept
-{
-  LLFIO_LOG_FUNCTION_CALL(this);
-  auto ret = byte_io_handle::_do_write(std::move(reqs), d);
-  if(!(_v.behaviour & native_handle_type::disposition::_is_connected))
-  {
-    if(!ret)
-    {
-      if(ret.error() == errc::not_connected)
-      {
-        return errc::operation_would_block;
-      }
-    }
-    else
-    {
-      _v.behaviour |= native_handle_type::disposition::_is_connected;
-      if(!is_writable())
-      {
-        OUTCOME_TRY(shutdown(shutdown_write));
-      }
-      else if(!is_readable())
-      {
-        OUTCOME_TRY(shutdown(shutdown_read));
-      }
-    }
-  }
-  return ret;
-}
 
 LLFIO_V2_NAMESPACE_END
 

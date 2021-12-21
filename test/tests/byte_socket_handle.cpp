@@ -273,17 +273,15 @@ static inline void TestSocketAddress()
 static inline void TestBlockingSocketHandles()
 {
   namespace llfio = LLFIO_V2_NAMESPACE;
-  auto serversocket = llfio::listening_socket_handle::listening_socket(true, llfio::listening_socket_handle::mode::read).value();
+  auto serversocket = llfio::listening_socket_handle::listening_socket(llfio::ip::family::v4, llfio::listening_socket_handle::mode::read).value();
   BOOST_REQUIRE(serversocket.is_valid());
   BOOST_CHECK(serversocket.is_socket());
   BOOST_CHECK(serversocket.is_readable());
   BOOST_CHECK(!serversocket.is_writable());
-  serversocket.bind(llfio::ip::address_v6::loopback()).value();
+  serversocket.bind(llfio::ip::address_v4::loopback()).value();
   auto endpoint = serversocket.local_endpoint().value();
   std::cout << "Server socket is listening on " << endpoint << std::endl;
-  auto readerthread = std::async(
-  [serversocket = std::move(serversocket)]() mutable
-  {
+  auto readerthread = std::async([serversocket = std::move(serversocket)]() mutable {
     std::pair<llfio::byte_socket_handle, llfio::ip::address> s;
     serversocket.read({s}).value();  // This immediately blocks in blocking mode
     BOOST_REQUIRE(s.first.is_valid());
@@ -311,10 +309,11 @@ static inline void TestBlockingSocketHandles()
   begin = std::chrono::steady_clock::now();
   while(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count() < 1000)
   {
-    auto r = llfio::byte_socket_handle::byte_socket(endpoint, llfio::byte_socket_handle::mode::append, llfio::byte_socket_handle::caching::reads);
+    writer =
+    llfio::byte_socket_handle::byte_socket(llfio::ip::family::v4, llfio::byte_socket_handle::mode::append, llfio::byte_socket_handle::caching::reads).value();
+    auto r = writer.connect(endpoint);
     if(r)
     {
-      writer = std::move(r.value());
       break;
     }
   }
@@ -331,14 +330,14 @@ static inline void TestBlockingSocketHandles()
 static inline void TestNonBlockingSocketHandles()
 {
   namespace llfio = LLFIO_V2_NAMESPACE;
-  auto serversocket = llfio::listening_socket_handle::listening_socket(true, llfio::listening_socket_handle::mode::read,
+  auto serversocket = llfio::listening_socket_handle::listening_socket(llfio::ip::family::v4, llfio::listening_socket_handle::mode::read,
                                                                        llfio::byte_socket_handle::caching::all, llfio::byte_socket_handle::flag::multiplexable)
                       .value();
   BOOST_REQUIRE(serversocket.is_valid());
   BOOST_CHECK(serversocket.is_socket());
   BOOST_CHECK(serversocket.is_readable());
   BOOST_CHECK(!serversocket.is_writable());
-  serversocket.bind(llfio::ip::address_v6::loopback()).value();
+  serversocket.bind(llfio::ip::address_v4::loopback()).value();
   auto endpoint = serversocket.local_endpoint().value();
   std::cout << "Server socket is listening on " << endpoint << std::endl;
 
@@ -355,9 +354,10 @@ static inline void TestNonBlockingSocketHandles()
   }
 
   // Form the connection.
-  auto writer = llfio::byte_socket_handle::byte_socket(endpoint, llfio::byte_socket_handle::mode::append, llfio::byte_socket_handle::caching::reads,
-                                                       llfio::byte_socket_handle::flag::multiplexable)
+  auto writer = llfio::byte_socket_handle::byte_socket(llfio::ip::family::v4, llfio::byte_socket_handle::mode::append,
+                                                       llfio::byte_socket_handle::caching::reads, llfio::byte_socket_handle::flag::multiplexable)
                 .value();
+  writer.connect(endpoint).value();
   serversocket.read({reader}, std::chrono::seconds(1)).value();
   std::cout << "Server socket sees incoming connection from " << reader.second << std::endl;
 
@@ -389,8 +389,7 @@ static inline void TestMultiplexedSocketHandles()
 {
   static constexpr size_t MAX_SOCKETS = 64;
   namespace llfio = LLFIO_V2_NAMESPACE;
-  auto test_multiplexer = [](llfio::byte_io_multiplexer_ptr multiplexer)
-  {
+  auto test_multiplexer = [](llfio::byte_io_multiplexer_ptr multiplexer) {
     std::vector<llfio::byte_socket_handle> read_sockets, write_sockets;
     std::vector<size_t> received_for(MAX_SOCKETS);
     struct checking_receiver final : public llfio::byte_io_multiplexer::io_operation_state_visitor
@@ -485,19 +484,20 @@ static inline void TestMultiplexedSocketHandles()
       }
     };
     auto serversocket =
-    llfio::listening_socket_handle::listening_socket(true, llfio::listening_socket_handle::mode::write, llfio::byte_socket_handle::caching::all,
-                                                     llfio::byte_socket_handle::flag::multiplexable)
+    llfio::listening_socket_handle::listening_socket(llfio::ip::family::v4, llfio::listening_socket_handle::mode::write,
+                                                     llfio::byte_socket_handle::caching::all, llfio::byte_socket_handle::flag::multiplexable)
     .value();
-    serversocket.bind(llfio::ip::address_v6::loopback()).value();
+    serversocket.bind(llfio::ip::address_v4::loopback()).value();
     auto endpoint = serversocket.local_endpoint().value();
     std::cout << "Server socket is listening on " << endpoint << std::endl;
 
     std::vector<checking_receiver> async_reads;
     for(size_t n = 0; n < MAX_SOCKETS; n++)
     {
-      auto write_socket = llfio::byte_socket_handle::byte_socket(endpoint, llfio::byte_socket_handle::mode::write, llfio::byte_socket_handle::caching::all,
-                                                                 llfio::byte_socket_handle::flag::multiplexable)
+      auto write_socket = llfio::byte_socket_handle::byte_socket(llfio::ip::family::v4, llfio::byte_socket_handle::mode::write,
+                                                                 llfio::byte_socket_handle::caching::all, llfio::byte_socket_handle::flag::multiplexable)
                           .value();
+      write_socket.connect(endpoint).value();
       std::pair<llfio::byte_socket_handle, llfio::ip::address> read_socket;
       serversocket.read({read_socket}).value();
       read_socket.first.set_multiplexer(multiplexer.get()).value();
@@ -505,9 +505,7 @@ static inline void TestMultiplexedSocketHandles()
       read_sockets.push_back(std::move(read_socket.first));
       write_sockets.push_back(std::move(write_socket));
     }
-    auto writerthread = std::async(
-    [&]
-    {
+    auto writerthread = std::async([&] {
       std::this_thread::sleep_for(std::chrono::milliseconds(500));
       for(size_t n = MAX_SOCKETS - 1; n < MAX_SOCKETS; n--)
       {
@@ -570,8 +568,7 @@ static inline void TestCoroutinedSocketHandles()
 {
   static constexpr size_t MAX_SOCKETS = 70;
   namespace llfio = LLFIO_V2_NAMESPACE;
-  auto test_multiplexer = [](llfio::byte_io_multiplexer_ptr multiplexer)
-  {
+  auto test_multiplexer = [](llfio::byte_io_multiplexer_ptr multiplexer) {
     struct coroutine
     {
       llfio::byte_socket_handle read_socket, write_socket;
@@ -609,16 +606,17 @@ static inline void TestCoroutinedSocketHandles()
     llfio::listening_socket_handle::listening_socket(true, llfio::listening_socket_handle::mode::write, llfio::byte_socket_handle::caching::all,
                                                      llfio::byte_socket_handle::flag::multiplexable)
     .value();
-    serversocket.bind(llfio::ip::address_v6::loopback()).value();
+    serversocket.bind(llfio::ip::address_v4::loopback()).value();
     auto endpoint = serversocket.local_endpoint().value();
     std::cout << "Server socket is listening on " << endpoint << std::endl;
 
     std::vector<coroutine> coroutines;
     for(size_t n = 0; n < MAX_SOCKETS; n++)
     {
-      auto write_socket = llfio::byte_socket_handle::byte_socket(endpoint, llfio::byte_socket_handle::mode::write, llfio::byte_socket_handle::caching::all,
-                                                                 llfio::byte_socket_handle::flag::multiplexable)
+      auto write_socket = llfio::byte_socket_handle::byte_socket(llfio::ip::family::v4, llfio::byte_socket_handle::mode::write,
+                                                                 llfio::byte_socket_handle::caching::all, llfio::byte_socket_handle::flag::multiplexable)
                           .value();
+      write_socket.connect(endpoint).value();
       std::pair<llfio::byte_socket_handle, llfio::ip::address> read_socket;
       serversocket.read({read_socket}).value();
       read_socket.first.set_multiplexer(multiplexer.get()).value();

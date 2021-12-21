@@ -71,8 +71,8 @@ namespace detail
       }
     }
   }
-  inline result<void> create_socket(void *p, native_handle_type &nativeh, unsigned short family, handle::mode _mode, handle::caching _caching,
-                             handle::flag flags) noexcept
+  inline result<void> create_socket(void *p, native_handle_type &nativeh, ip::family _family, handle::mode _mode, handle::caching _caching,
+                                    handle::flag flags) noexcept
   {
     flags &= ~handle::flag::unlink_on_first_close;
     nativeh.behaviour |= native_handle_type::disposition::socket;
@@ -81,6 +81,7 @@ namespace detail
     nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
 
     detail::register_socket_handle_instance(p);
+    const unsigned short family = (_family == ip::family::v6) ? AF_INET6 : ((_family == ip::family::v4) ? AF_INET : 0);
     nativeh.sock =
     WSASocketW(family, SOCK_STREAM, IPPROTO_TCP, nullptr, 0, WSA_FLAG_NO_HANDLE_INHERIT | ((flags & handle::flag::multiplexable) ? WSA_FLAG_OVERLAPPED : 0));
     if(nativeh.sock == INVALID_SOCKET)
@@ -104,6 +105,16 @@ namespace detail
         {
           return win32_error(WSAGetLastError());
         }
+      }
+    }
+    if(flags & handle::flag::multiplexable)
+    {
+      // Also set to non-blocking so reads/writes etc return partially completed, but also
+      // connects and accepts do not block.
+      u_long val = 1;
+      if(SOCKET_ERROR == ::ioctlsocket(nativeh.sock, FIONBIO, &val))
+      {
+        return win32_error(WSAGetLastError());
       }
     }
     return success();
@@ -144,34 +155,86 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> byte_socket_handle::shutdown(shutdo
   return success();
 }
 
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> byte_socket_handle::connect(const ip::address &addr, deadline d) noexcept
+{
+  LLFIO_LOG_FUNCTION_CALL(this);
+  if(d && !_v.is_nonblocking())
+  {
+    return errc::not_supported;
+  }
+  LLFIO_DEADLINE_TO_SLEEP_INIT(d);
+  if(!(_v.behaviour & native_handle_type::disposition::_is_connected))
+  {
+    if(SOCKET_ERROR == ::connect(_v.sock, addr.to_sockaddr(), addr.sockaddrlen()))
+    {
+      auto retcode = WSAGetLastError();
+      if(retcode != WSAEWOULDBLOCK)
+      {
+        return win32_error(retcode);
+      }
+    }
+    _v.behaviour |= native_handle_type::disposition::_is_connected;
+  }
+  if(_v.is_nonblocking())
+  {
+    for(;;)
+    {
+      pollfd writefds;
+      writefds.fd = _v.fd;
+      writefds.events = POLLOUT | POLLERR | POLLHUP;
+      writefds.revents = 0;
+      int timeout = -1;
+      std::chrono::milliseconds ms;
+      if(d.steady)
+      {
+        ms = std::chrono::duration_cast<std::chrono::milliseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());
+      }
+      else
+      {
+        ms = std::chrono::duration_cast<std::chrono::milliseconds>(d.to_time_point() - std::chrono::system_clock::now());
+      }
+      if(ms.count() < 0)
+      {
+        timeout = 0;
+      }
+      else
+      {
+        timeout = (int) ms.count();
+      }
+      if(SOCKET_ERROR == WSAPoll(&writefds, 1, timeout))
+      {
+        return win32_error(WSAGetLastError());
+      }
+      if(writefds.revents & POLLOUT)
+      {
+        break;
+      }
+      if(writefds.revents & (POLLERR | POLLHUP))
+      {
+        return errc::not_connected;
+      }
+      LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
+    }
+  }
+  if(!is_writable())
+  {
+    OUTCOME_TRY(shutdown(shutdown_write));
+  }
+  else if(!is_readable())
+  {
+    OUTCOME_TRY(shutdown(shutdown_read));
+  }
+  return success();
+}
 
-LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<byte_socket_handle> byte_socket_handle::byte_socket(const ip::address &addr, mode _mode, caching _caching,
+
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<byte_socket_handle> byte_socket_handle::byte_socket(ip::family _family, mode _mode, caching _caching,
                                                                                            flag flags) noexcept
 {
   result<byte_socket_handle> ret(byte_socket_handle(native_handle_type(), _caching, flags, nullptr));
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
-  OUTCOME_TRY(detail::create_socket(&ret.value(), nativeh, addr.family(), _mode, _caching, flags));
-  if(SOCKET_ERROR == ::connect(nativeh.sock, addr.to_sockaddr(), addr.sockaddrlen()))
-  {
-    auto retcode = WSAGetLastError();
-    if(retcode != WSA_IO_PENDING)
-    {
-      return win32_error(retcode);
-    }
-  }
-  else
-  {
-    nativeh.behaviour |= native_handle_type::disposition::_is_connected;
-    if(_mode == mode::read)
-    {
-      OUTCOME_TRY(ret.value().shutdown(shutdown_write));
-    }
-    else if(_mode == mode::append)
-    {
-      OUTCOME_TRY(ret.value().shutdown(shutdown_read));
-    }
-  }
+  OUTCOME_TRY(detail::create_socket(&ret.value(), nativeh, _family, _mode, _caching, flags));
   return ret;
 }
 
@@ -247,17 +310,17 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> listening_socket_handle::bind(const
   return success();
 }
 
-LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle> listening_socket_handle::listening_socket(bool use_ipv6, mode _mode, caching _caching,
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle> listening_socket_handle::listening_socket(ip::family family, mode _mode, caching _caching,
                                                                                                           flag flags) noexcept
 {
   result<listening_socket_handle> ret(listening_socket_handle(native_handle_type(), _caching, flags, nullptr));
   native_handle_type &nativeh = ret.value()._v;
-  OUTCOME_TRY(detail::create_socket(&ret.value(), nativeh, use_ipv6 ? AF_INET6 : AF_INET, _mode, _caching, flags));
+  OUTCOME_TRY(detail::create_socket(&ret.value(), nativeh, family, _mode, _caching, flags));
   return ret;
 }
 
 LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle::buffers_type> listening_socket_handle::_do_read(io_request<buffers_type> req,
-                                                                                                            deadline d) noexcept
+                                                                                                                deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   if(req.buffers.empty())
@@ -279,35 +342,33 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle::buffers_type> li
     if(d)
     {
       ready_to_accept = false;
-      fd_set readfds;
-      FD_ZERO(&readfds);
-      FD_SET(_v.sock, &readfds);
-      TIMEVAL *timeout = nullptr, _timeout;
-      std::chrono::microseconds us;
+      pollfd readfds;
+      readfds.fd = _v.fd;
+      readfds.events = POLLIN;
+      readfds.revents = 0;
+      int timeout = -1;
+      std::chrono::milliseconds ms;
       if(d.steady)
       {
-        us = std::chrono::duration_cast<std::chrono::microseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());
+        ms = std::chrono::duration_cast<std::chrono::milliseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());
       }
       else
       {
-        us = std::chrono::duration_cast<std::chrono::microseconds>(d.to_time_point() - std::chrono::system_clock::now());
+        ms = std::chrono::duration_cast<std::chrono::milliseconds>(d.to_time_point() - std::chrono::system_clock::now());
       }
-      if(us.count() < 0)
+      if(ms.count() < 0)
       {
-        _timeout.tv_sec = 0;
-        _timeout.tv_usec = 0;
+        timeout = 0;
       }
       else
       {
-        _timeout.tv_sec = (long) (us.count() / 1000000UL);
-        _timeout.tv_usec = (long) (us.count() % 1000000UL);
+        timeout = (int) ms.count();
       }
-      timeout = &_timeout;
-      if(SOCKET_ERROR == ::select(1, &readfds, nullptr, nullptr, timeout))
+      if(SOCKET_ERROR == WSAPoll(&readfds, 1, timeout))
       {
         return win32_error(WSAGetLastError());
       }
-      if(FD_ISSET(_v.sock, &readfds))
+      if(readfds.revents & POLLIN)
       {
         ready_to_accept = true;
       }

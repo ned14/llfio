@@ -30,7 +30,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <poll.h>
 #include <sys/socket.h>
 
-#ifndef SOCK_CLOEXEC
+#if !defined(SOCK_CLOEXEC) || !defined(SOCK_NONBLOCK)
 #include <fcntl.h>
 #endif
 
@@ -38,14 +38,14 @@ LLFIO_V2_NAMESPACE_BEGIN
 
 namespace detail
 {
-  inline result<void> create_socket(native_handle_type &nativeh, unsigned short family, handle::mode _mode, handle::caching _caching,
-                                    handle::flag flags) noexcept
+  inline result<void> create_socket(native_handle_type &nativeh, ip::family _family, handle::mode _mode, handle::caching _caching, handle::flag flags) noexcept
   {
     flags &= ~handle::flag::unlink_on_first_close;
     nativeh.behaviour |= native_handle_type::disposition::socket;
     OUTCOME_TRY(attribs_from_handle_mode_caching_and_flags(nativeh, _mode, handle::creation::if_needed, _caching, flags));
     nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
 
+    const unsigned short family = (_family == ip::family::v6) ? AF_INET6 : ((_family == ip::family::v4) ? AF_INET : 0);
     nativeh.fd = ::socket(family,
                           SOCK_STREAM
 #ifdef SOCK_CLOEXEC
@@ -54,7 +54,7 @@ namespace detail
 #ifdef SOCK_NONBLOCK
                           | ((flags & handle::flag::multiplexable) ? SOCK_NONBLOCK : 0)
 #endif
-       ,
+                          ,
                           IPPROTO_TCP);
     if(nativeh.fd == -1)
     {
@@ -131,34 +131,84 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> byte_socket_handle::shutdown(shutdo
   return success();
 }
 
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> byte_socket_handle::connect(const ip::address &addr, deadline d) noexcept
+{
+  LLFIO_LOG_FUNCTION_CALL(this);
+  if(d && !_v.is_nonblocking())
+  {
+    return errc::not_supported;
+  }
+  LLFIO_DEADLINE_TO_SLEEP_INIT(d);
+  if(!(_v.behaviour & native_handle_type::disposition::_is_connected))
+  {
+    if(-1 == ::connect(_v.fd, addr.to_sockaddr(), addr.sockaddrlen()))
+    {
+      auto retcode = errno;
+      if(retcode != EINPROGRESS && retcode != EAGAIN)
+      {
+        return posix_error(retcode);
+      }
+    }
+    _v.behaviour |= native_handle_type::disposition::_is_connected;
+  }
+  if(_v.is_nonblocking())
+  {
+    for(;;)
+    {
+      pollfd writefds;
+      writefds.fd = _v.fd;
+      writefds.events = POLLOUT|POLLERR|POLLHUP;
+      writefds.revents = 0;
+      int timeout = -1;
+      std::chrono::milliseconds ms;
+      if(d.steady)
+      {
+        ms = std::chrono::duration_cast<std::chrono::milliseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());
+      }
+      else
+      {
+        ms = std::chrono::duration_cast<std::chrono::milliseconds>(d.to_time_point() - std::chrono::system_clock::now());
+      }
+      if(ms.count() < 0)
+      {
+        timeout = 0;
+      }
+      else
+      {
+        timeout = (int) ms.count();
+      }
+      if(-1 == ::poll(&writefds, 1, timeout))
+      {
+        return posix_error();
+      }
+      if(writefds.revents & POLLOUT)
+      {
+        break;
+      }
+      if(writefds.revents & (POLLERR | POLLHUP))
+      {
+        return errc::not_connected;
+      }
+      LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
+    }
+  }
+  if(!is_writable())
+  {
+    OUTCOME_TRY(shutdown(shutdown_write));
+  }
+  else if(!is_readable())
+  {
+    OUTCOME_TRY(shutdown(shutdown_read));
+  }
+  return success();
+}
 
-LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<byte_socket_handle> byte_socket_handle::byte_socket(const ip::address &addr, mode _mode, caching _caching,
-                                                                                           flag flags) noexcept
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<byte_socket_handle> byte_socket_handle::byte_socket(ip::family family, mode _mode, caching _caching, flag flags) noexcept
 {
   result<byte_socket_handle> ret(byte_socket_handle(native_handle_type(), _caching, flags, nullptr));
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
-  OUTCOME_TRY(detail::create_socket(nativeh, addr.family(), _mode, _caching, flags));
-  if(-1 == ::connect(nativeh.fd, addr.to_sockaddr(), addr.sockaddrlen()))
-  {
-    auto retcode = errno;
-    if(retcode != EINPROGRESS && retcode != EAGAIN)
-    {
-      return posix_error(retcode);
-    }
-  }
-  else
-  {
-    nativeh.behaviour |= native_handle_type::disposition::_is_connected;
-    if(_mode == mode::read)
-    {
-      OUTCOME_TRY(ret.value().shutdown(shutdown_write));
-    }
-    else if(_mode == mode::append)
-    {
-      OUTCOME_TRY(ret.value().shutdown(shutdown_read));
-    }
-  }
+  OUTCOME_TRY(detail::create_socket(nativeh, family, _mode, _caching, flags));
   return ret;
 }
 
@@ -233,12 +283,12 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> listening_socket_handle::bind(const
   return success();
 }
 
-LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle> listening_socket_handle::listening_socket(bool use_ipv6, mode _mode, caching _caching,
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle> listening_socket_handle::listening_socket(ip::family family, mode _mode, caching _caching,
                                                                                                           flag flags) noexcept
 {
   result<listening_socket_handle> ret(listening_socket_handle(native_handle_type(), _caching, flags, nullptr));
   native_handle_type &nativeh = ret.value()._v;
-  OUTCOME_TRY(detail::create_socket(nativeh, use_ipv6 ? AF_INET6 : AF_INET, _mode, _caching, flags));
+  OUTCOME_TRY(detail::create_socket(nativeh, family, _mode, _caching, flags));
   return ret;
 }
 
@@ -284,7 +334,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle::buffers_type> li
       }
       else
       {
-        timeout = ms.count();
+        timeout = (int) ms.count();
       }
       if(-1 == ::poll(&readfds, 1, timeout))
       {

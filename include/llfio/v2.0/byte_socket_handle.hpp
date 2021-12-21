@@ -62,6 +62,14 @@ namespace ip
 {
   class address_v4;
   class address_v6;
+
+  //! The family of IP
+  enum class family
+  {
+    unknown,
+    v4,  //!< IP version 4
+    v6   //!< IP version 6
+  };
   /*! \class address
   \brief A version independent IP address.
 
@@ -104,12 +112,9 @@ namespace ip
 
   public:
     constexpr address() noexcept
-        : _family(0)
-        , _port(0)
-        , ipv6{0,
-               {to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0),
-                to_byte(0), to_byte(0), to_byte(0), to_byte(0)},
-               0}
+        : _storage{to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0),
+                   to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0),
+                   to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0), to_byte(0)}
     {
     }
     LLFIO_HEADERS_ONLY_MEMFUNC_SPEC explicit address(const sockaddr_in &storage) noexcept;
@@ -141,7 +146,9 @@ namespace ip
     LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool is_v6() const noexcept;
 
     //! Returns the raw family of the address
-    unsigned short family() const noexcept { return _family; }
+    unsigned short raw_family() const noexcept { return _family; }
+    //! Returns the family of the addres
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC enum family family() const noexcept;
     //! Returns the port of the address
     uint16_t port() const noexcept { return _port; }
     //! Returns the IPv6 flow info, if address is v6.
@@ -299,6 +306,9 @@ This *should* avoid the need for `SO_LINGER` for remote sides
 acting in good faith. If you don't control remote side code quality,
 you may still need to set `SO_LINGER`, though be aware that that
 socket option is full of gotchas.
+
+If you don't wish to have this operation occur during close, you
+can call `shutdown_and_close()` manually instead.
 */
 class LLFIO_DECL byte_socket_handle : public byte_io_handle
 {
@@ -318,10 +328,6 @@ public:
   using const_buffers_type = byte_io_handle::const_buffers_type;
   template <class T> using io_request = byte_io_handle::io_request<T>;
   template <class T> using io_result = byte_io_handle::io_result<T>;
-
-protected:
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> _do_read(io_request<buffers_type> reqs, deadline d) noexcept override;
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_write(io_request<const_buffers_type> reqs, deadline d) noexcept override;
 
 public:
   //! Default constructor
@@ -421,8 +427,20 @@ public:
   */
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> shutdown(shutdown_kind = shutdown_write) noexcept;
 
-  /*! Create a socket handle connecting to a specified address.
+  /*! \brief Connects to an address.
   \param addr The address to connect to.
+  \param d How long to wait for a connection.
+
+  The connection begins upon first call, if it times out then you can call this function again with a
+  new timeout to poll the socket for when it connects. Eventually this function will either succeed,
+  or fail with an error if the connection failed.
+
+  \errors Any of the values `connect()` can return;
+  */
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> connect(const ip::address &addr, deadline d = {}) noexcept;
+
+  /*! Create a socket handle.
+  \param family Which IP family to create the socket in.
   \param _mode How to open the socket. If this is `mode::append`, the read side of the socket
   is shutdown; if this is `mode::read`, the write side of the socket is shutdown.
   \param _caching How to ask the kernel to cache the socket. If writes are not cached,
@@ -433,8 +451,8 @@ public:
   \errors Any of the values POSIX `socket()` or `WSASocket()` can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<byte_socket_handle> byte_socket(const ip::address &addr, mode _mode = mode::write,
-                                                                                caching _caching = caching::all, flag flags = flag::none) noexcept;
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<byte_socket_handle> byte_socket(ip::family family, mode _mode = mode::write, caching _caching = caching::all,
+                                                                                flag flags = flag::none) noexcept;
 
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~byte_socket_handle() override
   {
@@ -443,7 +461,7 @@ public:
       auto r = byte_socket_handle::close();
       if(!r)
       {
-        //std::cout << r.error().message() << std::endl;
+        // std::cout << r.error().message() << std::endl;
         LLFIO_LOG_FATAL(_v.fd, "byte_socket_handle::~byte_socket_handle() close failed");
         abort();
       }
@@ -476,11 +494,11 @@ public:
 //! \brief Constructor for `byte_socket_handle`
 template <> struct construct<byte_socket_handle>
 {
-  const ip::address &addr;
+  ip::family family;
   byte_socket_handle::mode _mode = byte_socket_handle::mode::write;
   byte_socket_handle::caching _caching = byte_socket_handle::caching::all;
   byte_socket_handle::flag flags = byte_socket_handle::flag::none;
-  result<byte_socket_handle> operator()() const noexcept { return byte_socket_handle::byte_socket(addr, _mode, _caching, flags); }
+  result<byte_socket_handle> operator()() const noexcept { return byte_socket_handle::byte_socket(family, _mode, _caching, flags); }
 };
 
 /* \class listening_socket_handle
@@ -726,6 +744,7 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> bind(const ip::address &addr, creation _creation = creation::only_if_not_exist, int backlog = -1) noexcept;
 
   /*! Create a listening socket handle.
+  \param family Which IP family to create the socket in.
   \param _mode How to open the socket. If this is `mode::append`, the read side of the socket
   is shutdown; if this is `mode::read`, the write side of the socket is shutdown.
   \param _caching How to ask the kernel to cache the socket. If writes are not cached,
@@ -736,7 +755,7 @@ public:
   \errors Any of the values POSIX `socket()` or `WSASocket()` can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle> listening_socket(bool use_ipv6 = true, mode _mode = mode::write,
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle> listening_socket(ip::family _family, mode _mode = mode::write,
                                                                                           caching _caching = caching::all, flag flags = flag::none) noexcept;
 
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~listening_socket_handle() override
@@ -822,11 +841,11 @@ inline result<void> listening_socket_handle::set_multiplexer(byte_io_multiplexer
 //! \brief Constructor for `listening_socket_handle`
 template <> struct construct<listening_socket_handle>
 {
-  bool use_ipv6{true};
+  ip::family family;
   byte_socket_handle::mode _mode = byte_socket_handle::mode::write;
   byte_socket_handle::caching _caching = byte_socket_handle::caching::all;
   byte_socket_handle::flag flags = byte_socket_handle::flag::none;
-  result<listening_socket_handle> operator()() const noexcept { return listening_socket_handle::listening_socket(use_ipv6, _mode, _caching, flags); }
+  result<listening_socket_handle> operator()() const noexcept { return listening_socket_handle::listening_socket(family, _mode, _caching, flags); }
 };
 
 
