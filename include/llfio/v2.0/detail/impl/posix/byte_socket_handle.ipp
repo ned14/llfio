@@ -30,22 +30,40 @@ Distributed under the Boost Software License, Version 1.0.
 #include <poll.h>
 #include <sys/socket.h>
 
+#ifndef SOCK_CLOEXEC
+#include <fcntl.h>
+#endif
+
 LLFIO_V2_NAMESPACE_BEGIN
 
 namespace detail
 {
-  result<void> create_socket(native_handle_type &nativeh, unsigned short family, handle::mode _mode, handle::caching _caching, handle::flag flags) noexcept
+  inline result<void> create_socket(native_handle_type &nativeh, unsigned short family, handle::mode _mode, handle::caching _caching,
+                                    handle::flag flags) noexcept
   {
     flags &= ~handle::flag::unlink_on_first_close;
     nativeh.behaviour |= native_handle_type::disposition::socket;
     OUTCOME_TRY(attribs_from_handle_mode_caching_and_flags(nativeh, _mode, handle::creation::if_needed, _caching, flags));
     nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
 
-    nativeh.fd = ::socket(family, SOCK_STREAM | SOCK_CLOEXEC | ((flags & handle::flag::multiplexable) ? SOCK_NONBLOCK : 0), IPPROTO_TCP);
+    nativeh.fd = ::socket(family,
+                          SOCK_STREAM |
+#ifdef SOCK_CLOEXEC
+                          SOCK_CLOEXEC |
+#endif
+                          ((flags & handle::flag::multiplexable) ? SOCK_NONBLOCK : 0),
+                          IPPROTO_TCP);
     if(nativeh.fd == -1)
     {
       return posix_error();
     }
+#ifndef SOCK_CLOEXEC
+    // Not FD_CLOEXEC as it's only MacOS that doesn't implement SOCK_NONBLOCK, and its F_SETFD requires bit 0.
+    if(-1 == ::fcntl(nativeh.fd, F_SETFD, 1))
+    {
+      return posix_error();
+    }
+#endif
     if(_caching < handle::caching::all)
     {
       {

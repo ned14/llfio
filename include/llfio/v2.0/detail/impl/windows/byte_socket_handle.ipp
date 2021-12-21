@@ -71,7 +71,7 @@ namespace detail
       }
     }
   }
-  result<void> create_socket(void *p, native_handle_type &nativeh, unsigned short family, handle::mode _mode, handle::caching _caching,
+  inline result<void> create_socket(void *p, native_handle_type &nativeh, unsigned short family, handle::mode _mode, handle::caching _caching,
                              handle::flag flags) noexcept
   {
     flags &= ~handle::flag::unlink_on_first_close;

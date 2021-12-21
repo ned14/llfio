@@ -420,10 +420,10 @@ public:
         : Base()
     {
     }
-    LLFIO_TEMPLATE(class... Args)
-    LLFIO_TREQUIRES(LLFIO_TEXPR(Base(std::declval<Args>()...)))
-    constexpr io_result(Args &&...args)
-        : Base(std::forward<Args>(args)...)
+    LLFIO_TEMPLATE(class Arg, class... Args)
+    LLFIO_TREQUIRES(LLFIO_TPRED(!std::is_same<std::decay_t<Arg>, io_result>::value), LLFIO_TEXPR(Base(std::declval<Arg>(), std::declval<Args>()...)))
+    constexpr io_result(Arg &&arg, Args &&...args)
+        : Base(std::forward<Arg>(arg), std::forward<Args>(args)...)
     {
     }
 #else
@@ -486,7 +486,7 @@ public:
   //! `_multiplexer_state_bit`
   virtual result<uint8_t> do_byte_io_handle_register(listening_socket_handle * /*unused*/) noexcept { return errc::operation_not_supported; }
   //! Implements `listening_socket_handle` deregistration
-  virtual result<void> do_byte_io_handle_deregister(listening_socket_handle * /*unused*/) noexcept { return errc::operation_not_supported; }  
+  virtual result<void> do_byte_io_handle_deregister(listening_socket_handle * /*unused*/) noexcept { return errc::operation_not_supported; }
   //! Implements `byte_io_handle::max_buffers()`
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t do_byte_io_handle_max_buffers(const byte_io_handle *h) const noexcept;
   //! Implements `byte_io_handle::allocate_registered_buffer()`

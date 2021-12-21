@@ -60,6 +60,8 @@ namespace detail
 //! Inspired by ASIO's `ip` namespace
 namespace ip
 {
+  class address_v4;
+  class address_v6;
   /*! \class address
   \brief A version independent IP address.
 
@@ -156,12 +158,14 @@ namespace ip
   };
   //! Write address to stream
   LLFIO_HEADERS_ONLY_FUNC_SPEC std::ostream &operator<<(std::ostream &s, const address &v);
+  //! Make an `address_v4`
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<address_v4> make_address_v4(string_view str) noexcept;
   /*! \class address_v4
   \brief A v4 IP address.
   */
   class LLFIO_DECL address_v4 : public address
   {
-    friend LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<address_v4> make_address_v4(string_view str) noexcept;
+    friend result<address_v4> make_address_v4(string_view str) noexcept;
 
   public:
 #if QUICKCPPLIB_USE_STD_SPAN
@@ -190,14 +194,14 @@ namespace ip
   inline result<address_v4> make_address_v4(const address_v4::bytes_type &bytes, uint16_t port = 0) noexcept { return address_v4(bytes, port); }
   //! Make an `address_v4`
   inline result<address_v4> make_address_v4(const address_v4::uint_type &bytes, uint16_t port = 0) noexcept { return address_v4(bytes, port); }
-  //! Make an `address_v4`
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<address_v4> make_address_v4(string_view str) noexcept;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<address_v6> make_address_v6(string_view str) noexcept;
   /*! \class address_v6
   \brief A v6 IP address.
   */
+  //! Make an `address_v6`. v6 addresses need to have the form `[::]:port`.
   class LLFIO_DECL address_v6 : public address
   {
-    friend LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<address_v6> make_address_v6(string_view str) noexcept;
+    friend result<address_v6> make_address_v6(string_view str) noexcept;
 
   public:
 #if QUICKCPPLIB_USE_STD_SPAN
@@ -224,8 +228,6 @@ namespace ip
   {
     return address_v6(bytes, port, scope_id);
   }
-  //! Make an `address_v6`. v6 addresses need to have the form `[::]:port`.
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<address_v6> make_address_v6(string_view str) noexcept;
   //! Make a v4 or v6 `address`. v6 addresses need to have the form `[::]:port`.
   inline result<address> make_address(string_view str) noexcept
   {
@@ -441,7 +443,7 @@ public:
       auto r = byte_socket_handle::close();
       if(!r)
       {
-        std::cout << r.error().message() << std::endl;
+        //std::cout << r.error().message() << std::endl;
         LLFIO_LOG_FATAL(_v.fd, "byte_socket_handle::~byte_socket_handle() close failed");
         abort();
       }
