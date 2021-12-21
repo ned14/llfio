@@ -84,6 +84,7 @@ $(document).ready(function(){initNavTree('namespacellfio__v2__xxx_1_1ip.html',''
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">llfio_v2_xxx::ip Namespace Reference</div>  </div>
@@ -104,6 +105,15 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1ip_1_1address__v6.html">address_v6</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make an <code>address_v6</code>. v6 addresses need to have the form <code>[::]:port</code>.  <a href="classllfio__v2__xxx_1_1ip_1_1address__v6.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:aa209c529f55f8c8a242080d55c66a4a9"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9">family</a> { <b>unknown</b>, 
+<a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a5ed3a3ff8e5c29979502b9030e8518e0">family::v4</a>, 
+<a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a0af45c99beb7a9afc9192665c4a05cd3">family::v6</a>
+ }</td></tr>
+<tr class="memdesc:aa209c529f55f8c8a242080d55c66a4a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The family of IP.  <a href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9">More...</a><br /></td></tr>
+<tr class="separator:aa209c529f55f8c8a242080d55c66a4a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -137,8 +147,46 @@ result&lt; <a class="el" href="classllfio__v2__xxx_1_1ip_1_1address.html">addres
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Inspired by ASIO's <code>ip</code> namespace. </p>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="aa209c529f55f8c8a242080d55c66a4a9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa209c529f55f8c8a242080d55c66a4a9">&#9670;&nbsp;</a></span>family</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9">llfio_v2_xxx::ip::family</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The family of IP. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="aa209c529f55f8c8a242080d55c66a4a9a5ed3a3ff8e5c29979502b9030e8518e0"></a>v4&#160;</td><td class="fielddoc"><p>IP version 4. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa209c529f55f8c8a242080d55c66a4a9a0af45c99beb7a9afc9192665c4a05cd3"></a>v6&#160;</td><td class="fielddoc"><p>IP version 6. </p>
+</td></tr>
+</table>
+<div class="fragment"><div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  {</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    unknown,</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a5ed3a3ff8e5c29979502b9030e8518e0">v4</a>,  <span class="comment">//!&lt; IP version 4</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment"></span>    <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a0af45c99beb7a9afc9192665c4a05cd3">v6</a>   <span class="comment">//!&lt; IP version 6</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment"></span>  };</div>
+</div><!-- fragment -->
+</div>
+</div>
+</div><!-- contents -->
 </div><!-- doc-content -->
+<div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_aa209c529f55f8c8a242080d55c66a4a9a0af45c99beb7a9afc9192665c4a05cd3"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a0af45c99beb7a9afc9192665c4a05cd3">llfio_v2_xxx::ip::family::v6</a></div><div class="ttdeci">@ v6</div><div class="ttdoc">IP version 6.</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_aa209c529f55f8c8a242080d55c66a4a9a5ed3a3ff8e5c29979502b9030e8518e0"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a5ed3a3ff8e5c29979502b9030e8518e0">llfio_v2_xxx::ip::family::v4</a></div><div class="ttdeci">@ v4</div><div class="ttdoc">IP version 4.</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

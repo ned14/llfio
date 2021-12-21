@@ -9,6 +9,11 @@ var byte__socket__handle_8hpp =
     [ "buffers_type", "structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type.html", "structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type" ],
     [ "io_request", "structllfio__v2__xxx_1_1listening__socket__handle_1_1io__request.html", "structllfio__v2__xxx_1_1listening__socket__handle_1_1io__request" ],
     [ "construct< listening_socket_handle >", "structllfio__v2__xxx_1_1construct_3_01listening__socket__handle_01_4.html", "structllfio__v2__xxx_1_1construct_3_01listening__socket__handle_01_4" ],
+    [ "family", "byte__socket__handle_8hpp.html#aa209c529f55f8c8a242080d55c66a4a9", [
+      [ "unknown", "byte__socket__handle_8hpp.html#aa209c529f55f8c8a242080d55c66a4a9aad921d60486366258809553a3db49a4a", null ],
+      [ "v4", "byte__socket__handle_8hpp.html#aa209c529f55f8c8a242080d55c66a4a9a5ed3a3ff8e5c29979502b9030e8518e0", null ],
+      [ "v6", "byte__socket__handle_8hpp.html#aa209c529f55f8c8a242080d55c66a4a9a0af45c99beb7a9afc9192665c4a05cd3", null ]
+    ] ],
     [ "make_address", "byte__socket__handle_8hpp.html#a199651ec383913fa9a2aec88d5100d1f", null ],
     [ "make_address_v4", "byte__socket__handle_8hpp.html#ae20910a38d7e4ff3e8e4e3293dd7943c", null ],
     [ "make_address_v4", "byte__socket__handle_8hpp.html#a8440fda3b66f65fc7115dab9d890c88b", null ],
