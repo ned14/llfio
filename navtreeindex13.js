@@ -1,5 +1,9 @@
 var NAVTREEINDEX13 =
 {
+"structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html#ac096bd0798cbef4c03680fe562797c92":[4,0,2,7,3,14],
+"structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html#ac89814ae050771d0640bd221fd3009f7":[4,0,2,7,3,8],
+"structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html#ad69f15c5d5e4c980bb766ce58e77b6a1":[4,0,2,7,3,12],
+"structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html#ad9d4c1367d8a797ecde7ce5dd88843be":[4,0,2,7,3,9],
 "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html#ae160f84bb8519b427f8eef8e7e782f39":[4,0,2,7,3,20],
 "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html#aec45fffa93d4b974cb27e5d06e105350":[4,0,2,7,3,6],
 "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html":[4,0,2,7,4],
@@ -245,9 +249,5 @@ var NAVTREEINDEX13 =
 "structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type.html":[4,0,2,33,0],
 "structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type.html#a18ad5ff2a5e50b36715dd95db0e14fc3":[4,0,2,33,0,1],
 "structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type.html#a1a13948c650e1f55b376b4886cdb1956":[4,0,2,33,0,17],
-"structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type.html#a1fd9356bfeb0165f75d8b1d4ebe84914":[4,0,2,33,0,11],
-"structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type.html#a2e767342e1c441b4dff9ad1fdb10017e":[4,0,2,33,0,13],
-"structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type.html#a3ab044b91c7e33cf4e25c24d3899829f":[4,0,2,33,0,9],
-"structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type.html#a5889539295fb10a3647dbf8aa89e0b38":[4,0,2,33,0,7],
-"structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type.html#a592988c2055a29d15c908e771d4e3e4f":[4,0,2,33,0,5]
+"structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type.html#a1fd9356bfeb0165f75d8b1d4ebe84914":[4,0,2,33,0,11]
 };

@@ -219,9 +219,9 @@ virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1ip_1_1address.html
 <tr class="memitem:a5540668ce4d19424c5b2a5d56daac757"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__socket__handle.html#a5540668ce4d19424c5b2a5d56daac757">shutdown</a> (<a class="el" href="classllfio__v2__xxx_1_1byte__socket__handle.html#a855a84c09fdc9c9c9626a0b51a34f70f">shutdown_kind</a>=<a class="el" href="classllfio__v2__xxx_1_1byte__socket__handle.html#a855a84c09fdc9c9c9626a0b51a34f70fa999f8815721873c59d567f2b149541a5">shutdown_write</a>) noexcept</td></tr>
 <tr class="memdesc:a5540668ce4d19424c5b2a5d56daac757"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initiates shutting down further communication on the socket.  <a href="classllfio__v2__xxx_1_1byte__socket__handle.html#a5540668ce4d19424c5b2a5d56daac757">More...</a><br /></td></tr>
 <tr class="separator:a5540668ce4d19424c5b2a5d56daac757"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a371042a299270df28e3f632b7e1463f4"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__socket__handle.html#a371042a299270df28e3f632b7e1463f4">connect</a> (const <a class="el" href="classllfio__v2__xxx_1_1ip_1_1address.html">ip::address</a> &amp;addr, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d={}) noexcept</td></tr>
-<tr class="memdesc:a371042a299270df28e3f632b7e1463f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Connects to an address.  <a href="classllfio__v2__xxx_1_1byte__socket__handle.html#a371042a299270df28e3f632b7e1463f4">More...</a><br /></td></tr>
-<tr class="separator:a371042a299270df28e3f632b7e1463f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a07dfe0ec32421cab451a3ea4ef4cb214"><td class="memItemLeft" align="right" valign="top">result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__socket__handle.html#a07dfe0ec32421cab451a3ea4ef4cb214">connect</a> (const <a class="el" href="classllfio__v2__xxx_1_1ip_1_1address.html">ip::address</a> &amp;addr, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d={}) noexcept</td></tr>
+<tr class="memdesc:a07dfe0ec32421cab451a3ea4ef4cb214"><td class="mdescLeft">&#160;</td><td class="mdescRight">Connects to an address.  <a href="classllfio__v2__xxx_1_1byte__socket__handle.html#a07dfe0ec32421cab451a3ea4ef4cb214">More...</a><br /></td></tr>
+<tr class="separator:a07dfe0ec32421cab451a3ea4ef4cb214"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92f2f31e07624dc26f783bde1fc4a6d6"><td class="memItemLeft" align="right" valign="top"><a id="a92f2f31e07624dc26f783bde1fc4a6d6"></a>
 virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__socket__handle.html#a92f2f31e07624dc26f783bde1fc4a6d6">close</a> () noexcept override</td></tr>
 <tr class="memdesc:a92f2f31e07624dc26f783bde1fc4a6d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Immediately close the native handle type managed by this handle. <br /></td></tr>
@@ -451,6 +451,12 @@ Static Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
+<tr class="memitem:a9e8fdcc6566c5e17850c1f8633c6977d"><td class="memItemLeft" align="right" valign="top"><a id="a9e8fdcc6566c5e17850c1f8633c6977d"></a>
+virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_do_connect</b> (const <a class="el" href="classllfio__v2__xxx_1_1ip_1_1address.html">ip::address</a> &amp;addr, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d) noexcept</td></tr>
+<tr class="separator:a9e8fdcc6566c5e17850c1f8633c6977d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a872d2a8399f2d0db79a4ff5f0ceae130"><td class="memItemLeft" align="right" valign="top"><a id="a872d2a8399f2d0db79a4ff5f0ceae130"></a>
+result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_do_multiplexer_connect</b> (const <a class="el" href="classllfio__v2__xxx_1_1ip_1_1address.html">ip::address</a> &amp;addr, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d) noexcept</td></tr>
+<tr class="separator:a872d2a8399f2d0db79a4ff5f0ceae130"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae7db63f7ae859409fd2fd667dcd9133a"><td class="memItemLeft" align="right" valign="top"><a id="ae7db63f7ae859409fd2fd667dcd9133a"></a>
 virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html#ae7db63f7ae859409fd2fd667dcd9133a">_do_max_buffers</a> () const noexcept</td></tr>
 <tr class="memdesc:ae7db63f7ae859409fd2fd667dcd9133a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The virtualised implementation of <code>max_buffers()</code> used if no multiplexer has been set. <br /></td></tr>
@@ -555,11 +561,11 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b> {flag::non
 <tr><td class="fieldname"><a id="a855a84c09fdc9c9c9626a0b51a34f70fa267df6c0691424c64a4911bf4cddecbd"></a>shutdown_both&#160;</td><td class="fielddoc"><p>Shutdown both further reads and writes. </p>
 </td></tr>
 </table>
-<div class="fragment"><div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;  {</div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;    <a class="code" href="classllfio__v2__xxx_1_1byte__socket__handle.html#a855a84c09fdc9c9c9626a0b51a34f70fa31c55b72d38c558a707b6ecbf6f88600">shutdown_read</a>,   <span class="comment">//!&lt; Shutdown further reads.</span></div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;<span class="comment"></span>    <a class="code" href="classllfio__v2__xxx_1_1byte__socket__handle.html#a855a84c09fdc9c9c9626a0b51a34f70fa999f8815721873c59d567f2b149541a5">shutdown_write</a>,  <span class="comment">//!&lt; Shutdown further writes.</span></div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;<span class="comment"></span>    <a class="code" href="classllfio__v2__xxx_1_1byte__socket__handle.html#a855a84c09fdc9c9c9626a0b51a34f70fa267df6c0691424c64a4911bf4cddecbd">shutdown_both</a>    <span class="comment">//!&lt; Shutdown both further reads and writes.</span></div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;<span class="comment"></span>  };</div>
+<div class="fragment"><div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;  {</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;    <a class="code" href="classllfio__v2__xxx_1_1byte__socket__handle.html#a855a84c09fdc9c9c9626a0b51a34f70fa31c55b72d38c558a707b6ecbf6f88600">shutdown_read</a>,   <span class="comment">//!&lt; Shutdown further reads.</span></div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;<span class="comment"></span>    <a class="code" href="classllfio__v2__xxx_1_1byte__socket__handle.html#a855a84c09fdc9c9c9626a0b51a34f70fa999f8815721873c59d567f2b149541a5">shutdown_write</a>,  <span class="comment">//!&lt; Shutdown further writes.</span></div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;<span class="comment"></span>    <a class="code" href="classllfio__v2__xxx_1_1byte__socket__handle.html#a855a84c09fdc9c9c9626a0b51a34f70fa267df6c0691424c64a4911bf4cddecbd">shutdown_both</a>    <span class="comment">//!&lt; Shutdown both further reads and writes.</span></div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;<span class="comment"></span>  };</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -906,8 +912,8 @@ For portability, you can only assume that barriers write order for a single hand
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a371042a299270df28e3f632b7e1463f4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a371042a299270df28e3f632b7e1463f4">&#9670;&nbsp;</a></span>connect()</h2>
+<a id="a07dfe0ec32421cab451a3ea4ef4cb214"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a07dfe0ec32421cab451a3ea4ef4cb214">&#9670;&nbsp;</a></span>connect()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -916,7 +922,7 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual result&lt;void&gt; llfio_v2_xxx::byte_socket_handle::connect </td>
+          <td class="memname">result&lt;void&gt; llfio_v2_xxx::byte_socket_handle::connect </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classllfio__v2__xxx_1_1ip_1_1address.html">ip::address</a> &amp;&#160;</td>
           <td class="paramname"><em>addr</em>, </td>
@@ -935,7 +941,7 @@ For portability, you can only assume that barriers write order for a single hand
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -950,7 +956,11 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <p>The connection begins upon first call, if it times out then you can call this function again with a new timeout to poll the socket for when it connects. Eventually this function will either succeed, or fail with an error if the connection failed.</p>
 <dl class="section user"><dt>Errors returnable\n Any of the values connect() can return;</dt><dd></dd></dl>
-
+<div class="fragment"><div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;                                                           {}) noexcept</div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;  {</div>
+<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;    <span class="keywordflow">return</span> (_ctx == <span class="keyword">nullptr</span>) ? _do_connect(addr, d) : _do_multiplexer_connect(addr, d);</div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;  }</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a00a85eec5a41f7edb2c574d40cf04535"></a>
@@ -1399,14 +1409,14 @@ For portability, you can only assume that barriers write order for a single hand
 </div><!-- doc-content -->
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__multiplexer_html_a977ed1bb0e53f9e5f7b7493245848dd0"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a977ed1bb0e53f9e5f7b7493245848dd0">llfio_v2_xxx::byte_io_multiplexer::do_byte_io_handle_max_buffers</a></div><div class="ttdeci">virtual size_t do_byte_io_handle_max_buffers(const byte_io_handle *h) const noexcept</div><div class="ttdoc">Implements byte_io_handle::max_buffers()</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:516</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__multiplexer_html_a0a0d3b7d155d63ac644a2e651e538b72"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a0a0d3b7d155d63ac644a2e651e538b72">llfio_v2_xxx::byte_io_multiplexer::construct</a></div><div class="ttdeci">virtual io_operation_state * construct(span&lt; byte &gt; storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &amp;&amp;b, deadline d, io_request&lt; buffers_type &gt; reqs) noexcept=0</div><div class="ttdoc">Constructs either a unsynchronised_io_operation_state or a synchronised_io_operation_state for a read...</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1byte__socket__handle_html_a855a84c09fdc9c9c9626a0b51a34f70fa999f8815721873c59d567f2b149541a5"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__socket__handle.html#a855a84c09fdc9c9c9626a0b51a34f70fa999f8815721873c59d567f2b149541a5">llfio_v2_xxx::byte_socket_handle::shutdown_write</a></div><div class="ttdeci">@ shutdown_write</div><div class="ttdoc">Shutdown further writes.</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:419</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1byte__socket__handle_html_a855a84c09fdc9c9c9626a0b51a34f70fa999f8815721873c59d567f2b149541a5"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__socket__handle.html#a855a84c09fdc9c9c9626a0b51a34f70fa999f8815721873c59d567f2b149541a5">llfio_v2_xxx::byte_socket_handle::shutdown_write</a></div><div class="ttdeci">@ shutdown_write</div><div class="ttdoc">Shutdown further writes.</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:446</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__multiplexer_html_a567ade7a70d3883b9fa88d17284702c0"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a567ade7a70d3883b9fa88d17284702c0">llfio_v2_xxx::byte_io_multiplexer::do_byte_io_handle_allocate_registered_buffer</a></div><div class="ttdeci">virtual result&lt; registered_buffer_type &gt; do_byte_io_handle_allocate_registered_buffer(byte_io_handle *h, size_t &amp;bytes) noexcept</div><div class="ttdoc">Implements byte_io_handle::allocate_registered_buffer()</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:520</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1byte__socket__handle_html_a855a84c09fdc9c9c9626a0b51a34f70fa31c55b72d38c558a707b6ecbf6f88600"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__socket__handle.html#a855a84c09fdc9c9c9626a0b51a34f70fa31c55b72d38c558a707b6ecbf6f88600">llfio_v2_xxx::byte_socket_handle::shutdown_read</a></div><div class="ttdeci">@ shutdown_read</div><div class="ttdoc">Shutdown further reads.</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:418</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__multiplexer_html_a26c52ec51bcb3e27c457c51c6bae4112"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a26c52ec51bcb3e27c457c51c6bae4112">llfio_v2_xxx::byte_io_multiplexer::do_byte_io_handle_deregister</a></div><div class="ttdeci">virtual result&lt; void &gt; do_byte_io_handle_deregister(byte_io_handle *) noexcept</div><div class="ttdoc">Implements byte_io_handle deregistration.</div><div class="ttdef"><b>Definition:</b> byte_io_multiplexer.hpp:483</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1byte__socket__handle_html_a855a84c09fdc9c9c9626a0b51a34f70fa31c55b72d38c558a707b6ecbf6f88600"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__socket__handle.html#a855a84c09fdc9c9c9626a0b51a34f70fa31c55b72d38c558a707b6ecbf6f88600">llfio_v2_xxx::byte_socket_handle::shutdown_read</a></div><div class="ttdeci">@ shutdown_read</div><div class="ttdoc">Shutdown further reads.</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:445</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__multiplexer_html_a26c52ec51bcb3e27c457c51c6bae4112"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a26c52ec51bcb3e27c457c51c6bae4112">llfio_v2_xxx::byte_io_multiplexer::do_byte_io_handle_deregister</a></div><div class="ttdeci">virtual result&lt; void &gt; do_byte_io_handle_deregister(byte_io_handle *) noexcept</div><div class="ttdoc">Implements byte_io_handle deregistration.</div><div class="ttdef"><b>Definition:</b> byte_io_multiplexer.hpp:485</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__handle_html_ae7db63f7ae859409fd2fd667dcd9133a"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__handle.html#ae7db63f7ae859409fd2fd667dcd9133a">llfio_v2_xxx::byte_io_handle::_do_max_buffers</a></div><div class="ttdeci">virtual size_t _do_max_buffers() const noexcept</div><div class="ttdoc">The virtualised implementation of max_buffers() used if no multiplexer has been set.</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__handle_html_a85fc2da7fd79abbc73228f820445ed91"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__handle.html#a85fc2da7fd79abbc73228f820445ed91">llfio_v2_xxx::byte_io_handle::_do_barrier</a></div><div class="ttdeci">virtual io_result&lt; const_buffers_type &gt; _do_barrier(io_request&lt; const_buffers_type &gt; reqs, barrier_kind kind, deadline d) noexcept</div><div class="ttdoc">The virtualised implementation of barrier() used if no multiplexer has been set.</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__handle_html_a6fdbbcde6ecdc5a3f1f3110bcec5f3c0"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__handle.html#a6fdbbcde6ecdc5a3f1f3110bcec5f3c0">llfio_v2_xxx::byte_io_handle::write</a></div><div class="ttdeci">io_result&lt; const_buffers_type &gt; write(io_request&lt; const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the open handle, preferentially using any i/o multiplexer set over the virtually overri...</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:337</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1byte__socket__handle_html_a855a84c09fdc9c9c9626a0b51a34f70fa267df6c0691424c64a4911bf4cddecbd"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__socket__handle.html#a855a84c09fdc9c9c9626a0b51a34f70fa267df6c0691424c64a4911bf4cddecbd">llfio_v2_xxx::byte_socket_handle::shutdown_both</a></div><div class="ttdeci">@ shutdown_both</div><div class="ttdoc">Shutdown both further reads and writes.</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:420</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1byte__socket__handle_html_a855a84c09fdc9c9c9626a0b51a34f70fa267df6c0691424c64a4911bf4cddecbd"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__socket__handle.html#a855a84c09fdc9c9c9626a0b51a34f70fa267df6c0691424c64a4911bf4cddecbd">llfio_v2_xxx::byte_socket_handle::shutdown_both</a></div><div class="ttdeci">@ shutdown_both</div><div class="ttdoc">Shutdown both further reads and writes.</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:447</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__handle_html_a0dc183a5eca8c3fb601ebecc13540f96"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__handle.html#a0dc183a5eca8c3fb601ebecc13540f96">llfio_v2_xxx::byte_io_handle::_do_write</a></div><div class="ttdeci">virtual io_result&lt; const_buffers_type &gt; _do_write(io_request&lt; const_buffers_type &gt; reqs, deadline d) noexcept</div><div class="ttdoc">The virtualised implementation of write() used if no multiplexer has been set.</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__handle_html_a4cc14d7effb7bebb42c996b68a5ce906"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__handle.html#a4cc14d7effb7bebb42c996b68a5ce906">llfio_v2_xxx::byte_io_handle::_do_read</a></div><div class="ttdeci">virtual io_result&lt; buffers_type &gt; _do_read(io_request&lt; buffers_type &gt; reqs, deadline d) noexcept</div><div class="ttdoc">The virtualised implementation of read() used if no multiplexer has been set.</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__handle_html_aa17020bc615b9a3bc73c66fff8968d11"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__handle.html#aa17020bc615b9a3bc73c66fff8968d11">llfio_v2_xxx::byte_io_handle::read</a></div><div class="ttdeci">io_result&lt; buffers_type &gt; read(io_request&lt; buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Read data from the open handle, preferentially using any i/o multiplexer set over the virtually overr...</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:295</div></div>
