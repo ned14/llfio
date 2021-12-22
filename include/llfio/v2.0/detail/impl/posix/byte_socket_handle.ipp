@@ -131,7 +131,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> byte_socket_handle::shutdown(shutdo
   return success();
 }
 
-LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> byte_socket_handle::connect(const ip::address &addr, deadline d) noexcept
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> byte_socket_handle::_do_connect(const ip::address &addr, deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   if(d && !_v.is_nonblocking())
@@ -160,22 +160,25 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> byte_socket_handle::connect(const i
       writefds.events = POLLOUT|POLLERR|POLLHUP;
       writefds.revents = 0;
       int timeout = -1;
-      std::chrono::milliseconds ms;
-      if(d.steady)
+      if(d)
       {
-        ms = std::chrono::duration_cast<std::chrono::milliseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());
-      }
-      else
-      {
-        ms = std::chrono::duration_cast<std::chrono::milliseconds>(d.to_time_point() - std::chrono::system_clock::now());
-      }
-      if(ms.count() < 0)
-      {
-        timeout = 0;
-      }
-      else
-      {
-        timeout = (int) ms.count();
+        std::chrono::milliseconds ms;
+        if(d.steady)
+        {
+          ms = std::chrono::duration_cast<std::chrono::milliseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());
+        }
+        else
+        {
+          ms = std::chrono::duration_cast<std::chrono::milliseconds>(d.to_time_point() - std::chrono::system_clock::now());
+        }
+        if(ms.count() < 0)
+        {
+          timeout = 0;
+        }
+        else
+        {
+          timeout = (int) ms.count();
+        }
       }
       if(-1 == ::poll(&writefds, 1, timeout))
       {
@@ -187,7 +190,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> byte_socket_handle::connect(const i
       }
       if(writefds.revents & (POLLERR | POLLHUP))
       {
-        return errc::not_connected;
+        return errc::connection_refused;
       }
       LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
     }

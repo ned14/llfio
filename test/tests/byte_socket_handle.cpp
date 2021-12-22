@@ -281,6 +281,12 @@ static inline void TestBlockingSocketHandles()
   serversocket.bind(llfio::ip::address_v4::loopback()).value();
   auto endpoint = serversocket.local_endpoint().value();
   std::cout << "Server socket is listening on " << endpoint << std::endl;
+  if(endpoint.family() == llfio::ip::family::unknown && getenv("CI") != nullptr)
+  {
+    std::cout << "\nNOTE: Currently on CI and couldn't bind a listening socket to loopback, assuming it is CI host restrictions and skipping this test."
+              << std::endl;
+    return;
+  }
   auto readerthread = std::async([serversocket = std::move(serversocket)]() mutable {
     std::pair<llfio::byte_socket_handle, llfio::ip::address> s;
     serversocket.read({s}).value();  // This immediately blocks in blocking mode
@@ -340,6 +346,12 @@ static inline void TestNonBlockingSocketHandles()
   serversocket.bind(llfio::ip::address_v4::loopback()).value();
   auto endpoint = serversocket.local_endpoint().value();
   std::cout << "Server socket is listening on " << endpoint << std::endl;
+  if(endpoint.family() == llfio::ip::family::unknown && getenv("CI") != nullptr)
+  {
+    std::cout << "\nNOTE: Currently on CI and couldn't bind a listening socket to loopback, assuming it is CI host restrictions and skipping this test."
+              << std::endl;
+    return;
+  }
 
   std::pair<llfio::byte_socket_handle, llfio::ip::address> reader;
   {  // no incoming, so non-blocking read should time out
@@ -490,6 +502,12 @@ static inline void TestMultiplexedSocketHandles()
     serversocket.bind(llfio::ip::address_v4::loopback()).value();
     auto endpoint = serversocket.local_endpoint().value();
     std::cout << "Server socket is listening on " << endpoint << std::endl;
+    if(endpoint.family() == llfio::ip::family::unknown && getenv("CI") != nullptr)
+    {
+      std::cout << "\nNOTE: Currently on CI and couldn't bind a listening socket to loopback, assuming it is CI host restrictions and skipping this test."
+                << std::endl;
+      return;
+    }
 
     std::vector<checking_receiver> async_reads;
     for(size_t n = 0; n < MAX_SOCKETS; n++)
@@ -609,6 +627,12 @@ static inline void TestCoroutinedSocketHandles()
     serversocket.bind(llfio::ip::address_v4::loopback()).value();
     auto endpoint = serversocket.local_endpoint().value();
     std::cout << "Server socket is listening on " << endpoint << std::endl;
+    if(endpoint.family() == llfio::ip::family::unknown && getenv("CI") != nullptr)
+    {
+      std::cout << "\nNOTE: Currently on CI and couldn't bind a listening socket to loopback, assuming it is CI host restrictions and skipping this test."
+                << std::endl;
+      return;
+    }
 
     std::vector<coroutine> coroutines;
     for(size_t n = 0; n < MAX_SOCKETS; n++)

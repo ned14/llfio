@@ -329,6 +329,33 @@ public:
   template <class T> using io_request = byte_io_handle::io_request<T>;
   template <class T> using io_result = byte_io_handle::io_result<T>;
 
+protected:
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _do_connect(const ip::address &addr, deadline d) noexcept;
+
+  result<void> _do_multiplexer_connect(const ip::address &addr, deadline d) noexcept
+  {
+    LLFIO_DEADLINE_TO_SLEEP_INIT(d);
+    const auto state_reqs = _ctx->io_state_requirements();
+    auto *storage = (byte *) alloca(state_reqs.first + state_reqs.second);
+    const auto diff = (uintptr_t) storage & (state_reqs.second - 1);
+    storage += state_reqs.second - diff;
+    auto *state = _ctx->construct_and_init_io_operation({storage, state_reqs.first}, this, nullptr, d, addr);
+    if(state == nullptr)
+    {
+      return errc::resource_unavailable_try_again;
+    }
+    OUTCOME_TRY(_ctx->flush_inited_io_operations());
+    while(!is_finished(_ctx->check_io_operation(state)))
+    {
+      deadline nd;
+      LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+      OUTCOME_TRY(_ctx->check_for_any_completed_io(nd));
+    }
+    OUTCOME_TRY(std::move(*state).get_completed_read());
+    state->~io_operation_state();
+    return success();
+  }
+
 public:
   //! Default constructor
   constexpr byte_socket_handle() {}  // NOLINT
@@ -437,7 +464,10 @@ public:
 
   \errors Any of the values `connect()` can return;
   */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> connect(const ip::address &addr, deadline d = {}) noexcept;
+  result<void> connect(const ip::address &addr, deadline d = {}) noexcept
+  {
+    return (_ctx == nullptr) ? _do_connect(addr, d) : _do_multiplexer_connect(addr, d);
+  }
 
   /*! Create a socket handle.
   \param family Which IP family to create the socket in.

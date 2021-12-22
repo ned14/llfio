@@ -51,10 +51,12 @@ namespace ip
 enum class io_operation_state_type
 {
   unknown,
+
   read_initialised,
   read_initiated,
   read_completed,
   read_finished,
+
   write_initialised,
   write_initiated,
   barrier_initialised,
@@ -162,7 +164,7 @@ following LLFIO classes change how they create handles with the kernel:
 <tr><td><code>mapped_file_handle</code><td>No effect<td>Creates `HANDLE` as `OVERLAPPED`, but i/o is to map not file
 <tr><td><code>pipe_handle</code><td>Creates file descriptor as non-blocking<td>Creates `HANDLE` as `OVERLAPPED`
 <tr><td><code>section_handle</code><td>No effect<td>Creates `HANDLE` as `OVERLAPPED`
-<tr><td><code>socket_handle</code><td>Creates file descriptor as non-blocking<td>Creates `HANDLE` as `OVERLAPPED`
+<tr><td><code>socket_handle</code><td>Creates file descriptor as non-blocking<td>Creates `HANDLE` as `OVERLAPPED` **and** as non-blocking
 <tr><td><code>symlink_handle</code><td>No effect<td>Creates `HANDLE` as `OVERLAPPED`
 </table>
 
@@ -1214,9 +1216,7 @@ public:
     //! Suspends the coroutine for resumption after the i/o finishes
     void await_suspend(coroutine_handle<> coro)
     {
-      _state->invoke(make_function_ptr<void *(io_operation_state_type)>(
-      [&](io_operation_state_type s) -> void *
-      {
+      _state->invoke(make_function_ptr<void *(io_operation_state_type)>([&](io_operation_state_type s) -> void * {
         if(is_finished(s))
         {
           coro.resume();
@@ -1334,6 +1334,20 @@ public:
                                         io_request<const_buffers_type> reqs, barrier_kind kind) noexcept = 0;
 
   /*! \brief Constructs either a `unsynchronised_io_operation_state` or a `synchronised_io_operation_state`
+  for a `byte_socket_handle` read operation into the storage provided. The i/o is not initiated. The storage must
+  meet the requirements from `state_requirements()`.
+  */
+  virtual io_operation_state *construct(span<byte> storage, byte_socket_handle *_h, io_operation_state_visitor *_visitor, deadline d,
+                                        const ip::address & /*unused*/) noexcept
+  {
+    (void) storage;
+    (void) _h;
+    (void) _visitor;
+    (void) d;
+    return nullptr;
+  }
+
+  /*! \brief Constructs either a `unsynchronised_io_operation_state` or a `synchronised_io_operation_state`
   for a `listening_socket_handle` read operation into the storage provided. The i/o is not initiated. The storage must
   meet the requirements from `state_requirements()`.
   */
@@ -1386,6 +1400,19 @@ public:
                                                               barrier_kind kind) noexcept
   {
     io_operation_state *state = construct(storage, _h, _visitor, std::move(b), d, std::move(reqs), kind);
+    if(state != nullptr)
+    {
+      init_io_operation(state);
+    }
+    return state;
+  }
+
+  /*! \brief Combines `.construct()` with `.init_io_operation()` in a single call for improved efficiency.
+   */
+  virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, byte_socket_handle *_h, io_operation_state_visitor *_visitor, deadline d,
+                                                              const ip::address &addr) noexcept
+  {
+    io_operation_state *state = construct(storage, _h, _visitor, d, addr);
     if(state != nullptr)
     {
       init_io_operation(state);

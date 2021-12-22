@@ -155,7 +155,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> byte_socket_handle::shutdown(shutdo
   return success();
 }
 
-LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> byte_socket_handle::connect(const ip::address &addr, deadline d) noexcept
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> byte_socket_handle::_do_connect(const ip::address &addr, deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   if(d && !_v.is_nonblocking())
@@ -179,39 +179,50 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> byte_socket_handle::connect(const i
   {
     for(;;)
     {
-      pollfd writefds;
-      writefds.fd = _v.fd;
-      writefds.events = POLLOUT | POLLERR | POLLHUP;
-      writefds.revents = 0;
-      int timeout = -1;
-      std::chrono::milliseconds ms;
-      if(d.steady)
+      /* For some reason WSAPoll() always returns Incorrect Parameter if you ask
+      to be notified of POLLERR or POLLHUP. At least Windows select() doesn't have
+      the scalability problems of Linux select().
+      */
+      fd_set writefds, errfds;
+      FD_ZERO(&writefds);
+      FD_ZERO(&errfds);
+      FD_SET(_v.sock, &writefds);
+      FD_SET(_v.sock, &errfds);
+      TIMEVAL *timeout = nullptr, _timeout;
+      if(d)
       {
-        ms = std::chrono::duration_cast<std::chrono::milliseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());
+        std::chrono::microseconds us;
+        if(d.steady)
+        {
+          us = std::chrono::duration_cast<std::chrono::microseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());
+        }
+        else
+        {
+          us = std::chrono::duration_cast<std::chrono::microseconds>(d.to_time_point() - std::chrono::system_clock::now());
+        }
+        if(us.count() < 0)
+        {
+          _timeout.tv_sec = 0;
+          _timeout.tv_usec = 0;
+        }
+        else
+        {
+          _timeout.tv_sec = (long) (us.count() / 1000000UL);
+          _timeout.tv_usec = (long) (us.count() % 1000000UL);
+        }
+        timeout = &_timeout;
       }
-      else
-      {
-        ms = std::chrono::duration_cast<std::chrono::milliseconds>(d.to_time_point() - std::chrono::system_clock::now());
-      }
-      if(ms.count() < 0)
-      {
-        timeout = 0;
-      }
-      else
-      {
-        timeout = (int) ms.count();
-      }
-      if(SOCKET_ERROR == WSAPoll(&writefds, 1, timeout))
+      if(SOCKET_ERROR == ::select(1, nullptr, &writefds, &errfds, timeout))
       {
         return win32_error(WSAGetLastError());
       }
-      if(writefds.revents & POLLOUT)
+      if(FD_ISSET(_v.sock, &writefds))
       {
         break;
       }
-      if(writefds.revents & (POLLERR | POLLHUP))
+      if(FD_ISSET(_v.sock, &errfds))
       {
-        return errc::not_connected;
+        return errc::connection_refused;
       }
       LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
     }
@@ -343,7 +354,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle::buffers_type> li
     {
       ready_to_accept = false;
       pollfd readfds;
-      readfds.fd = _v.fd;
+      readfds.fd = _v.sock;
       readfds.events = POLLIN;
       readfds.revents = 0;
       int timeout = -1;
