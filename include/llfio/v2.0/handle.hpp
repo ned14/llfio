@@ -1,5 +1,5 @@
 /* A handle to something
-(C) 2015-2019 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2015-2021 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: Dec 2015
 
 
@@ -376,6 +376,8 @@ public:
   bool is_seekable() const noexcept { return _v.is_seekable(); }
   //! True if requires aligned i/o
   bool requires_aligned_io() const noexcept { return _v.requires_aligned_io(); }
+  //! True if `native_handle()` is a valid kernel handle
+  bool is_kernel_handle() const noexcept { return _v.is_kernel_handle(); }
 
   //! True if a regular file or device
   bool is_regular() const noexcept { return _v.is_regular(); }

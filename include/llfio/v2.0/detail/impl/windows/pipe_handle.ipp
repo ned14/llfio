@@ -35,7 +35,7 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
   result<pipe_handle> ret(pipe_handle(native_handle_type(), 0, 0, _caching, flags, nullptr));
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
-  nativeh.behaviour |= native_handle_type::disposition::pipe;
+  nativeh.behaviour |= native_handle_type::disposition::pipe | native_handle_type::disposition::kernel_handle;
   DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
   OUTCOME_TRY(auto &&access, access_mask_from_handle_mode(nativeh, _mode, flags));
   OUTCOME_TRY(auto &&attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
@@ -176,7 +176,7 @@ result<std::pair<pipe_handle, pipe_handle>> pipe_handle::anonymous_pipe(caching 
   OUTCOME_TRY(auto &&access, access_mask_from_handle_mode(writenativeh, mode::append, flags));
   access = SYNCHRONIZE | DELETE | GENERIC_WRITE;  // correct for pipes
   OUTCOME_TRY(auto &&attribs, attributes_from_handle_caching_and_flags(writenativeh, _caching, flags));
-  writenativeh.behaviour |= native_handle_type::disposition::pipe;
+  writenativeh.behaviour |= native_handle_type::disposition::pipe | native_handle_type::disposition::kernel_handle;
   writenativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
   LLFIO_LOG_FUNCTION_CALL(&ret.first);
 

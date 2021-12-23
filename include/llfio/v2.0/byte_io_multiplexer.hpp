@@ -477,6 +477,48 @@ public:
   byte_io_multiplexer &operator=(const byte_io_multiplexer &) = delete;
   ~byte_io_multiplexer() = default;
 
+  struct implementation_information_t
+  {
+    string_view name;  //!< The name of the underlying implementation e.g. "OpenSSL", "IOCP, "io_uring", "Windows RIO" etc.
+    struct
+    {
+      uint16_t major{0}, minor{0}, patch{0};
+    } version;            //!< Version of the underlying implementation. Could be a kernel version if appropriate.
+    string_view postfix;  //!< The build config or other disambiguator from others with the same name and version.
+    struct multiplexes_t
+    {
+      struct kernel_t
+      {
+        uint16_t file_handle : 1;              //!< This i/o multiplexer can register plain kernel `file_handle`.
+        uint16_t pipe_handle : 1;              //!< This i/o multiplexer can register plain kernel `pipe_handle`.
+        uint16_t byte_socket_handle : 1;       //!< This i/o multiplexer can register plain kernel `byte_socket_handle`.
+        uint16_t listening_socket_handle : 1;  //!< This i/o multiplexer can register plain kernel `listening_socket_handle`.
+
+        constexpr kernel_t()
+            : file_handle(false)
+            , pipe_handle(false)
+            , byte_socket_handle(false)
+            , listening_socket_handle(false)
+        {
+        }
+      } kernel;
+      uint16_t registered_io_buffers : 1;      //!< This i/o multiplexer implements registered i/o buffers.
+      uint16_t secure_byte_socket_source : 1;  //!< This i/o multiplexer can register a `byte_socket_handle` obtained from a `secure_byte_socket_source`.
+      uint16_t http_byte_socket_source : 1;    //!< This i/o multiplexer can register a `http_byte_socket_handle` obtained from a `http_byte_socket_source`.
+
+      constexpr multiplexes_t()
+          : registered_io_buffers(false)
+          , secure_byte_socket_source(false)
+          , http_byte_socket_source(false)
+      {
+      }
+    } multiplexes;
+
+    constexpr implementation_information_t() {}
+  };
+  //! Returns implementation information about an i/o multiplexer
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC implementation_information_t implementation_information() const noexcept = 0;
+
 public:
   //! Implements `byte_io_handle` registration. The bottom two bits of the returned value are set into `_v.behaviour`'s `_multiplexer_state_bit0` and
   //! `_multiplexer_state_bit`

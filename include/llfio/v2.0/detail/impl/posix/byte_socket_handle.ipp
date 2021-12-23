@@ -41,7 +41,7 @@ namespace detail
   inline result<void> create_socket(native_handle_type &nativeh, ip::family _family, handle::mode _mode, handle::caching _caching, handle::flag flags) noexcept
   {
     flags &= ~handle::flag::unlink_on_first_close;
-    nativeh.behaviour |= native_handle_type::disposition::socket;
+    nativeh.behaviour |= native_handle_type::disposition::socket | native_handle_type::disposition::kernel_handle;
     OUTCOME_TRY(attribs_from_handle_mode_caching_and_flags(nativeh, _mode, handle::creation::if_needed, _caching, flags));
     nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
 
@@ -308,7 +308,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle::buffers_type> li
   caching _caching = this->kernel_caching();
   auto &b = *req.buffers.begin();
   native_handle_type nativeh;
-  nativeh.behaviour |= native_handle_type::disposition::socket;
+  nativeh.behaviour |= native_handle_type::disposition::socket | native_handle_type::disposition::kernel_handle;
   OUTCOME_TRY(attribs_from_handle_mode_caching_and_flags(nativeh, _mode, handle::creation::if_needed, _caching, _flags));
   nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
   for(;;)

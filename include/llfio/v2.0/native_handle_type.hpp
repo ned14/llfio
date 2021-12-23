@@ -52,6 +52,7 @@ struct native_handle_type  // NOLINT
   nonblocking = 1U << 4U,  //!< Requires additional synchronisation (Windows: `OVERLAPPED`; POSIX: `O_NONBLOCK`)
   seekable = 1U << 5U,     //!< Is seekable
   aligned_io = 1U << 6U,   //!< Requires sector aligned i/o (typically 512 or 4096)
+    kernel_handle = 1U << 7U, //!< Handle is a valid kernel handle
 
   file = 1U << 8U,          //!< Is a regular file
   directory = 1U << 9U,     //!< Is a directory
@@ -170,6 +171,8 @@ struct native_handle_type  // NOLINT
   constexpr bool is_seekable() const noexcept { return (behaviour & disposition::seekable) ? true : false; }
   //! True if requires aligned i/o
   constexpr bool requires_aligned_io() const noexcept { return (behaviour & disposition::aligned_io) ? true : false; }
+  //! True if handle is a valid kernel handle
+  constexpr bool is_kernel_handle() const noexcept { return (behaviour & disposition::kernel_handle) ? true : false; }
 
   //! True if a regular file or device
   constexpr bool is_regular() const noexcept { return (behaviour & disposition::file) ? true : false; }

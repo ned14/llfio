@@ -57,6 +57,7 @@ namespace test
     using registered_buffer_type = typename _base::registered_buffer_type;
     template <class T> using io_request = typename _base::template io_request<T>;
     template <class T> using io_result = typename _base::template io_result<T>;
+    using implementation_information_t = typename _base::implementation_information_t;
     using io_operation_state = typename _base::io_operation_state;
     using io_operation_state_visitor = typename _base::io_operation_state_visitor;
     using check_for_any_completed_io_statistics = typename _base::check_for_any_completed_io_statistics;
@@ -66,7 +67,8 @@ namespace test
     from which we can subclass. We can, of course, add our own i/o operation
     state. Here we track time.
     */
-    struct _null_operation_state final : public std::conditional_t<is_threadsafe, typename _base::_synchronised_io_operation_state, typename _base::_unsynchronised_io_operation_state>
+    struct _null_operation_state final
+        : public std::conditional_t<is_threadsafe, typename _base::_synchronised_io_operation_state, typename _base::_unsynchronised_io_operation_state>
     {
       using _impl = std::conditional_t<is_threadsafe, typename _base::_synchronised_io_operation_state, typename _base::_unsynchronised_io_operation_state>;
 
@@ -172,6 +174,20 @@ namespace test
       return success();
     }
 
+    virtual implementation_information_t implementation_information() const noexcept override
+    {
+      static auto v = []() -> implementation_information_t {
+        implementation_information_t ret;
+        ret.name = "null multiplexer";
+        ret.multiplexes.kernel.file_handle = true;
+        ret.multiplexes.kernel.pipe_handle = true;
+        ret.multiplexes.kernel.byte_socket_handle = true;
+        ret.multiplexes.kernel.listening_socket_handle = false;
+        return ret;
+      }();
+      return v;
+    }
+
     // These functions are inherited from handle
     virtual result<path_type> current_path() const noexcept override
     {
@@ -227,7 +243,8 @@ namespace test
     virtual std::pair<size_t, size_t> io_state_requirements() noexcept override { return {sizeof(_null_operation_state), alignof(_null_operation_state)}; }
 
     // These are straight i/o state construction functions, one each for read, write and barrier
-    virtual io_operation_state *construct(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept override
+    virtual io_operation_state *construct(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d,
+                                          io_request<buffers_type> reqs) noexcept override
     {
       assert(storage.size() >= sizeof(_null_operation_state));
       assert(((uintptr_t) storage.data() % alignof(_null_operation_state)) == 0);
@@ -237,7 +254,8 @@ namespace test
       }
       return new(storage.data()) _null_operation_state(_h, _visitor, std::move(b), d, std::move(reqs));
     }
-    virtual io_operation_state *construct(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept override
+    virtual io_operation_state *construct(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d,
+                                          io_request<const_buffers_type> reqs) noexcept override
     {
       assert(storage.size() >= sizeof(_null_operation_state));
       assert(((uintptr_t) storage.data() % alignof(_null_operation_state)) == 0);
@@ -247,7 +265,8 @@ namespace test
       }
       return new(storage.data()) _null_operation_state(_h, _visitor, std::move(b), d, std::move(reqs));
     }
-    virtual io_operation_state *construct(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept override
+    virtual io_operation_state *construct(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d,
+                                          io_request<const_buffers_type> reqs, barrier_kind kind) noexcept override
     {
       assert(storage.size() >= sizeof(_null_operation_state));
       assert(((uintptr_t) storage.data() % alignof(_null_operation_state)) == 0);
@@ -338,9 +357,12 @@ namespace test
 
     // If you can combine `construct()` with `init_io_operation()` into a more efficient implementation,
     // you should override these
-    // virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept override
-    // virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept override
-    // virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept override
+    // virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor,
+    // registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept override virtual io_operation_state
+    // *construct_and_init_io_operation(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d,
+    // io_request<const_buffers_type> reqs) noexcept override virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, byte_io_handle
+    // *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept
+    // override
 
     // On some implementations, `init_io_operation()` just enqueues request packets, and
     // a separate operation is required to submit the enqueued list.
@@ -497,7 +519,8 @@ namespace test
     // This must check all i/o initiated or completed on this i/o multiplexer
     // and invoke state transition from initiated to completed/finished, or from
     // completed to finished, for no more than max_completions i/o states.
-    virtual result<check_for_any_completed_io_statistics> check_for_any_completed_io(deadline d = std::chrono::seconds(0), size_t max_completions = (size_t) -1) noexcept override
+    virtual result<check_for_any_completed_io_statistics> check_for_any_completed_io(deadline d = std::chrono::seconds(0),
+                                                                                     size_t max_completions = (size_t) -1) noexcept override
     {
       LLFIO_DEADLINE_TO_SLEEP_INIT(d);
       check_for_any_completed_io_statistics ret;

@@ -91,9 +91,7 @@ inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &
     EIOSB &ol = *ol_it++;
     ol.Status = -1;
   }
-  auto cancel_io = make_scope_exit(
-  [&]() noexcept
-  {
+  auto cancel_io = make_scope_exit([&]() noexcept {
     if(nativeh.is_nonblocking())
     {
       if(ol_it != ols.begin() + 1)
@@ -149,8 +147,7 @@ inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &
       if(STATUS_TIMEOUT == ntwait(nativeh.h, ol, nd))
       {
         // ntwait cancels the i/o, undoer will cancel all the other i/o
-        auto r = [&]() -> result<void>
-        {
+        auto r = [&]() -> result<void> {
           LLFIO_WIN_DEADLINE_TO_TIMEOUT_LOOP(d);
           return success();
         }();
@@ -196,18 +193,19 @@ inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &
 // we get proper atomic scatter-gather i/o. A proper IOCP multiplexer would need to implement
 // the usual tricks of appending to OVERLAPPED etc to store the i/o state pointer, and not
 // be naughty like our test IOCP multiplexer is by misusing the ApcContext parameter.
-// 
+//
 // Returns true if operation completed immediately
 template <bool blocking, class Syscall, class Flags, class BuffersType>
 inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &&syscall, const native_handle_type &nativeh, span<WSABUF> bufs, Flags flags,
                           byte_io_handle::io_request<BuffersType> reqs, deadline d) noexcept
 {
-  LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+  LLFIO_DEADLINE_TO_SLEEP_INIT(d);
   for(size_t n = 0; n < reqs.buffers.size(); n++)
   {
     bufs[n].buf = (char *) reqs.buffers[n].data();
     bufs[n].len = (ULONG) reqs.buffers[n].size();
   }
+retry:
   DWORD transferred = 0;
   WSAOVERLAPPED ol;
   memset(&ol, 0, sizeof(ol));
@@ -215,13 +213,8 @@ inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &
   if(SOCKET_ERROR == syscall(nativeh.sock, bufs.data(), (DWORD) reqs.buffers.size(), &transferred, flags, d ? &ol : nullptr, nullptr))
   {
     auto retcode = WSAGetLastError();
-    if(WSA_IO_PENDING != retcode)
+    if(WSA_IO_PENDING != retcode && WSAEWOULDBLOCK != retcode)
     {
-      if(WSAEWOULDBLOCK == retcode)
-      {
-        transferred = 0;
-        goto exit_now;
-      }
       if(WSAESHUTDOWN == retcode)
       {
         // Emulate POSIX here
@@ -235,12 +228,65 @@ inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &
     {
       deadline nd;
       LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
-      if(STATUS_TIMEOUT == ntwait(nativeh.h, ol, nd))
+      if(WSA_IO_PENDING == retcode)
       {
-        // ntwait cancels the i/o, undoer will cancel all the other i/o
-        auto r = [&]() -> result<void>
+        if(STATUS_TIMEOUT == ntwait(nativeh.h, ol, nd))
         {
-          LLFIO_WIN_DEADLINE_TO_TIMEOUT_LOOP(d);
+          // ntwait cancels the i/o, undoer will cancel all the other i/o
+          auto r = [&]() -> result<void> {
+            LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
+            return success();
+          }();
+          if(!r)
+          {
+            ret = std::move(r).error();
+            return true;
+          }
+        }
+        DWORD flags_ = 0;
+        if(!WSAGetOverlappedResult(nativeh.sock, &ol, &transferred, false, &flags_))
+        {
+          ret = win32_error(WSAGetLastError());
+          return true;
+        }
+      }
+      else
+      {
+        // i/o was never started, so poll
+        static constexpr bool is_write = std::is_const<typename BuffersType::value_type>::value;
+        pollfd fds;
+        fds.fd = nativeh.sock;
+        fds.events = is_write ? POLLOUT : POLLIN;
+        fds.revents = 0;
+        int timeout = -1;
+        if(nd)
+        {
+          std::chrono::milliseconds ms;
+          if(nd.steady)
+          {
+            ms =
+            std::chrono::duration_cast<std::chrono::milliseconds>((began_steady + std::chrono::nanoseconds((nd).nsecs)) - std::chrono::steady_clock::now());
+          }
+          else
+          {
+            ms = std::chrono::duration_cast<std::chrono::milliseconds>(nd.to_time_point() - std::chrono::system_clock::now());
+          }
+          if(ms.count() < 0)
+          {
+            timeout = 0;
+          }
+          else
+          {
+            timeout = (int) ms.count();
+          }
+        }
+        if(SOCKET_ERROR == WSAPoll(&fds, 1, timeout))
+        {
+          ret = win32_error(WSAGetLastError());
+          return true;
+        }
+        auto r = [&]() -> result<void> {
+          LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
           return success();
         }();
         if(!r)
@@ -249,12 +295,7 @@ inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &
           return true;
         }
       }
-      DWORD flags_ = 0;
-      if(!WSAGetOverlappedResult(nativeh.sock, &ol, &transferred, false, &flags_))
-      {
-        ret = win32_error(WSAGetLastError());
-        return true;
-      }
+      goto retry;
     }
   }
   if(!blocking)

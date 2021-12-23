@@ -37,6 +37,7 @@ struct sockaddr_in6;
 #pragma warning(push)
 #pragma warning(disable : 4201)  // nameless struct/union
 #pragma warning(disable : 4251)  // dll interface
+#pragma warning(disable : 4275)  // dll interface
 #endif
 
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
@@ -68,7 +69,8 @@ namespace ip
   {
     unknown,
     v4,  //!< IP version 4
-    v6   //!< IP version 6
+    v6,  //!< IP version 6
+    any  //!< Either v4 or v6
   };
   /*! \class address
   \brief A version independent IP address.
@@ -165,6 +167,74 @@ namespace ip
   };
   //! Write address to stream
   LLFIO_HEADERS_ONLY_FUNC_SPEC std::ostream &operator<<(std::ostream &s, const address &v);
+
+  class resolver;
+  namespace detail
+  {
+    struct LLFIO_DECL resolver_deleter
+    {
+      void operator()(resolver *p) const;
+    };
+  }  // namespace detail
+  //! Returned by `resolve()` as a handle to the asynchronous name resolution operation.
+  class LLFIO_DECL resolver
+  {
+  public:
+    //! Returns true if the deadline expired, and the returned list of addresses is incomplete. Until `get()` is called, always is true.
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool incomplete() const noexcept;
+    //! Returns the array of addresses, blocking until completion if necessary, returning any error if one occurred.
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<span<address>> get() const noexcept;
+    //! Wait for up the deadline for the array of addresses to be retrieved.
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> wait(deadline d = {}) const noexcept;
+    //! \overload
+    template <class Rep, class Period> result<bool> wait_for(const std::chrono::duration<Rep, Period> &duration) const noexcept
+    {
+      auto r = wait(duration);
+      if(!r && r.error() == errc::timed_out)
+      {
+        return false;
+      }
+      OUTCOME_TRY(std::move(r));
+      return true;
+    }
+    //! \overload
+    template <class Clock, class Duration> result<bool> wait_until(const std::chrono::time_point<Clock, Duration> &timeout) const noexcept
+    {
+      auto r = wait(timeout);
+      if(!r && r.error() == errc::timed_out)
+      {
+        return false;
+      }
+      OUTCOME_TRY(std::move(r));
+      return true;
+    }
+  };
+  //! A pointer to a resolver
+  using resolver_ptr = std::unique_ptr<resolver, detail::resolver_deleter>;
+
+  /*! \brief Retrieve a list of potential `address` for a given name and service e.g.
+  "www.google.com" and "https" optionally within a bounded deadline.
+
+  The object returned by this function can take many seconds to become ready as multiple network requests may
+  need to be made. The deadline can be used to bound execution times -- like in a few
+  other places in LLFIO, this deadline does not cause timed out errors, rather it aborts
+  any remaining name resolution after the deadline expires and returns whatever addresses
+  have been resolved by the deadline.
+
+  This function has a future-like API as several major platforms provide native asynchronous
+  name resolution (currently: Linux, Windows). On other platforms, `std::async` with
+  `getaddrinfo()` is used as an emulation, and therefore deadline expiry means no partial
+  list of addresses are returned.
+
+  If you become no longer interested in the results, simply reset or delete the pointer
+  and the resolution will be aborted asynchronously.
+
+  \mallocs This is one of those very few APIs in LLFIO where dynamic memory allocation
+  is unbounded and uncontrollable thanks to how the platform APIs are implemented.
+  */
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<resolver_ptr> resolve(string_view name, string_view service, family _family = family::any, deadline d = {},
+                                                            bool blocking = false) noexcept;
+
   //! Make an `address_v4`
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<address_v4> make_address_v4(string_view str) noexcept;
   /*! \class address_v4
@@ -201,6 +271,8 @@ namespace ip
   inline result<address_v4> make_address_v4(const address_v4::bytes_type &bytes, uint16_t port = 0) noexcept { return address_v4(bytes, port); }
   //! Make an `address_v4`
   inline result<address_v4> make_address_v4(const address_v4::uint_type &bytes, uint16_t port = 0) noexcept { return address_v4(bytes, port); }
+
+  //! Make an `address_v6`
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<address_v6> make_address_v6(string_view str) noexcept;
   /*! \class address_v6
   \brief A v6 IP address.
@@ -247,6 +319,7 @@ namespace ip
     return addr;
   }
 }  // namespace ip
+
 
 /*! \class byte_socket_handle
 \brief A handle to a byte-orientated socket-like entity.
@@ -310,7 +383,7 @@ socket option is full of gotchas.
 If you don't wish to have this operation occur during close, you
 can call `shutdown_and_close()` manually instead.
 */
-class LLFIO_DECL byte_socket_handle : public byte_io_handle
+class LLFIO_DECL byte_socket_handle : public byte_io_handle, public pollable_handle
 {
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept final { return *this; }
 
@@ -534,8 +607,10 @@ template <> struct construct<byte_socket_handle>
 /* \class listening_socket_handle
 \brief A handle to a socket-like entity able to receive incoming connections.
 */
-class LLFIO_DECL listening_socket_handle : public handle
+class LLFIO_DECL listening_socket_handle : public handle, public pollable_handle
 {
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept final { return *this; }
+
 protected:
   byte_io_multiplexer *_ctx{nullptr};  // +4 or +8 bytes
 public:
@@ -877,7 +952,6 @@ template <> struct construct<listening_socket_handle>
   byte_socket_handle::flag flags = byte_socket_handle::flag::none;
   result<listening_socket_handle> operator()() const noexcept { return listening_socket_handle::listening_socket(family, _mode, _caching, flags); }
 };
-
 
 // BEGIN make_free_functions.py
 // END make_free_functions.py

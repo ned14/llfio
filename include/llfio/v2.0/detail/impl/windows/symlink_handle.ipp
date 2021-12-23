@@ -44,7 +44,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
   result<symlink_handle> ret(symlink_handle(native_handle_type(), 0, 0, flags));
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
-  nativeh.behaviour |= native_handle_type::disposition::symlink;
+  nativeh.behaviour |= native_handle_type::disposition::symlink | native_handle_type::disposition::kernel_handle;
   DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
   if(_mode == mode::append || _creation == creation::truncate_existing)
   {

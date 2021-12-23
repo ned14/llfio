@@ -32,7 +32,7 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
   result<pipe_handle> ret(pipe_handle(native_handle_type(), 0, 0, _caching, flags, nullptr));
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
-  nativeh.behaviour |= native_handle_type::disposition::pipe;
+  nativeh.behaviour |= native_handle_type::disposition::pipe | native_handle_type::disposition::kernel_handle;
   OUTCOME_TRY(auto &&attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, _caching, flags));
   attribs &= ~(O_CREAT | O_EXCL);                                   // needs to be emulated for fifos
   nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
@@ -139,9 +139,9 @@ result<std::pair<pipe_handle, pipe_handle>> pipe_handle::anonymous_pipe(caching 
 #else
   readattribs &= O_NONBLOCK;
 #endif
-  readnativeh.behaviour |= native_handle_type::disposition::pipe;
+  readnativeh.behaviour |= native_handle_type::disposition::pipe | native_handle_type::disposition::kernel_handle;
   readnativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
-  writenativeh.behaviour |= native_handle_type::disposition::pipe;
+  writenativeh.behaviour |= native_handle_type::disposition::pipe | native_handle_type::disposition::kernel_handle;
   writenativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
   int pipefds[2];
 #if defined(__linux__) || defined(__FreeBSD__)
