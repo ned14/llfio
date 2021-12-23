@@ -83,7 +83,12 @@ So long as you use `path_discovery::temporary_named_pipes_directory()`
 as your base directory, you can write quite portable code between POSIX
 and Windows.
 */
-class LLFIO_DECL pipe_handle : public byte_io_handle, public fs_handle
+class LLFIO_DECL pipe_handle : public byte_io_handle,
+                               public fs_handle
+#ifndef _WIN32
+    ,
+                               public pollable_handle
+#endif
 {
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept final { return *this; }
 
@@ -183,19 +188,29 @@ public:
   \errors Any of the values POSIX `open()`, `mkfifo()`, `NtCreateFile()` or `NtCreateNamedPipeFile()` can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<pipe_handle> pipe(path_view_type path, mode _mode, creation _creation, caching _caching = caching::all, flag flags = flag::none, const path_handle &base = path_discovery::temporary_named_pipes_directory()) noexcept;
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<pipe_handle> pipe(path_view_type path, mode _mode, creation _creation, caching _caching = caching::all,
+                                                                  flag flags = flag::none,
+                                                                  const path_handle &base = path_discovery::temporary_named_pipes_directory()) noexcept;
   /*! Convenience overload for `pipe()` creating a new named pipe if
   needed, and with read-only privileges. Unless `flag::multiplexable`
   is specified, this will block until the other end connects.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<pipe_handle> pipe_create(path_view_type path, caching _caching = caching::all, flag flags = flag::unlink_on_first_close, const path_handle &base = path_discovery::temporary_named_pipes_directory()) noexcept { return pipe(path, mode::read, creation::if_needed, _caching, flags, base); }
+  static inline result<pipe_handle> pipe_create(path_view_type path, caching _caching = caching::all, flag flags = flag::unlink_on_first_close,
+                                                const path_handle &base = path_discovery::temporary_named_pipes_directory()) noexcept
+  {
+    return pipe(path, mode::read, creation::if_needed, _caching, flags, base);
+  }
   /*! Convenience overload for `pipe()` opening an existing named pipe
   with write-only privileges. This will fail if no reader is waiting
   on the other end of the pipe.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<pipe_handle> pipe_open(path_view_type path, caching _caching = caching::all, flag flags = flag::none, const path_handle &base = path_discovery::temporary_named_pipes_directory()) noexcept { return pipe(path, mode::append, creation::open_existing, _caching, flags, base); }
+  static inline result<pipe_handle> pipe_open(path_view_type path, caching _caching = caching::all, flag flags = flag::none,
+                                              const path_handle &base = path_discovery::temporary_named_pipes_directory()) noexcept
+  {
+    return pipe(path, mode::append, creation::open_existing, _caching, flags, base);
+  }
 
   /*! Create a pipe handle creating a randomly named pipe on a path.
   The pipe is opened exclusively with `creation::only_if_not_exist` so it
@@ -204,7 +219,8 @@ public:
   \errors Any of the values POSIX `open()`, `mkfifo()`, `NtCreateFile()` or `NtCreateNamedPipeFile()` can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<pipe_handle> random_pipe(mode _mode = mode::read, caching _caching = caching::all, flag flags = flag::unlink_on_first_close, const path_handle &dirpath = path_discovery::temporary_named_pipes_directory()) noexcept
+  static inline result<pipe_handle> random_pipe(mode _mode = mode::read, caching _caching = caching::all, flag flags = flag::unlink_on_first_close,
+                                                const path_handle &dirpath = path_discovery::temporary_named_pipes_directory()) noexcept
   {
     try
     {
@@ -233,7 +249,8 @@ public:
   \errors Any of the values POSIX `pipe()` or `NtCreateNamedPipeFile()` can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<pipe_handle, pipe_handle>> anonymous_pipe(caching _caching = caching::all, flag flags = flag::none) noexcept;
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<pipe_handle, pipe_handle>> anonymous_pipe(caching _caching = caching::all,
+                                                                                                    flag flags = flag::none) noexcept;
 
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~pipe_handle() override
   {

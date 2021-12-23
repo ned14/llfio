@@ -122,7 +122,8 @@ protected:
   //! The virtualised implementation of `max_buffers()` used if no multiplexer has been set.
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t _do_max_buffers() const noexcept;
   //! The virtualised implementation of `allocate_registered_buffer()` used if no multiplexer has been set.
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<registered_buffer_type> _do_allocate_registered_buffer(size_t &bytes) noexcept;  // default implementation is in map_handle.hpp
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<registered_buffer_type>
+  _do_allocate_registered_buffer(size_t &bytes) noexcept;  // default implementation is in map_handle.hpp
   //! The virtualised implementation of `read()` used if no multiplexer has been set.
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> _do_read(io_request<buffers_type> reqs, deadline d) noexcept;
   //! The virtualised implementation of `read()` used if no multiplexer has been set.
@@ -188,7 +189,8 @@ protected:
     state->~io_operation_state();
     return ret;
   }
-  io_result<const_buffers_type> _do_multiplexer_barrier(registered_buffer_type &&base, io_request<const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
+  io_result<const_buffers_type> _do_multiplexer_barrier(registered_buffer_type &&base, io_request<const_buffers_type> reqs, barrier_kind kind,
+                                                        deadline d) noexcept
   {
     LLFIO_DEADLINE_TO_SLEEP_INIT(d);
     const auto state_reqs = _ctx->io_state_requirements();
@@ -292,10 +294,16 @@ public:
   \mallocs The default synchronous implementation in file_handle performs no memory allocation.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept { return (_ctx == nullptr) ? _do_read(reqs, d) : _do_multiplexer_read({}, reqs, d); }
+  io_result<buffers_type> read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept
+  {
+    return (_ctx == nullptr) ? _do_read(reqs, d) : _do_multiplexer_read({}, reqs, d);
+  }
   //! \overload Registered buffer overload, scatter list **must** be wholly within the registered buffer
   LLFIO_MAKE_FREE_FUNCTION
-  io_result<buffers_type> read(registered_buffer_type base, io_request<buffers_type> reqs, deadline d = deadline()) noexcept { return (_ctx == nullptr) ? _do_read(std::move(base), reqs, d) : _do_multiplexer_read(std::move(base), reqs, d); }
+  io_result<buffers_type> read(registered_buffer_type base, io_request<buffers_type> reqs, deadline d = deadline()) noexcept
+  {
+    return (_ctx == nullptr) ? _do_read(std::move(base), reqs, d) : _do_multiplexer_read(std::move(base), reqs, d);
+  }
   //! \overload Convenience initialiser list based overload for `read()`
   LLFIO_MAKE_FREE_FUNCTION
   io_result<size_type> read(extent_type offset, std::initializer_list<buffer_type> lst, deadline d = deadline()) noexcept
@@ -334,10 +342,16 @@ public:
   \mallocs The default synchronous implementation in file_handle performs no memory allocation.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept { return (_ctx == nullptr) ? _do_write(reqs, d) : _do_multiplexer_write({}, std::move(reqs), d); }
+  io_result<const_buffers_type> write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept
+  {
+    return (_ctx == nullptr) ? _do_write(reqs, d) : _do_multiplexer_write({}, std::move(reqs), d);
+  }
   //! \overload Registered buffer overload, gather list **must** be wholly within the registered buffer
   LLFIO_MAKE_FREE_FUNCTION
-  io_result<const_buffers_type> write(registered_buffer_type base, io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept { return (_ctx == nullptr) ? _do_write(std::move(base), reqs, d) : _do_multiplexer_write(std::move(base), std::move(reqs), d); }
+  io_result<const_buffers_type> write(registered_buffer_type base, io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept
+  {
+    return (_ctx == nullptr) ? _do_write(std::move(base), reqs, d) : _do_multiplexer_write(std::move(base), std::move(reqs), d);
+  }
   //! \overload Convenience initialiser list based overload for `write()`
   LLFIO_MAKE_FREE_FUNCTION
   io_result<size_type> write(extent_type offset, std::initializer_list<const_buffer_type> lst, deadline d = deadline()) noexcept
@@ -385,7 +399,8 @@ public:
   \mallocs None.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), barrier_kind kind = barrier_kind::nowait_data_only, deadline d = deadline()) noexcept
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(),
+                                                                        barrier_kind kind = barrier_kind::nowait_data_only, deadline d = deadline()) noexcept
   {
     return (_ctx == nullptr) ? _do_barrier(reqs, kind, d) : _do_multiplexer_barrier({}, std::move(reqs), kind, d);
   }
@@ -466,7 +481,8 @@ public:
   and finishes immediately, no coroutine suspension occurs.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  awaitable<io_result<const_buffers_type>> co_barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(), barrier_kind kind = barrier_kind::nowait_data_only, deadline d = deadline()) noexcept
+  awaitable<io_result<const_buffers_type>> co_barrier(io_request<const_buffers_type> reqs = io_request<const_buffers_type>(),
+                                                      barrier_kind kind = barrier_kind::nowait_data_only, deadline d = deadline()) noexcept
   {
     if(_ctx == nullptr)
     {
@@ -477,7 +493,8 @@ public:
     return ret;
   }
 };
-static_assert((sizeof(void *) == 4 && sizeof(byte_io_handle) == 20) || (sizeof(void *) == 8 && sizeof(byte_io_handle) == 32), "byte_io_handle is not 20 or 32 bytes in size!");
+static_assert((sizeof(void *) == 4 && sizeof(byte_io_handle) == 20) || (sizeof(void *) == 8 && sizeof(byte_io_handle) == 32),
+              "byte_io_handle is not 20 or 32 bytes in size!");
 
 // Out of line definition purely to work around a bug in GCC where if marked inline,
 // its visibility is hidden and links fail
@@ -517,7 +534,8 @@ inline size_t byte_io_multiplexer::do_byte_io_handle_max_buffers(const byte_io_h
 {
   return h->_do_max_buffers();
 }
-inline result<byte_io_multiplexer::registered_buffer_type> byte_io_multiplexer::do_byte_io_handle_allocate_registered_buffer(byte_io_handle *h, size_t &bytes) noexcept
+inline result<byte_io_multiplexer::registered_buffer_type> byte_io_multiplexer::do_byte_io_handle_allocate_registered_buffer(byte_io_handle *h,
+                                                                                                                             size_t &bytes) noexcept
 {
   return h->_do_allocate_registered_buffer(bytes);
 }
@@ -560,6 +578,50 @@ template <class T> inline byte_io_multiplexer::awaitable<T>::~awaitable()
   }
 }
 
+/*! \class pollable_handle
+\brief A handle type which can be supplied to `poll()`.
+*/
+class pollable_handle
+{
+  virtual const handle &_get_handle() const noexcept = 0;
+
+public:
+  virtual ~pollable_handle() {}
+};
+
+//! What to poll
+QUICKCPPLIB_BITFIELD_BEGIN_T(poll_what, uint8_t)  //
+{
+none = 0U,  //!< Query nothing for this handle.
+
+is_readable = (1U << 0U),  //!< If this handle is readable.
+is_writable = (1U << 1U),  //!< If this handle is writable.
+is_errored = (1U << 2U),   //!< If this handle is errored.
+is_closed = (1U << 3U),    //!< If this handle is closed/hung up.
+
+not_pollable = (1U << 7U)  //!< This handle is not pollable.
+}  //
+QUICKCPPLIB_BITFIELD_END(poll_what)
+
+/*! \brief Polls a list of pollable handles awaiting a change in state.
+\return The number of handles with changed state. Handles not `is_kernel_handle()`
+receive `poll_what::not_pollable`.
+\param out An array of `poll_what` set with the results of the poll.
+\param handles An array of pointers to `handle`. Individual pointers can be null if you want to skip them.
+\param query An array of `poll_what` to check.
+\param d An optional timeout.
+\errors Whatever POSIX `poll()` or Windows `select()` can return.
+
+Note that the maximum number of handles which can be passed to this function is 1024
+(the platform syscall may refuse even that many). Note that this function is `O(N)` to
+handle count, so more than a few hundred is a bad idea in any case.
+If you need to wait on more handles than this, you need to implement a `byte_io_multiplexer`
+for your platform.
+
+The sizes of `out`, `handles` and `query` must be the same, or an error is returned.
+*/
+LLFIO_HEADERS_ONLY_FUNC_SPEC result<size_t> poll(span<poll_what> out, span<pollable_handle *> handles, span<const poll_what> query, deadline d = {}) noexcept;
+
 // BEGIN make_free_functions.py
 /*! \brief Read data from the open handle.
 
@@ -580,7 +642,8 @@ returned if deadline i/o is not possible with this particular handle configurati
 reading from regular files on POSIX or reading from a non-overlapped HANDLE on Windows).
 \mallocs The default synchronous implementation in file_handle performs no memory allocation.
 */
-inline byte_io_handle::io_result<byte_io_handle::buffers_type> read(byte_io_handle &self, byte_io_handle::io_request<byte_io_handle::buffers_type> reqs, deadline d = deadline()) noexcept
+inline byte_io_handle::io_result<byte_io_handle::buffers_type> read(byte_io_handle &self, byte_io_handle::io_request<byte_io_handle::buffers_type> reqs,
+                                                                    deadline d = deadline()) noexcept
 {
   return self.read(std::forward<decltype(reqs)>(reqs), std::forward<decltype(d)>(d));
 }
@@ -605,12 +668,14 @@ returned if deadline i/o is not possible with this particular handle configurati
 writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows).
 \mallocs The default synchronous implementation in file_handle performs no memory allocation.
 */
-inline byte_io_handle::io_result<byte_io_handle::const_buffers_type> write(byte_io_handle &self, byte_io_handle::io_request<byte_io_handle::const_buffers_type> reqs, deadline d = deadline()) noexcept
+inline byte_io_handle::io_result<byte_io_handle::const_buffers_type>
+write(byte_io_handle &self, byte_io_handle::io_request<byte_io_handle::const_buffers_type> reqs, deadline d = deadline()) noexcept
 {
   return self.write(std::forward<decltype(reqs)>(reqs), std::forward<decltype(d)>(d));
 }
 //! \overload
-inline byte_io_handle::io_result<byte_io_handle::size_type> write(byte_io_handle &self, byte_io_handle::extent_type offset, std::initializer_list<byte_io_handle::const_buffer_type> lst, deadline d = deadline()) noexcept
+inline byte_io_handle::io_result<byte_io_handle::size_type>
+write(byte_io_handle &self, byte_io_handle::extent_type offset, std::initializer_list<byte_io_handle::const_buffer_type> lst, deadline d = deadline()) noexcept
 {
   return self.write(std::forward<decltype(offset)>(offset), std::forward<decltype(lst)>(lst), std::forward<decltype(d)>(d));
 }

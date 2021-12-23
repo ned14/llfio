@@ -1,5 +1,5 @@
 /* Multiplex file i/o
-(C) 2019 Niall Douglas <http://www.nedproductions.biz/> (9 commits)
+(C) 2019-2021 Niall Douglas <http://www.nedproductions.biz/> (9 commits)
 File Created: Nov 2019
 
 
@@ -43,6 +43,7 @@ namespace test
     using registered_buffer_type = typename _base::registered_buffer_type;
     template <class T> using io_request = typename _base::template io_request<T>;
     template <class T> using io_result = typename _base::template io_result<T>;
+    using implementation_information_t = typename _base::implementation_information_t;
     using io_operation_state = typename _base::io_operation_state;
     using io_operation_state_visitor = typename _base::io_operation_state_visitor;
     using check_for_any_completed_io_statistics = typename _base::check_for_any_completed_io_statistics;
@@ -94,8 +95,22 @@ namespace test
         return win32_error();
       }
       _disable_immediate_completions = disable_immediate_completions;
-      this->_v.behaviour |= native_handle_type::disposition::multiplexer;
+      this->_v.behaviour |= native_handle_type::disposition::multiplexer | native_handle_type::disposition::kernel_handle;
       return success();
+    }
+
+    virtual implementation_information_t implementation_information() const noexcept override
+    {
+      static auto v = []() -> implementation_information_t {
+        implementation_information_t ret;
+        ret.name = "IOCP multiplexer";
+        ret.multiplexes.kernel.file_handle = true;
+        ret.multiplexes.kernel.pipe_handle = true;
+        ret.multiplexes.kernel.byte_socket_handle = true;
+        ret.multiplexes.kernel.listening_socket_handle = false;
+        return ret;
+      }();
+      return v;
     }
 
     // virtual result<path_type> current_path() const noexcept override;

@@ -303,6 +303,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
   nativeh.behaviour &= ~native_handle_type::disposition::nonblocking;
   nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
 #if !LLFIO_SYMLINK_HANDLE_IS_FAKED
+  nativeh.behaviour |= native_handle_type::disposition::kernel_handle;
   path_handle _dirh_, *dirh = &_dirh_;
   path_type leafname;
 #else

@@ -47,7 +47,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   result<file_handle> ret(file_handle(native_handle_type(), 0, 0, _caching, flags, nullptr));
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
-  nativeh.behaviour |= native_handle_type::disposition::file;
+  nativeh.behaviour |= native_handle_type::disposition::file | native_handle_type::disposition::kernel_handle;
   OUTCOME_TRY(auto &&attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, _creation, _caching, flags));
   attribs &= ~O_NONBLOCK;
   nativeh.behaviour &= ~native_handle_type::disposition::nonblocking;
@@ -121,7 +121,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   result<file_handle> ret(file_handle(native_handle_type(), 0, 0, _caching, flags, nullptr));
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
-  nativeh.behaviour |= native_handle_type::disposition::file;
+  nativeh.behaviour |= native_handle_type::disposition::file | native_handle_type::disposition::kernel_handle;
   // Open file exclusively to prevent collision
   OUTCOME_TRY(auto &&attribs, attribs_from_handle_mode_caching_and_flags(nativeh, _mode, creation::only_if_not_exist, _caching, flags));
   attribs &= ~O_NONBLOCK;

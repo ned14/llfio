@@ -866,7 +866,7 @@ namespace test
       else
       {
         this->_v.fd = fd;
-        this->_v.behaviour |= native_handle_type::disposition::multiplexer;
+        this->_v.behaviour |= native_handle_type::disposition::multiplexer | native_handle_type::disposition::kernel_handle;
       }
       return success();
     }
