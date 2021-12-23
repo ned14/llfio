@@ -129,6 +129,8 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1const__buffer__type.html">const_buffer_type</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1implementation__information__t.html">implementation_information_t</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__operation__state.html">io_operation_state</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An interface to a state for an i/o operation scheduled against an i/o multiplexer.  <a href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__operation__state.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -204,6 +206,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2df2cb9170af9860a3abc3ac2dfac16f"><td class="memItemLeft" align="right" valign="top"><a id="a2df2cb9170af9860a3abc3ac2dfac16f"></a>
 <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html">byte_io_multiplexer</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html">byte_io_multiplexer</a> &amp;)=delete</td></tr>
 <tr class="separator:a2df2cb9170af9860a3abc3ac2dfac16f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab2928135a2c85af895798685275e8d32"><td class="memItemLeft" align="right" valign="top"><a id="ab2928135a2c85af895798685275e8d32"></a>
+virtual <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1implementation__information__t.html">implementation_information_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#ab2928135a2c85af895798685275e8d32">implementation_information</a> () const noexcept=0</td></tr>
+<tr class="memdesc:ab2928135a2c85af895798685275e8d32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns implementation information about an i/o multiplexer. <br /></td></tr>
+<tr class="separator:ab2928135a2c85af895798685275e8d32"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3e387f33a9b7c38d43e0fd2454a95b17"><td class="memItemLeft" align="right" valign="top">virtual result&lt; uint8_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a3e387f33a9b7c38d43e0fd2454a95b17">do_byte_io_handle_register</a> (<a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html">byte_io_handle</a> *) noexcept</td></tr>
 <tr class="separator:a3e387f33a9b7c38d43e0fd2454a95b17"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26c52ec51bcb3e27c457c51c6bae4112"><td class="memItemLeft" align="right" valign="top"><a id="a26c52ec51bcb3e27c457c51c6bae4112"></a>
@@ -357,6 +363,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a751e912d8dab755ea969a418c1d544eb">requires_aligned_io</a> () const noexcept</td></tr>
 <tr class="memdesc:a751e912d8dab755ea969a418c1d544eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if requires aligned i/o. <br /></td></tr>
 <tr class="separator:a751e912d8dab755ea969a418c1d544eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ca660b86e595ad4d4e124e46f61b127"><td class="memItemLeft" align="right" valign="top"><a id="a8ca660b86e595ad4d4e124e46f61b127"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a8ca660b86e595ad4d4e124e46f61b127">is_kernel_handle</a> () const noexcept</td></tr>
+<tr class="memdesc:a8ca660b86e595ad4d4e124e46f61b127"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if <code>native_handle()</code> is a valid kernel handle. <br /></td></tr>
+<tr class="separator:a8ca660b86e595ad4d4e124e46f61b127"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7751fbb4b1aff527f469412ea33116ed"><td class="memItemLeft" align="right" valign="top"><a id="a7751fbb4b1aff527f469412ea33116ed"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a7751fbb4b1aff527f469412ea33116ed">is_regular</a> () const noexcept</td></tr>
 <tr class="memdesc:a7751fbb4b1aff527f469412ea33116ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if a regular file or device. <br /></td></tr>
@@ -616,7 +626,7 @@ static constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><b>_a
 </table>
 </div><div class="memdoc">
 <p>Implements <code>byte_io_handle</code> registration. The bottom two bits of the returned value are set into <code>_v.behaviour</code>'s <code>_multiplexer_state_bit0</code> and <code>_multiplexer_state_bit</code> </p>
-<div class="fragment"><div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;{ <span class="keywordflow">return</span> (uint8_t) 0; }</div>
+<div class="fragment"><div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;{ <span class="keywordflow">return</span> (uint8_t) 0; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -644,7 +654,7 @@ static constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><b>_a
 </table>
 </div><div class="memdoc">
 <p>Implements <code>listening_socket_handle</code> registration. The bottom two bits of the returned value are set into <code>_v.behaviour</code>'s <code>_multiplexer_state_bit0</code> and <code>_multiplexer_state_bit</code> </p>
-<div class="fragment"><div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;{ <span class="keywordflow">return</span> errc::operation_not_supported; }</div>
+<div class="fragment"><div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;{ <span class="keywordflow">return</span> errc::operation_not_supported; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -932,7 +942,7 @@ static constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><b>_a
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_a013936bc1254b1a47567fe29698d1b1c"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">llfio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with.</div><div class="ttdef"><b>Definition:</b> handle.hpp:443</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_a013936bc1254b1a47567fe29698d1b1c"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">llfio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with.</div><div class="ttdef"><b>Definition:</b> handle.hpp:445</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

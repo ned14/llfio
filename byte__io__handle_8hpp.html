@@ -85,7 +85,8 @@ $(document).ready(function(){initNavTree('byte__io__handle_8hpp.html',''); initR
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">byte_io_handle.hpp File Reference</div>  </div>
 </div><!--header-->
@@ -97,6 +98,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html">llfio_v2_xxx::byte_io_handle</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to something capable of scatter-gather byte i/o.  <a href="classllfio__v2__xxx_1_1byte__io__handle.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pollable__handle.html">llfio_v2_xxx::pollable_handle</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle type which can be supplied to <code>poll()</code>.  <a href="classllfio__v2__xxx_1_1pollable__handle.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 Namespaces</h2></td></tr>
@@ -106,6 +110,12 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a26baf26ed8a75301a92134497cc3ac8a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a26baf26ed8a75301a92134497cc3ac8a">llfio_v2_xxx::QUICKCPPLIB_BITFIELD_BEGIN_T</a> (poll_what, uint8_t)</td></tr>
+<tr class="memdesc:a26baf26ed8a75301a92134497cc3ac8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">What to poll.  <a href="namespacellfio__v2__xxx.html#a26baf26ed8a75301a92134497cc3ac8a">More...</a><br /></td></tr>
+<tr class="separator:a26baf26ed8a75301a92134497cc3ac8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36814e250c3473392fe01573e9b52ca3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a36814e250c3473392fe01573e9b52ca3">llfio_v2_xxx::QUICKCPPLIB_BITFIELD_END</a> (poll_what) inline result&lt; size_t &gt; poll(span&lt; poll_what &gt; out</td></tr>
+<tr class="memdesc:a36814e250c3473392fe01573e9b52ca3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Polls a list of pollable handles awaiting a change in state.  <a href="namespacellfio__v2__xxx.html#a36814e250c3473392fe01573e9b52ca3">More...</a><br /></td></tr>
+<tr class="separator:a36814e250c3473392fe01573e9b52ca3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acbd9eb25fed94bb0bc8fa888b3c26bdf"><td class="memItemLeft" align="right" valign="top">byte_io_handle::io_result&lt; byte_io_handle::buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#acbd9eb25fed94bb0bc8fa888b3c26bdf">llfio_v2_xxx::read</a> (byte_io_handle &amp;self, byte_io_handle::io_request&lt; byte_io_handle::buffers_type &gt; reqs, deadline d=deadline()) noexcept</td></tr>
 <tr class="memdesc:acbd9eb25fed94bb0bc8fa888b3c26bdf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read data from the open handle.  <a href="namespacellfio__v2__xxx.html#acbd9eb25fed94bb0bc8fa888b3c26bdf">More...</a><br /></td></tr>
 <tr class="separator:acbd9eb25fed94bb0bc8fa888b3c26bdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -116,6 +126,18 @@ Functions</h2></td></tr>
 byte_io_handle::io_result&lt; byte_io_handle::size_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a04b4a9d45c9739fbcba139c2cecfb80b">llfio_v2_xxx::write</a> (byte_io_handle &amp;self, byte_io_handle::extent_type offset, std::initializer_list&lt; byte_io_handle::const_buffer_type &gt; lst, deadline d=deadline()) noexcept</td></tr>
 <tr class="memdesc:a04b4a9d45c9739fbcba139c2cecfb80b"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br /></td></tr>
 <tr class="separator:a04b4a9d45c9739fbcba139c2cecfb80b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:ac4091bf755435ce8ac2537c70bde3f65"><td class="memItemLeft" align="right" valign="top"><a id="ac4091bf755435ce8ac2537c70bde3f65"></a>
+span&lt; pollable_handle * &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::handles</b></td></tr>
+<tr class="separator:ac4091bf755435ce8ac2537c70bde3f65"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd6a3a006f947fd8d441d2c823afce06"><td class="memItemLeft" align="right" valign="top"><a id="acd6a3a006f947fd8d441d2c823afce06"></a>
+span&lt; pollable_handle * &gt; span&lt; const poll_what &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::query</b></td></tr>
+<tr class="separator:acd6a3a006f947fd8d441d2c823afce06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f5de17b348418166c2bcc01602b96a2"><td class="memItemLeft" align="right" valign="top"><a id="a6f5de17b348418166c2bcc01602b96a2"></a>
+span&lt; pollable_handle * &gt; span&lt; const poll_what &gt; deadline&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::d</b> = {}) noexcept</td></tr>
+<tr class="separator:a6f5de17b348418166c2bcc01602b96a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides a byte-orientated i/o handle </p>

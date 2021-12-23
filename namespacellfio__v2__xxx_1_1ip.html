@@ -84,6 +84,7 @@ $(document).ready(function(){initNavTree('namespacellfio__v2__xxx_1_1ip.html',''
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
@@ -105,12 +106,23 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1ip_1_1address__v6.html">address_v6</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make an <code>address_v6</code>. v6 addresses need to have the form <code>[::]:port</code>.  <a href="classllfio__v2__xxx_1_1ip_1_1address__v6.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1ip_1_1resolver.html">resolver</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returned by <code>resolve()</code> as a handle to the asynchronous name resolution operation.  <a href="classllfio__v2__xxx_1_1ip_1_1resolver.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:a57373211cd8f5531937f14ea9852dcd4"><td class="memItemLeft" align="right" valign="top"><a id="a57373211cd8f5531937f14ea9852dcd4"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a57373211cd8f5531937f14ea9852dcd4">resolver_ptr</a> = std::unique_ptr&lt; <a class="el" href="classllfio__v2__xxx_1_1ip_1_1resolver.html">resolver</a>, detail::resolver_deleter &gt;</td></tr>
+<tr class="memdesc:a57373211cd8f5531937f14ea9852dcd4"><td class="mdescLeft">&#160;</td><td class="mdescRight">A pointer to a resolver. <br /></td></tr>
+<tr class="separator:a57373211cd8f5531937f14ea9852dcd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
 <tr class="memitem:aa209c529f55f8c8a242080d55c66a4a9"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9">family</a> { <b>unknown</b>, 
 <a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a5ed3a3ff8e5c29979502b9030e8518e0">family::v4</a>, 
-<a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a0af45c99beb7a9afc9192665c4a05cd3">family::v6</a>
+<a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a0af45c99beb7a9afc9192665c4a05cd3">family::v6</a>, 
+<a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a100b8cad7cf2a56f6df78f171f97a1ec">family::any</a>
  }</td></tr>
 <tr class="memdesc:aa209c529f55f8c8a242080d55c66a4a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The family of IP.  <a href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9">More...</a><br /></td></tr>
 <tr class="separator:aa209c529f55f8c8a242080d55c66a4a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -121,6 +133,9 @@ Functions</h2></td></tr>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a6765418b2c35f959b2eeed474b20db03">operator&lt;&lt;</a> (std::ostream &amp;s, const <a class="el" href="classllfio__v2__xxx_1_1ip_1_1address.html">address</a> &amp;v)</td></tr>
 <tr class="memdesc:a6765418b2c35f959b2eeed474b20db03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write address to stream. <br /></td></tr>
 <tr class="separator:a6765418b2c35f959b2eeed474b20db03"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a683e36b652b458600d5dee91389c1b3f"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a57373211cd8f5531937f14ea9852dcd4">resolver_ptr</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a683e36b652b458600d5dee91389c1b3f">resolve</a> (string_view name, string_view service, <a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9">family</a> _family=<a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a100b8cad7cf2a56f6df78f171f97a1ec">family::any</a>, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d={}, bool blocking=false) noexcept</td></tr>
+<tr class="memdesc:a683e36b652b458600d5dee91389c1b3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve a list of potential <code>address</code> for a given name and service e.g. "www.google.com" and "https" optionally within a bounded deadline.  <a href="namespacellfio__v2__xxx_1_1ip.html#a683e36b652b458600d5dee91389c1b3f">More...</a><br /></td></tr>
+<tr class="separator:a683e36b652b458600d5dee91389c1b3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1ee33e4c8320dbf5510a0849608eebf2"><td class="memItemLeft" align="right" valign="top"><a id="a1ee33e4c8320dbf5510a0849608eebf2"></a>
 result&lt; <a class="el" href="classllfio__v2__xxx_1_1ip_1_1address__v4.html">address_v4</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a1ee33e4c8320dbf5510a0849608eebf2">make_address_v4</a> (string_view str) noexcept</td></tr>
 <tr class="memdesc:a1ee33e4c8320dbf5510a0849608eebf2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make an <code>address_v4</code> <br /></td></tr>
@@ -134,7 +149,8 @@ result&lt; <a class="el" href="classllfio__v2__xxx_1_1ip_1_1address__v4.html">ad
 <tr class="memdesc:a8440fda3b66f65fc7115dab9d890c88b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make an <code>address_v4</code> <br /></td></tr>
 <tr class="separator:a8440fda3b66f65fc7115dab9d890c88b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d8bff0582308aa1864d17663c5e34fc"><td class="memItemLeft" align="right" valign="top"><a id="a1d8bff0582308aa1864d17663c5e34fc"></a>
-result&lt; <a class="el" href="classllfio__v2__xxx_1_1ip_1_1address__v6.html">address_v6</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>make_address_v6</b> (string_view str) noexcept</td></tr>
+result&lt; <a class="el" href="classllfio__v2__xxx_1_1ip_1_1address__v6.html">address_v6</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a1d8bff0582308aa1864d17663c5e34fc">make_address_v6</a> (string_view str) noexcept</td></tr>
+<tr class="memdesc:a1d8bff0582308aa1864d17663c5e34fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make an <code>address_v6</code> <br /></td></tr>
 <tr class="separator:a1d8bff0582308aa1864d17663c5e34fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a20fd9dd208ab6b8f60f4b15f56c259dd"><td class="memItemLeft" align="right" valign="top"><a id="a20fd9dd208ab6b8f60f4b15f56c259dd"></a>
 result&lt; <a class="el" href="classllfio__v2__xxx_1_1ip_1_1address__v6.html">address_v6</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a20fd9dd208ab6b8f60f4b15f56c259dd">make_address_v6</a> (const address_v6::bytes_type &amp;bytes, uint16_t port=0, uint32_t scope_id=0) noexcept</td></tr>
@@ -174,17 +190,82 @@ result&lt; <a class="el" href="classllfio__v2__xxx_1_1ip_1_1address.html">addres
 </td></tr>
 <tr><td class="fieldname"><a id="aa209c529f55f8c8a242080d55c66a4a9a0af45c99beb7a9afc9192665c4a05cd3"></a>v6&#160;</td><td class="fielddoc"><p>IP version 6. </p>
 </td></tr>
+<tr><td class="fieldname"><a id="aa209c529f55f8c8a242080d55c66a4a9a100b8cad7cf2a56f6df78f171f97a1ec"></a>any&#160;</td><td class="fielddoc"><p>Either v4 or v6. </p>
+</td></tr>
 </table>
-<div class="fragment"><div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  {</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    unknown,</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a5ed3a3ff8e5c29979502b9030e8518e0">v4</a>,  <span class="comment">//!&lt; IP version 4</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment"></span>    <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a0af45c99beb7a9afc9192665c4a05cd3">v6</a>   <span class="comment">//!&lt; IP version 6</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment"></span>  };</div>
+<div class="fragment"><div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  {</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    unknown,</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a5ed3a3ff8e5c29979502b9030e8518e0">v4</a>,  <span class="comment">//!&lt; IP version 4</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment"></span>    <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a0af45c99beb7a9afc9192665c4a05cd3">v6</a>,  <span class="comment">//!&lt; IP version 6</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment"></span>    <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a100b8cad7cf2a56f6df78f171f97a1ec">any</a>  <span class="comment">//!&lt; Either v4 or v6</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="comment"></span>  };</div>
 </div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a683e36b652b458600d5dee91389c1b3f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a683e36b652b458600d5dee91389c1b3f">&#9670;&nbsp;</a></span>resolve()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;<a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a57373211cd8f5531937f14ea9852dcd4">resolver_ptr</a>&gt; llfio_v2_xxx::ip::resolve </td>
+          <td>(</td>
+          <td class="paramtype">string_view&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string_view&#160;</td>
+          <td class="paramname"><em>service</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9">family</a>&#160;</td>
+          <td class="paramname"><em>_family</em> = <code><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a100b8cad7cf2a56f6df78f171f97a1ec">family::any</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code>{}</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>blocking</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retrieve a list of potential <code>address</code> for a given name and service e.g. "www.google.com" and "https" optionally within a bounded deadline. </p>
+<p>The object returned by this function can take many seconds to become ready as multiple network requests may need to be made. The deadline can be used to bound execution times &ndash; like in a few other places in LLFIO, this deadline does not cause timed out errors, rather it aborts any remaining name resolution after the deadline expires and returns whatever addresses have been resolved by the deadline.</p>
+<p>This function has a future-like API as several major platforms provide native asynchronous name resolution (currently: Linux, Windows). On other platforms, <code>std::async</code> with <code>getaddrinfo()</code> is used as an emulation, and therefore deadline expiry means no partial list of addresses are returned.</p>
+<p>If you become no longer interested in the results, simply reset or delete the pointer and the resolution will be aborted asynchronously.</p>
+<dl class="section user"><dt>Memory Allocations\n This is one of those very few APIs in LLFIO where dynamic memory allocation</dt><dd>is unbounded and uncontrollable thanks to how the platform APIs are implemented. </dd></dl>
+
 </div>
 </div>
 </div><!-- contents -->
 </div><!-- doc-content -->
+<div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_aa209c529f55f8c8a242080d55c66a4a9a100b8cad7cf2a56f6df78f171f97a1ec"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a100b8cad7cf2a56f6df78f171f97a1ec">llfio_v2_xxx::ip::family::any</a></div><div class="ttdeci">@ any</div><div class="ttdoc">Either v4 or v6.</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_aa209c529f55f8c8a242080d55c66a4a9a0af45c99beb7a9afc9192665c4a05cd3"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a0af45c99beb7a9afc9192665c4a05cd3">llfio_v2_xxx::ip::family::v6</a></div><div class="ttdeci">@ v6</div><div class="ttdoc">IP version 6.</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_aa209c529f55f8c8a242080d55c66a4a9a5ed3a3ff8e5c29979502b9030e8518e0"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a5ed3a3ff8e5c29979502b9030e8518e0">llfio_v2_xxx::ip::family::v4</a></div><div class="ttdeci">@ v4</div><div class="ttdoc">IP version 4.</div></div>
 <!-- start footer part -->

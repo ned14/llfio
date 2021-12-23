@@ -35,6 +35,6 @@ var classllfio__v2__xxx_1_1ip_1_1address =
     [ "_port", "classllfio__v2__xxx_1_1ip_1_1address.html#a5684198c07c31dcac592aa0c001aa874", null ],
     [ "_scope_id", "classllfio__v2__xxx_1_1ip_1_1address.html#a83ed980c081a7af733b5203f9212c317", null ],
     [ "_storage", "classllfio__v2__xxx_1_1ip_1_1address.html#a494a4d40bc10b035893784e416f1eb61", null ],
-    [ "ipv4", "classllfio__v2__xxx_1_1ip_1_1address.html#abd6c54419e1ec6fc6f7e21f48ee14801", null ],
-    [ "ipv6", "classllfio__v2__xxx_1_1ip_1_1address.html#a0648a554e0f7d8aa11532c293a470d9a", null ]
+    [ "ipv4", "classllfio__v2__xxx_1_1ip_1_1address.html#a774e77794b42d9a33273f04de0c2c457", null ],
+    [ "ipv6", "classllfio__v2__xxx_1_1ip_1_1address.html#a3ce03031a1c947abde375b108bbb682a", null ]
 ];

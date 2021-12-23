@@ -45,6 +45,7 @@ var namespacellfio__v2__xxx =
     [ "path_view", "classllfio__v2__xxx_1_1path__view.html", "classllfio__v2__xxx_1_1path__view" ],
     [ "path_view_component", "classllfio__v2__xxx_1_1path__view__component.html", "classllfio__v2__xxx_1_1path__view__component" ],
     [ "pipe_handle", "classllfio__v2__xxx_1_1pipe__handle.html", "classllfio__v2__xxx_1_1pipe__handle" ],
+    [ "pollable_handle", "classllfio__v2__xxx_1_1pollable__handle.html", "classllfio__v2__xxx_1_1pollable__handle" ],
     [ "process_handle", "classllfio__v2__xxx_1_1process__handle.html", "classllfio__v2__xxx_1_1process__handle" ],
     [ "read_receiver", "classllfio__v2__xxx_1_1read__receiver.html", "classllfio__v2__xxx_1_1read__receiver" ],
     [ "section_handle", "classllfio__v2__xxx_1_1section__handle.html", "classllfio__v2__xxx_1_1section__handle" ],

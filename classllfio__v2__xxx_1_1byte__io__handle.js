@@ -51,6 +51,7 @@ var classllfio__v2__xxx_1_1byte__io__handle =
     [ "is_append_only", "classllfio__v2__xxx_1_1byte__io__handle.html#ac3aa3dc009822c0e437f317864534feb", null ],
     [ "is_directory", "classllfio__v2__xxx_1_1byte__io__handle.html#a4ca48bdcd6d6bf8b41d0cebb304fe9ce", null ],
     [ "is_http_socket", "classllfio__v2__xxx_1_1byte__io__handle.html#a4690e0a5364e33a70747beb45585695e", null ],
+    [ "is_kernel_handle", "classllfio__v2__xxx_1_1byte__io__handle.html#a8ca660b86e595ad4d4e124e46f61b127", null ],
     [ "is_multiplexable", "classllfio__v2__xxx_1_1byte__io__handle.html#ade2416b9154d1e56937c99cd514324f8", null ],
     [ "is_multiplexer", "classllfio__v2__xxx_1_1byte__io__handle.html#a018de0f7c177e3cff239016d14582e9a", null ],
     [ "is_nonblocking", "classllfio__v2__xxx_1_1byte__io__handle.html#a501aa723172f6852e82738b0969278ae", null ],

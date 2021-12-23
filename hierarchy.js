@@ -13,8 +13,8 @@ var hierarchy =
     ] ],
     [ "kvstore_v1_xxx::basic_key_value_store_info", "structkvstore__v1__xxx_1_1basic__key__value__store__info.html", null ],
     [ "llfio_v2_xxx::byte_io_multiplexer::buffer_type", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html", null ],
-    [ "llfio_v2_xxx::symlink_handle::buffers_type", "structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html", null ],
     [ "llfio_v2_xxx::listening_socket_handle::buffers_type", "structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type.html", null ],
+    [ "llfio_v2_xxx::symlink_handle::buffers_type", "structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html", null ],
     [ "llfio_v2_xxx::dynamic_thread_pool_group::io_aware_work_item::byte_io_handle_awareness", "structllfio__v2__xxx_1_1dynamic__thread__pool__group_1_1io__aware__work__item_1_1byte__io__handle__awareness.html", null ],
     [ "llfio_v2_xxx::map_handle::cache_statistics", "structllfio__v2__xxx_1_1map__handle_1_1cache__statistics.html", null ],
     [ "llfio_v2_xxx::byte_io_multiplexer::check_for_any_completed_io_statistics", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1check__for__any__completed__io__statistics.html", null ],
@@ -80,6 +80,7 @@ var hierarchy =
       [ "llfio_v2_xxx::section_handle", "classllfio__v2__xxx_1_1section__handle.html", null ],
       [ "llfio_v2_xxx::symlink_handle", "classllfio__v2__xxx_1_1symlink__handle.html", null ]
     ] ],
+    [ "llfio_v2_xxx::byte_io_multiplexer::implementation_information_t", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1implementation__information__t.html", null ],
     [ "llfio_v2_xxx::byte_io_multiplexer::io_operation_state", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__operation__state.html", [
       [ "llfio_v2_xxx::byte_io_multiplexer::_unsynchronised_io_operation_state", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state.html", [
         [ "llfio_v2_xxx::byte_io_multiplexer::_synchronised_io_operation_state", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__synchronised__io__operation__state.html", null ]
@@ -88,10 +89,10 @@ var hierarchy =
     [ "llfio_v2_xxx::byte_io_multiplexer::io_operation_state_visitor", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__operation__state__visitor.html", [
       [ "llfio_v2_xxx::byte_io_multiplexer::awaitable< T >", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html", null ]
     ] ],
+    [ "llfio_v2_xxx::listening_socket_handle::io_request< class >", "structllfio__v2__xxx_1_1listening__socket__handle_1_1io__request.html", null ],
     [ "llfio_v2_xxx::directory_handle::io_request< class >", "structllfio__v2__xxx_1_1directory__handle_1_1io__request.html", null ],
     [ "llfio_v2_xxx::symlink_handle::io_request< T, bool >", "structllfio__v2__xxx_1_1symlink__handle_1_1io__request.html", null ],
     [ "llfio_v2_xxx::byte_io_multiplexer::io_request< T >", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html", null ],
-    [ "llfio_v2_xxx::listening_socket_handle::io_request< class >", "structllfio__v2__xxx_1_1listening__socket__handle_1_1io__request.html", null ],
     [ "llfio_v2_xxx::byte_io_multiplexer::io_request< buffers_type >", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html", null ],
     [ "llfio_v2_xxx::symlink_handle::io_request< buffers_type, ____ >", "structllfio__v2__xxx_1_1symlink__handle_1_1io__request_3_01buffers__type_00_01_________01_4.html", null ],
     [ "llfio_v2_xxx::byte_io_multiplexer::io_request< const_buffers_type >", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html", null ],
@@ -109,8 +110,10 @@ var hierarchy =
       [ "llfio_v2_xxx::storage_profile::item< T >", "structllfio__v2__xxx_1_1storage__profile_1_1item.html", null ],
       [ "llfio_v2_xxx::storage_profile::item_erased", "structllfio__v2__xxx_1_1storage__profile_1_1item__erased.html", null ]
     ] ],
+    [ "llfio_v2_xxx::byte_io_multiplexer::implementation_information_t::multiplexes_t::kernel_t", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1implementation__information__t_1_1multiplexes__t_1_1kernel__t.html", null ],
     [ "llfio_v2_xxx::byte_io_multiplexer::io_operation_state::lock_guard", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__operation__state_1_1lock__guard.html", null ],
     [ "llfio_v2_xxx::log_level_guard", "classllfio__v2__xxx_1_1log__level__guard.html", null ],
+    [ "llfio_v2_xxx::byte_io_multiplexer::implementation_information_t::multiplexes_t", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1implementation__information__t_1_1multiplexes__t.html", null ],
     [ "llfio_v2_xxx::native_handle_type", "structllfio__v2__xxx_1_1native__handle__type.html", null ],
     [ "llfio_v2_xxx::byte_io_multiplexer::_unsynchronised_io_operation_state::payload_t::noncompleted_t", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t_1_1noncompleted__t.html", null ],
     [ "llfio_v2_xxx::utils::page_allocator< T >", "classllfio__v2__xxx_1_1utils_1_1page__allocator.html", null ],
@@ -121,12 +124,18 @@ var hierarchy =
       [ "llfio_v2_xxx::path_view", "classllfio__v2__xxx_1_1path__view.html", null ]
     ] ],
     [ "llfio_v2_xxx::byte_io_multiplexer::_unsynchronised_io_operation_state::payload_t", "unionllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t.html", null ],
+    [ "llfio_v2_xxx::pollable_handle", "classllfio__v2__xxx_1_1pollable__handle.html", [
+      [ "llfio_v2_xxx::byte_socket_handle", "classllfio__v2__xxx_1_1byte__socket__handle.html", null ],
+      [ "llfio_v2_xxx::listening_socket_handle", "classllfio__v2__xxx_1_1listening__socket__handle.html", null ],
+      [ "llfio_v2_xxx::pipe_handle", "classllfio__v2__xxx_1_1pipe__handle.html", null ]
+    ] ],
     [ "llfio_v2_xxx::utils::process_cpu_usage", "structllfio__v2__xxx_1_1utils_1_1process__cpu__usage.html", null ],
     [ "llfio_v2_xxx::utils::process_memory_usage", "structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html", null ],
     [ "llfio_v2_xxx::byte_io_multiplexer::_unsynchronised_io_operation_state::payload_t::noncompleted_t::params_t::read_params_t", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payloc9e18bbda84f717c8aae78e5df350ef8.html", null ],
     [ "llfio_v2_xxx::read_receiver< IoHandleType >", "classllfio__v2__xxx_1_1read__receiver.html", null ],
-    [ "llfio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
     [ "llfio_v2_xxx::utils::page_allocator< void >::rebind", "structllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
+    [ "llfio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
+    [ "llfio_v2_xxx::ip::resolver", "classllfio__v2__xxx_1_1ip_1_1resolver.html", null ],
     [ "result", null, [
       [ "llfio_v2_xxx::byte_io_multiplexer::io_result< buffers_type >", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html", null ],
       [ "llfio_v2_xxx::byte_io_multiplexer::io_result< const_buffers_type >", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html", null ],

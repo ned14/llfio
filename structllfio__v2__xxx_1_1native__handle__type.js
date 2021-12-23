@@ -10,6 +10,7 @@ var structllfio__v2__xxx_1_1native__handle__type =
     [ "is_append_only", "structllfio__v2__xxx_1_1native__handle__type.html#a38054fed025ad3deec2b5a5494e7e57d", null ],
     [ "is_directory", "structllfio__v2__xxx_1_1native__handle__type.html#af4d88dcf57bbfcc2f5c30210225c5fbd", null ],
     [ "is_http_socket", "structllfio__v2__xxx_1_1native__handle__type.html#a3a575695b8655f9a6fdcfebf0e9ef8e5", null ],
+    [ "is_kernel_handle", "structllfio__v2__xxx_1_1native__handle__type.html#a71706e7dd621ec11e855aa97df0812cd", null ],
     [ "is_multiplexer", "structllfio__v2__xxx_1_1native__handle__type.html#aa9773fae5d91f769e281cc05df1f0e6c", null ],
     [ "is_nonblocking", "structllfio__v2__xxx_1_1native__handle__type.html#ae5b2862752c1af2b4419a5fefa4938aa", null ],
     [ "is_path", "structllfio__v2__xxx_1_1native__handle__type.html#a32fc1a1881a45034b4f5bef972b3eb22", null ],

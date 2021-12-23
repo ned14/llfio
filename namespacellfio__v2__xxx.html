@@ -87,7 +87,8 @@ $(document).ready(function(){initNavTree('namespacellfio__v2__xxx.html',''); ini
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#enum-members">Enumerations</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">llfio_v2_xxx Namespace Reference</div>  </div>
 </div><!--header-->
@@ -238,6 +239,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html">pipe_handle</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to a named or anonymous pipe.  <a href="classllfio__v2__xxx_1_1pipe__handle.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pollable__handle.html">pollable_handle</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle type which can be supplied to <code>poll()</code>.  <a href="classllfio__v2__xxx_1_1pollable__handle.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1process__handle.html">process_handle</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to this, or another, process.  <a href="classllfio__v2__xxx_1_1process__handle.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -333,6 +337,12 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a26baf26ed8a75301a92134497cc3ac8a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a26baf26ed8a75301a92134497cc3ac8a">QUICKCPPLIB_BITFIELD_BEGIN_T</a> (poll_what, uint8_t)</td></tr>
+<tr class="memdesc:a26baf26ed8a75301a92134497cc3ac8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">What to poll.  <a href="namespacellfio__v2__xxx.html#a26baf26ed8a75301a92134497cc3ac8a">More...</a><br /></td></tr>
+<tr class="separator:a26baf26ed8a75301a92134497cc3ac8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36814e250c3473392fe01573e9b52ca3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a36814e250c3473392fe01573e9b52ca3">QUICKCPPLIB_BITFIELD_END</a> (poll_what) inline result&lt; size_t &gt; poll(span&lt; poll_what &gt; out</td></tr>
+<tr class="memdesc:a36814e250c3473392fe01573e9b52ca3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Polls a list of pollable handles awaiting a change in state.  <a href="namespacellfio__v2__xxx.html#a36814e250c3473392fe01573e9b52ca3">More...</a><br /></td></tr>
+<tr class="separator:a36814e250c3473392fe01573e9b52ca3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acbd9eb25fed94bb0bc8fa888b3c26bdf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">byte_io_handle::io_result</a>&lt; byte_io_handle::buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#acbd9eb25fed94bb0bc8fa888b3c26bdf">read</a> (<a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html">byte_io_handle</a> &amp;self, <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">byte_io_handle::io_request</a>&lt; byte_io_handle::buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="memdesc:acbd9eb25fed94bb0bc8fa888b3c26bdf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read data from the open handle.  <a href="namespacellfio__v2__xxx.html#acbd9eb25fed94bb0bc8fa888b3c26bdf">More...</a><br /></td></tr>
 <tr class="separator:acbd9eb25fed94bb0bc8fa888b3c26bdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -595,6 +605,18 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 <a class="el" href="structllfio__v2__xxx_1_1error__info.html">error_info</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a20ab6481a21bf2c4cf8185919edf0a66">posix_error</a> (int c=errno)</td></tr>
 <tr class="memdesc:a20ab6481a21bf2c4cf8185919edf0a66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper for constructing an error info from a POSIX errno. <br /></td></tr>
 <tr class="separator:a20ab6481a21bf2c4cf8185919edf0a66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:ac4091bf755435ce8ac2537c70bde3f65"><td class="memItemLeft" align="right" valign="top"><a id="ac4091bf755435ce8ac2537c70bde3f65"></a>
+span&lt; <a class="el" href="classllfio__v2__xxx_1_1pollable__handle.html">pollable_handle</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>handles</b></td></tr>
+<tr class="separator:ac4091bf755435ce8ac2537c70bde3f65"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd6a3a006f947fd8d441d2c823afce06"><td class="memItemLeft" align="right" valign="top"><a id="acd6a3a006f947fd8d441d2c823afce06"></a>
+span&lt; <a class="el" href="classllfio__v2__xxx_1_1pollable__handle.html">pollable_handle</a> * &gt; span&lt; const poll_what &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>query</b></td></tr>
+<tr class="separator:acd6a3a006f947fd8d441d2c823afce06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f5de17b348418166c2bcc01602b96a2"><td class="memItemLeft" align="right" valign="top"><a id="a6f5de17b348418166c2bcc01602b96a2"></a>
+span&lt; <a class="el" href="classllfio__v2__xxx_1_1pollable__handle.html">pollable_handle</a> * &gt; span&lt; const poll_what &gt; <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td><td class="memItemRight" valign="bottom"><b>d</b> = {}) noexcept</td></tr>
+<tr class="separator:a6f5de17b348418166c2bcc01602b96a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The LLFIO namespace. </p>
@@ -673,7 +695,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="comment">  /*! Map the input path to a valid win32 path as fast as possible for the input.</span></div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="comment">  This is currently `guid_volume` followed by `dos`, but may change in the future.</span></div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="comment">  */</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <a class="code" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aa100b8cad7cf2a56f6df78f171f97a1ec">any</a>,<span class="comment"></span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a100b8cad7cf2a56f6df78f171f97a1ec">any</a>,<span class="comment"></span></div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="comment">  /*! Map `\!!\Device\...` form input paths to `\\.\...` for which it is _usually_</span></div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="comment">  the case there is a mapping, which results in a valid Win32 path, but which</span></div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="comment">  legacy code bases may not accept. This efficiently covers the vast majority of</span></div>
@@ -1377,6 +1399,85 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 </div><!-- fragment -->
 </div>
 </div>
+<a id="a26baf26ed8a75301a92134497cc3ac8a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a26baf26ed8a75301a92134497cc3ac8a">&#9670;&nbsp;</a></span>QUICKCPPLIB_BITFIELD_BEGIN_T()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">llfio_v2_xxx::QUICKCPPLIB_BITFIELD_BEGIN_T </td>
+          <td>(</td>
+          <td class="paramtype">poll_what&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>What to poll. </p>
+<p>&lt; Query nothing for this handle.</p>
+<p>&lt; If this handle is readable.</p>
+<p>&lt; If this handle is writable.</p>
+<p>&lt; If this handle is errored.</p>
+<p>&lt; If this handle is closed/hung up.</p>
+<p>&lt; This handle is not pollable.</p>
+<div class="fragment"><div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;{</div>
+<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;none = 0U,  <span class="comment">//!&lt; Query nothing for this handle.</span></div>
+<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;is_readable = (1U &lt;&lt; 0U),  <span class="comment">//!&lt; If this handle is readable.</span></div>
+<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;<span class="comment"></span>is_writable = (1U &lt;&lt; 1U),  <span class="comment">//!&lt; If this handle is writable.</span></div>
+<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;<span class="comment"></span>is_errored = (1U &lt;&lt; 2U),   <span class="comment">//!&lt; If this handle is errored.</span></div>
+<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;<span class="comment"></span>is_closed = (1U &lt;&lt; 3U),    <span class="comment">//!&lt; If this handle is closed/hung up.</span></div>
+<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;not_pollable = (1U &lt;&lt; 7U)  <span class="comment">//!&lt; This handle is not pollable.</span></div>
+<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;<span class="comment"></span>}  <span class="comment">//</span></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a36814e250c3473392fe01573e9b52ca3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36814e250c3473392fe01573e9b52ca3">&#9670;&nbsp;</a></span>QUICKCPPLIB_BITFIELD_END()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">llfio_v2_xxx::QUICKCPPLIB_BITFIELD_END </td>
+          <td>(</td>
+          <td class="paramtype">poll_what&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Polls a list of pollable handles awaiting a change in state. </p>
+<dl class="section return"><dt>Returns</dt><dd>The number of handles with changed state. Handles not <code>is_kernel_handle()</code> receive <code>poll_what::not_pollable</code>. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">out</td><td>An array of <code>poll_what</code> set with the results of the poll. </td></tr>
+    <tr><td class="paramname">handles</td><td>An array of pointers to <code>handle</code>. Individual pointers can be null if you want to skip them. </td></tr>
+    <tr><td class="paramname">query</td><td>An array of <code>poll_what</code> to check. </td></tr>
+    <tr><td class="paramname">d</td><td>An optional timeout. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Errors returnable\n Whatever POSIX poll() or Windows select() can return.</dt><dd></dd></dl>
+<p>Note that the maximum number of handles which can be passed to this function is 1024 (the platform syscall may refuse even that many). Note that this function is <code>O(N)</code> to handle count, so more than a few hundred is a bad idea in any case. If you need to wait on more handles than this, you need to implement a <code>byte_io_multiplexer</code> for your platform.</p>
+<p>The sizes of <code>out</code>, <code>handles</code> and <code>query</code> must be the same, or an error is returned. </p>
+
+</div>
+</div>
 <a id="acbd9eb25fed94bb0bc8fa888b3c26bdf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#acbd9eb25fed94bb0bc8fa888b3c26bdf">&#9670;&nbsp;</a></span>read() <span class="overload">[1/2]</span></h2>
 
@@ -1430,9 +1531,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 </dl>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX read() can return, errc::timed_out, errc::operation_canceled. errc::not_supported may be</dt><dd>returned if deadline i/o is not possible with this particular handle configuration (e.g. reading from regular files on POSIX or reading from a non-overlapped HANDLE on Windows). </dd></dl>
 <dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;{</div>
-<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
-<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;{</div>
+<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
+<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2313,9 +2414,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 </dl>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX write() can return, errc::timed_out, errc::operation_canceled. errc::not_supported may be</dt><dd>returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
 <dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;{</div>
-<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
-<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;{</div>
+<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
+<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2448,6 +2549,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 <div class="ttc" id="anamespacellfio__v2__xxx_html_ab9dbbe2fe79758ef87fe2dd1f61d824c"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ab9dbbe2fe79758ef87fe2dd1f61d824c">llfio_v2_xxx::map</a></div><div class="ttdeci">result&lt; map_handle &gt; map(section_handle &amp;section, map_handle::size_type bytes=0, map_handle::extent_type offset=0, section_handle::flag _flag=section_handle::flag::readwrite) noexcept</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:1123</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a70d9ef3b988a880d171015b754bb7b27"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a70d9ef3b988a880d171015b754bb7b27">llfio_v2_xxx::temp_file</a></div><div class="ttdeci">result&lt; file_handle &gt; temp_file(file_handle::path_view_type name=file_handle::path_view_type(), file_handle::mode _mode=file_handle::mode::write, file_handle::creation _creation=file_handle::creation::if_needed, file_handle::caching _caching=file_handle::caching::temporary, file_handle::flag flags=file_handle::flag::unlink_on_first_close) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:455</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_ae79486289ff1386b26d1ce60bb797d33aa4293995cfbfa9ce60ce71ade2ff75f7"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33aa4293995cfbfa9ce60ce71ade2ff75f7">llfio_v2_xxx::lock_kind::exclusive</a></div><div class="ttdeci">@ exclusive</div><div class="ttdoc">Exclude those requesting any kind of lock on the same inode.</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_aa209c529f55f8c8a242080d55c66a4a9a100b8cad7cf2a56f6df78f171f97a1ec"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a100b8cad7cf2a56f6df78f171f97a1ec">llfio_v2_xxx::ip::family::any</a></div><div class="ttdeci">@ any</div><div class="ttdoc">Either v4 or v6.</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_addbdc12d4993a8ee40c105a02a105a61"><div class="ttname"><a href="namespacellfio__v2__xxx.html#addbdc12d4993a8ee40c105a02a105a61">llfio_v2_xxx::temp_directory</a></div><div class="ttdeci">result&lt; directory_handle &gt; temp_directory(directory_handle::path_view_type name=directory_handle::path_view_type(), directory_handle::mode _mode=directory_handle::mode::write, directory_handle::creation _creation=directory_handle::creation::if_needed, directory_handle::caching _caching=directory_handle::caching::all, directory_handle::flag flags=directory_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:417</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a5d9582bf6887848cd9fc363a282a1c21"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a5d9582bf6887848cd9fc363a282a1c21">llfio_v2_xxx::uniquely_named_file</a></div><div class="ttdeci">result&lt; file_handle &gt; uniquely_named_file(const path_handle &amp;dirpath, file_handle::mode _mode=file_handle::mode::write, file_handle::caching _caching=file_handle::caching::temporary, file_handle::flag flags=file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:433</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a092f75c4e639c85797120488d486fa38"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a092f75c4e639c85797120488d486fa38">llfio_v2_xxx::mapped_uniquely_named_file</a></div><div class="ttdeci">result&lt; mapped_file_handle &gt; mapped_uniquely_named_file(mapped_file_handle::size_type reservation, const path_handle &amp;dirpath, mapped_file_handle::mode _mode=mapped_file_handle::mode::write, mapped_file_handle::caching _caching=mapped_file_handle::caching::temporary, mapped_file_handle::flag flags=mapped_file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:794</div></div>
@@ -2464,7 +2566,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a5323ac4d73623d99f92109a5c184e5dd"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a5323ac4d73623d99f92109a5c184e5dd">llfio_v2_xxx::section</a></div><div class="ttdeci">result&lt; section_handle &gt; section(section_handle::extent_type bytes, const path_handle &amp;dirh=path_discovery::storage_backed_temporary_files_directory(), section_handle::flag _flag=section_handle::flag::read|section_handle::flag::write) noexcept</div><div class="ttdoc">Create a memory section backed by an anonymous, managed file.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:1065</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_ad8b12afdd4c80d69d2530bd40f92427c"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ad8b12afdd4c80d69d2530bd40f92427c">llfio_v2_xxx::path</a></div><div class="ttdeci">result&lt; path_handle &gt; path(path_handle::path_view_type _path) noexcept</div><div class="ttdoc">This is an overloaded member function, provided for convenience. It differs from the above function o...</div><div class="ttdef"><b>Definition:</b> path_handle.hpp:176</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a3eb3e8ef0ddff1270b3d78d4178335c7"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a3eb3e8ef0ddff1270b3d78d4178335c7">llfio_v2_xxx::mapped_temp_file</a></div><div class="ttdeci">result&lt; mapped_file_handle &gt; mapped_temp_file(mapped_file_handle::size_type reservation, mapped_file_handle::path_view_type name=mapped_file_handle::path_view_type(), mapped_file_handle::mode _mode=mapped_file_handle::mode::write, mapped_file_handle::creation _creation=mapped_file_handle::creation::if_needed, mapped_file_handle::caching _caching=mapped_file_handle::caching::temporary, mapped_file_handle::flag flags=mapped_file_handle::flag::unlink_on_first_close) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:818</div></div>
-<div class="ttc" id="anamespacellfio__v2__xxx_html_abcb445e5dfcc0eb04ce49ac8af0bc89aa100b8cad7cf2a56f6df78f171f97a1ec"><div class="ttname"><a href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aa100b8cad7cf2a56f6df78f171f97a1ec">llfio_v2_xxx::win32_path_namespace::any</a></div><div class="ttdeci">@ any</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a1f0ccde00add2f09579151fd71b8f06d"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a1f0ccde00add2f09579151fd71b8f06d">llfio_v2_xxx::mapped_file</a></div><div class="ttdeci">result&lt; mapped_file_handle &gt; mapped_file(const path_handle &amp;base, mapped_file_handle::path_view_type _path, mapped_file_handle::mode _mode=mapped_file_handle::mode::read, mapped_file_handle::creation _creation=mapped_file_handle::creation::open_existing, mapped_file_handle::caching _caching=mapped_file_handle::caching::all, mapped_file_handle::flag flags=mapped_file_handle::flag::none) noexcept</div><div class="ttdoc">This is an overloaded member function, provided for convenience. It differs from the above function o...</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:776</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

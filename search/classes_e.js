@@ -1,11 +1,8 @@
 var searchData=
 [
-  ['safe_5fbyte_5franges_920',['safe_byte_ranges',['../classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html',1,'llfio_v2_xxx::algorithm::shared_fs_mutex']]],
-  ['section_5fhandle_921',['section_handle',['../classllfio__v2__xxx_1_1section__handle.html',1,'llfio_v2_xxx']]],
-  ['shared_5ffs_5fmutex_922',['shared_fs_mutex',['../classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html',1,'llfio_v2_xxx::algorithm::shared_fs_mutex']]],
-  ['stat_5ft_923',['stat_t',['../structllfio__v2__xxx_1_1stat__t.html',1,'llfio_v2_xxx']]],
-  ['statfs_5ft_924',['statfs_t',['../structllfio__v2__xxx_1_1statfs__t.html',1,'llfio_v2_xxx']]],
-  ['storage_5fprofile_925',['storage_profile',['../structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html',1,'llfio_v2_xxx::storage_profile']]],
-  ['summarize_5fvisitor_926',['summarize_visitor',['../structllfio__v2__xxx_1_1algorithm_1_1summarize__visitor.html',1,'llfio_v2_xxx::algorithm']]],
-  ['symlink_5fhandle_927',['symlink_handle',['../classllfio__v2__xxx_1_1symlink__handle.html',1,'llfio_v2_xxx']]]
+  ['read_5fparams_5ft_937',['read_params_t',['../structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payloc9e18bbda84f717c8aae78e5df350ef8.html',1,'llfio_v2_xxx::byte_io_multiplexer::_unsynchronised_io_operation_state::payload_t::noncompleted_t::params_t']]],
+  ['read_5freceiver_938',['read_receiver',['../classllfio__v2__xxx_1_1read__receiver.html',1,'llfio_v2_xxx']]],
+  ['rebind_939',['rebind',['../structllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html',1,'llfio_v2_xxx::utils::page_allocator&lt; void &gt;::rebind'],['../structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html',1,'llfio_v2_xxx::utils::page_allocator&lt; T &gt;::rebind&lt; U &gt;']]],
+  ['reduce_5fvisitor_940',['reduce_visitor',['../structllfio__v2__xxx_1_1algorithm_1_1reduce__visitor.html',1,'llfio_v2_xxx::algorithm']]],
+  ['resolver_941',['resolver',['../classllfio__v2__xxx_1_1ip_1_1resolver.html',1,'llfio_v2_xxx::ip']]]
 ];
