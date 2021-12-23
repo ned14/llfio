@@ -38,7 +38,7 @@ Distributed under the Boost Software License, Version 1.0.
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 class dynamic_thread_pool_group_impl;
-class io_handle;
+class byte_io_handle;
 
 namespace detail
 {
@@ -67,7 +67,7 @@ must be careful as there are gotchas. For non-seekable i/o, it is very possible
 that there could be 100k handles upon which we do i/o. Doing i/o on
 100k handles using a dynamic thread pool would in theory cause the creation
 of 100k kernel threads, which would not be wise. A much better solution is
-to use an `io_multiplexer` to await changes in large sets of i/o handles.
+to use an `byte_io_multiplexer` to await changes in large sets of i/o handles.
 
 For seekable i/o, the same problem applies, but worse again: an i/o bound problem
 would cause a rapid increase in the number of kernel threads, which by
@@ -363,10 +363,10 @@ public:
     uint32_t max_iosinprogress{32};
 #endif
     //! Information about an i/o handle this work item will use
-    struct io_handle_awareness
+    struct byte_io_handle_awareness
     {
       //! An i/o handle this work item will use
-      io_handle *h{nullptr};
+      byte_io_handle *h{nullptr};
       //! The relative amount of reading done by this work item from the handle.
       float reads{0};
       //! The relative amount of writing done by this work item to the handle.
@@ -378,7 +378,7 @@ public:
     };
 
   private:
-    const span<io_handle_awareness> _handles;
+    const span<byte_io_handle_awareness> _handles;
 
     LLFIO_HEADERS_ONLY_VIRTUAL_SPEC intptr_t next(deadline &d) noexcept override final;
 
@@ -395,7 +395,7 @@ public:
     each with `reads/writes/barriers = 200/100/0` on entry would have `0.22/0.11/0.0`
     each after construction.
     */
-    explicit LLFIO_HEADERS_ONLY_MEMFUNC_SPEC io_aware_work_item(span<io_handle_awareness> hs);
+    explicit LLFIO_HEADERS_ONLY_MEMFUNC_SPEC io_aware_work_item(span<byte_io_handle_awareness> hs);
     io_aware_work_item(io_aware_work_item &&o) noexcept
         : work_item(std::move(o))
         , _handles(o._handles)
@@ -404,7 +404,7 @@ public:
     LLFIO_HEADERS_ONLY_MEMFUNC_SPEC ~io_aware_work_item();
 
     //! The handles originally registered during construction.
-    span<io_handle_awareness> handles() const noexcept { return _handles; }
+    span<byte_io_handle_awareness> handles() const noexcept { return _handles; }
 
     /*! \brief As for `work_item::next()`, but deadline may be extended to
     reduce i/o congestion on the hardware devices to which the handles

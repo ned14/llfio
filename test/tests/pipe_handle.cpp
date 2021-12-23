@@ -99,10 +99,10 @@ static inline void TestMultiplexedPipeHandle()
 {
   static constexpr size_t MAX_PIPES = 64;
   namespace llfio = LLFIO_V2_NAMESPACE;
-  auto test_multiplexer = [](llfio::io_multiplexer_ptr multiplexer) {
+  auto test_multiplexer = [](llfio::byte_io_multiplexer_ptr multiplexer) {
     std::vector<llfio::pipe_handle> read_pipes, write_pipes;
     std::vector<size_t> received_for(MAX_PIPES);
-    struct checking_receiver final : public llfio::io_multiplexer::io_operation_state_visitor
+    struct checking_receiver final : public llfio::byte_io_multiplexer::io_operation_state_visitor
     {
       size_t myindex;
       std::unique_ptr<llfio::byte[]> io_state_ptr;
@@ -112,9 +112,9 @@ static inline void TestMultiplexedPipeHandle()
         size_t _index;
       };
       llfio::pipe_handle::buffer_type buffer;
-      llfio::io_multiplexer::io_operation_state *io_state{nullptr};
+      llfio::byte_io_multiplexer::io_operation_state *io_state{nullptr};
 
-      checking_receiver(size_t _myindex, llfio::io_multiplexer_ptr &multiplexer, std::vector<size_t> &r)
+      checking_receiver(size_t _myindex, llfio::byte_io_multiplexer_ptr &multiplexer, std::vector<size_t> &r)
           : myindex(_myindex)
           , io_state_ptr(std::make_unique<llfio::byte[]>(multiplexer->io_state_requirements().first))
           , received_for(r)
@@ -140,7 +140,7 @@ static inline void TestMultiplexedPipeHandle()
       }
 
       // Initiated the read
-      llfio::result<void> read_begin(llfio::io_multiplexer_ptr &multiplexer, llfio::io_handle &h)
+      llfio::result<void> read_begin(llfio::byte_io_multiplexer_ptr &multiplexer, llfio::byte_io_handle &h)
       {
         if(io_state != nullptr)
         {
@@ -154,10 +154,10 @@ static inline void TestMultiplexedPipeHandle()
       }
 
       // Called if the read did not complete immediately
-      virtual void read_initiated(llfio::io_multiplexer::io_operation_state::lock_guard & /*g*/, llfio::io_operation_state_type /*former*/) override { std::cout << "   Pipe " << myindex << " will complete read later" << std::endl; }
+      virtual void read_initiated(llfio::byte_io_multiplexer::io_operation_state::lock_guard & /*g*/, llfio::io_operation_state_type /*former*/) override { std::cout << "   Pipe " << myindex << " will complete read later" << std::endl; }
 
       // Called when the read completes
-      virtual bool read_completed(llfio::io_multiplexer::io_operation_state::lock_guard & /*g*/, llfio::io_operation_state_type former, llfio::pipe_handle::io_result<llfio::pipe_handle::buffers_type> &&res) override
+      virtual bool read_completed(llfio::byte_io_multiplexer::io_operation_state::lock_guard & /*g*/, llfio::io_operation_state_type former, llfio::pipe_handle::io_result<llfio::pipe_handle::buffers_type> &&res) override
       {
         if(is_initialised(former))
         {
@@ -181,7 +181,7 @@ static inline void TestMultiplexedPipeHandle()
       }
 
       // Called when the state for the read can be disposed
-      virtual void read_finished(llfio::io_multiplexer::io_operation_state::lock_guard & /*g*/, llfio::io_operation_state_type former) override
+      virtual void read_finished(llfio::byte_io_multiplexer::io_operation_state::lock_guard & /*g*/, llfio::io_operation_state_type former) override
       {
         std::cout << "   Pipe " << myindex << " read finishes" << std::endl;
         BOOST_REQUIRE(former == llfio::io_operation_state_type::read_completed);
@@ -259,7 +259,7 @@ static inline void TestCoroutinedPipeHandle()
 {
   static constexpr size_t MAX_PIPES = 70;
   namespace llfio = LLFIO_V2_NAMESPACE;
-  auto test_multiplexer = [](llfio::io_multiplexer_ptr multiplexer) {
+  auto test_multiplexer = [](llfio::byte_io_multiplexer_ptr multiplexer) {
     struct coroutine
     {
       llfio::pipe_handle read_pipe, write_pipe;

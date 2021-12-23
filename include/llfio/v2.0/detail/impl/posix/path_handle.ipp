@@ -56,7 +56,7 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
   result<path_handle> ret(in_place_type<path_handle>);
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
-  nativeh.behaviour |= native_handle_type::disposition::path;
+  nativeh.behaviour |= native_handle_type::disposition::path | native_handle_type::disposition::kernel_handle;
   nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
   int attribs = O_CLOEXEC | O_RDONLY;
 #ifdef O_DIRECTORY

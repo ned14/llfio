@@ -37,11 +37,11 @@ template <class IoHandleType> class read_receiver
 {
 public:
   //! The i/o handle type this read receiver is for
-  using io_handle_type = IoHandleType;
+  using byte_io_handle_type = IoHandleType;
   //! The buffers type this receiver receives
-  using buffers_type = typename io_handle_type::buffers_type;
+  using buffers_type = typename byte_io_handle_type::buffers_type;
   //! The successful read result type this receiver receives
-  using value_type = typename io_handle_type::io_result<buffers_type>;
+  using value_type = typename byte_io_handle_type::io_result<buffers_type>;
   //! The failure result type this receiver receives
   using error_type = typename value_type::error_type;
 
@@ -59,11 +59,11 @@ template <class IoHandleType> class write_receiver
 {
 public:
   //! The i/o handle type this read receiver is for
-  using io_handle_type = IoHandleType;
+  using byte_io_handle_type = IoHandleType;
   //! The buffers type this receiver receives
-  using buffers_type = typename io_handle_type::const_buffers_type;
+  using buffers_type = typename byte_io_handle_type::const_buffers_type;
   //! The successful write result type this receiver receives
-  using value_type = typename io_handle_type::io_result<buffers_type>;
+  using value_type = typename byte_io_handle_type::io_result<buffers_type>;
   //! The failure result type this receiver receives
   using error_type = typename value_type::error_type;
 

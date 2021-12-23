@@ -292,10 +292,10 @@ Upon return, one knows that memory in the returned buffer has been barriered
 (it may be empty if there is no support for this operation in LLFIO, or if the current CPU does not
 support this operation). You may find the `is_nvram()` observer of particular use here.
 */
-inline io_handle::const_buffer_type nvram_barrier(io_handle::const_buffer_type req, bool evict = false) noexcept
+inline byte_io_handle::const_buffer_type nvram_barrier(byte_io_handle::const_buffer_type req, bool evict = false) noexcept
 {
-  auto *tp = (io_handle::const_buffer_type::pointer) (((uintptr_t) req.data()) & ~63);
-  io_handle::const_buffer_type ret{tp, (size_t) (req.data() + 63 + req.size() - tp) & ~63};
+  auto *tp = (byte_io_handle::const_buffer_type::pointer) (((uintptr_t) req.data()) & ~63);
+  byte_io_handle::const_buffer_type ret{tp, (size_t) (req.data() + 63 + req.size() - tp) & ~63};
   if(memory_flush_none == mem_flush_stores(ret.data(), ret.size(), evict ? memory_flush_evict : memory_flush_retain))
   {
     ret = {tp, 0};
@@ -399,7 +399,7 @@ address space you need to manually call `map_handle::trim_cache()` from time to 
 
 ## Barriers:
 
-`map_handle`, because it implements `io_handle`, implements `barrier()` in a very conservative way
+`map_handle`, because it implements `byte_io_handle`, implements `barrier()` in a very conservative way
 to account for OS differences i.e. it calls `msync()`, and then the `barrier()` implementation for the backing file
 (probably `fsync()` or equivalent on most platforms, which synchronises the entire file).
 
@@ -468,23 +468,23 @@ not be used when a large page allocation was requested.
 
 \sa `mapped_file_handle`, `algorithm::mapped_span`
 */
-class LLFIO_DECL map_handle : public lockable_io_handle
+class LLFIO_DECL map_handle : public lockable_byte_io_handle
 {
   friend class mapped_file_handle;
 
 public:
-  using extent_type = io_handle::extent_type;
-  using size_type = io_handle::size_type;
-  using mode = io_handle::mode;
-  using creation = io_handle::creation;
-  using caching = io_handle::caching;
-  using flag = io_handle::flag;
-  using buffer_type = io_handle::buffer_type;
-  using const_buffer_type = io_handle::const_buffer_type;
-  using buffers_type = io_handle::buffers_type;
-  using const_buffers_type = io_handle::const_buffers_type;
-  template <class T> using io_request = io_handle::io_request<T>;
-  template <class T> using io_result = io_handle::io_result<T>;
+  using extent_type = byte_io_handle::extent_type;
+  using size_type = byte_io_handle::size_type;
+  using mode = byte_io_handle::mode;
+  using creation = byte_io_handle::creation;
+  using caching = byte_io_handle::caching;
+  using flag = byte_io_handle::flag;
+  using buffer_type = byte_io_handle::buffer_type;
+  using const_buffer_type = byte_io_handle::const_buffer_type;
+  using buffers_type = byte_io_handle::buffers_type;
+  using const_buffers_type = byte_io_handle::const_buffers_type;
+  template <class T> using io_request = byte_io_handle::io_request<T>;
+  template <class T> using io_result = byte_io_handle::io_result<T>;
 
 protected:
   section_handle *_section{nullptr};
@@ -525,7 +525,7 @@ public:
   }
   //! Implicit move construction of map_handle permitted
   constexpr map_handle(map_handle &&o) noexcept
-      : lockable_io_handle(std::move(o))
+      : lockable_byte_io_handle(std::move(o))
       , _section(o._section)
       , _addr(o._addr)
       , _offset(o._offset)
@@ -884,7 +884,7 @@ public:
   \mallocs None.
   */
 #endif
-  using io_handle::read;
+  using byte_io_handle::read;
 
 #if 0
   /*! \brief Write data to the mapped view.
@@ -911,7 +911,7 @@ public:
   \mallocs None if a `QUICKCPPLIB_NAMESPACE::signal_guard_install` is already instanced.
   */
 #endif
-  using io_handle::write;
+  using byte_io_handle::write;
 };
 
 //! \brief Constructor for `map_handle`
@@ -950,22 +950,22 @@ template <class T> constexpr inline span<T> in_place_attach(map_handle &mh) noex
 
 namespace detail
 {
-  inline result<io_handle::registered_buffer_type> map_handle_allocate_registered_buffer(size_t &bytes) noexcept
+  inline result<byte_io_handle::registered_buffer_type> map_handle_allocate_registered_buffer(size_t &bytes) noexcept
   {
     try
     {
-      auto make_shared = [](map_handle h) -> io_handle::registered_buffer_type
+      auto make_shared = [](map_handle h) -> byte_io_handle::registered_buffer_type
       {
-        struct registered_buffer_type_indirect : io_multiplexer::_registered_buffer_type
+        struct registered_buffer_type_indirect : byte_io_multiplexer::_registered_buffer_type
         {
           map_handle h;
           registered_buffer_type_indirect(map_handle _h)
-              : io_multiplexer::_registered_buffer_type(_h.as_span())
+              : byte_io_multiplexer::_registered_buffer_type(_h.as_span())
               , h(std::move(_h))
           {
           }
         };
-        return io_handle::registered_buffer_type(std::make_shared<registered_buffer_type_indirect>(std::move(h)));
+        return byte_io_handle::registered_buffer_type(std::make_shared<registered_buffer_type_indirect>(std::move(h)));
       };
       const auto &page_sizes = utils::page_sizes(true);
       size_t idx = 0;
@@ -1019,8 +1019,8 @@ namespace detail
   }
 }  // namespace detail
 
-// Implement io_handle::_do_allocate_registered_buffer()
-inline result<io_handle::registered_buffer_type> io_handle::_do_allocate_registered_buffer(size_t &bytes) noexcept
+// Implement byte_io_handle::_do_allocate_registered_buffer()
+inline result<byte_io_handle::registered_buffer_type> byte_io_handle::_do_allocate_registered_buffer(size_t &bytes) noexcept
 {
   return detail::map_handle_allocate_registered_buffer(bytes);
 }

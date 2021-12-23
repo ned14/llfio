@@ -44,6 +44,9 @@ option(LLFIO_ENABLE_DEPENDENCY_SMOKE_TEST "Whether to build executables which ar
 option(LLFIO_ASSUME_CROSS_COMPILING "Whether to assume we are cross compiling. Normally automatically detected, but if automatic detection doesn't work, a working <filesystem> will not be found during cmake configure." OFF)
 option(LLFIO_FORCE_CONCEPTS_OFF "Whether to not auto detect and enable concepts for the LLFIO cmake targets" OFF)
 option(LLFIO_FORCE_COROUTINES_OFF "Whether to not auto detect and enable coroutines for the LLFIO cmake targets" OFF)
+option(LLFIO_FORCE_DYNAMIC_THREAD_POOL_GROUP_OFF "Whether to disable dynamic thread pool support in LLFIO" OFF)
+option(LLFIO_FORCE_NETWORKING_OFF "Whether to disable networking support in LLFIO" OFF)
+option(LLFIO_FORCE_MAPPED_FILES_OFF "Whether to disable memory mapped files support in LLFIO" OFF)
 option(UNIT_TESTS_BUILD_ALL "Whether to run all of the unit test suite." OFF)
 set(UNIT_TESTS_CXX_VERSION "latest" CACHE STRING "The version of C++ to use in the header-only unit tests")
 if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD" OR APPLE)
@@ -317,29 +320,43 @@ int main() {
     all_compile_definitions(PUBLIC LLFIO_FORCE_EXPERIMENTAL_FILESYSTEM=1 KERNELTEST_FORCE_EXPERIMENTAL_FILESYSTEM=1)
   endif()
 endif()
-# Do we have Grand Central Dispatch on this platform?
-if(LLFIO_USE_LIBDISPATCH)
-  function(check_have_libdispatch postfix)
-    set(CMAKE_REQUIRED_LIBRARIES ${ARGN})
-    check_cxx_source_compiles("
-#include <dispatch/dispatch.h>
-int main() {
-  return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0) != nullptr;
-}
-" LLFIO_HAS_LIBDISPATCH_${postfix})
-  endfunction()
-  check_have_libdispatch(BUILTIN)
-  if(NOT LLFIO_HAS_LIBDISPATCH_BUILTIN)
-    check_have_libdispatch(WITH_LIBDISPATCH dispatch)
-    if(LLFIO_HAS_LIBDISPATCH_WITH_LIBDISPATCH)
-      all_link_libraries(PUBLIC dispatch)
-    endif()
-  endif()
+if(LLFIO_FORCE_DYNAMIC_THREAD_POOL_GROUP_OFF)
+  all_compile_definitions(PUBLIC LLFIO_EXCLUDE_DYNAMIC_THREAD_POOL_GROUP=1)
 else()
-  all_compile_definitions(PUBLIC LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD=0)
+  # Do we have Grand Central Dispatch on this platform?
+  if(LLFIO_USE_LIBDISPATCH)
+    function(check_have_libdispatch postfix)
+      set(CMAKE_REQUIRED_LIBRARIES ${ARGN})
+      check_cxx_source_compiles("
+  #include <dispatch/dispatch.h>
+  int main() {
+    return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0) != nullptr;
+  }
+  " LLFIO_HAS_LIBDISPATCH_${postfix})
+    endfunction()
+    check_have_libdispatch(BUILTIN)
+    if(NOT LLFIO_HAS_LIBDISPATCH_BUILTIN)
+      check_have_libdispatch(WITH_LIBDISPATCH dispatch)
+      if(LLFIO_HAS_LIBDISPATCH_WITH_LIBDISPATCH)
+        all_link_libraries(PUBLIC dispatch)
+      endif()
+    endif()
+  else()
+    all_compile_definitions(PUBLIC LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD=0)
+  endif()
+  if(NOT LLFIO_HAS_LIBDISPATCH_BUILTIN AND NOT LLFIO_HAS_LIBDISPATCH_WITH_LIBDISPATCH AND (CMAKE_SYSTEM_NAME MATCHES "FreeBSD" OR APPLE))
+    indented_message(FATAL_ERROR "FATAL: Grand Central Dispatch as libdispatch was not found on this FreeBSD or Mac OS system. libdispatch is required for LLFIO to build on those systems.")
+  endif()
 endif()
-if(NOT LLFIO_HAS_LIBDISPATCH_BUILTIN AND NOT LLFIO_HAS_LIBDISPATCH_WITH_LIBDISPATCH AND (CMAKE_SYSTEM_NAME MATCHES "FreeBSD" OR APPLE))
-  indented_message(FATAL_ERROR "FATAL: Grand Central Dispatch as libdispatch was not found on this FreeBSD or Mac OS system. libdispatch is required for LLFIO to build on those systems.")
+if(LLFIO_FORCE_NETWORKING_OFF)
+  all_compile_definitions(PUBLIC LLFIO_EXCLUDE_NETWORKING=1)
+else()
+  if(WIN32)
+    all_link_libraries(PUBLIC ws2_32)
+  endif()
+endif()
+if(LLFIO_FORCE_MAPPED_FILES_OFF)
+  all_compile_definitions(PUBLIC LLFIO_EXCLUDE_MAPPED_FILE_HANDLE=1)
 endif()
 
 # Set any macros this library requires

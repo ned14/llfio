@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../io_multiplexer.hpp"
+#include "../../byte_io_multiplexer.hpp"
 
 #include <mutex>
 
@@ -30,12 +30,12 @@ LLFIO_V2_NAMESPACE_BEGIN
 
 namespace this_thread
 {
-  static LLFIO_THREAD_LOCAL io_multiplexer *_thread_multiplexer;
-  LLFIO_HEADERS_ONLY_FUNC_SPEC io_multiplexer *multiplexer() noexcept { return _thread_multiplexer; }
-  LLFIO_HEADERS_ONLY_FUNC_SPEC void set_multiplexer(io_multiplexer *ctx) noexcept { _thread_multiplexer = ctx; }
+  static LLFIO_THREAD_LOCAL byte_io_multiplexer *_thread_multiplexer;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC byte_io_multiplexer *multiplexer() noexcept { return _thread_multiplexer; }
+  LLFIO_HEADERS_ONLY_FUNC_SPEC void set_multiplexer(byte_io_multiplexer *ctx) noexcept { _thread_multiplexer = ctx; }
 }  // namespace this_thread
 
-template <bool is_threadsafe> struct io_multiplexer_impl : io_multiplexer
+template <bool is_threadsafe> struct byte_io_multiplexer_impl : byte_io_multiplexer
 {
   struct _lock_impl_type
   {
@@ -45,7 +45,7 @@ template <bool is_threadsafe> struct io_multiplexer_impl : io_multiplexer
   _lock_impl_type _lock;
   using _lock_guard = std::unique_lock<_lock_impl_type>;
 };
-template <> struct io_multiplexer_impl<true> : io_multiplexer
+template <> struct byte_io_multiplexer_impl<true> : byte_io_multiplexer
 {
   using _lock_impl_type = std::mutex;
   _lock_impl_type _lock;

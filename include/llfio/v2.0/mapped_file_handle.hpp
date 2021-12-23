@@ -170,19 +170,19 @@ public:
   using dev_t = file_handle::dev_t;
   using ino_t = file_handle::ino_t;
   using path_view_type = file_handle::path_view_type;
-  using path_type = io_handle::path_type;
-  using extent_type = io_handle::extent_type;
-  using size_type = io_handle::size_type;
-  using mode = io_handle::mode;
-  using creation = io_handle::creation;
-  using caching = io_handle::caching;
-  using flag = io_handle::flag;
-  using buffer_type = io_handle::buffer_type;
-  using const_buffer_type = io_handle::const_buffer_type;
-  using buffers_type = io_handle::buffers_type;
-  using const_buffers_type = io_handle::const_buffers_type;
-  template <class T> using io_request = io_handle::io_request<T>;
-  template <class T> using io_result = io_handle::io_result<T>;
+  using path_type = byte_io_handle::path_type;
+  using extent_type = byte_io_handle::extent_type;
+  using size_type = byte_io_handle::size_type;
+  using mode = byte_io_handle::mode;
+  using creation = byte_io_handle::creation;
+  using caching = byte_io_handle::caching;
+  using flag = byte_io_handle::flag;
+  using buffer_type = byte_io_handle::buffer_type;
+  using const_buffer_type = byte_io_handle::const_buffer_type;
+  using buffers_type = byte_io_handle::buffers_type;
+  using const_buffers_type = byte_io_handle::const_buffers_type;
+  template <class T> using io_request = byte_io_handle::io_request<T>;
+  template <class T> using io_result = byte_io_handle::io_result<T>;
 
 protected:
   size_type _reservation{0};
@@ -580,7 +580,7 @@ public:
     }
   }
   LLFIO_DEADLINE_TRY_FOR_UNTIL(reopen)
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> set_multiplexer(io_multiplexer *c = this_thread::multiplexer()) noexcept override
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> set_multiplexer(byte_io_multiplexer *c = this_thread::multiplexer()) noexcept override
   {
     OUTCOME_TRY(file_handle::set_multiplexer(c));
     return _mh.set_multiplexer(file_handle::multiplexer());

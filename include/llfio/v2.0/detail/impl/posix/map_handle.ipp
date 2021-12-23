@@ -505,7 +505,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   ret.value()._pagesize = pagesize;
   // Make my handle borrow the native handle of my backing storage
   ret.value()._v.fd = section.native_handle().fd;
-  nativeh.behaviour |= native_handle_type::disposition::allocation;
+  nativeh.behaviour |= native_handle_type::disposition::allocation | native_handle_type::disposition::kernel_handle;
   LLFIO_LOG_FUNCTION_CALL(&ret);
   return ret;
 }

@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef LLFIO_FILE_HANDLE_H
 #define LLFIO_FILE_HANDLE_H
 
-#include "lockable_io_handle.hpp"
+#include "lockable_byte_io_handle.hpp"
 #include "path_discovery.hpp"
 #include "utils.hpp"
 
@@ -49,24 +49,24 @@ with uncached i/o</td></tr>
 </table>
 
 */
-class LLFIO_DECL file_handle : public lockable_io_handle, public fs_handle
+class LLFIO_DECL file_handle : public lockable_byte_io_handle, public fs_handle
 {
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept final { return *this; }
 
 public:
-  using path_type = io_handle::path_type;
-  using extent_type = io_handle::extent_type;
-  using size_type = io_handle::size_type;
-  using mode = io_handle::mode;
-  using creation = io_handle::creation;
-  using caching = io_handle::caching;
-  using flag = io_handle::flag;
-  using buffer_type = io_handle::buffer_type;
-  using const_buffer_type = io_handle::const_buffer_type;
-  using buffers_type = io_handle::buffers_type;
-  using const_buffers_type = io_handle::const_buffers_type;
-  template <class T> using io_request = io_handle::io_request<T>;
-  template <class T> using io_result = io_handle::io_result<T>;
+  using path_type = byte_io_handle::path_type;
+  using extent_type = byte_io_handle::extent_type;
+  using size_type = byte_io_handle::size_type;
+  using mode = byte_io_handle::mode;
+  using creation = byte_io_handle::creation;
+  using caching = byte_io_handle::caching;
+  using flag = byte_io_handle::flag;
+  using buffer_type = byte_io_handle::buffer_type;
+  using const_buffer_type = byte_io_handle::const_buffer_type;
+  using buffers_type = byte_io_handle::buffers_type;
+  using const_buffers_type = byte_io_handle::const_buffers_type;
+  template <class T> using io_request = byte_io_handle::io_request<T>;
+  template <class T> using io_result = byte_io_handle::io_result<T>;
   using dev_t = fs_handle::dev_t;
   using ino_t = fs_handle::ino_t;
   using path_view_type = fs_handle::path_view_type;
@@ -75,14 +75,14 @@ public:
   //! Default constructor
   constexpr file_handle() {}  // NOLINT
   //! Construct a handle from a supplied native handle
-  constexpr file_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching, flag flags, io_multiplexer *ctx)
-      : lockable_io_handle(std::move(h), caching, flags, ctx)
+  constexpr file_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching, flag flags, byte_io_multiplexer *ctx)
+      : lockable_byte_io_handle(std::move(h), caching, flags, ctx)
       , fs_handle(devid, inode)
   {
   }
   //! Construct a handle from a supplied native handle
-  constexpr file_handle(native_handle_type h, caching caching, flag flags, io_multiplexer *ctx)
-      : lockable_io_handle(std::move(h), caching, flags, ctx)
+  constexpr file_handle(native_handle_type h, caching caching, flag flags, byte_io_multiplexer *ctx)
+      : lockable_byte_io_handle(std::move(h), caching, flags, ctx)
   {
   }
   //! No copy construction (use clone())
@@ -91,30 +91,30 @@ public:
   file_handle &operator=(const file_handle &) = delete;
   //! Implicit move construction of file_handle permitted
   constexpr file_handle(file_handle &&o) noexcept
-      : lockable_io_handle(std::move(o))
+      : lockable_byte_io_handle(std::move(o))
       , fs_handle(std::move(o))
   {
   }
   //! Explicit conversion from handle permitted
-  explicit constexpr file_handle(handle &&o, dev_t devid, ino_t inode, io_multiplexer *ctx) noexcept
-      : lockable_io_handle(std::move(o), ctx)
+  explicit constexpr file_handle(handle &&o, dev_t devid, ino_t inode, byte_io_multiplexer *ctx) noexcept
+      : lockable_byte_io_handle(std::move(o), ctx)
       , fs_handle(devid, inode)
   {
   }
   //! Explicit conversion from handle permitted
-  explicit constexpr file_handle(handle &&o, io_multiplexer *ctx) noexcept
-      : lockable_io_handle(std::move(o), ctx)
+  explicit constexpr file_handle(handle &&o, byte_io_multiplexer *ctx) noexcept
+      : lockable_byte_io_handle(std::move(o), ctx)
   {
   }
-  //! Explicit conversion from io_handle permitted
-  explicit constexpr file_handle(io_handle &&o, dev_t devid, ino_t inode) noexcept
-      : lockable_io_handle(std::move(o))
+  //! Explicit conversion from byte_io_handle permitted
+  explicit constexpr file_handle(byte_io_handle &&o, dev_t devid, ino_t inode) noexcept
+      : lockable_byte_io_handle(std::move(o))
       , fs_handle(devid, inode)
   {
   }
-  //! Explicit conversion from io_handle permitted
-  explicit constexpr file_handle(io_handle &&o) noexcept
-      : lockable_io_handle(std::move(o))
+  //! Explicit conversion from byte_io_handle permitted
+  explicit constexpr file_handle(byte_io_handle &&o) noexcept
+      : lockable_byte_io_handle(std::move(o))
   {
   }
   //! Move assignment of file_handle permitted
@@ -246,7 +246,7 @@ public:
       _v.behaviour |= native_handle_type::disposition::_child_close_executed;
     }
 #endif
-    return io_handle::close();
+    return byte_io_handle::close();
   }
 
   /*! Reopen this handle (copy constructor is disabled to avoid accidental copying),
@@ -351,11 +351,11 @@ public:
   */
   LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
-  result<extent_pair> clone_extents_to(extent_pair extent, io_handle &dest, io_handle::extent_type destoffset, deadline d = {}, bool force_copy_now = false,
+  result<extent_pair> clone_extents_to(extent_pair extent, byte_io_handle &dest, byte_io_handle::extent_type destoffset, deadline d = {}, bool force_copy_now = false,
                                        bool emulate_if_unsupported = true) noexcept;
   //! \overload
   LLFIO_MAKE_FREE_FUNCTION
-  result<extent_pair> clone_extents_to(io_handle &dest, deadline d = {}, bool force_copy_now = false, bool emulate_if_unsupported = true) noexcept
+  result<extent_pair> clone_extents_to(byte_io_handle &dest, deadline d = {}, bool force_copy_now = false, bool emulate_if_unsupported = true) noexcept
   {
     return clone_extents_to({(extent_type)-1, (extent_type)-1}, dest, 0, d, force_copy_now, emulate_if_unsupported);
   }
