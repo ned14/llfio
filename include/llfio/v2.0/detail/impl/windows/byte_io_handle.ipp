@@ -323,6 +323,138 @@ exit_now:
   }
   return true;
 }
+
+result<size_t> poll(span<poll_what> out, span<pollable_handle *> handles, span<const poll_what> query, deadline d) noexcept
+{
+  LLFIO_LOG_FUNCTION_CALL(nullptr);
+  if(out.size() != handles.size())
+  {
+    return errc::invalid_argument;
+  }
+  if(out.size() != query.size())
+  {
+    return errc::invalid_argument;
+  }
+  if(handles.empty())
+  {
+    return 0;
+  }
+  if(handles.size() > 1024)
+  {
+    return errc::argument_out_of_domain;
+  }
+  LLFIO_DEADLINE_TO_SLEEP_INIT(d);
+  auto *fds = (WSAPOLLFD *) alloca(handles.size() * sizeof(WSAPOLLFD));
+  memset(fds, 0, handles.size() * sizeof(WSAPOLLFD));
+  ULONG fdscount = 0;
+  for(size_t n = 0; n < handles.size(); n++)
+  {
+    if(handles[n] != nullptr)
+    {
+      auto &h = handles[n]->_get_handle();
+      if(h.is_kernel_handle())
+      {
+        fds[fdscount].fd = h.native_handle().sock;
+        if(query[n] & poll_what::is_readable)
+        {
+          fds[fdscount].events |= POLLIN;
+        }
+        if(query[n] & poll_what::is_writable)
+        {
+          fds[fdscount].events |= POLLOUT;
+        }
+        fdscount++;
+      }
+    }
+  }
+  if(0 == fdscount)
+  {
+    return 0;
+  }
+  for(;;)
+  {
+    int timeout = -1;
+    if(d)
+    {
+      std::chrono::milliseconds ms;
+      if(d.steady)
+      {
+        ms = std::chrono::duration_cast<std::chrono::milliseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());
+      }
+      else
+      {
+        ms = std::chrono::duration_cast<std::chrono::milliseconds>(d.to_time_point() - std::chrono::system_clock::now());
+      }
+      if(ms.count() < 0)
+      {
+        timeout = 0;
+      }
+      else
+      {
+        timeout = (int) ms.count();
+      }
+    }
+    if(timeout < 0 || timeout > 1000)
+    {
+      /* There is some weird race in Windows' WSAPoll where if thread A connects a socket
+      being polled by thread B to a listening socket being polled in thread C then it
+      can occasionally hang forever. We work around this by breaking and retrying the poll
+      no longer than every second to let i/o proceed.
+      */
+      timeout = 1000;
+    }
+    auto ret = WSAPoll(fds, fdscount, timeout);
+    if(SOCKET_ERROR == ret)
+    {
+      return win32_error(WSAGetLastError());
+    }
+    if(ret > 0)
+    {
+      auto count = ret;
+      fdscount = 0;
+      for(size_t n = 0; n < handles.size(); n++)
+      {
+        if(handles[n] != nullptr)
+        {
+          auto &h = handles[n]->_get_handle();
+          if(h.is_kernel_handle())
+          {
+            if(fds[fdscount].revents != 0)
+            {
+              if(fds[fdscount].revents & POLLIN)
+              {
+                out[n] |= poll_what::is_readable;
+              }
+              if(fds[fdscount].revents & POLLOUT)
+              {
+                out[n] |= poll_what::is_writable;
+              }
+              if(fds[fdscount].revents & POLLERR)
+              {
+                out[n] |= poll_what::is_errored;
+              }
+              if(fds[fdscount].revents & POLLHUP)
+              {
+                out[n] |= poll_what::is_closed;
+              }
+              if(--count == 0)
+              {
+                return ret;
+              }
+            }
+          }
+          else
+          {
+            out[n] |= poll_what::not_pollable;
+          }
+          fdscount++;
+        }
+      }
+      return ret;
+    }
+    LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
+  }
+}
 #endif
 
 byte_io_handle::io_result<byte_io_handle::buffers_type> byte_io_handle::_do_read(byte_io_handle::io_request<byte_io_handle::buffers_type> reqs,

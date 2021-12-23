@@ -179,50 +179,43 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> byte_socket_handle::_do_connect(con
   {
     for(;;)
     {
-      /* For some reason WSAPoll() always returns Incorrect Parameter if you ask
-      to be notified of POLLERR or POLLHUP. At least Windows select() doesn't have
-      the scalability problems of Linux select().
-      */
-      fd_set writefds, errfds;
-      FD_ZERO(&writefds);
-      FD_ZERO(&errfds);
-      FD_SET(_v.sock, &writefds);
-      FD_SET(_v.sock, &errfds);
-      TIMEVAL *timeout = nullptr, _timeout;
+      WSAPOLLFD fds;
+      fds.fd = _v.sock;
+      fds.events = POLLOUT;
+      fds.revents = 0;
+      int timeout = -1;
       if(d)
       {
-        std::chrono::microseconds us;
+        std::chrono::milliseconds ms;
         if(d.steady)
         {
-          us = std::chrono::duration_cast<std::chrono::microseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());
+          ms = std::chrono::duration_cast<std::chrono::milliseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());
         }
         else
         {
-          us = std::chrono::duration_cast<std::chrono::microseconds>(d.to_time_point() - std::chrono::system_clock::now());
+          ms = std::chrono::duration_cast<std::chrono::milliseconds>(d.to_time_point() - std::chrono::system_clock::now());
         }
-        if(us.count() < 0)
+        if(ms.count() < 0)
         {
-          _timeout.tv_sec = 0;
-          _timeout.tv_usec = 0;
+          timeout = 0;
         }
         else
         {
-          _timeout.tv_sec = (long) (us.count() / 1000000UL);
-          _timeout.tv_usec = (long) (us.count() % 1000000UL);
+          timeout = (int) ms.count();
         }
-        timeout = &_timeout;
       }
-      if(SOCKET_ERROR == ::select(1, nullptr, &writefds, &errfds, timeout))
+      auto ret = WSAPoll(&fds, 1, timeout);
+      if(SOCKET_ERROR == ret)
       {
         return win32_error(WSAGetLastError());
       }
-      if(FD_ISSET(_v.sock, &writefds))
-      {
-        break;
-      }
-      if(FD_ISSET(_v.sock, &errfds))
+      if(fds.revents&(POLLERR|POLLHUP))
       {
         return errc::connection_refused;
+      }
+      if(fds.revents & POLLOUT)
+      {
+        break;
       }
       LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
     }

@@ -1,5 +1,5 @@
 /* A handle to something
-(C) 2015-2019 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
+(C) 2015-2021 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
 File Created: Dec 2015
 
 
@@ -31,6 +31,10 @@ Distributed under the Boost Software License, Version 1.0.
 #include <poll.h>
 #include <sys/uio.h>  // for preadv etc
 #include <unistd.h>
+
+#ifndef LLFIO_EXCLUDE_NETWORKING
+#include <poll.h>
+#endif
 
 #include "quickcpplib/signal_guard.hpp"
 
@@ -342,5 +346,130 @@ byte_io_handle::io_result<byte_io_handle::const_buffers_type> byte_io_handle::_d
 #endif
   return {reqs.buffers};
 }
+
+#ifndef LLFIO_EXCLUDE_NETWORKING
+result<size_t> poll(span<poll_what> out, span<pollable_handle *> handles, span<const poll_what> query, deadline d) noexcept
+{
+  LLFIO_LOG_FUNCTION_CALL(nullptr);
+  if(out.size() != handles.size())
+  {
+    return errc::invalid_argument;
+  }
+  if(out.size() != query.size())
+  {
+    return errc::invalid_argument;
+  }
+  if(handles.empty())
+  {
+    return 0;
+  }
+  if(handles.size() > 1024)
+  {
+    return errc::argument_out_of_domain;
+  }
+  LLFIO_DEADLINE_TO_SLEEP_INIT(d);
+  auto *fds = (pollfd *) alloca(handles.size() * sizeof(pollfd));
+  memset(fds, 0, handles.size() * sizeof(pollfd));
+  nfds_t fdscount = 0;
+  for(size_t n = 0; n < handles.size(); n++)
+  {
+    if(handles[n] != nullptr)
+    {
+      auto &h = handles[n]->_get_handle();
+      if(h.is_kernel_handle())
+      {
+        fds[fdscount].fd = h.native_handle().fd;
+        if(query[n] & poll_what::is_readable)
+        {
+          fds[fdscount].events |= POLLIN;
+        }
+        if(query[n] & poll_what::is_writable)
+        {
+          fds[fdscount].events |= POLLOUT;
+        }
+        fdscount++;
+      }
+    }
+  }
+  if(0 == fdscount)
+  {
+    return 0;
+  }
+  for(;;)
+  {
+    int timeout = -1;
+    if(d)
+    {
+      std::chrono::milliseconds ms;
+      if(d.steady)
+      {
+        ms = std::chrono::duration_cast<std::chrono::milliseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());
+      }
+      else
+      {
+        ms = std::chrono::duration_cast<std::chrono::milliseconds>(d.to_time_point() - std::chrono::system_clock::now());
+      }
+      if(ms.count() < 0)
+      {
+        timeout = 0;
+      }
+      else
+      {
+        timeout = (int) ms.count();
+      }
+    }
+    auto ret = ::poll(fds, fdscount, timeout);
+    if(-1 == ret)
+    {
+      return posix_error();
+    }
+    if(ret > 0)
+    {
+      auto count = ret;
+      fdscount = 0;
+      for(size_t n = 0; n < handles.size(); n++)
+      {
+        if(handles[n] != nullptr)
+        {
+          auto &h = handles[n]->_get_handle();
+          if(h.is_kernel_handle())
+          {
+            if(fds[fdscount].revents != 0)
+            {
+              if(fds[fdscount].revents & POLLIN)
+              {
+                out[n] |= poll_what::is_readable;
+              }
+              if(fds[fdscount].revents & POLLOUT)
+              {
+                out[n] |= poll_what::is_writable;
+              }
+              if(fds[fdscount].revents & POLLERR)
+              {
+                out[n] |= poll_what::is_errored;
+              }
+              if(fds[fdscount].revents & POLLHUP)
+              {
+                out[n] |= poll_what::is_closed;
+              }
+              if(--count == 0)
+              {
+                return ret;
+              }
+            }
+          }
+          else
+          {
+            out[n] |= poll_what::not_pollable;
+          }
+          fdscount++;
+        }
+      }
+      return ret;
+    }
+    LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
+  }
+}
+#endif
 
 LLFIO_V2_NAMESPACE_END

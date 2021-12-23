@@ -173,7 +173,7 @@ namespace ip
   {
     struct LLFIO_DECL resolver_deleter
     {
-      void operator()(resolver *p) const;
+      LLFIO_HEADERS_ONLY_MEMFUNC_SPEC void operator()(resolver *p) const;
     };
   }  // namespace detail
   //! Returned by `resolve()` as a handle to the asynchronous name resolution operation.
@@ -183,9 +183,9 @@ namespace ip
     //! Returns true if the deadline expired, and the returned list of addresses is incomplete. Until `get()` is called, always is true.
     LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool incomplete() const noexcept;
     //! Returns the array of addresses, blocking until completion if necessary, returning any error if one occurred.
-    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<span<address>> get() const noexcept;
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<span<address>> get() noexcept;
     //! Wait for up the deadline for the array of addresses to be retrieved.
-    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> wait(deadline d = {}) const noexcept;
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> wait(deadline d = {}) noexcept;
     //! \overload
     template <class Rep, class Period> result<bool> wait_for(const std::chrono::duration<Rep, Period> &duration) const noexcept
     {
@@ -212,6 +212,14 @@ namespace ip
   //! A pointer to a resolver
   using resolver_ptr = std::unique_ptr<resolver, detail::resolver_deleter>;
 
+  //! Flags for `resolve()`
+  QUICKCPPLIB_BITFIELD_BEGIN(resolve_flag) {
+    none = 0,  //!< No flags
+                                           passive = (1U<<0U), //!< Return addresses for binding to this machine.
+                                           blocking = (1U<<1U) //!< Execute address resolution synchronously.
+  }
+  QUICKCPPLIB_BITFIELD_END(resolve_flag)
+
   /*! \brief Retrieve a list of potential `address` for a given name and service e.g.
   "www.google.com" and "https" optionally within a bounded deadline.
 
@@ -233,7 +241,9 @@ namespace ip
   is unbounded and uncontrollable thanks to how the platform APIs are implemented.
   */
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<resolver_ptr> resolve(string_view name, string_view service, family _family = family::any, deadline d = {},
-                                                            bool blocking = false) noexcept;
+                                                            resolve_flag flags = resolve_flag::none) noexcept;
+  //! `resolve()` may utilise a process-wide cache, if so this function will trim that cache.
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<size_t> resolve_trim_cache(size_t maxitems = 64) noexcept;
 
   //! Make an `address_v4`
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<address_v4> make_address_v4(string_view str) noexcept;
@@ -542,6 +552,27 @@ public:
     return (_ctx == nullptr) ? _do_connect(addr, d) : _do_multiplexer_connect(addr, d);
   }
 
+  /*! \brief A coroutinised equivalent to `.connect()` which suspends the coroutine until
+  a connection occurs. **Blocks execution** i.e is equivalent to `.connect()` if no i/o multiplexer
+  has been set on this handle!
+
+  The awaitable returned is **eager** i.e. it immediately begins the i/o. If the i/o completes
+  and finishes immediately, no coroutine suspension occurs.
+  */
+  LLFIO_MAKE_FREE_FUNCTION
+  awaitable<io_result<void>> co_connect(const ip::address &addr, deadline d = {}) noexcept;
+#if 0  // TODO
+  {
+    if(_ctx == nullptr)
+    {
+      return awaitable<io_result<void>>(connect(addr, d));
+    }
+    awaitable<io_result<void>> ret;
+    ret.set_state(_ctx->construct(ret._state_storage, this, nullptr, d, addr));
+    return ret;
+  }
+#endif
+
   /*! Create a socket handle.
   \param family Which IP family to create the socket in.
   \param _mode How to open the socket. If this is `mode::append`, the read side of the socket
@@ -716,6 +747,7 @@ public:
     }
   };
   template <class T> using io_result = result<T>;
+  template <class T> using awaitable = byte_io_multiplexer::awaitable<T>;
 
 protected:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<buffers_type> _do_read(io_request<buffers_type> req, deadline d) noexcept;
@@ -907,6 +939,27 @@ public:
   {
     return (_ctx == nullptr) ? _do_read(std::move(req), d) : _do_multiplexer_read(std::move(req), d);
   }
+
+  /*! \brief A coroutinised equivalent to `.read()` which suspends the coroutine until
+  a new incoming connection occurs. **Blocks execution** i.e is equivalent to `.read()` if no i/o multiplexer
+  has been set on this handle!
+
+  The awaitable returned is **eager** i.e. it immediately begins the i/o. If the i/o completes
+  and finishes immediately, no coroutine suspension occurs.
+  */
+  LLFIO_MAKE_FREE_FUNCTION
+  awaitable<io_result<buffers_type>> co_read(io_request<buffers_type> reqs, deadline d = {}) noexcept;
+#if 0  // TODO
+  {
+    if(_ctx == nullptr)
+    {
+      return awaitable<io_result<buffers_type>>(read(std::move(reqs), d));
+    }
+    awaitable<io_result<buffers_type>> ret;
+    ret.set_state(_ctx->construct(ret._state_storage, this, nullptr, d, reqs.buffers.connected_socket()));
+    return ret;
+  }
+#endif
 };
 
 // Out of line definition purely to work around a bug in GCC where if marked inline,

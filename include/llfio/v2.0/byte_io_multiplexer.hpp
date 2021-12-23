@@ -1179,6 +1179,8 @@ public:
   template <class T> struct awaitable final : protected io_operation_state_visitor
   {
     friend class byte_io_handle;
+    friend class byte_socket_handle;
+    friend class listening_socket_handle;
     static constexpr size_t _state_storage_bytes = _awaitable_size - sizeof(void *) - sizeof(io_operation_state *)
 #if LLFIO_ENABLE_COROUTINES
                                                    - sizeof(coroutine_handle<>)
