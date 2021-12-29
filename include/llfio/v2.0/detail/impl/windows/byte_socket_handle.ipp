@@ -27,6 +27,9 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <WinSock2.h>
 #include <ws2ipdef.h>
+#include <ws2tcpip.h>
+
+#include <deque>
 
 LLFIO_V2_NAMESPACE_BEGIN
 
@@ -71,6 +74,315 @@ namespace detail
       }
     }
   }
+}  // namespace detail
+
+namespace ip
+{
+  namespace detail
+  {
+    struct resolver_impl : resolver
+    {
+      std::string name, service;
+      std::vector<address> addresses;
+      ::ADDRINFOEXW hints;
+      OVERLAPPED ol;
+      ::ADDRINFOEXW *res{nullptr};
+      HANDLE ophandle{nullptr};
+
+      resolver_impl() { clear(); }
+
+      void clear()
+      {
+        name.clear();
+        service.clear();
+        addresses.clear();
+        memset(&hints, 0, sizeof(hints));
+        HANDLE event = ol.hEvent;
+        memset(&ol, 0, sizeof(ol));
+        ResetEvent(event);
+        ol.hEvent = event;
+        if(res != nullptr)
+        {
+          FreeAddrInfoExW(res);
+          res = nullptr;
+        }
+        ophandle = nullptr;
+      }
+
+      // Returns 0 for not ready yet, -1 for already processed, +1 for just processed
+      int check(DWORD millis)
+      {
+        if(0 != WaitForSingleObject(ol.hEvent, millis))
+        {
+          return 0;
+        }
+        if(!res)
+        {
+          return -1;
+        }
+        auto unaddrinfo = make_scope_exit([&]() noexcept {
+          FreeAddrInfoExW(res);
+          res = nullptr;
+        });
+        addresses.reserve(4);
+        for(auto *p = res; p != nullptr; p = p->ai_next)
+        {
+          if(p->ai_socktype == SOCK_STREAM)
+          {
+            address a;
+            switch(p->ai_family)
+            {
+            default:
+              break;  // ignore
+            case AF_INET:
+              assert(p->ai_addrlen <= sizeof(address));
+              memcpy(const_cast<::sockaddr *>(a.to_sockaddr()), p->ai_addr, p->ai_addrlen);
+              assert(a.is_v4());
+              addresses.push_back(a);
+              break;
+            case AF_INET6:
+              assert(p->ai_addrlen <= sizeof(address));
+              memcpy(const_cast<::sockaddr *>(a.to_sockaddr()), p->ai_addr, p->ai_addrlen);
+              assert(a.is_v6());
+              addresses.push_back(a);
+              break;
+            }
+          }
+        }
+        return 1;
+      }
+      ~resolver_impl()
+      {
+        if(ol.hEvent != nullptr)
+        {
+          CloseHandle(ol.hEvent);
+        }
+        if(res != nullptr)
+        {
+          FreeAddrInfoExW(res);
+        }
+      }
+    };
+    struct resolver_impl_cache_t
+    {
+      std::mutex lock;
+      std::deque<resolver_impl *> list;
+      resolver_impl_cache_t() { LLFIO_V2_NAMESPACE::detail::register_socket_handle_instance(nullptr); }
+      ~resolver_impl_cache_t()
+      {
+        for(auto *i : list)
+        {
+          delete i;
+        }
+        list.clear();
+        LLFIO_V2_NAMESPACE::detail::unregister_socket_handle_instance(nullptr);
+      }
+    };
+    LLFIO_HEADERS_ONLY_FUNC_SPEC resolver_impl_cache_t &resolver_impl_cache()
+    {
+      static resolver_impl_cache_t v;
+      return v;
+    }
+    void resolver_deleter::operator()(resolver *_p) const
+    {
+      auto *p = static_cast<resolver_impl *>(_p);
+      if(0 != WaitForSingleObject(p->ol.hEvent, 0))
+      {
+        GetAddrInfoExCancel(&p->ophandle);
+        WaitForSingleObject(p->ol.hEvent, INFINITE);
+      }
+      p->clear();
+      auto &cache = resolver_impl_cache();
+      std::lock_guard<std::mutex> g(cache.lock);
+      try
+      {
+        cache.list.push_back(p);
+      }
+      catch(...)
+      {
+        delete p;
+      }
+    }
+  }  // namespace detail
+
+  const std::string &resolver::name() const noexcept
+  {
+    auto *self = static_cast<const detail::resolver_impl *>(this);
+    return self->name;
+  }
+  const std::string &resolver::service() const noexcept
+  {
+    auto *self = static_cast<const detail::resolver_impl *>(this);
+    return self->service;
+  }
+  bool resolver::incomplete() const noexcept
+  {
+    auto *self = static_cast<const detail::resolver_impl *>(this);
+    return 0 != WaitForSingleObject(self->ol.hEvent, 0);
+  }
+  result<span<address>> resolver::get() noexcept
+  {
+    auto *self = static_cast<detail::resolver_impl *>(this);
+    self->check(INFINITE);
+    auto retcode = GetAddrInfoExOverlappedResult(&self->ol);
+    if(retcode != NO_ERROR)
+    {
+      if(WSAETIMEDOUT == retcode)
+      {
+        return errc::operation_canceled;
+      }
+      return win32_error(retcode);
+    }
+    return span<address>(self->addresses);
+  }
+  result<void> resolver::wait(deadline d) noexcept
+  {
+    auto *self = static_cast<detail::resolver_impl *>(this);
+    DWORD millis = INFINITE;
+    if(d)
+    {
+      if(d.steady)
+      {
+        millis = (DWORD)(d.nsecs / 1000000);
+      }
+      else
+      {
+        auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - d.to_time_point()).count();
+        if(diff < 0)
+        {
+          diff = 0;
+        }
+        millis = (DWORD) diff;
+      }
+    }
+    if(0 == self->check(millis))
+    {
+      return errc::timed_out;
+    }
+    return success();
+  }
+
+  result<resolver_ptr> resolve(string_view name, string_view service, family _family, deadline d, resolve_flag flags) noexcept
+  {
+    LLFIO_LOG_FUNCTION_CALL(nullptr);
+    try
+    {
+      windows_nt_kernel::init();
+      using namespace windows_nt_kernel;
+      resolver_ptr ret;
+      detail::resolver_impl *p = nullptr;
+      {
+        auto &cache = detail::resolver_impl_cache();
+        std::lock_guard<std::mutex> g(cache.lock);
+        if(!cache.list.empty())
+        {
+          p = cache.list.back();
+          cache.list.pop_back();
+          ret = resolver_ptr(p);
+        }
+      }
+      if(!ret)
+      {
+        ret = resolver_ptr((p = new detail::resolver_impl));
+        p->ol.hEvent = CreateEvent(nullptr, true, false, nullptr);
+        if(p->ol.hEvent == INVALID_HANDLE_VALUE)
+        {
+          return win32_error();
+        }
+      }
+      p->name.assign(name.data(), name.size());
+      p->service.assign(service.data(), service.size());
+      switch(_family)
+      {
+      case family::v4:
+        p->hints.ai_family = AF_INET;
+        break;
+      case family::v6:
+        p->hints.ai_family = AF_INET6;
+        break;
+      default:
+        p->hints.ai_family = AF_UNSPEC;
+        break;
+      }
+      ::timeval *timeout = nullptr, _timeout;
+      memset(&_timeout, 0, sizeof(_timeout));
+      if(d)
+      {
+        if(d.steady)
+        {
+          _timeout.tv_sec = (long) (d.nsecs / 1000000000ULL);
+          _timeout.tv_usec = (long) ((d.nsecs / 1000ULL) % 1000000ULL);
+        }
+        else
+        {
+          auto diff = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - d.to_time_point()).count();
+          if(diff < 0)
+          {
+            diff = 0;
+          }
+          _timeout.tv_sec = (long) (diff / 1000000);
+          _timeout.tv_usec = (long) (diff % 1000000);
+        }
+        timeout = &_timeout;
+      }
+      p->hints.ai_socktype = SOCK_STREAM;
+      p->hints.ai_flags = AI_ADDRCONFIG | AI_V4MAPPED;
+      if(flags & resolve_flag::passive)
+      {
+        p->hints.ai_flags |= AI_PASSIVE;
+      }
+      auto to_wstring = [](const std::string &str) -> result<std::wstring> {
+        ULONG written = 0;
+        // Ask for the length needed
+        NTSTATUS ntstat = RtlUTF8ToUnicodeN(nullptr, 0, &written, str.c_str(), static_cast<ULONG>(str.size()));
+        if(ntstat < 0)
+        {
+          return ntkernel_error(ntstat);
+        }
+        std::wstring ret;
+        ret.resize(written);
+        written = 0;
+        // Do the conversion UTF-8 to UTF-16
+        ntstat = RtlUTF8ToUnicodeN(const_cast<wchar_t *>(ret.data()), static_cast<ULONG>(ret.size()), &written, str.c_str(), static_cast<ULONG>(str.size()));
+        if(ntstat < 0)
+        {
+          return ntkernel_error(ntstat);
+        }
+        ret.resize(written);
+        return ret;
+      };
+      OUTCOME_TRY(auto &&_name, to_wstring(p->name));
+      OUTCOME_TRY(auto &&_service, to_wstring(p->service));
+      auto errcode = GetAddrInfoExW(_name.c_str(), _service.c_str(), NS_ALL, nullptr, &p->hints, &p->res, timeout,
+                                    (flags & resolve_flag::blocking) ? nullptr : &p->ol, nullptr, (flags & resolve_flag::blocking) ? nullptr : &p->ophandle);
+      if(NO_ERROR != errcode && WSA_IO_PENDING != errcode)
+      {
+        SetEvent(p->ol.hEvent);
+        return win32_error(errcode);
+      }
+      p->check(0);
+      return {std::move(ret)};
+    }
+    catch(...)
+    {
+      return error_from_exception();
+    }
+  }
+
+  result<size_t> resolve_trim_cache(size_t maxitems) noexcept
+  {
+    auto &cache = detail::resolver_impl_cache();
+    std::lock_guard<std::mutex> g(cache.lock);
+    while(cache.list.size() > maxitems)
+    {
+      cache.list.pop_front();
+    }
+    return cache.list.size();
+  }
+}  // namespace ip
+
+namespace detail
+{
   inline result<void> create_socket(void *p, native_handle_type &nativeh, ip::family _family, handle::mode _mode, handle::caching _caching,
                                     handle::flag flags) noexcept
   {
@@ -209,7 +521,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> byte_socket_handle::_do_connect(con
       {
         return win32_error(WSAGetLastError());
       }
-      if(fds.revents&(POLLERR|POLLHUP))
+      if(fds.revents & (POLLERR | POLLHUP))
       {
         return errc::connection_refused;
       }

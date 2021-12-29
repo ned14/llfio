@@ -70,7 +70,7 @@ import LLFIO_MODULE_NAME;
 #include "file_handle.hpp"
 #include "process_handle.hpp"
 #ifndef LLFIO_EXCLUDE_NETWORKING
-#include "byte_socket_handle.hpp"
+#include "byte_socket_source.hpp"
 #endif
 #include "statfs.hpp"
 #ifdef LLFIO_INCLUDE_STORAGE_PROFILE

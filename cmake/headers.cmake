@@ -32,6 +32,7 @@ set(llfio_HEADERS
   "include/llfio/v2.0/deadline.h"
   "include/llfio/v2.0/detail/impl/byte_io_multiplexer.ipp"
   "include/llfio/v2.0/detail/impl/byte_socket_handle.ipp"
+  "include/llfio/v2.0/detail/impl/byte_socket_source.ipp"
   "include/llfio/v2.0/detail/impl/cached_parent_handle_adapter.ipp"
   "include/llfio/v2.0/detail/impl/clone.ipp"
   "include/llfio/v2.0/detail/impl/config.ipp"

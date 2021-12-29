@@ -300,7 +300,7 @@ static inline void TestSocketResolve()
         for(auto &x : res)
         {
           std::cout << "\n   " << x;
-          BOOST_CHECK(x.port()==443);
+          BOOST_CHECK(x.port() == 443);
         }
         i.reset();
       }
@@ -312,9 +312,63 @@ static inline void TestSocketResolve()
     }
   }
   resolvers.clear();
+
+  // Test abandonment/cancellation
   for(auto &addr : addrs)
   {
     resolvers.push_back(llfio::ip::resolve(addr, "https").value());
+  }
+  resolvers.clear();
+
+  // Test timeouts
+  for(auto &addr : addrs)
+  {
+    resolvers.push_back(llfio::ip::resolve(addr, "https", llfio::ip::family::any, std::chrono::milliseconds(1)).value());
+  }
+  for(;;)
+  {
+    bool done = true;
+    for(auto &i : resolvers)
+    {
+      if(!i)
+      {
+        continue;
+      }
+      if(!i->wait(std::chrono::seconds(0)))
+      {
+        done = false;
+      }
+      else
+      {
+        auto res = i->get();
+        if(!res)
+        {
+          if(res.error() == llfio::errc::operation_canceled)
+          {
+            std::cout << "\nFor host '" << i->name() << "' resolve() returns operation cancelled";
+          }
+          else
+          {
+            res.value();
+          }
+        }
+        else
+        {
+          std::cout << "\nFor host '" << i->name() << "' resolve() returns " << res.value().size() << " addresses:";
+          for(auto &x : res.value())
+          {
+            std::cout << "\n   " << x;
+            BOOST_CHECK(x.port() == 443);
+          }
+        }
+        i.reset();
+      }
+    }
+    if(done)
+    {
+      std::cout << "\n" << std::endl;
+      break;
+    }
   }
   resolvers.clear();
 }
@@ -430,6 +484,10 @@ static inline void TestNonBlockingSocketHandles()
   }
   {  // no data, so blocking read should time out
     auto read = reader.first.read(0, {{buffer, 64}}, std::chrono::seconds(1));
+    if(!read.has_error())
+    {
+      std::cout << "Blocking read did not return error, instead returned " << read.value() << std::endl;
+    }
     BOOST_REQUIRE(read.has_error());
     BOOST_REQUIRE(read.error() == llfio::errc::timed_out);
   }
@@ -774,13 +832,20 @@ static inline void TestPollingSocketHandles()
   {
     auto s = llfio::listening_socket_handle::listening_socket(llfio::ip::family::v4).value();
     s.bind(llfio::ip::address_v4::loopback()).value();
-    listening.emplace_back(std::move(s), s.local_endpoint().value());
+    auto endpoint = s.local_endpoint().value();
+    if(endpoint.family() == llfio::ip::family::unknown && getenv("CI") != nullptr)
+    {
+      std::cout << "\nNOTE: Currently on CI and couldn't bind a listening socket to loopback, assuming it is CI host restrictions and skipping this test."
+                << std::endl;
+      return;
+    }
+    listening.emplace_back(std::move(s), endpoint);
     sockets.push_back(llfio::byte_socket_handle::byte_socket(llfio::ip::family::v4).value());
     idxs.push_back(n);
   }
   QUICKCPPLIB_NAMESPACE::algorithm::small_prng::random_shuffle(idxs.begin(), idxs.end());
   std::mutex lock;
-  std::atomic<size_t> currently_connecting{0};
+  std::atomic<size_t> currently_connecting{(size_t)-1};
   auto poll_listening_task = std::async(std::launch::async, [&] {
     std::vector<llfio::pollable_handle *> handles;
     std::vector<llfio::poll_what> what, out;
@@ -800,11 +865,12 @@ static inline void TestPollingSocketHandles()
         if(handles[idx] != nullptr)
         {
           done = false;
-          if(out[idx] == llfio::poll_what::is_readable)
+          if(out[idx] & llfio::poll_what::is_readable)
           {
             {
               std::lock_guard<std::mutex> g(lock);
-              std::cout << "Poll listening sees readable on socket " << idx << std::endl;
+              std::cout << "Poll listening sees readable (raw = " << (int) (uint8_t) out[idx] << ") on socket " << idx << ". Currently connecting is "
+                        << currently_connecting << std::endl;
             }
             BOOST_CHECK(currently_connecting == idx);
             std::pair<llfio::byte_socket_handle, llfio::ip::address> s;
@@ -812,6 +878,7 @@ static inline void TestPollingSocketHandles()
             handles[idx] = nullptr;
             ret--;
           }
+          out[idx] = llfio::poll_what::none;
         }
       }
       BOOST_CHECK(ret == 0);
@@ -835,26 +902,45 @@ static inline void TestPollingSocketHandles()
     for(;;)
     {
       int ret = (int) llfio::poll(out, {handles}, what, std::chrono::seconds(30)).value();
-      bool done = true;
+      bool done = true, saw_closed = false;
+      size_t remaining = MAX_SOCKETS;
       for(size_t n = 0; n < MAX_SOCKETS; n++)
       {
         auto idx = idxs[n];
         if(handles[idx] != nullptr)
         {
           done = false;
-          if(out[idx] == llfio::poll_what::is_writable)
+          // On Linux, a new socket not yet connected MAY appear as both writable and hanged up,
+          // so filter out the closed.
+          if(!(out[idx] & llfio::poll_what::is_closed) || (remaining == 1 && currently_connecting == idx))
           {
+            if(out[idx] & llfio::poll_what::is_writable)
             {
-              std::lock_guard<std::mutex> g(lock);
-              std::cout << "Poll connect sees writable on socket " << idx << std::endl;
+              {
+                std::lock_guard<std::mutex> g(lock);
+                std::cout << "Poll connect sees writable (raw = " << (int) (uint8_t) out[idx] << ")  on socket " << idx << ". Currently connecting is "
+                          << currently_connecting << std::endl;
+              }
+              BOOST_CHECK(currently_connecting == idx);
+              handles[idx] = nullptr;
+              ret--;
             }
-            BOOST_CHECK(currently_connecting == idx);
-            handles[idx] = nullptr;
-            ret--;
           }
+          else
+          {
+            saw_closed = true;
+          }
+          out[idx] = llfio::poll_what::none;
+        }
+        else
+        {
+          remaining--;
         }
       }
-      BOOST_CHECK(ret == 0);
+      if(!saw_closed)
+      {
+        BOOST_CHECK(ret == 0);
+      }
       if(done)
       {
         std::lock_guard<std::mutex> g(lock);

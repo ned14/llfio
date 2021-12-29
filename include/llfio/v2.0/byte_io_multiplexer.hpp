@@ -477,9 +477,10 @@ public:
   byte_io_multiplexer &operator=(const byte_io_multiplexer &) = delete;
   ~byte_io_multiplexer() = default;
 
+  //! The implementation information returned.
   struct implementation_information_t
   {
-    string_view name;  //!< The name of the underlying implementation e.g. "OpenSSL", "IOCP, "io_uring", "Windows RIO" etc.
+    string_view name;  //!< The name of the underlying implementation e.g. "OpenSSL", "IOCP", "io_uring", "Windows RIO" etc.
     struct
     {
       uint16_t major{0}, minor{0}, patch{0};

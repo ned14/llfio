@@ -416,6 +416,9 @@ public:
   template <class T> using io_request = byte_io_handle::io_request<T>;
   template <class T> using io_result = byte_io_handle::io_result<T>;
 
+  // Used by byte_socket_source
+  virtual void _deleter() { delete this; }
+
 protected:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _do_connect(const ip::address &addr, deadline d) noexcept;
 
@@ -753,6 +756,9 @@ public:
   template <class T> using io_result = result<T>;
   template <class T> using awaitable = byte_io_multiplexer::awaitable<T>;
 
+  // Used by byte_socket_source
+  virtual void _deleter() { delete this; }
+
 protected:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<buffers_type> _do_read(io_request<buffers_type> req, deadline d) noexcept;
 
@@ -885,7 +891,7 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> bind(const ip::address &addr, creation _creation = creation::only_if_not_exist, int backlog = -1) noexcept;
 
   /*! Create a listening socket handle.
-  \param family Which IP family to create the socket in.
+  \param _family Which IP family to create the socket in.
   \param _mode How to open the socket. If this is `mode::append`, the read side of the socket
   is shutdown; if this is `mode::read`, the write side of the socket is shutdown.
   \param _caching How to ask the kernel to cache the socket. If writes are not cached,
