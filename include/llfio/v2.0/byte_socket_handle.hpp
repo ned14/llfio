@@ -90,22 +90,23 @@ namespace ip
   protected:
     union
     {
+      // This is a struct sockaddr, so endian varies
       struct
       {
-        unsigned short _family;  // sa_family_t
-        uint16_t _port;          // in_port_t
+        unsigned short _family;  // sa_family_t, host endian
+        uint16_t _port;          // in_port_t, big endian
         union
         {
           struct
           {
-            uint32_t _flowinfo;
-            byte _addr[16];
-            uint32_t _scope_id;
+            uint32_t _flowinfo;  // big endian
+            byte _addr[16];      // big endian
+            uint32_t _scope_id;  // big endian
           } ipv6;
           union
           {
-            byte _addr[4];
-            uint32_t _addr_be;
+            byte _addr[4];      // big endian
+            uint32_t _addr_be;  // big endian
           } ipv4;
         };
       };
@@ -148,15 +149,15 @@ namespace ip
     LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool is_v6() const noexcept;
 
     //! Returns the raw family of the address
-    unsigned short raw_family() const noexcept { return _family; }
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC unsigned short raw_family() const noexcept;
     //! Returns the family of the addres
     LLFIO_HEADERS_ONLY_MEMFUNC_SPEC enum family family() const noexcept;
     //! Returns the port of the address
-    uint16_t port() const noexcept { return _port; }
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC uint16_t port() const noexcept;
     //! Returns the IPv6 flow info, if address is v6.
-    uint32_t flowinfo() const noexcept { return is_v6() ? ipv6._flowinfo : 0; }
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC uint32_t flowinfo() const noexcept;
     //! Returns the IPv6 scope id, if address is v6.
-    uint32_t scope_id() const noexcept { return is_v6() ? ipv6._scope_id : 0; }
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC uint32_t scope_id() const noexcept;
 
     //! Returns the bytes of the address in network order
     span<const byte> to_bytes() const noexcept { return is_v6() ? span<const byte>(ipv6._addr) : span<const byte>(ipv4._addr); }
@@ -180,6 +181,10 @@ namespace ip
   class LLFIO_DECL resolver
   {
   public:
+    //! Returns the name being resolved
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC const std::string &name() const noexcept;
+    //! Returns the service being resolved
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC const std::string &service() const noexcept;
     //! Returns true if the deadline expired, and the returned list of addresses is incomplete. Until `get()` is called, always is true.
     LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool incomplete() const noexcept;
     //! Returns the array of addresses, blocking until completion if necessary, returning any error if one occurred.
@@ -213,12 +218,11 @@ namespace ip
   using resolver_ptr = std::unique_ptr<resolver, detail::resolver_deleter>;
 
   //! Flags for `resolve()`
-  QUICKCPPLIB_BITFIELD_BEGIN(resolve_flag) {
-    none = 0,  //!< No flags
-                                           passive = (1U<<0U), //!< Return addresses for binding to this machine.
-                                           blocking = (1U<<1U) //!< Execute address resolution synchronously.
-  }
-  QUICKCPPLIB_BITFIELD_END(resolve_flag)
+  QUICKCPPLIB_BITFIELD_BEGIN(resolve_flag){
+  none = 0,              //!< No flags
+  passive = (1U << 0U),  //!< Return addresses for binding to this machine.
+  blocking = (1U << 1U)  //!< Execute address resolution synchronously.
+  } QUICKCPPLIB_BITFIELD_END(resolve_flag)
 
   /*! \brief Retrieve a list of potential `address` for a given name and service e.g.
   "www.google.com" and "https" optionally within a bounded deadline.

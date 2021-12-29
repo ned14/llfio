@@ -270,6 +270,55 @@ static inline void TestSocketAddress()
   }
 }
 
+static inline void TestSocketResolve()
+{
+  namespace llfio = LLFIO_V2_NAMESPACE;
+  static const llfio::string_view addrs[] = {"google.com", "youtube.com",  "tmall.com",  "qq.com",     "baidu.com",
+                                             "sohu.com",   "facebook.com", "taobao.com", "amazon.com", "www.nedprod.com"};
+  std::vector<llfio::ip::resolver_ptr> resolvers;
+  for(auto &addr : addrs)
+  {
+    resolvers.push_back(llfio::ip::resolve(addr, "https").value());
+  }
+  for(;;)
+  {
+    bool done = true;
+    for(auto &i : resolvers)
+    {
+      if(!i)
+      {
+        continue;
+      }
+      if(!i->wait(std::chrono::seconds(0)))
+      {
+        done = false;
+      }
+      else
+      {
+        auto res = i->get().value();
+        std::cout << "\nFor host '" << i->name() << "' resolve() returns " << res.size() << " addresses:";
+        for(auto &x : res)
+        {
+          std::cout << "\n   " << x;
+          BOOST_CHECK(x.port()==443);
+        }
+        i.reset();
+      }
+    }
+    if(done)
+    {
+      std::cout << "\n" << std::endl;
+      break;
+    }
+  }
+  resolvers.clear();
+  for(auto &addr : addrs)
+  {
+    resolvers.push_back(llfio::ip::resolve(addr, "https").value());
+  }
+  resolvers.clear();
+}
+
 static inline void TestBlockingSocketHandles()
 {
   namespace llfio = LLFIO_V2_NAMESPACE;
@@ -836,7 +885,7 @@ static inline void TestPollingSocketHandles()
 }
 
 KERNELTEST_TEST_KERNEL(integration, llfio, ip, address, "Tests that llfio::ip::address works as expected", TestSocketAddress())
-// KERNELTEST_TEST_KERNEL(integration, llfio, ip, resolve, "Tests that llfio::ip::resolve works as expected", TestSocketResolve())
+KERNELTEST_TEST_KERNEL(integration, llfio, ip, resolve, "Tests that llfio::ip::resolve works as expected", TestSocketResolve())
 KERNELTEST_TEST_KERNEL(integration, llfio, socket_handle, blocking, "Tests that blocking llfio::byte_socket_handle works as expected",
                        TestBlockingSocketHandles())
 KERNELTEST_TEST_KERNEL(integration, llfio, socket_handle, nonblocking, "Tests that nonblocking llfio::byte_socket_handle works as expected",

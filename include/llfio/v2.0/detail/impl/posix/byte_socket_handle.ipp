@@ -90,14 +90,19 @@ namespace ip
         {
           return {retcode, errno};
         }
+        auto unaddrinfo = make_scope_exit([&]() noexcept {
+          ::freeaddrinfo(res);
+          res = nullptr;
+        });
         std::lock_guard<std::mutex> g(lock);
         if(status == -1)
         {
           // We have been abandoned
-          std::thread([this] {
+          std::thread t([this] {
             task.wait();
             delete this;
           });
+          t.detach();
           return {EAI_SYSTEM, (int) errc::operation_canceled};
         }
         status = 1;
@@ -126,8 +131,6 @@ namespace ip
             }
           }
         }
-        ::freeaddrinfo(res);
-        res = nullptr;
         return {0, 0};
       }
       ~resolver_impl()
@@ -199,7 +202,8 @@ namespace ip
     void resolver_deleter::operator()(resolver *_p) const
     {
       auto *p = static_cast<resolver_impl *>(_p);
-      if(std::future_status::timeout == p->task.wait_for(std::chrono::seconds(0)))
+#if !LLFIO_IP_ADDRESS_RESOLVER_USE_ASYNC_GETADDRINFO
+      if(p->task.valid() && std::future_status::timeout == p->task.wait_for(std::chrono::seconds(0)))
       {
         std::lock_guard<std::mutex> g(p->lock);
         if(p->status == 0)
@@ -208,10 +212,21 @@ namespace ip
           return;
         }
       }
+#endif
       delete p;
     }
   }  // namespace detail
 
+  const std::string &resolver::name() const noexcept
+  {
+    auto *self = static_cast<const detail::resolver_impl *>(this);
+    return self->name;
+  }
+  const std::string &resolver::service() const noexcept
+  {
+    auto *self = static_cast<const detail::resolver_impl *>(this);
+    return self->service;
+  }
   bool resolver::incomplete() const noexcept
   {
     auto *self = static_cast<const detail::resolver_impl *>(this);
@@ -309,8 +324,10 @@ namespace ip
 
   result<size_t> resolve_trim_cache(size_t maxitems) noexcept
   {
+#if !LLFIO_IP_ADDRESS_RESOLVER_USE_ASYNC_GETADDRINFO
     (void) maxitems;
     return 0;
+#endif
   }
 }  // namespace ip
 
