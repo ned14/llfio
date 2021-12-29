@@ -9,6 +9,7 @@ var namespacellfio__v2__xxx =
     [ "byte_io_handle", "classllfio__v2__xxx_1_1byte__io__handle.html", "classllfio__v2__xxx_1_1byte__io__handle" ],
     [ "byte_io_multiplexer", "classllfio__v2__xxx_1_1byte__io__multiplexer.html", "classllfio__v2__xxx_1_1byte__io__multiplexer" ],
     [ "byte_socket_handle", "classllfio__v2__xxx_1_1byte__socket__handle.html", "classllfio__v2__xxx_1_1byte__socket__handle" ],
+    [ "byte_socket_source", "classllfio__v2__xxx_1_1byte__socket__source.html", "classllfio__v2__xxx_1_1byte__socket__source" ],
     [ "construct", "structllfio__v2__xxx_1_1construct.html", "structllfio__v2__xxx_1_1construct" ],
     [ "construct< algorithm::cached_parent_handle_adapter< T > >", "structllfio__v2__xxx_1_1construct_3_01algorithm_1_1cached__parent__handle__adapter_3_01_t_01_4_01_4.html", "structllfio__v2__xxx_1_1construct_3_01algorithm_1_1cached__parent__handle__adapter_3_01_t_01_4_01_4" ],
     [ "construct< byte_socket_handle >", "structllfio__v2__xxx_1_1construct_3_01byte__socket__handle_01_4.html", "structllfio__v2__xxx_1_1construct_3_01byte__socket__handle_01_4" ],

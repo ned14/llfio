@@ -87,7 +87,8 @@ $(document).ready(function(){initNavTree('byte__socket__handle_8hpp.html',''); i
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#enum-members">Enumerations</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">byte_socket_handle.hpp File Reference</div>  </div>
 </div><!--header-->
@@ -160,9 +161,16 @@ Functions</h2></td></tr>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a6765418b2c35f959b2eeed474b20db03">llfio_v2_xxx::ip::operator&lt;&lt;</a> (std::ostream &amp;s, const address &amp;v)</td></tr>
 <tr class="memdesc:a6765418b2c35f959b2eeed474b20db03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write address to stream. <br /></td></tr>
 <tr class="separator:a6765418b2c35f959b2eeed474b20db03"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a683e36b652b458600d5dee91389c1b3f"><td class="memItemLeft" align="right" valign="top">result&lt; resolver_ptr &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a683e36b652b458600d5dee91389c1b3f">llfio_v2_xxx::ip::resolve</a> (string_view name, string_view service, family _family=family::any, deadline d={}, bool blocking=false) noexcept</td></tr>
-<tr class="memdesc:a683e36b652b458600d5dee91389c1b3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve a list of potential <code>address</code> for a given name and service e.g. "www.google.com" and "https" optionally within a bounded deadline.  <a href="namespacellfio__v2__xxx_1_1ip.html#a683e36b652b458600d5dee91389c1b3f">More...</a><br /></td></tr>
-<tr class="separator:a683e36b652b458600d5dee91389c1b3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf1d36169c4576c6d0917fc17cd6e17e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aaf1d36169c4576c6d0917fc17cd6e17e">llfio_v2_xxx::ip::QUICKCPPLIB_BITFIELD_BEGIN</a> (resolve_flag)</td></tr>
+<tr class="memdesc:aaf1d36169c4576c6d0917fc17cd6e17e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flags for <code>resolve()</code>  <a href="namespacellfio__v2__xxx_1_1ip.html#aaf1d36169c4576c6d0917fc17cd6e17e">More...</a><br /></td></tr>
+<tr class="separator:aaf1d36169c4576c6d0917fc17cd6e17e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27328312a9ba596942b36b4adcd43433"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a27328312a9ba596942b36b4adcd43433">llfio_v2_xxx::ip::QUICKCPPLIB_BITFIELD_END</a> (resolve_flag) inline result&lt; resolver_ptr &gt; resolve(string_view name</td></tr>
+<tr class="memdesc:a27328312a9ba596942b36b4adcd43433"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve a list of potential <code>address</code> for a given name and service e.g. "www.google.com" and "https" optionally within a bounded deadline.  <a href="namespacellfio__v2__xxx_1_1ip.html#a27328312a9ba596942b36b4adcd43433">More...</a><br /></td></tr>
+<tr class="separator:a27328312a9ba596942b36b4adcd43433"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10295dc13fad53bb539533871e747eb2"><td class="memItemLeft" align="right" valign="top"><a id="a10295dc13fad53bb539533871e747eb2"></a>
+result&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a10295dc13fad53bb539533871e747eb2">llfio_v2_xxx::ip::resolve_trim_cache</a> (size_t maxitems=64) noexcept</td></tr>
+<tr class="memdesc:a10295dc13fad53bb539533871e747eb2"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code>resolve()</code> may utilise a process-wide cache, if so this function will trim that cache. <br /></td></tr>
+<tr class="separator:a10295dc13fad53bb539533871e747eb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1ee33e4c8320dbf5510a0849608eebf2"><td class="memItemLeft" align="right" valign="top"><a id="a1ee33e4c8320dbf5510a0849608eebf2"></a>
 result&lt; address_v4 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a1ee33e4c8320dbf5510a0849608eebf2">llfio_v2_xxx::ip::make_address_v4</a> (string_view str) noexcept</td></tr>
 <tr class="memdesc:a1ee33e4c8320dbf5510a0849608eebf2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make an <code>address_v4</code> <br /></td></tr>
@@ -187,6 +195,21 @@ result&lt; address_v6 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a
 result&lt; address &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a199651ec383913fa9a2aec88d5100d1f">llfio_v2_xxx::ip::make_address</a> (string_view str) noexcept</td></tr>
 <tr class="memdesc:a199651ec383913fa9a2aec88d5100d1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make a v4 or v6 <code>address</code>. v6 addresses need to have the form <code>[::]:port</code>. <br /></td></tr>
 <tr class="separator:a199651ec383913fa9a2aec88d5100d1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a32f9d03d00478ba190c1160b08c46338"><td class="memItemLeft" align="right" valign="top"><a id="a32f9d03d00478ba190c1160b08c46338"></a>
+string_view&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::ip::service</b></td></tr>
+<tr class="separator:a32f9d03d00478ba190c1160b08c46338"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a260aebfdb57084b90e721bad166bc2ff"><td class="memItemLeft" align="right" valign="top"><a id="a260aebfdb57084b90e721bad166bc2ff"></a>
+string_view family&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::ip::_family</b> = family::any</td></tr>
+<tr class="separator:a260aebfdb57084b90e721bad166bc2ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6511dde2ae512a6262ac979a2fd28a51"><td class="memItemLeft" align="right" valign="top"><a id="a6511dde2ae512a6262ac979a2fd28a51"></a>
+string_view family deadline&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::ip::d</b> = {}</td></tr>
+<tr class="separator:a6511dde2ae512a6262ac979a2fd28a51"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9cc4f2c010893bac428decc77e0f93a0"><td class="memItemLeft" align="right" valign="top"><a id="a9cc4f2c010893bac428decc77e0f93a0"></a>
+string_view family deadline resolve_flag&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::ip::flags</b> = resolve_flag::none) noexcept</td></tr>
+<tr class="separator:a9cc4f2c010893bac428decc77e0f93a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides <code>byte_socket_handle</code>. </p>

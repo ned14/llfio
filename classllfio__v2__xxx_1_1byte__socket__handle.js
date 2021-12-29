@@ -49,6 +49,7 @@ var classllfio__v2__xxx_1_1byte__socket__handle =
     [ "clone", "classllfio__v2__xxx_1_1byte__socket__handle.html#aeea4389189021b94dde6d8f2c3ccc5b3", null ],
     [ "close", "classllfio__v2__xxx_1_1byte__socket__handle.html#a92f2f31e07624dc26f783bde1fc4a6d6", null ],
     [ "co_barrier", "classllfio__v2__xxx_1_1byte__socket__handle.html#aceeee62d494e22432923d80c596b937d", null ],
+    [ "co_connect", "classllfio__v2__xxx_1_1byte__socket__handle.html#a296a0879175877bc0b93c6d844a6a268", null ],
     [ "co_read", "classllfio__v2__xxx_1_1byte__socket__handle.html#a8bf9b8dee03f826229a9cee117b6b9ef", null ],
     [ "co_read", "classllfio__v2__xxx_1_1byte__socket__handle.html#ae27d8d8bad6b55d7544271ebb82cff1f", null ],
     [ "co_write", "classllfio__v2__xxx_1_1byte__socket__handle.html#a497f1b933e7b15b04cf2aeef4c721f66", null ],

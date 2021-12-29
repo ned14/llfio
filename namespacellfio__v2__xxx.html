@@ -87,8 +87,7 @@ $(document).ready(function(){initNavTree('namespacellfio__v2__xxx.html',''); ini
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#enum-members">Enumerations</a> &#124;
-<a href="#func-members">Functions</a> &#124;
-<a href="#var-members">Variables</a>  </div>
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">llfio_v2_xxx Namespace Reference</div>  </div>
 </div><!--header-->
@@ -133,6 +132,9 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__socket__handle.html">byte_socket_handle</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to a byte-orientated socket-like entity.  <a href="classllfio__v2__xxx_1_1byte__socket__handle.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__socket__source.html">byte_socket_source</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A source of <code>byte_socket_handle</code> and <code>listening_socket</code> and optionally a <code>byte_io_multiplexer</code> to multiplex i/o on multiple instances at the same time.  <a href="classllfio__v2__xxx_1_1byte__socket__source.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1construct.html">construct</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Metaprogramming shim for constructing any <code>handle</code> subclass.  <a href="structllfio__v2__xxx_1_1construct.html#details">More...</a><br /></td></tr>
@@ -273,6 +275,14 @@ Typedefs</h2></td></tr>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a12c7d894767fdd2e0ebda26d9e6d8be0">byte_io_multiplexer_ptr</a> = std::unique_ptr&lt; <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html">byte_io_multiplexer</a> &gt;</td></tr>
 <tr class="memdesc:a12c7d894767fdd2e0ebda26d9e6d8be0"><td class="mdescLeft">&#160;</td><td class="mdescRight">A unique ptr to an i/o multiplexer implementation. <br /></td></tr>
 <tr class="separator:a12c7d894767fdd2e0ebda26d9e6d8be0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b1fc5e08959bfaac325426e1ee0d7c9"><td class="memItemLeft" align="right" valign="top"><a id="a3b1fc5e08959bfaac325426e1ee0d7c9"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a3b1fc5e08959bfaac325426e1ee0d7c9">byte_socket_source_handle_ptr</a> = std::unique_ptr&lt; <a class="el" href="classllfio__v2__xxx_1_1byte__socket__handle.html">byte_socket_handle</a>, detail::byte_socket_source_handle_deleter &gt;</td></tr>
+<tr class="memdesc:a3b1fc5e08959bfaac325426e1ee0d7c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">A pointer to a byte socket handle returned by a byte socket source. <br /></td></tr>
+<tr class="separator:a3b1fc5e08959bfaac325426e1ee0d7c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac90839bac7668aa8b449b7637610c746"><td class="memItemLeft" align="right" valign="top"><a id="ac90839bac7668aa8b449b7637610c746"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#ac90839bac7668aa8b449b7637610c746">listening_socket_source_handle_ptr</a> = std::unique_ptr&lt; <a class="el" href="classllfio__v2__xxx_1_1listening__socket__handle.html">listening_socket_handle</a>, detail::listening_socket_source_handle_deleter &gt;</td></tr>
+<tr class="memdesc:ac90839bac7668aa8b449b7637610c746"><td class="mdescLeft">&#160;</td><td class="mdescRight">A pointer to a listening socket handle returned by a byte socket source. <br /></td></tr>
+<tr class="separator:ac90839bac7668aa8b449b7637610c746"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a23358ae319d76dd1149a26b04b17796a"><td class="memTemplParams" colspan="2"><a id="a23358ae319d76dd1149a26b04b17796a"></a>
 template&lt;class F , size_t callable_storage_bytes = 32 - sizeof(uintptr_t)&gt; </td></tr>
 <tr class="memitem:a23358ae319d76dd1149a26b04b17796a"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>function_ptr</b> = QUICKCPPLIB_NAMESPACE::function_ptr::function_ptr&lt; F, callable_storage_bytes &gt;</td></tr>
@@ -340,9 +350,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a26baf26ed8a75301a92134497cc3ac8a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a26baf26ed8a75301a92134497cc3ac8a">QUICKCPPLIB_BITFIELD_BEGIN_T</a> (poll_what, uint8_t)</td></tr>
 <tr class="memdesc:a26baf26ed8a75301a92134497cc3ac8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">What to poll.  <a href="namespacellfio__v2__xxx.html#a26baf26ed8a75301a92134497cc3ac8a">More...</a><br /></td></tr>
 <tr class="separator:a26baf26ed8a75301a92134497cc3ac8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36814e250c3473392fe01573e9b52ca3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a36814e250c3473392fe01573e9b52ca3">QUICKCPPLIB_BITFIELD_END</a> (poll_what) inline result&lt; size_t &gt; poll(span&lt; poll_what &gt; out</td></tr>
-<tr class="memdesc:a36814e250c3473392fe01573e9b52ca3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Polls a list of pollable handles awaiting a change in state.  <a href="namespacellfio__v2__xxx.html#a36814e250c3473392fe01573e9b52ca3">More...</a><br /></td></tr>
-<tr class="separator:a36814e250c3473392fe01573e9b52ca3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abde2ff6c2085a19f9968ba3b628f3ae3"><td class="memItemLeft" align="right" valign="top"><a id="abde2ff6c2085a19f9968ba3b628f3ae3"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>QUICKCPPLIB_BITFIELD_END</b> (poll_what) class <a class="el" href="classllfio__v2__xxx_1_1pollable__handle.html">pollable_handle</a></td></tr>
+<tr class="separator:abde2ff6c2085a19f9968ba3b628f3ae3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a727d8ebc7f42ff3124d1734a1a1f0563"><td class="memItemLeft" align="right" valign="top">result&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a727d8ebc7f42ff3124d1734a1a1f0563">poll</a> (span&lt; poll_what &gt; out, span&lt; <a class="el" href="classllfio__v2__xxx_1_1pollable__handle.html">pollable_handle</a> * &gt; handles, span&lt; const poll_what &gt; query, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d={}) noexcept</td></tr>
+<tr class="memdesc:a727d8ebc7f42ff3124d1734a1a1f0563"><td class="mdescLeft">&#160;</td><td class="mdescRight">Polls a list of pollable handles awaiting a change in state.  <a href="namespacellfio__v2__xxx.html#a727d8ebc7f42ff3124d1734a1a1f0563">More...</a><br /></td></tr>
+<tr class="separator:a727d8ebc7f42ff3124d1734a1a1f0563"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acbd9eb25fed94bb0bc8fa888b3c26bdf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">byte_io_handle::io_result</a>&lt; byte_io_handle::buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#acbd9eb25fed94bb0bc8fa888b3c26bdf">read</a> (<a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html">byte_io_handle</a> &amp;self, <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">byte_io_handle::io_request</a>&lt; byte_io_handle::buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="memdesc:acbd9eb25fed94bb0bc8fa888b3c26bdf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read data from the open handle.  <a href="namespacellfio__v2__xxx.html#acbd9eb25fed94bb0bc8fa888b3c26bdf">More...</a><br /></td></tr>
 <tr class="separator:acbd9eb25fed94bb0bc8fa888b3c26bdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -605,18 +618,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 <a class="el" href="structllfio__v2__xxx_1_1error__info.html">error_info</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a20ab6481a21bf2c4cf8185919edf0a66">posix_error</a> (int c=errno)</td></tr>
 <tr class="memdesc:a20ab6481a21bf2c4cf8185919edf0a66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper for constructing an error info from a POSIX errno. <br /></td></tr>
 <tr class="separator:a20ab6481a21bf2c4cf8185919edf0a66"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
-Variables</h2></td></tr>
-<tr class="memitem:ac4091bf755435ce8ac2537c70bde3f65"><td class="memItemLeft" align="right" valign="top"><a id="ac4091bf755435ce8ac2537c70bde3f65"></a>
-span&lt; <a class="el" href="classllfio__v2__xxx_1_1pollable__handle.html">pollable_handle</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>handles</b></td></tr>
-<tr class="separator:ac4091bf755435ce8ac2537c70bde3f65"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acd6a3a006f947fd8d441d2c823afce06"><td class="memItemLeft" align="right" valign="top"><a id="acd6a3a006f947fd8d441d2c823afce06"></a>
-span&lt; <a class="el" href="classllfio__v2__xxx_1_1pollable__handle.html">pollable_handle</a> * &gt; span&lt; const poll_what &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>query</b></td></tr>
-<tr class="separator:acd6a3a006f947fd8d441d2c823afce06"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6f5de17b348418166c2bcc01602b96a2"><td class="memItemLeft" align="right" valign="top"><a id="a6f5de17b348418166c2bcc01602b96a2"></a>
-span&lt; <a class="el" href="classllfio__v2__xxx_1_1pollable__handle.html">pollable_handle</a> * &gt; span&lt; const poll_what &gt; <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td><td class="memItemRight" valign="bottom"><b>d</b> = {}) noexcept</td></tr>
-<tr class="separator:a6f5de17b348418166c2bcc01602b96a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The LLFIO namespace. </p>
@@ -1399,6 +1400,70 @@ span&lt; <a class="el" href="classllfio__v2__xxx_1_1pollable__handle.html">polla
 </div><!-- fragment -->
 </div>
 </div>
+<a id="a727d8ebc7f42ff3124d1734a1a1f0563"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a727d8ebc7f42ff3124d1734a1a1f0563">&#9670;&nbsp;</a></span>poll()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;size_t&gt; llfio_v2_xxx::poll </td>
+          <td>(</td>
+          <td class="paramtype">span&lt; poll_what &gt;&#160;</td>
+          <td class="paramname"><em>out</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">span&lt; <a class="el" href="classllfio__v2__xxx_1_1pollable__handle.html">pollable_handle</a> * &gt;&#160;</td>
+          <td class="paramname"><em>handles</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">span&lt; const poll_what &gt;&#160;</td>
+          <td class="paramname"><em>query</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code>{}</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Polls a list of pollable handles awaiting a change in state. </p>
+<dl class="section return"><dt>Returns</dt><dd>The number of handles with changed state. Handles not <code>is_kernel_handle()</code> receive <code>poll_what::not_pollable</code>. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">out</td><td>An array of <code>poll_what</code> set with the results of the poll. The bits in this array are NOT cleared by this operation, so you need to clear this manualy before the call if that's what you need. </td></tr>
+    <tr><td class="paramname">handles</td><td>An array of pointers to <code>handle</code>. Individual pointers can be null if you want to skip them. </td></tr>
+    <tr><td class="paramname">query</td><td>An array of <code>poll_what</code> to check. </td></tr>
+    <tr><td class="paramname">d</td><td>An optional timeout. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Errors returnable\n Whatever POSIX poll() or Windows WSAPoll() can return.</dt><dd></dd></dl>
+<p>Note that the maximum number of handles which can be passed to this function is 1024 (the platform syscall may refuse even that many). Note that this function is <code>O(N)</code> to handle count, so more than a few hundred is a bad idea in any case. If you need to wait on more handles than this, you need to implement a <code>byte_io_multiplexer</code> for your platform.</p>
+<p>The sizes of <code>out</code>, <code>handles</code> and <code>query</code> must be the same, or an error is returned.</p>
+<dl class="section note"><dt>Note</dt><dd>On POSIX <code>pipe_handle</code> is a <code>pollable_handle</code>, but on Windows it is not. Also, on Windows, you cannot mix socket handles from different networking stacks in the same poll. </dd></dl>
+
+</div>
+</div>
 <a id="a26baf26ed8a75301a92134497cc3ac8a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a26baf26ed8a75301a92134497cc3ac8a">&#9670;&nbsp;</a></span>QUICKCPPLIB_BITFIELD_BEGIN_T()</h2>
 
@@ -1429,53 +1494,20 @@ span&lt; <a class="el" href="classllfio__v2__xxx_1_1pollable__handle.html">polla
 <p>&lt; Query nothing for this handle.</p>
 <p>&lt; If this handle is readable.</p>
 <p>&lt; If this handle is writable.</p>
-<p>&lt; If this handle is errored.</p>
-<p>&lt; If this handle is closed/hung up.</p>
+<p>&lt; If this handle is errored. This is always set in the output even if not requested.</p>
+<p>&lt; If this handle is closed/hung up. This is always set in the output even if not requested.</p>
 <p>&lt; This handle is not pollable.</p>
-<div class="fragment"><div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;{</div>
-<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;none = 0U,  <span class="comment">//!&lt; Query nothing for this handle.</span></div>
-<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;is_readable = (1U &lt;&lt; 0U),  <span class="comment">//!&lt; If this handle is readable.</span></div>
-<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;<span class="comment"></span>is_writable = (1U &lt;&lt; 1U),  <span class="comment">//!&lt; If this handle is writable.</span></div>
-<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;<span class="comment"></span>is_errored = (1U &lt;&lt; 2U),   <span class="comment">//!&lt; If this handle is errored.</span></div>
-<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;<span class="comment"></span>is_closed = (1U &lt;&lt; 3U),    <span class="comment">//!&lt; If this handle is closed/hung up.</span></div>
-<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;not_pollable = (1U &lt;&lt; 7U)  <span class="comment">//!&lt; This handle is not pollable.</span></div>
-<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;<span class="comment"></span>}  <span class="comment">//</span></div>
+<div class="fragment"><div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;{</div>
+<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;none = 0U,  <span class="comment">//!&lt; Query nothing for this handle.</span></div>
+<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;is_readable = (1U &lt;&lt; 0U),  <span class="comment">//!&lt; If this handle is readable.</span></div>
+<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;<span class="comment"></span>is_writable = (1U &lt;&lt; 1U),  <span class="comment">//!&lt; If this handle is writable.</span></div>
+<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;<span class="comment"></span>is_errored = (1U &lt;&lt; 2U),   <span class="comment">//!&lt; If this handle is errored. This is always set in the output even if not requested.</span></div>
+<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;<span class="comment"></span>is_closed = (1U &lt;&lt; 3U),    <span class="comment">//!&lt; If this handle is closed/hung up. This is always set in the output even if not requested.</span></div>
+<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;not_pollable = (1U &lt;&lt; 7U)  <span class="comment">//!&lt; This handle is not pollable.</span></div>
+<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;<span class="comment"></span>}  <span class="comment">//</span></div>
 </div><!-- fragment -->
-</div>
-</div>
-<a id="a36814e250c3473392fe01573e9b52ca3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a36814e250c3473392fe01573e9b52ca3">&#9670;&nbsp;</a></span>QUICKCPPLIB_BITFIELD_END()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">llfio_v2_xxx::QUICKCPPLIB_BITFIELD_END </td>
-          <td>(</td>
-          <td class="paramtype">poll_what&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Polls a list of pollable handles awaiting a change in state. </p>
-<dl class="section return"><dt>Returns</dt><dd>The number of handles with changed state. Handles not <code>is_kernel_handle()</code> receive <code>poll_what::not_pollable</code>. </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">out</td><td>An array of <code>poll_what</code> set with the results of the poll. </td></tr>
-    <tr><td class="paramname">handles</td><td>An array of pointers to <code>handle</code>. Individual pointers can be null if you want to skip them. </td></tr>
-    <tr><td class="paramname">query</td><td>An array of <code>poll_what</code> to check. </td></tr>
-    <tr><td class="paramname">d</td><td>An optional timeout. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section user"><dt>Errors returnable\n Whatever POSIX poll() or Windows select() can return.</dt><dd></dd></dl>
-<p>Note that the maximum number of handles which can be passed to this function is 1024 (the platform syscall may refuse even that many). Note that this function is <code>O(N)</code> to handle count, so more than a few hundred is a bad idea in any case. If you need to wait on more handles than this, you need to implement a <code>byte_io_multiplexer</code> for your platform.</p>
-<p>The sizes of <code>out</code>, <code>handles</code> and <code>query</code> must be the same, or an error is returned. </p>
-
 </div>
 </div>
 <a id="acbd9eb25fed94bb0bc8fa888b3c26bdf"></a>
@@ -1531,9 +1563,9 @@ span&lt; <a class="el" href="classllfio__v2__xxx_1_1pollable__handle.html">polla
 </dl>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX read() can return, errc::timed_out, errc::operation_canceled. errc::not_supported may be</dt><dd>returned if deadline i/o is not possible with this particular handle configuration (e.g. reading from regular files on POSIX or reading from a non-overlapped HANDLE on Windows). </dd></dl>
 <dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;{</div>
-<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
-<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;{</div>
+<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.read(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
+<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2414,9 +2446,9 @@ span&lt; <a class="el" href="classllfio__v2__xxx_1_1pollable__handle.html">polla
 </dl>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX write() can return, errc::timed_out, errc::operation_canceled. errc::not_supported may be</dt><dd>returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
 <dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;{</div>
-<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
-<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;{</div>
+<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.write(std::forward&lt;decltype(reqs)&gt;(reqs), std::forward&lt;decltype(d)&gt;(d));</div>
+<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
