@@ -91,12 +91,15 @@ $(document).ready(function(){initNavTree('byte__socket__source_8hpp.html',''); i
 <div class="title">byte_socket_source.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="byte__io__handle_8hpp.html">byte_io_handle.hpp</a>&quot;</code><br />
+<div class="textblock"><code>#include &quot;<a class="el" href="byte__socket__handle_8hpp.html">byte_socket_handle.hpp</a>&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__socket__source.html">llfio_v2_xxx::byte_socket_source</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A source of <code>byte_socket_handle</code> and <code>listening_socket</code> and possibly a <code>byte_io_multiplexer</code> to multiplex i/o on multiple socket instances at the same time.  <a href="classllfio__v2__xxx_1_1byte__socket__source.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1byte__socket__source__implementation__information.html">llfio_v2_xxx::byte_socket_source_implementation_information</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The implementation information returned.  <a href="structllfio__v2__xxx_1_1byte__socket__source__implementation__information.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__socket__source__registry.html">llfio_v2_xxx::byte_socket_source_registry</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A process-wide registry of <code>byte_socket_source</code>.  <a href="classllfio__v2__xxx_1_1byte__socket__source__registry.html#details">More...</a><br /></td></tr>
@@ -120,15 +123,19 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="nam
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#ac90839bac7668aa8b449b7637610c746">llfio_v2_xxx::listening_socket_source_handle_ptr</a> = std::unique_ptr&lt; listening_socket_handle, detail::listening_socket_source_handle_deleter &gt;</td></tr>
 <tr class="memdesc:ac90839bac7668aa8b449b7637610c746"><td class="mdescLeft">&#160;</td><td class="mdescRight">A pointer to a listening socket handle returned by a byte socket source. <br /></td></tr>
 <tr class="separator:ac90839bac7668aa8b449b7637610c746"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a83730967ac2e59f1fc1a83fd86085a0c"><td class="memItemLeft" align="right" valign="top"><a id="a83730967ac2e59f1fc1a83fd86085a0c"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a83730967ac2e59f1fc1a83fd86085a0c">llfio_v2_xxx::byte_socket_source_ptr</a> = std::unique_ptr&lt; byte_socket_source, detail::byte_socket_source_deleter &gt;</td></tr>
+<tr class="memdesc:a83730967ac2e59f1fc1a83fd86085a0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">A pointer to a byte socket source. <br /></td></tr>
+<tr class="separator:a83730967ac2e59f1fc1a83fd86085a0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a0ea2c8896bfb21b18ed1a084a0a75651"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a0ea2c8896bfb21b18ed1a084a0a75651">llfio_v2_xxx::QUICKCPPLIB_BITFIELD_BEGIN_T</a> (byte_socket_source_implementation_features, uint32_t)</td></tr>
 <tr class="memdesc:a0ea2c8896bfb21b18ed1a084a0a75651"><td class="mdescLeft">&#160;</td><td class="mdescRight">Feature bits for byte socket sources.  <a href="namespacellfio__v2__xxx.html#a0ea2c8896bfb21b18ed1a084a0a75651">More...</a><br /></td></tr>
 <tr class="separator:a0ea2c8896bfb21b18ed1a084a0a75651"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac6629245498887dc6ae7d6d312c5e692"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#ac6629245498887dc6ae7d6d312c5e692">llfio_v2_xxx::QUICKCPPLIB_BITFIELD_END</a> (byte_socket_source_implementation_features) struct byte_socket_source_implementation_information_t</td></tr>
-<tr class="memdesc:ac6629245498887dc6ae7d6d312c5e692"><td class="mdescLeft">&#160;</td><td class="mdescRight">The implementation information returned.  <a href="namespacellfio__v2__xxx.html#ac6629245498887dc6ae7d6d312c5e692">More...</a><br /></td></tr>
-<tr class="separator:ac6629245498887dc6ae7d6d312c5e692"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a419865951dfcc92509477236215da888"><td class="memItemLeft" align="right" valign="top"><a id="a419865951dfcc92509477236215da888"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::QUICKCPPLIB_BITFIELD_END</b> (byte_socket_source_implementation_features) struct byte_socket_source_implementation_information</td></tr>
+<tr class="separator:a419865951dfcc92509477236215da888"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides a source of <code>byte_socket_handle</code>. </p>

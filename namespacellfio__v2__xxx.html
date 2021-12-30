@@ -136,6 +136,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__socket__source.html">byte_socket_source</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A source of <code>byte_socket_handle</code> and <code>listening_socket</code> and possibly a <code>byte_io_multiplexer</code> to multiplex i/o on multiple socket instances at the same time.  <a href="classllfio__v2__xxx_1_1byte__socket__source.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1byte__socket__source__implementation__information.html">byte_socket_source_implementation_information</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The implementation information returned.  <a href="structllfio__v2__xxx_1_1byte__socket__source__implementation__information.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__socket__source__registry.html">byte_socket_source_registry</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A process-wide registry of <code>byte_socket_source</code>.  <a href="classllfio__v2__xxx_1_1byte__socket__source__registry.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -286,6 +289,10 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="nam
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#ac90839bac7668aa8b449b7637610c746">listening_socket_source_handle_ptr</a> = std::unique_ptr&lt; <a class="el" href="classllfio__v2__xxx_1_1listening__socket__handle.html">listening_socket_handle</a>, detail::listening_socket_source_handle_deleter &gt;</td></tr>
 <tr class="memdesc:ac90839bac7668aa8b449b7637610c746"><td class="mdescLeft">&#160;</td><td class="mdescRight">A pointer to a listening socket handle returned by a byte socket source. <br /></td></tr>
 <tr class="separator:ac90839bac7668aa8b449b7637610c746"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a83730967ac2e59f1fc1a83fd86085a0c"><td class="memItemLeft" align="right" valign="top"><a id="a83730967ac2e59f1fc1a83fd86085a0c"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a83730967ac2e59f1fc1a83fd86085a0c">byte_socket_source_ptr</a> = std::unique_ptr&lt; <a class="el" href="classllfio__v2__xxx_1_1byte__socket__source.html">byte_socket_source</a>, detail::byte_socket_source_deleter &gt;</td></tr>
+<tr class="memdesc:a83730967ac2e59f1fc1a83fd86085a0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">A pointer to a byte socket source. <br /></td></tr>
+<tr class="separator:a83730967ac2e59f1fc1a83fd86085a0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a23358ae319d76dd1149a26b04b17796a"><td class="memTemplParams" colspan="2"><a id="a23358ae319d76dd1149a26b04b17796a"></a>
 template&lt;class F , size_t callable_storage_bytes = 32 - sizeof(uintptr_t)&gt; </td></tr>
 <tr class="memitem:a23358ae319d76dd1149a26b04b17796a"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>function_ptr</b> = QUICKCPPLIB_NAMESPACE::function_ptr::function_ptr&lt; F, callable_storage_bytes &gt;</td></tr>
@@ -388,9 +395,9 @@ constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 <tr class="memitem:a0ea2c8896bfb21b18ed1a084a0a75651"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a0ea2c8896bfb21b18ed1a084a0a75651">QUICKCPPLIB_BITFIELD_BEGIN_T</a> (byte_socket_source_implementation_features, uint32_t)</td></tr>
 <tr class="memdesc:a0ea2c8896bfb21b18ed1a084a0a75651"><td class="mdescLeft">&#160;</td><td class="mdescRight">Feature bits for byte socket sources.  <a href="namespacellfio__v2__xxx.html#a0ea2c8896bfb21b18ed1a084a0a75651">More...</a><br /></td></tr>
 <tr class="separator:a0ea2c8896bfb21b18ed1a084a0a75651"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac6629245498887dc6ae7d6d312c5e692"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#ac6629245498887dc6ae7d6d312c5e692">QUICKCPPLIB_BITFIELD_END</a> (byte_socket_source_implementation_features) struct byte_socket_source_implementation_information_t</td></tr>
-<tr class="memdesc:ac6629245498887dc6ae7d6d312c5e692"><td class="mdescLeft">&#160;</td><td class="mdescRight">The implementation information returned.  <a href="namespacellfio__v2__xxx.html#ac6629245498887dc6ae7d6d312c5e692">More...</a><br /></td></tr>
-<tr class="separator:ac6629245498887dc6ae7d6d312c5e692"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a419865951dfcc92509477236215da888"><td class="memItemLeft" align="right" valign="top"><a id="a419865951dfcc92509477236215da888"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>QUICKCPPLIB_BITFIELD_END</b> (byte_socket_source_implementation_features) struct <a class="el" href="structllfio__v2__xxx_1_1byte__socket__source__implementation__information.html">byte_socket_source_implementation_information</a></td></tr>
+<tr class="separator:a419865951dfcc92509477236215da888"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a026590e0aff0af0331ec8f8308e56724"><td class="memItemLeft" align="right" valign="top"><a id="a026590e0aff0af0331ec8f8308e56724"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207">directory_handle::filter</a> &amp;v)</td></tr>
 <tr class="separator:a026590e0aff0af0331ec8f8308e56724"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1504,14 +1511,14 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 <p>&lt; This socket source provides TLS secured sockets</p>
 <p>&lt; This socket source provides an i/o multiplexer</p>
 <p>&lt; This socket source may be able to work with compatible io multiplexers</p>
-<div class="fragment"><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;                                                                                  {</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;none = 0U,</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;kernel_sockets =</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;(1U &lt;&lt; 0U),  <span class="comment">//!&lt; This socket source provides kernel sockets i.e. their native handles will be valid kernel sockets which can be used in `poll()` etc</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="comment"></span>tls_sockets = (1U &lt;&lt; 1U),             <span class="comment">//!&lt; This socket source provides TLS secured sockets</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="comment"></span>io_multiplexer = (1U &lt;&lt; 2U),          <span class="comment">//!&lt; This socket source provides an i/o multiplexer</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="comment"></span>foreign_io_multiplexer = (1U &lt;&lt; 3U),  <span class="comment">//!&lt; This socket source may be able to work with compatible io multiplexers</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="comment"></span>all = 0xffffffff} <a class="code" href="namespacellfio__v2__xxx.html#ac6629245498887dc6ae7d6d312c5e692">QUICKCPPLIB_BITFIELD_END</a>(byte_socket_source_implementation_features)</div>
+<div class="fragment"><div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;                                                                                  {</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;none = 0U,</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;kernel_sockets =</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;(1U &lt;&lt; 0U),  <span class="comment">//!&lt; This socket source provides kernel sockets i.e. their native handles will be valid kernel sockets which can be used in `poll()` etc</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="comment"></span>tls_sockets = (1U &lt;&lt; 1U),             <span class="comment">//!&lt; This socket source provides TLS secured sockets</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment"></span>io_multiplexer = (1U &lt;&lt; 2U),          <span class="comment">//!&lt; This socket source provides an i/o multiplexer</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment"></span>foreign_io_multiplexer = (1U &lt;&lt; 3U),  <span class="comment">//!&lt; This socket source may be able to work with compatible io multiplexers</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment"></span>all = 0xffffffff} QUICKCPPLIB_BITFIELD_END(byte_socket_source_implementation_features)</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1558,45 +1565,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 <div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;<span class="comment"></span> </div>
 <div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;not_pollable = (1U &lt;&lt; 7U)  <span class="comment">//!&lt; This handle is not pollable.</span></div>
 <div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;<span class="comment"></span>}  <span class="comment">//</span></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="ac6629245498887dc6ae7d6d312c5e692"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac6629245498887dc6ae7d6d312c5e692">&#9670;&nbsp;</a></span>QUICKCPPLIB_BITFIELD_END()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">llfio_v2_xxx::QUICKCPPLIB_BITFIELD_END </td>
-          <td>(</td>
-          <td class="paramtype">byte_socket_source_implementation_features&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>The implementation information returned. </p>
-<p>&lt; The name of the underlying implementation e.g. "OpenSSL", "IOCP", "io_uring", "Windows RIO" etc.</p>
-<p>&lt; Version of the underlying implementation. Could be a kernel version if appropriate.</p>
-<p>&lt; The build config or other disambiguator from others with the same name and version.</p>
-<p>Returns true if this byte socket source is compatible with the specified i/o multiplexer</p>
-<div class="fragment"><div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;{</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  string_view name;  <span class="comment">//!&lt; The name of the underlying implementation e.g. &quot;OpenSSL&quot;, &quot;IOCP&quot;, &quot;io_uring&quot;, &quot;Windows RIO&quot; etc.</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment"></span>  <span class="keyword">struct</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  {</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    uint16_t major{0}, minor{0}, patch{0};</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  } version;            <span class="comment">//!&lt; Version of the underlying implementation. Could be a kernel version if appropriate.</span></div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="comment"></span>  string_view postfix;  <span class="comment">//!&lt; The build config or other disambiguator from others with the same name and version.</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  byte_socket_source_implementation_features features;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  constexpr byte_socket_source_implementation_information_t() {}</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="comment">  //! Returns true if this byte socket source is compatible with the specified i/o multiplexer</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="comment"></span>  <span class="keywordtype">bool</span> is_compatible_with(<span class="keyword">const</span> byte_io_multiplexer_ptr &amp;multiplexer) <span class="keyword">const</span> noexcept;</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;};</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2688,7 +2656,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a5323ac4d73623d99f92109a5c184e5dd"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a5323ac4d73623d99f92109a5c184e5dd">llfio_v2_xxx::section</a></div><div class="ttdeci">result&lt; section_handle &gt; section(section_handle::extent_type bytes, const path_handle &amp;dirh=path_discovery::storage_backed_temporary_files_directory(), section_handle::flag _flag=section_handle::flag::read|section_handle::flag::write) noexcept</div><div class="ttdoc">Create a memory section backed by an anonymous, managed file.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:1065</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_ad8b12afdd4c80d69d2530bd40f92427c"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ad8b12afdd4c80d69d2530bd40f92427c">llfio_v2_xxx::path</a></div><div class="ttdeci">result&lt; path_handle &gt; path(path_handle::path_view_type _path) noexcept</div><div class="ttdoc">This is an overloaded member function, provided for convenience. It differs from the above function o...</div><div class="ttdef"><b>Definition:</b> path_handle.hpp:176</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a3eb3e8ef0ddff1270b3d78d4178335c7"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a3eb3e8ef0ddff1270b3d78d4178335c7">llfio_v2_xxx::mapped_temp_file</a></div><div class="ttdeci">result&lt; mapped_file_handle &gt; mapped_temp_file(mapped_file_handle::size_type reservation, mapped_file_handle::path_view_type name=mapped_file_handle::path_view_type(), mapped_file_handle::mode _mode=mapped_file_handle::mode::write, mapped_file_handle::creation _creation=mapped_file_handle::creation::if_needed, mapped_file_handle::caching _caching=mapped_file_handle::caching::temporary, mapped_file_handle::flag flags=mapped_file_handle::flag::unlink_on_first_close) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:818</div></div>
-<div class="ttc" id="anamespacellfio__v2__xxx_html_ac6629245498887dc6ae7d6d312c5e692"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ac6629245498887dc6ae7d6d312c5e692">llfio_v2_xxx::QUICKCPPLIB_BITFIELD_END</a></div><div class="ttdeci">QUICKCPPLIB_BITFIELD_END(byte_socket_source_implementation_features) struct byte_socket_source_implementation_information_t</div><div class="ttdoc">The implementation information returned.</div><div class="ttdef"><b>Definition:</b> byte_socket_source.hpp:65</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a1f0ccde00add2f09579151fd71b8f06d"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a1f0ccde00add2f09579151fd71b8f06d">llfio_v2_xxx::mapped_file</a></div><div class="ttdeci">result&lt; mapped_file_handle &gt; mapped_file(const path_handle &amp;base, mapped_file_handle::path_view_type _path, mapped_file_handle::mode _mode=mapped_file_handle::mode::read, mapped_file_handle::creation _creation=mapped_file_handle::creation::open_existing, mapped_file_handle::caching _caching=mapped_file_handle::caching::all, mapped_file_handle::flag flags=mapped_file_handle::flag::none) noexcept</div><div class="ttdoc">This is an overloaded member function, provided for convenience. It differs from the above function o...</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:776</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

@@ -105,10 +105,10 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>check_for_any_comple
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:af70ce20d8ddc06b2cdcb41f91ad369aa"><td class="memItemLeft" align="right" valign="top"><a id="af70ce20d8ddc06b2cdcb41f91ad369aa"></a>
-const byte_socket_source_implementation_information_t &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__socket__source.html#af70ce20d8ddc06b2cdcb41f91ad369aa">implementation_information</a> () const noexcept</td></tr>
-<tr class="memdesc:af70ce20d8ddc06b2cdcb41f91ad369aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns implementation information about this byte socket source. <br /></td></tr>
-<tr class="separator:af70ce20d8ddc06b2cdcb41f91ad369aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ebe33d72aa34828a37356fab2541674"><td class="memItemLeft" align="right" valign="top"><a id="a1ebe33d72aa34828a37356fab2541674"></a>
+const <a class="el" href="structllfio__v2__xxx_1_1byte__socket__source__implementation__information.html">byte_socket_source_implementation_information</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__socket__source.html#a1ebe33d72aa34828a37356fab2541674">implementation_information</a> () const noexcept</td></tr>
+<tr class="memdesc:a1ebe33d72aa34828a37356fab2541674"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns implementation information about this byte socket source. <br /></td></tr>
+<tr class="separator:a1ebe33d72aa34828a37356fab2541674"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a323221fc1c787a62954a0a081eabcf8a"><td class="memItemLeft" align="right" valign="top"><a id="a323221fc1c787a62954a0a081eabcf8a"></a>
 <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html">byte_io_multiplexer</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__socket__source.html#a323221fc1c787a62954a0a081eabcf8a">multiplexer</a> () const noexcept</td></tr>
 <tr class="memdesc:a323221fc1c787a62954a0a081eabcf8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the i/o multiplexer for this byte socket handle source. All handles created from this source will have this multiplexer set upon them. <br /></td></tr>
@@ -128,9 +128,9 @@ virtual result&lt; <a class="el" href="namespacellfio__v2__xxx.html#ac90839bac76
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:ac5c2f8d8f5599b44d35bad3a2e6d7589"><td class="memItemLeft" align="right" valign="top"><a id="ac5c2f8d8f5599b44d35bad3a2e6d7589"></a>
-constexpr&#160;</td><td class="memItemRight" valign="bottom"><b>byte_socket_source</b> (const byte_socket_source_implementation_information_t &amp;<a class="el" href="classllfio__v2__xxx_1_1byte__socket__source.html#af70ce20d8ddc06b2cdcb41f91ad369aa">implementation_information</a>)</td></tr>
-<tr class="separator:ac5c2f8d8f5599b44d35bad3a2e6d7589"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac135bd54f106ef6d927eb17ecab67ec3"><td class="memItemLeft" align="right" valign="top"><a id="ac135bd54f106ef6d927eb17ecab67ec3"></a>
+constexpr&#160;</td><td class="memItemRight" valign="bottom"><b>byte_socket_source</b> (const <a class="el" href="structllfio__v2__xxx_1_1byte__socket__source__implementation__information.html">byte_socket_source_implementation_information</a> &amp;<a class="el" href="classllfio__v2__xxx_1_1byte__socket__source.html#a1ebe33d72aa34828a37356fab2541674">implementation_information</a>)</td></tr>
+<tr class="separator:ac135bd54f106ef6d927eb17ecab67ec3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A source of <code>byte_socket_handle</code> and <code>listening_socket</code> and possibly a <code>byte_io_multiplexer</code> to multiplex i/o on multiple socket instances at the same time. </p>

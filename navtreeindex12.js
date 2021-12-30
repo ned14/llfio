@@ -1,5 +1,6 @@
 var NAVTREEINDEX12 =
 {
+"structllfio__v2__xxx_1_1algorithm_1_1difference__item.html#aa63255f48ab96f35618852c8a7ca1c95ab9540bdf60e5c2ad28b683edcf2b2c37":[4,0,2,0,6,0,5],
 "structllfio__v2__xxx_1_1algorithm_1_1difference__item.html#aa63255f48ab96f35618852c8a7ca1c95adfe03cb8be0de8104977a91efde5fcdd":[4,0,2,0,6,0,0],
 "structllfio__v2__xxx_1_1algorithm_1_1difference__item.html#aa63255f48ab96f35618852c8a7ca1c95ae2b66949209c74e8f1b6ef219c959ea9":[4,0,2,0,6,0,7],
 "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html":[4,0,2,0,0,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX12 =
 "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state.html#a4aea137496faa126beb5f7855395b26c":[4,0,2,7,2,32],
 "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state.html#a54c744e90de37f2692a926b3c52dafa0":[4,0,2,7,2,16],
 "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state.html#a5afb4b217128af146fe976694ff0628f":[4,0,2,7,2,13],
-"structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state.html#a6452a27cf7fd0adb1375949d0f9ea4e0":[4,0,2,7,2,23],
-"structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state.html#a6538dbccfd4937eb4db16b045ad3dbc4":[4,0,2,7,2,17]
+"structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state.html#a6452a27cf7fd0adb1375949d0f9ea4e0":[4,0,2,7,2,23]
 };
