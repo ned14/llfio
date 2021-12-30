@@ -91,7 +91,7 @@ $(document).ready(function(){initNavTree('classllfio__v2__xxx_1_1byte__socket__s
 </div><!--header-->
 <div class="contents">
 
-<p>A source of <code>byte_socket_handle</code> and <code>listening_socket</code> and optionally a <code>byte_io_multiplexer</code> to multiplex i/o on multiple instances at the same time.  
+<p>A source of <code>byte_socket_handle</code> and <code>listening_socket</code> and possibly a <code>byte_io_multiplexer</code> to multiplex i/o on multiple socket instances at the same time.  
  <a href="classllfio__v2__xxx_1_1byte__socket__source.html#details">More...</a></p>
 
 <p><code>#include &quot;byte_socket_source.hpp&quot;</code></p>
@@ -122,7 +122,7 @@ virtual result&lt; <a class="el" href="namespacellfio__v2__xxx.html#ac90839bac76
 <tr class="separator:a69c192f88d519652309385e2c70262d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>A source of <code>byte_socket_handle</code> and <code>listening_socket</code> and optionally a <code>byte_io_multiplexer</code> to multiplex i/o on multiple instances at the same time. </p>
+<div class="textblock"><p>A source of <code>byte_socket_handle</code> and <code>listening_socket</code> and possibly a <code>byte_io_multiplexer</code> to multiplex i/o on multiple socket instances at the same time. </p>
 <p>The socket handles returned by this source may be <em>very</em> different implementations to the kernel socket handles returned by <code>byte_socket_handle::byte_socket()</code> &ndash; they may have all virtual functions overridden AND a custom i/o multiplexer set, plus RTTI may show an internal derived type from the public types.</p>
 <p>However, they may still be a valid kernel socket handle e.g. a TLS implementation may act upon a base kernel socket handle. If so, <code>is_kernel_handle()</code> will be true. </p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
