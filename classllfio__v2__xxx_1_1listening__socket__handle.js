@@ -42,6 +42,7 @@ var classllfio__v2__xxx_1_1listening__socket__handle =
     [ "listening_socket_handle", "classllfio__v2__xxx_1_1listening__socket__handle.html#a00dcf8c0cfba92a5c679befdf855382b", null ],
     [ "listening_socket_handle", "classllfio__v2__xxx_1_1listening__socket__handle.html#aa5c07bf533928b2122daff8bed97bc06", null ],
     [ "~listening_socket_handle", "classllfio__v2__xxx_1_1listening__socket__handle.html#a6b2983851a165335ffede29c18d7d43a", null ],
+    [ "_deleter", "classllfio__v2__xxx_1_1listening__socket__handle.html#aa456171a0524a0d6b605b947c261e5a6", null ],
     [ "_do_multiplexer_read", "classllfio__v2__xxx_1_1listening__socket__handle.html#a6838c06fc097aae8f96c56a9dd6a821b", null ],
     [ "_do_read", "classllfio__v2__xxx_1_1listening__socket__handle.html#abc09e502f38985d54e30bcd668d0168f", null ],
     [ "are_reads_from_cache", "classllfio__v2__xxx_1_1listening__socket__handle.html#a7126a726b2a06e4c1eca1a94c41163ff", null ],

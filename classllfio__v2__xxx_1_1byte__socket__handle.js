@@ -28,6 +28,7 @@ var classllfio__v2__xxx_1_1byte__socket__handle =
     [ "byte_socket_handle", "classllfio__v2__xxx_1_1byte__socket__handle.html#a38eb57672e4130cf968657101b3335b6", null ],
     [ "byte_socket_handle", "classllfio__v2__xxx_1_1byte__socket__handle.html#af0c04dadd4c86ec1f367db71e42fa8ad", null ],
     [ "~byte_socket_handle", "classllfio__v2__xxx_1_1byte__socket__handle.html#a164f54952ddc3e0a769163f6c8caffe4", null ],
+    [ "_deleter", "classllfio__v2__xxx_1_1byte__socket__handle.html#a8c2e09bdbf3c17f0a2b33be6d3c211df", null ],
     [ "_do_allocate_registered_buffer", "classllfio__v2__xxx_1_1byte__socket__handle.html#a6e68ac7d62dfb84d4868b161eb25c859", null ],
     [ "_do_barrier", "classllfio__v2__xxx_1_1byte__socket__handle.html#a85fc2da7fd79abbc73228f820445ed91", null ],
     [ "_do_connect", "classllfio__v2__xxx_1_1byte__socket__handle.html#a9e8fdcc6566c5e17850c1f8633c6977d", null ],

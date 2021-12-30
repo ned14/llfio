@@ -398,6 +398,9 @@ constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 <tr class="memitem:a419865951dfcc92509477236215da888"><td class="memItemLeft" align="right" valign="top"><a id="a419865951dfcc92509477236215da888"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>QUICKCPPLIB_BITFIELD_END</b> (byte_socket_source_implementation_features) struct <a class="el" href="structllfio__v2__xxx_1_1byte__socket__source__implementation__information.html">byte_socket_source_implementation_information</a></td></tr>
 <tr class="separator:a419865951dfcc92509477236215da888"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d88143dce3fef61d4cc711b99306b45"><td class="memItemLeft" align="right" valign="top"><a id="a2d88143dce3fef61d4cc711b99306b45"></a>
+std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="structllfio__v2__xxx_1_1byte__socket__source__implementation__information.html">byte_socket_source_implementation_information</a> &amp;v)</td></tr>
+<tr class="separator:a2d88143dce3fef61d4cc711b99306b45"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a026590e0aff0af0331ec8f8308e56724"><td class="memItemLeft" align="right" valign="top"><a id="a026590e0aff0af0331ec8f8308e56724"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207">directory_handle::filter</a> &amp;v)</td></tr>
 <tr class="separator:a026590e0aff0af0331ec8f8308e56724"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1511,14 +1514,14 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 <p>&lt; This socket source provides TLS secured sockets</p>
 <p>&lt; This socket source provides an i/o multiplexer</p>
 <p>&lt; This socket source may be able to work with compatible io multiplexers</p>
-<div class="fragment"><div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;                                                                                  {</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;none = 0U,</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;kernel_sockets =</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;(1U &lt;&lt; 0U),  <span class="comment">//!&lt; This socket source provides kernel sockets i.e. their native handles will be valid kernel sockets which can be used in `poll()` etc</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="comment"></span>tls_sockets = (1U &lt;&lt; 1U),             <span class="comment">//!&lt; This socket source provides TLS secured sockets</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment"></span>io_multiplexer = (1U &lt;&lt; 2U),          <span class="comment">//!&lt; This socket source provides an i/o multiplexer</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment"></span>foreign_io_multiplexer = (1U &lt;&lt; 3U),  <span class="comment">//!&lt; This socket source may be able to work with compatible io multiplexers</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment"></span>all = 0xffffffff} QUICKCPPLIB_BITFIELD_END(byte_socket_source_implementation_features)</div>
+<div class="fragment"><div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;                                                                                  {</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;none = 0U,</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;kernel_sockets =</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;(1U &lt;&lt; 0U),  <span class="comment">//!&lt; This socket source provides kernel sockets i.e. their native handles will be valid kernel sockets which can be used in `poll()` etc</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="comment"></span>tls_sockets = (1U &lt;&lt; 1U),             <span class="comment">//!&lt; This socket source provides TLS secured sockets</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment"></span>io_multiplexer = (1U &lt;&lt; 2U),          <span class="comment">//!&lt; This socket source provides an i/o multiplexer</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="comment"></span>foreign_io_multiplexer = (1U &lt;&lt; 3U),  <span class="comment">//!&lt; This socket source may be able to work with compatible io multiplexers</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment"></span>all = 0xffffffff} QUICKCPPLIB_BITFIELD_END(byte_socket_source_implementation_features)</div>
 </div><!-- fragment -->
 </div>
 </div>
