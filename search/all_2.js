@@ -36,8 +36,7 @@ var searchData=
   ['byte_5fsocket_5fsource_5fhandle_5fptr_75',['byte_socket_source_handle_ptr',['../namespacellfio__v2__xxx.html#a3b1fc5e08959bfaac325426e1ee0d7c9',1,'llfio_v2_xxx']]],
   ['byte_5fsocket_5fsource_5fimplementation_5finformation_76',['byte_socket_source_implementation_information',['../structllfio__v2__xxx_1_1byte__socket__source__implementation__information.html',1,'llfio_v2_xxx']]],
   ['byte_5fsocket_5fsource_5fptr_77',['byte_socket_source_ptr',['../namespacellfio__v2__xxx.html#a83730967ac2e59f1fc1a83fd86085a0c',1,'llfio_v2_xxx']]],
-  ['byte_5fsocket_5fsource_5fregistry_78',['byte_socket_source_registry',['../classllfio__v2__xxx_1_1byte__socket__source__registry.html',1,'llfio_v2_xxx']]],
-  ['bytes_5fstored_79',['bytes_stored',['../classkvstore__v1__xxx_1_1basic__key__value__store.html#a30c0545051ee08ab7b4cd9c76b0a8cb0',1,'kvstore_v1_xxx::basic_key_value_store']]],
-  ['bytes_5ftransferred_80',['bytes_transferred',['../structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html#ae297202420462506d9192c2b2600471b',1,'llfio_v2_xxx::byte_io_multiplexer::io_result']]],
-  ['build_20instructions_81',['Build instructions',['../md__build.html',1,'']]]
+  ['bytes_5fstored_78',['bytes_stored',['../classkvstore__v1__xxx_1_1basic__key__value__store.html#a30c0545051ee08ab7b4cd9c76b0a8cb0',1,'kvstore_v1_xxx::basic_key_value_store']]],
+  ['bytes_5ftransferred_79',['bytes_transferred',['../structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html#ae297202420462506d9192c2b2600471b',1,'llfio_v2_xxx::byte_io_multiplexer::io_result']]],
+  ['build_20instructions_80',['Build instructions',['../md__build.html',1,'']]]
 ];
