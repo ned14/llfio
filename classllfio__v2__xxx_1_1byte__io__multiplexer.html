@@ -130,6 +130,7 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1const__buffer__type.html">const_buffer_type</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1implementation__information__t.html">implementation_information_t</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The implementation information returned.  <a href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1implementation__information__t.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__operation__state.html">io_operation_state</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An interface to a state for an i/o operation scheduled against an i/o multiplexer.  <a href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__operation__state.html#details">More...</a><br /></td></tr>
@@ -626,7 +627,7 @@ static constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><b>_a
 </table>
 </div><div class="memdoc">
 <p>Implements <code>byte_io_handle</code> registration. The bottom two bits of the returned value are set into <code>_v.behaviour</code>'s <code>_multiplexer_state_bit0</code> and <code>_multiplexer_state_bit</code> </p>
-<div class="fragment"><div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;{ <span class="keywordflow">return</span> (uint8_t) 0; }</div>
+<div class="fragment"><div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;{ <span class="keywordflow">return</span> (uint8_t) 0; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -654,7 +655,7 @@ static constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><b>_a
 </table>
 </div><div class="memdoc">
 <p>Implements <code>listening_socket_handle</code> registration. The bottom two bits of the returned value are set into <code>_v.behaviour</code>'s <code>_multiplexer_state_bit0</code> and <code>_multiplexer_state_bit</code> </p>
-<div class="fragment"><div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;{ <span class="keywordflow">return</span> errc::operation_not_supported; }</div>
+<div class="fragment"><div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;{ <span class="keywordflow">return</span> errc::operation_not_supported; }</div>
 </div><!-- fragment -->
 </div>
 </div>

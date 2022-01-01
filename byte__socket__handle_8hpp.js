@@ -24,5 +24,11 @@ var byte__socket__handle_8hpp =
     [ "make_address_v6", "byte__socket__handle_8hpp.html#a20fd9dd208ab6b8f60f4b15f56c259dd", null ],
     [ "make_address_v6", "byte__socket__handle_8hpp.html#a1d8bff0582308aa1864d17663c5e34fc", null ],
     [ "operator<<", "byte__socket__handle_8hpp.html#a6765418b2c35f959b2eeed474b20db03", null ],
-    [ "resolve", "byte__socket__handle_8hpp.html#a683e36b652b458600d5dee91389c1b3f", null ]
+    [ "QUICKCPPLIB_BITFIELD_BEGIN", "byte__socket__handle_8hpp.html#aaf1d36169c4576c6d0917fc17cd6e17e", null ],
+    [ "QUICKCPPLIB_BITFIELD_END", "byte__socket__handle_8hpp.html#a27328312a9ba596942b36b4adcd43433", null ],
+    [ "resolve_trim_cache", "byte__socket__handle_8hpp.html#a10295dc13fad53bb539533871e747eb2", null ],
+    [ "_family", "byte__socket__handle_8hpp.html#a260aebfdb57084b90e721bad166bc2ff", null ],
+    [ "d", "byte__socket__handle_8hpp.html#a6511dde2ae512a6262ac979a2fd28a51", null ],
+    [ "flags", "byte__socket__handle_8hpp.html#a9cc4f2c010893bac428decc77e0f93a0", null ],
+    [ "service", "byte__socket__handle_8hpp.html#a32f9d03d00478ba190c1160b08c46338", null ]
 ];

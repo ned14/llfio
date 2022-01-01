@@ -16,6 +16,8 @@ var hierarchy =
     [ "llfio_v2_xxx::listening_socket_handle::buffers_type", "structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type.html", null ],
     [ "llfio_v2_xxx::symlink_handle::buffers_type", "structllfio__v2__xxx_1_1symlink__handle_1_1buffers__type.html", null ],
     [ "llfio_v2_xxx::dynamic_thread_pool_group::io_aware_work_item::byte_io_handle_awareness", "structllfio__v2__xxx_1_1dynamic__thread__pool__group_1_1io__aware__work__item_1_1byte__io__handle__awareness.html", null ],
+    [ "llfio_v2_xxx::byte_socket_source", "classllfio__v2__xxx_1_1byte__socket__source.html", null ],
+    [ "llfio_v2_xxx::byte_socket_source_implementation_information", "structllfio__v2__xxx_1_1byte__socket__source__implementation__information.html", null ],
     [ "llfio_v2_xxx::map_handle::cache_statistics", "structllfio__v2__xxx_1_1map__handle_1_1cache__statistics.html", null ],
     [ "llfio_v2_xxx::byte_io_multiplexer::check_for_any_completed_io_statistics", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1check__for__any__completed__io__statistics.html", null ],
     [ "llfio_v2_xxx::byte_io_multiplexer::const_buffer_type", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1const__buffer__type.html", null ],
