@@ -133,10 +133,6 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 template&lt;class T &gt; </td></tr>
 <tr class="memitem:adcdbc6cb5745f45809746034211392c4"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>io_result</b> = result&lt; T &gt;</td></tr>
 <tr class="separator:adcdbc6cb5745f45809746034211392c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4443dd89bc76ba7193374a2b27d111be"><td class="memTemplParams" colspan="2"><a id="a4443dd89bc76ba7193374a2b27d111be"></a>
-template&lt;class T &gt; </td></tr>
-<tr class="memitem:a4443dd89bc76ba7193374a2b27d111be"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>awaitable</b> = <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html">byte_io_multiplexer::awaitable</a>&lt; T &gt;</td></tr>
-<tr class="separator:a4443dd89bc76ba7193374a2b27d111be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa3930273a2d4cabbac309e0b75701dca"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a> : unsigned char { <br />
 &#160;&#160;<b>unchanged</b> = 0, 
 <a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaa334c4a4c42fdb79d7ebc3e73b517e6f8">mode::none</a> = 2, 
@@ -190,9 +186,6 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aa456171a0524a0d6b605b947c261e5a6"><td class="memItemLeft" align="right" valign="top"><a id="aa456171a0524a0d6b605b947c261e5a6"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>_deleter</b> ()</td></tr>
-<tr class="separator:aa456171a0524a0d6b605b947c261e5a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4a6e04f4ec6aabdefc519c8cfd8f80fc"><td class="memItemLeft" align="right" valign="top"><a id="a4a6e04f4ec6aabdefc519c8cfd8f80fc"></a>
 constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1listening__socket__handle.html#a4a6e04f4ec6aabdefc519c8cfd8f80fc">listening_socket_handle</a> ()</td></tr>
 <tr class="memdesc:a4a6e04f4ec6aabdefc519c8cfd8f80fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
@@ -245,9 +238,6 @@ virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom">
 <tr class="separator:aea4cec4998790fc46edd3cd353c73ab5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a978b28297339da8850604e61c2d70ea1"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type.html">buffers_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1listening__socket__handle.html#a978b28297339da8850604e61c2d70ea1">read</a> (<a class="el" href="structllfio__v2__xxx_1_1listening__socket__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type.html">buffers_type</a> &gt; req, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d={}) noexcept</td></tr>
 <tr class="separator:a978b28297339da8850604e61c2d70ea1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a45e862bcb85fa219d0cc3a49c9673d8e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html">awaitable</a>&lt; io_result&lt; <a class="el" href="structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type.html">buffers_type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1listening__socket__handle.html#a45e862bcb85fa219d0cc3a49c9673d8e">co_read</a> (<a class="el" href="structllfio__v2__xxx_1_1listening__socket__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type.html">buffers_type</a> &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d={}) noexcept</td></tr>
-<tr class="memdesc:a45e862bcb85fa219d0cc3a49c9673d8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">A coroutinised equivalent to <code>.read()</code> which suspends the coroutine until a new incoming connection occurs. <b>Blocks execution</b> i.e is equivalent to <code>.read()</code> if no i/o multiplexer has been set on this handle!  <a href="classllfio__v2__xxx_1_1listening__socket__handle.html#a45e862bcb85fa219d0cc3a49c9673d8e">More...</a><br /></td></tr>
-<tr class="separator:a45e862bcb85fa219d0cc3a49c9673d8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac5222904f116c9beb0515a4a5aa850bf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#ac5222904f116c9beb0515a4a5aa850bf">QUICKCPPLIB_BITFIELD_BEGIN</a> (flag)</td></tr>
 <tr class="memdesc:ac5222904f116c9beb0515a4a5aa850bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bitwise flags which can be specified.  <a href="classllfio__v2__xxx_1_1handle.html#ac5222904f116c9beb0515a4a5aa850bf">More...</a><br /></td></tr>
 <tr class="separator:ac5222904f116c9beb0515a4a5aa850bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -647,45 +637,6 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b> {flag::non
 
 </div>
 </div>
-<a id="a45e862bcb85fa219d0cc3a49c9673d8e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a45e862bcb85fa219d0cc3a49c9673d8e">&#9670;&nbsp;</a></span>co_read()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html">awaitable</a>&lt;io_result&lt;<a class="el" href="structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type.html">buffers_type</a>&gt; &gt; llfio_v2_xxx::listening_socket_handle::co_read </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1listening__socket__handle_1_1io__request.html">io_request</a>&lt; <a class="el" href="structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type.html">buffers_type</a> &gt;&#160;</td>
-          <td class="paramname"><em>reqs</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
-          <td class="paramname"><em>d</em> = <code>{}</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>A coroutinised equivalent to <code>.read()</code> which suspends the coroutine until a new incoming connection occurs. <b>Blocks execution</b> i.e is equivalent to <code>.read()</code> if no i/o multiplexer has been set on this handle! </p>
-<p>The awaitable returned is <b>eager</b> i.e. it immediately begins the i/o. If the i/o completes and finishes immediately, no coroutine suspension occurs. </p>
-
-</div>
-</div>
 <a id="a00a85eec5a41f7edb2c574d40cf04535"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a00a85eec5a41f7edb2c574d40cf04535">&#9670;&nbsp;</a></span>current_path()</h2>
 
@@ -962,10 +913,10 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b> {flag::non
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable\n Any of the errors which accept() or WSAAccept() might return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00948"></a><span class="lineno">  948</span>&#160;                                                                       {}) noexcept</div>
-<div class="line"><a name="l00949"></a><span class="lineno">  949</span>&#160;  {</div>
-<div class="line"><a name="l00950"></a><span class="lineno">  950</span>&#160;    <span class="keywordflow">return</span> (_ctx == <span class="keyword">nullptr</span>) ? _do_read(std::move(req), d) : _do_multiplexer_read(std::move(req), d);</div>
-<div class="line"><a name="l00951"></a><span class="lineno">  951</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00906"></a><span class="lineno">  906</span>&#160;                                                                       {}) noexcept</div>
+<div class="line"><a name="l00907"></a><span class="lineno">  907</span>&#160;  {</div>
+<div class="line"><a name="l00908"></a><span class="lineno">  908</span>&#160;    <span class="keywordflow">return</span> (_ctx == <span class="keyword">nullptr</span>) ? _do_read(std::move(req), d) : _do_multiplexer_read(std::move(req), d);</div>
+<div class="line"><a name="l00909"></a><span class="lineno">  909</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1030,36 +981,36 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b> {flag::non
 <p>Note that this call deregisters this handle from any existing i/o multiplexer, and registers it with the new i/o multiplexer. You must therefore not call it if any i/o is currently outstanding on this handle. You should also be aware that multiple dynamic memory allocations and deallocations may occur, as well as multiple syscalls (i.e. this is an expensive call, try to do it from cold code).</p>
 <p>If the handle was not created as multiplexable, this call always fails.</p>
 <dl class="section user"><dt>Memory Allocations\n Multiple dynamic memory allocations and deallocations.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00978"></a><span class="lineno">  978</span>&#160;{</div>
-<div class="line"><a name="l00979"></a><span class="lineno">  979</span>&#160;  <span class="keywordflow">if</span>(!<a class="code" href="classllfio__v2__xxx_1_1handle.html#ade2416b9154d1e56937c99cd514324f8">is_multiplexable</a>())</div>
-<div class="line"><a name="l00980"></a><span class="lineno">  980</span>&#160;  {</div>
-<div class="line"><a name="l00981"></a><span class="lineno">  981</span>&#160;    <span class="keywordflow">return</span> errc::operation_not_supported;</div>
-<div class="line"><a name="l00982"></a><span class="lineno">  982</span>&#160;  }</div>
-<div class="line"><a name="l00983"></a><span class="lineno">  983</span>&#160;  <span class="keywordflow">if</span>(c == _ctx)</div>
-<div class="line"><a name="l00984"></a><span class="lineno">  984</span>&#160;  {</div>
-<div class="line"><a name="l00985"></a><span class="lineno">  985</span>&#160;    <span class="keywordflow">return</span> success();</div>
-<div class="line"><a name="l00986"></a><span class="lineno">  986</span>&#160;  }</div>
-<div class="line"><a name="l00987"></a><span class="lineno">  987</span>&#160;  <span class="keywordflow">if</span>(_ctx != <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l00988"></a><span class="lineno">  988</span>&#160;  {</div>
-<div class="line"><a name="l00989"></a><span class="lineno">  989</span>&#160;    OUTCOME_TRY(_ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a26c52ec51bcb3e27c457c51c6bae4112">do_byte_io_handle_deregister</a>(<span class="keyword">this</span>));</div>
-<div class="line"><a name="l00990"></a><span class="lineno">  990</span>&#160;    _ctx = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00991"></a><span class="lineno">  991</span>&#160;  }</div>
-<div class="line"><a name="l00992"></a><span class="lineno">  992</span>&#160;  <span class="keywordflow">if</span>(c != <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l00993"></a><span class="lineno">  993</span>&#160;  {</div>
-<div class="line"><a name="l00994"></a><span class="lineno">  994</span>&#160;    OUTCOME_TRY(<span class="keyword">auto</span> &amp;&amp;state, c-&gt;do_byte_io_handle_register(<span class="keyword">this</span>));</div>
-<div class="line"><a name="l00995"></a><span class="lineno">  995</span>&#160;    _v.behaviour = (_v.behaviour &amp; ~(native_handle_type::disposition::_multiplexer_state_bit0 | native_handle_type::disposition::_multiplexer_state_bit1));</div>
-<div class="line"><a name="l00996"></a><span class="lineno">  996</span>&#160;    <span class="keywordflow">if</span>((state &amp; 1) != 0)</div>
-<div class="line"><a name="l00997"></a><span class="lineno">  997</span>&#160;    {</div>
-<div class="line"><a name="l00998"></a><span class="lineno">  998</span>&#160;      _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit0;</div>
-<div class="line"><a name="l00999"></a><span class="lineno">  999</span>&#160;    }</div>
-<div class="line"><a name="l01000"></a><span class="lineno"> 1000</span>&#160;    <span class="keywordflow">if</span>((state &amp; 2) != 0)</div>
-<div class="line"><a name="l01001"></a><span class="lineno"> 1001</span>&#160;    {</div>
-<div class="line"><a name="l01002"></a><span class="lineno"> 1002</span>&#160;      _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit1;</div>
-<div class="line"><a name="l01003"></a><span class="lineno"> 1003</span>&#160;    }</div>
-<div class="line"><a name="l01004"></a><span class="lineno"> 1004</span>&#160;  }</div>
-<div class="line"><a name="l01005"></a><span class="lineno"> 1005</span>&#160;  _ctx = c;</div>
-<div class="line"><a name="l01006"></a><span class="lineno"> 1006</span>&#160;  <span class="keywordflow">return</span> success();</div>
-<div class="line"><a name="l01007"></a><span class="lineno"> 1007</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00915"></a><span class="lineno">  915</span>&#160;{</div>
+<div class="line"><a name="l00916"></a><span class="lineno">  916</span>&#160;  <span class="keywordflow">if</span>(!<a class="code" href="classllfio__v2__xxx_1_1handle.html#ade2416b9154d1e56937c99cd514324f8">is_multiplexable</a>())</div>
+<div class="line"><a name="l00917"></a><span class="lineno">  917</span>&#160;  {</div>
+<div class="line"><a name="l00918"></a><span class="lineno">  918</span>&#160;    <span class="keywordflow">return</span> errc::operation_not_supported;</div>
+<div class="line"><a name="l00919"></a><span class="lineno">  919</span>&#160;  }</div>
+<div class="line"><a name="l00920"></a><span class="lineno">  920</span>&#160;  <span class="keywordflow">if</span>(c == _ctx)</div>
+<div class="line"><a name="l00921"></a><span class="lineno">  921</span>&#160;  {</div>
+<div class="line"><a name="l00922"></a><span class="lineno">  922</span>&#160;    <span class="keywordflow">return</span> success();</div>
+<div class="line"><a name="l00923"></a><span class="lineno">  923</span>&#160;  }</div>
+<div class="line"><a name="l00924"></a><span class="lineno">  924</span>&#160;  <span class="keywordflow">if</span>(_ctx != <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l00925"></a><span class="lineno">  925</span>&#160;  {</div>
+<div class="line"><a name="l00926"></a><span class="lineno">  926</span>&#160;    OUTCOME_TRY(_ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a26c52ec51bcb3e27c457c51c6bae4112">do_byte_io_handle_deregister</a>(<span class="keyword">this</span>));</div>
+<div class="line"><a name="l00927"></a><span class="lineno">  927</span>&#160;    _ctx = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00928"></a><span class="lineno">  928</span>&#160;  }</div>
+<div class="line"><a name="l00929"></a><span class="lineno">  929</span>&#160;  <span class="keywordflow">if</span>(c != <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l00930"></a><span class="lineno">  930</span>&#160;  {</div>
+<div class="line"><a name="l00931"></a><span class="lineno">  931</span>&#160;    OUTCOME_TRY(<span class="keyword">auto</span> &amp;&amp;state, c-&gt;do_byte_io_handle_register(<span class="keyword">this</span>));</div>
+<div class="line"><a name="l00932"></a><span class="lineno">  932</span>&#160;    _v.behaviour = (_v.behaviour &amp; ~(native_handle_type::disposition::_multiplexer_state_bit0 | native_handle_type::disposition::_multiplexer_state_bit1));</div>
+<div class="line"><a name="l00933"></a><span class="lineno">  933</span>&#160;    <span class="keywordflow">if</span>((state &amp; 1) != 0)</div>
+<div class="line"><a name="l00934"></a><span class="lineno">  934</span>&#160;    {</div>
+<div class="line"><a name="l00935"></a><span class="lineno">  935</span>&#160;      _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit0;</div>
+<div class="line"><a name="l00936"></a><span class="lineno">  936</span>&#160;    }</div>
+<div class="line"><a name="l00937"></a><span class="lineno">  937</span>&#160;    <span class="keywordflow">if</span>((state &amp; 2) != 0)</div>
+<div class="line"><a name="l00938"></a><span class="lineno">  938</span>&#160;    {</div>
+<div class="line"><a name="l00939"></a><span class="lineno">  939</span>&#160;      _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit1;</div>
+<div class="line"><a name="l00940"></a><span class="lineno">  940</span>&#160;    }</div>
+<div class="line"><a name="l00941"></a><span class="lineno">  941</span>&#160;  }</div>
+<div class="line"><a name="l00942"></a><span class="lineno">  942</span>&#160;  _ctx = c;</div>
+<div class="line"><a name="l00943"></a><span class="lineno">  943</span>&#160;  <span class="keywordflow">return</span> success();</div>
+<div class="line"><a name="l00944"></a><span class="lineno">  944</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1068,9 +1019,9 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b> {flag::non
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__multiplexer_html_a26c52ec51bcb3e27c457c51c6bae4112"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a26c52ec51bcb3e27c457c51c6bae4112">llfio_v2_xxx::byte_io_multiplexer::do_byte_io_handle_deregister</a></div><div class="ttdeci">virtual result&lt; void &gt; do_byte_io_handle_deregister(byte_io_handle *) noexcept</div><div class="ttdoc">Implements byte_io_handle deregistration.</div><div class="ttdef"><b>Definition:</b> byte_io_multiplexer.hpp:528</div></div>
-<div class="ttc" id="anamespacellfio__v2__xxx_html_a59a3e33e0a5f68b867049fd640059b4d"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a59a3e33e0a5f68b867049fd640059b4d">llfio_v2_xxx::write</a></div><div class="ttdeci">byte_io_handle::io_result&lt; byte_io_handle::const_buffers_type &gt; write(byte_io_handle &amp;self, byte_io_handle::io_request&lt; byte_io_handle::const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the open handle.</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:681</div></div>
-<div class="ttc" id="anamespacellfio__v2__xxx_html_acbd9eb25fed94bb0bc8fa888b3c26bdf"><div class="ttname"><a href="namespacellfio__v2__xxx.html#acbd9eb25fed94bb0bc8fa888b3c26bdf">llfio_v2_xxx::read</a></div><div class="ttdeci">byte_io_handle::io_result&lt; byte_io_handle::buffers_type &gt; read(byte_io_handle &amp;self, byte_io_handle::io_request&lt; byte_io_handle::buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Read data from the open handle.</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:654</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__multiplexer_html_a26c52ec51bcb3e27c457c51c6bae4112"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a26c52ec51bcb3e27c457c51c6bae4112">llfio_v2_xxx::byte_io_multiplexer::do_byte_io_handle_deregister</a></div><div class="ttdeci">virtual result&lt; void &gt; do_byte_io_handle_deregister(byte_io_handle *) noexcept</div><div class="ttdoc">Implements byte_io_handle deregistration.</div><div class="ttdef"><b>Definition:</b> byte_io_multiplexer.hpp:527</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_a59a3e33e0a5f68b867049fd640059b4d"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a59a3e33e0a5f68b867049fd640059b4d">llfio_v2_xxx::write</a></div><div class="ttdeci">byte_io_handle::io_result&lt; byte_io_handle::const_buffers_type &gt; write(byte_io_handle &amp;self, byte_io_handle::io_request&lt; byte_io_handle::const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the open handle.</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:672</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_acbd9eb25fed94bb0bc8fa888b3c26bdf"><div class="ttname"><a href="namespacellfio__v2__xxx.html#acbd9eb25fed94bb0bc8fa888b3c26bdf">llfio_v2_xxx::read</a></div><div class="ttdeci">byte_io_handle::io_result&lt; byte_io_handle::buffers_type &gt; read(byte_io_handle &amp;self, byte_io_handle::io_request&lt; byte_io_handle::buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Read data from the open handle.</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:645</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_ade2416b9154d1e56937c99cd514324f8"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#ade2416b9154d1e56937c99cd514324f8">llfio_v2_xxx::handle::is_multiplexable</a></div><div class="ttdeci">bool is_multiplexable() const noexcept</div><div class="ttdoc">True if multiplexable.</div><div class="ttdef"><b>Definition:</b> handle.hpp:372</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

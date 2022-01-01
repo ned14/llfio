@@ -3,7 +3,6 @@ var dir_ff8d8ad368a820031e12dd9b12d79036 =
     [ "algorithm", "dir_2e3f7bf739bad988e6850471c071ba11.html", "dir_2e3f7bf739bad988e6850471c071ba11" ],
     [ "byte_io_handle.hpp", "byte__io__handle_8hpp.html", "byte__io__handle_8hpp" ],
     [ "byte_socket_handle.hpp", "byte__socket__handle_8hpp.html", "byte__socket__handle_8hpp" ],
-    [ "byte_socket_source.hpp", "byte__socket__source_8hpp.html", "byte__socket__source_8hpp" ],
     [ "config.hpp", "config_8hpp.html", "config_8hpp" ],
     [ "deadline.h", "deadline_8h.html", "deadline_8h" ],
     [ "directory_handle.hpp", "directory__handle_8hpp.html", "directory__handle_8hpp" ],

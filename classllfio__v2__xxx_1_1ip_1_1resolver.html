@@ -97,26 +97,18 @@ $(document).ready(function(){initNavTree('classllfio__v2__xxx_1_1ip_1_1resolver.
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a504e81fed24674a4a6cf37e48093f231"><td class="memItemLeft" align="right" valign="top"><a id="a504e81fed24674a4a6cf37e48093f231"></a>
-const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1ip_1_1resolver.html#a504e81fed24674a4a6cf37e48093f231">name</a> () const noexcept</td></tr>
-<tr class="memdesc:a504e81fed24674a4a6cf37e48093f231"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the name being resolved. <br /></td></tr>
-<tr class="separator:a504e81fed24674a4a6cf37e48093f231"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a78692e33db78bf3dfec9ecfd86a8df50"><td class="memItemLeft" align="right" valign="top"><a id="a78692e33db78bf3dfec9ecfd86a8df50"></a>
-const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1ip_1_1resolver.html#a78692e33db78bf3dfec9ecfd86a8df50">service</a> () const noexcept</td></tr>
-<tr class="memdesc:a78692e33db78bf3dfec9ecfd86a8df50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the service being resolved. <br /></td></tr>
-<tr class="separator:a78692e33db78bf3dfec9ecfd86a8df50"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c2defec70aa977a395eca04e1bf79d4"><td class="memItemLeft" align="right" valign="top"><a id="a1c2defec70aa977a395eca04e1bf79d4"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1ip_1_1resolver.html#a1c2defec70aa977a395eca04e1bf79d4">incomplete</a> () const noexcept</td></tr>
 <tr class="memdesc:a1c2defec70aa977a395eca04e1bf79d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the deadline expired, and the returned list of addresses is incomplete. Until <code>get()</code> is called, always is true. <br /></td></tr>
 <tr class="separator:a1c2defec70aa977a395eca04e1bf79d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a495067649548755a55ef7f514a76c512"><td class="memItemLeft" align="right" valign="top"><a id="a495067649548755a55ef7f514a76c512"></a>
-result&lt; span&lt; <a class="el" href="classllfio__v2__xxx_1_1ip_1_1address.html">address</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1ip_1_1resolver.html#a495067649548755a55ef7f514a76c512">get</a> () noexcept</td></tr>
-<tr class="memdesc:a495067649548755a55ef7f514a76c512"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the array of addresses, blocking until completion if necessary, returning any error if one occurred. <br /></td></tr>
-<tr class="separator:a495067649548755a55ef7f514a76c512"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6675c09213b244cfb774964d3e82eb89"><td class="memItemLeft" align="right" valign="top"><a id="a6675c09213b244cfb774964d3e82eb89"></a>
-result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1ip_1_1resolver.html#a6675c09213b244cfb774964d3e82eb89">wait</a> (<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d={}) noexcept</td></tr>
-<tr class="memdesc:a6675c09213b244cfb774964d3e82eb89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for up the deadline for the array of addresses to be retrieved. <br /></td></tr>
-<tr class="separator:a6675c09213b244cfb774964d3e82eb89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6fb7cf619e97c56cd0da7a5a5dfec253"><td class="memItemLeft" align="right" valign="top"><a id="a6fb7cf619e97c56cd0da7a5a5dfec253"></a>
+result&lt; span&lt; <a class="el" href="classllfio__v2__xxx_1_1ip_1_1address.html">address</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1ip_1_1resolver.html#a6fb7cf619e97c56cd0da7a5a5dfec253">get</a> () const noexcept</td></tr>
+<tr class="memdesc:a6fb7cf619e97c56cd0da7a5a5dfec253"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the array of addresses, blocking until completion if necessary, returning any error if one occurred. <br /></td></tr>
+<tr class="separator:a6fb7cf619e97c56cd0da7a5a5dfec253"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c59862daf449c7df8dc22bd3a98fa5f"><td class="memItemLeft" align="right" valign="top"><a id="a6c59862daf449c7df8dc22bd3a98fa5f"></a>
+result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1ip_1_1resolver.html#a6c59862daf449c7df8dc22bd3a98fa5f">wait</a> (<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d={}) const noexcept</td></tr>
+<tr class="memdesc:a6c59862daf449c7df8dc22bd3a98fa5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for up the deadline for the array of addresses to be retrieved. <br /></td></tr>
+<tr class="separator:a6c59862daf449c7df8dc22bd3a98fa5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a776ded943dd6d80d52301828c6d00b62"><td class="memTemplParams" colspan="2"><a id="a776ded943dd6d80d52301828c6d00b62"></a>
 template&lt;class Rep , class Period &gt; </td></tr>
 <tr class="memitem:a776ded943dd6d80d52301828c6d00b62"><td class="memTemplItemLeft" align="right" valign="top">result&lt; bool &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1ip_1_1resolver.html#a776ded943dd6d80d52301828c6d00b62">wait_for</a> (const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) const noexcept</td></tr>

@@ -2,7 +2,6 @@ var classllfio__v2__xxx_1_1listening__socket__handle =
 [
     [ "buffers_type", "structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type.html", "structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type" ],
     [ "io_request", "structllfio__v2__xxx_1_1listening__socket__handle_1_1io__request.html", "structllfio__v2__xxx_1_1listening__socket__handle_1_1io__request" ],
-    [ "awaitable", "classllfio__v2__xxx_1_1listening__socket__handle.html#a4443dd89bc76ba7193374a2b27d111be", null ],
     [ "buffer_type", "classllfio__v2__xxx_1_1listening__socket__handle.html#a89e4536c8ab307552e576137c6d00d9b", null ],
     [ "const_buffer_type", "classllfio__v2__xxx_1_1listening__socket__handle.html#ab0b1a3b7c06efe20e161e1f40b2a3773", null ],
     [ "const_buffers_type", "classllfio__v2__xxx_1_1listening__socket__handle.html#ad352cb3d6028322d3161c339437de1e2", null ],
@@ -42,7 +41,6 @@ var classllfio__v2__xxx_1_1listening__socket__handle =
     [ "listening_socket_handle", "classllfio__v2__xxx_1_1listening__socket__handle.html#a00dcf8c0cfba92a5c679befdf855382b", null ],
     [ "listening_socket_handle", "classllfio__v2__xxx_1_1listening__socket__handle.html#aa5c07bf533928b2122daff8bed97bc06", null ],
     [ "~listening_socket_handle", "classllfio__v2__xxx_1_1listening__socket__handle.html#a6b2983851a165335ffede29c18d7d43a", null ],
-    [ "_deleter", "classllfio__v2__xxx_1_1listening__socket__handle.html#aa456171a0524a0d6b605b947c261e5a6", null ],
     [ "_do_multiplexer_read", "classllfio__v2__xxx_1_1listening__socket__handle.html#a6838c06fc097aae8f96c56a9dd6a821b", null ],
     [ "_do_read", "classllfio__v2__xxx_1_1listening__socket__handle.html#abc09e502f38985d54e30bcd668d0168f", null ],
     [ "are_reads_from_cache", "classllfio__v2__xxx_1_1listening__socket__handle.html#a7126a726b2a06e4c1eca1a94c41163ff", null ],
@@ -51,7 +49,6 @@ var classllfio__v2__xxx_1_1listening__socket__handle =
     [ "bind", "classllfio__v2__xxx_1_1listening__socket__handle.html#a43eeccbd3730522a6dd0eeb245828ba6", null ],
     [ "clone", "classllfio__v2__xxx_1_1listening__socket__handle.html#aeea4389189021b94dde6d8f2c3ccc5b3", null ],
     [ "close", "classllfio__v2__xxx_1_1listening__socket__handle.html#aea4cec4998790fc46edd3cd353c73ab5", null ],
-    [ "co_read", "classllfio__v2__xxx_1_1listening__socket__handle.html#a45e862bcb85fa219d0cc3a49c9673d8e", null ],
     [ "current_path", "classllfio__v2__xxx_1_1listening__socket__handle.html#a00a85eec5a41f7edb2c574d40cf04535", null ],
     [ "flags", "classllfio__v2__xxx_1_1listening__socket__handle.html#a013936bc1254b1a47567fe29698d1b1c", null ],
     [ "is_allocation", "classllfio__v2__xxx_1_1listening__socket__handle.html#a028fbead3b3c4d4eed2da7fa51c75036", null ],
