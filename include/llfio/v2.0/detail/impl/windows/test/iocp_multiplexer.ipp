@@ -132,10 +132,6 @@ namespace test
       windows_nt_kernel::init();
       using namespace windows_nt_kernel;
       LLFIO_LOG_FUNCTION_CALL(this);
-      if(!h->is_kernel_handle())
-      {
-        return errc::bad_file_descriptor;
-      }
       IO_STATUS_BLOCK isb = make_iostatus();
       FILE_COMPLETION_INFORMATION fci{};
       memset(&fci, 0, sizeof(fci));

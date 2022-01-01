@@ -25,6 +25,13 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../byte_socket_handle.hpp"
 #include "import.hpp"
 
+#if LLFIO_EXPERIMENTAL_STATUS_CODE
+#include "outcome/experimental/status-code/include/getaddrinfo_code.hpp"
+#else
+#include "../getaddrinfo_category.hpp"
+#endif
+
+#include <netdb.h>
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
 #include <poll.h>
@@ -34,7 +41,438 @@ Distributed under the Boost Software License, Version 1.0.
 #include <fcntl.h>
 #endif
 
+#ifndef LLFIO_IP_ADDRESS_RESOLVER_USE_ASYNC_GETADDRINFO
+/* Benchmarking shows that getaddrinfo_a() is implemented using a thread pool.
+Therefore there seems no benefit to drag in an unnecessary extra library
+dependency if we already have a local thread pool based implementation.
+*/
+//#ifdef __linux__
+//#define LLFIO_IP_ADDRESS_RESOLVER_USE_ASYNC_GETADDRINFO 1
+//#else
+#define LLFIO_IP_ADDRESS_RESOLVER_USE_ASYNC_GETADDRINFO 0
+//#endif
+#endif
+
+#include <string>
+#include <vector>
+
+#if !LLFIO_IP_ADDRESS_RESOLVER_USE_ASYNC_GETADDRINFO
+#include <future>  // for std::async
+#endif
+
 LLFIO_V2_NAMESPACE_BEGIN
+
+namespace ip
+{
+  namespace detail
+  {
+    struct resolver_impl : resolver
+    {
+      std::string name, service;
+      std::chrono::steady_clock::time_point deadline_relative;
+      std::chrono::system_clock::time_point deadline_absolute;
+      std::vector<address> addresses;
+      ::addrinfo hints;
+
+      resolver_impl(string_view _name, string_view _service)
+          : name(_name)
+          , service(_service)
+      {
+        memset(&hints, 0, sizeof(hints));
+      }
+
+#if LLFIO_IP_ADDRESS_RESOLVER_USE_ASYNC_GETADDRINFO
+      ::gaicb _req, *req{&_req};
+      std::pair<int, int> get()
+      {
+        auto retcode = gai_error(req);
+        if(retcode != 0)
+        {
+          return {retcode, errno};
+        }
+        auto unaddrinfo = make_scope_exit([&]() noexcept {
+          ::freeaddrinfo(req->ar_result);
+          req->ar_result = nullptr;
+        });
+        addresses.reserve(4);
+        for(auto *p = req->ar_result; p != nullptr; p = p->ai_next)
+        {
+          if(p->ai_socktype == SOCK_STREAM)
+          {
+            address a;
+            switch(p->ai_family)
+            {
+            default:
+              break;  // ignore
+            case AF_INET:
+              assert(p->ai_addrlen <= sizeof(address));
+              memcpy(const_cast<::sockaddr *>(a.to_sockaddr()), p->ai_addr, p->ai_addrlen);
+              assert(a.is_v4());
+              addresses.push_back(a);
+              break;
+            case AF_INET6:
+              assert(p->ai_addrlen <= sizeof(address));
+              memcpy(const_cast<::sockaddr *>(a.to_sockaddr()), p->ai_addr, p->ai_addrlen);
+              assert(a.is_v6());
+              addresses.push_back(a);
+              break;
+            }
+          }
+        }
+        return {0, 0};
+      }
+      ~resolver_impl()
+      {
+        if(req->ar_result != nullptr)
+        {
+          ::freeaddrinfo(req->ar_result);
+        }
+      }
+#else
+      std::future<std::pair<int, int>> task;
+      mutable std::mutex lock;
+
+      int status{0};
+      ::addrinfo *res{nullptr};
+
+      // Runs in a different thread
+      std::pair<int, int> invoke()
+      {
+        auto retcode = ::getaddrinfo(!name.empty() ? name.c_str() : nullptr, !service.empty() ? service.c_str() : nullptr, &hints, &res);
+        if(retcode != 0)
+        {
+          return {retcode, errno};
+        }
+        auto unaddrinfo = make_scope_exit([&]() noexcept {
+          ::freeaddrinfo(res);
+          res = nullptr;
+        });
+        std::lock_guard<std::mutex> g(lock);
+        if(status == -1)
+        {
+          // We have been abandoned
+          std::thread t([this] {
+            task.wait();
+            delete this;
+          });
+          t.detach();
+          return {EAI_SYSTEM, (int) errc::operation_canceled};
+        }
+        status = 1;
+        addresses.reserve(4);
+        for(auto *p = res; p != nullptr; p = p->ai_next)
+        {
+          if(p->ai_socktype == SOCK_STREAM)
+          {
+            address a;
+            switch(p->ai_family)
+            {
+            default:
+              break;  // ignore
+            case AF_INET:
+              assert(p->ai_addrlen <= sizeof(address));
+              memcpy(const_cast<::sockaddr *>(a.to_sockaddr()), p->ai_addr, p->ai_addrlen);
+              assert(a.is_v4());
+              addresses.push_back(a);
+              break;
+            case AF_INET6:
+              assert(p->ai_addrlen <= sizeof(address));
+              memcpy(const_cast<::sockaddr *>(a.to_sockaddr()), p->ai_addr, p->ai_addrlen);
+              assert(a.is_v6());
+              addresses.push_back(a);
+              break;
+            }
+          }
+        }
+        return {0, 0};
+      }
+      ~resolver_impl()
+      {
+        if(res != nullptr)
+        {
+          ::freeaddrinfo(res);
+        }
+      }
+#endif
+
+      // -1 for bounded limit passed, +1 for d passed, 0 for it's ready
+      int wait(deadline d)
+      {
+        std::chrono::nanoseconds diff;
+        int is_timedout = 0;
+        if(deadline_relative != std::chrono::steady_clock::time_point())
+        {
+          diff = deadline_relative - std::chrono::steady_clock::now();
+          is_timedout = 1;
+        }
+        else if(deadline_absolute != std::chrono::system_clock::time_point())
+        {
+          diff = deadline_absolute - std::chrono::system_clock::now();
+          is_timedout = 1;
+        }
+        if(d)
+        {
+          if(d.steady)
+          {
+            if(std::chrono::nanoseconds(d.nsecs) < diff)
+            {
+              diff = std::chrono::nanoseconds(d.nsecs);
+              is_timedout = 2;
+            }
+          }
+          else
+          {
+            auto diff2 = std::chrono::system_clock::now() - d.to_time_point();
+            if(diff2 < diff)
+            {
+              diff = diff2;
+              is_timedout = 2;
+            }
+          }
+        }
+#if LLFIO_IP_ADDRESS_RESOLVER_USE_ASYNC_GETADDRINFO
+        ::timespec *timeout = nullptr, _timeout;
+        if(is_timedout != 0)
+        {
+          if(diff < std::chrono::seconds(0))
+          {
+            if(gai_error(req) == EAI_INPROGRESS)
+            {
+              gai_cancel(req);  // note this can fail
+            }
+            if(is_timedout == 1)
+            {
+              return -1;
+            }
+            return 1;
+          }
+          _timeout.tv_sec = (long) (diff.count() / 1000000000ULL);
+          _timeout.tv_nsec = (long) (diff.count() % 1000000000ULL);
+          timeout = &_timeout;
+        }
+        auto errcode = gai_suspend(&req, 1, timeout);
+        if(errcode != EAI_ALLDONE)
+        {
+          if(is_timedout == 1)
+          {
+            return -1;
+          }
+          return 1;
+        }
+#else
+        if(!task.valid())
+        {
+          return 0;
+        }
+        if(is_timedout == 0)
+        {
+          task.wait();
+        }
+        else
+        {
+          if(diff < std::chrono::seconds(0) || std::future_status::timeout == task.wait_for(diff))
+          {
+            if(is_timedout == 1)
+            {
+              return -1;
+            }
+            return 1;
+          }
+        }
+#endif
+        return 0;
+      }
+    };
+    void resolver_deleter::operator()(resolver *_p) const
+    {
+      auto *p = static_cast<resolver_impl *>(_p);
+#if LLFIO_IP_ADDRESS_RESOLVER_USE_ASYNC_GETADDRINFO
+      while(gai_error(p->req) == EAI_INPROGRESS)
+      {
+        gai_cancel(p->req);  // note this can fail
+      }
+#else
+      if(p->task.valid() && std::future_status::timeout == p->task.wait_for(std::chrono::seconds(0)))
+      {
+        std::lock_guard<std::mutex> g(p->lock);
+        if(p->status == 0)
+        {
+          p->status = -1;  // abandoned
+          return;
+        }
+      }
+#endif
+      delete p;
+    }
+  }  // namespace detail
+
+  const std::string &resolver::name() const noexcept
+  {
+    auto *self = static_cast<const detail::resolver_impl *>(this);
+    return self->name;
+  }
+  const std::string &resolver::service() const noexcept
+  {
+    auto *self = static_cast<const detail::resolver_impl *>(this);
+    return self->service;
+  }
+  bool resolver::incomplete() const noexcept
+  {
+    auto *self = static_cast<const detail::resolver_impl *>(this);
+#if LLFIO_IP_ADDRESS_RESOLVER_USE_ASYNC_GETADDRINFO
+    return gai_error(self->req) == EAI_INPROGRESS;
+#else
+    std::lock_guard<std::mutex> g(self->lock);
+    return self->status != 1;
+#endif
+  }
+  result<span<address>> resolver::get() noexcept
+  {
+    auto *self = static_cast<detail::resolver_impl *>(this);
+    auto timedout = self->wait({});
+    std::pair<int, int> retcode{0, 0};
+    switch(timedout)
+    {
+    case -1:  // bounded limit passed
+      return errc::operation_canceled;
+    case 0:  // ready
+#if LLFIO_IP_ADDRESS_RESOLVER_USE_ASYNC_GETADDRINFO
+      retcode = self->get();
+#else
+      retcode = self->task.get();
+#endif
+      break;
+    case 1:  // deadline passed
+      abort();
+    }
+#if !LLFIO_IP_ADDRESS_RESOLVER_USE_ASYNC_GETADDRINFO
+    std::lock_guard<std::mutex> g(self->lock);
+#endif
+    if(retcode.first != 0)
+    {
+      if(retcode.first == EAI_SYSTEM)
+      {
+        return posix_error(retcode.second);
+      }
+      else
+      {
+#if LLFIO_EXPERIMENTAL_STATUS_CODE
+        return SYSTEM_ERROR2_NAMESPACE::getaddrinfo_code(retcode.first);
+#else
+        return failure(std::error_code(retcode.first, getaddrinfo_category()));
+#endif
+      }
+    }
+    return span<address>(self->addresses);
+  }
+  result<void> resolver::wait(deadline d) noexcept
+  {
+    auto *self = static_cast<detail::resolver_impl *>(this);
+    self->wait(d);
+    return success();
+  }
+
+  result<resolver_ptr> resolve(string_view name, string_view service, family _family, deadline d, resolve_flag flags) noexcept
+  {
+    LLFIO_LOG_FUNCTION_CALL(nullptr);
+    try
+    {
+      detail::resolver_impl *p;
+      resolver_ptr ret((p = new detail::resolver_impl(name, service)));
+      switch(_family)
+      {
+      case family::v4:
+        p->hints.ai_family = AF_INET;
+        break;
+      case family::v6:
+        p->hints.ai_family = AF_INET6;
+        break;
+      default:
+        p->hints.ai_family = AF_UNSPEC;
+        break;
+      }
+      if(d)
+      {
+        if(d.steady)
+        {
+          p->deadline_relative = std::chrono::steady_clock::now() + std::chrono::nanoseconds(d.nsecs);
+        }
+        else
+        {
+          p->deadline_absolute = d.to_time_point();
+        }
+      }
+      p->hints.ai_socktype = SOCK_STREAM;
+      p->hints.ai_flags = AI_ADDRCONFIG | AI_V4MAPPED;
+      if(flags & resolve_flag::passive)
+      {
+        p->hints.ai_flags |= AI_PASSIVE;
+      }
+#if LLFIO_IP_ADDRESS_RESOLVER_USE_ASYNC_GETADDRINFO
+      p->req = &p->_req;
+      p->req->ar_name = !p->name.empty() ? p->name.c_str() : nullptr;
+      p->req->ar_service = !p->service.empty() ? p->service.c_str() : nullptr;
+      p->req->ar_request = &p->hints;
+      p->req->ar_result = nullptr;
+      auto retcode = getaddrinfo_a((!!(flags & resolve_flag::blocking) && !d) ? GAI_WAIT : GAI_NOWAIT, &p->req, 1, nullptr);
+      if(retcode != 0)
+      {
+        if(retcode == EAI_SYSTEM)
+        {
+          return posix_error();
+        }
+        else
+        {
+#if LLFIO_EXPERIMENTAL_STATUS_CODE
+          return SYSTEM_ERROR2_NAMESPACE::getaddrinfo_code(retcode);
+#else
+          return failure(std::error_code(retcode, getaddrinfo_category()));
+#endif
+        }
+      }
+      if(!!(flags & resolve_flag::blocking) && d)
+      {
+        p->wait({});
+      }
+#else
+      if(!!(flags & resolve_flag::blocking) && !d)
+      {
+        auto retcode = p->invoke();
+        if(retcode.first != 0)
+        {
+          if(retcode.first == EAI_SYSTEM)
+          {
+            return posix_error(retcode.second);
+          }
+          else
+          {
+#if LLFIO_EXPERIMENTAL_STATUS_CODE
+            return SYSTEM_ERROR2_NAMESPACE::getaddrinfo_code(retcode.first);
+#else
+            return failure(std::error_code(retcode.first, getaddrinfo_category()));
+#endif
+          }
+        }
+      }
+      else
+      {
+        p->task = std::async(std::launch::async, &detail::resolver_impl::invoke, p);
+        if(flags & resolve_flag::blocking)
+        {
+          p->wait({});
+        }
+      }
+#endif
+      return {std::move(ret)};
+    }
+    catch(...)
+    {
+      return error_from_exception();
+    }
+  }
+
+  result<size_t> resolve_trim_cache(size_t /*unused*/) noexcept { return 0; }
+}  // namespace ip
 
 namespace detail
 {
@@ -157,7 +595,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> byte_socket_handle::_do_connect(con
     {
       pollfd writefds;
       writefds.fd = _v.fd;
-      writefds.events = POLLOUT|POLLERR|POLLHUP;
+      writefds.events = POLLOUT | POLLERR | POLLHUP;
       writefds.revents = 0;
       int timeout = -1;
       if(d)
@@ -184,13 +622,13 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> byte_socket_handle::_do_connect(con
       {
         return posix_error();
       }
-      if(writefds.revents & POLLOUT)
-      {
-        break;
-      }
       if(writefds.revents & (POLLERR | POLLHUP))
       {
         return errc::connection_refused;
+      }
+      if(writefds.revents & POLLOUT)
+      {
+        break;
       }
       LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
     }
@@ -343,7 +781,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle::buffers_type> li
       {
         return posix_error();
       }
-      if(readfds.revents & POLLIN)
+      if(readfds.revents & (POLLIN | POLLERR))
       {
         ready_to_accept = true;
       }

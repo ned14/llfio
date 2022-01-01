@@ -353,6 +353,8 @@ if(LLFIO_FORCE_NETWORKING_OFF)
 else()
   if(WIN32)
     all_link_libraries(PUBLIC ws2_32)
+  else()
+    # all_link_libraries(PUBLIC $<$<PLATFORM_ID:Linux>:anl>)  ## LLFIO_IP_ADDRESS_RESOLVER_USE_ASYNC_GETADDRINFO is currently disabled in the source code
   endif()
 endif()
 if(LLFIO_FORCE_MAPPED_FILES_OFF)

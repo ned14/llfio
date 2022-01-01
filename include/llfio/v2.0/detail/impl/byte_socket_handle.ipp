@@ -61,17 +61,18 @@ namespace ip
   }
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool address::is_any() const noexcept
   {
-    return (_family == AF_INET && 0 == ipv4._addr_be && 0 == _port) ||
-           (_family == AF_INET6 && ipv6._addr[0] == to_byte(0) && ipv6._addr[1] == to_byte(0) && ipv6._addr[2] == to_byte(0) && ipv6._addr[3] == to_byte(0) &&
+    return (raw_family() == AF_INET && 0 == ipv4._addr_be && 0 == _port) ||
+           (raw_family() == AF_INET6 && ipv6._addr[0] == to_byte(0) && ipv6._addr[1] == to_byte(0) && ipv6._addr[2] == to_byte(0) && ipv6._addr[3] == to_byte(0) &&
             ipv6._addr[4] == to_byte(0) && ipv6._addr[5] == to_byte(0) && ipv6._addr[6] == to_byte(0) && ipv6._addr[7] == to_byte(0) &&
             ipv6._addr[8] == to_byte(0) && ipv6._addr[9] == to_byte(0) && ipv6._addr[10] == to_byte(0) && ipv6._addr[11] == to_byte(0) &&
             ipv6._addr[12] == to_byte(0) && ipv6._addr[13] == to_byte(0) && ipv6._addr[14] == to_byte(0) && ipv6._addr[15] == to_byte(0) && _port == 0);
   }
-  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool address::is_v4() const noexcept { return _family == AF_INET; }
-  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool address::is_v6() const noexcept { return _family == AF_INET6; }
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool address::is_v4() const noexcept { return raw_family() == AF_INET; }
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool address::is_v6() const noexcept { return raw_family() == AF_INET6; }
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC unsigned short address::raw_family() const noexcept { return _family; }
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC enum family address::family() const noexcept
   {
-    switch(_family)
+    switch(raw_family())
     {
     case AF_INET:
       return family::v4;
@@ -81,9 +82,12 @@ namespace ip
       return family::unknown;
     }
   }
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC uint16_t address::port() const noexcept { return htons(_port); }
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC uint32_t address::flowinfo() const noexcept { return is_v6() ? htonl(ipv6._flowinfo) : 0; }
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC uint32_t address::scope_id() const noexcept { return is_v6() ? htonl(ipv6._scope_id) : 0; }
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC int address::sockaddrlen() const noexcept
   {
-    switch(_family)
+    switch(raw_family())
     {
     case AF_INET:
       return sizeof(sockaddr_in);
@@ -96,16 +100,15 @@ namespace ip
 
   LLFIO_HEADERS_ONLY_FUNC_SPEC std::ostream &operator<<(std::ostream &s, const address &v)
   {
-    auto print_byte = [](const byte &b) -> uint16_t
-    {
+    auto print_byte = [](const byte &b) -> uint16_t {
       auto *v = (const uint8_t *) &b;
       return *v;
     };
-    switch(v._family)
+    switch(v.raw_family())
     {
     case AF_INET:
       return s << print_byte(v.ipv4._addr[0]) << "." << print_byte(v.ipv4._addr[1]) << "." << print_byte(v.ipv4._addr[2]) << "." << print_byte(v.ipv4._addr[3])
-               << ":" << v._port;
+               << ":" << ntohs(v._port);
     case AF_INET6:
     {
       std::stringstream ss;
@@ -118,7 +121,7 @@ namespace ip
         ss << (print_byte(v.ipv6._addr[n * 2 + 1]) | (print_byte(v.ipv6._addr[n * 2 + 0]) << 8)) << ":";
 #endif
       }
-      ss << std::dec << "]" << v._port;
+      ss << std::dec << "]" << ntohs(v._port);
       std::string str(std::move(ss).str());
       string_view zeros(":0:0:0:0:0:0:0:0:");
       if(0 == string_view(str).find(zeros))
@@ -153,13 +156,13 @@ namespace ip
     static_assert(sizeof(_storage) >= sizeof(sockaddr_in), "address is not bigger than sockaddr_in");
     static_assert(offsetof(address_v4, ipv4._addr) == offsetof(sockaddr_in, sin_addr), "offset of ipv4._addr is not that of sockaddr_in.sin_addr");
     _family = AF_INET;
-    _port = port;
+    _port = htons(port);
     memcpy(ipv4._addr, bytes.data(), sizeof(ipv4._addr));
   }
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC address_v4::address_v4(uint_type addr, uint16_t port) noexcept
   {
     _family = AF_INET;
-    _port = port;
+    _port = htons(port);
     ipv4._addr_be = htonl(addr);
   }
 
@@ -172,8 +175,7 @@ namespace ip
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<address_v4> make_address_v4(string_view str) noexcept
   {
     address_v4 ret(0);
-    auto parse = [&](auto &out, size_t &idx, char sep) -> result<void>
-    {
+    auto parse = [&](auto &out, size_t &idx, char sep) -> result<void> {
       if(idx >= str.size())
       {
         return errc::invalid_argument;
@@ -198,7 +200,9 @@ namespace ip
     OUTCOME_TRY(parse(*(uint8_t *) &ret.ipv4._addr[1], idx, '.'));
     OUTCOME_TRY(parse(*(uint8_t *) &ret.ipv4._addr[2], idx, '.'));
     OUTCOME_TRY(parse(*(uint8_t *) &ret.ipv4._addr[3], idx, ':'));
-    OUTCOME_TRY(parse(ret._port, idx, 0));
+    uint16_t port = 0;
+    OUTCOME_TRY(parse(port, idx, 0));
+    ret._port = htons(port);
     return ret;
   }
 
@@ -207,8 +211,8 @@ namespace ip
     static_assert(sizeof(_storage) >= sizeof(sockaddr_in6), "address is not bigger than sockaddr_in6");
     static_assert(offsetof(address_v6, ipv6._addr) == offsetof(sockaddr_in6, sin6_addr), "offset of ipv6._addr is not that of sockaddr_in6.sin_addr");
     _family = AF_INET6;
-    _port = port;
-    ipv6._scope_id = scope_id;
+    _port = htons(port);
+    ipv6._scope_id = htonl(scope_id);
     memcpy(ipv6._addr, bytes.data(), sizeof(ipv6._addr));
   }
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC address_v6::bytes_type address_v6::to_bytes() const noexcept { return ipv6._addr; }
@@ -228,8 +232,7 @@ namespace ip
     {
       return errc::invalid_argument;
     }
-    auto parse = [&](size_t &idx, char sep) -> result<uint16_t>
-    {
+    auto parse = [&](size_t &idx, char sep) -> result<uint16_t> {
       if(idx >= str.size())
       {
         return errc::invalid_argument;
@@ -257,8 +260,7 @@ namespace ip
     } while(idx < compactidx && idx < portidx);
     if(compactidx != str.npos)
     {
-      auto parse2 = [&](size_t &idx) -> result<uint16_t>
-      {
+      auto parse2 = [&](size_t &idx) -> result<uint16_t> {
         auto idx2 = str.rfind(':', idx - 1);
         if(idx2 == str.npos)
         {
@@ -288,7 +290,7 @@ namespace ip
     {
       return errc::invalid_argument;
     }
-    ret._port = (uint16_t) res;
+    ret._port = htons((uint16_t) res);
     return ret;
   }
 }  // namespace ip

@@ -477,9 +477,10 @@ public:
   byte_io_multiplexer &operator=(const byte_io_multiplexer &) = delete;
   ~byte_io_multiplexer() = default;
 
+  //! The implementation information returned.
   struct implementation_information_t
   {
-    string_view name;  //!< The name of the underlying implementation e.g. "OpenSSL", "IOCP, "io_uring", "Windows RIO" etc.
+    string_view name;  //!< The name of the underlying implementation e.g. "OpenSSL", "IOCP", "io_uring", "Windows RIO" etc.
     struct
     {
       uint16_t major{0}, minor{0}, patch{0};
@@ -1179,6 +1180,8 @@ public:
   template <class T> struct awaitable final : protected io_operation_state_visitor
   {
     friend class byte_io_handle;
+    friend class byte_socket_handle;
+    friend class listening_socket_handle;
     static constexpr size_t _state_storage_bytes = _awaitable_size - sizeof(void *) - sizeof(io_operation_state *)
 #if LLFIO_ENABLE_COROUTINES
                                                    - sizeof(coroutine_handle<>)

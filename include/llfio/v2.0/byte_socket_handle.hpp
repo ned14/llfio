@@ -90,22 +90,23 @@ namespace ip
   protected:
     union
     {
+      // This is a struct sockaddr, so endian varies
       struct
       {
-        unsigned short _family;  // sa_family_t
-        uint16_t _port;          // in_port_t
+        unsigned short _family;  // sa_family_t, host endian
+        uint16_t _port;          // in_port_t, big endian
         union
         {
           struct
           {
-            uint32_t _flowinfo;
-            byte _addr[16];
-            uint32_t _scope_id;
+            uint32_t _flowinfo;  // big endian
+            byte _addr[16];      // big endian
+            uint32_t _scope_id;  // big endian
           } ipv6;
           union
           {
-            byte _addr[4];
-            uint32_t _addr_be;
+            byte _addr[4];      // big endian
+            uint32_t _addr_be;  // big endian
           } ipv4;
         };
       };
@@ -148,15 +149,15 @@ namespace ip
     LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool is_v6() const noexcept;
 
     //! Returns the raw family of the address
-    unsigned short raw_family() const noexcept { return _family; }
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC unsigned short raw_family() const noexcept;
     //! Returns the family of the addres
     LLFIO_HEADERS_ONLY_MEMFUNC_SPEC enum family family() const noexcept;
     //! Returns the port of the address
-    uint16_t port() const noexcept { return _port; }
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC uint16_t port() const noexcept;
     //! Returns the IPv6 flow info, if address is v6.
-    uint32_t flowinfo() const noexcept { return is_v6() ? ipv6._flowinfo : 0; }
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC uint32_t flowinfo() const noexcept;
     //! Returns the IPv6 scope id, if address is v6.
-    uint32_t scope_id() const noexcept { return is_v6() ? ipv6._scope_id : 0; }
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC uint32_t scope_id() const noexcept;
 
     //! Returns the bytes of the address in network order
     span<const byte> to_bytes() const noexcept { return is_v6() ? span<const byte>(ipv6._addr) : span<const byte>(ipv4._addr); }
@@ -173,19 +174,23 @@ namespace ip
   {
     struct LLFIO_DECL resolver_deleter
     {
-      void operator()(resolver *p) const;
+      LLFIO_HEADERS_ONLY_MEMFUNC_SPEC void operator()(resolver *p) const;
     };
   }  // namespace detail
   //! Returned by `resolve()` as a handle to the asynchronous name resolution operation.
   class LLFIO_DECL resolver
   {
   public:
+    //! Returns the name being resolved
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC const std::string &name() const noexcept;
+    //! Returns the service being resolved
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC const std::string &service() const noexcept;
     //! Returns true if the deadline expired, and the returned list of addresses is incomplete. Until `get()` is called, always is true.
     LLFIO_HEADERS_ONLY_MEMFUNC_SPEC bool incomplete() const noexcept;
     //! Returns the array of addresses, blocking until completion if necessary, returning any error if one occurred.
-    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<span<address>> get() const noexcept;
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<span<address>> get() noexcept;
     //! Wait for up the deadline for the array of addresses to be retrieved.
-    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> wait(deadline d = {}) const noexcept;
+    LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> wait(deadline d = {}) noexcept;
     //! \overload
     template <class Rep, class Period> result<bool> wait_for(const std::chrono::duration<Rep, Period> &duration) const noexcept
     {
@@ -212,6 +217,13 @@ namespace ip
   //! A pointer to a resolver
   using resolver_ptr = std::unique_ptr<resolver, detail::resolver_deleter>;
 
+  //! Flags for `resolve()`
+  QUICKCPPLIB_BITFIELD_BEGIN(resolve_flag){
+  none = 0,              //!< No flags
+  passive = (1U << 0U),  //!< Return addresses for binding to this machine.
+  blocking = (1U << 1U)  //!< Execute address resolution synchronously.
+  } QUICKCPPLIB_BITFIELD_END(resolve_flag)
+
   /*! \brief Retrieve a list of potential `address` for a given name and service e.g.
   "www.google.com" and "https" optionally within a bounded deadline.
 
@@ -233,7 +245,9 @@ namespace ip
   is unbounded and uncontrollable thanks to how the platform APIs are implemented.
   */
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<resolver_ptr> resolve(string_view name, string_view service, family _family = family::any, deadline d = {},
-                                                            bool blocking = false) noexcept;
+                                                            resolve_flag flags = resolve_flag::none) noexcept;
+  //! `resolve()` may utilise a process-wide cache, if so this function will trim that cache.
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<size_t> resolve_trim_cache(size_t maxitems = 64) noexcept;
 
   //! Make an `address_v4`
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<address_v4> make_address_v4(string_view str) noexcept;
@@ -402,6 +416,9 @@ public:
   template <class T> using io_request = byte_io_handle::io_request<T>;
   template <class T> using io_result = byte_io_handle::io_result<T>;
 
+  // Used by byte_socket_source
+  virtual void _deleter() { delete this; }
+
 protected:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _do_connect(const ip::address &addr, deadline d) noexcept;
 
@@ -541,6 +558,27 @@ public:
   {
     return (_ctx == nullptr) ? _do_connect(addr, d) : _do_multiplexer_connect(addr, d);
   }
+
+  /*! \brief A coroutinised equivalent to `.connect()` which suspends the coroutine until
+  a connection occurs. **Blocks execution** i.e is equivalent to `.connect()` if no i/o multiplexer
+  has been set on this handle!
+
+  The awaitable returned is **eager** i.e. it immediately begins the i/o. If the i/o completes
+  and finishes immediately, no coroutine suspension occurs.
+  */
+  LLFIO_MAKE_FREE_FUNCTION
+  awaitable<io_result<void>> co_connect(const ip::address &addr, deadline d = {}) noexcept;
+#if 0  // TODO
+  {
+    if(_ctx == nullptr)
+    {
+      return awaitable<io_result<void>>(connect(addr, d));
+    }
+    awaitable<io_result<void>> ret;
+    ret.set_state(_ctx->construct(ret._state_storage, this, nullptr, d, addr));
+    return ret;
+  }
+#endif
 
   /*! Create a socket handle.
   \param family Which IP family to create the socket in.
@@ -716,6 +754,10 @@ public:
     }
   };
   template <class T> using io_result = result<T>;
+  template <class T> using awaitable = byte_io_multiplexer::awaitable<T>;
+
+  // Used by byte_socket_source
+  virtual void _deleter() { delete this; }
 
 protected:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<buffers_type> _do_read(io_request<buffers_type> req, deadline d) noexcept;
@@ -849,7 +891,7 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> bind(const ip::address &addr, creation _creation = creation::only_if_not_exist, int backlog = -1) noexcept;
 
   /*! Create a listening socket handle.
-  \param family Which IP family to create the socket in.
+  \param _family Which IP family to create the socket in.
   \param _mode How to open the socket. If this is `mode::append`, the read side of the socket
   is shutdown; if this is `mode::read`, the write side of the socket is shutdown.
   \param _caching How to ask the kernel to cache the socket. If writes are not cached,
@@ -907,6 +949,27 @@ public:
   {
     return (_ctx == nullptr) ? _do_read(std::move(req), d) : _do_multiplexer_read(std::move(req), d);
   }
+
+  /*! \brief A coroutinised equivalent to `.read()` which suspends the coroutine until
+  a new incoming connection occurs. **Blocks execution** i.e is equivalent to `.read()` if no i/o multiplexer
+  has been set on this handle!
+
+  The awaitable returned is **eager** i.e. it immediately begins the i/o. If the i/o completes
+  and finishes immediately, no coroutine suspension occurs.
+  */
+  LLFIO_MAKE_FREE_FUNCTION
+  awaitable<io_result<buffers_type>> co_read(io_request<buffers_type> reqs, deadline d = {}) noexcept;
+#if 0  // TODO
+  {
+    if(_ctx == nullptr)
+    {
+      return awaitable<io_result<buffers_type>>(read(std::move(reqs), d));
+    }
+    awaitable<io_result<buffers_type>> ret;
+    ret.set_state(_ctx->construct(ret._state_storage, this, nullptr, d, reqs.buffers.connected_socket()));
+    return ret;
+  }
+#endif
 };
 
 // Out of line definition purely to work around a bug in GCC where if marked inline,

@@ -578,17 +578,6 @@ template <class T> inline byte_io_multiplexer::awaitable<T>::~awaitable()
   }
 }
 
-/*! \class pollable_handle
-\brief A handle type which can be supplied to `poll()`.
-*/
-class pollable_handle
-{
-  virtual const handle &_get_handle() const noexcept = 0;
-
-public:
-  virtual ~pollable_handle() {}
-};
-
 //! What to poll
 QUICKCPPLIB_BITFIELD_BEGIN_T(poll_what, uint8_t)  //
 {
@@ -596,21 +585,24 @@ none = 0U,  //!< Query nothing for this handle.
 
 is_readable = (1U << 0U),  //!< If this handle is readable.
 is_writable = (1U << 1U),  //!< If this handle is writable.
-is_errored = (1U << 2U),   //!< If this handle is errored.
-is_closed = (1U << 3U),    //!< If this handle is closed/hung up.
+is_errored = (1U << 2U),   //!< If this handle is errored. This is always set in the output even if not requested.
+is_closed = (1U << 3U),    //!< If this handle is closed/hung up. This is always set in the output even if not requested.
 
 not_pollable = (1U << 7U)  //!< This handle is not pollable.
 }  //
 QUICKCPPLIB_BITFIELD_END(poll_what)
 
+class pollable_handle;
+
 /*! \brief Polls a list of pollable handles awaiting a change in state.
 \return The number of handles with changed state. Handles not `is_kernel_handle()`
 receive `poll_what::not_pollable`.
-\param out An array of `poll_what` set with the results of the poll.
+\param out An array of `poll_what` set with the results of the poll. The bits in this array are NOT
+cleared by this operation, so you need to clear this manualy before the call if that's what you need.
 \param handles An array of pointers to `handle`. Individual pointers can be null if you want to skip them.
 \param query An array of `poll_what` to check.
 \param d An optional timeout.
-\errors Whatever POSIX `poll()` or Windows `select()` can return.
+\errors Whatever POSIX `poll()` or Windows `WSAPoll()` can return.
 
 Note that the maximum number of handles which can be passed to this function is 1024
 (the platform syscall may refuse even that many). Note that this function is `O(N)` to
@@ -619,8 +611,25 @@ If you need to wait on more handles than this, you need to implement a `byte_io_
 for your platform.
 
 The sizes of `out`, `handles` and `query` must be the same, or an error is returned.
+
+\note On POSIX `pipe_handle` is a `pollable_handle`, but on Windows it is not. Also,
+on Windows, you cannot mix socket handles from different networking stacks in the same
+poll.
 */
 LLFIO_HEADERS_ONLY_FUNC_SPEC result<size_t> poll(span<poll_what> out, span<pollable_handle *> handles, span<const poll_what> query, deadline d = {}) noexcept;
+
+/*! \class pollable_handle
+\brief A handle type which can be supplied to `poll()`.
+*/
+class pollable_handle
+{
+  friend LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> poll(span<poll_what> out, span<pollable_handle *> handles, span<const poll_what> query,
+                                                          deadline d) noexcept;
+  virtual const handle &_get_handle() const noexcept = 0;
+
+public:
+  virtual ~pollable_handle() {}
+};
 
 // BEGIN make_free_functions.py
 /*! \brief Read data from the open handle.
