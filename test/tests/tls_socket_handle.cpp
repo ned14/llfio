@@ -1,6 +1,6 @@
-/* Integration test kernel for whether socket handles work
-(C) 2021-2022 Niall Douglas <http://www.nedproductions.biz/> (2 commits)
-File Created: Dec 2021
+/* Integration test kernel for whether TLS socket handles work
+(C) 2022 Niall Douglas <http://www.nedproductions.biz/> (2 commits)
+File Created: Jan 2022
 
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,417 +25,89 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../test_kernel_decl.hpp"
 
 #include <future>
-#include <sstream>
 
-static inline void TestSocketAddress()
+static inline void TestBlockingTLSSocketHandles()
 {
   namespace llfio = LLFIO_V2_NAMESPACE;
+  if(llfio::tls_socket_source_registry::empty())
   {
-    auto a = llfio::ip::address_v4::loopback();
-    BOOST_CHECK(a.is_loopback());
-    BOOST_CHECK(!a.is_multicast());
-    BOOST_CHECK(!a.is_any());
-    BOOST_CHECK(a.is_v4());
-    BOOST_CHECK(!a.is_v6());
-    BOOST_CHECK(a.port() == 0);
-    BOOST_CHECK(a.to_bytes().size() == 4);
-    BOOST_CHECK(a.to_bytes()[0] == llfio::to_byte(127));
-    BOOST_CHECK(a.to_bytes()[1] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[2] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[3] == llfio::to_byte(1));
-    BOOST_CHECK(a.to_uint() == 0x7f000001);
-    std::stringstream ss;
-    ss << a;
-    std::cout << ss.str() << std::endl;
-    BOOST_CHECK(ss.str() == "127.0.0.1:0");
-  }  // namespace ;
-  {
-    auto a = llfio::ip::address_v6::loopback();
-    BOOST_CHECK(a.is_loopback());
-    BOOST_CHECK(!a.is_multicast());
-    BOOST_CHECK(!a.is_any());
-    BOOST_CHECK(!a.is_v4());
-    BOOST_CHECK(a.is_v6());
-    BOOST_CHECK(a.port() == 0);
-    BOOST_CHECK(a.to_bytes().size() == 16);
-    BOOST_CHECK(a.to_bytes()[0] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[1] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[2] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[3] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[4] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[5] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[6] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[7] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[8] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[9] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[10] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[11] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[12] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[13] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[14] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[15] == llfio::to_byte(1));
-    std::stringstream ss;
-    ss << a;
-    std::cout << ss.str() << std::endl;
-    BOOST_CHECK(ss.str() == "[::1]:0");
-  }
-  {
-    auto a = llfio::ip::address_v4::any();
-    BOOST_CHECK(!a.is_loopback());
-    BOOST_CHECK(!a.is_multicast());
-    BOOST_CHECK(a.is_any());
-    BOOST_CHECK(a.is_v4());
-    BOOST_CHECK(!a.is_v6());
-    BOOST_CHECK(a.port() == 0);
-    BOOST_CHECK(a.to_bytes().size() == 4);
-    BOOST_CHECK(a.to_bytes()[0] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[1] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[2] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[3] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_uint() == 0x0000000);
-    std::stringstream ss;
-    ss << a;
-    std::cout << ss.str() << std::endl;
-    BOOST_CHECK(ss.str() == "0.0.0.0:0");
-  }
-  {
-    auto a = llfio::ip::address_v6::any();
-    BOOST_CHECK(!a.is_loopback());
-    BOOST_CHECK(!a.is_multicast());
-    BOOST_CHECK(a.is_any());
-    BOOST_CHECK(!a.is_v4());
-    BOOST_CHECK(a.is_v6());
-    BOOST_CHECK(a.port() == 0);
-    BOOST_CHECK(a.to_bytes().size() == 16);
-    BOOST_CHECK(a.to_bytes()[0] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[1] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[2] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[3] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[4] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[5] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[6] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[7] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[8] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[9] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[10] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[11] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[12] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[13] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[14] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[15] == llfio::to_byte(0));
-    std::stringstream ss;
-    ss << a;
-    std::cout << ss.str() << std::endl;
-    BOOST_CHECK(ss.str() == "[::]:0");
-  }
-  {
-    auto a = llfio::ip::make_address("78.68.1.255:1234").value();
-    BOOST_CHECK(!a.is_loopback());
-    BOOST_CHECK(!a.is_multicast());
-    BOOST_CHECK(!a.is_any());
-    BOOST_CHECK(a.is_v4());
-    BOOST_CHECK(!a.is_v6());
-    BOOST_CHECK(a.port() == 1234);
-    BOOST_CHECK(a.to_bytes().size() == 4);
-    BOOST_CHECK(a.to_bytes()[0] == llfio::to_byte(78));
-    BOOST_CHECK(a.to_bytes()[1] == llfio::to_byte(68));
-    BOOST_CHECK(a.to_bytes()[2] == llfio::to_byte(1));
-    BOOST_CHECK(a.to_bytes()[3] == llfio::to_byte(255));
-    std::stringstream ss;
-    ss << a;
-    std::cout << ss.str() << std::endl;
-    BOOST_CHECK(ss.str() == "78.68.1.255:1234");
-  }
-  {
-    auto a = llfio::ip::make_address("[78aa:bb68::1:255]:1234").value();
-    BOOST_CHECK(!a.is_loopback());
-    BOOST_CHECK(!a.is_multicast());
-    BOOST_CHECK(!a.is_any());
-    BOOST_CHECK(!a.is_v4());
-    BOOST_CHECK(a.is_v6());
-    BOOST_CHECK(a.port() == 1234);
-    BOOST_CHECK(a.to_bytes().size() == 16);
-    BOOST_CHECK(a.to_bytes()[0] == llfio::to_byte(0x78));
-    BOOST_CHECK(a.to_bytes()[1] == llfio::to_byte(0xaa));
-    BOOST_CHECK(a.to_bytes()[2] == llfio::to_byte(0xbb));
-    BOOST_CHECK(a.to_bytes()[3] == llfio::to_byte(0x68));
-    BOOST_CHECK(a.to_bytes()[4] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[5] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[6] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[7] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[8] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[9] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[10] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[11] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[12] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[13] == llfio::to_byte(0x1));
-    BOOST_CHECK(a.to_bytes()[14] == llfio::to_byte(0x2));
-    BOOST_CHECK(a.to_bytes()[15] == llfio::to_byte(0x55));
-    std::stringstream ss;
-    ss << a;
-    std::cout << ss.str() << std::endl;
-    BOOST_CHECK(ss.str() == "[78aa:bb68::1:255]:1234");
-  }
-
-  {
-    auto a = llfio::ip::make_address("[78aa:0:0:bb68:0:0:0:255]:1234").value();
-    BOOST_CHECK(!a.is_loopback());
-    BOOST_CHECK(!a.is_multicast());
-    BOOST_CHECK(!a.is_any());
-    BOOST_CHECK(!a.is_v4());
-    BOOST_CHECK(a.is_v6());
-    BOOST_CHECK(a.port() == 1234);
-    BOOST_CHECK(a.to_bytes().size() == 16);
-    BOOST_CHECK(a.to_bytes()[0] == llfio::to_byte(0x78));
-    BOOST_CHECK(a.to_bytes()[1] == llfio::to_byte(0xaa));
-    BOOST_CHECK(a.to_bytes()[2] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[3] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[4] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[5] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[6] == llfio::to_byte(0xbb));
-    BOOST_CHECK(a.to_bytes()[7] == llfio::to_byte(0x68));
-    BOOST_CHECK(a.to_bytes()[8] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[9] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[10] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[11] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[12] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[13] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[14] == llfio::to_byte(0x2));
-    BOOST_CHECK(a.to_bytes()[15] == llfio::to_byte(0x55));
-    std::stringstream ss;
-    ss << a;
-    std::cout << ss.str() << std::endl;
-    BOOST_CHECK(ss.str() == "[78aa:0:0:bb68::255]:1234");
-  }
-  {
-    auto a = llfio::ip::make_address("[78aa:0:0:0:bb68:0:0:255]:1234").value();
-    BOOST_CHECK(!a.is_loopback());
-    BOOST_CHECK(!a.is_multicast());
-    BOOST_CHECK(!a.is_any());
-    BOOST_CHECK(!a.is_v4());
-    BOOST_CHECK(a.is_v6());
-    BOOST_CHECK(a.port() == 1234);
-    BOOST_CHECK(a.to_bytes().size() == 16);
-    BOOST_CHECK(a.to_bytes()[0] == llfio::to_byte(0x78));
-    BOOST_CHECK(a.to_bytes()[1] == llfio::to_byte(0xaa));
-    BOOST_CHECK(a.to_bytes()[2] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[3] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[4] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[5] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[6] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[7] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[8] == llfio::to_byte(0xbb));
-    BOOST_CHECK(a.to_bytes()[9] == llfio::to_byte(0x68));
-    BOOST_CHECK(a.to_bytes()[10] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[11] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[12] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[13] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[14] == llfio::to_byte(0x2));
-    BOOST_CHECK(a.to_bytes()[15] == llfio::to_byte(0x55));
-    std::stringstream ss;
-    ss << a;
-    std::cout << ss.str() << std::endl;
-    BOOST_CHECK(ss.str() == "[78aa::bb68:0:0:255]:1234");
-  }
-  {
-    auto a = llfio::ip::make_address("[1000::]:1234").value();
-    BOOST_CHECK(!a.is_loopback());
-    BOOST_CHECK(!a.is_multicast());
-    BOOST_CHECK(!a.is_any());
-    BOOST_CHECK(!a.is_v4());
-    BOOST_CHECK(a.is_v6());
-    BOOST_CHECK(a.port() == 1234);
-    BOOST_CHECK(a.to_bytes().size() == 16);
-    BOOST_CHECK(a.to_bytes()[0] == llfio::to_byte(0x10));
-    BOOST_CHECK(a.to_bytes()[1] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[2] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[3] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[4] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[5] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[6] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[7] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[8] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[9] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[10] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[11] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[12] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[13] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[14] == llfio::to_byte(0));
-    BOOST_CHECK(a.to_bytes()[15] == llfio::to_byte(0));
-    std::stringstream ss;
-    ss << a;
-    std::cout << ss.str() << std::endl;
-    BOOST_CHECK(ss.str() == "[1000::]:1234");
-  }
-}
-
-static inline void TestSocketResolve()
-{
-  namespace llfio = LLFIO_V2_NAMESPACE;
-  static const llfio::string_view addrs[] = {"google.com", "youtube.com",  "tmall.com",  "qq.com",     "baidu.com",
-                                             "sohu.com",   "facebook.com", "taobao.com", "amazon.com", "www.nedprod.com"};
-  std::vector<llfio::ip::resolver_ptr> resolvers;
-  for(auto &addr : addrs)
-  {
-    resolvers.push_back(llfio::ip::resolve(addr, "https").value());
-  }
-  for(;;)
-  {
-    bool done = true;
-    for(auto &i : resolvers)
-    {
-      if(!i)
-      {
-        continue;
-      }
-      if(!i->wait(std::chrono::seconds(0)))
-      {
-        done = false;
-      }
-      else
-      {
-        auto res = i->get().value();
-        std::cout << "\nFor host '" << i->name() << "' resolve() returns " << res.size() << " addresses:";
-        for(auto &x : res)
-        {
-          std::cout << "\n   " << x;
-          BOOST_CHECK(x.port() == 443);
-        }
-        i.reset();
-      }
-    }
-    if(done)
-    {
-      std::cout << "\n" << std::endl;
-      break;
-    }
-  }
-  resolvers.clear();
-
-  // Test abandonment/cancellation
-  for(auto &addr : addrs)
-  {
-    resolvers.push_back(llfio::ip::resolve(addr, "https").value());
-  }
-  resolvers.clear();
-
-  // Test timeouts
-  for(auto &addr : addrs)
-  {
-    resolvers.push_back(llfio::ip::resolve(addr, "https", llfio::ip::family::any, std::chrono::milliseconds(1)).value());
-  }
-  for(;;)
-  {
-    bool done = true;
-    for(auto &i : resolvers)
-    {
-      if(!i)
-      {
-        continue;
-      }
-      if(!i->wait(std::chrono::seconds(0)))
-      {
-        done = false;
-      }
-      else
-      {
-        auto res = i->get();
-        if(!res)
-        {
-          if(res.error() == llfio::errc::operation_canceled)
-          {
-            std::cout << "\nFor host '" << i->name() << "' resolve() returns operation cancelled";
-          }
-          else
-          {
-            res.value();
-          }
-        }
-        else
-        {
-          std::cout << "\nFor host '" << i->name() << "' resolve() returns " << res.value().size() << " addresses:";
-          for(auto &x : res.value())
-          {
-            std::cout << "\n   " << x;
-            BOOST_CHECK(x.port() == 443);
-          }
-        }
-        i.reset();
-      }
-    }
-    if(done)
-    {
-      std::cout << "\n" << std::endl;
-      break;
-    }
-  }
-  resolvers.clear();
-}
-
-static inline void TestBlockingSocketHandles()
-{
-  namespace llfio = LLFIO_V2_NAMESPACE;
-  auto serversocket = llfio::listening_socket_handle::listening_socket(llfio::ip::family::v4, llfio::listening_socket_handle::mode::read).value();
-  BOOST_REQUIRE(serversocket.is_valid());
-  BOOST_CHECK(serversocket.is_socket());
-  BOOST_CHECK(serversocket.is_readable());
-  BOOST_CHECK(!serversocket.is_writable());
-  serversocket.bind(llfio::ip::address_v4::loopback()).value();
-  auto endpoint = serversocket.local_endpoint().value();
-  std::cout << "Server socket is listening on " << endpoint << std::endl;
-  if(endpoint.family() == llfio::ip::family::unknown && getenv("CI") != nullptr)
-  {
-    std::cout << "\nNOTE: Currently on CI and couldn't bind a listening socket to loopback, assuming it is CI host restrictions and skipping this test."
-              << std::endl;
+    std::cout << "\nNOTE: This platform has no TLS socket sources in its registry, skipping this test." << std::endl;
     return;
   }
-  auto readerthread = std::async([serversocket = std::move(serversocket)]() mutable {
-    std::pair<llfio::byte_socket_handle, llfio::ip::address> s;
-    serversocket.read({s}).value();  // This immediately blocks in blocking mode
-    BOOST_REQUIRE(s.first.is_valid());
-    BOOST_CHECK(s.first.is_socket());
-    BOOST_CHECK(s.first.is_readable());
-    BOOST_CHECK(!s.first.is_writable());
-    std::cout << "Server thread sees incoming connection from " << s.second << std::endl;
-    serversocket.close().value();
-    llfio::byte buffer[64];
-    auto read = s.first.read(0, {{buffer, 64}}).value();
-    BOOST_REQUIRE(read == 5);
-    BOOST_CHECK(0 == memcmp(buffer, "hello", 5));
-    s.first.close().value();
-  });
-  auto begin = std::chrono::steady_clock::now();
-  while(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count() < 100)
+  auto tls_socket_source = llfio::tls_socket_source_registry::default_source().instantiate().value();
+  std::cout << "The default TLS socket source on this platform is " << tls_socket_source->implementation_information() << std::endl;
+  auto runtest = [](llfio::listening_tls_socket_handle_ptr serversocket, llfio::tls_socket_handle_ptr writer)
   {
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  }
-  if(std::future_status::ready == readerthread.wait_for(std::chrono::seconds(0)))
-  {
-    readerthread.get();  // rethrow exception
-  }
-  llfio::byte_socket_handle writer;
-  begin = std::chrono::steady_clock::now();
-  while(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count() < 1000)
-  {
-    writer =
-    llfio::byte_socket_handle::byte_socket(llfio::ip::family::v4, llfio::byte_socket_handle::mode::append, llfio::byte_socket_handle::caching::reads).value();
-    auto r = writer.connect(endpoint);
-    if(r)
+    BOOST_REQUIRE(serversocket->is_valid());
+    BOOST_CHECK(serversocket->is_socket());
+    BOOST_CHECK(serversocket->is_readable());
+    BOOST_CHECK(serversocket->is_writable());
+    // Disable server authentication
+    serversocket->set_authentication_certificates_path({}).value();
+    serversocket->bind(llfio::ip::address_v4::loopback()).value();
+    auto endpoint = serversocket->local_endpoint().value();
+    std::cout << "Server socket is listening on " << endpoint << std::endl;
+    if(endpoint.family() == llfio::ip::family::unknown && getenv("CI") != nullptr)
     {
-      break;
+      std::cout << "\nNOTE: Currently on CI and couldn't bind a listening socket to loopback, assuming it is CI host restrictions and skipping this test."
+                << std::endl;
+      return;
     }
-  }
-  BOOST_REQUIRE(writer.is_valid());
-  BOOST_CHECK(writer.is_socket());
-  BOOST_CHECK(!writer.is_readable());
-  BOOST_CHECK(writer.is_writable());
-  auto written = writer.write(0, {{(const llfio::byte *) "hello", 5}}).value();
-  BOOST_REQUIRE(written == 5);
-  writer.shutdown_and_close().value();
-  readerthread.get();
+    auto readerthread = std::async(
+    [serversocket = std::move(serversocket)]() mutable
+    {
+      std::pair<llfio::tls_socket_handle_ptr, llfio::ip::address> s;
+      serversocket->read({s}).value();  // This immediately blocks in blocking mode
+      BOOST_REQUIRE(s.first->is_valid());
+      BOOST_CHECK(s.first->is_socket());
+      BOOST_CHECK(s.first->is_readable());
+      BOOST_CHECK(s.first->is_writable());
+      //std::cout << "Server thread sees incoming connection from " << s.second << std::endl;
+      serversocket->close().value();
+      llfio::byte buffer[64];
+      auto read = s.first->read(0, {{buffer, 64}}).value();
+      BOOST_REQUIRE(read == 5);
+      BOOST_CHECK(0 == memcmp(buffer, "hello", 5));
+      s.first->shutdown_and_close().value();
+    });
+    auto begin = std::chrono::steady_clock::now();
+    while(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count() < 100)
+    {
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    if(std::future_status::ready == readerthread.wait_for(std::chrono::seconds(0)))
+    {
+      readerthread.get();  // rethrow exception
+    }
+    begin = std::chrono::steady_clock::now();
+    while(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count() < 1000)
+    {
+      auto r = writer->connect(endpoint);
+      if(r)
+      {
+        break;
+      }
+    }
+    BOOST_REQUIRE(writer->is_valid());
+    BOOST_CHECK(writer->is_socket());
+    BOOST_CHECK(writer->is_readable());
+    BOOST_CHECK(writer->is_writable());
+    auto written = writer->write(0, {{(const llfio::byte *) "hello", 5}}).value();
+    BOOST_REQUIRE(written == 5);
+    writer->shutdown_and_close().value();
+    readerthread.get();
+  };
+  std::cout << "\nUnwrapped TLS socket:\n" << std::endl;
+  runtest(tls_socket_source->listening_socket(llfio::ip::family::v4).value(), tls_socket_source->connecting_socket(llfio::ip::family::v4).value());
+
+  std::cout << "\nWrapped TLS socket:\n" << std::endl;
+  auto rawserversocket = llfio::listening_socket_handle::listening_socket(llfio::ip::family::v4).value();
+  auto rawwriter = llfio::byte_socket_handle::byte_socket(llfio::ip::family::v4).value();
+  runtest(tls_socket_source->wrap(&rawserversocket).value(), tls_socket_source->wrap(&rawwriter).value());
 }
 
-static inline void TestNonBlockingSocketHandles()
+#if 0
+static inline void TestNonBlockingTLSSocketHandles()
 {
   namespace llfio = LLFIO_V2_NAMESPACE;
   auto serversocket = llfio::listening_socket_handle::listening_socket(llfio::ip::family::v4, llfio::listening_socket_handle::mode::read,
@@ -503,7 +175,7 @@ static inline void TestNonBlockingSocketHandles()
 }
 
 #if LLFIO_ENABLE_TEST_IO_MULTIPLEXERS
-static inline void TestMultiplexedSocketHandles()
+static inline void TestMultiplexedTLSSocketHandles()
 {
   static constexpr size_t MAX_SOCKETS = 64;
   namespace llfio = LLFIO_V2_NAMESPACE;
@@ -688,7 +360,7 @@ static inline void TestMultiplexedSocketHandles()
 }
 
 #if LLFIO_ENABLE_COROUTINES
-static inline void TestCoroutinedSocketHandles()
+static inline void TestCoroutinedTLSSocketHandles()
 {
   static constexpr size_t MAX_SOCKETS = 70;
   namespace llfio = LLFIO_V2_NAMESPACE;
@@ -727,7 +399,7 @@ static inline void TestCoroutinedSocketHandles()
       }
     };
     auto serversocket =
-    llfio::listening_socket_handle::listening_socket(llfio::ip::family::v4, llfio::listening_socket_handle::mode::write, llfio::byte_socket_handle::caching::all,
+    llfio::listening_socket_handle::listening_socket(true, llfio::listening_socket_handle::mode::write, llfio::byte_socket_handle::caching::all,
                                                      llfio::byte_socket_handle::flag::multiplexable)
     .value();
     serversocket.bind(llfio::ip::address_v4::loopback()).value();
@@ -820,7 +492,7 @@ static inline void TestCoroutinedSocketHandles()
 #endif
 #endif
 
-static inline void TestPollingSocketHandles()
+static inline void TestPollingTLSSocketHandles()
 {
   static constexpr size_t MAX_SOCKETS = 64;
   namespace llfio = LLFIO_V2_NAMESPACE;
@@ -968,19 +640,20 @@ static inline void TestPollingSocketHandles()
   poll_listening_task.get();
   poll_connecting_task.get();
 }
+#endif
 
-KERNELTEST_TEST_KERNEL(integration, llfio, ip, address, "Tests that llfio::ip::address works as expected", TestSocketAddress())
-KERNELTEST_TEST_KERNEL(integration, llfio, ip, resolve, "Tests that llfio::ip::resolve works as expected", TestSocketResolve())
-KERNELTEST_TEST_KERNEL(integration, llfio, socket_handle, blocking, "Tests that blocking llfio::byte_socket_handle works as expected",
-                       TestBlockingSocketHandles())
-KERNELTEST_TEST_KERNEL(integration, llfio, socket_handle, nonblocking, "Tests that nonblocking llfio::byte_socket_handle works as expected",
-                       TestNonBlockingSocketHandles())
+KERNELTEST_TEST_KERNEL(integration, llfio, tls_socket_handle, blocking, "Tests that blocking llfio::tls_byte_socket_handle works as expected",
+                       TestBlockingTLSSocketHandles())
+#if 0
+KERNELTEST_TEST_KERNEL(integration, llfio, tls_socket_handle, nonblocking, "Tests that nonblocking llfio::tls_byte_socket_handle works as expected",
+                       TestNonBlockingTLSSocketHandles())
 #if LLFIO_ENABLE_TEST_IO_MULTIPLEXERS
-KERNELTEST_TEST_KERNEL(integration, llfio, socket_handle, multiplexed, "Tests that multiplexed llfio::byte_socket_handle works as expected",
-                       TestMultiplexedSocketHandles())
+KERNELTEST_TEST_KERNEL(integration, llfio, tls_socket_handle, multiplexed, "Tests that multiplexed llfio::tls_byte_socket_handle works as expected",
+                       TestMultiplexedTLSSocketHandles())
 #if LLFIO_ENABLE_COROUTINES
-KERNELTEST_TEST_KERNEL(integration, llfio, socket_handle, coroutined, "Tests that coroutined llfio::byte_socket_handle works as expected",
-                       TestCoroutinedSocketHandles())
+KERNELTEST_TEST_KERNEL(integration, llfio, tls_socket_handle, coroutined, "Tests that coroutined llfio::tls_byte_socket_handle works as expected",
+                       TestCoroutinedTLSSocketHandles())
 #endif
 #endif
-KERNELTEST_TEST_KERNEL(integration, llfio, socket_handle, poll, "Tests that polling llfio::byte_socket_handle works as expected", TestPollingSocketHandles())
+KERNELTEST_TEST_KERNEL(integration, llfio, tls_socket_handle, poll, "Tests that polling llfio::tls_byte_socket_handle works as expected", TestPollingTLSSocketHandles())
+#endif

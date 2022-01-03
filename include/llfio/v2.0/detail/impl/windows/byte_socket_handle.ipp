@@ -120,7 +120,9 @@ namespace ip
         {
           return -1;
         }
-        auto unaddrinfo = make_scope_exit([&]() noexcept {
+        auto unaddrinfo = make_scope_exit(
+        [&]() noexcept
+        {
           FreeAddrInfoExW(res);
           res = nullptr;
         });
@@ -243,7 +245,7 @@ namespace ip
     {
       if(d.steady)
       {
-        millis = (DWORD)(d.nsecs / 1000000);
+        millis = (DWORD) (d.nsecs / 1000000);
       }
       else
       {
@@ -331,7 +333,8 @@ namespace ip
       {
         p->hints.ai_flags |= AI_PASSIVE;
       }
-      auto to_wstring = [](const std::string &str) -> result<std::wstring> {
+      auto to_wstring = [](const std::string &str) -> result<std::wstring>
+      {
         ULONG written = 0;
         // Ask for the length needed
         NTSTATUS ntstat = RtlUTF8ToUnicodeN(nullptr, 0, &written, str.c_str(), static_cast<ULONG>(str.size()));
@@ -381,16 +384,22 @@ namespace ip
   }
 }  // namespace ip
 
+/********************************************************************************************************************/
+
 namespace detail
 {
   inline result<void> create_socket(void *p, native_handle_type &nativeh, ip::family _family, handle::mode _mode, handle::caching _caching,
                                     handle::flag flags) noexcept
   {
-    flags &= ~handle::flag::unlink_on_first_close;
+    flags &= ~handle::flag(handle::flag::unlink_on_first_close);
     nativeh.behaviour |= native_handle_type::disposition::socket | native_handle_type::disposition::kernel_handle;
     OUTCOME_TRY(access_mask_from_handle_mode(nativeh, _mode, flags));
     OUTCOME_TRY(attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
     nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
+    if(_family == ip::family::v6)
+    {
+      nativeh.behaviour |= native_handle_type::disposition::is_alternate;
+    }
 
     detail::register_socket_handle_instance(p);
     const unsigned short family = (_family == ip::family::v6) ? AF_INET6 : ((_family == ip::family::v4) ? AF_INET : 0);
@@ -649,8 +658,8 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle::buffers_type> li
   auto &b = *req.buffers.begin();
   native_handle_type nativeh;
   nativeh.behaviour |= native_handle_type::disposition::socket | native_handle_type::disposition::kernel_handle;
-  OUTCOME_TRY(access_mask_from_handle_mode(nativeh, _mode, _flags));
-  OUTCOME_TRY(attributes_from_handle_caching_and_flags(nativeh, _caching, _flags));
+  OUTCOME_TRY(access_mask_from_handle_mode(nativeh, _mode, _.flags));
+  OUTCOME_TRY(attributes_from_handle_caching_and_flags(nativeh, _caching, _.flags));
   nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
   for(;;)
   {
@@ -723,7 +732,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle::buffers_type> li
       }
     }
   }
-  b.first = byte_socket_handle(nativeh, _caching, _flags, _ctx);
+  b.first = byte_socket_handle(nativeh, _caching, _.flags, _ctx);
   if(_mode == mode::read)
   {
     OUTCOME_TRY(b.first.shutdown(byte_socket_handle::shutdown_write));

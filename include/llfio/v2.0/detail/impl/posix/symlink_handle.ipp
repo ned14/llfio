@@ -134,7 +134,7 @@ result<symlink_handle> symlink_handle::reopen(mode mode_, deadline d) const noex
 {
   LLFIO_LOG_FUNCTION_CALL(this);
 #if LLFIO_SYMLINK_HANDLE_IS_FAKED
-  result<symlink_handle> ret(symlink_handle(native_handle_type(), _devid, _inode, _flags));
+  result<symlink_handle> ret(symlink_handle(native_handle_type(), _devid, _inode, _.flags));
   ret.value()._v.behaviour = _v.behaviour;
   OUTCOME_TRY(auto &&dirh, _dirh.clone());
   ret.value()._dirh = path_handle(std::move(dirh));
@@ -151,7 +151,7 @@ result<symlink_handle> symlink_handle::reopen(mode mode_, deadline d) const noex
   // fast path
   if(mode_ == mode::unchanged)
   {
-    result<symlink_handle> ret(symlink_handle(native_handle_type(), _devid, _inode, _flags));
+    result<symlink_handle> ret(symlink_handle(native_handle_type(), _devid, _inode, _.flags));
     ret.value()._v.behaviour = _v.behaviour;
     ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC, 0);
     if(-1 == ret.value()._v.fd)
@@ -179,7 +179,7 @@ result<symlink_handle> symlink_handle::reopen(mode mode_, deadline d) const noex
     // Get the current path of myself
     OUTCOME_TRY(auto &&currentpath, current_path());
     // Open myself
-    auto fh = symlink({}, currentpath, mode_, creation::open_existing, _flags);
+    auto fh = symlink({}, currentpath, mode_, creation::open_existing, _.flags);
     if(fh)
     {
       if(fh.value().unique_id() == unique_id())
@@ -460,9 +460,9 @@ result<symlink_handle::const_buffers_type> symlink_handle::write(symlink_handle:
   {
     // Current fd now points at the symlink we just atomically replaced, so need to reopen
     // it onto the new symlink
-    auto newthis = symlink(dirh, filename, is_writable() ? mode::write : mode::read, creation::open_existing, _flags);
+    auto newthis = symlink(dirh, filename, is_writable() ? mode::write : mode::read, creation::open_existing, _.flags);
     // Prevent unlink on first close if set
-    _flags &= ~flag::unlink_on_first_close;
+    _.flags &= ~flag(flag::unlink_on_first_close);
     // Close myself
     OUTCOME_TRY(close());
     // If reopen failed, report that now

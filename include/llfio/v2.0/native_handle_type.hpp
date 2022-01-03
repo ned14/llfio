@@ -1,5 +1,5 @@
 /* Wraps the platform specific i/o reference object
-(C) 2016-2017 Niall Douglas <http://www.nedproductions.biz/> (8 commits)
+(C) 2016-2022 Niall Douglas <http://www.nedproductions.biz/> (8 commits)
 File Created: March 2016
 
 
@@ -42,41 +42,46 @@ Unmanaged, wrap in a handle object to manage.
 struct native_handle_type  // NOLINT
 {
   //! The type of handle.
-  QUICKCPPLIB_BITFIELD_BEGIN(disposition){
+  QUICKCPPLIB_BITFIELD_BEGIN_T(disposition, uint64_t){
   invalid = 0U,  //!< Invalid handle
 
   readable = 1U << 0U,     //!< Is readable
   writable = 1U << 1U,     //!< Is writable
   append_only = 1U << 2U,  //!< Is append only
 
-  nonblocking = 1U << 4U,  //!< Requires additional synchronisation (Windows: `OVERLAPPED`; POSIX: `O_NONBLOCK`)
-  seekable = 1U << 5U,     //!< Is seekable
-  aligned_io = 1U << 6U,   //!< Requires sector aligned i/o (typically 512 or 4096)
-    kernel_handle = 1U << 7U, //!< Handle is a valid kernel handle
+  nonblocking = 1U << 4U,    //!< Requires additional synchronisation (Windows: `OVERLAPPED`; POSIX: `O_NONBLOCK`)
+  seekable = 1U << 5U,       //!< Is seekable
+  aligned_io = 1U << 6U,     //!< Requires sector aligned i/o (typically 512 or 4096)
+  kernel_handle = 1U << 7U,  //!< Handle is a valid kernel handle
 
-  file = 1U << 8U,          //!< Is a regular file
-  directory = 1U << 9U,     //!< Is a directory
-  symlink = 1U << 10U,      //!< Is a symlink
-  pipe = 1U << 11U,         //!< Is a pipe
-  socket = 1U << 12U,       //!< Is a socket
-  multiplexer = 1U << 13U,  //!< Is a kqueue/epoll/iocp
-  process = 1U << 14U,      //!< Is a child process
-  section = 1U << 15U,      //!< Is a memory section
-  allocation = 1U << 16U,   //!< Is a memory allocation
-  path = 1U << 17U,         //!< Is a path
-  tls_socket = 1U << 18U,   //!< Is a TLS socket
-  http_socket = 1U << 19U,  //!< Is a HTTP or HTTPS socket
+  file = 1U << 16U,         //!< Is a regular file
+  directory = 1U << 17U,    //!< Is a directory
+  symlink = 1U << 18U,      //!< Is a symlink
+  pipe = 1U << 19U,         //!< Is a pipe
+  socket = 1U << 20U,       //!< Is a socket
+  multiplexer = 1U << 21U,  //!< Is a kqueue/epoll/iocp
+  process = 1U << 22U,      //!< Is a child process
+  section = 1U << 23U,      //!< Is a memory section
+  allocation = 1U << 24U,   //!< Is a memory allocation
+  path = 1U << 25U,         //!< Is a path
+  tls_socket = 1U << 26U,   //!< Is a TLS socket
+  http_socket = 1U << 27U,  //!< Is a HTTP or HTTPS socket
 
-  safety_barriers = 1U << 20U,  //!< Issue write reordering barriers at various points
-  cache_metadata = 1U << 21U,   //!< Is serving metadata from the kernel cache
-  cache_reads = 1U << 22U,      //!< Is serving reads from the kernel cache
-  cache_writes = 1U << 23U,     //!< Is writing back from kernel cache rather than writing through
-  cache_temporary = 1U << 24U,  //!< Writes are not flushed to storage quickly
+  _flags_bits = 0xffffULL << 32U,  //!< Used to pack in handle::flag to save space (16 bits, bits 32 - 47)
 
-  _is_connected = 1U << 28U,            // used by pipe_handle on Windows to store connectedness
-  _multiplexer_state_bit0 = 1U << 29U,  // per-handle state bits used by an i/o multiplexer
-  _multiplexer_state_bit1 = 1U << 30U,  // per-handle state bits used by an i/o multiplexer
-  _child_close_executed = 1U << 31U     // used to trap when vptr has become corrupted
+  is_pointer = 1ULL << 48U,    //!< when ptr is being used to point at something elsewhere
+  is_alternate = 1ULL << 49U,  //!< when we refer to an alternate e.g. for byte_socket_handle this would be IPv6 instead of IPv4
+
+  safety_barriers = 1ULL << 52U,  //!< Issue write reordering barriers at various points
+  cache_metadata = 1ULL << 53U,   //!< Is serving metadata from the kernel cache
+  cache_reads = 1ULL << 54U,      //!< Is serving reads from the kernel cache
+  cache_writes = 1ULL << 55U,     //!< Is writing back from kernel cache rather than writing through
+  cache_temporary = 1ULL << 56U,  //!< Writes are not flushed to storage quickly
+
+  _is_connected = 1ULL << 61U,            // used by pipe_handle and byte_socket_handle on Windows to store connectedness
+  _multiplexer_state_bit0 = 1ULL << 62U,  // per-handle state bits used by an i/o multiplexer
+  _multiplexer_state_bit1 = 1ULL << 63U,  // per-handle state bits used by an i/o multiplexer
+  _child_close_executed = 1ULL << 63U     // used to trap when vptr has become corrupted
   } QUICKCPPLIB_BITFIELD_END(disposition)
 
   union
@@ -156,7 +161,7 @@ struct native_handle_type  // NOLINT
   constexpr bool operator!=(const native_handle_type &o) const noexcept { return behaviour != o.behaviour || _init != o._init; }
 
   //! True if the handle is valid
-  constexpr bool is_valid() const noexcept { return _init != -1 && static_cast<unsigned>(behaviour) != 0; }
+  constexpr bool is_valid() const noexcept { return _init != -1 && static_cast<uint64_t>(behaviour &~disposition::_flags_bits) != 0; }
 
   //! True if the handle is readable
   constexpr bool is_readable() const noexcept { return (behaviour & disposition::readable) ? true : false; }
@@ -198,9 +203,12 @@ struct native_handle_type  // NOLINT
   constexpr bool is_tls_socket() const noexcept { return (behaviour & disposition::tls_socket) ? true : false; }
   //! True if a HTTP socket
   constexpr bool is_http_socket() const noexcept { return (behaviour & disposition::http_socket) ? true : false; }
+
+  //! True if a third party pointer
+  constexpr bool is_third_party_pointer() const noexcept { return (behaviour & disposition::is_pointer) ? true : false; }
 };
-static_assert((sizeof(void *) == 4 && sizeof(native_handle_type) == 8) || (sizeof(void *) == 8 && sizeof(native_handle_type) == 12),
-              "native_handle_type is not 8 or 12 bytes in size!");
+static_assert((sizeof(void *) == 4 && sizeof(native_handle_type) == 12) || (sizeof(void *) == 8 && sizeof(native_handle_type) == 16),
+              "native_handle_type is not 12 or 16 bytes in size!");
 // Not trivially copyable, as has non-trivial move.
 static_assert(std::is_trivially_destructible<native_handle_type>::value, "native_handle_type is not trivially destructible!");
 static_assert(std::is_trivially_copy_constructible<native_handle_type>::value, "native_handle_type is not trivially copy constructible!");

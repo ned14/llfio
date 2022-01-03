@@ -117,7 +117,7 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
     {
       return posix_error();
     }
-    ret.value()._flags |= flag::unlink_on_first_close;
+    ret.value()._.flags |= flag::unlink_on_first_close;
   }
   nativeh.fd = ::openat(dirhfd, leafname.c_str(), attribs, 0x1b0 /*660*/);
   if(-1 == nativeh.fd)

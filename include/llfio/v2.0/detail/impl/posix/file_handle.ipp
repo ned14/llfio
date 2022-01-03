@@ -133,8 +133,8 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   nativeh.fd = ::openat(dirh.native_handle().fd, "", attribs, 0600);
   if(-1 != nativeh.fd)
   {
-    ret.value()._flags |= flag::anonymous_inode;
-    ret.value()._flags &= ~flag::unlink_on_first_close;  // It's already unlinked
+    ret.value()._.flags |= flag::anonymous_inode;
+    ret.value()._.flags &= ~flag::unlink_on_first_close;  // It's already unlinked
     return ret;
   }
   // If it failed, assume this kernel or FS doesn't support O_TMPFILE
@@ -167,7 +167,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
     {
       return posix_error();
     }
-    ret.value()._flags &= ~flag::unlink_on_first_close;
+    ret.value()._.flags &= ~flag::unlink_on_first_close;
     return ret;
   }
 }
@@ -178,7 +178,7 @@ result<file_handle> file_handle::reopen(mode mode_, caching caching_, deadline d
   // Fast path
   if(mode_ == mode::unchanged)
   {
-    result<file_handle> ret(file_handle(native_handle_type(), _devid, _inode, caching_, _flags, _ctx));
+    result<file_handle> ret(file_handle(native_handle_type(), _devid, _inode, caching_, _.flags, _ctx));
     ret.value()._v.behaviour = _v.behaviour;
     ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC, 0);
     if(-1 == ret.value()._v.fd)
@@ -284,7 +284,7 @@ result<file_handle> file_handle::reopen(mode mode_, caching caching_, deadline d
       return errc::no_such_file_or_directory;
     }
     // Open myself
-    auto fh = file({}, currentpath, mode_, creation::open_existing, caching_, _flags);
+    auto fh = file({}, currentpath, mode_, creation::open_existing, caching_, _.flags);
     if(fh)
     {
       if(fh.value().unique_id() == unique_id())

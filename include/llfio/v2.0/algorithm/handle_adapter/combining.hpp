@@ -196,7 +196,7 @@ namespace algorithm
         // Fill the temporary buffers
         optional<io_result<buffers_type>> _filleds[2];
 #if !defined(LLFIO_DISABLE_OPENMP) && defined(_OPENMP)
-#pragma omp parallel for if(_have_source && (this->_flags & flag::disable_parallelism) == 0)
+#pragma omp parallel for if(_have_source && (this->_.flags & flag::disable_parallelism) == 0)
 #endif
         for(size_t n = 0; n < 2; n++)
         {
@@ -351,7 +351,7 @@ namespace algorithm
       {
         optional<result<extent_guard>> _locks[2];
 #if !defined(LLFIO_DISABLE_OPENMP) && defined(_OPENMP)
-#pragma omp parallel for if(_have_source && (this->_flags & flag::disable_parallelism) == 0)
+#pragma omp parallel for if(_have_source && (this->_.flags & flag::disable_parallelism) == 0)
 #endif
         for(size_t n = 0; n < 2; n++)
         {
@@ -406,7 +406,7 @@ namespace algorithm
       {
         optional<result<extent_type>> r[2];
 #if !defined(LLFIO_DISABLE_OPENMP) && defined(_OPENMP)
-#pragma omp parallel for if(_have_source && (this->_flags & flag::disable_parallelism) == 0)
+#pragma omp parallel for if(_have_source && (this->_.flags & flag::disable_parallelism) == 0)
 #endif
         for(size_t n = 0; n < 2; n++)
         {
@@ -441,7 +441,7 @@ namespace algorithm
       {
         optional<result<extent_type>> r[2];
 #if !defined(LLFIO_DISABLE_OPENMP) && defined(_OPENMP)
-#pragma omp parallel for if(_have_source && (this->_flags & flag::disable_parallelism) == 0)
+#pragma omp parallel for if(_have_source && (this->_.flags & flag::disable_parallelism) == 0)
 #endif
         for(size_t n = 0; n < 2; n++)
         {

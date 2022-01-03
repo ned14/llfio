@@ -378,7 +378,7 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override
   {
     LLFIO_LOG_FUNCTION_CALL(this);
-    if(_flags & flag::unlink_on_first_close)
+    if(_.flags & flag::unlink_on_first_close)
     {
       auto ret = unlink();
       if(!ret)

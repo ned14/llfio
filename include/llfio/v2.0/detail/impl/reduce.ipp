@@ -76,7 +76,7 @@ namespace algorithm
       oa.ObjectName = &_path;
       oa.RootDirectory = dirh.native_handle().h;
       oa.Attributes = 0;  // 0x40 /*OBJ_CASE_INSENSITIVE*/;
-      // if(!!(flags & file_flags::int_opening_link))
+      // if(!!(flags & file_.flags::int_opening_link))
       //  oa.Attributes|=0x100/*OBJ_OPENLINK*/;
 
       HANDLE h = INVALID_HANDLE_VALUE;
@@ -184,7 +184,7 @@ namespace algorithm
       oa.ObjectName = &_path;
       oa.RootDirectory = dirh.native_handle().h;
       oa.Attributes = 0;  // 0x40 /*OBJ_CASE_INSENSITIVE*/;
-      // if(!!(flags & file_flags::int_opening_link))
+      // if(!!(flags & file_.flags::int_opening_link))
       //  oa.Attributes|=0x100/*OBJ_OPENLINK*/;
 
       HANDLE h = INVALID_HANDLE_VALUE;

@@ -51,7 +51,7 @@ result<bool> path_handle::exists(path_view_type path) const noexcept
     oa.ObjectName = &_path;
     oa.RootDirectory = native_handle().h;
     oa.Attributes = 0;  // 0x40 /*OBJ_CASE_INSENSITIVE*/;
-    // if(!!(flags & file_flags::int_opening_link))
+    // if(!!(flags & file_.flags::int_opening_link))
     //  oa.Attributes|=0x100/*OBJ_OPENLINK*/;
 
     FILE_BASIC_INFORMATION fbi;
@@ -116,7 +116,7 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
     oa.ObjectName = &_path;
     oa.RootDirectory = base.is_valid() ? base.native_handle().h : nullptr;
     oa.Attributes = 0;  // 0x40 /*OBJ_CASE_INSENSITIVE*/;
-    // if(!!(flags & file_flags::int_opening_link))
+    // if(!!(flags & file_.flags::int_opening_link))
     //  oa.Attributes|=0x100/*OBJ_OPENLINK*/;
 
     LARGE_INTEGER AllocationSize{};

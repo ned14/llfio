@@ -147,7 +147,7 @@ public:
   //! Close or release all the pipes, depending on `flag::release_pipes_on_close`
   result<void> close_pipes() noexcept
   {
-    if(!(_flags & flag::release_pipes_on_close))
+    if(!(_.flags & flag::release_pipes_on_close))
     {
       // Close the other's side's write pipes first, as closing its
       // read pipe may cause it to immediately exit

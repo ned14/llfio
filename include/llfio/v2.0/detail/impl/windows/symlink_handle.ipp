@@ -30,8 +30,8 @@ LLFIO_V2_NAMESPACE_BEGIN
 result<symlink_handle> symlink_handle::reopen(mode mode_, deadline /*unused*/) const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  result<symlink_handle> ret(symlink_handle(native_handle_type(), _devid, _inode, _flags));
-  OUTCOME_TRY(do_clone_handle(ret.value()._v, _v, mode_, caching::all, _flags));
+  result<symlink_handle> ret(symlink_handle(native_handle_type(), _devid, _inode, _.flags));
+  OUTCOME_TRY(do_clone_handle(ret.value()._v, _v, mode_, caching::all, _.flags));
   return ret;
 }
 
@@ -125,7 +125,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
     oa.ObjectName = &_path;
     oa.RootDirectory = base.is_valid() ? base.native_handle().h : nullptr;
     oa.Attributes = 0;  // 0x40 /*OBJ_CASE_INSENSITIVE*/;
-    // if(!!(flags & file_flags::int_opening_link))
+    // if(!!(flags & file_.flags::int_opening_link))
     //  oa.Attributes|=0x100/*OBJ_OPENLINK*/;
 
     LARGE_INTEGER AllocationSize{};

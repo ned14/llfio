@@ -747,7 +747,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle::buffers_type> li
   auto &b = *req.buffers.begin();
   native_handle_type nativeh;
   nativeh.behaviour |= native_handle_type::disposition::socket | native_handle_type::disposition::kernel_handle;
-  OUTCOME_TRY(attribs_from_handle_mode_caching_and_flags(nativeh, _mode, handle::creation::if_needed, _caching, _flags));
+  OUTCOME_TRY(attribs_from_handle_mode_caching_and_flags(nativeh, _mode, handle::creation::if_needed, _caching, _.flags));
   nativeh.behaviour &= ~native_handle_type::disposition::seekable;  // not seekable
   for(;;)
   {
@@ -791,7 +791,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle::buffers_type> li
       socklen_t len = (socklen_t) sizeof(b.second._storage);
 #ifdef __linux__
       // Linux's accept() doesn't inherit flags for some odd reason
-      nativeh.fd = ::accept4(_v.fd, (sockaddr *) b.second._storage, &len, SOCK_CLOEXEC | ((_flags & handle::flag::multiplexable) ? SOCK_NONBLOCK : 0));
+      nativeh.fd = ::accept4(_v.fd, (sockaddr *) b.second._storage, &len, SOCK_CLOEXEC | ((_.flags & handle::flag::multiplexable) ? SOCK_NONBLOCK : 0));
 #else
       nativeh.fd = ::accept(_v.fd, (sockaddr *) b.second._storage, &len);
 #endif
@@ -825,7 +825,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle::buffers_type> li
       }
     }
   }
-  b.first = byte_socket_handle(nativeh, _caching, _flags, _ctx);
+  b.first = byte_socket_handle(nativeh, _caching, _.flags, _ctx);
   if(_mode == mode::read)
   {
     OUTCOME_TRY(b.first.shutdown(byte_socket_handle::shutdown_write));

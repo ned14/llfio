@@ -31,7 +31,7 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  flags &= ~flag::unlink_on_first_close;
+  flags &= ~flag(flag::unlink_on_first_close);
   result<pipe_handle> ret(pipe_handle(native_handle_type(), 0, 0, _caching, flags, nullptr));
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
@@ -96,7 +96,7 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
   oa.ObjectName = &_path;
   oa.RootDirectory = base.native_handle().h;
   oa.Attributes = 0x40 /*OBJ_CASE_INSENSITIVE*/;
-  // if(!!(flags & file_flags::int_opening_link))
+  // if(!!(flags & file_.flags::int_opening_link))
   //  oa.Attributes|=0x100/*OBJ_OPENLINK*/;
 
   if(creation::open_existing == _creation)
@@ -168,7 +168,7 @@ result<std::pair<pipe_handle, pipe_handle>> pipe_handle::anonymous_pipe(caching 
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   // Create an unnamed new pipe
-  flags &= ~flag::unlink_on_first_close;
+  flags &= ~flag(flag::unlink_on_first_close);
   OUTCOME_TRY(auto &&anonpipe, pipe({}, mode::read, creation::only_if_not_exist, _caching, flags));
   std::pair<pipe_handle, pipe_handle> ret(std::move(anonpipe), pipe_handle(native_handle_type(), 0, 0, _caching, flags, nullptr));
   native_handle_type &readnativeh = ret.first._v, &writenativeh = ret.second._v;

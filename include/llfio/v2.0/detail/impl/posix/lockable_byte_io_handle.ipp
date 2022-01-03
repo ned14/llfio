@@ -135,7 +135,7 @@ result<lockable_byte_io_handle::extent_guard> lockable_byte_io_handle::lock_file
         if(-1 == fcntl(_v.fd, (d && !d.nsecs) ? F_SETLK : F_SETLKW, &fl))
           failed = true;
         else
-          _flags |= flag::byte_lock_insanity;
+          _.flags |= flag::byte_lock_insanity;
       }
       else
         failed = true;
@@ -147,7 +147,7 @@ result<lockable_byte_io_handle::extent_guard> lockable_byte_io_handle::lock_file
     }
     else
     {
-      _flags |= flag::byte_lock_insanity;
+      _.flags |= flag::byte_lock_insanity;
     }
 #endif
   }

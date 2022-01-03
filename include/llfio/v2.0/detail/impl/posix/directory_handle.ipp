@@ -166,7 +166,7 @@ opened:
     if(!ret.value()._fetch_inode())
     {
       // If fetching inode failed e.g. were opening device, disable safety unlinks
-      ret.value()._flags &= ~flag::disable_safety_unlinks;
+      ret.value()._.flags &= ~flag::disable_safety_unlinks;
     }
   }
   if(ret.value().are_safety_barriers_issued())
@@ -182,7 +182,7 @@ result<directory_handle> directory_handle::reopen(mode mode_, caching caching_, 
   // Fast path
   if(mode_ == mode::unchanged && caching_ == caching::unchanged)
   {
-    result<directory_handle> ret(directory_handle(native_handle_type(), _devid, _inode, kernel_caching(), _flags));
+    result<directory_handle> ret(directory_handle(native_handle_type(), _devid, _inode, kernel_caching(), _.flags));
     ret.value()._v.behaviour = _v.behaviour;
     ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC, 0);
     if(-1 == ret.value()._v.fd)
@@ -210,7 +210,7 @@ result<directory_handle> directory_handle::reopen(mode mode_, caching caching_, 
     // Get the current path of myself
     OUTCOME_TRY(auto &&currentpath, current_path());
     // Open myself
-    auto fh = directory({}, currentpath, mode_, creation::open_existing, caching_, _flags);
+    auto fh = directory({}, currentpath, mode_, creation::open_existing, caching_, _.flags);
     if(fh)
     {
       if(fh.value().unique_id() == unique_id())
@@ -249,7 +249,7 @@ result<directory_handle> directory_handle::reopen(mode mode_, caching caching_, 
 LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> directory_handle::clone_to_path_handle() const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  result<path_handle> ret(path_handle(native_handle_type(), kernel_caching(), _flags));
+  result<path_handle> ret(path_handle(native_handle_type(), kernel_caching(), _.flags));
   ret.value()._v.behaviour = _v.behaviour;
   ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC, 0);
   if(-1 == ret.value()._v.fd)

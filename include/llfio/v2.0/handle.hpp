@@ -36,6 +36,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #ifdef _MSC_VER
 #pragma warning(push)
+#pragma warning(disable : 4201)  // nameless struct
 #pragma warning(disable : 4251)  // dll interface
 #endif
 
@@ -106,8 +107,8 @@ public:
        // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
   };
   //! Bitwise flags which can be specified
-  QUICKCPPLIB_BITFIELD_BEGIN(flag){
-  none = 0,  //!< No flags
+  QUICKCPPLIB_BITFIELD_BEGIN_T(flag, uint16_t){
+  none = uint16_t(0),  //!< No flags
   /*! Unlinks the file on handle close. On POSIX, this simply unlinks whatever is pointed
   to by `path()` upon the call of `close()` if and only if the inode matches. On Windows,
   if you are on Windows 10 1709 or later, exactly the same thing occurs. If on previous
@@ -117,7 +118,7 @@ public:
   somewhat emulated by LLFIO on older Windows by renaming the file to a random name on `close()`
   causing it to appear to have been unlinked immediately.
   */
-  unlink_on_first_close = 1U << 0U,
+  unlink_on_first_close = uint16_t(1U << 0U),
 
   /*! Some kernel caching modes have unhelpfully inconsistent behaviours
   in getting your data onto storage, so by default unless this flag is
@@ -136,7 +137,7 @@ public:
   * caching::reads_and_metadata
   * caching::safety_barriers
   */
-  disable_safety_barriers = 1U << 2U,
+  disable_safety_barriers = uint16_t(1U << 2U),
   /*! `file_handle::unlink()` could accidentally delete the wrong file if someone has
   renamed the open file handle since the time it was opened. To prevent this occuring,
   where the OS doesn't provide race free unlink-by-open-handle we compare the inode of
@@ -145,17 +146,17 @@ public:
   and executing the unlink a third party changes the item about to be unlinked. Only
   operating systems with a true race-free unlink syscall are race free.
   */
-  disable_safety_unlinks = 1U << 3U,
+  disable_safety_unlinks = uint16_t(1U << 3U),
   /*! Ask the OS to disable prefetching of data. This can improve random
   i/o performance.
   */
-  disable_prefetching = 1U << 4U,
+  disable_prefetching = uint16_t(1U << 4U),
   /*! Ask the OS to maximise prefetching of data, possibly prefetching the entire file
   into kernel cache. This can improve sequential i/o performance.
   */
-  maximum_prefetching = 1U << 5U,
+  maximum_prefetching = uint16_t(1U << 5U),
 
-  win_disable_unlink_emulation = 1U << 24U,  //!< See the documentation for `unlink_on_first_close`
+  win_disable_unlink_emulation = uint16_t(1U << 9U),  //!< See the documentation for `unlink_on_first_close`
   /*! Microsoft Windows NTFS, having been created in the late 1980s, did not originally
   implement extents-based storage and thus could only represent sparse files via
   efficient compression of intermediate zeros. With NTFS v3.0 (Microsoft Windows 2000),
@@ -171,20 +172,20 @@ public:
   extents-based storage for any empty file it creates. If you don't want this, you
   can specify this flag to prevent that happening.
   */
-  win_disable_sparse_file_creation = 1U << 25U,
+  win_disable_sparse_file_creation = uint16_t(1U << 10U),
   /*! Filesystems tend to be embarrassingly parallel for operations performed to different
   inodes. Where LLFIO performs i/o to multiple inodes at a time, it will use OpenMP or
   the Parallelism or Concurrency standard library extensions to usually complete the
   operation in constant rather than linear time. If you don't want this default, you can
   disable default using this flag.
   */
-  disable_parallelism = 1U << 26U,
+  disable_parallelism = uint16_t(1U << 11U),
   /*! Microsoft Windows NTFS has the option, when creating a directory, to set whether
   leafname lookup will be case sensitive. This is the only way of getting exact POSIX
   semantics on Windows without resorting to editing the system registry, however it also
   affects all code doing lookups within that directory, so we must default it to off.
   */
-  win_create_case_sensitive_directory = 1U << 27U,
+  win_create_case_sensitive_directory = uint16_t(1U << 12U),
 
   /*! Create the handle in a way where i/o upon it can be multiplexed with other i/o
   on the same initiating thread of execution i.e. you can perform more than one read
@@ -195,18 +196,27 @@ public:
   as pipes and sockets, however for file, directory and symlink handles it does not set
   nonblocking, as it is non-portable.
   */
-  multiplexable = 1U << 28U,
+  multiplexable = uint16_t(1U << 13U),
 
   // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
 
-  byte_lock_insanity = 1U << 29U,  //!< Using insane POSIX byte range locks
-  anonymous_inode = 1U << 30U      //!< This is an inode created with no representation on the filing system
+  byte_lock_insanity = uint16_t(1U << 14U),  //!< Using insane POSIX byte range locks
+  anonymous_inode = uint16_t(1U << 15U)      //!< This is an inode created with no representation on the filing system
   } QUICKCPPLIB_BITFIELD_END(flag);
 
 protected:
   // vptr takes 4 or 8 bytes
-  native_handle_type _v;    // +8 or +12: total 12 or 20 bytes
-  flag _flags{flag::none};  // +4: total 16 or 24 bytes
+  union
+  {
+    native_handle_type _v;  // +12 or +16: total 16 or 24 bytes
+    struct
+    {
+      intptr_t _padding0_;
+      uint32_t _padding1_;
+      flag flags;  // exactly matches disposition::_flags_bits
+      uint16_t _padding2_;
+    } _;
+  };
 
   static constexpr void _set_caching(native_handle_type &nativeh, caching caching) noexcept
   {
@@ -247,12 +257,15 @@ protected:
 
 public:
   //! Default constructor
-  constexpr handle() {}  // NOLINT
+  constexpr handle()
+      : _v()
+  {
+  }  // NOLINT
   //! Construct a handle from a supplied native handle
   explicit constexpr handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none) noexcept
       : _v(std::move(h))
-      , _flags(flags)
   {
+    _.flags = flags;
     _set_caching(_v, caching);
   }
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~handle();
@@ -263,10 +276,8 @@ public:
   //! Move the handle.
   constexpr handle(handle &&o) noexcept
       : _v(std::move(o._v))
-      , _flags(o._flags)
   {
     o._v = native_handle_type();
-    o._flags = flag::none;
   }
   //! Move assignment of handle
   handle &operator=(handle &&o) noexcept
@@ -369,7 +380,7 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> set_append_only(bool enable) noexcept;
 
   //! True if multiplexable
-  bool is_multiplexable() const noexcept { return !!(_flags & flag::multiplexable); }
+  bool is_multiplexable() const noexcept { return !!(_.flags & flag::multiplexable); }
   //! True if nonblocking
   bool is_nonblocking() const noexcept { return _v.is_nonblocking(); }
   //! True if seekable
@@ -442,7 +453,7 @@ public:
   bool are_safety_barriers_issued() const noexcept { return !!(_v.behaviour & native_handle_type::disposition::safety_barriers); }
 
   //! The flags this handle was opened with
-  flag flags() const noexcept { return _flags; }
+  flag flags() const noexcept { return _.flags; }
   //! The native handle used by this handle
   native_handle_type native_handle() const noexcept { return _v; }
 };

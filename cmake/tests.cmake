@@ -36,6 +36,7 @@ set(llfio_TESTS
   "test/tests/statfs.cpp"
   "test/tests/symlink_handle_create_close/kernel_symlink_handle.cpp.hpp"
   "test/tests/symlink_handle_create_close/runner.cpp"
+  "test/tests/tls_socket_handle.cpp"
   "test/tests/traverse.cpp"
   "test/tests/trivial_vector.cpp"
   "test/tests/utils.cpp"

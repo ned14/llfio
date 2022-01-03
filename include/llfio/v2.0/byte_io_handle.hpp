@@ -130,7 +130,7 @@ protected:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> _do_read(registered_buffer_type base, io_request<buffers_type> reqs, deadline d) noexcept
   {
     (void) base;
-    return _do_read(reqs, d);
+    return byte_io_handle::_do_read(reqs, d);
   }
   //! The virtualised implementation of `write()` used if no multiplexer has been set.
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_write(io_request<const_buffers_type> reqs, deadline d) noexcept;
@@ -138,7 +138,7 @@ protected:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_write(registered_buffer_type base, io_request<const_buffers_type> reqs, deadline d) noexcept
   {
     (void) base;
-    return _do_write(reqs, d);
+    return byte_io_handle::_do_write(reqs, d);
   }
   //! The virtualised implementation of `barrier()` used if no multiplexer has been set.
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_barrier(io_request<const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept;

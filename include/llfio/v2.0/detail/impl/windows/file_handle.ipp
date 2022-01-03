@@ -88,7 +88,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
     oa.ObjectName = &_path;
     oa.RootDirectory = base.is_valid() ? base.native_handle().h : nullptr;
     oa.Attributes = 0;  // 0x40 /*OBJ_CASE_INSENSITIVE*/;
-    // if(!!(flags & file_flags::int_opening_link))
+    // if(!!(flags & file_.flags::int_opening_link))
     //  oa.Attributes|=0x100/*OBJ_OPENLINK*/;
 
     LARGE_INTEGER AllocationSize{};
@@ -311,7 +311,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
         if(ntstat >= 0)
         {
           // No need to delete it again on close
-          ret.value()._flags &= ~flag::unlink_on_first_close;
+          ret.value()._.flags &= ~flag(flag::unlink_on_first_close);
         }
       }
     }
@@ -322,9 +322,9 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
 result<file_handle> file_handle::reopen(mode mode_, caching caching_, deadline /*unused*/) const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  result<file_handle> ret(in_place_type<file_handle>, native_handle_type(), caching_, _flags, nullptr);
+  result<file_handle> ret(in_place_type<file_handle>, native_handle_type(), caching_, _.flags, nullptr);
   ret.value()._ctx = _ctx;
-  OUTCOME_TRY(do_clone_handle(ret.value()._v, _v, mode_, caching_, _flags));
+  OUTCOME_TRY(do_clone_handle(ret.value()._v, _v, mode_, caching_, _.flags));
   return ret;
 }
 

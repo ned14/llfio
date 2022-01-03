@@ -106,7 +106,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     oa.ObjectName = &_path;
     oa.RootDirectory = base.is_valid() ? base.native_handle().h : nullptr;
     oa.Attributes = 0;  // 0x40 /*OBJ_CASE_INSENSITIVE*/;
-    // if(!!(flags & file_flags::int_opening_link))
+    // if(!!(flags & file_.flags::int_opening_link))
     //  oa.Attributes|=0x100/*OBJ_OPENLINK*/;
 
     LARGE_INTEGER AllocationSize{};
@@ -211,15 +211,15 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
 result<directory_handle> directory_handle::reopen(mode mode_, caching caching_, deadline /* unused */) const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  result<directory_handle> ret(directory_handle(native_handle_type(), _devid, _inode, kernel_caching(), _flags));
-  OUTCOME_TRY(do_clone_handle(ret.value()._v, _v, mode_, caching_, _flags, true));
+  result<directory_handle> ret(directory_handle(native_handle_type(), _devid, _inode, kernel_caching(), _.flags));
+  OUTCOME_TRY(do_clone_handle(ret.value()._v, _v, mode_, caching_, _.flags, true));
   return ret;
 }
 
 LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<path_handle> directory_handle::clone_to_path_handle() const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  result<path_handle> ret(path_handle(native_handle_type(), kernel_caching(), _flags));
+  result<path_handle> ret(path_handle(native_handle_type(), kernel_caching(), _.flags));
   ret.value()._v.behaviour = _v.behaviour;
   if(DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, 0, DUPLICATE_SAME_ACCESS) == 0)
   {

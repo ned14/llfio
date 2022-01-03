@@ -245,6 +245,8 @@ public:
 
     // Emulation of this being a span<byte> in the TS
 
+    //! Returns if this buffer is empty
+    LLFIO_NODISCARD constexpr bool empty() const noexcept { return _len == 0; }
     //! Returns the address of the bytes for this buffer
     constexpr pointer data() noexcept { return _data; }
     //! Returns the address of the bytes for this buffer
@@ -320,6 +322,8 @@ public:
 
     // Emulation of this being a span<byte> in the TS
 
+    //! Returns if this buffer is empty
+    LLFIO_NODISCARD constexpr bool empty() const noexcept { return _len == 0; }
     //! Returns the address of the bytes for this buffer
     constexpr pointer data() noexcept { return _data; }
     //! Returns the address of the bytes for this buffer

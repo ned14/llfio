@@ -214,7 +214,7 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
     {
       return posix_error();
     }
-    h._flags &= ~handle::flag::anonymous_inode;
+    h._.flags &= ~handle::flag(handle::flag::anonymous_inode);
     return success();
   }
 #endif

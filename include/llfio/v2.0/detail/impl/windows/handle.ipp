@@ -86,7 +86,7 @@ result<void> handle::close() noexcept
   {
 #ifndef NDEBUG
     // Trap when refined handle implementations don't set their vptr properly (this took a while to debug!)
-    if((static_cast<unsigned>(_v.behaviour) & 0xff00) != 0 && !(_v.behaviour & native_handle_type::disposition::_child_close_executed))
+    if((static_cast<uint64_t>(_v.behaviour) & 0xff00) != 0 && !(_v.behaviour & native_handle_type::disposition::_child_close_executed))
     {
       LLFIO_LOG_FATAL(this, "handle::close() called on a derived handle implementation, this suggests vptr is incorrect");
       abort();
@@ -111,7 +111,7 @@ result<void> handle::close() noexcept
 result<handle> handle::clone() const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  result<handle> ret(handle(native_handle_type(), kernel_caching(), _flags));
+  result<handle> ret(handle(native_handle_type(), kernel_caching(), _.flags));
   ret.value()._v.behaviour = _v.behaviour;
   if(DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, 0, DUPLICATE_SAME_ACCESS) == 0)
   {
