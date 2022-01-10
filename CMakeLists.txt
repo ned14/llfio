@@ -475,6 +475,13 @@ endif()
 # Cache this library's auto scanned sources for later reuse
 include(QuickCppLibCacheLibrarySources)
 
+# Dependencies needed to consume our cmake package
+set(PROJECT_PACKAGE_DEPENDENCIES [=[
+include(CMakeFindDependencyMacro)
+find_dependency(quickcpplib)
+find_dependency(outcome)
+]=])
+
 # Make available this library for install and export
 include(QuickCppLibMakeInstall)
 if(WIN32 AND NOT LLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE)
