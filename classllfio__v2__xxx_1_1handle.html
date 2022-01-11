@@ -104,14 +104,20 @@ Inheritance diagram for llfio_v2_xxx::handle:</div>
  <div class="center">
   <img src="classllfio__v2__xxx_1_1handle.png" usemap="#llfio_5Fv2_5Fxxx::handle_map" alt=""/>
   <map id="llfio_5Fv2_5Fxxx::handle_map" name="llfio_5Fv2_5Fxxx::handle_map">
-<area href="classllfio__v2__xxx_1_1awaitable__handle.html" title="An awaitable handle which attempts to execute the i/o immediately. If the i/o can complete immediatel..." alt="llfio_v2_xxx::awaitable_handle&lt; IoHandleType &gt;" shape="rect" coords="294,56,578,80"/>
-<area href="classllfio__v2__xxx_1_1byte__io__handle.html" title="A handle to something capable of scatter-gather byte i/o." alt="llfio_v2_xxx::byte_io_handle" shape="rect" coords="294,112,578,136"/>
-<area href="classllfio__v2__xxx_1_1byte__io__multiplexer.html" title="A multiplexer of byte-orientated i/o." alt="llfio_v2_xxx::byte_io_multiplexer" shape="rect" coords="294,168,578,192"/>
-<area href="classllfio__v2__xxx_1_1listening__socket__handle.html" alt="llfio_v2_xxx::listening_socket_handle" shape="rect" coords="294,224,578,248"/>
-<area href="classllfio__v2__xxx_1_1path__handle.html" title="A handle to somewhere originally identified by a path on the filing system. Typically used as the lig..." alt="llfio_v2_xxx::path_handle" shape="rect" coords="294,280,578,304"/>
-<area href="classllfio__v2__xxx_1_1process__handle.html" title="A handle to this, or another, process." alt="llfio_v2_xxx::process_handle" shape="rect" coords="294,336,578,360"/>
-<area href="classllfio__v2__xxx_1_1section__handle.html" title="A handle to a source of mapped memory." alt="llfio_v2_xxx::section_handle" shape="rect" coords="294,392,578,416"/>
-<area href="classllfio__v2__xxx_1_1symlink__handle.html" title="A handle to an inode which redirects to a different path." alt="llfio_v2_xxx::symlink_handle" shape="rect" coords="294,448,578,472"/>
+<area href="classllfio__v2__xxx_1_1awaitable__handle.html" title="An awaitable handle which attempts to execute the i/o immediately. If the i/o can complete immediatel..." alt="llfio_v2_xxx::awaitable_handle&lt; IoHandleType &gt;" shape="rect" coords="0,56,284,80"/>
+<area href="classllfio__v2__xxx_1_1io__handle.html" title="A handle to something capable of scatter-gather byte i/o." alt="llfio_v2_xxx::io_handle" shape="rect" coords="441,56,725,80"/>
+<area href="classllfio__v2__xxx_1_1io__multiplexer.html" title="A multiplexer of byte-orientated i/o." alt="llfio_v2_xxx::io_multiplexer" shape="rect" coords="735,56,1019,80"/>
+<area href="classllfio__v2__xxx_1_1path__handle.html" title="A handle to somewhere originally identified by a path on the filing system. Typically used as the lig..." alt="llfio_v2_xxx::path_handle" shape="rect" coords="1029,56,1313,80"/>
+<area href="classllfio__v2__xxx_1_1process__handle.html" title="A handle to this, or another, process." alt="llfio_v2_xxx::process_handle" shape="rect" coords="1323,56,1607,80"/>
+<area href="classllfio__v2__xxx_1_1section__handle.html" title="A handle to a source of mapped memory." alt="llfio_v2_xxx::section_handle" shape="rect" coords="1617,56,1901,80"/>
+<area href="classllfio__v2__xxx_1_1symlink__handle.html" title="A handle to an inode which redirects to a different path." alt="llfio_v2_xxx::symlink_handle" shape="rect" coords="1911,56,2195,80"/>
+<area href="classllfio__v2__xxx_1_1lockable__io__handle.html" title="A handle to something capable of scatter-gather i/o and which can exclude other concurrent users...." alt="llfio_v2_xxx::lockable_io_handle" shape="rect" coords="294,112,578,136"/>
+<area href="classllfio__v2__xxx_1_1pipe__handle.html" title="A handle to a named or anonymous pipe." alt="llfio_v2_xxx::pipe_handle" shape="rect" coords="588,112,872,136"/>
+<area href="classllfio__v2__xxx_1_1directory__handle.html" title="A handle to a directory which can be enumerated." alt="llfio_v2_xxx::directory_handle" shape="rect" coords="1029,112,1313,136"/>
+<area href="classllfio__v2__xxx_1_1file__handle.html" title="A handle to a regular file or device." alt="llfio_v2_xxx::file_handle" shape="rect" coords="147,168,431,192"/>
+<area href="classllfio__v2__xxx_1_1map__handle.html" title="A handle to a memory mapped region of memory, either backed by the system page file or by a section." alt="llfio_v2_xxx::map_handle" shape="rect" coords="441,168,725,192"/>
+<area href="classllfio__v2__xxx_1_1fast__random__file__handle.html" title="A handle to synthesised, non-cryptographic, pseudo-random data." alt="llfio_v2_xxx::fast_random_file_handle" shape="rect" coords="0,224,284,248"/>
+<area href="classllfio__v2__xxx_1_1mapped__file__handle.html" title="A memory mapped regular file or device." alt="llfio_v2_xxx::mapped_file_handle" shape="rect" coords="294,224,578,248"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -251,10 +257,6 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a751e912d8dab755ea969a418c1d544eb">requires_aligned_io</a> () const noexcept</td></tr>
 <tr class="memdesc:a751e912d8dab755ea969a418c1d544eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if requires aligned i/o. <br /></td></tr>
 <tr class="separator:a751e912d8dab755ea969a418c1d544eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8ca660b86e595ad4d4e124e46f61b127"><td class="memItemLeft" align="right" valign="top"><a id="a8ca660b86e595ad4d4e124e46f61b127"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a8ca660b86e595ad4d4e124e46f61b127">is_kernel_handle</a> () const noexcept</td></tr>
-<tr class="memdesc:a8ca660b86e595ad4d4e124e46f61b127"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if <code>native_handle()</code> is a valid kernel handle. <br /></td></tr>
-<tr class="separator:a8ca660b86e595ad4d4e124e46f61b127"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7751fbb4b1aff527f469412ea33116ed"><td class="memItemLeft" align="right" valign="top"><a id="a7751fbb4b1aff527f469412ea33116ed"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a7751fbb4b1aff527f469412ea33116ed">is_regular</a> () const noexcept</td></tr>
 <tr class="memdesc:a7751fbb4b1aff527f469412ea33116ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if a regular file or device. <br /></td></tr>
@@ -295,14 +297,6 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#acf27a33c88cb7463ee228983690bce0f">is_path</a> () const noexcept</td></tr>
 <tr class="memdesc:acf27a33c88cb7463ee228983690bce0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if a path or a directory. <br /></td></tr>
 <tr class="separator:acf27a33c88cb7463ee228983690bce0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a53065eb7c4166e9d39036b1b122e8cab"><td class="memItemLeft" align="right" valign="top"><a id="a53065eb7c4166e9d39036b1b122e8cab"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a53065eb7c4166e9d39036b1b122e8cab">is_tls_socket</a> () const noexcept</td></tr>
-<tr class="memdesc:a53065eb7c4166e9d39036b1b122e8cab"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if a TLS socket. <br /></td></tr>
-<tr class="separator:a53065eb7c4166e9d39036b1b122e8cab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4690e0a5364e33a70747beb45585695e"><td class="memItemLeft" align="right" valign="top"><a id="a4690e0a5364e33a70747beb45585695e"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a4690e0a5364e33a70747beb45585695e">is_http_socket</a> () const noexcept</td></tr>
-<tr class="memdesc:a4690e0a5364e33a70747beb45585695e"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if a HTTP socket. <br /></td></tr>
-<tr class="separator:a4690e0a5364e33a70747beb45585695e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a90bf8668df002dac5a7d9397486b2946"><td class="memItemLeft" align="right" valign="top"><a id="a90bf8668df002dac5a7d9397486b2946"></a>
 <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a90bf8668df002dac5a7d9397486b2946">kernel_caching</a> () const noexcept</td></tr>
 <tr class="memdesc:a90bf8668df002dac5a7d9397486b2946"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kernel cache strategy used by this handle. <br /></td></tr>
@@ -500,8 +494,8 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    none = 2,        <span class="comment">//!&lt; No ability to read or write anything, but can synchronise (SYNCHRONIZE or 0)</span></div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="comment"></span>    attr_read = 4,   <span class="comment">//!&lt; Ability to read attributes (FILE_READ_ATTRIBUTES|SYNCHRONIZE or O_RDONLY)</span></div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment"></span>    attr_write = 5,  <span class="comment">//!&lt; Ability to read and write attributes (FILE_READ_ATTRIBUTES|FILE_WRITE_ATTRIBUTES|SYNCHRONIZE or O_RDONLY)</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment"></span>    <a class="code" href="namespacellfio__v2__xxx.html#acbd9eb25fed94bb0bc8fa888b3c26bdf">read</a> = 6,        <span class="comment">//!&lt; Ability to read (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|SYNCHRONISE or O_RDONLY)</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment"></span>    <a class="code" href="namespacellfio__v2__xxx.html#a59a3e33e0a5f68b867049fd640059b4d">write</a> =</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment"></span>    <a class="code" href="namespacellfio__v2__xxx.html#af678f58d20e1f0962ff0744150342683">read</a> = 6,        <span class="comment">//!&lt; Ability to read (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|SYNCHRONISE or O_RDONLY)</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment"></span>    <a class="code" href="namespacellfio__v2__xxx.html#a5a8908704c9988bbecc69c2359e6fd4a">write</a> =</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    7,  <span class="comment">//!&lt; Ability to read and write (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|FILE_WRITE_DATA|FILE_WRITE_ATTRIBUTES|FILE_WRITE_EA|FILE_APPEND_DATA|SYNCHRONISE or O_RDWR)</span></div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="comment"></span>    append = 9  <span class="comment">//!&lt; All mainstream OSs and CIFS guarantee this is atomic with respect to all other appenders (FILE_APPEND_DATA|SYNCHRONISE or O_APPEND)</span></div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="comment"></span>                <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div>
@@ -750,8 +744,8 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="anamespacellfio__v2__xxx_html_a59a3e33e0a5f68b867049fd640059b4d"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a59a3e33e0a5f68b867049fd640059b4d">llfio_v2_xxx::write</a></div><div class="ttdeci">byte_io_handle::io_result&lt; byte_io_handle::const_buffers_type &gt; write(byte_io_handle &amp;self, byte_io_handle::io_request&lt; byte_io_handle::const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the open handle.</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:681</div></div>
-<div class="ttc" id="anamespacellfio__v2__xxx_html_acbd9eb25fed94bb0bc8fa888b3c26bdf"><div class="ttname"><a href="namespacellfio__v2__xxx.html#acbd9eb25fed94bb0bc8fa888b3c26bdf">llfio_v2_xxx::read</a></div><div class="ttdeci">byte_io_handle::io_result&lt; byte_io_handle::buffers_type &gt; read(byte_io_handle &amp;self, byte_io_handle::io_request&lt; byte_io_handle::buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Read data from the open handle.</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:654</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_a5a8908704c9988bbecc69c2359e6fd4a"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a5a8908704c9988bbecc69c2359e6fd4a">llfio_v2_xxx::write</a></div><div class="ttdeci">io_handle::io_result&lt; io_handle::const_buffers_type &gt; write(io_handle &amp;self, io_handle::io_request&lt; io_handle::const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the open handle.</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:596</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_af678f58d20e1f0962ff0744150342683"><div class="ttname"><a href="namespacellfio__v2__xxx.html#af678f58d20e1f0962ff0744150342683">llfio_v2_xxx::read</a></div><div class="ttdeci">file_handle::io_result&lt; file_handle::size_type &gt; read(file_handle &amp;self, file_handle::extent_type offset, std::initializer_list&lt; file_handle::buffer_type &gt; lst, deadline d=deadline()) noexcept</div><div class="ttdoc">This is an overloaded member function, provided for convenience. It differs from the above function o...</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:479</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

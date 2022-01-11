@@ -1,8 +1,5 @@
 var searchData=
 [
-  ['map_5fhandle_930',['map_handle',['../classllfio__v2__xxx_1_1map__handle.html',1,'llfio_v2_xxx']]],
-  ['mapped_931',['mapped',['../classllfio__v2__xxx_1_1mapped.html',1,'llfio_v2_xxx']]],
-  ['mapped_5ffile_5fhandle_932',['mapped_file_handle',['../classllfio__v2__xxx_1_1mapped__file__handle.html',1,'llfio_v2_xxx']]],
-  ['memory_5fmap_933',['memory_map',['../classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html',1,'llfio_v2_xxx::algorithm::shared_fs_mutex']]],
-  ['multiplexes_5ft_934',['multiplexes_t',['../structllfio__v2__xxx_1_1byte__io__multiplexer_1_1implementation__information__t_1_1multiplexes__t.html',1,'llfio_v2_xxx::byte_io_multiplexer::implementation_information_t']]]
+  ['native_5fhandle_5ftype_850',['native_handle_type',['../structllfio__v2__xxx_1_1native__handle__type.html',1,'llfio_v2_xxx']]],
+  ['noncompleted_5ft_851',['noncompleted_t',['../structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t_1_1noncompleted__t.html',1,'llfio_v2_xxx::io_multiplexer::_unsynchronised_io_operation_state::payload_t']]]
 ];

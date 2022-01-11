@@ -1,17 +1,7 @@
 var searchData=
 [
-  ['page_5fallocator_937',['page_allocator',['../classllfio__v2__xxx_1_1utils_1_1page__allocator.html',1,'llfio_v2_xxx::utils']]],
-  ['page_5fallocator_3c_20void_20_3e_938',['page_allocator&lt; void &gt;',['../classllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4.html',1,'llfio_v2_xxx::utils']]],
-  ['params_5ft_939',['params_t',['../unionllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payloa7a7b0467733dd4d8f302e57707262627.html',1,'llfio_v2_xxx::byte_io_multiplexer::_unsynchronised_io_operation_state::payload_t::noncompleted_t']]],
-  ['path_5fhandle_940',['path_handle',['../classllfio__v2__xxx_1_1path__handle.html',1,'llfio_v2_xxx']]],
-  ['path_5fhasher_941',['path_hasher',['../structllfio__v2__xxx_1_1path__hasher.html',1,'llfio_v2_xxx']]],
-  ['path_5fview_942',['path_view',['../classllfio__v2__xxx_1_1path__view.html',1,'llfio_v2_xxx']]],
-  ['path_5fview_5fcomponent_943',['path_view_component',['../classllfio__v2__xxx_1_1path__view__component.html',1,'llfio_v2_xxx']]],
-  ['payload_5ft_944',['payload_t',['../unionllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t.html',1,'llfio_v2_xxx::byte_io_multiplexer::_unsynchronised_io_operation_state']]],
-  ['pipe_5fhandle_945',['pipe_handle',['../classllfio__v2__xxx_1_1pipe__handle.html',1,'llfio_v2_xxx']]],
-  ['pollable_5fhandle_946',['pollable_handle',['../classllfio__v2__xxx_1_1pollable__handle.html',1,'llfio_v2_xxx']]],
-  ['prng_947',['prng',['../structllfio__v2__xxx_1_1fast__random__file__handle_1_1prng.html',1,'llfio_v2_xxx::fast_random_file_handle']]],
-  ['process_5fcpu_5fusage_948',['process_cpu_usage',['../structllfio__v2__xxx_1_1utils_1_1process__cpu__usage.html',1,'llfio_v2_xxx::utils']]],
-  ['process_5fhandle_949',['process_handle',['../classllfio__v2__xxx_1_1process__handle.html',1,'llfio_v2_xxx']]],
-  ['process_5fmemory_5fusage_950',['process_memory_usage',['../structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html',1,'llfio_v2_xxx::utils']]]
+  ['read_5fparams_5ft_865',['read_params_t',['../structllfio__v2__xxx_1_1io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t_fd29c581ca55bf5954d3fa054ce41041.html',1,'llfio_v2_xxx::io_multiplexer::_unsynchronised_io_operation_state::payload_t::noncompleted_t::params_t']]],
+  ['read_5freceiver_866',['read_receiver',['../classllfio__v2__xxx_1_1read__receiver.html',1,'llfio_v2_xxx']]],
+  ['rebind_867',['rebind',['../structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html',1,'llfio_v2_xxx::utils::page_allocator&lt; T &gt;::rebind&lt; U &gt;'],['../structllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html',1,'llfio_v2_xxx::utils::page_allocator&lt; void &gt;::rebind']]],
+  ['reduce_5fvisitor_868',['reduce_visitor',['../structllfio__v2__xxx_1_1algorithm_1_1reduce__visitor.html',1,'llfio_v2_xxx::algorithm']]]
 ];

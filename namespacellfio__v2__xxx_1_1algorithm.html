@@ -539,9 +539,6 @@ template&lt;class T , class... Args&gt; </div>
 <p>Summarise the directory identified <code>dirh</code>, and everything therein. </p>
 <p>Summarise the directory identified <code>topdirh</code>, and everything therein.</p>
 <p>It can be useful to summarise a directory hierarchy, especially to determine how much storage it occupies, but also how many mounted filesystems it straddles etc. You should specify what metadata you wish to summarise, if this is a subset of what metadata <code>directory_handle::read()</code> returns, performance will be considerably better. The default summarises all possible metadata.</p>
-<p>This is a trivial implementation on top of <code>algorithm::traverse()</code>, indeed it is implemented entirely as header code. You should review the documentation for <code>algorithm::traverse()</code>, as this algorithm is entirely implemented using that algorithm.</p>
-<p>It can be useful to summarise a directory hierarchy, especially to determine how much storage it occupies, but also how many mounted filesystems it straddles etc. You should specify what metadata you wish to summarise, if this is a subset of what metadata <code>directory_handle::read()</code> returns, performance will be considerably better. The default summarises all possible metadata.</p>
-<p>Most errors during summary are accumulated into <code>stats_failed</code> and <code>directory_opens_failed</code>, rather than failing the summary.</p>
 <p>This is a trivial implementation on top of <code>algorithm::traverse()</code>, indeed it is implemented entirely as header code. You should review the documentation for <code>algorithm::traverse()</code>, as this algorithm is entirely implemented using that algorithm. </p>
 <div class="fragment"><div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  {</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    LLFIO_LOG_FUNCTION_CALL(&amp;dirh);</div>
@@ -624,7 +621,7 @@ template&lt;class T , class... Args&gt; </div>
 </ol>
 <p>If <code>known_dirs_remaining</code> exceeds four, a threadpool of not more than <code>threads</code> threads is spun up in order to traverse the hierarchy more quickly.</p>
 <p>This algorithm is therefore primarily a breadth-first algorithm, in that we proceed from root, level by level, to the tips. The number returned is the total number of directories traversed.</p>
-<h2><a class="anchor" id="autotoc_md19"></a>
+<h2><a class="anchor" id="autotoc_md18"></a>
 Notes</h2>
 <p>The implementation tries hard to not open too many file descriptors at a time in order to not exceed the system limit, which may be as low as 1024 on POSIX. On POSIX, it checks <code>getrlimit(RLIMIT_NOFILE)</code> for the soft limit on open file descriptors, and if the remaining unused open file descriptors is less than 65536, it will prefer a slow path implementation which exchanges file descriptor usage for lots more dynamic memory allocation and memory copying. You can force this slow path on any platform using <code>force_slow_path</code>, and in correct code you should always check for failures in <code>directory_open_failed()</code> comparing equal to <code>errc::too_many_files_open</code>, and if encountered restart the traversal using the slow path forced.</p>
 <p>Almost every modern POSIX system allows a <code>RLIMIT_NOFILE</code> of over a million nowadays, so you should <code>setrlimit(RLIMIT_NOFILE)</code> appropriately in your program if you are absolutely sure that doing so will not break code in your program (e.g. <code>select()</code> fails spectacularly if file descriptors exceed 1024 on most POSIX).</p>

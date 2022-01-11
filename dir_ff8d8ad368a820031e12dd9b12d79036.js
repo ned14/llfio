@@ -1,9 +1,6 @@
 var dir_ff8d8ad368a820031e12dd9b12d79036 =
 [
     [ "algorithm", "dir_2e3f7bf739bad988e6850471c071ba11.html", "dir_2e3f7bf739bad988e6850471c071ba11" ],
-    [ "byte_io_handle.hpp", "byte__io__handle_8hpp.html", "byte__io__handle_8hpp" ],
-    [ "byte_socket_handle.hpp", "byte__socket__handle_8hpp.html", "byte__socket__handle_8hpp" ],
-    [ "byte_socket_source.hpp", "byte__socket__source_8hpp.html", "byte__socket__source_8hpp" ],
     [ "config.hpp", "config_8hpp.html", "config_8hpp" ],
     [ "deadline.h", "deadline_8h.html", "deadline_8h" ],
     [ "directory_handle.hpp", "directory__handle_8hpp.html", "directory__handle_8hpp" ],
@@ -15,8 +12,9 @@ var dir_ff8d8ad368a820031e12dd9b12d79036 =
     [ "file_handle.hpp", "file__handle_8hpp.html", "file__handle_8hpp" ],
     [ "fs_handle.hpp", "fs__handle_8hpp.html", "fs__handle_8hpp" ],
     [ "handle.hpp", "handle_8hpp.html", "handle_8hpp" ],
+    [ "io_handle.hpp", "io__handle_8hpp.html", "io__handle_8hpp" ],
     [ "llfio.hpp", "v2_80_2llfio_8hpp.html", "v2_80_2llfio_8hpp" ],
-    [ "lockable_byte_io_handle.hpp", "lockable__byte__io__handle_8hpp.html", "lockable__byte__io__handle_8hpp" ],
+    [ "lockable_io_handle.hpp", "lockable__io__handle_8hpp.html", "lockable__io__handle_8hpp" ],
     [ "map_handle.hpp", "map__handle_8hpp.html", "map__handle_8hpp" ],
     [ "mapped.hpp", "mapped_8hpp.html", [
       [ "mapped", "classllfio__v2__xxx_1_1mapped.html", "classllfio__v2__xxx_1_1mapped" ]

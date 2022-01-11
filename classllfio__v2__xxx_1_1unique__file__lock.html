@@ -90,16 +90,16 @@ $(document).ready(function(){initNavTree('classllfio__v2__xxx_1_1unique__file__l
 </div><!--header-->
 <div class="contents">
 
-<p>RAII locker matching <code>std::unique_lock</code> for <code>lockable_byte_io_handle</code>, but untemplated.  
+<p>RAII locker matching <code>std::unique_lock</code> for <code>lockable_io_handle</code>, but untemplated.  
  <a href="classllfio__v2__xxx_1_1unique__file__lock.html#details">More...</a></p>
 
-<p><code>#include &quot;lockable_byte_io_handle.hpp&quot;</code></p>
+<p><code>#include &quot;lockable_io_handle.hpp&quot;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ae510273864a605a76cd2b3c8534a9de3"><td class="memItemLeft" align="right" valign="top"><a id="ae510273864a605a76cd2b3c8534a9de3"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>unique_file_lock</b> (<a class="el" href="classllfio__v2__xxx_1_1lockable__byte__io__handle.html">lockable_byte_io_handle</a> &amp;h, <a class="el" href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33">lock_kind</a> kind)</td></tr>
-<tr class="separator:ae510273864a605a76cd2b3c8534a9de3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4811cd80ae69eb2d72415bb02447a90d"><td class="memItemLeft" align="right" valign="top"><a id="a4811cd80ae69eb2d72415bb02447a90d"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>unique_file_lock</b> (<a class="el" href="classllfio__v2__xxx_1_1lockable__io__handle.html">lockable_io_handle</a> &amp;h, <a class="el" href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33">lock_kind</a> kind)</td></tr>
+<tr class="separator:a4811cd80ae69eb2d72415bb02447a90d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26d6f6539cc116675e40fe8aa4aedf6f"><td class="memItemLeft" align="right" valign="top"><a id="a26d6f6539cc116675e40fe8aa4aedf6f"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>unique_file_lock</b> (<a class="el" href="classllfio__v2__xxx_1_1unique__file__lock.html">unique_file_lock</a> &amp;&amp;o) noexcept</td></tr>
 <tr class="separator:a26d6f6539cc116675e40fe8aa4aedf6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -112,10 +112,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:acbe0708675bc8e1020edaebac8ce88af"><td class="memItemLeft" align="right" valign="top"><a id="acbe0708675bc8e1020edaebac8ce88af"></a>
 <a class="el" href="classllfio__v2__xxx_1_1unique__file__lock.html">unique_file_lock</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classllfio__v2__xxx_1_1unique__file__lock.html">unique_file_lock</a> &amp;)=delete</td></tr>
 <tr class="separator:acbe0708675bc8e1020edaebac8ce88af"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0539281446ffb37f49569b971c676515"><td class="memItemLeft" align="right" valign="top"><a id="a0539281446ffb37f49569b971c676515"></a>
-<a class="el" href="classllfio__v2__xxx_1_1lockable__byte__io__handle.html">lockable_byte_io_handle</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1unique__file__lock.html#a0539281446ffb37f49569b971c676515">mutex</a> () const noexcept</td></tr>
-<tr class="memdesc:a0539281446ffb37f49569b971c676515"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the associated mutex. <br /></td></tr>
-<tr class="separator:a0539281446ffb37f49569b971c676515"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac66e90389ea1568453ca7df71db96f16"><td class="memItemLeft" align="right" valign="top"><a id="ac66e90389ea1568453ca7df71db96f16"></a>
+<a class="el" href="classllfio__v2__xxx_1_1lockable__io__handle.html">lockable_io_handle</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1unique__file__lock.html#ac66e90389ea1568453ca7df71db96f16">mutex</a> () const noexcept</td></tr>
+<tr class="memdesc:ac66e90389ea1568453ca7df71db96f16"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the associated mutex. <br /></td></tr>
+<tr class="separator:ac66e90389ea1568453ca7df71db96f16"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab633b6cfaa5122af1ac74da719d6b106"><td class="memItemLeft" align="right" valign="top"><a id="ab633b6cfaa5122af1ac74da719d6b106"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1unique__file__lock.html#ab633b6cfaa5122af1ac74da719d6b106">owns_lock</a> () const noexcept</td></tr>
 <tr class="memdesc:ab633b6cfaa5122af1ac74da719d6b106"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if the associated mutex is owned by this lock. <br /></td></tr>
@@ -124,10 +124,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1unique__file__lock.html#acfb1ff9fa6f5e5559516411654bbd60b">operator bool</a> () const noexcept</td></tr>
 <tr class="memdesc:acfb1ff9fa6f5e5559516411654bbd60b"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if the associated mutex is owned by this lock. <br /></td></tr>
 <tr class="separator:acfb1ff9fa6f5e5559516411654bbd60b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab8b6d472d3cae44bf1fac87e71b69470"><td class="memItemLeft" align="right" valign="top"><a id="ab8b6d472d3cae44bf1fac87e71b69470"></a>
-<a class="el" href="classllfio__v2__xxx_1_1lockable__byte__io__handle.html">lockable_byte_io_handle</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1unique__file__lock.html#ab8b6d472d3cae44bf1fac87e71b69470">release</a> () noexcept</td></tr>
-<tr class="memdesc:ab8b6d472d3cae44bf1fac87e71b69470"><td class="mdescLeft">&#160;</td><td class="mdescRight">Releases the mutex from management. <br /></td></tr>
-<tr class="separator:ab8b6d472d3cae44bf1fac87e71b69470"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28cfecd8e9bae73c721f0e932be4acc1"><td class="memItemLeft" align="right" valign="top"><a id="a28cfecd8e9bae73c721f0e932be4acc1"></a>
+<a class="el" href="classllfio__v2__xxx_1_1lockable__io__handle.html">lockable_io_handle</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1unique__file__lock.html#a28cfecd8e9bae73c721f0e932be4acc1">release</a> () noexcept</td></tr>
+<tr class="memdesc:a28cfecd8e9bae73c721f0e932be4acc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Releases the mutex from management. <br /></td></tr>
+<tr class="separator:a28cfecd8e9bae73c721f0e932be4acc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0992bf3f3a85f0bc6355a743d37873e0"><td class="memItemLeft" align="right" valign="top"><a id="a0992bf3f3a85f0bc6355a743d37873e0"></a>
 result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1unique__file__lock.html#a0992bf3f3a85f0bc6355a743d37873e0">lock</a> () noexcept</td></tr>
 <tr class="memdesc:a0992bf3f3a85f0bc6355a743d37873e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lock the mutex for exclusive access. <br /></td></tr>
@@ -154,9 +154,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="separator:a97a893fe4a3b5356ef26b6b9b80fdce2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>RAII locker matching <code>std::unique_lock</code> for <code>lockable_byte_io_handle</code>, but untemplated. </p>
+<div class="textblock"><p>RAII locker matching <code>std::unique_lock</code> for <code>lockable_io_handle</code>, but untemplated. </p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
-<li>include/llfio/v2.0/<a class="el" href="lockable__byte__io__handle_8hpp.html">lockable_byte_io_handle.hpp</a></li>
+<li>include/llfio/v2.0/<a class="el" href="lockable__io__handle_8hpp.html">lockable_io_handle.hpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

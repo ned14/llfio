@@ -100,27 +100,27 @@ $(document).ready(function(){initNavTree('md__build.html',''); initResizable(); 
 <div class="fragment"><div class="line">Defining custom error code category ntkernel_category() via header only form is unreliable! Semantic comparisons will break! Define NTKERNEL_ERROR_CATEGORY_INLINE to 0 and only ever link in ntkernel_category() from a prebuilt shared library to avoid this problem.</div>
 </div><!-- fragment --><p>The cause is that <code>&lt;system_error&gt;</code> has a design flaw not rectified until (<a href="https://wg21.link/P1196">probably</a>) C++ 20 where custom error code categories are unsafe when shared libraries are in use.</p>
 <p>You have one of three choices here: (i) Use <a href="https://wg21.link/P1028">experimental SG14 <code>status_code</code></a> which doesn't have this problem (define <code>LLFIO_EXPERIMENTAL_STATUS_CODE=1</code>) (ii) Use the NT kernel error category as a shared library (<a href="https://github.com/ned14/ntkernel-error-category">see its documentation</a>) (iii) Don't use header only LLFIO on Windows (see below).</p>
-<h1><a class="anchor" id="autotoc_md23"></a>
+<h1><a class="anchor" id="autotoc_md22"></a>
 Install from the vcpkg package manager</h1>
 <p>This is particularly easy, and works on Mac OS, Linux and Microsoft Windows:</p>
 <div class="fragment"><div class="line">vcpkg install llfio</div>
 </div><!-- fragment --><p>LLFIO appears at <code>&lt;llfio/llfio.hpp&gt;</code>.</p>
-<h1><a class="anchor" id="autotoc_md24"></a>
+<h1><a class="anchor" id="autotoc_md23"></a>
 Prebuilt binaries</h1>
 <p>It is faster to build programs using LLFIO if you don't use a header only build. In this situation, define <code>LLFIO_HEADERS_ONLY=0</code>, and choose one of <code>LLFIO_DYN_LINK</code> or <code>LLFIO_STATIC_LINK</code> depending on whether you are using the prebuilt shared or static libraries respectively.</p>
 <p>You can find prebuilt binaries for Mac OS, Ubuntu and Microsoft Windows at <a href="https://github.com/ned14/llfio/releases">https://github.com/ned14/llfio/releases</a>. Choose a release, and under the Assets you will find the prebuilt binaries packages which include headers.</p>
-<h1><a class="anchor" id="autotoc_md25"></a>
+<h1><a class="anchor" id="autotoc_md24"></a>
 Get a copy of the source</h1>
 <p>Clone from the GitHub repository:</p>
 <div class="fragment"><div class="line">git config --system core.longpaths true</div>
 <div class="line">git clone --recursive https://github.com/ned14/llfio.git</div>
 <div class="line">cd llfio</div>
 </div><!-- fragment --><p>The first command is relevant so deeply nested paths on Windows will work when cloning the repository and submodules. It may require elevated privileges, but you can also use <code>git config --global core.longpaths true</code> instead.</p>
-<h2><a class="anchor" id="autotoc_md26"></a>
+<h2><a class="anchor" id="autotoc_md25"></a>
 If you already cloned before reading this</h2>
 <p>If you had already cloned <em>this</em> repository, but didn't use the <code>--recursive</code> switch, you can simply run the following command from inside the work tree:</p>
 <div class="fragment"><div class="line">git submodule update --init --recursive</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md27"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md26"></a>
 Build static libraries from source</h1>
 <p>You will need <a href="https://cmake.org/">CMake</a> installed, v3.5 or better. It is important to do an out-of-tree build, because the build will otherwise fail.</p>
 <p>If you want C++ Coroutines support, you will need a C++ Coroutines supporting compiler. It should get automatically discovered and detected, however note that on Linux you currently need a very recent clang combined with a very recent libc++ as no recent GCC implements C++ Coroutines yet. For Debian/Ubuntu, <code>apt install libc++-dev-9 libc++abi-dev-9</code> might do it.</p>
@@ -136,7 +136,7 @@ Build static libraries from source</h1>
 <div class="line">cmake .. -G&lt;your generator here&gt;</div>
 <div class="line">cmake --build . --config Release</div>
 <div class="line">ctest -C Release -R llfio_sl</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md28"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md27"></a>
 Build shared libraries from source</h1>
 <p>You will need <a href="https://cmake.org/">CMake</a> installed, v3.5 or better. It is important to do an out-of-tree build, because the build will otherwise fail.</p>
 <p>To build and test on POSIX (<code>make</code>, <code>ninja</code> etc):</p>
@@ -151,7 +151,7 @@ Build shared libraries from source</h1>
 <div class="line">cmake .. -G&lt;your generator here&gt;</div>
 <div class="line">cmake --build . --config Release --target _dl</div>
 <div class="line">ctest -C Release -R llfio_dl</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md29"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md28"></a>
 Installing libraries from source</h1>
 <div class="fragment"><div class="line">mkdir build</div>
 <div class="line">cd build</div>

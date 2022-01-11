@@ -15,7 +15,6 @@ var structllfio__v2__xxx_1_1algorithm_1_1traversal__summary =
     [ "file_blocks", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#a15caca304347aea4271f9ff6df759c69", null ],
     [ "max_depth", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#ad5862be5cc4b78861999aa69a78b9656", null ],
     [ "size", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#abd22fa87036c07f28e92469b970878a9", null ],
-    [ "stats_failed", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#abccbd441328708dfb408efcb4eda1a97", null ],
     [ "types", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#a51f79229a629006e28869656111d97e7", null ],
     [ "want", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#a0a99a9a1846577f6925479671480bd28", null ]
 ];
