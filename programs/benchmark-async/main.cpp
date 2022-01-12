@@ -800,21 +800,21 @@ template <class C, class... Args> void benchmark(llfio::path_view csv, size_t ma
   of << "\n";
 }
 
-struct NoHandle final : public llfio::io_handle
+struct NoHandle final : public llfio::byte_io_handle
 {
-  using mode = typename llfio::io_handle::mode;
-  using creation = typename llfio::io_handle::creation;
-  using caching = typename llfio::io_handle::caching;
-  using flag = typename llfio::io_handle::flag;
-  using buffer_type = typename llfio::io_handle::buffer_type;
-  using const_buffer_type = typename llfio::io_handle::const_buffer_type;
-  using buffers_type = typename llfio::io_handle::buffers_type;
-  using const_buffers_type = typename llfio::io_handle::const_buffers_type;
-  template <class T> using io_request = typename llfio::io_handle::template io_request<T>;
-  template <class T> using io_result = typename llfio::io_handle::template io_result<T>;
+  using mode = typename llfio::byte_io_handle::mode;
+  using creation = typename llfio::byte_io_handle::creation;
+  using caching = typename llfio::byte_io_handle::caching;
+  using flag = typename llfio::byte_io_handle::flag;
+  using buffer_type = typename llfio::byte_io_handle::buffer_type;
+  using const_buffer_type = typename llfio::byte_io_handle::const_buffer_type;
+  using buffers_type = typename llfio::byte_io_handle::buffers_type;
+  using const_buffers_type = typename llfio::byte_io_handle::const_buffers_type;
+  template <class T> using io_request = typename llfio::byte_io_handle::template io_request<T>;
+  template <class T> using io_result = typename llfio::byte_io_handle::template io_result<T>;
 
   NoHandle()
-      : llfio::io_handle(llfio::native_handle_type(llfio::native_handle_type::disposition::nonblocking | llfio::native_handle_type::disposition::readable | llfio::native_handle_type::disposition::writable, -2 /* fake being open */), llfio::io_handle::caching::all, llfio::io_handle::flag::multiplexable, nullptr)
+      : llfio::byte_io_handle(llfio::native_handle_type(llfio::native_handle_type::disposition::nonblocking | llfio::native_handle_type::disposition::readable | llfio::native_handle_type::disposition::writable, -2 /* fake being open */), llfio::byte_io_handle::caching::all, llfio::byte_io_handle::flag::multiplexable, nullptr)
   {
   }
   ~NoHandle()
@@ -862,14 +862,14 @@ template <class HandleType = NoHandle> struct benchmark_llfio
 
   static constexpr bool launch_writer_thread = !std::is_same<HandleType, NoHandle>::value;
 
-  struct receiver_type final : public llfio::io_multiplexer::io_operation_state_visitor
+  struct receiver_type final : public llfio::byte_io_multiplexer::io_operation_state_visitor
   {
     benchmark_llfio *parent{nullptr};
     HandleType read_handle;
     std::unique_ptr<llfio::byte[]> io_state_ptr;
     llfio::byte _buffer[sizeof(size_t)];
     buffer_type buffer;
-    llfio::io_multiplexer::io_operation_state *io_state{nullptr};
+    llfio::byte_io_multiplexer::io_operation_state *io_state{nullptr};
     std::chrono::high_resolution_clock::time_point when_read_completed;
 
     explicit receiver_type(benchmark_llfio *_parent, HandleType &&h)
@@ -922,7 +922,7 @@ template <class HandleType = NoHandle> struct benchmark_llfio
     }
 
     // Called when the read completes
-    virtual bool read_completed(llfio::io_multiplexer::io_operation_state::lock_guard & /*g*/, llfio::io_operation_state_type /*former*/, io_result<buffers_type> &&res) override
+    virtual bool read_completed(llfio::byte_io_multiplexer::io_operation_state::lock_guard & /*g*/, llfio::io_operation_state_type /*former*/, io_result<buffers_type> &&res) override
     {
       when_read_completed = std::chrono::high_resolution_clock::now();
       if(!res)
@@ -940,19 +940,19 @@ template <class HandleType = NoHandle> struct benchmark_llfio
     }
 
     // Called when the state for the read can be disposed
-    virtual void read_finished(llfio::io_multiplexer::io_operation_state::lock_guard & /*g*/, llfio::io_operation_state_type /*former*/) override
+    virtual void read_finished(llfio::byte_io_multiplexer::io_operation_state::lock_guard & /*g*/, llfio::io_operation_state_type /*former*/) override
     {
       io_state->~io_operation_state();
       io_state = nullptr;
     }
   };
 
-  llfio::io_multiplexer_ptr multiplexer;
+  llfio::byte_io_multiplexer_ptr multiplexer;
   std::vector<HandleType> write_handles;
   std::vector<receiver_type> read_states;
   receiver_type *to_restart{nullptr};
 
-  explicit benchmark_llfio(size_t count, llfio::io_multiplexer_ptr (*make_multiplexer)())
+  explicit benchmark_llfio(size_t count, llfio::byte_io_multiplexer_ptr (*make_multiplexer)())
   {
     multiplexer = make_multiplexer();
     read_states.reserve(count);
@@ -1126,22 +1126,22 @@ struct benchmark_asio_pipe
 int main(void)
 {
   std::cout << "Warming up ..." << std::endl;
-  do_benchmark<benchmark_llfio<>>(-1, []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_null(2, true).value(); });
+  do_benchmark<benchmark_llfio<>>(-1, []() -> llfio::byte_io_multiplexer_ptr { return llfio::test::multiplexer_null(2, true).value(); });
   benchmark<benchmark_llfio<>>("llfio-null-unsynchronised.csv", 64, "Null i/o multiplexer unsynchronised", //
-    []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_null(1, false).value(); });
+    []() -> llfio::byte_io_multiplexer_ptr { return llfio::test::multiplexer_null(1, false).value(); });
   benchmark<benchmark_llfio<>>("llfio-null-synchronised.csv", 64, "Null i/o multiplexer synchronised", //
-    []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_null(2, true).value(); });
+    []() -> llfio::byte_io_multiplexer_ptr { return llfio::test::multiplexer_null(2, true).value(); });
 
 #ifdef _WIN32
   std::cout << "\nWarming up ..." << std::endl;
   do_benchmark<benchmark_llfio<llfio::pipe_handle>>(-1, //
-    []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_win_iocp(2, true).value(); });
+    []() -> llfio::byte_io_multiplexer_ptr { return llfio::test::multiplexer_win_iocp(2, true).value(); });
   // No locking, enable IOCP immediate completions. ASIO can't compete with this.
   benchmark<benchmark_llfio<llfio::pipe_handle>>("llfio-pipe-handle-unsynchronised.csv", 64, "llfio::pipe_handle and IOCP unsynchronised", //
-    []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_win_iocp(1, false).value(); });
+    []() -> llfio::byte_io_multiplexer_ptr { return llfio::test::multiplexer_win_iocp(1, false).value(); });
   // Locking enabled, disable IOCP immediate completions so it's a fair comparison with ASIO
   benchmark<benchmark_llfio<llfio::pipe_handle>>("llfio-pipe-handle-synchronised.csv", 64, "llfio::pipe_handle and IOCP synchronised", //
-    []() -> llfio::io_multiplexer_ptr { return llfio::test::multiplexer_win_iocp(2, true).value(); });
+    []() -> llfio::byte_io_multiplexer_ptr { return llfio::test::multiplexer_win_iocp(2, true).value(); });
 #endif
 
 #if ENABLE_ASIO

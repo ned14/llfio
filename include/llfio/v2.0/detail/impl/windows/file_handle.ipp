@@ -40,7 +40,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   result<file_handle> ret(in_place_type<file_handle>, native_handle_type(), _caching, flags, nullptr);
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
-  nativeh.behaviour |= native_handle_type::disposition::file;
+  nativeh.behaviour |= native_handle_type::disposition::file | native_handle_type::disposition::kernel_handle;
   DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
   OUTCOME_TRY(auto &&access, access_mask_from_handle_mode(nativeh, _mode, flags));
   OUTCOME_TRY(auto &&attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
@@ -196,7 +196,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   result<file_handle> ret(in_place_type<file_handle>, native_handle_type(), _caching, flags, nullptr);
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
-  nativeh.behaviour |= native_handle_type::disposition::file;
+  nativeh.behaviour |= native_handle_type::disposition::file | native_handle_type::disposition::kernel_handle;
   DWORD fileshare = /* no read nor write access for others */ FILE_SHARE_DELETE;
   OUTCOME_TRY(auto &&access, access_mask_from_handle_mode(nativeh, _mode, flags));
   OUTCOME_TRY(auto &&attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
@@ -407,7 +407,7 @@ result<std::vector<file_handle::extent_pair>> file_handle::extents() const noexc
   }
 }
 
-result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::extent_pair extent, io_handle &dest_, io_handle::extent_type destoffset, deadline d,
+result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::extent_pair extent, byte_io_handle &dest_, byte_io_handle::extent_type destoffset, deadline d,
                                                                bool force_copy_now, bool emulate_if_unsupported) noexcept
 {
   try

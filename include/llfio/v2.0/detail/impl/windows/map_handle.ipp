@@ -122,7 +122,7 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
       attribs |= SEC_LARGE_PAGES;
     }
   }
-  nativeh.behaviour |= native_handle_type::disposition::section;
+  nativeh.behaviour |= native_handle_type::disposition::section | native_handle_type::disposition::kernel_handle;
   OBJECT_ATTRIBUTES oa{}, *poa = nullptr;
   UNICODE_STRING _path{};
   if(_flag & flag::singleton)
@@ -252,7 +252,7 @@ result<section_handle> section_handle::section(extent_type bytes, const path_han
       attribs |= SEC_LARGE_PAGES;
     }
   }
-  nativeh.behaviour |= native_handle_type::disposition::section;
+  nativeh.behaviour |= native_handle_type::disposition::section | native_handle_type::disposition::kernel_handle;
   LARGE_INTEGER _maximum_size{}, *pmaximum_size = &_maximum_size;
   _maximum_size.QuadPart = bytes;
   LLFIO_LOG_FUNCTION_CALL(&ret);
@@ -722,7 +722,7 @@ result<map_handle> map_handle::map(section_handle &section, size_type bytes, ext
   ret.value()._pagesize = pagesize;
   // Make my handle borrow the native handle of my backing storage
   ret.value()._v.h = section.backing_native_handle().h;
-  nativeh.behaviour |= native_handle_type::disposition::allocation;
+  nativeh.behaviour |= native_handle_type::disposition::allocation | native_handle_type::disposition::kernel_handle;
 
   // Windows has no way of getting the kernel to prefault maps on creation, so ...
   if(ret.value()._flag & section_handle::flag::prefault)

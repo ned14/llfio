@@ -40,7 +40,7 @@ namespace algorithm
     {
       file_handle_wrapper() = default;
       using file_handle::file_handle;
-      file_handle_wrapper(native_handle_type nativeh, io_handle::caching _caching, io_handle::flag flags, io_multiplexer *ctx)
+      file_handle_wrapper(native_handle_type nativeh, byte_io_handle::caching _caching, byte_io_handle::flag flags, byte_io_multiplexer *ctx)
           : file_handle(nativeh, 0, 0, _caching, flags, ctx)
       {
       }
@@ -49,7 +49,7 @@ namespace algorithm
     using combining_handle_adapter_choose_base = std::conditional_t<                                                              //
     std::is_base_of<file_handle, Target>::value && (std::is_void<Source>::value || std::is_base_of<file_handle, Source>::value),  //
     file_handle_wrapper,                                                                                                          //
-    io_handle                                                                                                                     //
+    byte_io_handle                                                                                                                     //
     >;
     template <class A, class B> struct is_void_or_io_request_compatible
     {
@@ -64,26 +64,26 @@ namespace algorithm
       static_assert(is_void_or_io_request_compatible<Target, Source>::value, "Combined handle types do not share io_request<buffers_type>");
 
     public:
-      using path_type = io_handle::path_type;
-      using extent_type = io_handle::extent_type;
-      using size_type = io_handle::size_type;
-      using mode = io_handle::mode;
-      using creation = io_handle::creation;
-      using caching = io_handle::caching;
-      using flag = io_handle::flag;
-      using buffer_type = io_handle::buffer_type;
-      using const_buffer_type = io_handle::const_buffer_type;
-      using buffers_type = io_handle::buffers_type;
-      using const_buffers_type = io_handle::const_buffers_type;
-      template <class T> using io_request = io_handle::io_request<T>;
-      template <class T> using io_result = io_handle::io_result<T>;
+      using path_type = byte_io_handle::path_type;
+      using extent_type = byte_io_handle::extent_type;
+      using size_type = byte_io_handle::size_type;
+      using mode = byte_io_handle::mode;
+      using creation = byte_io_handle::creation;
+      using caching = byte_io_handle::caching;
+      using flag = byte_io_handle::flag;
+      using buffer_type = byte_io_handle::buffer_type;
+      using const_buffer_type = byte_io_handle::const_buffer_type;
+      using buffers_type = byte_io_handle::buffers_type;
+      using const_buffers_type = byte_io_handle::const_buffers_type;
+      template <class T> using io_request = byte_io_handle::io_request<T>;
+      template <class T> using io_result = byte_io_handle::io_result<T>;
 
       using target_handle_type = Target;
       using source_handle_type = Source;
 
     protected:
       static constexpr bool _have_source = !std::is_void<source_handle_type>::value;
-      using _source_handle_type = std::conditional_t<!_have_source, io_handle, source_handle_type>;
+      using _source_handle_type = std::conditional_t<!_have_source, byte_io_handle, source_handle_type>;
 
       target_handle_type *_target{nullptr};
       _source_handle_type *_source{nullptr};
@@ -115,13 +115,13 @@ namespace algorithm
 
     protected:
       combining_handle_adapter_base() = default;
-      constexpr combining_handle_adapter_base(target_handle_type *a, _source_handle_type *b, mode _mode, flag flags, io_multiplexer *ctx)
+      constexpr combining_handle_adapter_base(target_handle_type *a, _source_handle_type *b, mode _mode, flag flags, byte_io_multiplexer *ctx)
           : Base(_native_handle(_mode), _combine_caching(a, b), flags, ctx)
           , _target(a)
           , _source(b)
       {
       }
-      combining_handle_adapter_base(target_handle_type *a, void *b, mode _mode, flag flags, io_multiplexer *ctx)
+      combining_handle_adapter_base(target_handle_type *a, void *b, mode _mode, flag flags, byte_io_multiplexer *ctx)
           : Base(_native_handle(_mode), a->caching(), flags, ctx)
           , _target(a)
           , _source(reinterpret_cast<_source_handle_type *>(b))
@@ -315,19 +315,19 @@ namespace algorithm
       static constexpr bool _have_source = _base::_have_source;
 
     public:
-      using path_type = io_handle::path_type;
-      using extent_type = io_handle::extent_type;
-      using size_type = io_handle::size_type;
-      using mode = io_handle::mode;
-      using creation = io_handle::creation;
-      using caching = io_handle::caching;
-      using flag = io_handle::flag;
-      using buffer_type = io_handle::buffer_type;
-      using const_buffer_type = io_handle::const_buffer_type;
-      using buffers_type = io_handle::buffers_type;
-      using const_buffers_type = io_handle::const_buffers_type;
-      template <class T> using io_request = io_handle::io_request<T>;
-      template <class T> using io_result = io_handle::io_result<T>;
+      using path_type = byte_io_handle::path_type;
+      using extent_type = byte_io_handle::extent_type;
+      using size_type = byte_io_handle::size_type;
+      using mode = byte_io_handle::mode;
+      using creation = byte_io_handle::creation;
+      using caching = byte_io_handle::caching;
+      using flag = byte_io_handle::flag;
+      using buffer_type = byte_io_handle::buffer_type;
+      using const_buffer_type = byte_io_handle::const_buffer_type;
+      using buffers_type = byte_io_handle::buffers_type;
+      using const_buffers_type = byte_io_handle::const_buffers_type;
+      template <class T> using io_request = byte_io_handle::io_request<T>;
+      template <class T> using io_result = byte_io_handle::io_result<T>;
 
       combining_handle_adapter_base() = default;
       using _base::_base;
@@ -505,7 +505,7 @@ namespace algorithm
 
   If both input handle types have a base of `file_handle`, `combining_handle_adapter`
   inherits from `file_handle` and provides the extra member functions which `file_handle`
-  provides over `io_handle`. If not, it inherits from `io_handle`, and provides that
+  provides over `byte_io_handle`. If not, it inherits from `byte_io_handle`, and provides that
   class' reduced functionality instead.
 
   The default implementation of `read()` and `write()` allocate temporary buffers, and
@@ -533,7 +533,7 @@ namespace algorithm
   Destroying the adapter does not destroy the attached handles. Closing the adapter
   does close the attached handles.
 
-  \todo I have been lazy and used public inheritance from `io_handle` and `file_handle`.
+  \todo I have been lazy and used public inheritance from `byte_io_handle` and `file_handle`.
   I should use protected inheritance to prevent slicing, and expose all the public functions by hand.
   */
   template <template <class, class> class Op, class Target, class Source> class combining_handle_adapter : public Op<Target, Source>::template override_<detail::combining_handle_adapter_base<Op, Target, Source, detail::combining_handle_adapter_choose_base<Target, Source>>>
@@ -541,19 +541,19 @@ namespace algorithm
     using _base = typename Op<Target, Source>::template override_<detail::combining_handle_adapter_base<Op, Target, Source, detail::combining_handle_adapter_choose_base<Target, Source>>>;
 
   public:
-    using path_type = io_handle::path_type;
-    using extent_type = io_handle::extent_type;
-    using size_type = io_handle::size_type;
-    using mode = io_handle::mode;
-    using creation = io_handle::creation;
-    using caching = io_handle::caching;
-    using flag = io_handle::flag;
-    using buffer_type = io_handle::buffer_type;
-    using const_buffer_type = io_handle::const_buffer_type;
-    using buffers_type = io_handle::buffers_type;
-    using const_buffers_type = io_handle::const_buffers_type;
-    template <class T> using io_request = io_handle::io_request<T>;
-    template <class T> using io_result = io_handle::io_result<T>;
+    using path_type = byte_io_handle::path_type;
+    using extent_type = byte_io_handle::extent_type;
+    using size_type = byte_io_handle::size_type;
+    using mode = byte_io_handle::mode;
+    using creation = byte_io_handle::creation;
+    using caching = byte_io_handle::caching;
+    using flag = byte_io_handle::flag;
+    using buffer_type = byte_io_handle::buffer_type;
+    using const_buffer_type = byte_io_handle::const_buffer_type;
+    using buffers_type = byte_io_handle::buffers_type;
+    using const_buffers_type = byte_io_handle::const_buffers_type;
+    template <class T> using io_request = byte_io_handle::io_request<T>;
+    template <class T> using io_result = byte_io_handle::io_result<T>;
 
     using target_handle_type = Target;
     using source_handle_type = Source;
@@ -563,7 +563,7 @@ namespace algorithm
     combining_handle_adapter() = default;
     //! Constructor, passing any extra arguments to `Op::override`.
     template <class... Args>
-    combining_handle_adapter(target_handle_type *a, source_handle_type *b, mode _mode = mode::write, flag flags = flag::none, io_multiplexer *ctx = nullptr, Args &&... args)
+    combining_handle_adapter(target_handle_type *a, source_handle_type *b, mode _mode = mode::write, flag flags = flag::none, byte_io_multiplexer *ctx = nullptr, Args &&... args)
         : _base(a, b, _mode, flags, ctx, std::forward<Args>(args)...)
     {
     }

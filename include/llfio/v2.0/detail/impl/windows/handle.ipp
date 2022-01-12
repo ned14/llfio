@@ -35,6 +35,12 @@ handle::~handle()
     auto ret = handle::close();
     if(ret.has_error())
     {
+#ifndef NDEBUG
+      char msg[1024];
+      snprintf(msg, 1023, "handle::~handle() failed with '%s'", ret.error().message().c_str());
+      msg[1023] = 0;
+      LLFIO_LOG_DEBUG(_v.h, msg);
+#endif
       LLFIO_LOG_FATAL(_v.h, "handle::~handle() close failed");
       abort();
     }
@@ -54,7 +60,7 @@ result<handle::path_type> handle::current_path() const noexcept
     // Should I use FILE_NAME_OPENED here instead of the default FILE_NAME_NORMALIZED?
     // I think the latter more likely to trap buggy assumptions, so let's do that. If
     // people really want FILE_NAME_OPENED, see to_win32_path().
-    DWORD len = GetFinalPathNameByHandleW(_v.h, _buffer + 3, (DWORD)(buffer.size() - 4 * sizeof(wchar_t)), VOLUME_NAME_NT);  // NOLINT
+    DWORD len = GetFinalPathNameByHandleW(_v.h, _buffer + 3, (DWORD) (buffer.size() - 4 * sizeof(wchar_t)), VOLUME_NAME_NT);  // NOLINT
     if(len == 0)
     {
       return win32_error();

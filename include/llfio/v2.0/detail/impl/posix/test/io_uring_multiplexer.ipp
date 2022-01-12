@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../io_handle.ipp"
+#include "../byte_io_handle.ipp"
 
 #ifndef __linux__
 #error This implementation file is for Linux only
@@ -95,11 +95,11 @@ namespace test
   - Registered i/o buffers
 
   */
-  template <bool is_threadsafe> class linux_io_uring_multiplexer final : public io_multiplexer_impl<is_threadsafe>
+  template <bool is_threadsafe> class linux_io_uring_multiplexer final : public byte_io_multiplexer_impl<is_threadsafe>
   {
-    friend LLFIO_HEADERS_ONLY_FUNC_SPEC result<io_multiplexer_ptr> multiplexer_linux_io_uring(size_t threads, bool is_polling) noexcept;
+    friend LLFIO_HEADERS_ONLY_FUNC_SPEC result<byte_io_multiplexer_ptr> multiplexer_linux_io_uring(size_t threads, bool is_polling) noexcept;
 
-    using _base = io_multiplexer_impl<is_threadsafe>;
+    using _base = byte_io_multiplexer_impl<is_threadsafe>;
     using _multiplexer_lock_guard = typename _base::_lock_guard;
 
     using path_type = typename _base::path_type;
@@ -478,7 +478,7 @@ namespace test
         _io_uring_operation_state *write_or_barrier{nullptr};
       } inprogress;
 
-      explicit _registered_fd(io_handle &h)
+      explicit _registered_fd(byte_io_handle &h)
           : fd(h.native_handle().fd)
       {
       }
@@ -569,7 +569,7 @@ namespace test
           {
             _dequeue_from(it->inprogress.reads, state);
             auto &reqs = state->payload.noncompleted.params.read.reqs;
-            io_handle::io_result<io_handle::buffers_type> ret(reqs.buffers);
+            byte_io_handle::io_result<byte_io_handle::buffers_type> ret(reqs.buffers);
             if(cqe->res < 0)
             {
               ret = posix_error(-cqe->res);
@@ -602,7 +602,7 @@ namespace test
             assert(it->inprogress.write_or_barrier == state);
             it->inprogress.write_or_barrier = nullptr;
             auto &reqs = state->payload.noncompleted.params.write.reqs;
-            io_handle::io_result<io_handle::const_buffers_type> ret(reqs.buffers);
+            byte_io_handle::io_result<byte_io_handle::const_buffers_type> ret(reqs.buffers);
             if(cqe->res < 0)
             {
               ret = posix_error(-cqe->res);
@@ -635,7 +635,7 @@ namespace test
             assert(it->inprogress.write_or_barrier == state);
             it->inprogress.write_or_barrier = nullptr;
             auto &reqs = state->payload.noncompleted.params.barrier.reqs;
-            io_handle::io_result<io_handle::const_buffers_type> ret(reqs.buffers);
+            byte_io_handle::io_result<byte_io_handle::const_buffers_type> ret(reqs.buffers);
             if(cqe->res < 0)
             {
               ret = posix_error(-cqe->res);
@@ -866,7 +866,7 @@ namespace test
       else
       {
         this->_v.fd = fd;
-        this->_v.behaviour |= native_handle_type::disposition::multiplexer;
+        this->_v.behaviour |= native_handle_type::disposition::multiplexer | native_handle_type::disposition::kernel_handle;
       }
       return success();
     }
@@ -943,7 +943,7 @@ namespace test
       }
       return success();
     }
-    virtual result<uint8_t> do_io_handle_register(io_handle *h) noexcept override  // linear complexity to total handles registered
+    virtual result<uint8_t> do_byte_io_handle_register(byte_io_handle *h) noexcept override  // linear complexity to total handles registered
     {
       _multiplexer_lock_guard g(this->_lock);
       if(h->is_seekable() && -1 == _seekable_iouring_fd)
@@ -955,7 +955,7 @@ namespace test
       _registered_fds.insert(std::lower_bound(_registered_fds.begin(), _registered_fds.end(), toinsert), toinsert);
       return _change_fd_registration(h->is_seekable(), toinsert.fd, true);
     }
-    virtual result<void> do_io_handle_deregister(io_handle *h) noexcept override
+    virtual result<void> do_byte_io_handle_deregister(byte_io_handle *h) noexcept override
     {
       _multiplexer_lock_guard g(this->_lock);
       int fd = h->native_handle().fd;
@@ -971,9 +971,9 @@ namespace test
       return _change_fd_registration(h->is_seekable(), fd, false);
     }
 
-    virtual size_t do_io_handle_max_buffers(const io_handle * /*unused*/) const noexcept override { return IOV_MAX; }
+    virtual size_t do_byte_io_handle_max_buffers(const byte_io_handle * /*unused*/) const noexcept override { return IOV_MAX; }
 
-    virtual result<registered_buffer_type> do_io_handle_allocate_registered_buffer(io_handle *h, size_t &bytes) noexcept override
+    virtual result<registered_buffer_type> do_byte_io_handle_allocate_registered_buffer(byte_io_handle *h, size_t &bytes) noexcept override
     {
       _multiplexer_lock_guard g(this->_lock);
       // Try to reuse any previously registered buffers no longer in use, as
@@ -986,7 +986,7 @@ namespace test
         }
       }
       // The default implementation uses mmap, so this is done for us
-      OUTCOME_TRY(auto &&ret, _base::do_io_handle_allocate_registered_buffer(h, bytes));
+      OUTCOME_TRY(auto &&ret, _base::do_byte_io_handle_allocate_registered_buffer(h, bytes));
       // Register this buffer with io_uring
       struct iovec upd;
       upd.iov_base = ret->data();
@@ -1002,7 +1002,7 @@ namespace test
     // io_uring has very minimal i/o state requirements
     virtual std::pair<size_t, size_t> io_state_requirements() noexcept override { return {sizeof(_io_uring_operation_state), alignof(_io_uring_operation_state)}; }
 
-    virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept override
+    virtual io_operation_state *construct(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept override
     {
       assert(storage.size() >= sizeof(_io_uring_operation_state));
       assert(((uintptr_t) storage.data() % alignof(_io_uring_operation_state)) == 0);
@@ -1012,7 +1012,7 @@ namespace test
       }
       return new(storage.data()) _io_uring_operation_state(_h, _visitor, std::move(b), d, std::move(reqs));
     }
-    virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept override
+    virtual io_operation_state *construct(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept override
     {
       assert(storage.size() >= sizeof(_io_uring_operation_state));
       assert(((uintptr_t) storage.data() % alignof(_io_uring_operation_state)) == 0);
@@ -1022,7 +1022,7 @@ namespace test
       }
       return new(storage.data()) _io_uring_operation_state(_h, _visitor, std::move(b), d, std::move(reqs));
     }
-    virtual io_operation_state *construct(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept override
+    virtual io_operation_state *construct(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept override
     {
       assert(storage.size() >= sizeof(_io_uring_operation_state));
       assert(((uintptr_t) storage.data() % alignof(_io_uring_operation_state)) == 0);
@@ -1070,9 +1070,9 @@ namespace test
       return state->state;
     }
 
-    // virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept override
-    // virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept override
-    // virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept override
+    // virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<buffers_type> reqs) noexcept override
+    // virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs) noexcept override
+    // virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &&b, deadline d, io_request<const_buffers_type> reqs, barrier_kind kind) noexcept override
 
     virtual result<void> flush_inited_io_operations() noexcept override
     {
@@ -1104,21 +1104,21 @@ namespace test
         break;
       case io_operation_state_type::read_initiated:
       {
-        io_handle::io_result<io_handle::buffers_type> ret(errc::operation_canceled);
+        byte_io_handle::io_result<byte_io_handle::buffers_type> ret(errc::operation_canceled);
         state->_read_completed(g, std::move(ret).value());
         state->count = 1;
         return io_operation_state_type::read_completed;
       }
       case io_operation_state_type::write_initiated:
       {
-        io_handle::io_result<io_handle::const_buffers_type> ret(errc::operation_canceled);
+        byte_io_handle::io_result<byte_io_handle::const_buffers_type> ret(errc::operation_canceled);
         state->_write_completed(g, std::move(ret).value());
         state->count = 1;
         return io_operation_state_type::write_or_barrier_completed;
       }
       case io_operation_state_type::barrier_initiated:
       {
-        io_handle::io_result<io_handle::const_buffers_type> ret(errc::operation_canceled);
+        byte_io_handle::io_result<byte_io_handle::const_buffers_type> ret(errc::operation_canceled);
         state->_barrier_completed(g, std::move(ret).value());
         state->count = 1;
         return io_operation_state_type::write_or_barrier_completed;
@@ -1223,7 +1223,7 @@ namespace test
     }
   };
 
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<io_multiplexer_ptr> multiplexer_linux_io_uring(size_t threads, bool is_polling) noexcept
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<byte_io_multiplexer_ptr> multiplexer_linux_io_uring(size_t threads, bool is_polling) noexcept
   {
     try
     {
@@ -1232,11 +1232,11 @@ namespace test
         // Make non locking edition
         auto ret = std::make_unique<linux_io_uring_multiplexer<false>>(is_polling);
         OUTCOME_TRY(ret->init(false, ret->_nonseekable));
-        return io_multiplexer_ptr(ret.release());
+        return byte_io_multiplexer_ptr(ret.release());
       }
       auto ret = std::make_unique<linux_io_uring_multiplexer<true>>(is_polling);
       OUTCOME_TRY(ret->init(false, ret->_nonseekable));
-      return io_multiplexer_ptr(ret.release());
+      return byte_io_multiplexer_ptr(ret.release());
     }
     catch(...)
     {

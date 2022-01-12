@@ -166,7 +166,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<process_handle> process_handle::launch_pr
   result<process_handle> ret(in_place_type<process_handle>, native_handle_type(), flags);
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
-  nativeh.behaviour |= native_handle_type::disposition::process;
+  nativeh.behaviour |= native_handle_type::disposition::process | native_handle_type::disposition::kernel_handle;
   pipe_handle childinpipe, childoutpipe, childerrorpipe;
   pipe_handle::flag pipeflags = !(flags & flag::no_multiplexable_pipes) ? pipe_handle::flag::multiplexable : pipe_handle::flag::none;
 

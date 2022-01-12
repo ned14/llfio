@@ -69,6 +69,9 @@ import LLFIO_MODULE_NAME;
 #include "fast_random_file_handle.hpp"
 #include "file_handle.hpp"
 #include "process_handle.hpp"
+#ifndef LLFIO_EXCLUDE_NETWORKING
+#include "byte_socket_source.hpp"
+#endif
 #include "statfs.hpp"
 #ifdef LLFIO_INCLUDE_STORAGE_PROFILE
 #include "storage_profile.hpp"

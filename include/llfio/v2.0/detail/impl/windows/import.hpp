@@ -1979,7 +1979,7 @@ inline void do_unlock_file_range(native_handle_type &_v, handle::extent_type off
     {
       auto ret = win32_error();
       (void) ret;
-      LLFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
+      LLFIO_LOG_FATAL(_v.h, "byte_io_handle::unlock() failed");
       std::terminate();
     }
   }
@@ -1993,7 +1993,7 @@ inline void do_unlock_file_range(native_handle_type &_v, handle::extent_type off
       ol.Internal = ol.Internal & 0xffffffff;
       auto ret = ntkernel_error(static_cast<NTSTATUS>(ol.Internal));
       (void) ret;
-      LLFIO_LOG_FATAL(_v.h, "io_handle::unlock() failed");
+      LLFIO_LOG_FATAL(_v.h, "byte_io_handle::unlock() failed");
       std::terminate();
     }
   }

@@ -30,7 +30,7 @@ using namespace std;
 #define throws(x)
 #define VALUE .value()
 
-inline io_handle::buffers_type read_all(io_handle &h, io_handle::io_request<io_handle::buffers_type> reqs, deadline d = deadline()) throws(file_io_error)
+inline byte_io_handle::buffers_type read_all(byte_io_handle &h, byte_io_handle::io_request<byte_io_handle::buffers_type> reqs, deadline d = deadline()) throws(file_io_error)
 {
   // Record beginning if deadline is specified
   chrono::steady_clock::time_point began_steady;
@@ -38,17 +38,17 @@ inline io_handle::buffers_type read_all(io_handle &h, io_handle::io_request<io_h
     began_steady = chrono::steady_clock::now();
 
   // Take copy of input buffers onto stack, and set output buffers to buffers supplied
-  auto *input_buffers_mem = reinterpret_cast<io_handle::buffer_type *>(alloca(reqs.buffers.size() * sizeof(io_handle::buffer_type)));
-  auto *input_buffers_sizes = reinterpret_cast<io_handle::size_type *>(alloca(reqs.buffers.size() * sizeof(io_handle::size_type)));
-  io_handle::buffers_type output_buffers(reqs.buffers);
-  io_handle::io_request<io_handle::buffers_type> creq({input_buffers_mem, reqs.buffers.size()}, 0);
+  auto *input_buffers_mem = reinterpret_cast<byte_io_handle::buffer_type *>(alloca(reqs.buffers.size() * sizeof(byte_io_handle::buffer_type)));
+  auto *input_buffers_sizes = reinterpret_cast<byte_io_handle::size_type *>(alloca(reqs.buffers.size() * sizeof(byte_io_handle::size_type)));
+  byte_io_handle::buffers_type output_buffers(reqs.buffers);
+  byte_io_handle::io_request<byte_io_handle::buffers_type> creq({input_buffers_mem, reqs.buffers.size()}, 0);
   for(size_t n = 0; n < reqs.buffers.size(); n++)
   {
     // Copy input buffer to stack and retain original size
     creq.buffers[n] = reqs.buffers[n];
     input_buffers_sizes[n] = reqs.buffers[n].size();
     // Set output buffer length to zero
-    output_buffers[n] = io_handle::buffer_type{output_buffers[n].data(), 0};
+    output_buffers[n] = byte_io_handle::buffer_type{output_buffers[n].data(), 0};
   }
 
   // Track which output buffer we are currently filling
@@ -71,7 +71,7 @@ inline io_handle::buffers_type read_all(io_handle &h, io_handle::io_request<io_h
         nd = d;
     }
     // Partial fill buffers with current request
-    io_handle::buffers_type filled = h.read(creq, nd) VALUE;
+    byte_io_handle::buffers_type filled = h.read(creq, nd) VALUE;
     (void) filled;
 
     // Adjust output buffers by what was filled, and prepare input
@@ -82,15 +82,15 @@ inline io_handle::buffers_type read_all(io_handle &h, io_handle::io_request<io_h
       auto &input_buffer = creq.buffers[n];
       auto &output_buffer = output_buffers[idx + n];
       creq.offset += input_buffer.size();
-      output_buffer = io_handle::buffer_type{output_buffer.data(), output_buffer.size() + input_buffer.size()};
+      output_buffer = byte_io_handle::buffer_type{output_buffer.data(), output_buffer.size() + input_buffer.size()};
       // Adjust input buffer to amount remaining
-      input_buffer = io_handle::buffer_type{input_buffer.data() + input_buffer.size(), input_buffers_sizes[idx + n] - output_buffer.size()};
+      input_buffer = byte_io_handle::buffer_type{input_buffer.data() + input_buffer.size(), input_buffers_sizes[idx + n] - output_buffer.size()};
     }
 
     // Remove completely filled input buffers
     while(!creq.buffers.empty() && creq.buffers[0].size() == 0)
     {
-      creq.buffers = io_handle::buffers_type(creq.buffers.data() + 1, creq.buffers.size() - 1);
+      creq.buffers = byte_io_handle::buffers_type(creq.buffers.data() + 1, creq.buffers.size() - 1);
       ++idx;
     }
   } while(!creq.buffers.empty());

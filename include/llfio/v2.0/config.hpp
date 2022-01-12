@@ -428,6 +428,7 @@ LLFIO_V2_NAMESPACE_BEGIN
 namespace win
 {
   using handle = void *;
+  using socket = uintptr_t;
   using dword = unsigned long;
 }  // namespace win
 

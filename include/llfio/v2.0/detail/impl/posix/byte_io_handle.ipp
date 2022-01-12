@@ -1,5 +1,5 @@
 /* A handle to something
-(C) 2015-2019 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
+(C) 2015-2021 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
 File Created: Dec 2015
 
 
@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-#include "../../../io_handle.hpp"
+#include "../../../byte_io_handle.hpp"
 
 #include "import.hpp"
 
@@ -32,18 +32,23 @@ Distributed under the Boost Software License, Version 1.0.
 #include <sys/uio.h>  // for preadv etc
 #include <unistd.h>
 
+#ifndef LLFIO_EXCLUDE_NETWORKING
+#include <poll.h>
+#endif
+
 #include "quickcpplib/signal_guard.hpp"
 
 LLFIO_V2_NAMESPACE_BEGIN
 
 constexpr inline void _check_iovec_match()
 {
-  static_assert(sizeof(io_handle::buffer_type) == sizeof(iovec), "buffer_type and struct iovec do not match in size");
-  static_assert(offsetof(io_handle::buffer_type, _data) == offsetof(iovec, iov_base), "buffer_type and struct iovec do not have same offset of data member");
-  static_assert(offsetof(io_handle::buffer_type, _len) == offsetof(iovec, iov_len), "buffer_type and struct iovec do not have same offset of len member");
+  static_assert(sizeof(byte_io_handle::buffer_type) == sizeof(iovec), "buffer_type and struct iovec do not match in size");
+  static_assert(offsetof(byte_io_handle::buffer_type, _data) == offsetof(iovec, iov_base),
+                "buffer_type and struct iovec do not have same offset of data member");
+  static_assert(offsetof(byte_io_handle::buffer_type, _len) == offsetof(iovec, iov_len), "buffer_type and struct iovec do not have same offset of len member");
 }
 
-size_t io_handle::_do_max_buffers() const noexcept
+size_t byte_io_handle::_do_max_buffers() const noexcept
 {
   static size_t v;
   if(v == 0u)
@@ -66,7 +71,8 @@ size_t io_handle::_do_max_buffers() const noexcept
   return v;
 }
 
-io_handle::io_result<io_handle::buffers_type> io_handle::_do_read(io_handle::io_request<io_handle::buffers_type> reqs, deadline d) noexcept
+byte_io_handle::io_result<byte_io_handle::buffers_type> byte_io_handle::_do_read(byte_io_handle::io_request<byte_io_handle::buffers_type> reqs,
+                                                                                 deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   if(d && !_v.is_nonblocking())
@@ -125,6 +131,11 @@ io_handle::io_result<io_handle::buffers_type> io_handle::_do_read(io_handle::io_
       bytesread = ::readv(_v.fd, iov, reqs.buffers.size());
       if(bytesread <= 0)
       {
+        if(bytesread == 0 && is_socket())
+        {
+          // Sockets read zero if the remote has shutdown
+          break;
+        }
         if(bytesread < 0 && EWOULDBLOCK != errno && EAGAIN != errno)
         {
           return posix_error();
@@ -163,7 +174,8 @@ io_handle::io_result<io_handle::buffers_type> io_handle::_do_read(io_handle::io_
   return {reqs.buffers};
 }
 
-io_handle::io_result<io_handle::const_buffers_type> io_handle::_do_write(io_handle::io_request<io_handle::const_buffers_type> reqs, deadline d) noexcept
+byte_io_handle::io_result<byte_io_handle::const_buffers_type> byte_io_handle::_do_write(byte_io_handle::io_request<byte_io_handle::const_buffers_type> reqs,
+                                                                                        deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   if(d && !_v.is_nonblocking())
@@ -221,12 +233,18 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::_do_write(io_hand
       // Can't guarantee that user code hasn't enabled SIGPIPE
       byteswritten = QUICKCPPLIB_NAMESPACE::signal_guard::signal_guard(
       QUICKCPPLIB_NAMESPACE::signal_guard::signalc_set::broken_pipe, [&] { return ::writev(_v.fd, iov, reqs.buffers.size()); },
-      [&](const QUICKCPPLIB_NAMESPACE::signal_guard::raised_signal_info * /*unused*/) {
+      [&](const QUICKCPPLIB_NAMESPACE::signal_guard::raised_signal_info * /*unused*/)
+      {
         errno = EPIPE;
         return -1;
       });
       if(byteswritten <= 0)
       {
+        if(byteswritten == 0 && is_socket())
+        {
+          // Sockets write zero if write has been shutdown
+          break;
+        }
         if(byteswritten < 0 && EWOULDBLOCK != errno && EAGAIN != errno)
         {
           return posix_error();
@@ -265,7 +283,8 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::_do_write(io_hand
   return {reqs.buffers};
 }
 
-io_handle::io_result<io_handle::const_buffers_type> io_handle::_do_barrier(io_handle::io_request<io_handle::const_buffers_type> reqs, barrier_kind kind, deadline d) noexcept
+byte_io_handle::io_result<byte_io_handle::const_buffers_type> byte_io_handle::_do_barrier(byte_io_handle::io_request<byte_io_handle::const_buffers_type> reqs,
+                                                                                          barrier_kind kind, deadline d) noexcept
 {
   (void) kind;
   LLFIO_LOG_FUNCTION_CALL(this);
@@ -327,5 +346,130 @@ io_handle::io_result<io_handle::const_buffers_type> io_handle::_do_barrier(io_ha
 #endif
   return {reqs.buffers};
 }
+
+#ifndef LLFIO_EXCLUDE_NETWORKING
+result<size_t> poll(span<poll_what> out, span<pollable_handle *> handles, span<const poll_what> query, deadline d) noexcept
+{
+  LLFIO_LOG_FUNCTION_CALL(nullptr);
+  if(out.size() != handles.size())
+  {
+    return errc::invalid_argument;
+  }
+  if(out.size() != query.size())
+  {
+    return errc::invalid_argument;
+  }
+  if(handles.empty())
+  {
+    return 0;
+  }
+  if(handles.size() > 1024)
+  {
+    return errc::argument_out_of_domain;
+  }
+  LLFIO_DEADLINE_TO_SLEEP_INIT(d);
+  auto *fds = (pollfd *) alloca(handles.size() * sizeof(pollfd));
+  memset(fds, 0, handles.size() * sizeof(pollfd));
+  nfds_t fdscount = 0;
+  for(size_t n = 0; n < handles.size(); n++)
+  {
+    if(handles[n] != nullptr)
+    {
+      auto &h = handles[n]->_get_handle();
+      if(h.is_kernel_handle())
+      {
+        fds[fdscount].fd = h.native_handle().fd;
+        if(query[n] & poll_what::is_readable)
+        {
+          fds[fdscount].events |= POLLIN;
+        }
+        if(query[n] & poll_what::is_writable)
+        {
+          fds[fdscount].events |= POLLOUT;
+        }
+        fdscount++;
+      }
+    }
+  }
+  if(0 == fdscount)
+  {
+    return 0;
+  }
+  for(;;)
+  {
+    int timeout = -1;
+    if(d)
+    {
+      std::chrono::milliseconds ms;
+      if(d.steady)
+      {
+        ms = std::chrono::duration_cast<std::chrono::milliseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());
+      }
+      else
+      {
+        ms = std::chrono::duration_cast<std::chrono::milliseconds>(d.to_time_point() - std::chrono::system_clock::now());
+      }
+      if(ms.count() < 0)
+      {
+        timeout = 0;
+      }
+      else
+      {
+        timeout = (int) ms.count();
+      }
+    }
+    auto ret = ::poll(fds, fdscount, timeout);
+    if(-1 == ret)
+    {
+      return posix_error();
+    }
+    if(ret > 0)
+    {
+      auto count = ret;
+      fdscount = 0;
+      for(size_t n = 0; n < handles.size(); n++)
+      {
+        if(handles[n] != nullptr)
+        {
+          auto &h = handles[n]->_get_handle();
+          if(h.is_kernel_handle())
+          {
+            if(fds[fdscount].revents != 0)
+            {
+              if(fds[fdscount].revents & POLLIN)
+              {
+                out[n] |= poll_what::is_readable;
+              }
+              if(fds[fdscount].revents & POLLOUT)
+              {
+                out[n] |= poll_what::is_writable;
+              }
+              if(fds[fdscount].revents & POLLERR)
+              {
+                out[n] |= poll_what::is_errored;
+              }
+              if(fds[fdscount].revents & POLLHUP)
+              {
+                out[n] |= poll_what::is_closed;
+              }
+              if(--count == 0)
+              {
+                return ret;
+              }
+            }
+          }
+          else
+          {
+            out[n] |= poll_what::not_pollable;
+          }
+          fdscount++;
+        }
+      }
+      return ret;
+    }
+    LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
+  }
+}
+#endif
 
 LLFIO_V2_NAMESPACE_END
