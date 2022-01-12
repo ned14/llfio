@@ -39,69 +39,26 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, sta
   IO_STATUS_BLOCK isb = make_iostatus();
   NTSTATUS ntstat;
   size_t ret = 0;
+  auto calculate_st_type = [&](ULONG FileAttributes, ULONG ReparsePointTag) -> result<filesystem::file_type>
+  {
+    // We need to get its reparse tag to see if it's a symlink
+    if(((FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0u) && (ReparsePointTag == 0u))
+    {
+      alignas(8) char buffer_[sizeof(REPARSE_DATA_BUFFER) + 32769];
+      DWORD written = 0;
+      auto *rpd = reinterpret_cast<REPARSE_DATA_BUFFER *>(buffer_);
+      memset(rpd, 0, sizeof(*rpd));
+      if(DeviceIoControl(h.native_handle().h, FSCTL_GET_REPARSE_POINT, nullptr, 0, rpd, sizeof(buffer_), &written, nullptr) == 0)
+      {
+        return win32_error();
+      }
+      ReparsePointTag = rpd->ReparseTag;
+    }
+    return windows_nt_kernel::to_st_type(FileAttributes, ReparsePointTag);
+  };
 
-  FILE_ALL_INFORMATION &fai = *reinterpret_cast<FILE_ALL_INFORMATION *>(buffer);
   FILE_FS_SECTOR_SIZE_INFORMATION ffssi{};
   memset(&ffssi, 0, sizeof(ffssi));
-  bool needInternal = !!(wanted & want::ino);
-  bool needBasic = (!!(wanted & want::type) || !!(wanted & want::atim) || !!(wanted & want::mtim) || !!(wanted & want::ctim) || !!(wanted & want::birthtim) || !!(wanted & want::sparse) || !!(wanted & want::compressed) || !!(wanted & want::reparse_point));
-  bool needStandard = (!!(wanted & want::nlink) || !!(wanted & want::size) || !!(wanted & want::allocated) || !!(wanted & want::blocks));
-  // It's not widely known that the NT kernel supplies a stat() equivalent i.e. get me everything in a single syscall
-  // However fetching FileAlignmentInformation which comes with FILE_ALL_INFORMATION is slow as it touches the device driver,
-  // so only use if we need more than one item
-  if((static_cast<int>(needInternal) + static_cast<int>(needBasic) + static_cast<int>(needStandard)) >= 2)
-  {
-    ntstat = NtQueryInformationFile(h.native_handle().h, &isb, &fai, sizeof(buffer), FileAllInformation);
-    if(STATUS_PENDING == ntstat)
-    {
-      ntstat = ntwait(h.native_handle().h, isb, deadline());
-    }
-    if(ntstat < 0)
-    {
-      return ntkernel_error(ntstat);
-    }
-  }
-  else
-  {
-    if(needInternal)
-    {
-      ntstat = NtQueryInformationFile(h.native_handle().h, &isb, &fai.InternalInformation, sizeof(fai.InternalInformation), FileInternalInformation);
-      if(STATUS_PENDING == ntstat)
-      {
-        ntstat = ntwait(h.native_handle().h, isb, deadline());
-      }
-      if(ntstat < 0)
-      {
-        return ntkernel_error(ntstat);
-      }
-    }
-    if(needBasic)
-    {
-      isb.Status = -1;
-      ntstat = NtQueryInformationFile(h.native_handle().h, &isb, &fai.BasicInformation, sizeof(fai.BasicInformation), FileBasicInformation);
-      if(STATUS_PENDING == ntstat)
-      {
-        ntstat = ntwait(h.native_handle().h, isb, deadline());
-      }
-      if(ntstat < 0)
-      {
-        return ntkernel_error(ntstat);
-      }
-    }
-    if(needStandard)
-    {
-      isb.Status = -1;
-      ntstat = NtQueryInformationFile(h.native_handle().h, &isb, &fai.StandardInformation, sizeof(fai.StandardInformation), FileStandardInformation);
-      if(STATUS_PENDING == ntstat)
-      {
-        ntstat = ntwait(h.native_handle().h, isb, deadline());
-      }
-      if(ntstat < 0)
-      {
-        return ntkernel_error(ntstat);
-      }
-    }
-  }
   if((wanted & want::blocks) || (wanted & want::blksize))
   {
     isb.Status = -1;
@@ -116,112 +73,304 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, sta
     }
   }
 
-  if(wanted & want::dev)
+  // Firstly let's try the Windows 10 1709 syscall especially for us
+  FILE_STAT_INFORMATION &fsi = *reinterpret_cast<FILE_STAT_INFORMATION *>(buffer);
+  isb.Status = -1;
+  ntstat = NtQueryInformationFile(h.native_handle().h, &isb, &fsi, sizeof(buffer), FileStatInformation);
+  if(STATUS_PENDING == ntstat)
   {
-    // This is a bit hacky, but we just need a unique device number
-    alignas(8) wchar_t buffer_[32769];
-    DWORD len = GetFinalPathNameByHandleW(h.native_handle().h, buffer_, sizeof(buffer_) / sizeof(*buffer_), VOLUME_NAME_NT);
-    if((len == 0u) || len >= sizeof(buffer_) / sizeof(*buffer_))
+    ntstat = ntwait(h.native_handle().h, isb, deadline());
+  }
+  // Otherwise fall back onto legacy implementation
+  if(ntstat < 0)
+  {
+    FILE_ALL_INFORMATION &fai = *reinterpret_cast<FILE_ALL_INFORMATION *>(buffer);
+    bool needInternal = !!(wanted & want::ino);
+    bool needBasic = (!!(wanted & want::type) || !!(wanted & want::atim) || !!(wanted & want::mtim) || !!(wanted & want::ctim) || !!(wanted & want::birthtim) ||
+                      !!(wanted & want::sparse) || !!(wanted & want::compressed) || !!(wanted & want::reparse_point));
+    bool needStandard = (!!(wanted & want::nlink) || !!(wanted & want::size) || !!(wanted & want::allocated) || !!(wanted & want::blocks));
+    // It's not widely known that the NT kernel supplies a stat() equivalent i.e. get me everything in a single syscall
+    // However fetching FileAlignmentInformation which comes with FILE_ALL_INFORMATION is slow as it touches the device driver,
+    // so only use if we need more than one item
+    if((static_cast<int>(needInternal) + static_cast<int>(needBasic) + static_cast<int>(needStandard)) >= 2)
     {
-      return win32_error();
+      ntstat = NtQueryInformationFile(h.native_handle().h, &isb, &fai, sizeof(buffer), FileAllInformation);
+      if(STATUS_PENDING == ntstat)
+      {
+        ntstat = ntwait(h.native_handle().h, isb, deadline());
+      }
+      if(ntstat < 0)
+      {
+        return ntkernel_error(ntstat);
+      }
     }
-    buffer_[len] = 0;
-    const bool is_harddisk = (memcmp(buffer_, L"\\Device\\HarddiskVolume", 44) == 0);
-    const bool is_unc = (memcmp(buffer_, L"\\Device\\Mup", 22) == 0);
-    if(!is_harddisk && !is_unc)
+    else
     {
-      return errc::illegal_byte_sequence;
+      if(needInternal)
+      {
+        ntstat = NtQueryInformationFile(h.native_handle().h, &isb, &fai.InternalInformation, sizeof(fai.InternalInformation), FileInternalInformation);
+        if(STATUS_PENDING == ntstat)
+        {
+          ntstat = ntwait(h.native_handle().h, isb, deadline());
+        }
+        if(ntstat < 0)
+        {
+          return ntkernel_error(ntstat);
+        }
+      }
+      if(needBasic)
+      {
+        isb.Status = -1;
+        ntstat = NtQueryInformationFile(h.native_handle().h, &isb, &fai.BasicInformation, sizeof(fai.BasicInformation), FileBasicInformation);
+        if(STATUS_PENDING == ntstat)
+        {
+          ntstat = ntwait(h.native_handle().h, isb, deadline());
+        }
+        if(ntstat < 0)
+        {
+          return ntkernel_error(ntstat);
+        }
+      }
+      if(needStandard)
+      {
+        isb.Status = -1;
+        ntstat = NtQueryInformationFile(h.native_handle().h, &isb, &fai.StandardInformation, sizeof(fai.StandardInformation), FileStandardInformation);
+        if(STATUS_PENDING == ntstat)
+        {
+          ntstat = ntwait(h.native_handle().h, isb, deadline());
+        }
+        if(ntstat < 0)
+        {
+          return ntkernel_error(ntstat);
+        }
+      }
     }
-    if(is_harddisk)
+
+    if(wanted & want::ino)
     {
-      // buffer_ should look like \Device\HarddiskVolumeX, so our number is from +22 onwards
-      st_dev = _wtoi(buffer_ + 22);
+      st_ino = fai.InternalInformation.IndexNumber.QuadPart;
+      ++ret;
+    }
+    if(wanted & want::type)
+    {
+      OUTCOME_TRY(st_type, calculate_st_type(fai.BasicInformation.FileAttributes, fai.EaInformation.ReparsePointTag));
+      ++ret;
+    }
+    if(wanted & want::nlink)
+    {
+      st_nlink = static_cast<int16_t>(fai.StandardInformation.NumberOfLinks);
+      ++ret;
+    }
+    if(wanted & want::atim)
+    {
+      st_atim = to_timepoint(fai.BasicInformation.LastAccessTime);
+      ++ret;
+    }
+    if(wanted & want::mtim)
+    {
+      st_mtim = to_timepoint(fai.BasicInformation.LastWriteTime);
+      ++ret;
+    }
+    if(wanted & want::ctim)
+    {
+      st_ctim = to_timepoint(fai.BasicInformation.ChangeTime);
+      ++ret;
+    }
+    if(wanted & want::size)
+    {
+      st_size = fai.StandardInformation.EndOfFile.QuadPart;
+      ++ret;
+    }
+    if(wanted & want::allocated)
+    {
+      st_allocated = fai.StandardInformation.AllocationSize.QuadPart;
+      ++ret;
+    }
+    if(wanted & want::blocks)
+    {
+      st_blocks = fai.StandardInformation.AllocationSize.QuadPart / ffssi.PhysicalBytesPerSectorForPerformance;
+      ++ret;
+    }
+    if(wanted & want::blksize)
+    {
+      st_blksize = static_cast<uint16_t>(ffssi.PhysicalBytesPerSectorForPerformance);
+      ++ret;
+    }
+    if(wanted & want::birthtim)
+    {
+      st_birthtim = to_timepoint(fai.BasicInformation.CreationTime);
+      ++ret;
+    }
+    if(wanted & want::sparse)
+    {
+      st_sparse = static_cast<unsigned int>((fai.BasicInformation.FileAttributes & FILE_ATTRIBUTE_SPARSE_FILE) != 0u);
+      ++ret;
+    }
+    if(wanted & want::compressed)
+    {
+      st_compressed = static_cast<unsigned int>((fai.BasicInformation.FileAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0u);
+      ++ret;
+    }
+    if(wanted & want::reparse_point)
+    {
+      st_reparse_point = static_cast<unsigned int>((fai.BasicInformation.FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0u);
       ++ret;
     }
   }
-  if(wanted & want::ino)
+  else
   {
-    st_ino = fai.InternalInformation.IndexNumber.QuadPart;
-    ++ret;
-  }
-  if(wanted & want::type)
-  {
-    ULONG ReparsePointTag = fai.EaInformation.ReparsePointTag;
-    // We need to get its reparse tag to see if it's a symlink
-    if(((fai.BasicInformation.FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0u) && (ReparsePointTag == 0u))
+    if(wanted & want::ino)
     {
-      alignas(8) char buffer_[sizeof(REPARSE_DATA_BUFFER) + 32769];
-      DWORD written = 0;
-      auto *rpd = reinterpret_cast<REPARSE_DATA_BUFFER *>(buffer_);
-      memset(rpd, 0, sizeof(*rpd));
-      if(DeviceIoControl(h.native_handle().h, FSCTL_GET_REPARSE_POINT, nullptr, 0, rpd, sizeof(buffer_), &written, nullptr) == 0)
+      st_ino = fsi.FileId.QuadPart;
+      ++ret;
+    }
+    if(wanted & want::type)
+    {
+      OUTCOME_TRY(st_type, calculate_st_type(fsi.FileAttributes, fsi.ReparseTag));
+      ++ret;
+    }
+    if(wanted & want::nlink)
+    {
+      st_nlink = static_cast<int16_t>(fsi.NumberOfLinks);
+      ++ret;
+    }
+    if(wanted & want::atim)
+    {
+      st_atim = to_timepoint(fsi.LastAccessTime);
+      ++ret;
+    }
+    if(wanted & want::mtim)
+    {
+      st_mtim = to_timepoint(fsi.LastWriteTime);
+      ++ret;
+    }
+    if(wanted & want::ctim)
+    {
+      st_ctim = to_timepoint(fsi.ChangeTime);
+      ++ret;
+    }
+    if(wanted & want::size)
+    {
+      st_size = fsi.EndOfFile.QuadPart;
+      ++ret;
+    }
+    if(wanted & want::allocated)
+    {
+      st_allocated = fsi.AllocationSize.QuadPart;
+      ++ret;
+    }
+    if(wanted & want::blocks)
+    {
+      st_blocks = fsi.AllocationSize.QuadPart / ffssi.PhysicalBytesPerSectorForPerformance;
+      ++ret;
+    }
+    if(wanted & want::blksize)
+    {
+      st_blksize = static_cast<uint16_t>(ffssi.PhysicalBytesPerSectorForPerformance);
+      ++ret;
+    }
+    if(wanted & want::birthtim)
+    {
+      st_birthtim = to_timepoint(fsi.CreationTime);
+      ++ret;
+    }
+    if(wanted & want::sparse)
+    {
+      st_sparse = static_cast<unsigned int>((fsi.FileAttributes & FILE_ATTRIBUTE_SPARSE_FILE) != 0u);
+      ++ret;
+    }
+    if(wanted & want::compressed)
+    {
+      st_compressed = static_cast<unsigned int>((fsi.FileAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0u);
+      ++ret;
+    }
+    if(wanted & want::reparse_point)
+    {
+      st_reparse_point = static_cast<unsigned int>((fsi.FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0u);
+      ++ret;
+    }
+  }
+  if((wanted & want::dev) || (wanted & want::ino))
+  {
+    /* The internal FileId isn't unique per stored file on some filing systems, which obviously breaks code which assumes
+    inode values are unique per stored file rather than per named file.
+
+    The filing system may store unique numbers per stored file, let's try fetching those.
+    */
+    bool still_need_dev = true, still_need_ino = true;
+
+    // This is a Windows 10 or later API
+    FILE_ID_INFORMATION &fii = *reinterpret_cast<FILE_ID_INFORMATION *>(buffer);
+    memset(&fii.VolumeSerialNumber, 0, sizeof(fii.VolumeSerialNumber));
+    memset(&fii.FileId, 0, sizeof(fii.FileId));
+    isb.Status = -1;
+    ntstat = NtQueryInformationFile(h.native_handle().h, &isb, &fii, sizeof(buffer), FileIdInformation);
+    if(STATUS_PENDING == ntstat)
+    {
+      ntstat = ntwait(h.native_handle().h, isb, deadline());
+    }
+    if(ntstat >= 0)
+    {
+      st_dev = fii.VolumeSerialNumber;
+      ++ret;
+      still_need_dev = false;
+      union
+      {
+        uint64_t ino;
+        uint8_t bytes[8];
+      };
+      ino = 0;
+      for(size_t n = 0; n < 16; n++)
+      {
+        if(fii.FileId.Identifier[n] != 0)
+        {
+          bytes[n & 7] ^= fii.FileId.Identifier[n];
+          still_need_ino = false;
+        }
+      }
+      if(!still_need_ino)
+      {
+        st_ino = ino;
+      }
+    }
+    if(still_need_dev)
+    {
+      // This is a bit hacky, but we just need a unique device number
+      alignas(8) wchar_t buffer_[32769];
+      DWORD len = GetFinalPathNameByHandleW(h.native_handle().h, buffer_, sizeof(buffer_) / sizeof(*buffer_), VOLUME_NAME_NT);
+      if((len == 0u) || len >= sizeof(buffer_) / sizeof(*buffer_))
       {
         return win32_error();
       }
-      ReparsePointTag = rpd->ReparseTag;
+      buffer_[len] = 0;
+      const bool is_harddisk = (memcmp(buffer_, L"\\Device\\HarddiskVolume", 44) == 0);
+      const bool is_unc = (memcmp(buffer_, L"\\Device\\Mup", 22) == 0);
+      if(!is_harddisk && !is_unc)
+      {
+        return errc::illegal_byte_sequence;
+      }
+      if(is_harddisk)
+      {
+        // buffer_ should look like \Device\HarddiskVolumeX, so our number is from +22 onwards
+        st_dev = _wtoi(buffer_ + 22);
+        ++ret;
+      }
     }
-    st_type = windows_nt_kernel::to_st_type(fai.BasicInformation.FileAttributes, ReparsePointTag);
-    ++ret;
-  }
-  if(wanted & want::nlink)
-  {
-    st_nlink = static_cast<int16_t>(fai.StandardInformation.NumberOfLinks);
-    ++ret;
-  }
-  if(wanted & want::atim)
-  {
-    st_atim = to_timepoint(fai.BasicInformation.LastAccessTime);
-    ++ret;
-  }
-  if(wanted & want::mtim)
-  {
-    st_mtim = to_timepoint(fai.BasicInformation.LastWriteTime);
-    ++ret;
-  }
-  if(wanted & want::ctim)
-  {
-    st_ctim = to_timepoint(fai.BasicInformation.ChangeTime);
-    ++ret;
-  }
-  if(wanted & want::size)
-  {
-    st_size = fai.StandardInformation.EndOfFile.QuadPart;
-    ++ret;
-  }
-  if(wanted & want::allocated)
-  {
-    st_allocated = fai.StandardInformation.AllocationSize.QuadPart;
-    ++ret;
-  }
-  if(wanted & want::blocks)
-  {
-    st_blocks = fai.StandardInformation.AllocationSize.QuadPart / ffssi.PhysicalBytesPerSectorForPerformance;
-    ++ret;
-  }
-  if(wanted & want::blksize)
-  {
-    st_blksize = static_cast<uint16_t>(ffssi.PhysicalBytesPerSectorForPerformance);
-    ++ret;
-  }
-  if(wanted & want::birthtim)
-  {
-    st_birthtim = to_timepoint(fai.BasicInformation.CreationTime);
-    ++ret;
-  }
-  if(wanted & want::sparse)
-  {
-    st_sparse = static_cast<unsigned int>((fai.BasicInformation.FileAttributes & FILE_ATTRIBUTE_SPARSE_FILE) != 0u);
-    ++ret;
-  }
-  if(wanted & want::compressed)
-  {
-    st_compressed = static_cast<unsigned int>((fai.BasicInformation.FileAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0u);
-    ++ret;
-  }
-  if(wanted & want::reparse_point)
-  {
-    st_reparse_point = static_cast<unsigned int>((fai.BasicInformation.FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0u);
-    ++ret;
+    if(still_need_ino)
+    {
+      // Should be good back to Windows 8
+      FILE_OBJECTID_INFORMATION &foii = *reinterpret_cast<FILE_OBJECTID_INFORMATION *>(buffer);
+      isb.Status = -1;
+      ntstat = NtQueryInformationFile(h.native_handle().h, &isb, &foii, sizeof(buffer), FileObjectIdInformation);
+      if(STATUS_PENDING == ntstat)
+      {
+        ntstat = ntwait(h.native_handle().h, isb, deadline());
+      }
+      if(ntstat >= 0)
+      {
+        st_ino = foii.FileReference;
+      }
+    }
   }
   return ret;
 }

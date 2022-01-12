@@ -557,7 +557,7 @@ namespace windows_nt_kernel
     DWORD ThreadCount;
   } PERFORMANCE_INFORMATION, *PPERFORMANCE_INFORMATION, PERFORMACE_INFORMATION, *PPERFORMACE_INFORMATION;
 
-  using GetPerformanceInfo_t = BOOL(NTAPI*)(PPERFORMANCE_INFORMATION pPerformanceInformation, DWORD cb);
+  using GetPerformanceInfo_t = BOOL(NTAPI *)(PPERFORMANCE_INFORMATION pPerformanceInformation, DWORD cb);
 
   using RtlCaptureStackBackTrace_t = USHORT(NTAPI *)(_In_ ULONG FramesToSkip, _In_ ULONG FramesToCapture, _Out_ PVOID *BackTrace,
                                                      _Out_opt_ PULONG BackTraceHash);
@@ -680,6 +680,43 @@ namespace windows_nt_kernel
     FILE_ALIGNMENT_INFORMATION AlignmentInformation;
     FILE_NAME_INFORMATION NameInformation;
   } FILE_ALL_INFORMATION, *PFILE_ALL_INFORMATION;
+
+  typedef struct _FILE_ID_INFORMATION  // NOLINT
+  {
+    ULONGLONG VolumeSerialNumber;
+    FILE_ID_128 FileId;
+  } FILE_ID_INFORMATION, *PFILE_ID_INFORMATION;
+
+  typedef struct _FILE_OBJECTID_INFORMATION  // NOLINT
+  {
+    LONGLONG FileReference;
+    UCHAR ObjectId[16];
+    union
+    {
+      struct
+      {
+        UCHAR BirthVolumeId[16];
+        UCHAR BirthObjectId[16];
+        UCHAR DomainId[16];
+      } DUMMYSTRUCTNAME;
+      UCHAR ExtendedInfo[48];
+    } DUMMYUNIONNAME;
+  } FILE_OBJECTID_INFORMATION, *PFILE_OBJECTID_INFORMATION;
+
+  typedef struct _FILE_STAT_INFORMATION  // NOLINT
+  {
+    LARGE_INTEGER FileId;
+    LARGE_INTEGER CreationTime;
+    LARGE_INTEGER LastAccessTime;
+    LARGE_INTEGER LastWriteTime;
+    LARGE_INTEGER ChangeTime;
+    LARGE_INTEGER AllocationSize;
+    LARGE_INTEGER EndOfFile;
+    ULONG FileAttributes;
+    ULONG ReparseTag;
+    ULONG NumberOfLinks;
+    ACCESS_MASK EffectiveAccess;
+  } FILE_STAT_INFORMATION, *PFILE_STAT_INFORMATION;
 
   typedef struct _FILE_FS_ATTRIBUTE_INFORMATION  // NOLINT
   {
@@ -2079,7 +2116,9 @@ inline HANDLE CreateFileW_(_In_ LPCWSTR lpFileName, _In_ DWORD dwDesiredAccess, 
     SetLastError(ERROR_FILE_NOT_FOUND);
     return INVALID_HANDLE_VALUE;  // NOLINT
   }
-  auto unntpath = make_scope_exit([&NtPath]() noexcept {
+  auto unntpath = make_scope_exit(
+  [&NtPath]() noexcept
+  {
     if(HeapFree(GetProcessHeap(), 0, NtPath.Buffer) == 0)
     {
       abort();
