@@ -105,55 +105,56 @@ Inheritance diagram for llfio_v2_xxx::pipe_handle:</div>
  <div class="center">
   <img src="classllfio__v2__xxx_1_1pipe__handle.png" usemap="#llfio_5Fv2_5Fxxx::pipe_5Fhandle_map" alt=""/>
   <map id="llfio_5Fv2_5Fxxx::pipe_5Fhandle_map" name="llfio_5Fv2_5Fxxx::pipe_5Fhandle_map">
-<area href="classllfio__v2__xxx_1_1io__handle.html" title="A handle to something capable of scatter-gather byte i/o." alt="llfio_v2_xxx::io_handle" shape="rect" coords="0,56,153,80"/>
-<area href="classfs__handle.html" title="A handle to something with a device and inode number." alt="fs_handle" shape="rect" coords="163,56,316,80"/>
-<area href="classllfio__v2__xxx_1_1handle.html" title="A native_handle_type which is managed by the lifetime of this object instance." alt="llfio_v2_xxx::handle" shape="rect" coords="0,0,153,24"/>
+<area href="classllfio__v2__xxx_1_1byte__io__handle.html" title="A handle to something capable of scatter-gather byte i/o." alt="llfio_v2_xxx::byte_io_handle" shape="rect" coords="0,56,173,80"/>
+<area href="classfs__handle.html" title="A handle to something with a device and inode number." alt="fs_handle" shape="rect" coords="183,56,356,80"/>
+<area href="classllfio__v2__xxx_1_1pollable__handle.html" title="A handle type which can be supplied to poll()." alt="llfio_v2_xxx::pollable_handle" shape="rect" coords="366,56,539,80"/>
+<area href="classllfio__v2__xxx_1_1handle.html" title="A native_handle_type which is managed by the lifetime of this object instance." alt="llfio_v2_xxx::handle" shape="rect" coords="0,0,173,24"/>
   </map>
 </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:addf6cc73369f6d4f1e7b529e083552ab"><td class="memItemLeft" align="right" valign="top"><a id="addf6cc73369f6d4f1e7b529e083552ab"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>path_type</b> = io_handle::path_type</td></tr>
-<tr class="separator:addf6cc73369f6d4f1e7b529e083552ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a86e3e779f751e9732f237c2d60e8edb3"><td class="memItemLeft" align="right" valign="top"><a id="a86e3e779f751e9732f237c2d60e8edb3"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>extent_type</b> = io_handle::extent_type</td></tr>
-<tr class="separator:a86e3e779f751e9732f237c2d60e8edb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0116ff078dc60da810a8170f4b7f6720"><td class="memItemLeft" align="right" valign="top"><a id="a0116ff078dc60da810a8170f4b7f6720"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>size_type</b> = io_handle::size_type</td></tr>
-<tr class="separator:a0116ff078dc60da810a8170f4b7f6720"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a78225352309cfe47ba4b88e218231cb6"><td class="memItemLeft" align="right" valign="top"><a id="a78225352309cfe47ba4b88e218231cb6"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>mode</b> = <a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">io_handle::mode</a></td></tr>
-<tr class="separator:a78225352309cfe47ba4b88e218231cb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad622556b831bdc12bfd32552fd325529"><td class="memItemLeft" align="right" valign="top"><a id="ad622556b831bdc12bfd32552fd325529"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>creation</b> = <a class="el" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42">io_handle::creation</a></td></tr>
-<tr class="separator:ad622556b831bdc12bfd32552fd325529"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaad4d496ae011dced498bc46162917c2"><td class="memItemLeft" align="right" valign="top"><a id="aaad4d496ae011dced498bc46162917c2"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>caching</b> = <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">io_handle::caching</a></td></tr>
-<tr class="separator:aaad4d496ae011dced498bc46162917c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3efccd17a106ade83e13cce154627c6f"><td class="memItemLeft" align="right" valign="top"><a id="a3efccd17a106ade83e13cce154627c6f"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>flag</b> = io_handle::flag</td></tr>
-<tr class="separator:a3efccd17a106ade83e13cce154627c6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65b5db5497f23147b46684d375cf2af3"><td class="memItemLeft" align="right" valign="top"><a id="a65b5db5497f23147b46684d375cf2af3"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>buffer_type</b> = <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1buffer__type.html">io_handle::buffer_type</a></td></tr>
-<tr class="separator:a65b5db5497f23147b46684d375cf2af3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a69a64dbc83bff0cd3cdbdbbbf5790331"><td class="memItemLeft" align="right" valign="top"><a id="a69a64dbc83bff0cd3cdbdbbbf5790331"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>const_buffer_type</b> = <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1const__buffer__type.html">io_handle::const_buffer_type</a></td></tr>
-<tr class="separator:a69a64dbc83bff0cd3cdbdbbbf5790331"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaf0ed095bd68c7605af258e1e4e4d56d"><td class="memItemLeft" align="right" valign="top"><a id="aaf0ed095bd68c7605af258e1e4e4d56d"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>buffers_type</b> = io_handle::buffers_type</td></tr>
-<tr class="separator:aaf0ed095bd68c7605af258e1e4e4d56d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad9538abba49629b0981480f654ffe63d"><td class="memItemLeft" align="right" valign="top"><a id="ad9538abba49629b0981480f654ffe63d"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>const_buffers_type</b> = io_handle::const_buffers_type</td></tr>
-<tr class="separator:ad9538abba49629b0981480f654ffe63d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7891cea73fd80138fbfc9170c4777c16"><td class="memTemplParams" colspan="2"><a id="a7891cea73fd80138fbfc9170c4777c16"></a>
+<tr class="memitem:a2694e80d392f29e42ad05c00ca4fc332"><td class="memItemLeft" align="right" valign="top"><a id="a2694e80d392f29e42ad05c00ca4fc332"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>path_type</b> = byte_io_handle::path_type</td></tr>
+<tr class="separator:a2694e80d392f29e42ad05c00ca4fc332"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1244328ab985ec35229e839cd9e1f54f"><td class="memItemLeft" align="right" valign="top"><a id="a1244328ab985ec35229e839cd9e1f54f"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>extent_type</b> = byte_io_handle::extent_type</td></tr>
+<tr class="separator:a1244328ab985ec35229e839cd9e1f54f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a28f723f19793d904b3200f58ec1dc9"><td class="memItemLeft" align="right" valign="top"><a id="a5a28f723f19793d904b3200f58ec1dc9"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>size_type</b> = byte_io_handle::size_type</td></tr>
+<tr class="separator:a5a28f723f19793d904b3200f58ec1dc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add4d490631e710e9cd47cec52596eeaf"><td class="memItemLeft" align="right" valign="top"><a id="add4d490631e710e9cd47cec52596eeaf"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>mode</b> = <a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">byte_io_handle::mode</a></td></tr>
+<tr class="separator:add4d490631e710e9cd47cec52596eeaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a645c0538d7e039a7d584a53c0b9032e1"><td class="memItemLeft" align="right" valign="top"><a id="a645c0538d7e039a7d584a53c0b9032e1"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>creation</b> = <a class="el" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42">byte_io_handle::creation</a></td></tr>
+<tr class="separator:a645c0538d7e039a7d584a53c0b9032e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae728a62539a76b2346e3165570b9aeb4"><td class="memItemLeft" align="right" valign="top"><a id="ae728a62539a76b2346e3165570b9aeb4"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>caching</b> = <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">byte_io_handle::caching</a></td></tr>
+<tr class="separator:ae728a62539a76b2346e3165570b9aeb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0a18183672763260f9475108554f00b"><td class="memItemLeft" align="right" valign="top"><a id="ad0a18183672763260f9475108554f00b"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>flag</b> = byte_io_handle::flag</td></tr>
+<tr class="separator:ad0a18183672763260f9475108554f00b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7dc3c45dc2debb5f6d905e27ac00ed44"><td class="memItemLeft" align="right" valign="top"><a id="a7dc3c45dc2debb5f6d905e27ac00ed44"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>buffer_type</b> = <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html">byte_io_handle::buffer_type</a></td></tr>
+<tr class="separator:a7dc3c45dc2debb5f6d905e27ac00ed44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6f6ac15626bb829acb8165761f972cb"><td class="memItemLeft" align="right" valign="top"><a id="aa6f6ac15626bb829acb8165761f972cb"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>const_buffer_type</b> = <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1const__buffer__type.html">byte_io_handle::const_buffer_type</a></td></tr>
+<tr class="separator:aa6f6ac15626bb829acb8165761f972cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af452471510ffe29ba3123e125c0e6ce1"><td class="memItemLeft" align="right" valign="top"><a id="af452471510ffe29ba3123e125c0e6ce1"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>buffers_type</b> = byte_io_handle::buffers_type</td></tr>
+<tr class="separator:af452471510ffe29ba3123e125c0e6ce1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93f67ed951ae200afc6778988455dc14"><td class="memItemLeft" align="right" valign="top"><a id="a93f67ed951ae200afc6778988455dc14"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>const_buffers_type</b> = byte_io_handle::const_buffers_type</td></tr>
+<tr class="separator:a93f67ed951ae200afc6778988455dc14"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad1ea356fb54d277d0d4db99146cdf995"><td class="memTemplParams" colspan="2"><a id="ad1ea356fb54d277d0d4db99146cdf995"></a>
 template&lt;class T &gt; </td></tr>
-<tr class="memitem:a7891cea73fd80138fbfc9170c4777c16"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>io_request</b> = <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_handle::io_request</a>&lt; T &gt;</td></tr>
-<tr class="separator:a7891cea73fd80138fbfc9170c4777c16"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a32c60dec78576807a163d370e7a47409"><td class="memTemplParams" colspan="2"><a id="a32c60dec78576807a163d370e7a47409"></a>
+<tr class="memitem:ad1ea356fb54d277d0d4db99146cdf995"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>io_request</b> = <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">byte_io_handle::io_request</a>&lt; T &gt;</td></tr>
+<tr class="separator:ad1ea356fb54d277d0d4db99146cdf995"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a396714a9796b390b8c12b956ab6937"><td class="memTemplParams" colspan="2"><a id="a3a396714a9796b390b8c12b956ab6937"></a>
 template&lt;class T &gt; </td></tr>
-<tr class="memitem:a32c60dec78576807a163d370e7a47409"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>io_result</b> = <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_handle::io_result</a>&lt; T &gt;</td></tr>
-<tr class="separator:a32c60dec78576807a163d370e7a47409"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a396714a9796b390b8c12b956ab6937"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>io_result</b> = <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">byte_io_handle::io_result</a>&lt; T &gt;</td></tr>
+<tr class="separator:a3a396714a9796b390b8c12b956ab6937"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae1045e33170d615420a0f743bd8e5ec2"><td class="memItemLeft" align="right" valign="top"><a id="ae1045e33170d615420a0f743bd8e5ec2"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>dev_t</b> = fs_handle::dev_t</td></tr>
 <tr class="separator:ae1045e33170d615420a0f743bd8e5ec2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -163,16 +164,16 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>ino_t</b> = fs_handl
 <tr class="memitem:ac121cc7fa9d30c0c4ffecd0d8469c37d"><td class="memItemLeft" align="right" valign="top"><a id="ac121cc7fa9d30c0c4ffecd0d8469c37d"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>path_view_type</b> = fs_handle::path_view_type</td></tr>
 <tr class="separator:ac121cc7fa9d30c0c4ffecd0d8469c37d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0e3d363c01073647a00a2fbbd7b50fbf"><td class="memItemLeft" align="right" valign="top"><a id="a0e3d363c01073647a00a2fbbd7b50fbf"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>barrier_kind</b> = <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26">io_multiplexer::barrier_kind</a></td></tr>
-<tr class="separator:a0e3d363c01073647a00a2fbbd7b50fbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9f6466750a7411512da502cd60d3c461"><td class="memItemLeft" align="right" valign="top"><a id="a9f6466750a7411512da502cd60d3c461"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>registered_buffer_type</b> = <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#a9991b48f4cd8c77ef7fd31e6c48003b3">io_multiplexer::registered_buffer_type</a></td></tr>
-<tr class="separator:a9f6466750a7411512da502cd60d3c461"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac7a2e68c2f5d49187ec3d179e40b33ea"><td class="memTemplParams" colspan="2"><a id="ac7a2e68c2f5d49187ec3d179e40b33ea"></a>
+<tr class="memitem:ac54a07a91e9e39ac606560dca1065567"><td class="memItemLeft" align="right" valign="top"><a id="ac54a07a91e9e39ac606560dca1065567"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>barrier_kind</b> = <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a2a7e52ff0c192a5edf67ceee4c7195d3">byte_io_multiplexer::barrier_kind</a></td></tr>
+<tr class="separator:ac54a07a91e9e39ac606560dca1065567"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2633fe1e749aff4307ca6d1d4cc5c711"><td class="memItemLeft" align="right" valign="top"><a id="a2633fe1e749aff4307ca6d1d4cc5c711"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>registered_buffer_type</b> = <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a1cf4200e074af12c5662a4cb7bdcfa46">byte_io_multiplexer::registered_buffer_type</a></td></tr>
+<tr class="separator:a2633fe1e749aff4307ca6d1d4cc5c711"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93af2fdd7b3f0c26561ec97035ab3d5c"><td class="memTemplParams" colspan="2"><a id="a93af2fdd7b3f0c26561ec97035ab3d5c"></a>
 template&lt;class T &gt; </td></tr>
-<tr class="memitem:ac7a2e68c2f5d49187ec3d179e40b33ea"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>awaitable</b> = <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html">io_multiplexer::awaitable</a>&lt; T &gt;</td></tr>
-<tr class="separator:ac7a2e68c2f5d49187ec3d179e40b33ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93af2fdd7b3f0c26561ec97035ab3d5c"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>awaitable</b> = <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html">byte_io_multiplexer::awaitable</a>&lt; T &gt;</td></tr>
+<tr class="separator:a93af2fdd7b3f0c26561ec97035ab3d5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -180,14 +181,14 @@ Public Member Functions</h2></td></tr>
 constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html#a1d4c5c39a211181ccd1a2ebeac4acb30">pipe_handle</a> ()</td></tr>
 <tr class="memdesc:a1d4c5c39a211181ccd1a2ebeac4acb30"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
 <tr class="separator:a1d4c5c39a211181ccd1a2ebeac4acb30"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a059c4dfab3ed474d539dabd783892b0e"><td class="memItemLeft" align="right" valign="top"><a id="a059c4dfab3ed474d539dabd783892b0e"></a>
-constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html#a059c4dfab3ed474d539dabd783892b0e">pipe_handle</a> (<a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a> h, dev_t devid, ino_t inode, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a>, flag <a class="el" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>, <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html">io_multiplexer</a> *ctx)</td></tr>
-<tr class="memdesc:a059c4dfab3ed474d539dabd783892b0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a handle from a supplied native handle. <br /></td></tr>
-<tr class="separator:a059c4dfab3ed474d539dabd783892b0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a15f621ed9c82e7c9e9c24d2ba299ee85"><td class="memItemLeft" align="right" valign="top"><a id="a15f621ed9c82e7c9e9c24d2ba299ee85"></a>
-constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html#a15f621ed9c82e7c9e9c24d2ba299ee85">pipe_handle</a> (<a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a> h, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a>, flag <a class="el" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>, <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html">io_multiplexer</a> *ctx)</td></tr>
-<tr class="memdesc:a15f621ed9c82e7c9e9c24d2ba299ee85"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a handle from a supplied native handle. <br /></td></tr>
-<tr class="separator:a15f621ed9c82e7c9e9c24d2ba299ee85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3dc6a73d4a7060e10bd45f23b444aee7"><td class="memItemLeft" align="right" valign="top"><a id="a3dc6a73d4a7060e10bd45f23b444aee7"></a>
+constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html#a3dc6a73d4a7060e10bd45f23b444aee7">pipe_handle</a> (<a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a> h, dev_t devid, ino_t inode, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a>, flag <a class="el" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>, <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html">byte_io_multiplexer</a> *ctx)</td></tr>
+<tr class="memdesc:a3dc6a73d4a7060e10bd45f23b444aee7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a handle from a supplied native handle. <br /></td></tr>
+<tr class="separator:a3dc6a73d4a7060e10bd45f23b444aee7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27d5c0c93cba90a77c16cd7ab3c98476"><td class="memItemLeft" align="right" valign="top"><a id="a27d5c0c93cba90a77c16cd7ab3c98476"></a>
+constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html#a27d5c0c93cba90a77c16cd7ab3c98476">pipe_handle</a> (<a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a> h, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a>, flag <a class="el" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>, <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html">byte_io_multiplexer</a> *ctx)</td></tr>
+<tr class="memdesc:a27d5c0c93cba90a77c16cd7ab3c98476"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a handle from a supplied native handle. <br /></td></tr>
+<tr class="separator:a27d5c0c93cba90a77c16cd7ab3c98476"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa5eda647e77f848d07763bebef75473d"><td class="memItemLeft" align="right" valign="top"><a id="aa5eda647e77f848d07763bebef75473d"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html#aa5eda647e77f848d07763bebef75473d">pipe_handle</a> (const <a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html">pipe_handle</a> &amp;)=delete</td></tr>
 <tr class="memdesc:aa5eda647e77f848d07763bebef75473d"><td class="mdescLeft">&#160;</td><td class="mdescRight">No copy construction (use clone()) <br /></td></tr>
@@ -200,22 +201,22 @@ constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html#a57ba2b79928a2b9b6b556e7364b05a57">pipe_handle</a> (<a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html">pipe_handle</a> &amp;&amp;o) noexcept</td></tr>
 <tr class="memdesc:a57ba2b79928a2b9b6b556e7364b05a57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implicit move construction of <code>pipe_handle</code> permitted. <br /></td></tr>
 <tr class="separator:a57ba2b79928a2b9b6b556e7364b05a57"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad9cd2f81eb83696e8787b4bc02d31575"><td class="memItemLeft" align="right" valign="top"><a id="ad9cd2f81eb83696e8787b4bc02d31575"></a>
-constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html#ad9cd2f81eb83696e8787b4bc02d31575">pipe_handle</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;&amp;o, dev_t devid, ino_t inode, <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html">io_multiplexer</a> *ctx) noexcept</td></tr>
-<tr class="memdesc:ad9cd2f81eb83696e8787b4bc02d31575"><td class="mdescLeft">&#160;</td><td class="mdescRight">Explicit conversion from handle permitted. <br /></td></tr>
-<tr class="separator:ad9cd2f81eb83696e8787b4bc02d31575"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5d125573d7a8c08d50b234470067e530"><td class="memItemLeft" align="right" valign="top"><a id="a5d125573d7a8c08d50b234470067e530"></a>
-constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html#a5d125573d7a8c08d50b234470067e530">pipe_handle</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;&amp;o, <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html">io_multiplexer</a> *ctx) noexcept</td></tr>
-<tr class="memdesc:a5d125573d7a8c08d50b234470067e530"><td class="mdescLeft">&#160;</td><td class="mdescRight">Explicit conversion from handle permitted. <br /></td></tr>
-<tr class="separator:a5d125573d7a8c08d50b234470067e530"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae008da2cbe3de01cfad2a8252e449b8a"><td class="memItemLeft" align="right" valign="top"><a id="ae008da2cbe3de01cfad2a8252e449b8a"></a>
-constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html#ae008da2cbe3de01cfad2a8252e449b8a">pipe_handle</a> (<a class="el" href="classllfio__v2__xxx_1_1io__handle.html">io_handle</a> &amp;&amp;o, dev_t devid, ino_t inode) noexcept</td></tr>
-<tr class="memdesc:ae008da2cbe3de01cfad2a8252e449b8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Explicit conversion from io_handle permitted. <br /></td></tr>
-<tr class="separator:ae008da2cbe3de01cfad2a8252e449b8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a95997b7fd729b09798a87f71efab4347"><td class="memItemLeft" align="right" valign="top"><a id="a95997b7fd729b09798a87f71efab4347"></a>
-constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html#a95997b7fd729b09798a87f71efab4347">pipe_handle</a> (<a class="el" href="classllfio__v2__xxx_1_1io__handle.html">io_handle</a> &amp;&amp;o) noexcept</td></tr>
-<tr class="memdesc:a95997b7fd729b09798a87f71efab4347"><td class="mdescLeft">&#160;</td><td class="mdescRight">Explicit conversion from io_handle permitted. <br /></td></tr>
-<tr class="separator:a95997b7fd729b09798a87f71efab4347"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc93cfeb52220004600884a1a014b56d"><td class="memItemLeft" align="right" valign="top"><a id="afc93cfeb52220004600884a1a014b56d"></a>
+constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html#afc93cfeb52220004600884a1a014b56d">pipe_handle</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;&amp;o, dev_t devid, ino_t inode, <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html">byte_io_multiplexer</a> *ctx) noexcept</td></tr>
+<tr class="memdesc:afc93cfeb52220004600884a1a014b56d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Explicit conversion from handle permitted. <br /></td></tr>
+<tr class="separator:afc93cfeb52220004600884a1a014b56d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba49db90c0b5d0ba85f0c679990c3ea3"><td class="memItemLeft" align="right" valign="top"><a id="aba49db90c0b5d0ba85f0c679990c3ea3"></a>
+constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html#aba49db90c0b5d0ba85f0c679990c3ea3">pipe_handle</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;&amp;o, <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html">byte_io_multiplexer</a> *ctx) noexcept</td></tr>
+<tr class="memdesc:aba49db90c0b5d0ba85f0c679990c3ea3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Explicit conversion from handle permitted. <br /></td></tr>
+<tr class="separator:aba49db90c0b5d0ba85f0c679990c3ea3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a48e4388bf1b15e6b4c3f9cc342510df7"><td class="memItemLeft" align="right" valign="top"><a id="a48e4388bf1b15e6b4c3f9cc342510df7"></a>
+constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html#a48e4388bf1b15e6b4c3f9cc342510df7">pipe_handle</a> (<a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html">byte_io_handle</a> &amp;&amp;o, dev_t devid, ino_t inode) noexcept</td></tr>
+<tr class="memdesc:a48e4388bf1b15e6b4c3f9cc342510df7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Explicit conversion from byte_io_handle permitted. <br /></td></tr>
+<tr class="separator:a48e4388bf1b15e6b4c3f9cc342510df7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a32e1bc7f4d547db0c42498645bdfaba6"><td class="memItemLeft" align="right" valign="top"><a id="a32e1bc7f4d547db0c42498645bdfaba6"></a>
+constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html#a32e1bc7f4d547db0c42498645bdfaba6">pipe_handle</a> (<a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html">byte_io_handle</a> &amp;&amp;o) noexcept</td></tr>
+<tr class="memdesc:a32e1bc7f4d547db0c42498645bdfaba6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Explicit conversion from byte_io_handle permitted. <br /></td></tr>
+<tr class="separator:a32e1bc7f4d547db0c42498645bdfaba6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6926cae050b034558a3ae25ec9c0de94"><td class="memItemLeft" align="right" valign="top"><a id="a6926cae050b034558a3ae25ec9c0de94"></a>
 <a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html">pipe_handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html#a6926cae050b034558a3ae25ec9c0de94">operator=</a> (<a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html">pipe_handle</a> &amp;&amp;o) noexcept</td></tr>
 <tr class="memdesc:a6926cae050b034558a3ae25ec9c0de94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move assignment of <code>pipe_handle</code> permitted. <br /></td></tr>
@@ -228,94 +229,94 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1pipe__handle.html#ad0ae759071d6e5907e73b657a4da688e">close</a> () noexcept override</td></tr>
 <tr class="memdesc:ad0ae759071d6e5907e73b657a4da688e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Immediately close the native handle type managed by this handle. <br /></td></tr>
 <tr class="separator:ad0ae759071d6e5907e73b657a4da688e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac44b02d62334e55b99a5668d67ad484e"><td class="memItemLeft" align="right" valign="top"><a id="ac44b02d62334e55b99a5668d67ad484e"></a>
-<a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html">io_multiplexer</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__handle.html#ac44b02d62334e55b99a5668d67ad484e">multiplexer</a> () const noexcept</td></tr>
-<tr class="memdesc:ac44b02d62334e55b99a5668d67ad484e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The i/o multiplexer this handle will use to multiplex i/o. If this returns null, then this handle has not been registered with an i/o multiplexer yet. <br /></td></tr>
-<tr class="separator:ac44b02d62334e55b99a5668d67ad484e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a281467f83f70f2e12aaedf5847fd818c"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__handle.html#a281467f83f70f2e12aaedf5847fd818c">set_multiplexer</a> (<a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html">io_multiplexer</a> *c=<a class="el" href="namespacellfio__v2__xxx_1_1this__thread.html#afd6a1f179a8f8027f6c051badadf2707">this_thread::multiplexer</a>()) noexcept</td></tr>
-<tr class="memdesc:a281467f83f70f2e12aaedf5847fd818c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the i/o multiplexer this handle will use to implement <code>read()</code>, <code>write()</code> and <code>barrier()</code>.  <a href="classllfio__v2__xxx_1_1io__handle.html#a281467f83f70f2e12aaedf5847fd818c">More...</a><br /></td></tr>
-<tr class="separator:a281467f83f70f2e12aaedf5847fd818c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa3465a87f2c732cd6465cd3a832a26f0"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__handle.html#aa3465a87f2c732cd6465cd3a832a26f0">max_buffers</a> () const noexcept</td></tr>
-<tr class="memdesc:aa3465a87f2c732cd6465cd3a832a26f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">The <em>maximum</em> number of buffers which a single read or write syscall can (atomically) process at a time for this specific open handle. On POSIX, this is known as <code>IOV_MAX</code>. Preferentially uses any i/o multiplexer set over the virtually overridable per-class implementation.  <a href="classllfio__v2__xxx_1_1io__handle.html#aa3465a87f2c732cd6465cd3a832a26f0">More...</a><br /></td></tr>
-<tr class="separator:aa3465a87f2c732cd6465cd3a832a26f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a97ac1b43da39d9935919ac848ee3e8d3"><td class="memItemLeft" align="right" valign="top">result&lt; registered_buffer_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__handle.html#a97ac1b43da39d9935919ac848ee3e8d3">allocate_registered_buffer</a> (size_t &amp;bytes) noexcept</td></tr>
-<tr class="memdesc:a97ac1b43da39d9935919ac848ee3e8d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Request the allocation of a new registered i/o buffer with the system suitable for maximum performance i/o, preferentially using any i/o multiplexer set over the virtually overridable per-class implementation.  <a href="classllfio__v2__xxx_1_1io__handle.html#a97ac1b43da39d9935919ac848ee3e8d3">More...</a><br /></td></tr>
-<tr class="separator:a97ac1b43da39d9935919ac848ee3e8d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae04ada27942187f03b59044cd1328f49"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__handle.html#ae04ada27942187f03b59044cd1328f49">read</a> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
-<tr class="memdesc:ae04ada27942187f03b59044cd1328f49"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read data from the open handle, preferentially using any i/o multiplexer set over the virtually overridable per-class implementation.  <a href="classllfio__v2__xxx_1_1io__handle.html#ae04ada27942187f03b59044cd1328f49">More...</a><br /></td></tr>
-<tr class="separator:ae04ada27942187f03b59044cd1328f49"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a411cebe2880393c7c61caa6a168b128b"><td class="memItemLeft" align="right" valign="top"><a id="a411cebe2880393c7c61caa6a168b128b"></a>
-<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>read</b> (registered_buffer_type base, <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
-<tr class="separator:a411cebe2880393c7c61caa6a168b128b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac0369e8025ae1320e7d607922f61b48"><td class="memItemLeft" align="right" valign="top"><a id="aac0369e8025ae1320e7d607922f61b48"></a>
-<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html#aed9587571c3fb932adadddc1beeeed58">size_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>read</b> (<a class="el" href="classllfio__v2__xxx_1_1handle.html#a4ee58f1b6a24af5e64d850d1e3eed07f">extent_type</a> offset, std::initializer_list&lt; <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1buffer__type.html">buffer_type</a> &gt; lst, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
-<tr class="separator:aac0369e8025ae1320e7d607922f61b48"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a785c739c96c277a7a75135ee3b77548a"><td class="memTemplParams" colspan="2"><a id="a785c739c96c277a7a75135ee3b77548a"></a>
+<tr class="memitem:ae80e58316f9f1ed3c522cfe5553196ec"><td class="memItemLeft" align="right" valign="top"><a id="ae80e58316f9f1ed3c522cfe5553196ec"></a>
+<a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html">byte_io_multiplexer</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html#ae80e58316f9f1ed3c522cfe5553196ec">multiplexer</a> () const noexcept</td></tr>
+<tr class="memdesc:ae80e58316f9f1ed3c522cfe5553196ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">The i/o multiplexer this handle will use to multiplex i/o. If this returns null, then this handle has not been registered with an i/o multiplexer yet. <br /></td></tr>
+<tr class="separator:ae80e58316f9f1ed3c522cfe5553196ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50dcc073eb056a01694e0b78fddfaae4"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html#a50dcc073eb056a01694e0b78fddfaae4">set_multiplexer</a> (<a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html">byte_io_multiplexer</a> *c=<a class="el" href="namespacellfio__v2__xxx_1_1this__thread.html#a5e16f34ead62e35a2d252dc4c6a75892">this_thread::multiplexer</a>()) noexcept</td></tr>
+<tr class="memdesc:a50dcc073eb056a01694e0b78fddfaae4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the i/o multiplexer this handle will use to implement <code>read()</code>, <code>write()</code> and <code>barrier()</code>.  <a href="classllfio__v2__xxx_1_1byte__io__handle.html#a50dcc073eb056a01694e0b78fddfaae4">More...</a><br /></td></tr>
+<tr class="separator:a50dcc073eb056a01694e0b78fddfaae4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b9d9bf00c3c07b76b056b32e8079651"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html#a6b9d9bf00c3c07b76b056b32e8079651">max_buffers</a> () const noexcept</td></tr>
+<tr class="memdesc:a6b9d9bf00c3c07b76b056b32e8079651"><td class="mdescLeft">&#160;</td><td class="mdescRight">The <em>maximum</em> number of buffers which a single read or write syscall can (atomically) process at a time for this specific open handle. On POSIX, this is known as <code>IOV_MAX</code>. Preferentially uses any i/o multiplexer set over the virtually overridable per-class implementation.  <a href="classllfio__v2__xxx_1_1byte__io__handle.html#a6b9d9bf00c3c07b76b056b32e8079651">More...</a><br /></td></tr>
+<tr class="separator:a6b9d9bf00c3c07b76b056b32e8079651"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf59c18ca31e95fb44dd1730af05be61"><td class="memItemLeft" align="right" valign="top">result&lt; registered_buffer_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html#abf59c18ca31e95fb44dd1730af05be61">allocate_registered_buffer</a> (size_t &amp;bytes) noexcept</td></tr>
+<tr class="memdesc:abf59c18ca31e95fb44dd1730af05be61"><td class="mdescLeft">&#160;</td><td class="mdescRight">Request the allocation of a new registered i/o buffer with the system suitable for maximum performance i/o, preferentially using any i/o multiplexer set over the virtually overridable per-class implementation.  <a href="classllfio__v2__xxx_1_1byte__io__handle.html#abf59c18ca31e95fb44dd1730af05be61">More...</a><br /></td></tr>
+<tr class="separator:abf59c18ca31e95fb44dd1730af05be61"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa17020bc615b9a3bc73c66fff8968d11"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html#aa17020bc615b9a3bc73c66fff8968d11">read</a> (<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="memdesc:aa17020bc615b9a3bc73c66fff8968d11"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read data from the open handle, preferentially using any i/o multiplexer set over the virtually overridable per-class implementation.  <a href="classllfio__v2__xxx_1_1byte__io__handle.html#aa17020bc615b9a3bc73c66fff8968d11">More...</a><br /></td></tr>
+<tr class="separator:aa17020bc615b9a3bc73c66fff8968d11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acbcd4d6f6364f8494104287305ff9d2b"><td class="memItemLeft" align="right" valign="top"><a id="acbcd4d6f6364f8494104287305ff9d2b"></a>
+<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>read</b> (registered_buffer_type base, <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="separator:acbcd4d6f6364f8494104287305ff9d2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add4d9cad06933bba45ddb8df5a26077e"><td class="memItemLeft" align="right" valign="top"><a id="add4d9cad06933bba45ddb8df5a26077e"></a>
+<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; size_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>read</b> (extent_type offset, std::initializer_list&lt; <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html">buffer_type</a> &gt; lst, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="separator:add4d9cad06933bba45ddb8df5a26077e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b7dedad749aa30ead8e3f690ae1f021"><td class="memTemplParams" colspan="2"><a id="a7b7dedad749aa30ead8e3f690ae1f021"></a>
 template&lt;class... Args&gt; </td></tr>
-<tr class="memitem:a785c739c96c277a7a75135ee3b77548a"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_read</b> (Args &amp;&amp;... args) noexcept</td></tr>
-<tr class="separator:a785c739c96c277a7a75135ee3b77548a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab955e35f67130e85f13048f984b3b5ac"><td class="memTemplParams" colspan="2"><a id="ab955e35f67130e85f13048f984b3b5ac"></a>
+<tr class="memitem:a7b7dedad749aa30ead8e3f690ae1f021"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_read</b> (Args &amp;&amp;... args) noexcept</td></tr>
+<tr class="separator:a7b7dedad749aa30ead8e3f690ae1f021"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a117804b6c2019069fa2c51fb539d8b03"><td class="memTemplParams" colspan="2"><a id="a117804b6c2019069fa2c51fb539d8b03"></a>
 template&lt;class... Args, class Rep , class Period &gt; </td></tr>
-<tr class="memitem:ab955e35f67130e85f13048f984b3b5ac"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_read_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
-<tr class="separator:ab955e35f67130e85f13048f984b3b5ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c3fa301d864c8863c4b464a10aec4e0"><td class="memTemplParams" colspan="2"><a id="a1c3fa301d864c8863c4b464a10aec4e0"></a>
+<tr class="memitem:a117804b6c2019069fa2c51fb539d8b03"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_read_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
+<tr class="separator:a117804b6c2019069fa2c51fb539d8b03"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2174012904c7746d5aaf00d31adf1397"><td class="memTemplParams" colspan="2"><a id="a2174012904c7746d5aaf00d31adf1397"></a>
 template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
-<tr class="memitem:a1c3fa301d864c8863c4b464a10aec4e0"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_read_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
-<tr class="separator:a1c3fa301d864c8863c4b464a10aec4e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7848ef15e774eacec7e4446a8c365a3d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__handle.html#a7848ef15e774eacec7e4446a8c365a3d">write</a> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
-<tr class="memdesc:a7848ef15e774eacec7e4446a8c365a3d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write data to the open handle, preferentially using any i/o multiplexer set over the virtually overridable per-class implementation.  <a href="classllfio__v2__xxx_1_1io__handle.html#a7848ef15e774eacec7e4446a8c365a3d">More...</a><br /></td></tr>
-<tr class="separator:a7848ef15e774eacec7e4446a8c365a3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a31ccfbd651d91a4f00e5192e0614cf6c"><td class="memItemLeft" align="right" valign="top"><a id="a31ccfbd651d91a4f00e5192e0614cf6c"></a>
-<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> (registered_buffer_type base, <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
-<tr class="separator:a31ccfbd651d91a4f00e5192e0614cf6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab500784aa806dc7c2d90028d2f72de57"><td class="memItemLeft" align="right" valign="top"><a id="ab500784aa806dc7c2d90028d2f72de57"></a>
-<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html#aed9587571c3fb932adadddc1beeeed58">size_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> (<a class="el" href="classllfio__v2__xxx_1_1handle.html#a4ee58f1b6a24af5e64d850d1e3eed07f">extent_type</a> offset, std::initializer_list&lt; <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1const__buffer__type.html">const_buffer_type</a> &gt; lst, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
-<tr class="separator:ab500784aa806dc7c2d90028d2f72de57"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aee4c492a592eb15a5bf48e2d3deeec3a"><td class="memTemplParams" colspan="2"><a id="aee4c492a592eb15a5bf48e2d3deeec3a"></a>
+<tr class="memitem:a2174012904c7746d5aaf00d31adf1397"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_read_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
+<tr class="separator:a2174012904c7746d5aaf00d31adf1397"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6fdbbcde6ecdc5a3f1f3110bcec5f3c0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html#a6fdbbcde6ecdc5a3f1f3110bcec5f3c0">write</a> (<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="memdesc:a6fdbbcde6ecdc5a3f1f3110bcec5f3c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write data to the open handle, preferentially using any i/o multiplexer set over the virtually overridable per-class implementation.  <a href="classllfio__v2__xxx_1_1byte__io__handle.html#a6fdbbcde6ecdc5a3f1f3110bcec5f3c0">More...</a><br /></td></tr>
+<tr class="separator:a6fdbbcde6ecdc5a3f1f3110bcec5f3c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a12c13f2aaadf9c2f4cb04bd711e7ee72"><td class="memItemLeft" align="right" valign="top"><a id="a12c13f2aaadf9c2f4cb04bd711e7ee72"></a>
+<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> (registered_buffer_type base, <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="separator:a12c13f2aaadf9c2f4cb04bd711e7ee72"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef8d24213a1205289cea00a0fae25a17"><td class="memItemLeft" align="right" valign="top"><a id="aef8d24213a1205289cea00a0fae25a17"></a>
+<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; size_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> (extent_type offset, std::initializer_list&lt; <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1const__buffer__type.html">const_buffer_type</a> &gt; lst, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="separator:aef8d24213a1205289cea00a0fae25a17"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab5588bbf2a8615719eceedb45363c60d"><td class="memTemplParams" colspan="2"><a id="ab5588bbf2a8615719eceedb45363c60d"></a>
 template&lt;class... Args&gt; </td></tr>
-<tr class="memitem:aee4c492a592eb15a5bf48e2d3deeec3a"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_write</b> (Args &amp;&amp;... args) noexcept</td></tr>
-<tr class="separator:aee4c492a592eb15a5bf48e2d3deeec3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac93b34407da6944f70000b1dd656c8e7"><td class="memTemplParams" colspan="2"><a id="ac93b34407da6944f70000b1dd656c8e7"></a>
+<tr class="memitem:ab5588bbf2a8615719eceedb45363c60d"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_write</b> (Args &amp;&amp;... args) noexcept</td></tr>
+<tr class="separator:ab5588bbf2a8615719eceedb45363c60d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1edc98bc49328d245690a13b50b50c95"><td class="memTemplParams" colspan="2"><a id="a1edc98bc49328d245690a13b50b50c95"></a>
 template&lt;class... Args, class Rep , class Period &gt; </td></tr>
-<tr class="memitem:ac93b34407da6944f70000b1dd656c8e7"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_write_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
-<tr class="separator:ac93b34407da6944f70000b1dd656c8e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae8f08b7afac7020b8901eb9d353a817e"><td class="memTemplParams" colspan="2"><a id="ae8f08b7afac7020b8901eb9d353a817e"></a>
+<tr class="memitem:a1edc98bc49328d245690a13b50b50c95"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_write_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
+<tr class="separator:a1edc98bc49328d245690a13b50b50c95"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21aa624fdb9af12fe45bada29e0d0007"><td class="memTemplParams" colspan="2"><a id="a21aa624fdb9af12fe45bada29e0d0007"></a>
 template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
-<tr class="memitem:ae8f08b7afac7020b8901eb9d353a817e"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_write_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
-<tr class="separator:ae8f08b7afac7020b8901eb9d353a817e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6a1044eeb6ab16939e4669bbeb071b32"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__handle.html#a6a1044eeb6ab16939e4669bbeb071b32">barrier</a> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs=<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt;(), <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26">barrier_kind</a> kind=<a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26a2f6648dac37731813bb84ae9b24bdfdb">barrier_kind::nowait_data_only</a>, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
-<tr class="memdesc:a6a1044eeb6ab16939e4669bbeb071b32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Issue a write reordering barrier such that writes preceding the barrier will reach storage before writes after this barrier, preferentially using any i/o multiplexer set over the virtually overridable per-class implementation.  <a href="classllfio__v2__xxx_1_1io__handle.html#a6a1044eeb6ab16939e4669bbeb071b32">More...</a><br /></td></tr>
-<tr class="separator:a6a1044eeb6ab16939e4669bbeb071b32"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa38e8a96767e65a11b7b12b08a4b44ca"><td class="memItemLeft" align="right" valign="top"><a id="aa38e8a96767e65a11b7b12b08a4b44ca"></a>
-<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>barrier</b> (<a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26">barrier_kind</a> kind, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
-<tr class="separator:aa38e8a96767e65a11b7b12b08a4b44ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89cb37107cf0ec70dc99ae1f944c1b1b"><td class="memTemplParams" colspan="2"><a id="a89cb37107cf0ec70dc99ae1f944c1b1b"></a>
+<tr class="memitem:a21aa624fdb9af12fe45bada29e0d0007"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_write_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
+<tr class="separator:a21aa624fdb9af12fe45bada29e0d0007"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8536f660a264c143e0d52dee9e43702"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html#ae8536f660a264c143e0d52dee9e43702">barrier</a> (<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs=<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt;(), <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a2a7e52ff0c192a5edf67ceee4c7195d3">barrier_kind</a> kind=<a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a2a7e52ff0c192a5edf67ceee4c7195d3a2f6648dac37731813bb84ae9b24bdfdb">barrier_kind::nowait_data_only</a>, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="memdesc:ae8536f660a264c143e0d52dee9e43702"><td class="mdescLeft">&#160;</td><td class="mdescRight">Issue a write reordering barrier such that writes preceding the barrier will reach storage before writes after this barrier, preferentially using any i/o multiplexer set over the virtually overridable per-class implementation.  <a href="classllfio__v2__xxx_1_1byte__io__handle.html#ae8536f660a264c143e0d52dee9e43702">More...</a><br /></td></tr>
+<tr class="separator:ae8536f660a264c143e0d52dee9e43702"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac94edf4d26e746e2f033116528d6c768"><td class="memItemLeft" align="right" valign="top"><a id="ac94edf4d26e746e2f033116528d6c768"></a>
+<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>barrier</b> (<a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a2a7e52ff0c192a5edf67ceee4c7195d3">barrier_kind</a> kind, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="separator:ac94edf4d26e746e2f033116528d6c768"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3c89b9ce85e84d75e8bd5b7a56c5061a"><td class="memTemplParams" colspan="2"><a id="a3c89b9ce85e84d75e8bd5b7a56c5061a"></a>
 template&lt;class... Args&gt; </td></tr>
-<tr class="memitem:a89cb37107cf0ec70dc99ae1f944c1b1b"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_barrier</b> (Args &amp;&amp;... args) noexcept</td></tr>
-<tr class="separator:a89cb37107cf0ec70dc99ae1f944c1b1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad021935ffbf5f753f123ac5af723184f"><td class="memTemplParams" colspan="2"><a id="ad021935ffbf5f753f123ac5af723184f"></a>
+<tr class="memitem:a3c89b9ce85e84d75e8bd5b7a56c5061a"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_barrier</b> (Args &amp;&amp;... args) noexcept</td></tr>
+<tr class="separator:a3c89b9ce85e84d75e8bd5b7a56c5061a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b9fd7f0c3677563cdef63cc0a883f2c"><td class="memTemplParams" colspan="2"><a id="a6b9fd7f0c3677563cdef63cc0a883f2c"></a>
 template&lt;class... Args, class Rep , class Period &gt; </td></tr>
-<tr class="memitem:ad021935ffbf5f753f123ac5af723184f"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_barrier_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
-<tr class="separator:ad021935ffbf5f753f123ac5af723184f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2427c3fc217848e107af94fb0f1590ba"><td class="memTemplParams" colspan="2"><a id="a2427c3fc217848e107af94fb0f1590ba"></a>
+<tr class="memitem:a6b9fd7f0c3677563cdef63cc0a883f2c"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_barrier_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
+<tr class="separator:a6b9fd7f0c3677563cdef63cc0a883f2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6001d4482b69d3f2788ac10fb71b1c5f"><td class="memTemplParams" colspan="2"><a id="a6001d4482b69d3f2788ac10fb71b1c5f"></a>
 template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
-<tr class="memitem:a2427c3fc217848e107af94fb0f1590ba"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_barrier_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
-<tr class="separator:a2427c3fc217848e107af94fb0f1590ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a30eca672189ffc408a4e01b064e8b78e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html">awaitable</a>&lt; <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; buffers_type &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__handle.html#a30eca672189ffc408a4e01b064e8b78e">co_read</a> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
-<tr class="memdesc:a30eca672189ffc408a4e01b064e8b78e"><td class="mdescLeft">&#160;</td><td class="mdescRight">A coroutinised equivalent to <code>.read()</code> which suspends the coroutine until the i/o finishes. <b>Blocks execution</b> i.e is equivalent to <code>.read()</code> if no i/o multiplexer has been set on this handle!  <a href="classllfio__v2__xxx_1_1io__handle.html#a30eca672189ffc408a4e01b064e8b78e">More...</a><br /></td></tr>
-<tr class="separator:a30eca672189ffc408a4e01b064e8b78e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a883a0fd7de8f10fd8b67a8aee415d735"><td class="memItemLeft" align="right" valign="top"><a id="a883a0fd7de8f10fd8b67a8aee415d735"></a>
-<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html">awaitable</a>&lt; <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; buffers_type &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>co_read</b> (registered_buffer_type base, <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
-<tr class="separator:a883a0fd7de8f10fd8b67a8aee415d735"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a608634d1664d2a43fbdc2e18cae464ee"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html">awaitable</a>&lt; <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__handle.html#a608634d1664d2a43fbdc2e18cae464ee">co_write</a> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
-<tr class="memdesc:a608634d1664d2a43fbdc2e18cae464ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">A coroutinised equivalent to <code>.write()</code> which suspends the coroutine until the i/o finishes. <b>Blocks execution</b> i.e is equivalent to <code>.write()</code> if no i/o multiplexer has been set on this handle!  <a href="classllfio__v2__xxx_1_1io__handle.html#a608634d1664d2a43fbdc2e18cae464ee">More...</a><br /></td></tr>
-<tr class="separator:a608634d1664d2a43fbdc2e18cae464ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa1847e17496a22bc107f509c3cdfecdd"><td class="memItemLeft" align="right" valign="top"><a id="aa1847e17496a22bc107f509c3cdfecdd"></a>
-<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html">awaitable</a>&lt; <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>co_write</b> (registered_buffer_type base, <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
-<tr class="separator:aa1847e17496a22bc107f509c3cdfecdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a359f780e7468407b38978cc5eb7b2555"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html">awaitable</a>&lt; <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__handle.html#a359f780e7468407b38978cc5eb7b2555">co_barrier</a> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs=<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt;(), <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26">barrier_kind</a> kind=<a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26a2f6648dac37731813bb84ae9b24bdfdb">barrier_kind::nowait_data_only</a>, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
-<tr class="memdesc:a359f780e7468407b38978cc5eb7b2555"><td class="mdescLeft">&#160;</td><td class="mdescRight">A coroutinised equivalent to <code>.barrier()</code> which suspends the coroutine until the i/o finishes. <b>Blocks execution</b> i.e is equivalent to <code>.barrier()</code> if no i/o multiplexer has been set on this handle!  <a href="classllfio__v2__xxx_1_1io__handle.html#a359f780e7468407b38978cc5eb7b2555">More...</a><br /></td></tr>
-<tr class="separator:a359f780e7468407b38978cc5eb7b2555"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6001d4482b69d3f2788ac10fb71b1c5f"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_barrier_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
+<tr class="separator:a6001d4482b69d3f2788ac10fb71b1c5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8bf9b8dee03f826229a9cee117b6b9ef"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html">awaitable</a>&lt; <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; buffers_type &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html#a8bf9b8dee03f826229a9cee117b6b9ef">co_read</a> (<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="memdesc:a8bf9b8dee03f826229a9cee117b6b9ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">A coroutinised equivalent to <code>.read()</code> which suspends the coroutine until the i/o finishes. <b>Blocks execution</b> i.e is equivalent to <code>.read()</code> if no i/o multiplexer has been set on this handle!  <a href="classllfio__v2__xxx_1_1byte__io__handle.html#a8bf9b8dee03f826229a9cee117b6b9ef">More...</a><br /></td></tr>
+<tr class="separator:a8bf9b8dee03f826229a9cee117b6b9ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae27d8d8bad6b55d7544271ebb82cff1f"><td class="memItemLeft" align="right" valign="top"><a id="ae27d8d8bad6b55d7544271ebb82cff1f"></a>
+<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html">awaitable</a>&lt; <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; buffers_type &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>co_read</b> (registered_buffer_type base, <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="separator:ae27d8d8bad6b55d7544271ebb82cff1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a497f1b933e7b15b04cf2aeef4c721f66"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html">awaitable</a>&lt; <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html#a497f1b933e7b15b04cf2aeef4c721f66">co_write</a> (<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="memdesc:a497f1b933e7b15b04cf2aeef4c721f66"><td class="mdescLeft">&#160;</td><td class="mdescRight">A coroutinised equivalent to <code>.write()</code> which suspends the coroutine until the i/o finishes. <b>Blocks execution</b> i.e is equivalent to <code>.write()</code> if no i/o multiplexer has been set on this handle!  <a href="classllfio__v2__xxx_1_1byte__io__handle.html#a497f1b933e7b15b04cf2aeef4c721f66">More...</a><br /></td></tr>
+<tr class="separator:a497f1b933e7b15b04cf2aeef4c721f66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5621865dc76cda9ca6f31595edded0a3"><td class="memItemLeft" align="right" valign="top"><a id="a5621865dc76cda9ca6f31595edded0a3"></a>
+<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html">awaitable</a>&lt; <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>co_write</b> (registered_buffer_type base, <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="separator:a5621865dc76cda9ca6f31595edded0a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aceeee62d494e22432923d80c596b937d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html">awaitable</a>&lt; <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html#aceeee62d494e22432923d80c596b937d">co_barrier</a> (<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs=<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt;(), <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a2a7e52ff0c192a5edf67ceee4c7195d3">barrier_kind</a> kind=<a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a2a7e52ff0c192a5edf67ceee4c7195d3a2f6648dac37731813bb84ae9b24bdfdb">barrier_kind::nowait_data_only</a>, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="memdesc:aceeee62d494e22432923d80c596b937d"><td class="mdescLeft">&#160;</td><td class="mdescRight">A coroutinised equivalent to <code>.barrier()</code> which suspends the coroutine until the i/o finishes. <b>Blocks execution</b> i.e is equivalent to <code>.barrier()</code> if no i/o multiplexer has been set on this handle!  <a href="classllfio__v2__xxx_1_1byte__io__handle.html#aceeee62d494e22432923d80c596b937d">More...</a><br /></td></tr>
+<tr class="separator:aceeee62d494e22432923d80c596b937d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac5222904f116c9beb0515a4a5aa850bf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#ac5222904f116c9beb0515a4a5aa850bf">QUICKCPPLIB_BITFIELD_BEGIN</a> (flag)</td></tr>
 <tr class="memdesc:ac5222904f116c9beb0515a4a5aa850bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bitwise flags which can be specified.  <a href="classllfio__v2__xxx_1_1handle.html#ac5222904f116c9beb0515a4a5aa850bf">More...</a><br /></td></tr>
 <tr class="separator:ac5222904f116c9beb0515a4a5aa850bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -326,7 +327,7 @@ template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a4716696b8700953889006251e0678aa4">swap</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;o) noexcept</td></tr>
 <tr class="memdesc:a4716696b8700953889006251e0678aa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br /></td></tr>
 <tr class="separator:a4716696b8700953889006251e0678aa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a00a85eec5a41f7edb2c574d40cf04535"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html#a33481bae57d9ccd0c97946416f9682f3">path_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a00a85eec5a41f7edb2c574d40cf04535">current_path</a> () const noexcept</td></tr>
+<tr class="memitem:a00a85eec5a41f7edb2c574d40cf04535"><td class="memItemLeft" align="right" valign="top">virtual result&lt; path_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a00a85eec5a41f7edb2c574d40cf04535">current_path</a> () const noexcept</td></tr>
 <tr class="separator:a00a85eec5a41f7edb2c574d40cf04535"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeea4389189021b94dde6d8f2c3ccc5b3"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#aeea4389189021b94dde6d8f2c3ccc5b3">clone</a> () const noexcept</td></tr>
 <tr class="separator:aeea4389189021b94dde6d8f2c3ccc5b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -369,6 +370,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a751e912d8dab755ea969a418c1d544eb">requires_aligned_io</a> () const noexcept</td></tr>
 <tr class="memdesc:a751e912d8dab755ea969a418c1d544eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if requires aligned i/o. <br /></td></tr>
 <tr class="separator:a751e912d8dab755ea969a418c1d544eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ca660b86e595ad4d4e124e46f61b127"><td class="memItemLeft" align="right" valign="top"><a id="a8ca660b86e595ad4d4e124e46f61b127"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a8ca660b86e595ad4d4e124e46f61b127">is_kernel_handle</a> () const noexcept</td></tr>
+<tr class="memdesc:a8ca660b86e595ad4d4e124e46f61b127"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if <code>native_handle()</code> is a valid kernel handle. <br /></td></tr>
+<tr class="separator:a8ca660b86e595ad4d4e124e46f61b127"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7751fbb4b1aff527f469412ea33116ed"><td class="memItemLeft" align="right" valign="top"><a id="a7751fbb4b1aff527f469412ea33116ed"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a7751fbb4b1aff527f469412ea33116ed">is_regular</a> () const noexcept</td></tr>
 <tr class="memdesc:a7751fbb4b1aff527f469412ea33116ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if a regular file or device. <br /></td></tr>
@@ -409,6 +414,14 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#acf27a33c88cb7463ee228983690bce0f">is_path</a> () const noexcept</td></tr>
 <tr class="memdesc:acf27a33c88cb7463ee228983690bce0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if a path or a directory. <br /></td></tr>
 <tr class="separator:acf27a33c88cb7463ee228983690bce0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53065eb7c4166e9d39036b1b122e8cab"><td class="memItemLeft" align="right" valign="top"><a id="a53065eb7c4166e9d39036b1b122e8cab"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a53065eb7c4166e9d39036b1b122e8cab">is_tls_socket</a> () const noexcept</td></tr>
+<tr class="memdesc:a53065eb7c4166e9d39036b1b122e8cab"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if a TLS socket. <br /></td></tr>
+<tr class="separator:a53065eb7c4166e9d39036b1b122e8cab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4690e0a5364e33a70747beb45585695e"><td class="memItemLeft" align="right" valign="top"><a id="a4690e0a5364e33a70747beb45585695e"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a4690e0a5364e33a70747beb45585695e">is_http_socket</a> () const noexcept</td></tr>
+<tr class="memdesc:a4690e0a5364e33a70747beb45585695e"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if a HTTP socket. <br /></td></tr>
+<tr class="separator:a4690e0a5364e33a70747beb45585695e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a90bf8668df002dac5a7d9397486b2946"><td class="memItemLeft" align="right" valign="top"><a id="a90bf8668df002dac5a7d9397486b2946"></a>
 <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a90bf8668df002dac5a7d9397486b2946">kernel_caching</a> () const noexcept</td></tr>
 <tr class="memdesc:a90bf8668df002dac5a7d9397486b2946"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kernel cache strategy used by this handle. <br /></td></tr>
@@ -449,43 +462,43 @@ Static Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:ae5ec845b3e2c2e31c2dc3de1d276a7e3"><td class="memItemLeft" align="right" valign="top"><a id="ae5ec845b3e2c2e31c2dc3de1d276a7e3"></a>
-virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__handle.html#ae5ec845b3e2c2e31c2dc3de1d276a7e3">_do_max_buffers</a> () const noexcept</td></tr>
-<tr class="memdesc:ae5ec845b3e2c2e31c2dc3de1d276a7e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">The virtualised implementation of <code>max_buffers()</code> used if no multiplexer has been set. <br /></td></tr>
-<tr class="separator:ae5ec845b3e2c2e31c2dc3de1d276a7e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad17b8879c355d86174187f198b70baaa"><td class="memItemLeft" align="right" valign="top"><a id="ad17b8879c355d86174187f198b70baaa"></a>
-virtual result&lt; registered_buffer_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__handle.html#ad17b8879c355d86174187f198b70baaa">_do_allocate_registered_buffer</a> (size_t &amp;bytes) noexcept</td></tr>
-<tr class="memdesc:ad17b8879c355d86174187f198b70baaa"><td class="mdescLeft">&#160;</td><td class="mdescRight">The virtualised implementation of <code>allocate_registered_buffer()</code> used if no multiplexer has been set. <br /></td></tr>
-<tr class="separator:ad17b8879c355d86174187f198b70baaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4379e3f84b913f606bb2ec6a194d4380"><td class="memItemLeft" align="right" valign="top"><a id="a4379e3f84b913f606bb2ec6a194d4380"></a>
-virtual <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__handle.html#a4379e3f84b913f606bb2ec6a194d4380">_do_read</a> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d) noexcept</td></tr>
-<tr class="memdesc:a4379e3f84b913f606bb2ec6a194d4380"><td class="mdescLeft">&#160;</td><td class="mdescRight">The virtualised implementation of <code>read()</code> used if no multiplexer has been set. <br /></td></tr>
-<tr class="separator:a4379e3f84b913f606bb2ec6a194d4380"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc47501ff4d4278e497758643ddb332a"><td class="memItemLeft" align="right" valign="top"><a id="adc47501ff4d4278e497758643ddb332a"></a>
-virtual <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__handle.html#adc47501ff4d4278e497758643ddb332a">_do_read</a> (registered_buffer_type base, <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d) noexcept</td></tr>
-<tr class="memdesc:adc47501ff4d4278e497758643ddb332a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The virtualised implementation of <code>read()</code> used if no multiplexer has been set. <br /></td></tr>
-<tr class="separator:adc47501ff4d4278e497758643ddb332a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2102f73a4872e8fd8bbe1c71ef82c97f"><td class="memItemLeft" align="right" valign="top"><a id="a2102f73a4872e8fd8bbe1c71ef82c97f"></a>
-virtual <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__handle.html#a2102f73a4872e8fd8bbe1c71ef82c97f">_do_write</a> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d) noexcept</td></tr>
-<tr class="memdesc:a2102f73a4872e8fd8bbe1c71ef82c97f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The virtualised implementation of <code>write()</code> used if no multiplexer has been set. <br /></td></tr>
-<tr class="separator:a2102f73a4872e8fd8bbe1c71ef82c97f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa0611d9a49a6d5fd5ffd713ecaf4da1f"><td class="memItemLeft" align="right" valign="top"><a id="aa0611d9a49a6d5fd5ffd713ecaf4da1f"></a>
-virtual <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__handle.html#aa0611d9a49a6d5fd5ffd713ecaf4da1f">_do_write</a> (registered_buffer_type base, <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d) noexcept</td></tr>
-<tr class="memdesc:aa0611d9a49a6d5fd5ffd713ecaf4da1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The virtualised implementation of <code>write()</code> used if no multiplexer has been set. <br /></td></tr>
-<tr class="separator:aa0611d9a49a6d5fd5ffd713ecaf4da1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f1d67fa1ad7f0d0b1256b6138929d60"><td class="memItemLeft" align="right" valign="top"><a id="a0f1d67fa1ad7f0d0b1256b6138929d60"></a>
-virtual <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1io__handle.html#a0f1d67fa1ad7f0d0b1256b6138929d60">_do_barrier</a> (<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26">barrier_kind</a> kind, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d) noexcept</td></tr>
-<tr class="memdesc:a0f1d67fa1ad7f0d0b1256b6138929d60"><td class="mdescLeft">&#160;</td><td class="mdescRight">The virtualised implementation of <code>barrier()</code> used if no multiplexer has been set. <br /></td></tr>
-<tr class="separator:a0f1d67fa1ad7f0d0b1256b6138929d60"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a684c961072904a3a7c83198aa595bb0d"><td class="memItemLeft" align="right" valign="top"><a id="a684c961072904a3a7c83198aa595bb0d"></a>
-<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_do_multiplexer_read</b> (registered_buffer_type &amp;&amp;base, <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d) noexcept</td></tr>
-<tr class="separator:a684c961072904a3a7c83198aa595bb0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aea936231e3b8113562b9923bb660d64a"><td class="memItemLeft" align="right" valign="top"><a id="aea936231e3b8113562b9923bb660d64a"></a>
-<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_do_multiplexer_write</b> (registered_buffer_type &amp;&amp;base, <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d) noexcept</td></tr>
-<tr class="separator:aea936231e3b8113562b9923bb660d64a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ad2a78d5e63c1f12f34e496e2cc999e"><td class="memItemLeft" align="right" valign="top"><a id="a6ad2a78d5e63c1f12f34e496e2cc999e"></a>
-<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_do_multiplexer_barrier</b> (registered_buffer_type &amp;&amp;base, <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26">barrier_kind</a> kind, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d) noexcept</td></tr>
-<tr class="separator:a6ad2a78d5e63c1f12f34e496e2cc999e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae7db63f7ae859409fd2fd667dcd9133a"><td class="memItemLeft" align="right" valign="top"><a id="ae7db63f7ae859409fd2fd667dcd9133a"></a>
+virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html#ae7db63f7ae859409fd2fd667dcd9133a">_do_max_buffers</a> () const noexcept</td></tr>
+<tr class="memdesc:ae7db63f7ae859409fd2fd667dcd9133a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The virtualised implementation of <code>max_buffers()</code> used if no multiplexer has been set. <br /></td></tr>
+<tr class="separator:ae7db63f7ae859409fd2fd667dcd9133a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e68ac7d62dfb84d4868b161eb25c859"><td class="memItemLeft" align="right" valign="top"><a id="a6e68ac7d62dfb84d4868b161eb25c859"></a>
+virtual result&lt; registered_buffer_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html#a6e68ac7d62dfb84d4868b161eb25c859">_do_allocate_registered_buffer</a> (size_t &amp;bytes) noexcept</td></tr>
+<tr class="memdesc:a6e68ac7d62dfb84d4868b161eb25c859"><td class="mdescLeft">&#160;</td><td class="mdescRight">The virtualised implementation of <code>allocate_registered_buffer()</code> used if no multiplexer has been set. <br /></td></tr>
+<tr class="separator:a6e68ac7d62dfb84d4868b161eb25c859"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4cc14d7effb7bebb42c996b68a5ce906"><td class="memItemLeft" align="right" valign="top"><a id="a4cc14d7effb7bebb42c996b68a5ce906"></a>
+virtual <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html#a4cc14d7effb7bebb42c996b68a5ce906">_do_read</a> (<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d) noexcept</td></tr>
+<tr class="memdesc:a4cc14d7effb7bebb42c996b68a5ce906"><td class="mdescLeft">&#160;</td><td class="mdescRight">The virtualised implementation of <code>read()</code> used if no multiplexer has been set. <br /></td></tr>
+<tr class="separator:a4cc14d7effb7bebb42c996b68a5ce906"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55a5c7c3f24092f04a7807eef795a676"><td class="memItemLeft" align="right" valign="top"><a id="a55a5c7c3f24092f04a7807eef795a676"></a>
+virtual <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html#a55a5c7c3f24092f04a7807eef795a676">_do_read</a> (registered_buffer_type base, <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d) noexcept</td></tr>
+<tr class="memdesc:a55a5c7c3f24092f04a7807eef795a676"><td class="mdescLeft">&#160;</td><td class="mdescRight">The virtualised implementation of <code>read()</code> used if no multiplexer has been set. <br /></td></tr>
+<tr class="separator:a55a5c7c3f24092f04a7807eef795a676"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0dc183a5eca8c3fb601ebecc13540f96"><td class="memItemLeft" align="right" valign="top"><a id="a0dc183a5eca8c3fb601ebecc13540f96"></a>
+virtual <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html#a0dc183a5eca8c3fb601ebecc13540f96">_do_write</a> (<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d) noexcept</td></tr>
+<tr class="memdesc:a0dc183a5eca8c3fb601ebecc13540f96"><td class="mdescLeft">&#160;</td><td class="mdescRight">The virtualised implementation of <code>write()</code> used if no multiplexer has been set. <br /></td></tr>
+<tr class="separator:a0dc183a5eca8c3fb601ebecc13540f96"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9810fcaae6b4c0a68752e26e46ddc162"><td class="memItemLeft" align="right" valign="top"><a id="a9810fcaae6b4c0a68752e26e46ddc162"></a>
+virtual <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html#a9810fcaae6b4c0a68752e26e46ddc162">_do_write</a> (registered_buffer_type base, <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d) noexcept</td></tr>
+<tr class="memdesc:a9810fcaae6b4c0a68752e26e46ddc162"><td class="mdescLeft">&#160;</td><td class="mdescRight">The virtualised implementation of <code>write()</code> used if no multiplexer has been set. <br /></td></tr>
+<tr class="separator:a9810fcaae6b4c0a68752e26e46ddc162"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a85fc2da7fd79abbc73228f820445ed91"><td class="memItemLeft" align="right" valign="top"><a id="a85fc2da7fd79abbc73228f820445ed91"></a>
+virtual <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html#a85fc2da7fd79abbc73228f820445ed91">_do_barrier</a> (<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a2a7e52ff0c192a5edf67ceee4c7195d3">barrier_kind</a> kind, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d) noexcept</td></tr>
+<tr class="memdesc:a85fc2da7fd79abbc73228f820445ed91"><td class="mdescLeft">&#160;</td><td class="mdescRight">The virtualised implementation of <code>barrier()</code> used if no multiplexer has been set. <br /></td></tr>
+<tr class="separator:a85fc2da7fd79abbc73228f820445ed91"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac80eecc44b34dc77a62b4a358ecb9302"><td class="memItemLeft" align="right" valign="top"><a id="ac80eecc44b34dc77a62b4a358ecb9302"></a>
+<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_do_multiplexer_read</b> (registered_buffer_type &amp;&amp;base, <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d) noexcept</td></tr>
+<tr class="separator:ac80eecc44b34dc77a62b4a358ecb9302"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c37266c7b7efc549f7d779edacdd4d2"><td class="memItemLeft" align="right" valign="top"><a id="a4c37266c7b7efc549f7d779edacdd4d2"></a>
+<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_do_multiplexer_write</b> (registered_buffer_type &amp;&amp;base, <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d) noexcept</td></tr>
+<tr class="separator:a4c37266c7b7efc549f7d779edacdd4d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9eac28f1623570ffdcd56b4425183788"><td class="memItemLeft" align="right" valign="top"><a id="a9eac28f1623570ffdcd56b4425183788"></a>
+<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_do_multiplexer_barrier</b> (registered_buffer_type &amp;&amp;base, <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a2a7e52ff0c192a5edf67ceee4c7195d3">barrier_kind</a> kind, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d) noexcept</td></tr>
+<tr class="separator:a9eac28f1623570ffdcd56b4425183788"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-methods"></a>
 Static Protected Member Functions</h2></td></tr>
@@ -495,9 +508,9 @@ static constexpr void&#160;</td><td class="memItemRight" valign="bottom"><b>_set
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:aa0f48150ffdbd275ac910ecb70be282c"><td class="memItemLeft" align="right" valign="top"><a id="aa0f48150ffdbd275ac910ecb70be282c"></a>
-<a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html">io_multiplexer</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>_ctx</b> {nullptr}</td></tr>
-<tr class="separator:aa0f48150ffdbd275ac910ecb70be282c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4b79ba6b413f45da50c9c418d592d97"><td class="memItemLeft" align="right" valign="top"><a id="aa4b79ba6b413f45da50c9c418d592d97"></a>
+<a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html">byte_io_multiplexer</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>_ctx</b> {nullptr}</td></tr>
+<tr class="separator:aa4b79ba6b413f45da50c9c418d592d97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d6911771ac743fd9d64063c12429deb"><td class="memItemLeft" align="right" valign="top"><a id="a1d6911771ac743fd9d64063c12429deb"></a>
 <a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a>&#160;</td><td class="memItemRight" valign="bottom"><b>_v</b></td></tr>
 <tr class="separator:a1d6911771ac743fd9d64063c12429deb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -512,14 +525,14 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><b>_flags</b> {flag::non
 <p>For the static functions which create a pipe, <code>flag::unlink_on_first_close</code> is the default. This is due to portability reasons - on some platforms (e.g. Windows), named pipes always get deleted when the last handle to them is closed in the system, so the closest matching semantic on POSIX is for the creating handle to unlink its creation on first close on all platforms. If you don't want this, change the flags given during creation. Note that on Windows, <code>flag::unlink_on_first_close</code> is always masked out, this is because Windows appears to not permit renaming nor unlinking of open pipes.</p>
 <p>If <code>flag::multiplexable</code> is specified which causes the handle to be created as <code>native_handle_type::disposition::nonblocking</code>, opening pipes for reads no longer blocks in the constructor. However it will then block in <code>read()</code>, unless its deadline is zero. Opening pipes for write in nonblocking mode will now fail if there is no reader present on the other side of the pipe.</p>
 <dl class="section warning"><dt>Warning</dt><dd>On POSIX neither <code>creation::only_if_not_exist</code> nor <code>creation::always_new</code> is atomic due to lack of kernel API support.</dd></dl>
-<h1><a class="anchor" id="autotoc_md17"></a>
+<h1><a class="anchor" id="autotoc_md18"></a>
 Windows only</h1>
 <p>On Microsoft Windows, all pipes (including anonymous) are created within the <code>\Device\NamedPipe\</code> region within the NT kernel namespace, which is the ONLY place where pipes can exist on Windows (i.e. you cannot place them in the filing system like on POSIX).</p>
 <p>Because pipes can only exist in a single, global namespace shared amongst all applications, and this is the same whether for Win32 or the NT kernel, <code>pipe_handle</code> does not bother implementing the <code>\!!\</code> extension which forces use of the NT kernel API. All named pipes always operate out of the NT kernel namespace. <code>.parent_path_handle()</code> always returns <code>path_discovery::temporary_named_pipes_directory()</code> on Windows.</p>
 <p>So long as you use <code>path_discovery::temporary_named_pipes_directory()</code> as your base directory, you can write quite portable code between POSIX and Windows. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a97ac1b43da39d9935919ac848ee3e8d3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a97ac1b43da39d9935919ac848ee3e8d3">&#9670;&nbsp;</a></span>allocate_registered_buffer()</h2>
+<a id="abf59c18ca31e95fb44dd1730af05be61"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf59c18ca31e95fb44dd1730af05be61">&#9670;&nbsp;</a></span>allocate_registered_buffer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -528,7 +541,7 @@ Windows only</h1>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">result&lt;registered_buffer_type&gt; llfio_v2_xxx::io_handle::allocate_registered_buffer </td>
+          <td class="memname">result&lt;registered_buffer_type&gt; llfio_v2_xxx::byte_io_handle::allocate_registered_buffer </td>
           <td>(</td>
           <td class="paramtype">size_t &amp;&#160;</td>
           <td class="paramname"><em>bytes</em></td><td>)</td>
@@ -552,13 +565,13 @@ Windows only</h1>
 </dl>
 <p>Some i/o multiplexer implementations have the ability to allocate i/o buffers in special memory shared between the i/o hardware and user space processes. Using registered i/o buffers can entirely eliminate all kernel transitions and memory copying during i/o, and can saturate very high end hardware from a single kernel thread.</p>
 <p>If no multiplexer is set, the default implementation uses <code>map_handle</code> to allocate raw memory pages from the OS kernel. If the requested buffer size is a multiple of one of the larger page sizes from <code>utils::page_sizes()</code>, an attempt to satisfy the request using the larger page size will be attempted first. </p>
-<div class="fragment"><div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;  {</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    <span class="keywordflow">if</span>(_ctx == <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    {</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classllfio__v2__xxx_1_1io__handle.html#ad17b8879c355d86174187f198b70baaa">_do_allocate_registered_buffer</a>(bytes);</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    }</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    <span class="keywordflow">return</span> _ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1io__multiplexer.html#a3e79fd19de80e77c274b93d0d01b2f10">do_io_handle_allocate_registered_buffer</a>(<span class="keyword">this</span>, bytes);</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;  {</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    <span class="keywordflow">if</span>(_ctx == <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    {</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classllfio__v2__xxx_1_1byte__io__handle.html#a6e68ac7d62dfb84d4868b161eb25c859">_do_allocate_registered_buffer</a>(bytes);</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    }</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    <span class="keywordflow">return</span> _ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a567ade7a70d3883b9fa88d17284702c0">do_byte_io_handle_allocate_registered_buffer</a>(<span class="keyword">this</span>, bytes);</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -601,8 +614,8 @@ Windows only</h1>
 
 </div>
 </div>
-<a id="a6a1044eeb6ab16939e4669bbeb071b32"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6a1044eeb6ab16939e4669bbeb071b32">&#9670;&nbsp;</a></span>barrier()</h2>
+<a id="ae8536f660a264c143e0d52dee9e43702"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8536f660a264c143e0d52dee9e43702">&#9670;&nbsp;</a></span>barrier()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -611,16 +624,16 @@ Windows only</h1>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt;const_buffers_type&gt; llfio_v2_xxx::io_handle::barrier </td>
+          <td class="memname">virtual <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt;const_buffers_type&gt; llfio_v2_xxx::byte_io_handle::barrier </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt;&#160;</td>
-          <td class="paramname"><em>reqs</em> = <code><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt;const_buffers_type&gt;()</code>, </td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt;&#160;</td>
+          <td class="paramname"><em>reqs</em> = <code><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt;const_buffers_type&gt;()</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26">barrier_kind</a>&#160;</td>
-          <td class="paramname"><em>kind</em> = <code><a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26a2f6648dac37731813bb84ae9b24bdfdb">barrier_kind::nowait_data_only</a></code>, </td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a2a7e52ff0c192a5edf67ceee4c7195d3">barrier_kind</a>&#160;</td>
+          <td class="paramname"><em>kind</em> = <code><a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a2a7e52ff0c192a5edf67ceee4c7195d3a2f6648dac37731813bb84ae9b24bdfdb">barrier_kind::nowait_data_only</a></code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -658,9 +671,9 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX fdatasync() or Windows NtFlushBuffersFileEx() can return.</dt><dd></dd></dl>
 <dl class="section user"><dt>Memory Allocations\n None.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;  {</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;    <span class="keywordflow">return</span> (_ctx == <span class="keyword">nullptr</span>) ? <a class="code" href="classllfio__v2__xxx_1_1io__handle.html#a0f1d67fa1ad7f0d0b1256b6138929d60">_do_barrier</a>(reqs, kind, d) : _do_multiplexer_barrier({}, std::move(reqs), kind, d);</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;  {</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;    <span class="keywordflow">return</span> (_ctx == <span class="keyword">nullptr</span>) ? <a class="code" href="classllfio__v2__xxx_1_1byte__io__handle.html#a85fc2da7fd79abbc73228f820445ed91">_do_barrier</a>(reqs, kind, d) : _do_multiplexer_barrier({}, std::move(reqs), kind, d);</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -691,8 +704,8 @@ For portability, you can only assume that barriers write order for a single hand
 
 </div>
 </div>
-<a id="a359f780e7468407b38978cc5eb7b2555"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a359f780e7468407b38978cc5eb7b2555">&#9670;&nbsp;</a></span>co_barrier()</h2>
+<a id="aceeee62d494e22432923d80c596b937d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aceeee62d494e22432923d80c596b937d">&#9670;&nbsp;</a></span>co_barrier()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -701,16 +714,16 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html">awaitable</a>&lt;<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt;const_buffers_type&gt; &gt; llfio_v2_xxx::io_handle::co_barrier </td>
+          <td class="memname"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html">awaitable</a>&lt;<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt;const_buffers_type&gt; &gt; llfio_v2_xxx::byte_io_handle::co_barrier </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt;&#160;</td>
-          <td class="paramname"><em>reqs</em> = <code><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt;const_buffers_type&gt;()</code>, </td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt;&#160;</td>
+          <td class="paramname"><em>reqs</em> = <code><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt;const_buffers_type&gt;()</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26">barrier_kind</a>&#160;</td>
-          <td class="paramname"><em>kind</em> = <code><a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html#ace3fed6888ea1b5b6f1f641e2cf7cd26a2f6648dac37731813bb84ae9b24bdfdb">barrier_kind::nowait_data_only</a></code>, </td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a2a7e52ff0c192a5edf67ceee4c7195d3">barrier_kind</a>&#160;</td>
+          <td class="paramname"><em>kind</em> = <code><a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a2a7e52ff0c192a5edf67ceee4c7195d3a2f6648dac37731813bb84ae9b24bdfdb">barrier_kind::nowait_data_only</a></code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -733,20 +746,20 @@ For portability, you can only assume that barriers write order for a single hand
 
 <p>A coroutinised equivalent to <code>.barrier()</code> which suspends the coroutine until the i/o finishes. <b>Blocks execution</b> i.e is equivalent to <code>.barrier()</code> if no i/o multiplexer has been set on this handle! </p>
 <p>The awaitable returned is <b>eager</b> i.e. it immediately begins the i/o. If the i/o completes and finishes immediately, no coroutine suspension occurs. </p>
-<div class="fragment"><div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;  {</div>
-<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;    <span class="keywordflow">if</span>(_ctx == <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;    {</div>
-<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;      <span class="keywordflow">return</span> awaitable&lt;io_result&lt;const_buffers_type&gt;&gt;(<a class="code" href="classllfio__v2__xxx_1_1io__handle.html#a6a1044eeb6ab16939e4669bbeb071b32">barrier</a>(std::move(reqs), kind, d));</div>
-<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;    }</div>
-<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;    awaitable&lt;io_result&lt;const_buffers_type&gt;&gt; ret;</div>
-<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;    ret.set_state(_ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1io__multiplexer.html#a00bf4ea26d854a7e8c9734f357d417f3">construct</a>(ret._state_storage, <span class="keyword">this</span>, <span class="keyword">nullptr</span>, {}, d, std::move(reqs), kind));</div>
-<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;    <span class="keywordflow">return</span> ret;</div>
-<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;  {</div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;    <span class="keywordflow">if</span>(_ctx == <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;    {</div>
+<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;      <span class="keywordflow">return</span> awaitable&lt;io_result&lt;const_buffers_type&gt;&gt;(<a class="code" href="classllfio__v2__xxx_1_1byte__io__handle.html#ae8536f660a264c143e0d52dee9e43702">barrier</a>(std::move(reqs), kind, d));</div>
+<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;    }</div>
+<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;    awaitable&lt;io_result&lt;const_buffers_type&gt;&gt; ret;</div>
+<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;    ret.set_state(_ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a0a0d3b7d155d63ac644a2e651e538b72">construct</a>(ret._state_storage, <span class="keyword">this</span>, <span class="keyword">nullptr</span>, {}, d, std::move(reqs), kind));</div>
+<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;    <span class="keywordflow">return</span> ret;</div>
+<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a30eca672189ffc408a4e01b064e8b78e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a30eca672189ffc408a4e01b064e8b78e">&#9670;&nbsp;</a></span>co_read()</h2>
+<a id="a8bf9b8dee03f826229a9cee117b6b9ef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8bf9b8dee03f826229a9cee117b6b9ef">&#9670;&nbsp;</a></span>co_read()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -755,9 +768,9 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html">awaitable</a>&lt;<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt;buffers_type&gt; &gt; llfio_v2_xxx::io_handle::co_read </td>
+          <td class="memname"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html">awaitable</a>&lt;<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt;buffers_type&gt; &gt; llfio_v2_xxx::byte_io_handle::co_read </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; buffers_type &gt;&#160;</td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; buffers_type &gt;&#160;</td>
           <td class="paramname"><em>reqs</em>, </td>
         </tr>
         <tr>
@@ -781,20 +794,20 @@ For portability, you can only assume that barriers write order for a single hand
 
 <p>A coroutinised equivalent to <code>.read()</code> which suspends the coroutine until the i/o finishes. <b>Blocks execution</b> i.e is equivalent to <code>.read()</code> if no i/o multiplexer has been set on this handle! </p>
 <p>The awaitable returned is <b>eager</b> i.e. it immediately begins the i/o. If the i/o completes and finishes immediately, no coroutine suspension occurs. </p>
-<div class="fragment"><div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;  {</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;    <span class="keywordflow">if</span>(_ctx == <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;    {</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;      <span class="keywordflow">return</span> awaitable&lt;io_result&lt;buffers_type&gt;&gt;(<a class="code" href="classllfio__v2__xxx_1_1io__handle.html#ae04ada27942187f03b59044cd1328f49">read</a>(std::move(reqs), d));</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;    }</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;    awaitable&lt;io_result&lt;buffers_type&gt;&gt; ret;</div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;    ret.set_state(_ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1io__multiplexer.html#a00bf4ea26d854a7e8c9734f357d417f3">construct</a>(ret._state_storage, <span class="keyword">this</span>, <span class="keyword">nullptr</span>, {}, d, std::move(reqs)));</div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;    <span class="keywordflow">return</span> ret;</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;  {</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    <span class="keywordflow">if</span>(_ctx == <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;    {</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;      <span class="keywordflow">return</span> awaitable&lt;io_result&lt;buffers_type&gt;&gt;(<a class="code" href="classllfio__v2__xxx_1_1byte__io__handle.html#aa17020bc615b9a3bc73c66fff8968d11">read</a>(std::move(reqs), d));</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;    }</div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;    awaitable&lt;io_result&lt;buffers_type&gt;&gt; ret;</div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;    ret.set_state(_ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a0a0d3b7d155d63ac644a2e651e538b72">construct</a>(ret._state_storage, <span class="keyword">this</span>, <span class="keyword">nullptr</span>, {}, d, std::move(reqs)));</div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;    <span class="keywordflow">return</span> ret;</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a608634d1664d2a43fbdc2e18cae464ee"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a608634d1664d2a43fbdc2e18cae464ee">&#9670;&nbsp;</a></span>co_write()</h2>
+<a id="a497f1b933e7b15b04cf2aeef4c721f66"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a497f1b933e7b15b04cf2aeef4c721f66">&#9670;&nbsp;</a></span>co_write()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -803,9 +816,9 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1awaitable.html">awaitable</a>&lt;<a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt;const_buffers_type&gt; &gt; llfio_v2_xxx::io_handle::co_write </td>
+          <td class="memname"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html">awaitable</a>&lt;<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt;const_buffers_type&gt; &gt; llfio_v2_xxx::byte_io_handle::co_write </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt;&#160;</td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt;&#160;</td>
           <td class="paramname"><em>reqs</em>, </td>
         </tr>
         <tr>
@@ -829,15 +842,15 @@ For portability, you can only assume that barriers write order for a single hand
 
 <p>A coroutinised equivalent to <code>.write()</code> which suspends the coroutine until the i/o finishes. <b>Blocks execution</b> i.e is equivalent to <code>.write()</code> if no i/o multiplexer has been set on this handle! </p>
 <p>The awaitable returned is <b>eager</b> i.e. it immediately begins the i/o. If the i/o completes and finishes immediately, no coroutine suspension occurs. </p>
-<div class="fragment"><div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;  {</div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;    <span class="keywordflow">if</span>(_ctx == <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;    {</div>
-<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;      <span class="keywordflow">return</span> awaitable&lt;io_result&lt;const_buffers_type&gt;&gt;(<a class="code" href="classllfio__v2__xxx_1_1io__handle.html#a7848ef15e774eacec7e4446a8c365a3d">write</a>(std::move(reqs), d));</div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;    }</div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;    awaitable&lt;io_result&lt;const_buffers_type&gt;&gt; ret;</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    ret.set_state(_ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1io__multiplexer.html#a00bf4ea26d854a7e8c9734f357d417f3">construct</a>(ret._state_storage, <span class="keyword">this</span>, <span class="keyword">nullptr</span>, {}, d, std::move(reqs)));</div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    <span class="keywordflow">return</span> ret;</div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;  {</div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;    <span class="keywordflow">if</span>(_ctx == <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;    {</div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;      <span class="keywordflow">return</span> awaitable&lt;io_result&lt;const_buffers_type&gt;&gt;(<a class="code" href="classllfio__v2__xxx_1_1byte__io__handle.html#a6fdbbcde6ecdc5a3f1f3110bcec5f3c0">write</a>(std::move(reqs), d));</div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;    }</div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;    awaitable&lt;io_result&lt;const_buffers_type&gt;&gt; ret;</div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;    ret.set_state(_ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a0a0d3b7d155d63ac644a2e651e538b72">construct</a>(ret._state_storage, <span class="keyword">this</span>, <span class="keyword">nullptr</span>, {}, d, std::move(reqs)));</div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;    <span class="keywordflow">return</span> ret;</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -851,7 +864,7 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual result&lt;<a class="el" href="classllfio__v2__xxx_1_1handle.html#a33481bae57d9ccd0c97946416f9682f3">path_type</a>&gt; llfio_v2_xxx::handle::current_path </td>
+          <td class="memname">virtual result&lt;path_type&gt; llfio_v2_xxx::handle::current_path </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -875,8 +888,8 @@ For portability, you can only assume that barriers write order for a single hand
 
 </div>
 </div>
-<a id="aa3465a87f2c732cd6465cd3a832a26f0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa3465a87f2c732cd6465cd3a832a26f0">&#9670;&nbsp;</a></span>max_buffers()</h2>
+<a id="a6b9d9bf00c3c07b76b056b32e8079651"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b9d9bf00c3c07b76b056b32e8079651">&#9670;&nbsp;</a></span>max_buffers()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -885,7 +898,7 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">size_t llfio_v2_xxx::io_handle::max_buffers </td>
+          <td class="memname">size_t llfio_v2_xxx::byte_io_handle::max_buffers </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -904,13 +917,13 @@ For portability, you can only assume that barriers write order for a single hand
 <p>OS X does not implement scatter-gather file i/o syscalls. Thus this function will always return <code>1</code> in that situation.</p>
 <p>Microsoft Windows <em>may</em> implement scatter-gather i/o under certain handle configurations. Most of the time for non-socket handles this function will return <code>1</code>.</p>
 <p>For handles which implement i/o entirely in user space, and thus syscalls are not involved, this function will return <code>0</code>. </p>
-<div class="fragment"><div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  {</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="keywordflow">if</span>(_ctx == <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    {</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classllfio__v2__xxx_1_1io__handle.html#ae5ec845b3e2c2e31c2dc3de1d276a7e3">_do_max_buffers</a>();</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    }</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <span class="keywordflow">return</span> _ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1io__multiplexer.html#a1cc4f56ad15d1bed49d68c56a278ad0c">do_io_handle_max_buffers</a>(<span class="keyword">this</span>);</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;  {</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <span class="keywordflow">if</span>(_ctx == <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    {</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classllfio__v2__xxx_1_1byte__io__handle.html#ae7db63f7ae859409fd2fd667dcd9133a">_do_max_buffers</a>();</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    }</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    <span class="keywordflow">return</span> _ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a977ed1bb0e53f9e5f7b7493245848dd0">do_byte_io_handle_max_buffers</a>(<span class="keyword">this</span>);</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1032,7 +1045,9 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>Convenience overload for <code>pipe()</code> creating a new named pipe if needed, and with read-only privileges. Unless <code>flag::multiplexable</code> is specified, this will block until the other end connects. </p>
-<div class="fragment"><div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classllfio__v2__xxx_1_1pipe__handle.html#ab2a30c788731707f70ff08c107ca1c97">pipe</a>(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>, <a class="code" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaaecae13117d6f0584c25a9da6c8f8415e">mode::read</a>, <a class="code" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42a8f0339e854eb5321306a443ce9199e1d">creation::if_needed</a>, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>, base); }</div>
+<div class="fragment"><div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  {</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classllfio__v2__xxx_1_1pipe__handle.html#ab2a30c788731707f70ff08c107ca1c97">pipe</a>(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>, <a class="code" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaaecae13117d6f0584c25a9da6c8f8415e">mode::read</a>, <a class="code" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42a8f0339e854eb5321306a443ce9199e1d">creation::if_needed</a>, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>, base);</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1082,7 +1097,9 @@ For portability, you can only assume that barriers write order for a single hand
 </table>
 </div><div class="memdoc">
 <p>Convenience overload for <code>pipe()</code> opening an existing named pipe with write-only privileges. This will fail if no reader is waiting on the other end of the pipe. </p>
-<div class="fragment"><div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;{ <span class="keywordflow">return</span> <a class="code" href="classllfio__v2__xxx_1_1pipe__handle.html#ab2a30c788731707f70ff08c107ca1c97">pipe</a>(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>, <a class="code" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaa9516dfb15f51c7ee19a4d46b8c0dbe1d">mode::append</a>, <a class="code" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42aa200dcd6176417e93be2405188ae7cc9">creation::open_existing</a>, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>, base); }</div>
+<div class="fragment"><div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;  {</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classllfio__v2__xxx_1_1pipe__handle.html#ab2a30c788731707f70ff08c107ca1c97">pipe</a>(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>, <a class="code" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaa9516dfb15f51c7ee19a4d46b8c0dbe1d">mode::append</a>, <a class="code" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42aa200dcd6176417e93be2405188ae7cc9">creation::open_existing</a>, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>, base);</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1274,30 +1291,30 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 <p>Create a pipe handle creating a randomly named pipe on a path. The pipe is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing pipe.</p>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX open(), mkfifo(), NtCreateFile() or NtCreateNamedPipeFile() can return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;  {</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <span class="keywordflow">try</span></div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    {</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;      <span class="keywordflow">for</span>(;;)</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;      {</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">utils::random_string</a>(32);</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;        randomname.append(<span class="stringliteral">&quot;.random&quot;</span>);</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;        result&lt;pipe_handle&gt; ret = <a class="code" href="classllfio__v2__xxx_1_1pipe__handle.html#ab2a30c788731707f70ff08c107ca1c97">pipe</a>(randomname, _mode, <a class="code" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255">creation::only_if_not_exist</a>, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>, dirpath);</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;        <span class="keywordflow">if</span>(ret || (!ret &amp;&amp; ret.error() != errc::file_exists))</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;        {</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;          <span class="keywordflow">return</span> ret;</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        }</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;      }</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    }</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    <span class="keywordflow">catch</span>(...)</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    {</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    }</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  {</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <span class="keywordflow">try</span></div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    {</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;      <span class="keywordflow">for</span>(;;)</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;      {</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">utils::random_string</a>(32);</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;        randomname.append(<span class="stringliteral">&quot;.random&quot;</span>);</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;        result&lt;pipe_handle&gt; ret = <a class="code" href="classllfio__v2__xxx_1_1pipe__handle.html#ab2a30c788731707f70ff08c107ca1c97">pipe</a>(randomname, _mode, <a class="code" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255">creation::only_if_not_exist</a>, _caching, <a class="code" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>, dirpath);</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;        <span class="keywordflow">if</span>(ret || (!ret &amp;&amp; ret.error() != errc::file_exists))</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;        {</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;          <span class="keywordflow">return</span> ret;</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;        }</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;      }</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    }</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    <span class="keywordflow">catch</span>(...)</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    {</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    }</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="ae04ada27942187f03b59044cd1328f49"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae04ada27942187f03b59044cd1328f49">&#9670;&nbsp;</a></span>read()</h2>
+<a id="aa17020bc615b9a3bc73c66fff8968d11"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa17020bc615b9a3bc73c66fff8968d11">&#9670;&nbsp;</a></span>read()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1306,9 +1323,9 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt;buffers_type&gt; llfio_v2_xxx::io_handle::read </td>
+          <td class="memname"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt;buffers_type&gt; llfio_v2_xxx::byte_io_handle::read </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; buffers_type &gt;&#160;</td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; buffers_type &gt;&#160;</td>
           <td class="paramname"><em>reqs</em>, </td>
         </tr>
         <tr>
@@ -1342,7 +1359,9 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX read() can return, errc::timed_out, errc::operation_canceled. errc::not_supported may be</dt><dd>returned if deadline i/o is not possible with this particular handle configuration (e.g. reading from regular files on POSIX or reading from a non-overlapped HANDLE on Windows). </dd></dl>
 <dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;{ <span class="keywordflow">return</span> (_ctx == <span class="keyword">nullptr</span>) ? <a class="code" href="classllfio__v2__xxx_1_1io__handle.html#a4379e3f84b913f606bb2ec6a194d4380">_do_read</a>(reqs, d) : _do_multiplexer_read({}, reqs, d); }</div>
+<div class="fragment"><div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  {</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    <span class="keywordflow">return</span> (_ctx == <span class="keyword">nullptr</span>) ? <a class="code" href="classllfio__v2__xxx_1_1byte__io__handle.html#a4cc14d7effb7bebb42c996b68a5ce906">_do_read</a>(reqs, d) : _do_multiplexer_read({}, reqs, d);</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1379,8 +1398,8 @@ For portability, you can only assume that barriers write order for a single hand
 
 </div>
 </div>
-<a id="a281467f83f70f2e12aaedf5847fd818c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a281467f83f70f2e12aaedf5847fd818c">&#9670;&nbsp;</a></span>set_multiplexer()</h2>
+<a id="a50dcc073eb056a01694e0b78fddfaae4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a50dcc073eb056a01694e0b78fddfaae4">&#9670;&nbsp;</a></span>set_multiplexer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1389,10 +1408,10 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">result&lt; void &gt; llfio_v2_xxx::io_handle::set_multiplexer </td>
+          <td class="memname">result&lt; void &gt; llfio_v2_xxx::byte_io_handle::set_multiplexer </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1io__multiplexer.html">io_multiplexer</a> *&#160;</td>
-          <td class="paramname"><em>c</em> = <code><a class="el" href="namespacellfio__v2__xxx_1_1this__thread.html#afd6a1f179a8f8027f6c051badadf2707">this_thread::multiplexer</a>()</code></td><td>)</td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html">byte_io_multiplexer</a> *&#160;</td>
+          <td class="paramname"><em>c</em> = <code><a class="el" href="namespacellfio__v2__xxx_1_1this__thread.html#a5e16f34ead62e35a2d252dc4c6a75892">this_thread::multiplexer</a>()</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -1408,42 +1427,42 @@ For portability, you can only assume that barriers write order for a single hand
 <p>If the handle was not created as multiplexable, this call always fails.</p>
 <dl class="section user"><dt>Memory Allocations\n Multiple dynamic memory allocations and deallocations.</dt><dd></dd></dl>
 
-<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1mapped__file__handle.html#ac9a87793288b496940bdae0ff07cae0c">llfio_v2_xxx::mapped_file_handle</a>.</p>
-<div class="fragment"><div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;{</div>
-<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;  <span class="keywordflow">if</span>(!<a class="code" href="classllfio__v2__xxx_1_1handle.html#ade2416b9154d1e56937c99cd514324f8">is_multiplexable</a>())</div>
-<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;  {</div>
-<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;    <span class="keywordflow">return</span> errc::operation_not_supported;</div>
-<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;  }</div>
-<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;  <span class="keywordflow">if</span>(c == _ctx)</div>
-<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;  {</div>
-<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;    <span class="keywordflow">return</span> success();</div>
-<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;  }</div>
-<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;  <span class="keywordflow">if</span>(_ctx != <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;  {</div>
-<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;    OUTCOME_TRY(_ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1io__multiplexer.html#a7c9d163a9e1ca06acbce1f135cfef087">do_io_handle_deregister</a>(<span class="keyword">this</span>));</div>
-<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;    _ctx = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;  }</div>
-<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;  <span class="keywordflow">if</span>(c != <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;  {</div>
-<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;    OUTCOME_TRY(<span class="keyword">auto</span> &amp;&amp;state, c-&gt;do_io_handle_register(<span class="keyword">this</span>));</div>
-<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;    _v.behaviour = (_v.behaviour &amp; ~(native_handle_type::disposition::_multiplexer_state_bit0 | native_handle_type::disposition::_multiplexer_state_bit1));</div>
-<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;    <span class="keywordflow">if</span>((state &amp; 1) != 0)</div>
-<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;    {</div>
-<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;      _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit0;</div>
-<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;    }</div>
-<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;    <span class="keywordflow">if</span>((state &amp; 2) != 0)</div>
-<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;    {</div>
-<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;      _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit1;</div>
-<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;    }</div>
-<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;  }</div>
-<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;  _ctx = c;</div>
-<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;  <span class="keywordflow">return</span> success();</div>
-<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;}</div>
+<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1mapped__file__handle.html#a3a6d34e1bf7e199a0da5a13f42e5046d">llfio_v2_xxx::mapped_file_handle</a>.</p>
+<div class="fragment"><div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;{</div>
+<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;  <span class="keywordflow">if</span>(!<a class="code" href="classllfio__v2__xxx_1_1handle.html#ade2416b9154d1e56937c99cd514324f8">is_multiplexable</a>())</div>
+<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;  {</div>
+<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;    <span class="keywordflow">return</span> errc::operation_not_supported;</div>
+<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;  }</div>
+<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;  <span class="keywordflow">if</span>(c == _ctx)</div>
+<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;  {</div>
+<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;    <span class="keywordflow">return</span> success();</div>
+<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;  }</div>
+<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;  <span class="keywordflow">if</span>(_ctx != <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;  {</div>
+<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;    OUTCOME_TRY(_ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a26c52ec51bcb3e27c457c51c6bae4112">do_byte_io_handle_deregister</a>(<span class="keyword">this</span>));</div>
+<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;    _ctx = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;  }</div>
+<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;  <span class="keywordflow">if</span>(c != <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;  {</div>
+<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;    OUTCOME_TRY(<span class="keyword">auto</span> &amp;&amp;state, c-&gt;do_byte_io_handle_register(<span class="keyword">this</span>));</div>
+<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;    _v.behaviour = (_v.behaviour &amp; ~(native_handle_type::disposition::_multiplexer_state_bit0 | native_handle_type::disposition::_multiplexer_state_bit1));</div>
+<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;    <span class="keywordflow">if</span>((state &amp; 1) != 0)</div>
+<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;    {</div>
+<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;      _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit0;</div>
+<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;    }</div>
+<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;    <span class="keywordflow">if</span>((state &amp; 2) != 0)</div>
+<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;    {</div>
+<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;      _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit1;</div>
+<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;    }</div>
+<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;  }</div>
+<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;  _ctx = c;</div>
+<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;  <span class="keywordflow">return</span> success();</div>
+<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a7848ef15e774eacec7e4446a8c365a3d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7848ef15e774eacec7e4446a8c365a3d">&#9670;&nbsp;</a></span>write()</h2>
+<a id="a6fdbbcde6ecdc5a3f1f3110bcec5f3c0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6fdbbcde6ecdc5a3f1f3110bcec5f3c0">&#9670;&nbsp;</a></span>write()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1452,9 +1471,9 @@ For portability, you can only assume that barriers write order for a single hand
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__result.html">io_result</a>&lt;const_buffers_type&gt; llfio_v2_xxx::io_handle::write </td>
+          <td class="memname"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt;const_buffers_type&gt; llfio_v2_xxx::byte_io_handle::write </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt;&#160;</td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt;&#160;</td>
           <td class="paramname"><em>reqs</em>, </td>
         </tr>
         <tr>
@@ -1488,7 +1507,9 @@ For portability, you can only assume that barriers write order for a single hand
 </dl>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX write() can return, errc::timed_out, errc::operation_canceled. errc::not_supported may be</dt><dd>returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
 <dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;{ <span class="keywordflow">return</span> (_ctx == <span class="keyword">nullptr</span>) ? <a class="code" href="classllfio__v2__xxx_1_1io__handle.html#a2102f73a4872e8fd8bbe1c71ef82c97f">_do_write</a>(reqs, d) : _do_multiplexer_write({}, std::move(reqs), d); }</div>
+<div class="fragment"><div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;  {</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;    <span class="keywordflow">return</span> (_ctx == <span class="keyword">nullptr</span>) ? <a class="code" href="classllfio__v2__xxx_1_1byte__io__handle.html#a0dc183a5eca8c3fb601ebecc13540f96">_do_write</a>(reqs, d) : _do_multiplexer_write({}, std::move(reqs), d);</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1497,28 +1518,28 @@ For portability, you can only assume that barriers write order for a single hand
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a7848ef15e774eacec7e4446a8c365a3d"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a7848ef15e774eacec7e4446a8c365a3d">llfio_v2_xxx::io_handle::write</a></div><div class="ttdeci">io_result&lt; const_buffers_type &gt; write(io_request&lt; const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the open handle, preferentially using any i/o multiplexer set over the virtually overri...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:325</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__multiplexer_html_a977ed1bb0e53f9e5f7b7493245848dd0"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a977ed1bb0e53f9e5f7b7493245848dd0">llfio_v2_xxx::byte_io_multiplexer::do_byte_io_handle_max_buffers</a></div><div class="ttdeci">virtual size_t do_byte_io_handle_max_buffers(const byte_io_handle *h) const noexcept</div><div class="ttdoc">Implements byte_io_handle::max_buffers()</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:533</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__multiplexer_html_a0a0d3b7d155d63ac644a2e651e538b72"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a0a0d3b7d155d63ac644a2e651e538b72">llfio_v2_xxx::byte_io_multiplexer::construct</a></div><div class="ttdeci">virtual io_operation_state * construct(span&lt; byte &gt; storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &amp;&amp;b, deadline d, io_request&lt; buffers_type &gt; reqs) noexcept=0</div><div class="ttdoc">Constructs either a unsynchronised_io_operation_state or a synchronised_io_operation_state for a read...</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255">llfio_v2_xxx::handle::creation::only_if_not_exist</a></div><div class="ttdeci">@ only_if_not_exist</div><div class="ttdoc">Filesystem entry must NOT exist, and is atomically created by the success of this operation.</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a6a1044eeb6ab16939e4669bbeb071b32"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a6a1044eeb6ab16939e4669bbeb071b32">llfio_v2_xxx::io_handle::barrier</a></div><div class="ttdeci">virtual io_result&lt; const_buffers_type &gt; barrier(io_request&lt; const_buffers_type &gt; reqs=io_request&lt; const_buffers_type &gt;(), barrier_kind kind=barrier_kind::nowait_data_only, deadline d=deadline()) noexcept</div><div class="ttdoc">Issue a write reordering barrier such that writes preceding the barrier will reach storage before wri...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:376</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_ad17b8879c355d86174187f198b70baaa"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#ad17b8879c355d86174187f198b70baaa">llfio_v2_xxx::io_handle::_do_allocate_registered_buffer</a></div><div class="ttdeci">virtual result&lt; registered_buffer_type &gt; _do_allocate_registered_buffer(size_t &amp;bytes) noexcept</div><div class="ttdoc">The virtualised implementation of allocate_registered_buffer() used if no multiplexer has been set.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:1023</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a4379e3f84b913f606bb2ec6a194d4380"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a4379e3f84b913f606bb2ec6a194d4380">llfio_v2_xxx::io_handle::_do_read</a></div><div class="ttdeci">virtual io_result&lt; buffers_type &gt; _do_read(io_request&lt; buffers_type &gt; reqs, deadline d) noexcept</div><div class="ttdoc">The virtualised implementation of read() used if no multiplexer has been set.</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1io__multiplexer_html_a00bf4ea26d854a7e8c9734f357d417f3"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__multiplexer.html#a00bf4ea26d854a7e8c9734f357d417f3">llfio_v2_xxx::io_multiplexer::construct</a></div><div class="ttdeci">virtual io_operation_state * construct(span&lt; byte &gt; storage, io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &amp;&amp;b, deadline d, io_request&lt; buffers_type &gt; reqs) noexcept=0</div><div class="ttdoc">Constructs either a unsynchronised_io_operation_state or a synchronised_io_operation_state for a read...</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__multiplexer_html_a567ade7a70d3883b9fa88d17284702c0"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a567ade7a70d3883b9fa88d17284702c0">llfio_v2_xxx::byte_io_multiplexer::do_byte_io_handle_allocate_registered_buffer</a></div><div class="ttdeci">virtual result&lt; registered_buffer_type &gt; do_byte_io_handle_allocate_registered_buffer(byte_io_handle *h, size_t &amp;bytes) noexcept</div><div class="ttdoc">Implements byte_io_handle::allocate_registered_buffer()</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:537</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1pipe__handle_html_ab2a30c788731707f70ff08c107ca1c97"><div class="ttname"><a href="classllfio__v2__xxx_1_1pipe__handle.html#ab2a30c788731707f70ff08c107ca1c97">llfio_v2_xxx::pipe_handle::pipe</a></div><div class="ttdeci">static result&lt; pipe_handle &gt; pipe(path_view_type path, mode _mode, creation _creation, caching _caching=caching::all, flag flags=flag::none, const path_handle &amp;base=path_discovery::temporary_named_pipes_directory()) noexcept</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1io__multiplexer_html_a1cc4f56ad15d1bed49d68c56a278ad0c"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__multiplexer.html#a1cc4f56ad15d1bed49d68c56a278ad0c">llfio_v2_xxx::io_multiplexer::do_io_handle_max_buffers</a></div><div class="ttdeci">virtual size_t do_io_handle_max_buffers(const io_handle *h) const noexcept</div><div class="ttdoc">Implements io_handle::max_buffers()</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:504</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__multiplexer_html_a26c52ec51bcb3e27c457c51c6bae4112"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a26c52ec51bcb3e27c457c51c6bae4112">llfio_v2_xxx::byte_io_multiplexer::do_byte_io_handle_deregister</a></div><div class="ttdeci">virtual result&lt; void &gt; do_byte_io_handle_deregister(byte_io_handle *) noexcept</div><div class="ttdoc">Implements byte_io_handle deregistration.</div><div class="ttdef"><b>Definition:</b> byte_io_multiplexer.hpp:528</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__handle_html_ae7db63f7ae859409fd2fd667dcd9133a"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__handle.html#ae7db63f7ae859409fd2fd667dcd9133a">llfio_v2_xxx::byte_io_handle::_do_max_buffers</a></div><div class="ttdeci">virtual size_t _do_max_buffers() const noexcept</div><div class="ttdoc">The virtualised implementation of max_buffers() used if no multiplexer has been set.</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__handle_html_a85fc2da7fd79abbc73228f820445ed91"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__handle.html#a85fc2da7fd79abbc73228f820445ed91">llfio_v2_xxx::byte_io_handle::_do_barrier</a></div><div class="ttdeci">virtual io_result&lt; const_buffers_type &gt; _do_barrier(io_request&lt; const_buffers_type &gt; reqs, barrier_kind kind, deadline d) noexcept</div><div class="ttdoc">The virtualised implementation of barrier() used if no multiplexer has been set.</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a49f7bb77eb38fbe1280019225b66b78b"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">llfio_v2_xxx::path</a></div><div class="ttdeci">result&lt; path_handle &gt; path(const path_handle &amp;base, path_handle::path_view_type path) noexcept</div><div class="ttdef"><b>Definition:</b> path_handle.hpp:171</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_af0b352d0f273ba6fa70c178b2c2fee42a8f0339e854eb5321306a443ce9199e1d"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42a8f0339e854eb5321306a443ce9199e1d">llfio_v2_xxx::handle::creation::if_needed</a></div><div class="ttdeci">@ if_needed</div><div class="ttdoc">If filesystem entry exists that is used, else one is created.</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__handle_html_a6fdbbcde6ecdc5a3f1f3110bcec5f3c0"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__handle.html#a6fdbbcde6ecdc5a3f1f3110bcec5f3c0">llfio_v2_xxx::byte_io_handle::write</a></div><div class="ttdeci">io_result&lt; const_buffers_type &gt; write(io_request&lt; const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the open handle, preferentially using any i/o multiplexer set over the virtually overri...</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:345</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_1_1utils_html_a6a29cf29a4b097411f6c1e5274bfb417"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">llfio_v2_xxx::utils::random_string</a></div><div class="ttdeci">std::string random_string(size_t randomlen)</div><div class="ttdoc">Returns a cryptographically random string capable of being used as a filename. Essentially random_fil...</div><div class="ttdef"><b>Definition:</b> utils.hpp:170</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1io__multiplexer_html_a3e79fd19de80e77c274b93d0d01b2f10"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__multiplexer.html#a3e79fd19de80e77c274b93d0d01b2f10">llfio_v2_xxx::io_multiplexer::do_io_handle_allocate_registered_buffer</a></div><div class="ttdeci">virtual result&lt; registered_buffer_type &gt; do_io_handle_allocate_registered_buffer(io_handle *h, size_t &amp;bytes) noexcept</div><div class="ttdoc">Implements io_handle::allocate_registered_buffer()</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:508</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__handle_html_a0dc183a5eca8c3fb601ebecc13540f96"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__handle.html#a0dc183a5eca8c3fb601ebecc13540f96">llfio_v2_xxx::byte_io_handle::_do_write</a></div><div class="ttdeci">virtual io_result&lt; const_buffers_type &gt; _do_write(io_request&lt; const_buffers_type &gt; reqs, deadline d) noexcept</div><div class="ttdoc">The virtualised implementation of write() used if no multiplexer has been set.</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_aa3930273a2d4cabbac309e0b75701dcaaecae13117d6f0584c25a9da6c8f8415e"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaaecae13117d6f0584c25a9da6c8f8415e">llfio_v2_xxx::handle::mode::read</a></div><div class="ttdeci">@ read</div><div class="ttdoc">Ability to read (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|SYNCHRONISE or O_RDONL...</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1io__multiplexer_html_a7c9d163a9e1ca06acbce1f135cfef087"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__multiplexer.html#a7c9d163a9e1ca06acbce1f135cfef087">llfio_v2_xxx::io_multiplexer::do_io_handle_deregister</a></div><div class="ttdeci">virtual result&lt; void &gt; do_io_handle_deregister(io_handle *) noexcept</div><div class="ttdoc">Implements io_handle deregistration.</div><div class="ttdef"><b>Definition:</b> io_multiplexer.hpp:476</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_ae04ada27942187f03b59044cd1328f49"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#ae04ada27942187f03b59044cd1328f49">llfio_v2_xxx::io_handle::read</a></div><div class="ttdeci">io_result&lt; buffers_type &gt; read(io_request&lt; buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Read data from the open handle, preferentially using any i/o multiplexer set over the virtually overr...</div><div class="ttdef"><b>Definition:</b> io_handle.hpp:283</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_ae5ec845b3e2c2e31c2dc3de1d276a7e3"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#ae5ec845b3e2c2e31c2dc3de1d276a7e3">llfio_v2_xxx::io_handle::_do_max_buffers</a></div><div class="ttdeci">virtual size_t _do_max_buffers() const noexcept</div><div class="ttdoc">The virtualised implementation of max_buffers() used if no multiplexer has been set.</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_a013936bc1254b1a47567fe29698d1b1c"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">llfio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with.</div><div class="ttdef"><b>Definition:</b> handle.hpp:439</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__handle_html_a4cc14d7effb7bebb42c996b68a5ce906"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__handle.html#a4cc14d7effb7bebb42c996b68a5ce906">llfio_v2_xxx::byte_io_handle::_do_read</a></div><div class="ttdeci">virtual io_result&lt; buffers_type &gt; _do_read(io_request&lt; buffers_type &gt; reqs, deadline d) noexcept</div><div class="ttdoc">The virtualised implementation of read() used if no multiplexer has been set.</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_a013936bc1254b1a47567fe29698d1b1c"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">llfio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with.</div><div class="ttdef"><b>Definition:</b> handle.hpp:445</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__handle_html_aa17020bc615b9a3bc73c66fff8968d11"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__handle.html#aa17020bc615b9a3bc73c66fff8968d11">llfio_v2_xxx::byte_io_handle::read</a></div><div class="ttdeci">io_result&lt; buffers_type &gt; read(io_request&lt; buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Read data from the open handle, preferentially using any i/o multiplexer set over the virtually overr...</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:297</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__handle_html_ae8536f660a264c143e0d52dee9e43702"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__handle.html#ae8536f660a264c143e0d52dee9e43702">llfio_v2_xxx::byte_io_handle::barrier</a></div><div class="ttdeci">virtual io_result&lt; const_buffers_type &gt; barrier(io_request&lt; const_buffers_type &gt; reqs=io_request&lt; const_buffers_type &gt;(), barrier_kind kind=barrier_kind::nowait_data_only, deadline d=deadline()) noexcept</div><div class="ttdoc">Issue a write reordering barrier such that writes preceding the barrier will reach storage before wri...</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:402</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_aa3930273a2d4cabbac309e0b75701dcaa9516dfb15f51c7ee19a4d46b8c0dbe1d"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaa9516dfb15f51c7ee19a4d46b8c0dbe1d">llfio_v2_xxx::handle::mode::append</a></div><div class="ttdeci">@ append</div><div class="ttdoc">All mainstream OSs and CIFS guarantee this is atomic with respect to all other appenders (FILE_APPEND...</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_af0b352d0f273ba6fa70c178b2c2fee42aa200dcd6176417e93be2405188ae7cc9"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42aa200dcd6176417e93be2405188ae7cc9">llfio_v2_xxx::handle::creation::open_existing</a></div><div class="ttdeci">@ open_existing</div><div class="ttdoc">Filesystem entry must already exist.</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_ade2416b9154d1e56937c99cd514324f8"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#ade2416b9154d1e56937c99cd514324f8">llfio_v2_xxx::handle::is_multiplexable</a></div><div class="ttdeci">bool is_multiplexable() const noexcept</div><div class="ttdoc">True if multiplexable.</div><div class="ttdef"><b>Definition:</b> handle.hpp:372</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a0f1d67fa1ad7f0d0b1256b6138929d60"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a0f1d67fa1ad7f0d0b1256b6138929d60">llfio_v2_xxx::io_handle::_do_barrier</a></div><div class="ttdeci">virtual io_result&lt; const_buffers_type &gt; _do_barrier(io_request&lt; const_buffers_type &gt; reqs, barrier_kind kind, deadline d) noexcept</div><div class="ttdoc">The virtualised implementation of barrier() used if no multiplexer has been set.</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1io__handle_html_a2102f73a4872e8fd8bbe1c71ef82c97f"><div class="ttname"><a href="classllfio__v2__xxx_1_1io__handle.html#a2102f73a4872e8fd8bbe1c71ef82c97f">llfio_v2_xxx::io_handle::_do_write</a></div><div class="ttdeci">virtual io_result&lt; const_buffers_type &gt; _do_write(io_request&lt; const_buffers_type &gt; reqs, deadline d) noexcept</div><div class="ttdoc">The virtualised implementation of write() used if no multiplexer has been set.</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__handle_html_a6e68ac7d62dfb84d4868b161eb25c859"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__handle.html#a6e68ac7d62dfb84d4868b161eb25c859">llfio_v2_xxx::byte_io_handle::_do_allocate_registered_buffer</a></div><div class="ttdeci">virtual result&lt; registered_buffer_type &gt; _do_allocate_registered_buffer(size_t &amp;bytes) noexcept</div><div class="ttdoc">The virtualised implementation of allocate_registered_buffer() used if no multiplexer has been set.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:1023</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
