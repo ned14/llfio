@@ -173,8 +173,6 @@ private:
   static result<byte_socket_source_ptr> _instantiate_default() noexcept { return errc::invalid_argument; }
   static result<byte_socket_source_ptr> _instantiate_with_default(byte_io_multiplexer * /*unused*/) noexcept { return errc::invalid_argument; }
 };
-static_assert(std::is_trivially_copyable<byte_socket_source_implementation_information>::value,
-              "byte_socket_source_implementation_information_t is not trivially copyable!");
 inline std::ostream &operator<<(std::ostream &s, const byte_socket_source_implementation_information &v)
 {
   return s << v.name << "_v" << v.version.major << "." << v.version.minor << "." << v.version.patch << "_" << v.postfix;
