@@ -494,14 +494,38 @@ endif()
 # Cache this library's auto scanned sources for later reuse
 include(QuickCppLibCacheLibrarySources)
 
+# Dependencies needed to consume our cmake package
+set(PROJECT_PACKAGE_DEPENDENCIES [=[
+include(CMakeFindDependencyMacro)
+find_dependency(quickcpplib)
+find_dependency(outcome)
+]=])
+
 # Make available this library for install and export
 include(QuickCppLibMakeInstall)
 if(WIN32 AND NOT LLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE)
   set_target_properties(ntkernel-error-category_hl PROPERTIES EXPORT_NAME ntkernel-error-category_hl)
   set_target_properties(ntkernel-error-category_sl PROPERTIES EXPORT_NAME ntkernel-error-category_sl)
   set_target_properties(ntkernel-error-category_dl PROPERTIES EXPORT_NAME ntkernel-error-category_dl)
-  install(TARGETS ntkernel-error-category_hl ntkernel-error-category_sl ntkernel-error-category_dl
+  install(TARGETS ntkernel-error-category_hl
           EXPORT llfioExports
+          COMPONENT headers
+          INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+          ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+          LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+          RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+  )
+  install(TARGETS ntkernel-error-category_sl
+          EXPORT llfioSlExports
+          COMPONENT sl
+          INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+          ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+          LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+          RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+  )
+  install(TARGETS ntkernel-error-category_dl
+          EXPORT llfioDlExports
+          COMPONENT dl
           INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
           ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
           LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
