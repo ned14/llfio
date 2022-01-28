@@ -280,7 +280,7 @@ namespace detail
         {
           *out++ = *in++;
         }
-        if(!*in || bytes ==0)
+        if(!*in || bytes == 0)
         {
           break;
         }
@@ -332,7 +332,7 @@ LLFIO_V2_NAMESPACE_END
 #if LLFIO_LOGGING_LEVEL >= 5
 #define LLFIO_LOG_DEBUG(inst, message)                                                                                                                         \
   ::LLFIO_V2_NAMESPACE::log().emplace_back(                                                                                                                    \
-  QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::debug, ::LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<unsigned>(inst),                                    \
+  QUICKCPPLIB_NAMESPACE::ringbuffer_log::level::debug, (message), ::LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<unsigned>(inst),                         \
   QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id(), (LLFIO_LOG_BACKTRACE_LEVELS & (1U << 5U)) ? nullptr : __func__, __LINE__)
 #else
 #define LLFIO_LOG_DEBUG(inst, message)

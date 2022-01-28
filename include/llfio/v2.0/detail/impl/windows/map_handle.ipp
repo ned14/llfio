@@ -1,5 +1,5 @@
 /* A handle to a source of mapped memory
-(C) 2016-2021 Niall Douglas <http://www.nedproductions.biz/> (17 commits)
+(C) 2016-2022 Niall Douglas <http://www.nedproductions.biz/> (17 commits)
 File Created: August 2016
 
 
@@ -125,15 +125,17 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   nativeh.behaviour |= native_handle_type::disposition::section | native_handle_type::disposition::kernel_handle;
   OBJECT_ATTRIBUTES oa{}, *poa = nullptr;
   UNICODE_STRING _path{};
+  wchar_t *singleton_rwchar = nullptr;
   if(_flag & flag::singleton)
   {
-    static thread_local const std::pair<wchar_t *, wchar_t *> buffer = []() -> std::pair<wchar_t *, wchar_t *> {
+    static thread_local const std::pair<wchar_t *, wchar_t *> buffer = []() -> std::pair<wchar_t *, wchar_t *>
+    {
       static thread_local wchar_t buffer_[96] = L"\\Sessions\\0\\BaseNamedObjects\\llfio_";
       DWORD sessionid = 0;
       if(ProcessIdToSessionId(GetCurrentProcessId(), &sessionid) != 0)
       {
         wsprintfW(buffer_, L"\\Sessions\\%u\\BaseNamedObjects\\llfio_", sessionid);
-        if(96 - wcslen(buffer_) < 33)
+        if(96 - wcslen(buffer_) < 34)
         {
           abort();
         }
@@ -142,11 +144,31 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
       return {buffer_, end};
     }();
     auto unique_id = backing.unique_id();
-    QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string(buffer.second, sizeof(unique_id) * 4, reinterpret_cast<char *>(unique_id.as_bytes),
+    singleton_rwchar = buffer.second;
+    buffer.second[0] = 'w';
+    QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string(buffer.second + 1, sizeof(unique_id) * 4, reinterpret_cast<char *>(unique_id.as_bytes),
                                                             sizeof(unique_id));
-    buffer.second[32] = 0;
+    buffer.second[33] = 0;
+#if 0
+    {
+      void *bt[32];
+      auto btlen = backtrace(bt, 32);
+      auto **strings = backtrace_symbols(bt, btlen);
+      std::string disp;
+      for(size_t n = 0; n < btlen; n++)
+      {
+        disp.append(strings[n]);
+        disp.push_back(';');
+      }
+      free(strings);
+      std::wcout << "For file with unique id " << std::hex << unique_id.as_longlongs[0] << unique_id.as_longlongs[1] << std::dec
+                 << " I name the singleton section " << buffer.second << ". Path is " << backing.current_path().value()
+                 << ". writable = " << !!(_flag & flag::write) << std::flush;
+      std::cout << ". Backtrace: " << disp << std::endl;
+    }
+#endif
     _path.Buffer = buffer.first;
-    _path.MaximumLength = (_path.Length = static_cast<USHORT>((32 + buffer.second - buffer.first) * sizeof(wchar_t))) + sizeof(wchar_t);
+    _path.MaximumLength = (_path.Length = static_cast<USHORT>((33 + buffer.second - buffer.first) * sizeof(wchar_t))) + sizeof(wchar_t);
     memset(&oa, 0, sizeof(oa));
     oa.Length = sizeof(OBJECT_ATTRIBUTES);
     oa.ObjectName = &_path;
@@ -168,12 +190,26 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   NTSTATUS ntstat = NtOpenSection(&h, SECTION_ALL_ACCESS, poa);
   if(ntstat < 0)
   {
+    if(!(_flag & flag::write) && singleton_rwchar != nullptr)
+    {
+      // We always preferentially open the writable section if it exists so resizes of it by any one process automatically
+      // update all other processes, which is much more efficient when multiple threads are reading and writing the same
+      // file and some have write privs and some have read privs. If however we are in a situation where LLFIO processes
+      // only ever read, try the read section too, and only create a read section if we have read only privs.
+      *singleton_rwchar = 'r';
+      ntstat = NtOpenSection(&h, SECTION_ALL_ACCESS, poa);
+      if(ntstat >= 0)
+      {
+        goto successful;
+      }
+    }
     ntstat = NtCreateSection(&h, SECTION_ALL_ACCESS, poa, pmaximum_size, prot, attribs, backing.native_handle().h);
     if(ntstat < 0)
     {
       return ntkernel_error(ntstat);
     }
   }
+successful:
   nativeh.h = h;
   return ret;
 }
@@ -313,7 +349,7 @@ result<section_handle::extent_type> section_handle::truncate(extent_type newsize
 template <class T> static inline T win32_round_up_to_allocation_size(T i) noexcept
 {
   // Should we fetch the allocation granularity from Windows? I very much doubt it'll ever change from 64Kb
-  i = (T)((LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i) + 65535) & ~(65535));  // NOLINT
+  i = (T) ((LLFIO_V2_NAMESPACE::detail::unsigned_integer_cast<uintptr_t>(i) + 65535) & ~(65535));  // NOLINT
   return i;
 }
 static inline result<void> win32_map_flags(native_handle_type &nativeh, DWORD &allocation, DWORD &prot, size_t &commitsize, bool enable_reservation,
@@ -606,13 +642,15 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_barrier(ma
       return {reqs.buffers};
     }
   }
-  OUTCOME_TRYV(win32_maps_apply(addr, (size_type) bytes, win32_map_sought::committed, [](byte *addr, size_t bytes) -> result<void> {
-    if(FlushViewOfFile(addr, static_cast<SIZE_T>(bytes)) == 0)
-    {
-      return win32_error();
-    }
-    return success();
-  }));
+  OUTCOME_TRYV(win32_maps_apply(addr, (size_type) bytes, win32_map_sought::committed,
+                                [](byte *addr, size_t bytes) -> result<void>
+                                {
+                                  if(FlushViewOfFile(addr, static_cast<SIZE_T>(bytes)) == 0)
+                                  {
+                                    return win32_error();
+                                  }
+                                  return success();
+                                }));
   if((_section != nullptr) && (_section->backing() != nullptr) && kind >= barrier_kind::nowait_all)
   {
     reqs.offset += _offset;
@@ -832,14 +870,16 @@ result<map_handle::buffer_type> map_handle::commit(buffer_type region, section_h
   DWORD prot = 0;
   if(flag == section_handle::flag::none || flag == section_handle::flag::nocommit)
   {
-    OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed, [](byte *addr, size_t bytes) -> result<void> {
-      DWORD _ = 0;
-      if(VirtualProtect(addr, bytes, PAGE_NOACCESS, &_) == 0)
-      {
-        return win32_error();
-      }
-      return success();
-    }));
+    OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed,
+                                  [](byte *addr, size_t bytes) -> result<void>
+                                  {
+                                    DWORD _ = 0;
+                                    if(VirtualProtect(addr, bytes, PAGE_NOACCESS, &_) == 0)
+                                    {
+                                      return win32_error();
+                                    }
+                                    return success();
+                                  }));
     return region;
   }
   if(flag & section_handle::flag::cow)
@@ -894,31 +934,33 @@ result<void> map_handle::zero_memory(buffer_type region) noexcept
     region = utils::round_to_page_size_larger(region, _pagesize);
     if(region.size() > 0)
     {
-      OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed, [](byte *addr, size_t bytes) -> result<void> {
-        if(DiscardVirtualMemory_ != nullptr)
-        {
-          if(DiscardVirtualMemory_(addr, bytes) == 0)
-          {
-            // It seems DiscardVirtualMemory() behaves like VirtualUnlock() sometimes.
-            if(ERROR_NOT_LOCKED != GetLastError())
-            {
-              return win32_error();
-            }
-          }
-        }
-        else
-        {
-          // This will always fail, but has the side effect of discarding the pages anyway.
-          if(VirtualUnlock(addr, bytes) == 0)
-          {
-            if(ERROR_NOT_LOCKED != GetLastError())
-            {
-              return win32_error();
-            }
-          }
-        }
-        return success();
-      }));
+      OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed,
+                                    [](byte *addr, size_t bytes) -> result<void>
+                                    {
+                                      if(DiscardVirtualMemory_ != nullptr)
+                                      {
+                                        if(DiscardVirtualMemory_(addr, bytes) == 0)
+                                        {
+                                          // It seems DiscardVirtualMemory() behaves like VirtualUnlock() sometimes.
+                                          if(ERROR_NOT_LOCKED != GetLastError())
+                                          {
+                                            return win32_error();
+                                          }
+                                        }
+                                      }
+                                      else
+                                      {
+                                        // This will always fail, but has the side effect of discarding the pages anyway.
+                                        if(VirtualUnlock(addr, bytes) == 0)
+                                        {
+                                          if(ERROR_NOT_LOCKED != GetLastError())
+                                          {
+                                            return win32_error();
+                                          }
+                                        }
+                                      }
+                                      return success();
+                                    }));
     }
   }
   return success();
@@ -958,30 +1000,34 @@ result<map_handle::buffer_type> map_handle::do_not_store(buffer_type region) noe
     // Win8's DiscardVirtualMemory is much faster if it's available
     if(DiscardVirtualMemory_ != nullptr)
     {
-      OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed, [](byte *addr, size_t bytes) -> result<void> {
-        if(DiscardVirtualMemory_(addr, bytes) == 0)
-        {
-          if(ERROR_NOT_LOCKED != GetLastError())
-          {
-            return win32_error();
-          }
-        }
-        return success();
-      }));
+      OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed,
+                                    [](byte *addr, size_t bytes) -> result<void>
+                                    {
+                                      if(DiscardVirtualMemory_(addr, bytes) == 0)
+                                      {
+                                        if(ERROR_NOT_LOCKED != GetLastError())
+                                        {
+                                          return win32_error();
+                                        }
+                                      }
+                                      return success();
+                                    }));
       return region;
     }
     // Else VirtualUnlock will do
-    OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed, [](byte *addr, size_t bytes) -> result<void> {
-      // This will always fail, but has the side effect of discarding the pages anyway.
-      if(VirtualUnlock(addr, bytes) == 0)
-      {
-        if(ERROR_NOT_LOCKED != GetLastError())
-        {
-          return win32_error();
-        }
-      }
-      return success();
-    }));
+    OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed,
+                                  [](byte *addr, size_t bytes) -> result<void>
+                                  {
+                                    // This will always fail, but has the side effect of discarding the pages anyway.
+                                    if(VirtualUnlock(addr, bytes) == 0)
+                                    {
+                                      if(ERROR_NOT_LOCKED != GetLastError())
+                                      {
+                                        return win32_error();
+                                      }
+                                    }
+                                    return success();
+                                  }));
     return region;
   }
   // We did nothing
@@ -1032,7 +1078,8 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_write(io_r
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
   if(QUICKCPPLIB_NAMESPACE::signal_guard::signal_guard(
      QUICKCPPLIB_NAMESPACE::signal_guard::signalc_set::undefined_memory_access | QUICKCPPLIB_NAMESPACE::signal_guard::signalc_set::segmentation_fault,
-     [&] {
+     [&]
+     {
        for(size_t i = 0; i < reqs.buffers.size(); i++)
        {
          const_buffer_type &req = reqs.buffers[i];
@@ -1055,7 +1102,8 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_write(io_r
        }
        return false;
      },
-     [&](const QUICKCPPLIB_NAMESPACE::signal_guard::raised_signal_info *info) {
+     [&](const QUICKCPPLIB_NAMESPACE::signal_guard::raised_signal_info *info)
+     {
        auto *causingaddr = (byte *) info->addr;
        if(causingaddr < _addr || causingaddr >= (_addr + _length))
        {

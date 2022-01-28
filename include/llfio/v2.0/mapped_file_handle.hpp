@@ -152,17 +152,19 @@ permissions. LLFIO names the section object backing every mapped file uniquely t
 the file's inode, and all those section objects are shared between all LLFIO processes
 for the current Windows session. This means that if any one process updates a section
 object's length, the section's length gets updated for all processes, and all maps
-of that section in all processes get automatically updated.
+of that section in all processes get automatically updated. This is **far** more efficient
+than each process updating a section individually (like, orders of magnitude better).
 
-This works great if, and only if, the very first mapping of any file is with a writable
-file handle, as that permits the global section object to be writable, and all other
-LLFIO processes then discover that writable global section object. If however the
+This works great if, and only if, the very first mapping of any inode is with a writable
+file handle, as that permits the global section object all mapped files of that inode
+(including read only maps) to use the same section object. If however the
 very first mapping of any file is with a read-only file handle, that creates a
-read-only section object, and that in turn **disables all address space reservation
-permanently for all processes** using that file.
+read-only section object, and that forces the first writable map to create a second
+section object. Now, both section objects must be updated individually when the backing
+file length changes, potentially halving your performance.
 
-So long as you ensure that any shared mapped file is always opened first with writable
-privileges, which is usually the case, all works like POSIX on Microsoft Windows.
+This is different to on POSIX, where the ordering of the permissions of how you open a
+mapped file does not silently impair performance.
 */
 class LLFIO_DECL mapped_file_handle : public file_handle
 {
