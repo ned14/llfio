@@ -1385,7 +1385,9 @@ public:
     //! The size of the internal buffer
     static constexpr size_t internal_buffer_size() noexcept { return (_internal_buffer_size > 0) ? _internal_buffer_size : 1; }
     //! The storage capacity, which may be larger than `size()` if the internal buffer is in use
-    size_t capacity() noexcept { return (this->data() == _buffer) ? internal_buffer_size() : this->size(); }
+    size_t capacity() const noexcept { return (this->data() == _buffer) ? internal_buffer_size() : this->size(); }
+    //! True if this rendered path refers to the source path view
+    bool references_source() const noexcept { return this->data() != _buffer && _bytes_to_delete == 0; }
 
     //! Access the custom deleter instance passed to the constructor
     const AllocatorOrDeleter &deleter() const noexcept { return _deleter2; }
