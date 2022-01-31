@@ -338,6 +338,12 @@ namespace windows_nt_kernel
 
   using NtClose_t = NTSTATUS(NTAPI *)(_Out_ HANDLE FileHandle);
 
+  using NtQueryEaFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _Out_ PVOID Buffer, _In_ ULONG Length,
+                                            _In_ BOOLEAN ReturnSingleEntry, _In_opt_ PVOID EaList, _In_ ULONG EaListLength, _In_opt_ PULONG EaIndex,
+                                            _In_ BOOLEAN RestartScan);
+
+  using NtSetEaFile_t = NTSTATUS(NTAPI *)(_In_ HANDLE FileHandle, _Out_ PIO_STATUS_BLOCK IoStatusBlock, _Out_ PVOID Buffer, _In_ ULONG Length);
+
   // From https://undocumented.ntinternals.net/UserMode/Undocumented%20Functions/NT%20Objects/File/NtCreateNamedPipeFile.html
   using NtCreateNamedPipeFile_t = NTSTATUS(NTAPI *)(_Out_ PHANDLE NamedPipeFileHandle, _In_ ACCESS_MASK DesiredAccess, _In_ POBJECT_ATTRIBUTES ObjectAttributes,
                                                     _Out_ PIO_STATUS_BLOCK IoStatusBlock, _In_ ULONG ShareAccess, _In_ ULONG CreateDisposition,
@@ -687,6 +693,10 @@ namespace windows_nt_kernel
     FILE_ID_128 FileId;
   } FILE_ID_INFORMATION, *PFILE_ID_INFORMATION;
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4201)  // nameless struct/union
+#endif
   typedef struct _FILE_OBJECTID_INFORMATION  // NOLINT
   {
     LONGLONG FileReference;
@@ -702,6 +712,9 @@ namespace windows_nt_kernel
       UCHAR ExtendedInfo[48];
     } DUMMYUNIONNAME;
   } FILE_OBJECTID_INFORMATION, *PFILE_OBJECTID_INFORMATION;
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
   typedef struct _FILE_STAT_INFORMATION  // NOLINT
   {
@@ -717,6 +730,31 @@ namespace windows_nt_kernel
     ULONG NumberOfLinks;
     ACCESS_MASK EffectiveAccess;
   } FILE_STAT_INFORMATION, *PFILE_STAT_INFORMATION;
+
+  typedef struct _FILE_FULL_EA_INFORMATION
+  {
+    ULONG NextEntryOffset;
+    UCHAR Flags;
+    UCHAR EaNameLength;
+    USHORT EaValueLength;
+    CHAR EaName[1];
+  } FILE_FULL_EA_INFORMATION, *PFILE_FULL_EA_INFORMATION;
+
+  typedef struct _FILE_GET_EA_INFORMATION
+  {
+    ULONG NextEntryOffset;
+    UCHAR EaNameLength;
+    CHAR EaName[1];
+  } FILE_GET_EA_INFORMATION, *PFILE_GET_EA_INFORMATION;
+
+  typedef struct _FILE_STREAM_INFORMATION
+  {
+    ULONG NextEntryOffset;
+    ULONG StreamNameLength;
+    LARGE_INTEGER StreamSize;
+    LARGE_INTEGER StreamAllocationSize;
+    WCHAR StreamName[1];
+  } FILE_STREAM_INFORMATION, *PFILE_STREAM_INFORMATION;
 
   typedef struct _FILE_FS_ATTRIBUTE_INFORMATION  // NOLINT
   {
@@ -991,6 +1029,8 @@ namespace windows_nt_kernel
   static NtCancelIoFileEx_t NtCancelIoFileEx;
   static NtDeleteFile_t NtDeleteFile;
   static NtClose_t NtClose;
+  static NtQueryEaFile_t NtQueryEaFile;
+  static NtSetEaFile_t NtSetEaFile;
   static NtCreateNamedPipeFile_t NtCreateNamedPipeFile;
   static NtQueryDirectoryFile_t NtQueryDirectoryFile;
   static NtSetInformationFile_t NtSetInformationFile;
@@ -1146,6 +1186,20 @@ namespace windows_nt_kernel
     if(NtClose == nullptr)
     {
       if((NtClose = reinterpret_cast<NtClose_t>(GetProcAddress(ntdllh, "NtClose"))) == nullptr)
+      {
+        abort();
+      }
+    }
+    if(NtQueryEaFile == nullptr)
+    {
+      if((NtQueryEaFile = reinterpret_cast<NtQueryEaFile_t>(GetProcAddress(ntdllh, "NtQueryEaFile"))) == nullptr)
+      {
+        abort();
+      }
+    }
+    if(NtSetEaFile == nullptr)
+    {
+      if((NtSetEaFile = reinterpret_cast<NtSetEaFile_t>(GetProcAddress(ntdllh, "NtSetEaFile"))) == nullptr)
       {
         abort();
       }

@@ -1,5 +1,5 @@
 /* A filing system handle
-(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2017-2022 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: Aug 2017
 
 
@@ -32,6 +32,12 @@ Distributed under the Boost Software License, Version 1.0.
 #ifdef __linux__
 #include <sys/syscall.h>
 #include <sys/sysmacros.h>
+#endif
+#if defined(__linux__) || defined(__APPLE__)
+#include <sys/xattr.h>
+#elif defined(__FreeBSD__)
+#include <sys/extattr.h>
+#include <sys/types.h>
 #endif
 
 LLFIO_V2_NAMESPACE_BEGIN
@@ -83,7 +89,9 @@ namespace detail
             int tffd = ::openat(h.native_handle().fd, tempname.c_str(), O_RDWR | O_CLOEXEC | O_CREAT | O_EXCL, 0x1b0 /*660*/);
             if(tffd >= 0)
             {
-              auto untffd = make_scope_exit([&]() noexcept {
+              auto untffd = make_scope_exit(
+              [&]() noexcept
+              {
                 ::unlinkat(h.native_handle().fd, tempname.c_str(), 0);
                 ::close(tffd);
               });
@@ -178,8 +186,8 @@ namespace detail
 
 result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
 {
-  LLFIO_LOG_FUNCTION_CALL(this);
   auto &h = _get_handle();
+  LLFIO_LOG_FUNCTION_CALL(&h);
   if(_devid == 0 && _inode == 0)
   {
     OUTCOME_TRY(_fetch_inode());
@@ -189,8 +197,8 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
 
 result<void> fs_handle::relink(const path_handle &base, path_view_type path, bool atomic_replace, deadline d) noexcept
 {
-  LLFIO_LOG_FUNCTION_CALL(this);
   auto &h = const_cast<handle &>(_get_handle());
+  LLFIO_LOG_FUNCTION_CALL(&h);
   path_view::zero_terminated_rendered_path<> zpath(path);
 #ifdef O_TMPFILE
   // If the handle was created with O_TMPFILE, we need a different approach
@@ -253,8 +261,8 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
       return posix_error();
     }
 #endif
-// Otherwise we need to use linkat followed by unlinkat, carefully reopening the file descriptor
-// to preserve path tracking
+    // Otherwise we need to use linkat followed by unlinkat, carefully reopening the file descriptor
+    // to preserve path tracking
     if(-1 == ::linkat(dirh.native_handle().fd, filename.c_str(), base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.c_str(), 0))
     {
       return posix_error();
@@ -328,8 +336,8 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
 
 result<void> fs_handle::link(const path_handle &base, path_view_type path, deadline d) noexcept
 {
-  LLFIO_LOG_FUNCTION_CALL(this);
   auto &h = const_cast<handle &>(_get_handle());
+  LLFIO_LOG_FUNCTION_CALL(&h);
   path_view::zero_terminated_rendered_path<> zpath(path);
 #ifdef AT_EMPTY_PATH
   // Try to use the fd linking syscall
@@ -369,5 +377,155 @@ result<void> fs_handle::unlink(deadline d) noexcept
   }
   return success();
 }
+
+result<span<path_view_component>> fs_handle::list_extended_attributes(span<byte> tofill) noexcept
+{
+  auto &h = _get_handle();
+  LLFIO_LOG_FUNCTION_CALL(&h);
+#if defined(__linux__) || defined(__APPLE__)
+  auto readed = flistxattr(h.native_handle().fd, (char *) tofill.data(), tofill.size());
+  if(readed < 0)
+  {
+    return posix_error();
+  }
+  span<path_view_component> filled;
+  {
+    auto *p = tofill.data();
+    size_t count = 0;
+    do
+    {
+      auto length = strlen((char *) p);
+      if(length > 0)
+      {
+        count++;
+      }
+      p += length + 1;
+    } while(p < tofill.data() + readed);
+    if(count == 0)
+    {
+      return filled;
+    }
+    const auto offset = (readed + 7) & ~7;
+    auto tofillremaining = tofill.size() - offset;
+    if(count * sizeof(path_view_component) > tofillremaining)
+    {
+      return errc::no_buffer_space;
+    }
+    filled = {(path_view_component *) (p + offset), count};
+  }
+  {
+    auto *p = tofill.data();
+    size_t count = 0;
+    do
+    {
+      auto *i = (char *) p;
+      auto length = strlen(i);
+      if(length > 0)
+      {
+        filled[count] = path_view_component(i, length, path_view_component::zero_terminated);
+        count++;
+      }
+      p += length + 1;
+    } while(p < tofill.data() + readed);
+  }
+  return filled;
+#elif defined(__FreeBSD__)
+  auto readed = extattr_list_fd(h.native_handle().fd, EXTATTR_NAMESPACE_USER, tofill.data(), tofill.size());
+  if(readed < 0)
+  {
+    return posix_error();
+  }
+  struct record_t
+  {
+    uint8_t length;
+    char name[1];  // NOT null terminated, does NOT includer 'user.' prefix
+  };
+#error "Implement this next time I am on FreeBSD"
+#else
+  return errc::operation_not_supported;
+#endif
+}
+
+result<span<byte>> fs_handle::get_extended_attribute(span<byte> tofill, path_view_component name) noexcept
+{
+  auto &h = _get_handle();
+  LLFIO_LOG_FUNCTION_CALL(&h);
+#if defined(__linux__) || defined(__APPLE__)
+  path_view::zero_terminated_rendered_path<> zname(name);
+  auto readed = fgetxattr(h.native_handle().fd, zname.c_str(), tofill.data(), tofill.size());
+  if(readed < 0)
+  {
+    return posix_error();
+  }
+  return {tofill.data(), readed};
+#elif defined(__FreeBSD__)
+  path_view::zero_terminated_rendered_path<> zname(name);
+  // TODO: Strip "user." or "system." prefix and choose the right namespace
+  auto readed = extattr_get_fd(h.native_handle().fd, EXTATTR_NAMESPACE_USER, zname.c_str(), tofill.data(), tofill.size());
+  if(readed < 0)
+  {
+    return posix_error();
+  }
+  return {tofill.data(), readed};
+#else
+  return errc::operation_not_supported;
+#endif
+}
+
+result<void> fs_handle::set_extended_attribute(path_view_component name, span<const byte> value) noexcept
+{
+  auto &h = _get_handle();
+  LLFIO_LOG_FUNCTION_CALL(&h);
+#if defined(__linux__) || defined(__APPLE__)
+  path_view::zero_terminated_rendered_path<> zname(name);
+  if(-1 == fsetxattr(h.native_handle().fd, zname.c_str(), value.data(), value.size(), 0))
+  {
+    return posix_error();
+  }
+  return success();
+#elif defined(__FreeBSD__)
+  path_view::zero_terminated_rendered_path<> zname(name);
+  // TODO: Strip "user." or "system." prefix and choose the right namespace
+  auto written = extattr_set_fd(h.native_handle().fd, EXTATTR_NAMESPACE_USER, zname.c_str(), tofill.data(), tofill.size());
+  if(written < 0)
+  {
+    return posix_error();
+  }
+  if(written < value.size())
+  {
+    return errc::no_space_on_device;
+  }
+  return success();
+#else
+  return errc::operation_not_supported;
+#endif
+}
+
+result<void> fs_handle::remove_extended_attribute(path_view_component name) noexcept
+{
+  auto &h = _get_handle();
+  LLFIO_LOG_FUNCTION_CALL(&h);
+#if defined(__linux__) || defined(__APPLE__)
+  path_view::zero_terminated_rendered_path<> zname(name);
+  auto written = fremovexattr(h.native_handle().fd, zname.c_str());
+  if(written < 0)
+  {
+    return posix_error();
+  }
+  return success();
+#elif defined(__FreeBSD__)
+  path_view::zero_terminated_rendered_path<> zname(name);
+  // TODO: Strip "user." or "system." prefix and choose the right namespace
+  auto written = extattr_delete_fd(h.native_handle().fd, EXTATTR_NAMESPACE_USER, zname.c_str());
+  if(written < 0)
+  {
+    return posix_error();
+  }
+  return success();
+#else
+  return errc::operation_not_supported;
+#endif
+}
+
 
 LLFIO_V2_NAMESPACE_END

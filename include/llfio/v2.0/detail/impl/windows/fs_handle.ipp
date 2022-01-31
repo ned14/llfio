@@ -1,5 +1,5 @@
 /* A filing system handle
-(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2017-2022 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: Aug 2017
 
 
@@ -42,8 +42,8 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  LLFIO_LOG_FUNCTION_CALL(this);
   auto &h = _get_handle();
+  LLFIO_LOG_FUNCTION_CALL(&h);
   LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
   if(_devid == 0 && _inode == 0)
   {
@@ -133,8 +133,8 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  LLFIO_LOG_FUNCTION_CALL(this);
   auto &h = _get_handle();
+  LLFIO_LOG_FUNCTION_CALL(&h);
 
   // If the target is a win32 path, we need to convert to NT path and call ourselves
   if(!base.is_valid() && !path.is_ntpath())
@@ -145,7 +145,9 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
     {
       return win32_error(ERROR_FILE_NOT_FOUND);
     }
-    auto unntpath = make_scope_exit([&NtPath]() noexcept {
+    auto unntpath = make_scope_exit(
+    [&NtPath]() noexcept
+    {
       if(HeapFree(GetProcessHeap(), 0, NtPath.Buffer) == 0)
       {
         abort();
@@ -221,8 +223,8 @@ result<void> fs_handle::link(const path_handle &base, path_view_type path, deadl
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  LLFIO_LOG_FUNCTION_CALL(this);
   auto &h = _get_handle();
+  LLFIO_LOG_FUNCTION_CALL(&h);
 
   // If the target is a win32 path, we need to convert to NT path and call ourselves
   if(!base.is_valid() && !path.is_ntpath())
@@ -233,7 +235,9 @@ result<void> fs_handle::link(const path_handle &base, path_view_type path, deadl
     {
       return win32_error(ERROR_FILE_NOT_FOUND);
     }
-    auto unntpath = make_scope_exit([&NtPath]() noexcept {
+    auto unntpath = make_scope_exit(
+    [&NtPath]() noexcept
+    {
       if(HeapFree(GetProcessHeap(), 0, NtPath.Buffer) == 0)
       {
         abort();
@@ -279,8 +283,8 @@ result<void> fs_handle::unlink(deadline d) noexcept
   using flag = handle::flag;
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  LLFIO_LOG_FUNCTION_CALL(this);
   auto &h = _get_handle();
+  LLFIO_LOG_FUNCTION_CALL(&h);
   HANDLE duph = INVALID_HANDLE_VALUE;
   // Get myself DELETE privs if possible
   if(h.is_directory())
@@ -387,6 +391,444 @@ result<void> fs_handle::unlink(deadline d) noexcept
         return ntkernel_error(ntstat);
       }
     }
+  }
+  return success();
+}
+
+namespace detail
+{
+  static inline result<handle> create_alternate_stream(const handle &base, path_view path, handle::mode _mode, handle::creation _creation) noexcept
+  {
+    using namespace windows_nt_kernel;
+    const handle::caching _caching = handle::caching::all;
+    const handle::flag flags = handle::flag::none;
+    native_handle_type nativeh;
+    DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
+    OUTCOME_TRY(auto &&access, access_mask_from_handle_mode(nativeh, _mode, flags));
+    OUTCOME_TRY(auto &&attribs, attributes_from_handle_caching_and_flags(nativeh, _caching, flags));
+    DWORD creatdisp = 0x00000001 /*FILE_OPEN*/;
+    switch(_creation)
+    {
+    case handle::creation::open_existing:
+      break;
+    case handle::creation::only_if_not_exist:
+      creatdisp = 0x00000002 /*FILE_CREATE*/;
+      break;
+    case handle::creation::if_needed:
+      creatdisp = 0x00000003 /*FILE_OPEN_IF*/;
+      break;
+    case handle::creation::truncate_existing:
+      creatdisp = 0x00000004 /*FILE_OVERWRITE*/;
+      break;
+    case handle::creation::always_new:
+      creatdisp = 0x00000000 /*FILE_SUPERSEDE*/;
+      break;
+    }
+
+    attribs &= 0x00ffffff;  // the real attributes only, not the win32 flags
+    OUTCOME_TRY(auto &&ntflags, ntflags_from_handle_caching_and_flags(nativeh, _caching, flags));
+    ntflags |= 0x040 /*FILE_NON_DIRECTORY_FILE*/;  // do not open a directory
+    IO_STATUS_BLOCK isb = make_iostatus();
+
+    // We need to prepend a ':', so this gets handled a little different
+    path_view::zero_terminated_rendered_path<> zpath(
+    [&]() -> path_view::zero_terminated_rendered_path<>
+    {
+      return visit(path,
+                   [&](auto sv) -> path_view::zero_terminated_rendered_path<>
+                   {
+                     using sv_type = std::decay_t<decltype(sv)>;
+                     using value_type = typename sv_type::value_type;
+                     auto *buffer = (value_type *) alloca((sv.size() + 1) * sizeof(value_type));
+                     buffer[0] = ':';
+                     memcpy(buffer + 1, sv.data(), sv.size() * sizeof(value_type));
+                     // Force an immediate render into the internal buffer
+                     return path_view::zero_terminated_rendered_path<>(path_view(buffer, sv.size() + 1, path_view::not_zero_terminated));
+                   });
+    }());
+    UNICODE_STRING _path{};
+    _path.Buffer = const_cast<wchar_t *>(zpath.data());
+    _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.size() * sizeof(wchar_t))) + sizeof(wchar_t);
+
+    OBJECT_ATTRIBUTES oa{};
+    memset(&oa, 0, sizeof(oa));
+    oa.Length = sizeof(OBJECT_ATTRIBUTES);
+    oa.ObjectName = &_path;
+    oa.RootDirectory = base.native_handle().h;
+    oa.Attributes = 0;  // 0x40 /*OBJ_CASE_INSENSITIVE*/;
+    // if(!!(flags & file_flags::int_opening_link))
+    //  oa.Attributes|=0x100/*OBJ_OPENLINK*/;
+
+    LARGE_INTEGER AllocationSize{};
+    memset(&AllocationSize, 0, sizeof(AllocationSize));
+    NTSTATUS ntstat = NtCreateFile(&nativeh.h, access, &oa, &isb, &AllocationSize, attribs, fileshare, creatdisp, ntflags, nullptr, 0);
+    if(STATUS_PENDING == ntstat)
+    {
+      ntstat = ntwait(nativeh.h, isb, deadline());
+    }
+    if(ntstat < 0)
+    {
+      return ntkernel_error(ntstat);
+    }
+    return handle(nativeh, _caching, flags);
+  }
+}  // namespace detail
+
+result<span<path_view_component>> fs_handle::list_extended_attributes(span<byte> tofill) noexcept
+{
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  auto &h = _get_handle();
+  LLFIO_LOG_FUNCTION_CALL(&h);
+  IO_STATUS_BLOCK isb = make_iostatus();
+  NTSTATUS ntstat = NtQueryInformationFile(h.native_handle().h, &isb, tofill.data(), (ULONG) tofill.size(), FileStreamInformation);
+  if(STATUS_PENDING == ntstat)
+  {
+    ntstat = ntwait(h.native_handle().h, isb, deadline());
+  }
+  if(ntstat < 0)
+  {
+    return ntkernel_error(ntstat);
+  }
+  span<path_view_component> filled;
+  {
+    auto *p = tofill.data();
+    bool done = false;
+    size_t count = 0;
+    do
+    {
+      auto *i = (_FILE_STREAM_INFORMATION *) p;
+      if(i->StreamNameLength > 1 && i->StreamName[0] == ':' && i->StreamName[1] != ':')
+      {
+        count++;
+      }
+      if(i->NextEntryOffset == 0)
+      {
+        done = true;
+      }
+      else
+      {
+        p += i->NextEntryOffset;
+      }
+    } while(!done && p < tofill.data() + isb.Information);
+    if(count == 0)
+    {
+      return filled;
+    }
+    const auto offset = (isb.Information + 7) & ~7;
+    auto tofillremaining = tofill.size() - offset;
+    if(count * sizeof(path_view_component) > tofillremaining)
+    {
+      return errc::no_buffer_space;
+    }
+    filled = {(path_view_component *) (p + offset), count};
+  }
+  {
+    auto *p = tofill.data();
+    bool done = false;
+    size_t count = 0;
+    do
+    {
+      auto *i = (_FILE_STREAM_INFORMATION *) p;
+      // Strip out all :: prefixed streams, which are internal ones
+      if(i->StreamNameLength > 1 && i->StreamName[0] == ':' && i->StreamName[1] != ':')
+      {
+        // Alternate data streams can themselves have alternate data streams, so filter out any starting with '$' as those are internal
+        auto length = i->StreamNameLength / sizeof(wchar_t);
+        for(auto *c = i->StreamName + length; c > i->StreamName; c--)
+        {
+          if(c[0] == '$' && c > i->StreamName && c[-1] == ':')
+          {
+            length = c - i->StreamName - 1;
+            break;
+          }
+        }
+        filled[count] = path_view_component(i->StreamName + 1, length - 1, path_view_component::not_zero_terminated);
+        count++;
+      }
+      if(i->NextEntryOffset == 0)
+      {
+        done = true;
+      }
+      else
+      {
+        p += i->NextEntryOffset;
+      }
+    } while(!done && p < tofill.data() + isb.Information);
+  }
+  return filled;
+}
+
+result<span<byte>> fs_handle::get_extended_attribute(span<byte> tofill, path_view_component name) noexcept
+{
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  auto &h = _get_handle();
+  LLFIO_LOG_FUNCTION_CALL(&h);
+  OUTCOME_TRY(auto &&attribh, detail::create_alternate_stream(h, name, handle::mode::read, handle::creation::open_existing));
+  IO_STATUS_BLOCK isb = make_iostatus();
+  NTSTATUS ntstat = NtReadFile(attribh.native_handle().h, nullptr, nullptr, nullptr, &isb, tofill.data(), (ULONG) tofill.size(), nullptr, nullptr);
+  if(STATUS_PENDING == ntstat)
+  {
+    ntstat = ntwait(attribh.native_handle().h, isb, deadline());
+  }
+  if(ntstat < 0)
+  {
+    return ntkernel_error(ntstat);
+  }
+  return {tofill.data(), isb.Information};
+}
+
+result<void> fs_handle::set_extended_attribute(path_view_component name, span<const byte> value) noexcept
+{
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  auto &h = _get_handle();
+  LLFIO_LOG_FUNCTION_CALL(&h);
+  OUTCOME_TRY(auto &&attribh, detail::create_alternate_stream(h, name, handle::mode::write, handle::creation::always_new));
+  IO_STATUS_BLOCK isb = make_iostatus();
+  NTSTATUS ntstat = NtWriteFile(attribh.native_handle().h, nullptr, nullptr, nullptr, &isb, (PVOID) value.data(), (ULONG) value.size(), nullptr, nullptr);
+  if(STATUS_PENDING == ntstat)
+  {
+    ntstat = ntwait(attribh.native_handle().h, isb, deadline());
+  }
+  if(ntstat < 0)
+  {
+    return ntkernel_error(ntstat);
+  }
+  if(isb.Information < value.size())
+  {
+    return errc::no_space_on_device;
+  }
+  return success();
+}
+
+result<void> fs_handle::remove_extended_attribute(path_view_component name) noexcept
+{
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  auto &h = _get_handle();
+  LLFIO_LOG_FUNCTION_CALL(&h);
+  OUTCOME_TRY(auto &&attribh, detail::create_alternate_stream(h, name, handle::mode::attr_write, handle::creation::open_existing));
+  // Mark the item as delete on close
+  IO_STATUS_BLOCK isb = make_iostatus();
+  FILE_DISPOSITION_INFORMATION fdi{};
+  memset(&fdi, 0, sizeof(fdi));
+  fdi._DeleteFile = 1u;
+  NTSTATUS ntstat = NtSetInformationFile(attribh.native_handle().h, &isb, &fdi, sizeof(fdi), FileDispositionInformation);
+  if(STATUS_PENDING == ntstat)
+  {
+    ntstat = ntwait(attribh.native_handle().h, isb, deadline());
+  }
+  if(ntstat < 0)
+  {
+    return ntkernel_error(ntstat);
+  }
+  return success();
+}
+
+
+/************************************************ NTFS extended attributes *********************************************************/
+
+namespace detail
+{
+  struct win_extended_attributes_return_t
+  {
+    span<std::pair<path_view_component, span<byte>>> filled;
+    size_t tofillremaining;
+  };
+  static inline result<win_extended_attributes_return_t> win_extended_attributes(span<byte> tofill, const handle &h,
+                                                                                 span<const path_view_component> names) noexcept
+  {
+    windows_nt_kernel::init();
+    using namespace windows_nt_kernel;
+    IO_STATUS_BLOCK isb = make_iostatus();
+    _FILE_GET_EA_INFORMATION *ealist = nullptr;
+    ULONG ealistlen = 0;
+    for(auto name : names)
+    {
+      if(name.native_size() > 255)
+      {
+        return errc::invalid_argument;
+      }
+      if(!visit(name, [](auto sv) { return sizeof(sv[0]) == 1; }))
+      {
+        return errc::invalid_argument;
+      }
+      ealistlen += (ULONG) ((sizeof(ULONG) + 1 + name.native_size() + 3) & ~3);
+    }
+    if(ealistlen > 0)
+    {
+      ealist = (_FILE_GET_EA_INFORMATION *) alloca(ealistlen);
+      if(ealist == nullptr)
+      {
+        return errc::not_enough_memory;
+      }
+      auto *p = (byte *) ealist;
+      auto *i = (_FILE_GET_EA_INFORMATION *) p;
+      for(auto name : names)
+      {
+        i = (_FILE_GET_EA_INFORMATION *) p;
+        i->NextEntryOffset = (ULONG) ((sizeof(ULONG) + 1 + name.native_size() + 3) & ~3);
+        i->EaNameLength = (UCHAR) name.native_size();
+        visit(name,
+              [&](auto sv)
+              {
+                memcpy(i->EaName, sv.data(), i->EaNameLength);
+                i->EaName[i->EaNameLength] = 0;
+              });
+        p += i->NextEntryOffset;
+      }
+      i->NextEntryOffset = 0;
+    }
+    NTSTATUS ntstat = NtQueryEaFile(h.native_handle().h, &isb, tofill.data(), (ULONG) tofill.size(), false, ealist, ealistlen, nullptr, false);
+    if(STATUS_PENDING == ntstat)
+    {
+      ntstat = ntwait(h.native_handle().h, isb, {});
+    }
+    win_extended_attributes_return_t ret;
+    ret.tofillremaining = tofill.size();
+    if(ntstat < 0)
+    {
+      if(ntstat == 0xC0000052 /*STATUS_NO_EAS_ON_FILE*/)
+      {
+        return ret;
+      }
+      return ntkernel_error(ntstat);
+    }
+    {
+      auto *p = tofill.data();
+      bool done = false;
+      size_t count = 0;
+      do
+      {
+        auto *i = (_FILE_FULL_EA_INFORMATION *) p;
+        if(i->EaNameLength > 0)
+        {
+          count++;
+        }
+        if(i->NextEntryOffset == 0)
+        {
+          done = true;
+        }
+        else
+        {
+          p += i->NextEntryOffset;
+        }
+      } while(!done && p < tofill.data() + isb.Information);
+      const auto offset = (isb.Information + 7) & ~7;
+      ret.tofillremaining = tofill.size() - offset;
+      if(count * sizeof(std::pair<path_view_component, span<byte>>) > ret.tofillremaining)
+      {
+        return errc::no_buffer_space;
+      }
+      ret.filled = {(std::pair<path_view_component, span<byte>> *) (p + offset), count};
+      ret.tofillremaining -= count * sizeof(std::pair<path_view_component, span<byte>>);
+    }
+    {
+      auto *p = tofill.data();
+      bool done = false;
+      size_t count = 0;
+      do
+      {
+        auto *i = (_FILE_FULL_EA_INFORMATION *) p;
+        if(i->EaNameLength > 0)
+        {
+          ret.filled[count] = {path_view_component(i->EaName, i->EaNameLength, path_view_component::zero_terminated),
+                               {(byte *) i->EaName + i->EaNameLength + 1, i->EaValueLength}};
+          count++;
+        }
+        if(i->NextEntryOffset == 0)
+        {
+          done = true;
+        }
+        else
+        {
+          p += i->NextEntryOffset;
+        }
+      } while(!done && p < tofill.data() + isb.Information);
+    }
+    return ret;
+  }
+}  // namespace detail
+
+result<span<std::pair<path_view_component, span<byte>>>> fs_handle::win_list_extended_attributes(span<byte> tofill) noexcept
+{
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  auto &h = _get_handle();
+  LLFIO_LOG_FUNCTION_CALL(&h);
+  OUTCOME_TRY(auto &&ret, detail::win_extended_attributes(tofill, h, {}));
+  return ret.filled;
+}
+
+result<span<std::pair<path_view_component, span<byte>>>> fs_handle::win_get_extended_attributes(span<byte> tofill,
+                                                                                                span<const path_view_component> names) noexcept
+{
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  auto &h = _get_handle();
+  LLFIO_LOG_FUNCTION_CALL(&h);
+  OUTCOME_TRY(auto &&ret, detail::win_extended_attributes(tofill, h, names));
+  return ret.filled;
+}
+
+result<void> fs_handle::win_set_extended_attributes(span<std::pair<const path_view_component, span<const byte>>> toset) noexcept
+{
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  auto &h = _get_handle();
+  LLFIO_LOG_FUNCTION_CALL(&h);
+  _FILE_FULL_EA_INFORMATION *ealist = nullptr;
+  ULONG ealistlen = 0;
+  for(auto item : toset)
+  {
+    if(item.first.native_size() > 255 || item.second.size() > 65535)
+    {
+      return errc::invalid_argument;
+    }
+    if(!visit(item.first, [](auto sv) { return sizeof(sv[0]) == 1; }))
+    {
+      return errc::invalid_argument;
+    }
+    ealistlen += (ULONG) ((sizeof(ULONG) + 4 + item.first.native_size() + 1 + item.second.size() + 3) & ~3);
+  }
+  if(ealistlen > 0)
+  {
+    ealist = (_FILE_FULL_EA_INFORMATION *) alloca(ealistlen);
+    if(ealist == nullptr)
+    {
+      return errc::not_enough_memory;
+    }
+    auto *p = (byte *) ealist;
+    auto *i = (_FILE_FULL_EA_INFORMATION *) p;
+    for(auto item : toset)
+    {
+      i = (_FILE_FULL_EA_INFORMATION *) p;
+      i->NextEntryOffset = (ULONG) ((sizeof(ULONG) + 4 + item.first.native_size() + 1 + item.second.size() + 3) & ~3);
+      i->Flags = 0;
+      i->EaNameLength = (UCHAR) item.first.native_size();
+      visit(item.first,
+            [&](auto sv)
+            {
+              memcpy(i->EaName, sv.data(), i->EaNameLength);
+              i->EaName[i->EaNameLength] = 0;
+            });
+      i->EaValueLength = (USHORT) item.second.size();
+      memcpy(i->EaName + i->EaNameLength + 1, item.second.data(), item.second.size());
+      p += i->NextEntryOffset;
+    }
+    i->NextEntryOffset = 0;
+  }
+  IO_STATUS_BLOCK isb = make_iostatus();
+  NTSTATUS ntstat = NtSetEaFile(h.native_handle().h, &isb, ealist, ealistlen);
+  if(STATUS_PENDING == ntstat)
+  {
+    ntstat = ntwait(h.native_handle().h, isb, {});
+  }
+  if(ntstat < 0)
+  {
+    return ntkernel_error(ntstat);
   }
   return success();
 }

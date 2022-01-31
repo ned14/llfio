@@ -1,5 +1,5 @@
 /* A filing system handle
-(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2017-2022 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: Aug 2017
 
 
@@ -246,7 +246,7 @@ public:
     return ret;
   }
 
-  /*! Obtain a handle to the path **currently** containing this handle's file entry.
+  /*! \brief Obtain a handle to the path **currently** containing this handle's file entry.
 
   \warning This call is \b racy and can result in the wrong path handle being returned. Note that
   unless `flag::disable_safety_unlinks` is set, this implementation opens a
@@ -263,7 +263,7 @@ public:
 
   LLFIO_DEADLINE_TRY_FOR_UNTIL(parent_path_handle)
 
-  /*! Relinks the current path of this open handle to the new path specified. If `atomic_replace` is
+  /*! \brief Relinks the current path of this open handle to the new path specified. If `atomic_replace` is
   true, the relink \b atomically and silently replaces any item at the new path specified. This
   operation is both atomic and matching POSIX behaviour even on Microsoft Windows where
   no Win32 API can match POSIX semantics.
@@ -304,7 +304,7 @@ public:
 
   LLFIO_DEADLINE_TRY_FOR_UNTIL(relink)
 
-  /*! Links the inode referred to by this open handle to the path specified. The current path
+  /*! \brief Links the inode referred to by this open handle to the path specified. The current path
   of this open handle is not changed, unless it has no current path due to being unlinked.
 
   \warning Some operating systems provide a race free syscall for linking an open handle to a new
@@ -329,8 +329,10 @@ public:
 
   LLFIO_DEADLINE_TRY_FOR_UNTIL(link)
 
-  /*! Unlinks the current path of this open handle, causing its entry to immediately disappear
-  from the filing system. On Windows before Windows 10 1709 unless
+  /*! \brief Unlinks the current path of this open handle, causing its entry to immediately disappear
+  from the filing system.
+
+  On Windows before Windows 10 1709 unless
   `flag::win_disable_unlink_emulation` is set, this behaviour is simulated by renaming the file
   to something random and setting its delete-on-last-close flag. Note that Windows may prevent
   the renaming of a file in use by another process, if so it will NOT be renamed.
@@ -356,6 +358,93 @@ public:
   result<void> unlink(deadline d = std::chrono::seconds(30)) noexcept;
 
   LLFIO_DEADLINE_TRY_FOR_UNTIL(unlink)
+
+  /*! \brief Fill the supplied buffer with the names of all extended attributes set on this file or directory,
+  returning a span of pairs of path view components and values into that buffer.
+
+  Note that this routine is a very thin wrap of `listxattr()` on POSIX and `NtQueryInformationFile()`
+  on Windows. If the supplied buffer is too small, the syscall typically returns failure rather
+  than do a partial fill. Most implementations do not support more than 64Kb of extended attribute
+  information per inode so maybe 70Kb is a safe default (to account for the return value storage),
+  however properly written code will detect the buffer being too small and will auto-expand it until
+  success.
+
+  \note On Windows, this is the list of alternate streams on a file, NOT NTFS extended attributes.
+
+  \raceguarantees The list of extended attributes is fetched in a single syscall. This may be an
+  atomically consistent snapshot.
+  */
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
+  result<span<path_view_component>> list_extended_attributes(span<byte> tofill) noexcept;
+
+  /*! \brief Retrieve the value of an extended attribute set on this file or directory.
+
+  \note On Windows, this is the list of alternate streams on a file, NOT NTFS extended attributes.
+  */
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
+  result<span<byte>> get_extended_attribute(span<byte> tofill, path_view_component name) noexcept;
+
+  /*! \brief Sets the value of an extended attribute on this file or directory.
+
+  To prevent collision in a globally visible resource, there is a convention whereby you ought to
+  namespace the names of your values as `namespace.attribute`
+  e.g. `appname.setting` to prevent unintentional collision with other programs. Obviously, do choose
+  a unique `appname` if there is any chance another program might use the same namespace name.
+
+  On POSIX, there are additional namespacing requirements: before your value name, you need to prefix
+  one of `user` or `system`, so the actual name you might set would be `user.appname.propname`.
+  Windows does not have the `user`/`system` prefix requirement, but it does no harm to do the exact
+  same on Windows as on POSIX.
+
+  The host OS and target filing system choose the limits on value size, and will fail accordingly.
+  Some impose a maximum of 64Kb for all names and values per inode, others have a 4Kb maximum
+  value size, there are lots of combinations. You are probably safest not setting many names,
+  and keep the values short.
+
+  \warning Extended attributes are 'brittle' because they can get silently wiped at any moment.
+  Never store anything in extended attributes which cannot be recalculated if missing. The ideal
+  use case for extended attributes is as a cache of additional metadata about a file or
+  directory e.g. "I last checked this directory at timestamp X", or "the MD5 hash at last modified
+  timestamp X for this file was Y". Also remember that other
+  processes can and do arbitrarily modify extended attributes concurrent to you.
+
+  ### Windows only
+
+  This API is implemented as file alternate data streams, rather than the Extended Attributes
+  API as accessed via `NtSetEaFile()` and `NtQueryEaFile()` (which actually modify the file
+  alternate data stream `::$EA` in any case).
+
+  The reason why is that `NtSetEaFile()` can only **append** new records to EA storage. It cannot deallocate
+  any existing EA records, if you try to do so you will get `STATUS_EA_CORRUPT_ERROR`. You can
+  append setting the same name to a different value, which can include a null value which then
+  appears as if the name is no longer there. But there is a cap of 64kB for the EA record, and
+  once it is consumed, it is gone forever for that inode.
+
+  Obviously that doesn't map at all well onto POSIX extended attributes, where you can set the
+  value of an attribute as frequently as you like. The closest equivalent on Windows is therefore
+  file alternate data streams, even though the attribute's value is then worked with as a whole
+  proper file with all the attendant performance consequences.
+
+  As a result, `name` must be a valid filename and not contain any characters not permitted in
+  a filename. We use the NT API here, so the character restrictions are far fewer than for the
+  Win32 API e.g. single character names do NOT cause misoperation like on Win32.
+  */
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
+  result<void> set_extended_attribute(path_view_component name, span<const byte> value) noexcept;
+
+  /*! \brief Removes the extended attribute set on this file or directory.
+   */
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
+  result<void> remove_extended_attribute(path_view_component) noexcept;
+
+#ifdef _WIN32
+  //! Windows only: List all the NTFS extended attributes on a file. See the documentation for `set_extended_attribute()` before use.
+  result<span<std::pair<path_view_component, span<byte>>>> win_list_extended_attributes(span<byte> tofill) noexcept;
+  //! Windows only: Get the values of NTFS extended attributes on a file. See the documentation for `set_extended_attribute()` before use.
+  result<span<std::pair<path_view_component, span<byte>>>> win_get_extended_attributes(span<byte> tofill, span<const path_view_component> names) noexcept;
+  //! Windows only: Set the values of a NTFS extended attributes on a file. See the documentation for `set_extended_attribute()` before use. In particular, note the requirement that you can only _extend_ the attributes list i.e. you must always set whatever the list is already, with additional members.
+  result<void> win_set_extended_attributes(span<std::pair<const path_view_component, span<const byte>>> toset) noexcept;
+#endif
 };
 
 namespace detail
