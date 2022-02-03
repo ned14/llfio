@@ -624,7 +624,7 @@ template&lt;class T , class... Args&gt; </div>
 </ol>
 <p>If <code>known_dirs_remaining</code> exceeds four, a threadpool of not more than <code>threads</code> threads is spun up in order to traverse the hierarchy more quickly.</p>
 <p>This algorithm is therefore primarily a breadth-first algorithm, in that we proceed from root, level by level, to the tips. The number returned is the total number of directories traversed.</p>
-<h2><a class="anchor" id="autotoc_md19"></a>
+<h2><a class="anchor" id="autotoc_md20"></a>
 Notes</h2>
 <p>The implementation tries hard to not open too many file descriptors at a time in order to not exceed the system limit, which may be as low as 1024 on POSIX. On POSIX, it checks <code>getrlimit(RLIMIT_NOFILE)</code> for the soft limit on open file descriptors, and if the remaining unused open file descriptors is less than 65536, it will prefer a slow path implementation which exchanges file descriptor usage for lots more dynamic memory allocation and memory copying. You can force this slow path on any platform using <code>force_slow_path</code>, and in correct code you should always check for failures in <code>directory_open_failed()</code> comparing equal to <code>errc::too_many_files_open</code>, and if encountered restart the traversal using the slow path forced.</p>
 <p>Almost every modern POSIX system allows a <code>RLIMIT_NOFILE</code> of over a million nowadays, so you should <code>setrlimit(RLIMIT_NOFILE)</code> appropriately in your program if you are absolutely sure that doing so will not break code in your program (e.g. <code>select()</code> fails spectacularly if file descriptors exceed 1024 on most POSIX).</p>

@@ -90,6 +90,9 @@ $(document).ready(function(){initNavTree('namespacellfio__v2__xxx_1_1detail.html
 <div class="title">llfio_v2_xxx::detail Namespace Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Obtain a handle to the path <b>currently</b> containing this handle's file entry.  
+<a href="namespacellfio__v2__xxx_1_1detail.html#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
@@ -221,7 +224,7 @@ result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>stat_
 <tr class="separator:a0fc31d7bab5faf3ee82e73854ff798b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Obtain a handle to the path <b>currently</b> containing this handle's file entry.</p>
+<div class="textblock"><p>Obtain a handle to the path <b>currently</b> containing this handle's file entry. </p>
 <dl class="section warning"><dt>Warning</dt><dd>This call is <b>racy</b> and can result in the wrong path handle being returned. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation opens a <code>path_handle</code> to the source containing directory, then checks if the file entry within has the same inode as the open file handle. It will retry this matching until success until the deadline given.</dd></dl>
 <dl class="section user"><dt>Memory Allocations\n Calls current_path() and thus is both expensive and calls malloc many times.</dt><dd></dd></dl>
 <dl class="section see"><dt>See also</dt><dd><code>algorithm::cached_parent_handle_adapter&lt;T&gt;</code> which overrides this with a zero cost implementation, thus making unlinking and relinking very considerably quicker.</dd></dl>
@@ -250,7 +253,8 @@ result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>stat_
   </dd>
 </dl>
 <dl class="section user"><dt>Memory Allocations\n Except on platforms with race free syscalls for renaming open handles (Windows), calls</dt><dd><code>current_path()</code> via <code>parent_path_handle()</code> and thus is both expensive and calls malloc many times.</dd></dl>
-<p>Unlinks the current path of this open handle, causing its entry to immediately disappear from the filing system. On Windows before Windows 10 1709 unless <code>flag::win_disable_unlink_emulation</code> is set, this behaviour is simulated by renaming the file to something random and setting its delete-on-last-close flag. Note that Windows may prevent the renaming of a file in use by another process, if so it will NOT be renamed. After the next handle to that file closes, it will become permanently unopenable by anyone else until the last handle is closed, whereupon the entry will be eventually removed by the operating system.</p>
+<p>Unlinks the current path of this open handle, causing its entry to immediately disappear from the filing system.</p>
+<p>On Windows before Windows 10 1709 unless <code>flag::win_disable_unlink_emulation</code> is set, this behaviour is simulated by renaming the file to something random and setting its delete-on-last-close flag. Note that Windows may prevent the renaming of a file in use by another process, if so it will NOT be renamed. After the next handle to that file closes, it will become permanently unopenable by anyone else until the last handle is closed, whereupon the entry will be eventually removed by the operating system.</p>
 <dl class="section warning"><dt>Warning</dt><dd>Some operating systems provide a race free syscall for unlinking an open handle (Windows). On all other operating systems this call is <b>racy</b> and can result in the wrong file entry being unlinked. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation opens a <code>path_handle</code> to the containing directory first, then checks that the item about to be unlinked has the same inode as the open file handle. It will retry this matching until success until the deadline given. This should prevent most unmalicious accidental loss of data.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -258,7 +262,26 @@ result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>stat_
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Memory Allocations\n Except on platforms with race free syscalls for unlinking open handles (Windows), calls</dt><dd><code>current_path()</code> and thus is both expensive and calls malloc many times. On Windows, also calls <code>current_path()</code> if <code>flag::disable_safety_unlinks</code> is not set. </dd></dl>
+<dl class="section user"><dt>Memory Allocations\n Except on platforms with race free syscalls for unlinking open handles (Windows), calls</dt><dd><code>current_path()</code> and thus is both expensive and calls malloc many times. On Windows, also calls <code>current_path()</code> if <code>flag::disable_safety_unlinks</code> is not set.</dd></dl>
+<p>Fill the supplied buffer with the names of all extended attributes set on this file or directory, returning a span of pairs of path view components and values into that buffer.</p>
+<p>Note that this routine is a very thin wrap of <code>listxattr()</code> on POSIX and <code>NtQueryInformationFile()</code> on Windows. If the supplied buffer is too small, the syscall typically returns failure rather than do a partial fill. Most implementations do not support more than 64Kb of extended attribute information per inode so maybe 70Kb is a safe default (to account for the return value storage), however properly written code will detect the buffer being too small and will auto-expand it until success.</p>
+<dl class="section note"><dt>Note</dt><dd>On Windows, this is the list of alternate streams on a file, NOT NTFS extended attributes.</dd></dl>
+<p>\raceguarantees The list of extended attributes is fetched in a single syscall. This may be an atomically consistent snapshot.</p>
+<p>Retrieve the value of an extended attribute set on this file or directory.</p>
+<dl class="section note"><dt>Note</dt><dd>On Windows, this is the list of alternate streams on a file, NOT NTFS extended attributes.</dd></dl>
+<p>Sets the value of an extended attribute on this file or directory.</p>
+<p>To prevent collision in a globally visible resource, there is a convention whereby you ought to namespace the names of your values as <code>namespace.attribute</code> e.g. <code>appname.setting</code> to prevent unintentional collision with other programs. Obviously, do choose a unique <code>appname</code> if there is any chance another program might use the same namespace name.</p>
+<p>On POSIX, there are additional namespacing requirements: before your value name, you need to prefix one of <code>user</code> or <code>system</code>, so the actual name you might set would be <code>user.appname.propname</code>. Windows does not have the <code>user</code>/<code>system</code> prefix requirement, but it does no harm to do the exact same on Windows as on POSIX.</p>
+<p>The host OS and target filing system choose the limits on value size, and will fail accordingly. Some impose a maximum of 64Kb for all names and values per inode, others have a 4Kb maximum value size, there are lots of combinations. You are probably safest not setting many names, and keep the values short.</p>
+<dl class="section warning"><dt>Warning</dt><dd>Extended attributes are 'brittle' because they can get silently wiped at any moment. Never store anything in extended attributes which cannot be recalculated if missing. The ideal use case for extended attributes is as a cache of additional metadata about a file or directory e.g. "I last checked this directory at timestamp X", or "the MD5 hash at last modified
+timestamp X for this file was Y". Also remember that other processes can and do arbitrarily modify extended attributes concurrent to you.</dd></dl>
+<h3><a class="anchor" id="autotoc_md8"></a>
+Windows only</h3>
+<p>This API is implemented as file alternate data streams, rather than the Extended Attributes API as accessed via <code>NtSetEaFile()</code> and <code>NtQueryEaFile()</code> (which actually modify the file alternate data stream <code>$EA</code> in any case).</p>
+<p>The reason why is that <code>NtSetEaFile()</code> can only <b>append</b> new records to EA storage. It cannot deallocate any existing EA records, if you try to do so you will get <code>STATUS_EA_CORRUPT_ERROR</code>. You can append setting the same name to a different value, which can include a null value which then appears as if the name is no longer there. But there is a cap of 64kB for the EA record, and once it is consumed, it is gone forever for that inode.</p>
+<p>Obviously that doesn't map at all well onto POSIX extended attributes, where you can set the value of an attribute as frequently as you like. The closest equivalent on Windows is therefore file alternate data streams, even though the attribute's value is then worked with as a whole proper file with all the attendant performance consequences.</p>
+<p>As a result, <code>name</code> must be a valid filename and not contain any characters not permitted in a filename. We use the NT API here, so the character restrictions are far fewer than for the Win32 API e.g. single character names do NOT cause misoperation like on Win32.</p>
+<p>Removes the extended attribute set on this file or directory. </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

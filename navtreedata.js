@@ -24,16 +24,16 @@ var NAVTREE =
 [
   [ "LLFIO", "index.html", [
     [ "Build instructions", "md__build.html", [
-      [ "v2 architecture and design implemented:", "index.html#autotoc_md20", null ],
-      [ "Planned features implemented:", "index.html#autotoc_md21", null ],
-      [ "Install from the vcpkg package manager", "md__build.html#autotoc_md23", null ],
-      [ "Prebuilt binaries", "md__build.html#autotoc_md24", null ],
-      [ "Get a copy of the source", "md__build.html#autotoc_md25", [
-        [ "If you already cloned before reading this", "md__build.html#autotoc_md26", null ]
+      [ "v2 architecture and design implemented:", "index.html#autotoc_md21", null ],
+      [ "Planned features implemented:", "index.html#autotoc_md22", null ],
+      [ "Install from the vcpkg package manager", "md__build.html#autotoc_md24", null ],
+      [ "Prebuilt binaries", "md__build.html#autotoc_md25", null ],
+      [ "Get a copy of the source", "md__build.html#autotoc_md26", [
+        [ "If you already cloned before reading this", "md__build.html#autotoc_md27", null ]
       ] ],
-      [ "Build static libraries from source", "md__build.html#autotoc_md27", null ],
-      [ "Build shared libraries from source", "md__build.html#autotoc_md28", null ],
-      [ "Installing libraries from source", "md__build.html#autotoc_md29", null ]
+      [ "Build static libraries from source", "md__build.html#autotoc_md28", null ],
+      [ "Build shared libraries from source", "md__build.html#autotoc_md29", null ],
+      [ "Installing libraries from source", "md__build.html#autotoc_md30", null ]
     ] ],
     [ "Todo List", "todo.html", null ],
     [ "Modules", "modules.html", "modules" ],

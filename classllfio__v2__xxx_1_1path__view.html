@@ -417,7 +417,7 @@ LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom
 <li>POSIX: The native platform encoding is assumed to be UTF-8. If the input is <code>char8_t</code> or <code>char</code>, it is not translated. If the input is <code>char16_t</code>, a UTF-16 to UTF-8 translation is performed.</li>
 <li>Microsoft Windows: The native platform encoding is assumed to be UTF-16. If the input is <code>char16_t</code> or <code>wchar_t</code>, it is not translated. If the input is <code>char8_t</code>, a UTF-8 to UTF-16 translation is performed. If the input is <code>char</code>, the Microsoft Windows API for ANSI to UTF-16 translation is invoked in order to match how Windows ANSI APIs are mapped onto the Windows Unicode APIs (be aware this is very slow).</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md17"></a>
+<h1><a class="anchor" id="autotoc_md18"></a>
 Windows specific notes:</h1>
 <p>On Microsoft Windows, filesystem paths may require to be zero terminated, or they may not. Which is the case depends on whether LLFIO calls the NT kernel API directly rather than the Win32 API. As a general rule as to when which is used, the NT kernel API is called instead of the Win32 API when:</p>
 <ul>
@@ -598,9 +598,9 @@ template&lt;class T  = typename filesystem::path::value_type, class AllocatorOrD
 </table>
 </div><div class="memdoc">
 <p>Implicitly constructs a path view from a path. The input path MUST continue to exist for this view to be valid (DEVIATES from P1030 due to filesystem::path not exposing its path formatting). </p>
-<div class="fragment"><div class="line"><a name="l01703"></a><span class="lineno"> 1703</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(v, fmt)</div>
-<div class="line"><a name="l01704"></a><span class="lineno"> 1704</span>&#160;  {</div>
-<div class="line"><a name="l01705"></a><span class="lineno"> 1705</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l01705"></a><span class="lineno"> 1705</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(v, fmt)</div>
+<div class="line"><a name="l01706"></a><span class="lineno"> 1706</span>&#160;  {</div>
+<div class="line"><a name="l01707"></a><span class="lineno"> 1707</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -650,9 +650,9 @@ template&lt;class T  = typename filesystem::path::value_type, class AllocatorOrD
 </table>
 </div><div class="memdoc">
 <p>Constructs from a lengthed array of one of <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. The input string MUST continue to exist for this view to be valid. </p>
-<div class="fragment"><div class="line"><a name="l01720"></a><span class="lineno"> 1720</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, l, zt, fmt)</div>
-<div class="line"><a name="l01721"></a><span class="lineno"> 1721</span>&#160;  {</div>
-<div class="line"><a name="l01722"></a><span class="lineno"> 1722</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l01722"></a><span class="lineno"> 1722</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, l, zt, fmt)</div>
+<div class="line"><a name="l01723"></a><span class="lineno"> 1723</span>&#160;  {</div>
+<div class="line"><a name="l01724"></a><span class="lineno"> 1724</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -702,9 +702,9 @@ template&lt;class T  = typename filesystem::path::value_type, class AllocatorOrD
 </table>
 </div><div class="memdoc">
 <p>Constructs from a lengthed array of one of <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. The input string MUST continue to exist for this view to be valid. </p>
-<div class="fragment"><div class="line"><a name="l01727"></a><span class="lineno"> 1727</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, l, zt, fmt)</div>
-<div class="line"><a name="l01728"></a><span class="lineno"> 1728</span>&#160;  {</div>
-<div class="line"><a name="l01729"></a><span class="lineno"> 1729</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l01729"></a><span class="lineno"> 1729</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, l, zt, fmt)</div>
+<div class="line"><a name="l01730"></a><span class="lineno"> 1730</span>&#160;  {</div>
+<div class="line"><a name="l01731"></a><span class="lineno"> 1731</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -754,9 +754,9 @@ template&lt;class T  = typename filesystem::path::value_type, class AllocatorOrD
 </table>
 </div><div class="memdoc">
 <p>Constructs from a lengthed array of one of <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. The input string MUST continue to exist for this view to be valid. </p>
-<div class="fragment"><div class="line"><a name="l01734"></a><span class="lineno"> 1734</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, l, zt, fmt)</div>
-<div class="line"><a name="l01735"></a><span class="lineno"> 1735</span>&#160;  {</div>
-<div class="line"><a name="l01736"></a><span class="lineno"> 1736</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l01736"></a><span class="lineno"> 1736</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, l, zt, fmt)</div>
+<div class="line"><a name="l01737"></a><span class="lineno"> 1737</span>&#160;  {</div>
+<div class="line"><a name="l01738"></a><span class="lineno"> 1738</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -806,9 +806,9 @@ template&lt;class T  = typename filesystem::path::value_type, class AllocatorOrD
 </table>
 </div><div class="memdoc">
 <p>Constructs from a lengthed array of one of <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. The input string MUST continue to exist for this view to be valid. </p>
-<div class="fragment"><div class="line"><a name="l01741"></a><span class="lineno"> 1741</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, l, zt, fmt)</div>
-<div class="line"><a name="l01742"></a><span class="lineno"> 1742</span>&#160;  {</div>
-<div class="line"><a name="l01743"></a><span class="lineno"> 1743</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l01743"></a><span class="lineno"> 1743</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, l, zt, fmt)</div>
+<div class="line"><a name="l01744"></a><span class="lineno"> 1744</span>&#160;  {</div>
+<div class="line"><a name="l01745"></a><span class="lineno"> 1745</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -852,9 +852,9 @@ template&lt;class T  = typename filesystem::path::value_type, class AllocatorOrD
 </table>
 </div><div class="memdoc">
 <p>Constructs from a lengthed array of <code>byte</code>. The input array MUST continue to exist for this view to be valid. </p>
-<div class="fragment"><div class="line"><a name="l01748"></a><span class="lineno"> 1748</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, l, zt)</div>
-<div class="line"><a name="l01749"></a><span class="lineno"> 1749</span>&#160;  {</div>
-<div class="line"><a name="l01750"></a><span class="lineno"> 1750</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l01750"></a><span class="lineno"> 1750</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, l, zt)</div>
+<div class="line"><a name="l01751"></a><span class="lineno"> 1751</span>&#160;  {</div>
+<div class="line"><a name="l01752"></a><span class="lineno"> 1752</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -902,9 +902,9 @@ template&lt;class T  = typename filesystem::path::value_type, class AllocatorOrD
 </table>
 </div><div class="memdoc">
 <p>Constructs from a basic string if the character type is one of <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. </p>
-<div class="fragment"><div class="line"><a name="l01713"></a><span class="lineno"> 1713</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(v.data(), v.size(), <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732ead0eba8da8c1d0dab5c4196d6bbcc37a6">zero_terminated</a>, fmt)</div>
-<div class="line"><a name="l01714"></a><span class="lineno"> 1714</span>&#160;  {</div>
-<div class="line"><a name="l01715"></a><span class="lineno"> 1715</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l01715"></a><span class="lineno"> 1715</span>&#160;      : <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(v.data(), v.size(), <a class="code" href="classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732ead0eba8da8c1d0dab5c4196d6bbcc37a6">zero_terminated</a>, fmt)</div>
+<div class="line"><a name="l01716"></a><span class="lineno"> 1716</span>&#160;  {</div>
+<div class="line"><a name="l01717"></a><span class="lineno"> 1717</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
