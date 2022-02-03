@@ -24,7 +24,7 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
 set(LLFIO_DEPENDENCY_QUICKCPPLIB_GIT_TAG "master" CACHE STRING "Which git tag to use for the QuickCppLib dependency")
-set(LLFIO_DEPENDENCY_OUTCOME_GIT_TAG "master" CACHE STRING "Which git tag to use for the Outcome dependency")
+set(LLFIO_DEPENDENCY_OUTCOME_GIT_TAG "develop" CACHE STRING "Which git tag to use for the Outcome dependency")
 if(NOT LLFIO_DEPENDENCY_QUICKCPPLIB_GIT_TAG STREQUAL "master")
   # Don't reuse the bootstrapped git clone as the dependency itself
   if(CMAKE_BINARY_DIR)

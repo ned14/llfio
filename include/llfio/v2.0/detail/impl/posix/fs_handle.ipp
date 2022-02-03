@@ -457,7 +457,12 @@ result<span<byte>> fs_handle::get_extended_attribute(span<byte> tofill, path_vie
   LLFIO_LOG_FUNCTION_CALL(&h);
 #if defined(__linux__) || defined(__APPLE__)
   path_view::zero_terminated_rendered_path<> zname(name);
-  auto readed = fgetxattr(h.native_handle().fd, zname.c_str(), tofill.data(), tofill.size());
+  auto readed = fgetxattr(h.native_handle().fd, zname.c_str(), tofill.data(), tofill.size()
+#ifdef __APPLE__
+                                                                              ,
+                          0, 0
+#endif
+  );
   if(readed < 0)
   {
     return posix_error();
