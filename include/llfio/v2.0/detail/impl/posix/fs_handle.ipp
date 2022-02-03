@@ -383,7 +383,12 @@ result<span<path_view_component>> fs_handle::list_extended_attributes(span<byte>
   auto &h = _get_handle();
   LLFIO_LOG_FUNCTION_CALL(&h);
 #if defined(__linux__) || defined(__APPLE__)
-  auto readed = flistxattr(h.native_handle().fd, (char *) tofill.data(), tofill.size());
+  auto readed = flistxattr(h.native_handle().fd, (char *) tofill.data(), tofill.size()
+#ifdef __APPLE__
+                                                                         ,
+                           0
+#endif
+  );
   if(readed < 0)
   {
     return posix_error();
@@ -478,7 +483,11 @@ result<void> fs_handle::set_extended_attribute(path_view_component name, span<co
   LLFIO_LOG_FUNCTION_CALL(&h);
 #if defined(__linux__) || defined(__APPLE__)
   path_view::zero_terminated_rendered_path<> zname(name);
-  if(-1 == fsetxattr(h.native_handle().fd, zname.c_str(), value.data(), value.size(), 0))
+  if(-1 == fsetxattr(h.native_handle().fd, zname.c_str(), value.data(), value.size(),
+#ifdef __APPLE__
+                     0,
+#endif
+                     0))
   {
     return posix_error();
   }
@@ -507,7 +516,12 @@ result<void> fs_handle::remove_extended_attribute(path_view_component name) noex
   LLFIO_LOG_FUNCTION_CALL(&h);
 #if defined(__linux__) || defined(__APPLE__)
   path_view::zero_terminated_rendered_path<> zname(name);
-  auto written = fremovexattr(h.native_handle().fd, zname.c_str());
+  auto written = fremovexattr(h.native_handle().fd, zname.c_str()
+#ifdef __APPLE_
+                                                    ,
+                              0
+#endif
+  );
   if(written < 0)
   {
     return posix_error();
