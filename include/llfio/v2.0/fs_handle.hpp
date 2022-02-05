@@ -359,8 +359,9 @@ public:
 
   LLFIO_DEADLINE_TRY_FOR_UNTIL(unlink)
 
+
   /*! \brief Fill the supplied buffer with the names of all extended attributes set on this file or directory,
-  returning a span of pairs of path view components and values into that buffer.
+  returning a span of path view components.
 
   Note that this routine is a very thin wrap of `listxattr()` on POSIX and `NtQueryInformationFile()`
   on Windows. If the supplied buffer is too small, the syscall typically returns failure rather
@@ -375,14 +376,14 @@ public:
   atomically consistent snapshot.
   */
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
-  result<span<path_view_component>> list_extended_attributes(span<byte> tofill) noexcept;
+  result<span<path_view_component>> list_extended_attributes(span<byte> tofill) const noexcept;
 
   /*! \brief Retrieve the value of an extended attribute set on this file or directory.
 
   \note On Windows, this is the list of alternate streams on a file, NOT NTFS extended attributes.
   */
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
-  result<span<byte>> get_extended_attribute(span<byte> tofill, path_view_component name) noexcept;
+  result<span<byte>> get_extended_attribute(span<byte> tofill, path_view_component name) const noexcept;
 
   /*! \brief Sets the value of an extended attribute on this file or directory.
 
@@ -433,16 +434,62 @@ public:
   result<void> set_extended_attribute(path_view_component name, span<const byte> value) noexcept;
 
   /*! \brief Removes the extended attribute set on this file or directory.
-   */
+
+  \note On Windows, this is the list of alternate streams on a file, NOT NTFS extended attributes.
+  We do not prevent you trying to remove internal alternate streams, either.
+  */
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
   result<void> remove_extended_attribute(path_view_component) noexcept;
+
+  /*! \brief Copies the extended attributes from one entity to another, optionally replacing
+  all the extended attributes on the destination.
+
+  This convenience function is implemented using the APIs above, and therefore is racy with
+  respect to concurrent users. If you specifiy an invalid source with `replace_all_local_attributes = true`,
+  then this is a convenient way to remove all extended attributes on the local inode.
+
+  \note This function uses 130Kb of stack and cannot handle attribute values larger than 64Kb.
+  */
+  result<size_t> copy_extended_attributes(const fs_handle &src, bool replace_all_local_attributes = false) noexcept
+  {
+    auto &h = _get_handle();
+    LLFIO_LOG_FUNCTION_CALL(&h);
+    byte buffer[65536 + 4096];
+    if(replace_all_local_attributes)
+    {
+      for(;;)
+      {
+        OUTCOME_TRY(auto &&attribs, list_extended_attributes(buffer));
+        if(attribs.empty())
+        {
+          break;
+        }
+        for(auto &attrib : attribs)
+        {
+          OUTCOME_TRY(remove_extended_attribute(attrib));
+        }
+      }
+    }
+    if(src._get_handle().is_valid())
+    {
+      OUTCOME_TRY(auto &&attribs, src.list_extended_attributes(buffer));
+      for(auto &attrib : attribs)
+      {
+        byte buffer2[65536];
+        OUTCOME_TRY(auto &&value, src.get_extended_attribute(buffer2, attrib));
+        OUTCOME_TRY(set_extended_attribute(attrib, value));
+      }
+    }
+    return success();
+  }
 
 #ifdef _WIN32
   //! Windows only: List all the NTFS extended attributes on a file. See the documentation for `set_extended_attribute()` before use.
   result<span<std::pair<path_view_component, span<byte>>>> win_list_extended_attributes(span<byte> tofill) noexcept;
   //! Windows only: Get the values of NTFS extended attributes on a file. See the documentation for `set_extended_attribute()` before use.
   result<span<std::pair<path_view_component, span<byte>>>> win_get_extended_attributes(span<byte> tofill, span<const path_view_component> names) noexcept;
-  //! Windows only: Set the values of a NTFS extended attributes on a file. See the documentation for `set_extended_attribute()` before use. In particular, note the requirement that you can only _extend_ the attributes list i.e. you must always set whatever the list is already, with additional members.
+  //! Windows only: Set the values of a NTFS extended attributes on a file. See the documentation for `set_extended_attribute()` before use. In particular, note
+  //! the requirement that you can only _extend_ the attributes list i.e. you must always set whatever the list is already, with additional members.
   result<void> win_set_extended_attributes(span<std::pair<const path_view_component, span<const byte>>> toset) noexcept;
 #endif
 };

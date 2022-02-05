@@ -474,7 +474,7 @@ namespace detail
   }
 }  // namespace detail
 
-result<span<path_view_component>> fs_handle::list_extended_attributes(span<byte> tofill) noexcept
+result<span<path_view_component>> fs_handle::list_extended_attributes(span<byte> tofill) const noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -559,7 +559,7 @@ result<span<path_view_component>> fs_handle::list_extended_attributes(span<byte>
   return filled;
 }
 
-result<span<byte>> fs_handle::get_extended_attribute(span<byte> tofill, path_view_component name) noexcept
+result<span<byte>> fs_handle::get_extended_attribute(span<byte> tofill, path_view_component name) const noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -585,7 +585,45 @@ result<void> fs_handle::set_extended_attribute(path_view_component name, span<co
   using namespace windows_nt_kernel;
   auto &h = _get_handle();
   LLFIO_LOG_FUNCTION_CALL(&h);
-  OUTCOME_TRY(auto &&attribh, detail::create_alternate_stream(h, name, handle::mode::write, handle::creation::always_new));
+
+  /* To correctly emulate POSIX extended attributes, we must prevent any chance of torn reads, so
+  we firstly write the attribute's value into a randomly named alternate stream, and then atomically
+  rename it over the destination attribute. From the perspective of any concurrent attribute queryers,
+  the value will atomically update.
+  */
+  handle attribh;
+  try
+  {
+    for(;;)
+    {
+      auto randomname = utils::random_string(32);
+      result<handle> ret = detail::create_alternate_stream(h, randomname, handle::mode::write, handle::creation::only_if_not_exist);
+      if(ret)
+      {
+        attribh = std::move(ret).assume_value();
+        break;
+      }
+      else if(ret.error() != errc::file_exists)
+      {
+        OUTCOME_TRY(std::move(ret));
+      }
+    }
+  }
+  catch(...)
+  {
+    return error_from_exception();
+  }
+  auto unattribh = QUICKCPPLIB_NAMESPACE::scope::make_scope_exit(
+  [&]() noexcept
+  {
+    // Mark the item as delete on close
+    IO_STATUS_BLOCK isb = make_iostatus();
+    FILE_DISPOSITION_INFORMATION fdi{};
+    memset(&fdi, 0, sizeof(fdi));
+    fdi._DeleteFile = 1u;
+    (void) NtSetInformationFile(attribh.native_handle().h, &isb, &fdi, sizeof(fdi), FileDispositionInformation);
+  });
+
   IO_STATUS_BLOCK isb = make_iostatus();
   NTSTATUS ntstat = NtWriteFile(attribh.native_handle().h, nullptr, nullptr, nullptr, &isb, (PVOID) value.data(), (ULONG) value.size(), nullptr, nullptr);
   if(STATUS_PENDING == ntstat)
@@ -600,6 +638,43 @@ result<void> fs_handle::set_extended_attribute(path_view_component name, span<co
   {
     return errc::no_space_on_device;
   }
+
+  // We need to prepend a ':', so this gets handled a little different
+  path_view::zero_terminated_rendered_path<> zpath(
+  [&]() -> path_view::zero_terminated_rendered_path<>
+  {
+    return visit(name,
+                 [&](auto sv) -> path_view::zero_terminated_rendered_path<>
+                 {
+                   using sv_type = std::decay_t<decltype(sv)>;
+                   using value_type = typename sv_type::value_type;
+                   auto *buffer = (value_type *) alloca((sv.size() + 1) * sizeof(value_type));
+                   buffer[0] = ':';
+                   memcpy(buffer + 1, sv.data(), sv.size() * sizeof(value_type));
+                   // Force an immediate render into the internal buffer
+                   return path_view::zero_terminated_rendered_path<>(path_view(buffer, sv.size() + 1, path_view::not_zero_terminated));
+                 });
+  }());
+  UNICODE_STRING _path{};
+  _path.Buffer = const_cast<wchar_t *>(zpath.data());
+  _path.MaximumLength = (_path.Length = static_cast<USHORT>(zpath.size() * sizeof(wchar_t))) + sizeof(wchar_t);
+  isb = make_iostatus();
+  alignas(8) char buffer[sizeof(FILE_RENAME_INFORMATION) + 65536];
+  auto *fni = reinterpret_cast<FILE_RENAME_INFORMATION *>(buffer);
+  fni->Flags = (0x1 /*FILE_RENAME_REPLACE_IF_EXISTS*/ | 0x2 /*FILE_RENAME_POSIX_SEMANTICS*/);
+  fni->RootDirectory = nullptr; // Apparently this must be nullptr, not h.native_handle().h
+  fni->FileNameLength = _path.Length;
+  memcpy(fni->FileName, _path.Buffer, fni->FileNameLength);
+  ntstat = NtSetInformationFile(attribh.native_handle().h, &isb, fni, sizeof(FILE_RENAME_INFORMATION) + fni->FileNameLength, FileRenameInformation);
+  if(STATUS_PENDING == ntstat)
+  {
+    ntstat = ntwait(attribh.native_handle().h, isb, deadline());
+  }
+  if(ntstat < 0)
+  {
+    return ntkernel_error(ntstat);
+  }
+  unattribh.release();
   return success();
 }
 

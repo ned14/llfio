@@ -27,71 +27,84 @@ Distributed under the Boost Software License, Version 1.0.
 static inline void TestExtendedAttributes()
 {
   namespace llfio = LLFIO_V2_NAMESPACE;
-  llfio::byte buffer[65536];
+  auto runtest = [](llfio::fs_handle &fh)
+  {
+    llfio::byte buffer[65536];
+#ifdef _WIN32
+    static const llfio::path_view_component name[] = {L"user.llfiotest.name2", L"user.llfiotest.name1", L"user.llfiotest.name3"};
+#else
+    static const llfio::path_view_component name[] = {"user.llfiotest.name2", "user.llfiotest.name1", "user.llfiotest.name3"};
+#endif
+    {
+      auto attribs = fh.list_extended_attributes(buffer).value();
+      if(!attribs.empty())
+      {
+        std::cout << "The preexisting attributes on a newly created entity are:\n";
+        for(auto &i : attribs)
+        {
+          std::cout << "\n   " << i;
+        }
+        std::cout << std::endl;
+      }
+      BOOST_CHECK(attribs.size() == 0);
+    }
+    {
+      fh.set_extended_attribute(name[2], llfio::span<const llfio::byte>{(const llfio::byte *) "I love you!", 11}).value();
+    }
+    {
+      auto attribs = fh.list_extended_attributes(buffer).value();
+      BOOST_REQUIRE(attribs.size() == 1);
+      BOOST_CHECK(attribs.end() == std::find_if(attribs.begin(), attribs.end(), [](const auto &i) { return i == name[0]; }));
+      BOOST_CHECK(attribs.end() == std::find_if(attribs.begin(), attribs.end(), [](const auto &i) { return i == name[1]; }));
+      BOOST_CHECK(attribs.end() != std::find_if(attribs.begin(), attribs.end(), [](const auto &i) { return i == name[2]; }));
+    }
+    {
+      fh.set_extended_attribute(name[0], llfio::span<const llfio::byte>{(const llfio::byte *) "World", 5}).value();
+      fh.set_extended_attribute(name[1], llfio::span<const llfio::byte>{(const llfio::byte *) "Hello", 5}).value();
+    }
+    {
+      auto attribs = fh.list_extended_attributes(buffer).value();
+      BOOST_REQUIRE(attribs.size() == 3);
+      BOOST_CHECK(attribs.end() != std::find_if(attribs.begin(), attribs.end(), [](const auto &i) { return i == name[0]; }));
+      BOOST_CHECK(attribs.end() != std::find_if(attribs.begin(), attribs.end(), [](const auto &i) { return i == name[1]; }));
+      BOOST_CHECK(attribs.end() != std::find_if(attribs.begin(), attribs.end(), [](const auto &i) { return i == name[2]; }));
+    }
+    {
+      auto value1 = fh.get_extended_attribute(buffer, name[1]).value();
+      BOOST_REQUIRE(value1.size() == 5);
+      BOOST_CHECK(0 == memcmp(value1.data(), "Hello", 5));
+      auto value2 = fh.get_extended_attribute(buffer, name[0]).value();
+      BOOST_REQUIRE(value2.size() == 5);
+      BOOST_CHECK(0 == memcmp(value2.data(), "World", 5));
+      auto value3 = fh.get_extended_attribute(buffer, name[2]).value();
+      BOOST_REQUIRE(value3.size() == 11);
+      BOOST_CHECK(0 == memcmp(value3.data(), "I love you!", 11));
+    }
+    {
+      fh.remove_extended_attribute(name[0]).value();
+      auto attribs = fh.list_extended_attributes(buffer).value();
+      BOOST_REQUIRE(attribs.size() == 2);
+      BOOST_CHECK(attribs.end() == std::find_if(attribs.begin(), attribs.end(), [](const auto &i) { return i == name[0]; }));
+      BOOST_CHECK(attribs.end() != std::find_if(attribs.begin(), attribs.end(), [](const auto &i) { return i == name[1]; }));
+      BOOST_CHECK(attribs.end() != std::find_if(attribs.begin(), attribs.end(), [](const auto &i) { return i == name[2]; }));
+    }
+  };
 #if 0
   auto fh = llfio::file_handle::uniquely_named_file(llfio::path_discovery::storage_backed_temporary_files_directory()).value();
 #else
   auto fh = llfio::file_handle::temp_file().value();
 #endif
   std::cout << "NOTE: The temporary file for this test can be found at " << fh.current_path().value() << std::endl;
-#ifdef _WIN32
-  static const llfio::path_view_component name[] = {L"user.llfiotest.name2", L"user.llfiotest.name1", L"user.llfiotest.name3"};
+  runtest(fh);
+
+#if 0
+  auto dh = llfio::directory_handle::uniquely_named_directory(llfio::path_discovery::storage_backed_temporary_files_directory()).value();
 #else
-  static const llfio::path_view_component name[] = {"user.llfiotest.name2", "user.llfiotest.name1", "user.llfiotest.name3"};
+  auto dh = llfio::directory_handle::temp_directory().value();
 #endif
-  {
-    auto attribs = fh.list_extended_attributes(buffer).value();
-    if(!attribs.empty())
-    {
-      std::cout << "The preexisting attributes on a newly created file are:\n";
-      for(auto &i : attribs)
-      {
-        std::cout << "\n   " << i;
-      }
-      std::cout << std::endl;
-    }
-    BOOST_CHECK(attribs.size() == 0);
-  }
-  {
-    fh.set_extended_attribute(name[2], llfio::span<const llfio::byte>{(const llfio::byte *) "I love you!", 11}).value();
-  }
-  {
-    auto attribs = fh.list_extended_attributes(buffer).value();
-    BOOST_REQUIRE(attribs.size() == 1);
-    BOOST_CHECK(attribs.end() == std::find_if(attribs.begin(), attribs.end(), [](const auto &i) { return i == name[0]; }));
-    BOOST_CHECK(attribs.end() == std::find_if(attribs.begin(), attribs.end(), [](const auto &i) { return i == name[1]; }));
-    BOOST_CHECK(attribs.end() != std::find_if(attribs.begin(), attribs.end(), [](const auto &i) { return i == name[2]; }));
-  }
-  {
-    fh.set_extended_attribute(name[0], llfio::span<const llfio::byte>{(const llfio::byte *) "World", 5}).value();
-    fh.set_extended_attribute(name[1], llfio::span<const llfio::byte>{(const llfio::byte *) "Hello", 5}).value();
-  }
-  {
-    auto attribs = fh.list_extended_attributes(buffer).value();
-    BOOST_REQUIRE(attribs.size() == 3);
-    BOOST_CHECK(attribs.end() != std::find_if(attribs.begin(), attribs.end(), [](const auto &i) { return i == name[0]; }));
-    BOOST_CHECK(attribs.end() != std::find_if(attribs.begin(), attribs.end(), [](const auto &i) { return i == name[1]; }));
-    BOOST_CHECK(attribs.end() != std::find_if(attribs.begin(), attribs.end(), [](const auto &i) { return i == name[2]; }));
-  }
-  {
-    auto value1 = fh.get_extended_attribute(buffer, name[1]).value();
-    BOOST_REQUIRE(value1.size() == 5);
-    BOOST_CHECK(0 == memcmp(value1.data(), "Hello", 5));
-    auto value2 = fh.get_extended_attribute(buffer, name[0]).value();
-    BOOST_REQUIRE(value2.size() == 5);
-    BOOST_CHECK(0 == memcmp(value2.data(), "World", 5));
-    auto value3 = fh.get_extended_attribute(buffer, name[2]).value();
-    BOOST_REQUIRE(value3.size() == 11);
-    BOOST_CHECK(0 == memcmp(value3.data(), "I love you!", 11));
-  }
-  {
-    fh.remove_extended_attribute(name[0]).value();
-    auto attribs = fh.list_extended_attributes(buffer).value();
-    BOOST_REQUIRE(attribs.size() == 2);
-    BOOST_CHECK(attribs.end() == std::find_if(attribs.begin(), attribs.end(), [](const auto &i) { return i == name[0]; }));
-    BOOST_CHECK(attribs.end() != std::find_if(attribs.begin(), attribs.end(), [](const auto &i) { return i == name[1]; }));
-    BOOST_CHECK(attribs.end() != std::find_if(attribs.begin(), attribs.end(), [](const auto &i) { return i == name[2]; }));
-  }
+  std::cout << "NOTE: The temporary directory for this test can be found at " << dh.current_path().value() << std::endl;
+  runtest(dh);
+  (void) dh.unlink();
 }
 
 KERNELTEST_TEST_KERNEL(integration, llfio, extended_attributes, works, "Tests that extended_attributes() works as expected", TestExtendedAttributes())

@@ -70,6 +70,7 @@ set(llfio_HEADERS
   "include/llfio/v2.0/detail/impl/windows/byte_io_handle.ipp"
   "include/llfio/v2.0/detail/impl/windows/byte_io_multiplexer.ipp"
   "include/llfio/v2.0/detail/impl/windows/byte_socket_handle.ipp"
+  "include/llfio/v2.0/detail/impl/windows/byte_socket_sources/schannel.ipp"
   "include/llfio/v2.0/detail/impl/windows/directory_handle.ipp"
   "include/llfio/v2.0/detail/impl/windows/file_handle.ipp"
   "include/llfio/v2.0/detail/impl/windows/fs_handle.ipp"

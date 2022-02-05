@@ -378,7 +378,7 @@ result<void> fs_handle::unlink(deadline d) noexcept
   return success();
 }
 
-result<span<path_view_component>> fs_handle::list_extended_attributes(span<byte> tofill) noexcept
+result<span<path_view_component>> fs_handle::list_extended_attributes(span<byte> tofill) const noexcept
 {
   auto &h = _get_handle();
   LLFIO_LOG_FUNCTION_CALL(&h);
@@ -451,7 +451,7 @@ result<span<path_view_component>> fs_handle::list_extended_attributes(span<byte>
 #endif
 }
 
-result<span<byte>> fs_handle::get_extended_attribute(span<byte> tofill, path_view_component name) noexcept
+result<span<byte>> fs_handle::get_extended_attribute(span<byte> tofill, path_view_component name) const noexcept
 {
   auto &h = _get_handle();
   LLFIO_LOG_FUNCTION_CALL(&h);
