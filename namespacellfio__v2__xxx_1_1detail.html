@@ -263,7 +263,7 @@ result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>stat_
   </dd>
 </dl>
 <dl class="section user"><dt>Memory Allocations\n Except on platforms with race free syscalls for unlinking open handles (Windows), calls</dt><dd><code>current_path()</code> and thus is both expensive and calls malloc many times. On Windows, also calls <code>current_path()</code> if <code>flag::disable_safety_unlinks</code> is not set.</dd></dl>
-<p>Fill the supplied buffer with the names of all extended attributes set on this file or directory, returning a span of pairs of path view components and values into that buffer.</p>
+<p>Fill the supplied buffer with the names of all extended attributes set on this file or directory, returning a span of path view components.</p>
 <p>Note that this routine is a very thin wrap of <code>listxattr()</code> on POSIX and <code>NtQueryInformationFile()</code> on Windows. If the supplied buffer is too small, the syscall typically returns failure rather than do a partial fill. Most implementations do not support more than 64Kb of extended attribute information per inode so maybe 70Kb is a safe default (to account for the return value storage), however properly written code will detect the buffer being too small and will auto-expand it until success.</p>
 <dl class="section note"><dt>Note</dt><dd>On Windows, this is the list of alternate streams on a file, NOT NTFS extended attributes.</dd></dl>
 <p>\raceguarantees The list of extended attributes is fetched in a single syscall. This may be an atomically consistent snapshot.</p>
@@ -281,7 +281,11 @@ Windows only</h3>
 <p>The reason why is that <code>NtSetEaFile()</code> can only <b>append</b> new records to EA storage. It cannot deallocate any existing EA records, if you try to do so you will get <code>STATUS_EA_CORRUPT_ERROR</code>. You can append setting the same name to a different value, which can include a null value which then appears as if the name is no longer there. But there is a cap of 64kB for the EA record, and once it is consumed, it is gone forever for that inode.</p>
 <p>Obviously that doesn't map at all well onto POSIX extended attributes, where you can set the value of an attribute as frequently as you like. The closest equivalent on Windows is therefore file alternate data streams, even though the attribute's value is then worked with as a whole proper file with all the attendant performance consequences.</p>
 <p>As a result, <code>name</code> must be a valid filename and not contain any characters not permitted in a filename. We use the NT API here, so the character restrictions are far fewer than for the Win32 API e.g. single character names do NOT cause misoperation like on Win32.</p>
-<p>Removes the extended attribute set on this file or directory. </p>
+<p>Removes the extended attribute set on this file or directory.</p>
+<dl class="section note"><dt>Note</dt><dd>On Windows, this is the list of alternate streams on a file, NOT NTFS extended attributes. We do not prevent you trying to remove internal alternate streams, either.</dd></dl>
+<p>Copies the extended attributes from one entity to another, optionally replacing all the extended attributes on the destination.</p>
+<p>This convenience function is implemented using the APIs above, and therefore is racy with respect to concurrent users. If you specifiy an invalid source with <code>replace_all_local_attributes = true</code>, then this is a convenient way to remove all extended attributes on the local inode.</p>
+<dl class="section note"><dt>Note</dt><dd>This function uses 130Kb of stack and cannot handle attribute values larger than 64Kb. </dd></dl>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
