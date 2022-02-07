@@ -89,6 +89,7 @@ static inline void TestExtendedAttributes()
       BOOST_CHECK(attribs.end() != std::find_if(attribs.begin(), attribs.end(), [](const auto &i) { return i == name[2]; }));
     }
   };
+
 #if 0
   auto fh = llfio::file_handle::uniquely_named_file(llfio::path_discovery::storage_backed_temporary_files_directory()).value();
 #else

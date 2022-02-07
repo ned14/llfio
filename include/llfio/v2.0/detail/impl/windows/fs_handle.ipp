@@ -495,7 +495,7 @@ result<span<path_view_component>> fs_handle::list_extended_attributes(span<byte>
     auto *p = tofill.data();
     bool done = false;
     size_t count = 0;
-    do
+    while(!done && p < tofill.data() + isb.Information)
     {
       auto *i = (_FILE_STREAM_INFORMATION *) p;
       if(i->StreamNameLength > 1 && i->StreamName[0] == ':' && i->StreamName[1] != ':')
@@ -510,7 +510,7 @@ result<span<path_view_component>> fs_handle::list_extended_attributes(span<byte>
       {
         p += i->NextEntryOffset;
       }
-    } while(!done && p < tofill.data() + isb.Information);
+    }
     if(count == 0)
     {
       return filled;
@@ -527,7 +527,7 @@ result<span<path_view_component>> fs_handle::list_extended_attributes(span<byte>
     auto *p = tofill.data();
     bool done = false;
     size_t count = 0;
-    do
+    while(!done && p < tofill.data() + isb.Information)
     {
       auto *i = (_FILE_STREAM_INFORMATION *) p;
       // Strip out all :: prefixed streams, which are internal ones
@@ -554,7 +554,7 @@ result<span<path_view_component>> fs_handle::list_extended_attributes(span<byte>
       {
         p += i->NextEntryOffset;
       }
-    } while(!done && p < tofill.data() + isb.Information);
+    }
   }
   return filled;
 }
@@ -662,7 +662,7 @@ result<void> fs_handle::set_extended_attribute(path_view_component name, span<co
   alignas(8) char buffer[sizeof(FILE_RENAME_INFORMATION) + 65536];
   auto *fni = reinterpret_cast<FILE_RENAME_INFORMATION *>(buffer);
   fni->Flags = (0x1 /*FILE_RENAME_REPLACE_IF_EXISTS*/ | 0x2 /*FILE_RENAME_POSIX_SEMANTICS*/);
-  fni->RootDirectory = nullptr; // Apparently this must be nullptr, not h.native_handle().h
+  fni->RootDirectory = nullptr;  // Apparently this must be nullptr, not h.native_handle().h
   fni->FileNameLength = _path.Length;
   memcpy(fni->FileName, _path.Buffer, fni->FileNameLength);
   ntstat = NtSetInformationFile(attribh.native_handle().h, &isb, fni, sizeof(FILE_RENAME_INFORMATION) + fni->FileNameLength, FileRenameInformation);
@@ -775,7 +775,7 @@ namespace detail
       auto *p = tofill.data();
       bool done = false;
       size_t count = 0;
-      do
+      while(!done && p < tofill.data() + isb.Information)
       {
         auto *i = (_FILE_FULL_EA_INFORMATION *) p;
         if(i->EaNameLength > 0)
@@ -790,7 +790,7 @@ namespace detail
         {
           p += i->NextEntryOffset;
         }
-      } while(!done && p < tofill.data() + isb.Information);
+      }
       const auto offset = (isb.Information + 7) & ~7;
       ret.tofillremaining = tofill.size() - offset;
       if(count * sizeof(std::pair<path_view_component, span<byte>>) > ret.tofillremaining)
@@ -804,7 +804,7 @@ namespace detail
       auto *p = tofill.data();
       bool done = false;
       size_t count = 0;
-      do
+      while(!done && p < tofill.data() + isb.Information)
       {
         auto *i = (_FILE_FULL_EA_INFORMATION *) p;
         if(i->EaNameLength > 0)
@@ -821,7 +821,7 @@ namespace detail
         {
           p += i->NextEntryOffset;
         }
-      } while(!done && p < tofill.data() + isb.Information);
+      }
     }
     return ret;
   }

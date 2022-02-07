@@ -397,7 +397,7 @@ result<span<path_view_component>> fs_handle::list_extended_attributes(span<byte>
   {
     auto *p = tofill.data();
     size_t count = 0;
-    do
+    while(p < tofill.data() + readed)
     {
       auto length = strlen((char *) p);
       if(length > 0)
@@ -405,7 +405,7 @@ result<span<path_view_component>> fs_handle::list_extended_attributes(span<byte>
         count++;
       }
       p += length + 1;
-    } while(p < tofill.data() + readed);
+    }
     if(count == 0)
     {
       return filled;
@@ -421,7 +421,7 @@ result<span<path_view_component>> fs_handle::list_extended_attributes(span<byte>
   {
     auto *p = tofill.data();
     size_t count = 0;
-    do
+    while(p < tofill.data() + readed)
     {
       auto *i = (char *) p;
       auto length = strlen(i);
@@ -431,7 +431,7 @@ result<span<path_view_component>> fs_handle::list_extended_attributes(span<byte>
         count++;
       }
       p += length + 1;
-    } while(p < tofill.data() + readed);
+    } 
   }
   return filled;
 #elif defined(__FreeBSD__)
