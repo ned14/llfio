@@ -522,7 +522,7 @@ result<void> fs_handle::remove_extended_attribute(path_view_component name) noex
 #if defined(__linux__) || defined(__APPLE__)
   path_view::zero_terminated_rendered_path<> zname(name);
   auto written = fremovexattr(h.native_handle().fd, zname.c_str()
-#ifdef __APPLE_
+#ifdef __APPLE__
                                                     ,
                               0
 #endif
