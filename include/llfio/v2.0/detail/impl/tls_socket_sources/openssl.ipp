@@ -119,6 +119,9 @@ namespace detail
   static const char *openssl_verified_cipher_list = "CHACHA20:HIGH:!aNULL:!EXPORT:!LOW:!eNULL:!SSLv2:!SSLv3:!CAMELLIA:!ARIA:!SHA:!kRSA";
   static int openssl_library_code = ERR_get_next_error_library();
 #define LLFIO_OPENSSL_SET_RESULT_ERROR(which) ERR_PUT_error(detail::openssl_library_code, 1, (which), nullptr, 0)
+#if LLFIO_OPENSSL_ENABLE_DEBUG_PRINTING
+  static std::mutex openssl_printing_lock;
+#endif
 }  // namespace detail
 
 #if LLFIO_EXPERIMENTAL_STATUS_CODE
@@ -206,9 +209,6 @@ namespace detail
   constexpr openssl_error_domain openssl_error_domain_inst;
   inline constexpr const openssl_error_domain &openssl_error_domain::get() { return openssl_error_domain_inst; }
   using openssl_code = OUTCOME_V2_NAMESPACE::experimental::status_code<openssl_error_domain>;
-#if LLFIO_OPENSSL_ENABLE_DEBUG_PRINTING
-  static std::mutex openssl_printing_lock;
-#endif
 }  // namespace detail
 template <class T> inline result<void> openssl_error(T *inst, unsigned long errcode = ERR_get_error())
 {
