@@ -90,7 +90,7 @@ $(document).ready(function(){initNavTree('functions_i.html',''); initResizable()
 </li>
 <li>implementation_information()
 : <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#ab2928135a2c85af895798685275e8d32">llfio_v2_xxx::byte_io_multiplexer</a>
-, <a class="el" href="classllfio__v2__xxx_1_1byte__socket__source.html#a1ebe33d72aa34828a37356fab2541674">llfio_v2_xxx::byte_socket_source</a>
+, <a class="el" href="classllfio__v2__xxx_1_1tls__socket__source.html#a18c54796fdbb2cbb249f24e7ed1aa4f2">llfio_v2_xxx::tls_socket_source</a>
 </li>
 <li>in_pipe()
 : <a class="el" href="classllfio__v2__xxx_1_1process__handle.html#a1d0b03dfcc6aa09f0fdba5ae6f794dd7">llfio_v2_xxx::process_handle</a>
@@ -111,10 +111,10 @@ $(document).ready(function(){initNavTree('functions_i.html',''); initResizable()
 : <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a9ce5b87e963aa7a8f968ed23adcd2046">llfio_v2_xxx::algorithm::impl::trivial_vector_impl&lt; has_default_construction, T &gt;</a>
 </li>
 <li>instantiate
-: <a class="el" href="structllfio__v2__xxx_1_1byte__socket__source__implementation__information.html#a3855dface5715a51de2de1ffdcef3b09">llfio_v2_xxx::byte_socket_source_implementation_information</a>
+: <a class="el" href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#a24edcf957ea67971aa46f358934adad6">llfio_v2_xxx::tls_socket_source_implementation_information</a>
 </li>
 <li>instantiate_with
-: <a class="el" href="structllfio__v2__xxx_1_1byte__socket__source__implementation__information.html#a324a23eb1bc644d18c79c409571b4d2b">llfio_v2_xxx::byte_socket_source_implementation_information</a>
+: <a class="el" href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#aa80afd73d8d97225ef4cc09b5201ede6">llfio_v2_xxx::tls_socket_source_implementation_information</a>
 </li>
 <li>invoke()
 : <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__synchronised__io__operation__state.html#a930994c0ca60ab4a1d25bd7c4f8fdd7d">llfio_v2_xxx::byte_io_multiplexer::_synchronised_io_operation_state</a>
@@ -131,7 +131,7 @@ $(document).ready(function(){initNavTree('functions_i.html',''); initResizable()
 <li>io_request
 : <a class="el" href="classkvstore__v1__xxx_1_1basic__key__value__store.html#a2cea87068cef2cd35b2aec15a5130761">kvstore_v1_xxx::basic_key_value_store</a>
 , <a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1io__request.html#aaa243dbd10f9b7bab5e42d971804ab61">llfio_v2_xxx::directory_handle::io_request&lt; class &gt;</a>
-, <a class="el" href="structllfio__v2__xxx_1_1listening__socket__handle_1_1io__request.html#a273a05b79cc58597439420f413340ded">llfio_v2_xxx::listening_socket_handle::io_request&lt; class &gt;</a>
+, <a class="el" href="structllfio__v2__xxx_1_1listening__socket__handle__impl_1_1io__request.html#a308f99ceee8b923258091e65f3e7363e">llfio_v2_xxx::listening_socket_handle_impl&lt; SocketType &gt;::io_request&lt; class &gt;</a>
 , <a class="el" href="structllfio__v2__xxx_1_1symlink__handle_1_1io__request_3_01buffers__type_00_01_________01_4.html#a9712d301efd63761573e42c530860b6c">llfio_v2_xxx::symlink_handle::io_request&lt; buffers_type, ____ &gt;</a>
 , <a class="el" href="structllfio__v2__xxx_1_1symlink__handle_1_1io__request_3_01const__buffers__type_00_01_________01_4.html#a33e29e085faf927b441f5bc6432051fd">llfio_v2_xxx::symlink_handle::io_request&lt; const_buffers_type, ____ &gt;</a>
 </li>
@@ -156,7 +156,7 @@ $(document).ready(function(){initNavTree('functions_i.html',''); initResizable()
 , <a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html#a38054fed025ad3deec2b5a5494e7e57d">llfio_v2_xxx::native_handle_type</a>
 </li>
 <li>is_compatible_with
-: <a class="el" href="structllfio__v2__xxx_1_1byte__socket__source__implementation__information.html#a0913f5e05af9abe915ca07f54b07df4d">llfio_v2_xxx::byte_socket_source_implementation_information</a>
+: <a class="el" href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#adb94955d2d5feeff4668e83b5ecebfbb">llfio_v2_xxx::tls_socket_source_implementation_information</a>
 </li>
 <li>is_default()
 : <a class="el" href="classllfio__v2__xxx_1_1ip_1_1address.html#ab6165bc43b0fdaae4b007fed5ad1add0">llfio_v2_xxx::ip::address</a>
@@ -243,6 +243,9 @@ $(document).ready(function(){initNavTree('functions_i.html',''); initResizable()
 : <a class="el" href="classllfio__v2__xxx_1_1handle.html#ae0d5de068f71628e9491c5669f89dca0">llfio_v2_xxx::handle</a>
 , <a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html#ad6992242c9715661a4b737a21e860f32">llfio_v2_xxx::native_handle_type</a>
 </li>
+<li>is_third_party_pointer()
+: <a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html#a7ed5ce5dbedc8c9b81d41e011eb3420e">llfio_v2_xxx::native_handle_type</a>
+</li>
 <li>is_tls_socket()
 : <a class="el" href="classllfio__v2__xxx_1_1handle.html#a53065eb7c4166e9d39036b1b122e8cab">llfio_v2_xxx::handle</a>
 , <a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html#a043f6564ae06fb18ce2f72fcc96b0436">llfio_v2_xxx::native_handle_type</a>
@@ -266,7 +269,7 @@ $(document).ready(function(){initNavTree('functions_i.html',''); initResizable()
 , <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a4d7c7541169fc5a4daa1305bf0474a8d">llfio_v2_xxx::algorithm::impl::trivial_vector_impl&lt; true, T &gt;</a>
 , <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#aec7b71bd23ee32eb42a84273904bc8d4">llfio_v2_xxx::byte_io_multiplexer::buffer_type</a>
 , <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1const__buffer__type.html#abe3a779eb24bdaaa81b7e0bd8b3758f8">llfio_v2_xxx::byte_io_multiplexer::const_buffer_type</a>
-, <a class="el" href="structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type.html#a18ad5ff2a5e50b36715dd95db0e14fc3">llfio_v2_xxx::listening_socket_handle::buffers_type</a>
+, <a class="el" href="structllfio__v2__xxx_1_1listening__socket__handle__impl_1_1buffers__type.html#a35a0ba2ffccf871d892639cb35444a7e">llfio_v2_xxx::listening_socket_handle_impl&lt; SocketType &gt;::buffers_type</a>
 , <a class="el" href="classllfio__v2__xxx_1_1mapped.html#a6645c7abab4aea56e09ba4241b106cc4">llfio_v2_xxx::mapped&lt; T &gt;</a>
 , <a class="el" href="classllfio__v2__xxx_1_1path__view.html#a7bfb0a79057416a10f43cf25b4c6c57a">llfio_v2_xxx::path_view</a>
 , <a class="el" href="structllfio__v2__xxx_1_1storage__profile_1_1storage__profile.html#ac72468c441bcfd2d3989381600f6c923">llfio_v2_xxx::storage_profile::storage_profile</a>

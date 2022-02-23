@@ -65,7 +65,7 @@ var classllfio__v2__xxx_1_1handle =
     [ "native_handle", "classllfio__v2__xxx_1_1handle.html#a942b0d276c9f20fe41baab679b88fe72", null ],
     [ "operator=", "classllfio__v2__xxx_1_1handle.html#ab7a7864db8369f8e62ae81586ef68ef0", null ],
     [ "operator=", "classllfio__v2__xxx_1_1handle.html#a4acd6daf162e10373efedf7fd8528365", null ],
-    [ "QUICKCPPLIB_BITFIELD_BEGIN", "classllfio__v2__xxx_1_1handle.html#ac5222904f116c9beb0515a4a5aa850bf", null ],
+    [ "QUICKCPPLIB_BITFIELD_BEGIN_T", "classllfio__v2__xxx_1_1handle.html#af6ae214241d075f68c3df8cfb377f135", null ],
     [ "QUICKCPPLIB_BITFIELD_END", "classllfio__v2__xxx_1_1handle.html#aa7e9bedf8c7a4c4a79a644a6e1857ee4", null ],
     [ "release", "classllfio__v2__xxx_1_1handle.html#a1d273e38c061eb11f5012f624e9a202e", null ],
     [ "requires_aligned_io", "classllfio__v2__xxx_1_1handle.html#a751e912d8dab755ea969a418c1d544eb", null ],
@@ -73,6 +73,10 @@ var classllfio__v2__xxx_1_1handle =
     [ "swap", "classllfio__v2__xxx_1_1handle.html#a4716696b8700953889006251e0678aa4", null ],
     [ "fs_handle", "classllfio__v2__xxx_1_1handle.html#a026944e947f6830e5bc5fd31aae205be", null ],
     [ "operator<<", "classllfio__v2__xxx_1_1handle.html#a5c7d33dcd1f366fa378607e1dd087744", null ],
-    [ "_flags", "classllfio__v2__xxx_1_1handle.html#ad758cf1eb2e0b4c63583eab05e7f6820", null ],
-    [ "_v", "classllfio__v2__xxx_1_1handle.html#a1d6911771ac743fd9d64063c12429deb", null ]
+    [ "_", "classllfio__v2__xxx_1_1handle.html#ac06f9b0d4b04c14e1effa2f72b53b087", null ],
+    [ "_padding0_", "classllfio__v2__xxx_1_1handle.html#a50a43ba6489a7329f827bea76e069653", null ],
+    [ "_padding1_", "classllfio__v2__xxx_1_1handle.html#a4c83790f1a39dc02fa2a36844a1681e3", null ],
+    [ "_padding2_", "classllfio__v2__xxx_1_1handle.html#a887db9b5cbe882c85b414cdc4bf5d799", null ],
+    [ "_v", "classllfio__v2__xxx_1_1handle.html#a1d6911771ac743fd9d64063c12429deb", null ],
+    [ "flags", "classllfio__v2__xxx_1_1handle.html#a8a0dbf8624dfa681bfe549faedf4e0db", null ]
 ];

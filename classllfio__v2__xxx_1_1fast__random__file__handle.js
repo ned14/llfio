@@ -86,7 +86,7 @@ var classllfio__v2__xxx_1_1fast__random__file__handle =
     [ "native_handle", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a942b0d276c9f20fe41baab679b88fe72", null ],
     [ "operator=", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a5477b7a397fce509e1fd04092a559e8c", null ],
     [ "operator=", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a16ccaa28c68e06e7c3d5f7ff94d2cea5", null ],
-    [ "QUICKCPPLIB_BITFIELD_BEGIN", "classllfio__v2__xxx_1_1fast__random__file__handle.html#ac5222904f116c9beb0515a4a5aa850bf", null ],
+    [ "QUICKCPPLIB_BITFIELD_BEGIN_T", "classllfio__v2__xxx_1_1fast__random__file__handle.html#af6ae214241d075f68c3df8cfb377f135", null ],
     [ "QUICKCPPLIB_BITFIELD_END", "classllfio__v2__xxx_1_1fast__random__file__handle.html#aa7e9bedf8c7a4c4a79a644a6e1857ee4", null ],
     [ "read", "classllfio__v2__xxx_1_1fast__random__file__handle.html#add4d9cad06933bba45ddb8df5a26077e", null ],
     [ "read", "classllfio__v2__xxx_1_1fast__random__file__handle.html#aa17020bc615b9a3bc73c66fff8968d11", null ],
@@ -128,9 +128,13 @@ var classllfio__v2__xxx_1_1fast__random__file__handle =
     [ "write", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a12c13f2aaadf9c2f4cb04bd711e7ee72", null ],
     [ "zero", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a800b4d046b9648a9a4a69a7797548ee4", null ],
     [ "zero", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a8393617b1f8ea7cc16ec5e15ee8166bd", null ],
+    [ "_", "classllfio__v2__xxx_1_1fast__random__file__handle.html#ac06f9b0d4b04c14e1effa2f72b53b087", null ],
     [ "_ctx", "classllfio__v2__xxx_1_1fast__random__file__handle.html#aa4b79ba6b413f45da50c9c418d592d97", null ],
-    [ "_flags", "classllfio__v2__xxx_1_1fast__random__file__handle.html#ad758cf1eb2e0b4c63583eab05e7f6820", null ],
     [ "_length", "classllfio__v2__xxx_1_1fast__random__file__handle.html#ae5040ad73419130910156162006f37c1", null ],
+    [ "_padding0_", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a50a43ba6489a7329f827bea76e069653", null ],
+    [ "_padding1_", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a4c83790f1a39dc02fa2a36844a1681e3", null ],
+    [ "_padding2_", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a887db9b5cbe882c85b414cdc4bf5d799", null ],
     [ "_prng", "classllfio__v2__xxx_1_1fast__random__file__handle.html#aed4fd04da0a564159d6ccdcd724d0d7a", null ],
-    [ "_v", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a1d6911771ac743fd9d64063c12429deb", null ]
+    [ "_v", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a1d6911771ac743fd9d64063c12429deb", null ],
+    [ "flags", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a8a0dbf8624dfa681bfe549faedf4e0db", null ]
 ];

@@ -115,13 +115,15 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1construct_3_01byte__socket__handle_01_4.html">llfio_v2_xxx::construct&lt; byte_socket_handle &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for <code>byte_socket_handle</code>  <a href="structllfio__v2__xxx_1_1construct_3_01byte__socket__handle_01_4.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1listening__socket__handle__impl.html">llfio_v2_xxx::listening_socket_handle_impl&lt; SocketType &gt;</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1listening__socket__handle__impl_1_1buffers__type.html">llfio_v2_xxx::listening_socket_handle_impl&lt; SocketType &gt;::buffers_type</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The buffers type used by this handle for reads, which is a single item sequence of <code>buffer_type</code>.  <a href="structllfio__v2__xxx_1_1listening__socket__handle__impl_1_1buffers__type.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1listening__socket__handle__impl_1_1io__request.html">llfio_v2_xxx::listening_socket_handle_impl&lt; SocketType &gt;::io_request&lt; class &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The i/o request type used by this handle.  <a href="structllfio__v2__xxx_1_1listening__socket__handle__impl_1_1io__request.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1listening__socket__handle.html">llfio_v2_xxx::listening_socket_handle</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type.html">llfio_v2_xxx::listening_socket_handle::buffers_type</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The buffers type used by this handle for reads, which is a single item sequence of <code>buffer_type</code>.  <a href="structllfio__v2__xxx_1_1listening__socket__handle_1_1buffers__type.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1listening__socket__handle_1_1io__request.html">llfio_v2_xxx::listening_socket_handle::io_request&lt; class &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The i/o request type used by this handle.  <a href="structllfio__v2__xxx_1_1listening__socket__handle_1_1io__request.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1construct_3_01listening__socket__handle_01_4.html">llfio_v2_xxx::construct&lt; listening_socket_handle &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for <code>listening_socket_handle</code>  <a href="structllfio__v2__xxx_1_1construct_3_01listening__socket__handle_01_4.html#details">More...</a><br /></td></tr>
@@ -196,6 +198,9 @@ result&lt; address_v6 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a
 result&lt; address &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a199651ec383913fa9a2aec88d5100d1f">llfio_v2_xxx::ip::make_address</a> (string_view str) noexcept</td></tr>
 <tr class="memdesc:a199651ec383913fa9a2aec88d5100d1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make a v4 or v6 <code>address</code>. v6 addresses need to have the form <code>[::]:port</code>. <br /></td></tr>
 <tr class="separator:a199651ec383913fa9a2aec88d5100d1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9428ee4dc1d4450e4f7f41312d40eeb"><td class="memItemLeft" align="right" valign="top"><a id="ac9428ee4dc1d4450e4f7f41312d40eeb"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::LLFIO_TEMPLATE</b> (class T, class U) LLFIO_TREQUIRES(LLFIO_TEXPR(static_cast&lt; T * &gt;(static_cast&lt; handle * &gt;(nullptr)))) T *socket_cast(listening_socket_handle_impl&lt; U &gt; *v)</td></tr>
+<tr class="separator:ac9428ee4dc1d4450e4f7f41312d40eeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>

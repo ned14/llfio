@@ -71,6 +71,7 @@ var classllfio__v2__xxx_1_1section__handle =
     [ "operator=", "classllfio__v2__xxx_1_1section__handle.html#a5435021920a220ef8d1e244036c8219b", null ],
     [ "operator=", "classllfio__v2__xxx_1_1section__handle.html#a55daf2f49cf0f182e18e139f6c35668a", null ],
     [ "QUICKCPPLIB_BITFIELD_BEGIN", "classllfio__v2__xxx_1_1section__handle.html#a5405985448afbfe281cbf98ab7bbb3ab", null ],
+    [ "QUICKCPPLIB_BITFIELD_BEGIN_T", "classllfio__v2__xxx_1_1section__handle.html#af6ae214241d075f68c3df8cfb377f135", null ],
     [ "QUICKCPPLIB_BITFIELD_END", "classllfio__v2__xxx_1_1section__handle.html#ad057ca569878e127389457e80e0f393d", null ],
     [ "release", "classllfio__v2__xxx_1_1section__handle.html#a1d273e38c061eb11f5012f624e9a202e", null ],
     [ "requires_aligned_io", "classllfio__v2__xxx_1_1section__handle.html#a751e912d8dab755ea969a418c1d544eb", null ],
@@ -80,9 +81,13 @@ var classllfio__v2__xxx_1_1section__handle =
     [ "swap", "classllfio__v2__xxx_1_1section__handle.html#a4716696b8700953889006251e0678aa4", null ],
     [ "swap", "classllfio__v2__xxx_1_1section__handle.html#a2bad3e9b5baf82d9ee7f791f4c3b4733", null ],
     [ "truncate", "classllfio__v2__xxx_1_1section__handle.html#aa4d0beac304a5ae9d29441819a829b80", null ],
+    [ "_", "classllfio__v2__xxx_1_1section__handle.html#ac06f9b0d4b04c14e1effa2f72b53b087", null ],
     [ "_anonymous", "classllfio__v2__xxx_1_1section__handle.html#a508cd333b972b87a6e0dd63c4d05d30b", null ],
     [ "_backing", "classllfio__v2__xxx_1_1section__handle.html#a5b3323b6f5554b863c7f104de9519c86", null ],
     [ "_flag", "classllfio__v2__xxx_1_1section__handle.html#aff579de98516b809327d4443ad8eb84a", null ],
-    [ "_flags", "classllfio__v2__xxx_1_1section__handle.html#ad758cf1eb2e0b4c63583eab05e7f6820", null ],
-    [ "_v", "classllfio__v2__xxx_1_1section__handle.html#a1d6911771ac743fd9d64063c12429deb", null ]
+    [ "_padding0_", "classllfio__v2__xxx_1_1section__handle.html#a50a43ba6489a7329f827bea76e069653", null ],
+    [ "_padding1_", "classllfio__v2__xxx_1_1section__handle.html#a4c83790f1a39dc02fa2a36844a1681e3", null ],
+    [ "_padding2_", "classllfio__v2__xxx_1_1section__handle.html#a887db9b5cbe882c85b414cdc4bf5d799", null ],
+    [ "_v", "classllfio__v2__xxx_1_1section__handle.html#a1d6911771ac743fd9d64063c12429deb", null ],
+    [ "flags", "classllfio__v2__xxx_1_1section__handle.html#a8a0dbf8624dfa681bfe549faedf4e0db", null ]
 ];

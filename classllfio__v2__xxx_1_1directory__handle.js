@@ -58,7 +58,7 @@ var classllfio__v2__xxx_1_1directory__handle =
     [ "native_handle", "classllfio__v2__xxx_1_1directory__handle.html#a942b0d276c9f20fe41baab679b88fe72", null ],
     [ "operator=", "classllfio__v2__xxx_1_1directory__handle.html#a9acfca399be5d868fe659fce5166d630", null ],
     [ "operator=", "classllfio__v2__xxx_1_1directory__handle.html#a42cba9c448ac59e4f7057e01eb0ddf49", null ],
-    [ "QUICKCPPLIB_BITFIELD_BEGIN", "classllfio__v2__xxx_1_1directory__handle.html#ac5222904f116c9beb0515a4a5aa850bf", null ],
+    [ "QUICKCPPLIB_BITFIELD_BEGIN_T", "classllfio__v2__xxx_1_1directory__handle.html#af6ae214241d075f68c3df8cfb377f135", null ],
     [ "QUICKCPPLIB_BITFIELD_END", "classllfio__v2__xxx_1_1directory__handle.html#aa7e9bedf8c7a4c4a79a644a6e1857ee4", null ],
     [ "read", "classllfio__v2__xxx_1_1directory__handle.html#ab27aadf3740715dc8c5d7cd5a194d57e", null ],
     [ "release", "classllfio__v2__xxx_1_1directory__handle.html#a1d273e38c061eb11f5012f624e9a202e", null ],
@@ -71,6 +71,10 @@ var classllfio__v2__xxx_1_1directory__handle =
     [ "try_reopen", "classllfio__v2__xxx_1_1directory__handle.html#a3ccae4bed19960a3059b5c3bfadceafd", null ],
     [ "try_reopen_for", "classllfio__v2__xxx_1_1directory__handle.html#aafd16281ceb81c2901297c61248e4458", null ],
     [ "try_reopen_until", "classllfio__v2__xxx_1_1directory__handle.html#ac7f52299db09ae2fb3fdd022c0cb9465", null ],
-    [ "_flags", "classllfio__v2__xxx_1_1directory__handle.html#ad758cf1eb2e0b4c63583eab05e7f6820", null ],
-    [ "_v", "classllfio__v2__xxx_1_1directory__handle.html#a1d6911771ac743fd9d64063c12429deb", null ]
+    [ "_", "classllfio__v2__xxx_1_1directory__handle.html#ac06f9b0d4b04c14e1effa2f72b53b087", null ],
+    [ "_padding0_", "classllfio__v2__xxx_1_1directory__handle.html#a50a43ba6489a7329f827bea76e069653", null ],
+    [ "_padding1_", "classllfio__v2__xxx_1_1directory__handle.html#a4c83790f1a39dc02fa2a36844a1681e3", null ],
+    [ "_padding2_", "classllfio__v2__xxx_1_1directory__handle.html#a887db9b5cbe882c85b414cdc4bf5d799", null ],
+    [ "_v", "classllfio__v2__xxx_1_1directory__handle.html#a1d6911771ac743fd9d64063c12429deb", null ],
+    [ "flags", "classllfio__v2__xxx_1_1directory__handle.html#a8a0dbf8624dfa681bfe549faedf4e0db", null ]
 ];

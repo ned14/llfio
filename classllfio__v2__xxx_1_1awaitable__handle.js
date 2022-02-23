@@ -60,7 +60,7 @@ var classllfio__v2__xxx_1_1awaitable__handle =
     [ "is_writable", "classllfio__v2__xxx_1_1awaitable__handle.html#a211fee447a47bdeb5424a2a5ae1de852", null ],
     [ "kernel_caching", "classllfio__v2__xxx_1_1awaitable__handle.html#a90bf8668df002dac5a7d9397486b2946", null ],
     [ "native_handle", "classllfio__v2__xxx_1_1awaitable__handle.html#a942b0d276c9f20fe41baab679b88fe72", null ],
-    [ "QUICKCPPLIB_BITFIELD_BEGIN", "classllfio__v2__xxx_1_1awaitable__handle.html#ac5222904f116c9beb0515a4a5aa850bf", null ],
+    [ "QUICKCPPLIB_BITFIELD_BEGIN_T", "classllfio__v2__xxx_1_1awaitable__handle.html#af6ae214241d075f68c3df8cfb377f135", null ],
     [ "QUICKCPPLIB_BITFIELD_END", "classllfio__v2__xxx_1_1awaitable__handle.html#aa7e9bedf8c7a4c4a79a644a6e1857ee4", null ],
     [ "read", "classllfio__v2__xxx_1_1awaitable__handle.html#a67c9dc3a201fc43d85ab582759fbd116", null ],
     [ "release", "classllfio__v2__xxx_1_1awaitable__handle.html#a1d273e38c061eb11f5012f624e9a202e", null ],
@@ -77,6 +77,10 @@ var classllfio__v2__xxx_1_1awaitable__handle =
     [ "try_write_for", "classllfio__v2__xxx_1_1awaitable__handle.html#a3dad14fd2ff7107d066b1ac365d2e7d1", null ],
     [ "try_write_until", "classllfio__v2__xxx_1_1awaitable__handle.html#a5c3e328220dc0ab9d68b09dab659b1fc", null ],
     [ "write", "classllfio__v2__xxx_1_1awaitable__handle.html#abb0e2865ca62ca0715e8e1dce502f878", null ],
-    [ "_flags", "classllfio__v2__xxx_1_1awaitable__handle.html#ad758cf1eb2e0b4c63583eab05e7f6820", null ],
-    [ "_v", "classllfio__v2__xxx_1_1awaitable__handle.html#a1d6911771ac743fd9d64063c12429deb", null ]
+    [ "_", "classllfio__v2__xxx_1_1awaitable__handle.html#ac06f9b0d4b04c14e1effa2f72b53b087", null ],
+    [ "_padding0_", "classllfio__v2__xxx_1_1awaitable__handle.html#a50a43ba6489a7329f827bea76e069653", null ],
+    [ "_padding1_", "classllfio__v2__xxx_1_1awaitable__handle.html#a4c83790f1a39dc02fa2a36844a1681e3", null ],
+    [ "_padding2_", "classllfio__v2__xxx_1_1awaitable__handle.html#a887db9b5cbe882c85b414cdc4bf5d799", null ],
+    [ "_v", "classllfio__v2__xxx_1_1awaitable__handle.html#a1d6911771ac743fd9d64063c12429deb", null ],
+    [ "flags", "classllfio__v2__xxx_1_1awaitable__handle.html#a8a0dbf8624dfa681bfe549faedf4e0db", null ]
 ];

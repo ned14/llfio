@@ -17,6 +17,7 @@ var structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type =
     [ "cend", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#a76ffb549dc0e19f718f14544bd22cfdc", null ],
     [ "data", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#ae28e6b362e687d3e98fdccb55261c5a3", null ],
     [ "data", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#a17e2cc8dac55f5440535af9c0823725f", null ],
+    [ "empty", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#a05ce6ad74009458fd49f4891cdaca1c1", null ],
     [ "end", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#acaf365bfe0cf3b7ad2419d9153ef0f90", null ],
     [ "end", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#a92d22ceba2b4c1f1d280e9a905420118", null ],
     [ "operator=", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#a9effdb241919275af35795a99d3fa42a", null ],

@@ -134,12 +134,6 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__socket__handle.html">byte_socket_handle</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to a byte-orientated socket-like entity.  <a href="classllfio__v2__xxx_1_1byte__socket__handle.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__socket__source.html">byte_socket_source</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A source of <code>byte_socket_handle</code> and <code>listening_socket</code> and possibly a <code>byte_io_multiplexer</code> to multiplex i/o on multiple socket instances at the same time.  <a href="classllfio__v2__xxx_1_1byte__socket__source.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1byte__socket__source__implementation__information.html">byte_socket_source_implementation_information</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The implementation information returned.  <a href="structllfio__v2__xxx_1_1byte__socket__source__implementation__information.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1construct.html">construct</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Metaprogramming shim for constructing any <code>handle</code> subclass.  <a href="structllfio__v2__xxx_1_1construct.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -213,6 +207,11 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1listening__socket__handle.html">listening_socket_handle</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1listening__socket__handle__impl.html">listening_socket_handle_impl</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1listening__tls__socket__handle.html">listening_tls_socket_handle</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to a TLS socket-like entity able to receive incoming connections.  <a href="classllfio__v2__xxx_1_1listening__tls__socket__handle.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1lockable__byte__io__handle.html">lockable_byte_io_handle</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to something capable of scatter-gather i/o and which can exclude other concurrent users. Models <code>SharedMutex</code>, though note that the locks are per-handle, not per-thread.  <a href="classllfio__v2__xxx_1_1lockable__byte__io__handle.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -266,6 +265,15 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html">symlink_handle</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to an inode which redirects to a different path.  <a href="classllfio__v2__xxx_1_1symlink__handle.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1tls__socket__handle.html">tls_socket_handle</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to a TLS secure socket-like entity.  <a href="classllfio__v2__xxx_1_1tls__socket__handle.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1tls__socket__source.html">tls_socket_source</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A source of <code>tls_socket_handle</code> and <code>listening_tls_socket_handle</code> and possibly a <code>byte_io_multiplexer</code> to multiplex i/o on multiple socket instances at the same time.  <a href="classllfio__v2__xxx_1_1tls__socket__source.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html">tls_socket_source_implementation_information</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The implementation information returned.  <a href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1unique__file__lock.html">unique_file_lock</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">RAII locker matching <code>std::unique_lock</code> for <code>lockable_byte_io_handle</code>, but untemplated.  <a href="classllfio__v2__xxx_1_1unique__file__lock.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -279,18 +287,6 @@ Typedefs</h2></td></tr>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a12c7d894767fdd2e0ebda26d9e6d8be0">byte_io_multiplexer_ptr</a> = std::unique_ptr&lt; <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html">byte_io_multiplexer</a> &gt;</td></tr>
 <tr class="memdesc:a12c7d894767fdd2e0ebda26d9e6d8be0"><td class="mdescLeft">&#160;</td><td class="mdescRight">A unique ptr to an i/o multiplexer implementation. <br /></td></tr>
 <tr class="separator:a12c7d894767fdd2e0ebda26d9e6d8be0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b1fc5e08959bfaac325426e1ee0d7c9"><td class="memItemLeft" align="right" valign="top"><a id="a3b1fc5e08959bfaac325426e1ee0d7c9"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a3b1fc5e08959bfaac325426e1ee0d7c9">byte_socket_source_handle_ptr</a> = std::unique_ptr&lt; <a class="el" href="classllfio__v2__xxx_1_1byte__socket__handle.html">byte_socket_handle</a>, detail::byte_socket_source_handle_deleter &gt;</td></tr>
-<tr class="memdesc:a3b1fc5e08959bfaac325426e1ee0d7c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">A pointer to a byte socket handle returned by a byte socket source. <br /></td></tr>
-<tr class="separator:a3b1fc5e08959bfaac325426e1ee0d7c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac90839bac7668aa8b449b7637610c746"><td class="memItemLeft" align="right" valign="top"><a id="ac90839bac7668aa8b449b7637610c746"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#ac90839bac7668aa8b449b7637610c746">listening_socket_source_handle_ptr</a> = std::unique_ptr&lt; <a class="el" href="classllfio__v2__xxx_1_1listening__socket__handle.html">listening_socket_handle</a>, detail::listening_socket_source_handle_deleter &gt;</td></tr>
-<tr class="memdesc:ac90839bac7668aa8b449b7637610c746"><td class="mdescLeft">&#160;</td><td class="mdescRight">A pointer to a listening socket handle returned by a byte socket source. <br /></td></tr>
-<tr class="separator:ac90839bac7668aa8b449b7637610c746"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a83730967ac2e59f1fc1a83fd86085a0c"><td class="memItemLeft" align="right" valign="top"><a id="a83730967ac2e59f1fc1a83fd86085a0c"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a83730967ac2e59f1fc1a83fd86085a0c">byte_socket_source_ptr</a> = std::unique_ptr&lt; <a class="el" href="classllfio__v2__xxx_1_1byte__socket__source.html">byte_socket_source</a>, detail::byte_socket_source_deleter &gt;</td></tr>
-<tr class="memdesc:a83730967ac2e59f1fc1a83fd86085a0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">A pointer to a byte socket source. <br /></td></tr>
-<tr class="separator:a83730967ac2e59f1fc1a83fd86085a0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a23358ae319d76dd1149a26b04b17796a"><td class="memTemplParams" colspan="2"><a id="a23358ae319d76dd1149a26b04b17796a"></a>
 template&lt;class F , size_t callable_storage_bytes = 32 - sizeof(uintptr_t)&gt; </td></tr>
 <tr class="memitem:a23358ae319d76dd1149a26b04b17796a"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>function_ptr</b> = QUICKCPPLIB_NAMESPACE::function_ptr::function_ptr&lt; F, callable_storage_bytes &gt;</td></tr>
@@ -318,6 +314,18 @@ template&lt;class T &gt; </td></tr>
 template&lt;class T &gt; </td></tr>
 <tr class="memitem:a6ddb7c2bee277fc16207b7e8cb05693f"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>outcome</b> = OUTCOME_V2_NAMESPACE::outcome&lt; T, <a class="el" href="structllfio__v2__xxx_1_1error__info.html">error_info</a> &gt;</td></tr>
 <tr class="separator:a6ddb7c2bee277fc16207b7e8cb05693f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81cc4b6e44e81823d88c0433efd82292"><td class="memItemLeft" align="right" valign="top"><a id="a81cc4b6e44e81823d88c0433efd82292"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a81cc4b6e44e81823d88c0433efd82292">tls_socket_handle_ptr</a> = std::unique_ptr&lt; <a class="el" href="classllfio__v2__xxx_1_1tls__socket__handle.html">tls_socket_handle</a>, detail::tls_socket_handle_deleter &gt;</td></tr>
+<tr class="memdesc:a81cc4b6e44e81823d88c0433efd82292"><td class="mdescLeft">&#160;</td><td class="mdescRight">A pointer to a TLS socket handle returned by a TLS socket source. <br /></td></tr>
+<tr class="separator:a81cc4b6e44e81823d88c0433efd82292"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b0d8b81e15b9d2aec5dc7194c0e6d22"><td class="memItemLeft" align="right" valign="top"><a id="a1b0d8b81e15b9d2aec5dc7194c0e6d22"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a1b0d8b81e15b9d2aec5dc7194c0e6d22">listening_tls_socket_handle_ptr</a> = std::unique_ptr&lt; <a class="el" href="classllfio__v2__xxx_1_1listening__tls__socket__handle.html">listening_tls_socket_handle</a>, detail::listening_tls_socket_handle_deleter &gt;</td></tr>
+<tr class="memdesc:a1b0d8b81e15b9d2aec5dc7194c0e6d22"><td class="mdescLeft">&#160;</td><td class="mdescRight">A pointer to a listening TLS socket handle returned by a TLS socket source. <br /></td></tr>
+<tr class="separator:a1b0d8b81e15b9d2aec5dc7194c0e6d22"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a51dd6cc5299a316fdcd05c4c7db2dc"><td class="memItemLeft" align="right" valign="top"><a id="a1a51dd6cc5299a316fdcd05c4c7db2dc"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a1a51dd6cc5299a316fdcd05c4c7db2dc">tls_socket_source_ptr</a> = std::unique_ptr&lt; <a class="el" href="classllfio__v2__xxx_1_1tls__socket__source.html">tls_socket_source</a>, detail::tls_socket_source_deleter &gt;</td></tr>
+<tr class="memdesc:a1a51dd6cc5299a316fdcd05c4c7db2dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">A pointer to a TLS socket source. <br /></td></tr>
+<tr class="separator:a1a51dd6cc5299a316fdcd05c4c7db2dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
@@ -390,15 +398,9 @@ constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a7f32245d09ba18756513c19b053fd057">is_finished</a> (<a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745">io_operation_state_type</a> s) noexcept</td></tr>
 <tr class="memdesc:a7f32245d09ba18756513c19b053fd057"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if the i/o operation state is finished. <br /></td></tr>
 <tr class="separator:a7f32245d09ba18756513c19b053fd057"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0ea2c8896bfb21b18ed1a084a0a75651"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a0ea2c8896bfb21b18ed1a084a0a75651">QUICKCPPLIB_BITFIELD_BEGIN_T</a> (byte_socket_source_implementation_features, uint32_t)</td></tr>
-<tr class="memdesc:a0ea2c8896bfb21b18ed1a084a0a75651"><td class="mdescLeft">&#160;</td><td class="mdescRight">Feature bits for byte socket sources.  <a href="namespacellfio__v2__xxx.html#a0ea2c8896bfb21b18ed1a084a0a75651">More...</a><br /></td></tr>
-<tr class="separator:a0ea2c8896bfb21b18ed1a084a0a75651"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a419865951dfcc92509477236215da888"><td class="memItemLeft" align="right" valign="top"><a id="a419865951dfcc92509477236215da888"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>QUICKCPPLIB_BITFIELD_END</b> (byte_socket_source_implementation_features) struct <a class="el" href="structllfio__v2__xxx_1_1byte__socket__source__implementation__information.html">byte_socket_source_implementation_information</a></td></tr>
-<tr class="separator:a419865951dfcc92509477236215da888"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d88143dce3fef61d4cc711b99306b45"><td class="memItemLeft" align="right" valign="top"><a id="a2d88143dce3fef61d4cc711b99306b45"></a>
-std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="structllfio__v2__xxx_1_1byte__socket__source__implementation__information.html">byte_socket_source_implementation_information</a> &amp;v)</td></tr>
-<tr class="separator:a2d88143dce3fef61d4cc711b99306b45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9428ee4dc1d4450e4f7f41312d40eeb"><td class="memItemLeft" align="right" valign="top"><a id="ac9428ee4dc1d4450e4f7f41312d40eeb"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>LLFIO_TEMPLATE</b> (class T, class U) LLFIO_TREQUIRES(LLFIO_TEXPR(static_cast&lt; T * &gt;(static_cast&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> * &gt;(nullptr)))) T *socket_cast(<a class="el" href="classllfio__v2__xxx_1_1listening__socket__handle__impl.html">listening_socket_handle_impl</a>&lt; U &gt; *v)</td></tr>
+<tr class="separator:ac9428ee4dc1d4450e4f7f41312d40eeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a026590e0aff0af0331ec8f8308e56724"><td class="memItemLeft" align="right" valign="top"><a id="a026590e0aff0af0331ec8f8308e56724"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207">directory_handle::filter</a> &amp;v)</td></tr>
 <tr class="separator:a026590e0aff0af0331ec8f8308e56724"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -635,6 +637,15 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 <a class="el" href="structllfio__v2__xxx_1_1error__info.html">error_info</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a20ab6481a21bf2c4cf8185919edf0a66">posix_error</a> (int c=errno)</td></tr>
 <tr class="memdesc:a20ab6481a21bf2c4cf8185919edf0a66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper for constructing an error info from a POSIX errno. <br /></td></tr>
 <tr class="separator:a20ab6481a21bf2c4cf8185919edf0a66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30f0de9f074d32381006e42b02a3669e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a30f0de9f074d32381006e42b02a3669e">QUICKCPPLIB_BITFIELD_BEGIN_T</a> (tls_socket_source_implementation_features, uint32_t)</td></tr>
+<tr class="memdesc:a30f0de9f074d32381006e42b02a3669e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Feature bits for TLS socket sources.  <a href="namespacellfio__v2__xxx.html#a30f0de9f074d32381006e42b02a3669e">More...</a><br /></td></tr>
+<tr class="separator:a30f0de9f074d32381006e42b02a3669e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac572f4eb22f2fcdae9a6ee9d84d1742e"><td class="memItemLeft" align="right" valign="top"><a id="ac572f4eb22f2fcdae9a6ee9d84d1742e"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>QUICKCPPLIB_BITFIELD_END</b> (tls_socket_source_implementation_features) struct <a class="el" href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html">tls_socket_source_implementation_information</a></td></tr>
+<tr class="separator:ac572f4eb22f2fcdae9a6ee9d84d1742e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a235f3c82f22c7430a8e214c959da2a01"><td class="memItemLeft" align="right" valign="top"><a id="a235f3c82f22c7430a8e214c959da2a01"></a>
+std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html">tls_socket_source_implementation_information</a> &amp;v)</td></tr>
+<tr class="separator:a235f3c82f22c7430a8e214c959da2a01"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The LLFIO namespace. </p>
@@ -1481,54 +1492,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 
 </div>
 </div>
-<a id="a0ea2c8896bfb21b18ed1a084a0a75651"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0ea2c8896bfb21b18ed1a084a0a75651">&#9670;&nbsp;</a></span>QUICKCPPLIB_BITFIELD_BEGIN_T() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">llfio_v2_xxx::QUICKCPPLIB_BITFIELD_BEGIN_T </td>
-          <td>(</td>
-          <td class="paramtype">byte_socket_source_implementation_features&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname">&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Feature bits for byte socket sources. </p>
-<p>&lt; This socket source provides kernel sockets i.e. their native handles will be valid kernel sockets which can be used in <code>poll()</code> etc</p>
-<p>&lt; This socket source provides TLS secured sockets</p>
-<p>&lt; This socket source provides an i/o multiplexer</p>
-<p>&lt; This socket source may be able to work with compatible io multiplexers</p>
-<p>&lt; This socket source is the "system" rather than "third party" implementation for whatever it is.</p>
-<div class="fragment"><div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;                                                                                  {</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;none = 0U,</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;kernel_sockets =</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;(1U &lt;&lt; 0U),  <span class="comment">//!&lt; This socket source provides kernel sockets i.e. their native handles will be valid kernel sockets which can be used in `poll()` etc</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment"></span>tls_sockets = (1U &lt;&lt; 1U),             <span class="comment">//!&lt; This socket source provides TLS secured sockets</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="comment"></span>io_multiplexer = (1U &lt;&lt; 2U),          <span class="comment">//!&lt; This socket source provides an i/o multiplexer</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment"></span>foreign_io_multiplexer = (1U &lt;&lt; 3U),  <span class="comment">//!&lt; This socket source may be able to work with compatible io multiplexers</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="comment"></span>system_implementation = (1U &lt;&lt; 4U),   <span class="comment">//!&lt; This socket source is the &quot;system&quot; rather than &quot;third party&quot; implementation for whatever it is.</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;all = 0xffffffff} QUICKCPPLIB_BITFIELD_END(byte_socket_source_implementation_features)</div>
-</div><!-- fragment -->
-</div>
-</div>
 <a id="a26baf26ed8a75301a92134497cc3ac8a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a26baf26ed8a75301a92134497cc3ac8a">&#9670;&nbsp;</a></span>QUICKCPPLIB_BITFIELD_BEGIN_T() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a26baf26ed8a75301a92134497cc3ac8a">&#9670;&nbsp;</a></span>QUICKCPPLIB_BITFIELD_BEGIN_T() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1570,6 +1535,53 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 <div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;<span class="comment"></span> </div>
 <div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;not_pollable = (1U &lt;&lt; 7U)  <span class="comment">//!&lt; This handle is not pollable.</span></div>
 <div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;<span class="comment"></span>}  <span class="comment">//</span></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a30f0de9f074d32381006e42b02a3669e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a30f0de9f074d32381006e42b02a3669e">&#9670;&nbsp;</a></span>QUICKCPPLIB_BITFIELD_BEGIN_T() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">llfio_v2_xxx::QUICKCPPLIB_BITFIELD_BEGIN_T </td>
+          <td>(</td>
+          <td class="paramtype">tls_socket_source_implementation_features&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Feature bits for TLS socket sources. </p>
+<p>&lt; No bits set</p>
+<p>&lt; This socket source provides kernel sockets i.e. their native handles will be valid kernel sockets which can be used in <code>poll()</code> etc</p>
+<p>&lt; This socket source is the "system" rather than "third party" implementation for TLS sockets</p>
+<p>&lt; This socket source provides an i/o multiplexer</p>
+<p>&lt; This socket source may be able to wrap third party plain sockets</p>
+<p>&lt; All bits set</p>
+<div class="fragment"><div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;                                                                                 {</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;none = 0U,  <span class="comment">//!&lt; No bits set</span></div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;kernel_sockets =</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;(1U &lt;&lt; 0U),  <span class="comment">//!&lt; This socket source provides kernel sockets i.e. their native handles will be valid kernel sockets which can be used in `poll()` etc</span></div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;<span class="comment"></span>system_implementation = (1U &lt;&lt; 1U),  <span class="comment">//!&lt; This socket source is the &quot;system&quot; rather than &quot;third party&quot; implementation for TLS sockets</span></div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;<span class="comment"></span>io_multiplexer = (1U &lt;&lt; 2U),         <span class="comment">//!&lt; This socket source provides an i/o multiplexer</span></div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;<span class="comment"></span>supports_wrap = (1U &lt;&lt; 3U),          <span class="comment">//!&lt; This socket source may be able to wrap third party plain sockets</span></div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;all = 0xffffffff  <span class="comment">//!&lt; All bits set</span></div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;<span class="comment"></span>}  <span class="comment">//</span></div>
 </div><!-- fragment -->
 </div>
 </div>

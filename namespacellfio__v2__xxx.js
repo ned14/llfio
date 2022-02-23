@@ -9,8 +9,6 @@ var namespacellfio__v2__xxx =
     [ "byte_io_handle", "classllfio__v2__xxx_1_1byte__io__handle.html", "classllfio__v2__xxx_1_1byte__io__handle" ],
     [ "byte_io_multiplexer", "classllfio__v2__xxx_1_1byte__io__multiplexer.html", "classllfio__v2__xxx_1_1byte__io__multiplexer" ],
     [ "byte_socket_handle", "classllfio__v2__xxx_1_1byte__socket__handle.html", "classllfio__v2__xxx_1_1byte__socket__handle" ],
-    [ "byte_socket_source", "classllfio__v2__xxx_1_1byte__socket__source.html", "classllfio__v2__xxx_1_1byte__socket__source" ],
-    [ "byte_socket_source_implementation_information", "structllfio__v2__xxx_1_1byte__socket__source__implementation__information.html", "structllfio__v2__xxx_1_1byte__socket__source__implementation__information" ],
     [ "construct", "structllfio__v2__xxx_1_1construct.html", "structllfio__v2__xxx_1_1construct" ],
     [ "construct< algorithm::cached_parent_handle_adapter< T > >", "structllfio__v2__xxx_1_1construct_3_01algorithm_1_1cached__parent__handle__adapter_3_01_t_01_4_01_4.html", "structllfio__v2__xxx_1_1construct_3_01algorithm_1_1cached__parent__handle__adapter_3_01_t_01_4_01_4" ],
     [ "construct< byte_socket_handle >", "structllfio__v2__xxx_1_1construct_3_01byte__socket__handle_01_4.html", "structllfio__v2__xxx_1_1construct_3_01byte__socket__handle_01_4" ],
@@ -36,6 +34,8 @@ var namespacellfio__v2__xxx =
     [ "file_handle", "classllfio__v2__xxx_1_1file__handle.html", "classllfio__v2__xxx_1_1file__handle" ],
     [ "handle", "classllfio__v2__xxx_1_1handle.html", "classllfio__v2__xxx_1_1handle" ],
     [ "listening_socket_handle", "classllfio__v2__xxx_1_1listening__socket__handle.html", "classllfio__v2__xxx_1_1listening__socket__handle" ],
+    [ "listening_socket_handle_impl", "classllfio__v2__xxx_1_1listening__socket__handle__impl.html", "classllfio__v2__xxx_1_1listening__socket__handle__impl" ],
+    [ "listening_tls_socket_handle", "classllfio__v2__xxx_1_1listening__tls__socket__handle.html", "classllfio__v2__xxx_1_1listening__tls__socket__handle" ],
     [ "lockable_byte_io_handle", "classllfio__v2__xxx_1_1lockable__byte__io__handle.html", "classllfio__v2__xxx_1_1lockable__byte__io__handle" ],
     [ "log_level_guard", "classllfio__v2__xxx_1_1log__level__guard.html", "classllfio__v2__xxx_1_1log__level__guard" ],
     [ "map_handle", "classllfio__v2__xxx_1_1map__handle.html", "classllfio__v2__xxx_1_1map__handle" ],
@@ -54,6 +54,9 @@ var namespacellfio__v2__xxx =
     [ "stat_t", "structllfio__v2__xxx_1_1stat__t.html", "structllfio__v2__xxx_1_1stat__t" ],
     [ "statfs_t", "structllfio__v2__xxx_1_1statfs__t.html", "structllfio__v2__xxx_1_1statfs__t" ],
     [ "symlink_handle", "classllfio__v2__xxx_1_1symlink__handle.html", "classllfio__v2__xxx_1_1symlink__handle" ],
+    [ "tls_socket_handle", "classllfio__v2__xxx_1_1tls__socket__handle.html", "classllfio__v2__xxx_1_1tls__socket__handle" ],
+    [ "tls_socket_source", "classllfio__v2__xxx_1_1tls__socket__source.html", "classllfio__v2__xxx_1_1tls__socket__source" ],
+    [ "tls_socket_source_implementation_information", "structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html", "structllfio__v2__xxx_1_1tls__socket__source__implementation__information" ],
     [ "unique_file_lock", "classllfio__v2__xxx_1_1unique__file__lock.html", "classllfio__v2__xxx_1_1unique__file__lock" ],
     [ "write_receiver", "classllfio__v2__xxx_1_1write__receiver.html", "classllfio__v2__xxx_1_1write__receiver" ]
 ];

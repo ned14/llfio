@@ -77,6 +77,7 @@ var classllfio__v2__xxx_1_1process__handle =
     [ "out_pipe", "classllfio__v2__xxx_1_1process__handle.html#a8c86be2ef3bee1c3f9fc681b97937ceb", null ],
     [ "out_pipe", "classllfio__v2__xxx_1_1process__handle.html#a632eac607e16b80ac3f7a24a04f72366", null ],
     [ "QUICKCPPLIB_BITFIELD_BEGIN", "classllfio__v2__xxx_1_1process__handle.html#aa0c1f1cf5c93c0e8eb36482710bef81d", null ],
+    [ "QUICKCPPLIB_BITFIELD_BEGIN_T", "classllfio__v2__xxx_1_1process__handle.html#af6ae214241d075f68c3df8cfb377f135", null ],
     [ "QUICKCPPLIB_BITFIELD_END", "classllfio__v2__xxx_1_1process__handle.html#ae73288bf23a8408d782e45afd157a89f", null ],
     [ "release", "classllfio__v2__xxx_1_1process__handle.html#a1d273e38c061eb11f5012f624e9a202e", null ],
     [ "requires_aligned_io", "classllfio__v2__xxx_1_1process__handle.html#a751e912d8dab755ea969a418c1d544eb", null ],
@@ -87,9 +88,14 @@ var classllfio__v2__xxx_1_1process__handle =
     [ "try_wait_for", "classllfio__v2__xxx_1_1process__handle.html#a2940db04eeea67a2ec9d816135dbd536", null ],
     [ "try_wait_until", "classllfio__v2__xxx_1_1process__handle.html#a8516637838bb68ecded754dc904430a6", null ],
     [ "wait", "classllfio__v2__xxx_1_1process__handle.html#a2af6ecdb9948f3ddb05883d66cecbbb2", null ],
+    [ "_", "classllfio__v2__xxx_1_1process__handle.html#ac06f9b0d4b04c14e1effa2f72b53b087", null ],
     [ "_error_pipe", "classllfio__v2__xxx_1_1process__handle.html#a42079a878b650f345630b33b3c928dee", null ],
     [ "_flags", "classllfio__v2__xxx_1_1process__handle.html#a42f3c8e10d4906207309ce7ac96823df", null ],
     [ "_in_pipe", "classllfio__v2__xxx_1_1process__handle.html#a874778af80effa5e41c2a1d2c6885960", null ],
     [ "_out_pipe", "classllfio__v2__xxx_1_1process__handle.html#a9cceb31bebf51f6b2fe78b236aa9bdb3", null ],
-    [ "_v", "classllfio__v2__xxx_1_1process__handle.html#a1d6911771ac743fd9d64063c12429deb", null ]
+    [ "_padding0_", "classllfio__v2__xxx_1_1process__handle.html#a50a43ba6489a7329f827bea76e069653", null ],
+    [ "_padding1_", "classllfio__v2__xxx_1_1process__handle.html#a4c83790f1a39dc02fa2a36844a1681e3", null ],
+    [ "_padding2_", "classllfio__v2__xxx_1_1process__handle.html#a887db9b5cbe882c85b414cdc4bf5d799", null ],
+    [ "_v", "classllfio__v2__xxx_1_1process__handle.html#a1d6911771ac743fd9d64063c12429deb", null ],
+    [ "flags", "classllfio__v2__xxx_1_1process__handle.html#a8a0dbf8624dfa681bfe549faedf4e0db", null ]
 ];
