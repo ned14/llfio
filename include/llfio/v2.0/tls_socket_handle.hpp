@@ -38,6 +38,25 @@ Distributed under the Boost Software License, Version 1.0.
 
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
+/*! \brief TLS algorithm categories
+ */
+QUICKCPPLIB_BITFIELD_BEGIN(tls_algorithm)  //
+{                                          //
+ /*! The default set of TLS algorithms offered during handshake is a short list
+ of strong ciphers (typically 128 - 256 bits for the symmetric cipher)
+ to suit embedded and low end devices, ordered by strength-cpuload e.g. ChaCha20
+ would be chosen preferentially to AES, **if** the CPUs do not have hardware
+ accelerated AES, and longer key sizes would come before shorter key sizes.
+ */
+ default_ = (0U),
+ /*! The set of TLS algorithms compliant with the FIPS 140-2 standard.
+ Implementations may refuse to work if this is configured.
+ */
+ FIPS_140_2 = (1U << 0U)
+
+} QUICKCPPLIB_BITFIELD_END(tls_algorithm)
+
+
 /*! \class tls_socket_handle
 \brief A handle to a TLS secure socket-like entity.
 
@@ -60,6 +79,13 @@ protected:
 public:
   ~tls_socket_handle() = default;
 
+  /*! \brief Returns an implementation defined string describing the algorithms
+  either to be chosen during connection, or if after connection the algorithms chosen.
+  Can be an empty string if the implementation currently has no mechanism for determining
+  the algorithms available or in use (if the latter you may wish to retry later).
+  */
+  virtual std::string algorithms_description() const = 0;
+
   /*! \brief Sets the chunk size for registered buffer allocation.
 
   Some TLS socket handle implementations are able to use registered buffers from their
@@ -67,6 +93,24 @@ public:
   otherwise an error is returned if registered buffers are not supported.
   */
   virtual result<void> set_registered_buffer_chunk_size(size_t bytes) noexcept = 0;
+
+  /*! \brief Sets the algorithms to be used by the TLS connection.
+   */
+  virtual result<void> set_algorithms(tls_algorithm set) noexcept = 0;
+
+  /*! \brief Sets the CA certificates by which this connecting socket identifies itself to
+  servers. Defaults to **empty** i.e. clients do not authenticate themselves to servers.
+
+  Note that setting this to an empty path **disables** authentication by the client,
+  so client impersonation attacks become possible. This can be useful however for situations
+  where setting up client authentication certificates is non-trivial or unnecessary
+  (e.g. a HTTPS client connecting to a HTTPS web service), and all that is wanted is an
+  encrypted network transport.
+
+  Be aware that the path may not be a filesystem path, but some other sort of implementation
+  defined identifier.
+  */
+  virtual result<void> set_authentication_certificates_path(path_view identifier) noexcept = 0;
 
   /*! \brief Sets the name of the server which will be connected to for TLS.
   \return The port rendered into a string.
@@ -166,6 +210,12 @@ protected:
   using _base::_base;
 
 public:
+  /*! \brief Returns an implementation defined string describing the algorithms
+  to be chosen during connection. Can be an empty string if the implementation
+  has no mechanism for determining the algorithms available.
+  */
+  virtual std::string algorithms_description() const = 0;
+
   /*! \brief Sets the chunk size for registered buffer allocation.
 
   Some TLS socket handle implementations are able to use registered buffers from their
@@ -174,15 +224,22 @@ public:
   */
   virtual result<void> set_registered_buffer_chunk_size(size_t bytes) noexcept = 0;
 
-  /*! \brief Sets the CA certificates file by which this listening socket identifies itself to
+  /*! \brief Sets the algorithms to be used by the TLS connection.
+   */
+  virtual result<void> set_algorithms(tls_algorithm set) noexcept = 0;
+
+  /*! \brief Sets the CA certificates by which this listening socket identifies itself to
   clients. Defaults to the system certificates store.
 
   Note that setting this to an empty path **disables** authentication by the server,
-  so man-in-the-middle attacks become possible. This can be useful however for situations
-  where setting up authentication certificates is non-trivial or unnecessary, and all
+  so server impersonation attacks become possible. This can be useful however for situations
+  where setting up server authentication certificates is non-trivial or unnecessary, and all
   that is wanted is an encrypted network transport.
+
+  Be aware that the path may not be a filesystem path, but some other sort of implementation
+  defined identifier.
   */
-  virtual result<void> set_authentication_certificates_path(path_view path) noexcept = 0;
+  virtual result<void> set_authentication_certificates_path(path_view identifier) noexcept = 0;
 };
 
 namespace detail
@@ -350,6 +407,8 @@ inline std::ostream &operator<<(std::ostream &s, const tls_socket_source_impleme
 Probably the most common use case for this will be fetching the default source of TLS
 secured sockets, so here is some example boilerplate:
 
+Blocking:
+
 ```c++
 // Get a source able to manufacture TLS sockets
 tls_socket_source_ptr secure_socket_source =
@@ -381,8 +440,40 @@ if(string_view(buffer, b.size()) != "World") {
 sock->shutdown_and_close().value();
 ```
 
-If you want a non-blocking underlying socket, the usual `multiplexable_`
-prefix on the socket creation functions works as expected.
+Non-blocking:
+
+```c++
+// Get a source able to manufacture TLS sockets
+tls_socket_source_ptr secure_socket_source =
+  tls_socket_source_registry::default_source().instantiate().value();
+
+// Get a new TLS socket able to connect
+tls_socket_source_handle_ptr sock =
+  secure_socket_source->multiplexable_connecting_socket(ip::family::v6).value();
+
+// Resolve the name "host.org" and service "1234" into an IP address,
+// and connect to it over TLS. If the remote's TLS certificate is
+// not trusted by this system, or the remote certificate does not
+// match the host, this call will fail.
+//
+// If the connection does not complete within three seconds, fail.
+sock->connect("host.org", 1234, std::chrono::seconds(3)).value();
+
+// Write "Hello" to the connected TLS socket
+sock->write(0, {{(const byte *) "Hello", 5}}, std::chrono::seconds(3)).value();
+
+// Blocking read the response, but only up to three seconds.
+char buffer[5];
+tls_socket_handle::buffer_type b((byte *) buffer, 5);
+auto readed = sock->read({{&b, 1}, 0}, std::chrono::seconds(3)).value();
+if(string_view(buffer, b.size()) != "World") {
+  abort();
+}
+
+// With TLS sockets it is important to perform a proper shutdown
+// rather than hard close
+sock->shutdown_and_close(std::chrono::seconds(3)).value();
+```
 */
 class LLFIO_DECL tls_socket_source_registry
 {

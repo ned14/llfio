@@ -44,30 +44,57 @@ static inline void TestBlockingTLSSocketHandles()
     BOOST_CHECK(serversocket->is_writable());
     // Disable server authentication
     serversocket->set_authentication_certificates_path({}).value();
+    {
+      auto desc = serversocket->algorithms_description();
+      std::cout << "Server socket will offer during handshake the ciphers (" << (1 + std::count(desc.begin(), desc.end(), ',')) << "): ";
+      std::istringstream desc2(desc);
+      for(std::string s; std::getline(desc2, s, ',');)
+      {
+        std::cout << "\n   " << s;
+      }
+      std::cout << std::endl;
+    }
+    {
+      auto desc = writer->algorithms_description();
+      std::cout << "\nConnecting socket will offer during handshake the ciphers (" << (1 + std::count(desc.begin(), desc.end(), ',')) << "): ";
+      std::istringstream desc2(desc);
+      for(std::string s; std::getline(desc2, s, ',');)
+      {
+        std::cout << "\n   " << s;
+      }
+      std::cout << std::endl;
+    }
     serversocket->bind(llfio::ip::address_v4::loopback()).value();
     auto endpoint = serversocket->local_endpoint().value();
-    std::cout << "Server socket is listening on " << endpoint << std::endl;
+    std::cout << "\nServer socket is listening on " << endpoint << std::endl;
     if(endpoint.family() == llfio::ip::family::unknown && getenv("CI") != nullptr)
     {
       std::cout << "\nNOTE: Currently on CI and couldn't bind a listening socket to loopback, assuming it is CI host restrictions and skipping this test."
                 << std::endl;
       return;
     }
+    std::mutex printlock;
+    std::unique_lock<std::mutex> g(printlock);
     auto readerthread = std::async(
-    [serversocket = std::move(serversocket)]() mutable
+    [serversocket = std::move(serversocket), &printlock]() mutable
     {
       std::pair<llfio::tls_socket_handle_ptr, llfio::ip::address> s;
       serversocket->read({s}).value();  // This immediately blocks in blocking mode
+      std::unique_lock<std::mutex> g(printlock);
       BOOST_REQUIRE(s.first->is_valid());
       BOOST_CHECK(s.first->is_socket());
       BOOST_CHECK(s.first->is_readable());
       BOOST_CHECK(s.first->is_writable());
-      //std::cout << "Server thread sees incoming connection from " << s.second << std::endl;
+      std::cout << "\nServer thread sees incoming connection from " << s.second << std::endl;
+      g.unlock();
       serversocket->close().value();
       llfio::byte buffer[64];
       auto read = s.first->read(0, {{buffer, 64}}).value();
+      g.lock();
+      std::cout << "\nThe inbound server socket negotiated the cipher " << s.first->algorithms_description() << std::endl;
       BOOST_REQUIRE(read == 5);
       BOOST_CHECK(0 == memcmp(buffer, "hello", 5));
+      g.unlock();
       s.first->shutdown_and_close().value();
     });
     auto begin = std::chrono::steady_clock::now();
@@ -82,7 +109,9 @@ static inline void TestBlockingTLSSocketHandles()
     begin = std::chrono::steady_clock::now();
     while(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count() < 1000)
     {
+      g.unlock();
       auto r = writer->connect(endpoint);
+      g.lock();
       if(r)
       {
         break;
@@ -92,6 +121,8 @@ static inline void TestBlockingTLSSocketHandles()
     BOOST_CHECK(writer->is_socket());
     BOOST_CHECK(writer->is_readable());
     BOOST_CHECK(writer->is_writable());
+    std::cout << "\nThe connecting socket negotiated the cipher " << writer->algorithms_description() << std::endl;
+    g.unlock();
     auto written = writer->write(0, {{(const llfio::byte *) "hello", 5}}).value();
     BOOST_REQUIRE(written == 5);
     writer->shutdown_and_close().value();

@@ -637,6 +637,40 @@ public:
     }
     return close();
   }
+
+  using byte_io_handle::co_read;
+  using byte_io_handle::co_write;
+  using byte_io_handle::read;
+  using byte_io_handle::write;
+
+  //! \overload Convenience initialiser list based overload for `read()`
+  LLFIO_MAKE_FREE_FUNCTION
+  io_result<size_type> read(std::initializer_list<buffer_type> lst, deadline d = deadline()) noexcept
+  {
+    buffer_type *_reqs = reinterpret_cast<buffer_type *>(alloca(sizeof(buffer_type) * lst.size()));
+    memcpy(_reqs, lst.begin(), sizeof(buffer_type) * lst.size());
+    io_request<buffers_type> reqs(buffers_type(_reqs, lst.size()));
+    auto ret = read(reqs, d);
+    if(ret)
+    {
+      return ret.bytes_transferred();
+    }
+    return std::move(ret).error();
+  }
+  //! \overload Convenience initialiser list based overload for `write()`
+  LLFIO_MAKE_FREE_FUNCTION
+  io_result<size_type> write(std::initializer_list<const_buffer_type> lst, deadline d = deadline()) noexcept
+  {
+    const_buffer_type *_reqs = reinterpret_cast<const_buffer_type *>(alloca(sizeof(const_buffer_type) * lst.size()));
+    memcpy(_reqs, lst.begin(), sizeof(const_buffer_type) * lst.size());
+    io_request<const_buffers_type> reqs(const_buffers_type(_reqs, lst.size()));
+    auto ret = write(reqs, d);
+    if(ret)
+    {
+      return ret.bytes_transferred();
+    }
+    return std::move(ret).error();
+  }
 };
 
 //! \brief Constructor for `byte_socket_handle`

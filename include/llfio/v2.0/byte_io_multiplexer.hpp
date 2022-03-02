@@ -396,7 +396,7 @@ public:
     T buffers{};
     extent_type offset{0};
     constexpr io_request() {}  // NOLINT (defaulting this breaks clang and GCC, so don't do it!)
-    constexpr io_request(T _buffers, extent_type _offset)
+    constexpr io_request(T _buffers, extent_type _offset = (extent_type) -1)
         : buffers(std::move(_buffers))
         , offset(_offset)
     {
@@ -1265,7 +1265,9 @@ public:
     //! Suspends the coroutine for resumption after the i/o finishes
     void await_suspend(coroutine_handle<> coro)
     {
-      _state->invoke(make_function_ptr<void *(io_operation_state_type)>([&](io_operation_state_type s) -> void * {
+      _state->invoke(make_function_ptr<void *(io_operation_state_type)>(
+      [&](io_operation_state_type s) -> void *
+      {
         if(is_finished(s))
         {
           coro.resume();

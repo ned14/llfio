@@ -24,7 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../../../tls_socket_handle.hpp"
 
-#define LLFIO_OPENSSL_ENABLE_DEBUG_PRINTING 1
+#define LLFIO_OPENSSL_ENABLE_DEBUG_PRINTING 0
 
 #include <openssl/crypto.h>
 #include <openssl/err.h>
@@ -45,78 +45,115 @@ namespace detail
 
   The non-authenticating ciphers are enabled in this list, disabled in the list below.
 
-  This is the list my OpenSSL v1.1 offers in HELLO for this spec (34):
+  This is the list my OpenSSL v1.1 offers in HELLO for this spec (52):
 
-  TLS_AES_256_GCM_SHA384
-  TLS_CHACHA20_POLY1305_SHA256
-  TLS_AES_128_GCM_SHA256
-  ECDHE-ECDSA-CHACHA20-POLY1305
-  ECDHE-RSA-CHACHA20-POLY1305
-  DHE-RSA-CHACHA20-POLY1305
-  ECDHE-ECDSA-AES256-GCM-SHA384
-  ECDHE-RSA-AES256-GCM-SHA384
-  DHE-DSS-AES256-GCM-SHA384
-  DHE-RSA-AES256-GCM-SHA384
-  ECDHE-ECDSA-AES256-CCM8
-  ECDHE-ECDSA-AES256-CCM
-  DHE-RSA-AES256-CCM8
-  DHE-RSA-AES256-CCM
-  ADH-AES256-GCM-SHA384
-  ECDHE-ECDSA-AES128-GCM-SHA256
-  ECDHE-RSA-AES128-GCM-SHA256
-  DHE-DSS-AES128-GCM-SHA256
-  DHE-RSA-AES128-GCM-SHA256
-  ECDHE-ECDSA-AES128-CCM8
-  ECDHE-ECDSA-AES128-CCM
-  DHE-RSA-AES128-CCM8
-  DHE-RSA-AES128-CCM
-  ADH-AES128-GCM-SHA256
-  ECDHE-ECDSA-AES256-SHA384
-  ECDHE-RSA-AES256-SHA384
-  DHE-RSA-AES256-SHA256
-  DHE-DSS-AES256-SHA256
-  ADH-AES256-SHA256
-  ECDHE-ECDSA-AES128-SHA256
-  ECDHE-RSA-AES128-SHA256
-  DHE-RSA-AES128-SHA256
-  DHE-DSS-AES128-SHA256
-  ADH-AES128-SHA256
+   TLS_AES_256_GCM_SHA384
+   TLS_CHACHA20_POLY1305_SHA256
+   TLS_AES_128_GCM_SHA256
+   ECDHE-ECDSA-CHACHA20-POLY1305
+   ECDHE-RSA-CHACHA20-POLY1305
+   DHE-RSA-CHACHA20-POLY1305
+   RSA-PSK-CHACHA20-POLY1305
+   DHE-PSK-CHACHA20-POLY1305
+   ECDHE-PSK-CHACHA20-POLY1305
+   PSK-CHACHA20-POLY1305
+   ECDHE-ECDSA-AES256-GCM-SHA384
+   ECDHE-RSA-AES256-GCM-SHA384
+   DHE-DSS-AES256-GCM-SHA384
+   DHE-RSA-AES256-GCM-SHA384
+   ECDHE-ECDSA-AES256-CCM8
+   ECDHE-ECDSA-AES256-CCM
+   DHE-RSA-AES256-CCM8
+   DHE-RSA-AES256-CCM
+   ADH-AES256-GCM-SHA384
+   ECDHE-ECDSA-AES128-GCM-SHA256
+   ECDHE-RSA-AES128-GCM-SHA256
+   DHE-DSS-AES128-GCM-SHA256
+   DHE-RSA-AES128-GCM-SHA256
+   ECDHE-ECDSA-AES128-CCM8
+   ECDHE-ECDSA-AES128-CCM
+   DHE-RSA-AES128-CCM8
+   DHE-RSA-AES128-CCM
+   ADH-AES128-GCM-SHA256
+   ECDHE-ECDSA-AES256-SHA384
+   ECDHE-RSA-AES256-SHA384
+   DHE-RSA-AES256-SHA256
+   DHE-DSS-AES256-SHA256
+   ADH-AES256-SHA256
+   ECDHE-ECDSA-AES128-SHA256
+   ECDHE-RSA-AES128-SHA256
+   DHE-RSA-AES128-SHA256
+   DHE-DSS-AES128-SHA256
+   ADH-AES128-SHA256
+   RSA-PSK-AES256-GCM-SHA384
+   DHE-PSK-AES256-GCM-SHA384
+   DHE-PSK-AES256-CCM8
+   DHE-PSK-AES256-CCM
+   PSK-AES256-GCM-SHA384
+   PSK-AES256-CCM8
+   PSK-AES256-CCM
+   RSA-PSK-AES128-GCM-SHA256
+   DHE-PSK-AES128-GCM-SHA256
+   DHE-PSK-AES128-CCM8
+   DHE-PSK-AES128-CCM
+   PSK-AES128-GCM-SHA256
+   PSK-AES128-CCM8
+   PSK-AES128-CCM
 */
-  static const char *openssl_unverified_cipher_list = "CHACHA20:HIGH:aNULL:!EXPORT:!LOW:!eNULL:!SSLv2:!SSLv3:!CAMELLIA:!ARIA:!SHA:!kRSA:@SECLEVEL=0";
-  /* This is the list my OpenSSL v1.1 offers in HELLO for this spec (30):
+  static const char *openssl_unverified_cipher_list = "CHACHA20:HIGH:aNULL:!EXPORT:!LOW:!eNULL:!SSLv2:!SSLv3:!TLSv1.0:!CAMELLIA:!ARIA:!SHA:!kRSA:@SECLEVEL=0";
+  //static const char *openssl_unverified_cipher_list = "CHACHA20:HIGH:!aNULL:!EXPORT:!LOW:!eNULL:!SSLv2:!SSLv3:!TLSv1.0:!CAMELLIA:!ARIA:!SHA:!kRSA";
+  /* This is the list my OpenSSL v1.1 offers in HELLO for this spec (48):
 
-  TLS_AES_256_GCM_SHA384
-  TLS_CHACHA20_POLY1305_SHA256
-  TLS_AES_128_GCM_SHA256
-  ECDHE-ECDSA-CHACHA20-POLY1305
-  ECDHE-RSA-CHACHA20-POLY1305
-  DHE-RSA-CHACHA20-POLY1305
-  ECDHE-ECDSA-AES256-GCM-SHA384
-  ECDHE-RSA-AES256-GCM-SHA384
-  DHE-DSS-AES256-GCM-SHA384
-  DHE-RSA-AES256-GCM-SHA384
-  ECDHE-ECDSA-AES256-CCM8
-  ECDHE-ECDSA-AES256-CCM
-  DHE-RSA-AES256-CCM8
-  DHE-RSA-AES256-CCM
-  ECDHE-ECDSA-AES128-GCM-SHA256
-  ECDHE-RSA-AES128-GCM-SHA256
-  DHE-DSS-AES128-GCM-SHA256
-  DHE-RSA-AES128-GCM-SHA256
-  ECDHE-ECDSA-AES128-CCM8
-  ECDHE-ECDSA-AES128-CCM
-  DHE-RSA-AES128-CCM8
-  DHE-RSA-AES128-CCM
-  ECDHE-ECDSA-AES256-SHA384
-  ECDHE-RSA-AES256-SHA384
-  DHE-RSA-AES256-SHA256
-  DHE-DSS-AES256-SHA256
-  ECDHE-ECDSA-AES128-SHA256
-  ECDHE-RSA-AES128-SHA256
-  DHE-RSA-AES128-SHA256
-  DHE-DSS-AES128-SHA256
+   TLS_AES_256_GCM_SHA384
+   TLS_CHACHA20_POLY1305_SHA256
+   TLS_AES_128_GCM_SHA256
+   ECDHE-ECDSA-CHACHA20-POLY1305
+   ECDHE-RSA-CHACHA20-POLY1305
+   DHE-RSA-CHACHA20-POLY1305
+   RSA-PSK-CHACHA20-POLY1305
+   DHE-PSK-CHACHA20-POLY1305
+   ECDHE-PSK-CHACHA20-POLY1305
+   PSK-CHACHA20-POLY1305
+   ECDHE-ECDSA-AES256-GCM-SHA384
+   ECDHE-RSA-AES256-GCM-SHA384
+   DHE-DSS-AES256-GCM-SHA384
+   DHE-RSA-AES256-GCM-SHA384
+   ECDHE-ECDSA-AES256-CCM8
+   ECDHE-ECDSA-AES256-CCM
+   DHE-RSA-AES256-CCM8
+   DHE-RSA-AES256-CCM
+   ECDHE-ECDSA-AES128-GCM-SHA256
+   ECDHE-RSA-AES128-GCM-SHA256
+   DHE-DSS-AES128-GCM-SHA256
+   DHE-RSA-AES128-GCM-SHA256
+   ECDHE-ECDSA-AES128-CCM8
+   ECDHE-ECDSA-AES128-CCM
+   DHE-RSA-AES128-CCM8
+   DHE-RSA-AES128-CCM
+   ECDHE-ECDSA-AES256-SHA384
+   ECDHE-RSA-AES256-SHA384
+   DHE-RSA-AES256-SHA256
+   DHE-DSS-AES256-SHA256
+   ECDHE-ECDSA-AES128-SHA256
+   ECDHE-RSA-AES128-SHA256
+   DHE-RSA-AES128-SHA256
+   DHE-DSS-AES128-SHA256
+   RSA-PSK-AES256-GCM-SHA384
+   DHE-PSK-AES256-GCM-SHA384
+   DHE-PSK-AES256-CCM8
+   DHE-PSK-AES256-CCM
+   PSK-AES256-GCM-SHA384
+   PSK-AES256-CCM8
+   PSK-AES256-CCM
+   RSA-PSK-AES128-GCM-SHA256
+   DHE-PSK-AES128-GCM-SHA256
+   DHE-PSK-AES128-CCM8
+   DHE-PSK-AES128-CCM
+   PSK-AES128-GCM-SHA256
+   PSK-AES128-CCM8
+   PSK-AES128-CCM
 */
-  static const char *openssl_verified_cipher_list = "CHACHA20:HIGH:!aNULL:!EXPORT:!LOW:!eNULL:!SSLv2:!SSLv3:!CAMELLIA:!ARIA:!SHA:!kRSA";
+  static const char *openssl_verified_cipher_list = "CHACHA20:HIGH:!aNULL:!EXPORT:!LOW:!eNULL:!SSLv2:!SSLv3:!TLSv1.0:!CAMELLIA:!ARIA:!SHA:!kRSA";
   static int openssl_library_code = ERR_get_next_error_library();
 #define LLFIO_OPENSSL_SET_RESULT_ERROR(which) ERR_PUT_error(detail::openssl_library_code, 1, (which), nullptr, 0)
 #if LLFIO_OPENSSL_ENABLE_DEBUG_PRINTING
@@ -214,12 +251,30 @@ template <class T> inline result<void> openssl_error(T *inst, unsigned long errc
 {
   if(ERR_GET_LIB(errcode) == detail::openssl_library_code)
   {
+    if(inst == nullptr)
+    {
+      abort();
+    }
     auto ret = (ERR_GET_REASON(errcode) == 2) ? std::move(inst->_write_error) : std::move(inst->_read_error);
 #if 1
     std::lock_guard<std::mutex> g(detail::openssl_printing_lock);
     std::cerr << "OpenSSL underlying error: " << ret.error().message().c_str() << std::endl;
 #endif
     return ret;
+  }
+  detail::openssl_code ret(errcode);
+#if 1
+  std::lock_guard<std::mutex> g(detail::openssl_printing_lock);
+  std::cerr << "OpenSSL error: " << ret.message().c_str() << std::endl;
+#endif
+  assert(ret.failure());
+  return ret;
+}
+inline result<void> openssl_error(std::nullptr_t, unsigned long errcode = ERR_get_error())
+{
+  if(ERR_GET_LIB(errcode) == detail::openssl_library_code)
+  {
+    abort();
   }
   detail::openssl_code ret(errcode);
 #if 1
@@ -271,7 +326,20 @@ template <class T> inline result<void> openssl_error(T *inst, unsigned long errc
 {
   if(ERR_GET_LIB(errcode) == detail::openssl_library_code)
   {
+    if(inst == nullptr)
+    {
+      abort();
+    }
     return (ERR_GET_REASON(errcode) == 2) ? std::move(inst->_write_error) : std::move(inst->_read_error);
+  }
+  static detail::openssl_error_category cat;
+  return error_info(std::error_code((int) errcode, cat));
+}
+inline result<void> openssl_error(std::nullptr_t, unsigned long errcode = ERR_get_error())
+{
+  if(ERR_GET_LIB(errcode) == detail::openssl_library_code)
+  {
+    abort();
   }
   static detail::openssl_error_category cat;
   return error_info(std::error_code((int) errcode, cat));
@@ -324,6 +392,72 @@ namespace detail
     // static int _destroy(BIO * /*unused*/) {}
     // static long _callback_ctrl(BIO *bio, int cmd, BIO_info_cb *cb) {}
   } openssl_custom_bio;
+
+  static struct openssl_default_ctxs_t
+  {
+    SSL_CTX *unverified{nullptr}, *verified{nullptr};
+    ~openssl_default_ctxs_t()
+    {
+      if(verified != nullptr)
+      {
+        SSL_CTX_free(verified);
+        verified = nullptr;
+      }
+      if(unverified != nullptr)
+      {
+        SSL_CTX_free(unverified);
+        unverified = nullptr;
+      }
+    }
+    result<void> init()
+    {
+      if(verified == nullptr)
+      {
+        static QUICKCPPLIB_NAMESPACE::configurable_spinlock::spinlock<unsigned> lock;
+        QUICKCPPLIB_NAMESPACE::configurable_spinlock::lock_guard<QUICKCPPLIB_NAMESPACE::configurable_spinlock::spinlock<unsigned>> g(lock);
+        if(verified == nullptr)
+        {
+          auto make_ctx = [](bool verify_peer) -> result<SSL_CTX *>
+          {
+            SSL_CTX *_ctx = SSL_CTX_new(TLS_method());
+            if(_ctx == nullptr)
+            {
+              return openssl_error(nullptr).as_failure();
+            }
+            if(!verify_peer)
+            {
+              if(!SSL_CTX_set_cipher_list(_ctx, openssl_unverified_cipher_list))
+              {
+                return openssl_error(nullptr).as_failure();
+              }
+              SSL_CTX_set_verify(_ctx, SSL_VERIFY_NONE, nullptr);
+            }
+            else
+            {
+              if(!SSL_CTX_set_cipher_list(_ctx, openssl_verified_cipher_list))
+              {
+                return openssl_error(nullptr).as_failure();
+              }
+              SSL_CTX_set_verify(_ctx, SSL_VERIFY_PEER, nullptr);
+              SSL_CTX_set_verify_depth(_ctx, 4);
+              if(!SSL_CTX_set_default_verify_paths(_ctx))
+              {
+                return openssl_error(nullptr).as_failure();
+              }
+            }
+            SSL_CTX_set_options(_ctx, SSL_OP_PRIORITIZE_CHACHA);
+            SSL_CTX_set_min_proto_version(_ctx, TLS1_2_VERSION);
+            SSL_CTX_set_ecdh_auto(_ctx, 1);
+            SSL_CTX_set_dh_auto(_ctx, 1);
+            return _ctx;
+          };
+          OUTCOME_TRY(unverified, make_ctx(false));
+          OUTCOME_TRY(verified, make_ctx(true));
+        }
+      }
+      return success();
+    }
+  } openssl_default_ctxs;
 }  // namespace detail
 
 class openssl_socket_handle final : public tls_socket_handle
@@ -331,10 +465,10 @@ class openssl_socket_handle final : public tls_socket_handle
   static constexpr size_t BUFFERS_COUNT = 2;
   template <class T> friend inline result<void> openssl_error(T *, unsigned long errcode);
 
-  SSL_CTX *_ctx{nullptr};
   BIO *_ssl_bio{nullptr};
   BIO *_self_bio{nullptr};
 
+  optional<filesystem::path> _authentication_certificates_path;
   std::string _connect_hostname_port;
 
   std::mutex _lock;
@@ -501,9 +635,9 @@ protected:
     _lock_holder.lock();
     auto unlock = make_scope_exit([this]() noexcept { _lock_holder.unlock(); });
     LLFIO_DEADLINE_TO_SLEEP_INIT(d);
-    if(_ctx == nullptr)
+    if(_ssl_bio == nullptr)
     {
-      OUTCOME_TRY(_init(true));
+      OUTCOME_TRY(_init(true, _authentication_certificates_path && !_authentication_certificates_path->empty()));
     }
     if(!(_v.behaviour & native_handle_type::disposition::_is_connected))
     {
@@ -577,47 +711,15 @@ public:
       : tls_socket_handle(handle(), nullptr)
   {
     this->_v.ptr = sock;
-    this->_v.behaviour = (sock->native_handle().behaviour & ~(native_handle_type::disposition::kernel_handle)) |
-                         native_handle_type::disposition::is_pointer;
+    this->_v.behaviour = (sock->native_handle().behaviour & ~(native_handle_type::disposition::kernel_handle)) | native_handle_type::disposition::is_pointer;
   }
 
-  result<void> _init(bool is_client, const optional<filesystem::path> *authentication_certificates_path = nullptr) noexcept
+  result<void> _init(bool is_client, bool verify_peer) noexcept
   {
     LLFIO_LOG_FUNCTION_CALL(this);
-    assert(_ctx == nullptr);
-    _ctx = SSL_CTX_new(TLS_method());
-    if(_ctx == nullptr)
-    {
-      return openssl_error(this).as_failure();
-    }
-    if(authentication_certificates_path == nullptr || (*authentication_certificates_path && (*authentication_certificates_path)->empty()))
-    {
-      if(!SSL_CTX_set_cipher_list(_ctx, detail::openssl_unverified_cipher_list))
-      {
-        return openssl_error(this).as_failure();
-      }
-      SSL_CTX_set_verify(_ctx, SSL_VERIFY_NONE, nullptr);
-    }
-    else
-    {
-      if(!SSL_CTX_set_cipher_list(_ctx, detail::openssl_verified_cipher_list))
-      {
-        return openssl_error(this).as_failure();
-      }
-      SSL_CTX_set_verify(_ctx, SSL_VERIFY_PEER, nullptr);
-      SSL_CTX_set_verify_depth(_ctx, 4);
-      if(!SSL_CTX_set_default_verify_paths(_ctx))
-      {
-        return openssl_error(this).as_failure();
-      }
-    }
-    SSL_CTX_set_options(_ctx, SSL_OP_PRIORITIZE_CHACHA);
-    SSL_CTX_set_min_proto_version(_ctx, TLS1_VERSION);
-    SSL_CTX_set_ecdh_auto(_ctx, 1);
-    SSL_CTX_set_dh_auto(_ctx, 1);
-
+    OUTCOME_TRY(detail::openssl_default_ctxs.init());
     assert(_ssl_bio == nullptr);
-    _ssl_bio = BIO_new_ssl(_ctx, is_client);
+    _ssl_bio = BIO_new_ssl(verify_peer ? detail::openssl_default_ctxs.verified : detail::openssl_default_ctxs.unverified, is_client);
     if(_ssl_bio == nullptr)
     {
       return openssl_error(this).as_failure();
@@ -629,23 +731,6 @@ public:
     }
     BIO_set_data(_self_bio, this);
     BIO_push(_ssl_bio, _self_bio);
-#if 0
-    {
-      SSL *ssl{nullptr};
-      BIO_get_ssl(_ssl_bio, &ssl);
-      auto *ciphers = SSL_get1_supported_ciphers(ssl);
-      std::cout << "Ciphers enabled in HELLO (" << sk_SSL_CIPHER_num(ciphers) << "):";
-      if(ciphers != nullptr)
-      {
-        for(int n = 0; n < sk_SSL_CIPHER_num(ciphers); n++)
-        {
-          std::cout << "\n" << SSL_CIPHER_get_name(sk_SSL_CIPHER_value(ciphers, n));
-        }
-        std::cout << std::endl;
-        sk_SSL_CIPHER_free(ciphers);
-      }
-    }
-#endif
     return success();
   }
 
@@ -722,11 +807,6 @@ public:
       BIO_free_all(_ssl_bio);  // also frees _self_bio
       _ssl_bio = nullptr;
     }
-    if(_ctx != nullptr)
-    {
-      SSL_CTX_free(_ctx);
-      _ctx = nullptr;
-    }
     for(size_t n = 0; n < BUFFERS_COUNT; n++)
     {
       _read_buffers_valid[n] = {};
@@ -735,6 +815,66 @@ public:
       _write_buffers[n].reset();
     }
     return success();
+  }
+
+  virtual std::string algorithms_description() const override
+  {
+    LLFIO_LOG_FUNCTION_CALL(this);
+    if(_ssl_bio == nullptr)
+    {
+      if(!detail::openssl_default_ctxs.init())
+      {
+        return {};
+      }
+      auto ctx = (!_authentication_certificates_path || !_authentication_certificates_path->empty()) ? detail::openssl_default_ctxs.verified :
+                                                                                                       detail::openssl_default_ctxs.unverified;
+      auto *ciphers = SSL_CTX_get_ciphers(ctx);
+      if(ciphers != nullptr)
+      {
+        std::string ret;
+        for(int n = 0; n < sk_SSL_CIPHER_num(ciphers); n++)
+        {
+          if(n > 0)
+          {
+            ret.push_back(',');
+          }
+          ret.append(SSL_CIPHER_get_name(sk_SSL_CIPHER_value(ciphers, n)));
+        }
+        return ret;
+      }
+    }
+    else
+    {
+      SSL *ssl{nullptr};
+      BIO_get_ssl(_ssl_bio, &ssl);
+      if(!(_v.behaviour & native_handle_type::disposition::_is_connected))
+      {
+        auto *ciphers = SSL_get1_supported_ciphers(ssl);
+        if(ciphers != nullptr)
+        {
+          auto unciphers = make_scope_exit([&]() noexcept { sk_SSL_CIPHER_free(ciphers); });
+          std::string ret;
+          for(int n = 0; n < sk_SSL_CIPHER_num(ciphers); n++)
+          {
+            if(n > 0)
+            {
+              ret.push_back(',');
+            }
+            ret.append(SSL_CIPHER_get_name(sk_SSL_CIPHER_value(ciphers, n)));
+          }
+          return ret;
+        }
+      }
+      else
+      {
+        auto *cipher = SSL_get_current_cipher(ssl);
+        if(cipher != nullptr)
+        {
+          return SSL_CIPHER_get_name(cipher);
+        }
+      }
+    }
+    return {};
   }
 
   virtual result<void> set_registered_buffer_chunk_size(size_t bytes) noexcept override
@@ -761,6 +901,31 @@ public:
     return success();
   }
 
+  virtual result<void> set_algorithms(tls_algorithm set) noexcept override
+  {
+    LLFIO_LOG_FUNCTION_CALL(this);
+    // OpenSSL v1.1 doesn't implement FIPS 840-2, so fail if that is set.
+    if(set & tls_algorithm::FIPS_140_2)
+    {
+      return errc::not_supported;
+    }
+    return success();
+  }
+
+  virtual result<void> set_authentication_certificates_path(path_view identifier) noexcept override
+  {
+    try
+    {
+      LLFIO_LOG_FUNCTION_CALL(this);
+      _authentication_certificates_path = identifier.path();
+      return success();
+    }
+    catch(...)
+    {
+      return error_from_exception();
+    }
+  }
+
   virtual result<string_view> set_connect_hostname(string_view host, uint16_t port) noexcept override
   {
     try
@@ -776,8 +941,7 @@ public:
       }
       if(_ctx == nullptr)
       {
-        optional<filesystem::path> enable_verification;
-        OUTCOME_TRY(_init(true, &enable_verification));
+        OUTCOME_TRY(_init(true, true));
       }
       SSL *ssl{nullptr};
       BIO_get_ssl(_ssl_bio, &ssl);
@@ -1148,7 +1312,7 @@ protected:
     }
     req.buffers.connected_socket() = {tls_socket_handle_ptr(p), read.connected_socket().second};
     OUTCOME_TRY(p->set_registered_buffer_chunk_size(_registered_buffer_chunk_size));
-    OUTCOME_TRY(p->_init(false, &_authentication_certificates_path));
+    OUTCOME_TRY(p->_init(false, !_authentication_certificates_path || !_authentication_certificates_path->empty()));
     return {std::move(req.buffers)};
   }
 
@@ -1168,7 +1332,7 @@ protected:
     }
     req.buffers.connected_socket() = {tls_socket_handle_ptr(p), read.connected_socket().second};
     OUTCOME_TRY(p->set_registered_buffer_chunk_size(_registered_buffer_chunk_size));
-    OUTCOME_TRY(p->_init(false, &_authentication_certificates_path));
+    OUTCOME_TRY(p->_init(false, !_authentication_certificates_path || !_authentication_certificates_path->empty()));
     return {std::move(req.buffers)};
   }
 
@@ -1181,8 +1345,7 @@ public:
       : listening_tls_socket_handle(handle(), nullptr)
   {
     this->_v.ptr = sock;
-    this->_v.behaviour = (sock->native_handle().behaviour & ~(native_handle_type::disposition::kernel_handle)) |
-                         native_handle_type::disposition::is_pointer;
+    this->_v.behaviour = (sock->native_handle().behaviour & ~(native_handle_type::disposition::kernel_handle)) | native_handle_type::disposition::is_pointer;
   }
 
   virtual ~listening_openssl_socket_handle() override
@@ -1230,6 +1393,32 @@ public:
     return LLFIO_OPENSSL_DISPATCH(bind, bind, (addr, _creation, backlog));
   }
 
+  virtual std::string algorithms_description() const override
+  {
+    LLFIO_LOG_FUNCTION_CALL(this);
+    if(!detail::openssl_default_ctxs.init())
+    {
+      return {};
+    }
+    auto ctx = (!_authentication_certificates_path || !_authentication_certificates_path->empty()) ? detail::openssl_default_ctxs.verified :
+                                                                                                     detail::openssl_default_ctxs.unverified;
+    auto *ciphers = SSL_CTX_get_ciphers(ctx);
+    if(ciphers != nullptr)
+    {
+      std::string ret;
+      for(int n = 0; n < sk_SSL_CIPHER_num(ciphers); n++)
+      {
+        if(n > 0)
+        {
+          ret.push_back(',');
+        }
+        ret.append(SSL_CIPHER_get_name(sk_SSL_CIPHER_value(ciphers, n)));
+      }
+      return ret;
+    }
+    return {};
+  }
+
   virtual result<void> set_registered_buffer_chunk_size(size_t bytes) noexcept override
   {
     LLFIO_LOG_FUNCTION_CALL(this);
@@ -1237,12 +1426,23 @@ public:
     return success();
   }
 
-  virtual result<void> set_authentication_certificates_path(path_view path) noexcept override
+  virtual result<void> set_algorithms(tls_algorithm set) noexcept override
+  {
+    LLFIO_LOG_FUNCTION_CALL(this);
+    // OpenSSL v1.1 doesn't implement FIPS 840-2, so fail if that is set.
+    if(set & tls_algorithm::FIPS_140_2)
+    {
+      return errc::not_supported;
+    }
+    return success();
+  }
+
+  virtual result<void> set_authentication_certificates_path(path_view identifier) noexcept override
   {
     try
     {
       LLFIO_LOG_FUNCTION_CALL(this);
-      _authentication_certificates_path = path.path();
+      _authentication_certificates_path = identifier.path();
       return success();
     }
     catch(...)
