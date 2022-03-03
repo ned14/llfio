@@ -108,7 +108,6 @@ Inheritance diagram for llfio_v2_xxx::byte_socket_handle:</div>
 <area href="classllfio__v2__xxx_1_1byte__io__handle.html" title="A handle to something capable of scatter-gather byte i/o." alt="llfio_v2_xxx::byte_io_handle" shape="rect" coords="0,56,196,80"/>
 <area href="classllfio__v2__xxx_1_1pollable__handle.html" title="A handle type which can be supplied to poll()." alt="llfio_v2_xxx::pollable_handle" shape="rect" coords="206,56,402,80"/>
 <area href="classllfio__v2__xxx_1_1handle.html" title="A native_handle_type which is managed by the lifetime of this object instance." alt="llfio_v2_xxx::handle" shape="rect" coords="0,0,196,24"/>
-<area href="classllfio__v2__xxx_1_1tls__socket__handle.html" title="A handle to a TLS secure socket-like entity." alt="llfio_v2_xxx::tls_socket_handle" shape="rect" coords="103,168,299,192"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -242,6 +241,40 @@ virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom">
 result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__socket__handle.html#afce2026f870a3c055e458383cd3d4134">shutdown_and_close</a> (<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d={}) noexcept</td></tr>
 <tr class="memdesc:afce2026f870a3c055e458383cd3d4134"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience function to shut down the outbound connection and wait for the other side to shut down our inbound connection by throwing away any bytes read, then closing the socket. <br /></td></tr>
 <tr class="separator:afce2026f870a3c055e458383cd3d4134"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaaf53f8cf34d7ab9d36a623a00a0882c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; size_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__socket__handle.html#aaaf53f8cf34d7ab9d36a623a00a0882c">read</a> (std::initializer_list&lt; <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html">buffer_type</a> &gt; lst, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="separator:aaaf53f8cf34d7ab9d36a623a00a0882c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a761a5bcfd2814631d84b467984c3a770"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; size_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__socket__handle.html#a761a5bcfd2814631d84b467984c3a770">write</a> (std::initializer_list&lt; <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1const__buffer__type.html">const_buffer_type</a> &gt; lst, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="separator:a761a5bcfd2814631d84b467984c3a770"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8bf9b8dee03f826229a9cee117b6b9ef"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html">awaitable</a>&lt; <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; buffers_type &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__socket__handle.html#a8bf9b8dee03f826229a9cee117b6b9ef">co_read</a> (<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="memdesc:a8bf9b8dee03f826229a9cee117b6b9ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">A coroutinised equivalent to <code>.read()</code> which suspends the coroutine until the i/o finishes. <b>Blocks execution</b> i.e is equivalent to <code>.read()</code> if no i/o multiplexer has been set on this handle!  <a href="classllfio__v2__xxx_1_1byte__socket__handle.html#a8bf9b8dee03f826229a9cee117b6b9ef">More...</a><br /></td></tr>
+<tr class="separator:a8bf9b8dee03f826229a9cee117b6b9ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae27d8d8bad6b55d7544271ebb82cff1f"><td class="memItemLeft" align="right" valign="top"><a id="ae27d8d8bad6b55d7544271ebb82cff1f"></a>
+<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html">awaitable</a>&lt; <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; buffers_type &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>co_read</b> (registered_buffer_type base, <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="separator:ae27d8d8bad6b55d7544271ebb82cff1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a497f1b933e7b15b04cf2aeef4c721f66"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html">awaitable</a>&lt; <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__socket__handle.html#a497f1b933e7b15b04cf2aeef4c721f66">co_write</a> (<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="memdesc:a497f1b933e7b15b04cf2aeef4c721f66"><td class="mdescLeft">&#160;</td><td class="mdescRight">A coroutinised equivalent to <code>.write()</code> which suspends the coroutine until the i/o finishes. <b>Blocks execution</b> i.e is equivalent to <code>.write()</code> if no i/o multiplexer has been set on this handle!  <a href="classllfio__v2__xxx_1_1byte__socket__handle.html#a497f1b933e7b15b04cf2aeef4c721f66">More...</a><br /></td></tr>
+<tr class="separator:a497f1b933e7b15b04cf2aeef4c721f66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5621865dc76cda9ca6f31595edded0a3"><td class="memItemLeft" align="right" valign="top"><a id="a5621865dc76cda9ca6f31595edded0a3"></a>
+<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html">awaitable</a>&lt; <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>co_write</b> (registered_buffer_type base, <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="separator:a5621865dc76cda9ca6f31595edded0a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa17020bc615b9a3bc73c66fff8968d11"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__socket__handle.html#aa17020bc615b9a3bc73c66fff8968d11">read</a> (<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="memdesc:aa17020bc615b9a3bc73c66fff8968d11"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read data from the open handle, preferentially using any i/o multiplexer set over the virtually overridable per-class implementation.  <a href="classllfio__v2__xxx_1_1byte__socket__handle.html#aa17020bc615b9a3bc73c66fff8968d11">More...</a><br /></td></tr>
+<tr class="separator:aa17020bc615b9a3bc73c66fff8968d11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acbcd4d6f6364f8494104287305ff9d2b"><td class="memItemLeft" align="right" valign="top"><a id="acbcd4d6f6364f8494104287305ff9d2b"></a>
+<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>read</b> (registered_buffer_type base, <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="separator:acbcd4d6f6364f8494104287305ff9d2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add4d9cad06933bba45ddb8df5a26077e"><td class="memItemLeft" align="right" valign="top"><a id="add4d9cad06933bba45ddb8df5a26077e"></a>
+<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; size_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>read</b> (extent_type offset, std::initializer_list&lt; <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html">buffer_type</a> &gt; lst, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="separator:add4d9cad06933bba45ddb8df5a26077e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6fdbbcde6ecdc5a3f1f3110bcec5f3c0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__socket__handle.html#a6fdbbcde6ecdc5a3f1f3110bcec5f3c0">write</a> (<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="memdesc:a6fdbbcde6ecdc5a3f1f3110bcec5f3c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write data to the open handle, preferentially using any i/o multiplexer set over the virtually overridable per-class implementation.  <a href="classllfio__v2__xxx_1_1byte__socket__handle.html#a6fdbbcde6ecdc5a3f1f3110bcec5f3c0">More...</a><br /></td></tr>
+<tr class="separator:a6fdbbcde6ecdc5a3f1f3110bcec5f3c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a12c13f2aaadf9c2f4cb04bd711e7ee72"><td class="memItemLeft" align="right" valign="top"><a id="a12c13f2aaadf9c2f4cb04bd711e7ee72"></a>
+<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> (registered_buffer_type base, <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="separator:a12c13f2aaadf9c2f4cb04bd711e7ee72"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef8d24213a1205289cea00a0fae25a17"><td class="memItemLeft" align="right" valign="top"><a id="aef8d24213a1205289cea00a0fae25a17"></a>
+<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; size_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> (extent_type offset, std::initializer_list&lt; <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1const__buffer__type.html">const_buffer_type</a> &gt; lst, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
+<tr class="separator:aef8d24213a1205289cea00a0fae25a17"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae80e58316f9f1ed3c522cfe5553196ec"><td class="memItemLeft" align="right" valign="top"><a id="ae80e58316f9f1ed3c522cfe5553196ec"></a>
 <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html">byte_io_multiplexer</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html#ae80e58316f9f1ed3c522cfe5553196ec">multiplexer</a> () const noexcept</td></tr>
 <tr class="memdesc:ae80e58316f9f1ed3c522cfe5553196ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">The i/o multiplexer this handle will use to multiplex i/o. If this returns null, then this handle has not been registered with an i/o multiplexer yet. <br /></td></tr>
@@ -893,7 +926,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div>
 </div>
 <a id="a8bf9b8dee03f826229a9cee117b6b9ef"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8bf9b8dee03f826229a9cee117b6b9ef">&#9670;&nbsp;</a></span>co_read()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a8bf9b8dee03f826229a9cee117b6b9ef">&#9670;&nbsp;</a></span>co_read() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -940,8 +973,42 @@ For portability, you can only assume that barriers write order for a single hand
 </div><!-- fragment -->
 </div>
 </div>
+<a id="a8bf9b8dee03f826229a9cee117b6b9ef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8bf9b8dee03f826229a9cee117b6b9ef">&#9670;&nbsp;</a></span>co_read() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html">awaitable</a>&lt;<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt;buffers_type&gt; &gt; llfio_v2_xxx::byte_io_handle::co_read</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>A coroutinised equivalent to <code>.read()</code> which suspends the coroutine until the i/o finishes. <b>Blocks execution</b> i.e is equivalent to <code>.read()</code> if no i/o multiplexer has been set on this handle! </p>
+<p>The awaitable returned is <b>eager</b> i.e. it immediately begins the i/o. If the i/o completes and finishes immediately, no coroutine suspension occurs. </p>
+<div class="fragment"><div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;  {</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    <span class="keywordflow">if</span>(_ctx == <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;    {</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;      <span class="keywordflow">return</span> awaitable&lt;io_result&lt;buffers_type&gt;&gt;(<a class="code" href="classllfio__v2__xxx_1_1byte__socket__handle.html#aaaf53f8cf34d7ab9d36a623a00a0882c">read</a>(std::move(reqs), d));</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;    }</div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;    awaitable&lt;io_result&lt;buffers_type&gt;&gt; ret;</div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;    ret.set_state(_ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a0a0d3b7d155d63ac644a2e651e538b72">construct</a>(ret._state_storage, <span class="keyword">this</span>, <span class="keyword">nullptr</span>, {}, d, std::move(reqs)));</div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;    <span class="keywordflow">return</span> ret;</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;  }</div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="a497f1b933e7b15b04cf2aeef4c721f66"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a497f1b933e7b15b04cf2aeef4c721f66">&#9670;&nbsp;</a></span>co_write()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a497f1b933e7b15b04cf2aeef4c721f66">&#9670;&nbsp;</a></span>co_write() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -980,6 +1047,40 @@ For portability, you can only assume that barriers write order for a single hand
 <div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;    <span class="keywordflow">if</span>(_ctx == <span class="keyword">nullptr</span>)</div>
 <div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;    {</div>
 <div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;      <span class="keywordflow">return</span> awaitable&lt;io_result&lt;const_buffers_type&gt;&gt;(<a class="code" href="classllfio__v2__xxx_1_1byte__io__handle.html#a6fdbbcde6ecdc5a3f1f3110bcec5f3c0">write</a>(std::move(reqs), d));</div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;    }</div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;    awaitable&lt;io_result&lt;const_buffers_type&gt;&gt; ret;</div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;    ret.set_state(_ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a0a0d3b7d155d63ac644a2e651e538b72">construct</a>(ret._state_storage, <span class="keyword">this</span>, <span class="keyword">nullptr</span>, {}, d, std::move(reqs)));</div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;    <span class="keywordflow">return</span> ret;</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;  }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a497f1b933e7b15b04cf2aeef4c721f66"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a497f1b933e7b15b04cf2aeef4c721f66">&#9670;&nbsp;</a></span>co_write() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html">awaitable</a>&lt;<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt;const_buffers_type&gt; &gt; llfio_v2_xxx::byte_io_handle::co_write</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>A coroutinised equivalent to <code>.write()</code> which suspends the coroutine until the i/o finishes. <b>Blocks execution</b> i.e is equivalent to <code>.write()</code> if no i/o multiplexer has been set on this handle! </p>
+<p>The awaitable returned is <b>eager</b> i.e. it immediately begins the i/o. If the i/o completes and finishes immediately, no coroutine suspension occurs. </p>
+<div class="fragment"><div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;  {</div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;    <span class="keywordflow">if</span>(_ctx == <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;    {</div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;      <span class="keywordflow">return</span> awaitable&lt;io_result&lt;const_buffers_type&gt;&gt;(<a class="code" href="classllfio__v2__xxx_1_1byte__socket__handle.html#a761a5bcfd2814631d84b467984c3a770">write</a>(std::move(reqs), d));</div>
 <div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;    }</div>
 <div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;    awaitable&lt;io_result&lt;const_buffers_type&gt;&gt; ret;</div>
 <div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;    ret.set_state(_ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a0a0d3b7d155d63ac644a2e651e538b72">construct</a>(ret._state_storage, <span class="keyword">this</span>, <span class="keyword">nullptr</span>, {}, d, std::move(reqs)));</div>
@@ -1264,7 +1365,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div>
 </div>
 <a id="aa17020bc615b9a3bc73c66fff8968d11"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa17020bc615b9a3bc73c66fff8968d11">&#9670;&nbsp;</a></span>read()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aa17020bc615b9a3bc73c66fff8968d11">&#9670;&nbsp;</a></span>read() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1312,6 +1413,92 @@ For portability, you can only assume that barriers write order for a single hand
 <div class="fragment"><div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  {</div>
 <div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    <span class="keywordflow">return</span> (_ctx == <span class="keyword">nullptr</span>) ? <a class="code" href="classllfio__v2__xxx_1_1byte__io__handle.html#a4cc14d7effb7bebb42c996b68a5ce906">_do_read</a>(reqs, d) : _do_multiplexer_read({}, reqs, d);</div>
 <div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;  }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="aa17020bc615b9a3bc73c66fff8968d11"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa17020bc615b9a3bc73c66fff8968d11">&#9670;&nbsp;</a></span>read() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt;buffers_type&gt; llfio_v2_xxx::byte_io_handle::read</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read data from the open handle, preferentially using any i/o multiplexer set over the virtually overridable per-class implementation. </p>
+<dl class="section warning"><dt>Warning</dt><dd>Depending on the implementation backend, <b>very</b> different buffers may be returned than you supplied. You should <b>always</b> use the buffers returned and assume that they point to different memory and that each buffer's size will have changed.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The buffers read, which may not be the buffers input. The size of each scatter-gather buffer returned is updated with the number of bytes of that buffer transferred, and the pointer to the data may be <em>completely</em> different to what was submitted (e.g. it may point into a memory map). </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">reqs</td><td>A scatter-gather and offset request. </td></tr>
+    <tr><td class="paramname">d</td><td>An optional deadline by which the i/o must complete, else it is cancelled. Note function may return significantly after this deadline if the i/o takes long to cancel. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Errors returnable\n Any of the values POSIX read() can return, errc::timed_out, errc::operation_canceled. errc::not_supported may be</dt><dd>returned if deadline i/o is not possible with this particular handle configuration (e.g. reading from regular files on POSIX or reading from a non-overlapped HANDLE on Windows). </dd></dl>
+<dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd></dd></dl>
+<div class="fragment"><div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  {</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    <span class="keywordflow">return</span> (_ctx == <span class="keyword">nullptr</span>) ? <a class="code" href="classllfio__v2__xxx_1_1byte__io__handle.html#a4cc14d7effb7bebb42c996b68a5ce906">_do_read</a>(reqs, d) : _do_multiplexer_read({}, reqs, d);</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;  }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="aaaf53f8cf34d7ab9d36a623a00a0882c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaaf53f8cf34d7ab9d36a623a00a0882c">&#9670;&nbsp;</a></span>read() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Convenience initialiser list based overload for&lt; tt &gt; llfio_v2_xxx::byte_socket_handle::read </td>
+          <td>(</td>
+          <td class="paramtype">std::initializer_list&lt; <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html">buffer_type</a> &gt;&#160;</td>
+          <td class="paramname"><em>lst</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
+<div class="fragment"><div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;  {</div>
+<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;    buffer_type *_reqs = <span class="keyword">reinterpret_cast&lt;</span>buffer_type *<span class="keyword">&gt;</span>(alloca(<span class="keyword">sizeof</span>(buffer_type) * lst.size()));</div>
+<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;    memcpy(_reqs, lst.begin(), <span class="keyword">sizeof</span>(buffer_type) * lst.size());</div>
+<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;    io_request&lt;buffers_type&gt; reqs(buffers_type(_reqs, lst.size()));</div>
+<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;    <span class="keyword">auto</span> ret = <a class="code" href="classllfio__v2__xxx_1_1byte__socket__handle.html#aaaf53f8cf34d7ab9d36a623a00a0882c">read</a>(reqs, d);</div>
+<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;    <span class="keywordflow">if</span>(ret)</div>
+<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;    {</div>
+<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;      <span class="keywordflow">return</span> ret.bytes_transferred();</div>
+<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;    }</div>
+<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;    <span class="keywordflow">return</span> std::move(ret).error();</div>
+<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1441,7 +1628,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div>
 </div>
 <a id="a6fdbbcde6ecdc5a3f1f3110bcec5f3c0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6fdbbcde6ecdc5a3f1f3110bcec5f3c0">&#9670;&nbsp;</a></span>write()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a6fdbbcde6ecdc5a3f1f3110bcec5f3c0">&#9670;&nbsp;</a></span>write() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1492,6 +1679,92 @@ For portability, you can only assume that barriers write order for a single hand
 </div><!-- fragment -->
 </div>
 </div>
+<a id="a6fdbbcde6ecdc5a3f1f3110bcec5f3c0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6fdbbcde6ecdc5a3f1f3110bcec5f3c0">&#9670;&nbsp;</a></span>write() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt;const_buffers_type&gt; llfio_v2_xxx::byte_io_handle::write</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Write data to the open handle, preferentially using any i/o multiplexer set over the virtually overridable per-class implementation. </p>
+<dl class="section warning"><dt>Warning</dt><dd>Depending on the implementation backend, not all of the buffers input may be written. For example, with a zeroed deadline, some backends may only consume as many buffers as the system has available write slots for, thus for those backends this call is "non-blocking" in the sense that it will return immediately even if it could not schedule a single buffer write. Another example is that some implementations will not auto-extend the length of a file when a write exceeds the maximum extent, you will need to issue a <code>truncate(newsize)</code> first.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The buffers written, which may not be the buffers input. The size of each scatter-gather buffer returned is updated with the number of bytes of that buffer transferred. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">reqs</td><td>A scatter-gather and offset request. </td></tr>
+    <tr><td class="paramname">d</td><td>An optional deadline by which the i/o must complete, else it is cancelled. Note function may return significantly after this deadline if the i/o takes long to cancel. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Errors returnable\n Any of the values POSIX write() can return, errc::timed_out, errc::operation_canceled. errc::not_supported may be</dt><dd>returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
+<dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd></dd></dl>
+<div class="fragment"><div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;  {</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;    <span class="keywordflow">return</span> (_ctx == <span class="keyword">nullptr</span>) ? <a class="code" href="classllfio__v2__xxx_1_1byte__io__handle.html#a0dc183a5eca8c3fb601ebecc13540f96">_do_write</a>(reqs, d) : _do_multiplexer_write({}, std::move(reqs), d);</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;  }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a761a5bcfd2814631d84b467984c3a770"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a761a5bcfd2814631d84b467984c3a770">&#9670;&nbsp;</a></span>write() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Convenience initialiser list based overload for&lt; tt &gt; llfio_v2_xxx::byte_socket_handle::write </td>
+          <td>(</td>
+          <td class="paramtype">std::initializer_list&lt; <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1const__buffer__type.html">const_buffer_type</a> &gt;&#160;</td>
+          <td class="paramname"><em>lst</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
+<div class="fragment"><div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;  {</div>
+<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;    const_buffer_type *_reqs = <span class="keyword">reinterpret_cast&lt;</span>const_buffer_type *<span class="keyword">&gt;</span>(alloca(<span class="keyword">sizeof</span>(const_buffer_type) * lst.size()));</div>
+<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;    memcpy(_reqs, lst.begin(), <span class="keyword">sizeof</span>(const_buffer_type) * lst.size());</div>
+<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;    io_request&lt;const_buffers_type&gt; reqs(const_buffers_type(_reqs, lst.size()));</div>
+<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;    <span class="keyword">auto</span> ret = <a class="code" href="classllfio__v2__xxx_1_1byte__socket__handle.html#a761a5bcfd2814631d84b467984c3a770">write</a>(reqs, d);</div>
+<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;    <span class="keywordflow">if</span>(ret)</div>
+<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;    {</div>
+<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;      <span class="keywordflow">return</span> ret.bytes_transferred();</div>
+<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;    }</div>
+<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;    <span class="keywordflow">return</span> std::move(ret).error();</div>
+<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;  }</div>
+</div><!-- fragment -->
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>include/llfio/v2.0/<a class="el" href="byte__socket__handle_8hpp.html">byte_socket_handle.hpp</a></li>
 </ul>
@@ -1500,7 +1773,9 @@ For portability, you can only assume that barriers write order for a single hand
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__multiplexer_html_a977ed1bb0e53f9e5f7b7493245848dd0"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a977ed1bb0e53f9e5f7b7493245848dd0">llfio_v2_xxx::byte_io_multiplexer::do_byte_io_handle_max_buffers</a></div><div class="ttdeci">virtual size_t do_byte_io_handle_max_buffers(const byte_io_handle *h) const noexcept</div><div class="ttdoc">Implements byte_io_handle::max_buffers()</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:533</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__multiplexer_html_a0a0d3b7d155d63ac644a2e651e538b72"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a0a0d3b7d155d63ac644a2e651e538b72">llfio_v2_xxx::byte_io_multiplexer::construct</a></div><div class="ttdeci">virtual io_operation_state * construct(span&lt; byte &gt; storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &amp;&amp;b, deadline d, io_request&lt; buffers_type &gt; reqs) noexcept=0</div><div class="ttdoc">Constructs either a unsynchronised_io_operation_state or a synchronised_io_operation_state for a read...</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__socket__handle_html_a855a84c09fdc9c9c9626a0b51a34f70fa999f8815721873c59d567f2b149541a5"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__socket__handle.html#a855a84c09fdc9c9c9626a0b51a34f70fa999f8815721873c59d567f2b149541a5">llfio_v2_xxx::byte_socket_handle::shutdown_write</a></div><div class="ttdeci">@ shutdown_write</div><div class="ttdoc">Shutdown further writes.</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:539</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1byte__socket__handle_html_aaaf53f8cf34d7ab9d36a623a00a0882c"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__socket__handle.html#aaaf53f8cf34d7ab9d36a623a00a0882c">llfio_v2_xxx::byte_socket_handle::read</a></div><div class="ttdeci">io_result&lt; size_type &gt; read(std::initializer_list&lt; buffer_type &gt; lst, deadline d=deadline()) noexcept</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:648</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__multiplexer_html_a567ade7a70d3883b9fa88d17284702c0"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a567ade7a70d3883b9fa88d17284702c0">llfio_v2_xxx::byte_io_multiplexer::do_byte_io_handle_allocate_registered_buffer</a></div><div class="ttdeci">virtual result&lt; registered_buffer_type &gt; do_byte_io_handle_allocate_registered_buffer(byte_io_handle *h, size_t &amp;bytes) noexcept</div><div class="ttdoc">Implements byte_io_handle::allocate_registered_buffer()</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:537</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1byte__socket__handle_html_a761a5bcfd2814631d84b467984c3a770"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__socket__handle.html#a761a5bcfd2814631d84b467984c3a770">llfio_v2_xxx::byte_socket_handle::write</a></div><div class="ttdeci">io_result&lt; size_type &gt; write(std::initializer_list&lt; const_buffer_type &gt; lst, deadline d=deadline()) noexcept</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:662</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__socket__handle_html_a855a84c09fdc9c9c9626a0b51a34f70fa31c55b72d38c558a707b6ecbf6f88600"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__socket__handle.html#a855a84c09fdc9c9c9626a0b51a34f70fa31c55b72d38c558a707b6ecbf6f88600">llfio_v2_xxx::byte_socket_handle::shutdown_read</a></div><div class="ttdeci">@ shutdown_read</div><div class="ttdoc">Shutdown further reads.</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:538</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__multiplexer_html_a26c52ec51bcb3e27c457c51c6bae4112"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a26c52ec51bcb3e27c457c51c6bae4112">llfio_v2_xxx::byte_io_multiplexer::do_byte_io_handle_deregister</a></div><div class="ttdeci">virtual result&lt; void &gt; do_byte_io_handle_deregister(byte_io_handle *) noexcept</div><div class="ttdoc">Implements byte_io_handle deregistration.</div><div class="ttdef"><b>Definition:</b> byte_io_multiplexer.hpp:532</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__handle_html_ae7db63f7ae859409fd2fd667dcd9133a"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__handle.html#ae7db63f7ae859409fd2fd667dcd9133a">llfio_v2_xxx::byte_io_handle::_do_max_buffers</a></div><div class="ttdeci">virtual size_t _do_max_buffers() const noexcept</div><div class="ttdoc">The virtualised implementation of max_buffers() used if no multiplexer has been set.</div></div>

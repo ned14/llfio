@@ -183,12 +183,20 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:ab790b56ac85b5df7c13ed6ff72058e47"><td class="memItemLeft" align="right" valign="top"><a id="ab790b56ac85b5df7c13ed6ff72058e47"></a>
+virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1listening__tls__socket__handle.html#ab790b56ac85b5df7c13ed6ff72058e47">algorithms_description</a> () const =0</td></tr>
+<tr class="memdesc:ab790b56ac85b5df7c13ed6ff72058e47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an implementation defined string describing the algorithms to be chosen during connection. Can be an empty string if the implementation has no mechanism for determining the algorithms available. <br /></td></tr>
+<tr class="separator:ab790b56ac85b5df7c13ed6ff72058e47"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adfc195734ba5f5c816ef58414cb9c169"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1listening__tls__socket__handle.html#adfc195734ba5f5c816ef58414cb9c169">set_registered_buffer_chunk_size</a> (size_t bytes) noexcept=0</td></tr>
 <tr class="memdesc:adfc195734ba5f5c816ef58414cb9c169"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the chunk size for registered buffer allocation.  <a href="classllfio__v2__xxx_1_1listening__tls__socket__handle.html#adfc195734ba5f5c816ef58414cb9c169">More...</a><br /></td></tr>
 <tr class="separator:adfc195734ba5f5c816ef58414cb9c169"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a05625d78dbed209919868fb2311657eb"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1listening__tls__socket__handle.html#a05625d78dbed209919868fb2311657eb">set_authentication_certificates_path</a> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> <a class="el" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>) noexcept=0</td></tr>
-<tr class="memdesc:a05625d78dbed209919868fb2311657eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the CA certificates file by which this listening socket identifies itself to clients. Defaults to the system certificates store.  <a href="classllfio__v2__xxx_1_1listening__tls__socket__handle.html#a05625d78dbed209919868fb2311657eb">More...</a><br /></td></tr>
-<tr class="separator:a05625d78dbed209919868fb2311657eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ff0953c69704e7549d41c13d23d6876"><td class="memItemLeft" align="right" valign="top"><a id="a6ff0953c69704e7549d41c13d23d6876"></a>
+virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1listening__tls__socket__handle.html#a6ff0953c69704e7549d41c13d23d6876">set_algorithms</a> (tls_algorithm set) noexcept=0</td></tr>
+<tr class="memdesc:a6ff0953c69704e7549d41c13d23d6876"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the algorithms to be used by the TLS connection. <br /></td></tr>
+<tr class="separator:a6ff0953c69704e7549d41c13d23d6876"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1027a6a9387689fe281c57d6e802dfd0"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1listening__tls__socket__handle.html#a1027a6a9387689fe281c57d6e802dfd0">set_authentication_certificates_path</a> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> identifier) noexcept=0</td></tr>
+<tr class="memdesc:a1027a6a9387689fe281c57d6e802dfd0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the CA certificates by which this listening socket identifies itself to clients. Defaults to the system certificates store.  <a href="classllfio__v2__xxx_1_1listening__tls__socket__handle.html#a1027a6a9387689fe281c57d6e802dfd0">More...</a><br /></td></tr>
+<tr class="separator:a1027a6a9387689fe281c57d6e802dfd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0474f039ecabe14b94a9d85ca223ff93"><td class="memItemLeft" align="right" valign="top"><a id="a0474f039ecabe14b94a9d85ca223ff93"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>_deleter</b> ()</td></tr>
 <tr class="separator:a0474f039ecabe14b94a9d85ca223ff93"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -906,10 +914,10 @@ union {</td></tr>
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable\n Any of the errors which accept() or WSAAccept() might return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00879"></a><span class="lineno">  879</span>&#160;                                                                       {}) noexcept</div>
-<div class="line"><a name="l00880"></a><span class="lineno">  880</span>&#160;  {</div>
-<div class="line"><a name="l00881"></a><span class="lineno">  881</span>&#160;    <span class="keywordflow">return</span> (_ctx == <span class="keyword">nullptr</span>) ? _do_read(std::move(req), d) : _do_multiplexer_read(std::move(req), d);</div>
-<div class="line"><a name="l00882"></a><span class="lineno">  882</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00913"></a><span class="lineno">  913</span>&#160;                                                                       {}) noexcept</div>
+<div class="line"><a name="l00914"></a><span class="lineno">  914</span>&#160;  {</div>
+<div class="line"><a name="l00915"></a><span class="lineno">  915</span>&#160;    <span class="keywordflow">return</span> (_ctx == <span class="keyword">nullptr</span>) ? _do_read(std::move(req), d) : _do_multiplexer_read(std::move(req), d);</div>
+<div class="line"><a name="l00916"></a><span class="lineno">  916</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -946,8 +954,8 @@ union {</td></tr>
 
 </div>
 </div>
-<a id="a05625d78dbed209919868fb2311657eb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a05625d78dbed209919868fb2311657eb">&#9670;&nbsp;</a></span>set_authentication_certificates_path()</h2>
+<a id="a1027a6a9387689fe281c57d6e802dfd0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1027a6a9387689fe281c57d6e802dfd0">&#9670;&nbsp;</a></span>set_authentication_certificates_path()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -959,7 +967,7 @@ union {</td></tr>
           <td class="memname">virtual result&lt;void&gt; llfio_v2_xxx::listening_tls_socket_handle::set_authentication_certificates_path </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a>&#160;</td>
-          <td class="paramname"><em>path</em></td><td>)</td>
+          <td class="paramname"><em>identifier</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -970,8 +978,9 @@ union {</td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Sets the CA certificates file by which this listening socket identifies itself to clients. Defaults to the system certificates store. </p>
-<p>Note that setting this to an empty path <b>disables</b> authentication by the server, so man-in-the-middle attacks become possible. This can be useful however for situations where setting up authentication certificates is non-trivial or unnecessary, and all that is wanted is an encrypted network transport. </p>
+<p>Sets the CA certificates by which this listening socket identifies itself to clients. Defaults to the system certificates store. </p>
+<p>Note that setting this to an empty path <b>disables</b> authentication by the server, so server impersonation attacks become possible. This can be useful however for situations where setting up server authentication certificates is non-trivial or unnecessary, and all that is wanted is an encrypted network transport.</p>
+<p>Be aware that the path may not be a filesystem path, but some other sort of implementation defined identifier. </p>
 
 </div>
 </div>

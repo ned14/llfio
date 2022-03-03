@@ -70,9 +70,7 @@ var hierarchy =
       ] ],
       [ "llfio_v2_xxx::awaitable_handle< IoHandleType >", "classllfio__v2__xxx_1_1awaitable__handle.html", null ],
       [ "llfio_v2_xxx::byte_io_handle", "classllfio__v2__xxx_1_1byte__io__handle.html", [
-        [ "llfio_v2_xxx::byte_socket_handle", "classllfio__v2__xxx_1_1byte__socket__handle.html", [
-          [ "llfio_v2_xxx::tls_socket_handle", "classllfio__v2__xxx_1_1tls__socket__handle.html", null ]
-        ] ],
+        [ "llfio_v2_xxx::byte_socket_handle", "classllfio__v2__xxx_1_1byte__socket__handle.html", null ],
         [ "llfio_v2_xxx::lockable_byte_io_handle", "classllfio__v2__xxx_1_1lockable__byte__io__handle.html", [
           [ "llfio_v2_xxx::file_handle", "classllfio__v2__xxx_1_1file__handle.html", null ],
           [ "llfio_v2_xxx::map_handle", "classllfio__v2__xxx_1_1map__handle.html", null ]
@@ -143,8 +141,8 @@ var hierarchy =
     [ "llfio_v2_xxx::utils::process_memory_usage", "structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html", null ],
     [ "llfio_v2_xxx::byte_io_multiplexer::_unsynchronised_io_operation_state::payload_t::noncompleted_t::params_t::read_params_t", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payloc9e18bbda84f717c8aae78e5df350ef8.html", null ],
     [ "llfio_v2_xxx::read_receiver< IoHandleType >", "classllfio__v2__xxx_1_1read__receiver.html", null ],
-    [ "llfio_v2_xxx::utils::page_allocator< void >::rebind", "structllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
     [ "llfio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
+    [ "llfio_v2_xxx::utils::page_allocator< void >::rebind", "structllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
     [ "llfio_v2_xxx::ip::resolver", "classllfio__v2__xxx_1_1ip_1_1resolver.html", null ],
     [ "result", null, [
       [ "llfio_v2_xxx::byte_io_multiplexer::io_result< buffers_type >", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html", null ],
@@ -175,8 +173,10 @@ var hierarchy =
     [ "template override_< detail::combining_handle_adapter_base< Op, Target, Source, detail::combining_handle_adapter_choose_base< Target, Source > > >", null, [
       [ "llfio_v2_xxx::algorithm::combining_handle_adapter< Op, Target, Source >", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html", null ]
     ] ],
+    [ "tls_socket_handle", "classtls__socket__handle.html", null ],
     [ "llfio_v2_xxx::tls_socket_source", "classllfio__v2__xxx_1_1tls__socket__source.html", null ],
     [ "llfio_v2_xxx::tls_socket_source_implementation_information", "structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html", null ],
+    [ "llfio_v2_xxx::tls_socket_source_registry", "classllfio__v2__xxx_1_1tls__socket__source__registry.html", null ],
     [ "llfio_v2_xxx::algorithm::traversal_summary", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html", null ],
     [ "llfio_v2_xxx::algorithm::traverse_visitor", "structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html", [
       [ "llfio_v2_xxx::algorithm::compare_visitor", "structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html", null ],

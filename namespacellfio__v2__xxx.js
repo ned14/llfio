@@ -54,9 +54,9 @@ var namespacellfio__v2__xxx =
     [ "stat_t", "structllfio__v2__xxx_1_1stat__t.html", "structllfio__v2__xxx_1_1stat__t" ],
     [ "statfs_t", "structllfio__v2__xxx_1_1statfs__t.html", "structllfio__v2__xxx_1_1statfs__t" ],
     [ "symlink_handle", "classllfio__v2__xxx_1_1symlink__handle.html", "classllfio__v2__xxx_1_1symlink__handle" ],
-    [ "tls_socket_handle", "classllfio__v2__xxx_1_1tls__socket__handle.html", "classllfio__v2__xxx_1_1tls__socket__handle" ],
     [ "tls_socket_source", "classllfio__v2__xxx_1_1tls__socket__source.html", "classllfio__v2__xxx_1_1tls__socket__source" ],
     [ "tls_socket_source_implementation_information", "structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html", "structllfio__v2__xxx_1_1tls__socket__source__implementation__information" ],
+    [ "tls_socket_source_registry", "classllfio__v2__xxx_1_1tls__socket__source__registry.html", null ],
     [ "unique_file_lock", "classllfio__v2__xxx_1_1unique__file__lock.html", "classllfio__v2__xxx_1_1unique__file__lock" ],
     [ "write_receiver", "classllfio__v2__xxx_1_1write__receiver.html", "classllfio__v2__xxx_1_1write__receiver" ]
 ];
