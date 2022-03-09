@@ -1,5 +1,5 @@
 /* A TLS socket source based on OpenSSL
-(C) 2021-2021 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2021-2022 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: Dec 2021
 
 
@@ -101,7 +101,7 @@ namespace detail
    PSK-AES128-CCM
 */
   static const char *openssl_unverified_cipher_list = "CHACHA20:HIGH:aNULL:!EXPORT:!LOW:!eNULL:!SSLv2:!SSLv3:!TLSv1.0:!CAMELLIA:!ARIA:!SHA:!kRSA:@SECLEVEL=0";
-  //static const char *openssl_unverified_cipher_list = "CHACHA20:HIGH:!aNULL:!EXPORT:!LOW:!eNULL:!SSLv2:!SSLv3:!TLSv1.0:!CAMELLIA:!ARIA:!SHA:!kRSA";
+  // static const char *openssl_unverified_cipher_list = "CHACHA20:HIGH:!aNULL:!EXPORT:!LOW:!eNULL:!SSLv2:!SSLv3:!TLSv1.0:!CAMELLIA:!ARIA:!SHA:!kRSA";
   /* This is the list my OpenSSL v1.1 offers in HELLO for this spec (48):
 
    TLS_AES_256_GCM_SHA384
@@ -471,16 +471,28 @@ class openssl_socket_handle final : public tls_socket_handle
   optional<filesystem::path> _authentication_certificates_path;
   std::string _connect_hostname_port;
 
+  /* We use a registered buffer from the underlying transport for reads only, but not writes.
+  The reason why not is that OpenSSL doesn't seem to allow fixed size write buffers (as
+  according to the documentation for BIO_set_mem_buf), so there is no way of backpressuring
+  a fixed size buffer in OpenSSL. The documentation for BUF_MEM suggests that the buffer
+  must be a single contiguous region of memory, so we can't use a list of multiple registered
+  buffers either. If your TLS implementation were better designed, it should be possible to
+  use registered buffers for both reads and writes, and that then reduces CPU cache loading
+  on a very busy server.
+
+  Be aware that due to this design flaw in OpenSSL, it is possible to buffer writes to
+  infinity i.e. it never returns a partial write, it always accepts fully every write. We
+  therefore have to emulate backpressure below.
+  */
   std::mutex _lock;
   std::unique_lock<std::mutex> _lock_holder{_lock, std::defer_lock};
-  uint16_t _read_buffer_source_idx{0}, _write_buffer_source_idx{0};
-  uint16_t _read_buffer_sink_idx{0}, _write_buffer_sink_idx{0};
+  uint16_t _read_buffer_source_idx{0}, _read_buffer_sink_idx{0};
+  bool _write_socket_full{false};
   deadline _read_deadline, _write_deadline;
   result<void> _read_error{success()}, _write_error{success()};
   std::chrono::steady_clock::time_point _read_deadline_began_steady, _write_deadline_began_steady;
-  byte_socket_handle::registered_buffer_type _read_buffers[BUFFERS_COUNT]{}, _write_buffers[BUFFERS_COUNT]{};
+  byte_socket_handle::registered_buffer_type _read_buffers[BUFFERS_COUNT]{};
   byte_socket_handle::buffer_type _read_buffers_valid[BUFFERS_COUNT]{};
-  byte_socket_handle::const_buffer_type _write_buffers_valid[BUFFERS_COUNT]{};
 
   // Front of the queue
   std::pair<byte_socket_handle::registered_buffer_type *, byte_socket_handle::buffer_type *> _toread_source() noexcept
@@ -499,23 +511,6 @@ class openssl_socket_handle final : public tls_socket_handle
     }
     return {&_read_buffers[idx], &_read_buffers_valid[idx]};
   }
-  // Front of the queue
-  std::pair<byte_socket_handle::registered_buffer_type *, byte_socket_handle::const_buffer_type *> _towrite_source() noexcept
-  {
-    return {&_write_buffers[_write_buffer_source_idx % BUFFERS_COUNT], &_write_buffers_valid[_write_buffer_source_idx % BUFFERS_COUNT]};
-  }
-  bool _towrite_source_empty() const noexcept { return _write_buffers_valid[_write_buffer_source_idx % BUFFERS_COUNT].empty(); }
-  // Back of the queue. Can return "full"
-  std::pair<byte_socket_handle::registered_buffer_type *, byte_socket_handle::const_buffer_type *> _towrite_sink() noexcept
-  {
-    const auto idx = _write_buffer_sink_idx % BUFFERS_COUNT;
-    if(idx == (_write_buffer_source_idx % BUFFERS_COUNT) &&
-       (_write_buffers_valid[idx].data() + _write_buffers_valid[idx].size()) == (_write_buffers[idx]->data() + _write_buffers[idx]->size()))
-    {
-      return {nullptr, nullptr};  // full
-    }
-    return {&_write_buffers[idx], &_write_buffers_valid[idx]};
-  }
 
 #undef LLFIO_OPENSSL_DISPATCH
 #define LLFIO_OPENSSL_DISPATCH(functp, functt, ...)                                                                                                            \
@@ -524,6 +519,11 @@ class openssl_socket_handle final : public tls_socket_handle
 
 protected:
   virtual size_t _do_max_buffers() const noexcept override { return 1; /* There is no atomicity of scatter gather i/o at all! */ }
+  virtual result<registered_buffer_type> _do_allocate_registered_buffer(size_t &bytes) noexcept override
+  {
+    LLFIO_LOG_FUNCTION_CALL(this);
+    return LLFIO_OPENSSL_DISPATCH(allocate_registered_buffer, _do_allocate_registered_buffer, (bytes));
+  }
   virtual io_result<buffers_type> _do_read(io_request<buffers_type> reqs, deadline d) noexcept override
   {
     LLFIO_LOG_FUNCTION_CALL(this);
@@ -560,11 +560,16 @@ protected:
         {
           return errc::operation_would_block;
         }
-        return openssl_error(this).as_failure();
+        return openssl_error(this, errcode).as_failure();
       }
       if(read < reqs.buffers[n].size())
       {
         reqs.buffers[n] = {reqs.buffers[n].data(), read};
+        if(n == 0 && read == 0)
+        {
+          reqs.buffers = {reqs.buffers.data(), n};
+          return std::move(reqs.buffers);
+        }
         reqs.buffers = {reqs.buffers.data(), n + 1};
         break;
       }
@@ -590,6 +595,29 @@ protected:
     {
       _write_deadline = {};
     }
+    // OpenSSL will accept new writes forever, so we need to emulate write backpressure
+    if(_write_socket_full)
+    {
+      // Write nothing new to OpenSSL, should cause _bwrite() to get called which will check
+      // if the socket's write buffers have drained
+      size_t written = 0;
+      auto res = BIO_write_ex(_ssl_bio, nullptr, 0, &written);
+      if(res <= 0)
+      {
+        auto errcode = ERR_get_error();
+        if(BIO_should_retry(_ssl_bio))
+        {
+          return errc::operation_would_block;
+        }
+        return openssl_error(this, errcode).as_failure();
+      }
+      if(_write_socket_full)
+      {
+        // Return no buffers written
+        reqs.buffers = {reqs.buffers.data(), size_t(0)};
+        return std::move(reqs.buffers);
+      }
+    }
     for(size_t n = 0; n < reqs.buffers.size(); n++)
     {
       size_t written = 0;
@@ -607,11 +635,16 @@ protected:
         {
           return errc::operation_would_block;
         }
-        return openssl_error(this).as_failure();
+        return openssl_error(this, errcode).as_failure();
       }
       if(written < reqs.buffers[n].size())
       {
         reqs.buffers[n] = {reqs.buffers[n].data(), written};
+        if(n == 0 && written == 0)
+        {
+          reqs.buffers = {reqs.buffers.data(), n};
+          return std::move(reqs.buffers);
+        }
         reqs.buffers = {reqs.buffers.data(), n + 1};
         break;
       }
@@ -810,9 +843,7 @@ public:
     for(size_t n = 0; n < BUFFERS_COUNT; n++)
     {
       _read_buffers_valid[n] = {};
-      _write_buffers_valid[n] = {};
       _read_buffers[n].reset();
-      _write_buffers[n].reset();
     }
     return success();
   }
@@ -882,7 +913,7 @@ public:
     LLFIO_LOG_FUNCTION_CALL(this);
     _lock_holder.lock();
     auto unlock = make_scope_exit([this]() noexcept { _lock_holder.unlock(); });
-    if(!_toread_source_empty() || !_towrite_source_empty())
+    if(!_toread_source_empty())
     {
       return errc::device_or_resource_busy;
     }
@@ -893,9 +924,6 @@ public:
         auto _bytes = bytes;
         OUTCOME_TRY(_read_buffers[n], LLFIO_OPENSSL_DISPATCH(allocate_registered_buffer, allocate_registered_buffer, (_bytes)));
         _read_buffers_valid[n] = {_read_buffers[n]->data(), 0};
-        _bytes = bytes;
-        OUTCOME_TRY(_write_buffers[n], LLFIO_OPENSSL_DISPATCH(allocate_registered_buffer, allocate_registered_buffer, (_bytes)));
-        _write_buffers_valid[n] = {_write_buffers[n]->data(), 0};
       }
     }
     return success();
@@ -1073,130 +1101,36 @@ public:
       assert(_lock_holder.owns_lock());
       *written = 0;
       BIO_clear_retry_flags(bio);
-#if 0
-      // Write any existing buffers first
-      if(!_towrite_source_empty())
+      auto &began_steady = _write_deadline_began_steady;
+      deadline nd;
+      if(this->is_nonblocking())
       {
-        auto s = _towrite_source();
-        auto b = *s.second;
-        auto &began_steady = _write_deadline_began_steady;
-        deadline nd;
-        if(this->is_nonblocking())
-        {
-          LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, _write_deadline);
-        }
-        _lock_holder.unlock();
-        auto r = LLFIO_OPENSSL_DISPATCH(write, _do_write, (*s.first, {{&b, 1}, 0}, nd));
-        _lock_holder.lock();
-        if(!r)
-        {
-          if(r.error() == errc::operation_would_block || r.error() == errc::resource_unavailable_try_again || r.error() == errc::timed_out)
-          {
-            if(*written == 0)
-            {
-              BIO_set_retry_write(bio);
-              return 0;
-            }
-            return 1;
-          }
-          _write_error = std::move(r).as_failure();
-          LLFIO_OPENSSL_SET_RESULT_ERROR(2);
-          return 0;
-        }
-        *s.second = {s.second->data() + b.size(), s.second->size() - b.size()};
-        if(s.second->empty())
-        {
-          *s.second = {(*s.first)->data(), 0};
-          _write_buffer_source_idx++;
-        }
-        else
-        {
-          break;
-        }
-        auto r2 = [&]() -> result<void>
-        {
-          LLFIO_DEADLINE_TO_TIMEOUT_LOOP(_write_deadline);
-          return success();
-        }();
-        if(!r2)
+        LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, _write_deadline);
+      }
+      _lock_holder.unlock();
+      const_buffer_type b((const byte *) buffer, bytes);
+      auto r = LLFIO_OPENSSL_DISPATCH(write, _do_write, ({{&b, 1}, 0}, nd));
+      _lock_holder.lock();
+      _write_socket_full = false;
+      if(!r)
+      {
+        if(r.error() == errc::operation_would_block || r.error() == errc::resource_unavailable_try_again || r.error() == errc::timed_out)
         {
           if(*written == 0)
           {
             BIO_set_retry_write(bio);
+            _write_socket_full = true;
             return 0;
           }
           return 1;
         }
+        _write_error = std::move(r).as_failure();
+        LLFIO_OPENSSL_SET_RESULT_ERROR(2);
+        return 0;
       }
-#endif
-      // Are existing buffers now empty and we can write this directly?
-      if(_towrite_source_empty())
-      {
-        auto &began_steady = _write_deadline_began_steady;
-        deadline nd;
-        if(this->is_nonblocking())
-        {
-          LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, _write_deadline);
-        }
-        _lock_holder.unlock();
-        const_buffer_type b((const byte *) buffer, bytes);
-        auto r = LLFIO_OPENSSL_DISPATCH(write, _do_write, ({{&b, 1}, 0}, nd));
-        _lock_holder.lock();
-        if(!r)
-        {
-          if(r.error() == errc::operation_would_block || r.error() == errc::resource_unavailable_try_again || r.error() == errc::timed_out)
-          {
-            if(*written == 0)
-            {
-              BIO_set_retry_write(bio);
-              return 0;
-            }
-            return 1;
-          }
-          _write_error = std::move(r).as_failure();
-          LLFIO_OPENSSL_SET_RESULT_ERROR(2);
-          return 0;
-        }
-        buffer += b.size();
-        bytes -= b.size();
-        *written += b.size();
-        if(0 == bytes)
-        {
-          return 1;
-        }
-      }
-#if 0
-      // Append into write buffers
-      while(bytes > 0)
-      {
-        auto s = _towrite_sink();
-        // Are we full?
-        if(s.second == nullptr)
-        {
-          if(*written == 0)
-          {
-            BIO_set_retry_write(bio);
-            return 0;
-          }
-          return 1;
-        }
-        auto remaining = (size_t) (((*s.first)->data() + (*s.first)->size()) - (s.second->data() + s.second->size()));
-        auto tocopy = std::min(remaining, bytes);
-        memcpy((byte *) s.second->data() + s.second->size(), buffer, tocopy);
-        buffer += tocopy;
-        bytes -= tocopy;
-        *written += tocopy;
-        *s.second = {s.second->data(), s.second->size() + tocopy};
-        if(remaining == tocopy)
-        {
-          _write_buffer_sink_idx++;
-        }
-        if(0 == bytes)
-        {
-          return 1;
-        }
-      }
-#endif
+      buffer += b.size();
+      bytes -= b.size();
+      *written += b.size();
       return 1;
     }();
 #if LLFIO_OPENSSL_ENABLE_DEBUG_PRINTING
@@ -1214,52 +1148,11 @@ public:
     assert(_lock_holder.owns_lock());
     if(_ssl_bio != nullptr)
     {
-      auto *m = LLFIO_OPENSSL_DISPATCH(multiplexer, multiplexer, ());
-      do
+      auto res = BIO_flush(_ssl_bio);
+      if(res <= 0 && !BIO_should_retry(_ssl_bio))
       {
-        auto res = BIO_flush(_ssl_bio);
-        if(res <= 0 && !BIO_should_retry(_ssl_bio))
-        {
-          return openssl_error(this).as_failure();
-        }
-        if(!_towrite_source_empty())
-        {
-          if(m != nullptr)
-          {
-            deadline nd;
-            LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
-            OUTCOME_TRY(m->check_for_any_completed_io(nd));
-          }
-          if(this->is_nonblocking())
-          {
-            _write_deadline = std::chrono::seconds(0);
-          }
-          else
-          {
-            _write_deadline = {};
-          }
-          size_t written = 0;
-          res = _bwrite(_self_bio, nullptr, 0, &written);
-          if(res <= 0 && !BIO_should_retry(_ssl_bio))
-          {
-            return openssl_error(this).as_failure();
-          }
-          if(this->is_nonblocking())
-          {
-            _read_deadline = std::chrono::seconds(0);
-          }
-          else
-          {
-            _read_deadline = {};
-          }
-          size_t read = 0;
-          res = _bread(_self_bio, nullptr, 0, &read);
-          if(res <= 0 && !BIO_should_retry(_ssl_bio))
-          {
-            return openssl_error(this).as_failure();
-          }
-        }
-      } while(!_towrite_source_empty());
+        return openssl_error(this).as_failure();
+      }
     }
     return success();
   }
