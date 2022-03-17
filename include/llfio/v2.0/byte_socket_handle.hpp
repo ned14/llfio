@@ -599,8 +599,11 @@ public:
                                                                                 flag flags = flag::none) noexcept;
   //! \brief Convenience function defaulting `flag::multiplexable` set.
   LLFIO_MAKE_FREE_FUNCTION
-  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<byte_socket_handle>
-  multiplexable_byte_socket(ip::family family, mode _mode = mode::write, caching _caching = caching::all, flag flags = flag::multiplexable) noexcept;
+  static result<byte_socket_handle> multiplexable_byte_socket(ip::family family, mode _mode = mode::write, caching _caching = caching::all,
+                                                              flag flags = flag::multiplexable) noexcept
+  {
+    return byte_socket(family, _mode, _caching, flags);
+  }
 
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~byte_socket_handle() override
   {
@@ -1102,8 +1105,8 @@ public:
                                                                                           caching _caching = caching::all, flag flags = flag::none) noexcept;
   //! \brief Convenience function defaulting `flag::multiplexable` set.
   LLFIO_MAKE_FREE_FUNCTION
-  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle>
-  multiplexable_listening_socket(ip::family _family, mode _mode = mode::write, caching _caching = caching::all, flag flags = flag::multiplexable) noexcept
+  static result<listening_socket_handle> multiplexable_listening_socket(ip::family _family, mode _mode = mode::write, caching _caching = caching::all,
+                                                                        flag flags = flag::multiplexable) noexcept
   {
     return listening_socket(_family, _mode, _caching, flags);
   }

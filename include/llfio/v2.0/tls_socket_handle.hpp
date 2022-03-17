@@ -147,7 +147,7 @@ public:
     {
       deadline nd;
       LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
-      lasterror = byte_socket_handle::connect(address, nd);
+      lasterror = this->connect(address, nd);
       if(lasterror)
       {
         return lasterror;

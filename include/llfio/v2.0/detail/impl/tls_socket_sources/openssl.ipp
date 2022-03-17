@@ -24,14 +24,20 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../../../tls_socket_handle.hpp"
 
-#define LLFIO_OPENSSL_ENABLE_DEBUG_PRINTING 0
+#define LLFIO_OPENSSL_ENABLE_DEBUG_PRINTING 1
 
 #include <openssl/crypto.h>
 #include <openssl/err.h>
 #include <openssl/ssl.h>
+#include <openssl/x509.h>
 
 #if LLFIO_OPENSSL_ENABLE_DEBUG_PRINTING
 #include <iostream>
+#endif
+
+#ifdef _WIN32
+#include <cryptuiapi.h>
+#pragma comment(lib, "cryptui.lib")
 #endif
 
 LLFIO_V2_NAMESPACE_BEGIN
@@ -396,8 +402,14 @@ namespace detail
   static struct openssl_default_ctxs_t
   {
     SSL_CTX *unverified{nullptr}, *verified{nullptr};
+    X509_STORE *certstore{nullptr};
     ~openssl_default_ctxs_t()
     {
+      if(certstore != nullptr)
+      {
+        X509_STORE_free(certstore);
+        certstore = nullptr;
+      }
       if(verified != nullptr)
       {
         SSL_CTX_free(verified);
@@ -417,8 +429,42 @@ namespace detail
         QUICKCPPLIB_NAMESPACE::configurable_spinlock::lock_guard<QUICKCPPLIB_NAMESPACE::configurable_spinlock::spinlock<unsigned>> g(lock);
         if(verified == nullptr)
         {
-          auto make_ctx = [](bool verify_peer) -> result<SSL_CTX *>
+#ifdef _WIN32
+          // Create an OpenSSL certificate store made up of the certs from the Windows certificate store
+          HCERTSTORE winstore = CertOpenSystemStoreW(NULL, L"ROOT");
+          if(!winstore)
           {
+            return win32_error();
+          }
+          auto unwinstore = make_scope_exit([&]() noexcept { CertCloseStore(winstore, 0); });
+          certstore = X509_STORE_new();
+          if(!certstore)
+          {
+            return openssl_error(nullptr);
+          }
+          PCCERT_CONTEXT context = nullptr;
+          auto uncontext = make_scope_exit([&]() noexcept {
+            if(context != nullptr)
+            {
+              CertFreeCertificateContext(context);
+            }
+          });
+          while((context = CertEnumCertificatesInStore(winstore, context)) != nullptr)
+          {
+            const unsigned char *in = (const unsigned char *) context->pbCertEncoded;
+            X509 *x509 = d2i_X509(nullptr, &in, context->cbCertEncoded);
+            if(!x509)
+            {
+              return openssl_error(nullptr);
+            }
+            auto unx509 = make_scope_exit([&]() noexcept { X509_free(x509); });
+            if(X509_STORE_add_cert(certstore, x509) <= 0)
+            {
+              return openssl_error(nullptr);
+            }
+          }
+#endif
+          auto make_ctx = [certstore = certstore](bool verify_peer) -> result<SSL_CTX *> {
             SSL_CTX *_ctx = SSL_CTX_new(TLS_method());
             if(_ctx == nullptr)
             {
@@ -434,13 +480,17 @@ namespace detail
             }
             else
             {
+              if(certstore != nullptr)
+              {
+                SSL_CTX_set1_cert_store(_ctx, certstore);
+              }
               if(!SSL_CTX_set_cipher_list(_ctx, openssl_verified_cipher_list))
               {
                 return openssl_error(nullptr).as_failure();
               }
               SSL_CTX_set_verify(_ctx, SSL_VERIFY_PEER, nullptr);
               SSL_CTX_set_verify_depth(_ctx, 4);
-              if(!SSL_CTX_set_default_verify_paths(_ctx))
+              if(SSL_CTX_set_default_verify_paths(_ctx) <= 0)
               {
                 return openssl_error(nullptr).as_failure();
               }
@@ -670,7 +720,7 @@ protected:
     LLFIO_DEADLINE_TO_SLEEP_INIT(d);
     if(_ssl_bio == nullptr)
     {
-      OUTCOME_TRY(_init(true, _authentication_certificates_path && !_authentication_certificates_path->empty()));
+      OUTCOME_TRY(_init(true, _authentication_certificates_path));
     }
     if(!(_v.behaviour & native_handle_type::disposition::_is_connected))
     {
@@ -747,15 +797,33 @@ public:
     this->_v.behaviour = (sock->native_handle().behaviour & ~(native_handle_type::disposition::kernel_handle)) | native_handle_type::disposition::is_pointer;
   }
 
-  result<void> _init(bool is_client, bool verify_peer) noexcept
+  result<void> _init(bool is_client, const optional<filesystem::path> &certpath) noexcept
   {
     LLFIO_LOG_FUNCTION_CALL(this);
+    const bool verify_peer = (is_client && (!certpath.has_value() || !certpath->empty())) || (!is_client && (certpath.has_value() || !certpath->empty()));
     OUTCOME_TRY(detail::openssl_default_ctxs.init());
     assert(_ssl_bio == nullptr);
     _ssl_bio = BIO_new_ssl(verify_peer ? detail::openssl_default_ctxs.verified : detail::openssl_default_ctxs.unverified, is_client);
     if(_ssl_bio == nullptr)
     {
       return openssl_error(this).as_failure();
+    }
+    if(certpath.has_value() && !certpath->empty())
+    {
+      SSL *ssl{nullptr};
+      BIO_get_ssl(_ssl_bio, &ssl);
+      if(ssl == nullptr)
+      {
+        return openssl_error(this).as_failure();
+      }
+      if(SSL_use_certificate_file(ssl, certpath->string().c_str(), SSL_FILETYPE_PEM) <= 0)
+      {
+        return openssl_error(this).as_failure();
+      }
+      if(SSL_use_PrivateKey_file(ssl, certpath->string().c_str(), SSL_FILETYPE_PEM) <= 0)
+      {
+        return openssl_error(this).as_failure();
+      }
     }
     _self_bio = BIO_new(detail::openssl_custom_bio.method);
     if(_self_bio == nullptr)
@@ -962,28 +1030,28 @@ public:
       _connect_hostname_port.assign(host.data(), host.size());
       _connect_hostname_port.push_back(':');
       _connect_hostname_port.append(std::to_string(port));
-      auto res = BIO_set_conn_hostname(_ssl_bio, _connect_hostname_port.c_str());
-      if(res != 1)
-      {
-        return openssl_error(this).as_failure();
-      }
       if(_ctx == nullptr)
       {
-        OUTCOME_TRY(_init(true, true));
+        OUTCOME_TRY(_init(true, _authentication_certificates_path));
       }
+      auto res = BIO_set_conn_hostname(_ssl_bio, _connect_hostname_port.c_str());
+      /* if(res != 1)
+      {
+        return openssl_error(this).as_failure();
+      }*/
       SSL *ssl{nullptr};
       BIO_get_ssl(_ssl_bio, &ssl);
       if(ssl == nullptr)
       {
         return openssl_error(this).as_failure();
       }
-      auto hostname = _connect_hostname_port.substr(0, _connect_hostname_port.rfind(':'));
+      std::string hostname(host);
       res = SSL_set_tlsext_host_name(ssl, hostname.c_str());
       if(res != 1)
       {
         return openssl_error(this).as_failure();
       }
-      return _connect_hostname_port;
+      return string_view(_connect_hostname_port).substr(host.size() + 1);
     }
     catch(...)
     {
@@ -995,13 +1063,11 @@ public:
   int _bread(BIO *bio, char *buffer, size_t bytes, size_t *read)
   {
     LLFIO_LOG_FUNCTION_CALL(this);
-    auto ret = [=]() mutable
-    {
+    auto ret = [=]() mutable {
       assert(_lock_holder.owns_lock());
       *read = 0;
       BIO_clear_retry_flags(bio);
-      auto copy_out = [&]
-      {
+      auto copy_out = [&] {
         while(!_toread_source_empty() && bytes > 0)
         {
           auto s = _toread_source();
@@ -1036,7 +1102,7 @@ public:
         }
         return 1;
       }
-      auto remaining = (size_t) (((*s.first)->data() + (*s.first)->size()) - (s.second->data() + s.second->size()));
+      auto remaining = (size_t)(((*s.first)->data() + (*s.first)->size()) - (s.second->data() + s.second->size()));
       byte_socket_handle::buffer_type b{s.second->data() + s.second->size(), remaining};
       auto &began_steady = _read_deadline_began_steady;
       deadline nd;
@@ -1096,8 +1162,7 @@ public:
   int _bwrite(BIO *bio, const char *buffer, size_t bytes, size_t *written)
   {
     LLFIO_LOG_FUNCTION_CALL(this);
-    auto ret = [=]() mutable
-    {
+    auto ret = [=]() mutable {
       assert(_lock_holder.owns_lock());
       *written = 0;
       BIO_clear_retry_flags(bio);
@@ -1205,7 +1270,7 @@ protected:
     }
     req.buffers.connected_socket() = {tls_socket_handle_ptr(p), read.connected_socket().second};
     OUTCOME_TRY(p->set_registered_buffer_chunk_size(_registered_buffer_chunk_size));
-    OUTCOME_TRY(p->_init(false, !_authentication_certificates_path || !_authentication_certificates_path->empty()));
+    OUTCOME_TRY(p->_init(false, _authentication_certificates_path));
     return {std::move(req.buffers)};
   }
 
@@ -1225,7 +1290,7 @@ protected:
     }
     req.buffers.connected_socket() = {tls_socket_handle_ptr(p), read.connected_socket().second};
     OUTCOME_TRY(p->set_registered_buffer_chunk_size(_registered_buffer_chunk_size));
-    OUTCOME_TRY(p->_init(false, !_authentication_certificates_path || !_authentication_certificates_path->empty()));
+    OUTCOME_TRY(p->_init(false, _authentication_certificates_path));
     return {std::move(req.buffers)};
   }
 
