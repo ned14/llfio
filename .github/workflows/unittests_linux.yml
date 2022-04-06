@@ -25,6 +25,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Force cmake version to older than runner's
+      uses: jwlawson/actions-setup-cmake@v1.12
+      with:
+        cmake-version: '3.22.2'
+
     - name: CMake tests Linux
       shell: bash
       run: |
