@@ -44,7 +44,7 @@ struct sockaddr_in6;
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 class byte_socket_handle;
-class listening_socket_handle;
+class listening_byte_socket_handle;
 namespace ip
 {
   class address;
@@ -85,7 +85,7 @@ namespace ip
   class LLFIO_DECL address
   {
     friend class LLFIO_V2_NAMESPACE::byte_socket_handle;
-    friend class LLFIO_V2_NAMESPACE::listening_socket_handle;
+    friend class LLFIO_V2_NAMESPACE::listening_byte_socket_handle;
     friend LLFIO_HEADERS_ONLY_MEMFUNC_SPEC std::ostream &operator<<(std::ostream &s, const address &v);
 
   protected:
@@ -363,7 +363,7 @@ no longer blocks. However it will then block in `read()` or `write()`,
 unless its deadline is zero.
 
 If you want to create a socket which awaits connections, you need
-to instance a `listening_socket_handle`. Reads from that handle yield
+to instance a `listening_byte_socket_handle`. Reads from that handle yield
 new `byte_socket_handle` instances.
 
 ### `caching::safety_barriers`
@@ -621,21 +621,35 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> close() noexcept override;
 
   /*! \brief Convenience function to shut down the outbound connection and wait for the other side to shut down our
-  inbound connection by throwing away any bytes read, then closing the socket.
+  inbound connection by throwing away any bytes read, then closing the socket. Note that if the deadline passes
+  and we are still reading data, the socket is forced closed.
   */
   result<void> shutdown_and_close(deadline d = {}) noexcept
   {
     LLFIO_DEADLINE_TO_SLEEP_INIT(d);
-    OUTCOME_TRY(shutdown());
+    auto r = shutdown();
+    if(!r && r.assume_error() != errc::operation_in_progress)
+    {
+      OUTCOME_TRY(std::move(r));
+    }
     byte buffer[4096];
     for(;;)
     {
       deadline nd;
       LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
-      OUTCOME_TRY(auto readed, read(0, {{buffer}}, nd));
-      if(readed == 0)
+      auto r2 = read(0, {{buffer}}, nd);
+      if(r2 && r2.assume_value() == 0)
       {
         break;
+      }
+      if(!r2)
+      {
+        if(r2.assume_error() == errc::connection_aborted || r2.assume_error() == errc::connection_reset || r2.assume_error() == errc::not_connected ||
+           r2.assume_error() == errc::timed_out)
+        {
+          break;
+        }
+        OUTCOME_TRY(std::move(r2));
       }
     }
     return close();
@@ -686,29 +700,23 @@ template <> struct construct<byte_socket_handle>
   result<byte_socket_handle> operator()() const noexcept { return byte_socket_handle::byte_socket(family, _mode, _caching, flags); }
 };
 
-/* \class listening_socket_handle_impl
-\brief A handle to a socket-like entity able to receive incoming connections.
+/*! \class listening_socket_handle_buffer_types_injector
+\brief Injects buffer types for a particular kind of listening socket read.
 */
-template <class SocketType> class listening_socket_handle_impl : public handle, public pollable_handle
+template <class Base, class SocketType> struct listening_socket_handle_buffer_types_injector : public Base
 {
-  template <class ST> friend class listening_socket_handle_impl;
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept final { return *this; }
-
-protected:
-  byte_io_multiplexer *_ctx{nullptr};  // +4 or +8 bytes
-
-  template <class Impl>
-  result<typename Impl::buffers_type> _underlying_read(typename Impl::template io_request<typename Impl::buffers_type> req, deadline d) noexcept
+  using Base::Base;
+  constexpr listening_socket_handle_buffer_types_injector(Base &&o) noexcept(std::is_nothrow_move_constructible<Base>::value)
+      : Base(static_cast<Base &&>(o))
   {
-    if(_v.behaviour & native_handle_type::disposition::is_pointer)
-    {
-      return reinterpret_cast<Impl *>(_v.ptr)->read(std::move(req), d);
-    }
-    auto *sock = static_cast<Impl *>(static_cast<handle *>(this));
-    return (_ctx == nullptr) ? sock->Impl::_do_read(std::move(req), d) : sock->Impl::_do_multiplexer_read(std::move(req), d);
   }
+  listening_socket_handle_buffer_types_injector() = default;
+  listening_socket_handle_buffer_types_injector(const listening_socket_handle_buffer_types_injector &) = default;
+  listening_socket_handle_buffer_types_injector(listening_socket_handle_buffer_types_injector &&) = default;
+  listening_socket_handle_buffer_types_injector &operator=(const listening_socket_handle_buffer_types_injector &) = default;
+  listening_socket_handle_buffer_types_injector &operator=(listening_socket_handle_buffer_types_injector &&) = default;
+  ~listening_socket_handle_buffer_types_injector() = default;
 
-public:
   //! The buffer type used by this handle, which is a pair of `SocketType` and `ip::address`
   using buffer_type = std::pair<SocketType, ip::address>;
   //! The const buffer type used by this handle, which is a pair of `SocketType` and `ip::address`
@@ -812,21 +820,68 @@ public:
   };
   template <class T> using io_result = result<T>;
   template <class T> using awaitable = byte_io_multiplexer::awaitable<T>;
+};
 
+
+/* \class listening_byte_socket_handle
+\brief A handle to a socket-like entity able to receive incoming connections.
+*/
+class LLFIO_DECL listening_byte_socket_handle : public listening_socket_handle_buffer_types_injector<handle, byte_socket_handle>, public pollable_handle
+{
+  using _base = listening_socket_handle_buffer_types_injector<handle, byte_socket_handle>;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept final { return *this; }
+
+protected:
+  byte_io_multiplexer *_ctx{nullptr};  // +4 or +8 bytes
+
+  template <class Impl>
+  result<typename Impl::buffers_type> _underlying_read(typename Impl::template io_request<typename Impl::buffers_type> req, deadline d) noexcept
+  {
+    if(_v.behaviour & native_handle_type::disposition::is_pointer)
+    {
+      return reinterpret_cast<Impl *>(_v.ptr)->read(std::move(req), d);
+    }
+    auto *sock = static_cast<Impl *>(static_cast<handle *>(this));
+    return (_ctx == nullptr) ? sock->Impl::_do_read(std::move(req), d) : sock->Impl::_do_multiplexer_read(std::move(req), d);
+  }
+
+public:
   // Used by byte_socket_source
   virtual void _deleter() { delete this; }
 
 protected:
-  virtual result<buffers_type> _do_read(io_request<buffers_type> req, deadline d) noexcept = 0;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<buffers_type> _do_read(io_request<buffers_type> req, deadline d) noexcept;
 
-  virtual io_result<buffers_type> _do_multiplexer_read(io_request<buffers_type> reqs, deadline d) noexcept = 0;
+  virtual io_result<buffers_type> _do_multiplexer_read(io_request<buffers_type> reqs, deadline d) noexcept
+  {
+    LLFIO_DEADLINE_TO_SLEEP_INIT(d);
+    const auto state_reqs = _ctx->io_state_requirements();
+    auto *storage = (byte *) alloca(state_reqs.first + state_reqs.second);
+    const auto diff = (uintptr_t) storage & (state_reqs.second - 1);
+    storage += state_reqs.second - diff;
+    auto *state = _ctx->construct_and_init_io_operation({storage, state_reqs.first}, this, nullptr, d, reqs.buffers.connected_socket());
+    if(state == nullptr)
+    {
+      return errc::resource_unavailable_try_again;
+    }
+    OUTCOME_TRY(_ctx->flush_inited_io_operations());
+    while(!is_finished(_ctx->check_io_operation(state)))
+    {
+      deadline nd;
+      LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+      OUTCOME_TRY(_ctx->check_for_any_completed_io(nd));
+    }
+    OUTCOME_TRY(std::move(*state).get_completed_read());
+    state->~io_operation_state();
+    return {std::move(reqs.buffers)};
+  }
 
-protected:
+public:
   //! Default constructor
-  constexpr listening_socket_handle_impl() {}  // NOLINT
+  constexpr listening_byte_socket_handle() {}  // NOLINT
   //! Construct a handle from a supplied native handle
-  constexpr listening_socket_handle_impl(native_handle_type h, caching caching, flag flags, byte_io_multiplexer *ctx)
-      : handle(std::move(h), caching, flags)
+  constexpr listening_byte_socket_handle(native_handle_type h, caching caching, flag flags, byte_io_multiplexer *ctx)
+      : _base(std::move(h), caching, flags)
       , _ctx(ctx)
   {
 #ifdef _WIN32
@@ -837,12 +892,12 @@ protected:
 #endif
   }
   //! No copy construction (use clone())
-  listening_socket_handle_impl(const listening_socket_handle_impl &) = delete;
+  listening_byte_socket_handle(const listening_byte_socket_handle &) = delete;
   //! No copy assignment
-  listening_socket_handle_impl &operator=(const listening_socket_handle_impl &) = delete;
+  listening_byte_socket_handle &operator=(const listening_byte_socket_handle &) = delete;
   //! Implicit move construction of listening socket handle permitted
-  constexpr listening_socket_handle_impl(listening_socket_handle_impl &&o) noexcept
-      : handle(std::move(o))
+  constexpr listening_byte_socket_handle(listening_byte_socket_handle &&o) noexcept
+      : _base(std::move(o))
       , _ctx(o._ctx)
   {
 #ifdef _WIN32
@@ -854,8 +909,8 @@ protected:
 #endif
   }
   //! Explicit conversion from handle permitted
-  explicit constexpr listening_socket_handle_impl(handle &&o, byte_io_multiplexer *ctx) noexcept
-      : handle(std::move(o))
+  explicit constexpr listening_byte_socket_handle(handle &&o, byte_io_multiplexer *ctx) noexcept
+      : _base(std::move(o))
       , _ctx(ctx)
   {
 #ifdef _WIN32
@@ -864,6 +919,61 @@ protected:
       detail::register_socket_handle_instance(this);
     }
 #endif
+  }
+  //! Move assignment of listening_byte_socket_handle permitted
+  listening_byte_socket_handle &operator=(listening_byte_socket_handle &&o) noexcept
+  {
+    if(this == &o)
+    {
+      return *this;
+    }
+#ifdef _WIN32
+    if(_v)
+    {
+      detail::unregister_socket_handle_instance(this);
+    }
+#endif
+    this->~listening_byte_socket_handle();
+    new(this) listening_byte_socket_handle(std::move(o));
+    return *this;
+  }
+  //! Swap with another instance
+  LLFIO_MAKE_FREE_FUNCTION
+  void swap(listening_byte_socket_handle &o) noexcept
+  {
+    listening_byte_socket_handle temp(std::move(*this));
+    *this = std::move(o);
+    o = std::move(temp);
+  }
+  virtual ~listening_byte_socket_handle() override
+  {
+    if(_v)
+    {
+      (void) listening_byte_socket_handle::close();
+    }
+  }
+  virtual result<void> close() noexcept override
+  {
+    LLFIO_LOG_FUNCTION_CALL(this);
+    if(_ctx != nullptr)
+    {
+      OUTCOME_TRY(set_multiplexer(nullptr));
+    }
+#ifndef NDEBUG
+    if(_v)
+    {
+      // Tell handle::close() that we have correctly executed
+      _v.behaviour |= native_handle_type::disposition::_child_close_executed;
+    }
+#endif
+    auto ret = handle::close();
+#ifdef _WIN32
+    if(_v)
+    {
+      detail::unregister_socket_handle_instance(this);
+    }
+#endif
+    return ret;
   }
 
 public:
@@ -884,13 +994,66 @@ public:
 
   \mallocs Multiple dynamic memory allocations and deallocations.
   */
-  virtual result<void> set_multiplexer(byte_io_multiplexer *c = this_thread::multiplexer()) noexcept = 0;
+  virtual result<void> set_multiplexer(byte_io_multiplexer *c = this_thread::multiplexer()) noexcept
+  {
+    if(!is_multiplexable())
+    {
+      return errc::operation_not_supported;
+    }
+    if(c == _ctx)
+    {
+      return success();
+    }
+    if(_ctx != nullptr)
+    {
+      OUTCOME_TRY(_ctx->do_byte_io_handle_deregister(this));
+      _ctx = nullptr;
+    }
+    if(c != nullptr)
+    {
+      OUTCOME_TRY(auto &&state, c->do_byte_io_handle_register(this));
+      _v.behaviour = (_v.behaviour & ~(native_handle_type::disposition::_multiplexer_state_bit0 | native_handle_type::disposition::_multiplexer_state_bit1));
+      if((state & 1) != 0)
+      {
+        _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit0;
+      }
+      if((state & 2) != 0)
+      {
+        _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit1;
+      }
+    }
+    _ctx = c;
+    return success();
+  }
+
+  /*! Create a listening socket handle.
+  \param _family Which IP family to create the socket in.
+  \param _mode How to open the socket. If this is `mode::append`, the read side of the socket
+  is shutdown; if this is `mode::read`, the write side of the socket is shutdown.
+  \param _caching How to ask the kernel to cache the socket. If writes are not cached,
+  `SO_SNDBUF` to the minimum possible value and `TCP_NODELAY` is set, this should cause
+  writes to hit the network as quickly as possible.
+  \param flags Any additional custom behaviours.
+
+  \errors Any of the values POSIX `socket()` or `WSASocket()` can return.
+  */
+  LLFIO_MAKE_FREE_FUNCTION
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_byte_socket_handle>
+  listening_byte_socket(ip::family _family, mode _mode = mode::write, caching _caching = caching::all, flag flags = flag::none) noexcept;
+  //! \brief Convenience function defaulting `flag::multiplexable` set.
+  LLFIO_MAKE_FREE_FUNCTION
+  static result<listening_byte_socket_handle> multiplexable_listening_byte_socket(ip::family _family, mode _mode = mode::write, caching _caching = caching::all,
+                                                                             flag flags = flag::multiplexable) noexcept
+  {
+    return listening_byte_socket(_family, _mode, _caching, flags);
+  }
+
 
   //! Returns the IP family of this socket instance
   ip::family family() const noexcept { return (this->_v.behaviour & native_handle_type::disposition::is_alternate) ? ip::family::v6 : ip::family::v4; }
 
   //! Returns the local endpoint of this socket instance
-  virtual result<ip::address> local_endpoint() const noexcept = 0;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<ip::address> local_endpoint() const noexcept;
 
   /*! \brief Binds a socket to a local endpoint and sets the socket to listen for new connections.
   \param addr The local endpoint to which to bind the socket.
@@ -902,7 +1065,7 @@ public:
 
   \errors Any of the values `bind()` and `listen()` can return.
   */
-  virtual result<void> bind(const ip::address &addr, creation _creation = creation::only_if_not_exist, int backlog = -1) noexcept = 0;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> bind(const ip::address &addr, creation _creation = creation::only_if_not_exist, int backlog = -1) noexcept;
 
   /*! Read the contents of the listening socket for newly connected byte sockets.
 
@@ -940,186 +1103,14 @@ public:
 #endif
 };
 
-LLFIO_TEMPLATE(class T, class U)
-LLFIO_TREQUIRES(LLFIO_TEXPR(static_cast<T *>(static_cast<handle *>(nullptr))))
-T *socket_cast(listening_socket_handle_impl<U> *v)
-{
-  return static_cast<T *>(static_cast<handle *>(v));
-}
-LLFIO_TEMPLATE(class T, class U)
-LLFIO_TREQUIRES(LLFIO_TEXPR(static_cast<const T *>(static_cast<const handle *>(nullptr))))
-const T *socket_cast(const listening_socket_handle_impl<U> *v)
-{
-  return static_cast<const T *>(static_cast<const handle *>(v));
-}
-
-/* \class listening_socket_handle
-\brief A handle to a socket-like entity able to receive incoming connections.
-*/
-class LLFIO_DECL listening_socket_handle : public listening_socket_handle_impl<byte_socket_handle>
-{
-  template <class ST> friend class LLFIO_V2_NAMESPACE::listening_socket_handle_impl;
-  using _base = listening_socket_handle_impl<byte_socket_handle>;
-
-protected:
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<buffers_type> _do_read(io_request<buffers_type> req, deadline d) noexcept override;
-
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> _do_multiplexer_read(io_request<buffers_type> reqs, deadline d) noexcept override
-  {
-    LLFIO_DEADLINE_TO_SLEEP_INIT(d);
-    const auto state_reqs = _ctx->io_state_requirements();
-    auto *storage = (byte *) alloca(state_reqs.first + state_reqs.second);
-    const auto diff = (uintptr_t) storage & (state_reqs.second - 1);
-    storage += state_reqs.second - diff;
-    auto *state = _ctx->construct_and_init_io_operation({storage, state_reqs.first}, this, nullptr, d, reqs.buffers.connected_socket());
-    if(state == nullptr)
-    {
-      return errc::resource_unavailable_try_again;
-    }
-    OUTCOME_TRY(_ctx->flush_inited_io_operations());
-    while(!is_finished(_ctx->check_io_operation(state)))
-    {
-      deadline nd;
-      LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
-      OUTCOME_TRY(_ctx->check_for_any_completed_io(nd));
-    }
-    OUTCOME_TRY(std::move(*state).get_completed_read());
-    state->~io_operation_state();
-    return {std::move(reqs.buffers)};
-  }
-
-public:
-  constexpr listening_socket_handle() {}
-  using _base::_base;
-  listening_socket_handle(const listening_socket_handle &) = delete;
-  listening_socket_handle(listening_socket_handle &&) = default;
-  listening_socket_handle &operator=(const listening_socket_handle &) = delete;
-  //! Move assignment of listening_socket_handle_impl permitted
-  listening_socket_handle_impl &operator=(listening_socket_handle &&o) noexcept
-  {
-    if(this == &o)
-    {
-      return *this;
-    }
-#ifdef _WIN32
-    if(_v)
-    {
-      detail::unregister_socket_handle_instance(this);
-    }
-#endif
-    this->~listening_socket_handle();
-    new(this) listening_socket_handle(std::move(o));
-    return *this;
-  }
-
-  //! Swap with another instance
-  LLFIO_MAKE_FREE_FUNCTION
-  void swap(listening_socket_handle &o) noexcept
-  {
-    listening_socket_handle temp(std::move(*this));
-    *this = std::move(o);
-    o = std::move(temp);
-  }
-
-  virtual ~listening_socket_handle() override
-  {
-    if(_v)
-    {
-      (void) listening_socket_handle_impl::close();
-    }
-  }
-  virtual result<void> close() noexcept override
-  {
-    LLFIO_LOG_FUNCTION_CALL(this);
-    if(_ctx != nullptr)
-    {
-      OUTCOME_TRY(set_multiplexer(nullptr));
-    }
-#ifndef NDEBUG
-    if(_v)
-    {
-      // Tell handle::close() that we have correctly executed
-      _v.behaviour |= native_handle_type::disposition::_child_close_executed;
-    }
-#endif
-    auto ret = handle::close();
-#ifdef _WIN32
-    if(_v)
-    {
-      detail::unregister_socket_handle_instance(this);
-    }
-#endif
-    return ret;
-  }
-
-  virtual result<void> set_multiplexer(byte_io_multiplexer *c = this_thread::multiplexer()) noexcept override
-  {
-    if(!is_multiplexable())
-    {
-      return errc::operation_not_supported;
-    }
-    if(c == _ctx)
-    {
-      return success();
-    }
-    if(_ctx != nullptr)
-    {
-      OUTCOME_TRY(_ctx->do_byte_io_handle_deregister(this));
-      _ctx = nullptr;
-    }
-    if(c != nullptr)
-    {
-      OUTCOME_TRY(auto &&state, c->do_byte_io_handle_register(this));
-      _v.behaviour = (_v.behaviour & ~(native_handle_type::disposition::_multiplexer_state_bit0 | native_handle_type::disposition::_multiplexer_state_bit1));
-      if((state & 1) != 0)
-      {
-        _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit0;
-      }
-      if((state & 2) != 0)
-      {
-        _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit1;
-      }
-    }
-    _ctx = c;
-    return success();
-  }
-
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<ip::address> local_endpoint() const noexcept override;
-
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> bind(const ip::address &addr, creation _creation = creation::only_if_not_exist,
-                                                    int backlog = -1) noexcept override;
-
-  /*! Create a listening socket handle.
-  \param _family Which IP family to create the socket in.
-  \param _mode How to open the socket. If this is `mode::append`, the read side of the socket
-  is shutdown; if this is `mode::read`, the write side of the socket is shutdown.
-  \param _caching How to ask the kernel to cache the socket. If writes are not cached,
-  `SO_SNDBUF` to the minimum possible value and `TCP_NODELAY` is set, this should cause
-  writes to hit the network as quickly as possible.
-  \param flags Any additional custom behaviours.
-
-  \errors Any of the values POSIX `socket()` or `WSASocket()` can return.
-  */
-  LLFIO_MAKE_FREE_FUNCTION
-  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle> listening_socket(ip::family _family, mode _mode = mode::write,
-                                                                                          caching _caching = caching::all, flag flags = flag::none) noexcept;
-  //! \brief Convenience function defaulting `flag::multiplexable` set.
-  LLFIO_MAKE_FREE_FUNCTION
-  static result<listening_socket_handle> multiplexable_listening_socket(ip::family _family, mode _mode = mode::write, caching _caching = caching::all,
-                                                                        flag flags = flag::multiplexable) noexcept
-  {
-    return listening_socket(_family, _mode, _caching, flags);
-  }
-};
-
-//! \brief Constructor for `listening_socket_handle`
-template <> struct construct<listening_socket_handle>
+//! \brief Constructor for `listening_byte_socket_handle`
+template <> struct construct<listening_byte_socket_handle>
 {
   ip::family family;
   byte_socket_handle::mode _mode = byte_socket_handle::mode::write;
   byte_socket_handle::caching _caching = byte_socket_handle::caching::all;
   byte_socket_handle::flag flags = byte_socket_handle::flag::none;
-  result<listening_socket_handle> operator()() const noexcept { return listening_socket_handle::listening_socket(family, _mode, _caching, flags); }
+  result<listening_byte_socket_handle> operator()() const noexcept { return listening_byte_socket_handle::listening_byte_socket(family, _mode, _caching, flags); }
 };
 
 // BEGIN make_free_functions.py

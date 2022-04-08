@@ -107,7 +107,7 @@ namespace test
         ret.multiplexes.kernel.file_handle = true;
         ret.multiplexes.kernel.pipe_handle = true;
         ret.multiplexes.kernel.byte_socket_handle = true;
-        ret.multiplexes.kernel.listening_socket_handle = false;
+        ret.multiplexes.kernel.listening_byte_socket_handle = false;
         return ret;
       }();
       return v;

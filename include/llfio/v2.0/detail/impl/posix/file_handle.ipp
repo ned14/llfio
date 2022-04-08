@@ -807,7 +807,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
       {
       retry_clone:
         bool done = false;
-        const auto thisblock = std::min(blocksize, item.src.length - thisoffset);
+        const auto thisblock = (size_type) std::min(blocksize, item.src.length - thisoffset);
         if(duplicate_extents && item.op == workitem::clone_extents)
         {
           off_t off_in = item.src.offset + thisoffset, off_out = item.src.offset + thisoffset + destoffsetdiff;

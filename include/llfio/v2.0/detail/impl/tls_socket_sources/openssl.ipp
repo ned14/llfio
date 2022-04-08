@@ -24,7 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../../../tls_socket_handle.hpp"
 
-#define LLFIO_OPENSSL_ENABLE_DEBUG_PRINTING 1
+#define LLFIO_OPENSSL_ENABLE_DEBUG_PRINTING 0
 
 #include <openssl/crypto.h>
 #include <openssl/err.h>
@@ -252,6 +252,64 @@ namespace detail
   constexpr openssl_error_domain openssl_error_domain_inst;
   inline constexpr const openssl_error_domain &openssl_error_domain::get() { return openssl_error_domain_inst; }
   using openssl_code = OUTCOME_V2_NAMESPACE::experimental::status_code<openssl_error_domain>;
+
+  struct x509_error_domain final : public OUTCOME_V2_NAMESPACE::experimental::status_code_domain
+  {
+    using value_type = int;
+
+    constexpr x509_error_domain()
+        : OUTCOME_V2_NAMESPACE::experimental::status_code_domain("{bea47e79-6787-6009-7ac7-ba8616575312}")
+    {
+    }
+
+    virtual string_ref name() const noexcept override { return string_ref("x509"); }
+    virtual payload_info_t payload_info() const noexcept override
+    {
+      return {sizeof(value_type), sizeof(status_code_domain *) + sizeof(value_type),
+              (alignof(value_type) > alignof(status_code_domain *)) ? alignof(value_type) : alignof(status_code_domain *)};
+    }
+    static inline constexpr const x509_error_domain &get();
+
+    virtual bool _do_failure(const OUTCOME_V2_NAMESPACE::experimental::status_code<void> &code) const noexcept override
+    {
+      auto &c = static_cast<const OUTCOME_V2_NAMESPACE::experimental::status_code<x509_error_domain> &>(code);
+      return c.value() != 0;
+    }
+    virtual bool _do_equivalent(const OUTCOME_V2_NAMESPACE::experimental::status_code<void> &code1,
+                                const OUTCOME_V2_NAMESPACE::experimental::status_code<void> &code2) const noexcept override
+    {
+      assert(code1.domain() == *this);                                                                                  // NOLINT
+      const auto &c1 = static_cast<const OUTCOME_V2_NAMESPACE::experimental::status_code<x509_error_domain> &>(code1);  // NOLINT
+      if(code2.domain() == *this)
+      {
+        const auto &c2 = static_cast<const OUTCOME_V2_NAMESPACE::experimental::status_code<x509_error_domain> &>(code2);  // NOLINT
+        return c1.value() == c2.value();
+      }
+      return false;
+    }
+    virtual OUTCOME_V2_NAMESPACE::experimental::generic_code
+    _generic_code(const OUTCOME_V2_NAMESPACE::experimental::status_code<void> &) const noexcept override
+    {
+      return errc::unknown;
+    }
+    virtual string_ref _do_message(const OUTCOME_V2_NAMESPACE::experimental::status_code<void> &code) const noexcept override
+    {
+      auto &c = static_cast<const OUTCOME_V2_NAMESPACE::experimental::status_code<x509_error_domain> &>(code);
+      if(c.value() == 0)
+      {
+        return string_ref("not an error");
+      }
+      return string_ref(X509_verify_cert_error_string(c.value()));
+    }
+    SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const OUTCOME_V2_NAMESPACE::experimental::status_code<void> &code) const override
+    {
+      auto &c = static_cast<const OUTCOME_V2_NAMESPACE::experimental::status_code<x509_error_domain> &>(code);
+      throw OUTCOME_V2_NAMESPACE::experimental::status_error<x509_error_domain>(c);
+    }
+  };
+  constexpr x509_error_domain x509_error_domain_inst;
+  inline constexpr const x509_error_domain &x509_error_domain::get() { return x509_error_domain_inst; }
+  using x509_code = OUTCOME_V2_NAMESPACE::experimental::status_code<x509_error_domain>;
 }  // namespace detail
 template <class T> inline result<void> openssl_error(T *inst, unsigned long errcode = ERR_get_error())
 {
@@ -262,14 +320,14 @@ template <class T> inline result<void> openssl_error(T *inst, unsigned long errc
       abort();
     }
     auto ret = (ERR_GET_REASON(errcode) == 2) ? std::move(inst->_write_error) : std::move(inst->_read_error);
-#if 1
+#if LLFIO_OPENSSL_ENABLE_DEBUG_PRINTING
     std::lock_guard<std::mutex> g(detail::openssl_printing_lock);
     std::cerr << "OpenSSL underlying error: " << ret.error().message().c_str() << std::endl;
 #endif
     return ret;
   }
   detail::openssl_code ret(errcode);
-#if 1
+#if LLFIO_OPENSSL_ENABLE_DEBUG_PRINTING
   std::lock_guard<std::mutex> g(detail::openssl_printing_lock);
   std::cerr << "OpenSSL error: " << ret.message().c_str() << std::endl;
 #endif
@@ -283,9 +341,19 @@ inline result<void> openssl_error(std::nullptr_t, unsigned long errcode = ERR_ge
     abort();
   }
   detail::openssl_code ret(errcode);
-#if 1
+#if LLFIO_OPENSSL_ENABLE_DEBUG_PRINTING
   std::lock_guard<std::mutex> g(detail::openssl_printing_lock);
   std::cerr << "OpenSSL error: " << ret.message().c_str() << std::endl;
+#endif
+  assert(ret.failure());
+  return ret;
+}
+inline result<void> x509_error(int errcode)
+{
+  detail::x509_code ret(errcode);
+#if LLFIO_OPENSSL_ENABLE_DEBUG_PRINTING
+  std::lock_guard<std::mutex> g(detail::openssl_printing_lock);
+  std::cerr << "X509 error: " << ret.message().c_str() << std::endl;
 #endif
   assert(ret.failure());
   return ret;
@@ -327,6 +395,17 @@ namespace detail
       return {buffer};
     }
   };
+  struct x509_error_category final : public std::error_category
+  {
+    virtual const char *name() const noexcept override { return "x509"; }
+    virtual std::error_condition default_error_condition(int code) const noexcept override { return {code, *this}; }
+    virtual std::string message(int code) const override
+    {
+      if(code == 0)
+        return "not an error";
+      return X509_verify_cert_error_string(code);
+    }
+  };
 }  // namespace detail
 template <class T> inline result<void> openssl_error(T *inst, unsigned long errcode = ERR_get_error())
 {
@@ -339,7 +418,12 @@ template <class T> inline result<void> openssl_error(T *inst, unsigned long errc
     return (ERR_GET_REASON(errcode) == 2) ? std::move(inst->_write_error) : std::move(inst->_read_error);
   }
   static detail::openssl_error_category cat;
-  return error_info(std::error_code((int) errcode, cat));
+  error_info ret(std::error_code((int) errcode, cat));
+#if LLFIO_OPENSSL_ENABLE_DEBUG_PRINTING
+  std::lock_guard<std::mutex> g(detail::openssl_printing_lock);
+  std::cout << "ERROR: " << ret.message() << std::endl;
+#endif
+  return ret;
 }
 inline result<void> openssl_error(std::nullptr_t, unsigned long errcode = ERR_get_error())
 {
@@ -348,6 +432,11 @@ inline result<void> openssl_error(std::nullptr_t, unsigned long errcode = ERR_ge
     abort();
   }
   static detail::openssl_error_category cat;
+  return error_info(std::error_code((int) errcode, cat));
+}
+inline result<void> x509_error(int errcode)
+{
+  static detail::x509_error_category cat;
   return error_info(std::error_code((int) errcode, cat));
 }
 #endif
@@ -443,7 +532,9 @@ namespace detail
             return openssl_error(nullptr);
           }
           PCCERT_CONTEXT context = nullptr;
-          auto uncontext = make_scope_exit([&]() noexcept {
+          auto uncontext = make_scope_exit(
+          [&]() noexcept
+          {
             if(context != nullptr)
             {
               CertFreeCertificateContext(context);
@@ -458,13 +549,18 @@ namespace detail
               return openssl_error(nullptr);
             }
             auto unx509 = make_scope_exit([&]() noexcept { X509_free(x509); });
+            //{
+            //  X509_NAME_print_ex_fp(stdout, X509_get_issuer_name(x509), 3, 0);
+            //  printf("\n");
+            //}
             if(X509_STORE_add_cert(certstore, x509) <= 0)
             {
               return openssl_error(nullptr);
             }
           }
 #endif
-          auto make_ctx = [certstore = certstore](bool verify_peer) -> result<SSL_CTX *> {
+          auto make_ctx = [certstore = certstore](bool verify_peer) -> result<SSL_CTX *>
+          {
             SSL_CTX *_ctx = SSL_CTX_new(TLS_method());
             if(_ctx == nullptr)
             {
@@ -522,10 +618,14 @@ class openssl_socket_handle final : public tls_socket_handle
   std::string _connect_hostname_port;
 
   /* We use a registered buffer from the underlying transport for reads only, but not writes.
-  The reason why not is that OpenSSL doesn't seem to allow fixed size write buffers (as
-  according to the documentation for BIO_set_mem_buf), so there is no way of backpressuring
-  a fixed size buffer in OpenSSL. The documentation for BUF_MEM suggests that the buffer
-  must be a single contiguous region of memory, so we can't use a list of multiple registered
+  The reason why not is that from my best reading of the implementation source code,
+  OpenSSL doesn't seem to allow fixed size write buffers (as according to the documentation
+  for BIO_set_mem_buf), plus OpenSSL seems to treat failure to allocate memory as an abort
+  situation rather than a retry situation, so there seems to me that is no way of backpressuring
+  a fixed size buffer in OpenSSL.
+
+  Furthermore, the documentation for BUF_MEM suggests that the buffer must be a single
+  contiguous region of memory, so we can't use a list of multiple registered
   buffers either. If your TLS implementation were better designed, it should be possible to
   use registered buffers for both reads and writes, and that then reduces CPU cache loading
   on a very busy server.
@@ -538,6 +638,7 @@ class openssl_socket_handle final : public tls_socket_handle
   std::unique_lock<std::mutex> _lock_holder{_lock, std::defer_lock};
   uint16_t _read_buffer_source_idx{0}, _read_buffer_sink_idx{0};
   bool _write_socket_full{false};
+  uint8_t _still_connecting{0};
   deadline _read_deadline, _write_deadline;
   result<void> _read_error{success()}, _write_error{success()};
   std::chrono::steady_clock::time_point _read_deadline_began_steady, _write_deadline_began_steady;
@@ -582,10 +683,21 @@ protected:
       return errc::not_supported;
     }
     _lock_holder.lock();
-    auto unlock = make_scope_exit([this]() noexcept { _lock_holder.unlock(); });
+    auto unlock = make_scope_exit(
+    [this]() noexcept
+    {
+      if(_lock_holder.owns_lock())
+      {
+        _lock_holder.unlock();
+      }
+    });
+    if(!(_v.behaviour & native_handle_type::disposition::_is_connected) || _still_connecting > 0)
+    {
+      return errc::not_connected;
+    }
+    LLFIO_DEADLINE_TO_SLEEP_INIT(d);
     if(d)
     {
-      LLFIO_DEADLINE_TO_SLEEP_INIT(d);
       _read_deadline_began_steady = began_steady;
       _read_deadline = d;
     }
@@ -596,7 +708,9 @@ protected:
     for(size_t n = 0; n < reqs.buffers.size(); n++)
     {
       size_t read = 0;
-      auto res = BIO_read_ex(_ssl_bio, reqs.buffers[n].data(), reqs.buffers[n].size(), &read);
+      // OpenSSL early outs if buf is ever null
+      byte dummy{}, *buf = reqs.buffers[n].empty() ? &dummy : reqs.buffers[n].data();
+      auto res = BIO_read_ex(_ssl_bio, buf, reqs.buffers[n].size(), &read);
       if(res <= 0)
       {
         auto errcode = ERR_get_error();
@@ -634,7 +748,18 @@ protected:
       return errc::not_supported;
     }
     _lock_holder.lock();
-    auto unlock = make_scope_exit([this]() noexcept { _lock_holder.unlock(); });
+    auto unlock = make_scope_exit(
+    [this]() noexcept
+    {
+      if(_lock_holder.owns_lock())
+      {
+        _lock_holder.unlock();
+      }
+    });
+    if(!(_v.behaviour & native_handle_type::disposition::_is_connected) || _still_connecting > 0)
+    {
+      return errc::not_connected;
+    }
     LLFIO_DEADLINE_TO_SLEEP_INIT(d);
     if(d)
     {
@@ -716,47 +841,64 @@ protected:
       return errc::not_supported;
     }
     _lock_holder.lock();
-    auto unlock = make_scope_exit([this]() noexcept { _lock_holder.unlock(); });
-    LLFIO_DEADLINE_TO_SLEEP_INIT(d);
+    auto unlock = make_scope_exit(
+    [this]() noexcept
+    {
+      if(_lock_holder.owns_lock())
+      {
+        _lock_holder.unlock();
+      }
+    });
     if(_ssl_bio == nullptr)
     {
       OUTCOME_TRY(_init(true, _authentication_certificates_path));
     }
-    if(!(_v.behaviour & native_handle_type::disposition::_is_connected))
+    if(!(_v.behaviour & native_handle_type::disposition::_is_connected) || _still_connecting > 0)
     {
+      LLFIO_DEADLINE_TO_SLEEP_INIT(d);
       OUTCOME_TRY(LLFIO_OPENSSL_DISPATCH(connect, _do_connect, (addr, d)));
-      if(d)
+      for(;;)
       {
-        _read_deadline_began_steady = began_steady;
-        _write_deadline_began_steady = began_steady;
-        _read_deadline = d;
-        _write_deadline = d;
-      }
-      else
-      {
-        _read_deadline = {};
-        _write_deadline = {};
-      }
-      auto res = BIO_do_connect(_ssl_bio);
-      if(res != 1)
-      {
-        if(BIO_should_retry(_ssl_bio))
+        deadline nd;
+        LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+        if(nd)
         {
-          return errc::operation_in_progress;
+          _read_deadline_began_steady = began_steady;
+          _write_deadline_began_steady = began_steady;
+          _read_deadline = d;
+          _write_deadline = d;
         }
-        return openssl_error(this).as_failure();
-      }
-
-      res = BIO_do_handshake(_ssl_bio);
-      if(res != 1)
-      {
-        if(BIO_should_retry(_ssl_bio))
+        else
         {
-          return errc::operation_in_progress;
+          _read_deadline = {};
+          _write_deadline = {};
         }
-        return openssl_error(this).as_failure();
+        if(_still_connecting < 1)
+        {
+          auto res = BIO_do_connect(_ssl_bio);
+          _still_connecting = 1;
+          if(res != 1)
+          {
+            if(BIO_should_retry(_ssl_bio))
+            {
+              return errc::operation_in_progress;
+            }
+            return openssl_error(this).as_failure();
+          }
+        }
+        {
+          auto res = BIO_do_handshake(_ssl_bio);
+          if(res != 1)
+          {
+            if(BIO_should_retry(_ssl_bio))
+            {
+              return errc::operation_in_progress;
+            }
+            return openssl_error(this).as_failure();
+          }
+        }
+        break;
       }
-
       if(!_connect_hostname_port.empty())
       {
         SSL *ssl{nullptr};
@@ -774,13 +916,14 @@ protected:
         {
           return openssl_error(this).as_failure();
         }
-        res = SSL_get_verify_result(ssl);
+        auto res = SSL_get_verify_result(ssl);
         if(X509_V_OK != res)
         {
-          return openssl_error(this).as_failure();
+          return x509_error(res).as_failure();
         }
       }
       _v.behaviour |= native_handle_type::disposition::_is_connected;
+      _still_connecting = 0;
     }
     return success();
   }
@@ -800,7 +943,8 @@ public:
   result<void> _init(bool is_client, const optional<filesystem::path> &certpath) noexcept
   {
     LLFIO_LOG_FUNCTION_CALL(this);
-    const bool verify_peer = (is_client && (!certpath.has_value() || !certpath->empty())) || (!is_client && (certpath.has_value() || !certpath->empty()));
+    const bool verify_peer =
+    (is_client && (!certpath.has_value() || (certpath.has_value() && !certpath->empty()))) || (!is_client && (!certpath.has_value() || !certpath->empty()));
     OUTCOME_TRY(detail::openssl_default_ctxs.init());
     assert(_ssl_bio == nullptr);
     _ssl_bio = BIO_new_ssl(verify_peer ? detail::openssl_default_ctxs.verified : detail::openssl_default_ctxs.unverified, is_client);
@@ -841,7 +985,14 @@ public:
     if(kind == shutdown_write || kind == shutdown_both)
     {
       _lock_holder.lock();
-      auto unlock = make_scope_exit([this]() noexcept { _lock_holder.unlock(); });
+      auto unlock = make_scope_exit(
+      [this]() noexcept
+      {
+        if(_lock_holder.owns_lock())
+        {
+          _lock_holder.unlock();
+        }
+      });
       SSL *ssl{nullptr};
       BIO_get_ssl(_ssl_bio, &ssl);
       if(ssl == nullptr)
@@ -862,7 +1013,12 @@ public:
           {
             return errc::operation_in_progress;
           }
-          return openssl_error(this).as_failure();
+          if(e == SSL_ERROR_SSL)
+          {
+            // Already shut down?
+            break;
+          }
+          return openssl_error(this, e).as_failure();
         }
         // Shutdown is in progress
         if(this->is_nonblocking())
@@ -893,20 +1049,29 @@ public:
   {
     LLFIO_LOG_FUNCTION_CALL(this);
     _lock_holder.lock();
-    auto unlock = make_scope_exit([this]() noexcept { _lock_holder.unlock(); });
+    auto unlock = make_scope_exit(
+    [this]() noexcept
+    {
+      if(_lock_holder.owns_lock())
+      {
+        _lock_holder.unlock();
+      }
+    });
     OUTCOME_TRY(_flush_towrite({}));
+    if(_ssl_bio != nullptr)
+    {
+      BIO_free_all(_ssl_bio);  // also frees _self_bio
+      _ssl_bio = nullptr;
+    }
     if(_v.behaviour & native_handle_type::disposition::is_pointer)
     {
       tls_socket_handle::release();
     }
     else
     {
+      _lock_holder.unlock();
       OUTCOME_TRY(tls_socket_handle::close());
-    }
-    if(_ssl_bio != nullptr)
-    {
-      BIO_free_all(_ssl_bio);  // also frees _self_bio
-      _ssl_bio = nullptr;
+      _lock_holder.lock();
     }
     for(size_t n = 0; n < BUFFERS_COUNT; n++)
     {
@@ -980,7 +1145,14 @@ public:
   {
     LLFIO_LOG_FUNCTION_CALL(this);
     _lock_holder.lock();
-    auto unlock = make_scope_exit([this]() noexcept { _lock_holder.unlock(); });
+    auto unlock = make_scope_exit(
+    [this]() noexcept
+    {
+      if(_lock_holder.owns_lock())
+      {
+        _lock_holder.unlock();
+      }
+    });
     if(!_toread_source_empty())
     {
       return errc::device_or_resource_busy;
@@ -1063,11 +1235,13 @@ public:
   int _bread(BIO *bio, char *buffer, size_t bytes, size_t *read)
   {
     LLFIO_LOG_FUNCTION_CALL(this);
-    auto ret = [=]() mutable {
+    auto ret = [=]() mutable
+    {
       assert(_lock_holder.owns_lock());
       *read = 0;
       BIO_clear_retry_flags(bio);
-      auto copy_out = [&] {
+      auto copy_out = [&]
+      {
         while(!_toread_source_empty() && bytes > 0)
         {
           auto s = _toread_source();
@@ -1102,7 +1276,7 @@ public:
         }
         return 1;
       }
-      auto remaining = (size_t)(((*s.first)->data() + (*s.first)->size()) - (s.second->data() + s.second->size()));
+      auto remaining = (size_t) (((*s.first)->data() + (*s.first)->size()) - (s.second->data() + s.second->size()));
       byte_socket_handle::buffer_type b{s.second->data() + s.second->size(), remaining};
       auto &began_steady = _read_deadline_began_steady;
       deadline nd;
@@ -1119,17 +1293,15 @@ public:
         }
       }
       _lock_holder.unlock();
+      assert(!requires_aligned_io());
+      assert(_v.is_valid());
       auto r = LLFIO_OPENSSL_DISPATCH(read, _do_read, (*s.first, {{&b, 1}, 0}, nd));
       _lock_holder.lock();
       if(!r)
       {
-        if(r.error() == errc::operation_would_block || r.error() == errc::resource_unavailable_try_again || r.error() == errc::timed_out)
+        // Return an error if we never read any data, otherwise sink the error
+        if(*read > 0)
         {
-          if(*read == 0)
-          {
-            BIO_set_retry_read(bio);
-            return 0;
-          }
           return 1;
         }
         _read_error = std::move(r).as_failure();
@@ -1152,7 +1324,7 @@ public:
 #if LLFIO_OPENSSL_ENABLE_DEBUG_PRINTING
     std::lock_guard<std::mutex> g(detail::openssl_printing_lock);
     auto s = _toread_source();
-    std::cout << "_bread(" << (void *) buffer << ", " << bytes << ") returns " << ret << " with " << *read << " bytes read and " << s.second->size()
+    std::cout << this << " _bread(" << (void *) buffer << ", " << bytes << ") returns " << ret << " with " << *read << " bytes read and " << s.second->size()
               << " remaining in source buffer." << std::endl;
 #endif
     return ret;
@@ -1162,7 +1334,8 @@ public:
   int _bwrite(BIO *bio, const char *buffer, size_t bytes, size_t *written)
   {
     LLFIO_LOG_FUNCTION_CALL(this);
-    auto ret = [=]() mutable {
+    auto ret = [=]() mutable
+    {
       assert(_lock_holder.owns_lock());
       *written = 0;
       BIO_clear_retry_flags(bio);
@@ -1173,26 +1346,18 @@ public:
         LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, _write_deadline);
       }
       _lock_holder.unlock();
+      assert(!requires_aligned_io());
+      assert(_v.is_valid());
       const_buffer_type b((const byte *) buffer, bytes);
       auto r = LLFIO_OPENSSL_DISPATCH(write, _do_write, ({{&b, 1}, 0}, nd));
       _lock_holder.lock();
-      _write_socket_full = false;
       if(!r)
       {
-        if(r.error() == errc::operation_would_block || r.error() == errc::resource_unavailable_try_again || r.error() == errc::timed_out)
-        {
-          if(*written == 0)
-          {
-            BIO_set_retry_write(bio);
-            _write_socket_full = true;
-            return 0;
-          }
-          return 1;
-        }
         _write_error = std::move(r).as_failure();
         LLFIO_OPENSSL_SET_RESULT_ERROR(2);
         return 0;
       }
+      _write_socket_full = (b.size() == 0);
       buffer += b.size();
       bytes -= b.size();
       *written += b.size();
@@ -1200,7 +1365,7 @@ public:
     }();
 #if LLFIO_OPENSSL_ENABLE_DEBUG_PRINTING
     std::lock_guard<std::mutex> g(detail::openssl_printing_lock);
-    std::cout << "_bwrite(" << (void *) buffer << ", " << bytes << ") returns " << ret << " with " << *written << " bytes written." << std::endl;
+    std::cout << this << "_bwrite(" << (void *) buffer << ", " << bytes << ") returns " << ret << " with " << *written << " bytes written." << std::endl;
 #endif
     return ret;
   }
@@ -1246,12 +1411,12 @@ class listening_openssl_socket_handle final : public listening_tls_socket_handle
 
 #undef LLFIO_OPENSSL_DISPATCH
   /* *this has a vptr whose functions point into this class, so what
-  we need is to bind the function implementation listening_socket_handle
+  we need is to bind the function implementation listening_byte_socket_handle
   using its vptr and call it.
   */
 #define LLFIO_OPENSSL_DISPATCH(functp, functt, ...)                                                                                                            \
-  ((_v.behaviour & native_handle_type::disposition::is_pointer) ? (reinterpret_cast<listening_socket_handle *>(_v.ptr)->functp) __VA_ARGS__ :                  \
-                                                                  (socket_cast<listening_socket_handle>(this)->listening_socket_handle::functt) __VA_ARGS__)
+  ((_v.behaviour & native_handle_type::disposition::is_pointer) ? (reinterpret_cast<listening_byte_socket_handle *>(_v.ptr)->functp) __VA_ARGS__ :             \
+                                                                  (listening_byte_socket_handle::functt) __VA_ARGS__)
 
 protected:
   virtual result<buffers_type> _do_read(io_request<buffers_type> req, deadline d) noexcept override
@@ -1261,8 +1426,8 @@ protected:
     {
       return errc::not_supported;
     }
-    listening_socket_handle::buffer_type b;
-    OUTCOME_TRY(auto &&read, _underlying_read<listening_socket_handle>({b}, d));
+    listening_byte_socket_handle::buffer_type b;
+    OUTCOME_TRY(auto &&read, _underlying_read<listening_byte_socket_handle>({b}, d));
     auto *p = new(std::nothrow) openssl_socket_handle(std::move(read.connected_socket().first));
     if(p == nullptr)
     {
@@ -1281,8 +1446,8 @@ protected:
     {
       return errc::not_supported;
     }
-    listening_socket_handle::buffer_type b;
-    OUTCOME_TRY(auto &&read, _underlying_read<listening_socket_handle>({b}, d));
+    listening_byte_socket_handle::buffer_type b;
+    OUTCOME_TRY(auto &&read, _underlying_read<listening_byte_socket_handle>({b}, d));
     auto *p = new(std::nothrow) openssl_socket_handle(std::move(read.connected_socket().first));
     if(p == nullptr)
     {
@@ -1295,11 +1460,11 @@ protected:
   }
 
 public:
-  explicit listening_openssl_socket_handle(listening_socket_handle &&sock)
+  explicit listening_openssl_socket_handle(listening_byte_socket_handle &&sock)
       : listening_tls_socket_handle(std::move(sock))
   {
   }
-  explicit listening_openssl_socket_handle(listening_socket_handle *sock)
+  explicit listening_openssl_socket_handle(listening_byte_socket_handle *sock)
       : listening_tls_socket_handle(handle(), nullptr)
   {
     this->_v.ptr = sock;
@@ -1440,7 +1605,7 @@ static struct openssl_socket_source_registration_t
     virtual result<listening_tls_socket_handle_ptr> listening_socket(ip::family family, byte_socket_handle::mode _mode, byte_socket_handle::caching _caching,
                                                                      byte_socket_handle::flag flags) noexcept override
     {
-      OUTCOME_TRY(auto &&sock, listening_socket_handle::listening_socket(family, _mode, _caching, flags));
+      OUTCOME_TRY(auto &&sock, listening_byte_socket_handle::listening_byte_socket(family, _mode, _caching, flags));
       auto *p = new(std::nothrow) listening_openssl_socket_handle(std::move(sock));
       if(p == nullptr)
       {
@@ -1462,7 +1627,7 @@ static struct openssl_socket_source_registration_t
       return {std::move(ret)};
     }
 
-    virtual result<listening_tls_socket_handle_ptr> wrap(listening_socket_handle *listening) noexcept override
+    virtual result<listening_tls_socket_handle_ptr> wrap(listening_byte_socket_handle *listening) noexcept override
     {
       auto *p = new(std::nothrow) listening_openssl_socket_handle(listening);
       if(p == nullptr)

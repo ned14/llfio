@@ -615,7 +615,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> byte_socket_handle::close() noexcep
 
 /*******************************************************************************************************************/
 
-LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<ip::address> listening_socket_handle::local_endpoint() const noexcept
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<ip::address> listening_byte_socket_handle::local_endpoint() const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   ip::address ret;
@@ -627,7 +627,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<ip::address> listening_socket_handle::loc
   return ret;
 }
 
-LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> listening_socket_handle::bind(const ip::address &addr, creation _creation, int backlog) noexcept
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> listening_byte_socket_handle::bind(const ip::address &addr, creation _creation, int backlog) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   if(_creation != creation::only_if_not_exist)
@@ -649,16 +649,16 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> listening_socket_handle::bind(const
   return success();
 }
 
-LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle> listening_socket_handle::listening_socket(ip::family family, mode _mode, caching _caching,
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_byte_socket_handle> listening_byte_socket_handle::listening_byte_socket(ip::family family, mode _mode, caching _caching,
                                                                                                           flag flags) noexcept
 {
-  result<listening_socket_handle> ret(listening_socket_handle(native_handle_type(), _caching, flags, nullptr));
+  result<listening_byte_socket_handle> ret(listening_byte_socket_handle(native_handle_type(), _caching, flags, nullptr));
   native_handle_type &nativeh = ret.value()._v;
   OUTCOME_TRY(detail::create_socket(&ret.value(), nativeh, family, _mode, _caching, flags));
   return ret;
 }
 
-LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle::buffers_type> listening_socket_handle::_do_read(io_request<buffers_type> req,
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_byte_socket_handle::buffers_type> listening_byte_socket_handle::_do_read(io_request<buffers_type> req,
                                                                                                                 deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
