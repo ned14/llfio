@@ -987,10 +987,10 @@ template&lt;class ST &gt; </td></tr>
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable\n Any of the errors which accept() or WSAAccept() might return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00916"></a><span class="lineno">  916</span>&#160;                                                                       {}) noexcept</div>
-<div class="line"><a name="l00917"></a><span class="lineno">  917</span>&#160;  {</div>
-<div class="line"><a name="l00918"></a><span class="lineno">  918</span>&#160;    <span class="keywordflow">return</span> (_ctx == <span class="keyword">nullptr</span>) ? _do_read(std::move(req), d) : _do_multiplexer_read(std::move(req), d);</div>
-<div class="line"><a name="l00919"></a><span class="lineno">  919</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00930"></a><span class="lineno">  930</span>&#160;                                                                       {}) noexcept</div>
+<div class="line"><a name="l00931"></a><span class="lineno">  931</span>&#160;  {</div>
+<div class="line"><a name="l00932"></a><span class="lineno">  932</span>&#160;    <span class="keywordflow">return</span> (_ctx == <span class="keyword">nullptr</span>) ? _do_read(std::move(req), d) : _do_multiplexer_read(std::move(req), d);</div>
+<div class="line"><a name="l00933"></a><span class="lineno">  933</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1057,36 +1057,36 @@ template&lt;class ST &gt; </td></tr>
 <dl class="section user"><dt>Memory Allocations\n Multiple dynamic memory allocations and deallocations.</dt><dd></dd></dl>
 
 <p>Implements <a class="el" href="classllfio__v2__xxx_1_1listening__socket__handle__impl.html#a453b87588684df7103bd44dcceab42de">llfio_v2_xxx::listening_socket_handle_impl&lt; byte_socket_handle &gt;</a>.</p>
-<div class="fragment"><div class="line"><a name="l01056"></a><span class="lineno"> 1056</span>&#160;  {</div>
-<div class="line"><a name="l01057"></a><span class="lineno"> 1057</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="classllfio__v2__xxx_1_1handle.html#ade2416b9154d1e56937c99cd514324f8">is_multiplexable</a>())</div>
-<div class="line"><a name="l01058"></a><span class="lineno"> 1058</span>&#160;    {</div>
-<div class="line"><a name="l01059"></a><span class="lineno"> 1059</span>&#160;      <span class="keywordflow">return</span> errc::operation_not_supported;</div>
-<div class="line"><a name="l01060"></a><span class="lineno"> 1060</span>&#160;    }</div>
-<div class="line"><a name="l01061"></a><span class="lineno"> 1061</span>&#160;    <span class="keywordflow">if</span>(c == _ctx)</div>
-<div class="line"><a name="l01062"></a><span class="lineno"> 1062</span>&#160;    {</div>
-<div class="line"><a name="l01063"></a><span class="lineno"> 1063</span>&#160;      <span class="keywordflow">return</span> success();</div>
-<div class="line"><a name="l01064"></a><span class="lineno"> 1064</span>&#160;    }</div>
-<div class="line"><a name="l01065"></a><span class="lineno"> 1065</span>&#160;    <span class="keywordflow">if</span>(_ctx != <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l01066"></a><span class="lineno"> 1066</span>&#160;    {</div>
-<div class="line"><a name="l01067"></a><span class="lineno"> 1067</span>&#160;      OUTCOME_TRY(_ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a26c52ec51bcb3e27c457c51c6bae4112">do_byte_io_handle_deregister</a>(<span class="keyword">this</span>));</div>
-<div class="line"><a name="l01068"></a><span class="lineno"> 1068</span>&#160;      _ctx = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l01069"></a><span class="lineno"> 1069</span>&#160;    }</div>
-<div class="line"><a name="l01070"></a><span class="lineno"> 1070</span>&#160;    <span class="keywordflow">if</span>(c != <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l01071"></a><span class="lineno"> 1071</span>&#160;    {</div>
-<div class="line"><a name="l01072"></a><span class="lineno"> 1072</span>&#160;      OUTCOME_TRY(<span class="keyword">auto</span> &amp;&amp;state, c-&gt;do_byte_io_handle_register(<span class="keyword">this</span>));</div>
-<div class="line"><a name="l01073"></a><span class="lineno"> 1073</span>&#160;      _v.behaviour = (_v.behaviour &amp; ~(native_handle_type::disposition::_multiplexer_state_bit0 | native_handle_type::disposition::_multiplexer_state_bit1));</div>
-<div class="line"><a name="l01074"></a><span class="lineno"> 1074</span>&#160;      <span class="keywordflow">if</span>((state &amp; 1) != 0)</div>
-<div class="line"><a name="l01075"></a><span class="lineno"> 1075</span>&#160;      {</div>
-<div class="line"><a name="l01076"></a><span class="lineno"> 1076</span>&#160;        _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit0;</div>
-<div class="line"><a name="l01077"></a><span class="lineno"> 1077</span>&#160;      }</div>
-<div class="line"><a name="l01078"></a><span class="lineno"> 1078</span>&#160;      <span class="keywordflow">if</span>((state &amp; 2) != 0)</div>
-<div class="line"><a name="l01079"></a><span class="lineno"> 1079</span>&#160;      {</div>
-<div class="line"><a name="l01080"></a><span class="lineno"> 1080</span>&#160;        _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit1;</div>
-<div class="line"><a name="l01081"></a><span class="lineno"> 1081</span>&#160;      }</div>
-<div class="line"><a name="l01082"></a><span class="lineno"> 1082</span>&#160;    }</div>
-<div class="line"><a name="l01083"></a><span class="lineno"> 1083</span>&#160;    _ctx = c;</div>
-<div class="line"><a name="l01084"></a><span class="lineno"> 1084</span>&#160;    <span class="keywordflow">return</span> success();</div>
-<div class="line"><a name="l01085"></a><span class="lineno"> 1085</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l01070"></a><span class="lineno"> 1070</span>&#160;  {</div>
+<div class="line"><a name="l01071"></a><span class="lineno"> 1071</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="classllfio__v2__xxx_1_1handle.html#ade2416b9154d1e56937c99cd514324f8">is_multiplexable</a>())</div>
+<div class="line"><a name="l01072"></a><span class="lineno"> 1072</span>&#160;    {</div>
+<div class="line"><a name="l01073"></a><span class="lineno"> 1073</span>&#160;      <span class="keywordflow">return</span> errc::operation_not_supported;</div>
+<div class="line"><a name="l01074"></a><span class="lineno"> 1074</span>&#160;    }</div>
+<div class="line"><a name="l01075"></a><span class="lineno"> 1075</span>&#160;    <span class="keywordflow">if</span>(c == _ctx)</div>
+<div class="line"><a name="l01076"></a><span class="lineno"> 1076</span>&#160;    {</div>
+<div class="line"><a name="l01077"></a><span class="lineno"> 1077</span>&#160;      <span class="keywordflow">return</span> success();</div>
+<div class="line"><a name="l01078"></a><span class="lineno"> 1078</span>&#160;    }</div>
+<div class="line"><a name="l01079"></a><span class="lineno"> 1079</span>&#160;    <span class="keywordflow">if</span>(_ctx != <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l01080"></a><span class="lineno"> 1080</span>&#160;    {</div>
+<div class="line"><a name="l01081"></a><span class="lineno"> 1081</span>&#160;      OUTCOME_TRY(_ctx-&gt;<a class="code" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a26c52ec51bcb3e27c457c51c6bae4112">do_byte_io_handle_deregister</a>(<span class="keyword">this</span>));</div>
+<div class="line"><a name="l01082"></a><span class="lineno"> 1082</span>&#160;      _ctx = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l01083"></a><span class="lineno"> 1083</span>&#160;    }</div>
+<div class="line"><a name="l01084"></a><span class="lineno"> 1084</span>&#160;    <span class="keywordflow">if</span>(c != <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l01085"></a><span class="lineno"> 1085</span>&#160;    {</div>
+<div class="line"><a name="l01086"></a><span class="lineno"> 1086</span>&#160;      OUTCOME_TRY(<span class="keyword">auto</span> &amp;&amp;state, c-&gt;do_byte_io_handle_register(<span class="keyword">this</span>));</div>
+<div class="line"><a name="l01087"></a><span class="lineno"> 1087</span>&#160;      _v.behaviour = (_v.behaviour &amp; ~(native_handle_type::disposition::_multiplexer_state_bit0 | native_handle_type::disposition::_multiplexer_state_bit1));</div>
+<div class="line"><a name="l01088"></a><span class="lineno"> 1088</span>&#160;      <span class="keywordflow">if</span>((state &amp; 1) != 0)</div>
+<div class="line"><a name="l01089"></a><span class="lineno"> 1089</span>&#160;      {</div>
+<div class="line"><a name="l01090"></a><span class="lineno"> 1090</span>&#160;        _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit0;</div>
+<div class="line"><a name="l01091"></a><span class="lineno"> 1091</span>&#160;      }</div>
+<div class="line"><a name="l01092"></a><span class="lineno"> 1092</span>&#160;      <span class="keywordflow">if</span>((state &amp; 2) != 0)</div>
+<div class="line"><a name="l01093"></a><span class="lineno"> 1093</span>&#160;      {</div>
+<div class="line"><a name="l01094"></a><span class="lineno"> 1094</span>&#160;        _v.behaviour |= native_handle_type::disposition::_multiplexer_state_bit1;</div>
+<div class="line"><a name="l01095"></a><span class="lineno"> 1095</span>&#160;      }</div>
+<div class="line"><a name="l01096"></a><span class="lineno"> 1096</span>&#160;    }</div>
+<div class="line"><a name="l01097"></a><span class="lineno"> 1097</span>&#160;    _ctx = c;</div>
+<div class="line"><a name="l01098"></a><span class="lineno"> 1098</span>&#160;    <span class="keywordflow">return</span> success();</div>
+<div class="line"><a name="l01099"></a><span class="lineno"> 1099</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
