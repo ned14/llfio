@@ -595,7 +595,7 @@ union {</td></tr>
 <p>If you construct it directly and assign it a socket that you created, then it refers to a kernel BSD socket, as the default implementation is for a kernel BSD socket. If you get an instance from elsewhere, it may have a <em>very</em> different implementation.</p>
 <p>The default is blocking sockets, on which timed out i/o is not possible. In this use case, <code>byte_socket()</code> will block until a successful connection is established with the remote address. Thereafter <code>read()</code> and <code>write()</code> block based on i/o from the other side, returning immediately if at least one byte is transferred.</p>
 <p>If <code>flag::multiplexable</code> is specified which causes the handle to be created as <code>native_handle_type::disposition::nonblocking</code>, <code>byte_socket()</code> no longer blocks. However it will then block in <code>read()</code> or <code>write()</code>, unless its deadline is zero.</p>
-<p>If you want to create a socket which awaits connections, you need to instance a <code>listening_socket_handle</code>. Reads from that handle yield new <code>byte_socket_handle</code> instances.</p>
+<p>If you want to create a socket which awaits connections, you need to instance a <code>listening_byte_socket_handle</code>. Reads from that handle yield new <code>byte_socket_handle</code> instances.</p>
 <h3><a class="anchor" id="autotoc_md0"></a>
 &lt;tt&gt;caching::safety_barriers&lt;/tt&gt;</h3>
 <p>TCP connections need to be closed by both parties in a specific way to not cause the tail of data sent to get truncated:</p>

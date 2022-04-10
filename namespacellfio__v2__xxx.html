@@ -152,8 +152,8 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1construct_3_01file__handle_01_4.html">construct&lt; file_handle &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for <code>file_handle</code>  <a href="structllfio__v2__xxx_1_1construct_3_01file__handle_01_4.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1construct_3_01listening__socket__handle_01_4.html">construct&lt; listening_socket_handle &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for <code>listening_socket_handle</code>  <a href="structllfio__v2__xxx_1_1construct_3_01listening__socket__handle_01_4.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1construct_3_01listening__byte__socket__handle_01_4.html">construct&lt; listening_byte_socket_handle &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for <code>listening_byte_socket_handle</code>  <a href="structllfio__v2__xxx_1_1construct_3_01listening__byte__socket__handle_01_4.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1construct_3_01map__handle_01_4.html">construct&lt; map_handle &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for <code>map_handle</code>  <a href="structllfio__v2__xxx_1_1construct_3_01map__handle_01_4.html#details">More...</a><br /></td></tr>
@@ -205,9 +205,10 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A native_handle_type which is managed by the lifetime of this object instance.  <a href="classllfio__v2__xxx_1_1handle.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1listening__socket__handle.html">listening_socket_handle</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1listening__byte__socket__handle.html">listening_byte_socket_handle</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1listening__socket__handle__impl.html">listening_socket_handle_impl</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1listening__socket__handle__buffer__types__injector.html">listening_socket_handle_buffer_types_injector</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Injects buffer types for a particular kind of listening socket read.  <a href="structllfio__v2__xxx_1_1listening__socket__handle__buffer__types__injector.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1listening__tls__socket__handle.html">listening_tls_socket_handle</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to a TLS socket-like entity able to receive incoming connections.  <a href="classllfio__v2__xxx_1_1listening__tls__socket__handle.html#details">More...</a><br /></td></tr>
@@ -398,9 +399,6 @@ constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a7f32245d09ba18756513c19b053fd057">is_finished</a> (<a class="el" href="namespacellfio__v2__xxx.html#a8884e1fc12d34aeaa428539bf6298745">io_operation_state_type</a> s) noexcept</td></tr>
 <tr class="memdesc:a7f32245d09ba18756513c19b053fd057"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if the i/o operation state is finished. <br /></td></tr>
 <tr class="separator:a7f32245d09ba18756513c19b053fd057"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac9428ee4dc1d4450e4f7f41312d40eeb"><td class="memItemLeft" align="right" valign="top"><a id="ac9428ee4dc1d4450e4f7f41312d40eeb"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>LLFIO_TEMPLATE</b> (class T, class U) LLFIO_TREQUIRES(LLFIO_TEXPR(static_cast&lt; T * &gt;(static_cast&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> * &gt;(nullptr)))) T *socket_cast(<a class="el" href="classllfio__v2__xxx_1_1listening__socket__handle__impl.html">listening_socket_handle_impl</a>&lt; U &gt; *v)</td></tr>
-<tr class="separator:ac9428ee4dc1d4450e4f7f41312d40eeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a026590e0aff0af0331ec8f8308e56724"><td class="memItemLeft" align="right" valign="top"><a id="a026590e0aff0af0331ec8f8308e56724"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207">directory_handle::filter</a> &amp;v)</td></tr>
 <tr class="separator:a026590e0aff0af0331ec8f8308e56724"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1610,17 +1608,17 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <p>&lt; This socket source provides an i/o multiplexer</p>
 <p>&lt; This socket source may be able to wrap third party plain sockets</p>
 <p>&lt; All bits set</p>
-<div class="fragment"><div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;                                                                                 {</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;none = 0U,  <span class="comment">//!&lt; No bits set</span></div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;kernel_sockets =</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;(1U &lt;&lt; 0U),  <span class="comment">//!&lt; This socket source provides kernel sockets i.e. their native handles will be valid kernel sockets which can be used in `poll()` etc</span></div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;<span class="comment"></span>system_implementation = (1U &lt;&lt; 1U),  <span class="comment">//!&lt; This socket source is the &quot;system&quot; rather than &quot;third party&quot; implementation for TLS sockets</span></div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;<span class="comment"></span>io_multiplexer = (1U &lt;&lt; 2U),         <span class="comment">//!&lt; This socket source provides an i/o multiplexer</span></div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;<span class="comment"></span>supports_wrap = (1U &lt;&lt; 3U),          <span class="comment">//!&lt; This socket source may be able to wrap third party plain sockets</span></div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;all = 0xffffffff  <span class="comment">//!&lt; All bits set</span></div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;<span class="comment"></span>}  <span class="comment">//</span></div>
+<div class="fragment"><div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;                                                                                 {</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;none = 0U,  <span class="comment">//!&lt; No bits set</span></div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;kernel_sockets =</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;(1U &lt;&lt; 0U),  <span class="comment">//!&lt; This socket source provides kernel sockets i.e. their native handles will be valid kernel sockets which can be used in `poll()` etc</span></div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;<span class="comment"></span>system_implementation = (1U &lt;&lt; 1U),  <span class="comment">//!&lt; This socket source is the &quot;system&quot; rather than &quot;third party&quot; implementation for TLS sockets</span></div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;<span class="comment"></span>io_multiplexer = (1U &lt;&lt; 2U),         <span class="comment">//!&lt; This socket source provides an i/o multiplexer</span></div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;<span class="comment"></span>supports_wrap = (1U &lt;&lt; 3U),          <span class="comment">//!&lt; This socket source may be able to wrap third party plain sockets</span></div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;all = 0xffffffff  <span class="comment">//!&lt; All bits set</span></div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;<span class="comment"></span>}  <span class="comment">//</span></div>
 </div><!-- fragment -->
 </div>
 </div>
