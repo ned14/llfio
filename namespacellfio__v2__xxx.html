@@ -1608,17 +1608,17 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <p>&lt; This socket source provides an i/o multiplexer</p>
 <p>&lt; This socket source may be able to wrap third party plain sockets</p>
 <p>&lt; All bits set</p>
-<div class="fragment"><div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;                                                                                 {</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;none = 0U,  <span class="comment">//!&lt; No bits set</span></div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;kernel_sockets =</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;(1U &lt;&lt; 0U),  <span class="comment">//!&lt; This socket source provides kernel sockets i.e. their native handles will be valid kernel sockets which can be used in `poll()` etc</span></div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;<span class="comment"></span>system_implementation = (1U &lt;&lt; 1U),  <span class="comment">//!&lt; This socket source is the &quot;system&quot; rather than &quot;third party&quot; implementation for TLS sockets</span></div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;<span class="comment"></span>io_multiplexer = (1U &lt;&lt; 2U),         <span class="comment">//!&lt; This socket source provides an i/o multiplexer</span></div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;<span class="comment"></span>supports_wrap = (1U &lt;&lt; 3U),          <span class="comment">//!&lt; This socket source may be able to wrap third party plain sockets</span></div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;all = 0xffffffff  <span class="comment">//!&lt; All bits set</span></div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;<span class="comment"></span>}  <span class="comment">//</span></div>
+<div class="fragment"><div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;                                                                                 {</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;none = 0U,  <span class="comment">//!&lt; No bits set</span></div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;kernel_sockets =</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;(1U &lt;&lt; 0U),  <span class="comment">//!&lt; This socket source provides kernel sockets i.e. their native handles will be valid kernel sockets which can be used in `poll()` etc</span></div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;<span class="comment"></span>system_implementation = (1U &lt;&lt; 1U),  <span class="comment">//!&lt; This socket source is the &quot;system&quot; rather than &quot;third party&quot; implementation for TLS sockets</span></div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;<span class="comment"></span>io_multiplexer = (1U &lt;&lt; 2U),         <span class="comment">//!&lt; This socket source provides an i/o multiplexer</span></div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;<span class="comment"></span>supports_wrap = (1U &lt;&lt; 3U),          <span class="comment">//!&lt; This socket source may be able to wrap third party plain sockets</span></div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;all = 0xffffffff  <span class="comment">//!&lt; All bits set</span></div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;<span class="comment"></span>}  <span class="comment">//</span></div>
 </div><!-- fragment -->
 </div>
 </div>

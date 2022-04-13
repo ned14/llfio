@@ -375,9 +375,9 @@ disposition&#160;</td><td class="memItemRight" valign="bottom"><b>behaviour</b> 
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="comment"></span>  cache_writes = 1ULL &lt;&lt; 55U,     <span class="comment">//!&lt; Is writing back from kernel cache rather than writing through</span></div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="comment"></span>  cache_temporary = 1ULL &lt;&lt; 56U,  <span class="comment">//!&lt; Writes are not flushed to storage quickly</span></div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  _is_connected = 1ULL &lt;&lt; 61U,            <span class="comment">// used by pipe_handle and byte_socket_handle on Windows to store connectedness</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  _multiplexer_state_bit0 = 1ULL &lt;&lt; 62U,  <span class="comment">// per-handle state bits used by an i/o multiplexer</span></div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  _multiplexer_state_bit1 = 1ULL &lt;&lt; 63U,  <span class="comment">// per-handle state bits used by an i/o multiplexer</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  _is_connected = 1ULL &lt;&lt; 60U,            <span class="comment">// used by pipe_handle and byte_socket_handle on Windows to store connectedness</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  _multiplexer_state_bit0 = 1ULL &lt;&lt; 61U,  <span class="comment">// per-handle state bits used by an i/o multiplexer</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  _multiplexer_state_bit1 = 1ULL &lt;&lt; 62U,  <span class="comment">// per-handle state bits used by an i/o multiplexer</span></div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  _child_close_executed = 1ULL &lt;&lt; 63U     <span class="comment">// used to trap when vptr has become corrupted</span></div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  } <a class="code" href="structllfio__v2__xxx_1_1native__handle__type.html#aefed8c6f2ff66097dc7cb88b6f439db6">QUICKCPPLIB_BITFIELD_END</a>(disposition)</div>
 </div><!-- fragment -->

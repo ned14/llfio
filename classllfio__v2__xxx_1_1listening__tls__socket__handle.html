@@ -989,10 +989,10 @@ union {</td></tr>
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable\n Any of the errors which accept() or WSAAccept() might return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;                                                                       {}) noexcept</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  {</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    <span class="keywordflow">return</span> (_ctx == <span class="keyword">nullptr</span>) ? _do_read(std::move(req), d) : _do_multiplexer_read(std::move(req), d);</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;                                                                       {}) noexcept</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;  {</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    <span class="keywordflow">return</span> (_ctx == <span class="keyword">nullptr</span>) ? _do_read(std::move(req), d) : _do_multiplexer_read(std::move(req), d);</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
