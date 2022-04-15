@@ -88,7 +88,6 @@ $(document).ready(function(){initNavTree('classllfio__v2__xxx_1_1fast__random__f
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
-<a href="#pro-static-methods">Static Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classllfio__v2__xxx_1_1fast__random__file__handle-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -590,12 +589,6 @@ virtual <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io_
 <tr class="memitem:a9eac28f1623570ffdcd56b4425183788"><td class="memItemLeft" align="right" valign="top"><a id="a9eac28f1623570ffdcd56b4425183788"></a>
 <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_do_multiplexer_barrier</b> (registered_buffer_type &amp;&amp;base, <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a2a7e52ff0c192a5edf67ceee4c7195d3">barrier_kind</a> kind, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d) noexcept</td></tr>
 <tr class="separator:a9eac28f1623570ffdcd56b4425183788"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-methods"></a>
-Static Protected Member Functions</h2></td></tr>
-<tr class="memitem:a1dd1abc0bd1fa1f10782301dddf802b7"><td class="memItemLeft" align="right" valign="top"><a id="a1dd1abc0bd1fa1f10782301dddf802b7"></a>
-static constexpr void&#160;</td><td class="memItemRight" valign="bottom"><b>_set_caching</b> (<a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a> &amp;nativeh, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a>) noexcept</td></tr>
-<tr class="separator:a1dd1abc0bd1fa1f10782301dddf802b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -2059,7 +2052,7 @@ For portability, you can only assume that barriers write order for a single hand
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__handle_html_ae8536f660a264c143e0d52dee9e43702"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__handle.html#ae8536f660a264c143e0d52dee9e43702">llfio_v2_xxx::byte_io_handle::barrier</a></div><div class="ttdeci">virtual io_result&lt; const_buffers_type &gt; barrier(io_request&lt; const_buffers_type &gt; reqs=io_request&lt; const_buffers_type &gt;(), barrier_kind kind=barrier_kind::nowait_data_only, deadline d=deadline()) noexcept</div><div class="ttdoc">Issue a write reordering barrier such that writes preceding the barrier will reach storage before wri...</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:402</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_aa3930273a2d4cabbac309e0b75701dcaa9516dfb15f51c7ee19a4d46b8c0dbe1d"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaa9516dfb15f51c7ee19a4d46b8c0dbe1d">llfio_v2_xxx::handle::mode::append</a></div><div class="ttdeci">@ append</div><div class="ttdoc">All mainstream OSs and CIFS guarantee this is atomic with respect to all other appenders (FILE_APPEND...</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_aa3930273a2d4cabbac309e0b75701dcaaefb2a684e4afb7d55e6147fbe5a332ee"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaaefb2a684e4afb7d55e6147fbe5a332ee">llfio_v2_xxx::handle::mode::write</a></div><div class="ttdeci">@ write</div><div class="ttdoc">Ability to read and write (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|FILE_WRITE_D...</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_ade2416b9154d1e56937c99cd514324f8"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#ade2416b9154d1e56937c99cd514324f8">llfio_v2_xxx::handle::is_multiplexable</a></div><div class="ttdeci">bool is_multiplexable() const noexcept</div><div class="ttdoc">True if multiplexable.</div><div class="ttdef"><b>Definition:</b> handle.hpp:383</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_ade2416b9154d1e56937c99cd514324f8"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#ade2416b9154d1e56937c99cd514324f8">llfio_v2_xxx::handle::is_multiplexable</a></div><div class="ttdeci">bool is_multiplexable() const noexcept</div><div class="ttdoc">True if multiplexable.</div><div class="ttdef"><b>Definition:</b> handle.hpp:345</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__handle_html_a6e68ac7d62dfb84d4868b161eb25c859"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__handle.html#a6e68ac7d62dfb84d4868b161eb25c859">llfio_v2_xxx::byte_io_handle::_do_allocate_registered_buffer</a></div><div class="ttdeci">virtual result&lt; registered_buffer_type &gt; _do_allocate_registered_buffer(size_t &amp;bytes) noexcept</div><div class="ttdoc">The virtualised implementation of allocate_registered_buffer() used if no multiplexer has been set.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:1023</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

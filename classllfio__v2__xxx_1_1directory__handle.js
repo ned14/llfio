@@ -19,8 +19,8 @@ var classllfio__v2__xxx_1_1directory__handle =
       [ "fastdeleted", "classllfio__v2__xxx_1_1directory__handle.html#a54d63e0972dee77ef1f0ff14bd4f9207a14847befc159c1492671b53718fc46f8", null ]
     ] ],
     [ "directory_handle", "classllfio__v2__xxx_1_1directory__handle.html#ad505f506be33c58cf7176878e552d59e", null ],
-    [ "directory_handle", "classllfio__v2__xxx_1_1directory__handle.html#abc2ee09a6199fa2be9869943e6787c1a", null ],
-    [ "directory_handle", "classllfio__v2__xxx_1_1directory__handle.html#aa4670fd2bc968291f5e0c8a98d675aae", null ],
+    [ "directory_handle", "classllfio__v2__xxx_1_1directory__handle.html#a0d15370b20db1de86db7ee80ac436e08", null ],
+    [ "directory_handle", "classllfio__v2__xxx_1_1directory__handle.html#a861375650510657d69186fae77f2b59c", null ],
     [ "directory_handle", "classllfio__v2__xxx_1_1directory__handle.html#a20f3e10dfd3f2cfa80cc14b6987b9552", null ],
     [ "directory_handle", "classllfio__v2__xxx_1_1directory__handle.html#aa670b617d883625a9532ab12c65469d8", null ],
     [ "directory_handle", "classllfio__v2__xxx_1_1directory__handle.html#a993f752761d4488d717c95887ab3e824", null ],

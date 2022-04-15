@@ -26,7 +26,7 @@ var classllfio__v2__xxx_1_1ip_1_1address =
     [ "to_bytes", "classllfio__v2__xxx_1_1ip_1_1address.html#a6417b290b3059bc0c41243c1984775a9", null ],
     [ "to_sockaddr", "classllfio__v2__xxx_1_1ip_1_1address.html#a7865fec603fb30f5bceb9757b42d3d5e", null ],
     [ "llfio_v2_xxx::byte_socket_handle", "classllfio__v2__xxx_1_1ip_1_1address.html#af8de769efa2d9aa52b881ec9d0c1e0cd", null ],
-    [ "llfio_v2_xxx::listening_byte_socket_handle", "classllfio__v2__xxx_1_1ip_1_1address.html#a1d09e58ca107622a3639de14e6b55e84", null ],
+    [ "llfio_v2_xxx::listening_socket_handle", "classllfio__v2__xxx_1_1ip_1_1address.html#a858abfcc594540b9c9783c4e51deb816", null ],
     [ "operator<<", "classllfio__v2__xxx_1_1ip_1_1address.html#a376449b224474bb9e76e5de5ff0079d2", null ],
     [ "_addr", "classllfio__v2__xxx_1_1ip_1_1address.html#a9afdb474677db26b053b397c89339150", null ],
     [ "_addr_be", "classllfio__v2__xxx_1_1ip_1_1address.html#a4cf511d414cd6df6235242cfd8997387", null ],

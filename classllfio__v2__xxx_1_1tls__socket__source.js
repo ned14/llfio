@@ -12,5 +12,5 @@ var classllfio__v2__xxx_1_1tls__socket__source =
     [ "multiplexable_listening_socket", "classllfio__v2__xxx_1_1tls__socket__source.html#a31cfcf1631b0d10cc5fe50b249857d62", null ],
     [ "multiplexer", "classllfio__v2__xxx_1_1tls__socket__source.html#a66684af77d0f2dcb536fcc686c0a5750", null ],
     [ "wrap", "classllfio__v2__xxx_1_1tls__socket__source.html#adbd3a44e27e65f3cb45213c29aad687b", null ],
-    [ "wrap", "classllfio__v2__xxx_1_1tls__socket__source.html#a1ed341563e7a8ebb4f47d0596c19ed69", null ]
+    [ "wrap", "classllfio__v2__xxx_1_1tls__socket__source.html#a3c5516e668c67459ea6aad6dd96d0a96", null ]
 ];

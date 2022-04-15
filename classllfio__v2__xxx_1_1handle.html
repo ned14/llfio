@@ -85,7 +85,6 @@ $(document).ready(function(){initNavTree('classllfio__v2__xxx_1_1handle.html',''
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-static-methods">Static Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="#friends">Friends</a> &#124;
 <a href="classllfio__v2__xxx_1_1handle-members.html">List of all members</a>  </div>
@@ -104,14 +103,16 @@ Inheritance diagram for llfio_v2_xxx::handle:</div>
  <div class="center">
   <img src="classllfio__v2__xxx_1_1handle.png" usemap="#llfio_5Fv2_5Fxxx::handle_map" alt=""/>
   <map id="llfio_5Fv2_5Fxxx::handle_map" name="llfio_5Fv2_5Fxxx::handle_map">
-<area href="structllfio__v2__xxx_1_1listening__socket__handle__buffer__types__injector.html" alt="llfio_v2_xxx::listening_socket_handle_buffer_types_injector&lt; handle, byte_socket_handle &gt;" shape="rect" coords="538,56,1066,80"/>
-<area href="classllfio__v2__xxx_1_1awaitable__handle.html" title="An awaitable handle which attempts to execute the i/o immediately. If the i/o can complete immediatel..." alt="llfio_v2_xxx::awaitable_handle&lt; IoHandleType &gt;" shape="rect" coords="538,112,1066,136"/>
-<area href="classllfio__v2__xxx_1_1byte__io__handle.html" title="A handle to something capable of scatter-gather byte i/o." alt="llfio_v2_xxx::byte_io_handle" shape="rect" coords="538,168,1066,192"/>
-<area href="classllfio__v2__xxx_1_1byte__io__multiplexer.html" title="A multiplexer of byte-orientated i/o." alt="llfio_v2_xxx::byte_io_multiplexer" shape="rect" coords="538,224,1066,248"/>
-<area href="classllfio__v2__xxx_1_1path__handle.html" title="A handle to somewhere originally identified by a path on the filing system. Typically used as the lig..." alt="llfio_v2_xxx::path_handle" shape="rect" coords="538,280,1066,304"/>
-<area href="classllfio__v2__xxx_1_1process__handle.html" title="A handle to this, or another, process." alt="llfio_v2_xxx::process_handle" shape="rect" coords="538,336,1066,360"/>
-<area href="classllfio__v2__xxx_1_1section__handle.html" title="A handle to a source of mapped memory." alt="llfio_v2_xxx::section_handle" shape="rect" coords="538,392,1066,416"/>
-<area href="classllfio__v2__xxx_1_1symlink__handle.html" title="A handle to an inode which redirects to a different path." alt="llfio_v2_xxx::symlink_handle" shape="rect" coords="538,448,1066,472"/>
+<area href="classllfio__v2__xxx_1_1listening__socket__handle__impl.html" alt="llfio_v2_xxx::listening_socket_handle_impl&lt; byte_socket_handle &gt;" shape="rect" coords="403,56,796,80"/>
+<area href="classllfio__v2__xxx_1_1listening__socket__handle__impl.html" alt="llfio_v2_xxx::listening_socket_handle_impl&lt; tls_socket_handle_ptr &gt;" shape="rect" coords="403,112,796,136"/>
+<area href="classllfio__v2__xxx_1_1awaitable__handle.html" title="An awaitable handle which attempts to execute the i/o immediately. If the i/o can complete immediatel..." alt="llfio_v2_xxx::awaitable_handle&lt; IoHandleType &gt;" shape="rect" coords="403,168,796,192"/>
+<area href="classllfio__v2__xxx_1_1byte__io__handle.html" title="A handle to something capable of scatter-gather byte i/o." alt="llfio_v2_xxx::byte_io_handle" shape="rect" coords="403,224,796,248"/>
+<area href="classllfio__v2__xxx_1_1byte__io__multiplexer.html" title="A multiplexer of byte-orientated i/o." alt="llfio_v2_xxx::byte_io_multiplexer" shape="rect" coords="403,280,796,304"/>
+<area href="classllfio__v2__xxx_1_1listening__socket__handle__impl.html" alt="llfio_v2_xxx::listening_socket_handle_impl&lt; SocketType &gt;" shape="rect" coords="403,336,796,360"/>
+<area href="classllfio__v2__xxx_1_1path__handle.html" title="A handle to somewhere originally identified by a path on the filing system. Typically used as the lig..." alt="llfio_v2_xxx::path_handle" shape="rect" coords="403,392,796,416"/>
+<area href="classllfio__v2__xxx_1_1process__handle.html" title="A handle to this, or another, process." alt="llfio_v2_xxx::process_handle" shape="rect" coords="403,448,796,472"/>
+<area href="classllfio__v2__xxx_1_1section__handle.html" title="A handle to a source of mapped memory." alt="llfio_v2_xxx::section_handle" shape="rect" coords="403,504,796,528"/>
+<area href="classllfio__v2__xxx_1_1symlink__handle.html" title="A handle to an inode which redirects to a different path." alt="llfio_v2_xxx::symlink_handle" shape="rect" coords="403,560,796,584"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -180,10 +181,10 @@ Public Member Functions</h2></td></tr>
 constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#aea43917ff5cc28f3da3c622c0b3382c4">handle</a> ()</td></tr>
 <tr class="memdesc:aea43917ff5cc28f3da3c622c0b3382c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
 <tr class="separator:aea43917ff5cc28f3da3c622c0b3382c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad7912947fb8fe6270535eb6bddba50d4"><td class="memItemLeft" align="right" valign="top"><a id="ad7912947fb8fe6270535eb6bddba50d4"></a>
-constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#ad7912947fb8fe6270535eb6bddba50d4">handle</a> (<a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a> h, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a>=<a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a334c4a4c42fdb79d7ebc3e73b517e6f8">caching::none</a>, flag flags=flag::none) noexcept</td></tr>
-<tr class="memdesc:ad7912947fb8fe6270535eb6bddba50d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a handle from a supplied native handle. <br /></td></tr>
-<tr class="separator:ad7912947fb8fe6270535eb6bddba50d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a37425865ad1845481c4a41ab1409f3"><td class="memItemLeft" align="right" valign="top"><a id="a8a37425865ad1845481c4a41ab1409f3"></a>
+constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a8a37425865ad1845481c4a41ab1409f3">handle</a> (<a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a> h, flag flags=flag::none) noexcept</td></tr>
+<tr class="memdesc:a8a37425865ad1845481c4a41ab1409f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a handle from a supplied native handle. <br /></td></tr>
+<tr class="separator:a8a37425865ad1845481c4a41ab1409f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a798fa51a935da9b16ed7bb565b3a4c11"><td class="memItemLeft" align="right" valign="top"><a id="a798fa51a935da9b16ed7bb565b3a4c11"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a798fa51a935da9b16ed7bb565b3a4c11">handle</a> (const <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;)=delete</td></tr>
 <tr class="memdesc:a798fa51a935da9b16ed7bb565b3a4c11"><td class="mdescLeft">&#160;</td><td class="mdescRight">No copy construction (use clone()) <br /></td></tr>
@@ -327,12 +328,6 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a942b0d276c9f20fe41baab679b88fe72">native_handle</a> () const noexcept</td></tr>
 <tr class="memdesc:a942b0d276c9f20fe41baab679b88fe72"><td class="mdescLeft">&#160;</td><td class="mdescRight">The native handle used by this handle. <br /></td></tr>
 <tr class="separator:a942b0d276c9f20fe41baab679b88fe72"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-methods"></a>
-Static Protected Member Functions</h2></td></tr>
-<tr class="memitem:a1dd1abc0bd1fa1f10782301dddf802b7"><td class="memItemLeft" align="right" valign="top"><a id="a1dd1abc0bd1fa1f10782301dddf802b7"></a>
-static constexpr void&#160;</td><td class="memItemRight" valign="bottom"><b>_set_caching</b> (<a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a> &amp;nativeh, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a>) noexcept</td></tr>
-<tr class="separator:a1dd1abc0bd1fa1f10782301dddf802b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>

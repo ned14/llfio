@@ -25,7 +25,7 @@ var structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable =
     [ "write_or_barrier_finished", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html#a2ec13c540afe4016f5084747877e8c59", null ],
     [ "byte_io_handle", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html#a958c484f770e12da3634a39ed12e5ee7", null ],
     [ "byte_socket_handle", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html#a1deb9405a8daac1f4e64f45284d4e119", null ],
-    [ "listening_byte_socket_handle", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html#a3d030b7be7fa5f3fc117d514dfd37e81", null ],
+    [ "listening_socket_handle", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html#a1a03575469bc34bb359d0fe5ec980cfa", null ],
     [ "_state", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html#a4647cc0d1d3dc0ea1207f34c26cfb233", null ],
     [ "_state_storage", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html#a8e860002e04012c2b96dfbf3cdc8ff1f", null ]
 ];
