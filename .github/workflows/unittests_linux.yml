@@ -25,6 +25,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Force cmake version to older than runner's
+      uses: jwlawson/actions-setup-cmake@v1.12
+      with:
+        cmake-version: '3.22.2'
+
     - name: CMake tests Linux
       shell: bash
       run: |
@@ -42,7 +47,7 @@ jobs:
        fi
        if [ "${{ matrix.compiler }}" = "arm-linux-gnueabihf-g++" ]; then
          sudo apt install g++-arm-linux-gnueabihf;
-         ctest -S .ci.cmake -VV --timeout 900 -DCTEST_DISABLE_TESTING=1 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS;-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-arm.cmake";
+         ctest -S .ci.cmake -VV --timeout 900 -DCTEST_DISABLE_TESTING=1 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS;-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-arm.cmake;-DLLFIO_FORCE_OPENSSL_OFF=On";
        else
          ctest -S .ci.cmake -VV --timeout 900 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS";
        fi

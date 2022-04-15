@@ -404,7 +404,7 @@ struct test_results
 
 LLFIO_TEMPLATE(class C, class... Args)
 LLFIO_TREQUIRES(LLFIO_TPRED(std::is_constructible<C, int, Args...>::value))
-test_results do_benchmark(int handles, Args &&... args)
+test_results do_benchmark(int handles, Args &&...args)
 {
   const bool doing_warm_up = (handles < 0);
   handles = abs(handles);
@@ -483,7 +483,7 @@ test_results do_benchmark(int handles, Args &&... args)
       {
         timings[x].emplace_back();  // this may reallocate, very expensive
       }
-        // Begin all the reads
+      // Begin all the reads
       for(int x = 0; x < handles; x++)
       {
         timings[x].back().initiate = std::chrono::high_resolution_clock::now();
@@ -502,7 +502,8 @@ test_results do_benchmark(int handles, Args &&... args)
       // Reap the completions
       ios.check();
     }
-    if(std::chrono::duration_cast<std::chrono::seconds>(timings[0].back().initiate - timings[0].front().initiate).count() >= (doing_warm_up ? 3U : BENCHMARK_DURATION))
+    if(std::chrono::duration_cast<std::chrono::seconds>(timings[0].back().initiate - timings[0].front().initiate).count() >=
+       (doing_warm_up ? 3U : BENCHMARK_DURATION))
     {
       latch = -1;
       break;
@@ -617,7 +618,7 @@ test_results do_benchmark(int handles, Args &&... args)
   return ret;
 }
 
-template <class C, class... Args> void benchmark(llfio::path_view csv, size_t max_handles, const char *desc, Args &&... args)
+template <class C, class... Args> void benchmark(llfio::path_view csv, size_t max_handles, const char *desc, Args &&...args)
 {
   std::vector<test_results> results;
   for(int n = 1; n <= max_handles; n <<= 2)
@@ -628,11 +629,16 @@ template <class C, class... Args> void benchmark(llfio::path_view csv, size_t ma
     results.push_back(res);
     std::cout << "   per-handle create " << res.creation << " cancel " << res.cancel << " destroy " << res.destruction;
     std::cout << "\n     total i/o min " << res.total.min << " max " << res.total.max << " mean " << res.total.mean << " stddev " << sqrt(res.total.variance);
-    std::cout << "\n             @ 50% " << res.total._50 << " @ 95% " << res.total._95 << " @ 99% " << res.total._99 << " @ 99.9% " << res.total._999 << " @ 99.99% " << res.total._9999;
-    std::cout << "\n  initiate i/o min " << res.initiate.min << " max " << res.initiate.max << " mean " << res.initiate.mean << " stddev " << sqrt(res.initiate.variance);
-    std::cout << "\n             @ 50% " << res.initiate._50 << " @ 95% " << res.initiate._95 << " @ 99% " << res.initiate._99 << " @ 99.9% " << res.initiate._999 << " @ 99.99% " << res.initiate._9999;
-    std::cout << "\ncompletion i/o min " << res.completion.min << " max " << res.completion.max << " mean " << res.completion.mean << " stddev " << sqrt(res.completion.variance);
-    std::cout << "\n             @ 50% " << res.completion._50 << " @ 95% " << res.completion._95 << " @ 99% " << res.completion._99 << " @ 99.9% " << res.completion._999 << " @ 99.99% " << res.completion._9999;
+    std::cout << "\n             @ 50% " << res.total._50 << " @ 95% " << res.total._95 << " @ 99% " << res.total._99 << " @ 99.9% " << res.total._999
+              << " @ 99.99% " << res.total._9999;
+    std::cout << "\n  initiate i/o min " << res.initiate.min << " max " << res.initiate.max << " mean " << res.initiate.mean << " stddev "
+              << sqrt(res.initiate.variance);
+    std::cout << "\n             @ 50% " << res.initiate._50 << " @ 95% " << res.initiate._95 << " @ 99% " << res.initiate._99 << " @ 99.9% "
+              << res.initiate._999 << " @ 99.99% " << res.initiate._9999;
+    std::cout << "\ncompletion i/o min " << res.completion.min << " max " << res.completion.max << " mean " << res.completion.mean << " stddev "
+              << sqrt(res.completion.variance);
+    std::cout << "\n             @ 50% " << res.completion._50 << " @ 95% " << res.completion._95 << " @ 99% " << res.completion._99 << " @ 99.9% "
+              << res.completion._999 << " @ 99.99% " << res.completion._9999;
     std::cout << "\n   total results collected = " << res.total_readings << std::endl;
   }
   std::ofstream of(csv.path());
@@ -814,7 +820,12 @@ struct NoHandle final : public llfio::byte_io_handle
   template <class T> using io_result = typename llfio::byte_io_handle::template io_result<T>;
 
   NoHandle()
-      : llfio::byte_io_handle(llfio::native_handle_type(llfio::native_handle_type::disposition::nonblocking | llfio::native_handle_type::disposition::readable | llfio::native_handle_type::disposition::writable, -2 /* fake being open */), llfio::byte_io_handle::caching::all, llfio::byte_io_handle::flag::multiplexable, nullptr)
+      : llfio::byte_io_handle(llfio::native_handle_type(llfio::native_handle_type::disposition::nonblocking | llfio::native_handle_type::disposition::readable |
+                                                        llfio::native_handle_type::disposition::writable | llfio::native_handle_type::disposition::cache_reads |
+                                                        llfio::native_handle_type::disposition::cache_writes |
+                                                        llfio::native_handle_type::disposition::cache_metadata,
+                                                        -2 /* fake being open */),
+                              llfio::byte_io_handle::flag::multiplexable, nullptr)
   {
   }
   ~NoHandle()
@@ -918,11 +929,13 @@ template <class HandleType = NoHandle> struct benchmark_llfio
         }
       }
       buffer = {_buffer, sizeof(_buffer)};
-      io_state = read_handle.multiplexer()->construct_and_init_io_operation({io_state_ptr.get(), 4096 /*lies*/}, &read_handle, this, {}, {}, io_request<buffers_type>({&buffer, 1}, 0));
+      io_state = read_handle.multiplexer()->construct_and_init_io_operation({io_state_ptr.get(), 4096 /*lies*/}, &read_handle, this, {}, {},
+                                                                            io_request<buffers_type>({&buffer, 1}, 0));
     }
 
     // Called when the read completes
-    virtual bool read_completed(llfio::byte_io_multiplexer::io_operation_state::lock_guard & /*g*/, llfio::io_operation_state_type /*former*/, io_result<buffers_type> &&res) override
+    virtual bool read_completed(llfio::byte_io_multiplexer::io_operation_state::lock_guard & /*g*/, llfio::io_operation_state_type /*former*/,
+                                io_result<buffers_type> &&res) override
     {
       when_read_completed = std::chrono::high_resolution_clock::now();
       if(!res)
@@ -1127,21 +1140,21 @@ int main(void)
 {
   std::cout << "Warming up ..." << std::endl;
   do_benchmark<benchmark_llfio<>>(-1, []() -> llfio::byte_io_multiplexer_ptr { return llfio::test::multiplexer_null(2, true).value(); });
-  benchmark<benchmark_llfio<>>("llfio-null-unsynchronised.csv", 64, "Null i/o multiplexer unsynchronised", //
-    []() -> llfio::byte_io_multiplexer_ptr { return llfio::test::multiplexer_null(1, false).value(); });
-  benchmark<benchmark_llfio<>>("llfio-null-synchronised.csv", 64, "Null i/o multiplexer synchronised", //
-    []() -> llfio::byte_io_multiplexer_ptr { return llfio::test::multiplexer_null(2, true).value(); });
+  benchmark<benchmark_llfio<>>("llfio-null-unsynchronised.csv", 64, "Null i/o multiplexer unsynchronised",  //
+                               []() -> llfio::byte_io_multiplexer_ptr { return llfio::test::multiplexer_null(1, false).value(); });
+  benchmark<benchmark_llfio<>>("llfio-null-synchronised.csv", 64, "Null i/o multiplexer synchronised",  //
+                               []() -> llfio::byte_io_multiplexer_ptr { return llfio::test::multiplexer_null(2, true).value(); });
 
 #ifdef _WIN32
   std::cout << "\nWarming up ..." << std::endl;
-  do_benchmark<benchmark_llfio<llfio::pipe_handle>>(-1, //
-    []() -> llfio::byte_io_multiplexer_ptr { return llfio::test::multiplexer_win_iocp(2, true).value(); });
+  do_benchmark<benchmark_llfio<llfio::pipe_handle>>(-1,  //
+                                                    []() -> llfio::byte_io_multiplexer_ptr { return llfio::test::multiplexer_win_iocp(2, true).value(); });
   // No locking, enable IOCP immediate completions. ASIO can't compete with this.
-  benchmark<benchmark_llfio<llfio::pipe_handle>>("llfio-pipe-handle-unsynchronised.csv", 64, "llfio::pipe_handle and IOCP unsynchronised", //
-    []() -> llfio::byte_io_multiplexer_ptr { return llfio::test::multiplexer_win_iocp(1, false).value(); });
+  benchmark<benchmark_llfio<llfio::pipe_handle>>("llfio-pipe-handle-unsynchronised.csv", 64, "llfio::pipe_handle and IOCP unsynchronised",  //
+                                                 []() -> llfio::byte_io_multiplexer_ptr { return llfio::test::multiplexer_win_iocp(1, false).value(); });
   // Locking enabled, disable IOCP immediate completions so it's a fair comparison with ASIO
-  benchmark<benchmark_llfio<llfio::pipe_handle>>("llfio-pipe-handle-synchronised.csv", 64, "llfio::pipe_handle and IOCP synchronised", //
-    []() -> llfio::byte_io_multiplexer_ptr { return llfio::test::multiplexer_win_iocp(2, true).value(); });
+  benchmark<benchmark_llfio<llfio::pipe_handle>>("llfio-pipe-handle-synchronised.csv", 64, "llfio::pipe_handle and IOCP synchronised",  //
+                                                 []() -> llfio::byte_io_multiplexer_ptr { return llfio::test::multiplexer_win_iocp(2, true).value(); });
 #endif
 
 #if ENABLE_ASIO

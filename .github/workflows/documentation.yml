@@ -23,6 +23,11 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
+      - name: Force cmake version to older than runner's
+        uses: jwlawson/actions-setup-cmake@v1.12
+        with:
+          cmake-version: '3.22.2'
+
       - name: Regenerate Documentation
         shell: bash
         run: |
