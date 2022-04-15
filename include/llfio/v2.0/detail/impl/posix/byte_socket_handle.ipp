@@ -647,7 +647,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> byte_socket_handle::_do_connect(con
 
 LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<byte_socket_handle> byte_socket_handle::byte_socket(ip::family family, mode _mode, caching _caching, flag flags) noexcept
 {
-  result<byte_socket_handle> ret(byte_socket_handle(native_handle_type(), _caching, flags, nullptr));
+  result<byte_socket_handle> ret(byte_socket_handle(native_handle_type(), flags, nullptr));
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
   OUTCOME_TRY(detail::create_socket(nativeh, family, _mode, _caching, flags));
@@ -728,7 +728,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> listening_byte_socket_handle::bind(
 LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_byte_socket_handle> listening_byte_socket_handle::listening_byte_socket(ip::family family, mode _mode, caching _caching,
                                                                                                           flag flags) noexcept
 {
-  result<listening_byte_socket_handle> ret(listening_byte_socket_handle(native_handle_type(), _caching, flags, nullptr));
+  result<listening_byte_socket_handle> ret(listening_byte_socket_handle(native_handle_type(), flags, nullptr));
   native_handle_type &nativeh = ret.value()._v;
   OUTCOME_TRY(detail::create_socket(nativeh, family, _mode, _caching, flags));
   return ret;
@@ -826,7 +826,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_byte_socket_handle::buffers_typ
       }
     }
   }
-  b.first = byte_socket_handle(nativeh, _caching, _.flags, _ctx);
+  b.first = byte_socket_handle(nativeh, _.flags, _ctx);
   if(_mode == mode::read)
   {
     OUTCOME_TRY(b.first.shutdown(byte_socket_handle::shutdown_write));

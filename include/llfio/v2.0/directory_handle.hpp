@@ -199,14 +199,14 @@ public:
   //! Default constructor
   constexpr directory_handle() {}  // NOLINT
   //! Construct a directory_handle from a supplied native path_handle
-  explicit constexpr directory_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching, flag flags)
-      : path_handle(std::move(h), caching, flags)
+  explicit constexpr directory_handle(native_handle_type h, dev_t devid, ino_t inode, flag flags)
+      : path_handle(std::move(h), flags)
       , fs_handle(devid, inode)
   {
   }
   //! Construct a directory_handle from a supplied native path_handle
-  explicit constexpr directory_handle(native_handle_type h, caching caching, flag flags)
-      : path_handle(std::move(h), caching, flags)
+  explicit constexpr directory_handle(native_handle_type h, flag flags)
+      : path_handle(std::move(h), flags)
   {
   }
   //! Implicit move construction of directory_handle permitted

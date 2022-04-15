@@ -1,5 +1,5 @@
 /* Declarations for Microsoft Windows system APIs
-(C) 2015-2021 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
+(C) 2015-2022 Niall Douglas <http://www.nedproductions.biz/> (14 commits)
 File Created: Dec 2015
 
 
@@ -1841,21 +1841,33 @@ inline result<DWORD> attributes_from_handle_caching_and_flags(native_handle_type
     break;  // can be called by reopen()
   case handle::caching::none:
     attribs |= FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
-    nativeh.behaviour |= native_handle_type::disposition::aligned_io;
+    nativeh.behaviour |= native_handle_type::disposition::aligned_io | native_handle_type::disposition::safety_barriers;
     break;
   case handle::caching::only_metadata:
     attribs |= FILE_FLAG_NO_BUFFERING;
-    nativeh.behaviour |= native_handle_type::disposition::aligned_io;
+    nativeh.behaviour |= native_handle_type::disposition::aligned_io | native_handle_type::disposition::cache_metadata;
     break;
   case handle::caching::reads:
+    attribs |= FILE_FLAG_WRITE_THROUGH;
+    nativeh.behaviour |= native_handle_type::disposition::cache_reads | native_handle_type::disposition::safety_barriers;
+    break;
   case handle::caching::reads_and_metadata:
     attribs |= FILE_FLAG_WRITE_THROUGH;
+    nativeh.behaviour |=
+    native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_metadata | native_handle_type::disposition::safety_barriers;
     break;
   case handle::caching::all:
+    nativeh.behaviour |=
+    native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes | native_handle_type::disposition::cache_metadata;
+    break;
   case handle::caching::safety_barriers:
+    nativeh.behaviour |= native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes |
+                         native_handle_type::disposition::cache_metadata | native_handle_type::disposition::safety_barriers;
     break;
   case handle::caching::temporary:
     attribs |= FILE_ATTRIBUTE_TEMPORARY;
+    nativeh.behaviour |= native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes |
+                         native_handle_type::disposition::cache_metadata | native_handle_type::disposition::cache_temporary;
     break;
   }
   if(flags & handle::flag::unlink_on_first_close)
@@ -1889,21 +1901,32 @@ inline result<DWORD> ntflags_from_handle_caching_and_flags(native_handle_type &n
     break;  // can be called by reopen()
   case handle::caching::none:
     ntflags |= 0x00000008 /*FILE_NO_INTERMEDIATE_BUFFERING*/ | 0x00000002 /*FILE_WRITE_THROUGH*/;
-    nativeh.behaviour |= native_handle_type::disposition::aligned_io;
+    nativeh.behaviour |= native_handle_type::disposition::aligned_io | native_handle_type::disposition::safety_barriers;
     break;
   case handle::caching::only_metadata:
     ntflags |= 0x00000008 /*FILE_NO_INTERMEDIATE_BUFFERING*/;
-    nativeh.behaviour |= native_handle_type::disposition::aligned_io;
+    nativeh.behaviour |= native_handle_type::disposition::aligned_io | native_handle_type::disposition::safety_barriers;
     break;
   case handle::caching::reads:
+    ntflags |= 0x00000002 /*FILE_WRITE_THROUGH*/;
+    nativeh.behaviour |= native_handle_type::disposition::cache_reads | native_handle_type::disposition::safety_barriers;
+    break;
   case handle::caching::reads_and_metadata:
     ntflags |= 0x00000002 /*FILE_WRITE_THROUGH*/;
+    nativeh.behaviour |=
+    native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_metadata | native_handle_type::disposition::safety_barriers;
     break;
   case handle::caching::all:
+    nativeh.behaviour |=
+    native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes | native_handle_type::disposition::cache_metadata;
+    break;
   case handle::caching::safety_barriers:
+    nativeh.behaviour |= native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes |
+                         native_handle_type::disposition::cache_metadata | native_handle_type::disposition::safety_barriers;
     break;
   case handle::caching::temporary:
-    // should be handled by attributes_from_handle_caching_and_flags
+    nativeh.behaviour |= native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes |
+                         native_handle_type::disposition::cache_metadata | native_handle_type::disposition::cache_temporary;
     break;
   }
   if(flags & handle::flag::unlink_on_first_close)
@@ -2170,9 +2193,7 @@ inline HANDLE CreateFileW_(_In_ LPCWSTR lpFileName, _In_ DWORD dwDesiredAccess, 
     SetLastError(ERROR_FILE_NOT_FOUND);
     return INVALID_HANDLE_VALUE;  // NOLINT
   }
-  auto unntpath = make_scope_exit(
-  [&NtPath]() noexcept
-  {
+  auto unntpath = make_scope_exit([&NtPath]() noexcept {
     if(HeapFree(GetProcessHeap(), 0, NtPath.Buffer) == 0)
     {
       abort();

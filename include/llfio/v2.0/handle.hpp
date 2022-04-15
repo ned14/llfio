@@ -1,5 +1,5 @@
 /* A handle to something
-(C) 2015-2021 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2015-2022 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: Dec 2015
 
 
@@ -218,43 +218,6 @@ protected:
     } _;
   };
 
-  static constexpr void _set_caching(native_handle_type &nativeh, caching caching) noexcept
-  {
-    nativeh.behaviour &=
-    ~(native_handle_type::disposition::safety_barriers | native_handle_type::disposition::cache_metadata | native_handle_type::disposition::cache_reads |
-      native_handle_type::disposition::cache_writes | native_handle_type::disposition::cache_temporary);
-    switch(caching)
-    {
-    case caching::unchanged:
-      break;
-    case caching::none:
-      nativeh.behaviour |= native_handle_type::disposition::safety_barriers;
-      break;
-    case caching::only_metadata:
-      nativeh.behaviour |= native_handle_type::disposition::cache_metadata;
-      break;
-    case caching::reads:
-      nativeh.behaviour |= native_handle_type::disposition::cache_reads | native_handle_type::disposition::safety_barriers;
-      break;
-    case caching::reads_and_metadata:
-      nativeh.behaviour |=
-      native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_metadata | native_handle_type::disposition::safety_barriers;
-      break;
-    case caching::all:
-      nativeh.behaviour |=
-      native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes | native_handle_type::disposition::cache_metadata;
-      break;
-    case caching::safety_barriers:
-      nativeh.behaviour |= native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes |
-                           native_handle_type::disposition::cache_metadata | native_handle_type::disposition::safety_barriers;
-      break;
-    case caching::temporary:
-      nativeh.behaviour |= native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes |
-                           native_handle_type::disposition::cache_metadata | native_handle_type::disposition::cache_temporary;
-      break;
-    }
-  }
-
 public:
   //! Default constructor
   constexpr handle()
@@ -262,11 +225,10 @@ public:
   {
   }  // NOLINT
   //! Construct a handle from a supplied native handle
-  explicit constexpr handle(native_handle_type h, caching caching = caching::none, flag flags = flag::none) noexcept
+  explicit constexpr handle(native_handle_type h, flag flags = flag::none) noexcept
       : _v(std::move(h))
   {
     _.flags = flags;
-    _set_caching(_v, caching);
   }
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~handle();
   //! No copy construction (use clone())

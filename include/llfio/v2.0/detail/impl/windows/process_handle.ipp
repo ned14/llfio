@@ -153,15 +153,28 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC const process_handle &process_handle::current() 
 {
   static process_handle self = []() -> process_handle {
     process_handle ret(native_handle_type(native_handle_type::disposition::process, GetCurrentProcess()), flag::release_pipes_on_close);
-    ret._in_pipe = pipe_handle(native_handle_type(native_handle_type::disposition::pipe | native_handle_type::disposition::readable, GetStdHandle(STD_INPUT_HANDLE)), pipe_handle::caching::all, pipe_handle::flag::none, nullptr);
-    ret._out_pipe = pipe_handle(native_handle_type(native_handle_type::disposition::pipe | native_handle_type::disposition::writable, GetStdHandle(STD_OUTPUT_HANDLE)), pipe_handle::caching::all, pipe_handle::flag::none, nullptr);
-    ret._error_pipe = pipe_handle(native_handle_type(native_handle_type::disposition::pipe | native_handle_type::disposition::writable, GetStdHandle(STD_ERROR_HANDLE)), pipe_handle::caching::all, pipe_handle::flag::none, nullptr);
+    ret._in_pipe = pipe_handle(native_handle_type(native_handle_type::disposition::pipe | native_handle_type::disposition::readable |
+                                                  native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes |
+                                                  native_handle_type::disposition::cache_metadata,
+                                                  GetStdHandle(STD_INPUT_HANDLE)),
+                               pipe_handle::flag::none, nullptr);
+    ret._out_pipe = pipe_handle(native_handle_type(native_handle_type::disposition::pipe | native_handle_type::disposition::writable |
+                                                   native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes |
+                                                   native_handle_type::disposition::cache_metadata,
+                                                   GetStdHandle(STD_OUTPUT_HANDLE)),
+                                pipe_handle::flag::none, nullptr);
+    ret._error_pipe = pipe_handle(native_handle_type(native_handle_type::disposition::pipe | native_handle_type::disposition::writable |
+                                                     native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes |
+                                                     native_handle_type::disposition::cache_metadata,
+                                                     GetStdHandle(STD_ERROR_HANDLE)),
+                                  pipe_handle::flag::none, nullptr);
     return ret;
   }();
   return self;
 }
 
-LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<process_handle> process_handle::launch_process(path_view path, span<path_view_component> args, span<path_view_component> env, flag flags) noexcept
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<process_handle> process_handle::launch_process(path_view path, span<path_view_component> args,
+                                                                                      span<path_view_component> env, flag flags) noexcept
 {
   result<process_handle> ret(in_place_type<process_handle>, native_handle_type(), flags);
   native_handle_type &nativeh = ret.value()._v;

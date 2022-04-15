@@ -78,6 +78,8 @@ struct native_handle_type  // NOLINT
   cache_writes = 1ULL << 55U,     //!< Is writing back from kernel cache rather than writing through
   cache_temporary = 1ULL << 56U,  //!< Writes are not flushed to storage quickly
 
+  _cache_bits = 0x1fULL << 52U,  //!< All the bits used to store kernel caching
+
   _is_connected = 1ULL << 60U,            // used by pipe_handle and byte_socket_handle on Windows to store connectedness
   _multiplexer_state_bit0 = 1ULL << 61U,  // per-handle state bits used by an i/o multiplexer
   _multiplexer_state_bit1 = 1ULL << 62U,  // per-handle state bits used by an i/o multiplexer
@@ -161,7 +163,7 @@ struct native_handle_type  // NOLINT
   constexpr bool operator!=(const native_handle_type &o) const noexcept { return behaviour != o.behaviour || _init != o._init; }
 
   //! True if the handle is valid
-  constexpr bool is_valid() const noexcept { return _init != -1 && static_cast<uint64_t>(behaviour &~disposition::_flags_bits) != 0; }
+  constexpr bool is_valid() const noexcept { return _init != -1 && static_cast<uint64_t>(behaviour & ~disposition::_flags_bits) != 0; }
 
   //! True if the handle is readable
   constexpr bool is_readable() const noexcept { return (behaviour & disposition::readable) ? true : false; }

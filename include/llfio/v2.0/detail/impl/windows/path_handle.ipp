@@ -78,7 +78,7 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  result<path_handle> ret{path_handle(native_handle_type(), caching::none, flag::none)};
+  result<path_handle> ret{path_handle(native_handle_type(), flag::none)};
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::path | native_handle_type::disposition::kernel_handle;

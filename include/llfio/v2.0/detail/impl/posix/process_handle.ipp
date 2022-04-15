@@ -188,15 +188,28 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC const process_handle &process_handle::current() 
 {
   static process_handle self = []() -> process_handle {
     process_handle ret(native_handle_type(native_handle_type::disposition::process, getpid()), flag::release_pipes_on_close);
-    ret._in_pipe = pipe_handle(native_handle_type(native_handle_type::disposition::pipe | native_handle_type::disposition::readable, STDIN_FILENO), pipe_handle::caching::all, pipe_handle::flag::none, nullptr);
-    ret._out_pipe = pipe_handle(native_handle_type(native_handle_type::disposition::pipe | native_handle_type::disposition::writable, STDOUT_FILENO), pipe_handle::caching::all, pipe_handle::flag::none, nullptr);
-    ret._error_pipe = pipe_handle(native_handle_type(native_handle_type::disposition::pipe | native_handle_type::disposition::writable, STDERR_FILENO), pipe_handle::caching::all, pipe_handle::flag::none, nullptr);
+    ret._in_pipe = pipe_handle(native_handle_type(native_handle_type::disposition::pipe | native_handle_type::disposition::readable |
+                                                  native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes |
+                                                  native_handle_type::disposition::cache_metadata,
+                                                  STDIN_FILENO),
+                               pipe_handle::flag::none, nullptr);
+    ret._out_pipe = pipe_handle(native_handle_type(native_handle_type::disposition::pipe | native_handle_type::disposition::writable |
+                                                   native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes |
+                                                   native_handle_type::disposition::cache_metadata,
+                                                   STDOUT_FILENO),
+                                pipe_handle::flag::none, nullptr);
+    ret._error_pipe = pipe_handle(native_handle_type(native_handle_type::disposition::pipe | native_handle_type::disposition::writable |
+                                                     native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes |
+                                                     native_handle_type::disposition::cache_metadata,
+                                                     STDERR_FILENO),
+                                  pipe_handle::flag::none, nullptr);
     return ret;
   }();
   return self;
 }
 
-LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<process_handle> process_handle::launch_process(path_view path, span<path_view_component> args, span<path_view_component> env, flag flags) noexcept
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<process_handle> process_handle::launch_process(path_view path, span<path_view_component> args,
+                                                                                      span<path_view_component> env, flag flags) noexcept
 {
   try
   {
@@ -243,7 +256,8 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<process_handle> process_handle::launch_pr
         return posix_error();
     }
 
-    using small_path_view_c_str = path_view::zero_terminated_rendered_path<filesystem::path::value_type, std::default_delete<filesystem::path::value_type[]>, 1>;
+    using small_path_view_c_str =
+    path_view::zero_terminated_rendered_path<filesystem::path::value_type, std::default_delete<filesystem::path::value_type[]>, 1>;
     std::vector<const char *> argptrs(args.size() + 2);
     std::vector<small_path_view_c_str> _args;
     _args.reserve(args.size() + 1);
@@ -333,7 +347,9 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<process_handle> process_handle::launch_pr
           return posix_error(err);
       }
     }
-    int err = ::posix_spawn(&nativeh.pid, argptrs[0], (childinpipe.is_valid() || childoutpipe.is_valid() || childerrorpipe.is_valid()) ? &child_fd_actions : nullptr, nullptr, (char **) argptrs.data(), (char **) envptrs.data());
+    int err =
+    ::posix_spawn(&nativeh.pid, argptrs[0], (childinpipe.is_valid() || childoutpipe.is_valid() || childerrorpipe.is_valid()) ? &child_fd_actions : nullptr,
+                  nullptr, (char **) argptrs.data(), (char **) envptrs.data());
     if(err)
       return posix_error(err);
     if(childinpipe.is_valid() || childoutpipe.is_valid() || childerrorpipe.is_valid())

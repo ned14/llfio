@@ -76,8 +76,8 @@ public:
   constexpr lockable_byte_io_handle() {}  // NOLINT
   ~lockable_byte_io_handle() = default;
   //! Construct a handle from a supplied native handle
-  constexpr explicit lockable_byte_io_handle(native_handle_type h, caching caching, flag flags, byte_io_multiplexer *ctx)
-      : byte_io_handle(h, caching, flags, ctx)
+  constexpr explicit lockable_byte_io_handle(native_handle_type h, flag flags, byte_io_multiplexer *ctx)
+      : byte_io_handle(h, flags, ctx)
   {
   }
   //! Explicit conversion from `handle` permitted
