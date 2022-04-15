@@ -100,7 +100,7 @@ public:
   }
   //! Construct a section handle using the given native handle type for the section and the given i/o handle for the backing storage
   explicit section_handle(native_handle_type sectionh, file_handle *backing, file_handle anonymous, flag __flag)
-      : handle(sectionh, handle::caching::all)
+      : handle(sectionh)
       , _backing(backing)
       , _anonymous(std::move(anonymous))
       , _flag(__flag)

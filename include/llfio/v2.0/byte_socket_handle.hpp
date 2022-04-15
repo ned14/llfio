@@ -451,8 +451,8 @@ public:
   //! Default constructor
   constexpr byte_socket_handle() {}  // NOLINT
   //! Construct a handle from a supplied native handle
-  constexpr byte_socket_handle(native_handle_type h, caching caching, flag flags, byte_io_multiplexer *ctx)
-      : byte_io_handle(std::move(h), caching, flags, ctx)
+  constexpr byte_socket_handle(native_handle_type h, flag flags, byte_io_multiplexer *ctx)
+      : byte_io_handle(std::move(h), flags, ctx)
   {
 #ifdef _WIN32
     if(_v)
@@ -822,8 +822,8 @@ protected:
   //! Default constructor
   constexpr listening_socket_handle_impl() {}  // NOLINT
   //! Construct a handle from a supplied native handle
-  constexpr listening_socket_handle_impl(native_handle_type h, caching caching, flag flags, byte_io_multiplexer *ctx)
-      : handle(std::move(h), caching, flags)
+  constexpr listening_socket_handle_impl(native_handle_type h, flag flags, byte_io_multiplexer *ctx)
+      : handle(std::move(h), flags)
       , _ctx(ctx)
   {
 #ifdef _WIN32

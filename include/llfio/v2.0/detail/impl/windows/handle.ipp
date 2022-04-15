@@ -111,8 +111,8 @@ result<void> handle::close() noexcept
 result<handle> handle::clone() const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  result<handle> ret(handle(native_handle_type(), kernel_caching(), _.flags));
-  ret.value()._v.behaviour = _v.behaviour;
+  result<handle> ret(handle(native_handle(), _.flags));
+  ret.value()._v.h = INVALID_HANDLE_VALUE;
   if(DuplicateHandle(GetCurrentProcess(), _v.h, GetCurrentProcess(), &ret.value()._v.h, 0, 0, DUPLICATE_SAME_ACCESS) == 0)
   {
     return win32_error();

@@ -470,7 +470,7 @@ namespace detail
     {
       return ntkernel_error(ntstat);
     }
-    return handle(nativeh, _caching, flags);
+    return handle(nativeh, flags);
   }
 }  // namespace detail
 

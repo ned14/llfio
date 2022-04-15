@@ -203,7 +203,7 @@ class LLFIO_DECL listening_tls_socket_handle : public listening_socket_handle_im
 protected:
   constexpr listening_tls_socket_handle() {}
   explicit listening_tls_socket_handle(listening_socket_handle &&sock)
-      : _base(sock.release(), sock.kernel_caching(), sock.flags(), sock.multiplexer())
+      : _base(sock.release(), sock.flags(), sock.multiplexer())
   {
     this->_v.behaviour |= native_handle_type::disposition::tls_socket;
   }

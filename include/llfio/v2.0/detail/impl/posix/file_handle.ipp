@@ -44,7 +44,7 @@ LLFIO_V2_NAMESPACE_BEGIN
 result<file_handle> file_handle::file(const path_handle &base, file_handle::path_view_type path, file_handle::mode _mode, file_handle::creation _creation,
                                       file_handle::caching _caching, file_handle::flag flags) noexcept
 {
-  result<file_handle> ret(file_handle(native_handle_type(), 0, 0, _caching, flags, nullptr));
+  result<file_handle> ret(file_handle(native_handle_type(), 0, 0, flags, nullptr));
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::file | native_handle_type::disposition::kernel_handle;
@@ -118,7 +118,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   caching _caching = caching::temporary;
   // No need to check inode before unlink
   flags |= flag::unlink_on_first_close | flag::disable_safety_unlinks;
-  result<file_handle> ret(file_handle(native_handle_type(), 0, 0, _caching, flags, nullptr));
+  result<file_handle> ret(file_handle(native_handle_type(), 0, 0, flags, nullptr));
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::file | native_handle_type::disposition::kernel_handle;
@@ -178,7 +178,7 @@ result<file_handle> file_handle::reopen(mode mode_, caching caching_, deadline d
   // Fast path
   if(mode_ == mode::unchanged)
   {
-    result<file_handle> ret(file_handle(native_handle_type(), _devid, _inode, caching_, _.flags, _ctx));
+    result<file_handle> ret(file_handle(native_handle(), _devid, _inode, _.flags, _ctx));
     ret.value()._v.behaviour = _v.behaviour;
     ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC, 0);
     if(-1 == ret.value()._v.fd)

@@ -40,8 +40,8 @@ namespace algorithm
     {
       file_handle_wrapper() = default;
       using file_handle::file_handle;
-      file_handle_wrapper(native_handle_type nativeh, byte_io_handle::caching _caching, byte_io_handle::flag flags, byte_io_multiplexer *ctx)
-          : file_handle(nativeh, 0, 0, _caching, flags, ctx)
+      file_handle_wrapper(native_handle_type nativeh, byte_io_handle::flag flags, byte_io_multiplexer *ctx)
+          : file_handle(nativeh, 0, 0, flags, ctx)
       {
       }
     };
@@ -49,17 +49,20 @@ namespace algorithm
     using combining_handle_adapter_choose_base = std::conditional_t<                                                              //
     std::is_base_of<file_handle, Target>::value && (std::is_void<Source>::value || std::is_base_of<file_handle, Source>::value),  //
     file_handle_wrapper,                                                                                                          //
-    byte_io_handle                                                                                                                     //
+    byte_io_handle                                                                                                                //
     >;
     template <class A, class B> struct is_void_or_io_request_compatible
     {
-      static constexpr bool value = std::is_same<typename A::template io_request<typename A::buffers_type>, typename B::template io_request<typename B::buffers_type>>::value;
+      static constexpr bool value =
+      std::is_same<typename A::template io_request<typename A::buffers_type>, typename B::template io_request<typename B::buffers_type>>::value;
     };
     template <class T> struct is_void_or_io_request_compatible<T, void> : std::true_type
     {
     };
 
-    template <template <class, class> class Op, class Target, class Source, class Base, bool with_file_handle_base = std::is_same<Base, file_handle_wrapper>::value> class combining_handle_adapter_base : public Base
+    template <template <class, class> class Op, class Target, class Source, class Base,
+              bool with_file_handle_base = std::is_same<Base, file_handle_wrapper>::value>
+    class combining_handle_adapter_base : public Base
     {
       static_assert(is_void_or_io_request_compatible<Target, Source>::value, "Combined handle types do not share io_request<buffers_type>");
 
@@ -89,7 +92,7 @@ namespace algorithm
       _source_handle_type *_source{nullptr};
 
     private:
-      static constexpr native_handle_type _native_handle(mode _mode)
+      static constexpr native_handle_type _native_handle(mode _mode, native_handle_type::disposition a, native_handle_type::disposition b)
       {
         native_handle_type nativeh;
         nativeh.behaviour |= native_handle_type::disposition::file;
@@ -98,31 +101,21 @@ namespace algorithm
         {
           nativeh.behaviour |= native_handle_type::disposition::writable;
         }
+        nativeh.behaviour |= ((a & native_handle_type::disposition::_cache_bits) & (b & native_handle_type::disposition::_cache_bits));
+        // safety_barriers is on only if it was on in both, is that wise?
         return nativeh;
-      }
-      static constexpr caching _combine_caching(target_handle_type *a, _source_handle_type *b)
-      {
-        caching _a = a->kernel_caching();
-        caching _b = b->kernel_caching();
-        caching least = caching::none;
-        if(_a < _b)
-          least = _a;
-        else
-          least = _b;
-        // TODO: Bit 0 set means safety fsyncs on, should I reflect this?
-        return least;
       }
 
     protected:
       combining_handle_adapter_base() = default;
       constexpr combining_handle_adapter_base(target_handle_type *a, _source_handle_type *b, mode _mode, flag flags, byte_io_multiplexer *ctx)
-          : Base(_native_handle(_mode), _combine_caching(a, b), flags, ctx)
+          : Base(_native_handle(_mode, a->native_handle().behaviour, b->native_handle().behaviour), flags, ctx)
           , _target(a)
           , _source(b)
       {
       }
       combining_handle_adapter_base(target_handle_type *a, void *b, mode _mode, flag flags, byte_io_multiplexer *ctx)
-          : Base(_native_handle(_mode), a->caching(), flags, ctx)
+          : Base(_native_handle(_mode, a->native_handle().behaviour, ~native_handle_type::disposition::invalid), flags, ctx)
           , _target(a)
           , _source(reinterpret_cast<_source_handle_type *>(b))
       {
@@ -144,8 +137,7 @@ namespace algorithm
         return success();
       }
 
-      protected:
-
+    protected:
       //! \brief Return the lowest of the two handles' maximum buffers
       LLFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t _do_max_buffers() const noexcept override
       {
@@ -173,7 +165,8 @@ namespace algorithm
           bytes += b.size();
         }
         // If less than page size, use stack, else use free pages
-        buffer_type buffers[2] = {{(byte *) ((bytes <= utils::page_size()) ? alloca(bytes + 64) : nullptr), bytes}, {(byte *) ((_have_source && bytes <= utils::page_size()) ? alloca(bytes + 64) : nullptr), bytes}};
+        buffer_type buffers[2] = {{(byte *) ((bytes <= utils::page_size()) ? alloca(bytes + 64) : nullptr), bytes},
+                                  {(byte *) ((_have_source && bytes <= utils::page_size()) ? alloca(bytes + 64) : nullptr), bytes}};
         map_handle buffersh;
         if(buffers[0].data() != nullptr)
         {
@@ -250,7 +243,8 @@ namespace algorithm
           bytes += b.size();
         }
         // If less than page size, use stack, else use free pages
-        buffer_type buffers[2] = {{(byte *) ((bytes <= utils::page_size()) ? alloca(bytes + 64) : nullptr), bytes}, {(byte *) ((_have_source && bytes <= utils::page_size()) ? alloca(bytes + 64) : nullptr), bytes}};
+        buffer_type buffers[2] = {{(byte *) ((bytes <= utils::page_size()) ? alloca(bytes + 64) : nullptr), bytes},
+                                  {(byte *) ((_have_source && bytes <= utils::page_size()) ? alloca(bytes + 64) : nullptr), bytes}};
         map_handle buffersh;
         if(buffers[0].data() != nullptr)
         {
@@ -307,7 +301,9 @@ namespace algorithm
 
     public:
     };
-    template <template <class, class> class Op, class Target, class Source> class combining_handle_adapter_base<Op, Target, Source, file_handle_wrapper, true> : public combining_handle_adapter_base<Op, Target, Source, file_handle_wrapper, false>
+    template <template <class, class> class Op, class Target, class Source>
+    class combining_handle_adapter_base<Op, Target, Source, file_handle_wrapper, true>
+        : public combining_handle_adapter_base<Op, Target, Source, file_handle_wrapper, false>
     {
       using _base = combining_handle_adapter_base<Op, Target, Source, file_handle_wrapper, false>;
 
@@ -347,7 +343,8 @@ namespace algorithm
 
     public:
       //! \brief Lock the given extent in one or both of the attached handles. Any second handle is always locked for shared.
-      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_guard> lock_file_range(extent_type offset, extent_type bytes, lock_kind kind, deadline d = deadline()) noexcept override
+      LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_guard> lock_file_range(extent_type offset, extent_type bytes, lock_kind kind,
+                                                                           deadline d = deadline()) noexcept override
       {
         optional<result<extent_guard>> _locks[2];
 #if !defined(LLFIO_DISABLE_OPENMP) && defined(_OPENMP)
@@ -470,7 +467,7 @@ namespace algorithm
         return ret;
       }
     };
-  }
+  }  // namespace detail
 
   /*! \class combining_handle_adapter
   \brief A handle combining the data from one or two other handles.
@@ -536,9 +533,12 @@ namespace algorithm
   \todo I have been lazy and used public inheritance from `byte_io_handle` and `file_handle`.
   I should use protected inheritance to prevent slicing, and expose all the public functions by hand.
   */
-  template <template <class, class> class Op, class Target, class Source> class combining_handle_adapter : public Op<Target, Source>::template override_<detail::combining_handle_adapter_base<Op, Target, Source, detail::combining_handle_adapter_choose_base<Target, Source>>>
+  template <template <class, class> class Op, class Target, class Source>
+  class combining_handle_adapter : public Op<Target, Source>::template override_<
+                                   detail::combining_handle_adapter_base<Op, Target, Source, detail::combining_handle_adapter_choose_base<Target, Source>>>
   {
-    using _base = typename Op<Target, Source>::template override_<detail::combining_handle_adapter_base<Op, Target, Source, detail::combining_handle_adapter_choose_base<Target, Source>>>;
+    using _base = typename Op<Target, Source>::template override_<
+    detail::combining_handle_adapter_base<Op, Target, Source, detail::combining_handle_adapter_choose_base<Target, Source>>>;
 
   public:
     using path_type = byte_io_handle::path_type;
@@ -563,13 +563,17 @@ namespace algorithm
     combining_handle_adapter() = default;
     //! Constructor, passing any extra arguments to `Op::override`.
     template <class... Args>
-    combining_handle_adapter(target_handle_type *a, source_handle_type *b, mode _mode = mode::write, flag flags = flag::none, byte_io_multiplexer *ctx = nullptr, Args &&... args)
+    combining_handle_adapter(target_handle_type *a, source_handle_type *b, mode _mode = mode::write, flag flags = flag::none,
+                             byte_io_multiplexer *ctx = nullptr, Args &&...args)
         : _base(a, b, _mode, flags, ctx, std::forward<Args>(args)...)
     {
     }
 
     //! Implicit move construction of combining_handle_adapter permitted
-    combining_handle_adapter(combining_handle_adapter &&o) noexcept : _base(std::move(o)) {}
+    combining_handle_adapter(combining_handle_adapter &&o) noexcept
+        : _base(std::move(o))
+    {
+    }
     //! No copy construction (use `clone()`)
     combining_handle_adapter(const combining_handle_adapter &) = delete;
     //! Move assignment of combining_handle_adapter permitted

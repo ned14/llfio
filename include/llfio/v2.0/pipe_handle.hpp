@@ -114,14 +114,14 @@ public:
   //! Default constructor
   constexpr pipe_handle() {}  // NOLINT
   //! Construct a handle from a supplied native handle
-  constexpr pipe_handle(native_handle_type h, dev_t devid, ino_t inode, caching caching, flag flags, byte_io_multiplexer *ctx)
-      : byte_io_handle(std::move(h), caching, flags, ctx)
+  constexpr pipe_handle(native_handle_type h, dev_t devid, ino_t inode, flag flags, byte_io_multiplexer *ctx)
+      : byte_io_handle(std::move(h), flags, ctx)
       , fs_handle(devid, inode)
   {
   }
   //! Construct a handle from a supplied native handle
-  constexpr pipe_handle(native_handle_type h, caching caching, flag flags, byte_io_multiplexer *ctx)
-      : byte_io_handle(std::move(h), caching, flags, ctx)
+  constexpr pipe_handle(native_handle_type h, flag flags, byte_io_multiplexer *ctx)
+      : byte_io_handle(std::move(h), flags, ctx)
   {
   }
   //! No copy construction (use clone())

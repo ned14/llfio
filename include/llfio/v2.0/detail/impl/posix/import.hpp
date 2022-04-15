@@ -36,7 +36,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 LLFIO_V2_NAMESPACE_BEGIN
 
-inline result<int> attribs_from_handle_mode_caching_and_flags(native_handle_type &nativeh, handle::mode _mode, handle::creation _creation, handle::caching _caching, handle::flag flags) noexcept
+inline result<int> attribs_from_handle_mode_caching_and_flags(native_handle_type &nativeh, handle::mode _mode, handle::creation _creation,
+                                                              handle::caching _caching, handle::flag flags) noexcept
 {
   int attribs = O_CLOEXEC;
   switch(_mode)
@@ -88,16 +89,17 @@ inline result<int> attribs_from_handle_mode_caching_and_flags(native_handle_type
 #else
     ;
 #endif
-    nativeh.behaviour |= native_handle_type::disposition::aligned_io;
+    nativeh.behaviour |= native_handle_type::disposition::aligned_io | native_handle_type::disposition::safety_barriers;
     break;
   case handle::caching::only_metadata:
 #ifdef O_DIRECT
     attribs |= O_DIRECT;
 #endif
-    nativeh.behaviour |= native_handle_type::disposition::aligned_io;
+    nativeh.behaviour |= native_handle_type::disposition::aligned_io | native_handle_type::disposition::cache_metadata;
     break;
   case handle::caching::reads:
     attribs |= O_SYNC;
+    nativeh.behaviour |= native_handle_type::disposition::cache_reads | native_handle_type::disposition::safety_barriers;
     break;
   case handle::caching::reads_and_metadata:
 #ifdef O_DSYNC
@@ -105,10 +107,20 @@ inline result<int> attribs_from_handle_mode_caching_and_flags(native_handle_type
 #else
     attribs |= O_SYNC;
 #endif
+    nativeh.behaviour |=
+    native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_metadata | native_handle_type::disposition::safety_barriers;
     break;
   case handle::caching::all:
+    nativeh.behaviour |=
+    native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes | native_handle_type::disposition::cache_metadata;
+    break;
   case handle::caching::safety_barriers:
+    nativeh.behaviour |= native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes |
+                         native_handle_type::disposition::cache_metadata | native_handle_type::disposition::safety_barriers;
+    break;
   case handle::caching::temporary:
+    nativeh.behaviour |= native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes |
+                         native_handle_type::disposition::cache_metadata | native_handle_type::disposition::cache_temporary;
     break;
   }
   if(!!(flags & handle::flag::multiplexable))
@@ -125,55 +137,55 @@ inline result<int> attribs_from_handle_mode_caching_and_flags(native_handle_type
 - sleep_interval: Set to the number of steady milliseconds until the sleep must end
 - sleep_object: Set to a primed deadline timer HANDLE which will signal when the system clock reaches the deadline
 */
-#define LLFIO_POSIX_DEADLINE_TO_SLEEP_INIT(d)                                                                                                                                                                                                                                                                                  \
-  std::chrono::steady_clock::time_point began_steady;                                                                                                                                                                                                                                                                          \
-  struct timespec _timeout                                                                                                                                                                                                                                                                                                     \
-  {                                                                                                                                                                                                                                                                                                                            \
-  };                                                                                                                                                                                                                                                                                                                           \
-  memset(&_timeout, 0, sizeof(_timeout));                                                                                                                                                                                                                                                                                      \
-  struct timespec *timeout = nullptr;                                                                                                                                                                                                                                                                                          \
-  if(d)                                                                                                                                                                                                                                                                                                                        \
-  {                                                                                                                                                                                                                                                                                                                            \
-    if((d).steady)                                                                                                                                                                                                                                                                                                             \
-    {                                                                                                                                                                                                                                                                                                                          \
-      began_steady = std::chrono::steady_clock::now();                                                                                                                                                                                                                                                                         \
-      timeout = &_timeout;                                                                                                                                                                                                                                                                                                     \
-    }                                                                                                                                                                                                                                                                                                                          \
-    else                                                                                                                                                                                                                                                                                                                       \
-      timeout = &(d).utc;                                                                                                                                                                                                                                                                                                      \
+#define LLFIO_POSIX_DEADLINE_TO_SLEEP_INIT(d)                                                                                                                  \
+  std::chrono::steady_clock::time_point began_steady;                                                                                                          \
+  struct timespec _timeout                                                                                                                                     \
+  {                                                                                                                                                            \
+  };                                                                                                                                                           \
+  memset(&_timeout, 0, sizeof(_timeout));                                                                                                                      \
+  struct timespec *timeout = nullptr;                                                                                                                          \
+  if(d)                                                                                                                                                        \
+  {                                                                                                                                                            \
+    if((d).steady)                                                                                                                                             \
+    {                                                                                                                                                          \
+      began_steady = std::chrono::steady_clock::now();                                                                                                         \
+      timeout = &_timeout;                                                                                                                                     \
+    }                                                                                                                                                          \
+    else                                                                                                                                                       \
+      timeout = &(d).utc;                                                                                                                                      \
   }
 
-#define LLFIO_POSIX_DEADLINE_TO_SLEEP_LOOP(d)                                                                                                                                                                                                                                                                                  \
-  if((d) && (d).steady)                                                                                                                                                                                                                                                                                                        \
-  {                                                                                                                                                                                                                                                                                                                            \
-    std::chrono::nanoseconds ns;                                                                                                                                                                                                                                                                                               \
-    ns = std::chrono::duration_cast<std::chrono::nanoseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());                                                                                                                                                                        \
-    if(ns.count() < 0)                                                                                                                                                                                                                                                                                                         \
-    {                                                                                                                                                                                                                                                                                                                          \
-      _timeout.tv_sec = 0;                                                                                                                                                                                                                                                                                                     \
-      _timeout.tv_nsec = 0;                                                                                                                                                                                                                                                                                                    \
-    }                                                                                                                                                                                                                                                                                                                          \
-    else                                                                                                                                                                                                                                                                                                                       \
-    {                                                                                                                                                                                                                                                                                                                          \
-      _timeout.tv_sec = ns.count() / 1000000000ULL;                                                                                                                                                                                                                                                                            \
-      _timeout.tv_nsec = ns.count() % 1000000000ULL;                                                                                                                                                                                                                                                                           \
-    }                                                                                                                                                                                                                                                                                                                          \
+#define LLFIO_POSIX_DEADLINE_TO_SLEEP_LOOP(d)                                                                                                                  \
+  if((d) && (d).steady)                                                                                                                                        \
+  {                                                                                                                                                            \
+    std::chrono::nanoseconds ns;                                                                                                                               \
+    ns = std::chrono::duration_cast<std::chrono::nanoseconds>((began_steady + std::chrono::nanoseconds((d).nsecs)) - std::chrono::steady_clock::now());        \
+    if(ns.count() < 0)                                                                                                                                         \
+    {                                                                                                                                                          \
+      _timeout.tv_sec = 0;                                                                                                                                     \
+      _timeout.tv_nsec = 0;                                                                                                                                    \
+    }                                                                                                                                                          \
+    else                                                                                                                                                       \
+    {                                                                                                                                                          \
+      _timeout.tv_sec = ns.count() / 1000000000ULL;                                                                                                            \
+      _timeout.tv_nsec = ns.count() % 1000000000ULL;                                                                                                           \
+    }                                                                                                                                                          \
   }
 
-#define LLFIO_POSIX_DEADLINE_TO_TIMEOUT_LOOP(d)                                                                                                                                                                                                                                                                                \
-  if(d)                                                                                                                                                                                                                                                                                                                        \
-  {                                                                                                                                                                                                                                                                                                                            \
-    if((d).steady)                                                                                                                                                                                                                                                                                                             \
-    {                                                                                                                                                                                                                                                                                                                          \
-      if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))                                                                                                                                                                                                                             \
+#define LLFIO_POSIX_DEADLINE_TO_TIMEOUT_LOOP(d)                                                                                                                \
+  if(d)                                                                                                                                                        \
+  {                                                                                                                                                            \
+    if((d).steady)                                                                                                                                             \
+    {                                                                                                                                                          \
+      if(std::chrono::steady_clock::now() >= (began_steady + std::chrono::nanoseconds((d).nsecs)))                                                             \
         return LLFIO_V2_NAMESPACE::failure(LLFIO_V2_NAMESPACE::errc::timed_out);                                                                               \
-    }                                                                                                                                                                                                                                                                                                                          \
-    else                                                                                                                                                                                                                                                                                                                       \
-    {                                                                                                                                                                                                                                                                                                                          \
-      deadline now(std::chrono::system_clock::now());                                                                                                                                                                                                                                                                          \
-      if(now.utc.tv_sec > (d).utc.tv_sec || (now.utc.tv_sec == (d).utc.tv_sec && now.utc.tv_nsec >= (d).utc.tv_nsec))                                                                                                                                                                                                          \
+    }                                                                                                                                                          \
+    else                                                                                                                                                       \
+    {                                                                                                                                                          \
+      deadline now(std::chrono::system_clock::now());                                                                                                          \
+      if(now.utc.tv_sec > (d).utc.tv_sec || (now.utc.tv_sec == (d).utc.tv_sec && now.utc.tv_nsec >= (d).utc.tv_nsec))                                          \
         return LLFIO_V2_NAMESPACE::failure(LLFIO_V2_NAMESPACE::errc::timed_out);                                                                               \
-    }                                                                                                                                                                                                                                                                                                                          \
+    }                                                                                                                                                          \
   }
 
 LLFIO_V2_NAMESPACE_END

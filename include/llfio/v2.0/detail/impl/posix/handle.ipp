@@ -1,5 +1,5 @@
 /* A handle to something
-(C) 2015-2017 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
+(C) 2015-2022 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
 File Created: Dec 2015
 
 
@@ -161,7 +161,7 @@ result<void> handle::close() noexcept
 result<handle> handle::clone() const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  result<handle> ret(handle(native_handle_type(), kernel_caching(), _.flags));
+  result<handle> ret(handle(native_handle_type(), _.flags));
   ret.value()._v.behaviour = _v.behaviour;
   ret.value()._v.fd = ::fcntl(_v.fd, F_DUPFD_CLOEXEC, 0);
   if(-1 == ret.value()._v.fd)

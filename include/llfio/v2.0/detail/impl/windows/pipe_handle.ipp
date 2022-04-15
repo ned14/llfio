@@ -32,7 +32,7 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   flags &= ~flag(flag::unlink_on_first_close);
-  result<pipe_handle> ret(pipe_handle(native_handle_type(), 0, 0, _caching, flags, nullptr));
+  result<pipe_handle> ret(pipe_handle(native_handle_type(), 0, 0, flags, nullptr));
   native_handle_type &nativeh = ret.value()._v;
   LLFIO_LOG_FUNCTION_CALL(&ret);
   nativeh.behaviour |= native_handle_type::disposition::pipe | native_handle_type::disposition::kernel_handle;
@@ -170,7 +170,7 @@ result<std::pair<pipe_handle, pipe_handle>> pipe_handle::anonymous_pipe(caching 
   // Create an unnamed new pipe
   flags &= ~flag(flag::unlink_on_first_close);
   OUTCOME_TRY(auto &&anonpipe, pipe({}, mode::read, creation::only_if_not_exist, _caching, flags));
-  std::pair<pipe_handle, pipe_handle> ret(std::move(anonpipe), pipe_handle(native_handle_type(), 0, 0, _caching, flags, nullptr));
+  std::pair<pipe_handle, pipe_handle> ret(std::move(anonpipe), pipe_handle(native_handle_type(), 0, 0, flags, nullptr));
   native_handle_type &readnativeh = ret.first._v, &writenativeh = ret.second._v;
   DWORD fileshare = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
   OUTCOME_TRY(auto &&access, access_mask_from_handle_mode(writenativeh, mode::append, flags));

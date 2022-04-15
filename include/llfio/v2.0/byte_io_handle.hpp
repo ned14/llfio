@@ -69,8 +69,8 @@ public:
   constexpr byte_io_handle() {}  // NOLINT
   ~byte_io_handle() = default;
   //! Construct a handle from a supplied native handle
-  constexpr explicit byte_io_handle(native_handle_type h, caching caching, flag flags, byte_io_multiplexer *ctx)
-      : handle(h, caching, flags)
+  constexpr explicit byte_io_handle(native_handle_type h, flag flags, byte_io_multiplexer *ctx)
+      : handle(h, flags)
       , _ctx(ctx)
   {
   }

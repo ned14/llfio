@@ -330,7 +330,7 @@ public:
   constexpr
 #endif
   explicit symlink_handle(native_handle_type h, dev_t devid, ino_t inode, flag flags = flag::none)
-      : handle(std::move(h), caching::all, flags)
+      : handle(std::move(h), flags)
       , fs_handle(devid, inode)
   {
   }
