@@ -742,10 +742,10 @@ static constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><b>_a
 </table>
 </div><div class="memdoc">
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000001">Todo:</a></b></dt><dd>Why is io_result&lt;buffers_type&gt; not a standard layout type? </dd></dl>
-<div class="fragment"><div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;      : _v(std::move(o._v))</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;  {</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    o._v = native_handle_type();</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;      : _v(std::move(o._v))</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;  {</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    o._v = native_handle_type();</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -769,10 +769,9 @@ static constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><b>_a
 </table>
 </div><div class="memdoc">
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000001">Todo:</a></b></dt><dd>Why is io_result&lt;buffers_type&gt; not a standard layout type? </dd></dl>
-<div class="fragment"><div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;      : _v(std::move(h))</div>
+<div class="fragment"><div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;      : _v(std::move(h), <span class="comment">/* special move constructor to work around a constexpr bug in clang*/</span> uint16_t(flags))</div>
 <div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;  {</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    _.flags = flags;</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  }</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
