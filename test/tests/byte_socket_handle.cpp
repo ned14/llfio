@@ -375,7 +375,8 @@ static inline void TestSocketResolve()
 static inline void TestBlockingSocketHandles()
 {
   namespace llfio = LLFIO_V2_NAMESPACE;
-  auto serversocket = llfio::listening_byte_socket_handle::listening_byte_socket(llfio::ip::family::v4, llfio::listening_byte_socket_handle::mode::read).value();
+  auto serversocket =
+  llfio::listening_byte_socket_handle::listening_byte_socket(llfio::ip::family::v4, llfio::listening_byte_socket_handle::mode::read).value();
   BOOST_REQUIRE(serversocket.is_valid());
   BOOST_CHECK(serversocket.is_socket());
   BOOST_CHECK(serversocket.is_readable());
@@ -389,7 +390,9 @@ static inline void TestBlockingSocketHandles()
               << std::endl;
     return;
   }
-  auto readerthread = std::async([serversocket = std::move(serversocket)]() mutable {
+  auto readerthread = std::async(
+  [serversocket = std::move(serversocket)]() mutable
+  {
     std::pair<llfio::byte_socket_handle, llfio::ip::address> s;
     serversocket.read({s}).value();  // This immediately blocks in blocking mode
     BOOST_REQUIRE(s.first.is_valid());
@@ -438,9 +441,10 @@ static inline void TestBlockingSocketHandles()
 static inline void TestNonBlockingSocketHandles()
 {
   namespace llfio = LLFIO_V2_NAMESPACE;
-  auto serversocket = llfio::listening_byte_socket_handle::listening_byte_socket(llfio::ip::family::v4, llfio::listening_byte_socket_handle::mode::read,
-                                                                       llfio::byte_socket_handle::caching::all, llfio::byte_socket_handle::flag::multiplexable)
-                      .value();
+  auto serversocket =
+  llfio::listening_byte_socket_handle::listening_byte_socket(llfio::ip::family::v4, llfio::listening_byte_socket_handle::mode::read,
+                                                             llfio::byte_socket_handle::caching::all, llfio::byte_socket_handle::flag::multiplexable)
+  .value();
   BOOST_REQUIRE(serversocket.is_valid());
   BOOST_CHECK(serversocket.is_socket());
   BOOST_CHECK(serversocket.is_readable());
@@ -507,7 +511,8 @@ static inline void TestMultiplexedSocketHandles()
 {
   static constexpr size_t MAX_SOCKETS = 64;
   namespace llfio = LLFIO_V2_NAMESPACE;
-  auto test_multiplexer = [](llfio::byte_io_multiplexer_ptr multiplexer) {
+  auto test_multiplexer = [](llfio::byte_io_multiplexer_ptr multiplexer)
+  {
     std::vector<llfio::byte_socket_handle> read_sockets, write_sockets;
     std::vector<size_t> received_for(MAX_SOCKETS);
     struct checking_receiver final : public llfio::byte_io_multiplexer::io_operation_state_visitor
@@ -603,7 +608,7 @@ static inline void TestMultiplexedSocketHandles()
     };
     auto serversocket =
     llfio::listening_byte_socket_handle::listening_byte_socket(llfio::ip::family::v4, llfio::listening_byte_socket_handle::mode::write,
-                                                     llfio::byte_socket_handle::caching::all, llfio::byte_socket_handle::flag::multiplexable)
+                                                               llfio::byte_socket_handle::caching::all, llfio::byte_socket_handle::flag::multiplexable)
     .value();
     serversocket.bind(llfio::ip::address_v4::loopback()).value();
     auto endpoint = serversocket.local_endpoint().value();
@@ -629,7 +634,9 @@ static inline void TestMultiplexedSocketHandles()
       read_sockets.push_back(std::move(read_socket.first));
       write_sockets.push_back(std::move(write_socket));
     }
-    auto writerthread = std::async([&] {
+    auto writerthread = std::async(
+    [&]
+    {
       std::this_thread::sleep_for(std::chrono::milliseconds(500));
       for(size_t n = MAX_SOCKETS - 1; n < MAX_SOCKETS; n--)
       {
@@ -692,7 +699,8 @@ static inline void TestCoroutinedSocketHandles()
 {
   static constexpr size_t MAX_SOCKETS = 70;
   namespace llfio = LLFIO_V2_NAMESPACE;
-  auto test_multiplexer = [](llfio::byte_io_multiplexer_ptr multiplexer) {
+  auto test_multiplexer = [](llfio::byte_io_multiplexer_ptr multiplexer)
+  {
     struct coroutine
     {
       llfio::byte_socket_handle read_socket, write_socket;
@@ -727,8 +735,8 @@ static inline void TestCoroutinedSocketHandles()
       }
     };
     auto serversocket =
-    llfio::listening_byte_socket_handle::listening_socket(llfio::ip::family::v4, llfio::listening_byte_socket_handle::mode::write, llfio::byte_socket_handle::caching::all,
-                                                     llfio::byte_socket_handle::flag::multiplexable)
+    llfio::listening_byte_socket_handle::listening_socket(llfio::ip::family::v4, llfio::listening_byte_socket_handle::mode::write,
+                                                          llfio::byte_socket_handle::caching::all, llfio::byte_socket_handle::flag::multiplexable)
     .value();
     serversocket.bind(llfio::ip::address_v4::loopback()).value();
     auto endpoint = serversocket.local_endpoint().value();
@@ -844,126 +852,138 @@ static inline void TestPollingSocketHandles()
   }
   QUICKCPPLIB_NAMESPACE::algorithm::small_prng::random_shuffle(idxs.begin(), idxs.end());
   std::mutex lock;
-  std::atomic<size_t> currently_connecting{(size_t)-1};
-  auto poll_listening_task = std::async(std::launch::async, [&] {
-    std::vector<llfio::pollable_handle *> handles;
-    std::vector<llfio::poll_what> what, out;
-    for(size_t n = 0; n < MAX_SOCKETS; n++)
-    {
-      handles.push_back(&listening[n].first);
-      what.push_back(llfio::poll_what::is_readable);
-      out.push_back(llfio::poll_what::none);
-    }
-    for(;;)
-    {
-      int ret = (int) llfio::poll(out, {handles}, what, std::chrono::seconds(30)).value();
-      bool done = true;
-      for(size_t n = 0; n < MAX_SOCKETS; n++)
-      {
-        auto idx = idxs[n];
-        if(handles[idx] != nullptr)
-        {
-          done = false;
-          if(out[idx] & llfio::poll_what::is_readable)
-          {
-            {
-              std::lock_guard<std::mutex> g(lock);
-              std::cout << "Poll listening sees readable (raw = " << (int) (uint8_t) out[idx] << ") on socket " << idx << ". Currently connecting is "
-                        << currently_connecting << std::endl;
-            }
-            BOOST_CHECK(currently_connecting == idx);
-            std::pair<llfio::byte_socket_handle, llfio::ip::address> s;
-            listening[idx].first.read({s}).value();
-            handles[idx] = nullptr;
-            ret--;
-          }
-          out[idx] = llfio::poll_what::none;
-        }
-      }
-      BOOST_CHECK(ret == 0);
-      if(done)
-      {
-        std::lock_guard<std::mutex> g(lock);
-        std::cout << "Poll listening task exits." << std::endl;
-        break;
-      }
-    }
-  });
-  auto poll_connecting_task = std::async(std::launch::async, [&] {
-    std::vector<llfio::pollable_handle *> handles;
-    std::vector<llfio::poll_what> what, out;
-    for(size_t n = 0; n < MAX_SOCKETS; n++)
-    {
-      handles.push_back(&sockets[n]);
-      what.push_back(llfio::poll_what::is_writable);
-      out.push_back(llfio::poll_what::none);
-    }
-    for(;;)
-    {
-      int ret = (int) llfio::poll(out, {handles}, what, std::chrono::seconds(30)).value();
-      bool done = true, saw_closed = false;
-      size_t remaining = MAX_SOCKETS;
-      for(size_t n = 0; n < MAX_SOCKETS; n++)
-      {
-        auto idx = idxs[n];
-        if(handles[idx] != nullptr)
-        {
-          done = false;
-          // On Linux, a new socket not yet connected MAY appear as both writable and hanged up,
-          // so filter out the closed.
-          if(!(out[idx] & llfio::poll_what::is_closed) || (remaining == 1 && currently_connecting == idx))
-          {
-            if(out[idx] & llfio::poll_what::is_writable)
-            {
-              {
-                std::lock_guard<std::mutex> g(lock);
-                std::cout << "Poll connect sees writable (raw = " << (int) (uint8_t) out[idx] << ")  on socket " << idx << ". Currently connecting is "
-                          << currently_connecting << std::endl;
-              }
-              BOOST_CHECK(currently_connecting == idx);
-              handles[idx] = nullptr;
-              ret--;
-            }
-          }
-          else
-          {
-            saw_closed = true;
-          }
-          out[idx] = llfio::poll_what::none;
-        }
-        else
-        {
-          remaining--;
-        }
-      }
-      if(!saw_closed)
-      {
-        BOOST_CHECK(ret == 0);
-      }
-      if(done)
-      {
-        std::lock_guard<std::mutex> g(lock);
-        std::cout << "Poll connect task exits." << std::endl;
-        break;
-      }
-    }
-  });
-  auto connect_task = std::async(std::launch::async, [&] {
-    for(size_t n = 0; n < MAX_SOCKETS; n++)
-    {
-      auto idx = idxs[n];
-      {
-        std::lock_guard<std::mutex> g(lock);
-        std::cout << "Connecting " << idx << " ... " << std::endl;
-      }
-      currently_connecting = idx;
-      sockets[idx].connect(listening[idx].second).value();
-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::lock_guard<std::mutex> g(lock);
-    std::cout << "Connecting task exits." << std::endl;
-  });
+  std::atomic<size_t> currently_connecting{(size_t) -1};
+  auto poll_listening_task = std::async(std::launch::async,
+                                        [&]
+                                        {
+                                          std::vector<llfio::pollable_handle *> handles;
+                                          std::vector<llfio::poll_what> what, out;
+                                          for(size_t n = 0; n < MAX_SOCKETS; n++)
+                                          {
+                                            handles.push_back(&listening[n].first);
+                                            what.push_back(llfio::poll_what::is_readable);
+                                            out.push_back(llfio::poll_what::none);
+                                          }
+                                          for(;;)
+                                          {
+                                            int ret = (int) llfio::poll(out, {handles}, what, std::chrono::seconds(30)).value();
+                                            bool done = true;
+                                            for(size_t n = 0; n < MAX_SOCKETS; n++)
+                                            {
+                                              auto idx = idxs[n];
+                                              if(handles[idx] != nullptr)
+                                              {
+                                                done = false;
+                                                if(out[idx] & llfio::poll_what::is_readable)
+                                                {
+                                                  {
+                                                    std::lock_guard<std::mutex> g(lock);
+                                                    std::cout << "Poll listening sees readable (raw = " << (int) (uint8_t) out[idx] << ") on socket " << idx
+                                                              << ". Currently connecting is " << currently_connecting << std::endl;
+                                                  }
+                                                  BOOST_CHECK(currently_connecting == idx);
+                                                  std::pair<llfio::byte_socket_handle, llfio::ip::address> s;
+                                                  listening[idx].first.read({s}).value();
+                                                  llfio::byte buf;
+                                                  llfio::byte_socket_handle::buffer_type b(&buf, 1);
+                                                  s.first.read({{b}});
+                                                  handles[idx] = nullptr;
+                                                  ret--;
+                                                }
+                                                out[idx] = llfio::poll_what::none;
+                                              }
+                                            }
+                                            BOOST_CHECK(ret == 0);
+                                            if(done)
+                                            {
+                                              std::lock_guard<std::mutex> g(lock);
+                                              std::cout << "Poll listening task exits." << std::endl;
+                                              break;
+                                            }
+                                          }
+                                        });
+  auto poll_connecting_task = std::async(std::launch::async,
+                                         [&]
+                                         {
+                                           std::vector<llfio::pollable_handle *> handles;
+                                           std::vector<llfio::poll_what> what, out;
+                                           for(size_t n = 0; n < MAX_SOCKETS; n++)
+                                           {
+                                             handles.push_back(&sockets[n]);
+                                             what.push_back(llfio::poll_what::is_writable);
+                                             out.push_back(llfio::poll_what::none);
+                                           }
+                                           for(;;)
+                                           {
+                                             int ret = (int) llfio::poll(out, {handles}, what, std::chrono::seconds(30)).value();
+                                             bool done = true, saw_closed = false;
+                                             size_t remaining = MAX_SOCKETS;
+                                             for(size_t n = 0; n < MAX_SOCKETS; n++)
+                                             {
+                                               auto idx = idxs[n];
+                                               if(handles[idx] != nullptr)
+                                               {
+                                                 done = false;
+                                                 // On Linux, a new socket not yet connected MAY appear as both writable and hanged up,
+                                                 // so filter out the closed.
+                                                 if(!(out[idx] & llfio::poll_what::is_closed) || (remaining == 1 && currently_connecting == idx))
+                                                 {
+                                                   if(out[idx] & llfio::poll_what::is_writable)
+                                                   {
+                                                     {
+                                                       std::lock_guard<std::mutex> g(lock);
+                                                       std::cout << "Poll connect sees writable (raw = " << (int) (uint8_t) out[idx] << ")  on socket " << idx
+                                                                 << ". Currently connecting is " << currently_connecting << std::endl;
+                                                     }
+                                                     BOOST_CHECK(currently_connecting == idx);
+                                                     handles[idx] = nullptr;
+                                                     ret--;
+                                                   }
+                                                 }
+                                                 else
+                                                 {
+                                                   saw_closed = true;
+                                                 }
+                                                 out[idx] = llfio::poll_what::none;
+                                               }
+                                               else
+                                               {
+                                                 remaining--;
+                                               }
+                                             }
+                                             if(!saw_closed)
+                                             {
+                                               BOOST_CHECK(ret == 0);
+                                             }
+                                             if(done)
+                                             {
+                                               std::lock_guard<std::mutex> g(lock);
+                                               std::cout << "Poll connect task exits." << std::endl;
+                                               break;
+                                             }
+                                           }
+                                         });
+  auto connect_task = std::async(std::launch::async,
+                                 [&]
+                                 {
+                                   for(size_t n = 0; n < MAX_SOCKETS; n++)
+                                   {
+                                     auto idx = idxs[n];
+                                     {
+                                       std::lock_guard<std::mutex> g(lock);
+                                       std::cout << "Connecting " << idx << " ... " << std::endl;
+                                     }
+                                     currently_connecting = idx;
+                                     sockets[idx].connect(listening[idx].second).value();
+                                     llfio::byte buf(llfio::to_byte(0));
+                                     llfio::byte_socket_handle::const_buffer_type b(&buf, 1);
+                                     sockets[idx].write({{&b, 1}});
+                                     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                                   }
+                                   std::this_thread::sleep_for(std::chrono::seconds(1));
+                                   std::lock_guard<std::mutex> g(lock);
+                                   std::cout << "Connecting task exits." << std::endl;
+                                 });
   connect_task.get();
   poll_listening_task.get();
   poll_connecting_task.get();

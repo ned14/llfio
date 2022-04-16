@@ -1048,35 +1048,75 @@ public:
   virtual result<void> close() noexcept override
   {
     LLFIO_LOG_FUNCTION_CALL(this);
-    _lock_holder.lock();
-    auto unlock = make_scope_exit(
-    [this]() noexcept
+    if(_v)
     {
-      if(_lock_holder.owns_lock())
+      _lock_holder.lock();
+      auto unlock = make_scope_exit(
+      [this]() noexcept
+      {
+        if(_lock_holder.owns_lock())
+        {
+          _lock_holder.unlock();
+        }
+      });
+      OUTCOME_TRY(_flush_towrite({}));
+      if(are_safety_barriers_issued() && is_writable())
       {
         _lock_holder.unlock();
+        auto r = shutdown(shutdown_write);
+        _lock_holder.lock();
+        if(r)
+        {
+          byte buffer[4096];
+          for(;;)
+          {
+            _lock_holder.unlock();
+            OUTCOME_TRY(auto readed, read(0, {{buffer}}));
+            _lock_holder.lock();
+            if(readed == 0)
+            {
+              break;
+            }
+          }
+        }
+        else if(r.error() != errc::not_connected)
+        {
+          OUTCOME_TRY(std::move(r));
+        }
       }
-    });
-    OUTCOME_TRY(_flush_towrite({}));
-    if(_ssl_bio != nullptr)
-    {
-      BIO_free_all(_ssl_bio);  // also frees _self_bio
-      _ssl_bio = nullptr;
-    }
-    if(_v.behaviour & native_handle_type::disposition::is_pointer)
-    {
-      tls_socket_handle::release();
-    }
-    else
-    {
-      _lock_holder.unlock();
-      OUTCOME_TRY(tls_socket_handle::close());
-      _lock_holder.lock();
-    }
-    for(size_t n = 0; n < BUFFERS_COUNT; n++)
-    {
-      _read_buffers_valid[n] = {};
-      _read_buffers[n].reset();
+      if(_ssl_bio != nullptr)
+      {
+        BIO_free_all(_ssl_bio);  // also frees _self_bio
+        _ssl_bio = nullptr;
+      }
+      if(_v.behaviour & native_handle_type::disposition::is_pointer)
+      {
+        tls_socket_handle::release();
+      }
+      else
+      {
+        if(!!(_v.behaviour & native_handle_type::disposition::_is_connected) && _still_connecting == 0)
+        {
+          _lock_holder.unlock();
+          auto r = tls_socket_handle::close();
+          if(!r)
+          {
+            char msg[1024];
+#ifdef _MSC_VER
+            sprintf_s(msg, "WARNING: openssl_socket_handle::close() underlying close() fails with %s", r.error().message().c_str());
+#else
+            sprintf(msg, "WARNING: openssl_socket_handle::close() underlying close() fails with %s", r.error().message().c_str());
+#endif
+            LLFIO_LOG_WARN(this, msg);
+          }
+          _lock_holder.lock();
+        }
+      }
+      for(size_t n = 0; n < BUFFERS_COUNT; n++)
+      {
+        _read_buffers_valid[n] = {};
+        _read_buffers[n].reset();
+      }
     }
     return success();
   }
