@@ -147,7 +147,7 @@ public:
     {
       deadline nd;
       LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
-      lasterror = byte_socket_handle::connect(address, nd);
+      lasterror = this->connect(address, nd);
       if(lasterror)
       {
         return lasterror;
@@ -196,18 +196,29 @@ using tls_socket_handle_ptr = std::unique_ptr<tls_socket_handle, detail::tls_soc
 As you cannot create one of these on your own, one generally acquires one of these
 from a `tls_socket_source`.
 */
-class LLFIO_DECL listening_tls_socket_handle : public listening_socket_handle_impl<tls_socket_handle_ptr>
+class LLFIO_DECL listening_tls_socket_handle : public listening_socket_handle_buffer_types_injector<listening_byte_socket_handle, tls_socket_handle_ptr>
 {
-  using _base = listening_socket_handle_impl<tls_socket_handle_ptr>;
+  using _base = listening_socket_handle_buffer_types_injector<listening_byte_socket_handle, tls_socket_handle_ptr>;
 
 protected:
   constexpr listening_tls_socket_handle() {}
-  explicit listening_tls_socket_handle(listening_socket_handle &&sock)
+  explicit listening_tls_socket_handle(listening_byte_socket_handle &&sock)
       : _base(sock.release(), sock.flags(), sock.multiplexer())
   {
     this->_v.behaviour |= native_handle_type::disposition::tls_socket;
   }
   using _base::_base;
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Woverloaded-virtual"
+#endif
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<buffers_type> _do_read(io_request<buffers_type> req, deadline d) noexcept = 0;
+
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> _do_multiplexer_read(io_request<buffers_type> reqs, deadline d) noexcept = 0;
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 public:
   /*! \brief Returns an implementation defined string describing the algorithms
@@ -240,6 +251,41 @@ public:
   defined identifier.
   */
   virtual result<void> set_authentication_certificates_path(path_view identifier) noexcept = 0;
+
+  /*! Read the contents of the listening socket for newly connected byte sockets.
+
+  \return Returns the buffers filled, with its socket handle and address set to the newly connected socket.
+  \param req A buffer to fill with a newly connected socket.
+  \param d An optional deadline by which to time out.
+
+  \errors Any of the errors which `accept()` or `WSAAccept()` might return.
+  */
+  LLFIO_MAKE_FREE_FUNCTION
+  result<buffers_type> read(io_request<buffers_type> req, deadline d = {}) noexcept
+  {
+    return (_ctx == nullptr) ? _do_read(std::move(req), d) : _do_multiplexer_read(std::move(req), d);
+  }
+
+  /*! \brief A coroutinised equivalent to `.read()` which suspends the coroutine until
+  a new incoming connection occurs. **Blocks execution** i.e is equivalent to `.read()` if no i/o multiplexer
+  has been set on this handle!
+
+  The awaitable returned is **eager** i.e. it immediately begins the i/o. If the i/o completes
+  and finishes immediately, no coroutine suspension occurs.
+  */
+  LLFIO_MAKE_FREE_FUNCTION
+  awaitable<io_result<buffers_type>> co_read(io_request<buffers_type> reqs, deadline d = {}) noexcept;
+#if 0  // TODO
+  {
+    if(_ctx == nullptr)
+    {
+      return awaitable<io_result<buffers_type>>(read(std::move(reqs), d));
+    }
+    awaitable<io_result<buffers_type>> ret;
+    ret.set_state(_ctx->construct(ret._state_storage, this, nullptr, d, reqs.buffers.connected_socket()));
+    return ret;
+  }
+#endif
 };
 
 namespace detail
@@ -348,7 +394,7 @@ public:
 
   //! Returns a pointer to a new `listening_tls_socket_handle` instance, which will wrap `listening`. `listening` must NOT change address until the
   //! `listening_tls_socket_handle` is closed.
-  virtual result<listening_tls_socket_handle_ptr> wrap(listening_socket_handle *listening) noexcept = 0;
+  virtual result<listening_tls_socket_handle_ptr> wrap(listening_byte_socket_handle *listening) noexcept = 0;
 };
 
 namespace detail

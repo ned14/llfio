@@ -375,7 +375,8 @@ result<size_t> poll(span<poll_what> out, span<pollable_handle *> handles, span<c
   {
     if(handles[n] != nullptr)
     {
-      auto &h = handles[n]->_get_handle();
+      auto &h_ = handles[n]->_get_handle();
+      auto &h = h_.native_handle().is_third_party_pointer() ? *(handle *) h_.native_handle().ptr : h_;
       if(h.is_kernel_handle())
       {
         fds[fdscount].fd = h.native_handle().fd;
@@ -431,7 +432,8 @@ result<size_t> poll(span<poll_what> out, span<pollable_handle *> handles, span<c
       {
         if(handles[n] != nullptr)
         {
-          auto &h = handles[n]->_get_handle();
+          auto &h_ = handles[n]->_get_handle();
+          auto &h = h_.native_handle().is_third_party_pointer() ? *(handle *) h_.native_handle().ptr : h_;
           if(h.is_kernel_handle())
           {
             if(fds[fdscount].revents != 0)

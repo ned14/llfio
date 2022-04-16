@@ -375,7 +375,7 @@ static inline void TestSocketResolve()
 static inline void TestBlockingSocketHandles()
 {
   namespace llfio = LLFIO_V2_NAMESPACE;
-  auto serversocket = llfio::listening_socket_handle::listening_socket(llfio::ip::family::v4, llfio::listening_socket_handle::mode::read).value();
+  auto serversocket = llfio::listening_byte_socket_handle::listening_byte_socket(llfio::ip::family::v4, llfio::listening_byte_socket_handle::mode::read).value();
   BOOST_REQUIRE(serversocket.is_valid());
   BOOST_CHECK(serversocket.is_socket());
   BOOST_CHECK(serversocket.is_readable());
@@ -438,7 +438,7 @@ static inline void TestBlockingSocketHandles()
 static inline void TestNonBlockingSocketHandles()
 {
   namespace llfio = LLFIO_V2_NAMESPACE;
-  auto serversocket = llfio::listening_socket_handle::listening_socket(llfio::ip::family::v4, llfio::listening_socket_handle::mode::read,
+  auto serversocket = llfio::listening_byte_socket_handle::listening_byte_socket(llfio::ip::family::v4, llfio::listening_byte_socket_handle::mode::read,
                                                                        llfio::byte_socket_handle::caching::all, llfio::byte_socket_handle::flag::multiplexable)
                       .value();
   BOOST_REQUIRE(serversocket.is_valid());
@@ -602,7 +602,7 @@ static inline void TestMultiplexedSocketHandles()
       }
     };
     auto serversocket =
-    llfio::listening_socket_handle::listening_socket(llfio::ip::family::v4, llfio::listening_socket_handle::mode::write,
+    llfio::listening_byte_socket_handle::listening_byte_socket(llfio::ip::family::v4, llfio::listening_byte_socket_handle::mode::write,
                                                      llfio::byte_socket_handle::caching::all, llfio::byte_socket_handle::flag::multiplexable)
     .value();
     serversocket.bind(llfio::ip::address_v4::loopback()).value();
@@ -727,7 +727,7 @@ static inline void TestCoroutinedSocketHandles()
       }
     };
     auto serversocket =
-    llfio::listening_socket_handle::listening_socket(llfio::ip::family::v4, llfio::listening_socket_handle::mode::write, llfio::byte_socket_handle::caching::all,
+    llfio::listening_byte_socket_handle::listening_socket(llfio::ip::family::v4, llfio::listening_byte_socket_handle::mode::write, llfio::byte_socket_handle::caching::all,
                                                      llfio::byte_socket_handle::flag::multiplexable)
     .value();
     serversocket.bind(llfio::ip::address_v4::loopback()).value();
@@ -824,12 +824,12 @@ static inline void TestPollingSocketHandles()
 {
   static constexpr size_t MAX_SOCKETS = 64;
   namespace llfio = LLFIO_V2_NAMESPACE;
-  std::vector<std::pair<llfio::listening_socket_handle, llfio::ip::address>> listening;
+  std::vector<std::pair<llfio::listening_byte_socket_handle, llfio::ip::address>> listening;
   std::vector<llfio::byte_socket_handle> sockets;
   std::vector<size_t> idxs;
   for(size_t n = 0; n < MAX_SOCKETS; n++)
   {
-    auto s = llfio::listening_socket_handle::listening_socket(llfio::ip::family::v4).value();
+    auto s = llfio::listening_byte_socket_handle::listening_byte_socket(llfio::ip::family::v4).value();
     s.bind(llfio::ip::address_v4::loopback()).value();
     auto endpoint = s.local_endpoint().value();
     if(endpoint.family() == llfio::ip::family::unknown && getenv("CI") != nullptr)

@@ -41,7 +41,7 @@ LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 class byte_io_handle;
 class byte_socket_handle;
-class listening_socket_handle;
+class listening_byte_socket_handle;
 namespace ip
 {
   class address;
@@ -497,13 +497,13 @@ public:
         uint16_t file_handle : 1;              //!< This i/o multiplexer can register plain kernel `file_handle`.
         uint16_t pipe_handle : 1;              //!< This i/o multiplexer can register plain kernel `pipe_handle`.
         uint16_t byte_socket_handle : 1;       //!< This i/o multiplexer can register plain kernel `byte_socket_handle`.
-        uint16_t listening_socket_handle : 1;  //!< This i/o multiplexer can register plain kernel `listening_socket_handle`.
+        uint16_t listening_byte_socket_handle : 1;  //!< This i/o multiplexer can register plain kernel `listening_byte_socket_handle`.
 
         constexpr kernel_t()
             : file_handle(false)
             , pipe_handle(false)
             , byte_socket_handle(false)
-            , listening_socket_handle(false)
+            , listening_byte_socket_handle(false)
         {
         }
       } kernel;
@@ -530,11 +530,11 @@ public:
   virtual result<uint8_t> do_byte_io_handle_register(byte_io_handle * /*unused*/) noexcept { return (uint8_t) 0; }
   //! Implements `byte_io_handle` deregistration
   virtual result<void> do_byte_io_handle_deregister(byte_io_handle * /*unused*/) noexcept { return success(); }
-  //! Implements `listening_socket_handle` registration. The bottom two bits of the returned value are set into `_v.behaviour`'s `_multiplexer_state_bit0` and
+  //! Implements `listening_byte_socket_handle` registration. The bottom two bits of the returned value are set into `_v.behaviour`'s `_multiplexer_state_bit0` and
   //! `_multiplexer_state_bit`
-  virtual result<uint8_t> do_byte_io_handle_register(listening_socket_handle * /*unused*/) noexcept { return errc::operation_not_supported; }
-  //! Implements `listening_socket_handle` deregistration
-  virtual result<void> do_byte_io_handle_deregister(listening_socket_handle * /*unused*/) noexcept { return errc::operation_not_supported; }
+  virtual result<uint8_t> do_byte_io_handle_register(listening_byte_socket_handle * /*unused*/) noexcept { return errc::operation_not_supported; }
+  //! Implements `listening_byte_socket_handle` deregistration
+  virtual result<void> do_byte_io_handle_deregister(listening_byte_socket_handle * /*unused*/) noexcept { return errc::operation_not_supported; }
   //! Implements `byte_io_handle::max_buffers()`
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC size_t do_byte_io_handle_max_buffers(const byte_io_handle *h) const noexcept;
   //! Implements `byte_io_handle::allocate_registered_buffer()`
@@ -1185,7 +1185,7 @@ public:
   {
     friend class byte_io_handle;
     friend class byte_socket_handle;
-    friend class listening_socket_handle;
+    friend class listening_byte_socket_handle;
     static constexpr size_t _state_storage_bytes = _awaitable_size - sizeof(void *) - sizeof(io_operation_state *)
 #if LLFIO_ENABLE_COROUTINES
                                                    - sizeof(coroutine_handle<>)
@@ -1399,10 +1399,10 @@ public:
   }
 
   /*! \brief Constructs either a `unsynchronised_io_operation_state` or a `synchronised_io_operation_state`
-  for a `listening_socket_handle` read operation into the storage provided. The i/o is not initiated. The storage must
+  for a `listening_byte_socket_handle` read operation into the storage provided. The i/o is not initiated. The storage must
   meet the requirements from `state_requirements()`.
   */
-  virtual io_operation_state *construct(span<byte> storage, listening_socket_handle *_h, io_operation_state_visitor *_visitor, deadline d,
+  virtual io_operation_state *construct(span<byte> storage, listening_byte_socket_handle *_h, io_operation_state_visitor *_visitor, deadline d,
                                         std::pair<byte_socket_handle, ip::address> & /*unused*/) noexcept
   {
     (void) storage;
@@ -1473,7 +1473,7 @@ public:
 
   /*! \brief Combines `.construct()` with `.init_io_operation()` in a single call for improved efficiency.
    */
-  virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, listening_socket_handle *_h, io_operation_state_visitor *_visitor, deadline d,
+  virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, listening_byte_socket_handle *_h, io_operation_state_visitor *_visitor, deadline d,
                                                               std::pair<byte_socket_handle, ip::address> &req) noexcept
   {
     io_operation_state *state = construct(storage, _h, _visitor, d, req);

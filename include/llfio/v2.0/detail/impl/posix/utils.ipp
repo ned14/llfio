@@ -24,6 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../../../utils.hpp"
 
+#include <cinttypes>  // for SCNu64 
 #include <mutex>  // for lock_guard
 
 #include <sys/mman.h>
@@ -636,13 +637,15 @@ namespace utils
       static const uint64_t ts_multiplier = 1000000000ULL / sysconf(_SC_CLK_TCK);
       OUTCOME_TRY(fill_buffer(buffer1, "/proc/self/stat"));
       OUTCOME_TRY(fill_buffer(buffer2, "/proc/stat"));
-      if(sscanf(buffer1.data(), "%*d %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %lu %lu", &ret.process_ns_in_user_mode, &ret.process_ns_in_kernel_mode) <
+      if(sscanf(buffer1.data(), "%*d %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %" SCNu64 " %" SCNu64, &ret.process_ns_in_user_mode,
+                &ret.process_ns_in_kernel_mode) <
          2)
       {
         return errc::protocol_error;
       }
       uint64_t user_nice;
-      if(sscanf(buffer2.data(), "cpu %lu %lu %lu %lu", &ret.system_ns_in_user_mode, &user_nice, &ret.system_ns_in_kernel_mode, &ret.system_ns_in_idle_mode) < 4)
+      if(sscanf(buffer2.data(), "cpu %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64, &ret.system_ns_in_user_mode, &user_nice, &ret.system_ns_in_kernel_mode,
+                &ret.system_ns_in_idle_mode) < 4)
       {
         return errc::protocol_error;
       }

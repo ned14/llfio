@@ -91,7 +91,9 @@ inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &
     EIOSB &ol = *ol_it++;
     ol.Status = -1;
   }
-  auto cancel_io = make_scope_exit([&]() noexcept {
+  auto cancel_io = make_scope_exit(
+  [&]() noexcept
+  {
     if(nativeh.is_nonblocking())
     {
       if(ol_it != ols.begin() + 1)
@@ -147,7 +149,8 @@ inline bool do_read_write(byte_io_handle::io_result<BuffersType> &ret, Syscall &
       if(STATUS_TIMEOUT == ntwait(nativeh.h, ol, nd))
       {
         // ntwait cancels the i/o, undoer will cancel all the other i/o
-        auto r = [&]() -> result<void> {
+        auto r = [&]() -> result<void>
+        {
           LLFIO_WIN_DEADLINE_TO_TIMEOUT_LOOP(d);
           return success();
         }();
@@ -233,7 +236,8 @@ retry:
         if(STATUS_TIMEOUT == ntwait(nativeh.h, ol, nd))
         {
           // ntwait cancels the i/o, undoer will cancel all the other i/o
-          auto r = [&]() -> result<void> {
+          auto r = [&]() -> result<void>
+          {
             LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
             return success();
           }();
@@ -285,7 +289,8 @@ retry:
           ret = win32_error(WSAGetLastError());
           return true;
         }
-        auto r = [&]() -> result<void> {
+        auto r = [&]() -> result<void>
+        {
           LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
           return success();
         }();
@@ -351,7 +356,8 @@ result<size_t> poll(span<poll_what> out, span<pollable_handle *> handles, span<c
   {
     if(handles[n] != nullptr)
     {
-      auto &h = handles[n]->_get_handle();
+      auto &h_ = handles[n]->_get_handle();
+      auto &h = h_.native_handle().is_third_party_pointer() ? *(handle *) h_.native_handle().ptr : h_;
       if(h.is_kernel_handle())
       {
         fds[fdscount].fd = h.native_handle().sock;
@@ -416,7 +422,8 @@ result<size_t> poll(span<poll_what> out, span<pollable_handle *> handles, span<c
       {
         if(handles[n] != nullptr)
         {
-          auto &h = handles[n]->_get_handle();
+          auto &h_ = handles[n]->_get_handle();
+          auto &h = h_.native_handle().is_third_party_pointer() ? *(handle *) h_.native_handle().ptr : h_;
           if(h.is_kernel_handle())
           {
             if(fds[fdscount].revents != 0)

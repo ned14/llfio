@@ -88,6 +88,7 @@ namespace ip
       OVERLAPPED ol;
       ::ADDRINFOEXW *res{nullptr};
       HANDLE ophandle{nullptr};
+      bool done{false};
 
       resolver_impl() { clear(); }
 
@@ -107,12 +108,13 @@ namespace ip
           res = nullptr;
         }
         ophandle = nullptr;
+        done = false;
       }
 
       // Returns 0 for not ready yet, -1 for already processed, +1 for just processed
       int check(DWORD millis)
       {
-        if(0 != WaitForSingleObject(ol.hEvent, millis))
+        if(!done && 0 != WaitForSingleObject(ol.hEvent, millis))
         {
           return 0;
         }
@@ -120,6 +122,7 @@ namespace ip
         {
           return -1;
         }
+        done = true;
         auto unaddrinfo = make_scope_exit(
         [&]() noexcept
         {
@@ -188,7 +191,7 @@ namespace ip
     void resolver_deleter::operator()(resolver *_p) const
     {
       auto *p = static_cast<resolver_impl *>(_p);
-      if(0 != WaitForSingleObject(p->ol.hEvent, 0))
+      if(!p->done && 0 != WaitForSingleObject(p->ol.hEvent, 0))
       {
         GetAddrInfoExCancel(&p->ophandle);
         WaitForSingleObject(p->ol.hEvent, INFINITE);
@@ -220,7 +223,7 @@ namespace ip
   bool resolver::incomplete() const noexcept
   {
     auto *self = static_cast<const detail::resolver_impl *>(this);
-    return 0 != WaitForSingleObject(self->ol.hEvent, 0);
+    return !self->done && 0 != WaitForSingleObject(self->ol.hEvent, 0);
   }
   result<span<address>> resolver::get() noexcept
   {
@@ -326,9 +329,15 @@ namespace ip
           _timeout.tv_usec = (long) (diff % 1000000);
         }
         timeout = &_timeout;
+        // Can't combine blocking and timeouts
+        flags &= ~resolve_flag::blocking;
       }
       p->hints.ai_socktype = SOCK_STREAM;
-      p->hints.ai_flags = AI_ADDRCONFIG | AI_V4MAPPED;
+      p->hints.ai_flags = AI_ADDRCONFIG;
+      if(_family != family::v4)
+      {
+        p->hints.ai_flags |= AI_V4MAPPED;
+      }
       if(flags & resolve_flag::passive)
       {
         p->hints.ai_flags |= AI_PASSIVE;
@@ -343,24 +352,29 @@ namespace ip
           return ntkernel_error(ntstat);
         }
         std::wstring ret;
-        ret.resize(written);
+        ret.resize(written / sizeof(wchar_t));
         written = 0;
         // Do the conversion UTF-8 to UTF-16
-        ntstat = RtlUTF8ToUnicodeN(const_cast<wchar_t *>(ret.data()), static_cast<ULONG>(ret.size()), &written, str.c_str(), static_cast<ULONG>(str.size()));
+        ntstat = RtlUTF8ToUnicodeN(const_cast<wchar_t *>(ret.data()), static_cast<ULONG>(ret.size() * sizeof(wchar_t)), &written, str.c_str(),
+                                   static_cast<ULONG>(str.size()));
         if(ntstat < 0)
         {
           return ntkernel_error(ntstat);
         }
-        ret.resize(written);
+        ret.resize(written / sizeof(wchar_t));
         return ret;
       };
       OUTCOME_TRY(auto &&_name, to_wstring(p->name));
       OUTCOME_TRY(auto &&_service, to_wstring(p->service));
       auto errcode = GetAddrInfoExW(_name.c_str(), _service.c_str(), NS_ALL, nullptr, &p->hints, &p->res, timeout,
                                     (flags & resolve_flag::blocking) ? nullptr : &p->ol, nullptr, (flags & resolve_flag::blocking) ? nullptr : &p->ophandle);
-      if(NO_ERROR != errcode && WSA_IO_PENDING != errcode)
+      if(NO_ERROR == errcode)
       {
-        SetEvent(p->ol.hEvent);
+        p->done = true;
+      }
+      else if(WSA_IO_PENDING != errcode)
+      {
+        p->done = true;
         return win32_error(errcode);
       }
       p->check(0);
@@ -601,7 +615,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> byte_socket_handle::close() noexcep
 
 /*******************************************************************************************************************/
 
-LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<ip::address> listening_socket_handle::local_endpoint() const noexcept
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<ip::address> listening_byte_socket_handle::local_endpoint() const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   ip::address ret;
@@ -613,7 +627,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<ip::address> listening_socket_handle::loc
   return ret;
 }
 
-LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> listening_socket_handle::bind(const ip::address &addr, creation _creation, int backlog) noexcept
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> listening_byte_socket_handle::bind(const ip::address &addr, creation _creation, int backlog) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   if(_creation != creation::only_if_not_exist)
@@ -635,16 +649,16 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> listening_socket_handle::bind(const
   return success();
 }
 
-LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle> listening_socket_handle::listening_socket(ip::family family, mode _mode, caching _caching,
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_byte_socket_handle> listening_byte_socket_handle::listening_byte_socket(ip::family family, mode _mode, caching _caching,
                                                                                                           flag flags) noexcept
 {
-  result<listening_socket_handle> ret(listening_socket_handle(native_handle_type(), flags, nullptr));
+  result<listening_byte_socket_handle> ret(listening_byte_socket_handle(native_handle_type(), flags, nullptr));
   native_handle_type &nativeh = ret.value()._v;
   OUTCOME_TRY(detail::create_socket(&ret.value(), nativeh, family, _mode, _caching, flags));
   return ret;
 }
 
-LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_socket_handle::buffers_type> listening_socket_handle::_do_read(io_request<buffers_type> req,
+LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_byte_socket_handle::buffers_type> listening_byte_socket_handle::_do_read(io_request<buffers_type> req,
                                                                                                                 deadline d) noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
