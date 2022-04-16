@@ -256,14 +256,14 @@ template <class T> inline result<void> openssl_error(T *inst, unsigned long errc
       abort();
     }
     auto ret = (ERR_GET_REASON(errcode) == 2) ? std::move(inst->_write_error) : std::move(inst->_read_error);
-#if 1
+#if LLFIO_OPENSSL_ENABLE_DEBUG_PRINTING
     std::lock_guard<std::mutex> g(detail::openssl_printing_lock);
     std::cerr << "OpenSSL underlying error: " << ret.error().message().c_str() << std::endl;
 #endif
     return ret;
   }
   detail::openssl_code ret(errcode);
-#if 1
+#if LLFIO_OPENSSL_ENABLE_DEBUG_PRINTING
   std::lock_guard<std::mutex> g(detail::openssl_printing_lock);
   std::cerr << "OpenSSL error: " << ret.message().c_str() << std::endl;
 #endif
@@ -277,7 +277,7 @@ inline result<void> openssl_error(std::nullptr_t, unsigned long errcode = ERR_ge
     abort();
   }
   detail::openssl_code ret(errcode);
-#if 1
+#if LLFIO_OPENSSL_ENABLE_DEBUG_PRINTING
   std::lock_guard<std::mutex> g(detail::openssl_printing_lock);
   std::cerr << "OpenSSL error: " << ret.message().c_str() << std::endl;
 #endif
