@@ -34,7 +34,9 @@ jobs:
       run: |
        git config --global core.longpaths true
        if [ "${{ matrix.configuration }}" = "status_code" ]; then
-         export CMAKE_CONFIGURE_OPTIONS="-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON;-DLLFIO_FORCE_OPENSSL_OFF=ON"
+         export CMAKE_CONFIGURE_OPTIONS="-DLLFIO_FORCE_OPENSSL_OFF=ON -DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON"
+       else
+         export CMAKE_CONFIGURE_OPTIONS="-DLLFIO_FORCE_OPENSSL_OFF=ON"
        fi
        git clone --depth 1 https://github.com/ned14/quickcpplib.git
        pip install --user gitpython

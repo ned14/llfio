@@ -213,25 +213,37 @@ retry:
   WSAOVERLAPPED ol;
   memset(&ol, 0, sizeof(ol));
   ol.Internal = (ULONG_PTR) -1;
-  if(SOCKET_ERROR == syscall(nativeh.sock, bufs.data(), (DWORD) reqs.buffers.size(), &transferred, flags, d ? &ol : nullptr, nullptr))
+  const bool op_errored = (SOCKET_ERROR == syscall(nativeh.sock, bufs.data(), (DWORD) reqs.buffers.size(), &transferred, flags, d ? &ol : nullptr, nullptr));
+  // It would seem that sometimes Winsock returns zero bytes transferred and no error for nonblocking overlapped sockets
+  // In fairness, the Windows documentation does warn in the strongest possible terms to not combine nonblocking semantics
+  // with overlapped i/o, however it is so very much easier for this implementation if we do.
+  if(op_errored || (transferred == 0 && nativeh.is_nonblocking() && blocking))
   {
-    auto retcode = WSAGetLastError();
-    if(WSA_IO_PENDING != retcode && WSAEWOULDBLOCK != retcode)
+    bool io_pending = false;
+    if(op_errored)
     {
-      if(WSAESHUTDOWN == retcode)
+      auto retcode = WSAGetLastError();
+      if(WSA_IO_PENDING == retcode)
       {
-        // Emulate POSIX here
-        transferred = 0;
-        goto exit_now;
+        io_pending = true;
       }
-      ret = win32_error(retcode);
-      return true;
+      if(!io_pending && WSAEWOULDBLOCK != retcode)
+      {
+        if(WSAESHUTDOWN == retcode)
+        {
+          // Emulate POSIX here
+          transferred = 0;
+          goto exit_now;
+        }
+        ret = win32_error(retcode);
+        return true;
+      }
     }
     if(nativeh.is_nonblocking() && blocking)
     {
       deadline nd;
       LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
-      if(WSA_IO_PENDING == retcode)
+      if(io_pending)
       {
         if(STATUS_TIMEOUT == ntwait(nativeh.h, ol, nd))
         {

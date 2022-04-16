@@ -226,9 +226,8 @@ public:
   }  // NOLINT
   //! Construct a handle from a supplied native handle
   explicit constexpr handle(native_handle_type h, flag flags = flag::none) noexcept
-      : _v(std::move(h))
+      : _v(std::move(h), /* special move constructor to work around a constexpr bug in clang*/ uint16_t(flags))
   {
-    _.flags = flags;
   }
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~handle();
   //! No copy construction (use clone())

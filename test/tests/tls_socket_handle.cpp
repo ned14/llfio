@@ -186,19 +186,33 @@ static inline void TestNonBlockingTLSSocketHandles()
       BOOST_REQUIRE(!r);
       BOOST_REQUIRE(r.error() == llfio::errc::timed_out);  // can't possibly connect immediately
     }
+    BOOST_REQUIRE(serversocket->is_nonblocking());
     serversocket->read({reader}, std::chrono::seconds(1)).value();
+    // clang seems to be losing the nonblocking bit???
+    BOOST_REQUIRE(reader.first->is_nonblocking());
     std::cout << "Server socket sees incoming connection from " << reader.second << std::endl;
     // The TLS negotiation needs to do various reading and writing until the connection goes up
     bool connected = false;
-    for(size_t count=0;count<1024;count++)
+    for(size_t count = 0; count < 16; count++)
     {
       auto r1 = writer->connect(endpoint, std::chrono::milliseconds(0));
       auto r2 = reader.first->read({{nullptr, 0}}, std::chrono::milliseconds(0));
-      (void) r2;
       if(r1)
       {
         connected = true;
         break;
+      }
+      BOOST_REQUIRE(r2 || r2.error() != llfio::errc::not_supported);
+      if(count == 8)
+      {
+        if(r2)
+        {
+          std::cout << "\nread() returns success " << r2.value() << std::endl;
+        }
+        else
+        {
+          std::cout << "\nread() returns failure " << r2.error().message() << std::endl;
+        }
       }
       std::cout << "*" << std::flush;
       std::this_thread::sleep_for(std::chrono::milliseconds(1));

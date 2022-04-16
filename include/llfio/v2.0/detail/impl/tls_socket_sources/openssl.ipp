@@ -1468,11 +1468,13 @@ protected:
     }
     listening_byte_socket_handle::buffer_type b;
     OUTCOME_TRY(auto &&read, _underlying_read<listening_byte_socket_handle>({b}, d));
+    assert(this->is_nonblocking() == b.first.is_nonblocking());
     auto *p = new(std::nothrow) openssl_socket_handle(std::move(read.connected_socket().first));
     if(p == nullptr)
     {
       return errc::not_enough_memory;
     }
+    assert(this->is_nonblocking() == p->is_nonblocking());
     req.buffers.connected_socket() = {tls_socket_handle_ptr(p), read.connected_socket().second};
     OUTCOME_TRY(p->set_registered_buffer_chunk_size(_registered_buffer_chunk_size));
     OUTCOME_TRY(p->_init(false, _authentication_certificates_path));
@@ -1488,11 +1490,13 @@ protected:
     }
     listening_byte_socket_handle::buffer_type b;
     OUTCOME_TRY(auto &&read, _underlying_read<listening_byte_socket_handle>({b}, d));
+    assert(this->is_nonblocking() == b.first.is_nonblocking());
     auto *p = new(std::nothrow) openssl_socket_handle(std::move(read.connected_socket().first));
     if(p == nullptr)
     {
       return errc::not_enough_memory;
     }
+    assert(this->is_nonblocking() == p->is_nonblocking());
     req.buffers.connected_socket() = {tls_socket_handle_ptr(p), read.connected_socket().second};
     OUTCOME_TRY(p->set_registered_buffer_chunk_size(_registered_buffer_chunk_size));
     OUTCOME_TRY(p->_init(false, _authentication_certificates_path));

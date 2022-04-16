@@ -130,6 +130,14 @@ struct native_handle_type  // NOLINT
     o.behaviour = disposition();
     o._init = -1;
   }
+  //! Special move constructor to work around a constexpr bug in clang
+  constexpr native_handle_type(native_handle_type &&o, uint16_t flags) noexcept  // NOLINT
+      : _init(o._init)
+      , behaviour(uint64_t(o.behaviour) | (uint64_t(flags) << 32))
+  {
+    o.behaviour = disposition();
+    o._init = -1;
+  }
   //! Copy assign
   native_handle_type &operator=(const native_handle_type &) = default;
   //! Move assign
