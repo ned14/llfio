@@ -735,8 +735,8 @@ static inline void TestCoroutinedSocketHandles()
       }
     };
     auto serversocket =
-    llfio::listening_byte_socket_handle::listening_socket(llfio::ip::family::v4, llfio::listening_byte_socket_handle::mode::write,
-                                                          llfio::byte_socket_handle::caching::all, llfio::byte_socket_handle::flag::multiplexable)
+    llfio::listening_byte_socket_handle::listening_byte_socket(llfio::ip::family::v4, llfio::listening_byte_socket_handle::mode::write,
+                                                               llfio::byte_socket_handle::caching::all, llfio::byte_socket_handle::flag::multiplexable)
     .value();
     serversocket.bind(llfio::ip::address_v4::loopback()).value();
     auto endpoint = serversocket.local_endpoint().value();

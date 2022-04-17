@@ -138,17 +138,11 @@ static inline void TestBlockingTLSSocketHandles()
   runtest(tls_socket_source->wrap(&rawserversocket).value(), tls_socket_source->wrap(&rawwriter).value());
 }
 
-static inline void TestNonBlockingTLSSocketHandles()
+struct TestNonBlockingTLSSocketHandlesRunTest
 {
-  namespace llfio = LLFIO_V2_NAMESPACE;
-  if(llfio::tls_socket_source_registry::empty())
+  template <class F> TestNonBlockingTLSSocketHandlesRunTest(LLFIO_V2_NAMESPACE::listening_tls_socket_handle_ptr serversocket, F &&make_writer)
   {
-    std::cout << "\nNOTE: This platform has no TLS socket sources in its registry, skipping this test." << std::endl;
-    return;
-  }
-  auto tls_socket_source = llfio::tls_socket_source_registry::default_source().instantiate().value();
-  auto runtest = [](llfio::listening_tls_socket_handle_ptr serversocket, auto &&make_writer)
-  {
+    namespace llfio = LLFIO_V2_NAMESPACE;
     BOOST_REQUIRE(serversocket->is_valid());
     BOOST_CHECK(serversocket->is_socket());
     BOOST_CHECK(serversocket->is_readable());
@@ -262,15 +256,25 @@ static inline void TestNonBlockingTLSSocketHandles()
     BOOST_REQUIRE(!connected);
     writer->close().value();
     reader.first->close().value();
-  };
+  }
+};
+static inline void TestNonBlockingTLSSocketHandles()
+{
+  namespace llfio = LLFIO_V2_NAMESPACE;
+  if(llfio::tls_socket_source_registry::empty())
+  {
+    std::cout << "\nNOTE: This platform has no TLS socket sources in its registry, skipping this test." << std::endl;
+    return;
+  }
+  auto tls_socket_source = llfio::tls_socket_source_registry::default_source().instantiate().value();
   std::cout << "\nUnwrapped TLS socket:\n" << std::endl;
-  runtest(tls_socket_source->multiplexable_listening_socket(llfio::ip::family::v4).value(),
-          [&] { return tls_socket_source->multiplexable_connecting_socket(llfio::ip::family::v4).value(); });
+  TestNonBlockingTLSSocketHandlesRunTest(tls_socket_source->multiplexable_listening_socket(llfio::ip::family::v4).value(),
+                                         [&] { return tls_socket_source->multiplexable_connecting_socket(llfio::ip::family::v4).value(); });
 
   std::cout << "\nWrapped TLS socket:\n" << std::endl;
   auto rawserversocket = llfio::listening_byte_socket_handle::multiplexable_listening_byte_socket(llfio::ip::family::v4).value();
   auto rawwriter = llfio::byte_socket_handle::multiplexable_byte_socket(llfio::ip::family::v4).value();
-  runtest(tls_socket_source->wrap(&rawserversocket).value(), [&] { return tls_socket_source->wrap(&rawwriter).value(); });
+  TestNonBlockingTLSSocketHandlesRunTest(tls_socket_source->wrap(&rawserversocket).value(), [&] { return tls_socket_source->wrap(&rawwriter).value(); });
 }
 
 /* This test makes the assumption that the host OS is able to validate github.com's
