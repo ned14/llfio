@@ -33,8 +33,10 @@ jobs:
       shell: bash
       run: |
        git config --global core.longpaths true
-       sudo apt-get remove -y libssl-dev
-       sudo apt-get autoremove
+       if [ "${{ matrix.os }}" = "ubuntu-18.04" ]; then
+         sudo apt-get remove -y libssl-dev
+         sudo apt-get autoremove
+       fi
        if [ "${{ matrix.configuration }}" = "status_code" ]; then
          export CMAKE_CONFIGURE_OPTIONS="-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON"
        fi
