@@ -443,7 +443,7 @@ inline result<void> x509_error(int errcode)
 
 namespace detail
 {
-  struct openssl_custom_bio_method_t
+  static struct openssl_custom_bio_method_t
   {
     BIO_METHOD *method;
     openssl_custom_bio_method_t()
