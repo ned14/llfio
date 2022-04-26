@@ -311,7 +311,9 @@ supports_wrap = (1U << 3U),          //!< This socket source may be able to wrap
 
 all = 0xffffffff  //!< All bits set
 }  //
-QUICKCPPLIB_BITFIELD_END(tls_socket_source_implementation_features)
+QUICKCPPLIB_BITFIELD_END(tls_socket_source_implementation_features)  //
+static_assert(std::is_trivially_copyable<tls_socket_source_implementation_features>::value,
+              "tls_socket_source_implementation_features is not trivially copyable!");
 
 struct tls_socket_source_implementation_information;
 
@@ -430,18 +432,29 @@ struct LLFIO_DECL tls_socket_source_implementation_information
   result<tls_socket_source_ptr> (*instantiate_with)(byte_io_multiplexer *multiplexer) noexcept {_instantiate_with_default};
 
   constexpr tls_socket_source_implementation_information() {}
-  constexpr tls_socket_source_implementation_information(string_view _name)
+  constexpr explicit tls_socket_source_implementation_information(string_view _name)
       : name(_name)
   {
   }
+  tls_socket_source_implementation_information(const tls_socket_source_implementation_information &) = default;
+  tls_socket_source_implementation_information(tls_socket_source_implementation_information &&) = default;
+  tls_socket_source_implementation_information &operator=(const tls_socket_source_implementation_information &) = default;
+  tls_socket_source_implementation_information &operator=(tls_socket_source_implementation_information &&) = default;
+  ~tls_socket_source_implementation_information() = default;
 
 private:
   static bool _is_compatible_with_default(const byte_io_multiplexer_ptr & /*unused*/) noexcept { return false; }
   static result<tls_socket_source_ptr> _instantiate_default() noexcept { return errc::invalid_argument; }
   static result<tls_socket_source_ptr> _instantiate_with_default(byte_io_multiplexer * /*unused*/) noexcept { return errc::invalid_argument; }
 };
+static_assert(std::is_trivially_copy_constructible<tls_socket_source_implementation_information>::value,
+              "tls_socket_source_implementation_information is not trivially copy constructible!");
+static_assert(std::is_trivially_copy_assignable<tls_socket_source_implementation_information>::value,
+              "tls_socket_source_implementation_information is not trivially copy assignable!");
+static_assert(std::is_trivially_destructible<tls_socket_source_implementation_information>::value,
+              "tls_socket_source_implementation_information is not trivially destructible!");
 static_assert(std::is_trivially_copyable<tls_socket_source_implementation_information>::value,
-              "tls_socket_source_implementation_information_t is not trivially copyable!");
+              "tls_socket_source_implementation_information is not trivially copyable!");
 inline std::ostream &operator<<(std::ostream &s, const tls_socket_source_implementation_information &v)
 {
   return s << v.name << "_v" << v.version.major << "." << v.version.minor << "." << v.version.patch << "_" << v.postfix;
