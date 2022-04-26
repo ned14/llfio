@@ -9,6 +9,5 @@ var tls__socket__handle_8hpp =
     [ "tls_socket_source_ptr", "tls__socket__handle_8hpp.html#a1a51dd6cc5299a316fdcd05c4c7db2dc", null ],
     [ "operator<<", "tls__socket__handle_8hpp.html#a235f3c82f22c7430a8e214c959da2a01", null ],
     [ "QUICKCPPLIB_BITFIELD_BEGIN", "tls__socket__handle_8hpp.html#a54385a57b558008105b9429e89afaae2", null ],
-    [ "QUICKCPPLIB_BITFIELD_BEGIN_T", "tls__socket__handle_8hpp.html#a30f0de9f074d32381006e42b02a3669e", null ],
-    [ "QUICKCPPLIB_BITFIELD_END", "tls__socket__handle_8hpp.html#ac572f4eb22f2fcdae9a6ee9d84d1742e", null ]
+    [ "QUICKCPPLIB_BITFIELD_BEGIN_T", "tls__socket__handle_8hpp.html#a30f0de9f074d32381006e42b02a3669e", null ]
 ];
