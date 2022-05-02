@@ -1275,7 +1275,7 @@ public:
   int _bread(BIO *bio, char *buffer, size_t bytes, size_t *read)
   {
     LLFIO_LOG_FUNCTION_CALL(this);
-    auto ret = [=]() mutable
+    auto ret = [=, this]() mutable
     {
       assert(_lock_holder.owns_lock());
       *read = 0;
@@ -1374,7 +1374,7 @@ public:
   int _bwrite(BIO *bio, const char *buffer, size_t bytes, size_t *written)
   {
     LLFIO_LOG_FUNCTION_CALL(this);
-    auto ret = [=]() mutable
+    auto ret = [=, this]() mutable
     {
       assert(_lock_holder.owns_lock());
       *written = 0;
