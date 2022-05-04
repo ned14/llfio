@@ -453,6 +453,7 @@ public:
   result<size_t> copy_extended_attributes(const fs_handle &src, bool replace_all_local_attributes = false) noexcept
   {
     auto &h = _get_handle();
+    (void) h;
     LLFIO_LOG_FUNCTION_CALL(&h);
     byte buffer[65536 + 4096];
     if(replace_all_local_attributes)
