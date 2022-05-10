@@ -486,12 +486,13 @@ public:
 
 #ifdef _WIN32
   //! Windows only: List all the NTFS extended attributes on a file. See the documentation for `set_extended_attribute()` before use.
-  result<span<std::pair<path_view_component, span<byte>>>> win_list_extended_attributes(span<byte> tofill) noexcept;
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<span<std::pair<path_view_component, span<byte>>>> win_list_extended_attributes(span<byte> tofill) noexcept;
   //! Windows only: Get the values of NTFS extended attributes on a file. See the documentation for `set_extended_attribute()` before use.
-  result<span<std::pair<path_view_component, span<byte>>>> win_get_extended_attributes(span<byte> tofill, span<const path_view_component> names) noexcept;
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<span<std::pair<path_view_component, span<byte>>>>
+  win_get_extended_attributes(span<byte> tofill, span<const path_view_component> names) noexcept;
   //! Windows only: Set the values of a NTFS extended attributes on a file. See the documentation for `set_extended_attribute()` before use. In particular, note
   //! the requirement that you can only _extend_ the attributes list i.e. you must always set whatever the list is already, with additional members.
-  result<void> win_set_extended_attributes(span<std::pair<const path_view_component, span<const byte>>> toset) noexcept;
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> win_set_extended_attributes(span<std::pair<const path_view_component, span<const byte>>> toset) noexcept;
 #endif
 };
 
