@@ -1801,10 +1801,10 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
   </dd>
 </dl>
 <dl class="section user"><dt>Memory Allocations\n Except on platforms with race free syscalls for renaming open handles (Windows), calls</dt><dd><code>current_path()</code> via <code>parent_path_handle()</code> and thus is both expensive and calls malloc many times. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;{</div>
-<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.relink(std::forward&lt;decltype(base)&gt;(base), std::forward&lt;decltype(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>)&gt;(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>), std::forward&lt;decltype(atomic_replace)&gt;(atomic_replace),</div>
-<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;                     std::forward&lt;decltype(d)&gt;(d));</div>
-<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;{</div>
+<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.relink(std::forward&lt;decltype(base)&gt;(base), std::forward&lt;decltype(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>)&gt;(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>), std::forward&lt;decltype(atomic_replace)&gt;(atomic_replace),</div>
+<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;                     std::forward&lt;decltype(d)&gt;(d));</div>
+<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2496,9 +2496,9 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
   </dd>
 </dl>
 <dl class="section user"><dt>Memory Allocations\n Except on platforms with race free syscalls for unlinking open handles (Windows), calls</dt><dd><code>current_path()</code> and thus is both expensive and calls malloc many times. On Windows, also calls <code>current_path()</code> if <code>flag::disable_safety_unlinks</code> is not set. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;{</div>
-<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.unlink(std::forward&lt;decltype(d)&gt;(d));</div>
-<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;{</div>
+<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.unlink(std::forward&lt;decltype(d)&gt;(d));</div>
+<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
