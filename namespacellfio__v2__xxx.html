@@ -1604,6 +1604,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <p>&lt; This socket source is the "system" rather than "third party" implementation for TLS sockets</p>
 <p>&lt; This socket source provides an i/o multiplexer</p>
 <p>&lt; This socket source may be able to wrap third party plain sockets</p>
+<p>&lt; This socket source provides FIPS_140_2 compliant algorithms</p>
 <p>&lt; All bits set</p>
 <div class="fragment"><div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;                                                                                 {</div>
 <div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;none = 0U,  <span class="comment">//!&lt; No bits set</span></div>
@@ -1614,8 +1615,10 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;<span class="comment"></span>io_multiplexer = (1U &lt;&lt; 2U),         <span class="comment">//!&lt; This socket source provides an i/o multiplexer</span></div>
 <div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;<span class="comment"></span>supports_wrap = (1U &lt;&lt; 3U),          <span class="comment">//!&lt; This socket source may be able to wrap third party plain sockets</span></div>
 <div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;all = 0xffffffff  <span class="comment">//!&lt; All bits set</span></div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;<span class="comment"></span>}  <span class="comment">//</span></div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;FIPS_140_2 = (1U &lt;&lt; 16U),  <span class="comment">//!&lt; This socket source provides FIPS_140_2 compliant algorithms</span></div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;all = 0xffffffff  <span class="comment">//!&lt; All bits set</span></div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;<span class="comment"></span>}  <span class="comment">//</span></div>
 </div><!-- fragment -->
 </div>
 </div>
