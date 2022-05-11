@@ -309,6 +309,8 @@ system_implementation = (1U << 1U),  //!< This socket source is the "system" rat
 io_multiplexer = (1U << 2U),         //!< This socket source provides an i/o multiplexer
 supports_wrap = (1U << 3U),          //!< This socket source may be able to wrap third party plain sockets
 
+FIPS_140_2 = (1U << 16U),  //!< This socket source provides FIPS_140_2 compliant algorithms
+
 all = 0xffffffff  //!< All bits set
 }  //
 QUICKCPPLIB_BITFIELD_END(tls_socket_source_implementation_features)  //
@@ -533,6 +535,10 @@ if(string_view(buffer, b.size()) != "World") {
 // rather than hard close
 sock->shutdown_and_close(std::chrono::seconds(3)).value();
 ```
+
+Fuller fat example:
+
+ \snippet use_cases.cpp tls_socket_server
 */
 class LLFIO_DECL tls_socket_source_registry
 {
@@ -552,16 +558,18 @@ public:
   //! Convenience overload retrieving TLS socket sources, preferring system over third party implementations.
   static tls_socket_source_implementation_information
   default_source(tls_socket_source_implementation_features set = tls_socket_source_implementation_features::none,
-                 tls_socket_source_implementation_features mask = tls_socket_source_implementation_features::system_implementation) noexcept
+                 tls_socket_source_implementation_features mask = tls_socket_source_implementation_features::none) noexcept
   {
     tls_socket_source_implementation_information ret{"no implementation available"};
     set |= tls_socket_source_implementation_features::system_implementation;
+    mask |= tls_socket_source_implementation_features::system_implementation;
     auto filled = sources({&ret, 1}, set, mask);
     if(!filled.empty())
     {
       return ret;
     }
     set &= ~tls_socket_source_implementation_features::system_implementation;
+    mask &= ~tls_socket_source_implementation_features::system_implementation;
     filled = sources({&ret, 1}, set, mask);
     if(!filled.empty())
     {
