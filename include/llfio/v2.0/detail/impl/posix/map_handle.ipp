@@ -25,7 +25,9 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../../../map_handle.hpp"
 #include "../../../utils.hpp"
 
+#ifndef LLFIO_DISABLE_SIGNAL_GUARD
 #include "quickcpplib/signal_guard.hpp"
+#endif
 
 #include <sys/mman.h>
 
@@ -397,7 +399,8 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
   }
   auto _offset = offset & ~(pagesize - 1);
   auto _bytes = bytes + (offset & (pagesize - 1));
-// printf("mmap(%p, %u (%u), %d, %d, %d, %u (%u))\n", ataddr, (unsigned) _bytes, (unsigned) bytes, prot, flags, have_backing ? section->native_handle().fd : -1, (unsigned) _offset, (unsigned) offset);
+// printf("mmap(%p, %u (%u), %d, %d, %d, %u (%u))\n", ataddr, (unsigned) _bytes, (unsigned) bytes, prot, flags, have_backing ? section->native_handle().fd : -1,
+// (unsigned) _offset, (unsigned) offset);
 #ifdef MAP_SYNC  // Linux kernel 4.15 or later only
   // If backed by a file into persistent shared memory, ask the kernel to use persistent memory safe semantics
   if(have_backing && (_flag & section_handle::flag::nvram) && (flags & MAP_SHARED) != 0)
@@ -585,7 +588,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
     _reservation = _newsize;
     _length = length;
     return newsize;
-#else  // generic POSIX, inefficient
+#else                  // generic POSIX, inefficient
     byte *addrafter = _addr + _reservation;
     size_type bytes = newsize - _reservation;
     extent_type offset = _offset + _reservation;
@@ -766,44 +769,52 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_write(io_r
   }
   byte *addr = _addr + reqs.offset + (_offset & (_pagesize - 1));
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
+#ifndef LLFIO_DISABLE_SIGNAL_GUARD
   if(QUICKCPPLIB_NAMESPACE::signal_guard::signal_guard(
      QUICKCPPLIB_NAMESPACE::signal_guard::signalc_set::undefined_memory_access | QUICKCPPLIB_NAMESPACE::signal_guard::signalc_set::segmentation_fault,
-     [&] {
-       for(size_t i = 0; i < reqs.buffers.size(); i++)
-       {
-         const_buffer_type &req = reqs.buffers[i];
-         if(req.size() > togo)
-         {
-           assert(req.data() != nullptr);
-           memcpy(addr, req.data(), togo);
-           req = {addr, togo};
-           reqs.buffers = {reqs.buffers.data(), i + 1};
-           return false;
-         }
-         else
-         {
-           assert(req.data() != nullptr);
-           memcpy(addr, req.data(), req.size());
-           req = {addr, req.size()};
-           addr += req.size();
-           togo -= req.size();
-         }
-       }
-       return false;
+#endif
+     [&]
+     {
+    for(size_t i = 0; i < reqs.buffers.size(); i++)
+    {
+      const_buffer_type &req = reqs.buffers[i];
+      if(req.size() > togo)
+      {
+        assert(req.data() != nullptr);
+        memcpy(addr, req.data(), togo);
+        req = {addr, togo};
+        reqs.buffers = {reqs.buffers.data(), i + 1};
+        return false;
+      }
+      else
+      {
+        assert(req.data() != nullptr);
+        memcpy(addr, req.data(), req.size());
+        req = {addr, req.size()};
+        addr += req.size();
+        togo -= req.size();
+      }
+    }
+    return false;
+#ifdef LLFIO_DISABLE_SIGNAL_GUARD
+       }();
+#else
      },
-     [&](const QUICKCPPLIB_NAMESPACE::signal_guard::raised_signal_info *info) {
-       auto *causingaddr = (byte *) info->addr;
-       if(causingaddr < _addr || causingaddr >= (_addr + _reservation))
-       {
-         // Not caused by this map
-         thrd_raise_signal(info->signo, info->raw_info, info->raw_context);
-         abort();
-       }
-       return true;
+     [&](const QUICKCPPLIB_NAMESPACE::signal_guard::raised_signal_info *info)
+     {
+    auto *causingaddr = (byte *) info->addr;
+    if(causingaddr < _addr || causingaddr >= (_addr + _reservation))
+    {
+      // Not caused by this map
+      thrd_raise_signal(info->signo, info->raw_info, info->raw_context);
+      abort();
+    }
+    return true;
      }))
-  {
-    return errc::no_space_on_device;
-  }
+     {
+       return errc::no_space_on_device;
+     }
+#endif
   return reqs.buffers;
 }
 

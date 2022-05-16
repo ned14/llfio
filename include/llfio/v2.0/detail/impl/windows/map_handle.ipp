@@ -27,7 +27,10 @@ Distributed under the Boost Software License, Version 1.0.
 #include "import.hpp"
 
 #include "quickcpplib/algorithm/hash.hpp"
+
+#ifndef LLFIO_DISABLE_SIGNAL_GUARD
 #include "quickcpplib/signal_guard.hpp"
+#endif
 
 LLFIO_V2_NAMESPACE_BEGIN
 
@@ -1076,45 +1079,51 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_write(io_r
   }
   byte *addr = _addr + reqs.offset + (_offset & 65535);
   size_type togo = reqs.offset < _length ? static_cast<size_type>(_length - reqs.offset) : 0;
+#ifndef LLFIO_DISABLE_SIGNAL_GUARD
   if(QUICKCPPLIB_NAMESPACE::signal_guard::signal_guard(
      QUICKCPPLIB_NAMESPACE::signal_guard::signalc_set::undefined_memory_access | QUICKCPPLIB_NAMESPACE::signal_guard::signalc_set::segmentation_fault,
+#endif
      [&]
      {
-       for(size_t i = 0; i < reqs.buffers.size(); i++)
-       {
-         const_buffer_type &req = reqs.buffers[i];
-         if(req.size() > togo)
-         {
-           assert(req.data() != nullptr);
-           memcpy(addr, req.data(), togo);
-           req = {addr, togo};
-           reqs.buffers = {reqs.buffers.data(), i + 1};
-           return false;
-         }
-         else
-         {
-           assert(req.data() != nullptr);
-           memcpy(addr, req.data(), req.size());
-           req = {addr, req.size()};
-           addr += req.size();
-           togo -= req.size();
-         }
-       }
-       return false;
+    for(size_t i = 0; i < reqs.buffers.size(); i++)
+    {
+      const_buffer_type &req = reqs.buffers[i];
+      if(req.size() > togo)
+      {
+        assert(req.data() != nullptr);
+        memcpy(addr, req.data(), togo);
+        req = {addr, togo};
+        reqs.buffers = {reqs.buffers.data(), i + 1};
+        return false;
+      }
+      else
+      {
+        assert(req.data() != nullptr);
+        memcpy(addr, req.data(), req.size());
+        req = {addr, req.size()};
+        addr += req.size();
+        togo -= req.size();
+      }
+    }
+    return false;
+#ifdef LLFIO_DISABLE_SIGNAL_GUARD
+       }();
+#else
      },
      [&](const QUICKCPPLIB_NAMESPACE::signal_guard::raised_signal_info *info)
      {
-       auto *causingaddr = (byte *) info->addr;
-       if(causingaddr < _addr || causingaddr >= (_addr + _length))
-       {
-         // Not caused by this map
-         thrd_raise_signal(info->signo, info->raw_info, info->raw_context);
-       }
-       return true;
+    auto *causingaddr = (byte *) info->addr;
+    if(causingaddr < _addr || causingaddr >= (_addr + _length))
+    {
+      // Not caused by this map
+      thrd_raise_signal(info->signo, info->raw_info, info->raw_context);
+    }
+    return true;
      }))
-  {
-    return errc::no_space_on_device;
-  }
+     {
+       return errc::no_space_on_device;
+     }
+#endif
   return reqs.buffers;
 }
 

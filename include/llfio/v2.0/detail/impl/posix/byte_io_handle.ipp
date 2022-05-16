@@ -36,7 +36,9 @@ Distributed under the Boost Software License, Version 1.0.
 #include <poll.h>
 #endif
 
+#ifndef LLFIO_DISABLE_SIGNAL_GUARD
 #include "quickcpplib/signal_guard.hpp"
+#endif
 
 LLFIO_V2_NAMESPACE_BEGIN
 
@@ -231,13 +233,23 @@ byte_io_handle::io_result<byte_io_handle::const_buffers_type> byte_io_handle::_d
     do
     {
       // Can't guarantee that user code hasn't enabled SIGPIPE
-      byteswritten = QUICKCPPLIB_NAMESPACE::signal_guard::signal_guard(
-      QUICKCPPLIB_NAMESPACE::signal_guard::signalc_set::broken_pipe, [&] { return ::writev(_v.fd, iov, reqs.buffers.size()); },
+      byteswritten =
+#ifndef LLFIO_DISABLE_SIGNAL_GUARD
+      QUICKCPPLIB_NAMESPACE::signal_guard::signal_guard(
+      QUICKCPPLIB_NAMESPACE::signal_guard::signalc_set::broken_pipe,
+      [&]
+      {
+        return
+#endif
+        ::writev(_v.fd, iov, reqs.buffers.size());
+#ifndef LLFIO_DISABLE_SIGNAL_GUARD
+      },
       [&](const QUICKCPPLIB_NAMESPACE::signal_guard::raised_signal_info * /*unused*/)
       {
         errno = EPIPE;
         return -1;
       });
+#endif
       if(byteswritten <= 0)
       {
         if(byteswritten == 0 && is_socket())
