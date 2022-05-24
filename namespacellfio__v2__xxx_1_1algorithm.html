@@ -619,7 +619,7 @@ template&lt;class T , class... Args&gt; </div>
 <li>Call <code>pre_enumeration()</code> of the visitor on the <code>directory_handle</code> about to be enumerated.</li>
 <li>Enumerate the contents of the directory.</li>
 <li>Call <code>post_enumeration()</code> of the visitor on the contents just enumerated.</li>
-<li>For each directory in the contents, append the directory handle and each directory leafname to its hierarchy depth level in a stack of lists.</li>
+<li>For each directory in the contents, append a base directory handle and a directory fragment to its hierarchy depth level in a stack of lists.</li>
 <li>Loop, using the least deep available item in the stack, until the stack is empty.</li>
 </ol>
 <p>If <code>known_dirs_remaining</code> exceeds four, a threadpool of not more than <code>threads</code> threads is spun up in order to traverse the hierarchy more quickly.</p>
