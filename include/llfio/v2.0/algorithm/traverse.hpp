@@ -1,5 +1,5 @@
 /* A filesystem algorithm which traverses a directory tree
-(C) 2020 Niall Douglas <http://www.nedproductions.biz/> (12 commits)
+(C) 2020 - 2022 Niall Douglas <http://www.nedproductions.biz/> (12 commits)
 File Created: May 2020
 
 
@@ -143,8 +143,8 @@ namespace algorithm
 
   3. Call `post_enumeration()` of the visitor on the contents just enumerated.
 
-  4. For each directory in the contents, append the directory handle and each directory
-  leafname to its hierarchy depth level in a stack of lists.
+  4. For each directory in the contents, append a base directory handle and a directory
+  fragment to its hierarchy depth level in a stack of lists.
 
   5. Loop, using the least deep available item in the stack, until the stack is empty.
 

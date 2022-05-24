@@ -36,6 +36,9 @@ Distributed under the Boost Software License, Version 1.0.
 #include <sys/stat.h>
 #endif
 
+#define LLFIO_ALGORITHM_TRAVERSE_MAX_SSO_PATH_SIZE 64 /* cannot exceed 255 */
+
+
 LLFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
@@ -43,7 +46,10 @@ namespace algorithm
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<size_t> traverse(const path_handle &_topdirh, traverse_visitor *visitor, size_t threads, void *data,
                                                        bool force_slow_path) noexcept
   {
-    return visitor->finished(data, [&]() -> result<size_t> {
+    return visitor->finished(
+    data,
+    [&]() -> result<size_t>
+    {
       try
       {
         LLFIO_LOG_FUNCTION_CALL(&_topdirh);
@@ -73,6 +79,7 @@ namespace algorithm
 #endif
         struct state_t
         {
+          const size_t max_sso_path_size;
           std::mutex lock;
           traverse_visitor *visitor{nullptr};
 #if 0
@@ -94,28 +101,47 @@ namespace algorithm
             std::shared_ptr<directory_handle> dirh;
             bool using_sso{true};
             uint8_t _sso_length{0};
-            union {
-              filesystem::path::value_type _sso[64];
+            union
+            {
+              filesystem::path::value_type _sso[LLFIO_ALGORITHM_TRAVERSE_MAX_SSO_PATH_SIZE];
               filesystem::path _alloc;
             };
             workitem() {}
-            workitem(std::shared_ptr<directory_handle> _dirh, path_view leaf)
+            workitem(std::shared_ptr<directory_handle> _dirh, path_view stem, path_view leaf = {})
                 : dirh(std::move(_dirh))
             {
-              if(!leaf.empty())
+              _sso[0] = 0;
+              if(!stem.empty())
               {
-                size_t bytes = (1 + leaf.native_size()) * sizeof(filesystem::path::value_type);
+                size_t bytes = (1 + stem.native_size()) * sizeof(filesystem::path::value_type);
+                if(!leaf.empty())
+                {
+                  bytes = (1 + leaf.native_size()) * sizeof(filesystem::path::value_type);
+                }
                 if(bytes <= sizeof(_sso))
                 {
                   using_sso = true;
-                  visit(leaf, [&](auto sv) {
-                    memcpy(_sso, sv.data(), bytes);
-                    _sso_length = (uint8_t) sv.size();
-                  });
+                  visit(stem,
+                        [&](auto sv)
+                        {
+                          memcpy(_sso, sv.data(), sv.size() * sizeof(filesystem::path::value_type));
+                          _sso_length = (uint8_t) sv.size();
+                        });
+                  if(!leaf.empty())
+                  {
+                    _sso[_sso_length++] = filesystem::path::preferred_separator;
+                    visit(leaf,
+                          [&](auto sv)
+                          {
+                            memcpy(_sso + _sso_length, sv.data(), sv.size() * sizeof(filesystem::path::value_type));
+                            _sso_length += (uint8_t) sv.size();
+                          });
+                  }
+                  _sso[_sso_length] = 0;
                 }
                 else
                 {
-                  new(&_alloc) filesystem::path(leaf.path());
+                  new(&_alloc) filesystem::path(stem / leaf);
                   using_sso = false;
                 }
               }
@@ -128,7 +154,7 @@ namespace algorithm
                 using_sso = true;
               }
             }
-#ifdef _MSC_VER
+#if _MSC_VER < 1932
             // MSVC's list::splice() always copies :(
             workitem(const workitem &o) noexcept
                 : workitem(const_cast<workitem &&>(std::move(o)))
@@ -172,11 +198,12 @@ namespace algorithm
           size_t workqueue_base{0};
           size_t dirs_processed{0}, known_dirs_remaining{0}, depth_processed{0}, threads_sleeping{0}, threads_running{0};
 
-          explicit state_t(traverse_visitor *_visitor)
-              : visitor(_visitor)
+          explicit state_t(size_t _max_sso_path_size, traverse_visitor *_visitor)
+              : max_sso_path_size(_max_sso_path_size)
+              , visitor(_visitor)
           {
           }
-        } state(visitor);
+        } state(use_slow_path ? size_t(-1) : LLFIO_ALGORITHM_TRAVERSE_MAX_SSO_PATH_SIZE, visitor);
         struct worker
         {
           state_t *state{nullptr};
@@ -188,7 +215,7 @@ namespace algorithm
           {
           }
 
-          result<void> run(std::unique_lock<std::mutex> &g, bool use_slow_path, std::shared_ptr<directory_handle> &topdirh, void *data)
+          result<void> run(std::unique_lock<std::mutex> &g, void *data)
           {
             typename state_t::workitem mywork;
             size_t mylevel = 0;
@@ -264,7 +291,8 @@ namespace algorithm
                     path_view::zero_terminated_rendered_path<> zpath(entry.leafname);
                     if(::fstatat(mydirh->native_handle().fd, zpath.data(), &stat, AT_SYMLINK_NOFOLLOW) >= 0)
                     {
-                      entry.stat.st_type = [](uint16_t mode) {
+                      entry.stat.st_type = [](uint16_t mode)
+                      {
                         switch(mode & S_IFMT)
                         {
                         case S_IFBLK:
@@ -295,6 +323,7 @@ namespace algorithm
                 }
                 OUTCOME_TRY(state->visitor->post_enumeration(data, *mydirh, buffers, mylevel));
                 std::list<state_t::workitem> newwork;
+                size_t maxpathsize = 0;
                 for(auto &entry : buffers)
                 {
                   int entry_type = 0;  // 0 = unknown, 1 = file, 2 = directory
@@ -316,12 +345,54 @@ namespace algorithm
                   }
                   if(2 == entry_type)
                   {
-                    if(use_slow_path)
+                    size_t pathsize = mywork.leaf().native_size() + entry.leafname.native_size() + 2;
+                    if(pathsize > maxpathsize)
                     {
-                      newwork.push_back(state_t::workitem(topdirh, mywork.leaf() / entry.leafname));
+                      maxpathsize = pathsize;
+                    }
+                  }
+                }
+                for(auto &entry : buffers)
+                {
+                  int entry_type = 0;  // 0 = unknown, 1 = file, 2 = directory
+                  switch(entry.stat.st_type)
+                  {
+                  case filesystem::file_type::directory:
+                    entry_type = 2;
+                    break;
+                  case filesystem::file_type::regular:
+                  case filesystem::file_type::symlink:
+                  case filesystem::file_type::block:
+                  case filesystem::file_type::character:
+                  case filesystem::file_type::fifo:
+                  case filesystem::file_type::socket:
+                    entry_type = 1;
+                    break;
+                  default:
+                    break;
+                  }
+                  if(2 == entry_type)
+                  {
+                    if(maxpathsize <= state->max_sso_path_size)
+                    {
+                      // Reuse existing base directory handle, but with a longer path fragment
+                      // Note that "slow path" is defined as this branch always being taken
+                      // no matter what, so if pathsize exceeds LLFIO_ALGORITHM_TRAVERSE_MAX_SSO_PATH_SIZE
+                      // then a filesystem::path will be constructed per work item, and that has
+                      // a marked effect on performance. It does, however, avoid opening any
+                      // directory handles above minimum possible.
+                      if(!mywork.leaf().empty())
+                      {
+                        newwork.push_back(state_t::workitem(mywork.dirh, mywork.leaf(), entry.leafname));
+                      }
+                      else
+                      {
+                        newwork.push_back(state_t::workitem(mywork.dirh, entry.leafname));
+                      }
                     }
                     else
                     {
+                      // Use a new base directory handle with a single leaf
                       newwork.push_back(state_t::workitem(mydirh, entry.leafname));
                     }
                   }
@@ -358,7 +429,7 @@ namespace algorithm
             {
               g.lock();
             }
-            OUTCOME_TRY(firstworker.run(g, use_slow_path, topdirh, data));
+            OUTCOME_TRY(firstworker.run(g, data));
           }
         }
         if(state.known_dirs_remaining > 0)
@@ -386,7 +457,9 @@ namespace algorithm
           bool done = false;
           optional<result<void>::error_type> run_error;
           {
-            auto handle_failure = make_scope_fail([&]() noexcept {
+            auto handle_failure = make_scope_fail(
+            [&]() noexcept
+            {
               std::unique_lock<std::mutex> g(state.lock);
               done = true;
               while(state.threads_running > 0)
@@ -404,7 +477,8 @@ namespace algorithm
             for(size_t n = 0; n < threads; n++)
             {
               workerthreads.push_back(std::thread(
-              [&](worker *w) {
+              [&](worker *w)
+              {
                 std::unique_lock<std::mutex> g(state.lock);
                 state.threads_running++;
                 while(!done)
@@ -426,7 +500,7 @@ namespace algorithm
                     // wake everybody
                     cond.notify_all();
                   }
-                  auto r = w->run(g, use_slow_path, topdirh, data);
+                  auto r = w->run(g, data);
                   if(!g.owns_lock())
                   {
                     g.lock();
