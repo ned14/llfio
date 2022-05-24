@@ -24,9 +24,11 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../../algorithm/traverse.hpp"
 
+#include <atomic>
 #include <condition_variable>
 #include <iostream>
 #include <list>
+#include <memory>
 #include <mutex>
 #include <thread>
 #include <vector>
@@ -60,27 +62,32 @@ namespace algorithm
         }
         bool use_slow_path = force_slow_path;
 #ifndef _WIN32
-        if(!use_slow_path)
+        static const size_t rlimit_maxfd = []() -> size_t
         {
           struct rlimit r;
           if(getrlimit(RLIMIT_NOFILE, &r) >= 0)
           {
-            if(r.rlim_cur - topdirh->native_handle().fd < 65536)
-            {
-              use_slow_path = true;
+            return size_t(r.rlim_cur);
+          }
+          return 0;
+        }();
+        if(!use_slow_path)
+        {
+          if(rlimit_maxfd > 0 && rlimit_maxfd - topdirh->native_handle().fd < 65536)
+          {
+            use_slow_path = true;
 #ifndef NDEBUG
-              std::cerr << "WARNING: llfio::traverse() is using slow path due to " << (r.rlim_cur - topdirh->native_handle().fd)
-                        << " unused file descriptors remaining! Raise the limit using setrlimit(RLIMIT_NOFILE) if your application is > 1024 fd count safe."
-                        << std::endl;
+            std::cerr << "WARNING: llfio::traverse() is using slow path due to " << (rlimit_maxfd - topdirh->native_handle().fd)
+                      << " unused file descriptors remaining! Raise the limit using setrlimit(RLIMIT_NOFILE) if your application is > 1024 fd count safe."
+                      << std::endl;
 #endif
-            }
           }
         }
 #endif
         struct state_t
         {
-          const size_t max_sso_path_size;
           std::mutex lock;
+          size_t max_sso_path_size;
           traverse_visitor *visitor{nullptr};
 #if 0
         struct workitem
@@ -116,7 +123,7 @@ namespace algorithm
                 size_t bytes = (1 + stem.native_size()) * sizeof(filesystem::path::value_type);
                 if(!leaf.empty())
                 {
-                  bytes = (1 + leaf.native_size()) * sizeof(filesystem::path::value_type);
+                  bytes += (1 + leaf.native_size()) * sizeof(filesystem::path::value_type);
                 }
                 if(bytes <= sizeof(_sso))
                 {
@@ -138,6 +145,7 @@ namespace algorithm
                           });
                   }
                   _sso[_sso_length] = 0;
+                  assert(_sso_length < LLFIO_ALGORITHM_TRAVERSE_MAX_SSO_PATH_SIZE);
                 }
                 else
                 {
@@ -244,6 +252,7 @@ namespace algorithm
             }
             state->dirs_processed++;
             state->known_dirs_remaining--;
+            const auto max_sso_path_size = state->max_sso_path_size;
             g.unlock();
             std::shared_ptr<directory_handle> mydirh;
             if(mywork.leaf().empty())
@@ -373,7 +382,7 @@ namespace algorithm
                   }
                   if(2 == entry_type)
                   {
-                    if(maxpathsize <= state->max_sso_path_size)
+                    if(maxpathsize <= max_sso_path_size)
                     {
                       // Reuse existing base directory handle, but with a longer path fragment
                       // Note that "slow path" is defined as this branch always being taken
@@ -410,6 +419,17 @@ namespace algorithm
                 }
                 size_t dirs_processed = state->dirs_processed, known_dirs_remaining = state->known_dirs_remaining, depth_processed = state->depth_processed,
                        known_depth_remaining = state->workqueue.size();
+#ifndef _WIN32
+                if(max_sso_path_size < size_t(-1) && rlimit_maxfd > 0 && rlimit_maxfd - mydirh->native_handle().fd < 65536)
+                {
+                  state->max_sso_path_size = size_t(-1);
+#ifndef NDEBUG
+                  std::cerr << "WARNING: llfio::traverse() is falling back to slow path due to " << (rlimit_maxfd - mydirh->native_handle().fd)
+                            << " unused file descriptors remaining! Raise the limit using setrlimit(RLIMIT_NOFILE) if your application is > 1024 fd count safe."
+                            << std::endl;
+#endif
+                }
+#endif
                 g.unlock();
                 OUTCOME_TRY(state->visitor->stack_updated(data, dirs_processed, known_dirs_remaining, depth_processed, known_depth_remaining));
               }
@@ -558,7 +578,7 @@ namespace algorithm
         return error_from_exception();
       }
     }());
-  }
+  }  // namespace algorithm
 }  // namespace algorithm
 
 LLFIO_V2_NAMESPACE_END
