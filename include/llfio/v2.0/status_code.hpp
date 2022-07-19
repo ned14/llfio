@@ -57,7 +57,11 @@ as that (a) enables safe header only LLFIO on Windows (b) produces better codege
 #include "outcome/try.hpp"
 // Bring in status code utility
 #include "outcome/experimental/coroutine_support.hpp"
+#if !OUTCOME_USE_SYSTEM_STATUS_CODE && __has_include("outcome/experimental/status-code/include/status-code/system_code_from_exception.hpp")
 #include "outcome/experimental/status-code/include/status-code/system_code_from_exception.hpp"
+#else
+#include <status-code/system_code_from_exception.hpp>
+#endif
 #if !defined(LLFIO_ENABLE_COROUTINES) && defined(OUTCOME_FOUND_COROUTINE_HEADER)
 #define LLFIO_ENABLE_COROUTINES 1
 #endif
