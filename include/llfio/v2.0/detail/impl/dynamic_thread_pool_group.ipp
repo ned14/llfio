@@ -39,31 +39,19 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <iostream>
 
-#ifndef LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD
-#if LLFIO_FORCE_USE_LIBDISPATCH
-#include <dispatch/dispatch.h>
-#define LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD 1
-#else
-#ifdef _WIN32
+#if defined(_WIN32)
 #include "windows/import.hpp"
 #include <threadpoolapiset.h>
-#else
-#if __has_include(<dispatch/dispatch.h>)
-#include <dispatch/dispatch.h>
-#define LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD 1
-#endif
-#endif
-#endif
-#endif
-#if !LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD && !defined(_WIN32)
-#if !defined(__linux__)
-#error dynamic_thread_pool_group requires Grand Central Dispatch (libdispatch) on non-Linux POSIX.
-#endif
+#elif defined(__linux__) && !LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD
 #include <dirent.h> /* Defines DT_* constants */
 #include <sys/syscall.h>
 
 #include <condition_variable>
 #include <thread>
+#elif __has_include(<dispatch/dispatch.h>)
+#include <dispatch/dispatch.h>
+#else
+#error dynamic_thread_pool_group requires Grand Central Dispatch (libdispatch) on non-Linux POSIX.
 #endif
 
 #define LLFIO_DYNAMIC_THREAD_POOL_GROUP_PRINTING 0
