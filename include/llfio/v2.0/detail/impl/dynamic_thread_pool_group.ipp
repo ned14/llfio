@@ -49,8 +49,10 @@ Distributed under the Boost Software License, Version 1.0.
 #include <threadpoolapiset.h>
 #else
 #if __has_include(<dispatch/dispatch.h>)
+#if !(defined(__linux__) && defined(__GNUC__) && !defined(__clang__))
 #include <dispatch/dispatch.h>
 #define LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD 1
+#endif
 #endif
 #endif
 #endif
