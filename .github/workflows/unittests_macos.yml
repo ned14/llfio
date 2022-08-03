@@ -11,8 +11,8 @@ on:
 
 jobs:
   MacOS:
-    name: Mac OS 10.15
-    runs-on: macos-10.15
+    name: Mac OS
+    runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
