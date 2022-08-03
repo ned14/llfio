@@ -26,11 +26,6 @@ Distributed under the Boost Software License, Version 1.0.
 
 #define LLFIO_OPENSSL_ENABLE_DEBUG_PRINTING 0
 
-#include <openssl/crypto.h>
-#include <openssl/err.h>
-#include <openssl/ssl.h>
-#include <openssl/x509.h>
-
 #if LLFIO_OPENSSL_ENABLE_DEBUG_PRINTING
 #include <iostream>
 #endif
@@ -39,6 +34,12 @@ Distributed under the Boost Software License, Version 1.0.
 #include <cryptuiapi.h>
 #pragma comment(lib, "cryptui.lib")
 #endif
+
+// Must come AFTER the Windows include, else there is a macro collision with X509_NAME
+#include <openssl/crypto.h>
+#include <openssl/err.h>
+#include <openssl/ssl.h>
+#include <openssl/x509.h>
 
 LLFIO_V2_NAMESPACE_BEGIN
 
