@@ -101,11 +101,17 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, sta
       }
       if(ntstat < 0)
       {
+        if(ntstat == 0xC000000D /*STATUS_INVALID_PARAMETER*/)
+        {
+          // FileAllInformation fails on SMB mounts :(
+          goto fallback;
+        }
         return ntkernel_error(ntstat);
       }
     }
     else
     {
+    fallback:
       if(needInternal)
       {
         ntstat = NtQueryInformationFile(h.native_handle().h, &isb, &fai.InternalInformation, sizeof(fai.InternalInformation), FileInternalInformation);
