@@ -26,7 +26,11 @@ Distributed under the Boost Software License, Version 1.0.
 #include "import.hpp"
 
 #if LLFIO_EXPERIMENTAL_STATUS_CODE
+#if !OUTCOME_USE_SYSTEM_STATUS_CODE && __has_include("outcome/experimental/status-code/include/status-code/getaddrinfo_code.hpp")
 #include "outcome/experimental/status-code/include/status-code/getaddrinfo_code.hpp"
+#else
+#include <status-code/getaddrinfo_code.hpp>
+#endif
 #else
 #include "../getaddrinfo_category.hpp"
 #endif

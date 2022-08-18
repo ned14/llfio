@@ -38,7 +38,11 @@ Distributed under the Boost Software License, Version 1.0.
 
 #if LLFIO_EXPERIMENTAL_STATUS_CODE
 #define KERNELTEST_EXPERIMENTAL_STATUS_CODE 1
+#if !OUTCOME_USE_SYSTEM_STATUS_CODE && __has_include("outcome/experimental/status-code/include/status-code/iostream_support.hpp")
 #include "outcome/experimental/status-code/include/status-code/iostream_support.hpp"
+#else
+#include <status-code/iostream_support.hpp>
+#endif
 
 // Used for initialiser list stored results as the erased form is move-only
 template <class T> using il_result = OUTCOME_V2_NAMESPACE::experimental::status_result<T, SYSTEM_ERROR2_NAMESPACE::generic_code>;
