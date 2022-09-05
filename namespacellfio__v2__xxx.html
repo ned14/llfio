@@ -101,9 +101,6 @@ Namespaces</h2></td></tr>
 <tr class="memitem:namespacellfio__v2__xxx_1_1algorithm"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html">algorithm</a></td></tr>
 <tr class="memdesc:namespacellfio__v2__xxx_1_1algorithm"><td class="mdescLeft">&#160;</td><td class="mdescRight">Collection of file system based algorithms. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:namespacellfio__v2__xxx_1_1detail"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1detail.html">detail</a></td></tr>
-<tr class="memdesc:namespacellfio__v2__xxx_1_1detail"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a handle to the path <b>currently</b> containing this handle's file entry. <br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:namespacellfio__v2__xxx_1_1ip"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html">ip</a></td></tr>
 <tr class="memdesc:namespacellfio__v2__xxx_1_1ip"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inspired by ASIO's <code>ip</code> namespace. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -202,6 +199,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to a regular file or device.  <a href="classllfio__v2__xxx_1_1file__handle.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html">fs_handle</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to something with a device and inode number.  <a href="classllfio__v2__xxx_1_1fs__handle.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A native_handle_type which is managed by the lifetime of this object instance.  <a href="classllfio__v2__xxx_1_1handle.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -236,9 +236,6 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1path__hasher.html">path_hasher</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A borrowed view of a path. A lightweight trivial-type alternative to <code>std::filesystem::path</code>.  <a href="classllfio__v2__xxx_1_1path__view.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An iterated part of a <code>path_view</code>.  <a href="classllfio__v2__xxx_1_1path__view__component.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -265,6 +262,9 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html">symlink_handle</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to an inode which redirects to a different path.  <a href="classllfio__v2__xxx_1_1symlink__handle.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1tls__socket__handle.html">tls_socket_handle</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to a TLS secure socket-like entity.  <a href="classllfio__v2__xxx_1_1tls__socket__handle.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1tls__socket__source.html">tls_socket_source</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A source of <code>tls_socket_handle</code> and <code>listening_tls_socket_handle</code> and possibly a <code>byte_io_multiplexer</code> to multiplex i/o on multiple socket instances at the same time.  <a href="classllfio__v2__xxx_1_1tls__socket__source.html#details">More...</a><br /></td></tr>
@@ -316,7 +316,7 @@ template&lt;class T &gt; </td></tr>
 <tr class="memitem:a6ddb7c2bee277fc16207b7e8cb05693f"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>outcome</b> = OUTCOME_V2_NAMESPACE::outcome&lt; T, <a class="el" href="structllfio__v2__xxx_1_1error__info.html">error_info</a> &gt;</td></tr>
 <tr class="separator:a6ddb7c2bee277fc16207b7e8cb05693f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a81cc4b6e44e81823d88c0433efd82292"><td class="memItemLeft" align="right" valign="top"><a id="a81cc4b6e44e81823d88c0433efd82292"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a81cc4b6e44e81823d88c0433efd82292">tls_socket_handle_ptr</a> = std::unique_ptr&lt; <a class="el" href="classtls__socket__handle.html">tls_socket_handle</a>, detail::tls_socket_handle_deleter &gt;</td></tr>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a81cc4b6e44e81823d88c0433efd82292">tls_socket_handle_ptr</a> = std::unique_ptr&lt; <a class="el" href="classllfio__v2__xxx_1_1tls__socket__handle.html">tls_socket_handle</a>, detail::tls_socket_handle_deleter &gt;</td></tr>
 <tr class="memdesc:a81cc4b6e44e81823d88c0433efd82292"><td class="mdescLeft">&#160;</td><td class="mdescRight">A pointer to a TLS socket handle returned by a TLS socket source. <br /></td></tr>
 <tr class="separator:a81cc4b6e44e81823d88c0433efd82292"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b0d8b81e15b9d2aec5dc7194c0e6d22"><td class="memItemLeft" align="right" valign="top"><a id="a1b0d8b81e15b9d2aec5dc7194c0e6d22"></a>
@@ -361,15 +361,17 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:ae79486289ff1386b26d1ce60bb797d33"><td class="mdescLeft">&#160;</td><td class="mdescRight">The kinds of concurrent user exclusion which can be performed.  <a href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33">More...</a><br /></td></tr>
 <tr class="separator:ae79486289ff1386b26d1ce60bb797d33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6269702375c265b9985fe47df4447c7b"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a6269702375c265b9985fe47df4447c7b">bitfield__tls_algorithm</a> : unsigned { <a class="el" href="namespacellfio__v2__xxx.html#a6269702375c265b9985fe47df4447c7ba334aa63ec1fb6d0ef2267e1ff3c10fd1">default_</a> = (0U), 
+<a class="el" href="namespacellfio__v2__xxx.html#a6269702375c265b9985fe47df4447c7baf7da33fdf71e962b32ddd8345e293911">FIPS_140_2</a> = (1U &lt;&lt; 0U)
+ }</td></tr>
+<tr class="memdesc:a6269702375c265b9985fe47df4447c7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">TLS algorithm categories.  <a href="namespacellfio__v2__xxx.html#a6269702375c265b9985fe47df4447c7b">More...</a><br /></td></tr>
+<tr class="separator:a6269702375c265b9985fe47df4447c7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a26baf26ed8a75301a92134497cc3ac8a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a26baf26ed8a75301a92134497cc3ac8a">QUICKCPPLIB_BITFIELD_BEGIN_T</a> (poll_what, uint8_t)</td></tr>
 <tr class="memdesc:a26baf26ed8a75301a92134497cc3ac8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">What to poll.  <a href="namespacellfio__v2__xxx.html#a26baf26ed8a75301a92134497cc3ac8a">More...</a><br /></td></tr>
 <tr class="separator:a26baf26ed8a75301a92134497cc3ac8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abde2ff6c2085a19f9968ba3b628f3ae3"><td class="memItemLeft" align="right" valign="top"><a id="abde2ff6c2085a19f9968ba3b628f3ae3"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>QUICKCPPLIB_BITFIELD_END</b> (poll_what) class <a class="el" href="classllfio__v2__xxx_1_1pollable__handle.html">pollable_handle</a></td></tr>
-<tr class="separator:abde2ff6c2085a19f9968ba3b628f3ae3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a727d8ebc7f42ff3124d1734a1a1f0563"><td class="memItemLeft" align="right" valign="top">result&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a727d8ebc7f42ff3124d1734a1a1f0563">poll</a> (span&lt; poll_what &gt; out, span&lt; <a class="el" href="classllfio__v2__xxx_1_1pollable__handle.html">pollable_handle</a> * &gt; handles, span&lt; const poll_what &gt; query, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d={}) noexcept</td></tr>
 <tr class="memdesc:a727d8ebc7f42ff3124d1734a1a1f0563"><td class="mdescLeft">&#160;</td><td class="mdescRight">Polls a list of pollable handles awaiting a change in state.  <a href="namespacellfio__v2__xxx.html#a727d8ebc7f42ff3124d1734a1a1f0563">More...</a><br /></td></tr>
 <tr class="separator:a727d8ebc7f42ff3124d1734a1a1f0563"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -446,12 +448,15 @@ result&lt; std::vector&lt; <a class="el" href="structllfio__v2__xxx_1_1file__han
 <tr class="memitem:ad0fb15649a46da0d75b5797bfda8dc2e"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle::extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#ad0fb15649a46da0d75b5797bfda8dc2e">zero</a> (<a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;self, file_handle::extent_type offset, file_handle::extent_type bytes, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="memdesc:ad0fb15649a46da0d75b5797bfda8dc2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Efficiently zero, and possibly deallocate, data on storage.  <a href="namespacellfio__v2__xxx.html#ad0fb15649a46da0d75b5797bfda8dc2e">More...</a><br /></td></tr>
 <tr class="separator:ad0fb15649a46da0d75b5797bfda8dc2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab561e45415bf19b8cc6064b6b313d94d"><td class="memItemLeft" align="right" valign="top">result&lt; filesystem::path &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#ab561e45415bf19b8cc6064b6b313d94d">to_win32_path</a> (const <a class="el" href="classfs__handle.html">fs_handle</a> &amp;h, <a class="el" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89a">win32_path_namespace</a> mapping=<a class="el" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aa100b8cad7cf2a56f6df78f171f97a1ec">win32_path_namespace::any</a>) noexcept</td></tr>
+<tr class="memitem:ab561e45415bf19b8cc6064b6b313d94d"><td class="memItemLeft" align="right" valign="top">result&lt; filesystem::path &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#ab561e45415bf19b8cc6064b6b313d94d">to_win32_path</a> (const <a class="el" href="classllfio__v2__xxx_1_1fs__handle.html">fs_handle</a> &amp;h, <a class="el" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89a">win32_path_namespace</a> mapping=<a class="el" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aa100b8cad7cf2a56f6df78f171f97a1ec">win32_path_namespace::any</a>) noexcept</td></tr>
 <tr class="memdesc:ab561e45415bf19b8cc6064b6b313d94d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maps the current path of <code>h</code> into a form suitable for Win32 APIs. Passes through unmodified on POSIX, so you can use this in portable code.  <a href="namespacellfio__v2__xxx.html#ab561e45415bf19b8cc6064b6b313d94d">More...</a><br /></td></tr>
 <tr class="separator:ab561e45415bf19b8cc6064b6b313d94d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a60fa5c64c83ce05c8287c5379d082e49"><td class="memItemLeft" align="right" valign="top">result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a60fa5c64c83ce05c8287c5379d082e49">relink</a> (<a class="el" href="classfs__handle.html">fs_handle</a> &amp;self, const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, fs_handle::path_view_type <a class="el" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>, bool atomic_replace=true, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
+<tr class="memitem:a7042556839391e462df6743caf65fb24"><td class="memItemLeft" align="right" valign="top"><a id="a7042556839391e462df6743caf65fb24"></a>
+class T&lt; __VA_ARGS__, !std::is_base_of&lt; <a class="el" href="classllfio__v2__xxx_1_1fs__handle.html">fs_handle</a> std::enable_if&lt;(__VA_ARGS__) &gt; bool &gt;::type=true T &gt;::value &amp;&amp;std::is_base_of&lt; <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a>, T &gt;::value result&lt; filesystem::path &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>to_win32_path</b> (const T &amp;h, <a class="el" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89a">win32_path_namespace</a> mapping=<a class="el" href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aa100b8cad7cf2a56f6df78f171f97a1ec">win32_path_namespace::any</a>) noexcept</td></tr>
+<tr class="separator:a7042556839391e462df6743caf65fb24"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60fa5c64c83ce05c8287c5379d082e49"><td class="memItemLeft" align="right" valign="top">result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a60fa5c64c83ce05c8287c5379d082e49">relink</a> (<a class="el" href="classllfio__v2__xxx_1_1fs__handle.html">fs_handle</a> &amp;self, const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#abcd8c8171f4e561620864295e8d5879b">fs_handle::path_view_type</a> <a class="el" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>, bool atomic_replace=true, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
 <tr class="separator:a60fa5c64c83ce05c8287c5379d082e49"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3c20b46beeb225aa63ade3dc42e73362"><td class="memItemLeft" align="right" valign="top">result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a3c20b46beeb225aa63ade3dc42e73362">unlink</a> (<a class="el" href="classfs__handle.html">fs_handle</a> &amp;self, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
+<tr class="memitem:a3c20b46beeb225aa63ade3dc42e73362"><td class="memItemLeft" align="right" valign="top">result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a3c20b46beeb225aa63ade3dc42e73362">unlink</a> (<a class="el" href="classllfio__v2__xxx_1_1fs__handle.html">fs_handle</a> &amp;self, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
 <tr class="separator:a3c20b46beeb225aa63ade3dc42e73362"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae33af5701ff0ec4573bd72c7e71a04cf"><td class="memItemLeft" align="right" valign="top"><a id="ae33af5701ff0ec4573bd72c7e71a04cf"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;v)</td></tr>
@@ -560,49 +565,29 @@ result&lt; <a class="el" href="classllfio__v2__xxx_1_1mapped__file__handle.html"
 result&lt; <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#ad8b12afdd4c80d69d2530bd40f92427c">path</a> (<a class="el" href="classllfio__v2__xxx_1_1path__handle.html#a6f2c51636f17ae97255106d37ef4187c">path_handle::path_view_type</a> _path) noexcept</td></tr>
 <tr class="memdesc:ad8b12afdd4c80d69d2530bd40f92427c"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br /></td></tr>
 <tr class="separator:ad8b12afdd4c80d69d2530bd40f92427c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6024cdc07fef0c772c14ec1f91defa75"><td class="memItemLeft" align="right" valign="top"><a id="a6024cdc07fef0c772c14ec1f91defa75"></a>
-LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> x, <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> y) noexcept</td></tr>
-<tr class="separator:a6024cdc07fef0c772c14ec1f91defa75"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0846b040cbf733b34787c76a39e35b85"><td class="memItemLeft" align="right" valign="top"><a id="a0846b040cbf733b34787c76a39e35b85"></a>
-LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator!=</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> x, <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> y) noexcept</td></tr>
-<tr class="separator:a0846b040cbf733b34787c76a39e35b85"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1374384491dae4c33de1ddd218336f98"><td class="memTemplParams" colspan="2"><a id="a1374384491dae4c33de1ddd218336f98"></a>
+<tr class="memitem:a8b272f994e955b1219e61920df8ec136"><td class="memItemLeft" align="right" valign="top"><a id="a8b272f994e955b1219e61920df8ec136"></a>
+constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> x, <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> y) noexcept</td></tr>
+<tr class="separator:a8b272f994e955b1219e61920df8ec136"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a84c787ed5c98dc08c46bf520746bdbea"><td class="memItemLeft" align="right" valign="top"><a id="a84c787ed5c98dc08c46bf520746bdbea"></a>
+constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator!=</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> x, <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> y) noexcept</td></tr>
+<tr class="separator:a84c787ed5c98dc08c46bf520746bdbea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a692613da87074e2ffa2a54e24e0cb083"><td class="memTemplParams" colspan="2"><a id="a692613da87074e2ffa2a54e24e0cb083"></a>
 template&lt;class F &gt; </td></tr>
-<tr class="memitem:a1374384491dae4c33de1ddd218336f98"><td class="memTemplItemLeft" align="right" valign="top">LLFIO_PATH_VIEW_CONSTEXPR auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>visit</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> view, F &amp;&amp;f)</td></tr>
-<tr class="separator:a1374384491dae4c33de1ddd218336f98"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1d381d16b152632f617c82182fcf22a1"><td class="memTemplParams" colspan="2"><a id="a1d381d16b152632f617c82182fcf22a1"></a>
+<tr class="memitem:a692613da87074e2ffa2a54e24e0cb083"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>visit</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> view, F &amp;&amp;f)</td></tr>
+<tr class="separator:a692613da87074e2ffa2a54e24e0cb083"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acfa5367ac3e2a2b27aa547a357fe7e35"><td class="memTemplParams" colspan="2"><a id="acfa5367ac3e2a2b27aa547a357fe7e35"></a>
 template&lt;class F &gt; </td></tr>
-<tr class="memitem:a1d381d16b152632f617c82182fcf22a1"><td class="memTemplItemLeft" align="right" valign="top">LLFIO_PATH_VIEW_CONSTEXPR auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a1d381d16b152632f617c82182fcf22a1">visit</a> (F &amp;&amp;f, <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> view)</td></tr>
-<tr class="memdesc:a1d381d16b152632f617c82182fcf22a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visit the underlying source for a <code>path_view_component</code> (std compatible overload) <br /></td></tr>
-<tr class="separator:a1d381d16b152632f617c82182fcf22a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada4abf0a0e41c43e53dad057607cebbc"><td class="memItemLeft" align="right" valign="top"><a id="ada4abf0a0e41c43e53dad057607cebbc"></a>
+<tr class="memitem:acfa5367ac3e2a2b27aa547a357fe7e35"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>visit</b> (F &amp;&amp;f, <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> view)</td></tr>
+<tr class="separator:acfa5367ac3e2a2b27aa547a357fe7e35"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20dbb9e8deed80ea3d0b65d52fd34771"><td class="memItemLeft" align="right" valign="top"><a id="a20dbb9e8deed80ea3d0b65d52fd34771"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> &amp;v)</td></tr>
-<tr class="separator:ada4abf0a0e41c43e53dad057607cebbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa93a5ee3bddc44cc342826ff9892a170"><td class="memItemLeft" align="right" valign="top"><a id="aa93a5ee3bddc44cc342826ff9892a170"></a>
-LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> x, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> y) noexcept</td></tr>
-<tr class="separator:aa93a5ee3bddc44cc342826ff9892a170"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad34f076b77f1de6ae1660108254f2183"><td class="memItemLeft" align="right" valign="top"><a id="ad34f076b77f1de6ae1660108254f2183"></a>
-LLFIO_PATH_VIEW_CONSTEXPR bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator!=</b> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> x, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> y) noexcept</td></tr>
-<tr class="separator:ad34f076b77f1de6ae1660108254f2183"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3e68b8ef674b43bc67a04576a5d9a99e"><td class="memItemLeft" align="right" valign="top"><a id="a3e68b8ef674b43bc67a04576a5d9a99e"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>LLFIO_TEMPLATE</b> (class CharT) LLFIO_TREQUIRES(LLFIO_TPRED(<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a></td></tr>
-<tr class="separator:a3e68b8ef674b43bc67a04576a5d9a99e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa689b48f1fe2893f13e689a346a5dd5c"><td class="memItemLeft" align="right" valign="top"><a id="aa689b48f1fe2893f13e689a346a5dd5c"></a>
-filesystem::path &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#aa689b48f1fe2893f13e689a346a5dd5c">operator/=</a> (filesystem::path &amp;a, <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> b)</td></tr>
-<tr class="memdesc:aa689b48f1fe2893f13e689a346a5dd5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Append a path view component to a path. <br /></td></tr>
-<tr class="separator:aa689b48f1fe2893f13e689a346a5dd5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a177b07f74b322e7843ec46f13ffcf032"><td class="memItemLeft" align="right" valign="top"><a id="a177b07f74b322e7843ec46f13ffcf032"></a>
-filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a177b07f74b322e7843ec46f13ffcf032">operator/</a> (const filesystem::path &amp;a, <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> b)</td></tr>
-<tr class="memdesc:a177b07f74b322e7843ec46f13ffcf032"><td class="mdescLeft">&#160;</td><td class="mdescRight">Append a path view component to a path. <br /></td></tr>
-<tr class="separator:a177b07f74b322e7843ec46f13ffcf032"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a56f82dddf1ccbd54e467ef1e35adcb54"><td class="memItemLeft" align="right" valign="top"><a id="a56f82dddf1ccbd54e467ef1e35adcb54"></a>
-filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a56f82dddf1ccbd54e467ef1e35adcb54">operator/</a> (filesystem::path &amp;&amp;a, <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> b)</td></tr>
-<tr class="memdesc:a56f82dddf1ccbd54e467ef1e35adcb54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Append a path view component to a path. <br /></td></tr>
-<tr class="separator:a56f82dddf1ccbd54e467ef1e35adcb54"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adb4db47e035ae1ee5043008492e8986b"><td class="memItemLeft" align="right" valign="top"><a id="adb4db47e035ae1ee5043008492e8986b"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#adb4db47e035ae1ee5043008492e8986b">LLFIO_TEMPLATE</a> (class T) LLFIO_TREQUIRES(LLFIO_TPRED(std</td></tr>
-<tr class="memdesc:adb4db47e035ae1ee5043008492e8986b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Append a path view component to a path view component. <br /></td></tr>
-<tr class="separator:adb4db47e035ae1ee5043008492e8986b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a20dbb9e8deed80ea3d0b65d52fd34771"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96d00f83eb1996bcbbb9d3aa62424a51"><td class="memItemLeft" align="right" valign="top"><a id="a96d00f83eb1996bcbbb9d3aa62424a51"></a>
+constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (path_view x, path_view y) noexcept</td></tr>
+<tr class="separator:a96d00f83eb1996bcbbb9d3aa62424a51"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af909fbaabae06c5831b45bc7f506d2dd"><td class="memItemLeft" align="right" valign="top"><a id="af909fbaabae06c5831b45bc7f506d2dd"></a>
+constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator!=</b> (path_view x, path_view y) noexcept</td></tr>
+<tr class="separator:af909fbaabae06c5831b45bc7f506d2dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a94167268e0b7e7573e4599fd7872ef0f"><td class="memItemLeft" align="right" valign="top"><a id="a94167268e0b7e7573e4599fd7872ef0f"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const process_handle::flag &amp;v)</td></tr>
 <tr class="separator:a94167268e0b7e7573e4599fd7872ef0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -635,9 +620,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>outcome_throw_as_syst
 <a class="el" href="structllfio__v2__xxx_1_1error__info.html">error_info</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a20ab6481a21bf2c4cf8185919edf0a66">posix_error</a> (int c=errno)</td></tr>
 <tr class="memdesc:a20ab6481a21bf2c4cf8185919edf0a66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper for constructing an error info from a POSIX errno. <br /></td></tr>
 <tr class="separator:a20ab6481a21bf2c4cf8185919edf0a66"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a54385a57b558008105b9429e89afaae2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a54385a57b558008105b9429e89afaae2">QUICKCPPLIB_BITFIELD_BEGIN</a> (tls_algorithm)</td></tr>
-<tr class="memdesc:a54385a57b558008105b9429e89afaae2"><td class="mdescLeft">&#160;</td><td class="mdescRight">TLS algorithm categories.  <a href="namespacellfio__v2__xxx.html#a54385a57b558008105b9429e89afaae2">More...</a><br /></td></tr>
-<tr class="separator:a54385a57b558008105b9429e89afaae2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a30f0de9f074d32381006e42b02a3669e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a30f0de9f074d32381006e42b02a3669e">QUICKCPPLIB_BITFIELD_BEGIN_T</a> (tls_socket_source_implementation_features, uint32_t)</td></tr>
 <tr class="memdesc:a30f0de9f074d32381006e42b02a3669e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Feature bits for TLS socket sources.  <a href="namespacellfio__v2__xxx.html#a30f0de9f074d32381006e42b02a3669e">More...</a><br /></td></tr>
 <tr class="separator:a30f0de9f074d32381006e42b02a3669e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -649,6 +631,42 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <div class="textblock"><p>The LLFIO namespace. </p>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000002">Todo:</a></b></dt><dd>TODO FIXME Replace in-memory log with memory map file backed log. </dd></dl>
 </div><h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="a6269702375c265b9985fe47df4447c7b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6269702375c265b9985fe47df4447c7b">&#9670;&nbsp;</a></span>bitfield__tls_algorithm</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="namespacellfio__v2__xxx.html#a6269702375c265b9985fe47df4447c7b">llfio_v2_xxx::bitfield__tls_algorithm</a> : unsigned</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>TLS algorithm categories. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a6269702375c265b9985fe47df4447c7ba334aa63ec1fb6d0ef2267e1ff3c10fd1"></a>default_&#160;</td><td class="fielddoc"><p>The default set of TLS algorithms offered during handshake is a short list of strong ciphers (typically 128 - 256 bits for the symmetric cipher) to suit embedded and low end devices, ordered by strength-cpuload e.g. ChaCha20 would be chosen preferentially to AES, <b>if</b> the CPUs do not have hardware accelerated AES, and longer key sizes would come before shorter key sizes. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a6269702375c265b9985fe47df4447c7baf7da33fdf71e962b32ddd8345e293911"></a>FIPS_140_2&#160;</td><td class="fielddoc"><p>The set of TLS algorithms compliant with the FIPS 140-2 standard. Implementations may refuse to work if this is configured. </p>
+</td></tr>
+</table>
+<div class="fragment"><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;{                                          <span class="comment">//</span><span class="comment"></span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="comment"> /*! The default set of TLS algorithms offered during handshake is a short list</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="comment"> of strong ciphers (typically 128 - 256 bits for the symmetric cipher)</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="comment"> to suit embedded and low end devices, ordered by strength-cpuload e.g. ChaCha20</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="comment"> would be chosen preferentially to AES, **if** the CPUs do not have hardware</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="comment"> accelerated AES, and longer key sizes would come before shorter key sizes.</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="comment"> */</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; <a class="code" href="namespacellfio__v2__xxx.html#a6269702375c265b9985fe47df4447c7ba334aa63ec1fb6d0ef2267e1ff3c10fd1">default_</a> = (0U),<span class="comment"></span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="comment"> /*! The set of TLS algorithms compliant with the FIPS 140-2 standard.</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="comment"> Implementations may refuse to work if this is configured.</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="comment"> */</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; <a class="code" href="namespacellfio__v2__xxx.html#a6269702375c265b9985fe47df4447c7baf7da33fdf71e962b32ddd8345e293911">FIPS_140_2</a> = (1U &lt;&lt; 0U)</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;} QUICKCPPLIB_BITFIELD_END(tls_algorithm)</div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="ae79486289ff1386b26d1ce60bb797d33"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae79486289ff1386b26d1ce60bb797d33">&#9670;&nbsp;</a></span>lock_kind</h2>
 
@@ -832,9 +850,9 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 </div><div class="memdoc">
 <p>Create a handle opening access to a directory on path.</p>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX open() or CreateFile() can return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;{</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a3d112d170c1d485e1120de06eef02375">directory_handle::directory</a>(std::forward&lt;decltype(base)&gt;(base), std::forward&lt;decltype(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>)&gt;(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;{</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a3d112d170c1d485e1120de06eef02375">directory_handle::directory</a>(std::forward&lt;decltype(base)&gt;(base), std::forward&lt;decltype(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>)&gt;(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1108,12 +1126,12 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 </dl>
 <p>Note that if the file is currently zero sized, no mapping occurs now, but later when <code>truncate()</code> or <code>update_map()</code> is called.</p>
 <dl class="section user"><dt>Errors returnable\n Any of the values which the constructors for file_handle, section_handle and map_handle can return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;{</div>
-<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a1f0ccde00add2f09579151fd71b8f06d">mapped_file_handle::mapped_file</a>(std::forward&lt;decltype(reservation)&gt;(reservation), std::forward&lt;decltype(base)&gt;(base),</div>
-<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;                                         std::forward&lt;decltype(_path)&gt;(_path), std::forward&lt;decltype(_mode)&gt;(_mode),</div>
-<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;                                         std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching),</div>
-<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;                                         std::forward&lt;decltype(flags)&gt;(flags));</div>
-<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;{</div>
+<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a1f0ccde00add2f09579151fd71b8f06d">mapped_file_handle::mapped_file</a>(std::forward&lt;decltype(reservation)&gt;(reservation), std::forward&lt;decltype(base)&gt;(base),</div>
+<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;                                         std::forward&lt;decltype(_path)&gt;(_path), std::forward&lt;decltype(_mode)&gt;(_mode),</div>
+<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;                                         std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching),</div>
+<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;                                         std::forward&lt;decltype(flags)&gt;(flags));</div>
+<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1177,11 +1195,11 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <p>Create a mapped file handle creating the named file on some path which the OS declares to be suitable for temporary files. Most OSs are very lazy about flushing changes made to these temporary files. Note the default flags are to have the newly created file deleted on first handle close. Note also that an empty name is equivalent to calling <code>mapped_uniquely_named_file(path_discovery::storage_backed_temporary_files_directory())</code> and the creation parameter is ignored.</p>
 <dl class="section note"><dt>Note</dt><dd>If the temporary file you are creating is not going to have its path sent to another process for usage, this is the WRONG function to use. Use <code>temp_inode()</code> instead, it is far more secure.</dd></dl>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX open() or CreateFile() can return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;{</div>
-<div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a3eb3e8ef0ddff1270b3d78d4178335c7">mapped_file_handle::mapped_temp_file</a>(std::forward&lt;decltype(reservation)&gt;(reservation), std::forward&lt;decltype(name)&gt;(name),</div>
-<div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;                                              std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation),</div>
-<div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;                                              std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div>
-<div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;{</div>
+<div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a3eb3e8ef0ddff1270b3d78d4178335c7">mapped_file_handle::mapped_temp_file</a>(std::forward&lt;decltype(reservation)&gt;(reservation), std::forward&lt;decltype(name)&gt;(name),</div>
+<div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;                                              std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation),</div>
+<div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;                                              std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div>
+<div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1232,10 +1250,10 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 </div><div class="memdoc">
 <p><em>Securely</em> create a mapped file handle creating a temporary anonymous inode in the filesystem referred to by <em>dirpath</em>. The inode created has no name nor accessible path on the filing system and ceases to exist as soon as the last handle is closed, making it ideal for use as a temporary file where other processes do not need to have access to its contents via some path on the filing system (a classic use case is for backing shared memory maps).</p>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX open() or CreateFile() can return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00845"></a><span class="lineno">  845</span>&#160;{</div>
-<div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a58d5390cad390de24a80748c8cd7dc5b">mapped_file_handle::mapped_temp_inode</a>(std::forward&lt;decltype(reservation)&gt;(reservation), std::forward&lt;decltype(dir)&gt;(dir),</div>
-<div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;                                               std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(flags)&gt;(flags));</div>
-<div class="line"><a name="l00848"></a><span class="lineno">  848</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160;{</div>
+<div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a58d5390cad390de24a80748c8cd7dc5b">mapped_file_handle::mapped_temp_inode</a>(std::forward&lt;decltype(reservation)&gt;(reservation), std::forward&lt;decltype(dir)&gt;(dir),</div>
+<div class="line"><a name="l00848"></a><span class="lineno">  848</span>&#160;                                               std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(flags)&gt;(flags));</div>
+<div class="line"><a name="l00849"></a><span class="lineno">  849</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1292,11 +1310,11 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 </div><div class="memdoc">
 <p>Create an mapped file handle creating a randomly named file on a path. The file is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing file. Note also that caching defaults to temporary which hints to the OS to only flush changes to physical storage as lately as possible.</p>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX open() or CreateFile() can return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;{</div>
-<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a092f75c4e639c85797120488d486fa38">mapped_file_handle::mapped_uniquely_named_file</a>(std::forward&lt;decltype(reservation)&gt;(reservation), std::forward&lt;decltype(dirpath)&gt;(dirpath),</div>
-<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;                                                        std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_caching)&gt;(_caching),</div>
-<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;                                                        std::forward&lt;decltype(flags)&gt;(flags));</div>
-<div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;{</div>
+<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#a092f75c4e639c85797120488d486fa38">mapped_file_handle::mapped_uniquely_named_file</a>(std::forward&lt;decltype(reservation)&gt;(reservation), std::forward&lt;decltype(dirpath)&gt;(dirpath),</div>
+<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;                                                        std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_caching)&gt;(_caching),</div>
+<div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;                                                        std::forward&lt;decltype(flags)&gt;(flags));</div>
+<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1490,42 +1508,6 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 
 </div>
 </div>
-<a id="a54385a57b558008105b9429e89afaae2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a54385a57b558008105b9429e89afaae2">&#9670;&nbsp;</a></span>QUICKCPPLIB_BITFIELD_BEGIN()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">llfio_v2_xxx::QUICKCPPLIB_BITFIELD_BEGIN </td>
-          <td>(</td>
-          <td class="paramtype">tls_algorithm&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>TLS algorithm categories. </p>
-<p>The default set of TLS algorithms offered during handshake is a short list of strong ciphers (typically 128 - 256 bits for the symmetric cipher) to suit embedded and low end devices, ordered by strength-cpuload e.g. ChaCha20 would be chosen preferentially to AES, <b>if</b> the CPUs do not have hardware accelerated AES, and longer key sizes would come before shorter key sizes.</p>
-<p>The set of TLS algorithms compliant with the FIPS 140-2 standard. Implementations may refuse to work if this is configured.</p>
-<div class="fragment"><div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;{                                          <span class="comment">//</span><span class="comment"></span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="comment"> /*! The default set of TLS algorithms offered during handshake is a short list</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="comment"> of strong ciphers (typically 128 - 256 bits for the symmetric cipher)</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="comment"> to suit embedded and low end devices, ordered by strength-cpuload e.g. ChaCha20</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="comment"> would be chosen preferentially to AES, **if** the CPUs do not have hardware</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="comment"> accelerated AES, and longer key sizes would come before shorter key sizes.</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="comment"> */</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; default_ = (0U),<span class="comment"></span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="comment"> /*! The set of TLS algorithms compliant with the FIPS 140-2 standard.</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="comment"> Implementations may refuse to work if this is configured.</span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="comment"> */</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; FIPS_140_2 = (1U &lt;&lt; 0U)</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;} QUICKCPPLIB_BITFIELD_END(tls_algorithm)</div>
-</div><!-- fragment -->
-</div>
-</div>
 <a id="a26baf26ed8a75301a92134497cc3ac8a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a26baf26ed8a75301a92134497cc3ac8a">&#9670;&nbsp;</a></span>QUICKCPPLIB_BITFIELD_BEGIN_T() <span class="overload">[1/2]</span></h2>
 
@@ -1560,7 +1542,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <p>&lt; If this handle is closed/hung up. This is always set in the output even if not requested.</p>
 <p>&lt; This handle is not pollable.</p>
 <div class="fragment"><div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;{</div>
-<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;none = 0U,  <span class="comment">//!&lt; Query nothing for this handle.</span></div>
+<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;<a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">none</a> = 0U,  <span class="comment">//!&lt; Query nothing for this handle.</span></div>
 <div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;<span class="comment"></span> </div>
 <div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;is_readable = (1U &lt;&lt; 0U),  <span class="comment">//!&lt; If this handle is readable.</span></div>
 <div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;<span class="comment"></span>is_writable = (1U &lt;&lt; 1U),  <span class="comment">//!&lt; If this handle is writable.</span></div>
@@ -1607,7 +1589,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <p>&lt; This socket source provides FIPS_140_2 compliant algorithms</p>
 <p>&lt; All bits set</p>
 <div class="fragment"><div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;                                                                                 {</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;none = 0U,  <span class="comment">//!&lt; No bits set</span></div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;<a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">none</a> = 0U,  <span class="comment">//!&lt; No bits set</span></div>
 <div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;<span class="comment"></span> </div>
 <div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;kernel_sockets =</div>
 <div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;(1U &lt;&lt; 0U),  <span class="comment">//!&lt; This socket source provides kernel sockets i.e. their native handles will be valid kernel sockets which can be used in `poll()` etc</span></div>
@@ -1615,7 +1597,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;<span class="comment"></span>io_multiplexer = (1U &lt;&lt; 2U),         <span class="comment">//!&lt; This socket source provides an i/o multiplexer</span></div>
 <div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;<span class="comment"></span>supports_wrap = (1U &lt;&lt; 3U),          <span class="comment">//!&lt; This socket source may be able to wrap third party plain sockets</span></div>
 <div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;FIPS_140_2 = (1U &lt;&lt; 16U),  <span class="comment">//!&lt; This socket source provides FIPS_140_2 compliant algorithms</span></div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;<a class="code" href="namespacellfio__v2__xxx.html#a6269702375c265b9985fe47df4447c7baf7da33fdf71e962b32ddd8345e293911">FIPS_140_2</a> = (1U &lt;&lt; 16U),  <span class="comment">//!&lt; This socket source provides FIPS_140_2 compliant algorithms</span></div>
 <div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;<span class="comment"></span> </div>
 <div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;all = 0xffffffff  <span class="comment">//!&lt; All bits set</span></div>
 <div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;<span class="comment"></span>}  <span class="comment">//</span></div>
@@ -1752,7 +1734,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
         <tr>
           <td class="memname">result&lt;void&gt; llfio_v2_xxx::relink </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classfs__handle.html">fs_handle</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html">fs_handle</a> &amp;&#160;</td>
           <td class="paramname"><em>self</em>, </td>
         </tr>
         <tr>
@@ -1764,7 +1746,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">fs_handle::path_view_type&#160;</td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#abcd8c8171f4e561620864295e8d5879b">fs_handle::path_view_type</a>&#160;</td>
           <td class="paramname"><em>path</em>, </td>
         </tr>
         <tr>
@@ -1804,10 +1786,10 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
   </dd>
 </dl>
 <dl class="section user"><dt>Memory Allocations\n Except on platforms with race free syscalls for renaming open handles (Windows), calls</dt><dd><code>current_path()</code> via <code>parent_path_handle()</code> and thus is both expensive and calls malloc many times. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;{</div>
-<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.relink(std::forward&lt;decltype(base)&gt;(base), std::forward&lt;decltype(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>)&gt;(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>), std::forward&lt;decltype(atomic_replace)&gt;(atomic_replace),</div>
-<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;                     std::forward&lt;decltype(d)&gt;(d));</div>
-<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;{</div>
+<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.relink(std::forward&lt;decltype(base)&gt;(base), std::forward&lt;decltype(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>)&gt;(<a class="code" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>), std::forward&lt;decltype(atomic_replace)&gt;(atomic_replace),</div>
+<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;                     std::forward&lt;decltype(d)&gt;(d));</div>
+<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2027,9 +2009,9 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 </div><div class="memdoc">
 <p>Create a directory handle creating the named directory on some path which the OS declares to be suitable for temporary files. Note also that an empty name is equivalent to calling <code>uniquely_named_file(path_discovery::storage_backed_temporary_files_directory())</code> and the creation parameter is ignored.</p>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX open() or CreateFile() can return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;{</div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#addbdc12d4993a8ee40c105a02a105a61">directory_handle::temp_directory</a>(std::forward&lt;decltype(name)&gt;(name), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;{</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#addbdc12d4993a8ee40c105a02a105a61">directory_handle::temp_directory</a>(std::forward&lt;decltype(name)&gt;(name), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_creation)&gt;(_creation), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2153,7 +2135,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
         <tr>
           <td class="memname">result&lt;filesystem::path&gt; llfio_v2_xxx::to_win32_path </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classfs__handle.html">fs_handle</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classllfio__v2__xxx_1_1fs__handle.html">fs_handle</a> &amp;&#160;</td>
           <td class="paramname"><em>h</em>, </td>
         </tr>
         <tr>
@@ -2191,7 +2173,11 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <li><code>win32_path_namespace::guid_volume</code> simply fetches the GUID of the volume of the handle, and constructs a valid Win32 path from that.</li>
 <li><code>win32_path_namespace::any</code> means attempt <code>guid_volume</code> first, and if it fails (e.g. your file is on a network share) then it attempts <code>dos</code>. This semantic may change in the future, however any path emitted will always be a valid Win32 path. </li>
 </ul>
-
+<div class="fragment"><div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  {</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    (void) mapping;</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="keywordflow">return</span> h._get_handle().current_path();</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;  }</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a16ee1bea5a5791ecde266420e00fba81"></a>
@@ -2396,9 +2382,9 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 </div><div class="memdoc">
 <p>Create a directory handle creating a randomly named file on a path. The file is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing entry.</p>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX open() or CreateFile() can return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;{</div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#aba506997f2999cabbe0a7bd2a1d3b6e0">directory_handle::uniquely_named_directory</a>(std::forward&lt;decltype(dirpath)&gt;(dirpath), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;{</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacellfio__v2__xxx.html#aba506997f2999cabbe0a7bd2a1d3b6e0">directory_handle::uniquely_named_directory</a>(std::forward&lt;decltype(dirpath)&gt;(dirpath), std::forward&lt;decltype(_mode)&gt;(_mode), std::forward&lt;decltype(_caching)&gt;(_caching), std::forward&lt;decltype(flags)&gt;(flags));</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2468,7 +2454,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
         <tr>
           <td class="memname">result&lt;void&gt; llfio_v2_xxx::unlink </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classfs__handle.html">fs_handle</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html">fs_handle</a> &amp;&#160;</td>
           <td class="paramname"><em>self</em>, </td>
         </tr>
         <tr>
@@ -2499,9 +2485,9 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
   </dd>
 </dl>
 <dl class="section user"><dt>Memory Allocations\n Except on platforms with race free syscalls for unlinking open handles (Windows), calls</dt><dd><code>current_path()</code> and thus is both expensive and calls malloc many times. On Windows, also calls <code>current_path()</code> if <code>flag::disable_safety_unlinks</code> is not set. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;{</div>
-<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.unlink(std::forward&lt;decltype(d)&gt;(d));</div>
-<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;}</div>
+<div class="fragment"><div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;{</div>
+<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;  <span class="keywordflow">return</span> <span class="keyword">self</span>.unlink(std::forward&lt;decltype(d)&gt;(d));</div>
+<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2694,23 +2680,26 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a70d9ef3b988a880d171015b754bb7b27"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a70d9ef3b988a880d171015b754bb7b27">llfio_v2_xxx::temp_file</a></div><div class="ttdeci">result&lt; file_handle &gt; temp_file(file_handle::path_view_type name=file_handle::path_view_type(), file_handle::mode _mode=file_handle::mode::write, file_handle::creation _creation=file_handle::creation::if_needed, file_handle::caching _caching=file_handle::caching::temporary, file_handle::flag flags=file_handle::flag::unlink_on_first_close) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:455</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_ae79486289ff1386b26d1ce60bb797d33aa4293995cfbfa9ce60ce71ade2ff75f7"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33aa4293995cfbfa9ce60ce71ade2ff75f7">llfio_v2_xxx::lock_kind::exclusive</a></div><div class="ttdeci">@ exclusive</div><div class="ttdoc">Exclude those requesting any kind of lock on the same inode.</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_aa209c529f55f8c8a242080d55c66a4a9a100b8cad7cf2a56f6df78f171f97a1ec"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a100b8cad7cf2a56f6df78f171f97a1ec">llfio_v2_xxx::ip::family::any</a></div><div class="ttdeci">@ any</div><div class="ttdoc">Either v4 or v6.</div></div>
-<div class="ttc" id="anamespacellfio__v2__xxx_html_addbdc12d4993a8ee40c105a02a105a61"><div class="ttname"><a href="namespacellfio__v2__xxx.html#addbdc12d4993a8ee40c105a02a105a61">llfio_v2_xxx::temp_directory</a></div><div class="ttdeci">result&lt; directory_handle &gt; temp_directory(directory_handle::path_view_type name=directory_handle::path_view_type(), directory_handle::mode _mode=directory_handle::mode::write, directory_handle::creation _creation=directory_handle::creation::if_needed, directory_handle::caching _caching=directory_handle::caching::all, directory_handle::flag flags=directory_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:417</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_addbdc12d4993a8ee40c105a02a105a61"><div class="ttname"><a href="namespacellfio__v2__xxx.html#addbdc12d4993a8ee40c105a02a105a61">llfio_v2_xxx::temp_directory</a></div><div class="ttdeci">result&lt; directory_handle &gt; temp_directory(directory_handle::path_view_type name=directory_handle::path_view_type(), directory_handle::mode _mode=directory_handle::mode::write, directory_handle::creation _creation=directory_handle::creation::if_needed, directory_handle::caching _caching=directory_handle::caching::all, directory_handle::flag flags=directory_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:419</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a5d9582bf6887848cd9fc363a282a1c21"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a5d9582bf6887848cd9fc363a282a1c21">llfio_v2_xxx::uniquely_named_file</a></div><div class="ttdeci">result&lt; file_handle &gt; uniquely_named_file(const path_handle &amp;dirpath, file_handle::mode _mode=file_handle::mode::write, file_handle::caching _caching=file_handle::caching::temporary, file_handle::flag flags=file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:433</div></div>
-<div class="ttc" id="anamespacellfio__v2__xxx_html_a092f75c4e639c85797120488d486fa38"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a092f75c4e639c85797120488d486fa38">llfio_v2_xxx::mapped_uniquely_named_file</a></div><div class="ttdeci">result&lt; mapped_file_handle &gt; mapped_uniquely_named_file(mapped_file_handle::size_type reservation, const path_handle &amp;dirpath, mapped_file_handle::mode _mode=mapped_file_handle::mode::write, mapped_file_handle::caching _caching=mapped_file_handle::caching::temporary, mapped_file_handle::flag flags=mapped_file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:796</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_a092f75c4e639c85797120488d486fa38"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a092f75c4e639c85797120488d486fa38">llfio_v2_xxx::mapped_uniquely_named_file</a></div><div class="ttdeci">result&lt; mapped_file_handle &gt; mapped_uniquely_named_file(mapped_file_handle::size_type reservation, const path_handle &amp;dirpath, mapped_file_handle::mode _mode=mapped_file_handle::mode::write, mapped_file_handle::caching _caching=mapped_file_handle::caching::temporary, mapped_file_handle::flag flags=mapped_file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:797</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_a6269702375c265b9985fe47df4447c7ba334aa63ec1fb6d0ef2267e1ff3c10fd1"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a6269702375c265b9985fe47df4447c7ba334aa63ec1fb6d0ef2267e1ff3c10fd1">llfio_v2_xxx::default_</a></div><div class="ttdeci">@ default_</div><div class="ttdef"><b>Definition:</b> tls_socket_handle.hpp:51</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_ae79486289ff1386b26d1ce60bb797d33ad821dbe5ef2db3d805cd0f7eea0ec33f"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33ad821dbe5ef2db3d805cd0f7eea0ec33f">llfio_v2_xxx::lock_kind::unlocked</a></div><div class="ttdeci">@ unlocked</div><div class="ttdoc">Exclude none.</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_abcb445e5dfcc0eb04ce49ac8af0bc89aa0196f6c4f97df3f48d570c23e46501ae"><div class="ttname"><a href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aa0196f6c4f97df3f48d570c23e46501ae">llfio_v2_xxx::win32_path_namespace::dos</a></div><div class="ttdeci">@ dos</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_ac8d9dc908fe39f9c896e99f6b7a39d81"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ac8d9dc908fe39f9c896e99f6b7a39d81">llfio_v2_xxx::temp_inode</a></div><div class="ttdeci">result&lt; file_handle &gt; temp_inode(const path_handle &amp;dirh=path_discovery::storage_backed_temporary_files_directory(), file_handle::mode _mode=file_handle::mode::write, file_handle::flag flags=file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:473</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a49f7bb77eb38fbe1280019225b66b78b"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">llfio_v2_xxx::path</a></div><div class="ttdeci">result&lt; path_handle &gt; path(const path_handle &amp;base, path_handle::path_view_type path) noexcept</div><div class="ttdef"><b>Definition:</b> path_handle.hpp:171</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_ae79486289ff1386b26d1ce60bb797d33a9e81e7b963c71363e2fb3eefcfecfc0e"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ae79486289ff1386b26d1ce60bb797d33a9e81e7b963c71363e2fb3eefcfecfc0e">llfio_v2_xxx::lock_kind::shared</a></div><div class="ttdeci">@ shared</div><div class="ttdoc">Exclude only those requesting an exclusive lock on the same inode.</div></div>
-<div class="ttc" id="anamespacellfio__v2__xxx_html_a3d112d170c1d485e1120de06eef02375"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a3d112d170c1d485e1120de06eef02375">llfio_v2_xxx::directory</a></div><div class="ttdeci">result&lt; directory_handle &gt; directory(const path_handle &amp;base, directory_handle::path_view_type path, directory_handle::mode _mode=directory_handle::mode::read, directory_handle::creation _creation=directory_handle::creation::open_existing, directory_handle::caching _caching=directory_handle::caching::all, directory_handle::flag flags=directory_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:394</div></div>
-<div class="ttc" id="anamespacellfio__v2__xxx_html_aba506997f2999cabbe0a7bd2a1d3b6e0"><div class="ttname"><a href="namespacellfio__v2__xxx.html#aba506997f2999cabbe0a7bd2a1d3b6e0">llfio_v2_xxx::uniquely_named_directory</a></div><div class="ttdeci">result&lt; directory_handle &gt; uniquely_named_directory(const path_handle &amp;dirpath, directory_handle::mode _mode=directory_handle::mode::write, directory_handle::caching _caching=directory_handle::caching::temporary, directory_handle::flag flags=directory_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:405</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_a3d112d170c1d485e1120de06eef02375"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a3d112d170c1d485e1120de06eef02375">llfio_v2_xxx::directory</a></div><div class="ttdeci">result&lt; directory_handle &gt; directory(const path_handle &amp;base, directory_handle::path_view_type path, directory_handle::mode _mode=directory_handle::mode::read, directory_handle::creation _creation=directory_handle::creation::open_existing, directory_handle::caching _caching=directory_handle::caching::all, directory_handle::flag flags=directory_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:396</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_aba506997f2999cabbe0a7bd2a1d3b6e0"><div class="ttname"><a href="namespacellfio__v2__xxx.html#aba506997f2999cabbe0a7bd2a1d3b6e0">llfio_v2_xxx::uniquely_named_directory</a></div><div class="ttdeci">result&lt; directory_handle &gt; uniquely_named_directory(const path_handle &amp;dirpath, directory_handle::mode _mode=directory_handle::mode::write, directory_handle::caching _caching=directory_handle::caching::temporary, directory_handle::flag flags=directory_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:407</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_abcb445e5dfcc0eb04ce49ac8af0bc89aac9d7bcde106cf090f174db82fd3dcba0"><div class="ttname"><a href="namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89aac9d7bcde106cf090f174db82fd3dcba0">llfio_v2_xxx::win32_path_namespace::guid_volume</a></div><div class="ttdeci">@ guid_volume</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_af31a062639499a79ef5cc8aed16ba65d"><div class="ttname"><a href="namespacellfio__v2__xxx.html#af31a062639499a79ef5cc8aed16ba65d">llfio_v2_xxx::file</a></div><div class="ttdeci">result&lt; file_handle &gt; file(const path_handle &amp;base, file_handle::path_view_type path, file_handle::mode _mode=file_handle::mode::read, file_handle::creation _creation=file_handle::creation::open_existing, file_handle::caching _caching=file_handle::caching::all, file_handle::flag flags=file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:418</div></div>
-<div class="ttc" id="anamespacellfio__v2__xxx_html_a58d5390cad390de24a80748c8cd7dc5b"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a58d5390cad390de24a80748c8cd7dc5b">llfio_v2_xxx::mapped_temp_inode</a></div><div class="ttdeci">result&lt; mapped_file_handle &gt; mapped_temp_inode(mapped_file_handle::size_type reservation=0, const path_handle &amp;dir=path_discovery::storage_backed_temporary_files_directory(), mapped_file_handle::mode _mode=mapped_file_handle::mode::write, mapped_file_handle::flag flags=mapped_file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:841</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">llfio_v2_xxx::ip::none</a></div><div class="ttdeci">@ none</div><div class="ttdoc">No flags.</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:224</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_a58d5390cad390de24a80748c8cd7dc5b"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a58d5390cad390de24a80748c8cd7dc5b">llfio_v2_xxx::mapped_temp_inode</a></div><div class="ttdeci">result&lt; mapped_file_handle &gt; mapped_temp_inode(mapped_file_handle::size_type reservation=0, const path_handle &amp;dir=path_discovery::storage_backed_temporary_files_directory(), mapped_file_handle::mode _mode=mapped_file_handle::mode::write, mapped_file_handle::flag flags=mapped_file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:842</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_a6269702375c265b9985fe47df4447c7baf7da33fdf71e962b32ddd8345e293911"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a6269702375c265b9985fe47df4447c7baf7da33fdf71e962b32ddd8345e293911">llfio_v2_xxx::FIPS_140_2</a></div><div class="ttdeci">@ FIPS_140_2</div><div class="ttdef"><b>Definition:</b> tls_socket_handle.hpp:55</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a5323ac4d73623d99f92109a5c184e5dd"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a5323ac4d73623d99f92109a5c184e5dd">llfio_v2_xxx::section</a></div><div class="ttdeci">result&lt; section_handle &gt; section(section_handle::extent_type bytes, const path_handle &amp;dirh=path_discovery::storage_backed_temporary_files_directory(), section_handle::flag _flag=section_handle::flag::read|section_handle::flag::write) noexcept</div><div class="ttdoc">Create a memory section backed by an anonymous, managed file.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:1065</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_ad8b12afdd4c80d69d2530bd40f92427c"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ad8b12afdd4c80d69d2530bd40f92427c">llfio_v2_xxx::path</a></div><div class="ttdeci">result&lt; path_handle &gt; path(path_handle::path_view_type _path) noexcept</div><div class="ttdoc">This is an overloaded member function, provided for convenience. It differs from the above function o...</div><div class="ttdef"><b>Definition:</b> path_handle.hpp:176</div></div>
-<div class="ttc" id="anamespacellfio__v2__xxx_html_a3eb3e8ef0ddff1270b3d78d4178335c7"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a3eb3e8ef0ddff1270b3d78d4178335c7">llfio_v2_xxx::mapped_temp_file</a></div><div class="ttdeci">result&lt; mapped_file_handle &gt; mapped_temp_file(mapped_file_handle::size_type reservation, mapped_file_handle::path_view_type name=mapped_file_handle::path_view_type(), mapped_file_handle::mode _mode=mapped_file_handle::mode::write, mapped_file_handle::creation _creation=mapped_file_handle::creation::if_needed, mapped_file_handle::caching _caching=mapped_file_handle::caching::temporary, mapped_file_handle::flag flags=mapped_file_handle::flag::unlink_on_first_close) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:820</div></div>
-<div class="ttc" id="anamespacellfio__v2__xxx_html_a1f0ccde00add2f09579151fd71b8f06d"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a1f0ccde00add2f09579151fd71b8f06d">llfio_v2_xxx::mapped_file</a></div><div class="ttdeci">result&lt; mapped_file_handle &gt; mapped_file(const path_handle &amp;base, mapped_file_handle::path_view_type _path, mapped_file_handle::mode _mode=mapped_file_handle::mode::read, mapped_file_handle::creation _creation=mapped_file_handle::creation::open_existing, mapped_file_handle::caching _caching=mapped_file_handle::caching::all, mapped_file_handle::flag flags=mapped_file_handle::flag::none) noexcept</div><div class="ttdoc">This is an overloaded member function, provided for convenience. It differs from the above function o...</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:778</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_a3eb3e8ef0ddff1270b3d78d4178335c7"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a3eb3e8ef0ddff1270b3d78d4178335c7">llfio_v2_xxx::mapped_temp_file</a></div><div class="ttdeci">result&lt; mapped_file_handle &gt; mapped_temp_file(mapped_file_handle::size_type reservation, mapped_file_handle::path_view_type name=mapped_file_handle::path_view_type(), mapped_file_handle::mode _mode=mapped_file_handle::mode::write, mapped_file_handle::creation _creation=mapped_file_handle::creation::if_needed, mapped_file_handle::caching _caching=mapped_file_handle::caching::temporary, mapped_file_handle::flag flags=mapped_file_handle::flag::unlink_on_first_close) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:821</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_a1f0ccde00add2f09579151fd71b8f06d"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a1f0ccde00add2f09579151fd71b8f06d">llfio_v2_xxx::mapped_file</a></div><div class="ttdeci">result&lt; mapped_file_handle &gt; mapped_file(const path_handle &amp;base, mapped_file_handle::path_view_type _path, mapped_file_handle::mode _mode=mapped_file_handle::mode::read, mapped_file_handle::creation _creation=mapped_file_handle::creation::open_existing, mapped_file_handle::caching _caching=mapped_file_handle::caching::all, mapped_file_handle::flag flags=mapped_file_handle::flag::none) noexcept</div><div class="ttdoc">This is an overloaded member function, provided for convenience. It differs from the above function o...</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:779</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

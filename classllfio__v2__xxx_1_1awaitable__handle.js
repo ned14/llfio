@@ -61,7 +61,6 @@ var classllfio__v2__xxx_1_1awaitable__handle =
     [ "kernel_caching", "classllfio__v2__xxx_1_1awaitable__handle.html#a90bf8668df002dac5a7d9397486b2946", null ],
     [ "native_handle", "classllfio__v2__xxx_1_1awaitable__handle.html#a942b0d276c9f20fe41baab679b88fe72", null ],
     [ "QUICKCPPLIB_BITFIELD_BEGIN_T", "classllfio__v2__xxx_1_1awaitable__handle.html#af6ae214241d075f68c3df8cfb377f135", null ],
-    [ "QUICKCPPLIB_BITFIELD_END", "classllfio__v2__xxx_1_1awaitable__handle.html#aa7e9bedf8c7a4c4a79a644a6e1857ee4", null ],
     [ "read", "classllfio__v2__xxx_1_1awaitable__handle.html#a67c9dc3a201fc43d85ab582759fbd116", null ],
     [ "release", "classllfio__v2__xxx_1_1awaitable__handle.html#a1d273e38c061eb11f5012f624e9a202e", null ],
     [ "requires_aligned_io", "classllfio__v2__xxx_1_1awaitable__handle.html#a751e912d8dab755ea969a418c1d544eb", null ],

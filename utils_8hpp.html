@@ -85,7 +85,8 @@ $(document).ready(function(){initNavTree('utils_8hpp.html',''); initResizable();
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">utils.hpp File Reference</div>  </div>
 </div><!--header-->
@@ -95,6 +96,9 @@ $(document).ready(function(){initNavTree('utils_8hpp.html',''); initResizable();
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1utils_1_1std.html">llfio_v2_xxx::utils::std</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Round a pair of a pointer and a size_t to their nearest page size multiples. The pointer will be rounded down, the size_t upwards.  <a href="classllfio__v2__xxx_1_1utils_1_1std.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html">llfio_v2_xxx::utils::process_memory_usage</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Memory usage statistics for a process.  <a href="structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -135,9 +139,12 @@ template&lt;class T &gt; </td></tr>
 <tr class="memitem:a67f8f31f6b93293a22a4b30d686eb3af"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1utils.html#a67f8f31f6b93293a22a4b30d686eb3af">llfio_v2_xxx::utils::round_up_to_page_size</a> (T i, size_t pagesize) noexcept</td></tr>
 <tr class="memdesc:a67f8f31f6b93293a22a4b30d686eb3af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Round a value to its next highest page size multiple. <br /></td></tr>
 <tr class="separator:a67f8f31f6b93293a22a4b30d686eb3af"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a83420c7c9af03ca93d5ed029c34d5dd6"><td class="memItemLeft" align="right" valign="top">LLFIO_TEMPLATE(class T) LLFIO_TREQUIRES(LLFIO_TEXPR(std size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1utils.html#a83420c7c9af03ca93d5ed029c34d5dd6">llfio_v2_xxx::utils::file_buffer_default_size</a> ()</td></tr>
-<tr class="memdesc:a83420c7c9af03ca93d5ed029c34d5dd6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Round a pair of a pointer and a size_t to their nearest page size multiples. The pointer will be rounded down, the size_t upwards.  <a href="namespacellfio__v2__xxx_1_1utils.html#a83420c7c9af03ca93d5ed029c34d5dd6">More...</a><br /></td></tr>
-<tr class="separator:a83420c7c9af03ca93d5ed029c34d5dd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72dad2a3b7c22c96df3bf96db1604063"><td class="memItemLeft" align="right" valign="top"><a id="a72dad2a3b7c22c96df3bf96db1604063"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>assert</b> (pagesize &gt; 0)</td></tr>
+<tr class="separator:a72dad2a3b7c22c96df3bf96db1604063"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a90d8f94ddb6e026f931e86d0dc904778"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1utils.html#a90d8f94ddb6e026f931e86d0dc904778">llfio_v2_xxx::utils::file_buffer_default_size</a> ()</td></tr>
+<tr class="memdesc:a90d8f94ddb6e026f931e86d0dc904778"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reasonable default size for page_allocator, typically the closest page size from page_sizes() to 1Mb.  <a href="namespacellfio__v2__xxx_1_1utils.html#a90d8f94ddb6e026f931e86d0dc904778">More...</a><br /></td></tr>
+<tr class="separator:a90d8f94ddb6e026f931e86d0dc904778"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae61e2de30b06776a1c24643a1d1dc64e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1utils.html#ae61e2de30b06776a1c24643a1d1dc64e">llfio_v2_xxx::utils::random_fill</a> (char *buffer, size_t bytes) noexcept</td></tr>
 <tr class="memdesc:ae61e2de30b06776a1c24643a1d1dc64e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fills the buffer supplied with cryptographically strong randomness. Uses the OS kernel API.  <a href="namespacellfio__v2__xxx_1_1utils.html#ae61e2de30b06776a1c24643a1d1dc64e">More...</a><br /></td></tr>
 <tr class="separator:ae61e2de30b06776a1c24643a1d1dc64e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -174,6 +181,21 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::utils::
 template&lt;class T , class U &gt; </td></tr>
 <tr class="memitem:ae880ebd5681dcf6b700d67fb10b4547e"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>llfio_v2_xxx::utils::operator==</b> (const page_allocator&lt; T &gt; &amp;, const page_allocator&lt; U &gt; &amp;) noexcept</td></tr>
 <tr class="separator:ae880ebd5681dcf6b700d67fb10b4547e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a882276a97fe77b8104b94f993f7329e2"><td class="memItemLeft" align="right" valign="top"><a id="a882276a97fe77b8104b94f993f7329e2"></a>
+<a class="el" href="classllfio__v2__xxx_1_1utils_1_1std.html">llfio_v2_xxx::utils::std</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1utils.html#a882276a97fe77b8104b94f993f7329e2">llfio_v2_xxx::utils::__VA_ARGS__</a></td></tr>
+<tr class="memdesc:a882276a97fe77b8104b94f993f7329e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Round a pair of a pointer and a size_t to their nearest page size multiples. The pointer will be rounded upwards, the size_t downwards. <br /></td></tr>
+<tr class="separator:a882276a97fe77b8104b94f993f7329e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab488390ed1daad9fd2f93e792591ac21"><td class="memItemLeft" align="right" valign="top"><a id="ab488390ed1daad9fd2f93e792591ac21"></a>
+const auto&#160;</td><td class="memItemRight" valign="bottom"><b>base</b> = llfio_v2_xxx::detail::unsigned_integer_cast&lt;uintptr_t&gt;(i.data())</td></tr>
+<tr class="separator:ab488390ed1daad9fd2f93e792591ac21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef81082cf9452d44c4d47e547bd4f3d1"><td class="memItemLeft" align="right" valign="top"><a id="aef81082cf9452d44c4d47e547bd4f3d1"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>i</b> = {reinterpret_cast&lt;byte *&gt;(base &amp; ~(pagesize - 1)), ((base + i.size() + pagesize - 1) &amp; ~(pagesize - 1)) - (base &amp; ~(pagesize - 1))}</td></tr>
+<tr class="separator:aef81082cf9452d44c4d47e547bd4f3d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abed8bb2a831bf200d2e64413a8f6754b"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html">llfio_v2_xxx::utils::process_memory_usage</a>&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::utils::T</b></td></tr>
+<tr class="separator:abed8bb2a831bf200d2e64413a8f6754b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides namespace utils </p>

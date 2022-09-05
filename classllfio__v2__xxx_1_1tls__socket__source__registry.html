@@ -97,10 +97,10 @@ $(document).ready(function(){initNavTree('classllfio__v2__xxx_1_1tls__socket__so
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a8b22e67cd1ec964bacadddf2484d40d5"><td class="memItemLeft" align="right" valign="top"><a id="a8b22e67cd1ec964bacadddf2484d40d5"></a>
-static LLFIO_NODISCARD bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1tls__socket__source__registry.html#a8b22e67cd1ec964bacadddf2484d40d5">empty</a> () noexcept</td></tr>
-<tr class="memdesc:a8b22e67cd1ec964bacadddf2484d40d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if there are no socket sources known to this registry. <br /></td></tr>
-<tr class="separator:a8b22e67cd1ec964bacadddf2484d40d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a294c3be8a3c986009971c408b2a1a4c6"><td class="memItemLeft" align="right" valign="top"><a id="a294c3be8a3c986009971c408b2a1a4c6"></a>
+static QUICKCPPLIB_NODISCARD bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1tls__socket__source__registry.html#a294c3be8a3c986009971c408b2a1a4c6">empty</a> () noexcept</td></tr>
+<tr class="memdesc:a294c3be8a3c986009971c408b2a1a4c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if there are no socket sources known to this registry. <br /></td></tr>
+<tr class="separator:a294c3be8a3c986009971c408b2a1a4c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a466178a8da5bff6c67a99d04572143e7"><td class="memItemLeft" align="right" valign="top"><a id="a466178a8da5bff6c67a99d04572143e7"></a>
 static size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1tls__socket__source__registry.html#a466178a8da5bff6c67a99d04572143e7">size</a> () noexcept</td></tr>
 <tr class="memdesc:a466178a8da5bff6c67a99d04572143e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">The current total number of socket sources known to this registry. <br /></td></tr>
@@ -197,7 +197,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <div class="line">  <span class="comment">// The need for a kernel sockets based TLS implementation is so poll() will</span></div>
 <div class="line">  <span class="comment">// work, as it requires kernel sockets compatible input.</span></div>
 <div class="line">  <span class="keyword">static</span> constexpr <span class="keyword">auto</span> required_features =</div>
-<div class="line">    llfio::tls_socket_source_implementation_features::FIPS_140_2</div>
+<div class="line">    <a class="code" href="namespacellfio__v2__xxx.html#a6269702375c265b9985fe47df4447c7baf7da33fdf71e962b32ddd8345e293911">llfio::tls_socket_source_implementation_features::FIPS_140_2</a></div>
 <div class="line">    | llfio::tls_socket_source_implementation_features::kernel_sockets;</div>
 <div class="line">  <a class="code" href="namespacellfio__v2__xxx.html#a1a51dd6cc5299a316fdcd05c4c7db2dc">llfio::tls_socket_source_ptr</a> tls_socket_source =</div>
 <div class="line">    <a class="code" href="classllfio__v2__xxx_1_1tls__socket__source__registry.html#a318736c9183f9a4ce256f081b75fd4e3">llfio::tls_socket_source_registry::default_source</a>(required_features,</div>
@@ -226,7 +226,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <div class="line">  <span class="comment">// socket</span></div>
 <div class="line">  pollable_handles.push_back(serversocket.get());</div>
 <div class="line">  topoll.push_back(llfio::poll_what::is_readable);</div>
-<div class="line">  whatchanged.push_back(llfio::poll_what::none);</div>
+<div class="line">  whatchanged.push_back(<a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">llfio::poll_what::none</a>);</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// Connected socket state</span></div>
 <div class="line">  <span class="keyword">struct </span>connected_socket {</div>
@@ -265,7 +265,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <div class="line">  <span class="comment">// Begin the processing loop</span></div>
 <div class="line">  <span class="keywordflow">for</span>(;;) {</div>
 <div class="line">    <span class="comment">// We need to clear whatchanged before use, as it accumulates bits set.</span></div>
-<div class="line">    std::fill(whatchanged.begin(), whatchanged.end(), llfio::poll_what::none);</div>
+<div class="line">    std::fill(whatchanged.begin(), whatchanged.end(), <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">llfio::poll_what::none</a>);</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// As with all LLFIO calls, you can set a deadline here so this call</span></div>
 <div class="line">    <span class="comment">// times out. The default as usual is wait until infinity.</span></div>
@@ -276,7 +276,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <div class="line">    <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> handleidx = 0;</div>
 <div class="line">      handles_changed &gt; 0 &amp;&amp; handleidx &lt; pollable_handles.size();</div>
 <div class="line">      handleidx++) {</div>
-<div class="line">      <span class="keywordflow">if</span>(whatchanged[handleidx] == llfio::poll_what::none) {</div>
+<div class="line">      <span class="keywordflow">if</span>(whatchanged[handleidx] == <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">llfio::poll_what::none</a>) {</div>
 <div class="line">        <span class="keywordflow">continue</span>;</div>
 <div class="line">      }</div>
 <div class="line">      <span class="keywordflow">if</span>(0 == handleidx) {</div>
@@ -290,7 +290,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <div class="line">        <span class="comment">// Watch this connected socket going forth for data to read or failure</span></div>
 <div class="line">        pollable_handles.push_back(connected_sockets.back().socket.get());</div>
 <div class="line">        topoll.push_back(llfio::poll_what::is_readable|llfio::poll_what::is_errored);</div>
-<div class="line">        whatchanged.push_back(llfio::poll_what::none);</div>
+<div class="line">        whatchanged.push_back(<a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">llfio::poll_what::none</a>);</div>
 <div class="line">        handles_changed--;</div>
 <div class="line">        <span class="keywordflow">continue</span>;</div>
 <div class="line">      }</div>
@@ -389,8 +389,10 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a81cc4b6e44e81823d88c0433efd82292"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a81cc4b6e44e81823d88c0433efd82292">llfio_v2_xxx::tls_socket_handle_ptr</a></div><div class="ttdeci">std::unique_ptr&lt; tls_socket_handle, detail::tls_socket_handle_deleter &gt; tls_socket_handle_ptr</div><div class="ttdoc">A pointer to a TLS socket handle returned by a TLS socket source.</div><div class="ttdef"><b>Definition:</b> tls_socket_handle.hpp:191</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1tls__socket__source__registry_html_a318736c9183f9a4ce256f081b75fd4e3"><div class="ttname"><a href="classllfio__v2__xxx_1_1tls__socket__source__registry.html#a318736c9183f9a4ce256f081b75fd4e3">llfio_v2_xxx::tls_socket_source_registry::default_source</a></div><div class="ttdeci">static tls_socket_source_implementation_information default_source(tls_socket_source_implementation_features set=tls_socket_source_implementation_features::none, tls_socket_source_implementation_features mask=tls_socket_source_implementation_features::none) noexcept</div><div class="ttdoc">Convenience overload retrieving TLS socket sources, preferring system over third party implementation...</div><div class="ttdef"><b>Definition:</b> tls_socket_handle.hpp:560</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a727d8ebc7f42ff3124d1734a1a1f0563"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a727d8ebc7f42ff3124d1734a1a1f0563">llfio_v2_xxx::poll</a></div><div class="ttdeci">result&lt; size_t &gt; poll(span&lt; poll_what &gt; out, span&lt; pollable_handle * &gt; handles, span&lt; const poll_what &gt; query, deadline d={}) noexcept</div><div class="ttdoc">Polls a list of pollable handles awaiting a change in state.</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">llfio_v2_xxx::ip::none</a></div><div class="ttdeci">@ none</div><div class="ttdoc">No flags.</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:224</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_a199651ec383913fa9a2aec88d5100d1f"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#a199651ec383913fa9a2aec88d5100d1f">llfio_v2_xxx::ip::make_address</a></div><div class="ttdeci">result&lt; address &gt; make_address(string_view str) noexcept</div><div class="ttdoc">Make a v4 or v6 address. v6 addresses need to have the form [::]:port.</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:326</div></div>
-<div class="ttc" id="agroup__config_html_gac9f7f0153adb9034d26c4554728f817a"><div class="ttname"><a href="group__config.html#gac9f7f0153adb9034d26c4554728f817a">LLFIO_V2_NAMESPACE</a></div><div class="ttdeci">#define LLFIO_V2_NAMESPACE</div><div class="ttdoc">The namespace of this LLFIO v2 which will be some unknown inline namespace starting with v2_ inside t...</div><div class="ttdef"><b>Definition:</b> config.hpp:178</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_a6269702375c265b9985fe47df4447c7baf7da33fdf71e962b32ddd8345e293911"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a6269702375c265b9985fe47df4447c7baf7da33fdf71e962b32ddd8345e293911">llfio_v2_xxx::FIPS_140_2</a></div><div class="ttdeci">@ FIPS_140_2</div><div class="ttdef"><b>Definition:</b> tls_socket_handle.hpp:55</div></div>
+<div class="ttc" id="agroup__config_html_gac9f7f0153adb9034d26c4554728f817a"><div class="ttname"><a href="group__config.html#gac9f7f0153adb9034d26c4554728f817a">LLFIO_V2_NAMESPACE</a></div><div class="ttdeci">#define LLFIO_V2_NAMESPACE</div><div class="ttdoc">The namespace of this LLFIO v2 which will be some unknown inline namespace starting with v2_ inside t...</div><div class="ttdef"><b>Definition:</b> config.hpp:180</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html"><div class="ttname"><a href="namespacellfio__v2__xxx.html">llfio_v2_xxx</a></div><div class="ttdoc">The LLFIO namespace.</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:37</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

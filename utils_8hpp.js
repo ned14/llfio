@@ -1,5 +1,6 @@
 var utils_8hpp =
 [
+    [ "std", "classllfio__v2__xxx_1_1utils_1_1std.html", null ],
     [ "process_memory_usage", "structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html", "structllfio__v2__xxx_1_1utils_1_1process__memory__usage" ],
     [ "process_cpu_usage", "structllfio__v2__xxx_1_1utils_1_1process__cpu__usage.html", "structllfio__v2__xxx_1_1utils_1_1process__cpu__usage" ],
     [ "page_allocator", "classllfio__v2__xxx_1_1utils_1_1page__allocator.html", "classllfio__v2__xxx_1_1utils_1_1page__allocator" ],
@@ -7,12 +8,13 @@ var utils_8hpp =
     [ "page_allocator< void >", "classllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4.html", "classllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4" ],
     [ "rebind", "structllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", "structllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind" ],
     [ "allocate_large_pages", "utils_8hpp.html#a85afc40cff0ecfd3a13520ea7e5176a1", null ],
+    [ "assert", "utils_8hpp.html#a72dad2a3b7c22c96df3bf96db1604063", null ],
     [ "calculate_large_page_allocation", "utils_8hpp.html#acf1b1646f257d85f7f2655df1042483f", null ],
     [ "current_process_cpu_usage", "utils_8hpp.html#a264d603db8cc67ce5bfc468d71e0ffaf", null ],
     [ "current_process_memory_usage", "utils_8hpp.html#aab584554620ce071569198652607b5a9", null ],
     [ "deallocate_large_pages", "utils_8hpp.html#a2305cf865b7952f58aba997c4ac95efb", null ],
     [ "drop_filesystem_cache", "utils_8hpp.html#abacefaf60ae391226c4775cf8a61276a", null ],
-    [ "file_buffer_default_size", "utils_8hpp.html#a83420c7c9af03ca93d5ed029c34d5dd6", null ],
+    [ "file_buffer_default_size", "utils_8hpp.html#a90d8f94ddb6e026f931e86d0dc904778", null ],
     [ "flush_modified_data", "utils_8hpp.html#ae1d9ee5d6d391f39f62dacbc8c957ae8", null ],
     [ "operator==", "utils_8hpp.html#ae880ebd5681dcf6b700d67fb10b4547e", null ],
     [ "page_size", "utils_8hpp.html#a42fc69cae3dbbf66498545cbe358e2ba", null ],
@@ -20,5 +22,9 @@ var utils_8hpp =
     [ "random_string", "utils_8hpp.html#a6a29cf29a4b097411f6c1e5274bfb417", null ],
     [ "round_down_to_page_size", "utils_8hpp.html#a5499feaf6b774e774a26e7decd11e3fa", null ],
     [ "round_up_to_page_size", "utils_8hpp.html#a67f8f31f6b93293a22a4b30d686eb3af", null ],
-    [ "running_under_wsl", "utils_8hpp.html#a7aae80908cc5521ef67234152c5c5044", null ]
+    [ "running_under_wsl", "utils_8hpp.html#a7aae80908cc5521ef67234152c5c5044", null ],
+    [ "__VA_ARGS__", "utils_8hpp.html#a882276a97fe77b8104b94f993f7329e2", null ],
+    [ "base", "utils_8hpp.html#ab488390ed1daad9fd2f93e792591ac21", null ],
+    [ "i", "utils_8hpp.html#aef81082cf9452d44c4d47e547bd4f3d1", null ],
+    [ "T", "utils_8hpp.html#abed8bb2a831bf200d2e64413a8f6754b", null ]
 ];

@@ -33,6 +33,5 @@ var config_8hpp =
     [ "handle", "config_8hpp.html#af65fb3311b32b8757c3b7ebdd045afe9", null ],
     [ "socket", "config_8hpp.html#a0174f0c077863b3cd03b1b73c5e8a997", null ],
     [ "spinlock", "config_8hpp.html#a138a48536b1700db01f10e8a371d0a4f", null ],
-    [ "LLFIO_TEMPLATE", "config_8hpp.html#a77c52ccdc38be135a374dbb4a7d1d466", null ],
-    [ "LLFIO_TEMPLATE", "config_8hpp.html#a02c02d05e24d34c25324c192df11c0b4", null ]
+    [ "unsigned_integer_cast", "config_8hpp.html#a7c5e9f063756362a786506e36ae02a77", null ]
 ];

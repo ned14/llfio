@@ -93,7 +93,6 @@ var classllfio__v2__xxx_1_1byte__io__multiplexer =
     [ "operator=", "classllfio__v2__xxx_1_1byte__io__multiplexer.html#a4e48e8cf65439ba26bdcb2966ab4293b", null ],
     [ "operator=", "classllfio__v2__xxx_1_1byte__io__multiplexer.html#a2df2cb9170af9860a3abc3ac2dfac16f", null ],
     [ "QUICKCPPLIB_BITFIELD_BEGIN_T", "classllfio__v2__xxx_1_1byte__io__multiplexer.html#af6ae214241d075f68c3df8cfb377f135", null ],
-    [ "QUICKCPPLIB_BITFIELD_END", "classllfio__v2__xxx_1_1byte__io__multiplexer.html#aa7e9bedf8c7a4c4a79a644a6e1857ee4", null ],
     [ "release", "classllfio__v2__xxx_1_1byte__io__multiplexer.html#a1d273e38c061eb11f5012f624e9a202e", null ],
     [ "requires_aligned_io", "classllfio__v2__xxx_1_1byte__io__multiplexer.html#a751e912d8dab755ea969a418c1d544eb", null ],
     [ "set_append_only", "classllfio__v2__xxx_1_1byte__io__multiplexer.html#a101620e9fff0c0e8c346af0e9de58b6a", null ],

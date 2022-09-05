@@ -86,6 +86,7 @@ $(document).ready(function(){initNavTree('tls__socket__handle_8hpp.html',''); in
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">tls_socket_handle.hpp File Reference</div>  </div>
@@ -95,6 +96,9 @@ $(document).ready(function(){initNavTree('tls__socket__handle_8hpp.html',''); in
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1tls__socket__handle.html">llfio_v2_xxx::tls_socket_handle</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to a TLS secure socket-like entity.  <a href="classllfio__v2__xxx_1_1tls__socket__handle.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1listening__tls__socket__handle.html">llfio_v2_xxx::listening_tls_socket_handle</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A handle to a TLS socket-like entity able to receive incoming connections.  <a href="classllfio__v2__xxx_1_1listening__tls__socket__handle.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -113,14 +117,11 @@ Namespaces</h2></td></tr>
 <tr class="memitem:namespacellfio__v2__xxx"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html">llfio_v2_xxx</a></td></tr>
 <tr class="memdesc:namespacellfio__v2__xxx"><td class="mdescLeft">&#160;</td><td class="mdescRight">The LLFIO namespace. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:namespacellfio__v2__xxx_1_1detail"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1detail.html">llfio_v2_xxx::detail</a></td></tr>
-<tr class="memdesc:namespacellfio__v2__xxx_1_1detail"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a handle to the path <b>currently</b> containing this handle's file entry. <br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:a81cc4b6e44e81823d88c0433efd82292"><td class="memItemLeft" align="right" valign="top"><a id="a81cc4b6e44e81823d88c0433efd82292"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a81cc4b6e44e81823d88c0433efd82292">llfio_v2_xxx::tls_socket_handle_ptr</a> = std::unique_ptr&lt; <a class="el" href="classtls__socket__handle.html">tls_socket_handle</a>, detail::tls_socket_handle_deleter &gt;</td></tr>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a81cc4b6e44e81823d88c0433efd82292">llfio_v2_xxx::tls_socket_handle_ptr</a> = std::unique_ptr&lt; tls_socket_handle, detail::tls_socket_handle_deleter &gt;</td></tr>
 <tr class="memdesc:a81cc4b6e44e81823d88c0433efd82292"><td class="mdescLeft">&#160;</td><td class="mdescRight">A pointer to a TLS socket handle returned by a TLS socket source. <br /></td></tr>
 <tr class="separator:a81cc4b6e44e81823d88c0433efd82292"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b0d8b81e15b9d2aec5dc7194c0e6d22"><td class="memItemLeft" align="right" valign="top"><a id="a1b0d8b81e15b9d2aec5dc7194c0e6d22"></a>
@@ -132,11 +133,16 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="nam
 <tr class="memdesc:a1a51dd6cc5299a316fdcd05c4c7db2dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">A pointer to a TLS socket source. <br /></td></tr>
 <tr class="separator:a1a51dd6cc5299a316fdcd05c4c7db2dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:a6269702375c265b9985fe47df4447c7b"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a6269702375c265b9985fe47df4447c7b">llfio_v2_xxx::bitfield__tls_algorithm</a> : unsigned { <a class="el" href="namespacellfio__v2__xxx.html#a6269702375c265b9985fe47df4447c7ba334aa63ec1fb6d0ef2267e1ff3c10fd1">llfio_v2_xxx::default_</a> = (0U), 
+<a class="el" href="namespacellfio__v2__xxx.html#a6269702375c265b9985fe47df4447c7baf7da33fdf71e962b32ddd8345e293911">llfio_v2_xxx::FIPS_140_2</a> = (1U &lt;&lt; 0U)
+ }</td></tr>
+<tr class="memdesc:a6269702375c265b9985fe47df4447c7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">TLS algorithm categories.  <a href="namespacellfio__v2__xxx.html#a6269702375c265b9985fe47df4447c7b">More...</a><br /></td></tr>
+<tr class="separator:a6269702375c265b9985fe47df4447c7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a54385a57b558008105b9429e89afaae2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a54385a57b558008105b9429e89afaae2">llfio_v2_xxx::QUICKCPPLIB_BITFIELD_BEGIN</a> (tls_algorithm)</td></tr>
-<tr class="memdesc:a54385a57b558008105b9429e89afaae2"><td class="mdescLeft">&#160;</td><td class="mdescRight">TLS algorithm categories.  <a href="namespacellfio__v2__xxx.html#a54385a57b558008105b9429e89afaae2">More...</a><br /></td></tr>
-<tr class="separator:a54385a57b558008105b9429e89afaae2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a30f0de9f074d32381006e42b02a3669e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a30f0de9f074d32381006e42b02a3669e">llfio_v2_xxx::QUICKCPPLIB_BITFIELD_BEGIN_T</a> (tls_socket_source_implementation_features, uint32_t)</td></tr>
 <tr class="memdesc:a30f0de9f074d32381006e42b02a3669e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Feature bits for TLS socket sources.  <a href="namespacellfio__v2__xxx.html#a30f0de9f074d32381006e42b02a3669e">More...</a><br /></td></tr>
 <tr class="separator:a30f0de9f074d32381006e42b02a3669e"><td class="memSeparator" colspan="2">&#160;</td></tr>

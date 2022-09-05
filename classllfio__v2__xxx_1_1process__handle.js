@@ -4,6 +4,16 @@ var classllfio__v2__xxx_1_1process__handle =
     [ "extent_type", "classllfio__v2__xxx_1_1process__handle.html#a32d7120046bf8d178ca7faba27b69b46", null ],
     [ "path_type", "classllfio__v2__xxx_1_1process__handle.html#aa7e16281bce4c3bb7cf1bf337dd5b7ac", null ],
     [ "size_type", "classllfio__v2__xxx_1_1process__handle.html#a374e0db9af84a5dc1243123a9cb1b01c", null ],
+    [ "bitfield__flag", "classllfio__v2__xxx_1_1process__handle.html#adbdaefb199aea3066cbd0b70118091ba", [
+      [ "none", "classllfio__v2__xxx_1_1process__handle.html#adbdaefb199aea3066cbd0b70118091baa923f2fec60def5b14985ea960e4bc2d4", null ],
+      [ "no_redirect_in_pipe", "classllfio__v2__xxx_1_1process__handle.html#adbdaefb199aea3066cbd0b70118091baadad0b52d36561711b9e5a039df9d6913", null ],
+      [ "no_redirect_out_pipe", "classllfio__v2__xxx_1_1process__handle.html#adbdaefb199aea3066cbd0b70118091baa400ca38517fb5f58e5cf27f9526bf67d", null ],
+      [ "no_redirect_error_pipe", "classllfio__v2__xxx_1_1process__handle.html#adbdaefb199aea3066cbd0b70118091baab00ed909286f3e1fa82c3ea67456e7c2", null ],
+      [ "wait_on_close", "classllfio__v2__xxx_1_1process__handle.html#adbdaefb199aea3066cbd0b70118091baa69505a6c4e1b3a76379a824e3304980a", null ],
+      [ "release_pipes_on_close", "classllfio__v2__xxx_1_1process__handle.html#adbdaefb199aea3066cbd0b70118091baab7d8c9e4d283821c3ed56f564ad2386e", null ],
+      [ "no_multiplexable_pipes", "classllfio__v2__xxx_1_1process__handle.html#adbdaefb199aea3066cbd0b70118091baa444ff0b62ce7ddec9f1136a8e2d85b1f", null ],
+      [ "no_redirect", "classllfio__v2__xxx_1_1process__handle.html#adbdaefb199aea3066cbd0b70118091baa3d0bed028d6b38449497a08b4fbafe10", null ]
+    ] ],
     [ "caching", "classllfio__v2__xxx_1_1process__handle.html#aecd3a7db6cee3aec07d32fe6f99e6852", [
       [ "unchanged", "classllfio__v2__xxx_1_1process__handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a8d7b3d6b83c0a517eac07e1aac94b773", null ],
       [ "none", "classllfio__v2__xxx_1_1process__handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
@@ -76,9 +86,7 @@ var classllfio__v2__xxx_1_1process__handle =
     [ "operator=", "classllfio__v2__xxx_1_1process__handle.html#a0960eb5b296746df2fd77be42e14fcd6", null ],
     [ "out_pipe", "classllfio__v2__xxx_1_1process__handle.html#a8c86be2ef3bee1c3f9fc681b97937ceb", null ],
     [ "out_pipe", "classllfio__v2__xxx_1_1process__handle.html#a632eac607e16b80ac3f7a24a04f72366", null ],
-    [ "QUICKCPPLIB_BITFIELD_BEGIN", "classllfio__v2__xxx_1_1process__handle.html#aa0c1f1cf5c93c0e8eb36482710bef81d", null ],
     [ "QUICKCPPLIB_BITFIELD_BEGIN_T", "classllfio__v2__xxx_1_1process__handle.html#af6ae214241d075f68c3df8cfb377f135", null ],
-    [ "QUICKCPPLIB_BITFIELD_END", "classllfio__v2__xxx_1_1process__handle.html#ae73288bf23a8408d782e45afd157a89f", null ],
     [ "release", "classllfio__v2__xxx_1_1process__handle.html#a1d273e38c061eb11f5012f624e9a202e", null ],
     [ "requires_aligned_io", "classllfio__v2__xxx_1_1process__handle.html#a751e912d8dab755ea969a418c1d544eb", null ],
     [ "set_append_only", "classllfio__v2__xxx_1_1process__handle.html#ab64c9fc14fc555b5ec8571863458bf83", null ],

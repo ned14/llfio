@@ -12,6 +12,11 @@ var byte__socket__handle_8hpp =
     [ "listening_byte_socket_handle", "classllfio__v2__xxx_1_1listening__byte__socket__handle.html", "classllfio__v2__xxx_1_1listening__byte__socket__handle" ],
     [ "construct< listening_byte_socket_handle >", "structllfio__v2__xxx_1_1construct_3_01listening__byte__socket__handle_01_4.html", "structllfio__v2__xxx_1_1construct_3_01listening__byte__socket__handle_01_4" ],
     [ "resolver_ptr", "byte__socket__handle_8hpp.html#a57373211cd8f5531937f14ea9852dcd4", null ],
+    [ "bitfield__resolve_flag", "byte__socket__handle_8hpp.html#a2b874cadb614a4ef4ba44fdf3dd8dd74", [
+      [ "none", "byte__socket__handle_8hpp.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a", null ],
+      [ "passive", "byte__socket__handle_8hpp.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ae6a8afb252104fb9377515ef4ba6685c", null ],
+      [ "blocking", "byte__socket__handle_8hpp.html#a2b874cadb614a4ef4ba44fdf3dd8dd74a848178fff00d31d1c679b6f61f20fe44", null ]
+    ] ],
     [ "family", "byte__socket__handle_8hpp.html#aa209c529f55f8c8a242080d55c66a4a9", [
       [ "unknown", "byte__socket__handle_8hpp.html#aa209c529f55f8c8a242080d55c66a4a9aad921d60486366258809553a3db49a4a", null ],
       [ "v4", "byte__socket__handle_8hpp.html#aa209c529f55f8c8a242080d55c66a4a9a5ed3a3ff8e5c29979502b9030e8518e0", null ],
@@ -25,11 +30,6 @@ var byte__socket__handle_8hpp =
     [ "make_address_v6", "byte__socket__handle_8hpp.html#a20fd9dd208ab6b8f60f4b15f56c259dd", null ],
     [ "make_address_v6", "byte__socket__handle_8hpp.html#a1d8bff0582308aa1864d17663c5e34fc", null ],
     [ "operator<<", "byte__socket__handle_8hpp.html#a6765418b2c35f959b2eeed474b20db03", null ],
-    [ "QUICKCPPLIB_BITFIELD_BEGIN", "byte__socket__handle_8hpp.html#aaf1d36169c4576c6d0917fc17cd6e17e", null ],
-    [ "QUICKCPPLIB_BITFIELD_END", "byte__socket__handle_8hpp.html#a27328312a9ba596942b36b4adcd43433", null ],
-    [ "resolve_trim_cache", "byte__socket__handle_8hpp.html#a10295dc13fad53bb539533871e747eb2", null ],
-    [ "_family", "byte__socket__handle_8hpp.html#a260aebfdb57084b90e721bad166bc2ff", null ],
-    [ "d", "byte__socket__handle_8hpp.html#a6511dde2ae512a6262ac979a2fd28a51", null ],
-    [ "flags", "byte__socket__handle_8hpp.html#a9cc4f2c010893bac428decc77e0f93a0", null ],
-    [ "service", "byte__socket__handle_8hpp.html#a32f9d03d00478ba190c1160b08c46338", null ]
+    [ "resolve", "byte__socket__handle_8hpp.html#a9095eedda7cd3610631a971730de2c38", null ],
+    [ "resolve_trim_cache", "byte__socket__handle_8hpp.html#a10295dc13fad53bb539533871e747eb2", null ]
 ];

@@ -91,7 +91,6 @@ var classllfio__v2__xxx_1_1byte__socket__handle =
     [ "operator=", "classllfio__v2__xxx_1_1byte__socket__handle.html#a978f9162ae98e41ed6b9c3ad88ec99e6", null ],
     [ "operator=", "classllfio__v2__xxx_1_1byte__socket__handle.html#ad05f6e62a97795a1865dc7ac1a63588f", null ],
     [ "QUICKCPPLIB_BITFIELD_BEGIN_T", "classllfio__v2__xxx_1_1byte__socket__handle.html#af6ae214241d075f68c3df8cfb377f135", null ],
-    [ "QUICKCPPLIB_BITFIELD_END", "classllfio__v2__xxx_1_1byte__socket__handle.html#aa7e9bedf8c7a4c4a79a644a6e1857ee4", null ],
     [ "read", "classllfio__v2__xxx_1_1byte__socket__handle.html#add4d9cad06933bba45ddb8df5a26077e", null ],
     [ "read", "classllfio__v2__xxx_1_1byte__socket__handle.html#add4d9cad06933bba45ddb8df5a26077e", null ],
     [ "read", "classllfio__v2__xxx_1_1byte__socket__handle.html#aa17020bc615b9a3bc73c66fff8968d11", null ],

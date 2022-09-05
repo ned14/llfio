@@ -101,8 +101,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:af655df8dbeb9695f939cfdb7c51c867a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html#af655df8dbeb9695f939cfdb7c51c867a">QUICKCPPLIB_BITFIELD_BEGIN_T</a> (disposition, uint64_t)</td></tr>
 <tr class="memdesc:af655df8dbeb9695f939cfdb7c51c867a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of handle.  <a href="structllfio__v2__xxx_1_1native__handle__type.html#af655df8dbeb9695f939cfdb7c51c867a">More...</a><br /></td></tr>
 <tr class="separator:af655df8dbeb9695f939cfdb7c51c867a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aefed8c6f2ff66097dc7cb88b6f439db6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html#aefed8c6f2ff66097dc7cb88b6f439db6">QUICKCPPLIB_BITFIELD_END</a> (disposition) union</td></tr>
-<tr class="separator:aefed8c6f2ff66097dc7cb88b6f439db6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af9eb6d201364aae2e933da37caa4c1dd"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html#af9eb6d201364aae2e933da37caa4c1dd">native_handle_type</a> ()</td></tr>
 <tr class="memdesc:af9eb6d201364aae2e933da37caa4c1dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a default instance.  <a href="structllfio__v2__xxx_1_1native__handle__type.html#af9eb6d201364aae2e933da37caa4c1dd">More...</a><br /></td></tr>
 <tr class="separator:af9eb6d201364aae2e933da37caa4c1dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -241,6 +239,33 @@ constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" 
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
+<tr class="memitem:afb449b57f04b4c5296d892d5b631fd84"><td class="memItemLeft" ><a id="afb449b57f04b4c5296d892d5b631fd84"></a>
+union {</td></tr>
+<tr class="memitem:a01fe364cfa9b0750591f07d4522ed34c"><td class="memItemLeft" >
+&#160;&#160;&#160;intptr_t&#160;&#160;&#160;<b>_init</b> {-1}</td></tr>
+<tr class="separator:a01fe364cfa9b0750591f07d4522ed34c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ec64409e6554ed46820c6bf7fe1c6a5"><td class="memItemLeft" >
+&#160;&#160;&#160;int&#160;&#160;&#160;<a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html#a6d63f413705982a84f4140640e4340af">fd</a></td></tr>
+<tr class="memdesc:a6ec64409e6554ed46820c6bf7fe1c6a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">A POSIX file descriptor. <br /></td></tr>
+<tr class="separator:a6ec64409e6554ed46820c6bf7fe1c6a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad5bd11828f8eb54ca4d3091222b61bc"><td class="memItemLeft" >
+&#160;&#160;&#160;int&#160;&#160;&#160;<a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html#a8a38d56b1a9a3ee70799df3dac04edfc">pid</a></td></tr>
+<tr class="memdesc:aad5bd11828f8eb54ca4d3091222b61bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">A POSIX process identifier. <br /></td></tr>
+<tr class="separator:aad5bd11828f8eb54ca4d3091222b61bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96d1f6da8b0a5bd77db3b8d0ef8553e2"><td class="memItemLeft" >
+&#160;&#160;&#160;win::handle&#160;&#160;&#160;<a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html#afbc6866f3f80808fbe3ca903d15b5481">h</a></td></tr>
+<tr class="memdesc:a96d1f6da8b0a5bd77db3b8d0ef8553e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">A Windows HANDLE. <br /></td></tr>
+<tr class="separator:a96d1f6da8b0a5bd77db3b8d0ef8553e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4a0c4e832a179fe889ed06f35bae74e"><td class="memItemLeft" >
+&#160;&#160;&#160;win::socket&#160;&#160;&#160;<a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html#a3422bc1b2bc540ad3fc51dc479a37d40">sock</a></td></tr>
+<tr class="memdesc:aa4a0c4e832a179fe889ed06f35bae74e"><td class="mdescLeft">&#160;</td><td class="mdescRight">A Windows SOCKET. <br /></td></tr>
+<tr class="separator:aa4a0c4e832a179fe889ed06f35bae74e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6fe37da871a1205a82f4070932887ca1"><td class="memItemLeft" >
+&#160;&#160;&#160;void *&#160;&#160;&#160;<a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html#ac7c3afa0b56f7ebd6a0eddfcb2939742">ptr</a></td></tr>
+<tr class="memdesc:a6fe37da871a1205a82f4070932887ca1"><td class="mdescLeft">&#160;</td><td class="mdescRight">A third party pointer. <br /></td></tr>
+<tr class="separator:a6fe37da871a1205a82f4070932887ca1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb449b57f04b4c5296d892d5b631fd84"><td class="memItemLeft" valign="top">};&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
+<tr class="separator:afb449b57f04b4c5296d892d5b631fd84"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a967ace482f3fe7fd3c6e24bffee25888"><td class="memItemLeft" align="right" valign="top"><a id="a967ace482f3fe7fd3c6e24bffee25888"></a>
 disposition&#160;</td><td class="memItemRight" valign="bottom"><b>behaviour</b> {disposition::invalid}</td></tr>
 <tr class="separator:a967ace482f3fe7fd3c6e24bffee25888"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -386,51 +411,7 @@ disposition&#160;</td><td class="memItemRight" valign="bottom"><b>behaviour</b> 
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  _multiplexer_state_bit0 = 1ULL &lt;&lt; 61U,  <span class="comment">// per-handle state bits used by an i/o multiplexer</span></div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  _multiplexer_state_bit1 = 1ULL &lt;&lt; 62U,  <span class="comment">// per-handle state bits used by an i/o multiplexer</span></div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  _child_close_executed = 1ULL &lt;&lt; 63U     <span class="comment">// used to trap when vptr has become corrupted</span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  } <a class="code" href="structllfio__v2__xxx_1_1native__handle__type.html#aefed8c6f2ff66097dc7cb88b6f439db6">QUICKCPPLIB_BITFIELD_END</a>(disposition)</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="aefed8c6f2ff66097dc7cb88b6f439db6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aefed8c6f2ff66097dc7cb88b6f439db6">&#9670;&nbsp;</a></span>QUICKCPPLIB_BITFIELD_END()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">llfio_v2_xxx::native_handle_type::QUICKCPPLIB_BITFIELD_END </td>
-          <td>(</td>
-          <td class="paramtype">disposition&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>A POSIX file descriptor</p>
-<p>A POSIX process identifier</p>
-<p>A Windows HANDLE</p>
-<p>A Windows SOCKET</p>
-<p>A third party pointer</p>
-<div class="fragment"><div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  {</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    intptr_t _init{-1};<span class="comment"></span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="comment">    //! A POSIX file descriptor</span></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="comment"></span>    <span class="keywordtype">int</span> fd;  <span class="comment">// NOLINT</span><span class="comment"></span></div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="comment">    //! A POSIX process identifier</span></div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="comment"></span>    <span class="keywordtype">int</span> pid;  <span class="comment">// NOLINT</span><span class="comment"></span></div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="comment">    //! A Windows HANDLE</span></div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="comment"></span>    win::handle h;  <span class="comment">// NOLINT</span><span class="comment"></span></div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="comment">    //! A Windows SOCKET</span></div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="comment"></span>    win::socket sock;<span class="comment"></span></div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="comment">    //! A third party pointer</span></div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> *ptr;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  };</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  } QUICKCPPLIB_BITFIELD_END(disposition)</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -440,9 +421,8 @@ disposition&#160;</td><td class="memItemRight" valign="bottom"><b>behaviour</b> 
 </div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="anamespacellfio__v2__xxx_1_1this__thread_html_a5e16f34ead62e35a2d252dc4c6a75892"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1this__thread.html#a5e16f34ead62e35a2d252dc4c6a75892">llfio_v2_xxx::this_thread::multiplexer</a></div><div class="ttdeci">byte_io_multiplexer * multiplexer() noexcept</div><div class="ttdoc">Return the calling thread's current i/o multiplexer.</div></div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1native__handle__type_html_aefed8c6f2ff66097dc7cb88b6f439db6"><div class="ttname"><a href="structllfio__v2__xxx_1_1native__handle__type.html#aefed8c6f2ff66097dc7cb88b6f439db6">llfio_v2_xxx::native_handle_type::QUICKCPPLIB_BITFIELD_END</a></div><div class="ttdeci">QUICKCPPLIB_BITFIELD_END(disposition) union</div><div class="ttdef"><b>Definition:</b> native_handle_type.hpp:87</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a49f7bb77eb38fbe1280019225b66b78b"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">llfio_v2_xxx::path</a></div><div class="ttdeci">result&lt; path_handle &gt; path(const path_handle &amp;base, path_handle::path_view_type path) noexcept</div><div class="ttdef"><b>Definition:</b> path_handle.hpp:171</div></div>
-<div class="ttc" id="anamespacellfio__v2__xxx_html_a3d112d170c1d485e1120de06eef02375"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a3d112d170c1d485e1120de06eef02375">llfio_v2_xxx::directory</a></div><div class="ttdeci">result&lt; directory_handle &gt; directory(const path_handle &amp;base, directory_handle::path_view_type path, directory_handle::mode _mode=directory_handle::mode::read, directory_handle::creation _creation=directory_handle::creation::open_existing, directory_handle::caching _caching=directory_handle::caching::all, directory_handle::flag flags=directory_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:394</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_a3d112d170c1d485e1120de06eef02375"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a3d112d170c1d485e1120de06eef02375">llfio_v2_xxx::directory</a></div><div class="ttdeci">result&lt; directory_handle &gt; directory(const path_handle &amp;base, directory_handle::path_view_type path, directory_handle::mode _mode=directory_handle::mode::read, directory_handle::creation _creation=directory_handle::creation::open_existing, directory_handle::caching _caching=directory_handle::caching::all, directory_handle::flag flags=directory_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:396</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_af31a062639499a79ef5cc8aed16ba65d"><div class="ttname"><a href="namespacellfio__v2__xxx.html#af31a062639499a79ef5cc8aed16ba65d">llfio_v2_xxx::file</a></div><div class="ttdeci">result&lt; file_handle &gt; file(const path_handle &amp;base, file_handle::path_view_type path, file_handle::mode _mode=file_handle::mode::read, file_handle::creation _creation=file_handle::creation::open_existing, file_handle::caching _caching=file_handle::caching::all, file_handle::flag flags=file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:418</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_ac9be77116e7a2d8c029dd066dfa363fb"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ac9be77116e7a2d8c029dd066dfa363fb">llfio_v2_xxx::section</a></div><div class="ttdeci">result&lt; section_handle &gt; section(file_handle &amp;backing, section_handle::extent_type maximum_size, section_handle::flag _flag) noexcept</div><div class="ttdoc">Create a memory section backed by a file.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:1041</div></div>
 <!-- start footer part -->

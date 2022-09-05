@@ -1,23 +1,6 @@
 var searchData=
 [
-  ['f_5fbavail_1511',['f_bavail',['../structllfio__v2__xxx_1_1statfs__t.html#aa4a4f434ba56992244ac59c8f825a962',1,'llfio_v2_xxx::statfs_t']]],
-  ['f_5fbfree_1512',['f_bfree',['../structllfio__v2__xxx_1_1statfs__t.html#a360401ea41ab6debc8b8a8806c2dfc46',1,'llfio_v2_xxx::statfs_t']]],
-  ['f_5fblocks_1513',['f_blocks',['../structllfio__v2__xxx_1_1statfs__t.html#aee7f0b961f34b79e95189e6cf8677cbf',1,'llfio_v2_xxx::statfs_t']]],
-  ['f_5fbsize_1514',['f_bsize',['../structllfio__v2__xxx_1_1statfs__t.html#aa24a1f36d9addae9d0d6ab13eeb43e5d',1,'llfio_v2_xxx::statfs_t']]],
-  ['f_5fffree_1515',['f_ffree',['../structllfio__v2__xxx_1_1statfs__t.html#a78b08b8091ddcd264ce9bd903bc4dec2',1,'llfio_v2_xxx::statfs_t']]],
-  ['f_5ffiles_1516',['f_files',['../structllfio__v2__xxx_1_1statfs__t.html#a2655807be6194967c2768ab834ce8c4b',1,'llfio_v2_xxx::statfs_t']]],
-  ['f_5fflags_1517',['f_flags',['../structllfio__v2__xxx_1_1statfs__t.html#a9684fea78f72efeafdbaa4a11f402060',1,'llfio_v2_xxx::statfs_t']]],
-  ['f_5ffsid_1518',['f_fsid',['../structllfio__v2__xxx_1_1statfs__t.html#a3a5739137cee606782d47afbd4bac38c',1,'llfio_v2_xxx::statfs_t']]],
-  ['f_5ffstypename_1519',['f_fstypename',['../structllfio__v2__xxx_1_1statfs__t.html#abe7361e7f354e4de36b64f80b4c6c72e',1,'llfio_v2_xxx::statfs_t']]],
-  ['f_5fiosbusytime_1520',['f_iosbusytime',['../structllfio__v2__xxx_1_1statfs__t.html#a628819f907c707648266194410b7b6f2',1,'llfio_v2_xxx::statfs_t']]],
-  ['f_5fiosinprogress_1521',['f_iosinprogress',['../structllfio__v2__xxx_1_1statfs__t.html#ae3d5ec73abd75cb58c8be3e196c6cfbd',1,'llfio_v2_xxx::statfs_t']]],
-  ['f_5fiosize_1522',['f_iosize',['../structllfio__v2__xxx_1_1statfs__t.html#a378f9f413ad7178b65bbdab76a29a06d',1,'llfio_v2_xxx::statfs_t']]],
-  ['f_5fmntfromname_1523',['f_mntfromname',['../structllfio__v2__xxx_1_1statfs__t.html#a7b8ea29dcda069ef2af42a25eb283786',1,'llfio_v2_xxx::statfs_t']]],
-  ['f_5fmntonname_1524',['f_mntonname',['../structllfio__v2__xxx_1_1statfs__t.html#ac7bedb646a6855541633e7bb7232b5e0',1,'llfio_v2_xxx::statfs_t']]],
-  ['f_5fnamemax_1525',['f_namemax',['../structllfio__v2__xxx_1_1statfs__t.html#a2e594db0ff5018223f00ffdcbd4dd771',1,'llfio_v2_xxx::statfs_t']]],
-  ['f_5fowner_1526',['f_owner',['../structllfio__v2__xxx_1_1statfs__t.html#aa8b39815508e9252da673c7e18666cd7',1,'llfio_v2_xxx::statfs_t']]],
-  ['features_1527',['features',['../structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#a1848d129ac849bb80ab572fee3a7f8ae',1,'llfio_v2_xxx::tls_socket_source_implementation_information']]],
-  ['file_5fblocks_1528',['file_blocks',['../structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#a15caca304347aea4271f9ff6df759c69',1,'llfio_v2_xxx::algorithm::traversal_summary']]],
-  ['file_5fhandle_1529',['file_handle',['../structllfio__v2__xxx_1_1byte__io__multiplexer_1_1implementation__information__t_1_1multiplexes__t_1_1kernel__t.html#a485c305b325e31241d01af769ad9f171',1,'llfio_v2_xxx::byte_io_multiplexer::implementation_information_t::multiplexes_t::kernel_t']]],
-  ['filecompression_1530',['filecompression',['../structllfio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#af56d7eae510ec6f76827697d8f2ad7b1',1,'llfio_v2_xxx::statfs_t::f_flags_t']]]
+  ['empty_1548',['empty',['../unionllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t.html#a489e72242ebfef2d1f373889d56b01cc',1,'llfio_v2_xxx::byte_io_multiplexer::_unsynchronised_io_operation_state::payload_t']]],
+  ['exclusive_1549',['exclusive',['../structllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entity__type.html#a7ad77fdbebd5f1ec023e4324797f3716',1,'llfio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type']]],
+  ['extents_1550',['extents',['../structllfio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#a579e9f628436c4f5d90387355dd4ddf2',1,'llfio_v2_xxx::statfs_t::f_flags_t']]]
 ];

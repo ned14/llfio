@@ -217,9 +217,6 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:af6ae214241d075f68c3df8cfb377f135"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#af6ae214241d075f68c3df8cfb377f135">QUICKCPPLIB_BITFIELD_BEGIN_T</a> (flag, uint16_t)</td></tr>
 <tr class="memdesc:af6ae214241d075f68c3df8cfb377f135"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bitwise flags which can be specified.  <a href="classllfio__v2__xxx_1_1handle.html#af6ae214241d075f68c3df8cfb377f135">More...</a><br /></td></tr>
 <tr class="separator:af6ae214241d075f68c3df8cfb377f135"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa7e9bedf8c7a4c4a79a644a6e1857ee4"><td class="memItemLeft" align="right" valign="top"><a id="aa7e9bedf8c7a4c4a79a644a6e1857ee4"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>QUICKCPPLIB_BITFIELD_END</b> (flag)</td></tr>
-<tr class="separator:aa7e9bedf8c7a4c4a79a644a6e1857ee4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4716696b8700953889006251e0678aa4"><td class="memItemLeft" align="right" valign="top"><a id="a4716696b8700953889006251e0678aa4"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a4716696b8700953889006251e0678aa4">swap</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;o) noexcept</td></tr>
 <tr class="memdesc:a4716696b8700953889006251e0678aa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br /></td></tr>
@@ -416,7 +413,7 @@ class llfio_v2_xxx::awaitable_handle&lt; IoHandleType &gt;</h3>
 <div class="fragment"><div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;                     : <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>  <span class="comment">// bit 0 set means safety barriers enabled</span></div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  {</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    unchanged = 0,</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    none =</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">none</a> =</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    1,  <span class="comment">//!&lt; No caching whatsoever, all reads and writes come from storage (i.e. &lt;tt&gt;O_DIRECT|O_SYNC&lt;/tt&gt;). Align all i/o to 4Kb boundaries for this to work. &lt;tt&gt;disable_safety_barriers&lt;/tt&gt; can be used here.</span></div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="comment"></span>    only_metadata =</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    2,  <span class="comment">//!&lt; Cache reads and writes of metadata but avoid caching data (&lt;tt&gt;O_DIRECT&lt;/tt&gt;), thus i/o here does not affect other cached data for other handles. Align all i/o to 4Kb boundaries for this to work.</span></div>
@@ -518,7 +515,7 @@ class llfio_v2_xxx::awaitable_handle&lt; IoHandleType &gt;</h3>
 <div class="fragment"><div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;                  : <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>  <span class="comment">// bit 0 set means writable</span></div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  {</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    unchanged = 0,</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    none = 2,        <span class="comment">//!&lt; No ability to read or write anything, but can synchronise (SYNCHRONIZE or 0)</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">none</a> = 2,        <span class="comment">//!&lt; No ability to read or write anything, but can synchronise (SYNCHRONIZE or 0)</span></div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment"></span>    attr_read = 4,   <span class="comment">//!&lt; Ability to read attributes (FILE_READ_ATTRIBUTES|SYNCHRONIZE or O_RDONLY)</span></div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment"></span>    attr_write = 5,  <span class="comment">//!&lt; Ability to read and write attributes (FILE_READ_ATTRIBUTES|FILE_WRITE_ATTRIBUTES|SYNCHRONIZE or O_RDONLY)</span></div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment"></span>    <a class="code" href="namespacellfio__v2__xxx.html#acbd9eb25fed94bb0bc8fa888b3c26bdf">read</a> = 6,        <span class="comment">//!&lt; Ability to read (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|SYNCHRONISE or O_RDONLY)</span></div>
@@ -645,7 +642,7 @@ class llfio_v2_xxx::awaitable_handle&lt; IoHandleType &gt;</h3>
 <p>&lt; Using insane POSIX byte range locks</p>
 <p>&lt; This is an inode created with no representation on the filing system</p>
 <div class="fragment"><div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;                                              {</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  none = uint16_t(0),  <span class="comment">//!&lt; No flags</span></div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">none</a> = uint16_t(0),  <span class="comment">//!&lt; No flags</span></div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="comment"></span><span class="comment">  /*! Unlinks the file on handle close. On POSIX, this simply unlinks whatever is pointed</span></div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="comment">  to by `path()` upon the call of `close()` if and only if the inode matches. On Windows,</span></div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="comment">  if you are on Windows 10 1709 or later, exactly the same thing occurs. If on previous</span></div>
@@ -783,6 +780,7 @@ class llfio_v2_xxx::awaitable_handle&lt; IoHandleType &gt;</h3>
 </div><!-- doc-content -->
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a59a3e33e0a5f68b867049fd640059b4d"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a59a3e33e0a5f68b867049fd640059b4d">llfio_v2_xxx::write</a></div><div class="ttdeci">byte_io_handle::io_result&lt; byte_io_handle::const_buffers_type &gt; write(byte_io_handle &amp;self, byte_io_handle::io_request&lt; byte_io_handle::const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the open handle.</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:681</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_acbd9eb25fed94bb0bc8fa888b3c26bdf"><div class="ttname"><a href="namespacellfio__v2__xxx.html#acbd9eb25fed94bb0bc8fa888b3c26bdf">llfio_v2_xxx::read</a></div><div class="ttdeci">byte_io_handle::io_result&lt; byte_io_handle::buffers_type &gt; read(byte_io_handle &amp;self, byte_io_handle::io_request&lt; byte_io_handle::buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Read data from the open handle.</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:654</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">llfio_v2_xxx::ip::none</a></div><div class="ttdeci">@ none</div><div class="ttdoc">No flags.</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:224</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

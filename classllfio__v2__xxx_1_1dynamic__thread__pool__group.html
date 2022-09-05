@@ -116,6 +116,17 @@ Public Member Functions</h2></td></tr>
 result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#ac66e72ede37599df150ee8506a92dd66">submit</a> (<a class="el" href="classllfio__v2__xxx_1_1dynamic__thread__pool__group_1_1work__item.html">work_item</a> *wi) noexcept</td></tr>
 <tr class="memdesc:ac66e72ede37599df150ee8506a92dd66"><td class="mdescLeft">&#160;</td><td class="mdescRight">This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. <br /></td></tr>
 <tr class="separator:ac66e72ede37599df150ee8506a92dd66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade1a92a34c5655fc0ebca456c060f133"><td class="memItemLeft" align="right" valign="top"><a id="ade1a92a34c5655fc0ebca456c060f133"></a>
+class std::is_base_of&lt; <a class="el" href="classllfio__v2__xxx_1_1dynamic__thread__pool__group_1_1work__item.html">work_item</a> std::enable_if&lt;(__VA_ARGS__), bool &gt;::type=true T &gt;::value result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>submit</b> (span&lt; T &gt; wi) noexcept</td></tr>
+<tr class="separator:ade1a92a34c5655fc0ebca456c060f133"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abbbcb9428ee9fcb6cdd4a41c793f55db"><td class="memItemLeft" align="right" valign="top"><a id="abbbcb9428ee9fcb6cdd4a41c793f55db"></a>
+virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#abbbcb9428ee9fcb6cdd4a41c793f55db">stop</a> () noexcept=0</td></tr>
+<tr class="memdesc:abbbcb9428ee9fcb6cdd4a41c793f55db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Threadsafe. Cancel any remaining work previously submitted, but without blocking (use <code>wait()</code> to block). <br /></td></tr>
+<tr class="separator:abbbcb9428ee9fcb6cdd4a41c793f55db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e549f8799d24821dbc14c25eee88a9f"><td class="memItemLeft" align="right" valign="top"><a id="a5e549f8799d24821dbc14c25eee88a9f"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#a5e549f8799d24821dbc14c25eee88a9f">stopping</a> () const noexcept=0</td></tr>
+<tr class="memdesc:a5e549f8799d24821dbc14c25eee88a9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Threadsafe. True if a work item reported an error, or <code>stop()</code> was called, but work items are still running. <br /></td></tr>
+<tr class="separator:a5e549f8799d24821dbc14c25eee88a9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1a5a7e9924b9e428e77d4167e716f57c"><td class="memItemLeft" align="right" valign="top"><a id="a1a5a7e9924b9e428e77d4167e716f57c"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#a1a5a7e9924b9e428e77d4167e716f57c">stopped</a> () const noexcept=0</td></tr>
 <tr class="memdesc:a1a5a7e9924b9e428e77d4167e716f57c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Threadsafe. True if all the work previously submitted is complete. <br /></td></tr>
@@ -287,7 +298,7 @@ Linux</h3>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>include/llfio/v2.0/dynamic_thread_pool_group.hpp</li>
+<li>include/llfio/v2.0/<a class="el" href="dynamic__thread__pool__group_8hpp.html">dynamic_thread_pool_group.hpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

@@ -74,7 +74,6 @@ var classllfio__v2__xxx_1_1byte__io__handle =
     [ "operator=", "classllfio__v2__xxx_1_1byte__io__handle.html#ad0fe40402709efc08bad4c66b59e32b2", null ],
     [ "operator=", "classllfio__v2__xxx_1_1byte__io__handle.html#aac9c429cabace2e9761f9ffcaed527c0", null ],
     [ "QUICKCPPLIB_BITFIELD_BEGIN_T", "classllfio__v2__xxx_1_1byte__io__handle.html#af6ae214241d075f68c3df8cfb377f135", null ],
-    [ "QUICKCPPLIB_BITFIELD_END", "classllfio__v2__xxx_1_1byte__io__handle.html#aa7e9bedf8c7a4c4a79a644a6e1857ee4", null ],
     [ "read", "classllfio__v2__xxx_1_1byte__io__handle.html#add4d9cad06933bba45ddb8df5a26077e", null ],
     [ "read", "classllfio__v2__xxx_1_1byte__io__handle.html#aa17020bc615b9a3bc73c66fff8968d11", null ],
     [ "read", "classllfio__v2__xxx_1_1byte__io__handle.html#acbcd4d6f6364f8494104287305ff9d2b", null ],

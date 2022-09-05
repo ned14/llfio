@@ -66,7 +66,6 @@ var classllfio__v2__xxx_1_1handle =
     [ "operator=", "classllfio__v2__xxx_1_1handle.html#ab7a7864db8369f8e62ae81586ef68ef0", null ],
     [ "operator=", "classllfio__v2__xxx_1_1handle.html#a4acd6daf162e10373efedf7fd8528365", null ],
     [ "QUICKCPPLIB_BITFIELD_BEGIN_T", "classllfio__v2__xxx_1_1handle.html#af6ae214241d075f68c3df8cfb377f135", null ],
-    [ "QUICKCPPLIB_BITFIELD_END", "classllfio__v2__xxx_1_1handle.html#aa7e9bedf8c7a4c4a79a644a6e1857ee4", null ],
     [ "release", "classllfio__v2__xxx_1_1handle.html#a1d273e38c061eb11f5012f624e9a202e", null ],
     [ "requires_aligned_io", "classllfio__v2__xxx_1_1handle.html#a751e912d8dab755ea969a418c1d544eb", null ],
     [ "set_append_only", "classllfio__v2__xxx_1_1handle.html#a101620e9fff0c0e8c346af0e9de58b6a", null ],

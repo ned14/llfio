@@ -34,8 +34,13 @@ var structllfio__v2__xxx_1_1native__handle__type =
     [ "operator=", "structllfio__v2__xxx_1_1native__handle__type.html#ac0c95863560b730e724ca0f158564415", null ],
     [ "operator==", "structllfio__v2__xxx_1_1native__handle__type.html#a4cbeaf944ae68ff5811bd35b49767e73", null ],
     [ "QUICKCPPLIB_BITFIELD_BEGIN_T", "structllfio__v2__xxx_1_1native__handle__type.html#af655df8dbeb9695f939cfdb7c51c867a", null ],
-    [ "QUICKCPPLIB_BITFIELD_END", "structllfio__v2__xxx_1_1native__handle__type.html#aefed8c6f2ff66097dc7cb88b6f439db6", null ],
     [ "requires_aligned_io", "structllfio__v2__xxx_1_1native__handle__type.html#a45431e8a673c8a7d204136cd2ae612ed", null ],
     [ "swap", "structllfio__v2__xxx_1_1native__handle__type.html#abc96c9f96b0bf877af2cd9092bd3255e", null ],
-    [ "behaviour", "structllfio__v2__xxx_1_1native__handle__type.html#a967ace482f3fe7fd3c6e24bffee25888", null ]
+    [ "_init", "structllfio__v2__xxx_1_1native__handle__type.html#a4b4b6662c7efc8b95937a60cf6285d3a", null ],
+    [ "behaviour", "structllfio__v2__xxx_1_1native__handle__type.html#a967ace482f3fe7fd3c6e24bffee25888", null ],
+    [ "fd", "structllfio__v2__xxx_1_1native__handle__type.html#a6d63f413705982a84f4140640e4340af", null ],
+    [ "h", "structllfio__v2__xxx_1_1native__handle__type.html#afbc6866f3f80808fbe3ca903d15b5481", null ],
+    [ "pid", "structllfio__v2__xxx_1_1native__handle__type.html#a8a38d56b1a9a3ee70799df3dac04edfc", null ],
+    [ "ptr", "structllfio__v2__xxx_1_1native__handle__type.html#ac7c3afa0b56f7ebd6a0eddfcb2939742", null ],
+    [ "sock", "structllfio__v2__xxx_1_1native__handle__type.html#a3422bc1b2bc540ad3fc51dc479a37d40", null ]
 ];

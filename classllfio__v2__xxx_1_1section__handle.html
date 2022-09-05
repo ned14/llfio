@@ -109,6 +109,30 @@ Inheritance diagram for llfio_v2_xxx::section_handle:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
+<tr class="memitem:a5a4e0afe59d0eeb5683fb50d3d3ad549"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549">bitfield__flag</a> : unsigned { <br />
+&#160;&#160;<a class="el" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549aaa630970737cad05cddc88036a638d44">none</a> = 0U, 
+<a class="el" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a63bd03aae67c348121ac0bf88161d90f">read</a> = 1U &lt;&lt; 0U, 
+<a class="el" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549ab61620219a89d4c133c6c6f4b781a9ba">write</a> = 1U &lt;&lt; 1U, 
+<a class="el" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549ac57346933aada59cff3ee2296cc70332">cow</a> = 1U &lt;&lt; 2U, 
+<br />
+&#160;&#160;<a class="el" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a631fef30d1e40f9d7ce6fa3a0ad4fa9d">execute</a> = 1U &lt;&lt; 3U, 
+<a class="el" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a979d3bc3dccd10f67de00b228a12822f">nocommit</a> = 1U &lt;&lt; 8U, 
+<a class="el" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a1e91d093711d9d800b8ddc2f6e5d1ca2">prefault</a> = 1U &lt;&lt; 9U, 
+<a class="el" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549afde37a72636d74e28ce3553154341756">executable</a> = 1U &lt;&lt; 10U, 
+<br />
+&#160;&#160;<a class="el" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a41771be4e90788c06cc49f2d35538108">singleton</a> = 1U &lt;&lt; 11U, 
+<a class="el" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a06b41188d84f0fee5cff37c71b3d5877">barrier_on_close</a>, 
+<a class="el" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a2087205d797bb4de249c85cc8b87afc5">nvram</a> = 1U &lt;&lt; 17U, 
+<a class="el" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a43d3a52abad5e5c5e66c93ad1d684066">write_via_syscall</a>, 
+<br />
+&#160;&#160;<a class="el" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a8d15253a30787fff812c9f254e26baf1">page_sizes_1</a> = 1U &lt;&lt; 24U, 
+<a class="el" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549aa3a2b1b4beaa0a8f0e2658cb321f7c46">page_sizes_2</a> = 2U &lt;&lt; 24U, 
+<a class="el" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a0a225b6b1594a5540799b4c58c937522">page_sizes_3</a> = 3U &lt;&lt; 24U, 
+<b>readwrite</b> = (read | write)
+<br />
+ }</td></tr>
+<tr class="memdesc:a5a4e0afe59d0eeb5683fb50d3d3ad549"><td class="mdescLeft">&#160;</td><td class="mdescRight">The behaviour of the memory section.  <a href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549">More...</a><br /></td></tr>
+<tr class="separator:a5a4e0afe59d0eeb5683fb50d3d3ad549"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a91a4e4110fe6ed6358de00de3ae934d1"><td class="memItemLeft" align="right" valign="top"><a id="a91a4e4110fe6ed6358de00de3ae934d1"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>extent_type</b> = <a class="el" href="classllfio__v2__xxx_1_1handle.html#a4ee58f1b6a24af5e64d850d1e3eed07f">handle::extent_type</a></td></tr>
 <tr class="separator:a91a4e4110fe6ed6358de00de3ae934d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -160,12 +184,6 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a5405985448afbfe281cbf98ab7bbb3ab"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1section__handle.html#a5405985448afbfe281cbf98ab7bbb3ab">QUICKCPPLIB_BITFIELD_BEGIN</a> (flag)</td></tr>
-<tr class="memdesc:a5405985448afbfe281cbf98ab7bbb3ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">The behaviour of the memory section.  <a href="classllfio__v2__xxx_1_1section__handle.html#a5405985448afbfe281cbf98ab7bbb3ab">More...</a><br /></td></tr>
-<tr class="separator:a5405985448afbfe281cbf98ab7bbb3ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad057ca569878e127389457e80e0f393d"><td class="memItemLeft" align="right" valign="top"><a id="ad057ca569878e127389457e80e0f393d"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>QUICKCPPLIB_BITFIELD_END</b> (flag)</td></tr>
-<tr class="separator:ad057ca569878e127389457e80e0f393d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a967031835185e5ba872a4e584d51c40d"><td class="memItemLeft" align="right" valign="top"><a id="a967031835185e5ba872a4e584d51c40d"></a>
 virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1section__handle.html#a967031835185e5ba872a4e584d51c40d">close</a> () noexcept override</td></tr>
 <tr class="memdesc:a967031835185e5ba872a4e584d51c40d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Immediately close the native handle type managed by this handle. <br /></td></tr>
@@ -407,6 +425,80 @@ union {</td></tr>
 <p>There are two configurations of section handle, one where the user supplies the file backing for the section, and the other where an internal file descriptor to an unnamed inode in a tmpfs or ramfs based temporary directory is kept and managed. The latter is merely a convenience for creating an anonymous source of memory which can be resized whilst preserving contents: see <code>algorithm::trivial_vector&lt;T&gt;</code>.</p>
 <p>On Windows the native handle of this handle is that of the NT kernel section object. On POSIX it is a cloned file descriptor of the backing storage if there is backing storage, else it will be the aforementioned file descriptor to an unnamed inode. </p>
 </div><h2 class="groupheader">Member Enumeration Documentation</h2>
+<a id="a5a4e0afe59d0eeb5683fb50d3d3ad549"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a4e0afe59d0eeb5683fb50d3d3ad549">&#9670;&nbsp;</a></span>bitfield__flag</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549">llfio_v2_xxx::section_handle::bitfield__flag</a> : unsigned</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The behaviour of the memory section. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a5a4e0afe59d0eeb5683fb50d3d3ad549aaa630970737cad05cddc88036a638d44"></a>none&#160;</td><td class="fielddoc"><p>No flags. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a5a4e0afe59d0eeb5683fb50d3d3ad549a63bd03aae67c348121ac0bf88161d90f"></a>read&#160;</td><td class="fielddoc"><p>Memory views can be read. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a5a4e0afe59d0eeb5683fb50d3d3ad549ab61620219a89d4c133c6c6f4b781a9ba"></a>write&#160;</td><td class="fielddoc"><p>Memory views can be written. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a5a4e0afe59d0eeb5683fb50d3d3ad549ac57346933aada59cff3ee2296cc70332"></a>cow&#160;</td><td class="fielddoc"><p>Memory views can be copy on written. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a5a4e0afe59d0eeb5683fb50d3d3ad549a631fef30d1e40f9d7ce6fa3a0ad4fa9d"></a>execute&#160;</td><td class="fielddoc"><p>Memory views can execute code. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a5a4e0afe59d0eeb5683fb50d3d3ad549a979d3bc3dccd10f67de00b228a12822f"></a>nocommit&#160;</td><td class="fielddoc"><p>Don't allocate space for this memory in the system immediately. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a5a4e0afe59d0eeb5683fb50d3d3ad549a1e91d093711d9d800b8ddc2f6e5d1ca2"></a>prefault&#160;</td><td class="fielddoc"><p>Prefault, as if by reading every page, any views of memory upon creation. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a5a4e0afe59d0eeb5683fb50d3d3ad549afde37a72636d74e28ce3553154341756"></a>executable&#160;</td><td class="fielddoc"><p>The backing storage is in fact an executable program binary. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a5a4e0afe59d0eeb5683fb50d3d3ad549a41771be4e90788c06cc49f2d35538108"></a>singleton&#160;</td><td class="fielddoc"><p>A single instance of this section is to be shared by all processes using the same backing file. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a5a4e0afe59d0eeb5683fb50d3d3ad549a06b41188d84f0fee5cff37c71b3d5877"></a>barrier_on_close&#160;</td><td class="fielddoc"><p>Maps of this section, if writable, issue a <code>barrier()</code> when destructed blocking until data (not metadata) reaches physical storage. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a5a4e0afe59d0eeb5683fb50d3d3ad549a2087205d797bb4de249c85cc8b87afc5"></a>nvram&#160;</td><td class="fielddoc"><p>This section is of non-volatile RAM. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a5a4e0afe59d0eeb5683fb50d3d3ad549a43d3a52abad5e5c5e66c93ad1d684066"></a>write_via_syscall&#160;</td><td class="fielddoc"><p>For file backed maps, <code>map_handle::write()</code> is implemented as a <code>write()</code> syscall to the file descriptor. This causes the map to be mapped read-only. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a5a4e0afe59d0eeb5683fb50d3d3ad549a8d15253a30787fff812c9f254e26baf1"></a>page_sizes_1&#160;</td><td class="fielddoc"><p>Use <code>utils::page_sizes()[1]</code> sized pages, or fail. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a5a4e0afe59d0eeb5683fb50d3d3ad549aa3a2b1b4beaa0a8f0e2658cb321f7c46"></a>page_sizes_2&#160;</td><td class="fielddoc"><p>Use <code>utils::page_sizes()[2]</code> sized pages, or fail. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a5a4e0afe59d0eeb5683fb50d3d3ad549a0a225b6b1594a5540799b4c58c937522"></a>page_sizes_3&#160;</td><td class="fielddoc"><p>Use <code>utils::page_sizes()[3]</code> sized pages, or fail. </p>
+</td></tr>
+</table>
+<div class="fragment"><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;                                  {</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <a class="code" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549aaa630970737cad05cddc88036a638d44">none</a> = 0U,           <span class="comment">//!&lt; No flags</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="comment"></span>  <a class="code" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a63bd03aae67c348121ac0bf88161d90f">read</a> = 1U &lt;&lt; 0U,     <span class="comment">//!&lt; Memory views can be read</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="comment"></span>  <a class="code" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549ab61620219a89d4c133c6c6f4b781a9ba">write</a> = 1U &lt;&lt; 1U,    <span class="comment">//!&lt; Memory views can be written</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="comment"></span>  <a class="code" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549ac57346933aada59cff3ee2296cc70332">cow</a> = 1U &lt;&lt; 2U,      <span class="comment">//!&lt; Memory views can be copy on written</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="comment"></span>  <a class="code" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a631fef30d1e40f9d7ce6fa3a0ad4fa9d">execute</a> = 1U &lt;&lt; 3U,  <span class="comment">//!&lt; Memory views can execute code</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  <a class="code" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a979d3bc3dccd10f67de00b228a12822f">nocommit</a> = 1U &lt;&lt; 8U,     <span class="comment">//!&lt; Don&#39;t allocate space for this memory in the system immediately</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="comment"></span>  <a class="code" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a1e91d093711d9d800b8ddc2f6e5d1ca2">prefault</a> = 1U &lt;&lt; 9U,     <span class="comment">//!&lt; Prefault, as if by reading every page, any views of memory upon creation.</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment"></span>  <a class="code" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549afde37a72636d74e28ce3553154341756">executable</a> = 1U &lt;&lt; 10U,  <span class="comment">//!&lt; The backing storage is in fact an executable program binary.</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="comment"></span>  <a class="code" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a41771be4e90788c06cc49f2d35538108">singleton</a> = 1U &lt;&lt; 11U,   <span class="comment">//!&lt; A single instance of this section is to be shared by all processes using the same backing file.</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  <a class="code" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a06b41188d84f0fee5cff37c71b3d5877">barrier_on_close</a> =</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  1U &lt;&lt; 16U,          <span class="comment">//!&lt; Maps of this section, if writable, issue a `barrier()` when destructed blocking until data (not metadata) reaches physical storage.</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment"></span>  <a class="code" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a2087205d797bb4de249c85cc8b87afc5">nvram</a> = 1U &lt;&lt; 17U,  <span class="comment">//!&lt; This section is of non-volatile RAM.</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment"></span>  <a class="code" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a43d3a52abad5e5c5e66c93ad1d684066">write_via_syscall</a> =</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  1U</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  &lt;&lt; 18U,  <span class="comment">//!&lt; For file backed maps, `map_handle::write()` is implemented as a `write()` syscall to the file descriptor. This causes the map to be mapped read-only.</span></div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <a class="code" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a8d15253a30787fff812c9f254e26baf1">page_sizes_1</a> = 1U &lt;&lt; 24U,  <span class="comment">//!&lt; Use `utils::page_sizes()[1]` sized pages, or fail.</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="comment"></span>  <a class="code" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549aa3a2b1b4beaa0a8f0e2658cb321f7c46">page_sizes_2</a> = 2U &lt;&lt; 24U,  <span class="comment">//!&lt; Use `utils::page_sizes()[2]` sized pages, or fail.</span></div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="comment"></span>  <a class="code" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a0a225b6b1594a5540799b4c58c937522">page_sizes_3</a> = 3U &lt;&lt; 24U,  <span class="comment">//!&lt; Use `utils::page_sizes()[3]` sized pages, or fail.</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  readwrite = (<a class="code" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a63bd03aae67c348121ac0bf88161d90f">read</a> | <a class="code" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549ab61620219a89d4c133c6c6f4b781a9ba">write</a>)};</div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="aecd3a7db6cee3aec07d32fe6f99e6852"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aecd3a7db6cee3aec07d32fe6f99e6852">&#9670;&nbsp;</a></span>caching</h2>
 
@@ -447,7 +539,7 @@ union {</td></tr>
 <div class="fragment"><div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;                     : <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>  <span class="comment">// bit 0 set means safety barriers enabled</span></div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  {</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    unchanged = 0,</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    none =</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">none</a> =</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    1,  <span class="comment">//!&lt; No caching whatsoever, all reads and writes come from storage (i.e. &lt;tt&gt;O_DIRECT|O_SYNC&lt;/tt&gt;). Align all i/o to 4Kb boundaries for this to work. &lt;tt&gt;disable_safety_barriers&lt;/tt&gt; can be used here.</span></div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="comment"></span>    only_metadata =</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    2,  <span class="comment">//!&lt; Cache reads and writes of metadata but avoid caching data (&lt;tt&gt;O_DIRECT&lt;/tt&gt;), thus i/o here does not affect other cached data for other handles. Align all i/o to 4Kb boundaries for this to work.</span></div>
@@ -549,7 +641,7 @@ union {</td></tr>
 <div class="fragment"><div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;                  : <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>  <span class="comment">// bit 0 set means writable</span></div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  {</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    unchanged = 0,</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    none = 2,        <span class="comment">//!&lt; No ability to read or write anything, but can synchronise (SYNCHRONIZE or 0)</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">none</a> = 2,        <span class="comment">//!&lt; No ability to read or write anything, but can synchronise (SYNCHRONIZE or 0)</span></div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment"></span>    attr_read = 4,   <span class="comment">//!&lt; Ability to read attributes (FILE_READ_ATTRIBUTES|SYNCHRONIZE or O_RDONLY)</span></div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment"></span>    attr_write = 5,  <span class="comment">//!&lt; Ability to read and write attributes (FILE_READ_ATTRIBUTES|FILE_WRITE_ATTRIBUTES|SYNCHRONIZE or O_RDONLY)</span></div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment"></span>    <a class="code" href="namespacellfio__v2__xxx.html#acbd9eb25fed94bb0bc8fa888b3c26bdf">read</a> = 6,        <span class="comment">//!&lt; Ability to read (READ_CONTROL|FILE_READ_DATA|FILE_READ_ATTRIBUTES|FILE_READ_EA|SYNCHRONISE or O_RDONLY)</span></div>
@@ -623,75 +715,6 @@ union {</td></tr>
 
 </div>
 </div>
-<a id="a5405985448afbfe281cbf98ab7bbb3ab"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5405985448afbfe281cbf98ab7bbb3ab">&#9670;&nbsp;</a></span>QUICKCPPLIB_BITFIELD_BEGIN()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">llfio_v2_xxx::section_handle::QUICKCPPLIB_BITFIELD_BEGIN </td>
-          <td>(</td>
-          <td class="paramtype">flag&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>The behaviour of the memory section. </p>
-<p>&lt; No flags</p>
-<p>&lt; Memory views can be read</p>
-<p>&lt; Memory views can be written</p>
-<p>&lt; Memory views can be copy on written</p>
-<p>&lt; Memory views can execute code</p>
-<p>&lt; Don't allocate space for this memory in the system immediately</p>
-<p>&lt; Prefault, as if by reading every page, any views of memory upon creation.</p>
-<p>&lt; The backing storage is in fact an executable program binary.</p>
-<p>&lt; A single instance of this section is to be shared by all processes using the same backing file.</p>
-<p>&lt; Maps of this section, if writable, issue a <code>barrier()</code> when destructed blocking until data (not metadata) reaches physical storage.</p>
-<p>&lt; This section is of non-volatile RAM.</p>
-<p>&lt; For file backed maps, <code>map_handle::write()</code> is implemented as a <code>write()</code> syscall to the file descriptor. This causes the map to be mapped read-only.</p>
-<p>&lt; Use <code>utils::page_sizes()[1]</code> sized pages, or fail.</p>
-<p>&lt; Use <code>utils::page_sizes()[2]</code> sized pages, or fail.</p>
-<p>&lt; Use <code>utils::page_sizes()[3]</code> sized pages, or fail.</p>
-<div class="fragment"><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;                                  {</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  none = 0U,           <span class="comment">//!&lt; No flags</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="comment"></span>  <a class="code" href="namespacellfio__v2__xxx.html#acbd9eb25fed94bb0bc8fa888b3c26bdf">read</a> = 1U &lt;&lt; 0U,     <span class="comment">//!&lt; Memory views can be read</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="comment"></span>  <a class="code" href="namespacellfio__v2__xxx.html#a59a3e33e0a5f68b867049fd640059b4d">write</a> = 1U &lt;&lt; 1U,    <span class="comment">//!&lt; Memory views can be written</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="comment"></span>  cow = 1U &lt;&lt; 2U,      <span class="comment">//!&lt; Memory views can be copy on written</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="comment"></span>  execute = 1U &lt;&lt; 3U,  <span class="comment">//!&lt; Memory views can execute code</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  nocommit = 1U &lt;&lt; 8U,     <span class="comment">//!&lt; Don&#39;t allocate space for this memory in the system immediately</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="comment"></span>  prefault = 1U &lt;&lt; 9U,     <span class="comment">//!&lt; Prefault, as if by reading every page, any views of memory upon creation.</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment"></span>  executable = 1U &lt;&lt; 10U,  <span class="comment">//!&lt; The backing storage is in fact an executable program binary.</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="comment"></span>  singleton = 1U &lt;&lt; 11U,   <span class="comment">//!&lt; A single instance of this section is to be shared by all processes using the same backing file.</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  barrier_on_close =</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  1U &lt;&lt; 16U,          <span class="comment">//!&lt; Maps of this section, if writable, issue a `barrier()` when destructed blocking until data (not metadata) reaches physical storage.</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment"></span>  nvram = 1U &lt;&lt; 17U,  <span class="comment">//!&lt; This section is of non-volatile RAM.</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment"></span>  write_via_syscall =</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  1U</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  &lt;&lt; 18U,  <span class="comment">//!&lt; For file backed maps, `map_handle::write()` is implemented as a `write()` syscall to the file descriptor. This causes the map to be mapped read-only.</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  page_sizes_1 = 1U &lt;&lt; 24U,  <span class="comment">//!&lt; Use `utils::page_sizes()[1]` sized pages, or fail.</span></div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="comment"></span>  page_sizes_2 = 2U &lt;&lt; 24U,  <span class="comment">//!&lt; Use `utils::page_sizes()[2]` sized pages, or fail.</span></div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="comment"></span>  page_sizes_3 = 3U &lt;&lt; 24U,  <span class="comment">//!&lt; Use `utils::page_sizes()[3]` sized pages, or fail.</span></div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  readwrite = (<a class="code" href="namespacellfio__v2__xxx.html#acbd9eb25fed94bb0bc8fa888b3c26bdf">read</a> | <a class="code" href="namespacellfio__v2__xxx.html#a59a3e33e0a5f68b867049fd640059b4d">write</a>)};</div>
-</div><!-- fragment -->
-</div>
-</div>
 <a id="af6ae214241d075f68c3df8cfb377f135"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af6ae214241d075f68c3df8cfb377f135">&#9670;&nbsp;</a></span>QUICKCPPLIB_BITFIELD_BEGIN_T()</h2>
 
@@ -745,7 +768,7 @@ union {</td></tr>
 <p>&lt; Using insane POSIX byte range locks</p>
 <p>&lt; This is an inode created with no representation on the filing system</p>
 <div class="fragment"><div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;                                              {</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  none = uint16_t(0),  <span class="comment">//!&lt; No flags</span></div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">none</a> = uint16_t(0),  <span class="comment">//!&lt; No flags</span></div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="comment"></span><span class="comment">  /*! Unlinks the file on handle close. On POSIX, this simply unlinks whatever is pointed</span></div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="comment">  to by `path()` upon the call of `close()` if and only if the inode matches. On Windows,</span></div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="comment">  if you are on Windows 10 1709 or later, exactly the same thing occurs. If on previous</span></div>
@@ -1070,11 +1093,27 @@ union {</td></tr>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
+<div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a5a4e0afe59d0eeb5683fb50d3d3ad549a631fef30d1e40f9d7ce6fa3a0ad4fa9d"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a631fef30d1e40f9d7ce6fa3a0ad4fa9d">llfio_v2_xxx::section_handle::execute</a></div><div class="ttdeci">@ execute</div><div class="ttdoc">Memory views can execute code.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:63</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a5a4e0afe59d0eeb5683fb50d3d3ad549a63bd03aae67c348121ac0bf88161d90f"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a63bd03aae67c348121ac0bf88161d90f">llfio_v2_xxx::section_handle::read</a></div><div class="ttdeci">@ read</div><div class="ttdoc">Memory views can be read.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:60</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a00db3d1bbffbdb4237401568c441da21"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a00db3d1bbffbdb4237401568c441da21">llfio_v2_xxx::section_handle::section</a></div><div class="ttdeci">static result&lt; section_handle &gt; section(file_handle &amp;backing, extent_type maximum_size, flag _flag) noexcept</div><div class="ttdoc">Create a memory section backed by a file.</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a5a4e0afe59d0eeb5683fb50d3d3ad549a1e91d093711d9d800b8ddc2f6e5d1ca2"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a1e91d093711d9d800b8ddc2f6e5d1ca2">llfio_v2_xxx::section_handle::prefault</a></div><div class="ttdeci">@ prefault</div><div class="ttdoc">Prefault, as if by reading every page, any views of memory upon creation.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:66</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a5a4e0afe59d0eeb5683fb50d3d3ad549afde37a72636d74e28ce3553154341756"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549afde37a72636d74e28ce3553154341756">llfio_v2_xxx::section_handle::executable</a></div><div class="ttdeci">@ executable</div><div class="ttdoc">The backing storage is in fact an executable program binary.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:67</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a59a3e33e0a5f68b867049fd640059b4d"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a59a3e33e0a5f68b867049fd640059b4d">llfio_v2_xxx::write</a></div><div class="ttdeci">byte_io_handle::io_result&lt; byte_io_handle::const_buffers_type &gt; write(byte_io_handle &amp;self, byte_io_handle::io_request&lt; byte_io_handle::const_buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Write data to the open handle.</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:681</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a5a4e0afe59d0eeb5683fb50d3d3ad549a06b41188d84f0fee5cff37c71b3d5877"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a06b41188d84f0fee5cff37c71b3d5877">llfio_v2_xxx::section_handle::barrier_on_close</a></div><div class="ttdeci">@ barrier_on_close</div><div class="ttdoc">Maps of this section, if writable, issue a barrier() when destructed blocking until data (not metadat...</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:70</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_acbd9eb25fed94bb0bc8fa888b3c26bdf"><div class="ttname"><a href="namespacellfio__v2__xxx.html#acbd9eb25fed94bb0bc8fa888b3c26bdf">llfio_v2_xxx::read</a></div><div class="ttdeci">byte_io_handle::io_result&lt; byte_io_handle::buffers_type &gt; read(byte_io_handle &amp;self, byte_io_handle::io_request&lt; byte_io_handle::buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Read data from the open handle.</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:654</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_a211fee447a47bdeb5424a2a5ae1de852"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a211fee447a47bdeb5424a2a5ae1de852">llfio_v2_xxx::handle::is_writable</a></div><div class="ttdeci">bool is_writable() const noexcept</div><div class="ttdoc">True if the handle is writable.</div><div class="ttdef"><b>Definition:</b> handle.hpp:328</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a5a4e0afe59d0eeb5683fb50d3d3ad549aaa630970737cad05cddc88036a638d44"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549aaa630970737cad05cddc88036a638d44">llfio_v2_xxx::section_handle::none</a></div><div class="ttdeci">@ none</div><div class="ttdoc">No flags.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:59</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a5a4e0afe59d0eeb5683fb50d3d3ad549a41771be4e90788c06cc49f2d35538108"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a41771be4e90788c06cc49f2d35538108">llfio_v2_xxx::section_handle::singleton</a></div><div class="ttdeci">@ singleton</div><div class="ttdoc">A single instance of this section is to be shared by all processes using the same backing file.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:68</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a5a4e0afe59d0eeb5683fb50d3d3ad549a8d15253a30787fff812c9f254e26baf1"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a8d15253a30787fff812c9f254e26baf1">llfio_v2_xxx::section_handle::page_sizes_1</a></div><div class="ttdeci">@ page_sizes_1</div><div class="ttdoc">Use utils::page_sizes()[1] sized pages, or fail.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:77</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a5a4e0afe59d0eeb5683fb50d3d3ad549ab61620219a89d4c133c6c6f4b781a9ba"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549ab61620219a89d4c133c6c6f4b781a9ba">llfio_v2_xxx::section_handle::write</a></div><div class="ttdeci">@ write</div><div class="ttdoc">Memory views can be written.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:61</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">llfio_v2_xxx::ip::none</a></div><div class="ttdeci">@ none</div><div class="ttdoc">No flags.</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:224</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a5a4e0afe59d0eeb5683fb50d3d3ad549a979d3bc3dccd10f67de00b228a12822f"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a979d3bc3dccd10f67de00b228a12822f">llfio_v2_xxx::section_handle::nocommit</a></div><div class="ttdeci">@ nocommit</div><div class="ttdoc">Don't allocate space for this memory in the system immediately.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:65</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a5a4e0afe59d0eeb5683fb50d3d3ad549aa3a2b1b4beaa0a8f0e2658cb321f7c46"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549aa3a2b1b4beaa0a8f0e2658cb321f7c46">llfio_v2_xxx::section_handle::page_sizes_2</a></div><div class="ttdeci">@ page_sizes_2</div><div class="ttdoc">Use utils::page_sizes()[2] sized pages, or fail.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:78</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a5a4e0afe59d0eeb5683fb50d3d3ad549a2087205d797bb4de249c85cc8b87afc5"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a2087205d797bb4de249c85cc8b87afc5">llfio_v2_xxx::section_handle::nvram</a></div><div class="ttdeci">@ nvram</div><div class="ttdoc">This section is of non-volatile RAM.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:72</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a680320bd539378d99870d9b2cdedb9c8"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a680320bd539378d99870d9b2cdedb9c8">llfio_v2_xxx::section_handle::backing</a></div><div class="ttdeci">file_handle * backing() const noexcept</div><div class="ttdoc">Returns the borrowed handle backing this section, if any.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:182</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a5a4e0afe59d0eeb5683fb50d3d3ad549a0a225b6b1594a5540799b4c58c937522"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a0a225b6b1594a5540799b4c58c937522">llfio_v2_xxx::section_handle::page_sizes_3</a></div><div class="ttdeci">@ page_sizes_3</div><div class="ttdoc">Use utils::page_sizes()[3] sized pages, or fail.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:79</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a5a4e0afe59d0eeb5683fb50d3d3ad549a43d3a52abad5e5c5e66c93ad1d684066"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a43d3a52abad5e5c5e66c93ad1d684066">llfio_v2_xxx::section_handle::write_via_syscall</a></div><div class="ttdeci">@ write_via_syscall</div><div class="ttdoc">For file backed maps, map_handle::write() is implemented as a write() syscall to the file descriptor....</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:73</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a5a4e0afe59d0eeb5683fb50d3d3ad549ac57346933aada59cff3ee2296cc70332"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549ac57346933aada59cff3ee2296cc70332">llfio_v2_xxx::section_handle::cow</a></div><div class="ttdeci">@ cow</div><div class="ttdoc">Memory views can be copy on written.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:62</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_ab993693c98cdb52e2d611f8f9e24e4e2"><div class="ttname"><a href="namespacellfio__v2__xxx.html#ab993693c98cdb52e2d611f8f9e24e4e2">llfio_v2_xxx::read</a></div><div class="ttdeci">map_handle::io_result&lt; map_handle::buffers_type &gt; read(map_handle &amp;self, map_handle::io_request&lt; map_handle::buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Read data from the mapped view.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:1176</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

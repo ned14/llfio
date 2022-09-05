@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['want_1610',['want',['../structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#a0a99a9a1846577f6925479671480bd28',1,'llfio_v2_xxx::algorithm::traversal_summary']]],
-  ['writes_1611',['writes',['../structllfio__v2__xxx_1_1dynamic__thread__pool__group_1_1io__aware__work__item_1_1byte__io__handle__awareness.html#a031271e11144276936c63507dd6ef8a7',1,'llfio_v2_xxx::dynamic_thread_pool_group::io_aware_work_item::byte_io_handle_awareness']]]
+  ['value_1652',['value',['../structllfio__v2__xxx_1_1storage__profile_1_1item.html#a73583a38b2eac0522a71353b096f594b',1,'llfio_v2_xxx::storage_profile::item::value()'],['../structllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entity__type.html#a2ad515aaa41bfda6ade62bd7257330f6',1,'llfio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type::value()']]],
+  ['version_1653',['version',['../structllfio__v2__xxx_1_1byte__io__multiplexer_1_1implementation__information__t.html#ad8124d1a32ee399d607aadc55cb4da16',1,'llfio_v2_xxx::byte_io_multiplexer::implementation_information_t::version()'],['../structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#a4eafe5e13d3e540948c65d5e26413ce3',1,'llfio_v2_xxx::tls_socket_source_implementation_information::version()']]],
+  ['visitor_1654',['visitor',['../structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__operation__state.html#aab42664c6e3a4eee2298b5d1cae48f8b',1,'llfio_v2_xxx::byte_io_multiplexer::io_operation_state']]]
 ];

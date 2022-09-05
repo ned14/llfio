@@ -104,12 +104,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a876db6e58143e730afd0706226f39d6c"><td class="memItemLeft" align="right" valign="top"><a id="a876db6e58143e730afd0706226f39d6c"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (std::ostream &amp;s, const <a class="el" href="structllfio__v2__xxx_1_1path__discovery_1_1discovered__path.html#ae02f172851c050f6a7f5929410428c7d">discovered_path::source_type</a> &amp;v)</td></tr>
 <tr class="separator:a876db6e58143e730afd0706226f39d6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada0466e529e851d2d58ce87e0e28f4f2"><td class="memItemLeft" align="right" valign="top">span&lt; <a class="el" href="structllfio__v2__xxx_1_1path__discovery_1_1discovered__path.html">discovered_path</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1path__discovery.html#ada0466e529e851d2d58ce87e0e28f4f2">all_temporary_directories</a> (bool refresh=false) noexcept</td></tr>
-<tr class="memdesc:ada0466e529e851d2d58ce87e0e28f4f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list of potential directories which might be usuable for temporary files.  <a href="namespacellfio__v2__xxx_1_1path__discovery.html#ada0466e529e851d2d58ce87e0e28f4f2">More...</a><br /></td></tr>
-<tr class="separator:ada0466e529e851d2d58ce87e0e28f4f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab3c4aaa0c413e4989461ab6551058583"><td class="memItemLeft" align="right" valign="top">span&lt; <a class="el" href="structllfio__v2__xxx_1_1path__discovery_1_1discovered__path.html">discovered_path</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1path__discovery.html#ab3c4aaa0c413e4989461ab6551058583">verified_temporary_directories</a> () noexcept</td></tr>
-<tr class="memdesc:ab3c4aaa0c413e4989461ab6551058583"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a subset of <code>all_temporary_directories()</code> each of which has been tested to be writable by the current process. No testing is done of available writable space.  <a href="namespacellfio__v2__xxx_1_1path__discovery.html#ab3c4aaa0c413e4989461ab6551058583">More...</a><br /></td></tr>
-<tr class="separator:ab3c4aaa0c413e4989461ab6551058583"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6589b5c0e747dbbfec5fe83e3adf2233"><td class="memItemLeft" align="right" valign="top">span&lt; <a class="el" href="structllfio__v2__xxx_1_1path__discovery_1_1discovered__path.html">discovered_path</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1path__discovery.html#a6589b5c0e747dbbfec5fe83e3adf2233">all_temporary_directories</a> (bool refresh=false, span&lt; path_view &gt; fallbacks={}, span&lt; path_view &gt; overrides={}) noexcept</td></tr>
+<tr class="memdesc:a6589b5c0e747dbbfec5fe83e3adf2233"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list of potential directories which might be usuable for temporary files.  <a href="namespacellfio__v2__xxx_1_1path__discovery.html#a6589b5c0e747dbbfec5fe83e3adf2233">More...</a><br /></td></tr>
+<tr class="separator:a6589b5c0e747dbbfec5fe83e3adf2233"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad8472261ed3a5a59f86253c162b00b90"><td class="memItemLeft" align="right" valign="top">span&lt; <a class="el" href="structllfio__v2__xxx_1_1path__discovery_1_1discovered__path.html">discovered_path</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1path__discovery.html#ad8472261ed3a5a59f86253c162b00b90">verified_temporary_directories</a> (const char *_storage_backed_regex=storage_backed_regex, const char *_memory_backed_regex=memory_backed_regex) noexcept</td></tr>
+<tr class="memdesc:ad8472261ed3a5a59f86253c162b00b90"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a subset of <code>all_temporary_directories()</code> each of which has been tested to be writable by the current process. No testing is done of available writable space.  <a href="namespacellfio__v2__xxx_1_1path__discovery.html#ad8472261ed3a5a59f86253c162b00b90">More...</a><br /></td></tr>
+<tr class="separator:ad8472261ed3a5a59f86253c162b00b90"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2dd74ea752f3f511d58ccccdcac7f4fd"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1path__discovery.html#a2dd74ea752f3f511d58ccccdcac7f4fd">storage_backed_temporary_files_directory</a> () noexcept</td></tr>
 <tr class="memdesc:a2dd74ea752f3f511d58ccccdcac7f4fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to an open handle to a verified temporary directory where files created are stored in a filesystem directory, usually under the current user's quota.  <a href="namespacellfio__v2__xxx_1_1path__discovery.html#a2dd74ea752f3f511d58ccccdcac7f4fd">More...</a><br /></td></tr>
 <tr class="separator:a2dd74ea752f3f511d58ccccdcac7f4fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -123,8 +123,8 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Contains functions used to discover suitable paths for things. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="ada0466e529e851d2d58ce87e0e28f4f2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ada0466e529e851d2d58ce87e0e28f4f2">&#9670;&nbsp;</a></span>all_temporary_directories()</h2>
+<a id="a6589b5c0e747dbbfec5fe83e3adf2233"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6589b5c0e747dbbfec5fe83e3adf2233">&#9670;&nbsp;</a></span>all_temporary_directories()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -136,8 +136,24 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
           <td class="memname">span&lt;<a class="el" href="structllfio__v2__xxx_1_1path__discovery_1_1discovered__path.html">discovered_path</a>&gt; llfio_v2_xxx::path_discovery::all_temporary_directories </td>
           <td>(</td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>refresh</em> = <code>false</code></td><td>)</td>
+          <td class="paramname"><em>refresh</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">span&lt; path_view &gt;&#160;</td>
+          <td class="paramname"><em>fallbacks</em> = <code>{}</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">span&lt; path_view &gt;&#160;</td>
+          <td class="paramname"><em>overrides</em> = <code>{}</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -148,7 +164,36 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 </div><div class="memdoc">
 
 <p>Returns a list of potential directories which might be usuable for temporary files. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">refresh</td><td>Recalculate the list and all dependent lists, which are statically cached after first call. </td></tr>
+    <tr><td class="paramname">fallbacks</td><td>Additional local paths to place after the <code>discovered_path::source_type::system</code> paths, which therefore would take preference over later <code>discovered_path::source_type::hardcoded</code> paths. </td></tr>
+    <tr><td class="paramname">overrides</td><td>Additional paths to place at the beginning of the list, which therefore would take preference over all other paths.</td></tr>
+  </table>
+  </dd>
+</dl>
 <p>This is a fairly lightweight call which builds a master list of all potential temporary file directories given the environment block of this process (unless SUID or SGID or Privilege Elevation are in effect) and the user running this process. It does not verify if any of them exist, or are writable, or anything else about them. An internal mutex is held for the duration of this call.</p>
+<p>Potential temporary file directories are sourced as follows:</p>
+<ul>
+<li><p class="startli">POSIX:</p>
+<p class="startli">As per Unix guidelines, in order:</p><ol type="1">
+<li>If not SUID nor SUIG situation, from these environment variables in this order of preference: <code>"TMPDIR", "TMP", "TEMP", "TEMPDIR", "XDG_RUNTIME_DIR", "XDG_CACHE_HOME"</code> and <code>${HOME}/.cache</code>.</li>
+<li>The <code>.cache</code> directory within the effective user's home directory (created if it doesn't exist).</li>
+<li><code>/tmp</code>.</li>
+<li><code>/var/tmp</code>.</li>
+<li><code>/run/user/&lt;effective user id&gt;</code>.</li>
+<li><code>/run/shm</code>.</li>
+<li><code>/</code>.</li>
+</ol>
+</li>
+<li>Microsoft Windows:<ol type="1">
+<li>If not SUID nor SUIG situation, from these environment variables in this order of preference: <code>"TMP", "TEMP", "LOCALAPPDATA", "USERPROFILE"</code>.</li>
+<li>Whatever the Shell says are the paths for: <code>${FOLDERID_LocalAppData}\Temp</code>, <code>${FOLDERID_Profile}\AppData\Local\Temp</code>, <code>${FOLDERID_Profile}\Local Settings\Temp</code>.</li>
+<li><code>${GetWindowsDirectoryW()}\Temp</code>.</li>
+<li><code>GetSystemWindowsDirectoryW()\..\Temp</code>.</li>
+</ol>
+</li>
+</ul>
 <dl class="section user"><dt>Memory Allocations\n Allocates the master list of discovered temporary directories exactly once per process,</dt><dd>unless <code>refresh</code> is true in which case the list will be refreshed. The system calls to retrieve paths may allocate additional memory for paths returned. </dd></dl>
 <dl class="section user"><dt>Errors returnable\n This call never fails, except to return an empty span.</dt><dd></dd></dl>
 
@@ -178,8 +223,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 </div><div class="memdoc">
 
 <p>Returns a reference to an open handle to a verified temporary directory where files created are stored in memory/paging file, and thus access may be a lot quicker, but stronger limits on capacity may apply. </p>
-<p>This is implemented by iterating all of the paths returned by <code>verified_temporary_directories()</code> and checking what file system is in use. The following regex is used:</p>
-<p><code>tmpfs|ramfs</code></p>
+<p>This is implemented by <code>verified_temporary_directories()</code> iterating all of the paths returned by and checking what file system is in use, comparing it to <code>memory_backed_regex</code>.</p>
 <p>The handle is created during <code>verified_temporary_directories()</code> and is statically cached thereafter.</p>
 <dl class="section note"><dt>Note</dt><dd>If you wish to create an anonymous memory-backed inode for mmap and paging tricks like mapping the same extent into multiple addresses e.g. to implement a constant time zero copy <code>realloc()</code>, strongly consider using a non-file-backed <code>section_handle</code> as this is more portable. </dd></dl>
 
@@ -209,8 +253,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 </div><div class="memdoc">
 
 <p>Returns a reference to an open handle to a verified temporary directory where files created are stored in a filesystem directory, usually under the current user's quota. </p>
-<p>This is implemented by iterating all of the paths returned by <code>verified_temporary_directories()</code> and checking what file system is in use. The following regex is used:</p>
-<p><code>btrfs|cifs|exfat|ext(2|3|4)|f2fs|hfs|apfs|jfs|lxfs|nfs|nilf2|ufs|vfat|xfs|zfs|msdosfs|newnfs|ntfs|smbfs|unionfs|fat|fat32</code></p>
+<p>This is implemented by <code>verified_temporary_directories()</code> iterating all of the paths returned by and checking what file system is in use, comparing it to <code>storage_backed_regex</code>.</p>
 <p>The handle is created during <code>verified_temporary_directories()</code> and is statically cached thereafter. </p>
 
 </div>
@@ -244,8 +287,8 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 
 </div>
 </div>
-<a id="ab3c4aaa0c413e4989461ab6551058583"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab3c4aaa0c413e4989461ab6551058583">&#9670;&nbsp;</a></span>verified_temporary_directories()</h2>
+<a id="ad8472261ed3a5a59f86253c162b00b90"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8472261ed3a5a59f86253c162b00b90">&#9670;&nbsp;</a></span>verified_temporary_directories()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -256,8 +299,19 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
         <tr>
           <td class="memname">span&lt;<a class="el" href="structllfio__v2__xxx_1_1path__discovery_1_1discovered__path.html">discovered_path</a>&gt; llfio_v2_xxx::path_discovery::verified_temporary_directories </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>_storage_backed_regex</em> = <code>storage_backed_regex</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>_memory_backed_regex</em> = <code>memory_backed_regex</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -268,6 +322,13 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 </div><div class="memdoc">
 
 <p>Returns a subset of <code>all_temporary_directories()</code> each of which has been tested to be writable by the current process. No testing is done of available writable space. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">_storage_backed_regex</td><td>The regex to use to determine which of the temporary directories are backed by storage not memory. The regex is executed case insensitively. </td></tr>
+    <tr><td class="paramname">_memory_backed_regex</td><td>The regex to use to determine which of the temporary directories are backed by memory not storage. The regex is executed case insensitively.</td></tr>
+  </table>
+  </dd>
+</dl>
 <p>After this call returns, the successfully probed entries returned by <code>all_temporary_directories()</code> will have their stat structure set. As the probing involves creating a non-zero sized file in each possible temporary directory to verify its validity, this is not a fast call. It is however cached statically, so the cost occurs exactly once per process, unless someone calls <code>all_temporary_directories(true)</code> to wipe and refresh the master list. An internal mutex is held for the duration of this call. </p><dl class="section user"><dt>Memory Allocations\n None.</dt><dd></dd></dl>
 <dl class="section user"><dt>Errors returnable\n This call never fails, though if it fails to find any writable temporary directory, it will</dt><dd>terminate the process. </dd></dl>
 

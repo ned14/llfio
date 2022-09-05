@@ -133,7 +133,7 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>caching</b> = <a cla
 using&#160;</td><td class="memItemRight" valign="bottom"><b>flag</b> = handle::flag</td></tr>
 <tr class="separator:acab4abf41e3a54d6f55ca28da526fc8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6f2c51636f17ae97255106d37ef4187c"><td class="memItemLeft" align="right" valign="top"><a id="a6f2c51636f17ae97255106d37ef4187c"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__handle.html#a6f2c51636f17ae97255106d37ef4187c">path_view_type</a> = <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a></td></tr>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1path__handle.html#a6f2c51636f17ae97255106d37ef4187c">path_view_type</a> = path_view</td></tr>
 <tr class="memdesc:a6f2c51636f17ae97255106d37ef4187c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The path view type used by this handle. <br /></td></tr>
 <tr class="separator:a6f2c51636f17ae97255106d37ef4187c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -188,9 +188,6 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:af6ae214241d075f68c3df8cfb377f135"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#af6ae214241d075f68c3df8cfb377f135">QUICKCPPLIB_BITFIELD_BEGIN_T</a> (flag, uint16_t)</td></tr>
 <tr class="memdesc:af6ae214241d075f68c3df8cfb377f135"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bitwise flags which can be specified.  <a href="classllfio__v2__xxx_1_1handle.html#af6ae214241d075f68c3df8cfb377f135">More...</a><br /></td></tr>
 <tr class="separator:af6ae214241d075f68c3df8cfb377f135"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa7e9bedf8c7a4c4a79a644a6e1857ee4"><td class="memItemLeft" align="right" valign="top"><a id="aa7e9bedf8c7a4c4a79a644a6e1857ee4"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>QUICKCPPLIB_BITFIELD_END</b> (flag)</td></tr>
-<tr class="separator:aa7e9bedf8c7a4c4a79a644a6e1857ee4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4716696b8700953889006251e0678aa4"><td class="memItemLeft" align="right" valign="top"><a id="a4716696b8700953889006251e0678aa4"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a4716696b8700953889006251e0678aa4">swap</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;o) noexcept</td></tr>
 <tr class="memdesc:a4716696b8700953889006251e0678aa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br /></td></tr>
@@ -538,7 +535,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>directory_handle</b>
 <p>&lt; Using insane POSIX byte range locks</p>
 <p>&lt; This is an inode created with no representation on the filing system</p>
 <div class="fragment"><div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;                                              {</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  none = uint16_t(0),  <span class="comment">//!&lt; No flags</span></div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">none</a> = uint16_t(0),  <span class="comment">//!&lt; No flags</span></div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="comment"></span><span class="comment">  /*! Unlinks the file on handle close. On POSIX, this simply unlinks whatever is pointed</span></div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="comment">  to by `path()` upon the call of `close()` if and only if the inode matches. On Windows,</span></div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="comment">  if you are on Windows 10 1709 or later, exactly the same thing occurs. If on previous</span></div>
@@ -674,6 +671,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>directory_handle</b>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
+<div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">llfio_v2_xxx::ip::none</a></div><div class="ttdeci">@ none</div><div class="ttdoc">No flags.</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:224</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

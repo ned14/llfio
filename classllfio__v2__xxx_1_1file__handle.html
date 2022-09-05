@@ -106,7 +106,7 @@ Inheritance diagram for llfio_v2_xxx::file_handle:</div>
   <img src="classllfio__v2__xxx_1_1file__handle.png" usemap="#llfio_5Fv2_5Fxxx::file_5Fhandle_map" alt=""/>
   <map id="llfio_5Fv2_5Fxxx::file_5Fhandle_map" name="llfio_5Fv2_5Fxxx::file_5Fhandle_map">
 <area href="classllfio__v2__xxx_1_1lockable__byte__io__handle.html" title="A handle to something capable of scatter-gather i/o and which can exclude other concurrent users...." alt="llfio_v2_xxx::lockable_byte_io_handle" shape="rect" coords="0,112,224,136"/>
-<area href="classfs__handle.html" title="A handle to something with a device and inode number." alt="fs_handle" shape="rect" coords="234,112,458,136"/>
+<area href="classllfio__v2__xxx_1_1fs__handle.html" title="A handle to something with a device and inode number." alt="llfio_v2_xxx::fs_handle" shape="rect" coords="234,112,458,136"/>
 <area href="classllfio__v2__xxx_1_1byte__io__handle.html" title="A handle to something capable of scatter-gather byte i/o." alt="llfio_v2_xxx::byte_io_handle" shape="rect" coords="0,56,224,80"/>
 <area href="classllfio__v2__xxx_1_1handle.html" title="A native_handle_type which is managed by the lifetime of this object instance." alt="llfio_v2_xxx::handle" shape="rect" coords="0,0,224,24"/>
 <area href="classllfio__v2__xxx_1_1fast__random__file__handle.html" title="A handle to synthesised, non-cryptographic, pseudo-random data." alt="llfio_v2_xxx::fast_random_file_handle" shape="rect" coords="0,224,224,248"/>
@@ -170,7 +170,7 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>dev_t</b> = fs_handl
 using&#160;</td><td class="memItemRight" valign="bottom"><b>ino_t</b> = fs_handle::ino_t</td></tr>
 <tr class="separator:ac86af2e1397d2b6b5e6ab3df8e073817"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a987fcc0fc8a6874cb8275ad0efb1a576"><td class="memItemLeft" align="right" valign="top"><a id="a987fcc0fc8a6874cb8275ad0efb1a576"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>path_view_type</b> = fs_handle::path_view_type</td></tr>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>path_view_type</b> = <a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#abcd8c8171f4e561620864295e8d5879b">fs_handle::path_view_type</a></td></tr>
 <tr class="separator:a987fcc0fc8a6874cb8275ad0efb1a576"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac54a07a91e9e39ac606560dca1065567"><td class="memItemLeft" align="right" valign="top"><a id="ac54a07a91e9e39ac606560dca1065567"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>barrier_kind</b> = <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a2a7e52ff0c192a5edf67ceee4c7195d3">byte_io_multiplexer::barrier_kind</a></td></tr>
@@ -182,6 +182,14 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>registered_buffer_ty
 template&lt;class T &gt; </td></tr>
 <tr class="memitem:a93af2fdd7b3f0c26561ec97035ab3d5c"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>awaitable</b> = <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html">byte_io_multiplexer::awaitable</a>&lt; T &gt;</td></tr>
 <tr class="separator:a93af2fdd7b3f0c26561ec97035ab3d5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a65884346740af7fb4648c79d44a750"><td class="memItemLeft" align="right" valign="top"><a id="a1a65884346740af7fb4648c79d44a750"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#a1a65884346740af7fb4648c79d44a750">unique_id_type</a> = QUICKCPPLIB_NAMESPACE::integers128::uint128</td></tr>
+<tr class="memdesc:a1a65884346740af7fb4648c79d44a750"><td class="mdescLeft">&#160;</td><td class="mdescRight">The unique identifier type used by this handle. <br /></td></tr>
+<tr class="separator:a1a65884346740af7fb4648c79d44a750"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab82a83c5e44659e01a2218f0af41bde7"><td class="memItemLeft" align="right" valign="top"><a id="ab82a83c5e44659e01a2218f0af41bde7"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#ab82a83c5e44659e01a2218f0af41bde7">unique_id_type_hasher</a> = QUICKCPPLIB_NAMESPACE::integers128::uint128_hasher</td></tr>
+<tr class="memdesc:ab82a83c5e44659e01a2218f0af41bde7"><td class="mdescLeft">&#160;</td><td class="mdescRight">A hasher for the unique identifier type used by this handle. <br /></td></tr>
+<tr class="separator:ab82a83c5e44659e01a2218f0af41bde7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -423,9 +431,6 @@ flag&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:af6ae214241d075f68c3df8cfb377f135"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#af6ae214241d075f68c3df8cfb377f135">QUICKCPPLIB_BITFIELD_BEGIN_T</a> (flag, uint16_t)</td></tr>
 <tr class="memdesc:af6ae214241d075f68c3df8cfb377f135"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bitwise flags which can be specified.  <a href="classllfio__v2__xxx_1_1handle.html#af6ae214241d075f68c3df8cfb377f135">More...</a><br /></td></tr>
 <tr class="separator:af6ae214241d075f68c3df8cfb377f135"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa7e9bedf8c7a4c4a79a644a6e1857ee4"><td class="memItemLeft" align="right" valign="top"><a id="aa7e9bedf8c7a4c4a79a644a6e1857ee4"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>QUICKCPPLIB_BITFIELD_END</b> (flag)</td></tr>
-<tr class="separator:aa7e9bedf8c7a4c4a79a644a6e1857ee4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4716696b8700953889006251e0678aa4"><td class="memItemLeft" align="right" valign="top"><a id="a4716696b8700953889006251e0678aa4"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a4716696b8700953889006251e0678aa4">swap</a> (<a class="el" href="classllfio__v2__xxx_1_1handle.html">handle</a> &amp;o) noexcept</td></tr>
 <tr class="memdesc:a4716696b8700953889006251e0678aa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap with another instance. <br /></td></tr>
@@ -545,6 +550,93 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a942b0d276c9f20fe41baab679b88fe72">native_handle</a> () const noexcept</td></tr>
 <tr class="memdesc:a942b0d276c9f20fe41baab679b88fe72"><td class="mdescLeft">&#160;</td><td class="mdescRight">The native handle used by this handle. <br /></td></tr>
 <tr class="separator:a942b0d276c9f20fe41baab679b88fe72"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac24ed4cdb96690d7da95cd17b0f3d090"><td class="memItemLeft" align="right" valign="top"><a id="ac24ed4cdb96690d7da95cd17b0f3d090"></a>
+dev_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#ac24ed4cdb96690d7da95cd17b0f3d090">st_dev</a> () const noexcept</td></tr>
+<tr class="memdesc:ac24ed4cdb96690d7da95cd17b0f3d090"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unless <code>flag::disable_safety_unlinks</code> is set, the device id of the file when opened. <br /></td></tr>
+<tr class="separator:ac24ed4cdb96690d7da95cd17b0f3d090"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad6465d30ee438b860ccc59c0e0fc4dc"><td class="memItemLeft" align="right" valign="top"><a id="aad6465d30ee438b860ccc59c0e0fc4dc"></a>
+ino_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#aad6465d30ee438b860ccc59c0e0fc4dc">st_ino</a> () const noexcept</td></tr>
+<tr class="memdesc:aad6465d30ee438b860ccc59c0e0fc4dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unless <code>flag::disable_safety_unlinks</code> is set, the inode of the file when opened. When combined with st_dev(), forms a unique identifer on this system. <br /></td></tr>
+<tr class="separator:aad6465d30ee438b860ccc59c0e0fc4dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9793fe40564fda2437783488bd51b9f1"><td class="memItemLeft" align="right" valign="top"><a id="a9793fe40564fda2437783488bd51b9f1"></a>
+<a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#a1a65884346740af7fb4648c79d44a750">unique_id_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#a9793fe40564fda2437783488bd51b9f1">unique_id</a> () const noexcept</td></tr>
+<tr class="memdesc:a9793fe40564fda2437783488bd51b9f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">A unique identifier for this handle across the entire system. Can be used in hash tables etc. <br /></td></tr>
+<tr class="separator:a9793fe40564fda2437783488bd51b9f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a865caad2f7f4bdf12fb74aabfe3c5ff5"><td class="memItemLeft" align="right" valign="top">virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#a865caad2f7f4bdf12fb74aabfe3c5ff5">parent_path_handle</a> (<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) const noexcept</td></tr>
+<tr class="memdesc:a865caad2f7f4bdf12fb74aabfe3c5ff5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain a handle to the path <b>currently</b> containing this handle's file entry.  <a href="classllfio__v2__xxx_1_1fs__handle.html#a865caad2f7f4bdf12fb74aabfe3c5ff5">More...</a><br /></td></tr>
+<tr class="separator:a865caad2f7f4bdf12fb74aabfe3c5ff5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1eeaf9d77a1279b4f0d3062de509f77f"><td class="memTemplParams" colspan="2"><a id="a1eeaf9d77a1279b4f0d3062de509f77f"></a>
+template&lt;class... Args&gt; </td></tr>
+<tr class="memitem:a1eeaf9d77a1279b4f0d3062de509f77f"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_parent_path_handle</b> (Args &amp;&amp;... args) noexcept</td></tr>
+<tr class="separator:a1eeaf9d77a1279b4f0d3062de509f77f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a41ea4bd2d5a66fbde4cdbfe463166a4f"><td class="memTemplParams" colspan="2"><a id="a41ea4bd2d5a66fbde4cdbfe463166a4f"></a>
+template&lt;class... Args, class Rep , class Period &gt; </td></tr>
+<tr class="memitem:a41ea4bd2d5a66fbde4cdbfe463166a4f"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_parent_path_handle_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
+<tr class="separator:a41ea4bd2d5a66fbde4cdbfe463166a4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acbb1fe8c7901382307d84848fdc0afcb"><td class="memTemplParams" colspan="2"><a id="acbb1fe8c7901382307d84848fdc0afcb"></a>
+template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
+<tr class="memitem:acbb1fe8c7901382307d84848fdc0afcb"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_parent_path_handle_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
+<tr class="separator:acbb1fe8c7901382307d84848fdc0afcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8700edc9ecd4dd35d5aad7c65dd0eca2"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#a8700edc9ecd4dd35d5aad7c65dd0eca2">relink</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, path_view_type <a class="el" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>, bool atomic_replace=true, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
+<tr class="memdesc:a8700edc9ecd4dd35d5aad7c65dd0eca2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Relinks the current path of this open handle to the new path specified. If <code>atomic_replace</code> is true, the relink <b>atomically</b> and silently replaces any item at the new path specified. This operation is both atomic and matching POSIX behaviour even on Microsoft Windows where no Win32 API can match POSIX semantics.  <a href="classllfio__v2__xxx_1_1fs__handle.html#a8700edc9ecd4dd35d5aad7c65dd0eca2">More...</a><br /></td></tr>
+<tr class="separator:a8700edc9ecd4dd35d5aad7c65dd0eca2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f5f9892f6652359f2330bf6d9b89e17"><td class="memTemplParams" colspan="2"><a id="a7f5f9892f6652359f2330bf6d9b89e17"></a>
+template&lt;class... Args&gt; </td></tr>
+<tr class="memitem:a7f5f9892f6652359f2330bf6d9b89e17"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_relink</b> (Args &amp;&amp;... args) noexcept</td></tr>
+<tr class="separator:a7f5f9892f6652359f2330bf6d9b89e17"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5565cd5f2fcbb9472b2a00795cc0bcc"><td class="memTemplParams" colspan="2"><a id="af5565cd5f2fcbb9472b2a00795cc0bcc"></a>
+template&lt;class... Args, class Rep , class Period &gt; </td></tr>
+<tr class="memitem:af5565cd5f2fcbb9472b2a00795cc0bcc"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_relink_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
+<tr class="separator:af5565cd5f2fcbb9472b2a00795cc0bcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1fc4e2ade67dfb9140007cc31f4b6b20"><td class="memTemplParams" colspan="2"><a id="a1fc4e2ade67dfb9140007cc31f4b6b20"></a>
+template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
+<tr class="memitem:a1fc4e2ade67dfb9140007cc31f4b6b20"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_relink_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
+<tr class="separator:a1fc4e2ade67dfb9140007cc31f4b6b20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7770c6b7c478d74654f25b8c1a1585c"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#aa7770c6b7c478d74654f25b8c1a1585c">link</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, path_view_type <a class="el" href="namespacellfio__v2__xxx.html#a49f7bb77eb38fbe1280019225b66b78b">path</a>, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
+<tr class="memdesc:aa7770c6b7c478d74654f25b8c1a1585c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Links the inode referred to by this open handle to the path specified. The current path of this open handle is not changed, unless it has no current path due to being unlinked.  <a href="classllfio__v2__xxx_1_1fs__handle.html#aa7770c6b7c478d74654f25b8c1a1585c">More...</a><br /></td></tr>
+<tr class="separator:aa7770c6b7c478d74654f25b8c1a1585c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad43b812385c7fc8aae9e59838a1411bb"><td class="memTemplParams" colspan="2"><a id="ad43b812385c7fc8aae9e59838a1411bb"></a>
+template&lt;class... Args&gt; </td></tr>
+<tr class="memitem:ad43b812385c7fc8aae9e59838a1411bb"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_link</b> (Args &amp;&amp;... args) noexcept</td></tr>
+<tr class="separator:ad43b812385c7fc8aae9e59838a1411bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65d73e0e89bac484ce40427b58dcfe53"><td class="memTemplParams" colspan="2"><a id="a65d73e0e89bac484ce40427b58dcfe53"></a>
+template&lt;class... Args, class Rep , class Period &gt; </td></tr>
+<tr class="memitem:a65d73e0e89bac484ce40427b58dcfe53"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_link_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
+<tr class="separator:a65d73e0e89bac484ce40427b58dcfe53"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2703814c7599d2081ca10763bbeba4a"><td class="memTemplParams" colspan="2"><a id="ad2703814c7599d2081ca10763bbeba4a"></a>
+template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
+<tr class="memitem:ad2703814c7599d2081ca10763bbeba4a"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_link_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
+<tr class="separator:ad2703814c7599d2081ca10763bbeba4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1dd7923bb65456af4da41ebe7cb84982"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#a1dd7923bb65456af4da41ebe7cb84982">unlink</a> (<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=std::chrono::seconds(30)) noexcept</td></tr>
+<tr class="memdesc:a1dd7923bb65456af4da41ebe7cb84982"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unlinks the current path of this open handle, causing its entry to immediately disappear from the filing system.  <a href="classllfio__v2__xxx_1_1fs__handle.html#a1dd7923bb65456af4da41ebe7cb84982">More...</a><br /></td></tr>
+<tr class="separator:a1dd7923bb65456af4da41ebe7cb84982"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f77a249baf4e0c5de2172669a7724d7"><td class="memTemplParams" colspan="2"><a id="a7f77a249baf4e0c5de2172669a7724d7"></a>
+template&lt;class... Args&gt; </td></tr>
+<tr class="memitem:a7f77a249baf4e0c5de2172669a7724d7"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_unlink</b> (Args &amp;&amp;... args) noexcept</td></tr>
+<tr class="separator:a7f77a249baf4e0c5de2172669a7724d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a209de025a2d3e202a61c50b52d43f2af"><td class="memTemplParams" colspan="2"><a id="a209de025a2d3e202a61c50b52d43f2af"></a>
+template&lt;class... Args, class Rep , class Period &gt; </td></tr>
+<tr class="memitem:a209de025a2d3e202a61c50b52d43f2af"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_unlink_for</b> (Args &amp;&amp;... args, const std::chrono::duration&lt; Rep, Period &gt; &amp;duration) noexcept</td></tr>
+<tr class="separator:a209de025a2d3e202a61c50b52d43f2af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9c4133fef23811abcb01e1faf2b19d3"><td class="memTemplParams" colspan="2"><a id="ae9c4133fef23811abcb01e1faf2b19d3"></a>
+template&lt;class... Args, class Clock , class Duration &gt; </td></tr>
+<tr class="memitem:ae9c4133fef23811abcb01e1faf2b19d3"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>try_unlink_until</b> (Args &amp;&amp;... args, const std::chrono::time_point&lt; Clock, Duration &gt; &amp;timeout) noexcept</td></tr>
+<tr class="separator:ae9c4133fef23811abcb01e1faf2b19d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28669fc9588bb252eaa39fcf66d7b4fc"><td class="memItemLeft" align="right" valign="top">virtual result&lt; span&lt; <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#a28669fc9588bb252eaa39fcf66d7b4fc">list_extended_attributes</a> (span&lt; byte &gt; tofill) const noexcept</td></tr>
+<tr class="memdesc:a28669fc9588bb252eaa39fcf66d7b4fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill the supplied buffer with the names of all extended attributes set on this file or directory, returning a span of path view components.  <a href="classllfio__v2__xxx_1_1fs__handle.html#a28669fc9588bb252eaa39fcf66d7b4fc">More...</a><br /></td></tr>
+<tr class="separator:a28669fc9588bb252eaa39fcf66d7b4fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec8bd6a8bc3543f59a9980ca15b62295"><td class="memItemLeft" align="right" valign="top">virtual result&lt; span&lt; byte &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#aec8bd6a8bc3543f59a9980ca15b62295">get_extended_attribute</a> (span&lt; byte &gt; tofill, <a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> name) const noexcept</td></tr>
+<tr class="memdesc:aec8bd6a8bc3543f59a9980ca15b62295"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the value of an extended attribute set on this file or directory.  <a href="classllfio__v2__xxx_1_1fs__handle.html#aec8bd6a8bc3543f59a9980ca15b62295">More...</a><br /></td></tr>
+<tr class="separator:aec8bd6a8bc3543f59a9980ca15b62295"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69e4e3830b2dc8d97772aca03e5da275"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#a69e4e3830b2dc8d97772aca03e5da275">set_extended_attribute</a> (<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a> name, span&lt; const byte &gt; value) noexcept</td></tr>
+<tr class="memdesc:a69e4e3830b2dc8d97772aca03e5da275"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the value of an extended attribute on this file or directory.  <a href="classllfio__v2__xxx_1_1fs__handle.html#a69e4e3830b2dc8d97772aca03e5da275">More...</a><br /></td></tr>
+<tr class="separator:a69e4e3830b2dc8d97772aca03e5da275"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af7535871db526077329fc8314a11ab6c"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#af7535871db526077329fc8314a11ab6c">remove_extended_attribute</a> (<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a>) noexcept</td></tr>
+<tr class="memdesc:af7535871db526077329fc8314a11ab6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the extended attribute set on this file or directory.  <a href="classllfio__v2__xxx_1_1fs__handle.html#af7535871db526077329fc8314a11ab6c">More...</a><br /></td></tr>
+<tr class="separator:af7535871db526077329fc8314a11ab6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab87ff96477f1441bd82b0f85515e3339"><td class="memItemLeft" align="right" valign="top">result&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#ab87ff96477f1441bd82b0f85515e3339">copy_extended_attributes</a> (const <a class="el" href="classllfio__v2__xxx_1_1fs__handle.html">fs_handle</a> &amp;src, bool replace_all_local_attributes=false) noexcept</td></tr>
+<tr class="memdesc:ab87ff96477f1441bd82b0f85515e3339"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copies the extended attributes from one entity to another, optionally replacing all the extended attributes on the destination.  <a href="classllfio__v2__xxx_1_1fs__handle.html#ab87ff96477f1441bd82b0f85515e3339">More...</a><br /></td></tr>
+<tr class="separator:ab87ff96477f1441bd82b0f85515e3339"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -596,6 +688,10 @@ virtual <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io_
 <tr class="memitem:a9eac28f1623570ffdcd56b4425183788"><td class="memItemLeft" align="right" valign="top"><a id="a9eac28f1623570ffdcd56b4425183788"></a>
 <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_do_multiplexer_barrier</b> (registered_buffer_type &amp;&amp;base, <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs, <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a2a7e52ff0c192a5edf67ceee4c7195d3">barrier_kind</a> kind, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d) noexcept</td></tr>
 <tr class="separator:a9eac28f1623570ffdcd56b4425183788"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc2b24484565bcb0cf654adf2f732f7e"><td class="memItemLeft" align="right" valign="top"><a id="adc2b24484565bcb0cf654adf2f732f7e"></a>
+result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#adc2b24484565bcb0cf654adf2f732f7e">_fetch_inode</a> () const noexcept</td></tr>
+<tr class="memdesc:adc2b24484565bcb0cf654adf2f732f7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill in _devid and _inode from the handle via fstat() <br /></td></tr>
+<tr class="separator:adc2b24484565bcb0cf654adf2f732f7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -625,6 +721,12 @@ union {</td></tr>
 <tr class="separator:a6ea711b11e7caae4a45c83655da013ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a992cb6f2a59d0be4bd7ef0c162c1a99b"><td class="memItemLeft" valign="top">};&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
 <tr class="separator:a992cb6f2a59d0be4bd7ef0c162c1a99b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d20a64cf182162a49962ed25d2126b3"><td class="memItemLeft" align="right" valign="top"><a id="a4d20a64cf182162a49962ed25d2126b3"></a>
+dev_t&#160;</td><td class="memItemRight" valign="bottom"><b>_devid</b> {0}</td></tr>
+<tr class="separator:a4d20a64cf182162a49962ed25d2126b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8454764db3cd47e65ec7853b9cb0b3fa"><td class="memItemLeft" align="right" valign="top"><a id="a8454764db3cd47e65ec7853b9cb0b3fa"></a>
+ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td></tr>
+<tr class="separator:a8454764db3cd47e65ec7853b9cb0b3fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A handle to a regular file or device. </p>
@@ -990,6 +1092,78 @@ For portability, you can only assume that barriers write order for a single hand
 </div><!-- fragment -->
 </div>
 </div>
+<a id="ab87ff96477f1441bd82b0f85515e3339"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab87ff96477f1441bd82b0f85515e3339">&#9670;&nbsp;</a></span>copy_extended_attributes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;size_t&gt; llfio_v2_xxx::fs_handle::copy_extended_attributes </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classllfio__v2__xxx_1_1fs__handle.html">fs_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>src</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>replace_all_local_attributes</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Copies the extended attributes from one entity to another, optionally replacing all the extended attributes on the destination. </p>
+<p>This convenience function is implemented using the APIs above, and therefore is racy with respect to concurrent users. If you specifiy an invalid source with <code>replace_all_local_attributes = true</code>, then this is a convenient way to remove all extended attributes on the local inode.</p>
+<dl class="section note"><dt>Note</dt><dd>This function uses 130Kb of stack and cannot handle attribute values larger than 64Kb. </dd></dl>
+<div class="fragment"><div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;  {</div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;    <span class="keyword">auto</span> &amp;h = _get_handle();</div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;    (void) h;</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;    LLFIO_LOG_FUNCTION_CALL(&amp;h);</div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;    <span class="keywordtype">byte</span> buffer[65536 + 4096];</div>
+<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;    <span class="keywordflow">if</span>(replace_all_local_attributes)</div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;    {</div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;      <span class="keywordflow">for</span>(;;)</div>
+<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;      {</div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;        OUTCOME_TRY(<span class="keyword">auto</span> &amp;&amp;attribs, <a class="code" href="classllfio__v2__xxx_1_1fs__handle.html#a28669fc9588bb252eaa39fcf66d7b4fc">list_extended_attributes</a>(buffer));</div>
+<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;        <span class="keywordflow">if</span>(attribs.empty())</div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;        {</div>
+<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;          <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;        }</div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;attrib : attribs)</div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;        {</div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;          OUTCOME_TRY(<a class="code" href="classllfio__v2__xxx_1_1fs__handle.html#af7535871db526077329fc8314a11ab6c">remove_extended_attribute</a>(attrib));</div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;        }</div>
+<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;      }</div>
+<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;    }</div>
+<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;    <span class="keywordflow">if</span>(src._get_handle().is_valid())</div>
+<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;    {</div>
+<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;      OUTCOME_TRY(<span class="keyword">auto</span> &amp;&amp;attribs, src.list_extended_attributes(buffer));</div>
+<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;attrib : attribs)</div>
+<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;      {</div>
+<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;        <span class="keywordtype">byte</span> buffer2[65536];</div>
+<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;        OUTCOME_TRY(<span class="keyword">auto</span> &amp;&amp;value, src.get_extended_attribute(buffer2, attrib));</div>
+<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;        OUTCOME_TRY(<a class="code" href="classllfio__v2__xxx_1_1fs__handle.html#a69e4e3830b2dc8d97772aca03e5da275">set_extended_attribute</a>(attrib, value));</div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;      }</div>
+<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;    }</div>
+<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;    <span class="keywordflow">return</span> success();</div>
+<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;  }</div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="a00a85eec5a41f7edb2c574d40cf04535"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a00a85eec5a41f7edb2c574d40cf04535">&#9670;&nbsp;</a></span>current_path()</h2>
 
@@ -1123,6 +1297,130 @@ For portability, you can only assume that barriers write order for a single hand
   </dd>
 </dl>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX open() or CreateFile() can return.</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="aec8bd6a8bc3543f59a9980ca15b62295"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec8bd6a8bc3543f59a9980ca15b62295">&#9670;&nbsp;</a></span>get_extended_attribute()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual result&lt;span&lt;byte&gt; &gt; llfio_v2_xxx::fs_handle::get_extended_attribute </td>
+          <td>(</td>
+          <td class="paramtype">span&lt; byte &gt;&#160;</td>
+          <td class="paramname"><em>tofill</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a>&#160;</td>
+          <td class="paramname"><em>name</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retrieve the value of an extended attribute set on this file or directory. </p>
+<dl class="section note"><dt>Note</dt><dd>On Windows, this is the list of alternate streams on a file, NOT NTFS extended attributes. </dd></dl>
+
+</div>
+</div>
+<a id="aa7770c6b7c478d74654f25b8c1a1585c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa7770c6b7c478d74654f25b8c1a1585c">&#9670;&nbsp;</a></span>link()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual result&lt;void&gt; llfio_v2_xxx::fs_handle::link </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>base</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#abcd8c8171f4e561620864295e8d5879b">path_view_type</a>&#160;</td>
+          <td class="paramname"><em>path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code>std::chrono::seconds(30)</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Links the inode referred to by this open handle to the path specified. The current path of this open handle is not changed, unless it has no current path due to being unlinked. </p>
+<dl class="section warning"><dt>Warning</dt><dd>Some operating systems provide a race free syscall for linking an open handle to a new location (Linux, Windows). On all other operating systems this call is <b>racy</b> and can result in the wrong inode being linked. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation opens a <code>path_handle</code> to the source containing directory first, then checks before linking that the item about to be hard linked has the same inode as the open file handle. It will retry this matching until success until the deadline given. This should prevent most unmalicious accidental loss of data.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">base</td><td>Base for any relative path. </td></tr>
+    <tr><td class="paramname">path</td><td>The relative or absolute new path to hard link to. </td></tr>
+    <tr><td class="paramname">d</td><td>The deadline by which the matching of the containing directory to the open handle's inode must succeed, else <code>errc::timed_out</code> will be returned. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Memory Allocations\n Except on platforms with race free syscalls for renaming open handles (Windows), calls</dt><dd><code>current_path()</code> via <code>parent_path_handle()</code> and thus is both expensive and calls malloc many times. </dd></dl>
+
+</div>
+</div>
+<a id="a28669fc9588bb252eaa39fcf66d7b4fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a28669fc9588bb252eaa39fcf66d7b4fc">&#9670;&nbsp;</a></span>list_extended_attributes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual result&lt;span&lt;<a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a>&gt; &gt; llfio_v2_xxx::fs_handle::list_extended_attributes </td>
+          <td>(</td>
+          <td class="paramtype">span&lt; byte &gt;&#160;</td>
+          <td class="paramname"><em>tofill</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Fill the supplied buffer with the names of all extended attributes set on this file or directory, returning a span of path view components. </p>
+<p>Note that this routine is a very thin wrap of <code>listxattr()</code> on POSIX and <code>NtQueryInformationFile()</code> on Windows. If the supplied buffer is too small, the syscall typically returns failure rather than do a partial fill. Most implementations do not support more than 64Kb of extended attribute information per inode so maybe 70Kb is a safe default (to account for the return value storage), however properly written code will detect the buffer being too small and will auto-expand it until success.</p>
+<dl class="section note"><dt>Note</dt><dd>On Windows, this is the list of alternate streams on a file, NOT NTFS extended attributes.</dd></dl>
+<dl class="section user"><dt>Race Guarantees\n The list of extended attributes is fetched in a single syscall. This may be an</dt><dd>atomically consistent snapshot. </dd></dl>
 
 </div>
 </div>
@@ -1323,6 +1621,37 @@ For portability, you can only assume that barriers write order for a single hand
 
 </div>
 </div>
+<a id="a865caad2f7f4bdf12fb74aabfe3c5ff5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a865caad2f7f4bdf12fb74aabfe3c5ff5">&#9670;&nbsp;</a></span>parent_path_handle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual result&lt;<a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a>&gt; llfio_v2_xxx::fs_handle::parent_path_handle </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code>std::chrono::seconds(30)</code></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Obtain a handle to the path <b>currently</b> containing this handle's file entry. </p>
+<dl class="section warning"><dt>Warning</dt><dd>This call is <b>racy</b> and can result in the wrong path handle being returned. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation opens a <code>path_handle</code> to the source containing directory, then checks if the file entry within has the same inode as the open file handle. It will retry this matching until success until the deadline given.</dd></dl>
+<dl class="section user"><dt>Memory Allocations\n Calls current_path() and thus is both expensive and calls malloc many times.</dt><dd></dd></dl>
+<dl class="section see"><dt>See also</dt><dd><code>algorithm::cached_parent_handle_adapter&lt;T&gt;</code> which overrides this with a zero cost implementation, thus making unlinking and relinking very considerably quicker. </dd></dl>
+
+</div>
+</div>
 <a id="af6ae214241d075f68c3df8cfb377f135"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af6ae214241d075f68c3df8cfb377f135">&#9670;&nbsp;</a></span>QUICKCPPLIB_BITFIELD_BEGIN_T()</h2>
 
@@ -1376,7 +1705,7 @@ For portability, you can only assume that barriers write order for a single hand
 <p>&lt; Using insane POSIX byte range locks</p>
 <p>&lt; This is an inode created with no representation on the filing system</p>
 <div class="fragment"><div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;                                              {</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  none = uint16_t(0),  <span class="comment">//!&lt; No flags</span></div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">none</a> = uint16_t(0),  <span class="comment">//!&lt; No flags</span></div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="comment"></span><span class="comment">  /*! Unlinks the file on handle close. On POSIX, this simply unlinks whatever is pointed</span></div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="comment">  to by `path()` upon the call of `close()` if and only if the inode matches. On Windows,</span></div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="comment">  if you are on Windows 10 1709 or later, exactly the same thing occurs. If on previous</span></div>
@@ -1526,6 +1855,100 @@ For portability, you can only assume that barriers write order for a single hand
 </div><!-- fragment -->
 </div>
 </div>
+<a id="a8700edc9ecd4dd35d5aad7c65dd0eca2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8700edc9ecd4dd35d5aad7c65dd0eca2">&#9670;&nbsp;</a></span>relink()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual result&lt;void&gt; llfio_v2_xxx::fs_handle::relink </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>base</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#abcd8c8171f4e561620864295e8d5879b">path_view_type</a>&#160;</td>
+          <td class="paramname"><em>path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>atomic_replace</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code>std::chrono::seconds(30)</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Relinks the current path of this open handle to the new path specified. If <code>atomic_replace</code> is true, the relink <b>atomically</b> and silently replaces any item at the new path specified. This operation is both atomic and matching POSIX behaviour even on Microsoft Windows where no Win32 API can match POSIX semantics. </p>
+<p>Note that if <code>atomic_replace</code> is false, the operation <em>may</em> be implemented as creating a hard link to the destination (which fails if the destination exists), opening a new file descriptor to the destination, closing the existing file descriptor, replacing the existing file descriptor with the new one (this is to ensure path tracking continues to work), then unlinking the previous link. Thus <code>native_handle()</code>'s value <em>may</em> change. This is not the case on Microsoft Windows nor Linux, both of which provide syscalls capable of refusing to rename if the destination exists.</p>
+<p>If the handle refers to a pipe, on Microsoft Windows the base path handle is ignored as there is a single global named pipe namespace. Unless the path fragment begins with <code>\</code>, the string <code>\??\</code> is prefixed to the name before passing it to the NT kernel API which performs the rename. This is because <code>\\.\</code> in Win32 maps onto <code>\??\</code> in the NT kernel.</p>
+<dl class="section warning"><dt>Warning</dt><dd>Some operating systems provide a race free syscall for renaming an open handle (Windows). On all other operating systems this call is <b>racy</b> and can result in the wrong file entry being relinked. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation opens a <code>path_handle</code> to the source containing directory first, then checks before relinking that the item about to be relinked has the same inode as the open file handle. It will retry this matching until success until the deadline given. This should prevent most unmalicious accidental loss of data.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">base</td><td>Base for any relative path. </td></tr>
+    <tr><td class="paramname">path</td><td>The relative or absolute new path to relink to. </td></tr>
+    <tr><td class="paramname">atomic_replace</td><td>Atomically replace the destination if a file entry already is present there. Choosing false for this will fail if a file entry is already present at the destination, and may not be an atomic operation on some platforms (i.e. both the old and new names may be linked to the same inode for a very short period of time). Windows and recent Linuxes are always atomic. </td></tr>
+    <tr><td class="paramname">d</td><td>The deadline by which the matching of the containing directory to the open handle's inode must succeed, else <code>errc::timed_out</code> will be returned. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Memory Allocations\n Except on platforms with race free syscalls for renaming open handles (Windows), calls</dt><dd><code>current_path()</code> via <code>parent_path_handle()</code> and thus is both expensive and calls malloc many times. </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1mapped__file__handle.html#a35d3754438d64a63a7fe63c5ade23a62">llfio_v2_xxx::mapped_file_handle</a>, and <a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#afea9ef2b36cac3f6dfcae7555ca3303c">llfio_v2_xxx::symlink_handle</a>.</p>
+
+</div>
+</div>
+<a id="af7535871db526077329fc8314a11ab6c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af7535871db526077329fc8314a11ab6c">&#9670;&nbsp;</a></span>remove_extended_attribute()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual result&lt;void&gt; llfio_v2_xxx::fs_handle::remove_extended_attribute </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a>&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Removes the extended attribute set on this file or directory. </p>
+<dl class="section note"><dt>Note</dt><dd>On Windows, this is the list of alternate streams on a file, NOT NTFS extended attributes. We do not prevent you trying to remove internal alternate streams, either. </dd></dl>
+
+</div>
+</div>
 <a id="aa276caa8542cca700a2574459395ff60"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa276caa8542cca700a2574459395ff60">&#9670;&nbsp;</a></span>reopen()</h2>
 
@@ -1602,6 +2025,55 @@ For portability, you can only assume that barriers write order for a single hand
 <dl class="section user"><dt>Memory Allocations\n No memory allocation.</dt><dd></dd></dl>
 
 <p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1process__handle.html#ab64c9fc14fc555b5ec8571863458bf83">llfio_v2_xxx::process_handle</a>.</p>
+
+</div>
+</div>
+<a id="a69e4e3830b2dc8d97772aca03e5da275"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69e4e3830b2dc8d97772aca03e5da275">&#9670;&nbsp;</a></span>set_extended_attribute()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual result&lt;void&gt; llfio_v2_xxx::fs_handle::set_extended_attribute </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1path__view__component.html">path_view_component</a>&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">span&lt; const byte &gt;&#160;</td>
+          <td class="paramname"><em>value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets the value of an extended attribute on this file or directory. </p>
+<p>To prevent collision in a globally visible resource, there is a convention whereby you ought to namespace the names of your values as <code>namespace.attribute</code> e.g. <code>appname.setting</code> to prevent unintentional collision with other programs. Obviously, do choose a unique <code>appname</code> if there is any chance another program might use the same namespace name.</p>
+<p>On POSIX, there are additional namespacing requirements: before your value name, you need to prefix one of <code>user</code> or <code>system</code>, so the actual name you might set would be <code>user.appname.propname</code>. Windows does not have the <code>user</code>/<code>system</code> prefix requirement, but it does no harm to do the exact same on Windows as on POSIX.</p>
+<p>The host OS and target filing system choose the limits on value size, and will fail accordingly. Some impose a maximum of 64Kb for all names and values per inode, others have a 4Kb maximum value size, there are lots of combinations. You are probably safest not setting many names, and keep the values short.</p>
+<dl class="section warning"><dt>Warning</dt><dd>Extended attributes are 'brittle' because they can get silently wiped at any moment. Never store anything in extended attributes which cannot be recalculated if missing. The ideal use case for extended attributes is as a cache of additional metadata about a file or directory e.g. "I last checked this directory at timestamp X", or "the MD5 hash at last modified
+timestamp X for this file was Y". Also remember that other processes can and do arbitrarily modify extended attributes concurrent to you.</dd></dl>
+<h3><a class="anchor" id="autotoc_md8"></a>
+Windows only</h3>
+<p>This API is implemented as file alternate data streams, rather than the Extended Attributes API as accessed via <code>NtSetEaFile()</code> and <code>NtQueryEaFile()</code> (which actually modify the file alternate data stream <code>$EA</code> in any case).</p>
+<p>The reason why is that <code>NtSetEaFile()</code> can only <b>append</b> new records to EA storage. It cannot deallocate any existing EA records, if you try to do so you will get <code>STATUS_EA_CORRUPT_ERROR</code>. You can append setting the same name to a different value, which can include a null value which then appears as if the name is no longer there. But there is a cap of 64kB for the EA record, and once it is consumed, it is gone forever for that inode.</p>
+<p>Obviously that doesn't map at all well onto POSIX extended attributes, where you can set the value of an attribute as frequently as you like. The closest equivalent on Windows is therefore file alternate data streams, even though the attribute's value is then worked with as a whole proper file with all the attendant performance consequences.</p>
+<p>As a result, <code>name</code> must be a valid filename and not contain any characters not permitted in a filename. We use the NT API here, so the character restrictions are far fewer than for the Win32 API e.g. single character names do NOT cause misoperation like on Win32. </p>
 
 </div>
 </div>
@@ -1937,6 +2409,45 @@ For portability, you can only assume that barriers write order for a single hand
 </div><!-- fragment -->
 </div>
 </div>
+<a id="a1dd7923bb65456af4da41ebe7cb84982"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1dd7923bb65456af4da41ebe7cb84982">&#9670;&nbsp;</a></span>unlink()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual result&lt;void&gt; llfio_v2_xxx::fs_handle::unlink </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code>std::chrono::seconds(30)</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">noexcept</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Unlinks the current path of this open handle, causing its entry to immediately disappear from the filing system. </p>
+<p>On Windows before Windows 10 1709 unless <code>flag::win_disable_unlink_emulation</code> is set, this behaviour is simulated by renaming the file to something random and setting its delete-on-last-close flag. Note that Windows may prevent the renaming of a file in use by another process, if so it will NOT be renamed. After the next handle to that file closes, it will become permanently unopenable by anyone else until the last handle is closed, whereupon the entry will be eventually removed by the operating system.</p>
+<dl class="section warning"><dt>Warning</dt><dd>Some operating systems provide a race free syscall for unlinking an open handle (Windows). On all other operating systems this call is <b>racy</b> and can result in the wrong file entry being unlinked. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation opens a <code>path_handle</code> to the containing directory first, then checks that the item about to be unlinked has the same inode as the open file handle. It will retry this matching until success until the deadline given. This should prevent most unmalicious accidental loss of data.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">d</td><td>The deadline by which the matching of the containing directory to the open handle's inode must succeed, else <code>errc::timed_out</code> will be returned. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Memory Allocations\n Except on platforms with race free syscalls for unlinking open handles (Windows), calls</dt><dd><code>current_path()</code> and thus is both expensive and calls malloc many times. On Windows, also calls <code>current_path()</code> if <code>flag::disable_safety_unlinks</code> is not set. </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1symlink__handle.html#a002c9dab669604d58e08aa8f4dbc99c8">llfio_v2_xxx::symlink_handle</a>.</p>
+
+</div>
+</div>
 <a id="a24ce92f853d847b5bb4e342b6cc05ca1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a24ce92f853d847b5bb4e342b6cc05ca1">&#9670;&nbsp;</a></span>unlock_file_range()</h2>
 
@@ -2097,6 +2608,7 @@ For portability, you can only assume that barriers write order for a single hand
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__multiplexer_html_a977ed1bb0e53f9e5f7b7493245848dd0"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a977ed1bb0e53f9e5f7b7493245848dd0">llfio_v2_xxx::byte_io_multiplexer::do_byte_io_handle_max_buffers</a></div><div class="ttdeci">virtual size_t do_byte_io_handle_max_buffers(const byte_io_handle *h) const noexcept</div><div class="ttdoc">Implements byte_io_handle::max_buffers()</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:533</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__multiplexer_html_a0a0d3b7d155d63ac644a2e651e538b72"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a0a0d3b7d155d63ac644a2e651e538b72">llfio_v2_xxx::byte_io_multiplexer::construct</a></div><div class="ttdeci">virtual io_operation_state * construct(span&lt; byte &gt; storage, byte_io_handle *_h, io_operation_state_visitor *_visitor, registered_buffer_type &amp;&amp;b, deadline d, io_request&lt; buffers_type &gt; reqs) noexcept=0</div><div class="ttdoc">Constructs either a unsynchronised_io_operation_state or a synchronised_io_operation_state for a read...</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255">llfio_v2_xxx::handle::creation::only_if_not_exist</a></div><div class="ttdeci">@ only_if_not_exist</div><div class="ttdoc">Filesystem entry must NOT exist, and is atomically created by the success of this operation.</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1fs__handle_html_a69e4e3830b2dc8d97772aca03e5da275"><div class="ttname"><a href="classllfio__v2__xxx_1_1fs__handle.html#a69e4e3830b2dc8d97772aca03e5da275">llfio_v2_xxx::fs_handle::set_extended_attribute</a></div><div class="ttdeci">virtual result&lt; void &gt; set_extended_attribute(path_view_component name, span&lt; const byte &gt; value) noexcept</div><div class="ttdoc">Sets the value of an extended attribute on this file or directory.</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__multiplexer_html_a567ade7a70d3883b9fa88d17284702c0"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a567ade7a70d3883b9fa88d17284702c0">llfio_v2_xxx::byte_io_multiplexer::do_byte_io_handle_allocate_registered_buffer</a></div><div class="ttdeci">virtual result&lt; registered_buffer_type &gt; do_byte_io_handle_allocate_registered_buffer(byte_io_handle *h, size_t &amp;bytes) noexcept</div><div class="ttdoc">Implements byte_io_handle::allocate_registered_buffer()</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:537</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__multiplexer_html_a26c52ec51bcb3e27c457c51c6bae4112"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a26c52ec51bcb3e27c457c51c6bae4112">llfio_v2_xxx::byte_io_multiplexer::do_byte_io_handle_deregister</a></div><div class="ttdeci">virtual result&lt; void &gt; do_byte_io_handle_deregister(byte_io_handle *) noexcept</div><div class="ttdoc">Implements byte_io_handle deregistration.</div><div class="ttdef"><b>Definition:</b> byte_io_multiplexer.hpp:532</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__handle_html_ae7db63f7ae859409fd2fd667dcd9133a"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__handle.html#ae7db63f7ae859409fd2fd667dcd9133a">llfio_v2_xxx::byte_io_handle::_do_max_buffers</a></div><div class="ttdeci">virtual size_t _do_max_buffers() const noexcept</div><div class="ttdoc">The virtualised implementation of max_buffers() used if no multiplexer has been set.</div></div>
@@ -2105,11 +2617,14 @@ For portability, you can only assume that barriers write order for a single hand
 <div class="ttc" id="aclassllfio__v2__xxx_1_1file__handle_html_a8b7aa986243527fe224425f61c179709"><div class="ttname"><a href="classllfio__v2__xxx_1_1file__handle.html#a8b7aa986243527fe224425f61c179709">llfio_v2_xxx::file_handle::uniquely_named_file</a></div><div class="ttdeci">static result&lt; file_handle &gt; uniquely_named_file(const path_handle &amp;dirpath, mode _mode=mode::write, caching _caching=caching::temporary, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:163</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1file__handle_html_a09e6b3e9806b328a687a55e955b885a3"><div class="ttname"><a href="classllfio__v2__xxx_1_1file__handle.html#a09e6b3e9806b328a687a55e955b885a3">llfio_v2_xxx::file_handle::file</a></div><div class="ttdeci">static result&lt; file_handle &gt; file(const path_handle &amp;base, path_view_type path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_1_1utils_html_a6a29cf29a4b097411f6c1e5274bfb417"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">llfio_v2_xxx::utils::random_string</a></div><div class="ttdeci">std::string random_string(size_t randomlen)</div><div class="ttdoc">Returns a cryptographically random string capable of being used as a filename. Essentially random_fil...</div><div class="ttdef"><b>Definition:</b> utils.hpp:170</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1fs__handle_html_af7535871db526077329fc8314a11ab6c"><div class="ttname"><a href="classllfio__v2__xxx_1_1fs__handle.html#af7535871db526077329fc8314a11ab6c">llfio_v2_xxx::fs_handle::remove_extended_attribute</a></div><div class="ttdeci">virtual result&lt; void &gt; remove_extended_attribute(path_view_component) noexcept</div><div class="ttdoc">Removes the extended attribute set on this file or directory.</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__handle_html_a0dc183a5eca8c3fb601ebecc13540f96"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__handle.html#a0dc183a5eca8c3fb601ebecc13540f96">llfio_v2_xxx::byte_io_handle::_do_write</a></div><div class="ttdeci">virtual io_result&lt; const_buffers_type &gt; _do_write(io_request&lt; const_buffers_type &gt; reqs, deadline d) noexcept</div><div class="ttdoc">The virtualised implementation of write() used if no multiplexer has been set.</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_1_1path__discovery_html_a2dd74ea752f3f511d58ccccdcac7f4fd"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1path__discovery.html#a2dd74ea752f3f511d58ccccdcac7f4fd">llfio_v2_xxx::path_discovery::storage_backed_temporary_files_directory</a></div><div class="ttdeci">const path_handle &amp; storage_backed_temporary_files_directory() noexcept</div><div class="ttdoc">Returns a reference to an open handle to a verified temporary directory where files created are store...</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__handle_html_a4cc14d7effb7bebb42c996b68a5ce906"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__handle.html#a4cc14d7effb7bebb42c996b68a5ce906">llfio_v2_xxx::byte_io_handle::_do_read</a></div><div class="ttdeci">virtual io_result&lt; buffers_type &gt; _do_read(io_request&lt; buffers_type &gt; reqs, deadline d) noexcept</div><div class="ttdoc">The virtualised implementation of read() used if no multiplexer has been set.</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">llfio_v2_xxx::ip::none</a></div><div class="ttdeci">@ none</div><div class="ttdoc">No flags.</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:224</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__handle_html_aa17020bc615b9a3bc73c66fff8968d11"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__handle.html#aa17020bc615b9a3bc73c66fff8968d11">llfio_v2_xxx::byte_io_handle::read</a></div><div class="ttdeci">io_result&lt; buffers_type &gt; read(io_request&lt; buffers_type &gt; reqs, deadline d=deadline()) noexcept</div><div class="ttdoc">Read data from the open handle, preferentially using any i/o multiplexer set over the virtually overr...</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:297</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__handle_html_ae8536f660a264c143e0d52dee9e43702"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__handle.html#ae8536f660a264c143e0d52dee9e43702">llfio_v2_xxx::byte_io_handle::barrier</a></div><div class="ttdeci">virtual io_result&lt; const_buffers_type &gt; barrier(io_request&lt; const_buffers_type &gt; reqs=io_request&lt; const_buffers_type &gt;(), barrier_kind kind=barrier_kind::nowait_data_only, deadline d=deadline()) noexcept</div><div class="ttdoc">Issue a write reordering barrier such that writes preceding the barrier will reach storage before wri...</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:402</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1fs__handle_html_a28669fc9588bb252eaa39fcf66d7b4fc"><div class="ttname"><a href="classllfio__v2__xxx_1_1fs__handle.html#a28669fc9588bb252eaa39fcf66d7b4fc">llfio_v2_xxx::fs_handle::list_extended_attributes</a></div><div class="ttdeci">virtual result&lt; span&lt; path_view_component &gt; &gt; list_extended_attributes(span&lt; byte &gt; tofill) const noexcept</div><div class="ttdoc">Fill the supplied buffer with the names of all extended attributes set on this file or directory,...</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_ade2416b9154d1e56937c99cd514324f8"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#ade2416b9154d1e56937c99cd514324f8">llfio_v2_xxx::handle::is_multiplexable</a></div><div class="ttdeci">bool is_multiplexable() const noexcept</div><div class="ttdoc">True if multiplexable.</div><div class="ttdef"><b>Definition:</b> handle.hpp:344</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__handle_html_a6e68ac7d62dfb84d4868b161eb25c859"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__handle.html#a6e68ac7d62dfb84d4868b161eb25c859">llfio_v2_xxx::byte_io_handle::_do_allocate_registered_buffer</a></div><div class="ttdeci">virtual result&lt; registered_buffer_type &gt; _do_allocate_registered_buffer(size_t &amp;bytes) noexcept</div><div class="ttdoc">The virtualised implementation of allocate_registered_buffer() used if no multiplexer has been set.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:1023</div></div>
 <!-- start footer part -->

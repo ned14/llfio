@@ -86,8 +86,7 @@ $(document).ready(function(){initNavTree('namespacellfio__v2__xxx_1_1ip.html',''
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#enum-members">Enumerations</a> &#124;
-<a href="#func-members">Functions</a> &#124;
-<a href="#var-members">Variables</a>  </div>
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">llfio_v2_xxx::ip Namespace Reference</div>  </div>
 </div><!--header-->
@@ -127,6 +126,12 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:aa209c529f55f8c8a242080d55c66a4a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The family of IP.  <a href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9">More...</a><br /></td></tr>
 <tr class="separator:aa209c529f55f8c8a242080d55c66a4a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2b874cadb614a4ef4ba44fdf3dd8dd74"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74">bitfield__resolve_flag</a> : unsigned { <a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">none</a> = 0, 
+<a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ae6a8afb252104fb9377515ef4ba6685c">passive</a> = (1U &lt;&lt; 0U), 
+<a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74a848178fff00d31d1c679b6f61f20fe44">blocking</a> = (1U &lt;&lt; 1U)
+ }</td></tr>
+<tr class="memdesc:a2b874cadb614a4ef4ba44fdf3dd8dd74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flags for <code>resolve()</code>  <a href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74">More...</a><br /></td></tr>
+<tr class="separator:a2b874cadb614a4ef4ba44fdf3dd8dd74"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -134,12 +139,9 @@ Functions</h2></td></tr>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a6765418b2c35f959b2eeed474b20db03">operator&lt;&lt;</a> (std::ostream &amp;s, const <a class="el" href="classllfio__v2__xxx_1_1ip_1_1address.html">address</a> &amp;v)</td></tr>
 <tr class="memdesc:a6765418b2c35f959b2eeed474b20db03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write address to stream. <br /></td></tr>
 <tr class="separator:a6765418b2c35f959b2eeed474b20db03"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaf1d36169c4576c6d0917fc17cd6e17e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aaf1d36169c4576c6d0917fc17cd6e17e">QUICKCPPLIB_BITFIELD_BEGIN</a> (resolve_flag)</td></tr>
-<tr class="memdesc:aaf1d36169c4576c6d0917fc17cd6e17e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flags for <code>resolve()</code>  <a href="namespacellfio__v2__xxx_1_1ip.html#aaf1d36169c4576c6d0917fc17cd6e17e">More...</a><br /></td></tr>
-<tr class="separator:aaf1d36169c4576c6d0917fc17cd6e17e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a27328312a9ba596942b36b4adcd43433"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a27328312a9ba596942b36b4adcd43433">QUICKCPPLIB_BITFIELD_END</a> (resolve_flag) inline result&lt; <a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a57373211cd8f5531937f14ea9852dcd4">resolver_ptr</a> &gt; resolve(string_view name</td></tr>
-<tr class="memdesc:a27328312a9ba596942b36b4adcd43433"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve a list of potential <code>address</code> for a given name and service e.g. "www.google.com" and "https" optionally within a bounded deadline.  <a href="namespacellfio__v2__xxx_1_1ip.html#a27328312a9ba596942b36b4adcd43433">More...</a><br /></td></tr>
-<tr class="separator:a27328312a9ba596942b36b4adcd43433"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9095eedda7cd3610631a971730de2c38"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a57373211cd8f5531937f14ea9852dcd4">resolver_ptr</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a9095eedda7cd3610631a971730de2c38">resolve</a> (string_view name, string_view service, <a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9">family</a> _family=<a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a100b8cad7cf2a56f6df78f171f97a1ec">family::any</a>, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d={}, resolve_flag flags=resolve_flag::none) noexcept</td></tr>
+<tr class="memdesc:a9095eedda7cd3610631a971730de2c38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve a list of potential <code>address</code> for a given name and service e.g. "www.google.com" and "https" optionally within a bounded deadline.  <a href="namespacellfio__v2__xxx_1_1ip.html#a9095eedda7cd3610631a971730de2c38">More...</a><br /></td></tr>
+<tr class="separator:a9095eedda7cd3610631a971730de2c38"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a10295dc13fad53bb539533871e747eb2"><td class="memItemLeft" align="right" valign="top"><a id="a10295dc13fad53bb539533871e747eb2"></a>
 result&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a10295dc13fad53bb539533871e747eb2">resolve_trim_cache</a> (size_t maxitems=64) noexcept</td></tr>
 <tr class="memdesc:a10295dc13fad53bb539533871e747eb2"><td class="mdescLeft">&#160;</td><td class="mdescRight"><code>resolve()</code> may utilise a process-wide cache, if so this function will trim that cache. <br /></td></tr>
@@ -168,25 +170,39 @@ result&lt; <a class="el" href="classllfio__v2__xxx_1_1ip_1_1address__v6.html">ad
 result&lt; <a class="el" href="classllfio__v2__xxx_1_1ip_1_1address.html">address</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a199651ec383913fa9a2aec88d5100d1f">make_address</a> (string_view str) noexcept</td></tr>
 <tr class="memdesc:a199651ec383913fa9a2aec88d5100d1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make a v4 or v6 <code>address</code>. v6 addresses need to have the form <code>[::]:port</code>. <br /></td></tr>
 <tr class="separator:a199651ec383913fa9a2aec88d5100d1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
-Variables</h2></td></tr>
-<tr class="memitem:a32f9d03d00478ba190c1160b08c46338"><td class="memItemLeft" align="right" valign="top"><a id="a32f9d03d00478ba190c1160b08c46338"></a>
-string_view&#160;</td><td class="memItemRight" valign="bottom"><b>service</b></td></tr>
-<tr class="separator:a32f9d03d00478ba190c1160b08c46338"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a260aebfdb57084b90e721bad166bc2ff"><td class="memItemLeft" align="right" valign="top"><a id="a260aebfdb57084b90e721bad166bc2ff"></a>
-string_view <a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9">family</a>&#160;</td><td class="memItemRight" valign="bottom"><b>_family</b> = <a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a100b8cad7cf2a56f6df78f171f97a1ec">family::any</a></td></tr>
-<tr class="separator:a260aebfdb57084b90e721bad166bc2ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6511dde2ae512a6262ac979a2fd28a51"><td class="memItemLeft" align="right" valign="top"><a id="a6511dde2ae512a6262ac979a2fd28a51"></a>
-string_view <a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9">family</a> <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td><td class="memItemRight" valign="bottom"><b>d</b> = {}</td></tr>
-<tr class="separator:a6511dde2ae512a6262ac979a2fd28a51"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9cc4f2c010893bac428decc77e0f93a0"><td class="memItemLeft" align="right" valign="top"><a id="a9cc4f2c010893bac428decc77e0f93a0"></a>
-string_view <a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9">family</a> <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> resolve_flag&#160;</td><td class="memItemRight" valign="bottom"><b>flags</b> = resolve_flag::none) noexcept</td></tr>
-<tr class="separator:a9cc4f2c010893bac428decc77e0f93a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Inspired by ASIO's <code>ip</code> namespace. </p>
 </div><h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="a2b874cadb614a4ef4ba44fdf3dd8dd74"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b874cadb614a4ef4ba44fdf3dd8dd74">&#9670;&nbsp;</a></span>bitfield__resolve_flag</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74">llfio_v2_xxx::ip::bitfield__resolve_flag</a> : unsigned</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Flags for <code>resolve()</code> </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a"></a>none&#160;</td><td class="fielddoc"><p>No flags. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a2b874cadb614a4ef4ba44fdf3dd8dd74ae6a8afb252104fb9377515ef4ba6685c"></a>passive&#160;</td><td class="fielddoc"><p>Return addresses for binding to this machine. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a2b874cadb614a4ef4ba44fdf3dd8dd74a848178fff00d31d1c679b6f61f20fe44"></a>blocking&#160;</td><td class="fielddoc"><p>Execute address resolution synchronously. </p>
+</td></tr>
+</table>
+<div class="fragment"><div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;                                          {</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">none</a> = 0,              <span class="comment">//!&lt; No flags</span></div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;<span class="comment"></span>  <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ae6a8afb252104fb9377515ef4ba6685c">passive</a> = (1U &lt;&lt; 0U),  <span class="comment">//!&lt; Return addresses for binding to this machine.</span></div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;<span class="comment"></span>  <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74a848178fff00d31d1c679b6f61f20fe44">blocking</a> = (1U &lt;&lt; 1U)  <span class="comment">//!&lt; Execute address resolution synchronously.</span></div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;<span class="comment"></span>  } QUICKCPPLIB_BITFIELD_END(resolve_flag)</div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="aa209c529f55f8c8a242080d55c66a4a9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa209c529f55f8c8a242080d55c66a4a9">&#9670;&nbsp;</a></span>family</h2>
 
@@ -226,48 +242,56 @@ string_view <a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="aaf1d36169c4576c6d0917fc17cd6e17e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaf1d36169c4576c6d0917fc17cd6e17e">&#9670;&nbsp;</a></span>QUICKCPPLIB_BITFIELD_BEGIN()</h2>
+<a id="a9095eedda7cd3610631a971730de2c38"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9095eedda7cd3610631a971730de2c38">&#9670;&nbsp;</a></span>resolve()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">llfio_v2_xxx::ip::QUICKCPPLIB_BITFIELD_BEGIN </td>
+          <td class="memname">result&lt;<a class="el" href="namespacellfio__v2__xxx_1_1ip.html#a57373211cd8f5531937f14ea9852dcd4">resolver_ptr</a>&gt; llfio_v2_xxx::ip::resolve </td>
           <td>(</td>
-          <td class="paramtype">resolve_flag&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td class="paramtype">string_view&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
         </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Flags for <code>resolve()</code> </p>
-<p>&lt; No flags</p>
-<p>&lt; Return addresses for binding to this machine.</p>
-<p>&lt; Execute address resolution synchronously.</p>
-<div class="fragment"><div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;                                          {</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  none = 0,              <span class="comment">//!&lt; No flags</span></div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;<span class="comment"></span>  passive = (1U &lt;&lt; 0U),  <span class="comment">//!&lt; Return addresses for binding to this machine.</span></div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;<span class="comment"></span>  blocking = (1U &lt;&lt; 1U)  <span class="comment">//!&lt; Execute address resolution synchronously.</span></div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;<span class="comment"></span>  } <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a27328312a9ba596942b36b4adcd43433">QUICKCPPLIB_BITFIELD_END</a>(resolve_flag)</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="a27328312a9ba596942b36b4adcd43433"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a27328312a9ba596942b36b4adcd43433">&#9670;&nbsp;</a></span>QUICKCPPLIB_BITFIELD_END()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
         <tr>
-          <td class="memname">llfio_v2_xxx::ip::QUICKCPPLIB_BITFIELD_END </td>
-          <td>(</td>
-          <td class="paramtype">resolve_flag&#160;</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">string_view&#160;</td>
+          <td class="paramname"><em>service</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9">family</a>&#160;</td>
+          <td class="paramname"><em>_family</em> = <code><a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a100b8cad7cf2a56f6df78f171f97a1ec">family::any</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>&#160;</td>
+          <td class="paramname"><em>d</em> = <code>{}</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">resolve_flag&#160;</td>
+          <td class="paramname"><em>flags</em> = <code>resolve_flag::none</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Retrieve a list of potential <code>address</code> for a given name and service e.g. "www.google.com" and "https" optionally within a bounded deadline. </p>
@@ -280,10 +304,12 @@ string_view <a class="el" href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f
 </div>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_a27328312a9ba596942b36b4adcd43433"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#a27328312a9ba596942b36b4adcd43433">llfio_v2_xxx::ip::QUICKCPPLIB_BITFIELD_END</a></div><div class="ttdeci">QUICKCPPLIB_BITFIELD_END(resolve_flag) inline result&lt; resolver_ptr &gt; resolve(string_view name</div><div class="ttdoc">Retrieve a list of potential address for a given name and service e.g. &quot;www.google....</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_aa209c529f55f8c8a242080d55c66a4a9a100b8cad7cf2a56f6df78f171f97a1ec"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a100b8cad7cf2a56f6df78f171f97a1ec">llfio_v2_xxx::ip::family::any</a></div><div class="ttdeci">@ any</div><div class="ttdoc">Either v4 or v6.</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_a2b874cadb614a4ef4ba44fdf3dd8dd74a848178fff00d31d1c679b6f61f20fe44"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74a848178fff00d31d1c679b6f61f20fe44">llfio_v2_xxx::ip::blocking</a></div><div class="ttdeci">@ blocking</div><div class="ttdoc">Execute address resolution synchronously.</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:226</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_aa209c529f55f8c8a242080d55c66a4a9a0af45c99beb7a9afc9192665c4a05cd3"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a0af45c99beb7a9afc9192665c4a05cd3">llfio_v2_xxx::ip::family::v6</a></div><div class="ttdeci">@ v6</div><div class="ttdoc">IP version 6.</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_a2b874cadb614a4ef4ba44fdf3dd8dd74ae6a8afb252104fb9377515ef4ba6685c"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ae6a8afb252104fb9377515ef4ba6685c">llfio_v2_xxx::ip::passive</a></div><div class="ttdeci">@ passive</div><div class="ttdoc">Return addresses for binding to this machine.</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:225</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_aa209c529f55f8c8a242080d55c66a4a9a5ed3a3ff8e5c29979502b9030e8518e0"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#aa209c529f55f8c8a242080d55c66a4a9a5ed3a3ff8e5c29979502b9030e8518e0">llfio_v2_xxx::ip::family::v4</a></div><div class="ttdeci">@ v4</div><div class="ttdoc">IP version 4.</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">llfio_v2_xxx::ip::none</a></div><div class="ttdeci">@ none</div><div class="ttdoc">No flags.</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:224</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

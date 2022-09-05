@@ -107,7 +107,7 @@ Inheritance diagram for llfio_v2_xxx::algorithm::compare_visitor:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a7ec4aafb16d931783d190cbd8b9c5f7d"><td class="memItemLeft" align="right" valign="top"><a id="a7ec4aafb16d931783d190cbd8b9c5f7d"></a>
-virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html#a7ec4aafb16d931783d190cbd8b9c5f7d">directory_open_failed</a> (void *data, result&lt; void &gt;::error_type &amp;&amp;<a class="el" href="classllfio__v2__xxx_1_1error.html">error</a>, const <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;dirh, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> leaf, size_t depth) noexcept override</td></tr>
+virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html#a7ec4aafb16d931783d190cbd8b9c5f7d">directory_open_failed</a> (void *data, result&lt; void &gt;::error_type &amp;&amp;<a class="el" href="classllfio__v2__xxx_1_1error.html">error</a>, const <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;dirh, path_view leaf, size_t depth) noexcept override</td></tr>
 <tr class="memdesc:a7ec4aafb16d931783d190cbd8b9c5f7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">This override ignores failures to traverse into the directory. <br /></td></tr>
 <tr class="separator:a7ec4aafb16d931783d190cbd8b9c5f7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acec6f86b0ee269eb534f715b2affc5ae"><td class="memItemLeft" align="right" valign="top"><a id="acec6f86b0ee269eb534f715b2affc5ae"></a>
@@ -118,7 +118,7 @@ virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom">
 <tr class="memdesc:a4d3c4b226532089d121dc3d96ed88b39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called to decide whether to enumerate a directory.  <a href="structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html#a4d3c4b226532089d121dc3d96ed88b39">More...</a><br /></td></tr>
 <tr class="separator:a4d3c4b226532089d121dc3d96ed88b39"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a44e3a5ace0aa50d8f6f836c48e510c54"><td class="memItemLeft" align="right" valign="top">virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html#a44e3a5ace0aa50d8f6f836c48e510c54">stack_updated</a> (void *data, size_t dirs_processed, size_t known_dirs_remaining, size_t depth_processed, size_t known_depth_remaining) noexcept</td></tr>
-<tr class="memdesc:a44e3a5ace0aa50d8f6f836c48e510c54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called whenever the traversed stack of directory hierarchy is updated. This can act as an estimated progress indicator, or to give an accurate progress indicator by matching it against a previous traversal. \data The third party data pointer passed to <code>traverse()</code>.  <a href="structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html#a44e3a5ace0aa50d8f6f836c48e510c54">More...</a><br /></td></tr>
+<tr class="memdesc:a44e3a5ace0aa50d8f6f836c48e510c54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called whenever the traversed stack of directory hierarchy is updated. This can act as an estimated progress indicator, or to give an accurate progress indicator by matching it against a previous traversal.  <a href="structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html#a44e3a5ace0aa50d8f6f836c48e510c54">More...</a><br /></td></tr>
 <tr class="separator:a44e3a5ace0aa50d8f6f836c48e510c54"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac188f8691259ec970aeff79b47a5685b"><td class="memItemLeft" align="right" valign="top"><a id="ac188f8691259ec970aeff79b47a5685b"></a>
 virtual result&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html#ac188f8691259ec970aeff79b47a5685b">finished</a> (void *data, result&lt; size_t &gt; result) noexcept</td></tr>
@@ -235,9 +235,10 @@ virtual result&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom
 </table>
 </div><div class="memdoc">
 
-<p>Called whenever the traversed stack of directory hierarchy is updated. This can act as an estimated progress indicator, or to give an accurate progress indicator by matching it against a previous traversal. \data The third party data pointer passed to <code>traverse()</code>. </p>
+<p>Called whenever the traversed stack of directory hierarchy is updated. This can act as an estimated progress indicator, or to give an accurate progress indicator by matching it against a previous traversal. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
+    <tr><td class="paramname">data</td><td>The third party data pointer passed to <code>traverse()</code>. </td></tr>
     <tr><td class="paramname">dirs_processed</td><td>The total number of directories traversed so far. </td></tr>
     <tr><td class="paramname">known_dirs_remaining</td><td>The currently known number of directories awaiting traversal. </td></tr>
     <tr><td class="paramname">depth_processed</td><td>How many levels deep we have already completely traversed. </td></tr>
@@ -258,7 +259,7 @@ virtual result&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li>include/llfio/v2.0/algorithm/difference.hpp</li>
+<li>include/llfio/v2.0/algorithm/<a class="el" href="difference_8hpp.html">difference.hpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
