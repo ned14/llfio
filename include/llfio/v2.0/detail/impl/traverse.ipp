@@ -162,8 +162,7 @@ namespace algorithm
                 using_sso = true;
               }
             }
-#if _MSC_VER < 1933  // <= VS2022.2
-            // MSVC's list::splice() always copies :(
+#if _MSVC_STL_VERSION < 150 // see ned14/llfio#98
             workitem(const workitem &o) noexcept
                 : workitem(const_cast<workitem &&>(std::move(o)))
             {
