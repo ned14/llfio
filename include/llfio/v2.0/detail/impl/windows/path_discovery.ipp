@@ -34,11 +34,20 @@ LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace path_discovery
 {
-  std::vector<std::pair<discovered_path::source_type, _store::_discovered_path>> _all_temporary_directories()
+  std::vector<std::pair<discovered_path::source_type, detail::_store::_discovered_path>> _all_temporary_directories(span<path_view> overrides,
+                                                                                                                    span<path_view> fallbacks)
   {
-    std::vector<std::pair<discovered_path::source_type, _store::_discovered_path>> ret;
+    std::vector<std::pair<discovered_path::source_type, detail::_store::_discovered_path>> ret;
     filesystem::path::string_type buffer;
     buffer.resize(32768);
+    if(!overrides.empty())
+    {
+      ret.reserve(overrides.size());
+      for(auto &i : overrides)
+      {
+        ret.emplace_back(discovered_path::source_type::local, i.path());
+      }
+    }
     // Only observe environment variables if not a SUID or SGID situation
     if(!running_under_suid_gid())
     {
@@ -98,6 +107,14 @@ namespace path_discovery
       }
     }
 
+    if(!fallbacks.empty())
+    {
+      for(auto &i : fallbacks)
+      {
+        ret.emplace_back(discovered_path::source_type::local, i.path());
+      }
+    }
+
     // Finally if everything earlier failed e.g. if our environment block is zeroed,
     // fall back to Win3.1 era "the Windows directory" which definitely won't be
     // C:\Windows nowadays
@@ -129,7 +146,7 @@ namespace path_discovery
     {
       return pipesdir;
     }
-    auto &ps = path_store();
+    auto &ps = detail::path_store();
     std::lock_guard<std::mutex> g(ps.lock);
     auto r = path_handle::path(L"\\!!\\Device\\NamedPipe\\");
     if(!r)

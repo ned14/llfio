@@ -35,6 +35,12 @@ LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 //! \brief Contains functions used to discover suitable paths for things
 namespace path_discovery
 {
+  namespace detail
+  {
+    struct _store;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC inline _store &path_store();
+  }  // namespace detail
+
   //! \brief A discovered path.
   struct discovered_path
   {
@@ -66,21 +72,70 @@ namespace path_discovery
   }
 
   /*! \brief Returns a list of potential directories which might be usuable for temporary files.
+  \param refresh Recalculate the list and all dependent lists, which are statically cached after first call.
+  \param fallbacks Additional local paths to place after the `discovered_path::source_type::system` paths,
+  which therefore would take preference over later `discovered_path::source_type::hardcoded` paths.
+  \param overrides Additional paths to place at the beginning of the list, which therefore would take
+  preference over all other paths.
 
   This is a fairly lightweight call which builds a master list of all potential temporary file directories
   given the environment block of this process (unless SUID or SGID or Privilege Elevation are in effect) and the user
   running this process. It does not verify if any of them exist, or are writable, or anything else about them.
   An internal mutex is held for the duration of this call.
 
+  Potential temporary file directories are sourced as follows:
+
+  - POSIX:
+
+      As per Unix guidelines, in order:
+
+       1. If not SUID nor SUIG situation, from these environment variables in this order of preference:
+       `"TMPDIR", "TMP", "TEMP", "TEMPDIR", "XDG_RUNTIME_DIR", "XDG_CACHE_HOME"` and `${HOME}/.cache`.
+
+       2. The `.cache` directory within the effective user's home directory (created if it doesn't exist).
+
+       3. `/tmp`.
+
+       4. `/var/tmp`.
+
+       5. `/run/user/<effective user id>`.
+
+       6. `/run/shm`.
+
+       7. `/`.
+
+  - Microsoft Windows:
+
+      1. If not SUID nor SUIG situation, from these environment variables in this order of preference:
+      `"TMP", "TEMP", "LOCALAPPDATA", "USERPROFILE"`.
+
+      2. Whatever the Shell says are the paths for: `${FOLDERID_LocalAppData}\Temp`,
+      `${FOLDERID_Profile}\AppData\Local\Temp`, `${FOLDERID_Profile}\Local Settings\Temp`.
+
+      3. `${GetWindowsDirectoryW()}\Temp`.
+
+      4. `GetSystemWindowsDirectoryW()\..\Temp`.
+
   \mallocs Allocates the master list of discovered temporary directories exactly once per process,
   unless `refresh` is true in which case the list will be refreshed. The system calls to retrieve paths
   may allocate additional memory for paths returned.
   \errors This call never fails, except to return an empty span.
   */
-  LLFIO_HEADERS_ONLY_FUNC_SPEC span<discovered_path> all_temporary_directories(bool refresh = false) noexcept;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC span<discovered_path> all_temporary_directories(bool refresh = false, span<path_view> fallbacks = {},
+                                                                               span<path_view> overrides = {}) noexcept;
+
+  //! \brief The default regex used to determine what temporary directories are backed by storage not memory.
+  static constexpr const char storage_backed_regex[] =
+  "btrfs|cifs|exfat|ext[2-4]|f2fs|hfs|apfs|jfs|lxfs|nfs|nilf2|ufs|vfat|xfs|zfs|msdosfs|newnfs|ntfs|smbfs|unionfs|fat|fat32|overlayfs";
+  //! \brief The default regex used to determine what temporary directories are backed by memory not storage.
+  static constexpr const char memory_backed_regex[] = "tmpfs|ramfs";
 
   /*! \brief Returns a subset of `all_temporary_directories()` each of which has been tested to be writable
   by the current process. No testing is done of available writable space.
+  \param _storage_backed_regex The regex to use to determine which of the temporary directories are backed by
+  storage not memory. The regex is executed case insensitively.
+  \param _memory_backed_regex The regex to use to determine which of the temporary directories are backed by
+  memory not storage. The regex is executed case insensitively.
 
   After this call returns, the successfully probed entries returned by `all_temporary_directories()` will have their
   stat structure set. As the probing involves creating a non-zero sized file in each possible temporary
@@ -91,15 +146,14 @@ namespace path_discovery
   \errors This call never fails, though if it fails to find any writable temporary directory, it will
   terminate the process.
   */
-  LLFIO_HEADERS_ONLY_FUNC_SPEC span<discovered_path> verified_temporary_directories() noexcept;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC span<discovered_path> verified_temporary_directories(const char *_storage_backed_regex = storage_backed_regex,
+                                                                                    const char *_memory_backed_regex = memory_backed_regex) noexcept;
 
   /*! \brief Returns a reference to an open handle to a verified temporary directory where files created are
   stored in a filesystem directory, usually under the current user's quota.
 
-  This is implemented by iterating all of the paths returned by `verified_temporary_directories()`
-  and checking what file system is in use. The following regex is used:
-
-  `btrfs|cifs|exfat|ext(2|3|4)|f2fs|hfs|apfs|jfs|lxfs|nfs|nilf2|ufs|vfat|xfs|zfs|msdosfs|newnfs|ntfs|smbfs|unionfs|fat|fat32`
+  This is implemented by `verified_temporary_directories()` iterating all of the paths returned by
+  and checking what file system is in use, comparing it to `storage_backed_regex`.
 
   The handle is created during `verified_temporary_directories()` and is statically cached thereafter.
   */
@@ -109,10 +163,8 @@ namespace path_discovery
   stored in memory/paging file, and thus access may be a lot quicker, but stronger limits on
   capacity may apply.
 
-  This is implemented by iterating all of the paths returned by `verified_temporary_directories()`
-  and checking what file system is in use. The following regex is used:
-
-  `tmpfs|ramfs`
+  This is implemented by `verified_temporary_directories()` iterating all of the paths returned by
+  and checking what file system is in use, comparing it to `memory_backed_regex`.
 
   The handle is created during `verified_temporary_directories()` and is statically cached thereafter.
 

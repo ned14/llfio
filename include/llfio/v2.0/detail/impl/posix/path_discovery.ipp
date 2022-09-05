@@ -34,11 +34,20 @@ LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace path_discovery
 {
-  std::vector<std::pair<discovered_path::source_type, _store::_discovered_path>> _all_temporary_directories()
+  std::vector<std::pair<discovered_path::source_type, detail::_store::_discovered_path>> _all_temporary_directories(span<path_view> overrides,
+                                                                                                                    span<path_view> fallbacks)
   {
-    std::vector<std::pair<discovered_path::source_type, _store::_discovered_path>> ret;
+    std::vector<std::pair<discovered_path::source_type, detail::_store::_discovered_path>> ret;
     filesystem::path::string_type buffer;
     buffer.resize(PATH_MAX);
+    if(!overrides.empty())
+    {
+      ret.reserve(overrides.size());
+      for(auto &i : overrides)
+      {
+        ret.emplace_back(discovered_path::source_type::local, i.path());
+      }
+    }
     // Only observe environment variables if not a SUID or SGID situation
     // FIXME? Is this actually enough? What about the non-standard saved uid/gid?
     // Should I be checking if my executable is SUGID and its owning user is not mine?
@@ -130,6 +139,14 @@ namespace path_discovery
       }
     }
 
+    if(!fallbacks.empty())
+    {
+      for(auto &i : fallbacks)
+      {
+        ret.emplace_back(discovered_path::source_type::local, i.path());
+      }
+    }
+
     // If everything earlier failed e.g. if our environment block is zeroed,
     // fall back to /tmp and then /var/tmp, the last of which should succeed even if tmpfs is not mounted
     ret.emplace_back(discovered_path::source_type::hardcoded, "/tmp");
@@ -143,7 +160,10 @@ namespace path_discovery
     return ret;
   }
 
-  const path_handle &temporary_named_pipes_directory() noexcept { return storage_backed_temporary_files_directory(); }
+  const path_handle &temporary_named_pipes_directory() noexcept
+  {
+    return storage_backed_temporary_files_directory();
+  }
 }  // namespace path_discovery
 
 LLFIO_V2_NAMESPACE_END

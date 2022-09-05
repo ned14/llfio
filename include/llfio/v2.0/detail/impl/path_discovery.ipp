@@ -37,36 +37,40 @@ LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace path_discovery
 {
-  struct _store
+  namespace detail
   {
-    std::mutex lock;
-    std::vector<discovered_path> all;
-    span<discovered_path> verified;
-    struct _discovered_path
+    struct _store
     {
-      filesystem::path path;
-      size_t priority{0};
-      std::string fstypename;
-      directory_handle h;  // not retained after verification
-      explicit _discovered_path(filesystem::path _path)
-          : path(std::move(_path))
+      std::mutex lock;
+      std::vector<discovered_path> all;
+      span<discovered_path> verified;
+      struct _discovered_path
       {
-      }
+        filesystem::path path;
+        size_t priority{0};
+        std::string fstypename;
+        directory_handle h;  // not retained after verification
+        explicit _discovered_path(filesystem::path _path)
+            : path(std::move(_path))
+        {
+        }
+      };
+      std::vector<_discovered_path> _all;
+      directory_handle storage_backed, memory_backed;
     };
-    std::vector<_discovered_path> _all;
-    directory_handle storage_backed, memory_backed;
-  };
-  inline _store &path_store()
-  {
-    static _store s;
-    return s;
-  }
+    inline _store &path_store()
+    {
+      static _store s;
+      return s;
+    }
+  }  // namespace detail
 
-  inline std::vector<std::pair<discovered_path::source_type, _store::_discovered_path>> _all_temporary_directories();
+  inline std::vector<std::pair<discovered_path::source_type, detail::_store::_discovered_path>> _all_temporary_directories(span<path_view> overrides,
+                                                                                                                           span<path_view> fallbacks);
 
-  span<discovered_path> all_temporary_directories(bool refresh) noexcept
+  span<discovered_path> all_temporary_directories(bool refresh, span<path_view> fallbacks, span<path_view> overrides) noexcept
   {
-    auto &ps = path_store();
+    auto &ps = detail::path_store();
     if(!refresh && !ps.all.empty())
     {
       return ps.all;
@@ -86,7 +90,7 @@ namespace path_discovery
     }
     try
     {
-      std::vector<std::pair<discovered_path::source_type, _store::_discovered_path>> raw = _all_temporary_directories();
+      std::vector<std::pair<discovered_path::source_type, detail::_store::_discovered_path>> raw = _all_temporary_directories(overrides, fallbacks);
       if(raw.empty())
       {
         LLFIO_LOG_FATAL(nullptr, "path_discovery::all_temporary_directories() sees no possible temporary directories, something has gone very wrong");
@@ -128,9 +132,9 @@ namespace path_discovery
     return ps.all;
   }
 
-  span<discovered_path> verified_temporary_directories() noexcept
+  span<discovered_path> verified_temporary_directories(const char *_storage_backed_regex, const char *_memory_backed_regex) noexcept
   {
-    auto &ps = path_store();
+    auto &ps = detail::path_store();
     if(!ps.verified.empty())
     {
       return ps.verified;
@@ -214,7 +218,7 @@ namespace path_discovery
         }
       }
       // Now partition into those with valid stat directories and those without
-      std::stable_partition(ps._all.begin(), ps._all.end(), [](const _store::_discovered_path &a) { return a.h.is_valid(); });
+      std::stable_partition(ps._all.begin(), ps._all.end(), [](const detail::_store::_discovered_path &a) { return a.h.is_valid(); });
       auto it = std::stable_partition(ps.all.begin(), ps.all.end(), [](const discovered_path &a) { return a.stat; });
       ps.verified = span<discovered_path>(ps.all.data(), it - ps.all.begin());
       if(ps.verified.empty())
@@ -231,16 +235,15 @@ namespace path_discovery
       }
 
       // Finally, need to choose storage and memory backed directories
-      std::regex storage_backed_regex("btrfs|cifs|exfat|ext[2-4]|f2fs|hfs|apfs|jfs|lxfs|nfs|nilf2|ufs|vfat|xfs|zfs|msdosfs|newnfs|ntfs|smbfs|unionfs|fat|fat32",
-                                      std::regex::icase);
-      std::regex memory_backed_regex("tmpfs|ramfs", std::regex::icase);
+      std::regex storage_backed_regex_(_storage_backed_regex, std::regex::icase);
+      std::regex memory_backed_regex_(_memory_backed_regex, std::regex::icase);
       for(size_t n = 0; n < ps.verified.size(); n++)
       {
-        if(!ps.storage_backed.is_valid() && std::regex_match(ps._all[n].fstypename, storage_backed_regex))
+        if(!ps.storage_backed.is_valid() && std::regex_match(ps._all[n].fstypename, storage_backed_regex_))
         {
           ps.storage_backed = std::move(ps._all[n].h);
         }
-        if(!ps.memory_backed.is_valid() && std::regex_match(ps._all[n].fstypename, memory_backed_regex))
+        if(!ps.memory_backed.is_valid() && std::regex_match(ps._all[n].fstypename, memory_backed_regex_))
         {
           ps.memory_backed = std::move(ps._all[n].h);
         }
@@ -266,13 +269,13 @@ namespace path_discovery
   const path_handle &storage_backed_temporary_files_directory() noexcept
   {
     (void) verified_temporary_directories();
-    auto &ps = path_store();
+    auto &ps = detail::path_store();
     return ps.storage_backed;
   }
   const path_handle &memory_backed_temporary_files_directory() noexcept
   {
     (void) verified_temporary_directories();
-    auto &ps = path_store();
+    auto &ps = detail::path_store();
     return ps.memory_backed;
   }
 }  // namespace path_discovery
