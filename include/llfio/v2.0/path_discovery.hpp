@@ -38,7 +38,7 @@ namespace path_discovery
   namespace detail
   {
     struct _store;
-    LLFIO_HEADERS_ONLY_FUNC_SPEC inline _store &path_store();
+    LLFIO_HEADERS_ONLY_FUNC_SPEC _store &path_store();
   }  // namespace detail
 
   //! \brief A discovered path.

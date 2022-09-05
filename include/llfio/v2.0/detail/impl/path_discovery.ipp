@@ -58,7 +58,7 @@ namespace path_discovery
       std::vector<_discovered_path> _all;
       directory_handle storage_backed, memory_backed;
     };
-    inline _store &path_store()
+    _store &path_store()
     {
       static _store s;
       return s;
