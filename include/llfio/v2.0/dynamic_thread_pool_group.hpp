@@ -35,6 +35,8 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4275)  // dll interface
 #endif
 
+//! \file dynamic_thread_pool_group.hpp Provides a dynamic thread pool.
+
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 class dynamic_thread_pool_group_impl;

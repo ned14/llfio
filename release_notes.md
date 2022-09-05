@@ -47,7 +47,7 @@ Examples of use:
 \snippet use_cases.cpp sparse_array
 </td>
 <td width="50%" valign="top">
-\snippet use_cases.cpp coroutine_write
+\snippet tls_socket_handle.cpp https_get
 </td>
 </tr>
 </table>

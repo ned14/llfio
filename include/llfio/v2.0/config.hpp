@@ -108,6 +108,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "quickcpplib/cpp_feature.h"
 
+#ifndef STANDARDESE_IS_IN_THE_HOUSE
 #ifndef __cpp_exceptions
 #error LLFIO needs C++ exceptions to be turned on
 #endif
@@ -137,6 +138,7 @@ Distributed under the Boost Software License, Version 1.0.
 #if !__has_include(<filesystem>) && !__has_include(<experimental/filesystem>)
 // clang-format on
 #error LLFIO needs an implementation of the Filesystem TS in the standard library
+#endif
 #endif
 #endif
 
@@ -247,10 +249,10 @@ namespace filesystem = std::filesystem;
 LLFIO_V2_NAMESPACE_END
 #endif
 #elif __PCPP_ALWAYS_TRUE__
-#define LLFIO_USING_EXPERIMENTAL_FILESYSTEM 1
-#include <experimental/filesystem>
+#define LLFIO_USING_STD_FILESYSTEM 1
+#include <filesystem>
 LLFIO_V2_NAMESPACE_BEGIN
-namespace filesystem = std::experimental::filesystem;
+namespace filesystem = std::filesystem;
 LLFIO_V2_NAMESPACE_END
 // clang-format on
 #elif defined(_MSC_VER)

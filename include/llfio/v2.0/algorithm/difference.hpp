@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "traverse.hpp"
 
-//! \file compare.hpp Provides a directory tree difference algorithm.
+//! \file difference.hpp Provides a directory tree difference algorithm.
 
 LLFIO_V2_NAMESPACE_BEGIN
 

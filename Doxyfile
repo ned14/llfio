@@ -229,7 +229,7 @@ TAB_SIZE               = 2
 # newlines.
 
 ALIASES                = "errors=@par Errors returnable\n" "mallocs=@par Memory Allocations\n" \
-			"raceguarantees{1}=@par Race Guarantees\n\1" \
+			"raceguarantees=@par Race Guarantees\n" \
 			"complexity{1}=@par Complexity\n\1" \
       "exceptionmodel{1}=@par Errors returnable\n\1"
 
@@ -2024,7 +2024,16 @@ INCLUDE_FILE_PATTERNS  =
 # recursively expanded use the := operator instead of the = operator.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-PREDEFINED             = DOXYGEN_IS_IN_THE_HOUSE=1 DOXYGEN_SHOULD_SKIP_THIS=1 LLFIO_REQUIRES(...)=
+PREDEFINED             = DOXYGEN_IS_IN_THE_HOUSE=1 DOXYGEN_SHOULD_SKIP_THIS=1 LLFIO_REQUIRES(...)= \
+    QUICKCPPLIB_TEMPLATE(...)="template <__VA_ARGS__" \
+    QUICKCPPLIB_TREQUIRES(...)=", __VA_ARGS__ >" \
+    QUICKCPPLIB_TEXPR(...)="typename = decltype(__VA_ARGS__)" \
+    QUICKCPPLIB_TPRED(...)="typename std::enable_if<(__VA_ARGS__), bool>::type = true" \
+    QUICKCPPLIB_REQUIRES(...)= \
+    QUICKCPPLIB_NODISCARD="[[nodiscard]]" \
+    QUICKCPPLIB_BITFIELD_BEGIN(type)="enum bitfield__##type : unsigned" \
+    QUICKCPPLIB_BITFIELD_BEGIN_T(type, UT)="enum bitfield__##type : UT" \
+    QUICKCPPLIB_BITFIELD_END(type)=";"
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
@@ -2040,7 +2049,10 @@ EXPAND_AS_DEFINED      = LLFIO_DECL LLFIO_DEADLINE_NAME LLFIO_MAKE_FREE_FUNCTION
     LLFIO_VERSION_GLUE2 LLFIO_VERSION_GLUE LLFIO_HEADERS_PATH4 LLFIO_HEADERS_PATH3 LLFIO_HEADERS_PATH2 \
     LLFIO_HEADERS_PATH LLFIO_MODULE_NAME \
     LLFIO_VERSION_MAJOR LLFIO_VERSION_MINOR \
-    LLFIO_REQUIRES LLFIO_DEADLINE_TRY_FOR_UNTIL
+    LLFIO_REQUIRES LLFIO_DEADLINE_TRY_FOR_UNTIL \
+    LLFIO_NODISCARD QUICKCPPLIB_NODISCARD LLFIO_PATH_VIEW_CONSTEXPR \
+    LLFIO_TEMPLATE QUICKCPPLIB_TEMPLATE LLFIO_TREQUIRES QUICKCPPLIB_TREQUIRES LLFIO_TEXPR QUICKCPPLIB_TEXPR LLFIO_TPRED QUICKCPPLIB_TPRED \
+    QUICKCPPLIB_REQUIRES QUICKCPPLIB_BITFIELD_BEGIN QUICKCPPLIB_BITFIELD_BEGIN_T QUICKCPPLIB_BITFIELD_END
 
 EXPAND_AS_DEFINED     += KVSTORE_V1_NAMESPACE KVSTORE_V1_NAMESPACE_BEGIN KVSTORE_V1_NAMESPACE_EXPORT_BEGIN KVSTORE_V1_NAMESPACE_END
 

@@ -101,7 +101,7 @@ namespace algorithm
     This can act as an estimated progress indicator, or to give an
     accurate progress indicator by matching it against a previous
     traversal.
-    \data The third party data pointer passed to `traverse()`.
+    \param data The third party data pointer passed to `traverse()`.
     \param dirs_processed The total number of directories traversed so far.
     \param known_dirs_remaining The currently known number of directories
     awaiting traversal.

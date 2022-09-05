@@ -346,6 +346,8 @@ public:
   was read or not. You should *always* examine `.metadata()` for the metadata you are about to use,
   fetching it with `stat_t::fill()` if not yet present.
   \param req A buffer fill (directory enumeration) request.
+  \param d An optional deadline by which the i/o must complete, else it is cancelled.
+  Note function may return significantly after this deadline if the i/o takes long to cancel.
   \errors todo
   \mallocs If the `kernelbuffer` parameter is set in the request, no memory allocations.
   If unset, at least one memory allocation, possibly more is performed. MAKE SURE you reuse the

@@ -282,12 +282,13 @@ TLS certificate.
 */
 static inline void TestAuthenticatingTLSSocketHandles()
 {
-  static constexpr const char *test_host = "github.com";
-  static constexpr const char *get_request = R"(GET / HTTP/1.0
+  //! [https_get]
+  namespace llfio = LLFIO_V2_NAMESPACE;
+  static constexpr llfio::string_view test_host("github.com");
+  static constexpr llfio::string_view get_request(R"(GET / HTTP/1.0
 Host: github.com
 
-)";
-  namespace llfio = LLFIO_V2_NAMESPACE;
+)");
   if(llfio::tls_socket_source_registry::empty())
   {
     std::cout << "\nNOTE: This platform has no TLS socket sources in its registry, skipping this test." << std::endl;
@@ -313,12 +314,13 @@ Host: github.com
   }
   // Get the front page
   std::cout << "\nThe socket which connected to " << test_host << " negotiated the cipher " << sock->algorithms_description() << std::endl;
-  auto written = sock->write({{(const llfio::byte *) get_request, strlen(get_request)}}).value();
-  BOOST_REQUIRE(written == strlen(get_request));
+  llfio::tls_socket_handle::const_buffer_type get_request_buffer(reinterpret_cast<const llfio::byte *>(get_request.data()), get_request.size());
+  auto written = sock->write({get_request_buffer}).value();
+  BOOST_REQUIRE(written == get_request.size());
   // Fetch the front page. The connection will close once all data is sent.
-  std::vector<char> buffer(4096);
+  std::vector<llfio::byte> buffer(4096);
   size_t offset = 0;
-  for(size_t readed = 0; (readed = sock->read({{(llfio::byte *) buffer.data() + offset, buffer.size() - offset}}, std::chrono::seconds(3)).value()) > 0;)
+  for(size_t readed = 0; (readed = sock->read({{buffer.data() + offset, buffer.size() - offset}}, std::chrono::seconds(3)).value()) > 0;)
   {
     offset += readed;
     if(buffer.size() - offset < 1024)
@@ -328,10 +330,11 @@ Host: github.com
   }
   buffer.resize(offset);
   std::cout << "\nRead from " << test_host << " " << offset << " bytes. The first 1024 bytes are:\n\n"
-            << llfio::string_view(buffer.data(), offset).substr(0, 1024) << "\n"
+            << llfio::string_view(reinterpret_cast<const char *>(buffer.data()), offset).substr(0, 1024) << "\n"
             << std::endl;
   // Make sure this doesn't hang because the socket is closed
   sock->shutdown_and_close().value();
+  //! [https_get]
 }
 
 #if 0

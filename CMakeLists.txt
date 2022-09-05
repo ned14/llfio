@@ -119,7 +119,7 @@ endif()
 if(NOT PROJECT_IS_DEPENDENCY)
   if(NOT PYTHONINTERP_FOUND)
     indented_message(WARNING "NOT rebuilding preprocessed edition of library due to python not being installed")
-  elseif(FALSE)
+  else()
     function(make_single_header target name)
       add_partial_preprocess(${target}
                             "${name}"
@@ -155,6 +155,30 @@ if(NOT PROJECT_IS_DEPENDENCY)
                        -D QUICKCPPLIB_DISABLE_ABI_PERMUTATION=1
                        -U LLFIO_UNSTABLE_VERSION
                        -U OUTCOME_UNSTABLE_VERSION)
+#    add_partial_preprocess(llfio_hl-docs
+#                          "${CMAKE_CURRENT_SOURCE_DIR}/single-header/docs.hpp"
+#                          "${CMAKE_CURRENT_SOURCE_DIR}/include/llfio/revision.hpp"
+#                          "${CMAKE_CURRENT_SOURCE_DIR}/include/llfio/v2.0/llfio.hpp"
+#                          -D QUICKCPPLIB_USE_STD_BYTE -D QUICKCPPLIB_USE_STD_OPTIONAL -D QUICKCPPLIB_USE_STD_SPAN
+#                          -U gsl_COMPILER_MSVC_VERSION -U gsl_HAS_CPP0X -D gsl_CPLUSPLUS=201703 -D __cplusplus=201703
+#                          -D LLFIO_HEADERS_ONLY=0
+#                          -D LLFIO_DISABLE_ABI_PERMUTATION=1
+#                          -D OUTCOME_DISABLE_ABI_PERMUTATION=1
+#                          -D QUICKCPPLIB_DISABLE_ABI_PERMUTATION=1
+#                          -U LLFIO_UNSTABLE_VERSION
+#                          -U OUTCOME_UNSTABLE_VERSION
+#                          -I ../quickcpplib/include -I ../outcome/include
+#                          --passthru-unfound-includes
+#                          --passthru-comments # --debug
+#                          -U QUICKCPPLIB_ENABLE_VALGRIND
+#                          -D DOXYGEN_SHOULD_SKIP_THIS -D DOXYGEN_IS_IN_THE_HOUSE
+#                          -U __cpp_modules
+#                          -D LLFIO_INCLUDE_ALL
+#                          WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+#                          )
+#    if(NOT CMAKE_VERSION VERSION_LESS 3.3)
+#      add_dependencies(llfio_hl llfio_hl-docs)
+#    endif()
   endif()
 
   # Create a custom doxygen generation target

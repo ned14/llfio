@@ -139,8 +139,9 @@ inline result<filesystem::path> to_win32_path(const T &h, win32_path_namespace m
 inline result<filesystem::path> to_win32_path(const fs_handle &h, win32_path_namespace mapping = win32_path_namespace::any) noexcept;
 LLFIO_TEMPLATE(class T)
 LLFIO_TREQUIRES(LLFIO_TPRED(!std::is_base_of<fs_handle, T>::value && std::is_base_of<handle, T>::value))
-inline result<filesystem::path> to_win32_path(const T &h, win32_path_namespace /*unused*/ = win32_path_namespace::any) noexcept
+inline result<filesystem::path> to_win32_path(const T &h, win32_path_namespace mapping = win32_path_namespace::any) noexcept
 {
+  (void) mapping;
   return h.current_path();
 }
 #endif
@@ -155,7 +156,11 @@ class LLFIO_DECL fs_handle
 #ifdef _WIN32
   friend LLFIO_HEADERS_ONLY_FUNC_SPEC result<filesystem::path> to_win32_path(const fs_handle &h, win32_path_namespace mapping) noexcept;
 #else
-  friend inline result<filesystem::path> to_win32_path(const fs_handle &h, win32_path_namespace /*unused*/) noexcept { return h._get_handle().current_path(); }
+  friend inline result<filesystem::path> to_win32_path(const fs_handle &h, win32_path_namespace mapping) noexcept
+  {
+    (void) mapping;
+    return h._get_handle().current_path();
+  }
 #endif
 
 public:

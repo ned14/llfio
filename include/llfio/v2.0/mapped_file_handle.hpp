@@ -376,6 +376,7 @@ public:
   \param _caching How to ask the kernel to cache the file.
   \param flags Any additional custom behaviours.
   \param sflags Any additional custom behaviours for the internal `section_handle`.
+  \param offset The offset into the backing file for the map.
 
   Note that if the file is currently zero sized, no mapping occurs now, but
   later when `truncate()` or `update_map()` is called.
