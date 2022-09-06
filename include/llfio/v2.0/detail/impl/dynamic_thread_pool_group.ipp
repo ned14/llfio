@@ -49,6 +49,10 @@ Distributed under the Boost Software License, Version 1.0.
 #include <condition_variable>
 #include <thread>
 #elif __has_include(<dispatch/dispatch.h>)
+// enable GCD on non-Linux if available but not configured
+#ifndef LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD
+#define LLFIO_DYNAMIC_THREAD_POOL_GROUP_USING_GCD 1
+#endif
 #include <dispatch/dispatch.h>
 #else
 #error dynamic_thread_pool_group requires Grand Central Dispatch (libdispatch) on non-Linux POSIX.
