@@ -24,8 +24,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../../../utils.hpp"
 
-#include <cinttypes>  // for SCNu64 
-#include <mutex>  // for lock_guard
+#include <cinttypes>  // for SCNu64
+#include <mutex>      // for lock_guard
 
 #include <sys/mman.h>
 
@@ -220,7 +220,8 @@ namespace utils
 #ifdef __linux__
     try
     {
-      auto fill_buffer = [](std::vector<char> &buffer, const char *path) -> result<void> {
+      auto fill_buffer = [](std::vector<char> &buffer, const char *path) -> result<void>
+      {
         for(;;)
         {
           int ih = ::open(path, O_RDONLY);
@@ -253,7 +254,8 @@ namespace utils
         }
         return success();
       };
-      auto parse = [](string_view item, string_view what) -> result<uint64_t> {
+      auto parse = [](string_view item, string_view what) -> result<uint64_t>
+      {
         auto idx = item.find(what);
         if(string_view::npos == idx)
         {
@@ -417,7 +419,8 @@ namespace utils
           std::vector<string_view> anon_entries, non_anon_entries;
           anon_entries.reserve(32);
           non_anon_entries.reserve(32);
-          auto find_item = [&](size_t idx) -> string_view {
+          auto find_item = [&](size_t idx) -> string_view
+          {
             auto x = totalview.rfind("\nSize:", idx);
             if(x == string_view::npos)
             {
@@ -601,7 +604,8 @@ namespace utils
       cpu <user> <user-nice> <kernel> <idle>
       */
       std::vector<char> buffer1(65536), buffer2(65536);
-      auto fill_buffer = [](std::vector<char> &buffer, const char *path) -> result<void> {
+      auto fill_buffer = [](std::vector<char> &buffer, const char *path) -> result<void>
+      {
         for(;;)
         {
           int ih = ::open(path, O_RDONLY);
@@ -638,8 +642,7 @@ namespace utils
       OUTCOME_TRY(fill_buffer(buffer1, "/proc/self/stat"));
       OUTCOME_TRY(fill_buffer(buffer2, "/proc/stat"));
       if(sscanf(buffer1.data(), "%*d %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %" SCNu64 " %" SCNu64, &ret.process_ns_in_user_mode,
-                &ret.process_ns_in_kernel_mode) <
-         2)
+                &ret.process_ns_in_kernel_mode) < 2)
       {
         return errc::protocol_error;
       }
@@ -705,9 +708,9 @@ namespace utils
       return (double) timebase.numer / timebase.denom;
     }();*/
     10000000.0;                         // no idea why, but apparently this is the multiplier according to Mac CI runners
-    ret.system_ns_in_user_mode = (uint64_t)(ts_multiplier * ret.system_ns_in_user_mode);
-    ret.system_ns_in_kernel_mode = (uint64_t)(ts_multiplier * ret.system_ns_in_kernel_mode);
-    ret.system_ns_in_idle_mode = (uint64_t)(ts_multiplier * ret.system_ns_in_idle_mode);
+    ret.system_ns_in_user_mode = (uint64_t) (ts_multiplier * ret.system_ns_in_user_mode);
+    ret.system_ns_in_kernel_mode = (uint64_t) (ts_multiplier * ret.system_ns_in_kernel_mode);
+    ret.system_ns_in_idle_mode = (uint64_t) (ts_multiplier * ret.system_ns_in_idle_mode);
     return ret;
 #else
 #error Unknown platform
@@ -721,6 +724,7 @@ namespace utils
     {
       large_page_allocation ret(calculate_large_page_allocation(bytes));
       int flags = MAP_SHARED | MAP_ANON;
+      int fd_to_use = -1;
       if(ret.page_size_used > 65536)
       {
 #ifdef MAP_HUGETLB
@@ -730,18 +734,19 @@ namespace utils
         flags |= MAP_ALIGNED_SUPER;
 #endif
 #ifdef VM_FLAGS_SUPERPAGE_SIZE_ANY
-        flags |= VM_FLAGS_SUPERPAGE_SIZE_ANY;
+        fd_to_use = VM_FLAGS_SUPERPAGE_SIZE_ANY;
 #endif
       }
-      if((ret.p = mmap(nullptr, ret.actual_size, PROT_WRITE, flags, -1, 0)) == nullptr)
+      if((ret.p = mmap(nullptr, ret.actual_size, PROT_READ | PROT_WRITE, flags, fd_to_use, 0)) == MAP_FAILED)
       {
         if(ENOMEM == errno)
         {
-          if((ret.p = mmap(nullptr, ret.actual_size, PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0)) != nullptr)
+          if((ret.p = mmap(nullptr, ret.actual_size, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, fd_to_use, 0)) != MAP_FAILED)
           {
             return ret;
           }
         }
+        ret.p = nullptr;
       }
 #ifndef NDEBUG
       else if(ret.page_size_used > 65536)
