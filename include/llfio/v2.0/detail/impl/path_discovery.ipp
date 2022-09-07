@@ -263,6 +263,20 @@ namespace path_discovery
       LLFIO_LOG_FATAL(nullptr, "path_discovery::verified_temporary_directories() saw unknown exception throw");
       abort();
     }
+#ifndef LLFIO_PATH_DISCOVERY_DISABLE_STORAGE_BACKED_TEMPORARY_FILES_DIRECTORY_WARNING
+    if(!ps.storage_backed.is_valid())
+    {
+      LLFIO_LOG_WARN(nullptr, "path_discovery:verified_temporary_directories() found no suitable path for storage_backed_temporary_files_directory(), creation "
+                              "of storage backed temporary files will fail with bad_file_descriptor!");
+    }
+#endif
+#ifndef LLFIO_PATH_DISCOVERY_DISABLE_MEMORY_BACKED_TEMPORARY_FILES_DIRECTORY_WARNING
+    if(!ps.memory_backed.is_valid())
+    {
+      LLFIO_LOG_WARN(nullptr, "path_discovery:verified_temporary_directories() found no suitable path for memory_backed_temporary_files_directory(), creation "
+                              "of memory backed temporary files will fail with bad_file_descriptor!");
+    }
+#endif
     return ps.verified;
   }
 
