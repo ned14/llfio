@@ -141,11 +141,8 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <div class="line">  one_trillion_int_array[999999999999ULL] = 6;</div>
 </div><!-- fragment --> </td><td width="50%" valign="top"><div class="fragment"><div class="line">  <span class="keyword">namespace </span><a class="code" href="namespacellfio__v2__xxx.html">llfio</a> = <a class="code" href="group__config.html#gac9f7f0153adb9034d26c4554728f817a">LLFIO_V2_NAMESPACE</a>;</div>
 <div class="line">  <span class="keyword">static</span> constexpr llfio::string_view test_host(<span class="stringliteral">&quot;github.com&quot;</span>);</div>
-<div class="line">  <span class="keyword">static</span> constexpr llfio::string_view get_request(R<span class="stringliteral">&quot;(GET / HTTP/1.0</span></div>
-<div class="line"><span class="stringliteral">Host: github.com</span></div>
-<div class="line"><span class="stringliteral"></span> </div>
-<div class="line"><span class="stringliteral">)&quot;);</span></div>
-<div class="line"><span class="stringliteral">  </span><span class="keywordflow">if</span>(<a class="code" href="classllfio__v2__xxx_1_1tls__socket__source__registry.html#a294c3be8a3c986009971c408b2a1a4c6">llfio::tls_socket_source_registry::empty</a>())</div>
+<div class="line">  <span class="keyword">static</span> constexpr llfio::string_view get_request(<span class="stringliteral">&quot;GET / HTTP/1.0\r\nHost: github.com\r\n\r\n&quot;</span>);</div>
+<div class="line">  <span class="keywordflow">if</span>(<a class="code" href="classllfio__v2__xxx_1_1tls__socket__source__registry.html#a294c3be8a3c986009971c408b2a1a4c6">llfio::tls_socket_source_registry::empty</a>())</div>
 <div class="line">  {</div>
 <div class="line">    std::cout &lt;&lt; <span class="stringliteral">&quot;\nNOTE: This platform has no TLS socket sources in its registry, skipping this test.&quot;</span> &lt;&lt; std::endl;</div>
 <div class="line">    <span class="keywordflow">return</span>;</div>
@@ -176,9 +173,9 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <div class="line">  <span class="comment">// Fetch the front page. The connection will close once all data is sent.</span></div>
 <div class="line">  std::vector&lt;llfio::byte&gt; buffer(4096);</div>
 <div class="line">  <span class="keywordtype">size_t</span> offset = 0;</div>
-<div class="line">  <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> readed = 0; (readed = sock-&gt;read({{buffer.data() + offset, buffer.size() - offset}}, std::chrono::seconds(3)).value()) &gt; 0;)</div>
+<div class="line">  <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> nread = 0; (nread = sock-&gt;read({{buffer.data() + offset, buffer.size() - offset}}, std::chrono::seconds(3)).value()) &gt; 0;)</div>
 <div class="line">  {</div>
-<div class="line">    offset += readed;</div>
+<div class="line">    offset += nread;</div>
 <div class="line">    <span class="keywordflow">if</span>(buffer.size() - offset &lt; 1024)</div>
 <div class="line">    {</div>
 <div class="line">      buffer.resize(buffer.size() + 4096);</div>
