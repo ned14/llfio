@@ -194,8 +194,15 @@ public:
   static inline constexpr const file_io_error_domain &get();
 #endif
 
+  virtual typename _base::payload_info_t payload_info() const noexcept override
+  {
+    return {sizeof(value_type), sizeof(SYSTEM_ERROR2_NAMESPACE::status_code_domain *) + sizeof(value_type),
+            (alignof(value_type) > alignof(SYSTEM_ERROR2_NAMESPACE::status_code_domain *)) ? alignof(value_type) :
+                                                                                             alignof(SYSTEM_ERROR2_NAMESPACE::status_code_domain *)};
+  }
+
 protected:
-  virtual inline string_ref _do_message(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept override final
+  virtual inline string_ref _do_message(const SYSTEM_ERROR2_NAMESPACE::status_code<void> &code) const noexcept override
   {
     assert(code.domain() == *this);
     const auto &v = static_cast<const SYSTEM_ERROR2_NAMESPACE::status_code<file_io_error_domain> &>(code);  // NOLINT
@@ -245,6 +252,27 @@ protected:
     }
     memcpy(p, ret.c_str(), ret.size() + 1);
     return atomic_refcounted_string_ref(p, ret.size());
+  }
+  virtual bool _do_erased_copy(SYSTEM_ERROR2_NAMESPACE::status_code<void> &dst, const SYSTEM_ERROR2_NAMESPACE::status_code<void> &src,
+                               typename _base::payload_info_t dstinfo) const override
+  {
+    // Note that dst may not have its domain set
+    const auto srcinfo = payload_info();
+    if(dstinfo.total_size >= srcinfo.total_size)
+    {
+      // Identity
+      memcpy(&dst, &src, srcinfo.total_size);
+      return true;
+    }
+    if(dstinfo.total_size >= sizeof(SYSTEM_ERROR2_NAMESPACE::status_code_domain *) + sizeof(value_type::sc))
+    {
+      // Allow dropping LLFIO additional state
+      const auto *basedomain = &_base::get();
+      memcpy(&dst, &src, sizeof(SYSTEM_ERROR2_NAMESPACE::status_code_domain *) + sizeof(value_type::sc));
+      memcpy(&dst, &basedomain, sizeof(SYSTEM_ERROR2_NAMESPACE::status_code_domain *));
+      return true;
+    }
+    return false;
   }
 };
 #if __cplusplus >= 201402L || defined(_MSC_VER)
@@ -327,7 +355,10 @@ inline file_io_error ntkernel_error(SYSTEM_ERROR2_NAMESPACE::win32::NTSTATUS c);
 
 namespace detail
 {
-  inline std::ostream &operator<<(std::ostream &s, const file_io_error &v) { return s << "llfio::file_io_error(" << v.message().c_str() << ")"; }
+  inline std::ostream &operator<<(std::ostream &s, const file_io_error &v)
+  {
+    return s << "llfio::file_io_error(" << v.message().c_str() << ")";
+  }
 }  // namespace detail
 inline file_io_error error_from_exception(std::exception_ptr &&ep = std::current_exception(),
                                           SYSTEM_ERROR2_NAMESPACE::system_code not_matched = errc::resource_unavailable_try_again) noexcept
@@ -408,7 +439,10 @@ public:
   }
 
   //! Retrieve the value of the error code
-  int value() const noexcept { return ec.value(); }
+  int value() const noexcept
+  {
+    return ec.value();
+  }
   //! Retrieve any first path associated with this failure. Note this only works if called from the same thread as where the failure occurred.
   inline filesystem::path path1() const
   {

@@ -285,10 +285,7 @@ static inline void TestAuthenticatingTLSSocketHandles()
   //! [https_get]
   namespace llfio = LLFIO_V2_NAMESPACE;
   static constexpr llfio::string_view test_host("github.com");
-  static constexpr llfio::string_view get_request(R"(GET / HTTP/1.0
-Host: github.com
-
-)");
+  static constexpr llfio::string_view get_request("GET / HTTP/1.0\r\nHost: github.com\r\n\r\n");
   if(llfio::tls_socket_source_registry::empty())
   {
     std::cout << "\nNOTE: This platform has no TLS socket sources in its registry, skipping this test." << std::endl;
@@ -320,9 +317,9 @@ Host: github.com
   // Fetch the front page. The connection will close once all data is sent.
   std::vector<llfio::byte> buffer(4096);
   size_t offset = 0;
-  for(size_t readed = 0; (readed = sock->read({{buffer.data() + offset, buffer.size() - offset}}, std::chrono::seconds(3)).value()) > 0;)
+  for(size_t nread = 0; (nread = sock->read({{buffer.data() + offset, buffer.size() - offset}}, std::chrono::seconds(3)).value()) > 0;)
   {
-    offset += readed;
+    offset += nread;
     if(buffer.size() - offset < 1024)
     {
       buffer.resize(buffer.size() + 4096);
