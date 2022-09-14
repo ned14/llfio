@@ -1,5 +1,5 @@
 /* A view of a path to something
-(C) 2017-2021 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2017-2022 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: Jul 2017
 
 
@@ -90,17 +90,47 @@ namespace detail
         : v(_v)
     {
     }
-    constexpr bool operator!() const noexcept { return !v; }
-    constexpr explicit operator bool() const noexcept { return !!v; }
-    constexpr int operator-(int x) const noexcept { return v - x; }
-    constexpr int operator+(int x) const noexcept { return v + x; }
+    constexpr bool operator!() const noexcept
+    {
+      return !v;
+    }
+    constexpr explicit operator bool() const noexcept
+    {
+      return !!v;
+    }
+    constexpr int operator-(int x) const noexcept
+    {
+      return v - x;
+    }
+    constexpr int operator+(int x) const noexcept
+    {
+      return v + x;
+    }
   };
-  constexpr inline bool operator<(char8_t a, char8_t b) noexcept { return a.v < b.v; }
-  constexpr inline bool operator>(char8_t a, char8_t b) noexcept { return a.v > b.v; }
-  constexpr inline bool operator<=(char8_t a, char8_t b) noexcept { return a.v <= b.v; }
-  constexpr inline bool operator>=(char8_t a, char8_t b) noexcept { return a.v >= b.v; }
-  constexpr inline bool operator==(char8_t a, char8_t b) noexcept { return a.v == b.v; }
-  constexpr inline bool operator!=(char8_t a, char8_t b) noexcept { return a.v != b.v; }
+  constexpr inline bool operator<(char8_t a, char8_t b) noexcept
+  {
+    return a.v < b.v;
+  }
+  constexpr inline bool operator>(char8_t a, char8_t b) noexcept
+  {
+    return a.v > b.v;
+  }
+  constexpr inline bool operator<=(char8_t a, char8_t b) noexcept
+  {
+    return a.v <= b.v;
+  }
+  constexpr inline bool operator>=(char8_t a, char8_t b) noexcept
+  {
+    return a.v >= b.v;
+  }
+  constexpr inline bool operator==(char8_t a, char8_t b) noexcept
+  {
+    return a.v == b.v;
+  }
+  constexpr inline bool operator!=(char8_t a, char8_t b) noexcept
+  {
+    return a.v != b.v;
+  }
 #endif
 #endif
 #if !defined(__CHAR16_TYPE__) && !defined(_MSC_VER)  // VS2015 onwards has built in char16_t
@@ -156,7 +186,10 @@ namespace detail
   class path_view_iterator;
 
   LLFIO_TEMPLATE(class T, class U)
-  LLFIO_TREQUIRES(LLFIO_TEXPR(std::declval<U>()((T *) nullptr))) constexpr inline U is_deleter(U &&v) { return v; }
+  LLFIO_TREQUIRES(LLFIO_TEXPR(std::declval<U>()((T *) nullptr))) constexpr inline U is_deleter(U &&v)
+  {
+    return v;
+  }
   template <class T> constexpr inline void is_deleter(...) {}
   LLFIO_TEMPLATE(class U)
   LLFIO_TREQUIRES(LLFIO_TEXPR(std::declval<U>().deallocate((typename U::value_type *) nullptr, (size_t) 0))) constexpr inline U is_allocator(U &&v)
@@ -173,11 +206,13 @@ class path_view;
 class path_view_component;
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view_component x, path_view_component y) noexcept;
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view_component x, path_view_component y) noexcept;
+inline LLFIO_PATH_VIEW_CONSTEXPR size_t hash_value(path_view_component x) noexcept;
 template <class F> inline LLFIO_PATH_VIEW_CONSTEXPR auto visit(path_view_component view, F &&f);
 template <class F> inline LLFIO_PATH_VIEW_CONSTEXPR auto visit(F &&f, path_view_component view);
 inline std::ostream &operator<<(std::ostream &s, const path_view_component &v);
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view x, path_view y) noexcept;
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view x, path_view y) noexcept;
+inline LLFIO_PATH_VIEW_CONSTEXPR size_t hash_value(path_view x) noexcept;
 
 /*! \class path_view_component
 \brief An iterated part of a `path_view`.
@@ -188,6 +223,7 @@ class LLFIO_DECL path_view_component
   friend class detail::path_view_iterator;
   friend inline LLFIO_PATH_VIEW_CONSTEXPR bool LLFIO_V2_NAMESPACE::operator==(path_view_component x, path_view_component y) noexcept;
   friend inline LLFIO_PATH_VIEW_CONSTEXPR bool LLFIO_V2_NAMESPACE::operator!=(path_view_component x, path_view_component y) noexcept;
+  friend inline LLFIO_PATH_VIEW_CONSTEXPR size_t hash_value(path_view_component x) noexcept;
   template <class F> friend inline LLFIO_PATH_VIEW_CONSTEXPR auto LLFIO_V2_NAMESPACE::visit(path_view_component view, F &&f);
   template <class F> friend inline LLFIO_PATH_VIEW_CONSTEXPR auto LLFIO_V2_NAMESPACE::visit(F &&f, path_view_component view);
   friend inline std::ostream &LLFIO_V2_NAMESPACE::operator<<(std::ostream &s, const path_view_component &v);
@@ -560,7 +596,9 @@ private:
 #ifdef _WIN32
     if(sep_idx == 2 && _length == 3)
     {
-      return this->_invoke([this, sep_idx](const auto &v) mutable {
+      return this->_invoke(
+      [this, sep_idx](const auto &v) mutable
+      {
         if(v[1] == ':')
         {
           return path_view_component(v.data() + 2, 1, zero_termination(), formatting());
@@ -589,7 +627,10 @@ public:
   path_view_component &operator=(path_view_component &&) = default;
   ~path_view_component() = default;
 
-  const byte *_raw_data() const noexcept { return _bytestr; }
+  const byte *_raw_data() const noexcept
+  {
+    return _bytestr;
+  }
 
   //! Swap the view with another
   constexpr void swap(path_view_component &o) noexcept
@@ -600,7 +641,10 @@ public:
   }
 
   //! True if empty
-  LLFIO_NODISCARD constexpr bool empty() const noexcept { return _length == 0; }
+  LLFIO_NODISCARD constexpr bool empty() const noexcept
+  {
+    return _length == 0;
+  }
 
   //! Returns the size of the view in characters.
   LLFIO_PATH_VIEW_CONSTEXPR size_t native_size() const noexcept
@@ -609,22 +653,39 @@ public:
   }
 
   //! How path separators shall be interpreted
-  constexpr format formatting() const noexcept { return _format; }
+  constexpr format formatting() const noexcept
+  {
+    return _format;
+  }
 
   //! True if input is declared to be zero terminated
-  constexpr bool has_zero_termination() const noexcept { return _zero_terminated; }
+  constexpr bool has_zero_termination() const noexcept
+  {
+    return _zero_terminated;
+  }
   //! The zero termination during construction
-  constexpr enum zero_termination zero_termination() const noexcept { return _zero_terminated ? zero_terminated : not_zero_terminated; }
+  constexpr enum zero_termination zero_termination() const noexcept
+  {
+    return _zero_terminated ? zero_terminated : not_zero_terminated;
+  }
 
   //! True if `stem()` returns a non-empty path.
-  LLFIO_PATH_VIEW_CONSTEXPR bool has_stem() const noexcept { return !stem().empty(); }
+  LLFIO_PATH_VIEW_CONSTEXPR bool has_stem() const noexcept
+  {
+    return !stem().empty();
+  }
   //! True if `extension()` returns a non-empty path.
-  LLFIO_PATH_VIEW_CONSTEXPR bool has_extension() const noexcept { return !extension().empty(); }
+  LLFIO_PATH_VIEW_CONSTEXPR bool has_extension() const noexcept
+  {
+    return !extension().empty();
+  }
 
   //! True if the view contains any of the characters `*`, `?`, (POSIX only: `[` or `]`).
   LLFIO_PATH_VIEW_CONSTEXPR bool contains_glob() const noexcept
   {
-    return _invoke([](const auto &v) {
+    return _invoke(
+    [](const auto &v)
+    {
       using value_type = typename std::remove_reference<decltype(*v.data())>::type;
 #ifdef _WIN32
       const value_type *tofind = (sizeof(value_type) > 1) ? (const value_type *) L"*?" : (const value_type *) "*?";
@@ -639,7 +700,9 @@ public:
   LLFIO_PATH_VIEW_CONSTEXPR path_view_component stem() const noexcept
   {
     auto self = _filename();
-    return self._invoke([self](const auto &v) {
+    return self._invoke(
+    [self](const auto &v)
+    {
       auto dot_idx = v.rfind('.');
       if(_npos == dot_idx || dot_idx == 0 || (dot_idx == 1 && v[dot_idx - 1] == '.'))
       {
@@ -652,7 +715,9 @@ public:
   LLFIO_PATH_VIEW_CONSTEXPR path_view_component extension() const noexcept
   {
     auto self = _filename();
-    return self._invoke([this](const auto &v) {
+    return self._invoke(
+    [this](const auto &v)
+    {
       auto dot_idx = v.rfind('.');
       if(_npos == dot_idx || dot_idx == 0 || (dot_idx == 1 && v[dot_idx - 1] == '.'))
       {
@@ -682,7 +747,10 @@ private:
   }
 #endif
 #ifdef LLFIO_USING_EXPERIMENTAL_FILESYSTEM
-  template <class CharT> static filesystem::path _path_from_char_array(basic_string_view<CharT> v) { return {v.data(), v.data() + v.size()}; }
+  template <class CharT> static filesystem::path _path_from_char_array(basic_string_view<CharT> v)
+  {
+    return {v.data(), v.data() + v.size()};
+  }
   static filesystem::path _path_from_char_array(basic_string_view<char8_t> v)
   {
 #if(__cplusplus >= 202000 || _HAS_CXX20) && (!defined(_LIBCPP_VERSION) || _LIBCPP_VERSION > 10000 /* approx start of 2020 */)
@@ -693,7 +761,10 @@ private:
   }
 #endif
 
-  template <class CharT> static int _do_compare(const CharT *a, const CharT *b, size_t length) noexcept { return memcmp(a, b, length * sizeof(CharT)); }
+  template <class CharT> static int _do_compare(const CharT *a, const CharT *b, size_t length) noexcept
+  {
+    return memcmp(a, b, length * sizeof(CharT));
+  }
   static int _do_compare(const char8_t *_a, const char8_t *_b, size_t length) noexcept
   {
 #if LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED
@@ -742,19 +813,23 @@ public:
   //! Return the path view as a path. Allocates and copies memory!
   filesystem::path path() const
   {
-    return _invoke([&](const auto &v) {
+    return _invoke(
+    [&](const auto &v)
+    {
 #ifdef LLFIO_USING_STD_FILESYSTEM
-      return _path_from_char_array(v, [](format f) -> filesystem::path::format {
-        switch(f)
-        {
-        case format::generic_format:
-          return filesystem::path::format::generic_format;
-        case format::native_format:
-          return filesystem::path::format::native_format;
-        default:
-          return filesystem::path::format::auto_format;
-        }
-      }(formatting()));
+      return _path_from_char_array(v,
+                                   [](format f) -> filesystem::path::format
+                                   {
+                                     switch(f)
+                                     {
+                                     case format::generic_format:
+                                       return filesystem::path::format::generic_format;
+                                     case format::native_format:
+                                       return filesystem::path::format::native_format;
+                                     default:
+                                       return filesystem::path::format::auto_format;
+                                     }
+                                   }(formatting()));
 #endif
 #ifdef LLFIO_USING_EXPERIMENTAL_FILESYSTEM
       if(formatting() == generic_format || formatting() == native_format)
@@ -787,9 +862,11 @@ public:
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>))
   constexpr int compare(path_view_component p, const std::locale &loc) const
   {
-    return _invoke([&](const auto &self) {
-      return p._invoke(
-      [&](const auto &other) { return _compare<T, Deleter, _internal_buffer_size>(self, zero_termination(), other, p.zero_termination(), &loc); });
+    return _invoke(
+    [&](const auto &self)
+    {
+      return p._invoke([&](const auto &other)
+                       { return _compare<T, Deleter, _internal_buffer_size>(self, zero_termination(), other, p.zero_termination(), &loc); });
     });
   }
   //! \overload
@@ -798,9 +875,11 @@ public:
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>))
   constexpr int compare(path_view_component p) const
   {
-    return _invoke([&](const auto &self) {
-      return p._invoke(
-      [&](const auto &other) { return _compare<T, Deleter, _internal_buffer_size>(self, zero_termination(), other, p.zero_termination(), nullptr); });
+    return _invoke(
+    [&](const auto &self)
+    {
+      return p._invoke([&](const auto &other)
+                       { return _compare<T, Deleter, _internal_buffer_size>(self, zero_termination(), other, p.zero_termination(), nullptr); });
     });
   }
 
@@ -1319,7 +1398,10 @@ public:
         , _deleter2(std::move(o._deleter2))
     {
     }
-    ~rendered_path() { reset(); }
+    ~rendered_path()
+    {
+      reset();
+    }
     rendered_path(const rendered_path &) = delete;
     rendered_path(rendered_path &&o) noexcept
         : _base(o)
@@ -1381,26 +1463,103 @@ public:
     }
 
     //! The zero termination of this rendered path
-    static constexpr enum zero_termination zero_termination() noexcept { return ZeroTermination; }
+    static constexpr enum zero_termination zero_termination() noexcept
+    {
+      return ZeroTermination;
+    }
     //! The size of the internal buffer
-    static constexpr size_t internal_buffer_size() noexcept { return (_internal_buffer_size > 0) ? _internal_buffer_size : 1; }
+    static constexpr size_t internal_buffer_size() noexcept
+    {
+      return (_internal_buffer_size > 0) ? _internal_buffer_size : 1;
+    }
     //! The storage capacity, which may be larger than `size()` if the internal buffer is in use
-    size_t capacity() const noexcept { return (this->data() == _buffer) ? internal_buffer_size() : this->size(); }
+    size_t capacity() const noexcept
+    {
+      return (this->data() == _buffer) ? internal_buffer_size() : this->size();
+    }
     //! True if this rendered path refers to the source path view
-    bool references_source() const noexcept { return this->data() != _buffer && _bytes_to_delete == 0; }
+    bool references_source() const noexcept
+    {
+      return this->data() != _buffer && _bytes_to_delete == 0;
+    }
 
     //! Access the custom deleter instance passed to the constructor
-    const AllocatorOrDeleter &deleter() const noexcept { return _deleter2; }
+    const AllocatorOrDeleter &deleter() const noexcept
+    {
+      return _deleter2;
+    }
     //! Access the custom deleter instance passed to the constructor
-    AllocatorOrDeleter &deleter() noexcept { return _deleter2; }
+    AllocatorOrDeleter &deleter() noexcept
+    {
+      return _deleter2;
+    }
 
     //! The memory resource passed to the constructor
-    pmr::memory_resource *memory_resource() noexcept { return (pmr::memory_resource *) _deleter1arg; }
+    pmr::memory_resource *memory_resource() noexcept
+    {
+      return (pmr::memory_resource *) _deleter1arg;
+    }
 
     //! Access the custom allocator instance passed to the constructor
-    const AllocatorOrDeleter &allocator() const noexcept { return _deleter2; }
+    const AllocatorOrDeleter &allocator() const noexcept
+    {
+      return _deleter2;
+    }
     //! Access the custom allocator instance passed to the constructor
-    AllocatorOrDeleter &allocator() noexcept { return _deleter2; }
+    AllocatorOrDeleter &allocator() noexcept
+    {
+      return _deleter2;
+    }
+
+    //! True if the bits backing the rendered path are identical
+    bool operator==(const rendered_path &o) const noexcept
+    {
+      if(this->data() == nullptr && o->data() == nullptr)
+      {
+        return true;
+      }
+      if(this->data() == nullptr && o->data() != nullptr)
+      {
+        return false;
+      }
+      if(this->data() != nullptr && o->data() == nullptr)
+      {
+        return false;
+      }
+      if(this->size() != o.size())
+      {
+        return false;
+      }
+      return 0 == memcmp(this->data(), o.data(), this->size());
+    }
+    //! True if the bits backing the rendered path are non-identical
+    bool operator!=(const rendered_path &o) const noexcept
+    {
+      if(this->data() == nullptr && o->data() == nullptr)
+      {
+        return false;
+      }
+      if(this->data() == nullptr && o->data() != nullptr)
+      {
+        return true;
+      }
+      if(this->data() != nullptr && o->data() == nullptr)
+      {
+        return true;
+      }
+      if(this->size() != o.size())
+      {
+        return true;
+      }
+      return 0 != memcmp(this->data(), o.data(), this->size());
+    }
+    //! Returns the hash value for the bits backing the rendered path
+    friend size_t hash_value(const rendered_path &v) noexcept
+    {
+      auto sv = v.as_string_view();
+      using type = typename std::decay<decltype(sv)>::type;
+      return std::hash<type>()(sv);
+    }
 
   private:
     size_t _bytes_to_delete{0};
@@ -1432,6 +1591,8 @@ public:
 };
 static_assert(std::is_trivially_copyable<path_view_component>::value, "path_view_component is not trivially copyable!");
 static_assert(sizeof(path_view_component) == 3 * sizeof(void *), "path_view_component is not three pointers in size!");
+//! \brief Compares **identity** equality not equivalence i.e. backing storage type must be identical, and backing bytes must be identical. Use `compare()` if
+//! you want something stronger.
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view_component x, path_view_component y) noexcept
 {
   if(x.native_size() != y.native_size())
@@ -1467,6 +1628,8 @@ inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view_component x, path_vie
   const auto bytes = (x._wchar || x._utf16) ? (x._length * 2) : x._length;
   return 0 == memcmp(x._bytestr, y._bytestr, bytes);
 }
+//! \brief Compares **identity** inequality not disequivalence i.e. backing storage type must be different, or backing bytes must be different. Use `compare()`
+//! if you want something stronger.
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view_component x, path_view_component y) noexcept
 {
   if(x.native_size() != y.native_size())
@@ -1529,6 +1692,16 @@ inline constexpr bool operator!=(const CharT * /*unused*/, path_view_component /
 {
   static_assert(!path_view_component::is_source_acceptable<CharT>, "Do not use operator!= with path_view_component and a string literal, use .compare<>()");
   return false;
+}
+//! \brief Hashes a `path_view_component`.
+inline LLFIO_PATH_VIEW_CONSTEXPR size_t hash_value(path_view_component view) noexcept
+{
+  return view._invoke(
+  [](auto sv)
+  {
+    using type = typename std::decay<decltype(sv)>::type;
+    return std::hash<type>()(sv);
+  });
 }
 //! \brief Visit the underlying source for a `path_view_component` (LLFIO backwards compatible overload)
 template <class F> inline LLFIO_PATH_VIEW_CONSTEXPR auto visit(path_view_component view, F &&f)
@@ -1673,6 +1846,7 @@ class path_view : public path_view_component
   friend class detail::path_view_iterator;
   friend inline LLFIO_PATH_VIEW_CONSTEXPR bool LLFIO_V2_NAMESPACE::operator==(path_view x, path_view y) noexcept;
   friend inline LLFIO_PATH_VIEW_CONSTEXPR bool LLFIO_V2_NAMESPACE::operator!=(path_view x, path_view y) noexcept;
+  friend inline LLFIO_PATH_VIEW_CONSTEXPR size_t hash_value(path_view x) noexcept;
 
 public:
   //! Const iterator type
@@ -1854,7 +2028,9 @@ public:
 #ifdef _WIN32
     if(is_ntpath())
       return true;
-    return this->_invoke([sep_idx](const auto &v) {
+    return this->_invoke(
+    [sep_idx](const auto &v)
+    {
       if(sep_idx == 0)
       {
         if(v[sep_idx + 1] == preferred_separator)  // double separator at front
@@ -1868,12 +2044,17 @@ public:
 #endif
   }
   //! True if relative
-  constexpr bool is_relative() const noexcept { return !is_absolute(); }
+  constexpr bool is_relative() const noexcept
+  {
+    return !is_absolute();
+  }
 #ifdef _WIN32
   // True if the path view is a NT kernel path starting with `\!!\` or `\??\`
   constexpr bool is_ntpath() const noexcept
   {
-    return this->_invoke([](const auto &v) {
+    return this->_invoke(
+    [](const auto &v)
+    {
       if(v.size() < 4)
       {
         return false;
@@ -1893,7 +2074,9 @@ public:
   // True if the path view is a UNC path starting with `\\`
   constexpr bool is_uncpath() const noexcept
   {
-    return this->_invoke([](const auto &v) {
+    return this->_invoke(
+    [](const auto &v)
+    {
       if(v.size() < 2)
       {
         return false;
@@ -1909,7 +2092,9 @@ public:
   // True if the path view matches the format of an LLFIO deleted file
   constexpr bool is_llfio_deleted() const noexcept
   {
-    return filename()._invoke([](const auto &v) {
+    return filename()._invoke(
+    [](const auto &v)
+    {
       if(v.size() == 64 + 8)
       {
         // Could be one of our "deleted" files, is he all hex + ".deleted"?
@@ -1957,7 +2142,9 @@ public:
       return path_view();
 #endif
     }
-    return this->_invoke([sep_idx, this](auto v) {
+    return this->_invoke(
+    [sep_idx, this](auto v)
+    {
       return path_view(v.data(),
 #if LLFIO_USING_EXPERIMENTAL_FILESYSTEM
 #ifdef _MSC_VER
@@ -1990,7 +2177,9 @@ public:
     {
       return path_view();
     }
-    return this->_invoke([sep_idx, this](const auto &v) {
+    return this->_invoke(
+    [sep_idx, this](const auto &v)
+    {
 #ifdef _WIN32
       auto colon_idx = v.find(':');
       if(colon_idx < sep_idx)
@@ -2014,7 +2203,9 @@ public:
       return path_view();
     }
 #ifdef _WIN32
-    return this->_invoke([this, sep_idx](const auto &v) mutable {
+    return this->_invoke(
+    [this, sep_idx](const auto &v) mutable
+    {
       // Special case \\.\ and \\?\ to match filesystem::path
       if(is_ntpath() || (v.size() >= 4 && sep_idx == 0 && v[1] == '\\' && (v[2] == '.' || v[2] == '?') && v[3] == '\\'))
       {
@@ -2037,7 +2228,9 @@ public:
         return path_view(v.data(), sep_idx + 1, not_zero_terminated, formatting());
       }
 #else
-    return this->_invoke([this, sep_idx](const auto &v) {
+    return this->_invoke(
+    [this, sep_idx](const auto &v)
+    {
 #endif
       if(sep_idx == 0)
       {
@@ -2055,7 +2248,9 @@ public:
       return *this;
     }
 #ifdef _WIN32
-    return this->_invoke([this, sep_idx](const auto &v) mutable {
+    return this->_invoke(
+    [this, sep_idx](const auto &v) mutable
+    {
       // Special case \\.\ and \\?\ to match filesystem::path
       if(is_ntpath() || (v.size() >= 4 && sep_idx == 0 && v[1] == '\\' && (v[2] == '.' || v[2] == '?') && v[3] == '\\'))
       {
@@ -2078,7 +2273,9 @@ public:
         return path_view(v.data() + sep_idx + 1, v.size() - sep_idx - 1, this->zero_termination(), formatting());
       }
 #else
-    return this->_invoke([this, sep_idx](const auto &v) {
+    return this->_invoke(
+    [this, sep_idx](const auto &v)
+    {
 #endif
       if(sep_idx == 0)
       {
@@ -2096,7 +2293,9 @@ public:
       return path_view();
     }
 #ifdef _WIN32
-    return this->_invoke([this, sep_idx](const auto &v) {
+    return this->_invoke(
+    [this, sep_idx](const auto &v)
+    {
       // UNC paths return a trailing slash if the parent path is the server name
       if(is_uncpath())
       {
@@ -2119,19 +2318,24 @@ public:
 #endif
     });
 #elif LLFIO_USING_EXPERIMENTAL_FILESYSTEM  // Filesystem TS returns parent path "" for "/"
-    return this->_invoke(
-    [this, sep_idx](const auto &v) { return path_view(v.data(), (sep_idx == 0 && this->_length > 1) ? 1 : sep_idx, not_zero_terminated, formatting()); });
+    return this->_invoke([this, sep_idx](const auto &v)
+                         { return path_view(v.data(), (sep_idx == 0 && this->_length > 1) ? 1 : sep_idx, not_zero_terminated, formatting()); });
 #else
   return this->_invoke([this, sep_idx](const auto &v) { return path_view(v.data(), (sep_idx == 0) ? 1 : sep_idx, not_zero_terminated, formatting()); });
 #endif
   }
   //! Returns a view of the filename part of this view.
-  LLFIO_PATH_VIEW_CONSTEXPR path_view filename() const noexcept { return this->_filename(); }
+  LLFIO_PATH_VIEW_CONSTEXPR path_view filename() const noexcept
+  {
+    return this->_filename();
+  }
   //! Returns a view of this view without a trailing separator, if there is one, unless the input is '/'
   LLFIO_PATH_VIEW_CONSTEXPR path_view without_trailing_separator() const noexcept
   {
     auto sep_idx = this->_find_last_sep();
-    return this->_invoke([this, sep_idx](const auto &v) {
+    return this->_invoke(
+    [this, sep_idx](const auto &v)
+    {
       if(sep_idx > 0 && v.size() - 1 == sep_idx)
       {
         return path_view(v.data(), sep_idx, not_zero_terminated, formatting());
@@ -2207,14 +2411,44 @@ namespace detail
   private:
     const path_view *_parent{nullptr};
     size_type _begin{0}, _end{0};
-    int _special{0};  // -1 if at preceding /, +1 if at trailing /
+    int _special{0};  // -2 if at preceding /, -1 if at / after a //, +1 if at trailing /
 
     static constexpr auto _npos = string_view::npos;
     constexpr bool _is_end() const noexcept { return (nullptr == _parent) || (!_special && _parent->native_size() == _begin); }
+    constexpr size_t _find_unc_prefix() const noexcept
+    {
+      auto a = _parent->_find_first_sep(0);
+      if(a != 0)
+      {
+        return _npos;
+      }
+      a = _parent->_find_first_sep(1);
+      if(a != 1)
+      {
+        return _npos;
+      }
+      size_t ret = 2;
+      for(;;)
+      {
+        auto e = _parent->_find_first_sep(ret);
+        if(e == ret)
+        {
+          ret++;
+          continue;
+        }
+        if(e == _npos)
+        {
+          e = _parent->native_size();
+        }
+        return e;
+      }
+    }
     LLFIO_PATH_VIEW_CONSTEXPR value_type _get() const noexcept
     {
       assert(_parent != nullptr);
-      return _parent->_invoke([this](const auto &v) {
+      return _parent->_invoke(
+      [this](const auto &v)
+      {
         assert(_end <= v.size());
         assert(_begin <= _end);
         return path_view_component(v.data() + _begin, _end - _begin,
@@ -2223,13 +2457,41 @@ namespace detail
     }
     LLFIO_PATH_VIEW_CONSTEXPR void _inc() noexcept
     {
-      _begin = (_end > 0 && !_special) ? (_end + 1) : _end;
-      _end = _parent->_find_first_sep(_begin);
+      do
+      {
+        _begin = (_end > 0 && !_special) ? (_end + 1) : _end;
+        _end = _parent->_find_first_sep(_begin);
+      } while(_special == 0 && _begin == _end && _end != 0);
       if(0 == _end)
       {
-        // Path has a beginning /
-        _special = -1;
-        _end = 1;
+        // Path has a beginning /[/*] and all must be returned as a single component
+        _special = -2;
+        _end = _find_unc_prefix();
+        if(_npos == _end)
+        {
+          // Not an UNC prefix
+          _end = 1;
+        }
+        else
+        {
+          _special = -1;
+        }
+        return;
+      }
+      if(-1 == _special)
+      {
+        if(_npos != _end)
+        {
+          // For a //server/path/ form, //server is returned first then /
+          _end = _begin + 1;
+          _special = -2;
+        }
+        else
+        {
+          // This was just //server
+          _end = _begin;
+          _special = 0;
+        }
         return;
       }
       if(_npos == _end)
@@ -2250,26 +2512,66 @@ namespace detail
     }
     constexpr void _dec() noexcept
     {
-      auto is_end = _is_end();
-      _end = is_end ? _begin : (_begin - 1);
-      if(0 == _end)
+      const auto unc_prefix_end = _find_unc_prefix();
+      if(_special == -2 && unc_prefix_end != _npos)
       {
-        // Path has a beginning /
         _special = -1;
         _begin = 0;
-        _end = 1;
+        _end = unc_prefix_end;
         return;
       }
-      _begin = _parent->_find_last_sep(_end - 1);
-      if(is_end && _begin == _end - 1)
+      if(-1 == _special)
       {
-        // Path has a trailing /
-        _special = 1;
-        _begin = _end;
+        _special = 0;
+        _begin = 0;
+        _end = 0;
         return;
       }
-      _begin = (_npos == _begin) ? 0 : (_begin + 1);
-      _special = 0;
+      do
+      {
+        auto is_end = _is_end();
+        _end = is_end ? _begin : (_begin - 1);
+        if(0 == _end)
+        {
+          // Path has a beginning /
+          _special = -2;
+          _begin = 0;
+          _end = 1;
+          return;
+        }
+        if(_end == unc_prefix_end)
+        {
+          _special = -2;
+          _begin = _end;
+          if(_end < _parent->native_size())
+          {
+            _end++;
+          }
+          else
+          {
+            _begin = 0;
+            _special = -1;
+          }
+          return;
+        }
+        _begin = _parent->_find_last_sep(_end - 1);
+        if(is_end && _begin == _end - 1)
+        {
+          // Path has a trailing /
+          if(_begin == unc_prefix_end || _begin == 0)
+          {
+            _special = -2;
+          }
+          else
+          {
+            _special = 1;
+            _begin = _end;
+          }
+          return;
+        }
+        _begin = (_npos == _begin) ? 0 : (_begin + 1);
+        _special = 0;
+      } while(_begin == _end);
     }
 
     constexpr path_view_iterator(const path_view *p, bool end)
@@ -2363,6 +2665,7 @@ constexpr inline path_view::iterator path_view::end() noexcept
   return cend();
 }
 
+//! \brief Compares individual path view components for **identity** not equivalence. Use `compare()` if you want something stronger.
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view x, path_view y) noexcept
 {
   auto it1 = x.begin(), it2 = y.begin();
@@ -2383,6 +2686,7 @@ inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view x, path_view y) noexc
   }
   return true;
 }
+//! \brief Compares individual path view components for non-**identity** not disequivalence. Use `compare()` if you want something stronger.
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view x, path_view y) noexcept
 {
   auto it1 = x.begin(), it2 = y.begin();
@@ -2430,6 +2734,16 @@ inline constexpr bool operator!=(const CharT * /*unused*/, path_view /*unused*/)
 {
   static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator!= with path_view and a string literal, use .compare<>()");
   return false;
+}
+//! \brief Return the combined hash of individual path components
+inline LLFIO_PATH_VIEW_CONSTEXPR size_t hash_value(path_view x) noexcept
+{
+  size_t ret = 0;
+  for(auto component : x)
+  {
+    ret ^= hash_value(component) + 0x9e3779b9 + (ret << 6) + (ret >> 2);
+  }
+  return ret;
 }
 #ifdef __cpp_concepts
 template <class T, class Deleter, size_t _internal_buffer_size>
@@ -2531,7 +2845,10 @@ namespace detail
       ret.assign(_.begin(), _.end());
     }
 #endif
-    template <class T> void operator()(span<T> /*unused*/) { throw std::logic_error("filesystem::path cannot be constructed from a byte input."); }
+    template <class T> void operator()(span<T> /*unused*/)
+    {
+      throw std::logic_error("filesystem::path cannot be constructed from a byte input.");
+    }
   };
 }  // namespace detail
 //! Append a path view component to a path view component

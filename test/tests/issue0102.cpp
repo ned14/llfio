@@ -29,7 +29,7 @@ static inline void TestIssue0102()
   namespace llfio = LLFIO_V2_NAMESPACE;
   namespace outcome_e = OUTCOME_V2_NAMESPACE::experimental;
 
-  auto page = llfio::utils::page_allocator<std::byte>().allocate(llfio::utils::page_size());
+  auto page = llfio::utils::page_allocator<llfio::byte>().allocate(llfio::utils::page_size());
 
   llfio::file_io_error ioError = llfio::generic_error(llfio::errc::state_not_recoverable);
 

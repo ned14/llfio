@@ -227,12 +227,38 @@ static inline void TestPathView()
   CheckPathIteration("boostish/testdir/");
   CheckPathIteration("/a/c");
   CheckPathIteration("/a/c/");
+  CheckPathIteration("//a/c");
+  CheckPathIteration("//a");
+  CheckPathIteration("//a/");
+  // CheckPathIteration("///a/c");  // FIXME: fails, /// not ///a should be iterated
+  // CheckPathIteration("////a/c");  // FIXME: fails, //// not ////a should be iterated
+  CheckPathIteration("//a/c//");
+  // CheckPathIteration("///a/c//");  // FIXME: fails, /// not ///a should be iterated
+  // CheckPathIteration("////a/c////");  // FIXME: fails, //// not ////a should be iterated
+  CheckPathIteration("/a/c//");
+  CheckPathIteration("/a/c////");
   CheckPathIteration("a/c");
+  CheckPathIteration("a//c");
   CheckPathIteration("a/c/");
+  CheckPathIteration("a//c/");
+  CheckPathIteration("/");
+  CheckPathIteration("//");
+  CheckPathIteration("///");
+  CheckPathIteration("////");
+  CheckPathIteration("a/b/c");
+  CheckPathIteration("a/b//c");
+  CheckPathIteration("a/b///c");
 
   // Does visitation work right?
   visit(llfio::path_view("hi"), [](auto sv) { BOOST_CHECK(0 == memcmp(sv.data(), "hi", 2)); });
   visit(*llfio::path_view(L"hi").begin(), [](auto sv) { BOOST_CHECK(0 == memcmp(sv.data(), L"hi", 4)); });
+
+  // Hashing
+  {
+    BOOST_CHECK(hash_value(llfio::path_view("a/b/c")) == hash_value(llfio::path_view("a/b/c")));
+    BOOST_CHECK(hash_value(llfio::path_view("a/b/c")) == hash_value(llfio::path_view("a/b//c")));
+    BOOST_CHECK(hash_value(llfio::path_view("a/b/c")) == hash_value(llfio::path_view("a/b///c")));
+  }
 
   // Custom allocator and deleter
   {
