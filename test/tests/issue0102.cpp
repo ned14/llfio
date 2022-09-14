@@ -26,10 +26,13 @@ Distributed under the Boost Software License, Version 1.0.
 
 static inline void TestIssue0102()
 {
+#if !LLFIO_EXPERIMENTAL_STATUS_CODE
+  return;
+#else
   namespace llfio = LLFIO_V2_NAMESPACE;
   namespace outcome_e = OUTCOME_V2_NAMESPACE::experimental;
 
-  auto page = llfio::utils::page_allocator<llfio::byte>().allocate(llfio::utils::page_size());
+  auto page = llfio::utils::page_allocator<unsigned char>().allocate(llfio::utils::page_size());
 
   llfio::file_io_error ioError = llfio::generic_error(llfio::errc::state_not_recoverable);
 
@@ -40,6 +43,7 @@ static inline void TestIssue0102()
 
   // the following line must not segfault
   std::cout << erasedError->message() << std::endl;
+#endif
 }
 
 KERNELTEST_TEST_KERNEL(regression, llfio, issues, 0102, "Tests issue #0102 Using a status code converted from a file_io_error segfaults", TestIssue0102())
