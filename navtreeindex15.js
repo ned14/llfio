@@ -1,5 +1,8 @@
 var NAVTREEINDEX15 =
 {
+"structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html#a0937dfbed93b0ffc07ccbe5b7957df43":[4,0,2,7,3,19],
+"structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html#a10b5b6813433311fa085d68cb95cfe8a":[4,0,2,7,3,10],
+"structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html#a12749c9e94d7c82e982e008b7c35e49f":[4,0,2,7,3,17],
 "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html#a1deb9405a8daac1f4e64f45284d4e119":[4,0,2,7,3,24],
 "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html#a27359356a6d0834771a81cddc6908965":[4,0,2,7,3,4],
 "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html#a295afc67c3f95a1e15dda188f8394813":[4,0,2,7,3,18],
@@ -246,8 +249,5 @@ var NAVTREEINDEX15 =
 "structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a528b7a4f0ce374154791c6c79efcee96":[4,0,2,25,0,0],
 "structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a5d249881aa831fb0300b5681de3af11e":[4,0,2,25,0,1],
 "structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a6211e0e13161ab09825492cc6efb0fa5":[4,0,2,25,0,9],
-"structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a642a415d3444c11886c3bace729b917b":[4,0,2,25,0,7],
-"structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a83249c8307c80703efff0eb0c8cde85e":[4,0,2,25,0,10],
-"structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a8d1148aa4702fbdbf8386c39ade9df05":[4,0,2,25,0,4],
-"structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a92ffa4a0d93d289bf1f9173f0d220d41":[4,0,2,25,0,3]
+"structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a642a415d3444c11886c3bace729b917b":[4,0,2,25,0,7]
 };

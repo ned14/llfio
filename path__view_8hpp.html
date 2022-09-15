@@ -95,6 +95,7 @@ $(document).ready(function(){initNavTree('path__view_8hpp.html',''); initResizab
 <div class="textblock"><code>#include &quot;<a class="el" href="config_8hpp.html">config.hpp</a>&quot;</code><br />
 <code>#include &lt;iterator&gt;</code><br />
 <code>#include &lt;memory&gt;</code><br />
+<code>#include &quot;quickcpplib/algorithm/hash.hpp&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
@@ -183,11 +184,16 @@ class U&lt; __VA_ARGS__, std::declval&lt; U &gt;().deallocate((typename U::value
 constexpr void&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::detail::is_allocator</b> (...)</td></tr>
 <tr class="separator:a1081a69ba488868ed42e8c7ce5bb1e17"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8b272f994e955b1219e61920df8ec136"><td class="memItemLeft" align="right" valign="top"><a id="a8b272f994e955b1219e61920df8ec136"></a>
-constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::operator==</b> (path_view_component x, path_view_component y) noexcept</td></tr>
+constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a8b272f994e955b1219e61920df8ec136">llfio_v2_xxx::operator==</a> (path_view_component x, path_view_component y) noexcept</td></tr>
+<tr class="memdesc:a8b272f994e955b1219e61920df8ec136"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compares <b>identity</b> equality not equivalence i.e. backing storage type must be identical, and backing bytes must be identical. Use <code>compare()</code> if you want something stronger. <br /></td></tr>
 <tr class="separator:a8b272f994e955b1219e61920df8ec136"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a84c787ed5c98dc08c46bf520746bdbea"><td class="memItemLeft" align="right" valign="top"><a id="a84c787ed5c98dc08c46bf520746bdbea"></a>
-constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::operator!=</b> (path_view_component x, path_view_component y) noexcept</td></tr>
+constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a84c787ed5c98dc08c46bf520746bdbea">llfio_v2_xxx::operator!=</a> (path_view_component x, path_view_component y) noexcept</td></tr>
+<tr class="memdesc:a84c787ed5c98dc08c46bf520746bdbea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compares <b>identity</b> inequality not disequivalence i.e. backing storage type must be different, or backing bytes must be different. Use <code>compare()</code> if you want something stronger. <br /></td></tr>
 <tr class="separator:a84c787ed5c98dc08c46bf520746bdbea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28d324ab4ccb33f18d8d8672280aef00"><td class="memItemLeft" align="right" valign="top"><a id="a28d324ab4ccb33f18d8d8672280aef00"></a>
+constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::hash_value</b> (path_view_component x) noexcept</td></tr>
+<tr class="separator:a28d324ab4ccb33f18d8d8672280aef00"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a692613da87074e2ffa2a54e24e0cb083"><td class="memTemplParams" colspan="2"><a id="a692613da87074e2ffa2a54e24e0cb083"></a>
 template&lt;class F &gt; </td></tr>
 <tr class="memitem:a692613da87074e2ffa2a54e24e0cb083"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>llfio_v2_xxx::visit</b> (path_view_component view, F &amp;&amp;f)</td></tr>
@@ -200,11 +206,16 @@ template&lt;class F &gt; </td></tr>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::operator&lt;&lt;</b> (std::ostream &amp;s, const path_view_component &amp;v)</td></tr>
 <tr class="separator:a20dbb9e8deed80ea3d0b65d52fd34771"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a96d00f83eb1996bcbbb9d3aa62424a51"><td class="memItemLeft" align="right" valign="top"><a id="a96d00f83eb1996bcbbb9d3aa62424a51"></a>
-constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::operator==</b> (path_view x, path_view y) noexcept</td></tr>
+constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#a96d00f83eb1996bcbbb9d3aa62424a51">llfio_v2_xxx::operator==</a> (path_view x, path_view y) noexcept</td></tr>
+<tr class="memdesc:a96d00f83eb1996bcbbb9d3aa62424a51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compares individual path view components for <b>identity</b> not equivalence. Use <code>compare()</code> if you want something stronger. <br /></td></tr>
 <tr class="separator:a96d00f83eb1996bcbbb9d3aa62424a51"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af909fbaabae06c5831b45bc7f506d2dd"><td class="memItemLeft" align="right" valign="top"><a id="af909fbaabae06c5831b45bc7f506d2dd"></a>
-constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::operator!=</b> (path_view x, path_view y) noexcept</td></tr>
+constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx.html#af909fbaabae06c5831b45bc7f506d2dd">llfio_v2_xxx::operator!=</a> (path_view x, path_view y) noexcept</td></tr>
+<tr class="memdesc:af909fbaabae06c5831b45bc7f506d2dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compares individual path view components for non-**identity** not disequivalence. Use <code>compare()</code> if you want something stronger. <br /></td></tr>
 <tr class="separator:af909fbaabae06c5831b45bc7f506d2dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f5dd1b9b336fb59155347ad29694446"><td class="memItemLeft" align="right" valign="top"><a id="a0f5dd1b9b336fb59155347ad29694446"></a>
+constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::hash_value</b> (path_view x) noexcept</td></tr>
+<tr class="separator:a0f5dd1b9b336fb59155347ad29694446"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides view of a path </p>
