@@ -30,6 +30,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include <iterator>
 #include <memory>  // for unique_ptr
 
+#include "quickcpplib/algorithm/hash.hpp"
+
 //! \file path_view.hpp Provides view of a path
 
 #ifdef _MSC_VER
@@ -1697,10 +1699,11 @@ inline constexpr bool operator!=(const CharT * /*unused*/, path_view_component /
 inline LLFIO_PATH_VIEW_CONSTEXPR size_t hash_value(path_view_component view) noexcept
 {
   return view._invoke(
-  [](auto sv)
+  [](auto sv) -> size_t
   {
-    using type = typename std::decay<decltype(sv)>::type;
-    return std::hash<type>()(sv);
+    // std::hash isn't available for all kinds of string view on older compilers :(
+    const auto hash = QUICKCPPLIB_NAMESPACE::algorithm::hash::fast_hash::hash((const char *) sv.data(), sv.size() * sizeof(*sv.data()));
+    return *(size_t *) &hash;
   });
 }
 //! \brief Visit the underlying source for a `path_view_component` (LLFIO backwards compatible overload)
@@ -2417,6 +2420,10 @@ namespace detail
     constexpr bool _is_end() const noexcept { return (nullptr == _parent) || (!_special && _parent->native_size() == _begin); }
     constexpr size_t _find_unc_prefix() const noexcept
     {
+#if defined(_LIBCPP_VERSION)
+      // libc++'s path doesn't implement UNC prefixing
+      return _npos;
+#else
       auto a = _parent->_find_first_sep(0);
       if(a != 0)
       {
@@ -2442,6 +2449,7 @@ namespace detail
         }
         return e;
       }
+#endif
     }
     LLFIO_PATH_VIEW_CONSTEXPR value_type _get() const noexcept
     {
@@ -2593,10 +2601,22 @@ namespace detail
     path_view_iterator &operator=(path_view_iterator &&) = default;
     ~path_view_iterator() = default;
 
-    LLFIO_PATH_VIEW_CONSTEXPR const_reference operator*() const noexcept { return _get(); }
-    LLFIO_PATH_VIEW_CONSTEXPR reference operator*() noexcept { return _get(); }
-    LLFIO_PATH_VIEW_CONSTEXPR const_pointer operator->() const noexcept { return _get(); }
-    LLFIO_PATH_VIEW_CONSTEXPR pointer operator->() noexcept { return _get(); }
+    LLFIO_PATH_VIEW_CONSTEXPR const_reference operator*() const noexcept
+    {
+      return _get();
+    }
+    LLFIO_PATH_VIEW_CONSTEXPR reference operator*() noexcept
+    {
+      return _get();
+    }
+    LLFIO_PATH_VIEW_CONSTEXPR const_pointer operator->() const noexcept
+    {
+      return _get();
+    }
+    LLFIO_PATH_VIEW_CONSTEXPR pointer operator->() noexcept
+    {
+      return _get();
+    }
 
     constexpr bool operator!=(path_view_iterator o) const noexcept
     {
