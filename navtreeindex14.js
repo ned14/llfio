@@ -1,5 +1,8 @@
 var NAVTREEINDEX14 =
 {
+"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a7fdc1d26309758a94c9e321509e6f2b0":[4,0,2,0,0,0,39],
+"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a84a6bbb08480b7803a49e203b7501fa0":[4,0,2,0,0,0,64],
+"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a8526d8eef6bcc3851b34bdf1d364f102":[4,0,2,0,0,0,26],
 "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a8b3f69d7e670bf45727baa9e9ed30141":[4,0,2,0,0,0,23],
 "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a8b56f458ea957c41ca33e37cd52a28af":[4,0,2,0,0,0,56],
 "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a8cbd61a3899369965a1cbbd7cb21bd31":[4,0,2,0,0,0,62],
@@ -246,8 +249,5 @@ var NAVTREEINDEX14 =
 "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1paylobe6936dde2cabbe8f7d748b023b68c21.html":[4,0,2,7,2,0,0,0,0],
 "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1paylobe6936dde2cabbe8f7d748b023b68c21.html#a0b07716468b558e8a5c6d4e0de3aa4d8":[4,0,2,7,2,0,0,0,0,0],
 "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1paylobe6936dde2cabbe8f7d748b023b68c21.html#aae74317b0b9a2305b359e34bfee846d7":[4,0,2,7,2,0,0,0,0,1],
-"structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payloc9e18bbda84f717c8aae78e5df350ef8.html":[4,0,2,7,2,0,0,0,1],
-"structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payloc9e18bbda84f717c8aae78e5df350ef8.html#a9de1770131f4002558c853404a6c5f62":[4,0,2,7,2,0,0,0,1,0],
-"structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html":[4,0,2,7,3],
-"structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html#a0049b556698ae6432c33919c720a8d46":[4,0,2,7,3,3]
+"structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payloc9e18bbda84f717c8aae78e5df350ef8.html":[4,0,2,7,2,0,0,0,1]
 };

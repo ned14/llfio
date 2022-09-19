@@ -18,6 +18,8 @@ var path__view_8hpp =
     [ "is_deleter", "path__view_8hpp.html#a74e44dea3ad899ed6957a1f23ce99c7c", null ],
     [ "operator!=", "path__view_8hpp.html#af909fbaabae06c5831b45bc7f506d2dd", null ],
     [ "operator!=", "path__view_8hpp.html#a84c787ed5c98dc08c46bf520746bdbea", null ],
+    [ "operator<", "path__view_8hpp.html#a416eaa79dca4eeb278223d6da67c7a62", null ],
+    [ "operator<", "path__view_8hpp.html#a5be5d46e7385e95b82f145b950121f19", null ],
     [ "operator<<", "path__view_8hpp.html#a20dbb9e8deed80ea3d0b65d52fd34771", null ],
     [ "operator==", "path__view_8hpp.html#a96d00f83eb1996bcbbb9d3aa62424a51", null ],
     [ "operator==", "path__view_8hpp.html#a8b272f994e955b1219e61920df8ec136", null ],
