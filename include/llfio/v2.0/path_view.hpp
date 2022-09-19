@@ -30,6 +30,10 @@ Distributed under the Boost Software License, Version 1.0.
 #include <iterator>
 #include <memory>  // for unique_ptr
 
+#if __cplusplus >= 202000L || _HAS_CXX20
+#include <compare>
+#endif
+
 #include "quickcpplib/algorithm/hash.hpp"
 
 //! \file path_view.hpp Provides view of a path
@@ -208,12 +212,14 @@ class path_view;
 class path_view_component;
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view_component x, path_view_component y) noexcept;
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view_component x, path_view_component y) noexcept;
+inline LLFIO_PATH_VIEW_CONSTEXPR bool operator<(path_view_component x, path_view_component y) noexcept;
 inline LLFIO_PATH_VIEW_CONSTEXPR size_t hash_value(path_view_component x) noexcept;
 template <class F> inline LLFIO_PATH_VIEW_CONSTEXPR auto visit(path_view_component view, F &&f);
 template <class F> inline LLFIO_PATH_VIEW_CONSTEXPR auto visit(F &&f, path_view_component view);
 inline std::ostream &operator<<(std::ostream &s, const path_view_component &v);
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view x, path_view y) noexcept;
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view x, path_view y) noexcept;
+inline LLFIO_PATH_VIEW_CONSTEXPR bool operator<(path_view x, path_view y) noexcept;
 inline LLFIO_PATH_VIEW_CONSTEXPR size_t hash_value(path_view x) noexcept;
 
 /*! \class path_view_component
@@ -225,6 +231,21 @@ class LLFIO_DECL path_view_component
   friend class detail::path_view_iterator;
   friend inline LLFIO_PATH_VIEW_CONSTEXPR bool LLFIO_V2_NAMESPACE::operator==(path_view_component x, path_view_component y) noexcept;
   friend inline LLFIO_PATH_VIEW_CONSTEXPR bool LLFIO_V2_NAMESPACE::operator!=(path_view_component x, path_view_component y) noexcept;
+  friend inline LLFIO_PATH_VIEW_CONSTEXPR bool LLFIO_V2_NAMESPACE::operator<(path_view_component x, path_view_component y) noexcept;
+#if __cplusplus >= 202000L || _HAS_CXX20
+  friend inline LLFIO_PATH_VIEW_CONSTEXPR std::strong_ordering operator<=>(path_view_component x, path_view_component y) noexcept
+  {
+    if(x == y)
+    {
+      return std::strong_ordering::equal;
+    }
+    if(x < y)
+    {
+      return std::strong_ordering::less;
+    }
+    return std::strong_ordering::greater;
+  }
+#endif
   friend inline LLFIO_PATH_VIEW_CONSTEXPR size_t hash_value(path_view_component x) noexcept;
   template <class F> friend inline LLFIO_PATH_VIEW_CONSTEXPR auto LLFIO_V2_NAMESPACE::visit(path_view_component view, F &&f);
   template <class F> friend inline LLFIO_PATH_VIEW_CONSTEXPR auto LLFIO_V2_NAMESPACE::visit(F &&f, path_view_component view);
@@ -924,60 +945,60 @@ private:
     ~_rendered_path_base_() = default;
 
     //! Begin iteration
-    constexpr iterator begin() { return _ref.begin(); }
+    constexpr iterator begin() noexcept { return _ref.begin(); }
     //! Begin iteration
-    constexpr const_iterator begin() const { return _ref.begin(); }
+    constexpr const_iterator begin() const noexcept { return _ref.begin(); }
     //! Begin iteration
-    constexpr const_iterator cbegin() const { return _ref.cbegin(); }
+    constexpr const_iterator cbegin() const noexcept { return _ref.cbegin(); }
     //! End iteration
-    constexpr iterator end() { return _ref.end(); }
+    constexpr iterator end() noexcept { return _ref.end(); }
     //! End iteration
-    constexpr const_iterator end() const { return _ref.end(); }
+    constexpr const_iterator end() const noexcept { return _ref.end(); }
     //! End iteration
-    constexpr const_iterator cend() const { return _ref.cend(); }
+    constexpr const_iterator cend() const noexcept { return _ref.cend(); }
     //! Begin reverse iteration
-    constexpr reverse_iterator rbegin() { return _ref.rbegin(); }
+    constexpr reverse_iterator rbegin() noexcept { return _ref.rbegin(); }
     //! Begin reverse iteration
-    constexpr const_reverse_iterator rbegin() const { return _ref.rbegin(); }
+    constexpr const_reverse_iterator rbegin() const noexcept { return _ref.rbegin(); }
     //! Begin reverse iteration
-    constexpr const_reverse_iterator crbegin() const { return _ref.crbegin(); }
+    constexpr const_reverse_iterator crbegin() const noexcept { return _ref.crbegin(); }
     //! End reverse iteration
-    constexpr reverse_iterator rend() { return _ref.rend(); }
+    constexpr reverse_iterator rend() noexcept { return _ref.rend(); }
     //! End reverse iteration
-    constexpr const_reverse_iterator rend() const { return _ref.rend(); }
+    constexpr const_reverse_iterator rend() const noexcept { return _ref.rend(); }
     //! End reverse iteration
-    constexpr const_reverse_iterator crend() const { return _ref.crend(); }
+    constexpr const_reverse_iterator crend() const noexcept { return _ref.crend(); }
 
     //! Access
-    constexpr reference operator[](size_type idx) { return _ref[idx]; }
+    constexpr reference operator[](size_type idx) noexcept { return _ref[idx]; }
     //! Access
-    constexpr const_reference operator[](size_type idx) const { return _ref[idx]; }
+    constexpr const_reference operator[](size_type idx) const noexcept { return _ref[idx]; }
     //! Access
     constexpr reference at(size_type idx) { return _ref.at(idx); }
     //! Access
     constexpr const_reference at(size_type idx) const { return _ref.at(idx); }
     //! Access
-    constexpr reference front() { return _ref.front(); }
+    constexpr reference front() noexcept { return _ref.front(); }
     //! Access
-    constexpr const_reference front() const { return _ref.front(); }
+    constexpr const_reference front() const noexcept { return _ref.front(); }
     //! Access
-    constexpr reference back() { return _ref.back(); }
+    constexpr reference back() noexcept { return _ref.back(); }
     //! Access
-    constexpr const_reference back() const { return _ref.back(); }
+    constexpr const_reference back() const noexcept { return _ref.back(); }
     //! Access
-    constexpr pointer data() { return _ref.data(); }
+    constexpr pointer data() noexcept { return _ref.data(); }
     //! Access
-    constexpr const_pointer data() const { return _ref.data(); }
+    constexpr const_pointer data() const noexcept { return _ref.data(); }
     //! Size
-    constexpr size_type size() const { return _ref.size(); }
+    constexpr size_type size() const noexcept { return _ref.size(); }
     //! Size
-    constexpr size_type length() const { return _ref.length(); }
+    constexpr size_type length() const noexcept { return _ref.length(); }
     //! Max size
-    constexpr size_type max_size() const { return _ref.max_size(); }
+    constexpr size_type max_size() const noexcept { return _ref.max_size(); }
     //! Empty
-    QUICKCPPLIB_NODISCARD constexpr bool empty() const { return _ref.empty(); }
+    QUICKCPPLIB_NODISCARD constexpr bool empty() const noexcept { return _ref.empty(); }
     //! As span
-    constexpr _view_type as_span() const { return _ref; }
+    constexpr _view_type as_span() const noexcept { return _ref; }
   };
   template <enum path_view_component::zero_termination ZeroTermination, class T, bool = false> struct _rendered_path_base : public _rendered_path_base_<T>
   {
@@ -1580,6 +1601,39 @@ public:
   template <class T = typename filesystem::path::value_type, class AllocatorOrDeleter = default_rendered_path_deleter<T[]>,
             size_t _internal_buffer_size = default_internal_buffer_size>
   using not_zero_terminated_rendered_path = rendered_path<zero_termination::not_zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>;
+  //! Convenience function
+  LLFIO_TEMPLATE(enum path_view_component::zero_termination ZeroTermination, class T = typename filesystem::path::value_type,
+                 class AllocatorOrDeleter = default_rendered_path_deleter<T[]>, size_t _internal_buffer_size = default_internal_buffer_size, class... Args)
+  LLFIO_TREQUIRES(
+  LLFIO_TPRED(is_source_acceptable<T>),
+  LLFIO_TEXPR(std::is_constructible<rendered_path<ZeroTermination, T, AllocatorOrDeleter, _internal_buffer_size>, path_view_component, Args...>::value))
+  rendered_path<ZeroTermination, T, AllocatorOrDeleter, _internal_buffer_size> render(path_view_component view, Args &&...args)
+  {
+    return rendered_path<ZeroTermination, T, AllocatorOrDeleter, _internal_buffer_size>(view, std::forward<Args>(args)...);
+  }
+  //! Convenience function
+  LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class AllocatorOrDeleter = default_rendered_path_deleter<T[]>,
+                 size_t _internal_buffer_size = default_internal_buffer_size, class... Args)
+  LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>),
+                  LLFIO_TEXPR(std::is_constructible<rendered_path<zero_termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>,
+                                                    path_view_component, Args...>::value))
+  rendered_path<zero_termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size> render_zero_terminated(path_view_component view,
+                                                                                                                        Args &&...args)
+  {
+    return rendered_path<zero_termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>(view, std::forward<Args>(args)...);
+  }
+  //! Convenience function
+  LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class AllocatorOrDeleter = default_rendered_path_deleter<T[]>,
+                 size_t _internal_buffer_size = default_internal_buffer_size, class... Args)
+  LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>),
+                  LLFIO_TEXPR(std::is_constructible<rendered_path<zero_termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>,
+                                                    path_view_component, Args...>::value))
+  rendered_path<zero_termination::not_zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size> render_not_zero_terminated(path_view_component view,
+                                                                                                                                Args &&...args)
+  {
+    return rendered_path<zero_termination::not_zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>(view, std::forward<Args>(args)...);
+  }
+
 #ifdef __cpp_concepts
   template <enum path_view_component::zero_termination ZeroTermination, class T, class Deleter, size_t _internal_buffer_size>
   requires(is_source_acceptable<T>)
@@ -1621,7 +1675,7 @@ inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view_component x, path_vie
   {
     return false;
   }
-  if(0 == x._length && 0 == y._length)
+  if(x.native_size() == 0)
   {
     return true;
   }
@@ -1658,7 +1712,7 @@ inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view_component x, path_vie
   {
     return true;
   }
-  if(0 == x._length && 0 == y._length)
+  if(x.native_size() == 0)
   {
     return false;
   }
@@ -1667,6 +1721,68 @@ inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view_component x, path_vie
   const auto bytes = (x._wchar || x._utf16) ? (x._length * 2) : x._length;
   return 0 != memcmp(x._bytestr, y._bytestr, bytes);
 }
+//! \brief Compares **identity** for ordering i.e. backing storage type must be different, or backing bytes must be different. Use `compare()`
+//! if you want something stronger.
+inline LLFIO_PATH_VIEW_CONSTEXPR bool operator<(path_view_component x, path_view_component y) noexcept
+{
+  if(x.native_size() < y.native_size())
+  {
+    return true;
+  }
+  if(x.native_size() > y.native_size())
+  {
+    return false;
+  }
+  if(x._passthrough < y._passthrough)
+  {
+    return true;
+  }
+  if(x._passthrough > y._passthrough)
+  {
+    return false;
+  }
+  if(x._char < y._char)
+  {
+    return true;
+  }
+  if(x._char > y._char)
+  {
+    return false;
+  }
+  if(x._wchar < y._wchar)
+  {
+    return true;
+  }
+  if(x._wchar > y._wchar)
+  {
+    return false;
+  }
+  if(x._utf8 < y._utf8)
+  {
+    return true;
+  }
+  if(x._utf8 > y._utf8)
+  {
+    return false;
+  }
+  if(x._utf16 < y._utf16)
+  {
+    return true;
+  }
+  if(x._utf16 > y._utf16)
+  {
+    return false;
+  }
+  if(x.native_size() == 0)
+  {
+    return false;
+  }
+  assert(x._bytestr != nullptr);
+  assert(y._bytestr != nullptr);
+  const auto bytes = (x._wchar || x._utf16) ? (x._length * 2) : x._length;
+  return memcmp(x._bytestr, y._bytestr, bytes) < 0;
+}
+
 LLFIO_TEMPLATE(class CharT)
 LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_acceptable<CharT>))
 inline constexpr bool operator==(path_view_component /*unused*/, const CharT * /*unused*/) noexcept
@@ -1849,6 +1965,10 @@ class path_view : public path_view_component
   friend class detail::path_view_iterator;
   friend inline LLFIO_PATH_VIEW_CONSTEXPR bool LLFIO_V2_NAMESPACE::operator==(path_view x, path_view y) noexcept;
   friend inline LLFIO_PATH_VIEW_CONSTEXPR bool LLFIO_V2_NAMESPACE::operator!=(path_view x, path_view y) noexcept;
+  friend inline LLFIO_PATH_VIEW_CONSTEXPR bool LLFIO_V2_NAMESPACE::operator<(path_view x, path_view y) noexcept;
+#if __cplusplus >= 202000L || _HAS_CXX20
+  friend inline LLFIO_PATH_VIEW_CONSTEXPR auto operator<=>(path_view x, path_view y) = default;
+#endif
   friend inline LLFIO_PATH_VIEW_CONSTEXPR size_t hash_value(path_view x) noexcept;
 
 public:
@@ -2009,17 +2129,35 @@ public:
   path_view &operator=(path_view &&p) noexcept = default;
 
   //! True if has root path
-  LLFIO_PATH_VIEW_CONSTEXPR bool has_root_path() const noexcept { return !root_path().empty(); }
+  LLFIO_PATH_VIEW_CONSTEXPR bool has_root_path() const noexcept
+  {
+    return !root_path().empty();
+  }
   //! True if has root name
-  LLFIO_PATH_VIEW_CONSTEXPR bool has_root_name() const noexcept { return !root_name().empty(); }
+  LLFIO_PATH_VIEW_CONSTEXPR bool has_root_name() const noexcept
+  {
+    return !root_name().empty();
+  }
   //! True if has root directory
-  LLFIO_PATH_VIEW_CONSTEXPR bool has_root_directory() const noexcept { return !root_directory().empty(); }
+  LLFIO_PATH_VIEW_CONSTEXPR bool has_root_directory() const noexcept
+  {
+    return !root_directory().empty();
+  }
   //! True if has relative path
-  LLFIO_PATH_VIEW_CONSTEXPR bool has_relative_path() const noexcept { return !relative_path().empty(); }
+  LLFIO_PATH_VIEW_CONSTEXPR bool has_relative_path() const noexcept
+  {
+    return !relative_path().empty();
+  }
   //! True if has parent path
-  LLFIO_PATH_VIEW_CONSTEXPR bool has_parent_path() const noexcept { return !parent_path().empty(); }
+  LLFIO_PATH_VIEW_CONSTEXPR bool has_parent_path() const noexcept
+  {
+    return !parent_path().empty();
+  }
   //! True if has filename
-  LLFIO_PATH_VIEW_CONSTEXPR bool has_filename() const noexcept { return !filename().empty(); }
+  LLFIO_PATH_VIEW_CONSTEXPR bool has_filename() const noexcept
+  {
+    return !filename().empty();
+  }
   //! True if absolute
   constexpr bool is_absolute() const noexcept
   {
@@ -2414,16 +2552,23 @@ namespace detail
   private:
     const path_view *_parent{nullptr};
     size_type _begin{0}, _end{0};
-    int _special{0};  // -2 if at preceding /, -1 if at / after a //, +1 if at trailing /
+    enum class _at : uint8_t
+    {
+      unused=0,
+      leading_slash ,  // 1
+      slash_after_unc_prefix , // 2
+      none , // 3
+      trailing_slash  // 4
+    } _inc_state{_at::unused}, _dec_state{_at::unused};
 
     static constexpr auto _npos = string_view::npos;
-    constexpr bool _is_end() const noexcept { return (nullptr == _parent) || (!_special && _parent->native_size() == _begin); }
+    constexpr bool _state_not_special() const noexcept
+    {
+      return (_inc_state == _at::none || _inc_state == _at::unused) && (_dec_state == _at::none || _dec_state == _at::unused);
+    }
+    constexpr bool _is_end() const noexcept { return (nullptr == _parent) || (_state_not_special() && _parent->native_size() == _begin); }
     constexpr size_t _find_unc_prefix() const noexcept
     {
-#if defined(_LIBCPP_VERSION)
-      // libc++'s path doesn't implement UNC prefixing
-      return _npos;
-#else
       auto a = _parent->_find_first_sep(0);
       if(a != 0)
       {
@@ -2449,7 +2594,6 @@ namespace detail
         }
         return e;
       }
-#endif
     }
     LLFIO_PATH_VIEW_CONSTEXPR value_type _get() const noexcept
     {
@@ -2465,15 +2609,42 @@ namespace detail
     }
     LLFIO_PATH_VIEW_CONSTEXPR void _inc() noexcept
     {
+      //std::cout << "ENTRY: _inc begin = " << _begin << " end = " << _end << " inc_state = " << (int) _inc_state << " dec_state = " << (int) _dec_state
+      //          << " string = " << **this << std::endl;
+      //auto onexit = make_scope_exit(
+      //[&]() noexcept
+      //{
+      //  std::cout << "EXIT: _inc begin = " << _begin << " end = " << _end << " inc_state = " << (int) _inc_state << " dec_state = " << (int) _dec_state
+      //            << " string = " << **this << std::endl;
+      //});
+      if(_dec_state != _at::unused)
+      {
+        assert(_inc_state == _at::unused);
+        _inc_state = _at::none;
+        switch(_dec_state)
+        {
+        case _at::leading_slash:
+          _inc_state = _at::slash_after_unc_prefix;
+          // fallthrough
+        case _at::unused:
+        case _at::slash_after_unc_prefix:
+        case _at::none:
+        case _at::trailing_slash:
+          _dec_state = _at::unused;
+          break;
+        }
+      }
       do
       {
-        _begin = (_end > 0 && !_special) ? (_end + 1) : _end;
+        //std::cout << "ITER: _inc begin = " << _begin << " end = " << _end << " inc_state = " << (int) _inc_state << " dec_state = " << (int) _dec_state
+        //           << " string = " << **this << std::endl;
+        _begin = (_end > 0 && _state_not_special()) ? (_end + 1) : _end;
         _end = _parent->_find_first_sep(_begin);
-      } while(_special == 0 && _begin == _end && _end != 0);
+      } while(_state_not_special() && _begin == _end && _end != 0);
       if(0 == _end)
       {
         // Path has a beginning /[/*] and all must be returned as a single component
-        _special = -2;
+        _inc_state = _at::leading_slash;
         _end = _find_unc_prefix();
         if(_npos == _end)
         {
@@ -2482,33 +2653,40 @@ namespace detail
         }
         else
         {
-          _special = -1;
+#if defined(_LIBCPP_VERSION)
+          // libc++'s path doesn't implement UNC prefixing yet, but it does treat many leading separators as one
+          _inc_state = _at::leading_slash;
+          _end = _parent->_find_last_sep(_end - 1) + 1;
+          _begin = _end - 1;
+#else
+          _inc_state = _at::slash_after_unc_prefix;
+#endif
         }
         return;
       }
-      if(-1 == _special)
+      if(_inc_state == _at::slash_after_unc_prefix)  // is / after unc //?
       {
         if(_npos != _end)
         {
           // For a //server/path/ form, //server is returned first then /
           _end = _begin + 1;
-          _special = -2;
+          _inc_state = _at::leading_slash;
         }
         else
         {
           // This was just //server
           _end = _begin;
-          _special = 0;
+          _inc_state = _at::none;
         }
         return;
       }
       if(_npos == _end)
       {
         _end = _parent->native_size();
-        if(_begin == _end && !_special)
+        if(_begin == _end && _state_not_special())
         {
           // Path has a trailing /
-          _special = 1;
+          _inc_state = _at::trailing_slash;
           return;
         }
         if(_begin > _end)
@@ -2516,21 +2694,46 @@ namespace detail
           _begin = _end;
         }
       }
-      _special = 0;
+      _inc_state = _at::none;
     }
     constexpr void _dec() noexcept
     {
-      const auto unc_prefix_end = _find_unc_prefix();
-      if(_special == -2 && unc_prefix_end != _npos)
+      //std::cout << "ENTRY: _dec begin = " << _begin << " end = " << _end << " inc_state = " << (int) _inc_state << " dec_state = " << (int) _dec_state
+      //          << " string = " << **this << std::endl;
+      //auto onexit = make_scope_exit(
+      //[&]() noexcept
+      //{
+      //  std::cout << "EXIT: _dec begin = " << _begin << " end = " << _end << " inc_state = " << (int) _inc_state << " dec_state = " << (int) _dec_state
+      //            << " string = " << **this << std::endl;
+      //});
+      if(_inc_state != _at::unused)
       {
-        _special = -1;
+        assert(_dec_state == _at::unused);
+        _dec_state = _at::none;
+        switch(_inc_state)
+        {
+        case _at::slash_after_unc_prefix:
+          _dec_state = _at::leading_slash;
+          // fallthrough
+        case _at::unused:
+        case _at::leading_slash:
+        case _at::none:
+        case _at::trailing_slash:
+          _inc_state = _at::unused;
+          break;
+        }
+      }
+      const auto unc_prefix_end = _find_unc_prefix();
+      if(_dec_state == _at::slash_after_unc_prefix && unc_prefix_end != _npos)
+      {
+        _dec_state = _at::leading_slash;
         _begin = 0;
         _end = unc_prefix_end;
         return;
       }
-      if(-1 == _special)
+      if(_dec_state == _at::leading_slash)
       {
-        _special = 0;
+        _dec_state = _at::unused;
         _begin = 0;
         _end = 0;
         return;
@@ -2538,18 +2741,43 @@ namespace detail
       do
       {
         auto is_end = _is_end();
+        //std::cout << "ITER: _dec begin = " << _begin << " end = " << _end << " inc_state = " << (int) _inc_state << " dec_state = " << (int) _dec_state
+        //          << " is_end = " << is_end << " unc_prefix_end = " << unc_prefix_end << " string = " << **this << std::endl;
         _end = is_end ? _begin : (_begin - 1);
         if(0 == _end)
         {
+#if defined(_LIBCPP_VERSION)
+          // libc++'s path doesn't implement UNC prefixing yet, but it does treat many leading separators as one
+          _dec_state = _at::unused;
+          _inc_state = _at::leading_slash;
+          _end = _parent->_find_last_sep(_begin) + 1;
+          _begin = _end - 1;
+#else
           // Path has a beginning /
-          _special = -2;
+          _dec_state = _at::unused;
+          _inc_state = _at::leading_slash;
           _begin = 0;
           _end = 1;
+#endif
           return;
         }
-        if(_end == unc_prefix_end)
+        if(_end == unc_prefix_end && unc_prefix_end != _npos)
         {
-          _special = -2;
+#if defined(_LIBCPP_VERSION)
+          // libc++'s path doesn't implement UNC prefixing yet, but it does treat many leading separators as one
+          _begin = _parent->_find_last_sep(unc_prefix_end - 1) + 1;
+          if(_begin == unc_prefix_end)
+          {
+            _begin = _end - 1;
+          }
+          else
+          {
+            _end = unc_prefix_end;
+          }
+          _dec_state = _at::unused;
+          _inc_state = _at::leading_slash;
+#else
+          _dec_state = _at::slash_after_unc_prefix;
           _begin = _end;
           if(_end < _parent->native_size())
           {
@@ -2558,8 +2786,9 @@ namespace detail
           else
           {
             _begin = 0;
-            _special = -1;
+            _dec_state = _at::leading_slash;
           }
+#endif
           return;
         }
         _begin = _parent->_find_last_sep(_end - 1);
@@ -2568,17 +2797,28 @@ namespace detail
           // Path has a trailing /
           if(_begin == unc_prefix_end || _begin == 0)
           {
-            _special = -2;
+#if defined(_LIBCPP_VERSION)
+            if(_begin == 0)
+            {
+              _dec_state = _at::unused;
+              _inc_state = _at::leading_slash;
+              return;
+            }
+            _dec_state = _at::trailing_slash;
+            _begin = _end;
+#else
+            _dec_state = _at::slash_after_unc_prefix;
+#endif
           }
           else
           {
-            _special = 1;
+            _dec_state = _at::trailing_slash;
             _begin = _end;
           }
           return;
         }
         _begin = (_npos == _begin) ? 0 : (_begin + 1);
-        _special = 0;
+        _dec_state = _at::none;
       } while(_begin == _end);
     }
 
@@ -2624,7 +2864,7 @@ namespace detail
       {
         return false;
       }
-      return _parent != o._parent || _begin != o._begin || _end != o._end || _special != o._special;
+      return _parent != o._parent || _begin != o._begin || _end != o._end || _state_not_special() != o._state_not_special();
     }
     constexpr bool operator==(path_view_iterator o) const noexcept
     {
@@ -2632,7 +2872,7 @@ namespace detail
       {
         return true;
       }
-      return _parent == o._parent && _begin == o._begin && _end == o._end && _special == o._special;
+      return _parent == o._parent && _begin == o._begin && _end == o._end && _state_not_special() == o._state_not_special();
     }
 
     constexpr path_view_iterator &operator--() noexcept
@@ -2722,6 +2962,23 @@ inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view x, path_view y) noexc
     return true;
   }
   if(it1 != x.end() && it2 == y.end())
+  {
+    return true;
+  }
+  return false;
+}
+//! \brief Compares individual path view components for ordering. Use `compare()` if you want something stronger.
+inline LLFIO_PATH_VIEW_CONSTEXPR bool operator<(path_view x, path_view y) noexcept
+{
+  auto it1 = x.begin(), it2 = y.begin();
+  for(; it1 != x.end() && it2 != y.end(); ++it1, ++it2)
+  {
+    if(*it1 < *it2)
+    {
+      return true;
+    }
+  }
+  if(it1 == x.end() && it2 != y.end())
   {
     return true;
   }
