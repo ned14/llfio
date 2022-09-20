@@ -1,5 +1,5 @@
 /* LLFIO error handling
-(C) 2018-2020 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2018-2022 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: June 2018
 
 
@@ -253,6 +253,10 @@ protected:
     memcpy(p, ret.c_str(), ret.size() + 1);
     return atomic_refcounted_string_ref(p, ret.size());
   }
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
   virtual bool _do_erased_copy(SYSTEM_ERROR2_NAMESPACE::status_code<void> &dst, const SYSTEM_ERROR2_NAMESPACE::status_code<void> &src,
                                typename _base::payload_info_t dstinfo) const override
   {
@@ -274,6 +278,9 @@ protected:
     }
     return false;
   }
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 };
 #if __cplusplus >= 201402L || defined(_MSC_VER)
 template <class BaseStatusCodeDomain> constexpr file_io_error_domain<BaseStatusCodeDomain> file_io_error_domain_inst = {};
