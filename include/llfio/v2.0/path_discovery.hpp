@@ -126,7 +126,7 @@ namespace path_discovery
 
   //! \brief The default regex used to determine what temporary directories are backed by storage not memory.
   static constexpr const char storage_backed_regex[] =
-  "btrfs|cifs|exfat|ext[2-4]|f2fs|hfs|apfs|jfs|lxfs|nfs|nilf2|ufs|vfat|xfs|zfs|msdosfs|newnfs|ntfs|smbfs|unionfs|fat|fat32|overlay2?";
+  "btrfs|cifs|exfat|ext[2-4]|f2fs|hfs|apfs|jfs|lxfs|nfs[1-9]?|lustre|nilf2|ufs|vfat|xfs|zfs|msdosfs|newnfs|ntfs|smbfs|unionfs|fat|fat32|overlay2?";
   //! \brief The default regex used to determine what temporary directories are backed by memory not storage.
   static constexpr const char memory_backed_regex[] = "tmpfs|ramfs";
 

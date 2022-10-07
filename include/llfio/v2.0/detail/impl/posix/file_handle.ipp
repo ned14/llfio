@@ -433,8 +433,8 @@ result<std::vector<file_handle::extent_pair>> file_handle::extents() const noexc
   }
 }
 
-result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::extent_pair extent, byte_io_handle &dest_, byte_io_handle::extent_type destoffset, deadline d,
-                                                               bool force_copy_now, bool emulate_if_unsupported) noexcept
+result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::extent_pair extent, byte_io_handle &dest_, byte_io_handle::extent_type destoffset,
+                                                               deadline d, bool force_copy_now, bool emulate_if_unsupported) noexcept
 {
   try
   {
@@ -472,7 +472,9 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
     LLFIO_POSIX_DEADLINE_TO_SLEEP_INIT(d);
     const extent_type blocksize = utils::file_buffer_default_size();
     byte *buffer = nullptr;
-    auto unbufferh = make_scope_exit([&]() noexcept {
+    auto unbufferh = make_scope_exit(
+    [&]() noexcept
+    {
       if(buffer != nullptr)
         utils::page_allocator<byte>().deallocate(buffer, blocksize);
     });
@@ -727,7 +729,9 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
       OUTCOME_TRY(dest.truncate(destoffset + extent.length));
       truncate_back_on_failure = true;
     }
-    auto untruncate = make_scope_exit([&]() noexcept {
+    auto untruncate = make_scope_exit(
+    [&]() noexcept
+    {
       if(truncate_back_on_failure)
       {
         (void) dest.truncate(dest_length);
@@ -759,7 +763,8 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
       std::cout << std::endl;
     }
 #endif
-    auto _copy_file_range = [&](int infd, off_t *inoffp, int outfd, off_t *outoffp, size_t len, unsigned int flags) -> ssize_t {
+    auto _copy_file_range = [&](int infd, off_t *inoffp, int outfd, off_t *outoffp, size_t len, unsigned int flags) -> ssize_t
+    {
 #if defined(__linux__)
 #if defined __aarch64__
       return syscall(285 /*__NR_copy_file_range*/, infd, inoffp, outfd, outoffp, len, flags);
@@ -790,7 +795,8 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
       return -1;
 #endif
     };
-    auto _zero_file_range = [&](int fd, off_t offset, size_t len) -> int {
+    auto _zero_file_range = [&](int fd, off_t offset, size_t len) -> int
+    {
 #if defined(__linux__)
       return fallocate(fd, 0x02 /*FALLOC_FL_PUNCH_HOLE*/ | 0x01 /*FALLOC_FL_KEEP_SIZE*/, offset, len);
 #else
@@ -814,9 +820,20 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
           auto bytes_cloned = _copy_file_range(_v.fd, &off_in, dest.native_handle().fd, &off_out, thisblock, 0);
           if(bytes_cloned <= 0)
           {
-            if(bytes_cloned < 0 && ((EXDEV != errno && EOPNOTSUPP != errno && ENOSYS != errno) || !emulate_if_unsupported))
+            if(bytes_cloned < 0 &&
+               ((EXDEV != errno && EOPNOTSUPP != errno && ENOSYS != errno && EINVAL != errno /* bug in lustre */) || !emulate_if_unsupported))
             {
-              return posix_error();
+              auto errcode = errno;
+              if(EINVAL == errcode)
+              {
+                static std::atomic<bool> einval_seen{false};
+                bool expected = false;
+                if(einval_seen.compare_exchange_strong(expected, true, std::memory_order_acq_rel, std::memory_order_relaxed))
+                {
+                  LLFIO_LOG_WARN(this, "Treating copy_file_range() returning EINVAL as a kernel filesystem bug, not as a bug in LLFIO's file_handle::clone_extents()!");
+                }
+              }
+              return posix_error(errcode);
             }
             duplicate_extents = false;  // emulate using copy of bytes
           }
@@ -872,11 +889,11 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
               if(zs != ds)
               {
                 // Write portion from ds to zs
-                cb = {(const byte *) ds, (size_t)(zs - ds)};
+                cb = {(const byte *) ds, (size_t) (zs - ds)};
                 auto localoffset = cb.data() - readed.front().data();
                 // std::cout << "*** " << (item.src.offset + thisoffset + localoffset) << " - " << cb.size() << std::endl;
                 OUTCOME_TRY(auto &&written, dest.write({{&cb, 1}, item.src.offset + thisoffset + localoffset + destoffsetdiff}, nd));
-                if(written.front().size() != (size_t)(zs - ds))
+                if(written.front().size() != (size_t) (zs - ds))
                 {
                   return errc::resource_unavailable_try_again;  // something is wrong
                 }
