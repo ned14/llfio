@@ -820,20 +820,22 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
           auto bytes_cloned = _copy_file_range(_v.fd, &off_in, dest.native_handle().fd, &off_out, thisblock, 0);
           if(bytes_cloned <= 0)
           {
-            if(bytes_cloned < 0 &&
-               ((EXDEV != errno && EOPNOTSUPP != errno && ENOSYS != errno && EINVAL != errno /* bug in lustre */) || !emulate_if_unsupported))
+            if(bytes_cloned < 0)
             {
-              auto errcode = errno;
-              if(EINVAL == errcode)
+              if(((EXDEV != errno && EOPNOTSUPP != errno && ENOSYS != errno && EINVAL != errno /* bug in lustre */) || !emulate_if_unsupported))
+              {
+                return posix_error();
+              }
+              if(EINVAL == errno)
               {
                 static std::atomic<bool> einval_seen{false};
                 bool expected = false;
                 if(einval_seen.compare_exchange_strong(expected, true, std::memory_order_acq_rel, std::memory_order_relaxed))
                 {
-                  LLFIO_LOG_WARN(this, "Treating copy_file_range() returning EINVAL as a kernel filesystem bug, not as a bug in LLFIO's file_handle::clone_extents()!");
+                  LLFIO_LOG_WARN(
+                  this, "Treating copy_file_range() returning EINVAL as a kernel filesystem bug, not as a bug in LLFIO's file_handle::clone_extents()!");
                 }
               }
-              return posix_error(errcode);
             }
             duplicate_extents = false;  // emulate using copy of bytes
           }
