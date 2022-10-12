@@ -49,6 +49,7 @@ namespace path_discovery
         filesystem::path path;
         size_t priority{0};
         std::string fstypename;
+        bool is_networked{false};
         directory_handle h;  // not retained after verification
         explicit _discovered_path(filesystem::path _path)
             : path(std::move(_path))
@@ -57,6 +58,7 @@ namespace path_discovery
       };
       std::vector<_discovered_path> _all;
       directory_handle storage_backed, memory_backed;
+      bool storage_backed_is_networked{false}, memory_backed_is_networked{false};
     };
     _store &path_store()
     {
@@ -202,6 +204,7 @@ namespace path_discovery
         if(statfsres)
         {
           ps._all[n].fstypename = std::move(statfs.f_fstypename);
+          ps._all[n].is_networked = statfs.f_flags.networked;
         }
         else
         {
@@ -242,10 +245,12 @@ namespace path_discovery
         if(!ps.storage_backed.is_valid() && std::regex_match(ps._all[n].fstypename, storage_backed_regex_))
         {
           ps.storage_backed = std::move(ps._all[n].h);
+          ps.storage_backed_is_networked = ps._all[n].is_networked;
         }
         if(!ps.memory_backed.is_valid() && std::regex_match(ps._all[n].fstypename, memory_backed_regex_))
         {
           ps.memory_backed = std::move(ps._all[n].h);
+          ps.memory_backed_is_networked = ps._all[n].is_networked;
         }
         ps.all[n].path = ps._all[n].path;
         (void) ps._all[n].h.close();
@@ -286,11 +291,23 @@ namespace path_discovery
     auto &ps = detail::path_store();
     return ps.storage_backed;
   }
+  bool storage_backed_temporary_files_directory_is_networked() noexcept
+  {
+    (void) verified_temporary_directories();
+    auto &ps = detail::path_store();
+    return ps.storage_backed_is_networked;
+  }
   const path_handle &memory_backed_temporary_files_directory() noexcept
   {
     (void) verified_temporary_directories();
     auto &ps = detail::path_store();
     return ps.memory_backed;
+  }
+  bool memory_backed_temporary_files_directory_is_networked() noexcept
+  {
+    (void) verified_temporary_directories();
+    auto &ps = detail::path_store();
+    return ps.memory_backed_is_networked;
   }
 }  // namespace path_discovery
 

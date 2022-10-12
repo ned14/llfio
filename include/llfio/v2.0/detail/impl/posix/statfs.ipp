@@ -23,10 +23,12 @@ Distributed under the Boost Software License, Version 1.0.
 */
 
 #include "../../../handle.hpp"
+#include "../../../path_discovery.hpp"
 #include "../../../statfs.hpp"
 
 #include <chrono>
 #include <mutex>
+#include <regex>
 #include <vector>
 
 #include <sys/mount.h>
@@ -207,6 +209,8 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
         if(!!(wanted & want::fstypename))
         {
           f_fstypename = mountentries.front().first.mnt_type;
+          static const std::regex regex(path_discovery::network_backed_regex, std::regex::icase);
+          f_flags.networked = !!std::regex_match(f_fstypename, regex);
           ++ret;
         }
         if(!!(wanted & want::mntfromname))
@@ -306,6 +310,8 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
   if(!!(wanted & want::fstypename))
   {
     f_fstypename = s.f_fstypename;
+    static const std::regex regex(path_discovery::network_backed_regex, std::regex::icase);
+    f_flags.networked = !!std::regex_match(f_fstypename, regex);
     ++ret;
   }
   if(!!(wanted & want::mntfromname))
@@ -424,7 +430,8 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<uint32_t, float>> statfs_t::_fi
         Field 9 is i/o's currently in progress.
         Field 10 is milliseconds spent doing i/o (cumulative).
         */
-        auto match_line = [&](string_view sv) {
+        auto match_line = [&](string_view sv)
+        {
           int major = 0, minor = 0;
           sscanf(sv.data(), "%d %d", &major, &minor);
           // printf("Does %d,%d match %d,%d?\n", major, minor, major(s.st_dev), minor(s.st_dev));

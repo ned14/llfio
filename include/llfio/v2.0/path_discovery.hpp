@@ -129,6 +129,8 @@ namespace path_discovery
   "btrfs|cifs|exfat|ext[2-4]|f2fs|hfs|apfs|jfs|lxfs|nfs[1-9]?|lustre|nilf2|ufs|vfat|xfs|zfs|msdosfs|newnfs|ntfs|smbfs|unionfs|fat|fat32|overlay2?";
   //! \brief The default regex used to determine what temporary directories are backed by memory not storage.
   static constexpr const char memory_backed_regex[] = "tmpfs|ramfs";
+  //! \brief The default regex used to determine whether a temporary directory resides on a networked filing system.
+  static constexpr const char network_backed_regex[] = "cifs|nfs[1-9]?|lustre|smbfs";
 
   /*! \brief Returns a subset of `all_temporary_directories()` each of which has been tested to be writable
   by the current process. No testing is done of available writable space.
@@ -158,6 +160,8 @@ namespace path_discovery
   The handle is created during `verified_temporary_directories()` and is statically cached thereafter.
   */
   LLFIO_HEADERS_ONLY_FUNC_SPEC const path_handle &storage_backed_temporary_files_directory() noexcept;
+  //! \brief True if the storage backed temporary files directory is on a networked file system
+  LLFIO_HEADERS_ONLY_FUNC_SPEC bool storage_backed_temporary_files_directory_is_networked() noexcept;
 
   /*! \brief Returns a reference to an open handle to a verified temporary directory where files created are
   stored in memory/paging file, and thus access may be a lot quicker, but stronger limits on
@@ -173,6 +177,8 @@ namespace path_discovery
   strongly consider using a non-file-backed `section_handle` as this is more portable.
   */
   LLFIO_HEADERS_ONLY_FUNC_SPEC const path_handle &memory_backed_temporary_files_directory() noexcept;
+  //! \brief True if the memory backed temporary files directory is on a networked file system
+  LLFIO_HEADERS_ONLY_FUNC_SPEC bool memory_backed_temporary_files_directory_is_networked() noexcept;
 
   /*! \brief Returns a reference to an open handle to a verified temporary directory where named
   pipes may be created and found.

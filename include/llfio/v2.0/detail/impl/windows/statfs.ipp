@@ -24,6 +24,10 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../../../handle.hpp"
 #include "../../../statfs.hpp"
+#include "../../../path_discovery.hpp"
+
+#include <regex>
+
 #include "import.hpp"
 
 LLFIO_V2_NAMESPACE_BEGIN
@@ -72,6 +76,8 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
       {
         f_fstypename[n] = static_cast<char>(ffai->FileSystemName[n]);
       }
+      static const std::regex regex(path_discovery::network_backed_regex, std::regex::icase);
+      f_flags.networked = !!std::regex_match(f_fstypename, regex);
       ++ret;
     }
   }

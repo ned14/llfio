@@ -77,23 +77,24 @@ struct LLFIO_DECL statfs_t
   static constexpr float _allbits1_float = detail::constexpr_float_allbits_set_nan();
   struct f_flags_t
   {
-    uint32_t rdonly : 1;             //!< Filing system is read only                                      (Windows, POSIX)
-    uint32_t noexec : 1;             //!< Filing system cannot execute programs                           (POSIX)
-    uint32_t nosuid : 1;             //!< Filing system cannot superuser                                  (POSIX)
-    uint32_t acls : 1;               //!< Filing system provides ACLs                                     (Windows, POSIX)
-    uint32_t xattr : 1;              //!< Filing system provides extended attributes                      (Windows, POSIX)
-    uint32_t compression : 1;        //!< Filing system provides whole volume compression                 (Windows, POSIX)
-    uint32_t extents : 1;            //!< Filing system provides extent based file storage (sparse files) (Windows, POSIX)
-    uint32_t filecompression : 1;    //!< Filing system provides per-file selectable compression          (Windows)
-  } f_flags{0, 0, 0, 0, 0, 0, 0, 0}; /*!< copy of mount exported flags       (Windows, POSIX) */
-  uint64_t f_bsize{_allbits1_64};    /*!< fundamental filesystem block size  (Windows, POSIX) */
-  uint64_t f_iosize{_allbits1_64};   /*!< optimal transfer block size        (Windows, POSIX) */
-  uint64_t f_blocks{_allbits1_64};   /*!< total data blocks in filesystem    (Windows, POSIX) */
-  uint64_t f_bfree{_allbits1_64};    /*!< free blocks in filesystem          (Windows, POSIX) */
-  uint64_t f_bavail{_allbits1_64};   /*!< free blocks avail to non-superuser (Windows, POSIX) */
-  uint64_t f_files{_allbits1_64};    /*!< total file nodes in filesystem     (POSIX) */
-  uint64_t f_ffree{_allbits1_64};    /*!< free nodes avail to non-superuser  (POSIX) */
-  uint32_t f_namemax{_allbits1_32};  /*!< maximum filename length            (Windows, POSIX) */
+    uint32_t rdonly : 1;                //!< Filing system is read only                                             (Windows, POSIX)
+    uint32_t noexec : 1;                //!< Filing system cannot execute programs                                  (POSIX)
+    uint32_t nosuid : 1;                //!< Filing system cannot superuser                                         (POSIX)
+    uint32_t acls : 1;                  //!< Filing system provides ACLs                                            (Windows, POSIX)
+    uint32_t xattr : 1;                 //!< Filing system provides extended attributes                             (Windows, POSIX)
+    uint32_t compression : 1;           //!< Filing system provides whole volume compression                        (Windows, POSIX)
+    uint32_t extents : 1;               //!< Filing system provides extent based file storage (sparse files)        (Windows, POSIX)
+    uint32_t filecompression : 1;       //!< Filing system provides per-file selectable compression                 (Windows)
+    uint32_t networked : 1;             //!< Filing system operates over a network. Requires `want::fstypename`.    (Windows, POSIX)
+  } f_flags{0, 0, 0, 0, 0, 0, 0, 0, 0}; /*!< copy of mount exported flags       (Windows, POSIX) */
+  uint64_t f_bsize{_allbits1_64};       /*!< fundamental filesystem block size  (Windows, POSIX) */
+  uint64_t f_iosize{_allbits1_64};      /*!< optimal transfer block size        (Windows, POSIX) */
+  uint64_t f_blocks{_allbits1_64};      /*!< total data blocks in filesystem    (Windows, POSIX) */
+  uint64_t f_bfree{_allbits1_64};       /*!< free blocks in filesystem          (Windows, POSIX) */
+  uint64_t f_bavail{_allbits1_64};      /*!< free blocks avail to non-superuser (Windows, POSIX) */
+  uint64_t f_files{_allbits1_64};       /*!< total file nodes in filesystem     (POSIX) */
+  uint64_t f_ffree{_allbits1_64};       /*!< free nodes avail to non-superuser  (POSIX) */
+  uint32_t f_namemax{_allbits1_32};     /*!< maximum filename length            (Windows, POSIX) */
 #ifndef _WIN32
   int16_t f_owner{-1}; /*!< user that mounted the filesystem   (BSD, OS X) */
 #endif
