@@ -1106,7 +1106,8 @@ public:
 #ifdef _MSC_VER
             sprintf_s(msg, "WARNING: openssl_socket_handle::close() underlying close() fails with %s", r.error().message().c_str());
 #else
-            sprintf(msg, "WARNING: openssl_socket_handle::close() underlying close() fails with %s", r.error().message().c_str());
+            snprintf(msg, 1024, "WARNING: openssl_socket_handle::close() underlying close() fails with %s", r.error().message().c_str());
+            msg[1023] = 0;
 #endif
             LLFIO_LOG_WARN(this, msg);
           }

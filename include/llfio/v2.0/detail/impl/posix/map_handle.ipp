@@ -582,7 +582,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
   {
 #if defined(MAP_EXCL)  // BSD type systems
     byte *addrafter = _addr + _reservation;
-    size_type bytes = newsize - _reservation;
+    size_type bytes = _newsize - _reservation;
     extent_type offset = _offset + _reservation;
     OUTCOME_TRY(auto &&addr, do_mmap(_v, addrafter, MAP_FIXED | MAP_EXCL, _section, _pagesize, bytes, offset, _flag));
     _reservation = _newsize;
@@ -590,7 +590,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
     return newsize;
 #else                  // generic POSIX, inefficient
     byte *addrafter = _addr + _reservation;
-    size_type bytes = newsize - _reservation;
+    size_type bytes = _newsize - _reservation;
     extent_type offset = _offset + _reservation;
     OUTCOME_TRY(auto &&addr, do_mmap(_v, addrafter, 0, _section, _pagesize, bytes, offset, _flag));
     if(addr != addrafter)
@@ -604,11 +604,11 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
 #endif
   }
   // Shrink the map
-  if(-1 == ::munmap(_addr + newsize, _reservation - newsize))
+  if(-1 == ::munmap(_addr + _newsize, _reservation - _newsize))
   {
     return posix_error();
   }
-  _reservation = newsize;
+  _reservation = _newsize;
   _length = length;
   return newsize;
 #endif
