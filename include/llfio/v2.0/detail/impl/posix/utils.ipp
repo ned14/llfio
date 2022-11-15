@@ -739,9 +739,13 @@ namespace utils
       }
       if((ret.p = mmap(nullptr, ret.actual_size, PROT_READ | PROT_WRITE, flags, fd_to_use, 0)) == MAP_FAILED)
       {
-        if(ENOMEM == errno)
+        if(ENOMEM == errno
+#ifdef VM_FLAGS_SUPERPAGE_SIZE_ANY
+          || EINVAL == errno  // Apple M1 chip appears to do this
+#endif
+        )
         {
-          if((ret.p = mmap(nullptr, ret.actual_size, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, fd_to_use, 0)) != MAP_FAILED)
+          if((ret.p = mmap(nullptr, ret.actual_size, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0)) != MAP_FAILED)
           {
             return ret;
           }
