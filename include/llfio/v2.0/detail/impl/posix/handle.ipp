@@ -81,10 +81,17 @@ result<handle::path_type> handle::current_path() const noexcept
     ret.resize(32769);
     char *out = const_cast<char *>(ret.data());
     // Yes, this API is instant memory corruption. Thank you Apple.
-    if(-1 == fcntl(_v.fd, F_GETPATH, out))
+    if(-1 == fcntl(_v.fd, F_GETPATH, out)) {
+      // Newer Mac OS usefully returns ENOENT if the file is deleted,
+      // rather than the previous path
+      if(ENOENT == errno) {
+        ret.clear();
+        return ret;
+      }
       return posix_error();
+    }
     ret.resize(strchr(out, 0) - out);  // no choice :(
-    // Apple returns the previous path when deleted, so lstat to be sure
+    // Older Mac OS returns the previous path when deleted, so lstat to be sure
     struct stat ls;
     bool exists = (-1 != ::lstat(out, &ls));
     if(!exists)
@@ -202,7 +209,9 @@ result<void> handle::set_append_only(bool enable) noexcept
   }
   if(enable)
   {
-    // Set append_only
+    // Set append_only. Be aware that recent Mac OS have started to ignore
+    // the setting of O_APPEND on an existing fd, this didn't use to be
+    // the case and no error is reported. Writes just don't append.
     attribs |= O_APPEND;
     if(-1 == ::fcntl(_v.fd, F_SETFL, attribs))
     {
