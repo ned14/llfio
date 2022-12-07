@@ -57,21 +57,23 @@ static inline void TestMappedFileHandle()
 {
   namespace llfio = LLFIO_V2_NAMESPACE;
   std::vector<llfio::byte> reference(DATA_SIZE);
-  runtest(reference, [](std::vector<llfio::byte> &cont, llfio::file_handle::io_request<llfio::file_handle::const_buffers_type> req) {
-    for(auto &b : req.buffers)
-    {
-      memcpy(cont.data() + req.offset, b.data(), b.size());
-      req.offset += b.size();
-    }
-  });
+  runtest(reference,
+          [](std::vector<llfio::byte> &cont, llfio::file_handle::io_request<llfio::file_handle::const_buffers_type> req)
+          {
+            for(auto &b : req.buffers)
+            {
+              memcpy(cont.data() + req.offset, b.data(), b.size());
+              req.offset += b.size();
+            }
+          });
   auto mf1 = llfio::mapped_file_handle::mapped_temp_inode(DATA_SIZE).value();
   mf1.truncate(DATA_SIZE).value();
   runtest(mf1, [](llfio::mapped_file_handle &cont, llfio::file_handle::io_request<llfio::file_handle::const_buffers_type> req) { cont.write(req).value(); });
   BOOST_CHECK(0 == memcmp(mf1.address(), reference.data(), DATA_SIZE));
-  auto mf2 =
-  llfio::mapped_file_handle::mapped_temp_inode(DATA_SIZE, llfio::path_discovery::storage_backed_temporary_files_directory(), llfio::file_handle::mode::write,
-                                               llfio::file_handle::flag::none, llfio::section_handle::flag::write_via_syscall)
-  .value();
+  auto mf2 = llfio::mapped_file_handle::mapped_temp_inode(DATA_SIZE, llfio::path_discovery::storage_backed_temporary_files_directory(),
+                                                          llfio::file_handle::mode::write, llfio::file_handle::caching::temporary,
+                                                          llfio::file_handle::flag::none, llfio::section_handle::flag::write_via_syscall)
+             .value();
   mf2.truncate(DATA_SIZE).value();
   runtest(mf2, [](llfio::mapped_file_handle &cont, llfio::file_handle::io_request<llfio::file_handle::const_buffers_type> req) { cont.write(req).value(); });
   BOOST_CHECK(0 == memcmp(mf2.address(), reference.data(), DATA_SIZE));
