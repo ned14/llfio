@@ -215,7 +215,8 @@ public:
   */
   LLFIO_MAKE_FREE_FUNCTION
   static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<file_handle> temp_inode(const path_handle &dirh = path_discovery::storage_backed_temporary_files_directory(),
-                                                                        mode _mode = mode::write, flag flags = flag::none) noexcept;
+                                                                        mode _mode = mode::write, caching _caching = caching::temporary,
+                                                                        flag flags = flag::none) noexcept;
 
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~file_handle() override
   {
@@ -351,13 +352,13 @@ public:
   */
   LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
-  result<extent_pair> clone_extents_to(extent_pair extent, byte_io_handle &dest, byte_io_handle::extent_type destoffset, deadline d = {}, bool force_copy_now = false,
-                                       bool emulate_if_unsupported = true) noexcept;
+  result<extent_pair> clone_extents_to(extent_pair extent, byte_io_handle &dest, byte_io_handle::extent_type destoffset, deadline d = {},
+                                       bool force_copy_now = false, bool emulate_if_unsupported = true) noexcept;
   //! \overload
   LLFIO_MAKE_FREE_FUNCTION
   result<extent_pair> clone_extents_to(byte_io_handle &dest, deadline d = {}, bool force_copy_now = false, bool emulate_if_unsupported = true) noexcept
   {
-    return clone_extents_to({(extent_type)-1, (extent_type)-1}, dest, 0, d, force_copy_now, emulate_if_unsupported);
+    return clone_extents_to({(extent_type) -1, (extent_type) -1}, dest, 0, d, force_copy_now, emulate_if_unsupported);
   }
 
   /*! \brief Efficiently zero, and possibly deallocate, data on storage.
@@ -382,7 +383,10 @@ public:
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_type> zero(extent_pair extent, deadline d = deadline()) noexcept;
   //! \overload
   LLFIO_MAKE_FREE_FUNCTION
-  result<extent_type> zero(extent_type offset, extent_type bytes, deadline d = deadline()) noexcept { return zero({offset, bytes}, d); }
+  result<extent_type> zero(extent_type offset, extent_type bytes, deadline d = deadline()) noexcept
+  {
+    return zero({offset, bytes}, d);
+  }
 
   LLFIO_DEADLINE_TRY_FOR_UNTIL(zero)
 };
@@ -471,9 +475,11 @@ is for backing shared memory maps).
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
 inline result<file_handle> temp_inode(const path_handle &dirh = path_discovery::storage_backed_temporary_files_directory(),
-                                      file_handle::mode _mode = file_handle::mode::write, file_handle::flag flags = file_handle::flag::none) noexcept
+                                      file_handle::mode _mode = file_handle::mode::write, file_handle::caching _caching = file_handle::caching::temporary,
+                                      file_handle::flag flags = file_handle::flag::none) noexcept
 {
-  return file_handle::temp_inode(std::forward<decltype(dirh)>(dirh), std::forward<decltype(_mode)>(_mode), std::forward<decltype(flags)>(flags));
+  return file_handle::temp_inode(std::forward<decltype(dirh)>(dirh), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_caching)>(_caching),
+                                 std::forward<decltype(flags)>(flags));
 }
 //! \overload
 inline file_handle::io_result<file_handle::size_type> read(file_handle &self, file_handle::extent_type offset,

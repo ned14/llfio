@@ -497,11 +497,11 @@ public:
   LLFIO_MAKE_FREE_FUNCTION
   static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<mapped_file_handle>
   mapped_temp_inode(size_type reservation = 0, const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write,
-                    flag flags = flag::none, section_handle::flag sflags = section_handle::flag::none) noexcept
+                    caching _caching = caching::temporary, flag flags = flag::none, section_handle::flag sflags = section_handle::flag::none) noexcept
   {
     try
     {
-      OUTCOME_TRY(auto &&v, file_handle::temp_inode(dir, _mode, flags));
+      OUTCOME_TRY(auto &&v, file_handle::temp_inode(dir, _mode, _caching, flags));
       mapped_file_handle ret(std::move(v), sflags, 0);
       ret._reservation = reservation;
       return {std::move(ret)};
@@ -513,25 +513,49 @@ public:
   }
 
   //! The memory section this handle is using
-  const section_handle &section() const noexcept { return _sh; }
+  const section_handle &section() const noexcept
+  {
+    return _sh;
+  }
   //! The memory section this handle is using
-  section_handle &section() noexcept { return _sh; }
+  section_handle &section() noexcept
+  {
+    return _sh;
+  }
 
   //! The map this handle is using
-  const map_handle &map() const noexcept { return _mh; }
+  const map_handle &map() const noexcept
+  {
+    return _mh;
+  }
   //! The map this handle is using
-  map_handle &map() noexcept { return _mh; }
+  map_handle &map() noexcept
+  {
+    return _mh;
+  }
 
   //! The address in memory where this mapped file currently resides
-  byte *address() const noexcept { return _mh.address(); }
+  byte *address() const noexcept
+  {
+    return _mh.address();
+  }
   //! The offset into the backing file from which this mapped file begins
-  extent_type starting_offset() const noexcept { return _offset; }
+  extent_type starting_offset() const noexcept
+  {
+    return _offset;
+  }
 
   //! The page size used by the map, in bytes.
-  size_type page_size() const noexcept { return _mh.page_size(); }
+  size_type page_size() const noexcept
+  {
+    return _mh.page_size();
+  }
 
   //! True if the map is of non-volatile RAM
-  bool is_nvram() const noexcept { return _mh.is_nvram(); }
+  bool is_nvram() const noexcept
+  {
+    return _mh.is_nvram();
+  }
 
   //! The maximum extent of the underlying file, minus any offset.
   result<extent_type> underlying_file_maximum_extent() const noexcept
@@ -545,7 +569,10 @@ public:
   }
 
   //! The address space (to be) reserved for future expansion of this file.
-  size_type capacity() const noexcept { return _reservation; }
+  size_type capacity() const noexcept
+  {
+    return _reservation;
+  }
 
   /*! \brief Reserve a new amount of address space for mapping future expansion of this file.
   \param reservation The number of bytes of virtual address space to reserve. Zero means reserve
@@ -842,10 +869,12 @@ is for backing shared memory maps).
 inline result<mapped_file_handle> mapped_temp_inode(mapped_file_handle::size_type reservation = 0,
                                                     const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(),
                                                     mapped_file_handle::mode _mode = mapped_file_handle::mode::write,
+                                                    mapped_file_handle::caching _caching = mapped_file_handle::caching::temporary,
                                                     mapped_file_handle::flag flags = mapped_file_handle::flag::none) noexcept
 {
   return mapped_file_handle::mapped_temp_inode(std::forward<decltype(reservation)>(reservation), std::forward<decltype(dir)>(dir),
-                                               std::forward<decltype(_mode)>(_mode), std::forward<decltype(flags)>(flags));
+                                               std::forward<decltype(_mode)>(_mode), std::forward<decltype(_caching)>(_caching),
+                                               std::forward<decltype(flags)>(flags));
 }
 // END make_free_functions.py
 

@@ -113,9 +113,8 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   return ret;
 }
 
-result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode, flag flags) noexcept
+result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode, caching _caching, flag flags) noexcept
 {
-  caching _caching = caching::temporary;
   // No need to check inode before unlink
   flags |= flag::unlink_on_first_close | flag::disable_safety_unlinks;
   result<file_handle> ret(file_handle(native_handle_type(), 0, 0, flags, nullptr));
@@ -128,8 +127,10 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   nativeh.behaviour &= ~native_handle_type::disposition::nonblocking;
 #ifdef O_TMPFILE
   // Linux has a special flag just for this use case
+  auto oldattribs = attribs;
   attribs |= O_TMPFILE;
-  attribs &= ~O_EXCL;  // allow relinking later
+  attribs &= ~O_EXCL;   // allow relinking later
+  attribs &= ~O_CREAT;  // at some point kernels began to refuse this being set
   nativeh.fd = ::openat(dirh.native_handle().fd, "", attribs, 0600);
   if(-1 != nativeh.fd)
   {
@@ -137,9 +138,24 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
     ret.value()._.flags &= ~flag::unlink_on_first_close;  // It's already unlinked
     return ret;
   }
+  if(ENOENT == errno)
+  {
+    // Some filing systems (I'm looking at you xfs) don't support O_TMPFILE with openat()
+    // for absolutely no good reason, so work around this specific issue
+    auto r = dirh.current_path();
+    if(r)
+    {
+      nativeh.fd = ::open(r.assume_value().c_str(), attribs & ~O_CREAT, 0600);
+      if(-1 != nativeh.fd)
+      {
+        ret.value()._.flags |= flag::anonymous_inode;
+        ret.value()._.flags &= ~flag::unlink_on_first_close;  // It's already unlinked
+        return ret;
+      }
+    }
+  }
   // If it failed, assume this kernel or FS doesn't support O_TMPFILE
-  attribs &= ~O_TMPFILE;
-  attribs |= O_EXCL;
+  attribs = oldattribs;
 #endif
   std::string random;
   for(;;)

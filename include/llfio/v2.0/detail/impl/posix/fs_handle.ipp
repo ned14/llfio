@@ -345,6 +345,26 @@ result<void> fs_handle::link(const path_handle &base, path_view_type path, deadl
   {
     return success();
   }
+  if(EEXIST == errno)
+  {
+    return posix_error();
+  }
+#ifdef __linux__
+  if(ENOENT == errno)
+  {
+    // May not have the CAP_DAC_READ_SEARCH capability which prevents AT_EMPTY_PATH working, try working around that
+    char in[64];
+    snprintf(in, sizeof(in), "/proc/self/fd/%d", h.native_handle().fd);
+    if(-1 != ::linkat(AT_FDCWD, in, base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.c_str(), AT_SYMLINK_FOLLOW))
+    {
+      return success();
+    }
+    if(EEXIST == errno)
+    {
+      return posix_error();
+    }
+  }
+#endif
 #endif
   // Open our containing directory
   filesystem::path filename;
@@ -431,7 +451,7 @@ result<span<path_view_component>> fs_handle::list_extended_attributes(span<byte>
         count++;
       }
       p += length + 1;
-    } 
+    }
   }
   return filled;
 #elif defined(__FreeBSD__)

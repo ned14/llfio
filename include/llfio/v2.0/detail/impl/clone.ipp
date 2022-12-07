@@ -32,69 +32,198 @@ namespace algorithm
                                                                               bool preserve_timestamps, bool force_copy_now, file_handle::creation creation,
                                                                               deadline d) noexcept
   {
-    LLFIO_LOG_FUNCTION_CALL(&src);
-    filesystem::path destleaf_;
-    if(destleaf.empty())
+    try
     {
-      OUTCOME_TRY(destleaf_, src.current_path());
-      if(destleaf_.empty())
+      LLFIO_LOG_FUNCTION_CALL(&src);
+      filesystem::path destleaf_;
+      if(destleaf.empty())
       {
-        // Source has been deleted, so can't infer leafname
-        return errc::no_such_file_or_directory;
-      }
-      destleaf = destleaf_;
-    }
-    stat_t stat(nullptr);
-    OUTCOME_TRY(stat.fill(src));
-    if(creation != file_handle::creation::always_new)
-    {
-      auto r = file_handle::file(destdir, destleaf, file_handle::mode::attr_read, file_handle::creation::open_existing);
-      if(r)
-      {
-        stat_t deststat(nullptr);
-        OUTCOME_TRY(deststat.fill(r.value()));
-        if((stat.st_type == deststat.st_type) && (stat.st_mtim == deststat.st_mtim) && (stat.st_size == deststat.st_size)
-#ifndef _WIN32
-           && (stat.st_perms == deststat.st_perms) && (stat.st_uid == deststat.st_uid) && (stat.st_gid == deststat.st_gid) && (stat.st_rdev == deststat.st_rdev)
-#endif
-        )
+        OUTCOME_TRY(destleaf_, src.current_path());
+        if(destleaf_.empty())
         {
-          return 0;  // nothing copied
+          // Source has been deleted, so can't infer leafname
+          return errc::no_such_file_or_directory;
+        }
+        destleaf = destleaf_;
+      }
+      stat_t stat(nullptr);
+      OUTCOME_TRY(stat.fill(src));
+      if(creation != file_handle::creation::always_new)
+      {
+        auto r = file_handle::file(destdir, destleaf, file_handle::mode::attr_read, file_handle::creation::open_existing);
+        if(r)
+        {
+          stat_t deststat(nullptr);
+          OUTCOME_TRY(deststat.fill(r.value()));
+          if((stat.st_type == deststat.st_type) && (stat.st_mtim == deststat.st_mtim) && (stat.st_size == deststat.st_size)
+#ifndef _WIN32
+             && (stat.st_perms == deststat.st_perms) && (stat.st_uid == deststat.st_uid) && (stat.st_gid == deststat.st_gid) &&
+             (stat.st_rdev == deststat.st_rdev)
+#endif
+          )
+          {
+            return 0;  // nothing copied
+          }
         }
       }
+      OUTCOME_TRY(auto &&dest, file_handle::file(destdir, destleaf, file_handle::mode::write, creation, src.kernel_caching()));
+      bool failed = true;
+      auto undest = make_scope_exit(
+      [&]() noexcept
+      {
+        if(failed)
+        {
+          (void) dest.unlink(d);
+        }
+        else if(preserve_timestamps)
+        {
+          (void) stat.stamp(dest);
+        }
+        (void) dest.close();
+      });
+      (void) undest;
+      if(!force_copy_now)
+      {
+        log_level_guard g(log_level::fatal);
+        auto r = src.clone_extents_to(dest, d, force_copy_now, false);
+        if(r)
+        {
+          failed = false;
+          return r.assume_value().length;
+        }
+      }
+      statfs_t statfs;
+      OUTCOME_TRY(statfs.fill(destdir, statfs_t::want::bavail));
+      if(stat.st_blocks > statfs.f_bavail)
+      {
+        return errc::no_space_on_device;
+      }
+      OUTCOME_TRY(auto &&copied, src.clone_extents_to(dest, d, force_copy_now, true));
+      failed = false;
+      return copied.length;
     }
-    OUTCOME_TRY(auto &&dest, file_handle::file(destdir, destleaf, file_handle::mode::write, creation, src.kernel_caching()));
-    bool failed = true;
-    auto undest = make_scope_exit([&]() noexcept {
-      if(failed)
-      {
-        (void) dest.unlink(d);
-      }
-      else if(preserve_timestamps)
-      {
-        (void) stat.stamp(dest);
-      }
-      (void) dest.close();
-    });
-    (void) undest;
+    catch(...)
     {
-      log_level_guard g(log_level::fatal);
-      auto r = src.clone_extents_to(dest, d, force_copy_now, false);
-      if(r)
-      {
-        failed = false;
-        return r.assume_value().length;
-      }
+      return error_from_exception();
     }
-    statfs_t statfs;
-    OUTCOME_TRY(statfs.fill(src, statfs_t::want::bavail));
-    if(stat.st_blocks > statfs.f_bavail)
+  }
+
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<file_handle::extent_type> relink_or_clone_copy_unlink(file_handle &src, const path_handle &destdir, path_view destleaf,
+                                                                                            bool atomic_replace, bool preserve_timestamps, bool force_copy_now,
+                                                                                            deadline d) noexcept
+  {
+    try
     {
-      return errc::no_space_on_device;
+      LLFIO_LOG_FUNCTION_CALL(&src);
+      filesystem::path destleaf_;
+      if(destleaf.empty())
+      {
+        OUTCOME_TRY(destleaf_, src.current_path());
+        if(destleaf_.empty())
+        {
+          // Source has been deleted, so can't infer leafname
+          return errc::no_such_file_or_directory;
+        }
+        destleaf = destleaf_;
+      }
+      LLFIO_DEADLINE_TO_SLEEP_INIT(d);
+      {
+        auto r = src.relink(destdir, destleaf, atomic_replace, d);
+        if(r)
+        {
+          return false;
+        }
+        if(!atomic_replace && r.assume_error() == errc::file_exists)
+        {
+          OUTCOME_TRY(std::move(r));
+        }
+      }
+      stat_t stat(nullptr);
+      OUTCOME_TRY(stat.fill(src));
+
+      OUTCOME_TRY(auto &&desth, file_handle::temp_inode(destdir, file_handle::mode::write, src.kernel_caching()));
+      if(!atomic_replace)
+      {
+        auto r = file_handle::file(destdir, destleaf, file_handle::mode::none);
+        if(r)
+        {
+          return errc::file_exists;
+        }
+      }
+      {
+        log_level_guard g(log_level::fatal);
+        bool failed = true;
+        if(!force_copy_now)
+        {
+          if(src.clone_extents_to(desth, {}, force_copy_now, false))
+          {
+            failed = false;
+          }
+        }
+        if(failed)
+        {
+          statfs_t statfs;
+          OUTCOME_TRY(statfs.fill(desth, statfs_t::want::bavail));
+          if(stat.st_blocks > statfs.f_bavail)
+          {
+            return errc::no_space_on_device;
+          }
+          OUTCOME_TRY(src.clone_extents_to(desth, {}, force_copy_now, true));
+        }
+      }
+      LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
+      deadline nd;
+      LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+      auto r = desth.link(destdir, destleaf, nd);
+      if(atomic_replace && !r && r.assume_error() == errc::file_exists)
+      {
+        // Have to link + relink
+        for(;;)
+        {
+          LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
+          auto randomname = utils::random_string(32);
+          randomname.append(".random");
+          r = desth.link(destdir, randomname);
+          if(!r && r.assume_error() != errc::file_exists)
+          {
+            OUTCOME_TRY(std::move(r));
+          }
+          if(r)
+          {
+            // Note that if this fails, we leak the randomly named linked file.
+            OUTCOME_TRY(auto &&desth2,
+                        file_handle::file(destdir, randomname, file_handle::mode::write, file_handle::creation::open_existing, src.kernel_caching()));
+            if(desth.unique_id() == desth2.unique_id())
+            {
+              LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+              r = desth2.relink(destdir, destleaf, atomic_replace, nd);
+              if(!r)
+              {
+                OUTCOME_TRY(desth2.unlink());
+                OUTCOME_TRY(std::move(r));
+              }
+              desth.swap(desth2);
+              r = success();
+              break;
+            }
+          }
+        }
+      }
+      auto undesth = make_scope_exit([&]() noexcept { (void) desth.unlink(); });
+      OUTCOME_TRY(std::move(r));
+      if(preserve_timestamps)
+      {
+        OUTCOME_TRY(stat.stamp(desth));
+      }
+      LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
+      OUTCOME_TRY(src.unlink(nd));
+      undesth.release();
+      return true;
     }
-    OUTCOME_TRY(auto &&copied, src.clone_extents_to(dest, d, force_copy_now, true));
-    failed = false;
-    return copied.length;
+    catch(...)
+    {
+      return error_from_exception();
+    }
   }
 
 }  // namespace algorithm

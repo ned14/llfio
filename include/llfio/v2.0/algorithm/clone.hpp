@@ -80,6 +80,62 @@ namespace algorithm
                                                                               file_handle::creation creation = file_handle::creation::always_new,
                                                                               deadline d = {}) noexcept;
 
+  /*! \brief Relink or clone-unlink/copy-unlink the extents of the filesystem entity
+  identified by `src` to `destdir` optionally renamed to `destleaf`. This lets you
+  relink files across filing systems, with as close as possible matching of semantics
+  to atomic relinking.
+
+  \return True if a clone-unlink or copy-unlink was performed, false if a simple
+  relink was sufficient.
+  \param src The file to relink or clone or copy.
+  \param destdir The base to lookup `destleaf` within.
+  \param destleaf The leafname to use. If empty, use the same leafname as `src` currently has.
+  \param atomic_replace Whether any file entry at the destination should be
+  atomically replaced, or an error returned instead.
+  \param preserve_timestamps Use `stat_t::stamp()` to preserve as much metadata from
+  the original to the clone/copy as possible.
+  \param force_copy_now Parameter to pass to `file_handle::clone_extents()` to force
+  extents to be copied now, not copy-on-write lazily later.
+  \param d Deadline by which to complete the operation.
+
+  Firstly, `.relink()` is tried, which if successful, there is an immediate
+  return with value `false`.
+
+  If relinking fails, an anonymous inode `file_handle` is constructed at the
+  destination. The caching used for the destination handle is replicated from
+  the source handle -- be aware that not caching metadata is expensive. If
+  `atomic_replace` is false, and there is a file entry matching the destination,
+  an error code comparing equal to `errc::file_exists` will be returned.
+
+  Next `file_handle::clone_extents()` with `emulate_if_unsupported = false` is
+  called on the whole file content. If extent cloning is supported, this will
+  be very fast and not consume new disk space (note: except on networked filesystems).
+  If the source file is sparsely allocated, the destination will have identical
+  sparse allocation.
+
+  If the previous operation did not succeed, the disk free space is checked
+  using `statfs_t`, and if the copy would exceed current disk free space, the
+  destination file is unlinked and an error code comparing equal to
+  `errc::no_space_on_device` is returned.
+
+  Next, `file_handle::clone_extents()` with `emulate_if_unsupported = true` is
+  called on the whole file content. This copies only the allocated extents in
+  blocks sized whatever is the large page size on this platform (2Mb on x64).
+
+  Once all the extents have been replicated into temporary inode, a hard link
+  is attempted to the destination leafname. If that fails, if `atomic_replace`
+  is false then error is returned, otherwise a hard link to a randomly chosen
+  filename is created, and that link is relinked over the destination leafname.
+
+  Finally, if `preserve_timestamps` is true, the destination file handle is
+  restamped with the metadata from the source file handle just before the
+  destination file handle is closed.
+  */
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<file_handle::extent_type> relink_or_clone_copy_unlink(file_handle &src, const path_handle &destdir,
+                                                                                            path_view destleaf = {}, bool atomic_replace = true,
+                                                                                            bool preserve_timestamps = true, bool force_copy_now = false,
+                                                                                            deadline d = {}) noexcept;
+
 #if 0
 #ifdef _MSC_VER
 #pragma warning(push)

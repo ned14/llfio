@@ -186,11 +186,10 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
   return ret;
 }
 
-result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode, flag flags) noexcept
+result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode, caching _caching, flag flags) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-  caching _caching = caching::temporary;
   // No need to rename to random on unlink or check inode before unlink
   flags |= flag::disable_safety_unlinks | flag::win_disable_unlink_emulation;
   result<file_handle> ret(in_place_type<file_handle>, native_handle_type(), flags, nullptr);
@@ -407,8 +406,8 @@ result<std::vector<file_handle::extent_pair>> file_handle::extents() const noexc
   }
 }
 
-result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::extent_pair extent, byte_io_handle &dest_, byte_io_handle::extent_type destoffset, deadline d,
-                                                               bool force_copy_now, bool emulate_if_unsupported) noexcept
+result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::extent_pair extent, byte_io_handle &dest_, byte_io_handle::extent_type destoffset,
+                                                               deadline d, bool force_copy_now, bool emulate_if_unsupported) noexcept
 {
   try
   {
@@ -448,7 +447,9 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
     LLFIO_DEADLINE_TO_SLEEP_INIT(d);
     const size_type blocksize = utils::file_buffer_default_size();
     byte *buffer = nullptr;
-    auto unbufferh = make_scope_exit([&]() noexcept {
+    auto unbufferh = make_scope_exit(
+    [&]() noexcept
+    {
       if(buffer != nullptr)
         utils::page_allocator<byte>().deallocate(buffer, blocksize);
     });
@@ -631,7 +632,9 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
       OUTCOME_TRY(dest.truncate(destoffset + extent.length));
       truncate_back_on_failure = true;
     }
-    auto untruncate = make_scope_exit([&]() noexcept {
+    auto untruncate = make_scope_exit(
+    [&]() noexcept
+    {
       if(truncate_back_on_failure)
       {
         (void) dest.truncate(dest_length);
@@ -753,11 +756,11 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
               if(zs != ds)
               {
                 // Write portion from ds to zs
-                cb = {(const byte *) ds, (size_t)(zs - ds)};
+                cb = {(const byte *) ds, (size_t) (zs - ds)};
                 auto localoffset = cb.data() - readed.front().data();
                 // std::cout << "*** " << (item.src.offset + thisoffset + localoffset) << " - " << cb.size() << std::endl;
                 OUTCOME_TRY(auto &&written, dest.write({{&cb, 1}, item.src.offset + thisoffset + localoffset + destoffsetdiff}, nd));
-                if(written.front().size() != (size_t)(zs - ds))
+                if(written.front().size() != (size_t) (zs - ds))
                 {
                   return errc::resource_unavailable_try_again;  // something is wrong
                 }
@@ -934,7 +937,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<uint32_t, float>> statfs_t::_fi
       *e++ = '0' + (DiskNumber % 10);
       *e = 0;
       OUTCOME_TRY(auto &&diskh, file_handle::file({}, path_view(physicaldrivename, e - physicaldrivename, path_view::zero_terminated), handle::mode::none,
-                                                handle::creation::open_existing, handle::caching::only_metadata));
+                                                  handle::creation::open_existing, handle::caching::only_metadata));
       ol.Internal = static_cast<ULONG_PTR>(-1);
       auto *dp = reinterpret_cast<DISK_PERFORMANCE *>(buffer);
       if(DeviceIoControl(diskh.native_handle().h, IOCTL_DISK_PERFORMANCE, nullptr, 0, dp, sizeof(buffer), nullptr, &ol) == 0)
@@ -952,7 +955,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<uint32_t, float>> statfs_t::_fi
           return win32_error();
         }
       }
-      //printf("%llu,%llu,%llu\n", dp->ReadTime.QuadPart, dp->WriteTime.QuadPart, dp->IdleTime.QuadPart);
+      // printf("%llu,%llu,%llu\n", dp->ReadTime.QuadPart, dp->WriteTime.QuadPart, dp->IdleTime.QuadPart);
       iosinprogress += dp->QueueDepth;
       std::lock_guard<std::mutex> g(last_reading.lock);
       if(last_reading.items.size() < DiskNumber + 1)
