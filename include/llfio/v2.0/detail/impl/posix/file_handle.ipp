@@ -145,7 +145,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
     auto r = dirh.current_path();
     if(r)
     {
-      nativeh.fd = ::open(r.assume_value().c_str(), attribs & ~O_CREAT, 0600);
+      nativeh.fd = ::open(r.assume_value().c_str(), attribs, 0600);
       if(-1 != nativeh.fd)
       {
         ret.value()._.flags |= flag::anonymous_inode;
@@ -154,7 +154,9 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
       }
     }
   }
-  // If it failed, assume this kernel or FS doesn't support O_TMPFILE
+  // If it failed, assume this kernel or FS doesn't support O_TMPFILE. We don't test
+  // for a specific error code, because it has been found that some systems report
+  // the wrong one
   attribs = oldattribs;
 #endif
   std::string random;
@@ -168,7 +170,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
     {
       return error_from_exception();
     }
-    nativeh.fd = ::openat(dirh.native_handle().fd, random.c_str(), attribs, 0600);  // user read/write perms only
+    nativeh.fd = ::openat(dirh.native_handle().fd, random.c_str(), attribs, 0000);  // nobody else can open this
     if(-1 == nativeh.fd)
     {
       int errcode = errno;

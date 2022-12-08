@@ -209,8 +209,8 @@ namespace algorithm
           }
         }
       }
-      auto undesth = make_scope_exit([&]() noexcept { (void) desth.unlink(); });
       OUTCOME_TRY(std::move(r));
+      auto undesth = make_scope_exit([&]() noexcept { (void) desth.unlink(); });
       if(preserve_timestamps)
       {
         OUTCOME_TRY(stat.stamp(desth));
