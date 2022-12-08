@@ -10,6 +10,6 @@ var fs__handle_8hpp =
     [ "containing_directory", "fs__handle_8hpp.html#a1f5764bb77ec58ac60c6b92958a16043", null ],
     [ "relink", "fs__handle_8hpp.html#a60fa5c64c83ce05c8287c5379d082e49", null ],
     [ "to_win32_path", "fs__handle_8hpp.html#ab561e45415bf19b8cc6064b6b313d94d", null ],
-    [ "to_win32_path", "fs__handle_8hpp.html#a7042556839391e462df6743caf65fb24", null ],
+    [ "to_win32_path", "fs__handle_8hpp.html#a64524788da1440c29cae134ae2a53c70", null ],
     [ "unlink", "fs__handle_8hpp.html#a3c20b46beeb225aa63ade3dc42e73362", null ]
 ];

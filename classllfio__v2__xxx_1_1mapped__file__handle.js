@@ -1,6 +1,5 @@
 var classllfio__v2__xxx_1_1mapped__file__handle =
 [
-    [ "std", "classllfio__v2__xxx_1_1mapped__file__handle_1_1std.html", null ],
     [ "awaitable", "classllfio__v2__xxx_1_1mapped__file__handle.html#a93af2fdd7b3f0c26561ec97035ab3d5c", null ],
     [ "barrier_kind", "classllfio__v2__xxx_1_1mapped__file__handle.html#ac54a07a91e9e39ac606560dca1065567", null ],
     [ "buffer_type", "classllfio__v2__xxx_1_1mapped__file__handle.html#aae969aaddafe7e4e7b34e4c64a7c5ac9", null ],
@@ -25,6 +24,8 @@ var classllfio__v2__xxx_1_1mapped__file__handle =
     [ "mapped_file_handle", "classllfio__v2__xxx_1_1mapped__file__handle.html#a4aa124e03ec6376c70d9e07c548d0d44", null ],
     [ "mapped_file_handle", "classllfio__v2__xxx_1_1mapped__file__handle.html#ae6f542f218c7413a71aeccc5918a5ca3", null ],
     [ "mapped_file_handle", "classllfio__v2__xxx_1_1mapped__file__handle.html#a2fad4dde057abb62f289372ccbd4af3e", null ],
+    [ "mapped_file_handle", "classllfio__v2__xxx_1_1mapped__file__handle.html#a1474f8674d794bc901cc262008c72bca", null ],
+    [ "mapped_file_handle", "classllfio__v2__xxx_1_1mapped__file__handle.html#ab0529ebe544466f71021b631c4c0ccad", null ],
     [ "~mapped_file_handle", "classllfio__v2__xxx_1_1mapped__file__handle.html#a1f74f4fc555c609bb6056a7a4b6f8d77", null ],
     [ "_do_allocate_registered_buffer", "classllfio__v2__xxx_1_1mapped__file__handle.html#a6e68ac7d62dfb84d4868b161eb25c859", null ],
     [ "_do_barrier", "classllfio__v2__xxx_1_1mapped__file__handle.html#a298d19de0ece33a268f2338c52d784e2", null ],
@@ -57,7 +58,6 @@ var classllfio__v2__xxx_1_1mapped__file__handle =
     [ "co_write", "classllfio__v2__xxx_1_1mapped__file__handle.html#a5621865dc76cda9ca6f31595edded0a3", null ],
     [ "copy_extended_attributes", "classllfio__v2__xxx_1_1mapped__file__handle.html#ab87ff96477f1441bd82b0f85515e3339", null ],
     [ "current_path", "classllfio__v2__xxx_1_1mapped__file__handle.html#a00a85eec5a41f7edb2c574d40cf04535", null ],
-    [ "enable_if", "classllfio__v2__xxx_1_1mapped__file__handle.html#a313a79a697eee128787f34fb7d3c25a8", null ],
     [ "extents", "classllfio__v2__xxx_1_1mapped__file__handle.html#a6e30345e9aa4fa263b009efe2c97466a", null ],
     [ "flags", "classllfio__v2__xxx_1_1mapped__file__handle.html#a013936bc1254b1a47567fe29698d1b1c", null ],
     [ "get_extended_attribute", "classllfio__v2__xxx_1_1mapped__file__handle.html#aec8bd6a8bc3543f59a9980ca15b62295", null ],
@@ -168,7 +168,6 @@ var classllfio__v2__xxx_1_1mapped__file__handle =
     [ "zero", "classllfio__v2__xxx_1_1mapped__file__handle.html#a85989f7ebfd02ed54fbfa0afa6550d90", null ],
     [ "zero", "classllfio__v2__xxx_1_1mapped__file__handle.html#a800b4d046b9648a9a4a69a7797548ee4", null ],
     [ "_", "classllfio__v2__xxx_1_1mapped__file__handle.html#ac06f9b0d4b04c14e1effa2f72b53b087", null ],
-    [ "__VA_ARGS__", "classllfio__v2__xxx_1_1mapped__file__handle.html#a7643682ca0388f044c2ada775199fb9f", null ],
     [ "_ctx", "classllfio__v2__xxx_1_1mapped__file__handle.html#aa4b79ba6b413f45da50c9c418d592d97", null ],
     [ "_devid", "classllfio__v2__xxx_1_1mapped__file__handle.html#a4d20a64cf182162a49962ed25d2126b3", null ],
     [ "_inode", "classllfio__v2__xxx_1_1mapped__file__handle.html#a8454764db3cd47e65ec7853b9cb0b3fa", null ],

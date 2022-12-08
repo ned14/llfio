@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['_5f_5fva_5fargs_5f_5f_1532',['__VA_ARGS__',['../classllfio__v2__xxx_1_1mapped__file__handle.html#a7643682ca0388f044c2ada775199fb9f',1,'llfio_v2_xxx::mapped_file_handle::__VA_ARGS__()'],['../namespacellfio__v2__xxx_1_1utils.html#a882276a97fe77b8104b94f993f7329e2',1,'llfio_v2_xxx::utils::__VA_ARGS__()']]]
+  ['acls_1592',['acls',['../structllfio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#a17f61dd9f0f5aae7c34c55ba46358ddf',1,'llfio_v2_xxx::statfs_t::f_flags_t']]],
+  ['allocated_1593',['allocated',['../structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#ae0533251c886dd5a8e8ec46a9a7367c7',1,'llfio_v2_xxx::algorithm::traversal_summary']]]
 ];

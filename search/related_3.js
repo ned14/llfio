@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['poll_1842',['poll',['../classllfio__v2__xxx_1_1pollable__handle.html#a357eb44b1c9d3996a8d95f004f6d83cc',1,'llfio_v2_xxx::pollable_handle']]]
+  ['operator_3c_3c_1904',['operator&lt;&lt;',['../classllfio__v2__xxx_1_1ip_1_1address.html#a376449b224474bb9e76e5de5ff0079d2',1,'llfio_v2_xxx::ip::address']]]
 ];

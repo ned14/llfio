@@ -1,15 +1,35 @@
 var namespacellfio__v2__xxx_1_1algorithm =
 [
+    [ "detail", null, [
+      [ "cached_path_handle_ptr", "cached__parent_8hpp.html#acb1cc37df760619bb579c4ec007e1239", null ],
+      [ "combining_handle_adapter_choose_base", "combining_8hpp.html#a5f95b4f2c993e0010b37793acab770ba", null ],
+      [ "get_cached_path_handle", "cached__parent_8hpp.html#a9ec9e3c4b8183126c1f645181d3f1160", null ]
+    ] ],
     [ "impl", "namespacellfio__v2__xxx_1_1algorithm_1_1impl.html", "namespacellfio__v2__xxx_1_1algorithm_1_1impl" ],
     [ "shared_fs_mutex", "namespacellfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex.html", "namespacellfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex" ],
-    [ "cached_parent_handle_adapter", "classllfio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter.html", "classllfio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter" ],
-    [ "combining_handle_adapter", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter" ],
-    [ "compare_visitor", "structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html", "structllfio__v2__xxx_1_1algorithm_1_1compare__visitor" ],
     [ "contents_visitor", "structllfio__v2__xxx_1_1algorithm_1_1contents__visitor.html", "structllfio__v2__xxx_1_1algorithm_1_1contents__visitor" ],
     [ "difference_item", "structllfio__v2__xxx_1_1algorithm_1_1difference__item.html", "structllfio__v2__xxx_1_1algorithm_1_1difference__item" ],
+    [ "compare_visitor", "structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html", "structllfio__v2__xxx_1_1algorithm_1_1compare__visitor" ],
     [ "reduce_visitor", "structllfio__v2__xxx_1_1algorithm_1_1reduce__visitor.html", "structllfio__v2__xxx_1_1algorithm_1_1reduce__visitor" ],
-    [ "summarize_visitor", "structllfio__v2__xxx_1_1algorithm_1_1summarize__visitor.html", "structllfio__v2__xxx_1_1algorithm_1_1summarize__visitor" ],
     [ "traversal_summary", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary" ],
+    [ "summarize_visitor", "structllfio__v2__xxx_1_1algorithm_1_1summarize__visitor.html", "structllfio__v2__xxx_1_1algorithm_1_1summarize__visitor" ],
     [ "traverse_visitor", "structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html", "structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor" ],
-    [ "trivial_vector", "classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html", "classllfio__v2__xxx_1_1algorithm_1_1trivial__vector" ]
+    [ "trivial_vector", "classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html", "classllfio__v2__xxx_1_1algorithm_1_1trivial__vector" ],
+    [ "cached_parent_handle_adapter", "classllfio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter.html", "classllfio__v2__xxx_1_1algorithm_1_1cached__parent__handle__adapter" ],
+    [ "combining_handle_adapter", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter.html", "classllfio__v2__xxx_1_1algorithm_1_1combining__handle__adapter" ],
+    [ "xor_handle_adapter", "namespacellfio__v2__xxx_1_1algorithm.html#a27450e894b5dab6c18a01350670fa0dc", null ],
+    [ "cache_parent", "namespacellfio__v2__xxx_1_1algorithm.html#a0e474a5af3258fc971c71d057c8fb0bb", null ],
+    [ "clone_or_copy", "namespacellfio__v2__xxx_1_1algorithm.html#a3c661d6cba0da25fe9e1211ede1fd004", null ],
+    [ "contents", "namespacellfio__v2__xxx_1_1algorithm.html#afae251fc3bfb7280b47b6135e2f6c7e2", null ],
+    [ "operator!=", "namespacellfio__v2__xxx_1_1algorithm.html#a7ef00d65394827ceb91597dda1f496f9", null ],
+    [ "operator<", "namespacellfio__v2__xxx_1_1algorithm.html#a48db273f73f86955938b99faeef6e113", null ],
+    [ "operator<=", "namespacellfio__v2__xxx_1_1algorithm.html#a993ddc5c77998a907582247107f6e6c5", null ],
+    [ "operator==", "namespacellfio__v2__xxx_1_1algorithm.html#a6e8566ac7a5eeb0c14cf2387dfb8c1a1", null ],
+    [ "operator>", "namespacellfio__v2__xxx_1_1algorithm.html#a4ba09ef10dc88c605edf40669322d8d4", null ],
+    [ "operator>=", "namespacellfio__v2__xxx_1_1algorithm.html#ade7571062c3e19cb6622bd2e411130ab", null ],
+    [ "reduce", "namespacellfio__v2__xxx_1_1algorithm.html#a05594f7c8ae275fa65b2acd57cc9b8ac", null ],
+    [ "relink_or_clone_copy_unlink", "namespacellfio__v2__xxx_1_1algorithm.html#af7a0c4f6cae11d1914dce6514175d7d3", null ],
+    [ "summarize", "namespacellfio__v2__xxx_1_1algorithm.html#a6165d32704ff21b4aed3046f11b31cb0", null ],
+    [ "swap", "namespacellfio__v2__xxx_1_1algorithm.html#ae0973243c4b58d53d6f11ce5a2535a8c", null ],
+    [ "traverse", "namespacellfio__v2__xxx_1_1algorithm.html#ae068bc16598189811d0ce2b3530f1de7", null ]
 ];

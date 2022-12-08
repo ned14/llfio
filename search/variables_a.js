@@ -1,12 +1,8 @@
 var searchData=
 [
-  ['max_5fdepth_1589',['max_depth',['../structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#ad5862be5cc4b78861999aa69a78b9656',1,'llfio_v2_xxx::algorithm::traversal_summary']]],
-  ['max_5fiosbusytime_1590',['max_iosbusytime',['../classllfio__v2__xxx_1_1dynamic__thread__pool__group_1_1io__aware__work__item.html#a5860206701c43b7035475dc3f62a23ef',1,'llfio_v2_xxx::dynamic_thread_pool_group::io_aware_work_item']]],
-  ['max_5fiosinprogress_1591',['max_iosinprogress',['../classllfio__v2__xxx_1_1dynamic__thread__pool__group_1_1io__aware__work__item.html#a240b9e4d3d0ee510c46347e735185688',1,'llfio_v2_xxx::dynamic_thread_pool_group::io_aware_work_item']]],
-  ['max_5fkey_5fsize_1592',['max_key_size',['../structkvstore__v1__xxx_1_1basic__key__value__store__info.html#a55c5a2ab7632d6d6364ecabb96e97bee',1,'kvstore_v1_xxx::basic_key_value_store_info']]],
-  ['max_5fvalue_5fsize_1593',['max_value_size',['../structkvstore__v1__xxx_1_1basic__key__value__store__info.html#a860380a3823942caabac91e2d819b781',1,'kvstore_v1_xxx::basic_key_value_store_info']]],
-  ['metadata_1594',['metadata',['../structllfio__v2__xxx_1_1algorithm_1_1contents__visitor_1_1contents__type.html#a30ef9b01b6171889f403d64a0eee47ca',1,'llfio_v2_xxx::algorithm::contents_visitor::contents_type']]],
-  ['min_5fiosinprogress_1595',['min_iosinprogress',['../classllfio__v2__xxx_1_1dynamic__thread__pool__group_1_1io__aware__work__item.html#a81540923522973756560e20c44a0e948',1,'llfio_v2_xxx::dynamic_thread_pool_group::io_aware_work_item']]],
-  ['min_5fkey_5fsize_1596',['min_key_size',['../structkvstore__v1__xxx_1_1basic__key__value__store__info.html#a3a48e754b1f0ccb700a1d17663f0bbb4',1,'kvstore_v1_xxx::basic_key_value_store_info']]],
-  ['min_5fvalue_5fsize_1597',['min_value_size',['../structkvstore__v1__xxx_1_1basic__key__value__store__info.html#a413b348bd19556537cd4ff287b937b0a',1,'kvstore_v1_xxx::basic_key_value_store_info']]]
+  ['name_1657',['name',['../structkvstore__v1__xxx_1_1basic__key__value__store__info.html#aa89f3aa72d3cfd207242e7ef4ad853ed',1,'kvstore_v1_xxx::basic_key_value_store_info::name()'],['../structllfio__v2__xxx_1_1byte__io__multiplexer_1_1implementation__information__t.html#ab6870c5cc8cf541ffdd833225a48a8aa',1,'llfio_v2_xxx::byte_io_multiplexer::implementation_information_t::name()'],['../structllfio__v2__xxx_1_1storage__profile_1_1item__base.html#a2580620b39e8cce0db068444dd6c14bf',1,'llfio_v2_xxx::storage_profile::item_base::name()'],['../structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#af5ac42fa14988bbf2a71343d14596d5d',1,'llfio_v2_xxx::tls_socket_source_implementation_information::name()']]],
+  ['networked_1658',['networked',['../structllfio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#ac3f5b0c14d5da302cf7a6e7445ca9f74',1,'llfio_v2_xxx::statfs_t::f_flags_t']]],
+  ['noexec_1659',['noexec',['../structllfio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#a4559dec0d0c4354feb0b0c131aab266b',1,'llfio_v2_xxx::statfs_t::f_flags_t']]],
+  ['nosuid_1660',['nosuid',['../structllfio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#a973d0ca8c51f329587144682aff54879',1,'llfio_v2_xxx::statfs_t::f_flags_t']]],
+  ['nsecs_1661',['nsecs',['../structllfio__v2__xxx_1_1deadline.html#aff7d0cc77c5d0a9c90b5f16140df5359',1,'llfio_v2_xxx::deadline']]]
 ];

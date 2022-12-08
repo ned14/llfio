@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['to_5fwin32_5fpath_1843',['to_win32_path',['../classllfio__v2__xxx_1_1fs__handle.html#a98c35067c7ee7e6f61943cb192f006bc',1,'llfio_v2_xxx::fs_handle']]]
+  ['poll_1905',['poll',['../classllfio__v2__xxx_1_1pollable__handle.html#a357eb44b1c9d3996a8d95f004f6d83cc',1,'llfio_v2_xxx::pollable_handle']]]
 ];
