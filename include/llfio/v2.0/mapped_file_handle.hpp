@@ -168,16 +168,16 @@ mapped file does not silently impair performance.
 */
 class LLFIO_DECL mapped_file_handle : public file_handle
 {
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _replace_handle(handle &&o) noexcept override
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _replace_handle(handle &&o_) noexcept override
   {
-    if(!o.is_regular())
+    auto &o = static_cast<decltype(*this) &>(o_);
+    if(_v.behaviour != o._v.behaviour)
     {
       return errc::invalid_argument;
     }
     OUTCOME_TRY(_mh.close());
     OUTCOME_TRY(_sh.close());
-    handle *self = this;
-    self->swap(o);
+    _v.swap(o._v);
     auto length = (extent_type) -1;
     auto out = _reserve(length, _reservation);
     if(!out)

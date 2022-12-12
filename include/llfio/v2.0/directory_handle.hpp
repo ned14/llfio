@@ -69,14 +69,14 @@ an allocation-free cycle per directory enumeration.
 class LLFIO_DECL directory_handle : public path_handle, public fs_handle
 {
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept final { return *this; }
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _replace_handle(handle &&o) noexcept override
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _replace_handle(handle &&o_) noexcept override
   {
-    if(!o.is_directory())
+    auto &o = static_cast<decltype(*this) &>(o_);
+    if(_v.behaviour != o._v.behaviour)
     {
       return errc::invalid_argument;
     }
-    handle *self = this;
-    self->swap(o);
+    _v.swap(o._v);
     return success();
   }
 
