@@ -170,6 +170,10 @@ namespace algorithm
           OUTCOME_TRY(src.clone_extents_to(desth, {}, force_copy_now, true));
         }
       }
+      if(preserve_timestamps)
+      {
+        OUTCOME_TRY(stat.stamp(desth));
+      }
       LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
       deadline nd;
       LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
