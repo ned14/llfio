@@ -148,9 +148,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a3c661d6cba0da25fe9e1211ede1fd004"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle::extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a3c661d6cba0da25fe9e1211ede1fd004">clone_or_copy</a> (<a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;src, const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;destdir, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> destleaf={}, bool preserve_timestamps=true, bool force_copy_now=false, <a class="el" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42">file_handle::creation</a> creation=<a class="el" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42af7cf95e0f43dc8f79e39ae628c85a11d">file_handle::creation::always_new</a>, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d={}) noexcept</td></tr>
 <tr class="memdesc:a3c661d6cba0da25fe9e1211ede1fd004"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clone or copy the extents of the filesystem entity identified by <code>src</code> to <code>destdir</code> optionally renamed to <code>destleaf</code>.  <a href="namespacellfio__v2__xxx_1_1algorithm.html#a3c661d6cba0da25fe9e1211ede1fd004">More...</a><br /></td></tr>
 <tr class="separator:a3c661d6cba0da25fe9e1211ede1fd004"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af7a0c4f6cae11d1914dce6514175d7d3"><td class="memItemLeft" align="right" valign="top">result&lt; file_handle::extent_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#af7a0c4f6cae11d1914dce6514175d7d3">relink_or_clone_copy_unlink</a> (<a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;src, const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;destdir, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> destleaf={}, bool atomic_replace=true, bool preserve_timestamps=true, bool force_copy_now=false, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d={}) noexcept</td></tr>
-<tr class="memdesc:af7a0c4f6cae11d1914dce6514175d7d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Relink or clone-unlink/copy-unlink the extents of the filesystem entity identified by <code>src</code> to <code>destdir</code> optionally renamed to <code>destleaf</code>. This lets you relink files across filing systems, with as close as possible matching of semantics to atomic relinking.  <a href="namespacellfio__v2__xxx_1_1algorithm.html#af7a0c4f6cae11d1914dce6514175d7d3">More...</a><br /></td></tr>
-<tr class="separator:af7a0c4f6cae11d1914dce6514175d7d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae445124b0d6b194eeb4e5ae3b1bfcf05"><td class="memItemLeft" align="right" valign="top">result&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#ae445124b0d6b194eeb4e5ae3b1bfcf05">relink_or_clone_copy_unlink</a> (<a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;src, const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;destdir, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> destleaf={}, bool atomic_replace=true, bool preserve_timestamps=true, bool force_copy_now=false, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d={}) noexcept</td></tr>
+<tr class="memdesc:ae445124b0d6b194eeb4e5ae3b1bfcf05"><td class="mdescLeft">&#160;</td><td class="mdescRight">Relink or clone-unlink/copy-unlink the extents of the filesystem entity identified by <code>src</code> to <code>destdir</code> optionally renamed to <code>destleaf</code>. This lets you relink files across filing systems, with as close as possible matching of semantics to atomic relinking.  <a href="namespacellfio__v2__xxx_1_1algorithm.html#ae445124b0d6b194eeb4e5ae3b1bfcf05">More...</a><br /></td></tr>
+<tr class="separator:ae445124b0d6b194eeb4e5ae3b1bfcf05"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afae251fc3bfb7280b47b6135e2f6c7e2"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1contents__visitor_1_1contents__type.html">contents_visitor::contents_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#afae251fc3bfb7280b47b6135e2f6c7e2">contents</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;dirh, <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1contents__visitor.html">contents_visitor</a> *visitor=nullptr, size_t threads=0, bool force_slow_path=false) noexcept</td></tr>
 <tr class="memdesc:afae251fc3bfb7280b47b6135e2f6c7e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the contents of everything within and under <code>dirh</code>. What is returned is unordered.  <a href="namespacellfio__v2__xxx_1_1algorithm.html#afae251fc3bfb7280b47b6135e2f6c7e2">More...</a><br /></td></tr>
 <tr class="separator:afae251fc3bfb7280b47b6135e2f6c7e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -488,8 +488,8 @@ template&lt;class T , class... Args&gt; </div>
 
 </div>
 </div>
-<a id="af7a0c4f6cae11d1914dce6514175d7d3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af7a0c4f6cae11d1914dce6514175d7d3">&#9670;&nbsp;</a></span>relink_or_clone_copy_unlink()</h2>
+<a id="ae445124b0d6b194eeb4e5ae3b1bfcf05"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae445124b0d6b194eeb4e5ae3b1bfcf05">&#9670;&nbsp;</a></span>relink_or_clone_copy_unlink()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -498,7 +498,7 @@ template&lt;class T , class... Args&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">result&lt;file_handle::extent_type&gt; llfio_v2_xxx::algorithm::relink_or_clone_copy_unlink </td>
+          <td class="memname">result&lt;bool&gt; llfio_v2_xxx::algorithm::relink_or_clone_copy_unlink </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a> &amp;&#160;</td>
           <td class="paramname"><em>src</em>, </td>
@@ -553,7 +553,7 @@ template&lt;class T , class... Args&gt; </div>
 </div><div class="memdoc">
 
 <p>Relink or clone-unlink/copy-unlink the extents of the filesystem entity identified by <code>src</code> to <code>destdir</code> optionally renamed to <code>destleaf</code>. This lets you relink files across filing systems, with as close as possible matching of semantics to atomic relinking. </p>
-<dl class="section return"><dt>Returns</dt><dd>True if a clone-unlink or copy-unlink was performed, false if a simple relink was sufficient. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>True if a clone-unlink or copy-unlink was performed, false if a simple relink was sufficient. <code>src</code> on return is the relinked handle, which will be to a completely different inode if a clone-unlink or copy-unlink was performed. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">src</td><td>The file to relink or clone or copy. </td></tr>

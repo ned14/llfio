@@ -542,10 +542,10 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
 <tr><td class="fieldname"><a id="a54d63e0972dee77ef1f0ff14bd4f9207a14847befc159c1492671b53718fc46f8"></a>fastdeleted&#160;</td><td class="fielddoc"><p>For Windows without POSIX delete semantics, filter out LLFIO deleted files based on their filename (fast and fairly reliable) </p>
 </td></tr>
 </table>
-<div class="fragment"><div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;  {</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">none</a>,        <span class="comment">//!&lt; Do no filtering at all</span></div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    fastdeleted  <span class="comment">//!&lt; For Windows without POSIX delete semantics, filter out LLFIO deleted files based on their filename (fast and fairly reliable)</span></div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  };</div>
+<div class="fragment"><div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;  {</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">none</a>,        <span class="comment">//!&lt; Do no filtering at all</span></div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    fastdeleted  <span class="comment">//!&lt; For Windows without POSIX delete semantics, filter out LLFIO deleted files based on their filename (fast and fairly reliable)</span></div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;  };</div>
 <div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">llfio_v2_xxx::ip::none</a></div><div class="ttdeci">@ none</div><div class="ttdoc">No flags.</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:224</div></div>
 </div><!-- fragment -->
 </div>
@@ -643,38 +643,38 @@ ino_t&#160;</td><td class="memItemRight" valign="bottom"><b>_inode</b> {0}</td><
 <p>Copies the extended attributes from one entity to another, optionally replacing all the extended attributes on the destination. </p>
 <p>This convenience function is implemented using the APIs above, and therefore is racy with respect to concurrent users. If you specifiy an invalid source with <code>replace_all_local_attributes = true</code>, then this is a convenient way to remove all extended attributes on the local inode.</p>
 <dl class="section note"><dt>Note</dt><dd>This function uses 130Kb of stack and cannot handle attribute values larger than 64Kb. </dd></dl>
-<div class="fragment"><div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;  {</div>
-<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;    <span class="keyword">auto</span> &amp;h = _get_handle();</div>
-<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;    (void) h;</div>
-<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;    LLFIO_LOG_FUNCTION_CALL(&amp;h);</div>
-<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;    <span class="keywordtype">byte</span> buffer[65536 + 4096];</div>
-<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;    <span class="keywordflow">if</span>(replace_all_local_attributes)</div>
-<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;    {</div>
-<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;      <span class="keywordflow">for</span>(;;)</div>
-<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;      {</div>
-<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;        OUTCOME_TRY(<span class="keyword">auto</span> &amp;&amp;attribs, <a class="code" href="classllfio__v2__xxx_1_1fs__handle.html#a28669fc9588bb252eaa39fcf66d7b4fc">list_extended_attributes</a>(buffer));</div>
-<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;        <span class="keywordflow">if</span>(attribs.empty())</div>
-<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;        {</div>
-<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;          <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;        }</div>
-<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;attrib : attribs)</div>
-<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;        {</div>
-<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;          OUTCOME_TRY(<a class="code" href="classllfio__v2__xxx_1_1fs__handle.html#af7535871db526077329fc8314a11ab6c">remove_extended_attribute</a>(attrib));</div>
-<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;        }</div>
-<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;      }</div>
-<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;    }</div>
-<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;    <span class="keywordflow">if</span>(src._get_handle().is_valid())</div>
-<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;    {</div>
-<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;      OUTCOME_TRY(<span class="keyword">auto</span> &amp;&amp;attribs, src.list_extended_attributes(buffer));</div>
-<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;attrib : attribs)</div>
-<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;      {</div>
-<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;        <span class="keywordtype">byte</span> buffer2[65536];</div>
-<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;        OUTCOME_TRY(<span class="keyword">auto</span> &amp;&amp;value, src.get_extended_attribute(buffer2, attrib));</div>
-<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;        OUTCOME_TRY(<a class="code" href="classllfio__v2__xxx_1_1fs__handle.html#a69e4e3830b2dc8d97772aca03e5da275">set_extended_attribute</a>(attrib, value));</div>
-<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;      }</div>
-<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;    }</div>
-<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;    <span class="keywordflow">return</span> success();</div>
-<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;  {</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;    <span class="keyword">auto</span> &amp;h = _get_handle();</div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;    (void) h;</div>
+<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;    LLFIO_LOG_FUNCTION_CALL(&amp;h);</div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;    <span class="keywordtype">byte</span> buffer[65536 + 4096];</div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;    <span class="keywordflow">if</span>(replace_all_local_attributes)</div>
+<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;    {</div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;      <span class="keywordflow">for</span>(;;)</div>
+<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;      {</div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;        OUTCOME_TRY(<span class="keyword">auto</span> &amp;&amp;attribs, <a class="code" href="classllfio__v2__xxx_1_1fs__handle.html#a28669fc9588bb252eaa39fcf66d7b4fc">list_extended_attributes</a>(buffer));</div>
+<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;        <span class="keywordflow">if</span>(attribs.empty())</div>
+<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;        {</div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;          <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;        }</div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;attrib : attribs)</div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;        {</div>
+<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;          OUTCOME_TRY(<a class="code" href="classllfio__v2__xxx_1_1fs__handle.html#af7535871db526077329fc8314a11ab6c">remove_extended_attribute</a>(attrib));</div>
+<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;        }</div>
+<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;      }</div>
+<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;    }</div>
+<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;    <span class="keywordflow">if</span>(src._get_handle().is_valid())</div>
+<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;    {</div>
+<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;      OUTCOME_TRY(<span class="keyword">auto</span> &amp;&amp;attribs, src.list_extended_attributes(buffer));</div>
+<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;      <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;attrib : attribs)</div>
+<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;      {</div>
+<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;        <span class="keywordtype">byte</span> buffer2[65536];</div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;        OUTCOME_TRY(<span class="keyword">auto</span> &amp;&amp;value, src.get_extended_attribute(buffer2, attrib));</div>
+<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;        OUTCOME_TRY(<a class="code" href="classllfio__v2__xxx_1_1fs__handle.html#a69e4e3830b2dc8d97772aca03e5da275">set_extended_attribute</a>(attrib, value));</div>
+<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;      }</div>
+<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;    }</div>
+<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;    <span class="keywordflow">return</span> success();</div>
+<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;  }</div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1fs__handle_html_a28669fc9588bb252eaa39fcf66d7b4fc"><div class="ttname"><a href="classllfio__v2__xxx_1_1fs__handle.html#a28669fc9588bb252eaa39fcf66d7b4fc">llfio_v2_xxx::fs_handle::list_extended_attributes</a></div><div class="ttdeci">virtual result&lt; span&lt; path_view_component &gt; &gt; list_extended_attributes(span&lt; byte &gt; tofill) const noexcept</div><div class="ttdoc">Fill the supplied buffer with the names of all extended attributes set on this file or directory,...</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1fs__handle_html_a69e4e3830b2dc8d97772aca03e5da275"><div class="ttname"><a href="classllfio__v2__xxx_1_1fs__handle.html#a69e4e3830b2dc8d97772aca03e5da275">llfio_v2_xxx::fs_handle::set_extended_attribute</a></div><div class="ttdeci">virtual result&lt; void &gt; set_extended_attribute(path_view_component name, span&lt; const byte &gt; value) noexcept</div><div class="ttdoc">Sets the value of an extended attribute on this file or directory.</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1fs__handle_html_af7535871db526077329fc8314a11ab6c"><div class="ttname"><a href="classllfio__v2__xxx_1_1fs__handle.html#af7535871db526077329fc8314a11ab6c">llfio_v2_xxx::fs_handle::remove_extended_attribute</a></div><div class="ttdeci">virtual result&lt; void &gt; remove_extended_attribute(path_view_component) noexcept</div><div class="ttdoc">Removes the extended attribute set on this file or directory.</div></div>
@@ -1470,12 +1470,12 @@ Windows only</h3>
 </div><div class="memdoc">
 <p>Create a directory handle creating the named directory on some path which the OS declares to be suitable for temporary files. Note also that an empty name is equivalent to calling <code>uniquely_named_file(path_discovery::storage_backed_temporary_files_directory())</code> and the creation parameter is ignored.</p>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX open() or CreateFile() can return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;  {</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    <span class="keyword">auto</span> &amp;tempdirh = <a class="code" href="namespacellfio__v2__xxx_1_1path__discovery.html#a2dd74ea752f3f511d58ccccdcac7f4fd">path_discovery::storage_backed_temporary_files_directory</a>();</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    <span class="keywordflow">return</span> name.empty() ? <a class="code" href="classllfio__v2__xxx_1_1directory__handle.html#a6475175eca973ecb66c0cfb118ca1091">uniquely_named_directory</a>(tempdirh, _mode, _caching, flags) : <a class="code" href="classllfio__v2__xxx_1_1directory__handle.html#a1acc9714116df8fbb0651d912a870495">directory</a>(tempdirh, name, _mode, _creation, _caching, flags);</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;  {</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    <span class="keyword">auto</span> &amp;tempdirh = <a class="code" href="namespacellfio__v2__xxx_1_1path__discovery.html#a2dd74ea752f3f511d58ccccdcac7f4fd">path_discovery::storage_backed_temporary_files_directory</a>();</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    <span class="keywordflow">return</span> name.empty() ? <a class="code" href="classllfio__v2__xxx_1_1directory__handle.html#a6475175eca973ecb66c0cfb118ca1091">uniquely_named_directory</a>(tempdirh, _mode, _caching, flags) : <a class="code" href="classllfio__v2__xxx_1_1directory__handle.html#a1acc9714116df8fbb0651d912a870495">directory</a>(tempdirh, name, _mode, _creation, _caching, flags);</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;  }</div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1directory__handle_html_a1acc9714116df8fbb0651d912a870495"><div class="ttname"><a href="classllfio__v2__xxx_1_1directory__handle.html#a1acc9714116df8fbb0651d912a870495">llfio_v2_xxx::directory_handle::directory</a></div><div class="ttdeci">static result&lt; directory_handle &gt; directory(const path_handle &amp;base, path_view_type path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1directory__handle_html_a6475175eca973ecb66c0cfb118ca1091"><div class="ttname"><a href="classllfio__v2__xxx_1_1directory__handle.html#a6475175eca973ecb66c0cfb118ca1091">llfio_v2_xxx::directory_handle::uniquely_named_directory</a></div><div class="ttdeci">static result&lt; directory_handle &gt; uniquely_named_directory(const path_handle &amp;dirpath, mode _mode=mode::write, caching _caching=caching::temporary, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:253</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1directory__handle_html_a6475175eca973ecb66c0cfb118ca1091"><div class="ttname"><a href="classllfio__v2__xxx_1_1directory__handle.html#a6475175eca973ecb66c0cfb118ca1091">llfio_v2_xxx::directory_handle::uniquely_named_directory</a></div><div class="ttdeci">static result&lt; directory_handle &gt; uniquely_named_directory(const path_handle &amp;dirpath, mode _mode=mode::write, caching _caching=caching::temporary, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:278</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_1_1path__discovery_html_a2dd74ea752f3f511d58ccccdcac7f4fd"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1path__discovery.html#a2dd74ea752f3f511d58ccccdcac7f4fd">llfio_v2_xxx::path_discovery::storage_backed_temporary_files_directory</a></div><div class="ttdeci">const path_handle &amp; storage_backed_temporary_files_directory() noexcept</div><div class="ttdoc">Returns a reference to an open handle to a verified temporary directory where files created are store...</div></div>
 </div><!-- fragment -->
 </div>
@@ -1527,24 +1527,24 @@ Windows only</h3>
 </div><div class="memdoc">
 <p>Create a directory handle creating a uniquely named file on a path. The file is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing entry.</p>
 <dl class="section user"><dt>Errors returnable\n Any of the values POSIX open() or CreateFile() can return.</dt><dd></dd></dl>
-<div class="fragment"><div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;  {</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    <span class="keywordflow">try</span></div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    {</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;      <span class="keywordflow">for</span>(;;)</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;      {</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">utils::random_string</a>(32);</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;        result&lt;directory_handle&gt; ret = <a class="code" href="classllfio__v2__xxx_1_1directory__handle.html#a1acc9714116df8fbb0651d912a870495">directory</a>(dirpath, randomname, _mode, <a class="code" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255">creation::only_if_not_exist</a>, _caching, flags);</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;        <span class="keywordflow">if</span>(ret || (!ret &amp;&amp; ret.error() != errc::file_exists))</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;        {</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;          <span class="keywordflow">return</span> ret;</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;        }</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;      }</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    }</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    <span class="keywordflow">catch</span>(...)</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    {</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    }</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;  {</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    <span class="keywordflow">try</span></div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    {</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;      <span class="keywordflow">for</span>(;;)</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;      {</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;        <span class="keyword">auto</span> randomname = <a class="code" href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">utils::random_string</a>(32);</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;        result&lt;directory_handle&gt; ret = <a class="code" href="classllfio__v2__xxx_1_1directory__handle.html#a1acc9714116df8fbb0651d912a870495">directory</a>(dirpath, randomname, _mode, <a class="code" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255">creation::only_if_not_exist</a>, _caching, flags);</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;        <span class="keywordflow">if</span>(ret || (!ret &amp;&amp; ret.error() != errc::file_exists))</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;        {</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;          <span class="keywordflow">return</span> ret;</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;        }</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;      }</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    }</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    <span class="keywordflow">catch</span>(...)</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    {</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;      <span class="keywordflow">return</span> error_from_exception();</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;    }</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;  }</div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42abba3bc579480e6c94ecd81b7b5923255">llfio_v2_xxx::handle::creation::only_if_not_exist</a></div><div class="ttdeci">@ only_if_not_exist</div><div class="ttdoc">Filesystem entry must NOT exist, and is atomically created by the success of this operation.</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_1_1utils_html_a6a29cf29a4b097411f6c1e5274bfb417"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">llfio_v2_xxx::utils::random_string</a></div><div class="ttdeci">std::string random_string(size_t randomlen)</div><div class="ttdoc">Returns a cryptographically random string capable of being used as a filename. Essentially random_fil...</div><div class="ttdef"><b>Definition:</b> utils.hpp:170</div></div>
 </div><!-- fragment -->

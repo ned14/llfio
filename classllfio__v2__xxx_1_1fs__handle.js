@@ -12,6 +12,7 @@ var classllfio__v2__xxx_1_1fs__handle =
     [ "fs_handle", "classllfio__v2__xxx_1_1fs__handle.html#afbebcaabf0282923ff76f6a83d3b4073", null ],
     [ "_fetch_inode", "classllfio__v2__xxx_1_1fs__handle.html#adc2b24484565bcb0cf654adf2f732f7e", null ],
     [ "_get_handle", "classllfio__v2__xxx_1_1fs__handle.html#a5a8b8b7eb5a31bfc94c5bc7eb189fe45", null ],
+    [ "_replace_handle", "classllfio__v2__xxx_1_1fs__handle.html#a90ee251e0967fea3c1b0b37fde8e3204", null ],
     [ "copy_extended_attributes", "classllfio__v2__xxx_1_1fs__handle.html#ab87ff96477f1441bd82b0f85515e3339", null ],
     [ "get_extended_attribute", "classllfio__v2__xxx_1_1fs__handle.html#aec8bd6a8bc3543f59a9980ca15b62295", null ],
     [ "link", "classllfio__v2__xxx_1_1fs__handle.html#aa7770c6b7c478d74654f25b8c1a1585c", null ],
