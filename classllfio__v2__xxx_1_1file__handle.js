@@ -43,7 +43,7 @@ var classllfio__v2__xxx_1_1file__handle =
     [ "_do_write", "classllfio__v2__xxx_1_1file__handle.html#a0dc183a5eca8c3fb601ebecc13540f96", null ],
     [ "_do_write", "classllfio__v2__xxx_1_1file__handle.html#a9810fcaae6b4c0a68752e26e46ddc162", null ],
     [ "_fetch_inode", "classllfio__v2__xxx_1_1file__handle.html#adc2b24484565bcb0cf654adf2f732f7e", null ],
-    [ "_replace_handle", "classllfio__v2__xxx_1_1file__handle.html#a13e835b1c577fe87c579b490441dd5b4", null ],
+    [ "_replace_handle", "classllfio__v2__xxx_1_1file__handle.html#aaa51a6b087e4c985fb831ac82c8c3f61", null ],
     [ "allocate_registered_buffer", "classllfio__v2__xxx_1_1file__handle.html#abf59c18ca31e95fb44dd1730af05be61", null ],
     [ "are_reads_from_cache", "classllfio__v2__xxx_1_1file__handle.html#a7126a726b2a06e4c1eca1a94c41163ff", null ],
     [ "are_safety_barriers_issued", "classllfio__v2__xxx_1_1file__handle.html#a0a2a5896f5e373fa032cdae1c1fff2c1", null ],
