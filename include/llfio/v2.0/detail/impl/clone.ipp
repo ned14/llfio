@@ -108,9 +108,8 @@ namespace algorithm
     }
   }
 
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<file_handle::extent_type> relink_or_clone_copy_unlink(file_handle &src, const path_handle &destdir, path_view destleaf,
-                                                                                            bool atomic_replace, bool preserve_timestamps, bool force_copy_now,
-                                                                                            deadline d) noexcept
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<bool> relink_or_clone_copy_unlink(file_handle &src, const path_handle &destdir, path_view destleaf, bool atomic_replace,
+                                                                        bool preserve_timestamps, bool force_copy_now, deadline d) noexcept
   {
     try
     {
@@ -218,6 +217,8 @@ namespace algorithm
       LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
       OUTCOME_TRY(src.unlink(nd));
       undesth.release();
+      // We can't use swap() here, because src may not be a file handle.
+      OUTCOME_TRY(src._replace_handle(std::move(desth)));
       return true;
     }
     catch(...)

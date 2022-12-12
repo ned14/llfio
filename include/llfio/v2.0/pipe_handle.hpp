@@ -91,6 +91,16 @@ class LLFIO_DECL pipe_handle : public byte_io_handle,
 #endif
 {
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept final { return *this; }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _replace_handle(handle &&o) noexcept override
+  {
+    if(!o.is_regular())
+    {
+      return errc::invalid_argument;
+    }
+    handle *self = this;
+    self->swap(o);
+    return success();
+  }
 
 public:
   using path_type = byte_io_handle::path_type;

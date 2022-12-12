@@ -69,6 +69,16 @@ an allocation-free cycle per directory enumeration.
 class LLFIO_DECL directory_handle : public path_handle, public fs_handle
 {
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept final { return *this; }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _replace_handle(handle &&o) noexcept override
+  {
+    if(!o.is_directory())
+    {
+      return errc::invalid_argument;
+    }
+    handle *self = this;
+    self->swap(o);
+    return success();
+  }
 
   mutable std::atomic<unsigned> _lock{0};  // used to serialise read()
 
@@ -109,7 +119,7 @@ public:
     buffers_type() = default;
     //! Implicit construction from a span
     /* constexpr */ buffers_type(span<buffer_type> v)  // NOLINT TODO FIXME Make this constexpr when span becomes constexpr. SAME for move constructor below
-    : _base(v)
+        : _base(v)
     {
     }
     //! Construct from a span, using a kernel buffer from a preceding `buffers_type`.
@@ -125,7 +135,12 @@ public:
     }
     ~buffers_type() = default;
     //! Move constructor
-    /* constexpr */ buffers_type(buffers_type &&o) noexcept : _base(std::move(o)), _kernel_buffer(std::move(o._kernel_buffer)), _kernel_buffer_size(o._kernel_buffer_size), _metadata(o._metadata), _done(o._done)
+    /* constexpr */ buffers_type(buffers_type &&o) noexcept
+        : _base(std::move(o))
+        , _kernel_buffer(std::move(o._kernel_buffer))
+        , _kernel_buffer_size(o._kernel_buffer_size)
+        , _metadata(o._metadata)
+        , _done(o._done)
     {
       static_cast<_base &>(o) = {};
       o._kernel_buffer_size = 0;
@@ -210,11 +225,19 @@ public:
   {
   }
   //! Implicit move construction of directory_handle permitted
-  constexpr directory_handle(directory_handle &&o) noexcept : path_handle(std::move(o)), fs_handle(std::move(o)) {}
+  constexpr directory_handle(directory_handle &&o) noexcept
+      : path_handle(std::move(o))
+      , fs_handle(std::move(o))
+  {
+  }
   //! No copy construction (use `clone()`)
   directory_handle(const directory_handle &) = delete;
   //! Explicit conversion from handle permitted
-  explicit constexpr directory_handle(handle &&o, dev_t devid, ino_t inode) noexcept : path_handle(std::move(o)), fs_handle(devid, inode) {}
+  explicit constexpr directory_handle(handle &&o, dev_t devid, ino_t inode) noexcept
+      : path_handle(std::move(o))
+      , fs_handle(devid, inode)
+  {
+  }
   //! Move assignment of directory_handle permitted
   directory_handle &operator=(directory_handle &&o) noexcept
   {
@@ -242,7 +265,9 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<directory_handle> directory(const path_handle &base, path_view_type path, mode _mode = mode::read, creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none) noexcept;
+  static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<directory_handle> directory(const path_handle &base, path_view_type path, mode _mode = mode::read,
+                                                                            creation _creation = creation::open_existing, caching _caching = caching::all,
+                                                                            flag flags = flag::none) noexcept;
   /*! Create a directory handle creating a uniquely named file on a path.
   The file is opened exclusively with `creation::only_if_not_exist` so it
   will never collide with nor overwrite any existing entry.
@@ -250,7 +275,8 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<directory_handle> uniquely_named_directory(const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::temporary, flag flags = flag::none) noexcept
+  static inline result<directory_handle> uniquely_named_directory(const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::temporary,
+                                                                  flag flags = flag::none) noexcept
   {
     try
     {
@@ -278,7 +304,9 @@ public:
   \errors Any of the values POSIX open() or CreateFile() can return.
   */
   LLFIO_MAKE_FREE_FUNCTION
-  static inline result<directory_handle> temp_directory(path_view_type name = path_view_type(), mode _mode = mode::write, creation _creation = creation::if_needed, caching _caching = caching::all, flag flags = flag::none) noexcept
+  static inline result<directory_handle> temp_directory(path_view_type name = path_view_type(), mode _mode = mode::write,
+                                                        creation _creation = creation::if_needed, caching _caching = caching::all,
+                                                        flag flags = flag::none) noexcept
   {
     auto &tempdirh = path_discovery::storage_backed_temporary_files_directory();
     return name.empty() ? uniquely_named_directory(tempdirh, _mode, _caching, flags) : directory(tempdirh, name, _mode, _creation, _caching, flags);
@@ -320,7 +348,8 @@ public:
   \mallocs On POSIX if changing the mode, we must loop calling `current_path()` and
   trying to open the path returned. Thus many allocations may occur.
   */
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<directory_handle> reopen(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged, deadline d = std::chrono::seconds(30)) const noexcept;
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<directory_handle> reopen(mode mode_ = mode::unchanged, caching caching_ = caching::unchanged,
+                                                                  deadline d = std::chrono::seconds(30)) const noexcept;
   LLFIO_DEADLINE_TRY_FOR_UNTIL(reopen)
 
   /*! Return a copy of this directory handle, but as a path handle.
@@ -393,10 +422,15 @@ inline void swap(directory_handle &self, directory_handle &o) noexcept
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<directory_handle> directory(const path_handle &base, directory_handle::path_view_type path, directory_handle::mode _mode = directory_handle::mode::read, directory_handle::creation _creation = directory_handle::creation::open_existing, directory_handle::caching _caching = directory_handle::caching::all,
+inline result<directory_handle> directory(const path_handle &base, directory_handle::path_view_type path,
+                                          directory_handle::mode _mode = directory_handle::mode::read,
+                                          directory_handle::creation _creation = directory_handle::creation::open_existing,
+                                          directory_handle::caching _caching = directory_handle::caching::all,
                                           directory_handle::flag flags = directory_handle::flag::none) noexcept
 {
-  return directory_handle::directory(std::forward<decltype(base)>(base), std::forward<decltype(path)>(path), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
+  return directory_handle::directory(std::forward<decltype(base)>(base), std::forward<decltype(path)>(path), std::forward<decltype(_mode)>(_mode),
+                                     std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching),
+                                     std::forward<decltype(flags)>(flags));
 }
 /*! Create a directory handle creating a randomly named file on a path.
 The file is opened exclusively with `creation::only_if_not_exist` so it
@@ -404,9 +438,12 @@ will never collide with nor overwrite any existing entry.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<directory_handle> uniquely_named_directory(const path_handle &dirpath, directory_handle::mode _mode = directory_handle::mode::write, directory_handle::caching _caching = directory_handle::caching::temporary, directory_handle::flag flags = directory_handle::flag::none) noexcept
+inline result<directory_handle> uniquely_named_directory(const path_handle &dirpath, directory_handle::mode _mode = directory_handle::mode::write,
+                                                         directory_handle::caching _caching = directory_handle::caching::temporary,
+                                                         directory_handle::flag flags = directory_handle::flag::none) noexcept
 {
-  return directory_handle::uniquely_named_directory(std::forward<decltype(dirpath)>(dirpath), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
+  return directory_handle::uniquely_named_directory(std::forward<decltype(dirpath)>(dirpath), std::forward<decltype(_mode)>(_mode),
+                                                    std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
 }
 /*! Create a directory handle creating the named directory on some path which
 the OS declares to be suitable for temporary files.
@@ -416,10 +453,15 @@ parameter is ignored.
 
 \errors Any of the values POSIX open() or CreateFile() can return.
 */
-inline result<directory_handle> temp_directory(directory_handle::path_view_type name = directory_handle::path_view_type(), directory_handle::mode _mode = directory_handle::mode::write, directory_handle::creation _creation = directory_handle::creation::if_needed,
-                                               directory_handle::caching _caching = directory_handle::caching::all, directory_handle::flag flags = directory_handle::flag::none) noexcept
+inline result<directory_handle> temp_directory(directory_handle::path_view_type name = directory_handle::path_view_type(),
+                                               directory_handle::mode _mode = directory_handle::mode::write,
+                                               directory_handle::creation _creation = directory_handle::creation::if_needed,
+                                               directory_handle::caching _caching = directory_handle::caching::all,
+                                               directory_handle::flag flags = directory_handle::flag::none) noexcept
 {
-  return directory_handle::temp_directory(std::forward<decltype(name)>(name), std::forward<decltype(_mode)>(_mode), std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching), std::forward<decltype(flags)>(flags));
+  return directory_handle::temp_directory(std::forward<decltype(name)>(name), std::forward<decltype(_mode)>(_mode),
+                                          std::forward<decltype(_creation)>(_creation), std::forward<decltype(_caching)>(_caching),
+                                          std::forward<decltype(flags)>(flags));
 }
 // END make_free_functions.py
 

@@ -89,7 +89,20 @@ class LLFIO_DECL symlink_handle : public handle, public fs_handle
   path_handle _dirh;
   handle::path_type _leafname;
 #endif
-  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept final { return *this; }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept final
+  {
+    return *this;
+  }
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _replace_handle(handle &&o) noexcept override
+  {
+    if(!o.is_regular())
+    {
+      return errc::invalid_argument;
+    }
+    handle *self = this;
+    self->swap(o);
+    return success();
+  }
 
 #ifndef _WIN32
   friend result<void> detail::stat_from_symlink(struct stat &s, const handle &h) noexcept;
@@ -286,7 +299,7 @@ public:
     //! Convenience constructor constructing from anything a `span<char>` can construct from
     LLFIO_TEMPLATE(class... Args)
     LLFIO_TREQUIRES(LLFIO_TPRED(std::is_constructible<span<char>, Args...>::value))
-    constexpr io_request(Args &&... args) noexcept
+    constexpr io_request(Args &&...args) noexcept
         : io_request(span<char>(static_cast<Args &&>(args)...))
     {
     }
@@ -305,14 +318,14 @@ public:
     //! Convenience constructor constructing from anything a `path_view` can construct from
     LLFIO_TEMPLATE(class... Args)
     LLFIO_TREQUIRES(LLFIO_TPRED(std::is_constructible<path_view, Args...>::value))
-    constexpr io_request(Args &&... args) noexcept
+    constexpr io_request(Args &&...args) noexcept
         : buffers(path_view(static_cast<Args &&>(args)...))
     {
     }
     //! Convenience constructor constructing a specific type of link from anything a `path_view` can construct from
     LLFIO_TEMPLATE(class... Args)
     LLFIO_TREQUIRES(LLFIO_TPRED(std::is_constructible<path_view, Args...>::value))
-    constexpr io_request(symlink_type type, Args &&... args) noexcept
+    constexpr io_request(symlink_type type, Args &&...args) noexcept
         : buffers(path_view(static_cast<Args &&>(args)...), type)
     {
     }

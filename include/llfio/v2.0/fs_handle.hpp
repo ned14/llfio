@@ -182,6 +182,8 @@ protected:
 
   virtual const handle &_get_handle() const noexcept = 0;
 
+  virtual result<void> _replace_handle(handle &&o) noexcept = 0;
+
 protected:
   //! Default constructor
   constexpr fs_handle() {}  // NOLINT

@@ -86,7 +86,8 @@ namespace algorithm
   to atomic relinking.
 
   \return True if a clone-unlink or copy-unlink was performed, false if a simple
-  relink was sufficient.
+  relink was sufficient. `src` on return is the relinked handle, which will be to
+  a completely different inode if a clone-unlink or copy-unlink was performed.
   \param src The file to relink or clone or copy.
   \param destdir The base to lookup `destleaf` within.
   \param destleaf The leafname to use. If empty, use the same leafname as `src` currently has.
@@ -131,10 +132,9 @@ namespace algorithm
   restamped with the metadata from the source file handle just before the
   destination file handle is closed.
   */
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<file_handle::extent_type> relink_or_clone_copy_unlink(file_handle &src, const path_handle &destdir,
-                                                                                            path_view destleaf = {}, bool atomic_replace = true,
-                                                                                            bool preserve_timestamps = true, bool force_copy_now = false,
-                                                                                            deadline d = {}) noexcept;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<bool> relink_or_clone_copy_unlink(file_handle &src, const path_handle &destdir, path_view destleaf = {},
+                                                                        bool atomic_replace = true, bool preserve_timestamps = true,
+                                                                        bool force_copy_now = false, deadline d = {}) noexcept;
 
 #if 0
 #ifdef _MSC_VER

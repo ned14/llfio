@@ -54,6 +54,18 @@ class LLFIO_DECL file_handle : public lockable_byte_io_handle, public fs_handle
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC const handle &_get_handle() const noexcept final { return *this; }
 
 public:
+  LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<void> _replace_handle(handle &&o) noexcept override
+  {
+    if(!o.is_regular())
+    {
+      return errc::invalid_argument;
+    }
+    handle *self = this;
+    self->swap(o);
+    return success();
+  }
+
+public:
   using path_type = byte_io_handle::path_type;
   using extent_type = byte_io_handle::extent_type;
   using size_type = byte_io_handle::size_type;
