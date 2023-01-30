@@ -457,9 +457,10 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
   try
   {
     LLFIO_LOG_FUNCTION_CALL(this);
-    if(!dest_.is_writable())
+
+    if(!dest_.is_writable() || !dest_.is_seekable())
     {
-      return errc::bad_file_descriptor;
+      return errc::invalid_seek;
     }
     OUTCOME_TRY(auto &&mycurrentlength, maximum_extent());
     if(extent.offset == (extent_type) -1 && extent.length == (extent_type) -1)
