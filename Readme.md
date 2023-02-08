@@ -1,11 +1,12 @@
 <center><table border="0" cellpadding="4">
 <tr>
 <td align="center"> <a href="https://github.com/ned14/llfio">LLFIO</a><br><a href="https://github.com/ned14/llfio">on GitHub</a> </td>
+<td align="center"> <a href="https://ned14.github.io/llfio/">API</a><br><a href="https://ned14.github.io/llfio/">Documentation</a> </td>
 <td align="center"> <a href="https://my.cdash.org/index.php?project=Boost.AFIO">CTest summary</a><br><a href="https://my.cdash.org/index.php?project=Boost.AFIO">dashboard</a> </td>
-<td align="center"> <a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Linux%22">Linux CI:</a><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Linux/badge.svg?branch=master"/> </td>
-<td align="center"> <a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Mac+OS%22">Mac OS CI:</a><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Mac%20OS/badge.svg?branch=master"/> </td>
-<td align="center"> <a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Windows%22">Windows CI:</a><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Windows/badge.svg?branch=master"/> </td>
-<td align="center"> <a href="https://github.com/ned14/llfio/releases">Prebuilt binaries</a> </td>
+<td align="center"> <a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Linux%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Linux/badge.svg?branch=master"/></a> </td>
+<td align="center"> <a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Mac+OS%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Mac%20OS/badge.svg?branch=master"/></a> </td>
+<td align="center"> <a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Windows%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Windows/badge.svg?branch=master"/></a> </td>
+<td align="center"> <a href="https://github.com/ned14/llfio/releases">Prebuilt</a><br><a href="https://github.com/ned14/llfio/releases">binaries</a> </td>
 </tr>
 </table></center>
 
@@ -20,9 +21,9 @@ as Intel Optane.
 
 It is a complete rewrite after a Boost peer review in August 2015. LLFIO is the
 reference implementation for these C++ standardisations:
-    - `llfio::path_view` is expected to enter the C++ 26 standard ([P1030](https://wg21.link/p1030)).
-    - `llfio::file_handle` and `llfio::mapped_file_handle` are on track for entering the C++ 26 standard ([P1883](https://wg21.link/p1883)).
-    - `llfio::tls_socket_handle` and `llfio::byte_socket_handle` are being considered for the C++ 26 standard ([P2586](https://wg21.link/p2596)).
+- `llfio::path_view` is expected to enter the C++ 26 standard ([P1030](https://wg21.link/p1030)).
+- `llfio::file_handle` and `llfio::mapped_file_handle` are on track for entering the C++ 26 standard ([P1883](https://wg21.link/p1883)).
+- `llfio::tls_socket_handle` and `llfio::byte_socket_handle` are being considered for the C++ 26 standard ([P2586](https://wg21.link/p2596)).
 
 Other characteristics:
 - Portable to any conforming C++ 14 compiler with a working Filesystem TS in its STL.
@@ -49,7 +50,7 @@ Examples of use (more examples: https://github.com/ned14/llfio/tree/develop/exam
 \snippet example/sparse_array.cpp sparse_array
 </td>
 <td width="50%" valign="top">
-\snippet test/tls_socket_handle.cpp https_get
+\snippet tests/tls_socket_handle.cpp https_get
 </td>
 </tr>
 </table>
