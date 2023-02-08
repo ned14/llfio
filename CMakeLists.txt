@@ -1,5 +1,5 @@
 # LLFIO cmake
-# (C) 2016-2021 Niall Douglas <http://www.nedproductions.biz/>
+# (C) 2016-2023 Niall Douglas <http://www.nedproductions.biz/>
 # File Created: June 2016
 # 
 # 
@@ -472,6 +472,20 @@ if(NOT PROJECT_IS_DEPENDENCY)
       endif()
     endforeach()
   endif()
+
+  # Example targets should have an example- prefix
+  foreach(target ${llfio_COMPILE_TEST_TARGETS})
+    get_target_property(prop ${target} SOURCES)
+    list(GET prop 0 prop)
+    if(prop MATCHES "example/.*")
+      get_target_property(prop ${target} OUTPUT_NAME)
+      if(NOT prop)
+        set(prop "${target}")
+      endif()
+      string(REGEX REPLACE "llfio_([^-][^-])-([^-]*)-(.+)" "llfio_\\1-\\2-example_\\3" prop "${prop}")
+      set_target_properties(${target} PROPERTIES OUTPUT_NAME "${prop}")
+    endif()
+  endforeach()
 
   # Turn on latest C++ where possible for the test suite
   if(UNIT_TESTS_CXX_VERSION STREQUAL "latest")

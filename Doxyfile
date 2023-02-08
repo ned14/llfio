@@ -774,7 +774,7 @@ INPUT                  = include/llfio \
                          include/llfio/v2.0/algorithm \
                          include/llfio/v2.0/algorithm/handle_adapter \
                          include/llfio/v2.0/algorithm/shared_fs_mutex \
-                         release_notes.md Build.md
+                         Readme.md Build.md
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -915,7 +915,7 @@ FILTER_SOURCE_PATTERNS =
 # (index.html). This can be useful if you have a project on for instance GitHub
 # and want to reuse the introduction page also for the doxygen output.
 
-USE_MDFILE_AS_MAINPAGE = release_notes.md
+USE_MDFILE_AS_MAINPAGE = Readme.md
 
 #---------------------------------------------------------------------------
 # Configuration options related to source browsing

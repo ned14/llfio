@@ -1,232 +1,197 @@
-This is the post-peer-review LLFIO v2 rewrite. You can view its documentation at https://ned14.github.io/llfio/
+<center><table border="0" cellpadding="4">
+<tr>
+<td align="center"> <a href="https://github.com/ned14/llfio">LLFIO</a><br><a href="https://github.com/ned14/llfio">on GitHub</a> </td>
+<td align="center"> <a href="https://my.cdash.org/index.php?project=Boost.AFIO">CTest summary</a><br><a href="https://my.cdash.org/index.php?project=Boost.AFIO">dashboard</a> </td>
+<td align="center"> <a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Linux%22">Linux CI:</a><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Linux/badge.svg?branch=master"/> </td>
+<td align="center"> <a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Mac+OS%22">Mac OS CI:</a><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Mac%20OS/badge.svg?branch=master"/> </td>
+<td align="center"> <a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Windows%22">Windows CI:</a><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Windows/badge.svg?branch=master"/> </td>
+<td align="center"> <a href="https://github.com/ned14/llfio/releases">Prebuilt binaries</a> </td>
+</tr>
+</table></center>
 
-<table width="100%">
-<tr><th>master branch<th>develop branch
-<tr><td align="center"><img src="https://github.com/ned14/llfio/workflows/Documentation/badge.svg?branch=master"><td align="center"><img src="https://github.com/ned14/llfio/workflows/Documentation/badge.svg?branch=develop">
-<tr><td align="center"><img src="https://github.com/ned14/llfio/workflows/Installability/badge.svg?branch=master"><td align="center"><img src="https://github.com/ned14/llfio/workflows/Installability/badge.svg?branch=develop">
-<tr><td align="center"><img src="https://github.com/ned14/llfio/workflows/Programs/badge.svg?branch=master"><td align="center"><img src="https://github.com/ned14/llfio/workflows/Programs/badge.svg?branch=develop">
-<tr><td align="center"><a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Linux%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Linux/badge.svg?branch=master"></a><td align="center"><a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Linux%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Linux/badge.svg?branch=develop"></a>
-<tr><td align="center"><a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Mac+OS%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Mac%20OS/badge.svg?branch=master"></a><td align="center"><a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Mac+OS%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Mac%20OS/badge.svg?branch=develop"></a>
-<tr><td align="center"><a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Windows%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Windows/badge.svg?branch=master"></a><td align="center"><a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Windows%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Windows/badge.svg?branch=develop"></a>
+Herein lies my proposed zero whole machine memory copy file i/o and filesystem
+library for the C++ standard, intended for storage devices with ~1 microsecond
+4Kb transfer latencies and those supporting Storage Class Memory (SCM)/Direct Access
+Storage (DAX). Its i/o overhead, including syscall overhead, has been benchmarked to
+100 nanoseconds on Linux which corresponds to a theoretical maximum of 10M IOPS @ QD1,
+approx 40Gb/sec per thread. It has particularly strong support for writing portable
+filesystem algorithms which work well with directly mapped non-volatile storage such
+as Intel Optane.
+
+It is a complete rewrite after a Boost peer review in August 2015. LLFIO is the
+reference implementation for these C++ standardisations:
+    - `llfio::path_view` is expected to enter the C++ 26 standard ([P1030](https://wg21.link/p1030)).
+    - `llfio::file_handle` and `llfio::mapped_file_handle` are on track for entering the C++ 26 standard ([P1883](https://wg21.link/p1883)).
+    - `llfio::tls_socket_handle` and `llfio::byte_socket_handle` are being considered for the C++ 26 standard ([P2586](https://wg21.link/p2596)).
+
+Other characteristics:
+- Portable to any conforming C++ 14 compiler with a working Filesystem TS in its STL.
+    - Note that VS2019 16.3 and libc++ 11 dropped support for Filesystem in C++ 14, so for those LLFIO's cmake forces on C++ 17.
+- Fully clean with C++ 20.
+    - Will make use of any Coroutines, Concepts, Span, Byte etc if you have them, otherwise swaps in C++ 14 compatible alternatives.
+    - NOTE that Ubuntu 18.04's libstdc++ 9 does not currently provide symbols for `<codecvt>` if you are building in C++ 20, so linking LLFIO programs on libstdc++ on that Linux if in C++ 20 will fail. Either use a different STL, manually rebuild libstdc++, or use C++ 17.
+- Aims to support Microsoft Windows, Linux, Android, iOS, Mac OS and FreeBSD.
+    - Best effort to support older kernels up to their EOL (as of July 2020: >= Windows 8.1, >= Linux 2.6.32 (RHEL EOL), >= Mac OS 10.13, >= FreeBSD 11).
+- Original error code is always preserved, even down to the original NT kernel error code if a NT kernel API was used.
+    - Optional configuration based on [P1028](https://wg21.link/P1028) *SG14 status_code and standard error object
+    for P0709 Zero-overhead deterministic exceptions*.
+- Race free filesystem design used throughout (i.e. no TOCTOU).
+- Zero malloc, zero exception throw and zero whole system memory copy design used throughout, even down to paths (which can hit 64Kb!).
+- Comprehensive support for virtual and mapped memory of both SCM/DAX and page cached storage, including large, huge and super pages.
+- Happy on the cloud, well tested with AWS Lustre distributed network filing system.
+
+\note Most of this code is mature quality. It has been shipping in production with multiple vendors for some years now, indeed amongst many big data solutions it powers the low level custom database component of the US Security and Exchange Commission's MIDAS solution which ingresses Terabytes of trade data per day. It is considered quite reliable on Windows and Linux (less well tested on Mac OS).
+
+Examples of use (more examples: https://github.com/ned14/llfio/tree/develop/example):
+<table width="100%" border="0" cellpadding="4">
+<tr>
+<td width="50%" valign="top">
+\snippet example/sparse_array.cpp sparse_array
+</td>
+<td width="50%" valign="top">
+\snippet test/tls_socket_handle.cpp https_get
+</td>
+</tr>
 </table>
 
-<b>CMake dashboard</b>: https://my.cdash.org/index.php?project=Boost.AFIO
+See https://github.com/ned14/llfio/blob/master/programs/fs-probe/fs_probe_results.yaml
+for a database of latencies for various previously tested OS, filing systems and storage devices.
 
-PREBUILT BINARIES FOR LINUX (x64 and ARM), MAC OS AND WINDOWS CAN BE FOUND AT https://github.com/ned14/llfio/releases
+Todo list for already implemented parts: https://ned14.github.io/llfio/todo.html
 
-USAGE AND CONFIGURATION INSTRUCTIONS CAN BE FOUND AT https://ned14.github.io/llfio/
+<p>&nbsp;</p>
+<center><span style="font-size: large; text-decoration: underline;">[Build instructions can found here](Build.md)</span></center>
+<p>&nbsp;</p>
 
+## v2 architecture and design implemented:
 
-### Immediate todos in order of priority:
-- [x] Implement new custom C++ exception synthesis support from Outcome.
-- [x] Finish trivial vector, which is unfinished and currently segfaults.
-- [x] Run clang-tidy fix pass, it's got a bit untidy recently.
-- [ ] Add OS X support to `storage_profile`, this should complete the Mac OS port.
-- [x] Fix all known bugs in Outcome, plus reorg source code in prep for `status_code`.
-- [x] Scatter-gather buffers to use https://github.com/martinmoene/byte-lite
-- [x] Make lazy the stat fetch during file/dir open.
-- [x] Implement SG14 `status_code` as a standalone library and test in LLFIO.
-- [x] Single include generation now we're on `status_code` and it's safe.
-- [x] Implement `SIGBUS`/`EXCEPTION_IN_PAGE_ERROR` RAII catcher.
-- [x] Implement `symlink_handle` already!
-- [ ] `atomic_append` isn't actually being tested in shared_fs_mutex
-- [ ] Implement a non-toy ACID key-value BLOB store and send it to Boost for peer review.
-  - [ ] For this need to implement a file-based B+ tree. And for that, need to
-  implement a page allocator out of a single file. Some notes:
-  
-  B+ trees would be based on the 4Kb page for memory mapping, and thus allocate and release whole 4Kb pages.
+| NEW in v2 | Boost peer review feedback |     |
+| --------- | -------------------------- | --- |
+| ✔ | ✔ | Universal native handle/fd abstraction instead of `void *`.
+| ✔ | ✔ | Perfectly/Ideally low memory (de)allocation per op (usually none).
+| ✔ | ✔ | noexcept API throughout returning error_code for failure instead of throwing exceptions.
+| ✔ | ✔ | LLFIO v1 handle type split into hierarchy of types:<ol><li>handle - provides open, close, get path, clone, set/unset append only, change caching, characteristics<li>fs_handle - handles with an inode number<li>path_handle - a race free anchor to a subset of the filesystem<li>directory_handle - enumerates the filesystem<li>io_handle - adds synchronous scatter-gather i/o, byte range locking<li>file_handle - adds open/create file, get and set maximum extent<li>mapped_file_handle - adds low latency memory mapped scatter-gather i/o</ol>
+| ✔ | ✔ | Cancelable i/o (made possible thanks to dropping XP support).
+| ✔ | ✔ | All shared_ptr usage removed as all use of multiple threads removed.
+| ✔ | ✔ | Use of std::vector to transport scatter-gather sequences replaced with C++ 20 `span<>` borrowed views.
+| ✔ | ✔ | Completion callbacks are now some arbitrary type `U&&` instead of a future continuation. Type erasure for its storage is bound into the one single memory allocation for everything needed to execute the op, and so therefore overhead is optimal.
+| ✔ | ✔ | Filing system algorithms made generic and broken out into public `llfio::algorithms` template library (the LLFIO FTL).
+| ✔ | ✔ | Abstraction of native handle management via bitfield specified "characteristics".
+| ✔ |   | Storage profiles, a YAML database of behaviours of hardware, OS and filing system combinations.
+| ✔ |   | Absolute and interval deadline timed i/o throughout (made possible thanks to dropping XP support).
+| ✔ |   | Dependency on ASIO/Networking TS removed completely.
+| ✔ |   | Four choices of algorithm implementing a shared filing system mutex.
+| ✔ |   | Uses CMake, CTest, CDash and CPack with automatic usage of C++ Modules or precompiled headers where available.
+| ✔ |   | Far more comprehensive memory map and virtual memory facilities.
+| ✔ |   | Much more granular, micro level unit testing of individual functions.
+| ✔ |   | Much more granular, micro level internal logging of every code path taken.
+| ✔ |   | Path views used throughout, thus avoiding string copying and allocation in `std::filesystem::path`.
+| ✔ |   | Paths are equally interpreted as UTF-8 on all platforms.
+| ✔ |   | We never store nor retain a path, as they are inherently racy and are best avoided.
+| ✔ | ✔ | Parent handle caching is hard coded in, it is now an optional user applied templated adapter class.
 
-  A simple page allocator from a file might simply keep some magic at the top, and then a list of offsets to free pages for the remainder of the page. That might be (4096 – 12) / 4 = 1021 slots (remember these are 42 bit offsets, so simply limit to 32 bit offsets << 12).
-  
-  Each free page links to its next free page. Freeing a page means modulus its address >> 12 with 1021, and CASing it into its “slot” as its linked list.
+Todo:
 
-  Allocating pages involves iterating a round robin index, pulling free pages off the top. Only if no free pages remain do we atomic append 1021 * 4096 = 4,182,016 bytes and refill the free page index.
-- [ ] All time based kernel tests need to use soak test based API and auto adjust to
-valgrind.
-- [ ] In DEBUG builds, have io_handle always not fill buffers passed to remind
-people to use pointers returned!
-- KernelTest needs to be generating each test kernel as a standalone DLL so it can be
-fuzzed, coverage calculated, bloat calculated, ABI dumped etc
-  - Easy coverage is the usual gcov route => coveralls.io or gcovr http://gcovr.com/guide.html
-
-
-### clang AST parser based todos which await me getting back into the clang AST parser:
-- [ ] C bindings for all LLFIO v2 APIs. Write libclang parser which autogenerates
-SWIG interface files from the .hpp files using custom attributes to fill in the
-missing gaps.
-- Much better coverage is to permute the *valid* parameter inputs of the kernel
-  deduced from examining the kernel parameter API and
-  figure out what minimum set of calling parameters will induce execution of the
-  entire potential call graph. This approach is a poor man's symbolic execution
-  SMT solver, it uses brute force rather than constrained solution. Idea is that
-  when someone releases a proper C++ capable KLEE for open source use we can use
-  that instead.
-    - `-fsanitize-coverage=trace-pc -O3` will have clang (works also on winclang)
-    call a user supplied `__sanitizer_cov_trace_pc()` and `__sanitizer_cov_trace_pc_indirect(void *callee)`
-    function. This would simply atomically append the delta of the program counter
-    from the previously stored one to a memory mapped file. You should use a tagged
-    encoding, so leading byte specifies length and type of record.
-    - One also needs to replace syscalls with stubs (easy on Windows DLLs) and
-    permute their potential return codes and effects to maximise edge execution.
-    Either monkey patching or a custom DLL loader would work.
-  - One then generates a default KernelTest permutation set for that kernel
-  which can be freshened (probably via commenting out stale entries and appending
-  new entries) by an automated tooling run
-  - A freebie feature from this work is an automatic possible error returns
-  calculator for the documentation
-  - Another freebie feature is automatic calculation of the number of malloc + free
-  performed.
-  - Can we even figure out O type complexities from the call graph? e.g. doubling
-  an input parameter quadruples edges executed? Could generate an O() complexity
-  per input parameter for the documentation?
+| NEW in v2 | Boost peer review feedback |     |
+| --------- | -------------------------- | --- |
+| ✔ |   | clang AST assisted SWIG bindings for other languages.
+| ✔ |   | Statistical tracking of operation latencies so realtime IOPS can be measured.
 
 
 
-### Known bugs and problems:
-- [ ] algorithm::atomic_append needs improvements:
-  - Trap if append exceeds 2^63 and do something useful with that
-  - Fix the known inefficiencies in the implementation:
-    - We should use byte range locks when concurrency*entities is low
-    - We have an extra read() during locking between the scanning for our lock
-    request and scanning for other lock requests
-    - During scan when hashes mismatch we reload a suboptimal range
-    - We should use memory maps until a SMB/NFS/QNX/OpenBSD lock_request comes
-    in whereafter we should degrade to normal i/o gracefully
-- [ ] Add native BSD kqueues to POSIX AIO backend as is vastly more efficient.
-  - http://www.informit.com/articles/article.aspx?p=607373&seqNum=4 is a
-very useful programming guide for POSIX AIO.
-- [ ] Port to Linux KAIO
-  - http://linux.die.net/man/2/io_getevents would be in the run() loop.
-pthread_sigqueue() can be used by post() to cause aio_suspend() to break
-early to run user supplied functions.
-- [ ] Don't run the cpu and sys tests if cpu and sys ids already in fs_probe_results.yaml
-  - Need to uniquely fingerprint a machine somehow?
-- [ ] Add monitoring of CPU usage to tests. See GetThreadTimes. Make sure
-worker thread times are added into results.
-- [ ] Configurable tracking of op latency and throughput (bytes) for all
-handles on some storage i.e. storage needs to be kept in a global map.
-  - Something which strongly resembles the memory bandwidth test
-  - [ ] Should have decile bucketing e.g. percentage in bottom 10%, percentage
-  in next 10% etc. Plus mean and stddev.
-  - [ ] Should either be resettable or subtractable i.e. points can be diffed.
-- [ ] Output into YAML comparable hashes for OS + device + FS + flags
-so we can merge partial results for some combo into the results database.
-- [ ] Write YAML parsing tool which merges fs_probe_results.yaml into
-the results directory where flags and OS get its own directory and each YAML file
-is named FS + device e.g.
+## Planned features implemented:
+
+| NEW in v2 | Windows | POSIX |     |
+| --------- | --------| ----- | --- |
+| ✔ | ✔ | ✔ | Native handle cloning.
+| ✔ (up from four) | ✔ | ✔ | Maximum possible (seven) forms of kernel caching.
+|   | ✔ | ✔ | Absolute path open.
+|   | ✔ | ✔ | Relative "anchored" path open enabling race free file system.
+| ✔ | ✔ |   | Win32 path support (260 path limit).
+|   | ✔ |   | NT kernel path support (32,768 path limit).
+| ✔ | ✔ | ✔ | Synchronous universal scatter-gather i/o.
+| ✔ (POSIX AIO support) | ✔ | ✔ | Asynchronous universal scatter-gather i/o.
+| ✔ | ✔ | ✔ | i/o deadlines and cancellation.
+|   | ✔ | ✔ | Retrieving and setting the current maximum extent (size) of an open file.
+|   | ✔ | ✔ | Retrieving the current path of an open file irrespective of where it has been renamed to by third parties.
+|   | ✔ | ✔ | statfs_t ported over from LLFIO v1.
+|   | ✔ | ✔ | utils namespace ported over from LLFIO v1.
+| ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on lock files
+| ✔ | ✔ | ✔ | Byte range shared/exclusive locking.
+| ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on byte ranges
+| ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on atomic append
+|   | ✔ | ✔ | Memory mapped files and virtual memory management (`section_handle`, `map_handle` and `mapped_file_handle`)
+| ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on memory maps
+| ✔ | ✔ | ✔ | Universal portable UTF-8 path views.
+|   | ✔ | ✔ | "Hole punching" and hole enumeration ported over from LLFIO v1.
+|   | ✔ | ✔ | Directory handles and very fast directory enumeration ported over from LLFIO v1.
+| ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on safe byte ranges
+|   | ✔ | ✔ | Set random or sequential i/o (prefetch).
+| ✔ | ✔ | ✔ | `llfio::algorithm::trivial_vector<T>` with constant time reallocation if `T` is trivially copyable.
+|   | ✔ | ✔ | `symlink_handle`.
+| ✔ | ✔ | ✔ | Large, huge and massive page size support for memory allocation and (POSIX only) file maps.
+| ✔ | ✔ | ✔ | A mechanism for writing a `stat_t` onto an inode.
+| ✔ | ✔ | ✔ | Graph based directory hierarchy traveral algorithm.
+| ✔ | ✔ | ✔ | Graph based directory hierarchy summary algorithm.
+| ✔ | ✔ | ✔ | Graph based reliable directory hierarchy deletion algorithm.
+| ✔ | ✔ | ✔ | Intelligent file contents cloning between file handles.
+
+Todo thereafter in order of priority:
+
+| NEW in v2 | Windows | POSIX |     |
+| --------- | --------| ----- | --- |
+| ✔ |   |   | Page allocator based on an index of linked list of free pages. See notes.
+| ✔ |   |   | Optionally concurrent B+ tree index based on page allocator for key-value store.
+| ✔ |   |   | Attributes extending `span<buffers_type>` with DMA colouring.
+| ✔ |   |   | Coroutine generator for iterating a file's contents in DMA friendly way.
+| ✔ |   |   | Ranges & Concurrency based reliable directory hierarchy copy algorithm.
+| ✔ |   |   | Ranges & Concurrency based reliable directory hierarchy update (two and three way) algorithm.
+| ✔ |   |   | Linux io_uring support for native non-blocking `O_DIRECT` i/o
+| ✔ |   |   | `std::pmr::memory_resource` adapting a file backing if on C++ 17.
+| ✔ |   |   | Extended attributes support.
+| ✔ |   |   | Algorithm to replace all duplicate content with hard links.
+| ✔ |   |   | Algorithm to figure out all paths for a hard linked inode.
+| ✔ |   |   | Algorithm to compare two or three directory enumerations and give differences.
+
+Features possibly to be added after a Boost peer review:
+- Directory change monitoring.
+- Permissions support (ACLs).
 
 
-### Algorithms library `LLFIO_V2_NAMESPACE::algorithm` todo:
-- [ ] Add `vector<T>` which adapts a `mapped_view<T>`.
-- [ ] Add some primitive which intelligently copies/moves between views and vectors.
-Specifically, if resizing, if type is trivially copyable, skip memory copying during
-resize via remapping.
-- [ ] Add an intelligent on demand memory mapper:
-  - Use one-two-three level page system, so 4Kb/2Mb/1Gb. Files under 2Mb need just
-one indirection.
-  - Page tables need to also live in a potentially mapped file
-  - Could speculatively map 4Kb chunks lazily and keep an internal map of 4Kb
-offsets to map. This allows more optimal handing of growing files.
-  - WOULD BE NICE: Copy on Write support which collates a list of dirtied 4Kb
-pages and could write those out as a delta.
-    - Perhaps Snappy compression could be useful? It is continuable from a base
-if you dump out the dictionary i.e. 1Mb data compressed, then add 4Kb delta, you can
-compress the additional 4Kb very quickly using the dictionary from the 1Mb.
-    - LATER: Use guard pages to toggle dirty flag per initial COW
-- [ ] Store in EA or a file called .spookyhashes or .spookyhash the 128 bit hash of
-a file and the time it was calculated. This can save lots of hashing work later.
-- [x] Correct directory hierarchy delete
-  i.e.:
-  - Delete files first tips to trunk, retrying for some given timeout. If fail to
-  immediately delete, rename to base directory under a long random hex name, try
-  to delete again.
-  - Only after all files have been deleted, delete directories. If new files appear
-  during directory deletion, loop.
-  - Options:
-    - Rename base directory(ies) to something random to atomically prevent lookup.
-    - Delete all or nothing (i.e. rename all files into another tree checking
-    permissions etc, if successful only then delete)
-- [ ] Correct directory hierarchy copy
-  - Optional backup semantics (i.e. copy all ACLs, metadata etc)
-  - Intelligent retry for some given timeout before failing.
-  - Optional fixup of any symbolic links pointing into copied tree.
-  - Optional copy directory structure but hard or symbolic linking files.
-    - Symbolic links optionally are always absolute paths instead of relative.
-  - Optional deference all hard links and/or symbolic links into real files.
-- [ ] Correct directory hierarchy move
-- [ ] Correct directory hierarchy update (i.e. changes only)
-- [ ] Make directory tree C by cloning tree B to tree B, and then updating tree C
-with changes from tree A. The idea is for an incremental backup of changes over
-time but saving storage where possible.
-- [ ] Replace all content (including EA) duplicate files in a tree with hardlinks.
-- [ ] Figure out all hard linked file entries for some inode.
-- [ ] Generate list of all hard linked files in a tree (i.e. refcount>1) and which
-are the same inode.
+<table width="100%" border="0" cellpadding="4">
+<tr>
+<th colspan="3">Why you might need LLFIO<hr></th>
+</tr>
+<tr>
+<td valign="top" width="33%">
+Manufacturer claimed 4Kb transfer latencies for the physical hardware:
+- Spinning rust hard drive latency @ QD1: **9000us**
+- SATA flash drive latency @ QD1: **800us**
+- NVMe flash drive latency @ QD1: **300us**
+- RTT UDP packet latency over a LAN: **60us**
+- NVMe Optane drive latency @ QD1: **60us**
+- `memcpy(4Kb)` latency: **5us** (main memory) to **1.3us** (L3 cache)
+- RTT PCIe latency: **0.5us**
+</td>
+<td valign="top" width="33%">
+100% read QD1 4Kb direct transfer latencies for the software with LLFIO:
+- &lt; 99% spinning rust hard drive latency: Windows **187,231us** FreeBSD **9,836us** Linux **26,468us**
+- &lt; 99% SATA flash drive latency: Windows **290us** Linux **158us**
+- &lt; 99% NVMe drive latency: Windows **37us** FreeBSD **70us** Linux **30us**
+</td>
+<td valign="top" width="33%">
+75% read 25% write QD4 4Kb direct transfer latencies for the software with LLFIO:
+- &lt; 99% spinning rust hard drive latency: Windows **48,185us** FreeBSD **61,834us** Linux **104,507us**
+- &lt; 99% SATA flash drive latency: Windows **1,812us** Linux **1,416us**
+- &lt; 99% NVMe drive latency: Windows **50us** FreeBSD **143us** Linux **40us**
+</td>
+</tr>
+</table>
 
-
-### Eventual transactional key-blob store:
-- What's the least possible complex implementation based on files and directories?
-  - `store/index` is 48 bit counter + r/w mutex + open hash map of 128 bit key to blob
-  identifier (64 bits). Blob identifier is top 6 bits file id:
-    - 0 means large file, values 1-15 are reserved for future use (large file deltas).
-    - Values 16-63 are the smallfile. 
-  
-    1. `store/small/01-3f` for blobs <= 65512 bytes (8 bytes tail, 16 bytes key).
-    Each blob is padded to 64 byte
-    multiple and tail record with 16 bytes of key, 6 byte (48 bit) counter + 2 byte size aligned
-    at end + optional 16 byte hash. There are 48 of these used to maximise write concurrency
-    (use the thread id to select a smallfile on open, use exclusive lock probing to
-    figure out a small file not in use, hold shared lock on chosen small file until exit).
-
-    Remaining 58 bits of blob identifier is the offset into the smallfile of the end of
-    the tail record (shifted left 6 bits, all records in smallfiles are at 64 byte multiples).
-  
-    2. `store/large/*` for blobs > 65512 under the assumption that one day we'll
-    implement 4Kb dirty delta page with compression support.
-      - `store/large/hexkey/48bithexcounter` stores each blob
-      - Last 64 bytes contains magic, size, optional hash.
-      
-    Blob identifier is top 6 bits zero. Next 10 bits is 4 bits mantissa shifted left
-    6 bits of shift (0-63) for approx size. Remaining 48 bits is counter.
-    
-  - `store/config` keeps:
-    - transactions enabled or not.
-    - mmap enable or not (i.e. can be used over network drive)
-    - content hash used e.g. SpookyHash
-    - compression used e.g. pithy
-    - dirty flag i.e. do fsck on next first open
-      - `O_SYNC` was on or not last open (affects severity of any fsck).
-    - shared lock kept on config so we know last user exit/first user enter
-- Start a transaction = atomic increment current 48 bit counter
-  - Write the changes making up this transaction under this counter
-  - When ready, lock the open hash map's r/w mutex for exclusive access.
-  - Check that all the keys we are modifying have not been changed since the
-  transaction began.
-  - If all good, update all the keys with their new values and unlock the r/w mutex
-  QUESTION: Can forcing all map users to lock the mutex each access be avoided?
-  e.g. atomic swapping in a pointer to an updated table? One could COW the 4Kb pages
-  being changed in the current table, then update the map, then swap pointers
-  and leave the old table hang around for a while.
-- Garbage collecting in this design is easy enough, write all current small values
-into a single file, then update the map in a single shot, then hole punch all the
-other small files.
-- Live resizing the open hash map I think is impossible however unless we use that
-atomic swapping design.
-- You may need compression, https://github.com/johnezang/pithy looks easily convertible
-into header-only C++ and has a snappy-like performance to compression ratio. Make sure
-you merge the bug fixes from the forks first.
-
-## Commits and tags in this git repository can be verified using:
-<pre>
------BEGIN PGP PUBLIC KEY BLOCK-----
-Version: GnuPG v2
-
-mDMEVvMacRYJKwYBBAHaRw8BAQdAp+Qn6djfxWQYtAEvDmv4feVmGALEQH/pYpBC
-llaXNQe0WE5pYWxsIERvdWdsYXMgKHMgW3VuZGVyc2NvcmVdIHNvdXJjZWZvcmdl
-IHthdH0gbmVkcHJvZCBbZG90XSBjb20pIDxzcGFtdHJhcEBuZWRwcm9kLmNvbT6I
-eQQTFggAIQUCVvMacQIbAwULCQgHAgYVCAkKCwIEFgIDAQIeAQIXgAAKCRCELDV4
-Zvkgx4vwAP9gxeQUsp7ARMFGxfbR0xPf6fRbH+miMUg2e7rYNuHtLQD9EUoR32We
-V8SjvX4r/deKniWctvCi5JccgfUwXkVzFAk=
-=puFk
------END PGP PUBLIC KEY BLOCK-----
-</pre>
+Max bandwidth for the physical hardware:
+- DDR4 2133: **30Gb/sec** (main memory)
+- x4 PCIe 4.0: **7.5Gb/sec** (arrives end of 2017, the 2018 NVMe drives will use PCIe 4.0)
+- x4 PCIe 3.0: **3.75Gb/sec** (985Mb/sec per PCIe lane)
+- 2017 XPoint drive (x4 PCIe 3.0): **2.5Gb/sec**
+- 2017 NVMe flash drive (x4 PCIe 3.0): **2Gb/sec**
+- 10Gbit LAN: **1.2Gb/sec**
