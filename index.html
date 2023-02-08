@@ -89,8 +89,10 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <div class="textblock"><p><a class="anchor" id="md_Readme"></a> </p><center><table border="0" cellpadding="4">
 <tr>
 <td align="center"><a href="https://github.com/ned14/llfio">LLFIO</a><br  />
-<a href="https://github.com/ned14/llfio">on GitHub</a>  </td><td align="center"><a href="https://my.cdash.org/index.php?project=Boost.AFIO">CTest summary</a><br  />
-<a href="https://my.cdash.org/index.php?project=Boost.AFIO">dashboard</a>  </td><td align="center"><a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Linux%22">Linux CI:</a><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Linux/badge.svg?branch=master" alt="" style="pointer-events: none;" class="inline"/>  </td><td align="center"><a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Mac+OS%22">Mac OS CI:</a><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Mac%20OS/badge.svg?branch=master" alt="" style="pointer-events: none;" class="inline"/>  </td><td align="center"><a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Windows%22">Windows CI:</a><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Windows/badge.svg?branch=master" alt="" style="pointer-events: none;" class="inline"/>  </td><td align="center"><a href="https://github.com/ned14/llfio/releases">Prebuilt binaries</a>   </td></tr>
+<a href="https://github.com/ned14/llfio">on GitHub</a>  </td><td align="center"><a href="https://ned14.github.io/llfio/">API</a><br  />
+<a href="https://ned14.github.io/llfio/">Documentation</a>  </td><td align="center"><a href="https://my.cdash.org/index.php?project=Boost.AFIO">CTest summary</a><br  />
+<a href="https://my.cdash.org/index.php?project=Boost.AFIO">dashboard</a>  </td><td align="center"><a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Linux%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Linux/badge.svg?branch=master" alt="" style="pointer-events: none;" class="inline"/></a>  </td><td align="center"><a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Mac+OS%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Mac%20OS/badge.svg?branch=master" alt="" style="pointer-events: none;" class="inline"/></a>  </td><td align="center"><a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Windows%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Windows/badge.svg?branch=master" alt="" style="pointer-events: none;" class="inline"/></a>  </td><td align="center"><a href="https://github.com/ned14/llfio/releases">Prebuilt</a><br  />
+<a href="https://github.com/ned14/llfio/releases">binaries</a>   </td></tr>
 </table>
 </center><p>Herein lies my proposed zero whole machine memory copy file i/o and filesystem library for the C++ standard, intended for storage devices with ~1 microsecond 4Kb transfer latencies and those supporting Storage Class Memory (SCM)/Direct Access Storage (DAX). Its i/o overhead, including syscall overhead, has been benchmarked to 100 nanoseconds on Linux which corresponds to a theoretical maximum of 10M IOPS @ QD1, approx 40Gb/sec per thread. It has particularly strong support for writing portable filesystem algorithms which work well with directly mapped non-volatile storage such as Intel Optane.</p>
 <p>It is a complete rewrite after a Boost peer review in August 2015. LLFIO is the reference implementation for these C++ standardisations:</p><ul>
@@ -144,7 +146,60 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <div class="ttc" id="agroup__config_html_gac9f7f0153adb9034d26c4554728f817a"><div class="ttname"><a href="group__config.html#gac9f7f0153adb9034d26c4554728f817a">LLFIO_V2_NAMESPACE</a></div><div class="ttdeci">#define LLFIO_V2_NAMESPACE</div><div class="ttdoc">The namespace of this LLFIO v2 which will be some unknown inline namespace starting with v2_ inside t...</div><div class="ttdef"><b>Definition:</b> config.hpp:180</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html"><div class="ttname"><a href="namespacellfio__v2__xxx.html">llfio_v2_xxx</a></div><div class="ttdoc">The LLFIO namespace.</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:37</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a3b775591c19686ab10aa812fa3c82917"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a3b775591c19686ab10aa812fa3c82917">llfio_v2_xxx::mapped_temp_inode</a></div><div class="ttdeci">result&lt; mapped_file_handle &gt; mapped_temp_inode(mapped_file_handle::size_type reservation=0, const path_handle &amp;dir=path_discovery::storage_backed_temporary_files_directory(), mapped_file_handle::mode _mode=mapped_file_handle::mode::write, mapped_file_handle::caching _caching=mapped_file_handle::caching::temporary, mapped_file_handle::flag flags=mapped_file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:892</div></div>
-</div><!-- fragment --> </td><td width="50%" valign="top"><div class="fragment"></div><!-- fragment -->  </td></tr>
+</div><!-- fragment --> </td><td width="50%" valign="top"><div class="fragment"><div class="line">  <span class="keyword">namespace </span><a class="code" href="namespacellfio__v2__xxx.html">llfio</a> = <a class="code" href="group__config.html#gac9f7f0153adb9034d26c4554728f817a">LLFIO_V2_NAMESPACE</a>;</div>
+<div class="line">  <span class="keyword">static</span> constexpr llfio::string_view test_host(<span class="stringliteral">&quot;github.com&quot;</span>);</div>
+<div class="line">  <span class="keyword">static</span> constexpr llfio::string_view get_request(<span class="stringliteral">&quot;GET / HTTP/1.0\r\nHost: github.com\r\n\r\n&quot;</span>);</div>
+<div class="line">  <span class="keywordflow">if</span>(<a class="code" href="classllfio__v2__xxx_1_1tls__socket__source__registry.html#a294c3be8a3c986009971c408b2a1a4c6">llfio::tls_socket_source_registry::empty</a>())</div>
+<div class="line">  {</div>
+<div class="line">    std::cout &lt;&lt; <span class="stringliteral">&quot;\nNOTE: This platform has no TLS socket sources in its registry, skipping this test.&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line">    <span class="keywordflow">return</span>;</div>
+<div class="line">  }</div>
+<div class="line">  <span class="keyword">auto</span> test_host_ip = <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a9095eedda7cd3610631a971730de2c38">llfio::ip::resolve</a>(test_host, <span class="stringliteral">&quot;https&quot;</span>, llfio::ip::family::any, {}, <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74a848178fff00d31d1c679b6f61f20fe44">llfio::ip::resolve_flag::blocking</a>).value()-&gt;get().value().front();</div>
+<div class="line">  std::cout &lt;&lt; <span class="stringliteral">&quot;The IP address of &quot;</span> &lt;&lt; test_host &lt;&lt; <span class="stringliteral">&quot; is &quot;</span> &lt;&lt; test_host_ip &lt;&lt; std::endl;</div>
+<div class="line">  BOOST_REQUIRE(test_host_ip.is_v4() || test_host_ip.is_v6());</div>
+<div class="line">  <span class="keyword">auto</span> tls_socket_source = <a class="code" href="classllfio__v2__xxx_1_1tls__socket__source__registry.html#a318736c9183f9a4ce256f081b75fd4e3">llfio::tls_socket_source_registry::default_source</a>().<a class="code" href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#a24edcf957ea67971aa46f358934adad6">instantiate</a>().value();</div>
+<div class="line">  <span class="keyword">auto</span> sock = tls_socket_source-&gt;multiplexable_connecting_socket(test_host_ip.family()).value();</div>
+<div class="line">  {</div>
+<div class="line">    <span class="keyword">auto</span> r = sock-&gt;connect(test_host, 443, std::chrono::seconds(5));</div>
+<div class="line">    <span class="keywordflow">if</span>(!r)</div>
+<div class="line">    {</div>
+<div class="line">      <span class="keywordflow">if</span>(r.error() == llfio::errc::timed_out || r.error() == llfio::errc::host_unreachable || r.error() == llfio::errc::network_unreachable)</div>
+<div class="line">      {</div>
+<div class="line">        std::cout &lt;&lt; <span class="stringliteral">&quot;\nNOTE: Failed to connect to &quot;</span> &lt;&lt; test_host</div>
+<div class="line">                  &lt;&lt; <span class="stringliteral">&quot; within five seconds, assuming there is no internet connection and skipping this test. Error was: &quot;</span> &lt;&lt; r.error().message() &lt;&lt; std::endl;</div>
+<div class="line">        <span class="keywordflow">return</span>;</div>
+<div class="line">      }</div>
+<div class="line">      r.value();</div>
+<div class="line">    }</div>
+<div class="line">  }</div>
+<div class="line">  <span class="comment">// Get the front page</span></div>
+<div class="line">  std::cout &lt;&lt; <span class="stringliteral">&quot;\nThe socket which connected to &quot;</span> &lt;&lt; test_host &lt;&lt; <span class="stringliteral">&quot; negotiated the cipher &quot;</span> &lt;&lt; sock-&gt;algorithms_description() &lt;&lt; std::endl;</div>
+<div class="line">  llfio::tls_socket_handle::const_buffer_type get_request_buffer(<span class="keyword">reinterpret_cast&lt;</span><span class="keyword">const </span>llfio::byte *<span class="keyword">&gt;</span>(get_request.data()), get_request.size());</div>
+<div class="line">  <span class="keyword">auto</span> written = sock-&gt;write({get_request_buffer}).value();</div>
+<div class="line">  BOOST_REQUIRE(written == get_request.size());</div>
+<div class="line">  <span class="comment">// Fetch the front page. The connection will close once all data is sent.</span></div>
+<div class="line">  std::vector&lt;llfio::byte&gt; buffer(4096);</div>
+<div class="line">  <span class="keywordtype">size_t</span> offset = 0;</div>
+<div class="line">  <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> nread = 0; (nread = sock-&gt;read({{buffer.data() + offset, buffer.size() - offset}}, std::chrono::seconds(3)).value()) &gt; 0;)</div>
+<div class="line">  {</div>
+<div class="line">    offset += nread;</div>
+<div class="line">    <span class="keywordflow">if</span>(buffer.size() - offset &lt; 1024)</div>
+<div class="line">    {</div>
+<div class="line">      buffer.resize(buffer.size() + 4096);</div>
+<div class="line">    }</div>
+<div class="line">  }</div>
+<div class="line">  buffer.resize(offset);</div>
+<div class="line">  std::cout &lt;&lt; <span class="stringliteral">&quot;\nRead from &quot;</span> &lt;&lt; test_host &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; offset &lt;&lt; <span class="stringliteral">&quot; bytes. The first 1024 bytes are:\n\n&quot;</span></div>
+<div class="line">            &lt;&lt; llfio::string_view(<span class="keyword">reinterpret_cast&lt;</span><span class="keyword">const </span><span class="keywordtype">char</span> *<span class="keyword">&gt;</span>(buffer.data()), offset).substr(0, 1024) &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span></div>
+<div class="line">            &lt;&lt; std::endl;</div>
+<div class="line">  <span class="comment">// Make sure this doesn&#39;t hang because the socket is closed</span></div>
+<div class="line">  sock-&gt;shutdown_and_close().value();</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1tls__socket__source__registry_html_a294c3be8a3c986009971c408b2a1a4c6"><div class="ttname"><a href="classllfio__v2__xxx_1_1tls__socket__source__registry.html#a294c3be8a3c986009971c408b2a1a4c6">llfio_v2_xxx::tls_socket_source_registry::empty</a></div><div class="ttdeci">static QUICKCPPLIB_NODISCARD bool empty() noexcept</div><div class="ttdoc">True if there are no socket sources known to this registry.</div><div class="ttdef"><b>Definition:</b> tls_socket_handle.hpp:547</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1tls__socket__source__registry_html_a318736c9183f9a4ce256f081b75fd4e3"><div class="ttname"><a href="classllfio__v2__xxx_1_1tls__socket__source__registry.html#a318736c9183f9a4ce256f081b75fd4e3">llfio_v2_xxx::tls_socket_source_registry::default_source</a></div><div class="ttdeci">static tls_socket_source_implementation_information default_source(tls_socket_source_implementation_features set=tls_socket_source_implementation_features::none, tls_socket_source_implementation_features mask=tls_socket_source_implementation_features::none) noexcept</div><div class="ttdoc">Convenience overload retrieving TLS socket sources, preferring system over third party implementation...</div><div class="ttdef"><b>Definition:</b> tls_socket_handle.hpp:560</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_a2b874cadb614a4ef4ba44fdf3dd8dd74a848178fff00d31d1c679b6f61f20fe44"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74a848178fff00d31d1c679b6f61f20fe44">llfio_v2_xxx::ip::blocking</a></div><div class="ttdeci">@ blocking</div><div class="ttdoc">Execute address resolution synchronously.</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:226</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_a9095eedda7cd3610631a971730de2c38"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#a9095eedda7cd3610631a971730de2c38">llfio_v2_xxx::ip::resolve</a></div><div class="ttdeci">result&lt; resolver_ptr &gt; resolve(string_view name, string_view service, family _family=family::any, deadline d={}, resolve_flag flags=resolve_flag::none) noexcept</div><div class="ttdoc">Retrieve a list of potential address for a given name and service e.g. &quot;www.google....</div></div>
+<div class="ttc" id="astructllfio__v2__xxx_1_1tls__socket__source__implementation__information_html_a24edcf957ea67971aa46f358934adad6"><div class="ttname"><a href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#a24edcf957ea67971aa46f358934adad6">llfio_v2_xxx::tls_socket_source_implementation_information::instantiate</a></div><div class="ttdeci">result&lt; tls_socket_source_ptr &gt;(* instantiate)() noexcept</div><div class="ttdoc">Create an instance of this TLS socket source. The instance may be shared or recycled or a singleton.</div><div class="ttdef"><b>Definition:</b> tls_socket_handle.hpp:431</div></div>
+</div><!-- fragment -->  </td></tr>
 </table>
 <p>See <a href="https://github.com/ned14/llfio/blob/master/programs/fs-probe/fs_probe_results.yaml">https://github.com/ned14/llfio/blob/master/programs/fs-probe/fs_probe_results.yaml</a> for a database of latencies for various previously tested OS, filing systems and storage devices.</p>
 <p>Todo list for already implemented parts: <a href="https://ned14.github.io/llfio/todo.html">https://ned14.github.io/llfio/todo.html</a></p>
