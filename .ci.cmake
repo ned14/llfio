@@ -46,7 +46,7 @@ if(NOT CTEST_DISABLE_TESTING)
 endif()
 if(WIN32)
   if(EXISTS "prebuilt/bin/Release/llfio_dl-2.0-Windows-AMD64-Release.dll")
-    file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "${CMAKE_CURRENT_LIST_DIR}/outcome.tgz")
+    file(DOWNLOAD "https://github.com/ned14/outcome/tarball/master" "${CMAKE_CURRENT_LIST_DIR}/outcome.tgz")
     file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "${CMAKE_CURRENT_LIST_DIR}/quickcpplib.tgz")
     checked_execute_process("Tarring up binaries 0"
       COMMAND "${CMAKE_COMMAND}" -E tar xfz "outcome.tgz"
@@ -64,7 +64,6 @@ if(WIN32)
       COMMAND "${CMAKE_COMMAND}" -E copy index.html llfio/
       COMMAND "${CMAKE_COMMAND}" -E copy Licence.txt llfio/
       COMMAND "${CMAKE_COMMAND}" -E copy Readme.md llfio/
-      COMMAND "${CMAKE_COMMAND}" -E copy release_notes.md llfio/
     )
     checked_execute_process("Tarring up binaries 3"
       COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/Release/llfio_sl-2.0-Windows-AMD64-Release.lib llfio/prebuilt/lib/Release/
@@ -97,7 +96,7 @@ if(WIN32)
   endif()
 else()
   if(EXISTS "prebuilt/lib/libllfio_dl-2.0-Linux-x86_64-Release.so")
-    file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "${CMAKE_CURRENT_LIST_DIR}/outcome.tgz")
+    file(DOWNLOAD "https://github.com/ned14/outcome/tarball/master" "${CMAKE_CURRENT_LIST_DIR}/outcome.tgz")
     file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "${CMAKE_CURRENT_LIST_DIR}/quickcpplib.tgz")
     checked_execute_process("Tarring up binaries 0"
       COMMAND "${CMAKE_COMMAND}" -E tar xfz "outcome.tgz"
@@ -112,7 +111,6 @@ else()
       COMMAND "${CMAKE_COMMAND}" -E copy index.html llfio/
       COMMAND "${CMAKE_COMMAND}" -E copy Licence.txt llfio/
       COMMAND "${CMAKE_COMMAND}" -E copy Readme.md llfio/
-      COMMAND "${CMAKE_COMMAND}" -E copy release_notes.md llfio/
       COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/libllfio_sl-2.0-Linux-x86_64-Release.a llfio/prebuilt/lib/
       COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/libllfio_dl-2.0-Linux-x86_64-Release.so llfio/prebuilt/lib/
     )
@@ -126,7 +124,7 @@ else()
     get_filename_component(toupload llfio-v2.0-binaries-linux-x64.tgz ABSOLUTE)
   endif()
   if(EXISTS "prebuilt/lib/libllfio_dl-2.0-Linux-armhf-Release.so")
-    file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "${CMAKE_CURRENT_LIST_DIR}/outcome.tgz")
+    file(DOWNLOAD "https://github.com/ned14/outcome/tarball/master" "${CMAKE_CURRENT_LIST_DIR}/outcome.tgz")
     file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "${CMAKE_CURRENT_LIST_DIR}/quickcpplib.tgz")
     checked_execute_process("Tarring up binaries 0"
       COMMAND "${CMAKE_COMMAND}" -E tar xfz "outcome.tgz"
@@ -141,7 +139,6 @@ else()
       COMMAND "${CMAKE_COMMAND}" -E copy index.html llfio/
       COMMAND "${CMAKE_COMMAND}" -E copy Licence.txt llfio/
       COMMAND "${CMAKE_COMMAND}" -E copy Readme.md llfio/
-      COMMAND "${CMAKE_COMMAND}" -E copy release_notes.md llfio/
       COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/libllfio_sl-2.0-Linux-armhf-Release.a llfio/prebuilt/lib/
       COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/libllfio_dl-2.0-Linux-armhf-Release.so llfio/prebuilt/lib/
     )
@@ -155,7 +152,7 @@ else()
     get_filename_component(toupload llfio-v2.0-binaries-linux-armhf.tgz ABSOLUTE)
   endif()
   if(EXISTS "prebuilt/lib/libllfio_dl-2.0-Darwin-x86_64-Release.dylib")
-    file(DOWNLOAD "https://github.com/ned14/outcome/tarball/better_optimisation" "${CMAKE_CURRENT_LIST_DIR}/outcome.tgz")
+    file(DOWNLOAD "https://github.com/ned14/outcome/tarball/master" "${CMAKE_CURRENT_LIST_DIR}/outcome.tgz")
     file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "${CMAKE_CURRENT_LIST_DIR}/quickcpplib.tgz")
     checked_execute_process("Tarring up binaries 0"
       COMMAND "${CMAKE_COMMAND}" -E tar xfz "outcome.tgz"
@@ -170,7 +167,6 @@ else()
       COMMAND "${CMAKE_COMMAND}" -E copy index.html llfio/
       COMMAND "${CMAKE_COMMAND}" -E copy Licence.txt llfio/
       COMMAND "${CMAKE_COMMAND}" -E copy Readme.md llfio/
-      COMMAND "${CMAKE_COMMAND}" -E copy release_notes.md llfio/
       COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/libllfio_sl-2.0-Darwin-x86_64-Release.a llfio/prebuilt/lib/
       COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/libllfio_dl-2.0-Darwin-x86_64-Release.dylib llfio/prebuilt/lib/
     )
