@@ -25,6 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include "../include/llfio.hpp"
 
 #include <ctime>
+#include <iostream>
 #include <string>
 
 auto print = [](std::chrono::system_clock::time_point ts)
