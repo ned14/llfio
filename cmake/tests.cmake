@@ -49,6 +49,7 @@ set(llfio_COMPILE_TESTS
   "example/map_file.cpp"
   "example/mapped_file.cpp"
   "example/read_entire_file1.cpp"
+  "example/read_stats.cpp"
   "example/scatter_write.cpp"
   "example/sparse_array.cpp"
   "example/tls_socket_server.cpp"

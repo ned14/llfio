@@ -47,10 +47,12 @@ Examples of use (more examples: https://github.com/ned14/llfio/tree/develop/exam
 <table width="100%" border="0" cellpadding="4">
 <tr>
 <td width="50%" valign="top">
+\snippet example/mapped_file.cpp mapped_file
+
 \snippet example/sparse_array.cpp sparse_array
 </td>
 <td width="50%" valign="top">
-\snippet tests/tls_socket_handle.cpp https_get
+\snippet example/read_stats.cpp file_read_stats
 </td>
 </tr>
 </table>
