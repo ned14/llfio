@@ -324,7 +324,9 @@ public:
     LLFIO_LOG_FUNCTION_CALL(this);
     if(_.flags & flag::unlink_on_first_close)
     {
-      auto ret = unlink();
+      // if called from the destructor, no virtual dispatch will happen
+      // which is expected/fine in this case
+      auto ret = unlink();  // NOLINT(clang-analyzer-optin.cplusplus.VirtualCall)
       if(!ret)
       {
         // File may have already been deleted, if so ignore
