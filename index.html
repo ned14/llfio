@@ -128,6 +128,35 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <tr>
 <td width="50%" valign="top"><div class="fragment"><div class="line">  <span class="keyword">namespace </span><a class="code" href="namespacellfio__v2__xxx.html">llfio</a> = <a class="code" href="group__config.html#gac9f7f0153adb9034d26c4554728f817a">LLFIO_V2_NAMESPACE</a>;</div>
 <div class="line"> </div>
+<div class="line">  <span class="comment">// Open the mapped file for read</span></div>
+<div class="line">  <a class="code" href="classllfio__v2__xxx_1_1mapped__file__handle.html">llfio::mapped_file_handle</a> mh = <a class="code" href="namespacellfio__v2__xxx.html#abddc6cd762be581f04b00837a8a91730">llfio::mapped_file</a>(  <span class="comment">//</span></div>
+<div class="line">    {},       <span class="comment">// path_handle to base directory</span></div>
+<div class="line">    <span class="stringliteral">&quot;foo&quot;</span>     <span class="comment">// path_view to path fragment relative to base directory</span></div>
+<div class="line">              <span class="comment">// default mode is read only</span></div>
+<div class="line">              <span class="comment">// default creation is open existing</span></div>
+<div class="line">              <span class="comment">// default caching is all</span></div>
+<div class="line">              <span class="comment">// default flags is none</span></div>
+<div class="line">  ).value();  <span class="comment">// If failed, throw a filesystem_error exception</span></div>
+<div class="line"> </div>
+<div class="line">  <span class="keyword">auto</span> <a class="code" href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">length</a> = mh.<a class="code" href="classllfio__v2__xxx_1_1mapped__file__handle.html#a0723a6ba04a578754bb601541be832d0">maximum_extent</a>().value();</div>
+<div class="line"> </div>
+<div class="line">  <span class="comment">// Find my text</span></div>
+<div class="line">  <span class="keywordflow">for</span> (<span class="keywordtype">char</span> *p = <span class="keyword">reinterpret_cast&lt;</span><span class="keywordtype">char</span> *<span class="keyword">&gt;</span>(mh.<a class="code" href="classllfio__v2__xxx_1_1mapped__file__handle.html#af781e99c23d0a8158c249066214ac49c">address</a>()); (p = (<span class="keywordtype">char</span> *)memchr(p, <span class="charliteral">&#39;h&#39;</span>, <span class="keyword">reinterpret_cast&lt;</span><span class="keywordtype">char</span> *<span class="keyword">&gt;</span>(mh.<a class="code" href="classllfio__v2__xxx_1_1mapped__file__handle.html#af781e99c23d0a8158c249066214ac49c">address</a>()) + <a class="code" href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">length</a> - p)); p++)</div>
+<div class="line">  {</div>
+<div class="line">    <span class="keywordflow">if</span> (strcmp(p, <span class="stringliteral">&quot;hello&quot;</span>))</div>
+<div class="line">    {</div>
+<div class="line">      std::cout &lt;&lt; <span class="stringliteral">&quot;Happy days!&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line">    }</div>
+<div class="line">  }</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1mapped__file__handle_html"><div class="ttname"><a href="classllfio__v2__xxx_1_1mapped__file__handle.html">llfio_v2_xxx::mapped_file_handle</a></div><div class="ttdoc">A memory mapped regular file or device.</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:170</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1mapped__file__handle_html_a0723a6ba04a578754bb601541be832d0"><div class="ttname"><a href="classllfio__v2__xxx_1_1mapped__file__handle.html#a0723a6ba04a578754bb601541be832d0">llfio_v2_xxx::mapped_file_handle::maximum_extent</a></div><div class="ttdeci">virtual result&lt; extent_type &gt; maximum_extent() const noexcept override</div><div class="ttdoc">Return the current maximum permitted extent of the file, after updating the map.</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:648</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1mapped__file__handle_html_af781e99c23d0a8158c249066214ac49c"><div class="ttname"><a href="classllfio__v2__xxx_1_1mapped__file__handle.html#af781e99c23d0a8158c249066214ac49c">llfio_v2_xxx::mapped_file_handle::address</a></div><div class="ttdeci">byte * address() const noexcept</div><div class="ttdoc">The address in memory where this mapped file currently resides.</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:561</div></div>
+<div class="ttc" id="agroup__config_html_gac9f7f0153adb9034d26c4554728f817a"><div class="ttname"><a href="group__config.html#gac9f7f0153adb9034d26c4554728f817a">LLFIO_V2_NAMESPACE</a></div><div class="ttdeci">#define LLFIO_V2_NAMESPACE</div><div class="ttdoc">The namespace of this LLFIO v2 which will be some unknown inline namespace starting with v2_ inside t...</div><div class="ttdef"><b>Definition:</b> config.hpp:180</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html"><div class="ttname"><a href="namespacellfio__v2__xxx.html">llfio_v2_xxx</a></div><div class="ttdoc">The LLFIO namespace.</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:37</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_aa3676f0dd69f4b54cf7e14e3f86d32b9"><div class="ttname"><a href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">llfio_v2_xxx::length</a></div><div class="ttdeci">result&lt; section_handle::extent_type &gt; length(const section_handle &amp;self) noexcept</div><div class="ttdoc">Return the current maximum permitted extent of the memory section.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:1071</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_abddc6cd762be581f04b00837a8a91730"><div class="ttname"><a href="namespacellfio__v2__xxx.html#abddc6cd762be581f04b00837a8a91730">llfio_v2_xxx::mapped_file</a></div><div class="ttdeci">result&lt; mapped_file_handle &gt; mapped_file(mapped_file_handle::size_type reservation, const path_handle &amp;base, mapped_file_handle::path_view_type _path, mapped_file_handle::mode _mode=mapped_file_handle::mode::read, mapped_file_handle::creation _creation=mapped_file_handle::creation::open_existing, mapped_file_handle::caching _caching=mapped_file_handle::caching::all, mapped_file_handle::flag flags=mapped_file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:817</div></div>
+</div><!-- fragment --> <div class="fragment"><div class="line">  <span class="keyword">namespace </span><a class="code" href="namespacellfio__v2__xxx.html">llfio</a> = <a class="code" href="group__config.html#gac9f7f0153adb9034d26c4554728f817a">LLFIO_V2_NAMESPACE</a>;</div>
+<div class="line"> </div>
 <div class="line">  <span class="comment">// Make me a 1 trillion element sparsely allocated integer array!</span></div>
 <div class="line">  <a class="code" href="classllfio__v2__xxx_1_1mapped__file__handle.html">llfio::mapped_file_handle</a> mfh = <a class="code" href="namespacellfio__v2__xxx.html#a3b775591c19686ab10aa812fa3c82917">llfio::mapped_temp_inode</a>().value();</div>
 <div class="line"> </div>
@@ -141,64 +170,49 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <div class="line">  <span class="comment">// Write and read as you see fit, if you exceed physical RAM it&#39;ll be paged out</span></div>
 <div class="line">  one_trillion_int_array[0] = 5;</div>
 <div class="line">  one_trillion_int_array[999999999999ULL] = 6;</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1mapped__file__handle_html"><div class="ttname"><a href="classllfio__v2__xxx_1_1mapped__file__handle.html">llfio_v2_xxx::mapped_file_handle</a></div><div class="ttdoc">A memory mapped regular file or device.</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:170</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1mapped__file__handle_html_a01a5da3834fd354c5c3d38284b84ef75"><div class="ttname"><a href="classllfio__v2__xxx_1_1mapped__file__handle.html#a01a5da3834fd354c5c3d38284b84ef75">llfio_v2_xxx::mapped_file_handle::truncate</a></div><div class="ttdeci">virtual result&lt; extent_type &gt; truncate(extent_type newsize) noexcept override</div><div class="ttdoc">Resize the current maximum permitted extent of the mapped file to the given extent,...</div></div>
-<div class="ttc" id="agroup__config_html_gac9f7f0153adb9034d26c4554728f817a"><div class="ttname"><a href="group__config.html#gac9f7f0153adb9034d26c4554728f817a">LLFIO_V2_NAMESPACE</a></div><div class="ttdeci">#define LLFIO_V2_NAMESPACE</div><div class="ttdoc">The namespace of this LLFIO v2 which will be some unknown inline namespace starting with v2_ inside t...</div><div class="ttdef"><b>Definition:</b> config.hpp:180</div></div>
-<div class="ttc" id="anamespacellfio__v2__xxx_html"><div class="ttname"><a href="namespacellfio__v2__xxx.html">llfio_v2_xxx</a></div><div class="ttdoc">The LLFIO namespace.</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:37</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a3b775591c19686ab10aa812fa3c82917"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a3b775591c19686ab10aa812fa3c82917">llfio_v2_xxx::mapped_temp_inode</a></div><div class="ttdeci">result&lt; mapped_file_handle &gt; mapped_temp_inode(mapped_file_handle::size_type reservation=0, const path_handle &amp;dir=path_discovery::storage_backed_temporary_files_directory(), mapped_file_handle::mode _mode=mapped_file_handle::mode::write, mapped_file_handle::caching _caching=mapped_file_handle::caching::temporary, mapped_file_handle::flag flags=mapped_file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:892</div></div>
 </div><!-- fragment --> </td><td width="50%" valign="top"><div class="fragment"><div class="line">  <span class="keyword">namespace </span><a class="code" href="namespacellfio__v2__xxx.html">llfio</a> = <a class="code" href="group__config.html#gac9f7f0153adb9034d26c4554728f817a">LLFIO_V2_NAMESPACE</a>;</div>
-<div class="line">  <span class="keyword">static</span> constexpr llfio::string_view test_host(<span class="stringliteral">&quot;github.com&quot;</span>);</div>
-<div class="line">  <span class="keyword">static</span> constexpr llfio::string_view get_request(<span class="stringliteral">&quot;GET / HTTP/1.0\r\nHost: github.com\r\n\r\n&quot;</span>);</div>
-<div class="line">  <span class="keywordflow">if</span>(<a class="code" href="classllfio__v2__xxx_1_1tls__socket__source__registry.html#a294c3be8a3c986009971c408b2a1a4c6">llfio::tls_socket_source_registry::empty</a>())</div>
-<div class="line">  {</div>
-<div class="line">    std::cout &lt;&lt; <span class="stringliteral">&quot;\nNOTE: This platform has no TLS socket sources in its registry, skipping this test.&quot;</span> &lt;&lt; std::endl;</div>
-<div class="line">    <span class="keywordflow">return</span>;</div>
-<div class="line">  }</div>
-<div class="line">  <span class="keyword">auto</span> test_host_ip = <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a9095eedda7cd3610631a971730de2c38">llfio::ip::resolve</a>(test_host, <span class="stringliteral">&quot;https&quot;</span>, llfio::ip::family::any, {}, <a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74a848178fff00d31d1c679b6f61f20fe44">llfio::ip::resolve_flag::blocking</a>).value()-&gt;get().value().front();</div>
-<div class="line">  std::cout &lt;&lt; <span class="stringliteral">&quot;The IP address of &quot;</span> &lt;&lt; test_host &lt;&lt; <span class="stringliteral">&quot; is &quot;</span> &lt;&lt; test_host_ip &lt;&lt; std::endl;</div>
-<div class="line">  BOOST_REQUIRE(test_host_ip.is_v4() || test_host_ip.is_v6());</div>
-<div class="line">  <span class="keyword">auto</span> tls_socket_source = <a class="code" href="classllfio__v2__xxx_1_1tls__socket__source__registry.html#a318736c9183f9a4ce256f081b75fd4e3">llfio::tls_socket_source_registry::default_source</a>().<a class="code" href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#a24edcf957ea67971aa46f358934adad6">instantiate</a>().value();</div>
-<div class="line">  <span class="keyword">auto</span> sock = tls_socket_source-&gt;multiplexable_connecting_socket(test_host_ip.family()).value();</div>
-<div class="line">  {</div>
-<div class="line">    <span class="keyword">auto</span> r = sock-&gt;connect(test_host, 443, std::chrono::seconds(5));</div>
-<div class="line">    <span class="keywordflow">if</span>(!r)</div>
-<div class="line">    {</div>
-<div class="line">      <span class="keywordflow">if</span>(r.error() == llfio::errc::timed_out || r.error() == llfio::errc::host_unreachable || r.error() == llfio::errc::network_unreachable)</div>
-<div class="line">      {</div>
-<div class="line">        std::cout &lt;&lt; <span class="stringliteral">&quot;\nNOTE: Failed to connect to &quot;</span> &lt;&lt; test_host</div>
-<div class="line">                  &lt;&lt; <span class="stringliteral">&quot; within five seconds, assuming there is no internet connection and skipping this test. Error was: &quot;</span> &lt;&lt; r.error().message() &lt;&lt; std::endl;</div>
-<div class="line">        <span class="keywordflow">return</span>;</div>
-<div class="line">      }</div>
-<div class="line">      r.value();</div>
-<div class="line">    }</div>
-<div class="line">  }</div>
-<div class="line">  <span class="comment">// Get the front page</span></div>
-<div class="line">  std::cout &lt;&lt; <span class="stringliteral">&quot;\nThe socket which connected to &quot;</span> &lt;&lt; test_host &lt;&lt; <span class="stringliteral">&quot; negotiated the cipher &quot;</span> &lt;&lt; sock-&gt;algorithms_description() &lt;&lt; std::endl;</div>
-<div class="line">  llfio::tls_socket_handle::const_buffer_type get_request_buffer(<span class="keyword">reinterpret_cast&lt;</span><span class="keyword">const </span>llfio::byte *<span class="keyword">&gt;</span>(get_request.data()), get_request.size());</div>
-<div class="line">  <span class="keyword">auto</span> written = sock-&gt;write({get_request_buffer}).value();</div>
-<div class="line">  BOOST_REQUIRE(written == get_request.size());</div>
-<div class="line">  <span class="comment">// Fetch the front page. The connection will close once all data is sent.</span></div>
-<div class="line">  std::vector&lt;llfio::byte&gt; buffer(4096);</div>
-<div class="line">  <span class="keywordtype">size_t</span> offset = 0;</div>
-<div class="line">  <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> nread = 0; (nread = sock-&gt;read({{buffer.data() + offset, buffer.size() - offset}}, std::chrono::seconds(3)).value()) &gt; 0;)</div>
-<div class="line">  {</div>
-<div class="line">    offset += nread;</div>
-<div class="line">    <span class="keywordflow">if</span>(buffer.size() - offset &lt; 1024)</div>
-<div class="line">    {</div>
-<div class="line">      buffer.resize(buffer.size() + 4096);</div>
-<div class="line">    }</div>
-<div class="line">  }</div>
-<div class="line">  buffer.resize(offset);</div>
-<div class="line">  std::cout &lt;&lt; <span class="stringliteral">&quot;\nRead from &quot;</span> &lt;&lt; test_host &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; offset &lt;&lt; <span class="stringliteral">&quot; bytes. The first 1024 bytes are:\n\n&quot;</span></div>
-<div class="line">            &lt;&lt; llfio::string_view(<span class="keyword">reinterpret_cast&lt;</span><span class="keyword">const </span><span class="keywordtype">char</span> *<span class="keyword">&gt;</span>(buffer.data()), offset).substr(0, 1024) &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span></div>
-<div class="line">            &lt;&lt; std::endl;</div>
-<div class="line">  <span class="comment">// Make sure this doesn&#39;t hang because the socket is closed</span></div>
-<div class="line">  sock-&gt;shutdown_and_close().value();</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1tls__socket__source__registry_html_a294c3be8a3c986009971c408b2a1a4c6"><div class="ttname"><a href="classllfio__v2__xxx_1_1tls__socket__source__registry.html#a294c3be8a3c986009971c408b2a1a4c6">llfio_v2_xxx::tls_socket_source_registry::empty</a></div><div class="ttdeci">static QUICKCPPLIB_NODISCARD bool empty() noexcept</div><div class="ttdoc">True if there are no socket sources known to this registry.</div><div class="ttdef"><b>Definition:</b> tls_socket_handle.hpp:547</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1tls__socket__source__registry_html_a318736c9183f9a4ce256f081b75fd4e3"><div class="ttname"><a href="classllfio__v2__xxx_1_1tls__socket__source__registry.html#a318736c9183f9a4ce256f081b75fd4e3">llfio_v2_xxx::tls_socket_source_registry::default_source</a></div><div class="ttdeci">static tls_socket_source_implementation_information default_source(tls_socket_source_implementation_features set=tls_socket_source_implementation_features::none, tls_socket_source_implementation_features mask=tls_socket_source_implementation_features::none) noexcept</div><div class="ttdoc">Convenience overload retrieving TLS socket sources, preferring system over third party implementation...</div><div class="ttdef"><b>Definition:</b> tls_socket_handle.hpp:560</div></div>
-<div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_a2b874cadb614a4ef4ba44fdf3dd8dd74a848178fff00d31d1c679b6f61f20fe44"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74a848178fff00d31d1c679b6f61f20fe44">llfio_v2_xxx::ip::blocking</a></div><div class="ttdeci">@ blocking</div><div class="ttdoc">Execute address resolution synchronously.</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:226</div></div>
-<div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_a9095eedda7cd3610631a971730de2c38"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#a9095eedda7cd3610631a971730de2c38">llfio_v2_xxx::ip::resolve</a></div><div class="ttdeci">result&lt; resolver_ptr &gt; resolve(string_view name, string_view service, family _family=family::any, deadline d={}, resolve_flag flags=resolve_flag::none) noexcept</div><div class="ttdoc">Retrieve a list of potential address for a given name and service e.g. &quot;www.google....</div></div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1tls__socket__source__implementation__information_html_a24edcf957ea67971aa46f358934adad6"><div class="ttname"><a href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#a24edcf957ea67971aa46f358934adad6">llfio_v2_xxx::tls_socket_source_implementation_information::instantiate</a></div><div class="ttdeci">result&lt; tls_socket_source_ptr &gt;(* instantiate)() noexcept</div><div class="ttdoc">Create an instance of this TLS socket source. The instance may be shared or recycled or a singleton.</div><div class="ttdef"><b>Definition:</b> tls_socket_handle.hpp:431</div></div>
+<div class="line"> </div>
+<div class="line">  <span class="comment">// Open the file for read</span></div>
+<div class="line">  <a class="code" href="classllfio__v2__xxx_1_1file__handle.html">llfio::file_handle</a> fh = <a class="code" href="namespacellfio__v2__xxx.html#af31a062639499a79ef5cc8aed16ba65d">llfio::file</a>(  <span class="comment">//</span></div>
+<div class="line">    {},       <span class="comment">// path_handle to base directory</span></div>
+<div class="line">    <span class="stringliteral">&quot;foo&quot;</span>     <span class="comment">// path_view to path fragment relative to base directory</span></div>
+<div class="line">              <span class="comment">// default mode is read only</span></div>
+<div class="line">              <span class="comment">// default creation is open existing</span></div>
+<div class="line">              <span class="comment">// default caching is all</span></div>
+<div class="line">              <span class="comment">// default flags is none</span></div>
+<div class="line">  ).value();  <span class="comment">// If failed, throw a filesystem_error exception</span></div>
+<div class="line"> </div>
+<div class="line">  <span class="comment">// warning: default constructor does nothing. If you want all bits</span></div>
+<div class="line">  <span class="comment">// zero, construct with `nullptr`.</span></div>
+<div class="line">  <a class="code" href="structllfio__v2__xxx_1_1stat__t.html">llfio::stat_t</a> fhstat;</div>
+<div class="line">  fhstat.<a class="code" href="structllfio__v2__xxx_1_1stat__t.html#aa08a4b9530403b4689498706b0738db4">fill</a>(</div>
+<div class="line">    fh        <span class="comment">// file handle from which to fill stat_t</span></div>
+<div class="line">              <span class="comment">// default stat_t::want is all</span></div>
+<div class="line">  ).value();</div>
+<div class="line">  std::cout &lt;&lt; <span class="stringliteral">&quot;The file was last modified on &quot;</span></div>
+<div class="line">            &lt;&lt; print(fhstat.<a class="code" href="structllfio__v2__xxx_1_1stat__t.html#aefe8c88dad824c911fa7bf6e1baef1c4">st_mtim</a>) &lt;&lt; std::endl;</div>
+<div class="line">  </div>
+<div class="line">  <span class="comment">// Note that default constructor fills with all bits one. This</span></div>
+<div class="line">  <span class="comment">// lets you do partial fills and usually detect what wasn&#39;t filled.</span></div>
+<div class="line">  <a class="code" href="structllfio__v2__xxx_1_1statfs__t.html">llfio::statfs_t</a> fhfsstat;</div>
+<div class="line">  fhfsstat.<a class="code" href="structllfio__v2__xxx_1_1statfs__t.html#a1a1a822aca4e26f793e526f1779947bb">fill</a>(</div>
+<div class="line">    fh        <span class="comment">// file handle from which to fill statfs_t</span></div>
+<div class="line">              <span class="comment">// default statfs_t::want is all</span></div>
+<div class="line">  ).value();</div>
+<div class="line">  std::cout &lt;&lt; <span class="stringliteral">&quot;The file&#39;s storage has &quot;</span></div>
+<div class="line">            &lt;&lt; (fhfsstat.<a class="code" href="structllfio__v2__xxx_1_1statfs__t.html#aa4a4f434ba56992244ac59c8f825a962">f_bavail</a> * fhfsstat.<a class="code" href="structllfio__v2__xxx_1_1statfs__t.html#aa24a1f36d9addae9d0d6ab13eeb43e5d">f_bsize</a>)</div>
+<div class="line">            &lt;&lt; <span class="stringliteral">&quot;bytes free.&quot;</span> &lt;&lt; std::endl;</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1file__handle_html"><div class="ttname"><a href="classllfio__v2__xxx_1_1file__handle.html">llfio_v2_xxx::file_handle</a></div><div class="ttdoc">A handle to a regular file or device.</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:53</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_af31a062639499a79ef5cc8aed16ba65d"><div class="ttname"><a href="namespacellfio__v2__xxx.html#af31a062639499a79ef5cc8aed16ba65d">llfio_v2_xxx::file</a></div><div class="ttdeci">result&lt; file_handle &gt; file(const path_handle &amp;base, file_handle::path_view_type path, file_handle::mode _mode=file_handle::mode::read, file_handle::creation _creation=file_handle::creation::open_existing, file_handle::caching _caching=file_handle::caching::all, file_handle::flag flags=file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> file_handle.hpp:434</div></div>
+<div class="ttc" id="astructllfio__v2__xxx_1_1stat__t_html"><div class="ttname"><a href="structllfio__v2__xxx_1_1stat__t.html">llfio_v2_xxx::stat_t</a></div><div class="ttdoc">Metadata about a directory entry.</div><div class="ttdef"><b>Definition:</b> stat.hpp:66</div></div>
+<div class="ttc" id="astructllfio__v2__xxx_1_1stat__t_html_aa08a4b9530403b4689498706b0738db4"><div class="ttname"><a href="structllfio__v2__xxx_1_1stat__t.html#aa08a4b9530403b4689498706b0738db4">llfio_v2_xxx::stat_t::fill</a></div><div class="ttdeci">result&lt; size_t &gt; fill(const handle &amp;h, want wanted=want::all) noexcept</div></div>
+<div class="ttc" id="astructllfio__v2__xxx_1_1stat__t_html_aefe8c88dad824c911fa7bf6e1baef1c4"><div class="ttname"><a href="structllfio__v2__xxx_1_1stat__t.html#aefe8c88dad824c911fa7bf6e1baef1c4">llfio_v2_xxx::stat_t::st_mtim</a></div><div class="ttdeci">std::chrono::system_clock::time_point st_mtim</div><div class="ttdef"><b>Definition:</b> stat.hpp:94</div></div>
+<div class="ttc" id="astructllfio__v2__xxx_1_1statfs__t_html"><div class="ttname"><a href="structllfio__v2__xxx_1_1statfs__t.html">llfio_v2_xxx::statfs_t</a></div><div class="ttdoc">Metadata about a filing system. Unsupported entries are all bits set.</div><div class="ttdef"><b>Definition:</b> statfs.hpp:74</div></div>
+<div class="ttc" id="astructllfio__v2__xxx_1_1statfs__t_html_a1a1a822aca4e26f793e526f1779947bb"><div class="ttname"><a href="structllfio__v2__xxx_1_1statfs__t.html#a1a1a822aca4e26f793e526f1779947bb">llfio_v2_xxx::statfs_t::fill</a></div><div class="ttdeci">result&lt; size_t &gt; fill(const handle &amp;h, want wanted=want::all) noexcept</div><div class="ttdoc">Fills in the structure with metadata, returning number of items filled in.</div></div>
+<div class="ttc" id="astructllfio__v2__xxx_1_1statfs__t_html_aa24a1f36d9addae9d0d6ab13eeb43e5d"><div class="ttname"><a href="structllfio__v2__xxx_1_1statfs__t.html#aa24a1f36d9addae9d0d6ab13eeb43e5d">llfio_v2_xxx::statfs_t::f_bsize</a></div><div class="ttdeci">uint64_t f_bsize</div><div class="ttdef"><b>Definition:</b> statfs.hpp:90</div></div>
+<div class="ttc" id="astructllfio__v2__xxx_1_1statfs__t_html_aa4a4f434ba56992244ac59c8f825a962"><div class="ttname"><a href="structllfio__v2__xxx_1_1statfs__t.html#aa4a4f434ba56992244ac59c8f825a962">llfio_v2_xxx::statfs_t::f_bavail</a></div><div class="ttdeci">uint64_t f_bavail</div><div class="ttdef"><b>Definition:</b> statfs.hpp:94</div></div>
 </div><!-- fragment -->  </td></tr>
 </table>
 <p>See <a href="https://github.com/ned14/llfio/blob/master/programs/fs-probe/fs_probe_results.yaml">https://github.com/ned14/llfio/blob/master/programs/fs-probe/fs_probe_results.yaml</a> for a database of latencies for various previously tested OS, filing systems and storage devices.</p>
