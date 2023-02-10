@@ -97,7 +97,7 @@ namespace test
   */
   template <bool is_threadsafe> class linux_io_uring_multiplexer final : public byte_io_multiplexer_impl<is_threadsafe>
   {
-    friend LLFIO_HEADERS_ONLY_FUNC_SPEC result<byte_io_multiplexer_ptr> multiplexer_linux_io_uring(size_t threads, bool is_polling) noexcept;
+    friend result<byte_io_multiplexer_ptr> multiplexer_linux_io_uring(size_t threads, bool is_polling) noexcept;
 
     using _base = byte_io_multiplexer_impl<is_threadsafe>;
     using _multiplexer_lock_guard = typename _base::_lock_guard;
