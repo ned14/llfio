@@ -81,7 +81,7 @@ public:
   // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
 
   readwrite = (read | write)};
-  QUICKCPPLIB_BITFIELD_END(flag);
+  QUICKCPPLIB_BITFIELD_END(flag)
 
 protected:
   file_handle *_backing{nullptr};

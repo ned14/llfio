@@ -202,7 +202,7 @@ public:
 
   byte_lock_insanity = uint16_t(1U << 14U),  //!< Using insane POSIX byte range locks
   anonymous_inode = uint16_t(1U << 15U)      //!< This is an inode created with no representation on the filing system
-  } QUICKCPPLIB_BITFIELD_END(flag);
+  } QUICKCPPLIB_BITFIELD_END(flag)
 
 protected:
   // vptr takes 4 or 8 bytes
