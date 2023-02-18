@@ -58,7 +58,7 @@ public:
                                    no_multiplexable_pipes = 1U << 6U,  //!< Do not create any redirected pipes as multiplexable
 
                                    // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
-                                   no_redirect = no_redirect_in_pipe | no_redirect_out_pipe | no_redirect_error_pipe} QUICKCPPLIB_BITFIELD_END(flag);
+                                   no_redirect = no_redirect_in_pipe | no_redirect_out_pipe | no_redirect_error_pipe} QUICKCPPLIB_BITFIELD_END(flag)
 
 protected:
   flag _flags{flag::none};
