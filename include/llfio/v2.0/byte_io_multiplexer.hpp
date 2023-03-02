@@ -25,8 +25,8 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef LLFIO_IO_MULTIPLEXER_H
 #define LLFIO_IO_MULTIPLEXER_H
 
-//#define LLFIO_DEBUG_PRINT
-//#define LLFIO_ENABLE_TEST_IO_MULTIPLEXERS 1
+// #define LLFIO_DEBUG_PRINT
+// #define LLFIO_ENABLE_TEST_IO_MULTIPLEXERS 1
 
 #include "handle.hpp"
 
@@ -223,6 +223,12 @@ public:
     //! Type of the length of memory.
     using size_type = size_t;
 
+  private:
+    struct _implict_span_constructor_tag
+    {
+    };
+
+  public:
     //! Default constructor
     buffer_type() = default;
     //! Constructor
@@ -231,10 +237,12 @@ public:
         , _len(len)
     {
     }
-    //! Constructor
-    constexpr buffer_type(span<byte> s) noexcept
-        : _data(s.data())
-        , _len(s.size())
+    //! Constructor taking any type acceptable to `span`.
+    LLFIO_TEMPLATE(class T)
+    LLFIO_TREQUIRES(LLFIO_TPRED(!std::is_same<typename std::decay<T>::type, buffer_type>::value && std::is_constructible<span<byte>, T>::value))
+    constexpr buffer_type(T &&s, _implict_span_constructor_tag = {}) noexcept
+        : _data(span<byte>(s).data())
+        , _len(span<byte>(s).size())
     {
     }
     buffer_type(const buffer_type &) = default;
@@ -288,6 +296,12 @@ public:
     //! Type of the length of memory.
     using size_type = size_t;
 
+  private:
+    struct _implict_span_constructor_tag
+    {
+    };
+
+  public:
     //! Default constructor
     const_buffer_type() = default;
     //! Constructor
@@ -296,22 +310,18 @@ public:
         , _len(len)
     {
     }
-    //! Constructor
-    constexpr const_buffer_type(span<const byte> s) noexcept
-        : _data(s.data())
-        , _len(s.size())
-    {
-    }
     //! Converting constructor from non-const buffer type
     constexpr const_buffer_type(buffer_type b) noexcept
         : _data(b.data())
         , _len(b.size())
     {
     }
-    //! Converting constructor from non-const buffer type
-    constexpr const_buffer_type(span<byte> s) noexcept
-        : _data(s.data())
-        , _len(s.size())
+    //! Constructor taking any type acceptable to `span`.
+    LLFIO_TEMPLATE(class T)
+    LLFIO_TREQUIRES(LLFIO_TPRED(!std::is_same<typename std::decay<T>::type, buffer_type>::value && std::is_constructible<span<const byte>, T>::value))
+    constexpr const_buffer_type(T &&s, _implict_span_constructor_tag = {}) noexcept
+        : _data(span<const byte>(s).data())
+        , _len(span<const byte>(s).size())
     {
     }
     const_buffer_type(const const_buffer_type &) = default;
@@ -494,9 +504,9 @@ public:
     {
       struct kernel_t
       {
-        uint16_t file_handle : 1;              //!< This i/o multiplexer can register plain kernel `file_handle`.
-        uint16_t pipe_handle : 1;              //!< This i/o multiplexer can register plain kernel `pipe_handle`.
-        uint16_t byte_socket_handle : 1;       //!< This i/o multiplexer can register plain kernel `byte_socket_handle`.
+        uint16_t file_handle : 1;                   //!< This i/o multiplexer can register plain kernel `file_handle`.
+        uint16_t pipe_handle : 1;                   //!< This i/o multiplexer can register plain kernel `pipe_handle`.
+        uint16_t byte_socket_handle : 1;            //!< This i/o multiplexer can register plain kernel `byte_socket_handle`.
         uint16_t listening_byte_socket_handle : 1;  //!< This i/o multiplexer can register plain kernel `listening_byte_socket_handle`.
 
         constexpr kernel_t()
@@ -530,7 +540,8 @@ public:
   virtual result<uint8_t> do_byte_io_handle_register(byte_io_handle * /*unused*/) noexcept { return (uint8_t) 0; }
   //! Implements `byte_io_handle` deregistration
   virtual result<void> do_byte_io_handle_deregister(byte_io_handle * /*unused*/) noexcept { return success(); }
-  //! Implements `listening_byte_socket_handle` registration. The bottom two bits of the returned value are set into `_v.behaviour`'s `_multiplexer_state_bit0` and
+  //! Implements `listening_byte_socket_handle` registration. The bottom two bits of the returned value are set into `_v.behaviour`'s `_multiplexer_state_bit0`
+  //! and
   //! `_multiplexer_state_bit`
   virtual result<uint8_t> do_byte_io_handle_register(listening_byte_socket_handle * /*unused*/) noexcept { return errc::operation_not_supported; }
   //! Implements `listening_byte_socket_handle` deregistration
@@ -1473,8 +1484,8 @@ public:
 
   /*! \brief Combines `.construct()` with `.init_io_operation()` in a single call for improved efficiency.
    */
-  virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, listening_byte_socket_handle *_h, io_operation_state_visitor *_visitor, deadline d,
-                                                              std::pair<byte_socket_handle, ip::address> &req) noexcept
+  virtual io_operation_state *construct_and_init_io_operation(span<byte> storage, listening_byte_socket_handle *_h, io_operation_state_visitor *_visitor,
+                                                              deadline d, std::pair<byte_socket_handle, ip::address> &req) noexcept
   {
     io_operation_state *state = construct(storage, _h, _visitor, d, req);
     if(state != nullptr)

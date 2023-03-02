@@ -115,11 +115,19 @@ public:
     //! Whether the directory was entirely read or not into any buffers supplied.
     bool done() const noexcept { return _done; }
 
+  private:
+    struct _implict_span_constructor_tag
+    {
+    };
+
+  public:
     using _base::_base;
     buffers_type() = default;
-    //! Implicit construction from a span
-    /* constexpr */ buffers_type(span<buffer_type> v)  // NOLINT TODO FIXME Make this constexpr when span becomes constexpr. SAME for move constructor below
-        : _base(v)
+    //! Constructor taking any type acceptable to `span`.
+    LLFIO_TEMPLATE(class T)
+    LLFIO_TREQUIRES(LLFIO_TPRED(!std::is_same<typename std::decay<T>::type, buffers_type>::value && std::is_constructible<span<buffer_type>, T>::value))
+    constexpr buffers_type(T &&s, _implict_span_constructor_tag = {}) noexcept
+        : _base(std::forward<T>(s))
     {
     }
     //! Construct from a span, using a kernel buffer from a preceding `buffers_type`.
