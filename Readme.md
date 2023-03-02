@@ -47,11 +47,14 @@ Examples of use (more examples: https://github.com/ned14/llfio/tree/develop/exam
 <table width="100%" border="0" cellpadding="4">
 <tr>
 <td width="50%" valign="top">
+Memory map in a file for read:
 \snippet example/mapped_file.cpp mapped_file
 
+Sparsely stored temporary disposable array:
 \snippet example/sparse_array.cpp sparse_array
 </td>
 <td width="50%" valign="top">
+Read metadata about a file and its storage:
 \snippet example/read_stats.cpp file_read_stats
 </td>
 </tr>

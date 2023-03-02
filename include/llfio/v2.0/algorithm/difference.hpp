@@ -1,5 +1,5 @@
 /* A filesystem algorithm which generates the difference between two directory trees
-(C) 2020 Niall Douglas <http://www.nedproductions.biz/> (12 commits)
+(C) 2020 - 2023 Niall Douglas <http://www.nedproductions.biz/> (12 commits)
 File Created: July 2020
 
 
@@ -25,7 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef LLFIO_ALGORITHM_DIFFERENCE_HPP
 #define LLFIO_ALGORITHM_DIFFERENCE_HPP
 
-#include "traverse.hpp"
+#include "summarize.hpp"
 
 //! \file difference.hpp Provides a directory tree difference algorithm.
 
@@ -33,26 +33,22 @@ LLFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
-  /*!
-   */
-  struct difference_item
+  struct comparison_summary
   {
-    enum change_t : uint8_t
+    struct _lr : traversal_summary
     {
-      unknown,
-      content_metadata_changed,     //!< Maximum extent or modified timestamp metadata has changed
-      noncontent_metadata_changed,  //!< Non-content metadata (perms, non-modified timestamps etc) has changed
-      file_added,                   //!< A new file was added
-      file_renamed,                 //!< A file was renamed within this tree
-      file_linked,                  //!< A hard link to something else also in this tree was added
-      file_removed,                 //!< A file was removed
-      directory_added,              //!< A new directory was added
-      directory_renamed,            //!< A directory was renamed within this tree
-      directory_removed,            //!< A directory was removed
-      symlink_added,                //!< A symlink was added
-      symlink_removed               //!< A symlink was removed
-    } changed{change_t::unknown};
-    int8_t content_comparison{0};  //!< `memcmp()` of content, if requested
+      //! The kind of difference
+      enum difference_type : uint8_t
+      {
+        entry,                //!< Entry name is here but not there
+        entry_kind,           //!< Same entry name has different kind e.g. file vs directory
+        content_metadata,     //!< Maximum extent or modified timestamp metadata is different
+        noncontent_metadata,  //!< Non-content metadata (perms, non-modified timestamps etc) is different
+        content,              //!< The content is different (if contents comparison enabled)
+        none,                 //!< There is no difference
+      };
+      traversal_summary::map_type<difference_type> differences;  //!< The number of items with the given difference
+    } left, right;
   };
   /*! \brief A visitor for the filesystem traversal and comparison algorithm.
 
@@ -63,28 +59,20 @@ namespace algorithm
   that `compare()` is entirely implemented using `traverse()`, so not calling the
   implementations here will affect operation.
   */
-  struct compare_visitor : public traverse_visitor
+  struct compare_visitor : public summarize_visitor
   {
-    //! This override ignores failures to traverse into the directory.
-    virtual result<directory_handle> directory_open_failed(void *data, result<void>::error_type &&error, const directory_handle &dirh, path_view leaf,
-                                                           size_t depth) noexcept override
+    static void accumulate(comparison_summary &acc, comparison_summary *state, const directory_handle *dirh, directory_entry &entry,
+                           stat_t::want already_have_metadata)
     {
-      (void) error;
-      (void) dirh;
-      (void) leaf;
-      (void) depth;
-      auto *state = (traversal_summary *) data;
-      lock_guard<spinlock> g(state->_lock);
-      state->directory_opens_failed++;
-      return success();  // ignore failure to enter
+      summarize_visitor::accumulate(acc, state, dirh, entry, already_have_metadata);
     }
     //! This override implements the summary
     virtual result<void> post_enumeration(void *data, const directory_handle &dirh, directory_handle::buffers_type &contents, size_t depth) noexcept override
     {
       try
       {
-        auto *state = (traversal_summary *) data;
-        traversal_summary acc;
+        auto *state = (comparison_summary *) data;
+        comparison_summary acc;
         acc.max_depth = depth;
         for(auto &entry : contents)
         {
@@ -100,32 +88,33 @@ namespace algorithm
     }
   };
 
-  /*! \brief Summarise the directory identified `dirh`, and everything therein.
+  /*! \brief Compares the directories identified by `ldirh` and `rdirh`, and everything therein.
 
-  It can be useful to summarise a directory hierarchy, especially to determine how
-  much storage it occupies, but also how many mounted filesystems it straddles etc.
-  You should specify what metadata you wish to summarise, if this is a subset of
-  what metadata `directory_handle::read()` returns, performance will be considerably
-  better. The default summarises all possible metadata.
+  This extends `summarize()` to summarise two directory hierarchies, also summarising
+  the number of types of differences between them.
+   
+  It is trivially easy to further extend this implementation to synchronise the contents of a
+  directory tree such that after completion, both trees shall be identical. See the examples
+  directory for an example of this use case.
 
   This is a trivial implementation on top of `algorithm::traverse()`, indeed it is
   implemented entirely as header code. You should review the documentation for
   `algorithm::traverse()`, as this algorithm is entirely implemented using that algorithm.
   */
-  inline result<traversal_summary> summarize(const path_handle &dirh, stat_t::want want = traversal_summary::default_metadata(),
-                                             summarize_visitor *visitor = nullptr, size_t threads = 0, bool force_slow_path = false) noexcept
+  inline result<comparison_summary> compare(const path_handle &ldirh, const path_handle &rdirh, stat_t::want want = comparison_summary::default_metadata(),
+                                              compare_visitor *visitor = nullptr, size_t threads = 0, bool force_slow_path = false) noexcept
   {
     LLFIO_LOG_FUNCTION_CALL(&dirh);
-    summarize_visitor default_visitor;
+    compare_visitor default_visitor;
     if(visitor == nullptr)
     {
       visitor = &default_visitor;
     }
-    result<traversal_summary> state(in_place_type<traversal_summary>);
+    result<comparison_summary> state(in_place_type<comparison_summary>);
     state.assume_value().want = want;
     directory_entry entry{{}, stat_t(nullptr)};
     OUTCOME_TRY(entry.stat.fill(dirh, want));
-    OUTCOME_TRY(summarize_visitor::accumulate(state.assume_value(), &state.assume_value(), nullptr, entry, want));
+    OUTCOME_TRY(compare_visitor::accumulate(state.assume_value(), &state.assume_value(), nullptr, entry, want));
     OUTCOME_TRY(traverse(dirh, visitor, threads, &state.assume_value(), force_slow_path));
     return state;
   }
