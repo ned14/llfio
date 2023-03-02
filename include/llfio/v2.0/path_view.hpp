@@ -35,6 +35,7 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 
 #include "quickcpplib/algorithm/hash.hpp"
+#include "quickcpplib/algorithm/string.hpp"
 
 //! \file path_view.hpp Provides view of a path
 
@@ -650,10 +651,7 @@ public:
   path_view_component &operator=(path_view_component &&) = default;
   ~path_view_component() = default;
 
-  const byte *_raw_data() const noexcept
-  {
-    return _bytestr;
-  }
+  const byte *_raw_data() const noexcept { return _bytestr; }
 
   //! Swap the view with another
   constexpr void swap(path_view_component &o) noexcept
@@ -664,10 +662,7 @@ public:
   }
 
   //! True if empty
-  LLFIO_NODISCARD constexpr bool empty() const noexcept
-  {
-    return _length == 0;
-  }
+  LLFIO_NODISCARD constexpr bool empty() const noexcept { return _length == 0; }
 
   //! Returns the size of the view in characters.
   LLFIO_PATH_VIEW_CONSTEXPR size_t native_size() const noexcept
@@ -676,32 +671,17 @@ public:
   }
 
   //! How path separators shall be interpreted
-  constexpr format formatting() const noexcept
-  {
-    return _format;
-  }
+  constexpr format formatting() const noexcept { return _format; }
 
   //! True if input is declared to be zero terminated
-  constexpr bool has_zero_termination() const noexcept
-  {
-    return _zero_terminated;
-  }
+  constexpr bool has_zero_termination() const noexcept { return _zero_terminated; }
   //! The zero termination during construction
-  constexpr enum zero_termination zero_termination() const noexcept
-  {
-    return _zero_terminated ? zero_terminated : not_zero_terminated;
-  }
+  constexpr enum zero_termination zero_termination() const noexcept { return _zero_terminated ? zero_terminated : not_zero_terminated; }
 
   //! True if `stem()` returns a non-empty path.
-  LLFIO_PATH_VIEW_CONSTEXPR bool has_stem() const noexcept
-  {
-    return !stem().empty();
-  }
+  LLFIO_PATH_VIEW_CONSTEXPR bool has_stem() const noexcept { return !stem().empty(); }
   //! True if `extension()` returns a non-empty path.
-  LLFIO_PATH_VIEW_CONSTEXPR bool has_extension() const noexcept
-  {
-    return !extension().empty();
-  }
+  LLFIO_PATH_VIEW_CONSTEXPR bool has_extension() const noexcept { return !extension().empty(); }
 
   //! True if the view contains any of the characters `*`, `?`, (POSIX only: `[` or `]`).
   LLFIO_PATH_VIEW_CONSTEXPR bool contains_glob() const noexcept
@@ -770,10 +750,7 @@ private:
   }
 #endif
 #ifdef LLFIO_USING_EXPERIMENTAL_FILESYSTEM
-  template <class CharT> static filesystem::path _path_from_char_array(basic_string_view<CharT> v)
-  {
-    return {v.data(), v.data() + v.size()};
-  }
+  template <class CharT> static filesystem::path _path_from_char_array(basic_string_view<CharT> v) { return {v.data(), v.data() + v.size()}; }
   static filesystem::path _path_from_char_array(basic_string_view<char8_t> v)
   {
 #if(__cplusplus >= 202000 || _HAS_CXX20) && (!defined(_LIBCPP_VERSION) || _LIBCPP_VERSION > 10000 /* approx start of 2020 */)
@@ -784,10 +761,7 @@ private:
   }
 #endif
 
-  template <class CharT> static int _do_compare(const CharT *a, const CharT *b, size_t length) noexcept
-  {
-    return memcmp(a, b, length * sizeof(CharT));
-  }
+  template <class CharT> static int _do_compare(const CharT *a, const CharT *b, size_t length) noexcept { return memcmp(a, b, length * sizeof(CharT)); }
   static int _do_compare(const char8_t *_a, const char8_t *_b, size_t length) noexcept
   {
 #if LLFIO_PATH_VIEW_CHAR8_TYPE_EMULATED
@@ -1421,10 +1395,7 @@ public:
         , _deleter2(std::move(o._deleter2))
     {
     }
-    ~rendered_path()
-    {
-      reset();
-    }
+    ~rendered_path() { reset(); }
     rendered_path(const rendered_path &) = delete;
     rendered_path(rendered_path &&o) noexcept
         : _base(o)
@@ -1486,53 +1457,26 @@ public:
     }
 
     //! The zero termination of this rendered path
-    static constexpr enum zero_termination zero_termination() noexcept
-    {
-      return ZeroTermination;
-    }
+    static constexpr enum zero_termination zero_termination() noexcept { return ZeroTermination; }
     //! The size of the internal buffer
-    static constexpr size_t internal_buffer_size() noexcept
-    {
-      return (_internal_buffer_size > 0) ? _internal_buffer_size : 1;
-    }
+    static constexpr size_t internal_buffer_size() noexcept { return (_internal_buffer_size > 0) ? _internal_buffer_size : 1; }
     //! The storage capacity, which may be larger than `size()` if the internal buffer is in use
-    size_t capacity() const noexcept
-    {
-      return (this->data() == _buffer) ? internal_buffer_size() : this->size();
-    }
+    size_t capacity() const noexcept { return (this->data() == _buffer) ? internal_buffer_size() : this->size(); }
     //! True if this rendered path refers to the source path view
-    bool references_source() const noexcept
-    {
-      return this->data() != _buffer && _bytes_to_delete == 0;
-    }
+    bool references_source() const noexcept { return this->data() != _buffer && _bytes_to_delete == 0; }
 
     //! Access the custom deleter instance passed to the constructor
-    const AllocatorOrDeleter &deleter() const noexcept
-    {
-      return _deleter2;
-    }
+    const AllocatorOrDeleter &deleter() const noexcept { return _deleter2; }
     //! Access the custom deleter instance passed to the constructor
-    AllocatorOrDeleter &deleter() noexcept
-    {
-      return _deleter2;
-    }
+    AllocatorOrDeleter &deleter() noexcept { return _deleter2; }
 
     //! The memory resource passed to the constructor
-    pmr::memory_resource *memory_resource() noexcept
-    {
-      return (pmr::memory_resource *) _deleter1arg;
-    }
+    pmr::memory_resource *memory_resource() noexcept { return (pmr::memory_resource *) _deleter1arg; }
 
     //! Access the custom allocator instance passed to the constructor
-    const AllocatorOrDeleter &allocator() const noexcept
-    {
-      return _deleter2;
-    }
+    const AllocatorOrDeleter &allocator() const noexcept { return _deleter2; }
     //! Access the custom allocator instance passed to the constructor
-    AllocatorOrDeleter &allocator() noexcept
-    {
-      return _deleter2;
-    }
+    AllocatorOrDeleter &allocator() noexcept { return _deleter2; }
 
     //! True if the bits backing the rendered path are identical
     bool operator==(const rendered_path &o) const noexcept
@@ -1636,7 +1580,7 @@ public:
 
 #ifdef __cpp_concepts
   template <enum path_view_component::zero_termination ZeroTermination, class T, class Deleter, size_t _internal_buffer_size>
-  requires(is_source_acceptable<T>)
+    requires(is_source_acceptable<T>)
 #elif defined(_MSC_VER)
   template <enum path_view_component::zero_termination ZeroTermination, class T, class Deleter, size_t _internal_buffer_size, class>
 #else
@@ -2129,35 +2073,17 @@ public:
   path_view &operator=(path_view &&p) noexcept = default;
 
   //! True if has root path
-  LLFIO_PATH_VIEW_CONSTEXPR bool has_root_path() const noexcept
-  {
-    return !root_path().empty();
-  }
+  LLFIO_PATH_VIEW_CONSTEXPR bool has_root_path() const noexcept { return !root_path().empty(); }
   //! True if has root name
-  LLFIO_PATH_VIEW_CONSTEXPR bool has_root_name() const noexcept
-  {
-    return !root_name().empty();
-  }
+  LLFIO_PATH_VIEW_CONSTEXPR bool has_root_name() const noexcept { return !root_name().empty(); }
   //! True if has root directory
-  LLFIO_PATH_VIEW_CONSTEXPR bool has_root_directory() const noexcept
-  {
-    return !root_directory().empty();
-  }
+  LLFIO_PATH_VIEW_CONSTEXPR bool has_root_directory() const noexcept { return !root_directory().empty(); }
   //! True if has relative path
-  LLFIO_PATH_VIEW_CONSTEXPR bool has_relative_path() const noexcept
-  {
-    return !relative_path().empty();
-  }
+  LLFIO_PATH_VIEW_CONSTEXPR bool has_relative_path() const noexcept { return !relative_path().empty(); }
   //! True if has parent path
-  LLFIO_PATH_VIEW_CONSTEXPR bool has_parent_path() const noexcept
-  {
-    return !parent_path().empty();
-  }
+  LLFIO_PATH_VIEW_CONSTEXPR bool has_parent_path() const noexcept { return !parent_path().empty(); }
   //! True if has filename
-  LLFIO_PATH_VIEW_CONSTEXPR bool has_filename() const noexcept
-  {
-    return !filename().empty();
-  }
+  LLFIO_PATH_VIEW_CONSTEXPR bool has_filename() const noexcept { return !filename().empty(); }
   //! True if absolute
   constexpr bool is_absolute() const noexcept
   {
@@ -2185,10 +2111,7 @@ public:
 #endif
   }
   //! True if relative
-  constexpr bool is_relative() const noexcept
-  {
-    return !is_absolute();
-  }
+  constexpr bool is_relative() const noexcept { return !is_absolute(); }
 #ifdef _WIN32
   // True if the path view is a NT kernel path starting with `\!!\` or `\??\`
   constexpr bool is_ntpath() const noexcept
@@ -2466,10 +2389,7 @@ public:
 #endif
   }
   //! Returns a view of the filename part of this view.
-  LLFIO_PATH_VIEW_CONSTEXPR path_view filename() const noexcept
-  {
-    return this->_filename();
-  }
+  LLFIO_PATH_VIEW_CONSTEXPR path_view filename() const noexcept { return this->_filename(); }
   //! Returns a view of this view without a trailing separator, if there is one, unless the input is '/'
   LLFIO_PATH_VIEW_CONSTEXPR path_view without_trailing_separator() const noexcept
   {
@@ -2609,14 +2529,14 @@ namespace detail
     }
     LLFIO_PATH_VIEW_CONSTEXPR void _inc() noexcept
     {
-      //std::cout << "ENTRY: _inc begin = " << _begin << " end = " << _end << " inc_state = " << (int) _inc_state << " dec_state = " << (int) _dec_state
-      //          << " string = " << **this << std::endl;
-      //auto onexit = make_scope_exit(
+      // std::cout << "ENTRY: _inc begin = " << _begin << " end = " << _end << " inc_state = " << (int) _inc_state << " dec_state = " << (int) _dec_state
+      //           << " string = " << **this << std::endl;
+      // auto onexit = make_scope_exit(
       //[&]() noexcept
       //{
-      //  std::cout << "EXIT: _inc begin = " << _begin << " end = " << _end << " inc_state = " << (int) _inc_state << " dec_state = " << (int) _dec_state
-      //            << " string = " << **this << std::endl;
-      //});
+      //   std::cout << "EXIT: _inc begin = " << _begin << " end = " << _end << " inc_state = " << (int) _inc_state << " dec_state = " << (int) _dec_state
+      //             << " string = " << **this << std::endl;
+      // });
       if(_dec_state != _at::unused)
       {
         assert(_inc_state == _at::unused);
@@ -2636,8 +2556,8 @@ namespace detail
       }
       do
       {
-        //std::cout << "ITER: _inc begin = " << _begin << " end = " << _end << " inc_state = " << (int) _inc_state << " dec_state = " << (int) _dec_state
-        //           << " string = " << **this << std::endl;
+        // std::cout << "ITER: _inc begin = " << _begin << " end = " << _end << " inc_state = " << (int) _inc_state << " dec_state = " << (int) _dec_state
+        //            << " string = " << **this << std::endl;
         _begin = (_end > 0 && _state_not_special()) ? (_end + 1) : _end;
         _end = _parent->_find_first_sep(_begin);
       } while(_state_not_special() && _begin == _end && _end != 0);
@@ -2698,14 +2618,14 @@ namespace detail
     }
     constexpr void _dec() noexcept
     {
-      //std::cout << "ENTRY: _dec begin = " << _begin << " end = " << _end << " inc_state = " << (int) _inc_state << " dec_state = " << (int) _dec_state
-      //          << " string = " << **this << std::endl;
-      //auto onexit = make_scope_exit(
+      // std::cout << "ENTRY: _dec begin = " << _begin << " end = " << _end << " inc_state = " << (int) _inc_state << " dec_state = " << (int) _dec_state
+      //           << " string = " << **this << std::endl;
+      // auto onexit = make_scope_exit(
       //[&]() noexcept
       //{
-      //  std::cout << "EXIT: _dec begin = " << _begin << " end = " << _end << " inc_state = " << (int) _inc_state << " dec_state = " << (int) _dec_state
-      //            << " string = " << **this << std::endl;
-      //});
+      //   std::cout << "EXIT: _dec begin = " << _begin << " end = " << _end << " inc_state = " << (int) _inc_state << " dec_state = " << (int) _dec_state
+      //             << " string = " << **this << std::endl;
+      // });
       if(_inc_state != _at::unused)
       {
         assert(_dec_state == _at::unused);
@@ -2741,8 +2661,8 @@ namespace detail
       do
       {
         auto is_end = _is_end();
-        //std::cout << "ITER: _dec begin = " << _begin << " end = " << _end << " inc_state = " << (int) _inc_state << " dec_state = " << (int) _dec_state
-        //          << " is_end = " << is_end << " unc_prefix_end = " << unc_prefix_end << " string = " << **this << std::endl;
+        // std::cout << "ITER: _dec begin = " << _begin << " end = " << _end << " inc_state = " << (int) _inc_state << " dec_state = " << (int) _dec_state
+        //           << " is_end = " << is_end << " unc_prefix_end = " << unc_prefix_end << " string = " << **this << std::endl;
         _end = is_end ? _begin : (_begin - 1);
         if(0 == _end)
         {
@@ -2841,22 +2761,10 @@ namespace detail
     path_view_iterator &operator=(path_view_iterator &&) = default;
     ~path_view_iterator() = default;
 
-    LLFIO_PATH_VIEW_CONSTEXPR const_reference operator*() const noexcept
-    {
-      return _get();
-    }
-    LLFIO_PATH_VIEW_CONSTEXPR reference operator*() noexcept
-    {
-      return _get();
-    }
-    LLFIO_PATH_VIEW_CONSTEXPR const_pointer operator->() const noexcept
-    {
-      return _get();
-    }
-    LLFIO_PATH_VIEW_CONSTEXPR pointer operator->() noexcept
-    {
-      return _get();
-    }
+    LLFIO_PATH_VIEW_CONSTEXPR const_reference operator*() const noexcept { return _get(); }
+    LLFIO_PATH_VIEW_CONSTEXPR reference operator*() noexcept { return _get(); }
+    LLFIO_PATH_VIEW_CONSTEXPR const_pointer operator->() const noexcept { return _get(); }
+    LLFIO_PATH_VIEW_CONSTEXPR pointer operator->() noexcept { return _get(); }
 
     constexpr bool operator!=(path_view_iterator o) const noexcept
     {
@@ -3024,7 +2932,7 @@ inline LLFIO_PATH_VIEW_CONSTEXPR size_t hash_value(path_view x) noexcept
 }
 #ifdef __cpp_concepts
 template <class T, class Deleter, size_t _internal_buffer_size>
-requires(path_view::is_source_acceptable<T>)
+  requires(path_view::is_source_acceptable<T>)
 #elif defined(_MSC_VER)
 template <class T, class Deleter, size_t _internal_buffer_size, class>
 #else
@@ -3053,7 +2961,7 @@ constexpr inline int path_view::compare(path_view o, const std::locale &loc) con
 }
 #ifdef __cpp_concepts
 template <class T, class Deleter, size_t _internal_buffer_size>
-requires(path_view::is_source_acceptable<T>)
+  requires(path_view::is_source_acceptable<T>)
 #elif defined(_MSC_VER)
 template <class T, class Deleter, size_t _internal_buffer_size, class>
 #else
@@ -3122,10 +3030,7 @@ namespace detail
       ret.assign(_.begin(), _.end());
     }
 #endif
-    template <class T> void operator()(span<T> /*unused*/)
-    {
-      throw std::logic_error("filesystem::path cannot be constructed from a byte input.");
-    }
+    template <class T> void operator()(span<T> /*unused*/) { throw std::logic_error("filesystem::path cannot be constructed from a byte input."); }
   };
 }  // namespace detail
 //! Append a path view component to a path view component
