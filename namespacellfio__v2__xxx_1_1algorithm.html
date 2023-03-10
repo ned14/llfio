@@ -26,7 +26,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LLFIO
-   &#160;<span id="projectnumber">v2.00 late beta</span>
+   &#160;<span id="projectnumber">v2.00</span>
    </div>
   </td>
  </tr>
@@ -109,7 +109,7 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1contents__visitor.html">contents_visitor</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A visitor for the filesystem contents algorithm.  <a href="structllfio__v2__xxx_1_1algorithm_1_1contents__visitor.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1difference__item.html">difference_item</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1comparison__summary.html">comparison_summary</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html">compare_visitor</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A visitor for the filesystem traversal and comparison algorithm.  <a href="structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html#details">More...</a><br /></td></tr>
@@ -154,12 +154,15 @@ Functions</h2></td></tr>
 <tr class="memitem:afae251fc3bfb7280b47b6135e2f6c7e2"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1contents__visitor_1_1contents__type.html">contents_visitor::contents_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#afae251fc3bfb7280b47b6135e2f6c7e2">contents</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;dirh, <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1contents__visitor.html">contents_visitor</a> *visitor=nullptr, size_t threads=0, bool force_slow_path=false) noexcept</td></tr>
 <tr class="memdesc:afae251fc3bfb7280b47b6135e2f6c7e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the contents of everything within and under <code>dirh</code>. What is returned is unordered.  <a href="namespacellfio__v2__xxx_1_1algorithm.html#afae251fc3bfb7280b47b6135e2f6c7e2">More...</a><br /></td></tr>
 <tr class="separator:afae251fc3bfb7280b47b6135e2f6c7e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6165d32704ff21b4aed3046f11b31cb0"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html">traversal_summary</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a6165d32704ff21b4aed3046f11b31cb0">summarize</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;dirh, stat_t::want want=<a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#a8904eee9435edf3562642294046c634e">traversal_summary::default_metadata</a>(), <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1summarize__visitor.html">summarize_visitor</a> *visitor=nullptr, size_t threads=0, bool force_slow_path=false) noexcept</td></tr>
-<tr class="memdesc:a6165d32704ff21b4aed3046f11b31cb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Summarise the directory identified <code>dirh</code>, and everything therein.  <a href="namespacellfio__v2__xxx_1_1algorithm.html#a6165d32704ff21b4aed3046f11b31cb0">More...</a><br /></td></tr>
-<tr class="separator:a6165d32704ff21b4aed3046f11b31cb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a2e359ecdc0aa1fb4f253e701944485"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1comparison__summary.html">comparison_summary</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a7a2e359ecdc0aa1fb4f253e701944485">compare</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;ldirh, const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;rdirh, stat_t::want want=comparison_summary::default_metadata(), <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html">compare_visitor</a> *visitor=nullptr, size_t threads=0, bool force_slow_path=false) noexcept</td></tr>
+<tr class="memdesc:a7a2e359ecdc0aa1fb4f253e701944485"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compares the directories identified by <code>ldirh</code> and <code>rdirh</code>, and everything therein.  <a href="namespacellfio__v2__xxx_1_1algorithm.html#a7a2e359ecdc0aa1fb4f253e701944485">More...</a><br /></td></tr>
+<tr class="separator:a7a2e359ecdc0aa1fb4f253e701944485"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a05594f7c8ae275fa65b2acd57cc9b8ac"><td class="memItemLeft" align="right" valign="top">result&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a05594f7c8ae275fa65b2acd57cc9b8ac">reduce</a> (<a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;&amp;dirh, <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1reduce__visitor.html">reduce_visitor</a> *visitor=nullptr, size_t threads=0, bool force_slow_path=false) noexcept</td></tr>
 <tr class="memdesc:a05594f7c8ae275fa65b2acd57cc9b8ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reduce the directory identified <code>dirh</code>, and everything therein, to the null set.  <a href="namespacellfio__v2__xxx_1_1algorithm.html#a05594f7c8ae275fa65b2acd57cc9b8ac">More...</a><br /></td></tr>
 <tr class="separator:a05594f7c8ae275fa65b2acd57cc9b8ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a02a02e4a3c60a5cb18bd284194ce9c59"><td class="memItemLeft" align="right" valign="top">result&lt; <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html">traversal_summary</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a02a02e4a3c60a5cb18bd284194ce9c59">summarize</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;topdirh, stat_t::want want=<a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#a8904eee9435edf3562642294046c634e">traversal_summary::default_metadata</a>(), <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1summarize__visitor.html">summarize_visitor</a> *visitor=nullptr, size_t threads=0, bool force_slow_path=false) noexcept</td></tr>
+<tr class="memdesc:a02a02e4a3c60a5cb18bd284194ce9c59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Summarise the directory identified <code>topdirh</code>, and everything therein.  <a href="namespacellfio__v2__xxx_1_1algorithm.html#a02a02e4a3c60a5cb18bd284194ce9c59">More...</a><br /></td></tr>
+<tr class="separator:a02a02e4a3c60a5cb18bd284194ce9c59"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae068bc16598189811d0ce2b3530f1de7"><td class="memItemLeft" align="right" valign="top">result&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#ae068bc16598189811d0ce2b3530f1de7">traverse</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;dirh, <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html">traverse_visitor</a> *visitor, size_t threads=0, void *data=nullptr, bool force_slow_path=false) noexcept</td></tr>
 <tr class="memdesc:ae068bc16598189811d0ce2b3530f1de7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Traverse everything within and under <code>dirh</code>.  <a href="namespacellfio__v2__xxx_1_1algorithm.html#ae068bc16598189811d0ce2b3530f1de7">More...</a><br /></td></tr>
 <tr class="separator:ae068bc16598189811d0ce2b3530f1de7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -362,6 +365,87 @@ template&lt;class T , class... Args&gt; </div>
 
 </div>
 </div>
+<a id="a7a2e359ecdc0aa1fb4f253e701944485"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7a2e359ecdc0aa1fb4f253e701944485">&#9670;&nbsp;</a></span>compare()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">result&lt;<a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1comparison__summary.html">comparison_summary</a>&gt; llfio_v2_xxx::algorithm::compare </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>ldirh</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td>
+          <td class="paramname"><em>rdirh</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">stat_t::want&#160;</td>
+          <td class="paramname"><em>want</em> = <code>comparison_summary::default_metadata()</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html">compare_visitor</a> *&#160;</td>
+          <td class="paramname"><em>visitor</em> = <code>nullptr</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>threads</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>force_slow_path</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Compares the directories identified by <code>ldirh</code> and <code>rdirh</code>, and everything therein. </p>
+<p>This extends <code>summarize()</code> to summarise two directory hierarchies, also summarising the number of types of differences between them.</p>
+<p>It is trivially easy to further extend this implementation to synchronise the contents of a directory tree such that after completion, both trees shall be identical. See the examples directory for an example of this use case.</p>
+<p>This is a trivial implementation on top of <code>algorithm::traverse()</code>, indeed it is implemented entirely as header code. You should review the documentation for <code>algorithm::traverse()</code>, as this algorithm is entirely implemented using that algorithm. </p>
+<div class="fragment"><div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  {</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    LLFIO_LOG_FUNCTION_CALL(&amp;dirh);</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    compare_visitor default_visitor;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="keywordflow">if</span>(visitor == <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    {</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;      visitor = &amp;default_visitor;</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    }</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    result&lt;comparison_summary&gt; state(in_place_type&lt;comparison_summary&gt;);</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    state.assume_value().want = want;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    directory_entry entry{{}, stat_t(<span class="keyword">nullptr</span>)};</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    OUTCOME_TRY(entry.stat.fill(dirh, want));</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    OUTCOME_TRY(compare_visitor::accumulate(state.assume_value(), &amp;state.assume_value(), <span class="keyword">nullptr</span>, entry, want));</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    OUTCOME_TRY(<a class="code" href="namespacellfio__v2__xxx_1_1algorithm.html#ae068bc16598189811d0ce2b3530f1de7">traverse</a>(dirh, visitor, threads, &amp;state.assume_value(), force_slow_path));</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="keywordflow">return</span> state;</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  }</div>
+<div class="ttc" id="anamespacellfio__v2__xxx_1_1algorithm_html_ae068bc16598189811d0ce2b3530f1de7"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1algorithm.html#ae068bc16598189811d0ce2b3530f1de7">llfio_v2_xxx::algorithm::traverse</a></div><div class="ttdeci">result&lt; size_t &gt; traverse(const path_handle &amp;dirh, traverse_visitor *visitor, size_t threads=0, void *data=nullptr, bool force_slow_path=false) noexcept</div><div class="ttdoc">Traverse everything within and under dirh.</div></div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="afae251fc3bfb7280b47b6135e2f6c7e2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#afae251fc3bfb7280b47b6135e2f6c7e2">&#9670;&nbsp;</a></span>contents()</h2>
 
@@ -423,7 +507,6 @@ template&lt;class T , class... Args&gt; </div>
 <div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    OUTCOME_TRY(<a class="code" href="namespacellfio__v2__xxx_1_1algorithm.html#ae068bc16598189811d0ce2b3530f1de7">traverse</a>(dirh, visitor, threads, &amp;state, force_slow_path));</div>
 <div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    <span class="keywordflow">return</span> {std::move(state.contents)};</div>
 <div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;  }</div>
-<div class="ttc" id="anamespacellfio__v2__xxx_1_1algorithm_html_ae068bc16598189811d0ce2b3530f1de7"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1algorithm.html#ae068bc16598189811d0ce2b3530f1de7">llfio_v2_xxx::algorithm::traverse</a></div><div class="ttdeci">result&lt; size_t &gt; traverse(const path_handle &amp;dirh, traverse_visitor *visitor, size_t threads=0, void *data=nullptr, bool force_slow_path=false) noexcept</div><div class="ttdoc">Traverse everything within and under dirh.</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -576,8 +659,8 @@ template&lt;class T , class... Args&gt; </div>
 
 </div>
 </div>
-<a id="a6165d32704ff21b4aed3046f11b31cb0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6165d32704ff21b4aed3046f11b31cb0">&#9670;&nbsp;</a></span>summarize()</h2>
+<a id="a02a02e4a3c60a5cb18bd284194ce9c59"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a02a02e4a3c60a5cb18bd284194ce9c59">&#9670;&nbsp;</a></span>summarize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -586,7 +669,7 @@ template&lt;class T , class... Args&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">result&lt; <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html">traversal_summary</a> &gt; llfio_v2_xxx::algorithm::summarize </td>
+          <td class="memname">result&lt;<a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html">traversal_summary</a>&gt; llfio_v2_xxx::algorithm::summarize </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td>
           <td class="paramname"><em>topdirh</em>, </td>
@@ -628,28 +711,33 @@ template&lt;class T , class... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Summarise the directory identified <code>dirh</code>, and everything therein. </p>
-<p>Summarise the directory identified <code>topdirh</code>, and everything therein.</p>
-<p>It can be useful to summarise a directory hierarchy, especially to determine how much storage it occupies, but also how many mounted filesystems it straddles etc. You should specify what metadata you wish to summarise, if this is a subset of what metadata <code>directory_handle::read()</code> returns, performance will be considerably better. The default summarises all possible metadata.</p>
-<p>This is a trivial implementation on top of <code>algorithm::traverse()</code>, indeed it is implemented entirely as header code. You should review the documentation for <code>algorithm::traverse()</code>, as this algorithm is entirely implemented using that algorithm.</p>
+<p>Summarise the directory identified <code>topdirh</code>, and everything therein. </p>
 <p>It can be useful to summarise a directory hierarchy, especially to determine how much storage it occupies, but also how many mounted filesystems it straddles etc. You should specify what metadata you wish to summarise, if this is a subset of what metadata <code>directory_handle::read()</code> returns, performance will be considerably better. The default summarises all possible metadata.</p>
 <p>Most errors during summary are accumulated into <code>stats_failed</code> and <code>directory_opens_failed</code>, rather than failing the summary.</p>
 <p>This is a trivial implementation on top of <code>algorithm::traverse()</code>, indeed it is implemented entirely as header code. You should review the documentation for <code>algorithm::traverse()</code>, as this algorithm is entirely implemented using that algorithm. </p>
-<div class="fragment"><div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  {</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    LLFIO_LOG_FUNCTION_CALL(&amp;dirh);</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    summarize_visitor default_visitor;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="keywordflow">if</span>(visitor == <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    {</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;      visitor = &amp;default_visitor;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    }</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    result&lt;traversal_summary&gt; state(in_place_type&lt;traversal_summary&gt;);</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    state.assume_value().want = want;</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    directory_entry entry{{}, stat_t(<span class="keyword">nullptr</span>)};</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    OUTCOME_TRY(entry.stat.fill(dirh, want));</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    OUTCOME_TRY(summarize_visitor::accumulate(state.assume_value(), &amp;state.assume_value(), <span class="keyword">nullptr</span>, entry, want));</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    OUTCOME_TRY(<a class="code" href="namespacellfio__v2__xxx_1_1algorithm.html#ae068bc16598189811d0ce2b3530f1de7">traverse</a>(dirh, visitor, threads, &amp;state.assume_value(), force_slow_path));</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keywordflow">return</span> state;</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;  {</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;    LLFIO_LOG_FUNCTION_CALL(&amp;topdirh);</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    summarize_visitor default_visitor;</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    <span class="keywordflow">if</span>(visitor == <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    {</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;      visitor = &amp;default_visitor;</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    }</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    result&lt;traversal_summary&gt; state(in_place_type&lt;traversal_summary&gt;);</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    state.assume_value().want = want;</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    directory_entry entry{{}, stat_t(<span class="keyword">nullptr</span>)};</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    directory_handle _dirh;</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    <span class="keywordflow">if</span>(!topdirh.is_directory())</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    {</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;      OUTCOME_TRY(_dirh, <a class="code" href="namespacellfio__v2__xxx.html#a3d112d170c1d485e1120de06eef02375">directory_handle::directory</a>(topdirh, {}));</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;    }</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    <span class="keyword">const</span> path_handle &amp;dirh = _dirh.is_valid() ? _dirh : topdirh;</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    <span class="comment">// We should fail here if we can&#39;t stat topdirh</span></div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    OUTCOME_TRY(entry.stat.fill(dirh, want));</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    summarize_visitor::accumulate(state.assume_value(), &amp;state.assume_value(), <span class="keyword">nullptr</span>, entry, want);</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    OUTCOME_TRY(<a class="code" href="namespacellfio__v2__xxx_1_1algorithm.html#ae068bc16598189811d0ce2b3530f1de7">traverse</a>(dirh, visitor, threads, &amp;state.assume_value(), force_slow_path));</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    <span class="keywordflow">return</span> state;</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;  }</div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_a3d112d170c1d485e1120de06eef02375"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a3d112d170c1d485e1120de06eef02375">llfio_v2_xxx::directory</a></div><div class="ttdeci">result&lt; directory_handle &gt; directory(const path_handle &amp;base, directory_handle::path_view_type path, directory_handle::mode _mode=directory_handle::mode::read, directory_handle::creation _creation=directory_handle::creation::open_existing, directory_handle::caching _caching=directory_handle::caching::all, directory_handle::flag flags=directory_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> directory_handle.hpp:427</div></div>
 </div><!-- fragment -->
 </div>
 </div>

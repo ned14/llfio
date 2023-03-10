@@ -21,6 +21,7 @@ var hierarchy =
     [ "llfio_v2_xxx::dynamic_thread_pool_group::io_aware_work_item::byte_io_handle_awareness", "structllfio__v2__xxx_1_1dynamic__thread__pool__group_1_1io__aware__work__item_1_1byte__io__handle__awareness.html", null ],
     [ "llfio_v2_xxx::map_handle::cache_statistics", "structllfio__v2__xxx_1_1map__handle_1_1cache__statistics.html", null ],
     [ "llfio_v2_xxx::byte_io_multiplexer::check_for_any_completed_io_statistics", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1check__for__any__completed__io__statistics.html", null ],
+    [ "llfio_v2_xxx::algorithm::comparison_summary", "structllfio__v2__xxx_1_1algorithm_1_1comparison__summary.html", null ],
     [ "llfio_v2_xxx::byte_io_multiplexer::const_buffer_type", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1const__buffer__type.html", null ],
     [ "llfio_v2_xxx::symlink_handle::const_buffers_type", "structllfio__v2__xxx_1_1symlink__handle_1_1const__buffers__type.html", null ],
     [ "llfio_v2_xxx::construct< T >", "structllfio__v2__xxx_1_1construct.html", null ],
@@ -38,7 +39,6 @@ var hierarchy =
     [ "llfio_v2_xxx::construct< section_handle >", "structllfio__v2__xxx_1_1construct_3_01section__handle_01_4.html", null ],
     [ "llfio_v2_xxx::construct< symlink_handle >", "structllfio__v2__xxx_1_1construct_3_01symlink__handle_01_4.html", null ],
     [ "llfio_v2_xxx::deadline", "structllfio__v2__xxx_1_1deadline.html", null ],
-    [ "llfio_v2_xxx::algorithm::difference_item", "structllfio__v2__xxx_1_1algorithm_1_1difference__item.html", null ],
     [ "llfio_v2_xxx::directory_entry", "structllfio__v2__xxx_1_1directory__entry.html", null ],
     [ "llfio_v2_xxx::path_discovery::discovered_path", "structllfio__v2__xxx_1_1path__discovery_1_1discovered__path.html", null ],
     [ "llfio_v2_xxx::dynamic_thread_pool_group", "classllfio__v2__xxx_1_1dynamic__thread__pool__group.html", null ],
@@ -180,12 +180,15 @@ var hierarchy =
     [ "llfio_v2_xxx::tls_socket_source", "classllfio__v2__xxx_1_1tls__socket__source.html", null ],
     [ "llfio_v2_xxx::tls_socket_source_implementation_information", "structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html", null ],
     [ "llfio_v2_xxx::tls_socket_source_registry", "classllfio__v2__xxx_1_1tls__socket__source__registry.html", null ],
-    [ "llfio_v2_xxx::algorithm::traversal_summary", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html", null ],
+    [ "llfio_v2_xxx::algorithm::traversal_summary", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html", [
+      [ "llfio_v2_xxx::algorithm::comparison_summary::_lr", "structllfio__v2__xxx_1_1algorithm_1_1comparison__summary_1_1__lr.html", null ]
+    ] ],
     [ "llfio_v2_xxx::algorithm::traverse_visitor", "structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html", [
-      [ "llfio_v2_xxx::algorithm::compare_visitor", "structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html", null ],
       [ "llfio_v2_xxx::algorithm::contents_visitor", "structllfio__v2__xxx_1_1algorithm_1_1contents__visitor.html", null ],
       [ "llfio_v2_xxx::algorithm::reduce_visitor", "structllfio__v2__xxx_1_1algorithm_1_1reduce__visitor.html", null ],
-      [ "llfio_v2_xxx::algorithm::summarize_visitor", "structllfio__v2__xxx_1_1algorithm_1_1summarize__visitor.html", null ]
+      [ "llfio_v2_xxx::algorithm::summarize_visitor", "structllfio__v2__xxx_1_1algorithm_1_1summarize__visitor.html", [
+        [ "llfio_v2_xxx::algorithm::compare_visitor", "structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html", null ]
+      ] ]
     ] ],
     [ "llfio_v2_xxx::algorithm::impl::trivial_vector_impl< has_default_construction, T >", "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html", null ],
     [ "llfio_v2_xxx::algorithm::impl::trivial_vector_impl< false, T >", "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html", [

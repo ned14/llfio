@@ -26,7 +26,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LLFIO
-   &#160;<span id="projectnumber">v2.00 late beta</span>
+   &#160;<span id="projectnumber">v2.00</span>
    </div>
   </td>
  </tr>
@@ -93,11 +93,13 @@ $(document).ready(function(){initNavTree('difference_8hpp.html',''); initResizab
 
 <p>Provides a directory tree difference algorithm.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;<a class="el" href="traverse_8hpp.html">traverse.hpp</a>&quot;</code><br />
+<div class="textblock"><code>#include &quot;<a class="el" href="summarize_8hpp.html">summarize.hpp</a>&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1difference__item.html">llfio_v2_xxx::algorithm::difference_item</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1comparison__summary.html">llfio_v2_xxx::algorithm::comparison_summary</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1comparison__summary_1_1__lr.html">llfio_v2_xxx::algorithm::comparison_summary::_lr</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html">llfio_v2_xxx::algorithm::compare_visitor</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A visitor for the filesystem traversal and comparison algorithm.  <a href="structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html#details">More...</a><br /></td></tr>
@@ -114,9 +116,9 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a6165d32704ff21b4aed3046f11b31cb0"><td class="memItemLeft" align="right" valign="top">result&lt; traversal_summary &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a6165d32704ff21b4aed3046f11b31cb0">llfio_v2_xxx::algorithm::summarize</a> (const path_handle &amp;dirh, stat_t::want want=traversal_summary::default_metadata(), summarize_visitor *visitor=nullptr, size_t threads=0, bool force_slow_path=false) noexcept</td></tr>
-<tr class="memdesc:a6165d32704ff21b4aed3046f11b31cb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Summarise the directory identified <code>dirh</code>, and everything therein.  <a href="namespacellfio__v2__xxx_1_1algorithm.html#a6165d32704ff21b4aed3046f11b31cb0">More...</a><br /></td></tr>
-<tr class="separator:a6165d32704ff21b4aed3046f11b31cb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a2e359ecdc0aa1fb4f253e701944485"><td class="memItemLeft" align="right" valign="top">result&lt; comparison_summary &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#a7a2e359ecdc0aa1fb4f253e701944485">llfio_v2_xxx::algorithm::compare</a> (const path_handle &amp;ldirh, const path_handle &amp;rdirh, stat_t::want want=comparison_summary::default_metadata(), compare_visitor *visitor=nullptr, size_t threads=0, bool force_slow_path=false) noexcept</td></tr>
+<tr class="memdesc:a7a2e359ecdc0aa1fb4f253e701944485"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compares the directories identified by <code>ldirh</code> and <code>rdirh</code>, and everything therein.  <a href="namespacellfio__v2__xxx_1_1algorithm.html#a7a2e359ecdc0aa1fb4f253e701944485">More...</a><br /></td></tr>
+<tr class="separator:a7a2e359ecdc0aa1fb4f253e701944485"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides a directory tree difference algorithm. </p>

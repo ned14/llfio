@@ -1,4 +1,7 @@
 var searchData=
 [
-  ['win32_5fpath_5fnamespace_1802',['win32_path_namespace',['../namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89a',1,'llfio_v2_xxx']]]
+  ['shutdown_5fkind_1793',['shutdown_kind',['../classllfio__v2__xxx_1_1byte__socket__handle.html#a855a84c09fdc9c9c9626a0b51a34f70f',1,'llfio_v2_xxx::byte_socket_handle']]],
+  ['source_5ftype_1794',['source_type',['../structllfio__v2__xxx_1_1path__discovery_1_1discovered__path.html#ae02f172851c050f6a7f5929410428c7d',1,'llfio_v2_xxx::path_discovery::discovered_path']]],
+  ['storage_5ftypes_1795',['storage_types',['../namespacellfio__v2__xxx_1_1storage__profile.html#ac4910e412ff87c1c9e33615d81b2d238',1,'llfio_v2_xxx::storage_profile']]],
+  ['symlink_5ftype_1796',['symlink_type',['../classllfio__v2__xxx_1_1symlink__handle.html#a1908a242ca435cf1386fe96a86da4002',1,'llfio_v2_xxx::symlink_handle']]]
 ];

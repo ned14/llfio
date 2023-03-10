@@ -26,7 +26,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LLFIO
-   &#160;<span id="projectnumber">v2.00 late beta</span>
+   &#160;<span id="projectnumber">v2.00</span>
    </div>
   </td>
  </tr>
@@ -84,6 +84,7 @@ $(document).ready(function(){initNavTree('structllfio__v2__xxx_1_1algorithm_1_1c
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="structllfio__v2__xxx_1_1algorithm_1_1compare__visitor-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">llfio_v2_xxx::algorithm::compare_visitor Struct Reference</div>  </div>
@@ -100,20 +101,21 @@ Inheritance diagram for llfio_v2_xxx::algorithm::compare_visitor:</div>
  <div class="center">
   <img src="structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.png" usemap="#llfio_5Fv2_5Fxxx::algorithm::compare_5Fvisitor_map" alt=""/>
   <map id="llfio_5Fv2_5Fxxx::algorithm::compare_5Fvisitor_map" name="llfio_5Fv2_5Fxxx::algorithm::compare_5Fvisitor_map">
-<area href="structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html" title="A visitor for the filesystem traversal algorithm." alt="llfio_v2_xxx::algorithm::traverse_visitor" shape="rect" coords="0,0,231,24"/>
+<area href="structllfio__v2__xxx_1_1algorithm_1_1summarize__visitor.html" title="A visitor for the filesystem traversal and summary algorithm." alt="llfio_v2_xxx::algorithm::summarize_visitor" shape="rect" coords="0,56,241,80"/>
+<area href="structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html" title="A visitor for the filesystem traversal algorithm." alt="llfio_v2_xxx::algorithm::traverse_visitor" shape="rect" coords="0,0,241,24"/>
   </map>
 </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a7ec4aafb16d931783d190cbd8b9c5f7d"><td class="memItemLeft" align="right" valign="top"><a id="a7ec4aafb16d931783d190cbd8b9c5f7d"></a>
-virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html#a7ec4aafb16d931783d190cbd8b9c5f7d">directory_open_failed</a> (void *data, result&lt; void &gt;::error_type &amp;&amp;<a class="el" href="classllfio__v2__xxx_1_1error.html">error</a>, const <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;dirh, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> leaf, size_t depth) noexcept override</td></tr>
-<tr class="memdesc:a7ec4aafb16d931783d190cbd8b9c5f7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">This override ignores failures to traverse into the directory. <br /></td></tr>
-<tr class="separator:a7ec4aafb16d931783d190cbd8b9c5f7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acec6f86b0ee269eb534f715b2affc5ae"><td class="memItemLeft" align="right" valign="top"><a id="acec6f86b0ee269eb534f715b2affc5ae"></a>
 virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html#acec6f86b0ee269eb534f715b2affc5ae">post_enumeration</a> (void *data, const <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;dirh, <a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html">directory_handle::buffers_type</a> &amp;<a class="el" href="namespacellfio__v2__xxx_1_1algorithm.html#afae251fc3bfb7280b47b6135e2f6c7e2">contents</a>, size_t depth) noexcept override</td></tr>
 <tr class="memdesc:acec6f86b0ee269eb534f715b2affc5ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">This override implements the summary. <br /></td></tr>
 <tr class="separator:acec6f86b0ee269eb534f715b2affc5ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d6b2c113d9c3fad2318e9d0e5f83c13"><td class="memItemLeft" align="right" valign="top"><a id="a2d6b2c113d9c3fad2318e9d0e5f83c13"></a>
+virtual result&lt; <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1summarize__visitor.html#a2d6b2c113d9c3fad2318e9d0e5f83c13">directory_open_failed</a> (void *data, result&lt; void &gt;::error_type &amp;&amp;<a class="el" href="classllfio__v2__xxx_1_1error.html">error</a>, const <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;dirh, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view</a> leaf, size_t depth) noexcept override</td></tr>
+<tr class="memdesc:a2d6b2c113d9c3fad2318e9d0e5f83c13"><td class="mdescLeft">&#160;</td><td class="mdescRight">This override ignores failures to traverse into the directory. <br /></td></tr>
+<tr class="separator:a2d6b2c113d9c3fad2318e9d0e5f83c13"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d3c4b226532089d121dc3d96ed88b39"><td class="memItemLeft" align="right" valign="top">virtual result&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html#a4d3c4b226532089d121dc3d96ed88b39">pre_enumeration</a> (void *data, const <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> &amp;dirh, size_t depth) noexcept</td></tr>
 <tr class="memdesc:a4d3c4b226532089d121dc3d96ed88b39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called to decide whether to enumerate a directory.  <a href="structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html#a4d3c4b226532089d121dc3d96ed88b39">More...</a><br /></td></tr>
 <tr class="separator:a4d3c4b226532089d121dc3d96ed88b39"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -124,6 +126,15 @@ virtual result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom">
 virtual result&lt; size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1traverse__visitor.html#ac188f8691259ec970aeff79b47a5685b">finished</a> (void *data, result&lt; size_t &gt; result) noexcept</td></tr>
 <tr class="memdesc:ac188f8691259ec970aeff79b47a5685b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called when a traversal finishes, whether due to success or failure. Always called from the original thread. <br /></td></tr>
 <tr class="separator:ac188f8691259ec970aeff79b47a5685b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:ac216872f153fd4b06d26dd85149f4384"><td class="memItemLeft" align="right" valign="top"><a id="ac216872f153fd4b06d26dd85149f4384"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>accumulate</b> (<a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1comparison__summary.html">comparison_summary</a> &amp;acc, <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1comparison__summary.html">comparison_summary</a> *state, const <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> *dirh, <a class="el" href="structllfio__v2__xxx_1_1directory__entry.html">directory_entry</a> &amp;entry, stat_t::want already_have_metadata)</td></tr>
+<tr class="separator:ac216872f153fd4b06d26dd85149f4384"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc14982bd4a5bb496901644dd7272bc7"><td class="memItemLeft" align="right" valign="top"><a id="afc14982bd4a5bb496901644dd7272bc7"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>accumulate</b> (<a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html">traversal_summary</a> &amp;acc, <a class="el" href="structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html">traversal_summary</a> *state, const <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html">directory_handle</a> *dirh, <a class="el" href="structllfio__v2__xxx_1_1directory__entry.html">directory_entry</a> &amp;entry, stat_t::want already_have_metadata)</td></tr>
+<tr class="separator:afc14982bd4a5bb496901644dd7272bc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A visitor for the filesystem traversal and comparison algorithm. </p>

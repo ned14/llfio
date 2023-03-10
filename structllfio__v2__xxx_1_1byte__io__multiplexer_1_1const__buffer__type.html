@@ -26,7 +26,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LLFIO
-   &#160;<span id="projectnumber">v2.00 late beta</span>
+   &#160;<span id="projectnumber">v2.00</span>
    </div>
   </td>
  </tr>
@@ -83,6 +83,7 @@ $(document).ready(function(){initNavTree('structllfio__v2__xxx_1_1byte__io__mult
 
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1const__buffer__type-members.html">List of all members</a>  </div>
@@ -126,18 +127,15 @@ Public Member Functions</h2></td></tr>
 constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1const__buffer__type.html#a60d2d7583603b29e5cc937a1c3fc95e7">const_buffer_type</a> (<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1const__buffer__type.html#ab4656282696cf4075e574271acef7bc1">pointer</a> <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1const__buffer__type.html#a104fc0f33030f0472a4138d26ca254a4">data</a>, <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1const__buffer__type.html#af4743d9b045969e83be274fe07a94fd3">size_type</a> len) noexcept</td></tr>
 <tr class="memdesc:a60d2d7583603b29e5cc937a1c3fc95e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
 <tr class="separator:a60d2d7583603b29e5cc937a1c3fc95e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9ff3dc382629998cd89ab8133782588b"><td class="memItemLeft" align="right" valign="top"><a id="a9ff3dc382629998cd89ab8133782588b"></a>
-constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1const__buffer__type.html#a9ff3dc382629998cd89ab8133782588b">const_buffer_type</a> (span&lt; const byte &gt; s) noexcept</td></tr>
-<tr class="memdesc:a9ff3dc382629998cd89ab8133782588b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
-<tr class="separator:a9ff3dc382629998cd89ab8133782588b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af18ac086a79533f32a025ab3905591d4"><td class="memItemLeft" align="right" valign="top"><a id="af18ac086a79533f32a025ab3905591d4"></a>
 constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1const__buffer__type.html#af18ac086a79533f32a025ab3905591d4">const_buffer_type</a> (<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html">buffer_type</a> b) noexcept</td></tr>
 <tr class="memdesc:af18ac086a79533f32a025ab3905591d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converting constructor from non-const buffer type. <br /></td></tr>
 <tr class="separator:af18ac086a79533f32a025ab3905591d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a62b8d07a57c469aa092bc36d3b8192c8"><td class="memItemLeft" align="right" valign="top"><a id="a62b8d07a57c469aa092bc36d3b8192c8"></a>
-constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1const__buffer__type.html#a62b8d07a57c469aa092bc36d3b8192c8">const_buffer_type</a> (span&lt; byte &gt; s) noexcept</td></tr>
-<tr class="memdesc:a62b8d07a57c469aa092bc36d3b8192c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converting constructor from non-const buffer type. <br /></td></tr>
-<tr class="separator:a62b8d07a57c469aa092bc36d3b8192c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8711a9574671c70295ba3d2617fbd0c"><td class="memTemplParams" colspan="2"><a id="af8711a9574671c70295ba3d2617fbd0c"></a>
+template&lt;class T , typename std::enable_if&lt;(!std::is_same&lt; typename std::decay&lt; T &gt;::type, buffer_type &gt;::value &amp;&amp;std::is_constructible&lt; span&lt; const byte &gt;, T &gt;::value), bool &gt;::type  = true&gt; </td></tr>
+<tr class="memitem:af8711a9574671c70295ba3d2617fbd0c"><td class="memTemplItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1const__buffer__type.html#af8711a9574671c70295ba3d2617fbd0c">const_buffer_type</a> (T &amp;&amp;s, _implict_span_constructor_tag={}) noexcept</td></tr>
+<tr class="memdesc:af8711a9574671c70295ba3d2617fbd0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor taking any type acceptable to <code>span</code>. <br /></td></tr>
+<tr class="separator:af8711a9574671c70295ba3d2617fbd0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a896a986afe67ed6e7964e5807d6644c4"><td class="memItemLeft" align="right" valign="top"><a id="a896a986afe67ed6e7964e5807d6644c4"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>const_buffer_type</b> (const <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1const__buffer__type.html">const_buffer_type</a> &amp;)=default</td></tr>
 <tr class="separator:a896a986afe67ed6e7964e5807d6644c4"><td class="memSeparator" colspan="2">&#160;</td></tr>

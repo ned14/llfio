@@ -26,7 +26,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LLFIO
-   &#160;<span id="projectnumber">v2.00 late beta</span>
+   &#160;<span id="projectnumber">v2.00</span>
    </div>
   </td>
  </tr>
@@ -126,7 +126,7 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <dl class="section note"><dt>Note</dt><dd>Most of this code is mature quality. It has been shipping in production with multiple vendors for some years now, indeed amongst many big data solutions it powers the low level custom database component of the US Security and Exchange Commission's MIDAS solution which ingresses Terabytes of trade data per day. It is considered quite reliable on Windows and Linux (less well tested on Mac OS).</dd></dl>
 <p>Examples of use (more examples: <a href="https://github.com/ned14/llfio/tree/develop/example">https://github.com/ned14/llfio/tree/develop/example</a>): </p><table width="100%" border="0" cellpadding="4">
 <tr>
-<td width="50%" valign="top"><div class="fragment"><div class="line">  <span class="keyword">namespace </span><a class="code" href="namespacellfio__v2__xxx.html">llfio</a> = <a class="code" href="group__config.html#gac9f7f0153adb9034d26c4554728f817a">LLFIO_V2_NAMESPACE</a>;</div>
+<td width="50%" valign="top">Memory map in a file for read: <div class="fragment"><div class="line">  <span class="keyword">namespace </span><a class="code" href="namespacellfio__v2__xxx.html">llfio</a> = <a class="code" href="group__config.html#gac9f7f0153adb9034d26c4554728f817a">LLFIO_V2_NAMESPACE</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// Open the mapped file for read</span></div>
 <div class="line">  <a class="code" href="classllfio__v2__xxx_1_1mapped__file__handle.html">llfio::mapped_file_handle</a> mh = <a class="code" href="namespacellfio__v2__xxx.html#abddc6cd762be581f04b00837a8a91730">llfio::mapped_file</a>(  <span class="comment">//</span></div>
@@ -155,7 +155,7 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <div class="ttc" id="anamespacellfio__v2__xxx_html"><div class="ttname"><a href="namespacellfio__v2__xxx.html">llfio_v2_xxx</a></div><div class="ttdoc">The LLFIO namespace.</div><div class="ttdef"><b>Definition:</b> byte_io_handle.hpp:37</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_aa3676f0dd69f4b54cf7e14e3f86d32b9"><div class="ttname"><a href="namespacellfio__v2__xxx.html#aa3676f0dd69f4b54cf7e14e3f86d32b9">llfio_v2_xxx::length</a></div><div class="ttdeci">result&lt; section_handle::extent_type &gt; length(const section_handle &amp;self) noexcept</div><div class="ttdoc">Return the current maximum permitted extent of the memory section.</div><div class="ttdef"><b>Definition:</b> map_handle.hpp:1071</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_abddc6cd762be581f04b00837a8a91730"><div class="ttname"><a href="namespacellfio__v2__xxx.html#abddc6cd762be581f04b00837a8a91730">llfio_v2_xxx::mapped_file</a></div><div class="ttdeci">result&lt; mapped_file_handle &gt; mapped_file(mapped_file_handle::size_type reservation, const path_handle &amp;base, mapped_file_handle::path_view_type _path, mapped_file_handle::mode _mode=mapped_file_handle::mode::read, mapped_file_handle::creation _creation=mapped_file_handle::creation::open_existing, mapped_file_handle::caching _caching=mapped_file_handle::caching::all, mapped_file_handle::flag flags=mapped_file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:817</div></div>
-</div><!-- fragment --> <div class="fragment"><div class="line">  <span class="keyword">namespace </span><a class="code" href="namespacellfio__v2__xxx.html">llfio</a> = <a class="code" href="group__config.html#gac9f7f0153adb9034d26c4554728f817a">LLFIO_V2_NAMESPACE</a>;</div>
+</div><!-- fragment --> Sparsely stored temporary disposable array: <div class="fragment"><div class="line">  <span class="keyword">namespace </span><a class="code" href="namespacellfio__v2__xxx.html">llfio</a> = <a class="code" href="group__config.html#gac9f7f0153adb9034d26c4554728f817a">LLFIO_V2_NAMESPACE</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// Make me a 1 trillion element sparsely allocated integer array!</span></div>
 <div class="line">  <a class="code" href="classllfio__v2__xxx_1_1mapped__file__handle.html">llfio::mapped_file_handle</a> mfh = <a class="code" href="namespacellfio__v2__xxx.html#a3b775591c19686ab10aa812fa3c82917">llfio::mapped_temp_inode</a>().value();</div>
@@ -172,7 +172,7 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <div class="line">  one_trillion_int_array[999999999999ULL] = 6;</div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1mapped__file__handle_html_a01a5da3834fd354c5c3d38284b84ef75"><div class="ttname"><a href="classllfio__v2__xxx_1_1mapped__file__handle.html#a01a5da3834fd354c5c3d38284b84ef75">llfio_v2_xxx::mapped_file_handle::truncate</a></div><div class="ttdeci">virtual result&lt; extent_type &gt; truncate(extent_type newsize) noexcept override</div><div class="ttdoc">Resize the current maximum permitted extent of the mapped file to the given extent,...</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_html_a3b775591c19686ab10aa812fa3c82917"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a3b775591c19686ab10aa812fa3c82917">llfio_v2_xxx::mapped_temp_inode</a></div><div class="ttdeci">result&lt; mapped_file_handle &gt; mapped_temp_inode(mapped_file_handle::size_type reservation=0, const path_handle &amp;dir=path_discovery::storage_backed_temporary_files_directory(), mapped_file_handle::mode _mode=mapped_file_handle::mode::write, mapped_file_handle::caching _caching=mapped_file_handle::caching::temporary, mapped_file_handle::flag flags=mapped_file_handle::flag::none) noexcept</div><div class="ttdef"><b>Definition:</b> mapped_file_handle.hpp:892</div></div>
-</div><!-- fragment --> </td><td width="50%" valign="top"><div class="fragment"><div class="line">  <span class="keyword">namespace </span><a class="code" href="namespacellfio__v2__xxx.html">llfio</a> = <a class="code" href="group__config.html#gac9f7f0153adb9034d26c4554728f817a">LLFIO_V2_NAMESPACE</a>;</div>
+</div><!-- fragment --> </td><td width="50%" valign="top">Read metadata about a file and its storage: <div class="fragment"><div class="line">  <span class="keyword">namespace </span><a class="code" href="namespacellfio__v2__xxx.html">llfio</a> = <a class="code" href="group__config.html#gac9f7f0153adb9034d26c4554728f817a">LLFIO_V2_NAMESPACE</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// Open the file for read</span></div>
 <div class="line">  <a class="code" href="classllfio__v2__xxx_1_1file__handle.html">llfio::file_handle</a> fh = <a class="code" href="namespacellfio__v2__xxx.html#af31a062639499a79ef5cc8aed16ba65d">llfio::file</a>(  <span class="comment">//</span></div>

@@ -8,7 +8,7 @@ var namespacellfio__v2__xxx_1_1algorithm =
     [ "impl", "namespacellfio__v2__xxx_1_1algorithm_1_1impl.html", "namespacellfio__v2__xxx_1_1algorithm_1_1impl" ],
     [ "shared_fs_mutex", "namespacellfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex.html", "namespacellfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex" ],
     [ "contents_visitor", "structllfio__v2__xxx_1_1algorithm_1_1contents__visitor.html", "structllfio__v2__xxx_1_1algorithm_1_1contents__visitor" ],
-    [ "difference_item", "structllfio__v2__xxx_1_1algorithm_1_1difference__item.html", "structllfio__v2__xxx_1_1algorithm_1_1difference__item" ],
+    [ "comparison_summary", "structllfio__v2__xxx_1_1algorithm_1_1comparison__summary.html", "structllfio__v2__xxx_1_1algorithm_1_1comparison__summary" ],
     [ "compare_visitor", "structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html", "structllfio__v2__xxx_1_1algorithm_1_1compare__visitor" ],
     [ "reduce_visitor", "structllfio__v2__xxx_1_1algorithm_1_1reduce__visitor.html", "structllfio__v2__xxx_1_1algorithm_1_1reduce__visitor" ],
     [ "traversal_summary", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary" ],
@@ -20,6 +20,7 @@ var namespacellfio__v2__xxx_1_1algorithm =
     [ "xor_handle_adapter", "namespacellfio__v2__xxx_1_1algorithm.html#a27450e894b5dab6c18a01350670fa0dc", null ],
     [ "cache_parent", "namespacellfio__v2__xxx_1_1algorithm.html#a0e474a5af3258fc971c71d057c8fb0bb", null ],
     [ "clone_or_copy", "namespacellfio__v2__xxx_1_1algorithm.html#a3c661d6cba0da25fe9e1211ede1fd004", null ],
+    [ "compare", "namespacellfio__v2__xxx_1_1algorithm.html#a7a2e359ecdc0aa1fb4f253e701944485", null ],
     [ "contents", "namespacellfio__v2__xxx_1_1algorithm.html#afae251fc3bfb7280b47b6135e2f6c7e2", null ],
     [ "operator!=", "namespacellfio__v2__xxx_1_1algorithm.html#a7ef00d65394827ceb91597dda1f496f9", null ],
     [ "operator<", "namespacellfio__v2__xxx_1_1algorithm.html#a48db273f73f86955938b99faeef6e113", null ],
@@ -29,7 +30,7 @@ var namespacellfio__v2__xxx_1_1algorithm =
     [ "operator>=", "namespacellfio__v2__xxx_1_1algorithm.html#ade7571062c3e19cb6622bd2e411130ab", null ],
     [ "reduce", "namespacellfio__v2__xxx_1_1algorithm.html#a05594f7c8ae275fa65b2acd57cc9b8ac", null ],
     [ "relink_or_clone_copy_unlink", "namespacellfio__v2__xxx_1_1algorithm.html#ae445124b0d6b194eeb4e5ae3b1bfcf05", null ],
-    [ "summarize", "namespacellfio__v2__xxx_1_1algorithm.html#a6165d32704ff21b4aed3046f11b31cb0", null ],
+    [ "summarize", "namespacellfio__v2__xxx_1_1algorithm.html#a02a02e4a3c60a5cb18bd284194ce9c59", null ],
     [ "swap", "namespacellfio__v2__xxx_1_1algorithm.html#ae0973243c4b58d53d6f11ce5a2535a8c", null ],
     [ "traverse", "namespacellfio__v2__xxx_1_1algorithm.html#ae068bc16598189811d0ce2b3530f1de7", null ]
 ];

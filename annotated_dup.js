@@ -32,7 +32,7 @@ var annotated_dup =
           [ "safe_byte_ranges", "classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html", "classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges" ]
         ] ],
         [ "contents_visitor", "structllfio__v2__xxx_1_1algorithm_1_1contents__visitor.html", "structllfio__v2__xxx_1_1algorithm_1_1contents__visitor" ],
-        [ "difference_item", "structllfio__v2__xxx_1_1algorithm_1_1difference__item.html", "structllfio__v2__xxx_1_1algorithm_1_1difference__item" ],
+        [ "comparison_summary", "structllfio__v2__xxx_1_1algorithm_1_1comparison__summary.html", "structllfio__v2__xxx_1_1algorithm_1_1comparison__summary" ],
         [ "compare_visitor", "structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html", "structllfio__v2__xxx_1_1algorithm_1_1compare__visitor" ],
         [ "reduce_visitor", "structllfio__v2__xxx_1_1algorithm_1_1reduce__visitor.html", "structllfio__v2__xxx_1_1algorithm_1_1reduce__visitor" ],
         [ "traversal_summary", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary" ],

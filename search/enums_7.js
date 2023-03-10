@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['shutdown_5fkind_1798',['shutdown_kind',['../classllfio__v2__xxx_1_1byte__socket__handle.html#a855a84c09fdc9c9c9626a0b51a34f70f',1,'llfio_v2_xxx::byte_socket_handle']]],
-  ['source_5ftype_1799',['source_type',['../structllfio__v2__xxx_1_1path__discovery_1_1discovered__path.html#ae02f172851c050f6a7f5929410428c7d',1,'llfio_v2_xxx::path_discovery::discovered_path']]],
-  ['storage_5ftypes_1800',['storage_types',['../namespacellfio__v2__xxx_1_1storage__profile.html#ac4910e412ff87c1c9e33615d81b2d238',1,'llfio_v2_xxx::storage_profile']]],
-  ['symlink_5ftype_1801',['symlink_type',['../classllfio__v2__xxx_1_1symlink__handle.html#a1908a242ca435cf1386fe96a86da4002',1,'llfio_v2_xxx::symlink_handle']]]
+  ['memory_5faccounting_5fkind_1791',['memory_accounting_kind',['../classllfio__v2__xxx_1_1map__handle.html#a22f9cba517e54e36ef80a788af737b8b',1,'llfio_v2_xxx::map_handle']]],
+  ['mode_1792',['mode',['../classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca',1,'llfio_v2_xxx::handle']]]
 ];
