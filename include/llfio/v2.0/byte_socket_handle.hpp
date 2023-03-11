@@ -283,9 +283,15 @@ namespace ip
     static LLFIO_HEADERS_ONLY_MEMFUNC_SPEC address_v4 loopback() noexcept;
   };
   //! Make an `address_v4`
-  inline result<address_v4> make_address_v4(const address_v4::bytes_type &bytes, uint16_t port = 0) noexcept { return address_v4(bytes, port); }
+  inline result<address_v4> make_address_v4(const address_v4::bytes_type &bytes, uint16_t port = 0) noexcept
+  {
+    return address_v4(bytes, port);
+  }
   //! Make an `address_v4`
-  inline result<address_v4> make_address_v4(const address_v4::uint_type &bytes, uint16_t port = 0) noexcept { return address_v4(bytes, port); }
+  inline result<address_v4> make_address_v4(const address_v4::uint_type &bytes, uint16_t port = 0) noexcept
+  {
+    return address_v4(bytes, port);
+  }
 
   //! Make an `address_v6`
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<address_v6> make_address_v6(string_view str) noexcept;
@@ -1043,7 +1049,7 @@ public:
   //! \brief Convenience function defaulting `flag::multiplexable` set.
   LLFIO_MAKE_FREE_FUNCTION
   static result<listening_byte_socket_handle> multiplexable_listening_byte_socket(ip::family _family, mode _mode = mode::write, caching _caching = caching::all,
-                                                                             flag flags = flag::multiplexable) noexcept
+                                                                                  flag flags = flag::multiplexable) noexcept
   {
     return listening_byte_socket(_family, _mode, _caching, flags);
   }
@@ -1110,7 +1116,10 @@ template <> struct construct<listening_byte_socket_handle>
   byte_socket_handle::mode _mode = byte_socket_handle::mode::write;
   byte_socket_handle::caching _caching = byte_socket_handle::caching::all;
   byte_socket_handle::flag flags = byte_socket_handle::flag::none;
-  result<listening_byte_socket_handle> operator()() const noexcept { return listening_byte_socket_handle::listening_byte_socket(family, _mode, _caching, flags); }
+  result<listening_byte_socket_handle> operator()() const noexcept
+  {
+    return listening_byte_socket_handle::listening_byte_socket(family, _mode, _caching, flags);
+  }
 };
 
 // BEGIN make_free_functions.py

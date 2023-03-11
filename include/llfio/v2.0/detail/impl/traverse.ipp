@@ -162,7 +162,7 @@ namespace algorithm
                 using_sso = true;
               }
             }
-#if _MSVC_STL_VERSION < 150 // see ned14/llfio#98
+#if _MSVC_STL_VERSION < 150  // see ned14/llfio#98
             workitem(const workitem &o) noexcept
                 : workitem(const_cast<workitem &&>(std::move(o)))
             {
