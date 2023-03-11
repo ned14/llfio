@@ -83,6 +83,7 @@ $(document).ready(function(){initNavTree('structllfio__v2__xxx_1_1directory__han
 
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#friends">Friends</a> &#124;
@@ -114,10 +115,11 @@ Public Member Functions</h2></td></tr>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a642a415d3444c11886c3bace729b917b">done</a> () const noexcept</td></tr>
 <tr class="memdesc:a642a415d3444c11886c3bace729b917b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the directory was entirely read or not into any buffers supplied. <br /></td></tr>
 <tr class="separator:a642a415d3444c11886c3bace729b917b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac99d361654291d463bfce813c0d15989"><td class="memItemLeft" align="right" valign="top"><a id="ac99d361654291d463bfce813c0d15989"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#ac99d361654291d463bfce813c0d15989">buffers_type</a> (span&lt; <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#a388fc107831ed68dba60c6f4082be952">buffer_type</a> &gt; v)</td></tr>
-<tr class="memdesc:ac99d361654291d463bfce813c0d15989"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implicit construction from a span. <br /></td></tr>
-<tr class="separator:ac99d361654291d463bfce813c0d15989"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5815efb83bb9656f2aca24c5abb9d6d"><td class="memTemplParams" colspan="2"><a id="af5815efb83bb9656f2aca24c5abb9d6d"></a>
+template&lt;class T , typename std::enable_if&lt;(!std::is_same&lt; typename std::decay&lt; T &gt;::type, buffers_type &gt;::value &amp;&amp;std::is_constructible&lt; span&lt; buffer_type &gt;, T &gt;::value), bool &gt;::type  = true&gt; </td></tr>
+<tr class="memitem:af5815efb83bb9656f2aca24c5abb9d6d"><td class="memTemplItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#af5815efb83bb9656f2aca24c5abb9d6d">buffers_type</a> (T &amp;&amp;s, _implict_span_constructor_tag={}) noexcept</td></tr>
+<tr class="memdesc:af5815efb83bb9656f2aca24c5abb9d6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor taking any type acceptable to <code>span</code>. <br /></td></tr>
+<tr class="separator:af5815efb83bb9656f2aca24c5abb9d6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92ffa4a0d93d289bf1f9173f0d220d41"><td class="memItemLeft" align="right" valign="top"><a id="a92ffa4a0d93d289bf1f9173f0d220d41"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a92ffa4a0d93d289bf1f9173f0d220d41">buffers_type</a> (span&lt; <a class="el" href="classllfio__v2__xxx_1_1directory__handle.html#a388fc107831ed68dba60c6f4082be952">buffer_type</a> &gt; v, <a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html">buffers_type</a> &amp;&amp;o) noexcept</td></tr>
 <tr class="memdesc:a92ffa4a0d93d289bf1f9173f0d220d41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct from a span, using a kernel buffer from a preceding <code>buffers_type</code>. <br /></td></tr>
