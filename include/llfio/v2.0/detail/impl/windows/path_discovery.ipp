@@ -160,7 +160,7 @@ namespace path_discovery
   {
     LLFIO_LOG_FUNCTION_CALL(nullptr);
     wchar_t buffer[MAX_PATH];
-    DWORD written = GetCurrentDirectory(sizeof(buffer) / sizeof(wchar_t), buffer);
+    DWORD written = GetCurrentDirectoryW(sizeof(buffer) / sizeof(wchar_t), buffer);
     if(0 == written)
     {
       return win32_error();
