@@ -165,7 +165,7 @@ namespace path_discovery
     {
       return win32_error();
     }
-    return path_handle::path(path_view(buffer, written));
+    return path_handle::path(path_view(buffer, written, path_view::zero_terminated));
   }
 }  // namespace path_discovery
 
