@@ -127,6 +127,13 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="name
 <tr class="memitem:a2d3e2ea602c3195433c7898c41744188"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1path__discovery.html#a2d3e2ea602c3195433c7898c41744188">temporary_named_pipes_directory</a> () noexcept</td></tr>
 <tr class="memdesc:a2d3e2ea602c3195433c7898c41744188"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to an open handle to a verified temporary directory where named pipes may be created and found.  <a href="namespacellfio__v2__xxx_1_1path__discovery.html#a2d3e2ea602c3195433c7898c41744188">More...</a><br /></td></tr>
 <tr class="separator:a2d3e2ea602c3195433c7898c41744188"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a867400f74b74b9af5ff970491335fb8a"><td class="memItemLeft" align="right" valign="top"><a id="a867400f74b74b9af5ff970491335fb8a"></a>
+result&lt; <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1path__discovery.html#a867400f74b74b9af5ff970491335fb8a">current_working_directory</a> () noexcept</td></tr>
+<tr class="memdesc:a867400f74b74b9af5ff970491335fb8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a handle to the current working directory, which can change at any moment during a process' lifetime. <br /></td></tr>
+<tr class="separator:a867400f74b74b9af5ff970491335fb8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad4f3f291d7fbe8be09b692233d72bdf"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1path__discovery.html#aad4f3f291d7fbe8be09b692233d72bdf">starting_working_directory</a> () noexcept</td></tr>
+<tr class="memdesc:aad4f3f291d7fbe8be09b692233d72bdf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to an open handle to a verified directory which was the working directory during static data init of the process before <code>main()</code> was invoked.  <a href="namespacellfio__v2__xxx_1_1path__discovery.html#aad4f3f291d7fbe8be09b692233d72bdf">More...</a><br /></td></tr>
+<tr class="separator:aad4f3f291d7fbe8be09b692233d72bdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Contains functions used to discover suitable paths for things. </p>
@@ -234,6 +241,34 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="name
 <p>This is implemented by <code>verified_temporary_directories()</code> iterating all of the paths returned by and checking what file system is in use, comparing it to <code>memory_backed_regex</code>.</p>
 <p>The handle is created during <code>verified_temporary_directories()</code> and is statically cached thereafter.</p>
 <dl class="section note"><dt>Note</dt><dd>If you wish to create an anonymous memory-backed inode for mmap and paging tricks like mapping the same extent into multiple addresses e.g. to implement a constant time zero copy <code>realloc()</code>, strongly consider using a non-file-backed <code>section_handle</code> as this is more portable. </dd></dl>
+
+</div>
+</div>
+<a id="aad4f3f291d7fbe8be09b692233d72bdf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad4f3f291d7fbe8be09b692233d72bdf">&#9670;&nbsp;</a></span>starting_working_directory()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a>&amp; llfio_v2_xxx::path_discovery::starting_working_directory </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns a reference to an open handle to a verified directory which was the working directory during static data init of the process before <code>main()</code> was invoked. </p>
+<p>If the directory was not readable at the time of process start, a default initialised path handle is returned. If static data init code changes the current working directory, the directory you get is undefined (depends on static data init order, which itself is undefined). </p>
 
 </div>
 </div>

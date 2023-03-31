@@ -116,6 +116,9 @@ Functions</h2></td></tr>
 <tr class="memitem:afb8c20e09183c75930cd2a55cce95e57"><td class="memItemLeft" align="right" valign="top"><a id="afb8c20e09183c75930cd2a55cce95e57"></a>
 _store &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::path_discovery::detail::path_store</b> ()</td></tr>
 <tr class="separator:afb8c20e09183c75930cd2a55cce95e57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac1317df454ab371f6df19339dc1cff6"><td class="memItemLeft" align="right" valign="top"><a id="aac1317df454ab371f6df19339dc1cff6"></a>
+_capture_starting_working_directory_t &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::path_discovery::detail::capture_starting_working_directory</b> ()</td></tr>
+<tr class="separator:aac1317df454ab371f6df19339dc1cff6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a876db6e58143e730afd0706226f39d6c"><td class="memItemLeft" align="right" valign="top"><a id="a876db6e58143e730afd0706226f39d6c"></a>
 std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::path_discovery::operator&lt;&lt;</b> (std::ostream &amp;s, const discovered_path::source_type &amp;v)</td></tr>
 <tr class="separator:a876db6e58143e730afd0706226f39d6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -142,6 +145,13 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="name
 <tr class="memitem:a2d3e2ea602c3195433c7898c41744188"><td class="memItemLeft" align="right" valign="top">const path_handle &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1path__discovery.html#a2d3e2ea602c3195433c7898c41744188">llfio_v2_xxx::path_discovery::temporary_named_pipes_directory</a> () noexcept</td></tr>
 <tr class="memdesc:a2d3e2ea602c3195433c7898c41744188"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to an open handle to a verified temporary directory where named pipes may be created and found.  <a href="namespacellfio__v2__xxx_1_1path__discovery.html#a2d3e2ea602c3195433c7898c41744188">More...</a><br /></td></tr>
 <tr class="separator:a2d3e2ea602c3195433c7898c41744188"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a867400f74b74b9af5ff970491335fb8a"><td class="memItemLeft" align="right" valign="top"><a id="a867400f74b74b9af5ff970491335fb8a"></a>
+result&lt; path_handle &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1path__discovery.html#a867400f74b74b9af5ff970491335fb8a">llfio_v2_xxx::path_discovery::current_working_directory</a> () noexcept</td></tr>
+<tr class="memdesc:a867400f74b74b9af5ff970491335fb8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a handle to the current working directory, which can change at any moment during a process' lifetime. <br /></td></tr>
+<tr class="separator:a867400f74b74b9af5ff970491335fb8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad4f3f291d7fbe8be09b692233d72bdf"><td class="memItemLeft" align="right" valign="top">const path_handle &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacellfio__v2__xxx_1_1path__discovery.html#aad4f3f291d7fbe8be09b692233d72bdf">llfio_v2_xxx::path_discovery::starting_working_directory</a> () noexcept</td></tr>
+<tr class="memdesc:aad4f3f291d7fbe8be09b692233d72bdf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to an open handle to a verified directory which was the working directory during static data init of the process before <code>main()</code> was invoked.  <a href="namespacellfio__v2__xxx_1_1path__discovery.html#aad4f3f291d7fbe8be09b692233d72bdf">More...</a><br /></td></tr>
+<tr class="separator:aad4f3f291d7fbe8be09b692233d72bdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides <code>path_discovery</code> </p>
