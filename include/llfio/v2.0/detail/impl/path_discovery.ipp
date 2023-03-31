@@ -72,6 +72,7 @@ namespace path_discovery
 
   span<discovered_path> all_temporary_directories(bool refresh, span<path_view> fallbacks, span<path_view> overrides) noexcept
   {
+    LLFIO_LOG_FUNCTION_CALL(nullptr);
     auto &ps = detail::path_store();
     if(!refresh && !ps.all.empty())
     {
@@ -136,6 +137,7 @@ namespace path_discovery
 
   span<discovered_path> verified_temporary_directories(const char *_storage_backed_regex, const char *_memory_backed_regex) noexcept
   {
+    LLFIO_LOG_FUNCTION_CALL(nullptr);
     auto &ps = detail::path_store();
     if(!ps.verified.empty())
     {
@@ -308,6 +310,31 @@ namespace path_discovery
     (void) verified_temporary_directories();
     auto &ps = detail::path_store();
     return ps.memory_backed_is_networked;
+  }
+
+  namespace detail
+  {
+    struct _capture_starting_working_directory_t
+    {
+      path_handle dirh;
+      _capture_starting_working_directory_t()
+      {
+        auto r = current_working_directory();
+        if(r)
+        {
+          dirh = std::move(r).assume_value();
+        }
+      }
+    };
+    _capture_starting_working_directory_t &capture_starting_working_directory()
+    {
+      static _capture_starting_working_directory_t v;
+      return v;
+    }
+  }  // namespace detail
+  const path_handle &starting_working_directory() noexcept
+  {
+    return detail::capture_starting_working_directory().dirh;
   }
 }  // namespace path_discovery
 

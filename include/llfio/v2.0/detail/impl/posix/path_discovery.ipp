@@ -164,6 +164,16 @@ namespace path_discovery
   {
     return storage_backed_temporary_files_directory();
   }
+  result<path_handle> current_working_directory() noexcept
+  {
+    LLFIO_LOG_FUNCTION_CALL(nullptr);
+    char buffer[PATH_MAX];
+    if(nullptr == getcwd(buffer, sizeof(buffer)))
+    {
+      return posix_error();
+    }
+    return path_handle::path(buffer);
+  }
 }  // namespace path_discovery
 
 LLFIO_V2_NAMESPACE_END

@@ -39,6 +39,8 @@ namespace path_discovery
   {
     struct _store;
     LLFIO_HEADERS_ONLY_FUNC_SPEC _store &path_store();
+    struct _capture_starting_working_directory_t;
+    LLFIO_HEADERS_ONLY_FUNC_SPEC _capture_starting_working_directory_t &capture_starting_working_directory();
   }  // namespace detail
 
   //! \brief A discovered path.
@@ -188,6 +190,21 @@ namespace path_discovery
   On POSIX, this is `storage_backed_temporary_files_directory()`.
   */
   LLFIO_HEADERS_ONLY_FUNC_SPEC const path_handle &temporary_named_pipes_directory() noexcept;
+
+  /*! \brief Returns a handle to the current working directory, which can change at any
+  moment during a process' lifetime.
+  */
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<path_handle> current_working_directory() noexcept;
+
+  /*! \brief Returns a reference to an open handle to a verified directory which was the
+  working directory during static data init of the process before `main()` was invoked.
+
+  If the directory was not readable at the time of process start, a default initialised
+  path handle is returned. If static data init code changes the current working
+  directory, the directory you get is undefined (depends on static data init order,
+  which itself is undefined).
+  */
+  LLFIO_HEADERS_ONLY_FUNC_SPEC const path_handle &starting_working_directory() noexcept;
 
 }  // namespace path_discovery
 

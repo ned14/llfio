@@ -156,6 +156,17 @@ namespace path_discovery
     pipesdir = std::move(r).value();
     return pipesdir;
   }
+  result<path_handle> current_working_directory() noexcept
+  {
+    LLFIO_LOG_FUNCTION_CALL(nullptr);
+    wchar_t buffer[MAX_PATH];
+    DWORD written = GetCurrentDirectory(sizeof(buffer) / sizeof(wchar_t), buffer);
+    if(0 == written)
+    {
+      return win32_error();
+    }
+    return path_handle::path(path_view(buffer, written));
+  }
 }  // namespace path_discovery
 
 LLFIO_V2_NAMESPACE_END
