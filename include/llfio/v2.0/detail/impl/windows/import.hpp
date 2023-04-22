@@ -572,7 +572,7 @@ namespace windows_nt_kernel
 
   using SymGetLineFromAddr64_t = BOOL(NTAPI *)(_In_ HANDLE hProcess, _In_ DWORD64 dwAddr, _Out_ PDWORD pdwDisplacement, _Out_ PIMAGEHLP_LINEW64 Line);
 
-  using RtlDosPathNameToNtPathName_U_t = BOOLEAN(NTAPI *)(__in PCWSTR DosFileName, __out PUNICODE_STRING NtFileName, __out_opt PWSTR *FilePart,
+  using RtlDosPathNameToNtPathName_U_t = BOOLEAN(NTAPI *)(_In_ PCWSTR DosFileName, _Out_ PUNICODE_STRING NtFileName, __out_opt PWSTR *FilePart,
                                                           __out_opt PVOID RelativeName);
 
   using RtlUTF8ToUnicodeN_t = NTSTATUS(NTAPI *)(_Out_opt_ PWSTR UnicodeStringDestination, _In_ ULONG UnicodeStringMaxByteCount,
