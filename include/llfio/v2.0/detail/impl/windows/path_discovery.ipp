@@ -159,7 +159,7 @@ namespace path_discovery
   result<path_handle> current_working_directory() noexcept
   {
     LLFIO_LOG_FUNCTION_CALL(nullptr);
-    wchar_t buffer[MAX_PATH];
+    wchar_t buffer[0x8001];
     DWORD written = GetCurrentDirectoryW(sizeof(buffer) / sizeof(wchar_t), buffer);
     if(0 == written)
     {
