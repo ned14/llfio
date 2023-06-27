@@ -98,7 +98,7 @@ namespace detail
         return nullptr;
       }
       hits++;
-      auto *p = *it;
+      map_handle_cache_item_t *p = &*it;
       _base::erase(it);
       _base::bytes_in_cache -= bytes;
       assert(bytes == p->trie_key << page_size_shift());
@@ -134,7 +134,7 @@ namespace detail
         {
           if(it->when_added <= older_than)
           {
-            auto *p = *it;
+            map_handle_cache_item_t *p = &*it;
             _base::erase(it--);
             const auto _bytes = p->trie_key << page_size_shift();
             // std::cout << "map_handle::trim_cache(" << p->addr << ", " << _bytes << "). Index item was " << p << ". Trie key is " << p->trie_key << std::endl;
