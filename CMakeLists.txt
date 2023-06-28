@@ -23,6 +23,8 @@
 
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
+cmake_policy(SET CMP0057 NEW)  # Enable IN_LIST operator
+
 set(LLFIO_DEPENDENCY_QUICKCPPLIB_GIT_TAG "master" CACHE STRING "Which git tag to use for the QuickCppLib dependency")
 set(LLFIO_DEPENDENCY_OUTCOME_GIT_TAG "develop" CACHE STRING "Which git tag to use for the Outcome dependency")
 if(NOT LLFIO_DEPENDENCY_QUICKCPPLIB_GIT_TAG STREQUAL "master")

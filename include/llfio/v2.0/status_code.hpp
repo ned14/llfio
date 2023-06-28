@@ -302,7 +302,7 @@ namespace detail
 #endif  // LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
 
 //! An erased status code
-using file_io_error = SYSTEM_ERROR2_NAMESPACE::errored_status_code<SYSTEM_ERROR2_NAMESPACE::erased<detail::file_io_error_domain_value_system_code>>;
+using file_io_error = SYSTEM_ERROR2_NAMESPACE::erased_errored_status_code<detail::file_io_error_domain_value_system_code>;
 
 
 template <class T> using result = OUTCOME_V2_NAMESPACE::experimental::status_result<T, file_io_error>;
@@ -446,10 +446,7 @@ public:
   }
 
   //! Retrieve the value of the error code
-  int value() const noexcept
-  {
-    return ec.value();
-  }
+  int value() const noexcept { return ec.value(); }
   //! Retrieve any first path associated with this failure. Note this only works if called from the same thread as where the failure occurred.
   inline filesystem::path path1() const
   {

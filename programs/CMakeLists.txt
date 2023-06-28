@@ -1,4 +1,7 @@
-cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+
+cmake_policy(SET CMP0057 NEW)  # Enable IN_LIST operator
+
 include(../cmake/QuickCppLibBootstrap.cmake)
 include(QuickCppLibUtils)
 
