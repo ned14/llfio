@@ -158,13 +158,13 @@ std::error_code&#160;</td><td class="memItemRight" valign="bottom"><b>make_error
 </table>
 </div><div class="memdoc">
 <p>Retrieve a descriptive message for this failure, possibly with paths and stack backtraces. Extra detail only appears if called from the same thread as where the failure occurred. </p>
-<div class="fragment"><div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;  {</div>
-<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;    std::string ret(ec.message());</div>
-<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;<span class="preprocessor">#if !LLFIO_DISABLE_PATHS_IN_FAILURE_INFO</span></div>
-<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;    detail::append_path_info(*<span class="keyword">this</span>, ret);</div>
-<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;    <span class="keywordflow">return</span> ret;</div>
-<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;  }</div>
+<div class="fragment"><div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;  {</div>
+<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;    std::string ret(ec.message());</div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;<span class="preprocessor">#if !LLFIO_DISABLE_PATHS_IN_FAILURE_INFO</span></div>
+<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;    detail::append_path_info(*<span class="keyword">this</span>, ret);</div>
+<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;    <span class="keywordflow">return</span> ret;</div>
+<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -191,19 +191,19 @@ std::error_code&#160;</td><td class="memItemRight" valign="bottom"><b>make_error
 </table>
 </div><div class="memdoc">
 <p>Throw this failure as a C++ exception. Firstly if the error code matches any of the standard C++ exception types e.g. <code>bad_alloc</code>, we throw those types using the string from <code>message()</code> where possible. We then will throw an <code>error</code> exception type. </p>
-<div class="fragment"><div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;{</div>
-<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;  std::string msg;</div>
-<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;  <span class="keywordflow">try</span></div>
-<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;  {</div>
-<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;    msg = <a class="code" href="structllfio__v2__xxx_1_1error__info.html#a3ba6efb57025c79297c3a3061ae78bf9">message</a>();</div>
+<div class="fragment"><div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;{</div>
+<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;  std::string msg;</div>
+<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;  <span class="keywordflow">try</span></div>
+<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;  {</div>
+<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;    msg = <a class="code" href="structllfio__v2__xxx_1_1error__info.html#a3ba6efb57025c79297c3a3061ae78bf9">message</a>();</div>
+<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;  }</div>
+<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;  <span class="keywordflow">catch</span>(...)</div>
+<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;  {</div>
 <div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;  }</div>
-<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;  <span class="keywordflow">catch</span>(...)</div>
-<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;  {</div>
-<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;  }</div>
-<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;  OUTCOME_V2_NAMESPACE::try_throw_std_exception_from_error(ec, msg);</div>
-<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;  <span class="keywordflow">throw</span> error(*<span class="keyword">this</span>);</div>
-<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;}</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1error__info_html_a3ba6efb57025c79297c3a3061ae78bf9"><div class="ttname"><a href="structllfio__v2__xxx_1_1error__info.html#a3ba6efb57025c79297c3a3061ae78bf9">llfio_v2_xxx::error_info::message</a></div><div class="ttdeci">std::string message() const</div><div class="ttdef"><b>Definition:</b> status_code.hpp:487</div></div>
+<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;  OUTCOME_V2_NAMESPACE::try_throw_std_exception_from_error(ec, msg);</div>
+<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;  <span class="keywordflow">throw</span> error(*<span class="keyword">this</span>);</div>
+<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;}</div>
+<div class="ttc" id="astructllfio__v2__xxx_1_1error__info_html_a3ba6efb57025c79297c3a3061ae78bf9"><div class="ttname"><a href="structllfio__v2__xxx_1_1error__info.html#a3ba6efb57025c79297c3a3061ae78bf9">llfio_v2_xxx::error_info::message</a></div><div class="ttdeci">std::string message() const</div><div class="ttdef"><b>Definition:</b> status_code.hpp:484</div></div>
 </div><!-- fragment -->
 </div>
 </div>
