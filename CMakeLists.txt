@@ -69,7 +69,7 @@ project(llfio VERSION ${VERSIONSTRING} LANGUAGES C CXX)
 set(PROJECT_NAMESPACE)
 # Setup this cmake environment for this project
 include(QuickCppLibSetupProject)
-if(NOT PROJECT_IS_DEPENDENCY)
+if(NOT llfio_IS_DEPENDENCY)
   # This file should be updated with the last git SHA next commit
   UpdateRevisionHppFromGit("${CMAKE_CURRENT_SOURCE_DIR}/include/llfio/revision.hpp")
 endif()
@@ -87,14 +87,8 @@ find_quickcpplib_library(outcome
   IS_HEADER_ONLY
 )
 if(WIN32)
-  set(OLD_PROJECT_IS_DEPENDENCY ${PROJECT_IS_DEPENDENCY})
-  set(PROJECT_IS_DEPENDENCY On)
+  set(ntkernel-error-category_IS_DEPENDENCY On)
   add_subdirectory("include/llfio/ntkernel-error-category" EXCLUDE_FROM_ALL)
-  if(OLD_PROJECT_IS_DEPENDENCY)
-    set(PROJECT_IS_DEPENDENCY ${OLD_PROJECT_IS_DEPENDENCY})
-  else()
-    set(PROJECT_IS_DEPENDENCY)
-  endif()
 endif()
 
 # Make the standard static and shared libraries, and if supported by this compiler, C++ modules
@@ -118,7 +112,7 @@ if(NOT LLFIO_FORCE_COROUTINES_OFF)
 endif()
 
 # Make preprocessed edition of this library target
-if(NOT PROJECT_IS_DEPENDENCY)
+if(NOT llfio_IS_DEPENDENCY AND (NOT DEFINED BUILD_TESTING OR BUILD_TESTING))
   if(NOT PYTHONINTERP_FOUND)
     indented_message(WARNING "NOT rebuilding preprocessed edition of library due to python not being installed")
   else()
@@ -443,7 +437,7 @@ if(TARGET llfio-example_single-header)
   endif()
 endif()
 
-if(NOT PROJECT_IS_DEPENDENCY)
+if(NOT llfio_IS_DEPENDENCY AND (NOT DEFINED BUILD_TESTING OR BUILD_TESTING))
   # For all possible configurations of this library, add each test
   set(llfio_TESTS_DISABLE_PRECOMPILE_HEADERS
     "llfio_hl--coroutines"
