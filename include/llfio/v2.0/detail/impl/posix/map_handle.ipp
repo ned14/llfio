@@ -369,8 +369,8 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
   int fd_to_use = have_backing ? section->native_handle().fd : -1;
   if(pagesize != utils::page_size())
   {
-    static const auto &pagesizes = utils::page_sizes();  // can't throw, as guaranteed called before now
 #ifdef __linux__
+    static const auto &pagesizes = utils::page_sizes();  // can't throw, as guaranteed called before now
     flags |= MAP_HUGETLB;  // gets me pagesizes[1]
     if(pagesize > pagesizes[1])
     {
@@ -389,7 +389,6 @@ static inline result<void *> do_mmap(native_handle_type &nativeh, void *ataddr, 
     size_t topbitset = (__CHAR_BIT__ * sizeof(unsigned long)) - __builtin_clzl((unsigned long) pagesize);
     if(have_backing || topbitset < 21)
     {
-      (void) pagesizes;
       return errc::invalid_argument;
     }
     fd_to_use = ((topbitset - 20) << VM_FLAGS_SUPERPAGE_SHIFT);
@@ -584,7 +583,7 @@ result<map_handle::size_type> map_handle::truncate(size_type newsize, bool permi
     byte *addrafter = _addr + _reservation;
     size_type bytes = _newsize - _reservation;
     extent_type offset = _offset + _reservation;
-    OUTCOME_TRY(auto &&addr, do_mmap(_v, addrafter, MAP_FIXED | MAP_EXCL, _section, _pagesize, bytes, offset, _flag));
+    OUTCOME_TRY(do_mmap(_v, addrafter, MAP_FIXED | MAP_EXCL, _section, _pagesize, bytes, offset, _flag));
     _reservation = _newsize;
     _length = length;
     return newsize;

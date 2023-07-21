@@ -24,6 +24,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 //#define LLFIO_LOGGING_LEVEL 99
 
+#ifndef LLFIO_EXCLUDE_DYNAMIC_THREAD_POOL_GROUP
+
 #include "../test_kernel_decl.hpp"
 
 #include "quickcpplib/algorithm/small_prng.hpp"
@@ -582,3 +584,5 @@ KERNELTEST_TEST_KERNEL(integration, llfio, dynamic_thread_pool_group, nested, "T
                        TestDynamicThreadPoolGroupNestingWorks())
 KERNELTEST_TEST_KERNEL(integration, llfio, dynamic_thread_pool_group, io_aware_work_item,
                        "Tests that llfio::dynamic_thread_pool_group::io_aware_work_item works as expected", TestDynamicThreadPoolGroupIoAwareWorks())
+#endif
+

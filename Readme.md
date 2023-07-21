@@ -23,7 +23,6 @@ It is a complete rewrite after a Boost peer review in August 2015. LLFIO is the
 reference implementation for these C++ standardisations:
 - `llfio::path_view` is expected to enter the C++ 26 standard ([P1030](https://wg21.link/p1030)).
 - `llfio::file_handle` and `llfio::mapped_file_handle` are on track for entering the C++ 26 standard ([P1883](https://wg21.link/p1883)).
-- `llfio::tls_socket_handle` and `llfio::byte_socket_handle` are being considered for the C++ 26 standard ([P2586](https://wg21.link/p2596)).
 
 Other characteristics:
 - Portable to any conforming C++ 14 compiler with a working Filesystem TS in its STL.
