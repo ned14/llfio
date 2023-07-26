@@ -584,5 +584,10 @@ KERNELTEST_TEST_KERNEL(integration, llfio, dynamic_thread_pool_group, nested, "T
                        TestDynamicThreadPoolGroupNestingWorks())
 KERNELTEST_TEST_KERNEL(integration, llfio, dynamic_thread_pool_group, io_aware_work_item,
                        "Tests that llfio::dynamic_thread_pool_group::io_aware_work_item works as expected", TestDynamicThreadPoolGroupIoAwareWorks())
+#else
+int main(void)
+{
+  return 0;
+}
 #endif
 

@@ -28,6 +28,8 @@ Distributed under the Boost Software License, Version 1.0.
 #include "import.hpp"
 
 #include <climits>  // for PATH_MAX
+#include <cstdint>
+#include <cstring>
 
 #ifdef __linux__
 #include <sys/syscall.h>
@@ -455,17 +457,101 @@ result<span<path_view_component>> fs_handle::list_extended_attributes(span<byte>
   }
   return filled;
 #elif defined(__FreeBSD__)
-  auto readed = extattr_list_fd(h.native_handle().fd, EXTATTR_NAMESPACE_USER, tofill.data(), tofill.size());
-  if(readed < 0)
+  auto readed_user = extattr_list_fd(h.native_handle().fd, EXTATTR_NAMESPACE_USER, tofill.data(), tofill.size());
+  if(readed_user < 0)
   {
     return posix_error();
   }
-  struct record_t
+  auto readed_sys = extattr_list_fd(h.native_handle().fd, EXTATTR_NAMESPACE_SYSTEM, tofill.data() + readed_user, tofill.size() - readed_user);
+  if(readed_sys < 0)
   {
-    uint8_t length;
-    char name[1];  // NOT null terminated, does NOT includer 'user.' prefix
-  };
-#error "Implement this next time I am on FreeBSD"
+    return posix_error();
+  }
+  auto readed = readed_user + readed_sys;
+  span<path_view_component> filled;
+  {
+    auto *p = tofill.data();
+    size_t count = 0, totallength = 0;
+    uint8_t lengths[65536], *length_user = lengths;
+    while(p < tofill.data() + readed_user)
+    {
+      *length_user = *(uint8_t*)p;
+      totallength = 6 + *length_user;
+      count++;
+      p += (*length_user++) + 1;
+      if(length_user - lengths >= long(sizeof(lengths)))
+      {
+        abort();
+      }
+    }
+    auto *length_sys = length_user;
+    while(p < tofill.data() + readed_user + readed_sys)
+    {
+      *length_sys = *(uint8_t*)p;
+      totallength = 8 + *length_sys;
+      count++;
+      p += (*length_sys++) + 1;
+      if(length_sys - lengths >= long(sizeof(lengths)))
+      {
+        abort();
+      }
+    }  
+    if(count == 0)
+    {
+      return filled;
+    }
+    if(totallength > tofill.size())
+    {
+      return errc::no_buffer_space;
+    }
+    readed = totallength;
+    // Need to repack the names to contain a 'user.' or 'system.' prefix
+    auto *l = length_sys - 1;
+    auto *p1 = p - *l - 1;
+    auto *p2 = tofill.data() + totallength - *l - 8;
+    while(l >= length_user)
+    {
+      memcpy(p2, "system.", 7);
+      memmove(p2 + 7, p1, *l);
+      p2[7 + *l] = std::byte{0};
+      p1 -= *l + 1;
+      p2 -= *l + 8;
+      l--;
+    }
+    while(l >= lengths)
+    {
+      memcpy(p2, "user.", 5);
+      memmove(p2 + 5, p1, *l);
+      p2[5 + *l] = std::byte{0};
+      p1 -= *l + 1;
+      p2 -= *l + 6;
+      l--;
+    }
+    const auto offset = (readed + 7) & ~7;
+    auto tofillremaining = tofill.size() - offset;
+    if(count * sizeof(path_view_component) > tofillremaining)
+    {
+      return errc::no_buffer_space;
+    }
+    filled = {(path_view_component *) (p + offset), count};
+  }
+  {
+    auto *p = tofill.data();
+    size_t count = 0;
+    while(p < tofill.data() + readed)
+    {
+      auto *i = (char *) p;
+      auto length = strlen(i);
+      if(length > 0)
+      {
+        filled[count] = path_view_component(i, length, path_view_component::zero_terminated);
+        count++;
+      }
+      p += length + 1;
+    }
+  }      
+  return filled;
+
 #else
   return errc::operation_not_supported;
 #endif
@@ -490,8 +576,23 @@ result<span<byte>> fs_handle::get_extended_attribute(span<byte> tofill, path_vie
   return {tofill.data(), readed};
 #elif defined(__FreeBSD__)
   path_view::zero_terminated_rendered_path<> zname(name);
-  // TODO: Strip "user." or "system." prefix and choose the right namespace
-  auto readed = extattr_get_fd(h.native_handle().fd, EXTATTR_NAMESPACE_USER, zname.c_str(), tofill.data(), tofill.size());
+  int ns = 0;
+  const char *nme = zname.c_str();
+  if(zname.size() >= 5 && 0 == memcmp(nme, "user.", 5))
+  {
+    ns = EXTATTR_NAMESPACE_USER;
+    nme += 5;
+  }
+  else if(zname.size() >= 7 && 0 == memcmp(nme, "system.", 7))
+  {
+    ns = EXTATTR_NAMESPACE_SYSTEM;
+    nme += 7;
+  }
+  else
+  {
+    return errc::no_such_file_or_directory;
+  }
+  auto readed = extattr_get_fd(h.native_handle().fd, ns, nme, tofill.data(), tofill.size());
   if(readed < 0)
   {
     return posix_error();
@@ -519,13 +620,28 @@ result<void> fs_handle::set_extended_attribute(path_view_component name, span<co
   return success();
 #elif defined(__FreeBSD__)
   path_view::zero_terminated_rendered_path<> zname(name);
-  // TODO: Strip "user." or "system." prefix and choose the right namespace
-  auto written = extattr_set_fd(h.native_handle().fd, EXTATTR_NAMESPACE_USER, zname.c_str(), tofill.data(), tofill.size());
+  int ns = 0;
+  const char *nme = zname.c_str();
+  if(zname.size() >= 5 && 0 == memcmp(nme, "user.", 5))
+  {
+    ns = EXTATTR_NAMESPACE_USER;
+    nme += 5;
+  }                  
+  else if(zname.size() >= 7 && 0 == memcmp(nme, "system.", 7))
+  {                  
+    ns = EXTATTR_NAMESPACE_SYSTEM;
+    nme += 7;
+  }   
+  else
+  {
+    return errc::no_such_file_or_directory;
+  }
+  auto written = extattr_set_fd(h.native_handle().fd, ns, nme, value.data(), value.size());
   if(written < 0)
   {
     return posix_error();
   }
-  if(written < value.size())
+  if(written < ssize_t(value.size()))
   {
     return errc::no_space_on_device;
   }
@@ -554,8 +670,23 @@ result<void> fs_handle::remove_extended_attribute(path_view_component name) noex
   return success();
 #elif defined(__FreeBSD__)
   path_view::zero_terminated_rendered_path<> zname(name);
-  // TODO: Strip "user." or "system." prefix and choose the right namespace
-  auto written = extattr_delete_fd(h.native_handle().fd, EXTATTR_NAMESPACE_USER, zname.c_str());
+  int ns = 0;
+  const char *nme = zname.c_str();
+  if(zname.size() >= 5 && 0 == memcmp(nme, "user.", 5))
+  {
+    ns = EXTATTR_NAMESPACE_USER;
+    nme += 5;
+  }                  
+  else if(zname.size() >= 7 && 0 == memcmp(nme, "system.", 7))
+  {                  
+    ns = EXTATTR_NAMESPACE_SYSTEM;
+    nme += 7;
+  }   
+  else
+  {
+    return errc::no_such_file_or_directory;
+  }
+  auto written = extattr_delete_fd(h.native_handle().fd, ns, nme);
   if(written < 0)
   {
     return posix_error();
