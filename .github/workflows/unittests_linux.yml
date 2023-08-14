@@ -11,8 +11,8 @@ on:
 
 jobs:
   Linux:
-    name: Ubuntu 22.04
-    runs-on: ubuntu-22.04
+    name: Ubuntu 20.04
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
@@ -35,7 +35,10 @@ jobs:
       run: |
        sudo apt-get update
        if [ "${{ matrix.compiler }}" = "libc++" ]; then
-         sudo apt install libc++-dev libc++abi-dev libomp-dev;
+         wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -;
+         sudo add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-11 main";
+         sudo apt update;
+         sudo apt install clang-11 libc++-11-dev libc++abi-11-dev libomp-11-dev;
          export CMAKE_CONFIGURE_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake";
        fi
        if [ "${{ matrix.configuration }}" = "status_code" ]; then
@@ -49,14 +52,14 @@ jobs:
        fi
       
     - name: Upload Prebuilt Binaries
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: Linux ${{ matrix.configuration }} ${{ matrix.compiler }} prebuilt binaries
         path: llfio-v2.0-binaries-linux-*.tgz
       
     - name: Upload Test Results
       if: ${{ matrix.compiler != 'arm-linux-gnueabihf-g++' }}
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: Linux ${{ matrix.configuration }} ${{ matrix.compiler }} test results
         path: prebuilt/merged_junit_results.xml
@@ -69,7 +72,7 @@ jobs:
 
     steps:
       - name: Download Artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           path: artifacts
 

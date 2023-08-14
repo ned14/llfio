@@ -32,14 +32,14 @@ jobs:
        ctest -S .ci.cmake -VV -E noexcept --timeout 900 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS"
       
     - name: Upload Prebuilt Binaries
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: Mac OS ${{ matrix.configuration }} prebuilt binaries
         path: llfio-v2.0-binaries-darwin-x64.tgz
       
     - name: Upload Test Results
       if: always()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: Mac OS ${{ matrix.configuration }} test results
         path: prebuilt/merged_junit_results.xml
@@ -52,7 +52,7 @@ jobs:
 
     steps:
       - name: Download Artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           path: artifacts
 

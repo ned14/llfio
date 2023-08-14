@@ -31,7 +31,7 @@ jobs:
          sleep 60
 
       - name: Download Linux artifacts
-        uses: dawidd6/action-download-artifact@v3
+        uses: dawidd6/action-download-artifact@v2
         if: steps.waitforstatuschecks.outputs.status == 'success'
         with:
           github_token: ${{secrets.GITHUB_TOKEN}}
@@ -39,7 +39,7 @@ jobs:
           path: artifacts
     
       - name: Download Mac OS artifacts
-        uses: dawidd6/action-download-artifact@v3
+        uses: dawidd6/action-download-artifact@v2
         if: steps.waitforstatuschecks.outputs.status == 'success'
         with:
           github_token: ${{secrets.GITHUB_TOKEN}}
@@ -47,7 +47,7 @@ jobs:
           path: artifacts
     
       - name: Download Windows artifacts
-        uses: dawidd6/action-download-artifact@v3
+        uses: dawidd6/action-download-artifact@v2
         if: steps.waitforstatuschecks.outputs.status == 'success'
         with:
           github_token: ${{secrets.GITHUB_TOKEN}}

@@ -42,8 +42,9 @@ jobs:
          sudo apt-get remove -y libssl-dev
          sudo apt-get autoremove
        fi
+       export CMAKE_CONFIGURE_OPTIONS="-DLLFIO_FORCE_OPENSSL_OFF=On"
        if [ "${{ matrix.configuration }}" = "status_code" ]; then
-         export CMAKE_CONFIGURE_OPTIONS="-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON"
+         export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS -DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON"
        fi
        git clone --depth 1 https://github.com/ned14/quickcpplib.git
        pip install --user gitpython
@@ -51,5 +52,5 @@ jobs:
        cd test_cpp-pm_install
        mkdir build
        cd build
-       cmake .. -DCMAKE_BUILD_TYPE=Release -DLLFIO_FORCE_OPENSSL_OFF=On $CMAKE_CONFIGURE_OPTIONS
+       cmake .. -DCMAKE_BUILD_TYPE=Release $CMAKE_CONFIGURE_OPTIONS
        cmake --build .
