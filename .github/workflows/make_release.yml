@@ -88,7 +88,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: artifacts/Linux error_code g++ prebuilt binaries/llfio-v2.0-binaries-linux-x64.tgz
-          asset_name: llfio-v2.0-binaries-ubuntu18.04-x64-error_code.tgz
+          asset_name: llfio-v2.0-binaries-ubuntu20.04-x64-error_code.tgz
           asset_content_type: application/gzip
           
       - name: Upload Linux 2
@@ -99,7 +99,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: artifacts/Linux status_code g++ prebuilt binaries/llfio-v2.0-binaries-linux-x64.tgz
-          asset_name: llfio-v2.0-binaries-ubuntu18.04-x64-status_code.tgz
+          asset_name: llfio-v2.0-binaries-ubuntu20.04-x64-status_code.tgz
           asset_content_type: application/gzip
           
       - name: Upload Linux 3
@@ -110,7 +110,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: artifacts/Linux error_code arm-linux-gnueabihf-g++ prebuilt binaries/llfio-v2.0-binaries-linux-armhf.tgz
-          asset_name: llfio-v2.0-binaries-ubuntu18.04-armhf-error_code.tgz
+          asset_name: llfio-v2.0-binaries-ubuntu20.04-armhf-error_code.tgz
           asset_content_type: application/gzip
           
       - name: Upload Linux 4
@@ -121,7 +121,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: artifacts/Linux status_code arm-linux-gnueabihf-g++ prebuilt binaries/llfio-v2.0-binaries-linux-armhf.tgz
-          asset_name: llfio-v2.0-binaries-ubuntu18.04-armhf-status_code.tgz
+          asset_name: llfio-v2.0-binaries-ubuntu20.04-armhf-status_code.tgz
           asset_content_type: application/gzip
 
       - name: Upload MacOS 1
@@ -132,7 +132,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: artifacts/Mac OS error_code prebuilt binaries/llfio-v2.0-binaries-darwin-x64.tgz
-          asset_name: llfio-v2.0-binaries-macos-10.15-x64-error_code.tgz
+          asset_name: llfio-v2.0-binaries-macos-11-x64-error_code.tgz
           asset_content_type: application/gzip
           
       - name: Upload MacOS 2
@@ -143,7 +143,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: artifacts/Mac OS status_code prebuilt binaries/llfio-v2.0-binaries-darwin-x64.tgz
-          asset_name: llfio-v2.0-binaries-macos-10.15-x64-status_code.tgz
+          asset_name: llfio-v2.0-binaries-macos-11-x64-status_code.tgz
           asset_content_type: application/gzip
 
       - name: Upload Windows 1

@@ -393,6 +393,9 @@ endif()
 if(LLFIO_FORCE_MAPPED_FILES_OFF)
   all_compile_definitions(PUBLIC LLFIO_EXCLUDE_MAPPED_FILE_HANDLE=1)
 endif()
+if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
+  all_link_libraries(PUBLIC util)
+endif()
 
 # Set any macros this library requires
 all_compile_definitions(PRIVATE LLFIO_INCLUDE_STORAGE_PROFILE=1 LLFIO_ENABLE_TEST_IO_MULTIPLEXERS=1)

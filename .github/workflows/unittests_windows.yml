@@ -10,7 +10,7 @@ on:
   - cron: '0 0 1 * *'
 
 jobs:
-  WinVS2017:
+  WinVS2019:
     name: Visual Studio
     strategy:
       fail-fast: false
@@ -62,7 +62,7 @@ jobs:
 
   publish-test-results:
     name: "Publish Unit Tests Results"
-    needs: [WinVS2017]
+    needs: [WinVS2019]
     runs-on: ubuntu-latest
     if: success() || failure()
 

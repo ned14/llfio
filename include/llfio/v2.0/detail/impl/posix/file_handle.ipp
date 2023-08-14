@@ -802,7 +802,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
 #endif
 #elif defined(__FreeBSD__)
       // This gets implemented in FreeBSD 13. See https://reviews.freebsd.org/D20584
-      return syscall(569 /*copy_file_range*/, intfd, inoffp, outfd, outoffp, len, flags);
+      return syscall(569 /*copy_file_range*/, infd, inoffp, outfd, outoffp, len, flags);
 #else
       (void) infd;
       (void) inoffp;

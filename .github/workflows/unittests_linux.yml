@@ -11,8 +11,8 @@ on:
 
 jobs:
   Linux:
-    name: Ubuntu 18.04
-    runs-on: ubuntu-18.04
+    name: Ubuntu 20.04
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
@@ -34,13 +34,8 @@ jobs:
       shell: bash
       run: |
        sudo apt-get update
-       sudo apt-get remove -y libstdc++-10-dev g++-10 gcc-10 libstdc++-11-dev g++-11 gcc-11
-       sudo apt-get autoremove
        if [ "${{ matrix.compiler }}" = "libc++" ]; then
-         wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -;
-         sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-11 main";
-         sudo apt update;
-         sudo apt install clang-11 libc++-11-dev libc++abi-11-dev libomp-11-dev;
+         sudo apt installlibc++-dev libc++abi-dev libomp-dev;
          export CMAKE_CONFIGURE_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake";
        fi
        if [ "${{ matrix.configuration }}" = "status_code" ]; then

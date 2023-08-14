@@ -42,6 +42,12 @@ Distributed under the Boost Software License, Version 1.0.
 #include <mach/task_info.h>
 #include <mach/vm_map.h>
 #endif
+#ifdef __FreeBSD__
+#include <libutil.h>
+#include <sys/resource.h>
+#include <sys/sysctl.h>
+#include <sys/vmmeter.h>
+#endif
 
 LLFIO_V2_NAMESPACE_BEGIN
 
@@ -580,6 +586,61 @@ namespace utils
       // ret.system_commit_charge_available = (uint64_t) pi.CommitTotal * page_size();
     }
     return ret;
+#elif defined(__FreeBSD__)
+    process_memory_usage ret;
+    if(!!(want & process_memory_usage::want::this_system))
+    {
+      struct vmtotal totalmem;
+      memset(&totalmem, 0, sizeof(totalmem));
+      size_t len = sizeof(totalmem);
+      int mib[2] = {CTL_HW, VM_TOTAL};
+      if(sysctl(mib, 2, &totalmem, &len, nullptr, 0) < 0)
+      {
+        return posix_error();
+      }
+      ret.system_physical_memory_total = page_size() * (totalmem.t_rm + totalmem.t_free);
+      ret.system_physical_memory_available = page_size() * (totalmem.t_free);
+      ret.system_commit_charge_maximum = page_size() * (totalmem.t_vm);
+      ret.system_commit_charge_available = page_size() * (totalmem.t_vm - totalmem.t_avm);
+    }
+    if(!!(want & process_memory_usage::want::this_process))
+    {
+      if(!!(want & process_memory_usage::want::total_address_space_paged_in) || !!(want & process_memory_usage::want::private_committed))
+      {
+        struct rusage usage;
+        memset(&usage, 0, sizeof(usage));
+        if(getrusage(RUSAGE_SELF, &usage) < 0)
+        {
+          return posix_error();
+        }
+        const auto ticks = sysconf(_SC_CLK_TCK);
+        ret.total_address_space_paged_in = usage.ru_maxrss * 1024U;
+        ret.private_committed = (usage.ru_idrss + usage.ru_isrss) * 1024U * ticks;
+      }
+      if(!!(want & process_memory_usage::want::total_address_space_in_use) || !!(want & process_memory_usage::want::private_paged_in))
+      {
+        int records = 0;
+        struct kinfo_vmentry *entries = kinfo_getvmmap(getpid(), &records);
+        if(entries == nullptr)
+        {
+          return posix_error();
+        }
+        for(int n = 0; n < records; n++)
+        {
+          if(entries[n].kve_type == KVME_TYPE_DEFAULT || entries[n].kve_type == KVME_TYPE_VNODE)
+          {
+            ret.total_address_space_in_use += entries[n].kve_end - entries[n].kve_start;
+            // kve_private_resident actually means total private pages, not those currently resident.
+            if(!!(entries[n].kve_flags & KVME_FLAG_COW) && !(entries[n].kve_flags & KVME_FLAG_NEEDS_COPY))
+            {
+              ret.private_paged_in += page_size() * entries[n].kve_resident;
+            }
+          }
+        }
+        free(entries);
+      }
+    }
+    return ret;
 #else
 #error Unknown platform
 #endif
@@ -712,6 +773,37 @@ namespace utils
     ret.system_ns_in_kernel_mode = (uint64_t) (ts_multiplier * ret.system_ns_in_kernel_mode);
     ret.system_ns_in_idle_mode = (uint64_t) (ts_multiplier * ret.system_ns_in_idle_mode);
     return ret;
+#elif defined(__FreeBSD__)
+    struct rusage usage;
+    memset(&usage, 0, sizeof(usage));
+    if(getrusage(RUSAGE_SELF, &usage) < 0)
+    {
+      return posix_error();
+    }
+    ret.process_ns_in_user_mode = usage.ru_utime.tv_sec * 1000000000ULL + usage.ru_utime.tv_usec * 1000ULL;
+    ret.process_ns_in_kernel_mode = usage.ru_stime.tv_sec * 1000000000ULL + usage.ru_stime.tv_usec * 1000ULL;
+
+    static int mib[4];
+    static size_t miblen = [&]{
+      size_t len = 0;
+      if(sysctlnametomib("kern.cp_time", mib, &len) < 0)
+      {
+        abort();
+      }
+      return len;
+    }();
+    std::vector<long> cp_times(CPUSTATES + 1);
+    size_t len = (CPUSTATES + 1) * sizeof(long);
+    if(sysctl(mib, miblen, cp_times.data(), &len, nullptr, 0) < 0)
+    {
+      return posix_error();
+    }
+    const auto ticks = sysconf(_SC_CLK_TCK);
+    /* Apparently order is: user ticks, nice ticks, system ticks, interrupt ticks, idle ticks.
+    */
+    ret.system_ns_in_user_mode = (cp_times[0] + cp_times[1]) * 1000000000ULL / ticks;
+    ret.system_ns_in_kernel_mode = (cp_times[2] + cp_times[3]) * 1000000000ULL / ticks;
+    ret.system_ns_in_idle_mode = cp_times[4] * 1000000000ULL / ticks;
 #else
 #error Unknown platform
 #endif
