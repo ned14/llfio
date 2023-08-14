@@ -1,4 +1,5 @@
 ---
+# 2x 2Tb RAID0 Samsung PM9A1 (980 Pro) on XFS
 timestamp: 2023-06-28 11:48:02 +0000
 system:
     os:
@@ -733,6 +734,7 @@ direct=1 sync=1:
                     0b: 4956458
 
 ---
+# 2x 2Tb RAID0 Samsung PM9A1 (980 Pro) on F2FS
 timestamp: 2023-06-28 12:34:44 +0000
 system:
     os:
@@ -1443,3 +1445,715 @@ direct=1 sync=1:
                 delete_file:
                     # The average nanoseconds to delete a 0 byte file (cold cache, race free)
                     0b: 6243208
+---
+# 960Gb Intel Optane 905P X-Point on XFS
+timestamp: 2023-07-21 14:46:25 +0000
+system:
+    os:
+        name: Linux
+        ver: 5.15.0-76-generic
+    cpu:
+        name: AuthenticAMD AMD Ryzen Threadripper PRO 5975WX 32-Cores
+        architecture: x86_64
+        physical_cores: 64
+    mem:
+        # Main memory bandwidth when accessed sequentially (1 CPU core)
+        max_bandwidth: 1932735283
+        # Main memory bandwidth when 4Kb pages are accessed randomly (1 CPU core)
+        min_bandwidth: 1449551462
+        quantity: 134963339264
+        in_use: 0.187772
+    timer:
+        ns_per_tick: 20
+        ns_overhead: 20
+    scheduler:
+        # Nanoseconds to context switch a thread
+        ns_yield: 458
+        # Nanoseconds to sleep and wake a thread
+        ns_sleep_wake: 38039
+    drop_filesystem_cache_support: 1
+storage:
+    device:
+        min_io_size: 1024
+        size: 960193626112
+    fs:
+        name: xfs
+        config: todo
+        size: 959724781568
+        in_use: 0.0455115
+direct=0 sync=0:
+    concurrency:
+        # The i/o modify quantum guaranteed to be atomically visible to readers
+        # irrespective of rewrite quantity
+        atomic_rewrite_quantum: 1048576
+
+        # The maximum single aligned i/o modify quantity atomically visible to readers
+        # (can be [potentially unreliably] much larger than atomic_rewrite_quantum). A
+        # very common value on modern hardware with direct i/o thanks to PCIe DMA is
+        # 4096, don't trust values higher than this because of potentially discontiguous
+        # memory page mapping.
+        max_aligned_atomic_rewrite: 1048576
+
+    latency:
+        read:
+            # The nanoseconds to read zero bytes
+            nothing: 104
+            qd1:
+                # The nanoseconds to read 4Kb at a queue depth of 1 (min)
+                min: 250
+                # The nanoseconds to read 4Kb at a queue depth of 1 (arithmetic mean)
+                mean: 646
+                # The nanoseconds to read 4Kb at a queue depth of 1 (max)
+                max: 2488078
+                # The nanoseconds to read 4Kb at a queue depth of 1 (50% of the time)
+                50%: 480
+                # The nanoseconds to read 4Kb at a queue depth of 1 (95% of the time)
+                95%: 650
+                # The nanoseconds to read 4Kb at a queue depth of 1 (99% of the time)
+                99%: 11929
+                # The nanoseconds to read 4Kb at a queue depth of 1 (99.999% of the time)
+                99.999%: 41569
+            qd16:
+                # The nanoseconds to read 4Kb at a queue depth of 16 (min)
+                min: 270
+                # The nanoseconds to read 4Kb at a queue depth of 16 (arithmetic mean)
+                mean: 5189
+                # The nanoseconds to read 4Kb at a queue depth of 16 (max)
+                max: 4019592
+                # The nanoseconds to read 4Kb at a queue depth of 16 (50% of the time)
+                50%: 1610
+                # The nanoseconds to read 4Kb at a queue depth of 16 (95% of the time)
+                95%: 30389
+                # The nanoseconds to read 4Kb at a queue depth of 16 (99% of the time)
+                99%: 66159
+                # The nanoseconds to read 4Kb at a queue depth of 16 (99.999% of the time)
+                99.999%: 218226
+        write:
+            # The nanoseconds to write zero bytes
+            nothing: 102
+            qd1:
+                # The nanoseconds to write 4Kb at a queue depth of 1 (min)
+                min: 430
+                # The nanoseconds to write 4Kb at a queue depth of 1 (arithmetic mean)
+                mean: 943
+                # The nanoseconds to write 4Kb at a queue depth of 1 (max)
+                max: 2890876
+                # The nanoseconds to write 4Kb at a queue depth of 1 (50% of the time)
+                50%: 930
+                # The nanoseconds to write 4Kb at a queue depth of 1 (95% of the time)
+                95%: 1140
+                # The nanoseconds to write 4Kb at a queue depth of 1 (99% of the time)
+                99%: 1300
+                # The nanoseconds to write 4Kb at a queue depth of 1 (99.999% of the time)
+                99.999%: 24929
+            qd16:
+                # The nanoseconds to write 4Kb at a queue depth of 16 (min)
+                min: 450
+                # The nanoseconds to write 4Kb at a queue depth of 16 (arithmetic mean)
+                mean: 1581
+                # The nanoseconds to write 4Kb at a queue depth of 16 (max)
+                max: 54002385
+                # The nanoseconds to write 4Kb at a queue depth of 16 (50% of the time)
+                50%: 1460
+                # The nanoseconds to write 4Kb at a queue depth of 16 (95% of the time)
+                95%: 2380
+                # The nanoseconds to write 4Kb at a queue depth of 16 (99% of the time)
+                99%: 3470
+                # The nanoseconds to write 4Kb at a queue depth of 16 (99.999% of the time)
+                99.999%: 199106
+        readwrite:
+            qd4:
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (min)
+                min: 260
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4
+                # (arithmetic mean)
+                mean: 1034
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (max)
+                max: 3788260
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (50% of
+                # the time)
+                50%: 790
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (95% of
+                # the time)
+                95%: 1280
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99% of
+                # the time)
+                99%: 12940
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99.999%
+                # of the time)
+                99.999%: 50600
+
+    response_time:
+        race_free:
+            warm_cache:
+                create_file:
+                    # The average nanoseconds to create a 0 byte file (warm cache, race free)
+                    0b: 6448
+                enumerate_file:
+                    # The average nanoseconds to enumerate a 0 byte file (warm cache, race free)
+                    0b: 49
+                open_file_read:
+                    # The average nanoseconds to open a 0 byte file for reading (warm cache, race
+                    # free)
+                    0b: 1063
+
+                open_file_write:
+                    # The average nanoseconds to open a 0 byte file for writing (warm cache, race
+                    # free)
+                    0b: 1040
+
+                delete_file:
+                    # The average nanoseconds to delete a 0 byte file (warm cache, race free)
+                    0b: 10285
+        non_race_free:
+                create_file:
+                    # The average nanoseconds to create a 0 byte file (warm cache, non race free)
+                    0b: 6346
+                enumerate_file:
+                    # The average nanoseconds to enumerate a 0 byte file (warm cache, non race free)
+                    0b: 45
+                open_file_read:
+                    # The average nanoseconds to open a 0 byte file for reading (warm cache, non
+                    # race free)
+                    0b: 1035
+
+                open_file_write:
+                    # The average nanoseconds to open a 0 byte file for writing (warm cache, non
+                    # race free)
+                    0b: 1013
+
+                delete_file:
+                    # The average nanoseconds to delete a 0 byte file (warm cache, non race free)
+                    0b: 9769
+        race_free:
+            cold_cache:
+                create_file:
+                    # The average nanoseconds to create a 0 byte file (cold cache, race free)
+                    0b: 6865
+                enumerate_file:
+                    # The average nanoseconds to enumerate a 0 byte file (cold cache, race free)
+                    0b: 93
+                open_file_read:
+                    # The average nanoseconds to open a 0 byte file for reading (cold cache, race
+                    # free)
+                    0b: 3628
+
+                open_file_write:
+                    # The average nanoseconds to open a 0 byte file for writing (cold cache, race
+                    # free)
+                    0b: 3464
+
+                delete_file:
+                    # The average nanoseconds to delete a 0 byte file (cold cache, race free)
+                    0b: 13448
+direct=1 sync=0:
+    concurrency:
+        # The i/o modify quantum guaranteed to be atomically visible to readers
+        # irrespective of rewrite quantity
+        atomic_rewrite_quantum: 16384
+
+        # The maximum single aligned i/o modify quantity atomically visible to readers
+        # (can be [potentially unreliably] much larger than atomic_rewrite_quantum). A
+        # very common value on modern hardware with direct i/o thanks to PCIe DMA is
+        # 4096, don't trust values higher than this because of potentially discontiguous
+        # memory page mapping.
+        max_aligned_atomic_rewrite: 262144
+
+    latency:
+        read:
+            # The nanoseconds to read zero bytes
+            nothing: 101
+            qd1:
+                # The nanoseconds to read 4Kb at a queue depth of 1 (min)
+                min: 11290
+                # The nanoseconds to read 4Kb at a queue depth of 1 (arithmetic mean)
+                mean: 12164
+                # The nanoseconds to read 4Kb at a queue depth of 1 (max)
+                max: 467296
+                # The nanoseconds to read 4Kb at a queue depth of 1 (50% of the time)
+                50%: 12000
+                # The nanoseconds to read 4Kb at a queue depth of 1 (95% of the time)
+                95%: 12630
+                # The nanoseconds to read 4Kb at a queue depth of 1 (99% of the time)
+                99%: 13849
+                # The nanoseconds to read 4Kb at a queue depth of 1 (99.999% of the time)
+                99.999%: 51590
+            qd16:
+                # The nanoseconds to read 4Kb at a queue depth of 16 (min)
+                min: 12750
+                # The nanoseconds to read 4Kb at a queue depth of 16 (arithmetic mean)
+                mean: 27549
+                # The nanoseconds to read 4Kb at a queue depth of 16 (max)
+                max: 1010092
+                # The nanoseconds to read 4Kb at a queue depth of 16 (50% of the time)
+                50%: 26790
+                # The nanoseconds to read 4Kb at a queue depth of 16 (95% of the time)
+                95%: 35730
+                # The nanoseconds to read 4Kb at a queue depth of 16 (99% of the time)
+                99%: 57909
+                # The nanoseconds to read 4Kb at a queue depth of 16 (99.999% of the time)
+                99.999%: 77070
+        write:
+            # The nanoseconds to write zero bytes
+            nothing: 100
+            qd1:
+                # The nanoseconds to write 4Kb at a queue depth of 1 (min)
+                min: 12789
+                # The nanoseconds to write 4Kb at a queue depth of 1 (arithmetic mean)
+                mean: 14120
+                # The nanoseconds to write 4Kb at a queue depth of 1 (max)
+                max: 789235
+                # The nanoseconds to write 4Kb at a queue depth of 1 (50% of the time)
+                50%: 13910
+                # The nanoseconds to write 4Kb at a queue depth of 1 (95% of the time)
+                95%: 14930
+                # The nanoseconds to write 4Kb at a queue depth of 1 (99% of the time)
+                99%: 17030
+                # The nanoseconds to write 4Kb at a queue depth of 1 (99.999% of the time)
+                99.999%: 74370
+            qd16:
+                # The nanoseconds to write 4Kb at a queue depth of 16 (min)
+                min: 16810
+                # The nanoseconds to write 4Kb at a queue depth of 16 (arithmetic mean)
+                mean: 27311
+                # The nanoseconds to write 4Kb at a queue depth of 16 (max)
+                max: 986064
+                # The nanoseconds to write 4Kb at a queue depth of 16 (50% of the time)
+                50%: 26260
+                # The nanoseconds to write 4Kb at a queue depth of 16 (95% of the time)
+                95%: 43580
+                # The nanoseconds to write 4Kb at a queue depth of 16 (99% of the time)
+                99%: 57940
+                # The nanoseconds to write 4Kb at a queue depth of 16 (99.999% of the time)
+                99.999%: 95719
+        readwrite:
+            qd4:
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (min)
+                min: 10710
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4
+                # (arithmetic mean)
+                mean: 13945
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (max)
+                max: 1929499
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (50% of
+                # the time)
+                50%: 13339
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (95% of
+                # the time)
+                95%: 16210
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99% of
+                # the time)
+                99%: 23869
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99.999%
+                # of the time)
+                99.999%: 63520
+
+    response_time:
+        race_free:
+            warm_cache:
+                create_file:
+                    # The average nanoseconds to create a 0 byte file (warm cache, race free)
+                    0b: 5157
+                enumerate_file:
+                    # The average nanoseconds to enumerate a 0 byte file (warm cache, race free)
+                    0b: 70
+                open_file_read:
+                    # The average nanoseconds to open a 0 byte file for reading (warm cache, race
+                    # free)
+                    0b: 858
+
+                open_file_write:
+                    # The average nanoseconds to open a 0 byte file for writing (warm cache, race
+                    # free)
+                    0b: 832
+
+                delete_file:
+                    # The average nanoseconds to delete a 0 byte file (warm cache, race free)
+                    0b: 8403
+        non_race_free:
+                create_file:
+                    # The average nanoseconds to create a 0 byte file (warm cache, non race free)
+                    0b: 5433
+                enumerate_file:
+                    # The average nanoseconds to enumerate a 0 byte file (warm cache, non race free)
+                    0b: 54
+                open_file_read:
+                    # The average nanoseconds to open a 0 byte file for reading (warm cache, non
+                    # race free)
+                    0b: 872
+
+                open_file_write:
+                    # The average nanoseconds to open a 0 byte file for writing (warm cache, non
+                    # race free)
+                    0b: 832
+
+                delete_file:
+                    # The average nanoseconds to delete a 0 byte file (warm cache, non race free)
+                    0b: 8218
+        race_free:
+            cold_cache:
+                create_file:
+                    # The average nanoseconds to create a 0 byte file (cold cache, race free)
+                    0b: 5961
+                enumerate_file:
+                    # The average nanoseconds to enumerate a 0 byte file (cold cache, race free)
+                    0b: 126
+                open_file_read:
+                    # The average nanoseconds to open a 0 byte file for reading (cold cache, race
+                    # free)
+                    0b: 3530
+
+                open_file_write:
+                    # The average nanoseconds to open a 0 byte file for writing (cold cache, race
+                    # free)
+                    0b: 2702
+
+                delete_file:
+                    # The average nanoseconds to delete a 0 byte file (cold cache, race free)
+                    0b: 12081
+direct=0 sync=1:
+    concurrency:
+        # The i/o modify quantum guaranteed to be atomically visible to readers
+        # irrespective of rewrite quantity
+        atomic_rewrite_quantum: 1048576
+
+        # The maximum single aligned i/o modify quantity atomically visible to readers
+        # (can be [potentially unreliably] much larger than atomic_rewrite_quantum). A
+        # very common value on modern hardware with direct i/o thanks to PCIe DMA is
+        # 4096, don't trust values higher than this because of potentially discontiguous
+        # memory page mapping.
+        max_aligned_atomic_rewrite: 1048576
+
+    latency:
+        read:
+            # The nanoseconds to read zero bytes
+            nothing: 104
+            qd1:
+                # The nanoseconds to read 4Kb at a queue depth of 1 (min)
+                min: 250
+                # The nanoseconds to read 4Kb at a queue depth of 1 (arithmetic mean)
+                mean: 767
+                # The nanoseconds to read 4Kb at a queue depth of 1 (max)
+                max: 3147180
+                # The nanoseconds to read 4Kb at a queue depth of 1 (50% of the time)
+                50%: 600
+                # The nanoseconds to read 4Kb at a queue depth of 1 (95% of the time)
+                95%: 830
+                # The nanoseconds to read 4Kb at a queue depth of 1 (99% of the time)
+                99%: 12040
+                # The nanoseconds to read 4Kb at a queue depth of 1 (99.999% of the time)
+                99.999%: 43990
+            qd16:
+                # The nanoseconds to read 4Kb at a queue depth of 16 (min)
+                min: 270
+                # The nanoseconds to read 4Kb at a queue depth of 16 (arithmetic mean)
+                mean: 4911
+                # The nanoseconds to read 4Kb at a queue depth of 16 (max)
+                max: 3849262
+                # The nanoseconds to read 4Kb at a queue depth of 16 (50% of the time)
+                50%: 1570
+                # The nanoseconds to read 4Kb at a queue depth of 16 (95% of the time)
+                95%: 29550
+                # The nanoseconds to read 4Kb at a queue depth of 16 (99% of the time)
+                99%: 65301
+                # The nanoseconds to read 4Kb at a queue depth of 16 (99.999% of the time)
+                99.999%: 220170
+        write:
+            # The nanoseconds to write zero bytes
+            nothing: 101
+            qd1:
+                # The nanoseconds to write 4Kb at a queue depth of 1 (min)
+                min: 14050
+                # The nanoseconds to write 4Kb at a queue depth of 1 (arithmetic mean)
+                mean: 15338
+                # The nanoseconds to write 4Kb at a queue depth of 1 (max)
+                max: 3206413
+                # The nanoseconds to write 4Kb at a queue depth of 1 (50% of the time)
+                50%: 14800
+                # The nanoseconds to write 4Kb at a queue depth of 1 (95% of the time)
+                95%: 15730
+                # The nanoseconds to write 4Kb at a queue depth of 1 (99% of the time)
+                99%: 39400
+                # The nanoseconds to write 4Kb at a queue depth of 1 (99.999% of the time)
+                99.999%: 139330
+            qd16:
+                # The nanoseconds to write 4Kb at a queue depth of 16 (min)
+                min: 15190
+                # The nanoseconds to write 4Kb at a queue depth of 16 (arithmetic mean)
+                mean: 27629
+                # The nanoseconds to write 4Kb at a queue depth of 16 (max)
+                max: 4691087
+                # The nanoseconds to write 4Kb at a queue depth of 16 (50% of the time)
+                50%: 26040
+                # The nanoseconds to write 4Kb at a queue depth of 16 (95% of the time)
+                95%: 49270
+                # The nanoseconds to write 4Kb at a queue depth of 16 (99% of the time)
+                99%: 60200
+                # The nanoseconds to write 4Kb at a queue depth of 16 (99.999% of the time)
+                99.999%: 176820
+        readwrite:
+            qd4:
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (min)
+                min: 250
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4
+                # (arithmetic mean)
+                mean: 1130
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (max)
+                max: 3692158
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (50% of
+                # the time)
+                50%: 620
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (95% of
+                # the time)
+                95%: 980
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99% of
+                # the time)
+                99%: 15570
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99.999%
+                # of the time)
+                99.999%: 73450
+
+    response_time:
+        race_free:
+            warm_cache:
+                create_file:
+                    # The average nanoseconds to create a 0 byte file (warm cache, race free)
+                    0b: 106389
+                enumerate_file:
+                    # The average nanoseconds to enumerate a 0 byte file (warm cache, race free)
+                    0b: 160
+                open_file_read:
+                    # The average nanoseconds to open a 0 byte file for reading (warm cache, race
+                    # free)
+                    0b: 1976
+
+                open_file_write:
+                    # The average nanoseconds to open a 0 byte file for writing (warm cache, race
+                    # free)
+                    0b: 1984
+
+                delete_file:
+                    # The average nanoseconds to delete a 0 byte file (warm cache, race free)
+                    0b: 39299
+        non_race_free:
+                create_file:
+                    # The average nanoseconds to create a 0 byte file (warm cache, non race free)
+                    0b: 36742
+                enumerate_file:
+                    # The average nanoseconds to enumerate a 0 byte file (warm cache, non race free)
+                    0b: 54
+                open_file_read:
+                    # The average nanoseconds to open a 0 byte file for reading (warm cache, non
+                    # race free)
+                    0b: 952
+
+                open_file_write:
+                    # The average nanoseconds to open a 0 byte file for writing (warm cache, non
+                    # race free)
+                    0b: 1032
+
+                delete_file:
+                    # The average nanoseconds to delete a 0 byte file (warm cache, non race free)
+                    0b: 42777
+        race_free:
+            cold_cache:
+                create_file:
+                    # The average nanoseconds to create a 0 byte file (cold cache, race free)
+                    0b: 66312
+                enumerate_file:
+                    # The average nanoseconds to enumerate a 0 byte file (cold cache, race free)
+                    0b: 327
+                open_file_read:
+                    # The average nanoseconds to open a 0 byte file for reading (cold cache, race
+                    # free)
+                    0b: 20000
+
+                open_file_write:
+                    # The average nanoseconds to open a 0 byte file for writing (cold cache, race
+                    # free)
+                    0b: 3449
+
+                delete_file:
+                    # The average nanoseconds to delete a 0 byte file (cold cache, race free)
+                    0b: 55574
+direct=1 sync=1:
+    concurrency:
+        # The i/o modify quantum guaranteed to be atomically visible to readers
+        # irrespective of rewrite quantity
+        atomic_rewrite_quantum: 1048576
+
+        # The maximum single aligned i/o modify quantity atomically visible to readers
+        # (can be [potentially unreliably] much larger than atomic_rewrite_quantum). A
+        # very common value on modern hardware with direct i/o thanks to PCIe DMA is
+        # 4096, don't trust values higher than this because of potentially discontiguous
+        # memory page mapping.
+        max_aligned_atomic_rewrite: 1048576
+
+    latency:
+        read:
+            # The nanoseconds to read zero bytes
+            nothing: 101
+            qd1:
+                # The nanoseconds to read 4Kb at a queue depth of 1 (min)
+                min: 11060
+                # The nanoseconds to read 4Kb at a queue depth of 1 (arithmetic mean)
+                mean: 11935
+                # The nanoseconds to read 4Kb at a queue depth of 1 (max)
+                max: 3104919
+                # The nanoseconds to read 4Kb at a queue depth of 1 (50% of the time)
+                50%: 11541
+                # The nanoseconds to read 4Kb at a queue depth of 1 (95% of the time)
+                95%: 12591
+                # The nanoseconds to read 4Kb at a queue depth of 1 (99% of the time)
+                99%: 14001
+                # The nanoseconds to read 4Kb at a queue depth of 1 (99.999% of the time)
+                99.999%: 51210
+            qd16:
+                # The nanoseconds to read 4Kb at a queue depth of 16 (min)
+                min: 13150
+                # The nanoseconds to read 4Kb at a queue depth of 16 (arithmetic mean)
+                mean: 27554
+                # The nanoseconds to read 4Kb at a queue depth of 16 (max)
+                max: 3623594
+                # The nanoseconds to read 4Kb at a queue depth of 16 (50% of the time)
+                50%: 26800
+                # The nanoseconds to read 4Kb at a queue depth of 16 (95% of the time)
+                95%: 35740
+                # The nanoseconds to read 4Kb at a queue depth of 16 (99% of the time)
+                99%: 57930
+                # The nanoseconds to read 4Kb at a queue depth of 16 (99.999% of the time)
+                99.999%: 76710
+        write:
+            # The nanoseconds to write zero bytes
+            nothing: 101
+            qd1:
+                # The nanoseconds to write 4Kb at a queue depth of 1 (min)
+                min: 12860
+                # The nanoseconds to write 4Kb at a queue depth of 1 (arithmetic mean)
+                mean: 13626
+                # The nanoseconds to write 4Kb at a queue depth of 1 (max)
+                max: 248562
+                # The nanoseconds to write 4Kb at a queue depth of 1 (50% of the time)
+                50%: 13190
+                # The nanoseconds to write 4Kb at a queue depth of 1 (95% of the time)
+                95%: 13940
+                # The nanoseconds to write 4Kb at a queue depth of 1 (99% of the time)
+                99%: 35860
+                # The nanoseconds to write 4Kb at a queue depth of 1 (99.999% of the time)
+                99.999%: 84180
+            qd16:
+                # The nanoseconds to write 4Kb at a queue depth of 16 (min)
+                min: 13220
+                # The nanoseconds to write 4Kb at a queue depth of 16 (arithmetic mean)
+                mean: 27578
+                # The nanoseconds to write 4Kb at a queue depth of 16 (max)
+                max: 3224095
+                # The nanoseconds to write 4Kb at a queue depth of 16 (50% of the time)
+                50%: 26280
+                # The nanoseconds to write 4Kb at a queue depth of 16 (95% of the time)
+                95%: 48090
+                # The nanoseconds to write 4Kb at a queue depth of 16 (99% of the time)
+                99%: 59091
+                # The nanoseconds to write 4Kb at a queue depth of 16 (99.999% of the time)
+                99.999%: 126561
+        readwrite:
+            qd4:
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (min)
+                min: 10790
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4
+                # (arithmetic mean)
+                mean: 13410
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (max)
+                max: 1403291
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (50% of
+                # the time)
+                50%: 12980
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (95% of
+                # the time)
+                95%: 15690
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99% of
+                # the time)
+                99%: 24770
+
+                # The nanoseconds to 75% read 25% write 4Kb at a total queue depth of 4 (99.999%
+                # of the time)
+                99.999%: 124281
+
+    response_time:
+        race_free:
+            warm_cache:
+                create_file:
+                    # The average nanoseconds to create a 0 byte file (warm cache, race free)
+                    0b: 52387
+                enumerate_file:
+                    # The average nanoseconds to enumerate a 0 byte file (warm cache, race free)
+                    0b: 126
+                open_file_read:
+                    # The average nanoseconds to open a 0 byte file for reading (warm cache, race
+                    # free)
+                    0b: 1760
+
+                open_file_write:
+                    # The average nanoseconds to open a 0 byte file for writing (warm cache, race
+                    # free)
+                    0b: 1921
+
+                delete_file:
+                    # The average nanoseconds to delete a 0 byte file (warm cache, race free)
+                    0b: 40299
+        non_race_free:
+                create_file:
+                    # The average nanoseconds to create a 0 byte file (warm cache, non race free)
+                    0b: 36146
+                enumerate_file:
+                    # The average nanoseconds to enumerate a 0 byte file (warm cache, non race free)
+                    0b: 59
+                open_file_read:
+                    # The average nanoseconds to open a 0 byte file for reading (warm cache, non
+                    # race free)
+                    0b: 980
+
+                open_file_write:
+                    # The average nanoseconds to open a 0 byte file for writing (warm cache, non
+                    # race free)
+                    0b: 1035
+
+                delete_file:
+                    # The average nanoseconds to delete a 0 byte file (warm cache, non race free)
+                    0b: 41171
+        race_free:
+            cold_cache:
+                create_file:
+                    # The average nanoseconds to create a 0 byte file (cold cache, race free)
+                    0b: 55404
+                enumerate_file:
+                    # The average nanoseconds to enumerate a 0 byte file (cold cache, race free)
+                    0b: 1082
+                open_file_read:
+                    # The average nanoseconds to open a 0 byte file for reading (cold cache, race
+                    # free)
+                    0b: 18142
+
+                open_file_write:
+                    # The average nanoseconds to open a 0 byte file for writing (cold cache, race
+                    # free)
+                    0b: 16458
+
+                delete_file:
+                    # The average nanoseconds to delete a 0 byte file (cold cache, race free)
+                    0b: 59617
