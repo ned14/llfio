@@ -153,8 +153,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifacts/Windows VS2017 error_code prebuilt binaries/llfio-v2.0-binaries-win64.zip
-          asset_name: llfio-v2.0-binaries-win64-vs2017-error_code.zip
+          asset_path: artifacts/Windows VS2022 error_code prebuilt binaries/llfio-v2.0-binaries-win64.zip
+          asset_name: llfio-v2.0-binaries-win64-vs2022-error_code.zip
           asset_content_type: application/zip
           
       - name: Upload Windows 2
@@ -164,6 +164,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifacts/Windows VS2017 status_code prebuilt binaries/llfio-v2.0-binaries-win64.zip
-          asset_name: llfio-v2.0-binaries-win64-vs2017-status_code.zip
+          asset_path: artifacts/Windows VS2022 status_code prebuilt binaries/llfio-v2.0-binaries-win64.zip
+          asset_name: llfio-v2.0-binaries-win64-vs2022-status_code.zip
           asset_content_type: application/zip

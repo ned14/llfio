@@ -10,12 +10,12 @@ on:
   - cron: '0 0 1 * *'
 
 jobs:
-  WinVS2019:
+  WinVS2022:
     name: Visual Studio
     strategy:
       fail-fast: false
       matrix:
-        image: [windows-2019, windows-latest]
+        image: [windows-2022]
         configuration: [error_code, status_code]
     runs-on: ${{ matrix.image }}
 
@@ -26,9 +26,9 @@ jobs:
       id: vars
       shell: bash
       run: |
-       if [ "${{ matrix.image }}" = "windows-2019" ]; then
+       if [ "${{ matrix.image }}" = "windows-2025" ]; then
          NAME=VS2017;
-         GENERATOR="Visual Studio 16 2019";
+         GENERATOR="Visual Studio 18 2025";
        else
          NAME=VS2019;
          GENERATOR="Visual Studio 17 2022";
@@ -62,7 +62,7 @@ jobs:
 
   publish-test-results:
     name: "Publish Unit Tests Results"
-    needs: [WinVS2019]
+    needs: [WinVS2022]
     runs-on: ubuntu-latest
     if: success() || failure()
 

@@ -35,7 +35,7 @@ jobs:
       run: |
        sudo apt-get update
        if [ "${{ matrix.compiler }}" = "libc++" ]; then
-         sudo apt installlibc++-dev libc++abi-dev libomp-dev;
+         sudo apt install libc++-dev libc++abi-dev libomp-dev;
          export CMAKE_CONFIGURE_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake";
        fi
        if [ "${{ matrix.configuration }}" = "status_code" ]; then
