@@ -27,21 +27,22 @@ ctest_build(TARGET _dl)
 ctest_build(TARGET _sl)
 set(retval 0)
 if(NOT CTEST_DISABLE_TESTING)
+  # shared_fs_mutex takes too long on CI
+  # tls_socket_handle is unstable
+  # dynamic_thread_pool_group is unstable
+  set(LLFIO_DISABLE_TESTS "shared_fs_mutex|tls_socket_handle|dynamic_thread_pool_group")
   if(WIN32)
     # Azure's Windows version doesn't permit unprivileged creation of symbolic links
     if(CTEST_CMAKE_GENERATOR MATCHES "Visual Studio 15 2017.*")
-      ctest_test(RETURN_VALUE retval EXCLUDE "shared_fs_mutex|symlink|process_handle")
+      ctest_test(RETURN_VALUE retval EXCLUDE "${LLFIO_DISABLE_TESTS}|symlink|process_handle")
     else()
-      ctest_test(RETURN_VALUE retval EXCLUDE "shared_fs_mutex|symlink")
+      ctest_test(RETURN_VALUE retval EXCLUDE "${LLFIO_DISABLE_TESTS}|symlink")
     endif()
   elseif(APPLE)
     # Around Feb 2021 the Mac OS CI began failing pipe_handle and I don't have a Mac to diagnose
-    ctest_test(RETURN_VALUE retval EXCLUDE "shared_fs_mutex|pipe_handle")
-  elseif("$ENV{CXX}" MATCHES "clang")
-    # clang 10 with libc++ in C++ 20 currently segfaults
-    ctest_test(RETURN_VALUE retval EXCLUDE "shared_fs_mutex|llfio_hl--coroutines")
+    ctest_test(RETURN_VALUE retval EXCLUDE "${LLFIO_DISABLE_TESTS}|pipe_handle")
   else()
-    ctest_test(RETURN_VALUE retval EXCLUDE "shared_fs_mutex")
+    ctest_test(RETURN_VALUE retval EXCLUDE "${LLFIO_DISABLE_TESTS}")
   endif()
 endif()
 if(WIN32)

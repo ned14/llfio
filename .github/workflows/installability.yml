@@ -51,5 +51,5 @@ jobs:
        cd test_cpp-pm_install
        mkdir build
        cd build
-       cmake .. -DCMAKE_BUILD_TYPE=Release -Dllfio_CMAKE_ARGS="-DLLFIO_FORCE_OPENSSL_OFF=On$CMAKE_CONFIGURE_OPTIONS"
+       cmake .. -DCMAKE_BUILD_TYPE=Release -Dllfio_CMAKE_ARGS="CMAKE_ARGS=\"-DLLFIO_FORCE_OPENSSL_OFF=On$CMAKE_CONFIGURE_OPTIONS\""
        cmake --build .
