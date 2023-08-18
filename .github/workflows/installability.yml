@@ -43,12 +43,14 @@ jobs:
          sudo apt-get autoremove
        fi
        if [ "${{ matrix.configuration }}" = "status_code" ]; then
-         export CMAKE_CONFIGURE_OPTIONS=";-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON"
+         export CMAKE_CONFIGURE_OPTIONS="-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON"
        fi
        git clone --depth 1 https://github.com/ned14/quickcpplib.git
        pip install --user gitpython
-       python quickcpplib/scripts/test_cpp-pm_install.py test-packaging/example.cpp quickcpplib quickcpplib::hl https://github.com/ned14/quickcpplib master "" outcome outcome::hl https://github.com/ned14/outcome master "" llfio llfio::sl https://github.com/ned14/llfio develop "-DLLFIO_FORCE_OPENSSL_OFF=On$CMAKE_CONFIGURE_OPTIONS"
+       python quickcpplib/scripts/test_cpp-pm_install.py test-packaging/example.cpp quickcpplib quickcpplib::hl https://github.com/ned14/quickcpplib master "" outcome outcome::hl https://github.com/ned14/outcome master "" llfio llfio::sl https://github.com/ned14/llfio develop "$CMAKE_CONFIGURE_OPTIONS"
        cd test_cpp-pm_install
+       cat cmake/Hunter/config.cmake
+       cat CMakeLists.txt
        mkdir build
        cd build
        cmake .. -DCMAKE_BUILD_TYPE=Release
