@@ -27,10 +27,10 @@ jobs:
       shell: bash
       run: |
        if [ "${{ matrix.image }}" = "windows-2025" ]; then
-         NAME=VS2017;
+         NAME=VS2025;
          GENERATOR="Visual Studio 18 2025";
        else
-         NAME=VS2019;
+         NAME=VS2022;
          GENERATOR="Visual Studio 17 2022";
        fi
        echo ::set-output name=NAME::${NAME}
