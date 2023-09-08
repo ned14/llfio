@@ -785,7 +785,7 @@ namespace utils
 
     static int mib[4];
     static size_t miblen = [&]{
-      size_t len = 0;
+      size_t len = sizeof(mib);
       if(sysctlnametomib("kern.cp_time", mib, &len) < 0)
       {
         abort();

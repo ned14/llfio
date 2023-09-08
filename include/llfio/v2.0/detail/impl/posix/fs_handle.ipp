@@ -465,7 +465,8 @@ result<span<path_view_component>> fs_handle::list_extended_attributes(span<byte>
   auto readed_sys = extattr_list_fd(h.native_handle().fd, EXTATTR_NAMESPACE_SYSTEM, tofill.data() + readed_user, tofill.size() - readed_user);
   if(readed_sys < 0)
   {
-    return posix_error();
+    // Apparently unprivileged processes aren't allowed to read system extended attributes
+    readed_sys = 0;
   }
   auto readed = readed_user + readed_sys;
   span<path_view_component> filled;
@@ -476,7 +477,7 @@ result<span<path_view_component>> fs_handle::list_extended_attributes(span<byte>
     while(p < tofill.data() + readed_user)
     {
       *length_user = *(uint8_t*)p;
-      totallength = 6 + *length_user;
+      totallength += 6 + *length_user;
       count++;
       p += (*length_user++) + 1;
       if(length_user - lengths >= long(sizeof(lengths)))
@@ -488,7 +489,7 @@ result<span<path_view_component>> fs_handle::list_extended_attributes(span<byte>
     while(p < tofill.data() + readed_user + readed_sys)
     {
       *length_sys = *(uint8_t*)p;
-      totallength = 8 + *length_sys;
+      totallength += 8 + *length_sys;
       count++;
       p += (*length_sys++) + 1;
       if(length_sys - lengths >= long(sizeof(lengths)))
@@ -507,21 +508,24 @@ result<span<path_view_component>> fs_handle::list_extended_attributes(span<byte>
     readed = totallength;
     // Need to repack the names to contain a 'user.' or 'system.' prefix
     auto *l = length_sys - 1;
-    auto *p1 = p - *l - 1;
+    auto *p1 = p - *l;
     auto *p2 = tofill.data() + totallength - *l - 8;
     while(l >= length_user)
     {
-      memcpy(p2, "system.", 7);
+      assert(p2 >= tofill.data());
       memmove(p2 + 7, p1, *l);
+      memcpy(p2, "system.", 7);
       p2[7 + *l] = std::byte{0};
       p1 -= *l + 1;
       p2 -= *l + 8;
       l--;
     }
+    p2 += 2;
     while(l >= lengths)
     {
-      memcpy(p2, "user.", 5);
+      assert(p2 >= tofill.data());
       memmove(p2 + 5, p1, *l);
+      memcpy(p2, "user.", 5);
       p2[5 + *l] = std::byte{0};
       p1 -= *l + 1;
       p2 -= *l + 6;

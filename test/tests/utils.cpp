@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 static inline void TestCurrentProcessCPUUsage()
 {
   namespace llfio = LLFIO_V2_NAMESPACE;
-  const auto thread_count = std::thread::hardware_concurrency() / 2;
+  const auto thread_count = std::thread::hardware_concurrency() / 4;
   if(thread_count < 1)
   {
     return;
