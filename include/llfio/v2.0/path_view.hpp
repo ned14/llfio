@@ -1551,7 +1551,7 @@ public:
   LLFIO_TREQUIRES(
   LLFIO_TPRED(is_source_acceptable<T>),
   LLFIO_TEXPR(std::is_constructible<rendered_path<ZeroTermination, T, AllocatorOrDeleter, _internal_buffer_size>, path_view_component, Args...>::value))
-  rendered_path<ZeroTermination, T, AllocatorOrDeleter, _internal_buffer_size> render(path_view_component view, Args &&...args)
+  rendered_path<ZeroTermination, T, AllocatorOrDeleter, _internal_buffer_size> render(path_view_component view, Args &&...args) const
   {
     return rendered_path<ZeroTermination, T, AllocatorOrDeleter, _internal_buffer_size>(view, std::forward<Args>(args)...);
   }
@@ -1562,7 +1562,7 @@ public:
                   LLFIO_TEXPR(std::is_constructible<rendered_path<zero_termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>,
                                                     path_view_component, Args...>::value))
   rendered_path<zero_termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size> render_zero_terminated(path_view_component view,
-                                                                                                                        Args &&...args)
+                                                                                                                        Args &&...args) const
   {
     return rendered_path<zero_termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>(view, std::forward<Args>(args)...);
   }
@@ -1573,7 +1573,7 @@ public:
                   LLFIO_TEXPR(std::is_constructible<rendered_path<zero_termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>,
                                                     path_view_component, Args...>::value))
   rendered_path<zero_termination::not_zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size> render_not_zero_terminated(path_view_component view,
-                                                                                                                                Args &&...args)
+                                                                                                                                Args &&...args) const
   {
     return rendered_path<zero_termination::not_zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>(view, std::forward<Args>(args)...);
   }
