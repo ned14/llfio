@@ -38,8 +38,8 @@ static inline void TestIssue0102()
 
   // (I know this is very likely to be misaligned on 64Bit systems, but
   //  otherwise the problem/segfault is only triggered on 32Bit systems)
-  auto erasedError =
-  new(page + llfio::utils::page_size() - sizeof(outcome_e::status_code_domain *) - sizeof(int)) outcome_e::erased_errored_status_code<int>(ioError);
+  auto erasedError = new(page + llfio::utils::page_size() - sizeof(outcome_e::status_code_domain *) - sizeof(int))
+  outcome_e::erased_errored_status_code<int>(outcome_e::in_place, ioError);
 
   // the following line must not segfault
   std::cout << erasedError->message() << std::endl;
