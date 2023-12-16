@@ -2,10 +2,10 @@
 
 These compilers and OSs are regularly tested:
 
-- [GCC](https://gcc.gnu.org/) 7.5 (Linux 4.x x64)
-- [Clang](https://clang.llvm.org/) 7 (Linux 4.x x64)
-- Xcode 11.6 (macOS 10.15 x64)
-- Visual Studio 2017 (Windows 10 x64).
+- [GCC](https://gcc.gnu.org/) 9.4 (Linux 5.x x64)
+- [Clang](https://clang.llvm.org/) 11 (Linux 5.x x64)
+- Xcode 13.2 (macOS 11 x64)
+- Visual Studio 2022 (Windows Server 2022 x64).
 
 Other compilers, architectures and OSs may work, but are not tested regularly.
 You will need a working [Filesystem TS](https://en.cppreference.com/w/cpp/experimental/fs)
@@ -25,8 +25,7 @@ warning : LLFIO_HEADERS_ONLY=1, LLFIO_EXPERIMENTAL_STATUS_CODE=0 and NTKERNEL_ER
 Defining custom error code category ntkernel_category() via header only form is unreliable! Semantic comparisons will break! Define NTKERNEL_ERROR_CATEGORY_INLINE to 0 and only ever link in ntkernel_category() from a prebuilt shared library to avoid this problem.
 ~~~
 
-The cause is that `<system_error>` has a design flaw not rectified until
-([probably](https://wg21.link/P1196)) C++ 20 where custom error code categories
+The cause is that `<system_error>` has a design flaw where custom error code categories
 are unsafe when shared libraries are in use.
 
 You have one of three choices here: (i) Use [experimental SG14 `status_code`](https://wg21.link/P1028)
@@ -82,16 +81,16 @@ git submodule update --init --recursive
 
 ## Build static libraries from source
 
-You will need [CMake](https://cmake.org/) installed, v3.5 or better. It is important to do an out-of-tree build, because the build will otherwise fail.
+You will need [CMake](https://cmake.org/) installed, v3.9 or better. It is important to do an out-of-tree build, because the build will otherwise fail.
 
-If you want C++ Coroutines support, you will need a C++ Coroutines supporting compiler. It should get automatically discovered and detected, however note that on Linux you currently need a very recent clang combined with a very recent libc++ as no recent GCC implements C++ Coroutines yet. For Debian/Ubuntu, `apt install libc++-dev-9 libc++abi-dev-9` might do it.
+If you want C++ Coroutines support, you will need a C++ Coroutines supporting compiler. It should get automatically discovered and detected.
 
 To build and test on POSIX (`make`, `ninja` etc):
 
 ~~~
 mkdir build
 cd build
-cmake ..
+cmake .. -DCMAKE_BUILD_TYPE=Release
 cmake --build .
 ctest -R llfio_sl
 ~~~
@@ -108,14 +107,14 @@ ctest -C Release -R llfio_sl
 
 ## Build shared libraries from source
 
-You will need [CMake](https://cmake.org/) installed, v3.5 or better. It is important to do an out-of-tree build, because the build will otherwise fail.
+You will need [CMake](https://cmake.org/) installed, v3.9 or better. It is important to do an out-of-tree build, because the build will otherwise fail.
 
 To build and test on POSIX (`make`, `ninja` etc):
 
 ~~~
 mkdir build
 cd build
-cmake ..
+cmake .. -DCMAKE_BUILD_TYPE=Release
 cmake --build . -- _dl
 ctest -R llfio_dl
 ~~~
@@ -135,7 +134,7 @@ ctest -C Release -R llfio_dl
 ~~~
 mkdir build
 cd build
-cmake ..
+cmake .. -DCMAKE_BUILD_TYPE=Release
 cmake --build . -- _dl _sl _hl
 cmake --build . --target install
 ~~~
