@@ -88,17 +88,17 @@ $(document).ready(function(){initNavTree('md__build.html',''); initResizable(); 
 <div class="contents">
 <div class="textblock"><p>These compilers and OSs are regularly tested:</p>
 <ul>
-<li><a href="https://gcc.gnu.org/">GCC</a> 7.5 (Linux 4.x x64)</li>
-<li><a href="https://clang.llvm.org/">Clang</a> 7 (Linux 4.x x64)</li>
-<li>Xcode 11.6 (macOS 10.15 x64)</li>
-<li>Visual Studio 2017 (Windows 10 x64).</li>
+<li><a href="https://gcc.gnu.org/">GCC</a> 9.4 (Linux 5.x x64)</li>
+<li><a href="https://clang.llvm.org/">Clang</a> 11 (Linux 5.x x64)</li>
+<li>Xcode 13.2 (macOS 11 x64)</li>
+<li>Visual Studio 2022 (Windows Server 2022 x64).</li>
 </ul>
 <p>Other compilers, architectures and OSs may work, but are not tested regularly. You will need a working <a href="https://en.cppreference.com/w/cpp/experimental/fs">Filesystem TS</a> implementation in your STL, and at least C++ 14.</p>
 <p>LLFIO has your choice of header-only, static library, and shared library build modes. Note that on Microsoft Windows, the default header only configuration is unsafe to use outside of toy projects. You will get warnings of the form:</p>
 <div class="fragment"><div class="line">warning : LLFIO_HEADERS_ONLY=1, LLFIO_EXPERIMENTAL_STATUS_CODE=0 and NTKERNEL_ERROR_CATEGORY_INLINE=1 on Windows, this can produce unreliable binaries where semantic comparisons of error codes randomly fail!</div>
 </div><!-- fragment --><p>... and ...</p>
 <div class="fragment"><div class="line">Defining custom error code category ntkernel_category() via header only form is unreliable! Semantic comparisons will break! Define NTKERNEL_ERROR_CATEGORY_INLINE to 0 and only ever link in ntkernel_category() from a prebuilt shared library to avoid this problem.</div>
-</div><!-- fragment --><p>The cause is that <code>&lt;system_error&gt;</code> has a design flaw not rectified until (<a href="https://wg21.link/P1196">probably</a>) C++ 20 where custom error code categories are unsafe when shared libraries are in use.</p>
+</div><!-- fragment --><p>The cause is that <code>&lt;system_error&gt;</code> has a design flaw where custom error code categories are unsafe when shared libraries are in use.</p>
 <p>You have one of three choices here: (i) Use <a href="https://wg21.link/P1028">experimental SG14 <code>status_code</code></a> which doesn't have this problem (define <code>LLFIO_EXPERIMENTAL_STATUS_CODE=1</code>) (ii) Use the NT kernel error category as a shared library (<a href="https://github.com/ned14/ntkernel-error-category">see its documentation</a>) (iii) Don't use header only LLFIO on Windows (see below).</p>
 <h1><a class="anchor" id="autotoc_md24"></a>
 Install from the vcpkg package manager</h1>
@@ -122,12 +122,12 @@ If you already cloned before reading this</h2>
 <div class="fragment"><div class="line">git submodule update --init --recursive</div>
 </div><!-- fragment --><h1><a class="anchor" id="autotoc_md28"></a>
 Build static libraries from source</h1>
-<p>You will need <a href="https://cmake.org/">CMake</a> installed, v3.5 or better. It is important to do an out-of-tree build, because the build will otherwise fail.</p>
-<p>If you want C++ Coroutines support, you will need a C++ Coroutines supporting compiler. It should get automatically discovered and detected, however note that on Linux you currently need a very recent clang combined with a very recent libc++ as no recent GCC implements C++ Coroutines yet. For Debian/Ubuntu, <code>apt install libc++-dev-9 libc++abi-dev-9</code> might do it.</p>
+<p>You will need <a href="https://cmake.org/">CMake</a> installed, v3.9 or better. It is important to do an out-of-tree build, because the build will otherwise fail.</p>
+<p>If you want C++ Coroutines support, you will need a C++ Coroutines supporting compiler. It should get automatically discovered and detected.</p>
 <p>To build and test on POSIX (<code>make</code>, <code>ninja</code> etc):</p>
 <div class="fragment"><div class="line">mkdir build</div>
 <div class="line">cd build</div>
-<div class="line">cmake ..</div>
+<div class="line">cmake .. -DCMAKE_BUILD_TYPE=Release</div>
 <div class="line">cmake --build .</div>
 <div class="line">ctest -R llfio_sl</div>
 </div><!-- fragment --><p>To build and test on Windows or Mac OS (Visual Studio, XCode etc):</p>
@@ -138,11 +138,11 @@ Build static libraries from source</h1>
 <div class="line">ctest -C Release -R llfio_sl</div>
 </div><!-- fragment --><h1><a class="anchor" id="autotoc_md29"></a>
 Build shared libraries from source</h1>
-<p>You will need <a href="https://cmake.org/">CMake</a> installed, v3.5 or better. It is important to do an out-of-tree build, because the build will otherwise fail.</p>
+<p>You will need <a href="https://cmake.org/">CMake</a> installed, v3.9 or better. It is important to do an out-of-tree build, because the build will otherwise fail.</p>
 <p>To build and test on POSIX (<code>make</code>, <code>ninja</code> etc):</p>
 <div class="fragment"><div class="line">mkdir build</div>
 <div class="line">cd build</div>
-<div class="line">cmake ..</div>
+<div class="line">cmake .. -DCMAKE_BUILD_TYPE=Release</div>
 <div class="line">cmake --build . -- _dl</div>
 <div class="line">ctest -R llfio_dl</div>
 </div><!-- fragment --><p>To build and test on Windows or Mac OS (Visual Studio, XCode etc):</p>
@@ -155,7 +155,7 @@ Build shared libraries from source</h1>
 Installing libraries from source</h1>
 <div class="fragment"><div class="line">mkdir build</div>
 <div class="line">cd build</div>
-<div class="line">cmake ..</div>
+<div class="line">cmake .. -DCMAKE_BUILD_TYPE=Release</div>
 <div class="line">cmake --build . -- _dl _sl _hl</div>
 <div class="line">cmake --build . --target install</div>
 </div><!-- fragment --> </div></div><!-- contents -->
