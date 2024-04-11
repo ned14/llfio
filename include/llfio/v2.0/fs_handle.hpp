@@ -95,57 +95,6 @@ perfectly valid Win32 path which most Win32 APIs will accept.
 #endif
 };
 
-/*! \brief Maps the current path of `h` into a form suitable for Win32 APIs.
-Passes through unmodified on POSIX, so you can use this in portable code.
-\return The mapped current path of `h`, which may have been validated to refer to
-the exact same inode via `.unique_id()` (see below).
-\param h The handle whose `.current_path()` is to be mapped into a form suitable
-for Win32 APIs.
-\param mapping Which Win32 path namespace to map onto.
-
-This implementation may need to validate that the mapping of the current path of `h`
-onto the desired Win32 path namespace does indeed refer to the same file:
-
-- `win32_path_namespace::device` transforms `\!!\Device\...` => `\\.\...` and
-ensures that the mapped file's unique id matches the original, otherwise
-returning failure.
-- `win32_path_namespace::dos` enumerates all the DOS devices on the system and
-what those map onto within the NT kernel namespace. This mapping is for
-obvious reasons quite slow.
-- `win32_path_namespace::guid_volume` simply fetches the GUID of the volume of
-the handle, and constructs a valid Win32 path from that.
-- `win32_path_namespace::any` means attempt `guid_volume` first, and if it fails
-(e.g. your file is on a network share) then it attempts `dos`. This semantic may
-change in the future, however any path emitted will always be a valid Win32 path.
-*/
-#ifdef _WIN32
-LLFIO_HEADERS_ONLY_FUNC_SPEC result<filesystem::path> to_win32_path(const fs_handle &h, win32_path_namespace mapping = win32_path_namespace::any) noexcept;
-LLFIO_TEMPLATE(class T)
-LLFIO_TREQUIRES(LLFIO_TPRED(!std::is_base_of<fs_handle, T>::value && std::is_base_of<handle, T>::value))
-inline result<filesystem::path> to_win32_path(const T &h, win32_path_namespace mapping = win32_path_namespace::any) noexcept
-{
-  struct wrapper final : public fs_handle
-  {
-    const handle &_h;
-    explicit wrapper(const handle &h)
-        : _h(h)
-    {
-    }
-    virtual const handle &_get_handle() const noexcept override { return _h; }
-  } _(h);
-  return to_win32_path(_, mapping);
-}
-#else
-inline result<filesystem::path> to_win32_path(const fs_handle &h, win32_path_namespace mapping = win32_path_namespace::any) noexcept;
-LLFIO_TEMPLATE(class T)
-LLFIO_TREQUIRES(LLFIO_TPRED(!std::is_base_of<fs_handle, T>::value && std::is_base_of<handle, T>::value))
-inline result<filesystem::path> to_win32_path(const T &h, win32_path_namespace mapping = win32_path_namespace::any) noexcept
-{
-  (void) mapping;
-  return h.current_path();
-}
-#endif
-
 /*! \class fs_handle
 \brief A handle to something with a device and inode number.
 
@@ -502,6 +451,57 @@ public:
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> win_set_extended_attributes(span<std::pair<const path_view_component, span<const byte>>> toset) noexcept;
 #endif
 };
+
+/*! \brief Maps the current path of `h` into a form suitable for Win32 APIs.
+Passes through unmodified on POSIX, so you can use this in portable code.
+\return The mapped current path of `h`, which may have been validated to refer to
+the exact same inode via `.unique_id()` (see below).
+\param h The handle whose `.current_path()` is to be mapped into a form suitable
+for Win32 APIs.
+\param mapping Which Win32 path namespace to map onto.
+
+This implementation may need to validate that the mapping of the current path of `h`
+onto the desired Win32 path namespace does indeed refer to the same file:
+
+- `win32_path_namespace::device` transforms `\!!\Device\...` => `\\.\...` and
+ensures that the mapped file's unique id matches the original, otherwise
+returning failure.
+- `win32_path_namespace::dos` enumerates all the DOS devices on the system and
+what those map onto within the NT kernel namespace. This mapping is for
+obvious reasons quite slow.
+- `win32_path_namespace::guid_volume` simply fetches the GUID of the volume of
+the handle, and constructs a valid Win32 path from that.
+- `win32_path_namespace::any` means attempt `guid_volume` first, and if it fails
+(e.g. your file is on a network share) then it attempts `dos`. This semantic may
+change in the future, however any path emitted will always be a valid Win32 path.
+*/
+#ifdef _WIN32
+LLFIO_HEADERS_ONLY_FUNC_SPEC result<filesystem::path> to_win32_path(const fs_handle &h, win32_path_namespace mapping = win32_path_namespace::any) noexcept;
+LLFIO_TEMPLATE(class T)
+LLFIO_TREQUIRES(LLFIO_TPRED(!std::is_base_of<fs_handle, T>::value && std::is_base_of<handle, T>::value))
+inline result<filesystem::path> to_win32_path(const T &h, win32_path_namespace mapping = win32_path_namespace::any) noexcept
+{
+  struct wrapper final : public fs_handle
+  {
+    const handle &_h;
+    explicit wrapper(const handle &h)
+        : _h(h)
+    {
+    }
+    virtual const handle &_get_handle() const noexcept override { return _h; }
+  } _(h);
+  return to_win32_path(_, mapping);
+}
+#else
+inline result<filesystem::path> to_win32_path(const fs_handle &h, win32_path_namespace mapping = win32_path_namespace::any) noexcept;
+LLFIO_TEMPLATE(class T)
+LLFIO_TREQUIRES(LLFIO_TPRED(!std::is_base_of<fs_handle, T>::value && std::is_base_of<handle, T>::value))
+inline result<filesystem::path> to_win32_path(const T &h, win32_path_namespace mapping = win32_path_namespace::any) noexcept
+{
+  (void) mapping;
+  return h.current_path();
+}
+#endif
 
 namespace detail
 {
