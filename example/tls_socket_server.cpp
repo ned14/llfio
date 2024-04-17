@@ -175,7 +175,7 @@ void tls_socket_server()
         }
         if(sock.wbuf.empty()) {
           // Nothing more to write, so no longer poll for this
-          topoll[handleidx]&=~llfio::poll_what::is_writable;
+          topoll[handleidx]&=uint8_t(~llfio::poll_what::is_writable);
         }
       }
 

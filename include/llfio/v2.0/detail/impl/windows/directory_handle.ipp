@@ -320,7 +320,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
     directory for all entries + stat structures as a single snapshot.
     */
   retry:
-    size_t total_items = 0, kernelbuffertoallocate = 0;
+    size_t kernelbuffertoallocate = 0;
     while(_lock.exchange(1, std::memory_order_relaxed) != 0)
     {
       std::this_thread::yield();
@@ -339,7 +339,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
         {
           ntstat = ntwait(_v.h, isb, deadline());
         }
-        if(0x80000006 /*STATUS_NO_MORE_FILES*/ == ntstat || ntstat < 0)
+        if((NTSTATUS) 0x80000006l /*STATUS_NO_MORE_FILES*/ == ntstat || ntstat < 0)
         {
           break;
         }
@@ -350,7 +350,6 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
           done = (fni->NextEntryOffset == 0);
           kernelbuffertoallocate += sizeof(what_to_enumerate_type);
           kernelbuffertoallocate += (fni->FileNameLength + 7) & ~7;
-          ++total_items;
         }
       }
     }
@@ -391,7 +390,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
       auto *buffer_ = (what_to_enumerate_type *) _buffer;
       isb = make_iostatus();
       ntstat = NtQueryDirectoryFile(_v.h, nullptr, nullptr, nullptr, &isb, buffer_, sizeof(_buffer), what_to_enumerate, TRUE, req.glob.empty() ? nullptr : &_glob, FALSE);
-      if(ntstat != 0x80000006 /*STATUS_NO_MORE_FILES*/)
+      if(ntstat != (NTSTATUS) 0x80000006 /*STATUS_NO_MORE_FILES*/)
       {
         // The directory grew between first enumeration and second
         LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);

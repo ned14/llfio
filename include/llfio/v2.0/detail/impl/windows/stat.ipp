@@ -101,7 +101,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, sta
       }
       if(ntstat < 0)
       {
-        if(ntstat == 0xC000000D /*STATUS_INVALID_PARAMETER*/)
+        if(ntstat == (NTSTATUS) 0xC000000D /*STATUS_INVALID_PARAMETER*/)
         {
           // FileAllInformation fails on SMB mounts :(
           goto fallback;

@@ -88,7 +88,7 @@ namespace algorithm
         {
           ntstat = ntwait(h, isb, deadline());
         }
-        if(0xC0000056 /*STATUS_DELETE_PENDING*/ == ntstat)
+        if((NTSTATUS) 0xC0000056 /*STATUS_DELETE_PENDING*/ == ntstat)
         {
           // Can skip this fellow
           return success();
@@ -102,7 +102,7 @@ namespace algorithm
         {
           ntstat = ntwait(h, isb, deadline());
         }
-        if(0xC0000056 /*STATUS_DELETE_PENDING*/ == ntstat)
+        if((NTSTATUS) 0xC0000056 /*STATUS_DELETE_PENDING*/ == ntstat)
         {
           // Can skip this fellow
           return success();
@@ -121,7 +121,7 @@ namespace algorithm
           }
           if(ntstat < 0)
           {
-            assert(ntstat == 0xC0000101 /*STATUS_DIRECTORY_NOT_EMPTY*/);
+            assert(ntstat == (NTSTATUS) 0xC0000101 /*STATUS_DIRECTORY_NOT_EMPTY*/);
             // If cannot set the delete-on-close flag, retry this later.
             NtClose(h);
             h = INVALID_HANDLE_VALUE;
@@ -200,7 +200,7 @@ namespace algorithm
           {
             ntstat = ntwait(h, isb, deadline());
           }
-          if(0xC0000056 /*STATUS_DELETE_PENDING*/ == ntstat)
+          if((NTSTATUS) 0xC0000056 /*STATUS_DELETE_PENDING*/ == ntstat)
           {
             // Can skip this fellow
             return success();
@@ -213,7 +213,7 @@ namespace algorithm
           {
             ntstat = ntwait(h, isb, deadline());
           }
-          if(0xC0000056 /*STATUS_DELETE_PENDING*/ == ntstat)
+          if((NTSTATUS) 0xC0000056 /*STATUS_DELETE_PENDING*/ == ntstat)
           {
             // Can skip this fellow
             return success();

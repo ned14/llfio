@@ -1655,7 +1655,8 @@ inline void fill_stat_t(stat_t &stat, LLFIO_POSIX_STAT_STRUCT s, metadata_flags 
       _timeout = windows_nt_kernel::from_timepoint(end_utc);                                                                                                   \
     }                                                                                                                                                          \
     timeout = &_timeout;                                                                                                                                       \
-  }
+  }                                                                                                                                                            \
+  (void) timeout;
 
 #define LLFIO_WIN_DEADLINE_TO_SLEEP_LOOP(d)                                                                                                                    \
   if((d) && (d).steady)                                                                                                                                        \
@@ -2006,6 +2007,7 @@ inline result<void> do_lock_file_range(native_handle_type &_v, handle::extent_ty
     flags |= LOCKFILE_FAIL_IMMEDIATELY;
   }
   LLFIO_WIN_DEADLINE_TO_SLEEP_INIT(d);
+  (void) timeout;
   OVERLAPPED ol{};
   memset(&ol, 0, sizeof(ol));
   ol.Internal = static_cast<ULONG_PTR>(-1);
@@ -2193,7 +2195,9 @@ inline HANDLE CreateFileW_(_In_ LPCWSTR lpFileName, _In_ DWORD dwDesiredAccess, 
     SetLastError(ERROR_FILE_NOT_FOUND);
     return INVALID_HANDLE_VALUE;  // NOLINT
   }
-  auto unntpath = make_scope_exit([&NtPath]() noexcept {
+  auto unntpath = make_scope_exit(
+  [&NtPath]() noexcept
+  {
     if(HeapFree(GetProcessHeap(), 0, NtPath.Buffer) == 0)
     {
       abort();

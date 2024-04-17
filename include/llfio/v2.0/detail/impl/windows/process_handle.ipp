@@ -226,7 +226,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<process_handle> process_handle::launch_pr
   OUTCOME_TRY(visit(path, [&](auto sv) -> result<void> {
     for(auto c : sv)
     {
-      if(argsbuffere - argsbuffer >= sizeof(argsbuffer))
+      if((size_t)(argsbuffere - argsbuffer) >= sizeof(argsbuffer))
       {
         return errc::value_too_large;
       }
@@ -234,7 +234,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<process_handle> process_handle::launch_pr
     }
     return success();
   }));
-  if(argsbuffere - argsbuffer >= sizeof(argsbuffer) - 2)
+  if((size_t)(argsbuffere - argsbuffer) >= sizeof(argsbuffer) - 2)
   {
     return errc::value_too_large;
   }
@@ -245,13 +245,13 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<process_handle> process_handle::launch_pr
     OUTCOME_TRY(visit(arg, [&](auto sv) -> result<void> {
       for(auto c : sv)
       {
-        if(argsbuffere - argsbuffer >= sizeof(argsbuffer))
+        if((size_t)(argsbuffere - argsbuffer) >= sizeof(argsbuffer))
         {
           return errc::value_too_large;
         }
         *argsbuffere++ = c;
       }
-      if(argsbuffere - argsbuffer >= sizeof(argsbuffer))
+      if((size_t)(argsbuffere - argsbuffer) >= sizeof(argsbuffer))
       {
         return errc::value_too_large;
       }
@@ -266,13 +266,13 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<process_handle> process_handle::launch_pr
     OUTCOME_TRY(visit(i, [&](auto sv) -> result<void> {
       for(auto c : sv)
       {
-        if(envbuffere - envbuffer >= sizeof(envbuffer))
+        if((size_t)(envbuffere - envbuffer) >= sizeof(envbuffer))
         {
           return errc::value_too_large;
         }
         *envbuffere++ = c;
       }
-      if(envbuffere - envbuffer >= sizeof(argsbuffer))
+      if((size_t)(envbuffere - envbuffer) >= sizeof(argsbuffer))
       {
         return errc::value_too_large;
       }

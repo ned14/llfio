@@ -765,7 +765,7 @@ namespace detail
     ret.tofillremaining = tofill.size();
     if(ntstat < 0)
     {
-      if(ntstat == 0xC0000052 /*STATUS_NO_EAS_ON_FILE*/)
+      if(ntstat == (NTSTATUS) 0xC0000052 /*STATUS_NO_EAS_ON_FILE*/)
       {
         return ret;
       }

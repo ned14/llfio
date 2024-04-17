@@ -680,7 +680,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
             LARGE_INTEGER SourceFileOffset;
             LARGE_INTEGER TargetFileOffset;
             LARGE_INTEGER ByteCount;
-          } DUPLICATE_EXTENTS_DATA, *PDUPLICATE_EXTENTS_DATA;
+          } DUPLICATE_EXTENTS_DATA;
           DUPLICATE_EXTENTS_DATA ded;
           memset(&ded, 0, sizeof(ded));
           ded.FileHandle = _v.h;
