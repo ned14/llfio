@@ -63,6 +63,7 @@ result<mapped_file_handle::size_type> mapped_file_handle::_reserve(extent_type &
     return _reservation;
   }
   section_handle::flag mapflags = section_handle::flag::read;
+  mapflags |= _sh.section_flags() & section_handle::flag::cow;
   auto map_size = reservation;
   // Reserve the full reservation in address space
   if(this->is_writable())
