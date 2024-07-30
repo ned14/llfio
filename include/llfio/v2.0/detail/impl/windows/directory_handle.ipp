@@ -326,7 +326,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
     directory for all entries + stat structures as a single snapshot.
     */
   retry:
-    size_t kernelbuffertoallocate = 0;
+    size_t kernelbuffertoallocate = 1024;  // starting slop
     while(_lock.exchange(1, std::memory_order_relaxed) != 0)
     {
       std::this_thread::yield();
@@ -340,20 +340,23 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
       for(;;)
       {
         IO_STATUS_BLOCK isb = make_iostatus();
-        memset(_buffer, 0, sizeof(FILE_NAMES_INFORMATION));
         NTSTATUS ntstat = NtQueryDirectoryFile(_v.h, nullptr, nullptr, nullptr, &isb, buffer_, sizeof(_buffer), FileNamesInformation, FALSE,
                                                req.glob.empty() ? nullptr : &_glob, first);
         if(STATUS_PENDING == ntstat)
         {
           ntstat = ntwait(_v.h, isb, deadline());
         }
-        if((NTSTATUS) 0x80000006l /*STATUS_NO_MORE_FILES*/ == ntstat || (buffer_->FileNameLength == 0 && buffer_->NextEntryOffset == 0))
-        {
-          break;
-        }
         if(ntstat < 0)
         {
+          if((NTSTATUS) 0x80000006l /*STATUS_NO_MORE_FILES*/ == ntstat)
+          {
+            break;
+          }
           return ntkernel_error(ntstat);
+        }
+        if(isb.Information == 0)
+        {
+          break;
         }
         first = false;
         done = false;
@@ -389,91 +392,121 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
                                         reinterpret_cast<what_to_enumerate_type *>(req.kernelbuffer.data());
     max_bytes = req.kernelbuffer.empty() ? static_cast<ULONG>(req.buffers._kernel_buffer_size) : static_cast<ULONG>(req.kernelbuffer.size());
     bytes = std::min(max_bytes, (ULONG) kernelbuffertoallocate);
-    IO_STATUS_BLOCK isb = make_iostatus();
-    NTSTATUS ntstat =
-    NtQueryDirectoryFile(_v.h, nullptr, nullptr, nullptr, &isb, buffer, bytes, what_to_enumerate, FALSE, req.glob.empty() ? nullptr : &_glob, TRUE);
-    if(STATUS_PENDING == ntstat)
+    auto *buffer_ = buffer;
+    size_t entries_parsed = 0;
+    for(size_t count = 0;; count++)
     {
-      ntstat = ntwait(_v.h, isb, deadline());
-    }
-    if(ntstat < 0)
-    {
-      return ntkernel_error(ntstat);
-    }
-    {
-      char _buffer[65536 + sizeof(what_to_enumerate_type)];
-      auto *buffer_ = (what_to_enumerate_type *) _buffer;
-      isb = make_iostatus();
-      memset(_buffer, 0, sizeof(what_to_enumerate_type));
-      ntstat = NtQueryDirectoryFile(_v.h, nullptr, nullptr, nullptr, &isb, buffer_, sizeof(_buffer), what_to_enumerate, TRUE,
-                                    req.glob.empty() ? nullptr : &_glob, FALSE);
-      if(ntstat != (NTSTATUS) 0x80000006 /*STATUS_NO_MORE_FILES*/ && !(buffer_->FileNameLength == 0 && buffer_->NextEntryOffset == 0))
+      IO_STATUS_BLOCK isb = make_iostatus();
+      NTSTATUS ntstat =
+      NtQueryDirectoryFile(_v.h, nullptr, nullptr, nullptr, &isb, buffer_, bytes, what_to_enumerate, FALSE, req.glob.empty() ? nullptr : &_glob, count == 0);
+      if(STATUS_PENDING == ntstat)
       {
+        ntstat = ntwait(_v.h, isb, deadline());
+      }
+      if(ntstat < 0)
+      {
+        if(ntstat != (NTSTATUS) 0x80000006 /*STATUS_NO_MORE_FILES*/)
+        {
+          return ntkernel_error(ntstat);
+        }
+        if(count <= 1)
+        {
+          assert(isb.Information == 0);
+        }
+        else
+        {
+          if(req.flags & flags::permit_racy_reads)
+          {
+            req.buffers._snapshot = false;
+          }
+          else
+          {
+            // The directory has changed since we initially read it, need a bigger buffer
+            LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
+            goto retry;
+          }
+        }
+        // Fill is complete
+        req.buffers._resize(entries_parsed);
+        req.buffers._metadata = default_stat_contents;
+        req.buffers._done = true;
+        return std::move(req.buffers);
+      }
+      if(count >= 1 && !(req.flags & flags::permit_racy_reads))
+      {
+        return errc::operation_would_block;
+      }
+      if(isb.Information > bytes - 1024)
+      {
+        // The directory has changed since we initially read it, need a bigger buffer
         LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
         goto retry;
       }
-    }
-  }
-
-  size_t n = 0;
-  bool done = false;
-  for(what_to_enumerate_type *ffdi = buffer; !done;
-      ffdi = reinterpret_cast<what_to_enumerate_type *>(reinterpret_cast<uintptr_t>(ffdi) + ffdi->NextEntryOffset))
-  {
-    size_t length = ffdi->FileNameLength / sizeof(wchar_t);
-    done = (ffdi->NextEntryOffset == 0);
-    if(length <= 2 && '.' == ffdi->FileName[0])
-    {
-      if(1 == length || '.' == ffdi->FileName[1])
+      /* https://github.com/ned14/llfio/issues/137 reports that NT doesn't always fully fill
+      the buffer supplied for non-obvious reasons, and requires repeated additional enumerations
+      to get the whole directory.
+      */
+      bool done = false;
+      for(what_to_enumerate_type *ffdi = buffer_; !done;
+          ffdi = reinterpret_cast<what_to_enumerate_type *>(reinterpret_cast<uintptr_t>(ffdi) + ffdi->NextEntryOffset))
       {
-        continue;
+        size_t length = ffdi->FileNameLength / sizeof(wchar_t);
+        done = (ffdi->NextEntryOffset == 0);
+        if(length <= 2 && '.' == ffdi->FileName[0])
+        {
+          if(1 == length || '.' == ffdi->FileName[1])
+          {
+            continue;
+          }
+        }
+        directory_entry &item = req.buffers[entries_parsed];
+        // Try to zero terminate leafnames where possible for later efficiency
+        if(reinterpret_cast<uintptr_t>(ffdi->FileName + length) + sizeof(wchar_t) <= reinterpret_cast<uintptr_t>(ffdi) + ffdi->NextEntryOffset)
+        {
+          ffdi->FileName[length] = 0;
+          item.leafname = path_view_type(ffdi->FileName, length, path_view::zero_terminated);
+        }
+        else
+        {
+          item.leafname = path_view_type(ffdi->FileName, length, path_view::not_zero_terminated);
+        }
+        if(req.filtering == filter::fastdeleted && item.leafname.is_llfio_deleted())
+        {
+          continue;
+        }
+        item.stat = stat_t(nullptr);
+#ifndef LLFIO_DIRECTORY_HANDLE_ENUMERATE_LESS_INFO
+        item.stat.st_ino = ffdi->FileId.QuadPart;
+        item.stat.st_type = to_st_type(ffdi->FileAttributes, ffdi->ReparsePointTag);
+#else
+        item.stat.st_type = to_st_type(ffdi->FileAttributes, IO_REPARSE_TAG_SYMLINK /* not accurate, but best we can do */);
+#endif
+        item.stat.st_atim = to_timepoint(ffdi->LastAccessTime);
+        item.stat.st_mtim = to_timepoint(ffdi->LastWriteTime);
+        item.stat.st_ctim = to_timepoint(ffdi->ChangeTime);
+        item.stat.st_size = ffdi->EndOfFile.QuadPart;
+        item.stat.st_allocated = ffdi->AllocationSize.QuadPart;
+        item.stat.st_birthtim = to_timepoint(ffdi->CreationTime);
+        item.stat.st_sparse = static_cast<unsigned int>((ffdi->FileAttributes & FILE_ATTRIBUTE_SPARSE_FILE) != 0u);
+        item.stat.st_compressed = static_cast<unsigned int>((ffdi->FileAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0u);
+        item.stat.st_reparse_point = static_cast<unsigned int>((ffdi->FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0u);
+        entries_parsed++;
+        if(!done && entries_parsed >= req.buffers.size())
+        {
+          // Fill is incomplete
+          req.buffers._metadata = default_stat_contents;
+          req.buffers._done = false;
+          return std::move(req.buffers);
+        }
+        if(done)
+        {
+          auto whattoadd = (7 + offsetof(what_to_enumerate_type, FileName) + ffdi->FileNameLength) & ~7;
+          buffer_ = reinterpret_cast<what_to_enumerate_type *>(reinterpret_cast<uintptr_t>(ffdi) + whattoadd);
+          bytes -= whattoadd;
+        }
       }
     }
-    directory_entry &item = req.buffers[n];
-    // Try to zero terminate leafnames where possible for later efficiency
-    if(reinterpret_cast<uintptr_t>(ffdi->FileName + length) + sizeof(wchar_t) <= reinterpret_cast<uintptr_t>(ffdi) + ffdi->NextEntryOffset)
-    {
-      ffdi->FileName[length] = 0;
-      item.leafname = path_view_type(ffdi->FileName, length, path_view::zero_terminated);
-    }
-    else
-    {
-      item.leafname = path_view_type(ffdi->FileName, length, path_view::not_zero_terminated);
-    }
-    if(req.filtering == filter::fastdeleted && item.leafname.is_llfio_deleted())
-    {
-      continue;
-    }
-    item.stat = stat_t(nullptr);
-#ifndef LLFIO_DIRECTORY_HANDLE_ENUMERATE_LESS_INFO
-    item.stat.st_ino = ffdi->FileId.QuadPart;
-    item.stat.st_type = to_st_type(ffdi->FileAttributes, ffdi->ReparsePointTag);
-#else
-    item.stat.st_type = to_st_type(ffdi->FileAttributes, IO_REPARSE_TAG_SYMLINK /* not accurate, but best we can do */);
-#endif
-    item.stat.st_atim = to_timepoint(ffdi->LastAccessTime);
-    item.stat.st_mtim = to_timepoint(ffdi->LastWriteTime);
-    item.stat.st_ctim = to_timepoint(ffdi->ChangeTime);
-    item.stat.st_size = ffdi->EndOfFile.QuadPart;
-    item.stat.st_allocated = ffdi->AllocationSize.QuadPart;
-    item.stat.st_birthtim = to_timepoint(ffdi->CreationTime);
-    item.stat.st_sparse = static_cast<unsigned int>((ffdi->FileAttributes & FILE_ATTRIBUTE_SPARSE_FILE) != 0u);
-    item.stat.st_compressed = static_cast<unsigned int>((ffdi->FileAttributes & FILE_ATTRIBUTE_COMPRESSED) != 0u);
-    item.stat.st_reparse_point = static_cast<unsigned int>((ffdi->FileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0u);
-    n++;
-    if(!done && n >= req.buffers.size())
-    {
-      // Fill is incomplete
-      req.buffers._metadata = default_stat_contents;
-      req.buffers._done = false;
-      return std::move(req.buffers);
-    }
   }
-  // Fill is complete
-  req.buffers._resize(n);
-  req.buffers._metadata = default_stat_contents;
-  req.buffers._done = true;
-  return std::move(req.buffers);
 }
 
 LLFIO_V2_NAMESPACE_END
