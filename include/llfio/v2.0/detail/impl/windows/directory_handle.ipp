@@ -334,21 +334,26 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
     auto unlock = make_scope_exit([this]() noexcept { _lock.store(0, std::memory_order_release); });
     (void) unlock;
     {
-      char _buffer[65536 * 2];
+      char _buffer[65536 + sizeof(FILE_NAMES_INFORMATION)];
       auto *buffer_ = (FILE_NAMES_INFORMATION *) _buffer;
       bool first = true, done = false;
       for(;;)
       {
         IO_STATUS_BLOCK isb = make_iostatus();
+        memset(_buffer, 0, sizeof(FILE_NAMES_INFORMATION));
         NTSTATUS ntstat = NtQueryDirectoryFile(_v.h, nullptr, nullptr, nullptr, &isb, buffer_, sizeof(_buffer), FileNamesInformation, FALSE,
                                                req.glob.empty() ? nullptr : &_glob, first);
         if(STATUS_PENDING == ntstat)
         {
           ntstat = ntwait(_v.h, isb, deadline());
         }
-        if((NTSTATUS) 0x80000006l /*STATUS_NO_MORE_FILES*/ == ntstat || ntstat < 0 || (buffer_->FileNameLength == 0 && buffer_->NextEntryOffset == 0))
+        if((NTSTATUS) 0x80000006l /*STATUS_NO_MORE_FILES*/ == ntstat || (buffer_->FileNameLength == 0 && buffer_->NextEntryOffset == 0))
         {
           break;
+        }
+        if(ntstat < 0)
+        {
+          return ntkernel_error(ntstat);
         }
         first = false;
         done = false;
@@ -396,14 +401,14 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
       return ntkernel_error(ntstat);
     }
     {
-      char _buffer[65536 * 2];
+      char _buffer[65536 + sizeof(what_to_enumerate_type)];
       auto *buffer_ = (what_to_enumerate_type *) _buffer;
       isb = make_iostatus();
+      memset(_buffer, 0, sizeof(what_to_enumerate_type));
       ntstat = NtQueryDirectoryFile(_v.h, nullptr, nullptr, nullptr, &isb, buffer_, sizeof(_buffer), what_to_enumerate, TRUE,
                                     req.glob.empty() ? nullptr : &_glob, FALSE);
-      if(ntstat != (NTSTATUS) 0x80000006 /*STATUS_NO_MORE_FILES*/)
+      if(ntstat != (NTSTATUS) 0x80000006 /*STATUS_NO_MORE_FILES*/ && !(buffer_->FileNameLength == 0 && buffer_->NextEntryOffset == 0))
       {
-        // The directory grew between first enumeration and second
         LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
         goto retry;
       }
