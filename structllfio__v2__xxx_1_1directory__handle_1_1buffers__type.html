@@ -115,6 +115,10 @@ Public Member Functions</h2></td></tr>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a642a415d3444c11886c3bace729b917b">done</a> () const noexcept</td></tr>
 <tr class="memdesc:a642a415d3444c11886c3bace729b917b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the directory was entirely read or not into any buffers supplied. <br /></td></tr>
 <tr class="separator:a642a415d3444c11886c3bace729b917b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ef08db90ea9eb6547d341f8633aeb89"><td class="memItemLeft" align="right" valign="top"><a id="a2ef08db90ea9eb6547d341f8633aeb89"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#a2ef08db90ea9eb6547d341f8633aeb89">is_snapshot</a> () const noexcept</td></tr>
+<tr class="memdesc:a2ef08db90ea9eb6547d341f8633aeb89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the enumeration is an atomically consistent snapshot or not. <br /></td></tr>
+<tr class="separator:a2ef08db90ea9eb6547d341f8633aeb89"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af5815efb83bb9656f2aca24c5abb9d6d"><td class="memTemplParams" colspan="2"><a id="af5815efb83bb9656f2aca24c5abb9d6d"></a>
 template&lt;class T , typename std::enable_if&lt;(!std::is_same&lt; typename std::decay&lt; T &gt;::type, buffers_type &gt;::value &amp;&amp;std::is_constructible&lt; span&lt; buffer_type &gt;, T &gt;::value), bool &gt;::type  = true&gt; </td></tr>
 <tr class="memitem:af5815efb83bb9656f2aca24c5abb9d6d"><td class="memTemplItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structllfio__v2__xxx_1_1directory__handle_1_1buffers__type.html#af5815efb83bb9656f2aca24c5abb9d6d">buffers_type</a> (T &amp;&amp;s, _implict_span_constructor_tag={}) noexcept</td></tr>
@@ -174,7 +178,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>directory_handle</b>
 </table>
 </div><div class="memdoc">
 <p>The list of stat metadata retrieved. Sometimes, due to kernel API design, enumerating a directory retrieves more than the metadata requested in the read request. This indidicates what stat metadata is in the buffers filled. </p>
-<div class="fragment"><div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;{ <span class="keywordflow">return</span> _metadata; }</div>
+<div class="fragment"><div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;{ <span class="keywordflow">return</span> _metadata; }</div>
 </div><!-- fragment -->
 </div>
 </div>
