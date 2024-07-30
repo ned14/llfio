@@ -41,6 +41,11 @@ struct sockaddr_in6;
 #pragma warning(disable : 4661)  // missing implementation
 #endif
 
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Woverloaded-virtual="
+#endif
+
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 class byte_socket_handle;
@@ -787,19 +792,19 @@ template <class Base, class SocketType> struct listening_socket_handle_buffer_ty
     constexpr const_iterator cend() const noexcept { return _sock + 1; }
 
     //! The socket referenced by the buffers
-    const buffer_type &connected_socket() const &noexcept
+    const buffer_type &connected_socket() const & noexcept
     {
       assert(_sock != nullptr);
       return *_sock;
     }
     //! The socket referenced by the buffers
-    buffer_type &connected_socket() &noexcept
+    buffer_type &connected_socket() & noexcept
     {
       assert(_sock != nullptr);
       return *_sock;
     }
     //! The socket and its connected address referenced by the buffers
-    buffer_type connected_socket() &&noexcept
+    buffer_type connected_socket() && noexcept
     {
       assert(_sock != nullptr);
       return std::move(*_sock);
@@ -1135,6 +1140,10 @@ LLFIO_V2_NAMESPACE_END
 
 #ifdef _MSC_VER
 #pragma warning(pop)
+#endif
+
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
 #endif
 
 #endif

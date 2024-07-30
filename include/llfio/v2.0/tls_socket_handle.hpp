@@ -36,6 +36,11 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable : 4275)  // dll interface
 #endif
 
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Woverloaded-virtual="
+#endif
+
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 /*! \brief TLS algorithm categories
@@ -598,6 +603,10 @@ LLFIO_V2_NAMESPACE_END
 
 #ifdef _MSC_VER
 #pragma warning(pop)
+#endif
+
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
 #endif
 
 #endif

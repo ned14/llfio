@@ -1,5 +1,5 @@
 /* A handle to a directory
-(C) 2017-2021 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2017-2024 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: Aug 2017
 
 
@@ -26,6 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define LLFIO_DIRECTORY_HANDLE_H
 
 #include "path_discovery.hpp"
+#include "quickcpplib/bitfield.hpp"
 #include "stat.hpp"
 
 #include <memory>  // for unique_ptr
@@ -114,6 +115,8 @@ public:
     stat_t::want metadata() const noexcept { return _metadata; }
     //! Whether the directory was entirely read or not into any buffers supplied.
     bool done() const noexcept { return _done; }
+    //! Whether the enumeration is an atomically consistent snapshot or not
+    bool is_snapshot() const noexcept { return _snapshot; }
 
   private:
     struct _implict_span_constructor_tag
@@ -184,9 +187,15 @@ public:
     void _resize(size_t l) { *static_cast<span<buffer_type> *>(this) = this->subspan(0, l); }
     stat_t::want _metadata{stat_t::want::none};
     bool _done{false};
+    bool _snapshot{true};
   };
+  //! Flags for how to enumerate directory entries
+  QUICKCPPLIB_BITFIELD_BEGIN_T(flags, uint8_t){
+  none = 0u,                      //!< No flags
+  permit_racy_reads = (1u << 0u)  //!< Do not error out if a atomic snapshot cannot be performed
+  } QUICKCPPLIB_BITFIELD_END(flags) using _flags_type = flags;
   //! How to do deleted file elimination on Windows
-  enum class filter
+  enum class filter : uint8_t
   {
     none,        //!< Do no filtering at all
     fastdeleted  //!< For Windows without POSIX delete semantics, filter out LLFIO deleted files based on their filename (fast and fairly reliable)
@@ -196,6 +205,7 @@ public:
   {
     buffers_type buffers{};
     path_view_type glob{};
+    _flags_type flags{_flags_type::none};
     filter filtering{filter::fastdeleted};
     span<char> kernelbuffer{};
 
@@ -211,6 +221,25 @@ public:
     /*constexpr*/ io_request(buffers_type _buffers, path_view_type _glob = {}, filter _filtering = filter::fastdeleted, span<char> _kernelbuffer = {})
         : buffers(std::move(_buffers))
         , glob(_glob)
+        , filtering(_filtering)
+        , kernelbuffer(_kernelbuffer)
+    {
+    }
+    /*! Construct a request to enumerate a directory with optionally specified kernel buffer.
+
+    \param _buffers The buffers to fill with enumerated directory entries.
+    \param _flags What flags to apply to the enumeration.
+    \param _glob An optional shell glob by which to filter the items filled. Done kernel side on Windows, user side on POSIX.
+    \param _filtering Whether to filter out fake-deleted files on Windows or not.
+    \param _kernelbuffer A buffer to use for the kernel to fill. If left defaulted, a kernel buffer
+    is allocated internally and returned in the buffers returned which needs to not be destructed until one
+    is no longer using any items within (leafnames are views onto the original kernel data).
+    */
+    /*constexpr*/ io_request(buffers_type _buffers, _flags_type _flags, path_view_type _glob = {}, filter _filtering = filter::fastdeleted,
+                             span<char> _kernelbuffer = {})
+        : buffers(std::move(_buffers))
+        , glob(_glob)
+        , flags(_flags)
         , filtering(_filtering)
         , kernelbuffer(_kernelbuffer)
     {
@@ -379,7 +408,7 @@ public:
 
   /*! Fill the buffers type with as many directory entries as will fit into any optionally supplied buffer.
   This operation returns a **snapshot**, without races, of the directory contents at the moment of the
-  call.
+  call, unless `flags::permit_racy_reads` is set.
 
   \return Returns the buffers filled, what metadata was filled in and whether the entire directory
   was read or not. You should *always* examine `.metadata()` for the metadata you are about to use,

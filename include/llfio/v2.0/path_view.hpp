@@ -89,6 +89,10 @@ namespace detail
 #ifdef _MSC_VER  // MSVC's standard library refuses any basic_string_view<T> where T is not an unsigned type
   using char8_t = unsigned char;
 #else
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wc++20-compat"
+#endif
   struct char8_t
   {
     char v;
@@ -138,6 +142,9 @@ namespace detail
   {
     return a.v != b.v;
   }
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 #endif
 #endif
 #if !defined(__CHAR16_TYPE__) && !defined(_MSC_VER)  // VS2015 onwards has built in char16_t

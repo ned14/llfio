@@ -1,5 +1,5 @@
 /* A handle to a directory
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2017 - 2024 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: Aug 2017
 
 
@@ -32,7 +32,8 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 LLFIO_V2_NAMESPACE_BEGIN
 
-result<directory_handle> directory_handle::directory(const path_handle &base, path_view_type path, mode _mode, creation _creation, caching _caching, flag flags) noexcept
+result<directory_handle> directory_handle::directory(const path_handle &base, path_view_type path, mode _mode, creation _creation, caching _caching,
+                                                     flag flags) noexcept
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
@@ -245,7 +246,8 @@ namespace detail
     oa.ObjectName = &_path;
     oa.RootDirectory = o->native_handle().h;
     IO_STATUS_BLOCK isb = make_iostatus();
-    NTSTATUS ntstat = NtOpenFile(&nativeh.h, GENERIC_READ | SYNCHRONIZE | DELETE, &oa, &isb, fileshare, 0x01 /*FILE_DIRECTORY_FILE*/ | 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/);
+    NTSTATUS ntstat =
+    NtOpenFile(&nativeh.h, GENERIC_READ | SYNCHRONIZE | DELETE, &oa, &isb, fileshare, 0x01 /*FILE_DIRECTORY_FILE*/ | 0x20 /*FILE_SYNCHRONOUS_IO_NONALERT*/);
     if(STATUS_PENDING == ntstat)
     {
       ntstat = ntwait(nativeh.h, isb, deadline());
@@ -285,15 +287,19 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
 {
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
-//#define LLFIO_DIRECTORY_HANDLE_ENUMERATE_LESS_INFO 1
+// #define LLFIO_DIRECTORY_HANDLE_ENUMERATE_LESS_INFO 1
 #ifdef LLFIO_DIRECTORY_HANDLE_ENUMERATE_LESS_INFO
   using what_to_enumerate_type = FILE_DIRECTORY_INFORMATION;  // 68 bytes + filename
   const auto what_to_enumerate = FileDirectoryInformation;
-  static constexpr stat_t::want default_stat_contents = /*stat_t::want::ino |*/ stat_t::want::type | stat_t::want::atim | stat_t::want::mtim | stat_t::want::ctim | stat_t::want::size | stat_t::want::allocated | stat_t::want::birthtim | stat_t::want::sparse | stat_t::want::compressed | stat_t::want::reparse_point;
+  static constexpr stat_t::want default_stat_contents = /*stat_t::want::ino |*/ stat_t::want::type | stat_t::want::atim | stat_t::want::mtim |
+                                                        stat_t::want::ctim | stat_t::want::size | stat_t::want::allocated | stat_t::want::birthtim |
+                                                        stat_t::want::sparse | stat_t::want::compressed | stat_t::want::reparse_point;
 #else
   using what_to_enumerate_type = FILE_ID_FULL_DIR_INFORMATION;  // 80 bytes + filename
   const auto what_to_enumerate = FileIdFullDirectoryInformation;
-  static constexpr stat_t::want default_stat_contents = stat_t::want::ino | stat_t::want::type | stat_t::want::atim | stat_t::want::mtim | stat_t::want::ctim | stat_t::want::size | stat_t::want::allocated | stat_t::want::birthtim | stat_t::want::sparse | stat_t::want::compressed | stat_t::want::reparse_point;
+  static constexpr stat_t::want default_stat_contents = stat_t::want::ino | stat_t::want::type | stat_t::want::atim | stat_t::want::mtim | stat_t::want::ctim |
+                                                        stat_t::want::size | stat_t::want::allocated | stat_t::want::birthtim | stat_t::want::sparse |
+                                                        stat_t::want::compressed | stat_t::want::reparse_point;
 #endif
   LLFIO_LOG_FUNCTION_CALL(this);
   LLFIO_DEADLINE_TO_SLEEP_INIT(d);
@@ -307,7 +313,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
   if(!req.glob.empty())
   {
     _glob.Buffer = const_cast<wchar_t *>(zglob.data());
-    _glob.Length = (USHORT)(zglob.size() * sizeof(wchar_t));
+    _glob.Length = (USHORT) (zglob.size() * sizeof(wchar_t));
     _glob.MaximumLength = _glob.Length + sizeof(wchar_t);
   }
   what_to_enumerate_type *buffer = nullptr;
@@ -328,24 +334,26 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
     auto unlock = make_scope_exit([this]() noexcept { _lock.store(0, std::memory_order_release); });
     (void) unlock;
     {
-      char _buffer[65536];
+      char _buffer[65536 * 2];
       auto *buffer_ = (FILE_NAMES_INFORMATION *) _buffer;
       bool first = true, done = false;
       for(;;)
       {
         IO_STATUS_BLOCK isb = make_iostatus();
-        NTSTATUS ntstat = NtQueryDirectoryFile(_v.h, nullptr, nullptr, nullptr, &isb, buffer_, sizeof(_buffer), FileNamesInformation, FALSE, req.glob.empty() ? nullptr : &_glob, first);
+        NTSTATUS ntstat = NtQueryDirectoryFile(_v.h, nullptr, nullptr, nullptr, &isb, buffer_, sizeof(_buffer), FileNamesInformation, FALSE,
+                                               req.glob.empty() ? nullptr : &_glob, first);
         if(STATUS_PENDING == ntstat)
         {
           ntstat = ntwait(_v.h, isb, deadline());
         }
-        if((NTSTATUS) 0x80000006l /*STATUS_NO_MORE_FILES*/ == ntstat || ntstat < 0)
+        if((NTSTATUS) 0x80000006l /*STATUS_NO_MORE_FILES*/ == ntstat || ntstat < 0 || (buffer_->FileNameLength == 0 && buffer_->NextEntryOffset == 0))
         {
           break;
         }
         first = false;
         done = false;
-        for(FILE_NAMES_INFORMATION *fni = buffer_; !done; fni = reinterpret_cast<FILE_NAMES_INFORMATION *>(reinterpret_cast<uintptr_t>(fni) + fni->NextEntryOffset))
+        for(FILE_NAMES_INFORMATION *fni = buffer_; !done;
+            fni = reinterpret_cast<FILE_NAMES_INFORMATION *>(reinterpret_cast<uintptr_t>(fni) + fni->NextEntryOffset))
         {
           done = (fni->NextEntryOffset == 0);
           kernelbuffertoallocate += sizeof(what_to_enumerate_type);
@@ -372,11 +380,13 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
       return errc::no_buffer_space;  // user needs to supply a bigger buffer
     }
     ULONG max_bytes, bytes;
-    buffer = req.kernelbuffer.empty() ? reinterpret_cast<what_to_enumerate_type *>(req.buffers._kernel_buffer.get()) : reinterpret_cast<what_to_enumerate_type *>(req.kernelbuffer.data());
+    buffer = req.kernelbuffer.empty() ? reinterpret_cast<what_to_enumerate_type *>(req.buffers._kernel_buffer.get()) :
+                                        reinterpret_cast<what_to_enumerate_type *>(req.kernelbuffer.data());
     max_bytes = req.kernelbuffer.empty() ? static_cast<ULONG>(req.buffers._kernel_buffer_size) : static_cast<ULONG>(req.kernelbuffer.size());
     bytes = std::min(max_bytes, (ULONG) kernelbuffertoallocate);
     IO_STATUS_BLOCK isb = make_iostatus();
-    NTSTATUS ntstat = NtQueryDirectoryFile(_v.h, nullptr, nullptr, nullptr, &isb, buffer, bytes, what_to_enumerate, FALSE, req.glob.empty() ? nullptr : &_glob, TRUE);
+    NTSTATUS ntstat =
+    NtQueryDirectoryFile(_v.h, nullptr, nullptr, nullptr, &isb, buffer, bytes, what_to_enumerate, FALSE, req.glob.empty() ? nullptr : &_glob, TRUE);
     if(STATUS_PENDING == ntstat)
     {
       ntstat = ntwait(_v.h, isb, deadline());
@@ -386,10 +396,11 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
       return ntkernel_error(ntstat);
     }
     {
-      alignas(8) char _buffer[4096];
+      char _buffer[65536 * 2];
       auto *buffer_ = (what_to_enumerate_type *) _buffer;
       isb = make_iostatus();
-      ntstat = NtQueryDirectoryFile(_v.h, nullptr, nullptr, nullptr, &isb, buffer_, sizeof(_buffer), what_to_enumerate, TRUE, req.glob.empty() ? nullptr : &_glob, FALSE);
+      ntstat = NtQueryDirectoryFile(_v.h, nullptr, nullptr, nullptr, &isb, buffer_, sizeof(_buffer), what_to_enumerate, TRUE,
+                                    req.glob.empty() ? nullptr : &_glob, FALSE);
       if(ntstat != (NTSTATUS) 0x80000006 /*STATUS_NO_MORE_FILES*/)
       {
         // The directory grew between first enumeration and second
@@ -401,7 +412,8 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
 
   size_t n = 0;
   bool done = false;
-  for(what_to_enumerate_type *ffdi = buffer; !done; ffdi = reinterpret_cast<what_to_enumerate_type *>(reinterpret_cast<uintptr_t>(ffdi) + ffdi->NextEntryOffset))
+  for(what_to_enumerate_type *ffdi = buffer; !done;
+      ffdi = reinterpret_cast<what_to_enumerate_type *>(reinterpret_cast<uintptr_t>(ffdi) + ffdi->NextEntryOffset))
   {
     size_t length = ffdi->FileNameLength / sizeof(wchar_t);
     done = (ffdi->NextEntryOffset == 0);
