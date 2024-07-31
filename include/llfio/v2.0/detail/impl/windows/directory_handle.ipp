@@ -501,8 +501,9 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
         if(done)
         {
           auto whattoadd = (7 + offsetof(what_to_enumerate_type, FileName) + ffdi->FileNameLength) & ~7;
-          buffer_ = reinterpret_cast<what_to_enumerate_type *>(reinterpret_cast<uintptr_t>(ffdi) + whattoadd);
-          bytes -= whattoadd;
+          auto new_buffer_start = reinterpret_cast<what_to_enumerate_type *>(reinterpret_cast<uintptr_t>(ffdi) + whattoadd);
+          bytes -= reinterpret_cast<uintptr_t>(new_buffer_start) - reinterpret_cast<uintptr_t>(buffer_);
+          buffer_ = new_buffer_start;
         }
       }
     }
