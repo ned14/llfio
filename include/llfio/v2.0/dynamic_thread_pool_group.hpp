@@ -56,6 +56,8 @@ namespace detail
 /*! \class dynamic_thread_pool_group
 \brief Work group within the global dynamic thread pool.
 
+\warning This is deprecated and scheduled for removal in 2025.
+
 Some operating systems provide a per-process global kernel thread pool capable of
 dynamically adjusting its kernel thread count to how many of the threads in
 the pool are currently blocked. The platform will choose the exact strategy used,

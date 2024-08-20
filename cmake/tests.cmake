@@ -49,6 +49,7 @@ set(llfio_COMPILE_TESTS
   "example/malloc2.cpp"
   "example/map_file.cpp"
   "example/mapped_file.cpp"
+  "example/path_view_openat.cpp"
   "example/read_directory.cpp"
   "example/read_entire_file1.cpp"
   "example/read_stats.cpp"

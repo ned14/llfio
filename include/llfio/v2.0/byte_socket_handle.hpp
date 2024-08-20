@@ -85,6 +85,8 @@ namespace ip
   /*! \class address
   \brief A version independent IP address.
 
+  \warning This is deprecated and scheduled for removal in 2025.
+
   This is inspired by `asio::ip::address`, but it also adds `port()` from `asio::ip::endpoint`
   and a few other observer member functions i.e. it fuses ASIO's many types into one.
 
@@ -238,6 +240,8 @@ namespace ip
   /*! \brief Retrieve a list of potential `address` for a given name and service e.g.
   "www.google.com" and "https" optionally within a bounded deadline.
 
+  \warning This is deprecated and scheduled for removal in 2025.
+
   The object returned by this function can take many seconds to become ready as multiple network requests may
   need to be made. The deadline can be used to bound execution times -- like in a few
   other places in LLFIO, this deadline does not cause timed out errors, rather it aborts
@@ -353,6 +357,8 @@ namespace ip
 
 /*! \class byte_socket_handle
 \brief A handle to a byte-orientated socket-like entity.
+
+\warning This is deprecated and scheduled for removal in 2025.
 
 This handle, or subclasses thereof, may refer to:
 

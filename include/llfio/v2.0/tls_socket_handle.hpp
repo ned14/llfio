@@ -65,6 +65,8 @@ QUICKCPPLIB_BITFIELD_BEGIN(tls_algorithm)  //
 /*! \class tls_socket_handle
 \brief A handle to a TLS secure socket-like entity.
 
+\warning This is deprecated and scheduled for removal in 2025.
+
 As you cannot create one of these on your own, one generally acquires one of these
 from a `tls_socket_source`.
 */
@@ -328,6 +330,8 @@ struct tls_socket_source_implementation_information;
 \brief A source of `tls_socket_handle` and `listening_tls_socket_handle` and possibly a `byte_io_multiplexer`
 to multiplex i/o on multiple socket instances at the same time.
 
+\warning This is deprecated and scheduled for removal in 2025.
+
 The socket handles returned by this source may be _very_ different implementations
 to the kernel socket handles returned by `byte_socket_handle::byte_socket()` -- they
 may have all virtual functions overridden AND a custom i/o multiplexer set, plus RTTI
@@ -469,6 +473,8 @@ inline std::ostream &operator<<(std::ostream &s, const tls_socket_source_impleme
 
 /*! \class tls_socket_source_registry
 \brief A process-wide registry of `tls_socket_source`.
+
+\warning This is deprecated and scheduled for removal in 2025.
 
 Probably the most common use case for this will be fetching the default source of TLS
 secured sockets, so here is some example boilerplate:

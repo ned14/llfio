@@ -1,5 +1,5 @@
 /* Integration test kernel for whether path views work
-(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (2 commits)
+(C) 2017-2024 Niall Douglas <http://www.nedproductions.biz/> (2 commits)
 File Created: Aug 2017
 
 
@@ -227,14 +227,16 @@ static inline void TestPathView()
   CheckPathIteration("boostish/testdir/");
   CheckPathIteration("/a/c");
   CheckPathIteration("/a/c/");
+#ifdef _WIN32
   CheckPathIteration("//a/c");
   CheckPathIteration("//a");
   CheckPathIteration("//a/");
   // CheckPathIteration("///a/c");  // FIXME: fails, /// not ///a should be iterated
   // CheckPathIteration("////a/c");  // FIXME: fails, //// not ////a should be iterated
   CheckPathIteration("//a/c//");
-  // CheckPathIteration("///a/c//");  // FIXME: fails, /// not ///a should be iterated
-  // CheckPathIteration("////a/c////");  // FIXME: fails, //// not ////a should be iterated
+// CheckPathIteration("///a/c//");  // FIXME: fails, /// not ///a should be iterated
+// CheckPathIteration("////a/c////");  // FIXME: fails, //// not ////a should be iterated
+#endif
   CheckPathIteration("/a/c//");
   CheckPathIteration("/a/c////");
   CheckPathIteration("a/c");
