@@ -149,6 +149,7 @@ constexpr&#160;</td><td class="memItemRight" valign="bottom"><b>tls_socket_sourc
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A source of <code>tls_socket_handle</code> and <code>listening_tls_socket_handle</code> and possibly a <code>byte_io_multiplexer</code> to multiplex i/o on multiple socket instances at the same time. </p>
+<dl class="section warning"><dt>Warning</dt><dd>This is deprecated and scheduled for removal in 2025.</dd></dl>
 <p>The socket handles returned by this source may be <em>very</em> different implementations to the kernel socket handles returned by <code>byte_socket_handle::byte_socket()</code> &ndash; they may have all virtual functions overridden AND a custom i/o multiplexer set, plus RTTI may show an internal derived type from the public types.</p>
 <p>However, they may still be a valid kernel socket handle e.g. a TLS implementation may act upon a base kernel socket handle. If so, <code>is_kernel_handle()</code> will be true, and then <code>poll()</code> will work on these handles same as a plain socket handle. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>

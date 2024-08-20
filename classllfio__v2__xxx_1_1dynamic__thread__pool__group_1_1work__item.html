@@ -180,7 +180,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>dynamic_thread_pool_
 <p>Just before this is called for all work items submitted, the group becomes reset to fresh, and <code>parent()</code> becomes null. You can resubmit this work item, but do not submit other work items until their <code>group_complete()</code> has been invoked.</p>
 <p>Note that this function is called from multiple kernel threads.</p>
 <p><code>dynamic_thread_pool_group::current_work_item()</code> may have any value during this call. </p>
-<div class="fragment"><div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;{ (void) cancelled; }</div>
+<div class="fragment"><div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;{ (void) cancelled; }</div>
 </div><!-- fragment -->
 </div>
 </div>

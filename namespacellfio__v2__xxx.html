@@ -1657,7 +1657,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160; </div>
 <div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;not_pollable = (1U &lt;&lt; 7U)  <span class="comment">//!&lt; This handle is not pollable.</span></div>
 <div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;}  <span class="comment">//</span></div>
-<div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">llfio_v2_xxx::ip::none</a></div><div class="ttdeci">@ none</div><div class="ttdoc">No flags.</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:233</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_1_1ip_html_a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">llfio_v2_xxx::ip::none</a></div><div class="ttdeci">@ none</div><div class="ttdoc">No flags.</div><div class="ttdef"><b>Definition:</b> byte_socket_handle.hpp:235</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1695,19 +1695,19 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operato
 <p>&lt; This socket source may be able to wrap third party plain sockets</p>
 <p>&lt; This socket source provides FIPS_140_2 compliant algorithms</p>
 <p>&lt; All bits set</p>
-<div class="fragment"><div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;                                                                                 {</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;<a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">none</a> = 0U,  <span class="comment">//!&lt; No bits set</span></div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160; </div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;kernel_sockets =</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;(1U &lt;&lt; 0U),  <span class="comment">//!&lt; This socket source provides kernel sockets i.e. their native handles will be valid kernel sockets which can be used in `poll()` etc</span></div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;system_implementation = (1U &lt;&lt; 1U),  <span class="comment">//!&lt; This socket source is the &quot;system&quot; rather than &quot;third party&quot; implementation for TLS sockets</span></div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;io_multiplexer = (1U &lt;&lt; 2U),         <span class="comment">//!&lt; This socket source provides an i/o multiplexer</span></div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;supports_wrap = (1U &lt;&lt; 3U),          <span class="comment">//!&lt; This socket source may be able to wrap third party plain sockets</span></div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160; </div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;<a class="code" href="namespacellfio__v2__xxx.html#a6269702375c265b9985fe47df4447c7baf7da33fdf71e962b32ddd8345e293911">FIPS_140_2</a> = (1U &lt;&lt; 16U),  <span class="comment">//!&lt; This socket source provides FIPS_140_2 compliant algorithms</span></div>
+<div class="fragment"><div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;                                                                                 {</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;<a class="code" href="namespacellfio__v2__xxx_1_1ip.html#a2b874cadb614a4ef4ba44fdf3dd8dd74ac9a302c8c365bd927a21930678b71a8a">none</a> = 0U,  <span class="comment">//!&lt; No bits set</span></div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160; </div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;kernel_sockets =</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;(1U &lt;&lt; 0U),  <span class="comment">//!&lt; This socket source provides kernel sockets i.e. their native handles will be valid kernel sockets which can be used in `poll()` etc</span></div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;system_implementation = (1U &lt;&lt; 1U),  <span class="comment">//!&lt; This socket source is the &quot;system&quot; rather than &quot;third party&quot; implementation for TLS sockets</span></div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;io_multiplexer = (1U &lt;&lt; 2U),         <span class="comment">//!&lt; This socket source provides an i/o multiplexer</span></div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;supports_wrap = (1U &lt;&lt; 3U),          <span class="comment">//!&lt; This socket source may be able to wrap third party plain sockets</span></div>
 <div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160; </div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;all = 0xffffffff  <span class="comment">//!&lt; All bits set</span></div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;}  <span class="comment">//</span></div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;<a class="code" href="namespacellfio__v2__xxx.html#a6269702375c265b9985fe47df4447c7baf7da33fdf71e962b32ddd8345e293911">FIPS_140_2</a> = (1U &lt;&lt; 16U),  <span class="comment">//!&lt; This socket source provides FIPS_140_2 compliant algorithms</span></div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160; </div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;all = 0xffffffff  <span class="comment">//!&lt; All bits set</span></div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;}  <span class="comment">//</span></div>
 </div><!-- fragment -->
 </div>
 </div>

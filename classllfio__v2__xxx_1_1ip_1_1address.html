@@ -258,6 +258,7 @@ std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A version independent IP address. </p>
+<dl class="section warning"><dt>Warning</dt><dd>This is deprecated and scheduled for removal in 2025.</dd></dl>
 <p>This is inspired by <code>asio::ip::address</code>, but it also adds <code>port()</code> from <code>asio::ip::endpoint</code> and a few other observer member functions i.e. it fuses ASIO's many types into one.</p>
 <p>The reason why is that this type is a simple wrap of <code>struct sockaddr_in</code> or <code>struct sockaddr_in6</code>, it doesn't split those structures into multiple C++ types. </p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
