@@ -25,6 +25,10 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef LLFIO_DYNAMIC_THREAD_POOL_GROUP_H
 #define LLFIO_DYNAMIC_THREAD_POOL_GROUP_H
 
+#ifndef LLFIO_DISABLE_DEPRECATION_WARNINGS
+#warning "Dynamic thread pool groups are deprecated and scheduled for removal soon"
+#endif
+
 #include "deadline.h"
 
 #include <memory>  // for unique_ptr and shared_ptr
@@ -185,6 +189,7 @@ implementation).
 class LLFIO_DECL dynamic_thread_pool_group
 {
   friend class dynamic_thread_pool_group_impl;
+
 public:
   //! An individual item of work within the work group.
   class work_item

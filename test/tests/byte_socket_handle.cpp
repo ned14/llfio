@@ -29,6 +29,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 static inline void TestSocketAddress()
 {
+#ifndef LLFIO_EXCLUDE_NETWORKING
   namespace llfio = LLFIO_V2_NAMESPACE;
   {
     auto a = llfio::ip::address_v4::loopback();
@@ -267,10 +268,12 @@ static inline void TestSocketAddress()
     std::cout << ss.str() << std::endl;
     BOOST_CHECK(ss.str() == "[1000::]:1234");
   }
+#endif
 }
 
 static inline void TestSocketResolve()
 {
+#ifndef LLFIO_EXCLUDE_NETWORKING
   namespace llfio = LLFIO_V2_NAMESPACE;
   static const llfio::string_view addrs[] = {"google.com", "youtube.com",  "tmall.com",  "qq.com",     "baidu.com",
                                              "sohu.com",   "facebook.com", "taobao.com", "amazon.com", "www.nedprod.com"};
@@ -370,10 +373,12 @@ static inline void TestSocketResolve()
     }
   }
   resolvers.clear();
+#endif
 }
 
 static inline void TestBlockingSocketHandles()
 {
+#ifndef LLFIO_EXCLUDE_NETWORKING
   namespace llfio = LLFIO_V2_NAMESPACE;
   auto serversocket =
   llfio::listening_byte_socket_handle::listening_byte_socket(llfio::ip::family::v4, llfio::listening_byte_socket_handle::mode::read).value();
@@ -436,10 +441,12 @@ static inline void TestBlockingSocketHandles()
   BOOST_REQUIRE(written == 5);
   writer.shutdown_and_close().value();
   readerthread.get();
+#endif
 }
 
 static inline void TestNonBlockingSocketHandles()
 {
+#ifndef LLFIO_EXCLUDE_NETWORKING
   namespace llfio = LLFIO_V2_NAMESPACE;
   auto serversocket =
   llfio::listening_byte_socket_handle::listening_byte_socket(llfio::ip::family::v4, llfio::listening_byte_socket_handle::mode::read,
@@ -504,9 +511,11 @@ static inline void TestNonBlockingSocketHandles()
   writer.shutdown_and_close().value();  // must not block nor fail
   writer.close().value();
   reader.first.close().value();
+#endif
 }
 
 #if LLFIO_ENABLE_TEST_IO_MULTIPLEXERS
+#ifndef LLFIO_EXCLUDE_NETWORKING
 static inline void TestMultiplexedSocketHandles()
 {
   static constexpr size_t MAX_SOCKETS = 64;
@@ -827,9 +836,11 @@ static inline void TestCoroutinedSocketHandles()
 }
 #endif
 #endif
+#endif
 
 static inline void TestPollingSocketHandles()
 {
+#ifndef LLFIO_EXCLUDE_NETWORKING
   static constexpr size_t MAX_SOCKETS = 64;
   namespace llfio = LLFIO_V2_NAMESPACE;
   std::vector<std::pair<llfio::listening_byte_socket_handle, llfio::ip::address>> listening;
@@ -987,6 +998,7 @@ static inline void TestPollingSocketHandles()
   connect_task.get();
   poll_listening_task.get();
   poll_connecting_task.get();
+#endif
 }
 
 KERNELTEST_TEST_KERNEL(integration, llfio, ip, address, "Tests that llfio::ip::address works as expected", TestSocketAddress())

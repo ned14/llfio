@@ -25,6 +25,10 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef LLFIO_BYTE_SOCKET_HANDLE_H
 #define LLFIO_BYTE_SOCKET_HANDLE_H
 
+#ifndef LLFIO_DISABLE_DEPRECATION_WARNINGS
+#warning "Networking support is deprecated and scheduled for removal soon"
+#endif
+
 #include "byte_io_handle.hpp"
 
 struct sockaddr;

@@ -28,6 +28,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 static inline void TestBlockingTLSSocketHandles()
 {
+#ifndef LLFIO_EXCLUDE_NETWORKING
   namespace llfio = LLFIO_V2_NAMESPACE;
   if(llfio::tls_socket_source_registry::empty())
   {
@@ -136,8 +137,10 @@ static inline void TestBlockingTLSSocketHandles()
   auto rawserversocket = llfio::listening_byte_socket_handle::listening_byte_socket(llfio::ip::family::v4).value();
   auto rawwriter = llfio::byte_socket_handle::byte_socket(llfio::ip::family::v4).value();
   runtest(tls_socket_source->wrap(&rawserversocket).value(), tls_socket_source->wrap(&rawwriter).value());
+#endif
 }
 
+#ifndef LLFIO_EXCLUDE_NETWORKING
 struct TestNonBlockingTLSSocketHandlesRunTest
 {
   template <class F> TestNonBlockingTLSSocketHandlesRunTest(LLFIO_V2_NAMESPACE::listening_tls_socket_handle_ptr serversocket, F &&make_writer)
@@ -258,8 +261,10 @@ struct TestNonBlockingTLSSocketHandlesRunTest
     reader.first->close().value();
   }
 };
+#endif
 static inline void TestNonBlockingTLSSocketHandles()
 {
+#ifndef LLFIO_EXCLUDE_NETWORKING
   namespace llfio = LLFIO_V2_NAMESPACE;
   if(llfio::tls_socket_source_registry::empty())
   {
@@ -275,6 +280,7 @@ static inline void TestNonBlockingTLSSocketHandles()
   auto rawserversocket = llfio::listening_byte_socket_handle::multiplexable_listening_byte_socket(llfio::ip::family::v4).value();
   auto rawwriter = llfio::byte_socket_handle::multiplexable_byte_socket(llfio::ip::family::v4).value();
   TestNonBlockingTLSSocketHandlesRunTest(tls_socket_source->wrap(&rawserversocket).value(), [&] { return tls_socket_source->wrap(&rawwriter).value(); });
+#endif
 }
 
 /* This test makes the assumption that the host OS is able to validate github.com's
@@ -282,6 +288,7 @@ TLS certificate.
 */
 static inline void TestAuthenticatingTLSSocketHandles()
 {
+#ifndef LLFIO_EXCLUDE_NETWORKING
   //! [https_get]
   namespace llfio = LLFIO_V2_NAMESPACE;
   static constexpr llfio::string_view test_host("github.com");
@@ -331,7 +338,8 @@ static inline void TestAuthenticatingTLSSocketHandles()
             << std::endl;
   // Make sure this doesn't hang because the socket is closed
   sock->shutdown_and_close().value();
-  //! [https_get]
+//! [https_get]
+#endif
 }
 
 #if 0
@@ -656,6 +664,7 @@ static inline void TestCoroutinedTLSSocketHandles()
 
 static inline void TestPollingTLSSocketHandles()
 {
+#ifndef LLFIO_EXCLUDE_NETWORKING
   static constexpr size_t MAX_SOCKETS = 64;
   namespace llfio = LLFIO_V2_NAMESPACE;
   if(llfio::tls_socket_source_registry::empty())
@@ -843,6 +852,7 @@ static inline void TestPollingTLSSocketHandles()
   }
   runtest([&](size_t idx) { return tls_socket_source->wrap(&rawlisteners[idx]).value(); },
           [&](size_t idx) { return tls_socket_source->wrap(&rawwriters[idx]).value(); });
+#endif
 }
 
 KERNELTEST_TEST_KERNEL(integration, llfio, tls_socket_handle, blocking, "Tests that blocking llfio::tls_byte_socket_handle works as expected",

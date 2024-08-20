@@ -33,6 +33,7 @@ Distributed under the Boost Software License, Version 1.0.
 #pragma warning(disable: 4706)  // assignment within conditional
 #endif
 
+#ifndef LLFIO_EXCLUDE_NETWORKING
 void wrap_tls_socket()
 {
   //! [wrap_tls_socket]
@@ -73,6 +74,7 @@ void wrap_tls_socket()
 
   //! [wrap_tls_socket]
 }
+#endif
 
 int main()
 {
