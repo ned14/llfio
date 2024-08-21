@@ -48,16 +48,16 @@ inline result<int> attribs_from_handle_mode_caching_and_flags(native_handle_type
     break;
   case handle::mode::attr_read:
   case handle::mode::read:
-    attribs = O_RDONLY;
+    attribs |= O_RDONLY;
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable;
     break;
   case handle::mode::attr_write:
   case handle::mode::write:
-    attribs = O_RDWR;
+    attribs |= O_RDWR;
     nativeh.behaviour |= native_handle_type::disposition::seekable | native_handle_type::disposition::readable | native_handle_type::disposition::writable;
     break;
   case handle::mode::append:
-    attribs = O_WRONLY | O_APPEND;
+    attribs |= O_WRONLY | O_APPEND;
     nativeh.behaviour |= native_handle_type::disposition::writable | native_handle_type::disposition::append_only;
     break;
   }

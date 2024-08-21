@@ -1,5 +1,5 @@
 /* A handle to a directory
-(C) 2017 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2017-2024 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: Aug 2017
 
 
@@ -37,6 +37,11 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include <sys/stat.h>
 #include <sys/syscall.h>
 
+#ifdef __APPLE__
+extern "C" int _getdirentries(int, char *, int, long *);
+extern "C" size_t __getdirentries64(int fd, void *buf, size_t bufsize, __darwin_off_t *basep);
+#endif
+
 LLFIO_V2_NAMESPACE_BEGIN
 
 result<directory_handle> directory_handle::directory(const path_handle &base, path_view_type path, mode _mode, creation _creation, caching _caching,
@@ -71,7 +76,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
 #ifdef O_DIRECTORY
   attribs |= O_DIRECTORY;
 #endif
-#ifdef O_SEARCH
+#if defined(O_SEARCH) && !defined(__APPLE__)  // Newer Mac OS defines this, but setting it breaks enumeration
   attribs |= O_SEARCH;
 #endif
   if(base.is_valid() && path.empty())
@@ -81,7 +86,8 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     path = ".";
   }
   path_view::zero_terminated_rendered_path<> zpath(path);
-  auto rename_random_dir_over_existing_dir = [_mode, _caching, flags](const path_handle &base, path_view_type path) -> result<directory_handle> {
+  auto rename_random_dir_over_existing_dir = [_mode, _caching, flags](const path_handle &base, path_view_type path) -> result<directory_handle>
+  {
     // Take a path handle to the directory containing the file
     auto path_parent = path.parent_path();
     path_handle dirh;
@@ -343,11 +349,19 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
   using dirent = dirent64;
 #endif
 #ifdef __APPLE__
-  // OS X defines a getdirentries64() kernel syscall which can emulate getdents
   typedef int (*getdents_emulation_t)(int, char *, unsigned);
-  static getdents_emulation_t getdents = static_cast<getdents_emulation_t>([](int fd, char *buf, unsigned count) -> int {
-    off_t foo;
-    return syscall(SYS_getdirentries64, fd, buf, count, &foo);
+  static getdents_emulation_t getdents = static_cast<getdents_emulation_t>(
+  [](int fd, char *buf, unsigned count) -> int
+  {
+#if __DARWIN_64_BIT_INO_T
+    __darwin_off_t foo = 0;
+    uint64_t *flags = (uint64_t *) (buf + count - sizeof(uint64_t));
+    *flags = 0;
+    return (int) __getdirentries64(fd, buf, count, &foo);
+#else
+    long foo = 0;
+    return _getdirentries(fd, buf, (int) count, &foo);
+#endif
   });
 #endif
   if(!req.buffers._kernel_buffer && req.kernelbuffer.empty())
