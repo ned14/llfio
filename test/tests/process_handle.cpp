@@ -41,14 +41,16 @@ static inline void TestProcessHandle(bool with_redirection)
   {
     for(auto &i : *myenv)
     {
-      if(visit(i, [](auto sv) -> bool {
-           if(sv.size() >= 512)
-             return false;
-           using _string_view = std::decay_t<decltype(sv)>;
-           _string_view a((const typename _string_view::value_type *) "JENKINS_NEDPROD_PASSWORD");
-           _string_view b((const typename _string_view::value_type *) L"JENKINS_NEDPROD_PASSWORD");
-           return (sv.npos == sv.find(a)) && (sv.npos == sv.find(b));
-         }))
+      if(visit(i,
+               [](auto sv) -> bool
+               {
+                 if(sv.size() >= 512)
+                   return false;
+                 using _string_view = std::decay_t<decltype(sv)>;
+                 _string_view a((const typename _string_view::value_type *) "JENKINS_NEDPROD_PASSWORD");
+                 _string_view b((const typename _string_view::value_type *) L"JENKINS_NEDPROD_PASSWORD");
+                 return (sv.npos == sv.find(a)) && (sv.npos == sv.find(b));
+               }))
       {
         std::cout << "\n  " << i;
       }
@@ -63,7 +65,7 @@ static inline void TestProcessHandle(bool with_redirection)
   for(size_t n = 0; n < 4; n++)
   {
     char buffer[64];
-    sprintf(buffer, "--testchild,%u", (unsigned) n);
+    snprintf(buffer, 64, "--testchild,%u", (unsigned) n);
     llfio::path_view_component arg(buffer);
     children.push_back(llfio::process_handle::launch_process(myexepath, {&arg, 1}, flags).value());
   }

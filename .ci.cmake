@@ -152,7 +152,7 @@ else()
     )
     get_filename_component(toupload llfio-v2.0-binaries-linux-armhf.tgz ABSOLUTE)
   endif()
-  if(EXISTS "prebuilt/lib/libllfio_dl-2.0-Darwin-x86_64-Release.dylib")
+  if(EXISTS "prebuilt/lib/libllfio_dl-2.0-Darwin-arm64-Release.dylib")
     file(DOWNLOAD "https://github.com/ned14/outcome/tarball/master" "${CMAKE_CURRENT_LIST_DIR}/outcome.tgz")
     file(DOWNLOAD "https://github.com/ned14/quickcpplib/tarball/master" "${CMAKE_CURRENT_LIST_DIR}/quickcpplib.tgz")
     checked_execute_process("Tarring up binaries 0"
@@ -168,17 +168,17 @@ else()
       COMMAND "${CMAKE_COMMAND}" -E copy index.html llfio/
       COMMAND "${CMAKE_COMMAND}" -E copy Licence.txt llfio/
       COMMAND "${CMAKE_COMMAND}" -E copy Readme.md llfio/
-      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/libllfio_sl-2.0-Darwin-x86_64-Release.a llfio/prebuilt/lib/
-      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/libllfio_dl-2.0-Darwin-x86_64-Release.dylib llfio/prebuilt/lib/
+      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/libllfio_sl-2.0-Darwin-arm64-Release.a llfio/prebuilt/lib/
+      COMMAND "${CMAKE_COMMAND}" -E copy prebuilt/lib/libllfio_dl-2.0-Darwin-arm64-Release.dylib llfio/prebuilt/lib/
     )
     checked_execute_process("Tarring up binaries 2"
       COMMAND bash -c "mv ned14-outcome* llfio/include/outcome"
       COMMAND bash -c "mv ned14-quickcpplib* llfio/include/quickcpplib"
     )
     checked_execute_process("Tarring up binaries 3"
-      COMMAND "${CMAKE_COMMAND}" -E tar cfz llfio-v2.0-binaries-darwin-x64.tgz llfio
+      COMMAND "${CMAKE_COMMAND}" -E tar cfz llfio-v2.0-binaries-darwin-arm64.tgz llfio
     )
-    get_filename_component(toupload llfio-v2.0-binaries-darwin-x64.tgz ABSOLUTE)
+    get_filename_component(toupload llfio-v2.0-binaries-darwin-arm64.tgz ABSOLUTE)
   endif()
 endif()
 set(retval2 0)
@@ -205,6 +205,5 @@ ctest_submit()
 if(NOT retval EQUAL 0 OR NOT retval2 EQUAL 0 OR NOT retval3 EQUAL 0)
   message(FATAL_ERROR "FATAL: Running tests exited with ${retval} ${retval2} ${retval3}")
 else()
-  message(STATUS "Running tests exited with ${retval} ${retval2} ${retval3}")
-  cmake_language(EXIT 0)
+  message(STATUS "SUCCESS: Running tests exited with ${retval} ${retval2} ${retval3}")
 endif()

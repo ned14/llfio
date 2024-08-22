@@ -131,8 +131,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifacts/Mac OS error_code prebuilt binaries/llfio-v2.0-binaries-darwin-x64.tgz
-          asset_name: llfio-v2.0-binaries-macos-11-x64-error_code.tgz
+          asset_path: artifacts/Mac OS error_code prebuilt binaries/llfio-v2.0-binaries-darwin-arm64.tgz
+          asset_name: llfio-v2.0-binaries-macos-arm64-error_code.tgz
           asset_content_type: application/gzip
           
       - name: Upload MacOS 2
@@ -142,8 +142,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifacts/Mac OS status_code prebuilt binaries/llfio-v2.0-binaries-darwin-x64.tgz
-          asset_name: llfio-v2.0-binaries-macos-11-x64-status_code.tgz
+          asset_path: artifacts/Mac OS status_code prebuilt binaries/llfio-v2.0-binaries-darwin-arm64.tgz
+          asset_name: llfio-v2.0-binaries-macos-arm64-status_code.tgz
           asset_content_type: application/gzip
 
       - name: Upload Windows 1
