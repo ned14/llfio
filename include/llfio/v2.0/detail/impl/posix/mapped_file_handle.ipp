@@ -59,6 +59,7 @@ result<mapped_file_handle::size_type> mapped_file_handle::_reserve(extent_type &
   }
   // Reserve the full reservation in address space
   section_handle::flag mapflags = section_handle::flag::nocommit | section_handle::flag::read;
+  mapflags |= _sh.section_flags() & section_handle::flag::cow;
   if(this->is_writable())
   {
     mapflags |= section_handle::flag::write;

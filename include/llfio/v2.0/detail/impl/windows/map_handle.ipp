@@ -934,7 +934,7 @@ result<void> map_handle::zero_memory(buffer_type region) noexcept
   memset(region.data(), 0, region.size());
   if(region.size() >= utils::page_size())
   {
-    region = utils::round_to_page_size_larger(region, _pagesize);
+    region = utils::round_to_page_size_smaller(region, _pagesize);
     if(region.size() > 0)
     {
       OUTCOME_TRYV(win32_maps_apply(region.data(), region.size(), win32_map_sought::committed,
