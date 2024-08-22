@@ -33,6 +33,7 @@ namespace path_view_openat_example
   using namespace LLFIO_V2_NAMESPACE::windows_nt_kernel;
   using namespace std;
 
+  using LLFIO_V2_NAMESPACE::byte;
   using LLFIO_V2_NAMESPACE::windows_nt_kernel::IO_STATUS_BLOCK;
   using LLFIO_V2_NAMESPACE::windows_nt_kernel::NtCreateFile;
   using LLFIO_V2_NAMESPACE::windows_nt_kernel::OBJECT_ATTRIBUTES;
@@ -112,7 +113,7 @@ namespace path_view_openat_example
         return CreateFileA(zpath.c_str(), access, share, nullptr, creation,
                            flags, nullptr);
       }
-      else // char8_t, char16_t, wchar_t
+      else  // char8_t, char16_t, wchar_t
       {
         // Render to the system wide encoding null terminated
         auto zpath = path.render_null_terminated<wchar_t>(path);
