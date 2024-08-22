@@ -39,27 +39,36 @@ using QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng;
 
 inline uint64_t ticksclock()
 {
+#ifdef __APPLE__
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+  return ts.tv_sec * 1000000000ULL + ts.tv_nsec;
+#else
 #ifdef _MSC_VER
-  auto rdtscp = [] {
+  auto rdtscp = []
+  {
     unsigned x;
     return (uint64_t) __rdtscp(&x);
   };
 #else
 #if defined(__x86_64__)
-  auto rdtscp = [] {
+  auto rdtscp = []
+  {
     unsigned lo, hi, aux;
     asm volatile("rdtscp" : "=a"(lo), "=d"(hi), "=c"(aux));
     return (uint64_t) lo | ((uint64_t) hi << 32);
   };
 #elif defined(__i386__)
-  auto rdtscp = [] {
+  auto rdtscp = []
+  {
     unsigned lo, hi, aux;
     asm volatile("rdtscp" : "=a"(lo), "=d"(hi), "=c"(aux));
     return (uint64_t) lo | ((uint64_t) hi << 32);
   };
 #endif
 #if __ARM_ARCH >= 6
-  auto rdtscp = [] {
+  auto rdtscp = []
+  {
     unsigned count;
     asm volatile("MRC p15, 0, %0, c9, c13, 0" : "=r"(count));
     return (uint64_t) count * 64;
@@ -67,10 +76,14 @@ inline uint64_t ticksclock()
 #endif
 #endif
   return rdtscp();
+#endif
 }
 
 inline uint64_t nanoclock()
 {
+#ifdef __APPLE__
+  return 1000000000ULL;
+#else
   static double ticks_per_sec;
   static uint64_t offset;
   if(ticks_per_sec == 0)
@@ -91,7 +104,8 @@ inline uint64_t nanoclock()
     std::cout << "There are " << ticks_per_sec << " TSCs in 1 nanosecond and it takes " << offset << " ticks per nanoclock()." << std::endl;
 #endif
   }
-  return (uint64_t)((ticksclock() - offset) / ticks_per_sec);
+  return (uint64_t) ((ticksclock() - offset) / ticks_per_sec);
+#endif
 }
 
 template <class F> inline void run_test(const char *csv, off_t max_extent, F &&f)
@@ -185,10 +199,12 @@ int main()
     std::cout << "Testing latency of iostreams ..." << std::endl;
     std::ifstream testfile("testfile");
     testfile.exceptions(std::ios::failbit | std::ios::badbit);
-    run_test("iostreams.csv", REGIONSIZE, [&](unsigned offset, char *buffer, size_t len) {
-      testfile.seekg(offset, std::ios::beg);
-      testfile.read(buffer, len);
-    });
+    run_test("iostreams.csv", REGIONSIZE,
+             [&](unsigned offset, char *buffer, size_t len)
+             {
+               testfile.seekg(offset, std::ios::beg);
+               testfile.read(buffer, len);
+             });
   }
 #endif
   {
@@ -200,7 +216,8 @@ int main()
   {
     std::cout << "Testing latency of llfio::mapped_file_handle ..." << std::endl;
     auto th = llfio::mapped_file({}, "testfile").value();
-    run_test("mapped_file_handle.csv", REGIONSIZE, [&](unsigned offset, char *buffer, size_t len) { th.read(offset, {{(llfio::byte *) buffer, len}}).value(); });
+    run_test("mapped_file_handle.csv", REGIONSIZE,
+             [&](unsigned offset, char *buffer, size_t len) { th.read(offset, {{(llfio::byte *) buffer, len}}).value(); });
   }
 #endif
 #if 1
@@ -217,71 +234,73 @@ int main()
       }
     }
 #endif
-    run_test("memcpy.csv", REGIONSIZE, [&](unsigned offset, char *buffer, size_t len) {
+    run_test("memcpy.csv", REGIONSIZE,
+             [&](unsigned offset, char *buffer, size_t len)
+             {
 #if 0
       memcpy(buffer, th.address() + offset, len);
 #else
-      // Can't use memcpy, it gets elided
-      const llfio::byte *__restrict s = th.address() + offset;
+               // Can't use memcpy, it gets elided
+               const llfio::byte *__restrict s = th.address() + offset;
 #if defined(__SSE2__) || defined(_M_X64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
-      while(len >= 4 * sizeof(__m128i))
-      {
-        __m128i a = *(const __m128i *__restrict) s;
-        s += sizeof(__m128i);
-        __m128i b = *(const __m128i *__restrict) s;
-        s += sizeof(__m128i);
-        __m128i c = *(const __m128i *__restrict) s;
-        s += sizeof(__m128i);
-        __m128i d = *(const __m128i *__restrict) s;
-        s += sizeof(__m128i);
-        *(__m128i * __restrict) buffer = a;
-        buffer += sizeof(__m128i);
-        *(__m128i * __restrict) buffer = b;
-        buffer += sizeof(__m128i);
-        *(__m128i * __restrict) buffer = c;
-        buffer += sizeof(__m128i);
-        *(__m128i * __restrict) buffer = d;
-        buffer += sizeof(__m128i);
-        len -= 4 * sizeof(__m128i);
-      }
-      while(len >= sizeof(__m128i))
-      {
-        *(__m128i * __restrict) buffer = *(const __m128i *__restrict) s;
-        buffer += sizeof(__m128i);
-        s += sizeof(__m128i);
-        len -= sizeof(__m128i);
-      }
+               while(len >= 4 * sizeof(__m128i))
+               {
+                 __m128i a = *(const __m128i *__restrict) s;
+                 s += sizeof(__m128i);
+                 __m128i b = *(const __m128i *__restrict) s;
+                 s += sizeof(__m128i);
+                 __m128i c = *(const __m128i *__restrict) s;
+                 s += sizeof(__m128i);
+                 __m128i d = *(const __m128i *__restrict) s;
+                 s += sizeof(__m128i);
+                 *(__m128i *__restrict) buffer = a;
+                 buffer += sizeof(__m128i);
+                 *(__m128i *__restrict) buffer = b;
+                 buffer += sizeof(__m128i);
+                 *(__m128i *__restrict) buffer = c;
+                 buffer += sizeof(__m128i);
+                 *(__m128i *__restrict) buffer = d;
+                 buffer += sizeof(__m128i);
+                 len -= 4 * sizeof(__m128i);
+               }
+               while(len >= sizeof(__m128i))
+               {
+                 *(__m128i *__restrict) buffer = *(const __m128i *__restrict) s;
+                 buffer += sizeof(__m128i);
+                 s += sizeof(__m128i);
+                 len -= sizeof(__m128i);
+               }
 #endif
-      while(len >= sizeof(uint64_t))
-      {
-        *(volatile uint64_t * __restrict) buffer = *(const uint64_t *__restrict) s;
-        buffer += sizeof(uint64_t);
-        s += sizeof(uint64_t);
-        len -= sizeof(uint64_t);
-      }
-      if(len >= sizeof(uint32_t))
-      {
-        *(volatile uint32_t * __restrict) buffer = *(const uint32_t *__restrict) s;
-        buffer += sizeof(uint32_t);
-        s += sizeof(uint32_t);
-        len -= sizeof(uint32_t);
-      }
-      if(len >= sizeof(uint16_t))
-      {
-        *(volatile uint16_t * __restrict) buffer = *(const uint16_t *__restrict) s;
-        buffer += sizeof(uint16_t);
-        s += sizeof(uint16_t);
-        len -= sizeof(uint16_t);
-      }
-      if(len >= sizeof(uint8_t))
-      {
-        *(volatile uint8_t * __restrict) buffer = *(const uint8_t *__restrict) s;
-        buffer += sizeof(uint8_t);
-        s += sizeof(uint8_t);
-        len -= sizeof(uint8_t);
-      }
+               while(len >= sizeof(uint64_t))
+               {
+                 *(volatile uint64_t *__restrict) buffer = *(const uint64_t *__restrict) s;
+                 buffer += sizeof(uint64_t);
+                 s += sizeof(uint64_t);
+                 len -= sizeof(uint64_t);
+               }
+               if(len >= sizeof(uint32_t))
+               {
+                 *(volatile uint32_t *__restrict) buffer = *(const uint32_t *__restrict) s;
+                 buffer += sizeof(uint32_t);
+                 s += sizeof(uint32_t);
+                 len -= sizeof(uint32_t);
+               }
+               if(len >= sizeof(uint16_t))
+               {
+                 *(volatile uint16_t *__restrict) buffer = *(const uint16_t *__restrict) s;
+                 buffer += sizeof(uint16_t);
+                 s += sizeof(uint16_t);
+                 len -= sizeof(uint16_t);
+               }
+               if(len >= sizeof(uint8_t))
+               {
+                 *(volatile uint8_t *__restrict) buffer = *(const uint8_t *__restrict) s;
+                 buffer += sizeof(uint8_t);
+                 s += sizeof(uint8_t);
+                 len -= sizeof(uint8_t);
+               }
 #endif
-    });
+             });
   }
 #endif
   llfio::filesystem::remove("testfile");
