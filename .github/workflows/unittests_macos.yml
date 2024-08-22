@@ -35,7 +35,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: Mac OS ${{ matrix.configuration }} prebuilt binaries
-        path: llfio-v2.0-binaries-darwin-x64.tgz
+        path: llfio-v2.0-binaries-darwin-arm64.tgz
       
     - name: Upload Test Results
       if: always()
