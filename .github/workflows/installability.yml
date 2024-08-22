@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, macos-11, windows-2019]
+        os: [ubuntu-20.04, macos-latest, windows-2019]
         configuration: [error_code, status_code]
     env:
       NAME: Install-${{ matrix.os }}-${{ matrix.configuration }}
