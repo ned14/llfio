@@ -515,9 +515,9 @@ static inline void TestNonBlockingSocketHandles()
 }
 
 #if LLFIO_ENABLE_TEST_IO_MULTIPLEXERS
-#ifndef LLFIO_EXCLUDE_NETWORKING
 static inline void TestMultiplexedSocketHandles()
 {
+#ifndef LLFIO_EXCLUDE_NETWORKING
   static constexpr size_t MAX_SOCKETS = 64;
   namespace llfio = LLFIO_V2_NAMESPACE;
   auto test_multiplexer = [](llfio::byte_io_multiplexer_ptr multiplexer)
@@ -701,11 +701,13 @@ static inline void TestMultiplexedSocketHandles()
 #else
 #error Not implemented yet
 #endif
+#endif
 }
 
 #if LLFIO_ENABLE_COROUTINES
 static inline void TestCoroutinedSocketHandles()
 {
+#ifndef LLFIO_EXCLUDE_NETWORKING
   static constexpr size_t MAX_SOCKETS = 70;
   namespace llfio = LLFIO_V2_NAMESPACE;
   auto test_multiplexer = [](llfio::byte_io_multiplexer_ptr multiplexer)
@@ -833,8 +835,8 @@ static inline void TestCoroutinedSocketHandles()
 #else
 #error Not implemented yet
 #endif
-}
 #endif
+}
 #endif
 #endif
 
