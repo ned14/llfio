@@ -71,7 +71,7 @@ namespace path_view_openat_example
       if(base != nullptr || is_ntpath)
       {
         // The NT kernel always takes the system wide encoding
-        auto zpath = path.render_unterminated<wchar_t>(path);
+        auto zpath = path.render_unterminated<wchar_t>();
         UNICODE_STRING _path{};
         _path.Buffer = const_cast<wchar_t *>(zpath.data());
         _path.MaximumLength =
@@ -109,14 +109,14 @@ namespace path_view_openat_example
       if constexpr(is_same_v<type, char>)
       {
         // Render to the system narrow encoding null terminated
-        auto zpath = path.render_null_terminated<char>(path);
+        auto zpath = path.render_null_terminated<char>();
         return CreateFileA(zpath.c_str(), access, share, nullptr, creation,
                            flags, nullptr);
       }
       else  // char8_t, char16_t, wchar_t
       {
         // Render to the system wide encoding null terminated
-        auto zpath = path.render_null_terminated<wchar_t>(path);
+        auto zpath = path.render_null_terminated<wchar_t>();
         return CreateFileW(zpath.c_str(), access, share, nullptr, creation,
                            flags, nullptr);
       }
