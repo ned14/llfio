@@ -1563,10 +1563,9 @@ public:
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>),
                   LLFIO_TEXPR(std::is_constructible<rendered_path<zero_termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>,
                                                     path_view_component, Args...>::value))
-  rendered_path<zero_termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size> render_null_terminated(path_view_component view,
-                                                                                                                        Args &&...args) const
+  rendered_path<zero_termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size> render_null_terminated(Args &&...args) const
   {
-    return rendered_path<zero_termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>(view, std::forward<Args>(args)...);
+    return rendered_path<zero_termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>(*this, std::forward<Args>(args)...);
   }
   //! Convenience function
   LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class AllocatorOrDeleter = default_rendered_path_deleter<T[]>,
@@ -1574,10 +1573,9 @@ public:
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>),
                   LLFIO_TEXPR(std::is_constructible<rendered_path<zero_termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>,
                                                     path_view_component, Args...>::value))
-  rendered_path<zero_termination::not_zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size> render_unterminated(path_view_component view,
-                                                                                                                         Args &&...args) const
+  rendered_path<zero_termination::not_zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size> render_unterminated(Args &&...args) const
   {
-    return rendered_path<zero_termination::not_zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>(view, std::forward<Args>(args)...);
+    return rendered_path<zero_termination::not_zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>(*this, std::forward<Args>(args)...);
   }
 
 #ifdef __cpp_concepts
