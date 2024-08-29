@@ -34,6 +34,11 @@ Distributed under the Boost Software License, Version 1.0.
 #include <compare>
 #endif
 
+#if __cplusplus >= 202600L || _HAS_CXX26
+#include <format>
+#define LLFIO_PATH_VIEW_HAVE_FORMAT 1
+#endif
+
 #include "quickcpplib/algorithm/hash.hpp"
 #include "quickcpplib/algorithm/string.hpp"
 
@@ -3198,6 +3203,55 @@ static_assert(std::is_trivially_copyable<path_view>::value, "path_view is not a 
 #endif
 
 LLFIO_V2_NAMESPACE_END
+
+#if LLFIO_PATH_VIEW_HAVE_FORMAT
+template <class charT> struct std::formatter<LLFIO_V2_NAMESPACE::path_view_component, charT>
+{
+  std::formatter<std::filesystem::path, charT> fmt;
+  constexpr void set_debug_format() { fmt.set_debug_format(); }
+  constexpr typename std::basic_format_parse_context<charT>::iterator parse(std::basic_format_parse_context<charT> &ctx) { return fmt.parse(ctx); }
+  template <class FormatContext> typename FormatContext::iterator format(const LLFIO_V2_NAMESPACE::path_view_component &pv, FormatContext &ctx) const
+  {
+    return LLFIO_V2_NAMESPACE::visit(
+    [&](auto sv)
+    {
+      using type = typename decltype(sv)::value_type;
+      if constexpr(std::is_same_v<type, std::byte>)
+      {
+        return fmt.format(std::filesystem::path(QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string((const char *) v.data(), v.size())), ctx);
+      }
+      else
+      {
+        return fmt.format(std::filesystem::path(sv), ctx);
+      }
+    },
+    pv);
+  }
+};
+template <class charT> struct std::formatter<LLFIO_V2_NAMESPACE::path_view, charT>
+{
+  std::formatter<std::filesystem::path, charT> fmt;
+  constexpr void set_debug_format() { fmt.set_debug_format(); }
+  constexpr typename std::basic_format_parse_context<charT>::iterator parse(std::basic_format_parse_context<charT> &ctx) { return fmt.parse(ctx); }
+  template <class FormatContext> typename FormatContext::iterator format(const LLFIO_V2_NAMESPACE::path_view &pv, FormatContext &ctx) const
+  {
+    return LLFIO_V2_NAMESPACE::visit(
+    [&](auto sv)
+    {
+      using type = typename decltype(sv)::value_type;
+      if constexpr(std::is_same_v<type, std::byte>)
+      {
+        return fmt.format(std::filesystem::path(QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string((const char *) v.data(), v.size())), ctx);
+      }
+      else
+      {
+        return fmt.format(std::filesystem::path(sv), ctx);
+      }
+    },
+    pv);
+  }
+};
+#endif
 
 #if LLFIO_HEADERS_ONLY == 1 && !defined(DOXYGEN_SHOULD_SKIP_THIS)
 #define LLFIO_INCLUDED_BY_HEADER 1

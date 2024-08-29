@@ -357,6 +357,17 @@ static inline void TestPathView()
     BOOST_CHECK(zbuff.allocator().deleted == 1);
     BOOST_CHECK(zbuff.allocator().sig == 0);  // default initialised
   }
+
+#if LLFIO_PATH_VIEW_HAVE_FORMAT
+  {
+    std::string a, b;
+    std::format_to(std::back_inserter(a), std::filesystem::path("a/b/c"));
+    std::format_to(std::back_inserter(b), llfio::path_view("a/b/c"));
+    std::cout << "std::format(path) = " << a << std::endl;
+    std::cout << "std::format(path_view) = " << b << std::endl;
+    BOOST_CHECK(a == b);
+  }
+#endif
 }
 
 KERNELTEST_TEST_KERNEL(integration, llfio, path_view, path_view, "Tests that llfio::path_view() works as expected", TestPathView())
