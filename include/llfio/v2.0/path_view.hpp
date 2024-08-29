@@ -1596,10 +1596,6 @@ static_assert(sizeof(path_view_component) == 3 * sizeof(void *), "path_view_comp
 //! you want something stronger.
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view_component x, path_view_component y) noexcept
 {
-  if(x.native_size() != y.native_size())
-  {
-    return false;
-  }
   if(x._passthrough != y._passthrough)
   {
     return false;
@@ -1617,6 +1613,10 @@ inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view_component x, path_vie
     return false;
   }
   if(x._utf16 != y._utf16)
+  {
+    return false;
+  }
+  if(x.native_size() != y.native_size())
   {
     return false;
   }
@@ -1646,14 +1646,6 @@ inline constexpr bool operator==(const CharT * /*unused*/, path_view_component /
 #if __cplusplus >= 202000L || _HAS_CXX20
 inline LLFIO_PATH_VIEW_CONSTEXPR std::strong_ordering operator<=>(path_view_component x, path_view_component y) noexcept
 {
-  if(x.native_size() < y.native_size())
-  {
-    return std::strong_ordering::less;
-  }
-  if(x.native_size() > y.native_size())
-  {
-    return std::strong_ordering::greater;
-  }
   if(x._passthrough < y._passthrough)
   {
     return std::strong_ordering::less;
@@ -1691,6 +1683,14 @@ inline LLFIO_PATH_VIEW_CONSTEXPR std::strong_ordering operator<=>(path_view_comp
     return std::strong_ordering::less;
   }
   if(x._utf16 > y._utf16)
+  {
+    return std::strong_ordering::greater;
+  }
+  if(x.native_size() < y.native_size())
+  {
+    return std::strong_ordering::less;
+  }
+  if(x.native_size() > y.native_size())
   {
     return std::strong_ordering::greater;
   }
@@ -1733,10 +1733,6 @@ inline LLFIO_PATH_VIEW_CONSTEXPR std::strong_ordering operator<=>(const CharT * 
 //! if you want something stronger.
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view_component x, path_view_component y) noexcept
 {
-  if(x.native_size() != y.native_size())
-  {
-    return true;
-  }
   if(x._passthrough != y._passthrough)
   {
     return true;
@@ -1757,6 +1753,10 @@ inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view_component x, path_vie
   {
     return true;
   }
+  if(x.native_size() != y.native_size())
+  {
+    return true;
+  }
   if(x.native_size() == 0)
   {
     return false;
@@ -1770,14 +1770,6 @@ inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view_component x, path_vie
 //! if you want something stronger.
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator<(path_view_component x, path_view_component y) noexcept
 {
-  if(x.native_size() < y.native_size())
-  {
-    return true;
-  }
-  if(x.native_size() > y.native_size())
-  {
-    return false;
-  }
   if(x._passthrough < y._passthrough)
   {
     return true;
@@ -1815,6 +1807,14 @@ inline LLFIO_PATH_VIEW_CONSTEXPR bool operator<(path_view_component x, path_view
     return true;
   }
   if(x._utf16 > y._utf16)
+  {
+    return false;
+  }
+  if(x.native_size() < y.native_size())
+  {
+    return true;
+  }
+  if(x.native_size() > y.native_size())
   {
     return false;
   }
