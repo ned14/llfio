@@ -1,5 +1,5 @@
 /* A view of a path to something
-(C) 2017-2022 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
+(C) 2017-2024 Niall Douglas <http://www.nedproductions.biz/> (20 commits)
 File Created: Jul 2017
 
 
@@ -219,15 +219,20 @@ namespace detail
 class path_view;
 class path_view_component;
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view_component x, path_view_component y) noexcept;
+inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view x, path_view y) noexcept;
+#if __cplusplus >= 202000L || _HAS_CXX20
+inline LLFIO_PATH_VIEW_CONSTEXPR std::strong_ordering operator<=>(path_view_component x, path_view_component y) noexcept;
+inline LLFIO_PATH_VIEW_CONSTEXPR std::strong_ordering operator<=>(path_view x, path_view y) noexcept;
+#else
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view_component x, path_view_component y) noexcept;
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator<(path_view_component x, path_view_component y) noexcept;
+inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view x, path_view y) noexcept;
+inline LLFIO_PATH_VIEW_CONSTEXPR bool operator<(path_view x, path_view y) noexcept;
+#endif
 inline LLFIO_PATH_VIEW_CONSTEXPR size_t hash_value(path_view_component x) noexcept;
 template <class F> inline LLFIO_PATH_VIEW_CONSTEXPR auto visit(path_view_component view, F &&f);
 template <class F> inline LLFIO_PATH_VIEW_CONSTEXPR auto visit(F &&f, path_view_component view);
 inline std::ostream &operator<<(std::ostream &s, const path_view_component &v);
-inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view x, path_view y) noexcept;
-inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view x, path_view y) noexcept;
-inline LLFIO_PATH_VIEW_CONSTEXPR bool operator<(path_view x, path_view y) noexcept;
 inline LLFIO_PATH_VIEW_CONSTEXPR size_t hash_value(path_view x) noexcept;
 
 /*! \class path_view_component
@@ -238,21 +243,11 @@ class LLFIO_DECL path_view_component
   friend class path_view;
   friend class detail::path_view_iterator;
   friend inline LLFIO_PATH_VIEW_CONSTEXPR bool LLFIO_V2_NAMESPACE::operator==(path_view_component x, path_view_component y) noexcept;
+#if __cplusplus >= 202000L || _HAS_CXX20
+  friend inline LLFIO_PATH_VIEW_CONSTEXPR std::strong_ordering operator<=>(path_view_component x, path_view_component y) noexcept;
+#else
   friend inline LLFIO_PATH_VIEW_CONSTEXPR bool LLFIO_V2_NAMESPACE::operator!=(path_view_component x, path_view_component y) noexcept;
   friend inline LLFIO_PATH_VIEW_CONSTEXPR bool LLFIO_V2_NAMESPACE::operator<(path_view_component x, path_view_component y) noexcept;
-#if __cplusplus >= 202000L || _HAS_CXX20
-  friend inline LLFIO_PATH_VIEW_CONSTEXPR std::strong_ordering operator<=>(path_view_component x, path_view_component y) noexcept
-  {
-    if(x == y)
-    {
-      return std::strong_ordering::equal;
-    }
-    if(x < y)
-    {
-      return std::strong_ordering::less;
-    }
-    return std::strong_ordering::greater;
-  }
 #endif
   friend inline LLFIO_PATH_VIEW_CONSTEXPR size_t hash_value(path_view_component x) noexcept;
   template <class F> friend inline LLFIO_PATH_VIEW_CONSTEXPR auto LLFIO_V2_NAMESPACE::visit(path_view_component view, F &&f);
@@ -1598,6 +1593,7 @@ public:
 };
 static_assert(std::is_trivially_copyable<path_view_component>::value, "path_view_component is not trivially copyable!");
 static_assert(sizeof(path_view_component) == 3 * sizeof(void *), "path_view_component is not three pointers in size!");
+
 //! \brief Compares **identity** equality not equivalence i.e. backing storage type must be identical, and backing bytes must be identical. Use `compare()` if
 //! you want something stronger.
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view_component x, path_view_component y) noexcept
@@ -1635,6 +1631,106 @@ inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view_component x, path_vie
   const auto bytes = (x._wchar || x._utf16) ? (x._length * 2) : x._length;
   return 0 == memcmp(x._bytestr, y._bytestr, bytes);
 }
+LLFIO_TEMPLATE(class CharT)
+LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_acceptable<CharT>))
+inline constexpr bool operator==(path_view_component /*unused*/, const CharT * /*unused*/) noexcept
+{
+  static_assert(!path_view_component::is_source_acceptable<CharT>, "Do not use operator== with path_view_component and a string literal, use .compare<>()");
+  return false;
+}
+LLFIO_TEMPLATE(class CharT)
+LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_acceptable<CharT>))
+inline constexpr bool operator==(const CharT * /*unused*/, path_view_component /*unused*/) noexcept
+{
+  static_assert(!path_view_component::is_source_acceptable<CharT>, "Do not use operator== with path_view_component and a string literal, use .compare<>()");
+  return false;
+}
+#if __cplusplus >= 202000L || _HAS_CXX20
+inline LLFIO_PATH_VIEW_CONSTEXPR std::strong_ordering operator<=>(path_view_component x, path_view_component y) noexcept
+{
+  if(x.native_size() < y.native_size())
+  {
+    return std::strong_ordering::less;
+  }
+  if(x.native_size() > y.native_size())
+  {
+    return std::strong_ordering::greater;
+  }
+  if(x._passthrough < y._passthrough)
+  {
+    return std::strong_ordering::less;
+  }
+  if(x._passthrough > y._passthrough)
+  {
+    return std::strong_ordering::greater;
+  }
+  if(x._char < y._char)
+  {
+    return std::strong_ordering::less;
+  }
+  if(x._char > y._char)
+  {
+    return std::strong_ordering::greater;
+  }
+  if(x._wchar < y._wchar)
+  {
+    return std::strong_ordering::less;
+  }
+  if(x._wchar > y._wchar)
+  {
+    return std::strong_ordering::greater;
+  }
+  if(x._utf8 < y._utf8)
+  {
+    return std::strong_ordering::less;
+  }
+  if(x._utf8 > y._utf8)
+  {
+    return std::strong_ordering::greater;
+  }
+  if(x._utf16 < y._utf16)
+  {
+    return std::strong_ordering::less;
+  }
+  if(x._utf16 > y._utf16)
+  {
+    return std::strong_ordering::greater;
+  }
+  if(x.native_size() == 0)
+  {
+    return std::strong_ordering::equal;
+  }
+  assert(x._bytestr != nullptr);
+  assert(y._bytestr != nullptr);
+  const auto bytes = (x._wchar || x._utf16) ? (x._length * 2) : x._length;
+  int comp = memcmp(x._bytestr, y._bytestr, bytes);
+  if(comp == 0)
+  {
+    return std::strong_ordering::equal;
+  }
+  else if(comp < 0)
+  {
+    return std::strong_ordering::less;
+  }
+  return std::strong_ordering::greater;
+}
+
+LLFIO_TEMPLATE(class CharT)
+LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_acceptable<CharT>))
+inline LLFIO_PATH_VIEW_CONSTEXPR std::strong_ordering operator<=>(path_view_component /*unused*/, const CharT * /*unused*/) noexcept
+{
+  static_assert(!path_view_component::is_source_acceptable<CharT>, "Do not use operator<=> with path_view_component and a string literal, use .compare<>()");
+  return std::strong_ordering::equal;
+}
+LLFIO_TEMPLATE(class CharT)
+LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_acceptable<CharT>))
+inline LLFIO_PATH_VIEW_CONSTEXPR std::strong_ordering operator<=>(const CharT * /*unused*/, path_view_component /*unused*/) noexcept
+{
+  static_assert(!path_view_component::is_source_acceptable<CharT>, "Do not use operator<=> with path_view_component and a string literal, use .compare<>()");
+  return std::strong_ordering::equal;
+}
+
+#else
 //! \brief Compares **identity** inequality not disequivalence i.e. backing storage type must be different, or backing bytes must be different. Use `compare()`
 //! if you want something stronger.
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view_component x, path_view_component y) noexcept
@@ -1736,20 +1832,6 @@ inline LLFIO_PATH_VIEW_CONSTEXPR bool operator<(path_view_component x, path_view
 
 LLFIO_TEMPLATE(class CharT)
 LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_acceptable<CharT>))
-inline constexpr bool operator==(path_view_component /*unused*/, const CharT * /*unused*/) noexcept
-{
-  static_assert(!path_view_component::is_source_acceptable<CharT>, "Do not use operator== with path_view_component and a string literal, use .compare<>()");
-  return false;
-}
-LLFIO_TEMPLATE(class CharT)
-LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_acceptable<CharT>))
-inline constexpr bool operator==(const CharT * /*unused*/, path_view_component /*unused*/) noexcept
-{
-  static_assert(!path_view_component::is_source_acceptable<CharT>, "Do not use operator== with path_view_component and a string literal, use .compare<>()");
-  return false;
-}
-LLFIO_TEMPLATE(class CharT)
-LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_acceptable<CharT>))
 inline constexpr bool operator!=(path_view_component /*unused*/, const CharT * /*unused*/) noexcept
 {
   static_assert(!path_view_component::is_source_acceptable<CharT>, "Do not use operator!= with path_view_component and a string literal, use .compare<>()");
@@ -1762,6 +1844,22 @@ inline constexpr bool operator!=(const CharT * /*unused*/, path_view_component /
   static_assert(!path_view_component::is_source_acceptable<CharT>, "Do not use operator!= with path_view_component and a string literal, use .compare<>()");
   return false;
 }
+LLFIO_TEMPLATE(class CharT)
+LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_acceptable<CharT>))
+inline constexpr bool operator<(path_view_component /*unused*/, const CharT * /*unused*/) noexcept
+{
+  static_assert(!path_view_component::is_source_acceptable<CharT>, "Do not use operator< with path_view_component and a string literal, use .compare<>()");
+  return false;
+}
+LLFIO_TEMPLATE(class CharT)
+LLFIO_TREQUIRES(LLFIO_TPRED(path_view_component::is_source_acceptable<CharT>))
+inline constexpr bool operator<(const CharT * /*unused*/, path_view_component /*unused*/) noexcept
+{
+  static_assert(!path_view_component::is_source_acceptable<CharT>, "Do not use operator< with path_view_component and a string literal, use .compare<>()");
+  return false;
+}
+#endif
+
 //! \brief Hashes a `path_view_component`.
 inline LLFIO_PATH_VIEW_CONSTEXPR size_t hash_value(path_view_component view) noexcept
 {
@@ -1915,10 +2013,11 @@ class path_view : public path_view_component
 {
   friend class detail::path_view_iterator;
   friend inline LLFIO_PATH_VIEW_CONSTEXPR bool LLFIO_V2_NAMESPACE::operator==(path_view x, path_view y) noexcept;
+#if __cplusplus >= 202000L || _HAS_CXX20
+  friend inline LLFIO_PATH_VIEW_CONSTEXPR std::strong_ordering operator<=>(path_view x, path_view y) noexcept;
+#else
   friend inline LLFIO_PATH_VIEW_CONSTEXPR bool LLFIO_V2_NAMESPACE::operator!=(path_view x, path_view y) noexcept;
   friend inline LLFIO_PATH_VIEW_CONSTEXPR bool LLFIO_V2_NAMESPACE::operator<(path_view x, path_view y) noexcept;
-#if __cplusplus >= 202000L || _HAS_CXX20
-  friend inline LLFIO_PATH_VIEW_CONSTEXPR auto operator<=>(path_view x, path_view y) = default;
 #endif
   friend inline LLFIO_PATH_VIEW_CONSTEXPR size_t hash_value(path_view x) noexcept;
 
@@ -2861,6 +2960,60 @@ inline LLFIO_PATH_VIEW_CONSTEXPR bool operator==(path_view x, path_view y) noexc
   }
   return true;
 }
+LLFIO_TEMPLATE(class CharT)
+LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<CharT>))
+inline constexpr bool operator==(path_view /*unused*/, const CharT * /*unused*/) noexcept
+{
+  static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator== with path_view and a string literal, use .compare<>()");
+  return false;
+}
+LLFIO_TEMPLATE(class CharT)
+LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<CharT>))
+inline constexpr bool operator==(const CharT * /*unused*/, path_view /*unused*/) noexcept
+{
+  static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator== with path_view and a string literal, use .compare<>()");
+  return false;
+}
+#if __cplusplus >= 202000L || _HAS_CXX20
+inline LLFIO_PATH_VIEW_CONSTEXPR std::strong_ordering operator<=>(path_view x, path_view y) noexcept
+{
+  auto it1 = x.begin(), it2 = y.begin();
+  for(; it1 != x.end() && it2 != y.end(); ++it1, ++it2)
+  {
+    if(*it1 < *it2)
+    {
+      return std::strong_ordering::less;
+    }
+    if(*it1 > *it2)
+    {
+      return std::strong_ordering::greater;
+    }
+  }
+  if(it1 == x.end() && it2 != y.end())
+  {
+    return std::strong_ordering::less;
+  }
+  if(it2 == x.end() && it1 != y.end())
+  {
+    return std::strong_ordering::greater;
+  }
+  return std::strong_ordering::equal;
+}
+LLFIO_TEMPLATE(class CharT)
+LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<CharT>))
+inline constexpr std::strong_ordering operator<=>(path_view /*unused*/, const CharT * /*unused*/) noexcept
+{
+  static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator<=> with path_view and a string literal, use .compare<>()");
+  return std::strong_ordering::equal;
+}
+LLFIO_TEMPLATE(class CharT)
+LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<CharT>))
+inline constexpr std::strong_ordering operator<=>(const CharT * /*unused*/, path_view /*unused*/) noexcept
+{
+  static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator<=> with path_view and a string literal, use .compare<>()");
+  return std::strong_ordering::equal;
+}
+#else
 //! \brief Compares individual path view components for non-**identity** not disequivalence. Use `compare()` if you want something stronger.
 inline LLFIO_PATH_VIEW_CONSTEXPR bool operator!=(path_view x, path_view y) noexcept
 {
@@ -2892,25 +3045,15 @@ inline LLFIO_PATH_VIEW_CONSTEXPR bool operator<(path_view x, path_view y) noexce
     {
       return true;
     }
+    if(*it2 < *it1)
+    {
+      return false;
+    }
   }
   if(it1 == x.end() && it2 != y.end())
   {
     return true;
   }
-  return false;
-}
-LLFIO_TEMPLATE(class CharT)
-LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<CharT>))
-inline constexpr bool operator==(path_view /*unused*/, const CharT * /*unused*/) noexcept
-{
-  static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator== with path_view and a string literal, use .compare<>()");
-  return false;
-}
-LLFIO_TEMPLATE(class CharT)
-LLFIO_TREQUIRES(LLFIO_TPRED(path_view::is_source_acceptable<CharT>))
-inline constexpr bool operator==(const CharT * /*unused*/, path_view /*unused*/) noexcept
-{
-  static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator== with path_view and a string literal, use .compare<>()");
   return false;
 }
 LLFIO_TEMPLATE(class CharT)
@@ -2927,6 +3070,7 @@ inline constexpr bool operator!=(const CharT * /*unused*/, path_view /*unused*/)
   static_assert(!path_view::is_source_acceptable<CharT>, "Do not use operator!= with path_view and a string literal, use .compare<>()");
   return false;
 }
+#endif
 //! \brief Return the combined hash of individual path components
 inline LLFIO_PATH_VIEW_CONSTEXPR size_t hash_value(path_view x) noexcept
 {
