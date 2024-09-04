@@ -20,7 +20,7 @@ jobs:
     runs-on: ${{ matrix.image }}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set name
       id: vars
@@ -48,14 +48,14 @@ jobs:
        ctest -S .ci.cmake -VV --timeout 900 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS" -DCTEST_SITE=$NAME -DCTEST_CMAKE_GENERATOR="${{ steps.vars.outputs.GENERATOR }}"
       
     - name: Upload Prebuilt Binaries
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Windows ${{ steps.vars.outputs.NAME }} ${{ matrix.configuration }} prebuilt binaries
         path: llfio-v2.0-binaries-win64.zip
       
     - name: Upload Test Results
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Windows ${{ steps.vars.outputs.NAME }} ${{ matrix.configuration }} test results
         path: prebuilt/merged_junit_results.xml

@@ -21,7 +21,7 @@ jobs:
       NAME: MacOS-${{ matrix.configuration }}
           
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: CMake tests Mac OS
       shell: bash
@@ -32,14 +32,14 @@ jobs:
        ctest -S .ci.cmake -VV -E noexcept --timeout 900 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS"
       
     - name: Upload Prebuilt Binaries
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Mac OS ${{ matrix.configuration }} prebuilt binaries
         path: llfio-v2.0-binaries-darwin-arm64.tgz
       
     - name: Upload Test Results
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Mac OS ${{ matrix.configuration }} test results
         path: prebuilt/merged_junit_results.xml
