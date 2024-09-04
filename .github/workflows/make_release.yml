@@ -18,7 +18,7 @@ jobs:
       
       - name: 'Wait for status checks'
         id: waitforstatuschecks
-        uses: "WyriHaximus/github-action-wait-for-status@v1.2"
+        uses: "WyriHaximus/github-action-wait-for-status@v2"
         with:
           ignoreActions: "Publish Binaries"
           checkInterval: 60
@@ -31,7 +31,7 @@ jobs:
          sleep 60
 
       - name: Download Linux artifacts
-        uses: dawidd6/action-download-artifact@v2
+        uses: dawidd6/action-download-artifact@v6
         if: steps.waitforstatuschecks.outputs.status == 'success'
         with:
           github_token: ${{secrets.GITHUB_TOKEN}}
@@ -39,7 +39,7 @@ jobs:
           path: artifacts
     
       - name: Download Mac OS artifacts
-        uses: dawidd6/action-download-artifact@v2
+        uses: dawidd6/action-download-artifact@v6
         if: steps.waitforstatuschecks.outputs.status == 'success'
         with:
           github_token: ${{secrets.GITHUB_TOKEN}}
@@ -47,7 +47,7 @@ jobs:
           path: artifacts
     
       - name: Download Windows artifacts
-        uses: dawidd6/action-download-artifact@v2
+        uses: dawidd6/action-download-artifact@v6
         if: steps.waitforstatuschecks.outputs.status == 'success'
         with:
           github_token: ${{secrets.GITHUB_TOKEN}}
