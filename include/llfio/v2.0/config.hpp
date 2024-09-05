@@ -1,5 +1,5 @@
 /* Configures LLFIO
-(C) 2015-2020 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2015-2024 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: Dec 2015
 
 
@@ -25,10 +25,10 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef LLFIO_CONFIG_HPP
 #define LLFIO_CONFIG_HPP
 
-//#include <iostream>
-//#define LLFIO_LOG_TO_OSTREAM std::cerr
-//#define LLFIO_LOGGING_LEVEL 1
-//#define LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
+// #include <iostream>
+// #define LLFIO_LOG_TO_OSTREAM std::cerr
+// #define LLFIO_LOGGING_LEVEL 1
+// #define LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
 
 //! \file config.hpp Configures a compiler environment for LLFIO header and source code
 
@@ -85,6 +85,17 @@ Distributed under the Boost Software License, Version 1.0.
 #define LLFIO_EXPERIMENTAL_STATUS_CODE 0
 #endif
 
+// Exclude deprecated stuff by default
+#ifndef LLFIO_EXCLUDE_DYNAMIC_THREAD_POOL_GROUP
+#define LLFIO_EXCLUDE_DYNAMIC_THREAD_POOL_GROUP 1
+#endif
+#ifndef LLFIO_EXCLUDE_NETWORKING
+#define LLFIO_EXCLUDE_NETWORKING 1
+#endif
+#ifndef LLFIO_DISABLE_OPENSSL
+#define LLFIO_DISABLE_OPENSSL 1
+#endif
+
 
 #if defined(_WIN32)
 #if !defined(_WIN32_WINNT)
@@ -104,6 +115,18 @@ Distributed under the Boost Software License, Version 1.0.
 // Pull in detection of __MINGW64_VERSION_MAJOR
 #ifdef __MINGW32__
 #include <_mingw.h>
+#endif
+
+#ifdef __has_include
+#if !__has_include("quickcpplib/cpp_feature.h") && !__has_include("outcome/try.hpp")
+#error "Could not find quickcpplib nor outcome. If you installed LLFIO, did you also install quickcpplib and outcome?"
+#endif
+#if !__has_include("quickcpplib/cpp_feature.h")
+#error "Could not find quickcpplib. If you installed LLFIO, did you also install quickcpplib?"
+#endif
+#if !__has_include("outcome/try.hpp")
+#error "Could not find outcome. If you installed LLFIO, did you also install outcome?"
+#endif
 #endif
 
 #include "quickcpplib/cpp_feature.h"
@@ -181,15 +204,15 @@ namespace starting with `v2_` inside the `boost::llfio` namespace.
 /*! \brief Expands into the appropriate namespace markup to enter the LLFIO v2 namespace.
 \ingroup config
 */
-#define LLFIO_V2_NAMESPACE_BEGIN                                                                                                                                                                                                                                                                                               \
-  namespace llfio_v2_xxx                                                                                                                                                                                                                                                                                                       \
+#define LLFIO_V2_NAMESPACE_BEGIN                                                                                                                               \
+  namespace llfio_v2_xxx                                                                                                                                       \
   {
 /*! \brief Expands into the appropriate namespace markup to enter the C++ module
 exported LLFIO v2 namespace.
 \ingroup config
 */
-#define LLFIO_V2_NAMESPACE_EXPORT_BEGIN                                                                                                                                                                                                                                                                                        \
-  export namespace llfio_v2_xxx                                                                                                                                                                                                                                                                                                \
+#define LLFIO_V2_NAMESPACE_EXPORT_BEGIN                                                                                                                        \
+  export namespace llfio_v2_xxx                                                                                                                                \
   {
 /*! \brief Expands into the appropriate namespace markup to exit the LLFIO v2 namespace.
 \ingroup config
@@ -266,7 +289,8 @@ LLFIO_V2_NAMESPACE_END
 #endif
 #if LLFIO_USING_EXPERIMENTAL_FILESYSTEM && !LLFIO_DISABLE_USING_EXPERIMENTAL_FILESYSTEM_WARNING
 #ifdef _MSC_VER
-#pragma message("WARNING: LLFIO is using the experimental Filesystem TS instead of the standard Filesystem, there are many corner case surprises in the former! Support for the Experimental Filesystem TS is expected to be deprecated at some point, and C++ 17 shall become the minimum required for LLFIO.")
+#pragma message(                                                                                                                                               \
+"WARNING: LLFIO is using the experimental Filesystem TS instead of the standard Filesystem, there are many corner case surprises in the former! Support for the Experimental Filesystem TS is expected to be deprecated at some point, and C++ 17 shall become the minimum required for LLFIO.")
 #else
 #warning WARNING: LLFIO is using the experimental Filesystem TS instead of the standard Filesystem, there are many corner case surprises in the former! Support for the Experimental Filesystem TS is expected to be deprecated at some point, and C++ 17 shall become the minimum required for LLFIO.
 #endif
@@ -364,7 +388,8 @@ LLFIO_V2_NAMESPACE_END
 // Bring in a function_ptr implementation
 #include "quickcpplib/function_ptr.hpp"
 LLFIO_V2_NAMESPACE_BEGIN
-template <class F, size_t callable_storage_bytes = 32 - sizeof(uintptr_t)> using function_ptr = QUICKCPPLIB_NAMESPACE::function_ptr::function_ptr<F, callable_storage_bytes>;
+template <class F, size_t callable_storage_bytes = 32 - sizeof(uintptr_t)>
+using function_ptr = QUICKCPPLIB_NAMESPACE::function_ptr::function_ptr<F, callable_storage_bytes>;
 using QUICKCPPLIB_NAMESPACE::function_ptr::emplace_function_ptr;
 using QUICKCPPLIB_NAMESPACE::function_ptr::emplace_function_ptr_nothrow;
 using QUICKCPPLIB_NAMESPACE::function_ptr::make_function_ptr;
@@ -396,7 +421,7 @@ LLFIO_V2_NAMESPACE_END
 #include "quickcpplib/spinlock.hpp"
 LLFIO_V2_NAMESPACE_BEGIN
 using spinlock = QUICKCPPLIB_NAMESPACE::configurable_spinlock::spinlock<uintptr_t>;
-using  QUICKCPPLIB_NAMESPACE::configurable_spinlock::lock_guard;
+using QUICKCPPLIB_NAMESPACE::configurable_spinlock::lock_guard;
 LLFIO_V2_NAMESPACE_END
 // Bring in a memory resource implementation
 #include "quickcpplib/memory_resource.hpp"
@@ -412,13 +437,22 @@ namespace detail
   // Used to cast an unknown input to some unsigned integer
   LLFIO_TEMPLATE(class T, class U)
   LLFIO_TREQUIRES(LLFIO_TPRED(std::is_unsigned<T>::value && !std::is_same<std::decay_t<U>, std::nullptr_t>::value))
-  inline T unsigned_integer_cast(U &&v) { return static_cast<T>(v); }
+  inline T unsigned_integer_cast(U &&v)
+  {
+    return static_cast<T>(v);
+  }
   LLFIO_TEMPLATE(class T)
   LLFIO_TREQUIRES(LLFIO_TPRED(std::is_unsigned<T>::value))
-  inline T unsigned_integer_cast(std::nullptr_t /* unused */) { return static_cast<T>(0); }
+  inline T unsigned_integer_cast(std::nullptr_t /* unused */)
+  {
+    return static_cast<T>(0);
+  }
   LLFIO_TEMPLATE(class T, class U)
   LLFIO_TREQUIRES(LLFIO_TPRED(std::is_unsigned<T>::value))
-  inline T unsigned_integer_cast(U *v) { return static_cast<T>(reinterpret_cast<uintptr_t>(v)); }
+  inline T unsigned_integer_cast(U *v)
+  {
+    return static_cast<T>(reinterpret_cast<uintptr_t>(v));
+  }
 }  // namespace detail
 
 LLFIO_V2_NAMESPACE_END
@@ -437,10 +471,10 @@ namespace win
 LLFIO_V2_NAMESPACE_END
 
 
-//#define BOOST_THREAD_VERSION 4
-//#define BOOST_THREAD_PROVIDES_VARIADIC_THREAD
-//#define BOOST_THREAD_DONT_PROVIDE_FUTURE
-//#define BOOST_THREAD_PROVIDES_SIGNATURE_PACKAGED_TASK
+// #define BOOST_THREAD_VERSION 4
+// #define BOOST_THREAD_PROVIDES_VARIADIC_THREAD
+// #define BOOST_THREAD_DONT_PROVIDE_FUTURE
+// #define BOOST_THREAD_PROVIDES_SIGNATURE_PACKAGED_TASK
 #if LLFIO_HEADERS_ONLY == 1 && !defined(LLFIO_SOURCE)
 /*! \brief Expands into the appropriate markup to declare an `extern`
 function exported from the LLFIO DLL if not building headers only.
@@ -483,7 +517,9 @@ namespace detail
     {
       if(sizeof(LLFIO_V2_NAMESPACE::filesystem::path) != sizeof_filesystem_path())
       {
-        fprintf(stderr, "FATAL: sizeof(filesystem::path) = %u differs in the translation unit '%s' to the sizeof(filesystem::path) = %u as when LLFIO was built!\n", (unsigned) sizeof(LLFIO_V2_NAMESPACE::filesystem::path), filepath, (unsigned) sizeof_filesystem_path());
+        fprintf(stderr,
+                "FATAL: sizeof(filesystem::path) = %u differs in the translation unit '%s' to the sizeof(filesystem::path) = %u as when LLFIO was built!\n",
+                (unsigned) sizeof(LLFIO_V2_NAMESPACE::filesystem::path), filepath, (unsigned) sizeof_filesystem_path());
         abort();
       }
     }

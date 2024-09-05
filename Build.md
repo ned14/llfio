@@ -1,11 +1,11 @@
 # Build instructions
 
-These compilers and OSs are regularly tested:
+These compilers and OSs are regularly tested by CI:
 
-- [GCC](https://gcc.gnu.org/) 9.4 (Linux 5.x x64)
-- [Clang](https://clang.llvm.org/) 11 (Linux 5.x x64)
-- Xcode 13.2 (macOS 11 x64)
-- Visual Studio 2022 (Windows Server 2022 x64).
+- [GCC](https://gcc.gnu.org/) on Linux
+- [Clang](https://clang.llvm.org/) on Linux
+- Xcode on Mac OS
+- Visual Studio on Windows
 
 Other compilers, architectures and OSs may work, but are not tested regularly.
 You will need a working [Filesystem TS](https://en.cppreference.com/w/cpp/experimental/fs)
@@ -91,7 +91,7 @@ To build and test on POSIX (`make`, `ninja` etc):
 mkdir build
 cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
-cmake --build .
+cmake --build . --parallel
 ctest -R llfio_sl
 ~~~
 
@@ -101,7 +101,7 @@ To build and test on Windows or Mac OS (Visual Studio, XCode etc):
 mkdir build
 cd build
 cmake .. -G<your generator here>
-cmake --build . --config Release
+cmake --build . --parallel --config Release
 ctest -C Release -R llfio_sl
 ~~~
 
@@ -115,7 +115,7 @@ To build and test on POSIX (`make`, `ninja` etc):
 mkdir build
 cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
-cmake --build . -- _dl
+cmake --build . --parallel -- _dl
 ctest -R llfio_dl
 ~~~
 
@@ -125,16 +125,57 @@ To build and test on Windows or Mac OS (Visual Studio, XCode etc):
 mkdir build
 cd build
 cmake .. -G<your generator here>
-cmake --build . --config Release --target _dl
+cmake --build . --parallel --config Release --target _dl
 ctest -C Release -R llfio_dl
 ~~~
 
 ## Installing libraries from source
 
+If you add llfio as a subdirectory in cmake (`add_subdirectory()`),
+you can link to its exported targets and everything 'just works'. The
+dependencies quickcpplib and outcome will be automatically downloaded
+into the build directory and used.
+
+If you really want to install llfio into a directory, you can also:
+
 ~~~
+git config --system core.longpaths true
+
+git clone --recursive https://github.com/ned14/quickcpplib.git
+cd quickcpplib
 mkdir build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-cmake --build . -- _dl _sl _hl
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
+cmake --build . --parallel
 cmake --build . --target install
+cd ../..
+
+git clone --recursive https://github.com/ned14/outcome.git
+cd outcome
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
+cmake --build . --parallel
+cmake --build . --target install
+cd ../..
+
+git clone --recursive https://github.com/ned14/llfio.git
+cd llfio
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
+cmake --build . --parallel -- _dl _sl _hl
+cmake --build . --target install
+cd ../..
 ~~~
+
+If you chose a different `CMAKE_INSTALL_PREFIX` then it will need
+to be supplied to the compiler:
+
+~~~
+cd example
+g++ -std=c++17 -o test map_file.cpp -I/Users/ned/testinstall/inst/include
+~~~
+
+The above also works on Microsoft Windows, but paths etc will need to
+be adjusted.

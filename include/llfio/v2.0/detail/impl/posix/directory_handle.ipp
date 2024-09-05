@@ -29,7 +29,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #include "quickcpplib/valgrind/memcheck.h"  // from quickcpplib include directory
 #define LLFIO_VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(a, b) VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE((a), (b))
 #else
-#define LLFIO_VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(a, b)
+#define LLFIO_VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(a, b) (0)
 #endif
 
 #include <dirent.h> /* Defines DT_* constants */
@@ -443,7 +443,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
     req.buffers._done = true;
     return std::move(req.buffers);
   }
-  LLFIO_VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(buffer, bytes);  // NOLINT
+  (void) LLFIO_VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(buffer, bytes);  // NOLINT
   size_t n = 0;
   for(dirent *dent = buffer;; dent = reinterpret_cast<dirent *>(reinterpret_cast<uintptr_t>(dent) + dent->d_reclen))
   {
