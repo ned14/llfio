@@ -2,7 +2,10 @@ var config_8hpp =
 [
     [ "path_hasher", "structllfio__v2__xxx_1_1path__hasher.html", "structllfio__v2__xxx_1_1path__hasher" ],
     [ "LLFIO_DECL", "config_8hpp.html#a163aaaaa4d238aebd5fb9acec82006dd", null ],
+    [ "LLFIO_DISABLE_OPENSSL", "config_8hpp.html#ae12a33df168039b97346b6ad5b9879df", null ],
     [ "LLFIO_DISABLE_PATHS_IN_FAILURE_INFO", "config_8hpp.html#a65d3346e1345f27d02cfe4ef4d7c9c3a", null ],
+    [ "LLFIO_EXCLUDE_DYNAMIC_THREAD_POOL_GROUP", "config_8hpp.html#aadb2cf0e80a284995a25bd4d91242154", null ],
+    [ "LLFIO_EXCLUDE_NETWORKING", "config_8hpp.html#ac411c6fdd41c68385bda6af2534ac042", null ],
     [ "LLFIO_EXPERIMENTAL_STATUS_CODE", "config_8hpp.html#aebebb7d8d2589a39eba3e0e84cb26559", null ],
     [ "LLFIO_GLUE", "config_8hpp.html#a7f5813f203de5eb26f6f359d5418848a", null ],
     [ "LLFIO_GLUE2", "config_8hpp.html#adfde9bd005e6ec6b3f42492b758a99d3", null ],

@@ -86,12 +86,12 @@ $(document).ready(function(){initNavTree('md__build.html',''); initResizable(); 
 <div class="title">Build instructions </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>These compilers and OSs are regularly tested:</p>
+<div class="textblock"><p>These compilers and OSs are regularly tested by CI:</p>
 <ul>
-<li><a href="https://gcc.gnu.org/">GCC</a> 9.4 (Linux 5.x x64)</li>
-<li><a href="https://clang.llvm.org/">Clang</a> 11 (Linux 5.x x64)</li>
-<li>Xcode 13.2 (macOS 11 x64)</li>
-<li>Visual Studio 2022 (Windows Server 2022 x64).</li>
+<li><a href="https://gcc.gnu.org/">GCC</a> on Linux</li>
+<li><a href="https://clang.llvm.org/">Clang</a> on Linux</li>
+<li>Xcode on Mac OS</li>
+<li>Visual Studio on Windows</li>
 </ul>
 <p>Other compilers, architectures and OSs may work, but are not tested regularly. You will need a working <a href="https://en.cppreference.com/w/cpp/experimental/fs">Filesystem TS</a> implementation in your STL, and at least C++ 14.</p>
 <p>LLFIO has your choice of header-only, static library, and shared library build modes. Note that on Microsoft Windows, the default header only configuration is unsafe to use outside of toy projects. You will get warnings of the form:</p>
@@ -128,13 +128,13 @@ Build static libraries from source</h1>
 <div class="fragment"><div class="line">mkdir build</div>
 <div class="line">cd build</div>
 <div class="line">cmake .. -DCMAKE_BUILD_TYPE=Release</div>
-<div class="line">cmake --build .</div>
+<div class="line">cmake --build . --parallel</div>
 <div class="line">ctest -R llfio_sl</div>
 </div><!-- fragment --><p>To build and test on Windows or Mac OS (Visual Studio, XCode etc):</p>
 <div class="fragment"><div class="line">mkdir build</div>
 <div class="line">cd build</div>
 <div class="line">cmake .. -G&lt;your generator here&gt;</div>
-<div class="line">cmake --build . --config Release</div>
+<div class="line">cmake --build . --parallel --config Release</div>
 <div class="line">ctest -C Release -R llfio_sl</div>
 </div><!-- fragment --><h1><a class="anchor" id="autotoc_md29"></a>
 Build shared libraries from source</h1>
@@ -143,22 +143,51 @@ Build shared libraries from source</h1>
 <div class="fragment"><div class="line">mkdir build</div>
 <div class="line">cd build</div>
 <div class="line">cmake .. -DCMAKE_BUILD_TYPE=Release</div>
-<div class="line">cmake --build . -- _dl</div>
+<div class="line">cmake --build . --parallel -- _dl</div>
 <div class="line">ctest -R llfio_dl</div>
 </div><!-- fragment --><p>To build and test on Windows or Mac OS (Visual Studio, XCode etc):</p>
 <div class="fragment"><div class="line">mkdir build</div>
 <div class="line">cd build</div>
 <div class="line">cmake .. -G&lt;your generator here&gt;</div>
-<div class="line">cmake --build . --config Release --target _dl</div>
+<div class="line">cmake --build . --parallel --config Release --target _dl</div>
 <div class="line">ctest -C Release -R llfio_dl</div>
 </div><!-- fragment --><h1><a class="anchor" id="autotoc_md30"></a>
 Installing libraries from source</h1>
-<div class="fragment"><div class="line">mkdir build</div>
+<p>If you add llfio as a subdirectory in cmake (<code>add_subdirectory()</code>), you can link to its exported targets and everything 'just works'. The dependencies quickcpplib and outcome will be automatically downloaded into the build directory and used.</p>
+<p>If you really want to install llfio into a directory, you can also:</p>
+<div class="fragment"><div class="line">git config --system core.longpaths true</div>
+<div class="line"> </div>
+<div class="line">git clone --recursive https://github.com/ned14/quickcpplib.git</div>
+<div class="line">cd quickcpplib</div>
+<div class="line">mkdir build</div>
 <div class="line">cd build</div>
-<div class="line">cmake .. -DCMAKE_BUILD_TYPE=Release</div>
-<div class="line">cmake --build . -- _dl _sl _hl</div>
+<div class="line">cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local</div>
+<div class="line">cmake --build . --parallel</div>
 <div class="line">cmake --build . --target install</div>
-</div><!-- fragment --> </div></div><!-- contents -->
+<div class="line">cd ../..</div>
+<div class="line"> </div>
+<div class="line">git clone --recursive https://github.com/ned14/outcome.git</div>
+<div class="line">cd outcome</div>
+<div class="line">mkdir build</div>
+<div class="line">cd build</div>
+<div class="line">cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local</div>
+<div class="line">cmake --build . --parallel</div>
+<div class="line">cmake --build . --target install</div>
+<div class="line">cd ../..</div>
+<div class="line"> </div>
+<div class="line">git clone --recursive https://github.com/ned14/llfio.git</div>
+<div class="line">cd llfio</div>
+<div class="line">mkdir build</div>
+<div class="line">cd build</div>
+<div class="line">cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local</div>
+<div class="line">cmake --build . --parallel -- _dl _sl _hl</div>
+<div class="line">cmake --build . --target install</div>
+<div class="line">cd ../..</div>
+</div><!-- fragment --><p>If you chose a different <code>CMAKE_INSTALL_PREFIX</code> then it will need to be supplied to the compiler:</p>
+<div class="fragment"><div class="line">cd example</div>
+<div class="line">g++ -std=c++17 -o test map_file.cpp -I/Users/ned/testinstall/inst/include</div>
+</div><!-- fragment --><p>The above also works on Microsoft Windows, but paths etc will need to be adjusted. </p>
+</div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
 <!-- start footer part -->
