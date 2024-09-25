@@ -55,6 +55,10 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #endif
 
+#if LLFIO_LOGGING_LEVEL == 0
+#define LLFIO_DISABLE_PATHS_IN_FAILURE_INFO 1
+#endif
+
 #ifndef LLFIO_LOG_TO_OSTREAM
 #if !defined(NDEBUG) && !defined(LLFIO_DISABLE_LOG_TO_OSTREAM)
 #include <iostream>  // for std::cerr
@@ -239,8 +243,8 @@ LLFIO_V2_NAMESPACE_END
 #include "quickcpplib/config.hpp"
 #if LLFIO_LOGGING_LEVEL
 #include "quickcpplib/ringbuffer_log.hpp"
-#include "quickcpplib/utils/thread.hpp"
 #endif
+#include "quickcpplib/utils/thread.hpp"
 // Bring in filesystem
 #if defined(__has_include)
 // clang-format off

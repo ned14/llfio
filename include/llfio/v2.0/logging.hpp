@@ -171,13 +171,24 @@ namespace detail
 
 LLFIO_V2_NAMESPACE_END
 
+#else  // LLFIO_LOGGING_LEVEL
+enum class log_level
+{
+  fatal
+};
+struct log_level_guard
+{
+  log_level_guard(log_level) {}
+};
+#define LLFIO_LOG_INST_TO_TLS(inst)
+#endif  // LLFIO_LOGGING_LEVEL
+
 #ifndef LLFIO_LOG_FATAL_TO_CERR
 #include <cstdio>
 #define LLFIO_LOG_FATAL_TO_CERR(expr)                                                                                                                          \
   fprintf(stderr, "%s\n", (expr));                                                                                                                             \
   fflush(stderr)
 #endif
-#endif  // LLFIO_LOGGING_LEVEL
 
 #if LLFIO_LOGGING_LEVEL >= 1
 #define LLFIO_LOG_FATAL(inst, message)                                                                                                                         \

@@ -32,12 +32,12 @@ Distributed under the Boost Software License, Version 1.0.
 
 #ifdef __FreeBSD__
 #include <sys/sysctl.h>
-extern "C" char **environ;
 #endif
 #ifdef __APPLE__
 #include <mach-o/dyld.h>  // for _NSGetExecutablePath
-extern "C" char **environ;
 #endif
+
+extern "C" char **environ;
 
 LLFIO_V2_NAMESPACE_BEGIN
 
@@ -122,9 +122,6 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC std::unique_ptr<span<path_view_component>, proce
     // Laziness ...
     return {};
   }
-#ifdef __linux__
-  char **environ = __environ;
-#endif
   size_t bytesneeded = sizeof(span<path_view_component>);
   size_t count = 0;
   char **e;
