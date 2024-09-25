@@ -426,10 +426,9 @@ private:
   uint16_t _tls_path_id1{static_cast<uint16_t>(-1)}, _tls_path_id2{static_cast<uint16_t>(-1)};
   // The id of the relevant log entry in the LLFIO log (if logging enabled)
   size_t _log_id{static_cast<size_t>(-1)};
-
-public:
 #endif
 
+public:
   //! Default constructor
   error_info() = default;
   // Explicit construction from an error code
