@@ -31,6 +31,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <mutex>
 #include <new>
 #include <regex>
+#include <sstream>
 #include <vector>
 
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
