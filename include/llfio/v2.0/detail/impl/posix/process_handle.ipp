@@ -38,6 +38,9 @@ extern "C" char **environ;
 #include <mach-o/dyld.h>  // for _NSGetExecutablePath
 extern "C" char **environ;
 #endif
+#ifdef __ANDROID__
+extern "C" char **environ;
+#endif
 
 LLFIO_V2_NAMESPACE_BEGIN
 
@@ -122,7 +125,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC std::unique_ptr<span<path_view_component>, proce
     // Laziness ...
     return {};
   }
-#ifdef __linux__
+#if defined(__linux__) && !defined(__ANDROID__)
   char **environ = __environ;
 #endif
   size_t bytesneeded = sizeof(span<path_view_component>);
@@ -154,7 +157,8 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<intptr_t> process_handle::wait(deadline d
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   intptr_t ret = 0;
-  auto check_child = [&]() -> result<bool> {
+  auto check_child = [&]() -> result<bool>
+  {
     siginfo_t info;
     memset(&info, 0, sizeof(info));
     int options = WEXITED | WSTOPPED;
@@ -186,7 +190,8 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<intptr_t> process_handle::wait(deadline d
 
 LLFIO_HEADERS_ONLY_MEMFUNC_SPEC const process_handle &process_handle::current() noexcept
 {
-  static process_handle self = []() -> process_handle {
+  static process_handle self = []() -> process_handle
+  {
     process_handle ret(native_handle_type(native_handle_type::disposition::process, getpid()), flag::release_pipes_on_close);
     ret._in_pipe = pipe_handle(native_handle_type(native_handle_type::disposition::pipe | native_handle_type::disposition::readable |
                                                   native_handle_type::disposition::cache_reads | native_handle_type::disposition::cache_writes |

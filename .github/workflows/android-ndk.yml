@@ -11,7 +11,7 @@ on:
 
 jobs:
   Linux:
-    name: Ubuntu
+    name: Android
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -26,7 +26,7 @@ jobs:
     - name: CMake tests Linux
       shell: bash
       run: |
-       export CMAKE_CONFIGURE_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake"
+       export CMAKE_CONFIGURE_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake;-DANDROID_PLATFORM=28;-DCMAKE_CXX_STANDARD=20"
        if [ "${{ matrix.configuration }}" = "status_code" ]; then
          export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS;-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON";
        fi
