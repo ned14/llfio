@@ -591,7 +591,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
     OUTCOME_TRY(auto &&dest_length, dest.maximum_extent());
     if(dest.unique_id() == unique_id())
     {
-      if(abs((int64_t) destoffset - (int64_t) extent.offset) < (int64_t) blocksize)
+      if(std::abs((int64_t) destoffset - (int64_t) extent.offset) < (int64_t) blocksize)
       {
         return errc::invalid_argument;
       }

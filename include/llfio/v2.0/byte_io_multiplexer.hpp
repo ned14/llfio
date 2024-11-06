@@ -665,9 +665,9 @@ public:
     //! Used to retrieve the current state of the i/o operation
     virtual io_operation_state_type current_state() const noexcept = 0;
     //! After an i/o operation has finished, can be used to retrieve the result if the visitor did not.
-    virtual io_result<buffers_type> get_completed_read() &&noexcept = 0;
+    virtual io_result<buffers_type> get_completed_read() && noexcept = 0;
     //! After an i/o operation has finished, can be used to retrieve the result if the visitor did not.
-    virtual io_result<const_buffers_type> get_completed_write_or_barrier() &&noexcept = 0;
+    virtual io_result<const_buffers_type> get_completed_write_or_barrier() && noexcept = 0;
     //! Relocate the state to new storage, clearing the original state. Terminates the process if the state is in use.
     virtual io_operation_state *relocate_to(byte *to) noexcept = 0;
   };
@@ -892,14 +892,14 @@ protected:
 
     virtual void *invoke(function_ptr<void *(io_operation_state_type)> c) const noexcept override { return c(state); }
     virtual io_operation_state_type current_state() const noexcept override { return state; }
-    virtual io_result<buffers_type> get_completed_read() &&noexcept override
+    virtual io_result<buffers_type> get_completed_read() && noexcept override
     {
       assert(state == io_operation_state_type::read_completed || state == io_operation_state_type::read_finished);
       io_result<buffers_type> ret(std::move(payload.completed_read));
       clear_storage();
       return ret;
     }
-    virtual io_result<const_buffers_type> get_completed_write_or_barrier() &&noexcept override
+    virtual io_result<const_buffers_type> get_completed_write_or_barrier() && noexcept override
     {
       assert(state == io_operation_state_type::write_or_barrier_completed || state == io_operation_state_type::write_or_barrier_finished);
       io_result<const_buffers_type> ret(std::move(payload.completed_write_or_barrier));
@@ -1108,12 +1108,12 @@ protected:
       lock_guard g(const_cast<_synchronised_io_operation_state *>(this));
       return _unsynchronised_io_operation_state::current_state();
     }
-    virtual io_result<buffers_type> get_completed_read() &&noexcept override
+    virtual io_result<buffers_type> get_completed_read() && noexcept override
     {
       lock_guard g(this);
       return std::move(*this)._unsynchronised_io_operation_state::get_completed_read();
     }
-    virtual io_result<const_buffers_type> get_completed_write_or_barrier() &&noexcept override
+    virtual io_result<const_buffers_type> get_completed_write_or_barrier() && noexcept override
     {
       lock_guard g(this);
       return std::move(*this)._unsynchronised_io_operation_state::get_completed_write_or_barrier();
@@ -1290,48 +1290,6 @@ public:
       }));
     }
 #endif
-
-  private:
-    const void *_identifying_address() const noexcept
-    {
-      switch(this->state)
-      {
-      case io_operation_state_type::unknown:
-        break;
-      case io_operation_state_type::read_initialised:
-      case io_operation_state_type::read_initiated:
-        return this->payload.noncompleted.params.read.buffers.data();
-      case io_operation_state_type::read_completed:
-      case io_operation_state_type::read_finished:
-        return this->payload.completed_read ? this->payload.completed_read.data() : nullptr;
-      case io_operation_state_type::write_initialised:
-      case io_operation_state_type::write_initiated:
-        return this->payload.noncompleted.params.write.buffers.data();
-      case io_operation_state_type::barrier_initialised:
-      case io_operation_state_type::barrier_initiated:
-        return this->payload.noncompleted.params.barrier.buffers.data();
-      case io_operation_state_type::write_or_barrier_completed:
-      case io_operation_state_type::write_or_barrier_finished:
-        return this->payload.completed_write_or_barrier ? this->payload.completed_write_or_barrier.data() : nullptr;
-      }
-      return nullptr;
-    }
-
-  public:
-    //! Provides ordering, so awaitables can be placed into maps
-    bool operator<(const awaitable &o) const noexcept
-    {
-      if(this->h < o.h)
-        return true;
-      if(this->visitor < o.visitor)
-        return true;
-      return _identifying_address() < o._identifying_address();
-    }
-    //! Provides equality, so awaitables can be placed into maps
-    bool operator==(const awaitable &o) const noexcept
-    {
-      return this->h == o.h && this->visitor == o.visitor && _identifying_address() == o._identifying_address();
-    }
 
   protected:
     // virtual void read_initiated(lock_guard &g, io_operation_state_type /*former*/) override {}

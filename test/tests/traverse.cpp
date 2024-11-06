@@ -46,7 +46,8 @@ static inline void TestTraverse()
   {
     directory_handle::dev_t root_dev_id{0};
     std::atomic<size_t> failed_to_open{0}, items_enumerated{0}, max_depth{0}, count{0};
-    virtual result<directory_handle> directory_open_failed(void *data, result<void>::error_type &&error, const directory_handle &dirh, path_view leaf, size_t depth) noexcept override
+    virtual result<directory_handle> directory_open_failed(void *data, result<void>::error_type &&error, const directory_handle &dirh, path_view leaf,
+                                                           size_t depth) noexcept override
     {
       if(error == errc::too_many_files_open)
       {
@@ -91,7 +92,8 @@ static inline void TestTraverse()
       // std::cerr << "  " << dirh.current_path().value() << std::endl;
       return success();
     }
-    virtual result<void> stack_updated(void *data, size_t dirs_processed, size_t known_dirs_remaining, size_t depth_processed, size_t known_depth_remaining) noexcept override
+    virtual result<void> stack_updated(void *data, size_t dirs_processed, size_t known_dirs_remaining, size_t depth_processed,
+                                       size_t known_depth_remaining) noexcept override
     {
       (void) data;
       (void) dirs_processed;
@@ -171,9 +173,11 @@ static inline void TestTraverse()
   auto begin = std::chrono::high_resolution_clock::now();
   size_t items_st = algorithm::traverse(to_traverse, &visitor_st, 1).value();
   auto end = std::chrono::high_resolution_clock::now();
-  std::cout << "  Traversed " << items_st << " directories on " << to_traverse_path << " in " << (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000000.0) << " seconds (which is " << (items_st / (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000000.0))
-            << " directories/sec).\n";
-  std::cout << "     Enumerated a total of " << visitor_st.items_enumerated << " items. " << visitor_st.failed_to_open << " directories could not be opened. Maximum hierarchy depth was " << visitor_st.max_depth << std::endl;
+  std::cout << "  Traversed " << items_st << " directories on " << to_traverse_path << " in "
+            << (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000000.0) << " seconds (which is "
+            << (items_st / (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000000.0)) << " directories/sec).\n";
+  std::cout << "     Enumerated a total of " << visitor_st.items_enumerated << " items. " << visitor_st.failed_to_open
+            << " directories could not be opened. Maximum hierarchy depth was " << visitor_st.max_depth << std::endl;
   BOOST_CHECK(items_st > 0);
 
   std::cout << "Traversing " << to_traverse_path << " using many threads ..." << std::endl;
@@ -181,12 +185,14 @@ static inline void TestTraverse()
   begin = std::chrono::high_resolution_clock::now();
   auto items_mt = algorithm::traverse(to_traverse, &visitor_mt).value();
   end = std::chrono::high_resolution_clock::now();
-  std::cout << "  Traversed " << items_mt << " directories on " << to_traverse_path << " in " << (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000000.0) << " seconds (which is " << (items_mt / (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000000.0))
-            << " directories/sec).\n";
-  std::cout << "     Enumerated a total of " << visitor_mt.items_enumerated << " items. " << visitor_mt.failed_to_open << " directories could not be opened. Maximum hierarchy depth was " << visitor_mt.max_depth << std::endl;
-  BOOST_CHECK(abs((int) items_st - (int) items_mt) < 5);
+  std::cout << "  Traversed " << items_mt << " directories on " << to_traverse_path << " in "
+            << (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000000.0) << " seconds (which is "
+            << (items_mt / (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000000.0)) << " directories/sec).\n";
+  std::cout << "     Enumerated a total of " << visitor_mt.items_enumerated << " items. " << visitor_mt.failed_to_open
+            << " directories could not be opened. Maximum hierarchy depth was " << visitor_mt.max_depth << std::endl;
+  BOOST_CHECK(std::abs((int) items_st - (int) items_mt) < 5);
   BOOST_CHECK(visitor_st.failed_to_open == visitor_mt.failed_to_open);
-  BOOST_CHECK(abs((int) visitor_st.items_enumerated - (int) visitor_mt.items_enumerated) < 5);
+  BOOST_CHECK(std::abs((int) visitor_st.items_enumerated - (int) visitor_mt.items_enumerated) < 5);
   // For some unknown reason, on Github Mac OS CI only, st max_depth = 42 and mt max_depth = 41
 #ifdef __APPLE__
   if(getenv("CI") == nullptr)

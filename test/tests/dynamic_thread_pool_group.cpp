@@ -22,7 +22,7 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-//#define LLFIO_LOGGING_LEVEL 99
+// #define LLFIO_LOGGING_LEVEL 99
 
 #ifndef LLFIO_EXCLUDE_DYNAMIC_THREAD_POOL_GROUP
 
@@ -112,7 +112,8 @@ static inline void TestDynamicThreadPoolGroupWorks()
     }
   };
   std::vector<work_item> workitems;
-  auto reset = [&](size_t count) {
+  auto reset = [&](size_t count)
+  {
     workitems.clear();
     shared_state.executed.clear();
     shared_state.executed.resize(count + 1);
@@ -125,7 +126,8 @@ static inline void TestDynamicThreadPoolGroupWorks()
     shared_state.max_concurrency = 0;
     shared_state.group_completes = 0;
   };
-  auto submit = [&] {
+  auto submit = [&]
+  {
     auto **wis = (llfio::dynamic_thread_pool_group::work_item **) alloca(sizeof(work_item *) * workitems.size());
     for(size_t n = 0; n < workitems.size(); n++)
     {
@@ -149,7 +151,8 @@ static inline void TestDynamicThreadPoolGroupWorks()
     BOOST_CHECK(llfio::dynamic_thread_pool_group::current_nesting_level() == 0);
     BOOST_CHECK(llfio::dynamic_thread_pool_group::current_work_item() == nullptr);
   };
-  auto check = [&] {
+  auto check = [&]
+  {
     auto r = shared_state.tpg->wait();
     if(!r)
     {
@@ -350,7 +353,7 @@ static inline void TestDynamicThreadPoolGroupNestingWorks()
       mean /= count;
       for(auto &i : time_bucket)
       {
-        double diff = (double) abs((int64_t) i.first - (int64_t) mean);
+        double diff = (double) std::abs((int64_t) i.first - (int64_t) mean);
         stddev += diff * diff * i.second;
       }
       stddev /= count;
@@ -502,7 +505,8 @@ static inline void TestDynamicThreadPoolGroupIoAwareWorks()
   shared_state.awareness.h = &shared_state.h;
   shared_state.h.truncate(WORK_ITEMS * IO_SIZE).value();
   {
-    auto print_statfs = [](const llfio::file_handle &h, const llfio::statfs_t &statfs) {
+    auto print_statfs = [](const llfio::file_handle &h, const llfio::statfs_t &statfs)
+    {
       std::cout << "\nFor file " << h.current_path().value() << ":";
       std::cout << "\n fundamental filesystem block size = " << statfs.f_bsize;
       std::cout << "\n optimal transfer block size = " << statfs.f_iosize;
@@ -590,4 +594,3 @@ int main(void)
   return 0;
 }
 #endif
-
