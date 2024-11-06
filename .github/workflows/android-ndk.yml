@@ -1,0 +1,33 @@
+name: Build test Android
+
+on:
+  push:
+    branches:
+    - develop
+    - master
+  pull_request:
+  schedule:
+  - cron: '0 0 1 * *'
+
+jobs:
+  Linux:
+    name: Ubuntu
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [error_code, status_code]
+    env:
+      NAME: Android-${{ matrix.configuration }}
+          
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: CMake tests Linux
+      shell: bash
+      run: |
+       export CMAKE_CONFIGURE_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake"
+       if [ "${{ matrix.configuration }}" = "status_code" ]; then
+         export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS;-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON";
+       fi
+       ctest -S .ci.cmake -VV --timeout 900 -DCTEST_DISABLE_TESTING=1 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS";
