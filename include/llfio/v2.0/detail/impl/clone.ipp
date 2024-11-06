@@ -84,7 +84,9 @@ namespace algorithm
       (void) undest;
       if(!force_copy_now)
       {
+#if LLFIO_LOGGING_LEVEL
         log_level_guard g(log_level::fatal);
+#endif
         auto r = src.clone_extents_to(dest, d, force_copy_now, false);
         if(r)
         {
@@ -150,7 +152,9 @@ namespace algorithm
         }
       }
       {
+#if LLFIO_LOGGING_LEVEL
         log_level_guard g(log_level::fatal);
+#endif
         bool failed = true;
         if(!force_copy_now)
         {

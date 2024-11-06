@@ -31,6 +31,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <mutex>
 #include <new>
 #include <regex>
+#include <sstream>
 #include <vector>
 
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
@@ -155,8 +156,10 @@ namespace path_discovery
       for(size_t n = 0; n < ps.all.size(); n++)
       {
         {
+#if LLFIO_LOGGING_LEVEL
           log_level_guard logg(log_level::fatal);  // suppress log printing of failure
           (void) logg;
+#endif
           auto _h = directory_handle::directory({}, ps.all[n].path);
           if(!_h)
           {

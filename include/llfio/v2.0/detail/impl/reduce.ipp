@@ -299,7 +299,9 @@ namespace algorithm
       {
       case filesystem::file_type::directory:
       {
+#if LLFIO_LOGGING_LEVEL
         log_level_guard g(log_level::fatal);
+#endif
         auto r = detail::remove(dirh, entry.leafname, true);
         if(r)
         {

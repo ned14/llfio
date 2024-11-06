@@ -260,7 +260,9 @@ namespace algorithm
             }
             else
             {
+#if LLFIO_LOGGING_LEVEL
               log_level_guard gg(log_level::fatal);
+#endif
               auto r = directory_handle::directory(*mywork.dirh, mywork.leaf());
               if(!r)
               {

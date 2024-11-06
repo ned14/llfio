@@ -1,5 +1,5 @@
 /* LLFIO logging
-(C) 2015-2020 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2015-2024 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: Dec 2015
 
 
@@ -170,6 +170,9 @@ namespace detail
 #endif  // LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
 
 LLFIO_V2_NAMESPACE_END
+#else
+#define LLFIO_LOG_INST_TO_TLS(inst)
+#endif  // LLFIO_LOGGING_LEVEL
 
 #ifndef LLFIO_LOG_FATAL_TO_CERR
 #include <cstdio>
@@ -177,7 +180,6 @@ LLFIO_V2_NAMESPACE_END
   fprintf(stderr, "%s\n", (expr));                                                                                                                             \
   fflush(stderr)
 #endif
-#endif  // LLFIO_LOGGING_LEVEL
 
 #if LLFIO_LOGGING_LEVEL >= 1
 #define LLFIO_LOG_FATAL(inst, message)                                                                                                                         \
@@ -303,7 +305,10 @@ namespace detail
     }
     *out = 0;
   }
-  template <class T> void log_inst_to_info(T &&inst, const char *buffer) { LLFIO_LOG_INFO(inst, buffer); }
+  template <class T> void log_inst_to_info(T &&inst, const char *buffer)
+  {
+    LLFIO_LOG_INFO(inst, buffer);
+  }
 }  // namespace detail
 LLFIO_V2_NAMESPACE_END
 #ifdef _MSC_VER

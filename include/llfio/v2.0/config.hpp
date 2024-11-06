@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 // #include <iostream>
 // #define LLFIO_LOG_TO_OSTREAM std::cerr
-// #define LLFIO_LOGGING_LEVEL 1
+// #define LLFIO_LOGGING_LEVEL 0
 // #define LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
 
 //! \file config.hpp Configures a compiler environment for LLFIO header and source code
@@ -53,6 +53,9 @@ Distributed under the Boost Software License, Version 1.0.
 #else
 #define LLFIO_LOGGING_LEVEL 3  // warn
 #endif
+#elif LLFIO_LOGGING_LEVEL == 0
+#undef LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
+#define LLFIO_DISABLE_PATHS_IN_FAILURE_INFO 1
 #endif
 
 #ifndef LLFIO_LOG_TO_OSTREAM
@@ -239,8 +242,8 @@ LLFIO_V2_NAMESPACE_END
 #include "quickcpplib/config.hpp"
 #if LLFIO_LOGGING_LEVEL
 #include "quickcpplib/ringbuffer_log.hpp"
-#include "quickcpplib/utils/thread.hpp"
 #endif
+#include "quickcpplib/utils/thread.hpp"
 // Bring in filesystem
 #if defined(__has_include)
 // clang-format off
