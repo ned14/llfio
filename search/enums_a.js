@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['zero_5ftermination_1804',['zero_termination',['../classllfio__v2__xxx_1_1path__view__component.html#a4a24bb2d232a1aa744c3ba4018f8732e',1,'llfio_v2_xxx::path_view_component']]]
+  ['win32_5fpath_5fnamespace_1804',['win32_path_namespace',['../namespacellfio__v2__xxx.html#abcb445e5dfcc0eb04ce49ac8af0bc89a',1,'llfio_v2_xxx']]]
 ];
