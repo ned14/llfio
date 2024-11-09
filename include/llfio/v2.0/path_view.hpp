@@ -296,7 +296,7 @@ public:
   };
 
   //! The zero termination to use
-  enum zero_termination
+  enum termination
   {
     zero_terminated,      //!< The input is zero terminated, or requested output ought to be zero terminated.
     not_zero_terminated,  //!< The input is not zero terminated, or requested output ought to not be zero terminated.
@@ -371,7 +371,7 @@ public:
   /*! Constructs from a lengthed array of one of `char`, `wchar_t`, `char8_t` or `char16_t`. The input
   string MUST continue to exist for this view to be valid.
   */
-  constexpr path_view_component(const char *b, size_t l, enum zero_termination zt, format fmt = binary_format) noexcept
+  constexpr path_view_component(const char *b, size_t l, enum termination zt, format fmt = binary_format) noexcept
       : _charstr((l == 0) ? nullptr : b)
       , _length((l == 0) ? 0 : l)
       , _zero_terminated((l == 0) ? false : (zt == zero_terminated))
@@ -387,7 +387,7 @@ public:
   /*! Constructs from a lengthed array of one of `char`, `wchar_t`, `char8_t` or `char16_t`. The input
   string MUST continue to exist for this view to be valid.
   */
-  constexpr path_view_component(const wchar_t *b, size_t l, enum zero_termination zt, format fmt = binary_format) noexcept
+  constexpr path_view_component(const wchar_t *b, size_t l, enum termination zt, format fmt = binary_format) noexcept
       : _wcharstr((l == 0) ? nullptr : b)
       , _length((l == 0) ? 0 : l)
       , _zero_terminated((l == 0) ? false : (zt == zero_terminated))
@@ -403,7 +403,7 @@ public:
   /*! Constructs from a lengthed array of one of `char`, `wchar_t`, `char8_t` or `char16_t`. The input
   string MUST continue to exist for this view to be valid.
   */
-  constexpr path_view_component(const char8_t *b, size_t l, enum zero_termination zt, format fmt = binary_format) noexcept
+  constexpr path_view_component(const char8_t *b, size_t l, enum termination zt, format fmt = binary_format) noexcept
       : _char8str((l == 0) ? nullptr : b)
       , _length((l == 0) ? 0 : l)
       , _zero_terminated((l == 0) ? false : (zt == zero_terminated))
@@ -419,7 +419,7 @@ public:
   /*! Constructs from a lengthed array of one of `char`, `wchar_t`, `char8_t` or `char16_t`. The input
   string MUST continue to exist for this view to be valid.
   */
-  constexpr path_view_component(const char16_t *b, size_t l, enum zero_termination zt, format fmt = binary_format) noexcept
+  constexpr path_view_component(const char16_t *b, size_t l, enum termination zt, format fmt = binary_format) noexcept
       : _char16str((l == 0) ? nullptr : b)
       , _length((l == 0) ? 0 : l)
       , _zero_terminated((l == 0) ? false : (zt == zero_terminated))
@@ -435,7 +435,7 @@ public:
   /*! Constructs from a lengthed array of `byte`. The input
   array MUST continue to exist for this view to be valid.
   */
-  constexpr path_view_component(const byte *b, size_t l, enum zero_termination zt) noexcept
+  constexpr path_view_component(const byte *b, size_t l, enum termination zt) noexcept
       : _bytestr((l == 0) ? nullptr : b)
       , _length((l == 0) ? 0 : l)
       , _zero_terminated((l == 0) ? false : (zt == zero_terminated))
@@ -472,13 +472,13 @@ public:
   */
   LLFIO_TEMPLATE(class Char)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable<Char>))
-  constexpr path_view_component(basic_string_view<Char> v, enum zero_termination zt, format fmt = binary_format) noexcept
+  constexpr path_view_component(basic_string_view<Char> v, enum termination zt, format fmt = binary_format) noexcept
       : path_view_component(v.data(), v.size(), zt, fmt)
   {
   }
   /*! Constructs from a `span<const byte>`.
    */
-  constexpr path_view_component(span<const byte> v, enum zero_termination zt) noexcept
+  constexpr path_view_component(span<const byte> v, enum termination zt) noexcept
       : path_view_component(v.data(), v.size(), zt)
   {
   }
@@ -490,14 +490,14 @@ public:
   */
   LLFIO_TEMPLATE(class It, class End)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable<typename It::value_type>), LLFIO_TPRED(is_source_chartype_acceptable<typename End::value_type>))
-  constexpr path_view_component(It b, End e, enum zero_termination zt, format fmt = binary_format) noexcept
+  constexpr path_view_component(It b, End e, enum termination zt, format fmt = binary_format) noexcept
       : path_view_component(addressof(*b), e - b, zt, fmt)
   {
   }
   //! \overload
   LLFIO_TEMPLATE(class It, class End)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable<std::decay_t<It>>), LLFIO_TPRED(is_source_chartype_acceptable<std::decay_t<End>>))
-  constexpr path_view_component(It *b, End *e, enum zero_termination zt, format fmt = binary_format) noexcept
+  constexpr path_view_component(It *b, End *e, enum termination zt, format fmt = binary_format) noexcept
       : path_view_component(b, e - b, zt, fmt)
   {
   }
@@ -508,14 +508,14 @@ public:
   */
   LLFIO_TEMPLATE(class It, class End)
   LLFIO_TREQUIRES(LLFIO_TPRED(std::is_same<typename It::value_type, byte>::value), LLFIO_TPRED(std::is_same<typename End::value_type, byte>::value))
-  constexpr path_view_component(It b, End e, enum zero_termination zt) noexcept
+  constexpr path_view_component(It b, End e, enum termination zt) noexcept
       : path_view_component(addressof(*b), e - b, zt, binary_format)
   {
   }
   //! \overload
   LLFIO_TEMPLATE(class It, class End)
   LLFIO_TREQUIRES(LLFIO_TPRED(std::is_same<std::decay_t<It>, byte>::value), LLFIO_TPRED(std::is_same<std::decay_t<End>, byte>::value))
-  constexpr path_view_component(It *b, End *e, enum zero_termination zt) noexcept
+  constexpr path_view_component(It *b, End *e, enum termination zt) noexcept
       : path_view_component(b, e - b, zt, binary_format)
   {
   }
@@ -632,7 +632,7 @@ private:
       {
         if(v[1] == ':')
         {
-          return path_view_component(v.data() + 2, 1, zero_termination(), formatting());
+          return path_view_component(v.data() + 2, 1, termination(), formatting());
         }
         return *this;
       });
@@ -648,7 +648,7 @@ private:
       return *this;
     }
 #endif
-    return _invoke([sep_idx, this](const auto &v) { return path_view_component(v.data() + sep_idx + 1, v.size() - sep_idx - 1, zero_termination()); });
+    return _invoke([sep_idx, this](const auto &v) { return path_view_component(v.data() + sep_idx + 1, v.size() - sep_idx - 1, termination()); });
   }
 
 public:
@@ -680,10 +680,10 @@ public:
   //! How path separators shall be interpreted
   constexpr format formatting() const noexcept { return _format; }
 
-  //! True if input is declared to be zero terminated
-  constexpr bool has_zero_termination() const noexcept { return _zero_terminated; }
+  //! True if input is declared to be null terminated
+  constexpr bool has_null_termination() const noexcept { return _zero_terminated; }
   //! The zero termination during construction
-  constexpr enum zero_termination zero_termination() const noexcept { return _zero_terminated ? zero_terminated : not_zero_terminated; }
+  constexpr enum termination termination() const noexcept { return _zero_terminated ? zero_terminated : not_zero_terminated; }
 
   //! True if `stem()` returns a non-empty path.
   LLFIO_PATH_VIEW_CONSTEXPR bool has_stem() const noexcept { return !stem().empty(); }
@@ -733,7 +733,7 @@ public:
       {
         return path_view_component();
       }
-      return path_view_component(v.data() + dot_idx, v.size() - dot_idx, zero_termination());
+      return path_view_component(v.data() + dot_idx, v.size() - dot_idx, termination());
     });
   }
 
@@ -788,20 +788,19 @@ private:
   }
   // Identical source encodings compare lexiographically
   template <class DestT, class Deleter, size_t _internal_buffer_size, class CharT>
-  static int _compare(basic_string_view<CharT> a, enum zero_termination /*unused*/, basic_string_view<CharT> b, enum zero_termination /*unused*/,
+  static int _compare(basic_string_view<CharT> a, enum termination /*unused*/, basic_string_view<CharT> b, enum termination /*unused*/,
                       const std::locale * /*unused*/) noexcept
   {
     return a.compare(b);
   }
   // Disparate source encodings compare via rendered_path
   template <class DestT, class Deleter, size_t _internal_buffer_size, class Char1T, class Char2T>
-  static int _compare(basic_string_view<Char1T> a, enum zero_termination a_zt, basic_string_view<Char2T> b, enum zero_termination b_zt,
-                      const std::locale *loc) noexcept
+  static int _compare(basic_string_view<Char1T> a, enum termination a_zt, basic_string_view<Char2T> b, enum termination b_zt, const std::locale *loc) noexcept
   {
     path_view_component _a_(a.data(), a.size(), a_zt);
     path_view_component _b_(b.data(), b.size(), b_zt);
-    rendered_path<zero_termination::not_zero_terminated, DestT, Deleter, _internal_buffer_size> _a(_a_, loc);
-    rendered_path<zero_termination::not_zero_terminated, DestT, Deleter, _internal_buffer_size> _b(_b_, loc);
+    rendered_path<termination::not_zero_terminated, DestT, Deleter, _internal_buffer_size> _a(_a_, loc);
+    rendered_path<termination::not_zero_terminated, DestT, Deleter, _internal_buffer_size> _b(_b_, loc);
     if(_a.size() < _b.size())
     {
       return -1;
@@ -868,10 +867,7 @@ public:
   {
     return _invoke(
     [&](const auto &self)
-    {
-      return p._invoke([&](const auto &other)
-                       { return _compare<T, Deleter, _internal_buffer_size>(self, zero_termination(), other, p.zero_termination(), &loc); });
-    });
+    { return p._invoke([&](const auto &other) { return _compare<T, Deleter, _internal_buffer_size>(self, termination(), other, p.termination(), &loc); }); });
   }
   //! \overload
   LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class Deleter = default_rendered_path_deleter<T[]>,
@@ -880,10 +876,8 @@ public:
   constexpr int compare(path_view_component p) const
   {
     return _invoke(
-    [&](const auto &self)
-    {
-      return p._invoke([&](const auto &other)
-                       { return _compare<T, Deleter, _internal_buffer_size>(self, zero_termination(), other, p.zero_termination(), nullptr); });
+    [&](const auto &self) {
+      return p._invoke([&](const auto &other) { return _compare<T, Deleter, _internal_buffer_size>(self, termination(), other, p.termination(), nullptr); });
     });
   }
 
@@ -981,7 +975,7 @@ private:
     //! As span
     constexpr _view_type as_span() const noexcept { return _ref; }
   };
-  template <enum path_view_component::zero_termination ZeroTermination, class T, bool = false> struct _rendered_path_base : public _rendered_path_base_<T>
+  template <enum path_view_component::termination ZeroTermination, class T, bool = false> struct _rendered_path_base : public _rendered_path_base_<T>
   {
     //! As string view
     constexpr basic_string_view<T> as_string_view() const { return {this->_ref.data(), this->_ref.size()}; }
@@ -1020,7 +1014,7 @@ public:
   `operator new[]`. You can use an externally supplied larger temporary buffer to avoid
   dynamic memory allocation in all situations.
   */
-  LLFIO_TEMPLATE(enum path_view_component::zero_termination ZeroTermination, class T = typename filesystem::path::value_type,
+  LLFIO_TEMPLATE(enum path_view_component::termination ZeroTermination, class T = typename filesystem::path::value_type,
                  class AllocatorOrDeleter = default_rendered_path_deleter<T[]>, size_t _internal_buffer_size = default_internal_buffer_size)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>))
   class rendered_path : public _rendered_path_base<ZeroTermination, T>
@@ -1028,7 +1022,7 @@ public:
     using _base = _rendered_path_base<ZeroTermination, T>;
     static_assert(is_source_acceptable<T>, "path_view_component::rendered_path<T> does not have a T which is one of byte, char, wchar_t, char8_t nor char16_t");
     template <class DestT, class _Deleter, size_t _internal_buffer_size_, class Char1T, class Char2T>
-    friend int path_view_component::_compare(basic_string_view<Char1T> a, enum zero_termination a_zt, basic_string_view<Char2T> b, enum zero_termination b_zt,
+    friend int path_view_component::_compare(basic_string_view<Char1T> a, enum termination a_zt, basic_string_view<Char2T> b, enum termination b_zt,
                                              const std::locale *loc) noexcept;
 
   public:
@@ -1057,7 +1051,7 @@ public:
       const bool needs_slash_translation = (filesystem::path::preferred_separator != '/') &&
                                            (view.formatting() == format::auto_format || view.formatting() == format::generic_format) &&
                                            view._invoke([](auto sv) { return sv.find('/') != _npos; });
-      if(!needs_slash_translation && (this->zero_termination() == not_zero_terminated || view._zero_terminated))
+      if(!needs_slash_translation && (this->termination() == not_zero_terminated || view._zero_terminated))
       {
         _base::_ref = typename _base::_view_type(source, view._length);
       }
@@ -1464,7 +1458,7 @@ public:
     }
 
     //! The zero termination of this rendered path
-    static constexpr enum zero_termination zero_termination() noexcept { return ZeroTermination; }
+    static constexpr enum termination termination() noexcept { return ZeroTermination; }
     //! The size of the internal buffer
     static constexpr size_t internal_buffer_size() noexcept { return (_internal_buffer_size > 0) ? _internal_buffer_size : 1; }
     //! The storage capacity, which may be larger than `size()` if the internal buffer is in use
@@ -1547,13 +1541,13 @@ public:
   //! Convenience type alias
   template <class T = typename filesystem::path::value_type, class AllocatorOrDeleter = default_rendered_path_deleter<T[]>,
             size_t _internal_buffer_size = default_internal_buffer_size>
-  using zero_terminated_rendered_path = rendered_path<zero_termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>;
+  using zero_terminated_rendered_path = rendered_path<termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>;
   //! Convenience type alias
   template <class T = typename filesystem::path::value_type, class AllocatorOrDeleter = default_rendered_path_deleter<T[]>,
             size_t _internal_buffer_size = default_internal_buffer_size>
-  using not_zero_terminated_rendered_path = rendered_path<zero_termination::not_zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>;
+  using not_zero_terminated_rendered_path = rendered_path<termination::not_zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>;
   //! Convenience function
-  LLFIO_TEMPLATE(enum path_view_component::zero_termination ZeroTermination, class T = typename filesystem::path::value_type,
+  LLFIO_TEMPLATE(enum path_view_component::termination ZeroTermination, class T = typename filesystem::path::value_type,
                  class AllocatorOrDeleter = default_rendered_path_deleter<T[]>, size_t _internal_buffer_size = default_internal_buffer_size, class... Args)
   LLFIO_TREQUIRES(
   LLFIO_TPRED(is_source_acceptable<T>),
@@ -1566,30 +1560,30 @@ public:
   LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class AllocatorOrDeleter = default_rendered_path_deleter<T[]>,
                  size_t _internal_buffer_size = default_internal_buffer_size, class... Args)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>),
-                  LLFIO_TEXPR(std::is_constructible<rendered_path<zero_termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>,
+                  LLFIO_TEXPR(std::is_constructible<rendered_path<termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>,
                                                     path_view_component, Args...>::value))
-  rendered_path<zero_termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size> render_null_terminated(Args &&...args) const
+  rendered_path<termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size> render_null_terminated(Args &&...args) const
   {
-    return rendered_path<zero_termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>(*this, std::forward<Args>(args)...);
+    return rendered_path<termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>(*this, std::forward<Args>(args)...);
   }
   //! Convenience function
   LLFIO_TEMPLATE(class T = typename filesystem::path::value_type, class AllocatorOrDeleter = default_rendered_path_deleter<T[]>,
                  size_t _internal_buffer_size = default_internal_buffer_size, class... Args)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_acceptable<T>),
-                  LLFIO_TEXPR(std::is_constructible<rendered_path<zero_termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>,
+                  LLFIO_TEXPR(std::is_constructible<rendered_path<termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>,
                                                     path_view_component, Args...>::value))
-  rendered_path<zero_termination::not_zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size> render_unterminated(Args &&...args) const
+  rendered_path<termination::not_zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size> render_unterminated(Args &&...args) const
   {
-    return rendered_path<zero_termination::not_zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>(*this, std::forward<Args>(args)...);
+    return rendered_path<termination::not_zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size>(*this, std::forward<Args>(args)...);
   }
 
 #ifdef __cpp_concepts
-  template <enum path_view_component::zero_termination ZeroTermination, class T, class Deleter, size_t _internal_buffer_size>
+  template <enum path_view_component::termination ZeroTermination, class T, class Deleter, size_t _internal_buffer_size>
     requires(is_source_acceptable<T>)
 #elif defined(_MSC_VER)
-  template <enum path_view_component::zero_termination ZeroTermination, class T, class Deleter, size_t _internal_buffer_size, class>
+  template <enum path_view_component::termination ZeroTermination, class T, class Deleter, size_t _internal_buffer_size, class>
 #else
-  template <enum path_view_component::zero_termination ZeroTermination, class T, class Deleter, size_t _internal_buffer_size,
+  template <enum path_view_component::termination ZeroTermination, class T, class Deleter, size_t _internal_buffer_size,
             typename std::enable_if<(is_source_acceptable<T>), bool>::type>
 #endif
   friend class rendered_path;
@@ -2068,35 +2062,35 @@ public:
   /*! Constructs from a lengthed array of one of `char`, `wchar_t`, `char8_t` or `char16_t`. The input
   string MUST continue to exist for this view to be valid.
   */
-  constexpr path_view(const char *b, size_t l, enum zero_termination zt, format fmt = auto_format) noexcept
+  constexpr path_view(const char *b, size_t l, enum termination zt, format fmt = auto_format) noexcept
       : path_view_component(b, l, zt, fmt)
   {
   }
   /*! Constructs from a lengthed array of one of `char`, `wchar_t`, `char8_t` or `char16_t`. The input
   string MUST continue to exist for this view to be valid.
   */
-  constexpr path_view(const wchar_t *b, size_t l, enum zero_termination zt, format fmt = auto_format) noexcept
+  constexpr path_view(const wchar_t *b, size_t l, enum termination zt, format fmt = auto_format) noexcept
       : path_view_component(b, l, zt, fmt)
   {
   }
   /*! Constructs from a lengthed array of one of `char`, `wchar_t`, `char8_t` or `char16_t`. The input
   string MUST continue to exist for this view to be valid.
   */
-  constexpr path_view(const char8_t *b, size_t l, enum zero_termination zt, format fmt = auto_format) noexcept
+  constexpr path_view(const char8_t *b, size_t l, enum termination zt, format fmt = auto_format) noexcept
       : path_view_component(b, l, zt, fmt)
   {
   }
   /*! Constructs from a lengthed array of one of `char`, `wchar_t`, `char8_t` or `char16_t`. The input
   string MUST continue to exist for this view to be valid.
   */
-  constexpr path_view(const char16_t *b, size_t l, enum zero_termination zt, format fmt = auto_format) noexcept
+  constexpr path_view(const char16_t *b, size_t l, enum termination zt, format fmt = auto_format) noexcept
       : path_view_component(b, l, zt, fmt)
   {
   }
   /*! Constructs from a lengthed array of `byte`. The input
   array MUST continue to exist for this view to be valid.
   */
-  constexpr path_view(const byte *b, size_t l, enum zero_termination zt) noexcept
+  constexpr path_view(const byte *b, size_t l, enum termination zt) noexcept
       : path_view_component(b, l, zt)
   {
   }
@@ -2124,13 +2118,13 @@ public:
   */
   LLFIO_TEMPLATE(class Char)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable<Char>))
-  constexpr path_view(basic_string_view<Char> v, enum zero_termination zt, format fmt = auto_format) noexcept
+  constexpr path_view(basic_string_view<Char> v, enum termination zt, format fmt = auto_format) noexcept
       : path_view_component(v.data(), v.size(), zt, fmt)
   {
   }
   /*! Constructs from a `span<const byte>`.
    */
-  constexpr path_view(span<const byte> v, enum zero_termination zt) noexcept
+  constexpr path_view(span<const byte> v, enum termination zt) noexcept
       : path_view_component(v, zt)
   {
   }
@@ -2142,14 +2136,14 @@ public:
   */
   LLFIO_TEMPLATE(class It, class End)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable<typename It::value_type>), LLFIO_TPRED(is_source_chartype_acceptable<typename End::value_type>))
-  constexpr path_view(It b, End e, enum zero_termination zt, format fmt = auto_format) noexcept
+  constexpr path_view(It b, End e, enum termination zt, format fmt = auto_format) noexcept
       : path_view_component(addressof(*b), e - b, zt, fmt)
   {
   }
   //! \overload
   LLFIO_TEMPLATE(class It, class End)
   LLFIO_TREQUIRES(LLFIO_TPRED(is_source_chartype_acceptable<std::decay_t<It>>), LLFIO_TPRED(is_source_chartype_acceptable<std::decay_t<End>>))
-  constexpr path_view(It *b, End *e, enum zero_termination zt, format fmt = auto_format) noexcept
+  constexpr path_view(It *b, End *e, enum termination zt, format fmt = auto_format) noexcept
       : path_view_component(b, e - b, zt, fmt)
   {
   }
@@ -2160,14 +2154,14 @@ public:
   */
   LLFIO_TEMPLATE(class It, class End)
   LLFIO_TREQUIRES(LLFIO_TPRED(std::is_same<typename It::value_type, byte>::value), LLFIO_TPRED(std::is_same<typename End::value_type, byte>::value))
-  constexpr path_view(It b, End e, enum zero_termination zt) noexcept
+  constexpr path_view(It b, End e, enum termination zt) noexcept
       : path_view_component(addressof(*b), e - b, zt, binary_format)
   {
   }
   //! \overload
   LLFIO_TEMPLATE(class It, class End)
   LLFIO_TREQUIRES(LLFIO_TPRED(std::is_same<std::decay_t<It>, byte>::value), LLFIO_TPRED(std::is_same<std::decay_t<End>, byte>::value))
-  constexpr path_view(It *b, End *e, enum zero_termination zt) noexcept
+  constexpr path_view(It *b, End *e, enum termination zt) noexcept
       : path_view_component(b, e - b, zt, binary_format)
   {
   }
@@ -2427,13 +2421,13 @@ public:
       // Special case \\.\ and \\?\ to match filesystem::path
       if(is_ntpath() || (v.size() >= 4 && sep_idx == 0 && v[1] == '\\' && (v[2] == '.' || v[2] == '?') && v[3] == '\\'))
       {
-        return path_view(v.data() + 4, v.size() - 4, this->zero_termination(), formatting());
+        return path_view(v.data() + 4, v.size() - 4, this->termination(), formatting());
       }
       // Is there a drive letter before the first separator?
       auto colon_idx = v.find(':');
       if(colon_idx < sep_idx)
       {
-        return path_view(v.data() + sep_idx + 1, v.size() - sep_idx - 1, this->zero_termination(), formatting());
+        return path_view(v.data() + sep_idx + 1, v.size() - sep_idx - 1, this->termination(), formatting());
       }
       // UNC paths return the server name as the root path
       if(is_uncpath())
@@ -2443,7 +2437,7 @@ public:
         {
           return path_view();
         }
-        return path_view(v.data() + sep_idx + 1, v.size() - sep_idx - 1, this->zero_termination(), formatting());
+        return path_view(v.data() + sep_idx + 1, v.size() - sep_idx - 1, this->termination(), formatting());
       }
 #else
     return this->_invoke(
@@ -2452,7 +2446,7 @@ public:
 #endif
       if(sep_idx == 0)
       {
-        return path_view(v.data() + 1, v.size() - 1, this->zero_termination(), formatting());
+        return path_view(v.data() + 1, v.size() - 1, this->termination(), formatting());
       }
       return *this;
     });
@@ -2632,8 +2626,7 @@ namespace detail
       {
         assert(_end <= v.size());
         assert(_begin <= _end);
-        return path_view_component(v.data() + _begin, _end - _begin,
-                                   (_end == v.size()) ? _parent->zero_termination() : path_view_component::not_zero_terminated);
+        return path_view_component(v.data() + _begin, _end - _begin, (_end == v.size()) ? _parent->termination() : path_view_component::not_zero_terminated);
       });
     }
     LLFIO_PATH_VIEW_CONSTEXPR void _inc() noexcept
