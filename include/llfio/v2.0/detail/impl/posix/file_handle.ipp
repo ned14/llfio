@@ -991,13 +991,15 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_pair exte
     return errc::value_too_large;
   }
 #if defined(__linux__)
-  if(-1 == fallocate(_v.fd, 0x02 /*FALLOC_FL_PUNCH_HOLE*/ | 0x01 /*FALLOC_FL_KEEP_SIZE*/, extent.offset, extent.length))
+  if(-1 != fallocate(_v.fd, 0x02 /*FALLOC_FL_PUNCH_HOLE*/ | 0x01 /*FALLOC_FL_KEEP_SIZE*/, extent.offset, extent.length))
   {
-    // The filing system may not support trim
-    if(EOPNOTSUPP != errno)
-    {
-      return posix_error();
-    }
+    // Success
+    return extent;
+  }
+  // The filing system may not support trim
+  if(EOPNOTSUPP != errno)
+  {
+    return posix_error();
   }
 #endif
   // Fall back onto a write of zeros
