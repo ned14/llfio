@@ -994,7 +994,7 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_pair exte
   if(-1 != fallocate(_v.fd, 0x02 /*FALLOC_FL_PUNCH_HOLE*/ | 0x01 /*FALLOC_FL_KEEP_SIZE*/, extent.offset, extent.length))
   {
     // Success
-    return extent;
+    return extent.length;
   }
   // The filing system may not support trim
   if(EOPNOTSUPP != errno)
