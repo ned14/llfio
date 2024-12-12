@@ -62,15 +62,25 @@ jobs:
 #        env:
 #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Rename artifacts
+        if: steps.waitforstatuschecks.outputs.status == 'success'
+        shell: bash
+        run: |
+         mv "artifacts/Linux error_code g++ prebuilt binaries/llfio-v2.0-binaries-linux-x64.tgz" llfio-v2.0-binaries-ubuntu20.04-x64-error_code.tgz
+         mv "artifacts/Linux status_code g++ prebuilt binaries/llfio-v2.0-binaries-linux-x64.tgz" llfio-v2.0-binaries-ubuntu20.04-x64-status_code.tgz
+         mv "artifacts/Linux error_code arm-linux-gnueabihf-g++ prebuilt binaries/llfio-v2.0-binaries-linux-armhf.tgz" llfio-v2.0-binaries-ubuntu20.04-armhf-error_code.tgz
+         mv "artifacts/Mac OS error_code prebuilt binaries/llfio-v2.0-binaries-darwin-arm64.tgz" llfio-v2.0-binaries-macos-arm64-error_code.tgz
+         mv "artifacts/Mac OS status_code prebuilt binaries/llfio-v2.0-binaries-darwin-arm64.tgz" llfio-v2.0-binaries-macos-arm64-status_code.tgz
+         mv "artifacts/Windows VS2022 error_code prebuilt binaries/llfio-v2.0-binaries-win64.zip" llfio-v2.0-binaries-win64-vs2022-error_code.zip
+         mv "artifacts/Windows VS2022 status_code prebuilt binaries/llfio-v2.0-binaries-win64.zip" llfio-v2.0-binaries-win64-vs2022-status_code.zip
+
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v2
         if: steps.waitforstatuschecks.outputs.status == 'success'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: all_tests_passed_${{ github.sha }}
-          release_name: All tests passed ${{ github.sha }}
+          name: All tests passed ${{ github.sha }}
           body: |
             ```
             ${{ github.event.head_commit.message }}
@@ -79,91 +89,4 @@ jobs:
             Prebuilt binaries with development headers and documentation for common platforms are in Assets below:
           draft: false
           prerelease: true
-          
-      - name: Upload Linux 1
-        uses: actions/upload-release-asset@v1
-        if: steps.waitforstatuschecks.outputs.status == 'success'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifacts/Linux error_code g++ prebuilt binaries/llfio-v2.0-binaries-linux-x64.tgz
-          asset_name: llfio-v2.0-binaries-ubuntu20.04-x64-error_code.tgz
-          asset_content_type: application/gzip
-          
-      - name: Upload Linux 2
-        uses: actions/upload-release-asset@v1
-        if: steps.waitforstatuschecks.outputs.status == 'success'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifacts/Linux status_code g++ prebuilt binaries/llfio-v2.0-binaries-linux-x64.tgz
-          asset_name: llfio-v2.0-binaries-ubuntu20.04-x64-status_code.tgz
-          asset_content_type: application/gzip
-          
-      - name: Upload Linux 3
-        uses: actions/upload-release-asset@v1
-        if: steps.waitforstatuschecks.outputs.status == 'success'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifacts/Linux error_code arm-linux-gnueabihf-g++ prebuilt binaries/llfio-v2.0-binaries-linux-armhf.tgz
-          asset_name: llfio-v2.0-binaries-ubuntu20.04-armhf-error_code.tgz
-          asset_content_type: application/gzip
-          
-      - name: Upload Linux 4
-        uses: actions/upload-release-asset@v1
-        if: steps.waitforstatuschecks.outputs.status == 'success'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifacts/Linux status_code arm-linux-gnueabihf-g++ prebuilt binaries/llfio-v2.0-binaries-linux-armhf.tgz
-          asset_name: llfio-v2.0-binaries-ubuntu20.04-armhf-status_code.tgz
-          asset_content_type: application/gzip
-
-      - name: Upload MacOS 1
-        uses: actions/upload-release-asset@v1
-        if: steps.waitforstatuschecks.outputs.status == 'success'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifacts/Mac OS error_code prebuilt binaries/llfio-v2.0-binaries-darwin-arm64.tgz
-          asset_name: llfio-v2.0-binaries-macos-arm64-error_code.tgz
-          asset_content_type: application/gzip
-          
-      - name: Upload MacOS 2
-        uses: actions/upload-release-asset@v1
-        if: steps.waitforstatuschecks.outputs.status == 'success'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifacts/Mac OS status_code prebuilt binaries/llfio-v2.0-binaries-darwin-arm64.tgz
-          asset_name: llfio-v2.0-binaries-macos-arm64-status_code.tgz
-          asset_content_type: application/gzip
-
-      - name: Upload Windows 1
-        uses: actions/upload-release-asset@v1
-        if: steps.waitforstatuschecks.outputs.status == 'success'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifacts/Windows VS2022 error_code prebuilt binaries/llfio-v2.0-binaries-win64.zip
-          asset_name: llfio-v2.0-binaries-win64-vs2022-error_code.zip
-          asset_content_type: application/zip
-          
-      - name: Upload Windows 2
-        uses: actions/upload-release-asset@v1
-        if: steps.waitforstatuschecks.outputs.status == 'success'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifacts/Windows VS2022 status_code prebuilt binaries/llfio-v2.0-binaries-win64.zip
-          asset_name: llfio-v2.0-binaries-win64-vs2022-status_code.zip
-          asset_content_type: application/zip
+          files: llfio-v2.0-binaries-*
