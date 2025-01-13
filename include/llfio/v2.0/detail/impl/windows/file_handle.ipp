@@ -1,5 +1,5 @@
 /* A handle to a file
-(C) 2015-2021 Niall Douglas <http://www.nedproductions.biz/> (16 commits)
+(C) 2015-2024 Niall Douglas <http://www.nedproductions.biz/> (16 commits)
 File Created: Dec 2015
 
 
@@ -398,6 +398,7 @@ result<std::vector<file_handle::extent_pair>> file_handle::extents() const noexc
         return win32_error();
       }
     }
+    ret.resize(bytesout / sizeof(FILE_ALLOCATED_RANGE_BUFFER));
     return ret;
   }
   catch(...)
