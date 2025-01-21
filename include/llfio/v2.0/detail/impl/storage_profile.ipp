@@ -170,7 +170,7 @@ namespace storage_profile
       }
       else
       {
-        try
+        LLFIO_TRY
         {
           size_t chunksize = 256 * 1024 * 1024;
 #ifdef WIN32
@@ -211,7 +211,7 @@ namespace storage_profile
           }
           sp.mem_min_bandwidth.value = static_cast<unsigned long long>(static_cast<double>(count) * chunksize / 10);
         }
-        catch(...)
+        LLFIO_CATCH(...)
         {
           return std::current_exception();
         }
@@ -346,7 +346,7 @@ namespace storage_profile
     // Device name, size, min i/o size
     outcome<void> device(storage_profile &sp, file_handle &h) noexcept
     {
-      try
+      LLFIO_TRY
       {
         statfs_t fsinfo;
         OUTCOME_TRYV(fsinfo.fill(h, statfs_t::want::iosize | statfs_t::want::mntfromname | statfs_t::want::fstypename));
@@ -357,7 +357,7 @@ namespace storage_profile
         OUTCOME_TRYV(posix::_device(sp, h, fsinfo.f_mntfromname, fsinfo.f_fstypename));
 #endif
       }
-      catch(...)
+      LLFIO_CATCH(...)
       {
         return std::current_exception();
       }
@@ -366,7 +366,7 @@ namespace storage_profile
     // FS name, config, size, in use
     outcome<void> fs(storage_profile &sp, file_handle &h) noexcept
     {
-      try
+      LLFIO_TRY
       {
         statfs_t fsinfo;
         OUTCOME_TRYV(fsinfo.fill(h));
@@ -375,7 +375,7 @@ namespace storage_profile
         sp.fs_size.value = fsinfo.f_blocks * fsinfo.f_bsize;
         sp.fs_in_use.value = static_cast<float>(fsinfo.f_blocks - fsinfo.f_bfree) / fsinfo.f_blocks;
       }
-      catch(...)
+      LLFIO_CATCH(...)
       {
         return std::current_exception();
       }
@@ -395,7 +395,7 @@ namespace storage_profile
       {
         return success();
       }
-      try
+      LLFIO_TRY
       {
         using off_t = byte_io_handle::extent_type;
         sp.max_aligned_atomic_rewrite.value = 1;
@@ -420,7 +420,7 @@ namespace storage_profile
               auto _h(srch.reopen());
               if(!_h)
               {
-                throw std::runtime_error(std::string("concurrency::atomic_rewrite_quantum: "  // NOLINT
+                LLFIO_THROW std::runtime_error(std::string("concurrency::atomic_rewrite_quantum: "  // NOLINT
                                                      "Could not open work file due to ") +
                                          _h.error().message().c_str());
               }
@@ -459,7 +459,7 @@ namespace storage_profile
               auto _h(srch.reopen());
               if(!_h)
               {
-                throw std::runtime_error(std::string("concurrency::atomic_rewrite_quantum: "  // NOLINT
+                LLFIO_THROW std::runtime_error(std::string("concurrency::atomic_rewrite_quantum: "  // NOLINT
                                                      "Could not open work file due to ") +
                                          _h.error().message().c_str());
               }
@@ -564,7 +564,7 @@ namespace storage_profile
                 auto _h(srch.reopen());
                 if(!_h)
                 {
-                  throw std::runtime_error(std::string("concurrency::atomic_rewrite_"  // NOLINT
+                  LLFIO_THROW std::runtime_error(std::string("concurrency::atomic_rewrite_"  // NOLINT
                                                        "quantum: Could not open work file "
                                                        "due to ") +
                                            _h.error().message().c_str());
@@ -604,7 +604,7 @@ namespace storage_profile
                 auto _h(srch.reopen());
                 if(!_h)
                 {
-                  throw std::runtime_error(std::string("concurrency::atomic_rewrite_"  // NOLINT
+                  LLFIO_THROW std::runtime_error(std::string("concurrency::atomic_rewrite_"  // NOLINT
                                                        "quantum: Could not open work file "
                                                        "due to ") +
                                            _h.error().message().c_str());
@@ -676,7 +676,7 @@ namespace storage_profile
           }
         }
       }
-      catch(...)
+      LLFIO_CATCH(...)
       {
         return std::current_exception();
       }
@@ -695,7 +695,7 @@ namespace storage_profile
         return success();
       }
 #endif
-      try
+      LLFIO_TRY
       {
         using off_t = byte_io_handle::extent_type;
         auto size = static_cast<size_t>(sp.max_aligned_atomic_rewrite.value);
@@ -725,7 +725,7 @@ namespace storage_profile
                   auto _h(srch.reopen());
                   if(!_h)
                   {
-                    throw std::runtime_error(std::string("concurrency::atomic_rewrite_"  // NOLINT
+                    LLFIO_THROW std::runtime_error(std::string("concurrency::atomic_rewrite_"  // NOLINT
                                                          "offset_boundary: Could not open "
                                                          "work file due to ") +
                                              _h.error().message().c_str());
@@ -765,7 +765,7 @@ namespace storage_profile
                   auto _h(srch.reopen());
                   if(!_h)
                   {
-                    throw std::runtime_error(std::string("concurrency::atomic_rewrite_"  // NOLINT
+                    LLFIO_THROW std::runtime_error(std::string("concurrency::atomic_rewrite_"  // NOLINT
                                                          "offset_boundary: Could not open "
                                                          "work file due to ") +
                                              _h.error().message().c_str());
@@ -838,7 +838,7 @@ namespace storage_profile
           }
         }
       }
-      catch(...)
+      LLFIO_CATCH(...)
       {
         return std::current_exception();
       }
@@ -859,7 +859,7 @@ namespace storage_profile
       static constexpr size_t memory_to_use = 128 * 1024 * 1024;  // 1Gb
       // static const unsigned clock_overhead = system::_clock_granularity_and_overhead().overhead;
       static const unsigned clock_granularity = system::_clock_granularity_and_overhead().granularity;
-      try
+      LLFIO_TRY
       {
         std::vector<file_handle> _workfiles;
         _workfiles.reserve(noreaders + nowriters);
@@ -1046,7 +1046,7 @@ namespace storage_profile
         s._99999 = totalresults[static_cast<size_t>(0.99999 * totalresults.size())];
         return s;
       }
-      catch(...)
+      LLFIO_CATCH(...)
       {
         return std::current_exception();
       }
@@ -1184,7 +1184,7 @@ namespace storage_profile
 #ifdef LLFIO_STORAGE_PROFILE_PIN_THREADS
       SetThreadAffinityMask(GetCurrentThread(), 1ULL << (no * 2));
 #endif
-      try
+      LLFIO_TRY
       {
         directory_handle dirh(directory_handle::directory(srch.parent_path_handle().value(), "testdir", directory_handle::mode::write, directory_handle::creation::if_needed).value());
         auto flags = srch.flags();
@@ -1295,7 +1295,7 @@ namespace storage_profile
         dirh.unlink().value();
         return s;
       }
-      catch(...)
+      LLFIO_CATCH(...)
       {
         return std::current_exception();
       }

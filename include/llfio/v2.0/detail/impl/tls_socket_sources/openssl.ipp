@@ -247,7 +247,7 @@ namespace detail
     SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const OUTCOME_V2_NAMESPACE::experimental::status_code<void> &code) const override
     {
       auto &c = static_cast<const OUTCOME_V2_NAMESPACE::experimental::status_code<openssl_error_domain> &>(code);
-      throw OUTCOME_V2_NAMESPACE::experimental::status_error<openssl_error_domain>(c);
+      LLFIO_THROW OUTCOME_V2_NAMESPACE::experimental::status_error<openssl_error_domain>(c);
     }
   };
   constexpr openssl_error_domain openssl_error_domain_inst;
@@ -305,7 +305,7 @@ namespace detail
     SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const OUTCOME_V2_NAMESPACE::experimental::status_code<void> &code) const override
     {
       auto &c = static_cast<const OUTCOME_V2_NAMESPACE::experimental::status_code<x509_error_domain> &>(code);
-      throw OUTCOME_V2_NAMESPACE::experimental::status_error<x509_error_domain>(c);
+      LLFIO_THROW OUTCOME_V2_NAMESPACE::experimental::status_error<x509_error_domain>(c);
     }
   };
   constexpr x509_error_domain x509_error_domain_inst;
@@ -1224,13 +1224,13 @@ public:
 
   virtual result<void> set_authentication_certificates_path(path_view identifier) noexcept override
   {
-    try
+    LLFIO_TRY
     {
       LLFIO_LOG_FUNCTION_CALL(this);
       _authentication_certificates_path = identifier.path();
       return success();
     }
-    catch(...)
+    LLFIO_CATCH(...)
     {
       return error_from_exception();
     }
@@ -1238,7 +1238,7 @@ public:
 
   virtual result<string_view> set_connect_hostname(string_view host, uint16_t port) noexcept override
   {
-    try
+    LLFIO_TRY
     {
       LLFIO_LOG_FUNCTION_CALL(this);
       _connect_hostname_port.assign(host.data(), host.size());
@@ -1267,7 +1267,7 @@ public:
       }
       return string_view(_connect_hostname_port).substr(host.size() + 1);
     }
-    catch(...)
+    LLFIO_CATCH(...)
     {
       return error_from_exception();
     }
@@ -1618,13 +1618,13 @@ public:
 
   virtual result<void> set_authentication_certificates_path(path_view identifier) noexcept override
   {
-    try
+    LLFIO_TRY
     {
       LLFIO_LOG_FUNCTION_CALL(this);
       _authentication_certificates_path = identifier.path();
       return success();
     }
-    catch(...)
+    LLFIO_CATCH(...)
     {
       return error_from_exception();
     }

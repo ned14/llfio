@@ -232,7 +232,7 @@ public:
   static inline result<pipe_handle> random_pipe(mode _mode = mode::read, caching _caching = caching::all, flag flags = flag::unlink_on_first_close,
                                                 const path_handle &dirpath = path_discovery::temporary_named_pipes_directory()) noexcept
   {
-    try
+    LLFIO_TRY
     {
       for(;;)
       {
@@ -245,7 +245,7 @@ public:
         }
       }
     }
-    catch(...)
+    LLFIO_CATCH(...)
     {
       return error_from_exception();
     }

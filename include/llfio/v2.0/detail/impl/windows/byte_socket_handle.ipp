@@ -199,11 +199,11 @@ namespace ip
       p->clear();
       auto &cache = resolver_impl_cache();
       std::lock_guard<std::mutex> g(cache.lock);
-      try
+      LLFIO_TRY
       {
         cache.list.push_back(p);
       }
-      catch(...)
+      LLFIO_CATCH(...)
       {
         delete p;
       }
@@ -270,7 +270,7 @@ namespace ip
   result<resolver_ptr> resolve(string_view name, string_view service, family _family, deadline d, resolve_flag flags) noexcept
   {
     LLFIO_LOG_FUNCTION_CALL(nullptr);
-    try
+    LLFIO_TRY
     {
       windows_nt_kernel::init();
       using namespace windows_nt_kernel;
@@ -380,7 +380,7 @@ namespace ip
       p->check(0);
       return {std::move(ret)};
     }
-    catch(...)
+    LLFIO_CATCH(...)
     {
       return error_from_exception();
     }

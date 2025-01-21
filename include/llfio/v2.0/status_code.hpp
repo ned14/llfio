@@ -215,7 +215,7 @@ protected:
       return msg;
     }
     std::string ret;
-    try
+    LLFIO_TRY
     {
       ret = msg.c_str();
       if(paths.first != nullptr)
@@ -241,7 +241,7 @@ protected:
       }
 #endif
     }
-    catch(...)
+    LLFIO_CATCH(...)
     {
       return string_ref("Failed to retrieve message for status code");
     }
@@ -592,28 +592,44 @@ public:
   }
 };
 
+#ifdef __cpp_exceptions
 inline void error_info::throw_exception() const
 {
   std::string msg;
-  try
+  LLFIO_TRY
   {
     msg = message();
   }
-  catch(...)
+  LLFIO_CATCH(...)
   {
   }
   OUTCOME_V2_NAMESPACE::try_throw_std_exception_from_error(ec, msg);
   throw error(*this);
 }
-
 template <class T> using result = OUTCOME_V2_NAMESPACE::result<T, error_info>;
+#else
+inline void error_info::throw_exception() const {
+  std::abort();
+}
+template <class T> using result = OUTCOME_V2_NAMESPACE::result<T, error_info, OUTCOME_V2_NAMESPACE::policy::terminate>;
+#endif
+
 using OUTCOME_V2_NAMESPACE::failure;
 using OUTCOME_V2_NAMESPACE::success;
+#ifdef __cpp_exceptions
 inline error_info error_from_exception(std::exception_ptr &&ep = std::current_exception(),
                                        std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept
 {
   return error_info(OUTCOME_V2_NAMESPACE::error_from_exception(std::move(ep), not_matched));
 }
+#else
+
+inline error_info error_from_exception(std::exception_ptr &&ep = std::current_exception(),
+                                       std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept
+{
+  return error_info();
+}
+#endif
 using OUTCOME_V2_NAMESPACE::in_place_type;
 #if defined(LLFIO_ENABLE_COROUTINES)
 template <class T> using atomic_eager = OUTCOME_V2_NAMESPACE::awaitables::atomic_eager<T>;

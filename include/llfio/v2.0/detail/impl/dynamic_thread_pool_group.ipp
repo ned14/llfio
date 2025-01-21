@@ -741,13 +741,13 @@ namespace detail
     void _add_thread(threadpool_guard & /*unused*/)
     {
       thread_t *p = nullptr;
-      try
+      LLFIO_TRY
       {
         p = new thread_t;
         _append_to_list(threadpool_active, p);
         p->thread = std::thread([this, p] { _execute_work(p); });
       }
-      catch(...)
+      LLFIO_CATCH(...)
       {
         if(p != nullptr)
         {
@@ -1286,7 +1286,7 @@ public:
   result<void> init()
   {
     LLFIO_LOG_FUNCTION_CALL(this);
-    try
+    LLFIO_TRY
     {
       auto &impl = detail::global_dynamic_thread_pool();
       _nesting_level = detail::global_dynamic_thread_pool_thread_local_state().nesting_level;
@@ -1311,7 +1311,7 @@ public:
       impl.workqueue->items.insert(this);
       return success();
     }
-    catch(...)
+    LLFIO_CATCH(...)
     {
       return error_from_exception();
     }
@@ -1448,13 +1448,13 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC uint32_t dynamic_thread_pool_group::ms_sleep_for
 
 LLFIO_HEADERS_ONLY_FUNC_SPEC result<dynamic_thread_pool_group_ptr> make_dynamic_thread_pool_group() noexcept
 {
-  try
+  LLFIO_TRY
   {
     auto ret = std::make_unique<dynamic_thread_pool_group_impl>();
     OUTCOME_TRY(ret->init());
     return dynamic_thread_pool_group_ptr(std::move(ret));
   }
-  catch(...)
+  LLFIO_CATCH(...)
   {
     return error_from_exception();
   }
@@ -1620,11 +1620,11 @@ namespace detail
         std::cout << "*** DTP " << self << " wakes, state = " << self->state << std::endl;
 #endif
         g.unlock();
-        try
+        LLFIO_TRY
         {
           populate_threadmetrics(now_steady);
         }
-        catch(...)
+        LLFIO_CATCH(...)
         {
         }
         continue;
@@ -1643,7 +1643,7 @@ namespace detail
         _workerthread(workitem, nullptr);
       }
       // workitem->_internalworkh should be null, however workitem may also no longer exist
-      try
+      LLFIO_TRY
       {
         if(populate_threadmetrics(now_steady))
         {
@@ -1658,7 +1658,7 @@ namespace detail
           return;
         }
       }
-      catch(...)
+      LLFIO_CATCH(...)
       {
       }
     }
@@ -1862,7 +1862,7 @@ namespace detail
   inline result<void> global_dynamic_thread_pool_impl::submit(dynamic_thread_pool_group_impl_guard &g, dynamic_thread_pool_group_impl *group,
                                                               span<dynamic_thread_pool_group::work_item *> work) noexcept
   {
-    try
+    LLFIO_TRY
     {
       if(work.empty())
       {
@@ -1931,7 +1931,7 @@ namespace detail
       g.lock();
       return success();
     }
-    catch(...)
+    LLFIO_CATCH(...)
     {
       return error_from_exception();
     }
@@ -2394,7 +2394,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC dynamic_thread_pool_group::io_aware_work_item::i
       {
         if(!h.h->is_seekable())
         {
-          throw std::runtime_error("Supplied handle is not seekable");
+          LLFIO_THROW std::runtime_error("Supplied handle is not seekable");
         }
         auto *fh = static_cast<file_handle *>(h.h);
         auto unique_id = fh->unique_id();
@@ -2410,7 +2410,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC dynamic_thread_pool_group::io_aware_work_item::i
             {
               r.value();
             }
-            throw std::runtime_error("statfs::f_iosinprogress unavailable for supplied handle");
+            LLFIO_THROW std::runtime_error("statfs::f_iosinprogress unavailable for supplied handle");
           }
           it->second.last_updated = std::chrono::steady_clock::now();
         }

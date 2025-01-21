@@ -1225,7 +1225,7 @@ namespace test
 
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<byte_io_multiplexer_ptr> multiplexer_linux_io_uring(size_t threads, bool is_polling) noexcept
   {
-    try
+    LLFIO_TRY
     {
       if(1 == threads)
       {
@@ -1238,7 +1238,7 @@ namespace test
       OUTCOME_TRY(ret->init(false, ret->_nonseekable));
       return byte_io_multiplexer_ptr(ret.release());
     }
-    catch(...)
+    LLFIO_CATCH(...)
     {
       return error_from_exception();
     }

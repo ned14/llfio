@@ -195,7 +195,7 @@ namespace algorithm
       static result<memory_map> fs_mutex_map(const path_handle &base, path_view lockfile) noexcept
       {
         LLFIO_LOG_FUNCTION_CALL(0);
-        try
+        LLFIO_TRY
         {
           OUTCOME_TRY(auto &&ret, file_handle::file(base, lockfile, file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::reads));
           file_handle temph;
@@ -263,7 +263,7 @@ namespace algorithm
           lockinuse = std::move(lockinuse2);  // releases exclusive lock on all three offsets
           return memory_map(std::move(ret), std::move(temph), std::move(lockinuse.value()), std::move(hmap), std::move(temphmap));
         }
-        catch(...)
+        LLFIO_CATCH(...)
         {
           return error_from_exception();
         }

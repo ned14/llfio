@@ -411,7 +411,7 @@ public:
                                                        creation _creation = creation::open_existing, caching _caching = caching::all, flag flags = flag::none,
                                                        section_handle::flag sflags = section_handle::flag::none, extent_type offset = 0) noexcept
   {
-    try
+    LLFIO_TRY
     {
       if(_mode == mode::append)
       {
@@ -437,7 +437,7 @@ public:
       }
       }
     }
-    catch(...)
+    LLFIO_CATCH(...)
     {
       return error_from_exception();
     }
@@ -464,7 +464,7 @@ public:
                                                                       caching _caching = caching::temporary, flag flags = flag::none,
                                                                       section_handle::flag sflags = section_handle::flag::none) noexcept
   {
-    try
+    LLFIO_TRY
     {
       for(;;)
       {
@@ -477,7 +477,7 @@ public:
         }
       }
     }
-    catch(...)
+    LLFIO_CATCH(...)
     {
       return error_from_exception();
     }
@@ -522,14 +522,14 @@ public:
   mapped_temp_inode(size_type reservation = 0, const path_handle &dir = path_discovery::storage_backed_temporary_files_directory(), mode _mode = mode::write,
                     caching _caching = caching::temporary, flag flags = flag::none, section_handle::flag sflags = section_handle::flag::none) noexcept
   {
-    try
+    LLFIO_TRY
     {
       OUTCOME_TRY(auto &&v, file_handle::temp_inode(dir, _mode, _caching, flags));
       mapped_file_handle ret(std::move(v), sflags, 0);
       ret._reservation = reservation;
       return {std::move(ret)};
     }
-    catch(...)
+    LLFIO_CATCH(...)
     {
       return error_from_exception();
     }
@@ -622,12 +622,12 @@ public:
   result<mapped_file_handle> reopen(size_type reservation, extent_type offset = 0, mode mode_ = mode::unchanged, caching caching_ = caching::unchanged,
                                     deadline d = std::chrono::seconds(30)) const noexcept
   {
-    try
+    LLFIO_TRY
     {
       OUTCOME_TRY(auto &&fh, file_handle::reopen(mode_, caching_, d));
       return mapped_file_handle(std::move(fh), reservation, _sh.section_flags(), _offset + offset);
     }
-    catch(...)
+    LLFIO_CATCH(...)
     {
       return error_from_exception();
     }

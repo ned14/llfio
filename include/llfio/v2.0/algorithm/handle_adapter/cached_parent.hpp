@@ -151,14 +151,14 @@ namespace algorithm
       OUTCOME_TRYV(adapted_handle_type::relink(base, newpath, atomic_replace, d));
       _sph.reset();
       _leafname.clear();
-      try
+      LLFIO_TRY
       {
         auto r = detail::get_cached_path_handle(base, newpath);
         _sph = std::move(r.first);
         _leafname = std::move(r.second);
         return success();
       }
-      catch(...)
+      LLFIO_CATCH(...)
       {
         return error_from_exception();
       }
@@ -182,11 +182,11 @@ namespace algorithm
   {
     construct<T> constructor{std::forward<Args>(args)...};
     OUTCOME_TRY(auto &&h, constructor());
-    try
+    LLFIO_TRY
     {
       return cached_parent_handle_adapter<T>(std::move(h), constructor.base, constructor._path);
     }
-    catch(...)
+    LLFIO_CATCH(...)
     {
       return error_from_exception();
     }
@@ -201,11 +201,11 @@ template <class T> struct construct<algorithm::cached_parent_handle_adapter<T>>
   result<algorithm::cached_parent_handle_adapter<T>> operator()() const noexcept
   {
     OUTCOME_TRY(auto &&h, args());
-    try
+    LLFIO_TRY
     {
       return algorithm::cached_parent_handle_adapter<T>(std::move(h), args.base, args._path);
     }
-    catch(...)
+    LLFIO_CATCH(...)
     {
       return error_from_exception();
     }

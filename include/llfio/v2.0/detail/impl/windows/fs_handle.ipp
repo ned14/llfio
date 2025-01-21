@@ -49,7 +49,7 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
   {
     OUTCOME_TRY(_fetch_inode());
   }
-  try
+  LLFIO_TRY
   {
     for(;;)
     {
@@ -123,7 +123,7 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
       LLFIO_WIN_DEADLINE_TO_TIMEOUT_LOOP(d);
     }
   }
-  catch(...)
+  LLFIO_CATCH(...)
   {
     return error_from_exception();
   }
@@ -335,12 +335,12 @@ result<void> fs_handle::unlink(deadline d) noexcept
     {
       // Rename it to something random to emulate immediate unlinking
       std::string randomname;
-      try
+      LLFIO_TRY
       {
         randomname = utils::random_string(32);
         randomname.append(".deleted");
       }
-      catch(...)
+      LLFIO_CATCH(...)
       {
         return error_from_exception();
       }
@@ -592,7 +592,7 @@ result<void> fs_handle::set_extended_attribute(path_view_component name, span<co
   the value will atomically update.
   */
   handle attribh;
-  try
+  LLFIO_TRY
   {
     for(;;)
     {
@@ -609,7 +609,7 @@ result<void> fs_handle::set_extended_attribute(path_view_component name, span<co
       }
     }
   }
-  catch(...)
+  LLFIO_CATCH(...)
   {
     return error_from_exception();
   }

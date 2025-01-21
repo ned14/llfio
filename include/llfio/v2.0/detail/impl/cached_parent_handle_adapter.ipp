@@ -46,7 +46,7 @@ namespace algorithm
     }
     LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<filesystem::path> cached_path_handle::current_path(const filesystem::path &append) noexcept
     {
-      try
+      LLFIO_TRY
       {
         auto ret = h.current_path();
         auto &map = cached_path_handle_map();
@@ -65,7 +65,7 @@ namespace algorithm
         }
         return _lastpath / append;
       }
-      catch(...)
+      LLFIO_CATCH(...)
       {
         return error_from_exception();
       }

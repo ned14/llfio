@@ -272,7 +272,7 @@ result<map_handle> map_handle::_recycled_map(size_type bytes, section_handle::fl
 
 bool map_handle::_recycle_map() noexcept
 {
-  try
+  LLFIO_TRY
   {
     LLFIO_LOG_FUNCTION_CALL(this);
     auto *c = detail::map_handle_cache();
@@ -311,7 +311,7 @@ bool map_handle::_recycle_map() noexcept
 #endif
     return c->add(_reservation, _pagesize, _addr);
   }
-  catch(...)
+  LLFIO_CATCH(...)
   {
     return false;
   }

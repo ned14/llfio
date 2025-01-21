@@ -89,7 +89,7 @@ namespace algorithm
 
     static std::shared_ptr<contents_type> _thread_contents(_state_type *state) noexcept
     {
-      try
+      LLFIO_TRY
       {
         static thread_local std::weak_ptr<contents_type> mycontents;
         auto ret = mycontents.lock();
@@ -103,7 +103,7 @@ namespace algorithm
         state->all_thread_contents.push_back(ret);
         return ret;
       }
-      catch(...)
+      LLFIO_CATCH(...)
       {
         return {};
       }
@@ -116,7 +116,7 @@ namespace algorithm
     */
     virtual result<void> post_enumeration(void *data, const directory_handle &dirh, directory_handle::buffers_type &contents, size_t depth) noexcept
     {
-      try
+      LLFIO_TRY
       {
         auto *state = (_state_type *) data;
         (void) depth;
@@ -171,7 +171,7 @@ namespace algorithm
         }
         return success();
       }
-      catch(...)
+      LLFIO_CATCH(...)
       {
         return error_from_exception();
       }
@@ -183,7 +183,7 @@ namespace algorithm
     */
     virtual result<size_t> finished(void *data, result<size_t> result) noexcept
     {
-      try
+      LLFIO_TRY
       {
         auto *state = (_state_type *) data;
         state->contents.clear();
@@ -201,7 +201,7 @@ namespace algorithm
         state->all_thread_contents.clear();
         return result;
       }
-      catch(...)
+      LLFIO_CATCH(...)
       {
         return error_from_exception();
       }

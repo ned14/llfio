@@ -248,7 +248,7 @@ namespace algorithm
       {
         if(i >= size())
         {
-          throw std::out_of_range("bounds exceeded");  // NOLINT
+          LLFIO_THROW std::out_of_range("bounds exceeded");  // NOLINT
         }
         return _begin[i];
       }
@@ -257,7 +257,7 @@ namespace algorithm
       {
         if(i >= size())
         {
-          throw std::out_of_range("bounds exceeded");  // NOLINT
+          LLFIO_THROW std::out_of_range("bounds exceeded");  // NOLINT
         }
         return _begin[i];
       }
@@ -314,7 +314,7 @@ namespace algorithm
       {
         if(n > max_size())
         {
-          throw std::length_error("Max size exceeded");  // NOLINT
+          LLFIO_THROW std::length_error("Max size exceeded");  // NOLINT
         }
         size_type current_size = size();
         size_type bytes = n * sizeof(value_type);
@@ -435,11 +435,11 @@ namespace algorithm
         // Trivially copyable, so memmove
         memmove(pos._v + 1, pos._v, (_end - pos._v) * sizeof(value_type));
         // BUT complex constructors may throw!
-        try
+        LLFIO_TRY
         {
           new(pos._v) value_type(std::forward<Args>(args)...);
         }
-        catch(...)
+        LLFIO_CATCH(...)
         {
           memmove(pos._v, pos._v + 1, (_end - pos._v) * sizeof(value_type));
           throw;

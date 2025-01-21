@@ -29,7 +29,7 @@ Distributed under the Boost Software License, Version 1.0.
 LLFIO_V2_NAMESPACE_BEGIN
 
 result<bool> path_handle::exists(path_view_type path) const noexcept {
-  try
+  LLFIO_TRY
   {
     LLFIO_LOG_FUNCTION_CALL(this);
     path_view::zero_terminated_rendered_path<> zpath(path);
@@ -45,7 +45,7 @@ result<bool> path_handle::exists(path_view_type path) const noexcept {
     }
     return (x == F_OK);
   }
-  catch(...)
+  LLFIO_CATCH(...)
   {
     return error_from_exception();
   }

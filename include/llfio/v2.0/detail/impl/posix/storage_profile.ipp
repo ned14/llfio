@@ -52,7 +52,7 @@ namespace storage_profile
       }
       else
       {
-        try
+        LLFIO_TRY
         {
           struct utsname name
           {
@@ -65,7 +65,7 @@ namespace storage_profile
           sp.os_name.value = os_name = name.sysname;
           sp.os_ver.value = os_ver = name.release;
         }
-        catch(...)
+        LLFIO_CATCH(...)
         {
           return std::current_exception();
         }
@@ -86,7 +86,7 @@ namespace storage_profile
       }
       else
       {
-        try
+        LLFIO_TRY
         {
           struct utsname name
           {
@@ -199,7 +199,7 @@ namespace storage_profile
           cpu_architecture = sp.cpu_architecture.value;
           cpu_physical_cores = sp.cpu_physical_cores.value;
         }
-        catch(...)
+        LLFIO_CATCH(...)
         {
           return std::current_exception();
         }
@@ -241,7 +241,7 @@ namespace storage_profile
       outcome<void> _device(storage_profile &sp, file_handle & /*unused*/, const std::string &_mntfromname, const std::string &fstypename) noexcept
       {
         (void) fstypename;
-        try
+        LLFIO_TRY
         {
           std::string mntfromname(_mntfromname);
           // Firstly open a handle to the device
@@ -312,7 +312,7 @@ namespace storage_profile
           ioctl(deviceh.native_handle().fd, DKIOCGETBLOCKCOUNT, &sp.device_size.value);
 #endif
         }
-        catch(...)
+        LLFIO_CATCH(...)
         {
           return std::current_exception();
         }

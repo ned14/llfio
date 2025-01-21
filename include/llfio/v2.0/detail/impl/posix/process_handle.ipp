@@ -218,7 +218,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC const process_handle &process_handle::current() 
 LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<process_handle> process_handle::launch_process(path_view path, span<path_view_component> args,
                                                                                       span<path_view_component> env, flag flags) noexcept
 {
-  try
+  LLFIO_TRY
   {
     result<process_handle> ret(in_place_type<process_handle>, native_handle_type(), flags);
     native_handle_type &nativeh = ret.value()._v;
@@ -366,7 +366,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<process_handle> process_handle::launch_pr
 #endif
     return ret;
   }
-  catch(...)
+  LLFIO_CATCH(...)
   {
     return error_from_exception();
   }

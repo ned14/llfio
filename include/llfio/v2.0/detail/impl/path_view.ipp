@@ -106,7 +106,7 @@ namespace detail
         // If input is supposed to be valid UTF, barf
         if(std::is_same<SrcT, char8_t>::value || std::is_same<SrcT, char16_t>::value)
         {
-          throw std::system_error(make_error_code(std::errc::illegal_byte_sequence));
+          LLFIO_THROW std::system_error(make_error_code(std::errc::illegal_byte_sequence));
         }
         // Otherwise proceed anyway :)
         LLFIO_LOG_WARN(nullptr, "path_view_component::rendered_path saw failure to completely convert input encoding");
@@ -222,7 +222,7 @@ namespace detail
       state.buffer.Buffer = (wchar_t *) malloc(state.buffer.MaximumLength);
       if(nullptr == state.buffer.Buffer)
       {
-        throw std::bad_alloc();
+        LLFIO_THROW std::bad_alloc();
       }
       // Do the conversion UTF-8 to UTF-16
       ntstat = RtlUTF8ToUnicodeN(state.buffer.Buffer, state.buffer.Length, &written, (const char *) src_buffer, static_cast<ULONG>(src_buffer_length));
@@ -242,7 +242,7 @@ namespace detail
       state.buffer.Buffer = (wchar_t *) malloc(state.buffer.MaximumLength);
       if(nullptr == state.buffer.Buffer)
       {
-        throw std::bad_alloc();
+        LLFIO_THROW std::bad_alloc();
       }
       // Do the conversion UTF-8 to UTF-16
       auto *src_ptr = src_buffer;
@@ -258,12 +258,12 @@ namespace detail
       if(std::codecvt_base::error == result)
       {
         // If input is supposed to be valid UTF, barf
-        throw std::system_error(make_error_code(std::errc::illegal_byte_sequence));
+        LLFIO_THROW std::system_error(make_error_code(std::errc::illegal_byte_sequence));
       }
       written = (DWORD)((dest_ptr - state.buffer.Buffer) * sizeof(wchar_t));
       if(written > 65535)
       {
-        throw std::system_error(make_error_code(std::errc::no_buffer_space));
+        LLFIO_THROW std::system_error(make_error_code(std::errc::no_buffer_space));
       }
       state.buffer.Length = (USHORT) written;
     }

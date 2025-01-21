@@ -135,9 +135,6 @@ Distributed under the Boost Software License, Version 1.0.
 #include "quickcpplib/cpp_feature.h"
 
 #ifndef STANDARDESE_IS_IN_THE_HOUSE
-#ifndef __cpp_exceptions
-#error LLFIO needs C++ exceptions to be turned on
-#endif
 #ifndef __cpp_alias_templates
 #error LLFIO needs template alias support in the compiler
 #endif
@@ -165,6 +162,20 @@ Distributed under the Boost Software License, Version 1.0.
 // clang-format on
 #error LLFIO needs an implementation of the Filesystem TS in the standard library
 #endif
+#endif
+#ifndef __cpp_exceptions
+#define LLFIO_TRY      if (true)
+#define LLFIO_CATCH(x) if (false)
+#define LLFIO_CATCH_SPECIFIC_BEGIN(x) (void)([&](x) {
+#define LLFIO_CATCH_SPECIFIC_END      });
+#define LLFIO_THROW
+#else
+// Else proceed normally.
+#define LLFIO_TRY      try
+#define LLFIO_CATCH(e) catch(e)
+#define LLFIO_CATCH_SPECIFIC_BEGIN(e) LLFIO_CATCH(e) {
+#define LLFIO_CATCH_SPECIFIC_END      }
+#define LLFIO_THROW throw
 #endif
 #endif
 

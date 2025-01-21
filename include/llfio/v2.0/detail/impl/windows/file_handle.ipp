@@ -1,5 +1,5 @@
 /* A handle to a file
-(C) 2015-2024 Niall Douglas <http://www.nedproductions.biz/> (16 commits)
+(C) 2015-2021 Niall Douglas <http://www.nedproductions.biz/> (16 commits)
 File Created: Dec 2015
 
 
@@ -219,7 +219,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   std::wstring random(68, 0);
   for(;;)
   {
-    try
+    LLFIO_TRY
     {
       _random = utils::random_string(32) + ".tmp";
       for(size_t n = 0; n < _random.size(); n++)
@@ -227,7 +227,7 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
         random[n] = _random[n];
       }
     }
-    catch(...)
+    LLFIO_CATCH(...)
     {
       return error_from_exception();
     }
@@ -367,7 +367,7 @@ result<std::vector<file_handle::extent_pair>> file_handle::extents() const noexc
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   LLFIO_LOG_FUNCTION_CALL(this);
-  try
+  LLFIO_TRY
   {
     static_assert(sizeof(file_handle::extent_pair) == sizeof(FILE_ALLOCATED_RANGE_BUFFER),
                   "FILE_ALLOCATED_RANGE_BUFFER is not equivalent to pair<extent_type, extent_type>!");
@@ -398,10 +398,9 @@ result<std::vector<file_handle::extent_pair>> file_handle::extents() const noexc
         return win32_error();
       }
     }
-    ret.resize(bytesout / sizeof(FILE_ALLOCATED_RANGE_BUFFER));
     return ret;
   }
-  catch(...)
+  LLFIO_CATCH(...)
   {
     return error_from_exception();
   }
@@ -410,7 +409,7 @@ result<std::vector<file_handle::extent_pair>> file_handle::extents() const noexc
 result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::extent_pair extent, byte_io_handle &dest_, byte_io_handle::extent_type destoffset,
                                                                deadline d, bool force_copy_now, bool emulate_if_unsupported) noexcept
 {
-  try
+  LLFIO_TRY
   {
     windows_nt_kernel::init();
     using namespace windows_nt_kernel;
@@ -840,7 +839,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
     }
     return ret;
   }
-  catch(...)
+  LLFIO_CATCH(...)
   {
     return error_from_exception();
   }
@@ -885,7 +884,7 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_pair exte
 
 LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<uint32_t, float>> statfs_t::_fill_ios(const handle & /*unused*/, const std::string &mntfromname) noexcept
 {
-  try
+  LLFIO_TRY
   {
     alignas(8) wchar_t buffer[32769];
     // Firstly open a handle to the volume
@@ -978,7 +977,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<uint32_t, float>> statfs_t::_fi
     iosbusytime /= disk_extents;
     return {iosinprogress, std::min(iosbusytime, 1.0f)};
   }
-  catch(...)
+  LLFIO_CATCH(...)
   {
     return error_from_exception();
   }

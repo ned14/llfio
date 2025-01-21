@@ -224,7 +224,7 @@ namespace utils
   result<process_memory_usage> current_process_memory_usage(process_memory_usage::want want) noexcept
   {
 #ifdef __linux__
-    try
+    LLFIO_TRY
     {
       auto fill_buffer = [](std::vector<char> &buffer, const char *path) -> result<void>
       {
@@ -535,7 +535,7 @@ namespace utils
       }
       return ret;
     }
-    catch(...)
+    LLFIO_CATCH(...)
     {
       return error_from_exception();
     }
@@ -650,7 +650,7 @@ namespace utils
   {
     process_cpu_usage ret;
 #ifdef __linux__
-    try
+    LLFIO_TRY
     {
       /* Need to multiply all below by 1000000000ULL / sysconf(_SC_CLK_TCK)
 
@@ -721,7 +721,7 @@ namespace utils
       ret.system_ns_in_idle_mode *= ts_multiplier;
       return ret;
     }
-    catch(...)
+    LLFIO_CATCH(...)
     {
       return error_from_exception();
     }

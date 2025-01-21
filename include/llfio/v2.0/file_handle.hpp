@@ -175,7 +175,7 @@ public:
   static inline result<file_handle> uniquely_named_file(const path_handle &dirpath, mode _mode = mode::write, caching _caching = caching::temporary,
                                                         flag flags = flag::none) noexcept
   {
-    try
+    LLFIO_TRY
     {
       for(;;)
       {
@@ -188,7 +188,7 @@ public:
         }
       }
     }
-    catch(...)
+    LLFIO_CATCH(...)
     {
       return error_from_exception();
     }
