@@ -17,7 +17,7 @@ var structkvstore__v1__xxx_1_1basic__key__value__store__info =
       [ "atomic_snapshots", "structkvstore__v1__xxx_1_1basic__key__value__store__info.html#af30d19036dae0956d02af0c1e867c54aa5a728b7bc78a19837107974cf95a4d72", null ],
       [ "atomic_transactions", "structkvstore__v1__xxx_1_1basic__key__value__store__info.html#af30d19036dae0956d02af0c1e867c54aa28f74a66be96d3481e374af6b741172f", null ]
     ] ],
-    [ "create", "structkvstore__v1__xxx_1_1basic__key__value__store__info.html#aa52a30f6b8dafd8720fb6b19d7df3847", null ],
+    [ "create", "structkvstore__v1__xxx_1_1basic__key__value__store__info.html#af9aa104a0d908e4c021b394131004e39", null ],
     [ "features", "structkvstore__v1__xxx_1_1basic__key__value__store__info.html#adf38388186505565b7ebb4f87a6f0124", null ],
     [ "max_key_size", "structkvstore__v1__xxx_1_1basic__key__value__store__info.html#a55c5a2ab7632d6d6364ecabb96e97bee", null ],
     [ "max_value_size", "structkvstore__v1__xxx_1_1basic__key__value__store__info.html#a860380a3823942caabac91e2d819b781", null ],

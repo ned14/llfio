@@ -8,20 +8,14 @@ var structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type =
     [ "buffer_type", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#a999fb2891ee9655624d13fde3056fa1e", null ],
     [ "buffer_type", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#a835328fa5acca676ada83ceed840e49b", null ],
     [ "buffer_type", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#a466f7f5a0178840ce415e4e83204976f", null ],
-    [ "buffer_type", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#a1ca398ae766fe210f8bc31f994989747", null ],
-    [ "buffer_type", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#a7fc919389d1e96721a8370f2183de7ad", null ],
-    [ "~buffer_type", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#aa3647a10810a85331b70a4512a8396a1", null ],
     [ "begin", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#a10475a4cef587f0fa51e1b3c526736e2", null ],
     [ "begin", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#ac7eec94c3d4f2aa4bb06172289ca3753", null ],
     [ "cbegin", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#a486b5cbbc4de7b5c572503e42c057815", null ],
     [ "cend", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#a76ffb549dc0e19f718f14544bd22cfdc", null ],
     [ "data", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#ae28e6b362e687d3e98fdccb55261c5a3", null ],
     [ "data", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#a17e2cc8dac55f5440535af9c0823725f", null ],
-    [ "empty", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#aa4f445cc03b2698d625c088b6c0ad6cf", null ],
+    [ "empty", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#a892ff9532c145bae7673f67c0e73afca", null ],
     [ "end", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#acaf365bfe0cf3b7ad2419d9153ef0f90", null ],
     [ "end", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#a92d22ceba2b4c1f1d280e9a905420118", null ],
-    [ "operator=", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#a9effdb241919275af35795a99d3fa42a", null ],
-    [ "operator=", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#aa4491b8333320d5d7236d8a85ffb738e", null ],
-    [ "size", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#ae6b3907e2883f99107b30c8d7fe239e6", null ],
-    [ "_check_iovec_match", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#a2be41190e9bc27f3a11510b92fe7d951", null ]
+    [ "size", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#ae6b3907e2883f99107b30c8d7fe239e6", null ]
 ];

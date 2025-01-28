@@ -1,7 +1,5 @@
 var structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__operation__state__visitor =
 [
-    [ "lock_guard", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__operation__state__visitor.html#a82960b8165764be60ee8570d1c6eda18", null ],
-    [ "~io_operation_state_visitor", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__operation__state__visitor.html#acaaded4c6d97d60510f3c81f5f15ee06", null ],
     [ "barrier_completed", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__operation__state__visitor.html#a10b5b6813433311fa085d68cb95cfe8a", null ],
     [ "barrier_initiated", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__operation__state__visitor.html#a30dade632ef635797cbc6fafcb7293de", null ],
     [ "read_completed", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__operation__state__visitor.html#a2c42f9a0c07e9ad3f16f4c739aaaa016", null ],

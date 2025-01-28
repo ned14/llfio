@@ -1,11 +1,5 @@
 var classllfio__v2__xxx_1_1ip_1_1address__v6 =
 [
-    [ "bytes_type", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#a8e69c7e87bf8450573c87409dfeb7a07", null ],
-    [ "address_v6", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#a552908fe4d47fd7b658839e249c395a1", null ],
-    [ "address_v6", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#a6971b622d0221477923a4b1c9974e8ee", null ],
-    [ "address_v6", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#a3789b936cdf3bbcde8fe2d11da992bb9", null ],
-    [ "address_v6", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#a8b0b8d3f62be362486d48f1ef11ff00b", null ],
-    [ "~address_v6", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#aa41a5578a8aa220eec82f96d36312b7e", null ],
     [ "family", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#ac2a0322d2c3843fa9383ba2bf62005a8", null ],
     [ "flowinfo", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#ad4b91b3286167fc174ef605e67e96376", null ],
     [ "is_any", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#a352fc59577ca546274ca165144bd04a8", null ],
@@ -16,23 +10,11 @@ var classllfio__v2__xxx_1_1ip_1_1address__v6 =
     [ "is_v6", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#a13404ee7b9398a66fb62be0c73a58f4e", null ],
     [ "operator!=", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#aaa91bdb827084391c11457da57e770cd", null ],
     [ "operator<", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#ac9865ec60334be3ae89b6de6e61f0110", null ],
-    [ "operator=", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#a2134d871349cd228e3d1bd4d64cf7b30", null ],
-    [ "operator=", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#af839d2e60d27572b6bc54515f8c468da", null ],
     [ "operator==", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#a0e04366aa54b4058b94576d2ed565b81", null ],
     [ "port", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#a992e386ea6236b2f0a07ec370828589c", null ],
     [ "raw_family", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#a8e0c187ffd6d762b0e4fd7974db4a495", null ],
     [ "scope_id", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#a02fe0d2558a2bcf2f790988ab7ea8018", null ],
     [ "sockaddrlen", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#af15952469793e50f7c7733d03ba64f8a", null ],
-    [ "to_bytes", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#a600ac2eb4ed52a34c08bfa20eecea6a7", null ],
-    [ "to_sockaddr", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#a7865fec603fb30f5bceb9757b42d3d5e", null ],
-    [ "make_address_v6", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#a0cd36cf7e8c232aa4aa4bb4f7ee68a17", null ],
-    [ "_addr", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#a9afdb474677db26b053b397c89339150", null ],
-    [ "_addr_be", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#a4cf511d414cd6df6235242cfd8997387", null ],
-    [ "_family", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#af72062caf455270931bc8843fc33ead7", null ],
-    [ "_flowinfo", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#a2b536fafe01a44f2fee6f57ba55e46ba", null ],
-    [ "_port", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#a5684198c07c31dcac592aa0c001aa874", null ],
-    [ "_scope_id", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#a83ed980c081a7af733b5203f9212c317", null ],
-    [ "_storage", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#a494a4d40bc10b035893784e416f1eb61", null ],
-    [ "ipv4", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#a774e77794b42d9a33273f04de0c2c457", null ],
-    [ "ipv6", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#a3ce03031a1c947abde375b108bbb682a", null ]
+    [ "to_sockaddr", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#aff184c7c7018d6192a1de9ee7ca0a475", null ],
+    [ "make_address_v6", "classllfio__v2__xxx_1_1ip_1_1address__v6.html#a7dbfe0069463b56a8e013f859c3d9900", null ]
 ];

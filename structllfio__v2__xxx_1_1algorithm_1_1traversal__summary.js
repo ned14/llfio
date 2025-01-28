@@ -1,13 +1,6 @@
 var structllfio__v2__xxx_1_1algorithm_1_1traversal__summary =
 [
-    [ "map_type", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#ab4258d77fcc2f077260d06fdb0110e59", null ],
-    [ "traversal_summary", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#ad9bba4b90a004b07a15a5b324123415b", null ],
-    [ "traversal_summary", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#a533cb66597118c350ee8ca7fa676babd", null ],
-    [ "traversal_summary", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#a16b4e7953e25f603c1265d5c6510e51c", null ],
-    [ "operator+=", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#a388749e9ec590deede8f91f7827d632b", null ],
-    [ "operator=", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#abeac3c35cc18de2e87082af16f4efa38", null ],
-    [ "operator=", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#a31bc382aac68fd74714cd259f4b134c9", null ],
-    [ "_lock", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#acbf29cd42621edbff393a0ab84eb1753", null ],
+    [ "operator+=", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#a94824ccecb2eee42a305843bdea9bac6", null ],
     [ "allocated", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#ae0533251c886dd5a8e8ec46a9a7367c7", null ],
     [ "devs", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#a87a9c093f4545e1e3a9aa056f7e888c7", null ],
     [ "directory_blocks", "structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#a7ba41ce2ef1ecb93e764d7a60ad9a006", null ],

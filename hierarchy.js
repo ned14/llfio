@@ -113,17 +113,16 @@ var hierarchy =
     [ "kvstore_v1_xxx::traits::is_trivially_attachable< T >", "structkvstore__v1__xxx_1_1traits_1_1is__trivially__attachable.html", null ],
     [ "kvstore_v1_xxx::traits::is_trivially_detachable< T >", "structkvstore__v1__xxx_1_1traits_1_1is__trivially__detachable.html", null ],
     [ "llfio_v2_xxx::storage_profile::item_base", "structllfio__v2__xxx_1_1storage__profile_1_1item__base.html", [
-      [ "llfio_v2_xxx::storage_profile::item< unsigned long long >", "structllfio__v2__xxx_1_1storage__profile_1_1item.html", null ],
       [ "llfio_v2_xxx::storage_profile::item< std::string >", "structllfio__v2__xxx_1_1storage__profile_1_1item.html", null ],
-      [ "llfio_v2_xxx::storage_profile::item< float >", "structllfio__v2__xxx_1_1storage__profile_1_1item.html", null ],
       [ "llfio_v2_xxx::storage_profile::item< unsigned >", "structllfio__v2__xxx_1_1storage__profile_1_1item.html", null ],
+      [ "llfio_v2_xxx::storage_profile::item< unsigned long long >", "structllfio__v2__xxx_1_1storage__profile_1_1item.html", null ],
+      [ "llfio_v2_xxx::storage_profile::item< float >", "structllfio__v2__xxx_1_1storage__profile_1_1item.html", null ],
       [ "llfio_v2_xxx::storage_profile::item< byte_io_handle::extent_type >", "structllfio__v2__xxx_1_1storage__profile_1_1item.html", null ],
       [ "llfio_v2_xxx::storage_profile::item< T >", "structllfio__v2__xxx_1_1storage__profile_1_1item.html", null ],
       [ "llfio_v2_xxx::storage_profile::item_erased", "structllfio__v2__xxx_1_1storage__profile_1_1item__erased.html", null ]
     ] ],
     [ "llfio_v2_xxx::byte_io_multiplexer::implementation_information_t::multiplexes_t::kernel_t", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1implementation__information__t_1_1multiplexes__t_1_1kernel__t.html", null ],
     [ "llfio_v2_xxx::byte_io_multiplexer::io_operation_state::lock_guard", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__operation__state_1_1lock__guard.html", null ],
-    [ "llfio_v2_xxx::log_level_guard", "classllfio__v2__xxx_1_1log__level__guard.html", null ],
     [ "llfio_v2_xxx::byte_io_multiplexer::implementation_information_t::multiplexes_t", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1implementation__information__t_1_1multiplexes__t.html", null ],
     [ "llfio_v2_xxx::native_handle_type", "structllfio__v2__xxx_1_1native__handle__type.html", null ],
     [ "llfio_v2_xxx::byte_io_multiplexer::_unsynchronised_io_operation_state::payload_t::noncompleted_t", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t_1_1noncompleted__t.html", null ],
@@ -148,7 +147,7 @@ var hierarchy =
     [ "llfio_v2_xxx::utils::page_allocator< void >::rebind", "structllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
     [ "llfio_v2_xxx::path_view_component::rendered_path< ZeroTermination, T, AllocatorOrDeleter, _internal_buffer_size, type >", "classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html", null ],
     [ "llfio_v2_xxx::ip::resolver", "classllfio__v2__xxx_1_1ip_1_1resolver.html", null ],
-    [ "llfio_v2_xxx::result", null, [
+    [ "llfio_v2_xxx ::result", null, [
       [ "llfio_v2_xxx::byte_io_multiplexer::io_result< buffers_type >", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html", null ],
       [ "llfio_v2_xxx::byte_io_multiplexer::io_result< const_buffers_type >", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html", null ],
       [ "llfio_v2_xxx::byte_io_multiplexer::io_result< T >", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html", null ]
@@ -198,8 +197,8 @@ var hierarchy =
     ] ],
     [ "llfio_v2_xxx::algorithm::impl::trivial_vector_iterator< T >", "classllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__iterator.html", null ],
     [ "std::true_type", null, [
-      [ "in_place_attach_detach::traits::disable_attached_for< llfio_v2_xxx::map_handle >", "structin__place__attach__detach_1_1traits_1_1disable__attached__for_3_01llfio__v2__xxx_1_1map__handle_01_4.html", null ],
-      [ "in_place_attach_detach::traits::disable_attached_for< llfio_v2_xxx::mapped_file_handle >", "structin__place__attach__detach_1_1traits_1_1disable__attached__for_3_01llfio__v2__xxx_1_1mapped__file__handle_01_4.html", null ]
+      [ "in_place_attach_detach::traits::disable_attached_for< llfio_v2_xxx ::map_handle >", "structin__place__attach__detach_1_1traits_1_1disable__attached__for_3_01llfio__v2__xxx_01_1_1map__handle_01_4.html", null ],
+      [ "in_place_attach_detach::traits::disable_attached_for< llfio_v2_xxx ::mapped_file_handle >", "structin__place__attach__detach_1_1traits_1_1disable__attached__for_3_01llfio__v2__xxx_01_1_1mapped__file__handle_01_4.html", null ]
     ] ],
     [ "llfio_v2_xxx::unique_file_lock", "classllfio__v2__xxx_1_1unique__file__lock.html", null ],
     [ "std::vector< T >", null, [

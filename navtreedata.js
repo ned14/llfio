@@ -38,7 +38,7 @@ var NAVTREE =
       [ "Installing libraries from source", "md__build.html#autotoc_md30", null ]
     ] ],
     [ "Todo List", "todo.html", null ],
-    [ "Modules", "modules.html", "modules" ],
+    [ "Topics", "topics.html", "topics" ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ],
       [ "Namespace Members", "namespacemembers.html", [
@@ -60,7 +60,7 @@ var NAVTREE =
         [ "Typedefs", "functions_type.html", null ],
         [ "Enumerations", "functions_enum.html", null ],
         [ "Enumerator", "functions_eval.html", null ],
-        [ "Related Functions", "functions_rela.html", null ]
+        [ "Related Symbols", "functions_rela.html", null ]
       ] ]
     ] ],
     [ "Files", "files.html", [
@@ -75,27 +75,31 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"",
-"classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html#abed292cfeab855d43b220a0ee176a1f6",
-"classllfio__v2__xxx_1_1awaitable__handle.html#af0b352d0f273ba6fa70c178b2c2fee42af7cf95e0f43dc8f79e39ae628c85a11d",
-"classllfio__v2__xxx_1_1byte__socket__handle.html#a63c27d7465022f9ffb326858cb7f5888",
-"classllfio__v2__xxx_1_1fast__random__file__handle.html#a1dd7923bb65456af4da41ebe7cb84982",
-"classllfio__v2__xxx_1_1file__handle.html#a9793fe40564fda2437783488bd51b9f1",
-"classllfio__v2__xxx_1_1ip_1_1address__v4.html#abdee003aeadf38778508f6d4bbeea8a3",
-"classllfio__v2__xxx_1_1lockable__byte__io__handle.html#a0fa5be2d96296f0c355b58035060abf1",
-"classllfio__v2__xxx_1_1map__handle.html#ac94edf4d26e746e2f033116528d6c768",
-"classllfio__v2__xxx_1_1path__handle.html#a4690e0a5364e33a70747beb45585695e",
-"classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html#a804055ba900cb3f0b47f48228ec21d81",
-"classllfio__v2__xxx_1_1process__handle.html#adbdaefb199aea3066cbd0b70118091baa923f2fec60def5b14985ea960e4bc2d4",
-"classllfio__v2__xxx_1_1tls__socket__handle.html#a0dc183a5eca8c3fb601ebecc13540f96",
-"dir_d44c64559bbebec7f509842c48db8b23.html",
-"namespacekvstore__v1__xxx.html#ad464f951f0250c13c513f131f4571f2e",
-"path__discovery_8hpp.html#aad4f3f291d7fbe8be09b692233d72bdf",
-"structllfio__v2__xxx_1_1algorithm_1_1contents__visitor_1_1__state__type.html#aa89c6f12cc8d894fc72b48e8bbc8a634",
-"structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state.html#a6452a27cf7fd0adb1375949d0f9ea4e0",
-"structllfio__v2__xxx_1_1construct_3_01pipe__handle_01_4.html#a1c1c03647dedc0a218247d742989e9ac",
-"structllfio__v2__xxx_1_1statfs__t.html#a0505ba8b6f220ef9256306404843f398a84ba71def686269838034a46bc23d09e",
-"structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html#a3ee6fde7e3f58576e863f5ba9a8ac1bb"
+"annotated.html",
+"classllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__iterator.html#a75263e7a463a37563ebdffc5cadbb469",
+"classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html#a01a933a3116abd41955118b607b47bfd",
+"classllfio__v2__xxx_1_1byte__io__handle.html#a19ceb23d192defc8eb9d151a55135c20",
+"classllfio__v2__xxx_1_1byte__socket__handle.html",
+"classllfio__v2__xxx_1_1directory__handle.html#aad6465d30ee438b860ccc59c0e0fc4dc",
+"classllfio__v2__xxx_1_1fast__random__file__handle.html#ae02db5b127faac6fb99f37de6460ec93",
+"classllfio__v2__xxx_1_1fs__handle.html#ab77ab0e6128cc79fc88d27ab16b1dfe4",
+"classllfio__v2__xxx_1_1ip_1_1address__v6.html#ad4b91b3286167fc174ef605e67e96376",
+"classllfio__v2__xxx_1_1listening__tls__socket__handle.html#a90bf8668df002dac5a7d9397486b2946",
+"classllfio__v2__xxx_1_1map__handle.html#a086842dbe51124f655be57d607ce6ac0",
+"classllfio__v2__xxx_1_1mapped__file__handle.html#a32dd26dd2dbffbab505e7b7bd8aa41ee",
+"classllfio__v2__xxx_1_1path__handle.html#ae81c55923bdf4bfc78c75fa60c2badcc",
+"classllfio__v2__xxx_1_1path__view__component.html#aaddc29d3eb4bd29e2a676ad0eac864c0",
+"classllfio__v2__xxx_1_1process__handle.html#a4690e0a5364e33a70747beb45585695e",
+"classllfio__v2__xxx_1_1section__handle.html#a8036792f332459064172d7b0cfaee3cf",
+"classllfio__v2__xxx_1_1tls__socket__handle.html#a3332402037676a708b7f346a59a24d57",
+"functions.html",
+"namespacellfio__v2__xxx.html#af909fbaabae06c5831b45bc7f506d2dd",
+"structllfio__v2__xxx_1_1algorithm_1_1comparison__summary_1_1__lr.html#ae0533251c886dd5a8e8ec46a9a7367c7",
+"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a9ce5b87e963aa7a8f968ed23adcd2046",
+"structllfio__v2__xxx_1_1byte__io__multiplexer_1_1buffer__type.html#a76ffb549dc0e19f718f14544bd22cfdc",
+"structllfio__v2__xxx_1_1listening__socket__handle__buffer__types__injector.html#a8b89721b4396bf156554d52fe1507283",
+"structllfio__v2__xxx_1_1stat__t.html#ad42affc84324ad00a39379ab3d9a428b",
+"structllfio__v2__xxx_1_1symlink__handle_1_1io__request_3_01buffers__type_00_01_________01_4.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

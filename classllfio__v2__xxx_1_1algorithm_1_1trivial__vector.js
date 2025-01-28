@@ -11,7 +11,6 @@ var classllfio__v2__xxx_1_1algorithm_1_1trivial__vector =
     [ "reverse_iterator", "classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html#a6477cecf8801118b5d8a5df6df0bc339", null ],
     [ "size_type", "classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html#a9daee40ff05d3b161652273556caf46a", null ],
     [ "value_type", "classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html#a499cc1593d16f042c2d3266b8e0c205a", null ],
-    [ "trivial_vector", "classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html#ab33af3e39910f56747f00f70dc0c8b4e", null ],
     [ "assign", "classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html#aa9a12b102e96f3f5e1cc24a71fbf480b", null ],
     [ "assign", "classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html#aea98df8215a197c3356e5ff9098ae238", null ],
     [ "assign", "classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html#ae539f1d862f516854859e22adad5e833", null ],

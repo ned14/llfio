@@ -2,15 +2,13 @@ var classllfio__v2__xxx_1_1dynamic__thread__pool__group =
 [
     [ "io_aware_work_item", "classllfio__v2__xxx_1_1dynamic__thread__pool__group_1_1io__aware__work__item.html", "classllfio__v2__xxx_1_1dynamic__thread__pool__group_1_1io__aware__work__item" ],
     [ "work_item", "classllfio__v2__xxx_1_1dynamic__thread__pool__group_1_1work__item.html", "classllfio__v2__xxx_1_1dynamic__thread__pool__group_1_1work__item" ],
-    [ "~dynamic_thread_pool_group", "classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#a926ed224e83131320905ea6917cbefa3", null ],
-    [ "stop", "classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#abbbcb9428ee9fcb6cdd4a41c793f55db", null ],
+    [ "stop", "classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#aa4f44cc183122a9766be6c11b12fd98c", null ],
     [ "stopped", "classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#a1a5a7e9924b9e428e77d4167e716f57c", null ],
     [ "stopping", "classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#a5e549f8799d24821dbc14c25eee88a9f", null ],
-    [ "submit", "classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#a91e10f2075f15a500f0fcd42a8309c14", null ],
-    [ "submit", "classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#ab59c09d197cc2ab310375d6e0b4f06f8", null ],
-    [ "submit", "classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#ac66e72ede37599df150ee8506a92dd66", null ],
-    [ "wait", "classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#a26d88fd329e5c0e04739b3214831a887", null ],
-    [ "wait_for", "classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#a1f8d01ba540996392dd4c8d87b8c6f41", null ],
-    [ "wait_until", "classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#a00fdd6c7fb86e9b1e967a5a5f0305816", null ],
-    [ "dynamic_thread_pool_group_impl", "classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#acd9883ca1a476119de857fac1601332a", null ]
+    [ "submit", "classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#adf54e0c13c95e7e0789117d6098cce3f", null ],
+    [ "submit", "classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#a757839973accd7f62612c419292b6da9", null ],
+    [ "submit", "classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#aa4b7dd1339d1aa07bf66b871fd5a0972", null ],
+    [ "wait", "classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#a62b76c973dd3716d4053b2e8d7af9eae", null ],
+    [ "wait_for", "classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#aeaf57517d9e58604360b053ef2a42648", null ],
+    [ "wait_until", "classllfio__v2__xxx_1_1dynamic__thread__pool__group.html#adff3e2488e09a94868f536747a546362", null ]
 ];
