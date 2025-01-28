@@ -1,5 +1,5 @@
 /* Configures LLFIO
-(C) 2015-2024 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2015-2025 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: Dec 2015
 
 
@@ -135,9 +135,6 @@ Distributed under the Boost Software License, Version 1.0.
 #include "quickcpplib/cpp_feature.h"
 
 #ifndef STANDARDESE_IS_IN_THE_HOUSE
-#ifndef __cpp_exceptions
-#error LLFIO needs C++ exceptions to be turned on
-#endif
 #ifndef __cpp_alias_templates
 #error LLFIO needs template alias support in the compiler
 #endif
@@ -501,6 +498,46 @@ function exported from the LLFIO DLL if not building headers only.
 #define LLFIO_HEADERS_ONLY_FUNC_SPEC extern LLFIO_DECL
 #define LLFIO_HEADERS_ONLY_MEMFUNC_SPEC
 #define LLFIO_HEADERS_ONLY_VIRTUAL_SPEC virtual
+#endif
+
+#ifndef LLFIO_EXCEPTION_TRY
+#ifndef __cpp_exceptions
+#define LLFIO_EXCEPTION_TRY if(true)
+#else
+#define LLFIO_EXCEPTION_TRY try
+#endif
+#endif
+#ifndef LLFIO_EXCEPTION_CATCH
+#ifndef __cpp_exceptions
+#define LLFIO_EXCEPTION_CATCH(init, ...) else if(__VA_ARGS__ = init; false)
+#else
+#define LLFIO_EXCEPTION_CATCH(init, ...) catch(__VA_ARGS__)
+#endif
+#endif
+#ifndef LLFIO_EXCEPTION_CATCH_ALL
+#ifndef __cpp_exceptions
+#define LLFIO_EXCEPTION_CATCH_ALL else if(false)
+#else
+#define LLFIO_EXCEPTION_CATCH_ALL catch(...)
+#endif
+#endif
+#ifndef LLFIO_EXCEPTION_THROW
+#ifndef __cpp_exceptions
+#define LLFIO_EXCEPTION_THROW(...)                                                                                                                             \
+  {                                                                                                                                                            \
+    fprintf(stderr, "FATAL: throw " #__VA_ARGS__ " at " __FILE__ ":%d\n", __LINE__);                                                                           \
+    abort();                                                                                                                                                   \
+  }
+#else
+#define LLFIO_EXCEPTION_THROW(...) throw(__VA_ARGS__)
+#endif
+#endif
+#ifndef LLFIO_EXCEPTION_RETHROW
+#ifndef __cpp_exceptions
+#define LLFIO_EXCEPTION_RETHROW
+#else
+#define LLFIO_EXCEPTION_RETHROW throw
+#endif
 #endif
 
 /* I've been burned by this enough times now that I'm adding a runtime check

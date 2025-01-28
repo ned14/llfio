@@ -160,7 +160,7 @@ namespace storage_profile
       case storage_types::unknown:
         break;
       }
-      throw std::invalid_argument("No type set in item");  // NOLINT
+      LLFIO_EXCEPTION_THROW(std::invalid_argument("No type set in item"));  // NOLINT
     }
     //! Set this item if its value is default
     outcome<void> operator()(storage_profile &sp, handle_type &h) const

@@ -52,7 +52,7 @@ namespace algorithm
     data,
     [&]() -> result<size_t>
     {
-      try
+      LLFIO_EXCEPTION_TRY
       {
         LLFIO_LOG_FUNCTION_CALL(&_topdirh);
         std::shared_ptr<directory_handle> topdirh;
@@ -574,7 +574,7 @@ namespace algorithm
 #endif
         return state.dirs_processed;
       }
-      catch(...)
+      LLFIO_EXCEPTION_CATCH_ALL
       {
         return error_from_exception();
       }

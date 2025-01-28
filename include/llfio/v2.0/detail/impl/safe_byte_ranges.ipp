@@ -377,7 +377,7 @@ namespace algorithm
       }
       LLFIO_HEADERS_ONLY_FUNC_SPEC result<std::shared_ptr<shared_fs_mutex>> inode_to_fs_mutex(const path_handle &base, path_view lockfile) noexcept
       {
-        try
+        LLFIO_EXCEPTION_TRY
         {
           path_view::zero_terminated_rendered_path<> zpath(lockfile);
           struct stat s
@@ -413,7 +413,7 @@ namespace algorithm
           }
           return ret;
         }
-        catch(...)
+        LLFIO_EXCEPTION_CATCH_ALL
         {
           return error_from_exception();
         }

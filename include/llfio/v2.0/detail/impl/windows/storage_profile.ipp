@@ -52,7 +52,7 @@ namespace storage_profile
       }
       else
       {
-        try
+        LLFIO_EXCEPTION_TRY
         {
           using std::to_string;
           RTL_OSVERSIONINFOW ovi{};
@@ -76,7 +76,7 @@ namespace storage_profile
           os_name = sp.os_name.value;
           os_ver = sp.os_ver.value;
         }
-        catch(...)
+        LLFIO_EXCEPTION_CATCH_ALL
         {
           return std::current_exception();
         }
@@ -99,7 +99,7 @@ namespace storage_profile
       }
       else
       {
-        try
+        LLFIO_EXCEPTION_TRY
         {
           SYSTEM_INFO si{};
           memset(&si, 0, sizeof(si));
@@ -193,7 +193,7 @@ namespace storage_profile
           cpu_architecture = sp.cpu_architecture.value;
           cpu_physical_cores = sp.cpu_physical_cores.value;
         }
-        catch(...)
+        LLFIO_EXCEPTION_CATCH_ALL
         {
           return std::current_exception();
         }
@@ -221,7 +221,7 @@ namespace storage_profile
       // Controller type, max transfer, max buffers. Device name, size
       outcome<void> _device(storage_profile &sp, file_handle & /*unused*/, const std::string &_mntfromname, const std::string & /*fstypename*/) noexcept
       {
-        try
+        LLFIO_EXCEPTION_TRY
         {
           if(memcmp(_mntfromname.c_str(), "\\!!\\Device\\Mup", 14) == 0 || memcmp(_mntfromname.c_str(), "\\\\", 2) == 0)
           {
@@ -433,7 +433,7 @@ namespace storage_profile
             sp.device_size.value = dg->DiskSize.QuadPart;
           }
         }
-        catch(...)
+        LLFIO_EXCEPTION_CATCH_ALL
         {
           return std::current_exception();
         }

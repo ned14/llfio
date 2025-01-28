@@ -71,7 +71,7 @@ namespace detail
         end_utc = d.to_time_point();
       }
     }
-    try
+    LLFIO_EXCEPTION_TRY
     {
       for(;;)
       {
@@ -179,7 +179,7 @@ namespace detail
         }
       }
     }
-    catch(...)
+    LLFIO_EXCEPTION_CATCH_ALL
     {
       return error_from_exception();
     }

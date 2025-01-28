@@ -69,7 +69,7 @@ namespace algorithm
     //! This override implements the summary
     virtual result<void> post_enumeration(void *data, const directory_handle &dirh, directory_handle::buffers_type &contents, size_t depth) noexcept override
     {
-      try
+      LLFIO_EXCEPTION_TRY
       {
         auto *state = (comparison_summary *) data;
         comparison_summary acc;
@@ -81,7 +81,7 @@ namespace algorithm
         state->operator+=(acc);
         return success();
       }
-      catch(...)
+      LLFIO_EXCEPTION_CATCH_ALL
       {
         return error_from_exception();
       }

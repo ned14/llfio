@@ -43,13 +43,13 @@ static inline void TestMappedView1()
   v3[49] = 5;
   BOOST_CHECK(v3[0] == 78);
   BOOST_CHECK(v3[49] == 5);
-  try
+  LLFIO_EXCEPTION_TRY
   {
     // Overly large views must not extend the file until written to
     mapped<int> v4(sh, 20000);
     BOOST_CHECK(fh.maximum_extent().value() == 10000 * sizeof(int));
   }
-  catch(...)
+  LLFIO_EXCEPTION_CATCH_ALL
   {
 #ifdef _WIN32
     // Unlike POSIX, Windows refuses to map a view exceeding the length of the file

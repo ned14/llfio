@@ -43,7 +43,7 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
   path_handle dirh;
   path_type leafname;
   int dirhfd = AT_FDCWD;
-  try
+  LLFIO_EXCEPTION_TRY
   {
     // Take a path handle to the directory containing the symlink
     auto path_parent = path.parent_path();
@@ -59,7 +59,7 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
       dirhfd = dirh.native_handle().fd;
     }
   }
-  catch(...)
+  LLFIO_EXCEPTION_CATCH_ALL
   {
     return error_from_exception();
   }

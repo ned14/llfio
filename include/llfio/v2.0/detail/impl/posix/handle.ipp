@@ -55,7 +55,7 @@ handle::~handle()
 result<handle::path_type> handle::current_path() const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  try
+  LLFIO_EXCEPTION_TRY
   {
     // Most efficient, least memory copying method is direct fill of a string which is moved into filesystem::path
     filesystem::path::string_type ret;
@@ -130,7 +130,7 @@ result<handle::path_type> handle::current_path() const noexcept
 #endif
     return path_type(std::move(ret));
   }
-  catch(...)
+  LLFIO_EXCEPTION_CATCH_ALL
   {
     return error_from_exception();
   }

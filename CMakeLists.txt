@@ -1,5 +1,5 @@
 # LLFIO cmake
-# (C) 2016-2023 Niall Douglas <http://www.nedproductions.biz/>
+# (C) 2016-2025 Niall Douglas <http://www.nedproductions.biz/>
 # File Created: June 2016
 # 
 # 
@@ -470,6 +470,68 @@ if(NOT llfio_IS_DEPENDENCY AND (NOT DEFINED BUILD_TESTING OR BUILD_TESTING))
     endforeach()
   endif()
 
+  # Duplicate all tests into C++ exceptions disabled forms
+  set(noexcept_tests)
+  set(first_test_target_noexcept)
+  set(first_test_target_permissive)
+  foreach(testtarget ${llfio_TEST_TARGETS})
+    if(testtarget MATCHES "llfio_hl--(.+)$")
+      set(testname ${CMAKE_MATCH_1})
+      if(TRUE)
+	    get_target_property(testsource ${testtarget} SOURCES)
+        set(target_name "llfio_hl--${testname}-noexcept")
+        add_executable(${target_name} "${testsource}")
+        if(NOT first_test_target_noexcept)
+          set(first_test_target_noexcept ${target_name})
+        elseif(${target_name} MATCHES "coroutines")
+          set_target_properties(${target_name} PROPERTIES DISABLE_PRECOMPILE_HEADERS On)
+        elseif(COMMAND target_precompile_headers)
+          target_precompile_headers(${target_name} REUSE_FROM ${first_test_target_noexcept})
+        endif()
+        target_link_libraries(${target_name} PRIVATE kerneltest::hl)
+        add_dependencies(_hl ${target_name})
+        list(APPEND noexcept_tests ${target_name})
+        if(MSVC AND NOT CLANG)
+          # Disable warnings "C++ exception handler used" and "noexcept used with no exception handling"
+          target_compile_options(${target_name} PRIVATE /wd4530 /wd4577)
+#          target_compile_options(${target_name} PRIVATE /permissive-)  # test bug report #142
+        endif()
+        target_compile_definitions(${target_name} PRIVATE SYSTEM_ERROR2_NOT_POSIX=1 "SYSTEM_ERROR2_FATAL=::abort()")
+        target_link_libraries(${target_name} PRIVATE llfio::hl)
+        set_target_properties(${target_name} PROPERTIES
+          RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+          POSITION_INDEPENDENT_CODE ON
+          CXX_EXCEPTIONS OFF
+          CXX_RTTI OFF
+        )
+        add_test(NAME ${target_name} CONFIGURATIONS Debug Release RelWithDebInfo MinSizeRel
+          COMMAND $<TARGET_FILE:${target_name}> --reporter junit --out $<TARGET_FILE:${target_name}>.junit.xml
+        )
+        if(MSVC AND NOT CLANG)
+          set(target_name "llfio_hl--${testname}-permissive")
+          add_executable(${target_name} "${testsource}")
+          if(NOT first_test_target_permissive)
+            set(first_test_target_permissive ${target_name})
+          elseif(${target_name} MATCHES "coroutines")
+            set_target_properties(${target_name} PROPERTIES DISABLE_PRECOMPILE_HEADERS On)
+          elseif(COMMAND target_precompile_headers)
+            target_precompile_headers(${target_name} REUSE_FROM ${first_test_target_permissive})
+          endif()
+          target_link_libraries(${target_name} PRIVATE kerneltest::hl)
+          add_dependencies(_hl ${target_name})
+          target_link_libraries(${target_name} PRIVATE llfio::hl)
+          target_compile_options(${target_name} PRIVATE /permissive)
+          set_target_properties(${target_name} PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+            POSITION_INDEPENDENT_CODE ON
+          )
+        endif()
+      endif()
+    endif()
+  endforeach()
+  add_custom_target(${PROJECT_NAME}-noexcept COMMENT "Building all tests with C++ exceptions disabled ...")
+  add_dependencies(${PROJECT_NAME}-noexcept ${noexcept_tests})
+  
   # Example targets should have an example- prefix
   foreach(target ${llfio_COMPILE_TEST_TARGETS})
     get_target_property(prop ${target} SOURCES)

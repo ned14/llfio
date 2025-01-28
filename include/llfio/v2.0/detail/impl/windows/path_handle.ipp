@@ -29,7 +29,7 @@ LLFIO_V2_NAMESPACE_BEGIN
 
 result<bool> path_handle::exists(path_view_type path) const noexcept
 {
-  try
+  LLFIO_EXCEPTION_TRY
   {
     windows_nt_kernel::init();
     using namespace windows_nt_kernel;
@@ -68,7 +68,7 @@ result<bool> path_handle::exists(path_view_type path) const noexcept
     }
     return true;
   }
-  catch(...)
+  LLFIO_EXCEPTION_CATCH_ALL
   {
     return error_from_exception();
   }

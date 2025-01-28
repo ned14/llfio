@@ -96,7 +96,7 @@ struct LLFIO_DEADLINE_NAME
   {
     if(steady)
     {
-      throw std::invalid_argument("Not a UTC deadline!");  // NOLINT
+      LLFIO_EXCEPTION_THROW(std::invalid_argument("Not a UTC deadline!"));  // NOLINT
     }
     std::chrono::system_clock::time_point tp(std::chrono::system_clock::from_time_t(utc.tv_sec));
     tp += std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::nanoseconds(utc.tv_nsec));

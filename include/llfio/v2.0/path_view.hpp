@@ -750,7 +750,7 @@ private:
 #else
     if(f != filesystem::path::format::auto_format)
     {
-      throw std::runtime_error("UTF-8 path conversion pre-C++20 cannot handle non-auto_format formatting.");
+      LLFIO_EXCEPTION_THROW(std::runtime_error("UTF-8 path conversion pre-C++20 cannot handle non-auto_format formatting."));
     }
     return filesystem::u8path((const char *) v.data(), (const char *) v.data() + v.size());
 #endif
@@ -837,7 +837,7 @@ public:
 #ifdef LLFIO_USING_EXPERIMENTAL_FILESYSTEM
       if(formatting() == generic_format || formatting() == native_format)
       {
-        throw std::runtime_error("Path conversion with <experimental/filesystem> cannot handle generic_format or native_format formatting.");
+        LLFIO_EXCEPTION_THROW(std::runtime_error("Path conversion with <experimental/filesystem> cannot handle generic_format or native_format formatting."));
       }
       return _path_from_char_array(v);
 #endif
@@ -3177,7 +3177,10 @@ namespace detail
       ret.assign(_.begin(), _.end());
     }
 #endif
-    template <class T> void operator()(span<T> /*unused*/) { throw std::logic_error("filesystem::path cannot be constructed from a byte input."); }
+    template <class T> void operator()(span<T> /*unused*/)
+    {
+      LLFIO_EXCEPTION_THROW(std::logic_error("filesystem::path cannot be constructed from a byte input."));
+    }
   };
 }  // namespace detail
 //! Append a path view component to a path view component
