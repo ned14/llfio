@@ -128,6 +128,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> symlink_handle::_create_symlink(con
   {
     return error_from_exception();
   }
+  abort();
 }
 
 result<symlink_handle> symlink_handle::reopen(mode mode_, deadline d) const noexcept
@@ -330,13 +331,13 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
     }
     else
 #if !LLFIO_SYMLINK_HANDLE_IS_FAKED  // always take a dirh if faking the handle for race safety
-    if(!path_parent.empty())
+      if(!path_parent.empty())
 #endif
-    {
-      // If faking the symlink, write this directly into the member variable cache
-      OUTCOME_TRY(*dirh, path_handle::path(base, path_parent.empty() ? "." : path_parent));
-      dirhfd = dirh->native_handle().fd;
-    }
+      {
+        // If faking the symlink, write this directly into the member variable cache
+        OUTCOME_TRY(*dirh, path_handle::path(base, path_parent.empty() ? "." : path_parent));
+        dirhfd = dirh->native_handle().fd;
+      }
   }
   LLFIO_EXCEPTION_CATCH_ALL
   {

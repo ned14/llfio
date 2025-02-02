@@ -449,6 +449,7 @@ result<std::vector<file_handle::extent_pair>> file_handle::extents() const noexc
   {
     return error_from_exception();
   }
+  abort();
 }
 
 result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::extent_pair extent, byte_io_handle &dest_, byte_io_handle::extent_type destoffset,
@@ -1031,6 +1032,7 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_pair exte
   {
     return error_from_exception();
   }
+  abort();
 }
 
 LLFIO_V2_NAMESPACE_END

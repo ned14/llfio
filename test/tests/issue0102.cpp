@@ -26,7 +26,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 static inline void TestIssue0102()
 {
-#if !LLFIO_EXPERIMENTAL_STATUS_CODE
+#if !LLFIO_EXPERIMENTAL_STATUS_CODE || !defined(__cpp_exceptions)
   return;
 #else
   namespace llfio = LLFIO_V2_NAMESPACE;

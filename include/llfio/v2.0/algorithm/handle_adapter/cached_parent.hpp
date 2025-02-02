@@ -77,7 +77,8 @@ namespace algorithm
   */
   template <class T> LLFIO_REQUIRES(sizeof(construct<T>) > 0) class LLFIO_DECL cached_parent_handle_adapter : public T
   {
-    static_assert(sizeof(construct<T>) > 0, "Type T must be registered with the construct<T> framework so cached_parent_handle_adapter<T> knows how to construct it");  // NOLINT
+    static_assert(sizeof(construct<T>) > 0,
+                  "Type T must be registered with the construct<T> framework so cached_parent_handle_adapter<T> knows how to construct it");  // NOLINT
 
   public:
     //! The handle type being adapted
@@ -162,6 +163,7 @@ namespace algorithm
       {
         return error_from_exception();
       }
+      abort();
     }
     LLFIO_HEADERS_ONLY_VIRTUAL_SPEC
     result<void> unlink(deadline d = std::chrono::seconds(30)) noexcept override
@@ -178,7 +180,7 @@ namespace algorithm
   This function works via the `construct<T>()` free function framework for which your `handle`
   implementation must have registered its construction details.
   */
-  template <class T, class... Args> inline result<cached_parent_handle_adapter<T>> cache_parent(Args &&... args) noexcept
+  template <class T, class... Args> inline result<cached_parent_handle_adapter<T>> cache_parent(Args &&...args) noexcept
   {
     construct<T> constructor{std::forward<Args>(args)...};
     OUTCOME_TRY(auto &&h, constructor());
@@ -209,6 +211,7 @@ template <class T> struct construct<algorithm::cached_parent_handle_adapter<T>>
     {
       return error_from_exception();
     }
+    abort();
   }
 };
 

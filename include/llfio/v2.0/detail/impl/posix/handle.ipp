@@ -81,10 +81,12 @@ result<handle::path_type> handle::current_path() const noexcept
     ret.resize(32769);
     char *out = const_cast<char *>(ret.data());
     // Yes, this API is instant memory corruption. Thank you Apple.
-    if(-1 == fcntl(_v.fd, F_GETPATH, out)) {
+    if(-1 == fcntl(_v.fd, F_GETPATH, out))
+    {
       // Newer Mac OS usefully returns ENOENT if the file is deleted,
       // rather than the previous path
-      if(ENOENT == errno) {
+      if(ENOENT == errno)
+      {
         ret.clear();
         return ret;
       }
@@ -134,6 +136,7 @@ result<handle::path_type> handle::current_path() const noexcept
   {
     return error_from_exception();
   }
+  abort();
 }
 
 result<void> handle::close() noexcept

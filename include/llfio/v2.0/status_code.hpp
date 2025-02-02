@@ -58,9 +58,13 @@ as that (a) enables safe header only LLFIO on Windows (b) produces better codege
 // Bring in status code utility
 #include "outcome/experimental/coroutine_support.hpp"
 #if !OUTCOME_USE_SYSTEM_STATUS_CODE && __has_include("outcome/experimental/status-code/include/status-code/system_code_from_exception.hpp")
+#ifdef __cpp_exceptions
 #include "outcome/experimental/status-code/include/status-code/system_code_from_exception.hpp"
+#endif
 #else
+#ifdef __cpp_exceptions
 #include <status-code/system_code_from_exception.hpp>
+#endif
 #endif
 #if !defined(LLFIO_ENABLE_COROUTINES) && defined(OUTCOME_FOUND_COROUTINE_HEADER)
 #define LLFIO_ENABLE_COROUTINES 1
@@ -309,11 +313,11 @@ using file_io_error = SYSTEM_ERROR2_NAMESPACE::erased_errored_status_code<detail
 template <class T> using result = OUTCOME_V2_NAMESPACE::experimental::status_result<T, file_io_error>;
 #else
 template <class T> using result = OUTCOME_V2_NAMESPACE::experimental::status_result<T, file_io_error, OUTCOME_V2_NAMESPACE::policy::terminate>;
-inline error_info error_from_exception(std::exception_ptr && = std::current_exception(),
-                                       std::error_code = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept
-{
-  abort();  // should never be called
-}
+// inline std::error_code error_from_exception(std::exception_ptr && = std::current_exception(),
+//                                             std::error_code = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept
+//{
+//   abort();  // should never be called
+// }
 #endif
 using OUTCOME_V2_NAMESPACE::failure;
 using OUTCOME_V2_NAMESPACE::in_place_type;
@@ -379,8 +383,12 @@ namespace detail
 inline file_io_error error_from_exception(std::exception_ptr &&ep = std::current_exception(),
                                           SYSTEM_ERROR2_NAMESPACE::system_code not_matched = errc::resource_unavailable_try_again) noexcept
 {
+#ifdef __cpp_exceptions
   return SYSTEM_ERROR2_NAMESPACE::system_code_from_exception(static_cast<std::exception_ptr &&>(ep),
                                                              static_cast<SYSTEM_ERROR2_NAMESPACE::system_code &&>(not_matched));
+#else
+  abort();
+#endif
 }
 
 LLFIO_V2_NAMESPACE_END
