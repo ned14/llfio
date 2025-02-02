@@ -141,17 +141,18 @@ template&lt;class T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  202</span>  {</div>
-<div class="line"><span class="lineno">  203</span>    OUTCOME_TRY(<span class="keyword">auto</span> &amp;&amp;h, args());</div>
-<div class="line"><span class="lineno">  204</span>    LLFIO_EXCEPTION_TRY</div>
-<div class="line"><span class="lineno">  205</span>    {</div>
-<div class="line"><span class="lineno">  206</span>      <span class="keywordflow">return</span> algorithm::cached_parent_handle_adapter&lt;T&gt;(std::move(h), args.base, args._path);</div>
-<div class="line"><span class="lineno">  207</span>    }</div>
-<div class="line"><span class="lineno">  208</span>    LLFIO_EXCEPTION_CATCH_ALL</div>
-<div class="line"><span class="lineno">  209</span>    {</div>
-<div class="line"><span class="lineno">  210</span>      <span class="keywordflow">return</span> error_from_exception();</div>
-<div class="line"><span class="lineno">  211</span>    }</div>
-<div class="line"><span class="lineno">  212</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  204</span>  {</div>
+<div class="line"><span class="lineno">  205</span>    OUTCOME_TRY(<span class="keyword">auto</span> &amp;&amp;h, args());</div>
+<div class="line"><span class="lineno">  206</span>    LLFIO_EXCEPTION_TRY</div>
+<div class="line"><span class="lineno">  207</span>    {</div>
+<div class="line"><span class="lineno">  208</span>      <span class="keywordflow">return</span> algorithm::cached_parent_handle_adapter&lt;T&gt;(std::move(h), args.base, args._path);</div>
+<div class="line"><span class="lineno">  209</span>    }</div>
+<div class="line"><span class="lineno">  210</span>    LLFIO_EXCEPTION_CATCH_ALL</div>
+<div class="line"><span class="lineno">  211</span>    {</div>
+<div class="line"><span class="lineno">  212</span>      <span class="keywordflow">return</span> error_from_exception();</div>
+<div class="line"><span class="lineno">  213</span>    }</div>
+<div class="line"><span class="lineno">  214</span>    abort();</div>
+<div class="line"><span class="lineno">  215</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>

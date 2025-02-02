@@ -195,13 +195,13 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Retrieve a descriptive message for this failure, possibly with paths and stack backtraces. Extra detail only appears if called from the same thread as where the failure occurred. </p>
-<div class="fragment"><div class="line"><span class="lineno">  492</span>  {</div>
-<div class="line"><span class="lineno">  493</span>    std::string ret(ec.message());</div>
-<div class="line"><span class="lineno">  494</span><span class="preprocessor">#if !LLFIO_DISABLE_PATHS_IN_FAILURE_INFO</span></div>
-<div class="line"><span class="lineno">  495</span>    detail::append_path_info(*<span class="keyword">this</span>, ret);</div>
-<div class="line"><span class="lineno">  496</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno">  497</span>    <span class="keywordflow">return</span> ret;</div>
-<div class="line"><span class="lineno">  498</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  500</span>  {</div>
+<div class="line"><span class="lineno">  501</span>    std::string ret(ec.message());</div>
+<div class="line"><span class="lineno">  502</span><span class="preprocessor">#if !LLFIO_DISABLE_PATHS_IN_FAILURE_INFO</span></div>
+<div class="line"><span class="lineno">  503</span>    detail::append_path_info(*<span class="keyword">this</span>, ret);</div>
+<div class="line"><span class="lineno">  504</span><span class="preprocessor">#endif</span></div>
+<div class="line"><span class="lineno">  505</span>    <span class="keywordflow">return</span> ret;</div>
+<div class="line"><span class="lineno">  506</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -230,9 +230,9 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Implicit construct from an error condition enum. </p>
-<div class="fragment"><div class="line"><span class="lineno">  451</span>      : <a class="code hl_function" href="structllfio__v2__xxx_1_1error__info.html#a3831950954e8d008630dcc6e0e1dadf4">error_info</a>(make_error_code(std::forward&lt;ErrorCondEnum&gt;(v)))</div>
-<div class="line"><span class="lineno">  452</span>  {</div>
-<div class="line"><span class="lineno">  453</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  459</span>      : <a class="code hl_function" href="structllfio__v2__xxx_1_1error__info.html#a3831950954e8d008630dcc6e0e1dadf4">error_info</a>(make_error_code(std::forward&lt;ErrorCondEnum&gt;(v)))</div>
+<div class="line"><span class="lineno">  460</span>  {</div>
+<div class="line"><span class="lineno">  461</span>  }</div>
 <div class="ttc" id="astructllfio__v2__xxx_1_1error__info_html_a3831950954e8d008630dcc6e0e1dadf4"><div class="ttname"><a href="structllfio__v2__xxx_1_1error__info.html#a3831950954e8d008630dcc6e0e1dadf4">llfio_v2_xxx::error_info::error_info</a></div><div class="ttdeci">error_info()=default</div><div class="ttdoc">Default constructor.</div></div>
 </div><!-- fragment -->
 </div>
@@ -261,21 +261,21 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Retrieve any first path associated with this failure. Note this only works if called from the same thread as where the failure occurred. </p>
-<div class="fragment"><div class="line"><span class="lineno">  459</span>  {</div>
-<div class="line"><span class="lineno">  460</span><span class="preprocessor">#if !LLFIO_DISABLE_PATHS_IN_FAILURE_INFO</span></div>
-<div class="line"><span class="lineno">  461</span>    <span class="keywordflow">if</span>(QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id() == _thread_id)</div>
-<div class="line"><span class="lineno">  462</span>    {</div>
-<div class="line"><span class="lineno">  463</span>      <span class="keyword">auto</span> &amp;tls = detail::tls_errored_results();</div>
-<div class="line"><span class="lineno">  464</span>      <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code hl_function" href="structllfio__v2__xxx_1_1error__info.html#a9037be55f1038e6ebffe2f98e5b1b6a5">path1</a> = tls.get(_tls_path_id1);</div>
-<div class="line"><span class="lineno">  465</span>      <span class="keywordflow">if</span>(<a class="code hl_function" href="structllfio__v2__xxx_1_1error__info.html#a9037be55f1038e6ebffe2f98e5b1b6a5">path1</a> != <span class="keyword">nullptr</span>)</div>
-<div class="line"><span class="lineno">  466</span>      {</div>
-<div class="line"><span class="lineno">  467</span>        <span class="keywordflow">return</span> filesystem::path(<a class="code hl_function" href="structllfio__v2__xxx_1_1error__info.html#a9037be55f1038e6ebffe2f98e5b1b6a5">path1</a>);</div>
-<div class="line"><span class="lineno">  468</span>      }</div>
-<div class="line"><span class="lineno">  469</span>    }</div>
-<div class="line"><span class="lineno">  470</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno">  471</span>    <span class="keywordflow">return</span> {};</div>
-<div class="line"><span class="lineno">  472</span>  }</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1error__info_html_a9037be55f1038e6ebffe2f98e5b1b6a5"><div class="ttname"><a href="structllfio__v2__xxx_1_1error__info.html#a9037be55f1038e6ebffe2f98e5b1b6a5">llfio_v2_xxx::error_info::path1</a></div><div class="ttdeci">filesystem::path path1() const</div><div class="ttdoc">Retrieve any first path associated with this failure. Note this only works if called from the same th...</div><div class="ttdef"><b>Definition</b> status_code.hpp:458</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  467</span>  {</div>
+<div class="line"><span class="lineno">  468</span><span class="preprocessor">#if !LLFIO_DISABLE_PATHS_IN_FAILURE_INFO</span></div>
+<div class="line"><span class="lineno">  469</span>    <span class="keywordflow">if</span>(QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id() == _thread_id)</div>
+<div class="line"><span class="lineno">  470</span>    {</div>
+<div class="line"><span class="lineno">  471</span>      <span class="keyword">auto</span> &amp;tls = detail::tls_errored_results();</div>
+<div class="line"><span class="lineno">  472</span>      <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code hl_function" href="structllfio__v2__xxx_1_1error__info.html#a9037be55f1038e6ebffe2f98e5b1b6a5">path1</a> = tls.get(_tls_path_id1);</div>
+<div class="line"><span class="lineno">  473</span>      <span class="keywordflow">if</span>(<a class="code hl_function" href="structllfio__v2__xxx_1_1error__info.html#a9037be55f1038e6ebffe2f98e5b1b6a5">path1</a> != <span class="keyword">nullptr</span>)</div>
+<div class="line"><span class="lineno">  474</span>      {</div>
+<div class="line"><span class="lineno">  475</span>        <span class="keywordflow">return</span> filesystem::path(<a class="code hl_function" href="structllfio__v2__xxx_1_1error__info.html#a9037be55f1038e6ebffe2f98e5b1b6a5">path1</a>);</div>
+<div class="line"><span class="lineno">  476</span>      }</div>
+<div class="line"><span class="lineno">  477</span>    }</div>
+<div class="line"><span class="lineno">  478</span><span class="preprocessor">#endif</span></div>
+<div class="line"><span class="lineno">  479</span>    <span class="keywordflow">return</span> {};</div>
+<div class="line"><span class="lineno">  480</span>  }</div>
+<div class="ttc" id="astructllfio__v2__xxx_1_1error__info_html_a9037be55f1038e6ebffe2f98e5b1b6a5"><div class="ttname"><a href="structllfio__v2__xxx_1_1error__info.html#a9037be55f1038e6ebffe2f98e5b1b6a5">llfio_v2_xxx::error_info::path1</a></div><div class="ttdeci">filesystem::path path1() const</div><div class="ttdoc">Retrieve any first path associated with this failure. Note this only works if called from the same th...</div><div class="ttdef"><b>Definition</b> status_code.hpp:466</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -303,21 +303,21 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Retrieve any second path associated with this failure. Note this only works if called from the same thread as where the failure occurred. </p>
-<div class="fragment"><div class="line"><span class="lineno">  475</span>  {</div>
-<div class="line"><span class="lineno">  476</span><span class="preprocessor">#if !LLFIO_DISABLE_PATHS_IN_FAILURE_INFO</span></div>
-<div class="line"><span class="lineno">  477</span>    <span class="keywordflow">if</span>(QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id() == _thread_id)</div>
-<div class="line"><span class="lineno">  478</span>    {</div>
-<div class="line"><span class="lineno">  479</span>      <span class="keyword">auto</span> &amp;tls = detail::tls_errored_results();</div>
-<div class="line"><span class="lineno">  480</span>      <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code hl_function" href="structllfio__v2__xxx_1_1error__info.html#a6bc1649b05341a45c414c48e3dd94f38">path2</a> = tls.get(_tls_path_id2);</div>
-<div class="line"><span class="lineno">  481</span>      <span class="keywordflow">if</span>(<a class="code hl_function" href="structllfio__v2__xxx_1_1error__info.html#a6bc1649b05341a45c414c48e3dd94f38">path2</a> != <span class="keyword">nullptr</span>)</div>
-<div class="line"><span class="lineno">  482</span>      {</div>
-<div class="line"><span class="lineno">  483</span>        <span class="keywordflow">return</span> filesystem::path(<a class="code hl_function" href="structllfio__v2__xxx_1_1error__info.html#a6bc1649b05341a45c414c48e3dd94f38">path2</a>);</div>
-<div class="line"><span class="lineno">  484</span>      }</div>
-<div class="line"><span class="lineno">  485</span>    }</div>
-<div class="line"><span class="lineno">  486</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno">  487</span>    <span class="keywordflow">return</span> {};</div>
-<div class="line"><span class="lineno">  488</span>  }</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1error__info_html_a6bc1649b05341a45c414c48e3dd94f38"><div class="ttname"><a href="structllfio__v2__xxx_1_1error__info.html#a6bc1649b05341a45c414c48e3dd94f38">llfio_v2_xxx::error_info::path2</a></div><div class="ttdeci">filesystem::path path2() const</div><div class="ttdoc">Retrieve any second path associated with this failure. Note this only works if called from the same t...</div><div class="ttdef"><b>Definition</b> status_code.hpp:474</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  483</span>  {</div>
+<div class="line"><span class="lineno">  484</span><span class="preprocessor">#if !LLFIO_DISABLE_PATHS_IN_FAILURE_INFO</span></div>
+<div class="line"><span class="lineno">  485</span>    <span class="keywordflow">if</span>(QUICKCPPLIB_NAMESPACE::utils::thread::this_thread_id() == _thread_id)</div>
+<div class="line"><span class="lineno">  486</span>    {</div>
+<div class="line"><span class="lineno">  487</span>      <span class="keyword">auto</span> &amp;tls = detail::tls_errored_results();</div>
+<div class="line"><span class="lineno">  488</span>      <span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code hl_function" href="structllfio__v2__xxx_1_1error__info.html#a6bc1649b05341a45c414c48e3dd94f38">path2</a> = tls.get(_tls_path_id2);</div>
+<div class="line"><span class="lineno">  489</span>      <span class="keywordflow">if</span>(<a class="code hl_function" href="structllfio__v2__xxx_1_1error__info.html#a6bc1649b05341a45c414c48e3dd94f38">path2</a> != <span class="keyword">nullptr</span>)</div>
+<div class="line"><span class="lineno">  490</span>      {</div>
+<div class="line"><span class="lineno">  491</span>        <span class="keywordflow">return</span> filesystem::path(<a class="code hl_function" href="structllfio__v2__xxx_1_1error__info.html#a6bc1649b05341a45c414c48e3dd94f38">path2</a>);</div>
+<div class="line"><span class="lineno">  492</span>      }</div>
+<div class="line"><span class="lineno">  493</span>    }</div>
+<div class="line"><span class="lineno">  494</span><span class="preprocessor">#endif</span></div>
+<div class="line"><span class="lineno">  495</span>    <span class="keywordflow">return</span> {};</div>
+<div class="line"><span class="lineno">  496</span>  }</div>
+<div class="ttc" id="astructllfio__v2__xxx_1_1error__info_html_a6bc1649b05341a45c414c48e3dd94f38"><div class="ttname"><a href="structllfio__v2__xxx_1_1error__info.html#a6bc1649b05341a45c414c48e3dd94f38">llfio_v2_xxx::error_info::path2</a></div><div class="ttdeci">filesystem::path path2() const</div><div class="ttdoc">Retrieve any second path associated with this failure. Note this only works if called from the same t...</div><div class="ttdef"><b>Definition</b> status_code.hpp:482</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -344,19 +344,19 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Throw this failure as a C++ exception. Firstly if the error code matches any of the standard C++ exception types e.g. <code>bad_alloc</code>, we throw those types using the string from <code>message()</code> where possible. We then will throw an <code>error</code> exception type. </p>
-<div class="fragment"><div class="line"><span class="lineno">  605</span>{</div>
-<div class="line"><span class="lineno">  606</span>  std::string msg;</div>
-<div class="line"><span class="lineno">  607</span>  LLFIO_EXCEPTION_TRY</div>
-<div class="line"><span class="lineno">  608</span>  {</div>
-<div class="line"><span class="lineno">  609</span>    msg = <a class="code hl_function" href="structllfio__v2__xxx_1_1error__info.html#a3ba6efb57025c79297c3a3061ae78bf9">message</a>();</div>
-<div class="line"><span class="lineno">  610</span>  }</div>
-<div class="line"><span class="lineno">  611</span>  LLFIO_EXCEPTION_CATCH_ALL {}</div>
-<div class="line"><span class="lineno">  612</span><span class="preprocessor">#ifdef __cpp_exceptions</span></div>
-<div class="line"><span class="lineno">  613</span>  OUTCOME_V2_NAMESPACE::try_throw_std_exception_from_error(ec, msg);</div>
-<div class="line"><span class="lineno">  614</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno">  615</span>  LLFIO_EXCEPTION_THROW(error(*<span class="keyword">this</span>));</div>
-<div class="line"><span class="lineno">  616</span>}</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1error__info_html_a3ba6efb57025c79297c3a3061ae78bf9"><div class="ttname"><a href="structllfio__v2__xxx_1_1error__info.html#a3ba6efb57025c79297c3a3061ae78bf9">llfio_v2_xxx::error_info::message</a></div><div class="ttdeci">std::string message() const</div><div class="ttdef"><b>Definition</b> status_code.hpp:491</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  613</span>{</div>
+<div class="line"><span class="lineno">  614</span>  std::string msg;</div>
+<div class="line"><span class="lineno">  615</span>  LLFIO_EXCEPTION_TRY</div>
+<div class="line"><span class="lineno">  616</span>  {</div>
+<div class="line"><span class="lineno">  617</span>    msg = <a class="code hl_function" href="structllfio__v2__xxx_1_1error__info.html#a3ba6efb57025c79297c3a3061ae78bf9">message</a>();</div>
+<div class="line"><span class="lineno">  618</span>  }</div>
+<div class="line"><span class="lineno">  619</span>  LLFIO_EXCEPTION_CATCH_ALL {}</div>
+<div class="line"><span class="lineno">  620</span><span class="preprocessor">#ifdef __cpp_exceptions</span></div>
+<div class="line"><span class="lineno">  621</span>  OUTCOME_V2_NAMESPACE::try_throw_std_exception_from_error(ec, msg);</div>
+<div class="line"><span class="lineno">  622</span><span class="preprocessor">#endif</span></div>
+<div class="line"><span class="lineno">  623</span>  LLFIO_EXCEPTION_THROW(error(*<span class="keyword">this</span>));</div>
+<div class="line"><span class="lineno">  624</span>}</div>
+<div class="ttc" id="astructllfio__v2__xxx_1_1error__info_html_a3ba6efb57025c79297c3a3061ae78bf9"><div class="ttname"><a href="structllfio__v2__xxx_1_1error__info.html#a3ba6efb57025c79297c3a3061ae78bf9">llfio_v2_xxx::error_info::message</a></div><div class="ttdeci">std::string message() const</div><div class="ttdef"><b>Definition</b> status_code.hpp:499</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -384,7 +384,7 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Retrieve the value of the error code. </p>
-<div class="fragment"><div class="line"><span class="lineno">  456</span>{ <span class="keywordflow">return</span> ec.value(); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  464</span>{ <span class="keywordflow">return</span> ec.value(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -412,9 +412,9 @@ Friends</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  579</span>{</div>
-<div class="line"><span class="lineno">  580</span>  <span class="keywordflow">return</span> ei.ec;</div>
-<div class="line"><span class="lineno">  581</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">  587</span>{</div>
+<div class="line"><span class="lineno">  588</span>  <span class="keywordflow">return</span> ei.ec;</div>
+<div class="line"><span class="lineno">  589</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
