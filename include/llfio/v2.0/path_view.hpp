@@ -94,7 +94,7 @@ namespace detail
 #ifdef _MSC_VER  // MSVC's standard library refuses any basic_string_view<T> where T is not an unsigned type
   using char8_t = unsigned char;
 #else
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 12
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wc++20-compat"
 #endif
@@ -147,7 +147,7 @@ namespace detail
   {
     return a.v != b.v;
   }
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 12
 #pragma GCC diagnostic pop
 #endif
 #endif
