@@ -11,8 +11,8 @@ on:
 
 jobs:
   Linux:
-    name: Ubuntu 20.04
-    runs-on: ubuntu-20.04
+    name: Ubuntu 22.04
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
@@ -30,10 +30,7 @@ jobs:
       run: |
        sudo apt-get update
        if [ "${{ matrix.compiler }}" = "libc++" ]; then
-         wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -;
-         sudo add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-11 main";
-         sudo apt update;
-         sudo apt install clang-11 libc++-11-dev libc++abi-11-dev libomp-11-dev;
+         sudo apt install libc++-dev libc++abi-dev libomp-dev;
          export CMAKE_CONFIGURE_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake";
        fi
        if [ "${{ matrix.configuration }}" = "status_code" ]; then
