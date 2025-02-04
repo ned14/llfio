@@ -28,7 +28,9 @@ static inline void TestMappedView1()
 {
   using namespace LLFIO_V2_NAMESPACE;
   using LLFIO_V2_NAMESPACE::file_handle;
-  file_handle fh = file_handle::file({}, "testfile", file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::all, file_handle::flag::unlink_on_first_close).value();
+  file_handle fh = file_handle::file({}, "testfile", file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::all,
+                                     file_handle::flag::unlink_on_first_close)
+                   .value();
   fh.truncate(10000 * sizeof(int)).value();
   section_handle sh(section_handle::section(fh).value());
   mapped<int> v1(sh, 5);
@@ -43,6 +45,7 @@ static inline void TestMappedView1()
   v3[49] = 5;
   BOOST_CHECK(v3[0] == 78);
   BOOST_CHECK(v3[49] == 5);
+#if !defined(_WIN32) || defined(__cpp_exceptions)
   LLFIO_EXCEPTION_TRY
   {
     // Overly large views must not extend the file until written to
@@ -58,13 +61,14 @@ static inline void TestMappedView1()
     BOOST_CHECK(false);
 #endif
   }
+#endif
 }
 
 static inline void TestMappedView2()
 {
   using namespace LLFIO_V2_NAMESPACE;
-  using LLFIO_V2_NAMESPACE::file_handle;
   using LLFIO_V2_NAMESPACE::byte;
+  using LLFIO_V2_NAMESPACE::file_handle;
 #ifndef _WIN32
   std::cout << "NOTE: utils::running_under_wsl() = " << utils::running_under_wsl() << std::endl;
 #endif
@@ -72,7 +76,9 @@ static inline void TestMappedView2()
     std::error_code ec;
     filesystem::remove("testfile", ec);
   }
-  mapped_file_handle mfh = mapped_file_handle::mapped_file(1024 * 1024, {}, "testfile", file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::all, file_handle::flag::unlink_on_first_close).value();
+  mapped_file_handle mfh = mapped_file_handle::mapped_file(1024 * 1024, {}, "testfile", file_handle::mode::write, file_handle::creation::if_needed,
+                                                           file_handle::caching::all, file_handle::flag::unlink_on_first_close)
+                           .value();
   mfh.truncate(10000 * sizeof(int)).value();
   byte *addr = mfh.address();
   BOOST_CHECK(addr != nullptr);
@@ -115,7 +121,9 @@ static inline void TestMappedView2()
   BOOST_CHECK(v1[0] == 78);
 
   // Use a different handle to extend the file
-  mapped_file_handle mfh2 = mapped_file_handle::mapped_file(1024 * 1024, {}, "testfile", file_handle::mode::write, file_handle::creation::open_existing, file_handle::caching::all, file_handle::flag::unlink_on_first_close).value();
+  mapped_file_handle mfh2 = mapped_file_handle::mapped_file(1024 * 1024, {}, "testfile", file_handle::mode::write, file_handle::creation::open_existing,
+                                                            file_handle::caching::all, file_handle::flag::unlink_on_first_close)
+                            .value();
   mfh2.truncate(10000 * sizeof(int)).value();
   v1 = attached<int>(mfh2);
   BOOST_CHECK(v1.size() == 10000);
@@ -132,7 +140,9 @@ static inline void TestMappedView2()
   mfh.truncate(1 * sizeof(int)).value();
 
   // Use a normal file handle to extend the file
-  file_handle fh = file_handle::file({}, "testfile", file_handle::mode::write, file_handle::creation::open_existing, file_handle::caching::all, file_handle::flag::unlink_on_first_close).value();
+  file_handle fh = file_handle::file({}, "testfile", file_handle::mode::write, file_handle::creation::open_existing, file_handle::caching::all,
+                                     file_handle::flag::unlink_on_first_close)
+                   .value();
   fh.truncate(10000 * sizeof(int)).value();
   // On POSIX this will have updated the mapping, on Windows it will not, so prod Windows
   mfh.update_map().value();
