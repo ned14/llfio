@@ -142,9 +142,6 @@ Distributed under the Boost Software License, Version 1.0.
 #if !__has_include(<filesystem>)
 #error "LLFIO needs an implementation of C++ 17 <filesystem> in the standard library"
 #endif
-#if !__has_include(<memory_resource>)
-#error "LLFIO needs an implementation of C++ 17 <memory_resource> in the standard library"
-#endif
 #endif
 #endif
 
@@ -317,8 +314,11 @@ LLFIO_V2_NAMESPACE_END
 // Bring in a string_view implementation
 #include <string_view>
 LLFIO_V2_NAMESPACE_BEGIN
-template <class CharT, class Traits = std::char_traits<CharT>> using basic_string_view = std::basic_string_view<CharT, Traits>;
-using std::string_view;
+template <typename charT, typename traits = std::char_traits<charT>> using basic_string_view = std::basic_string_view<charT, traits>;
+typedef basic_string_view<char, std::char_traits<char>> string_view;
+typedef basic_string_view<wchar_t, std::char_traits<wchar_t>> wstring_view;
+typedef basic_string_view<char16_t, std::char_traits<char16_t>> u16string_view;
+typedef basic_string_view<char32_t, std::char_traits<char32_t>> u32string_view;
 LLFIO_V2_NAMESPACE_END
 // Bring in a function_ptr implementation
 #include "quickcpplib/function_ptr.hpp"
@@ -359,9 +359,9 @@ using spinlock = QUICKCPPLIB_NAMESPACE::configurable_spinlock::spinlock<uintptr_
 using QUICKCPPLIB_NAMESPACE::configurable_spinlock::lock_guard;
 LLFIO_V2_NAMESPACE_END
 // Bring in a memory resource implementation
-#include <memory_resource>
+#include "quickcpplib/memory_resource.hpp"
 LLFIO_V2_NAMESPACE_BEGIN
-namespace pmr = std::pmr;
+namespace pmr = QUICKCPPLIB_NAMESPACE::pmr;
 LLFIO_V2_NAMESPACE_END
 
 
