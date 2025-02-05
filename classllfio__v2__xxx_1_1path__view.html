@@ -548,7 +548,7 @@ Windows specific notes:</h1>
 </div><div class="memdoc">
 
 <p>Constructs an empty path view. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2037</span>{}  <span class="comment">// NOLINT</span></div>
+<div class="fragment"><div class="line"><span class="lineno"> 1994</span>{}  <span class="comment">// NOLINT</span></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -587,9 +587,9 @@ Windows specific notes:</h1>
 </div><div class="memdoc">
 
 <p>Constructs a path view component identical to the input, except with different format interpretation. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2042</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(p, fmt)</div>
-<div class="line"><span class="lineno"> 2043</span>  {</div>
-<div class="line"><span class="lineno"> 2044</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1999</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(p, fmt)</div>
+<div class="line"><span class="lineno"> 2000</span>  {</div>
+<div class="line"><span class="lineno"> 2001</span>  }</div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1path__view__component_html_a9595c5841e26ca5e0fc18e6d735b1142"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">llfio_v2_xxx::path_view_component::path_view_component</a></div><div class="ttdeci">constexpr path_view_component() noexcept</div><div class="ttdoc">Constructs an empty path view component (DEVIATES from P1030, is not trivial due to C++ 14 compatibil...</div><div class="ttdef"><b>Definition</b> path_view.hpp:331</div></div>
 </div><!-- fragment -->
 </div>
@@ -628,9 +628,9 @@ Windows specific notes:</h1>
 </table>
 </div><div class="memdoc">
 <p>Implicitly constructs a path view from a path. The input path MUST continue to exist for this view to be valid (DEVIATES from P1030 due to filesystem::path not exposing its path formatting). </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2049</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(v, fmt)</div>
-<div class="line"><span class="lineno"> 2050</span>  {</div>
-<div class="line"><span class="lineno"> 2051</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2006</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(v, fmt)</div>
+<div class="line"><span class="lineno"> 2007</span>  {</div>
+<div class="line"><span class="lineno"> 2008</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -670,9 +670,9 @@ template&lt;class Char , typename std::enable_if&lt;(<a class="el" href="classll
 </table>
 </div><div class="memdoc">
 <p>Constructs from a basic string if the character type is one of <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2059</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(v.data(), v.size(), <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2ad0eba8da8c1d0dab5c4196d6bbcc37a6">zero_terminated</a>, fmt)</div>
-<div class="line"><span class="lineno"> 2060</span>  {</div>
-<div class="line"><span class="lineno"> 2061</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2016</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(v.data(), v.size(), <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2ad0eba8da8c1d0dab5c4196d6bbcc37a6">zero_terminated</a>, fmt)</div>
+<div class="line"><span class="lineno"> 2017</span>  {</div>
+<div class="line"><span class="lineno"> 2018</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -722,9 +722,9 @@ template&lt;class Char , typename std::enable_if&lt;(<a class="el" href="classll
 </table>
 </div><div class="memdoc">
 <p>Constructs from a lengthed array of one of <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. The input string MUST continue to exist for this view to be valid. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2066</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, l, zt, fmt)</div>
-<div class="line"><span class="lineno"> 2067</span>  {</div>
-<div class="line"><span class="lineno"> 2068</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2023</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, l, zt, fmt)</div>
+<div class="line"><span class="lineno"> 2024</span>  {</div>
+<div class="line"><span class="lineno"> 2025</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -774,9 +774,9 @@ template&lt;class Char , typename std::enable_if&lt;(<a class="el" href="classll
 </table>
 </div><div class="memdoc">
 <p>Constructs from a lengthed array of one of <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. The input string MUST continue to exist for this view to be valid. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2073</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, l, zt, fmt)</div>
-<div class="line"><span class="lineno"> 2074</span>  {</div>
-<div class="line"><span class="lineno"> 2075</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2030</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, l, zt, fmt)</div>
+<div class="line"><span class="lineno"> 2031</span>  {</div>
+<div class="line"><span class="lineno"> 2032</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -826,9 +826,9 @@ template&lt;class Char , typename std::enable_if&lt;(<a class="el" href="classll
 </table>
 </div><div class="memdoc">
 <p>Constructs from a lengthed array of one of <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. The input string MUST continue to exist for this view to be valid. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2080</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, l, zt, fmt)</div>
-<div class="line"><span class="lineno"> 2081</span>  {</div>
-<div class="line"><span class="lineno"> 2082</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2037</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, l, zt, fmt)</div>
+<div class="line"><span class="lineno"> 2038</span>  {</div>
+<div class="line"><span class="lineno"> 2039</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -878,9 +878,9 @@ template&lt;class Char , typename std::enable_if&lt;(<a class="el" href="classll
 </table>
 </div><div class="memdoc">
 <p>Constructs from a lengthed array of one of <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. The input string MUST continue to exist for this view to be valid. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2087</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, l, zt, fmt)</div>
-<div class="line"><span class="lineno"> 2088</span>  {</div>
-<div class="line"><span class="lineno"> 2089</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2044</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, l, zt, fmt)</div>
+<div class="line"><span class="lineno"> 2045</span>  {</div>
+<div class="line"><span class="lineno"> 2046</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -924,9 +924,9 @@ template&lt;class Char , typename std::enable_if&lt;(<a class="el" href="classll
 </table>
 </div><div class="memdoc">
 <p>Constructs from a lengthed array of <code>byte</code>. The input array MUST continue to exist for this view to be valid. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2094</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, l, zt)</div>
-<div class="line"><span class="lineno"> 2095</span>  {</div>
-<div class="line"><span class="lineno"> 2096</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2051</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, l, zt)</div>
+<div class="line"><span class="lineno"> 2052</span>  {</div>
+<div class="line"><span class="lineno"> 2053</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -966,9 +966,9 @@ template&lt;class Char , typename std::enable_if&lt;(<a class="el" href="classll
 </table>
 </div><div class="memdoc">
 <p>Implicitly constructs a path view from a zero terminated pointer to a character array, which must be one of <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. The input string MUST continue to exist for this view to be valid. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2105</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(s, detail::constexpr_strlen(s), <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2ad0eba8da8c1d0dab5c4196d6bbcc37a6">zero_terminated</a>, fmt)</div>
-<div class="line"><span class="lineno"> 2106</span>  {</div>
-<div class="line"><span class="lineno"> 2107</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2062</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(s, detail::constexpr_strlen(s), <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2ad0eba8da8c1d0dab5c4196d6bbcc37a6">zero_terminated</a>, fmt)</div>
+<div class="line"><span class="lineno"> 2063</span>  {</div>
+<div class="line"><span class="lineno"> 2064</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -996,9 +996,9 @@ template&lt;class Char , typename std::enable_if&lt;(<a class="el" href="classll
 </table>
 </div><div class="memdoc">
 <p>Implicitly constructs a path view from a zero terminated pointer to byte array. The input array MUST continue to exist for this view to be valid. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2112</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(s)</div>
-<div class="line"><span class="lineno"> 2113</span>  {</div>
-<div class="line"><span class="lineno"> 2114</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2069</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(s)</div>
+<div class="line"><span class="lineno"> 2070</span>  {</div>
+<div class="line"><span class="lineno"> 2071</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1044,9 +1044,9 @@ template&lt;class Char , typename std::enable_if&lt;(<a class="el" href="classll
 </table>
 </div><div class="memdoc">
 <p>Constructs from a basic string view if the character type is one of <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2122</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(v.data(), v.size(), zt, fmt)</div>
-<div class="line"><span class="lineno"> 2123</span>  {</div>
-<div class="line"><span class="lineno"> 2124</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2079</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(v.data(), v.size(), zt, fmt)</div>
+<div class="line"><span class="lineno"> 2080</span>  {</div>
+<div class="line"><span class="lineno"> 2081</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1084,9 +1084,9 @@ template&lt;class Char , typename std::enable_if&lt;(<a class="el" href="classll
 </table>
 </div><div class="memdoc">
 <p>Constructs from a <code>span&lt;const byte&gt;</code>. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2128</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(v, zt)</div>
-<div class="line"><span class="lineno"> 2129</span>  {</div>
-<div class="line"><span class="lineno"> 2130</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2085</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(v, zt)</div>
+<div class="line"><span class="lineno"> 2086</span>  {</div>
+<div class="line"><span class="lineno"> 2087</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1139,9 +1139,9 @@ template&lt;class It , class End , typename std::enable_if&lt;(<a class="el" hre
 </div><div class="memdoc">
 <p>Constructs from an iterator sequence if the iterator is contiguous, if its value type is one of <code>char</code>, <code>wchar_t</code>, <code>char8_t</code> or <code>char16_t</code>.</p>
 <p>(DEVIATES from P1030, cannot detect contiguous iterator in SFINAE in C++ 14) </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2140</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(addressof(*b), e - b, zt, fmt)</div>
-<div class="line"><span class="lineno"> 2141</span>  {</div>
-<div class="line"><span class="lineno"> 2142</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2097</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(addressof(*b), e - b, zt, fmt)</div>
+<div class="line"><span class="lineno"> 2098</span>  {</div>
+<div class="line"><span class="lineno"> 2099</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1194,9 +1194,9 @@ template&lt;class It , class End , typename std::enable_if&lt;(<a class="el" hre
 </div><div class="memdoc">
 
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2147</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, e - b, zt, fmt)</div>
-<div class="line"><span class="lineno"> 2148</span>  {</div>
-<div class="line"><span class="lineno"> 2149</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2104</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, e - b, zt, fmt)</div>
+<div class="line"><span class="lineno"> 2105</span>  {</div>
+<div class="line"><span class="lineno"> 2106</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1243,9 +1243,9 @@ template&lt;class It , class End , typename std::enable_if&lt;(std::is_same&lt; 
 </div><div class="memdoc">
 <p>Constructs from an iterator sequence if the iterator is contiguous, if its value type is <code>byte</code>.</p>
 <p>(DEVIATES from P1030, cannot detect contiguous iterator in SFINAE in C++ 14) </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2158</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(addressof(*b), e - b, zt, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48dad2ec403bd4441cca9391d09fbf694055">binary_format</a>)</div>
-<div class="line"><span class="lineno"> 2159</span>  {</div>
-<div class="line"><span class="lineno"> 2160</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2115</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(addressof(*b), e - b, zt, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48dad2ec403bd4441cca9391d09fbf694055">binary_format</a>)</div>
+<div class="line"><span class="lineno"> 2116</span>  {</div>
+<div class="line"><span class="lineno"> 2117</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1292,9 +1292,9 @@ template&lt;class It , class End , typename std::enable_if&lt;(std::is_same&lt; 
 </div><div class="memdoc">
 
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2165</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, e - b, zt, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48dad2ec403bd4441cca9391d09fbf694055">binary_format</a>)</div>
-<div class="line"><span class="lineno"> 2166</span>  {</div>
-<div class="line"><span class="lineno"> 2167</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2122</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(b, e - b, zt, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48dad2ec403bd4441cca9391d09fbf694055">binary_format</a>)</div>
+<div class="line"><span class="lineno"> 2123</span>  {</div>
+<div class="line"><span class="lineno"> 2124</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1321,7 +1321,7 @@ template&lt;class It , class End , typename std::enable_if&lt;(std::is_same&lt; 
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  661</span>{ <span class="keywordflow">return</span> _bytestr; }</div>
+<div class="fragment"><div class="line"><span class="lineno">  640</span>{ <span class="keywordflow">return</span> _bytestr; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1349,10 +1349,10 @@ template&lt;class It , class End , typename std::enable_if&lt;(std::is_same&lt; 
 </div><div class="memdoc">
 
 <p>Returns an iterator to the first path component. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2922</span>{</div>
-<div class="line"><span class="lineno"> 2923</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a8efb8be3b3f3b224680e9f10149bb2da">cbegin</a>();</div>
-<div class="line"><span class="lineno"> 2924</span>}</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_a8efb8be3b3f3b224680e9f10149bb2da"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a8efb8be3b3f3b224680e9f10149bb2da">llfio_v2_xxx::path_view::cbegin</a></div><div class="ttdeci">constexpr const_iterator cbegin() const noexcept</div><div class="ttdoc">Returns an iterator to the first path component.</div><div class="ttdef"><b>Definition</b> path_view.hpp:2913</div></div>
+<div class="fragment"><div class="line"><span class="lineno"> 2850</span>{</div>
+<div class="line"><span class="lineno"> 2851</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a8efb8be3b3f3b224680e9f10149bb2da">cbegin</a>();</div>
+<div class="line"><span class="lineno"> 2852</span>}</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_a8efb8be3b3f3b224680e9f10149bb2da"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a8efb8be3b3f3b224680e9f10149bb2da">llfio_v2_xxx::path_view::cbegin</a></div><div class="ttdeci">constexpr const_iterator cbegin() const noexcept</div><div class="ttdoc">Returns an iterator to the first path component.</div><div class="ttdef"><b>Definition</b> path_view.hpp:2841</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1380,9 +1380,9 @@ template&lt;class It , class End , typename std::enable_if&lt;(std::is_same&lt; 
 </div><div class="memdoc">
 
 <p>Returns an iterator to the first path component. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2926</span>{</div>
-<div class="line"><span class="lineno"> 2927</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a8efb8be3b3f3b224680e9f10149bb2da">cbegin</a>();</div>
-<div class="line"><span class="lineno"> 2928</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2854</span>{</div>
+<div class="line"><span class="lineno"> 2855</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a8efb8be3b3f3b224680e9f10149bb2da">cbegin</a>();</div>
+<div class="line"><span class="lineno"> 2856</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1410,10 +1410,10 @@ template&lt;class It , class End , typename std::enable_if&lt;(std::is_same&lt; 
 </div><div class="memdoc">
 
 <p>Returns an iterator to the first path component. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2914</span>{</div>
-<div class="line"><span class="lineno"> 2915</span>  <span class="keywordflow">return</span> <a class="code hl_typedef" href="classllfio__v2__xxx_1_1path__view.html#ae064112c51630be49c33bd51e4380cbd">const_iterator</a>(<span class="keyword">this</span>, <span class="keyword">false</span>);</div>
-<div class="line"><span class="lineno"> 2916</span>}</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_ae064112c51630be49c33bd51e4380cbd"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#ae064112c51630be49c33bd51e4380cbd">llfio_v2_xxx::path_view::const_iterator</a></div><div class="ttdeci">detail::path_view_iterator const_iterator</div><div class="ttdoc">Const iterator type.</div><div class="ttdef"><b>Definition</b> path_view.hpp:2023</div></div>
+<div class="fragment"><div class="line"><span class="lineno"> 2842</span>{</div>
+<div class="line"><span class="lineno"> 2843</span>  <span class="keywordflow">return</span> <a class="code hl_typedef" href="classllfio__v2__xxx_1_1path__view.html#ae064112c51630be49c33bd51e4380cbd">const_iterator</a>(<span class="keyword">this</span>, <span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno"> 2844</span>}</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_ae064112c51630be49c33bd51e4380cbd"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#ae064112c51630be49c33bd51e4380cbd">llfio_v2_xxx::path_view::const_iterator</a></div><div class="ttdeci">detail::path_view_iterator const_iterator</div><div class="ttdoc">Const iterator type.</div><div class="ttdef"><b>Definition</b> path_view.hpp:1980</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1441,9 +1441,9 @@ template&lt;class It , class End , typename std::enable_if&lt;(std::is_same&lt; 
 </div><div class="memdoc">
 
 <p>Returns an iterator to after the last path component. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2918</span>{</div>
-<div class="line"><span class="lineno"> 2919</span>  <span class="keywordflow">return</span> <a class="code hl_typedef" href="classllfio__v2__xxx_1_1path__view.html#ae064112c51630be49c33bd51e4380cbd">const_iterator</a>(<span class="keyword">this</span>, <span class="keyword">true</span>);</div>
-<div class="line"><span class="lineno"> 2920</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2846</span>{</div>
+<div class="line"><span class="lineno"> 2847</span>  <span class="keywordflow">return</span> <a class="code hl_typedef" href="classllfio__v2__xxx_1_1path__view.html#ae064112c51630be49c33bd51e4380cbd">const_iterator</a>(<span class="keyword">this</span>, <span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno"> 2848</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1474,28 +1474,28 @@ template&lt;class T , class Deleter , size_t _internal_buffer_size, typename std
 </div><div class="memdoc">
 
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 3118</span>{</div>
-<div class="line"><span class="lineno"> 3119</span>  <span class="keyword">auto</span> it1 = <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#ad732574572c44177bd661456a542f50a">begin</a>(), it2 = o.begin();</div>
-<div class="line"><span class="lineno"> 3120</span>  <span class="keywordflow">for</span>(; it1 != <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a266f7052b687b4ba422c4cbcd0b2f453">end</a>() &amp;&amp; it2 != o.end(); ++it1, ++it2)</div>
-<div class="line"><span class="lineno"> 3121</span>  {</div>
-<div class="line"><span class="lineno"> 3122</span>    <span class="keywordtype">int</span> res = it1-&gt;compare&lt;T, Deleter, _internal_buffer_size&gt;(*it2);</div>
-<div class="line"><span class="lineno"> 3123</span>    <span class="keywordflow">if</span>(res != 0)</div>
-<div class="line"><span class="lineno"> 3124</span>    {</div>
-<div class="line"><span class="lineno"> 3125</span>      <span class="keywordflow">return</span> res;</div>
-<div class="line"><span class="lineno"> 3126</span>    }</div>
-<div class="line"><span class="lineno"> 3127</span>  }</div>
-<div class="line"><span class="lineno"> 3128</span>  <span class="keywordflow">if</span>(it1 == <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a266f7052b687b4ba422c4cbcd0b2f453">end</a>() &amp;&amp; it2 != o.end())</div>
-<div class="line"><span class="lineno"> 3129</span>  {</div>
-<div class="line"><span class="lineno"> 3130</span>    <span class="keywordflow">return</span> -1;</div>
-<div class="line"><span class="lineno"> 3131</span>  }</div>
-<div class="line"><span class="lineno"> 3132</span>  <span class="keywordflow">if</span>(it1 != <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a266f7052b687b4ba422c4cbcd0b2f453">end</a>() &amp;&amp; it2 == o.end())</div>
-<div class="line"><span class="lineno"> 3133</span>  {</div>
-<div class="line"><span class="lineno"> 3134</span>    <span class="keywordflow">return</span> 1;</div>
-<div class="line"><span class="lineno"> 3135</span>  }</div>
-<div class="line"><span class="lineno"> 3136</span>  <span class="keywordflow">return</span> 0;  <span class="comment">// identical</span></div>
-<div class="line"><span class="lineno"> 3137</span>}</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_a266f7052b687b4ba422c4cbcd0b2f453"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a266f7052b687b4ba422c4cbcd0b2f453">llfio_v2_xxx::path_view::end</a></div><div class="ttdeci">constexpr const_iterator end() const noexcept</div><div class="ttdoc">Returns an iterator to after the last path component.</div><div class="ttdef"><b>Definition</b> path_view.hpp:2929</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_ad732574572c44177bd661456a542f50a"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#ad732574572c44177bd661456a542f50a">llfio_v2_xxx::path_view::begin</a></div><div class="ttdeci">constexpr const_iterator begin() const noexcept</div><div class="ttdoc">Returns an iterator to the first path component.</div><div class="ttdef"><b>Definition</b> path_view.hpp:2921</div></div>
+<div class="fragment"><div class="line"><span class="lineno"> 3046</span>{</div>
+<div class="line"><span class="lineno"> 3047</span>  <span class="keyword">auto</span> it1 = <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#ad732574572c44177bd661456a542f50a">begin</a>(), it2 = o.begin();</div>
+<div class="line"><span class="lineno"> 3048</span>  <span class="keywordflow">for</span>(; it1 != <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a266f7052b687b4ba422c4cbcd0b2f453">end</a>() &amp;&amp; it2 != o.end(); ++it1, ++it2)</div>
+<div class="line"><span class="lineno"> 3049</span>  {</div>
+<div class="line"><span class="lineno"> 3050</span>    <span class="keywordtype">int</span> res = it1-&gt;compare&lt;T, Deleter, _internal_buffer_size&gt;(*it2);</div>
+<div class="line"><span class="lineno"> 3051</span>    <span class="keywordflow">if</span>(res != 0)</div>
+<div class="line"><span class="lineno"> 3052</span>    {</div>
+<div class="line"><span class="lineno"> 3053</span>      <span class="keywordflow">return</span> res;</div>
+<div class="line"><span class="lineno"> 3054</span>    }</div>
+<div class="line"><span class="lineno"> 3055</span>  }</div>
+<div class="line"><span class="lineno"> 3056</span>  <span class="keywordflow">if</span>(it1 == <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a266f7052b687b4ba422c4cbcd0b2f453">end</a>() &amp;&amp; it2 != o.end())</div>
+<div class="line"><span class="lineno"> 3057</span>  {</div>
+<div class="line"><span class="lineno"> 3058</span>    <span class="keywordflow">return</span> -1;</div>
+<div class="line"><span class="lineno"> 3059</span>  }</div>
+<div class="line"><span class="lineno"> 3060</span>  <span class="keywordflow">if</span>(it1 != <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a266f7052b687b4ba422c4cbcd0b2f453">end</a>() &amp;&amp; it2 == o.end())</div>
+<div class="line"><span class="lineno"> 3061</span>  {</div>
+<div class="line"><span class="lineno"> 3062</span>    <span class="keywordflow">return</span> 1;</div>
+<div class="line"><span class="lineno"> 3063</span>  }</div>
+<div class="line"><span class="lineno"> 3064</span>  <span class="keywordflow">return</span> 0;  <span class="comment">// identical</span></div>
+<div class="line"><span class="lineno"> 3065</span>}</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_a266f7052b687b4ba422c4cbcd0b2f453"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a266f7052b687b4ba422c4cbcd0b2f453">llfio_v2_xxx::path_view::end</a></div><div class="ttdeci">constexpr const_iterator end() const noexcept</div><div class="ttdoc">Returns an iterator to after the last path component.</div><div class="ttdef"><b>Definition</b> path_view.hpp:2857</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_ad732574572c44177bd661456a542f50a"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#ad732574572c44177bd661456a542f50a">llfio_v2_xxx::path_view::begin</a></div><div class="ttdeci">constexpr const_iterator begin() const noexcept</div><div class="ttdoc">Returns an iterator to the first path component.</div><div class="ttdef"><b>Definition</b> path_view.hpp:2849</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1538,26 +1538,26 @@ template&lt;class T , class Deleter , size_t _internal_buffer_size, typename std
 <p>If the source encodings of the two path views are compatible, a lexicographical comparison is performed. If they are incompatible, either or both views are converted to the destination encoding using <code>rendered_path&lt;T, Delete, _internal_buffer_size&gt;</code>, and then a lexicographical comparison is performed.</p>
 <p>This can, for obvious reasons, be expensive. It can also throw exceptions, as <code>rendered_path</code> does.</p>
 <p>If the destination encoding is <code>byte</code>, <code>memcmp()</code> is used, and <code>rendered_path</code> is never invoked as the two sources are byte compared directly. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 3089</span>{</div>
-<div class="line"><span class="lineno"> 3090</span>  <span class="keyword">auto</span> it1 = <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#ad732574572c44177bd661456a542f50a">begin</a>(), it2 = o.begin();</div>
-<div class="line"><span class="lineno"> 3091</span>  <span class="keywordflow">for</span>(; it1 != <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a266f7052b687b4ba422c4cbcd0b2f453">end</a>() &amp;&amp; it2 != o.end(); ++it1, ++it2)</div>
-<div class="line"><span class="lineno"> 3092</span>  {</div>
-<div class="line"><span class="lineno"> 3093</span>    <span class="keywordtype">int</span> res = it1-&gt;compare&lt;T, Deleter, _internal_buffer_size&gt;(*it2, loc);</div>
-<div class="line"><span class="lineno"> 3094</span>    <span class="keywordflow">if</span>(res != 0)</div>
-<div class="line"><span class="lineno"> 3095</span>    {</div>
-<div class="line"><span class="lineno"> 3096</span>      <span class="keywordflow">return</span> res;</div>
-<div class="line"><span class="lineno"> 3097</span>    }</div>
-<div class="line"><span class="lineno"> 3098</span>  }</div>
-<div class="line"><span class="lineno"> 3099</span>  <span class="keywordflow">if</span>(it1 == <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a266f7052b687b4ba422c4cbcd0b2f453">end</a>() &amp;&amp; it2 != o.end())</div>
-<div class="line"><span class="lineno"> 3100</span>  {</div>
-<div class="line"><span class="lineno"> 3101</span>    <span class="keywordflow">return</span> -1;</div>
-<div class="line"><span class="lineno"> 3102</span>  }</div>
-<div class="line"><span class="lineno"> 3103</span>  <span class="keywordflow">if</span>(it1 != <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a266f7052b687b4ba422c4cbcd0b2f453">end</a>() &amp;&amp; it2 == o.end())</div>
-<div class="line"><span class="lineno"> 3104</span>  {</div>
-<div class="line"><span class="lineno"> 3105</span>    <span class="keywordflow">return</span> 1;</div>
-<div class="line"><span class="lineno"> 3106</span>  }</div>
-<div class="line"><span class="lineno"> 3107</span>  <span class="keywordflow">return</span> 0;  <span class="comment">// identical</span></div>
-<div class="line"><span class="lineno"> 3108</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno"> 3017</span>{</div>
+<div class="line"><span class="lineno"> 3018</span>  <span class="keyword">auto</span> it1 = <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#ad732574572c44177bd661456a542f50a">begin</a>(), it2 = o.begin();</div>
+<div class="line"><span class="lineno"> 3019</span>  <span class="keywordflow">for</span>(; it1 != <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a266f7052b687b4ba422c4cbcd0b2f453">end</a>() &amp;&amp; it2 != o.end(); ++it1, ++it2)</div>
+<div class="line"><span class="lineno"> 3020</span>  {</div>
+<div class="line"><span class="lineno"> 3021</span>    <span class="keywordtype">int</span> res = it1-&gt;compare&lt;T, Deleter, _internal_buffer_size&gt;(*it2, loc);</div>
+<div class="line"><span class="lineno"> 3022</span>    <span class="keywordflow">if</span>(res != 0)</div>
+<div class="line"><span class="lineno"> 3023</span>    {</div>
+<div class="line"><span class="lineno"> 3024</span>      <span class="keywordflow">return</span> res;</div>
+<div class="line"><span class="lineno"> 3025</span>    }</div>
+<div class="line"><span class="lineno"> 3026</span>  }</div>
+<div class="line"><span class="lineno"> 3027</span>  <span class="keywordflow">if</span>(it1 == <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a266f7052b687b4ba422c4cbcd0b2f453">end</a>() &amp;&amp; it2 != o.end())</div>
+<div class="line"><span class="lineno"> 3028</span>  {</div>
+<div class="line"><span class="lineno"> 3029</span>    <span class="keywordflow">return</span> -1;</div>
+<div class="line"><span class="lineno"> 3030</span>  }</div>
+<div class="line"><span class="lineno"> 3031</span>  <span class="keywordflow">if</span>(it1 != <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a266f7052b687b4ba422c4cbcd0b2f453">end</a>() &amp;&amp; it2 == o.end())</div>
+<div class="line"><span class="lineno"> 3032</span>  {</div>
+<div class="line"><span class="lineno"> 3033</span>    <span class="keywordflow">return</span> 1;</div>
+<div class="line"><span class="lineno"> 3034</span>  }</div>
+<div class="line"><span class="lineno"> 3035</span>  <span class="keywordflow">return</span> 0;  <span class="comment">// identical</span></div>
+<div class="line"><span class="lineno"> 3036</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1588,12 +1588,12 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 </div><div class="memdoc">
 
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><span class="lineno">  877</span>  {</div>
-<div class="line"><span class="lineno">  878</span>    <span class="keywordflow">return</span> _invoke(</div>
-<div class="line"><span class="lineno">  879</span>    [&amp;](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;self) {</div>
-<div class="line"><span class="lineno">  880</span>      <span class="keywordflow">return</span> p._invoke([&amp;](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;other) { <span class="keywordflow">return</span> _compare&lt;T, Deleter, _internal_buffer_size&gt;(self, <a class="code hl_enumeration" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2">termination</a>(), other, p.termination(), <span class="keyword">nullptr</span>); });</div>
-<div class="line"><span class="lineno">  881</span>    });</div>
-<div class="line"><span class="lineno">  882</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  834</span>  {</div>
+<div class="line"><span class="lineno">  835</span>    <span class="keywordflow">return</span> _invoke(</div>
+<div class="line"><span class="lineno">  836</span>    [&amp;](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;self) {</div>
+<div class="line"><span class="lineno">  837</span>      <span class="keywordflow">return</span> p._invoke([&amp;](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;other) { <span class="keywordflow">return</span> _compare&lt;T, Deleter, _internal_buffer_size&gt;(self, <a class="code hl_enumeration" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2">termination</a>(), other, p.termination(), <span class="keyword">nullptr</span>); });</div>
+<div class="line"><span class="lineno">  838</span>    });</div>
+<div class="line"><span class="lineno">  839</span>  }</div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1path__view__component_html_aadacf9651511d41cc0a44067ac0331a2"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2">llfio_v2_xxx::path_view_component::termination</a></div><div class="ttdeci">termination</div><div class="ttdoc">The zero termination to use.</div><div class="ttdef"><b>Definition</b> path_view.hpp:300</div></div>
 </div><!-- fragment -->
 </div>
@@ -1637,11 +1637,11 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 <p>If the source encodings of the two path views are compatible, a lexicographical comparison is performed. If they are incompatible, either or both views are converted to the destination encoding using <code>rendered_path&lt;T, Delete, _internal_buffer_size&gt;</code>, and then a lexicographical comparison is performed.</p>
 <p>This can, for obvious reasons, be expensive. It can also throw exceptions, as <code>rendered_path</code> does.</p>
 <p>If the destination encoding is <code>byte</code>, <code>memcmp()</code> is used, and <code>rendered_path</code> is never invoked as the two sources are byte compared directly. </p>
-<div class="fragment"><div class="line"><span class="lineno">  867</span>  {</div>
-<div class="line"><span class="lineno">  868</span>    <span class="keywordflow">return</span> _invoke(</div>
-<div class="line"><span class="lineno">  869</span>    [&amp;](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;self)</div>
-<div class="line"><span class="lineno">  870</span>    { <span class="keywordflow">return</span> p._invoke([&amp;](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;other) { <span class="keywordflow">return</span> _compare&lt;T, Deleter, _internal_buffer_size&gt;(self, <a class="code hl_enumeration" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2">termination</a>(), other, p.termination(), &amp;loc); }); });</div>
-<div class="line"><span class="lineno">  871</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  824</span>  {</div>
+<div class="line"><span class="lineno">  825</span>    <span class="keywordflow">return</span> _invoke(</div>
+<div class="line"><span class="lineno">  826</span>    [&amp;](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;self)</div>
+<div class="line"><span class="lineno">  827</span>    { <span class="keywordflow">return</span> p._invoke([&amp;](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;other) { <span class="keywordflow">return</span> _compare&lt;T, Deleter, _internal_buffer_size&gt;(self, <a class="code hl_enumeration" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2">termination</a>(), other, p.termination(), &amp;loc); }); });</div>
+<div class="line"><span class="lineno">  828</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1669,19 +1669,19 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 </div><div class="memdoc">
 
 <p>True if the view contains any of the characters <code>*</code>, <code>?</code>, (POSIX only: <code>[</code> or <code>]</code>). </p>
-<div class="fragment"><div class="line"><span class="lineno">  695</span>  {</div>
-<div class="line"><span class="lineno">  696</span>    <span class="keywordflow">return</span> _invoke(</div>
-<div class="line"><span class="lineno">  697</span>    [](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v)</div>
-<div class="line"><span class="lineno">  698</span>    {</div>
-<div class="line"><span class="lineno">  699</span>      <span class="keyword">using </span>value_type = <span class="keyword">typename</span> std::remove_reference&lt;<span class="keyword">decltype</span>(*v.data())&gt;::type;</div>
-<div class="line"><span class="lineno">  700</span><span class="preprocessor">#ifdef _WIN32</span></div>
-<div class="line"><span class="lineno">  701</span>      <span class="keyword">const</span> value_type *tofind = (<span class="keyword">sizeof</span>(value_type) &gt; 1) ? (<span class="keyword">const</span> value_type *) L<span class="stringliteral">&quot;*?&quot;</span> : (const value_type *) <span class="stringliteral">&quot;*?&quot;</span>;</div>
-<div class="line"><span class="lineno">  702</span><span class="preprocessor">#else</span></div>
-<div class="line"><span class="lineno">  703</span>      <span class="keyword">const</span> value_type *tofind = (<span class="keyword">sizeof</span>(value_type) &gt; 1) ? (<span class="keyword">const</span> value_type *) L<span class="stringliteral">&quot;*?[]&quot;</span> : (const value_type *) <span class="stringliteral">&quot;*?[]&quot;</span>;</div>
-<div class="line"><span class="lineno">  704</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno">  705</span>      <span class="keywordflow">return</span> string_view::npos != v.find_first_of(tofind);</div>
-<div class="line"><span class="lineno">  706</span>    });</div>
-<div class="line"><span class="lineno">  707</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  674</span>  {</div>
+<div class="line"><span class="lineno">  675</span>    <span class="keywordflow">return</span> _invoke(</div>
+<div class="line"><span class="lineno">  676</span>    [](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v)</div>
+<div class="line"><span class="lineno">  677</span>    {</div>
+<div class="line"><span class="lineno">  678</span>      <span class="keyword">using </span>value_type = <span class="keyword">typename</span> std::remove_reference&lt;<span class="keyword">decltype</span>(*v.data())&gt;::type;</div>
+<div class="line"><span class="lineno">  679</span><span class="preprocessor">#ifdef _WIN32</span></div>
+<div class="line"><span class="lineno">  680</span>      <span class="keyword">const</span> value_type *tofind = (<span class="keyword">sizeof</span>(value_type) &gt; 1) ? (<span class="keyword">const</span> value_type *) L<span class="stringliteral">&quot;*?&quot;</span> : (const value_type *) <span class="stringliteral">&quot;*?&quot;</span>;</div>
+<div class="line"><span class="lineno">  681</span><span class="preprocessor">#else</span></div>
+<div class="line"><span class="lineno">  682</span>      <span class="keyword">const</span> value_type *tofind = (<span class="keyword">sizeof</span>(value_type) &gt; 1) ? (<span class="keyword">const</span> value_type *) L<span class="stringliteral">&quot;*?[]&quot;</span> : (const value_type *) <span class="stringliteral">&quot;*?[]&quot;</span>;</div>
+<div class="line"><span class="lineno">  683</span><span class="preprocessor">#endif</span></div>
+<div class="line"><span class="lineno">  684</span>      <span class="keywordflow">return</span> string_view::npos != v.find_first_of(tofind);</div>
+<div class="line"><span class="lineno">  685</span>    });</div>
+<div class="line"><span class="lineno">  686</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1709,7 +1709,7 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 </div><div class="memdoc">
 
 <p>True if empty. </p>
-<div class="fragment"><div class="line"><span class="lineno">  672</span>{ <span class="keywordflow">return</span> _length == 0; }</div>
+<div class="fragment"><div class="line"><span class="lineno">  651</span>{ <span class="keywordflow">return</span> _length == 0; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1737,10 +1737,10 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 </div><div class="memdoc">
 
 <p>Returns an iterator to after the last path component. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2930</span>{</div>
-<div class="line"><span class="lineno"> 2931</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a37beaa71c1df79c40133a0548e8d0042">cend</a>();</div>
-<div class="line"><span class="lineno"> 2932</span>}</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_a37beaa71c1df79c40133a0548e8d0042"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a37beaa71c1df79c40133a0548e8d0042">llfio_v2_xxx::path_view::cend</a></div><div class="ttdeci">constexpr const_iterator cend() const noexcept</div><div class="ttdoc">Returns an iterator to after the last path component.</div><div class="ttdef"><b>Definition</b> path_view.hpp:2917</div></div>
+<div class="fragment"><div class="line"><span class="lineno"> 2858</span>{</div>
+<div class="line"><span class="lineno"> 2859</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a37beaa71c1df79c40133a0548e8d0042">cend</a>();</div>
+<div class="line"><span class="lineno"> 2860</span>}</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_a37beaa71c1df79c40133a0548e8d0042"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a37beaa71c1df79c40133a0548e8d0042">llfio_v2_xxx::path_view::cend</a></div><div class="ttdeci">constexpr const_iterator cend() const noexcept</div><div class="ttdoc">Returns an iterator to after the last path component.</div><div class="ttdef"><b>Definition</b> path_view.hpp:2845</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1768,9 +1768,9 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 </div><div class="memdoc">
 
 <p>Returns an iterator to after the last path component. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2934</span>{</div>
-<div class="line"><span class="lineno"> 2935</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a37beaa71c1df79c40133a0548e8d0042">cend</a>();</div>
-<div class="line"><span class="lineno"> 2936</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2862</span>{</div>
+<div class="line"><span class="lineno"> 2863</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a37beaa71c1df79c40133a0548e8d0042">cend</a>();</div>
+<div class="line"><span class="lineno"> 2864</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1798,19 +1798,19 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 </div><div class="memdoc">
 
 <p>Returns a view of the file extension part of this view. </p>
-<div class="fragment"><div class="line"><span class="lineno">  726</span>  {</div>
-<div class="line"><span class="lineno">  727</span>    <span class="keyword">auto</span> self = _filename();</div>
-<div class="line"><span class="lineno">  728</span>    <span class="keywordflow">return</span> self._invoke(</div>
-<div class="line"><span class="lineno">  729</span>    [<span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v)</div>
-<div class="line"><span class="lineno">  730</span>    {</div>
-<div class="line"><span class="lineno">  731</span>      <span class="keyword">auto</span> dot_idx = v.rfind(<span class="charliteral">&#39;.&#39;</span>);</div>
-<div class="line"><span class="lineno">  732</span>      <span class="keywordflow">if</span>(_npos == dot_idx || dot_idx == 0 || (dot_idx == 1 &amp;&amp; v[dot_idx - 1] == <span class="charliteral">&#39;.&#39;</span>))</div>
-<div class="line"><span class="lineno">  733</span>      {</div>
-<div class="line"><span class="lineno">  734</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>();</div>
-<div class="line"><span class="lineno">  735</span>      }</div>
-<div class="line"><span class="lineno">  736</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(v.data() + dot_idx, v.size() - dot_idx, <a class="code hl_enumeration" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2">termination</a>());</div>
-<div class="line"><span class="lineno">  737</span>    });</div>
-<div class="line"><span class="lineno">  738</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  705</span>  {</div>
+<div class="line"><span class="lineno">  706</span>    <span class="keyword">auto</span> self = _filename();</div>
+<div class="line"><span class="lineno">  707</span>    <span class="keywordflow">return</span> self._invoke(</div>
+<div class="line"><span class="lineno">  708</span>    [<span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v)</div>
+<div class="line"><span class="lineno">  709</span>    {</div>
+<div class="line"><span class="lineno">  710</span>      <span class="keyword">auto</span> dot_idx = v.rfind(<span class="charliteral">&#39;.&#39;</span>);</div>
+<div class="line"><span class="lineno">  711</span>      <span class="keywordflow">if</span>(_npos == dot_idx || dot_idx == 0 || (dot_idx == 1 &amp;&amp; v[dot_idx - 1] == <span class="charliteral">&#39;.&#39;</span>))</div>
+<div class="line"><span class="lineno">  712</span>      {</div>
+<div class="line"><span class="lineno">  713</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>();</div>
+<div class="line"><span class="lineno">  714</span>      }</div>
+<div class="line"><span class="lineno">  715</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(v.data() + dot_idx, v.size() - dot_idx, <a class="code hl_enumeration" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2">termination</a>());</div>
+<div class="line"><span class="lineno">  716</span>    });</div>
+<div class="line"><span class="lineno">  717</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1838,7 +1838,7 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 </div><div class="memdoc">
 
 <p>Returns a view of the filename part of this view. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2495</span>{ <span class="keywordflow">return</span> this-&gt;_filename(); }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2423</span>{ <span class="keywordflow">return</span> this-&gt;_filename(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1866,7 +1866,7 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 </div><div class="memdoc">
 
 <p>How path separators shall be interpreted. </p>
-<div class="fragment"><div class="line"><span class="lineno">  681</span>{ <span class="keywordflow">return</span> _format; }</div>
+<div class="fragment"><div class="line"><span class="lineno">  660</span>{ <span class="keywordflow">return</span> _format; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1894,9 +1894,9 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 </div><div class="memdoc">
 
 <p>True if <code>extension()</code> returns a non-empty path. </p>
-<div class="fragment"><div class="line"><span class="lineno">  691</span>{ <span class="keywordflow">return</span> !<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a81eaa18bb48cc4712a250f60070bcc20">extension</a>().<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#aa501a1549a3de8a4364fd65295375784">empty</a>(); }</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view__component_html_a81eaa18bb48cc4712a250f60070bcc20"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#a81eaa18bb48cc4712a250f60070bcc20">llfio_v2_xxx::path_view_component::extension</a></div><div class="ttdeci">constexpr path_view_component extension() const noexcept</div><div class="ttdoc">Returns a view of the file extension part of this view.</div><div class="ttdef"><b>Definition</b> path_view.hpp:725</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view__component_html_aa501a1549a3de8a4364fd65295375784"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#aa501a1549a3de8a4364fd65295375784">llfio_v2_xxx::path_view_component::empty</a></div><div class="ttdeci">constexpr bool empty() const noexcept</div><div class="ttdoc">True if empty.</div><div class="ttdef"><b>Definition</b> path_view.hpp:672</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  670</span>{ <span class="keywordflow">return</span> !<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a81eaa18bb48cc4712a250f60070bcc20">extension</a>().<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#aa501a1549a3de8a4364fd65295375784">empty</a>(); }</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view__component_html_a81eaa18bb48cc4712a250f60070bcc20"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#a81eaa18bb48cc4712a250f60070bcc20">llfio_v2_xxx::path_view_component::extension</a></div><div class="ttdeci">constexpr path_view_component extension() const noexcept</div><div class="ttdoc">Returns a view of the file extension part of this view.</div><div class="ttdef"><b>Definition</b> path_view.hpp:704</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view__component_html_aa501a1549a3de8a4364fd65295375784"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#aa501a1549a3de8a4364fd65295375784">llfio_v2_xxx::path_view_component::empty</a></div><div class="ttdeci">constexpr bool empty() const noexcept</div><div class="ttdoc">True if empty.</div><div class="ttdef"><b>Definition</b> path_view.hpp:651</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1924,8 +1924,8 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 </div><div class="memdoc">
 
 <p>True if has filename. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2189</span>{ <span class="keywordflow">return</span> !<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#ab9973b8929a55d92a74c8ef8a6f52f90">filename</a>().<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#aa501a1549a3de8a4364fd65295375784">empty</a>(); }</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_ab9973b8929a55d92a74c8ef8a6f52f90"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#ab9973b8929a55d92a74c8ef8a6f52f90">llfio_v2_xxx::path_view::filename</a></div><div class="ttdeci">constexpr path_view filename() const noexcept</div><div class="ttdoc">Returns a view of the filename part of this view.</div><div class="ttdef"><b>Definition</b> path_view.hpp:2495</div></div>
+<div class="fragment"><div class="line"><span class="lineno"> 2146</span>{ <span class="keywordflow">return</span> !<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#ab9973b8929a55d92a74c8ef8a6f52f90">filename</a>().<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#aa501a1549a3de8a4364fd65295375784">empty</a>(); }</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_ab9973b8929a55d92a74c8ef8a6f52f90"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#ab9973b8929a55d92a74c8ef8a6f52f90">llfio_v2_xxx::path_view::filename</a></div><div class="ttdeci">constexpr path_view filename() const noexcept</div><div class="ttdoc">Returns a view of the filename part of this view.</div><div class="ttdef"><b>Definition</b> path_view.hpp:2423</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1953,7 +1953,7 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 </div><div class="memdoc">
 
 <p>True if input is declared to be null terminated. </p>
-<div class="fragment"><div class="line"><span class="lineno">  684</span>{ <span class="keywordflow">return</span> _zero_terminated; }</div>
+<div class="fragment"><div class="line"><span class="lineno">  663</span>{ <span class="keywordflow">return</span> _zero_terminated; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1981,8 +1981,8 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 </div><div class="memdoc">
 
 <p>True if has parent path. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2187</span>{ <span class="keywordflow">return</span> !<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a0a2538aaa8ee056c9e29eec1f4abc989">parent_path</a>().<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#aa501a1549a3de8a4364fd65295375784">empty</a>(); }</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_a0a2538aaa8ee056c9e29eec1f4abc989"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a0a2538aaa8ee056c9e29eec1f4abc989">llfio_v2_xxx::path_view::parent_path</a></div><div class="ttdeci">constexpr path_view parent_path() const noexcept</div><div class="ttdoc">Returns a view of the everything apart from the filename part of this view.</div><div class="ttdef"><b>Definition</b> path_view.hpp:2455</div></div>
+<div class="fragment"><div class="line"><span class="lineno"> 2144</span>{ <span class="keywordflow">return</span> !<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a0a2538aaa8ee056c9e29eec1f4abc989">parent_path</a>().<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#aa501a1549a3de8a4364fd65295375784">empty</a>(); }</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_a0a2538aaa8ee056c9e29eec1f4abc989"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a0a2538aaa8ee056c9e29eec1f4abc989">llfio_v2_xxx::path_view::parent_path</a></div><div class="ttdeci">constexpr path_view parent_path() const noexcept</div><div class="ttdoc">Returns a view of the everything apart from the filename part of this view.</div><div class="ttdef"><b>Definition</b> path_view.hpp:2390</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2010,8 +2010,8 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 </div><div class="memdoc">
 
 <p>True if has relative path. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2185</span>{ <span class="keywordflow">return</span> !<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a2660a043095f236e04c64518befe3811">relative_path</a>().<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#aa501a1549a3de8a4364fd65295375784">empty</a>(); }</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_a2660a043095f236e04c64518befe3811"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a2660a043095f236e04c64518befe3811">llfio_v2_xxx::path_view::relative_path</a></div><div class="ttdeci">constexpr path_view relative_path() const noexcept</div><div class="ttdoc">Returns a view of everything after the root path.</div><div class="ttdef"><b>Definition</b> path_view.hpp:2410</div></div>
+<div class="fragment"><div class="line"><span class="lineno"> 2142</span>{ <span class="keywordflow">return</span> !<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a2660a043095f236e04c64518befe3811">relative_path</a>().<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#aa501a1549a3de8a4364fd65295375784">empty</a>(); }</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_a2660a043095f236e04c64518befe3811"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a2660a043095f236e04c64518befe3811">llfio_v2_xxx::path_view::relative_path</a></div><div class="ttdeci">constexpr path_view relative_path() const noexcept</div><div class="ttdoc">Returns a view of everything after the root path.</div><div class="ttdef"><b>Definition</b> path_view.hpp:2345</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2039,8 +2039,8 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 </div><div class="memdoc">
 
 <p>True if has root directory. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2183</span>{ <span class="keywordflow">return</span> !<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#af1ca707bbe218ba97647e6fc976ed0fc">root_directory</a>().<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#aa501a1549a3de8a4364fd65295375784">empty</a>(); }</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_af1ca707bbe218ba97647e6fc976ed0fc"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#af1ca707bbe218ba97647e6fc976ed0fc">llfio_v2_xxx::path_view::root_directory</a></div><div class="ttdeci">constexpr path_view root_directory() const noexcept</div><div class="ttdoc">Returns a view of the root directory, if there is one e.g. /.</div><div class="ttdef"><b>Definition</b> path_view.hpp:2340</div></div>
+<div class="fragment"><div class="line"><span class="lineno"> 2140</span>{ <span class="keywordflow">return</span> !<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#af1ca707bbe218ba97647e6fc976ed0fc">root_directory</a>().<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#aa501a1549a3de8a4364fd65295375784">empty</a>(); }</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_af1ca707bbe218ba97647e6fc976ed0fc"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#af1ca707bbe218ba97647e6fc976ed0fc">llfio_v2_xxx::path_view::root_directory</a></div><div class="ttdeci">constexpr path_view root_directory() const noexcept</div><div class="ttdoc">Returns a view of the root directory, if there is one e.g. /.</div><div class="ttdef"><b>Definition</b> path_view.hpp:2275</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2068,8 +2068,8 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 </div><div class="memdoc">
 
 <p>True if has root name. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2181</span>{ <span class="keywordflow">return</span> !<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a5efe04f8c9f7a74559a10e81e775de2c">root_name</a>().<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#aa501a1549a3de8a4364fd65295375784">empty</a>(); }</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_a5efe04f8c9f7a74559a10e81e775de2c"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a5efe04f8c9f7a74559a10e81e775de2c">llfio_v2_xxx::path_view::root_name</a></div><div class="ttdeci">constexpr path_view root_name() const noexcept</div><div class="ttdoc">Returns a view of the root name part of this view e.g. C:</div><div class="ttdef"><b>Definition</b> path_view.hpp:2330</div></div>
+<div class="fragment"><div class="line"><span class="lineno"> 2138</span>{ <span class="keywordflow">return</span> !<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a5efe04f8c9f7a74559a10e81e775de2c">root_name</a>().<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#aa501a1549a3de8a4364fd65295375784">empty</a>(); }</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_a5efe04f8c9f7a74559a10e81e775de2c"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a5efe04f8c9f7a74559a10e81e775de2c">llfio_v2_xxx::path_view::root_name</a></div><div class="ttdeci">constexpr path_view root_name() const noexcept</div><div class="ttdoc">Returns a view of the root name part of this view e.g. C:</div><div class="ttdef"><b>Definition</b> path_view.hpp:2265</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2097,8 +2097,8 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 </div><div class="memdoc">
 
 <p>True if has root path. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2179</span>{ <span class="keywordflow">return</span> !<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#ace2d2fec2c49aff2a2536465b93e6639">root_path</a>().<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#aa501a1549a3de8a4364fd65295375784">empty</a>(); }</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_ace2d2fec2c49aff2a2536465b93e6639"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#ace2d2fec2c49aff2a2536465b93e6639">llfio_v2_xxx::path_view::root_path</a></div><div class="ttdeci">constexpr path_view root_path() const noexcept</div><div class="ttdoc">Returns, if any, a view of the root path part of this view e.g. C:/.</div><div class="ttdef"><b>Definition</b> path_view.hpp:2365</div></div>
+<div class="fragment"><div class="line"><span class="lineno"> 2136</span>{ <span class="keywordflow">return</span> !<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#ace2d2fec2c49aff2a2536465b93e6639">root_path</a>().<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#aa501a1549a3de8a4364fd65295375784">empty</a>(); }</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_ace2d2fec2c49aff2a2536465b93e6639"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#ace2d2fec2c49aff2a2536465b93e6639">llfio_v2_xxx::path_view::root_path</a></div><div class="ttdeci">constexpr path_view root_path() const noexcept</div><div class="ttdoc">Returns, if any, a view of the root path part of this view e.g. C:/.</div><div class="ttdef"><b>Definition</b> path_view.hpp:2300</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2126,8 +2126,8 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 </div><div class="memdoc">
 
 <p>True if <code>stem()</code> returns a non-empty path. </p>
-<div class="fragment"><div class="line"><span class="lineno">  689</span>{ <span class="keywordflow">return</span> !<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a824346ba86aed542137be23ea8cad5c0">stem</a>().<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#aa501a1549a3de8a4364fd65295375784">empty</a>(); }</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view__component_html_a824346ba86aed542137be23ea8cad5c0"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#a824346ba86aed542137be23ea8cad5c0">llfio_v2_xxx::path_view_component::stem</a></div><div class="ttdeci">constexpr path_view_component stem() const noexcept</div><div class="ttdoc">Returns a view of the filename without any file extension.</div><div class="ttdef"><b>Definition</b> path_view.hpp:710</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  668</span>{ <span class="keywordflow">return</span> !<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a824346ba86aed542137be23ea8cad5c0">stem</a>().<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#aa501a1549a3de8a4364fd65295375784">empty</a>(); }</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view__component_html_a824346ba86aed542137be23ea8cad5c0"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#a824346ba86aed542137be23ea8cad5c0">llfio_v2_xxx::path_view_component::stem</a></div><div class="ttdeci">constexpr path_view_component stem() const noexcept</div><div class="ttdoc">Returns a view of the filename without any file extension.</div><div class="ttdef"><b>Definition</b> path_view.hpp:689</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2155,30 +2155,30 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 </div><div class="memdoc">
 
 <p>True if absolute. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2192</span>  {</div>
-<div class="line"><span class="lineno"> 2193</span>    <span class="keyword">auto</span> sep_idx = this-&gt;_find_first_sep();</div>
-<div class="line"><span class="lineno"> 2194</span>    <span class="keywordflow">if</span>(_npos == sep_idx)</div>
-<div class="line"><span class="lineno"> 2195</span>    {</div>
-<div class="line"><span class="lineno"> 2196</span>      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno"> 2197</span>    }</div>
-<div class="line"><span class="lineno"> 2198</span><span class="preprocessor">#ifdef _WIN32</span></div>
-<div class="line"><span class="lineno"> 2199</span>    <span class="keywordflow">if</span>(is_ntpath())</div>
-<div class="line"><span class="lineno"> 2200</span>      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno"> 2201</span>    <span class="keywordflow">return</span> this-&gt;_invoke(</div>
-<div class="line"><span class="lineno"> 2202</span>    [sep_idx](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v)</div>
-<div class="line"><span class="lineno"> 2203</span>    {</div>
-<div class="line"><span class="lineno"> 2204</span>      <span class="keywordflow">if</span>(sep_idx == 0)</div>
-<div class="line"><span class="lineno"> 2205</span>      {</div>
-<div class="line"><span class="lineno"> 2206</span>        <span class="keywordflow">if</span>(v[sep_idx + 1] == <a class="code hl_variable" href="classllfio__v2__xxx_1_1path__view__component.html#a7c7def30502a37e61b83836e52a0a40b">preferred_separator</a>)  <span class="comment">// double separator at front</span></div>
-<div class="line"><span class="lineno"> 2207</span>          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno"> 2208</span>      }</div>
-<div class="line"><span class="lineno"> 2209</span>      <span class="keyword">auto</span> colon_idx = v.find(<span class="charliteral">&#39;:&#39;</span>);</div>
-<div class="line"><span class="lineno"> 2210</span>      <span class="keywordflow">return</span> colon_idx &lt; sep_idx;  <span class="comment">// colon before first separator</span></div>
-<div class="line"><span class="lineno"> 2211</span>    });</div>
-<div class="line"><span class="lineno"> 2212</span><span class="preprocessor">#else</span></div>
-<div class="line"><span class="lineno"> 2213</span>    <span class="keywordflow">return</span> sep_idx == 0;</div>
-<div class="line"><span class="lineno"> 2214</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno"> 2215</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2149</span>  {</div>
+<div class="line"><span class="lineno"> 2150</span>    <span class="keyword">auto</span> sep_idx = this-&gt;_find_first_sep();</div>
+<div class="line"><span class="lineno"> 2151</span>    <span class="keywordflow">if</span>(_npos == sep_idx)</div>
+<div class="line"><span class="lineno"> 2152</span>    {</div>
+<div class="line"><span class="lineno"> 2153</span>      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno"> 2154</span>    }</div>
+<div class="line"><span class="lineno"> 2155</span><span class="preprocessor">#ifdef _WIN32</span></div>
+<div class="line"><span class="lineno"> 2156</span>    <span class="keywordflow">if</span>(is_ntpath())</div>
+<div class="line"><span class="lineno"> 2157</span>      <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno"> 2158</span>    <span class="keywordflow">return</span> this-&gt;_invoke(</div>
+<div class="line"><span class="lineno"> 2159</span>    [sep_idx](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v)</div>
+<div class="line"><span class="lineno"> 2160</span>    {</div>
+<div class="line"><span class="lineno"> 2161</span>      <span class="keywordflow">if</span>(sep_idx == 0)</div>
+<div class="line"><span class="lineno"> 2162</span>      {</div>
+<div class="line"><span class="lineno"> 2163</span>        <span class="keywordflow">if</span>(v[sep_idx + 1] == <a class="code hl_variable" href="classllfio__v2__xxx_1_1path__view__component.html#a7c7def30502a37e61b83836e52a0a40b">preferred_separator</a>)  <span class="comment">// double separator at front</span></div>
+<div class="line"><span class="lineno"> 2164</span>          <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno"> 2165</span>      }</div>
+<div class="line"><span class="lineno"> 2166</span>      <span class="keyword">auto</span> colon_idx = v.find(<span class="charliteral">&#39;:&#39;</span>);</div>
+<div class="line"><span class="lineno"> 2167</span>      <span class="keywordflow">return</span> colon_idx &lt; sep_idx;  <span class="comment">// colon before first separator</span></div>
+<div class="line"><span class="lineno"> 2168</span>    });</div>
+<div class="line"><span class="lineno"> 2169</span><span class="preprocessor">#else</span></div>
+<div class="line"><span class="lineno"> 2170</span>    <span class="keywordflow">return</span> sep_idx == 0;</div>
+<div class="line"><span class="lineno"> 2171</span><span class="preprocessor">#endif</span></div>
+<div class="line"><span class="lineno"> 2172</span>  }</div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1path__view__component_html_a7c7def30502a37e61b83836e52a0a40b"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#a7c7def30502a37e61b83836e52a0a40b">llfio_v2_xxx::path_view_component::preferred_separator</a></div><div class="ttdeci">static constexpr auto preferred_separator</div><div class="ttdoc">The preferred separator type.</div><div class="ttdef"><b>Definition</b> path_view.hpp:266</div></div>
 </div><!-- fragment -->
 </div>
@@ -2207,8 +2207,8 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 </div><div class="memdoc">
 
 <p>True if relative. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2217</span>{ <span class="keywordflow">return</span> !<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#aa764357828bed56ec356828a090aff86">is_absolute</a>(); }</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_aa764357828bed56ec356828a090aff86"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#aa764357828bed56ec356828a090aff86">llfio_v2_xxx::path_view::is_absolute</a></div><div class="ttdeci">constexpr bool is_absolute() const noexcept</div><div class="ttdoc">True if absolute.</div><div class="ttdef"><b>Definition</b> path_view.hpp:2191</div></div>
+<div class="fragment"><div class="line"><span class="lineno"> 2174</span>{ <span class="keywordflow">return</span> !<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#aa764357828bed56ec356828a090aff86">is_absolute</a>(); }</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_aa764357828bed56ec356828a090aff86"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#aa764357828bed56ec356828a090aff86">llfio_v2_xxx::path_view::is_absolute</a></div><div class="ttdeci">constexpr bool is_absolute() const noexcept</div><div class="ttdoc">True if absolute.</div><div class="ttdef"><b>Definition</b> path_view.hpp:2148</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2236,9 +2236,9 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 </div><div class="memdoc">
 
 <p>Returns the size of the view in characters. </p>
-<div class="fragment"><div class="line"><span class="lineno">  676</span>  {</div>
-<div class="line"><span class="lineno">  677</span>    <span class="keywordflow">return</span> _invoke([](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v) { <span class="keywordflow">return</span> v.size(); });</div>
-<div class="line"><span class="lineno">  678</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  655</span>  {</div>
+<div class="line"><span class="lineno">  656</span>    <span class="keywordflow">return</span> _invoke([](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v) { <span class="keywordflow">return</span> v.size(); });</div>
+<div class="line"><span class="lineno">  657</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2266,47 +2266,40 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 </div><div class="memdoc">
 
 <p>Returns a view of the everything apart from the filename part of this view. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2456</span>  {</div>
-<div class="line"><span class="lineno"> 2457</span>    <span class="keyword">auto</span> sep_idx = this-&gt;_find_last_sep();</div>
-<div class="line"><span class="lineno"> 2458</span>    <span class="keywordflow">if</span>(_npos == sep_idx)</div>
-<div class="line"><span class="lineno"> 2459</span>    {</div>
-<div class="line"><span class="lineno"> 2460</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>();</div>
-<div class="line"><span class="lineno"> 2461</span>    }</div>
-<div class="line"><span class="lineno"> 2462</span><span class="preprocessor">#ifdef _WIN32</span></div>
-<div class="line"><span class="lineno"> 2463</span>    <span class="keywordflow">return</span> this-&gt;_invoke(</div>
-<div class="line"><span class="lineno"> 2464</span>    [<span class="keyword">this</span>, sep_idx](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v)</div>
-<div class="line"><span class="lineno"> 2465</span>    {</div>
-<div class="line"><span class="lineno"> 2466</span>      <span class="comment">// UNC paths return a trailing slash if the parent path is the server name</span></div>
-<div class="line"><span class="lineno"> 2467</span>      <span class="keywordflow">if</span>(is_uncpath())</div>
-<div class="line"><span class="lineno"> 2468</span>      {</div>
-<div class="line"><span class="lineno"> 2469</span>        <span class="keyword">auto</span> sep_idx2 = this-&gt;_find_first_sep(2);</div>
-<div class="line"><span class="lineno"> 2470</span>        <span class="keywordflow">if</span>(sep_idx2 == sep_idx)</div>
-<div class="line"><span class="lineno"> 2471</span>        {</div>
-<div class="line"><span class="lineno"> 2472</span>          <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), sep_idx + 1, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>, <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>());</div>
-<div class="line"><span class="lineno"> 2473</span>        }</div>
-<div class="line"><span class="lineno"> 2474</span>      }</div>
-<div class="line"><span class="lineno"> 2475</span><span class="preprocessor">#if !LLFIO_USING_EXPERIMENTAL_FILESYSTEM</span></div>
-<div class="line"><span class="lineno"> 2476</span>      <span class="comment">// If a C:\ or whatever, return exactly that.</span></div>
-<div class="line"><span class="lineno"> 2477</span>      <span class="keyword">auto</span> rp = <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#ace2d2fec2c49aff2a2536465b93e6639">root_path</a>();</div>
-<div class="line"><span class="lineno"> 2478</span>      <span class="keywordflow">if</span>(rp.native_size() == <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#ae8f844fe50fd3a3ee3da24aee760e456">native_size</a>())</div>
-<div class="line"><span class="lineno"> 2479</span>      {</div>
-<div class="line"><span class="lineno"> 2480</span>        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><span class="lineno"> 2481</span>      }</div>
-<div class="line"><span class="lineno"> 2482</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), (sep_idx == 0) ? 1 : sep_idx, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>, <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>());</div>
-<div class="line"><span class="lineno"> 2483</span><span class="preprocessor">#else</span></div>
-<div class="line"><span class="lineno"> 2484</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), (sep_idx == 0 &amp;&amp; this-&gt;_length &gt; 1) ? 1 : sep_idx, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>, <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>());</div>
-<div class="line"><span class="lineno"> 2485</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno"> 2486</span>    });</div>
-<div class="line"><span class="lineno"> 2487</span><span class="preprocessor">#elif LLFIO_USING_EXPERIMENTAL_FILESYSTEM  </span><span class="comment">// Filesystem TS returns parent path &quot;&quot; for &quot;/&quot;</span></div>
-<div class="line"><span class="lineno"> 2488</span>    <span class="keywordflow">return</span> this-&gt;_invoke([<span class="keyword">this</span>, sep_idx](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v)</div>
-<div class="line"><span class="lineno"> 2489</span>                         { <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), (sep_idx == 0 &amp;&amp; this-&gt;_length &gt; 1) ? 1 : sep_idx, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>, <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>()); });</div>
-<div class="line"><span class="lineno"> 2490</span><span class="preprocessor">#else</span></div>
-<div class="line"><span class="lineno"> 2491</span>  <span class="keywordflow">return</span> this-&gt;_invoke([<span class="keyword">this</span>, sep_idx](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v) { <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), (sep_idx == 0) ? 1 : sep_idx, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>, <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>()); });</div>
-<div class="line"><span class="lineno"> 2492</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno"> 2493</span>  }</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view__component_html_a6b6792638386aa705083c173e5d9b948"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">llfio_v2_xxx::path_view_component::formatting</a></div><div class="ttdeci">constexpr format formatting() const noexcept</div><div class="ttdoc">How path separators shall be interpreted.</div><div class="ttdef"><b>Definition</b> path_view.hpp:681</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view__component_html_ae8f844fe50fd3a3ee3da24aee760e456"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#ae8f844fe50fd3a3ee3da24aee760e456">llfio_v2_xxx::path_view_component::native_size</a></div><div class="ttdeci">constexpr size_t native_size() const noexcept</div><div class="ttdoc">Returns the size of the view in characters.</div><div class="ttdef"><b>Definition</b> path_view.hpp:675</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_a91540ade852194b9507184cdcaed3339"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">llfio_v2_xxx::path_view::path_view</a></div><div class="ttdeci">constexpr path_view()</div><div class="ttdoc">Constructs an empty path view.</div><div class="ttdef"><b>Definition</b> path_view.hpp:2037</div></div>
+<div class="fragment"><div class="line"><span class="lineno"> 2391</span>  {</div>
+<div class="line"><span class="lineno"> 2392</span>    <span class="keyword">auto</span> sep_idx = this-&gt;_find_last_sep();</div>
+<div class="line"><span class="lineno"> 2393</span>    <span class="keywordflow">if</span>(_npos == sep_idx)</div>
+<div class="line"><span class="lineno"> 2394</span>    {</div>
+<div class="line"><span class="lineno"> 2395</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>();</div>
+<div class="line"><span class="lineno"> 2396</span>    }</div>
+<div class="line"><span class="lineno"> 2397</span><span class="preprocessor">#ifdef _WIN32</span></div>
+<div class="line"><span class="lineno"> 2398</span>    <span class="keywordflow">return</span> this-&gt;_invoke(</div>
+<div class="line"><span class="lineno"> 2399</span>    [<span class="keyword">this</span>, sep_idx](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v)</div>
+<div class="line"><span class="lineno"> 2400</span>    {</div>
+<div class="line"><span class="lineno"> 2401</span>      <span class="comment">// UNC paths return a trailing slash if the parent path is the server name</span></div>
+<div class="line"><span class="lineno"> 2402</span>      <span class="keywordflow">if</span>(is_uncpath())</div>
+<div class="line"><span class="lineno"> 2403</span>      {</div>
+<div class="line"><span class="lineno"> 2404</span>        <span class="keyword">auto</span> sep_idx2 = this-&gt;_find_first_sep(2);</div>
+<div class="line"><span class="lineno"> 2405</span>        <span class="keywordflow">if</span>(sep_idx2 == sep_idx)</div>
+<div class="line"><span class="lineno"> 2406</span>        {</div>
+<div class="line"><span class="lineno"> 2407</span>          <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), sep_idx + 1, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>, <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>());</div>
+<div class="line"><span class="lineno"> 2408</span>        }</div>
+<div class="line"><span class="lineno"> 2409</span>      }</div>
+<div class="line"><span class="lineno"> 2410</span>      <span class="comment">// If a C:\ or whatever, return exactly that.</span></div>
+<div class="line"><span class="lineno"> 2411</span>      <span class="keyword">auto</span> rp = <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#ace2d2fec2c49aff2a2536465b93e6639">root_path</a>();</div>
+<div class="line"><span class="lineno"> 2412</span>      <span class="keywordflow">if</span>(rp.native_size() == <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#ae8f844fe50fd3a3ee3da24aee760e456">native_size</a>())</div>
+<div class="line"><span class="lineno"> 2413</span>      {</div>
+<div class="line"><span class="lineno"> 2414</span>        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><span class="lineno"> 2415</span>      }</div>
+<div class="line"><span class="lineno"> 2416</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), (sep_idx == 0) ? 1 : sep_idx, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>, <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>());</div>
+<div class="line"><span class="lineno"> 2417</span>    });</div>
+<div class="line"><span class="lineno"> 2418</span><span class="preprocessor">#else</span></div>
+<div class="line"><span class="lineno"> 2419</span>    <span class="keywordflow">return</span> this-&gt;_invoke([<span class="keyword">this</span>, sep_idx](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v) { <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), (sep_idx == 0) ? 1 : sep_idx, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>, <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>()); });</div>
+<div class="line"><span class="lineno"> 2420</span><span class="preprocessor">#endif</span></div>
+<div class="line"><span class="lineno"> 2421</span>  }</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view__component_html_a6b6792638386aa705083c173e5d9b948"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">llfio_v2_xxx::path_view_component::formatting</a></div><div class="ttdeci">constexpr format formatting() const noexcept</div><div class="ttdoc">How path separators shall be interpreted.</div><div class="ttdef"><b>Definition</b> path_view.hpp:660</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view__component_html_ae8f844fe50fd3a3ee3da24aee760e456"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#ae8f844fe50fd3a3ee3da24aee760e456">llfio_v2_xxx::path_view_component::native_size</a></div><div class="ttdeci">constexpr size_t native_size() const noexcept</div><div class="ttdoc">Returns the size of the view in characters.</div><div class="ttdef"><b>Definition</b> path_view.hpp:654</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_a91540ade852194b9507184cdcaed3339"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">llfio_v2_xxx::path_view::path_view</a></div><div class="ttdeci">constexpr path_view()</div><div class="ttdoc">Constructs an empty path view.</div><div class="ttdef"><b>Definition</b> path_view.hpp:1994</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2334,34 +2327,25 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 </div><div class="memdoc">
 
 <p>Return the path view as a path. Allocates and copies memory! </p>
-<div class="fragment"><div class="line"><span class="lineno">  818</span>  {</div>
-<div class="line"><span class="lineno">  819</span>    <span class="keywordflow">return</span> _invoke(</div>
-<div class="line"><span class="lineno">  820</span>    [&amp;](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v)</div>
-<div class="line"><span class="lineno">  821</span>    {</div>
-<div class="line"><span class="lineno">  822</span><span class="preprocessor">#ifdef LLFIO_USING_STD_FILESYSTEM</span></div>
-<div class="line"><span class="lineno">  823</span>      <span class="keywordflow">return</span> _path_from_char_array(v,</div>
-<div class="line"><span class="lineno">  824</span>                                   [](<a class="code hl_enumeration" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48d">format</a> f) -&gt; filesystem::path::format</div>
-<div class="line"><span class="lineno">  825</span>                                   {</div>
-<div class="line"><span class="lineno">  826</span>                                     <span class="keywordflow">switch</span>(f)</div>
-<div class="line"><span class="lineno">  827</span>                                     {</div>
-<div class="line"><span class="lineno">  828</span>                                     <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48da570096cfe6db7f309f5932170f5c3455">format::generic_format</a>:</div>
-<div class="line"><span class="lineno">  829</span>                                       <span class="keywordflow">return</span> filesystem::path::format::generic_format;</div>
-<div class="line"><span class="lineno">  830</span>                                     <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48dafc810cf94971424955357c610a506b7b">format::native_format</a>:</div>
-<div class="line"><span class="lineno">  831</span>                                       <span class="keywordflow">return</span> filesystem::path::format::native_format;</div>
-<div class="line"><span class="lineno">  832</span>                                     <span class="keywordflow">default</span>:</div>
-<div class="line"><span class="lineno">  833</span>                                       <span class="keywordflow">return</span> filesystem::path::format::auto_format;</div>
-<div class="line"><span class="lineno">  834</span>                                     }</div>
-<div class="line"><span class="lineno">  835</span>                                   }(<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>()));</div>
-<div class="line"><span class="lineno">  836</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno">  837</span><span class="preprocessor">#ifdef LLFIO_USING_EXPERIMENTAL_FILESYSTEM</span></div>
-<div class="line"><span class="lineno">  838</span>      <span class="keywordflow">if</span>(<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>() == <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48da570096cfe6db7f309f5932170f5c3455">generic_format</a> || <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>() == <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48dafc810cf94971424955357c610a506b7b">native_format</a>)</div>
-<div class="line"><span class="lineno">  839</span>      {</div>
-<div class="line"><span class="lineno">  840</span>        LLFIO_EXCEPTION_THROW(std::runtime_error(<span class="stringliteral">&quot;Path conversion with &lt;experimental/filesystem&gt; cannot handle generic_format or native_format formatting.&quot;</span>));</div>
-<div class="line"><span class="lineno">  841</span>      }</div>
-<div class="line"><span class="lineno">  842</span>      <span class="keywordflow">return</span> _path_from_char_array(v);</div>
-<div class="line"><span class="lineno">  843</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno">  844</span>    });</div>
-<div class="line"><span class="lineno">  845</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  784</span>  {</div>
+<div class="line"><span class="lineno">  785</span>    <span class="keywordflow">return</span> _invoke(</div>
+<div class="line"><span class="lineno">  786</span>    [&amp;](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v)</div>
+<div class="line"><span class="lineno">  787</span>    {</div>
+<div class="line"><span class="lineno">  788</span>      <span class="keywordflow">return</span> _path_from_char_array(v,</div>
+<div class="line"><span class="lineno">  789</span>                                   [](<a class="code hl_enumeration" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48d">format</a> f) -&gt; filesystem::path::format</div>
+<div class="line"><span class="lineno">  790</span>                                   {</div>
+<div class="line"><span class="lineno">  791</span>                                     <span class="keywordflow">switch</span>(f)</div>
+<div class="line"><span class="lineno">  792</span>                                     {</div>
+<div class="line"><span class="lineno">  793</span>                                     <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48da570096cfe6db7f309f5932170f5c3455">format::generic_format</a>:</div>
+<div class="line"><span class="lineno">  794</span>                                       <span class="keywordflow">return</span> filesystem::path::format::generic_format;</div>
+<div class="line"><span class="lineno">  795</span>                                     <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48dafc810cf94971424955357c610a506b7b">format::native_format</a>:</div>
+<div class="line"><span class="lineno">  796</span>                                       <span class="keywordflow">return</span> filesystem::path::format::native_format;</div>
+<div class="line"><span class="lineno">  797</span>                                     <span class="keywordflow">default</span>:</div>
+<div class="line"><span class="lineno">  798</span>                                       <span class="keywordflow">return</span> filesystem::path::format::auto_format;</div>
+<div class="line"><span class="lineno">  799</span>                                     }</div>
+<div class="line"><span class="lineno">  800</span>                                   }(<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>()));</div>
+<div class="line"><span class="lineno">  801</span>    });</div>
+<div class="line"><span class="lineno">  802</span>  }</div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1path__view__component_html_a3d0688505b971f8ff6f9b9075817d48d"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component.html#a3d0688505b971f8ff6f9b9075817d48d">llfio_v2_xxx::path_view_component::format</a></div><div class="ttdeci">format</div><div class="ttdoc">How to interpret separators.</div><div class="ttdef"><b>Definition</b> path_view.hpp:290</div></div>
 </div><!-- fragment -->
 </div>
@@ -2390,49 +2374,49 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 </div><div class="memdoc">
 
 <p>Returns a view of everything after the root path. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2411</span>  {</div>
-<div class="line"><span class="lineno"> 2412</span>    <span class="keyword">auto</span> sep_idx = this-&gt;_find_first_sep();</div>
-<div class="line"><span class="lineno"> 2413</span>    <span class="keywordflow">if</span>(_npos == sep_idx)</div>
-<div class="line"><span class="lineno"> 2414</span>    {</div>
-<div class="line"><span class="lineno"> 2415</span>      <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><span class="lineno"> 2416</span>    }</div>
-<div class="line"><span class="lineno"> 2417</span><span class="preprocessor">#ifdef _WIN32</span></div>
-<div class="line"><span class="lineno"> 2418</span>    <span class="keywordflow">return</span> this-&gt;_invoke(</div>
-<div class="line"><span class="lineno"> 2419</span>    [<span class="keyword">this</span>, sep_idx](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v) <span class="keyword">mutable</span></div>
-<div class="line"><span class="lineno"> 2420</span>    {</div>
-<div class="line"><span class="lineno"> 2421</span>      <span class="comment">// Special case \\.\ and \\?\ to match filesystem::path</span></div>
-<div class="line"><span class="lineno"> 2422</span>      <span class="keywordflow">if</span>(is_ntpath() || (v.size() &gt;= 4 &amp;&amp; sep_idx == 0 &amp;&amp; v[1] == <span class="charliteral">&#39;\\&#39;</span> &amp;&amp; (v[2] == <span class="charliteral">&#39;.&#39;</span> || v[2] == <span class="charliteral">&#39;?&#39;</span>) &amp;&amp; v[3] == <span class="charliteral">&#39;\\&#39;</span>))</div>
-<div class="line"><span class="lineno"> 2423</span>      {</div>
-<div class="line"><span class="lineno"> 2424</span>        return path_view(v.data() + 4, v.size() - 4, this-&gt;termination(), formatting());</div>
-<div class="line"><span class="lineno"> 2425</span>      }</div>
-<div class="line"><span class="lineno"> 2426</span>      <span class="comment">// Is there a drive letter before the first separator?</span></div>
-<div class="line"><span class="lineno"> 2427</span>      <span class="keyword">auto</span> colon_idx = v.find(<span class="charliteral">&#39;:&#39;</span>);</div>
-<div class="line"><span class="lineno"> 2428</span>      <span class="keywordflow">if</span>(colon_idx &lt; sep_idx)</div>
-<div class="line"><span class="lineno"> 2429</span>      {</div>
-<div class="line"><span class="lineno"> 2430</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data() + sep_idx + 1, v.size() - sep_idx - 1, this-&gt;termination(), <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>());</div>
-<div class="line"><span class="lineno"> 2431</span>      }</div>
-<div class="line"><span class="lineno"> 2432</span>      <span class="comment">// UNC paths return the server name as the root path</span></div>
-<div class="line"><span class="lineno"> 2433</span>      <span class="keywordflow">if</span>(is_uncpath())</div>
-<div class="line"><span class="lineno"> 2434</span>      {</div>
-<div class="line"><span class="lineno"> 2435</span>        sep_idx = this-&gt;_find_first_sep(2);</div>
-<div class="line"><span class="lineno"> 2436</span>        <span class="keywordflow">if</span>(_npos == sep_idx)</div>
-<div class="line"><span class="lineno"> 2437</span>        {</div>
-<div class="line"><span class="lineno"> 2438</span>          <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>();</div>
-<div class="line"><span class="lineno"> 2439</span>        }</div>
-<div class="line"><span class="lineno"> 2440</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data() + sep_idx + 1, v.size() - sep_idx - 1, this-&gt;termination(), <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>());</div>
-<div class="line"><span class="lineno"> 2441</span>      }</div>
-<div class="line"><span class="lineno"> 2442</span><span class="preprocessor">#else</span></div>
-<div class="line"><span class="lineno"> 2443</span>    <span class="keywordflow">return</span> this-&gt;_invoke(</div>
-<div class="line"><span class="lineno"> 2444</span>    [<span class="keyword">this</span>, sep_idx](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v)</div>
-<div class="line"><span class="lineno"> 2445</span>    {</div>
-<div class="line"><span class="lineno"> 2446</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno"> 2447</span>      <span class="keywordflow">if</span>(sep_idx == 0)</div>
-<div class="line"><span class="lineno"> 2448</span>      {</div>
-<div class="line"><span class="lineno"> 2449</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data() + 1, v.size() - 1, this-&gt;termination(), <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>());</div>
-<div class="line"><span class="lineno"> 2450</span>      }</div>
-<div class="line"><span class="lineno"> 2451</span>      <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><span class="lineno"> 2452</span>    });</div>
-<div class="line"><span class="lineno"> 2453</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2346</span>  {</div>
+<div class="line"><span class="lineno"> 2347</span>    <span class="keyword">auto</span> sep_idx = this-&gt;_find_first_sep();</div>
+<div class="line"><span class="lineno"> 2348</span>    <span class="keywordflow">if</span>(_npos == sep_idx)</div>
+<div class="line"><span class="lineno"> 2349</span>    {</div>
+<div class="line"><span class="lineno"> 2350</span>      <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><span class="lineno"> 2351</span>    }</div>
+<div class="line"><span class="lineno"> 2352</span><span class="preprocessor">#ifdef _WIN32</span></div>
+<div class="line"><span class="lineno"> 2353</span>    <span class="keywordflow">return</span> this-&gt;_invoke(</div>
+<div class="line"><span class="lineno"> 2354</span>    [<span class="keyword">this</span>, sep_idx](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v) <span class="keyword">mutable</span></div>
+<div class="line"><span class="lineno"> 2355</span>    {</div>
+<div class="line"><span class="lineno"> 2356</span>      <span class="comment">// Special case \\.\ and \\?\ to match filesystem::path</span></div>
+<div class="line"><span class="lineno"> 2357</span>      <span class="keywordflow">if</span>(is_ntpath() || (v.size() &gt;= 4 &amp;&amp; sep_idx == 0 &amp;&amp; v[1] == <span class="charliteral">&#39;\\&#39;</span> &amp;&amp; (v[2] == <span class="charliteral">&#39;.&#39;</span> || v[2] == <span class="charliteral">&#39;?&#39;</span>) &amp;&amp; v[3] == <span class="charliteral">&#39;\\&#39;</span>))</div>
+<div class="line"><span class="lineno"> 2358</span>      {</div>
+<div class="line"><span class="lineno"> 2359</span>        return path_view(v.data() + 4, v.size() - 4, this-&gt;termination(), formatting());</div>
+<div class="line"><span class="lineno"> 2360</span>      }</div>
+<div class="line"><span class="lineno"> 2361</span>      <span class="comment">// Is there a drive letter before the first separator?</span></div>
+<div class="line"><span class="lineno"> 2362</span>      <span class="keyword">auto</span> colon_idx = v.find(<span class="charliteral">&#39;:&#39;</span>);</div>
+<div class="line"><span class="lineno"> 2363</span>      <span class="keywordflow">if</span>(colon_idx &lt; sep_idx)</div>
+<div class="line"><span class="lineno"> 2364</span>      {</div>
+<div class="line"><span class="lineno"> 2365</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data() + sep_idx + 1, v.size() - sep_idx - 1, this-&gt;termination(), <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>());</div>
+<div class="line"><span class="lineno"> 2366</span>      }</div>
+<div class="line"><span class="lineno"> 2367</span>      <span class="comment">// UNC paths return the server name as the root path</span></div>
+<div class="line"><span class="lineno"> 2368</span>      <span class="keywordflow">if</span>(is_uncpath())</div>
+<div class="line"><span class="lineno"> 2369</span>      {</div>
+<div class="line"><span class="lineno"> 2370</span>        sep_idx = this-&gt;_find_first_sep(2);</div>
+<div class="line"><span class="lineno"> 2371</span>        <span class="keywordflow">if</span>(_npos == sep_idx)</div>
+<div class="line"><span class="lineno"> 2372</span>        {</div>
+<div class="line"><span class="lineno"> 2373</span>          <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>();</div>
+<div class="line"><span class="lineno"> 2374</span>        }</div>
+<div class="line"><span class="lineno"> 2375</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data() + sep_idx + 1, v.size() - sep_idx - 1, this-&gt;termination(), <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>());</div>
+<div class="line"><span class="lineno"> 2376</span>      }</div>
+<div class="line"><span class="lineno"> 2377</span><span class="preprocessor">#else</span></div>
+<div class="line"><span class="lineno"> 2378</span>    <span class="keywordflow">return</span> this-&gt;_invoke(</div>
+<div class="line"><span class="lineno"> 2379</span>    [<span class="keyword">this</span>, sep_idx](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v)</div>
+<div class="line"><span class="lineno"> 2380</span>    {</div>
+<div class="line"><span class="lineno"> 2381</span><span class="preprocessor">#endif</span></div>
+<div class="line"><span class="lineno"> 2382</span>      <span class="keywordflow">if</span>(sep_idx == 0)</div>
+<div class="line"><span class="lineno"> 2383</span>      {</div>
+<div class="line"><span class="lineno"> 2384</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data() + 1, v.size() - 1, this-&gt;termination(), <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>());</div>
+<div class="line"><span class="lineno"> 2385</span>      }</div>
+<div class="line"><span class="lineno"> 2386</span>      <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><span class="lineno"> 2387</span>    });</div>
+<div class="line"><span class="lineno"> 2388</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2460,37 +2444,15 @@ template&lt;class T  = typename filesystem::path::value_type, class Deleter  = d
 </div><div class="memdoc">
 
 <p>Returns a copy of this view with the end adjusted to match the final separator. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2298</span>  {</div>
-<div class="line"><span class="lineno"> 2299</span>    <span class="keyword">auto</span> sep_idx = this-&gt;_find_last_sep();</div>
-<div class="line"><span class="lineno"> 2300</span>    <span class="keywordflow">if</span>(_npos == sep_idx)</div>
-<div class="line"><span class="lineno"> 2301</span>    {</div>
-<div class="line"><span class="lineno"> 2302</span>      <span class="comment">// Sorry, this semantic is so broken that it&#39;s unwise to emulate!</span></div>
-<div class="line"><span class="lineno"> 2303</span><span class="preprocessor">#if 0  </span><span class="comment">// LLFIO_USING_EXPERIMENTAL_FILESYSTEM &amp;&amp; defined(_MSC_VER)</span></div>
-<div class="line"><span class="lineno"> 2304</span>      <span class="keywordflow">return</span> this-&gt;_invoke([&amp;](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v) {</div>
-<div class="line"><span class="lineno"> 2305</span>        <span class="comment">// MSVC&#39;s Experimental Filesystem has some really, really weird semantics :(</span></div>
-<div class="line"><span class="lineno"> 2306</span>        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><span class="lineno"> 2307</span>      });</div>
-<div class="line"><span class="lineno"> 2308</span><span class="preprocessor">#else</span></div>
-<div class="line"><span class="lineno"> 2309</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>();</div>
-<div class="line"><span class="lineno"> 2310</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno"> 2311</span>    }</div>
-<div class="line"><span class="lineno"> 2312</span>    <span class="keywordflow">return</span> this-&gt;_invoke(</div>
-<div class="line"><span class="lineno"> 2313</span>    [sep_idx, <span class="keyword">this</span>](<span class="keyword">auto</span> v)</div>
-<div class="line"><span class="lineno"> 2314</span>    {</div>
-<div class="line"><span class="lineno"> 2315</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(),</div>
-<div class="line"><span class="lineno"> 2316</span>#<span class="keywordflow">if</span> LLFIO_USING_EXPERIMENTAL_FILESYSTEM</div>
-<div class="line"><span class="lineno"> 2317</span>#ifdef _MSC_VER</div>
-<div class="line"><span class="lineno"> 2318</span>                       (sep_idx &gt; 3 &amp;&amp; (!is_uncpath() || v.data()[2] == <span class="charliteral">&#39;.&#39;</span> || v.data()[2] == <span class="charliteral">&#39;?&#39;</span>)) ? sep_idx : (sep_idx + 1)</div>
-<div class="line"><span class="lineno"> 2319</span>#else</div>
-<div class="line"><span class="lineno"> 2320</span>                       (v.size() - 1 == sep_idx) ? sep_idx : (sep_idx + 1)</div>
-<div class="line"><span class="lineno"> 2321</span>#endif</div>
-<div class="line"><span class="lineno"> 2322</span>#else</div>
-<div class="line"><span class="lineno"> 2323</span>                       (sep_idx + 1)</div>
-<div class="line"><span class="lineno"> 2324</span>#endif</div>
-<div class="line"><span class="lineno"> 2325</span>                       ,</div>
-<div class="line"><span class="lineno"> 2326</span>                       <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>, <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>());</div>
-<div class="line"><span class="lineno"> 2327</span>    });</div>
-<div class="line"><span class="lineno"> 2328</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2255</span>  {</div>
+<div class="line"><span class="lineno"> 2256</span>    <span class="keyword">auto</span> sep_idx = this-&gt;_find_last_sep();</div>
+<div class="line"><span class="lineno"> 2257</span>    <span class="keywordflow">if</span>(_npos == sep_idx)</div>
+<div class="line"><span class="lineno"> 2258</span>    {</div>
+<div class="line"><span class="lineno"> 2259</span>      <span class="comment">// Sorry, this semantic is so broken that it&#39;s unwise to emulate!</span></div>
+<div class="line"><span class="lineno"> 2260</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>();</div>
+<div class="line"><span class="lineno"> 2261</span>    }</div>
+<div class="line"><span class="lineno"> 2262</span>    <span class="keywordflow">return</span> this-&gt;_invoke([sep_idx, <span class="keyword">this</span>](<span class="keyword">auto</span> v) { <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), (sep_idx + 1), <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>, <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>()); });</div>
+<div class="line"><span class="lineno"> 2263</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2531,9 +2493,9 @@ template&lt;enum <a class="el" href="classllfio__v2__xxx_1_1path__view__componen
 </div><div class="memdoc">
 
 <p>Convenience function. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 1556</span>  {</div>
-<div class="line"><span class="lineno"> 1557</span>    <span class="keywordflow">return</span> rendered_path&lt;ZeroTermination, T, AllocatorOrDeleter, _internal_buffer_size&gt;(view, std::forward&lt;Args&gt;(args)...);</div>
-<div class="line"><span class="lineno"> 1558</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1513</span>  {</div>
+<div class="line"><span class="lineno"> 1514</span>    <span class="keywordflow">return</span> rendered_path&lt;ZeroTermination, T, AllocatorOrDeleter, _internal_buffer_size&gt;(view, std::forward&lt;Args&gt;(args)...);</div>
+<div class="line"><span class="lineno"> 1515</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2564,9 +2526,9 @@ template&lt;class T  = typename filesystem::path::value_type, class AllocatorOrD
 </div><div class="memdoc">
 
 <p>Convenience function. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 1566</span>  {</div>
-<div class="line"><span class="lineno"> 1567</span>    <span class="keywordflow">return</span> rendered_path&lt;termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size&gt;(*<span class="keyword">this</span>, std::forward&lt;Args&gt;(args)...);</div>
-<div class="line"><span class="lineno"> 1568</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1523</span>  {</div>
+<div class="line"><span class="lineno"> 1524</span>    <span class="keywordflow">return</span> rendered_path&lt;termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size&gt;(*<span class="keyword">this</span>, std::forward&lt;Args&gt;(args)...);</div>
+<div class="line"><span class="lineno"> 1525</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2597,9 +2559,9 @@ template&lt;class T  = typename filesystem::path::value_type, class AllocatorOrD
 </div><div class="memdoc">
 
 <p>Convenience function. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 1576</span>  {</div>
-<div class="line"><span class="lineno"> 1577</span>    <span class="keywordflow">return</span> rendered_path&lt;termination::not_zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size&gt;(*<span class="keyword">this</span>, std::forward&lt;Args&gt;(args)...);</div>
-<div class="line"><span class="lineno"> 1578</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1533</span>  {</div>
+<div class="line"><span class="lineno"> 1534</span>    <span class="keywordflow">return</span> rendered_path&lt;termination::not_zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size&gt;(*<span class="keyword">this</span>, std::forward&lt;Args&gt;(args)...);</div>
+<div class="line"><span class="lineno"> 1535</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2627,29 +2589,29 @@ template&lt;class T  = typename filesystem::path::value_type, class AllocatorOrD
 </div><div class="memdoc">
 
 <p>Returns a view of the root directory, if there is one e.g. /. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2341</span>  {</div>
-<div class="line"><span class="lineno"> 2342</span>    <span class="keyword">auto</span> sep_idx = this-&gt;_find_first_sep();</div>
-<div class="line"><span class="lineno"> 2343</span>    <span class="keywordflow">if</span>(_npos == sep_idx)</div>
-<div class="line"><span class="lineno"> 2344</span>    {</div>
-<div class="line"><span class="lineno"> 2345</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>();</div>
-<div class="line"><span class="lineno"> 2346</span>    }</div>
-<div class="line"><span class="lineno"> 2347</span>    <span class="keywordflow">return</span> this-&gt;_invoke(</div>
-<div class="line"><span class="lineno"> 2348</span>    [sep_idx, <span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v)</div>
-<div class="line"><span class="lineno"> 2349</span>    {</div>
-<div class="line"><span class="lineno"> 2350</span><span class="preprocessor">#ifdef _WIN32</span></div>
-<div class="line"><span class="lineno"> 2351</span>      <span class="keyword">auto</span> colon_idx = v.find(<span class="charliteral">&#39;:&#39;</span>);</div>
-<div class="line"><span class="lineno"> 2352</span>      <span class="keywordflow">if</span>(colon_idx &lt; sep_idx)</div>
-<div class="line"><span class="lineno"> 2353</span>      {</div>
-<div class="line"><span class="lineno"> 2354</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data() + sep_idx, 1, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>, <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>());</div>
-<div class="line"><span class="lineno"> 2355</span>      }</div>
-<div class="line"><span class="lineno"> 2356</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno"> 2357</span>      <span class="keywordflow">if</span>(sep_idx == 0)</div>
-<div class="line"><span class="lineno"> 2358</span>      {</div>
-<div class="line"><span class="lineno"> 2359</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), 1, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>, <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>());</div>
-<div class="line"><span class="lineno"> 2360</span>      }</div>
-<div class="line"><span class="lineno"> 2361</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>();</div>
-<div class="line"><span class="lineno"> 2362</span>    });</div>
-<div class="line"><span class="lineno"> 2363</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2276</span>  {</div>
+<div class="line"><span class="lineno"> 2277</span>    <span class="keyword">auto</span> sep_idx = this-&gt;_find_first_sep();</div>
+<div class="line"><span class="lineno"> 2278</span>    <span class="keywordflow">if</span>(_npos == sep_idx)</div>
+<div class="line"><span class="lineno"> 2279</span>    {</div>
+<div class="line"><span class="lineno"> 2280</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>();</div>
+<div class="line"><span class="lineno"> 2281</span>    }</div>
+<div class="line"><span class="lineno"> 2282</span>    <span class="keywordflow">return</span> this-&gt;_invoke(</div>
+<div class="line"><span class="lineno"> 2283</span>    [sep_idx, <span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v)</div>
+<div class="line"><span class="lineno"> 2284</span>    {</div>
+<div class="line"><span class="lineno"> 2285</span><span class="preprocessor">#ifdef _WIN32</span></div>
+<div class="line"><span class="lineno"> 2286</span>      <span class="keyword">auto</span> colon_idx = v.find(<span class="charliteral">&#39;:&#39;</span>);</div>
+<div class="line"><span class="lineno"> 2287</span>      <span class="keywordflow">if</span>(colon_idx &lt; sep_idx)</div>
+<div class="line"><span class="lineno"> 2288</span>      {</div>
+<div class="line"><span class="lineno"> 2289</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data() + sep_idx, 1, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>, <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>());</div>
+<div class="line"><span class="lineno"> 2290</span>      }</div>
+<div class="line"><span class="lineno"> 2291</span><span class="preprocessor">#endif</span></div>
+<div class="line"><span class="lineno"> 2292</span>      <span class="keywordflow">if</span>(sep_idx == 0)</div>
+<div class="line"><span class="lineno"> 2293</span>      {</div>
+<div class="line"><span class="lineno"> 2294</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), 1, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>, <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>());</div>
+<div class="line"><span class="lineno"> 2295</span>      }</div>
+<div class="line"><span class="lineno"> 2296</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>();</div>
+<div class="line"><span class="lineno"> 2297</span>    });</div>
+<div class="line"><span class="lineno"> 2298</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2677,14 +2639,14 @@ template&lt;class T  = typename filesystem::path::value_type, class AllocatorOrD
 </div><div class="memdoc">
 
 <p>Returns a view of the root name part of this view e.g. C: </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2331</span>  {</div>
-<div class="line"><span class="lineno"> 2332</span>    <span class="keyword">auto</span> sep_idx = this-&gt;_find_first_sep();</div>
-<div class="line"><span class="lineno"> 2333</span>    <span class="keywordflow">if</span>(_npos == sep_idx)</div>
-<div class="line"><span class="lineno"> 2334</span>    {</div>
-<div class="line"><span class="lineno"> 2335</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>();</div>
-<div class="line"><span class="lineno"> 2336</span>    }</div>
-<div class="line"><span class="lineno"> 2337</span>    <span class="keywordflow">return</span> this-&gt;_invoke([sep_idx, <span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v) { <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), sep_idx, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>, <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>()); });</div>
-<div class="line"><span class="lineno"> 2338</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2266</span>  {</div>
+<div class="line"><span class="lineno"> 2267</span>    <span class="keyword">auto</span> sep_idx = this-&gt;_find_first_sep();</div>
+<div class="line"><span class="lineno"> 2268</span>    <span class="keywordflow">if</span>(_npos == sep_idx)</div>
+<div class="line"><span class="lineno"> 2269</span>    {</div>
+<div class="line"><span class="lineno"> 2270</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>();</div>
+<div class="line"><span class="lineno"> 2271</span>    }</div>
+<div class="line"><span class="lineno"> 2272</span>    <span class="keywordflow">return</span> this-&gt;_invoke([sep_idx, <span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v) { <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), sep_idx, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>, <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>()); });</div>
+<div class="line"><span class="lineno"> 2273</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2712,49 +2674,49 @@ template&lt;class T  = typename filesystem::path::value_type, class AllocatorOrD
 </div><div class="memdoc">
 
 <p>Returns, if any, a view of the root path part of this view e.g. C:/. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2366</span>  {</div>
-<div class="line"><span class="lineno"> 2367</span>    <span class="keyword">auto</span> sep_idx = this-&gt;_find_first_sep();</div>
-<div class="line"><span class="lineno"> 2368</span>    <span class="keywordflow">if</span>(_npos == sep_idx)</div>
-<div class="line"><span class="lineno"> 2369</span>    {</div>
-<div class="line"><span class="lineno"> 2370</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>();</div>
-<div class="line"><span class="lineno"> 2371</span>    }</div>
-<div class="line"><span class="lineno"> 2372</span><span class="preprocessor">#ifdef _WIN32</span></div>
-<div class="line"><span class="lineno"> 2373</span>    <span class="keywordflow">return</span> this-&gt;_invoke(</div>
-<div class="line"><span class="lineno"> 2374</span>    [<span class="keyword">this</span>, sep_idx](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v) <span class="keyword">mutable</span></div>
-<div class="line"><span class="lineno"> 2375</span>    {</div>
-<div class="line"><span class="lineno"> 2376</span>      <span class="comment">// Special case \\.\ and \\?\ to match filesystem::path</span></div>
-<div class="line"><span class="lineno"> 2377</span>      <span class="keywordflow">if</span>(is_ntpath() || (v.size() &gt;= 4 &amp;&amp; sep_idx == 0 &amp;&amp; v[1] == <span class="charliteral">&#39;\\&#39;</span> &amp;&amp; (v[2] == <span class="charliteral">&#39;.&#39;</span> || v[2] == <span class="charliteral">&#39;?&#39;</span>) &amp;&amp; v[3] == <span class="charliteral">&#39;\\&#39;</span>))</div>
-<div class="line"><span class="lineno"> 2378</span>      {</div>
-<div class="line"><span class="lineno"> 2379</span>        return path_view(v.data() + 0, 4, not_zero_terminated, formatting());</div>
-<div class="line"><span class="lineno"> 2380</span>      }</div>
-<div class="line"><span class="lineno"> 2381</span>      <span class="comment">// Is there a drive letter before the first separator?</span></div>
-<div class="line"><span class="lineno"> 2382</span>      <span class="keyword">auto</span> colon_idx = v.find(<span class="charliteral">&#39;:&#39;</span>);</div>
-<div class="line"><span class="lineno"> 2383</span>      <span class="keywordflow">if</span>(colon_idx &lt; sep_idx)</div>
-<div class="line"><span class="lineno"> 2384</span>      {</div>
-<div class="line"><span class="lineno"> 2385</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), sep_idx + 1, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>, <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>());</div>
-<div class="line"><span class="lineno"> 2386</span>      }</div>
-<div class="line"><span class="lineno"> 2387</span>      <span class="comment">// UNC paths return the server name as the root path</span></div>
-<div class="line"><span class="lineno"> 2388</span>      <span class="keywordflow">if</span>(is_uncpath())</div>
-<div class="line"><span class="lineno"> 2389</span>      {</div>
-<div class="line"><span class="lineno"> 2390</span>        sep_idx = this-&gt;_find_first_sep(2);</div>
-<div class="line"><span class="lineno"> 2391</span>        <span class="keywordflow">if</span>(_npos == sep_idx)</div>
-<div class="line"><span class="lineno"> 2392</span>        {</div>
-<div class="line"><span class="lineno"> 2393</span>          <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><span class="lineno"> 2394</span>        }</div>
-<div class="line"><span class="lineno"> 2395</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), sep_idx + 1, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>, <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>());</div>
-<div class="line"><span class="lineno"> 2396</span>      }</div>
-<div class="line"><span class="lineno"> 2397</span><span class="preprocessor">#else</span></div>
-<div class="line"><span class="lineno"> 2398</span>    <span class="keywordflow">return</span> this-&gt;_invoke(</div>
-<div class="line"><span class="lineno"> 2399</span>    [<span class="keyword">this</span>, sep_idx](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v)</div>
-<div class="line"><span class="lineno"> 2400</span>    {</div>
-<div class="line"><span class="lineno"> 2401</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno"> 2402</span>      <span class="keywordflow">if</span>(sep_idx == 0)</div>
-<div class="line"><span class="lineno"> 2403</span>      {</div>
-<div class="line"><span class="lineno"> 2404</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), 1, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>, <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>());</div>
-<div class="line"><span class="lineno"> 2405</span>      }</div>
-<div class="line"><span class="lineno"> 2406</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>();</div>
-<div class="line"><span class="lineno"> 2407</span>    });</div>
-<div class="line"><span class="lineno"> 2408</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2301</span>  {</div>
+<div class="line"><span class="lineno"> 2302</span>    <span class="keyword">auto</span> sep_idx = this-&gt;_find_first_sep();</div>
+<div class="line"><span class="lineno"> 2303</span>    <span class="keywordflow">if</span>(_npos == sep_idx)</div>
+<div class="line"><span class="lineno"> 2304</span>    {</div>
+<div class="line"><span class="lineno"> 2305</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>();</div>
+<div class="line"><span class="lineno"> 2306</span>    }</div>
+<div class="line"><span class="lineno"> 2307</span><span class="preprocessor">#ifdef _WIN32</span></div>
+<div class="line"><span class="lineno"> 2308</span>    <span class="keywordflow">return</span> this-&gt;_invoke(</div>
+<div class="line"><span class="lineno"> 2309</span>    [<span class="keyword">this</span>, sep_idx](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v) <span class="keyword">mutable</span></div>
+<div class="line"><span class="lineno"> 2310</span>    {</div>
+<div class="line"><span class="lineno"> 2311</span>      <span class="comment">// Special case \\.\ and \\?\ to match filesystem::path</span></div>
+<div class="line"><span class="lineno"> 2312</span>      <span class="keywordflow">if</span>(is_ntpath() || (v.size() &gt;= 4 &amp;&amp; sep_idx == 0 &amp;&amp; v[1] == <span class="charliteral">&#39;\\&#39;</span> &amp;&amp; (v[2] == <span class="charliteral">&#39;.&#39;</span> || v[2] == <span class="charliteral">&#39;?&#39;</span>) &amp;&amp; v[3] == <span class="charliteral">&#39;\\&#39;</span>))</div>
+<div class="line"><span class="lineno"> 2313</span>      {</div>
+<div class="line"><span class="lineno"> 2314</span>        return path_view(v.data() + 0, 4, not_zero_terminated, formatting());</div>
+<div class="line"><span class="lineno"> 2315</span>      }</div>
+<div class="line"><span class="lineno"> 2316</span>      <span class="comment">// Is there a drive letter before the first separator?</span></div>
+<div class="line"><span class="lineno"> 2317</span>      <span class="keyword">auto</span> colon_idx = v.find(<span class="charliteral">&#39;:&#39;</span>);</div>
+<div class="line"><span class="lineno"> 2318</span>      <span class="keywordflow">if</span>(colon_idx &lt; sep_idx)</div>
+<div class="line"><span class="lineno"> 2319</span>      {</div>
+<div class="line"><span class="lineno"> 2320</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), sep_idx + 1, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>, <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>());</div>
+<div class="line"><span class="lineno"> 2321</span>      }</div>
+<div class="line"><span class="lineno"> 2322</span>      <span class="comment">// UNC paths return the server name as the root path</span></div>
+<div class="line"><span class="lineno"> 2323</span>      <span class="keywordflow">if</span>(is_uncpath())</div>
+<div class="line"><span class="lineno"> 2324</span>      {</div>
+<div class="line"><span class="lineno"> 2325</span>        sep_idx = this-&gt;_find_first_sep(2);</div>
+<div class="line"><span class="lineno"> 2326</span>        <span class="keywordflow">if</span>(_npos == sep_idx)</div>
+<div class="line"><span class="lineno"> 2327</span>        {</div>
+<div class="line"><span class="lineno"> 2328</span>          <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><span class="lineno"> 2329</span>        }</div>
+<div class="line"><span class="lineno"> 2330</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), sep_idx + 1, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>, <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>());</div>
+<div class="line"><span class="lineno"> 2331</span>      }</div>
+<div class="line"><span class="lineno"> 2332</span><span class="preprocessor">#else</span></div>
+<div class="line"><span class="lineno"> 2333</span>    <span class="keywordflow">return</span> this-&gt;_invoke(</div>
+<div class="line"><span class="lineno"> 2334</span>    [<span class="keyword">this</span>, sep_idx](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v)</div>
+<div class="line"><span class="lineno"> 2335</span>    {</div>
+<div class="line"><span class="lineno"> 2336</span><span class="preprocessor">#endif</span></div>
+<div class="line"><span class="lineno"> 2337</span>      <span class="keywordflow">if</span>(sep_idx == 0)</div>
+<div class="line"><span class="lineno"> 2338</span>      {</div>
+<div class="line"><span class="lineno"> 2339</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>(v.data(), 1, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>, <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a6b6792638386aa705083c173e5d9b948">formatting</a>());</div>
+<div class="line"><span class="lineno"> 2340</span>      }</div>
+<div class="line"><span class="lineno"> 2341</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view.html#a91540ade852194b9507184cdcaed3339">path_view</a>();</div>
+<div class="line"><span class="lineno"> 2342</span>    });</div>
+<div class="line"><span class="lineno"> 2343</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2782,19 +2744,19 @@ template&lt;class T  = typename filesystem::path::value_type, class AllocatorOrD
 </div><div class="memdoc">
 
 <p>Returns a view of the filename without any file extension. </p>
-<div class="fragment"><div class="line"><span class="lineno">  711</span>  {</div>
-<div class="line"><span class="lineno">  712</span>    <span class="keyword">auto</span> self = _filename();</div>
-<div class="line"><span class="lineno">  713</span>    <span class="keywordflow">return</span> self._invoke(</div>
-<div class="line"><span class="lineno">  714</span>    [self](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v)</div>
-<div class="line"><span class="lineno">  715</span>    {</div>
-<div class="line"><span class="lineno">  716</span>      <span class="keyword">auto</span> dot_idx = v.rfind(<span class="charliteral">&#39;.&#39;</span>);</div>
-<div class="line"><span class="lineno">  717</span>      <span class="keywordflow">if</span>(_npos == dot_idx || dot_idx == 0 || (dot_idx == 1 &amp;&amp; v[dot_idx - 1] == <span class="charliteral">&#39;.&#39;</span>))</div>
-<div class="line"><span class="lineno">  718</span>      {</div>
-<div class="line"><span class="lineno">  719</span>        <span class="keywordflow">return</span> self;</div>
-<div class="line"><span class="lineno">  720</span>      }</div>
-<div class="line"><span class="lineno">  721</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(v.data(), dot_idx, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>);</div>
-<div class="line"><span class="lineno">  722</span>    });</div>
-<div class="line"><span class="lineno">  723</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  690</span>  {</div>
+<div class="line"><span class="lineno">  691</span>    <span class="keyword">auto</span> self = _filename();</div>
+<div class="line"><span class="lineno">  692</span>    <span class="keywordflow">return</span> self._invoke(</div>
+<div class="line"><span class="lineno">  693</span>    [self](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v)</div>
+<div class="line"><span class="lineno">  694</span>    {</div>
+<div class="line"><span class="lineno">  695</span>      <span class="keyword">auto</span> dot_idx = v.rfind(<span class="charliteral">&#39;.&#39;</span>);</div>
+<div class="line"><span class="lineno">  696</span>      <span class="keywordflow">if</span>(_npos == dot_idx || dot_idx == 0 || (dot_idx == 1 &amp;&amp; v[dot_idx - 1] == <span class="charliteral">&#39;.&#39;</span>))</div>
+<div class="line"><span class="lineno">  697</span>      {</div>
+<div class="line"><span class="lineno">  698</span>        <span class="keywordflow">return</span> self;</div>
+<div class="line"><span class="lineno">  699</span>      }</div>
+<div class="line"><span class="lineno">  700</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a>(v.data(), dot_idx, <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>);</div>
+<div class="line"><span class="lineno">  701</span>    });</div>
+<div class="line"><span class="lineno">  702</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2823,11 +2785,11 @@ template&lt;class T  = typename filesystem::path::value_type, class AllocatorOrD
 </div><div class="memdoc">
 
 <p>Swap the view with another. </p>
-<div class="fragment"><div class="line"><span class="lineno">  665</span>  {</div>
-<div class="line"><span class="lineno">  666</span>    <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a> x = *<span class="keyword">this</span>;</div>
-<div class="line"><span class="lineno">  667</span>    *<span class="keyword">this</span> = o;</div>
-<div class="line"><span class="lineno">  668</span>    o = x;</div>
-<div class="line"><span class="lineno">  669</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  644</span>  {</div>
+<div class="line"><span class="lineno">  645</span>    <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component.html#a9595c5841e26ca5e0fc18e6d735b1142">path_view_component</a> x = *<span class="keyword">this</span>;</div>
+<div class="line"><span class="lineno">  646</span>    *<span class="keyword">this</span> = o;</div>
+<div class="line"><span class="lineno">  647</span>    o = x;</div>
+<div class="line"><span class="lineno">  648</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2855,7 +2817,7 @@ template&lt;class T  = typename filesystem::path::value_type, class AllocatorOrD
 </div><div class="memdoc">
 
 <p>The zero termination during construction. </p>
-<div class="fragment"><div class="line"><span class="lineno">  686</span>{ <span class="keywordflow">return</span> _zero_terminated ? <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2ad0eba8da8c1d0dab5c4196d6bbcc37a6">zero_terminated</a> : <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>; }</div>
+<div class="fragment"><div class="line"><span class="lineno">  665</span>{ <span class="keywordflow">return</span> _zero_terminated ? <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2ad0eba8da8c1d0dab5c4196d6bbcc37a6">zero_terminated</a> : <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1path__view__component.html#aadacf9651511d41cc0a44067ac0331a2a86968f101145830aa8b984150d82392f">not_zero_terminated</a>; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2883,21 +2845,21 @@ template&lt;class T  = typename filesystem::path::value_type, class AllocatorOrD
 </div><div class="memdoc">
 
 <p>Returns a view of this view without a trailing separator, if there is one, unless the input is '/'. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 2498</span>  {</div>
-<div class="line"><span class="lineno"> 2499</span>    <span class="keyword">auto</span> sep_idx = this-&gt;_find_last_sep();</div>
-<div class="line"><span class="lineno"> 2500</span>    <span class="keywordflow">return</span> this-&gt;_invoke(</div>
-<div class="line"><span class="lineno"> 2501</span>    [<span class="keyword">this</span>, sep_idx](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v)</div>
-<div class="line"><span class="lineno"> 2502</span>    {</div>
-<div class="line"><span class="lineno"> 2503</span>      <span class="keywordflow">if</span>(sep_idx &gt; 0 &amp;&amp; v.size() - 1 == sep_idx)</div>
-<div class="line"><span class="lineno"> 2504</span>      {</div>
-<div class="line"><span class="lineno"> 2505</span>        return path_view(v.data(), sep_idx, not_zero_terminated, formatting());</div>
-<div class="line"><span class="lineno"> 2506</span>      }</div>
-<div class="line"><span class="lineno"> 2507</span>      <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno"> 2508</span>      {</div>
-<div class="line"><span class="lineno"> 2509</span>        return *this;</div>
-<div class="line"><span class="lineno"> 2510</span>      }</div>
-<div class="line"><span class="lineno"> 2511</span>    });</div>
-<div class="line"><span class="lineno"> 2512</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 2426</span>  {</div>
+<div class="line"><span class="lineno"> 2427</span>    <span class="keyword">auto</span> sep_idx = this-&gt;_find_last_sep();</div>
+<div class="line"><span class="lineno"> 2428</span>    <span class="keywordflow">return</span> this-&gt;_invoke(</div>
+<div class="line"><span class="lineno"> 2429</span>    [<span class="keyword">this</span>, sep_idx](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;v)</div>
+<div class="line"><span class="lineno"> 2430</span>    {</div>
+<div class="line"><span class="lineno"> 2431</span>      <span class="keywordflow">if</span>(sep_idx &gt; 0 &amp;&amp; v.size() - 1 == sep_idx)</div>
+<div class="line"><span class="lineno"> 2432</span>      {</div>
+<div class="line"><span class="lineno"> 2433</span>        return path_view(v.data(), sep_idx, not_zero_terminated, formatting());</div>
+<div class="line"><span class="lineno"> 2434</span>      }</div>
+<div class="line"><span class="lineno"> 2435</span>      <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno"> 2436</span>      {</div>
+<div class="line"><span class="lineno"> 2437</span>        return *this;</div>
+<div class="line"><span class="lineno"> 2438</span>      }</div>
+<div class="line"><span class="lineno"> 2439</span>    });</div>
+<div class="line"><span class="lineno"> 2440</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2927,15 +2889,15 @@ template&lt;class T  = typename filesystem::path::value_type, class AllocatorOrD
 </div><div class="memdoc">
 
 <p>Return the combined hash of individual path components. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 3072</span>{</div>
-<div class="line"><span class="lineno"> 3073</span>  <span class="keywordtype">size_t</span> ret = 0;</div>
-<div class="line"><span class="lineno"> 3074</span>  <span class="keywordflow">for</span>(<span class="keyword">auto</span> component : x)</div>
-<div class="line"><span class="lineno"> 3075</span>  {</div>
-<div class="line"><span class="lineno"> 3076</span>    ret ^= <a class="code hl_friend" href="classllfio__v2__xxx_1_1path__view.html#a5aacc1c555f0f108f587934faa66e117">hash_value</a>(component) + 0x9e3779b9 + (ret &lt;&lt; 6) + (ret &gt;&gt; 2);</div>
-<div class="line"><span class="lineno"> 3077</span>  }</div>
-<div class="line"><span class="lineno"> 3078</span>  <span class="keywordflow">return</span> ret;</div>
-<div class="line"><span class="lineno"> 3079</span>}</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_a5aacc1c555f0f108f587934faa66e117"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a5aacc1c555f0f108f587934faa66e117">llfio_v2_xxx::path_view::hash_value</a></div><div class="ttdeci">friend constexpr size_t hash_value(path_view x) noexcept</div><div class="ttdoc">Return the combined hash of individual path components.</div><div class="ttdef"><b>Definition</b> path_view.hpp:3071</div></div>
+<div class="fragment"><div class="line"><span class="lineno"> 3000</span>{</div>
+<div class="line"><span class="lineno"> 3001</span>  <span class="keywordtype">size_t</span> ret = 0;</div>
+<div class="line"><span class="lineno"> 3002</span>  <span class="keywordflow">for</span>(<span class="keyword">auto</span> component : x)</div>
+<div class="line"><span class="lineno"> 3003</span>  {</div>
+<div class="line"><span class="lineno"> 3004</span>    ret ^= <a class="code hl_friend" href="classllfio__v2__xxx_1_1path__view.html#a5aacc1c555f0f108f587934faa66e117">hash_value</a>(component) + 0x9e3779b9 + (ret &lt;&lt; 6) + (ret &gt;&gt; 2);</div>
+<div class="line"><span class="lineno"> 3005</span>  }</div>
+<div class="line"><span class="lineno"> 3006</span>  <span class="keywordflow">return</span> ret;</div>
+<div class="line"><span class="lineno"> 3007</span>}</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view_html_a5aacc1c555f0f108f587934faa66e117"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view.html#a5aacc1c555f0f108f587934faa66e117">llfio_v2_xxx::path_view::hash_value</a></div><div class="ttdeci">friend constexpr size_t hash_value(path_view x) noexcept</div><div class="ttdoc">Return the combined hash of individual path components.</div><div class="ttdef"><b>Definition</b> path_view.hpp:2999</div></div>
 </div><!-- fragment -->
 </div>
 </div>

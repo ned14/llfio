@@ -391,7 +391,7 @@ template&lt;enum <a class="el" href="classllfio__v2__xxx_1_1path__view__componen
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno"> 1103</span>{}</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1060</span>{}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -460,14 +460,14 @@ template&lt;class U , class V , typename std::enable_if&lt;(_is_deleter_based&lt
   </dd>
 </dl>
 <p>If <code>loc</code> is defaulted, and an error occurs during any conversion from UTF-8 or UTF-16, an exception of <code>system_error(errc::illegal_byte_sequence)</code> is thrown. This is because if you tell <code>path_view</code> that its source is UTF-8 or UTF-16, then that must be <b>valid</b> UTF. If you wish to supply UTF-invalid paths (which are legal on most filesystems), use native narrow or wide encoded source, or binary. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 1322</span>                                                                                                                                                   {})</div>
-<div class="line"><span class="lineno"> 1323</span>        : _deleter1(_invoke_deleter)</div>
-<div class="line"><span class="lineno"> 1324</span>        , _deleter1arg(&amp;_deleter2)</div>
-<div class="line"><span class="lineno"> 1325</span>        , _deleter2(static_cast&lt;V &amp;&amp;&gt;(<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html#a035588dcd216e998491e7026d36501e8">deleter</a>))</div>
-<div class="line"><span class="lineno"> 1326</span>    {</div>
-<div class="line"><span class="lineno"> 1327</span>      _init(view, loc, <span class="keyword">static_cast&lt;</span>U &amp;&amp;<span class="keyword">&gt;</span>(allocate));</div>
-<div class="line"><span class="lineno"> 1328</span>    }</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view__component_1_1rendered__path_html_a035588dcd216e998491e7026d36501e8"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html#a035588dcd216e998491e7026d36501e8">llfio_v2_xxx::path_view_component::rendered_path::deleter</a></div><div class="ttdeci">const AllocatorOrDeleter &amp; deleter() const noexcept</div><div class="ttdoc">Access the custom deleter instance passed to the constructor.</div><div class="ttdef"><b>Definition</b> path_view.hpp:1470</div></div>
+<div class="fragment"><div class="line"><span class="lineno"> 1279</span>                                                                                                                                                   {})</div>
+<div class="line"><span class="lineno"> 1280</span>        : _deleter1(_invoke_deleter)</div>
+<div class="line"><span class="lineno"> 1281</span>        , _deleter1arg(&amp;_deleter2)</div>
+<div class="line"><span class="lineno"> 1282</span>        , _deleter2(static_cast&lt;V &amp;&amp;&gt;(<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html#a035588dcd216e998491e7026d36501e8">deleter</a>))</div>
+<div class="line"><span class="lineno"> 1283</span>    {</div>
+<div class="line"><span class="lineno"> 1284</span>      _init(view, loc, <span class="keyword">static_cast&lt;</span>U &amp;&amp;<span class="keyword">&gt;</span>(allocate));</div>
+<div class="line"><span class="lineno"> 1285</span>    }</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view__component_1_1rendered__path_html_a035588dcd216e998491e7026d36501e8"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html#a035588dcd216e998491e7026d36501e8">llfio_v2_xxx::path_view_component::rendered_path::deleter</a></div><div class="ttdeci">const AllocatorOrDeleter &amp; deleter() const noexcept</div><div class="ttdoc">Access the custom deleter instance passed to the constructor.</div><div class="ttdef"><b>Definition</b> path_view.hpp:1427</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -522,13 +522,13 @@ template&lt;class U , class V , typename std::enable_if&lt;(_is_deleter_based&lt
 </div><div class="memdoc">
 
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 1332</span>                                                                                                                             {})</div>
-<div class="line"><span class="lineno"> 1333</span>        : _deleter1(_invoke_deleter)</div>
-<div class="line"><span class="lineno"> 1334</span>        , _deleter1arg(&amp;_deleter2)</div>
-<div class="line"><span class="lineno"> 1335</span>        , _deleter2(static_cast&lt;V &amp;&amp;&gt;(<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html#a035588dcd216e998491e7026d36501e8">deleter</a>))</div>
-<div class="line"><span class="lineno"> 1336</span>    {</div>
-<div class="line"><span class="lineno"> 1337</span>      _init(view, (<span class="keyword">const</span> std::locale *) <span class="keyword">nullptr</span>, <span class="keyword">static_cast&lt;</span>U &amp;&amp;<span class="keyword">&gt;</span>(allocate));</div>
-<div class="line"><span class="lineno"> 1338</span>    }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1289</span>                                                                                                                             {})</div>
+<div class="line"><span class="lineno"> 1290</span>        : _deleter1(_invoke_deleter)</div>
+<div class="line"><span class="lineno"> 1291</span>        , _deleter1arg(&amp;_deleter2)</div>
+<div class="line"><span class="lineno"> 1292</span>        , _deleter2(static_cast&lt;V &amp;&amp;&gt;(<a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html#a035588dcd216e998491e7026d36501e8">deleter</a>))</div>
+<div class="line"><span class="lineno"> 1293</span>    {</div>
+<div class="line"><span class="lineno"> 1294</span>      _init(view, (<span class="keyword">const</span> std::locale *) <span class="keyword">nullptr</span>, <span class="keyword">static_cast&lt;</span>U &amp;&amp;<span class="keyword">&gt;</span>(allocate));</div>
+<div class="line"><span class="lineno"> 1295</span>    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -579,12 +579,12 @@ template&lt;enum <a class="el" href="classllfio__v2__xxx_1_1path__view__componen
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno"> 1340</span>                                                                                                                 {})</div>
-<div class="line"><span class="lineno"> 1341</span>        : _deleter1(_memory_resouce_deallocate)</div>
-<div class="line"><span class="lineno"> 1342</span>        , _deleter1arg(&amp;mr)</div>
-<div class="line"><span class="lineno"> 1343</span>    {</div>
-<div class="line"><span class="lineno"> 1344</span>      _init(view, &amp;loc, _memory_resource_allocate{&amp;mr});</div>
-<div class="line"><span class="lineno"> 1345</span>    }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1297</span>                                                                                                                 {})</div>
+<div class="line"><span class="lineno"> 1298</span>        : _deleter1(_memory_resouce_deallocate)</div>
+<div class="line"><span class="lineno"> 1299</span>        , _deleter1arg(&amp;mr)</div>
+<div class="line"><span class="lineno"> 1300</span>    {</div>
+<div class="line"><span class="lineno"> 1301</span>      _init(view, &amp;loc, _memory_resource_allocate{&amp;mr});</div>
+<div class="line"><span class="lineno"> 1302</span>    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -629,12 +629,12 @@ template&lt;enum <a class="el" href="classllfio__v2__xxx_1_1path__view__componen
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno"> 1347</span>                                                                                           {})</div>
-<div class="line"><span class="lineno"> 1348</span>        : _deleter1(_memory_resouce_deallocate)</div>
-<div class="line"><span class="lineno"> 1349</span>        , _deleter1arg(&amp;mr)</div>
-<div class="line"><span class="lineno"> 1350</span>    {</div>
-<div class="line"><span class="lineno"> 1351</span>      _init(view, (<span class="keyword">const</span> std::locale *) <span class="keyword">nullptr</span>, _memory_resource_allocate{&amp;mr});</div>
-<div class="line"><span class="lineno"> 1352</span>    }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1304</span>                                                                                           {})</div>
+<div class="line"><span class="lineno"> 1305</span>        : _deleter1(_memory_resouce_deallocate)</div>
+<div class="line"><span class="lineno"> 1306</span>        , _deleter1arg(&amp;mr)</div>
+<div class="line"><span class="lineno"> 1307</span>    {</div>
+<div class="line"><span class="lineno"> 1308</span>      _init(view, (<span class="keyword">const</span> std::locale *) <span class="keyword">nullptr</span>, _memory_resource_allocate{&amp;mr});</div>
+<div class="line"><span class="lineno"> 1309</span>    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -687,14 +687,14 @@ template&lt;class U , typename std::enable_if&lt;(_is_allocator_based&lt; U &gt;
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno"> 1356</span>                                                                                                     {})</div>
-<div class="line"><span class="lineno"> 1357</span>        : _deleter1(_stl_allocator_deallocate&lt;<a class="code hl_typedef" href="classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html#a02d5856c9d152925571d55f68d2ccb88">allocator_type</a>&gt;)</div>
-<div class="line"><span class="lineno"> 1358</span>        , _deleter1arg(&amp;_deleter2)</div>
-<div class="line"><span class="lineno"> 1359</span>        , _deleter2(static_cast&lt;U &amp;&amp;&gt;(allocate))</div>
-<div class="line"><span class="lineno"> 1360</span>    {</div>
-<div class="line"><span class="lineno"> 1361</span>      _init(view, &amp;loc, _stl_allocator_allocate&lt;std::decay_t&lt;U&gt;&gt;(<span class="keyword">static_cast&lt;</span>std::decay_t&lt;U&gt; *<span class="keyword">&gt;</span>(&amp;_deleter2)));</div>
-<div class="line"><span class="lineno"> 1362</span>    }</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view__component_1_1rendered__path_html_a02d5856c9d152925571d55f68d2ccb88"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html#a02d5856c9d152925571d55f68d2ccb88">llfio_v2_xxx::path_view_component::rendered_path::allocator_type</a></div><div class="ttdeci">decltype(detail::is_allocator(std::declval&lt; AllocatorOrDeleter &gt;())) allocator_type</div><div class="ttdoc">Type of the allocator, or void if that was not configured.</div><div class="ttdef"><b>Definition</b> path_view.hpp:1031</div></div>
+<div class="fragment"><div class="line"><span class="lineno"> 1313</span>                                                                                                     {})</div>
+<div class="line"><span class="lineno"> 1314</span>        : _deleter1(_stl_allocator_deallocate&lt;<a class="code hl_typedef" href="classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html#a02d5856c9d152925571d55f68d2ccb88">allocator_type</a>&gt;)</div>
+<div class="line"><span class="lineno"> 1315</span>        , _deleter1arg(&amp;_deleter2)</div>
+<div class="line"><span class="lineno"> 1316</span>        , _deleter2(static_cast&lt;U &amp;&amp;&gt;(allocate))</div>
+<div class="line"><span class="lineno"> 1317</span>    {</div>
+<div class="line"><span class="lineno"> 1318</span>      _init(view, &amp;loc, _stl_allocator_allocate&lt;std::decay_t&lt;U&gt;&gt;(<span class="keyword">static_cast&lt;</span>std::decay_t&lt;U&gt; *<span class="keyword">&gt;</span>(&amp;_deleter2)));</div>
+<div class="line"><span class="lineno"> 1319</span>    }</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view__component_1_1rendered__path_html_a02d5856c9d152925571d55f68d2ccb88"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html#a02d5856c9d152925571d55f68d2ccb88">llfio_v2_xxx::path_view_component::rendered_path::allocator_type</a></div><div class="ttdeci">decltype(detail::is_allocator(std::declval&lt; AllocatorOrDeleter &gt;())) allocator_type</div><div class="ttdoc">Type of the allocator, or void if that was not configured.</div><div class="ttdef"><b>Definition</b> path_view.hpp:988</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -741,13 +741,13 @@ template&lt;class U , typename std::enable_if&lt;(_is_allocator_based&lt; U &gt;
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno"> 1366</span>                                                                               {})</div>
-<div class="line"><span class="lineno"> 1367</span>        : _deleter1(_stl_allocator_deallocate&lt;<a class="code hl_typedef" href="classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html#a02d5856c9d152925571d55f68d2ccb88">allocator_type</a>&gt;)</div>
-<div class="line"><span class="lineno"> 1368</span>        , _deleter1arg(&amp;_deleter2)</div>
-<div class="line"><span class="lineno"> 1369</span>        , _deleter2(static_cast&lt;U &amp;&amp;&gt;(allocate))</div>
-<div class="line"><span class="lineno"> 1370</span>    {</div>
-<div class="line"><span class="lineno"> 1371</span>      _init(view, (<span class="keyword">const</span> std::locale *) <span class="keyword">nullptr</span>, _stl_allocator_allocate&lt;std::decay_t&lt;U&gt;&gt;(<span class="keyword">static_cast&lt;</span>std::decay_t&lt;U&gt; *<span class="keyword">&gt;</span>(&amp;_deleter2)));</div>
-<div class="line"><span class="lineno"> 1372</span>    }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1323</span>                                                                               {})</div>
+<div class="line"><span class="lineno"> 1324</span>        : _deleter1(_stl_allocator_deallocate&lt;<a class="code hl_typedef" href="classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html#a02d5856c9d152925571d55f68d2ccb88">allocator_type</a>&gt;)</div>
+<div class="line"><span class="lineno"> 1325</span>        , _deleter1arg(&amp;_deleter2)</div>
+<div class="line"><span class="lineno"> 1326</span>        , _deleter2(static_cast&lt;U &amp;&amp;&gt;(allocate))</div>
+<div class="line"><span class="lineno"> 1327</span>    {</div>
+<div class="line"><span class="lineno"> 1328</span>      _init(view, (<span class="keyword">const</span> std::locale *) <span class="keyword">nullptr</span>, _stl_allocator_allocate&lt;std::decay_t&lt;U&gt;&gt;(<span class="keyword">static_cast&lt;</span>std::decay_t&lt;U&gt; *<span class="keyword">&gt;</span>(&amp;_deleter2)));</div>
+<div class="line"><span class="lineno"> 1329</span>    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -786,11 +786,11 @@ template&lt;enum <a class="el" href="classllfio__v2__xxx_1_1path__view__componen
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno"> 1375</span>        : _deleter1(_default_deleter)</div>
-<div class="line"><span class="lineno"> 1376</span>        , _deleter1arg(&amp;_deleter2)</div>
-<div class="line"><span class="lineno"> 1377</span>    {</div>
-<div class="line"><span class="lineno"> 1378</span>      _init(view, &amp;loc, _default_allocate&lt;AllocatorOrDeleter&gt;(&amp;_deleter2));</div>
-<div class="line"><span class="lineno"> 1379</span>    }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1332</span>        : _deleter1(_default_deleter)</div>
+<div class="line"><span class="lineno"> 1333</span>        , _deleter1arg(&amp;_deleter2)</div>
+<div class="line"><span class="lineno"> 1334</span>    {</div>
+<div class="line"><span class="lineno"> 1335</span>      _init(view, &amp;loc, _default_allocate&lt;AllocatorOrDeleter&gt;(&amp;_deleter2));</div>
+<div class="line"><span class="lineno"> 1336</span>    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -821,11 +821,11 @@ template&lt;enum <a class="el" href="classllfio__v2__xxx_1_1path__view__componen
 </div><div class="memdoc">
 
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 1382</span>        : _deleter1(_default_deleter)</div>
-<div class="line"><span class="lineno"> 1383</span>        , _deleter1arg(&amp;_deleter2)</div>
-<div class="line"><span class="lineno"> 1384</span>    {</div>
-<div class="line"><span class="lineno"> 1385</span>      _init(view, <span class="keyword">nullptr</span>, _default_allocate&lt;AllocatorOrDeleter&gt;(&amp;_deleter2));</div>
-<div class="line"><span class="lineno"> 1386</span>    }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1339</span>        : _deleter1(_default_deleter)</div>
+<div class="line"><span class="lineno"> 1340</span>        , _deleter1arg(&amp;_deleter2)</div>
+<div class="line"><span class="lineno"> 1341</span>    {</div>
+<div class="line"><span class="lineno"> 1342</span>      _init(view, <span class="keyword">nullptr</span>, _default_allocate&lt;AllocatorOrDeleter&gt;(&amp;_deleter2));</div>
+<div class="line"><span class="lineno"> 1343</span>    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -858,13 +858,13 @@ template&lt;class AllocatorOrDeleter2 , size_t _internal_buffer_size2, typename 
 </div><div class="memdoc">
 
 <p>Construct from a compatible <code>rendered_path</code>. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 1392</span>        : _base(o)</div>
-<div class="line"><span class="lineno"> 1393</span>        , _bytes_to_delete(o._bytes_to_delete)</div>
-<div class="line"><span class="lineno"> 1394</span>        , _deleter1(o._deleter1)</div>
-<div class="line"><span class="lineno"> 1395</span>        , _deleter1arg(o._deleter1arg)</div>
-<div class="line"><span class="lineno"> 1396</span>        , _deleter2(std::move(o._deleter2))</div>
-<div class="line"><span class="lineno"> 1397</span>    {</div>
-<div class="line"><span class="lineno"> 1398</span>    }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1349</span>        : _base(o)</div>
+<div class="line"><span class="lineno"> 1350</span>        , _bytes_to_delete(o._bytes_to_delete)</div>
+<div class="line"><span class="lineno"> 1351</span>        , _deleter1(o._deleter1)</div>
+<div class="line"><span class="lineno"> 1352</span>        , _deleter1arg(o._deleter1arg)</div>
+<div class="line"><span class="lineno"> 1353</span>        , _deleter2(std::move(o._deleter2))</div>
+<div class="line"><span class="lineno"> 1354</span>    {</div>
+<div class="line"><span class="lineno"> 1355</span>    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -892,8 +892,8 @@ template&lt;enum <a class="el" href="classllfio__v2__xxx_1_1path__view__componen
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno"> 1399</span>{ <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html#ae9e4d45a3067099efb64e426cb8fca9d">reset</a>(); }</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view__component_1_1rendered__path_html_ae9e4d45a3067099efb64e426cb8fca9d"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html#ae9e4d45a3067099efb64e426cb8fca9d">llfio_v2_xxx::path_view_component::rendered_path::reset</a></div><div class="ttdeci">void reset()</div><div class="ttdoc">Delete any held resources now.</div><div class="ttdef"><b>Definition</b> path_view.hpp:1438</div></div>
+<div class="fragment"><div class="line"><span class="lineno"> 1356</span>{ <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html#ae9e4d45a3067099efb64e426cb8fca9d">reset</a>(); }</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view__component_1_1rendered__path_html_ae9e4d45a3067099efb64e426cb8fca9d"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html#ae9e4d45a3067099efb64e426cb8fca9d">llfio_v2_xxx::path_view_component::rendered_path::reset</a></div><div class="ttdeci">void reset()</div><div class="ttdoc">Delete any held resources now.</div><div class="ttdef"><b>Definition</b> path_view.hpp:1395</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -922,29 +922,29 @@ template&lt;enum <a class="el" href="classllfio__v2__xxx_1_1path__view__componen
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno"> 1402</span>        : _base(o)</div>
-<div class="line"><span class="lineno"> 1403</span>        , _bytes_to_delete(o._bytes_to_delete)</div>
-<div class="line"><span class="lineno"> 1404</span>        , _deleter1(o._deleter1)</div>
-<div class="line"><span class="lineno"> 1405</span>        , _deleter1arg(o._deleter1arg)</div>
-<div class="line"><span class="lineno"> 1406</span>        , _deleter2(std::move(o._deleter2))</div>
-<div class="line"><span class="lineno"> 1407</span>    {</div>
-<div class="line"><span class="lineno"> 1408</span>      <span class="keywordflow">if</span>(<span class="keyword">this</span> != &amp;o)</div>
-<div class="line"><span class="lineno"> 1409</span>      {</div>
-<div class="line"><span class="lineno"> 1410</span>        <span class="keywordflow">if</span>(o.data() == o._buffer)</div>
-<div class="line"><span class="lineno"> 1411</span>        {</div>
-<div class="line"><span class="lineno"> 1412</span>          memcpy(_buffer, o._buffer, (o.size() + 1) * <span class="keyword">sizeof</span>(value_type));</div>
-<div class="line"><span class="lineno"> 1413</span>          _base::_ref = <span class="keyword">typename</span> _base::_view_type(_buffer, _base::_ref.size());</div>
-<div class="line"><span class="lineno"> 1414</span>        }</div>
-<div class="line"><span class="lineno"> 1415</span>        <span class="keywordflow">if</span>(o._deleter1arg == &amp;o._deleter2)</div>
-<div class="line"><span class="lineno"> 1416</span>        {</div>
-<div class="line"><span class="lineno"> 1417</span>          _deleter1arg = &amp;_deleter2;</div>
-<div class="line"><span class="lineno"> 1418</span>        }</div>
-<div class="line"><span class="lineno"> 1419</span>        o._ref = {};</div>
-<div class="line"><span class="lineno"> 1420</span>        o._bytes_to_delete = 0;</div>
-<div class="line"><span class="lineno"> 1421</span>        o._deleter1 = <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno"> 1422</span>        o._deleter1arg = <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno"> 1423</span>      }</div>
-<div class="line"><span class="lineno"> 1424</span>    }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1359</span>        : _base(o)</div>
+<div class="line"><span class="lineno"> 1360</span>        , _bytes_to_delete(o._bytes_to_delete)</div>
+<div class="line"><span class="lineno"> 1361</span>        , _deleter1(o._deleter1)</div>
+<div class="line"><span class="lineno"> 1362</span>        , _deleter1arg(o._deleter1arg)</div>
+<div class="line"><span class="lineno"> 1363</span>        , _deleter2(std::move(o._deleter2))</div>
+<div class="line"><span class="lineno"> 1364</span>    {</div>
+<div class="line"><span class="lineno"> 1365</span>      <span class="keywordflow">if</span>(<span class="keyword">this</span> != &amp;o)</div>
+<div class="line"><span class="lineno"> 1366</span>      {</div>
+<div class="line"><span class="lineno"> 1367</span>        <span class="keywordflow">if</span>(o.data() == o._buffer)</div>
+<div class="line"><span class="lineno"> 1368</span>        {</div>
+<div class="line"><span class="lineno"> 1369</span>          memcpy(_buffer, o._buffer, (o.size() + 1) * <span class="keyword">sizeof</span>(value_type));</div>
+<div class="line"><span class="lineno"> 1370</span>          _base::_ref = <span class="keyword">typename</span> _base::_view_type(_buffer, _base::_ref.size());</div>
+<div class="line"><span class="lineno"> 1371</span>        }</div>
+<div class="line"><span class="lineno"> 1372</span>        <span class="keywordflow">if</span>(o._deleter1arg == &amp;o._deleter2)</div>
+<div class="line"><span class="lineno"> 1373</span>        {</div>
+<div class="line"><span class="lineno"> 1374</span>          _deleter1arg = &amp;_deleter2;</div>
+<div class="line"><span class="lineno"> 1375</span>        }</div>
+<div class="line"><span class="lineno"> 1376</span>        o._ref = {};</div>
+<div class="line"><span class="lineno"> 1377</span>        o._bytes_to_delete = 0;</div>
+<div class="line"><span class="lineno"> 1378</span>        o._deleter1 = <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno"> 1379</span>        o._deleter1arg = <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno"> 1380</span>      }</div>
+<div class="line"><span class="lineno"> 1381</span>    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -973,7 +973,7 @@ template&lt;class T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  891</span>{ <span class="keywordflow">return</span> {_ref.data(), _ref.size()}; }</div>
+<div class="fragment"><div class="line"><span class="lineno">  848</span>{ <span class="keywordflow">return</span> {_ref.data(), _ref.size()}; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1003,7 +1003,7 @@ template&lt;enum <a class="el" href="classllfio__v2__xxx_1_1path__view__componen
 </div><div class="memdoc">
 
 <p>Access the custom allocator instance passed to the constructor. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 1478</span>{ <span class="keywordflow">return</span> _deleter2; }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1435</span>{ <span class="keywordflow">return</span> _deleter2; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1034,7 +1034,7 @@ template&lt;enum <a class="el" href="classllfio__v2__xxx_1_1path__view__componen
 
 <p>Access the custom allocator instance passed to the constructor. </p>
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 1480</span>{ <span class="keywordflow">return</span> _deleter2; }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1437</span>{ <span class="keywordflow">return</span> _deleter2; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1064,7 +1064,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>As span. </p>
-<div class="fragment"><div class="line"><span class="lineno">  976</span>{ <span class="keywordflow">return</span> _ref; }</div>
+<div class="fragment"><div class="line"><span class="lineno">  933</span>{ <span class="keywordflow">return</span> _ref; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1094,7 +1094,7 @@ template&lt;enum <a class="el" href="classllfio__v2__xxx_1_1path__view__componen
 </div><div class="memdoc">
 
 <p>As string view. </p>
-<div class="fragment"><div class="line"><span class="lineno">  981</span>{ <span class="keywordflow">return</span> {this-&gt;_ref.data(), this-&gt;_ref.size()}; }</div>
+<div class="fragment"><div class="line"><span class="lineno">  938</span>{ <span class="keywordflow">return</span> {this-&gt;_ref.data(), this-&gt;_ref.size()}; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1125,7 +1125,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Access. </p>
-<div class="fragment"><div class="line"><span class="lineno">  952</span>{ <span class="keywordflow">return</span> _ref.at(idx); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  909</span>{ <span class="keywordflow">return</span> _ref.at(idx); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1156,7 +1156,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Access. </p>
-<div class="fragment"><div class="line"><span class="lineno">  954</span>{ <span class="keywordflow">return</span> _ref.at(idx); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  911</span>{ <span class="keywordflow">return</span> _ref.at(idx); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1186,7 +1186,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Access. </p>
-<div class="fragment"><div class="line"><span class="lineno">  962</span>{ <span class="keywordflow">return</span> _ref.back(); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  919</span>{ <span class="keywordflow">return</span> _ref.back(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1216,7 +1216,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Access. </p>
-<div class="fragment"><div class="line"><span class="lineno">  960</span>{ <span class="keywordflow">return</span> _ref.back(); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  917</span>{ <span class="keywordflow">return</span> _ref.back(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1246,7 +1246,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Begin iteration. </p>
-<div class="fragment"><div class="line"><span class="lineno">  925</span>{ <span class="keywordflow">return</span> _ref.begin(); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  882</span>{ <span class="keywordflow">return</span> _ref.begin(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1276,7 +1276,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Begin iteration. </p>
-<div class="fragment"><div class="line"><span class="lineno">  923</span>{ <span class="keywordflow">return</span> _ref.begin(); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  880</span>{ <span class="keywordflow">return</span> _ref.begin(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1306,8 +1306,8 @@ template&lt;enum <a class="el" href="classllfio__v2__xxx_1_1path__view__componen
 </div><div class="memdoc">
 
 <p>The storage capacity, which may be larger than <code>size()</code> if the internal buffer is in use. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 1465</span>{ <span class="keywordflow">return</span> (this-&gt;data() == _buffer) ? <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html#a90f3cd38ea3a85da1a15759aea8473dd">internal_buffer_size</a>() : this-&gt;size(); }</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view__component_1_1rendered__path_html_a90f3cd38ea3a85da1a15759aea8473dd"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html#a90f3cd38ea3a85da1a15759aea8473dd">llfio_v2_xxx::path_view_component::rendered_path::internal_buffer_size</a></div><div class="ttdeci">static constexpr size_t internal_buffer_size() noexcept</div><div class="ttdoc">The size of the internal buffer.</div><div class="ttdef"><b>Definition</b> path_view.hpp:1463</div></div>
+<div class="fragment"><div class="line"><span class="lineno"> 1422</span>{ <span class="keywordflow">return</span> (this-&gt;data() == _buffer) ? <a class="code hl_function" href="classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html#a90f3cd38ea3a85da1a15759aea8473dd">internal_buffer_size</a>() : this-&gt;size(); }</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1path__view__component_1_1rendered__path_html_a90f3cd38ea3a85da1a15759aea8473dd"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html#a90f3cd38ea3a85da1a15759aea8473dd">llfio_v2_xxx::path_view_component::rendered_path::internal_buffer_size</a></div><div class="ttdeci">static constexpr size_t internal_buffer_size() noexcept</div><div class="ttdoc">The size of the internal buffer.</div><div class="ttdef"><b>Definition</b> path_view.hpp:1420</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1337,7 +1337,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Begin iteration. </p>
-<div class="fragment"><div class="line"><span class="lineno">  927</span>{ <span class="keywordflow">return</span> _ref.cbegin(); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  884</span>{ <span class="keywordflow">return</span> _ref.cbegin(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1367,7 +1367,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>End iteration. </p>
-<div class="fragment"><div class="line"><span class="lineno">  933</span>{ <span class="keywordflow">return</span> _ref.cend(); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  890</span>{ <span class="keywordflow">return</span> _ref.cend(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1397,7 +1397,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Begin reverse iteration. </p>
-<div class="fragment"><div class="line"><span class="lineno">  939</span>{ <span class="keywordflow">return</span> _ref.crbegin(); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  896</span>{ <span class="keywordflow">return</span> _ref.crbegin(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1427,7 +1427,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>End reverse iteration. </p>
-<div class="fragment"><div class="line"><span class="lineno">  945</span>{ <span class="keywordflow">return</span> _ref.crend(); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  902</span>{ <span class="keywordflow">return</span> _ref.crend(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1457,7 +1457,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Access. </p>
-<div class="fragment"><div class="line"><span class="lineno">  966</span>{ <span class="keywordflow">return</span> _ref.data(); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  923</span>{ <span class="keywordflow">return</span> _ref.data(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1487,7 +1487,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Access. </p>
-<div class="fragment"><div class="line"><span class="lineno">  964</span>{ <span class="keywordflow">return</span> _ref.data(); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  921</span>{ <span class="keywordflow">return</span> _ref.data(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1517,7 +1517,7 @@ template&lt;enum <a class="el" href="classllfio__v2__xxx_1_1path__view__componen
 </div><div class="memdoc">
 
 <p>Access the custom deleter instance passed to the constructor. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 1470</span>{ <span class="keywordflow">return</span> _deleter2; }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1427</span>{ <span class="keywordflow">return</span> _deleter2; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1547,7 +1547,7 @@ template&lt;enum <a class="el" href="classllfio__v2__xxx_1_1path__view__componen
 </div><div class="memdoc">
 
 <p>Access the custom deleter instance passed to the constructor. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 1472</span>{ <span class="keywordflow">return</span> _deleter2; }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1429</span>{ <span class="keywordflow">return</span> _deleter2; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1577,7 +1577,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Empty. </p>
-<div class="fragment"><div class="line"><span class="lineno">  974</span>{ <span class="keywordflow">return</span> _ref.empty(); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  931</span>{ <span class="keywordflow">return</span> _ref.empty(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1607,7 +1607,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>End iteration. </p>
-<div class="fragment"><div class="line"><span class="lineno">  931</span>{ <span class="keywordflow">return</span> _ref.end(); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  888</span>{ <span class="keywordflow">return</span> _ref.end(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1637,7 +1637,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>End iteration. </p>
-<div class="fragment"><div class="line"><span class="lineno">  929</span>{ <span class="keywordflow">return</span> _ref.end(); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  886</span>{ <span class="keywordflow">return</span> _ref.end(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1667,7 +1667,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Access. </p>
-<div class="fragment"><div class="line"><span class="lineno">  958</span>{ <span class="keywordflow">return</span> _ref.front(); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  915</span>{ <span class="keywordflow">return</span> _ref.front(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1697,7 +1697,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Access. </p>
-<div class="fragment"><div class="line"><span class="lineno">  956</span>{ <span class="keywordflow">return</span> _ref.front(); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  913</span>{ <span class="keywordflow">return</span> _ref.front(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1727,7 +1727,7 @@ template&lt;enum <a class="el" href="classllfio__v2__xxx_1_1path__view__componen
 </div><div class="memdoc">
 
 <p>The size of the internal buffer. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 1463</span>{ <span class="keywordflow">return</span> (_internal_buffer_size &gt; 0) ? _internal_buffer_size : 1; }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1420</span>{ <span class="keywordflow">return</span> (_internal_buffer_size &gt; 0) ? _internal_buffer_size : 1; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1757,7 +1757,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Size. </p>
-<div class="fragment"><div class="line"><span class="lineno">  970</span>{ <span class="keywordflow">return</span> _ref.length(); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  927</span>{ <span class="keywordflow">return</span> _ref.length(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1787,7 +1787,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Max size. </p>
-<div class="fragment"><div class="line"><span class="lineno">  972</span>{ <span class="keywordflow">return</span> _ref.max_size(); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  929</span>{ <span class="keywordflow">return</span> _ref.max_size(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1818,7 +1818,7 @@ template&lt;enum <a class="el" href="classllfio__v2__xxx_1_1path__view__componen
 
 <p>The memory resource passed to the constructor. </p>
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 1475</span>{ <span class="keywordflow">return</span> (pmr::memory_resource *) _deleter1arg; }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1432</span>{ <span class="keywordflow">return</span> (pmr::memory_resource *) _deleter1arg; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1849,25 +1849,25 @@ template&lt;enum <a class="el" href="classllfio__v2__xxx_1_1path__view__componen
 </div><div class="memdoc">
 
 <p>True if the bits backing the rendered path are non-identical. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 1505</span>    {</div>
-<div class="line"><span class="lineno"> 1506</span>      <span class="keywordflow">if</span>(this-&gt;data() == <span class="keyword">nullptr</span> &amp;&amp; o-&gt;data() == <span class="keyword">nullptr</span>)</div>
-<div class="line"><span class="lineno"> 1507</span>      {</div>
-<div class="line"><span class="lineno"> 1508</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno"> 1509</span>      }</div>
-<div class="line"><span class="lineno"> 1510</span>      <span class="keywordflow">if</span>(this-&gt;data() == <span class="keyword">nullptr</span> &amp;&amp; o-&gt;data() != <span class="keyword">nullptr</span>)</div>
-<div class="line"><span class="lineno"> 1511</span>      {</div>
-<div class="line"><span class="lineno"> 1512</span>        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno"> 1513</span>      }</div>
-<div class="line"><span class="lineno"> 1514</span>      <span class="keywordflow">if</span>(this-&gt;data() != <span class="keyword">nullptr</span> &amp;&amp; o-&gt;data() == <span class="keyword">nullptr</span>)</div>
-<div class="line"><span class="lineno"> 1515</span>      {</div>
-<div class="line"><span class="lineno"> 1516</span>        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno"> 1517</span>      }</div>
-<div class="line"><span class="lineno"> 1518</span>      <span class="keywordflow">if</span>(this-&gt;size() != o.size())</div>
-<div class="line"><span class="lineno"> 1519</span>      {</div>
-<div class="line"><span class="lineno"> 1520</span>        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno"> 1521</span>      }</div>
-<div class="line"><span class="lineno"> 1522</span>      <span class="keywordflow">return</span> 0 != memcmp(this-&gt;data(), o.data(), this-&gt;size());</div>
-<div class="line"><span class="lineno"> 1523</span>    }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1462</span>    {</div>
+<div class="line"><span class="lineno"> 1463</span>      <span class="keywordflow">if</span>(this-&gt;data() == <span class="keyword">nullptr</span> &amp;&amp; o-&gt;data() == <span class="keyword">nullptr</span>)</div>
+<div class="line"><span class="lineno"> 1464</span>      {</div>
+<div class="line"><span class="lineno"> 1465</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno"> 1466</span>      }</div>
+<div class="line"><span class="lineno"> 1467</span>      <span class="keywordflow">if</span>(this-&gt;data() == <span class="keyword">nullptr</span> &amp;&amp; o-&gt;data() != <span class="keyword">nullptr</span>)</div>
+<div class="line"><span class="lineno"> 1468</span>      {</div>
+<div class="line"><span class="lineno"> 1469</span>        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno"> 1470</span>      }</div>
+<div class="line"><span class="lineno"> 1471</span>      <span class="keywordflow">if</span>(this-&gt;data() != <span class="keyword">nullptr</span> &amp;&amp; o-&gt;data() == <span class="keyword">nullptr</span>)</div>
+<div class="line"><span class="lineno"> 1472</span>      {</div>
+<div class="line"><span class="lineno"> 1473</span>        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno"> 1474</span>      }</div>
+<div class="line"><span class="lineno"> 1475</span>      <span class="keywordflow">if</span>(this-&gt;size() != o.size())</div>
+<div class="line"><span class="lineno"> 1476</span>      {</div>
+<div class="line"><span class="lineno"> 1477</span>        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno"> 1478</span>      }</div>
+<div class="line"><span class="lineno"> 1479</span>      <span class="keywordflow">return</span> 0 != memcmp(this-&gt;data(), o.data(), this-&gt;size());</div>
+<div class="line"><span class="lineno"> 1480</span>    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1896,15 +1896,15 @@ template&lt;enum <a class="el" href="classllfio__v2__xxx_1_1path__view__componen
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno"> 1427</span>    {</div>
-<div class="line"><span class="lineno"> 1428</span>      <span class="keywordflow">if</span>(<span class="keyword">this</span> == &amp;o)</div>
-<div class="line"><span class="lineno"> 1429</span>      {</div>
-<div class="line"><span class="lineno"> 1430</span>        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><span class="lineno"> 1431</span>      }</div>
-<div class="line"><span class="lineno"> 1432</span>      this-&gt;~rendered_path();</div>
-<div class="line"><span class="lineno"> 1433</span>      <span class="keyword">new</span>(<span class="keyword">this</span>) rendered_path(std::move(o));</div>
-<div class="line"><span class="lineno"> 1434</span>      <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><span class="lineno"> 1435</span>    }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1384</span>    {</div>
+<div class="line"><span class="lineno"> 1385</span>      <span class="keywordflow">if</span>(<span class="keyword">this</span> == &amp;o)</div>
+<div class="line"><span class="lineno"> 1386</span>      {</div>
+<div class="line"><span class="lineno"> 1387</span>        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><span class="lineno"> 1388</span>      }</div>
+<div class="line"><span class="lineno"> 1389</span>      this-&gt;~rendered_path();</div>
+<div class="line"><span class="lineno"> 1390</span>      <span class="keyword">new</span>(<span class="keyword">this</span>) rendered_path(std::move(o));</div>
+<div class="line"><span class="lineno"> 1391</span>      <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><span class="lineno"> 1392</span>    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1935,25 +1935,25 @@ template&lt;enum <a class="el" href="classllfio__v2__xxx_1_1path__view__componen
 </div><div class="memdoc">
 
 <p>True if the bits backing the rendered path are identical. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 1484</span>    {</div>
-<div class="line"><span class="lineno"> 1485</span>      <span class="keywordflow">if</span>(this-&gt;data() == <span class="keyword">nullptr</span> &amp;&amp; o-&gt;data() == <span class="keyword">nullptr</span>)</div>
-<div class="line"><span class="lineno"> 1486</span>      {</div>
-<div class="line"><span class="lineno"> 1487</span>        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno"> 1488</span>      }</div>
-<div class="line"><span class="lineno"> 1489</span>      <span class="keywordflow">if</span>(this-&gt;data() == <span class="keyword">nullptr</span> &amp;&amp; o-&gt;data() != <span class="keyword">nullptr</span>)</div>
-<div class="line"><span class="lineno"> 1490</span>      {</div>
-<div class="line"><span class="lineno"> 1491</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno"> 1492</span>      }</div>
-<div class="line"><span class="lineno"> 1493</span>      <span class="keywordflow">if</span>(this-&gt;data() != <span class="keyword">nullptr</span> &amp;&amp; o-&gt;data() == <span class="keyword">nullptr</span>)</div>
-<div class="line"><span class="lineno"> 1494</span>      {</div>
-<div class="line"><span class="lineno"> 1495</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno"> 1496</span>      }</div>
-<div class="line"><span class="lineno"> 1497</span>      <span class="keywordflow">if</span>(this-&gt;size() != o.size())</div>
-<div class="line"><span class="lineno"> 1498</span>      {</div>
-<div class="line"><span class="lineno"> 1499</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno"> 1500</span>      }</div>
-<div class="line"><span class="lineno"> 1501</span>      <span class="keywordflow">return</span> 0 == memcmp(this-&gt;data(), o.data(), this-&gt;size());</div>
-<div class="line"><span class="lineno"> 1502</span>    }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1441</span>    {</div>
+<div class="line"><span class="lineno"> 1442</span>      <span class="keywordflow">if</span>(this-&gt;data() == <span class="keyword">nullptr</span> &amp;&amp; o-&gt;data() == <span class="keyword">nullptr</span>)</div>
+<div class="line"><span class="lineno"> 1443</span>      {</div>
+<div class="line"><span class="lineno"> 1444</span>        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno"> 1445</span>      }</div>
+<div class="line"><span class="lineno"> 1446</span>      <span class="keywordflow">if</span>(this-&gt;data() == <span class="keyword">nullptr</span> &amp;&amp; o-&gt;data() != <span class="keyword">nullptr</span>)</div>
+<div class="line"><span class="lineno"> 1447</span>      {</div>
+<div class="line"><span class="lineno"> 1448</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno"> 1449</span>      }</div>
+<div class="line"><span class="lineno"> 1450</span>      <span class="keywordflow">if</span>(this-&gt;data() != <span class="keyword">nullptr</span> &amp;&amp; o-&gt;data() == <span class="keyword">nullptr</span>)</div>
+<div class="line"><span class="lineno"> 1451</span>      {</div>
+<div class="line"><span class="lineno"> 1452</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno"> 1453</span>      }</div>
+<div class="line"><span class="lineno"> 1454</span>      <span class="keywordflow">if</span>(this-&gt;size() != o.size())</div>
+<div class="line"><span class="lineno"> 1455</span>      {</div>
+<div class="line"><span class="lineno"> 1456</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno"> 1457</span>      }</div>
+<div class="line"><span class="lineno"> 1458</span>      <span class="keywordflow">return</span> 0 == memcmp(this-&gt;data(), o.data(), this-&gt;size());</div>
+<div class="line"><span class="lineno"> 1459</span>    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1984,7 +1984,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Access. </p>
-<div class="fragment"><div class="line"><span class="lineno">  950</span>{ <span class="keywordflow">return</span> _ref[idx]; }</div>
+<div class="fragment"><div class="line"><span class="lineno">  907</span>{ <span class="keywordflow">return</span> _ref[idx]; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2015,7 +2015,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Access. </p>
-<div class="fragment"><div class="line"><span class="lineno">  948</span>{ <span class="keywordflow">return</span> _ref[idx]; }</div>
+<div class="fragment"><div class="line"><span class="lineno">  905</span>{ <span class="keywordflow">return</span> _ref[idx]; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2045,7 +2045,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Begin reverse iteration. </p>
-<div class="fragment"><div class="line"><span class="lineno">  937</span>{ <span class="keywordflow">return</span> _ref.rbegin(); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  894</span>{ <span class="keywordflow">return</span> _ref.rbegin(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2075,7 +2075,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Begin reverse iteration. </p>
-<div class="fragment"><div class="line"><span class="lineno">  935</span>{ <span class="keywordflow">return</span> _ref.rbegin(); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  892</span>{ <span class="keywordflow">return</span> _ref.rbegin(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2105,7 +2105,7 @@ template&lt;enum <a class="el" href="classllfio__v2__xxx_1_1path__view__componen
 </div><div class="memdoc">
 
 <p>True if this rendered path refers to the source path view. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 1467</span>{ <span class="keywordflow">return</span> this-&gt;data() != _buffer &amp;&amp; _bytes_to_delete == 0; }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1424</span>{ <span class="keywordflow">return</span> this-&gt;data() != _buffer &amp;&amp; _bytes_to_delete == 0; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2135,16 +2135,16 @@ template&lt;enum <a class="el" href="classllfio__v2__xxx_1_1path__view__componen
 </div><div class="memdoc">
 
 <p>Release from ownership any resources. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 1449</span>    {</div>
-<div class="line"><span class="lineno"> 1450</span>      <span class="keywordflow">if</span>(_bytes_to_delete &gt; 0)</div>
-<div class="line"><span class="lineno"> 1451</span>      {</div>
-<div class="line"><span class="lineno"> 1452</span>        <span class="keyword">auto</span> *ret = _base::_ref.data();</div>
-<div class="line"><span class="lineno"> 1453</span>        _base::_ref = <span class="keyword">typename</span> _base::_view_type{};</div>
-<div class="line"><span class="lineno"> 1454</span>        _bytes_to_delete = 0;</div>
-<div class="line"><span class="lineno"> 1455</span>        <span class="keywordflow">return</span> ret;</div>
-<div class="line"><span class="lineno"> 1456</span>      }</div>
-<div class="line"><span class="lineno"> 1457</span>      <span class="keywordflow">return</span> <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno"> 1458</span>    }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1406</span>    {</div>
+<div class="line"><span class="lineno"> 1407</span>      <span class="keywordflow">if</span>(_bytes_to_delete &gt; 0)</div>
+<div class="line"><span class="lineno"> 1408</span>      {</div>
+<div class="line"><span class="lineno"> 1409</span>        <span class="keyword">auto</span> *ret = _base::_ref.data();</div>
+<div class="line"><span class="lineno"> 1410</span>        _base::_ref = <span class="keyword">typename</span> _base::_view_type{};</div>
+<div class="line"><span class="lineno"> 1411</span>        _bytes_to_delete = 0;</div>
+<div class="line"><span class="lineno"> 1412</span>        <span class="keywordflow">return</span> ret;</div>
+<div class="line"><span class="lineno"> 1413</span>      }</div>
+<div class="line"><span class="lineno"> 1414</span>      <span class="keywordflow">return</span> <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno"> 1415</span>    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2174,7 +2174,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>End reverse iteration. </p>
-<div class="fragment"><div class="line"><span class="lineno">  943</span>{ <span class="keywordflow">return</span> _ref.rend(); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  900</span>{ <span class="keywordflow">return</span> _ref.rend(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2204,7 +2204,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>End reverse iteration. </p>
-<div class="fragment"><div class="line"><span class="lineno">  941</span>{ <span class="keywordflow">return</span> _ref.rend(); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  898</span>{ <span class="keywordflow">return</span> _ref.rend(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2234,14 +2234,14 @@ template&lt;enum <a class="el" href="classllfio__v2__xxx_1_1path__view__componen
 </div><div class="memdoc">
 
 <p>Delete any held resources now. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 1439</span>    {</div>
-<div class="line"><span class="lineno"> 1440</span>      <span class="keywordflow">if</span>(_bytes_to_delete &gt; 0)</div>
-<div class="line"><span class="lineno"> 1441</span>      {</div>
-<div class="line"><span class="lineno"> 1442</span>        _deleter1(_deleter1arg, <span class="keyword">const_cast&lt;</span>value_type *<span class="keyword">&gt;</span>(_base::_ref.data()), _bytes_to_delete);</div>
-<div class="line"><span class="lineno"> 1443</span>        _base::_ref = <span class="keyword">typename</span> _base::_view_type{};</div>
-<div class="line"><span class="lineno"> 1444</span>        _bytes_to_delete = 0;</div>
-<div class="line"><span class="lineno"> 1445</span>      }</div>
-<div class="line"><span class="lineno"> 1446</span>    }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1396</span>    {</div>
+<div class="line"><span class="lineno"> 1397</span>      <span class="keywordflow">if</span>(_bytes_to_delete &gt; 0)</div>
+<div class="line"><span class="lineno"> 1398</span>      {</div>
+<div class="line"><span class="lineno"> 1399</span>        _deleter1(_deleter1arg, <span class="keyword">const_cast&lt;</span>value_type *<span class="keyword">&gt;</span>(_base::_ref.data()), _bytes_to_delete);</div>
+<div class="line"><span class="lineno"> 1400</span>        _base::_ref = <span class="keyword">typename</span> _base::_view_type{};</div>
+<div class="line"><span class="lineno"> 1401</span>        _bytes_to_delete = 0;</div>
+<div class="line"><span class="lineno"> 1402</span>      }</div>
+<div class="line"><span class="lineno"> 1403</span>    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2271,7 +2271,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Size. </p>
-<div class="fragment"><div class="line"><span class="lineno">  968</span>{ <span class="keywordflow">return</span> _ref.size(); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  925</span>{ <span class="keywordflow">return</span> _ref.size(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2301,7 +2301,7 @@ template&lt;enum <a class="el" href="classllfio__v2__xxx_1_1path__view__componen
 </div><div class="memdoc">
 
 <p>The zero termination of this rendered path. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 1461</span>{ <span class="keywordflow">return</span> ZeroTermination; }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1418</span>{ <span class="keywordflow">return</span> ZeroTermination; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2333,11 +2333,11 @@ template&lt;enum <a class="el" href="classllfio__v2__xxx_1_1path__view__componen
 </div><div class="memdoc">
 
 <p>Returns the hash value for the bits backing the rendered path. </p>
-<div class="fragment"><div class="line"><span class="lineno"> 1526</span>    {</div>
-<div class="line"><span class="lineno"> 1527</span>      <span class="keyword">auto</span> sv = v.as_string_view();</div>
-<div class="line"><span class="lineno"> 1528</span>      <span class="keyword">using </span>type = <span class="keyword">typename</span> std::decay&lt;<span class="keyword">decltype</span>(sv)&gt;::type;</div>
-<div class="line"><span class="lineno"> 1529</span>      <span class="keywordflow">return</span> std::hash&lt;type&gt;()(sv);</div>
-<div class="line"><span class="lineno"> 1530</span>    }</div>
+<div class="fragment"><div class="line"><span class="lineno"> 1483</span>    {</div>
+<div class="line"><span class="lineno"> 1484</span>      <span class="keyword">auto</span> sv = v.as_string_view();</div>
+<div class="line"><span class="lineno"> 1485</span>      <span class="keyword">using </span>type = <span class="keyword">typename</span> std::decay&lt;<span class="keyword">decltype</span>(sv)&gt;::type;</div>
+<div class="line"><span class="lineno"> 1486</span>      <span class="keywordflow">return</span> std::hash&lt;type&gt;()(sv);</div>
+<div class="line"><span class="lineno"> 1487</span>    }</div>
 </div><!-- fragment -->
 </div>
 </div>

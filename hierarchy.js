@@ -52,7 +52,7 @@ var hierarchy =
     [ "llfio_v2_xxx::lockable_byte_io_handle::extent_guard", "classllfio__v2__xxx_1_1lockable__byte__io__handle_1_1extent__guard.html", null ],
     [ "llfio_v2_xxx::file_handle::extent_pair", "structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html", null ],
     [ "llfio_v2_xxx::statfs_t::f_flags_t", "structllfio__v2__xxx_1_1statfs__t_1_1f__flags__t.html", null ],
-    [ "filesystem::filesystem_error", null, [
+    [ "std::filesystem::filesystem_error", null, [
       [ "llfio_v2_xxx::error", "classllfio__v2__xxx_1_1error.html", null ]
     ] ],
     [ "llfio_v2_xxx::fs_handle", "classllfio__v2__xxx_1_1fs__handle.html", [
