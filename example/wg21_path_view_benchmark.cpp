@@ -47,7 +47,7 @@ Traversal test for path_view (longer paths) ...
 #include "../include/llfio.hpp"
 #include "llfio/v2.0/directory_handle.hpp"
 
-#if !defined(_WIN32) && (__cplusplus >= 201700L || _HAS_CXX17)
+#if !defined(_WIN32)
 
 #include <atomic>
 #include <chrono>

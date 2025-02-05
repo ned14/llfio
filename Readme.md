@@ -21,15 +21,12 @@ as Intel Optane.
 
 It is a complete rewrite after a Boost peer review in August 2015. LLFIO is the
 reference implementation for these C++ standardisations:
-- `llfio::path_view` is expected to enter the C++ 26 standard ([P1030](https://wg21.link/p1030)).
-- `llfio::file_handle` and `llfio::mapped_file_handle` are on track for entering the C++ 26 standard ([P1883](https://wg21.link/p1883)).
+- `llfio::path_view` is expected to enter the C++ 29 standard ([P1030](https://wg21.link/p1030)).
 
 Other characteristics:
-- Portable to any conforming C++ 14 compiler with a working Filesystem TS in its STL.
-    - Note that VS2019 16.3 and libc++ 11 dropped support for Filesystem in C++ 14, so for those LLFIO's cmake forces on C++ 17.
+- Portable to any conforming C++ 17 compiler with a working Filesystem in its STL.
 - Fully clean with C++ 20.
-    - Will make use of any Coroutines, Concepts, Span, Byte etc if you have them, otherwise swaps in C++ 14 compatible alternatives.
-    - NOTE that Ubuntu 18.04's libstdc++ 9 does not currently provide symbols for `<codecvt>` if you are building in C++ 20, so linking LLFIO programs on libstdc++ on that Linux if in C++ 20 will fail. Either use a different STL, manually rebuild libstdc++, or use C++ 17.
+    - Will make use of any Coroutines, Concepts, Span, Byte etc if you have them, otherwise swaps in C++ 17 compatible alternatives.
 - Aims to support Microsoft Windows, Linux, Android, iOS, Mac OS and FreeBSD.
     - Best effort to support older kernels up to their EOL (as of July 2020: >= Windows 8.1, >= Linux 2.6.32 (RHEL EOL), >= Mac OS 10.13, >= FreeBSD 11).
 - Original error code is always preserved, even down to the original NT kernel error code if a NT kernel API was used.
