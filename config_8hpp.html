@@ -120,7 +120,7 @@ $(document).ready(function(){initNavTree('config_8hpp.html',''); initResizable()
 <code>#include &quot;quickcpplib/detach_cast.hpp&quot;</code><br />
 <code>#include &quot;quickcpplib/in_place_detach_attach.hpp&quot;</code><br />
 <code>#include &quot;quickcpplib/spinlock.hpp&quot;</code><br />
-<code>#include &lt;memory_resource&gt;</code><br />
+<code>#include &quot;quickcpplib/memory_resource.hpp&quot;</code><br />
 <code>#include &lt;cstdio&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
@@ -269,10 +269,22 @@ Typedefs</h2></td></tr>
 template&lt;class T &gt; </td></tr>
 <tr class="memitem:aa94e1ec116955e75221a37a0ba0e8626"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>llfio_v2_xxx::optional</b> = std::optional&lt; T &gt;</td></tr>
 <tr class="separator:aa94e1ec116955e75221a37a0ba0e8626"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6bc7a0e7e79cb8f25e4cb28057d35e76" id="r_a6bc7a0e7e79cb8f25e4cb28057d35e76"><td class="memTemplParams" colspan="2"><a id="a6bc7a0e7e79cb8f25e4cb28057d35e76" name="a6bc7a0e7e79cb8f25e4cb28057d35e76"></a>
-template&lt;class CharT , class Traits  = std::char_traits&lt;CharT&gt;&gt; </td></tr>
-<tr class="memitem:a6bc7a0e7e79cb8f25e4cb28057d35e76"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>llfio_v2_xxx::basic_string_view</b> = std::basic_string_view&lt; CharT, Traits &gt;</td></tr>
-<tr class="separator:a6bc7a0e7e79cb8f25e4cb28057d35e76"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada93a14f6828aa80b5c936e7aa8d5197" id="r_ada93a14f6828aa80b5c936e7aa8d5197"><td class="memTemplParams" colspan="2"><a id="ada93a14f6828aa80b5c936e7aa8d5197" name="ada93a14f6828aa80b5c936e7aa8d5197"></a>
+template&lt;typename charT , typename traits  = std::char_traits&lt;charT&gt;&gt; </td></tr>
+<tr class="memitem:ada93a14f6828aa80b5c936e7aa8d5197"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>llfio_v2_xxx::basic_string_view</b> = std::basic_string_view&lt; charT, traits &gt;</td></tr>
+<tr class="separator:ada93a14f6828aa80b5c936e7aa8d5197"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31f9d992e5d11f20e94456ee3a78d3fb" id="r_a31f9d992e5d11f20e94456ee3a78d3fb"><td class="memItemLeft" align="right" valign="top"><a id="a31f9d992e5d11f20e94456ee3a78d3fb" name="a31f9d992e5d11f20e94456ee3a78d3fb"></a>
+typedef basic_string_view&lt; char, std::char_traits&lt; char &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::string_view</b></td></tr>
+<tr class="separator:a31f9d992e5d11f20e94456ee3a78d3fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aecc40afa2aa8ad5db02ae7a098e2c797" id="r_aecc40afa2aa8ad5db02ae7a098e2c797"><td class="memItemLeft" align="right" valign="top"><a id="aecc40afa2aa8ad5db02ae7a098e2c797" name="aecc40afa2aa8ad5db02ae7a098e2c797"></a>
+typedef basic_string_view&lt; wchar_t, std::char_traits&lt; wchar_t &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::wstring_view</b></td></tr>
+<tr class="separator:aecc40afa2aa8ad5db02ae7a098e2c797"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10657696dab0955fbdd4b58656455a49" id="r_a10657696dab0955fbdd4b58656455a49"><td class="memItemLeft" align="right" valign="top"><a id="a10657696dab0955fbdd4b58656455a49" name="a10657696dab0955fbdd4b58656455a49"></a>
+typedef basic_string_view&lt; char16_t, std::char_traits&lt; char16_t &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::u16string_view</b></td></tr>
+<tr class="separator:a10657696dab0955fbdd4b58656455a49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed49a8482c70b2b44140565bd79cbecd" id="r_aed49a8482c70b2b44140565bd79cbecd"><td class="memItemLeft" align="right" valign="top"><a id="aed49a8482c70b2b44140565bd79cbecd" name="aed49a8482c70b2b44140565bd79cbecd"></a>
+typedef basic_string_view&lt; char32_t, std::char_traits&lt; char32_t &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::u32string_view</b></td></tr>
+<tr class="separator:aed49a8482c70b2b44140565bd79cbecd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a23358ae319d76dd1149a26b04b17796a" id="r_a23358ae319d76dd1149a26b04b17796a"><td class="memTemplParams" colspan="2"><a id="a23358ae319d76dd1149a26b04b17796a" name="a23358ae319d76dd1149a26b04b17796a"></a>
 template&lt;class F , size_t callable_storage_bytes = 32 - sizeof(uintptr_t)&gt; </td></tr>
 <tr class="memitem:a23358ae319d76dd1149a26b04b17796a"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>llfio_v2_xxx::function_ptr</b> = QUICKCPPLIB_NAMESPACE::function_ptr::function_ptr&lt; F, callable_storage_bytes &gt;</td></tr>
