@@ -32,7 +32,7 @@ namespace algorithm
                                                                               bool preserve_timestamps, bool force_copy_now, file_handle::creation creation,
                                                                               deadline d) noexcept
   {
-    try
+    LLFIO_EXCEPTION_TRY
     {
       LLFIO_LOG_FUNCTION_CALL(&src);
       filesystem::path destleaf_;
@@ -104,7 +104,7 @@ namespace algorithm
       failed = false;
       return copied.length;
     }
-    catch(...)
+    LLFIO_EXCEPTION_CATCH_ALL
     {
       return error_from_exception();
     }
@@ -113,7 +113,7 @@ namespace algorithm
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<bool> relink_or_clone_copy_unlink(file_handle &src, const path_handle &destdir, path_view destleaf, bool atomic_replace,
                                                                         bool preserve_timestamps, bool force_copy_now, deadline d) noexcept
   {
-    try
+    LLFIO_EXCEPTION_TRY
     {
       LLFIO_LOG_FUNCTION_CALL(&src);
       filesystem::path destleaf_;
@@ -229,7 +229,7 @@ namespace algorithm
       OUTCOME_TRY(src._replace_handle(std::move(desth)));
       return true;
     }
-    catch(...)
+    LLFIO_EXCEPTION_CATCH_ALL
     {
       return error_from_exception();
     }

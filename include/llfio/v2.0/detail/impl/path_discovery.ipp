@@ -92,7 +92,7 @@ namespace path_discovery
     {
       return ps.all;
     }
-    try
+    LLFIO_EXCEPTION_TRY
     {
       std::vector<std::pair<discovered_path::source_type, detail::_store::_discovered_path>> raw = _all_temporary_directories(overrides, fallbacks);
       if(raw.empty())
@@ -123,13 +123,13 @@ namespace path_discovery
         ps.all.push_back(std::move(dp));
       }
     }
-    catch(const std::exception &e)
+    LLFIO_EXCEPTION_CATCH({}, const std::exception &e)
     {
       std::string msg("path_discovery::all_temporary_directories() saw exception thrown: ");
       msg.append(e.what());
       LLFIO_LOG_WARN(nullptr, msg.c_str());
     }
-    catch(...)
+    LLFIO_EXCEPTION_CATCH_ALL
     {
       LLFIO_LOG_WARN(nullptr, "path_discovery::all_temporary_directories() saw unknown exception throw");
     }
@@ -150,7 +150,7 @@ namespace path_discovery
     {
       return ps.verified;
     }
-    try
+    LLFIO_EXCEPTION_TRY
     {
       // Firstly go try to open and stat all items
       for(size_t n = 0; n < ps.all.size(); n++)
@@ -261,14 +261,14 @@ namespace path_discovery
         (void) ps._all[n].h.close();
       }
     }
-    catch(const std::exception &e)
+    LLFIO_EXCEPTION_CATCH({}, const std::exception &e)
     {
       std::string msg("path_discovery::verified_temporary_directories() saw exception thrown: ");
       msg.append(e.what());
       LLFIO_LOG_FATAL(nullptr, msg.c_str());
       abort();
     }
-    catch(...)
+    LLFIO_EXCEPTION_CATCH_ALL
     {
       LLFIO_LOG_FATAL(nullptr, "path_discovery::verified_temporary_directories() saw unknown exception throw");
       abort();

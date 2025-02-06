@@ -162,11 +162,11 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
   std::string random;
   for(;;)
   {
-    try
+    LLFIO_EXCEPTION_TRY
     {
       random = utils::random_string(32) + ".tmp";
     }
-    catch(...)
+    LLFIO_EXCEPTION_CATCH_ALL
     {
       return error_from_exception();
     }
@@ -369,7 +369,7 @@ result<file_handle::extent_type> file_handle::truncate(file_handle::extent_type 
 result<std::vector<file_handle::extent_pair>> file_handle::extents() const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  try
+  LLFIO_EXCEPTION_TRY
   {
     std::vector<file_handle::extent_pair> out;
     out.reserve(64);
@@ -445,16 +445,17 @@ result<std::vector<file_handle::extent_pair>> file_handle::extents() const noexc
 #endif
     return out;
   }
-  catch(...)
+  LLFIO_EXCEPTION_CATCH_ALL
   {
     return error_from_exception();
   }
+  abort();
 }
 
 result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::extent_pair extent, byte_io_handle &dest_, byte_io_handle::extent_type destoffset,
                                                                deadline d, bool force_copy_now, bool emulate_if_unsupported) noexcept
 {
-  try
+  LLFIO_EXCEPTION_TRY
   {
     LLFIO_LOG_FUNCTION_CALL(this);
 
@@ -977,7 +978,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
     }
     return ret;
   }
-  catch(...)
+  LLFIO_EXCEPTION_CATCH_ALL
   {
     return error_from_exception();
   }
@@ -1010,7 +1011,7 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_pair exte
     OUTCOME_TRY(auto &&written, write(extent.offset, {{buffer, (size_type) extent.length}}, d));
     return written;
   }
-  try
+  LLFIO_EXCEPTION_TRY
   {
     extent_type ret = 0;
     auto blocksize = utils::file_buffer_default_size();
@@ -1027,10 +1028,11 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_pair exte
     }
     return ret;
   }
-  catch(...)
+  LLFIO_EXCEPTION_CATCH_ALL
   {
     return error_from_exception();
   }
+  abort();
 }
 
 LLFIO_V2_NAMESPACE_END

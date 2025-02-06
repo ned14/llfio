@@ -409,12 +409,12 @@ namespace utils
     {
       if(n > max_size())
       {
-        throw std::bad_alloc();
+        LLFIO_EXCEPTION_THROW(std::bad_alloc());
       }
       auto mem(detail::allocate_large_pages(n * sizeof(T)));
       if(mem.p == nullptr)
       {
-        throw std::bad_alloc();
+        LLFIO_EXCEPTION_THROW(std::bad_alloc());
       }
       return reinterpret_cast<pointer>(mem.p);
     }
@@ -423,7 +423,7 @@ namespace utils
     {
       if(n > max_size())
       {
-        throw std::bad_alloc();
+        LLFIO_EXCEPTION_THROW(std::bad_alloc());
       }
       detail::deallocate_large_pages(p, n * sizeof(T));
     }

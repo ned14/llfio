@@ -8,8 +8,7 @@ These compilers and OSs are regularly tested by CI:
 - Visual Studio on Windows
 
 Other compilers, architectures and OSs may work, but are not tested regularly.
-You will need a working [Filesystem TS](https://en.cppreference.com/w/cpp/experimental/fs)
-implementation in your STL, and at least C++ 14.
+You will need a working Filesystem implementation in your STL, and at least C++ 17.
 
 LLFIO has your choice of header-only, static library, and shared library build modes.
 Note that on Microsoft Windows, the default header only configuration is unsafe

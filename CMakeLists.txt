@@ -1,5 +1,5 @@
 # LLFIO cmake
-# (C) 2016-2023 Niall Douglas <http://www.nedproductions.biz/>
+# (C) 2016-2025 Niall Douglas <http://www.nedproductions.biz/>
 # File Created: June 2016
 # 
 # 
@@ -183,33 +183,13 @@ endif()
 include(QuickCppLibApplyDefaultDefinitions)
 
 # Set the C++ features this library requires
-all_compile_features(PUBLIC
-  # cxx_exceptions                        ## Annoyingly not supported by cmake 3.6
-  cxx_alias_templates
-  cxx_variadic_templates
-  cxx_noexcept
-  cxx_constexpr
-  cxx_lambda_init_captures
-  cxx_attributes
-  cxx_generic_lambdas
-)
-if(NOT MSVC OR CMAKE_VERSION VERSION_GREATER 3.59)
-  all_compile_features(PUBLIC
-    cxx_variable_templates
-  )
-endif()
+all_compile_features(PUBLIC cxx_std_17)
 set(check_cxx_source_linkage_flags)
-# If on VS2019 16.3 or later, or on Apple, we require C++ 17
-if((MSVC AND MSVC_VERSION VERSION_GREATER_EQUAL 1923) OR APPLE)
-  all_compile_features(PUBLIC
-    cxx_std_17
-  )
-  if(NOT CMAKE_CXX_STANDARD)
-    if(MSVC)
-      set(check_cxx_source_linkage_flags /std:c++17)
-    else()
-      set(check_cxx_source_linkage_flags -std=c++17)
-    endif()
+if(NOT CMAKE_CXX_STANDARD)
+  if(MSVC)
+    set(check_cxx_source_linkage_flags /std:c++17)
+  else()
+    set(check_cxx_source_linkage_flags -std=c++17)
   endif()
 endif()
 # Set the library dependencies this library has
@@ -264,93 +244,7 @@ int main() {
 }
 " CXX_HAS_CXX17_FILESYSTEM)
 if(NOT CXX_HAS_CXX17_FILESYSTEM)
-  check_cxx_source_linkage("
-#include <experimental/filesystem>
-int main() {
-  try { return std::experimental::filesystem::path(\"hi\").empty(); } catch(std::experimental::filesystem::filesystem_error) { return 1; }
-}
-" CXX_HAS_CXX_EXPERIMENTAL_FILESYSTEM)
-endif()
-if(NOT CXX_HAS_CXX17_FILESYSTEM AND NOT CXX_HAS_CXX_EXPERIMENTAL_FILESYSTEM)
-  indented_message(STATUS "NOTE: Standard <filesystem> not found in the current compiler configuration (try forcing C++ 17 or later?), attempting to figure out what <experimental/filesystem> linker flags to use for this STL ...")
-  # Are we on libstdc++ or libc++?
-  check_cxx_source_compiles("
-#include <iostream>
-int main() {
-#ifdef __GLIBCXX__
-  std::cout << \"hi\";
-  return 0;
-#else
-  return i am not a number;
-#endif
-}
-" CXX_IS_USING_LIBSTDCXX)
-  check_cxx_source_compiles("
-#include <iostream>
-int main() {
-#ifdef _LIBCPP_VERSION
-  std::cout << \"hi\";
-  return 0;
-#else
-  return i am not a number;
-#endif
-}
-" CXX_IS_USING_LIBCXX)
-  if(NOT CXX_IS_USING_LIBSTDCXX AND NOT CXX_IS_USING_LIBCXX)
-    indented_message(FATAL_ERROR "FATAL: <filesystem> is not available, and neither libstdc++ nor libc++ STLs will link a program")
-  endif()
-  set(stl_filesystem_link_flags)
-  # If on libstdc++, we need to link in stdc++fs for experimental filesystem
-  if(CXX_IS_USING_LIBSTDCXX)
-    find_library(libstdcxx_stdcxxfs stdc++fs)
-    if(libstdcxx_stdcxxfs MATCHES "NOTFOUND")
-      set(libstdcxx_stdcxxfs -lstdc++fs)
-    endif()
-    all_link_libraries(PUBLIC ${libstdcxx_stdcxxfs})
-    list(APPEND stl_filesystem_link_flags ${libstdcxx_stdcxxfs})
-  endif()
-  # If on libc++, we may need to link in c++fs or c++experimental for experimental filesystem
-  if(CXX_IS_USING_LIBCXX)
-    find_library(libcxx_cxxfs c++fs)
-    find_library(libcxx_cxxexperimental c++experimental)
-    if(libcxx_cxxfs MATCHES "NOTFOUND" AND libcxx_cxxexperimental MATCHES "NOTFOUND")
-      # I guess default to forcing libc++experimental?
-      set(libcxx_cxxexperimental -lc++experimental)
-    endif()
-    if(NOT libcxx_cxxfs MATCHES "NOTFOUND")
-      all_link_libraries(PUBLIC ${libcxx_cxxfs})
-      list(APPEND stl_filesystem_link_flags ${libcxx_cxxfs})
-    endif()
-    if(NOT libcxx_cxxexperimental MATCHES "NOTFOUND")
-      all_link_libraries(PUBLIC ${libcxx_cxxexperimental})
-      list(APPEND stl_filesystem_link_flags ${libcxx_cxxexperimental})
-    endif()
-    # Disable the irritating warnings
-    all_compile_definitions(PUBLIC _LIBCPP_NO_EXPERIMENTAL_DEPRECATION_WARNING_FILESYSTEM=1)
-  endif()
-  function(check_stl_filesystem_link_flags)
-    indented_message(STATUS "NOTE: Using STL link flags '${ARGN}'")
-    set(CMAKE_REQUIRED_LIBRARIES ${ARGN})
-    check_cxx_source_linkage("
-#include <filesystem>
-int main() {
-  try { return std::filesystem::path(\"hi\").empty(); } catch(std::filesystem::filesystem_error) { return 1; }
-}
-" CXX_HAS_CXX_FILESYSTEM_AFTER_FLAGS)
-    check_cxx_source_linkage("
-#include <experimental/filesystem>
-int main() {
-  try { return std::experimental::filesystem::path(\"hi\").empty(); } catch(std::experimental::filesystem::filesystem_error) { return 1; }
-}
-" CXX_HAS_CXX_EXPERIMENTAL_FILESYSTEM_AFTER_FLAGS)
-  if(NOT CXX_HAS_CXX_FILESYSTEM_AFTER_FLAGS AND NOT CXX_HAS_CXX_EXPERIMENTAL_FILESYSTEM_AFTER_FLAGS)
-    indented_message(FATAL_ERROR "FATAL: After probing multiple configurations, still cannot compile and link a <filesystem> or <experimental/filesystem> based program! Please adjust the configuration and/or install missing dependencies.")
-  endif()
-  endfunction()
-  check_stl_filesystem_link_flags(${stl_filesystem_link_flags})
-  if(NOT CXX_HAS_CXX_FILESYSTEM_AFTER_FLAGS AND CXX_HAS_CXX_EXPERIMENTAL_FILESYSTEM_AFTER_FLAGS)
-    all_compile_definitions(PUBLIC LLFIO_FORCE_EXPERIMENTAL_FILESYSTEM=1 KERNELTEST_FORCE_EXPERIMENTAL_FILESYSTEM=1)
-  endif()
+  indented_message(FATAL_ERROR "FATAL: C++ 17 <filesystem> is not available, use a LLFIO from before year 2025 if you want legacy <filesystem> polyfill support")
 endif()
 if(LLFIO_FORCE_DYNAMIC_THREAD_POOL_GROUP_OFF)
   all_compile_definitions(PUBLIC LLFIO_EXCLUDE_DYNAMIC_THREAD_POOL_GROUP=1)
@@ -424,18 +318,7 @@ foreach(special ${SPECIAL_BUILDS})
   target_compile_definitions(llfio_dl-${special} PRIVATE LLFIO_SOURCE=1 LLFIO_DYN_LINK=1) 
 endforeach()
 if(TARGET llfio-example_single-header)
-  set(compiler_has_cxx_17 0)
-  foreach(feature ${CMAKE_CXX_COMPILE_FEATURES})
-    if(feature STREQUAL "cxx_std_17")
-      set(compiler_has_cxx_17 1)
-    endif()
-  endforeach()
-  # The single header test requires C++ 17
-  if(compiler_has_cxx_17)
-    target_compile_features(llfio-example_single-header PRIVATE cxx_std_17)
-  else()
-    set_target_properties(llfio-example_single-header PROPERTIES EXCLUDE_FROM_ALL ON EXCLUDE_FROM_DEFAULT_BUILD ON)
-  endif()
+  target_compile_features(llfio-example_single-header PRIVATE cxx_std_17)
 endif()
 
 if(NOT llfio_IS_DEPENDENCY AND (NOT DEFINED BUILD_TESTING OR BUILD_TESTING))
@@ -470,6 +353,64 @@ if(NOT llfio_IS_DEPENDENCY AND (NOT DEFINED BUILD_TESTING OR BUILD_TESTING))
     endforeach()
   endif()
 
+  # Duplicate all tests into C++ exceptions disabled forms
+  set(noexcept_tests)
+  set(first_test_target_noexcept)
+  set(first_test_target_permissive)
+  foreach(testtarget ${llfio_TEST_TARGETS})
+    if(testtarget MATCHES "llfio_hl--(.+)$")
+      set(testname ${CMAKE_MATCH_1})
+      if(TRUE)
+        get_target_property(testsource ${testtarget} SOURCES)
+        set(target_name "llfio_hl--${testname}-noexcept")
+        add_executable(${target_name} "${testsource}")
+        if(NOT first_test_target_noexcept)
+          set(first_test_target_noexcept ${target_name})
+        endif()
+        set_target_properties(${target_name} PROPERTIES DISABLE_PRECOMPILE_HEADERS On)
+        target_link_libraries(${target_name} PRIVATE kerneltest::hl)
+        add_dependencies(_hl ${target_name})
+        list(APPEND noexcept_tests ${target_name})
+        if(MSVC AND NOT CLANG)
+          # Disable warnings "C++ exception handler used" and "noexcept used with no exception handling"
+          target_compile_options(${target_name} PRIVATE /wd4530 /wd4577)
+#          target_compile_options(${target_name} PRIVATE /permissive-)  # test bug report #142
+        endif()
+        target_link_libraries(${target_name} PRIVATE llfio::hl)
+        set_target_properties(${target_name} PROPERTIES
+          RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+          POSITION_INDEPENDENT_CODE ON
+          CXX_EXCEPTIONS OFF
+          CXX_RTTI OFF
+        )
+        add_test(NAME ${target_name} CONFIGURATIONS Debug Release RelWithDebInfo MinSizeRel
+          COMMAND $<TARGET_FILE:${target_name}> --reporter junit --out $<TARGET_FILE:${target_name}>.junit.xml
+        )
+        if(MSVC AND NOT CLANG)
+          set(target_name "llfio_hl--${testname}-permissive")
+          add_executable(${target_name} "${testsource}")
+          if(NOT first_test_target_permissive)
+            set(first_test_target_permissive ${target_name})
+          elseif(${target_name} MATCHES "coroutines")
+            set_target_properties(${target_name} PROPERTIES DISABLE_PRECOMPILE_HEADERS On)
+          elseif(COMMAND target_precompile_headers)
+            target_precompile_headers(${target_name} REUSE_FROM ${first_test_target_permissive})
+          endif()
+          target_link_libraries(${target_name} PRIVATE kerneltest::hl)
+          add_dependencies(_hl ${target_name})
+          target_link_libraries(${target_name} PRIVATE llfio::hl)
+          target_compile_options(${target_name} PRIVATE /permissive)
+          set_target_properties(${target_name} PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+            POSITION_INDEPENDENT_CODE ON
+          )
+        endif()
+      endif()
+    endif()
+  endforeach()
+  add_custom_target(${PROJECT_NAME}-noexcept COMMENT "Building all tests with C++ exceptions disabled ...")
+  add_dependencies(${PROJECT_NAME}-noexcept ${noexcept_tests})
+  
   # Example targets should have an example- prefix
   foreach(target ${llfio_COMPILE_TEST_TARGETS})
     get_target_property(prop ${target} SOURCES)
@@ -488,29 +429,29 @@ if(NOT llfio_IS_DEPENDENCY AND (NOT DEFINED BUILD_TESTING OR BUILD_TESTING))
   if(UNIT_TESTS_CXX_VERSION STREQUAL "latest")
     set(LATEST_CXX_FEATURE)
     foreach(feature ${CMAKE_CXX_COMPILE_FEATURES})
-      if(feature STREQUAL "cxx_std_23")
+      if(feature STREQUAL "cxx_std_26")
         if(NOT MSVC OR MSVC_VERSION VERSION_GREATER_EQUAL 1930)
-          set(LATEST_CXX_FEATURE "cxx_std_23")
-          indented_message(STATUS "NOTE: This compiler claims to support C++ 23, enabling for header-only unit test suite")
+          set(LATEST_CXX_FEATURE "cxx_std_26")
+          indented_message(STATUS "NOTE: This compiler claims to support C++ 26, enabling for header-only unit test suite")
         endif()
       endif()
     endforeach()
     if(NOT LATEST_CXX_FEATURE)
       foreach(feature ${CMAKE_CXX_COMPILE_FEATURES})
-        if(feature STREQUAL "cxx_std_20")
+        if(feature STREQUAL "cxx_std_23")
           if(NOT MSVC OR MSVC_VERSION VERSION_GREATER_EQUAL 1930)
-            set(LATEST_CXX_FEATURE "cxx_std_20")
-            indented_message(STATUS "NOTE: This compiler claims to support C++ 20, enabling for header-only unit test suite")
+            set(LATEST_CXX_FEATURE "cxx_std_23")
+            indented_message(STATUS "NOTE: This compiler claims to support C++ 23, enabling for header-only unit test suite")
           endif()
         endif()
       endforeach()
     endif()
     if(NOT LATEST_CXX_FEATURE)
       foreach(feature ${CMAKE_CXX_COMPILE_FEATURES})
-        if(feature STREQUAL "cxx_std_17")
-          if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "8.0")
-            set(LATEST_CXX_FEATURE "cxx_std_17")
-            indented_message(STATUS "NOTE: This compiler claims to support C++ 17, enabling for header-only unit test suite")
+        if(feature STREQUAL "cxx_std_20")
+          if(NOT MSVC OR MSVC_VERSION VERSION_GREATER_EQUAL 1930)
+            set(LATEST_CXX_FEATURE "cxx_std_20")
+            indented_message(STATUS "NOTE: This compiler claims to support C++ 20, enabling for header-only unit test suite")
           endif()
         endif()
       endforeach()

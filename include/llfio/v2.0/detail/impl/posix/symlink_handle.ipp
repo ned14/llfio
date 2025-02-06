@@ -64,7 +64,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> symlink_handle::_create_symlink(con
     }
   }
   path_view::zero_terminated_rendered_path<> zpath(target);
-  try
+  LLFIO_EXCEPTION_TRY
   {
     if(atomic_replace)
     {
@@ -124,10 +124,11 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> symlink_handle::_create_symlink(con
       return success();
     }
   }
-  catch(...)
+  LLFIO_EXCEPTION_CATCH_ALL
   {
     return error_from_exception();
   }
+  abort();
 }
 
 result<symlink_handle> symlink_handle::reopen(mode mode_, deadline d) const noexcept
@@ -138,11 +139,11 @@ result<symlink_handle> symlink_handle::reopen(mode mode_, deadline d) const noex
   ret.value()._v.behaviour = _v.behaviour;
   OUTCOME_TRY(auto &&dirh, _dirh.clone());
   ret.value()._dirh = path_handle(std::move(dirh));
-  try
+  LLFIO_EXCEPTION_TRY
   {
     ret.value()._leafname = _leafname;
   }
-  catch(...)
+  LLFIO_EXCEPTION_CATCH_ALL
   {
     return error_from_exception();
   }
@@ -219,7 +220,7 @@ result<symlink_handle> symlink_handle::reopen(mode mode_, deadline d) const noex
 result<symlink_handle::path_type> symlink_handle::current_path() const noexcept
 {
   LLFIO_LOG_FUNCTION_CALL(this);
-  try
+  LLFIO_EXCEPTION_TRY
   {
     // Deleted?
     if(!_dirh.is_valid() && _leafname.empty())
@@ -243,7 +244,7 @@ result<symlink_handle::path_type> symlink_handle::current_path() const noexcept
       return {std::move(dirpath)};
     }
   }
-  catch(...)
+  LLFIO_EXCEPTION_CATCH_ALL
   {
     return error_from_exception();
   }
@@ -253,7 +254,7 @@ result<void> symlink_handle::relink(const path_handle &base, path_view_type path
 {
   LLFIO_LOG_FUNCTION_CALL(this);
   OUTCOME_TRY(fs_handle::relink(base, path, atomic_replace, d));
-  try
+  LLFIO_EXCEPTION_TRY
   {
     // Take a path handle to the directory containing the symlink
     auto path_parent = path.parent_path();
@@ -269,7 +270,7 @@ result<void> symlink_handle::relink(const path_handle &base, path_view_type path
       _dirh = std::move(dh);
     }
   }
-  catch(...)
+  LLFIO_EXCEPTION_CATCH_ALL
   {
     return error_from_exception();
   }
@@ -312,7 +313,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
   path_type &leafname = ret.value()._leafname;
 #endif
   int dirhfd = AT_FDCWD;
-  try
+  LLFIO_EXCEPTION_TRY
   {
     // Take a path handle to the directory containing the symlink
     auto path_parent = path.parent_path();
@@ -330,15 +331,15 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
     }
     else
 #if !LLFIO_SYMLINK_HANDLE_IS_FAKED  // always take a dirh if faking the handle for race safety
-    if(!path_parent.empty())
+      if(!path_parent.empty())
 #endif
-    {
-      // If faking the symlink, write this directly into the member variable cache
-      OUTCOME_TRY(*dirh, path_handle::path(base, path_parent.empty() ? "." : path_parent));
-      dirhfd = dirh->native_handle().fd;
-    }
+      {
+        // If faking the symlink, write this directly into the member variable cache
+        OUTCOME_TRY(*dirh, path_handle::path(base, path_parent.empty() ? "." : path_parent));
+        dirhfd = dirh->native_handle().fd;
+      }
   }
-  catch(...)
+  LLFIO_EXCEPTION_CATCH_ALL
   {
     return error_from_exception();
   }

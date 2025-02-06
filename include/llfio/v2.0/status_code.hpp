@@ -1,5 +1,5 @@
 /* LLFIO error handling
-(C) 2018-2022 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2018-2025 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: June 2018
 
 
@@ -58,9 +58,13 @@ as that (a) enables safe header only LLFIO on Windows (b) produces better codege
 // Bring in status code utility
 #include "outcome/experimental/coroutine_support.hpp"
 #if !OUTCOME_USE_SYSTEM_STATUS_CODE && __has_include("outcome/experimental/status-code/include/status-code/system_code_from_exception.hpp")
+#ifdef __cpp_exceptions
 #include "outcome/experimental/status-code/include/status-code/system_code_from_exception.hpp"
+#endif
 #else
+#ifdef __cpp_exceptions
 #include <status-code/system_code_from_exception.hpp>
+#endif
 #endif
 #if !defined(LLFIO_ENABLE_COROUTINES) && defined(OUTCOME_FOUND_COROUTINE_HEADER)
 #define LLFIO_ENABLE_COROUTINES 1
@@ -215,7 +219,7 @@ protected:
       return msg;
     }
     std::string ret;
-    try
+    LLFIO_EXCEPTION_TRY
     {
       ret = msg.c_str();
       if(paths.first != nullptr)
@@ -241,7 +245,7 @@ protected:
       }
 #endif
     }
-    catch(...)
+    LLFIO_EXCEPTION_CATCH_ALL
     {
       return string_ref("Failed to retrieve message for status code");
     }
@@ -305,7 +309,16 @@ namespace detail
 using file_io_error = SYSTEM_ERROR2_NAMESPACE::erased_errored_status_code<detail::file_io_error_domain_value_system_code>;
 
 
+#ifdef __cpp_exceptions
 template <class T> using result = OUTCOME_V2_NAMESPACE::experimental::status_result<T, file_io_error>;
+#else
+template <class T> using result = OUTCOME_V2_NAMESPACE::experimental::status_result<T, file_io_error, OUTCOME_V2_NAMESPACE::policy::terminate>;
+// inline std::error_code error_from_exception(std::exception_ptr && = std::current_exception(),
+//                                             std::error_code = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept
+//{
+//   abort();  // should never be called
+// }
+#endif
 using OUTCOME_V2_NAMESPACE::failure;
 using OUTCOME_V2_NAMESPACE::in_place_type;
 using OUTCOME_V2_NAMESPACE::success;
@@ -370,8 +383,12 @@ namespace detail
 inline file_io_error error_from_exception(std::exception_ptr &&ep = std::current_exception(),
                                           SYSTEM_ERROR2_NAMESPACE::system_code not_matched = errc::resource_unavailable_try_again) noexcept
 {
+#ifdef __cpp_exceptions
   return SYSTEM_ERROR2_NAMESPACE::system_code_from_exception(static_cast<std::exception_ptr &&>(ep),
                                                              static_cast<SYSTEM_ERROR2_NAMESPACE::system_code &&>(not_matched));
+#else
+  abort();
+#endif
 }
 
 LLFIO_V2_NAMESPACE_END
@@ -595,24 +612,34 @@ public:
 inline void error_info::throw_exception() const
 {
   std::string msg;
-  try
+  LLFIO_EXCEPTION_TRY
   {
     msg = message();
   }
-  catch(...)
-  {
-  }
+  LLFIO_EXCEPTION_CATCH_ALL {}
+#ifdef __cpp_exceptions
   OUTCOME_V2_NAMESPACE::try_throw_std_exception_from_error(ec, msg);
-  throw error(*this);
+#endif
+  LLFIO_EXCEPTION_THROW(error(*this));
 }
 
+#ifdef __cpp_exceptions
 template <class T> using result = OUTCOME_V2_NAMESPACE::result<T, error_info>;
+#else
+template <class T> using result = OUTCOME_V2_NAMESPACE::result<T, error_info, OUTCOME_V2_NAMESPACE::policy::terminate>;
+#endif
 using OUTCOME_V2_NAMESPACE::failure;
 using OUTCOME_V2_NAMESPACE::success;
 inline error_info error_from_exception(std::exception_ptr &&ep = std::current_exception(),
                                        std::error_code not_matched = std::make_error_code(std::errc::resource_unavailable_try_again)) noexcept
 {
+#ifdef __cpp_exceptions
   return error_info(OUTCOME_V2_NAMESPACE::error_from_exception(std::move(ep), not_matched));
+#else
+  (void) ep;
+  (void) not_matched;
+  abort();  // should never be called
+#endif
 }
 using OUTCOME_V2_NAMESPACE::in_place_type;
 #if defined(LLFIO_ENABLE_COROUTINES)

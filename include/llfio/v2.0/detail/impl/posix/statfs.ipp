@@ -103,7 +103,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
     }
     if(!!(wanted & want::flags) || !!(wanted & want::fstypename) || !!(wanted & want::mntfromname) || !!(wanted & want::mntonname))
     {
-      try
+      LLFIO_EXCEPTION_TRY
       {
         struct mountentry
         {
@@ -224,7 +224,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
           ++ret;
         }
       }
-      catch(...)
+      LLFIO_EXCEPTION_CATCH_ALL
       {
         return error_from_exception();
       }
@@ -347,7 +347,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
 LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<uint32_t, float>> statfs_t::_fill_ios(const handle &h, const std::string & /*unused*/) noexcept
 {
   (void) h;
-  try
+  LLFIO_EXCEPTION_TRY
   {
 #ifdef __linux__
     struct stat s
@@ -394,7 +394,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<uint32_t, float>> statfs_t::_fi
         }
       }
     }
-    try
+    LLFIO_EXCEPTION_TRY
     {
       int fd = ::open("/proc/diskstats", O_RDONLY);
       if(fd >= 0)
@@ -414,14 +414,14 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<uint32_t, float>> statfs_t::_fi
             diskstats.resize(read);
             break;
           }
-          try
+          LLFIO_EXCEPTION_TRY
           {
             diskstats.resize(diskstats.size() << 1);
           }
-          catch(...)
+          LLFIO_EXCEPTION_CATCH_ALL
           {
             ::close(fd);
-            throw;
+            LLFIO_EXCEPTION_RETHROW;
           }
         }
         /* Format is (https://www.kernel.org/doc/Documentation/iostats.txt):
@@ -478,7 +478,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<uint32_t, float>> statfs_t::_fi
         // return all bits one to indicate soft failure.
       }
     }
-    catch(...)
+    LLFIO_EXCEPTION_CATCH_ALL
     {
       return error_from_exception();
     }
@@ -492,7 +492,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<uint32_t, float>> statfs_t::_fi
 #endif
     return {-1, detail::constexpr_float_allbits_set_nan()};
   }
-  catch(...)
+  LLFIO_EXCEPTION_CATCH_ALL
   {
     return error_from_exception();
   }

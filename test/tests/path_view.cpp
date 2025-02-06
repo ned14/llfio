@@ -56,7 +56,7 @@ static inline void CheckPathView(const LLFIO_V2_NAMESPACE::filesystem::path &pat
   CheckPathView(path, "filename()", [](const auto &p) { return p.filename(); });
   CheckPathView(path, "stem()", [](const auto &p) { return p.stem(); });
   CheckPathView(path, "extension()", [](const auto &p) { return p.extension(); });
-#if !(LLFIO_USING_EXPERIMENTAL_FILESYSTEM && defined(_MSC_VER))
+#if !(defined(_MSC_VER))
   // remove_filename() is completely stupid on MSVC's Experimental Filesystem
   CheckPathView(path, "remove_filename()", [](auto p) { return p.remove_filename(); });
 #endif
@@ -118,11 +118,7 @@ static inline void TestPathView()
   llfio::path_view e(p);  // NOLINT
   llfio::path_view f(e.filename());
   e = e.remove_filename();
-#if LLFIO_USING_EXPERIMENTAL_FILESYSTEM && defined(_MSC_VER)
-  BOOST_CHECK(0 == e.compare<>("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir"));
-#else
   BOOST_CHECK(0 == e.compare<>("/mnt/c/Users/ned/Documents/boostish/afio/programs/build_posix/testdir/"));
-#endif
   BOOST_CHECK(0 == f.compare<>("0"));
   // Trailing
   BOOST_CHECK(0 == llfio::path_view("/a/b/").without_trailing_separator().compare<>("/a/b"));
@@ -173,11 +169,7 @@ static inline void TestPathView()
   llfio::path_view g(p2);
   llfio::path_view h(g.filename());
   g = g.remove_filename();
-#if LLFIO_USING_EXPERIMENTAL_FILESYSTEM && defined(_MSC_VER)
-  BOOST_CHECK(0 == g.compare<>("\\mnt\\c\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir"));
-#else
   BOOST_CHECK(0 == g.compare<>("\\mnt\\c\\Users\\ned\\Documents\\boostish\\afio\\programs\\build_posix\\testdir\\"));
-#endif
   BOOST_CHECK(0 == h.compare<>("0"));
   // cstr
   llfio::path_view::zero_terminated_rendered_path<> i(g);
@@ -195,9 +187,7 @@ static inline void TestPathView()
   CheckPathView("C:/Users/ned/Documents/boostish/afio/programs/build_posix/testdir/0.txt");
   CheckPathView(L"\\\\niall\\douglas.txt");
   // CheckPathView(L"\\!!\\niall\\douglas.txt");
-#ifndef _EXPERIMENTAL_FILESYSTEM_
   CheckPathView(L"\\??\\niall\\douglas.txt");
-#endif
   CheckPathView(L"\\\\?\\niall\\douglas.txt");
   CheckPathView(L"\\\\.\\niall\\douglas.txt");
 

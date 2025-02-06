@@ -466,7 +466,7 @@ public:
   LLFIO_MAKE_FREE_FUNCTION
   static inline result<symlink_handle> uniquely_named_symlink(const path_handle &dirpath, mode _mode = mode::write, flag flags = flag::none) noexcept
   {
-    try
+    LLFIO_EXCEPTION_TRY
     {
       for(;;)
       {
@@ -479,7 +479,7 @@ public:
         }
       }
     }
-    catch(...)
+    LLFIO_EXCEPTION_CATCH_ALL
     {
       return error_from_exception();
     }

@@ -530,7 +530,7 @@ static inline void TestDynamicThreadPoolGroupIoAwareWorks()
   alignas(4096) llfio::byte buffer[IO_SIZE];
   llfio::utils::random_fill((char *) buffer, sizeof(buffer));
   std::vector<work_item> workitems;
-  try
+  LLFIO_EXCEPTION_TRY
   {
     for(size_t n = 0; n < WORK_ITEMS; n++)
     {
@@ -538,7 +538,7 @@ static inline void TestDynamicThreadPoolGroupIoAwareWorks()
       shared_state.h.write(n * IO_SIZE, {{buffer, sizeof(buffer)}}).value();
     }
   }
-  catch(const std::runtime_error &e)
+  LLFIO_EXCEPTION_CATCH({}, const std::runtime_error &e)
   {
     std::cout << "\nNOTE: Received exception '" << e.what()
               << "' when trying to construct dynamic_thread_pool_group::io_aware_work_item, assuming this platform does not implement statfs::f_iosinprogress "

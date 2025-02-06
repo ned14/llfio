@@ -380,7 +380,7 @@ namespace ip
   result<resolver_ptr> resolve(string_view name, string_view service, family _family, deadline d, resolve_flag flags) noexcept
   {
     LLFIO_LOG_FUNCTION_CALL(nullptr);
-    try
+    LLFIO_EXCEPTION_TRY
     {
       detail::resolver_impl *p;
       resolver_ptr ret((p = new detail::resolver_impl(name, service)));
@@ -470,7 +470,7 @@ namespace ip
 #endif
       return {std::move(ret)};
     }
-    catch(...)
+    LLFIO_EXCEPTION_CATCH_ALL
     {
       return error_from_exception();
     }

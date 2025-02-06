@@ -94,7 +94,7 @@ namespace detail
 #ifdef _MSC_VER  // MSVC's standard library refuses any basic_string_view<T> where T is not an unsigned type
   using char8_t = unsigned char;
 #else
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 12
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wc++20-compat"
 #endif
@@ -147,7 +147,7 @@ namespace detail
   {
     return a.v != b.v;
   }
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 12
 #pragma GCC diagnostic pop
 #endif
 #endif
@@ -623,31 +623,10 @@ private:
   LLFIO_PATH_VIEW_CONSTEXPR path_view_component _filename() const noexcept
   {
     auto sep_idx = _find_last_sep();
-#if LLFIO_USING_EXPERIMENTAL_FILESYSTEM
-#ifdef _WIN32
-    if(sep_idx == 2 && _length == 3)
-    {
-      return this->_invoke(
-      [this, sep_idx](const auto &v) mutable
-      {
-        if(v[1] == ':')
-        {
-          return path_view_component(v.data() + 2, 1, termination(), formatting());
-        }
-        return *this;
-      });
-    }
-#endif
-    if(_npos == sep_idx || (_length == 1 && sep_idx == 0))  // Filesystem TS thinks the filename() of "/" is "/"
-    {
-      return *this;
-    }
-#else
     if(_npos == sep_idx)
     {
       return *this;
     }
-#endif
     return _invoke([sep_idx, this](const auto &v) { return path_view_component(v.data() + sep_idx + 1, v.size() - sep_idx - 1, termination()); });
   }
 
@@ -738,7 +717,6 @@ public:
   }
 
 private:
-#ifdef LLFIO_USING_STD_FILESYSTEM
   template <class CharT> static filesystem::path _path_from_char_array(basic_string_view<CharT> v, filesystem::path::format f)
   {
     return {v.data(), v.data() + v.size(), f};
@@ -750,23 +728,11 @@ private:
 #else
     if(f != filesystem::path::format::auto_format)
     {
-      throw std::runtime_error("UTF-8 path conversion pre-C++20 cannot handle non-auto_format formatting.");
+      LLFIO_EXCEPTION_THROW(std::runtime_error("UTF-8 path conversion pre-C++20 cannot handle non-auto_format formatting."));
     }
     return filesystem::u8path((const char *) v.data(), (const char *) v.data() + v.size());
 #endif
   }
-#endif
-#ifdef LLFIO_USING_EXPERIMENTAL_FILESYSTEM
-  template <class CharT> static filesystem::path _path_from_char_array(basic_string_view<CharT> v) { return {v.data(), v.data() + v.size()}; }
-  static filesystem::path _path_from_char_array(basic_string_view<char8_t> v)
-  {
-#if(__cplusplus >= 202000 || _HAS_CXX20) && (!defined(_LIBCPP_VERSION) || _LIBCPP_VERSION > 10000 /* approx start of 2020 */)
-    return filesystem::path(v);
-#else
-    return filesystem::u8path((const char *) v.data(), (const char *) v.data() + v.size());
-#endif
-  }
-#endif
 
   template <class CharT> static int _do_compare(const CharT *a, const CharT *b, size_t length) noexcept { return memcmp(a, b, length * sizeof(CharT)); }
   static int _do_compare(const char8_t *_a, const char8_t *_b, size_t length) noexcept
@@ -819,7 +785,6 @@ public:
     return _invoke(
     [&](const auto &v)
     {
-#ifdef LLFIO_USING_STD_FILESYSTEM
       return _path_from_char_array(v,
                                    [](format f) -> filesystem::path::format
                                    {
@@ -833,14 +798,6 @@ public:
                                        return filesystem::path::format::auto_format;
                                      }
                                    }(formatting()));
-#endif
-#ifdef LLFIO_USING_EXPERIMENTAL_FILESYSTEM
-      if(formatting() == generic_format || formatting() == native_format)
-      {
-        throw std::runtime_error("Path conversion with <experimental/filesystem> cannot handle generic_format or native_format formatting.");
-      }
-      return _path_from_char_array(v);
-#endif
     });
   }
 
@@ -2300,31 +2257,9 @@ public:
     if(_npos == sep_idx)
     {
       // Sorry, this semantic is so broken that it's unwise to emulate!
-#if 0  // LLFIO_USING_EXPERIMENTAL_FILESYSTEM && defined(_MSC_VER)
-      return this->_invoke([&](const auto &v) {
-        // MSVC's Experimental Filesystem has some really, really weird semantics :(
-        return *this;
-      });
-#else
       return path_view();
-#endif
     }
-    return this->_invoke(
-    [sep_idx, this](auto v)
-    {
-      return path_view(v.data(),
-#if LLFIO_USING_EXPERIMENTAL_FILESYSTEM
-#ifdef _MSC_VER
-                       (sep_idx > 3 && (!is_uncpath() || v.data()[2] == '.' || v.data()[2] == '?')) ? sep_idx : (sep_idx + 1)
-#else
-                       (v.size() - 1 == sep_idx) ? sep_idx : (sep_idx + 1)
-#endif
-#else
-                       (sep_idx + 1)
-#endif
-                       ,
-                       not_zero_terminated, formatting());
-    });
+    return this->_invoke([sep_idx, this](auto v) { return path_view(v.data(), (sep_idx + 1), not_zero_terminated, formatting()); });
   }
   //! Returns a view of the root name part of this view e.g. C:
   LLFIO_PATH_VIEW_CONSTEXPR path_view root_name() const noexcept
@@ -2472,7 +2407,6 @@ public:
           return path_view(v.data(), sep_idx + 1, not_zero_terminated, formatting());
         }
       }
-#if !LLFIO_USING_EXPERIMENTAL_FILESYSTEM
       // If a C:\ or whatever, return exactly that.
       auto rp = root_path();
       if(rp.native_size() == native_size())
@@ -2480,15 +2414,9 @@ public:
         return *this;
       }
       return path_view(v.data(), (sep_idx == 0) ? 1 : sep_idx, not_zero_terminated, formatting());
-#else
-      return path_view(v.data(), (sep_idx == 0 && this->_length > 1) ? 1 : sep_idx, not_zero_terminated, formatting());
-#endif
     });
-#elif LLFIO_USING_EXPERIMENTAL_FILESYSTEM  // Filesystem TS returns parent path "" for "/"
-    return this->_invoke([this, sep_idx](const auto &v)
-                         { return path_view(v.data(), (sep_idx == 0 && this->_length > 1) ? 1 : sep_idx, not_zero_terminated, formatting()); });
 #else
-  return this->_invoke([this, sep_idx](const auto &v) { return path_view(v.data(), (sep_idx == 0) ? 1 : sep_idx, not_zero_terminated, formatting()); });
+    return this->_invoke([this, sep_idx](const auto &v) { return path_view(v.data(), (sep_idx == 0) ? 1 : sep_idx, not_zero_terminated, formatting()); });
 #endif
   }
   //! Returns a view of the filename part of this view.
@@ -3177,7 +3105,10 @@ namespace detail
       ret.assign(_.begin(), _.end());
     }
 #endif
-    template <class T> void operator()(span<T> /*unused*/) { throw std::logic_error("filesystem::path cannot be constructed from a byte input."); }
+    template <class T> void operator()(span<T> /*unused*/)
+    {
+      LLFIO_EXCEPTION_THROW(std::logic_error("filesystem::path cannot be constructed from a byte input."));
+    }
   };
 }  // namespace detail
 //! Append a path view component to a path view component

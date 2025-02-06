@@ -22,10 +22,32 @@ Distributed under the Boost Software License, Version 1.0.
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
+/* For a randomly generated directory hierarchy of 128457372 items in 1000000
+directories (average 128 items per directory):
+
+echo 3 > /proc/sys/vm/drop_caches was done before each test
+
+Traversal test for path (very short paths) ...
+  Traversed 1000001 directories on "testdir" in 123.289 seconds (which is
+8111.06 directories/sec, or 959.762 ns/item).
+
+Traversal test for path_view (very short paths) ...
+  Traversed 1000001 directories on "testdir" in 102.852 seconds (which is
+9722.77 directories/sec, or 800.666 ns/item).
+
+Traversal test for path (longer paths) ...
+  Traversed 1000001 directories on "testdir" in 206.522 seconds (which is
+4842.09 directories/sec, or 1607.71 ns/item).
+
+Traversal test for path_view (longer paths) ...
+  Traversed 1000001 directories on "testdir" in 18.7709 seconds (which is
+53274.1 directories/sec, or 146.125 ns/item).
+*/
+
 #include "../include/llfio.hpp"
 #include "llfio/v2.0/directory_handle.hpp"
 
-#if !defined(_WIN32) && (__cplusplus >= 201700L || _HAS_CXX17)
+#if !defined(_WIN32)
 
 #include <atomic>
 #include <chrono>
@@ -39,11 +61,16 @@ Distributed under the Boost Software License, Version 1.0.
 namespace llfio = LLFIO_V2_NAMESPACE;
 namespace fs = llfio::filesystem;
 
-
 struct base_visitor : public llfio::algorithm::traverse_visitor
 {
   std::atomic<llfio::file_handle::extent_type> total_bytes{0};
   std::atomic<size_t> total_items{0};
+
+  void clear()
+  {
+    total_bytes = 0;
+    total_items = 0;
+  }
 
   virtual llfio::result<llfio::directory_handle>
   directory_open_failed(void *, llfio::result<void>::error_type &&,
@@ -55,9 +82,9 @@ struct base_visitor : public llfio::algorithm::traverse_visitor
   }
 };
 
-struct path_visitor final : public base_visitor
+struct path_visitor1 final : public base_visitor
 {
-  static constexpr char name[] = "path";
+  static constexpr char name[] = "path (very short paths)";
 
   virtual llfio::result<void>
   post_enumeration(void *, const llfio::directory_handle &dirh,
@@ -87,9 +114,9 @@ struct path_visitor final : public base_visitor
   }
 };
 
-struct path_view_visitor final : public base_visitor
+struct path_view_visitor1 final : public base_visitor
 {
-  static constexpr char name[] = "path_view";
+  static constexpr char name[] = "path_view (very short paths)";
 
   virtual llfio::result<void>
   post_enumeration(void *, const llfio::directory_handle &dirh,
@@ -119,11 +146,78 @@ struct path_view_visitor final : public base_visitor
   }
 };
 
+struct path_visitor2 final : public base_visitor
+{
+  static constexpr char name[] = "path (longer paths)";
+
+  virtual llfio::result<void>
+  post_enumeration(void *, const llfio::directory_handle &dirh,
+                   llfio::directory_handle::buffers_type &contents,
+                   size_t) noexcept override final
+  {
+    llfio::file_handle::extent_type bytes = 0;
+    struct stat s;
+    auto dirpath = dirh.current_path().value();
+    for(const llfio::directory_entry &entry : contents)
+    {
+      fs::path path(dirpath / entry.leafname.path());
+      if(-1 == lstat(path.c_str(), &s))
+      {
+        const auto errcode = errno;
+        std::cerr << "FATAL: Failed to lstat " << path << " due to '"
+                  << strerror(errcode) << "'." << std::endl;
+        abort();
+      }
+      bytes += s.st_size;
+    }
+    this->total_bytes.fetch_add(bytes, std::memory_order_relaxed);
+    this->total_items.fetch_add(contents.size(), std::memory_order_relaxed);
+    return llfio::success();
+  }
+};
+
+struct path_view_visitor2 final : public base_visitor
+{
+  static constexpr char name[] = "path_view (longer paths)";
+
+  virtual llfio::result<void>
+  post_enumeration(void *, const llfio::directory_handle &dirh,
+                   llfio::directory_handle::buffers_type &contents,
+                   size_t) noexcept override final
+  {
+    llfio::file_handle::extent_type bytes = 0;
+    struct stat s;
+    auto dirpath = dirh.current_path().value().native();
+    fs::path::value_type path[PATH_MAX];
+    memcpy(path, dirpath.data(), dirpath.size());
+    char *endp = path + dirpath.size();
+    *endp++ = '/';
+    for(const llfio::directory_entry &entry : contents)
+    {
+      auto leafname = entry.leafname.render_null_terminated();
+      memcpy(endp, leafname.data(), leafname.size() + 1);
+      if(-1 == lstat(dirpath.data(), &s))
+      {
+        const auto errcode = errno;
+        std::cerr << "FATAL: Failed to lstat " << dirpath.data()
+                  << " due to '" << strerror(errcode) << "'." << std::endl;
+        abort();
+      }
+      bytes += s.st_size;
+    }
+    this->total_bytes.fetch_add(bytes, std::memory_order_relaxed);
+    this->total_items.fetch_add(contents.size(), std::memory_order_relaxed);
+    return llfio::success();
+  }
+};
+
 static constexpr llfio::path_view to_traverse_path("testdir");
 static auto to_traverse = llfio::path_handle::path(to_traverse_path).value();
 
 template <class T> void do_test(T &visitor)
 {
+  visitor.clear();
+  std::cout << "\nTraversal test for " << visitor.name << " ..." << std::endl;
   const auto begin = std::chrono::high_resolution_clock::now();
   auto items_mt = llfio::algorithm::traverse(to_traverse, &visitor).value();
   const auto end = std::chrono::high_resolution_clock::now();
@@ -146,7 +240,7 @@ template <class T> void do_test(T &visitor)
 }
 
 
-int main(void)
+int main(int argc, const char *argv[])
 {
 #ifndef _WIN32
   {
@@ -235,10 +329,40 @@ int main(void)
   .value();
 #endif
 
-  path_visitor pathv;
-  path_view_visitor pathvv;
-  do_test(pathv);
-  do_test(pathvv);
+  if(argc < 2)
+  {
+    std::cerr << "FATAL: " << argv[0] << " <testidx>" << std::endl;
+    return 1;
+  }
+  const auto testno = atoi(argv[1]);
+
+  switch(testno)
+  {
+  case 1:
+  {
+    path_visitor1 v;
+    do_test(v);
+    break;
+  }
+  case 2:
+  {
+    path_visitor2 v;
+    do_test(v);
+    break;
+  }
+  case 3:
+  {
+    path_view_visitor1 v;
+    do_test(v);
+    break;
+  }
+  case 4:
+  {
+    path_view_visitor2 v;
+    do_test(v);
+    break;
+  }
+  }
   return 0;
 }
 #else

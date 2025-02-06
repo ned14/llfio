@@ -49,7 +49,7 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
   {
     OUTCOME_TRY(_fetch_inode());
   }
-  try
+  LLFIO_EXCEPTION_TRY
   {
     for(;;)
     {
@@ -123,7 +123,7 @@ result<path_handle> fs_handle::parent_path_handle(deadline d) const noexcept
       LLFIO_WIN_DEADLINE_TO_TIMEOUT_LOOP(d);
     }
   }
-  catch(...)
+  LLFIO_EXCEPTION_CATCH_ALL
   {
     return error_from_exception();
   }
@@ -335,12 +335,12 @@ result<void> fs_handle::unlink(deadline d) noexcept
     {
       // Rename it to something random to emulate immediate unlinking
       std::string randomname;
-      try
+      LLFIO_EXCEPTION_TRY
       {
         randomname = utils::random_string(32);
         randomname.append(".deleted");
       }
-      catch(...)
+      LLFIO_EXCEPTION_CATCH_ALL
       {
         return error_from_exception();
       }
@@ -592,7 +592,7 @@ result<void> fs_handle::set_extended_attribute(path_view_component name, span<co
   the value will atomically update.
   */
   handle attribh;
-  try
+  LLFIO_EXCEPTION_TRY
   {
     for(;;)
     {
@@ -609,7 +609,7 @@ result<void> fs_handle::set_extended_attribute(path_view_component name, span<co
       }
     }
   }
-  catch(...)
+  LLFIO_EXCEPTION_CATCH_ALL
   {
     return error_from_exception();
   }
@@ -1040,7 +1040,7 @@ LLFIO_HEADERS_ONLY_FUNC_SPEC result<filesystem::path> to_win32_path(const fs_han
         {
           // Are any segments of the filename a reserved name?
           static
-#if(_HAS_CXX17 || __cplusplus >= 201700) && (!defined(__GLIBCXX__) || __GLIBCXX__ > 20170519)  // libstdc++'s string_view is missing constexpr
+#if(!defined(__GLIBCXX__) || __GLIBCXX__ > 20170519)  // libstdc++'s string_view is missing constexpr
           constexpr
 #endif
           const wstring_view reserved_names[] = {L"\\CON\\",  L"\\PRN\\",  L"\\AUX\\",  L"\\NUL\\",  L"\\COM1\\", L"\\COM2\\", L"\\COM3\\", L"\\COM4\\",

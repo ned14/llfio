@@ -1,5 +1,5 @@
 /* Configures LLFIO
-(C) 2015-2024 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
+(C) 2015-2025 Niall Douglas <http://www.nedproductions.biz/> (24 commits)
 File Created: Dec 2015
 
 
@@ -135,35 +135,12 @@ Distributed under the Boost Software License, Version 1.0.
 #include "quickcpplib/cpp_feature.h"
 
 #ifndef STANDARDESE_IS_IN_THE_HOUSE
-#ifndef __cpp_exceptions
-#error LLFIO needs C++ exceptions to be turned on
-#endif
-#ifndef __cpp_alias_templates
-#error LLFIO needs template alias support in the compiler
-#endif
-#ifndef __cpp_variadic_templates
-#error LLFIO needs variadic template support in the compiler
-#endif
-#if __cpp_constexpr < 201304L && !defined(_MSC_VER)
-#error LLFIO needs relaxed constexpr (C++ 14) support in the compiler
-#endif
-#ifndef __cpp_init_captures
-#error LLFIO needs lambda init captures support in the compiler (C++ 14)
-#endif
-#ifndef __cpp_attributes
-#error LLFIO needs attributes support in the compiler
-#endif
-#ifndef __cpp_variable_templates
-#error LLFIO needs variable template support in the compiler
-#endif
-#ifndef __cpp_generic_lambdas
-#error LLFIO needs generic lambda support in the compiler
+#if !(_HAS_CXX17 || __cplusplus >= 201700)
+#error "LLFIO needs a minimum of C++ 17 support in the compiler"
 #endif
 #ifdef __has_include
-// clang-format off
-#if !__has_include(<filesystem>) && !__has_include(<experimental/filesystem>)
-// clang-format on
-#error LLFIO needs an implementation of the Filesystem TS in the standard library
+#if !__has_include(<filesystem>)
+#error "LLFIO needs an implementation of C++ 17 <filesystem> in the standard library"
 #endif
 #endif
 #endif
@@ -245,60 +222,11 @@ LLFIO_V2_NAMESPACE_END
 #endif
 #include "quickcpplib/utils/thread.hpp"
 // Bring in filesystem
-#if defined(__has_include)
-// clang-format off
-#if !LLFIO_FORCE_EXPERIMENTAL_FILESYSTEM && __has_include(<filesystem>) && (__cplusplus >= 201700 || _HAS_CXX17)
 #define LLFIO_USING_STD_FILESYSTEM 1
 #include <filesystem>
 LLFIO_V2_NAMESPACE_BEGIN
 namespace filesystem = std::filesystem;
-LLFIO_V2_NAMESPACE_END
-// C++ 14 filesystem support was dropped in VS2019 16.3
-// C++ 14 filesystem support was dropped in LLVM 11
-#elif __has_include(<experimental/filesystem>) && (!defined(_MSC_VER) || _MSC_VER < 1923) && (!defined(_LIBCPP_VERSION) || _LIBCPP_VERSION < 11000)  
-#define LLFIO_USING_EXPERIMENTAL_FILESYSTEM 1
-#include <experimental/filesystem>
-LLFIO_V2_NAMESPACE_BEGIN
-namespace filesystem = std::experimental::filesystem;
-LLFIO_V2_NAMESPACE_END
-#elif !LLFIO_FORCE_EXPERIMENTAL_FILESYSTEM && __has_include(<filesystem>)
-#if defined(_MSC_VER) && _MSC_VER >= 1923
-#error MSVC dropped support for C++ 14 <filesystem> from VS2019 16.3 onwards. Please enable C++ 17 or later.
-#endif
-#if defined(_LIBCPP_VERSION) && _LIBCPP_VERSION >= 11000
-#error libc++ dropped support for C++ 14 <filesystem> from LLVM 11 onwards. Please enable C++ 17 or later.
-#endif
-#define LLFIO_USING_STD_FILESYSTEM 1
-#include <filesystem>
-LLFIO_V2_NAMESPACE_BEGIN
-namespace filesystem = std::filesystem;
-LLFIO_V2_NAMESPACE_END
-#endif
-#elif __PCPP_ALWAYS_TRUE__
-#define LLFIO_USING_STD_FILESYSTEM 1
-#include <filesystem>
-LLFIO_V2_NAMESPACE_BEGIN
-namespace filesystem = std::filesystem;
-LLFIO_V2_NAMESPACE_END
-// clang-format on
-#elif defined(_MSC_VER)
-#define LLFIO_USING_STD_FILESYSTEM 1
-#include <filesystem>
-LLFIO_V2_NAMESPACE_BEGIN
-namespace filesystem = std::experimental::filesystem;
-LLFIO_V2_NAMESPACE_END
-#else
-#error No <filesystem> implementation found
-#endif
-#if LLFIO_USING_EXPERIMENTAL_FILESYSTEM && !LLFIO_DISABLE_USING_EXPERIMENTAL_FILESYSTEM_WARNING
-#ifdef _MSC_VER
-#pragma message(                                                                                                                                               \
-"WARNING: LLFIO is using the experimental Filesystem TS instead of the standard Filesystem, there are many corner case surprises in the former! Support for the Experimental Filesystem TS is expected to be deprecated at some point, and C++ 17 shall become the minimum required for LLFIO.")
-#else
-#warning WARNING: LLFIO is using the experimental Filesystem TS instead of the standard Filesystem, there are many corner case surprises in the former! Support for the Experimental Filesystem TS is expected to be deprecated at some point, and C++ 17 shall become the minimum required for LLFIO.
-#endif
-#endif
-LLFIO_V2_NAMESPACE_BEGIN
+
 struct path_hasher
 {
   size_t operator()(const filesystem::path &p) const { return std::hash<filesystem::path::string_type>()(p.native()); }
@@ -373,9 +301,9 @@ LLFIO_V2_NAMESPACE_BEGIN
 using namespace QUICKCPPLIB_NAMESPACE::span;
 LLFIO_V2_NAMESPACE_END
 // Bring in an optional implementation
-#include "quickcpplib/optional.hpp"
+#include <optional>
 LLFIO_V2_NAMESPACE_BEGIN
-using namespace QUICKCPPLIB_NAMESPACE::optional;
+template <class T> using optional = std::optional<T>;
 LLFIO_V2_NAMESPACE_END
 // Bring in a byte implementation
 #include "quickcpplib/byte.hpp"
@@ -384,9 +312,13 @@ using QUICKCPPLIB_NAMESPACE::byte::byte;
 using QUICKCPPLIB_NAMESPACE::byte::to_byte;
 LLFIO_V2_NAMESPACE_END
 // Bring in a string_view implementation
-#include "quickcpplib/string_view.hpp"
+#include <string_view>
 LLFIO_V2_NAMESPACE_BEGIN
-using namespace QUICKCPPLIB_NAMESPACE::string_view;
+template <typename charT, typename traits = std::char_traits<charT>> using basic_string_view = std::basic_string_view<charT, traits>;
+typedef basic_string_view<char, std::char_traits<char>> string_view;
+typedef basic_string_view<wchar_t, std::char_traits<wchar_t>> wstring_view;
+typedef basic_string_view<char16_t, std::char_traits<char16_t>> u16string_view;
+typedef basic_string_view<char32_t, std::char_traits<char32_t>> u32string_view;
 LLFIO_V2_NAMESPACE_END
 // Bring in a function_ptr implementation
 #include "quickcpplib/function_ptr.hpp"
@@ -501,6 +433,46 @@ function exported from the LLFIO DLL if not building headers only.
 #define LLFIO_HEADERS_ONLY_FUNC_SPEC extern LLFIO_DECL
 #define LLFIO_HEADERS_ONLY_MEMFUNC_SPEC
 #define LLFIO_HEADERS_ONLY_VIRTUAL_SPEC virtual
+#endif
+
+#ifndef LLFIO_EXCEPTION_TRY
+#ifndef __cpp_exceptions
+#define LLFIO_EXCEPTION_TRY if(true)
+#else
+#define LLFIO_EXCEPTION_TRY try
+#endif
+#endif
+#ifndef LLFIO_EXCEPTION_CATCH
+#ifndef __cpp_exceptions
+#define LLFIO_EXCEPTION_CATCH(init, ...) else if(__VA_ARGS__ = init; false)
+#else
+#define LLFIO_EXCEPTION_CATCH(init, ...) catch(__VA_ARGS__)
+#endif
+#endif
+#ifndef LLFIO_EXCEPTION_CATCH_ALL
+#ifndef __cpp_exceptions
+#define LLFIO_EXCEPTION_CATCH_ALL else if(false)
+#else
+#define LLFIO_EXCEPTION_CATCH_ALL catch(...)
+#endif
+#endif
+#ifndef LLFIO_EXCEPTION_THROW
+#ifndef __cpp_exceptions
+#define LLFIO_EXCEPTION_THROW(...)                                                                                                                             \
+  {                                                                                                                                                            \
+    fprintf(stderr, "FATAL: throw " #__VA_ARGS__ " at " __FILE__ ":%d\n", __LINE__);                                                                           \
+    abort();                                                                                                                                                   \
+  }
+#else
+#define LLFIO_EXCEPTION_THROW(...) throw(__VA_ARGS__)
+#endif
+#endif
+#ifndef LLFIO_EXCEPTION_RETHROW
+#ifndef __cpp_exceptions
+#define LLFIO_EXCEPTION_RETHROW
+#else
+#define LLFIO_EXCEPTION_RETHROW throw
+#endif
 #endif
 
 /* I've been burned by this enough times now that I'm adding a runtime check

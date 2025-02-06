@@ -614,7 +614,7 @@ int main(int argc, char *argv[])
         std::cerr << "KernelTest child worker " << thischild << " fails to find work '" << name << "', exiting" << std::endl;
         return 1;
       }
-      try
+      LLFIO_EXCEPTION_TRY
       {
         // Fire up a worker thread and get him to block
         waitable_done waitable(-1);
@@ -651,12 +651,12 @@ int main(int argc, char *argv[])
           }
         }
       }
-      catch(const std::exception &e)
+      LLFIO_EXCEPTION_CATCH({}, const std::exception &e)
       {
         std::cerr << "KernelTest child worker " << thischild << " throws exception '" << e.what() << "'" << std::endl;
         return 1;
       }
-      catch(...)
+      LLFIO_EXCEPTION_CATCH_ALL
       {
         std::cerr << "KernelTest child worker " << thischild << " throws exception 'unknown'" << std::endl;
         return 1;

@@ -27,10 +27,10 @@ Distributed under the Boost Software License, Version 1.0.
 template <class U> inline void map_handle_create_close_(U &&f)
 {
   using namespace KERNELTEST_V1_NAMESPACE;
-  using LLFIO_V2_NAMESPACE::result;
   using LLFIO_V2_NAMESPACE::file_handle;
-  using LLFIO_V2_NAMESPACE::section_handle;
   using LLFIO_V2_NAMESPACE::map_handle;
+  using LLFIO_V2_NAMESPACE::result;
+  using LLFIO_V2_NAMESPACE::section_handle;
 
   // Create a temporary file and put some text into it
   file_handle temph;
@@ -83,7 +83,7 @@ template <class U> inline void map_handle_create_close_(U &&f)
       },
       [&](auto tuplestate) {
         auto &permuter = std::get<0>(tuplestate);
-        auto &testreturn = std::get<1>(tuplestate).value();
+        auto &testreturn = *std::get<1>(tuplestate);
         size_t idx = std::get<2>(tuplestate);
         int use_file_backing = std::get<3>(tuplestate);
         map_handle maph;
@@ -163,4 +163,5 @@ template <class U> inline void map_handle_create_close_(U &&f)
   check_results_with_boost_test(permuter, results);
 }
 
-KERNELTEST_TEST_KERNEL(unit, llfio, map_handle_create_close, map_handle, "Tests that llfio::map_handle's creation parameters work as expected", map_handle_create_close_(map_handle_create_close::test_kernel_map_handle))
+KERNELTEST_TEST_KERNEL(unit, llfio, map_handle_create_close, map_handle, "Tests that llfio::map_handle's creation parameters work as expected",
+                       map_handle_create_close_(map_handle_create_close::test_kernel_map_handle))

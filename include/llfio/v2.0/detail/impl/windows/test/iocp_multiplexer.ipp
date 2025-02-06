@@ -537,7 +537,7 @@ namespace test
 
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<byte_io_multiplexer_ptr> multiplexer_win_iocp(size_t threads, bool disable_immediate_completions) noexcept
   {
-    try
+    LLFIO_EXCEPTION_TRY
     {
       if(1 == threads)
       {
@@ -549,7 +549,7 @@ namespace test
       OUTCOME_TRY(ret->init(threads, disable_immediate_completions));
       return ret;
     }
-    catch(...)
+    LLFIO_EXCEPTION_CATCH_ALL
     {
       return error_from_exception();
     }

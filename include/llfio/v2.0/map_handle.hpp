@@ -952,7 +952,7 @@ namespace detail
 {
   inline result<byte_io_handle::registered_buffer_type> map_handle_allocate_registered_buffer(size_t &bytes) noexcept
   {
-    try
+    LLFIO_EXCEPTION_TRY
     {
       auto make_shared = [](map_handle h) -> byte_io_handle::registered_buffer_type
       {
@@ -1012,7 +1012,7 @@ namespace detail
       }
       return errc::not_enough_memory;
     }
-    catch(...)
+    LLFIO_EXCEPTION_CATCH_ALL
     {
       return error_from_exception();
     }
@@ -1199,7 +1199,7 @@ namespace detail
 {
   inline result<size_t> pagesize_from_flags(section_handle::flag _flag) noexcept
   {
-    try
+    LLFIO_EXCEPTION_TRY
     {
       const auto &pagesizes = utils::page_sizes();
       if((_flag & section_handle::flag::page_sizes_3) == section_handle::flag::page_sizes_3)
@@ -1228,7 +1228,7 @@ namespace detail
       }
       return pagesizes[0];
     }
-    catch(...)
+    LLFIO_EXCEPTION_CATCH_ALL
     {
       return error_from_exception();
     }
