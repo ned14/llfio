@@ -25,6 +25,7 @@ reference implementation for these C++ standardisations:
 
 Other characteristics:
 - Portable to any conforming C++ 17 compiler with a working Filesystem in its STL.
+- Works with C++ exceptions and RTTI globally disabled.
 - Fully clean with C++ 20.
     - Will make use of any Coroutines, Concepts, Span, Byte etc if you have them, otherwise swaps in C++ 17 compatible alternatives.
 - Aims to support Microsoft Windows, Linux, Android, iOS, Mac OS and FreeBSD.
