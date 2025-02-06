@@ -9,6 +9,7 @@ These compilers and OSs are regularly tested by CI:
 
 Other compilers, architectures and OSs may work, but are not tested regularly.
 You will need a working Filesystem implementation in your STL, and at least C++ 17.
+You may optionally disable C++ exceptions and/or RTTI globally if you wish.
 
 LLFIO has your choice of header-only, static library, and shared library build modes.
 Note that on Microsoft Windows, the default header only configuration is unsafe
