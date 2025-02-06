@@ -99,7 +99,7 @@ $(document).ready(function(){initNavTree('md__build.html',''); initResizable(); 
 <li>Xcode on Mac OS</li>
 <li>Visual Studio on Windows</li>
 </ul>
-<p>Other compilers, architectures and OSs may work, but are not tested regularly. You will need a working Filesystem implementation in your STL, and at least C++ 17.</p>
+<p>Other compilers, architectures and OSs may work, but are not tested regularly. You will need a working Filesystem implementation in your STL, and at least C++ 17. You may optionally disable C++ exceptions and/or RTTI globally if you wish.</p>
 <p>LLFIO has your choice of header-only, static library, and shared library build modes. Note that on Microsoft Windows, the default header only configuration is unsafe to use outside of toy projects. You will get warnings of the form:</p>
 <div class="fragment"><div class="line">warning : LLFIO_HEADERS_ONLY=1, LLFIO_EXPERIMENTAL_STATUS_CODE=0 and NTKERNEL_ERROR_CATEGORY_INLINE=1 on Windows, this can produce unreliable binaries where semantic comparisons of error codes randomly fail!</div>
 </div><!-- fragment --><p>... and ...</p>
