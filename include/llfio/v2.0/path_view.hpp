@@ -3142,7 +3142,7 @@ template <class charT> struct std::formatter<LLFIO_V2_NAMESPACE::path_view_compo
       using type = typename decltype(sv)::value_type;
       if constexpr(std::is_same_v<type, std::byte>)
       {
-        return fmt.format(std::filesystem::path(QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string((const char *) v.data(), v.size())), ctx);
+        return fmt.format(std::filesystem::path(QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string((const char *) sv.data(), sv.size())), ctx);
       }
       else
       {
@@ -3165,7 +3165,7 @@ template <class charT> struct std::formatter<LLFIO_V2_NAMESPACE::path_view, char
       using type = typename decltype(sv)::value_type;
       if constexpr(std::is_same_v<type, std::byte>)
       {
-        return fmt.format(std::filesystem::path(QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string((const char *) v.data(), v.size())), ctx);
+        return fmt.format(std::filesystem::path(QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string((const char *) sv.data(), sv.size())), ctx);
       }
       else
       {

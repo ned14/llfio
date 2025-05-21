@@ -525,7 +525,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
         off_t written = 0;
         if(-1 == ::sendfile(_v.fd, dest_.native_handle().fd, extent.offset, extent.length, nullptr, &written, 0))
 #else
-#ifdef __GLIBC__
+#if defined(__GLIBC__) || defined(__ANDROID__)
         off64_t off_in = extent.offset, off_out = 0;
 #else
         off_t off_in = extent.offset, off_out = 0;
