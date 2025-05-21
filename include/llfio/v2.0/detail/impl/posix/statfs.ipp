@@ -46,11 +46,19 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
 #ifdef __linux__
   if(!!(wanted & ~(want::iosinprogress | want::iosbusytime)))
   {
+#ifdef __GLIBC__
     struct statfs64 s
     {
     };
     memset(&s, 0, sizeof(s));
     if(-1 == fstatfs64(h.native_handle().fd, &s))
+#else
+    struct statfs s
+    {
+    };
+    memset(&s, 0, sizeof(s));
+    if(-1 == fstatfs(h.native_handle().fd, &s))
+#endif
     {
       return posix_error();
     }
@@ -116,7 +124,11 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
           {
           }
         };
+#ifdef __GLIBC__
         std::vector<std::pair<mountentry, struct statfs64>> mountentries;
+#else
+        std::vector<std::pair<mountentry, struct statfs>> mountentries;
+#endif
         {
           // Need to parse mount options on Linux
           FILE *mtab = setmntent("/etc/mtab", "r");
@@ -135,12 +147,21 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
           char buffer[32768];
           while(getmntent_r(mtab, &m, buffer, sizeof(buffer)) != nullptr)
           {
+#ifdef __GLIBC__
             struct statfs64 temp
             {
             };
             memset(&temp, 0, sizeof(temp));
             // std::cout << m.mnt_fsname << "," << m.mnt_dir << "," << m.mnt_type << "," << m.mnt_opts << std::endl;
             if(0 == statfs64(m.mnt_dir, &temp))
+#else
+            struct statfs temp
+            {
+            };
+            memset(&temp, 0, sizeof(temp));
+            // std::cout << m.mnt_fsname << "," << m.mnt_dir << "," << m.mnt_type << "," << m.mnt_opts << std::endl;
+            if(0 == statfs(m.mnt_dir, &temp))
+#endif
             {
               // std::cout << "   " << temp.f_fsid.__val[0] << temp.f_fsid.__val[1] << " =? " << s.f_fsid.__val[0] << s.f_fsid.__val[1] << std::endl;
               if(temp.f_type == s.f_type && (memcmp(&temp.f_fsid, &s.f_fsid, sizeof(s.f_fsid)) == 0))

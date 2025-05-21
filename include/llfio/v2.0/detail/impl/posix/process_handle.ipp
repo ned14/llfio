@@ -127,7 +127,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC std::unique_ptr<span<path_view_component>, proce
     // Laziness ...
     return {};
   }
-#if defined(__linux__) && !defined(__ANDROID__)
+#if defined(__linux__) && !defined(__ANDROID__) && defined(__GLIBC__)
   char **environ = __environ;
 #endif
   size_t bytesneeded = sizeof(span<path_view_component>);

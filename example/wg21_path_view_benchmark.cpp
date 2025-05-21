@@ -53,10 +53,9 @@ Traversal test for path_view (longer paths) ...
 #include <chrono>
 #include <iostream>
 
-#include <sys/stat.h>
-#ifndef _WIN32
+#include <fcntl.h>
 #include <sys/resource.h>
-#endif
+#include <sys/stat.h>
 
 namespace llfio = LLFIO_V2_NAMESPACE;
 namespace fs = llfio::filesystem;
