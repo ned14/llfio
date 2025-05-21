@@ -228,10 +228,10 @@ TAB_SIZE               = 2
 # "Side Effects:". You can put \n's in the value part of an alias to insert
 # newlines.
 
-ALIASES                = "errors=@par Errors returnable\n" "mallocs=@par Memory Allocations\n" \
-			"raceguarantees=@par Race Guarantees\n" \
-			"complexity{1}=@par Complexity\n\1" \
-      "exceptionmodel{1}=@par Errors returnable\n\1"
+ALIASES                = "errors=@par Errors returnable^^" "mallocs=@par Memory Allocations^^" \
+			"raceguarantees=@par Race Guarantees^^" \
+			"complexity{1}=@par Complexity^^\1" \
+      "exceptionmodel{1}=@par Errors returnable^^\1"
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding "class=itcl::class"

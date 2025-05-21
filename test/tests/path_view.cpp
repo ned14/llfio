@@ -350,11 +350,16 @@ static inline void TestPathView()
 
 #if LLFIO_PATH_VIEW_HAVE_FORMAT
   {
-    std::string a, b;
-    std::format_to(std::back_inserter(a), std::filesystem::path("a/b/c"));
-    std::format_to(std::back_inserter(b), llfio::path_view("a/b/c"));
-    std::cout << "std::format(path) = " << a << std::endl;
-    std::cout << "std::format(path_view) = " << b << std::endl;
+    std::filesystem::path::string_type l, m;
+    std::format_to(std::back_inserter(l), std::filesystem::path("a/b/c"));
+    std::format_to(std::back_inserter(m), llfio::path_view("a/b/c"));
+#ifdef _WIN32
+    std::wcout
+#else
+    std::cout
+#endif
+    << "std::format(path) = " << l << std::endl
+    << "std::format(path_view) = " << m << std::endl;
     BOOST_CHECK(a == b);
   }
 #endif
