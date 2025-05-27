@@ -534,7 +534,7 @@ Friends</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Memory Allocations\n Except on platforms with race free syscalls for renaming open handles (Windows), calls</dt><dd><code>current_path()</code> via <code>parent_path_handle()</code> and thus is both expensive and calls malloc many times. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>Except on platforms with race free syscalls for renaming open handles (Windows), calls <code>current_path()</code> via <code>parent_path_handle()</code> and thus is both expensive and calls malloc many times. </dd></dl>
 
 </div>
 </div>
@@ -565,7 +565,7 @@ Friends</h2></td></tr>
 <p>Fill the supplied buffer with the names of all extended attributes set on this file or directory, returning a span of path view components. </p>
 <p>Note that this routine is a very thin wrap of <code>listxattr()</code> on POSIX and <code>NtQueryInformationFile()</code> on Windows. If the supplied buffer is too small, the syscall typically returns failure rather than do a partial fill. Most implementations do not support more than 64Kb of extended attribute information per inode so maybe 70Kb is a safe default (to account for the return value storage), however properly written code will detect the buffer being too small and will auto-expand it until success.</p>
 <dl class="section note"><dt>Note</dt><dd>On Windows, this is the list of alternate streams on a file, NOT NTFS extended attributes.</dd></dl>
-<dl class="section user"><dt>Race Guarantees\n The list of extended attributes is fetched in a single syscall. This may be an</dt><dd>atomically consistent snapshot. </dd></dl>
+<dl class="section user"><dt>Race Guarantees</dt><dd>The list of extended attributes is fetched in a single syscall. This may be an atomically consistent snapshot. </dd></dl>
 
 </div>
 </div>
@@ -634,7 +634,7 @@ Friends</h2></td></tr>
 
 <p>Obtain a handle to the path <b>currently</b> containing this handle's file entry. </p>
 <dl class="section warning"><dt>Warning</dt><dd>This call is <b>racy</b> and can result in the wrong path handle being returned. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation opens a <code>path_handle</code> to the source containing directory, then checks if the file entry within has the same inode as the open file handle. It will retry this matching until success until the deadline given.</dd></dl>
-<dl class="section user"><dt>Memory Allocations\n Calls <code>current_path()</code> and thus is both expensive and calls malloc many times.</dt><dd></dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>Calls <code>current_path()</code> and thus is both expensive and calls malloc many times.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><code>algorithm::cached_parent_handle_adapter&lt;T&gt;</code> which overrides this with a zero cost implementation, thus making unlinking and relinking very considerably quicker. </dd></dl>
 
 </div>
@@ -698,7 +698,7 @@ Friends</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Memory Allocations\n Except on platforms with race free syscalls for renaming open handles (Windows), calls</dt><dd><code>current_path()</code> via <code>parent_path_handle()</code> and thus is both expensive and calls malloc many times. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>Except on platforms with race free syscalls for renaming open handles (Windows), calls <code>current_path()</code> via <code>parent_path_handle()</code> and thus is both expensive and calls malloc many times. </dd></dl>
 
 <p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1mapped__file__handle.html#a612b033c4687f7025b58fa92e90aabfb">llfio_v2_xxx::mapped_file_handle</a>.</p>
 
@@ -1338,7 +1338,7 @@ template&lt;class... Args, class Clock , class Duration &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Memory Allocations\n Except on platforms with race free syscalls for unlinking open handles (Windows), calls</dt><dd><code>current_path()</code> and thus is both expensive and calls malloc many times. On Windows, also calls <code>current_path()</code> if <code>flag::disable_safety_unlinks</code> is not set. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>Except on platforms with race free syscalls for unlinking open handles (Windows), calls <code>current_path()</code> and thus is both expensive and calls malloc many times. On Windows, also calls <code>current_path()</code> if <code>flag::disable_safety_unlinks</code> is not set. </dd></dl>
 
 </div>
 </div>

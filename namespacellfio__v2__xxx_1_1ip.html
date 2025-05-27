@@ -475,7 +475,7 @@ result&lt; <a class="el" href="classllfio__v2__xxx_1_1ip_1_1address__v6.html">ad
 <p>The object returned by this function can take many seconds to become ready as multiple network requests may need to be made. The deadline can be used to bound execution times &ndash; like in a few other places in LLFIO, this deadline does not cause timed out errors, rather it aborts any remaining name resolution after the deadline expires and returns whatever addresses have been resolved by the deadline.</p>
 <p>This function has a future-like API as several major platforms provide native asynchronous name resolution (currently: Linux, Windows). On other platforms, <code>std::async</code> with <code>getaddrinfo()</code> is used as an emulation, and therefore deadline expiry means no partial list of addresses are returned.</p>
 <p>If you become no longer interested in the results, simply reset or delete the pointer and the resolution will be aborted asynchronously.</p>
-<dl class="section user"><dt>Memory Allocations\n This is one of those very few APIs in LLFIO where dynamic memory allocation</dt><dd>is unbounded and uncontrollable thanks to how the platform APIs are implemented. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>This is one of those very few APIs in LLFIO where dynamic memory allocation is unbounded and uncontrollable thanks to how the platform APIs are implemented. </dd></dl>
 
 </div>
 </div>

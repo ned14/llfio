@@ -208,7 +208,7 @@ Friends</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable\n Whatever POSIX <code>poll()</code> or Windows <code>WSAPoll()</code> can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Whatever POSIX <code>poll()</code> or Windows <code>WSAPoll()</code> can return.</dd></dl>
 <p>Note that the maximum number of handles which can be passed to this function is 1024 (the platform syscall may refuse even that many). Note that this function is <code>O(N)</code> to handle count, so more than a few hundred is a bad idea in any case. If you need to wait on more handles than this, you need to implement a <code>byte_io_multiplexer</code> for your platform.</p>
 <p>The sizes of <code>out</code>, <code>handles</code> and <code>query</code> must be the same, or an error is returned.</p>
 <dl class="section note"><dt>Note</dt><dd>On POSIX <code>pipe_handle</code> is a <code>pollable_handle</code>, but on Windows it is not. Also, on Windows, you cannot mix socket handles from different networking stacks in the same poll. </dd></dl>

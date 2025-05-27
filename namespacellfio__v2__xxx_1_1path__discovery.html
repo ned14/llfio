@@ -214,8 +214,8 @@ result&lt; <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_ha
 </ol>
 </li>
 </ul>
-<dl class="section user"><dt>Memory Allocations\n Allocates the master list of discovered temporary directories exactly once per process,</dt><dd>unless <code>refresh</code> is true in which case the list will be refreshed. The system calls to retrieve paths may allocate additional memory for paths returned. </dd></dl>
-<dl class="section user"><dt>Errors returnable\n This call never fails, except to return an empty span.</dt><dd></dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>Allocates the master list of discovered temporary directories exactly once per process, unless <code>refresh</code> is true in which case the list will be refreshed. The system calls to retrieve paths may allocate additional memory for paths returned. </dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>This call never fails, except to return an empty span. </dd></dl>
 
 </div>
 </div>
@@ -421,8 +421,8 @@ result&lt; <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_ha
   </table>
   </dd>
 </dl>
-<p>After this call returns, the successfully probed entries returned by <code>all_temporary_directories()</code> will have their stat structure set. As the probing involves creating a non-zero sized file in each possible temporary directory to verify its validity, this is not a fast call. It is however cached statically, so the cost occurs exactly once per process, unless someone calls <code>all_temporary_directories(true)</code> to wipe and refresh the master list. An internal mutex is held for the duration of this call. </p><dl class="section user"><dt>Memory Allocations\n None.</dt><dd></dd></dl>
-<dl class="section user"><dt>Errors returnable\n This call never fails, though if it fails to find any writable temporary directory, it will</dt><dd>terminate the process. </dd></dl>
+<p>After this call returns, the successfully probed entries returned by <code>all_temporary_directories()</code> will have their stat structure set. As the probing involves creating a non-zero sized file in each possible temporary directory to verify its validity, this is not a fast call. It is however cached statically, so the cost occurs exactly once per process, unless someone calls <code>all_temporary_directories(true)</code> to wipe and refresh the master list. An internal mutex is held for the duration of this call. </p><dl class="section user"><dt>Memory Allocations</dt><dd>None. </dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>This call never fails, though if it fails to find any writable temporary directory, it will terminate the process. </dd></dl>
 
 </div>
 </div>

@@ -909,7 +909,7 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Clone this handle (copy constructor is disabled to avoid accidental copying)</p>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX dup() or DuplicateHandle() can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or DuplicateHandle() can return. </dd></dl>
 
 </div>
 </div>
@@ -1957,7 +1957,7 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
   </dd>
 </dl>
 <p>This is the only handle creation function in LLFIO which requires an absolute path. This is because no platform implements race-free process launch, and worse, there is no way of non-intrusively emulating race-free process launch either. So we accept the inevitable, launching child processes is always racy with respect to concurrent filesystem modification.</p>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX <code>posix_spawn()</code> or <code>CreateProcess()</code> can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX <code>posix_spawn()</code> or <code>CreateProcess()</code> can return. </dd></dl>
 
 </div>
 </div>
@@ -2321,8 +2321,8 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
 
 <p>EXTENSION: Changes whether this handle is append only or not. </p>
 <dl class="section warning"><dt>Warning</dt><dd>On Windows this is implemented as a bit of a hack to make it fast like on POSIX, so make sure you open the handle for read/write originally. Note unlike on POSIX the append_only disposition will be the only one toggled, seekable and readable will remain turned on.</dd></dl>
-<dl class="section user"><dt>Errors returnable\n Whatever POSIX fcntl() returns. On Windows nothing is changed on the handle.</dt><dd></dd></dl>
-<dl class="section user"><dt>Memory Allocations\n No memory allocation.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Whatever POSIX fcntl() returns. On Windows nothing is changed on the handle. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>No memory allocation. </dd></dl>
 
 <p>Reimplemented from <a class="el" href="classllfio__v2__xxx_1_1handle.html#a19ceb23d192defc8eb9d151a55135c20">llfio_v2_xxx::handle</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  195</span>{ <span class="keywordflow">return</span> errc::operation_not_supported; }</div>

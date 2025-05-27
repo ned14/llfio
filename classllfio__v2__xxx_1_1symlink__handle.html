@@ -760,7 +760,7 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Clone this handle (copy constructor is disabled to avoid accidental copying)</p>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX dup() or DuplicateHandle() can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or DuplicateHandle() can return. </dd></dl>
 
 </div>
 </div>
@@ -927,7 +927,7 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
 <p>On Linux if <code>/proc</code> is not mounted, this call fails with an error. All APIs in LLFIO which require the use of <code>current_path()</code> can be told to not use it e.g. <code>flag::disable_safety_unlinks</code>. It is up to you to detect if <code>current_path()</code> is not working, and to change how you call LLFIO appropriately.</p>
 <p>On Windows, you will almost certainly get back a path of the form <code>\!!\Device\HarddiskVolume10\Users\ned\...</code>. See <code>path_view</code> for what all the path prefix sequences mean, but to summarise the <code>\!!\</code> prefix is LLFIO-only and will not be accepted by other Windows APIs. Pass LLFIO derived paths through the function <code>to_win32_path()</code> to Win32-ise them. This function is also available on Linux where it does nothing, so you can use it in portable code.</p>
 <dl class="section warning"><dt>Warning</dt><dd>This call is expensive, it always asks the kernel for the current path, and no checking is done to ensure what the kernel returns is accurate or even sensible. Be aware that despite these precautions, paths are unstable and <b>can change randomly at any moment</b>. Most code written to use absolute file systems paths is <b>racy</b>, so don't do it, use <code>path_handle</code> to fix a base location on the file system and work from that anchor instead!</dd></dl>
-<dl class="section user"><dt>Memory Allocations\n At least one malloc for the <code>path_type</code>, likely several more.</dt><dd></dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>At least one malloc for the <code>path_type</code>, likely several more. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><code>algorithm::cached_parent_handle_adapter&lt;T&gt;</code> which overrides this with an implementation based on retrieving the current path of a cached handle to the parent directory. On platforms with instability or failure to retrieve the correct current path for regular files, the cached parent handle adapter works around the problem by taking advantage of directory inodes not having the same instability problems on any platform. </dd></dl>
 
 <p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1process__handle.html#ae009f553f9a96bf9c8e2d321f1f6409b">llfio_v2_xxx::process_handle</a>.</p>
@@ -1692,7 +1692,7 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Memory Allocations\n Except on platforms with race free syscalls for renaming open handles (Windows), calls</dt><dd><code>current_path()</code> via <code>parent_path_handle()</code> and thus is both expensive and calls malloc many times. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>Except on platforms with race free syscalls for renaming open handles (Windows), calls <code>current_path()</code> via <code>parent_path_handle()</code> and thus is both expensive and calls malloc many times. </dd></dl>
 
 </div>
 </div>
@@ -1723,7 +1723,7 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
 <p>Fill the supplied buffer with the names of all extended attributes set on this file or directory, returning a span of path view components. </p>
 <p>Note that this routine is a very thin wrap of <code>listxattr()</code> on POSIX and <code>NtQueryInformationFile()</code> on Windows. If the supplied buffer is too small, the syscall typically returns failure rather than do a partial fill. Most implementations do not support more than 64Kb of extended attribute information per inode so maybe 70Kb is a safe default (to account for the return value storage), however properly written code will detect the buffer being too small and will auto-expand it until success.</p>
 <dl class="section note"><dt>Note</dt><dd>On Windows, this is the list of alternate streams on a file, NOT NTFS extended attributes.</dd></dl>
-<dl class="section user"><dt>Race Guarantees\n The list of extended attributes is fetched in a single syscall. This may be an</dt><dd>atomically consistent snapshot. </dd></dl>
+<dl class="section user"><dt>Race Guarantees</dt><dd>The list of extended attributes is fetched in a single syscall. This may be an atomically consistent snapshot. </dd></dl>
 
 </div>
 </div>
@@ -1819,7 +1819,7 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
 
 <p>Obtain a handle to the path <b>currently</b> containing this handle's file entry. </p>
 <dl class="section warning"><dt>Warning</dt><dd>This call is <b>racy</b> and can result in the wrong path handle being returned. Note that unless <code>flag::disable_safety_unlinks</code> is set, this implementation opens a <code>path_handle</code> to the source containing directory, then checks if the file entry within has the same inode as the open file handle. It will retry this matching until success until the deadline given.</dd></dl>
-<dl class="section user"><dt>Memory Allocations\n Calls <code>current_path()</code> and thus is both expensive and calls malloc many times.</dt><dd></dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>Calls <code>current_path()</code> and thus is both expensive and calls malloc many times.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><code>algorithm::cached_parent_handle_adapter&lt;T&gt;</code> which overrides this with a zero cost implementation, thus making unlinking and relinking very considerably quicker. </dd></dl>
 
 </div>
@@ -2008,8 +2008,8 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable\n Any of the errors which <code>readlinkat()</code> or <code>DeviceIoControl()</code> might return, or failure</dt><dd>to allocate memory if the user did not supply a kernel buffer to use, or the user supplied buffer was too small. </dd></dl>
-<dl class="section user"><dt>Memory Allocations\n If the <code>kernelbuffer</code> parameter is set in the request, no memory allocations.</dt><dd>If unset, at least one memory allocation, possibly more is performed. </dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the errors which <code>readlinkat()</code> or <code>DeviceIoControl()</code> might return, or failure to allocate memory if the user did not supply a kernel buffer to use, or the user supplied buffer was too small. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>If the <code>kernelbuffer</code> parameter is set in the request, no memory allocations. If unset, at least one memory allocation, possibly more is performed. </dd></dl>
 
 </div>
 </div>
@@ -2105,7 +2105,7 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Memory Allocations\n Except on platforms with race free syscalls for renaming open handles (Windows), calls</dt><dd><code>current_path()</code> via <code>parent_path_handle()</code> and thus is both expensive and calls malloc many times. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>Except on platforms with race free syscalls for renaming open handles (Windows), calls <code>current_path()</code> via <code>parent_path_handle()</code> and thus is both expensive and calls malloc many times. </dd></dl>
 
 <p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1mapped__file__handle.html#a612b033c4687f7025b58fa92e90aabfb">llfio_v2_xxx::mapped_file_handle</a>.</p>
 
@@ -2175,8 +2175,8 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
 </div><div class="memdoc">
 <p>Reopen this handle (copy constructor is disabled to avoid accidental copying), optionally race free reopening the handle with different access or caching.</p>
 <p>Microsoft Windows provides a syscall for cloning an existing handle but with new access. On POSIX, we must loop calling <code>current_path()</code>, trying to open the path returned and making sure it is the same inode.</p>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX dup() or DuplicateHandle() can return.</dt><dd></dd></dl>
-<dl class="section user"><dt>Memory Allocations\n On POSIX if changing the mode, we must loop calling <code>current_path()</code> and</dt><dd>trying to open the path returned. Thus many allocations may occur. </dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or DuplicateHandle() can return. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>On POSIX if changing the mode, we must loop calling <code>current_path()</code> and trying to open the path returned. Thus many allocations may occur. </dd></dl>
 
 </div>
 </div>
@@ -2235,8 +2235,8 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
 
 <p>EXTENSION: Changes whether this handle is append only or not. </p>
 <dl class="section warning"><dt>Warning</dt><dd>On Windows this is implemented as a bit of a hack to make it fast like on POSIX, so make sure you open the handle for read/write originally. Note unlike on POSIX the append_only disposition will be the only one toggled, seekable and readable will remain turned on.</dd></dl>
-<dl class="section user"><dt>Errors returnable\n Whatever POSIX fcntl() returns. On Windows nothing is changed on the handle.</dt><dd></dd></dl>
-<dl class="section user"><dt>Memory Allocations\n No memory allocation.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Whatever POSIX fcntl() returns. On Windows nothing is changed on the handle. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>No memory allocation. </dd></dl>
 
 <p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1process__handle.html#a80e34d8d23c9dbe96dde3a174496473f">llfio_v2_xxx::process_handle</a>.</p>
 
@@ -2479,8 +2479,8 @@ Windows only</h3>
 </div><div class="memdoc">
 <p>Create a symlink handle opening access to a symbolic link.</p>
 <p>For obvious reasons, one cannot append to a symbolic link, nor create with truncate. In this situation a failure comparing equal to <code>errc::function_not_supported</code> shall be returned.</p>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX open() or CreateFile() can return.</dt><dd></dd></dl>
-<dl class="section user"><dt>Memory Allocations\n None, unless <code>LLFIO_SYMLINK_HANDLE_IS_FAKED</code> is on, in which case one.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>None, unless <code>LLFIO_SYMLINK_HANDLE_IS_FAKED</code> is on, in which case one. </dd></dl>
 
 </div>
 </div>
@@ -3082,7 +3082,7 @@ template&lt;class... Args, class Clock , class Duration &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>Create a symlink handle creating a uniquely named symlink on a path. The symlink is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing symlink.</p>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX open() or CreateFile() can return,</dt><dd>or failure to allocate memory. </dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return, or failure to allocate memory. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  468</span>  {</div>
 <div class="line"><span class="lineno">  469</span>    LLFIO_EXCEPTION_TRY</div>
 <div class="line"><span class="lineno">  470</span>    {</div>
@@ -3140,7 +3140,7 @@ template&lt;class... Args, class Clock , class Duration &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Memory Allocations\n Except on platforms with race free syscalls for unlinking open handles (Windows), calls</dt><dd><code>current_path()</code> and thus is both expensive and calls malloc many times. On Windows, also calls <code>current_path()</code> if <code>flag::disable_safety_unlinks</code> is not set. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>Except on platforms with race free syscalls for unlinking open handles (Windows), calls <code>current_path()</code> and thus is both expensive and calls malloc many times. On Windows, also calls <code>current_path()</code> if <code>flag::disable_safety_unlinks</code> is not set. </dd></dl>
 
 </div>
 </div>
@@ -3185,8 +3185,8 @@ template&lt;class... Args, class Clock , class Duration &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable\n Any of the errors which <code>symlinkat()</code> or <code>DeviceIoControl()</code> might return.</dt><dd></dd></dl>
-<dl class="section user"><dt>Memory Allocations\n On Windows, if the <code>kernelbuffer</code> parameter is set on entry, no memory allocations.</dt><dd>If unset, then at least one memory allocation, possibly more is performed. On POSIX, at least one memory allocation. </dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the errors which <code>symlinkat()</code> or <code>DeviceIoControl()</code> might return. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>On Windows, if the <code>kernelbuffer</code> parameter is set on entry, no memory allocations. If unset, then at least one memory allocation, possibly more is performed. On POSIX, at least one memory allocation. </dd></dl>
 
 </div>
 </div>

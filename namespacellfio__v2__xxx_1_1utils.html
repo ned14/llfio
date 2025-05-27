@@ -294,8 +294,8 @@ Mac OS provides no way of reading how much memory a process has committed. We th
 
 <p>Returns a reasonable default size for page_allocator, typically the closest page size from page_sizes() to 1Mb. </p>
 <dl class="section return"><dt>Returns</dt><dd>A value of a TLB large page size close to 1Mb.</dd></dl>
-<dl class="section user"><dt>Complexity\nWhatever the system API takes (one would hope constant time).</dt><dd></dd></dl>
-<dl class="section user"><dt>Errors returnable\nThrows any error from the operating system or std::bad_alloc.</dt><dd></dd></dl>
+<dl class="section user"><dt>Complexity</dt><dd>Whatever the system API takes (one would hope constant time). </dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Throws any error from the operating system or std::bad_alloc. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  131</span>  {</div>
 <div class="line"><span class="lineno">  132</span>    <span class="keyword">static</span> <span class="keywordtype">size_t</span> size;</div>
 <div class="line"><span class="lineno">  133</span>    <span class="keywordflow">if</span>(size == 0u)</div>
@@ -384,7 +384,7 @@ template&lt;class T , class U &gt; </div>
 
 <p>Returns the smallest page size of this architecture which is useful for calculating direct i/o multiples. </p>
 <dl class="section return"><dt>Returns</dt><dd>The page size of this architecture.</dd></dl>
-<dl class="section user"><dt>Complexity\nWhatever the system API takes (one would hope constant time).</dt><dd></dd></dl>
+<dl class="section user"><dt>Complexity</dt><dd>Whatever the system API takes (one would hope constant time). </dd></dl>
 
 </div>
 </div>
@@ -420,8 +420,8 @@ template&lt;class T , class U &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The page sizes of this architecture.</dd></dl>
-<dl class="section user"><dt>Complexity\nFirst call performs multiple memory allocations, mutex locks and system calls. Subsequent calls</dt><dd>lock mutexes. </dd></dl>
-<dl class="section user"><dt>Errors returnable\nThrows any error from the operating system or std::bad_alloc.</dt><dd></dd></dl>
+<dl class="section user"><dt>Complexity</dt><dd>First call performs multiple memory allocations, mutex locks and system calls. Subsequent calls lock mutexes. </dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Throws any error from the operating system or std::bad_alloc. </dd></dl>
 
 </div>
 </div>
@@ -467,8 +467,8 @@ template&lt;class T , class U &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Complexity\nWhatever the system API takes.</dt><dd></dd></dl>
-<dl class="section user"><dt>Errors returnable\nAny error from the operating system.</dt><dd></dd></dl>
+<dl class="section user"><dt>Complexity</dt><dd>Whatever the system API takes. </dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any error from the operating system. </dd></dl>
 
 </div>
 </div>
@@ -504,8 +504,8 @@ template&lt;class T , class U &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A string representing the randomness at a 2x ratio, so if 32 bytes were requested, this string would be 64 bytes long.</dd></dl>
-<dl class="section user"><dt>Complexity\nWhatever the system API takes.</dt><dd></dd></dl>
-<dl class="section user"><dt>Errors returnable\nAny error from the operating system.</dt><dd></dd></dl>
+<dl class="section user"><dt>Complexity</dt><dd>Whatever the system API takes. </dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any error from the operating system. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  171</span>  {</div>
 <div class="line"><span class="lineno">  172</span>    <span class="keywordtype">size_t</span> outlen = randomlen * 2;</div>
 <div class="line"><span class="lineno">  173</span>    std::string ret(outlen, 0);</div>

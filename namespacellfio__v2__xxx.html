@@ -988,7 +988,7 @@ result&lt; <a class="el" href="namespacellfio__v2__xxx.html#a1cebefd1c4caade9a0a
 </table>
 </div><div class="memdoc">
 <p>Create a handle opening access to a directory on path.</p>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX open() or CreateFile() can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  469</span>{</div>
 <div class="line"><span class="lineno">  470</span>  <span class="keywordflow">return</span> directory_handle::directory(std::forward&lt;<span class="keyword">decltype</span>(base)&gt;(base), std::forward&lt;<span class="keyword">decltype</span>(path)&gt;(path), std::forward&lt;<span class="keyword">decltype</span>(_mode)&gt;(_mode),</div>
 <div class="line"><span class="lineno">  471</span>                                     std::forward&lt;<span class="keyword">decltype</span>(_creation)&gt;(_creation), std::forward&lt;<span class="keyword">decltype</span>(_caching)&gt;(_caching),</div>
@@ -1143,7 +1143,7 @@ result&lt; <a class="el" href="namespacellfio__v2__xxx.html#a1cebefd1c4caade9a0a
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX open() or CreateFile() can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  437</span>{</div>
 <div class="line"><span class="lineno">  438</span>  <span class="keywordflow">return</span> file_handle::file(std::forward&lt;<span class="keyword">decltype</span>(base)&gt;(base), std::forward&lt;<span class="keyword">decltype</span>(path)&gt;(path), std::forward&lt;<span class="keyword">decltype</span>(_mode)&gt;(_mode),</div>
 <div class="line"><span class="lineno">  439</span>                           std::forward&lt;<span class="keyword">decltype</span>(_creation)&gt;(_creation), std::forward&lt;<span class="keyword">decltype</span>(_caching)&gt;(_caching), std::forward&lt;<span class="keyword">decltype</span>(flags)&gt;(flags));</div>
@@ -1654,7 +1654,7 @@ template&lt;class T &gt; </div>
   </dd>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>On Microsoft Windows this constructor uses the faster VirtualAlloc() which creates less versatile page backed memory. If you want anonymous memory allocated from a paging file backed section instead, create a page file backed section and then a mapped view from that using the other constructor. This makes available all those very useful VM tricks Windows can do with section mapped memory which VirtualAlloc() memory cannot do.</dd></dl>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX mmap() or VirtualAlloc() can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX mmap() or VirtualAlloc() can return. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno"> 1110</span>{</div>
 <div class="line"><span class="lineno"> 1111</span>  <span class="keywordflow">return</span> map_handle::map(std::forward&lt;<span class="keyword">decltype</span>(bytes)&gt;(bytes), zeroed, std::forward&lt;<span class="keyword">decltype</span>(_flag)&gt;(_flag));</div>
 <div class="line"><span class="lineno"> 1112</span>}</div>
@@ -1715,7 +1715,7 @@ template&lt;class T &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX mmap() or NtMapViewOfSection() can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX mmap() or NtMapViewOfSection() can return. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno"> 1125</span>{</div>
 <div class="line"><span class="lineno"> 1126</span>  <span class="keywordflow">return</span> map_handle::map(std::forward&lt;<span class="keyword">decltype</span>(section)&gt;(section), std::forward&lt;<span class="keyword">decltype</span>(bytes)&gt;(bytes), std::forward&lt;<span class="keyword">decltype</span>(offset)&gt;(offset),</div>
 <div class="line"><span class="lineno"> 1127</span>                         std::forward&lt;<span class="keyword">decltype</span>(_flag)&gt;(_flag));</div>
@@ -1866,7 +1866,7 @@ template&lt;class T &gt; </div>
   </dd>
 </dl>
 <p>Note that if the file is currently zero sized, no mapping occurs now, but later when <code>truncate()</code> or <code>update_map()</code> is called.</p>
-<dl class="section user"><dt>Errors returnable\n Any of the values which the constructors for <code>file_handle</code>, <code>section_handle</code> and <code>map_handle</code> can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values which the constructors for <code>file_handle</code>, <code>section_handle</code> and <code>map_handle</code> can return. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  822</span>{</div>
 <div class="line"><span class="lineno">  823</span>  <span class="keywordflow">return</span> mapped_file_handle::mapped_file(std::forward&lt;<span class="keyword">decltype</span>(reservation)&gt;(reservation), std::forward&lt;<span class="keyword">decltype</span>(base)&gt;(base),</div>
 <div class="line"><span class="lineno">  824</span>                                         std::forward&lt;<span class="keyword">decltype</span>(_path)&gt;(_path), std::forward&lt;<span class="keyword">decltype</span>(_mode)&gt;(_mode),</div>
@@ -1935,7 +1935,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 <p>Create a mapped file handle creating the named file on some path which the OS declares to be suitable for temporary files. Most OSs are very lazy about flushing changes made to these temporary files. Note the default flags are to have the newly created file deleted on first handle close. Note also that an empty name is equivalent to calling <code>mapped_uniquely_named_file(path_discovery::storage_backed_temporary_files_directory())</code> and the creation parameter is ignored.</p>
 <dl class="section note"><dt>Note</dt><dd>If the temporary file you are creating is not going to have its path sent to another process for usage, this is the WRONG function to use. Use <code>temp_inode()</code> instead, it is far more secure.</dd></dl>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX open() or CreateFile() can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  877</span>{</div>
 <div class="line"><span class="lineno">  878</span>  <span class="keywordflow">return</span> mapped_file_handle::mapped_temp_file(std::forward&lt;<span class="keyword">decltype</span>(reservation)&gt;(reservation), std::forward&lt;<span class="keyword">decltype</span>(name)&gt;(name),</div>
 <div class="line"><span class="lineno">  879</span>                                              std::forward&lt;<span class="keyword">decltype</span>(_mode)&gt;(_mode), std::forward&lt;<span class="keyword">decltype</span>(_creation)&gt;(_creation),</div>
@@ -1996,7 +1996,7 @@ template&lt;class T &gt; </div>
 </table>
 </div><div class="memdoc">
 <p><em>Securely</em> create a mapped file handle creating a temporary anonymous inode in the filesystem referred to by <em>dirpath</em>. The inode created has no name nor accessible path on the filing system and ceases to exist as soon as the last handle is closed, making it ideal for use as a temporary file where other processes do not need to have access to its contents via some path on the filing system (a classic use case is for backing shared memory maps).</p>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX open() or CreateFile() can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  897</span>{</div>
 <div class="line"><span class="lineno">  898</span>  <span class="keywordflow">return</span> mapped_file_handle::mapped_temp_inode(std::forward&lt;<span class="keyword">decltype</span>(reservation)&gt;(reservation), std::forward&lt;<span class="keyword">decltype</span>(dir)&gt;(dir),</div>
 <div class="line"><span class="lineno">  899</span>                                               std::forward&lt;<span class="keyword">decltype</span>(_mode)&gt;(_mode), std::forward&lt;<span class="keyword">decltype</span>(_caching)&gt;(_caching),</div>
@@ -2057,7 +2057,7 @@ template&lt;class T &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>Create an mapped file handle creating a randomly named file on a path. The file is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing file. Note also that caching defaults to temporary which hints to the OS to only flush changes to physical storage as lately as possible.</p>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX open() or CreateFile() can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  851</span>{</div>
 <div class="line"><span class="lineno">  852</span>  <span class="keywordflow">return</span> mapped_file_handle::mapped_uniquely_named_file(std::forward&lt;<span class="keyword">decltype</span>(reservation)&gt;(reservation), std::forward&lt;<span class="keyword">decltype</span>(dirpath)&gt;(dirpath),</div>
 <div class="line"><span class="lineno">  853</span>                                                        std::forward&lt;<span class="keyword">decltype</span>(_mode)&gt;(_mode), std::forward&lt;<span class="keyword">decltype</span>(_caching)&gt;(_caching),</div>
@@ -2090,7 +2090,7 @@ template&lt;class T &gt; </div>
 </table>
 </div><div class="memdoc">
 <p>Return the current maximum permitted extent of the file.</p>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX fstat() or GetFileInformationByHandleEx() can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX fstat() or GetFileInformationByHandleEx() can return. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  507</span>{</div>
 <div class="line"><span class="lineno">  508</span>  <span class="keywordflow">return</span> self.<a class="code hl_function" href="classllfio__v2__xxx_1_1file__handle.html#a79b8461000f37524194500b414c599e3">maximum_extent</a>();</div>
 <div class="line"><span class="lineno">  509</span>}</div>
@@ -4051,7 +4051,7 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
 </table>
 </div><div class="memdoc">
 <p>Create a path handle opening access to some location on the filing system. Some operating systems provide a particularly lightweight method of doing this (Linux: <code>O_PATH</code>, Windows: no access perms) which is much faster than opening a directory. For other systems, we open a directory with read only permissions.</p>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX open() or CreateFile() can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  172</span>{</div>
 <div class="line"><span class="lineno">  173</span>  <span class="keywordflow">return</span> path_handle::path(std::forward&lt;<span class="keyword">decltype</span>(base)&gt;(base), std::forward&lt;<span class="keyword">decltype</span>(path)&gt;(path));</div>
 <div class="line"><span class="lineno">  174</span>}</div>
@@ -4146,7 +4146,7 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable\n Whatever POSIX <code>poll()</code> or Windows <code>WSAPoll()</code> can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Whatever POSIX <code>poll()</code> or Windows <code>WSAPoll()</code> can return.</dd></dl>
 <p>Note that the maximum number of handles which can be passed to this function is 1024 (the platform syscall may refuse even that many). Note that this function is <code>O(N)</code> to handle count, so more than a few hundred is a bad idea in any case. If you need to wait on more handles than this, you need to implement a <code>byte_io_multiplexer</code> for your platform.</p>
 <p>The sizes of <code>out</code>, <code>handles</code> and <code>query</code> must be the same, or an error is returned.</p>
 <dl class="section note"><dt>Note</dt><dd>On POSIX <code>pipe_handle</code> is a <code>pollable_handle</code>, but on Windows it is not. Also, on Windows, you cannot mix socket handles from different networking stacks in the same poll. </dd></dl>
@@ -4332,8 +4332,8 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX read() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be</dt><dd>returned if deadline i/o is not possible with this particular handle configuration (e.g. reading from regular files on POSIX or reading from a non-overlapped HANDLE on Windows). </dd></dl>
-<dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX read() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be returned if deadline i/o is not possible with this particular handle configuration (e.g. reading from regular files on POSIX or reading from a non-overlapped HANDLE on Windows). </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  656</span>{</div>
 <div class="line"><span class="lineno">  657</span>  <span class="keywordflow">return</span> self.<a class="code hl_function" href="classllfio__v2__xxx_1_1byte__io__handle.html#a9ae9076c36c184895786566ba8eaa072">read</a>(std::forward&lt;<span class="keyword">decltype</span>(reqs)&gt;(reqs), std::forward&lt;<span class="keyword">decltype</span>(d)&gt;(d));</div>
 <div class="line"><span class="lineno">  658</span>}</div>
@@ -4445,8 +4445,8 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable\n None, though the various signals and structured exception throws common to using memory maps may occur.</dt><dd></dd></dl>
-<dl class="section user"><dt>Memory Allocations\n None.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>None, though the various signals and structured exception throws common to using memory maps may occur. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>None. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno"> 1178</span>{</div>
 <div class="line"><span class="lineno"> 1179</span>  <span class="keywordflow">return</span> self.<a class="code hl_function" href="classllfio__v2__xxx_1_1map__handle.html#a9ae9076c36c184895786566ba8eaa072">read</a>(std::forward&lt;<span class="keyword">decltype</span>(reqs)&gt;(reqs), std::forward&lt;<span class="keyword">decltype</span>(d)&gt;(d));</div>
 <div class="line"><span class="lineno"> 1180</span>}</div>
@@ -4517,7 +4517,7 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Memory Allocations\n Except on platforms with race free syscalls for renaming open handles (Windows), calls</dt><dd><code>current_path()</code> via <code>parent_path_handle()</code> and thus is both expensive and calls malloc many times. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>Except on platforms with race free syscalls for renaming open handles (Windows), calls <code>current_path()</code> via <code>parent_path_handle()</code> and thus is both expensive and calls malloc many times. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  543</span>{</div>
 <div class="line"><span class="lineno">  544</span>  <span class="keywordflow">return</span> self.<a class="code hl_function" href="classllfio__v2__xxx_1_1fs__handle.html#a8574050f1988a925322d5a60a84c714b">relink</a>(std::forward&lt;<span class="keyword">decltype</span>(base)&gt;(base), std::forward&lt;<span class="keyword">decltype</span>(path)&gt;(path), std::forward&lt;<span class="keyword">decltype</span>(atomic_replace)&gt;(atomic_replace),</div>
 <div class="line"><span class="lineno">  545</span>                     std::forward&lt;<span class="keyword">decltype</span>(d)&gt;(d));</div>
@@ -4569,7 +4569,7 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
   </dd>
 </dl>
 <p>This convenience overload create a writable section if the backing file is writable, otherwise a read-only section.</p>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX dup(), open() or NtCreateSection() can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup(), open() or NtCreateSection() can return. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno"> 1055</span>{</div>
 <div class="line"><span class="lineno"> 1056</span>  <span class="keywordflow">return</span> section_handle::section(std::forward&lt;<span class="keyword">decltype</span>(backing)&gt;(backing), std::forward&lt;<span class="keyword">decltype</span>(bytes)&gt;(bytes));</div>
 <div class="line"><span class="lineno"> 1057</span>}</div>
@@ -4625,7 +4625,7 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX dup(), open() or NtCreateSection() can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup(), open() or NtCreateSection() can return. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno"> 1042</span>{</div>
 <div class="line"><span class="lineno"> 1043</span>  <span class="keywordflow">return</span> section_handle::section(std::forward&lt;<span class="keyword">decltype</span>(backing)&gt;(backing), std::forward&lt;<span class="keyword">decltype</span>(maximum_size)&gt;(maximum_size),</div>
 <div class="line"><span class="lineno"> 1044</span>                                 std::forward&lt;<span class="keyword">decltype</span>(_flag)&gt;(_flag));</div>
@@ -4682,7 +4682,7 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX dup(), open() or NtCreateSection() can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup(), open() or NtCreateSection() can return. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno"> 1067</span>{</div>
 <div class="line"><span class="lineno"> 1068</span>  <span class="keywordflow">return</span> section_handle::section(std::forward&lt;<span class="keyword">decltype</span>(bytes)&gt;(bytes), std::forward&lt;<span class="keyword">decltype</span>(dirh)&gt;(dirh), std::forward&lt;<span class="keyword">decltype</span>(_flag)&gt;(_flag));</div>
 <div class="line"><span class="lineno"> 1069</span>}</div>
@@ -4993,7 +4993,7 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
 </table>
 </div><div class="memdoc">
 <p>Create a directory handle creating the named directory on some path which the OS declares to be suitable for temporary files. Note also that an empty name is equivalent to calling <code>uniquely_named_file(path_discovery::storage_backed_temporary_files_directory())</code> and the creation parameter is ignored.</p>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX open() or CreateFile() can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  500</span>{</div>
 <div class="line"><span class="lineno">  501</span>  <span class="keywordflow">return</span> directory_handle::temp_directory(std::forward&lt;<span class="keyword">decltype</span>(name)&gt;(name), std::forward&lt;<span class="keyword">decltype</span>(_mode)&gt;(_mode),</div>
 <div class="line"><span class="lineno">  502</span>                                          std::forward&lt;<span class="keyword">decltype</span>(_creation)&gt;(_creation), std::forward&lt;<span class="keyword">decltype</span>(_caching)&gt;(_caching),</div>
@@ -5055,7 +5055,7 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
 </div><div class="memdoc">
 <p>Create a file handle creating the named file on some path which the OS declares to be suitable for temporary files. Most OSs are very lazy about flushing changes made to these temporary files. Note the default flags are to have the newly created file deleted on first handle close. Note also that an empty name is equivalent to calling <code>uniquely_named_file(path_discovery::storage_backed_temporary_files_directory())</code> and the creation parameter is ignored.</p>
 <dl class="section note"><dt>Note</dt><dd>If the temporary file you are creating is not going to have its path sent to another process for usage, this is the WRONG function to use. Use <code>temp_inode()</code> instead, it is far more secure.</dd></dl>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX open() or CreateFile() can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  475</span>{</div>
 <div class="line"><span class="lineno">  476</span>  <span class="keywordflow">return</span> file_handle::temp_file(std::forward&lt;<span class="keyword">decltype</span>(name)&gt;(name), std::forward&lt;<span class="keyword">decltype</span>(_mode)&gt;(_mode), std::forward&lt;<span class="keyword">decltype</span>(_creation)&gt;(_creation),</div>
 <div class="line"><span class="lineno">  477</span>                                std::forward&lt;<span class="keyword">decltype</span>(_caching)&gt;(_caching), std::forward&lt;<span class="keyword">decltype</span>(flags)&gt;(flags));</div>
@@ -5109,7 +5109,7 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
 </table>
 </div><div class="memdoc">
 <p><em>Securely</em> create a file handle creating a temporary anonymous inode in the filesystem referred to by <em>dirpath</em>. The inode created has no name nor accessible path on the filing system and ceases to exist as soon as the last handle is closed, making it ideal for use as a temporary file where other processes do not need to have access to its contents via some path on the filing system (a classic use case is for backing shared memory maps).</p>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX open() or CreateFile() can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  492</span>{</div>
 <div class="line"><span class="lineno">  493</span>  <span class="keywordflow">return</span> file_handle::temp_inode(std::forward&lt;<span class="keyword">decltype</span>(dirh)&gt;(dirh), std::forward&lt;<span class="keyword">decltype</span>(_mode)&gt;(_mode), std::forward&lt;<span class="keyword">decltype</span>(_caching)&gt;(_caching),</div>
 <div class="line"><span class="lineno">  494</span>                                 std::forward&lt;<span class="keyword">decltype</span>(flags)&gt;(flags));</div>
@@ -5258,7 +5258,7 @@ template&lt;class T , typename std::enable_if&lt;(!std::is_base_of&lt; <a class=
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX ftruncate() or SetFileInformationByHandle() can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX ftruncate() or SetFileInformationByHandle() can return. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  520</span>{</div>
 <div class="line"><span class="lineno">  521</span>  <span class="keywordflow">return</span> self.<a class="code hl_function" href="classllfio__v2__xxx_1_1file__handle.html#a730d89cf49839172bf15551139045112">truncate</a>(std::forward&lt;<span class="keyword">decltype</span>(newsize)&gt;(newsize));</div>
 <div class="line"><span class="lineno">  522</span>}</div>
@@ -5318,7 +5318,7 @@ template&lt;class T , typename std::enable_if&lt;(!std::is_base_of&lt; <a class=
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX <code>mremap()</code>, <code>mmap(addr)</code> or <code>VirtualAlloc(addr)</code> can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX <code>mremap()</code>, <code>mmap(addr)</code> or <code>VirtualAlloc(addr)</code> can return. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno"> 1161</span>{</div>
 <div class="line"><span class="lineno"> 1162</span>  <span class="keywordflow">return</span> self.<a class="code hl_function" href="classllfio__v2__xxx_1_1map__handle.html#a734cc6a23a606c0ca7e5a3660800f90b">truncate</a>(std::forward&lt;<span class="keyword">decltype</span>(newsize)&gt;(newsize), std::forward&lt;<span class="keyword">decltype</span>(permit_relocation)&gt;(permit_relocation));</div>
 <div class="line"><span class="lineno"> 1163</span>}</div>
@@ -5366,7 +5366,7 @@ template&lt;class T , typename std::enable_if&lt;(!std::is_base_of&lt; <a class=
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable\n Any of the values <code>NtExtendSection()</code> or <code>ftruncate()</code> can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values <code>NtExtendSection()</code> or <code>ftruncate()</code> can return. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno"> 1083</span>{</div>
 <div class="line"><span class="lineno"> 1084</span>  <span class="keywordflow">return</span> self.<a class="code hl_function" href="classllfio__v2__xxx_1_1section__handle.html#a8942748c5d52f342dc9d9a062a7298db">truncate</a>(std::forward&lt;<span class="keyword">decltype</span>(newsize)&gt;(newsize));</div>
 <div class="line"><span class="lineno"> 1085</span>}</div>
@@ -5420,7 +5420,7 @@ template&lt;class T , typename std::enable_if&lt;(!std::is_base_of&lt; <a class=
 </table>
 </div><div class="memdoc">
 <p>Create a directory handle creating a randomly named file on a path. The file is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing entry.</p>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX open() or CreateFile() can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  483</span>{</div>
 <div class="line"><span class="lineno">  484</span>  <span class="keywordflow">return</span> directory_handle::uniquely_named_directory(std::forward&lt;<span class="keyword">decltype</span>(dirpath)&gt;(dirpath), std::forward&lt;<span class="keyword">decltype</span>(_mode)&gt;(_mode),</div>
 <div class="line"><span class="lineno">  485</span>                                                    std::forward&lt;<span class="keyword">decltype</span>(_caching)&gt;(_caching), std::forward&lt;<span class="keyword">decltype</span>(flags)&gt;(flags));</div>
@@ -5474,7 +5474,7 @@ template&lt;class T , typename std::enable_if&lt;(!std::is_base_of&lt; <a class=
 </table>
 </div><div class="memdoc">
 <p>Create a file handle creating a randomly named file on a path. The file is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing file. Note also that caching defaults to temporary which hints to the OS to only flush changes to physical storage as lately as possible.</p>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX open() or CreateFile() can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  452</span>{</div>
 <div class="line"><span class="lineno">  453</span>  <span class="keywordflow">return</span> file_handle::uniquely_named_file(std::forward&lt;<span class="keyword">decltype</span>(dirpath)&gt;(dirpath), std::forward&lt;<span class="keyword">decltype</span>(_mode)&gt;(_mode),</div>
 <div class="line"><span class="lineno">  454</span>                                          std::forward&lt;<span class="keyword">decltype</span>(_caching)&gt;(_caching), std::forward&lt;<span class="keyword">decltype</span>(flags)&gt;(flags));</div>
@@ -5524,7 +5524,7 @@ template&lt;class T , typename std::enable_if&lt;(!std::is_base_of&lt; <a class=
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Memory Allocations\n Except on platforms with race free syscalls for unlinking open handles (Windows), calls</dt><dd><code>current_path()</code> and thus is both expensive and calls malloc many times. On Windows, also calls <code>current_path()</code> if <code>flag::disable_safety_unlinks</code> is not set. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>Except on platforms with race free syscalls for unlinking open handles (Windows), calls <code>current_path()</code> and thus is both expensive and calls malloc many times. On Windows, also calls <code>current_path()</code> if <code>flag::disable_safety_unlinks</code> is not set. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  571</span>{</div>
 <div class="line"><span class="lineno">  572</span>  <span class="keywordflow">return</span> self.<a class="code hl_function" href="classllfio__v2__xxx_1_1fs__handle.html#a7b4f17a0b437d430a37d3875d8570bf2">unlink</a>(std::forward&lt;<span class="keyword">decltype</span>(d)&gt;(d));</div>
 <div class="line"><span class="lineno">  573</span>}</div>
@@ -5723,8 +5723,8 @@ template&lt;class F &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX write() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be</dt><dd>returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
-<dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX write() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  682</span>{</div>
 <div class="line"><span class="lineno">  683</span>  <span class="keywordflow">return</span> self.<a class="code hl_function" href="classllfio__v2__xxx_1_1byte__io__handle.html#a0938630d13cd68ba4c69cdbaf7b7c513">write</a>(std::forward&lt;<span class="keyword">decltype</span>(reqs)&gt;(reqs), std::forward&lt;<span class="keyword">decltype</span>(d)&gt;(d));</div>
 <div class="line"><span class="lineno">  684</span>}</div>
@@ -5781,8 +5781,8 @@ template&lt;class F &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable\n None, though the various signals and structured exception throws common to using memory maps may occur.</dt><dd></dd></dl>
-<dl class="section user"><dt>Memory Allocations\n None.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>None, though the various signals and structured exception throws common to using memory maps may occur. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>None. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno"> 1193</span>{</div>
 <div class="line"><span class="lineno"> 1194</span>  <span class="keywordflow">return</span> self.<a class="code hl_function" href="classllfio__v2__xxx_1_1map__handle.html#a0938630d13cd68ba4c69cdbaf7b7c513">write</a>(std::forward&lt;<span class="keyword">decltype</span>(reqs)&gt;(reqs), std::forward&lt;<span class="keyword">decltype</span>(d)&gt;(d));</div>
 <div class="line"><span class="lineno"> 1195</span>}</div>
@@ -5848,8 +5848,8 @@ template&lt;class F &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX write() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be</dt><dd>returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
-<dl class="section user"><dt>Memory Allocations\n The default synchronous implementation in file_handle performs no memory allocation.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX write() can return, <code>errc::timed_out</code>, <code>errc::operation_canceled</code>. <code>errc::not_supported</code> may be returned if deadline i/o is not possible with this particular handle configuration (e.g. writing to regular files on POSIX or writing to a non-overlapped HANDLE on Windows). </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>The default synchronous implementation in file_handle performs no memory allocation. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  550</span>{</div>
 <div class="line"><span class="lineno">  551</span>  <span class="keywordflow">return</span> self.<a class="code hl_function" href="classllfio__v2__xxx_1_1file__handle.html#a608044761b73fc9554379b444e8c9044">zero</a>(std::forward&lt;<span class="keyword">decltype</span>(offset)&gt;(offset), std::forward&lt;<span class="keyword">decltype</span>(bytes)&gt;(bytes), std::forward&lt;<span class="keyword">decltype</span>(d)&gt;(d));</div>
 <div class="line"><span class="lineno">  552</span>}</div>

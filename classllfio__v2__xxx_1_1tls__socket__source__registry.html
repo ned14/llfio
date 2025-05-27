@@ -195,7 +195,160 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>unregister_sou
 <div class="line"><span class="comment">// rather than hard close</span></div>
 <div class="line">sock-&gt;shutdown_and_close(std::chrono::seconds(3)).value();</div>
 </div><!-- fragment --><p>Fuller fat example:</p>
-<div class="fragment"></div><!-- fragment --> </div><h2 class="groupheader">Member Function Documentation</h2>
+<div class="fragment"><div class="line">  <span class="keyword">namespace </span><a class="code hl_namespace" href="namespacellfio__v2__xxx.html">llfio</a> = <a class="code hl_define" href="group__config.html#gac9f7f0153adb9034d26c4554728f817a">LLFIO_V2_NAMESPACE</a>;</div>
+<div class="line">  std::string host;  <span class="comment">// set to one of my network cards</span></div>
+<div class="line"> </div>
+<div class="line">  <span class="comment">// Get me a FIPS 140 compliant source of TLS sockets which uses kernel</span></div>
+<div class="line">  <span class="comment">// sockets, this call takes bits set and bits masked, so the implementation</span></div>
+<div class="line">  <span class="comment">// features bitfield is masked for the FIPS 140 bit, and only if that is set</span></div>
+<div class="line">  <span class="comment">// is the TLS socket source considered.</span></div>
+<div class="line">  <span class="comment">//</span></div>
+<div class="line">  <span class="comment">// The need for a kernel sockets based TLS implementation is so poll() will</span></div>
+<div class="line">  <span class="comment">// work, as it requires kernel sockets compatible input.</span></div>
+<div class="line">  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keyword">auto</span> required_features =</div>
+<div class="line">    llfio::tls_socket_source_implementation_features::FIPS_140_2</div>
+<div class="line">    | llfio::tls_socket_source_implementation_features::kernel_sockets;</div>
+<div class="line">  <a class="code hl_typedef" href="namespacellfio__v2__xxx.html#a1a51dd6cc5299a316fdcd05c4c7db2dc">llfio::tls_socket_source_ptr</a> <a class="code hl_class" href="classllfio__v2__xxx_1_1tls__socket__source.html">tls_socket_source</a> =</div>
+<div class="line">    llfio::tls_socket_source_registry::default_source(required_features,</div>
+<div class="line">      required_features).instantiate().value();</div>
+<div class="line"> </div>
+<div class="line">  <span class="comment">// Create a listening TLS socket on any IP family.</span></div>
+<div class="line">  <a class="code hl_typedef" href="namespacellfio__v2__xxx.html#a1b0d8b81e15b9d2aec5dc7194c0e6d22">llfio::listening_tls_socket_handle_ptr</a> serversocket = <a class="code hl_class" href="classllfio__v2__xxx_1_1tls__socket__source.html">tls_socket_source</a></div>
+<div class="line">    -&gt;<a class="code hl_function" href="classllfio__v2__xxx_1_1tls__socket__source.html#a7cda41bbd9f16e58fa9cbd675a84912d">multiplexable_listening_socket</a>(llfio::ip::family::any).value();</div>
+<div class="line"> </div>
+<div class="line">  <span class="comment">// The default is to NOT authenticate the TLS certificates of those connecting</span></div>
+<div class="line">  <span class="comment">// in with the system&#39;s TLS certificate store. If you wanted something</span></div>
+<div class="line">  <span class="comment">// different, you&#39;d set that now using:</span></div>
+<div class="line">  <span class="comment">// serversocket-&gt;set_authentication_certificates_path()</span></div>
+<div class="line"> </div>
+<div class="line">  <span class="comment">// Bind the listening TLS socket to port 8989 on the NIC described by host</span></div>
+<div class="line">  <span class="comment">// ip::address incidentally is inspired by ASIO&#39;s class, it is very</span></div>
+<div class="line">  <span class="comment">// similar. I only made it more constexpr.</span></div>
+<div class="line">  serversocket-&gt;bind(llfio::ip::make_address(host+<span class="stringliteral">&quot;:8989&quot;</span>).value()).value();</div>
+<div class="line"> </div>
+<div class="line">  <span class="comment">// poll() works on three spans. We deliberately have separate poll_what</span></div>
+<div class="line">  <span class="comment">// storage so we can avoid having to reset topoll&#39;s contents per poll()</span></div>
+<div class="line">  std::vector&lt;llfio::pollable_handle *&gt; pollable_handles;</div>
+<div class="line">  std::vector&lt;llfio::poll_what&gt; topoll, whatchanged;</div>
+<div class="line"> </div>
+<div class="line">  <span class="comment">// We will want to know about new inbound connections to our listening</span></div>
+<div class="line">  <span class="comment">// socket</span></div>
+<div class="line">  pollable_handles.push_back(serversocket.get());</div>
+<div class="line">  topoll.push_back(llfio::poll_what::is_readable);</div>
+<div class="line">  whatchanged.push_back(llfio::poll_what::none);</div>
+<div class="line"> </div>
+<div class="line">  <span class="comment">// Connected socket state</span></div>
+<div class="line">  <span class="keyword">struct </span>connected_socket {</div>
+<div class="line">    <span class="comment">// The connected socket</span></div>
+<div class="line">    <a class="code hl_typedef" href="namespacellfio__v2__xxx.html#a81cc4b6e44e81823d88c0433efd82292">llfio::tls_socket_handle_ptr</a> socket;</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// The endpoint from which it connected</span></div>
+<div class="line">    llfio::ip::address endpoint;</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// The size of registered buffer actually allocated (we request system</span></div>
+<div class="line">    <span class="comment">// page size, the DMA controller may return that or more)</span></div>
+<div class="line">    <span class="keywordtype">size_t</span> rbuf_storage_length{llfio::utils::page_size()};</div>
+<div class="line">    <span class="keywordtype">size_t</span> wbuf_storage_length{llfio::utils::page_size()};</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// These are shared ptrs to memory potentially registered with the NIC&#39;s</span></div>
+<div class="line">    <span class="comment">// DMA controller and therefore i/o using them would be true whole system</span></div>
+<div class="line">    <span class="comment">// zero copy</span></div>
+<div class="line">    llfio::tls_socket_handle::registered_buffer_type rbuf_storage, wbuf_storage;</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// These spans of byte and const byte index into buffer storage and get</span></div>
+<div class="line">    <span class="comment">// updated by each i/o operation to describe what was done</span></div>
+<div class="line">    llfio::tls_socket_handle::buffer_type rbuf;</div>
+<div class="line">    llfio::tls_socket_handle::const_buffer_type wbuf;</div>
+<div class="line"> </div>
+<div class="line">    <span class="keyword">explicit</span> connected_socket(std::pair&lt;llfio::tls_socket_handle_ptr, llfio::ip::address&gt; s)</div>
+<div class="line">      : socket(std::move(s.first))</div>
+<div class="line">      , endpoint(std::move(s.second))</div>
+<div class="line">      , rbuf_storage(socket-&gt;allocate_registered_buffer(rbuf_storage_length).value())</div>
+<div class="line">      , wbuf_storage(socket-&gt;allocate_registered_buffer(wbuf_storage_length).value())</div>
+<div class="line">      , rbuf(*rbuf_storage)            <span class="comment">// fill this buffer</span></div>
+<div class="line">      , wbuf(wbuf_storage-&gt;data(), 0)  <span class="comment">// nothing to write</span></div>
+<div class="line">      {}</div>
+<div class="line">  };</div>
+<div class="line">  std::vector&lt;connected_socket&gt; connected_sockets;</div>
+<div class="line"> </div>
+<div class="line">  <span class="comment">// Begin the processing loop</span></div>
+<div class="line">  <span class="keywordflow">for</span>(;;) {</div>
+<div class="line">    <span class="comment">// We need to clear whatchanged before use, as it accumulates bits set.</span></div>
+<div class="line">    std::fill(whatchanged.begin(), whatchanged.end(), llfio::poll_what::none);</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// As with all LLFIO calls, you can set a deadline here so this call</span></div>
+<div class="line">    <span class="comment">// times out. The default as usual is wait until infinity.</span></div>
+<div class="line">    <span class="keywordtype">size_t</span> handles_changed</div>
+<div class="line">      = <a class="code hl_function" href="namespacellfio__v2__xxx.html#a72e16ba75bf2d2f65628f0d4eee7f52c">llfio::poll</a>(whatchanged, {pollable_handles}, topoll).value();</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// Loop the polled handles looking for events changed.</span></div>
+<div class="line">    <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> handleidx = 0;</div>
+<div class="line">      handles_changed &gt; 0 &amp;&amp; handleidx &lt; pollable_handles.size();</div>
+<div class="line">      handleidx++) {</div>
+<div class="line">      <span class="keywordflow">if</span>(whatchanged[handleidx] == llfio::poll_what::none) {</div>
+<div class="line">        <span class="keywordflow">continue</span>;</div>
+<div class="line">      }</div>
+<div class="line">      <span class="keywordflow">if</span>(0 == handleidx) {</div>
+<div class="line">        <span class="comment">// This is the listening socket, and there is a new connection to be</span></div>
+<div class="line">        <span class="comment">// read, as listening socket defines its read operation to be</span></div>
+<div class="line">        <span class="comment">// connected sockets and the endpoint they connected from.</span></div>
+<div class="line">        std::pair&lt;llfio::tls_socket_handle_ptr, llfio::ip::address&gt; s;</div>
+<div class="line">        serversocket-&gt;read({s}).value();</div>
+<div class="line">        connected_sockets.emplace_back(std::move(s));</div>
+<div class="line"> </div>
+<div class="line">        <span class="comment">// Watch this connected socket going forth for data to read or failure</span></div>
+<div class="line">        pollable_handles.push_back(connected_sockets.back().socket.get());</div>
+<div class="line">        topoll.push_back(llfio::poll_what::is_readable|llfio::poll_what::is_errored);</div>
+<div class="line">        whatchanged.push_back(llfio::poll_what::none);</div>
+<div class="line">        handles_changed--;</div>
+<div class="line">        <span class="keywordflow">continue</span>;</div>
+<div class="line">      }</div>
+<div class="line">      <span class="comment">// There has been an event on this socket</span></div>
+<div class="line">      <span class="keyword">auto</span> &amp;sock = connected_sockets[handleidx - 1];</div>
+<div class="line">      handles_changed--;</div>
+<div class="line">      <span class="keywordflow">if</span>(whatchanged[handleidx] &amp; llfio::poll_what::is_errored) {</div>
+<div class="line">        <span class="comment">// Force it closed and ignore it from polling going forth</span></div>
+<div class="line">        sock.socket-&gt;close().value();</div>
+<div class="line">        sock.rbuf_storage.reset();</div>
+<div class="line">        sock.wbuf_storage.reset();</div>
+<div class="line">        pollable_handles[handleidx] = <span class="keyword">nullptr</span>;</div>
+<div class="line">      }</div>
+<div class="line">      <span class="keywordflow">if</span>(whatchanged[handleidx] &amp; llfio::poll_what::is_readable) {</div>
+<div class="line">        <span class="comment">// Set up the buffer to fill. Note the scatter buffer list</span></div>
+<div class="line">        <span class="comment">// based API.</span></div>
+<div class="line">        sock.rbuf = *sock.rbuf_storage;</div>
+<div class="line">        sock.socket-&gt;read({{&amp;sock.rbuf, 1}}).value();</div>
+<div class="line">        <span class="comment">// sock.rbuf has its size adjusted to bytes read</span></div>
+<div class="line">      }</div>
+<div class="line">      <span class="keywordflow">if</span>(whatchanged[handleidx] &amp; llfio::poll_what::is_writable) {</div>
+<div class="line">        <span class="comment">// If this was set in topoll, it means write buffers</span></div>
+<div class="line">        <span class="comment">// were full at some point, and we are now being told</span></div>
+<div class="line">        <span class="comment">// there is space to write some more</span></div>
+<div class="line">        <span class="keywordflow">if</span>(!sock.wbuf.empty()) {</div>
+<div class="line">          <span class="comment">// Take a copy of the buffer to write, as it will be</span></div>
+<div class="line">          <span class="comment">// modified in place with what was written</span></div>
+<div class="line">          <span class="keyword">auto</span> b(sock.wbuf);</div>
+<div class="line">          sock.socket-&gt;write({{&amp;b, 1}}).value();</div>
+<div class="line">          <span class="comment">// Adjust the buffer to yet to write</span></div>
+<div class="line">          sock.wbuf = {sock.wbuf.data() + b.size(), sock.wbuf.size() - b.size() };</div>
+<div class="line">        }</div>
+<div class="line">        <span class="keywordflow">if</span>(sock.wbuf.empty()) {</div>
+<div class="line">          <span class="comment">// Nothing more to write, so no longer poll for this</span></div>
+<div class="line">          topoll[handleidx]&amp;=uint8_t(~llfio::poll_what::is_writable);</div>
+<div class="line">        }</div>
+<div class="line">      }</div>
+<div class="line"> </div>
+<div class="line">      <span class="comment">// Process buffers read and written for this socket ...</span></div>
+<div class="line">    }</div>
+<div class="line">  }</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1tls__socket__source_html"><div class="ttname"><a href="classllfio__v2__xxx_1_1tls__socket__source.html">llfio_v2_xxx::tls_socket_source</a></div><div class="ttdoc">A source of tls_socket_handle and listening_tls_socket_handle and possibly a byte_io_multiplexer to m...</div><div class="ttdef"><b>Definition</b> tls_socket_handle.hpp:345</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1tls__socket__source_html_a7cda41bbd9f16e58fa9cbd675a84912d"><div class="ttname"><a href="classllfio__v2__xxx_1_1tls__socket__source.html#a7cda41bbd9f16e58fa9cbd675a84912d">llfio_v2_xxx::tls_socket_source::multiplexable_listening_socket</a></div><div class="ttdeci">result&lt; listening_tls_socket_handle_ptr &gt; multiplexable_listening_socket(ip::family family, byte_socket_handle::mode _mode=byte_socket_handle::mode::write, byte_socket_handle::caching _caching=byte_socket_handle::caching::all, byte_socket_handle::flag flags=byte_socket_handle::flag::multiplexable) noexcept</div><div class="ttdoc">Convenience function defaulting flag::multiplexable set.</div><div class="ttdef"><b>Definition</b> tls_socket_handle.hpp:397</div></div>
+<div class="ttc" id="agroup__config_html_gac9f7f0153adb9034d26c4554728f817a"><div class="ttname"><a href="group__config.html#gac9f7f0153adb9034d26c4554728f817a">LLFIO_V2_NAMESPACE</a></div><div class="ttdeci">#define LLFIO_V2_NAMESPACE</div><div class="ttdoc">The namespace of this LLFIO v2 which will be some unknown inline namespace starting with v2_ inside t...</div><div class="ttdef"><b>Definition</b> config.hpp:183</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html"><div class="ttname"><a href="namespacellfio__v2__xxx.html">llfio_v2_xxx</a></div><div class="ttdoc">The LLFIO namespace.</div><div class="ttdef"><b>Definition</b> byte_io_handle.hpp:37</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_a1b0d8b81e15b9d2aec5dc7194c0e6d22"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a1b0d8b81e15b9d2aec5dc7194c0e6d22">llfio_v2_xxx::listening_tls_socket_handle_ptr</a></div><div class="ttdeci">std::unique_ptr&lt; listening_tls_socket_handle, detail::listening_tls_socket_handle_deleter &gt; listening_tls_socket_handle_ptr</div><div class="ttdoc">A pointer to a listening TLS socket handle returned by a TLS socket source.</div><div class="ttdef"><b>Definition</b> tls_socket_handle.hpp:307</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_a72e16ba75bf2d2f65628f0d4eee7f52c"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a72e16ba75bf2d2f65628f0d4eee7f52c">llfio_v2_xxx::poll</a></div><div class="ttdeci">result&lt; size_t &gt; poll(span&lt; poll_what &gt; out, span&lt; pollable_handle * &gt; handles, span&lt; const poll_what &gt; query, deadline d={}) noexcept</div><div class="ttdoc">Polls a list of pollable handles awaiting a change in state.</div></div>
+<div class="ttc" id="anamespacellfio__v2__xxx_html_a81cc4b6e44e81823d88c0433efd82292"><div class="ttname"><a href="namespacellfio__v2__xxx.html#a81cc4b6e44e81823d88c0433efd82292">llfio_v2_xxx::tls_socket_handle_ptr</a></div><div class="ttdeci">std::unique_ptr&lt; tls_socket_handle, detail::tls_socket_handle_deleter &gt; tls_socket_handle_ptr</div><div class="ttdoc">A pointer to a TLS socket handle returned by a TLS socket source.</div><div class="ttdef"><b>Definition</b> tls_socket_handle.hpp:198</div></div>
+</div><!-- fragment --> </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a318736c9183f9a4ce256f081b75fd4e3" name="a318736c9183f9a4ce256f081b75fd4e3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a318736c9183f9a4ce256f081b75fd4e3">&#9670;&#160;</a></span>default_source()</h2>
 

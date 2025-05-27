@@ -966,7 +966,7 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Clone this handle (copy constructor is disabled to avoid accidental copying)</p>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX dup() or DuplicateHandle() can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup() or DuplicateHandle() can return. </dd></dl>
 
 </div>
 </div>
@@ -1026,7 +1026,7 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
 <p>On Linux if <code>/proc</code> is not mounted, this call fails with an error. All APIs in LLFIO which require the use of <code>current_path()</code> can be told to not use it e.g. <code>flag::disable_safety_unlinks</code>. It is up to you to detect if <code>current_path()</code> is not working, and to change how you call LLFIO appropriately.</p>
 <p>On Windows, you will almost certainly get back a path of the form <code>\!!\Device\HarddiskVolume10\Users\ned\...</code>. See <code>path_view</code> for what all the path prefix sequences mean, but to summarise the <code>\!!\</code> prefix is LLFIO-only and will not be accepted by other Windows APIs. Pass LLFIO derived paths through the function <code>to_win32_path()</code> to Win32-ise them. This function is also available on Linux where it does nothing, so you can use it in portable code.</p>
 <dl class="section warning"><dt>Warning</dt><dd>This call is expensive, it always asks the kernel for the current path, and no checking is done to ensure what the kernel returns is accurate or even sensible. Be aware that despite these precautions, paths are unstable and <b>can change randomly at any moment</b>. Most code written to use absolute file systems paths is <b>racy</b>, so don't do it, use <code>path_handle</code> to fix a base location on the file system and work from that anchor instead!</dd></dl>
-<dl class="section user"><dt>Memory Allocations\n At least one malloc for the <code>path_type</code>, likely several more.</dt><dd></dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>At least one malloc for the <code>path_type</code>, likely several more. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><code>algorithm::cached_parent_handle_adapter&lt;T&gt;</code> which overrides this with an implementation based on retrieving the current path of a cached handle to the parent directory. On platforms with instability or failure to retrieve the correct current path for regular files, the cached parent handle adapter works around the problem by taking advantage of directory inodes not having the same instability problems on any platform. </dd></dl>
 
 <p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1process__handle.html#ae009f553f9a96bf9c8e2d321f1f6409b">llfio_v2_xxx::process_handle</a>.</p>
@@ -2052,7 +2052,7 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX dup(), open() or NtCreateSection() can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup(), open() or NtCreateSection() can return. </dd></dl>
 
 </div>
 </div>
@@ -2099,7 +2099,7 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
   </dd>
 </dl>
 <p>This convenience overload create a writable section if the backing file is writable, otherwise a read-only section.</p>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX dup(), open() or NtCreateSection() can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup(), open() or NtCreateSection() can return. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  162</span>  {</div>
 <div class="line"><span class="lineno">  163</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1section__handle.html#a07dc4eba215e0b670f807faa0f9b52b1">section</a>(<a class="code hl_function" href="classllfio__v2__xxx_1_1section__handle.html#a135cf209f94453c0afcc4779dd2e3069">backing</a>, bytes, <a class="code hl_function" href="classllfio__v2__xxx_1_1section__handle.html#a135cf209f94453c0afcc4779dd2e3069">backing</a>.<a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a211fee447a47bdeb5424a2a5ae1de852">is_writable</a>() ? (flag::readwrite) : (flag::<a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a63bd03aae67c348121ac0bf88161d90f">read</a>));</div>
 <div class="line"><span class="lineno">  164</span>  }</div>
@@ -2157,7 +2157,7 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable\n Any of the values POSIX dup(), open() or NtCreateSection() can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup(), open() or NtCreateSection() can return. </dd></dl>
 
 </div>
 </div>
@@ -2215,8 +2215,8 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
 
 <p>EXTENSION: Changes whether this handle is append only or not. </p>
 <dl class="section warning"><dt>Warning</dt><dd>On Windows this is implemented as a bit of a hack to make it fast like on POSIX, so make sure you open the handle for read/write originally. Note unlike on POSIX the append_only disposition will be the only one toggled, seekable and readable will remain turned on.</dd></dl>
-<dl class="section user"><dt>Errors returnable\n Whatever POSIX fcntl() returns. On Windows nothing is changed on the handle.</dt><dd></dd></dl>
-<dl class="section user"><dt>Memory Allocations\n No memory allocation.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Whatever POSIX fcntl() returns. On Windows nothing is changed on the handle. </dd></dl>
+<dl class="section user"><dt>Memory Allocations</dt><dd>No memory allocation. </dd></dl>
 
 <p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1process__handle.html#a80e34d8d23c9dbe96dde3a174496473f">llfio_v2_xxx::process_handle</a>.</p>
 
@@ -2346,7 +2346,7 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable\n Any of the values <code>NtExtendSection()</code> or <code>ftruncate()</code> can return.</dt><dd></dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values <code>NtExtendSection()</code> or <code>ftruncate()</code> can return. </dd></dl>
 
 </div>
 </div>
