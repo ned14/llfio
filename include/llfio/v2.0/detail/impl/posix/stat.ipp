@@ -90,7 +90,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> stat_t::fill(const handle &h, sta
 {
   LLFIO_LOG_FUNCTION_CALL(&h);
   size_t ret = 0;
-#ifdef __linux__
+#if defined(__linux__) && defined(__GLIBC__)  // musl doesn't support syscall 332 for some reason
   {
     struct statx_timestamp
     {

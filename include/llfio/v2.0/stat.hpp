@@ -30,6 +30,10 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 #include "config.hpp"
 
+#ifndef _WIN32
+#include <sys/types.h>  // for dev_t
+#endif
+
 //! \file stat.hpp Provides stat
 
 #ifdef _MSC_VER

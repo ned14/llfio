@@ -381,6 +381,7 @@ result<std::vector<file_handle::extent_pair>> file_handle::extents() const noexc
       errno = EINVAL;
       break;
 #else
+#ifdef __GLIBC__
       start = lseek64(_v.fd, end, SEEK_DATA);
       if(static_cast<extent_type>(-1) == start)
       {
@@ -391,6 +392,18 @@ result<std::vector<file_handle::extent_pair>> file_handle::extents() const noexc
       {
         break;
       }
+#else
+      start = lseek(_v.fd, end, SEEK_DATA);
+      if(static_cast<extent_type>(-1) == start)
+      {
+        break;
+      }
+      end = lseek(_v.fd, start, SEEK_HOLE);
+      if(static_cast<extent_type>(-1) == end)
+      {
+        break;
+      }
+#endif
 #endif
 #elif defined(__APPLE__)
       // Can't find any support for extent enumeration in OS X
@@ -512,7 +525,11 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
         off_t written = 0;
         if(-1 == ::sendfile(_v.fd, dest_.native_handle().fd, extent.offset, extent.length, nullptr, &written, 0))
 #else
+#if defined(__GLIBC__) || defined(__ANDROID__)
         off64_t off_in = extent.offset, off_out = 0;
+#else
+        off_t off_in = extent.offset, off_out = 0;
+#endif
         auto written = ::splice(_v.fd, &off_in, dest_.native_handle().fd, &off_out, extent.length, 0);
         if(written < 0)
 #endif
@@ -618,7 +635,11 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
             return posix_error();
           }
         }
+#ifdef __GLIBC__
         start = lseek64(_v.fd, end, SEEK_DATA);
+#else
+        start = lseek(_v.fd, end, SEEK_DATA);
+#endif
 #else
         start = lseek(_v.fd, end, SEEK_DATA);
 #endif
@@ -654,7 +675,7 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
         {
           break;  // done
         }
-#ifdef __linux__
+#ifdef __GLIBC__
         end = lseek64(_v.fd, start, SEEK_HOLE);
 #else
         end = lseek(_v.fd, start, SEEK_HOLE);

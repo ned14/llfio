@@ -1,5 +1,5 @@
 # CTest script for a CI to submit to CDash a documentation generation run
-cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 include(cmake/QuickCppLibBootstrap.cmake)
 include(QuickCppLibUtils)
 

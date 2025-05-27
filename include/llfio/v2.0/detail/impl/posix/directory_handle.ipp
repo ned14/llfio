@@ -346,7 +346,9 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
   // Unlike FreeBSD, Linux doesn't define a getdents() function, so we'll do that here.
   using getdents64_t = int (*)(int, char *, unsigned int);
   static auto getdents = static_cast<getdents64_t>([](int fd, char *buf, unsigned count) -> int { return syscall(SYS_getdents64, fd, buf, count); });
+#ifdef __GLIBC__
   using dirent = dirent64;
+#endif
 #endif
 #ifdef __APPLE__
   typedef int (*getdents_emulation_t)(int, char *, unsigned);
@@ -391,7 +393,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
     auto unlock = make_scope_exit([this]() noexcept { _lock.store(0, std::memory_order_release); });
     (void) unlock;
 // Seek to start
-#ifdef __linux__
+#ifdef __GLIBC__
     if(-1 == ::lseek64(_v.fd, 0, SEEK_SET))
     {
       return posix_error();

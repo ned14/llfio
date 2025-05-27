@@ -66,10 +66,10 @@ jobs:
         if: steps.waitforstatuschecks.outputs.status == 'success'
         shell: bash
         run: |
-         mv "artifacts/Linux error_code g++ prebuilt binaries/llfio-v2.0-binaries-linux-x64.tgz" llfio-v2.0-binaries-ubuntu20.04-x64-error_code.tgz
-         mv "artifacts/Linux status_code g++ prebuilt binaries/llfio-v2.0-binaries-linux-x64.tgz" llfio-v2.0-binaries-ubuntu20.04-x64-status_code.tgz
-         mv "artifacts/Linux error_code arm-linux-gnueabihf-g++ prebuilt binaries/llfio-v2.0-binaries-linux-armhf.tgz" llfio-v2.0-binaries-ubuntu20.04-armhf-error_code.tgz
-         mv "artifacts/Linux status_code arm-linux-gnueabihf-g++ prebuilt binaries/llfio-v2.0-binaries-linux-armhf.tgz" llfio-v2.0-binaries-ubuntu20.04-armhf-status_code.tgz
+         mv "artifacts/Linux error_code g++ prebuilt binaries/llfio-v2.0-binaries-linux-x64.tgz" llfio-v2.0-binaries-ubuntu22.04-x64-error_code.tgz
+         mv "artifacts/Linux status_code g++ prebuilt binaries/llfio-v2.0-binaries-linux-x64.tgz" llfio-v2.0-binaries-ubuntu22.04-x64-status_code.tgz
+         mv "artifacts/Linux error_code arm-linux-gnueabihf-g++ prebuilt binaries/llfio-v2.0-binaries-linux-armhf.tgz" llfio-v2.0-binaries-ubuntu22.04-armhf-error_code.tgz
+         mv "artifacts/Linux status_code arm-linux-gnueabihf-g++ prebuilt binaries/llfio-v2.0-binaries-linux-armhf.tgz" llfio-v2.0-binaries-ubuntu22.04-armhf-status_code.tgz
          mv "artifacts/Mac OS error_code prebuilt binaries/llfio-v2.0-binaries-darwin-arm64.tgz" llfio-v2.0-binaries-macos-arm64-error_code.tgz
          mv "artifacts/Mac OS status_code prebuilt binaries/llfio-v2.0-binaries-darwin-arm64.tgz" llfio-v2.0-binaries-macos-arm64-status_code.tgz
          mv "artifacts/Windows VS2022 error_code prebuilt binaries/llfio-v2.0-binaries-win64.zip" llfio-v2.0-binaries-win64-vs2022-error_code.zip

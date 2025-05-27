@@ -1,5 +1,5 @@
 # QuickCppLib cmake
-# (C) 2016-2019 Niall Douglas <http://www.nedproductions.biz/>
+# (C) 2016-2025 Niall Douglas <http://www.nedproductions.biz/>
 # 
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +20,7 @@
 #     (See accompanying file Licence.txt or copy at
 #           http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 # If necessary bring in the quickcpplib cmake tooling
 set(quickcpplib_done OFF)
 foreach(item ${CMAKE_MODULE_PATH})

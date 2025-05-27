@@ -230,7 +230,7 @@ public:
 
   /*! \brief EXTENSION: Tries to lock the range of bytes specified for shared or exclusive access.
   Note that this may, or MAY NOT, observe whole file locks placed with `lock()`, `lock_shared()` etc.
-  
+
   Be aware this passes through the same semantics as the underlying OS call, including any POSIX
   insanity present on your platform:
 
@@ -266,7 +266,7 @@ public:
   \mallocs The default synchronous implementation in file_handle performs no memory allocation.
   */
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC result<extent_guard> lock_file_range(extent_type offset, extent_type bytes, lock_kind kind, deadline d = deadline()) noexcept;
-  //! \overload EXTENSION: Locks for shared access
+  //! \overload
   result<extent_guard> lock_file_range(io_request<buffers_type> reqs, deadline d = deadline()) noexcept
   {
     size_t bytes = 0;
@@ -280,7 +280,7 @@ public:
     }
     return lock_file_range(reqs.offset, bytes, lock_kind::shared, d);
   }
-  //! \overload EXTENSION: Locks for exclusive access
+  //! \overload
   result<extent_guard> lock_file_range(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept
   {
     size_t bytes = 0;

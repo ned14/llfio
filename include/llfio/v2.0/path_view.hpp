@@ -36,7 +36,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #if __cplusplus >= 202600L || _HAS_CXX26
 #include <format>
-#define LLFIO_PATH_VIEW_HAVE_FORMAT 1
+#define LLFIO_PATH_VIEW_HAVE_FORMAT (__cpp_lib_format_path >= 202403L)
 #endif
 
 #include "quickcpplib/algorithm/hash.hpp"
@@ -1261,12 +1261,12 @@ public:
   public:
     /*! Construct, performing any reencoding or memory copying required.
     \param view The path component view to use as source.
-    \param output_zero_termination The zero termination in the output desired
     \param loc The locale to use to perform reencoding.
     \param allocate Either a callable with prototype `value_type *(size_t length)` which
     is defaulted to `return static_cast<value_type *>(::operator new[](length * sizeof(value_type)));`,
     or a `pmr::memory_resource *`. You can return `nullptr` if you wish, the consumer of `rendered_path` will
     see a `buffer` set to `nullptr`.
+    \param deleter Either an Allocator or a Deleter.
 
     If `loc` is defaulted, and an error occurs during any conversion from UTF-8 or UTF-16, an exception of
     `system_error(errc::illegal_byte_sequence)` is thrown.
@@ -1293,21 +1293,21 @@ public:
     {
       _init(view, (const std::locale *) nullptr, static_cast<U &&>(allocate));
     }
-    //! \overload memory_resource
+    //! \overload
     rendered_path(path_view_component view, const std::locale &loc, pmr::memory_resource &mr, _memory_resource_tag = {})
         : _deleter1(_memory_resouce_deallocate)
         , _deleter1arg(&mr)
     {
       _init(view, &loc, _memory_resource_allocate{&mr});
     }
-    //! \overload memory_resource
+    //! \overload
     rendered_path(path_view_component view, pmr::memory_resource &mr, _memory_resource_tag = {})
         : _deleter1(_memory_resouce_deallocate)
         , _deleter1arg(&mr)
     {
       _init(view, (const std::locale *) nullptr, _memory_resource_allocate{&mr});
     }
-    //! \overload STL allocator
+    //! \overload
     LLFIO_TEMPLATE(class U)
     LLFIO_TREQUIRES(LLFIO_TPRED(_is_allocator_based<U>), LLFIO_TEXPR(std::declval<U>().allocate((size_t) 1)))
     rendered_path(path_view_component view, const std::locale &loc, U &&allocate, _stl_allocator_tag = {})
@@ -1317,7 +1317,7 @@ public:
     {
       _init(view, &loc, _stl_allocator_allocate<std::decay_t<U>>(static_cast<std::decay_t<U> *>(&_deleter2)));
     }
-    //! \overload STL allocator
+    //! \overload
     LLFIO_TEMPLATE(class U)
     LLFIO_TREQUIRES(LLFIO_TPRED(_is_allocator_based<U>), LLFIO_TEXPR(std::declval<U>().allocate((size_t) 1)))
     rendered_path(path_view_component view, U &&allocate, _stl_allocator_tag = {})
@@ -1327,7 +1327,7 @@ public:
     {
       _init(view, (const std::locale *) nullptr, _stl_allocator_allocate<std::decay_t<U>>(static_cast<std::decay_t<U> *>(&_deleter2)));
     }
-    //! \overload default allocation
+    //! \overload
     rendered_path(path_view_component view, const std::locale &loc)
         : _deleter1(_default_deleter)
         , _deleter1arg(&_deleter2)
@@ -3142,7 +3142,7 @@ template <class charT> struct std::formatter<LLFIO_V2_NAMESPACE::path_view_compo
       using type = typename decltype(sv)::value_type;
       if constexpr(std::is_same_v<type, std::byte>)
       {
-        return fmt.format(std::filesystem::path(QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string((const char *) v.data(), v.size())), ctx);
+        return fmt.format(std::filesystem::path(QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string((const char *) sv.data(), sv.size())), ctx);
       }
       else
       {
@@ -3165,7 +3165,7 @@ template <class charT> struct std::formatter<LLFIO_V2_NAMESPACE::path_view, char
       using type = typename decltype(sv)::value_type;
       if constexpr(std::is_same_v<type, std::byte>)
       {
-        return fmt.format(std::filesystem::path(QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string((const char *) v.data(), v.size())), ctx);
+        return fmt.format(std::filesystem::path(QUICKCPPLIB_NAMESPACE::algorithm::string::to_hex_string((const char *) sv.data(), sv.size())), ctx);
       }
       else
       {
