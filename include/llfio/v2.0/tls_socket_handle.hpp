@@ -549,7 +549,7 @@ sock->shutdown_and_close(std::chrono::seconds(3)).value();
 
 Fuller fat example:
 
- \snippet use_cases.cpp tls_socket_server
+ \snippet tls_socket_server.cpp tls_socket_server
 */
 class LLFIO_DECL tls_socket_source_registry
 {

@@ -298,13 +298,13 @@ public:
   {
     return (_ctx == nullptr) ? _do_read(reqs, d) : _do_multiplexer_read({}, reqs, d);
   }
-  //! \overload Registered buffer overload, scatter list **must** be wholly within the registered buffer
+  //! \overload
   LLFIO_MAKE_FREE_FUNCTION
   io_result<buffers_type> read(registered_buffer_type base, io_request<buffers_type> reqs, deadline d = deadline()) noexcept
   {
     return (_ctx == nullptr) ? _do_read(std::move(base), reqs, d) : _do_multiplexer_read(std::move(base), reqs, d);
   }
-  //! \overload Convenience initialiser list based overload for `read()`
+  //! \overload
   LLFIO_MAKE_FREE_FUNCTION
   io_result<size_type> read(extent_type offset, std::initializer_list<buffer_type> lst, deadline d = deadline()) noexcept
   {
@@ -346,13 +346,13 @@ public:
   {
     return (_ctx == nullptr) ? _do_write(reqs, d) : _do_multiplexer_write({}, std::move(reqs), d);
   }
-  //! \overload Registered buffer overload, gather list **must** be wholly within the registered buffer
+  //! \overload
   LLFIO_MAKE_FREE_FUNCTION
   io_result<const_buffers_type> write(registered_buffer_type base, io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept
   {
     return (_ctx == nullptr) ? _do_write(std::move(base), reqs, d) : _do_multiplexer_write(std::move(base), std::move(reqs), d);
   }
-  //! \overload Convenience initialiser list based overload for `write()`
+  //! \overload
   LLFIO_MAKE_FREE_FUNCTION
   io_result<size_type> write(extent_type offset, std::initializer_list<const_buffer_type> lst, deadline d = deadline()) noexcept
   {
@@ -404,7 +404,7 @@ public:
   {
     return (_ctx == nullptr) ? _do_barrier(reqs, kind, d) : _do_multiplexer_barrier({}, std::move(reqs), kind, d);
   }
-  //! \overload Convenience overload
+  //! \overload
   LLFIO_MAKE_FREE_FUNCTION
   io_result<const_buffers_type> barrier(barrier_kind kind, deadline d = deadline()) noexcept { return barrier(io_request<const_buffers_type>(), kind, d); }
 
@@ -429,7 +429,7 @@ public:
     ret.set_state(_ctx->construct(ret._state_storage, this, nullptr, {}, d, std::move(reqs)));
     return ret;
   }
-  //! \overload Registered buffer overload, scatter list **must** be wholly within the registered buffer
+  //! \overload
   LLFIO_MAKE_FREE_FUNCTION
   awaitable<io_result<buffers_type>> co_read(registered_buffer_type base, io_request<buffers_type> reqs, deadline d = deadline()) noexcept
   {
@@ -460,7 +460,7 @@ public:
     ret.set_state(_ctx->construct(ret._state_storage, this, nullptr, {}, d, std::move(reqs)));
     return ret;
   }
-  //! \overload Registered buffer overload, gather list **must** be wholly within the registered buffer
+  //! \overload
   LLFIO_MAKE_FREE_FUNCTION
   awaitable<io_result<const_buffers_type>> co_write(registered_buffer_type base, io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept
   {
@@ -624,7 +624,7 @@ LLFIO_HEADERS_ONLY_FUNC_SPEC result<size_t> poll(span<poll_what> out, span<polla
 class pollable_handle
 {
   friend LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> poll(span<poll_what> out, span<pollable_handle *> handles, span<const poll_what> query,
-                                                          deadline d) noexcept;
+                                                             deadline d) noexcept;
   virtual const handle &_get_handle() const noexcept = 0;
 
 public:
@@ -706,7 +706,7 @@ LLFIO_V2_NAMESPACE_END
 #endif
 #else
 #if LLFIO_ENABLE_TEST_IO_MULTIPLEXERS
-//#include "detail/impl/posix/test/io_uring_multiplexer.ipp"
+// #include "detail/impl/posix/test/io_uring_multiplexer.ipp"
 #else
 #endif
 #include "detail/impl/posix/byte_io_handle.ipp"
