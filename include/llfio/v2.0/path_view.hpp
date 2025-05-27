@@ -36,7 +36,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #if __cplusplus >= 202600L || _HAS_CXX26
 #include <format>
-#define LLFIO_PATH_VIEW_HAVE_FORMAT 1
+#define LLFIO_PATH_VIEW_HAVE_FORMAT (__cpp_lib_format_path >= 202403L)
 #endif
 
 #include "quickcpplib/algorithm/hash.hpp"
