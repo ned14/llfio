@@ -133,15 +133,33 @@ result<section_handle> section_handle::section(file_handle &backing, extent_type
   {
     static thread_local const std::pair<wchar_t *, wchar_t *> buffer = []() -> std::pair<wchar_t *, wchar_t *>
     {
-      static thread_local wchar_t buffer_[96] = L"\\Sessions\\0\\BaseNamedObjects\\llfio_";
-      DWORD sessionid = 0;
-      if(ProcessIdToSessionId(GetCurrentProcessId(), &sessionid) != 0)
+      static thread_local wchar_t buffer_[96];
+      struct
       {
-        wsprintfW(buffer_, L"\\Sessions\\%u\\BaseNamedObjects\\llfio_", sessionid);
-        if(96 - wcslen(buffer_) < 34)
+        UNICODE_STRING str;
+        wchar_t buffer[96];
+      } name;
+      HANDLE dir;  // Should not be freed
+      if(BaseGetNamedObjectDirectory(&dir) == 0 && NtQueryObject(dir, ObjectNameInformation, &name, sizeof(name), nullptr) == 0)
+      {
+        unsigned len = name.str.Length / sizeof(wchar_t);
+        if(len + 7 + 34 >= std::size(buffer_))
         {
           abort();
         }
+        memcpy(buffer_, name.str.Buffer, name.str.Length + sizeof(wchar_t));
+        wcscpy_s(buffer_ + len, 8, L"\\llfio_");
+        return {buffer_, buffer_ + len + 7};
+      }
+      DWORD sessionid = 0;
+      if(ProcessIdToSessionId(GetCurrentProcessId(), &sessionid) == 0)
+      {
+        sessionid = 0;
+      }
+      wsprintfW(buffer_, L"\\Sessions\\%u\\BaseNamedObjects\\llfio_", sessionid);
+      if(std::size(buffer_) - wcslen(buffer_) < 34)
+      {
+        abort();
       }
       auto *end = wcschr(buffer_, 0);
       return {buffer_, end};

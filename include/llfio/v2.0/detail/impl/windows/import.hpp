@@ -593,6 +593,8 @@ namespace windows_nt_kernel
 
   using RtlFreeUnicodeString_t = NTSTATUS(NTAPI *)(PUNICODE_STRING String);
 
+  using BaseGetNamedObjectDirectory_t = NTSTATUS(NTAPI *)(HANDLE *DirHandle);
+
   typedef struct _FILE_STANDARD_INFORMATION  // NOLINT
   {
     LARGE_INTEGER AllocationSize;
@@ -1076,6 +1078,7 @@ namespace windows_nt_kernel
   static RtlFreeUnicodeString_t RtlFreeUnicodeString;
   static RtlFreeAnsiString_t RtlFreeAnsiString;
 
+  static BaseGetNamedObjectDirectory_t BaseGetNamedObjectDirectory;
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -1498,6 +1501,13 @@ namespace windows_nt_kernel
     if(RtlFreeAnsiString == nullptr)
     {
       if((RtlFreeAnsiString = reinterpret_cast<RtlFreeAnsiString_t>(GetProcAddress(ntdllh, "RtlFreeAnsiString"))) == nullptr)
+      {
+        abort();
+      }
+    }
+    if(BaseGetNamedObjectDirectory == nullptr)
+    {
+      if((BaseGetNamedObjectDirectory = reinterpret_cast<BaseGetNamedObjectDirectory_t>(GetProcAddress(kernel32, "BaseGetNamedObjectDirectory"))) == nullptr)
       {
         abort();
       }
