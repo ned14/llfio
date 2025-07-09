@@ -50,7 +50,7 @@ class io_context;
 /*! \class handle
 \brief A native_handle_type which is managed by the lifetime of this object instance.
 */
-class LLFIO_DECL alignas(sizeof(void *)) handle
+class alignas(sizeof(void *)) LLFIO_DECL handle
 {
   friend class fs_handle;
   friend inline std::ostream &operator<<(std::ostream &s, const handle &v);
