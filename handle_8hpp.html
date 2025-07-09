@@ -183,54 +183,54 @@ template&lt;class Dest , class Src &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  543</span>  {</div>
-<div class="line"><span class="lineno">  544</span>    (void) src;</div>
-<div class="line"><span class="lineno">  545</span>    <span class="keyword">auto</span> &amp;tls = detail::tls_errored_results();</div>
-<div class="line"><span class="lineno">  546</span>    <span class="keywordflow">if</span>(!tls.reentering_self)</div>
-<div class="line"><span class="lineno">  547</span>    {</div>
-<div class="line"><span class="lineno">  548</span>      handle *currenth = tls.current_handle;</div>
-<div class="line"><span class="lineno">  549</span>      native_handle_type nativeh;</div>
-<div class="line"><span class="lineno">  550</span>      <span class="keywordflow">if</span>(currenth != <span class="keyword">nullptr</span>)</div>
-<div class="line"><span class="lineno">  551</span>      {</div>
-<div class="line"><span class="lineno">  552</span>        nativeh = currenth-&gt;native_handle();</div>
-<div class="line"><span class="lineno">  553</span>        <span class="comment">// This may fail, if it does it will construct an error_info thus reentering ourselves. Prevent that.</span></div>
-<div class="line"><span class="lineno">  554</span>        tls.reentering_self = <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">  555</span>        <span class="keyword">auto</span> currentpath_ = currenth-&gt;current_path();</div>
-<div class="line"><span class="lineno">  556</span>        tls.reentering_self = <span class="keyword">false</span>;</div>
-<div class="line"><span class="lineno">  557</span>        <span class="keywordflow">if</span>(currentpath_)</div>
-<div class="line"><span class="lineno">  558</span>        {</div>
-<div class="line"><span class="lineno">  559</span>          <span class="keyword">auto</span> currentpath = currentpath_.value().string();</div>
-<div class="line"><span class="lineno">  560</span>          dest._thread_id = tls.this_thread_id;</div>
-<div class="line"><span class="lineno">  561</span><span class="preprocessor">#ifdef _MSC_VER</span></div>
-<div class="line"><span class="lineno">  562</span><span class="preprocessor">#pragma warning(push)</span></div>
-<div class="line"><span class="lineno">  563</span><span class="preprocessor">#pragma warning(disable : 4996)  </span><span class="comment">// the function may be unsafe</span></div>
-<div class="line"><span class="lineno">  564</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno">  565</span><span class="preprocessor">#if(__GNUC__ &gt;= 8) &amp;&amp; !defined(__clang__)</span></div>
-<div class="line"><span class="lineno">  566</span><span class="preprocessor">#pragma GCC diagnostic push</span></div>
-<div class="line"><span class="lineno">  567</span><span class="preprocessor">#pragma GCC diagnostic ignored &quot;-Wstringop-overflow&quot;</span></div>
-<div class="line"><span class="lineno">  568</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno">  569</span>          <span class="comment">// The type in TLS is char paths[190][16]{};</span></div>
-<div class="line"><span class="lineno">  570</span>          <span class="comment">// If I index that by paths[x], I get back a type of char(&amp;)[190].</span></div>
-<div class="line"><span class="lineno">  571</span>          <span class="comment">// See https://godbolt.org/z/d69xzd for proof.</span></div>
-<div class="line"><span class="lineno">  572</span>          <span class="comment">// So I don&#39;t know why there is a warning here about overflowing a buffer of 16!</span></div>
-<div class="line"><span class="lineno">  573</span>          strncpy(tls.next(dest._tls_path_id1), QUICKCPPLIB_NAMESPACE::ringbuffer_log::last190(currentpath), 190);</div>
-<div class="line"><span class="lineno">  574</span><span class="preprocessor">#if(__GNUC__ &gt;= 8) &amp;&amp; !defined(__clang__)</span></div>
-<div class="line"><span class="lineno">  575</span><span class="preprocessor">#pragma GCC diagnostic pop</span></div>
-<div class="line"><span class="lineno">  576</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno">  577</span><span class="preprocessor">#ifdef _MSC_VER</span></div>
-<div class="line"><span class="lineno">  578</span><span class="preprocessor">#pragma warning(pop)</span></div>
-<div class="line"><span class="lineno">  579</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno">  580</span>          dest._tls_path_id2 = dest._tls_path_id1 - 17;  <span class="comment">// guaranteed invalid</span></div>
-<div class="line"><span class="lineno">  581</span>        }</div>
-<div class="line"><span class="lineno">  582</span>      }</div>
-<div class="line"><span class="lineno">  583</span><span class="preprocessor">#if LLFIO_LOGGING_LEVEL &gt;= 2</span></div>
-<div class="line"><span class="lineno">  584</span>      <span class="keywordflow">if</span>(log().log_level() &gt;= log_level::error)</div>
-<div class="line"><span class="lineno">  585</span>      {</div>
-<div class="line"><span class="lineno">  586</span>        dest._log_id = log().emplace_back(log_level::error, src.message().c_str(), <span class="keyword">static_cast&lt;</span>uint32_t<span class="keyword">&gt;</span>(nativeh._init), tls.this_thread_id);</div>
-<div class="line"><span class="lineno">  587</span>      }</div>
-<div class="line"><span class="lineno">  588</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno">  589</span>    }</div>
-<div class="line"><span class="lineno">  590</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  544</span>  {</div>
+<div class="line"><span class="lineno">  545</span>    (void) src;</div>
+<div class="line"><span class="lineno">  546</span>    <span class="keyword">auto</span> &amp;tls = detail::tls_errored_results();</div>
+<div class="line"><span class="lineno">  547</span>    <span class="keywordflow">if</span>(!tls.reentering_self)</div>
+<div class="line"><span class="lineno">  548</span>    {</div>
+<div class="line"><span class="lineno">  549</span>      handle *currenth = tls.current_handle;</div>
+<div class="line"><span class="lineno">  550</span>      native_handle_type nativeh;</div>
+<div class="line"><span class="lineno">  551</span>      <span class="keywordflow">if</span>(currenth != <span class="keyword">nullptr</span>)</div>
+<div class="line"><span class="lineno">  552</span>      {</div>
+<div class="line"><span class="lineno">  553</span>        nativeh = currenth-&gt;native_handle();</div>
+<div class="line"><span class="lineno">  554</span>        <span class="comment">// This may fail, if it does it will construct an error_info thus reentering ourselves. Prevent that.</span></div>
+<div class="line"><span class="lineno">  555</span>        tls.reentering_self = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  556</span>        <span class="keyword">auto</span> currentpath_ = currenth-&gt;current_path();</div>
+<div class="line"><span class="lineno">  557</span>        tls.reentering_self = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  558</span>        <span class="keywordflow">if</span>(currentpath_)</div>
+<div class="line"><span class="lineno">  559</span>        {</div>
+<div class="line"><span class="lineno">  560</span>          <span class="keyword">auto</span> currentpath = currentpath_.value().string();</div>
+<div class="line"><span class="lineno">  561</span>          dest._thread_id = tls.this_thread_id;</div>
+<div class="line"><span class="lineno">  562</span><span class="preprocessor">#ifdef _MSC_VER</span></div>
+<div class="line"><span class="lineno">  563</span><span class="preprocessor">#pragma warning(push)</span></div>
+<div class="line"><span class="lineno">  564</span><span class="preprocessor">#pragma warning(disable : 4996)  </span><span class="comment">// the function may be unsafe</span></div>
+<div class="line"><span class="lineno">  565</span><span class="preprocessor">#endif</span></div>
+<div class="line"><span class="lineno">  566</span><span class="preprocessor">#if (__GNUC__ &gt;= 8) &amp;&amp; !defined(__clang__)</span></div>
+<div class="line"><span class="lineno">  567</span><span class="preprocessor">#pragma GCC diagnostic push</span></div>
+<div class="line"><span class="lineno">  568</span><span class="preprocessor">#pragma GCC diagnostic ignored &quot;-Wstringop-overflow&quot;</span></div>
+<div class="line"><span class="lineno">  569</span><span class="preprocessor">#endif</span></div>
+<div class="line"><span class="lineno">  570</span>          <span class="comment">// The type in TLS is char paths[190][16]{};</span></div>
+<div class="line"><span class="lineno">  571</span>          <span class="comment">// If I index that by paths[x], I get back a type of char(&amp;)[190].</span></div>
+<div class="line"><span class="lineno">  572</span>          <span class="comment">// See https://godbolt.org/z/d69xzd for proof.</span></div>
+<div class="line"><span class="lineno">  573</span>          <span class="comment">// So I don&#39;t know why there is a warning here about overflowing a buffer of 16!</span></div>
+<div class="line"><span class="lineno">  574</span>          strncpy(tls.next(dest._tls_path_id1), QUICKCPPLIB_NAMESPACE::ringbuffer_log::last190(currentpath), 190);</div>
+<div class="line"><span class="lineno">  575</span><span class="preprocessor">#if (__GNUC__ &gt;= 8) &amp;&amp; !defined(__clang__)</span></div>
+<div class="line"><span class="lineno">  576</span><span class="preprocessor">#pragma GCC diagnostic pop</span></div>
+<div class="line"><span class="lineno">  577</span><span class="preprocessor">#endif</span></div>
+<div class="line"><span class="lineno">  578</span><span class="preprocessor">#ifdef _MSC_VER</span></div>
+<div class="line"><span class="lineno">  579</span><span class="preprocessor">#pragma warning(pop)</span></div>
+<div class="line"><span class="lineno">  580</span><span class="preprocessor">#endif</span></div>
+<div class="line"><span class="lineno">  581</span>          dest._tls_path_id2 = dest._tls_path_id1 - 17;  <span class="comment">// guaranteed invalid</span></div>
+<div class="line"><span class="lineno">  582</span>        }</div>
+<div class="line"><span class="lineno">  583</span>      }</div>
+<div class="line"><span class="lineno">  584</span><span class="preprocessor">#if LLFIO_LOGGING_LEVEL &gt;= 2</span></div>
+<div class="line"><span class="lineno">  585</span>      <span class="keywordflow">if</span>(log().log_level() &gt;= log_level::error)</div>
+<div class="line"><span class="lineno">  586</span>      {</div>
+<div class="line"><span class="lineno">  587</span>        dest._log_id = log().emplace_back(log_level::error, src.message().c_str(), <span class="keyword">static_cast&lt;</span>uint32_t<span class="keyword">&gt;</span>(nativeh._init), tls.this_thread_id);</div>
+<div class="line"><span class="lineno">  588</span>      }</div>
+<div class="line"><span class="lineno">  589</span><span class="preprocessor">#endif</span></div>
+<div class="line"><span class="lineno">  590</span>    }</div>
+<div class="line"><span class="lineno">  591</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -261,11 +261,11 @@ template&lt;class T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  665</span>  {</div>
-<div class="line"><span class="lineno">  666</span>    (void) inst;</div>
-<div class="line"><span class="lineno">  667</span>    (void) buffer;</div>
-<div class="line"><span class="lineno">  668</span>    LLFIO_LOG_INFO(inst-&gt;native_handle()._init, buffer);</div>
-<div class="line"><span class="lineno">  669</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  666</span>  {</div>
+<div class="line"><span class="lineno">  667</span>    (void) inst;</div>
+<div class="line"><span class="lineno">  668</span>    (void) buffer;</div>
+<div class="line"><span class="lineno">  669</span>    LLFIO_LOG_INFO(inst-&gt;native_handle()._init, buffer);</div>
+<div class="line"><span class="lineno">  670</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
