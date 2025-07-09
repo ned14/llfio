@@ -39,7 +39,7 @@ LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 \brief A native handle type used for wrapping file descriptors, process ids or HANDLEs.
 Unmanaged, wrap in a handle object to manage.
 */
-struct native_handle_type  // NOLINT
+struct alignas(sizeof(void *)) native_handle_type  // NOLINT
 {
   //! The type of handle.
   QUICKCPPLIB_BITFIELD_BEGIN_T(disposition, uint64_t){
@@ -219,6 +219,8 @@ struct native_handle_type  // NOLINT
 };
 static_assert((sizeof(void *) == 4 && sizeof(native_handle_type) == 12) || (sizeof(void *) == 8 && sizeof(native_handle_type) == 16),
               "native_handle_type is not 12 or 16 bytes in size!");
+static_assert((sizeof(void *) == 4 && alignof(native_handle_type) == 4) || (sizeof(void *) == 8 && alignof(native_handle_type) == 8),
+              "native_handle_type is not aligned to 4 or 8 bytes!");
 // Not trivially copyable, as has non-trivial move.
 static_assert(std::is_trivially_destructible<native_handle_type>::value, "native_handle_type is not trivially destructible!");
 static_assert(std::is_trivially_copy_constructible<native_handle_type>::value, "native_handle_type is not trivially copy constructible!");

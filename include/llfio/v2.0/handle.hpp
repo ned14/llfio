@@ -50,7 +50,7 @@ class io_context;
 /*! \class handle
 \brief A native_handle_type which is managed by the lifetime of this object instance.
 */
-class LLFIO_DECL handle
+class LLFIO_DECL alignas(sizeof(void *)) handle
 {
   friend class fs_handle;
   friend inline std::ostream &operator<<(std::ostream &s, const handle &v);
@@ -107,106 +107,106 @@ public:
        // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
   };
   //! Bitwise flags which can be specified
-  QUICKCPPLIB_BITFIELD_BEGIN_T(flag, uint16_t){
-  none = uint16_t(0),  //!< No flags
-  /*! Unlinks the file on handle close. On POSIX, this simply unlinks whatever is pointed
-  to by `path()` upon the call of `close()` if and only if the inode matches. On Windows,
-  if you are on Windows 10 1709 or later, exactly the same thing occurs. If on previous
-  editions of Windows, the file entry does not disappears but becomes unavailable for
-  anyone else to open with an `errc::resource_unavailable_try_again` error return. Because this is confusing, unless the
-  `win_disable_unlink_emulation` flag is also specified, this POSIX behaviour is
-  somewhat emulated by LLFIO on older Windows by renaming the file to a random name on `close()`
-  causing it to appear to have been unlinked immediately.
-  */
-  unlink_on_first_close = uint16_t(1U << 0U),
+QUICKCPPLIB_BITFIELD_BEGIN_T(flag, uint16_t){
+none = uint16_t(0),  //!< No flags
+/*! Unlinks the file on handle close. On POSIX, this simply unlinks whatever is pointed
+to by `path()` upon the call of `close()` if and only if the inode matches. On Windows,
+if you are on Windows 10 1709 or later, exactly the same thing occurs. If on previous
+editions of Windows, the file entry does not disappears but becomes unavailable for
+anyone else to open with an `errc::resource_unavailable_try_again` error return. Because this is confusing, unless the
+`win_disable_unlink_emulation` flag is also specified, this POSIX behaviour is
+somewhat emulated by LLFIO on older Windows by renaming the file to a random name on `close()`
+causing it to appear to have been unlinked immediately.
+*/
+unlink_on_first_close = uint16_t(1U << 0U),
 
-  /*! Some kernel caching modes have unhelpfully inconsistent behaviours
-  in getting your data onto storage, so by default unless this flag is
-  specified LLFIO adds extra fsyncs to the following operations for the
-  caching modes specified below:
-  * truncation of file length either explicitly or during file open.
-  * closing of the handle either explicitly or in the destructor.
+/*! Some kernel caching modes have unhelpfully inconsistent behaviours
+in getting your data onto storage, so by default unless this flag is
+specified LLFIO adds extra fsyncs to the following operations for the
+caching modes specified below:
+* truncation of file length either explicitly or during file open.
+* closing of the handle either explicitly or in the destructor.
 
-  Additionally on Linux only to prevent loss of file metadata:
-  * On the parent directory whenever a file might have been created.
-  * On the parent directory on file close.
+Additionally on Linux only to prevent loss of file metadata:
+* On the parent directory whenever a file might have been created.
+* On the parent directory on file close.
 
-  This only occurs for these kernel caching modes:
-  * caching::none
-  * caching::reads
-  * caching::reads_and_metadata
-  * caching::safety_barriers
-  */
-  disable_safety_barriers = uint16_t(1U << 2U),
-  /*! `file_handle::unlink()` could accidentally delete the wrong file if someone has
-  renamed the open file handle since the time it was opened. To prevent this occuring,
-  where the OS doesn't provide race free unlink-by-open-handle we compare the inode of
-  the path we are about to unlink with that of the open handle before unlinking.
-  \warning This does not prevent races where in between the time of checking the inode
-  and executing the unlink a third party changes the item about to be unlinked. Only
-  operating systems with a true race-free unlink syscall are race free.
-  */
-  disable_safety_unlinks = uint16_t(1U << 3U),
-  /*! Ask the OS to disable prefetching of data. This can improve random
-  i/o performance.
-  */
-  disable_prefetching = uint16_t(1U << 4U),
-  /*! Ask the OS to maximise prefetching of data, possibly prefetching the entire file
-  into kernel cache. This can improve sequential i/o performance.
-  */
-  maximum_prefetching = uint16_t(1U << 5U),
+This only occurs for these kernel caching modes:
+* caching::none
+* caching::reads
+* caching::reads_and_metadata
+* caching::safety_barriers
+*/
+disable_safety_barriers = uint16_t(1U << 2U),
+/*! `file_handle::unlink()` could accidentally delete the wrong file if someone has
+renamed the open file handle since the time it was opened. To prevent this occuring,
+where the OS doesn't provide race free unlink-by-open-handle we compare the inode of
+the path we are about to unlink with that of the open handle before unlinking.
+\warning This does not prevent races where in between the time of checking the inode
+and executing the unlink a third party changes the item about to be unlinked. Only
+operating systems with a true race-free unlink syscall are race free.
+*/
+disable_safety_unlinks = uint16_t(1U << 3U),
+/*! Ask the OS to disable prefetching of data. This can improve random
+i/o performance.
+*/
+disable_prefetching = uint16_t(1U << 4U),
+/*! Ask the OS to maximise prefetching of data, possibly prefetching the entire file
+into kernel cache. This can improve sequential i/o performance.
+*/
+maximum_prefetching = uint16_t(1U << 5U),
 
-  win_disable_unlink_emulation = uint16_t(1U << 9U),  //!< See the documentation for `unlink_on_first_close`
-  /*! Microsoft Windows NTFS, having been created in the late 1980s, did not originally
-  implement extents-based storage and thus could only represent sparse files via
-  efficient compression of intermediate zeros. With NTFS v3.0 (Microsoft Windows 2000),
-  a proper extents-based on-storage representation was added, thus allowing only 64Kb
-  extent chunks written to be stored irrespective of whatever the maximum file extent
-  was set to.
+win_disable_unlink_emulation = uint16_t(1U << 9U),  //!< See the documentation for `unlink_on_first_close`
+/*! Microsoft Windows NTFS, having been created in the late 1980s, did not originally
+implement extents-based storage and thus could only represent sparse files via
+efficient compression of intermediate zeros. With NTFS v3.0 (Microsoft Windows 2000),
+a proper extents-based on-storage representation was added, thus allowing only 64Kb
+extent chunks written to be stored irrespective of whatever the maximum file extent
+was set to.
 
-  For various historical reasons, extents-based storage is disabled by default in newly
-  created files on NTFS, unlike in almost every other major filing system. You have to
-  explicitly "opt in" to extents-based storage.
+For various historical reasons, extents-based storage is disabled by default in newly
+created files on NTFS, unlike in almost every other major filing system. You have to
+explicitly "opt in" to extents-based storage.
 
-  As extents-based storage is nearly cost free on NTFS, LLFIO by default opts in to
-  extents-based storage for any empty file it creates. If you don't want this, you
-  can specify this flag to prevent that happening.
-  */
-  win_disable_sparse_file_creation = uint16_t(1U << 10U),
-  /*! Filesystems tend to be embarrassingly parallel for operations performed to different
-  inodes. Where LLFIO performs i/o to multiple inodes at a time, it will use OpenMP or
-  the Parallelism or Concurrency standard library extensions to usually complete the
-  operation in constant rather than linear time. If you don't want this default, you can
-  disable default using this flag.
-  */
-  disable_parallelism = uint16_t(1U << 11U),
-  /*! Microsoft Windows NTFS has the option, when creating a directory, to set whether
-  leafname lookup will be case sensitive. This is the only way of getting exact POSIX
-  semantics on Windows without resorting to editing the system registry, however it also
-  affects all code doing lookups within that directory, so we must default it to off.
-  */
-  win_create_case_sensitive_directory = uint16_t(1U << 12U),
+As extents-based storage is nearly cost free on NTFS, LLFIO by default opts in to
+extents-based storage for any empty file it creates. If you don't want this, you
+can specify this flag to prevent that happening.
+*/
+win_disable_sparse_file_creation = uint16_t(1U << 10U),
+/*! Filesystems tend to be embarrassingly parallel for operations performed to different
+inodes. Where LLFIO performs i/o to multiple inodes at a time, it will use OpenMP or
+the Parallelism or Concurrency standard library extensions to usually complete the
+operation in constant rather than linear time. If you don't want this default, you can
+disable default using this flag.
+*/
+disable_parallelism = uint16_t(1U << 11U),
+/*! Microsoft Windows NTFS has the option, when creating a directory, to set whether
+leafname lookup will be case sensitive. This is the only way of getting exact POSIX
+semantics on Windows without resorting to editing the system registry, however it also
+affects all code doing lookups within that directory, so we must default it to off.
+*/
+win_create_case_sensitive_directory = uint16_t(1U << 12U),
 
-  /*! Create the handle in a way where i/o upon it can be multiplexed with other i/o
-  on the same initiating thread of execution i.e. you can perform more than one read
-  concurrently, without using threads. The blocking operations `.read()` and `.write()`
-  may have to use a less efficient, but cancellable, blocking implementation for handles created
-  in this way. On Microsoft Windows, this creates handles with `OVERLAPPED` semantics.
-  On POSIX, this creates handles with nonblocking semantics for non-file handles such
-  as pipes and sockets, however for file, directory and symlink handles it does not set
-  nonblocking, as it is non-portable.
-  */
-  multiplexable = uint16_t(1U << 13U),
+/*! Create the handle in a way where i/o upon it can be multiplexed with other i/o
+on the same initiating thread of execution i.e. you can perform more than one read
+concurrently, without using threads. The blocking operations `.read()` and `.write()`
+may have to use a less efficient, but cancellable, blocking implementation for handles created
+in this way. On Microsoft Windows, this creates handles with `OVERLAPPED` semantics.
+On POSIX, this creates handles with nonblocking semantics for non-file handles such
+as pipes and sockets, however for file, directory and symlink handles it does not set
+nonblocking, as it is non-portable.
+*/
+multiplexable = uint16_t(1U << 13U),
 
-  // NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
+// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!
 
-  byte_lock_insanity = uint16_t(1U << 14U),  //!< Using insane POSIX byte range locks
-  anonymous_inode = uint16_t(1U << 15U)      //!< This is an inode created with no representation on the filing system
-  } QUICKCPPLIB_BITFIELD_END(flag)
+byte_lock_insanity = uint16_t(1U << 14U),  //!< Using insane POSIX byte range locks
+anonymous_inode = uint16_t(1U << 15U)      //!< This is an inode created with no representation on the filing system
+} QUICKCPPLIB_BITFIELD_END(flag)
 
-protected:
-  // vptr takes 4 or 8 bytes
-  union
+protected :
+    // vptr takes 4 or 8 bytes
+    union
   {
     native_handle_type _v;  // +12 or +16: total 16 or 24 bytes
     struct
@@ -419,6 +419,7 @@ public:
   native_handle_type native_handle() const noexcept { return _v; }
 };
 static_assert((sizeof(void *) == 4 && sizeof(handle) == 16) || (sizeof(void *) == 8 && sizeof(handle) == 24), "handle is not 16 or 24 bytes in size!");
+static_assert((sizeof(void *) == 4 && alignof(handle) == 4) || (sizeof(void *) == 8 && alignof(handle) == 8), "handle is not aligned to 4 or 8 bytes!");
 
 #pragma pack(pop)
 
@@ -562,7 +563,7 @@ namespace detail
 #pragma warning(push)
 #pragma warning(disable : 4996)  // the function may be unsafe
 #endif
-#if(__GNUC__ >= 8) && !defined(__clang__)
+#if (__GNUC__ >= 8) && !defined(__clang__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstringop-overflow"
 #endif
@@ -571,7 +572,7 @@ namespace detail
           // See https://godbolt.org/z/d69xzd for proof.
           // So I don't know why there is a warning here about overflowing a buffer of 16!
           strncpy(tls.next(dest._tls_path_id1), QUICKCPPLIB_NAMESPACE::ringbuffer_log::last190(currentpath), 190);
-#if(__GNUC__ >= 8) && !defined(__clang__)
+#if (__GNUC__ >= 8) && !defined(__clang__)
 #pragma GCC diagnostic pop
 #endif
 #ifdef _MSC_VER
